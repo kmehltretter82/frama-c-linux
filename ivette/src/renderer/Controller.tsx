@@ -92,7 +92,7 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 
 Dome.onCommand((argv: string[], cwd: string) => {
   const cfg = buildServerConfig(argv, cwd);
-  Server.configure(cfg);
+  Server.setConfig(cfg);
   Server.start();
 });
 
@@ -196,7 +196,7 @@ const RenderConsole = () => {
     setHistory(hst);
     setCursor(-1);
     editor.clear();
-    Server.configure(cfg);
+    Server.setConfig(cfg);
     Server.restart();
   };
 

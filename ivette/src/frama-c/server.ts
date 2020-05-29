@@ -3,10 +3,9 @@
 // --------------------------------------------------------------------------
 
 /**
-   @packageDocumentation
-   @module frama-c/server
-   @description
-   Manage the current Frama-C server/client interface
+ * Manage the current Frama-C server/client interface
+ * @packageDocumentation
+ * @module frama-c/server
 */
 
 import _ from 'lodash';
@@ -31,50 +30,38 @@ class PP {
 // --------------------------------------------------------------------------
 
 /**
- *  @event
- *  @name 'frama-c.server.status'
- *  @summary Server Status Notification Event
- *  @description
+ *  Server Status Notification Event.
+
  *  This event is emitted whenever the server status changes.
  */
 const STATUS = 'frama-c.server.status';
 
 /**
- *  @event
- *  @name 'frama-c.server.ready'
- *  @summary Server is actually started and running.
- *  @description
+ *  Server is actually started and running.
+
  *  This event is emitted when ther server _enters_ the `ON` state.
- *  It is now ready to handle requests.
+ *  The server is now ready to handle requests.
  */
 const READY = 'frama-c.server.ready';
 
 /**
- *  @event
- *  @name 'frama-c.server.shutdown'
- *  @summary Server Status Notification Event
- *  @description
+ *  Server Status Notification Event
+
  *  This event is emitted when ther server _leaves_ the `ON` state.
- *  It is no more able to handle requests until re-start.
+ *  The server is no more able to handle requests until restart.
  */
 const SHUTDOWN = 'frama-c.server.shutdown';
 
 /**
- *  @event
- *  @name 'frama-c.server.signal.*'
- *  @summary Server Signal Prefix
- *  @description
+ *  Server Signal Prefix
+
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
  */
 const SIGNAL = 'frama-c.server.signal.';
 
 /**
- *  @event
- *  @name 'frama-c.server.activity.*'
- *  @summary Server Signal Activity Prefix
- *  @param {boolean} active - whether the server is listening or not to the
- *  signal.
- *  @description
+ *  Server Signal Activity Prefix
+
  *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
  */
 const ACTIVITY = 'frama-c.server.activity.';
@@ -174,6 +161,7 @@ let zmqIsBusy = false;
 // --- Server Console
 // --------------------------------------------------------------------------
 
+/** The server console buffer. */
 export const buffer = new RichTextBuffer({ maxlines: 200 });
 
 // --------------------------------------------------------------------------
@@ -181,54 +169,50 @@ export const buffer = new RichTextBuffer({ maxlines: 200 });
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Current Server Status.
- *  @return {Status} the current server status
- *  @description
- *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
+ *  Current server status.
+ *  @return {Status} The current server status.
  */
-export function getStatus() { return status; }
+export function getStatus(): Status { return status; }
 
 /**
- *  @summary Hook on current server (Custom React Hook).
- *  @return {Status} the current server status
- *  @description
- *  See [STATUS](module-frama-c_server.html#~STATUS) code definitions.
+ *  Hook on current server (Custom React Hook).
+ *  @return {Status} The current server status.
  */
-export function useStatus() {
+export function useStatus(): Status {
   Dome.useUpdate(STATUS);
   return status;
 }
 
 /**
- *  @summary Frama-C Server is running and ready to handle requests.
- *  @return {boolean} Whether status is `ON`.
+ *  Whether the server is running and ready to handle requests.
+ *  @return {boolean} Whether server stage is [[ON]].
  */
-export function isRunning() { return status.stage === Stage.ON; }
+export function isRunning(): boolean { return status.stage === Stage.ON; }
 
 /**
- *  @summary Number of requests still pending.
- *  @return {number} pending requests
+ *  Number of requests still pending.
+ *  @return {number} Pending requests.
  */
 export function getPending(): number {
   return _.reduce(pending, (n) => n + 1, 0);
 }
 
 /**
- *  @summary Register callback on READY event.
- *  @param {function} callback - invoked when the server enters `ON` status
+ *  Register callback on `READY` event.
+ *  @param {function} callback Invoked when the server enters [[ON]] stage.
  */
 export function onReady(callback: any) { Dome.on(READY, callback); }
 
 /**
- *  @summary Register callback on SHUTDOWN event.
- *  @param {function} callback - invoked when the server enters SHUTDOWN status
+ *  Register callback on `SHUTDOWN` event.
+ *  @param {function} callback Invoked when the server leaves [[ON]] stage.
  */
 export function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
 
 /**
- *  @summary Register callback on Signal ACTIVITY event.
- *  @*param {string} id - the signal event to listen to
- *  @*param {function} callback - invoked with `callback(signal,active)`
+ *  Register callback on a signal `ACTIVITY` event.
+ *  @param {string} id The signal identifier to listen to.
+ *  @param {function} callback Invoked with `callback(signal, active)`.
  */
 export function onActivity(signal: string, callback: any) {
   Dome.on(ACTIVITY + signal, callback);
@@ -257,11 +241,11 @@ function _status(newStatus: Status) {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Start the Server.
- *  @description
- *  If the server is started or running, this is a no-op.
- *  If the server is being shutdown, it will reboot.
- *  Otherwise, the Frama-C Server is spawned.
+ *  Start the server.
+ *
+ *  - If the server is either started or running, this is a no-op.
+ *  - If the server is halting, it will restart.
+ *  - Otherwise, the Frama-C server is spawned.
  */
 export async function start() {
   switch (status.stage) {
@@ -291,12 +275,12 @@ export async function start() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Stop the Server.
- *  @description
- *  If the server is starting, it is hard killed.
- *  If the server is running, it is shutdown gracefully.
- *  When the server is shutting down, restart is canceled.
- *  Otherwise, this is a no-op.
+ *  Stop the server.
+ *
+ *  - If the server is starting, it is hard killed.
+ *  - If the server is running, it is shutdown gracefully.
+ *  - If the server is restarting, restart is canceled.
+ *  - Otherwise, this is a no-op.
  */
 export function stop() {
   switch (status.stage) {
@@ -321,14 +305,11 @@ export function stop() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Terminate the Server.
- *  @description
- *  If the server is starting or running or shutting down,
- *  it is hard killed and restart is canceled.
- *  Otherwize, this is no-op.
+ *  Terminate the server.
  *
- *  This function is automatically called when the `module` emits the `KILL`
- *  signal.
+ *  - If the server is either starting, running or shutting down,
+ *  it is hard killed and restart is canceled.
+ *  - Otherwise, this is a no-op.
  */
 export function kill() {
   switch (status.stage) {
@@ -349,11 +330,12 @@ export function kill() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Re-start the Server.
- *  @description
- *  If paused, simply start the Server.
- *  When running, try to gracefully shutdown the Server,
+ *  Restart the server.
+ *
+ *  - If the server is either off or paused on failure, simply start the server.
+ *  - If the server is running, try to gracefully shutdown the server,
  *  and finally schedule a reboot on exit.
+ *  - Otherwise, this is a no-op.
  */
 export function restart() {
   switch (status.stage) {
@@ -378,10 +360,11 @@ export function restart() {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Acknowledge `FAILURE` status.
- *  @description
- *  When not running, clear the console and reset any error flag.
- *  Otherwised, do nothing.
+ *  Acknowledge the [[OFF]] or [[FAILURE]] stages.
+ *
+ *  - If the server is either off or paused on failure,
+ *  clear the console and set server stage to [[OFF]].
+ *  - Otherwise, this is a no-op.
  */
 export function clear() {
   switch (status.stage) {
@@ -429,18 +412,16 @@ export interface Configuration {
 let config: Configuration = { command: 'frama-c', params: [] };
 
 /**
- *  @summary Configure the Server.
- *  @param {Configuration} sc - Server Configuration
+ *  Set the current server configuration.
+ *  @param {Configuration} sc Server configuration.
  */
-export function configure(sc: Configuration) {
+export function setConfig(sc: Configuration) {
   config = { ...sc };
 }
 
 /**
- *  @summary Configure the Server.
- *  @return {object} server configuration
- *  @description
- *  See `configure()` method.
+ *  Get the current server configuration.
+ *  @return {Configuration} Current server configuration.
  */
 export function getConfig(): Configuration {
   return config;
@@ -669,6 +650,7 @@ class Signal {
 // --- Memo
 
 const signals: Map<string, Signal> = new Map();
+
 function _signal(id: any) {
   let s = signals.get(id);
   if (!s) {
@@ -681,33 +663,33 @@ function _signal(id: any) {
 // --- External API
 
 /**
- *  @summary Register a Signal callback.
- *  @param {string} id - the signal event to listen to
- *  @param {function} callback - the callback to call on received signal
- *  @description
+ *  Register a callback for a signal.
+ *
  *  If the server is not yet listening to this signal, a `SIGON` command is
- *  sent.
+ *  sent to the Frama-C server.
+ *  @param {string} id The signal identifier to listen to.
+ *  @param {function} callback The callback to call upon signal.
  */
 export function onSignal(id: string, callback: any) {
   _signal(id).on(callback);
 }
 
 /**
- *  @summary Un-register a Signal callback.
- *  @param {string} id - the signal event that was listen to
- *  @param {function} callback - the callback to remove
- *  @description
+ *  Unregister a callback of a signal.
+ *
  *  When no more callbacks are listening to this signal for a while,
- *  the server will be notified with a `SIGOFF` command.
+ *  the Frama-C server will be notified with a `SIGOFF` command.
+ *  @param {string} id The signal identifier that was listen to.
+ *  @param {function} callback The callback to remove.
  */
 export function offSignal(id: string, callback: any) {
   _signal(id).off(callback);
 }
 
 /**
- *  @summary Hook on Signal (Custom React Hook).
- *  @param {string} id - the signal event to listen to
- *  @param {function} callback - the callback to be called on signal
+ *  Hook on a signal (Custom React Hook).
+ *  @param {string} id The signal identifier to listen to.
+ *  @param {function} callback The callback to call upon signal.
  */
 export function useSignal(id: string, callback: any) {
   React.useEffect(() => {
@@ -735,71 +717,60 @@ Dome.on(SHUTDOWN, () => {
 // --- REQUEST Management
 // --------------------------------------------------------------------------
 
-/**
- *  @typedef RqKind
- *  @summary Request kind.
- *  @description
- *   - `R_GET` Used to read data from the server
- *   - `R_SET` Used to write data into the server
- *   - `R_EXEC` Used to make the server execute a task
- */
-export enum RqKind {
+/** Request kind. */
+enum RqKind {
+  /** Used to read data from the Frama-C server. */
   R_GET = 'GET',
+  /** Used to write data into the Frama-C server. */
   R_SET = 'SET',
+  /** Used to make the Frama-C server execute a task. */
   R_EXEC = 'EXEC'
 }
 
-/**
- * @typedef Request
- * @summary Server request.
- * @param {string} endpoint - the request identifier
- * @param {any} params - the request parameters
- */
+/** Server request. */
 export interface Request {
+  /** The request identifier on the Frama-C server. */
   endpoint: string;
+  /** The request parameters. */
   params: any;
 }
 
 /**
- * @summary Get data from the server.
- * @param sr - the server request description.
+ * Read data from the Frama-C server.
+ * @param {Request} sr
  */
 export async function GET(sr: Request) {
-  return send(RqKind.R_GET, sr.endpoint, sr.params);
+  return send(RqKind.R_GET, sr);
 }
 
 /**
- * @summary Set data into the server.
- * @param sr - the server request description.
+ * Write data into the Frama-C server.
+ * @param {Request} sr
  */
 export async function SET(sr: Request) {
-  return send(RqKind.R_SET, sr.endpoint, sr.params);
+  return send(RqKind.R_SET, sr);
 }
 
 /**
- * @summary Make the server execute a task.
- * @param sr - the server request description.
+ * Make the Frama-C server execute a task.
+ * @param {Request} sr
  */
 export async function EXEC(sr: Request) {
-  return send(RqKind.R_EXEC, sr.endpoint, sr.params);
+  return send(RqKind.R_EXEC, sr);
 }
 
 /**
- *  @summary Send a request to the server.
- *  @param {RqKind} kind - the request kind
- *  @param {string} rq - the request identifier
- *  @param {object} params - request parameters
- *  @return {Promise<object>} the promised request results
- *  @description
+ *  Send a request to the server.
+ *
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-function send(kind: RqKind, rq: string, params: any) {
+function send(kind: RqKind, request: Request) {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
-  if (!rq) return Promise.reject(new Error('Undefined request'));
+  if (!request.endpoint) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
-  const data = JSON.stringify(params);
+  const data = JSON.stringify(request.params);
   const promise: any = new Promise((resolve, reject) => {
     pending[rid] = [resolve, reject];
   });
@@ -809,7 +780,7 @@ function send(kind: RqKind, rq: string, params: any) {
       _flush();
     }
   };
-  queueCmd.push(kind, rid, rq, data);
+  queueCmd.push(kind, rid, request.endpoint, data);
   queueId.push(rid);
   _flush();
   return promise;
