@@ -50,15 +50,19 @@ plugin_use(wp,gui)
 ######################
 
 configure_pkg(why3,[package why3 not found])
-plugin_require_external(wp,why3)
 
+plugin_require_pkg(wp,why3)
+
+check_plugin_dependencies
+
+if test "$HAS_OCAML_WHY3" = "yes"; then
+AC_MSG_CHECKING(why3 version)
 WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
-if test "$WHY3VERSION" == "" ;
-then
-  plugin_disable(wp,[why3 not found])
-else
-  AC_MSG_CHECKING(why3 version)
-  case $WHY3VERSION in
+case $WHY3VERSION in
+      "")
+        AC_MSG_RESULT([not found!])
+        plugin_disable(wp,[why3 not found])
+        ;;
       0.* | 1.[[012]].* | 1.3.0)
         AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
         plugin_disable(wp,[non-supported why3 $WHY3VERSION])
@@ -69,7 +73,7 @@ else
       *)
         AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.1+)])
         ;;
-  esac
+esac
 fi
 
 # Nb: this would deserve to use plugin_requires mechanism
