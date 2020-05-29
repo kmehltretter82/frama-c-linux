@@ -198,7 +198,7 @@ export class MapModel<Key, Row>
 
   /** Trigger a complete reload of the table. */
   reload() {
-    if (!this.table || !this.order) {
+    if (this.table || this.order) {
       this.table = undefined;
       this.order = undefined;
       super.reload();

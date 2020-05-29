@@ -8,6 +8,8 @@
  */
 
 import React from 'react';
+import { debounce } from 'lodash';
+import isEqual from 'react-fast-compare';
 //import * as Dome from 'dome';
 import { Trigger, Client, Sorting, Fetching, Model } from './models';
 //import { DraggableCore, DraggableEventHandler } from 'react-draggable';
@@ -31,7 +33,7 @@ const SVG = SVGraw as (props: { id: string, size?: number }) => JSX.Element;
 // --- Rendering Interfaces
 // --------------------------------------------------------------------------
 
-export type Renderer<D> = (data: D) => null | JSX.Element;
+export type Renderer<D> = (data?: D) => null | JSX.Element;
 export type RenderByFields<Row> = {
   [fd in keyof Row]?: Renderer<Row[fd]>;
 };
@@ -148,7 +150,7 @@ type Cprops = ColProps<any>;
 type ColProps<R> = ColumnProps<R, any>;
 
 const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
-  const defaultVisible = col.visible;
+  const defaultVisible = col.visible ?? true;
   switch (defaultVisible) {
     case 'never': return false;
     case 'always': return false;
@@ -179,11 +181,14 @@ class TableState<Row> {
   fetching?: Fetching<Row>; // Last user proxy used for computing getter
   sorting?: Sorting; // Last user proxy used for sorting
   client?: Client; // Client of last fetching
+  columns: ColProps<Row>[] = []; // Currently known columns
 
   constructor() {
     this.reload = this.reload.bind(this);
     this.update = this.update.bind(this);
+    this.watchRange = this.watchRange.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
+    this.rebuild = debounce(this.rebuild.bind(this), 50);
     this.rowGetter = makeGetter();
   }
 
@@ -191,7 +196,10 @@ class TableState<Row> {
 
   reload() {
     const s = this.signal;
-    if (s) { this.signal = undefined; s(); }
+    if (s) {
+      this.signal = undefined; s();
+      this.update();
+    }
   }
 
   update() {
@@ -252,15 +260,11 @@ class TableState<Row> {
 
   // --- User Column Registry
 
-  private registered?: ColProps<Row>[];
   private registry = new Map<string, null | ColProps<Row>>();
 
   setRegistry(id: string, props: null | ColProps<Row>) {
     this.registry.set(id, props);
-    this.registered = undefined;
-    this.getter.delete(id);
-    this.render.delete(id);
-    this.reload();
+    this.rebuild();
   }
 
   useColumn(props: ColProps<Row>): Trigger {
@@ -269,14 +273,17 @@ class TableState<Row> {
     return () => this.setRegistry(id, null);
   }
 
-  getRegistry() {
-    let current = this.registered;
-    if (current) return current;
+  rebuild() {
+    const current = this.columns;
     const cols: ColProps<Row>[] = [];
     this.registry.forEach((col) => col && cols.push(col));
-    return cols;
+    if (!isEqual(current, cols)) {
+      this.getter.clear();
+      this.render.clear();
+      this.columns = cols;
+      this.reload();
+    }
   }
-
 }
 
 // --------------------------------------------------------------------------
@@ -370,7 +377,7 @@ function makeColumns<Row>(state: TableState<Row>) {
   const cols: Cprops[] = [];
   let hasFill = false;
   let lastExt: undefined | Cprops;
-  state.getRegistry().forEach((col) => {
+  state.columns.forEach((col) => {
     if (col && isVisible(state.visible, col)) {
       cols.push(col);
       if (col.fill) hasFill = true;

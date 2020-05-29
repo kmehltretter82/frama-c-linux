@@ -15,7 +15,7 @@ import { Component } from 'frama-c/LabViews';
 // --------------------------------------------------------------------------
 
 export const renderCode: Renderer<string> =
-  (text: string) => <Code>{text}</Code>;
+  (text?: string) => text ? <Code>{text}</Code> : null;
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
@@ -24,7 +24,7 @@ function ColumnCode<Row>(props: ColumnProps<Row, string>) {
 interface Tag { name: string; label: string; descr: string }
 
 export const renderTag: Renderer<Tag> =
-  (d: Tag) => <Label label={d.label} title={d.descr} />;
+  (d?: Tag) => d ? <Label label={d.label} title={d.descr} /> : null;
 
 function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
   return <Column render={renderTag} {...props} />;
@@ -55,16 +55,19 @@ const RenderTable = () => {
     React.useMemo(() => new ArrayModel<Property>('key'), []);
   const items: { [key: string]: Property } =
     States.useSyncArray('kernel.properties');
-  const status: { [status: string]: Tag } =
+  const statusDict: { [status: string]: Tag } =
     States.useDictionary('kernel.dictionary.propstatus');
   const [select, setSelect] =
     States.useSelection();
+
   React.useEffect(() => {
-    model.replace(_.toArray(items));
+    const data = _.toArray(items);
+    model.replace(data);
   }, [model, items]);
 
   // Callbacks
-  const getStatus = ({ status: st }: Property) => status[st] || { label: st };
+  const getStatus =
+    ({ status: st }: Property) => (statusDict[st] ?? { label: st });
   const selection = select?.marker;
   const onSelection = ({ key, function: fct }: Property) => {
     setSelect({ marker: key, function: fct });
