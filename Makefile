@@ -259,6 +259,8 @@ DISTRIB_FILES:=\
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
+      share/analysis-scripts/eva-prefix.mk                              \
+      share/analysis-scripts/eva-suffix.mk                              \
       $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
@@ -1939,6 +1941,8 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
 	  share/analysis-scripts/creduce.sh \
+	  share/analysis-scripts/eva-prefix.mk \
+	  share/analysis-scripts/eva-suffix.mk \
 	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
