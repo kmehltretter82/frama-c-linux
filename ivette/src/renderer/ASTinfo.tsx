@@ -14,7 +14,7 @@ import { Component } from 'frama-c/LabViews';
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-const printInfo = (buffer: RichTextBuffer, text: string) => {
+const printInfo = (buffer: RichTextBuffer, text: string | string[]) => {
   if (Array.isArray(text)) {
     const tag = text.shift();
     if (tag !== '') {
@@ -24,7 +24,7 @@ const printInfo = (buffer: RichTextBuffer, text: string) => {
     if (tag !== '') {
       buffer.closeTextMarker();
     }
-  } else if (typeof (text) === 'string') {
+  } else {
     buffer.append(text);
   }
 };
