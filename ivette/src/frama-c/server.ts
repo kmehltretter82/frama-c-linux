@@ -153,20 +153,20 @@ let queueId: string[] = [];
 
 /** Polling timeout and timer. */
 const pollingTimeout = 50;
-let pollingTimer: NodeJS.Timeout | null = null;
+let pollingTimer: NodeJS.Timeout | undefined;
 
 /** Flushing timer. */
-let flushingTimer: NodeJS.Immediate | null = null;
+let flushingTimer: NodeJS.Immediate | undefined;
 
 /** Server process. */
-let process: ChildProcess | null = null;
+let process: ChildProcess | undefined;
 
 /** Killing timeout and timer for server process hard kill. */
 const killingTimeout = 300;
-let killingTimer: NodeJS.Timeout | null = null;
+let killingTimer: NodeJS.Timeout | undefined;
 
 /** ZMQ (REQ) socket. */
-let zmqSocket: ZmqRequest | null = null;
+let zmqSocket: ZmqRequest | undefined;
 /** Flag on whether ZMQ socket is busy. */
 let zmqIsBusy = false;
 
@@ -543,15 +543,15 @@ function _reset() {
   pending = {};
   if (flushingTimer) {
     clearImmediate(flushingTimer);
-    flushingTimer = null;
+    flushingTimer = undefined;
   }
   if (pollingTimer) {
     clearTimeout(pollingTimer);
-    pollingTimer = null;
+    pollingTimer = undefined;
   }
   if (killingTimer) {
     clearTimeout(killingTimer);
-    killingTimer = null;
+    killingTimer = undefined;
   }
 }
 
@@ -588,10 +588,10 @@ function _exit(error?: Error) {
   _reset();
   if (zmqSocket) {
     zmqSocket.close();
-    zmqSocket = null;
+    zmqSocket = undefined;
   }
   zmqIsBusy = false;
-  process = null;
+  process = undefined;
   if (status.stage === Stage.RESTARTING) {
     setImmediate(start);
   } else if (error) {
@@ -846,7 +846,7 @@ function _waiting() {
 function _flush() {
   if (!flushingTimer) {
     flushingTimer = setImmediate(() => {
-      flushingTimer = null;
+      flushingTimer = undefined;
       _send();
     });
   }
@@ -856,7 +856,7 @@ function _poll() {
   if (!pollingTimer) {
     const delay = (config && config.polling) || pollingTimeout;
     pollingTimer = setTimeout(() => {
-      pollingTimer = null;
+      pollingTimer = undefined;
       _send();
     }, delay);
   }

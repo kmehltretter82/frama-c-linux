@@ -46,7 +46,7 @@ class PP {
 // --- Synchronized Current Project
 // --------------------------------------------------------------------------
 
-let currentProject: string | null = null;
+let currentProject: string | undefined;
 let states: any = {};
 const stateDefaults: any = {};
 
@@ -107,12 +107,12 @@ export async function setProject(project: string) {
 // --- Projectified State
 // --------------------------------------------------------------------------
 
-function getValue(id: string, project: string | null) {
+function getValue(id: string, project?: string) {
   if (!project) return undefined;
   return _.get(states, [project, id], stateDefaults[id]);
 }
 
-function setValue(id: string, project: string | null, value: any) {
+function setValue(id: string, project: string | undefined, value: any) {
   if (!project) return;
   _.set(states, [project, id], value);
   Dome.emit(STATE + id, value);
