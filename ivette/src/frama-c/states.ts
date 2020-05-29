@@ -37,10 +37,7 @@ export const STATE = 'frama-c.state.';
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-class PP {
-  static warning(t: string) { console.warn(`[Frama-C States] ${t}.`); }
-  static error(t: string) { console.error(`[Frama-C States] ${t}.`); }
-}
+const PP = new Dome.PP('States');
 
 // --------------------------------------------------------------------------
 // --- Synchronized Current Project

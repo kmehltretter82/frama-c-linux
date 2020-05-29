@@ -20,10 +20,7 @@ import { ChildProcess } from 'child_process';
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-class PP {
-  static warning(t: string) { console.warn(`[Frama-C Server] ${t}.`); }
-  static error(t: string) { console.error(`[Frama-C Server] ${t}.`); }
-}
+const PP = new Dome.PP('Server');
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -485,7 +482,7 @@ async function _launch() {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    PP.warning('Process exited');
+    PP.log('Process exited');
 
     if (signal) {
       // [signal] is non-null.
@@ -515,7 +512,7 @@ async function _launch() {
 // --------------------------------------------------------------------------
 
 function _reset() {
-  PP.warning('Reset to initial configuration');
+  PP.log('Reset to initial configuration');
 
   rqCount = 0;
   queueCmd = [];
@@ -537,7 +534,7 @@ function _reset() {
 }
 
 function _kill() {
-  PP.warning('Hard kill');
+  PP.log('Hard kill');
 
   _reset();
   if (process) {
@@ -546,7 +543,7 @@ function _kill() {
 }
 
 async function _shutdown() {
-  PP.warning('Shutdown');
+  PP.log('Shutdown');
 
   _reset();
   queueCmd.push('SHUTDOWN');

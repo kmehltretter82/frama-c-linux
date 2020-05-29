@@ -27,10 +27,7 @@ const THEMES = [
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-class PP {
-  static warning(t: string) { console.warn(`[AST View] ${t}.`); }
-  static error(t: string) { console.error(`[AST View] ${t}.`); }
-}
+const PP = new Dome.PP('AST View');
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
