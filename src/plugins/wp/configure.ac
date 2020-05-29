@@ -48,13 +48,6 @@ plugin_use(wp,gui)
 
 # Why3 API dependency
 ######################
-# REQUIRE_LIBRARY: library *must* be present in order to build plugins
-# USE_LIBRARY: better for plugins if library is present, but not required
-# HAS_LIBRARY: is the library available?
-
-REQUIRE_WHY3=
-USE_WHY3=
-HAS_WHY3=
 
 configure_pkg(why3,[package why3 not found])
 
@@ -79,12 +72,11 @@ esac
 
 plugin_require_external(wp,why3)
 
-AC_SUBST(HAS_WHY3)
-
-
 check_plugin_dependencies
 
-# NB: this would deserve to use plugin_requires mechanism
+AC_SUBST(HAS_WHY3)
+
+# Nb: this would deserve to use plugin_requires mechanism
 if test "$ENABLE_WP" != "no"; then
 
   ## Configuring for WP-COQ
