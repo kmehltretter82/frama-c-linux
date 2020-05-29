@@ -61,6 +61,10 @@ configure_pkg(why3,[package why3 not found])
 AC_MSG_CHECKING(why3 version)
 WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
 case $WHY3VERSION in
+      "")
+        AC_MSG_RESULT([not found!])
+        plugin_disable(wp,[why3 not found])
+        ;;
       0.* | 1.[[012]].* | 1.3.0)
         AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
         plugin_disable(wp,[non-supported why3 $WHY3VERSION])
@@ -69,7 +73,7 @@ case $WHY3VERSION in
         AC_MSG_RESULT([found $WHY3VERSION: ok])
         ;;
       *)
-        AC_MSG_RESULT([found $WHY3VERSION: should work but prefer 1.3.x])
+        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.1+)])
         ;;
 esac
 
