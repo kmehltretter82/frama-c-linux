@@ -65,35 +65,24 @@ value c_trunc(value d)
   return caml_copy_double(trunc(Double_val(d)));
 }
 
-/* NOTE: The single-precision functions below (expf, logf, etc.) need the
-   'volatile' modifier due to odd behaviors detected in Ubuntu 12.04
-   (precise32), with gcc 4.6.3 and glibc 2.15.
-   In those machines, the absence of volatile leads gcc to optimize the
-   call to a double-precision result and, despite the use of 'float' and
-   casts (which should force the result to be truncated to 32 bits),
-   the 64-bit result is propagated back to OCaml, leading to non-zero bits
-   beyond the 32-bit range, which cause FRange.check_representability to fail,
-   leading to errors in tests/float/math_builtins.c.
-   This behavior has not been observed in more recent distributions. */
-
 value c_expf(value d)
 {
   float f = Double_val(d);
-  volatile float res = expf(f); // see remarks above
+  float res = expf(f);
   return caml_copy_double(res);
 }
 
 value c_logf(value d)
 {
   float f = Double_val(d);
-  volatile float res = logf(f); // see remarks above
+  float res = logf(f);
   return caml_copy_double(res);
 }
 
 value c_log10f(value d)
 {
   float f = Double_val(d);
-  volatile float res = log10f(f); // see remarks above
+  float res = log10f(f);
   return caml_copy_double(res);
 }
 
@@ -101,14 +90,14 @@ value c_powf(value x, value y)
 {
   float fx = Double_val(x);
   float fy = Double_val(y);
-  volatile float res = powf(fx, fy); // see remarks above
+  float res = powf(fx, fy);
   return caml_copy_double(res);
 }
 
 value c_sqrtf(value d)
 {
   float f = Double_val(d);
-  volatile float res = sqrtf(f); // see remarks above
+  float res = sqrtf(f);
   return caml_copy_double(res);
 }
 
@@ -116,42 +105,42 @@ value c_fmodf(value x, value y)
 {
   float fx = Double_val(x);
   float fy = Double_val(y);
-  volatile float res = fmodf(fx, fy); // see remarks above
+  float res = fmodf(fx, fy);
   return caml_copy_double(res);
 }
 
 value c_cosf(value x)
 {
   float f = Double_val(x);
-  volatile float res = cosf(f); // see remarks above
+  float res = cosf(f);
   return caml_copy_double(res);
 }
 
 value c_sinf(value x)
 {
   float f = Double_val(x);
-  volatile float res = sinf(f); // see remarks above
+  float res = sinf(f);
   return caml_copy_double(res);
 }
 
 value c_acosf(value x)
 {
   float f = Double_val(x);
-  volatile float res = acosf(f); // see remarks above
+  float res = acosf(f);
   return caml_copy_double(res);
 }
 
 value c_asinf(value x)
 {
   float f = Double_val(x);
-  volatile float res = asinf(f); // see remarks above
+  float res = asinf(f);
   return caml_copy_double(res);
 }
 
 value c_atanf(value x)
 {
   float f = Double_val(x);
-  volatile float res = atanf(f); // see remarks above
+  float res = atanf(f);
   return caml_copy_double(res);
 }
 
@@ -159,7 +148,7 @@ value c_atan2f(value x, value y)
 {
   float fx = Double_val(x);
   float fy = Double_val(y);
-  volatile float res = atan2f(fx, fy); // see remarks above
+  float res = atan2f(fx, fy);
   return caml_copy_double(res);
 }
 
