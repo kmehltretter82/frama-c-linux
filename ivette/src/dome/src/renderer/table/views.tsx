@@ -8,9 +8,9 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome';
+//import * as Dome from 'dome';
 import { Trigger, Client, Sorting, Fetching, Model } from './models';
-import { DraggableCore, DraggableEventHandler } from 'react-draggable';
+//import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { SVG as SVGraw } from 'dome/controls/icons';
 import {
   AutoSizer, Size,
@@ -114,8 +114,8 @@ export interface TableProps<Key, Row> {
   settings?: string;
   /** Selected row (identified by key). */
   selection?: Key;
-  /** Selection callback (identified by key). */
-  onSelection?: (selected?: Key) => void;
+  /** Selection callback. */
+  onSelection?: (row: Row, key: Key, index: number) => void;
   /** Ensures the item is visible (if displayed at all). */
   scrollTo?: Key;
   /** Fallback for rendering an empty table. */
@@ -212,14 +212,14 @@ class TableState<Row> {
 
   // --- User Table properties
 
-  setSorting(sorting: Sorting) {
+  setSorting(sorting?: Sorting) {
     if (sorting !== this.sorting) {
       this.sorting = sorting;
       this.reload();
     }
   }
 
-  setFetching(fetching: Fetching<Row>) {
+  setFetching(fetching?: Fetching<Row>) {
     if (fetching !== this.fetching) {
       this.client?.unlink();
       this.fetching = fetching;
@@ -236,7 +236,7 @@ class TableState<Row> {
     }
   }
 
-  setRendering(fields: RenderByFields<Row>) {
+  setRendering(fields?: RenderByFields<Row>) {
     if (fields !== this.fields) {
       this.fields = fields;
       this.render.clear();
@@ -383,7 +383,7 @@ function makeColumns<Row>(state: TableState<Row>) {
 }
 
 // --------------------------------------------------------------------------
-// --- Header Renderer
+// --- Table Utility Renderers
 // --------------------------------------------------------------------------
 
 const headerIcon = (icon?: string) => (
@@ -443,51 +443,11 @@ function headerRenderer(props: TableHeaderProps) {
   );
 }
 
-// --------------------------------------------------------------------------
-// --- Table Rows
-// --------------------------------------------------------------------------
-
 const rowClassName =
   (selected?: number) =>
     ({ index }: { index: number }) =>
       (selected === index ? 'dome-color-selected' :
         (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'));
-
-// --------------------------------------------------------------------------
-// --- Column Resizer
-// --------------------------------------------------------------------------
-
-const DRAGGING = 'dome-xTable-resizer dome-color-dragging';
-const DRAGZONE = 'dome-xTable-resizer dome-color-dragzone';
-
-interface ResizerProps {
-  id: number;
-  dragging: undefined | number;
-  left: string; // resized column-id on the left
-  right: string; // resized column-id on the right
-  offset: number; // drag-start offset
-  onStart: DraggableEventHandler;
-  onStop: DraggableEventHandler;
-  onDrag: (left: string, right: string, offset: number) => void;
-}
-
-const Resizer = (props: ResizerProps) => (
-  <DraggableCore
-    onStart={props.onStart}
-    onStop={props.onStop}
-    onDrag={(_elt, data) => props.onDrag(props.left, props.right, data.x - props.offset)}
-  >
-    <div
-      className={props.id === props.dragging ? DRAGGING : DRAGZONE}
-      style={{ left: props.offset - 2 }}
-    />
-  </DraggableCore>
-);
-
-const computeWidth = (elt: Element) => {
-  const parent = elt && elt.parentElement;
-  return parent && parent.getBoundingClientRect().width;
-};
 
 // --------------------------------------------------------------------------
 // --- Virtualized Table View
@@ -510,7 +470,6 @@ function makeTable<Key, Row>(
   const rowCount = (smallHeight ? itemCount + 1 : itemCount);
   const selection = props.selection;
   const selected = selection && model.getIndexOf(selection);
-  const resizers = null; // this.computeResizers(columns);
   const columns = makeColumns(state);
   return (
     <React.Fragment>
@@ -528,18 +487,93 @@ function makeTable<Key, Row>(
         headerHeight={CSS_HEADER_HEIGHT}
         headerRowRenderer={headerRowRenderer}
         onRowsRendered={state.watchRange}
-        onRowClick={onSelection && this.selectRow}
-        sortBy={ordering && ordering.sortBy}
-        sortDirection={ordering && ordering.sortDirection}
-        sort={model.setOrdering.bind(model)}
-        scrollToIndex={scrollToIndex}
+        onRowClick={undefined}
+        sortBy={undefined}
+        sortDirection={undefined}
+        sort={undefined}
+        scrollToIndex={undefined}
         scrollToAlignment='auto'
       >
         {columns}
       </VTable>
-      {resizers}
+      {/*resizers*/null}
     </React.Fragment>
   );
 };
+
+// --------------------------------------------------------------------------
+// --- Table View
+// --------------------------------------------------------------------------
+
+/**
+   Table View.
+
+   This component is base on [React-Virtualized
+   Tables](https://bvaughn.github.io/react-virtualized/#/components/Table),
+   offering a lazy, super-optimized rendering process that scales on huge
+   datasets.
+
+   A table shall be connected to an instance of
+   [[Model]] class to retrieve the data and
+   get informed of data updates.
+
+   The table columns shall be instances of
+   [[Column]] class.
+
+   Clicking on table headers trigger re-ordering callback on the model with the
+   expected column and direction, unless disabled _via_ the column
+   x   specification. However, actual sorting (and corresponding feedback on table
+   headers) would only take place if the model supports re-ordering and
+   eventually triggers a reload.
+
+   Right-clicking the table headers displays a popup-menu with actions to reset natural ordering,
+   reset column widths and select column visibility.
+
+   Tables do not control item selection state. Instead, you shall supply the selection
+   state and callback _via_ properties, like any other controlled React components.
+
+   Item selection can be based either on single-row or multiple-row. In case of
+   single-row selection (`multipleSelection:false`, the default), selection state
+   must be a single item or `undefined`, and the `onSelection` callback is called
+   with the same type of values.
+
+   In case of multiple-row selection (`multipleSelection:true`), the selection state
+   shall be an _array_ of items, and `onSelection` callback also. Single items are _not_
+   accepted, but `undefined` selection can be used in place of an empty array.
+
+   Clicking on a row triggers the `onSelection` callback with the updated selection.
+   In single-selection mode, the clicked item is sent to the callback. In
+   multiple-selection mode, key modifiers are taken into account for determining the new
+   slection. By default, the new selection only contains the clicked item. If the `Shift`
+   modifier has been pressed, the current selection is extended with a range of items
+   from the last selected one, to the newly selected one. If the `CtrlOrCmd` modifier
+   has been pressed, the selection is extended with the newly clicked item.
+   Clicking an already selected item with the `CtrlOrCmd` modifier removes it from
+   the current selection.
+
+ */
+
+export function Table<Key, Row>(props: TableProps<Key, Row>) {
+
+  const state = React.useMemo(() => new TableState<Row>(), []);
+  const [age, setAge] = React.useState(0);
+  React.useEffect(() => {
+    state.signal = () => setAge(age + 1);
+    state.setFetching(props.model);
+    state.setSorting(props.sorting);
+    state.setRendering(props.rendering);
+  });
+
+  return (
+    <div className='dome-xTable'>
+      <ColumnContext.Provider value={state}>
+        {props.children}
+      </ColumnContext.Provider>
+      <AutoSizer key='table'>
+        {(size: Size) => makeTable(size, props, state)}
+      </AutoSizer>
+    </div>
+  );
+}
 
 // --------------------------------------------------------------------------
