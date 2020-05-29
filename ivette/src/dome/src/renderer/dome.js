@@ -953,3 +953,16 @@ export function useClock(period,initStart)
 }
 
 // --------------------------------------------------------------------------
+// --- Pretty Printing (Browser Console)
+// --------------------------------------------------------------------------
+
+export class PP {
+  constructor(moduleName) {
+    this.moduleName = moduleName;
+  }
+  log(t) { console.log(`[${this.moduleName}] ${t}.`); }
+  warning(t) { console.warn(`[${this.moduleName}] ${t}.`); }
+  error(t) { console.error(`[${this.moduleName}] ${t}.`); }
+}
+
+// --------------------------------------------------------------------------
