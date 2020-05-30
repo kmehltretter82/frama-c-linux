@@ -5,6 +5,7 @@
 import _ from 'lodash';
 import React from 'react';
 import * as States from 'frama-c/states';
+import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
 import { ArrayModel } from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
@@ -44,15 +45,34 @@ interface Property {
   descr: string;
   kind: string;
   status: string;
-  function: string;
+  function?: string;
   kinstr: string;
   source: SourceLoc;
 }
 
+const bySource =
+  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.primitive });
+
+const byProperty =
+  Compare.byFields<Property>({
+    function: Compare.option(Compare.alpha),
+    source: bySource,
+    kind: Compare.primitive,
+    status: Compare.primitive,
+    kinstr: Compare.primitive,
+    key: Compare.primitive,
+  });
+
+class PropertyModel extends ArrayModel<Property> {
+  constructor() {
+    super('key');
+    this.setNaturalOrder(byProperty);
+  }
+}
+
 const RenderTable = () => {
   // Hooks
-  const model =
-    React.useMemo(() => new ArrayModel<Property>('key'), []);
+  const model = React.useMemo(() => new PropertyModel(), []);
   const items: { [key: string]: Property } =
     States.useSyncArray('kernel.properties');
   const statusDict: { [status: string]: Tag } =
@@ -69,12 +89,14 @@ const RenderTable = () => {
 
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
-    [statusDict]);
+    [statusDict],
+  );
 
   const onSelection = React.useCallback(
     ({ key, function: fct }: Property) => {
       setSelect({ marker: key, function: fct });
-    }, [setSelect]);
+    }, [setSelect],
+  );
 
   const selection = select?.marker;
 

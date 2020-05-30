@@ -269,7 +269,6 @@ class TableState<Key, Row> {
     const model = this.model;
     const key = (data !== undefined) ? model?.getKeyFor(index, data) : undefined;
     const onSelection = this.onSelection;
-    console.log('CLICK', index, key, data);
     if (key !== undefined && data !== undefined && onSelection)
       onSelection(data, key, index);
   }
