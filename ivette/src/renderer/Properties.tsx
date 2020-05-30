@@ -55,7 +55,7 @@ const bySource =
 
 const byProperty =
   Compare.byFields<Property>({
-    function: Compare.option(Compare.alpha),
+    function: Compare.defined(Compare.alpha),
     source: bySource,
     kind: Compare.primitive,
     status: Compare.primitive,

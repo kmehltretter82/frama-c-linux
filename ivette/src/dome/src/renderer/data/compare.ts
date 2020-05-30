@@ -86,12 +86,22 @@ export function sequence<A>(...orders: (Order<A> | undefined)[]): Order<A> {
   };
 }
 
-/** Compare optional values. */
+/** Compare optional values. Undefined values come first. */
 export function option<A>(order: Order<A>): Order<undefined | A> {
   return (x?: A, y?: A) => {
     if (x == undefined && y == undefined) return 0;
     if (x == undefined) return -1;
     if (y == undefined) return 1;
+    return order(x, y);
+  };
+}
+
+/** Compare optional values. Undefined values come last. */
+export function defined<A>(order: Order<A>): Order<undefined | A> {
+  return (x?: A, y?: A) => {
+    if (x == undefined && y == undefined) return 0;
+    if (x == undefined) return 1;
+    if (y == undefined) return -1;
     return order(x, y);
   };
 }
