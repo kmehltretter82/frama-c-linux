@@ -480,7 +480,7 @@ ipcRenderer.on('dome.ipc.settings.update',(sender,patches) => {
 
 /**
     @summary Get value from local window (persistent) settings.
-    @param {string} key User's Setting Key (`'dome.*'` are reserved keys)
+    @param {string} [key] -  User's Setting Key (`'dome.*'` are reserved keys)
     @param {any} [defaultValue] - default value if the key is not present
     @return {any} associated value of object or `undefined`.
     @description
