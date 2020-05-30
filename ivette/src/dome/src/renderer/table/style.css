@@ -96,6 +96,14 @@
     vertical-align: baseline ;
 }
 
+.dome-window-active .dome-xTable-selected {
+    background: #92ceea ;
+}
+
+.dome-window-inactive .dome-xTable-selected {
+    background: #ccc ;
+}
+
 .dome-xTable-odd {
     background: #fdfdfd ;
 }

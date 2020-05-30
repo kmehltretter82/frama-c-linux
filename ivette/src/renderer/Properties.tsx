@@ -66,12 +66,17 @@ const RenderTable = () => {
   }, [model, items]);
 
   // Callbacks
-  const getStatus =
-    ({ status: st }: Property) => (statusDict[st] ?? { label: st });
+
+  const getStatus = React.useCallback(
+    ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
+    [statusDict]);
+
+  const onSelection = React.useCallback(
+    ({ key, function: fct }: Property) => {
+      setSelect({ marker: key, function: fct });
+    }, [setSelect]);
+
   const selection = select?.marker;
-  const onSelection = ({ key, function: fct }: Property) => {
-    setSelect({ marker: key, function: fct });
-  };
 
   // Rendering
   return (
@@ -79,7 +84,6 @@ const RenderTable = () => {
       model={model}
       selection={selection}
       onSelection={onSelection}
-      scrollTo={selection}
     >
       <ColumnCode id="function" label="Function" width={120} />
       <ColumnCode id="descr" label="Description" fill />

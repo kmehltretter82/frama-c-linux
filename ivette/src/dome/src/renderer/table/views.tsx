@@ -119,8 +119,6 @@ export interface TableProps<Key, Row> {
   selection?: Key;
   /** Selection callback. */
   onSelection?: (row: Row, key: Key, index: number) => void;
-  /** Ensures the item is visible (if displayed at all). */
-  scrollTo?: Key;
   /** Fallback for rendering an empty table. */
   renderEmpty?: () => null | JSX.Element;
   /** Shall only contains `<Column<Row> … />` elements. */
@@ -183,11 +181,14 @@ class TableState<Key, Row> {
   sorting?: Sorting; // Last user proxy used for sorting
   client?: Client; // Client of last fetching
   columns: ColProps<Row>[] = []; // Currently known columns
+  selectedKey?: Key; // Last selected key
+  selectedIndex?: number; // Current selected index
 
   constructor() {
     this.reload = this.reload.bind(this);
     this.update = this.update.bind(this);
     this.watchRange = this.watchRange.bind(this);
+    this.rowClassName = this.rowClassName.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 50);
@@ -206,10 +207,6 @@ class TableState<Key, Row> {
 
   update() {
     this.tableRef.current?.forceUpdateGrid();
-  }
-
-  watchRange(info: IndexRange) {
-    this.client?.watch(info.startIndex, info.stopIndex);
   }
 
   getRef(id: string) {
@@ -259,7 +256,6 @@ class TableState<Key, Row> {
   onSelection?: (data: Row, key: Key, index: number) => void;
 
   onRowClick(info: RowMouseEventHandlerParams) {
-    console.log('CLICK', info);
     const index = info.index;
     const data = info.rowData as (Row | undefined);
     const model = this.model;
@@ -267,6 +263,25 @@ class TableState<Key, Row> {
     const onSelection = this.onSelection;
     if (key !== undefined && data !== undefined && onSelection)
       onSelection(data, key, index);
+  }
+
+  watchRange(info: IndexRange) {
+    this.client?.watch(info.startIndex, info.stopIndex);
+  }
+
+  rowClassName({ index }: Index): string {
+    if (this.selectedIndex === index) return 'dome-xTable-selected';
+    return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd');
+  }
+
+  scrollToIndex(selection: Key | undefined): number | undefined {
+    const index = selection && this.model?.getIndexOf(selection);
+    this.selectedIndex = index;
+    if (this.selectedKey !== selection) {
+      this.selectedKey = selection;
+      if (selection) return index;
+    }
+    return undefined;
   }
 
   // ---- Context Menu
@@ -467,12 +482,6 @@ function headerRenderer(props: TableHeaderProps) {
   );
 }
 
-const rowClassName =
-  (selected?: number) =>
-    ({ index }: { index: number }) =>
-      (selected === index ? 'dome-color-selected' :
-        (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'));
-
 // --------------------------------------------------------------------------
 // --- Virtualized Table View
 // --------------------------------------------------------------------------
@@ -492,21 +501,20 @@ function makeTable<Key, Row>(
   const tableHeight = CSS_HEADER_HEIGHT + CSS_ROW_HEIGHT * itemCount;
   const smallHeight = itemCount > 0 && tableHeight < height;
   const rowCount = (smallHeight ? itemCount + 1 : itemCount);
-  const selection = props.selection;
-  const selected = selection && model.getIndexOf(selection);
+  const scrollTo = state.scrollToIndex(props.selection);
   const columns = makeColumns(state);
   return (
     <React.Fragment>
       <VTable
         ref={state.tableRef}
-        key='table'
-        displayName='React-Virtualized-Table'
+        key="table"
+        displayName="React-Virtualized-Table"
         width={width}
         height={height}
         rowCount={rowCount}
         noRowsRenderer={props.renderEmpty}
         rowGetter={state.rowGetter}
-        rowClassName={rowClassName(selected)}
+        rowClassName={state.rowClassName}
         rowHeight={CSS_ROW_HEIGHT}
         headerHeight={CSS_HEADER_HEIGHT}
         headerRowRenderer={headerRowRenderer}
@@ -515,8 +523,8 @@ function makeTable<Key, Row>(
         sortBy={undefined}
         sortDirection={undefined}
         sort={undefined}
-        scrollToIndex={undefined}
-        scrollToAlignment='auto'
+        scrollToIndex={scrollTo}
+        scrollToAlignment="auto"
       >
         {columns}
       </VTable>
