@@ -100,7 +100,7 @@ export class MapModel<Key, Row>
       this.index.forEach((packed) => {
         packed.index = undefined;
         const phi = this.filter;
-        if (phi && phi(packed.key, packed.row))
+        if (!phi || phi(packed.row, packed.key))
           table.push(packed);
       });
       table.sort(this.sorter());
@@ -237,7 +237,7 @@ export class MapModel<Key, Row>
     const n = current ? current.length : 0;
     const phi = this.filter;
     const old_ok = 0 <= k && k < n;
-    const now_ok = phi ? phi(pack.key, pack.row) : true;
+    const now_ok = phi ? phi(pack.row, pack.key) : true;
     if (old_ok !== now_ok) return true;
     // Case where element was not displayed and will still not be
     if (!old_ok) return false;
@@ -257,7 +257,7 @@ export class MapModel<Key, Row>
     if (!current) return false;
     // Case where inserted element is filtered out
     const phi = this.filter;
-    return phi ? phi(pack.key, pack.row) : true;
+    return phi ? phi(pack.row, pack.key) : true;
   }
 
   private needReloadForRemoval(pack: PACK<Key, Row>): boolean {

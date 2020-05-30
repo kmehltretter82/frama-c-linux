@@ -64,7 +64,7 @@ export interface Sorting {
 // --------------------------------------------------------------------------
 
 export interface Filter<Key, Row> {
-  (key: Key, row: Row): boolean;
+  (row: Row, key: Key): boolean;
 }
 
 export interface Filtering<Key, Row> {
