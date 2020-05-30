@@ -40,8 +40,8 @@ interface Watcher {
 // --- Sorting
 // --------------------------------------------------------------------------
 
-/** Ordering proxy. */
-export interface Ordering {
+/** Sorting Info. */
+export interface SortingInfo {
   /** The column identifier that triggers some sorting. */
   sortBy: string;
   /** The requested sorting direction (`'ASC'` or `'DESC'`). */
@@ -52,9 +52,11 @@ export interface Ordering {
     Can be provided along with Models or in a separate class or object. */
 export interface Sorting {
   /** Whether the model can be sorted from the `dataKey` column identifier. */
-  hasOrdering(dataKey: string): boolean;
+  canSortBy(dataKey: string): boolean;
   /** Callback to respond to sorting requests from columns. */
-  setOrdering(order?: Ordering): void;
+  setSorting(order?: SortingInfo): void;
+  /** Current sorting information. */
+  getSorting(): SortingInfo | undefined;
 }
 
 // --------------------------------------------------------------------------

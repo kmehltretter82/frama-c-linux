@@ -10,7 +10,7 @@
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
 import {
-  Ordering, Sorting, Filter, Filtering, Model, Collection, forEach
+  SortingInfo, Sorting, Filter, Filtering, Model, Collection, forEach
 } from './models';
 
 // --------------------------------------------------------------------------
@@ -25,7 +25,7 @@ interface PACK<Key, Row> {
 
 type SORT<K, R> = Order<PACK<K, R>>;
 
-function orderBy<K, R>(fields: ByFields<R>, ord: Ordering): SORT<K, R> {
+function orderBy<K, R>(fields: ByFields<R>, ord: SortingInfo): SORT<K, R> {
   const fd = ord.sortBy as keyof R;
   const fn = fields[fd] ?? Compare.equal;
   const rv = ord.sortDirection === 'DESC';
@@ -38,7 +38,7 @@ function orderBy<K, R>(fields: ByFields<R>, ord: Ordering): SORT<K, R> {
 function orderByRing<K, R>(
   natural: undefined | Order<R>,
   compare: undefined | ByFields<R>,
-  ring: Ordering[],
+  ring: SortingInfo[],
 ): SORT<K, R> {
   type D = PACK<K, R>;
   const byRing = compare ? ring.map((ord) => orderBy(compare, ord)) : [];
@@ -78,7 +78,7 @@ export class MapModel<Key, Row>
   private columns?: ByFields<Row>;
 
   // Comparison Ring
-  private ring: Ordering[] = [];
+  private ring: SortingInfo[] = [];
 
   // Consolidated order (computed on demand)
   private order?: SORT<Key, Row>;
@@ -94,14 +94,21 @@ export class MapModel<Key, Row>
   // Lazily compute table
   protected rebuild(): TABLE<Key, Row> {
     const current = this.table;
-    if (current) return current;
-    let table: TABLE<Key, Row> = this.table = [];
-    this.index.forEach((packed) => {
-      const phi = this.filter;
-      const ok = phi ? phi(packed.key, packed.row) : true;
-      packed.index = ok ? table.push(packed) - 1 : undefined;
-    });
-    table.sort(this.sorter());
+    if (current !== undefined) return current;
+    let table: TABLE<Key, Row> = [];
+    try {
+      this.index.forEach((packed) => {
+        packed.index = undefined;
+        const phi = this.filter;
+        if (phi && phi(packed.key, packed.row))
+          table.push(packed);
+      });
+      table.sort(this.sorter());
+    } catch (err) {
+      console.warn('[Dome] error when rebuilding table:', err);
+    }
+    table.forEach((pack, index) => pack.index = index);
+    this.table = table;
     return table;
   }
 
@@ -131,18 +138,20 @@ export class MapModel<Key, Row>
   // --- Ordering
   // --------------------------------------------------------------------------
 
-  /** Sets comparison functions for (sortable) columns.
-      This makes the associated columns sortable in views.
+  /** Sets comparison functions for _all_ columns.
+      Non-specified columns becomes _non_ sortable.  This will be used to refine
+      [[setNaturalOrder]] in response to user column selection with
+      [[setSortBy]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
-  setCompare(columns?: ByFields<Row>) {
+  setSortBy(columns?: ByFields<Row>) {
     this.columns = columns;
     this.reload();
   }
 
-  /** Sets natural ordering function.
-      This ordering is always used to finally refine
-      column ordering, if any.
-      When `undefined`, the natural order follows data insertion order.
+  /** Sets natural ordering of the rows.
+      It defines in which order the entries are rendered in the table.  This
+      primary ordering can be refined in response to user column selection with
+      [[setSortBy]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
   setNaturalOrder(order?: Order<Row>) {
     this.natural = order;
@@ -152,7 +161,7 @@ export class MapModel<Key, Row>
   /** Reorder rows with the provided column and direction.
       Previous ordering is kept and refined by the new one.
       Use `undefined` or `null` to reset the natural ordering. */
-  setOrdering(ord?: undefined | null | Ordering) {
+  setSorting(ord?: undefined | null | SortingInfo) {
     if (ord) {
       const ring = this.ring;
       const cur = this.ring[0];
@@ -175,9 +184,13 @@ export class MapModel<Key, Row>
     }
   }
 
-  hasOrdering(column: string) {
+  canSortBy(column: string) {
     const columns = this.columns as any;
     return columns[column] !== undefined;
+  }
+
+  getSorting(): SortingInfo | undefined {
+    return this.ring[0];
   }
 
   // --------------------------------------------------------------------------

@@ -11,12 +11,11 @@ import React from 'react';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 //import * as Dome from 'dome';
-import { Trigger, Client, Sorting, Model } from './models';
 //import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { SVG as SVGraw } from 'dome/controls/icons';
 import {
   AutoSizer, Size,
-  SortDirection, Index, IndexRange,
+  SortDirection, SortDirectionType,
+  Index, IndexRange,
   Table as VTable,
   Column as VColumn,
   TableHeaderRowProps,
@@ -25,6 +24,9 @@ import {
   TableCellRenderer,
   RowMouseEventHandlerParams,
 } from 'react-virtualized';
+
+import { SVG as SVGraw } from 'dome/controls/icons';
+import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
 
 import './style.css';
 
@@ -183,6 +185,8 @@ class TableState<Key, Row> {
   columns: ColProps<Row>[] = []; // Currently known columns
   selectedKey?: Key; // Last selected key
   selectedIndex?: number; // Current selected index
+  sortBy?: string; // last sorting dataKey
+  sortDirection?: SortDirectionType; // last sorting direction
 
   constructor() {
     this.reload = this.reload.bind(this);
@@ -191,6 +195,7 @@ class TableState<Key, Row> {
     this.rowClassName = this.rowClassName.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
+    this.onSorting = this.onSorting.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 50);
     this.rowGetter = makeGetter();
   }
@@ -220,6 +225,9 @@ class TableState<Key, Row> {
   // --- User Table properties
 
   setSorting(sorting?: Sorting) {
+    const info = sorting?.getSorting();
+    this.sortBy = info?.sortBy;
+    this.sortDirection = info?.sortDirection;
     if (sorting !== this.sorting) {
       this.sorting = sorting;
       this.reload();
@@ -261,6 +269,7 @@ class TableState<Key, Row> {
     const model = this.model;
     const key = (data !== undefined) ? model?.getKeyFor(index, data) : undefined;
     const onSelection = this.onSelection;
+    console.log('CLICK', index, key, data);
     if (key !== undefined && data !== undefined && onSelection)
       onSelection(data, key, index);
   }
@@ -282,6 +291,15 @@ class TableState<Key, Row> {
       if (selection) return index;
     }
     return undefined;
+  }
+
+  onSorting(ord?: SortingInfo) {
+    const sorting = this.sorting;
+    if (sorting) {
+      sorting.setSorting(ord);
+      this.sortBy = ord?.sortBy;
+      this.sortDirection = ord?.sortDirection;
+    }
   }
 
   // ---- Context Menu
@@ -369,7 +387,8 @@ function makeColumn<Key, Row>(
   const width = state.resize.get(id) || props.width || 60;
   const flexGrow = (forceFill || props.fill) ? 1 : 0;
   const sorting = state.sorting;
-  const disableSort = props.disableSort || !sorting || !sorting.hasOrdering(dataKey);
+  const disableSort =
+    props.disableSort || !sorting || !sorting.canSortBy(dataKey);
   let getter: TableCellDataGetter;
   {
     const g = state.getter.get(id);
@@ -520,9 +539,9 @@ function makeTable<Key, Row>(
         headerRowRenderer={headerRowRenderer}
         onRowsRendered={state.watchRange}
         onRowClick={state.onRowClick}
-        sortBy={undefined}
-        sortDirection={undefined}
-        sort={undefined}
+        sortBy={state.sortBy}
+        sortDirection={state.sortDirection}
+        sort={state.onSorting}
         scrollToIndex={scrollTo}
         scrollToAlignment="auto"
       >

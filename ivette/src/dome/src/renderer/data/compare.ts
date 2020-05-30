@@ -75,6 +75,7 @@ export function alpha(x: string, y: string) {
 /** Combine comparison orders in sequence. */
 export function sequence<A>(...orders: (Order<A> | undefined)[]): Order<A> {
   return (x: A, y: A) => {
+    if (x === y) return 0;
     for (const order of orders) {
       if (order) {
         const cmp = order(x, y);
@@ -98,6 +99,7 @@ export function option<A>(order: Order<A>): Order<undefined | A> {
 /** Lexicographic comparison of array elements. */
 export function array<A>(order: Order<A>): Order<A[]> {
   return (x: A[], y: A[]) => {
+    if (x === y) return 0;
     const p = x.length;
     const q = y.length;
     const m = p < q ? p : q;
@@ -109,14 +111,32 @@ export function array<A>(order: Order<A>): Order<A[]> {
   };
 }
 
+/** Order string enumeration constants.
+    `enums(v1,...,vN)` will order constant following the order of arguments.
+    Non-listed constants appear at the end, or at the rank specified by `'*'`. */
+export function byRank(...args: string[]): Order<string> {
+  const ranks: { [index: string]: number } = {};
+  args.forEach((C, k) => ranks[C] = k);
+  const wildcard = ranks['*'] ?? ranks.length;
+  return (x: string, y: string) => {
+    if (x === y) return 0;
+    const rx = ranks[x] ?? wildcard;
+    const ry = ranks[y] ?? wildcard;
+    if (rx == wildcard && ry == wildcard)
+      return primitive(x, y);
+    else
+      return rx - ry;
+  };
+}
+
 /** Direct or reverse direction. */
 export function direction<A>(order: Order<A>, reverse = false): Order<A> {
-  return (x, y) => reverse ? order(y, x) : order(x, y);
+  return (x, y) => (x === y ? 0 : reverse ? order(y, x) : order(x, y));
 }
 
 /** By projection. */
 export function lift<A, B>(fn: (x: A) => B, order: Order<B>): Order<A> {
-  return (x: A, y: A) => order(fn(x), fn(y));
+  return (x: A, y: A) => (x === y ? 0 : order(fn(x), fn(y)));
 }
 
 /** Return own property names of its object argument. */
@@ -152,8 +172,8 @@ export type ByAllFields<A> = {
     fields, you shall provide a comparison function compatible with type
     `undefined`.
 
-    It might be difficult for Typescript to typecheck `fields(…)` expressions
-    when dealing with optional types. In such cases, you shall use `fields<A>(…)`
+    It might be difficult for Typescript to typecheck `byFields(…)` expressions
+    when dealing with optional types. In such cases, you shall use `byFields<A>(…)`
     and explicitly mention the type of compared values.
 
     Example:
@@ -162,8 +182,9 @@ export type ByAllFields<A> = {
         const compare = fields<foo>({ id: number, name: option(alpha) });
 
 */
-export function fields<A>(order: ByFields<A>): Order<A> {
+export function byFields<A>(order: ByFields<A>): Order<A> {
   return (x: A, y: A) => {
+    if (x === y) return 0;
     for (const fd of getKeys(order)) {
       const byFd = order[fd];
       if (byFd !== undefined) {
@@ -176,11 +197,12 @@ export function fields<A>(order: ByFields<A>): Order<A> {
 }
 
 /** Complete object comparison.
-    This is similar to `fields()` comparison, but an ordering function must be
+    This is similar to `byFields()` comparison, but an ordering function must be
     provided for _any_ field (optional or not) of the compared values.
 */
-export function fieldsComplete<A>(order: ByAllFields<A>): Order<A> {
+export function byAllFields<A>(order: ByAllFields<A>): Order<A> {
   return (x: A, y: A) => {
+    if (x === y) return 0;
     for (const fd of getKeys<ByFields<A>>(order)) {
       const byFd = order[fd];
       const cmp = byFd(x[fd], y[fd]);
@@ -192,7 +214,10 @@ export function fieldsComplete<A>(order: ByAllFields<A>): Order<A> {
 
 /** Pair comparison. */
 export function pair<A, B>(ordA: Order<A>, ordB: Order<B>): Order<[A, B]> {
-  return ([x1, y1], [x2, y2]) => {
+  return (u, v) => {
+    if (u === v) return 0;
+    const [x1, y1] = u;
+    const [x2, y2] = v;
     const cmp = ordA(x1, x2);
     return cmp != 0 ? cmp : ordB(y1, y2);
   };
@@ -204,7 +229,10 @@ export function triple<A, B, C>(
   ordB: Order<B>,
   ordC: Order<C>,
 ): Order<[A, B, C]> {
-  return ([x1, y1, z1], [x2, y2, z2]) => {
+  return (u, v) => {
+    if (u === v) return 0;
+    const [x1, y1, z1] = u;
+    const [x2, y2, z2] = v;
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
     const cmp2 = ordB(y1, y2);
@@ -220,7 +248,10 @@ export function tuple4<A, B, C, D>(
   ordC: Order<C>,
   ordD: Order<D>,
 ): Order<[A, B, C, D]> {
-  return ([x1, y1, z1, t1], [x2, y2, z2, t2]) => {
+  return (u, v) => {
+    if (u === v) return 0;
+    const [x1, y1, z1, t1] = u;
+    const [x2, y2, z2, t2] = v;
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
     const cmp2 = ordB(y1, y2);
@@ -239,7 +270,10 @@ export function tuple5<A, B, C, D, E>(
   ordD: Order<D>,
   ordE: Order<E>,
 ): Order<[A, B, C, D, E]> {
-  return ([x1, y1, z1, t1, u1], [x2, y2, z2, t2, u2]) => {
+  return (u, v) => {
+    if (u === v) return 0;
+    const [x1, y1, z1, t1, w1] = u;
+    const [x2, y2, z2, t2, w2] = v;
     const cmp1 = ordA(x1, x2);
     if (cmp1 != 0) return cmp1;
     const cmp2 = ordB(y1, y2);
@@ -248,7 +282,7 @@ export function tuple5<A, B, C, D, E>(
     if (cmp3 != 0) return cmp3;
     const cmp4 = ordD(t1, t2);
     if (cmp4 != 0) return cmp4;
-    return ordE(u1, u2);
+    return ordE(w1, w2);
   };
 }
 
