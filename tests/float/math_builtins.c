@@ -1,5 +1,5 @@
 /* run.config*
-  FILTER: sed -e '/f32__/ s/\([0-9][.][0-9]\{6\}\)[0-9]\{10\}/\1/g'
+  FILTER: sed -e '/f32__/ s/\([0-9][.][0-9]\{6\}\)[0-9]\{10\}/\1/g' -e '/d64__/ s/\([0-9][.][0-9]\{15\}\)[0-9]\{1\}/\1/g'
   COMMENT: 'sed' filter is a temporary workaround due to libc imprecisions
   STDOPT: +"-float-normal -eva -eva-no-memexec -eva-builtin sqrt:Frama_C_sqrt,exp:Frama_C_exp,log:Frama_C_log,log10:Frama_C_log10,cos:Frama_C_cos,sin:Frama_C_sin,atan2:Frama_C_atan2,pow:Frama_C_pow,fmod:Frama_C_fmod,sqrtf:Frama_C_sqrtf,expf:Frama_C_expf,logf:Frama_C_logf,log10f:Frama_C_log10f,powf:Frama_C_powf,floor:Frama_C_floor,ceil:Frama_C_ceil,trunc:Frama_C_trunc,round:Frama_C_round,floorf:Frama_C_floorf,ceilf:Frama_C_ceilf,truncf:Frama_C_truncf,roundf:Frama_C_roundf -then -print"
 */ 
@@ -40,15 +40,15 @@ void test_acos () {
     double bottom = acos(1.5);
     Frama_C_show_each_bottom(bottom);
   }
-  double x = acos(0.5);
-  double y = acos(-0.5);
-  double xy = double_interval(-0.5, 0.5);
-  xy = acos(xy);
+  double d64__x = acos(0.5);
+  double d64__y = acos(-0.5);
+  double d64__xy = double_interval(-0.5, 0.5);
+  d64__xy = acos(d64__xy);
   /* Test acosf. */
-  float f32_half_pi = acosf(0.f);
-  float f32_pi = acosf(-1.f);
-  float f32_zero = acosf(1.f);
-  float f32_acosf_image = acosf(any_float);
+  float f32__half_pi = acosf(0.f);
+  float f32__pi = acosf(-1.f);
+  float f32__zero = acosf(1.f);
+  float f32__acosf_image = acosf(any_float);
   if (nondet) {
     float bottom = acosf(2.f);
     Frama_C_show_each_bottom(bottom);
@@ -68,15 +68,15 @@ void test_asin () {
     double bottom = asin(1.5);
     Frama_C_show_each_bottom(bottom);
   }
-  double x = asin(-0.5);
-  double y = asin(0.5);
-  double xy = double_interval(-0.5, 0.5);
-  xy = asin(xy);
+  double d64__x = asin(-0.5);
+  double d64__y = asin(0.5);
+  double d64__xy = double_interval(-0.5, 0.5);
+  d64__xy = asin(d64__xy);
   /* Test asinf. */
-  float f32_zero = asinf(0.f);
-  float f32_minus_half_pi = asinf(-1.f);
-  float f32_half_pi = asinf(1.f);
-  float f32_asinf_image = asinf(any_float);
+  float f32__zero = asinf(0.f);
+  float f32__minus_half_pi = asinf(-1.f);
+  float f32__half_pi = asinf(1.f);
+  float f32__asinf_image = asinf(any_float);
   if (nondet) {
     float bottom = asinf(2.f);
     Frama_C_show_each_bottom(bottom);
@@ -86,13 +86,13 @@ void test_asin () {
 void test_atan () {
   double zero = atan(0.);
   double atan_image = atan(any_double);
-  double x = atan(-2.);
-  double y = atan(2.);
-  double xy = double_interval(-2., 2.);
-  xy = atan(xy);
+  double d64__x = atan(-2.);
+  double d64__y = atan(2.);
+  double d64__xy = double_interval(-2., 2.);
+  d64__xy = atan(d64__xy);
   /* Test atanf. */
-  float f32_zero = atanf(0.f);
-  float f32_atanf_image = atanf(any_float);
+  float f32__zero = atanf(0.f);
+  float f32__atanf_image = atanf(any_float);
 }
 
 void test_atan2_det() {

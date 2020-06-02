@@ -2437,33 +2437,33 @@
   pi ∈ {3.1415926535897931}
   zero ∈ {0}
   acos_image ∈ [0.0000000000000000 .. 3.1415926535897931]
-  x ∈ {1.0471975511965978}
-  y ∈ {2.0943951023931957}
-  xy ∈ [1.0471975511965978 .. 2.0943951023931957]
-  f32_half_pi ∈ {1.5707963705062866}
-  f32_pi ∈ {3.1415927410125732}
-  f32_zero ∈ {0}
-  f32_acosf_image ∈ [0.0000000000000000 .. 3.1415927410125732]
+  d64__x ∈ {1.047197551196597}
+  d64__y ∈ {2.094395102393195}
+  d64__xy ∈ [1.047197551196597 .. 2.094395102393195]
+  f32__half_pi ∈ {1.570796}
+  f32__pi ∈ {3.141592}
+  f32__zero ∈ {0}
+  f32__acosf_image ∈ [0.000000 .. 3.141592]
 [eva:final-states] Values at end of function test_asin:
   zero ∈ {0}
   minus_half_pi ∈ {-1.5707963267948965}
   half_pi ∈ {1.5707963267948965}
   asin_image ∈ [-1.5707963267948965 .. 1.5707963267948965]
-  x ∈ {-1.0471975511965978*2^-1}
-  y ∈ {1.0471975511965978*2^-1}
-  xy ∈ [-1.0471975511965978*2^-1 .. 1.0471975511965978*2^-1]
-  f32_zero ∈ {0}
-  f32_minus_half_pi ∈ {-1.5707963705062866}
-  f32_half_pi ∈ {1.5707963705062866}
-  f32_asinf_image ∈ [-1.5707963705062866 .. 1.5707963705062866]
+  d64__x ∈ {-1.047197551196597*2^-1}
+  d64__y ∈ {1.047197551196597*2^-1}
+  d64__xy ∈ [-1.047197551196597*2^-1 .. 1.047197551196597*2^-1]
+  f32__zero ∈ {0}
+  f32__minus_half_pi ∈ {-1.570796}
+  f32__half_pi ∈ {1.570796}
+  f32__asinf_image ∈ [-1.570796 .. 1.570796]
 [eva:final-states] Values at end of function test_atan:
   zero ∈ {0}
   atan_image ∈ [-1.5707963267948965 .. 1.5707963267948965]
-  x ∈ {-1.1071487177940904}
-  y ∈ {1.1071487177940904}
-  xy ∈ [-1.1071487177940904 .. 1.1071487177940904]
-  f32_zero ∈ {0}
-  f32_atanf_image ∈ [-1.5707963705062866 .. 1.5707963705062866]
+  d64__x ∈ {-1.107148717794090}
+  d64__y ∈ {1.107148717794090}
+  d64__xy ∈ [-1.107148717794090 .. 1.107148717794090]
+  f32__zero ∈ {0}
+  f32__atanf_image ∈ [-1.570796 .. 1.570796]
 [eva:final-states] Values at end of function test_atan2:
   x ∈ [1.0000000000000000 .. 5.0000000000000000]
   y ∈ [-0.0000000000000000 .. 0.0000000000000000]
@@ -3075,17 +3075,18 @@
 [inout] Inputs for function double_interval:
     nondet
 [inout] Out (internal) for function test_acos:
-    half_pi; pi; zero; acos_image; bottom; bottom_0; x; y; xy; f32_half_pi;
-    f32_pi; f32_zero; f32_acosf_image; bottom_1
+    half_pi; pi; zero; acos_image; bottom; bottom_0; d64__x; d64__y; d64__xy;
+    f32__half_pi; f32__pi; f32__zero; f32__acosf_image; bottom_1
 [inout] Inputs for function test_acos:
     nondet; any_double; any_float
 [inout] Out (internal) for function test_asin:
-    zero; minus_half_pi; half_pi; asin_image; bottom; bottom_0; x; y; xy;
-    f32_zero; f32_minus_half_pi; f32_half_pi; f32_asinf_image; bottom_1
+    zero; minus_half_pi; half_pi; asin_image; bottom; bottom_0; d64__x; 
+    d64__y; d64__xy; f32__zero; f32__minus_half_pi; f32__half_pi;
+    f32__asinf_image; bottom_1
 [inout] Inputs for function test_asin:
     nondet; any_double; any_float
 [inout] Out (internal) for function test_atan:
-    zero; atan_image; x; y; xy; f32_zero; f32_atanf_image
+    zero; atan_image; d64__x; d64__y; d64__xy; f32__zero; f32__atanf_image
 [inout] Inputs for function test_atan:
     nondet; any_double; any_float
 [inout] Out (internal) for function test_atan2:
@@ -3306,14 +3307,14 @@ void test_acos(void)
     double bottom_0 = acos(1.5);
     Frama_C_show_each_bottom(bottom_0);
   }
-  double x = acos(0.5);
-  double y = acos(- 0.5);
-  double xy = double_interval(- 0.5,0.5);
-  xy = acos(xy);
-  float f32_half_pi = acosf(0.f);
-  float f32_pi = acosf(- 1.f);
-  float f32_zero = acosf(1.f);
-  float f32_acosf_image = acosf(any_float);
+  double d64__x = acos(0.5);
+  double d64__y = acos(- 0.5);
+  double d64__xy = double_interval(- 0.5,0.5);
+  d64__xy = acos(d64__xy);
+  float f32__half_pi = acosf(0.f);
+  float f32__pi = acosf(- 1.f);
+  float f32__zero = acosf(1.f);
+  float f32__acosf_image = acosf(any_float);
   if (nondet) {
     float bottom_1 = acosf(2.f);
     Frama_C_show_each_bottom(bottom_1);
@@ -3335,14 +3336,14 @@ void test_asin(void)
     double bottom_0 = asin(1.5);
     Frama_C_show_each_bottom(bottom_0);
   }
-  double x = asin(- 0.5);
-  double y = asin(0.5);
-  double xy = double_interval(- 0.5,0.5);
-  xy = asin(xy);
-  float f32_zero = asinf(0.f);
-  float f32_minus_half_pi = asinf(- 1.f);
-  float f32_half_pi = asinf(1.f);
-  float f32_asinf_image = asinf(any_float);
+  double d64__x = asin(- 0.5);
+  double d64__y = asin(0.5);
+  double d64__xy = double_interval(- 0.5,0.5);
+  d64__xy = asin(d64__xy);
+  float f32__zero = asinf(0.f);
+  float f32__minus_half_pi = asinf(- 1.f);
+  float f32__half_pi = asinf(1.f);
+  float f32__asinf_image = asinf(any_float);
   if (nondet) {
     float bottom_1 = asinf(2.f);
     Frama_C_show_each_bottom(bottom_1);
@@ -3354,12 +3355,12 @@ void test_atan(void)
 {
   double zero = atan(0.);
   double atan_image = atan(any_double);
-  double x = atan(- 2.);
-  double y = atan(2.);
-  double xy = double_interval(- 2.,2.);
-  xy = atan(xy);
-  float f32_zero = atanf(0.f);
-  float f32_atanf_image = atanf(any_float);
+  double d64__x = atan(- 2.);
+  double d64__y = atan(2.);
+  double d64__xy = double_interval(- 2.,2.);
+  d64__xy = atan(d64__xy);
+  float f32__zero = atanf(0.f);
+  float f32__atanf_image = atanf(any_float);
   return;
 }
 
