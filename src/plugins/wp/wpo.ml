@@ -135,7 +135,7 @@ struct
   let pretty ~pid ~model ~prover ~result fmt =
     begin
       Format.fprintf fmt "[%a] Goal %a : %a@\n"
-        pp_prover prover WpPropId.pp_propid pid pp_result result ;
+        pp_prover prover WpPropId.pp_propid pid pp_result_perfo result ;
       dump_file fmt "StdOut" (file_logout ~pid ~model ~prover) ;
       dump_file fmt "StdErr" (file_logerr ~pid ~model ~prover) ;
     end
@@ -282,8 +282,7 @@ struct
         (fun (prover,result) ->
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %a@\n"
-               pp_prover prover
-               pp_result result
+               pp_prover prover (pp_result_qualif prover) result
         ) results ;
     end
 
@@ -348,7 +347,7 @@ struct
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %a@\n"
                pp_prover prover
-               pp_result result
+               pp_result_perfo result
         ) results ;
     end
 

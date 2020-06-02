@@ -58,10 +58,10 @@ class printer (text : Wtext.text) =
              if VCS.is_verdict res then
                if VCS.is_valid res then
                  text#printf "@{<bf>Prover@} %a: @{<green>%a@}.@\n"
-                   VCS.pp_prover prv VCS.pp_result res
+                   VCS.pp_prover prv VCS.pp_result_perfo res
                else
                  text#printf "@{<bf>Prover@} %a: @{<green>%a@}.@\n"
-                   VCS.pp_prover prv VCS.pp_result res
+                   VCS.pp_prover prv VCS.pp_result_perfo res
         ) (Wpo.get_results wpo)
 
     method private tactic header node =
@@ -87,7 +87,8 @@ class printer (text : Wtext.text) =
       | Error(msg,_) -> text#printf "@{<bf>Script@} Error (%S).@\n" msg
       | Prover(p,r) ->
           if not (Wpo.has_verdict g p) then
-            text#printf "@{<bf>Script@} %a: %a.@\n" VCS.pp_prover p VCS.pp_result r
+            text#printf "@{<bf>Script@} %a: %a.@\n"
+              VCS.pp_prover p VCS.pp_result_perfo r
 
     method private strategy index i h =
       text#printf "@{<bf>Strategy@} %s"

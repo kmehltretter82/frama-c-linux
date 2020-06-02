@@ -315,18 +315,39 @@ let pp_res ~extended fmt r =
   | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Invalid -> Format.pp_print_string fmt "Invalid"
-  | Valid when Wp_parameters.has_dkey dkey_success_only ->
-      Format.pp_print_string fmt "Valid"
-  | (Timeout|Stepout|Unknown) when Wp_parameters.has_dkey dkey_success_only ->
-      Format.pp_print_string fmt "Unsuccess"
+  | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
   | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
   | Unknown -> Format.fprintf fmt "Unknown%a" (pp_perf ~extended) r
-  | Timeout -> Format.fprintf fmt "Timeout%a" (pp_perf ~extended) r
   | Stepout -> Format.fprintf fmt "Step limit%a" (pp_perf ~extended) r
-  | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
+  | Timeout -> Format.fprintf fmt "Timeout%a" (pp_perf ~extended) r
 
-let pp_result = pp_res ~extended:false
-let pp_result_perf = pp_res ~extended:true
+let pp_result_short = pp_res ~extended:false
+
+let pp_result_perfo = pp_res ~extended:true
+
+let pp_cache_miss fmt st prover r =
+  let cachemissed =
+    match prover with
+    | NativeAltErgo | NativeCoq | Qed | Tactical -> false
+    | Why3 _ -> not r.cached && r.prover_time > Rformat.epsilon
+  in if not cachemissed then
+    Format.pp_print_string fmt (if is_valid r then st else "Unsuccess")
+  else
+    Format.fprintf fmt "%s%a (cache miss)" st (pp_perf ~extended:true) r
+
+let pp_result_qualif prover fmt r =
+  if Wp_parameters.has_dkey dkey_success_only then
+    match r.verdict with
+    | NoResult -> Format.pp_print_string fmt "No Result"
+    | Computing _ -> Format.pp_print_string fmt "Computing"
+    | Invalid -> Format.pp_print_string fmt "Invalid"
+    | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
+    | Valid -> pp_cache_miss fmt "Valid" prover r
+    | Unknown -> pp_cache_miss fmt "Unknown" prover r
+    | Timeout -> pp_cache_miss fmt "Timeout" prover r
+    | Stepout -> pp_cache_miss fmt "Stepout" prover r
+  else
+    pp_result_perfo fmt r
 
 let compare p q =
   let rank = function

@@ -1167,7 +1167,7 @@ let ping_prover_call p =
         "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
         Why3.Whyconf.print_prover p.prover
         (Why3.Call_provers.print_prover_result ~json_model:false) pr
-        VCS.pp_result r;
+        VCS.pp_result_perfo r;
       Task.Return (Task.Result r)
 
 let call_prover ~timeout ~steplimit drv prover prover_config task =

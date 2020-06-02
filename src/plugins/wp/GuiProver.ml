@@ -77,7 +77,7 @@ class prover ~(console:Wtext.text) ~prover =
         let lerr = Sys.file_exists ferr in
         if lout || lerr then console#hrule ;
         console#scroll () ;
-        console#printf "[%a] %a@." VCS.pp_prover prover VCS.pp_result res ;
+        console#printf "[%a] %a@." VCS.pp_prover prover VCS.pp_result_perfo res ;
         if lout then Command.pp_from_file console#fmt fout ;
         if lerr then Command.pp_from_file console#fmt ferr ;
         if lout || lerr then console#hrule ;
@@ -115,7 +115,7 @@ class prover ~(console:Wtext.text) ~prover =
     method update wpo =
       begin
         let res = Wpo.get_result wpo prover in
-        result#set_text (Pretty_utils.to_string VCS.pp_result_perf res) ;
+        result#set_text (Pretty_utils.to_string VCS.pp_result_perfo res) ;
         match res.VCS.verdict with
         | VCS.NoResult ->
             let callback () = self#run wpo in
