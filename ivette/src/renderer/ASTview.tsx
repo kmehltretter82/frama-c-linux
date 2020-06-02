@@ -33,21 +33,6 @@ const PP = new Dome.PP('AST View');
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const printAST = (buffer: RichTextBuffer, text: string) => {
-  if (Array.isArray(text)) {
-    const tag = text.shift();
-    if (tag !== '') {
-      buffer.openTextMarker({ id: tag });
-    }
-    text.forEach((txt) => printAST(buffer, txt));
-    if (tag !== '') {
-      buffer.closeTextMarker();
-    }
-  } else if (typeof (text) === 'string') {
-    buffer.append(text);
-  }
-};
-
 async function loadAST(
   buffer: RichTextBuffer, theFunction?: string, theMarker?: string,
 ) {
@@ -62,9 +47,10 @@ async function loadAST(
         });
         buffer.operation(() => {
           buffer.clear();
-          if (!data)
+          if (!data) {
             buffer.log('// No code for function ', theFunction);
-          printAST(buffer, data);
+          }
+          buffer.printTextWithTags(data);
           if (theMarker)
             buffer.scroll(theMarker, undefined);
         });

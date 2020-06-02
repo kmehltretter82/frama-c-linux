@@ -14,21 +14,6 @@ import { Component } from 'frama-c/LabViews';
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-const printInfo = (buffer: RichTextBuffer, text: string | string[]) => {
-  if (Array.isArray(text)) {
-    const tag = text.shift();
-    if (tag !== '') {
-      buffer.openTextMarker({ id: tag, css: 'color: blue' });
-    }
-    text.forEach((txt) => printInfo(buffer, txt));
-    if (tag !== '') {
-      buffer.closeTextMarker();
-    }
-  } else {
-    buffer.append(text);
-  }
-};
-
 const ASTinfo = () => {
 
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
@@ -39,7 +24,7 @@ const ASTinfo = () => {
   React.useEffect(() => {
     buffer.clear();
     if (data) {
-      printInfo(buffer, data);
+      buffer.printTextWithTags(data, { css: 'color: blue' });
     }
   }, [buffer, data]);
 
