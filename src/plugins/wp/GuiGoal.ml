@@ -288,7 +288,7 @@ class pane (gprovers : GuiConfig.provers) =
             ~result:
               (fun wpo prv res ->
                  text#printf "[%a] %a : %a@."
-                   VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result_perfo res)
+                   VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res)
             ~success:
               (fun _ _ ->
                  ProofEngine.forward p ;
@@ -598,7 +598,7 @@ class pane (gprovers : GuiConfig.provers) =
         ~result:
           begin fun wpo prv res ->
             text#printf "[%a] %a : %a@."
-              VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result_perfo res
+              VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res
           end
         ~success:(fun _ _ -> Wutil.later self#commit)
         ~pool (List.map (fun dp -> VCS.BatchMode , dp) provers)
@@ -658,7 +658,7 @@ class pane (gprovers : GuiConfig.provers) =
                          text#printf "[%a] %a : %a@."
                            VCS.pp_prover prv
                            Wpo.pp_title wpo
-                           VCS.pp_result_perfo res)
+                           VCS.pp_result res)
                     ~success:
                       (fun _ _ ->
                          ProofEngine.forward proof ;
