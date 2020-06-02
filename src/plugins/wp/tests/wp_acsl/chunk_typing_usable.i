@@ -39,8 +39,8 @@ void usable_axiom(int* a, unsigned b, unsigned e){
 */
 
 /*@
-	requires b < s <= e;
-	ensures \forall int v ; occ(v,a,b,e) == occ(v,a,b,s) + occ(v,a,s,e) ;
+  requires b < s <= e;
+  ensures \forall int v ; occ(v,a,b,e) == occ(v,a,b,s) + occ(v,a,s,e) ;
 */
 void usable_lemma(int* a, unsigned b, unsigned s, unsigned e){
 

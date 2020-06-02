@@ -7,7 +7,7 @@
   Function function
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/chunk_typing.i, line 13) in 'function':
+Goal Post-condition (file tests/wp_acsl/chunk_typing.i, line 15) in 'function':
 Let a = shift_sint8(i8_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
 Let a_2 = shift_uint8(u8_0, 0).
