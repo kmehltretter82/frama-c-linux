@@ -1,6 +1,6 @@
 -include frama-c-path.mk
-FRAMAC_CONFIG ?= frama-c-config
--include $(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/frama-c.mk
+FRAMAC ?= frama-c
+-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
 
 # Global parameters
 CPPFLAGS     = -D__I586__

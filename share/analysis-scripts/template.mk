@@ -12,12 +12,12 @@ export FRAMA_C_MEMORY_FOOTPRINT = 8
 # It is an optional include, unnecessary if frama-c is in the PATH
 -include frama-c-path.mk
 #
-# FRAMAC_CONFIG is defined in frama-c-path.mk when it is included, so the
+# FRAMAC is defined in frama-c-path.mk when it is included, so the
 # line below will be safely ignored if this is the case
-FRAMAC_CONFIG ?= frama-c-config
+FRAMAC ?= frama-c
 #
 # frama-c.mk contains the main rules and targets
--include $(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/frama-c.mk
+-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
 #
 ###############################################################################
 
