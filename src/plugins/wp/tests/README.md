@@ -41,6 +41,7 @@ The WP makefile provides several targets to automate cache management. It is hig
 recommanded to use them most of the time:
 
 - `make wp-qualif` re-runs qualif tests; no new cache entry is created, though.
+- `make wp-qualif-env` prints the environment variables for wp-qualif.
 - `make wp-qualif-update` re-runs and create missing cache entries.
 - `make wp-qualif-upgrade` creates missing cache entries _and_ update tests scripts is necessary.
 - `make wp-qualif-push` commits and pushes all new cache entries to the GitLab repository.
@@ -51,7 +52,7 @@ commands in a _local_ shell:
 
     $ export FRAMAC_WP_CACHE=update
     $ export FRAMAC_WP_CACHEDIR=<path-to-wp-cache>
-    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i [-show|-update]
+    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
 
 It is _highly_ recommanded to _not_ set the `FRAMAC_WP_xxx` variables globally;
 doing so would causing WP to add new cache entries to the global « qualif » cache
@@ -83,7 +84,13 @@ environment. To run individual tests, you may now use:
 
     $ export FRAMAC_WP_CACHE=update
     $ export FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
-    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i [-show|-update]
+    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
+
+The necessary environment variables can also be displayed by the makefile:
+
+    $ make wp-qualif-env
+    FRAMAC_WP_CACHE=update
+    FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
 
 As mentionned above, it is _not_ recommanded to globally set the
 `FRAMAC_WP_XXX` variables in your default shell environment, because WP will
