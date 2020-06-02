@@ -1,8 +1,8 @@
 /* run.config
-   OPT: -wp-rte -wp-prop="-NO_CHECK,-rte"
+   OPT: -wp-rte
 */
 /* run.config_qualif
-   OPT: -wp-rte -wp-prop="-NO_CHECK,-rte"
+   OPT: -wp-rte
 */
 
 const char x[10];
@@ -28,7 +28,7 @@ void function(signed char i8[10],
               unsigned long long int u64[10])
 {
   /*@
-    loop invariant NO_CHECK: 0 <= i <= 10;
+    loop invariant 0 <= i <= 10;
     loop invariant \forall integer k ; 0 <= k < i ==> i8[k] == 1 ;
     loop invariant \forall integer k ; 0 <= k < i ==> u8[k] == 2 ;
     loop invariant \forall integer k ; 0 <= k < i ==> i16[k] == 3 ;
@@ -37,9 +37,9 @@ void function(signed char i8[10],
     loop invariant \forall integer k ; 0 <= k < i ==> u32[k] == 6 ;
     loop invariant \forall integer k ; 0 <= k < i ==> i64[k] == 7 ;
     loop invariant \forall integer k ; 0 <= k < i ==> u64[k] == 8 ;
-    loop assigns NO_CHECK: i, i8[0..9], u8[0..9], i16[0..9], u16[0..9],
-                           i32[0..9], u32[0..9], i64[0..9], u64[0..9] ;
-    loop variant NO_CHECK: 10-i;
+    loop assigns i, i8[0..9], u8[0..9], i16[0..9], u16[0..9],
+                    i32[0..9], u32[0..9], i64[0..9], u64[0..9] ;
+    loop variant 10-i;
   */
   for (int i = 0; i < 10; ++i) {
     i8[i] = 1;
