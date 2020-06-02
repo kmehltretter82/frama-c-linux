@@ -347,7 +347,7 @@ struct
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %a@\n"
                pp_prover prover
-               pp_result result
+               (pp_result_qualif prover) result
         ) results ;
     end
 

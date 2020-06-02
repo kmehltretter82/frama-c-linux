@@ -59,10 +59,29 @@ doing so would causing WP to add new cache entries to the global « qualif » ca
 from all your projects around. Consult the section « Global WP Cache Setup »
 below for details.
 
+# Qualified Test Results
+
+To be accepted by Frama-CI, tests in « qualif » configuration must be easily
+reproducible on any platform. This is checked by running WP with flag
+`-wp-msg-key success-only` which is set by the default in the qualif test
+configuration. Hence, a qualified test result only contains proof status that
+are either:
+- failed
+- valid for qed or script
+- cached for alt-ergo in all cases
+- valid, unknown or stepout for native Alt-Ergo
+- valid or unknown for (native) Coq
+
+This excludes any timeout with native Alt-Ergo, which must be turned into some
+reproducible stepout by setting `-wp-steps` and `-wp-timeout` options
+accordingly. Please choose a step limit that makes large enough to ensure the
+goal is not provable, but small enough to make alt-ergo decide quickly.
+
 # Global WP Cache Setup (for wp-qualif)
 
-All prover results for test configuration `qualif` shall be cached in a dedicate GitLab repo.
-This considerally speed-up the process of running those tests, from hours downto minutes.
+All prover results for test configuration `qualif` shall be cached in a dedicate
+GitLab repo.  This considerally speed-up the process of running those tests,
+from hours downto minutes.
 
 To ease the management of cache entries accross merge requests,
 _all_ cache entries shall be merged into the _same_ master branch of a global
