@@ -21,52 +21,71 @@
 #                                                                        #
 ##########################################################################
 
-# Script to run C-Reduce (https://embed.cs.utah.edu/creduce) when debugging
-# Frama-C crashes with a 'fatal' error, which produces a stack trace and
-# a message "Please report".
+usage="
+Script to run C-Reduce (https://embed.cs.utah.edu/creduce) when debugging
+Frama-C, or when minimizing test cases resulting in a Frama-C error.
 
-### Requirements
-#
-# - C-Reduce installed in the PATH, or its path given in the
-#   environment variable CREDUCE;
-#
-# - GCC, or the path to a compiler with compatible options given in the
-#   environment variable CC;
-#
-# - Frama-C installed in the PATH, or its path given in the environment
-#   variable FRAMAC;
-#
-# - a source file + a command line which causes Frama-C to crash with
-#   a 'fatal' error (producing a stack trace).
+# Requirements
 
-### How it works
-#
-#   creduce.sh <file.c> <command line options>
-#
-# This script creates a temporary directory named 'creducing'.
-# It copies <file.c> inside it, then runs creduce.
-# creduce runs "frama-c <command line options>" on the copied file,
-# modifying it to make it smaller while still crashing.
-#
-# When done, copy the reduced file and erase directoy 'creducing'.
+- C-Reduce installed in the PATH, or its path in environment variable CREDUCE;
+- Frama-C installed in the PATH, or the path to its 'bin' directory in
+   environment variable FRAMAC_BIN;
+- a source file + a command line which causes Frama-C to crash with
+  a 'fatal' error (producing a stack trace); can also be used when
+  Frama-C reports other errors, but in this case a separate script must be
+  completed by the user.
+
+# Basic usage
+
+  arguments: <file> <command line options>
+
+This script creates a temporary directory named 'creducing'. It copies <file>
+inside it, then runs creduce with 'frama-c <command line options>'
+on the copied file, modifying it to make it smaller while still crashing.
+
+When done, you need to copy the reduced file and erase directoy 'creducing'.
+
+# Advanced usage
+
+- if <file> is not a preprocessed (.i) source, this script
+  will retrieve the preprocessing arguments from Frama-C. It will try to
+  preprocess the file in GCC to make sure it is parseable during reduction.
+  This may cause some issues; use a preprocessed file if you can.
+
+- For "fatal" crashes (with stack trace and 'Please report...' message),
+  this script should work automatically. For other crashes (e.g. invalid
+  input), this script will copy a template to the current directory and you
+  need to fill it so that creduce will work. This usage mode requires knowing
+  how C-Reduce works.
+"
 
 if [ $# -lt 1 ]; then
-    echo "usage: $0 file.c [Frama-C options that cause a crash]"
+    echo "$usage"
     exit 1
 fi
+
+case "$1" in
+    --help) echo "$usage"; exit;;
+    --h) echo "$usage"; exit;;
+    -help) echo "$usage"; exit;;
+    -h) echo "$usage"; exit;;
+esac
 
 file="$1"
 base=$(basename "$file")
 shift
-options="$@"
+fcflags="$@"
 dir_for_reduction="creducing"
+
+script_for_creduce="./script_for_creduce.sh"
 
 if [ -z "$CREDUCE" ]; then
     CREDUCE="creduce"
 fi
 
 if ! command -v "$CREDUCE" 2>&1 >/dev/null; then
-    echo "creduce not found, put it in PATH or in environment variable CREDUCE."
+    echo "creduce not found; install it in the PATH or"
+    echo "put it in environment variable CREDUCE."
     exit 1
 fi
 
@@ -75,10 +94,26 @@ if [[ ! -f "$file" ]]; then
     exit 1
 fi
 
-if [[ $(dirname "$file") -eq "$dir_for_reduction" ]]; then
+if [[ $(dirname "$file") = "$dir_for_reduction" ]]; then
     echo "error: cannot reduce a file inside the directory used for reduction,"
     echo "       $dir_for_reduction"
     exit 1
+fi
+
+if [ -z "$FRAMAC_BIN" ]; then
+    if ! command -v "frama-c" >/dev/null; then
+        echo "error: frama-c must be in the PATH, or FRAMAC_BIN must point to"
+        echo "       the directory containing the frama-c binary"
+        exit 1
+    fi
+    FRAMAC="frama-c"
+else
+    FRAMAC="$FRAMAC_BIN/frama-c"
+fi
+echo "[info] using FRAMAC: $FRAMAC"
+
+if [ -z "$FRAMAC_SHARE" ]; then
+    FRAMAC_SHARE="$("$FRAMAC" -print-share-path)"
 fi
 
 if [[ ! "$options" =~ no-autoload-plugins ]]; then
@@ -93,69 +128,97 @@ if [[ "$base" =~ \.c$ ]]; then
     echo "Hint: consider passing a preprocessed (.i) file if possible,"
     echo "      otherwise #includes may prevent further reduction"
     echo "********************************************************************"
+    # TODO: check for libc includes and suggest -print-libc
 fi
+
+# Obtain cpp flags by running Frama-C with `-kernel-msg-key pp`
+if [[ "$base" =~ \.i$ ]]; then
+    # Preprocessed file: no need to get preprocessing flags
+    # TODO: check for '-machdep' option and add/remove flags accordingly
+    CPP="gcc -fsyntax-only"
+else
+    CPP=$("$FRAMAC" -kernel-msg-key pp $fcflags "$file" 2>/dev/null | \
+          grep "preprocessing with " | \
+          sed 's|.* preprocessing with "||' | sed 's|"$||')
+    if [[ "$CPP" = "" ]]; then
+        echo "[info] Could not get preprocessing flags when running Frama-C,"
+        echo "       using default flags"
+        # TODO: check for '-machdep' option and add/remove flags accordingly
+        CPP="gcc -fsyntax-only -m32"
+    else
+        # Replace -E with -fsyntax-only to force GCC to try parsing the file;
+        # also remove Frama-C's libc; use the standard system libraries.
+        CPP=$(echo $CPP | \
+                  sed 's| -E | -fsyntax-only |' | \
+                  sed 's| -nostdinc | |' | \
+                  sed 's| -I[^ ]\+/libc | |' )
+    fi
+fi
+
+if [ ! -e "$script_for_creduce" ]; then
+    echo "[info] $script_for_creduce not found."
+    echo "Which kind of error are you reducing for?"
+    echo "1. Fatal crash (error message with stacktrace)"
+    echo "2. Non-fatal error"
+    read -p "Please enter 1 or 2: " errorkind
+    case $errorkind in
+        1)
+            cp "$FRAMAC_SHARE/analysis-scripts/script_for_creduce_fatal.sh" "$script_for_creduce"
+            ;;
+        2)
+            cp "$FRAMAC_SHARE/analysis-scripts/script_for_creduce_non_fatal.sh" "$script_for_creduce"
+            echo "Script copied. Please edit $script_for_creduce and re-run this script."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice, aborting."
+            exit 0
+            ;;
+    esac
+fi
+
+echo "[info] the following command will be used to check for syntactic validity during reduction:"
+echo "    $CPP"
 
 mkdir -p "$dir_for_reduction"
-
-if [ -z "$FRAMAC" ]; then
-    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    FRAMAC=$(realpath "$SCRIPT_DIR/../../bin/frama-c")
-    echo "[info] FRAMAC not set, using binary at: $FRAMAC"
-else
-    echo "[info] using FRAMAC: $FRAMAC"
-fi
-
-if [ -z "$FRAMAC_SHARE" ]; then
-    FRAMAC_SHARE="$("$FRAMAC" -print-share-path)"
-fi
-
-if [ -z "$CC" ]; then
-    CC=gcc
-    CFLAGS+="-fsyntax-only -I\"$FRAMAC_SHARE\"/libc -D__FC_MACHDEP_X86_32 -m32"
-fi
-
-echo "[info] checking syntactic validity with: $CC $CFLAGS"
-
 cp "$file" "$dir_for_reduction"
+cp "$script_for_creduce" "$dir_for_reduction"
 cd "$dir_for_reduction"
 
-cat <<EOF > script_for_creduce.sh
-#!/bin/bash -e
-
-# This script is given to creduce to reduce a Frama-C crashing test case
-# (where "crashing" means a 'fatal' exception, with stack trace).
-
-set +e
-$CC $CFLAGS "$base"
-if [ \$? -ne 0 ]; then
-   exit 1
-fi
-"$FRAMAC" "$base" $options
-retcode=\$?
-# see cmdline.ml for the different exit codes returned by Frama-C
-if [ \$retcode -eq 125 -o \$retcode -eq 4 ]; then
-    exit 0
-else
-    exit 1
-fi
-set -e
-
-EOF
-
-chmod u+x script_for_creduce.sh
+# we avoid using '-i' for compatibility with macOS sed
+sed -e "s|@CPP@|$CPP|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
+mv "${script_for_creduce}.tmp" "$script_for_creduce"
+sed -e "s|@FRAMAC@|$FRAMAC|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
+mv "${script_for_creduce}.tmp" "$script_for_creduce"
+sed -e "s|@BASE@|$base|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
+mv "${script_for_creduce}.tmp" "$script_for_creduce"
+sed -e "s|@FCFLAGS@|$fcflags|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
+mv "${script_for_creduce}.tmp" "$script_for_creduce"
+chmod u+x "$script_for_creduce"
 
 trap "{ echo \"Creduce interrupted!\"; echo \"\"; echo \"(partially) reduced file: $dir_for_reduction/$base\"; exit 0; }" SIGINT
 
 echo "File being reduced: $dir_for_reduction/$base (press Ctrl+C to stop at any time)"
 
 set +e
-./script_for_creduce.sh 2>&1 >/tmp/script_for_creduce.out
+rm -rf /tmp/script_for_creduce.out
+$script_for_creduce >>/tmp/script_for_creduce.out 2>&1
 if [ $? -ne 0 ]; then
-    echo "error: script did not produce a Frama-C 'fatal' crash."
-    echo "       check the options given to Frama-C to ensure they make Frama-C crash."
+    # TODO: check if -cpp-extra-args exists and contains relative paths,
+    # and if so, warn about them
+    echo "#################################################"
+    echo "ERROR: script did not produce the expected error."
+    echo "       check the options given to Frama-C."
+    echo "       If you edited '$script_for_creduce', check it as well."
     echo ""
-    echo "Script output:"
-    cat /tmp/script_for_creduce.out
+    if [ $(wc -l /tmp/script_for_creduce.out | cut -d' ' -f1) -gt 20 ]; then
+        echo "# Script output (first 20 lines):"
+        head -n 20 /tmp/script_for_creduce.out
+        echo "(...) [truncated; full output in /tmp/script_for_creduce.out]"
+    else
+        echo "# Script output:"
+        cat /tmp/script_for_creduce.out
+    fi
     exit 1
 fi
 set -e
