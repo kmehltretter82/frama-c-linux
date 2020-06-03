@@ -41,6 +41,11 @@ export type RenderByFields<Row> = {
   [fd in keyof Row]?: Renderer<Row[fd]>;
 };
 
+const defaultGetter = (row: any, dataKey: string) => {
+  if (typeof row === 'object') return row[dataKey];
+  return undefined;
+};
+
 const defaultRenderer = (d: any) => {
   switch (d) {
     case null:
@@ -160,9 +165,22 @@ const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
   }
 };
 
-function makeGetter<Key, Row>(model?: Model<Key, Row>) {
+function makeRowGetter<Key, Row>(model?: Model<Key, Row>) {
   return ({ index }: Index) => model && model.getRowAt(index);
 };
+
+function makeDataGetter(
+  getter: ((row: any, dataKey: string) => any),
+  dataKey: string,
+): TableCellDataGetter {
+  return (({ rowData }) => getter(rowData, dataKey));
+}
+
+function makeDataRenderer(
+  render: ((data: any) => React.ReactNode)
+): TableCellRenderer {
+  return (({ cellData }) => render(cellData));
+}
 
 // --------------------------------------------------------------------------
 // --- Table State
@@ -182,7 +200,7 @@ class TableState<Key, Row> {
   getter: Cmap<TableCellDataGetter> = new Map(); // Computed from registry
   render: Cmap<TableCellRenderer> = new Map(); // Computed from registry and getterFields
   rowGetter: (info: Index) => Row | undefined; // Computed from last fetching
-  fields?: RenderByFields<Row>; // Last user props used for computing renderers
+  rendering?: RenderByFields<Row>; // Last user props used for computing renderers
   model?: Model<Key, Row>; // Last user proxy used for computing getter
   sorting?: Sorting; // Last user proxy used for sorting
   client?: Client; // Client of last fetching
@@ -202,7 +220,7 @@ class TableState<Key, Row> {
     this.onRowClick = this.onRowClick.bind(this);
     this.onSorting = this.onSorting.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
-    this.rowGetter = makeGetter();
+    this.rowGetter = makeRowGetter();
   }
 
   // --- Static Callbacks
@@ -296,14 +314,14 @@ class TableState<Key, Row> {
       } else {
         this.client = undefined;
       }
-      this.rowGetter = makeGetter(model);
+      this.rowGetter = makeRowGetter(model);
       this.fullReload();
     }
   }
 
-  setRendering(fields?: RenderByFields<Row>) {
-    if (fields !== this.fields) {
-      this.fields = fields;
+  setRendering(rendering?: RenderByFields<Row>) {
+    if (rendering !== this.rendering) {
+      this.rendering = rendering;
       this.render.clear();
       this.fullReload();
     }
@@ -357,6 +375,30 @@ class TableState<Key, Row> {
     console.log('CONTEXT MENU');
   }
 
+  // --- Getter & Setters
+
+  computeGetter(id: string, dataKey: string, props: Cprops) {
+    const current = this.getter.get(id);
+    if (current) return current;
+    const getter = props.getter ?? defaultGetter;
+    const dataGetter = makeDataGetter(getter, dataKey);
+    this.getter.set(id, dataGetter);
+    return dataGetter;
+  }
+
+  computeRender(id: string, dataKey: string, props: Cprops) {
+    const current = this.render.get(id);
+    if (current) return current;
+    let renderer = props.render;
+    if (!props.render) {
+      const rdr = this.rendering;
+      if (rdr) renderer = (rdr as any)[dataKey];
+    }
+    const cellRenderer = makeDataRenderer(renderer ?? defaultRenderer);
+    this.render.set(id, cellRenderer);
+    return cellRenderer;
+  }
+
   // --- User Column Registry
 
   private registry = new Map<string, null | ColProps<Row>>();
@@ -405,19 +447,6 @@ export function Column<Row, Data>(props: ColumnProps<Row, Data>) {
 // --- Virtualized Column
 // --------------------------------------------------------------------------
 
-function makeDataGetter(
-  getter: ((row: any, dataKey: string) => any),
-  dataKey: string,
-): TableCellDataGetter {
-  return (({ rowData }) => getter(rowData, dataKey));
-}
-
-function makeDataRenderer(
-  render: ((data: any) => React.ReactNode)
-): TableCellRenderer {
-  return (({ cellData }) => render(cellData));
-}
-
 function makeColumn<Key, Row>(
   state: TableState<Key, Row>,
   props: ColProps<Row>,
@@ -438,24 +467,8 @@ function makeColumn<Key, Row>(
   const sorting = state.sorting;
   const disableSort =
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
-  let getter: TableCellDataGetter;
-  {
-    const g = state.getter.get(id);
-    if (g) getter = g; else {
-      const gc = props.getter ?? ((row: any) => row[dataKey]);
-      getter = makeDataGetter(gc, dataKey);
-      state.getter.set(id, getter);
-    }
-  }
-  let render: TableCellRenderer;
-  {
-    const r = state.render.get(id);
-    if (r) render = r; else {
-      const rc = props.render ?? (state.fields as any)[dataKey];
-      render = makeDataRenderer(rc ?? defaultRenderer);
-      state.render.set(id, render);
-    }
-  }
+  const getter = state.computeGetter(id, dataKey, props);
+  const render = state.computeRender(id, dataKey, props);
   return (
     <VColumn
       key={id}
