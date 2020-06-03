@@ -317,7 +317,13 @@ struct
       let f = Context.get cframe in
       f.triggers <- tg :: f.triggers
 
-  let guards f = Lang.hypotheses f.gamma
+  let make_chunk_constraints f =
+    if not (Wp_parameters.RTE.get()) then []
+    else LabelMap.fold (fun _ s l -> M.is_well_formed s :: l) f.labels []
+
+  let guards f =
+    let constraints = in_frame f (fun () -> make_chunk_constraints f) () in
+    Lang.hypotheses f.gamma @ constraints
 
   (* -------------------------------------------------------------------------- *)
   (* --- Environments                                                       --- *)
@@ -438,6 +444,7 @@ struct
         let used = List.filter used_var sigv in
         let parp = List.map snd used in
         let sigp = List.map (fun (lv,_) -> Sig_value lv) used in
+        let domain = make_chunk_constraints frame @ domain in
         let (parm,sigm) =
           LabelMap.fold
             (fun label sigma acc ->

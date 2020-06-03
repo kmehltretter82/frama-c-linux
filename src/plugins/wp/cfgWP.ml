@@ -207,11 +207,15 @@ struct
   let intersect_vc vc p =
     Vars.intersect (F.varsp p) vc.vars || Conditions.intersect p vc.hyps
 
-  let state_vc ?descr ?stmt state vc =
+  let state_vc ?descr ?stmt sigma state vc =
     let path = match stmt with
       | None -> vc.path
       | Some s -> S.add s vc.path in
-    let hyps = Conditions.state ?stmt ?descr state vc.hyps in
+    let hyps =
+      if not (Wp_parameters.RTE.get()) then vc.hyps
+      else Conditions.domain [M.is_well_formed sigma] vc.hyps
+    in
+    let hyps = Conditions.state ?stmt ?descr state hyps in
     { vc with path ; hyps }
 
   let assume_vc ?descr ?hpid ?stmt ?warn
@@ -640,7 +644,7 @@ struct
         | Some { labels = lbl::_ } ->
             Some (Pretty_utils.to_string Printer.pp_label lbl) in
       let state = Mstate.state state sigma in
-      gmap (state_vc ?descr ?stmt state) vcs
+      gmap (state_vc ?descr ?stmt sigma state) vcs
     with Not_found -> vcs
 
   let label wenv stmt label wp =

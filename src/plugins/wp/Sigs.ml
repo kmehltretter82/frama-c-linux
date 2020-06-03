@@ -412,6 +412,10 @@ sig
       the given C-type. It is safe to retun an over-approximation of the
       chunks involved. *)
 
+  val is_well_formed : sigma -> pred
+  (** Provides the constraint corresponding to the kind of data stored by all
+      chunks in sigma. *)
+
   val load : sigma -> c_object -> loc -> loc value
   (** Return the value of the object of the given type at the given location in
       the given memory state. *)
