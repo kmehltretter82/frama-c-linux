@@ -1,24 +1,24 @@
 #!/bin/bash -eu
 
 # Displays the current working configuration of OCaml dependencies of Frama-C,
-# comparing them with the one in `known_working_configuration.md`.
+# comparing them with the one in `reference-configuration.md`.
 
 if ! type "opam" > /dev/null; then
-    opam="<none>"
+    opam="NOT"
 else
     opam="$(opam --version)"
 fi
 
 if ! type "ocaml" > /dev/null; then
-    ocaml="<none>"
+    ocaml="NOT"
 else
     ocaml=$(ocaml -vnum)
 fi
 
 version_via_opam() {
-    v=$(opam info -f version "$1" 2>/dev/null)
-    if [ "$v" = "" ]; then
-        echo "<none>"
+    v=$(opam info -f installed-version "$1" 2>/dev/null)
+    if [ "$v" = "" -o "$v" = "--" ]; then
+        echo "NOT"
     else
         echo $v
     fi
@@ -27,23 +27,23 @@ version_via_opam() {
 version_via_ocamlfind() {
     v=$(ocamlfind query -format "$1" 2>/dev/null)
     if [ "$v" = "" ]; then
-        echo "<none>"
+        echo "NOT"
     else
         echo $v
     fi
 }
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-kwc="$SCRIPT_DIR/../known_working_configuration.md"
+refconf="$SCRIPT_DIR/../reference-configuration.md"
 
-packages=$(grep '^- [^ ]*\.' "$kwc" | sed 's/^- //' | sed 's/ .*//')
+packages=$(grep '^- [^ ]*\.' "$refconf" | sed 's/^- //' | sed 's/ .*//')
 
 bold=$(tput bold)
 normal=$(tput sgr0)
 
 has_any_diffs=0
 # Check OCaml version separately (not same syntax as the packages)
-working_ocaml=$(grep "\- OCaml " "$kwc" | sed 's/.*OCaml //')
+working_ocaml=$(grep "\- OCaml " "$refconf" | sed 's/.*OCaml //')
 if [ "$working_ocaml" != "$ocaml" ]; then
     echo -n "warning: OCaml ${bold}${ocaml}${normal} installed, "
     echo "expected ${bold}${working_ocaml}${normal}"
@@ -55,9 +55,9 @@ for package in $packages; do
     name=${package%%.*}
     all_packages+=" $package"
     working_version=$(echo $package | sed 's/^[^.]*\.//')
-    if [ "$opam" != "<none>" ]; then
+    if [ "$opam" != "NOT" ]; then
         actual_version=$(version_via_opam $name)
-    elif [ "$ocamlfind" != "<none>" ]; then
+    elif [ "$ocamlfind" != "NOT" ]; then
         actual_version=$(version_via_ocamlfind $name)
     else
         echo "error: neither opam nor ocamlfind found."

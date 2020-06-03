@@ -89,9 +89,9 @@ Why3 must be configured to make them available for Frama-C/WP:
     why3 config --detect
     ```
 
-### Known working configuration
+### Reference configuration
 
-See file [known_working_configuration.md](known_working_configuration.md)
+See file [reference-configuration.md](reference-configuration.md)
 for a set of packages that is known to work with Frama-C 21 (Scandium).
 
 ### Installing Custom Versions of Frama-C
