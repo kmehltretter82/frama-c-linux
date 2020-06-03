@@ -321,9 +321,9 @@ export function Select({
 
 */
 
-export const Form = ({className,style,...props}) =>
+export const Form = ({...props}) =>
   (
-    <div className={CLASSES('dome-xForm-grid',className)}>
+    <div className={CLASSES('dome-xForm-grid',props.className)}>
       <Context.Provider value={{}}>
         <Select state {...props}/>
       </Context.Provider>
@@ -1056,13 +1056,13 @@ export const FieldSelect = ({ className, style, children, placeholder, ...props 
    A check box field.
 */
 
-export const FieldCheckbox = ({ label, title, inverted, ...props }) => {
-  let transform = inverted ? (v) => !v : (v) => !!v ;
+export const FieldCheckbox = ({ label, ...props }) => {
+  let transform = props.inverted ? (v) => !v : (v) => !!v ;
   return (
     <Select input={transform} output={transform} {...props}>
       {({value,disabled,onChange}) => (
         <Checkbox className={disabled ? FIELD_DISABLED : FIELD_ENABLED}
-                  label={label} title={title}
+                  label={label} title={props.title}
                   disabled={disabled}
                   value={value} onChange={onChange}/>
       )}
