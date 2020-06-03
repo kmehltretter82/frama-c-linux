@@ -227,6 +227,11 @@ let () = States.column ~model ~name:"kind"
     ~data:(module PropKind)
     ~get:(fun ip -> ip) ()
 
+let () = States.column ~model ~name:"names"
+    ~descr:(Md.plain "Names")
+    ~data:(module Jstring.Jlist)
+    ~get:Property.get_names ()
+
 let () = States.column ~model ~name:"status"
     ~descr:(Md.plain "Status")
     ~data:(module PropStatus)
