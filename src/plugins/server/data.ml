@@ -632,10 +632,9 @@ module type IdentifiedType =
 sig
   type t
   val id : t -> int
-  include Info
 end
 
-module Identified(A : IdentifiedType) : Index with type t = A.t =
+module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t =
 struct
 
   type index = (int,A.t) Hashtbl.t
@@ -646,13 +645,13 @@ struct
         type t = index
         include Datatype.Undefined
         let reprs = [Hashtbl.create 0]
-        let name = "Server.Data.Identified.Type." ^ A.name
+        let name = "Server.Data.Identified.Type." ^ I.name
         let mem_project = Datatype.never_any_project
       end)
 
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Data.Identified.State." ^ A.name
+        let name = "Server.Data.Identified.State." ^ I.name
         let dependencies = []
         let default () = Hashtbl.create 0
       end)
@@ -666,12 +665,12 @@ struct
   include Collection
       (struct
         type t = A.t
-        let syntax = publish_id (module A)
+        let syntax = publish_id (module I)
         let to_json a = `Int (get a)
         let of_json js =
           let k = Ju.to_int js in
           try find k
-          with Not_found -> failure "[%s] No registered id #%d" A.name k
+          with Not_found -> failure "[%s] No registered id #%d" I.name k
       end)
 
 end

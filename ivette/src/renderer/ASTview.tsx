@@ -33,22 +33,9 @@ const PP = new Dome.PP('AST View');
 // --- Rich Text Printer
 // --------------------------------------------------------------------------
 
-const printAST = (buffer: any, text: string) => {
-  if (Array.isArray(text)) {
-    const tag = text.shift();
-    if (tag !== '') {
-      buffer.openTextMarker({ id: tag });
-    }
-    text.forEach((txt) => printAST(buffer, txt));
-    if (tag !== '') {
-      buffer.closeTextMarker();
-    }
-  } else if (typeof (text) === 'string') {
-    buffer.append(text);
-  }
-};
-
-async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
+async function loadAST(
+  buffer: RichTextBuffer, theFunction?: string, theMarker?: string,
+) {
   buffer.clear();
   if (theFunction) {
     buffer.log('// Loading', theFunction, '…');
@@ -60,9 +47,10 @@ async function loadAST(buffer: any, theFunction?: string, theMarker?: string) {
         });
         buffer.operation(() => {
           buffer.clear();
-          if (!data)
+          if (!data) {
             buffer.log('// No code for function ', theFunction);
-          printAST(buffer, data);
+          }
+          buffer.printTextWithTags(data);
           if (theMarker)
             buffer.scroll(theMarker, undefined);
         });
@@ -89,6 +77,7 @@ const ASTview = () => {
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
+  const markers = States.useSyncArray('kernel.ast.markerKind');
 
   const theFunction = select && select.function;
   const theMarker = select && select.marker;
@@ -111,8 +100,18 @@ const ASTview = () => {
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
   const onSelection = (marker: any) => setSelect({ marker });
 
-  // Theme Popup
+  function contextMenu(id: string) {
+    const marker = markers[id];
+    if (marker && marker.kind === 'function') {
+      const item1 = {
+        label: `Go to definition of ${marker.name}`,
+        onClick: () => setSelect({ function: marker.name }),
+      };
+      Dome.popupMenu([item1]);
+    }
+  }
 
+  // Theme Popup
   const selectTheme = (id?: string) => id && setTheme(id);
   const checkTheme =
     (th: { id: string }) => ({ checked: th.id === theme, ...th });
@@ -155,6 +154,7 @@ const ASTview = () => {
         lineWrapping={wrapText}
         selection={theMarker}
         onSelection={onSelection}
+        onContextMenu={contextMenu}
         readOnly
       />
     </>

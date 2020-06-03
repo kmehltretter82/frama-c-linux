@@ -172,22 +172,23 @@ export function useRequest(rq: string, params: any, options: any = {}) {
   const state = React.useRef<string>();
   const project = useProject();
   const [response, setResponse] = React.useState(options.offline);
-  const footprint =
-    project ? JSON.stringify([project, rq, params]) : undefined;
+  const footprint = project ? JSON.stringify([project, rq, params]) : undefined;
 
   async function trigger() {
     if (project) {
       try {
-        const r = await Server.GET({ endpoint: rq, params });
-        setResponse(r);
+        if (rq && params) {
+          const r = await Server.GET({ endpoint: rq, params });
+          setResponse(r);
+        }
       } catch (error) {
         PP.error(`Fail in useRequest '${rq}'. ${error.toString()}`);
         const err = options.error;
-        if (err !== undefined) setResponse(err);
+        setResponse(err);
       }
     } else {
       const off = options.offline;
-      if (off !== undefined) setResponse(off);
+      setResponse(off);
     }
   }
 
@@ -447,7 +448,7 @@ class SyncArray {
       Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
-        `Fail to set reload of syncArray '${this.id}. ${error.toString()}`,
+        `Fail to set reload of syncArray '${this.id}'. ${error.toString()}`,
       );
     }
   }

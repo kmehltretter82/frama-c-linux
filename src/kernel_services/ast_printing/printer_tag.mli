@@ -46,6 +46,7 @@ module Localizable: Datatype.S_with_collections with type t = localizable
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
+val typ_of_localizable: localizable -> typ option
 val loc_of_localizable : localizable -> location
 (** Might return [Location.unknown] *)
 

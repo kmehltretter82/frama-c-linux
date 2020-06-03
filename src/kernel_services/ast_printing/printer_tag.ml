@@ -169,14 +169,17 @@ let ki_of_localizable loc = match loc with
   | PIP ip -> Property.get_kinstr ip
   | PGlobal _ -> Kglobal
 
-let varinfo_of_localizable loc =
-  match kf_of_localizable loc with
-  | Some kf -> Some (Kernel_function.get_vi kf)
-  | None ->
-    match loc with
-    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)
-              | GFunDecl (_, vi, _) | GFun ({svar = vi }, _)) -> Some vi
-    | _ -> None
+let varinfo_of_localizable = function
+  | PLval (_, _, (Var vi, NoOffset)) -> Some vi
+  | PVDecl (_, _, vi) -> Some vi
+  | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)
+            | GFunDecl (_, vi, _) | GFun ({svar = vi }, _)) -> Some vi
+  | _ -> None
+
+let typ_of_localizable = function
+  | PLval (_, _, lval) -> Some (Cil.typeOfLval lval)
+  | PExp (_, _, expr) -> Some (Cil.typeOf expr)
+  | _ -> None
 
 let loc_of_localizable = function
   | PStmt (_,st) | PStmtStart(_,st)

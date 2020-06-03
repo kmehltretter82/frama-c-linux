@@ -540,6 +540,37 @@ is blocked.
       .finally(endOperation);
   }
 
+  // --------------------------------------------------------------------------
+  // --- Print Utilities
+  // --------------------------------------------------------------------------
+
+  /**
+     @summary Print text containing tags into buffer (bound to `this`).
+     @param {string|string[]} text - Text to print.
+     @param {object} options - CodeMirror
+       [text marker](https://codemirror.net/doc/manual.html#api_marker) options.
+  */
+  printTextWithTags(text, options = {}) {
+    if (Array.isArray(text)) {
+      const tag = text.shift();
+      if (tag !== '') {
+        const markerOptions = { id: tag, ...options };
+        this.openTextMarker(markerOptions);
+      }
+      text.forEach((txt) => this.printTextWithTags(txt, options));
+      if (tag !== '') {
+        this.closeTextMarker();
+      }
+    } else if (typeof (text) === 'string') {
+      this.append(text);
+    } else { // This case should be useless when using TS.
+      console.error(
+        `Function 'printTextWithTags' accepts a parameter of `
+        + `type string or string array: got '${typeof text}'.`
+      );
+    }
+  }
+
 }
 
 // --------------------------------------------------------------------------

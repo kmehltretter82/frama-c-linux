@@ -41,6 +41,41 @@ let () = Request.register ~page
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* The kind of a marker. *)
+module MarkerKind = struct
+  let t =
+    Enum.dictionary ~page ~name:"markerkind" ~title:"Marker kind"
+      ~descr:(Md.plain "Marker kind") ()
+
+  let kind name = Enum.tag t ~name ~descr:(Md.plain name) ()
+  let expr = kind "expression"
+  let lval = kind "lvalue"
+  let var = kind "variable"
+  let fct = kind "function"
+  let decl = kind "declaration"
+  let stmt = kind "statement"
+  let glob = kind "global"
+  let term = kind "term"
+  let prop = kind "property"
+
+  let tag =
+    let open Printer_tag in
+    function
+    | PStmt _ -> stmt
+    | PStmtStart _ -> stmt
+    | PVDecl _ -> decl
+    | PLval (_, _, (Var vi, NoOffset)) ->
+      if Cil.isFunctionType vi.vtype then fct else var
+    | PLval _ -> lval
+    | PExp _ -> expr
+    | PTermLval _ -> term
+    | PGlobal _ -> glob
+    | PIP _ -> prop
+
+  let data = Enum.publish t ~tag ()
+  include (val data : S with type t = Printer_tag.localizable)
+end
+
 module Marker =
 struct
 
@@ -75,6 +110,39 @@ struct
         let default = index
       end)
 
+  let get_name = function
+    | PLval (_, _, (Var vi, NoOffset)) -> Some vi.vname
+    | PLval (_, _, lval) -> Some (Format.asprintf "%a" Printer.pp_lval lval)
+    | PExp  (_, _, expr) -> Some (Format.asprintf "%a" Printer.pp_exp expr)
+    | PStmt _ | PStmtStart _ | PVDecl _
+    | PTermLval _ | PGlobal _| PIP _ -> None
+
+  let iter f =
+    Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
+
+  let array =
+    let model = States.model () in
+    let () =
+      States.column ~model
+        ~name:"kind" ~descr:(Md.plain "Marker kind")
+        ~data:(module MarkerKind) ~get:fst ()
+    in
+    let () =
+      States.column ~model
+        ~name:"name"
+        ~descr:(Md.plain "Marker identifier for the end-user, if any")
+        ~data:(module Jstring.Joption)
+        ~get:(fun (tag, _) -> get_name tag)
+        ()
+    in
+    States.register_array
+      ~page
+      ~name:"kernel.ast.markerKind"
+      ~descr:(Md.plain "Kind of markers")
+      ~key:snd
+      ~iter
+      model
+
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
     | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
@@ -92,6 +160,7 @@ struct
       let tag = create_tag loc in
       Localizable.Hashtbl.add tags loc tag ;
       Hashtbl.add locs tag loc ;
+      States.update array (loc, tag);
       tag
 
   let lookup tag = Hashtbl.find (STATE.get()).locs tag
@@ -176,6 +245,76 @@ let () = Request.register ~page
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+
+(* -------------------------------------------------------------------------- *)
+(* --- Information                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Info = struct
+  open Printer_tag
+
+  let print_function fmt name =
+    let stag = Transitioning.Format.stag_of_string name in
+    Transitioning.Format.pp_open_stag fmt stag;
+    Format.pp_print_string fmt name;
+    Transitioning.Format.pp_close_stag fmt ()
+
+  let print_kf fmt kf = print_function fmt (Kernel_function.get_name kf)
+
+  let print_variable fmt vi =
+    Format.fprintf fmt "Variable %s has type %a.@."
+      vi.vname Printer.pp_typ vi.vtype;
+    let kf = Kernel_function.find_defining_kf vi in
+    let pp_kf fmt kf = Format.fprintf fmt " of function %a" print_kf kf in
+    Format.fprintf fmt "It is a %s variable%a.@."
+      (if vi.vglob then "global" else if vi.vformal then "formal" else "local")
+      (Transitioning.Format.pp_print_option pp_kf) kf;
+    if vi.vtemp then
+      Format.fprintf fmt "This is a temporary variable%s.@."
+        (match vi.vdescr with None -> "" | Some descr -> " for " ^ descr);
+    Format.fprintf fmt "It is %sreferenced and its address is %staken."
+      (if vi.vreferenced then "" else "not ")
+      (if vi.vaddrof then "" else "not ")
+
+  let print_varinfo fmt vi =
+    if Cil.isFunctionType vi.vtype
+    then
+      Format.fprintf fmt "%a is a C function of type '%a'."
+        print_function vi.vname Printer.pp_typ vi.vtype
+    else print_variable fmt vi
+
+  let print_lvalue fmt _loc = function
+    | Var vi, NoOffset -> print_varinfo fmt vi
+    | lval ->
+      Format.fprintf fmt "This is an lvalue of type %a."
+        Printer.pp_typ (Cil.typeOfLval lval)
+
+  let print_localizable fmt = function
+    | PExp (_, _, e) ->
+      Format.fprintf fmt "This is a pure C expression of type %a."
+        Printer.pp_typ (Cil.typeOf e)
+    | PLval (_, _, lval) as loc -> print_lvalue fmt loc lval
+    | PVDecl (_, _, vi) ->
+      Format.fprintf fmt "This is the declaration of variable %a.@.@."
+        Printer.pp_varinfo vi;
+      print_varinfo fmt vi
+    | PStmt (kf, _) | PStmtStart (kf, _) ->
+      Format.fprintf fmt "This is a statement of function %a." print_kf kf
+    | _ -> ()
+
+  let get_marker_info loc =
+    let buffer = Jbuffer.create () in
+    let fmt = Jbuffer.formatter buffer in
+    print_localizable fmt loc;
+    Format.pp_print_flush fmt ();
+    Jbuffer.contents buffer
+end
+
+let () = Request.register ~page
+    ~kind:`GET ~name:"kernel.ast.info"
+    ~descr:(Md.plain "Get textual information about a marker")
+    ~input:(module Marker) ~output:(module Jtext)
+    Info.get_marker_info
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)
