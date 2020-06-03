@@ -253,11 +253,11 @@ class TableState<Key, Row> {
   // --- Computing Column Size
 
   computeWidth(id: string): number | undefined {
-    const old = this.columnWith.get(id);
-    if (this.resizing !== undefined) return old;
+    const cwidth = this.columnWith;
+    if (this.resizing !== undefined) return cwidth.get(id);
     const elt = this.headerRef.get(id)?.current?.parentElement;
     const cw = elt?.getBoundingClientRect()?.width;
-    if (cw) this.columnWith.set(id, cw);
+    if (cw) cwidth.set(id, cw);
     return cw;
   }
 
@@ -279,8 +279,8 @@ class TableState<Key, Row> {
     const colws = this.columnWith;
     const cwl = colws.get(lcol);
     const cwr = colws.get(rcol);
-    const wl = cwl ? cwl - offset : 0;
-    const wr = cwr ? cwr + offset : 0;
+    const wl = cwl ? cwl + offset : 0;
+    const wr = cwr ? cwr - offset : 0;
     if (wl > 40 && wr > 40) {
       const resize = this.resize;
       resize.set(lcol, wl);
@@ -499,13 +499,14 @@ function makeCprops<Key, Row>(state: TableState<Key, Row>) {
 function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
   let hasFill = false;
   let lastExt: undefined | Cprops;
+  let forceFill: undefined | Cprops;
   cols.forEach((col) => {
     if (col.fill) hasFill = true;
     else if (!col.fixed) lastExt = col;
   });
   const n = cols.length;
-  if (0 < n && !hasFill && !lastExt) lastExt = cols[n - 1];
-  return cols.map((col) => makeColumn(state, col, col === lastExt));
+  if (0 < n && !hasFill) forceFill = lastExt || cols[n - 1];
+  return cols.map((col) => makeColumn(state, col, col === forceFill));
 }
 
 // --------------------------------------------------------------------------
@@ -617,10 +618,10 @@ function makeResizers(
     r.right = cid;
     if (!r.fixed) cid = r.id;
   }
+  const cwidth = columns.map(col => state.computeWidth(col.id));
   var position = 0, resizers = [];
   for (k = 0; k < columns.length - 1; k++) {
-    const cid = columns[k].id;
-    const width = state.computeWidth(cid);
+    const width = cwidth[k];
     if (!width) return null;
     position += width;
     const a = resizing[k];
@@ -633,7 +634,7 @@ function makeResizers(
       const dragging = state.resizing === index;
       const onStart = () => state.startResizing(index);
       const onStop = () => state.stopResizing();
-      const onDrag = (ofs: number) => state.setResizeOffset(rcol, lcol, ofs);
+      const onDrag = (ofs: number) => state.setResizeOffset(lcol, rcol, ofs);
       const resizer = (
         <Resizer
           key={index}
