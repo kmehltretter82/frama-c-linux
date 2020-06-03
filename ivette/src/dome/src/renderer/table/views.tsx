@@ -52,7 +52,11 @@ const defaultRenderer = (d: any) => {
     case undefined:
       return null;
     default:
-      return <span>{new String(d)}</span>
+      return (
+        <div className="dome-xTable-renderer dome-text-label">
+          {new String(d)}
+        </div>
+      );
   }
 };
 
