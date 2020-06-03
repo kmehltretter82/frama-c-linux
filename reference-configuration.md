@@ -1,5 +1,5 @@
 The following set of packages is known to be a working configuration for
-Frama-C 21 (Scandium):
+compiling Frama-C 21 (Scandium), on a machine with gcc <= 9[^gcc-10]
 
 - OCaml 4.07.1
 - ocamlfind.1.8.0
@@ -12,3 +12,9 @@ Frama-C 21 (Scandium):
 - yojson.1.7.0
 - zarith.1.9.1
 - zmq.5.1.3 (for server, optional)
+
+[^gcc-10]: As mentioned in this [OCaml PR](https://github.com/ocaml/ocaml/issues/9144)
+gcc 10 changed its default linking conventions to make them more stringent,
+resulting in various linking issues. In particular, only OCaml 4.10 can be
+linked against gcc-10. With respect to the list above, this also means using
+ocamlfind.1.8.1 and the development version of lablgtk (https://github.com/garrigue/lablgtk)
