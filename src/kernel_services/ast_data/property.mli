@@ -514,6 +514,7 @@ val has_status: identified_property -> bool
 val get_kinstr: identified_property -> kinstr
 val get_kf: identified_property -> kernel_function option
 val get_behavior: identified_property -> funbehavior option
+val get_names: identified_property -> string list
 
 val location: identified_property -> location
 (** returns the location of the property.
