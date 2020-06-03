@@ -171,6 +171,8 @@ function makeGetter<Key, Row>(model?: Model<Key, Row>) {
 class TableState<Key, Row> {
 
   signal?: Trigger; // Full reload
+  width?: number; // Current table width
+  offset?: number; // Current resizing offset
   resizing?: number; // Currently dragging resizer
   resize: Cmap<number> = new Map(); // Current resizing wrt. dragging
   visible: Cmap<boolean> = new Map(); // Current
@@ -199,7 +201,7 @@ class TableState<Key, Row> {
     this.contextMenu = this.contextMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.onSorting = this.onSorting.bind(this);
-    this.rebuild = debounce(this.rebuild.bind(this), 50);
+    this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeGetter();
   }
 
@@ -232,29 +234,40 @@ class TableState<Key, Row> {
 
   // --- Computing Column Size
 
-  // 0 means no width
-  computeWidth(id: string): number {
+  computeWidth(id: string): number | undefined {
+    const old = this.columnWith.get(id);
+    if (this.resizing !== undefined) return old;
     const elt = this.headerRef.get(id)?.current?.parentElement;
-    const cw = elt?.getBoundingClientRect()?.width ?? 0;
-    this.columnWith.set(id, cw);
+    const cw = elt?.getBoundingClientRect()?.width;
+    if (cw) this.columnWith.set(id, cw);
     return cw;
   }
 
-  setResizing(idx?: number) {
+  startResizing(idx: number) {
     this.resizing = idx;
+    this.offset = 0;
     this.forceUpdate();
   }
 
-  setResizeOffset(lcol: string, rcol: string, delta: number) {
-    const width = this.columnWith;
-    const cwl = width.get(lcol);
-    const cwr = width.get(rcol);
-    const wl = cwl ? cwl - delta : 0;
-    const wr = cwr ? cwr + delta : 0;
+  stopResizing() {
+    this.resizing = undefined;
+    this.offset = undefined;
+    this.columnWith.clear();
+    this.forceUpdate();
+  }
+
+  // Debounced
+  setResizeOffset(lcol: string, rcol: string, offset: number) {
+    const colws = this.columnWith;
+    const cwl = colws.get(lcol);
+    const cwr = colws.get(rcol);
+    const wl = cwl ? cwl - offset : 0;
+    const wr = cwr ? cwr + offset : 0;
     if (wl > 40 && wr > 40) {
       const resize = this.resize;
       resize.set(lcol, wl);
       resize.set(rcol, wr);
+      this.offset = offset;
       this.forceUpdate();
     }
   }
@@ -552,7 +565,8 @@ const DRAGZONE = 'dome-xTable-resizer dome-color-dragzone';
 
 interface ResizerProps {
   dragging: boolean; // Currently dragging
-  offset: number; // drag-start offset
+  position: number; // drag-start offset
+  offset: number; // current offset
   onStart: Trigger;
   onStop: Trigger;
   onDrag: (offset: number) => void;
@@ -562,18 +576,21 @@ const Resizer = (props: ResizerProps) => (
   <DraggableCore
     onStart={props.onStart}
     onStop={props.onStop}
-    onDrag={(_elt, data) => props.onDrag(data.x - props.offset)}
+    onDrag={(_elt, data) => props.onDrag(data.x - props.position)}
   >
     <div
       className={props.dragging ? DRAGGING : DRAGZONE}
-      style={{ left: props.offset - 2 }}
+      style={{ left: props.position + props.offset - 2 }}
     />
   </DraggableCore>
 );
 
 type ResizeInfo = { id: string, fixed: boolean, left?: string, right?: string };
 
-function makeResizers(state: TableState<any, any>, columns: Cprops[]): null | JSX.Element[] {
+function makeResizers(
+  state: TableState<any, any>,
+  columns: Cprops[],
+): null | JSX.Element[] {
   if (columns.length < 2) return null;
   const resizing: ResizeInfo[] = columns.map(({ id, fixed = false }) => ({ id, fixed }));
   var k: number, cid; // last non-fixed from left/right
@@ -587,25 +604,28 @@ function makeResizers(state: TableState<any, any>, columns: Cprops[]): null | JS
     r.right = cid;
     if (!r.fixed) cid = r.id;
   }
-  var offset = 0, resizers = [];
+  var position = 0, resizers = [];
   for (k = 0; k < columns.length - 1; k++) {
-    const width = state.computeWidth(columns[k].id);
+    const cid = columns[k].id;
+    const width = state.computeWidth(cid);
     if (!width) return null;
-    offset += width;
+    position += width;
     const a = resizing[k];
     const b = resizing[k + 1];
     if ((!a.fixed || !b.fixed) && a.right && b.left) {
       const index = k; // Otherwize use dynamic value of k
       const rcol = a.right;
       const lcol = b.left;
+      const offset = state.offset ?? 0;
       const dragging = state.resizing === index;
-      const onStart = () => state.setResizing(index);
-      const onStop = () => state.setResizing(undefined);
+      const onStart = () => state.startResizing(index);
+      const onStop = () => state.stopResizing();
       const onDrag = (ofs: number) => state.setResizeOffset(rcol, lcol, ofs);
       const resizer = (
         <Resizer
           key={index}
           dragging={dragging}
+          position={position}
           offset={offset}
           onStart={onStart}
           onStop={onStop}
@@ -631,6 +651,7 @@ function makeTable<Key, Row>(
   state: TableState<Key, Row>,
   size: Size,
 ) {
+
   const { width, height } = size;
   const model = props.model;
   const itemCount = model.getRowCount();
@@ -641,6 +662,12 @@ function makeTable<Key, Row>(
   const cprops = makeCprops(state);
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
+
+  if (state.width !== width) {
+    state.width = width;
+    setImmediate(state.forceUpdate);
+  }
+
   return (
     <React.Fragment>
       <VTable
@@ -733,6 +760,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.setSorting(props.sorting);
     state.setRendering(props.rendering);
     state.onSelection = props.onSelection;
+    return () => state.signal = undefined;
   });
 
   return (

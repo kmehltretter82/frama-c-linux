@@ -127,3 +127,17 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Dragging Columns                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xTable .ReactVirtualized__Table__headerColumn,
+.dome-xTable .ReactVirtualized__Table__rowColumn
+{
+    transition: flex-basis linear 50ms ;
+}
+
+.dome-xTable-resizer {
+    transition: left linear 50ms ;
+}
+
+/* -------------------------------------------------------------------------- */
