@@ -261,7 +261,7 @@ module Info = struct
 
   let print_kf fmt kf = print_function fmt (Kernel_function.get_name kf)
 
-  let print_varinfo fmt vi =
+  let print_variable fmt vi =
     Format.fprintf fmt "Variable %s has type %a.@."
       vi.vname Printer.pp_typ vi.vtype;
     let kf = Kernel_function.find_defining_kf vi in
@@ -271,25 +271,27 @@ module Info = struct
       (Transitioning.Format.pp_print_option pp_kf) kf;
     if vi.vtemp then
       Format.fprintf fmt "This is a temporary variable%s.@."
-        (match vi.vdescr with None -> "" | Some descr -> descr);
-    Format.fprintf fmt "It is %sreferenced and its address is %staken.@."
+        (match vi.vdescr with None -> "" | Some descr -> " for " ^ descr);
+    Format.fprintf fmt "It is %sreferenced and its address is %staken."
       (if vi.vreferenced then "" else "not ")
       (if vi.vaddrof then "" else "not ")
 
+  let print_varinfo fmt vi =
+    if Cil.isFunctionType vi.vtype
+    then
+      Format.fprintf fmt "%a is a C function of type '%a'."
+        print_function vi.vname Printer.pp_typ vi.vtype
+    else print_variable fmt vi
+
   let print_lvalue fmt _loc = function
-    | Var vi, NoOffset ->
-      if Cil.isFunctionType vi.vtype
-      then
-        Format.fprintf fmt "%a is a C function of type %a.@."
-          print_function vi.vname Printer.pp_typ vi.vtype
-      else print_varinfo fmt vi
+    | Var vi, NoOffset -> print_varinfo fmt vi
     | lval ->
-      Format.fprintf fmt "This is an lvalue of type %a.@."
+      Format.fprintf fmt "This is an lvalue of type %a."
         Printer.pp_typ (Cil.typeOfLval lval)
 
   let print_localizable fmt = function
     | PExp (_, _, e) ->
-      Format.fprintf fmt "This is a pure C expression of type %a.@."
+      Format.fprintf fmt "This is a pure C expression of type %a."
         Printer.pp_typ (Cil.typeOf e)
     | PLval (_, _, lval) as loc -> print_lvalue fmt loc lval
     | PVDecl (_, _, vi) ->
@@ -297,24 +299,21 @@ module Info = struct
         Printer.pp_varinfo vi;
       print_varinfo fmt vi
     | PStmt (kf, _) | PStmtStart (kf, _) ->
-      Format.fprintf fmt "This is a statement of function %a@." print_kf kf
+      Format.fprintf fmt "This is a statement of function %a." print_kf kf
     | _ -> ()
 
-  let get_marker_info marker =
-    try
-      let loc = Marker.lookup marker in
-      let buffer = Jbuffer.create () in
-      print_localizable (Jbuffer.formatter buffer) loc;
-      Jbuffer.flush buffer ();
-      Jbuffer.contents buffer
-    with Not_found -> Data.failure "not a localizable marker"
+  let get_marker_info loc =
+    let buffer = Jbuffer.create () in
+    let fmt = Jbuffer.formatter buffer in
+    print_localizable fmt loc;
+    Format.pp_print_flush fmt ();
+    Jbuffer.contents buffer
 end
-
 
 let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.info"
-    ~descr:(Md.plain "Get information about a marker")
-    ~input:(module Jstring) ~output:(module Jtext)
+    ~descr:(Md.plain "Get textual information about a marker")
+    ~input:(module Marker) ~output:(module Jtext)
     Info.get_marker_info
 
 (* -------------------------------------------------------------------------- *)
