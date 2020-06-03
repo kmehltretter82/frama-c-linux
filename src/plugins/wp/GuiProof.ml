@@ -87,7 +87,8 @@ class printer (text : Wtext.text) =
       | Error(msg,_) -> text#printf "@{<bf>Script@} Error (%S).@\n" msg
       | Prover(p,r) ->
           if not (Wpo.has_verdict g p) then
-            text#printf "@{<bf>Script@} %a: %a.@\n" VCS.pp_prover p VCS.pp_result r
+            text#printf "@{<bf>Script@} %a: %a.@\n"
+              VCS.pp_prover p VCS.pp_result r
 
     method private strategy index i h =
       text#printf "@{<bf>Strategy@} %s"

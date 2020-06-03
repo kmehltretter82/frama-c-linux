@@ -170,9 +170,9 @@ rec {
                mkdir home
                HOME=$(pwd)/home
                why3 config --full-config
-               FRAMAC_WP_CACHE=replay
-               FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src};
                make src/plugins/wp/tests/test_config_qualif
+               export FRAMAC_WP_CACHE=replay
+               export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                bin/ptests.opt -error-code -config qualif src/plugins/wp/tests
         '';
         installPhase = ''
