@@ -11,7 +11,7 @@ import React from 'react';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 //import * as Dome from 'dome';
-//import { DraggableCore, DraggableEventHandler } from 'react-draggable';
+import { DraggableCore } from 'react-draggable';
 import {
   AutoSizer, Size,
   SortDirection, SortDirectionType,
@@ -171,9 +171,11 @@ function makeGetter<Key, Row>(model?: Model<Key, Row>) {
 class TableState<Key, Row> {
 
   signal?: Trigger; // Full reload
-  resize: Cmap<number> = new Map(); // Current
+  resizing?: number; // Currently dragging resizer
+  resize: Cmap<number> = new Map(); // Current resizing wrt. dragging
   visible: Cmap<boolean> = new Map(); // Current
   headerRef: Cmap<divRef> = new Map(); // Once, build on demand
+  columnWith: Cmap<number> = new Map(); // DOM column element width without dragging
   tableRef: tableRef = React.createRef(); // Once, global
   getter: Cmap<TableCellDataGetter> = new Map(); // Computed from registry
   render: Cmap<TableCellRenderer> = new Map(); // Computed from registry and getterFields
@@ -189,8 +191,9 @@ class TableState<Key, Row> {
   sortDirection?: SortDirectionType; // last sorting direction
 
   constructor() {
-    this.reload = this.reload.bind(this);
-    this.update = this.update.bind(this);
+    this.forceUpdate = this.forceUpdate.bind(this);
+    this.fullReload = this.fullReload.bind(this);
+    this.updateGrid = this.updateGrid.bind(this);
     this.watchRange = this.watchRange.bind(this);
     this.rowClassName = this.rowClassName.bind(this);
     this.contextMenu = this.contextMenu.bind(this);
@@ -202,16 +205,21 @@ class TableState<Key, Row> {
 
   // --- Static Callbacks
 
-  reload() {
+  forceUpdate() {
+    const s = this.signal;
+    if (s) { this.signal = undefined; s(); }
+  }
+
+  updateGrid() {
+    this.tableRef.current?.forceUpdateGrid();
+  }
+
+  fullReload() {
     const s = this.signal;
     if (s) {
       this.signal = undefined; s();
-      this.update();
+      this.updateGrid();
     }
-  }
-
-  update() {
-    this.tableRef.current?.forceUpdateGrid();
   }
 
   getRef(id: string) {
@@ -222,6 +230,35 @@ class TableState<Key, Row> {
     return nref;
   }
 
+  // --- Computing Column Size
+
+  // 0 means no width
+  computeWidth(id: string): number {
+    const elt = this.headerRef.get(id)?.current?.parentElement;
+    const cw = elt?.getBoundingClientRect()?.width ?? 0;
+    this.columnWith.set(id, cw);
+    return cw;
+  }
+
+  setResizing(idx?: number) {
+    this.resizing = idx;
+    this.forceUpdate();
+  }
+
+  setResizeOffset(lcol: string, rcol: string, delta: number) {
+    const width = this.columnWith;
+    const cwl = width.get(lcol);
+    const cwr = width.get(rcol);
+    const wl = cwl ? cwl - delta : 0;
+    const wr = cwr ? cwr + delta : 0;
+    if (wl > 40 && wr > 40) {
+      const resize = this.resize;
+      resize.set(lcol, wl);
+      resize.set(rcol, wr);
+      this.forceUpdate();
+    }
+  }
+
   // --- User Table properties
 
   setSorting(sorting?: Sorting) {
@@ -230,7 +267,7 @@ class TableState<Key, Row> {
     this.sortDirection = info?.sortDirection;
     if (sorting !== this.sorting) {
       this.sorting = sorting;
-      this.reload();
+      this.fullReload();
     }
   }
 
@@ -240,14 +277,14 @@ class TableState<Key, Row> {
       this.model = model;
       if (model) {
         const client = model.link();
-        client.onReload(this.reload);
-        client.onUpdate(this.update);
+        client.onReload(this.fullReload);
+        client.onUpdate(this.updateGrid);
         this.client = client;
       } else {
         this.client = undefined;
       }
       this.rowGetter = makeGetter(model);
-      this.reload();
+      this.fullReload();
     }
   }
 
@@ -255,7 +292,7 @@ class TableState<Key, Row> {
     if (fields !== this.fields) {
       this.fields = fields;
       this.render.clear();
-      this.reload();
+      this.fullReload();
     }
   }
 
@@ -330,7 +367,7 @@ class TableState<Key, Row> {
       this.getter.clear();
       this.render.clear();
       this.columns = cols;
-      this.reload();
+      this.fullReload();
     }
   }
 }
@@ -423,16 +460,22 @@ function makeColumn<Key, Row>(
   );
 };
 
-function makeColumns<Key, Row>(state: TableState<Key, Row>) {
+function makeCprops<Key, Row>(state: TableState<Key, Row>) {
   const cols: Cprops[] = [];
-  let hasFill = false;
-  let lastExt: undefined | Cprops;
   state.columns.forEach((col) => {
     if (col && isVisible(state.visible, col)) {
       cols.push(col);
-      if (col.fill) hasFill = true;
-      else if (!col.fixed) lastExt = col;
     }
+  });
+  return cols;
+}
+
+function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
+  let hasFill = false;
+  let lastExt: undefined | Cprops;
+  cols.forEach((col) => {
+    if (col.fill) hasFill = true;
+    else if (!col.fixed) lastExt = col;
   });
   const n = cols.length;
   if (0 < n && !hasFill && !lastExt) lastExt = cols[n - 1];
@@ -501,6 +544,81 @@ function headerRenderer(props: TableHeaderProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Column Resizer
+// --------------------------------------------------------------------------
+
+const DRAGGING = 'dome-xTable-resizer dome-color-dragging';
+const DRAGZONE = 'dome-xTable-resizer dome-color-dragzone';
+
+interface ResizerProps {
+  dragging: boolean; // Currently dragging
+  offset: number; // drag-start offset
+  onStart: Trigger;
+  onStop: Trigger;
+  onDrag: (offset: number) => void;
+}
+
+const Resizer = (props: ResizerProps) => (
+  <DraggableCore
+    onStart={props.onStart}
+    onStop={props.onStop}
+    onDrag={(_elt, data) => props.onDrag(data.x - props.offset)}
+  >
+    <div
+      className={props.dragging ? DRAGGING : DRAGZONE}
+      style={{ left: props.offset - 2 }}
+    />
+  </DraggableCore>
+);
+
+type ResizeInfo = { id: string, fixed: boolean, left?: string, right?: string };
+
+function makeResizers(state: TableState<any, any>, columns: Cprops[]): null | JSX.Element[] {
+  if (columns.length < 2) return null;
+  const resizing: ResizeInfo[] = columns.map(({ id, fixed = false }) => ({ id, fixed }));
+  var k: number, cid; // last non-fixed from left/right
+  for (cid = undefined, k = 0; k < columns.length; k++) {
+    const r = resizing[k];
+    r.left = cid;
+    if (!r.fixed) cid = r.id;
+  }
+  for (cid = undefined, k = columns.length - 1; 0 <= k; k--) {
+    const r = resizing[k];
+    r.right = cid;
+    if (!r.fixed) cid = r.id;
+  }
+  var offset = 0, resizers = [];
+  for (k = 0; k < columns.length - 1; k++) {
+    const width = state.computeWidth(columns[k].id);
+    if (!width) return null;
+    offset += width;
+    const a = resizing[k];
+    const b = resizing[k + 1];
+    if ((!a.fixed || !b.fixed) && a.right && b.left) {
+      const index = k; // Otherwize use dynamic value of k
+      const rcol = a.right;
+      const lcol = b.left;
+      const dragging = state.resizing === index;
+      const onStart = () => state.setResizing(index);
+      const onStop = () => state.setResizing(undefined);
+      const onDrag = (ofs: number) => state.setResizeOffset(rcol, lcol, ofs);
+      const resizer = (
+        <Resizer
+          key={index}
+          dragging={dragging}
+          offset={offset}
+          onStart={onStart}
+          onStop={onStop}
+          onDrag={onDrag}
+        />
+      );
+      resizers.push(resizer);
+    }
+  }
+  return resizers;
+}
+
+// --------------------------------------------------------------------------
 // --- Virtualized Table View
 // --------------------------------------------------------------------------
 
@@ -509,9 +627,9 @@ const CSS_HEADER_HEIGHT = 22;
 const CSS_ROW_HEIGHT = 20;
 
 function makeTable<Key, Row>(
-  size: Size,
   props: TableProps<Key, Row>,
   state: TableState<Key, Row>,
+  size: Size,
 ) {
   const { width, height } = size;
   const model = props.model;
@@ -520,7 +638,9 @@ function makeTable<Key, Row>(
   const smallHeight = itemCount > 0 && tableHeight < height;
   const rowCount = (smallHeight ? itemCount + 1 : itemCount);
   const scrollTo = state.scrollToIndex(props.selection);
-  const columns = makeColumns(state);
+  const cprops = makeCprops(state);
+  const columns = makeColumns(state, cprops);
+  const resizers = makeResizers(state, cprops);
   return (
     <React.Fragment>
       <VTable
@@ -546,7 +666,7 @@ function makeTable<Key, Row>(
       >
         {columns}
       </VTable>
-      {/*resizers*/null}
+      {resizers}
     </React.Fragment>
   );
 };
@@ -621,7 +741,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
         {props.children}
       </ColumnContext.Provider>
       <AutoSizer key='table'>
-        {(size: Size) => makeTable(size, props, state)}
+        {(size: Size) => makeTable(props, state, size)}
       </AutoSizer>
     </div>
   );
