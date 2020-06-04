@@ -50,6 +50,7 @@ struct
 
   let t_assumes = t_clause "assumes"
   let t_requires = t_clause "requires"
+  let t_instance = t_clause "instance"
   let t_breaks = t_clause "breaks"
   let t_continues = t_clause "continues"
   let t_returns = t_clause "returns"
@@ -62,6 +63,7 @@ struct
   let t_froms = t_kind "froms" "Clause `@assigns … \\from …`"
 
   let t_assert = t_clause "assert"
+  let t_check = t_clause "check"
   let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
@@ -89,7 +91,7 @@ struct
 
   open Property
 
-  let rec tag = function
+  let tag = function
     | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires _ -> t_requires
@@ -110,7 +112,8 @@ struct
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert _ -> t_assert
+        | AAssert (_, Assert, _) -> t_assert
+        | AAssert (_, Check, _) -> t_check
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant
@@ -125,7 +128,7 @@ struct
     | IPFrom _ -> t_froms
     | IPDecrease _ -> t_decreases
     | IPReachable _ -> t_reachable
-    | IPPropertyInstance { ii_ip } -> tag ii_ip
+    | IPPropertyInstance _ -> t_instance
     | IPTypeInvariant _ -> t_type_invariant
     | IPGlobalInvariant _ -> t_global_invariant
     | IPOther { io_name } -> Enum.instance p_other io_name
