@@ -215,6 +215,10 @@ end
 (* --- Property Model                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let find_alarm = function
+  | Property.IPCodeAnnot annot -> Alarms.find annot.ica_ca
+  | _ -> None
+
 let model = States.model ()
 
 let () = States.column ~model ~name:"descr"
@@ -249,6 +253,16 @@ let () = States.column ~model ~name:"source"
     ~descr:(Md.plain "Position")
     ~data:(module LogSource)
     ~get:(fun ip -> Property.location ip |> fst) ()
+
+let () = States.column ~model ~name:"alarm"
+    ~descr:(Md.plain "Alarm name (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip)) ()
+
+let () = States.column ~model ~name:"alarm_descr"
+    ~descr:(Md.plain "Alarm description (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip)) ()
 
 let is_relevant ip =
   match Property.get_kf ip with
