@@ -10,7 +10,7 @@
 import React from 'react';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
-//import * as Dome from 'dome';
+import * as Dome from 'dome';
 import { DraggableCore } from 'react-draggable';
 import {
   AutoSizer, Size,
@@ -150,6 +150,16 @@ interface ColumnData {
   contextMenu: () => void;
   headerRef: divRef;
 };
+
+interface PopupItem {
+  label: string;
+  checked?: boolean;
+  enabled?: boolean;
+  display?: boolean;
+  onClick?: Trigger;
+};
+
+type PopupMenu = ('separator' | PopupItem)[];
 
 // --------------------------------------------------------------------------
 // --- Column Utilities
@@ -376,7 +386,60 @@ class TableState<Key, Row> {
   // ---- Context Menu
 
   contextMenu() {
-    console.log('CONTEXT MENU');
+    let has_order = false;
+    let has_resize = false;
+    let has_visible = false;
+    const visible = this.visible;
+    const columns = this.columns;
+    columns.forEach(col => {
+      if (!col.disableSort) has_order = true;
+      if (!col.fixed) has_resize = true;
+      if (col.visible !== 'never' && col.visible !== 'always')
+        has_visible = true;
+    });
+    const resetSizing = () => {
+      this.resize.clear();
+      this.forceUpdate();
+    };
+    const resetColumns = () => {
+      this.visible.clear();
+      this.resize.clear();
+      this.forceUpdate();
+    };
+    const items: PopupMenu = [
+      {
+        label: 'Reset ordering',
+        display: has_order,
+        onClick: undefined,
+      },
+      {
+        label: 'Reset column widths',
+        display: has_resize,
+        onClick: resetSizing,
+      },
+      {
+        label: 'Restore column defaults',
+        display: has_visible,
+        onClick: resetColumns,
+      },
+      'separator',
+    ];
+    columns.forEach(col => {
+      switch (col.visible) {
+        case 'never':
+        case 'always':
+          break;
+        default:
+          const { id, label, title } = col;
+          const checked = isVisible(visible, col);
+          const onClick = () => {
+            visible.set(id, !checked);
+            this.forceUpdate();
+          };
+          items.push({ label: label || title || id, checked, onClick });
+      }
+    });
+    Dome.popupMenu(items);
   }
 
   // --- Getter & Setters
@@ -552,8 +615,8 @@ function headerRowRenderer(props: TableHeaderRowProps) {
 }
 
 function headerRenderer(props: TableHeaderProps) {
-  const { sortBy, sortDirection, dataKey } = props;
   const data: ColumnData = props.columnData;
+  const { sortBy, sortDirection, dataKey } = props;
   const { icon, label, title, headerRef, contextMenu } = data;
   const sorter =
     dataKey === sortBy
