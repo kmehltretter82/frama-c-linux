@@ -2,8 +2,15 @@
 /* --- Frama-C Styling                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+.sidebar-ruler {
+    display: block;
+    visibility: hidden;
+    width: 80px;
+    height: 0px;
+}
+
 .component-info {
-    color: #888;
+    color: #888 ;
     min-width: 50px;
     padding-top: 4px;
     font-size: smaller;

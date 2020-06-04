@@ -15,9 +15,11 @@ import './style.css';
 import { LabView, View, Group } from 'frama-c/LabViews';
 import { GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
-import Properties from './Properties';
+
 import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
+import Globals from './Globals';
+import Properties from './Properties';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -82,7 +84,8 @@ export default (() => {
       </Toolbar.ToolBar>
       <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
         <Sidebar.SideBar>
-          <div>(Empty)</div>
+          <div className='sidebar-ruler' />
+          <Globals key="globals" />
         </Sidebar.SideBar>
         <LabView
           customize={viewbar}
