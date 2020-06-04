@@ -53,20 +53,34 @@ interface Property {
 const bySource =
   Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.primitive });
 
-const byProperty =
-  Compare.byFields<Property>({
-    function: Compare.defined(Compare.alpha),
-    source: bySource,
-    kind: Compare.primitive,
-    status: Compare.primitive,
-    kinstr: Compare.primitive,
-    key: Compare.primitive,
-  });
+const byStatus =
+  Compare.byRank(
+    'inconsistent',
+    'invalid',
+    'invalid_under_hyp',
+    'unknown',
+    'valid_under_hyp',
+    'valid',
+    'invalid_but_dead',
+    'unknown_but_dead',
+    'valid_but_dead',
+    'never_tried',
+    'considered_valid',
+  );
+
+const byProperty: Compare.ByFields<Property> = {
+  status: byStatus,
+  function: Compare.defined(Compare.alpha),
+  source: bySource,
+  kind: Compare.primitive,
+  key: Compare.primitive,
+  kinstr: Compare.primitive,
+};
 
 class PropertyModel extends ArrayModel<Property> {
   constructor() {
     super('key');
-    this.setNaturalOrder(byProperty);
+    this.setOrderingByFields(byProperty);
   }
 }
 
@@ -86,7 +100,6 @@ const RenderTable = () => {
   }, [model, items]);
 
   // Callbacks
-
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
     [statusDict],
@@ -104,6 +117,7 @@ const RenderTable = () => {
   return (
     <Table<string, Property>
       model={model}
+      sorting={model}
       selection={selection}
       onSelection={onSelection}
     >
