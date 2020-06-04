@@ -36,7 +36,13 @@ const SVG = SVGraw as (props: { id: string, size?: number }) => JSX.Element;
 // --- Rendering Interfaces
 // --------------------------------------------------------------------------
 
-export type Renderer<D> = (data?: D) => null | JSX.Element;
+/** Cell data renderer. */
+export type Renderer<Cell> = (data?: Cell) => null | JSX.Element;
+
+/**
+   Associates, for each field `{ fd: Cell }` in `Row`, a renderer
+   for type `Cell`.
+ */
 export type RenderByFields<Row> = {
   [fd in keyof Row]?: Renderer<Row[fd]>;
 };
@@ -45,12 +51,11 @@ export type RenderByFields<Row> = {
 // --- Table Columns
 // --------------------------------------------------------------------------
 
-/** Applied to any table cell in a column. */
-export type TextAlign = 'left' | 'center' | 'right';
-
-export type Visibility = boolean | 'never' | 'always';
-
-export interface ColumnProps<Row, Data> {
+/**
+   @template Row - table row data of some table entries
+   @template Cell - type of cell data to render in this column
+ */
+export interface ColumnProps<Row, Cell> {
   /** Column identifier. */
   id: string;
   /** Header icon. */
@@ -65,7 +70,7 @@ export interface ColumnProps<Row, Data> {
    */
   index?: number;
   /** CSS vertical alignment on cells. */
-  align?: TextAlign;
+  align?: 'left' | 'center' | 'right';
   /** Column base width in pixels (default 60px). */
   width?: number;
   /** Extensible column (not by default). */
@@ -88,15 +93,15 @@ export interface ColumnProps<Row, Data> {
      visibility is forced and can not be modified by the user. Otherwize,
      the user can change visibility through the column header context menu.
    */
-  visible?: Visibility;
+  visible?: boolean | 'never' | 'always';
   /**
      Data getter for this column.
    */
-  getter?: (row: Row, dataKey: string) => Data;
+  getter?: (row: Row, dataKey: string) => Cell;
   /**
      Override table by-fields cell renderers.
    */
-  render?: Renderer<Data>;
+  render?: Renderer<Cell>;
   /**
      Override table right-click callback.
    */
@@ -107,6 +112,10 @@ export interface ColumnProps<Row, Data> {
 // --- Table Properties
 // --------------------------------------------------------------------------
 
+/**
+   @template Key - unique identifiers of table entries
+   @template Row - data associated to each key in the table entries
+ */
 export interface TableProps<Key, Row> {
   /** Data proxy. */
   model: Model<Key, Row>;
@@ -634,8 +643,10 @@ const ColumnContext =
 
 /**
    Table Column.
+   @template Row - table row data of some table entries
+   @template Cell - type of cell data to render in this column
  */
-export function Column<Row, Data>(props: ColumnProps<Row, Data>) {
+export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
   const context = React.useContext(ColumnContext);
   React.useEffect(() => context && context.useColumn(props));
   return null;
@@ -916,53 +927,55 @@ function makeTable<Key, Row>(
 // --- Table View
 // --------------------------------------------------------------------------
 
-/**
-   Table View.
+/** Table View.
 
    This component is base on [React-Virtualized
    Tables](https://bvaughn.github.io/react-virtualized/#/components/Table),
    offering a lazy, super-optimized rendering process that scales on huge
    datasets.
 
-   A table shall be connected to an instance of
-   [[Model]] class to retrieve the data and
-   get informed of data updates.
+   A table shall be connected to an instance of [[Model]] class to retrieve the
+   data and get informed of data updates.
 
-   The table columns shall be instances of
-   [[Column]] class.
+   The table children shall be instances of [[Column]] class, and can be grouped
+   into arbitrary level of React fragments or custom components.
 
    Clicking on table headers trigger re-ordering callback on the model with the
-   expected column and direction, unless disabled _via_ the column
-   x   specification. However, actual sorting (and corresponding feedback on table
+   expected column and direction, unless disabled _via_ the column x
+   specification. However, actual sorting (and corresponding feedback on table
    headers) would only take place if the model supports re-ordering and
    eventually triggers a reload.
 
-   Right-clicking the table headers displays a popup-menu with actions to reset natural ordering,
-   reset column widths and select column visibility.
+   Right-clicking the table headers displays a popup-menu with actions to reset
+   natural ordering, reset column widths and select column visibility.
 
-   Tables do not control item selection state. Instead, you shall supply the selection
-   state and callback _via_ properties, like any other controlled React components.
+   Tables do not control item selection state. Instead, you shall supply the
+   selection state and callback _via_ properties, like any other controlled
+   React components.
 
    Item selection can be based either on single-row or multiple-row. In case of
-   single-row selection (`multipleSelection:false`, the default), selection state
-   must be a single item or `undefined`, and the `onSelection` callback is called
-   with the same type of values.
+   single-row selection (`multipleSelection:false`, the default), selection
+   state must be a single item or `undefined`, and the `onSelection` callback is
+   called with the same type of values.
 
-   In case of multiple-row selection (`multipleSelection:true`), the selection state
-   shall be an _array_ of items, and `onSelection` callback also. Single items are _not_
-   accepted, but `undefined` selection can be used in place of an empty array.
+   In case of multiple-row selection (`multipleSelection:true`), the selection
+   state shall be an _array_ of items, and `onSelection` callback also. Single
+   items are _not_ accepted, but `undefined` selection can be used in place of
+   an empty array.
 
-   Clicking on a row triggers the `onSelection` callback with the updated selection.
-   In single-selection mode, the clicked item is sent to the callback. In
-   multiple-selection mode, key modifiers are taken into account for determining the new
-   slection. By default, the new selection only contains the clicked item. If the `Shift`
-   modifier has been pressed, the current selection is extended with a range of items
-   from the last selected one, to the newly selected one. If the `CtrlOrCmd` modifier
-   has been pressed, the selection is extended with the newly clicked item.
-   Clicking an already selected item with the `CtrlOrCmd` modifier removes it from
-   the current selection.
+   Clicking on a row triggers the `onSelection` callback with the updated
+   selection.  In single-selection mode, the clicked item is sent to the
+   callback. In multiple-selection mode, key modifiers are taken into account
+   for determining the new slection. By default, the new selection only contains
+   the clicked item. If the `Shift` modifier has been pressed, the current
+   selection is extended with a range of items from the last selected one, to
+   the newly selected one. If the `CtrlOrCmd` modifier has been pressed, the
+   selection is extended with the newly clicked item.  Clicking an already
+   selected item with the `CtrlOrCmd` modifier removes it from the current
+   selection.
 
- */
+   @template Key - unique identifiers of table entries @template Row - data
+   associated to each key in the table entries */
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 

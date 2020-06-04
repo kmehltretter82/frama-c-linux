@@ -373,16 +373,20 @@ export class MapModel<Key, Row>
 // --- Compact Array Model
 // --------------------------------------------------------------------------
 
+/**
+   @template Row - object data that also contains « key »
+*/
 export class ArrayModel<Row> extends MapModel<string, Row> {
 
   private key: keyof Row
 
+  /** @param key - the key property of `Row` holding an entry identifier. */
   constructor(key: keyof Row) {
     super();
     this.key = key;
   }
 
-  /** Optimized with respected to inherited version. */
+  /** Optimized, see [[getKey]]. */
   getKeyFor(_: number, data: Row) { return this.getKey(data); }
 
   /** Returns the key of data. */
