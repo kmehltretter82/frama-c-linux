@@ -2835,135 +2835,45 @@ int __fc_fpclassifyf(float x);
  */
 int __fc_fpclassify(double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern double acos(double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern float acosf(float x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures positive_result: \is_finite(\result) ∧ \result ≥ 0;
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern long double acosl(long double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures finite_result: \is_finite(\result);
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures finite_result: \is_finite(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern double asin(double x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures finite_result: \is_finite(\result);
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures finite_result: \is_finite(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern float asinf(float x);
 
-/*@ assigns __fc_errno, \result;
-    assigns __fc_errno \from x;
+/*@ requires in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
+    ensures finite_result: \is_finite(\result);
+    assigns \result;
     assigns \result \from x;
-    
-    behavior normal:
-      assumes in_domain: \is_finite(x) ∧ \abs(x) ≤ 1;
-      ensures finite_result: \is_finite(\result);
-      assigns \result;
-      assigns \result \from x;
-    
-    behavior domain_error:
-      assumes
-        out_of_domain: \is_infinite(x) ∨ (\is_finite(x) ∧ \abs(x) > 1);
-      ensures errno_set: __fc_errno ≡ 1;
-      assigns __fc_errno, \result;
-      assigns __fc_errno \from x;
-      assigns \result \from x;
-    
-    disjoint behaviors domain_error, normal;
  */
 extern long double asinl(long double x);
 
@@ -6492,6 +6402,17 @@ axiomatic nanosleep_predicates {
 extern int clock_nanosleep(clockid_t clock_id, int flags,
                            struct timespec const *rqtp, struct timespec *rmtp);
 
+/*@ requires valid_timer: \valid_read(timer);
+    requires valid_result: \valid(result);
+    ensures
+      result_null_or_result: \result ≡ \old(result) ∨ \result ≡ \null;
+    assigns \result, *result;
+    assigns \result \from (indirect: *timer), result;
+    assigns *result \from (indirect: *timer);
+ */
+extern struct tm *gmtime_r(time_t const * __restrict timer,
+                           struct tm * __restrict result);
+
 /*@ requires valid_request: \valid_read(rqtp);
     requires
       initialization: initialized_request:
@@ -7866,6 +7787,30 @@ extern int pthread_mutex_lock(pthread_mutex_t *mutex);
     assigns \result \from (indirect: *mutex);
  */
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 22;
+    assigns *attr, \result;
+    assigns *attr \from *attr;
+    assigns \result \from (indirect: *attr);
+ */
+extern int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 12;
+    assigns \result, *attr;
+    assigns \result \from \nothing;
+    assigns *attr \from \nothing;
+ */
+extern int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 22;
+    assigns \result, *attr;
+    assigns \result \from (indirect: type);
+    assigns *attr \from (indirect: type);
+ */
+extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
 
 extern char __fc_getpwuid_pw_name[64];
 

@@ -58,14 +58,13 @@ By default, the scripts use the frama-c binaries located in your `$PATH`
 environment variable. You may want to specify different binaries, but, if you
 want to version your analysis, this path will depend on the computer it is run
 on. So, we recommend you use an unversioned file `frama-c-path.mk`. Add this
-file to your `.gitignore` and define the `FRAMAC`, `FRAMAC_GUI` and
-`FRAMAC_CONFIG` variables there. For instance:
+file to your `.gitignore` and define the `FRAMAC` and `FRAMAC_GUI`
+variables there. For instance:
 
 ````
 FRAMAC_DIR=frama-c/bin
 FRAMAC=$(FRAMAC_DIR)/frama-c
 FRAMAC_GUI=$(FRAMAC_DIR)/frama-c-gui
-FRAMAC_CONFIG=$(FRAMAC_DIR)/frama-c-config
 ````
 
 And include this file before `frama-c.mk` in your Makefile. As this file
@@ -78,12 +77,12 @@ files:
 ````
 
 Then, to handle both cases when Frama-C is in the path, and when it is not,
-use the following conditional definition of `FRAMAC_CONFIG` followed by the
+use the following conditional definition of `FRAMAC` followed by the
 inclusion of `frama-c.mk`:
 
 ```
-FRAMAC_CONFIG ?= frama-c-config
-include $(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/frama-c.mk
+FRAMAC ?= frama-c
+include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
 ```
 
 
@@ -164,8 +163,7 @@ Full example
 # optional include, in case frama-c-path.mk does not exist (frama-c in the PATH)
 -include frama-c-path.mk
 # frama-c-config is used to find the analysis scripts and frama-c.mk
-FRAMAC_CONFIG ?= frama-c-config
-include $(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/frama-c.mk
+include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
 
 # Global parameters
 CPPFLAGS     = -D__I586__
@@ -192,7 +190,6 @@ example.eva:   EVAFLAGS += -slevel 500
 FRAMAC_DIR=frama-c/bin
 FRAMAC=$(FRAMAC_DIR)/frama-c
 FRAMAC_GUI=$(FRAMAC_DIR)/frama-c-gui
-FRAMAC_CONFIG=$(FRAMAC_DIR)/frama-c-config
 ````
 
 ### `.gitignore`

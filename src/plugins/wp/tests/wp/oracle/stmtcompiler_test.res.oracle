@@ -332,7 +332,7 @@ Prove: foo_0 = 42.
 
 Goal Assertion 'bad' (file tests/wp/stmtcompiler_test.i, line 54):
 Prove: foo_0 = 42.
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 [wp] tests/wp/stmtcompiler_test.i:145: Warning: void object
@@ -352,7 +352,7 @@ Prove: foo_0 = 1.
 
 Goal Assertion 'bad' (file tests/wp/stmtcompiler_test.i, line 69):
 Prove: foo_0 = 1.
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 main_assigns_global sequent:
@@ -409,7 +409,7 @@ Prove: i = 1.
 Goal Assertion 'bad' (file tests/wp/stmtcompiler_test.i, line 87):
 Assume { Have: 0 <= x. }
 Prove: false.
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 zloop sequent:
@@ -592,7 +592,7 @@ Prove: x < 0.
 Goal Assertion 'bad' (file tests/wp/stmtcompiler_test.i, line 131):
 Assume { Have: 0 <= x. }
 Prove: false.
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 new way
@@ -621,7 +621,7 @@ Assume {
   Have: x_1 < (y * y).
 }
 Prove: false.
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 if_assert sequent:
@@ -656,7 +656,7 @@ Prove: x < (y * y).
 Goal Assertion (file tests/wp/stmtcompiler_test.i, line 140):
 Assume { Have: 0 <= x. }
 Prove: 0 < (x + (y * y)).
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 if_assert sequent:
@@ -670,7 +670,7 @@ Prove: x < (y * y).
 Goal Assertion (file tests/wp/stmtcompiler_test.i, line 137):
 Assume { Have: x < 0. }
 Prove: x < (y * y).
-[Qed] -
+[Qed] No Result
 
 ------------------------------------------------------------
 new way

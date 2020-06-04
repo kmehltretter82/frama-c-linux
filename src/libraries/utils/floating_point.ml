@@ -426,6 +426,9 @@ external sqrtf: float -> float = "c_sqrtf"
 external fmodf: float -> float -> float = "c_fmodf"
 external cosf: float -> float = "c_cosf"
 external sinf: float -> float = "c_sinf"
+external acosf: float -> float = "c_acosf"
+external asinf: float -> float = "c_asinf"
+external atanf: float -> float = "c_atanf"
 external atan2f: float -> float -> float = "c_atan2f"
 
 

@@ -8,8 +8,8 @@
 # 3. The all rule invoke the script
 
 -include frama-c-path.mk
-FRAMAC_CONFIG ?= frama-c-config
--include $(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/frama-c.mk
+FRAMAC ?= frama-c
+-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
 
 # Global parameters
 CPPFLAGS     = -D__I586__
@@ -21,7 +21,7 @@ export FRAMA_C_MEMORY_FOOTPRINT = 8
 
 # Default targets
 all:
-	$(shell $(FRAMAC_CONFIG) -print-share-path)/analysis-scripts/slevel-tweaker.sh -f example-slevel.mk example1 example2
+	$(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/slevel-tweaker.sh -f example-slevel.mk example1 example2
 
 # Clean
 clean::

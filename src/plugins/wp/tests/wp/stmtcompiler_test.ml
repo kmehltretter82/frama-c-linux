@@ -29,7 +29,7 @@ let run () =
   let spawn goal =
     let result _ prv res =
       Format.printf "[%a] %a@.@\n"
-        VCS.pp_prover prv VCS.pp_result res
+        VCS.pp_prover prv (VCS.pp_result_qualif prv) res
     in
     let server = ProverTask.server () in
     Prover.spawn goal ~delayed:true ~result provers;

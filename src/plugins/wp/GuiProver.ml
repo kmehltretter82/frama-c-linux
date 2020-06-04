@@ -115,7 +115,7 @@ class prover ~(console:Wtext.text) ~prover =
     method update wpo =
       begin
         let res = Wpo.get_result wpo prover in
-        result#set_text (Pretty_utils.to_string VCS.pp_result_perf res) ;
+        result#set_text (Pretty_utils.to_string VCS.pp_result res) ;
         match res.VCS.verdict with
         | VCS.NoResult ->
             let callback () = self#run wpo in

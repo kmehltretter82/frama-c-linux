@@ -41,6 +41,7 @@ The WP makefile provides several targets to automate cache management. It is hig
 recommanded to use them most of the time:
 
 - `make wp-qualif` re-runs qualif tests; no new cache entry is created, though.
+- `make wp-qualif-env` prints the environment variables for wp-qualif.
 - `make wp-qualif-update` re-runs and create missing cache entries.
 - `make wp-qualif-upgrade` creates missing cache entries _and_ update tests scripts is necessary.
 - `make wp-qualif-push` commits and pushes all new cache entries to the GitLab repository.
@@ -51,17 +52,36 @@ commands in a _local_ shell:
 
     $ export FRAMAC_WP_CACHE=update
     $ export FRAMAC_WP_CACHEDIR=<path-to-wp-cache>
-    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i [-show|-update]
+    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
 
 It is _highly_ recommanded to _not_ set the `FRAMAC_WP_xxx` variables globally;
 doing so would causing WP to add new cache entries to the global « qualif » cache
 from all your projects around. Consult the section « Global WP Cache Setup »
 below for details.
 
+# Qualified Test Results
+
+To be accepted by Frama-CI, tests in « qualif » configuration must be easily
+reproducible on any platform. This is checked by running WP with flag
+`-wp-msg-key success-only` which is set by the default in the qualif test
+configuration. Hence, a qualified test result only contains proof status that
+are either:
+- failed
+- valid for qed or script
+- cached for alt-ergo in all cases
+- valid, unknown or stepout for native Alt-Ergo
+- valid or unknown for (native) Coq
+
+This excludes any timeout with native Alt-Ergo, which must be turned into some
+reproducible stepout by setting `-wp-steps` and `-wp-timeout` options
+accordingly. Please choose a step limit that makes large enough to ensure the
+goal is not provable, but small enough to make alt-ergo decide quickly.
+
 # Global WP Cache Setup (for wp-qualif)
 
-All prover results for test configuration `qualif` shall be cached in a dedicate GitLab repo.
-This considerally speed-up the process of running those tests, from hours downto minutes.
+All prover results for test configuration `qualif` shall be cached in a dedicate
+GitLab repo.  This considerally speed-up the process of running those tests,
+from hours downto minutes.
 
 To ease the management of cache entries accross merge requests,
 _all_ cache entries shall be merged into the _same_ master branch of a global
@@ -83,7 +103,13 @@ environment. To run individual tests, you may now use:
 
     $ export FRAMAC_WP_CACHE=update
     $ export FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
-    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i [-show|-update]
+    $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
+
+The necessary environment variables can also be displayed by the makefile:
+
+    $ make wp-qualif-env
+    FRAMAC_WP_CACHE=update
+    FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
 
 As mentionned above, it is _not_ recommanded to globally set the
 `FRAMAC_WP_XXX` variables in your default shell environment, because WP will

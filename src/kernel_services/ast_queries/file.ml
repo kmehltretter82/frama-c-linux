@@ -473,13 +473,13 @@ let parse_cabs = function
       else []
     in
     let define_args =
-      if Kernel.FramaCStdLib.get () && not (existing_machdep_macro ())
+      if not (existing_machdep_macro ())
       then [machdep_macro (Kernel.Machdep.get ())]
       else []
     in
     let extra_args =
-      if include_args = [] && define_args = [] then []
-      else add_if_gnu "-nostdinc"
+      if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
+      else []
     in
     let define_args = "__FRAMAC__" :: define_args in
     (* Hypothesis: the preprocessor does support the arch-related

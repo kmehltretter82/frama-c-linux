@@ -321,11 +321,10 @@ module type IdentifiedType =
 sig
   type t
   val id : t -> int
-  include Info
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType) : Index with type t = A.t
+module Identified(A : IdentifiedType)(I:Info) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling}

@@ -1,11 +1,13 @@
 /* run.config*
-  FILTER: sed -e '/f32__/ s/\([0-9][.][0-9]\{6\}\)[0-9]\{10\}/\1/g'
+  FILTER: sed -e '/f32__/ s/\([0-9][.][0-9]\{6\}\)[0-9]\{10\}/\1/g' -e '/d64__/ s/\([0-9][.][0-9]\{15\}\)[0-9]\{1\}/\1/g'
   COMMENT: 'sed' filter is a temporary workaround due to libc imprecisions
   STDOPT: +"-float-normal -eva -eva-no-memexec -eva-builtin sqrt:Frama_C_sqrt,exp:Frama_C_exp,log:Frama_C_log,log10:Frama_C_log10,cos:Frama_C_cos,sin:Frama_C_sin,atan2:Frama_C_atan2,pow:Frama_C_pow,fmod:Frama_C_fmod,sqrtf:Frama_C_sqrtf,expf:Frama_C_expf,logf:Frama_C_logf,log10f:Frama_C_log10f,powf:Frama_C_powf,floor:Frama_C_floor,ceil:Frama_C_ceil,trunc:Frama_C_trunc,round:Frama_C_round,floorf:Frama_C_floorf,ceilf:Frama_C_ceilf,truncf:Frama_C_truncf,roundf:Frama_C_roundf -then -print"
 */ 
 #include <math.h>
 
 static volatile int nondet;
+static volatile double any_double;
+static volatile float any_float;
 #define assert_bottom(exp) if (nondet) { exp; Frama_C_show_each_unreachable(); }
 
 double double_interval(double min, double max) {
@@ -23,6 +25,74 @@ void test_sin_det() {
   double x = sin(1.);
   double y = sin(0.);
   double z = sin(-1.);
+}
+
+void test_acos () {
+  double half_pi = acos(0.);
+  double pi = acos(-1.);
+  double zero = acos(1.);
+  double acos_image = acos(any_double);
+  if (nondet) {
+    double bottom = acos(-1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  if (nondet) {
+    double bottom = acos(1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  double d64__x = acos(0.5);
+  double d64__y = acos(-0.5);
+  double d64__xy = double_interval(-0.5, 0.5);
+  d64__xy = acos(d64__xy);
+  /* Test acosf. */
+  float f32__half_pi = acosf(0.f);
+  float f32__pi = acosf(-1.f);
+  float f32__zero = acosf(1.f);
+  float f32__acosf_image = acosf(any_float);
+  if (nondet) {
+    float bottom = acosf(2.f);
+    Frama_C_show_each_bottom(bottom);
+  }
+}
+
+void test_asin () {
+  double zero = asin(0.);
+  double minus_half_pi = asin(-1.);
+  double half_pi = asin(1.);
+  double asin_image = asin(any_double);
+  if (nondet) {
+    double bottom = asin(-1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  if (nondet) {
+    double bottom = asin(1.5);
+    Frama_C_show_each_bottom(bottom);
+  }
+  double d64__x = asin(-0.5);
+  double d64__y = asin(0.5);
+  double d64__xy = double_interval(-0.5, 0.5);
+  d64__xy = asin(d64__xy);
+  /* Test asinf. */
+  float f32__zero = asinf(0.f);
+  float f32__minus_half_pi = asinf(-1.f);
+  float f32__half_pi = asinf(1.f);
+  float f32__asinf_image = asinf(any_float);
+  if (nondet) {
+    float bottom = asinf(2.f);
+    Frama_C_show_each_bottom(bottom);
+  }
+}
+
+void test_atan () {
+  double zero = atan(0.);
+  double atan_image = atan(any_double);
+  double d64__x = atan(-2.);
+  double d64__y = atan(2.);
+  double d64__xy = double_interval(-2., 2.);
+  d64__xy = atan(d64__xy);
+  /* Test atanf. */
+  float f32__zero = atanf(0.f);
+  float f32__atanf_image = atanf(any_float);
 }
 
 void test_atan2_det() {
@@ -655,6 +725,9 @@ void test_roundf() {
 int main() {
   test_cos_det();
   test_sin_det();
+  test_acos();
+  test_asin();
+  test_atan();
   test_atan2_det();
   test_atan2();
   test_pow_det();

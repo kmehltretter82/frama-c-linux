@@ -383,7 +383,7 @@ let do_wpo_failed goal =
   | [p,r] ->
       Wp_parameters.result "[%a] Goal %s : %a%a"
         VCS.pp_prover p (Wpo.get_gid goal)
-        VCS.pp_result r pp_warnings goal
+        (VCS.pp_result_qualif p) r pp_warnings goal
   | pres ->
       Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
         begin fun fmt ->
@@ -391,7 +391,7 @@ let do_wpo_failed goal =
           List.iter
             (fun (p,r) ->
                Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
-                 (VCS.title_of_prover p) VCS.pp_result r
+                 (VCS.title_of_prover p) (VCS.pp_result_qualif p) r
             ) pres ;
         end
 
@@ -408,7 +408,7 @@ let do_wpo_smoke status goal =
         (fun (p,r) ->
            Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
              (VCS.title_of_prover p)
-             VCS.pp_result r
+             (VCS.pp_result_qualif p) r
         ) (results goal) ;
     end
 
@@ -444,7 +444,7 @@ let do_wpo_success goal s =
           Wp_parameters.feedback ~ontty:`Silent
             "[%a] Goal %s : %a"
             VCS.pp_prover prover (Wpo.get_gid goal)
-            VCS.pp_result result
+            (VCS.pp_result_qualif prover) result
     end
 
 let do_report_time fmt s =

@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2020-05-29] New builtins for trigonometric functions acos, asin
+              and atan (and their single-precision version acosf, asinf, atanf).
 -   Kernel    [2020-05-28] Support for C11's _Thread_local storage specifier
 -   Kernel    [2020-05-26] New option -explain, which provides help messages
               for options used on the command line.

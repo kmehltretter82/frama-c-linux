@@ -119,7 +119,7 @@ val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
 val pp_result : Format.formatter -> result -> unit
-val pp_result_perf : Format.formatter -> result -> unit
+val pp_result_qualif : prover -> Format.formatter -> result -> unit
 
 val compare : result -> result -> int (* best is minimal *)
 val merge : result -> result -> result

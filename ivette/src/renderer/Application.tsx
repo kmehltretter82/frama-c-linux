@@ -16,6 +16,7 @@ import { GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
 import Properties from './Properties';
 import ASTview from './ASTview';
+import ASTinfo from './ASTinfo';
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -64,6 +65,7 @@ export default (() => {
             <Controller.Console />
             <Properties />
             <ASTview />
+            <ASTinfo />
           </Group>
         </LabView>
       </Splitter>

@@ -293,40 +293,59 @@ let cached r = if is_verdict r then { r with cached=true } else r
 
 let kfailed ?pos msg = Pretty_utils.ksfprintf (failed ?pos) msg
 
-let perfo extended dkey = extended || not (Wp_parameters.has_dkey dkey)
+let perfo dkey = not (Wp_parameters.has_dkey dkey)
 
-let pp_perf ~extended fmt r =
+let pp_perf fmt r =
   begin
     let t = r.solver_time in
-    if t > Rformat.epsilon && perfo extended dkey_no_time_info
+    if t > Rformat.epsilon && perfo dkey_no_time_info
     then Format.fprintf fmt " (Qed:%a)" Rformat.pp_time t ;
     let t = r.prover_time in
-    if t > Rformat.epsilon && perfo extended dkey_no_time_info
+    if t > Rformat.epsilon && perfo dkey_no_time_info
     then Format.fprintf fmt " (%a)" Rformat.pp_time t ;
     let s = r.prover_steps in
-    if s > 0 && perfo extended dkey_no_step_info
+    if s > 0 && perfo dkey_no_step_info
     then Format.fprintf fmt " (%d)" s ;
-    if r.cached && perfo extended dkey_no_cache_info
+    if r.cached && perfo dkey_no_cache_info
     then Format.fprintf fmt " (cached)" ;
   end
 
-let pp_res ~extended fmt r =
+let pp_result fmt r =
   match r.verdict with
-  | NoResult -> Format.pp_print_string fmt (if extended then "No Result" else "-")
+  | NoResult -> Format.pp_print_string fmt "No Result"
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Invalid -> Format.pp_print_string fmt "Invalid"
-  | Valid when Wp_parameters.has_dkey dkey_success_only ->
-      Format.pp_print_string fmt "Valid"
-  | (Timeout|Stepout|Unknown) when Wp_parameters.has_dkey dkey_success_only ->
-      Format.pp_print_string fmt "Unsuccess"
-  | Valid -> Format.fprintf fmt "Valid%a" (pp_perf ~extended) r
-  | Unknown -> Format.fprintf fmt "Unknown%a" (pp_perf ~extended) r
-  | Timeout -> Format.fprintf fmt "Timeout%a" (pp_perf ~extended) r
-  | Stepout -> Format.fprintf fmt "Step limit%a" (pp_perf ~extended) r
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
+  | Valid -> Format.fprintf fmt "Valid%a" pp_perf r
+  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf r
+  | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf r
+  | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf r
 
-let pp_result = pp_res ~extended:false
-let pp_result_perf = pp_res ~extended:true
+let pp_cache_miss fmt st prover r =
+  let qualified =
+    match prover with
+    | Qed | Tactical -> true
+    | NativeAltErgo | NativeCoq -> r.verdict <> Timeout
+    | Why3 _ -> r.cached || r.prover_time < Rformat.epsilon
+  in
+  if qualified then
+    Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
+  else
+    Format.fprintf fmt "%s%a (unqualified)" st pp_perf r
+
+let pp_result_qualif prover fmt r =
+  if Wp_parameters.has_dkey dkey_success_only then
+    match r.verdict with
+    | NoResult -> Format.pp_print_string fmt "No Result"
+    | Computing _ -> Format.pp_print_string fmt "Computing"
+    | Invalid -> Format.pp_print_string fmt "Invalid"
+    | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
+    | Valid -> pp_cache_miss fmt "Valid" prover r
+    | Unknown -> pp_cache_miss fmt "Unsuccess" prover r
+    | Timeout -> pp_cache_miss fmt "Timeout" prover r
+    | Stepout -> pp_cache_miss fmt "Stepout" prover r
+  else
+    pp_result fmt r
 
 let compare p q =
   let rank = function

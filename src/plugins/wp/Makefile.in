@@ -174,6 +174,10 @@ wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
 	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 
+wp-qualif-env:
+	echo "FRAMAC_WP_CACHE=update"
+	echo "FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE)"
+
 wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	@echo "[CACHE] pull cache"
 	@echo "[CACHE] $(WP_QUALIF_CACHE)"
@@ -181,7 +185,7 @@ wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	@echo "[TESTS] updating wp-qualif"
 	FRAMAC_WP_CACHE=update \
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
-	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	  ./bin/ptests.opt src/plugins/wp/tests -config qualif
 	@echo "[CACHE] cache status"
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
 	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
@@ -194,7 +198,7 @@ wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
 	FRAMAC_WP_CACHE=update \
 	FRAMAC_WP_SCRIPT=update \
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
-	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
+	  ./bin/ptests.opt src/plugins/wp/tests -config qualif
 	@echo "[CACHE] cache status"
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
 	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
