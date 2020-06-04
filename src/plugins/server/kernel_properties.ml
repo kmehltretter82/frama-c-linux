@@ -222,7 +222,7 @@ let find_alarm = function
 let model = States.model ()
 
 let () = States.column ~model ~name:"descr"
-    ~descr:(Md.plain "Description")
+    ~descr:(Md.plain "Full description")
     ~data:(module Jstring)
     ~get:(fun ip -> Format.asprintf "%a" Property.pretty ip) ()
 
@@ -263,6 +263,12 @@ let () = States.column ~model ~name:"alarm_descr"
     ~descr:(Md.plain "Alarm description (if the property is an alarm)")
     ~data:(module Jstring.Joption)
     ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip)) ()
+
+let () = States.column ~model ~name:"predicate"
+    ~descr:(Md.plain "Predicate")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
+    ()
 
 let is_relevant ip =
   match Property.get_kf ip with
