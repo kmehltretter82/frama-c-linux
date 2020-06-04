@@ -120,6 +120,7 @@ const RenderTable = () => {
       sorting={model}
       selection={selection}
       onSelection={onSelection}
+      settings="ivette.properties.table"
     >
       <ColumnCode id="function" label="Function" width={120} />
       <ColumnCode id="descr" label="Description" fill />

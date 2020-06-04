@@ -8,7 +8,7 @@
  */
 
 import React, { ReactNode } from 'react';
-import { debounce } from 'lodash';
+import { forEach, debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
 import { DraggableCore } from 'react-draggable';
@@ -214,11 +214,23 @@ function makeDataRenderer(
 }
 
 // --------------------------------------------------------------------------
+// --- Table Settings
+// --------------------------------------------------------------------------
+
+type ColSettings<A> = { [id: string]: undefined | null | A };
+
+type TableSettings = {
+  resize?: ColSettings<number>;
+  visible?: ColSettings<boolean>;
+}
+
+// --------------------------------------------------------------------------
 // --- Table State
 // --------------------------------------------------------------------------
 
 class TableState<Key, Row> {
 
+  settings?: string; // User settings
   signal?: Trigger; // Full reload
   width?: number; // Current table width
   offset?: number; // Current resizing offset
@@ -256,6 +268,7 @@ class TableState<Key, Row> {
     this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
+    this.clearSettings = this.clearSettings.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
   }
@@ -312,7 +325,7 @@ class TableState<Key, Row> {
     this.resizing = undefined;
     this.offset = undefined;
     this.columnWith.clear();
-    this.forceUpdate();
+    this.updateSettings();
   }
 
   // Debounced
@@ -327,7 +340,55 @@ class TableState<Key, Row> {
       resize.set(lcol, wl);
       resize.set(rcol, wr);
       this.offset = offset;
-      this.forceUpdate();
+      this.forceUpdate(); // no settings yet, onStop only
+    }
+  }
+
+  // --- Table settings
+
+  clearSettings() {
+    this.resize.clear();
+    this.visible.clear();
+    this.forceUpdate();
+  }
+
+  updateSettings() {
+    const userSettings = this.settings;
+    if (userSettings) {
+      const cws: ColSettings<number> = {};
+      const cvs: ColSettings<boolean> = {};
+      const resize = this.resize;
+      const visible = this.visible;
+      this.columns.forEach(({ id }) => {
+        const cw = resize.get(id);
+        const cv = visible.get(id);
+        cws[id] = cw === undefined ? null : cw;
+        cvs[id] = cv === undefined ? null : cv;
+      });
+      const theSettings: TableSettings = { resize: cws, visible: cvs };
+      Dome.setWindowSetting(userSettings, theSettings);
+    }
+    this.forceUpdate();
+  }
+
+  importSettings(settings?: string) {
+    if (settings !== this.settings) {
+      this.settings = settings;
+      const resize = this.resize;
+      const visible = this.visible;
+      resize.clear();
+      visible.clear();
+      const theSettings: undefined | TableSettings =
+        Dome.getWindowSetting(settings);
+      if (theSettings) {
+        forEach(theSettings.resize, (cw, cid) => {
+          if (typeof cw === 'number') this.resize.set(cid, cw);
+        });
+        forEach(theSettings.visible, (cv, cid) => {
+          if (typeof cv === 'boolean') this.visible.set(cid, cv);
+        });
+        this.forceUpdate();
+      }
     }
   }
 
@@ -465,12 +526,12 @@ class TableState<Key, Row> {
     });
     const resetSizing = () => {
       this.resize.clear();
-      this.forceUpdate();
+      this.updateSettings();
     };
     const resetColumns = () => {
       this.visible.clear();
       this.resize.clear();
-      this.forceUpdate();
+      this.updateSettings();
     };
     const items: PopupMenu = [
       {
@@ -500,7 +561,7 @@ class TableState<Key, Row> {
           const checked = isVisible(visible, col);
           const onClick = () => {
             visible.set(id, !checked);
-            this.forceUpdate();
+            this.updateSettings();
           };
           items.push({ label: label || title || id, checked, onClick });
       }
@@ -903,6 +964,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
   const [age, setAge] = React.useState(0);
   React.useEffect(() => {
     state.signal = () => setAge(age + 1);
+    state.importSettings(props.settings);
     state.setModel(props.model);
     state.setSorting(props.sorting);
     state.setRendering(props.rendering);
@@ -910,6 +972,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
+  Dome.useEvent('dome.defaults', state.clearSettings);
 
   return (
     <div className='dome-xTable'>
