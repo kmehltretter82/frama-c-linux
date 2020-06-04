@@ -23,15 +23,15 @@ const ASTinfo = () => {
 
   React.useEffect(() => {
     buffer.clear();
-    if (data) {
+    if (marker && data) {
       buffer.printTextWithTags(data, { css: 'color: blue' });
     }
-  }, [buffer, data]);
+  }, [marker, buffer, data]);
 
   // Callbacks
   function onSelection(name: string) {
     // For now, the only markers are functions.
-    setSelect({ function: name });
+    setSelect({ function: name, marker: null });
   }
 
   // Component
