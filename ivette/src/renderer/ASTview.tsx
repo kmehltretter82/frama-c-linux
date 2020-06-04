@@ -105,7 +105,7 @@ const ASTview = () => {
     if (marker && marker.kind === 'function') {
       const item1 = {
         label: `Go to definition of ${marker.name}`,
-        onClick: () => setSelect({ function: marker.name, marker: null }),
+        onClick: () => setSelect({ function: marker.name, marker: undefined }),
       };
       Dome.popupMenu([item1]);
     }
