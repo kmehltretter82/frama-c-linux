@@ -6402,6 +6402,17 @@ axiomatic nanosleep_predicates {
 extern int clock_nanosleep(clockid_t clock_id, int flags,
                            struct timespec const *rqtp, struct timespec *rmtp);
 
+/*@ requires valid_timer: \valid_read(timer);
+    requires valid_result: \valid(result);
+    ensures
+      result_null_or_result: \result ≡ \old(result) ∨ \result ≡ \null;
+    assigns \result, *result;
+    assigns \result \from (indirect: *timer), result;
+    assigns *result \from (indirect: *timer);
+ */
+extern struct tm *gmtime_r(time_t const * __restrict timer,
+                           struct tm * __restrict result);
+
 /*@ requires valid_request: \valid_read(rqtp);
     requires
       initialization: initialized_request:
@@ -7776,6 +7787,30 @@ extern int pthread_mutex_lock(pthread_mutex_t *mutex);
     assigns \result \from (indirect: *mutex);
  */
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 22;
+    assigns *attr, \result;
+    assigns *attr \from *attr;
+    assigns \result \from (indirect: *attr);
+ */
+extern int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 12;
+    assigns \result, *attr;
+    assigns \result \from \nothing;
+    assigns *attr \from \nothing;
+ */
+extern int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+
+/*@ requires valid_attr: \valid(attr);
+    ensures success_or_error: \result ≡ 0 ∨ \result ≡ 22;
+    assigns \result, *attr;
+    assigns \result \from (indirect: type);
+    assigns *attr \from (indirect: type);
+ */
+extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
 
 extern char __fc_getpwuid_pw_name[64];
 

@@ -3,7 +3,7 @@
  */
 
 #include <time.h>
-
+#include "__fc_builtin.h"
 
 
 int main() {
@@ -42,5 +42,24 @@ int main() {
   time_t tt = 42;
   char *time_str = ctime(&tt);
   //@ assert valid_string(time_str);
+
+  struct tm mytime =
+    {
+     .tm_sec = Frama_C_interval(0,60), // 60: for leap seconds
+     .tm_min = Frama_C_interval(0,59),
+     .tm_hour = Frama_C_interval(0,23),
+     .tm_mday = Frama_C_interval(1,31),
+     .tm_mon = Frama_C_interval(0,11),
+     .tm_year = Frama_C_interval(0,177), // arbitrary value
+     .tm_wday = Frama_C_interval(0,6),
+     .tm_yday = Frama_C_interval(0,365),
+     .tm_isdst = Frama_C_interval(0,1)
+    };
+  time_t t = mktime(&mytime);
+  struct tm *res_time;
+  res_time = gmtime(&t);
+  struct tm mytime2;
+  res_time = gmtime_r(&t, &mytime2);
+
   return 0;
 }

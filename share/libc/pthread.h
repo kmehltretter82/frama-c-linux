@@ -316,7 +316,15 @@ extern int pthread_mutex_trylock(pthread_mutex_t *);
   ensures success_or_error: \result == 0 || \result == EPERM;
 */
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
-extern int pthread_mutexattr_destroy(pthread_mutexattr_t *);
+
+/*@
+  requires valid_attr: \valid(attr);
+  assigns *attr \from *attr;
+  assigns \result \from indirect:*attr;
+  ensures success_or_error: \result == 0 || \result == EINVAL;
+ */
+extern int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
+
 extern int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *restrict,
                                             int *restrict);
 extern int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *restrict,
@@ -327,12 +335,26 @@ extern int pthread_mutexattr_getrobust(const pthread_mutexattr_t *restrict,
                                        int *restrict);
 extern int pthread_mutexattr_gettype(const pthread_mutexattr_t *restrict,
                                      int *restrict);
-extern int pthread_mutexattr_init(pthread_mutexattr_t *);
+
+/*@
+  requires valid_attr: \valid(attr);
+  assigns \result, *attr \from \nothing;
+  ensures success_or_error: \result == 0 || \result == ENOMEM;
+ */
+extern int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+
 extern int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *, int);
 extern int pthread_mutexattr_setprotocol(pthread_mutexattr_t *, int);
 extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *, int);
 extern int pthread_mutexattr_setrobust(pthread_mutexattr_t *, int);
-extern int pthread_mutexattr_settype(pthread_mutexattr_t *, int);
+
+/*@
+  requires valid_attr: \valid(attr);
+  assigns \result, *attr \from indirect:type;
+  ensures success_or_error: \result == 0 || \result == EINVAL;
+ */
+extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
+
 extern int pthread_once(pthread_once_t *, void (*)(void));
 extern int pthread_rwlock_destroy(pthread_rwlock_t *);
 extern int pthread_rwlock_init(pthread_rwlock_t *restrict,
