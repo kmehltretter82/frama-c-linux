@@ -143,7 +143,7 @@ export class MapModel<Key, Row>
       [[setNaturalOrder]] in response to user column selection with
       [[setSortBy]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
-  setSortBy(columns?: ByFields<Row>) {
+  setColumnOrder(columns?: ByFields<Row>) {
     this.columns = columns;
     this.reload();
   }
@@ -158,13 +158,24 @@ export class MapModel<Key, Row>
     this.reload();
   }
 
+  /**
+     Sets both natural ordering and column ordering with the provided
+     orders by fields. This is a combination of [[setColumnOrder]] and
+     [[setNaturalOrder]] with [[Compare.byFields]].
+   */
+  setOrderingByFields(byfields: ByFields<Row>) {
+    this.natural = Compare.byFields(byfields);
+    this.columns = byfields;
+    this.reload();
+  }
+
   /** Reorder rows with the provided column and direction.
       Previous ordering is kept and refined by the new one.
       Use `undefined` or `null` to reset the natural ordering. */
   setSorting(ord?: undefined | null | SortingInfo) {
     if (ord) {
       const ring = this.ring;
-      const cur = this.ring[0];
+      const cur = ring[0];
       const fd = ord.sortBy;
       if (
         !cur ||

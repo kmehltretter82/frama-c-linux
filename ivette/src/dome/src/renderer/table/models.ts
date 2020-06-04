@@ -198,7 +198,7 @@ export abstract class Model<Key, Row> {
       update: undefined,
       reload: undefined,
       onUpdate(s?: Trigger) { w.update = s; },
-      onReload(s?: Trigger) { w.update = s; },
+      onReload(s?: Trigger) { w.reload = s; },
       unlink() { m.delete(id); },
       watch(lower: number, upper: number) {
         w.lower = lower;

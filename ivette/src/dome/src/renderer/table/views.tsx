@@ -249,11 +249,8 @@ class TableState<Key, Row> {
   }
 
   fullReload() {
-    const s = this.signal;
-    if (s) {
-      this.signal = undefined; s();
-      this.updateGrid();
-    }
+    this.forceUpdate();
+    this.updateGrid();
   }
 
   getRef(id: string) {
@@ -380,6 +377,7 @@ class TableState<Key, Row> {
       sorting.setSorting(ord);
       this.sortBy = ord?.sortBy;
       this.sortDirection = ord?.sortDirection;
+      this.forceUpdate();
     }
   }
 
@@ -409,8 +407,8 @@ class TableState<Key, Row> {
     const items: PopupMenu = [
       {
         label: 'Reset ordering',
-        display: has_order,
-        onClick: undefined,
+        display: has_order && this.sorting,
+        onClick: this.onSorting,
       },
       {
         label: 'Reset column widths',
