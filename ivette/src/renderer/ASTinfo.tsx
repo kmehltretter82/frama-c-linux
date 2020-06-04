@@ -19,7 +19,11 @@ const ASTinfo = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [select, setSelect] = States.useSelection();
   const marker = select && select.marker;
-  const data = States.useRequest('kernel.ast.info', marker);
+  const data = States.useRequest(
+    'kernel.ast.info',
+    marker,
+    { offline: undefined },
+  );
 
   React.useEffect(() => {
     buffer.clear();
@@ -31,7 +35,7 @@ const ASTinfo = () => {
   // Callbacks
   function onSelection(name: string) {
     // For now, the only markers are functions.
-    setSelect({ function: name });
+    setSelect({ function: name, marker: undefined });
   }
 
   // Component

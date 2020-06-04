@@ -161,6 +161,9 @@ export function useState(id: string) {
  *  The request is send asynchronously and cached until any change in
  *  `rq`, `params`, current project or server activity.
  *
+ *  The request is considered off-line as soon as either `rq` or `params` or
+ *  current project takes a falsy value.
+ *
  *  Default values for various situations can be defined in the options
  *  parameter, which is `undefined` unless specified, or `null` to keep the
  *  current value.
@@ -175,12 +178,10 @@ export function useRequest(rq: string, params: any, options: any = {}) {
   const footprint = project ? JSON.stringify([project, rq, params]) : undefined;
 
   async function trigger() {
-    if (project) {
+    if (project && rq && params) {
       try {
-        if (rq && params) {
-          const r = await Server.GET({ endpoint: rq, params });
-          setResponse(r);
-        }
+        const r = await Server.GET({ endpoint: rq, params });
+        setResponse(r);
       } catch (error) {
         PP.error(`Fail in useRequest '${rq}'. ${error.toString()}`);
         const err = options.error;
