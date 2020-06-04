@@ -7,7 +7,7 @@
    @module dome/table/views
  */
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
@@ -39,25 +39,6 @@ const SVG = SVGraw as (props: { id: string, size?: number }) => JSX.Element;
 export type Renderer<D> = (data?: D) => null | JSX.Element;
 export type RenderByFields<Row> = {
   [fd in keyof Row]?: Renderer<Row[fd]>;
-};
-
-const defaultGetter = (row: any, dataKey: string) => {
-  if (typeof row === 'object') return row[dataKey];
-  return undefined;
-};
-
-const defaultRenderer = (d: any) => {
-  switch (d) {
-    case null:
-    case undefined:
-      return null;
-    default:
-      return (
-        <div className="dome-xTable-renderer dome-text-label">
-          {new String(d)}
-        </div>
-      );
-  }
 };
 
 // --------------------------------------------------------------------------
@@ -111,6 +92,10 @@ export interface ColumnProps<Row, Data> {
      Override table by-fields cell renderers.
    */
   render?: Renderer<Data>;
+  /**
+     Override table right-click callback.
+   */
+  onContextMenu?: (row: Row, index: number, dataKey: string) => void;
 }
 
 // --------------------------------------------------------------------------
@@ -130,6 +115,8 @@ export interface TableProps<Key, Row> {
   selection?: Key;
   /** Selection callback. */
   onSelection?: (row: Row, key: Key, index: number) => void;
+  /** Context menu callback. */
+  onContextMenu?: (row: Row, index: number) => void;
   /** Fallback for rendering an empty table. */
   renderEmpty?: () => null | JSX.Element;
   /** Shall only contains `<Column<Row> … />` elements. */
@@ -147,7 +134,7 @@ interface ColumnData {
   icon?: string;
   label?: string;
   title?: string;
-  contextMenu: () => void;
+  headerMenu: () => void;
   headerRef: divRef;
 };
 
@@ -161,13 +148,13 @@ interface PopupItem {
 
 type PopupMenu = ('separator' | PopupItem)[];
 
-// --------------------------------------------------------------------------
-// --- Column Utilities
-// --------------------------------------------------------------------------
-
 type Cmap<A> = Map<string, A>
 type Cprops = ColProps<any>;
 type ColProps<R> = ColumnProps<R, any>;
+
+// --------------------------------------------------------------------------
+// --- Column Utilities
+// --------------------------------------------------------------------------
 
 const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
   const defaultVisible = col.visible ?? true;
@@ -179,21 +166,51 @@ const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
   }
 };
 
+const defaultGetter = (row: any, dataKey: string) => {
+  if (typeof row === 'object') return row[dataKey];
+  return undefined;
+};
+
+const defaultRenderer = (d: any) => {
+  switch (d) {
+    case null:
+    case undefined:
+      return null;
+    default:
+      return (
+        <div className="dome-xTable-renderer dome-text-label">
+          {new String(d)}
+        </div>
+      );
+  }
+};
+
 function makeRowGetter<Key, Row>(model?: Model<Key, Row>) {
   return ({ index }: Index) => model && model.getRowAt(index);
 };
 
 function makeDataGetter(
-  getter: ((row: any, dataKey: string) => any),
+  getter: ((row: any, dataKey: string) => any) = defaultGetter,
   dataKey: string,
 ): TableCellDataGetter {
   return (({ rowData }) => getter(rowData, dataKey));
 }
 
 function makeDataRenderer(
-  render: ((data: any) => React.ReactNode)
+  render: ((data: any) => ReactNode) = defaultRenderer,
+  onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
-  return (({ cellData }) => render(cellData));
+  return (props => {
+    const contents = render(props.cellData);
+    if (onContextMenu) {
+      const callback = (evt: React.MouseEvent) => {
+        evt.stopPropagation();
+        onContextMenu(props.rowData, props.rowIndex, props.dataKey);
+      };
+      return (<div onContextMenu={callback}>{contents}</div>);
+    }
+    return contents;
+  });
 }
 
 // --------------------------------------------------------------------------
@@ -223,21 +240,30 @@ class TableState<Key, Row> {
   selectedIndex?: number; // Current selected index
   sortBy?: string; // last sorting dataKey
   sortDirection?: SortDirectionType; // last sorting direction
+  onContextMenu?: (row: Row, index: number) => void; // context menu callback
 
   constructor() {
+    this.unwind = this.unwind.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this);
     this.fullReload = this.fullReload.bind(this);
     this.updateGrid = this.updateGrid.bind(this);
     this.watchRange = this.watchRange.bind(this);
     this.rowClassName = this.rowClassName.bind(this);
-    this.contextMenu = this.contextMenu.bind(this);
+    this.onHeaderMenu = this.onHeaderMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
+    this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onSorting = this.onSorting.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
   }
 
   // --- Static Callbacks
+
+  unwind() {
+    this.signal = undefined;
+    this.onSelection = undefined;
+    this.onContextMenu = undefined;
+  }
 
   forceUpdate() {
     const s = this.signal;
@@ -381,9 +407,19 @@ class TableState<Key, Row> {
     }
   }
 
-  // ---- Context Menu
+  // ---- Row Context Menu
 
-  contextMenu() {
+  onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams) {
+    const callback = this.onContextMenu;
+    if (callback) {
+      event.stopPropagation();
+      callback(rowData, index);
+    }
+  }
+
+  // ---- Header Context Menu
+
+  onHeaderMenu() {
     let has_order = false;
     let has_resize = false;
     let has_visible = false;
@@ -445,8 +481,7 @@ class TableState<Key, Row> {
   computeGetter(id: string, dataKey: string, props: Cprops) {
     const current = this.getter.get(id);
     if (current) return current;
-    const getter = props.getter ?? defaultGetter;
-    const dataGetter = makeDataGetter(getter, dataKey);
+    const dataGetter = makeDataGetter(props.getter, dataKey);
     this.getter.set(id, dataGetter);
     return dataGetter;
   }
@@ -455,11 +490,11 @@ class TableState<Key, Row> {
     const current = this.render.get(id);
     if (current) return current;
     let renderer = props.render;
-    if (!props.render) {
+    if (!renderer) {
       const rdr = this.rendering;
       if (rdr) renderer = (rdr as any)[dataKey];
     }
-    const cellRenderer = makeDataRenderer(renderer ?? defaultRenderer);
+    const cellRenderer = makeDataRenderer(renderer, props.onContextMenu);
     this.render.set(id, cellRenderer);
     return cellRenderer;
   }
@@ -524,7 +559,7 @@ function makeColumn<Key, Row>(
     icon: props.icon,
     label: props.label,
     title: props.title,
-    contextMenu: state.contextMenu,
+    headerMenu: state.onHeaderMenu,
     headerRef: state.getRef(id),
   };
   const width = state.resize.get(id) || props.width || 60;
@@ -615,7 +650,7 @@ function headerRowRenderer(props: TableHeaderRowProps) {
 function headerRenderer(props: TableHeaderProps) {
   const data: ColumnData = props.columnData;
   const { sortBy, sortDirection, dataKey } = props;
-  const { icon, label, title, headerRef, contextMenu } = data;
+  const { icon, label, title, headerRef, headerMenu } = data;
   const sorter =
     dataKey === sortBy
       ? (sortDirection === SortDirection.ASC ? sorterASC : sorterDESC)
@@ -625,7 +660,7 @@ function headerRenderer(props: TableHeaderProps) {
       className='dome-xTable-header'
       title={title}
       ref={headerRef}
-      onContextMenu={contextMenu}
+      onContextMenu={headerMenu}
     >
       {headerIcon(icon)}
       {headerLabel(label)}
@@ -763,6 +798,7 @@ function makeTable<Key, Row>(
         headerRowRenderer={headerRowRenderer}
         onRowsRendered={state.watchRange}
         onRowClick={state.onRowClick}
+        onRowRightClick={state.onRowRightClick}
         sortBy={state.sortBy}
         sortDirection={state.sortDirection}
         sort={state.onSorting}
@@ -838,7 +874,8 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.setSorting(props.sorting);
     state.setRendering(props.rendering);
     state.onSelection = props.onSelection;
-    return () => state.signal = undefined;
+    state.onContextMenu = props.onContextMenu;
+    return state.unwind;
   });
 
   return (
