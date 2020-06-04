@@ -236,22 +236,25 @@ class TableState<Key, Row> {
   sorting?: Sorting; // Last user proxy used for sorting
   client?: Client; // Client of last fetching
   columns: ColProps<Row>[] = []; // Currently known columns
-  selectedKey?: Key; // Last selected key
+  scrolledKey?: Key; // Lastly scrolled key
   selectedIndex?: number; // Current selected index
   sortBy?: string; // last sorting dataKey
   sortDirection?: SortDirectionType; // last sorting direction
   onContextMenu?: (row: Row, index: number) => void; // context menu callback
+  range?: IndexRange;
+  rowCount = 0;
 
   constructor() {
     this.unwind = this.unwind.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this);
     this.fullReload = this.fullReload.bind(this);
     this.updateGrid = this.updateGrid.bind(this);
-    this.watchRange = this.watchRange.bind(this);
+    this.onRowsRendered = this.onRowsRendered.bind(this);
     this.rowClassName = this.rowClassName.bind(this);
     this.onHeaderMenu = this.onHeaderMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.onRowRightClick = this.onRowRightClick.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
@@ -275,6 +278,7 @@ class TableState<Key, Row> {
   }
 
   fullReload() {
+    this.scrolledKey = undefined;
     this.forceUpdate();
     this.updateGrid();
   }
@@ -378,7 +382,8 @@ class TableState<Key, Row> {
       onSelection(data, key, index);
   }
 
-  watchRange(info: IndexRange) {
+  onRowsRendered(info: IndexRange) {
+    this.range = info;
     this.client?.watch(info.startIndex, info.stopIndex);
   }
 
@@ -387,11 +392,20 @@ class TableState<Key, Row> {
     return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd');
   }
 
+  keyStepper(index: number) {
+    const onSelection = this.onSelection;
+    const key = this.model?.getKeyAt(index);
+    const data = this.model?.getRowAt(index);
+    if (key !== undefined && data !== undefined && onSelection) {
+      onSelection(data, key, index);
+    }
+  }
+
   scrollToIndex(selection: Key | undefined): number | undefined {
     const index = selection && this.model?.getIndexOf(selection);
     this.selectedIndex = index;
-    if (this.selectedKey !== selection) {
-      this.selectedKey = selection;
+    if (this.scrolledKey !== selection) {
+      this.scrolledKey = selection;
       if (selection) return index;
     }
     return undefined;
@@ -407,13 +421,31 @@ class TableState<Key, Row> {
     }
   }
 
-  // ---- Row Context Menu
+  // ---- Row Events
 
   onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams) {
     const callback = this.onContextMenu;
     if (callback) {
       event.stopPropagation();
       callback(rowData, index);
+    }
+  }
+
+  onKeyDown(evt: React.KeyboardEvent) {
+    const index = this.selectedIndex;
+    switch (evt.key) {
+      case 'ArrowUp':
+        if (index !== undefined) {
+          this.keyStepper(index - 1);
+          evt.preventDefault();
+        }
+        break;
+      case 'ArrowDown':
+        if (index !== undefined) {
+          this.keyStepper(index + 1);
+          evt.preventDefault();
+        }
+        break;
     }
   }
 
@@ -776,13 +808,14 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
+  state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
 
   return (
-    <React.Fragment>
+    <div onKeyDown={state.onKeyDown}>
       <VTable
         ref={state.tableRef}
         key="table"
@@ -796,7 +829,7 @@ function makeTable<Key, Row>(
         rowHeight={CSS_ROW_HEIGHT}
         headerHeight={CSS_HEADER_HEIGHT}
         headerRowRenderer={headerRowRenderer}
-        onRowsRendered={state.watchRange}
+        onRowsRendered={state.onRowsRendered}
         onRowClick={state.onRowClick}
         onRowRightClick={state.onRowRightClick}
         sortBy={state.sortBy}
@@ -808,7 +841,7 @@ function makeTable<Key, Row>(
         {columns}
       </VTable>
       {resizers}
-    </React.Fragment>
+    </div >
   );
 };
 

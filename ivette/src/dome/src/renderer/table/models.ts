@@ -141,6 +141,13 @@ export abstract class Model<Key, Row> {
   abstract getRowAt(index: number): undefined | Row;
 
   /**
+     Shall return the key at the given index. The specified index and data
+     are those of the last corresponding call to [[getRowAt]].
+     Might return `undefined` if the index is invalid.
+  */
+  abstract getKeyAt(index: number): undefined | Key;
+
+  /**
      Shall return the key of the given entry. The specified index and data
      are those of the last corresponding call to [[getRowAt]].
      Might return `undefined` if the index is invalid.

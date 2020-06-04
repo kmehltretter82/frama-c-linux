@@ -120,10 +120,12 @@ export class MapModel<Key, Row>
 
   getRowAt(k: number) { return this.rebuild()[k]?.row; }
 
-  getKeyFor(k: number, _: Row) {
+  getKeyAt(k: number) {
     const current = this.table;
-    return current ? current[k].key : undefined;
+    return current ? current[k]?.key : undefined;
   }
+
+  getKeyFor(k: number, _: Row) { return this.getKeyAt(k); }
 
   getIndexOf(key: Key) {
     const pack = this.index.get(key);
@@ -379,6 +381,9 @@ export class ArrayModel<Row> extends MapModel<string, Row> {
     super();
     this.key = key;
   }
+
+  /** Optimized with respected to inherited version. */
+  getKeyFor(_: number, data: Row) { return this.getKey(data); }
 
   /** Returns the key of data. */
   getKey(data: Row): string { return (data as any)[this.key]; }
