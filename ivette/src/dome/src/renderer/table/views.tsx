@@ -59,6 +59,11 @@ export interface ColumnProps<Row, Data> {
   label?: string;
   /** Header title. */
   title?: string;
+  /**
+     Column position.
+     By default, column will appear according to their mounting order.
+   */
+  index?: number;
   /** CSS vertical alignment on cells. */
   align?: TextAlign;
   /** Column base width in pixels (default 60px). */
@@ -686,6 +691,7 @@ function makeCprops<Key, Row>(state: TableState<Key, Row>) {
       cols.push(col);
     }
   });
+  cols.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
   return cols;
 }
 
