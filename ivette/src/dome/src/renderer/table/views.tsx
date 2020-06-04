@@ -454,7 +454,7 @@ export function Column<Row, Data>(props: ColumnProps<Row, Data>) {
 function makeColumn<Key, Row>(
   state: TableState<Key, Row>,
   props: ColProps<Row>,
-  forceFill: boolean,
+  fill: boolean,
 ) {
   const { id } = props;
   const align = { textAlign: props.align };
@@ -467,7 +467,7 @@ function makeColumn<Key, Row>(
     headerRef: state.getRef(id),
   };
   const width = state.resize.get(id) || props.width || 60;
-  const flexGrow = (forceFill || props.fill) ? 1 : 0;
+  const flexGrow = fill ? 1 : 0;
   const sorting = state.sorting;
   const disableSort =
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
@@ -501,16 +501,15 @@ function makeCprops<Key, Row>(state: TableState<Key, Row>) {
 }
 
 function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
-  let hasFill = false;
+  let fill: undefined | Cprops;
   let lastExt: undefined | Cprops;
-  let forceFill: undefined | Cprops;
   cols.forEach((col) => {
-    if (col.fill) hasFill = true;
-    else if (!col.fixed) lastExt = col;
+    if (col.fill && !fill) fill = col;
+    if (!col.fixed) lastExt = col;
   });
   const n = cols.length;
-  if (0 < n && !hasFill) forceFill = lastExt || cols[n - 1];
-  return cols.map((col) => makeColumn(state, col, col === forceFill));
+  if (0 < n && !fill) fill = lastExt || cols[n - 1];
+  return cols.map((col) => makeColumn(state, col, col === fill));
 }
 
 // --------------------------------------------------------------------------
