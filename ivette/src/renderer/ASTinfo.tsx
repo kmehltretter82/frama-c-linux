@@ -27,10 +27,10 @@ const ASTinfo = () => {
 
   React.useEffect(() => {
     buffer.clear();
-    if (marker && data) {
+    if (data) {
       buffer.printTextWithTags(data, { css: 'color: blue' });
     }
-  }, [marker, buffer, data]);
+  }, [buffer, data]);
 
   // Callbacks
   function onSelection(name: string) {
