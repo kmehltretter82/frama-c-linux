@@ -73,6 +73,30 @@ re-running \texttt{make} should be enough to obtain a new result.
 Section~\ref{sec:using-generated-makefile} details usage of the Makefile
 and presents an illustrative diagram.
 
+\subsection{Necessary Build Information}
+\label{sec:necessary-build-information}
+
+For an analysis with \FramaC, besides the source code, the following pieces
+of information are necessary:
+
+\begin{description}
+\item[machdep]: architectural information about system where the code will run:
+  integer type sizes, compiler, OS, etc. See section~\ref{sec:normalize} for
+  more details.
+\item[preprocessing flags]: options given to the C preprocessor, mainly
+  macros (\texttt{-D}) and include directories (\texttt{-I}).
+\item[list of sources]: the actual list of source files that make a logical
+  unit (e.g. a test case or a whole program), without duplicate function
+  definitions.
+\item[main function]: the function where the analysis will start; it is often
+  \texttt{main}, but not always. ({\em Note: \FramaC itself thes not require
+    a \texttt{main} function, but plug-ins such as \texttt{Eva} do}.)
+\end{description}
+
+A project without such information is incomplete. In such cases, an alternative
+workflow is necessary. The next section presents some possibilities to
+retrieve such information.
+
 \subsection{Possible Workflows in the Absence of Build Information}
 \label{alternative-workflows}
 
