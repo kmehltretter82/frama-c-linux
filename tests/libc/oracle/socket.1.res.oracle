@@ -143,7 +143,7 @@
 [eva] using specification for function memset
 [eva] tests/libc/socket.c:103: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] computing for function bind <- test_server_echo <- main.

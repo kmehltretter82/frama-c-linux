@@ -21,7 +21,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf_va_1
 [eva] tests/known/snprintf.c:12: 

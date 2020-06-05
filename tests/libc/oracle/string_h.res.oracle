@@ -13,7 +13,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] tests/libc/string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.h:140: 
+[eva] share/libc/string.h:143: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
 [eva:alarm] tests/libc/string_h.c:6: Warning: assertion got status unknown.
@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] tests/libc/string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:227: 
+[eva] share/libc/string.h:230: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] tests/libc/string_h.c:25: Warning: assertion got status unknown.
@@ -325,7 +325,7 @@
 [eva] tests/libc/string_h.c:154: Call to builtin strchr
 [eva] tests/libc/string_h.c:154: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] share/libc/string.h:165: 
+[eva] share/libc/string.h:168: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] computing for function strchrnul <- main.
   Called from tests/libc/string_h.c:155.

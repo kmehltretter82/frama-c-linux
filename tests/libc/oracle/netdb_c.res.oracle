@@ -57,7 +57,7 @@
 [eva] tests/libc/netdb_c.c:33: Call to builtin memset
 [eva] tests/libc/netdb_c.c:33: 
   function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] share/libc/string.h:121: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] computing for function getaddrinfo <- main.
   Called from tests/libc/netdb_c.c:42.
@@ -238,7 +238,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] share/libc/netdb.c:146: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] share/libc/string.h:101: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] computing for function strncpy <- gethostbyname <- main.
   Called from share/libc/netdb.c:147.
@@ -249,7 +249,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] share/libc/netdb.c:147: 
   function strncpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:373: 
+[eva] share/libc/string.h:376: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strncpy
 [eva] Recording results for gethostbyname

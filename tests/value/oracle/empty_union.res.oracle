@@ -22,7 +22,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] tests/value/empty_union.c:72: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] share/libc/string.h:101: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] tests/value/empty_union.c:77: Call to builtin memcpy
 [eva] tests/value/empty_union.c:77: 
