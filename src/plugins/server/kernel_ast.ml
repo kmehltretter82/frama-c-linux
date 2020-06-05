@@ -110,13 +110,6 @@ struct
         let default = index
       end)
 
-  let get_name = function
-    | PLval (_, _, (Var vi, NoOffset)) -> Some vi.vname
-    | PLval (_, _, lval) -> Some (Format.asprintf "%a" Printer.pp_lval lval)
-    | PExp  (_, _, expr) -> Some (Format.asprintf "%a" Printer.pp_exp expr)
-    | PStmt _ | PStmtStart _ | PVDecl _
-    | PTermLval _ | PGlobal _| PIP _ -> None
-
   let iter f =
     Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
 
@@ -130,9 +123,17 @@ struct
     let () =
       States.column ~model
         ~name:"name"
-        ~descr:(Md.plain "Marker identifier for the end-user, if any")
-        ~data:(module Jstring.Joption)
-        ~get:(fun (tag, _) -> get_name tag)
+        ~descr:(Md.plain "Marker short name")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) -> Printer_tag.label tag)
+        ()
+    in
+    let () =
+      States.column ~model
+        ~name:"descr"
+        ~descr:(Md.plain "Marker declaration or description")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) -> Pretty_utils.to_string Printer_tag.pretty tag)
         ()
     in
     States.register_array

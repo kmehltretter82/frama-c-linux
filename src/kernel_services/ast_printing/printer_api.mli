@@ -402,6 +402,7 @@ module type S_pp = sig
 
   val pp_typ: Format.formatter -> typ -> unit
   val pp_exp: Format.formatter -> exp -> unit
+  val pp_vdecl: Format.formatter -> varinfo -> unit
   val pp_varinfo: Format.formatter -> varinfo -> unit
   val pp_lval: Format.formatter -> lval -> unit
   val pp_field: Format.formatter -> fieldinfo -> unit

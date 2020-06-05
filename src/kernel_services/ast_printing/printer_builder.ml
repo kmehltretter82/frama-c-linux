@@ -36,6 +36,7 @@ struct
   let pp_storage fmt x = (printer ())#storage fmt x
   let pp_typ fmt x = (printer ())#typ None fmt x
   let pp_exp fmt x = (printer ())#exp fmt x
+  let pp_vdecl fmt x = (printer ())#vdecl fmt x
   let pp_varinfo fmt x = (printer ())#varinfo fmt x
   let pp_lval fmt x = (printer ())#lval fmt x
   let pp_field fmt x = (printer())#field fmt x

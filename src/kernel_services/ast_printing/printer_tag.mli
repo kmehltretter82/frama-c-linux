@@ -41,6 +41,18 @@ type localizable =
                           definitions. *)
   | PIP of Property.t
 
+(** Name (or category). *)
+val label: localizable -> string
+
+(** Name (or category). *)
+val glabel: global -> string
+
+(** Signature. *)
+val pretty: Format.formatter -> localizable -> unit
+
+(** Debugging. *)
+val pp_debug: Format.formatter -> localizable -> unit
+
 module Localizable: Datatype.S_with_collections with type t = localizable
 
 val kf_of_localizable : localizable -> kernel_function option
