@@ -3,8 +3,8 @@
     "id": "GET-1",
     "data": {
       "updated": [
-        { "key": "kf#24", "name": "g", "signature": "int g(int y);\n\n" },
-        { "key": "kf#20", "name": "f", "signature": "int f(int x);\n\n" }
+        { "key": "kf#24", "name": "g", "signature": "int g(int y);" },
+        { "key": "kf#20", "name": "f", "signature": "int f(int x);" }
       ],
       "removed": [],
       "reload": true,

@@ -133,7 +133,7 @@ struct
         ~name:"descr"
         ~descr:(Md.plain "Marker declaration or description")
         ~data:(module Jstring)
-        ~get:(fun (tag, _) -> Pretty_utils.to_string Printer_tag.pretty tag)
+        ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
         ()
     in
     States.register_array
@@ -242,8 +242,9 @@ struct
 
   let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
 
-  let pp_signature fmt kf =
-    Printer_tag.pretty fmt (PGlobal (Kernel_function.get_global kf))
+  let signature kf =
+    let global = Kernel_function.get_global kf in
+    Rich_text.to_string Printer_tag.pretty (PGlobal global)
 
   let array : kernel_function States.array =
     begin
@@ -257,7 +258,7 @@ struct
         ~name:"signature"
         ~descr:(Md.plain "Signature")
         ~data:(module Data.Jstring)
-        ~get:(Pretty_utils.to_string pp_signature)
+        ~get:signature
         () ;
       States.register_array
         ~page ~key

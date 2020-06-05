@@ -242,4 +242,17 @@ let formatter buffer = buffer.formatter
 let bprintf buffer text = Format.fprintf buffer.formatter text
 let kprintf kjob buffer text = Format.kfprintf kjob buffer.formatter text
 
+let to_string ?(indent=20) ?(margin=40) ?(trim=true) pp data =
+  let buffer = create ~indent ~margin () in
+  let fmt = formatter buffer in
+  pp fmt data ;
+  Format.pp_print_flush fmt () ;
+  truncate_text buffer max_buffer ;
+  if trim then
+    let p = trim_begin buffer in
+    let q = trim_end buffer in
+    Buffer.sub buffer.content p (q+1-p)
+  else
+    Buffer.contents buffer.content
+
 (* -------------------------------------------------------------------------- *)
