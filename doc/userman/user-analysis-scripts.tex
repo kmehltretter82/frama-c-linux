@@ -76,8 +76,9 @@ and presents an illustrative diagram.
 \subsection{Necessary Build Information}
 \label{sec:necessary-build-information}
 
-For an analysis with \FramaC, besides the source code, the following pieces
-of information are necessary:
+The command \texttt{frama-c-script make-template} can be used to generate the
+Makefile from a template. The user must fill in the following information,
+required for running an \Value analysis:
 
 \begin{description}
 \item[machdep]: architectural information about system where the code will run:
@@ -93,8 +94,8 @@ of information are necessary:
     a \texttt{main} function, but plug-ins such as \texttt{Eva} do}.)
 \end{description}
 
-A project without such information is incomplete. In such cases, an alternative
-workflow is necessary. The next section presents some possibilities to
+A project without this information is incomplete; an alternative
+workflow is then necessary. The next section presents some possibilities to
 retrieve such information.
 
 \subsection{Possible Workflows in the Absence of Build Information}
