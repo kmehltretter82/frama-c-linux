@@ -9,7 +9,7 @@ TARGET	= userman
 
 ###########
 
-.PHONY: all install clean
+.PHONY: all install clean $(TARGET).pdf
 
 ifneq ($(VERBOSEMAKE),no)
   SILENT =
