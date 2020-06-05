@@ -12,14 +12,13 @@ import * as States from 'frama-c/states';
 // --- Globals API
 // --------------------------------------------------------------------------
 
-interface Global {
+interface Gfun {
   key: string;
-  kind: 'function' | 'variable' | 'typedef';
   name: string;
-  descr: string;
+  signature: string;
 }
 
-type Globals = undefined | Dictionary<Global>;
+type Gfuns = undefined | Dictionary<Gfun>;
 
 // --------------------------------------------------------------------------
 // --- Globals Section
@@ -29,26 +28,25 @@ export default () => {
 
   // Hooks
   const [select, setSelect] = States.useSelection();
-  const globals: Globals = States.useSyncArray('kernel.ast.globals');
+  const gfuns: Gfuns = States.useSyncArray('kernel.ast.functions');
 
   // Functions
   const functions =
-    toArray(globals)
-      .filter((g) => g.kind === 'function' && g.name)
-      .sort((g1, g2) => {
-        if (g1.name < g2.name) return -1;
-        if (g1.name > g2.name) return 1;
+    toArray(gfuns)
+      .sort((f1, f2) => {
+        if (f1.name < f2.name) return -1;
+        if (f1.name > f2.name) return 1;
         return 0;
       });
 
   const current: undefined | string = select?.function;
-  const makeFctItem = (fct: Global) => {
+  const makeFctItem = (fct: Gfun) => {
     const kf = fct.name;
     return (
       <Item
         key={kf}
         label={kf}
-        title={fct.descr}
+        title={fct.signature}
         selected={kf === current}
         onSelection={() => setSelect({ function: kf })}
       />
@@ -56,7 +54,7 @@ export default () => {
   };
 
   return (
-    <Section label='Functions'>
+    <Section label="Functions">
       {functions.map(makeFctItem)}
     </Section>
   );

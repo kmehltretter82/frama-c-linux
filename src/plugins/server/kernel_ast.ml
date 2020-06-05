@@ -232,20 +232,43 @@ module Kf = Data.Collection
 (* -------------------------------------------------------------------------- *)
 
 let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.ast.getFunctions"
-    ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Kf.Jlist)
-    begin fun () ->
-      let pool = ref [] in
-      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
-      List.rev !pool
-    end
-
-let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+
+module Functions =
+struct
+
+  let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
+
+  let pp_signature fmt kf =
+    Printer_tag.pretty fmt (PGlobal (Kernel_function.get_global kf))
+
+  let array : kernel_function States.array =
+    begin
+      let model = States.model () in
+      States.column ~model
+        ~name:"name"
+        ~descr:(Md.plain "Name")
+        ~data:(module Data.Jstring)
+        ~get:Kernel_function.get_name () ;
+      States.column ~model
+        ~name:"signature"
+        ~descr:(Md.plain "Signature")
+        ~data:(module Data.Jstring)
+        ~get:(Pretty_utils.to_string pp_signature)
+        () ;
+      States.register_array
+        ~page ~key
+        ~name:"kernel.ast.functions"
+        ~descr:(Md.plain "AST Functions")
+        ~iter:Globals.Functions.iter
+        ~add_reload_hook:Ast.add_hook_on_update
+        model
+    end
+
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Information                                                        --- *)

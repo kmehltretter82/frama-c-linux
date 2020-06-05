@@ -54,10 +54,10 @@ async function loadAST(
           if (theMarker)
             buffer.scroll(theMarker, undefined);
         });
-      } catch (error) {
+      } catch (err) {
         PP.error(
-          `Fail to retrieve the AST of function ${theFunction}, ` +
-          `on marker ${theMarker}`,
+          'Fail to retrieve the AST of function', theFunction,
+          'marker:', theMarker, err,
         );
       }
     })();

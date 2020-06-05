@@ -513,7 +513,7 @@ is blocked.
     // Protect each start/end call against error
     const forEachEditor = (fn) => {
       this._editors.forEach((cm) => {
-        try { fn(cm); } catch(e) { console.err('[Dome.text.buffers]',e); }
+        try { fn(cm); } catch(e) { console.error('[Dome.text.buffers]',e); }
       });
     };
 
@@ -550,7 +550,7 @@ is blocked.
      @param {object} options - CodeMirror
        [text marker](https://codemirror.net/doc/manual.html#api_marker) options.
   */
-  printTextWithTags(text, options = {}) {
+  printTextWithTags(text = '', options = {}) {
     if (Array.isArray(text)) {
       const tag = text.shift();
       if (tag !== '') {
@@ -561,13 +561,10 @@ is blocked.
       if (tag !== '') {
         this.closeTextMarker();
       }
-    } else if (typeof (text) === 'string') {
+    } else if (typeof text === 'string') {
       this.append(text);
-    } else { // This case should be useless when using TS.
-      console.error(
-        `Function 'printTextWithTags' accepts a parameter of `
-        + `type string or string array: got '${typeof text}'.`
-      );
+    } else if (text !== null) {
+      console.error('[Dome.buffers] unexpected text',text);
     }
   }
 

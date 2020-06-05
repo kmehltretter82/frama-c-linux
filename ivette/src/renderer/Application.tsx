@@ -84,7 +84,7 @@ export default (() => {
       </Toolbar.ToolBar>
       <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
         <Sidebar.SideBar>
-          <div className='sidebar-ruler' />
+          <div className="sidebar-ruler" />
           <Globals key="globals" />
         </Sidebar.SideBar>
         <LabView
