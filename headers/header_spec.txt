@@ -120,11 +120,6 @@ share/analysis-scripts/fc_stubs.c: .ignore
 share/analysis-scripts/frama_c_results.py: .ignore
 share/analysis-scripts/cmd-dep.sh: .ignore
 share/analysis-scripts/concat-csv.sh: .ignore
-share/analysis-scripts/examples/example.c: .ignore
-share/analysis-scripts/examples/example.mk: .ignore
-share/analysis-scripts/examples/example-multi.mk: .ignore
-share/analysis-scripts/examples/example-slevel.mk: .ignore
-share/analysis-scripts/examples/Makefile: .ignore
 share/analysis-scripts/find_fun.py: .ignore
 share/analysis-scripts/flamegraph.pl: CDDL
 share/analysis-scripts/git_utils.py: .ignore

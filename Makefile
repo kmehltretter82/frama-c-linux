@@ -261,7 +261,6 @@ DISTRIB_FILES:=\
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
       share/analysis-scripts/epilogue.mk                                \
-      $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
@@ -1959,9 +1958,6 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
-	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples
-	$(CP) share/analysis-scripts/examples/* \
-	  $(FRAMAC_DATADIR)/analysis-scripts/examples
 	$(MKDIR) $(FRAMAC_DATADIR)/compliance
 	$(CP) share/compliance/c11_functions.json \
 	  share/compliance/glibc_functions.json \
