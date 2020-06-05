@@ -132,7 +132,7 @@ struct hostent *gethostbyname(const char *name) {
         return &__fc_ghbn.host;
       }
 
-      if (*cp < '0' && *cp > '9' && *cp != '.') break;
+      if (*cp < '0' || *cp > '9' || *cp != '.') break;
     }
   }
 
