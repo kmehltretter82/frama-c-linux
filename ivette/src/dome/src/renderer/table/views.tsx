@@ -185,19 +185,11 @@ const defaultGetter = (row: any, dataKey: string) => {
   return undefined;
 };
 
-const defaultRenderer = (d: any) => {
-  switch (d) {
-    case null:
-    case undefined:
-      return null;
-    default:
-      return (
-        <div className="dome-xTable-renderer dome-text-label">
-          {new String(d)}
-        </div>
-      );
-  }
-};
+const defaultRenderer = (d: any) => (
+  <div className="dome-xTable-renderer dome-text-label">)
+    {new String(d)}
+  </div>
+);
 
 function makeRowGetter<Key, Row>(model?: Model<Key, Row>) {
   return ({ index }: Index) => model && model.getRowAt(index);
@@ -207,7 +199,19 @@ function makeDataGetter(
   getter: ((row: any, dataKey: string) => any) = defaultGetter,
   dataKey: string,
 ): TableCellDataGetter {
-  return (({ rowData }) => getter(rowData, dataKey));
+  return (({ rowData }) => {
+    try {
+      if (rowData !== undefined) return getter(rowData, dataKey);
+    } catch (err) {
+      console.error(
+        '[Dome.table] custom getter error',
+        'rowData:', rowData,
+        'dataKey:', dataKey,
+        err,
+      );
+    }
+    return undefined;
+  });
 }
 
 function makeDataRenderer(
@@ -215,15 +219,26 @@ function makeDataRenderer(
   onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
   return (props => {
-    const contents = render(props.cellData);
-    if (onContextMenu) {
-      const callback = (evt: React.MouseEvent) => {
-        evt.stopPropagation();
-        onContextMenu(props.rowData, props.rowIndex, props.dataKey);
-      };
-      return (<div onContextMenu={callback}>{contents}</div>);
+    const cellData = props.cellData;
+    try {
+      const contents = cellData ? render(cellData) : null;
+      if (onContextMenu) {
+        const callback = (evt: React.MouseEvent) => {
+          evt.stopPropagation();
+          onContextMenu(props.rowData, props.rowIndex, props.dataKey);
+        };
+        return (<div onContextMenu={callback}>{contents}</div>);
+      }
+      return contents;
+    } catch (err) {
+      console.error(
+        '[Dome.table] custom renderer error',
+        'dataKey:', props.dataKey,
+        'cellData:', cellData,
+        err,
+      );
+      return null;
     }
-    return contents;
   });
 }
 
@@ -928,41 +943,41 @@ function makeTable<Key, Row>(
 // --------------------------------------------------------------------------
 
 /** Table View.
-
+ 
    This component is base on [React-Virtualized
    Tables](https://bvaughn.github.io/react-virtualized/#/components/Table),
    offering a lazy, super-optimized rendering process that scales on huge
    datasets.
-
+ 
    A table shall be connected to an instance of [[Model]] class to retrieve the
    data and get informed of data updates.
-
+ 
    The table children shall be instances of [[Column]] class, and can be grouped
    into arbitrary level of React fragments or custom components.
-
+ 
    Clicking on table headers trigger re-ordering callback on the model with the
    expected column and direction, unless disabled _via_ the column x
    specification. However, actual sorting (and corresponding feedback on table
    headers) would only take place if the model supports re-ordering and
    eventually triggers a reload.
-
+ 
    Right-clicking the table headers displays a popup-menu with actions to reset
    natural ordering, reset column widths and select column visibility.
-
+ 
    Tables do not control item selection state. Instead, you shall supply the
    selection state and callback _via_ properties, like any other controlled
    React components.
-
+ 
    Item selection can be based either on single-row or multiple-row. In case of
    single-row selection (`multipleSelection:false`, the default), selection
    state must be a single item or `undefined`, and the `onSelection` callback is
    called with the same type of values.
-
+ 
    In case of multiple-row selection (`multipleSelection:true`), the selection
    state shall be an _array_ of items, and `onSelection` callback also. Single
    items are _not_ accepted, but `undefined` selection can be used in place of
    an empty array.
-
+ 
    Clicking on a row triggers the `onSelection` callback with the updated
    selection.  In single-selection mode, the clicked item is sent to the
    callback. In multiple-selection mode, key modifiers are taken into account
@@ -973,7 +988,7 @@ function makeTable<Key, Row>(
    selection is extended with the newly clicked item.  Clicking an already
    selected item with the `CtrlOrCmd` modifier removes it from the current
    selection.
-
+ 
    @template Key - unique identifiers of table entries @template Row - data
    associated to each key in the table entries */
 
