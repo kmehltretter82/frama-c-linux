@@ -372,7 +372,6 @@ let consider_function ~libc vinfo =
       ) && (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let consider_variable ~libc vinfo =
-  not (Cil.hasAttribute "FRAMA_C_MODEL" vinfo.vattr) &&
   (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let float_to_string f =

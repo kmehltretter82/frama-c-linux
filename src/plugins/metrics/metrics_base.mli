@@ -157,8 +157,7 @@ val get_file_type: Filepath.Normalized.t -> output_type;;
 val consider_function: libc:bool -> Cil_types.varinfo -> bool
 
 (** [consider_variable vinfo] returns false if the varinfo is not an object
-    variable we are interested in. Currently excluded variables are those
-    declared with attribute [__FRAMA_C_MODEL__].
+    variable we are interested in.
     If [libc] is false, do not consider variables from the Frama-C libc.
 *)
 val consider_variable: libc:bool -> Cil_types.varinfo -> bool

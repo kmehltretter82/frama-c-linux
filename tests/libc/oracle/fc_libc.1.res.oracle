@@ -3580,8 +3580,7 @@ extern int killpg(pid_t pgrp, int sig);
 extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
 
 /*@ ghost struct __fc_sockfds_type __fc_sockfds[1024]; */
-/*@ ghost extern int __fc_socket_counter __attribute__((__FRAMA_C_MODEL__));
-*/
+/*@ ghost extern int __fc_socket_counter; */
 
 /*@ ghost int volatile __fc_open_sock_fds; */
 /*@ requires valid_sockfd: 0 ≤ sockfd < 1024;

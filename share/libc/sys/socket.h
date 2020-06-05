@@ -291,7 +291,7 @@ struct __fc_sockfds_type { int x; };
 //@ ghost struct __fc_sockfds_type __fc_sockfds[__FC_MAX_OPEN_SOCKETS];
 
 /* Represents the creation of new file descriptors for sockets. */
-//@ ghost extern int __fc_socket_counter __attribute__((__FRAMA_C_MODEL__));
+//@ ghost extern int __fc_socket_counter;
 
 // __fc_sockfds represents the state of open socket descriptors.
 //@ ghost volatile int __fc_open_sock_fds;
