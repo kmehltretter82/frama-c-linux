@@ -111,11 +111,12 @@ ptests/.gitignore: .ignore
 ptests/.merlin: .ignore
 ptests/ptests.ml: CEA_LGPL
 share/_frama-c: CEA_LGPL
+share/analysis-scripts/analysis.mk: CEA_LGPL
 share/analysis-scripts/benchmark_database.py: .ignore
 share/analysis-scripts/clone.sh: .ignore
 share/analysis-scripts/creduce.sh: CEA_LGPL
+share/analysis-scripts/epilogue.mk: CEA_LGPL
 share/analysis-scripts/fc_stubs.c: .ignore
-share/analysis-scripts/frama-c.mk: CEA_LGPL
 share/analysis-scripts/frama_c_results.py: .ignore
 share/analysis-scripts/cmd-dep.sh: .ignore
 share/analysis-scripts/concat-csv.sh: .ignore
@@ -131,6 +132,7 @@ share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/make_template.py: .ignore
 share/analysis-scripts/make_wrapper.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore
+share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore
 share/analysis-scripts/results_display.py: .ignore
 share/analysis-scripts/summary.py: .ignore

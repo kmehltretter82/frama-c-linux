@@ -1,15 +1,13 @@
-# TEMPLATE FOR MAKEFILE TO USE IN FRAMA-C/EVA CASE STUDIES
-
+# Makefile template for Frama-C/Eva case studies.
 # For details and usage information, see the Frama-C User Manual.
 
-# Do not modify the block below
-###############################################################################
--include frama-c-path.mk
+### Prologue. Do not modify this block. #######################################
+-include path.mk
 FRAMAC ?= frama-c
-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/eva-prefix.mk
+include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/prologue.mk
 ###############################################################################
 
-# Edit below as needed. Suggested flags are optional.
+# Edit below as needed. MACHDEP is mandatory. Suggested flags are optional.
 
 MACHDEP = x86_32
 
@@ -25,6 +23,9 @@ FCFLAGS     += \
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
 
+## GUI-only flags
+FCGUIFLAGS +=
+
 ## Analysis targets (suffixed with .eva)
 TARGETS = main.eva
 
@@ -32,7 +33,6 @@ TARGETS = main.eva
 main.parse: \
   main.c \
 
-# Do not modify the block below
-###############################################################################
-include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/eva-suffix.mk
+### Epilogue. Do not modify this block. #######################################
+include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/epilogue.mk
 ###############################################################################

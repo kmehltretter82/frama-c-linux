@@ -254,24 +254,24 @@ DISTRIB_FILES:=\
       Changelog config.h.in						\
       VERSION VERSION_CODENAME $(wildcard licenses/*)                   \
       $(LIBC_FILES)							\
+      share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
-      share/analysis-scripts/eva-prefix.mk                              \
-      share/analysis-scripts/eva-suffix.mk                              \
+      share/analysis-scripts/epilogue.mk                                \
       $(wildcard share/analysis-scripts/examples/*)                     \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
-      share/analysis-scripts/frama-c.mk                                 \
       share/analysis-scripts/frama_c_results.py                         \
       share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/parse-coverage.sh                          \
+      share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/summary.py                                 \
@@ -1936,23 +1936,24 @@ install:: install-lib-$(OCAMLBEST)
 	  share/configure.ac share/autocomplete_frama-c share/_frama-c \
 	  $(FRAMAC_DATADIR)
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
-	$(CP) share/analysis-scripts/benchmark_database.py \
+	$(CP) \
+	  share/analysis-scripts/analysis.mk \
+	  share/analysis-scripts/benchmark_database.py \
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
 	  share/analysis-scripts/creduce.sh \
-	  share/analysis-scripts/eva-prefix.mk \
-	  share/analysis-scripts/eva-suffix.mk \
+	  share/analysis-scripts/epilogue.mk \
 	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
-	  share/analysis-scripts/frama-c.mk \
 	  share/analysis-scripts/frama_c_results.py \
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/parse-coverage.sh \
+	  share/analysis-scripts/prologue.mk \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/summary.py \
