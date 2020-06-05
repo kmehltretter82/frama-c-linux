@@ -11,6 +11,8 @@ include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/eva-prefix.
 
 # Edit below as needed. Suggested flags are optional.
 
+MACHDEP = x86_32
+
 ## Preprocessing flags (for -cpp-extra-args)
 CPPFLAGS    +=
 

@@ -31,6 +31,7 @@
 # FRAMAC        the frama-c binary
 # FRAMAC_GUI    the frama-c gui binary
 # CPPFLAGS      preprocessing flags
+# MACHDEP       machdep to use with frama-c
 # FCFLAGS       general flags to use with frama-c
 # FCGUIFLAGS    flags to use with frama-c-gui
 # EVAFLAGS      flags to use with the Eva plugin
@@ -161,7 +162,7 @@ SHELL        := /bin/bash
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
-%.parse: PARSE = $(FRAMAC) $(FCFLAGS) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
+%.parse: PARSE = $(FRAMAC) $(FCFLAGS) -machdep $(MACHDEP) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
