@@ -111,7 +111,7 @@ char *getenv(const char *name)
 
 int putenv(char *string)
 {
-  char *separator = strchr(string, '=');
+  char *separator __attribute__((unused)) = strchr(string, '=');
   //@ assert string_contains_separator: separator != \null;
   //@ assert name_is_not_empty: separator != string;
 

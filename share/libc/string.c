@@ -272,7 +272,9 @@ char *strstr(const char *haystack, const char *needle)
 }
 
 char __fc_strerror[64];
+#ifdef __FRAMAC__
 static int __fc_strerror_init;
+#endif
 
 char *strerror(int errnum)
 {
@@ -318,7 +320,9 @@ char *strndup(const char *s, size_t n)
 }
 
 char __fc_strsignal[64];
+#ifdef __FRAMAC__
 static int __fc_strsignal_init;
+#endif
 
 char *strsignal(int signum)
 {

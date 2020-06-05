@@ -23,11 +23,15 @@
 #include "locale.h"
 #include "limits.h"
 __PUSH_FC_STDLIB
-struct lconv __C_locale = {".","","","","","","","","","",CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX};
+struct lconv __C_locale = {(char*)".",(char*)"",(char*)"",(char*)"",(char*)"",
+                           (char*)"",(char*)"",(char*)"",(char*)"",(char*)"",
+                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,
+                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX,
+                           CHAR_MAX,CHAR_MAX,CHAR_MAX,CHAR_MAX};
 
 struct lconv *__frama_c_locale=&__C_locale;
 
-char*__frama_c_locale_names[512]={"C"};
+char*__frama_c_locale_names[512]={(char*)"C"};
 char *setlocale(int category, const char *locale) {
   if (*locale == 'C') 
     { __frama_c_locale = &__C_locale;
