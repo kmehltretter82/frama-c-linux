@@ -96,9 +96,6 @@ const ASTview = () => {
   }, [buffer, theMarker]);
 
   // Callbacks
-  const doPrevSelect = () => { updateSelection('GO_BACK'); };
-  const doNextSelect = () => { updateSelection('GO_FORWARD'); };
-
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
@@ -134,18 +131,6 @@ const ASTview = () => {
   return (
     <>
       <TitleBar>
-        <IconButton
-          icon="MEDIA.PREV"
-          onClick={doPrevSelect}
-          disabled={!selection || selection.prevSelections.length === 0}
-          title="Previous location"
-        />
-        <IconButton
-          icon="MEDIA.NEXT"
-          onClick={doNextSelect}
-          disabled={!selection || selection.nextSelections.length === 0}
-          title="Next location"
-        />
         <IconButton
           icon="ZOOM.OUT"
           onClick={zoomOut}
