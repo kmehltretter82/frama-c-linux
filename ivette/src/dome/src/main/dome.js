@@ -196,6 +196,7 @@ function navigateURL( event , url ) {
 // --------------------------------------------------------------------------
 
 const windowsHandle = {} ; // Prevent live windows to be garbage collected
+const windowsReload = {} ; // Reloaded windows
 
 function createBrowserWindow( config, isMain=true )
 {
@@ -226,7 +227,8 @@ function createBrowserWindow( config, isMain=true )
   }
 
   const theWindow = new BrowserWindow( options );
-
+  const wid = theWindow.id;
+  
   // Load the index.html of the app.
   if (DEVEL || LOCAL)
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -249,7 +251,14 @@ function createBrowserWindow( config, isMain=true )
   // URL Navigation
   theWindow.webContents.on('will-navigate', navigateURL );
   theWindow.webContents.on('did-navigate-in-page', navigateURL );
-  theWindow.webContents.on('did-finish-load', () => broadcast('dome.ipc.reload'));
+  theWindow.webContents.on('did-finish-load', () => {
+    const isLoaded = windowsReload[wid];
+    if (!isLoaded) {
+      windowsReload[wid] = true;
+    } else {
+      broadcast('dome.ipc.reload');
+    }
+  });
 
   // Emitted when the window want's to close.
   theWindow.on('close', (evt) => {
@@ -270,7 +279,6 @@ function createBrowserWindow( config, isMain=true )
   }
 
   // Keep the window reference to prevent destruction
-  const wid = theWindow.id ;
   windowsHandle[ wid ] = theWindow ;
 
   // Emitted when the window is closed.

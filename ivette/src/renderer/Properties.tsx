@@ -5,68 +5,134 @@
 import _ from 'lodash';
 import React from 'react';
 import * as States from 'frama-c/states';
+import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
 import { ArrayModel } from 'dome/table/arrays';
-import { Table, DefineColumn } from 'dome/table/views';
+import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { Component } from 'frama-c/LabViews';
 
 // --------------------------------------------------------------------------
 // --- Property Columns
 // --------------------------------------------------------------------------
 
-const ColumnCode: any =
-  DefineColumn({ renderValue: (text: string) => <Code>{text}</Code> });
+export const renderCode: Renderer<string> =
+  (text?: string) => (text ? <Code>{text}</Code> : null);
 
-const ColumnTag: any =
-  DefineColumn({
-    renderValue: (l: { label: string; descr: string }) => (
-      <Label label={l.label} title={l.descr} />
-    ),
-  });
+function ColumnCode<Row>(props: ColumnProps<Row, string>) {
+  return <Column render={renderCode} {...props} />;
+}
+
+interface Tag { name: string; label: string; descr: string }
+
+export const renderTag: Renderer<Tag> =
+  (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
+
+function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
+  return <Column render={renderTag} {...props} />;
+}
 
 // --------------------------------------------------------------------------
 // --- Properties Table
 // -------------------------------------------------------------------------
 
+interface SourceLoc {
+  file: string;
+  line: number;
+}
+
+interface Property {
+  key: string;
+  descr: string;
+  kind: string;
+  status: string;
+  function?: string;
+  kinstr: string;
+  source: SourceLoc;
+}
+
+const bySource =
+  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.primitive });
+
+const byStatus =
+  Compare.byRank(
+    'inconsistent',
+    'invalid',
+    'invalid_under_hyp',
+    'unknown',
+    'valid_under_hyp',
+    'valid',
+    'invalid_but_dead',
+    'unknown_but_dead',
+    'valid_but_dead',
+    'never_tried',
+    'considered_valid',
+  );
+
+const byProperty: Compare.ByFields<Property> = {
+  status: byStatus,
+  function: Compare.defined(Compare.alpha),
+  source: bySource,
+  kind: Compare.primitive,
+  key: Compare.primitive,
+  kinstr: Compare.primitive,
+};
+
+class PropertyModel extends ArrayModel<Property> {
+  constructor() {
+    super('key');
+    this.setOrderingByFields(byProperty);
+  }
+}
+
 const RenderTable = () => {
   // Hooks
-  const model = React.useMemo(() => new ArrayModel(), []);
-  const items = States.useSyncArray('kernel.properties');
-  const status = States.useDictionary('kernel.dictionary.propstatus');
-  const [select, setSelect] = States.useSelection();
+  const model = React.useMemo(() => new PropertyModel(), []);
+  const items: { [key: string]: Property } =
+    States.useSyncArray('kernel.properties');
+  const statusDict: { [status: string]: Tag } =
+    States.useDictionary('kernel.dictionary.propstatus');
+  const [select, setSelect] =
+    States.useSelection();
+
   React.useEffect(() => {
-    model.setData(_.toArray(items));
+    const data = _.toArray(items);
+    model.replace(data);
   }, [model, items]);
 
   // Callbacks
-  const getStatus = ({ status: st }: any) => status[st] || { label: st };
-  const selection = select ? items[select.marker] : undefined;
-  const onSelection = (item: any) => item && setSelect({
-    marker: item.key,
-    function: item.function,
-  });
+  const getStatus = React.useCallback(
+    ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
+    [statusDict],
+  );
+
+  const onSelection = React.useCallback(
+    ({ key, function: fct }: Property) => {
+      setSelect({ marker: key, function: fct });
+    }, [setSelect],
+  );
+
+  const selection = select?.marker;
 
   // Rendering
   return (
-    <>
-      <Table
-        model={model}
-        selection={selection}
-        onSelection={onSelection}
-        scrollToItem={selection}
-      >
-        <ColumnCode id="function" label="Function" width={120} />
-        <ColumnCode id="descr" label="Description" fill />
-        <ColumnTag
-          id="status"
-          label="Status"
-          fixed
-          width={80}
-          align="center"
-          getValue={getStatus}
-        />
-      </Table>
-    </>
+    <Table<string, Property>
+      model={model}
+      sorting={model}
+      selection={selection}
+      onSelection={onSelection}
+      settings="ivette.properties.table"
+    >
+      <ColumnCode id="function" label="Function" width={120} />
+      <ColumnCode id="descr" label="Description" fill />
+      <ColumnTag
+        id="status"
+        label="Status"
+        fixed
+        width={80}
+        align="center"
+        getter={getStatus}
+      />
+    </Table>
   );
 };
 

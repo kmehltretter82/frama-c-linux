@@ -76,6 +76,10 @@ function buildServerConfig(argv: string[], cwd?: string) {
   };
 }
 
+function buildServerCommand(cmd: string) {
+  return buildServerConfig(cmd.trim().split(/[ \t\n]+/));
+}
+
 function insertConfig(hs: string[], cfg: Server.Configuration) {
   const cmd = dumpServerConfig(cfg).trim();
   const newhs =
@@ -90,8 +94,20 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 // --- Start Server on Command
 // --------------------------------------------------------------------------
 
+let reloadCommand: string | undefined;
+
+Dome.onReload(() => {
+  const hst = Dome.getWindowSetting('Controller.history');
+  reloadCommand = Array.isArray(hst) && hst[0];
+});
+
 Dome.onCommand((argv: string[], cwd: string) => {
-  const cfg = buildServerConfig(argv, cwd);
+  let cfg;
+  if (reloadCommand) {
+    cfg = buildServerCommand(reloadCommand);
+  } else {
+    cfg = buildServerConfig(argv, cwd);
+  }
   Server.setConfig(cfg);
   Server.start();
 });
@@ -189,9 +205,7 @@ const RenderConsole = () => {
   };
 
   const doExec = () => {
-    const cmd = editor.getValue().trim();
-    const argv = cmd.split(/[ \t\n]+/);
-    const cfg = buildServerConfig(argv);
+    const cfg = buildServerCommand(editor.getValue());
     const hst = insertConfig(history, cfg);
     setHistory(hst);
     setCursor(-1);

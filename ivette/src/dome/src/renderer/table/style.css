@@ -66,6 +66,10 @@
     margin-right: 2px ;
 }
 
+.dome-xTable-renderer {
+    overflow: hidden;
+}
+
 .dome-xTable-resizer {
     position: absolute ;
     cursor: col-resize ;
@@ -96,6 +100,14 @@
     vertical-align: baseline ;
 }
 
+.dome-window-active .dome-xTable-selected {
+    background: #8ce0fb ;
+}
+
+.dome-window-inactive .dome-xTable-selected {
+    background: #ccc ;
+}
+
 .dome-xTable-odd {
     background: #fdfdfd ;
 }
@@ -116,6 +128,20 @@
 .dome-xTable-cell {
     display: block ;
     position: relative ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Dragging Columns                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xTable .ReactVirtualized__Table__headerColumn,
+.dome-xTable .ReactVirtualized__Table__rowColumn
+{
+    transition: flex-basis linear 50ms ;
+}
+
+.dome-xTable-resizer {
+    transition: left linear 50ms ;
 }
 
 /* -------------------------------------------------------------------------- */

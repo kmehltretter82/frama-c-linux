@@ -178,7 +178,7 @@ export function useRequest(rq: string, params: any, options: any = {}) {
   const footprint = project ? JSON.stringify([project, rq, params]) : undefined;
 
   async function trigger() {
-    if (project && rq && params) {
+    if (project && rq && params !== undefined) {
       try {
         const r = await Server.GET({ endpoint: rq, params });
         setResponse(r);

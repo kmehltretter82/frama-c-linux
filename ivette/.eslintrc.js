@@ -67,6 +67,8 @@ module.exports = {
     "no-return-assign": ["error", "except-parens" ],
     // Allow single line expressions in react
     "react/jsx-one-expression-per-line": "off",
+    // Allow property spreading since with aim at using TSC
+    "react/jsx-props-no-spreading": "off",
     // Allow all sorts of linebreaking for operators
     "operator-linebreak": "off",
     // Force curly brackets on newline if some item is
