@@ -17,6 +17,8 @@ import {
 // --- Sorting Utilities
 // --------------------------------------------------------------------------
 
+export type ByColumns<Row> = { [dataKey: string]: Compare.Order<Row> };
+
 interface PACK<Key, Row> {
   index: number | undefined;
   key: Key;
@@ -25,23 +27,26 @@ interface PACK<Key, Row> {
 
 type SORT<K, R> = Order<PACK<K, R>>;
 
-function orderBy<K, R>(fields: ByFields<R>, ord: SortingInfo): SORT<K, R> {
-  const fd = ord.sortBy as keyof R;
-  const fn = fields[fd] ?? Compare.equal;
+function orderBy<K, R>(
+  columns: ByColumns<R>,
+  ord: SortingInfo,
+): SORT<K, R> {
+  const dataKey = ord.sortBy;
+  const byData = columns[dataKey] ?? Compare.equal;
   const rv = ord.sortDirection === 'DESC';
   type D = PACK<K, R>;
-  const byField = (x: D, y: D) => fn(x.row[fd], y.row[fd]);
+  const byEntry = (x: D, y: D) => byData(x.row, y.row);
   const byIndex = (x: D, y: D) => (x.index ?? 0) - (y.index ?? 0);
-  return Compare.direction(Compare.sequence(byField, byIndex), rv);
+  return Compare.direction(Compare.sequence(byEntry, byIndex), rv);
 }
 
 function orderByRing<K, R>(
   natural: undefined | Order<R>,
-  compare: undefined | ByFields<R>,
+  columns: undefined | ByColumns<R>,
   ring: SortingInfo[],
 ): SORT<K, R> {
   type D = PACK<K, R>;
-  const byRing = compare ? ring.map((ord) => orderBy(compare, ord)) : [];
+  const byRing = columns ? ring.map((ord) => orderBy(columns, ord)) : [];
   const byData = natural ? ((x: D, y: D) => natural(x.row, y.row)) : undefined;
   return Compare.sequence(...byRing, byData);
 }
@@ -75,7 +80,7 @@ export class MapModel<Key, Row>
   private natural?: Order<Row>;
 
   // Sortable columns and associated ordering (if any)
-  private columns?: ByFields<Row>;
+  private columns?: ByColumns<Row>;
 
   // Comparison Ring
   private ring: SortingInfo[] = [];
@@ -140,13 +145,14 @@ export class MapModel<Key, Row>
   // --- Ordering
   // --------------------------------------------------------------------------
 
-  /** Sets comparison functions for _all_ columns.
-      Non-specified columns becomes _non_ sortable.  This will be used to refine
+  /** Sets comparison functions for the specified columns. Previous
+      comparison for un-specified columns are kept unchanged, if any.
+      This will be used to refine
       [[setNaturalOrder]] in response to user column selection with
       [[setSortBy]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
-  setColumnOrder(columns?: ByFields<Row>) {
-    this.columns = columns;
+  setColumnOrder(columns?: ByColumns<Row>) {
+    this.columns = { ...this.columns, ...columns };
     this.reload();
   }
 
@@ -167,7 +173,30 @@ export class MapModel<Key, Row>
    */
   setOrderingByFields(byfields: ByFields<Row>) {
     this.natural = Compare.byFields(byfields);
-    this.columns = byfields;
+    const columns = this.columns ?? {};
+    for (let k of Object.keys(byfields)) {
+      const dataKey = k as (string & keyof Row);
+      const fn = byfields[dataKey];
+      if (fn) columns[dataKey] = (x: Row, y: Row) => {
+        const dx = x[dataKey];
+        const dy = y[dataKey];
+        if (dx === dy) return 0;
+        if (dx === undefined) return 1;
+        if (dy === undefined) return -1;
+        return fn(dx, dy);
+      };
+    }
+    this.columns = columns;
+    this.reload();
+  }
+
+  /**
+     Remove the sorting function for the provided column.
+   */
+  deleteColumnOrder(dataKey: string) {
+    const columns = this.columns;
+    if (columns) delete columns[dataKey];
+    this.ring = this.ring.filter(ord => ord.sortBy !== dataKey);
     this.reload();
   }
 
