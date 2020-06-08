@@ -50,13 +50,13 @@ export function pretty(js: any) {
 // --------------------------------------------------------------------------
 
 /** Decoder for values of type `D`. */
-export type Safe<D> = (js: json) => D;
+export type Safe<D> = (js?: json) => D;
 
 /**
    Decode for values of type `D`, if any.
    Same as `Safe<D | undefined>`.
 */
-export type Loose<D> = (js: json) => D | undefined;
+export type Loose<D> = (js?: json) => D | undefined;
 
 // --------------------------------------------------------------------------
 // --- Primitives
@@ -64,12 +64,17 @@ export type Loose<D> = (js: json) => D | undefined;
 
 /** Primitive JSON number or `undefined`. */
 export const jNumber: Loose<number> = (js: json) => (
-  typeof js === 'number' ? js : undefined
+  typeof js === 'number' && !Number.isNaN(js) ? js : undefined
+);
+
+/** Primitive JSON number, rounded to integer, or `undefined`. */
+export const jInt: Loose<number> = (js: json) => (
+  typeof js === 'number' && !Number.isNaN(js) ? Math.round(js) : undefined
 );
 
 /** Primitive JSON number or `0`. */
 export const jZero: Safe<number> = (js: json) => (
-  typeof js === 'number' ? js : 0
+  typeof js === 'number' && !Number.isNaN(js) ? js : 0
 );
 
 /** Primitive JSON boolean or `undefined`. */
