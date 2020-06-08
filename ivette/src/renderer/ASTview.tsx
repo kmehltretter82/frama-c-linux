@@ -124,7 +124,7 @@ const ASTview = () => {
   }
 
   // Theme Popup
-  const selectTheme = (id?: string) => id && setTheme(id);
+  const selectTheme = (id: string) => setTheme(id);
   const checkTheme =
     (th: { id: string }) => ({ checked: th.id === theme, ...th });
   const themePopup =
