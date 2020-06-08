@@ -544,7 +544,7 @@ function isSelect(a: SelectionActions): a is SelectAction {
 function reducer(s: Selection, action: SelectionActions) {
   if (isSelect(action)) {
     const [prevSelections, nextSelections] =
-      s.current?.function !== action.location.function ?
+      s.current && s.current.function !== action.location.function ?
         [[s.current, ...s.prevSelections], []] :
         [s.prevSelections, s.nextSelections];
     return {
