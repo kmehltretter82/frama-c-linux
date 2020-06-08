@@ -36,7 +36,7 @@ usage() {
    echo ""
    echo "  - make-template [dir]"
    echo "      Interactively prepares a template for running analysis scripts,"
-   echo "      writing it to [dir/GNUmakefile]. [dir] is [.] if omitted."
+   echo "      writing it to [dir/GNUmakefile]. [dir] is [.frama-c] if omitted."
    echo ""
    echo "  - make-path"
    echo "      [for Frama-C developers and advanced users without Frama-C in the path]"
@@ -232,7 +232,8 @@ case "$command" in
         ;;
     "make-template")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$0" "$@";
+        export FRAMAC="${DIR}/frama-c"
+        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$@";
         ;;
     "make-path")
         shift;
