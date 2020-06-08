@@ -6,7 +6,7 @@ import React from 'react';
 import * as Dome from 'dome';
 
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/frame/toolbars';
-import { LED, IconButton } from 'dome/controls/buttons';
+import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
@@ -325,7 +325,7 @@ export const Console = () => (
 export const Status = () => {
   const status = Server.useStatus();
   const pending = Server.getPending();
-  let led;
+  let led: LEDstatus;
   let blink;
   let error;
 
