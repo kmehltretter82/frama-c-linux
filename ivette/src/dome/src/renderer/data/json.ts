@@ -133,6 +133,46 @@ export function jNull<A>(fn: Safe<A>, defaultValue?: A): Loose<A> {
 }
 
 /**
+   Fail when the loose decoder returns `undefined`.
+   See also [[jCatch]] and [[jTry]].
+ */
+export function jFail<A>(fn: Loose<A>, error: Error): Safe<A> {
+  return (js: json) => {
+    const d = fn(js);
+    if (d !== undefined) return d;
+    throw error;
+  };
+}
+
+/**
+   Provide a fallback value in case of undefined value or error.
+   See also [[jFail]] and [[jTry]].
+ */
+export function jCatch<A>(fn: Loose<A>, fallBack: A): Safe<A> {
+  return (js: json) => {
+    try {
+      return fn(js) ?? fallBack;
+    } catch (_err) {
+      return fallBack;
+    }
+  };
+}
+
+/**
+   Provides an (optional) default value in case of error or undefined value.
+   See also [[jFail]] and [[jCatch]].
+ */
+export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
+  return (js: json) => {
+    try {
+      return fn(js) ?? defaultValue;
+    } catch (_err) {
+      return defaultValue;
+    }
+  };
+}
+
+/**
    Apply the decoder on each item of a JSON array, or return `[]` otherwize.
    Can be also applied on a _loose_ decoder, but you will get
    an array with possibly `undefined` elements. Use [[jList]]
