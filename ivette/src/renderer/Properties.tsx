@@ -109,7 +109,7 @@ const RenderTable = () => {
     ({ key, function: fct }: Property) => {
       if (fct) {
         const location = { function: fct, marker: key };
-        updateSelection({ type: 'SELECT', location });
+        updateSelection({ location });
       }
     }, [updateSelection],
   );

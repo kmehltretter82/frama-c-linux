@@ -105,7 +105,7 @@ const ASTview = () => {
   function onTextSelection(id: string) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
-      updateSelection({ type: 'SELECT', location });
+      updateSelection({ location });
     }
   }
 
@@ -116,7 +116,7 @@ const ASTview = () => {
         label: `Go to definition of ${marker.name}`,
         onClick: () => {
           const location = { function: marker.name };
-          updateSelection({ type: 'GOTO', location });
+          updateSelection({ location });
         },
       };
       Dome.popupMenu([item]);

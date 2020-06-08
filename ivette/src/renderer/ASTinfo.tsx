@@ -36,7 +36,7 @@ const ASTinfo = () => {
   function onTextSelection(id: string) {
     // For now, the only markers are functions.
     const location = { function: id };
-    updateSelection({ type: 'SELECT', location });
+    updateSelection({ location });
   }
 
   // Component
