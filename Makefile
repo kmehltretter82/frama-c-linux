@@ -311,7 +311,7 @@ DISTRIB_FILES:=\
       bin/sed_get_make_major bin/sed_get_make_minor                     \
       INSTALL.md README.md .make-clean	                        \
       .make-clean-stamp .force-reconfigure 	\
-      opam/opam opam/descr \
+      opam/opam \
 
 # Test files to be included in the distribution (without header checking).
 # Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files. 
