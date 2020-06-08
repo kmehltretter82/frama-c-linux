@@ -507,21 +507,112 @@ export function useSyncArray(id: string) {
 // --- Selection
 // --------------------------------------------------------------------------
 
+/** An AST location. */
+export interface Location {
+  /** Function name. */
+  readonly function: string;
+  /** Marker identifier. */
+  readonly marker?: string;
+}
+
+export interface Selection {
+  /** Current selection. */
+  current?: Location;
+  /** Previous locations with respect to the [[current]] one. */
+  prevSelections: Location[];
+  /** Next locations with respect to the [[current]] one. */
+  nextSelections: Location[];
+}
+
+/** An action on a location. */
+export interface LocationAction {
+  /** Type of action:
+   * - `SELECT` selects a given [[location]].
+   * - `GOTO` jumps to a given [[location]], and empties [[nextSelections]].
+   */
+  readonly type: 'SELECT' | 'GOTO';
+  readonly location: Location;
+}
+
+/** Actions on selection:
+ * - [[LocationAction]].
+ * - `GO_BACK` jumps to previous location (first in [[prevSelections]]).
+ * - `GO_FORWARD` jumps to next location (first in [[nextSelections]]).
+ */
+export type SelectionActions = LocationAction | 'GO_BACK' | 'GO_FORWARD';
+
+function isOnLocation(a: SelectionActions): a is LocationAction {
+  return (a as LocationAction).type !== undefined;
+}
+
+/** Compute the next selection based on the current one and the given action. */
+function reducer(s: Selection, action: SelectionActions) {
+  if (isOnLocation(action)) {
+    switch (action.type) {
+      case 'SELECT':
+        // Save current location if the selected one is in a different function.
+        if (s.current?.function !== action.location.function &&
+          (s.prevSelections.length !== 0 || s.nextSelections.length !== 0)) {
+          return {
+            current: action.location,
+            prevSelections: [s.current, ...s.prevSelections],
+            nextSelections: s.nextSelections,
+          };
+        }
+        return { ...s, current: action.location };
+      case 'GOTO':
+        return {
+          current: action.location,
+          prevSelections: [s.current, ...s.prevSelections],
+          nextSelections: [],
+        };
+      default:
+        return s;
+    }
+  } else {
+    const [pS, ...prevS] = s.prevSelections;
+    const [nS, ...nextS] = s.nextSelections;
+    switch (action) {
+      case 'GO_BACK':
+        return {
+          current: pS,
+          prevSelections: prevS,
+          nextSelections: [s.current, ...s.nextSelections],
+        };
+      case 'GO_FORWARD':
+        return {
+          current: nS,
+          prevSelections: [s.current, ...s.prevSelections],
+          nextSelections: nextS,
+        };
+      default:
+        return s;
+    }
+  }
+}
+
 const SELECTION = 'kernel.selection';
 
-setStateDefault(SELECTION, {});
+const initialSelection = {
+  current: undefined,
+  prevSelections: [],
+  nextSelections: [],
+};
+setStateDefault(SELECTION, initialSelection);
 
 /**
- *  @summary Current selection state.
- *  @return {array} `[selection,update]` for the current selection
- *  @description
- *  The selection is an object with many independant fields.
- *  You update it by providing only some fields, the other ones being kept
- *  unchanged, like the `setState()` behaviour of React components.
+ *  Current selection.
+ *  @return {array} The current selection and the function to update it.
  */
-export function useSelection() {
-  const [state, setState] = useState(SELECTION);
-  return [state, (upd: any) => setState({ ...state, ...upd })];
+export function useSelection(): [Selection, (a: SelectionActions) => void] {
+  const [selection, setSelection] = useState(SELECTION);
+
+  function update(action: SelectionActions) {
+    const nextSelection = reducer(selection, action);
+    setSelection(nextSelection);
+  }
+
+  return [selection, update];
 }
 
 // --------------------------------------------------------------------------

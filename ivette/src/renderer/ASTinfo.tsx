@@ -17,8 +17,8 @@ import { Component } from 'frama-c/LabViews';
 const ASTinfo = () => {
 
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const [select, setSelect] = States.useSelection();
-  const marker = select && select.marker;
+  const [selection, updateSelection] = States.useSelection();
+  const marker = selection?.current?.marker;
   const data = States.useRequest(
     'kernel.ast.info',
     marker,
@@ -33,9 +33,10 @@ const ASTinfo = () => {
   }, [buffer, data]);
 
   // Callbacks
-  function onSelection(name: string) {
+  function onTextSelection(id: string) {
     // For now, the only markers are functions.
-    setSelect({ function: name, marker: undefined });
+    const location = { function: id };
+    updateSelection({ type: 'SELECT', location });
   }
 
   // Component
@@ -46,7 +47,7 @@ const ASTinfo = () => {
           buffer={buffer}
           mode="text"
           theme="default"
-          onSelection={onSelection}
+          onSelection={onTextSelection}
           readOnly
         />
       </Vfill>
