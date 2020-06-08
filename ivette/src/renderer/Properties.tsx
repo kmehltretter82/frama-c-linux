@@ -107,10 +107,8 @@ const RenderTable = () => {
 
   const onPropertySelection = React.useCallback(
     ({ key, function: fct }: Property) => {
-      if (fct) {
-        const location = { function: fct, marker: key };
-        updateSelection({ location });
-      }
+      const location = { function: (fct as string), marker: key };
+      updateSelection({ location });
     }, [updateSelection],
   );
 
