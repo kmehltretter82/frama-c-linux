@@ -186,7 +186,7 @@ const defaultGetter = (row: any, dataKey: string) => {
 };
 
 const defaultRenderer = (d: any) => (
-  <div className="dome-xTable-renderer dome-text-label">)
+  <div className="dome-xTable-renderer dome-text-label">
     {new String(d)}
   </div>
 );
