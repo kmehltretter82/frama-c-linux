@@ -7,7 +7,7 @@ import React from 'react';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
-import { ArrayModel } from 'dome/table/arrays';
+import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { Component } from 'frama-c/LabViews';
 import { Vfill } from 'dome/layout/boxes';
@@ -232,15 +232,24 @@ const byProperty: Compare.ByFields<Property> = {
   kind: Compare.primitive,
   alarm: Compare.defined(Compare.alpha),
   names: Compare.array(Compare.alpha),
-  predicate: Compare.alpha,
+  predicate: Compare.defined(Compare.alpha),
   key: Compare.primitive,
   kinstr: Compare.primitive,
 };
 
-class PropertyModel extends ArrayModel<Property> {
+const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
+const byFile = Compare.byFields<SourceLoc>({ base: Compare.alpha });
+
+const byColumn: Arrays.ByColumns<Property> = {
+  dir: Compare.byFields<Property>({ source: byDir }),
+  file: Compare.byFields<Property>({ source: byFile }),
+};
+
+class PropertyModel extends Arrays.ArrayModel<Property> {
   constructor() {
     super('key');
     this.setOrderingByFields(byProperty);
+    this.setColumnOrder(byColumn);
   }
 }
 
@@ -363,13 +372,19 @@ const RenderTable = () => {
         settings="ivette.properties.table"
       >
         <Column
-          id="path"
+          id="dir"
           label="Directory"
           width={240}
           visible={false}
-          getter={(prop: Property) => prop.source.dir}
+          getter={(prop: Property) => prop?.source?.dir}
         />
-        <Column id="source" label="File" width={120} render={renderFile} />
+        <Column
+          id="file"
+          label="File"
+          width={120}
+          getter={(prop: Property) => prop?.source}
+          render={renderFile}
+        />
         <ColumnCode id="function" label="Function" width={120} />
         <ColumnCode id="kind" label="Property kind" width={120} />
         <ColumnCode id="alarm" label="Alarms" width={160} />
