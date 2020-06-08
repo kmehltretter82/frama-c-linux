@@ -20,21 +20,10 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "fenv.c"
-#include "getopt.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "netinet/in.c"
-#include "signal.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "unistd.c"
-#include "wchar.c"
+#include "in.h"
+
+const struct in6_addr in6addr_any={{0}};
+const struct in6_addr in6addr_loopback=
+  {{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+    0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}}
+  ;

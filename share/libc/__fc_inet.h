@@ -83,11 +83,8 @@ struct sockaddr_in6 {
 // Not required by POSIX
 #define INADDR_LOOPBACK (uint32_t)0x7F000001
 
-const struct in6_addr in6addr_any={{0}};
-const struct in6_addr in6addr_loopback=
-  {{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
-    0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}}
-  ;
+extern const struct in6_addr in6addr_any;
+extern const struct in6_addr in6addr_loopback;
 
 struct ipv6_mreq {
   struct in6_addr  ipv6mr_multiaddr;
