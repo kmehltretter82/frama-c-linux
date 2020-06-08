@@ -222,6 +222,34 @@ export function byAllFields<A>(order: ByAllFields<A>): Order<A> {
   };
 }
 
+export type dict<A> = undefined | null | { [key: string]: A };
+
+/**
+   Compare dictionaries _wrt_ lexicographic order of entries.
+*/
+export function dictionary<A>(order: Order<A>): Order<dict<A>> {
+  return (x: dict<A>, y: dict<A>) => {
+    if (x === y) return 0;
+    const dx = x ?? {};
+    const dy = y ?? {};
+    const phi = option(order);
+    const fs = Object.getOwnPropertyNames(dx).sort();
+    const gs = Object.getOwnPropertyNames(dy).sort();
+    const p = fs.length;
+    const q = gs.length;
+    for (let i = 0, j = 0; i < p && j < q;) {
+      let a = undefined, b = undefined;
+      const f = fs[i];
+      const g = gs[j];
+      if (f <= g) { a = dx[f]; i++; }
+      if (g <= f) { b = dy[g]; j++; }
+      const cmp = phi(a, b);
+      if (cmp != 0) return cmp;
+    }
+    return p - q;
+  };
+}
+
 /** Pair comparison. */
 export function pair<A, B>(ordA: Order<A>, ordB: Order<B>): Order<[A, B]> {
   return (u, v) => {
