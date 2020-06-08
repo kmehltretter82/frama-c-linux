@@ -106,7 +106,6 @@ licenses/LGPLv2: .ignore
 licenses/LGPLv2.1: .ignore
 licenses/Q_MODIFIED_LICENSE: .ignore
 man/frama-c.1: CEA_LGPL
-opam/descr: .ignore
 opam/opam: .ignore
 ptests/.gitignore: .ignore
 ptests/.merlin: .ignore
