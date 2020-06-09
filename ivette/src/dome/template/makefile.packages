@@ -25,6 +25,7 @@ DOME_APP_PACKAGES= \
 	lodash \
 	react-virtualized \
 	react-draggable \
+	react-fast-compare \
 	codemirror
 
 # --------------------------------------------------------------------------
