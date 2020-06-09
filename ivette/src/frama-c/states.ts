@@ -507,15 +507,23 @@ export function useSyncArray(id: string) {
 // --- Selection
 // --------------------------------------------------------------------------
 
-/** An AST location. */
-export interface Location {
+type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+
+export interface FullLocation {
   /** Function name. */
   readonly function: string;
   /** Marker identifier. */
-  readonly marker?: string;
+  readonly marker: string;
 }
 
+/** An AST location.
+ *
+ *  Properties [[function]] and [[marker]] are optional,
+ *  but at least one of the two must be set.
+ */
+export type Location = AtLeastOne<FullLocation>;
 export interface Selection {
+
   /** Current selection. */
   current?: Location;
   /** Previous locations with respect to the [[current]] one. */
@@ -541,7 +549,7 @@ function isSelect(a: SelectionActions): a is SelectAction {
 }
 
 /** Compute the next selection based on the current one and the given action. */
-function reducer(s: Selection, action: SelectionActions) {
+function reducer(s: Selection, action: SelectionActions): Selection {
   if (isSelect(action)) {
     const [prevSelections, nextSelections] =
       s.current && s.current.function !== action.location.function ?
@@ -560,12 +568,12 @@ function reducer(s: Selection, action: SelectionActions) {
       return {
         current: pS,
         prevSelections: prevS,
-        nextSelections: [s.current, ...s.nextSelections],
+        nextSelections: [(s.current as Location), ...s.nextSelections],
       };
     case 'GO_FORWARD':
       return {
         current: nS,
-        prevSelections: [s.current, ...s.prevSelections],
+        prevSelections: [(s.current as Location), ...s.prevSelections],
         nextSelections: nextS,
       };
     default:
