@@ -88,6 +88,10 @@ export class MapModel<Key, Row>
   // Consolidated order (computed on demand)
   private order?: SORT<Key, Row>;
 
+  // --------------------------------------------------------------------------
+  // --- Rebuild Array
+  // --------------------------------------------------------------------------
+
   // Lazily compute order
   protected sorter(): SORT<Key, Row> {
     let current = this.order;
