@@ -493,7 +493,7 @@ export function getWindowSetting( key, defaultValue ) {
 }
 
 /** @summary Set value into local window (persistent) settings.
-    @param {string} key to store the data
+    @param {string} [key] to store the data
     @param {any} value associated value or object
     @description
     This settings are local to the current window, but persistently
@@ -501,7 +501,7 @@ export function getWindowSetting( key, defaultValue ) {
     For global application settings, use `setGlobal()` instead.
 */
 export function setWindowSetting( key , value ) {
-  writeSetting( true, key, value );
+  key && writeSetting( true, key, value );
 }
 
 /**

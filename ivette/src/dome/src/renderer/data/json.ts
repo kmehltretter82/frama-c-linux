@@ -2,12 +2,13 @@
 // --- JSON Utilities
 // --------------------------------------------------------------------------
 
-import { DEVEL } from 'dome/system';
-
 /**
    Safe JSON utilities.
+   @packageDocumentation
    @package dome/data/json
 */
+
+import { DEVEL } from 'dome/system';
 
 export type json =
   undefined | null | number | string | json[] | { [key: string]: json }
@@ -57,6 +58,16 @@ export type Safe<D> = (js?: json) => D;
    Same as `Safe<D | undefined>`.
 */
 export type Loose<D> = (js?: json) => D | undefined;
+
+/**
+   Encoder for value of type `D`.
+ */
+export type Encoder<D> = (v: D) => json;
+
+/**
+   Can be used for any encoder / decoder function.
+ */
+export function identity<A>(v: A): A { return v; };
 
 // --------------------------------------------------------------------------
 // --- Primitives
