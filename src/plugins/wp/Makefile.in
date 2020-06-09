@@ -67,7 +67,7 @@ PLUGIN_CMO:= \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
-	cil2cfg normAtLabels wpPropId mcfg \
+	cil2cfg normAtLabels wpPropId wpStrategy mcfg \
 	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
@@ -81,7 +81,7 @@ PLUGIN_CMO:= \
 	Sigma MemLoader \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion \
-	wpReached wpStrategy wpRTE wpAnnot \
+	wpReached wpRTE wpAnnot \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
