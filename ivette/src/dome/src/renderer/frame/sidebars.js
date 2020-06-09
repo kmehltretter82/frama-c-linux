@@ -119,7 +119,7 @@ export function Section(props) {
   const foldable = unfold === undefined ;
   const visible = foldable ? state : unfold ;
   const onClick = foldable ? (() => setState(!state)) : undefined ;
-  const maxHeight = visible ? 2000 : 0 ;
+  const maxHeight = visible ? 'max-content' : 0 ;
   const subContext = Object.assign( {}, context, { disabled: dimmed } );
 
   return (
