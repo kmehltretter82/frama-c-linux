@@ -37,7 +37,7 @@ module type VarUsage =
 sig
   val datatype : string
   val param : varinfo -> MemoryContext.param
-  val hypotheses : unit -> MemoryContext.clause list
+  val iter: ?kf:kernel_function -> init:bool -> (varinfo -> unit) -> unit
 end
 
 module Make(V : VarUsage)(M : Sigs.Model) =
@@ -52,7 +52,13 @@ struct
   let no_binder = { bind = fun _ f v -> f v }
   let configure_ia _ = no_binder
 
-  let hypotheses () = V.hypotheses () @ M.hypotheses ()
+  let hypotheses () =
+    let kf,init = match WpContext.get_scope () with
+      | WpContext.Global -> None,false
+      | WpContext.Kf f -> Some f, WpStrategy.is_main_init f in
+    let w = ref MemoryContext.empty in
+    V.iter ?kf ~init (fun vi -> w := MemoryContext.set vi (V.param vi) !w) ;
+    MemoryContext.requires !w @ M.hypotheses ()
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Chunk                                                             --- *)
