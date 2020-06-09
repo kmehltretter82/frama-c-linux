@@ -4,6 +4,7 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import * as States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
 import { Splitter } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -17,6 +18,34 @@ import * as Controller from './Controller';
 import Properties from './Properties';
 import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
+
+// --------------------------------------------------------------------------
+// --- Selection Controls
+// --------------------------------------------------------------------------
+
+const SelectionControls = () => {
+  const [selection, updateSelection] = States.useSelection();
+
+  const doPrevSelect = () => { updateSelection('GO_BACK'); };
+  const doNextSelect = () => { updateSelection('GO_FORWARD'); };
+
+  return (
+    <Toolbar.ButtonGroup>
+      <Toolbar.Button
+        icon="MEDIA.PREV"
+        onClick={doPrevSelect}
+        disabled={!selection || selection.prevSelections.length === 0}
+        title="Previous location"
+      />
+      <Toolbar.Button
+        icon="MEDIA.NEXT"
+        onClick={doNextSelect}
+        disabled={!selection || selection.nextSelections.length === 0}
+        title="Next location"
+      />
+    </Toolbar.ButtonGroup>
+  );
+};
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -42,6 +71,7 @@ export default (() => {
           onClick={flipSidebar}
         />
         <Controller.Control />
+        <SelectionControls />
         <Toolbar.Filler />
         <Toolbar.Button
           icon="ITEMS.GRID"

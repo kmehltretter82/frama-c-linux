@@ -87,17 +87,17 @@ class PropertyModel extends ArrayModel<Property> {
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const items: { [key: string]: Property } =
+  const properties: { [key: string]: Property } =
     States.useSyncArray('kernel.properties');
   const statusDict: { [status: string]: Tag } =
     States.useDictionary('kernel.dictionary.propstatus');
-  const [select, setSelect] =
+  const [selection, updateSelection] =
     States.useSelection();
 
   React.useEffect(() => {
-    const data = _.toArray(items);
+    const data = _.toArray(properties);
     model.replace(data);
-  }, [model, items]);
+  }, [model, properties]);
 
   // Callbacks
   const getStatus = React.useCallback(
@@ -105,21 +105,22 @@ const RenderTable = () => {
     [statusDict],
   );
 
-  const onSelection = React.useCallback(
+  const onPropertySelection = React.useCallback(
     ({ key, function: fct }: Property) => {
-      setSelect({ marker: key, function: fct });
-    }, [setSelect],
+      const location = { function: fct, marker: key };
+      updateSelection({ location });
+    }, [updateSelection],
   );
 
-  const selection = select?.marker;
+  const propertySelection = selection?.current?.marker;
 
   // Rendering
   return (
     <Table<string, Property>
       model={model}
       sorting={model}
-      selection={selection}
-      onSelection={onSelection}
+      selection={propertySelection}
+      onSelection={onPropertySelection}
       settings="ivette.properties.table"
     >
       <ColumnCode id="function" label="Function" width={120} />

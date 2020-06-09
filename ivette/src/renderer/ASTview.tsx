@@ -72,15 +72,15 @@ const ASTview = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const printed = React.useRef();
-  const [select, setSelect] = States.useSelection();
+  const printed: React.MutableRefObject<string | undefined> = React.useRef();
+  const [selection, updateSelection] = States.useSelection();
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
   const markers = States.useSyncArray('kernel.ast.markerKind');
 
-  const theFunction = select && select.function;
-  const theMarker = select && select.marker;
+  const theFunction = selection?.current?.function;
+  const theMarker = selection?.current?.marker;
 
   // Hook: async loading
   React.useEffect(() => {
@@ -98,21 +98,30 @@ const ASTview = () => {
   // Callbacks
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
-  const onSelection = (marker: any) => setSelect({ marker });
 
-  function contextMenu(id: string) {
+  function onTextSelection(id: string) {
+    if (selection.current) {
+      const location = { ...selection.current, marker: id };
+      updateSelection({ location });
+    }
+  }
+
+  function onContextMenu(id: string) {
     const marker = markers[id];
     if (marker && marker.kind === 'function') {
-      const item1 = {
+      const item = {
         label: `Go to definition of ${marker.name}`,
-        onClick: () => setSelect({ function: marker.name, marker: undefined }),
+        onClick: () => {
+          const location = { function: marker.name };
+          updateSelection({ location });
+        },
       };
-      Dome.popupMenu([item1]);
+      Dome.popupMenu([item]);
     }
   }
 
   // Theme Popup
-  const selectTheme = (id?: string) => id && setTheme(id);
+  const selectTheme = (id: string) => setTheme(id);
   const checkTheme =
     (th: { id: string }) => ({ checked: th.id === theme, ...th });
   const themePopup =
@@ -153,8 +162,8 @@ const ASTview = () => {
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}
-        onSelection={onSelection}
-        onContextMenu={contextMenu}
+        onSelection={onTextSelection}
+        onContextMenu={onContextMenu}
         readOnly
       />
     </>
