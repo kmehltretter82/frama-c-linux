@@ -156,31 +156,36 @@ function filterProperty(f: typeof defaultFilter, item: Property) {
 // --------------------------------------------------------------------------
 
 const renderCode: Renderer<string> =
-  (text?: string) => (text ? <Code>{text}</Code> : null);
-
-function ColumnCode<Row>(props: ColumnProps<Row, string>) {
-  return <Column render={renderCode} {...props} />;
-}
+  (text: string) => (<Code>{text}</Code>);
 
 interface Tag { name: string; label: string; descr: string }
 
 const renderTag: Renderer<Tag> =
   (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
 
-function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
-  return <Column render={renderTag} {...props} />;
-}
-
 const renderNames: Renderer<string[]> =
-  (names?: string[]) => {
+  (names: string[]) => {
     const label = names?.join(': ');
     return (label ? <Label label={label} /> : null);
   };
 
-const renderFile: Renderer<SourceLoc> =
-  (loc?: SourceLoc) => (
-    loc ? <Label label={loc.base} title={loc.file} /> : null
+const renderDir: Renderer<SourceLoc> =
+  (loc: SourceLoc) => (
+    <Code label={loc.dir} title={loc.file} />
   );
+
+const renderFile: Renderer<SourceLoc> =
+  (loc: SourceLoc) => (
+    <Code label={loc.base} title={loc.file} />
+  );
+
+function ColumnCode<Row>(props: ColumnProps<Row, string>) {
+  return <Column render={renderCode} {...props} />;
+}
+
+function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
+  return <Column render={renderTag} {...props} />;
+}
 
 // --------------------------------------------------------------------------
 // --- Properties Table
@@ -246,11 +251,36 @@ const byColumn: Arrays.ByColumns<Property> = {
 };
 
 class PropertyModel extends Arrays.ArrayModel<Property> {
+
+  private filterFun?: string;
+  private filterProp = _.cloneDeep(defaultFilter);
+
   constructor() {
     super('key');
     this.setOrderingByFields(byProperty);
     this.setColumnOrder(byColumn);
+    this.setFilter(this.filterItem.bind(this));
   }
+
+  getFilterProps() {
+    return this.filterProp;
+  }
+
+  setFilterFunction(kf?: string) {
+    this.filterFun = kf;
+    if (this.filterProp.currentFunction)
+      this.reload();
+  }
+
+  filterItem(item: Property) {
+    const cf = this.filterFun;
+    const cp = this.filterProp;
+    return (
+      (!cp.currentFunction || cf === undefined || cf === item.function) &&
+      filterProperty(cp, item)
+    );
+  }
+
 }
 
 // --------------------------------------------------------------------------
@@ -258,11 +288,11 @@ class PropertyModel extends Arrays.ArrayModel<Property> {
 // -------------------------------------------------------------------------
 
 const PropertyFilter =
-  (props: { value: typeof defaultFilter, onChange: () => void }) => (
+  (props: { model: PropertyModel }) => (
     <Vfill>
       <Form
-        value={props.value}
-        onChange={props.onChange}
+        value={props.model.getFilterProps()}
+        onChange={props.model.reload}
       >
         <FieldCheckbox label="Current function" path="currentFunction" />
         <Section label="Status" unfold path="status">
@@ -336,12 +366,17 @@ const RenderTable = () => {
   const [select, setSelect] =
     States.useSelection();
   const selectedFunction = select?.function;
-  const filter = React.useRef(defaultFilter);
 
+  // Populating the model
   React.useEffect(() => {
     const data = _.toArray(items);
     model.replace(data);
   }, [model, items]);
+
+  // Updating the filter
+  React.useEffect(() => {
+    model.setFilterFunction(selectedFunction);
+  }, [selectedFunction]);
 
   // Callbacks
   const getStatus = React.useCallback(
@@ -357,24 +392,9 @@ const RenderTable = () => {
 
   const selection = select?.marker;
 
-  /* --- Filters selection -------------------------------------------------- */
-
-  React.useEffect(() => {
-
-    function filtering(item: Property) {
-      const current =
-        !filter.current.currentFunction
-        || (selectedFunction === item?.function);
-      return current && filterProperty(filter.current, item);
-    }
-
-    model.setFilter(filtering);
-  }, [model, filter, selectedFunction]);
-
-  // Rendering
   return (
     <Splitter dir="LEFT">
-      <PropertyFilter value={filter.current} onChange={model.reload} />
+      <PropertyFilter model={model} />
       <Table<string, Property>
         model={model}
         sorting={model}
@@ -387,7 +407,8 @@ const RenderTable = () => {
           label="Directory"
           width={240}
           visible={false}
-          getter={(prop: Property) => prop?.source?.dir}
+          getter={(prop: Property) => prop?.source}
+          render={renderDir}
         />
         <Column
           id="file"
