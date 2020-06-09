@@ -277,7 +277,7 @@ const RenderConsole = () => {
         />
         <Space />
         <Label
-          className="controller-rank"
+          className="component-info"
           title="History (last command first)"
           display={edited}
         >

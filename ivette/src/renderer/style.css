@@ -2,9 +2,11 @@
 /* --- Frama-C Styling                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-.controller-rank {
-    color: #888 ;
+.component-info {
+    color: #888;
     min-width: 50px;
+    padding-top: 4px;
+    font-size: smaller;
 }
 
 .code-column {

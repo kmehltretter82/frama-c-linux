@@ -73,6 +73,10 @@ export class MapModel<Key, Row>
   // Hold filtered & sorted data (computed on demand)
   private table?: TABLE<Key, Row>;
 
+  // Filtered-out Row Count
+  private filtered: number = 0;
+
+
   // Filtering function
   private filter?: Filter<Key, Row>;
 
@@ -103,6 +107,7 @@ export class MapModel<Key, Row>
   // Lazily compute table
   protected rebuild(): TABLE<Key, Row> {
     const current = this.table;
+    let filtered = 0;
     if (current !== undefined) return current;
     let table: TABLE<Key, Row> = [];
     try {
@@ -111,6 +116,8 @@ export class MapModel<Key, Row>
         const phi = this.filter;
         if (!phi || phi(packed.row, packed.key))
           table.push(packed);
+        else
+          filtered++;
       });
       table.sort(this.sorter());
     } catch (err) {
@@ -118,12 +125,16 @@ export class MapModel<Key, Row>
     }
     table.forEach((pack, index) => pack.index = index);
     this.table = table;
+    this.filtered = filtered;
     return table;
   }
 
   // --------------------------------------------------------------------------
   // --- Proxy
   // --------------------------------------------------------------------------
+
+  /** Non filtered. */
+  getTotalRowCount() { return this.getRowCount() + this.filtered; }
 
   getRowCount() { return this.rebuild().length; }
 

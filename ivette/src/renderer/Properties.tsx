@@ -400,7 +400,8 @@ const PropertyColumns = () => {
       <ColumnTag
         id="status"
         label="Status"
-        fixed width={100}
+        fixed
+        width={100}
         align="center"
         getter={getStatus}
       />
@@ -408,6 +409,26 @@ const PropertyColumns = () => {
   );
 
 };
+
+function FilterRatio({ model }: { model: PropertyModel }) {
+  const forceUpdate = Dome.useForceUpdate() as (() => void);
+  React.useEffect(() => {
+    const client = model.link();
+    client.onReload(forceUpdate);
+    return client.unlink;
+  });
+  const filtered = model.getRowCount();
+  const total = model.getTotalRowCount();
+  return (
+    <Label
+      className="component-info"
+      title="Displayed Properties / Total"
+      display={filtered !== total}
+    >
+      {filtered} / {total}
+    </Label>
+  );
+}
 
 // -------------------------------------------------------------------------
 // --- Properties Table
@@ -432,7 +453,7 @@ const RenderTable = () => {
   const selectedFunction = select?.function;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
-  }, [selectedFunction]);
+  }, [model, selectedFunction]);
 
   // Callbacks
   const onSelection = React.useCallback(
@@ -446,7 +467,12 @@ const RenderTable = () => {
   return (
     <>
       <TitleBar>
-        <IconButton icon='ITEMS.LIST' selected={showFilter} onClick={flipFilter} />
+        <FilterRatio model={model} />
+        <IconButton
+          icon="ITEMS.LIST"
+          selected={showFilter}
+          onClick={flipFilter}
+        />
       </TitleBar>
       <Splitter dir="RIGHT" unfold={showFilter}>
         <Table<string, Property>
