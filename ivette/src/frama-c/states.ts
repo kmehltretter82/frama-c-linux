@@ -507,21 +507,102 @@ export function useSyncArray(id: string) {
 // --- Selection
 // --------------------------------------------------------------------------
 
+type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+
+export interface FullLocation {
+  /** Function name. */
+  readonly function: string;
+  /** Marker identifier. */
+  readonly marker: string;
+}
+
+/** An AST location.
+ *
+ *  Properties [[function]] and [[marker]] are optional,
+ *  but at least one of the two must be set.
+ */
+export type Location = AtLeastOne<FullLocation>;
+export interface Selection {
+
+  /** Current selection. */
+  current?: Location;
+  /** Previous locations with respect to the [[current]] one. */
+  prevSelections: Location[];
+  /** Next locations with respect to the [[current]] one. */
+  nextSelections: Location[];
+}
+
+/** A select action on a location. */
+export interface SelectAction {
+  readonly location: Location;
+}
+
+/** Actions on selection:
+ * - [[SelectAction]].
+ * - `GO_BACK` jumps to previous location (first in [[prevSelections]]).
+ * - `GO_FORWARD` jumps to next location (first in [[nextSelections]]).
+ */
+export type SelectionActions = SelectAction | 'GO_BACK' | 'GO_FORWARD';
+
+function isSelect(a: SelectionActions): a is SelectAction {
+  return (a as SelectAction).location !== undefined;
+}
+
+/** Compute the next selection based on the current one and the given action. */
+function reducer(s: Selection, action: SelectionActions): Selection {
+  if (isSelect(action)) {
+    const [prevSelections, nextSelections] =
+      s.current && s.current.function !== action.location.function ?
+        [[s.current, ...s.prevSelections], []] :
+        [s.prevSelections, s.nextSelections];
+    return {
+      current: action.location,
+      prevSelections,
+      nextSelections,
+    };
+  }
+  const [pS, ...prevS] = s.prevSelections;
+  const [nS, ...nextS] = s.nextSelections;
+  switch (action) {
+    case 'GO_BACK':
+      return {
+        current: pS,
+        prevSelections: prevS,
+        nextSelections: [(s.current as Location), ...s.nextSelections],
+      };
+    case 'GO_FORWARD':
+      return {
+        current: nS,
+        prevSelections: [(s.current as Location), ...s.prevSelections],
+        nextSelections: nextS,
+      };
+    default:
+      return s;
+  }
+}
+
 const SELECTION = 'kernel.selection';
 
-setStateDefault(SELECTION, {});
+const initialSelection = {
+  current: undefined,
+  prevSelections: [],
+  nextSelections: [],
+};
+setStateDefault(SELECTION, initialSelection);
 
 /**
- *  @summary Current selection state.
- *  @return {array} `[selection,update]` for the current selection
- *  @description
- *  The selection is an object with many independant fields.
- *  You update it by providing only some fields, the other ones being kept
- *  unchanged, like the `setState()` behaviour of React components.
+ *  Current selection.
+ *  @return {array} The current selection and the function to update it.
  */
-export function useSelection() {
-  const [state, setState] = useState(SELECTION);
-  return [state, (upd: any) => setState({ ...state, ...upd })];
+export function useSelection(): [Selection, (a: SelectionActions) => void] {
+  const [selection, setSelection] = useState(SELECTION);
+
+  function update(action: SelectionActions) {
+    const nextSelection = reducer(selection, action);
+    setSelection(nextSelection);
+  }
+
+  return [selection, update];
 }
 
 // --------------------------------------------------------------------------

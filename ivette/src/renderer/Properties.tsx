@@ -437,32 +437,37 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const items: { [key: string]: Property } =
+  const properties: { [key: string]: Property } =
     States.useSyncArray('kernel.properties');
-  const [select, setSelect] = States.useSelection();
+
+  const [selection, updateSelection] = States.useSelection();
+
   const [showFilter, flipFilter] =
     Dome.useSwitch('ivette.properties.showFilter', true);
 
   // Populating the model
   React.useEffect(() => {
-    const data = _.toArray(items);
+    const data = _.toArray(properties);
     model.replace(data);
-  }, [model, items]);
+  }, [model, properties]);
 
   // Updating the filter
-  const selectedFunction = select?.function;
+  const selectedFunction = selection?.current?.function;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
   }, [model, selectedFunction]);
 
+
   // Callbacks
-  const onSelection = React.useCallback(
+
+  const onPropertySelection = React.useCallback(
     ({ key, function: fct }: Property) => {
-      setSelect({ marker: key, function: fct });
-    }, [setSelect],
+      const location = { function: fct, marker: key };
+      updateSelection({ location });
+    }, [updateSelection],
   );
 
-  const selection = select?.marker;
+  const propertySelection = selection?.current?.marker;
 
   return (
     <>
@@ -478,8 +483,8 @@ const RenderTable = () => {
         <Table<string, Property>
           model={model}
           sorting={model}
-          selection={selection}
-          onSelection={onSelection}
+          selection={propertySelection}
+          onSelection={onPropertySelection}
           settings="ivette.properties.table"
         >
           <PropertyColumns />
