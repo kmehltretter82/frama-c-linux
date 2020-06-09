@@ -156,7 +156,7 @@ function filterProperty(f: typeof defaultFilter, item: Property) {
 // --------------------------------------------------------------------------
 
 const renderCode: Renderer<string> =
-  (text: string) => (<Code className='code-column'>{text}</Code>);
+  (text: string) => (<Code className="code-column">{text}</Code>);
 
 interface Tag { name: string; label: string; descr: string }
 
@@ -171,12 +171,12 @@ const renderNames: Renderer<string[]> =
 
 const renderDir: Renderer<SourceLoc> =
   (loc: SourceLoc) => (
-    <Code className='code-column' label={loc.dir} title={loc.file} />
+    <Code className="code-column" label={loc.dir} title={loc.file} />
   );
 
 const renderFile: Renderer<SourceLoc> =
   (loc: SourceLoc) => (
-    <Code className='code-column' label={loc.base} title={loc.file} />
+    <Code className="code-column" label={loc.base} title={loc.file} />
   );
 
 function ColumnCode<Row>(props: ColumnProps<Row, string>) {
