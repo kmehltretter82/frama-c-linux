@@ -4,20 +4,23 @@
 
 /**
    Typed States & Settings
+   @packageDocumentation
    @package dome/data/states
 */
 
 import React from 'react';
 import isEqual from 'react-fast-compare';
+import { DEVEL } from 'dome/misc/system';
 import * as Dome from 'dome';
+import * as JSON from './json';
 
 export type NonFunction =
   undefined | null | boolean | number | string | object | any[] | bigint | symbol;
 
-/** State updater. `undefined` is no-op, `null` is reset, new value,
-    or updating function applied to the current, lastly updated value. */
+/** State updater. New value or updating function applied to the current,
+    lastly updated value. Use `null` to restore default value. */
 export type updateAction<A extends NonFunction> =
-  undefined | null | A | ((current: A) => A);
+  null | A | ((current: A) => A);
 
 /** The type of updater callbacks. Typically used for `[A,setState<A>]` hooks. */
 export type setState<A extends NonFunction> = (action: updateAction<A>) => void;
@@ -70,9 +73,14 @@ export class StateDef<A extends NonFunction> implements State<A> {
 
   /** State updater. */
   update(upd: updateAction<A>) {
-    if (upd === undefined) return;
-    if (upd === null) { this.reset(); return; }
-    if (typeof upd === 'function') this.set(upd(this.value));
+    if (upd === null)
+      this.reset();
+    else {
+      if (typeof upd === 'function')
+        this.set(upd(this.value));
+      else
+        this.set(upd);
+    }
   }
 
   /** Restore default value. */
@@ -99,6 +107,101 @@ export class StateOpt<A extends NonFunction> extends StateDef<undefined | A> {
   constructor(defaultValue?: A) {
     super(defaultValue);
   }
+}
+
+// --------------------------------------------------------------------------
+// --- Settings
+// --------------------------------------------------------------------------
+
+abstract class Settings<A> {
+
+  private static keyRoles = new Map<string, symbol>();
+
+  private readonly role: symbol;
+  protected readonly decoder: JSON.Safe<A>;
+
+  constructor(role: string, decoder: JSON.Safe<A>) {
+    this.role = Symbol(role);
+    this.decoder = decoder;
+  }
+
+  validateKey(k?: string): string | undefined {
+    if (k === undefined) return undefined;
+    const rq = this.role;
+    const rk = Settings.keyRoles.get(k);
+    if (rk === undefined) {
+      Settings.keyRoles.set(k, rq);
+    } else {
+      if (rk !== rq) {
+        if (DEVEL) console.error(
+          `[Dome.settings] key ${k} used with incompatible roles`, rk, rq,
+        );
+        return undefined;
+      }
+    }
+    return k;
+  }
+
+  abstract loadData(key: string): JSON.json;
+  abstract saveData(key: string, data: JSON.json): void;
+  abstract event: symbol;
+
+  loadValue(key?: string) {
+    return this.decoder(key ? this.loadData(key) : undefined)
+  }
+
+}
+
+export function useSettings<A extends JSON.json>(
+  S: Settings<A>,
+  dataKey?: string,
+): [A, (update: A) => void] {
+
+  const theKey = React.useMemo(() => S.validateKey(dataKey), [S, dataKey]);
+  const [value, setValue] = React.useState<A>(() => S.loadValue(theKey));
+
+  React.useEffect(() => {
+    if (theKey) {
+      const callback = () => setValue(S.loadValue(theKey));
+      Dome.on(S.event, callback);
+      return () => Dome.off(S.event, callback);
+    }
+    return undefined;
+  });
+
+  const updateValue = React.useCallback((update: A) => {
+    if (!isEqual(value, update)) {
+      setValue(update);
+      if (theKey) S.saveData(theKey, update);
+    }
+  }, [S, theKey]);
+
+  return [value, updateValue];
+
+}
+
+export class WindowSettings<A> extends Settings<A> {
+
+  constructor(role: string, decoder: JSON.Safe<A>) {
+    super(role, decoder);
+  }
+
+  event = Symbol('dome.settings');
+  loadData(key: string) { return Dome.getWindowSetting(key) as JSON.json; }
+  saveData(key: string, data: JSON.json) { Dome.setWindowSetting(key, data); }
+
+}
+
+export class GlobalSettings<A> extends Settings<A> {
+
+  constructor(role: string, decoder: JSON.Safe<A>) {
+    super(role, decoder);
+  }
+
+  event = Symbol('dome.globals');
+  loadData(key: string) { return Dome.getGlobalSetting(key) as JSON.json; }
+  saveData(key: string, data: JSON.json) { Dome.setGlobalSetting(key, data); }
+
 }
 
 // --------------------------------------------------------------------------
