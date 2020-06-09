@@ -158,7 +158,7 @@ function filterProperty(f: typeof defaultFilter, item: Property) {
 // --------------------------------------------------------------------------
 
 const renderCode: Renderer<string> =
-  (text: string) => (<Code className="code-column">{text}</Code>);
+  (text: string) => (<Code className="code-column" title={text}>{text}</Code>);
 
 interface Tag { name: string; label: string; descr: string }
 
@@ -386,8 +386,8 @@ const PropertyColumns = () => {
         render={renderFile}
       />
       <ColumnCode id="function" label="Function" width={120} />
-      <ColumnCode id="kind" label="Property kind" width={120} />
-      <ColumnCode id="alarm" label="Alarms" width={160} />
+      <ColumnCode id="kind" label="Property kind" fixed width={120} />
+      <ColumnCode id="alarm" label="Alarms" fixed width={160} />
       <Column
         id="names"
         label="Names"
@@ -395,12 +395,12 @@ const PropertyColumns = () => {
         visible={false}
         render={renderNames}
       />
-      <ColumnCode id="predicate" label="Predicate" />
+      <ColumnCode id="predicate" label="Predicate" fill />
       <ColumnCode id="descr" label="Property" fill visible={false} />
       <ColumnTag
         id="status"
         label="Status"
-        width={100}
+        fixed width={100}
         align="center"
         getter={getStatus}
       />
@@ -435,7 +435,6 @@ const RenderTable = () => {
   }, [selectedFunction]);
 
   // Callbacks
-
   const onSelection = React.useCallback(
     ({ key, function: fct }: Property) => {
       setSelect({ marker: key, function: fct });
