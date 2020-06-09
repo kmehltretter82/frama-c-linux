@@ -8,6 +8,8 @@
    @module dome/data/compare
 */
 
+import FastCompare from 'react-fast-compare';
+
 /**
    Interface for comparison functions.
    These function shall fullfill the following contract:
@@ -22,11 +24,19 @@ export interface Order<A> {
   (x: A, y: A): number;
 }
 
+/**
+   Deep structural equality.
+   Provided by [react-fast-compare]().
+*/
+export const isEqual = FastCompare;
+
+/** Always returns 0. */
 export function equal(_x: any, _y: any): 0 { return 0; }
 
+/** Primitive comparison works on this type. */
 export type bignum = bigint | number;
 
-/** Non-NaN numbers and big-ints */
+/** Detect Non-NaN numbers and big-ints. */
 export function isBigNum(x: any): x is bignum {
   return typeof (x) === 'bigint' || (typeof (x) === 'number' && !Number.isNaN(x));
 }

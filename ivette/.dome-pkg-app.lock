@@ -1,1 +1,1 @@
-react@^16.8 react-dom source-map-support lodash react-virtualized react-draggable codemirror
+react@^16.8 react-dom source-map-support lodash react-virtualized react-draggable react-fast-compare codemirror
