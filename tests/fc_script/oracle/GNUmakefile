@@ -12,13 +12,13 @@ include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/prologue.mk
 MACHDEP = x86_64
 
 ## Preprocessing flags (for -cpp-extra-args)
-CPPFLAGS    +=
+CPPFLAGS    += \
 
 ## General flags
 FCFLAGS     += \
-  -machdep x86_64 \
-  -json-compilation-database . \
+  -json-compilation-database ../compile_commands.json \
   -main eva_main \
+  -add-symbolic-path=.:.. \
   -kernel-warn-key annot:missing-spec=abort \
   -kernel-warn-key typing:implicit-function-declaration=abort \
 
@@ -27,7 +27,8 @@ EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
 
 ## GUI-only flags
-FCGUIFLAGS +=
+FCGUIFLAGS += \
+  -add-symbolic-path=.:.. \
 
 ## Analysis targets (suffixed with .eva)
 TARGETS = fc_script_main.eva

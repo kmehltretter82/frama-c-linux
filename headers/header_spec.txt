@@ -122,6 +122,7 @@ share/analysis-scripts/cmd-dep.sh: .ignore
 share/analysis-scripts/concat-csv.sh: .ignore
 share/analysis-scripts/find_fun.py: .ignore
 share/analysis-scripts/flamegraph.pl: CDDL
+share/analysis-scripts/function_finder.py: .ignore
 share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/make_template.py: .ignore

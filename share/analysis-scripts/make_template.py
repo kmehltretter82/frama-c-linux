@@ -33,6 +33,7 @@ import shlex
 import glob
 from subprocess import Popen, PIPE
 from pathlib import Path
+import function_finder
 
 MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
 if sys.version_info < MIN_PYTHON:
@@ -43,8 +44,10 @@ if len(sys.argv) > 2:
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")
     sys.exit(1)
 
-framac="frama-c"
-if not shutil.which(framac):
+framac_in_path = True
+framac = shutil.which("frama-c")
+if not framac:
+    framac_in_path = False
     if os.environ.get("FRAMAC"):
         framac = os.environ["FRAMAC"]
     else:
@@ -112,11 +115,32 @@ main = input("Main target name: ")
 if not re.match("^[a-zA-Z_0-9]+$", main):
     sys.exit("error: invalid main target name (can only contain letters, digits, dash or underscore)")
 
+main_fun_finder_re = function_finder.prepare("main")
+
+# returns 0 if none, 1 if declaration, 2 if definition
+def defines_or_declares_main(f):
+    return function_finder.find(main_fun_finder_re, f)
+
 def expand_and_normalize_sources(expression, relprefix):
     subexps = shlex.split(expression)
     sources_lists = [glob.glob(exp, recursive=True) for exp in subexps]
     sources = sorted(set([item for sublist in sources_lists for item in sublist]))
-    return [f"  {source} \\" if os.path.isabs(source) else f"  {relprefix}/{source} \\" for source in sources]
+    return sources
+
+def rel_prefix(f):
+    return f"{f}" if os.path.isabs(f) else f"{relprefix}/{f}"
+
+def sources_list_for_makefile(sources):
+    return "\n".join([f"  {rel_prefix(source)} \\" for source in sources])
+
+def main_suffix(f):
+    main = defines_or_declares_main(f)
+    if main == 2:
+        return "\t# defines 'main'"
+    elif main == 1:
+        return "\t# declares 'main'"
+    else:
+        return ""
 
 while True:
     sources = input("Source files (default: **/*.c): ")
@@ -127,8 +151,11 @@ while True:
         print(f"error: no sources were matched for '{sources}'.")
     else:
         print(f"The following sources were matched (relative to {dir}):")
-        print("\n".join(source_list))
+        print("\n".join(["  " + rel_prefix(source) + main_suffix(source) for source in source_list]))
         print()
+        definitions_of_main = len([source for source in source_list if defines_or_declares_main(source)])
+        if definitions_of_main > 1:
+            print("warning: 'main' seems to be defined multiple times.")
         yn = input("Is this ok? [Y/n] ")
         if yn == "" or not (yn[0] == "N" or yn[0] == "n"):
             break
@@ -137,7 +164,7 @@ json_compilation_database = None
 if jcdb.is_file():
     yn = input("compile_commands.json exists, add option -json-compilation-database? [Y/n] ")
     if yn == "" or not (yn[0] == "N" or yn[0] == "n"):
-        json_compilation_database = "."
+        json_compilation_database = f"{relprefix}/compile_commands.json"
     else:
         print("Option not added; you can later add it to FCFLAGS.")
 
@@ -213,7 +240,7 @@ with open(sharedir / "analysis-scripts" / "template.mk") as f:
         print(f"Created stub for main function: {dir / 'fc_stubs.c'}")
     lines = replace_line(lines, "^main.parse: \\\\", f"{main}.parse: \\\n")
     lines = replace_line(lines, "^TARGETS = main.eva", f"TARGETS = {main}.eva\n")
-    lines = replace_line(lines, "^  main.c \\\\", "\n".join(source_list) + "\n")
+    lines = replace_line(lines, "^  main.c \\\\", sources_list_for_makefile(source_list) + "\n")
     if json_compilation_database:
       lines = insert_line_after(lines, "^FCFLAGS", f"  -json-compilation-database {json_compilation_database} \\\n")
     if relprefix != "..":
@@ -222,6 +249,11 @@ with open(sharedir / "analysis-scripts" / "template.mk") as f:
 gnumakefile.write_text("".join(lines))
 
 print(f"Template created: {gnumakefile}")
+
+if not framac_in_path:
+    print(f"Frama-C not in path, adding path.mk to {dir}")
+    frama_c_script = bindir / "frama-c-script"
+    os.system(f"{frama_c_script} make-path {dir}")
 
 if "PTESTS_TESTING" in os.environ:
     print("Running ptests: cleaning up after tests...")

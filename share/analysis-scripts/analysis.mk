@@ -113,6 +113,7 @@ fc_list = $(subst $(space),$(comma),$(strip $1))
 FRAMAC     ?= frama-c
 FRAMAC_SCRIPT = $(FRAMAC)-script
 FRAMAC_GUI ?= frama-c-gui
+MACHDEP    ?= x86_32
 SLEVEL     ?=
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
