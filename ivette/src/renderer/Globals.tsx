@@ -6,7 +6,7 @@ import React from 'react';
 import { toArray, Dictionary } from 'lodash';
 import { Section, Item } from 'dome/frame/sidebars';
 import * as States from 'frama-c/states';
-
+import { alpha } from 'dome/data/compare';
 
 // --------------------------------------------------------------------------
 // --- Globals API
@@ -31,13 +31,7 @@ export default () => {
   const gfuns: Gfuns = States.useSyncArray('kernel.ast.functions');
 
   // Functions
-  const functions =
-    toArray(gfuns)
-      .sort((f1, f2) => {
-        if (f1.name < f2.name) return -1;
-        if (f1.name > f2.name) return 1;
-        return 0;
-      });
+  const functions = toArray(gfuns).sort((f1, f2) => alpha(f1.name, f2.name));
 
   const current: undefined | string = selection?.current?.function;
   const makeFctItem = (fct: Gfun) => {
