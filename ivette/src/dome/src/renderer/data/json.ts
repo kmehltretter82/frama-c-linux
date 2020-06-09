@@ -40,7 +40,7 @@ export function stringify(js: any) {
 }
 
 /**
-   Export JSON (or any data) as a string with indented content.
+   Export JSON (or any data) as a string with indentation.
  */
 export function pretty(js: any) {
   return JSON.stringify(js, undefined, 2);
@@ -190,6 +190,38 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
 }
 
 /**
+   Converts maps to dictionnaries.
+ */
+export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
+  return (js: json) => {
+    const m = new Map<string, A>();
+    if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
+      for (let k of Object.keys(js)) {
+        const v = fn(js[k]);
+        if (v !== undefined) m.set(k, v);
+      }
+    }
+    return m;
+  };
+}
+
+/**
+   Converts dictionnaries to maps.
+ */
+export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
+  return m => {
+    const js: json = {};
+    m.forEach((v, k) => {
+      if (v !== undefined) {
+        const u = fn(v);
+        if (u !== undefined) js[k] = u;
+      }
+    });
+    return js;
+  };
+}
+
+/**
    Apply the decoder on each item of a JSON array, or return `[]` otherwize.
    Can be also applied on a _loose_ decoder, but you will get
    an array with possibly `undefined` elements. Use [[jList]]
@@ -212,6 +244,22 @@ export function jList<A>(fn: Loose<A>): Safe<A[]> {
       if (d !== undefined) buffer.push(d);
     });
     return buffer;
+  };
+}
+
+/**
+   Exports all non-undefined elements.
+ */
+export function eList<A>(fn: Encoder<A>): Encoder<(A | undefined)[]> {
+  return m => {
+    const js: json[] = [];
+    m.forEach(v => {
+      if (v !== undefined) {
+        const u = fn(v);
+        if (u !== undefined) js.push(u);
+      }
+    });
+    return js;
   };
 }
 
@@ -289,13 +337,47 @@ export function jObject<A>(fp: Props<A>): Loose<A> {
       const buffer = {} as A;
       for (var k of Object.keys(fp)) {
         const fn = fp[k as keyof A];
-        const fv = fn(js[k]);
-        buffer[k as keyof A] = fv;
+        if (fn !== undefined) {
+          const fj = js[k];
+          if (fj !== undefined) {
+            const fv = fn(fj);
+            if (fv !== undefined) buffer[k as keyof A] = fv;
+          }
+        }
       }
       return buffer;
     }
     return undefined;
   };
+}
+
+/**
+   Encoders for each property of object type `A`.
+*/
+export type EProps<A> = {
+  [P in keyof A]?: Encoder<A[P]>;
+}
+
+/**
+   Encode an object given the provided encoders by fields.
+   The exported JSON object has only original
+   fields with some specified encoder.
+ */
+export function eObject<A>(fp: EProps<A>): Encoder<A> {
+  return (m: A) => {
+    const js: json = {};
+    for (var k of Object.keys(fp)) {
+      const fn = fp[k as keyof A];
+      if (fn !== undefined) {
+        const fv = m[k as keyof A];
+        if (fv !== undefined) {
+          const r = fn(fv);
+          if (r !== undefined) js[k] = r;
+        }
+      }
+    }
+    return js;
+  }
 }
 
 /** Type of dictionaries. */
@@ -310,11 +392,32 @@ export function jDictionary<A>(fn: Loose<A>): Safe<dict<A>> {
     const buffer: dict<A> = {};
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
       for (var k of Object.keys(js)) {
-        const fv = fn(js[k]);
-        if (fv) buffer[k] = fv;
+        const fd = js[k];
+        if (fd !== undefined) {
+          const fv = fn(fd);
+          if (fv !== undefined) buffer[k] = fv;
+        }
       }
     }
     return buffer;
+  };
+}
+
+/**
+   Encode a dictionary into JSON, dicarding all inconsistent entries.
+   If the dictionary contains no valid entry, still returns `{}`.
+*/
+export function eDictionary<A>(fn: Encoder<A>): Encoder<dict<A>> {
+  return (d: dict<A>) => {
+    const js: json = {};
+    for (var k of Object.keys(d)) {
+      const fv = d[k];
+      if (fv !== undefined) {
+        const fv = fn(d[k]);
+        if (fv !== undefined) js[k] = fv;
+      }
+    }
+    return js;
   };
 }
 
