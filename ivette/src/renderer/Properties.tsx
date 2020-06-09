@@ -4,12 +4,14 @@
 
 import _ from 'lodash';
 import React from 'react';
+import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
+import { IconButton } from 'dome/controls/buttons';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { Component } from 'frama-c/LabViews';
+import { TitleBar, Component } from 'frama-c/LabViews';
 import { Vfill } from 'dome/layout/boxes';
 import { Splitter } from 'dome/layout/splitters';
 import { Form, Section, FieldCheckbox } from 'dome/layout/forms';
@@ -353,6 +355,61 @@ const PropertyFilter =
   );
 
 // -------------------------------------------------------------------------
+// --- Property Columns
+// -------------------------------------------------------------------------
+
+const PropertyColumns = () => {
+
+  const statusDict: { [status: string]: Tag } =
+    States.useDictionary('kernel.dictionary.propstatus');
+
+  const getStatus = React.useCallback(
+    ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
+    [statusDict],
+  );
+
+  return (
+    <>
+      <Column
+        id="dir"
+        label="Directory"
+        width={240}
+        visible={false}
+        getter={(prop: Property) => prop?.source}
+        render={renderDir}
+      />
+      <Column
+        id="file"
+        label="File"
+        width={120}
+        getter={(prop: Property) => prop?.source}
+        render={renderFile}
+      />
+      <ColumnCode id="function" label="Function" width={120} />
+      <ColumnCode id="kind" label="Property kind" width={120} />
+      <ColumnCode id="alarm" label="Alarms" width={160} />
+      <Column
+        id="names"
+        label="Names"
+        width={240}
+        visible={false}
+        render={renderNames}
+      />
+      <ColumnCode id="predicate" label="Predicate" />
+      <ColumnCode id="descr" label="Property" fill visible={false} />
+      <ColumnTag
+        id="status"
+        label="Status"
+        width={100}
+        align="center"
+        getter={getStatus}
+      />
+    </>
+  );
+
+};
+
+// -------------------------------------------------------------------------
 // --- Properties Table
 // -------------------------------------------------------------------------
 
@@ -361,11 +418,9 @@ const RenderTable = () => {
   const model = React.useMemo(() => new PropertyModel(), []);
   const items: { [key: string]: Property } =
     States.useSyncArray('kernel.properties');
-  const statusDict: { [status: string]: Tag } =
-    States.useDictionary('kernel.dictionary.propstatus');
-  const [select, setSelect] =
-    States.useSelection();
-  const selectedFunction = select?.function;
+  const [select, setSelect] = States.useSelection();
+  const [showFilter, flipFilter] =
+    Dome.useSwitch('ivette.properties.showFilter', true);
 
   // Populating the model
   React.useEffect(() => {
@@ -374,15 +429,12 @@ const RenderTable = () => {
   }, [model, items]);
 
   // Updating the filter
+  const selectedFunction = select?.function;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
   }, [selectedFunction]);
 
   // Callbacks
-  const getStatus = React.useCallback(
-    ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
-    [statusDict],
-  );
 
   const onSelection = React.useCallback(
     ({ key, function: fct }: Property) => {
@@ -393,51 +445,23 @@ const RenderTable = () => {
   const selection = select?.marker;
 
   return (
-    <Splitter dir="LEFT">
-      <PropertyFilter model={model} />
-      <Table<string, Property>
-        model={model}
-        sorting={model}
-        selection={selection}
-        onSelection={onSelection}
-        settings="ivette.properties.table"
-      >
-        <Column
-          id="dir"
-          label="Directory"
-          width={240}
-          visible={false}
-          getter={(prop: Property) => prop?.source}
-          render={renderDir}
-        />
-        <Column
-          id="file"
-          label="File"
-          width={120}
-          getter={(prop: Property) => prop?.source}
-          render={renderFile}
-        />
-        <ColumnCode id="function" label="Function" width={120} />
-        <ColumnCode id="kind" label="Property kind" width={120} />
-        <ColumnCode id="alarm" label="Alarms" width={160} />
-        <Column
-          id="names"
-          label="Names"
-          width={240}
-          visible={false}
-          render={renderNames}
-        />
-        <ColumnCode id="predicate" label="Predicate" />
-        <ColumnCode id="descr" label="Property" fill visible={false} />
-        <ColumnTag
-          id="status"
-          label="Status"
-          width={100}
-          align="center"
-          getter={getStatus}
-        />
-      </Table>
-    </Splitter>
+    <>
+      <TitleBar>
+        <IconButton icon='ITEMS.LIST' selected={showFilter} onClick={flipFilter} />
+      </TitleBar>
+      <Splitter dir="RIGHT" unfold={showFilter}>
+        <Table<string, Property>
+          model={model}
+          sorting={model}
+          selection={selection}
+          onSelection={onSelection}
+          settings="ivette.properties.table"
+        >
+          <PropertyColumns />
+        </Table>
+        <PropertyFilter model={model} />
+      </Splitter>
+    </>
   );
 };
 
