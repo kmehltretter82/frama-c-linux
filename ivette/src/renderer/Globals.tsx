@@ -27,7 +27,7 @@ type Gfuns = undefined | Dictionary<Gfun>;
 export default () => {
 
   // Hooks
-  const [select, setSelect] = States.useSelection();
+  const [selection, updateSelection] = States.useSelection();
   const gfuns: Gfuns = States.useSyncArray('kernel.ast.functions');
 
   // Functions
@@ -39,7 +39,7 @@ export default () => {
         return 0;
       });
 
-  const current: undefined | string = select?.function;
+  const current: undefined | string = selection?.current?.function;
   const makeFctItem = (fct: Gfun) => {
     const kf = fct.name;
     return (
@@ -48,7 +48,7 @@ export default () => {
         label={kf}
         title={fct.signature}
         selected={kf === current}
-        onSelection={() => setSelect({ function: kf })}
+        onSelection={() => updateSelection({ location: { function: kf } })}
       />
     );
   };
