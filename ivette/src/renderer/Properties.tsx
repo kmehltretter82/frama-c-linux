@@ -469,7 +469,7 @@ const RenderTable = () => {
       <TitleBar>
         <FilterRatio model={model} />
         <IconButton
-          icon="ITEMS.LIST"
+          icon="CLIPBOARD"
           selected={showFilter}
           onClick={flipFilter}
         />
