@@ -119,10 +119,12 @@ abstract class Settings<A> {
 
   private readonly role: symbol;
   protected readonly decoder: JSON.Safe<A>;
+  protected readonly encoder: JSON.Encoder<A>;
 
-  constructor(role: string, decoder: JSON.Safe<A>) {
+  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
     this.role = Symbol(role);
     this.decoder = decoder;
+    this.encoder = encoder;
   }
 
   validateKey(k?: string): string | undefined {
@@ -150,9 +152,13 @@ abstract class Settings<A> {
     return this.decoder(key ? this.loadData(key) : undefined)
   }
 
+  saveValue(key: string, value: A) {
+    this.saveData(key, this.encoder(value));
+  }
+
 }
 
-export function useSettings<A extends JSON.json>(
+export function useSettings<A>(
   S: Settings<A>,
   dataKey?: string,
 ): [A, (update: A) => void] {
@@ -172,7 +178,7 @@ export function useSettings<A extends JSON.json>(
   const updateValue = React.useCallback((update: A) => {
     if (!isEqual(value, update)) {
       setValue(update);
-      if (theKey) S.saveData(theKey, update);
+      if (theKey) S.saveValue(theKey, update);
     }
   }, [S, theKey]);
 
@@ -180,10 +186,10 @@ export function useSettings<A extends JSON.json>(
 
 }
 
-export class WindowSettings<A> extends Settings<A> {
+export class WindowSettingsData<A> extends Settings<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>) {
-    super(role, decoder);
+  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
+    super(role, decoder, encoder);
   }
 
   event = Symbol('dome.settings');
@@ -192,15 +198,31 @@ export class WindowSettings<A> extends Settings<A> {
 
 }
 
-export class GlobalSettings<A> extends Settings<A> {
+export class GlobalSettingsData<A> extends Settings<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>) {
-    super(role, decoder);
+  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
+    super(role, decoder, encoder);
   }
 
   event = Symbol('dome.globals');
   loadData(key: string) { return Dome.getGlobalSetting(key) as JSON.json; }
   saveData(key: string, data: JSON.json) { Dome.setGlobalSetting(key, data); }
+
+}
+
+export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
+
+  constructor(role: string, decoder: JSON.Safe<A>) {
+    super(role, decoder, JSON.identity);
+  }
+
+}
+
+export class GlobalSettings<A extends JSON.json> extends GlobalSettingsData<A> {
+
+  constructor(role: string, decoder: JSON.Safe<A>) {
+    super(role, decoder, JSON.identity);
+  }
 
 }
 
