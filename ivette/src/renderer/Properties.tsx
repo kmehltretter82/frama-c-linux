@@ -253,6 +253,79 @@ class PropertyModel extends Arrays.ArrayModel<Property> {
   }
 }
 
+// --------------------------------------------------------------------------
+// --- Property Filter Form
+// -------------------------------------------------------------------------
+
+const PropertyFilter =
+  (props: { value: typeof defaultFilter, onChange: () => void }) => (
+    <Vfill>
+      <Form
+        value={props.value}
+        onChange={props.onChange}
+      >
+        <FieldCheckbox label="Current function" path="currentFunction" />
+        <Section label="Status" unfold path="status">
+          <FieldCheckbox label="Valid" path="valid" />
+          <FieldCheckbox label="Valid under hyp." path="valid_hyp" />
+          <FieldCheckbox label="Unknown" path="unknown" />
+          <FieldCheckbox label="Invalid" path="invalid" />
+          <FieldCheckbox label="Invalid under hyp." path="invalid_hyp" />
+          <FieldCheckbox label="Considered valid" path="considered_valid" />
+          <FieldCheckbox label="Untried" path="untried" />
+          <FieldCheckbox label="Dead" path="dead" />
+          <FieldCheckbox label="Inconsistent" path="inconsistent" />
+        </Section>
+        <Section label="Property kind" path="kind">
+          <FieldCheckbox label="Assertions" path="assert" />
+          <FieldCheckbox label="Invariants" path="invariant" />
+          <FieldCheckbox label="Variants" path="variant" />
+          <FieldCheckbox label="Preconditions" path="requires" />
+          <FieldCheckbox label="Postconditions" path="ensures" />
+          <FieldCheckbox label="Instance" path="instance" />
+          <FieldCheckbox label="Assigns clauses" path="assigns" />
+          <FieldCheckbox label="From clauses" path="from" />
+          <FieldCheckbox label="Allocates" path="allocates" />
+          <FieldCheckbox label="Behaviors" path="behavior" />
+          <FieldCheckbox label="Reachables" path="reachable" />
+          <FieldCheckbox label="Axiomatics" path="axiomatic" />
+          <FieldCheckbox label="Pragma" path="pragma" />
+          <FieldCheckbox label="Others" path="others" />
+        </Section>
+        <Section label="Alarms" path="alarms">
+          <FieldCheckbox label="Alarms" path="alarms" />
+          <FieldCheckbox label="Others" path="others" />
+        </Section>
+        <Section label="Alarms kind" path="alarms">
+          <FieldCheckbox label="Overflows" path="overflow" />
+          <FieldCheckbox label="Divisions by zero" path="division_by_zero" />
+          <FieldCheckbox label="Shifts" path="shift" />
+          <FieldCheckbox label="Special floats" path="special_float" />
+          <FieldCheckbox label="Float to int" path="float_to_int" />
+          <FieldCheckbox label="_Bool values" path="bool_value" />
+          <FieldCheckbox label="Memory accesses" path="mem_access" />
+          <FieldCheckbox label="Index bounds" path="index_bound" />
+          <FieldCheckbox label="Initializations" path="initialization" />
+          <FieldCheckbox label="Dangling pointers" path="dangling_pointer" />
+          <FieldCheckbox label="Pointer values" path="pointer_value" />
+          <FieldCheckbox label="Function pointers" path="function_pointer" />
+          <FieldCheckbox label="Pointer comparisons" path="ptr_comparison" />
+          <FieldCheckbox label="Differing blocks" path="differing_blocks" />
+          <FieldCheckbox label="Separations" path="separation" />
+          <FieldCheckbox label="Overlaps" path="overlap" />
+          <FieldCheckbox
+            label="Initialization of unions"
+            path="union_initialization"
+          />
+        </Section>
+      </Form>
+    </Vfill>
+  );
+
+// -------------------------------------------------------------------------
+// --- Properties Table
+// -------------------------------------------------------------------------
+
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
@@ -298,72 +371,10 @@ const RenderTable = () => {
     model.setFilter(filtering);
   }, [model, filter, selectedFunction]);
 
-  const filtersList = (
-    <Form
-      value={filter.current}
-      onChange={() => model.reload()}
-    >
-      <FieldCheckbox label="Current function" path="currentFunction" />
-      <Section label="Status" unfold path="status">
-        <FieldCheckbox label="Valid" path="valid" />
-        <FieldCheckbox label="Valid under hyp." path="valid_hyp" />
-        <FieldCheckbox label="Unknown" path="unknown" />
-        <FieldCheckbox label="Invalid" path="invalid" />
-        <FieldCheckbox label="Invalid under hyp." path="invalid_hyp" />
-        <FieldCheckbox label="Considered valid" path="considered_valid" />
-        <FieldCheckbox label="Untried" path="untried" />
-        <FieldCheckbox label="Dead" path="dead" />
-        <FieldCheckbox label="Inconsistent" path="inconsistent" />
-      </Section>
-      <Section label="Property kind" path="kind">
-        <FieldCheckbox label="Assertions" path="assert" />
-        <FieldCheckbox label="Invariants" path="invariant" />
-        <FieldCheckbox label="Variants" path="variant" />
-        <FieldCheckbox label="Preconditions" path="requires" />
-        <FieldCheckbox label="Postconditions" path="ensures" />
-        <FieldCheckbox label="Instance" path="instance" />
-        <FieldCheckbox label="Assigns clauses" path="assigns" />
-        <FieldCheckbox label="From clauses" path="from" />
-        <FieldCheckbox label="Allocates" path="allocates" />
-        <FieldCheckbox label="Behaviors" path="behavior" />
-        <FieldCheckbox label="Reachables" path="reachable" />
-        <FieldCheckbox label="Axiomatics" path="axiomatic" />
-        <FieldCheckbox label="Pragma" path="pragma" />
-        <FieldCheckbox label="Others" path="others" />
-      </Section>
-      <Section label="Alarms" path="alarms">
-        <FieldCheckbox label="Alarms" path="alarms" />
-        <FieldCheckbox label="Others" path="others" />
-      </Section>
-      <Section label="Alarms kind" path="alarms">
-        <FieldCheckbox label="Overflows" path="overflow" />
-        <FieldCheckbox label="Divisions by zero" path="division_by_zero" />
-        <FieldCheckbox label="Shifts" path="shift" />
-        <FieldCheckbox label="Special floats" path="special_float" />
-        <FieldCheckbox label="Float to int" path="float_to_int" />
-        <FieldCheckbox label="_Bool values" path="bool_value" />
-        <FieldCheckbox label="Memory accesses" path="mem_access" />
-        <FieldCheckbox label="Index bounds" path="index_bound" />
-        <FieldCheckbox label="Initializations" path="initialization" />
-        <FieldCheckbox label="Dangling pointers" path="dangling_pointer" />
-        <FieldCheckbox label="Pointer values" path="pointer_value" />
-        <FieldCheckbox label="Function pointers" path="function_pointer" />
-        <FieldCheckbox label="Pointer comparisons" path="ptr_comparison" />
-        <FieldCheckbox label="Differing blocks" path="differing_blocks" />
-        <FieldCheckbox label="Separations" path="separation" />
-        <FieldCheckbox label="Overlaps" path="overlap" />
-        <FieldCheckbox
-          label="Initialization of unions"
-          path="union_initialization"
-        />
-      </Section>
-    </Form>
-  );
-
   // Rendering
   return (
     <Splitter dir="LEFT">
-      <Vfill> {filtersList} </Vfill>
+      <PropertyFilter value={filter.current} onChange={model.reload} />
       <Table<string, Property>
         model={model}
         sorting={model}
