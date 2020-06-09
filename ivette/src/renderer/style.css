@@ -7,4 +7,11 @@
     min-width: 50px;
 }
 
+.code-column {
+    margin: 0px;
+    padding: 0px;
+    display: block;
+    text-overflow: ellipsis;
+}
+
 /* -------------------------------------------------------------------------- */
