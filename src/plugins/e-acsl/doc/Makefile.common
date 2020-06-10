@@ -10,7 +10,7 @@ include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 # Generic rules #
 #################
 
-eacslversion.tex: Makefile
+eacslversion.tex: Makefile $(VERSION_FILE)
 	rm -f $@
 	printf '\\newcommand{\\eacslpluginversion}{$(EACSL_VERSION)\\xspace}\n' > $@
 	printf '\\newcommand{\\fcversion}{$(FC_VERSION)\\xspace}\n' >> $@
