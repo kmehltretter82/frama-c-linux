@@ -51,6 +51,9 @@ export type RenderByFields<Row> = {
 // --- Table Columns
 // --------------------------------------------------------------------------
 
+/** Column position. You may use hierarchical index to order columns. */
+export type index = number | number[]
+
 /**
    @template Row - table row data of some table entries
    @template Cell - type of cell data to render in this column
@@ -68,7 +71,7 @@ export interface ColumnProps<Row, Cell> {
      Column position.
      By default, column will appear according to their mounting order.
    */
-  index?: number;
+  index?: index;
   /** CSS vertical alignment on cells. */
   align?: 'left' | 'center' | 'right';
   /** Column base width in pixels (default 60px). */
@@ -630,9 +633,15 @@ class TableState<Key, Row> {
     this.rebuild();
   }
 
-  useColumn(props: ColProps<Row>): Trigger {
+  useColumn(
+    props: ColProps<Row>,
+    path: number[],
+    index: number,
+  ): Trigger {
     const id = props.id;
-    this.setRegistry(id, props);
+    const theIndex = props.index ?? index;
+    const thePath = path.concat(theIndex);
+    this.setRegistry(id, { ...props, index: thePath });
     return () => this.setRegistry(id, null);
   }
 
@@ -653,8 +662,13 @@ class TableState<Key, Row> {
 // --- Columns Components
 // --------------------------------------------------------------------------
 
-const ColumnContext =
-  React.createContext<undefined | TableState<any, any>>(undefined);
+interface ColumnIndex {
+  state: TableState<any, any>;
+  path: number[];
+  index: number;
+}
+
+const ColumnContext = React.createContext<undefined | ColumnIndex>(undefined);
 
 /**
    Table Column.
@@ -663,8 +677,39 @@ const ColumnContext =
  */
 export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
   const context = React.useContext(ColumnContext);
-  React.useEffect(() => context && context.useColumn(props));
+  React.useEffect(() => {
+    if (context) {
+      const { state, path, index } = context;
+      state.useColumn(props, path, index);
+    }
+  });
   return null;
+}
+
+function spawnIndex(
+  state: TableState<any, any>,
+  path: number[],
+  children: any
+) {
+  const indexChild = (elt: React.ReactElement, k: number) => (
+    <ColumnContext.Provider value={{ state, path, index: k }}>
+      {elt}
+    </ColumnContext.Provider>
+  );
+  return <>{React.Children.map(children, indexChild)}</>;
+}
+
+/**
+   Column Group.
+   Automatically assign hierarchical index
+   to its sub-columns and sub-column-groups.
+ */
+export function ColumnGroup(props: { index?: index, children: any }) {
+  const context = React.useContext(ColumnContext);
+  if (!context) return null;
+  const { state, path, index: defaultIndex } = context;
+  const newPath = path.concat(props.index ?? defaultIndex);
+  return spawnIndex(state, newPath, props.children);
 }
 
 // --------------------------------------------------------------------------
@@ -710,6 +755,14 @@ function makeColumn<Key, Row>(
   );
 };
 
+const byIndex = (a: Cprops, b: Cprops) => {
+  const ak = a.index ?? 0;
+  const bk = b.index ?? 0;
+  if (ak < bk) return -1;
+  if (bk < ak) return 1;
+  return 0;
+}
+
 function makeCprops<Key, Row>(state: TableState<Key, Row>) {
   const cols: Cprops[] = [];
   state.columns.forEach((col) => {
@@ -717,7 +770,7 @@ function makeCprops<Key, Row>(state: TableState<Key, Row>) {
       cols.push(col);
     }
   });
-  cols.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  cols.sort(byIndex);
   return cols;
 }
 
@@ -943,41 +996,41 @@ function makeTable<Key, Row>(
 // --------------------------------------------------------------------------
 
 /** Table View.
- 
+
    This component is base on [React-Virtualized
    Tables](https://bvaughn.github.io/react-virtualized/#/components/Table),
    offering a lazy, super-optimized rendering process that scales on huge
    datasets.
- 
+
    A table shall be connected to an instance of [[Model]] class to retrieve the
    data and get informed of data updates.
- 
+
    The table children shall be instances of [[Column]] class, and can be grouped
    into arbitrary level of React fragments or custom components.
- 
+
    Clicking on table headers trigger re-ordering callback on the model with the
    expected column and direction, unless disabled _via_ the column x
    specification. However, actual sorting (and corresponding feedback on table
    headers) would only take place if the model supports re-ordering and
    eventually triggers a reload.
- 
+
    Right-clicking the table headers displays a popup-menu with actions to reset
    natural ordering, reset column widths and select column visibility.
- 
+
    Tables do not control item selection state. Instead, you shall supply the
    selection state and callback _via_ properties, like any other controlled
    React components.
- 
+
    Item selection can be based either on single-row or multiple-row. In case of
    single-row selection (`multipleSelection:false`, the default), selection
    state must be a single item or `undefined`, and the `onSelection` callback is
    called with the same type of values.
- 
+
    In case of multiple-row selection (`multipleSelection:true`), the selection
    state shall be an _array_ of items, and `onSelection` callback also. Single
    items are _not_ accepted, but `undefined` selection can be used in place of
    an empty array.
- 
+
    Clicking on a row triggers the `onSelection` callback with the updated
    selection.  In single-selection mode, the clicked item is sent to the
    callback. In multiple-selection mode, key modifiers are taken into account
@@ -988,7 +1041,7 @@ function makeTable<Key, Row>(
    selection is extended with the newly clicked item.  Clicking an already
    selected item with the `CtrlOrCmd` modifier removes it from the current
    selection.
- 
+
    @template Key - unique identifiers of table entries @template Row - data
    associated to each key in the table entries */
 
@@ -1007,16 +1060,15 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     return state.unwind;
   });
   Dome.useEvent('dome.defaults', state.clearSettings);
-
   return (
     <div className='dome-xTable'>
-      <ColumnContext.Provider value={state}>
-        {props.children}
-      </ColumnContext.Provider>
+      <React.Fragment key='columns'>
+        {spawnIndex(state, [], props.children)}
+      </React.Fragment>
       <AutoSizer key='table'>
         {(size: Size) => makeTable(props, state, size)}
       </AutoSizer>
-    </div>
+    </div >
   );
 }
 
