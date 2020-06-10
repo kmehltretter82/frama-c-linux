@@ -123,6 +123,9 @@ let init () =
   end in
   try Cil.visitCilFileSameGlobals set_mp_t (Ast.get ()) with Exit -> ()
 
+let is_t ty =
+  Z.is_t ty || Q.is_t ty
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
