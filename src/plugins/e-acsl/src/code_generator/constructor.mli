@@ -25,12 +25,53 @@
 open Cil_types
 open Cil_datatype
 
+(* ********************************************************************** *)
+(* Expressions *)
+(* ********************************************************************** *)
+
+val extract_uncoerced_lval: exp -> exp option
+(** Unroll the [CastE] part of the expression until an [Lval] is found, and
+    return it.
+
+    If at some point the expression is neither a [CastE] nor an [Lval], then
+    return [None]. *)
+
+val mk_lval: loc:location -> lval -> exp
+(** Construct an lval expression from an lval. *)
+
 val mk_deref: loc:Location.t -> exp -> exp
 (** Construct a dereference of an expression. *)
+
+val mk_subscript: loc:location -> exp -> exp -> exp
+(** [mk_subscript ~loc array idx] Create an expression to access the [idx]'th
+    element of the [array]. *)
+
+(* ********************************************************************** *)
+(* Statements *)
+(* ********************************************************************** *)
+
+val mk_stmt: stmtkind -> stmt
+(** Create a statement from a statement kind. *)
 
 val mk_block: stmt -> block -> stmt
 (** Create a block statement from a block to replace a given statement.
     Requires that (1) the block is not empty, or (2) the statement is a skip. *)
+
+val mk_block_stmt: block -> stmt
+(** Create a block statement from a block *)
+
+val mk_assigns: loc:location -> result:lval -> exp -> stmt
+(** [mk_assigns ~loc ~result value] create a statement to assign the [value]
+    expression to the [result] lval. *)
+
+val mk_if:
+  loc:location -> cond:exp -> ?else_blk:block -> block -> stmt
+(** [mk_if ~loc ~cond ~then_blk ~else_blk] create an if statement with [cond]
+    as condition and [then_blk] and [else_blk] as respectively "then" block and
+    "else" block. *)
+
+val mk_break: loc:location -> stmt
+(** Create a break statement *)
 
 (* ********************************************************************** *)
 (* E-ACSL specific code: build calls to its RTL API *)
