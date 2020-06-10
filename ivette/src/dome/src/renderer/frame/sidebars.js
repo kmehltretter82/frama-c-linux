@@ -108,7 +108,7 @@ export function Section(props) {
 
   const context = React.useContext( SideBarContext );
   const [ state=true, setState ] = Dome.useState(
-    makeSettings(context,props),
+    makeSettings(context.settings,props),
     props.defaultUnfold
   );
   const { enabled=true, disabled=false, unfold, children } = props ;

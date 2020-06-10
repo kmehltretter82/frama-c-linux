@@ -200,7 +200,7 @@ abstract class Settings<A> {
   abstract saveData(key: string, data: JSON.json): void;
 
   /** @internal */
-  abstract event: symbol;
+  abstract event: string;
 
   /** Returns the current setting value for the provided data key. You shall
       only use validated keys otherwise you might fallback to default values. */
@@ -273,7 +273,7 @@ export class WindowSettingsData<A> extends Settings<A> {
     super(role, decoder, encoder, fallback);
   }
 
-  event = Symbol('dome.settings');
+  event = 'dome.defaults';
   loadData(key: string) { return Dome.getWindowSetting(key) as JSON.json; }
   saveData(key: string, data: JSON.json) { Dome.setWindowSetting(key, data); }
 
@@ -293,7 +293,7 @@ export class GlobalSettingsData<A> extends Settings<A> {
     super(role, decoder, encoder, fallback);
   }
 
-  event = Symbol('dome.globals');
+  event = 'dome.settings';
   loadData(key: string) { return Dome.getGlobalSetting(key) as JSON.json; }
   saveData(key: string, data: JSON.json) { Dome.setGlobalSetting(key, data); }
 
