@@ -232,6 +232,51 @@ void __gen_e_acsl_k(int x)
   return;
 }
 
+double __gen_e_acsl_f2(double x)
+{
+  __e_acsl_mpq_t __gen_e_acsl__8;
+  __e_acsl_mpq_t __gen_e_acsl__9;
+  __e_acsl_mpq_t __gen_e_acsl_div;
+  double __gen_e_acsl__10;
+  __gmpq_init(__gen_e_acsl__8);
+  __gmpq_set_str(__gen_e_acsl__8,"1",10);
+  __gmpq_init(__gen_e_acsl__9);
+  __gmpq_set_d(__gen_e_acsl__9,x);
+  __gmpq_init(__gen_e_acsl_div);
+  __gmpq_div(__gen_e_acsl_div,(__e_acsl_mpq_struct const *)(__gen_e_acsl__8),
+             (__e_acsl_mpq_struct const *)(__gen_e_acsl__9));
+  __gen_e_acsl__10 = __gmpq_get_d((__e_acsl_mpq_struct const *)(__gen_e_acsl_div));
+  __gmpq_clear(__gen_e_acsl__8);
+  __gmpq_clear(__gen_e_acsl__9);
+  __gmpq_clear(__gen_e_acsl_div);
+  /*@ assert Eva: is_nan_or_infinite: \is_finite(__gen_e_acsl__10); */
+  return __gen_e_acsl__10;
+}
+
+int __gen_e_acsl_g(int x)
+{
+  int __gen_e_acsl_g_hidden_2;
+  __gen_e_acsl_g_hidden_2 = __gen_e_acsl_g_hidden(x);
+  return __gen_e_acsl_g_hidden_2;
+}
+
+mystruct __gen_e_acsl_t1(mystruct m)
+{
+  return m;
+}
+
+int __gen_e_acsl_p1(int x, int y)
+{
+  int __retres = x + (long)y > 0L;
+  return __retres;
+}
+
+long __gen_e_acsl_t2(mystruct m)
+{
+  long __retres = m.k + (long)m.l;
+  return __retres;
+}
+
 int __gen_e_acsl_p2(int x, int y)
 {
   int __retres = x + (long)y > 0L;
@@ -337,51 +382,6 @@ int __gen_e_acsl_h_short(int s)
 int __gen_e_acsl_g_hidden(int x)
 {
   return x;
-}
-
-double __gen_e_acsl_f2(double x)
-{
-  __e_acsl_mpq_t __gen_e_acsl__8;
-  __e_acsl_mpq_t __gen_e_acsl__9;
-  __e_acsl_mpq_t __gen_e_acsl_div;
-  double __gen_e_acsl__10;
-  __gmpq_init(__gen_e_acsl__8);
-  __gmpq_set_str(__gen_e_acsl__8,"1",10);
-  __gmpq_init(__gen_e_acsl__9);
-  __gmpq_set_d(__gen_e_acsl__9,x);
-  __gmpq_init(__gen_e_acsl_div);
-  __gmpq_div(__gen_e_acsl_div,(__e_acsl_mpq_struct const *)(__gen_e_acsl__8),
-             (__e_acsl_mpq_struct const *)(__gen_e_acsl__9));
-  __gen_e_acsl__10 = __gmpq_get_d((__e_acsl_mpq_struct const *)(__gen_e_acsl_div));
-  __gmpq_clear(__gen_e_acsl__8);
-  __gmpq_clear(__gen_e_acsl__9);
-  __gmpq_clear(__gen_e_acsl_div);
-  /*@ assert Eva: is_nan_or_infinite: \is_finite(__gen_e_acsl__10); */
-  return __gen_e_acsl__10;
-}
-
-int __gen_e_acsl_g(int x)
-{
-  int __gen_e_acsl_g_hidden_2;
-  __gen_e_acsl_g_hidden_2 = __gen_e_acsl_g_hidden(x);
-  return __gen_e_acsl_g_hidden_2;
-}
-
-mystruct __gen_e_acsl_t1(mystruct m)
-{
-  return m;
-}
-
-int __gen_e_acsl_p1(int x, int y)
-{
-  int __retres = x + (long)y > 0L;
-  return __retres;
-}
-
-long __gen_e_acsl_t2(mystruct m)
-{
-  long __retres = m.k + (long)m.l;
-  return __retres;
 }
 
 

@@ -28,6 +28,9 @@ int main(void) {
 
   /*@ assert 1.1d != 1 + 0.1; */ ;
 
+  short a = 1, b = 1;
+  //@ assert a+b > 2.  - 1.; // gitlab public issue #14
+
   // Not yet:
   // long double ld = 0.1l;
   // /*@ assert d + 1 != ld + 1; */ ; // long double

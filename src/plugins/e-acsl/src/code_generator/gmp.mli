@@ -42,6 +42,6 @@ val affect: loc:location -> lval -> exp -> exp -> stmt
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
