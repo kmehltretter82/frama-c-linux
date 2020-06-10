@@ -292,10 +292,13 @@ let ty_of_logic_ty ?term lty =
 (* generate a context [c]. Take --e-acsl-gmp-only into account iff [use_gmp_opt]
    is true. *)
 let mk_ctx ~use_gmp_opt = function
+  | C_float _ as f ->
+    if use_gmp_opt && Options.Gmp_only.get () then Rational
+    else f
   | C_integer _ as c ->
     if use_gmp_opt && Options.Gmp_only.get () then Gmpz
     else c
-  | C_float _ | Gmpz | Rational | Real | Nan as c -> c
+  | Gmpz | Rational | Real | Nan as c -> c
 
 (* the number_ty corresponding to [t] whenever use as an offset.
    In that case, it cannot be a GMP, so it must be coerced to an integral type
