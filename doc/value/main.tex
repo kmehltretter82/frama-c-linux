@@ -630,7 +630,7 @@ no run-time error could happen when running the program.
 
 The alarm means that \Eva{} could not prove that the value \verb|ks[i]|
 accessed in \verb|skein_block.c:69| was definitely initialized before being
-read. Reading an initialized value is an undefined behavior according to the
+read. Reading an uninitialized value is an undefined behavior according to the
 \isoc{} standard (and can even lead to security vulnerabilities).
 
 As is often the case, this alarm is related to the approximation introduced
