@@ -762,29 +762,46 @@ and comparison_to_exp
     | Some e1 ->
       e1, env
   in
+  let ty1 = Cil.typeOf e1 in
   let e2, env = term_to_exp kf env t2 in
-  match ity with
-  | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
-    Cil.mkBinOp ~loc bop e1 e2, env
-  | Typing.Gmpz ->
-    let _, e, env = Env.new_var
-        ~loc
-        env
-        kf
-        t_opt
-        ~name
-        Cil.intType
-        (fun v _ ->
-           [ Constructor.mk_lib_call ~loc
-               ~result:(Cil.var v)
-               "__gmpz_cmp"
-               [ e1; e2 ] ])
-    in
-    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-  | Typing.Rational ->
-    Rational.cmp ~loc bop e1 e2 env kf t_opt
-  | Typing.Real ->
-    Error.not_yet "comparison involving real numbers"
+  let ty2 = Cil.typeOf e2 in
+  match Logic_array.is_array ty1, Logic_array.is_array ty2 with
+  | true, true ->
+    Logic_array.comparison_to_exp
+      ~loc
+      kf
+      env
+      ~name
+      bop
+      e1
+      e2
+  | false, false -> (
+      match ity with
+      | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
+        Cil.mkBinOp ~loc bop e1 e2, env
+      | Typing.Gmpz ->
+        let _, e, env = Env.new_var
+            ~loc
+            env
+            kf
+            t_opt
+            ~name
+            Cil.intType
+            (fun v _ ->
+               [ Constructor.mk_lib_call ~loc
+                   ~result:(Cil.var v)
+                   "__gmpz_cmp"
+                   [ e1; e2 ] ])
+        in
+        Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
+      | Typing.Rational ->
+        Rational.cmp ~loc bop e1 e2 env kf t_opt
+      | Typing.Real ->
+        Error.not_yet "comparison involving real numbers"
+    )
+  | _, _ ->
+    Options.fatal ~current:true "Comparison involving an array with something \
+                                 else."
 
 and at_to_exp_no_lscope env kf t_opt label e =
   let stmt = E_acsl_label.get_stmt kf label in
@@ -1080,7 +1097,8 @@ let () =
   Mmodel_translate.term_to_exp_ref := term_to_exp;
   Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp;
   Logic_functions.term_to_exp_ref := term_to_exp;
-  Logic_functions.named_predicate_to_exp_ref := named_predicate_to_exp
+  Logic_functions.named_predicate_to_exp_ref := named_predicate_to_exp;
+  Logic_array.translate_rte_ref := translate_rte
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)
