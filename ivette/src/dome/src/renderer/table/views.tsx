@@ -51,7 +51,11 @@ export type RenderByFields<Row> = {
 // --- Table Columns
 // --------------------------------------------------------------------------
 
-/** Column position. You may use hierarchical index to order columns. */
+/**
+   Column position.
+   You may use hierarchical index to order columns.
+   See [[ColumnGroup]].
+ */
 export type index = number | number[]
 
 /**
@@ -70,6 +74,7 @@ export interface ColumnProps<Row, Cell> {
   /**
      Column position.
      By default, column will appear according to their mounting order.
+     See also [[ColumnGroup]].
    */
   index?: index;
   /** CSS vertical alignment on cells. */
@@ -699,10 +704,48 @@ function spawnIndex(
   return <>{React.Children.map(children, indexChild)}</>;
 }
 
-/**
-   Column Group.
-   Automatically assign hierarchical index
-   to its sub-columns and sub-column-groups.
+/** Column Groups.
+
+   You should use this component in replacement of React fragments rendering
+   several columns:
+
+ * ```ts
+ *  function MyCustomColumn(props) {
+ *    ...
+ *    return (
+ *       <ColumnGroup>
+ *          <Column id='A' index={3} ... />
+ *          <Column id='B'           ... />
+ *          <MyOtherCustomColumns    ... />
+ *          <Column id='C' index={0} ... />
+ *        </ColumnGroup>
+ *      );
+ *   }
+ * ```
+
+   When rendering a column or a column group, there is an implicit column
+   indexing context which is provided by the parent Table component and
+   propagated down to the virtual DOM.  This context provides each column and
+   column group with a default index position, which can be locally adjusted
+   with the `index` property.
+
+   More precisely, if a column group is assigned to index `K` by the inherited
+   context, its `i`-th child will inherit a refined indexing context
+   corresponding to index `[...K, i]`. Then, inside this refined context, a
+   column or column-group rendered from the `i`-th child of the column group
+   with be assigned to a default index of `[...K, i]`, or a refined index of
+   `[...K, ...index]` if it the sub-column or sub-column-group has an `index`
+   property.
+
+   This indexing context allows you to number columns locally inside a
+   `<ColumnGroup />` without having to take into account its neighbours. This
+   also means that columns rendered in a group never goes outside of this group.
+   Column groups hence provide hierarchical column ordering.
+
+   The immediate children of a Table component are implicitely rendered in a
+   column group initialized at index `[i]` for the `i`-th child. To cancel
+   this implicit root column group, just pack your columns inside a classical
+   React fragment: `<Table … ><>{children}</></Table>`.
  */
 export function ColumnGroup(props: { index?: index, children: any }) {
   const context = React.useContext(ColumnContext);
@@ -997,16 +1040,17 @@ function makeTable<Key, Row>(
 
 /** Table View.
 
-   This component is base on [React-Virtualized
-   Tables](https://bvaughn.github.io/react-virtualized/#/components/Table),
-   offering a lazy, super-optimized rendering process that scales on huge
+   This component is base on
+   [React-Virtualized](https://bvaughn.github.io/react-virtualized/#/components/Table)
+   which offers a super-optimized lazy rendering process that scales on huge
    datasets.
 
    A table shall be connected to an instance of [[Model]] class to retrieve the
    data and get informed of data updates.
 
-   The table children shall be instances of [[Column]] class, and can be grouped
-   into arbitrary level of React fragments or custom components.
+   The table children shall only be component finally rendering [[Column]]
+   elements. You can use [[ColumnGroup]] and column index properties to manage
+   column natural order precisely.
 
    Clicking on table headers trigger re-ordering callback on the model with the
    expected column and direction, unless disabled _via_ the column x
@@ -1021,29 +1065,9 @@ function makeTable<Key, Row>(
    selection state and callback _via_ properties, like any other controlled
    React components.
 
-   Item selection can be based either on single-row or multiple-row. In case of
-   single-row selection (`multipleSelection:false`, the default), selection
-   state must be a single item or `undefined`, and the `onSelection` callback is
-   called with the same type of values.
-
-   In case of multiple-row selection (`multipleSelection:true`), the selection
-   state shall be an _array_ of items, and `onSelection` callback also. Single
-   items are _not_ accepted, but `undefined` selection can be used in place of
-   an empty array.
-
-   Clicking on a row triggers the `onSelection` callback with the updated
-   selection.  In single-selection mode, the clicked item is sent to the
-   callback. In multiple-selection mode, key modifiers are taken into account
-   for determining the new slection. By default, the new selection only contains
-   the clicked item. If the `Shift` modifier has been pressed, the current
-   selection is extended with a range of items from the last selected one, to
-   the newly selected one. If the `CtrlOrCmd` modifier has been pressed, the
-   selection is extended with the newly clicked item.  Clicking an already
-   selected item with the `CtrlOrCmd` modifier removes it from the current
-   selection.
-
-   @template Key - unique identifiers of table entries @template Row - data
-   associated to each key in the table entries */
+   @template Key - unique identifiers of table entries.
+   @template Row - data associated to each key in the table entries.
+*/
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 
