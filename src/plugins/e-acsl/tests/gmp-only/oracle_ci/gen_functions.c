@@ -277,6 +277,70 @@ void __gen_e_acsl_k(int x)
   return;
 }
 
+void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y)
+{
+  __e_acsl_mpz_t __gen_e_acsl_x_4;
+  __e_acsl_mpz_t __gen_e_acsl_y_3;
+  __e_acsl_mpz_t __gen_e_acsl_add_4;
+  __gmpz_init_set_si(__gen_e_acsl_x_4,(long)x);
+  __gmpz_init_set_si(__gen_e_acsl_y_3,(long)y);
+  __gmpz_init(__gen_e_acsl_add_4);
+  __gmpz_add(__gen_e_acsl_add_4,
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_4),
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl_y_3));
+  __gmpz_init_set(*__retres_arg,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
+  __gmpz_clear(__gen_e_acsl_x_4);
+  __gmpz_clear(__gen_e_acsl_y_3);
+  __gmpz_clear(__gen_e_acsl_add_4);
+  return;
+}
+
+void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
+                       __e_acsl_mpz_struct * y)
+{
+  __e_acsl_mpz_t __gen_e_acsl_x_5;
+  __e_acsl_mpz_t __gen_e_acsl_add_5;
+  __gmpz_init_set_si(__gen_e_acsl_x_5,(long)x);
+  __gmpz_init(__gen_e_acsl_add_5);
+  __gmpz_add(__gen_e_acsl_add_5,
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_5),
+             (__e_acsl_mpz_struct const *)(y));
+  __gmpz_init_set(*__retres_arg,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5));
+  __gmpz_clear(__gen_e_acsl_x_5);
+  __gmpz_clear(__gen_e_acsl_add_5);
+  return;
+}
+
+void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
+                       __e_acsl_mpz_struct * y)
+{
+  __e_acsl_mpz_t __gen_e_acsl_add_6;
+  __gmpz_init(__gen_e_acsl_add_6);
+  __gmpz_add(__gen_e_acsl_add_6,(__e_acsl_mpz_struct const *)(x),
+             (__e_acsl_mpz_struct const *)(y));
+  __gmpz_init_set(*__retres_arg,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_6));
+  __gmpz_clear(__gen_e_acsl_add_6);
+  return;
+}
+
+int __gen_e_acsl_h_char(int c)
+{
+  return c;
+}
+
+int __gen_e_acsl_h_short(int s)
+{
+  return s;
+}
+
+int __gen_e_acsl_g_hidden(int x)
+{
+  return x;
+}
+
 double __gen_e_acsl_f2(double x)
 {
   __e_acsl_mpq_t __gen_e_acsl__13;
@@ -411,70 +475,6 @@ int __gen_e_acsl_k_pred(int x)
   __gmpz_clear(__gen_e_acsl_x);
   __gmpz_clear(__gen_e_acsl_);
   return __retres;
-}
-
-void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y)
-{
-  __e_acsl_mpz_t __gen_e_acsl_x_4;
-  __e_acsl_mpz_t __gen_e_acsl_y_3;
-  __e_acsl_mpz_t __gen_e_acsl_add_4;
-  __gmpz_init_set_si(__gen_e_acsl_x_4,(long)x);
-  __gmpz_init_set_si(__gen_e_acsl_y_3,(long)y);
-  __gmpz_init(__gen_e_acsl_add_4);
-  __gmpz_add(__gen_e_acsl_add_4,
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_4),
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl_y_3));
-  __gmpz_init_set(*__retres_arg,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
-  __gmpz_clear(__gen_e_acsl_x_4);
-  __gmpz_clear(__gen_e_acsl_y_3);
-  __gmpz_clear(__gen_e_acsl_add_4);
-  return;
-}
-
-void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
-                       __e_acsl_mpz_struct * y)
-{
-  __e_acsl_mpz_t __gen_e_acsl_x_5;
-  __e_acsl_mpz_t __gen_e_acsl_add_5;
-  __gmpz_init_set_si(__gen_e_acsl_x_5,(long)x);
-  __gmpz_init(__gen_e_acsl_add_5);
-  __gmpz_add(__gen_e_acsl_add_5,
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_5),
-             (__e_acsl_mpz_struct const *)(y));
-  __gmpz_init_set(*__retres_arg,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5));
-  __gmpz_clear(__gen_e_acsl_x_5);
-  __gmpz_clear(__gen_e_acsl_add_5);
-  return;
-}
-
-void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
-                       __e_acsl_mpz_struct * y)
-{
-  __e_acsl_mpz_t __gen_e_acsl_add_6;
-  __gmpz_init(__gen_e_acsl_add_6);
-  __gmpz_add(__gen_e_acsl_add_6,(__e_acsl_mpz_struct const *)(x),
-             (__e_acsl_mpz_struct const *)(y));
-  __gmpz_init_set(*__retres_arg,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_6));
-  __gmpz_clear(__gen_e_acsl_add_6);
-  return;
-}
-
-int __gen_e_acsl_h_char(int c)
-{
-  return c;
-}
-
-int __gen_e_acsl_h_short(int s)
-{
-  return s;
-}
-
-int __gen_e_acsl_g_hidden(int x)
-{
-  return x;
 }
 
 
