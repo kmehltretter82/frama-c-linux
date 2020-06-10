@@ -27,6 +27,8 @@ Plugin E-ACSL 21.0 (Scandium)
 
 -* E-ACSL       [2020-06-10] Fix ##13: bug when mixing integers and floats in
                 annotations while -e-acsl-gmp-only is activated.
+-* E-ACSL       [2020-06-10] Fix a soundness bug (##14) when initializing
+                rationals from integers.
 -* E-ACSL       [2020-03-24] Fix automatic deactivation of plug-in Variadic when
                 E-ACSL is directly called from Frama-C without using
                 e-acsl-gcc.sh.

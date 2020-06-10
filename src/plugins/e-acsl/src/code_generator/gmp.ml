@@ -40,18 +40,25 @@ let clear ~loc e = apply_on_var "clear" ~loc e
 
 exception Longlong of ikind
 
-let get_set_suffix_and_arg e =
+let get_set_suffix_and_arg res_ty e =
   let ty = Cil.typeOf e in
   if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then "", [ e ]
   else
+    let args_uisi e =
+      if Gmp_types.Z.is_t res_ty then [ e ]
+      else begin
+        assert (Gmp_types.Q.is_t res_ty);
+        [ e; Cil.one ~loc:e.eloc ]
+      end
+    in
     match Cil.unrollType ty with
     | TInt(IChar, _) ->
       (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui"
        else "_si"),
-      [ e ]
+      args_uisi e
     | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
-      "_ui", [ e ]
-    | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", [ e ]
+      "_ui", args_uisi e
+    | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", args_uisi e
     | TInt((ILongLong | IULongLong as ikind), _) -> raise (Longlong ikind)
     | TPtr(TInt(IChar, _), _) ->
       "_str",
@@ -71,7 +78,7 @@ let get_set_suffix_and_arg e =
 let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
   if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then begin
-    let suf, args = get_set_suffix_and_arg e in
+    let suf, args = get_set_suffix_and_arg ty e in
     Constructor.mk_lib_call ~loc (fname ^ suf) (ev :: args)
   end else
     Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, e.eloc))
@@ -122,6 +129,6 @@ let affect ~loc lv ev e =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

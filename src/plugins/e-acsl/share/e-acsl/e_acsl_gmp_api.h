@@ -145,8 +145,13 @@ extern void __gmpq_set_d(mpq_t q, double d)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q);
-  @ assigns *q \from n; */
-extern void __gmpq_set_si(mpq_t q, signed long int n)
+  @ assigns *q \from n,d; */
+extern void __gmpq_set_ui(mpq_t q, unsigned long int n, unsigned long int d)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(q);
+  @ assigns *q \from n,d; */
+extern void __gmpq_set_si(mpq_t q, signed long int n, unsigned long int d)
   __attribute__((FC_BUILTIN));
 
 /*@ allocates q;
@@ -158,7 +163,6 @@ extern int __gmpq_set_str(mpq_t q, const char *str, int base)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z);
-//  @ ensures z->n == n;
   @ assigns *z \from n; */
 extern void __gmpz_set_ui(mpz_t z, unsigned long int n)
   __attribute__((FC_BUILTIN));

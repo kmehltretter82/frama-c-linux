@@ -272,9 +272,9 @@ void __gen_e_acsl_foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     __gmpq_init(__gen_e_acsl_);
     __gmpq_set_str(__gen_e_acsl_,"5",10);
     __gmpq_init(__gen_e_acsl__2);
-    __gmpq_set_si(__gen_e_acsl__2,5L);
+    __gmpq_set_si(__gen_e_acsl__2,5L,1UL);
     __gmpq_init(__gen_e_acsl__3);
-    __gmpq_set_si(__gen_e_acsl__3,80L);
+    __gmpq_set_si(__gen_e_acsl__3,80L,1UL);
     __gmpq_init(__gen_e_acsl_div);
     __gmpq_div(__gen_e_acsl_div,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__2),
