@@ -477,8 +477,8 @@ on the fly and then used, but results are likely to be unsatisfactory.
   Absence of code or ACSL specification is a major issue which often renders
   the analysis incorrect. For this reason, we recommend converting this warning
   into an error, in order to spot it immediately.
-  The {\em analysis script templates}, to be presented in
-  section~\ref{analysis-scripts}, already include this change.
+  The {\em analysis scripts template}, mentioned in the Frama-C User
+  Manual~\cite{FCUserMan}, includes it by default.
 \end{important}
 
 To fix the issue, we only need to give Frama-C all of the C sources in
@@ -2742,8 +2742,6 @@ while the remaining sections (\ref{boucles-traitement},
 \ref{controlling-approximations} and \ref{sec:eva}) deal with performance
 tuning options. Section \ref{nonterm} presents a derived analysis to
 obtain information about non-termination.
-Finally, section \ref{analysis-scripts} presents some scripts and templates
-to help bootstrap an analysis and automate some of its steps.
 
 
 \section{Three-step approach}
@@ -4268,34 +4266,6 @@ to syntactically unreachable code, e.g. instructions that are unreachable due to
 amount of warnings and is rarely needed in practice.
 
 % TODO: plevel, wlevel?
-
-\section{Analysis scripts and templates}\label{analysis-scripts}
-
-Setting up an analysis is a process that takes some time. Iterating an
-analysis (changing the parametrization, adding annotations, etc.) is a process
-which can greatly benefit from a structured approach, for instance to avoid
-reparsing the sources when only \Eva{}-related options are modified.
-For both tasks, Frama-C offers some templates and scripts to help the user.
-
-The files themselves are located mostly in Frama-C's \verb|share| directory
-(\verb|FRAMAC_SHARE|, when running \verb|frama-c-config|), but they can be
-accessed via the \verb|frama-c-script| command, among which we cite:
-
-\begin{description}
-\item[make-template]: creates a Makefile template in the current directory.
-  This template follows the recommended three-step setup
-  (section~\ref{three-step}), tracks dependencies (e.g. re-running parsing
-  when source files are modified) and offers useful targets for the user.
-\item[find-fun]: useful to find which source files declare/define a given
-  function; for instance, when there are multiple \verb|main| functions.
-\item[flamegraph]: opens a {\em flamegraph}\footnote{See
-  https://github.com/brendangregg/FlameGraph for details about flamegraphs.}
-  (a graphical profiling tool) of the analysis performed by \Eva{}.
-\end{description}
-
-Running \verb|frama-c-script| without arguments outputs the list of
-currently-available commands\footnote{The list of commands is liable to change
-  for each Frama-C release.}.
 
 \chapter{Inputs, outputs and dependencies}\label{inoutdeps}
 \vspace{2cm}
