@@ -150,14 +150,25 @@ abstract class Settings<A> {
   protected readonly encoder: JSON.Encoder<A>;
 
   /**
+     Encoders shall be protected against exception.
+     Use [[JSON.jTry]] and [[JSON.jCatch]] in case of uncertainty.
+     Decoders are automatically protected internally to the Settings class.
      @param role - Debugging name of instance roles (each instance has its unique role, though)
      @param decoder - JSON decoder for the setting values
      @param encoder - JSON encoder for the setting values
+     @param fallback -
+     If provided, used to automatically protect your encoders against exceptions.
    */
-  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
+  constructor(
+    role: string,
+    decoder: JSON.Safe<A>,
+    encoder: JSON.Encoder<A>,
+    fallback?: A,
+  ) {
     this.role = Symbol(role);
-    this.decoder = decoder;
     this.encoder = encoder;
+    this.decoder =
+      fallback !== undefined ? JSON.jCatch(decoder, fallback) : decoder;
   }
 
   /**
@@ -201,7 +212,13 @@ abstract class Settings<A> {
       You only use validated keys otherwise further loads
       might fail and fallback to defaults. */
   saveValue(dataKey: string, value: A) {
-    this.saveData(dataKey, this.encoder(value));
+    try { this.saveData(dataKey, this.encoder(value)); }
+    catch (err) {
+      if (DEVEL) console.error(
+        '[Dome.settings] error while encoding value',
+        dataKey, value, err,
+      );
+    }
   }
 
 }
@@ -247,8 +264,13 @@ export function useSettings<A>(
     You can use a [[JSON.Loose]] decoder for optional values. */
 export class WindowSettingsData<A> extends Settings<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
-    super(role, decoder, encoder);
+  constructor(
+    role: string,
+    decoder: JSON.Safe<A>,
+    encoder: JSON.Encoder<A>,
+    fallback?: A,
+  ) {
+    super(role, decoder, encoder, fallback);
   }
 
   event = Symbol('dome.settings');
@@ -262,8 +284,13 @@ export class WindowSettingsData<A> extends Settings<A> {
     You can use a [[JSON.Loose]] decoder for optional values. */
 export class GlobalSettingsData<A> extends Settings<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>, encoder: JSON.Encoder<A>) {
-    super(role, decoder, encoder);
+  constructor(
+    role: string,
+    decoder: JSON.Safe<A>,
+    encoder: JSON.Encoder<A>,
+    fallback?: A,
+  ) {
+    super(role, decoder, encoder, fallback);
   }
 
   event = Symbol('dome.globals');
@@ -277,8 +304,8 @@ export class GlobalSettingsData<A> extends Settings<A> {
     You can use a [[JSON.Loose]] decoder for optional values. */
 export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>) {
-    super(role, decoder, JSON.identity);
+  constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {
+    super(role, decoder, JSON.identity, fallback);
   }
 
 }
@@ -288,8 +315,8 @@ export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
     You can use a [[JSON.Loose]] decoder for optional values. */
 export class GlobalSettings<A extends JSON.json> extends GlobalSettingsData<A> {
 
-  constructor(role: string, decoder: JSON.Safe<A>) {
-    super(role, decoder, JSON.identity);
+  constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {
+    super(role, decoder, JSON.identity, fallback);
   }
 
 }
