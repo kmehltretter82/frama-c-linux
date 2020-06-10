@@ -5,6 +5,8 @@
 .dome-xLabel {
     padding: 2px ;
     margin: 2px 4px ;
+    overflow: hidden ;
+    white-space: nowrap ;
 }
 
 .dome-xLabel .dome-xIcon {
@@ -13,6 +15,7 @@
 
 .dome-xLabel.dome-text-descr {
     overflow: auto ;
+    white-space: wrap ;
 }
 
 /* -------------------------------------------------------------------------- */

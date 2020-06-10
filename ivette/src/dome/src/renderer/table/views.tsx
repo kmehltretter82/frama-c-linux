@@ -37,7 +37,7 @@ const SVG = SVGraw as (props: { id: string, size?: number }) => JSX.Element;
 // --------------------------------------------------------------------------
 
 /** Cell data renderer. */
-export type Renderer<Cell> = (data?: Cell) => null | JSX.Element;
+export type Renderer<Cell> = (data: Cell) => null | JSX.Element;
 
 /**
    Associates, for each field `{ fd: Cell }` in `Row`, a renderer

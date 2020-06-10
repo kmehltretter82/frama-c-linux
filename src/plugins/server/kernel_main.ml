@@ -82,23 +82,37 @@ module LogSource = Collection
     (struct
       type t = Filepath.position
 
-      let syntax = Sy.publish ~page:Data.page ~name:"source"
-          ~synopsis:(Sy.record [ "file" , Sy.string ; "line" , Sy.int ])
+      let synopsis =
+        Sy.record [ "dir", Sy.string; "base", Sy.string;
+                    "file", Sy.string; "line", Sy.int ]
+
+      let syntax = Sy.publish ~page:Data.page ~name:"source" ~synopsis
           ~descr:(Md.plain "Source file positions.")
           ~details:Md.([Block [Text (plain "The file path is normalized, \
                                             and the line number starts at one.")]])
           ()
 
-      let to_json p = `Assoc [
+      let to_json p =
+        let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+        `Assoc [
+          "dir"  , `String (Filename.dirname path) ;
+          "base" , `String (Filename.basename path) ;
           "file" , `String (p.Filepath.pos_path :> string) ;
           "line" , `Int p.Filepath.pos_lnum ;
         ]
 
-      let of_json = function
-        | `Assoc [ "file" , `String path ; "line" , `Int line ]
-        | `Assoc [ "line" , `Int line ; "file" , `String path ]
-          -> Log.source ~file:(Filepath.Normalized.of_string path) ~line
-        | js -> failure_from_type_error "Invalid source format" js
+      let of_json js =
+        let fail () = failure_from_type_error "Invalid source format" js in
+        match js with
+        | `Assoc assoc ->
+          begin
+            match List.assoc "file" assoc, List.assoc "line" assoc with
+            | `String path, `Int line ->
+              Log.source ~file:(Filepath.Normalized.of_string path) ~line
+            | _, _ -> fail ()
+            | exception Not_found -> fail ()
+          end
+        | _ -> fail ()
 
     end)
 

@@ -127,6 +127,10 @@ export abstract class Model<Key, Row> {
   private clients = new Map<number, Watcher>();
   private clientsId = 0;
 
+  constructor() {
+    this.reload = this.reload.bind(this);
+  }
+
   /**
      Shall return the number of rows to be currently displayed in the table.
      Negative values are considered as zero.
@@ -187,7 +191,10 @@ export abstract class Model<Key, Row> {
     }
   }
 
-  /** Re-render all views. */
+  /**
+     Re-render all views.
+     Bound to this.
+  */
   reload() { this.clients.forEach(({ reload }) => reload && reload()); }
 
   /**

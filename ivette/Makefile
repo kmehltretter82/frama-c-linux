@@ -8,7 +8,7 @@ DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc serve dist typecheck lint
+.PHONY: all app dev doc serve dist typecheck lint tsc
 
 all: typecheck lint app
 
@@ -28,6 +28,7 @@ fixlint: dome-pkg dome-templ
 	@echo "[Ivette] running ts linter (with fix)"
 	yarn run lint --fix
 
+tsc: typecheck fixlint
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation

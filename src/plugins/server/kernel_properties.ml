@@ -50,6 +50,7 @@ struct
 
   let t_assumes = t_clause "assumes"
   let t_requires = t_clause "requires"
+  let t_instance = t_clause "instance"
   let t_breaks = t_clause "breaks"
   let t_continues = t_clause "continues"
   let t_returns = t_clause "returns"
@@ -62,6 +63,7 @@ struct
   let t_froms = t_kind "froms" "Clause `@assigns … \\from …`"
 
   let t_assert = t_clause "assert"
+  let t_check = t_clause "check"
   let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
@@ -89,7 +91,7 @@ struct
 
   open Property
 
-  let rec tag = function
+  let tag = function
     | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires _ -> t_requires
@@ -110,7 +112,8 @@ struct
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert _ -> t_assert
+        | AAssert (_, Assert, _) -> t_assert
+        | AAssert (_, Check, _) -> t_check
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant
@@ -125,7 +128,7 @@ struct
     | IPFrom _ -> t_froms
     | IPDecrease _ -> t_decreases
     | IPReachable _ -> t_reachable
-    | IPPropertyInstance { ii_ip } -> tag ii_ip
+    | IPPropertyInstance _ -> t_instance
     | IPTypeInvariant _ -> t_type_invariant
     | IPGlobalInvariant _ -> t_global_invariant
     | IPOther { io_name } -> Enum.instance p_other io_name
@@ -215,10 +218,14 @@ end
 (* --- Property Model                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let find_alarm = function
+  | Property.IPCodeAnnot annot -> Alarms.find annot.ica_ca
+  | _ -> None
+
 let model = States.model ()
 
 let () = States.column ~model ~name:"descr"
-    ~descr:(Md.plain "Description")
+    ~descr:(Md.plain "Full description")
     ~data:(module Jstring)
     ~get:(fun ip -> Format.asprintf "%a" Property.pretty ip) ()
 
@@ -226,6 +233,11 @@ let () = States.column ~model ~name:"kind"
     ~descr:(Md.plain "Kind")
     ~data:(module PropKind)
     ~get:(fun ip -> ip) ()
+
+let () = States.column ~model ~name:"names"
+    ~descr:(Md.plain "Names")
+    ~data:(module Jstring.Jlist)
+    ~get:Property.get_names ()
 
 let () = States.column ~model ~name:"status"
     ~descr:(Md.plain "Status")
@@ -245,15 +257,46 @@ let () = States.column ~model ~name:"source"
     ~data:(module LogSource)
     ~get:(fun ip -> Property.location ip |> fst) ()
 
+let () = States.column ~model ~name:"alarm"
+    ~descr:(Md.plain "Alarm name (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip)) ()
+
+let () = States.column ~model ~name:"alarm_descr"
+    ~descr:(Md.plain "Alarm description (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip)) ()
+
+let () = States.column ~model ~name:"predicate"
+    ~descr:(Md.plain "Predicate")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
+    ()
+
+let is_relevant ip =
+  match Property.get_kf ip with
+  | None -> true
+  | Some kf ->
+    not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
+         || Cil.is_unused_builtin (Kernel_function.get_vi kf))
+
+let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
+let add_update_hook f =
+  Property_status.register_property_add_hook
+    (fun ip -> if is_relevant ip then f ip)
+let add_remove_hook f =
+  Property_status.register_property_remove_hook
+    (fun ip -> if is_relevant ip then f ip)
+
 let array =
   States.register_array
     ~page
     ~name:"kernel.properties"
     ~descr:(Md.plain "Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-    ~iter:(Property_status.iter)
-    ~add_update_hook:Property_status.register_property_add_hook
-    ~add_remove_hook:Property_status.register_property_remove_hook
+    ~iter
+    ~add_update_hook
+    ~add_remove_hook
     model
 
 let reload () = States.reload array

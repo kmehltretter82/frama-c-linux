@@ -271,6 +271,27 @@ let get_kf = function
   | IPOther {io_loc} -> kf_of_loc_o io_loc
   | IPTypeInvariant _ | IPGlobalInvariant _ -> None
 
+let rec get_names = function
+  | IPPredicate ip -> ip.ip_pred.ip_content.pred_name
+  | IPExtended { ie_ext = {ext_name = name} }
+  | IPAxiom { il_name = name }
+  | IPAxiomatic { iax_name = name }
+  | IPLemma { il_name = name }
+  | IPBehavior { ib_bhv = {b_name = name} }
+  | IPTypeInvariant { iti_name = name }
+  | IPGlobalInvariant { igi_name = name }
+  | IPOther { io_name = name } -> [ name ]
+  | IPPropertyInstance instance -> get_names instance.ii_ip
+  | IPCodeAnnot annot ->
+    begin
+      match annot.ica_ca.annot_content with
+      | AAssert (_, _, pred)
+      | AInvariant (_, _, pred) -> pred.pred_name
+      | _ -> []
+    end
+  | IPComplete _ | IPDisjoint _ | IPAllocation _
+  | IPAssigns _ | IPFrom _ | IPDecrease _ | IPReachable _ -> []
+
 let loc_of_kf_ki kf = function
   | Kstmt s -> Cil_datatype.Stmt.loc s
   | Kglobal -> Kernel_function.get_location kf
