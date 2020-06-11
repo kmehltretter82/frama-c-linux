@@ -376,7 +376,7 @@ let code_annot_emitter ?filter stmt =
     let contracts,assigns,others = partition_code_annot_emitter l in
     merge_stmt_contracts_emitters contracts @
     merge_loop_assigns_emitters assigns @
-    others
+    List.rev others
   with Not_found ->
     []
 
