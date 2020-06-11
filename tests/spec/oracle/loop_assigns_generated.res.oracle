@@ -5,7 +5,7 @@ void f(void)
   int k;
   int j;
   int i = 0;
-  /*@ loop assigns k, j, i; */
+  /*@ loop assigns (added_by_emitter2: k), (added_by_emitter1: j), i; */
   while (i < 10) i ++;
   return;
 }

@@ -1,11 +1,13 @@
 open Cil_types
 
-let e1 = Emitter.(create "test1" [ Code_annot ] [] [])
-let e2 = Emitter.(create "test2" [ Code_annot ] [] [])
+let e1 = Emitter.(create "emitter1" [ Code_annot ] [] [])
+let e2 = Emitter.(create "emitter2" [ Code_annot ] [] [])
 
 let add_assigns e kf stmt v =
   let lv = Cil.cvar_to_lvar v in
-  let id_v = Logic_const.new_identified_term (Logic_const.tvar lv) in
+  let term_v  = Logic_const.tvar lv in
+  let named_term_v = { term_v with term_name = ("added_by_"^(Emitter.get_name e))::term_v.term_name } in
+  let id_v = Logic_const.new_identified_term named_term_v  in
   Annotations.add_code_annot e ~kf stmt
     (Logic_const.new_code_annotation
        (AAssigns ([], Writes [id_v, FromAny])));
