@@ -358,7 +358,7 @@ let code_annot_emitter ?filter stmt =
           (* in some cases, e.g. when loading a state with a different set
              of plugins loaded, the original emitter might not be available,
              leading to discarding annotations. Let the kernel adopt them. *)
-          Emitter.kernel
+          Emitter.orphan
       in
       match filter with
       | None -> List.map (fun a -> a, e) l @ acc
