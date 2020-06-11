@@ -141,7 +141,7 @@ following tools:
 #### Prerequisites: WSL + a Linux distribution
 
 For enabling WSL on Windows, you may follow these instructions
-(we tested with Ubuntu 18.04 LTS and Ubuntu 20.04 LTS;
+(we tested with Ubuntu 18.04 LTS;
 other distributions/versions should also work,
 but the instructions below may require some modifications).
 
