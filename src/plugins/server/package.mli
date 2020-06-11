@@ -22,7 +22,25 @@
 
 type plugin = Kernel | Plugin of string
 type package = { plugin: plugin; pkgname: string list }
-type identifier = package * string
+type ident = package * string
+type name = string list
+
+val pp_plugin : Format.formatter -> plugin -> unit
+val pp_package : Format.formatter -> package -> unit
+val pp_ident : Format.formatter -> ident -> unit
+val pp_name : Format.formatter -> name -> unit
+
+module PkgMap : Map.S with type key = package
+module IdMap : Map.S with type key = ident
+
+module Scope :
+sig
+  type t
+  val create : plugin -> t
+  val resolve : t -> name IdMap.t
+  val name_of : name IdMap.t -> ident -> string
+  val use : t -> ident -> unit
+end
 
 type json =
   | Jany
@@ -30,12 +48,24 @@ type json =
   | Jboolean
   | Jnumber
   | Jstring
-  | Jid of string
-  | Joption of json
-  | Jassoc of json
+  | Jtag of string (** Enum constant tag *)
+  | Jkind of string (** Kind of ids (actually strings) *)
+  | Joption of json (** Value or 'null' *)
+  | Jassoc of string * json (** Dictionary for kind of ids *)
   | Jarray of json
   | Jtuple of json list
+  | Junion of json list
   | Jrecord of (string * json) list
-  | Jdata of identifier
+  | Jdata of ident
+
+val iter : (ident -> unit) -> json -> unit
+val pretty : Format.formatter -> json -> unit
+
+type pp = {
+  data: ident -> Markdown.text ;
+  kind: string -> Markdown.text ;
+}
+
+val text : pp -> json -> Markdown.text
 
 (* -------------------------------------------------------------------------- *)
