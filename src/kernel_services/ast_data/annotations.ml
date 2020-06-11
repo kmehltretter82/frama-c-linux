@@ -280,7 +280,7 @@ let merge_funspec s1 s2 =
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
-module StmtContractMap = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
+module Behavior_set_map = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
 
 let is_same_behavior_set l1 l2 =
   Datatype.String.Set.(equal (of_list l1) (of_list l2))
@@ -291,10 +291,10 @@ let merge_stmt_contracts contracts =
     | AStmtSpec(bhvs, spec) ->
       let bhvs = Datatype.String.Set.of_list bhvs in
       let fresh_spec, acc =
-        try StmtContractMap.find bhvs acc, acc
+        try Behavior_set_map.find bhvs acc, acc
         with Not_found ->
           let spec = Cil.empty_funspec () in
-          spec, StmtContractMap.add bhvs spec acc
+          spec, Behavior_set_map.add bhvs spec acc
           (* avoid sharing directly the spec,
              as merge_funspec will modify it in place*)
       in
@@ -303,14 +303,110 @@ let merge_stmt_contracts contracts =
     | _ -> acc
   in
   let merged_contracts =
-    List.fold_left add_one StmtContractMap.empty contracts
+    List.fold_left add_one Behavior_set_map.empty contracts
   in
-  StmtContractMap.fold
+  Behavior_set_map.fold
     (fun bhvs spec acc ->
        (Logic_const.new_code_annotation
           (AStmtSpec (Datatype.String.Set.elements bhvs, spec)))
        :: acc)
     merged_contracts []
+
+let merge_stmt_contracts_emitters contracts =
+  let add_one acc (c,e) =
+    match c.annot_content with
+    | AStmtSpec(bhvs, spec) ->
+      let bhvs = Datatype.String.Set.of_list bhvs in
+      (match Behavior_set_map.find_opt bhvs acc with
+       | Some (spec', e') ->
+         merge_funspec spec' spec;
+         if Emitter.equal e e' then acc
+         else
+           Behavior_set_map.add bhvs (spec', Emitter.kernel) acc
+       | None ->
+         let spec' = Cil.empty_funspec () in
+         merge_funspec spec' spec;
+         Behavior_set_map.add bhvs (spec',e) acc
+         (* avoid sharing directly the spec,
+            as merge_funspec will modify it in place*))
+    | _ -> acc
+  in
+  let merged_contracts =
+    List.fold_left add_one Behavior_set_map.empty contracts
+  in
+  Behavior_set_map.fold
+    (fun bhvs (spec,e) acc ->
+       (Logic_const.new_code_annotation
+          (AStmtSpec (Datatype.String.Set.elements bhvs, spec)),e)
+       :: acc)
+    merged_contracts []
+
+let merge_loop_assigns annots =
+  let merge_assigns bhvs a acc =
+    let a' =
+      match Behavior_set_map.find_opt bhvs acc with
+      | Some a' -> merge_assigns ~keep_empty:false a' a
+      | None -> a
+    in
+    Behavior_set_map.add bhvs a' acc
+  in
+  let treat_code_annot acc ca =
+    match ca.annot_content with
+    | AAssigns(bhvs,a) ->
+      merge_assigns (Datatype.String.Set.of_list bhvs) a acc
+    | _ -> acc
+  in
+  let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
+  Behavior_set_map.fold
+    (fun bhvs a acc ->
+       Logic_const.new_code_annotation
+         (AAssigns (Datatype.String.Set.elements bhvs, a))
+       :: acc)
+    bhvs []
+
+let merge_loop_assigns_emitters annots =
+  let merge_assigns bhvs (a,e) acc =
+    let elt =
+      match Behavior_set_map.find_opt bhvs acc with
+      | Some (a',e') ->
+        let a' = merge_assigns ~keep_empty:false a' a in
+        let e' = if Emitter.equal e e' then e else Emitter.kernel in
+        a', e'
+      | None -> a,e
+    in
+    Behavior_set_map.add bhvs elt acc
+  in
+  let treat_code_annot acc (ca,e) =
+    match ca.annot_content with
+    | AAssigns(bhvs,a) ->
+      merge_assigns (Datatype.String.Set.of_list bhvs) (a,e) acc
+    | _ -> acc
+  in
+  let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
+  Behavior_set_map.fold
+    (fun bhvs (a,e) acc ->
+       (Logic_const.new_code_annotation
+         (AAssigns (Datatype.String.Set.elements bhvs, a)),e)
+       :: acc)
+    bhvs []
+
+let partition_code_annot l =
+  let add_one_ca (contracts, assigns, others) ca =
+    if Logic_utils.is_contract ca then (ca::contracts,assigns,others)
+    else if Logic_utils.is_assigns ca then (contracts,ca::assigns,others)
+    else (contracts,assigns,ca::others)
+  in
+  let (contracts,assigns,others) = List.fold_left add_one_ca ([],[],[]) l in
+  List.rev contracts, List.rev assigns, List.rev others
+
+let partition_code_annot_emitter l =
+  let add_one_ca (contracts, assigns, others) (ca,_ as v) =
+    if Logic_utils.is_contract ca then (v::contracts,assigns,others)
+    else if Logic_utils.is_assigns ca then (contracts,v::assigns,others)
+    else (contracts,assigns,v::others)
+  in
+  let (contracts,assigns,others) = List.fold_left add_one_ca ([],[],[]) l in
+  List.rev contracts, List.rev assigns, List.rev others
 
 let code_annot ?emitter ?filter stmt =
   try
@@ -330,13 +426,11 @@ let code_annot ?emitter ?filter stmt =
         Emitter.Usable_emitter.Hashtbl.fold
           (fun _ l acc -> filter !l acc) tbl []
       in
-      let l1, l2 = List.partition Logic_utils.is_contract l in
-      (match l1 with
-       | [] -> l2
-       | _ -> (merge_stmt_contracts l1) @ l2)
+      let contracts, assigns, others = partition_code_annot l in
+      merge_stmt_contracts contracts @ merge_loop_assigns assigns @ others
     | Some e ->
-      (* No need to merge stmt contracts here: each emitter maintain one
-         statement contract per set of behavior. *)
+      (* No need to merge stmt contracts or loop assigns:
+         each emitter maintains one of each per set of behavior. *)
       let l = !(Emitter.Usable_emitter.Hashtbl.find tbl (Emitter.get e)) in
       match filter with
       | None -> l
@@ -362,17 +456,10 @@ let code_annot_emitter ?filter stmt =
       Emitter.Usable_emitter.Hashtbl.fold
         (fun e l acc -> filter e !l acc) tbl []
     in
-    let l1, l2 = List.partition (fun (x,_) -> Logic_utils.is_contract x) l in
-    match l1 with
-    | [] -> l2
-    | _ ->
-      let contracts, emitters = List.split l1 in
-      let e = List.hd emitters in
-      let emit =
-        if List.for_all (fun x -> Emitter.equal x e) emitters then e
-        else Emitter.kernel
-      in
-      (List.map (fun x -> (x, emit)) contracts) @ l2
+    let contracts,assigns,others = partition_code_annot_emitter l in
+    merge_stmt_contracts_emitters contracts @
+    merge_loop_assigns_emitters assigns @
+    others
   with Not_found ->
     []
 
@@ -1188,7 +1275,7 @@ let add_code_annot emitter ?kf stmt ca =
                     acc)
                ips l
          in
-         let ca' = code_annot ~emitter ~filter stmt in
+         let ca' = code_annot ~filter stmt in
          let new_a =
            match ca' with
            | [] -> a
