@@ -43,7 +43,8 @@ let add_allocates_nothing_funspec kf =
   let all_default _ alloc r = r && alloc = FreeAllocAny in
   let all_default = Annotations.fold_allocates all_default kf behavior true in
   if all_default then
-    Annotations.add_allocates Emitter.kernel kf ~behavior (FreeAlloc ([], []))
+    Annotations.add_allocates
+      ~keep_empty:false Emitter.kernel kf ~behavior (FreeAlloc ([], []))
 
 class vis_add_loop_allocates =
 object
