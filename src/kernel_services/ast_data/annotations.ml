@@ -401,7 +401,8 @@ let code_annot_emitter ?filter stmt =
         aux acc l
     in
     let l =
-      Emitter.Usable_emitter.Hashtbl.fold
+      Emitter.Usable_emitter.Hashtbl.fold_sorted
+        ~cmp:Emitter.Usable_emitter.compare
         (fun e l acc -> filter e !l acc) tbl []
     in
     let contracts,assigns,allocation,others = partition_code_annot_emitter l in
