@@ -188,29 +188,24 @@ account.
   about it, or ask directly on the merge request.
 \end{itemize}
 
-\section{Updating Frama-C-snapshot}
+\section{Updating pub/frama-c}
 
-You'll need a GitHub account with commit rights to Frama-C/Frama-C-snapshot.
-The release script \texttt{bin/build-src-distrib.sh} has prepared both the
-repository and the associated wiki (see section~\ref{sec:build-source-distr}).
+You'll need to be member of the \texttt{pub/frama-c} project to be able to
+commit to it.
 
 \begin{itemize}
-\item ensure that the sources in \texttt{Frama-C-snapshot} compile;
-  the following command must work:\\
-  \verb+./configure --prefix=/tmp/frama-c && make && make install+
-\item commit in branch \texttt{latest}
-\item tag the commit with the version number (including suffix for beta
-  releases), then push
-\item for a final release, merge \texttt{latest} into \texttt{master},
-  and push \texttt{master}
-\item in \texttt{Frama-C-snapshot.wiki}, update the new
-\texttt{Frama-C-VERSION.md} page with the list of main changes.
-\item Add your changes, commit and push
+\item add the \texttt{pub/frama-c} remote to your Git clone;
+\item make sure the last commit is tagged (either a release candidate, or a
+  final release);
+\item push the stable/\texttt{<codename>} branch to the \texttt{pub} remote.
 \end{itemize}
+
+({\em Non-beta only}) After pushing the tag to Gitlab, go to the Releases page
+and create a release for the tag.
 
 \section{Updating the BTS}
 
-\expertise{Usually Julien performs this step.}
+\expertise{Usually Julien performs this step. Soon to be obsoleted.}
 
 Each task marked as \texttt{Resolved} and really resolved in this release (say
 \texttt{VERSION}) must be marked as \texttt{Fixed in Version VERSION}, then
@@ -234,8 +229,9 @@ Check if other Frama-C (and related) repositories need to be updated:
 
 \begin{itemize}
 \item \texttt{acsl-language/acsl} (if last minute patches were applied)
-\item \texttt{Frama-C/open-source-case-studies}
-\item \texttt{Frama-C/sate-vi}
+\item \texttt{pub/open-source-case-studies}
+\item \texttt{pub/sate-6}
+\item other \texttt{pub} repositories related to Frama-C...
 \end{itemize}
 
 \section{Preparing the Next Release}
