@@ -324,7 +324,7 @@ let merge_loop_assigns_emitters annots =
     let elt =
       match Behavior_set_map.find_opt bhvs acc with
       | Some (a',e') ->
-        let a' = merge_assigns ~keep_empty:false a' a in
+        let a' = merge_assigns ~keep_empty:false a a' in
         let e' = if Emitter.equal e e' then e else Emitter.kernel in
         a', e'
       | None -> a,e
@@ -350,7 +350,7 @@ let merge_loop_allocation annots =
     let elt =
       match Behavior_set_map.find_opt bhvs acc with
       | Some (a', e') ->
-        let a' = merge_allocation ~keep_empty:false a' a in
+        let a' = merge_allocation ~keep_empty:false a a' in
         let e' = if Emitter.equal e e' then e else Emitter.kernel in
         a', e'
       | None -> a,e
@@ -377,7 +377,10 @@ let partition_code_annot_emitter l =
     else if Logic_utils.is_allocation ca then contracts,assigns,v::alloc,others
     else (contracts,assigns,alloc,v::others)
   in
-  List.fold_left add_one_ca ([],[],[],[]) l
+  let (contracts,assigns,alloc,others) =
+    List.fold_left add_one_ca ([],[],[],[]) l
+  in
+  List.(rev contracts, rev assigns, rev alloc, rev others)
 
 let code_annot_emitter ?filter stmt =
   try
@@ -409,7 +412,7 @@ let code_annot_emitter ?filter stmt =
     merge_stmt_contracts_emitters contracts @
     merge_loop_assigns_emitters assigns @
     merge_loop_allocation allocation @
-    List.rev others
+    others
   with Not_found ->
     []
 

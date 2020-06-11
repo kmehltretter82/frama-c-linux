@@ -275,8 +275,8 @@ int main(void)
   /*@ ghost main_pre_func(); */
   /*@ assigns X; */
   X ++;
-  /*@ assigns X, aorai_CurOpStatus, aorai_CurOperation, S1, S2, S_in_f, Sf,
-              in_main;
+  /*@ assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S_in_f, Sf,
+              in_main, X;
   */
   f();
   /*@ ghost main_post_func(X); */

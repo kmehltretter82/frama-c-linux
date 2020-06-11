@@ -213,7 +213,7 @@ int main(void)
   /*@ ghost main_pre_func(); */
   /*@ assigns X; */
   X ++;
-  /*@ assigns X, aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates; */
+  /*@ assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, X; */
   f();
   /*@ ghost main_post_func(X); */
   return X;
