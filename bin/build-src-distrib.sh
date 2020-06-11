@@ -54,57 +54,51 @@ run () {
   fi
 }
 
-GITHUB_DIR=./Frama-C-snapshot
-GITHUB_GIT="git@github.com:Frama-C/Frama-C-snapshot.git"
+GITLAB_DIR=./pub-frama-c
+GITLAB_GIT="git@git.frama-c.com:pub/frama-c.git"
 
-if test ! -d $GITHUB_DIR/.git; then
-    echo "WARNING: $GITHUB_DIR/.git directory not found; do you want to clone it? (y/n)"
+if test ! -d $GITLAB_DIR/.git; then
+    echo "WARNING: $GITLAB_DIR/.git directory not found; do you want to clone it? (y/n)"
     read CHOICE
     case "${CHOICE}" in
         "Y"|"y")
-            run "git clone $GITHUB_GIT"
+            run "git clone $GITLAB_GIT $GITLAB_DIR"
             ;;
         *)
-            echo "github's Frama-C-snapshot project must be linked at $GITHUB_DIR \
+            echo "gitlab's public Frama-C project must be linked at $GITLAB_DIR \
                  (clone or symbolic link)"
             exit 1
             ;&
     esac
 fi
-GITHUB_BRANCH=$(git --git-dir=$GITHUB_DIR/.git rev-parse --abbrev-ref HEAD)
-
-if test "$FINAL_RELEASE" = "yes" -a "$GITHUB_BRANCH" != "master"; then
-    echo "WARNING: your setup will commit (locally) a final release on a non-master branch of Frama-C-snapshot";
+GITLAB_BRANCH=$(git --git-dir=$GITLAB_DIR/.git rev-parse --abbrev-ref HEAD)
+if test "$FRAMAC_BRANCH" != "$GITLAB_BRANCH"; then
+    echo "WARNING: switching pub-frama-c to current branch $FRAMAC_BRANCH"
+    run "git -C $GITLAB_DIR checkout -b $FRAMAC_BRANCH"
 fi
-
-if test "$FINAL_RELEASE" = "no" -a "$GITHUB_BRANCH" = "master";
-then
-    echo "WARNING: your setup will commit (locally) an intermediate release on the master branch of Frama-C-snapshot"
-fi
-
-GITHUB_WIKI_GIT="git@github.com:Frama-C/Frama-C-snapshot.wiki.git"
-GITHUB_WIKI=./Frama-C-snapshot.wiki
-if test ! -d $GITHUB_WIKI/.git; then
-    echo "WARNING: $GITHUB_WIKI/.git directory not found; do you want to clone it? (y/n)"
+GITLAB_WIKI_GIT="git@git.frama-c.com:pub/frama-c.wiki"
+GITLAB_WIKI=./frama-c.wiki
+if test ! -d $GITLAB_WIKI/.git; then
+    echo "WARNING: $GITLAB_WIKI/.git directory not found; do you want to clone it? (y/n)"
     read CHOICE
     case "${CHOICE}" in
         "Y"|"y")
-            run "git clone $GITHUB_WIKI_GIT"
+            run "git clone $GITLAB_WIKI_GIT"
             ;;
         *)
-            echo "Frama-C-snapshot wiki must be linked at $GITHUB_WIKI \
+            echo "pub/frama-c wiki must be linked at $GITLAB_WIKI \
                  (clone or symbolic link)"
             exit 1
             ;&
     esac
 fi
-GITHUB_WIKI_BRANCH=$(git --git-dir=$GITHUB_WIKI/.git rev-parse --abbrev-ref HEAD)
+GITLAB_WIKI_BRANCH=$(git --git-dir=$GITLAB_WIKI/.git rev-parse --abbrev-ref HEAD)
 
-if test "$GITHUB_WIKI_BRANCH" != "master"; then
-    echo "WARNING: Frama-C-snapshot's wiki is not on the master branch";
+if test "$GITLAB_WIKI_BRANCH" != "master"; then
+    echo "WARNING: pub/frama-c's wiki is not on the master branch";
 fi
 
-ACSL_GIT="git@github.com:acsl-language/acsl.git"
+ACSL_GIT="git@gitlab.com:acsl-language/acsl.git"
 ACSL_DIR="./doc/acsl"
 if test \! -d $ACSL_DIR/.git ; then
     echo "WARNING: $ACSL_DIR/.git directory not found; do you want to clone it? (y/n)"
@@ -125,12 +119,6 @@ fi
 
 
 MANUALS_DIR="./doc/manuals"
-#if test \! -d $MANUALS_DIR/.git ; then
-#    echo "ERROR: $MANUALS_DIR/.git directory not found"
-#    echo "The Frama-C manuals repository must linked at $MANUALS_DIR (clone or symbolic link)"
-#    exit 1
-#fi
-#MANUALS_BRANCH=`git --git-dir=$MANUALS_DIR/.git rev-parse --abbrev-ref HEAD`
 
 # push on frama-c.com only for final releases
 if test "$FINAL_RELEASE" = "yes"; then
@@ -149,11 +137,10 @@ BUILD_DIR="$BUILD_DIR_ROOT/frama-c"
 echo "Frama-C Version         : $FRAMAC_VERSION"
 echo "Frama-C Branch          : $FRAMAC_BRANCH"
 echo "Final release           : $FINAL_RELEASE"
-echo "Frama-C-snapshot dir    : $GITHUB_DIR"
-echo "Frama-C-snapshot branch : $GITHUB_BRANCH"
-echo "Frama-C-snapshot wiki   : $GITHUB_WIKI"
+echo "pub/frama-c dir         : $GITLAB_DIR"
+echo "pub/frama-c branch      : $GITLAB_BRANCH"
+echo "pub/frama-c wiki        : $GITLAB_WIKI"
 echo "Manuals Dir             : $MANUALS_DIR"
-#echo "Manuals Branch          : $MANUALS_BRANCH"
 if test "$FINAL_RELEASE" = "yes"; then
 echo "Website Dir             : $WEBSITE_DIR"
 echo "Website Branch          : $WEBSITE_BRANCH"
@@ -198,15 +185,18 @@ case "${STEP}" in
       run "doc/build-manuals.sh"
     ;&
   1)
-    run "git -C $GITHUB_DIR reset --hard"
-    run "git -C $GITHUB_WIKI reset --hard"
+    run "git -C $GITLAB_DIR reset --hard"
+    run "git -C $GITLAB_WIKI reset --hard"
     if test "$FINAL_RELEASE" = "yes"; then
        run "git -C $WEBSITE_DIR reset --hard"
     fi
     ;&
   2)
     step 2 "BUILDING THE SOURCE DISTRIBUTION"
-    if ! git diff-index --quiet HEAD --; then
+    # WARNING! MUST RUN git update-index BEFORE git diff-index!
+    # See: https://stackoverflow.com/questions/36367190/git-diff-files-output-changes-after-git-status
+    run "git update-index --refresh"
+    if ! git diff-index HEAD --; then
         echo ""
         echo "### WARNING: uncommitted git changes will be discarded when creating archive!"
         echo "Proceed anyway? [y/N]"
@@ -227,15 +217,9 @@ case "${STEP}" in
     run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
     # sanity check: markdown-report must be distributed
     run "tar tf $BUILD_DIR/$TARGZ_FILENAME | grep -q src/plugins/markdown-report"
-    # cleanup Frama-C-snapshot
-    for file in $(git -C $GITHUB_DIR ls-files); do
-        run "rm $GITHUB_DIR/$file";
-    done
-    run "git -C $GITHUB_DIR clean -fx"
-    run "cd $GITHUB_DIR; tar --strip-components=1 -xzvf $BUILD_DIR/$TARGZ_FILENAME"
-    run "git -C $GITHUB_DIR add -A"
-    run "mkdir -p $GITHUB_WIKI/downloads"
-    run "cp $BUILD_DIR/$TARGZ_FILENAME $GITHUB_WIKI/downloads/"
+    # populate release assets in wiki
+    run "mkdir -p $GITLAB_WIKI/downloads"
+    run "cp $BUILD_DIR/$TARGZ_FILENAME $GITLAB_WIKI/downloads/"
     if test "$FINAL_RELEASE" = "yes"; then
         SPEC_FILE="$DOWNLOAD_DIR/$TARGZ_FILENAME"
         run "rm -f $WEBSITE_DIR/$SPEC_FILE"
@@ -284,83 +268,39 @@ case "${STEP}" in
   5)
     step 5 "COPYING AND STAGING THE DISTRIBUTED MANUALS"
       PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
-      WIKI_PAGE=$GITHUB_WIKI/$PAGE_NAME
-      run "mkdir -p $GITHUB_WIKI/manuals"
+      WIKI_PAGE=$GITLAB_WIKI/$PAGE_NAME
+      run "mkdir -p $GITLAB_WIKI/manuals"
       run "sed -i -e '/<!-- LAST RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITHUB_WIKI/Home.md"
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/Home.md"
+      if test "$FINAL_RELEASE" = "yes"; then
+          release_type="FINAL"
+      else
+          release_type="BETA"
+      fi
+      run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/_sidebar.md"
       echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
       echo "## Sources" >> $WIKI_PAGE
       echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
       echo "" >> $WIKI_PAGE
       echo "## Manuals" >> $WIKI_PAGE
-    for f in "user-manual" "acsl-implementation" "eva-manual" "plugin-development-guide" "rte-manual" "wp-manual" "metrics-manual" "aorai-manual"; do
-        echo "- [$f](manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
-        run "cp $MANUALS_DIR/$f.pdf $GITHUB_WIKI/manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-            RELE_FILE="$DOWNLOAD_DIR/frama-c-$f.pdf"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp $MANUALS_DIR/$f.pdf $WEBSITE_DIR/$SPEC_FILE";
-            run "ln -s $f-${FRAMAC_VERSION_AND_CODENAME}.pdf $WEBSITE_DIR/$RELE_FILE";
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $RELE_FILE"
-        fi
-    done
-    for f in "aorai-example"; do
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/$f-${FRAMAC_VERSION_AND_CODENAME}.tgz"
-            RELE_FILE="$DOWNLOAD_DIR/frama-c-$f.tgz"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp $MANUALS_DIR/$f.tgz $WEBSITE_DIR/$SPEC_FILE";
-            run "ln -s $f-${FRAMAC_VERSION_AND_CODENAME}.tgz $WEBSITE_DIR/$RELE_FILE";
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $RELE_FILE"
-        fi
-    done
+      for fpath in $MANUALS_DIR/*; do
+          f=$(basename $fpath)
+          f_no_ext=${f%.*}
+          if [[ $f =~ ^frama-c ]]; then
+              echo "Skipping adding link to $f in wiki"
+              continue
+          fi
+          if [[ $f_no_ext = *${FRAMAC_VERSION_AND_CODENAME} ]]; then
+              echo "Skipping adding link to $f in wiki"
+              continue
+          fi
+          echo "- [$f](manuals/$f)" >> $WIKI_PAGE
+          run "cp $fpath $GITLAB_WIKI/manuals/"
+          run "git -C $GITLAB_WIKI add manuals/$f"
+      done
 
-    for f in "acsl"; do
-      ACSL_VERSION=`cat doc/acsl/ACSL_VERSION`
-      if test "$FINAL_RELEASE" = "yes"; then
-          SPEC_FILE="$DOWNLOAD_DIR/${f}-${ACSL_VERSION}.pdf"
-          RELE_FILE="$DOWNLOAD_DIR/$f.pdf"
-          run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-          run "cp $MANUALS_DIR/$f.pdf $WEBSITE_DIR/$SPEC_FILE";
-          run "ln -s ${f}-${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
-          run "git -C $WEBSITE_DIR add $SPEC_FILE"
-          run "git -C $WEBSITE_DIR add $RELE_FILE"
-      fi
-    done
-    for f in "e-acsl-manual" "e-acsl-implementation"; do
-        echo "- [$f](manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf)" >> $WIKI_PAGE
-        run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf"
-            RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
-            run "ln -s ${f}-${FRAMAC_VERSION_AND_CODENAME}.pdf $WEBSITE_DIR/$RELE_FILE";
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $RELE_FILE"
-        fi
-    done
-    # E-ACSL manuals based on ACSL version number
-    for f in "e-acsl"; do
-        echo "- [$f](manuals/${f}-${ACSL_VERSION}.pdf)" >> $WIKI_PAGE
-        run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $GITHUB_WIKI/manuals/${f}-${ACSL_VERSION}.pdf"
-        run "git -C $GITHUB_WIKI add manuals/${f}-${ACSL_VERSION}.pdf"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/e-acsl/${f}-${ACSL_VERSION}.pdf"
-            RELE_FILE="$DOWNLOAD_DIR/e-acsl/$f.pdf"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp src/plugins/e-acsl/doc/manuals/$f.pdf $WEBSITE_DIR/$SPEC_FILE"
-            run "ln -s ${f}-${ACSL_VERSION}.pdf $WEBSITE_DIR/$RELE_FILE";
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $RELE_FILE"
-        fi
-    done
-    run "git -C $GITHUB_WIKI add $PAGE_NAME"
+    run "git -C $GITLAB_WIKI add $PAGE_NAME"
     ;;
   *)
     echo "Bad entry: ${STEP}"

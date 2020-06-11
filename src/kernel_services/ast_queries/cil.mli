@@ -1216,7 +1216,7 @@ val dropAttributes: string list -> attributes -> attributes
 
 (** A block marked with this attribute is known to be a ghost else.
 
-    @since 19.0-Potassium+dev
+    @since 21.0-Scandium
 *)
 val frama_c_ghost_else: string
 

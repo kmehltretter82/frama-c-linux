@@ -129,8 +129,9 @@ following tools:
 #### Prerequisites: WSL + a Linux distribution
 
 For enabling WSL on Windows, you may follow these instructions
-(we tested with Ubuntu 18.04 LTS; other distributions/versions should also
-work, but the instructions below may require some modifications).
+(we tested with Ubuntu 18.04 LTS;
+other distributions/versions should also work,
+but the instructions below may require some modifications).
 
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
@@ -170,7 +171,7 @@ For installing opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
 ```
-sudo add-apt-repository -y ppa:avsm/ppa
+sudo add-apt-repository -y ppa:avsm/ppa # unnecessary for Ubuntu 20.04
 sudo apt update
 sudo apt upgrade
 sudo apt install make m4 gcc opam

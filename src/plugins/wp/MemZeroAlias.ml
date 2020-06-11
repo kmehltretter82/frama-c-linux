@@ -183,6 +183,8 @@ let domain _obj l =
   try Heap.Set.singleton (fst (access l))
   with _ -> Heap.Set.empty
 
+let is_well_formed _s = p_true
+
 let value sigma l =
   let m,ks = access l in
   let x = Sigma.get sigma m in

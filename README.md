@@ -113,6 +113,6 @@ via the GUI:
 - The [Frama-C wiki](https://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:start)
   has some useful information, although it is not entirely up-to-date.
 
-- The [Frama-C blog](http://blog.frama-c.com/) has several posts about
+- The [Frama-C blog](http://pub.frama-c.com/blog) has several posts about
   new developments of Frama-C, as well as general discussions about the C
   language, undefined behavior, floating-point computations, etc.

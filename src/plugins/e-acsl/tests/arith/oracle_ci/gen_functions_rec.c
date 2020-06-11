@@ -105,18 +105,6 @@ int main(void)
   return __retres;
 }
 
-int __gen_e_acsl_g(int n)
-{
-  int __retres = 0;
-  return __retres;
-}
-
-int __gen_e_acsl_g_5(long n)
-{
-  int __retres = 0;
-  return __retres;
-}
-
 int __gen_e_acsl_f3(int n)
 {
   int __gen_e_acsl_if_6;
@@ -315,6 +303,18 @@ int __gen_e_acsl_f2_2(long n)
     __gen_e_acsl_if_3 = (__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8;
   }
   return __gen_e_acsl_if_3;
+}
+
+int __gen_e_acsl_g(int n)
+{
+  int __retres = 0;
+  return __retres;
+}
+
+int __gen_e_acsl_g_5(long n)
+{
+  int __retres = 0;
+  return __retres;
 }
 
 

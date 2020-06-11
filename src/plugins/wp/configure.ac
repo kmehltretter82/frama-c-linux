@@ -48,40 +48,35 @@ plugin_use(wp,gui)
 
 # Why3 API dependency
 ######################
-# REQUIRE_LIBRARY: library *must* be present in order to build plugins
-# USE_LIBRARY: better for plugins if library is present, but not required
-# HAS_LIBRARY: is the library available?
 
-REQUIRE_WHY3=
-USE_WHY3=
-HAS_WHY3=
+configure_pkg(why3,[package why3 not found])
 
-AC_MSG_CHECKING(for why3 (>= 1.3.1))
-WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
-case $WHY3VERSION in
-      0.* | 1.[[012]].* | 1.3.0)
-        AC_MSG_ERROR(found why3 $WHY3VERSION: requires 1.3.1 or higher.);;
-      *)
-        AC_MSG_RESULT(found $WHY3VERSION: should work);;
-esac
-
-WHY3_PATH=`ocamlfind query why3 | tr -d '\\r\\n'`
-WHY3PATH_FOR_CONFIGURE=$WHY3_PATH
-
-configure_library([WHY3],
-                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX],
-                  [$WHY3PATH_FOR_CONFIGURE/why3.$LIB_SUFFIX not found.],
-                  no)
-
-
-plugin_require_external(wp,why3)
-
-AC_SUBST(HAS_WHY3)
-
+plugin_require_pkg(wp,why3)
 
 check_plugin_dependencies
 
-# NB: this would deserve to use plugin_requires mechanism
+if test "$HAS_OCAML_WHY3" = "yes"; then
+AC_MSG_CHECKING(why3 version)
+WHY3VERSION=`ocamlfind query -format %v why3 | tr -d '\\r\\n'`
+case $WHY3VERSION in
+      "")
+        AC_MSG_RESULT([not found!])
+        plugin_disable(wp,[why3 not found])
+        ;;
+      0.* | 1.[[012]].* | 1.3.0)
+        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
+        plugin_disable(wp,[non-supported why3 $WHY3VERSION])
+        ;;
+      1.3.*)
+        AC_MSG_RESULT([found $WHY3VERSION: ok])
+        ;;
+      *)
+        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.1+)])
+        ;;
+esac
+fi
+
+# Nb: this would deserve to use plugin_requires mechanism
 if test "$ENABLE_WP" != "no"; then
 
   ## Configuring for WP-COQ

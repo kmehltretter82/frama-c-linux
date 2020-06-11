@@ -1267,6 +1267,9 @@ struct
           (fun m s -> Heap.Set.add (Mem m) s)
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty
 
+  let is_well_formed sigma =
+    M.is_well_formed sigma.mem
+
   (* -------------------------------------------------------------------------- *)
 
 end

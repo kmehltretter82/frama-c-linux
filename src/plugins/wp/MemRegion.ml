@@ -700,6 +700,8 @@ let domain _obj = function
   | Lfld(_,_,_,ovl) -> Heap.of_overlay (map()) ovl
   | Larr(r,_,_,_,_,_) -> Heap.of_region (map()) r
 
+let is_well_formed _s = Lang.F.p_true
+
 let region_of_loc = function
   | (GarbledMix | Index _) as l -> error "Can not find region of %a" pretty l
   | Lref(r,_,_) | Lraw(r,_,_,_) | Lmem(r,_,_,_)

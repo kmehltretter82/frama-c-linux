@@ -28,6 +28,6 @@
 [eva:alarm] tests/gmp-only/functions.c:25: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp-only/functions.c:68: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__15);
+  non-finite double value. assert \is_finite(__gen_e_acsl_cast);
 [eva:alarm] tests/gmp-only/functions.c:68: Warning: 
   function __e_acsl_assert: precondition got status unknown.

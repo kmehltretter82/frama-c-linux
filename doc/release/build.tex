@@ -2,6 +2,16 @@
 
 The procedure for creating the source distribution.
 
+\section{Prerequisites}
+
+\begin{itemize}
+\item All tools needed to compile Frama-C (that you should have anyways)
+\item \texttt{bash} v4.0 or higher
+\item \texttt{git-lfs}
+\item GNU \texttt{parallel}
+\item a \TeX distribution
+\end{itemize}
+
 \section{Final checks}
 
 \begin{itemize}
@@ -21,8 +31,9 @@ The procedure for creating the source distribution.
   \begin{itemize}
   \item In particular, check and update a full known good configuration for
     opam packages, including alt-ergo, why3, coq, etc.
-    Use \verb+ptests.opt -config qualif src/plugins/wp/tests+ to help check if
-    the configuration is ok.
+    Use \verb+bin/check-reference-configuration.sh+ to help check if the
+    configuration is ok. You can also try running
+    \verb+ptests.opt -config qualif src/plugins/wp/tests+.
   \end{itemize}
 \item Check the contents of \texttt{README.md} \todo{Should always be up to date}
 \item Check the contents of \texttt{Changelog}
@@ -137,7 +148,7 @@ manuals.
 %\texttt{install} target below).
 
 Run the script \texttt{doc/build-manuals.sh} to compile and install all manuals,
-even for E-ACSL.
+even for E-ACSL. Note that this script requires \texttt{GNU parallel}.
 
 Otherwise, if you want to do it \textbf{manually}, in each directory:
 \begin{shell}
@@ -226,15 +237,13 @@ website git.
 \texttt{build-src-distrib.sh} for this purpose (\texttt{bash version
   4} required) after cloning the following repositories
 \begin{itemize}
-\item \texttt{Frama-C-snapshot} (\texttt{git@github.com:Frama-C/Frama-C-snapshot}),
-\item \texttt{Frama-C-snapshot.wiki} (\texttt{git@github.com:Frama-C/Frama-C-snapshot.wiki}), and
+\item \texttt{pub-frama-c} (\texttt{git@git.frama-c.com:pub/frama-c}),
+\item \texttt{frama-c.wiki} (\texttt{git@git.frama-c.com:pub/frama-c.wiki}), and
 \item \texttt{website} (\texttt{git@git.frama-c.com:frama-c/website})
 \end{itemize}
 in the root directory of Frama-C. The last one is only needed when creating a
-final release. Release candidates are only put on github and require only
-\texttt{Frama-C-snapshot} and its associated wiki. Branch on
-\texttt{Frama-C-snapshot} should be \texttt{latest} for every release
-(for final releases, \texttt{latest} is merged into \texttt{master} at the end).
+final release. Release candidates are pushed as a branch \texttt{stable/<codename>}
+and added to the \texttt{pub/frama-c} wiki.
 For \texttt{website}, a new branch should be created over \texttt{online}.
 
 Finally, ensure that locale \verb+en_US.UTF-8+ is available on your system,
@@ -255,22 +264,12 @@ Please check that the distribution (sources and API) is OK:
   \item run \texttt{<path-to-frama-c-git-clone>/doc/release/checktar.sh}
     (CWD must be where the tar was extracted). Fix issues and/or update
     the script if needed.
-  \item On a pristine clone of the Github Frama-C-snapshot repository
-    (e.g. the one created a few steps before),
-  compare the untared directory and the Github clone using e.g. \texttt{meld},
-  to see if there are suspicious newly-added files or directories (indicating
-  e.g. that the .tar.gz was created on a non-clean environment).
-  Note that comparing file contents is irrelevant at this stage, since
-  there are likely too many differences between this and the last release
-  (unless the previous one was a beta, in which case differences should be
-  small).
-  However, check for post-release commits (namely to \texttt{opam/opam}) and
-  see if there are changes that were forgotten to be ported back to Frama-C's git.
-\end{enumerate}
+  \end{enumerate}
 \item check for possible path/environment leaks in the \texttt{tar.gz}:
   grep for the path where your Frama-C git directory is, e.g.
   \texttt{/home/user/git/frama-c}. It should appear nowhere in the archive.
-\item check that \texttt{./configure \&\& make \&\& sudo make install} works fine;
+\item check that \texttt{./configure \&\& make -j \&\& sudo make install} works fine
+  (or check e.g. \texttt{./configure --prefix=\$PWD/build \&\& make -j \&\& make install});
 \item test the installed binaries (especially the GUI). (On Linux, OCI tests
   everything but the GUI);
 \item redo the two steps above on Windows/WSL \expertise{André/Allan}, macOS
@@ -280,7 +279,7 @@ Please check that the distribution (sources and API) is OK:
   \item \verb+./configure --prefix="$PWD/build"+
   \item \verb+make+;
   \item \verb+make install+;
-  \item \verb+rm -f ~/.why3.conf; why3 config+;
+  \item \verb+rm -f ~/.why3.conf; why3 config --full-config+;
   \item \verb+build/bin/frama-c tests/idct/*.c -eva -wp -wp-rte+
   \item If you have a GUI, replace \verb+frama-c+ above with \verb+frama-c-gui+
     and click around, see if things work (e.g. no segmentation faults).
@@ -289,6 +288,9 @@ Please check that the distribution (sources and API) is OK:
   \texttt{index.html} in a browser, click on a few links, etc).
   If there are minor bugs/typos, note them for later, but it's not
   worth delaying the release to fix them.
+\item consider decompressing both the current and the previous release archives
+  in different directories, then using \texttt{meld} to compare them. This
+  allows spotting if some files were unexpectedly added, for instance.
 \end{enumerate}
 
 

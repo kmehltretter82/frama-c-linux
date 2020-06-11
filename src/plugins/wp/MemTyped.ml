@@ -117,7 +117,7 @@ let pointer = Context.create "MemTyped.pointer"
 (* -------------------------------------------------------------------------- *)
 
 type chunk =
-  | M_int
+  | M_int of Ctypes.c_int
   | M_char
   | M_f32
   | M_f64
@@ -128,16 +128,27 @@ module Chunk =
 struct
   type t = chunk
   let self = "typed"
+  let int_rank = function
+    | CBool -> 0
+    | UInt8 -> 1
+    | SInt8 -> 2
+    | UInt16 -> 3
+    | SInt16 -> 4
+    | UInt32 -> 5
+    | SInt32 -> 6
+    | UInt64 -> 7
+    | SInt64 -> 8
+
   let rank = function
-    | M_int -> 0
-    | M_char -> 1
-    | M_f32 -> 2
-    | M_f64 -> 3
-    | M_pointer -> 4
-    | T_alloc -> 5
+    | M_char -> -1
+    | M_int i -> int_rank i
+    | M_f32 -> 9
+    | M_f64 -> 10
+    | M_pointer -> 11
+    | T_alloc -> 12
   let hash = rank
   let name = function
-    | M_int -> "Mint"
+    | M_int _ -> "Mint"
     | M_char -> "Mchar"
     | M_f32 -> "Mf32"
     | M_f64 -> "Mf64"
@@ -147,13 +158,13 @@ struct
   let equal = (=)
   let pretty fmt c = Format.pp_print_string fmt (name c)
   let val_of_chunk = function
-    | M_int | M_char -> L.Int
+    | M_int _ | M_char -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
     | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
   let tau_of_chunk = function
-    | M_int | M_char -> L.Array(t_addr,L.Int)
+    | M_int _ | M_char -> L.Array(t_addr,L.Int)
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
@@ -171,7 +182,7 @@ type loc = term (* of type addr *)
 (* --- Utilities on locations                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let m_int i = if Ctypes.is_char i then M_char else M_int
+let m_int i = if Ctypes.is_char i then M_char else M_int i
 let m_float = function Float32 -> M_f32 | Float64 -> M_f64
 
 let rec footprint = function
@@ -870,6 +881,51 @@ let frames obj addr = function
       let tau = Chunk.val_of_chunk m in
       let basename = Chunk.basename_of_chunk m in
       MemMemory.frames ~addr ~offset ~sizeof ~basename tau
+
+(* -------------------------------------------------------------------------- *)
+(* --- Chunk element type                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+module ChunkContent = WpContext.Generator(Chunk)
+    (struct
+      let name = "MemTyped.ChunkContent"
+      type key = Chunk.t
+      type data = lfun
+
+      let int_kind = function
+        | M_char -> Ctypes.c_char ()
+        | M_int k -> k
+        | _ -> failwith "MemTyped asked constraint for non int type"
+
+      let generate c =
+        let k = int_kind c in
+        let p = Lang.freshvar ~basename:"m" (Chunk.tau_of_chunk c) in
+        let m = e_var p in
+        let name = Format.asprintf "is_%a_chunk" Ctypes.pp_int k in
+        let lfun = Lang.generated_p name in
+        let l = Lang.freshvar ~basename:"l" (Lang.t_addr()) in
+        let is_int = Cint.range k in
+        let def = p_forall [l] (is_int (F.e_get m (e_var l))) in
+        Definitions.define_symbol {
+          d_lfun = lfun ; d_types = 0 ;
+          d_params = [p] ;
+          d_definition = Predicate(Def, def) ;
+          d_cluster = cluster ~id:"Chunk" ~title:"Chunk type constraint" () ;
+        } ;
+        lfun
+
+      let compile = Lang.local generate
+    end)
+
+let is_chunk sigma = function
+  | M_int _ | M_char as m ->
+      F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
+  | _ ->
+      p_true
+
+let is_well_formed sigma =
+  let open Sigma in
+  p_conj (Chunk.Set.fold (fun c l -> is_chunk sigma c :: l) (domain sigma) [])
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loader                                                             --- *)
