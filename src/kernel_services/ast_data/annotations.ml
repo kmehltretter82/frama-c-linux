@@ -352,7 +352,14 @@ let code_annot_emitter ?filter stmt =
   try
     let tbl = Code_annots.find stmt in
     let filter e l acc =
-      let e = Emitter.Usable_emitter.get e in
+      let e =
+        try Emitter.Usable_emitter.get e
+        with Not_found ->
+          (* in some cases, e.g. when loading a state with a different set
+             of plugins loaded, the original emitter might not be available,
+             leading to discarding annotations. Let the kernel adopt them. *)
+          Emitter.kernel
+      in
       match filter with
       | None -> List.map (fun a -> a, e) l @ acc
       | Some f ->

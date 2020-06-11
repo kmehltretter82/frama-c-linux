@@ -16,6 +16,9 @@ module S =
 module S2 =
   P.False(struct let option_name = "-s2" let help = "" end)
 
+module Enabled =
+  P.True(struct let option_name = "-my-visitor" let help = "" end)
+
 let emitter1 = 
   Emitter.create "emitter1" [ Emitter.Code_annot ]
     ~correctness:[ S.parameter ] ~tuning:[]
@@ -64,28 +67,32 @@ let print () =
   Kernel.log "================================"
 
 let main () =
-  (* The initial AST *)
-  print ();
-  let file = Ast.get () in
-  ignore (Cil.visitCilFileSameGlobals (new foo:>cilVisitor) file);
-  (* The AST with all asserts *)
-  print ();
-  Kernel.SafeArrays.set false;
-  Project.clear 
-    ~selection:(State_selection.Static.with_dependencies S.self) ();
-  (* The AST with 1/2 asserts *)
-  print ()
+  if Enabled.get() then begin
+    (* The initial AST *)
+    print ();
+    let file = Ast.get () in
+    ignore (Cil.visitCilFileSameGlobals (new foo:>cilVisitor) file);
+    (* The AST with all asserts *)
+    print ();
+    Kernel.SafeArrays.set false;
+    Project.clear
+      ~selection:(State_selection.Static.with_dependencies S.self) ();
+    (* The AST with 1/2 asserts *)
+    print ()
+  end
 
 let () = Db.Main.extend main
 
 (* This other main is a simple test for deep copy. *)
 
 let main () =
-  let p = File.create_project_from_visitor "param" (new Visitor.frama_c_copy) in
-  let selection = State_selection.singleton Kernel.LibEntry.self in
-  Project.copy ~selection p;
-  Kernel.LibEntry.on ();
-  assert (Kernel.LibEntry.get ());
-  assert (Project.on p ~selection (fun () -> not (Kernel.LibEntry.get ())) ())
+  if Enabled.get() then begin
+    let p = File.create_project_from_visitor "param" (new Visitor.frama_c_copy) in
+    let selection = State_selection.singleton Kernel.LibEntry.self in
+    Project.copy ~selection p;
+    Kernel.LibEntry.on ();
+    assert (Kernel.LibEntry.get ());
+    assert (Project.on p ~selection (fun () -> not (Kernel.LibEntry.get ())) ())
+  end
 
 let () = Db.Main.extend main
