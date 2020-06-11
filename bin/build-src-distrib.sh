@@ -272,6 +272,13 @@ case "${STEP}" in
       run "mkdir -p $GITLAB_WIKI/manuals"
       run "sed -i -e '/<!-- LAST RELEASE -->/a \
 - [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/Home.md"
+      if test "$FINAL_RELEASE" = "yes"; then
+          release_type="FINAL"
+      else
+          release_type="BETA"
+      fi
+      run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/_sidebar.md"
       echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
       echo "## Sources" >> $WIKI_PAGE
       echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
