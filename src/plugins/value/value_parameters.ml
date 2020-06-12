@@ -918,13 +918,13 @@ module BuiltinsOverrides =
         begin match nameopt with
           | Some name ->
             if not (!Db.Value.mem_builtin name) then
-              abort "option '-val-builtin %a:%s': undeclared builtin '%s'@.\
+              abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
                      declared builtins: @[%a@]"
                 Kernel_function.pretty kf name name
                 (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
                 (List.map fst (!Db.Value.registered_builtins ()))
           | _ -> abort
-                   "option '-val-builtin':@ \
+                   "option '-eva-builtin':@ \
                     no builtin associated to function '%a',@ use '%a:<builtin>'"
                    Kernel_function.pretty kf Kernel_function.pretty kf
         end;
@@ -941,6 +941,12 @@ module BuiltinsOverrides =
     end)
 let () = add_precision_dep BuiltinsOverrides.parameter
 let () = BuiltinsOverrides.add_aliases ["-val-builtin"]
+
+(* Exported in Eva.mli. *)
+let use_builtin key name =
+  if !Db.Value.mem_builtin name
+  then BuiltinsOverrides.add (key, Some name)
+  else raise Not_found
 
 let () = Parameter_customize.set_group precision_tuning
 module BuiltinsAuto =
