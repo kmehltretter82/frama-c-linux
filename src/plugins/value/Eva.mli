@@ -36,8 +36,9 @@ module Value_parameters: sig
   (** Returns the list (name, descr) of currently enabled abstract domains. *)
   val enabled_domains: unit -> (string * string) list
 
-  (** [use_builtin kf b] adds a builtin override for function [kf] to
-      builtin {!b}. *)
+  (** [use_builtin kf name] instructs the analysis to use the builtin [name]
+      to interpret calls to function [kf].
+      Raises [Not_found] if there is no builtin of name [name]. *)
   val use_builtin: Cil_types.kernel_function -> string -> unit
 end
 

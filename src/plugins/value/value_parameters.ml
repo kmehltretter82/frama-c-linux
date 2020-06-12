@@ -941,8 +941,12 @@ module BuiltinsOverrides =
     end)
 let () = add_precision_dep BuiltinsOverrides.parameter
 let () = BuiltinsOverrides.add_aliases ["-val-builtin"]
-let use_builtin key value =
-  BuiltinsOverrides.add (key, Some value)
+
+(* Exported in Eva.mli. *)
+let use_builtin key name =
+  if !Db.Value.mem_builtin name
+  then BuiltinsOverrides.add (key, Some name)
+  else raise Not_found
 
 let () = Parameter_customize.set_group precision_tuning
 module BuiltinsAuto =
