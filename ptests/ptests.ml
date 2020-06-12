@@ -1110,6 +1110,16 @@ let command_string command =
   in
   let res = Filename.sanitize (log_prefix ^ ".res.log") in
   let command_string = command_string ^ " >" ^ res in
+  let command_string =
+    match command.timeout with
+      | "" -> command_string
+      | s ->
+          Printf.sprintf
+            "%s; if test $? -eq 124; then \
+               echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+             fi"
+            command_string s (Filename.sanitize stderr)
+  in
   let command_string = match filter with
     | None -> command_string
     | Some filter ->
