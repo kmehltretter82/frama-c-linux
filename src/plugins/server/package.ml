@@ -20,6 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+
+module Md = Markdown
+
+(* -------------------------------------------------------------------------- *)
+
 type plugin = Kernel | Plugin of string
 type package = { plugin: plugin; pkgname: string list }
 type ident = package * string
@@ -56,6 +62,8 @@ module PkgMap =
 module IdMap =
   Map.Make(struct type t = ident let compare = Stdlib.compare end)
 
+module NameSet = Set.Make(String)
+
 module Scope =
 struct
 
@@ -90,6 +98,7 @@ struct
     mutable clashes : bool ;
     mutable index : (name,(ident * int) list) Hashtbl.t ;
     mutable names : name IdMap.t ;
+    mutable reserved : NameSet.t ;
   }
 
   let create source = {
@@ -97,11 +106,18 @@ struct
     index = Hashtbl.create 0 ;
     clashes = false ;
     names = IdMap.empty ;
+    reserved = NameSet.empty ;
   }
+
+  let rec non_reserved scope id rk =
+    match ranked_name scope.source id rk with
+    | [a] when NameSet.mem a scope.reserved ->
+      non_reserved scope id (succ rk)
+    | ns -> ns , rk
 
   let push scope id rk =
     begin
-      let name = ranked_name scope.source id rk in
+      let name, rk = non_reserved scope id rk in
       scope.names <- IdMap.add id name scope.names ;
       let index = scope.index in
       match Hashtbl.find_opt index name with
@@ -112,6 +128,12 @@ struct
     end
 
   let use scope id = push scope id 0
+
+  let reserve_name scope name =
+    assert (IdMap.is_empty scope.names) ;
+    scope.reserved <- NameSet.add name scope.reserved
+
+  let reserve_ident scope (_,id) = reserve_name scope id
 
   let rec resolve scope =
     if not scope.clashes then scope.names else
@@ -139,7 +161,7 @@ end
 (* --- JSON Datatypes                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type json =
+type jtype =
   | Jany
   | Jnull
   | Jboolean
@@ -147,27 +169,97 @@ type json =
   | Jstring
   | Jtag of string
   | Jkind of string
-  | Joption of json
-  | Jassoc of string * json
-  | Jarray of json
-  | Jtuple of json list
-  | Junion of json list
-  | Jrecord of (string * json) list
+  | Joption of jtype
+  | Jassoc of string * jtype
+  | Jarray of jtype
+  | Jtuple of jtype list
+  | Junion of jtype list
+  | Jrecord of (string * jtype) list
   | Jdata of ident
 
-let rec iter fn = function
+(* -------------------------------------------------------------------------- *)
+(* --- Declarations                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type fieldInfo = {
+  fd_name: string;
+  fd_type: jtype;
+  fd_descr: Markdown.text;
+}
+
+type paramInfo =
+  | P_value of jtype
+  | P_named of fieldInfo list
+
+type requestInfo = {
+  rq_kind: [ `GET | `SET | `EXEC ];
+  rq_input: paramInfo ;
+  rq_output: paramInfo ;
+}
+
+type declKindInfo =
+  | D_signal
+  | D_type of jtype
+  | D_record of fieldInfo list
+  | D_request of requestInfo
+
+type declInfo = {
+  d_ident : ident;
+  d_kind : declKindInfo;
+  d_title : Markdown.text;
+  d_descr : Markdown.block;
+}
+
+type packageInfo = {
+  d_package : package;
+  d_content : declInfo Bag.t;
+}
+
+(* -------------------------------------------------------------------------- *)
+(* --- Visitors                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec visit_jtype fn = function
   | Jany | Jnull | Jboolean | Jnumber
   | Jstring | Jkind _ | Jtag _ -> ()
-  | Joption js | Jassoc(_,js)  | Jarray js -> iter fn js
-  | Jtuple js | Junion js -> List.iter (iter fn) js
-  | Jrecord fjs -> List.iter (fun (_,js) -> iter fn js) fjs
+  | Joption js | Jassoc(_,js)  | Jarray js -> visit_jtype fn js
+  | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
+  | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
   | Jdata id -> fn id
 
-(* -------------------------------------------------------------------------- *)
-(* --- JSON MarkDown                                                      --- *)
-(* -------------------------------------------------------------------------- *)
+let visit_field f { fd_type } = visit_jtype f fd_type
 
-module Md = Markdown
+let visit_param f = function
+  | P_value js -> visit_jtype f js
+  | P_named fds -> List.iter (visit_field f) fds
+
+let visit_request f { rq_input ; rq_output } =
+  ( visit_param f rq_input ; visit_param f rq_output )
+
+let visit_dkind f = function
+  | D_signal -> ()
+  | D_type js -> visit_jtype f js
+  | D_record fds -> List.iter (visit_field f) fds
+  | D_request rq -> visit_request f rq
+
+let visit_decl f { d_kind } = visit_dkind f d_kind
+
+let visit_package_def f { d_content } =
+  Bag.iter (fun { d_ident } -> f d_ident) d_content
+
+let visit_package_used f { d_content } =
+  Bag.iter (visit_decl f) d_content
+
+let package_resolve ?(keywords=[]) pkg =
+  let scope = Scope.create pkg.d_package.plugin in
+  List.iter (Scope.reserve_name scope) keywords ;
+  visit_package_def (Scope.reserve_ident scope) pkg ;
+  visit_package_used (Scope.use scope) pkg ;
+  IdMap.map (String.concat "_") (Scope.resolve scope)
+
+(* -------------------------------------------------------------------------- *)
+(* --- JSON To MarkDown                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let escaped tag = Md.code (Printf.sprintf "\"%s\"" @@ String.escaped tag)
 
@@ -176,7 +268,7 @@ type pp = {
   kind: string -> Md.text ;
 }
 
-let rec text pp = function
+let rec md_jtype pp = function
   | Jany -> Md.emph "any"
   | Jnull -> Md.emph "null"
   | Jnumber -> Md.emph "number"
@@ -186,35 +278,36 @@ let rec text pp = function
   | Jkind kd -> pp.kind kd
   | Jdata id -> pp.data id
   | Joption js -> protect pp js @ Md.code "?"
-  | Jtuple js -> Md.code "[" @ list pp "," js @ Md.code "]"
-  | Junion js -> list pp "|" js
+  | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
+  | Junion js -> md_jlist pp "|" js
   | Jarray js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
   | Jassoc (id,js) ->
-    Md.code "{[" @ pp.kind id @ Md.code "]:" @ text pp js @ Md.code "}"
+    Md.code "{[" @ pp.kind id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
 
-and list pp sep js = Md.glue ~sep:(Md.plain sep)  (List.map (text pp) js)
+and md_jlist pp sep js =
+  Md.glue ~sep:(Md.plain sep)  (List.map (md_jtype pp) js)
 
 and fields pp fjs =
   Md.glue ~sep:(Md.plain ",") @@
   List.map (fun (fd,js) ->
       escaped fd @
       match js with
-      | Joption js -> Md.code ":?" @ text pp js
-      | _ -> Md.code ":" @ text pp js
+      | Joption js -> Md.code ":?" @ md_jtype pp js
+      | _ -> Md.code ":" @ md_jtype pp js
     ) fjs
 
 and protect names js =
   match js with
-  | Junion _ -> Md.code "(" @ text names js @ Md.code ")"
-  | _ -> text names js
+  | Junion _ -> Md.code "(" @ md_jtype names js @ Md.code ")"
+  | _ -> md_jtype names js
 
-let pretty fmt js =
+let pp_jtype fmt js =
   let scope = Scope.create Kernel in
-  iter (Scope.use scope) js ;
+  visit_jtype (Scope.use scope) js ;
   let ns = Scope.resolve scope in
   let kind id = Md.code (Printf.sprintf "#%s" id) in
   let data id = Md.emph (Scope.name_of ns id) in
-  Markdown.pp_text fmt (text { kind ; data } js)
+  Markdown.pp_text fmt (md_jtype { kind ; data } js)
 
 (* -------------------------------------------------------------------------- *)
