@@ -287,17 +287,33 @@ case "${STEP}" in
       for fpath in $MANUALS_DIR/*; do
           f=$(basename $fpath)
           f_no_ext=${f%.*}
-          if [[ $f =~ ^frama-c ]]; then
-              echo "Skipping adding link to $f in wiki"
-              continue
+          # E-ACSL-related files are stored in subdirectory e-acsl
+          if [[ $f_no_ext =~ ^e-acsl.*$ ]]; then
+              destdir="$WEBSITE_DIR/$DOWNLOAD_DIR/e-acsl"
+          else
+              destdir="$WEBSITE_DIR/$DOWNLOAD_DIR"
           fi
-          if [[ $f_no_ext = *${FRAMAC_VERSION_AND_CODENAME} ]]; then
-              echo "Skipping adding link to $f in wiki"
-              continue
+          if [[ -L $fpath ]]; then
+              # symbolic links are copied to the website and prepended with 'frama-c-'
+              # (except for acsl.pdf, which is copied as is)
+              if [[ $f_no_ext =~ ^(e-)?acsl$ ]]; then
+                  ln="$f"
+              else
+                  ln="frama-c-$f"
+              fi
+              run "rm -f $destdir/$ln"
+              run "cp -P $fpath $destdir/$ln"
+              run "git -C $destdir add $ln"
+          else
+              # non-symbolic links are copied as-is to the website, and also to
+              # the Gitlab wiki, where they are also added as links
+              f_no_pdf_ext="${f%.pdf}"
+              echo "- [${f_no_pdf_ext%-${FRAMAC_VERSION_AND_CODENAME}}](manuals/$f)" >> $WIKI_PAGE
+              run "cp $fpath $GITLAB_WIKI/manuals/"
+              run "git -C $GITLAB_WIKI add manuals/$f"
+              run "cp $fpath $destdir/$f"
+              run "git -C $destdir add $f"
           fi
-          echo "- [$f](manuals/$f)" >> $WIKI_PAGE
-          run "cp $fpath $GITLAB_WIKI/manuals/"
-          run "git -C $GITLAB_WIKI add manuals/$f"
       done
 
     run "git -C $GITLAB_WIKI add $PAGE_NAME"
