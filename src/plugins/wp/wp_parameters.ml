@@ -644,13 +644,13 @@ module Cache = String
     end)
 
 let () = Parameter_customize.set_group wp_prover
-module CacheEnv = True
+module CacheEnv = False
     (struct
       let option_name = "-wp-cache-env"
       let help = "Use environment variables for cache.\n\
                   - FRAMAC_WP_CACHE overrides -wp-cache\n\
                   - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
-                  This is the behavior by default."
+                  Disabled by default."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -661,8 +661,8 @@ module CacheDir = String
       let default = ""
       let help =
         "Specify global cache directory (no cleanup mode).\n\
-         This option is overriden by environment variable FRAMAC_WP_CACHEDIR,\
-         unless -wp-no-cache-env is used."
+         This option is overriden by environment variable FRAMAC_WP_CACHEDIR \
+         if -wp-cache-env is used."
     end)
 
 let () = Parameter_customize.set_group wp_prover

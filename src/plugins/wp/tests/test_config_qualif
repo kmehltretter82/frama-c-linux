@@ -1,2 +1,2 @@
-CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-par 1 -wp-share ./share -wp-msg-key shell,success-only -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache replay @PTEST_FILE@ -wp-coq-timeout 120
+CMD: @frama-c@ -no-autoload-plugins -load-module wp -wp -wp-par 1 -wp-share ./share -wp-msg-key shell,success-only -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay @PTEST_FILE@ -wp-coq-timeout 120
 OPT:
