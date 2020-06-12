@@ -666,6 +666,13 @@ module CacheDir = String
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module CachePrint = False
+    (struct
+      let option_name = "-wp-cache-print"
+      let help = "Show cache directory"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Generate = False
     (struct
       let option_name = "-wp-gen"

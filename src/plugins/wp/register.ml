@@ -811,6 +811,8 @@ let cmdline_run () =
       end ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
+  if Wp_parameters.CachePrint.get () then
+    Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
   let fct = Wp_parameters.get_wp () in
   match fct with
   | Wp_parameters.Fct_none -> ()

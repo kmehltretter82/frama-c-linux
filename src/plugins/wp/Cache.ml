@@ -60,9 +60,9 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
           Wp_parameters.get_session_dir ~force:false "cache"
     end)
 
-let get_cache_dir () = (CACHEDIR.get () :> string)
+let get_dir () = (CACHEDIR.get () :> string)
 
-let has_cache_dir () =
+let has_dir () =
   try
     if not (Wp_parameters.CacheEnv.get()) then
       raise Not_found ;
@@ -112,7 +112,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
           let mode = Wp_parameters.Cache.get() in
           parse_mode ~origin:"-wp-cache" ~fallback:"none" mode
         with Not_found ->
-          if Wp_parameters.has_session () || has_cache_dir ()
+          if Wp_parameters.has_session () || has_dir ()
           then Update else NoCache
     end)
 
@@ -177,7 +177,7 @@ let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      let dir = get_cache_dir () in
+      let dir = get_dir () in
       if not (Sys.file_exists dir && Sys.is_directory dir) then
         VCS.no_result
       else
@@ -211,7 +211,7 @@ let set_cache_result ~mode hash prover result =
 let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
-    let dir = get_cache_dir () in
+    let dir = get_dir () in
     if is_global_cache () then
       Wp_parameters.warning ~current:false ~once:true
         "Cleanup mode deactivated with global cache."
