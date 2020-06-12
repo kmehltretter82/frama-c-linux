@@ -25,8 +25,8 @@
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
-type package = { plugin: plugin; pkgname: string list }
-type ident = package * string
+type package = private { plugin: plugin; pkgname: string list }
+type ident = private { package: package; name: string }
 type name = string list
 
 type jtype =
@@ -44,6 +44,7 @@ type jtype =
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
+  | Jself (* for (simply) recursive types *)
 
 type fieldInfo = {
   fd_name: string;
@@ -76,7 +77,7 @@ type declInfo = {
 
 type packageInfo = {
   d_package : package;
-  d_content : declInfo Bag.t;
+  d_content : declInfo list;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -116,6 +117,25 @@ val visit_decl: (ident -> unit) -> declInfo -> unit
 val visit_package_def: (ident -> unit) -> packageInfo -> unit
 val visit_package_used: (ident -> unit) -> packageInfo -> unit
 
+(* -------------------------------------------------------------------------- *)
+(* --- Server API                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+(**
+   Register the declaration in the Server API.
+   This is only way to obtain identifiers.
+   This ensures identifiers are declared before being used.
+*)
+val declare :
+  ?plugin:string ->
+  id:string ->
+  title:Markdown.text ->
+  ?descr:Markdown.block ->
+  declKindInfo ->
+  ident
+
+val iter : (packageInfo -> unit) -> unit
+
 (** Assigns non-classing names for each identifier. *)
 val package_resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 
@@ -124,6 +144,7 @@ val package_resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 (* -------------------------------------------------------------------------- *)
 
 type pp = {
+  self: Markdown.text ;
   data: ident -> Markdown.text ;
   kind: string -> Markdown.text ;
 }

@@ -28,7 +28,7 @@ module Md = Markdown
 
 type plugin = Kernel | Plugin of string
 type package = { plugin: plugin; pkgname: string list }
-type ident = package * string
+type ident = { package: package; name: string }
 type name = string list
 
 let pp_plugin fmt = function
@@ -49,7 +49,7 @@ let pp_package fmt { plugin ; pkgname } =
   | Kernel -> pp_name fmt pkgname
   | Plugin p -> Format.fprintf fmt "%s.%a" p pp_name pkgname
 
-let pp_ident fmt (pkg,id) =
+let pp_ident fmt { package = pkg ; name = id } =
   Format.fprintf fmt "%a.%s" pp_package pkg id
 
 (* -------------------------------------------------------------------------- *)
@@ -84,7 +84,7 @@ struct
     | Plugin p -> "plugin" :: p :: ids
 
   (* propose various abbreviations ; finally render full qualified name *)
-  let ranked_name source (pkg,id) k =
+  let ranked_name source { package = pkg ; name = id } k =
     let name = [id] in
     match k with
     | 0 -> name
@@ -133,7 +133,7 @@ struct
     assert (IdMap.is_empty scope.names) ;
     scope.reserved <- NameSet.add name scope.reserved
 
-  let reserve_ident scope (_,id) = reserve_name scope id
+  let reserve_ident scope { name } = reserve_name scope name
 
   let rec resolve scope =
     if not scope.clashes then scope.names else
@@ -176,6 +176,7 @@ type jtype =
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
+  | Jself (* for (simply) recursive types *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)
@@ -212,7 +213,7 @@ type declInfo = {
 
 type packageInfo = {
   d_package : package;
-  d_content : declInfo Bag.t;
+  d_content : declInfo list;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -220,7 +221,7 @@ type packageInfo = {
 (* -------------------------------------------------------------------------- *)
 
 let rec visit_jtype fn = function
-  | Jany | Jnull | Jboolean | Jnumber
+  | Jany | Jself | Jnull | Jboolean | Jnumber
   | Jstring | Jkind _ | Jtag _ -> ()
   | Joption js | Jassoc(_,js)  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
@@ -245,10 +246,10 @@ let visit_dkind f = function
 let visit_decl f { d_kind } = visit_dkind f d_kind
 
 let visit_package_def f { d_content } =
-  Bag.iter (fun { d_ident } -> f d_ident) d_content
+  List.iter (fun { d_ident } -> f d_ident) d_content
 
 let visit_package_used f { d_content } =
-  Bag.iter (visit_decl f) d_content
+  List.iter (visit_decl f) d_content
 
 let package_resolve ?(keywords=[]) pkg =
   let scope = Scope.create pkg.d_package.plugin in
@@ -258,18 +259,51 @@ let package_resolve ?(keywords=[]) pkg =
   IdMap.map (String.concat "_") (Scope.resolve scope)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Server API                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let ident_re = Str.regexp "^\\([a-z0-9]+\\.\\)*[a-zA-Z0-9]+$"
+
+let identFor ?plugin name =
+  if not (Str.string_match ident_re name 0) then
+    failwith
+      (Printf.sprintf "Invalid identifier %S (use \"abc.def.fooBar\")" name) ;
+  let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
+  let path = String.split_on_char '.' name in
+  let pkgname , name = match List.rev path with
+    | [] -> failwith (Printf.sprintf "Inconsistent name %S" name)
+    | a :: ps -> List.map String.lowercase_ascii (List.rev ps) , a
+  in { package = { plugin ; pkgname } ; name }
+
+let packages = ref PkgMap.empty
+
+let declare ?plugin ~id ~title ?(descr=[]) decl =
+  let ident = identFor ?plugin id in
+  let pkg = ident.package in
+  let decl = { d_ident=ident ; d_title=title ; d_descr=descr ; d_kind=decl } in
+  let content = try PkgMap.find pkg !packages with Not_found -> [] in
+  packages := PkgMap.add pkg (decl::content) !packages ; ident
+
+let iter f =
+  PkgMap.iter
+    (fun d_package d_content -> f { d_package ; d_content })
+    !packages
+
+(* -------------------------------------------------------------------------- *)
 (* --- JSON To MarkDown                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 let escaped tag = Md.code (Printf.sprintf "\"%s\"" @@ String.escaped tag)
 
 type pp = {
+  self: Md.text ;
   data: ident -> Md.text ;
   kind: string -> Md.text ;
 }
 
 let rec md_jtype pp = function
   | Jany -> Md.emph "any"
+  | Jself -> pp.self
   | Jnull -> Md.emph "null"
   | Jnumber -> Md.emph "number"
   | Jboolean -> Md.emph "boolean"
@@ -306,8 +340,9 @@ let pp_jtype fmt js =
   let scope = Scope.create Kernel in
   visit_jtype (Scope.use scope) js ;
   let ns = Scope.resolve scope in
+  let self = Md.emph "self" in
   let kind id = Md.code (Printf.sprintf "#%s" id) in
   let data id = Md.emph (Scope.name_of ns id) in
-  Markdown.pp_text fmt (md_jtype { kind ; data } js)
+  Markdown.pp_text fmt (md_jtype { kind ; data ; self } js)
 
 (* -------------------------------------------------------------------------- *)
