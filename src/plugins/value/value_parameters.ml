@@ -918,13 +918,13 @@ module BuiltinsOverrides =
         begin match nameopt with
           | Some name ->
             if not (!Db.Value.mem_builtin name) then
-              abort "option '-val-builtin %a:%s': undeclared builtin '%s'@.\
+              abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
                      declared builtins: @[%a@]"
                 Kernel_function.pretty kf name name
                 (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
                 (List.map fst (!Db.Value.registered_builtins ()))
           | _ -> abort
-                   "option '-val-builtin':@ \
+                   "option '-eva-builtin':@ \
                     no builtin associated to function '%a',@ use '%a:<builtin>'"
                    Kernel_function.pretty kf Kernel_function.pretty kf
         end;
