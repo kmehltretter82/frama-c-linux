@@ -309,8 +309,8 @@ let do_report_cache_usage mode =
      not (Wp_parameters.has_dkey dkey_shell) &&
      not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
   then
-    let hits = ProverWhy3.get_hits () in
-    let miss = ProverWhy3.get_miss () in
+    let hits = Cache.get_hits () in
+    let miss = Cache.get_miss () in
     if hits <= 0 && miss <= 0 then
       Wp_parameters.result "[Cache] not used"
     else
@@ -321,20 +321,20 @@ let do_report_cache_usage mode =
             if n > 0 then
               ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
           match mode with
-          | ProverWhy3.NoCache -> ()
-          | ProverWhy3.Replay ->
+          | Cache.NoCache -> ()
+          | Cache.Replay ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "missed" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Offline ->
+          | Cache.Offline ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "failed" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Update | ProverWhy3.Cleanup ->
+          | Cache.Update | Cache.Cleanup ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "updated" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Rebuild ->
+          | Cache.Rebuild ->
               pp_cache fmt hits "replaced" ;
               pp_cache fmt miss "updated" ;
               Format.pp_print_newline fmt () ;
@@ -519,8 +519,8 @@ let do_report_scheduled () =
     if !scheduled > 0 then
       begin
         let proved = GOALS.cardinal !proved in
-        let mode = ProverWhy3.get_mode () in
-        if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
+        let mode = Cache.get_mode () in
+        if mode <> Cache.NoCache then do_report_cache_usage mode ;
         Wp_parameters.result "%t"
           begin fun fmt ->
             Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
@@ -736,9 +736,8 @@ let do_wp_proofs_for goals = do_wp_proofs_iter (fun f -> Bag.iter f goals)
 (* registered at frama-c (normal) exit *)
 let do_cache_cleanup () =
   begin
-    let mode = ProverWhy3.get_mode () in
-    ProverWhy3.cleanup_cache ~mode ;
-    let removed = ProverWhy3.get_removed () in
+    Cache.cleanup_cache () ;
+    let removed = Cache.get_removed () in
     if removed > 0 &&
        not (Wp_parameters.has_dkey dkey_shell) &&
        not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)

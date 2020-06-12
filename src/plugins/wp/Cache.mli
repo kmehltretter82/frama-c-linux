@@ -20,14 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val add_specific_equality:
-  for_tau:(Lang.tau -> bool) ->
-  mk_new_eq:Lang.F.binop ->
-  unit
-(** Equality used in the goal, simpler to prove than polymorphic equality *)
+type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
 
-val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
-  Wpo.t -> VCS.result Task.task
-(** Return NoResult if it is already proved by Qed *)
+val set_mode : mode -> unit
+val get_mode : unit -> mode
+val get_hits : unit -> int
+val get_miss : unit -> int
+val get_removed : unit -> int
 
-(**************************************************************************)
+val cleanup_cache : unit -> unit
+
+type runner =
+  timeout:int option -> steplimit:int option ->
+  Why3.Driver.driver -> Why3Provers.t -> Why3.Task.task ->
+  VCS.result Task.task
+
+val get_result: Wpo.t -> runner -> runner
