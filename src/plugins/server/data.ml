@@ -446,6 +446,9 @@ struct
       | Some v -> Hashtbl.add d.vindex v name
     end ; name
 
+  let find_tag (d : 'a dictionary) name =
+    if Hashtbl.mem d.values name then name else raise Not_found
+
   let instance = Printf.sprintf "%s:%s"
 
   let prefix (d : 'a dictionary) ~prefix ?(var="*") ?label ~descr () =

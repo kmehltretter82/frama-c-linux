@@ -216,6 +216,32 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Alarm kind                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module AlarmKind = struct
+  let alarms = Enum.dictionary ~page ~name:"alarmkind" ~title:"Alarm kind"
+      ~descr:(Md.plain "Alarm kind") ()
+
+  let register alarm =
+    let name = Alarms.get_short_name alarm in
+    let label = Md.plain name in
+    let descr = Md.plain (Alarms.get_description alarm) in
+    ignore (Enum.tag alarms ~name ~label ~descr ())
+  let () = List.iter register Alarms.reprs
+
+  let tag alarm =
+    let name = Alarms.get_short_name alarm in
+    try Enum.find_tag alarms name
+    with Not_found -> failure "Unknown alarm kind: %s" name
+
+  let data = Enum.publish alarms ~tag ()
+  let () = Request.dictionary alarms
+
+  include (val data : S with type t = Alarms.t)
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Model                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -259,14 +285,9 @@ let () = States.column ~model ~name:"source"
     ~get:(fun ip -> Property.location ip |> fst) ()
 
 let () = States.column ~model ~name:"alarm"
-    ~descr:(Md.plain "Alarm name (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip)) ()
-
-let () = States.column ~model ~name:"alarm_descr"
-    ~descr:(Md.plain "Alarm description (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip)) ()
+    ~descr:(Md.plain "Alarm kind (if the property is an alarm)")
+    ~data:(module Data.Joption (AlarmKind))
+    ~get:find_alarm ()
 
 let () = States.column ~model ~name:"predicate"
     ~descr:(Md.plain "Predicate")

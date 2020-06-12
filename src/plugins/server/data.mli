@@ -236,6 +236,10 @@ sig
     ?value:'a ->
     unit -> 'a tag
 
+  (** Returns the tag from its name.
+      @raise Not_found if no tag has been registered with this name. *)
+  val find_tag: 'a dictionary -> string -> 'a tag
+
   (** Register a new prefix tag in the dictionary.
       The default label is the capitalized prefix.
       To decoding from json is provided to prefix tags.
