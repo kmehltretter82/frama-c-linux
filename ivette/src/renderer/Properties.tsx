@@ -162,7 +162,7 @@ const renderCode: Renderer<string> =
 
 interface Tag { name: string; label: string; descr: string }
 
-const renderTag: Renderer<Tag> =
+const renderTag: Renderer<Tag | undefined> =
   (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
 
 const renderNames: Renderer<string[]> =
@@ -185,7 +185,7 @@ function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
 }
 
-function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
+function ColumnTag<Row>(props: ColumnProps<Row, Tag | undefined>) {
   return <Column render={renderTag} {...props} />;
 }
 
@@ -205,7 +205,6 @@ interface Property {
   descr: string;
   kind: string;
   alarm?: string;
-  alarm_descr?: string;
   names: string[];
   predicate: string;
   status: string;
@@ -362,9 +361,10 @@ const PropertyColumns = () => {
 
   const statusDict: { [status: string]: Tag } =
     States.useDictionary('kernel.dictionary.propstatus');
-
   const kindDict: { [kind: string]: Tag } =
     States.useDictionary('kernel.dictionary.propkind');
+  const alarmDict: { [alarm: string]: Tag } =
+    States.useDictionary('kernel.dictionary.alarmkind');
 
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
@@ -374,6 +374,13 @@ const PropertyColumns = () => {
   const getKind = React.useCallback(
     ({ kind }: Property) => (kindDict[kind] ?? { label: kind }),
     [kindDict],
+  );
+
+  const getAlarm = React.useCallback(
+    ({ alarm }: Property) => (
+      alarm === undefined ? alarm : (alarmDict[alarm] ?? { label: alarm })
+    ),
+    [alarmDict],
   );
 
   return (
@@ -395,7 +402,7 @@ const PropertyColumns = () => {
       />
       <ColumnCode id="function" label="Function" width={120} />
       <ColumnTag id="kind" label="Property kind" getter={getKind} width={120} />
-      <ColumnCode id="alarm" label="Alarms" fixed width={160} />
+      <ColumnTag id="alarm" label="Alarms" getter={getAlarm} width={160} />
       <Column
         id="names"
         label="Names"
