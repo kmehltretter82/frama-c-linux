@@ -123,6 +123,7 @@ type chunk =
   | M_f64
   | M_pointer
   | T_alloc
+  | T_init
 
 module Chunk =
 struct
@@ -146,6 +147,7 @@ struct
     | M_f64 -> 10
     | M_pointer -> 11
     | T_alloc -> 12
+    | T_init -> 13
   let hash = rank
   let name = function
     | M_int _ -> "Mint"
@@ -154,6 +156,7 @@ struct
     | M_f64 -> "Mf64"
     | M_pointer -> "Mptr"
     | T_alloc -> "Malloc"
+    | T_init -> "Init"
   let compare a b = rank a - rank b
   let equal = (=)
   let pretty fmt c = Format.pp_print_string fmt (name c)
@@ -163,12 +166,14 @@ struct
     | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
     | M_pointer -> t_addr
     | T_alloc -> L.Int
+    | T_init -> L.Bool
   let tau_of_chunk = function
     | M_int _ | M_char -> L.Array(t_addr,L.Int)
     | M_pointer -> L.Array(t_addr,t_addr)
     | M_f32 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float32)
     | M_f64 -> L.Array(t_addr,Cfloat.tau_of_float Ctypes.Float64)
-    | T_alloc -> L.Array(L.Int,L.Int)
+    | T_alloc -> t_malloc
+    | T_init -> t_init
   let basename_of_chunk = name
   let is_framed _ = false
 end
@@ -198,7 +203,8 @@ and footprint_comp c =
        Heap.Set.union ft (footprint (object_of f.ftype))
     ) Heap.Set.empty c.cfields
 
-let domain obj _l = footprint obj
+let init_footprint _ _ = Heap.Set.singleton T_init
+let value_footprint obj _l = footprint obj
 
 let rec length_of_object = function
   | C_int _ | C_float _ | C_pointer _ -> 1
@@ -523,6 +529,28 @@ module BASE = WpContext.Generator(Varinfo)
               l_cluster = cluster_globals () ;
             }
 
+      let initialization prefix x base =
+        match sizeof x with
+        | Some size when x.vformal || x.vglob ->
+            let a = Lang.freshvar ~basename:"init" t_init in
+            let m = e_var a in
+            let init_access =
+              if size = 1 then
+                p_bool (F.e_get m (a_addr base e_zero))
+              else
+                F.p_call p_is_init_r [ m ; a_addr base e_zero ; e_int size ]
+            in
+            let m_init = p_call p_cinits [m] in
+            let init_prop = p_forall [a] (p_imply m_init init_access) in
+            Definitions.define_lemma {
+              l_assumed = true ;
+              l_name = prefix ^ "_init" ; l_types = 0 ;
+              l_triggers = [] ; l_forall = [] ;
+              l_lemma = init_prop ;
+              l_cluster = cluster_globals () ;
+            }
+        | _ -> ()
+
       let generate x =
         let acs_rd = Cil.typeHasQualifier "const" x.vtype in
         let prefix =
@@ -544,6 +572,7 @@ module BASE = WpContext.Generator(Varinfo)
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
+        initialization prefix x base ;
         base
 
       let compile = Lang.local generate
@@ -940,7 +969,8 @@ struct
   let field = field
   let shift = shift
   let sizeof = length_of_object
-  let domain = domain
+  let init_footprint = init_footprint
+  let value_footprint = value_footprint
   let frames = frames
   let to_addr l = l
   let to_region_pointer l = 0,l
@@ -977,6 +1007,22 @@ struct
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
+  let set_init_atom sigma l v = updated sigma T_init l v
+  let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
+
+  let is_init_range sigma obj loc length =
+    let n = F.e_fact (length_of_object obj) length in
+    F.p_call p_is_init_r [ Sigma.value sigma T_init ; loc ; n ]
+
+  let set_init obj loc ~length _chunk ~current =
+    let n = F.e_fact (length_of_object obj) length in
+    F.e_fun f_set_init [current;loc;n]
+
+  let monotonic_init s1 s2 =
+    let m1 = Sigma.value s1 T_init in
+    let m2 = Sigma.value s2 T_init in
+    F.p_call p_monotonic [m1; m2]
+
 end
 
 module LOADER = MemLoader.Make(MODEL)
@@ -985,6 +1031,8 @@ let load = LOADER.load
 let stored = LOADER.stored
 let copied = LOADER.copied
 let assigned = LOADER.assigned
+let initialized = LOADER.initialized
+let domain = LOADER.domain
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)
@@ -1042,6 +1090,7 @@ let frame sigma =
     else []
   in
   wellformed_frame p_linked T_alloc @
+  wellformed_frame p_cinits T_init @
   wellformed_frame p_sconst M_char @
   wellformed_frame p_framed M_pointer
 
@@ -1098,14 +1147,20 @@ and lookup_f f es =
 
 and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
 
-let mchunk c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c)
+let mchunk c =
+  match c with
+  | T_init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
+  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
 
 let lookup s e =
   try mchunk (Tmap.find e s)
   with Not_found ->
   try match F.repr e with
     | L.Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
-    | L.Aget( m , k ) when Tmap.find m s <> T_alloc -> Sigs.Mlval (lookup_lv k)
+    | L.Aget( m , k ) when Tmap.find m s = T_init ->
+        Sigs.Mlval (lookup_lv k, KInit)
+    | L.Aget( m , k ) when Tmap.find m s <> T_alloc ->
+        Sigs.Mlval (lookup_lv k, KValue)
     | _ -> Sigs.Mterm
   with Not_found -> Sigs.Mterm
 

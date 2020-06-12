@@ -52,7 +52,9 @@ sig
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
-  val domain : c_object -> loc -> Sigma.domain
+  val value_footprint: c_object -> loc -> Sigma.domain
+  val init_footprint: c_object -> loc -> Sigma.domain
+
   val frames : c_object -> loc -> Chunk.t -> frame list
 
   val last : Sigma.t -> c_object -> loc -> term
@@ -73,11 +75,20 @@ sig
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
+  val is_init_atom : Sigma.t -> loc -> term
+  val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
+  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
+  val set_init : c_object -> loc -> length:term ->
+    Chunk.t -> current:term -> term
+  val monotonic_init : Sigma.t -> Sigma.t -> pred
+
 end
 
 (** Generates Loader for Compound Values *)
 module Make (M : Model) :
 sig
+
+  val domain : c_object -> M.loc -> M.Sigma.domain
 
   val load : M.Sigma.t -> c_object -> M.loc -> M.loc Sigs.value
   val loadvalue : M.Sigma.t -> c_object -> M.loc -> term
@@ -89,6 +100,8 @@ sig
   val copied : M.Sigma.t sequence -> c_object -> M.loc -> M.loc -> equation list
 
   val assigned : M.Sigma.t sequence -> c_object -> M.loc sloc -> equation list
+
+  val initialized : M.Sigma.t -> M.loc rloc -> pred
 
 end
 

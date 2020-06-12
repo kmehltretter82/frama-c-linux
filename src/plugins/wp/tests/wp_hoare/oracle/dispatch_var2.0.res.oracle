@@ -14,11 +14,13 @@ Assume {
   (* Heap *)
   Type: is_sint32(x_1).
   (* Block In *)
-  Have: (ta_tmp_0=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_0=false).
   (* Call 'reset' *)
   Have: x = 0.
   (* Call 'load' *)
   Have: (tmp_0 = load_0) /\ (x = load_0).
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
   (* Return *)
   Have: tmp_0 = call_global_0.
 }
@@ -44,11 +46,13 @@ Assume {
   Type: is_sint32(x_1).
   Have: (ta_tmp_1=true) <-> (ta_tmp_0=true).
   (* Block In *)
-  Have: (ta_tmp_1=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_1=false).
   (* Call 'reset' *)
   Have: x = 0.
   (* Call 'load' *)
   Have: x = load_0.
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
 }
 Prove: (ta_tmp_0=false).
 
@@ -74,11 +78,17 @@ Assume {
   Type: is_sint32(call_local_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(z).
   (* Block In *)
-  Have: (ta_tmp_0=false) /\ (ta_z_0=false).
+  Have: (Init_tmp_0=false) /\ (Init_z_0=false) /\ (ta_tmp_0=false) /\
+      (ta_z_0=false).
+  Have: (Init_z_0=true) <-> (Init_z_1=true).
   (* Call 'reset' *)
   Have: z = 0.
+  (* Call Effects *)
+  Have: ((Init_z_1=true) -> (Init_z_2=true)).
   (* Call 'load' *)
   Have: (tmp_0 = load_0) /\ (z = load_0).
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
   (* Return *)
   Have: tmp_0 = call_local_0.
 }
@@ -97,9 +107,20 @@ Assume {
   Type: is_sint32(status_0) /\ is_sint32(status_1) /\ is_sint32(z).
   Have: (ta_z_1=true) <-> (ta_z_0=true).
   (* Block In *)
-  Have: (ta_tmp_0=false) /\ (ta_z_1=false).
+  Have: (Init_z_0=false) /\ (ta_tmp_0=false) /\ (ta_z_1=false).
   (* Merge *)
-  Either { Case: (* Call 'reset' *) Have: z = 0. Case: }
+  Either {
+    Case:
+      Have: (Init_z_0=true) <-> (Init_z_1=true).
+      (* Call 'reset' *)
+      Have: z = 0.
+      (* Call Effects *)
+      Have: ((Init_z_1=true) -> (Init_z_2=true)).
+    Case:
+      Have: (Init_z_0=true) <-> (Init_z_3=true).
+      (* Exit Effects *)
+      Have: ((Init_z_3=true) -> (Init_z_4=true)).
+  }
 }
 Prove: (ta_z_0=false).
 
@@ -116,9 +137,12 @@ Assume {
   Type: is_sint32(z).
   Have: (ta_z_1=true) <-> (ta_z_0=true).
   (* Block In *)
-  Have: (ta_tmp_0=false) /\ (ta_z_1=false).
+  Have: (Init_z_0=false) /\ (ta_tmp_0=false) /\ (ta_z_1=false).
+  Have: (Init_z_0=true) <-> (Init_z_1=true).
   (* Call 'reset' *)
   Have: z = 0.
+  (* Call Effects *)
+  Have: ((Init_z_1=true) -> (Init_z_2=true)).
 }
 Prove: (ta_z_0=false).
 
@@ -130,11 +154,17 @@ Assume {
   Type: is_sint32(load_0) /\ is_sint32(tmp_0) /\ is_sint32(z).
   Have: (ta_tmp_1=true) <-> (ta_tmp_0=true).
   (* Block In *)
-  Have: (ta_tmp_1=false) /\ (ta_z_0=false).
+  Have: (Init_tmp_0=false) /\ (Init_z_0=false) /\ (ta_tmp_1=false) /\
+      (ta_z_0=false).
+  Have: (Init_z_0=true) <-> (Init_z_1=true).
   (* Call 'reset' *)
   Have: z = 0.
+  (* Call Effects *)
+  Have: ((Init_z_1=true) -> (Init_z_2=true)).
   (* Call 'load' *)
   Have: z = load_0.
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
 }
 Prove: (ta_tmp_0=false).
 
@@ -155,9 +185,13 @@ Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) i
 Assume {
   Type: is_sint32(z).
   (* Block In *)
-  Have: (ta_tmp_0=false) /\ (ta_z_0=true) /\ (ta_z_1=false).
+  Have: (Init_z_0=false) /\ (ta_tmp_0=false) /\ (ta_z_0=true) /\
+      (ta_z_1=false).
+  Have: (Init_z_0=true) <-> (Init_z_1=true).
   (* Call 'reset' *)
   Have: (ta_z_0=true) /\ (z = 0).
+  (* Call Effects *)
+  Have: ((Init_z_1=true) -> (Init_z_2=true)).
 }
 Prove: (ta_z_0=true).
 
@@ -177,13 +211,15 @@ Assume {
   (* Function Frame *)
   Have: (ta_y_1=true) /\ (ta_y_0=false).
   (* Block In *)
-  Have: (ta_tmp_0=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_0=false).
   Have: (ta_y_1=true) <-> (ta_y_2=true).
   (* Call 'reset' *)
   Have: (ta_y_1=true) /\ (y = 0).
   Have: (ta_y_2=true) <-> (ta_y_3=true).
   (* Call 'load' *)
   Have: (ta_y_2=true) /\ (tmp_0 = load_0) /\ (y = load_0).
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
   (* Return *)
   Have: tmp_0 = call_param_0.
   (* Function Exit *)
@@ -258,12 +294,14 @@ Assume {
   (* Function Frame *)
   Have: (ta_y_1=true) /\ (ta_y_0=false).
   (* Block In *)
-  Have: (ta_tmp_1=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_1=false).
   Have: (ta_y_1=true) <-> (ta_y_2=true).
   (* Call 'reset' *)
   Have: (ta_y_1=true) /\ (y = 0).
   (* Call 'load' *)
   Have: (ta_y_2=true) /\ (y = load_0).
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
 }
 Prove: (ta_tmp_0=false).
 
@@ -313,11 +351,13 @@ Assume {
   Type: is_sint32(call_param_ref_0) /\ is_sint32(load_0) /\ is_sint32(q) /\
       is_sint32(tmp_0).
   (* Block In *)
-  Have: (ta_tmp_0=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_0=false).
   (* Call 'reset' *)
   Have: q = 0.
   (* Call 'load' *)
   Have: (q = load_0) /\ (tmp_0 = load_0).
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
   (* Return *)
   Have: tmp_0 = call_param_ref_0.
 }
@@ -341,11 +381,13 @@ Assume {
   Type: is_sint32(load_0) /\ is_sint32(q) /\ is_sint32(tmp_0).
   Have: (ta_tmp_1=true) <-> (ta_tmp_0=true).
   (* Block In *)
-  Have: (ta_tmp_1=false).
+  Have: (Init_tmp_0=false) /\ (ta_tmp_1=false).
   (* Call 'reset' *)
   Have: q = 0.
   (* Call 'load' *)
   Have: q = load_0.
+  (* Return Effects *)
+  Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
 }
 Prove: (ta_tmp_0=false).
 

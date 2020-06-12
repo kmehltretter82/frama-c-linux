@@ -1575,6 +1575,56 @@ end
 
 let parasite = Parasite.filter
 
+module InitFilter =
+struct
+  let add_state filter s = s :: filter
+
+  let rec collect_step filter s =
+    match s.condition with
+    | State s -> add_state filter s
+    | Have _ | Core _ | Init _ | When _ | Type _ -> filter
+    | Branch(_p,a,b) -> collect_seq (collect_seq filter a) b
+    | Either ws -> List.fold_left collect_seq filter ws
+
+  and collect_seq filter s =
+    List.fold_left collect_step filter s.seq_list
+
+  exception Found
+
+  let has_init filter pred =
+    let visited = ref Tset.empty in
+    let rec term_is_init_in_states states t =
+      let raise_if_is_init t s =
+        match Mstate.lookup s t with
+        | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
+        | _ -> ()
+      in
+      if Tset.mem t !visited then ()
+      else begin
+        visited := Tset.add t !visited ;
+        List.iter (raise_if_is_init t) states ;
+        Lang.F.lc_iter (term_is_init_in_states states) t
+      end
+    in
+    try term_is_init_in_states filter (F.e_prop pred) ; false
+    with Found -> true
+
+  let rec do_filter filter p =
+    let on_sub_nodes = do_filter filter in
+    match F.p_expr p with
+    | And ps -> p_all on_sub_nodes ps
+    | If(e,a,b) -> F.p_if e (on_sub_nodes a) (on_sub_nodes b)
+    | _ when has_init filter p -> p_true
+    | _ -> p
+
+  let filter (hs, g) =
+    let filter = collect_seq [] hs in
+    if has_init filter g then (hs, g)
+    else map_sequence (do_filter filter) hs, g
+end
+
+let init_filter = InitFilter.filter
+
 (* -------------------------------------------------------------------------- *)
 (* --- Finalization                                                       --- *)
 (* -------------------------------------------------------------------------- *)

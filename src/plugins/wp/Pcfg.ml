@@ -43,6 +43,7 @@ type value =
   | Term
   | Addr of s_lval
   | Lval of s_lval * label
+  | Init of s_lval * label
   | Chunk of string * label
 
 module Imap = Datatype.Int.Map
@@ -94,8 +95,9 @@ and lookup env e = function
       try match Mstate.lookup lbl.state e with
         | Sigs.Mterm -> raise Not_found
         | Sigs.Maddr lv -> Addr lv
-        | Sigs.Mlval lv -> Lval(lv,flag lbl)
-        | Sigs.Mchunk m -> Chunk(m,flag lbl)
+        | Sigs.Mlval (lv, KValue) -> Lval(lv,flag lbl)
+        | Sigs.Mlval (lv, KInit) -> Init(lv,flag lbl)
+        | Sigs.Mchunk (m, _) -> Chunk(m,flag lbl)
       with Not_found -> lookup env e others
 
 let is_ref x k = (k == F.e_zero) && Cil.isPointerType x.vtype
@@ -237,6 +239,9 @@ class virtual engine =
           Format.fprintf fmt "@[<hov 2>%a@,%a@]"
             self#pp_host host self#pp_offset ofs
 
+    method pp_init fmt lv =
+      Format.fprintf fmt "initialized(%a)" self#pp_lval lv
+
     method pp_addr fmt = function
       | Mvar x , [] -> Format.fprintf fmt "&%s" x.vname
       | Mmem p , [] -> self#pp_atom fmt p
@@ -261,4 +266,4 @@ let subterms env f e =
   match find env e with
   | Term -> false
   | Chunk _ -> true
-  | Addr lv | Lval(lv,_) -> lv_iter f lv ; true
+  | Addr lv | Lval(lv,_) | Init(lv,_) -> lv_iter f lv ; true

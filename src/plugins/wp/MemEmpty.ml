@@ -117,6 +117,7 @@ let alloc sigma _xs = sigma
 let scope _seq _s _xs = []
 let valid _sigma _acs _l = Warning.error ~source "No validity"
 let invalid _sigma _l = Warning.error ~source "No validity"
+let initialized _sigma _l = Warning.error ~source "MemEmpty: No initialized"
 let global _sigma _p = p_true
 
 let included _s1 _s2 = no_pointer ()

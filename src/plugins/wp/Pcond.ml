@@ -144,6 +144,10 @@ class state =
               if self#is_atomic_lv lv
               then self#atflow ~lbl self#pp_lval fmt lv
               else self#at ~lbl self#pp_lval fmt lv
+          | Pcfg.Init(lv,lbl) ->
+              if self#is_atomic_lv lv
+              then self#atflow ~lbl self#pp_init fmt lv
+              else self#at ~lbl self#pp_init fmt lv
           | Pcfg.Chunk(m,lbl) ->
               self#atflow ~lbl self#pp_chunk fmt m
         end

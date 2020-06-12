@@ -240,6 +240,7 @@ val bundle : bundle -> sequence
 val clean : sequent -> sequent
 val filter : sequent -> sequent
 val parasite : sequent -> sequent
+val init_filter : sequent -> sequent
 val simplify : ?solvers:simplifier list -> ?intros:int -> sequent -> sequent
 val pruning : ?solvers:simplifier list -> sequent -> sequent
 

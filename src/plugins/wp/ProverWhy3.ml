@@ -155,7 +155,8 @@ let coerce ~cnv sort expected r =
 let name_of_adt = function
   | Lang.Mtype a -> a.Lang.ext_link.Lang.why3
   | Mrecord(a,_) -> a.Lang.ext_link.Lang.why3
-  | Comp c -> Lang.comp_id c
+  | Comp (c, KValue) -> Lang.comp_id c
+  | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
 
 let tvar =
@@ -359,7 +360,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     match Lang.F.repr t, sort, expected with
     | (Fvar _, _, _) -> invalid_arg "unbound variable in of_term"
     | (Bvar _, _, _) -> invalid_arg "bound variable in of_term"
-    | Bind((Forall|Exists) as q,_,_), _, _ ->
+    | Bind((Forall|Exists) as q,_,_), _, _ -> begin
         coerce ~cnv Prop expected $
         let why3_vars, t = successive_binders cnv q t in
         let quant = match q with
@@ -368,6 +369,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           | _ -> assert false
         in
         Why3.Term.t_quant quant (Why3.Term.t_close_quant why3_vars [] t)
+      end
     | True, _, Prop -> Why3.Term.t_true
     | True, _, Bool -> Why3.Term.t_bool_true
     | False, _, Prop -> Why3.Term.t_false
@@ -481,13 +483,14 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | If(a,b,c), _, _ ->
         let cnv' = {cnv with polarity = `NoPolarity} in
         Why3.Term.t_if (of_term cnv' Prop a) (of_term cnv expected b) (of_term cnv expected c)
-    | Aget(m,k), _, _ ->
+    | Aget(m,k), _, _ -> begin
         coerce ~cnv sort expected $
         let mtau = Lang.F.typeof m in
         let ksort = match mtau with
           | Array(ksort,_) -> ksort
           | _ -> assert false (** absurd: by qed typing *)in
         t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_term cnv mtau m;of_term cnv ksort k]
+      end
     | Aset(m,k,v), Array(ksort,vsort), _ ->
         coerce ~cnv sort expected $
         t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_term cnv sort m;of_term cnv ksort k;of_term cnv vsort v]
@@ -550,15 +553,33 @@ let rec of_term ~cnv expected t : Why3.Term.term =
             why3_failure "badly expected type %a for term %a"
               Lang.F.pp_tau expected Lang.F.pp_term t
       end
+    | Rget(a, (Cfield(_,KInit) as f)), _ , tau -> begin
+        let s = Lang.name_of_field f in
+        match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
+        | ls ->
+            begin match tau with
+              | Prop ->
+                  Why3.Term.t_equ
+                    (Why3.Term.t_app ls [of_term' cnv a] (Some Why3.Ty.ty_bool))
+                    (Why3.Term.t_bool_true)
+              | _ ->
+                  Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv tau)
+            end
+        | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
+      end
+
     | Rget(a,f), _ , _ -> begin
         let s = Lang.name_of_field f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | Rdef(l), Data(Comp c,_) , _ -> begin
+    | Rdef(l), Data(Comp (c, k),_) , _ -> begin
         (* l is already sorted by field *)
-        let s = Lang.comp_id c in
+        let s = match k with
+          | KValue -> Lang.comp_id c
+          | KInit -> Lang.comp_init_id c
+        in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls ->
             let l = List.map (fun (_,t) -> of_term' cnv t) l in
@@ -874,18 +895,22 @@ class visitor (ctx:context) c =
           let decl = Why3.Decl.create_data_decl [tys,[cstr,fields]] in
           ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
 
-    method on_comp c (fts:(Lang.field * Lang.tau) list) =
+    method private on_comp_gen kind c (fts:(Lang.field * Lang.tau) list) =
       begin
+        let make_id = match kind with
+          | Lang.KValue -> Lang.comp_id
+          | Lang.KInit -> Lang.comp_init_id
+        in
         let compare_field (f,_) (g,_) =
           let cmp = Lang.Field.compare f g in
           if cmp = 0 then assert false (* by definition *) else cmp
         in
         let fts = List.sort compare_field fts in
         (*TODO:NUPW: manage UNIONS *)
-        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let id = Why3.Ident.id_fresh (make_id c) in
         let ts = Why3.Ty.create_tysymbol id [] Why3.Ty.NoDef in
         let ty = Why3.Ty.ty_app ts [] in
-        let id = Why3.Ident.id_fresh (Lang.comp_id c) in
+        let id = Why3.Ident.id_fresh (make_id c) in
         let cnv = empty_cnv ctx in
         let map (f,tau) =
           let ty_ctr = of_tau ~cnv tau in
@@ -898,6 +923,9 @@ class visitor (ctx:context) c =
         let decl = Why3.Decl.create_data_decl [ts,[constr,List.map fst fields]] in
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
       end
+
+    method on_comp = self#on_comp_gen KValue
+    method on_icomp = self#on_comp_gen KInit
 
     method private make_lemma cnv (l: Definitions.dlemma) =
       let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in

@@ -26,6 +26,7 @@
 
 open Cil_types
 open Ctypes
+open Lang
 open Lang.F
 open Interpreted_automata
 
@@ -117,8 +118,8 @@ and s_offset = Mfield of fieldinfo | Mindex of term
 type mval =
   | Mterm (** Not a state-related value *)
   | Maddr of s_lval (** The value is the address of an l-value in current memory *)
-  | Mlval of s_lval (** The value is the value of an l-value in current memory *)
-  | Mchunk of string (** The value is an abstract memory chunk (description) *)
+  | Mlval of s_lval * datakind (** The value is the value of an l-value in current memory *)
+  | Mchunk of string * datakind (** The value is an abstract memory chunk (description) *)
 
 (** Reversed update *)
 type update = Mstore of s_lval * term
@@ -472,6 +473,12 @@ sig
 
   val alloc : sigma -> varinfo list -> sigma
   (** Allocates new chunk for the validity of variables. *)
+
+  val initialized : sigma -> segment -> pred
+  (** Return the formula that tests if a memory state is initialized
+      (according to {!acs}) in the given memory state at the given
+      segment.
+  *)
 
   val invalid : sigma -> segment -> pred
   (** Returns the formula that tests if the entire memory is invalid

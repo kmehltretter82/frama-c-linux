@@ -1,6 +1,6 @@
 [ { "header": "Range", "tactic": "Wp.range",
     "params": { "inf": 0, "sup": 16 },
-    "select": { "select": "inside-goal", "occur": 0, "target": "i_112",
+    "select": { "select": "inside-goal", "occur": 0, "target": "i_147",
                 "pattern": "$i" },
     "children": { "Lower 0": [ { "prover": "qed", "verdict": "valid" } ],
                   "Value 0": [ { "prover": "qed", "verdict": "valid" } ],

@@ -70,6 +70,21 @@ and constant_term t =
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
+let rec init_value value obj =
+  match obj with
+  | C_int _ | C_float _ | C_pointer _ -> value
+  | C_comp ci ->
+      let make_term f =
+        Cfield (f, KInit), init_value value (object_of f.ftype)
+      in
+      Lang.F.e_record (List.map make_term ci.cfields)
+  | C_array _ as arr ->
+      Lang.F.e_const Lang.t_int
+        (init_value value (object_of_array_elem arr))
+
+let initialized_obj = init_value e_true
+let uninitialized_obj = init_value e_false
+
 (* -------------------------------------------------------------------------- *)
 
 (* The type contains C-integers *)
@@ -146,7 +161,8 @@ struct
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.tau_of_comp c) in
          let def = p_all
-             (fun f -> is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield f)))
+             (fun f ->
+                is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
              c.cfields
          in {
            d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
@@ -293,7 +309,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         let rb = e_var xb in
         let def = p_all
             (fun f ->
-               let fd = Cfield f in
+               let fd = Cfield (f, KValue) in
                !equal_rec (Ctypes.object_of f.ftype)
                  (e_getfield ra fd) (e_getfield rb fd))
             c.cfields
@@ -755,6 +771,7 @@ struct
 
   let valid sigma acs sloc = on_sloc (M.valid sigma acs) sloc
   let invalid sigma sloc = on_sloc (M.invalid sigma) sloc
+  let initialized sigma sloc = on_sloc (M.initialized sigma) sloc
 
   (* -------------------------------------------------------------------------- *)
   (* --- Subset                                                             --- *)

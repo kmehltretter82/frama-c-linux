@@ -47,7 +47,9 @@ val infoprover: 'a -> 'a infoprover
 (** {2 Naming} Unique identifiers. *)
 
 val comp_id  : compinfo -> string
+val comp_init_id  : compinfo -> string
 val field_id : fieldinfo -> string
+val field_init_id : fieldinfo -> string
 val type_id  : logic_type_info -> string
 val logic_id : logic_info -> string
 val ctor_id  : logic_ctor_info -> string
@@ -55,11 +57,13 @@ val lemma_id : string -> string
 
 (** {2 Symbols} *)
 
+type datakind = KValue | KInit
+
 type adt = private (** A type is never registered in a Definition.t *)
   | Mtype of mdt (** External type *)
   | Mrecord of mdt * fields (** External record-type *)
   | Atype of logic_type_info (** Logic Type *)
-  | Comp of compinfo (** C-code struct or union *)
+  | Comp of compinfo * datakind (** C-code struct or union *)
 and mdt = string extern (** name to print to the provers *)
 and 'a extern = {
   ext_id     : int;
@@ -70,7 +74,7 @@ and 'a extern = {
 and fields = { mutable fields : field list }
 and field =
   | Mfield of mdt * fields * string * tau
-  | Cfield of fieldinfo
+  | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
@@ -102,6 +106,7 @@ val datatype : library:string -> string -> adt
 val record :
   link:string infoprover -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
+val comp_init : compinfo -> adt
 val field : adt -> string -> field
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
@@ -163,6 +168,10 @@ val tau_of_return : logic_info -> tau
 val tau_of_lfun : lfun -> tau option list -> tau
 val tau_of_field : field -> tau
 val tau_of_record : field -> tau
+
+val init_of_comp : compinfo -> tau
+val init_of_object : c_object -> tau
+val init_of_ctype : typ -> tau
 
 val t_int : tau
 val t_real : tau

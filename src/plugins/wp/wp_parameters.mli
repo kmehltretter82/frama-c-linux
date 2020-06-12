@@ -82,6 +82,7 @@ module Simpl: Parameter_sig.Bool
 module Let: Parameter_sig.Bool
 module Core: Parameter_sig.Bool
 module Prune: Parameter_sig.Bool
+module FilterInit: Parameter_sig.Bool
 module Clean: Parameter_sig.Bool
 module Filter: Parameter_sig.Bool
 module Parasite: Parameter_sig.Bool

@@ -692,13 +692,15 @@ module Sigma = Sigma.Make(Chunk)(Heap)
 type sigma = Sigma.t
 type domain = Sigma.domain
 
-let domain _obj = function
+let value_footprint _obj = function
   | GarbledMix | Index _ -> error "Can not compute Garbled-mix domain"
   | Lref _ -> Heap.empty
   | Lraw(r,_,rt,_) -> Heap.of_raw r rt
   | Lmem(r,_,rt,v) -> Heap.of_mem r rt v
   | Lfld(_,_,_,ovl) -> Heap.of_overlay (map()) ovl
   | Larr(r,_,_,_,_,_) -> Heap.of_region (map()) r
+
+let init_footprint _ _ = Heap.empty
 
 let is_well_formed _s = Lang.F.p_true
 
@@ -721,7 +723,8 @@ struct
   let field = field
   let shift = shift
   let sizeof = Ctypes.bits_sizeof_object
-  let domain = domain
+  let value_footprint = value_footprint
+  let init_footprint = init_footprint
   let frames _ _ _ = []
 
   let to_addr l = a_addrof (pointer_val l)
@@ -810,6 +813,15 @@ struct
     | Lmem(r,l,rt,(Pointer _ as v)) -> store_mem sigma r rt v l value
     | _ -> error "Can not store pointer values into %a" pretty loc
 
+  let set_init_atom _ _ _ = assert false
+  let set_init _obj _loc ~length _chunk ~current =
+    let _ = length in
+    let _ = current in
+    assert false
+  let is_init_atom _ _ = assert false
+  let is_init_range _ _ _ _ = assert false
+  let monotonic_init _ _ = assert false
+
 end
 
 module LOADER = MemLoader.Make(MODEL)
@@ -820,6 +832,9 @@ let loadvalue = LOADER.loadvalue
 let stored = LOADER.stored
 let copied = LOADER.copied
 let assigned = LOADER.assigned
+let initialized = LOADER.initialized
+
+let domain = LOADER.domain
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Loc Segments                                                      --- *)

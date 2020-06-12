@@ -129,7 +129,7 @@ struct
     | TNoOffset -> v
     | TModel _ -> Wp_parameters.not_yet_implemented "Model field"
     | TField(f,offset) ->
-        let v_f = L.map (fun r -> e_getfield r (Cfield f)) v in
+        let v_f = L.map (fun r -> e_getfield r (Cfield (f, KValue))) v in
         access_offset env v_f offset
     | TIndex(k,offset) ->
         let rk = C.logic env k in
@@ -144,9 +144,9 @@ struct
     | TNoOffset -> v
     | TModel _ -> Wp_parameters.not_yet_implemented "Model field"
     | TField(f,offset) ->
-        let r_f = e_getfield r (Cfield f) in
+        let r_f = e_getfield r (Cfield (f, KValue)) in
         let r_fv = update_offset env r_f offset v in
-        e_setfield r (Cfield f) r_fv
+        e_setfield r (Cfield (f, KValue)) r_fv
     | TIndex(k,offset) ->
         let k = val_of_term env k in
         let r_kv = update_offset env (e_get r k) offset v in
@@ -798,6 +798,12 @@ struct
     let addrs = C.logic env t in
     p_all (L.valid sigma acs) (L.region (Ctypes.object_of te) addrs)
 
+  let initialized env label t =
+    let te = Logic_typing.ctype_of_pointed t.term_type in
+    let sigma = C.mem_at env (Clabels.of_logic label) in
+    let addrs = C.logic env t in
+    p_all (L.initialized sigma) (L.region (Ctypes.object_of te) addrs)
+
   let predicate polarity env p =
     match p.pred_content with
     | Pfalse -> p_false
@@ -873,12 +879,14 @@ struct
     | Pvalid_read(label,t) -> valid env RD label t
     | Pobject_pointer(label,t) -> valid env OBJ label t
 
+    | Pinitialized(label, t) -> initialized env label t
+
     | Pvalid_function _t ->
         Warning.error
           "\\valid_function not yet implemented@\n\
            @[<hov 0>(%a)@]" Printer.pp_predicate p
 
-    | Pallocable _ | Pfreeable _ | Pfresh _ | Pinitialized _ | Pdangling _->
+    | Pallocable _ | Pfreeable _ | Pfresh _ | Pdangling _ ->
         Warning.error
           "Allocation, initialization and danglingness not yet implemented@\n\
            @[<hov 0>(%a)@]" Printer.pp_predicate p

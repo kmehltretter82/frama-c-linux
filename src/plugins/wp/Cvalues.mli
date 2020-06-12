@@ -97,6 +97,9 @@ val logic_constant : logic_constant -> term
 val constant_exp : exp -> term
 val constant_term : Cil_types.term -> term
 
+val initialized_obj: c_object -> term
+val uninitialized_obj: c_object -> term
+
 (** {2 Lifting Operations over Memory Values} *)
 
 val map_sloc : ('a -> 'b) -> 'a Sigs.sloc -> 'b Sigs.sloc
@@ -158,5 +161,6 @@ sig
   val included : segment -> segment -> pred
   val valid : Sigma.t -> acs -> segment -> pred
   val invalid : Sigma.t -> segment -> pred
+  val initialized : Sigma.t -> segment -> pred
 
 end
