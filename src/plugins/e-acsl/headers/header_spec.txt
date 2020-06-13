@@ -82,8 +82,6 @@ src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/visit.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/visit.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/error.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -100,8 +98,6 @@ src/local_config.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/main.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/project_initializer/dup_functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/project_initializer/dup_functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/keep_status.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/keep_status.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
