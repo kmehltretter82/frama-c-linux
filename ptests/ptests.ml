@@ -770,8 +770,8 @@ let config_options =
        let new_top =
          List.map
            (fun (cmd,opts, log, macros,_) ->
-             cmd, make_custom_opts opts s, log,
-             current.dc_macros, current.dc_timeout)
+              cmd, make_custom_opts opts s, log,
+              current.dc_macros, current.dc_timeout)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
@@ -1019,9 +1019,9 @@ let basic_command_string =
       if has_ptest_file_t || has_ptest_file_o || command.execnow then
         toplevel ^ " " ^ options
       else begin
-          let file = Filename.sanitize @@ get_ptest_file command in
-          toplevel ^ " " ^ file ^ " " ^ options
-        end
+        let file = Filename.sanitize @@ get_ptest_file command in
+        toplevel ^ " " ^ file ^ " " ^ options
+      end
     in
     if command.timeout = "" then raw_command
     else "timeout " ^ command.timeout ^ " " ^ raw_command
@@ -1112,13 +1112,13 @@ let command_string command =
   let command_string = command_string ^ " >" ^ res in
   let command_string =
     match command.timeout with
-      | "" -> command_string
-      | s ->
-          Printf.sprintf
-            "%s; if test $? -eq 124; then \
-               echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-             fi"
-            command_string s (Filename.sanitize stderr)
+    | "" -> command_string
+    | s ->
+      Printf.sprintf
+        "%s; if test $? -eq 124; then \
+         echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+         fi"
+        command_string s (Filename.sanitize stderr)
   in
   let command_string = match filter with
     | None -> command_string
