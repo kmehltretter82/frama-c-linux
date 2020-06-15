@@ -56,11 +56,13 @@ let pp_ident fmt { package = pkg ; name = id } =
 (* --- Name Resolution                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Std = Transitioning.Stdlib
+
 module PkgMap =
-  Map.Make(struct type t = package let compare = Stdlib.compare end)
+  Map.Make(struct type t = package let compare = Std.compare end)
 
 module IdMap =
-  Map.Make(struct type t = ident let compare = Stdlib.compare end)
+  Map.Make(struct type t = ident let compare = Std.compare end)
 
 module NameSet = Set.Make(String)
 
