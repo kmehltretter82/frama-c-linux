@@ -117,7 +117,7 @@ let bounds_for_small_type ~loc (t1, lv, t2) =
       let min, max = Misc.finite_min_and_max i in
       let t1 = Logic_const.tint ~loc min in
       let t2 = Logic_const.tint ~loc max in
-      let ctx = Typing.number_ty_of_typ ty in
+      let ctx = Typing.number_ty_of_typ ~post:false ty in
       (* we are assured that we will not have a GMP,
          once again because we intersected with [ity] *)
       Typing.type_term ~use_gmp_opt:false ~ctx t1;

@@ -88,7 +88,10 @@ let pred_to_block ~loc kf env ret_vi p =
 
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
-  Typing.type_term ~use_gmp_opt:false ~ctx:(Typing.number_ty_of_typ ret_ty) t;
+  Typing.type_term
+    ~use_gmp_opt:false
+    ~ctx:(Typing.number_ty_of_typ ~post:false ret_ty)
+    t;
   let e, env = !term_to_exp_ref kf env t in
   if Cil.isVoidType ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
