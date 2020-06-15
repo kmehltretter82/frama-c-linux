@@ -24,39 +24,39 @@
 Plugin WP <next-release>
 #########################
 
- -   WP        [2020-06-12] Supports the \initialized ACSL predicate
+-   WP        [2020-06-12] Supports the \initialized ACSL predicate
 
 #########################
 Plugin WP 21.0 (Scandium)
 #########################
 
- - WP          [2020-04-10] Full support for Why3 IEEE float library
- - WP          [2020-04-10] Removed option -wp-check
- - WP          [2020-04-09] Added smoke tests for dead call (-wp-smoke-dead-call)
- - WP          [2020-03-23] Added smoke tests for dead code (-wp-smoke-dead-code)
- - WP          [2020-03-23] Added smoke tests for dead loop (-wp-smoke-dead-loop)
- - WP          [2020-03-26] Added support for invalid-pointer predicate
- - WP          [2020-03-04] Fixed scope problem on block outgoing edge
- - WP          [2020-02-21] Why3 prover version fallback
- - WP          [2020-02-21] Why3 prover full-names use ':' instead of ','
- - WP          [2020-02-20] Fixes handling of LoopCurrent in loop invariants
- - WP          [2020-02-10] Specify cache mode with FRAMAC_WP_CACHE=<mode> (-wp-cache-env)
- - WP          [2020-02-10] Update scripts with FRAMAC_WP_SCRIPT=update and -wp-prover script
- - WP          [2020-02-10] Move frame conditions to Type section for better filtering
- - WP          [2020-02-10] Extended frame conditions to pointers inside compound
- - WP          [2020-02-10] Extended frame conditions with global C-types
- - WP          [2019-17-04] Control splitting with -wp-max-split <n>
- - WP          [2019-12-19] Fix drivers in different projects
- - WP          [2019-12-04] Added option -wp-run-all-provers
- - WP          [2019-06-04] Checks for inconsistent requires (-wp-smoke-tests)
- - WP          [2019-01-29] Emit a warning when no goal is generated
- - WP          [2018-04-17] Limit the number of splits (see -wp-max-split)
- - TIP         [2018-04-03] Create session directory only on demand
- - TIP         [2018-03-19] Specification of JSON script format
- - WP          [2018-03-18] Additional lemma about remainder (mod)
- - TIP         [2018-03-18] Refactor structure of session directory (remove models)
- - TIP         [2018-02-20] Extends bitwise tactics to dis-equalities
- - WP          [2018-02-18] Additional lemmas about logical shift compositions
+- WP          [2020-04-10] Full support for Why3 IEEE float library
+- WP          [2020-04-10] Removed option-wp-check
+- WP          [2020-04-09] Added smoke tests for dead call (-wp-smoke-dead-call)
+- WP          [2020-03-23] Added smoke tests for dead code (-wp-smoke-dead-code)
+- WP          [2020-03-23] Added smoke tests for dead loop (-wp-smoke-dead-loop)
+- WP          [2020-03-26] Added support for invalid-pointer predicate
+- WP          [2020-03-04] Fixed scope problem on block outgoing edge
+- WP          [2020-02-21] Why3 prover version fallback
+- WP          [2020-02-21] Why3 prover full-names use ':' instead of ','
+- WP          [2020-02-20] Fixes handling of LoopCurrent in loop invariants
+- WP          [2020-02-10] Specify cache mode with FRAMAC_WP_CACHE=<mode> (-wp-cache-env)
+- WP          [2020-02-10] Update scripts with FRAMAC_WP_SCRIPT=update and-wp-prover script
+- WP          [2020-02-10] Move frame conditions to Type section for better filtering
+- WP          [2020-02-10] Extended frame conditions to pointers inside compound
+- WP          [2020-02-10] Extended frame conditions with global C-types
+- WP          [2019-17-04] Control splitting with-wp-max-split <n>
+- WP          [2019-12-19] Fix drivers in different projects
+- WP          [2019-12-04] Added option-wp-run-all-provers
+- WP          [2019-06-04] Checks for inconsistent requires (-wp-smoke-tests)
+- WP          [2019-01-29] Emit a warning when no goal is generated
+- WP          [2018-04-17] Limit the number of splits (see-wp-max-split)
+- TIP         [2018-04-03] Create session directory only on demand
+- TIP         [2018-03-19] Specification of JSON script format
+- WP          [2018-03-18] Additional lemma about remainder (mod)
+- TIP         [2018-03-18] Refactor structure of session directory (remove models)
+- TIP         [2018-02-20] Extends bitwise tactics to dis-equalities
+- WP          [2018-02-18] Additional lemmas about logical shift compositions
 
 ##########################
 Plugin WP 20.0 (Calcium)
