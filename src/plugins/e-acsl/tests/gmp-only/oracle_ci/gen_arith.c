@@ -677,6 +677,52 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_add_7);
   }
   /*@ assert 1 - x ≡ -x + 1; */ ;
+  short a = (short)1;
+  short b = (short)1;
+  {
+    __e_acsl_mpz_t __gen_e_acsl_a;
+    __e_acsl_mpz_t __gen_e_acsl_b;
+    __e_acsl_mpq_t __gen_e_acsl__61;
+    __e_acsl_mpq_t __gen_e_acsl__62;
+    __e_acsl_mpq_t __gen_e_acsl_add_8;
+    __e_acsl_mpq_t __gen_e_acsl__63;
+    __e_acsl_mpq_t __gen_e_acsl__64;
+    __e_acsl_mpq_t __gen_e_acsl_sub_6;
+    int __gen_e_acsl_gt_2;
+    __gmpz_init_set_si(__gen_e_acsl_a,(long)a);
+    __gmpz_init_set_si(__gen_e_acsl_b,(long)b);
+    __gmpq_init(__gen_e_acsl__61);
+    __gmpq_set_z(__gen_e_acsl__61,
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_a));
+    __gmpq_init(__gen_e_acsl__62);
+    __gmpq_set_z(__gen_e_acsl__62,
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
+    __gmpq_init(__gen_e_acsl_add_8);
+    __gmpq_add(__gen_e_acsl_add_8,
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__61),
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__62));
+    __gmpq_init(__gen_e_acsl__63);
+    __gmpq_set_d(__gen_e_acsl__63,2.);
+    __gmpq_init(__gen_e_acsl__64);
+    __gmpq_set_d(__gen_e_acsl__64,1.);
+    __gmpq_init(__gen_e_acsl_sub_6);
+    __gmpq_sub(__gen_e_acsl_sub_6,
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__63),
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__64));
+    __gen_e_acsl_gt_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_8),
+                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub_6));
+    __e_acsl_assert(__gen_e_acsl_gt_2 > 0,"Assertion","main",
+                    "a + b > 2. - 1.","tests/gmp-only/arith.i",39);
+    __gmpz_clear(__gen_e_acsl_a);
+    __gmpz_clear(__gen_e_acsl_b);
+    __gmpq_clear(__gen_e_acsl__61);
+    __gmpq_clear(__gen_e_acsl__62);
+    __gmpq_clear(__gen_e_acsl_add_8);
+    __gmpq_clear(__gen_e_acsl__63);
+    __gmpq_clear(__gen_e_acsl__64);
+    __gmpq_clear(__gen_e_acsl_sub_6);
+  }
+  /*@ assert a + b > 2. - 1.; */ ;
   __retres = 0;
   return __retres;
 }
