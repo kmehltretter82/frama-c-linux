@@ -105,3 +105,14 @@ val trim : buffer -> int * int
 val shrink : buffer -> unit
 
 (* -------------------------------------------------------------------------- *)
+(** Printer *)
+(* -------------------------------------------------------------------------- *)
+
+(**
+   Dump the formatter into a string.
+   Defaults are [~indent:20], [~margin:40] and [~trim:true].
+*)
+val to_string : ?indent:int -> ?margin:int -> ?trim:bool ->
+  (Format.formatter -> 'a -> unit) -> 'a -> string
+
+(* -------------------------------------------------------------------------- *)

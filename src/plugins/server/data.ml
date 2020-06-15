@@ -358,7 +358,7 @@ struct
       ~synopsis:Syntax.string ()
   let of_json js = Markdown.plain (Ju.to_string js)
   let to_json txt =
-    `String (Pretty_utils.to_string (Markdown.pp_text ?page:None) txt)
+    `String (Rich_text.to_string ~margin:80 (Markdown.pp_text ?page:None) txt)
 
 end
 

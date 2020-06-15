@@ -110,13 +110,6 @@ struct
         let default = index
       end)
 
-  let get_name = function
-    | PLval (_, _, (Var vi, NoOffset)) -> Some vi.vname
-    | PLval (_, _, lval) -> Some (Format.asprintf "%a" Printer.pp_lval lval)
-    | PExp  (_, _, expr) -> Some (Format.asprintf "%a" Printer.pp_exp expr)
-    | PStmt _ | PStmtStart _ | PVDecl _
-    | PTermLval _ | PGlobal _| PIP _ -> None
-
   let iter f =
     Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
 
@@ -130,9 +123,17 @@ struct
     let () =
       States.column ~model
         ~name:"name"
-        ~descr:(Md.plain "Marker identifier for the end-user, if any")
-        ~data:(module Jstring.Joption)
-        ~get:(fun (tag, _) -> get_name tag)
+        ~descr:(Md.plain "Marker short name")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) -> Printer_tag.label tag)
+        ()
+    in
+    let () =
+      States.column ~model
+        ~name:"descr"
+        ~descr:(Md.plain "Marker declaration or description")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
         ()
     in
     States.register_array
@@ -231,20 +232,44 @@ module Kf = Data.Collection
 (* -------------------------------------------------------------------------- *)
 
 let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.ast.getFunctions"
-    ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Kf.Jlist)
-    begin fun () ->
-      let pool = ref [] in
-      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
-      List.rev !pool
-    end
-
-let () = Request.register ~page
     ~kind:`GET ~name:"kernel.ast.printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+
+module Functions =
+struct
+
+  let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
+
+  let signature kf =
+    let global = Kernel_function.get_global kf in
+    Rich_text.to_string Printer_tag.pretty (PGlobal global)
+
+  let array : kernel_function States.array =
+    begin
+      let model = States.model () in
+      States.column ~model
+        ~name:"name"
+        ~descr:(Md.plain "Name")
+        ~data:(module Data.Jstring)
+        ~get:Kernel_function.get_name () ;
+      States.column ~model
+        ~name:"signature"
+        ~descr:(Md.plain "Signature")
+        ~data:(module Data.Jstring)
+        ~get:signature
+        () ;
+      States.register_array
+        ~page ~key
+        ~name:"kernel.ast.functions"
+        ~descr:(Md.plain "AST Functions")
+        ~iter:Globals.Functions.iter
+        ~add_reload_hook:Ast.add_hook_on_update
+        model
+    end
+
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Information                                                        --- *)

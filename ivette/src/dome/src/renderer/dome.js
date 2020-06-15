@@ -964,9 +964,9 @@ export class PP {
   constructor(moduleName) {
     this.moduleName = moduleName;
   }
-  log(t) { console.log(`[${this.moduleName}] ${t}.`); }
-  warning(t) { console.warn(`[${this.moduleName}] ${t}.`); }
-  error(t) { console.error(`[${this.moduleName}] ${t}.`); }
+  log(...args) { console.log(`[${this.moduleName}]`,...args); }
+  warn(...args) { console.warn(`[${this.moduleName}]`,...args); }
+  error(...args) { console.error(`[${this.moduleName}]`,...args); }
 }
 
 // --------------------------------------------------------------------------

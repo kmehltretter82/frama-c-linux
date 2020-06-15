@@ -37,6 +37,79 @@ type localizable =
   | PGlobal of global
   | PIP of Property.t
 
+let glabel = function
+  | GType(tinfo,_) -> tinfo.tname
+  | GCompTag(comp, _) | GCompTagDecl(comp, _) -> comp.cname
+  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) -> enum.ename
+  | GVarDecl(vi,_) | GVar(vi, _, _)
+  | GFun( { svar=vi }, _) | GFunDecl(_,vi,_) -> vi.vname
+  | GPragma((Attr(a,_) | AttrAnnot a),_) -> a
+  | GAnnot _ -> "(annotation)"
+  | GAsm _ -> "(assembly)"
+  | GText _ -> "(text)"
+
+let label = function
+  | PVDecl(_,_,vi) -> vi.vname
+  | PLval (_, _, (Var vi, NoOffset)) -> vi.vname
+  | PLval _ -> "(l-value)"
+  | PExp  _ -> "(expression)"
+  | PStmt _ | PStmtStart _ -> "(statement)"
+  | PTermLval _ -> "(term)"
+  | PGlobal g -> glabel g
+  | PIP _ -> "(property)"
+
+let decl_of = function
+  | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
+  | GEnumTag(enum,loc) -> GEnumTagDecl(enum,loc)
+  | GFunDecl(_,vi,loc) | GVar(vi,_,loc) | GFun({ svar=vi },loc)
+    -> GVarDecl(vi,loc)
+  | GAsm(_,loc) -> GAsm("…",loc)
+  | GText s when String.length s > 20 -> GText(String.sub s 0 20 ^ "…")
+  | GPragma(Attr(a,_),loc) -> GPragma(Attr(a,[]),loc)
+  | GAnnot _ -> GText "Global annotation"
+  | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
+    | GVarDecl _ | GText _ | GPragma _) as g -> g
+
+let pretty fmt = function
+  | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
+  | PLval (_, _, lval) -> Printer.pp_lval fmt lval
+  | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
+  | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
+  | PIP prop -> Description.pp_property fmt prop
+  | PStmt(_,stmt) | PStmtStart (_, stmt) ->
+    let p = fst @@ Cil_datatype.Stmt.loc stmt in
+    Format.fprintf fmt "Statement at %a" Filepath.pp_pos p
+  | PGlobal g -> Printer.pp_global fmt (decl_of g)
+
+let pp_ki_loc fmt ki =
+  match ki with
+  | Kglobal -> (* no location, print 'global' *)
+    Format.fprintf fmt "global"
+  | Kstmt st -> Filepath.pp_pos fmt (fst @@ Stmt.loc st)
+
+let pp_debug fmt = function
+  | PStmtStart (_, s) ->
+    Format.fprintf fmt "LocalizableStart %d (%a)"
+      s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
+  | PStmt (_, s) ->
+    Format.fprintf fmt "LocalizableStmt %d (%a)"
+      s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
+  | PLval (_, ki, lv) ->
+    Format.fprintf fmt "LocalizableLval %a (%a)"
+      Printer.pp_lval lv pp_ki_loc ki
+  | PExp (_, ki, lv) ->
+    Format.fprintf fmt "LocalizableExp %a (%a)"
+      Printer.pp_exp lv pp_ki_loc ki
+  | PTermLval (_, ki, _pi, tlv) ->
+    Format.fprintf fmt "LocalizableTermLval %a (%a)"
+      Printer.pp_term_lval tlv pp_ki_loc ki
+  | PVDecl (_, _, vi) ->
+    Format.fprintf fmt "LocalizableVDecl %a" Printer.pp_vdecl vi
+  | PGlobal g ->
+    Format.fprintf fmt "LocalizableGlobal %a" Printer.pp_global g
+  | PIP ip ->
+    Format.fprintf fmt "LocalizableIP %a" Description.pp_property ip
+
 module Localizable =
   Datatype.Make_with_collections
     (struct
@@ -114,35 +187,8 @@ module Localizable =
         | _ , PIP _ -> 1
         | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
 
-      let pp_ki_loc fmt ki =
-        match ki with
-        | Kglobal -> (* no location, print 'global' *)
-          Format.fprintf fmt "global"
-        | Kstmt st ->
-          Cil_datatype.Location.pretty fmt (Stmt.loc st)
+      let pretty = pretty (* defined above *)
 
-      let pretty fmt = function
-        | PStmtStart (_, s) ->
-          Format.fprintf fmt "LocalizableStart %d (%a)"
-            s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
-        | PStmt (_, s) ->
-          Format.fprintf fmt "LocalizableStmt %d (%a)"
-            s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
-        | PLval (_, ki, lv) ->
-          Format.fprintf fmt "LocalizableLval %a (%a)"
-            Printer.pp_lval lv pp_ki_loc ki
-        | PExp (_, ki, lv) ->
-          Format.fprintf fmt "LocalizableExp %a (%a)"
-            Printer.pp_exp lv pp_ki_loc ki
-        | PTermLval (_, ki, _pi, tlv) ->
-          Format.fprintf fmt "LocalizableTermLval %a (%a)"
-            Printer.pp_term_lval tlv pp_ki_loc ki
-        | PVDecl (_, _, vi) ->
-          Format.fprintf fmt "LocalizableVDecl %a" Printer.pp_varinfo vi
-        | PGlobal g ->
-          Format.fprintf fmt "LocalizableGlobal %a" Printer.pp_global g
-        | PIP ip ->
-          Format.fprintf fmt "LocalizableIP %a" Description.pp_property ip
     end)
 
 (* -------------------------------------------------------------------------- *)
