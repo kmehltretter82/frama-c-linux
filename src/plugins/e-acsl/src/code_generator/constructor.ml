@@ -152,12 +152,7 @@ let mk_mark_readonly vi =
   let loc = vi.vdecl in
   mk_rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-let mk_runtime_check ?(reverse=false) kind kf e p =
-  let loc = p.pred_loc in
-  let msg =
-    Kernel.Unicode.without_unicode
-      (Format.asprintf "%a@?" Printer.pp_predicate) p
-  in
+let mk_runtime_check_with_msg ?(reverse=false) ~loc msg kind kf e =
   let file = (fst loc).Filepath.pos_path in
   let line = (fst loc).Filepath.pos_lnum in
   let e =
@@ -173,6 +168,14 @@ let mk_runtime_check ?(reverse=false) kind kf e p =
       Cil.mkString ~loc msg;
       Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
       Cil.integer loc line ]
+
+let mk_runtime_check ?(reverse=false) kind kf e p =
+  let loc = p.pred_loc in
+  let msg =
+    Kernel.Unicode.without_unicode
+      (Format.asprintf "%a@?" Printer.pp_predicate) p
+  in
+  mk_runtime_check_with_msg ~reverse ~loc msg kind kf e
 
 (*
 Local Variables:
