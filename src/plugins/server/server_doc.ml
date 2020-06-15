@@ -133,6 +133,8 @@ let page_of_package pkg =
 
 let kind_of_decl = function
   | D_signal -> "SIGNAL"
+  | D_value | D_state -> "STATE"
+  | D_array -> "ARRAY"
   | D_type _ | D_record _ | D_enum _ -> "DATA"
   | D_request { rq_kind=`GET } -> "GET"
   | D_request { rq_kind=`SET } -> "SET"
@@ -159,6 +161,9 @@ let md_named ~kind pp = function
 let descr_of_decl names decl =
   match decl.d_kind with
   | D_signal -> []
+  | D_state -> [] (* TBC *)
+  | D_value -> [] (* TBC *)
+  | D_array -> [] (* TBC *)
   | D_type data ->
     let pp = pp_for ~decl names in
     Md.quote (pp.self @ Md.code "::=" @ Package.md_jtype pp data)

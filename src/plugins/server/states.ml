@@ -43,20 +43,22 @@ let install_emit signal add_hook =
 (* --- Values                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_value (type a) ~page ~name ~descr ?(details=[])
+let register_value (type a) ~package ~name ~descr
     ~(output : a Request.output) ~get
     ?(add_hook : unit callback option) ()
   =
   let open Markdown in
-  let title =  Printf.sprintf "`VALUE` %s" name in
-  let index = [ Printf.sprintf "%s (`VALUE`)" name ] in
-  let contents = [ Block [Text descr] ; Block details] in
-  let h = Server_doc.publish ~page ~name ~title ~index ~contents () in
-  let signal = Request.signal ~page ~name:(name ^ ".sig")
-      ~descr:(plain "Signal for value " @ href h) () in
-  Request.register ~page ~kind:`GET ~name:(name ^ ".get")
-    ~descr:(plain "Getter for value " @ href h)
-    ~input:(module Junit) ~output get ;
+  let href = link ~name () in
+  let descr = Markdown.par descr in
+  let () = Package.declare
+      ~package ~name ~descr D_value in
+  let signal = Request.signal
+      ~package ~name:(name ^ "Sig")
+      ~descr:(plain "Signal for state" @ href) in
+  let () = Request.register
+      ~package ~name:(name ^ "Get")
+      ~descr:(plain "Getter for state" @ href)
+      ~kind:`GET ~input:(module Junit) ~output get in
   install_emit signal add_hook ;
   signal
 
@@ -64,22 +66,26 @@ let register_value (type a) ~page ~name ~descr ?(details=[])
 (* --- States                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_state (type a) ~page ~name ~descr ?(details=[])
+let register_state (type a) ~package ~name ~descr
     ~(data : a data) ~get ~set
     ?(add_hook : unit callback option) () =
   let open Markdown in
-  let title =  Printf.sprintf "`STATE` %s" name in
-  let index = [ Printf.sprintf "%s (`STATE`)" name ] in
-  let contents = [ Block [Text descr] ; Block details] in
-  let h = Server_doc.publish ~page ~name ~title ~index ~contents () in
-  let signal = Request.signal ~page ~name:(name ^ ".sig")
-      ~descr:(plain "Signal for state " @ href h) () in
-  Request.register ~page ~kind:`GET ~name:(name ^ ".get")
-    ~descr:(plain "Getter for state " @ href h)
-    ~input:(module Junit) ~output:(module (val data)) get ;
-  Request.register ~page ~kind:`SET ~name:(name ^ ".set")
-    ~descr:(plain "Setter for state " @ href h)
-    ~input:(module (val data)) ~output:(module Junit) set ;
+  let module D = (val data) in
+  let href = link ~name () in
+  let descr = Markdown.par descr in
+  let () = Package.declare
+      ~package ~name ~descr D_state in
+  let signal = Request.signal
+      ~package ~name:(name ^ "Sig")
+      ~descr:(plain "Signal for state" @ href) in
+  let () = Request.register
+      ~package ~name:(name ^ "Get")
+      ~descr:(plain "Getter for state" @ href)
+      ~kind:`GET ~input:(module Junit) ~output:(module D) get in
+  let () = Request.register
+      ~package ~name:(name ^ "Set")
+      ~descr:(plain "Setter for state" @ href)
+      ~kind:`SET ~input:(module D) ~output:(module Junit) set in
   install_emit signal add_hook ;
   signal
 
@@ -87,22 +93,22 @@ let register_state (type a) ~page ~name ~descr ?(details=[])
 (* --- Model Signature                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a column = Syntax.field * ('a -> json)
+type 'a column = Package.fieldInfo * ('a -> json)
 
 type 'a model = 'a column list ref
 
 let model () = ref []
 
-let column (type a b) ~(model : a model) ~name ~descr
-    ~(data: b Request.output) ~(get : a -> b) () =
+let column (type a b) ~name ~descr
+    ~(data: b Request.output) ~(get : a -> b) (model : a model) =
   let module D = (val data) in
   if name = "key" || name = "index" then
     raise (Invalid_argument "Server.States.column: invalid name") ;
-  if List.exists (fun (fd,_) -> fd.Syntax.fd_name = name) !model then
+  if List.exists (fun (fd,_) -> fd.Package.fd_name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
-  let fd = Syntax.{
+  let fd = Package.{
       fd_name = name ;
-      fd_syntax = D.syntax ;
+      fd_type = D.jtype ;
       fd_descr = descr ;
     } in
   model := (fd , fun a -> D.to_json (get a)) :: !model
@@ -255,65 +261,61 @@ let fetch array n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_array ~page ~name ~descr ?(details=[]) ~key
+let register_array ~package ~name ~descr ~key
     ~(iter : 'a callback)
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
     ?(add_reload_hook : unit callback option)
     model =
   let open Markdown in
-  let title =  Printf.sprintf "`ARRAY` %s" name in
-  let index = [ Printf.sprintf "%s (`ARRAY`)" name ] in
-  let columns = !model in
-  let contents = [
-    Block [Text descr] ;
-    Syntax.fields ~title:"Columns"
-      begin
-        Syntax.{
-          fd_name = "key" ;
-          fd_syntax = Syntax.ident ;
-          fd_descr = plain "entry identifier" ;
-        } :: List.rev (List.map fst columns)
-      end ;
-    Block details
-  ] in
-  let mref = Server_doc.publish ~page:page ~name:name ~title ~index ~contents () in
-  let signal = Request.signal ~page ~name:(name ^ ".sig")
-      ~descr:(plain "Signal for array " @ href mref) () in
-  let getter = List.map Syntax.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
+  let href = link ~name () in
+  let descr = Markdown.par descr in
+  let columns = List.rev !model in
+  let fields = Package.{
+      fd_name = "key" ;
+      fd_type = Jkey name ;
+      fd_descr = plain "Entry identifier." ;
+    } :: List.map fst columns in
+  let () = Package.declare ~package:package ~name:name ~descr D_array in
+  let signal = Request.signal
+      ~package ~name:(name ^ "Sig")
+      ~descr:(plain "Signal for array" @ href) in
+  let row = Package.declare_id
+      ~package ~name:(name ^ "Row")
+      ~descr:(par (plain "Data rows for array" @ href))
+      (D_record fields) in
+  let getter =
+    List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
   let array = {
     key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
   } in
-  let signature =
-    Request.signature ~kind:`GET ~page ~name:(name ^ ".fetch")
-      ~descr:(plain "Fetch updates for array " @ href mref)
-      ~input:(module Jint)
-      ~details:[
-        Text(plain
-               "Collect all entry updates since the last fetch.\n\
-                The number of fetched entries is limited to the\n\
-                provided integer. When `reload:true` is returned,\n\
-                _all_ previously received entries must be removed.")]
-      () in
-  let module Jentries =
-    (struct
-      include Jany
-      let syntax = Syntax.data "entry" mref
-    end) in
+  let signature = Request.signature () in
+  let module Jkeys = Jlist(struct
+    include Jstring
+    let jtype = Package.Jkey name
+  end) in
+  let module Jrows = Jlist (struct
+    include Jany
+    let jtype = Package.Jdata row
+  end) in
   let set_reload = Request.result signature
       ~name:"reload" ~descr:(plain "array fully reloaded")
       (module Jbool) in
   let set_removed = Request.result signature
       ~name:"removed" ~descr:(plain "removed entries")
-      (module Jident.Jlist) in
+      (module Jkeys) in
   let set_updated = Request.result signature
       ~name:"updated" ~descr:(plain "updated entries")
-      (module Jlist(Jentries)) in
+      (module Jrows) in
   let set_pending = Request.result signature
       ~name:"pending" ~descr:(plain "remaining entries to be fetched")
       (module Jint) in
-  Request.register_sig signature
+  Request.register_sig
+    ~package ~name:(name ^ "Fetch")
+    ~descr:(plain "Data fetcher for array" @ href)
+    ~kind:`GET
+    signature
     begin fun rq n ->
       let buffer = fetch array n in
       set_reload rq buffer.reload ;
@@ -321,8 +323,9 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
       set_updated rq buffer.updated ;
       set_pending rq buffer.pending ;
     end ;
-  Request.register ~kind:`GET ~page ~name:(name ^ ".reload")
-    ~descr:(plain "Force full reload for array " @ href mref)
+  Request.register
+    ~package ~name:(name ^ "Reload") ~kind:`GET
+    ~descr:(plain "Force full reload for array" @ href)
     ~input:(module Junit) ~output:(module Junit)
     (fun () -> reload array) ;
   synchronize array ;

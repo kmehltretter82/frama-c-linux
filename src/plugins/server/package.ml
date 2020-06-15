@@ -197,6 +197,9 @@ type requestInfo = {
 
 type declKindInfo =
   | D_signal
+  | D_value
+  | D_state
+  | D_array
   | D_type of jtype
   | D_enum of tagInfo list
   | D_record of fieldInfo list
@@ -247,8 +250,7 @@ let visit_request f { rq_input ; rq_output } =
   ( visit_param f rq_input ; visit_param f rq_output )
 
 let visit_dkind f = function
-  | D_signal -> ()
-  | D_enum _ -> ()
+  | D_signal | D_state | D_value | D_array | D_enum _ -> ()
   | D_type js -> visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq

@@ -70,6 +70,9 @@ type requestInfo = {
 
 type declKindInfo =
   | D_signal
+  | D_value
+  | D_state
+  | D_array
   | D_type of jtype
   | D_enum of tagInfo list
   | D_record of fieldInfo list
