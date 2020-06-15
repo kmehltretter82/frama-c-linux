@@ -48,7 +48,7 @@ async function loadAST(
         buffer.operation(() => {
           buffer.clear();
           if (!data) {
-            buffer.log('// No code for function ', theFunction);
+            buffer.log('// No code for function', theFunction);
           }
           buffer.printTextWithTags(data);
           if (theMarker)
