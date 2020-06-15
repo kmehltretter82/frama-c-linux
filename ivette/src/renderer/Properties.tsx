@@ -363,9 +363,17 @@ const PropertyColumns = () => {
   const statusDict: { [status: string]: Tag } =
     States.useDictionary('kernel.dictionary.propstatus');
 
+  const kindDict: { [kind: string]: Tag } =
+    States.useDictionary('kernel.dictionary.propkind');
+
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
     [statusDict],
+  );
+
+  const getKind = React.useCallback(
+    ({ kind }: Property) => (kindDict[kind] ?? { label: kind }),
+    [kindDict],
   );
 
   return (
@@ -386,7 +394,7 @@ const PropertyColumns = () => {
         render={renderFile}
       />
       <ColumnCode id="function" label="Function" width={120} />
-      <ColumnCode id="kind" label="Property kind" fixed width={120} />
+      <ColumnTag id="kind" label="Property kind" getter={getKind} width={120} />
       <ColumnCode id="alarm" label="Alarms" fixed width={160} />
       <Column
         id="names"
