@@ -120,7 +120,8 @@ val visit_package_used: (ident -> unit) -> packageInfo -> unit
 type package
 
 val package :
-  ?plugin:plugin ->
+  ?plugin:string ->
+  ?title:string ->
   ?descr:Markdown.block ->
   ?readme:string ->
   name:string ->
@@ -141,7 +142,7 @@ val declare :
 val iter : (packageInfo -> unit) -> unit
 
 (** Assigns non-classing names for each identifier. *)
-val package_resolve : ?keywords: string list -> packageInfo -> string IdMap.t
+val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Markdown Generation                                                --- *)
@@ -152,6 +153,8 @@ type pp = {
   data: ident -> Markdown.text ;
   kind: string -> Markdown.text ;
 }
+
+val escaped : string -> Markdown.text
 
 val md_jtype : pp -> jtype -> Markdown.text
 

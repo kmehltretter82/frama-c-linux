@@ -131,13 +131,13 @@ let codeblock ?(lang="") content =
        [Code_block(lang,lines)]
     ) fmt content
 
-let text text = [Text text]
-let list items = [UL items]
-let enum items = [OL items]
-let description items = [DL items]
-
-let par text = [Block [Text text]]
-let block b = if b = [] then [] else [Block b]
+let text text = if text = [] then [] else [Text text]
+let par text = if text = [] then [] else [Block [Text text]]
+let quote text = if text = [] then [] else [Block [Block_quote [Block [Text text]]]]
+let block block = if block = [] then [] else [Block block]
+let list items = if items = [] then [] else [UL items]
+let enum items = if items = [] then [] else [OL items]
+let description items = if items = [] then [] else [DL items]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sectioning                                                         --- *)

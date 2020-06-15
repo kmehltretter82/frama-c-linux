@@ -161,6 +161,9 @@ val codeblock : ?lang:string -> ('a,Format.formatter,unit,block) format4 -> 'a
 (** Single Paragraph element *)
 val par : text -> elements
 
+(** Quoted Paragraph element *)
+val quote : text -> elements
+
 (** Block element *)
 val block : block -> elements
 

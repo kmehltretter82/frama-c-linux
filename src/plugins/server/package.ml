@@ -242,7 +242,7 @@ let visit_package_def f { d_content } =
 let visit_package_used f { d_content } =
   List.iter (visit_decl f) d_content
 
-let package_resolve ?(keywords=[]) pkg =
+let resolve ?(keywords=[]) pkg =
   let scope = Scope.create pkg.d_plugin in
   List.iter (Scope.reserve_name scope) keywords ;
   visit_package_def (Scope.reserve_ident scope) pkg ;
@@ -299,11 +299,14 @@ let userdoc ~plugin ~title ~descr = function
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package ?(plugin=Kernel) ?(descr=[]) ?readme ~name () =
+let package ?plugin ?title ?(descr=[]) ?readme ~name () =
   check_package name ;
+  let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
   let pkgname = String.split_on_char '.' name in
   let pkgid = { plugin ; package = pkgname ; name = "*"} in
-  let title = Printf.sprintf "Package %s" name in
+  let title = match title with
+    | None -> Printf.sprintf "Package %s" name
+    | Some text -> text in
   let userdoc = userdoc ~plugin ~title ~descr readme in
   let pkgInfo = {
     d_plugin = plugin ;

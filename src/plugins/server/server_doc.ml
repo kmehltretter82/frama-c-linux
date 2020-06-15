@@ -24,8 +24,9 @@
 (* --- Server Documentation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Markdown
+open Package
 type json = Yojson.Basic.t
+module Md = Markdown
 module Senv = Server_parameters
 module Pages = Map.Make(String)
 
@@ -97,7 +98,7 @@ let publish ~page ?name ?(index=[]) ~title
     ?(generated=static)
     () =
   let id = match name with Some id -> id | None -> title in
-  let href = Section( page.path , id ) in
+  let href = Md.Section( page.path , id ) in
   let section () = Markdown.section ?name ~title (contents @ generated ()) in
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
@@ -111,8 +112,15 @@ let () = protocole ~title:"Architecture" ~filename:"server.md"
 (* --- Package Publication                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+let href_of_ident names id =
+  let chapter = match id.plugin with
+    | Kernel -> `Kernel | Plugin p -> `Plugin p in
+  let filename = String.concat "_" id.package ^ ".md" in
+  let page = snd @@ path_for chapter filename in
+  let text = try IdMap.find id names with Not_found -> id.name in
+  Md.link ~text:(Md.emph text) ~page ~name:id.name ()
+
 let page_of_package pkg =
-  let open Package in
   let chapter = match pkg.d_plugin with
     | Kernel -> `Kernel | Plugin p -> `Plugin p in
   let filename = String.concat "_" pkg.d_package ^ ".md" in
@@ -126,18 +134,70 @@ let page_of_package pkg =
     let title = Printf.sprintf "Package %s" (String.concat "." path) in
     page chapter ~title ~descr:pkg.d_userdoc ~filename ()
 
-let declaration page links decl =
-  let open Package in
+let fullname_of_ident id =
+  String.concat "." @@
+  match id.plugin with
+  | Kernel -> id.package @ [ id.name ]
+  | Plugin p -> p :: (id.package @ [id.name ])
+
+let kind_of_decl = function
+  | D_signal -> "SIGNAL"
+  | D_type _ | D_record _ -> "DATA"
+  | D_request { rq_kind=`GET } -> "GET"
+  | D_request { rq_kind=`SET } -> "SET"
+  | D_request { rq_kind=`EXEC } -> "EXEC"
+
+let pp_for ?decl names =
+  let self = match decl with Some d -> d.d_ident.name | None -> "self" in
+  {
+    self = Md.emph self ;
+    data = href_of_ident names ;
+    kind = (fun tag -> Md.code (Printf.sprintf "#%s" tag)) ;
+  }
+
+let descr_of_fields ?(title="Field") pp (fields : fieldInfo list) =
+  let header = [
+    Md.plain title, Md.Left;
+    Md.plain "Format", Md.Center;
+    Md.plain "Description", Md.Left;
+  ] in
+  let row f = [
+    Package.escaped f.fd_name ;
+    Package.md_jtype pp f.fd_type ;
+    f.fd_descr ;
+  ] in
+  [Md.Table {
+    caption = None ; header ; content = List.map row fields ;
+  }]
+
+let descr_of_decl names decl =
+  match decl.d_kind with
+  | D_signal -> []
+  | D_type data ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::=" @ Package.md_jtype pp data)
+  | D_record fields ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::= { … }") @
+    descr_of_fields pp fields
+  | _ -> []
+
+let declaration page names decl =
   let name = decl.d_ident.name in
-  let contents = block decl.d_descr in
-  let href = publish ~page ~name ~contents () in
-  links := IdMap.add decl.d_ident href !links
+  let fullname = fullname_of_ident decl.d_ident in
+  let kind = kind_of_decl decl.d_kind in
+  let title = Printf.sprintf "`%s` %s" kind fullname in
+  let index = [ Printf.sprintf "%s (`%s`)" fullname kind ] in
+  let contents = Md.block decl.d_descr in
+  let generated () = descr_of_decl names decl in
+  let _href = publish ~page ~name ~title ~index ~contents ~generated () in
+  ()
 
 let package pkg =
   begin
     let page = page_of_package pkg in
-    let links = ref Package.IdMap.empty in
-    List.iter (declaration page links) pkg.Package.d_content ;
+    let names = Package.resolve pkg in
+    List.iter (declaration page names) pkg.d_content ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -156,10 +216,9 @@ let pages_of_chapter c =
   List.sort (fun p q -> p.order - q.order) !w
 
 let table_of_chapter c =
-  [H2 (Markdown.plain (title_of_chapter c), None);
-   Block (list (List.map
-                  (fun p -> text (link ~text:(plain p.title) ~page:p.path ()))
-                  (pages_of_chapter c)))]
+  let page p = Md.text (Md.link ~text:(Md.plain p.title) ~page:p.path ()) in
+  [Md.H2 (Markdown.plain (title_of_chapter c), None);
+   Md.Block (Md.list (List.map page (pages_of_chapter c)))]
 
 let table_of_contents () =
   table_of_chapter `Protocol @
@@ -176,7 +235,7 @@ module Cmap = Map.Make
     end)
 
 let index_entry (title,href) =
-  text @@ Markdown.href ~text:(plain title) href
+  Md.text @@ Markdown.href ~text:(Md.plain title) href
 
 let index () =
   let category name =
@@ -197,12 +256,13 @@ let index () =
   begin
     List.fold_left
       (fun elements (c,es) ->
-         let entries = Block (list @@ List.map index_entry es) :: elements in
+         let entries =
+           Md.Block (Md.list @@ List.map index_entry es) :: elements in
          if c = [] then entries
          else
            let cname = String.concat "." c in
            let title = Printf.sprintf "Index of `%s`" cname in
-           H3(plain title,None) :: entries
+           Md.H3(Md.plain title,None) :: entries
       ) [] categories
   end
 
@@ -247,7 +307,7 @@ let pp_one_page ~root ~page ~title body =
   try
     let chan = open_out full_path in
     let fmt = Format.formatter_of_out_channel chan in
-    let title = plain title in
+    let title = Md.plain title in
     Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
@@ -272,12 +332,12 @@ let dump ~root ?(meta=true) () =
       let path = Printf.sprintf "%s/readme.md.json" root in
       Yojson.Basic.to_file path maindata ;
       let body =
-        [ H1 (plain "Documentation", None);
-          Block (text (format "Version %s" Fc_config.version))]
+        [ Md.H1 (Md.plain "Documentation", None);
+          Md.Block (Md.text (Md.format "Version %s" Fc_config.version))]
         @
         table_of_contents ()
         @
-        [H2 (plain "Index", None)]
+        [Md.H2 (Md.plain "Index", None)]
         @
         index ()
       in
