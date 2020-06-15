@@ -42,38 +42,49 @@ exception Longlong of ikind
 
 let get_set_suffix_and_arg res_ty e =
   let ty = Cil.typeOf e in
-  if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then "", [ e ]
-  else
-    let args_uisi e =
-      if Gmp_types.Z.is_t res_ty then [ e ]
-      else begin
-        assert (Gmp_types.Q.is_t res_ty);
-        [ e; Cil.one ~loc:e.eloc ]
-      end
-    in
-    match Cil.unrollType ty with
-    | TInt(IChar, _) ->
-      (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui"
-       else "_si"),
-      args_uisi e
-    | TInt((IBool | IUChar | IUInt | IUShort | IULong), _) ->
-      "_ui", args_uisi e
-    | TInt((ISChar | IShort | IInt | ILong), _) -> "_si", args_uisi e
-    | TInt((ILongLong | IULongLong as ikind), _) -> raise (Longlong ikind)
-    | TPtr(TInt(IChar, _), _) ->
-      "_str",
-      (* decimal base for the number given as string *)
-      [ e; Cil.integer ~loc:e.eloc 10 ]
-    | TFloat((FDouble | FFloat), _) ->
-      (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
-         Hence, calling [set_d] for both of them is sound.
-         HOWEVER: the machdep MUST NOT be vulnerable to double rounding
-         [TODO] check the statement above *)
-      "_d", [ e ]
-    | TFloat(FLongDouble, _) ->
-      Error.not_yet "creating gmp from long double"
-    | _ ->
-      assert false
+  let exp_number_ty = Typing.number_ty_of_typ ~post:true ty in
+  let res_number_ty = Typing.number_ty_of_typ ~post:true res_ty in
+  let args_uisi e =
+    if Gmp_types.Z.is_t res_ty then [ e ]
+    else begin
+      assert (Gmp_types.Q.is_t res_ty);
+      [ e; Cil.one ~loc:e.eloc ]
+    end
+  in
+  match (exp_number_ty, res_number_ty) with
+  | Typing.Gmpz, Typing.Gmpz | Typing.Rational, Typing.Rational ->
+    "", [ e ]
+  | Typing.Gmpz, Typing.Rational ->
+    "_z", [ e ]
+  | Typing.Rational, Typing.Gmpz ->
+    "_q", [ e ]
+  | Typing.C_integer IChar, _ ->
+    (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui"
+     else "_si"),
+    args_uisi e
+  | Typing.C_integer (IBool | IUChar | IUInt | IUShort | IULong), _ ->
+    "_ui", args_uisi e
+  | Typing.C_integer (ISChar | IShort | IInt | ILong), _ ->
+    "_si", args_uisi e
+  | Typing.C_integer (ILongLong | IULongLong as ikind), _ ->
+    raise (Longlong ikind)
+  | Typing.C_float (FDouble | FFloat), _ ->
+    (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
+       Hence, calling [set_d] for both of them is sound.
+       HOWEVER: the machdep MUST NOT be vulnerable to double rounding
+       [TODO] check the statement above *)
+    "_d", [ e ]
+  | Typing.C_float FLongDouble, _ ->
+    Error.not_yet "creating gmp from long double"
+  | Typing.Gmpz, _ | Typing.Rational, _ | Typing.Real, _ | Typing.Nan, _ -> (
+      match Cil.unrollType ty with
+      | TPtr(TInt(IChar, _), _) ->
+        "_str",
+        (* decimal base for the number given as string *)
+        [ e; Cil.integer ~loc:e.eloc 10 ]
+      | _ ->
+        assert false
+    )
 
 let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
