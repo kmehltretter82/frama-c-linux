@@ -47,7 +47,7 @@ val label: localizable -> string
 (** Name (or category). *)
 val glabel: global -> string
 
-(** Signature. *)
+(** Description of a localizable. *)
 val pretty: Format.formatter -> localizable -> unit
 
 (** Debugging. *)

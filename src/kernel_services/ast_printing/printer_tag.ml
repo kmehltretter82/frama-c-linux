@@ -52,8 +52,8 @@ let label = function
   | PVDecl(_,_,vi) -> vi.vname
   | PLval (_, _, (Var vi, NoOffset)) -> vi.vname
   | PLval _ -> "(l-value)"
-  | PExp  _ -> "(expr)"
-  | PStmt _ | PStmtStart _ -> "(stmt)"
+  | PExp  _ -> "(expression)"
+  | PStmt _ | PStmtStart _ -> "(statement)"
   | PTermLval _ -> "(term)"
   | PGlobal g -> glabel g
   | PIP _ -> "(property)"
