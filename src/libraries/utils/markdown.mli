@@ -167,6 +167,9 @@ val quote : text -> elements
 (** Block element *)
 val block : block -> elements
 
+(** Table element *)
+val table : table -> elements
+
 (** Get the content of a file as raw markdown.
     @raise Sys_error if there's no such file.
 *)

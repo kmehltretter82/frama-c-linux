@@ -137,6 +137,7 @@ let quote text = if text = [] then [] else [Block [Block_quote [Block [Text text
 let block block = if block = [] then [] else [Block block]
 let list items = if items = [] then [] else [UL items]
 let enum items = if items = [] then [] else [OL items]
+let table table = if table.content = [] then [] else [Table table]
 let description items = if items = [] then [] else [DL items]
 
 (* -------------------------------------------------------------------------- *)

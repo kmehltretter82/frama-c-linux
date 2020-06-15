@@ -158,7 +158,7 @@ type jtype =
   | Jnumber
   | Jstring
   | Jtag of string
-  | Jkind of string
+  | Jindex of string (* kind of a string used for indexing *)
   | Joption of jtype
   | Jassoc of string * jtype
   | Jarray of jtype
@@ -178,6 +178,12 @@ type fieldInfo = {
   fd_descr: Markdown.text;
 }
 
+type tagInfo = {
+  tg_name: string;
+  tg_label: Markdown.text;
+  tg_descr: Markdown.text;
+}
+
 type paramInfo =
   | P_value of jtype
   | P_named of fieldInfo list
@@ -191,6 +197,7 @@ type requestInfo = {
 type declKindInfo =
   | D_signal
   | D_type of jtype
+  | D_enum of tagInfo list
   | D_record of fieldInfo list
   | D_request of requestInfo
 
@@ -213,7 +220,7 @@ type packageInfo = {
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
-  | Jstring | Jkind _ | Jtag _ -> ()
+  | Jstring | Jindex _ | Jtag _ -> ()
   | Joption js | Jassoc(_,js)  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
@@ -230,6 +237,7 @@ let visit_request f { rq_input ; rq_output } =
 
 let visit_dkind f = function
   | D_signal -> ()
+  | D_enum _ -> ()
   | D_type js -> visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq
@@ -349,7 +357,7 @@ let escaped tag = Md.code (Printf.sprintf "\"%s\"" @@ String.escaped tag)
 type pp = {
   self: Md.text ;
   data: ident -> Md.text ;
-  kind: string -> Md.text ;
+  index: string -> Md.text ;
 }
 
 let rec md_jtype pp = function
@@ -360,7 +368,7 @@ let rec md_jtype pp = function
   | Jboolean -> Md.emph "boolean"
   | Jstring -> Md.emph "string"
   | Jtag tag -> escaped tag
-  | Jkind kd -> pp.kind kd
+  | Jindex kd -> pp.index kd
   | Jdata id -> pp.data id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
@@ -368,7 +376,7 @@ let rec md_jtype pp = function
   | Jarray js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
   | Jassoc (id,js) ->
-    Md.code "{[" @ pp.kind id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
+    Md.code "{[" @ pp.index id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
 
 and md_jlist pp sep js =
   Md.glue ~sep:(Md.plain sep)  (List.map (md_jtype pp) js)
@@ -387,13 +395,47 @@ and protect names js =
   | Junion _ -> Md.code "(" @ md_jtype names js @ Md.code ")"
   | _ -> md_jtype names js
 
+(* -------------------------------------------------------------------------- *)
+(* --- Tags & Fields                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let md_tags ?(title="Tags") (tags : tagInfo list) =
+  let header = Md.[
+    plain title, Left;
+    plain "Value", Left;
+    plain "Description", Left
+  ] in
+  let row tg = [
+    tg.tg_label ;
+    escaped tg.tg_name ;
+    tg.tg_descr ;
+  ] in
+  Md.{ caption = None ; header ; content = List.map row tags  }
+
+let md_fields ?(title="Field") pp (fields : fieldInfo list) =
+  let header = Md.[
+    plain title, Left;
+    plain "Format", Center;
+    plain "Description", Left;
+  ] in
+  let row f = [
+    escaped f.fd_name ;
+    md_jtype pp f.fd_type ;
+    f.fd_descr ;
+  ] in
+  Md.{ caption = None ; header ; content = List.map row fields }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printer                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
 let pp_jtype fmt js =
   let scope = Scope.create Kernel in
   visit_jtype (Scope.use scope) js ;
   let ns = Scope.resolve scope in
   let self = Md.emph "self" in
-  let kind id = Md.code (Printf.sprintf "#%s" id) in
   let data id = Md.emph (IdMap.find id ns) in
-  Markdown.pp_text fmt (md_jtype { kind ; data ; self } js)
+  let index id = Md.code (Printf.sprintf "#%s" id) in
+  Markdown.pp_text fmt (md_jtype { index ; data ; self } js)
 
 (* -------------------------------------------------------------------------- *)

@@ -35,7 +35,7 @@ type jtype =
   | Jnumber
   | Jstring
   | Jtag of string (** Enum constant tag *)
-  | Jkind of string (** Kind of ids (actually strings) *)
+  | Jindex of string (** Kind of ids (actually strings) *)
   | Joption of jtype (** Value or 'null' *)
   | Jassoc of string * jtype (** Dictionary for kind of ids *)
   | Jarray of jtype
@@ -51,6 +51,12 @@ type fieldInfo = {
   fd_descr: Markdown.text;
 }
 
+type tagInfo = {
+  tg_name: string;
+  tg_label: Markdown.text;
+  tg_descr: Markdown.text;
+}
+
 type paramInfo =
   | P_value of jtype
   | P_named of fieldInfo list
@@ -64,6 +70,7 @@ type requestInfo = {
 type declKindInfo =
   | D_signal
   | D_type of jtype
+  | D_enum of tagInfo list
   | D_record of fieldInfo list
   | D_request of requestInfo
 
@@ -151,11 +158,13 @@ val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 type pp = {
   self: Markdown.text ;
   data: ident -> Markdown.text ;
-  kind: string -> Markdown.text ;
+  index: string -> Markdown.text ;
 }
 
 val escaped : string -> Markdown.text
 
 val md_jtype : pp -> jtype -> Markdown.text
+val md_tags : ?title:string -> tagInfo list -> Markdown.table
+val md_fields : ?title:string -> pp -> fieldInfo list -> Markdown.table
 
 (* -------------------------------------------------------------------------- *)

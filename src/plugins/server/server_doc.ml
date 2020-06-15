@@ -142,33 +142,20 @@ let fullname_of_ident id =
 
 let kind_of_decl = function
   | D_signal -> "SIGNAL"
-  | D_type _ | D_record _ -> "DATA"
+  | D_type _ | D_record _ | D_enum _ -> "DATA"
   | D_request { rq_kind=`GET } -> "GET"
   | D_request { rq_kind=`SET } -> "SET"
   | D_request { rq_kind=`EXEC } -> "EXEC"
 
+let md_index kind = Md.code (Printf.sprintf "#%s" kind)
+
 let pp_for ?decl names =
   let self = match decl with Some d -> d.d_ident.name | None -> "self" in
-  {
+  Package.{
     self = Md.emph self ;
     data = href_of_ident names ;
-    kind = (fun tag -> Md.code (Printf.sprintf "#%s" tag)) ;
+    index = md_index ;
   }
-
-let descr_of_fields ?(title="Field") pp (fields : fieldInfo list) =
-  let header = [
-    Md.plain title, Md.Left;
-    Md.plain "Format", Md.Center;
-    Md.plain "Description", Md.Left;
-  ] in
-  let row f = [
-    Package.escaped f.fd_name ;
-    Package.md_jtype pp f.fd_type ;
-    f.fd_descr ;
-  ] in
-  [Md.Table {
-    caption = None ; header ; content = List.map row fields ;
-  }]
 
 let descr_of_decl names decl =
   match decl.d_kind with
@@ -179,7 +166,11 @@ let descr_of_decl names decl =
   | D_record fields ->
     let pp = pp_for ~decl names in
     Md.quote (pp.self @ Md.code "::= { … }") @
-    descr_of_fields pp fields
+    Md.table (Package.md_fields pp fields)
+  | D_enum tags ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::=" @ Md.emph "tags…") @
+    Md.table (Package.md_tags tags)
   | _ -> []
 
 let declaration page names decl =
