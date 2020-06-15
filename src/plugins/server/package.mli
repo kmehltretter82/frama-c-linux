@@ -25,9 +25,8 @@
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
-type package = private { plugin: plugin; pkgname: string list }
-type ident = private { package: package; name: string }
-type name = string list
+type path = string list
+type ident = private { plugin: plugin; package: path; name: string; }
 
 type jtype =
   | Jany
@@ -70,13 +69,14 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_kind : declKindInfo;
-  d_title : Markdown.text;
   d_descr : Markdown.block;
+  d_kind : declKindInfo;
 }
 
 type packageInfo = {
-  d_package : package;
+  d_plugin : plugin;
+  d_package : path;
+  d_userdoc : Markdown.elements;
   d_content : declInfo list;
 }
 
@@ -85,16 +85,13 @@ type packageInfo = {
 (* -------------------------------------------------------------------------- *)
 
 val pp_plugin : Format.formatter -> plugin -> unit
-val pp_package : Format.formatter -> package -> unit
 val pp_ident : Format.formatter -> ident -> unit
-val pp_name : Format.formatter -> name -> unit
 val pp_jtype : Format.formatter -> jtype -> unit
 
 (* -------------------------------------------------------------------------- *)
 (* --- Imports Resolution                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-module PkgMap : Map.S with type key = package
 module IdMap : Map.S with type key = ident
 
 module Scope :
@@ -103,8 +100,7 @@ sig
   val create : plugin -> t
   val reserve_name : t -> string -> unit (** Must _not_ be call after [use] *)
   val reserve_ident : t -> ident -> unit (** Must _not_ be call after [use] *)
-  val resolve : t -> name IdMap.t
-  val name_of : name IdMap.t -> ident -> string
+  val resolve : t -> string IdMap.t
   val use : t -> ident -> unit
 end
 
@@ -121,18 +117,26 @@ val visit_package_used: (ident -> unit) -> packageInfo -> unit
 (* --- Server API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
+type package
+
+val package :
+  ?plugin:string ->
+  ?descr:Markdown.block ->
+  ?readme:string ->
+  name:string ->
+  unit -> package
+
 (**
    Register the declaration in the Server API.
    This is only way to obtain identifiers.
    This ensures identifiers are declared before being used.
 *)
 val declare :
-  ?plugin:string ->
-  id:string ->
-  title:Markdown.text ->
+  package:package ->
+  name:string ->
   ?descr:Markdown.block ->
   declKindInfo ->
-  ident
+  unit
 
 val iter : (packageInfo -> unit) -> unit
 

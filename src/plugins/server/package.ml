@@ -22,48 +22,39 @@
 
 (* -------------------------------------------------------------------------- *)
 
+module Senv = Server_parameters
 module Md = Markdown
 
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
-type package = { plugin: plugin; pkgname: string list }
-type ident = { package: package; name: string }
-type name = string list
+type path = string list
+type ident = { plugin: plugin; package: path; name: string }
 
 let pp_plugin fmt = function
   | Kernel -> Format.pp_print_string fmt "Kernel"
   | Plugin p -> Format.fprintf fmt "Plugin %s" p
 
-let pp_name fmt = function
-  | [] -> ()
-  | p::ps ->
-    Format.pp_print_string fmt p ;
-    List.iter (fun p ->
-        Format.pp_print_char fmt '.' ;
-        Format.pp_print_string fmt p ;
-      ) ps
+let pp_step fmt a =
+  ( Format.pp_print_string fmt a ; Format.pp_print_char fmt '.' )
 
-let pp_package fmt { plugin ; pkgname } =
-  match plugin with
-  | Kernel -> pp_name fmt pkgname
-  | Plugin p -> Format.fprintf fmt "%s.%a" p pp_name pkgname
+let pp_plugin_step fmt = function
+  | Kernel -> ()
+  | Plugin p -> pp_step fmt p
 
-let pp_ident fmt { package = pkg ; name = id } =
-  Format.fprintf fmt "%a.%s" pp_package pkg id
+let pp_ident fmt { plugin ; package ; name } =
+  ( pp_plugin_step fmt plugin ;
+    List.iter (pp_step fmt) package ;
+    Format.pp_print_string fmt name )
 
 (* -------------------------------------------------------------------------- *)
 (* --- Name Resolution                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Std = Transitioning.Stdlib
-
-module PkgMap =
-  Map.Make(struct type t = package let compare = Std.compare end)
-
-module IdMap =
-  Map.Make(struct type t = ident let compare = Std.compare end)
-
+module Id = struct type t = ident let compare = Std.compare end
+module IdMap = Map.Make(Id)
+module IdSet = Set.Make(Id)
 module NameSet = Set.Make(String)
 
 module Scope =
@@ -86,20 +77,21 @@ struct
     | Plugin p -> "plugin" :: p :: ids
 
   (* propose various abbreviations ; finally render full qualified name *)
-  let ranked_name source { package = pkg ; name = id } k =
-    let name = [id] in
+  let ranked source { plugin ; package ; name } k =
+    String.concat "_" @@
+    let name = [name] in
     match k with
     | 0 -> name
-    | 1 -> relative ~source ~target:pkg.plugin name
-    | 2 -> relative ~source ~target:pkg.plugin (inpkg name pkg.pkgname)
-    | 3 -> relative ~source ~target:pkg.plugin (pkg.pkgname @ name)
-    | _ -> target pkg.plugin (pkg.pkgname @ name)
+    | 1 -> relative ~source ~target:plugin name
+    | 2 -> relative ~source ~target:plugin (inpkg name package)
+    | 3 -> relative ~source ~target:plugin (package @ name)
+    | _ -> target plugin (package @ name)
 
   type t = {
     source : plugin ;
     mutable clashes : bool ;
-    mutable index : (name,(ident * int) list) Hashtbl.t ;
-    mutable names : name IdMap.t ;
+    mutable index : (string,(ident * int) list) Hashtbl.t ;
+    mutable names : string IdMap.t ;
     mutable reserved : NameSet.t ;
   }
 
@@ -112,10 +104,10 @@ struct
   }
 
   let rec non_reserved scope id rk =
-    match ranked_name scope.source id rk with
-    | [a] when NameSet.mem a scope.reserved ->
+    let a = ranked scope.source id rk in
+    if NameSet.mem a scope.reserved then
       non_reserved scope id (succ rk)
-    | ns -> ns , rk
+    else a,rk
 
   let push scope id rk =
     begin
@@ -152,10 +144,6 @@ struct
           ) index ;
         resolve scope
       end
-
-  let name_of ns id =
-    try String.concat "." (IdMap.find id ns)
-    with Not_found -> "?"
 
 end
 
@@ -208,13 +196,14 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_kind : declKindInfo;
-  d_title : Markdown.text;
   d_descr : Markdown.block;
+  d_kind : declKindInfo;
 }
 
 type packageInfo = {
-  d_package : package;
+  d_plugin : plugin ;
+  d_package : string list ;
+  d_userdoc : Markdown.elements ;
   d_content : declInfo list;
 }
 
@@ -254,42 +243,95 @@ let visit_package_used f { d_content } =
   List.iter (visit_decl f) d_content
 
 let package_resolve ?(keywords=[]) pkg =
-  let scope = Scope.create pkg.d_package.plugin in
+  let scope = Scope.create pkg.d_plugin in
   List.iter (Scope.reserve_name scope) keywords ;
   visit_package_def (Scope.reserve_ident scope) pkg ;
   visit_package_used (Scope.use scope) pkg ;
-  IdMap.map (String.concat "_") (Scope.resolve scope)
+  Scope.resolve scope
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let ident_re = Str.regexp "^\\([a-z0-9]+\\.\\)*[a-zA-Z0-9]+$"
+type package = {
+  pkgInfo : packageInfo ; (* with empty decl *)
+  mutable revDecl : declInfo list ; (* in reverse order *)
+}
 
-let identFor ?plugin name =
-  if not (Str.string_match ident_re name 0) then
-    failwith
-      (Printf.sprintf "Invalid identifier %S (use \"abc.def.fooBar\")" name) ;
+let registry = ref IdSet.empty (* including packages *)
+let packages = ref [] (* in reverse order *)
+
+let name_re = Str.regexp "^[a-zA-Z0-9]+$"
+let package_re = Str.regexp "^[a-z0-9]+\\(\\.[a-z0-9]+\\)*$"
+
+let check_name name =
+  if not (Str.string_match name_re name 0) then
+    Senv.fatal
+      "Invalid identifier %S (use « camlCased » names)" name
+
+let check_package pkg =
+  if not (Str.string_match package_re pkg 0) then
+    Senv.fatal
+      "Invalid package identifier %S (use dot separated lowercase names)"
+      pkg
+
+let register_ident id =
+  if IdSet.mem id !registry then
+    Senv.fatal "Duplicate identifier '%a'" pp_ident id ;
+  registry := IdSet.add id !registry
+
+let userdoc ~plugin ~title ?(descr=[]) = function
+  | None -> Md.section ~title (Md.block descr)
+  | Some readme ->
+    let file =
+      match plugin with
+      | Kernel ->
+        Printf.sprintf "%s/server/kernel/%s" Fc_config.datadir readme
+      | Plugin name ->
+        Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name readme
+    in
+    if Sys.file_exists file
+    then Markdown.rawfile file
+    else Markdown.(section ~title (Md.block descr))
+
+(* -------------------------------------------------------------------------- *)
+(* --- Declarations                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let package ?plugin ?descr ?readme ~name () =
+  check_package name ;
   let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
-  let path = String.split_on_char '.' name in
-  let pkgname , name = match List.rev path with
-    | [] -> failwith (Printf.sprintf "Inconsistent name %S" name)
-    | a :: ps -> List.map String.lowercase_ascii (List.rev ps) , a
-  in { package = { plugin ; pkgname } ; name }
+  let pkgname = String.split_on_char '.' name in
+  let pkgid = { plugin ; package = pkgname ; name = "*"} in
+  let title = Printf.sprintf "Package %s" name in
+  let userdoc = userdoc ~plugin ~title ?descr readme in
+  let pkgInfo = {
+    d_plugin = plugin ;
+    d_package = pkgname ;
+    d_userdoc = userdoc ;
+    d_content = [] ;
+  } in
+  let package = { pkgInfo ; revDecl=[] } in
+  register_ident pkgid ;
+  packages := package :: !packages ;
+  package
 
-let packages = ref PkgMap.empty
-
-let declare ?plugin ~id ~title ?(descr=[]) decl =
-  let ident = identFor ?plugin id in
-  let pkg = ident.package in
-  let decl = { d_ident=ident ; d_title=title ; d_descr=descr ; d_kind=decl } in
-  let content = try PkgMap.find pkg !packages with Not_found -> [] in
-  packages := PkgMap.add pkg (decl::content) !packages ; ident
+let declare ~package:pkg ~name ?(descr=[]) decl =
+  check_name name ;
+  let { d_plugin = plugin ; d_package = package } = pkg.pkgInfo in
+  let ident = { plugin ; package ; name } in
+  let decl = { d_ident=ident ; d_descr=descr ; d_kind=decl } in
+  register_ident ident ;
+  pkg.revDecl <- decl :: pkg.revDecl
 
 let iter f =
-  PkgMap.iter
-    (fun d_package d_content -> f { d_package ; d_content })
-    !packages
+  begin
+    List.iter f @@
+    List.sort (fun a b -> Std.compare a.d_plugin b.d_plugin) @@
+    List.rev_map
+      (fun pkg -> { pkg.pkgInfo with d_content = List.rev pkg.revDecl })
+      !packages
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- JSON To MarkDown                                                   --- *)
@@ -344,7 +386,7 @@ let pp_jtype fmt js =
   let ns = Scope.resolve scope in
   let self = Md.emph "self" in
   let kind id = Md.code (Printf.sprintf "#%s" id) in
-  let data id = Md.emph (Scope.name_of ns id) in
+  let data id = Md.emph (IdMap.find id ns) in
   Markdown.pp_text fmt (md_jtype { kind ; data ; self } js)
 
 (* -------------------------------------------------------------------------- *)

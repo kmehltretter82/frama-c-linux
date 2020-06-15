@@ -137,7 +137,7 @@ let enum items = [OL items]
 let description items = [DL items]
 
 let par text = [Block [Text text]]
-let block b = [Block b]
+let block b = if b = [] then [] else [Block b]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sectioning                                                         --- *)
