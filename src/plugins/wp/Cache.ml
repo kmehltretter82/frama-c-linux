@@ -62,6 +62,23 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
 
 let get_dir () = (CACHEDIR.get () :> string)
 
+let is_session_dir path =
+  0 = Filepath.Normalized.compare
+    path (Wp_parameters.get_session_dir ~force:false "cache")
+
+let get_usable_dir ?(make=false) () =
+  let path = CACHEDIR.get () in
+  let parents = is_session_dir path in
+  let path = (path :> string) in
+  if not (Sys.file_exists path) && make then
+    Extlib.mkdir ~parents path 0o755 ;
+  if not (Sys.is_directory path) then begin
+    Wp_parameters.warning ~current:false ~once:true
+      "Cache path is not a directory" ;
+    raise Not_found
+  end ;
+  path
+
 let has_dir () =
   try
     if not (Wp_parameters.CacheEnv.get()) then
@@ -177,10 +194,8 @@ let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
-      let dir = get_dir () in
-      if not (Sys.file_exists dir && Sys.is_directory dir) then
-        VCS.no_result
-      else
+      try
+        let dir = get_usable_dir ~make:true () in
         let hash = Lazy.force hash in
         let file = Printf.sprintf "%s/%s.json" dir hash in
         if not (Sys.file_exists file) then VCS.no_result
@@ -192,15 +207,16 @@ let get_cache_result ~mode hash =
             Wp_parameters.warning ~current:false ~once:true
               "invalid cache entry (%s)" (Printexc.to_string err) ;
             VCS.no_result
+      with Not_found -> VCS.no_result
 
 let set_cache_result ~mode hash prover result =
   match mode with
   | NoCache | Replay | Offline -> ()
   | Rebuild | Update | Cleanup ->
-      let dir = CACHEDIR.get () in
       let hash = Lazy.force hash in
-      let file = Printf.sprintf "%s/%s.json" (dir :> string) hash in
       try
+        let dir = get_usable_dir ~make:true () in
+        let file = Printf.sprintf "%s/%s.json" dir hash in
         mark_cache ~mode hash ;
         ProofScript.json_of_result (VCS.Why3 prover) result
         |> Json.save_file file
@@ -211,26 +227,29 @@ let set_cache_result ~mode hash prover result =
 let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
-    let dir = get_dir () in
-    if is_global_cache () then
-      Wp_parameters.warning ~current:false ~once:true
-        "Cleanup mode deactivated with global cache."
-    else
-      try
-        if Sys.file_exists dir && Sys.is_directory dir then
-          Array.iter
-            (fun f ->
-               if Filename.check_suffix f ".json" then
-                 let hash = Filename.chop_suffix f ".json" in
-                 if not (Hashtbl.mem cleanup hash) then
-                   begin
-                     incr removed ;
-                     Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
-                   end
-            ) (Sys.readdir dir) ;
-      with Unix.Unix_error _ as exn ->
+    try
+      let dir = get_usable_dir () in
+      if is_global_cache () then
+        Wp_parameters.warning ~current:false ~once:true
+          "Cleanup mode deactivated with global cache."
+      else
+        Array.iter
+          (fun f ->
+             if Filename.check_suffix f ".json" then
+               let hash = Filename.chop_suffix f ".json" in
+               if not (Hashtbl.mem cleanup hash) then
+                 begin
+                   incr removed ;
+                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                 end
+          ) (Sys.readdir dir) ;
+    with
+    | Unix.Unix_error _ as exn ->
         Wp_parameters.warning ~current:false
           "Can not cleanup cache (%s)" (Printexc.to_string exn)
+    | Not_found ->
+        Wp_parameters.warning ~current:false
+          "Cannot cleanup cache"
 
 type runner =
   timeout:int option -> steplimit:int option ->
