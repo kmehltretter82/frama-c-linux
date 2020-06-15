@@ -157,6 +157,17 @@ let pp_for ?decl names =
     index = md_index ;
   }
 
+let md_param ~kind pp prm =
+  Md.emph kind @ Md.code "::=" @ match prm with
+  | P_value jt -> Package.md_jtype pp jt
+  | P_named _ -> Md.code "{" @ Md.emph (kind ^ "…") @ Md.code "}"
+
+let md_named ~kind pp = function
+  | P_value _ -> []
+  | P_named prms ->
+    let title = String.capitalize_ascii kind in
+    Md.table (Package.md_fields ~title pp prms)
+
 let descr_of_decl names decl =
   match decl.d_kind with
   | D_signal -> []
@@ -165,13 +176,18 @@ let descr_of_decl names decl =
     Md.quote (pp.self @ Md.code "::=" @ Package.md_jtype pp data)
   | D_record fields ->
     let pp = pp_for ~decl names in
-    Md.quote (pp.self @ Md.code "::= { … }") @
+    Md.quote (pp.self @ Md.code "::= {" @ Md.emph "fields…" @ Md.code "}") @
     Md.table (Package.md_fields pp fields)
   | D_enum tags ->
     let pp = pp_for ~decl names in
     Md.quote (pp.self @ Md.code "::=" @ Md.emph "tags…") @
     Md.table (Package.md_tags tags)
-  | _ -> []
+  | D_request rq ->
+    let pp = pp_for names in
+    Md.quote (md_param ~kind:"input" pp rq.rq_input) @
+    Md.quote (md_param ~kind:"output" pp rq.rq_output) @
+    md_named ~kind:"input" pp rq.rq_input @
+    md_named ~kind:"output" pp rq.rq_output
 
 let declaration page names decl =
   let name = decl.d_ident.name in
