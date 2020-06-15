@@ -20,12 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Package
+module Js = Yojson.Basic
+module Ju = Yojson.Basic.Util
+
 (* -------------------------------------------------------------------------- *)
 (* --- Data Encoding                                                      --- *)
 (* -------------------------------------------------------------------------- *)
-
-module Js = Yojson.Basic
-module Ju = Yojson.Basic.Util
 
 type json = Js.t
 let pretty = Js.pretty_print ~std:false
@@ -33,16 +34,9 @@ let pretty = Js.pretty_print ~std:false
 module type S =
 sig
   type t
-  val syntax : Syntax.t
+  val jtype : jtype
   val of_json : json -> t
   val to_json : t -> json
-end
-
-module type Info =
-sig
-  val page : Server_doc.page
-  val name : string
-  val descr : Markdown.text
 end
 
 type 'a data = (module S with type t = 'a)
@@ -63,7 +57,7 @@ let failure ?json msg =
 let failure_from_type_error msg json =
   failure ~json "%s" msg
 
-let page = Server_doc.page `Kernel ~title:"Basic Types" ~filename:"data.md" ()
+let package = Package.package ~name:"data" ~readme:"data.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
@@ -74,8 +68,7 @@ struct
   type t = A.t option
 
   let nullable = try ignore (A.of_json `Null) ; true with _ -> false
-  let syntax =
-    Syntax.option (if not nullable then A.syntax else Syntax.tuple [A.syntax])
+  let jtype = Joption (if not nullable then A.jtype else Jtuple [A.jtype])
 
   let to_json = function
     | None -> `Null
@@ -95,7 +88,7 @@ end
 module Jpair(A : S)(B : S) : S with type t = A.t * B.t =
 struct
   type t = A.t * B.t
-  let syntax = Syntax.tuple [A.syntax;B.syntax]
+  let jtype = Jtuple [A.jtype;B.jtype]
   let to_json (x,y) = `List [ A.to_json x ; B.to_json y ]
   let of_json = function
     | `List [ ja ; jb ] -> A.of_json ja , B.of_json jb
@@ -105,7 +98,7 @@ end
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t =
 struct
   type t = A.t * B.t * C.t
-  let syntax = Syntax.tuple [A.syntax;B.syntax;C.syntax]
+  let jtype = Jtuple [A.jtype;B.jtype;C.jtype]
   let to_json (x,y,z) = `List [ A.to_json x ; B.to_json y ; C.to_json z ]
   let of_json = function
     | `List [ ja ; jb ; jc ] -> A.of_json ja , B.of_json jb , C.of_json jc
@@ -119,7 +112,7 @@ end
 module Jlist(A : S) : S with type t = A.t list =
 struct
   type t = A.t list
-  let syntax = Syntax.array A.syntax
+  let jtype = Jarray A.jtype
   let to_json xs = `List (List.map A.to_json xs)
   let of_json js = List.map A.of_json (Ju.to_list js)
 end
@@ -131,7 +124,7 @@ end
 module Jarray(A : S) : S with type t = A.t array =
 struct
   type t = A.t array
-  let syntax = Syntax.array A.syntax
+  let jtype = Jarray A.jtype
   let to_json xs = `List (List.map A.to_json (Array.to_list xs))
   let of_json js = Array.of_list @@ List.map A.of_json (Ju.to_list js)
 end
@@ -163,7 +156,7 @@ end
 module Junit : S with type t = unit =
 struct
   type t = unit
-  let syntax = Syntax.unit
+  let jtype = Jnull
   let of_json _js = ()
   let to_json () = `Null
 end
@@ -171,7 +164,7 @@ end
 module Jany : S with type t = json =
 struct
   type t = json
-  let syntax = Syntax.any
+  let jtype = Jany
   let of_json js = js
   let to_json js = js
 end
@@ -180,7 +173,7 @@ module Jbool : S_collection with type t = bool =
   Collection
     (struct
       type t = bool
-      let syntax = Syntax.boolean
+      let jtype = Jboolean
       let of_json = Ju.to_bool
       let to_json b = `Bool b
     end)
@@ -189,7 +182,7 @@ module Jint : S_collection with type t = int =
   Collection
     (struct
       type t = int
-      let syntax = Syntax.int
+      let jtype = Jnumber
       let of_json = Ju.to_int
       let to_json n = `Int n
     end)
@@ -198,7 +191,7 @@ module Jfloat : S_collection with type t = float =
   Collection
     (struct
       type t = float
-      let syntax = Syntax.number
+      let jtype = Jnumber
       let of_json = Ju.to_number
       let to_json v = `Float v
     end)
@@ -207,27 +200,32 @@ module Jstring : S_collection with type t = string =
   Collection
     (struct
       type t = string
-      let syntax = Syntax.string
+      let jtype = Jstring
       let of_json = Ju.to_string
       let to_json s = `String s
     end)
 
-module Jident : S_collection with type t = string =
+module Jmarkdown : S_collection with type t = Markdown.text =
   Collection
     (struct
-      type t = string
-      let syntax = Syntax.ident
-      let of_json = Ju.to_string
-      let to_json s = `String s
+      type t = Markdown.text
+      let jtype =
+        let descr = Markdown.(par (plain "Markdown (inlined) text.")) in
+        datatype ~package ~name:"markdown" ~descr Jstring
+      let of_json js = Markdown.plain (Ju.to_string js)
+      let to_json txt = `String (Pretty_utils.to_string Markdown.pp_text txt)
     end)
-
-let text_page = Server_doc.page `Kernel ~title:"Rich Text Format" ~filename:"text.md" ()
 
 module Jtext =
 struct
   include Jany
-  let syntax = Syntax.publish ~page:text_page ~name:"text"
-      ~synopsis:Syntax.any ~descr:(Markdown.plain "Formatted text.") ()
+  let jtype =
+    let descr = Markdown.plain
+        "Rich text format uses `[tag; …text ]` to apply \
+         the tag `tag` to the enclosed text. \
+         Empty tag `\"\"` can also used to simply group text together." in
+    let jdef = Junion [ Jnull; Jstring; Jarray Jself ] in
+    datatype ~package ~name:"text" ~descr:(Markdown.par descr) jdef
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -248,10 +246,7 @@ struct
   }
 
   type 'a signature = {
-    page : Server_doc.page ;
-    name : string ;
-    descr : Markdown.text ;
-    mutable fields : Syntax.field list ;
+    mutable fields : fieldInfo list ;
     mutable default : 'a record ;
     mutable published : bool ;
   }
@@ -266,29 +261,27 @@ struct
     val set : (r,'a) field -> 'a -> t -> t
   end
 
-  let signature ~page ~name ~descr () = {
-    page ; name ; descr ;
+  let signature () = {
     published = false ;
     fields = [] ;
     default = Fmap.empty ;
   }
 
-  let invalid name reason =
-    let msg = Printf.sprintf "Server.Data.Record.%s: %s" name reason in
-    raise (Invalid_argument msg)
+  let not_published s =
+    if s.published then
+      raise (Invalid_argument "Server.Data.Record: already published")
 
   let field (type a r) (s : r signature)
       ~name ~descr ?default (d : a data) : (r,a) field =
-    if s.published then
-      invalid s.name (Printf.sprintf "published record (%s)" name) ;
+    not_published s ;
     let module D = (val d) in
     begin match default with
       | None -> ()
       | Some v -> s.default <- Fmap.add name (D.to_json v) s.default
     end ;
-    let field = Syntax.{
+    let field = Package.{
         fd_name = name ;
-        fd_syntax = D.syntax ;
+        fd_type = D.jtype ;
         fd_descr = descr ;
       } in
     s.fields <- field :: s.fields ;
@@ -299,12 +292,11 @@ struct
 
   let option (type a r) (s : r signature)
       ~name ~descr (d : a data) : (r,a option) field =
-    if s.published then
-      invalid s.name (Printf.sprintf "published record (%s)" name) ;
+    not_published s ;
     let module D = (val d) in
-    let field = Syntax.{
+    let field = Package.{
         fd_name = name ;
-        fd_syntax = option D.syntax ;
+        fd_type = Joption D.jtype ;
         fd_descr = descr ;
       } in
     s.fields <- field :: s.fields ;
@@ -316,19 +308,16 @@ struct
       | Some v -> Fmap.add name (D.to_json v) r in
     { member ; getter ; setter }
 
-  let publish (type r) (s : r signature) =
-    if s.published then
-      invalid s.name "already published record" ;
+  let publish (type r) ~package ~name ?(descr=[]) (s : r signature) =
+    not_published s ;
     let module M =
     struct
       type nonrec r = r
       type t = r record
-      let descr = s.descr
-      let syntax =
-        let fields = Syntax.fields ~title:"Field" (List.rev s.fields) in
-        Syntax.publish ~page:s.page ~name:s.name ~descr
-          ~synopsis:(Syntax.record [])
-          ~details:[fields] ()
+      let jtype =
+        let record = D_record (List.rev s.fields) in
+        let descr = Markdown.par descr in
+        Jdata (Package.declare_id ~package ~name ~descr record)
       let default = s.default
       let has fd r = fd.member r
       let get fd r = fd.getter r
@@ -349,95 +338,72 @@ struct
 
 end
 
-module Jmarkdown : S with type t = Markdown.text =
-struct
-
-  type t = Markdown.text
-  let syntax = Syntax.publish ~page
-      ~name:"markdown" ~descr:(Markdown.plain "Markdown (inlined text)")
-      ~synopsis:Syntax.string ()
-  let of_json js = Markdown.plain (Ju.to_string js)
-  let to_json txt =
-    `String (Rich_text.to_string ~margin:80 (Markdown.pp_text ?page:None) txt)
-
-end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Enums                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Tag = Collection
     (struct
-      type t = Syntax.tag
+      type t = Package.tagInfo
 
-      let syntax = Syntax.publish ~page ~name:"tag"
-          ~descr:(Markdown.plain "Tag description")
-          ~synopsis:(Syntax.record [
-              "name",Syntax.string ;
-              "label",Jmarkdown.syntax ;
-              "descr",Jmarkdown.syntax ;
-            ]) ()
+      let jtype =
+        datatype ~package ~name:"tag"
+          ~descr:Markdown.(par (plain "Enum Tag Description"))
+          (Jrecord [
+              "name",Jstring ;
+              "label",Jmarkdown.jtype ;
+              "descr",Jmarkdown.jtype ;
+            ])
 
-      let to_json tg = `Assoc [
-          "name", `String tg.Syntax.tag_name ;
-          "label", Jmarkdown.to_json tg.tag_label ;
-          "descr" , Jmarkdown.to_json tg.tag_descr ;
+      let to_json tg = `Assoc Package.[
+          "name", `String tg.tg_name ;
+          "label", Jmarkdown.to_json tg.tg_label ;
+          "descr" , Jmarkdown.to_json tg.tg_descr ;
         ]
 
-      let of_json js = Syntax.{
-          tag_name = Ju.member "name" js |> Ju.to_string ;
-          tag_label = Ju.member "label" js |> Jmarkdown.of_json ;
-          tag_descr = Ju.member "descr" js |> Jmarkdown.of_json ;
+      let of_json js = Package.{
+          tg_name = Ju.member "name" js |> Ju.to_string ;
+          tg_label = Ju.member "label" js |> Jmarkdown.of_json ;
+          tg_descr = Ju.member "descr" js |> Jmarkdown.of_json ;
         }
+
     end)
 
 module Enum =
 struct
 
   type 'a dictionary = {
-    page : Server_doc.page ;
-    name : string ;
-    title : string ;
-    descr : Markdown.text ;
     values : (string,'a option) Hashtbl.t ;
     vindex : ('a,string) Hashtbl.t ;
     mutable syntax : Markdown.text ;
-    mutable published : bool ;
-    mutable tags : Syntax.tag list ;
+    mutable published : (package * string) option ;
+    mutable tags : tagInfo list ;
   }
 
   type 'a tag = string
-  type 'a prefix = string
+  type 'a prefix = 'a dictionary * string
 
   let tag_name tg = tg
   let tag_label a = function
     | None -> Markdown.plain (String.(capitalize_ascii (lowercase_ascii a)))
     | Some lbl -> lbl
 
-  let dictionary ~page ~name ~title ~descr () = {
-    page ; name ; descr ; title ;
-    published = false ;
+  let dictionary () = {
+    published = None ;
     values = Hashtbl.create 0 ;
     vindex = Hashtbl.create 0 ;
     syntax = [] ;
     tags = [] ;
   }
 
-  let invalid name reason =
-    let msg = Printf.sprintf "Server.Data.Enum.%s: %s" name reason in
-    raise (Invalid_argument msg)
-
-  let page (d : 'a dictionary) = d.page
-  let name (d : 'a dictionary) = d.name
-  let syntax (d : 'a dictionary) = d.syntax
-
-  let tag (d : 'a dictionary) ~name ?label ~descr ?value () : 'a tag =
+  let tag ~name ?label ~descr ?value (d : 'a dictionary) : 'a tag =
     if Hashtbl.mem d.values name then
-      invalid d.name (Printf.sprintf "duplicate tag (%s)" name) ;
-    let tg = Syntax.{
-        tag_name = name ;
-        tag_label = tag_label name label ;
-        tag_descr = descr ;
+      ( let msg = Printf.sprintf "Server.Data.Enum: duplicate tag %S" name in
+        raise (Invalid_argument msg) );
+    let tg = Package.{
+        tg_name = name ;
+        tg_label = tag_label name label ;
+        tg_descr = descr ;
       } in
     d.tags <- tg :: d.tags ;
     Hashtbl.add d.values name value ;
@@ -449,18 +415,25 @@ struct
   let find_tag (d : 'a dictionary) name =
     if Hashtbl.mem d.values name then name else raise Not_found
 
-  let instance = Printf.sprintf "%s:%s"
+  let instance_name = Printf.sprintf "%s:%s"
 
-  let prefix (d : 'a dictionary) ~prefix ?(var="*") ?label ~descr () =
-    let tg = Syntax.{
-        tag_name = instance prefix var ;
-        tag_label = tag_label (prefix ^ ".") label ;
-        tag_descr = descr ;
+  let instance (_,prefix) = instance_name prefix
+
+  let prefix ~name ?(var="*") ?label ~descr (d : 'a dictionary) =
+    let tg = Package.{
+        tg_name = instance_name name var ;
+        tg_label = tag_label (name ^ ".") label ;
+        tg_descr = descr ;
       } in
-    d.tags <- tg :: d.tags ; prefix
+    d.tags <- tg :: d.tags ; d , name
 
-  let extends d prefix ~name ?label ~descr ?value () =
-    tag d ~name:(instance prefix name) ?label ~descr ?value ()
+  let extends ~name ?label ~descr ?value ((d,prefix) : 'a prefix) : 'a tag =
+    let name = tag ~name:(instance_name prefix name) ?label ~descr ?value d in
+    ( match d.published with
+      | None -> ()
+      | Some (package,name) ->
+        Package.update ~package ~name (D_enum (List.rev d.tags))
+    ) ; name
 
   let to_json name vindex v =
     try `String (Hashtbl.find vindex v)
@@ -478,26 +451,27 @@ struct
 
   let tags d = List.rev d.tags
 
-  let publish (type a) (d : a dictionary) ?tag () =
-    if d.published then
-      invalid d.name "already published" ;
+  let publish (type a) ~package ~name ~descr ?tag (d : a dictionary) =
+    ( match d.published with
+      | None -> ()
+      | Some _ ->
+        let msg = "Server.Data.Enums: already published" in
+        raise (Invalid_argument msg) );
     let module M =
     struct
       type t = a
-      let descr = d.descr
-      let syntax =
-        let tags () = [Syntax.tags ~title:d.title (List.rev d.tags)] in
-        Syntax.publish ~page:d.page ~name:d.name ~descr
-          ~synopsis:(Syntax.string) ~generated:tags ()
-      let of_json = of_json d.name d.values
+      let jtype =
+        let enums = D_enum (List.rev d.tags) in
+        let descr = Markdown.par descr in
+        Jdata (Package.declare_id ~package ~name ~descr enums)
+      let of_json = of_json name d.values
       let to_json =
         match tag with
-        | None -> to_json d.name d.vindex
+        | None -> to_json name d.vindex
         | Some to_tag -> fun x -> `String (to_tag x)
     end in
     begin
-      d.published <- true ;
-      d.syntax <- Syntax.text M.syntax ;
+      d.published <- Some (package,name) ;
       (module M : S with type t = a)
     end
 
@@ -519,17 +493,14 @@ end
 
 module type Index =
 sig
-  include S_collection
+  type t
+  val kind : string
   val get : t -> int
   val find : int -> t
   val clear : unit -> unit
 end
 
-let publish_id (module A : Info) =
-  Syntax.publish
-    ~page:A.page ~name:A.name ~synopsis:Syntax.int ~descr:A.descr ()
-
-module INDEXER(M : Map)(I : Info) :
+module INDEXER(M : Map)(D : S_collection)(I : Index with type t = D.t) :
 sig
   type index
   val create : unit -> index
@@ -575,13 +546,15 @@ struct
     let id = Ju.to_int js in
     try find m id
     with Not_found ->
-      failure "[%s] No registered id #%d" I.name id
+      failure "[%s] No registered id #%d" I.kind id
 
 end
 
-module Static(M : Map)(I : Info) : Index with type t = M.key =
+module Static(M : Map)(S : S_collection)(I : Index with type t = S.t)
+  : Index with type t = M.key =
 struct
-  module INDEX = INDEXER(M)(I)
+  module INDEX = INDEXER(M)(S)(I)
+  let kind = I.kind
   let index = INDEX.create ()
   let clear () = INDEX.clear index
   let get = INDEX.get index
@@ -589,32 +562,33 @@ struct
   include Collection
       (struct
         type t = M.key
-        let syntax = publish_id (module I)
+        let jtype = Jindex I.kind
         let of_json = INDEX.of_json index
         let to_json = INDEX.to_json index
       end)
 end
 
-module Index(M : Map)(I : Info) : Index with type t = M.key =
+module Index(M : Map)(S : S_collection)(I : Index with type t = S.t)
+  : Index with type t = M.key =
 struct
-
-  module INDEX = INDEXER(M)(I)
+  module INDEX = INDEXER(M)(S)(I)
   module TYPE : Datatype.S with type t = INDEX.index =
     Datatype.Make
       (struct
         type t = INDEX.index
         include Datatype.Undefined
         let reprs = [INDEX.create()]
-        let name = "Server.Data.Index.Type." ^ I.name
+        let name = "Server.Data.Index.Type." ^ I.kind
         let mem_project = Datatype.never_any_project
       end)
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Data.Index.State." ^ I.name
+        let name = "Server.Data.Index.State." ^ I.kind
         let dependencies = []
         let default = INDEX.create
       end)
 
+  let kind = I.kind
   let index () = STATE.get ()
   let clear () = INDEX.clear (index())
 
@@ -624,7 +598,7 @@ struct
   include Collection
       (struct
         type t = M.key
-        let syntax = publish_id (module I)
+        let jtype = Jindex I.kind
         let of_json js = INDEX.of_json (index()) js
         let to_json v = INDEX.to_json (index()) v
       end)
@@ -637,10 +611,13 @@ sig
   val id : t -> int
 end
 
-module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t =
+module Identified(A : IdentifiedType)(S : S_collection)
+    (I : Index with type t = S.t) : Index with type t = A.t =
 struct
 
   type index = (int,A.t) Hashtbl.t
+
+  let kind = I.kind
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -648,13 +625,13 @@ struct
         type t = index
         include Datatype.Undefined
         let reprs = [Hashtbl.create 0]
-        let name = "Server.Data.Identified.Type." ^ I.name
+        let name = "Server.Data.Identified.Type." ^ I.kind
         let mem_project = Datatype.never_any_project
       end)
 
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Data.Identified.State." ^ I.name
+        let name = "Server.Data.Identified.State." ^ I.kind
         let dependencies = []
         let default () = Hashtbl.create 0
       end)
@@ -668,12 +645,12 @@ struct
   include Collection
       (struct
         type t = A.t
-        let syntax = publish_id (module I)
+        let jtype = Jindex kind
         let to_json a = `Int (get a)
         let of_json js =
           let k = Ju.to_int js in
           try find k
-          with Not_found -> failure "[%s] No registered id #%d" I.name k
+          with Not_found -> failure "[%s] No registered id #%d" I.kind k
       end)
 
 end

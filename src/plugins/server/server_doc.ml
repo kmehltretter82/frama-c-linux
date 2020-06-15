@@ -128,17 +128,8 @@ let page_of_package pkg =
     let _,path = path_for chapter filename in
     Pages.find path !pages
   with Not_found ->
-    let path = match pkg.d_plugin with
-      | Kernel -> pkg.d_package
-      | Plugin p -> p :: pkg.d_package in
-    let title = Printf.sprintf "Package %s" (String.concat "." path) in
+    let title = Printf.sprintf "Package %s" (name_of_pkginfo pkg) in
     page chapter ~title ~descr:pkg.d_userdoc ~filename ()
-
-let fullname_of_ident id =
-  String.concat "." @@
-  match id.plugin with
-  | Kernel -> id.package @ [ id.name ]
-  | Plugin p -> p :: (id.package @ [id.name ])
 
 let kind_of_decl = function
   | D_signal -> "SIGNAL"
@@ -147,14 +138,11 @@ let kind_of_decl = function
   | D_request { rq_kind=`SET } -> "SET"
   | D_request { rq_kind=`EXEC } -> "EXEC"
 
-let md_index kind = Md.code (Printf.sprintf "#%s" kind)
-
 let pp_for ?decl names =
   let self = match decl with Some d -> d.d_ident.name | None -> "self" in
   Package.{
     self = Md.emph self ;
     data = href_of_ident names ;
-    index = md_index ;
   }
 
 let md_param ~kind pp prm =
@@ -191,11 +179,11 @@ let descr_of_decl names decl =
 
 let declaration page names decl =
   let name = decl.d_ident.name in
-  let fullname = fullname_of_ident decl.d_ident in
+  let fullname = name_of_ident decl.d_ident in
   let kind = kind_of_decl decl.d_kind in
   let title = Printf.sprintf "`%s` %s" kind fullname in
   let index = [ Printf.sprintf "%s (`%s`)" fullname kind ] in
-  let contents = Md.block decl.d_descr in
+  let contents = decl.d_descr in
   let generated () = descr_of_decl names decl in
   let _href = publish ~page ~name ~title ~index ~contents ~generated () in
   ()

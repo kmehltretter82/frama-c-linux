@@ -35,7 +35,8 @@ type jtype =
   | Jnumber
   | Jstring
   | Jtag of string (** Enum constant tag *)
-  | Jindex of string (** Kind of ids (actually strings) *)
+  | Jkey of string (** Kind of numbers used for indexing *)
+  | Jindex of string (** Kind of strings used for indexing *)
   | Joption of jtype (** Value or 'null' *)
   | Jassoc of string * jtype (** Dictionary for kind of ids *)
   | Jarray of jtype
@@ -43,7 +44,7 @@ type jtype =
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
-  | Jself (* for (simply) recursive types *)
+  | Jself (** for (simply) recursive types *)
 
 type fieldInfo = {
   fd_name: string;
@@ -76,7 +77,7 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_descr : Markdown.block;
+  d_descr : Markdown.elements;
   d_kind : declKindInfo;
 }
 
@@ -96,7 +97,7 @@ val pp_ident : Format.formatter -> ident -> unit
 val pp_jtype : Format.formatter -> jtype -> unit
 
 (* -------------------------------------------------------------------------- *)
-(* --- Imports Resolution                                                 --- *)
+(* --- Names Resolution                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 module IdMap : Map.S with type key = ident
@@ -129,7 +130,7 @@ type package
 val package :
   ?plugin:string ->
   ?title:string ->
-  ?descr:Markdown.block ->
+  ?descr:Markdown.elements ->
   ?readme:string ->
   name:string ->
   unit -> package
@@ -142,7 +143,36 @@ val package :
 val declare :
   package:package ->
   name:string ->
-  ?descr:Markdown.block ->
+  ?descr:Markdown.elements ->
+  declKindInfo ->
+  unit
+
+(**
+   Same as [declare] but returns the associated identifier.
+*)
+val declare_id :
+  package:package ->
+  name:string ->
+  ?descr:Markdown.elements ->
+  declKindInfo ->
+  ident
+
+(**
+   Declare a new type and returns its alias.
+   Same as [Jdata (declare_id ~package ~name (D_type js))]`
+*)
+val datatype :
+  package:package ->
+  name:string ->
+  ?descr:Markdown.elements ->
+  jtype -> jtype
+
+(**
+   Replace the declaration for the given name in the package.
+*)
+val update :
+  package:package ->
+  name:string ->
   declKindInfo ->
   unit
 
@@ -151,6 +181,10 @@ val iter : (packageInfo -> unit) -> unit
 (** Assigns non-classing names for each identifier. *)
 val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 
+val name_of_pkginfo : packageInfo -> string
+val name_of_package : package -> string
+val name_of_ident : ident -> string
+
 (* -------------------------------------------------------------------------- *)
 (* --- Markdown Generation                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -158,7 +192,6 @@ val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 type pp = {
   self: Markdown.text ;
   data: ident -> Markdown.text ;
-  index: string -> Markdown.text ;
 }
 
 val escaped : string -> Markdown.text

@@ -55,31 +55,26 @@
     time a JSON record or tag is needed. *)
 (* -------------------------------------------------------------------------- *)
 
+open Package
+
 type json = Json.t
 
-val page : Server_doc.page (** Documentation page for general purpose data types. *)
 val pretty : Format.formatter -> json -> unit
 
 (** Datatype module signature. *)
 module type S =
 sig
   type t
-  val syntax : Syntax.t (** readable description of the JSON format *)
+  val jtype : jtype
   val of_json : json -> t
   val to_json : t -> json
 end
 
-
-(** Datatype informations. *)
-module type Info =
-sig
-  val page : Server_doc.page
-  val name : string
-  val descr : Markdown.text
-end
-
 (** Polymorphic data value. *)
 type 'a data = (module S with type t = 'a)
+
+(** Of main kernel data. *)
+val package : package
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Collections} *)
@@ -105,7 +100,6 @@ module Jbool : S_collection with type t = bool
 module Jint : S_collection with type t = int
 module Jfloat : S_collection with type t = float
 module Jstring : S_collection with type t = string
-module Jident : S_collection with type t = string (** Syntax is {i ident}. *)
 module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
 module Jmarkdown : S with type t = Markdown.text
 
@@ -167,8 +161,7 @@ sig
   end
 
   (** Create a new, opened record type. *)
-  val signature : page:Server_doc.page -> name:string -> descr:Markdown.text ->
-    unit -> 'a signature
+  val signature : unit -> 'a signature
 
   (** Adds a field to an opened record. *)
   val field : 'r signature ->
@@ -181,8 +174,8 @@ sig
     ('r,'a option) field
 
   (** Publish and close an opened record. *)
-  val publish : 'a signature ->
-    (module S with type r = 'a)
+  val publish : package:package -> name:string -> ?descr:Markdown.text ->
+    'a signature -> (module S with type r = 'a)
 
 end
 
@@ -190,7 +183,7 @@ end
 (** {2 Enums} *)
 (* -------------------------------------------------------------------------- *)
 
-module Tag : S_collection with type t = Syntax.tag
+module Tag : S_collection with type t = tagInfo
 
 (** Enum factory.
 
@@ -218,9 +211,7 @@ sig
   val tag_name : 'a tag -> string
 
   (** Creates an opened, empty dictionary. *)
-  val dictionary :
-    page:Server_doc.page -> name:string -> title:string -> descr:Markdown.text ->
-    unit -> 'a dictionary
+  val dictionary : unit -> 'a dictionary
 
   (** Register a new tag in the dictionary.
       The default label is the capitalized name.
@@ -230,11 +221,11 @@ sig
       Registered values must be hashable with [Hashtbl.hash] function.
 
       You may register a new tag {i after} the dictionary has been published. *)
-  val tag : 'a dictionary ->
+  val tag :
     name:string ->
     ?label:Markdown.text -> descr:Markdown.text ->
     ?value:'a ->
-    unit -> 'a tag
+    'a dictionary -> 'a tag
 
   (** Returns the tag from its name.
       @raise Not_found if no tag has been registered with this name. *)
@@ -249,32 +240,30 @@ sig
 
       You may register a new prefix-tag {i after} the dictionary has
       been published. *)
-  val prefix : 'a dictionary ->
-    prefix:string -> ?var:string ->
+  val prefix :
+    name:string -> ?var:string ->
     ?label:Markdown.text -> descr:Markdown.text ->
-    unit -> 'a prefix
+    'a dictionary -> 'a prefix
 
   (** Returns the tag for a value associated with the given prefix. *)
   val instance : 'a prefix -> string -> 'a tag
 
   (** Publish a new instance in the documentation. *)
-  val extends : 'a dictionary -> 'a prefix ->
+  val extends :
     name:string ->
     ?label:Markdown.text -> descr:Markdown.text ->
     ?value:'a ->
-    unit -> 'a tag
+    'a prefix -> 'a tag
 
   (** Obtain all the tags registered in the dictionary so far. *)
   val tags : 'a dictionary -> Tag.t list
 
-  val page : 'a dictionary -> Server_doc.page
-  val name : 'a dictionary -> string
-  val syntax : 'a dictionary -> Markdown.text
-
-  (** Publish the dictionary. No more tag nor prefix can be added afterwards. If
-      no [~tag] function is provided, registered values with tags are used. *)
-  val publish :
-    'a dictionary -> ?tag:('a -> 'a tag) -> unit -> (module S with type t = 'a)
+  (**
+     Publish the dictionary. No more tag nor prefix can be added afterwards.
+     If no [~tag] function is provided, the values registered with tags are used.
+  *)
+  val publish : package:package -> name:string -> descr:Markdown.text ->
+    ?tag:('a -> 'a tag) -> 'a dictionary -> (module S with type t = 'a)
 
 end
 
@@ -307,7 +296,8 @@ end
 (** Datatype extended with access to value identifiers. *)
 module type Index =
 sig
-  include S_collection
+  type t
+  val kind : string
   val get : t -> int
   val find : int -> t (** @raise Not_found if not registered. *)
   val clear : unit -> unit
@@ -315,10 +305,12 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(I : Info) : Index with type t = M.key
+module Static(M : Map)(S : S_collection)
+    (I : Index with type t = S.t) : Index with type t = M.key
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(I : Info) : Index with type t = M.key
+module Index(M : Map)(S : S_collection)
+    (I : Index with type t = S.t) : Index with type t = M.key
 
 (** Datatype already identified by unique integers. *)
 module type IdentifiedType =
@@ -328,7 +320,9 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)(I:Info) : Index with type t = A.t
+module Identified(A : IdentifiedType)
+    (S : S_collection)
+    (I : Index with type t = S.t) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling}

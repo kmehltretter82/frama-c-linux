@@ -158,9 +158,10 @@ type jtype =
   | Jnumber
   | Jstring
   | Jtag of string
-  | Jindex of string (* kind of a string used for indexing *)
+  | Jkey of string (* kind of a string used for indexing *)
+  | Jindex of string (* kind of a number used for indexing *)
   | Joption of jtype
-  | Jassoc of string * jtype
+  | Jassoc of string * jtype (* kind of keys *)
   | Jarray of jtype
   | Jtuple of jtype list
   | Junion of jtype list
@@ -203,7 +204,7 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_descr : Markdown.block;
+  d_descr : Markdown.elements;
   d_kind : declKindInfo;
 }
 
@@ -214,13 +215,23 @@ type packageInfo = {
   d_content : declInfo list;
 }
 
+let name_of_ident id =
+  String.concat "." @@ match id.plugin with
+  | Kernel -> id.package @ [ id.name ]
+  | Plugin p -> p :: (id.package @ [id.name ])
+
+let name_of_pkginfo pkg =
+  String.concat "." @@ match pkg.d_plugin with
+  | Kernel -> pkg.d_package
+  | Plugin p -> p :: pkg.d_package
+
 (* -------------------------------------------------------------------------- *)
 (* --- Visitors                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
-  | Jstring | Jindex _ | Jtag _ -> ()
+  | Jstring | Jindex _ | Jkey _ | Jtag _ -> ()
   | Joption js | Jassoc(_,js)  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
@@ -266,6 +277,8 @@ type package = {
   mutable revDecl : declInfo list ; (* in reverse order *)
 }
 
+let name_of_package pkg = name_of_pkginfo pkg.pkgInfo
+
 let registry = ref IdSet.empty (* including packages *)
 let packages = ref [] (* in reverse order *)
 let collection = ref None (* computed *)
@@ -290,7 +303,7 @@ let register_ident id =
   registry := IdSet.add id !registry
 
 let userdoc ~plugin ~title ~descr = function
-  | None -> Md.section ~title (Md.block descr)
+  | None -> Md.section ~title descr
   | Some readme ->
     let file =
       match plugin with
@@ -301,7 +314,7 @@ let userdoc ~plugin ~title ~descr = function
     in
     if Sys.file_exists file
     then Markdown.rawfile file
-    else Markdown.(section ~title (Md.block descr))
+    else Markdown.(section ~title descr)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)
@@ -328,13 +341,27 @@ let package ?plugin ?title ?(descr=[]) ?readme ~name () =
   packages := package :: !packages ;
   package
 
-let declare ~package:pkg ~name ?(descr=[]) decl =
+let declare_id ~package:pkg ~name ?(descr=[]) decl =
   check_name name ;
   let { d_plugin = plugin ; d_package = package } = pkg.pkgInfo in
   let ident = { plugin ; package ; name } in
   let decl = { d_ident=ident ; d_descr=descr ; d_kind=decl } in
   register_ident ident ;
-  pkg.revDecl <- decl :: pkg.revDecl
+  pkg.revDecl <- decl :: pkg.revDecl ; ident
+
+let declare ~package ~name ?descr decl =
+  let _id = declare_id ~package ~name ?descr decl in ()
+
+let update ~package:pkg ~name decl =
+  pkg.revDecl <- List.map
+      (fun curr ->
+         if curr.d_ident.name = name then
+           { curr with d_kind = decl }
+         else curr
+      ) pkg.revDecl
+
+let datatype ~package ~name ?descr jtype =
+  Jdata (declare_id ~package ~name ?descr (D_type jtype))
 
 let iter f =
   List.iter f @@
@@ -352,12 +379,13 @@ let iter f =
 (* --- JSON To MarkDown                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let key kd = Md.emph (Printf.sprintf "$%s" kd)
+let index kd = Md.emph (Printf.sprintf "#%s" kd)
 let escaped tag = Md.code (Printf.sprintf "\"%s\"" @@ String.escaped tag)
 
 type pp = {
   self: Md.text ;
   data: ident -> Md.text ;
-  index: string -> Md.text ;
 }
 
 let rec md_jtype pp = function
@@ -368,7 +396,8 @@ let rec md_jtype pp = function
   | Jboolean -> Md.emph "boolean"
   | Jstring -> Md.emph "string"
   | Jtag tag -> escaped tag
-  | Jindex kd -> pp.index kd
+  | Jkey kd -> key kd
+  | Jindex kd -> index kd
   | Jdata id -> pp.data id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
@@ -376,7 +405,7 @@ let rec md_jtype pp = function
   | Jarray js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
   | Jassoc (id,js) ->
-    Md.code "{[" @ pp.index id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
+    Md.code "{[" @ key id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
 
 and md_jlist pp sep js =
   Md.glue ~sep:(Md.plain sep)  (List.map (md_jtype pp) js)
@@ -418,11 +447,19 @@ let md_fields ?(title="Field") pp (fields : fieldInfo list) =
     plain "Format", Center;
     plain "Description", Left;
   ] in
-  let row f = [
-    escaped f.fd_name ;
-    md_jtype pp f.fd_type ;
-    f.fd_descr ;
-  ] in
+  let row f =
+    match f.fd_type with
+    | Joption js -> [
+        escaped (f.fd_name ^ "?") ;
+        md_jtype pp js ;
+        f.fd_descr ;
+      ]
+    | _ -> [
+        escaped f.fd_name ;
+        md_jtype pp f.fd_type ;
+        f.fd_descr ;
+      ]
+  in
   Md.{ caption = None ; header ; content = List.map row fields }
 
 (* -------------------------------------------------------------------------- *)
@@ -435,7 +472,6 @@ let pp_jtype fmt js =
   let ns = Scope.resolve scope in
   let self = Md.emph "self" in
   let data id = Md.emph (IdMap.find id ns) in
-  let index id = Md.code (Printf.sprintf "#%s" id) in
-  Markdown.pp_text fmt (md_jtype { index ; data ; self } js)
+  Markdown.pp_text fmt (md_jtype { data ; self } js)
 
 (* -------------------------------------------------------------------------- *)
