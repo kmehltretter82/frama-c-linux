@@ -40,7 +40,7 @@ end
 
 module type Info =
 sig
-  val page : Doc.page
+  val page : Server_doc.page
   val name : string
   val descr : Markdown.text
 end
@@ -63,7 +63,7 @@ let failure ?json msg =
 let failure_from_type_error msg json =
   failure ~json "%s" msg
 
-let page = Doc.page `Kernel ~title:"Basic Types" ~filename:"data.md"
+let page = Server_doc.page `Kernel ~title:"Basic Types" ~filename:"data.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
@@ -221,7 +221,7 @@ module Jident : S_collection with type t = string =
       let to_json s = `String s
     end)
 
-let text_page = Doc.page `Kernel ~title:"Rich Text Format" ~filename:"text.md"
+let text_page = Server_doc.page `Kernel ~title:"Rich Text Format" ~filename:"text.md" ()
 
 module Jtext =
 struct
@@ -248,7 +248,7 @@ struct
   }
 
   type 'a signature = {
-    page : Doc.page ;
+    page : Server_doc.page ;
     name : string ;
     descr : Markdown.text ;
     mutable fields : Syntax.field list ;
@@ -395,7 +395,7 @@ module Enum =
 struct
 
   type 'a dictionary = {
-    page : Doc.page ;
+    page : Server_doc.page ;
     name : string ;
     title : string ;
     descr : Markdown.text ;

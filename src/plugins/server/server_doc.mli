@@ -44,7 +44,8 @@ val chapter : page -> chapter
     - [frama-c/share/server/kernel/<filename>] for kernel pages,
     - [frama-c/share/<plugin>/server/<filename>] for plugin's pages.
 *)
-val page : chapter -> title:string -> filename:string -> page
+val page : chapter -> title:string -> ?descr:elements -> filename:string ->
+  unit ->page
 
 (** Adds a section in the corresponding page.
     Returns an href to the published section.
@@ -59,6 +60,12 @@ val publish :
   ?contents:Markdown.elements ->
   ?generated:(unit -> Markdown.elements) ->
   unit -> Markdown.href
+
+(** Publish a protocole. *)
+val protocole : title:string -> filename:string -> unit
+
+(** Publish a package. *)
+val package : Package.packageInfo -> unit
 
 (** Dumps all published pages of documentations. Unless [~meta:false], also
     generates METADATA for each page in [<filename>.json] for each page. *)

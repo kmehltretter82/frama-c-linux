@@ -29,7 +29,7 @@ module Senv = Server_parameters
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let page = Doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md"
+let page = Server_doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)

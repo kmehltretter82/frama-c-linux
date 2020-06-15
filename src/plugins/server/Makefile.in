@@ -40,7 +40,8 @@ PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
 	package \
-	doc syntax data \
+	server_doc \
+	syntax data \
 	main request states \
 	server_batch \
 	kernel_main \
@@ -80,7 +81,8 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 ##############
 
 SERVER_API= \
-	doc.mli syntax.mli data.mli request.mli states.mli \
+	package.mli server_doc.mli \
+	syntax.mli data.mli request.mli states.mli \
 	kernel_main.mli \
 	kernel_ast.mli \
 	kernel_properties.mli

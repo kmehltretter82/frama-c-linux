@@ -1112,8 +1112,6 @@ src/plugins/server/Server.mli: .ignore
 src/plugins/server/configure.ac: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/data.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/data.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/doc.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/doc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/jbuffer.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/jbuffer.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/kernel_ast.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1130,6 +1128,8 @@ src/plugins/server/package.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/package.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/request.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/request.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_doc.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/server/server_doc.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_parameters.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_parameters.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_batch.ml: CEA_LGPL_OR_PROPRIETARY

@@ -37,7 +37,7 @@ type 'a callback = ('a -> unit) -> unit
     synchronize with this value.
 *)
 val register_value :
-  page:Doc.page ->
+  page:Server_doc.page ->
   name:string ->
   descr:Markdown.text ->
   ?details:Markdown.block ->
@@ -60,7 +60,7 @@ val register_value :
     synchronize with this state.
 *)
 val register_state :
-  page:Doc.page ->
+  page:Server_doc.page ->
   name:string ->
   descr:Markdown.text ->
   ?details:Markdown.block ->
@@ -121,7 +121,7 @@ val signal : 'a array -> Request.signal
     [States.useSyncArray()] hook.
 *)
 val register_array :
-  page:Doc.page ->
+  page:Server_doc.page ->
   name:string ->
   descr:Markdown.text ->
   ?details:Markdown.block ->

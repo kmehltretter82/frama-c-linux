@@ -52,7 +52,9 @@ module BatchOutputDir = Senv.Empty_string
          directory."
     end)
 
-let _ = Doc.page `Protocol ~title:"Batch Protocol" ~filename:"server_batch.md"
+let () = Server_doc.protocole
+    ~title:"Batch Protocol"
+    ~filename:"server_batch.md"
 
 
 (* -------------------------------------------------------------------------- *)

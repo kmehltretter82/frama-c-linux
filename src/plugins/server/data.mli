@@ -57,7 +57,7 @@
 
 type json = Json.t
 
-val page : Doc.page (** Documentation page for general purpose data types. *)
+val page : Server_doc.page (** Documentation page for general purpose data types. *)
 val pretty : Format.formatter -> json -> unit
 
 (** Datatype module signature. *)
@@ -73,7 +73,7 @@ end
 (** Datatype informations. *)
 module type Info =
 sig
-  val page : Doc.page
+  val page : Server_doc.page
   val name : string
   val descr : Markdown.text
 end
@@ -167,7 +167,7 @@ sig
   end
 
   (** Create a new, opened record type. *)
-  val signature : page:Doc.page -> name:string -> descr:Markdown.text ->
+  val signature : page:Server_doc.page -> name:string -> descr:Markdown.text ->
     unit -> 'a signature
 
   (** Adds a field to an opened record. *)
@@ -219,7 +219,7 @@ sig
 
   (** Creates an opened, empty dictionary. *)
   val dictionary :
-    page:Doc.page -> name:string -> title:string -> descr:Markdown.text ->
+    page:Server_doc.page -> name:string -> title:string -> descr:Markdown.text ->
     unit -> 'a dictionary
 
   (** Register a new tag in the dictionary.
@@ -267,7 +267,7 @@ sig
   (** Obtain all the tags registered in the dictionary so far. *)
   val tags : 'a dictionary -> Tag.t list
 
-  val page : 'a dictionary -> Doc.page
+  val page : 'a dictionary -> Server_doc.page
   val name : 'a dictionary -> string
   val syntax : 'a dictionary -> Markdown.text
 

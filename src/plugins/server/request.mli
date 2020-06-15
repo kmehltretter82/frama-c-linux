@@ -60,7 +60,7 @@ type signal
 
 (** Register a server signal. The signal [name] must be unique. *)
 val signal :
-  page:Doc.page ->
+  page:Server_doc.page ->
   name:string ->
   descr:Markdown.text ->
   ?details:Markdown.block ->
@@ -87,7 +87,7 @@ val on_signal : signal -> (bool -> unit) -> unit
 
 *)
 val register :
-  page:Doc.page ->
+  page:Server_doc.page ->
   kind:kind ->
   name:string ->
   descr:Markdown.text ->
@@ -133,7 +133,7 @@ type ('a,'b) signature
     you shall define named parameters and results before registering the
     request processing function. *)
 val signature :
-  page:Doc.page ->
+  page:Server_doc.page ->
   kind:kind ->
   name:string ->
   descr:Markdown.text ->

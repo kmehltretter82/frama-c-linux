@@ -260,6 +260,7 @@ type package = {
 
 let registry = ref IdSet.empty (* including packages *)
 let packages = ref [] (* in reverse order *)
+let collection = ref None (* computed *)
 
 let name_re = Str.regexp "^[a-zA-Z0-9]+$"
 let package_re = Str.regexp "^[a-z0-9]+\\(\\.[a-z0-9]+\\)*$"
@@ -280,7 +281,7 @@ let register_ident id =
     Senv.fatal "Duplicate identifier '%a'" pp_ident id ;
   registry := IdSet.add id !registry
 
-let userdoc ~plugin ~title ?(descr=[]) = function
+let userdoc ~plugin ~title ~descr = function
   | None -> Md.section ~title (Md.block descr)
   | Some readme ->
     let file =
@@ -298,13 +299,12 @@ let userdoc ~plugin ~title ?(descr=[]) = function
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package ?plugin ?descr ?readme ~name () =
+let package ?(plugin=Kernel) ?(descr=[]) ?readme ~name () =
   check_package name ;
-  let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
   let pkgname = String.split_on_char '.' name in
   let pkgid = { plugin ; package = pkgname ; name = "*"} in
   let title = Printf.sprintf "Package %s" name in
-  let userdoc = userdoc ~plugin ~title ?descr readme in
+  let userdoc = userdoc ~plugin ~title ~descr readme in
   let pkgInfo = {
     d_plugin = plugin ;
     d_package = pkgname ;
@@ -313,6 +313,7 @@ let package ?plugin ?descr ?readme ~name () =
   } in
   let package = { pkgInfo ; revDecl=[] } in
   register_ident pkgid ;
+  collection := None ;
   packages := package :: !packages ;
   package
 
@@ -325,13 +326,16 @@ let declare ~package:pkg ~name ?(descr=[]) decl =
   pkg.revDecl <- decl :: pkg.revDecl
 
 let iter f =
-  begin
-    List.iter f @@
-    List.sort (fun a b -> Std.compare a.d_plugin b.d_plugin) @@
-    List.rev_map
-      (fun pkg -> { pkg.pkgInfo with d_content = List.rev pkg.revDecl })
-      !packages
-  end
+  List.iter f @@
+  match !collection with
+  | Some pkgs -> pkgs
+  | None ->
+    let pkgs =
+      List.sort (fun a b -> Std.compare a.d_plugin b.d_plugin) @@
+      List.rev_map
+        (fun pkg -> { pkg.pkgInfo with d_content = List.rev pkg.revDecl })
+          !packages
+    in collection := Some pkgs ; pkgs
 
 (* -------------------------------------------------------------------------- *)
 (* --- JSON To MarkDown                                                   --- *)

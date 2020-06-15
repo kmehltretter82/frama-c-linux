@@ -25,7 +25,7 @@ module Sy = Syntax
 module Md = Markdown
 module Js = Yojson.Basic.Util
 
-let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
+let page = Server_doc.page `Kernel ~title:"Project Management" ~filename:"project.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Info                                                       --- *)

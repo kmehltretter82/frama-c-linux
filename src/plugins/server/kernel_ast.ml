@@ -26,7 +26,7 @@ module Md = Markdown
 module Js = Yojson.Basic.Util
 open Cil_types
 
-let page = Doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md"
+let page = Server_doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)

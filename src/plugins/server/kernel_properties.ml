@@ -26,7 +26,7 @@ open Data
 open Kernel_main
 open Kernel_ast
 
-let page = Doc.page `Kernel ~title:"Property Services" ~filename:"properties.md"
+let page = Server_doc.page `Kernel ~title:"Property Services" ~filename:"properties.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Kind                                                      --- *)

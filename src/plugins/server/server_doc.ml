@@ -60,12 +60,14 @@ let href page name : Markdown.href = Section( page.path , name )
 
 let chapter pg = pg.chapter
 
-let page chapter ~title ~filename =
-  let rootdir,path = match chapter with
-    | `Protocol -> "." , filename
-    | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
-    | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
-  in
+let path_for chapter filename =
+  match chapter with
+  | `Protocol -> "." , filename
+  | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
+  | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
+
+let page chapter ~title ?(descr=[]) ~filename () =
+  let rootdir , path = path_for chapter filename in
   try
     let other = Pages.find path !pages in
     Senv.failure "Duplicate page '%s' path@." path ; other
@@ -80,8 +82,8 @@ let page chapter ~title ~filename =
         Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name filename in
     let intro =
       if Sys.file_exists intro
-      then Markdown.rawfile intro
-      else Markdown.(section ~title []) in
+      then descr @ Markdown.rawfile intro
+      else Markdown.(section ~title descr) in
     let order = incr order ; !order in
     let page = { order ; rootdir ; path ;
                  chapter ; title ; intro ;
@@ -100,7 +102,43 @@ let publish ~page ?name ?(index=[]) ~title
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
-let _ = page `Protocol ~title:"Architecture" ~filename:"server.md"
+let protocole ~title ~filename =
+  ignore (page `Protocol ~title ~filename ())
+
+let () = protocole ~title:"Architecture" ~filename:"server.md"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Package Publication                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let page_of_package pkg =
+  let open Package in
+  let chapter = match pkg.d_plugin with
+    | Kernel -> `Kernel | Plugin p -> `Plugin p in
+  let filename = String.concat "_" pkg.d_package ^ ".md" in
+  try
+    let _,path = path_for chapter filename in
+    Pages.find path !pages
+  with Not_found ->
+    let path = match pkg.d_plugin with
+      | Kernel -> pkg.d_package
+      | Plugin p -> p :: pkg.d_package in
+    let title = Printf.sprintf "Package %s" (String.concat "." path) in
+    page chapter ~title ~descr:pkg.d_userdoc ~filename ()
+
+let declaration page links decl =
+  let open Package in
+  let name = decl.d_ident.name in
+  let contents = block decl.d_descr in
+  let href = publish ~page ~name ~contents () in
+  links := IdMap.add decl.d_ident href !links
+
+let package pkg =
+  begin
+    let page = page_of_package pkg in
+    let links = ref Package.IdMap.empty in
+    List.iter (declaration page links) pkg.Package.d_content ;
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tables of Content                                                  --- *)

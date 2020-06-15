@@ -37,7 +37,7 @@ let check_plugin plugin name =
       name plugin
 
 let check_page page name =
-  match Doc.chapter page with
+  match Server_doc.chapter page with
   | `Kernel -> ()
   | `Plugin plugin -> check_plugin plugin name
   | `Protocol -> check_plugin "server" name
@@ -69,13 +69,13 @@ let publish ~page ~name ~descr ~synopsis ?(details = []) ?generated () =
   let id = Printf.sprintf "data-%s" name in
   let title = Printf.sprintf "`DATA` %s" name in
   let index = [ Printf.sprintf "%s (`DATA`)" name ] in
-  let dref = Doc.href page id in
+  let dref = Server_doc.href page id in
   let dlink = Markdown.href ~text:(Markdown.emph name) dref in
   let data = Markdown.(plain "<" @ dlink @ plain ">") in
   let contents = Markdown.(Block(
       [ Text descr ; define data synopsis.text ]
     )) :: details in
-  let _href = Doc.publish ~page ~name:id ~title ~index ~contents ?generated ()
+  let _href = Server_doc.publish ~page ~name:id ~title ~index ~contents ?generated ()
   in atom dlink
 
 (* -------------------------------------------------------------------------- *)

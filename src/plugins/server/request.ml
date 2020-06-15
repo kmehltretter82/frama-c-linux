@@ -74,7 +74,7 @@ let check_plugin plugin name =
       name (String.capitalize_ascii plugin)
 
 let check_page page name =
-  match Doc.chapter page with
+  match Server_doc.chapter page with
   | `Kernel -> check_plugin "kernel" name
   | `Plugin plugin -> check_plugin plugin name
   | `Protocol ->
@@ -82,7 +82,7 @@ let check_page page name =
       "Request '%s' shall not be published in protocol pages" name
 
 let page_prefix page =
-  match Doc.chapter page with
+  match Server_doc.chapter page with
   | `Kernel -> "kernel"
   | `Plugin plugin -> plugin
   | `Protocol -> "protocol"
@@ -100,7 +100,7 @@ let signal ~page ~name ~descr  ?(details=[]) () =
   let title =  Printf.sprintf "`SIG` %s" name in
   let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
   let contents = [ Block [Text descr] ; Block details] in
-  let _ = Doc.publish ~page ~name ~title ~index ~contents () in
+  let _ = Server_doc.publish ~page ~name ~title ~index ~contents () in
   Main.signal name
 
 let emit = Main.emit
@@ -175,7 +175,7 @@ let doc_output (type b) (output : b rq_output) =
 (* -------------------------------------------------------------------------- *)
 
 type ('a,'b) signature = {
-  page : Doc.page ;
+  page : Server_doc.page ;
   kind : kind ;
   name : string ;
   descr : Markdown.text ;
@@ -346,7 +346,7 @@ let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
     Block ( Text s.descr :: input :: output :: s.details ) ::
     ( doc_input s.input @ doc_output s.output )
   in
-  let _ = Doc.publish ~page:s.page ~name:s.name ~title ~index ~contents () in
+  let _ = Server_doc.publish ~page:s.page ~name:s.name ~title ~index ~contents () in
   Main.register s.kind s.name processor ;
   s.defined <- true
 

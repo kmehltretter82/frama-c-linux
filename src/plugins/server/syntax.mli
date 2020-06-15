@@ -32,7 +32,7 @@ val text : t -> Markdown.text
     Extended definition, like record fields and such, must be detailed in
     the description block. *)
 val publish :
-  page:Doc.page -> name:string -> descr:Markdown.text ->
+  page:Server_doc.page -> name:string -> descr:Markdown.text ->
   synopsis:t ->
   ?details:Markdown.elements ->
   ?generated:(unit -> Markdown.elements) ->

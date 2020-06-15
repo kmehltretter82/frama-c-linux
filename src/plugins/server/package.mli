@@ -120,7 +120,7 @@ val visit_package_used: (ident -> unit) -> packageInfo -> unit
 type package
 
 val package :
-  ?plugin:string ->
+  ?plugin:plugin ->
   ?descr:Markdown.block ->
   ?readme:string ->
   name:string ->

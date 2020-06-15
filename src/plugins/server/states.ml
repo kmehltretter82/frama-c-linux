@@ -51,7 +51,7 @@ let register_value (type a) ~page ~name ~descr ?(details=[])
   let title =  Printf.sprintf "`VALUE` %s" name in
   let index = [ Printf.sprintf "%s (`VALUE`)" name ] in
   let contents = [ Block [Text descr] ; Block details] in
-  let h = Doc.publish ~page ~name ~title ~index ~contents () in
+  let h = Server_doc.publish ~page ~name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for value " @ href h) () in
   Request.register ~page ~kind:`GET ~name:(name ^ ".get")
@@ -71,7 +71,7 @@ let register_state (type a) ~page ~name ~descr ?(details=[])
   let title =  Printf.sprintf "`STATE` %s" name in
   let index = [ Printf.sprintf "%s (`STATE`)" name ] in
   let contents = [ Block [Text descr] ; Block details] in
-  let h = Doc.publish ~page ~name ~title ~index ~contents () in
+  let h = Server_doc.publish ~page ~name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for state " @ href h) () in
   Request.register ~page ~kind:`GET ~name:(name ^ ".get")
@@ -277,7 +277,7 @@ let register_array ~page ~name ~descr ?(details=[]) ~key
       end ;
     Block details
   ] in
-  let mref = Doc.publish ~page:page ~name:name ~title ~index ~contents () in
+  let mref = Server_doc.publish ~page:page ~name:name ~title ~index ~contents () in
   let signal = Request.signal ~page ~name:(name ^ ".sig")
       ~descr:(plain "Signal for array " @ href mref) () in
   let getter = List.map Syntax.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
