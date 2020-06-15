@@ -24,7 +24,6 @@ open Factory
 
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
-let dkey_shell = Wp_parameters.register_category "shell"
 let wkey_smoke = Wp_parameters.register_warn_category "smoke"
 
 (* --------- Command Line ------------------- *)
@@ -306,7 +305,7 @@ let do_progress goal msg =
 
 let do_report_cache_usage mode =
   if !exercised > 0 &&
-     not (Wp_parameters.has_dkey dkey_shell) &&
+     not (Wp_parameters.has_dkey VCS.dkey_shell) &&
      not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
   then
     let hits = Cache.get_hits () in
@@ -739,7 +738,7 @@ let do_cache_cleanup () =
     Cache.cleanup_cache () ;
     let removed = Cache.get_removed () in
     if removed > 0 &&
-       not (Wp_parameters.has_dkey dkey_shell) &&
+       not (Wp_parameters.has_dkey VCS.dkey_shell) &&
        not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
     then
       Wp_parameters.result "[Cache] removed:%d" removed
@@ -933,7 +932,7 @@ let pp_wp_parameters fmt =
 
 let () = Cmdline.run_after_setting_files
     (fun _ ->
-       if Wp_parameters.has_dkey dkey_shell then
+       if Wp_parameters.has_dkey VCS.dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
 (* -------------------------------------------------------------------------- *)

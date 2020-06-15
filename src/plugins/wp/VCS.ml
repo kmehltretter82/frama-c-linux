@@ -24,6 +24,7 @@
 (* --- Prover Results                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let dkey_shell = Wp_parameters.register_category "shell"
 let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
 let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
 let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
@@ -328,10 +329,10 @@ let pp_cache_miss fmt st prover r =
     | NativeAltErgo | NativeCoq -> r.verdict <> Timeout
     | Why3 _ -> r.cached || r.prover_time < Rformat.epsilon
   in
-  if qualified then
-    Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
-  else
+  if not qualified && Wp_parameters.has_dkey dkey_shell then
     Format.fprintf fmt "%s%a (unqualified)" st pp_perf r
+  else
+    Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
 
 let pp_result_qualif prover fmt r =
   if Wp_parameters.has_dkey dkey_success_only then
