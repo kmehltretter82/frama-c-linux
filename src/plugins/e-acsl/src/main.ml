@@ -205,13 +205,43 @@ let change_printer =
       let module Printer_class(X: Printer.PrinterClass) = struct
         class printer = object
           inherit X.printer as super
+
           method !varinfo fmt vi =
-            if vi.Cil_types.vghost || vi.Cil_types.vstorage <> Cil_types.Extern
-            then
-              super#varinfo fmt vi
-            else
+            if Functions.Libc.is_vla_alloc_name vi.Cil_types.vname then
+              (* Replace VLA allocation with calls to [__builtin_alloca] *)
+              Format.fprintf fmt "%s" Functions.Libc.actual_alloca
+            else if (not vi.vghost) && vi.vstorage == Cil_types.Extern then
+              (* Replace calls to Frama-C builtins with calls to their original
+                 version from the libc *)
               let s = Str.replace_first r "" vi.Cil_types.vname in
               Format.fprintf fmt "%s" s
+            else
+              (* Otherwise use the original printer *)
+              super#varinfo fmt vi
+
+          method !instr fmt i =
+            match i with
+            | Call(_, fct, _, _) when Functions.Libc.is_vla_free fct ->
+              (* Nothing to print: VLA deallocation is done automatically when
+                 leaving the scope *)
+              Format.fprintf fmt "/* ";
+              super#instr fmt i;
+              Format.fprintf fmt " */"
+            | _ ->
+              super#instr fmt i
+
+          method !global fmt g =
+            let is_vla_builtin vi =
+              Functions.Libc.is_vla_alloc_name vi.Cil_types.vname ||
+              Functions.Libc.is_vla_free_name vi.Cil_types.vname
+            in
+            match g with
+            | GFunDecl (_, vi, _) when is_vla_builtin vi ->
+              (* Nothing to print: the VLA builtins don't have an original libc
+                 version. *)
+              ()
+            | _ ->
+              super#global fmt g
         end
       end in
       Printer.update_printer (module Printer_class: Printer.PrinterExtension)
