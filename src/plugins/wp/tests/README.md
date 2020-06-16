@@ -63,7 +63,7 @@ below for details.
 
 To be accepted by Frama-CI, tests in « qualif » configuration must be easily
 reproducible on any platform. This is checked by running WP with flag
-`-wp-msg-key success-only` which is set by the default in the qualif test
+`-wp-msg-key shell` which is set by the default in the qualif test
 configuration. Hence, a qualified test result only contains proof status that
 are either:
 - failed

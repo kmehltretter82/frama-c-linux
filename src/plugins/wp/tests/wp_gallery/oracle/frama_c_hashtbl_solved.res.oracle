@@ -8,7 +8,6 @@
 [rte] annotating function init
 [rte] annotating function mem_binding
 [rte] annotating function size
-[wp] Computing [100 goals...]
 [wp] Goal typed_add_complete_full_nominal : not tried
 [wp] Goal typed_add_disjoint_full_nominal : not tried
 [wp] Goal typed_add_assert_rte_index_bound : not tried

@@ -25,11 +25,6 @@
 (* -------------------------------------------------------------------------- *)
 
 let dkey_shell = Wp_parameters.register_category "shell"
-let dkey_no_time_info = Wp_parameters.register_category "no-time-info"
-let dkey_no_step_info = Wp_parameters.register_category "no-step-info"
-let dkey_no_goals_info = Wp_parameters.register_category "no-goals-info"
-let dkey_no_cache_info = Wp_parameters.register_category "no-cache-info"
-let dkey_success_only = Wp_parameters.register_category "success-only"
 
 type prover =
   | Why3 of Why3Provers.t (* Prover via WHY *)
@@ -92,7 +87,7 @@ let name_of_prover = function
 
 let title_of_prover = function
   | Why3 s ->
-      if Wp_parameters.has_dkey dkey_success_only
+      if Wp_parameters.has_dkey dkey_shell
       then Why3Provers.name s
       else Why3Provers.title s
   | NativeAltErgo -> "Alt-Ergo (native)"
@@ -299,15 +294,15 @@ let perfo dkey = not (Wp_parameters.has_dkey dkey)
 let pp_perf fmt r =
   begin
     let t = r.solver_time in
-    if t > Rformat.epsilon && perfo dkey_no_time_info
+    if t > Rformat.epsilon && perfo dkey_shell
     then Format.fprintf fmt " (Qed:%a)" Rformat.pp_time t ;
     let t = r.prover_time in
-    if t > Rformat.epsilon && perfo dkey_no_time_info
+    if t > Rformat.epsilon && perfo dkey_shell
     then Format.fprintf fmt " (%a)" Rformat.pp_time t ;
     let s = r.prover_steps in
-    if s > 0 && perfo dkey_no_step_info
+    if s > 0 && perfo dkey_shell
     then Format.fprintf fmt " (%d)" s ;
-    if r.cached && perfo dkey_no_cache_info
+    if r.cached && perfo dkey_shell
     then Format.fprintf fmt " (cached)" ;
   end
 
@@ -335,7 +330,7 @@ let pp_cache_miss fmt st prover r =
     Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
 
 let pp_result_qualif prover fmt r =
-  if Wp_parameters.has_dkey dkey_success_only then
+  if Wp_parameters.has_dkey dkey_shell then
     match r.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
