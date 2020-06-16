@@ -407,19 +407,23 @@ let model_varinfo :
   | PLval(Some kf, _ , (Var x,NoOffset))
   | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
     when button=1 ->
-      let init = WpStrategy.is_main_init kf in
-      let acc = RefUsage.get ~kf ~init x in
-      let model = match acc with
-        | RefUsage.NoAccess -> "any"
-        | RefUsage.ByValue -> "'var'"
-        | RefUsage.ByRef -> "'ref'"
-        | RefUsage.ByArray when x.vformal && Cil.isPointerType x.vtype
-          -> "'caveat'"
-        | _ -> "'typed'"
-      in
-      main#pretty_information
-        "Is is accessed as %t and fits in %s wp-model@."
-        (RefUsage.print x acc) model ;
+      begin
+        try
+          let init = WpStrategy.is_main_init kf in
+          let acc = RefUsage.get ~kf ~init x in
+          let model = match acc with
+            | RefUsage.NoAccess -> "any"
+            | RefUsage.ByValue -> "'var'"
+            | RefUsage.ByRef -> "'ref'"
+            | RefUsage.ByArray when x.vformal && Cil.isPointerType x.vtype
+              -> "'caveat'"
+            | _ -> "'typed'"
+          in
+          main#pretty_information
+            "Is is accessed as %t and fits in %s wp-model@."
+            (RefUsage.print x acc) model ;
+        with _ -> ()
+      end
   | _ -> ()
 
 (* -------------------------------------------------------------------------- *)
