@@ -207,7 +207,7 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_descr : Markdown.elements;
+  d_descr : Markdown.text;
   d_kind : declKindInfo;
 }
 
@@ -305,7 +305,7 @@ let register_ident id =
   registry := IdSet.add id !registry
 
 let userdoc ~plugin ~title ~descr = function
-  | None -> Md.section ~title descr
+  | None -> Md.section ~title (Md.par descr)
   | Some readme ->
     let file =
       match plugin with
@@ -316,7 +316,7 @@ let userdoc ~plugin ~title ~descr = function
     in
     if Sys.file_exists file
     then Markdown.rawfile file
-    else Markdown.(section ~title descr)
+    else Markdown.(section ~title (Md.par descr))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)

@@ -210,7 +210,7 @@ module Jmarkdown : S_collection with type t = Markdown.text =
     (struct
       type t = Markdown.text
       let jtype =
-        let descr = Markdown.(par (plain "Markdown (inlined) text.")) in
+        let descr = Markdown.plain "Markdown (inlined) text." in
         datatype ~package ~name:"markdown" ~descr Jstring
       let of_json js = Markdown.plain (Ju.to_string js)
       let to_json txt = `String (Pretty_utils.to_string Markdown.pp_text txt)
@@ -225,7 +225,7 @@ struct
          the tag `tag` to the enclosed text. \
          Empty tag `\"\"` can also used to simply group text together." in
     let jdef = Junion [ Jnull; Jstring; Jarray Jself ] in
-    datatype ~package ~name:"text" ~descr:(Markdown.par descr) jdef
+    datatype ~package ~name:"text" ~descr jdef
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -316,7 +316,6 @@ struct
       type t = r record
       let jtype =
         let record = D_record (List.rev s.fields) in
-        let descr = Markdown.par descr in
         Jdata (Package.declare_id ~package ~name ~descr record)
       let default = s.default
       let has fd r = fd.member r
@@ -348,7 +347,7 @@ module Tag = Collection
 
       let jtype =
         datatype ~package ~name:"tag"
-          ~descr:Markdown.(par (plain "Enum Tag Description"))
+          ~descr:(Markdown.plain "Enum Tag Description")
           (Jrecord [
               "name",Jstring ;
               "label",Jmarkdown.jtype ;
@@ -462,7 +461,6 @@ struct
       type t = a
       let jtype =
         let enums = D_enum (List.rev d.tags) in
-        let descr = Markdown.par descr in
         Jdata (Package.declare_id ~package ~name ~descr enums)
       let of_json = of_json name d.values
       let to_json =

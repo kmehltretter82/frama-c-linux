@@ -188,7 +188,7 @@ let declaration page names decl =
   let kind = kind_of_decl decl.d_kind in
   let title = Printf.sprintf "`%s` %s" kind fullname in
   let index = [ Printf.sprintf "%s (`%s`)" fullname kind ] in
-  let contents = decl.d_descr in
+  let contents = Markdown.par decl.d_descr in
   let generated () = descr_of_decl names decl in
   let _href = publish ~page ~name ~title ~index ~contents ~generated () in
   ()

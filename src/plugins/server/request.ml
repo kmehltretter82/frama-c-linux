@@ -56,7 +56,6 @@ type 'a output = (module Output with type t = 'a)
 type signal = Main.signal
 
 let signal ~package ~name ~descr =
-  let descr = Markdown.par descr in
   let id = Package.declare_id ~package ~name ~descr D_signal in
   Main.signal (Package.name_of_ident id)
 
@@ -278,7 +277,6 @@ let register_sig (type a b)
       rq_input = rq_input s.input ;
       rq_output = rq_output s.output ;
     } in
-  let descr = Markdown.par descr in
   let id = declare_id ~package ~name ~descr request in
   Main.register kind (name_of_ident id) processor ;
   s.defined <- true
@@ -293,13 +291,15 @@ let register ~package ~kind ~name ~descr ~input ~output process =
     (fun _rq v -> process v)
 
 let dictionary (type a) ~package ~name ~descr (d : a Data.Enum.dictionary) =
-  let module T = (val Data.Enum.publish ~package ~name ~descr d) in
+  let data = Data.Enum.publish ~package ~name ~descr d in
+  let module T = (val data) in
   let descr = Markdown.plain "Returns all registered tags for the above type." in
   let name = name ^ "Tags" in
   register ~kind:`GET ~package
     ~name ~descr
     ~input:(module Data.Junit)
     ~output:(module Data.Tag.Jlist)
-    (fun () -> Data.Enum.tags d)
+    (fun () -> Data.Enum.tags d) ;
+  data
 
 (* -------------------------------------------------------------------------- *)

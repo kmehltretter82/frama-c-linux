@@ -80,7 +80,7 @@ type declKindInfo =
 
 type declInfo = {
   d_ident : ident;
-  d_descr : Markdown.elements;
+  d_descr : Markdown.text;
   d_kind : declKindInfo;
 }
 
@@ -133,7 +133,7 @@ type package
 val package :
   ?plugin:string ->
   ?title:string ->
-  ?descr:Markdown.elements ->
+  ?descr:Markdown.text ->
   ?readme:string ->
   name:string ->
   unit -> package
@@ -146,7 +146,7 @@ val package :
 val declare :
   package:package ->
   name:string ->
-  ?descr:Markdown.elements ->
+  ?descr:Markdown.text ->
   declKindInfo ->
   unit
 
@@ -156,7 +156,7 @@ val declare :
 val declare_id :
   package:package ->
   name:string ->
-  ?descr:Markdown.elements ->
+  ?descr:Markdown.text ->
   declKindInfo ->
   ident
 
@@ -167,7 +167,7 @@ val declare_id :
 val datatype :
   package:package ->
   name:string ->
-  ?descr:Markdown.elements ->
+  ?descr:Markdown.text ->
   jtype -> jtype
 
 (**

@@ -49,7 +49,6 @@ let register_value (type a) ~package ~name ~descr
   =
   let open Markdown in
   let href = link ~name () in
-  let descr = Markdown.par descr in
   let () = Package.declare
       ~package ~name ~descr D_value in
   let signal = Request.signal

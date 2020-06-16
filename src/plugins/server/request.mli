@@ -228,6 +228,6 @@ val dictionary :
   package:package ->
   name:string ->
   descr:Markdown.text ->
-  'a Data.Enum.dictionary -> unit
+  'a Data.Enum.dictionary -> (module Data.S with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)
