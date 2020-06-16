@@ -4,14 +4,14 @@
             "cc",
             "main.c"
         ],
-        "directory": "tests/fc_script",
+        "directory": ".",
         "file": "main.c"
     },
-    { "directory": "tests/fc_script",
+    { "directory": ".",
       "command": "gcc -DUH",
       "file": "main2.c"
     },
-    { "directory": "tests/fc_script",
+    { "directory": ".",
       "command": "gcc",
       "file": "main3.c"
     }

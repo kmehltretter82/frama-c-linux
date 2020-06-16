@@ -131,10 +131,15 @@ let split_command_args s =
     never need quotes. *)
 let quote_define_argument arg = Format.sprintf "%S" arg
 
-let parse_entry ?(cwd=Sys.getcwd()) r =
+let parse_entry jcdb_dir r =
   let open Yojson.Basic.Util in
   let filename = r |> member "file" |> to_string in
-  let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv "" in
+  let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv jcdb_dir in
+  let dirname =
+    if Filepath.is_relative dirname then Filename.concat jcdb_dir dirname
+    else dirname
+  in
+  let dirname = Filepath.normalize dirname in
   let path = Datatype.Filepath.of_string ~base_name:dirname filename in
 
   (* get the list of arguments, and a flag indicating if the arguments
@@ -157,13 +162,10 @@ let parse_entry ?(cwd=Sys.getcwd()) r =
     with _ ->
       Kernel.abort "compilation database: expected 'arguments' or 'command'"
   in
-  (* Normalize path names in include directives: first we normalize w.r.t.
-     the file's directory (following the compilation database logic),
-     then we relativize w.r.t. to Frama-C's PWD if possible
-     (to avoid overly long absolute paths). *)
+  (* conversion for '-I' flags *)
   let convert_path arg =
-    let abs = Filepath.normalize ~base_name:dirname arg in
-    Filepath.relativize ~base_name:cwd abs
+    if Filepath.is_relative arg then Filename.concat dirname arg
+    else arg
   in
   let convert_define arg =
     if requote then quote_define_argument arg else arg
@@ -241,19 +243,19 @@ let get_flags f =
   if Kernel.JsonCompilationDatabase.get () <> "" then begin
     if not (Flags.is_computed ()) then begin
       let database = Kernel.JsonCompilationDatabase.get () in
-      let path =
+      let jcdb_dir, jcdb_path =
         if Sys.is_directory database then
-          Filename.concat database "compile_commands.json"
-        else database
+          database, Filename.concat database "compile_commands.json"
+        else Filename.dirname database, database
       in
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
-        "using compilation database: %s" path;
+        "using compilation database: %s" jcdb_path;
       begin
         try
           let r_list =
-            Yojson.Basic.from_file path |> Yojson.Basic.Util.to_list
+            Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
           in
-          List.iter parse_entry r_list;
+          List.iter (parse_entry jcdb_dir) r_list;
         with
         | Sys_error msg
         | Yojson.Json_error msg
