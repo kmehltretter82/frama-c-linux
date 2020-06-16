@@ -406,7 +406,7 @@ let model_varinfo :
   match item with
   | PLval(Some kf, _ , (Var x,NoOffset))
   | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
-    when button=1 ->
+    when button=1 && RefUsage.is_computed () ->
       begin
         let init = WpStrategy.is_main_init kf in
         let acc = RefUsage.get ~kf ~init x in

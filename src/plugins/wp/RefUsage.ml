@@ -817,6 +817,7 @@ module S = State_builder.Option_ref(D)
 
 (* compute_usage is called once per project *)
 let usage () = S.memo compute_usage
+let is_computed () = S.is_computed ()
 
 (* ---------------------------------------------------------------------- *)
 (* --- API                                                            --- *)
