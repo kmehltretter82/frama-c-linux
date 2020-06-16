@@ -763,8 +763,8 @@ let selector_localizable (main_ui:main_window_extension_points) origin ~button l
   in
   List.iter
     (fun (f, origins) ->
-      if List.mem origin origins then
-        callback (f popup_factory main_ui ~button) localizable
+       if List.mem origin origins then
+         callback (f popup_factory main_ui ~button) localizable
     ) !selector;
   if button = 3 && popup_factory#menu#children <> [] then
     let time = GtkMain.Main.get_current_event_time () in
