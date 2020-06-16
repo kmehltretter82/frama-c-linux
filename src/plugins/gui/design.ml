@@ -725,6 +725,14 @@ let selector = ref ([] :
                         button:int -> Pretty_source.localizable -> unit
                        ) * localizable_selection_origin list) list)
 
+(* Protect user callback from exceptions *)
+let callback f arg =
+  try f arg with
+  | Sys.Break as exn -> raise exn (* Silently pass the exception *)
+  | exn when Cmdline.catch_at_toplevel exn ->
+    Gui_parameters.warning "Uncaught exception:@\n%s"
+      (Cmdline.protect exn) ;
+
 class protected_menu_factory (host:Gtk_helper.host) (menu:GMenu.menu) = object
   inherit [GMenu.menu] GMenu.factory menu as super
 
@@ -755,10 +763,9 @@ let selector_localizable (main_ui:main_window_extension_points) origin ~button l
   in
   List.iter
     (fun (f, origins) ->
-       if List.mem origin origins then
-         f popup_factory main_ui ~button localizable
-    )
-    !selector;
+      if List.mem origin origins then
+        callback (f popup_factory main_ui ~button) localizable
+    ) !selector;
   if button = 3 && popup_factory#menu#children <> [] then
     let time = GtkMain.Main.get_current_event_time () in
     popup_factory#menu#popup ~button ~time
@@ -780,7 +787,12 @@ class reactive_buffer_cl (main_ui:main_window_extension_points)
     method private init =
       Feedback.clear_tables ();
       let highlighter localizable ~start ~stop =
-        List.iter (fun f -> f (self:>reactive_buffer) localizable ~start ~stop) !highlighter
+        List.iter
+          (fun f ->
+             callback
+               (fun () -> f (self:>reactive_buffer) localizable ~start ~stop)
+               ())
+          !highlighter
       in
       let selector = selector_localizable main_ui ReactiveBuffer in
       Pretty_source.display_source
