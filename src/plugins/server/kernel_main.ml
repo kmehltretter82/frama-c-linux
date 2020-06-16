@@ -21,34 +21,34 @@
 (**************************************************************************)
 
 open Data
-module Sy = Syntax
 module Md = Markdown
+module Pkg = Package
 module Senv = Server_parameters
 
 (* -------------------------------------------------------------------------- *)
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let page = Server_doc.page `Kernel ~title:"Kernel Services" ~filename:"kernel.md" ()
+let package = Pkg.package ~title:"Kernel Services" ~name:"kernel" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let get_config = Request.signature
-      ~page ~kind:`GET ~name:"kernel.getConfig"
-      ~descr:(Md.plain "Frama-C Kernel configuration")
-      ~input:(module Junit) () in
+  let signature = Request.signature ~input:(module Junit) () in
   let result name descr =
-    Request.result get_config ~name ~descr:(Md.plain descr) (module Jstring) in
+    Request.result signature ~name ~descr:(Md.plain descr) (module Jstring) in
   let set_version = result "version" "Frama-C version" in
   let set_datadir = result "datadir" "Shared directory (FRAMAC_SHARE)" in
   let set_libdir = result "libdir" "Lib directory (FRAMAC_LIB)" in
-  let set_pluginpath = Request.result get_config
+  let set_pluginpath = Request.result signature
       ~name:"pluginpath" ~descr:(Md.plain "Plugin directories (FRAMAC_PLUGIN)")
       (module Jstring.Jlist) in
-  Request.register_sig get_config
+  Request.register_sig
+    ~package ~kind:`GET ~name:"getConfig"
+    ~descr:(Md.plain "Frama-C Kernel configuration")
+    signature
     begin fun rq () ->
       set_version rq Fc_config.version ;
       set_datadir rq Fc_config.datadir ;
@@ -61,18 +61,13 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let signature =
-    Request.signature ~page ~kind:`SET ~name:"kernel.load"
-      ~descr:(Md.plain "Load a save file")
-      ~input:(module Jstring)
-      ~output:(module Jstring.Joption)
-      ()
-  in
-  let load _rq file =
-    try Project.load_all (Filepath.Normalized.of_string file); None
-    with Project.IOError err -> Some err
-  in
-  Request.register_sig signature load
+  Request.register ~package ~kind:`SET ~name:"load"
+    ~descr:(Md.plain "Load a save file. Returns an error, if not successfull.")
+    ~input:(module Jstring)
+    ~output:(module Jstring.Joption)
+    (fun file ->
+       try Project.load_all (Filepath.Normalized.of_string file); None
+       with Project.IOError err -> Some err)
 
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
@@ -82,15 +77,14 @@ module LogSource = Collection
     (struct
       type t = Filepath.position
 
-      let synopsis =
-        Sy.record [ "dir", Sy.string; "base", Sy.string;
-                    "file", Sy.string; "line", Sy.int ]
-
-      let syntax = Sy.publish ~page:Data.page ~name:"source" ~synopsis
+      let jtype = Pkg.datatype ~package ~name:"source"
           ~descr:(Md.plain "Source file positions.")
-          ~details:Md.([Block [Text (plain "The file path is normalized, \
-                                            and the line number starts at one.")]])
-          ()
+          (Jrecord [
+              "dir", Jstring;
+              "base", Jstring;
+              "file", Jstring;
+              "line", Jnumber;
+            ])
 
       let to_json p =
         let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
@@ -123,13 +117,10 @@ module LogSource = Collection
 module LogKind = Collection
     (struct
 
-      let kinds = Enum.dictionary ~page
-          ~name:"logkind" ~title:"Log Kind"
-          ~descr:(Md.plain "Frama-C message category.")
-          ()
+      let kinds = Enum.dictionary ()
 
       let t_kind value name descr =
-        Enum.tag kinds ~name ~descr:(Md.plain descr) ~value ()
+        Enum.tag ~name ~descr:(Md.plain descr) ~value kinds
 
       let t_error = t_kind Log.Error "ERROR" "User Error"
       let t_warning = t_kind Log.Warning "WARNING" "User Warning"
@@ -146,8 +137,10 @@ module LogKind = Collection
         | Log.Failure -> t_failure
         | Log.Debug -> t_debug
 
-      let data = Enum.publish kinds ~tag ()
-      let () = Request.dictionary kinds
+      let data = Request.dictionary ~package
+          ~name:"logkind"
+          ~descr:(Md.plain "Log messages categories.")
+          kinds
 
       include (val data : S with type t = Log.kind)
     end)
@@ -161,8 +154,7 @@ module LogEvent = Collection
 
       type rlog
 
-      let jlog : rlog Record.signature = Record.signature ~page
-          ~name:"log" ~descr:(Md.plain "Message event record.") ()
+      let jlog : rlog Record.signature = Record.signature ()
 
       let kind = Record.field jlog ~name:"kind"
           ~descr:(Md.plain "Message kind") (module LogKind)
@@ -175,10 +167,14 @@ module LogEvent = Collection
       let source = Record.option jlog ~name:"source"
           ~descr:(Md.plain "Source file position") (module LogSource)
 
-      module R = (val (Record.publish jlog) : Record.S with type r = rlog)
+      let data = Record.publish ~package ~name:"log"
+              ~descr:(Md.plain "Message event record.") jlog
+
+      module R : Record.S with type r = rlog = (val data)
 
       type t = Log.event
-      let syntax = R.syntax
+
+      let jtype = R.jtype
 
       let to_json evt =
         R.default |>
@@ -236,14 +232,16 @@ let () =
 (* --- Log Requests                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* TODO:LC: shall have an array here. *)
+
 let () = Request.register
-    ~page ~kind:`SET ~name:"kernel.setLogs"
+    ~package ~kind:`SET ~name:"setLogs"
     ~descr:(Md.plain "Turn logs monitoring on/off")
     ~input:(module Jbool) ~output:(module Junit)
     set_monitoring
 
 let () = Request.register
-    ~page ~kind:`GET ~name:"kernel.getLogs"
+    ~package ~kind:`GET ~name:"getLogs"
     ~descr:(Md.plain "Flush the last emitted logs since last call (max 100)")
     ~input:(module Junit) ~output:(module LogEvent.Jlist)
     begin fun () ->

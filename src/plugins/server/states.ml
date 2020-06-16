@@ -71,7 +71,6 @@ let register_state (type a) ~package ~name ~descr
   let open Markdown in
   let module D = (val data) in
   let href = link ~name () in
-  let descr = Markdown.par descr in
   let () = Package.declare
       ~package ~name ~descr D_state in
   let signal = Request.signal
@@ -268,7 +267,6 @@ let register_array ~package ~name ~descr ~key
     model =
   let open Markdown in
   let href = link ~name () in
-  let descr = Markdown.par descr in
   let columns = List.rev !model in
   let fields = Package.{
       fd_name = "key" ;
@@ -281,7 +279,7 @@ let register_array ~package ~name ~descr ~key
       ~descr:(plain "Signal for array" @ href) in
   let row = Package.declare_id
       ~package ~name:(name ^ "Row")
-      ~descr:(par (plain "Data rows for array" @ href))
+      ~descr:(plain "Data rows for array" @ href)
       (D_record fields) in
   let getter =
     List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
