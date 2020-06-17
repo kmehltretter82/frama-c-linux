@@ -25,7 +25,7 @@ module Md = Markdown
 module Js = Yojson.Basic.Util
 module Pkg = Package
 
-let package = Pkg.package ~name:"project" ()
+let package = Pkg.package ~name:"project" ~title:"Project Management" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Info                                                       --- *)
@@ -107,25 +107,25 @@ let () = Request.register ~package
     (fun pid -> Project.(set_current (from_unique_name pid)))
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"kernel.project.getList"
+    ~kind:`GET ~name:"getList"
     ~descr:(Md.plain "Returns the list of all projects")
     ~input:(module Junit) ~output:(module Jlist(ProjectInfo))
     (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"kernel.project.getOn"
+    ~kind:`GET ~name:"getOn"
     ~descr:(Md.plain "Execute a GET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `GET)
 
 let () = Request.register ~package
-    ~kind:`SET ~name:"kernel.project.setOn"
+    ~kind:`SET ~name:"setOn"
     ~descr:(Md.plain "Execute a SET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `SET)
 
 let () = Request.register ~package
-    ~kind:`EXEC ~name:"kernel.project.execOn"
+    ~kind:`EXEC ~name:"execOn"
     ~descr:(Md.plain "Execute an EXEC request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `EXEC)
@@ -139,7 +139,7 @@ let () =
     ~package
     ~descr:(Md.plain "Create a new project")
     ~kind:`SET
-    ~name:"kernel.project.setCreate"
+    ~name:"create"
     ~input:(module Jstring)
     ~output:(module ProjectInfo)
     Project.create

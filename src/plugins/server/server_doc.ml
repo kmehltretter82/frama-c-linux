@@ -195,8 +195,10 @@ let declaration page names decl =
 
 let package pkg =
   begin
+    Format.eprintf "PACKAGE %s@." (Package.name_of_pkginfo pkg);
     let page = page_of_package pkg in
     let names = Package.resolve pkg in
+    Format.eprintf "RESOLVED %s@." (Package.name_of_pkginfo pkg);
     List.iter (declaration page names) pkg.d_content ;
   end
 
@@ -353,6 +355,7 @@ let () =
         if Sys.file_exists root && Sys.is_directory root then
           begin
             Senv.feedback "[doc] Root: '%s'" root ;
+            Package.iter package ;
             dump ~root () ;
           end
         else

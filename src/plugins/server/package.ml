@@ -90,7 +90,7 @@ struct
   type t = {
     source : plugin ;
     mutable clashes : bool ;
-    mutable index : (string,(ident * int) list) Hashtbl.t ;
+    mutable index : (string,int IdMap.t) Hashtbl.t ;
     mutable names : string IdMap.t ;
     mutable reserved : NameSet.t ;
   }
@@ -115,19 +115,31 @@ struct
       scope.names <- IdMap.add id name scope.names ;
       let index = scope.index in
       match Hashtbl.find_opt index name with
-      | None -> Hashtbl.add index name [id,rk]
+      | None ->
+        Hashtbl.add index name (IdMap.add id rk IdMap.empty)
       | Some idks ->
-        if List.length idks = 1 then scope.clashes <- true ;
-        Hashtbl.replace index name ((id,rk) :: idks)
+        if IdMap.mem id idks then
+          scope.clashes <- true
+        else
+          Hashtbl.replace index name (IdMap.add id rk idks)
     end
 
-  let use scope id = push scope id 0
+  let use scope id =
+    if not (IdMap.mem id scope.names) then
+      push scope id 0
 
-  let reserve_name scope name =
+  let reserve scope name =
     assert (IdMap.is_empty scope.names) ;
     scope.reserved <- NameSet.add name scope.reserved
 
-  let reserve_ident scope { name } = reserve_name scope name
+  let declare scope id =
+    begin
+      let { name } = id in
+      if NameSet.mem name scope.reserved then
+        Senv.fatal "Reserved name for identifier '%a'" pp_ident id ;
+      scope.names <- IdMap.add id name scope.names ;
+      scope.reserved <- NameSet.add name scope.reserved ;
+    end
 
   let rec resolve scope =
     if not scope.clashes then scope.names else
@@ -136,11 +148,16 @@ struct
         scope.index <- Hashtbl.create 0 ;
         scope.clashes <- false ;
         Hashtbl.iter
-          (fun _name idks ->
-             match idks with
-             | [id,rk] -> push scope id rk
+          (fun name idks ->
+             match IdMap.bindings idks with
+             | [id,rk] ->
+               push scope id rk
              | idks ->
-               List.iter (fun (id,rk) -> push scope id (succ rk)) idks
+               Format.eprintf "CLASHING %S@." name ;
+               List.iter (fun (id,rk) ->
+                   Format.eprintf "RANK %a %d@." pp_ident id rk ;
+                   push scope id (succ rk)
+                 ) idks
           ) index ;
         resolve scope
       end
@@ -220,12 +237,12 @@ type packageInfo = {
 
 let name_of_ident id =
   String.concat "." @@ match id.plugin with
-  | Kernel -> id.package @ [ id.name ]
+  | Kernel -> "kernel" :: id.package @ [ id.name ]
   | Plugin p -> p :: (id.package @ [id.name ])
 
 let name_of_pkginfo pkg =
   String.concat "." @@ match pkg.d_plugin with
-  | Kernel -> pkg.d_package
+  | Kernel -> "kernel" :: pkg.d_package
   | Plugin p -> p :: pkg.d_package
 
 (* -------------------------------------------------------------------------- *)
@@ -257,7 +274,7 @@ let visit_dkind f = function
 
 let visit_decl f { d_kind } = visit_dkind f d_kind
 
-let visit_package_def f { d_content } =
+let visit_package_decl f { d_content } =
   List.iter (fun { d_ident } -> f d_ident) d_content
 
 let visit_package_used f { d_content } =
@@ -265,8 +282,8 @@ let visit_package_used f { d_content } =
 
 let resolve ?(keywords=[]) pkg =
   let scope = Scope.create pkg.d_plugin in
-  List.iter (Scope.reserve_name scope) keywords ;
-  visit_package_def (Scope.reserve_ident scope) pkg ;
+  List.iter (Scope.reserve scope) keywords ;
+  visit_package_decl (Scope.declare scope) pkg ;
   visit_package_used (Scope.use scope) pkg ;
   Scope.resolve scope
 
@@ -322,14 +339,11 @@ let userdoc ~plugin ~title ~descr = function
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package ?plugin ?title ?(descr=[]) ?readme ~name () =
+let package ?plugin ~title ?(descr=[]) ?readme ~name () =
   check_package name ;
   let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
   let pkgname = String.split_on_char '.' name in
   let pkgid = { plugin ; package = pkgname ; name = "*"} in
-  let title = match title with
-    | None -> Printf.sprintf "Package %s" name
-    | Some text -> text in
   let userdoc = userdoc ~plugin ~title ~descr readme in
   let pkgInfo = {
     d_plugin = plugin ;
@@ -374,16 +388,16 @@ let iter f =
       List.sort (fun a b -> Std.compare a.d_plugin b.d_plugin) @@
       List.rev_map
         (fun pkg -> { pkg.pkgInfo with d_content = List.rev pkg.revDecl })
-          !packages
+        !packages
     in collection := Some pkgs ; pkgs
 
 (* -------------------------------------------------------------------------- *)
 (* --- JSON To MarkDown                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let key kd = Md.emph (Printf.sprintf "$%s" kd)
-let index kd = Md.emph (Printf.sprintf "#%s" kd)
-let escaped tag = Md.code (Printf.sprintf "\"%s\"" @@ String.escaped tag)
+let key kd = Md.plain (Printf.sprintf "`#%s`" kd)
+let index kd = Md.plain (Printf.sprintf "`#0%s`" kd)
+let escaped tag = Md.plain (Printf.sprintf "`\"%s\"`" @@ String.escaped tag)
 
 type pp = {
   self: Md.text ;
@@ -432,10 +446,10 @@ and protect names js =
 
 let md_tags ?(title="Tags") (tags : tagInfo list) =
   let header = Md.[
-    plain title, Left;
-    plain "Value", Left;
-    plain "Description", Left
-  ] in
+      plain title, Left;
+      plain "Value", Left;
+      plain "Description", Left
+    ] in
   let row tg = [
     tg.tg_label ;
     escaped tg.tg_name ;
@@ -445,10 +459,10 @@ let md_tags ?(title="Tags") (tags : tagInfo list) =
 
 let md_fields ?(title="Field") pp (fields : fieldInfo list) =
   let header = Md.[
-    plain title, Left;
-    plain "Format", Center;
-    plain "Description", Left;
-  ] in
+      plain title, Left;
+      plain "Format", Center;
+      plain "Description", Left;
+    ] in
   let row f =
     match f.fd_type with
     | Joption js -> [

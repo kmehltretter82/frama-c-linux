@@ -1136,8 +1136,6 @@ src/plugins/server/server_batch.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/server_zmq.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/states.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/server/states.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/syntax.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/server/syntax.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/Scope.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/datascope.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/scope/datascope.mli: CEA_LGPL_OR_PROPRIETARY

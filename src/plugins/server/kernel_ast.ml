@@ -144,8 +144,8 @@ struct
     in
     States.register_array
       ~package
-      ~name:"markerKind"
-      ~descr:(Md.plain "Kind of markers")
+      ~name:"markerData"
+      ~descr:(Md.plain "Markers data")
       ~key:snd
       ~iter model
 
@@ -179,7 +179,7 @@ struct
 
   let jstmt = jmarker "stmt"
   let jdecl = jmarker "decl"
-  let jllet = jmarker "llet"
+  let jlval = jmarker "lval"
   let jexpr = jmarker "expr"
   let jterm = jmarker "term"
   let jglobal = jmarker "global"
@@ -392,19 +392,5 @@ let () =
     ~input:(module Jstring.Jlist)
     ~output:(module Junit)
     set_files
-
-(*
-let () =
-  Request.register
-    ~package
-    ~descr:(Md.plain "Compute the AST of the currently set source file names.")
-    ~kind:`EXEC
-    ~name:"kernel.execCompute"
-    ~input:(module Junit)
-    ~output:(module Junit)
-    (fun () ->
-       if not (Ast.is_computed ())
-       then File.init_from_cmdline ())
-*)
 
 (* -------------------------------------------------------------------------- *)

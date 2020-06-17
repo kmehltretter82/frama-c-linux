@@ -37,7 +37,7 @@ sig
 
   val jstmt : jtype
   val jdecl : jtype
-  val jllet : jtype
+  val jlval : jtype
   val jexpr : jtype
   val jterm : jtype
   val jglobal : jtype

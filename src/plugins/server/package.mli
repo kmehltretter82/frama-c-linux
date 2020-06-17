@@ -109,10 +109,10 @@ module Scope :
 sig
   type t
   val create : plugin -> t
-  val reserve_name : t -> string -> unit (** Must _not_ be call after [use] *)
-  val reserve_ident : t -> ident -> unit (** Must _not_ be call after [use] *)
-  val resolve : t -> string IdMap.t
+  val reserve : t -> string -> unit (** Must _not_ be call after [use] *)
+  val declare : t -> ident -> unit (** Must _not_ be call after [use] *)
   val use : t -> ident -> unit
+  val resolve : t -> string IdMap.t
 end
 
 val visit_jtype : (ident -> unit) -> jtype -> unit
@@ -121,7 +121,7 @@ val visit_param: (ident -> unit) -> paramInfo -> unit
 val visit_request: (ident -> unit) -> requestInfo -> unit
 val visit_dkind: (ident -> unit) -> declKindInfo -> unit
 val visit_decl: (ident -> unit) -> declInfo -> unit
-val visit_package_def: (ident -> unit) -> packageInfo -> unit
+val visit_package_decl: (ident -> unit) -> packageInfo -> unit
 val visit_package_used: (ident -> unit) -> packageInfo -> unit
 
 (* -------------------------------------------------------------------------- *)
@@ -132,7 +132,7 @@ type package
 
 val package :
   ?plugin:string ->
-  ?title:string ->
+  title:string ->
   ?descr:Markdown.text ->
   ?readme:string ->
   name:string ->

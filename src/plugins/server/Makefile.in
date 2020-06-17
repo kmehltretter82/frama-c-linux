@@ -40,9 +40,8 @@ PLUGIN_CMO:= \
 	server_parameters \
 	jbuffer \
 	package \
+	data main request states \
 	server_doc \
-	syntax data \
-	main request states \
 	server_batch \
 	kernel_main \
 	kernel_project \
@@ -81,11 +80,13 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 ##############
 
 SERVER_API= \
-	package.mli server_doc.mli \
-	syntax.mli data.mli request.mli states.mli \
+	package.mli \
+	data.mli \
+	request.mli \
+	states.mli \
 	kernel_main.mli \
-#	kernel_ast.mli \
-#	kernel_properties.mli
+	kernel_ast.mli \
+	kernel_properties.mli
 
 define Capitalize
 $(shell printf "%s%s" \

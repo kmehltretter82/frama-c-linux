@@ -287,7 +287,7 @@ let register_array ~package ~name ~descr ~key
     key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
   } in
-  let signature = Request.signature () in
+  let signature = Request.signature ~input:(module Jint) () in
   let module Jkeys = Jlist(struct
       include Jstring
       let jtype = Package.Jkey name
