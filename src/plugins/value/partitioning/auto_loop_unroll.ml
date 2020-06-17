@@ -67,10 +67,10 @@ let is_conditional_break stmt =
    the condition must be zero or non-zero to exit the loop. *)
 let find_loop_exit_condition loop =
   let rec aux = function
-    | [] -> None
+    | [] -> []
     | stmt :: tl ->
       match is_conditional_break stmt with
-      | Some _ as x -> x
+      | Some x -> x :: aux tl
       | None -> aux tl
   in
   aux loop.bstmts
@@ -466,46 +466,55 @@ module Make (Abstract: Abstractions.Eva) = struct
     then None
     else flagged_value.v >> fun v -> Some v
 
+  let (>>:) v f = match v with Some v -> f v | None -> false
+
   (* Is the number of iterations of a loop bounded by [limit]?
      [state] is the loop entry state, and [loop_block] the block of the loop. *)
   let is_bounded_loop kf stmt state limit loop_block =
     (* Computes the effect of the loop. Stops if it contains assembly code. *)
-    loop_effect_visitor#compute_effect loop_block >>= fun loop_effect ->
-    (* Finds the first loop exit condition, or stops. *)
-    find_loop_exit_condition loop_block >>= fun (condition, positive) ->
-    (* Finds the unique integer lvalue modified within the loop in [condition].
-       Stops if it does not exist is not a good candidate for the heuristic. *)
-    find_lonely_candidate loop_effect condition >>= fun lval ->
-    (* If [lval] is not in scope at [stmt], introduces it into [state] so that
-       [lval] can be properly evaluated in [state]. *)
-    let state = enter_scope state kf stmt lval in
-    (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
-       if [lval] ∈ [v_exit] then [condition = positive]. *)
-    reduce_to_lval_from_state state lval condition positive >>= fun v_exit ->
-    (* If [lval] is only assigned to the value of another lvalue, uses it
-       instead. This is especially useful to deal with temporary variables
-       introduced by the Frama-C normalization. *)
-    let lval = cross_equality lval loop_block in
-    (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
-    evaluate_lvalue state lval >>= fun v_init ->
-    (* Computes an over-approximation [v_delta] of the increment of [lval]
-       in one iteration of the loop. *)
-    compute_delta lval loop_block >>= fun v_delta ->
-    let typ = Cil.typeOfLval lval in
-    let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
-    (* Possible iterations numbers to exit the loop. *)
-    let iter_nb = binop Div (binop MinusA v_exit v_init) v_delta in
-    let bound = Abstract_value.Int (Integer.of_int limit) in
-    (* Use the iteration number if it is always smaller than the [limit].
-       Otherwise use [limit]. *)
-    let limit =
-      if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
-      then iter_nb
-      else Val.inject_int typ (Integer.of_int limit)
+    loop_effect_visitor#compute_effect loop_block >>: fun loop_effect ->
+    (* Finds loop exit conditions. *)
+    let exit_conditions = find_loop_exit_condition loop_block in
+    (* Does the condition [condition = positive] limits the number of iterations
+       of the loop by [limit]? *)
+    let is_bounded_by_condition (condition, positive) =
+      (* Finds the unique integer lvalue modified within the loop in [condition].
+         Stops if it does not exist is not a good candidate for the heuristic. *)
+      find_lonely_candidate loop_effect condition >>: fun lval ->
+      (* If [lval] is not in scope at [stmt], introduces it into [state] so that
+         [lval] can be properly evaluated in [state]. *)
+      let state = enter_scope state kf stmt lval in
+      (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
+         if [lval] ∈ [v_exit] then [condition = positive]. *)
+      reduce_to_lval_from_state state lval condition positive >>: fun v_exit ->
+      (* If [lval] is only assigned to the value of another lvalue, uses it
+         instead. This is especially useful to deal with temporary variables
+         introduced by the Frama-C normalization. *)
+      let lval = cross_equality lval loop_block in
+      (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
+      evaluate_lvalue state lval >>: fun v_init ->
+      (* Computes an over-approximation [v_delta] of the increment of [lval]
+         in one iteration of the loop. *)
+      compute_delta lval loop_block >>: fun v_delta ->
+      let typ = Cil.typeOfLval lval in
+      let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
+      (* Possible iterations numbers to exit the loop. *)
+      let iter_nb = binop Div (binop MinusA v_exit v_init) v_delta in
+      let bound = Abstract_value.Int (Integer.of_int limit) in
+      (* Use the iteration number if it is always smaller than the [limit].
+         Otherwise use [limit]. *)
+      let limit =
+        if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
+        then iter_nb
+        else Val.inject_int typ (Integer.of_int limit)
+      in
+      (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
+      let value = binop PlusA v_init (binop Mult limit v_delta) in
+      Val.is_included value v_exit
     in
-    (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
-    let value = binop PlusA v_init (binop Mult limit v_delta) in
-    Some (Val.is_included value v_exit)
+    (* Tests whether at least one of the exit conditions limits the number of
+       iteration by [limit]. *)
+    List.exists is_bounded_by_condition exit_conditions
 
   (* Computes an automatic loop unrolling for statement [stmt] in state [state],
      with a maximum limit. Returns None for no automatic loop unrolling. *)
@@ -515,8 +524,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       let loop_stmt = Kernel_function.find_enclosing_loop kf stmt in
       match loop_stmt.skind with
       | Loop (_code_annot, block, _loc, _, _) ->
-        is_bounded_loop kf stmt state max_unroll block >>= fun bounded ->
-        if bounded then Some max_unroll else None
+        if is_bounded_loop kf stmt state max_unroll block
+        then Some max_unroll
+        else None
       | _ -> None
     with Not_found -> None
 end
