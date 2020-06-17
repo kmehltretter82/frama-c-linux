@@ -44,7 +44,7 @@ class find_write target_vi = object (self)
     end;
     Cil.SkipChildren
 
-    method result = res
+  method result = res
 end
 
 let find_assignments kf vi =

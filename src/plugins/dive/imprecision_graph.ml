@@ -91,7 +91,7 @@ let merge_int_values p1 p2 =
   {
     values_interval = union_int_interval p1.values_interval p2.values_interval;
     values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade; 
+    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
   }
 
 let merge_float_values p1 p2 =
@@ -100,7 +100,7 @@ let merge_float_values p1 p2 =
   {
     values_interval = union_float_interval p1.values_interval p2.values_interval;
     values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade; 
+    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
   }
 
 let update_node_int_values node new_values =
@@ -125,7 +125,7 @@ let create_dependency ~allow_folding g v1 dependency_kind v2 =
     with Not_found -> None
   in
   match matching_edge with
-  | Some (_,e,_) -> 
+  | Some (_,e,_) ->
     e.dependency_multiple <- true
   | None ->
     let e = {
@@ -229,9 +229,9 @@ let ouptput_to_dot out_channel g =
         !l
       let get_subgraph v =
         let {loc_file ; loc_callstack} = v.node_locality in
-          match loc_callstack with
-          | [] -> Some (get_file_subgraph loc_file)
-          | cs -> get_callstack_subgraph cs
+        match loc_callstack with
+        | [] -> Some (get_file_subgraph loc_file)
+        | cs -> get_callstack_subgraph cs
       let default_edge_attributes _g = []
       let edge_attributes (_v1,e,_v2) =
         let kind_attribute = match e.dependency_kind with
@@ -240,7 +240,7 @@ let ouptput_to_dot out_channel g =
         and folding_attribute = match e.dependency_multiple with
           | true -> [ `Style `Bold ]
           | false -> []
-        in kind_attribute @ folding_attribute 
+        in kind_attribute @ folding_attribute
     end)
   in
   Dot.output_graph out_channel g
@@ -317,20 +317,20 @@ struct
 
   let output_node_float_values values =
     `Assoc [
-        ("computed", output_float_interval values.values_interval) ;
-        ("limits", output_float_interval values.values_limits) ;
-        ("grade", output_node_precision_grade values.values_grade) ;
-      ]
+      ("computed", output_float_interval values.values_interval) ;
+      ("limits", output_float_interval values.values_limits) ;
+      ("grade", output_node_precision_grade values.values_grade) ;
+    ]
 
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
     `Assoc ([
-      ("id", `Int node.node_key) ;
-      ("label", `String label) ;
-      ("kind", output_node_kind node.node_kind) ;
-      ("locality", output_node_locality node.node_locality) ;
-      ("explored", `Bool node.node_deps_computed) ;
-    ] @
+        ("id", `Int node.node_key) ;
+        ("label", `String label) ;
+        ("kind", output_node_kind node.node_kind) ;
+        ("locality", output_node_locality node.node_locality) ;
+        ("explored", `Bool node.node_deps_computed) ;
+      ] @
         begin match node.node_int_values with
           | None -> []
           | Some node_values ->

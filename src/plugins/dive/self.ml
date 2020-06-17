@@ -68,7 +68,7 @@ struct
       let function_name = Str.matched_group 1 s
       and variable_name = Str.matched_group 2 s in
       let kf = try Globals.Functions.find_by_name function_name
-        with Not_found -> 
+        with Not_found ->
           raise (Cannot_build ("no function '" ^ function_name ^ "'"))
       in
       try Globals.Vars.find_from_astinfo variable_name (VLocal kf)
@@ -100,12 +100,12 @@ module type Varinfo_set = Parameter_sig.Set
 
 module Varinfo_set (X: Parameter_sig.Input_with_arg) =
   Make_set
-      (Varinfo)
-      (struct
-        include X
-        let dependencies = []
-        let default = Cil_datatype.Varinfo.Set.empty
-      end)
+    (Varinfo)
+    (struct
+      include X
+      let dependencies = []
+      let default = Cil_datatype.Varinfo.Set.empty
+    end)
 
 module FromBases = Varinfo_set
     (struct

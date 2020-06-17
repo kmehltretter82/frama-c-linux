@@ -197,7 +197,7 @@ let build_node_kind ~is_folded_base lval kinstr =
 
 let default_node_locality callstack =
   match callstack with
-  | [] -> 
+  | [] ->
     (* The empty callstack can be used for global lvalues *)
     { loc_file="" ; loc_callstack=[] }
   | (kf,_kinstr) :: _ ->
@@ -409,12 +409,12 @@ let build_node_deps context node =
 
   and build_call_deps callstack stmt callee args =
     begin match callee.enode with
-    | Lval (Var _vi, _offset) -> ()
-    | Lval (Mem exp, _offset) ->
-      build_exp_deps callstack stmt Callee exp
-    | _ ->
-      Self.warning "Cannot compute all callee dependencies for %a"
-        Cil_printer.pp_stmt stmt;
+      | Lval (Var _vi, _offset) -> ()
+      | Lval (Mem exp, _offset) ->
+        build_exp_deps callstack stmt Callee exp
+      | _ ->
+        Self.warning "Cannot compute all callee dependencies for %a"
+          Cil_printer.pp_stmt stmt;
     end;
     let kinstr = Kstmt stmt in
     let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
@@ -433,7 +433,7 @@ let build_node_deps context node =
     | Differing_blocks (e1,e2) -> for_exp e1; for_exp e2
     | Memory_access _ | Not_separated _ | Overlap _
     | Uninitialized _ | Dangling _ | Uninitialized_union _ -> ()
-      (* TODO: adress depencies inside lval *)
+    (* TODO: adress depencies inside lval *)
     | Invalid_bool lv -> build_lval_deps callstack stmt Data lv
 
   and build_instr_deps callstack stmt = function
@@ -554,8 +554,8 @@ let explore ~depth context root =
   let should_auto_explore node =
     let is_root = Graph.Node.equal node root (* the root is always explored *)
     and is_intersting_kind = match node.node_kind with
-     | Scalar _ | Composite _ | Alarm _ -> true
-     | Scattered _ -> false
+      | Scalar _ | Composite _ | Alarm _ -> true
+      | Scattered _ -> false
     in
     is_root || (not node.node_hidden && is_intersting_kind)
   in
@@ -566,16 +566,16 @@ let explore ~depth context root =
     let (n,d) = Queue.take queue in
     if d < depth then begin
       if not (n.node_deps_computed) && should_auto_explore n then
-      begin
-        begin try
-            build_node_deps context n;
-          with Too_many_deps ->
-            (* TODO: give a mean to explore more dependencies *)
-            Self.warning "Too many dependencies for %a ; throwing them out"
-              Node_kind.pretty n.node_kind;
+        begin
+          begin try
+              build_node_deps context n;
+            with Too_many_deps ->
+              (* TODO: give a mean to explore more dependencies *)
+              Self.warning "Too many dependencies for %a ; throwing them out"
+                Node_kind.pretty n.node_kind;
+          end;
+          n.node_deps_computed <- true;
         end;
-        n.node_deps_computed <- true;
-      end;
       Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n
     end;
   done

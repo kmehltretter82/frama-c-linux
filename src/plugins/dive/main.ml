@@ -59,4 +59,3 @@ let main () =
 
 let () =
   Db.Main.extend main
-
