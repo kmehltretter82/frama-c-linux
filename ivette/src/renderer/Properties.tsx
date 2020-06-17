@@ -162,8 +162,8 @@ const renderCode: Renderer<string> =
 
 interface Tag { name: string; label: string; descr: string }
 
-const renderTag: Renderer<Tag | undefined> =
-  (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
+const renderTag: Renderer<Tag> =
+  (d: Tag) => <Label label={d.label} title={d.descr} />;
 
 const renderNames: Renderer<string[]> =
   (names: string[]) => {
@@ -185,7 +185,7 @@ function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
 }
 
-function ColumnTag<Row>(props: ColumnProps<Row, Tag | undefined>) {
+function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
   return <Column render={renderTag} {...props} />;
 }
 

@@ -105,7 +105,7 @@ export interface ColumnProps<Row, Cell> {
   /**
      Data getter for this column.
    */
-  getter?: (row: Row, dataKey: string) => Cell;
+  getter?: (row: Row, dataKey: string) => Cell | undefined;
   /**
      Override table by-fields cell renderers.
    */
