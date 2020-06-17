@@ -200,7 +200,7 @@ let pretty file_name =
     else
       let buffer = Buffer.create 80 in
       add_path buffer path ;
-      Buffer.contents buffer
+      skip_dot (Buffer.contents buffer)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
