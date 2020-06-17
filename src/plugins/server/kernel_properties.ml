@@ -21,12 +21,13 @@
 (**************************************************************************)
 
 module Md = Markdown
+module Pkg = Package
 
 open Data
 open Kernel_main
 open Kernel_ast
 
-let page = Server_doc.page `Kernel ~title:"Property Services" ~filename:"properties.md" ()
+let package = Pkg.package ~title:"Property Services" ~name:"properties" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Kind                                                      --- *)
@@ -34,14 +35,14 @@ let page = Server_doc.page `Kernel ~title:"Property Services" ~filename:"propert
 
 module PropKind =
 struct
-  let kinds = Enum.dictionary ~page
-      ~name:"propkind" ~title:"Kind"
-      ~descr:(Md.plain "Property Kind")
-      ()
+  let kinds = Enum.dictionary ()
 
   let t_kind name descr =
-    Enum.tag kinds ~name ~label:(Md.plain name) ~descr:(Md.plain descr) ()
-  let t_clause name = t_kind name (Printf.sprintf "Clause `@%s`" name)
+    Enum.tag ~name ~label:(Md.plain name) ~descr:(Md.plain descr) kinds
+
+  let t_clause name =
+    t_kind name (Printf.sprintf "Clause `@%s`" name)
+
   let t_loop name =
     t_kind ("loop-" ^ name) (Printf.sprintf "Clause `@loop %s`" name)
 
@@ -81,18 +82,18 @@ struct
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
 
-  let p_ext = Enum.prefix kinds ~prefix:"ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL extension `<clause>`") ()
+  let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL extension `<clause>`")
 
-  let p_loop_ext = Enum.prefix kinds ~prefix:"loop-ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL loop extension `loop <clause>`") ()
+  let p_loop_ext = Enum.prefix kinds ~name:"loop-ext" ~var:"<clause>"
+      ~descr:(Md.plain "ACSL loop extension `loop <clause>`")
 
-  let p_other = Enum.prefix kinds ~prefix:"prop" ~var:"<prop>"
-      ~descr:(Md.plain "Plugin Specific properties") ()
+  let p_other = Enum.prefix kinds ~name:"prop" ~var:"<prop>"
+      ~descr:(Md.plain "Plugin Specific properties")
 
   open Property
 
-  let tag = function
+  let lookup = function
     | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires _ -> t_requires
@@ -134,8 +135,11 @@ struct
     | IPGlobalInvariant _ -> t_global_invariant
     | IPOther { io_name } -> Enum.instance p_other io_name
 
-  let data = Enum.publish kinds ~tag ()
-  let () = Request.dictionary kinds
+  let () = Enum.set_lookup kinds lookup
+  let data = Request.dictionary ~package
+      ~name:"propKind"
+      ~descr:(Md.plain "Property Kinds")
+      kinds
 
   include (val data : S with type t = Property.t)
 end
@@ -146,7 +150,7 @@ let register_propkind ~name ~kind ?label ~descr () =
     | `Clause -> p_ext
     | `Loop -> p_loop_ext
     | `Other -> p_other
-  in ignore @@ Enum.extends kinds prefix ~name ?label ~descr ()
+  in ignore @@ Enum.extends prefix ~name ?label ~descr
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Status                                                    --- *)
@@ -155,14 +159,12 @@ let register_propkind ~name ~kind ?label ~descr () =
 module PropStatus =
 struct
 
-  let status = Enum.dictionary ~page
-      ~name:"propstatus" ~title:"Status"
-      ~descr:(Md.plain "Property Status (consolidated)") ()
+  let status = Enum.dictionary ()
 
   let t_status value name ?label descr =
-    Enum.tag status ~name
+    Enum.tag ~name
       ?label:(Extlib.opt_map Md.plain label)
-      ~descr:(Md.plain descr) ~value ()
+      ~descr:(Md.plain descr) ~value status
 
   open Property_status.Feedback
 
@@ -196,21 +198,23 @@ struct
     t_status Unknown_but_dead "unknown_but_dead"
       ~label:"Unknown (✝)" "Dead property (but unknown)"
 
-  let tag = function
-    | Valid -> t_valid
-    | Invalid -> t_invalid
-    | Unknown -> t_unknown
-    | Never_tried -> t_never_tried
-    | Valid_under_hyp -> t_valid_under_hyp
-    | Valid_but_dead -> t_valid_but_dead
-    | Considered_valid -> t_considered_valid
-    | Invalid_under_hyp -> t_invalid_under_hyp
-    | Invalid_but_dead -> t_invalid_but_dead
-    | Unknown_but_dead -> t_unknown_but_dead
-    | Inconsistent -> t_inconsistent
+  let () = Enum.set_lookup status
+      begin function
+        | Valid -> t_valid
+        | Invalid -> t_invalid
+        | Unknown -> t_unknown
+        | Never_tried -> t_never_tried
+        | Valid_under_hyp -> t_valid_under_hyp
+        | Valid_but_dead -> t_valid_but_dead
+        | Considered_valid -> t_considered_valid
+        | Invalid_under_hyp -> t_invalid_under_hyp
+        | Invalid_but_dead -> t_invalid_but_dead
+        | Unknown_but_dead -> t_unknown_but_dead
+        | Inconsistent -> t_inconsistent
+      end
 
-  let data = Enum.publish status ~tag ()
-  let () = Request.dictionary status
+  let data = Request.dictionary ~package ~name:"propStatus"
+      ~descr:(Md.plain "Property Status (consolidated)") status
 
   include (val data : S with type t = Property_status.Feedback.t)
 end
@@ -219,27 +223,33 @@ end
 (* --- Alarm kind                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-module AlarmKind = struct
-  let alarms = Enum.dictionary ~page ~name:"alarmkind" ~title:"Alarm kind"
-      ~descr:(Md.plain "Alarm kind") ()
+[@@@ warning "-60"]
+module AlarmKind =
+struct
+
+  let alarms = Enum.dictionary ()
 
   let register alarm =
     let name = Alarms.get_short_name alarm in
     let label = Md.plain name in
     let descr = Md.plain (Alarms.get_description alarm) in
-    ignore (Enum.tag alarms ~name ~label ~descr ())
+    Enum.add alarms ~name ~label ~descr
+
   let () = List.iter register Alarms.reprs
 
-  let tag alarm =
-    let name = Alarms.get_short_name alarm in
-    try Enum.find_tag alarms name
-    with Not_found -> failure "Unknown alarm kind: %s" name
+  let () = Enum.set_lookup alarms
+      begin function alarm ->
+        let name = Alarms.get_short_name alarm in
+        try Enum.find_tag alarms name
+        with Not_found -> failure "Unknown alarm kind: %s" name
+      end
 
-  let data = Enum.publish alarms ~tag ()
-  let () = Request.dictionary alarms
+  let data = Request.dictionary
+      ~package ~name:"alarms" ~descr:(Md.plain "Alarm Kinds") alarms
 
   include (val data : S with type t = Alarms.t)
 end
+[@@@ warning "+60"]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Model                                                     --- *)
@@ -251,49 +261,53 @@ let find_alarm = function
 
 let model = States.model ()
 
-let () = States.column ~model ~name:"descr"
+let () = States.column model ~name:"descr"
     ~descr:(Md.plain "Full description")
     ~data:(module Jstring)
-    ~get:(fun ip -> Format.asprintf "%a" Property.pretty ip) ()
+    ~get:(fun ip -> Format.asprintf "%a" Property.pretty ip)
 
-let () = States.column ~model ~name:"kind"
+let () = States.column model ~name:"kind"
     ~descr:(Md.plain "Kind")
     ~data:(module PropKind)
-    ~get:(fun ip -> ip) ()
+    ~get:(fun ip -> ip)
 
-let () = States.column ~model ~name:"names"
+let () = States.column model ~name:"names"
     ~descr:(Md.plain "Names")
     ~data:(module Jstring.Jlist)
-    ~get:Property.get_names ()
+    ~get:Property.get_names
 
-let () = States.column ~model ~name:"status"
+let () = States.column model ~name:"status"
     ~descr:(Md.plain "Status")
     ~data:(module PropStatus)
-    ~get:(Property_status.Feedback.get) ()
+    ~get:(Property_status.Feedback.get)
 
-let () = States.column ~model ~name:"function"
+let () = States.column model ~name:"function"
     ~descr:(Md.plain "Function")
-    ~data:(module Kf.Joption) ~get:Property.get_kf ()
+    ~data:(module Kf.Joption) ~get:Property.get_kf
 
-let () = States.column ~model ~name:"kinstr"
+let () = States.column model ~name:"kinstr"
     ~descr:(Md.plain "Instruction")
-    ~data:(module Ki) ~get:Property.get_kinstr ()
+    ~data:(module Ki) ~get:Property.get_kinstr
 
-let () = States.column ~model ~name:"source"
+let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
     ~data:(module LogSource)
-    ~get:(fun ip -> Property.location ip |> fst) ()
+    ~get:(fun ip -> Property.location ip |> fst)
 
-let () = States.column ~model ~name:"alarm"
-    ~descr:(Md.plain "Alarm kind (if the property is an alarm)")
-    ~data:(module Data.Joption (AlarmKind))
-    ~get:find_alarm ()
+let () = States.column model ~name:"alarm"
+    ~descr:(Md.plain "Alarm name (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip))
 
-let () = States.column ~model ~name:"predicate"
+let () = States.column model ~name:"alarm_descr"
+    ~descr:(Md.plain "Alarm description (if the property is an alarm)")
+    ~data:(module Jstring.Joption)
+    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip))
+
+let () = States.column model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
     ~data:(module Jstring.Joption)
     ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
-    ()
 
 let is_relevant ip =
   match Property.get_kf ip with
@@ -312,9 +326,9 @@ let add_remove_hook f =
 
 let array =
   States.register_array
-    ~page
-    ~name:"kernel.properties"
-    ~descr:(Md.plain "Registered Properties")
+    ~package
+    ~name:"status"
+    ~descr:(Md.plain "Status of Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
     ~iter
     ~add_update_hook

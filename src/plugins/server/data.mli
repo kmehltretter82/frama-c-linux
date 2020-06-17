@@ -243,9 +243,24 @@ sig
     ?value:'a ->
     'a dictionary -> 'a tag
 
+  (** Same as [tag] but to not return the associated tag. *)
+  val add :
+    name:string ->
+    ?label:Markdown.text -> descr:Markdown.text ->
+    ?value:'a ->
+    'a dictionary -> unit
+
+  (** Returns the value associated to some tag.
+      @raise Not_found if no value is associated to the tag. *)
+  val find: 'a dictionary -> 'a tag -> 'a
+
+  (** Returns the tag associated to a value.
+      @raise Not_found if no value is associated to the tag. *)
+  val lookup: 'a dictionary -> 'a -> 'a tag
+
   (** Returns the tag from its name.
       @raise Not_found if no tag has been registered with this name. *)
-  val find: 'a dictionary -> string -> 'a tag
+  val find_tag: 'a dictionary -> string -> 'a tag
 
   (** Register a new prefix tag in the dictionary.
       The default label is the capitalized prefix.

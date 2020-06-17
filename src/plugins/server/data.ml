@@ -452,9 +452,25 @@ struct
       | Some v -> Hashtbl.add d.vindex v name
     end ; name
 
-  let find (d : 'a dictionary) name : 'a tag =
+  let add ~name ?label ~descr ?value (d : 'a dictionary) : unit =
+    ignore (tag ~name ?label ~descr ?value d)
+
+  let find (d : 'a dictionary) (tg : 'a tag) : 'a =
+    match Hashtbl.find d.values tg with
+    | Some v -> v
+    | None -> raise Not_found
+
+  let find_tag (d : 'a dictionary) name : 'a tag =
     if Hashtbl.mem d.values name then name else
       raise Not_found
+
+  let lookup_index lookup vindex v =
+    match lookup with
+    | None -> Hashtbl.find vindex v
+    | Some f -> try f v with Not_found -> Hashtbl.find vindex v
+
+  let lookup (d : 'a dictionary) (v: 'a) :  'a tag =
+    lookup_index d.lookup d.vindex v
 
   let set_lookup (d : 'a dictionary) (tag : 'a -> 'a tag) =
     d.lookup <- Some tag
@@ -481,11 +497,7 @@ struct
 
   let to_json name lookup vindex v =
     `String begin
-      try match lookup with
-        | None ->
-          Hashtbl.find vindex v
-        | Some f ->
-          try f v with Not_found -> Hashtbl.find vindex v
+      try lookup_index lookup vindex v
       with Not_found ->
         failure "[%s] Value not found" name
     end

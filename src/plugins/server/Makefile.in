@@ -47,7 +47,7 @@ PLUGIN_CMO:= \
 	kernel_main \
 	kernel_project \
 	kernel_ast \
-#	kernel_properties
+	kernel_properties
 
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
