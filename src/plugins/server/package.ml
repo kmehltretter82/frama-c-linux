@@ -327,10 +327,7 @@ let resolve_readme ~plugin = function
         Printf.sprintf "%s/server/%s" Fc_config.datadir readme
       | Plugin name ->
         Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name readme
-    in
-    if Sys.file_exists file
-    then Some file
-    else (Senv.warning "Can not find %S file" file ; None)
+    in Some file
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)

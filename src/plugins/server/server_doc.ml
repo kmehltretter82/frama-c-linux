@@ -45,6 +45,7 @@ type page = {
   title : string ;
   order : int ;
   descr : Markdown.elements ;
+  readme: string option ;
   mutable sections : section list ;
 }
 
@@ -74,12 +75,9 @@ let page chapter ~title ?(descr=[]) ?readme ~filename () =
     Senv.failure "Duplicate page '%s' path@." path ; other
   with Not_found ->
     let order = incr order ; !order in
-    let descr = match readme with
-      | None -> Markdown.section ~title descr
-      | Some file -> Markdown.rawfile file @ descr in
     let page = {
       order ; rootdir ; path ;
-      chapter ; title ; descr ;
+      chapter ; title ; descr ; readme ;
       sections=[] ;
     } in
     pages := Pages.add path page !pages ; page
@@ -323,9 +321,17 @@ let dump ~root ?(meta=true) () =
     Pages.iter
       (fun path page ->
          Senv.feedback "[doc] Page: '%s'" path ;
-         let body = Markdown.subsections page.descr (build [] page.sections) in
          let title = page.title in
-         pp_one_page ~root ~page:path ~title body ;
+         let intro = match page.readme with
+           | None -> Markdown.section ~title page.descr
+           | Some file ->
+             if Sys.file_exists file
+             then Markdown.rawfile file @ page.descr
+             else (Senv.warning "Can not find %S file" file ;
+                   Markdown.section ~title page.descr)
+         in
+         let body = Markdown.subsections page.descr (build [] page.sections) in
+         pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
            let path = Printf.sprintf "%s/%s.json" root path in
            Yojson.Basic.to_file path (metadata page) ;
