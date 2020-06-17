@@ -492,6 +492,7 @@ const RenderTable = () => {
           icon="CLIPBOARD"
           selected={showFilter}
           onClick={flipFilter}
+          title="Toggle filters"
         />
       </TitleBar>
       <Splitter dir="RIGHT" unfold={showFilter}>
