@@ -163,7 +163,7 @@ const renderCode: Renderer<string> =
 interface Tag { name: string; label: string; descr: string }
 
 const renderTag: Renderer<Tag> =
-  (d?: Tag) => (d ? <Label label={d.label} title={d.descr} /> : null);
+  (d: Tag) => <Label label={d.label} title={d.descr} />;
 
 const renderNames: Renderer<string[]> =
   (names: string[]) => {
@@ -205,7 +205,6 @@ interface Property {
   descr: string;
   kind: string;
   alarm?: string;
-  alarm_descr?: string;
   names: string[];
   predicate: string;
   status: string;
@@ -362,10 +361,26 @@ const PropertyColumns = () => {
 
   const statusDict: { [status: string]: Tag } =
     States.useDictionary('kernel.dictionary.propstatus');
+  const kindDict: { [kind: string]: Tag } =
+    States.useDictionary('kernel.dictionary.propkind');
+  const alarmDict: { [alarm: string]: Tag } =
+    States.useDictionary('kernel.dictionary.alarmkind');
 
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
     [statusDict],
+  );
+
+  const getKind = React.useCallback(
+    ({ kind }: Property) => (kindDict[kind] ?? { label: kind }),
+    [kindDict],
+  );
+
+  const getAlarm = React.useCallback(
+    ({ alarm }: Property) => (
+      alarm === undefined ? alarm : (alarmDict[alarm] ?? { label: alarm })
+    ),
+    [alarmDict],
   );
 
   return (
@@ -386,8 +401,8 @@ const PropertyColumns = () => {
         render={renderFile}
       />
       <ColumnCode id="function" label="Function" width={120} />
-      <ColumnCode id="kind" label="Property kind" fixed width={120} />
-      <ColumnCode id="alarm" label="Alarms" fixed width={160} />
+      <ColumnTag id="kind" label="Property kind" getter={getKind} width={120} />
+      <ColumnTag id="alarm" label="Alarms" getter={getAlarm} width={160} />
       <Column
         id="names"
         label="Names"
@@ -477,6 +492,7 @@ const RenderTable = () => {
           icon="CLIPBOARD"
           selected={showFilter}
           onClick={flipFilter}
+          title="Toggle filters panel"
         />
       </TitleBar>
       <Splitter dir="RIGHT" unfold={showFilter}>

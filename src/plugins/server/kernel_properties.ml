@@ -39,7 +39,8 @@ struct
       ~descr:(Md.plain "Property Kind")
       ()
 
-  let t_kind name descr = Enum.tag kinds ~name ~descr:(Md.plain descr) ()
+  let t_kind name descr =
+    Enum.tag kinds ~name ~label:(Md.plain name) ~descr:(Md.plain descr) ()
   let t_clause name = t_kind name (Printf.sprintf "Clause `@%s`" name)
   let t_loop name =
     t_kind ("loop-" ^ name) (Printf.sprintf "Clause `@loop %s`" name)
@@ -49,29 +50,29 @@ struct
   let t_disjoint = t_kind "disjoint" "Disjoint behaviors clause"
 
   let t_assumes = t_clause "assumes"
-  let t_requires = t_clause "requires"
-  let t_instance = t_clause "instance"
+  let t_requires = t_kind "requires" "Function precondition"
+  let t_instance = t_kind "instance" "Instance of a precondition at a call site"
   let t_breaks = t_clause "breaks"
   let t_continues = t_clause "continues"
   let t_returns = t_clause "returns"
   let t_exits = t_clause "exits"
-  let t_ensures = t_clause "ensures"
-  let t_terminates = t_clause "terminates"
-  let t_allocates = t_clause "allocates"
+  let t_ensures = t_kind "ensures" "Function postcondition"
+  let t_terminates = t_kind "terminates" "Function termination clause"
+  let t_allocates = t_kind "allocates" "Function allocation"
   let t_decreases = t_clause "decreases"
-  let t_assigns = t_clause "assigns"
-  let t_froms = t_kind "froms" "Clause `@assigns … \\from …`"
+  let t_assigns = t_kind "assigns" "Function assigns"
+  let t_froms = t_kind "froms" "Functional dependencies in function assigns"
 
-  let t_assert = t_clause "assert"
-  let t_check = t_clause "check"
-  let t_loop_invariant = t_loop "invariant"
+  let t_assert = t_kind "assert" "Assertion"
+  let t_check = t_kind "check" "Check"
+  let t_loop_invariant = t_kind "invariant" "Loop invariant"
   let t_loop_assigns = t_loop "assigns"
-  let t_loop_variant = t_loop "variant"
+  let t_loop_variant = t_kind "variant" "Loop termination argument"
   let t_loop_allocates = t_loop "allocates"
   let t_loop_pragma = t_loop "pragma"
 
   let t_reachable = t_kind "reachable" "Reachable statement"
-  let t_code_contract = t_kind "code-contract" "Statement Contract"
+  let t_code_contract = t_kind "code-contract" "Statement contract"
   let t_code_invariant = t_kind "code-invariant" "Generalized loop invariant"
   let t_type_invariant = t_kind "type-invariant" "Type invariant"
   let t_global_invariant = t_kind "global-invariant" "Global invariant"
@@ -215,6 +216,32 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Alarm kind                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module AlarmKind = struct
+  let alarms = Enum.dictionary ~page ~name:"alarmkind" ~title:"Alarm kind"
+      ~descr:(Md.plain "Alarm kind") ()
+
+  let register alarm =
+    let name = Alarms.get_short_name alarm in
+    let label = Md.plain name in
+    let descr = Md.plain (Alarms.get_description alarm) in
+    ignore (Enum.tag alarms ~name ~label ~descr ())
+  let () = List.iter register Alarms.reprs
+
+  let tag alarm =
+    let name = Alarms.get_short_name alarm in
+    try Enum.find_tag alarms name
+    with Not_found -> failure "Unknown alarm kind: %s" name
+
+  let data = Enum.publish alarms ~tag ()
+  let () = Request.dictionary alarms
+
+  include (val data : S with type t = Alarms.t)
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Model                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -258,14 +285,9 @@ let () = States.column ~model ~name:"source"
     ~get:(fun ip -> Property.location ip |> fst) ()
 
 let () = States.column ~model ~name:"alarm"
-    ~descr:(Md.plain "Alarm name (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip)) ()
-
-let () = States.column ~model ~name:"alarm_descr"
-    ~descr:(Md.plain "Alarm description (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip)) ()
+    ~descr:(Md.plain "Alarm kind (if the property is an alarm)")
+    ~data:(module Data.Joption (AlarmKind))
+    ~get:find_alarm ()
 
 let () = States.column ~model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
