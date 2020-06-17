@@ -4,11 +4,11 @@
 [eva] Initial state computed
 [eva:alarm] tests/dive/unfocused_callers.i:16: Warning: 
   non-finite float value.
-  assert \is_finite((float)(tmp + tmp_0));
+  assert \is_finite(\add_float(tmp, tmp_0));
   (tmp from f1(x), tmp_0 from f2(x))
 [eva:alarm] tests/dive/unfocused_callers.i:16: Warning: 
   non-finite float value.
-  assert \is_finite((float)((float)(tmp + tmp_0) + tmp_1));
+  assert \is_finite(\add_float(\add_float(tmp, tmp_0), tmp_1));
   (tmp from f1(x), tmp_0 from f2(x), tmp_1 from f3(x))
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======

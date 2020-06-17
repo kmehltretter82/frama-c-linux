@@ -3,9 +3,9 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:alarm] tests/dive/per_callstack.i:15: Warning: 
-  non-finite float value. assert \is_finite((float)(x + y));
+  non-finite float value. assert \is_finite(\add_float(x, y));
 [eva:alarm] tests/dive/per_callstack.i:15: Warning: 
-  non-finite float value. assert \is_finite((float)((float)(x + y) + z));
+  non-finite float value. assert \is_finite(\add_float(\add_float(x, y), z));
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

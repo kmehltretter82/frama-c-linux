@@ -5,9 +5,9 @@
 [eva] tests/dive/various.i:10: starting to merge loop iterations
 [eva:alarm] tests/dive/various.i:13: Warning: 
   non-finite float value.
-  assert \is_finite((float)((double)((double)y * 2.0)));
+  assert \is_finite((float)\mul_double((double)y, (double)2.0));
 [eva:alarm] tests/dive/various.i:27: Warning: 
-  non-finite float value. assert \is_finite((float)(y + w));
+  non-finite float value. assert \is_finite(\add_float(y, w));
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
