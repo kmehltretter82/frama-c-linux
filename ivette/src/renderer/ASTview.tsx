@@ -179,7 +179,7 @@ export default () => (
   <Component
     id="frama-c.astview"
     label="AST"
-    title="Normalized source code representation."
+    title="Normalized source code representation"
   >
     <ASTview />
   </Component>
