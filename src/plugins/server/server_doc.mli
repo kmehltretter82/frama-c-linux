@@ -38,13 +38,16 @@ val chapter : page -> chapter
 
 (** Obtain the given page in the server documentation.
 
-    The page initially contains an introductory section
+    The readme introductory section is
     read from the share directory:
-    - [frama-c/share/protocol/<filename>] for protocol pages,
-    - [frama-c/share/server/kernel/<filename>] for kernel pages,
+    - [frama-c/share/<filename>] server and kernel pages,
     - [frama-c/share/<plugin>/server/<filename>] for plugin's pages.
 *)
-val page : chapter -> title:string -> ?descr:elements -> filename:string ->
+val page : chapter ->
+  title:string ->
+  ?descr:elements ->
+  ?readme:string ->
+  filename:string ->
   unit ->page
 
 (** Adds a section in the corresponding page.
@@ -62,7 +65,7 @@ val publish :
   unit -> Markdown.href
 
 (** Publish a protocole. *)
-val protocole : title:string -> filename:string -> unit
+val protocole : title:string -> readme:string -> unit
 
 (** Publish a package. *)
 val package : Package.packageInfo -> unit

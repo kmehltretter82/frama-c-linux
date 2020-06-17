@@ -218,18 +218,19 @@ let relativize page target =
       | [] -> assert false
       | [_f2 ] ->
         (* it's the length of the argument to go_up that matters, not
-           its exact content *)
+             its exact content *)
         go_up p1 @ l2
       | d2 :: p2 when d2 = d1 -> remove_common p1 p2
       | _ -> go_up p1 @ l2
-  in
-  let relative = remove_common page_dir target_dir in
-  String.concat "/" relative
+    in
+    let relative = remove_common page_dir target_dir in
+    String.concat "/" relative
 
 let pp_href ?(page="") fmt = function
   | URL s -> Format.pp_print_string fmt s
   | Page s -> Format.pp_print_string fmt (relativize page s)
-  | Section (p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (label s)
+  | Section("",s) -> Format.fprintf fmt "#%s" (label s)
+  | Section(p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (label s)
 
 let rec pp_inline ?page fmt =
   function

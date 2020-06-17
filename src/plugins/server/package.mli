@@ -25,8 +25,7 @@
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
-type path = string list
-type ident = private { plugin: plugin; package: path; name: string; }
+type ident = private { plugin: plugin; package: string list; name: string; }
 
 type jtype =
   | Jany
@@ -85,10 +84,12 @@ type declInfo = {
 }
 
 type packageInfo = {
-  d_plugin : plugin;
-  d_package : path;
-  d_userdoc : Markdown.elements;
-  d_content : declInfo list;
+  p_plugin : plugin ;
+  p_package : string list ;
+  p_title : string ;
+  p_descr : Markdown.text ;
+  p_readme : string option ;
+  p_content : declInfo list ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -194,7 +195,7 @@ val name_of_ident : ident -> string
 
 type pp = {
   self: Markdown.text ;
-  data: ident -> Markdown.text ;
+  ident: ident -> Markdown.text ;
 }
 
 val escaped : string -> Markdown.text

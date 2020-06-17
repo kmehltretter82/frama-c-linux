@@ -55,8 +55,7 @@ let failure ?json msg =
 let failure_from_type_error msg json =
   failure ~json "%s" msg
 
-let package =
-  Package.package ~name:"data" ~title:"Kernel Basic Types" ()
+let package = Package.package ~name:"data" ~title:"Informations" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)

@@ -25,7 +25,8 @@ module Md = Markdown
 module Js = Yojson.Basic.Util
 module Pkg = Package
 
-let package = Pkg.package ~name:"project" ~title:"Project Management" ()
+let package = Pkg.package ~name:"project"
+    ~title:"Project Management" ~readme:"project.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Info                                                       --- *)

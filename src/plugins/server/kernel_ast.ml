@@ -26,7 +26,7 @@ module Js = Yojson.Basic.Util
 module Pkg = Package
 open Cil_types
 
-let package = Pkg.package ~title:"Ast Services" ~name:"ast" ()
+let package = Pkg.package ~title:"Ast Services" ~name:"ast" ~readme:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)

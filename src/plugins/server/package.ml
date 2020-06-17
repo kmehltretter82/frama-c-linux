@@ -28,8 +28,7 @@ module Md = Markdown
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
-type path = string list
-type ident = { plugin: plugin; package: path; name: string }
+type ident = { plugin: plugin; package: string list; name: string }
 
 let pp_plugin fmt = function
   | Kernel -> Format.pp_print_string fmt "Kernel"
@@ -148,16 +147,12 @@ struct
         scope.index <- Hashtbl.create 0 ;
         scope.clashes <- false ;
         Hashtbl.iter
-          (fun name idks ->
+          (fun _name idks ->
              match IdMap.bindings idks with
              | [id,rk] ->
                push scope id rk
              | idks ->
-               Format.eprintf "CLASHING %S@." name ;
-               List.iter (fun (id,rk) ->
-                   Format.eprintf "RANK %a %d@." pp_ident id rk ;
-                   push scope id (succ rk)
-                 ) idks
+               List.iter (fun (id,rk) -> push scope id (succ rk)) idks
           ) index ;
         resolve scope
       end
@@ -229,10 +224,12 @@ type declInfo = {
 }
 
 type packageInfo = {
-  d_plugin : plugin ;
-  d_package : string list ;
-  d_userdoc : Markdown.elements ;
-  d_content : declInfo list;
+  p_plugin : plugin ;
+  p_package : string list ;
+  p_title : string ;
+  p_descr : Markdown.text ;
+  p_readme : string option ;
+  p_content : declInfo list ;
 }
 
 let name_of_ident id =
@@ -241,9 +238,9 @@ let name_of_ident id =
   | Plugin p -> p :: (id.package @ [id.name ])
 
 let name_of_pkginfo pkg =
-  String.concat "." @@ match pkg.d_plugin with
-  | Kernel -> "kernel" :: pkg.d_package
-  | Plugin p -> p :: pkg.d_package
+  String.concat "." @@ match pkg.p_plugin with
+  | Kernel -> "kernel" :: pkg.p_package
+  | Plugin p -> p :: pkg.p_package
 
 (* -------------------------------------------------------------------------- *)
 (* --- Visitors                                                           --- *)
@@ -274,14 +271,14 @@ let visit_dkind f = function
 
 let visit_decl f { d_kind } = visit_dkind f d_kind
 
-let visit_package_decl f { d_content } =
-  List.iter (fun { d_ident } -> f d_ident) d_content
+let visit_package_decl f { p_content } =
+  List.iter (fun { d_ident } -> f d_ident) p_content
 
-let visit_package_used f { d_content } =
-  List.iter (visit_decl f) d_content
+let visit_package_used f { p_content } =
+  List.iter (visit_decl f) p_content
 
 let resolve ?(keywords=[]) pkg =
-  let scope = Scope.create pkg.d_plugin in
+  let scope = Scope.create pkg.p_plugin in
   List.iter (Scope.reserve scope) keywords ;
   visit_package_decl (Scope.declare scope) pkg ;
   visit_package_used (Scope.use scope) pkg ;
@@ -321,19 +318,19 @@ let register_ident id =
     Senv.fatal "Duplicate identifier '%a'" pp_ident id ;
   registry := IdSet.add id !registry
 
-let userdoc ~plugin ~title ~descr = function
-  | None -> Md.section ~title (Md.par descr)
+let resolve_readme ~plugin = function
+  | None -> None
   | Some readme ->
     let file =
       match plugin with
       | Kernel ->
-        Printf.sprintf "%s/server/kernel/%s" Fc_config.datadir readme
+        Printf.sprintf "%s/server/%s" Fc_config.datadir readme
       | Plugin name ->
         Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name readme
     in
     if Sys.file_exists file
-    then Markdown.rawfile file
-    else Markdown.(section ~title (Md.par descr))
+    then Some file
+    else (Senv.warning "Can not find %S file" file ; None)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)
@@ -344,12 +341,13 @@ let package ?plugin ~title ?(descr=[]) ?readme ~name () =
   let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
   let pkgname = String.split_on_char '.' name in
   let pkgid = { plugin ; package = pkgname ; name = "*"} in
-  let userdoc = userdoc ~plugin ~title ~descr readme in
   let pkgInfo = {
-    d_plugin = plugin ;
-    d_package = pkgname ;
-    d_userdoc = userdoc ;
-    d_content = [] ;
+    p_plugin = plugin ;
+    p_package = pkgname ;
+    p_title = title ;
+    p_descr = descr ;
+    p_readme = resolve_readme ~plugin readme ;
+    p_content = [] ;
   } in
   let package = { pkgInfo ; revDecl=[] } in
   register_ident pkgid ;
@@ -359,7 +357,7 @@ let package ?plugin ~title ?(descr=[]) ?readme ~name () =
 
 let declare_id ~package:pkg ~name ?(descr=[]) decl =
   check_name name ;
-  let { d_plugin = plugin ; d_package = package } = pkg.pkgInfo in
+  let { p_plugin = plugin ; p_package = package } = pkg.pkgInfo in
   let ident = { plugin ; package ; name } in
   let decl = { d_ident=ident ; d_descr=descr ; d_kind=decl } in
   register_ident ident ;
@@ -385,9 +383,9 @@ let iter f =
   | Some pkgs -> pkgs
   | None ->
     let pkgs =
-      List.sort (fun a b -> Std.compare a.d_plugin b.d_plugin) @@
+      List.sort (fun a b -> Std.compare a.p_plugin b.p_plugin) @@
       List.rev_map
-        (fun pkg -> { pkg.pkgInfo with d_content = List.rev pkg.revDecl })
+        (fun pkg -> { pkg.pkgInfo with p_content = List.rev pkg.revDecl })
         !packages
     in collection := Some pkgs ; pkgs
 
@@ -401,7 +399,7 @@ let escaped tag = Md.plain (Printf.sprintf "`\"%s\"`" @@ String.escaped tag)
 
 type pp = {
   self: Md.text ;
-  data: ident -> Md.text ;
+  ident: ident -> Md.text ;
 }
 
 let rec md_jtype pp = function
@@ -414,7 +412,7 @@ let rec md_jtype pp = function
   | Jtag tag -> escaped tag
   | Jkey kd -> key kd
   | Jindex kd -> index kd
-  | Jdata id -> pp.data id
+  | Jdata id -> pp.ident id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
@@ -487,7 +485,7 @@ let pp_jtype fmt js =
   visit_jtype (Scope.use scope) js ;
   let ns = Scope.resolve scope in
   let self = Md.emph "self" in
-  let data id = Md.emph (IdMap.find id ns) in
-  Markdown.pp_text fmt (md_jtype { data ; self } js)
+  let ident id = Md.emph (IdMap.find id ns) in
+  Markdown.pp_text fmt (md_jtype { self ; ident } js)
 
 (* -------------------------------------------------------------------------- *)
