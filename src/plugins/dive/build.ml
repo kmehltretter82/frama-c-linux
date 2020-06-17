@@ -428,7 +428,7 @@ let build_node_deps context node =
     match alarm with
     | Division_by_zero e | Index_out_of_bound (e, _) | Invalid_shift (e,_)
     | Overflow (_,e,_,_) | Float_to_int (e,_,_) | Is_nan_or_infinite (e,_)
-    | Is_nan (e,_) | Function_pointer (e,_) -> for_exp e
+    | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e -> for_exp e
     | Pointer_comparison (opt_e1,e2) -> Extlib.may for_exp opt_e1; for_exp e2
     | Differing_blocks (e1,e2) -> for_exp e1; for_exp e2
     | Memory_access _ | Not_separated _ | Overlap _
