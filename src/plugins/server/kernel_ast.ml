@@ -21,19 +21,19 @@
 (**************************************************************************)
 
 open Data
-module Sy = Syntax
 module Md = Markdown
 module Js = Yojson.Basic.Util
+module Pkg = Package
 open Cil_types
 
-let page = Server_doc.page `Kernel ~title:"Ast Services" ~filename:"ast.md" ()
+let package = Pkg.package ~title:"Ast Services" ~name:"ast" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"kernel.ast.compute"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"compute"
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
@@ -43,11 +43,12 @@ let () = Request.register ~page
 
 (* The kind of a marker. *)
 module MarkerKind = struct
-  let t =
-    Enum.dictionary ~page ~name:"markerkind" ~title:"Marker kind"
-      ~descr:(Md.plain "Marker kind") ()
 
-  let kind name = Enum.tag t ~name ~descr:(Md.plain name) ()
+  let kinds = Enum.dictionary ()
+
+  let kind name = Enum.tag ~name
+      ~descr:(Md.plain (String.capitalize_ascii name)) kinds
+
   let expr = kind "expression"
   let lval = kind "lvalue"
   let var = kind "variable"
@@ -58,21 +59,25 @@ module MarkerKind = struct
   let term = kind "term"
   let prop = kind "property"
 
-  let tag =
-    let open Printer_tag in
-    function
-    | PStmt _ -> stmt
-    | PStmtStart _ -> stmt
-    | PVDecl _ -> decl
-    | PLval (_, _, (Var vi, NoOffset)) ->
-      if Cil.isFunctionType vi.vtype then fct else var
-    | PLval _ -> lval
-    | PExp _ -> expr
-    | PTermLval _ -> term
-    | PGlobal _ -> glob
-    | PIP _ -> prop
+  let () = Enum.set_lookup kinds
+      begin
+        let open Printer_tag in
+        function
+        | PStmt _ -> stmt
+        | PStmtStart _ -> stmt
+        | PVDecl _ -> decl
+        | PLval (_, _, (Var vi, NoOffset)) ->
+          if Cil.isFunctionType vi.vtype then fct else var
+        | PLval _ -> lval
+        | PExp _ -> expr
+        | PTermLval _ -> term
+        | PGlobal _ -> glob
+        | PIP _ -> prop
+      end
 
-  let data = Enum.publish t ~tag ()
+  let data = Request.dictionary ~package
+      ~name:"markerKind" ~descr:(Md.plain "Marker kind") kinds
+
   include (val data : S with type t = Printer_tag.localizable)
 end
 
@@ -116,33 +121,33 @@ struct
   let array =
     let model = States.model () in
     let () =
-      States.column ~model
+      States.column
         ~name:"kind" ~descr:(Md.plain "Marker kind")
-        ~data:(module MarkerKind) ~get:fst ()
+        ~data:(module MarkerKind) ~get:fst
+        model
     in
     let () =
-      States.column ~model
+      States.column
         ~name:"name"
         ~descr:(Md.plain "Marker short name")
         ~data:(module Jstring)
         ~get:(fun (tag, _) -> Printer_tag.label tag)
-        ()
+        model
     in
     let () =
-      States.column ~model
+      States.column
         ~name:"descr"
         ~descr:(Md.plain "Marker declaration or description")
         ~data:(module Jstring)
         ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
-        ()
+        model
     in
     States.register_array
-      ~page
-      ~name:"kernel.ast.markerKind"
+      ~package
+      ~name:"markerKind"
       ~descr:(Md.plain "Kind of markers")
       ~key:snd
-      ~iter
-      model
+      ~iter model
 
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
@@ -167,10 +172,22 @@ struct
   let lookup tag = Hashtbl.find (STATE.get()).locs tag
 
   type t = localizable
-  let syntax = Sy.publish ~page:Data.page ~name:"marker"
-      ~synopsis:Sy.ident
-      ~descr:(Md.plain "Localizable AST marker \
-                        (function, globals, statements, properties, etc.)") ()
+
+  let markers = ref []
+  let jmarker kd =
+    let jt = Pkg.Jkey kd in markers := jt :: !markers ; jt
+
+  let jstmt = jmarker "stmt"
+  let jdecl = jmarker "decl"
+  let jllet = jmarker "llet"
+  let jexpr = jmarker "expr"
+  let jterm = jmarker "term"
+  let jglobal = jmarker "global"
+  let jproperty = jmarker "property"
+
+  let jtype = Pkg.datatype ~package ~name:"marker"
+      ~descr:(Md.plain "Localizable AST markers")
+      Pkg.(Junion (List.rev !markers))
 
   let to_json loc = `String (create loc)
   let of_json js =
@@ -188,9 +205,7 @@ module Printer = Printer_tag.Make(Marker)
 module Stmt = Data.Collection
     (struct
       type t = stmt
-      let syntax = Sy.publish ~page:Data.page ~name:"stmt"
-          ~synopsis:Sy.ident
-          ~descr:(Md.plain "Code statement identifier") ()
+      let jtype = Marker.jstmt
       let to_json st =
         let kf = Kernel_function.find_englobing_kf st in
         Marker.to_json (PStmt(kf,st))
@@ -204,21 +219,19 @@ module Stmt = Data.Collection
 module Ki = Data.Collection
     (struct
       type t = kinstr
-      let syntax = Sy.union [ Sy.tag "global" ; Stmt.syntax ]
+      let jtype = Pkg.Joption Marker.jstmt
       let to_json = function
-        | Kglobal -> `String "global"
+        | Kglobal -> `Null
         | Kstmt st -> Stmt.to_json st
       let of_json = function
-        | `String "global" -> Kglobal
+        | `Null -> Kglobal
         | js -> Kstmt (Stmt.of_json js)
     end)
 
 module Kf = Data.Collection
     (struct
       type t = kernel_function
-      let syntax = Sy.publish ~page:Data.page ~name:"fct-id"
-          ~synopsis:Sy.ident
-          ~descr:(Md.plain "Function identified by its global name.") ()
+      let jtype = Pkg.Jkey "fct"
       let to_json kf =
         `String (Kernel_function.get_name kf)
       let of_json js =
@@ -231,8 +244,18 @@ module Kf = Data.Collection
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.ast.printFunction"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getFunctions"
+    ~descr:(Md.plain "Collect all functions in the AST")
+    ~input:(module Junit) ~output:(module Kf.Jlist)
+    begin fun () ->
+      let pool = ref [] in
+      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
+      List.rev !pool
+    end
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
     (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
@@ -249,24 +272,22 @@ struct
   let array : kernel_function States.array =
     begin
       let model = States.model () in
-      States.column ~model
+      States.column model
         ~name:"name"
         ~descr:(Md.plain "Name")
         ~data:(module Data.Jstring)
-        ~get:Kernel_function.get_name () ;
-      States.column ~model
+        ~get:Kernel_function.get_name ;
+      States.column model
         ~name:"signature"
         ~descr:(Md.plain "Signature")
         ~data:(module Data.Jstring)
-        ~get:signature
-        () ;
-      States.register_array
-        ~page ~key
-        ~name:"kernel.ast.functions"
+        ~get:signature ;
+      States.register_array model
+        ~package ~key
+        ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter:Globals.Functions.iter
-        ~add_reload_hook:Ast.add_hook_on_update
-        model
+        ~add_reload_hook:Ast.add_hook_on_update ;
     end
 
 end
@@ -335,8 +356,8 @@ module Info = struct
     Jbuffer.contents buffer
 end
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.ast.info"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getInfo"
     ~descr:(Md.plain "Get textual information about a marker")
     ~input:(module Marker) ~output:(module Jtext)
     Info.get_marker_info
@@ -351,10 +372,10 @@ let get_files () =
 
 let () =
   Request.register
-    ~page
+    ~package
     ~descr:(Md.plain "Get the currently analyzed source file names")
     ~kind:`GET
-    ~name:"kernel.ast.getFiles"
+    ~name:"getFiles"
     ~input:(module Junit) ~output:(module Jstring.Jlist)
     get_files
 
@@ -364,24 +385,26 @@ let set_files files =
 
 let () =
   Request.register
-    ~page
+    ~package
     ~descr:(Md.plain "Set the source file names to analyze.")
     ~kind:`SET
-    ~name:"kernel.ast.setFiles"
+    ~name:"setFiles"
     ~input:(module Jstring.Jlist)
     ~output:(module Junit)
     set_files
 
+(*
 let () =
   Request.register
-    ~page
+    ~package
     ~descr:(Md.plain "Compute the AST of the currently set source file names.")
     ~kind:`EXEC
-    ~name:"kernel.ast.execCompute"
+    ~name:"kernel.execCompute"
     ~input:(module Junit)
     ~output:(module Junit)
     (fun () ->
        if not (Ast.is_computed ())
        then File.init_from_cmdline ())
+*)
 
 (* -------------------------------------------------------------------------- *)

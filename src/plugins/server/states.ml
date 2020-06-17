@@ -289,13 +289,13 @@ let register_array ~package ~name ~descr ~key
   } in
   let signature = Request.signature () in
   let module Jkeys = Jlist(struct
-    include Jstring
-    let jtype = Package.Jkey name
-  end) in
+      include Jstring
+      let jtype = Package.Jkey name
+    end) in
   let module Jrows = Jlist (struct
-    include Jany
-    let jtype = Package.Jdata row
-  end) in
+      include Jany
+      let jtype = Package.Jdata row
+    end) in
   let set_reload = Request.result signature
       ~name:"reload" ~descr:(plain "array fully reloaded")
       (module Jbool) in

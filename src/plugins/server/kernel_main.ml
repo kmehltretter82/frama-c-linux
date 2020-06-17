@@ -114,38 +114,37 @@ module LogSource = Collection
 (* --- Log Lind                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module LogKind = Collection
-    (struct
+module LogKind =
+struct
+  let kinds = Enum.dictionary ()
 
-      let kinds = Enum.dictionary ()
+  let t_kind value name descr =
+    Enum.tag ~name ~descr:(Md.plain descr) ~value kinds
 
-      let t_kind value name descr =
-        Enum.tag ~name ~descr:(Md.plain descr) ~value kinds
+  let t_error = t_kind Log.Error "ERROR" "User Error"
+  let t_warning = t_kind Log.Warning "WARNING" "User Warning"
+  let t_feedback = t_kind Log.Feedback "FEEDBACK" "Plugin Feedback"
+  let t_result = t_kind Log.Result "RESULT" "Plugin Result"
+  let t_failure = t_kind Log.Failure "FAILURE" "Plugin Failure"
+  let t_debug = t_kind Log.Debug "DEBUG" "Analyser Debug"
 
-      let t_error = t_kind Log.Error "ERROR" "User Error"
-      let t_warning = t_kind Log.Warning "WARNING" "User Warning"
-      let t_feedback = t_kind Log.Feedback "FEEDBACK" "Plugin Feedback"
-      let t_result = t_kind Log.Result "RESULT" "Plugin Result"
-      let t_failure = t_kind Log.Failure "FAILURE" "Plugin Failure"
-      let t_debug = t_kind Log.Debug "DEBUG" "Analyser Debug"
+  let () = Enum.set_lookup kinds
+      begin function
+        | Log.Error -> t_error
+        | Log.Warning -> t_warning
+        | Log.Feedback -> t_feedback
+        | Log.Result -> t_result
+        | Log.Failure -> t_failure
+        | Log.Debug -> t_debug
+      end
 
-      let () = Enum.set_lookup kinds
-          begin function
-            | Log.Error -> t_error
-            | Log.Warning -> t_warning
-            | Log.Feedback -> t_feedback
-            | Log.Result -> t_result
-            | Log.Failure -> t_failure
-            | Log.Debug -> t_debug
-          end
+  let data = Request.dictionary ~package
+      ~name:"logkind"
+      ~descr:(Md.plain "Log messages categories.")
+      kinds
 
-      let data = Request.dictionary ~package
-          ~name:"logkind"
-          ~descr:(Md.plain "Log messages categories.")
-          kinds
-
-      include (val data : S with type t = Log.kind)
-    end)
+  include (val data : S with type t = Log.kind)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Events                                                         --- *)
@@ -170,7 +169,7 @@ module LogEvent = Collection
           ~descr:(Md.plain "Source file position") (module LogSource)
 
       let data = Record.publish ~package ~name:"log"
-              ~descr:(Md.plain "Message event record.") jlog
+          ~descr:(Md.plain "Message event record.") jlog
 
       module R : Record.S with type r = rlog = (val data)
 

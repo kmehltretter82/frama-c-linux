@@ -46,7 +46,7 @@ PLUGIN_CMO:= \
 	server_batch \
 	kernel_main \
 	kernel_project \
-#	kernel_ast \
+	kernel_ast \
 #	kernel_properties
 
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)

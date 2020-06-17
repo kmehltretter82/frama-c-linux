@@ -24,6 +24,7 @@
 (** Ast Data *)
 (* -------------------------------------------------------------------------- *)
 
+open Package
 open Cil_types
 
 module Kf : Data.S_collection with type t = kernel_function
@@ -33,6 +34,15 @@ module Stmt : Data.S_collection with type t = stmt
 module Marker :
 sig
   include Data.S with type t = Printer_tag.localizable
+
+  val jstmt : jtype
+  val jdecl : jtype
+  val jllet : jtype
+  val jexpr : jtype
+  val jterm : jtype
+  val jglobal : jtype
+  val jproperty : jtype
+
   val create : t -> string (** Memoized unique identifier. *)
   val lookup : string -> t (** Get back the localizable, if any. *)
 end
