@@ -55,23 +55,24 @@ let is_true = function
   | `True | `TrueReduced _ -> true
   | _ -> false
 
-(* Is a statement a loop exit condition? If so, returns the condition and
-   whether the condition must hold to exit the loop. Otherwise, returns None. *)
-let is_conditional_break stmt =
-  match stmt.skind with
-  | If (cond, {bstmts=[{skind=Break _}]}, _, _) -> Some (cond, true)
-  | If (cond, _, {bstmts=[{skind=Break _}]}, _) -> Some (cond, false)
-  | _ -> None
+(* Does a block exits a loop? *)
+let is_break block =
+  match block.bstmts with
+  | [{skind = Break _}] -> true
+  | _ -> false
 
-(* Returns a loop exit condition, as the conditional expression and whether
-   the condition must be zero or non-zero to exit the loop. *)
+(* Returns a list of loop exit conditions. Each condition is expressed as an
+   expression and whether it must be zero or non-zero to exit the loop. *)
 let find_loop_exit_condition loop =
   let rec aux = function
     | [] -> []
     | stmt :: tl ->
-      match is_conditional_break stmt with
-      | Some x -> x :: aux tl
-      | None -> aux tl
+      match stmt.skind with
+      | If (cond, b1, b2, _) when is_break b1 || is_break b2 ->
+        if is_break b1
+        then (cond, true) :: aux (b2.bstmts @ tl)
+        else (cond, false) :: aux (b1.bstmts @ tl)
+      | _ -> aux tl
   in
   aux loop.bstmts
 
@@ -437,6 +438,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       | Block block -> cross_block acc block
       | UnspecifiedSequence list ->
         List.fold_left (fun acc (s, _, _, _, _) -> cross_stmt acc s) acc list
+      | If (_, {bstmts=[{skind=Break _}]}, block, _)
+      | If (_, block, {bstmts=[{skind=Break _}]}, _) -> cross_block acc block
       | _ -> acc
     and cross_block acc block =
       List.fold_left cross_stmt acc block.bstmts
