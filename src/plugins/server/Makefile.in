@@ -45,7 +45,7 @@ PLUGIN_CMO:= \
 	main request states \
 	server_batch \
 	kernel_main \
-#	kernel_project \
+	kernel_project \
 #	kernel_ast \
 #	kernel_properties
 
