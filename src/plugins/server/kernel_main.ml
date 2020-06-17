@@ -129,13 +129,15 @@ module LogKind = Collection
       let t_failure = t_kind Log.Failure "FAILURE" "Plugin Failure"
       let t_debug = t_kind Log.Debug "DEBUG" "Analyser Debug"
 
-      let tag = function
-        | Log.Error -> t_error
-        | Log.Warning -> t_warning
-        | Log.Feedback -> t_feedback
-        | Log.Result -> t_result
-        | Log.Failure -> t_failure
-        | Log.Debug -> t_debug
+      let () = Enum.set_lookup kinds
+          begin function
+            | Log.Error -> t_error
+            | Log.Warning -> t_warning
+            | Log.Feedback -> t_feedback
+            | Log.Result -> t_result
+            | Log.Failure -> t_failure
+            | Log.Debug -> t_debug
+          end
 
       let data = Request.dictionary ~package
           ~name:"logkind"

@@ -70,9 +70,6 @@ sig
   val to_json : t -> json
 end
 
-(** Polymorphic data value. *)
-type 'a data = (module S with type t = 'a)
-
 (** Of main kernel data. *)
 val package : package
 
@@ -112,6 +109,25 @@ module Jpair(A : S)(B : S) : S with type t = A.t * B.t
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
 module Jlist(A : S) : S with type t = A.t list
 module Jarray(A : S) : S with type t = A.t array
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Functional API} *)
+(* -------------------------------------------------------------------------- *)
+
+(** Polymorphic data value. *)
+type 'a data = (module S with type t = 'a)
+
+val junit : unit data
+val jany : json data
+val jbool : bool data
+val jint : int data
+val jfloat : float data
+val jstring : string data
+val jindex : kind:string -> int data
+val jkey : kind:string -> string data
+val jlist : 'a data -> 'a list data
+val jarray : 'a data -> 'a array data
+val joption : 'a data -> 'a option data
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Records} *)
@@ -229,7 +245,7 @@ sig
 
   (** Returns the tag from its name.
       @raise Not_found if no tag has been registered with this name. *)
-  val find_tag: 'a dictionary -> string -> 'a tag
+  val find: 'a dictionary -> string -> 'a tag
 
   (** Register a new prefix tag in the dictionary.
       The default label is the capitalized prefix.
@@ -258,12 +274,17 @@ sig
   (** Obtain all the tags registered in the dictionary so far. *)
   val tags : 'a dictionary -> Tag.t list
 
+  (** Set tagging function for values. If the lookup function
+      raises `Not_found`, the dictionary will use the tag associated
+      with the provided value, if any. *)
+  val set_lookup : 'a dictionary -> ('a -> 'a tag) -> unit
+
   (**
      Publish the dictionary. No more tag nor prefix can be added afterwards.
      If no [~tag] function is provided, the values registered with tags are used.
   *)
   val publish : package:package -> name:string -> descr:Markdown.text ->
-    ?tag:('a -> 'a tag) -> 'a dictionary -> (module S with type t = 'a)
+    'a dictionary -> (module S with type t = 'a)
 
 end
 

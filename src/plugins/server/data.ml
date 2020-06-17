@@ -39,8 +39,6 @@ sig
   val to_json : t -> json
 end
 
-type 'a data = (module S with type t = 'a)
-
 exception InputError of string
 
 let failure ?json msg =
@@ -229,6 +227,47 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Functional API                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+type 'a data = (module S with type t = 'a)
+
+let junit : unit data = (module Junit)
+let jany : json data = (module Jany)
+let jbool : bool data = (module Jbool)
+let jint : int data = (module Jint)
+let jfloat : float data = (module Jfloat)
+let jstring : string data = (module Jstring)
+
+let jkey ~kind =
+  let module JkeyKind =
+  struct
+    include Jstring
+    let jtype = Jkey kind
+  end in
+  (module JkeyKind : S with type t = string)
+
+let jindex ~kind =
+  let module JindexKind =
+  struct
+    include Jint
+    let jtype = Jindex kind
+  end in
+  (module JindexKind : S with type t = int)
+
+let joption (type a) (d : a data) : a option data =
+  let module A = Joption(val d) in
+  (module A : S with type t = a option)
+
+let jlist (type a) (d : a data) : a list data =
+  let module A = Jlist(val d) in
+  (module A : S with type t = a list)
+
+let jarray (type a) (d : a data) : a array data =
+  let module A = Jarray(val d) in
+  (module A : S with type t = a array)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Records                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -377,6 +416,7 @@ struct
     mutable syntax : Markdown.text ;
     mutable published : (package * string) option ;
     mutable tags : tagInfo list ;
+    mutable lookup : ('a -> string) option ;
   }
 
   type 'a tag = string
@@ -393,6 +433,7 @@ struct
     vindex = Hashtbl.create 0 ;
     syntax = [] ;
     tags = [] ;
+    lookup = None ;
   }
 
   let tag ~name ?label ~descr ?value (d : 'a dictionary) : 'a tag =
@@ -411,8 +452,12 @@ struct
       | Some v -> Hashtbl.add d.vindex v name
     end ; name
 
-  let find_tag (d : 'a dictionary) name =
-    if Hashtbl.mem d.values name then name else raise Not_found
+  let find (d : 'a dictionary) name : 'a tag =
+    if Hashtbl.mem d.values name then name else
+      raise Not_found
+
+  let set_lookup (d : 'a dictionary) (tag : 'a -> 'a tag) =
+    d.lookup <- Some tag
 
   let instance_name = Printf.sprintf "%s:%s"
 
@@ -434,10 +479,16 @@ struct
         Package.update ~package ~name (D_enum (List.rev d.tags))
     ) ; name
 
-  let to_json name vindex v =
-    try `String (Hashtbl.find vindex v)
-    with Not_found ->
-      failure "[%s] Value not found" name
+  let to_json name lookup vindex v =
+    `String begin
+      try match lookup with
+        | None ->
+          Hashtbl.find vindex v
+        | Some f ->
+          try f v with Not_found -> Hashtbl.find vindex v
+      with Not_found ->
+        failure "[%s] Value not found" name
+    end
 
   let of_json name values js =
     let tag = Ju.to_string js in
@@ -450,7 +501,7 @@ struct
 
   let tags d = List.rev d.tags
 
-  let publish (type a) ~package ~name ~descr ?tag (d : a dictionary) =
+  let publish (type a) ~package ~name ~descr (d : a dictionary) =
     ( match d.published with
       | None -> ()
       | Some _ ->
@@ -463,10 +514,7 @@ struct
         let enums = D_enum (List.rev d.tags) in
         Jdata (Package.declare_id ~package ~name ~descr enums)
       let of_json = of_json name d.values
-      let to_json =
-        match tag with
-        | None -> to_json name d.vindex
-        | Some to_tag -> fun x -> `String (to_tag x)
+      let to_json = to_json name d.lookup d.vindex
     end in
     begin
       d.published <- Some (package,name) ;
