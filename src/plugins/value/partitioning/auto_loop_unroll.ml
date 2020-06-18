@@ -72,6 +72,7 @@ let find_loop_exit_condition loop =
         if is_break b1
         then (cond, true) :: aux (b2.bstmts @ tl)
         else (cond, false) :: aux (b1.bstmts @ tl)
+      | Block b -> aux (b.bstmts @ tl)
       | _ -> aux tl
   in
   aux loop.bstmts
