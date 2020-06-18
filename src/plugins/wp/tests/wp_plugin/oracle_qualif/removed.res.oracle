@@ -4,8 +4,8 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-
-[eva:alarm] tests/wp_plugin/removed.i:10: Warning:
+  
+[eva:alarm] tests/wp_plugin/removed.i:10: Warning: 
   signed overflow. assert 1 + i ≤ 2147483647;
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -15,7 +15,7 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_main_assert_Eva_signed_overflow : Unsuccess
+[wp] [Alt-Ergo] Goal typed_main_assert_Eva_signed_overflow : Timeout (unqualified)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 [wp] Running WP plugin...
