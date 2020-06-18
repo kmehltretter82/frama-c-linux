@@ -1307,6 +1307,8 @@ and eval_term_as_lval ~alarm_mode env t =
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
       tcond ttrue tfalse
+  | Tinter _ -> unsupported "intersection of locations"
+  | Tcomprehension _ -> unsupported "set comprehension"
   | _ -> ast_error (Format.asprintf "non-lval term %a" Printer.pp_term t)
 
 and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a) -> ('a -> 'a -> 'a) -> alarm_mode:_ -> _ -> _ -> _ -> _ -> 'a eval_result =
