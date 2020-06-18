@@ -40,9 +40,8 @@ else:
    arg = sys.argv[1]
 
 if not os.path.exists(arg):
-   print("error: file '%s' not found" % arg)
-   print("usage: %s [compile_commands.json]" % sys.argv[0])
-   sys.exit(1)
+   print(f"error: file '{arg}' not found")
+   sys.exit(f"usage: {sys.argv[0]} [compile_commands.json]")
 
 # check if arg has a known extension
 def has_known_c_extension(arg):
@@ -50,6 +49,7 @@ def has_known_c_extension(arg):
 
 pwd = os.getcwd()
 json = json.loads(open(arg).read())
+jcdb_dir = os.path.dirname(arg)
 includes = set()
 defines = set()
 files = set()
@@ -60,10 +60,12 @@ for entry in json:
    # json compile spec says either command or arguments are mandatory
    if os.path.isabs(file):
       filepath = file
-   else:
+   elif os.path.isabs(dir):
       filepath = os.path.join(dir, file)
+   else:
+      filepath = os.path.join(jcdb_dir, dir, file)
    if not has_known_c_extension(filepath):
-      print("warning: ignoring file of unknown type: %s" % filepath)
+      print(f"warning: ignoring file of unknown type: {filepath}")
    else:
       files.add(os.path.relpath(filepath, pwd))
 
