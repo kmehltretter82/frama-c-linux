@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Dome from 'dome';
 import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
 
 import { Vfill } from 'dome/layout/boxes';
 import { Graph } from './graph_viewports';
@@ -360,6 +361,20 @@ class Dive {
 
 export default () => {
   const [dive, setDive] = useState(() => new Dive());
+  const [selection,] = States.useSelection();
+  const fun = selection?.current?.function;
+  const marker = selection?.current?.marker;
+  const markers = States.useSyncArray('kernel.ast.markerKind');
+
+  React.useEffect(() => {
+    if (marker) {
+      const mark = markers[marker];
+      if (mark && mark.kind === 'variable') {
+        const variable = {fun: fun, var: mark.name};
+        dive.addVariable(variable);
+      }
+    }
+  }, [fun, marker, markers]);
 
   return (
     <Component
