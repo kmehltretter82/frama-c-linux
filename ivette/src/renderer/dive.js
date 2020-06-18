@@ -76,18 +76,16 @@ class Dive {
   }
 
   setupSelection() {
-    let that = this;
     /* when a node is selected, also select neighbor edges */
-    this.cy.on('select', 'node', function(event) {
+    this.cy.on('select', 'node', (event) => {
       var node = event.target;
       node.neighborhood('edge').select();
-      that.explore(node);
+      this.explore(node);
     });
   }
 
   setupCtxMenu() {
-    var that = this;
-    this.graph.onmount = function()
+    this.graph.onmount = () =>
     {
       this.cy.cxtmenu({
         selector: 'node',
@@ -95,7 +93,7 @@ class Dive {
           let data = ele.data();
           let commands = [{
             content: '<span class="fas fa-binoculars fa-2x"></span><br/>Explore',
-            select: (ele) => { that.explore(ele); }
+            select: (ele) => this.explore(ele)
           }];
           if (data.kind == 'composite') {
             commands.push({
@@ -116,14 +114,14 @@ class Dive {
           if (!data.explored) {
             commands.push({
               content: '<span class="fa fa-eye fa-2x"></span><br/>Show',
-              select: (ele) => { that.show(ele); },
+              select: (ele) => this.show(ele),
               enabled: true
             })
           }
           else {
             commands.push({
               content: '<span class="fa fa-eye-slash fa-2x"></span><br/>Hide',
-              select: (ele) => { that.hide(ele); },
+              select: (ele) => this.hide(ele),
               enabled: true
             })
           }

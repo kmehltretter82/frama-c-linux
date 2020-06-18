@@ -27,7 +27,6 @@ export class Graph extends React.Component {
     const div = this.container.current ;
     const data = this.props.data ;
     if (div && data) {
-      data.layout();
       data._mount(div);
     }
   }

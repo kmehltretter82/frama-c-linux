@@ -34,9 +34,10 @@ const defaultStyle = [
 */
 
 export class Data {
+  onmount = undefined;
 
-  constructor() {
-    this._cy = Cytoscape({ style: defaultStyle });
+  constructor(options = {}) {
+    this._cy = Cytoscape({style: defaultStyle, ...options});
     this._engine = { name: 'preset' };
     this._kid = 0 ;
   }
@@ -70,7 +71,10 @@ export class Data {
 
   // Private: only used by DOME
   _mount( divRef ) {
-    divRef && this._cy.mount( divRef );
+    if (divRef) {
+      this._cy.mount(divRef);
+      this.onmount && this.onmount();
+    }
     this.layout();
   }
 
