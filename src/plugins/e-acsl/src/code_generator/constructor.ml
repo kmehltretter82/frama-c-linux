@@ -147,11 +147,11 @@ let mk_store_stmt ?str_size vi =
 let mk_duplicate_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block_duplicate" ?str_size vi
 
-let mk_delete_stmt vi =
+let mk_delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = mk_rtl_call ~loc "delete_block" in
-  match Cil.unrollType vi.vtype with
-  | TArray(_, Some _, _, _) -> mk [ Cil.evar ~loc vi ]
+  match is_addr, Cil.unrollType vi.vtype with
+  | _, TArray(_, Some _, _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
 let mk_mark_readonly vi =

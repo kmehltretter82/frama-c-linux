@@ -54,9 +54,10 @@ val mk_duplicate_store_stmt: ?str_size:exp -> varinfo -> stmt
 (** Same as [mk_store_stmt] for [__e_acsl_duplicate_store_block] that first
     checks for a previous allocation of the given varinfo. *)
 
-val mk_delete_stmt: varinfo -> stmt
+val mk_delete_stmt: ?is_addr:bool -> varinfo -> stmt
 (** Same as [mk_store_stmt] for [__e_acsl_delete_block] that observes the
-    de-allocation of the given varinfo. *)
+    de-allocation of the given varinfo.
+    If [is_addr] is false (default), take the address of varinfo. *)
 
 val mk_full_init_stmt: varinfo -> stmt
 (** Same as [mk_store_stmt] for [__e_acsl_full_init] that observes the
