@@ -138,7 +138,7 @@ let mk_init_function () =
          let str_size = Cil.new_exp loc (SizeOfStr s) in
          Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
          :: Constructor.mk_store_stmt ~str_size vi
-         :: Constructor.mk_full_init_stmt ~addr:false vi
+         :: Constructor.mk_full_init_stmt vi
          :: Constructor.mk_mark_readonly vi
          :: stmts)
       stmts
