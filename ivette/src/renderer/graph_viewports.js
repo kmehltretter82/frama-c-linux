@@ -40,9 +40,7 @@ export class Graph extends React.Component {
 
   render() {
     return (
-      <div className='dome-shape-hvfill'>
-        <div ref={this.container} style={{ width:'100%', height: '100%' }} />
-      </div>
+      <div ref={this.container} style={{ width:'100%', height: '100%' }} />
     );
   }
 
