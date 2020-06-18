@@ -71,8 +71,6 @@ class Dive {
     this.graph = new Data({style, autounselectify: false});
     this.cy = this.graph._cy;
 
-    this.clear();
-
     this.setupSelection();
     this.setupCtxMenu();
   }
