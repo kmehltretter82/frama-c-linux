@@ -443,6 +443,7 @@ val is_stmt_invariant : code_annotation -> bool
 val is_loop_invariant : code_annotation -> bool
 val is_invariant : code_annotation -> bool
 val is_variant : code_annotation -> bool
+val is_allocation: code_annotation -> bool
 val is_assigns : code_annotation -> bool
 val is_pragma : code_annotation -> bool
 val is_loop_pragma : code_annotation -> bool

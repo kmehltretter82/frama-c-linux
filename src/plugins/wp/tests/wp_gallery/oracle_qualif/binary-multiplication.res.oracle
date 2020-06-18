@@ -10,7 +10,6 @@
 [wp] [Qed] Goal typed_lemma_sizeof_ok_ok : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : Unsuccess
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_established : Valid
@@ -21,13 +20,15 @@
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
-[wp] Proved goals:   16 / 17
+[wp] [Script] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : Valid
+[wp] Proved goals:   17 / 17
   Qed:             4 
-  Alt-Ergo:       12  (unsuccess: 1)
+  Script:          1 
+  Alt-Ergo:       12
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Axiomatic mult            1        3        4       100%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  BinaryMultiplication      3        9       13      92.3%
+  BinaryMultiplication      3        9       13       100%
 ------------------------------------------------------------

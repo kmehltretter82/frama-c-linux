@@ -7,11 +7,11 @@ void main(void)
   int i;
   int t[10];
   i = 0;
-  /*@ loop assigns t[0 .. i];
-      loop invariant \true;
+  /*@ loop invariant \true;
+      loop assigns t[0 .. i];
+      for foo: loop invariant \true;
+      for foo: loop invariant \true;
       for foo: loop assigns t[0 .. i];
-      for foo: loop invariant \true;
-      for foo: loop invariant \true;
       loop variant 0;
   */
   while (i < 10) {

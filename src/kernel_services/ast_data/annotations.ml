@@ -205,6 +205,11 @@ let merge_assigns ~keep_empty a1 a2 = match a1, a2, keep_empty with
   | (WritesAny as a), _, true | _, (WritesAny as a), true -> a
   | Writes a1, Writes a2, _ -> Writes (merge_froms a1 a2)
 
+let merge_allocation ~keep_empty a1 a2 = match a1, a2, keep_empty with
+  | FreeAllocAny, a, false | a, FreeAllocAny, false
+  | (FreeAllocAny as a),_,true | _, (FreeAllocAny as a), true -> a
+  | FreeAlloc (f1,a1), FreeAlloc (f2,a2), _ -> FreeAlloc (f1 @ f2, a1 @ a2)
+
 let merge_behavior fresh_bhv bhv =
   assert (fresh_bhv.b_name = bhv.b_name);
   fresh_bhv.b_assumes <- bhv.b_assumes @ fresh_bhv.b_assumes;
@@ -213,7 +218,7 @@ let merge_behavior fresh_bhv bhv =
   fresh_bhv.b_assigns <-
     merge_assigns ~keep_empty:false fresh_bhv.b_assigns bhv.b_assigns;
   fresh_bhv.b_allocation <-
-    Logic_utils.merge_allocation fresh_bhv.b_allocation bhv.b_allocation;
+    merge_allocation ~keep_empty:false fresh_bhv.b_allocation bhv.b_allocation;
   fresh_bhv.b_extended <- fresh_bhv.b_extended @ bhv.b_extended
 
 let merge_behaviors fresh old =
@@ -280,75 +285,115 @@ let merge_funspec s1 s2 =
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
-module StmtContractMap = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
+module Behavior_set_map = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
 
 let is_same_behavior_set l1 l2 =
   Datatype.String.Set.(equal (of_list l1) (of_list l2))
 
-let merge_stmt_contracts contracts =
-  let add_one acc c =
+let merge_stmt_contracts_emitters contracts =
+  let add_one acc (c,e) =
     match c.annot_content with
     | AStmtSpec(bhvs, spec) ->
       let bhvs = Datatype.String.Set.of_list bhvs in
-      let fresh_spec, acc =
-        try StmtContractMap.find bhvs acc, acc
-        with Not_found ->
-          let spec = Cil.empty_funspec () in
-          spec, StmtContractMap.add bhvs spec acc
-          (* avoid sharing directly the spec,
-             as merge_funspec will modify it in place*)
-      in
-      merge_funspec fresh_spec spec;
-      acc
+      (match Behavior_set_map.find_opt bhvs acc with
+       | Some (spec', e') ->
+         merge_funspec spec' spec;
+         if Emitter.equal e e' then acc
+         else
+           Behavior_set_map.add bhvs (spec', Emitter.kernel) acc
+       | None ->
+         let spec' = Cil.empty_funspec () in
+         merge_funspec spec' spec;
+         Behavior_set_map.add bhvs (spec',e) acc
+         (* avoid sharing directly the spec,
+            as merge_funspec will modify it in place*))
     | _ -> acc
   in
   let merged_contracts =
-    List.fold_left add_one StmtContractMap.empty contracts
+    List.fold_left add_one Behavior_set_map.empty contracts
   in
-  StmtContractMap.fold
-    (fun bhvs spec acc ->
+  Behavior_set_map.fold
+    (fun bhvs (spec,e) acc ->
        (Logic_const.new_code_annotation
-          (AStmtSpec (Datatype.String.Set.elements bhvs, spec)))
+          (AStmtSpec (Datatype.String.Set.elements bhvs, spec)),e)
        :: acc)
     merged_contracts []
 
-let code_annot ?emitter ?filter stmt =
-  try
-    let tbl = Code_annots.find stmt in
-    match emitter with
-    | None ->
-      let filter l acc = match filter with
-        | None -> l @ acc
-        | Some f ->
-          let rec aux acc = function
-            | [] -> acc
-            | x :: l -> aux (if f x then x :: acc else acc) l
-          in
-          aux acc l
-      in
-      let l =
-        Emitter.Usable_emitter.Hashtbl.fold
-          (fun _ l acc -> filter !l acc) tbl []
-      in
-      let l1, l2 = List.partition Logic_utils.is_contract l in
-      (match l1 with
-       | [] -> l2
-       | _ -> (merge_stmt_contracts l1) @ l2)
-    | Some e ->
-      (* No need to merge stmt contracts here: each emitter maintain one
-         statement contract per set of behavior. *)
-      let l = !(Emitter.Usable_emitter.Hashtbl.find tbl (Emitter.get e)) in
-      match filter with
-      | None -> l
-      | Some f -> List.filter f l
-  with Not_found ->
-    []
+let merge_loop_assigns_emitters annots =
+  let merge_assigns bhvs (a,e) acc =
+    let elt =
+      match Behavior_set_map.find_opt bhvs acc with
+      | Some (a',e') ->
+        let a' = merge_assigns ~keep_empty:false a a' in
+        let e' = if Emitter.equal e e' then e else Emitter.kernel in
+        a', e'
+      | None -> a,e
+    in
+    Behavior_set_map.add bhvs elt acc
+  in
+  let treat_code_annot acc (ca,e) =
+    match ca.annot_content with
+    | AAssigns(bhvs,a) ->
+      merge_assigns (Datatype.String.Set.of_list bhvs) (a,e) acc
+    | _ -> acc
+  in
+  let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
+  Behavior_set_map.fold
+    (fun bhvs (a,e) acc ->
+       (Logic_const.new_code_annotation
+         (AAssigns (Datatype.String.Set.elements bhvs, a)),e)
+       :: acc)
+    bhvs []
+
+let merge_loop_allocation annots =
+  let merge_allocates bhvs (a,e) acc =
+    let elt =
+      match Behavior_set_map.find_opt bhvs acc with
+      | Some (a', e') ->
+        let a' = merge_allocation ~keep_empty:false a a' in
+        let e' = if Emitter.equal e e' then e else Emitter.kernel in
+        a', e'
+      | None -> a,e
+    in Behavior_set_map.add bhvs elt acc
+  in
+  let treat_code_annot acc (ca, e) =
+    match ca.annot_content with
+    | AAllocation(bhvs,a) ->
+      merge_allocates (Datatype.String.Set.of_list bhvs) (a,e) acc
+    | _ -> acc
+  in
+  let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
+  Behavior_set_map.fold
+    (fun bhvs (a,e) acc ->
+       (Logic_const.new_code_annotation
+          (AAllocation (Datatype.String.Set.elements bhvs, a)),e)
+       ::acc)
+    bhvs []
+
+let partition_code_annot_emitter l =
+  let add_one_ca (contracts, assigns, alloc, others) (ca,_ as v) =
+    if Logic_utils.is_contract ca then v::contracts,assigns,alloc,others
+    else if Logic_utils.is_assigns ca then contracts,v::assigns,alloc,others
+    else if Logic_utils.is_allocation ca then contracts,assigns,v::alloc,others
+    else (contracts,assigns,alloc,v::others)
+  in
+  let (contracts,assigns,alloc,others) =
+    List.fold_left add_one_ca ([],[],[],[]) l
+  in
+  List.(rev contracts, rev assigns, rev alloc, rev others)
 
 let code_annot_emitter ?filter stmt =
   try
     let tbl = Code_annots.find stmt in
     let filter e l acc =
-      let e = Emitter.Usable_emitter.get e in
+      let e =
+        try Emitter.Usable_emitter.get e
+        with Not_found ->
+          (* in some cases, e.g. when loading a state with a different set
+             of plugins loaded, the original emitter might not be available,
+             leading to discarding annotations. Let the kernel adopt them. *)
+          Emitter.orphan
+      in
       match filter with
       | None -> List.map (fun a -> a, e) l @ acc
       | Some f ->
@@ -359,22 +404,33 @@ let code_annot_emitter ?filter stmt =
         aux acc l
     in
     let l =
-      Emitter.Usable_emitter.Hashtbl.fold
+      Emitter.Usable_emitter.Hashtbl.fold_sorted
+        ~cmp:Emitter.Usable_emitter.compare
         (fun e l acc -> filter e !l acc) tbl []
     in
-    let l1, l2 = List.partition (fun (x,_) -> Logic_utils.is_contract x) l in
-    match l1 with
-    | [] -> l2
-    | _ ->
-      let contracts, emitters = List.split l1 in
-      let e = List.hd emitters in
-      let emit =
-        if List.for_all (fun x -> Emitter.equal x e) emitters then e
-        else Emitter.kernel
-      in
-      (List.map (fun x -> (x, emit)) contracts) @ l2
+    let contracts,assigns,allocation,others = partition_code_annot_emitter l in
+    merge_stmt_contracts_emitters contracts @
+    merge_loop_assigns_emitters assigns @
+    merge_loop_allocation allocation @
+    others
   with Not_found ->
     []
+
+let code_annot ?emitter ?filter stmt =
+  match emitter with
+  | Some e ->
+    (try
+       (* No need to merge stmt contracts or loop assigns:
+          each emitter maintains one of each per set of behavior. *)
+       let tbl = Code_annots.find stmt in
+       let l = !(Emitter.Usable_emitter.Hashtbl.find tbl (Emitter.get e)) in
+       (match filter with
+        | None -> l
+        | Some f -> List.filter f l)
+     with Not_found -> [])
+  | None ->
+    let filter = Extlib.opt_map (fun filter _ e -> filter e) filter in
+    fst (List.split (code_annot_emitter ?filter stmt))
 
 let pre_register_funspec ?tbl ?(emitter=Emitter.end_user) ?(force=false) kf =
   (* Avoid sharing with kf.spec *)
@@ -1039,15 +1095,17 @@ let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
   in
   extend_behavior e kf ?stmt ?active ?behavior set_bhv
 
-let add_allocates e kf ?stmt ?active ?behavior a =
+let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
   let ki = kinstr stmt in
   let set_bhv full_bhv e_bhv =
-    e_bhv.b_allocation <- Logic_utils.merge_allocation e_bhv.b_allocation a;
+    let keep_empty = keep_empty && full_bhv.b_allocation = FreeAllocAny in
+    e_bhv.b_allocation <-
+      merge_allocation ~keep_empty e_bhv.b_allocation a;
     let active = match active with None -> [] | Some l -> l in
     Extlib.may Property_status.remove
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
     full_bhv.b_allocation <-
-      Logic_utils.merge_allocation full_bhv.b_allocation a;
+      merge_allocation ~keep_empty full_bhv.b_allocation a;
     Extlib.may Property_status.register
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
   in
@@ -1188,7 +1246,7 @@ let add_code_annot emitter ?kf stmt ca =
                     acc)
                ips l
          in
-         let ca' = code_annot ~emitter ~filter stmt in
+         let ca' = code_annot ~filter stmt in
          let new_a =
            match ca' with
            | [] -> a
@@ -1215,7 +1273,7 @@ let add_code_annot emitter ?kf stmt ca =
        | l ->
          let merge_alloc_ca acc alloc =
            match alloc.annot_content with
-           | AAllocation(_,a) -> Logic_utils.merge_allocation acc a
+           | AAllocation(_,a) -> merge_allocation ~keep_empty:false acc a
            | _ -> acc
          in
          let alloc' = List.fold_left merge_alloc_ca FreeAllocAny l in
@@ -1228,7 +1286,7 @@ let add_code_annot emitter ?kf stmt ca =
                (Id_loop merged_a) alloc')
          in
          Extlib.may Property_status.remove ip;
-         let new_alloc = Logic_utils.merge_allocation alloc' alloc in
+         let new_alloc = merge_allocation ~keep_empty:false alloc' alloc in
          let new_a =
            { a with annot_content = AAllocation(bhvs,new_alloc) }
          in
@@ -1244,7 +1302,8 @@ let add_code_annot emitter ?kf stmt ca =
              remove_code_annot_internal emitter ~kf stmt ca;
              { a with annot_content =
                         AAllocation(
-                          bhvs, Logic_utils.merge_allocation alloc' alloc) }
+                          bhvs,
+                          merge_allocation ~keep_empty:false alloc' alloc) }
            | _ ->
              Kernel.fatal
                "More than one allocation clause for a statement. \

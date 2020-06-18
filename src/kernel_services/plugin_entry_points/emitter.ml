@@ -176,6 +176,13 @@ let kernel =
     ~correctness:[] 
     ~tuning:[]
 
+let orphan =
+  create
+    "Orphan"
+    [ Code_annot; Funspec; Global_annot ]
+    ~correctness:[]
+    ~tuning:[]
+
 (**************************************************************************)
 (** {2 State of all known emitters} *)
 (**************************************************************************)

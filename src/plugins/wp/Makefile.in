@@ -166,7 +166,7 @@ $(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 
 .PHONY: wp-qualif wp-qualif-update wp-qualif-upgrade wp-qualif-push wp-qualif-status
 
-WP_QUALIF_CACHE?=../wp-cache
+WP_QUALIF_CACHE?=$(abspath $(Wp_DIR)/../wp-cache)
 WP_QUALIF_ENTRIES=git -C $(WP_QUALIF_CACHE) ls-files --others --exclude-standard | wc -l
 
 wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)

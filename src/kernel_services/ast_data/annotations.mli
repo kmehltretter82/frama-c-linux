@@ -395,8 +395,12 @@ val add_assigns:
     @modify Aluminium-20160501 restructuration of annotations management
 *)
 
-val add_allocates: allocation behavior_component_addition
-(** Add new allocates into the given behavior. *)
+val add_allocates:
+  keep_empty:bool -> allocation behavior_component_addition
+(** Add new allocates into the given behavior.
+    See {!Annotations.add_assigns} for the signification of [keep_empty]
+    @modify Frama-C+dev add keep_empty argument
+ *)
 
 val add_extended: acsl_extension behavior_component_addition
 (** @since Sodium-20150201 *)

@@ -285,7 +285,8 @@ object(self)
           { Fold.apply = Annotations.fold_allocates }
           Cil.visitCilAllocation
           Annotations.remove_allocates
-          (fun e kf behavior a -> Annotations.add_allocates e kf ~behavior a)
+          (fun e kf behavior a ->
+             Annotations.add_allocates ~keep_empty:false e kf ~behavior a)
           concat_allocation
           FreeAllocAny
       in
@@ -361,7 +362,8 @@ object(self)
       remove_and_add
         (fun b -> match b.b_allocation with FreeAllocAny -> [] | a -> [a])
         Annotations.remove_allocates
-        (fun e kf behavior a -> Annotations.add_allocates e kf ~behavior a)
+        (fun e kf behavior a ->
+           Annotations.add_allocates ~keep_empty:false e kf ~behavior a)
         Annotations.fold_allocates
         old_allocates b';
       remove_and_add
