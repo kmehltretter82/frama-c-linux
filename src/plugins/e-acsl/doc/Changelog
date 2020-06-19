@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-06-19] Add support to create GMP rational from GMP
+                integer. (frama-c/e-acsl#120)
 -* E-ACSL       [2020-06-18] Fix support of VLA memory tracking.
                 (frama-c/e-acsl#119)
 
