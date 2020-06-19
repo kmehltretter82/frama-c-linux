@@ -37,6 +37,7 @@ endif
 #########################
 
 PLUGIN_DIR ?=.
+PLUGIN_ENABLE:=@ENABLE_DIVE@
 PLUGIN_NAME := Dive
 PLUGIN_CMO := self callstack node_kind imprecision_graph build main \
   server_interface
@@ -46,6 +47,7 @@ PLUGIN_HAS_MLI:= yes
 PLUGIN_TESTS_DIRS:=dive
 PLUGIN_GENERATED:=
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
+PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 
 ################
 # Generic part #
