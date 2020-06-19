@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from main::w -dive-depth-limit 5"
+STDOPT: +"-dive-from-variables main::w -dive-depth-limit 5"
 */
 
 volatile int nondet;

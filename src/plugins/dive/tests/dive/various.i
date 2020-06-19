@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from main::z,f::x2 -dive-from-function-alarms f,main -dive-depth-limit 5"
+STDOPT: +"-dive-from-variables main::z,f::x2 -dive-from-alarms f,main -dive-depth-limit 5"
 */
 
 float g;

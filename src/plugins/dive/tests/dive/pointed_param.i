@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from main::y -dive-depth-limit 5"
+STDOPT: +"-dive-from-variables main::y -dive-depth-limit 5"
 */
 
 float h(float *p)

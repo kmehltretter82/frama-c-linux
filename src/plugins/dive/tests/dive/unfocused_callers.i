@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from g::x -dive-depth-limit 7"
+STDOPT: +"-dive-from-variables g::x -dive-depth-limit 7"
 */
 
 float g(float x) {

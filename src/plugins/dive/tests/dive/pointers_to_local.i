@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from main::x -dive-depth-limit 5"
+STDOPT: +"-dive-from-variables main::x -dive-depth-limit 5"
 */
 
 void g(float *p) {

@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from main::z"
+STDOPT: +"-dive-from-variables main::z"
 */
 
 float g;
