@@ -1,6 +1,6 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of the Frama-C plug-in `Dive'.                      *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2018                                                    *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)

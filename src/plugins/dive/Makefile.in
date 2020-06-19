@@ -1,6 +1,6 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of the Frama-C plug-in `Dive'.                      #
+#  This file is part of Frama-C.                                         #
 #                                                                        #
 #  Copyright (C) 2007-2020                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
@@ -52,16 +52,6 @@ PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 ################
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
-
-##########
-# Header #
-##########
-
-headers::
-	@echo "Applying Headers..."
-	headache -c licence/headache_config.txt -h licence/LGPL_HEADER \
-		*.ml *.mli \
-		Makefile.in configure.ac
 
 #####################################
 # Regenerating the Makefile on need #
