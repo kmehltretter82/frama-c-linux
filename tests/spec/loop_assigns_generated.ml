@@ -29,6 +29,16 @@ let add_allocates e kf stmt v =
        (AAllocation([],FreeAlloc ([],[id_v]))));
   Filecheck.check_ast ("after insertion of loop allocates " ^ v.vname )
 
+let check_only_one f =
+  let seen = ref false in
+  fun _ a ->
+    if f a then begin
+      assert (not !seen);
+      seen := true
+    end
+
+let filter_category f _ a acc = if f a then a :: acc else acc
+
 let main () =
   Ast.compute();
   let kf = Globals.Functions.find_by_name "f" in
@@ -45,6 +55,22 @@ let main () =
   add_assigns e2 kf s k;
   add_allocates e1 kf s p;
   add_allocates e2 kf s q;
+  Annotations.iter_code_annot (check_only_one Logic_utils.is_assigns) s;
+  Annotations.iter_code_annot (check_only_one Logic_utils.is_allocation) s;
+  let lassigns =
+    Annotations.fold_code_annot (filter_category Logic_utils.is_assigns) s []
+  in
+  assert (List.length lassigns = 1);
+  let lalloc =
+    Annotations.fold_code_annot (filter_category Logic_utils.is_allocation) s []
+  in
+  assert (List.length lalloc = 1);
+  ignore
+    (Property_status.get
+       (Property.ip_of_code_annot_single kf s (List.hd lassigns)));
+  ignore
+    (Property_status.get
+       (Property.ip_of_code_annot_single kf s (List.hd lalloc)));
   File.pretty_ast ()
 
 let () = Db.Main.extend main
