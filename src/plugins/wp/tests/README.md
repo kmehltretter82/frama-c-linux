@@ -1,6 +1,6 @@
 # Test Suites
 
-Here is a short description of the WP tests suites:
+Here is a short description of the WP test suites:
 
 - `tests/wp` tests dedicated to the VC generation engine and proof strategy
 - `tests/wp_tip` tests associated to the script engine
@@ -20,7 +20,7 @@ Deprecated test suites that shall be moved around:
 
 # Test Configurations
 
-There are two tests configurations:
+There are two test configurations:
 - the default one requires _no_ prover execution;
 - the `qualif` configuration uses the `wp-cache` global cache, `Alt-Ergo` and `Coq`.
 
@@ -43,7 +43,7 @@ recommanded to use them most of the time:
 - `make wp-qualif` re-runs qualif tests; no new cache entry is created, though.
 - `make wp-qualif-env` prints the environment variables for wp-qualif.
 - `make wp-qualif-update` re-runs and create missing cache entries.
-- `make wp-qualif-upgrade` creates missing cache entries _and_ update tests scripts is necessary.
+- `make wp-qualif-upgrade` creates missing cache entries _and_ updates test scripts if necessary.
 - `make wp-qualif-push` commits and pushes all new cache entries to the GitLab repository.
 - `make wp-qualif-status` displays a very short git status of your local wp-cache.
 
