@@ -290,35 +290,6 @@ module Behavior_set_map = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
 let is_same_behavior_set l1 l2 =
   Datatype.String.Set.(equal (of_list l1) (of_list l2))
 
-let merge_stmt_contracts_emitters contracts =
-  let add_one acc (c,e) =
-    match c.annot_content with
-    | AStmtSpec(bhvs, spec) ->
-      let bhvs = Datatype.String.Set.of_list bhvs in
-      (match Behavior_set_map.find_opt bhvs acc with
-       | Some (spec', e') ->
-         merge_funspec spec' spec;
-         if Emitter.equal e e' then acc
-         else
-           Behavior_set_map.add bhvs (spec', Emitter.kernel) acc
-       | None ->
-         let spec' = Cil.empty_funspec () in
-         merge_funspec spec' spec;
-         Behavior_set_map.add bhvs (spec',e) acc
-         (* avoid sharing directly the spec,
-            as merge_funspec will modify it in place*))
-    | _ -> acc
-  in
-  let merged_contracts =
-    List.fold_left add_one Behavior_set_map.empty contracts
-  in
-  Behavior_set_map.fold
-    (fun bhvs (spec,e) acc ->
-       (Logic_const.new_code_annotation
-          (AStmtSpec (Datatype.String.Set.elements bhvs, spec)),e)
-       :: acc)
-    merged_contracts []
-
 let merge_annots_emitters extract merge make annots =
   let merge_same_bhvs bhvs (ca,a,e) acc =
     let elt =
@@ -344,6 +315,21 @@ let merge_annots_emitters extract merge make annots =
   in
   let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
   Behavior_set_map.fold (fun _ (ca,_,e) acc -> (ca,e) :: acc) bhvs []
+
+let merge_stmt_contracts_emitters =
+  let extract ca =
+    match ca.annot_content with
+    | AStmtSpec(bhvs, spec) -> Some (bhvs,spec)
+    | _ -> None
+  in
+  let merge s s' =
+    let e = Cil.empty_funspec() in
+    merge_funspec e s;
+    merge_funspec e s';
+    e
+  in
+  let make bhvs s = AStmtSpec(bhvs,s) in
+  merge_annots_emitters extract merge make
 
 let merge_loop_assigns_emitter =
   let extract ca =
