@@ -2,12 +2,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 int LEN = 10;
-/*@ assigns \nothing;
-    frees p; */
- __attribute__((__FC_BUILTIN__)) void __e_acsl_delete_block(void *p);
-
-/* compiler builtin: 
-    __attribute__((__FC_BUILTIN__)) void *__builtin_alloca(unsigned long size);   */
 int main(int argc, char **argv)
 {
   int __retres;
@@ -67,6 +61,7 @@ int main(int argc, char **argv)
   }
   __retres = 0;
   __e_acsl_delete_block((void *)arr);
+  /* __fc_vla_free((void *)arr); */
   __e_acsl_delete_block((void *)(& arr));
   __e_acsl_memory_clean();
   return __retres;

@@ -105,12 +105,9 @@ let mk_rtl_call ~loc ?result fname args =
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
 (* ************************************************************************** *)
 
-let mk_full_init_stmt ?(addr=true) vi =
+let mk_full_init_stmt vi =
   let loc = vi.vdecl in
-  let mk = mk_rtl_call ~loc "full_init" in
-  match addr, Cil.unrollType vi.vtype with
-  | _, TArray(_,Some _, _, _) | false, _ -> mk [ Cil.evar ~loc vi ]
-  | _ -> mk [ Cil.mkAddrOfVi vi ]
+  mk_rtl_call ~loc "full_init" [ Cil.evar ~loc vi ]
 
 let mk_initialize ~loc (host, offset as lv) = match host, offset with
   | Var _, NoOffset ->
@@ -150,11 +147,11 @@ let mk_store_stmt ?str_size vi =
 let mk_duplicate_store_stmt ?str_size vi =
   mk_named_store_stmt "store_block_duplicate" ?str_size vi
 
-let mk_delete_stmt vi =
+let mk_delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = mk_rtl_call ~loc "delete_block" in
-  match Cil.unrollType vi.vtype with
-  | TArray(_, Some _, _, _) -> mk [ Cil.evar ~loc vi ]
+  match is_addr, Cil.unrollType vi.vtype with
+  | _, TArray(_, Some _, _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
 let mk_mark_readonly vi =

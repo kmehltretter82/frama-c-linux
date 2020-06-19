@@ -59,17 +59,7 @@ let rec inject_in_init env kf_opt vi off = function
 let inject_in_local_init loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
-    (* handle variable-length array allocation via [__fc_vla_alloc].  Here each
-       instance of [__fc_vla_alloc] is rewritten to [alloca] (that is used to
-       implement VLA) and further a custom call to [store_block] tracking VLA
-       allocation is issued. *)
-    (* KV: do not add handling [alloca] allocation here (or anywhere else for
-       that matter). Handling of [alloca] should be implemented in Frama-C
-       (eventually). This is such that each call to [alloca] becomes
-       [__fc_vla_alloc]. It is already handled using the code below. *)
-    fvi.vname <- Functions.Libc.actual_alloca;
-    (* Since we need to pass [vi] by value, cannot use [Misc.mk_store_stmt]
-       here. Do it manually. *)
+    (* add a store statement when creating a variable length array *)
     let store = Constructor.mk_store_stmt ~str_size:sz vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
@@ -120,12 +110,6 @@ let rename_caller loc args exp = match exp.enode with
       && Functions.RTL.has_rtl_replacement vi.vname
     ->
     vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname;
-    exp, args
-
-  | Lval(Var vi , _) when Functions.Libc.is_vla_free_name vi.vname ->
-    (* handle variable-length array allocation via [__fc_vla_free]. Rewrite its
-       name to [delete_block]. The rest is in place. *)
-    vi.vname <- Functions.RTL.mk_api_name "delete_block";
     exp, args
 
   | Lval(Var vi, _)
@@ -198,6 +182,17 @@ let inject_in_instr env kf stmt = function
       | Some lv when not (Functions.RTL.is_generated_kf kf) ->
         add_initializer loc lv ~post:false stmt env kf
       | _ ->
+        env
+    in
+    (* if this is a call to free a vla, add a call to delete_block *)
+    let env =
+      if Functions.Libc.is_vla_free caller then
+        match args with
+        | [ { enode = CastE (_, { enode = Lval (Var vi, NoOffset) }) } ] ->
+          let delete_block = Constructor.mk_delete_stmt ~is_addr:true vi in
+          Env.add_stmt env kf delete_block
+        | _ -> Options.fatal "The normalization of __fc_vla_free() has changed"
+      else
         env
     in
     Call(result, caller, args, loc), env
