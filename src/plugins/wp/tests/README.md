@@ -34,7 +34,7 @@ To re-run tests, use by default the following commands:
 - `make Wp_TESTS` for the default test configuration;
 - `make wp-qualif` for the `qualif` configuration.
 
-When using the `wp-qualif` target, it wil clone the global wp-cache at `../wp-cache` by default,
+When using the `wp-qualif` target, it will clone the global wp-cache at `../wp-cache` by default,
 if not yet present. To choose another place, consult the « Global WP Cache »
 installation instructions below.
 The WP makefile provides several targets to automate cache management. It is highly
@@ -42,7 +42,7 @@ recommanded to use them most of the time:
 
 - `make wp-qualif` re-runs qualif tests; no new cache entry is created, though.
 - `make wp-qualif-env` prints the environment variables for wp-qualif.
-- `make wp-qualif-update` re-runs and create missing cache entries.
+- `make wp-qualif-update` re-runs and creates missing cache entries.
 - `make wp-qualif-upgrade` creates missing cache entries _and_ updates test scripts if necessary.
 - `make wp-qualif-push` commits and pushes all new cache entries to the GitLab repository.
 - `make wp-qualif-status` displays a very short git status of your local wp-cache.
