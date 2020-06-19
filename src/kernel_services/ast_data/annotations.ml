@@ -541,25 +541,12 @@ let model_fields ?emitter t =
 (**************************************************************************)
 
 let iter_code_annot f stmt =
-  try
-    let tbl = Code_annots.find stmt in
-    Emitter.Usable_emitter.Hashtbl.iter
-      (fun e l -> List.iter (f (Emitter.Usable_emitter.get e)) !l)
-      tbl
-  with Not_found ->
-    ()
+  let l = code_annot_emitter stmt in
+  List.iter (fun (a,e) -> f e a) l
 
 let fold_code_annot f stmt acc =
-  try
-    let tbl = Code_annots.find stmt in
-    Emitter.Usable_emitter.Hashtbl.fold
-      (fun e l acc ->
-         let e = Emitter.Usable_emitter.get e in
-         List.fold_left (fun acc x -> f e x acc) acc !l)
-      tbl
-      acc
-  with Not_found ->
-    acc
+  let l = code_annot_emitter stmt in
+  List.fold_left (fun acc (a,e) -> f e a acc) acc l
 
 let iter_all_code_annot ?(sorted=true) f =
   let cmp s1 s2 =
