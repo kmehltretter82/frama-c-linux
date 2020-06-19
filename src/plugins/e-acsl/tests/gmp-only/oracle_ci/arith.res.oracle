@@ -42,3 +42,5 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/gmp-only/arith.i:36: Warning: 
   function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/gmp-only/arith.i:39: Warning: 
+  function __e_acsl_assert: precondition got status unknown.

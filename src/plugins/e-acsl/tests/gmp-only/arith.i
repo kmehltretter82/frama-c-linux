@@ -35,5 +35,8 @@ int main(void) {
 
   /*@ assert 1 - x == -x + 1; */ // test GIT issue #37
 
+  short a = 1, b = 1;
+  //@ assert a+b > 2.  - 1.; // gitlab eacsl issue #120
+
   return 0;
 }

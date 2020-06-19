@@ -79,8 +79,12 @@ val typ_of_number_ty: number_ty -> typ
     for [Gmpz], [Real.t ()] for [Real] and [TInt(ik, [[]])] for [Ctype ik].
     @raise Not_a_number in case of [Nan]. *)
 
-val number_ty_of_typ: typ -> number_ty
-(** Reverse of [typ_of_number_ty] *)
+val number_ty_of_typ: post:bool -> typ -> number_ty
+(** Reverse of [typ_of_number_ty]
+    [number_ty_of_typ ~post ty] return the {!number_ty} corresponding to a
+    C type. [post] indicates if the type is before or after the typing phase.
+    The GMP types will be recognized only in a post-typing phase.
+*)
 
 val join: number_ty -> number_ty -> number_ty
 (** {!number_ty} is a join-semi-lattice if you do not consider [Other]. If

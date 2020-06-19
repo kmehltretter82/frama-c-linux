@@ -262,16 +262,21 @@ let coerce ~arith_operand ~ctx ~op ty =
   then { ty; op; cast = Some ctx }
   else { ty; op; cast = None }
 
-let number_ty_of_typ ty = match Cil.unrollType ty with
-  | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_integer ik
-  | TFloat(fk, _) -> C_float fk
-  | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
-  | TNamed _ -> assert false
+let number_ty_of_typ ~post ty =
+  (* Consider GMP types only in a post typing phase *)
+  if post && Gmp_types.Z.is_t ty then Gmpz
+  else if post && Gmp_types.Q.is_t ty then Rational
+  else
+    match Cil.unrollType ty with
+    | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_integer ik
+    | TFloat(fk, _) -> C_float fk
+    | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
+    | TNamed _ -> assert false
 
 let ty_of_logic_ty ?term lty =
   let get_ty = function
     | Linteger -> Gmpz
-    | Ctype ty -> number_ty_of_typ ty
+    | Ctype ty -> number_ty_of_typ ~post:false ty
     | Lreal -> Real
     | Larrow _ -> Nan
     | Ltype _ -> Error.not_yet "user-defined logic type"

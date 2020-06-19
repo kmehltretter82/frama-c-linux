@@ -932,7 +932,7 @@ let term_to_exp typ t =
     else if Gmp_types.Q.is_t ty then Typing.rational
     else
       match ty with
-      | TInt(ik, _) -> Typing.ikind ik
+      | TInt(ik, _) | TEnum({ ekind = ik }, _) -> Typing.ikind ik
       | TFloat(fk, _) -> Typing.fkind fk
       | _ -> Typing.nan
   in

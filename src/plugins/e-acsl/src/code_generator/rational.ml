@@ -32,12 +32,7 @@ let init_set ~loc lval vi_e e =
 
 let create ~loc ?name e env kf t_opt =
   let ty = Cil.typeOf e in
-  if Gmp_types.Z.is_t ty then
-    (* GMPQ has no builtin for creating Q from Z. Hence:
-       1) Get the MPZ as a string: gmZ_get_str
-       2) Set the MPQ with that string: gmpQ_set_str *)
-    Error.not_yet "reals: creating Q from Z"
-  else if Gmp_types.Q.is_t ty then
+  if Gmp_types.Q.is_t ty then
     e, env
   else
     let _, e, env =
