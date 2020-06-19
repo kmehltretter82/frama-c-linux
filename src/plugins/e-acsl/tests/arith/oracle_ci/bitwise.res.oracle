@@ -1,0 +1,66 @@
+[e-acsl] beginning translation.
+[e-acsl] tests/arith/bitwise.c:39: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:41: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:43: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:44: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:45: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:46: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:47: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:48: Warning: 
+  E-ACSL construct `bitwise operator on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:49: Warning: 
+  E-ACSL construct `bitwise operator on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:56: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:58: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:60: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:61: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:62: Warning: 
+  E-ACSL construct `left/right shift on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:63: Warning: 
+  E-ACSL construct `bitwise operator on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] tests/arith/bitwise.c:64: Warning: 
+  E-ACSL construct `bitwise operator on arbitrary precision'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".

@@ -382,7 +382,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
        | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
        | Neg | BNot -> dup ctx_res)
 
-    | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt), t1, t2)
+    | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd
+              | BOr | BXor), t1, t2)
       ->
       let i = Interval.infer t in
       let i1 = Interval.infer t1 in
@@ -428,10 +429,6 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int t2);
       dup ty
-
-    | TBinOp (BAnd, _, _) -> Error.not_yet "bitwise and"
-    | TBinOp (BXor, _, _) -> Error.not_yet "bitwise xor"
-    | TBinOp (BOr, _, _) -> Error.not_yet "bitwise or"
 
     | TCastE(_, t') ->
       (* compute the smallest interval from the whole term [t] *)

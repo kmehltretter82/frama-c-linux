@@ -390,9 +390,17 @@ and context_insensitive_term_to_exp kf env t =
     let ity = Typing.get_integer_op t in
     let e, env = comparison_to_exp ~loc kf env ity bop t1 t2 (Some t) in
     e, env, C_number, ""
-  | TBinOp((Shiftlt | Shiftrt), _, _) ->
+  | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
-    not_yet env "left/right shift"
+    let ty = Typing.get_typ t in
+    let e1, env = term_to_exp kf env t1 in
+    let e2, env = term_to_exp kf env t2 in
+    if Gmp_types.Z.is_t ty then
+      not_yet env "left/right shift on arbitrary precision"
+    else begin
+      assert (Logic_typing.is_integral_type t.term_type);
+      Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
+    end
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
@@ -412,9 +420,17 @@ and context_insensitive_term_to_exp kf env t =
         ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
     in
     e, env, C_number, ""
-  | TBinOp((BOr | BXor | BAnd), _, _) ->
+  | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
     (* other logic/arith operators  *)
-    not_yet env "missing binary bitwise operator"
+    let ty = Typing.get_typ t in
+    let e1, env = term_to_exp kf env t1 in
+    let e2, env = term_to_exp kf env t2 in
+    if Gmp_types.Z.is_t ty then
+      not_yet env "bitwise operator on arbitrary precision"
+    else begin
+      assert (Logic_typing.is_integral_type t.term_type);
+      Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
+    end
   | TBinOp(PlusPI | IndexPI | MinusPI as bop, t1, t2) ->
     if Misc.is_set_of_ptr_or_array t1.term_type ||
        Misc.is_set_of_ptr_or_array t2.term_type then
