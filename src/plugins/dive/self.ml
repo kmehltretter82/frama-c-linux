@@ -26,7 +26,7 @@ include Plugin.Register
     (struct
       let name = "dive"
       let shortname = "dive"
-      let help = "An interactive imprecision graph generator."
+      let help = "An interactive imprecision graph generator for Eva."
     end)
 
 module OutputDot = Empty_string
@@ -54,7 +54,7 @@ module DepthLimit = Int
 module FromFunctionAlarms = Kernel_function_set
     (struct
       let option_name = "-dive-from-function-alarms"
-      let help = "Build the graph from alarms presents in the functions."
+      let help = "Build the graph from the alarms emitted in the given functions."
       let arg_name = "f1,..."
     end)
 
@@ -118,7 +118,7 @@ module UnfoldedBases = Varinfo_set
     (struct
       let option_name = "-dive-unfold"
       let help = "Defines the composite variables which should be \
-                  unfolded into each individual cell."
+                  unfolded into individual cells."
       let arg_name = "f::v,..."
     end)
 
