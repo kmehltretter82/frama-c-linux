@@ -319,56 +319,49 @@ let merge_stmt_contracts_emitters contracts =
        :: acc)
     merged_contracts []
 
-let merge_loop_assigns_emitters annots =
-  let merge_assigns bhvs (a,e) acc =
+let merge_annots_emitters extract merge make annots =
+  let merge_same_bhvs bhvs (ca,a,e) acc =
     let elt =
       match Behavior_set_map.find_opt bhvs acc with
-      | Some (a',e') ->
-        let a' = merge_assigns ~keep_empty:false a a' in
+      | Some (ca', a',e') ->
+        let a' = merge a a' in
         let e' = if Emitter.equal e e' then e else Emitter.kernel in
-        a', e'
-      | None -> a,e
+        let ca' =
+          if Cil_datatype.Code_annotation.compare ca' ca < 0 then ca' else ca
+        in
+        let annot_content = make (Datatype.String.Set.elements bhvs) a' in
+        let ca' = { ca' with annot_content } in
+        ca', a', e'
+      | None -> ca,a,e
     in
     Behavior_set_map.add bhvs elt acc
   in
   let treat_code_annot acc (ca,e) =
-    match ca.annot_content with
-    | AAssigns(bhvs,a) ->
-      merge_assigns (Datatype.String.Set.of_list bhvs) (a,e) acc
-    | _ -> acc
+    match extract ca with
+    | Some(bhvs,a) ->
+      merge_same_bhvs (Datatype.String.Set.of_list bhvs) (ca,a,e) acc
+    | None -> acc
   in
   let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
-  Behavior_set_map.fold
-    (fun bhvs (a,e) acc ->
-       (Logic_const.new_code_annotation
-         (AAssigns (Datatype.String.Set.elements bhvs, a)),e)
-       :: acc)
-    bhvs []
+  Behavior_set_map.fold (fun _ (ca,_,e) acc -> (ca,e) :: acc) bhvs []
 
-let merge_loop_allocation annots =
-  let merge_allocates bhvs (a,e) acc =
-    let elt =
-      match Behavior_set_map.find_opt bhvs acc with
-      | Some (a', e') ->
-        let a' = merge_allocation ~keep_empty:false a a' in
-        let e' = if Emitter.equal e e' then e else Emitter.kernel in
-        a', e'
-      | None -> a,e
-    in Behavior_set_map.add bhvs elt acc
-  in
-  let treat_code_annot acc (ca, e) =
+let merge_loop_assigns_emitter =
+  let extract ca =
     match ca.annot_content with
-    | AAllocation(bhvs,a) ->
-      merge_allocates (Datatype.String.Set.of_list bhvs) (a,e) acc
-    | _ -> acc
+    | AAssigns(bhvs,a) -> Some(bhvs,a)
+    | _ -> None
   in
-  let bhvs = List.fold_left treat_code_annot Behavior_set_map.empty annots in
-  Behavior_set_map.fold
-    (fun bhvs (a,e) acc ->
-       (Logic_const.new_code_annotation
-          (AAllocation (Datatype.String.Set.elements bhvs, a)),e)
-       ::acc)
-    bhvs []
+  let merge a a' = merge_assigns ~keep_empty:false a a' in
+  let make bhvs a = AAssigns(bhvs,a) in
+  merge_annots_emitters extract merge make
+
+let merge_loop_allocation_emitter =
+  let extract ca =
+    match ca.annot_content with AAllocation(bhvs,a) -> Some (bhvs,a) | _ -> None
+  in
+  let merge a a' = merge_allocation ~keep_empty:false a a' in
+  let make bhvs a = AAllocation(bhvs,a) in
+  merge_annots_emitters extract merge make
 
 let partition_code_annot_emitter l =
   let add_one_ca (contracts, assigns, alloc, others) (ca,_ as v) =
@@ -410,8 +403,8 @@ let code_annot_emitter ?filter stmt =
     in
     let contracts,assigns,allocation,others = partition_code_annot_emitter l in
     merge_stmt_contracts_emitters contracts @
-    merge_loop_assigns_emitters assigns @
-    merge_loop_allocation allocation @
+    merge_loop_assigns_emitter assigns @
+    merge_loop_allocation_emitter allocation @
     others
   with Not_found ->
     []
@@ -1177,78 +1170,23 @@ let add_code_annot emitter ?kf stmt ca =
         | AAssigns (bhvs', _) -> is_same_behavior_set bhvs bhvs'
         | _ -> false
       in
-      let assigns' = code_annot ~filter stmt in
-      (match assigns' with
-       | [] -> a, Property.ip_of_code_annot kf stmt a
-       | l ->
-         let merge_assigns_ca acc ca =
-           match ca.annot_content with
-           | AAssigns(_,assigns') ->
-             merge_assigns ~keep_empty:false assigns' acc
-           | _ -> acc
-         in
-         let assigns' = List.fold_left merge_assigns_ca WritesAny l in
-         let merged_ca = { a with annot_content = AAssigns(bhvs,assigns') }
-         in
-         let ip =
-           Property.(
-             ip_of_assigns
-               kf (Kstmt stmt) (Id_loop merged_ca) assigns')
-         in
-         Extlib.may Property_status.remove ip;
-         (match assigns' with
-          | WritesAny -> ()
-          | Writes l ->
-            List.iter
-              (fun from ->
-                 let ip =
-                   Property.(
-                     ip_of_from kf (Kstmt stmt)
-                       (Id_loop merged_ca) from)
-                 in
-                 Extlib.may Property_status.remove ip)
-              l);
-         let new_assigns =
-           merge_assigns ~keep_empty:false assigns' assigns
-         in
-         let new_ca = { a with annot_content = AAssigns(bhvs,new_assigns) }
-         in
-         let ips =
-           Extlib.list_of_opt
-             Property.(
-               ip_of_assigns
-                 kf (Kstmt stmt) (Id_loop new_ca) new_assigns)
-         in
-         let ips =
-           match new_assigns with
-           | WritesAny -> ips
-           | Writes l ->
-             List.fold_left
-               (fun acc f ->
-                  Extlib.opt_fold
-                    (fun x y -> x::y)
-                    Property.(
-                      ip_of_from kf (Kstmt stmt)
-                        (Id_loop new_ca) f)
-                    acc)
-               ips l
-         in
-         let ca' = code_annot ~filter stmt in
-         let new_a =
-           match ca' with
-           | [] -> a
-           | [ { annot_content = AAssigns(_, assigns') } as ca ] ->
-             remove_code_annot_internal emitter ~kf stmt ca;
-             let merged =
-               merge_assigns ~keep_empty:false assigns' assigns
-             in
-             { a with annot_content = AAssigns (bhvs, merged) }
-           | _ ->
-             Kernel.fatal
-               "More than one loop assigns clause for a statement. \
-                Annotations internal state broken."
-         in
-         new_a, ips)
+      let ca' = code_annot ~filter stmt in
+      let new_a =
+        match ca' with
+        | [] -> a
+        | [ { annot_content = AAssigns(_, assigns') } as ca ] ->
+          remove_code_annot_internal emitter ~kf stmt ca;
+          let merged =
+            merge_assigns ~keep_empty:false assigns' assigns
+          in
+          { a with annot_content = AAssigns (bhvs, merged) }
+        | _ ->
+          Kernel.fatal
+            "More than one loop assigns clause for a statement. \
+             Annotations internal state broken."
+      in
+      let ips = Property.ip_of_code_annot kf stmt new_a in
+      new_a, ips
     | AAllocation (bhvs, alloc) ->
       let filter ca =
         match ca.annot_content with
