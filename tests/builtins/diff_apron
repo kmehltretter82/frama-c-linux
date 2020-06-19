@@ -1,5 +1,5 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_apron/Longinit_sequencer.res.oracle
-62,65c62,81
+59,62c59,78
 < [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
@@ -25,7 +25,7 @@ diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_a
 >   Called from tests/builtins/long_init.c:29.
 > [eva] Recording results for subanalyze
 > [eva] Done for function subanalyze
-153,154c169,216
+148,149c164,211
 < [eva] tests/builtins/long_init.c:93: Reusing old results for call to analyze
 < [eva] tests/builtins/long_init.c:94: Reusing old results for call to analyze
 ---
@@ -77,11 +77,11 @@ diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_a
 > [eva] Done for function subanalyze
 > [eva] Recording results for analyze
 > [eva] Done for function analyze
-327c389
+320c382
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav
-421,424c483,498
+411,414c473,488
 < [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
@@ -103,11 +103,11 @@ diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_a
 >   Called from tests/builtins/long_init2.c:29.
 > [eva] Recording results for subanalyze
 > [eva] Done for function subanalyze
-568c642
+556c630
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_apron/Longinit_sequencer.sav
-658,661c732,747
+643,646c717,732
 < [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
 < [eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze

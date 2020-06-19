@@ -1,23 +1,23 @@
 diff tests/value/oracle/addition.res.oracle tests/value/oracle_bitwise/addition.res.oracle
-90,92c90
+121,123c121
 < [eva] tests/value/addition.i:52: 
 <   Assigning imprecise value to p10.
 <   The imprecision originates from Arithmetic {tests/value/addition.i:52}
 ---
 > [eva] tests/value/addition.i:52: Assigning imprecise value to p10.
-128a127
+163a162
 >   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:52}) }}
-130a130
+165a165
 >   {{ garbled mix of &{p2} (origin: Misaligned {tests/value/addition.i:56}) }}
-166,168c166
+201,203c201
 <   p10 ∈
 <      {{ garbled mix of &{p1}
 <       (origin: Arithmetic {tests/value/addition.i:52}) }}
 ---
 >   p10 ∈ {{ garbled mix of &{p1} }}
-358a357
+428a427
 >   {{ garbled mix of &{p1} (origin: Misaligned {tests/value/addition.i:52}) }}
-397,399c396
+467,469c466
 <   p10 ∈
 <      {{ garbled mix of &{p1}
 <       (origin: Arithmetic {tests/value/addition.i:52}) }}
@@ -32,13 +32,13 @@ diff tests/value/oracle/bitwise.res.oracle tests/value/oracle_bitwise/bitwise.re
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
 diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_bitwise/bitwise_pointer.res.oracle
-32,34c32
+34,36c34
 < [eva] tests/value/bitwise_pointer.i:18: 
 <   Assigning imprecise value to p.
 <   The imprecision originates from Arithmetic {tests/value/bitwise_pointer.i:18}
 ---
 > [eva] tests/value/bitwise_pointer.i:18: Assigning imprecise value to p.
-37,39c35
+41,43c39
 < [eva] tests/value/bitwise_pointer.i:22: 
 <   Assigning imprecise value to p1.
 <   The imprecision originates from Arithmetic {tests/value/bitwise_pointer.i:22}

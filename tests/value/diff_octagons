@@ -34,7 +34,7 @@ diff tests/value/oracle/alias.6.res.oracle tests/value/oracle_octagons/alias.6.r
 >   tz2 ∈ {1}
 >   tz3 ∈ {1}
 diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_octagons/bitfield.res.oracle
-132a133,135
+138a139,141
 > [eva] tests/value/bitfield.i:71: 
 >   Frama_C_show_each:
 >   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
@@ -79,12 +79,12 @@ diff tests/value/oracle/descending.res.oracle tests/value/oracle_octagons/descen
 <   i ∈ {31; 32}
 ---
 >   i ∈ {31}
-diff tests/value/oracle/downcast.res.oracle tests/value/oracle_octagons/downcast.res.oracle
+diff tests/value/oracle/downcast.1.res.oracle tests/value/oracle_octagons/downcast.1.res.oracle
 61c61
 <   [100000..2147483647], [100145..2147483647], [100145..2147483647]
 ---
 >   [100000..2147483502], [100145..2147483647], [100145..2147483647]
-167c167
+166c166
 <   x_0 ∈ [100000..2147483647]
 ---
 >   x_0 ∈ [100000..2147483502]
@@ -119,24 +119,24 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_octagons/gauges.res
 209,210d208
 < [eva:alarm] tests/value/gauges.c:156: Warning: 
 <   signed overflow. assert -2147483648 ≤ toCopy - 1;
-272,273d269
+276,277d273
 < [eva:alarm] tests/value/gauges.c:201: Warning: 
 <   signed overflow. assert -2147483648 ≤ numNonZero - 1;
-296,300d291
+300,304d295
 < [eva] tests/value/gauges.c:218: Frama_C_show_each:
 < [eva] tests/value/gauges.c:218: Frama_C_show_each:
 < [eva] tests/value/gauges.c:218: Frama_C_show_each:
 < [eva:alarm] tests/value/gauges.c:220: Warning: 
 <   signed overflow. assert -2147483648 ≤ n - 1;
-787c778
+791c782
 <   numNonZero ∈ [-2147483648..8]
 ---
 >   numNonZero ∈ {-1}
-798c789
+802c793
 <   n ∈ [-2147483648..99]
 ---
 >   n ∈ {-1}
-859c850
+863c854
 <   toCopy ∈ [-2147483648..99]
 ---
 >   toCopy ∈ {-1}
@@ -238,22 +238,22 @@ diff tests/value/oracle/non_natural.res.oracle tests/value/oracle_octagons/non_n
 > [kernel] tests/value/non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
 diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_octagons/nonlin.res.oracle
-105a106,107
+107a108,109
 > [eva:nonlin] tests/value/nonlin.c:65: non-linear 'x * x', lv 'x'
 > [eva:nonlin] tests/value/nonlin.c:65: subdividing on x
-108a111,113
+110a113,115
 > [eva:nonlin] tests/value/nonlin.c:66: subdividing on x
 > [eva:nonlin] tests/value/nonlin.c:66: non-linear 'y * y', lv 'y'
 > [eva:nonlin] tests/value/nonlin.c:66: subdividing on y
-111a117,118
+113a119,120
 > [eva:nonlin] tests/value/nonlin.c:68: non-linear 'z * x + x * y', lv 'x'
 > [eva:nonlin] tests/value/nonlin.c:68: subdividing on x
-149a157,158
+151a159,160
 > [eva:nonlin] tests/value/nonlin.c:112: non-linear 'x * x', lv 'x'
 > [eva:nonlin] tests/value/nonlin.c:112: subdividing on x
-152a162
+154a164
 > [eva:nonlin] tests/value/nonlin.c:113: subdividing on x
-153a164
+155a166
 > [eva:nonlin] tests/value/nonlin.c:115: subdividing on x
 diff tests/value/oracle/plevel.res.oracle tests/value/oracle_octagons/plevel.res.oracle
 12d11

@@ -4,7 +4,7 @@ Only in tests/float/oracle: absorb_sav.res
 Only in tests/float/oracle: absorb_sav2.err
 Only in tests/float/oracle: absorb_sav2.res
 diff tests/float/oracle/alarms.0.res.oracle tests/float/oracle_equalities/alarms.0.res.oracle
-137,139c137,138
+141,143c141,142
 <   u1{.l[bits 0 to 31]; .f; .d[bits 0 to 31]} ∈
 <     [-3.40282346639e+38 .. 3.40282346639e+38]
 <     {.l[bits 32 to 63]; .f[bits 32 to 63]; .d[bits 32 to 63]} ∈ [--..--]
@@ -39,6 +39,6 @@ diff tests/float/oracle/nonlin.5.res.oracle tests/float/oracle_equalities/nonlin
 61a62
 > [eva:nonlin] tests/float/nonlin.c:44: subdividing on a
 diff tests/float/oracle/parse.res.oracle tests/float/oracle_equalities/parse.res.oracle
-21a22,23
+22a23,24
 > [eva] tests/float/parse.i:37: Warning: 
 >   cannot parse floating-point constant, returning imprecise result
