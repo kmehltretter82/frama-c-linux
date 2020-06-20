@@ -1,24 +1,24 @@
 diff tests/value/oracle/CruiseControl.res.oracle tests/value/oracle_equalities/CruiseControl.res.oracle
-978c978
+980c980
 <        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {0; 1}
 ---
 >        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {1}
-1016c1016
+1018c1018
 <        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle{._I0_ThrottleIn; ._O0_ThrottleOut} ∈
 ---
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle._I0_ThrottleIn ∈
-1017a1018,1019
+1019a1020,1021
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle._O0_ThrottleOut ∈
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
-1031c1033
+1033c1035
 <        [-1.9999998807907104*2^127 .. 1.9999998807907104*2^127]
 ---
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
-1216c1218
+1218c1220
 <        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {0; 1}
 ---
 >        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {1}
-1228c1230,1234
+1230c1232,1236
 <        [0]._C4_ThrottleCmd._C0_ThrottleRegulation{._I1_CruiseSpeed; ._I2_VehiculeSpeed; ._O0_Throttle; ._L1_CruiseControl; ._L2_CruiseControl; ._L3_CruiseControl} ∈
 ---
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation{._I1_CruiseSpeed; ._I2_VehiculeSpeed} ∈
@@ -26,39 +26,43 @@ diff tests/value/oracle/CruiseControl.res.oracle tests/value/oracle_equalities/C
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._O0_Throttle ∈
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation{._L1_CruiseControl; ._L2_CruiseControl; ._L3_CruiseControl} ∈
-1246c1252
+1248c1254
 <        [0]._C4_ThrottleCmd._C0_ThrottleRegulation{._L4_CruiseControl; ._L13_CruiseControl} ∈
 ---
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._L4_CruiseControl ∈
-1247a1254,1255
+1249a1256,1257
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._L13_CruiseControl ∈
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
-1254c1262
+1256c1264
 <        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle{._I0_ThrottleIn; ._O0_ThrottleOut} ∈
 ---
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle._I0_ThrottleIn ∈
-1255a1264,1265
+1257a1266,1267
 >        [0]._C4_ThrottleCmd._C0_ThrottleRegulation._C0_SaturateThrottle._O0_ThrottleOut ∈
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
-1269c1279
+1271c1281
 <        [-1.9999998807907104*2^127 .. 1.9999998807907104*2^127]
 ---
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
 diff tests/value/oracle/addition.res.oracle tests/value/oracle_equalities/addition.res.oracle
-103,106d102
+138,141d137
 < [eva:alarm] tests/value/addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] tests/value/addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
-133d128
-< [scope:rm_asserts] removing 2 assertion(s)
-337,340d331
+168c164
+< [scope:rm_asserts] removing 9 assertion(s)
+---
+> [scope:rm_asserts] removing 7 assertion(s)
+407,410d402
 < [eva:alarm] tests/value/addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] tests/value/addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
-363d353
-< [scope:rm_asserts] removing 2 assertion(s)
+433c425
+< [scope:rm_asserts] removing 9 assertion(s)
+---
+> [scope:rm_asserts] removing 7 assertion(s)
 diff tests/value/oracle/alias.0.res.oracle tests/value/oracle_equalities/alias.0.res.oracle
 103,104c103,104
 <   t ∈ {1; 2; 4}
@@ -249,16 +253,16 @@ diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_equalitie
 >   {{ garbled mix of &{b; c}
 >     (origin: Arithmetic {tests/value/backward_add_ptr.c:178}) }}
 diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_equalities/bitfield.res.oracle
-132a133,135
+138a139,141
 > [eva] tests/value/bitfield.i:71: 
 >   Frama_C_show_each:
 >   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
 diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_equalities/bitwise_pointer.res.oracle
-58c58
+62c62
 <   x ∈ [0..9]
 ---
 >   x ∈ {5}
-71c71
+75c75
 <   x1 ∈ [0..9]
 ---
 >   x1 ∈ {5}
@@ -282,12 +286,74 @@ diff tests/value/oracle/descending.res.oracle tests/value/oracle_equalities/desc
 <   i ∈ {31; 32}
 ---
 >   i ∈ {31}
-diff tests/value/oracle/downcast.res.oracle tests/value/oracle_equalities/downcast.res.oracle
-735c735
+diff tests/value/oracle/domains_function.res.oracle tests/value/oracle_equalities/domains_function.res.oracle
+19,20c19
+< [eva] tests/value/domains_function.c:92: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:92: Frama_C_show_each_top: {3}
+28,29c27
+< [eva] tests/value/domains_function.c:77: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:77: Frama_C_show_each_top: {1}
+32,33c30
+< [eva] tests/value/domains_function.c:96: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:96: Frama_C_show_each_top: {1}
+36,37c33
+< [eva] tests/value/domains_function.c:84: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+40,41c36
+< [eva] tests/value/domains_function.c:98: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:98: Frama_C_show_each_top: {2}
+60,61c55
+< [eva] tests/value/domains_function.c:84: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+64,65c58
+< [eva] tests/value/domains_function.c:113: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:113: Frama_C_show_each_top: {2}
+78,79c71
+< [eva] tests/value/domains_function.c:55: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:55: Frama_C_show_each_top: {42}
+108,109c100
+< [eva] tests/value/domains_function.c:64: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
+---
+> [eva] tests/value/domains_function.c:64: Frama_C_show_each_top: {42}
+116c107
+<   result ∈ [--..--]
+---
+>   result ∈ {2}
+130c121
+<   result ∈ [--..--]
+---
+>   result ∈ {1}
+135c126
+<   result ∈ [--..--]
+---
+>   result ∈ {2}
+138c129
+<   result ∈ [--..--]
+---
+>   result ∈ {2}
+diff tests/value/oracle/downcast.2.res.oracle tests/value/oracle_equalities/downcast.2.res.oracle
+114c114
 <   ux ∈ [--..--]
 ---
 >   ux ∈ [0..65535]
-778c778
+157c157
 <   ux ∈ [--..--]
 ---
 >   ux ∈ [0..65535]
@@ -301,7 +367,7 @@ diff tests/value/oracle/fptr.1.res.oracle tests/value/oracle_equalities/fptr.1.r
 ---
 >   n ∈ {0; 1}
 diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_equalities/from_call.0.res.oracle
-64c64,69
+68c68,73
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
@@ -310,7 +376,7 @@ diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_equalities/fro
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
-74c79,84
+78c83,88
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
@@ -320,14 +386,14 @@ diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_equalities/fro
 > [from] Done for function g
 > [eva] Done for function g
 diff tests/value/oracle/from_call.1.res.oracle tests/value/oracle_equalities/from_call.1.res.oracle
-60c60,63
+64c64,67
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
 >   Called from tests/value/from_call.i:20.
 > [eva] Recording results for g
 > [eva] Done for function g
-68c71,74
+72c75,78
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
@@ -338,7 +404,7 @@ diff tests/value/oracle/from_termin.res.oracle tests/value/oracle_equalities/fro
 9a10
 > [eva] tests/value/from_termin.i:8: starting to merge loop iterations
 diff tests/value/oracle/imprecise_invalid_write.res.oracle tests/value/oracle_equalities/imprecise_invalid_write.res.oracle
-27a28,29
+29a30,31
 > [kernel] tests/value/imprecise_invalid_write.i:9: 
 >   imprecise size for variable main1 (Undefined sizeof on a function.)
 diff tests/value/oracle/incompatible_states.res.oracle tests/value/oracle_equalities/incompatible_states.res.oracle
@@ -347,26 +413,27 @@ diff tests/value/oracle/incompatible_states.res.oracle tests/value/oracle_equali
 >   The evaluation of the expression x * x
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
-26,27c30,33
+27,29c31,34
 < [eva:alarm] tests/value/incompatible_states.c:41: Warning: 
-<   accessing uninitialized left-value. assert \initialized(&t[(2 * i) / 2]);
+<   accessing uninitialized left-value.
+<   assert \initialized(&t[(int)((int)(2 * i) / 2)]);
 ---
 > [eva] tests/value/incompatible_states.c:41: 
 >   The evaluation of the expression t[(2 * i) / 2]
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
-39,40d44
+41,42d45
 < [eva:alarm] tests/value/incompatible_states.c:53: Warning: 
 <   division by zero. assert t[i] ≢ 0;
-45,47d48
+47,49d49
 < [eva] tests/value/incompatible_states.c:41: 
 <   assertion 'Eva,initialization' got final status invalid.
 < [scope:rm_asserts] removing 2 assertion(s)
-53c54
+55c55
 <   z ∈ [-3..100]
 ---
 >   z ∈ {-3; -2}
-56c57
+58c58
 <   t[0] ∈ {0; 1}
 ---
 >   t[0] ∈ {0}
@@ -375,7 +442,7 @@ diff tests/value/oracle/library.res.oracle tests/value/oracle_equalities/library
 < [eva:alarm] tests/value/library.i:44: Warning: 
 <   non-finite float value. assert \is_finite(*pf);
 < [eva:alarm] tests/value/library.i:44: Warning: 
-<   non-finite float value. assert \is_finite((float)(*pf + *pf));
+<   non-finite float value. assert \is_finite(\add_float(*pf, *pf));
 diff tests/value/oracle/long_const.0.res.oracle tests/value/oracle_equalities/long_const.0.res.oracle
 19c19,22
 < [eva] tests/value/long_const.i:25: Reusing old results for call to LL_ABS
@@ -621,7 +688,7 @@ diff tests/value/oracle/non_natural.res.oracle tests/value/oracle_equalities/non
 > [kernel] tests/value/non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
 diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_equalities/nonlin.res.oracle
-186c186
+188c188
 <   q ∈ {{ &x + [-400..400],0%4 }}
 ---
 >   q ∈ {{ &x }}
@@ -635,33 +702,37 @@ diff tests/value/oracle/octagons.res.oracle tests/value/oracle_equalities/octago
 ---
 >   t ∈ [6..4294967295] or UNINITIALIZED
 diff tests/value/oracle/offsetmap.0.res.oracle tests/value/oracle_equalities/offsetmap.0.res.oracle
-38d37
+40d39
 < [eva] Recording results for g
-40a40
+42a42
 > [eva] Recording results for g
 diff tests/value/oracle/offsetmap.1.res.oracle tests/value/oracle_equalities/offsetmap.1.res.oracle
-38d37
+40d39
 < [eva] Recording results for g
-40a40
+42a42
 > [eva] Recording results for g
 diff tests/value/oracle/origin.0.res.oracle tests/value/oracle_equalities/origin.0.res.oracle
-226,227c226
+249,250c249
 <   pm2[bits 0 to 15]# ∈ {{ (? *)&a }}%32, bits 16 to 31 
 <      [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
 ---
 >   pm2 ∈ {{ &a + {-4} ; &b + {-4} }}
-266,267c265
+289,290c288
 <   pm2[bits 0 to 15]# ∈ {{ (? *)&a }}%32, bits 16 to 31 
 <      [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
 ---
 >   pm2 ∈ {{ &a + {-4} ; &b + {-4} }}
 diff tests/value/oracle/period.res.oracle tests/value/oracle_equalities/period.res.oracle
-86,90d85
+88,94d87
+< [eva:alarm] tests/value/period.c:53: Warning: 
+<   pointer downcast. assert (unsigned int)(&g) ≤ 2147483647;
 < [eva] tests/value/period.c:53: 
 <   Assigning imprecise value to p.
 <   The imprecision originates from Arithmetic {tests/value/period.c:53}
 < [eva:alarm] tests/value/period.c:54: Warning: 
 <   out of bounds read. assert \valid_read(p);
+99d91
+< [scope:rm_asserts] removing 1 assertion(s)
 diff tests/value/oracle/plevel.res.oracle tests/value/oracle_equalities/plevel.res.oracle
 12d11
 < [eva] Recording results for main

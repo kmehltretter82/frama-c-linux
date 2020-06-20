@@ -501,7 +501,15 @@ diff tests/value/oracle/divneg.res.oracle tests/value/oracle_apron/divneg.res.or
 <   vic ∈ {4294967295}
 ---
 >   vic ∈ {-1}
-diff tests/value/oracle/downcast.res.oracle tests/value/oracle_apron/downcast.res.oracle
+diff tests/value/oracle/domains_function.res.oracle tests/value/oracle_apron/domains_function.res.oracle
+107c107,110
+< [eva] tests/value/domains_function.c:63: Reusing old results for call to use
+---
+> [eva] computing for function use <- test_propagation <- main.
+>   Called from tests/value/domains_function.c:63.
+> [eva] Recording results for use
+> [eva] Done for function use
+diff tests/value/oracle/downcast.1.res.oracle tests/value/oracle_apron/downcast.1.res.oracle
 61c61
 <   [100000..2147483647], [100145..2147483647], [100145..2147483647]
 ---
@@ -615,7 +623,7 @@ diff tests/value/oracle/fptr.1.res.oracle tests/value/oracle_apron/fptr.1.res.or
 > [eva] Recording results for f
 > [eva] Done for function f
 diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_apron/from_call.0.res.oracle
-64c64,69
+68c68,73
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
@@ -624,7 +632,7 @@ diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_apron/from_cal
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
-74c79,84
+78c83,88
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
@@ -633,7 +641,7 @@ diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_apron/from_cal
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
-145,146c155,166
+149,150c159,170
 < [eva] tests/value/from_call.i:44: Reusing old results for call to return_A1
 < [eva] tests/value/from_call.i:44: Reusing old results for call to return_A2
 ---
@@ -650,21 +658,21 @@ diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_apron/from_cal
 > [from] Done for function return_A2
 > [eva] Done for function return_A2
 diff tests/value/oracle/from_call.1.res.oracle tests/value/oracle_apron/from_call.1.res.oracle
-60c60,63
+64c64,67
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
 >   Called from tests/value/from_call.i:20.
 > [eva] Recording results for g
 > [eva] Done for function g
-68c71,74
+72c75,78
 < [eva] tests/value/from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
 >   Called from tests/value/from_call.i:20.
 > [eva] Recording results for g
 > [eva] Done for function g
-119,120c125,132
+123,124c129,136
 < [eva] tests/value/from_call.i:44: Reusing old results for call to return_A1
 < [eva] tests/value/from_call.i:44: Reusing old results for call to return_A2
 ---
@@ -685,7 +693,7 @@ diff tests/value/oracle/fun_ptr.0.res.oracle tests/value/oracle_apron/fun_ptr.0.
 > [eva] Recording results for f
 > [eva] Done for function f
 diff tests/value/oracle/fun_ptr.1.res.oracle tests/value/oracle_apron/fun_ptr.1.res.oracle
-39c39,42
+43c43,46
 < [eva] tests/value/fun_ptr.i:33: Reusing old results for call to f
 ---
 > [eva] computing for function f <- test2 <- main.
@@ -720,53 +728,53 @@ diff tests/value/oracle/gauges.res.oracle tests/value/oracle_apron/gauges.res.or
 187,188d180
 < [eva:alarm] tests/value/gauges.c:140: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-299,300d290
+303,304d294
 < [eva:alarm] tests/value/gauges.c:220: Warning: 
 <   signed overflow. assert -2147483648 ≤ n - 1;
-315,316d304
+319,320d308
 < [eva:alarm] tests/value/gauges.c:240: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-318c306
+322c310
 <   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..2147483647]
 ---
 >   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..46]
-324,325d311
+328,329d315
 < [eva:alarm] tests/value/gauges.c:251: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-327c313
+331c317
 <   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..2147483647]
 ---
 >   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..49]
-333,334d318
+337,338d322
 < [eva:alarm] tests/value/gauges.c:263: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-336c320
+340c324
 <   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..65]
-342,343d325
+346,347d329
 < [eva:alarm] tests/value/gauges.c:274: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-345c327
+349c331
 <   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..70]
-353,354d334
+357,358d338
 < [eva:alarm] tests/value/gauges.c:293: Warning: 
 <   signed overflow. assert j + 1 ≤ 2147483647;
-356c336
+360c340
 <   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..598]
-798c778
+802c782
 <   n ∈ [-2147483648..99]
 ---
 >   n ∈ [-2147483547..99]
-801c781
+805c785
 <   i ∈ [0..2147483647]
 ---
 >   i ∈ [10..2147483647]
-837c817
+841c821
 <   i ∈ [0..2147483647]
 ---
 >   i ∈ [0..21]
@@ -978,7 +986,7 @@ diff tests/value/oracle/loopinv.res.oracle tests/value/oracle_apron/loopinv.res.
 >      3 To be validated
 >     12 Total
 diff tests/value/oracle/memexec.res.oracle tests/value/oracle_apron/memexec.res.oracle
-25,30c25,48
+27,32c27,50
 < [eva] tests/value/memexec.c:13: Reusing old results for call to f11
 < [eva] tests/value/memexec.c:14: Reusing old results for call to f11
 < [eva] tests/value/memexec.c:16: Reusing old results for call to f11
@@ -1010,40 +1018,27 @@ diff tests/value/oracle/memexec.res.oracle tests/value/oracle_apron/memexec.res.
 >   Called from tests/value/memexec.c:21.
 > [eva] Recording results for f11
 > [eva] Done for function f11
-104c122,125
+106c124,127
 < [eva] tests/value/memexec.c:113: Reusing old results for call to f5_aux
 ---
 > [eva] computing for function f5_aux <- f5 <- main.
 >   Called from tests/value/memexec.c:113.
 > [eva] Recording results for f5_aux
 > [eva] Done for function f5_aux
-106,107c127
-<   Frama_C_show_each_f5:
-<   [9..2147483647], [-2147483648..2147483647], [-2147483648..7]
----
->   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
-128c148,151
+129c150,153
 < [eva] tests/value/memexec.c:137: Reusing old results for call to f7_1
 ---
 > [eva] computing for function f7_1 <- f7 <- main.
 >   Called from tests/value/memexec.c:137.
 > [eva] Recording results for f7_1
 > [eva] Done for function f7_1
-143c166,169
+144c168,171
 < [eva] tests/value/memexec.c:150: Reusing old results for call to f8_1
 ---
 > [eva] computing for function f8_1 <- f8 <- main.
 >   Called from tests/value/memexec.c:150.
 > [eva] Recording results for f8_1
 > [eva] Done for function f8_1
-195c221
-<   g_f5_1 ∈ [--..--]
----
->   g_f5_1 ∈ [-2147483648..6]
-231c257
-<   g_f5_1 ∈ [--..--]
----
->   g_f5_1 ∈ [-2147483648..6]
 diff tests/value/oracle/modulo.res.oracle tests/value/oracle_apron/modulo.res.oracle
 40a41,64
 > [eva] tests/value/modulo.i:41: Frama_C_show_each_1: [-10..-1], [-9..-1], [-8..0]
@@ -1110,28 +1105,28 @@ diff tests/value/oracle/octagons.res.oracle tests/value/oracle_apron/octagons.re
 >   c ∈ [-602..1446]
 >   d ∈ [-611..2147483647]
 diff tests/value/oracle/offsetmap.0.res.oracle tests/value/oracle_apron/offsetmap.0.res.oracle
-62,63c62
+64,65c64
 <   a[bits 0 to 7] ∈ {1; 6}
 <    [bits 8 to 31]# ∈ {6}%32, bits 8 to 31 
 ---
 >   a ∈ {1; 6}
-65,66c64
+67,68c66
 <   a7[bits 0 to 7] ∈ {1}
 <     [bits 8 to 31]# ∈ {97}%32, bits 8 to 31 
 ---
 >   a7 ∈ {1}
-106,107c104
+108,109c106
 <   a[bits 0 to 7] ∈ {1; 6}
 <    [bits 8 to 31]# ∈ {6}%32, bits 8 to 31 
 ---
 >   a ∈ {1; 6}
-109,110c106
+111,112c108
 <   a7[bits 0 to 7] ∈ {1}
 <     [bits 8 to 31]# ∈ {97}%32, bits 8 to 31 
 ---
 >   a7 ∈ {1}
 diff tests/value/oracle/offsetmap.1.res.oracle tests/value/oracle_apron/offsetmap.1.res.oracle
-62,67c62,64
+64,69c64,66
 <   a[bits 0 to 7] ∈ {1; 6}
 <    [bits 8 to 31]# ∈ {6}%32, bits 8 to 31 
 <   b[bits 0 to 7] ∈ {0; 1}
@@ -1142,7 +1137,7 @@ diff tests/value/oracle/offsetmap.1.res.oracle tests/value/oracle_apron/offsetma
 >   a ∈ {1; 6}
 >   b ∈ {0; 1}
 >   a7 ∈ {1}
-107,112c104,106
+109,114c106,108
 <   a[bits 0 to 7] ∈ {1; 6}
 <    [bits 8 to 31]# ∈ {6}%32, bits 8 to 31 
 <   b[bits 0 to 7] ∈ {0; 1}

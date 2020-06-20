@@ -1,9 +1,9 @@
 diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_gauges/Longinit_sequencer.res.oracle
-327c327
+320c320
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_gauges/Longinit_sequencer.sav
-568c568
+556c556
 <   tests/builtins/result/Longinit_sequencer.sav
 ---
 >   tests/builtins/result_gauges/Longinit_sequencer.sav
@@ -36,13 +36,13 @@ diff tests/builtins/oracle/malloc-size-zero.1.res.oracle tests/builtins/oracle_g
 > [eva] Recording results for my_calloc
 > [eva] Done for function my_calloc
 diff tests/builtins/oracle/memcpy.res.oracle tests/builtins/oracle_gauges/memcpy.res.oracle
-168a169,170
+176a177,178
 > [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
 > [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
-449a452
+457a460
 > [eva] tests/builtins/memcpy.c:230: starting to merge loop iterations
 diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/realloc.res.oracle
-689a690,1038
+677a678,1026
 > [eva] tests/builtins/realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
 > [eva:malloc] tests/builtins/realloc.c:152: 
