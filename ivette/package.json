@@ -55,7 +55,7 @@
     "react-fast-compare": "^3.2.0",
     "react-hot-loader": "^4.12.20",
     "serve": "^11.3.0",
-    "tippy.js": "^6.2.3",
+    "tippy.js": "5.2.1",
     "typedoc": "^0.17.6",
     "typedoc-plugin-external-module-name": "^3.1.0",
     "typescript": "^3.8.3",

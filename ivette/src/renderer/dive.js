@@ -1,11 +1,14 @@
 import "@fortawesome/fontawesome-free/js/all.js";
-import "tippy.js/themes/light-border.css";
 
 import Cytoscape from 'cytoscape' ;
 
 import { Data } from './graph_elements';
 
 import Tippy from 'tippy.js'
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/light-border.css";
+import 'tippy.js/animations/shift-away.css';
+import "./dive_tippy.css";
 
 import CytoscapeMenu from 'cytoscape-cxtmenu';
 import CytoscapePopper from 'cytoscape-popper';
@@ -168,41 +171,60 @@ class Dive {
     }
   }
 
-  addTip(node, options) {
-    let tippy = Tippy(node.popperRef(), options);
-    let timeout = null;
-    node.on('mouseover', () => { timeout = setTimeout(() => tippy.show(), 500) });
-    node.on('mouseout', () => { clearTimeout(timeout); tippy.hide() });
-  }
+  createTips(node) {
+    let common = {
+      interactive: true,
+      multiple: true,
+      animation: 'shift-away',
+      duration: 500,
+      trigger: 'manual',
+      appendTo: document.body,
+      lazy: false,
+      onCreate: instance => {
+        instance.popperInstance.reference = node.popperRef();
+    }};
 
-  addTips(node) {
+    let tips = [];
+
     if (node.data().float_values || node.data().int_values) {
-      this.addTip(node, {
-        content: () => node_to_interval_string(node),
-        interactive: true,
+      tips.push(new Tippy(this.cy.container(), {
+        ...common,
+        content: node_to_interval_string(node),
         placement: 'top',
-        distance: 20,
-        theme: 'dark',
+        distance: 10,
         arrow: true,
-        animation: 'shift-away',
-        trigger: 'manual',
-        multiple: 'true'
-      });
+      }));
     }
 
     if (node.data().type) {
-      this.addTip(node, {
-        content: () => node.data().type,
-        interactive: true,
+      tips.push(new Tippy(this.cy.container(), {
+        ...common,
+        content: node.data().type,
         placement: 'bottom',
-        distance: 30,
+        distance: 20,
         theme: 'light-border',
-        arrow: false,
-        animation: 'shift-away',
-        trigger: 'manual',
-        multiple: 'true'
-      });
+        arrow: false
+      }));
     }
+
+    return tips;
+  }
+
+  addTips(node, options) {
+    let timeout = null, tips = undefined;
+
+    // Create tips lazily
+    node.on('mouseover', () => {
+      if (tips == undefined)
+        tips = this.createTips(node);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => tips?.forEach(tip => { tip.show() }), 200);
+     });
+
+    node.on('mouseout', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => tips?.forEach(tip => { tip.hide() }), 1000);
+    });
   }
 
   receiveData(data)
@@ -246,7 +268,7 @@ class Dive {
           parent = this.referenceFile(node.locality['file']).id();
 
         let ele = this.cy.add({data: {...node, parent}});
-        // this.addTips(ele);
+        this.addTips(ele);
         added_eles = this.cy.add(ele).union(added_eles);
       }
     }
