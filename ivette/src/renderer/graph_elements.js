@@ -5,6 +5,7 @@
 /** @module dome/graph/elements */
 
 import Cytoscape from 'cytoscape' ;
+import './graph_libs'
 
 const defaultStyle = [
   {

@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import Dome from 'dome';
+import * as Server from 'frama-c/server';
 
 import { Vfill } from 'dome/layout/boxes';
 import { Graph } from './graph_viewports';
 import { Component } from 'frama-c/LabViews';
-
-import "@fortawesome/fontawesome-free/js/all.js";
-
-import Cytoscape from 'cytoscape' ;
-
 import { Data } from './graph_elements';
 
 import Tippy from 'tippy.js'
@@ -17,23 +13,10 @@ import "tippy.js/themes/light-border.css";
 import 'tippy.js/animations/shift-away.css';
 import "./dive_tippy.css";
 
-import CytoscapeMenu from 'cytoscape-cxtmenu';
-import CytoscapePopper from 'cytoscape-popper';
-import CytoscapeLayoutDagre from 'cytoscape-dagre';
-import CytoscapeLayoutCola from 'cytoscape-cola';
-import CytoscapeLayoutCoseBilkent from 'cytoscape-cose-bilkent';
-import CytoscapeLayoutKlay from 'cytoscape-klay';
+import "@fortawesome/fontawesome-free/js/all.js";
 
-import * as Server from 'frama-c/server';
 import style from './dive_style.js';
 import layouts from './dive_layouts.js';
-
-Cytoscape.use(CytoscapePopper);
-Cytoscape.use(CytoscapeMenu);
-Cytoscape.use(CytoscapeLayoutDagre);
-Cytoscape.use(CytoscapeLayoutCola);
-Cytoscape.use(CytoscapeLayoutCoseBilkent);
-Cytoscape.use(CytoscapeLayoutKlay);
 
 
 function parseVariable(variable_name) {
