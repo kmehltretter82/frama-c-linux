@@ -1,3 +1,10 @@
+import React, { useState } from 'react';
+import Dome from 'dome';
+
+import { Vfill } from 'dome/layout/boxes';
+import { Graph } from './graph_viewports';
+import { Component } from 'frama-c/LabViews';
+
 import "@fortawesome/fontawesome-free/js/all.js";
 
 import Cytoscape from 'cytoscape' ;
@@ -28,6 +35,18 @@ Cytoscape.use(CytoscapeLayoutCola);
 Cytoscape.use(CytoscapeLayoutCoseBilkent);
 Cytoscape.use(CytoscapeLayoutKlay);
 
+
+function parseVariable(variable_name) {
+  let re = new RegExp(/^((\w+)::)?(\w+)$/);
+  let result = re.exec(variable_name);
+  if (result) {
+    if (result[2])
+      return {fun:result[2], var:result[3]};
+    else
+      return {var:result[3]};
+  }
+  return null;
+}
 
 function callstack_to_string(callstack)
 {
@@ -295,7 +314,6 @@ class Dive {
   }
 
   set layout(layoutName) {
-    console.log("changed layout for", layoutName);
     let extended_options = {};
     if (layoutName in layouts)
       extended_options = layouts[layoutName];
@@ -356,4 +374,51 @@ class Dive {
   }
 }
 
-export default Dive;
+
+export default () => {
+  const [dive, setDive] = useState(() => new Dive());
+
+  return (
+    <Component
+      id="dive.graph"
+      label="Imprecision graph"
+      title="Imprecision graph"
+    >
+      <Vfill>
+        <form onSubmit={event => {
+            let variable = parseVariable(event.target.variable.value);
+            variable && dive.addVariable(variable);
+            event.preventDefault();
+          }}>
+          <input type="text" defaultValue="fb_122_RecdXout::ffn" name="variable" />
+          <button>Find Variable</button>
+        </form>
+        <form onSubmit={event => {
+            dive.addFunctionAlarms(event.target.function.value);
+            event.preventDefault();
+          }}>
+          <input type="text" defaultValue="main" name="function" />
+          <button>Find Alarms</button>
+        </form>
+        <form onSubmit={event => {
+          dive.clear();
+          event.preventDefault();
+        }}>
+          <button>Clear graph</button>
+        </form>
+        <label>
+          Layout:
+          <select defaultValue="{dive.layout}" onChange={event => {
+            dive.layout = event.target.value;
+            dive.recomputeLayout();
+          }}>
+            <option value="cose-bilkent">cose-bilkent</option>
+            <option value="dagre">dagre</option>
+            <option value="cola">cola</option>
+            <option value="klay">klay</option>
+          </select>
+        </label>
+        <Graph data={dive.graph}/>
+      </Vfill>
+    </Component>);
+}
