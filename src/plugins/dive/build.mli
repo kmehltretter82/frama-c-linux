@@ -40,6 +40,11 @@ val add_lval : ?depth:int -> t -> Cil_types.kinstr -> Cil_types.lval -> unit
 val add_var : ?depth:int -> t -> Cil_types.varinfo -> unit
 val add_alarm : ?depth:int -> t -> Cil_types.stmt -> Alarms.alarm -> unit
 val add_function_alarms : ?depth:int -> t -> Cil_types.kernel_function -> unit
+val add_code_annotation : ?depth:int -> t -> Cil_types.stmt ->
+  Cil_types.code_annotation -> unit
+val add_property : ?depth:int -> t -> Property.t -> unit
+val add_localizable : ?depth:int -> t -> Printer_tag.localizable -> unit
+
 val explore_from_node : depth:int -> t -> Graph_types.node -> unit
 
 val show : ?depth:int -> t -> Graph_types.node -> unit

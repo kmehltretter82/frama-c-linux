@@ -609,6 +609,21 @@ let add_function_alarms ?(depth=1) context kf =
   in
   Alarms.iter add_one_alarm
 
+let add_code_annotation ?(depth=1) context stmt annot =
+  (* Only do something for alarms notations *)
+  Extlib.may (add_alarm ~depth context stmt) (Alarms.find annot)
+
+let add_property ?(depth=1) context = function
+  | Property.IPCodeAnnot { ica_stmt ; ica_ca } ->
+    add_code_annotation ~depth context ica_stmt ica_ca
+  | _ -> () (* Do nothing fo any other property *)
+
+let add_localizable ?(depth=1) context = function
+  | Printer_tag.PLval (_kf, kinstr, lval) -> add_lval ~depth context kinstr lval
+  | PVDecl (_kf, _kinstr, varinfo) -> add_var ~depth context varinfo
+  | PIP (prop) -> add_property ~depth context prop
+  | _ -> () (* Do nothing for any other localizable *)
+
 let explore_from_node ~depth context node =
   explore ~depth context node
 
