@@ -136,7 +136,7 @@ let parse_entry jcdb_dir r =
   let filename = r |> member "file" |> to_string in
   let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv jcdb_dir in
   let dirname =
-    if Filepath.is_relative dirname then Filename.concat jcdb_dir dirname
+    if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
     else dirname
   in
   let dirname = Filepath.normalize dirname in
@@ -164,7 +164,7 @@ let parse_entry jcdb_dir r =
   in
   (* conversion for '-I' flags *)
   let convert_path arg =
-    if Filepath.is_relative arg then Filename.concat dirname arg
+    if Filename.is_relative arg then Filename.concat dirname arg
     else arg
   in
   let convert_define arg =
