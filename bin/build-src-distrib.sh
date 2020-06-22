@@ -228,6 +228,8 @@ case "${STEP}" in
         run "cp Changelog $WEBSITE_DIR/src/last-release/Changelog"
         run "cp src/plugins/wp/Changelog $WEBSITE_DIR/src/wpChangelog"
         run "cp src/plugins/wp/Changelog $WEBSITE_DIR/src/last-release/wpChangelog"
+        run "cp src/plugins/e-acsl/doc/Changelog $WEBSITE_DIR/src/eacslChangelog"
+        run "cp src/plugins/e-acsl/doc/Changelog $WEBSITE_DIR/src/last-release/eacslChangelog"
     fi
     ;&
   3)
