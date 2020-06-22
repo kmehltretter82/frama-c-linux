@@ -49,10 +49,12 @@ let main () =
   in
   let j = Cil.makeLocalVar def ~insert:true "j" Cil.intType in
   let k = Cil.makeLocalVar def ~insert:true "k" Cil.intType in
+  let l = Cil.makeLocalVar def ~insert:true "l" Cil.intType in
   let p = Cil.makeLocalVar def ~insert:true "p" Cil.intPtrType in
   let q = Cil.makeLocalVar def ~insert:true "q" Cil.intPtrType in
   add_assigns e1 kf s j;
   add_assigns e2 kf s k;
+  add_assigns e1 kf s l;
   add_allocates e1 kf s p;
   add_allocates e2 kf s q;
   Annotations.iter_code_annot (check_only_one Logic_utils.is_assigns) s;

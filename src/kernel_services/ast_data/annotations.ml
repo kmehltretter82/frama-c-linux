@@ -1151,16 +1151,18 @@ let add_code_annot emitter ?kf stmt ca =
            "trying to register a second variant for statement %a"
            Stmt.pretty stmt)
     | AAssigns (bhvs, assigns) ->
-      let filter ca =
+      let filter_ca ca =
         match ca.annot_content with
         | AAssigns (bhvs', _) -> is_same_behavior_set bhvs bhvs'
         | _ -> false
       in
-      let ca' = code_annot ~filter stmt in
+      let filter e ca = Emitter.equal e emitter && filter_ca ca in
+      let ca_e = code_annot_emitter ~filter stmt in
+      let ca_total = code_annot ~filter:filter_ca stmt in
       let new_a =
-        match ca' with
+        match ca_e with
         | [] -> a
-        | [ { annot_content = AAssigns(_, assigns') } as ca ] ->
+        | [ { annot_content = AAssigns(_, assigns') } as ca,_ ] ->
           remove_code_annot_internal emitter ~kf stmt ca;
           let merged =
             merge_assigns ~keep_empty:false assigns' assigns
@@ -1171,7 +1173,18 @@ let add_code_annot emitter ?kf stmt ca =
             "More than one loop assigns clause for a statement. \
              Annotations internal state broken."
       in
-      let ips = Property.ip_of_code_annot kf stmt new_a in
+      let ips =
+        match ca_total with
+        | [] -> Property.ip_of_code_annot kf stmt a
+        | [ { annot_content = AAssigns (_,assigns') } ] ->
+          let merged = merge_assigns ~keep_empty:false assigns' assigns in
+          Property.ip_of_code_annot
+            kf stmt { a with annot_content = AAssigns(bhvs,merged) }
+        | _ ->
+          Kernel.fatal
+            "More than one loop assigns clause for a statement. \
+             Annotations internal state broken."
+      in
       new_a, ips
     | AAllocation (bhvs, alloc) ->
       let filter ca =
