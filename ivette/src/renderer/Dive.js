@@ -20,18 +20,6 @@ import style from './dive_style.js';
 import layouts from './dive_layouts.js';
 
 
-function parseVariable(variable_name) {
-  let re = new RegExp(/^((\w+)::)?(\w+)$/);
-  let result = re.exec(variable_name);
-  if (result) {
-    if (result[2])
-      return {fun:result[2], var:result[3]};
-    else
-      return {var:result[3]};
-  }
-  return null;
-}
-
 function callstack_to_string(callstack)
 {
   return callstack.map(cs => cs['fun'] + ':' + cs['instr']).join('/');
@@ -331,12 +319,8 @@ class Dive {
     this.exec("dive.clear", null);
   }
 
-  addVariable(variable) {
-    this.exec("dive.add_var", variable);
-  }
-
-  addFunctionAlarms(function_name) {
-    this.exec("dive.add_function_alarms", function_name);
+  addNode(marker) {
+    this.exec("dive.add_node", marker);
   }
 
   explore(node) {
@@ -368,10 +352,10 @@ export default () => {
 
   React.useEffect(() => {
     if (marker) {
-      const mark = markers[marker];
-      if (mark && mark.kind === 'variable') {
-        const variable = {fun: fun, var: mark.name};
-        dive.addVariable(variable);
+      const kind = markers[marker]?.kind;
+      if (kind === 'variable' || kind === 'lvalue' || kind === 'declaration'
+          || kind === 'property') {
+        dive.addNode(marker);
       }
     }
   }, [fun, marker, markers]);
@@ -383,21 +367,6 @@ export default () => {
       title="Imprecision graph"
     >
       <Vfill>
-        <form onSubmit={event => {
-            let variable = parseVariable(event.target.variable.value);
-            variable && dive.addVariable(variable);
-            event.preventDefault();
-          }}>
-          <input type="text" defaultValue="fb_122_RecdXout::ffn" name="variable" />
-          <button>Find Variable</button>
-        </form>
-        <form onSubmit={event => {
-            dive.addFunctionAlarms(event.target.function.value);
-            event.preventDefault();
-          }}>
-          <input type="text" defaultValue="main" name="function" />
-          <button>Find Alarms</button>
-        </form>
         <form onSubmit={event => {
           dive.clear();
           event.preventDefault();
