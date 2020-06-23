@@ -89,7 +89,7 @@ val on_signal : signal -> (bool -> unit) -> unit
 *)
 val register :
   package:package ->
-  kind:Main.kind ->
+  kind:kind ->
   name:string ->
   descr:Markdown.text ->
   input:'a input ->

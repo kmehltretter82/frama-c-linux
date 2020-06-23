@@ -133,10 +133,10 @@ type package
 
 val package :
   ?plugin:string ->
+  ?name:string ->
   title:string ->
   ?descr:Markdown.text ->
   ?readme:string ->
-  name:string ->
   unit -> package
 
 (**

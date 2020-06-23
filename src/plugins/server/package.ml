@@ -302,16 +302,16 @@ let collection = ref None (* computed *)
 let name_re = Str.regexp "^[a-zA-Z0-9]+$"
 let package_re = Str.regexp "^[a-z0-9]+\\(\\.[a-z0-9]+\\)*$"
 
-let check_name name =
-  if not (Str.string_match name_re name 0) then
-    Senv.fatal
-      "Invalid identifier %S (use « camlCased » names)" name
-
 let check_package pkg =
   if not (Str.string_match package_re pkg 0) then
     Senv.fatal
       "Invalid package identifier %S (use dot separated lowercase names)"
       pkg
+
+let check_name name =
+  if not (Str.string_match name_re name 0) then
+    Senv.fatal
+      "Invalid identifier %S (use « camlCased » names)" name
 
 let register_ident id =
   if IdSet.mem id !registry then
@@ -333,10 +333,11 @@ let resolve_readme ~plugin = function
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package ?plugin ~title ?(descr=[]) ?readme ~name () =
-  check_package name ;
+let package ?plugin ?name ~title ?(descr=[]) ?readme () =
   let plugin = match plugin with None -> Kernel | Some p -> Plugin p in
-  let pkgname = String.split_on_char '.' name in
+  let pkgname = match name with
+    | None -> []
+    | Some pkg -> check_package pkg ; String.split_on_char '.' pkg in
   let pkgid = { plugin ; package = pkgname ; name = "*"} in
   let pkgInfo = {
     p_plugin = plugin ;

@@ -33,30 +33,27 @@ let get_graph =
       graph := Some g;
       g
 
-
-let page = Doc.page (`Plugin "dive")
-    ~title:"Dive Services"
-    ~filename:"dive.md"
+let package = Package.package ~plugin:"dive" ~title:"Dive Services" ()
 
 module Graph =
 struct
   type t = Imprecision_graph.t
-  let syntax = Syntax.any
+  let jtype = Data.Jany.jtype
   let to_json = Imprecision_graph.to_json
 end
 
 module GraphDiff =
 struct
   type t = Imprecision_graph.t * Graph_types.graph_diff
-  let syntax = Syntax.any
+  let jtype = Data.Jany.jtype
   let to_json = fun (g,d) -> Imprecision_graph.diff_to_json g d
 end
 
 module Variable = Data.Collection (struct
-    let name = "dive-variable-name"
+    let name = "variableName"
     let descr = Markdown.plain "The name of variable of the program"
 
-    let signature = Data.Record.signature ~page ~name ~descr ()
+    let signature = Data.Record.signature ()
 
     let _fun_field = Data.Record.option signature
         ~descr:(Markdown.plain "owner function for a local variable")
@@ -68,9 +65,9 @@ module Variable = Data.Collection (struct
 
     type t = Cil_types.varinfo
     module R =
-      (val (Data.Record.publish signature): Data.Record.S with type r = t)
+      (val (Data.Record.publish ~package ~name ~descr signature): Data.Record.S with type r = t)
 
-    let syntax = R.syntax
+    let jtype = R.jtype
 
     let to_json v =
       let varname = v.Cil_types.vname in
@@ -116,9 +113,7 @@ module Variable = Data.Collection (struct
 module Function = Data.Collection (struct
     type t = Cil_types.kernel_function
 
-    let syntax = Syntax.publish ~page ~name:"dive-function-name"
-        ~synopsis:Syntax.string
-        ~descr:(Markdown.plain "The name of a function of the program") ()
+    let jtype = Package.Jkey "fct-name"
 
     let to_json kf =
       `String (Kernel_function.get_name kf)
@@ -135,9 +130,7 @@ module Function = Data.Collection (struct
 module Node = Data.Collection (struct
     type t = Graph_types.node
 
-    let syntax = Syntax.publish ~page ~name:"dive-node"
-        ~synopsis:Syntax.int
-        ~descr:(Markdown.plain "A node identifier in the graph") ()
+    let jtype = Package.Jindex "dive-node"
 
     let to_json node =
       `Int node.Graph_types.node_key
@@ -152,20 +145,20 @@ module Node = Data.Collection (struct
   end)
 
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"dive.graph"
+let () = Request.register ~package
+    ~kind:`GET ~name:"graph"
     ~descr:(Markdown.plain "Retrieve the whole graph")
     ~input:(module Data.Junit) ~output:(module Graph)
     (fun () -> Build.get_graph (get_graph ()))
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.clear"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
     (fun () -> Build.clear (get_graph ()))
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.add_var"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"addVar"
     ~descr:(Markdown.plain "Add a variable to the graph")
     ~input:(module Variable) ~output:(module GraphDiff)
     begin fun var ->
@@ -175,8 +168,8 @@ let () = Request.register ~page
       Build.get_graph g, Build.take_last_differences g
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.add_function_alarms"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"addFunctionAlarms"
     ~descr:(Markdown.plain "Add all alarms of the given function")
     ~input:(module Function) ~output:(module GraphDiff)
     begin fun kf ->
@@ -186,8 +179,8 @@ let () = Request.register ~page
       Build.get_graph g, Build.take_last_differences g
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.explore"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
@@ -197,8 +190,8 @@ let () = Request.register ~page
       Build.get_graph g, Build.take_last_differences g
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.show"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
@@ -208,8 +201,8 @@ let () = Request.register ~page
       Build.get_graph g, Build.take_last_differences g
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.hide"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
