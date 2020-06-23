@@ -385,10 +385,10 @@ class Dive {
 export default () => {
   const [dive] = useState(() => new Dive());
   const [selection] = States.useSelection();
-  const fun = selection?.current?.function;
   const marker = selection?.current?.marker;
   const markers = States.useSyncArray('kernel.ast.markerKind');
 
+  // Updates the graph according to the selected marker.
   React.useEffect(() => {
     if (marker) {
       const kind = markers[marker]?.kind;
@@ -397,7 +397,7 @@ export default () => {
         dive.addNode(marker);
       }
     }
-  }, [dive, fun, marker, markers]);
+  }, [dive, marker, markers]);
 
   return (
     <Component
