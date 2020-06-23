@@ -1087,7 +1087,7 @@ let add_extended e kf ?stmt ?active ?behavior ext =
 
 (** {3 Adding code annotations} *)
 
-let add_code_annot emitter ?kf stmt ca =
+let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
   (*  Kernel.feedback "%a: adding code annot %a with stmt %a (%d)"
       Project.pretty (Project.current ())
       Code_annotation.pretty ca
@@ -1165,7 +1165,7 @@ let add_code_annot emitter ?kf stmt ca =
         | [ { annot_content = AAssigns(_, assigns') } as ca,_ ] ->
           remove_code_annot_internal emitter ~kf stmt ca;
           let merged =
-            merge_assigns ~keep_empty:false assigns' assigns
+            merge_assigns ~keep_empty assigns' assigns
           in
           { a with annot_content = AAssigns (bhvs, merged) }
         | _ ->
@@ -1177,7 +1177,7 @@ let add_code_annot emitter ?kf stmt ca =
         match ca_total with
         | [] -> Property.ip_of_code_annot kf stmt a
         | [ { annot_content = AAssigns (_,assigns') } ] ->
-          let merged = merge_assigns ~keep_empty:false assigns' assigns in
+          let merged = merge_assigns ~keep_empty assigns' assigns in
           Property.ip_of_code_annot
             kf stmt { a with annot_content = AAssigns(bhvs,merged) }
         | _ ->
@@ -1197,7 +1197,7 @@ let add_code_annot emitter ?kf stmt ca =
        | l ->
          let merge_alloc_ca acc alloc =
            match alloc.annot_content with
-           | AAllocation(_,a) -> merge_allocation ~keep_empty:false acc a
+           | AAllocation(_,a) -> merge_allocation ~keep_empty acc a
            | _ -> acc
          in
          let alloc' = List.fold_left merge_alloc_ca FreeAllocAny l in
@@ -1210,7 +1210,7 @@ let add_code_annot emitter ?kf stmt ca =
                (Id_loop merged_a) alloc')
          in
          Extlib.may Property_status.remove ip;
-         let new_alloc = merge_allocation ~keep_empty:false alloc' alloc in
+         let new_alloc = merge_allocation ~keep_empty alloc' alloc in
          let new_a =
            { a with annot_content = AAllocation(bhvs,new_alloc) }
          in
@@ -1227,7 +1227,7 @@ let add_code_annot emitter ?kf stmt ca =
              { a with annot_content =
                         AAllocation(
                           bhvs,
-                          merge_allocation ~keep_empty:false alloc' alloc) }
+                          merge_allocation ~keep_empty alloc' alloc) }
            | _ ->
              Kernel.fatal
                "More than one allocation clause for a statement. \

@@ -124,7 +124,8 @@ object(self)
                remove;
              List.iter
                (fun (e, a) ->
-                  Annotations.add_code_annot e ~kf:new_kf stmt a)
+                  Annotations.add_code_annot
+                    ~keep_empty:false e ~kf:new_kf stmt a)
                add)
           self#get_filling_actions
       end
