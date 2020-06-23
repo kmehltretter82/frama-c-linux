@@ -470,14 +470,17 @@ let build_node_deps context node =
       build_exp_deps callstack stmt kind e2
 
   and build_lval_deps callstack stmt kind lval =
-    let dst = build_lval context callstack (Kstmt stmt) lval in
-    Graph.create_dependency ~allow_folding:true context.graph dst kind node
+    let kinstr = Kstmt stmt in
+    let dst = build_lval context callstack kinstr lval in
+    Graph.create_dependency ~allow_folding:true
+      context.graph kinstr dst kind node
 
   and build_scattered_deps callstack kinstr lval =
     let nodes = build_all_scattered_node context callstack kinstr lval in
     let kind = Composition in
     let add_dep dst =
-      Graph.create_dependency ~allow_folding:true context.graph dst kind node
+      Graph.create_dependency ~allow_folding:true
+        context.graph kinstr dst kind node
     in
     List.iter add_dep nodes
 
@@ -515,7 +518,7 @@ let create () =
     hidden_bases = BaseSet.empty;
     focus = FunctionMap.empty;
     roots = [];
-    graph_diff = { added_nodes=[] ; removed_nodes=[] };
+    graph_diff = { last_root = None ; added_nodes=[] ; removed_nodes=[] };
   }
 
 let clear context =
@@ -524,7 +527,7 @@ let clear context =
   context.node_table <- NodeTable.create 13;
   context.focus <- FunctionMap.empty;
   context.roots <- [];
-  context.graph_diff <- { added_nodes=[] ; removed_nodes=[] }
+  context.graph_diff <- { last_root = None ; added_nodes=[] ; removed_nodes=[] }
 
 
 (* --- Accessors --- *)
@@ -551,6 +554,7 @@ let unhide_base context vi =
   context.hidden_bases <- BaseSet.add vi context.hidden_bases
 
 let explore ~depth context root =
+  context.graph_diff <- { context.graph_diff with last_root = Some root };
   let should_auto_explore node =
     let is_root = Graph.Node.equal node root (* the root is always explored *)
     and is_intersting_kind = match node.node_kind with
@@ -613,6 +617,18 @@ let add_code_annotation ?(depth=1) context stmt annot =
   (* Only do something for alarms notations *)
   Extlib.may (add_alarm ~depth context stmt) (Alarms.find annot)
 
+let add_instr ?(depth=1) context stmt = function
+  | Set (lval, _, _)
+  | Call (Some lval, _, _, _) -> add_lval ~depth context (Kstmt stmt) lval
+  | Local_init (vi, _, _) -> add_var ~depth context vi
+  | Code_annot (annot, _) -> add_code_annotation ~depth context stmt annot
+  | _ -> () (* Do nothing for any other instruction *)
+
+let add_stmt ?(depth=1) context stmt =
+  match stmt.skind with
+  | Instr instr -> add_instr ~depth context stmt instr
+  | _ -> () (* Do nothing for any other statements *)
+
 let add_property ?(depth=1) context = function
   | Property.IPCodeAnnot { ica_stmt ; ica_ca } ->
     add_code_annotation ~depth context ica_stmt ica_ca
@@ -622,6 +638,7 @@ let add_localizable ?(depth=1) context = function
   | Printer_tag.PLval (_kf, kinstr, lval) -> add_lval ~depth context kinstr lval
   | PVDecl (_kf, _kinstr, varinfo) -> add_var ~depth context varinfo
   | PIP (prop) -> add_property ~depth context prop
+  | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt ~depth context stmt
   | _ -> () (* Do nothing for any other localizable *)
 
 let explore_from_node ~depth context node =
@@ -645,6 +662,7 @@ let hide context node =
       List.iter (remove_node context) disconnected_nodes;
       (* Dependencies are not there anymore *)
       node.node_deps_computed <- false;
+      node.node_write_stmts <- [];
       (* Notify node update *)
       update_node context node
     end
@@ -653,8 +671,13 @@ let take_last_differences context =
   let pp_node fmt n = Format.pp_print_int fmt n.node_key in
   let pp_node_list = Pretty_utils.pp_list ~sep:",@, " pp_node in
   let diff = context.graph_diff in
-  Self.debug ~dkey "added: %a,@, subbed: %a"
+  Self.debug ~dkey "root: %a,@, added: %a,@, subbed: %a"
+    (Pretty_utils.pp_opt pp_node) diff.last_root
     pp_node_list diff.added_nodes
     pp_node_list diff.removed_nodes;
-  context.graph_diff <- { added_nodes=[] ; removed_nodes=[] };
+  context.graph_diff <- {
+    last_root = None ;
+    added_nodes=[] ;
+    removed_nodes=[]
+  };
   diff

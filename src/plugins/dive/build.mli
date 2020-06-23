@@ -42,6 +42,7 @@ val add_alarm : ?depth:int -> t -> Cil_types.stmt -> Alarms.alarm -> unit
 val add_function_alarms : ?depth:int -> t -> Cil_types.kernel_function -> unit
 val add_code_annotation : ?depth:int -> t -> Cil_types.stmt ->
   Cil_types.code_annotation -> unit
+val add_stmt : ?depth:int -> t -> Cil_types.stmt -> unit
 val add_property : ?depth:int -> t -> Property.t -> unit
 val add_localizable : ?depth:int -> t -> Printer_tag.localizable -> unit
 

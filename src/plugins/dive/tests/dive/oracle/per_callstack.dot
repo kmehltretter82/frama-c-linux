@@ -1,50 +1,50 @@
 digraph G {
-  cp0 [label=<w>, shape=box, ];
-  cp1 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp1 [label=<w>, shape=box, ];
+  cp2 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp3 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp4 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp5 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp6 [label=<z>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp7 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp8 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp9 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-       style="filled", ];
-  cp11 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp10 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp13 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp12 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp15 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp14 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp17 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp16 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp19 [label=<a>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp18 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp21 [label=<b>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp20 [label=<a>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp23 [label=<c>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp22 [label=<b>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp24 [label=<c>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp23;cp21;cp19;cp5;cp3;cp1;cp0;
-    subgraph cluster_cs_2 { label=<f>; cp13;cp7;
+  subgraph cluster_cs_1 { label=<main>; cp24;cp22;cp20;cp6;cp4;cp2;cp1;
+    subgraph cluster_cs_2 { label=<f>; cp14;cp8;
        };
-    subgraph cluster_cs_3 { label=<f>; cp15;cp9;
+    subgraph cluster_cs_3 { label=<f>; cp16;cp10;
        };
-    subgraph cluster_cs_4 { label=<f>; cp17;cp11;
+    subgraph cluster_cs_4 { label=<f>; cp18;cp12;
        };
      };
   
-  cp1 -> cp0;
-  cp3 -> cp0;
-  cp5 -> cp0;
-  cp7 -> cp1;
-  cp9 -> cp3;
-  cp11 -> cp5;
-  cp13 -> cp7;
-  cp15 -> cp9;
-  cp17 -> cp11;
-  cp19 -> cp13;
-  cp21 -> cp15;
-  cp23 -> cp17;
+  cp2 -> cp1;
+  cp4 -> cp1;
+  cp6 -> cp1;
+  cp8 -> cp2;
+  cp10 -> cp4;
+  cp12 -> cp6;
+  cp14 -> cp8;
+  cp16 -> cp10;
+  cp18 -> cp12;
+  cp20 -> cp14;
+  cp22 -> cp16;
+  cp24 -> cp18;
   
   }

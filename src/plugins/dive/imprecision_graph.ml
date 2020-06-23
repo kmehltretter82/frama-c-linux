@@ -40,6 +40,7 @@ struct
     dependency_key = -1;
     dependency_kind = Data;
     dependency_multiple = false;
+    dependency_origins = []
   }
 end
 
@@ -53,20 +54,22 @@ let vertices g =
 let edges g =
   fold_edges_e (fun d acc -> d ::acc) g []
 
-let next_key = ref 0
+let fresh_key =
+  let next_key = ref 0 in
+  fun () -> incr next_key; !next_key
 
 let create_node ~node_kind ~node_locality g =
   let node = {
-    node_key = !next_key;
+    node_key = fresh_key ();
     node_kind;
     node_locality;
     node_hidden = false;
     node_int_values = None;
     node_float_values = None;
     node_deps_computed = false;
+    node_write_stmts = [];
   }
   in
-  incr next_key;
   add_vertex g node;
   node
 
@@ -112,7 +115,7 @@ let update_node_float_values node new_values =
     Some (Extlib.opt_fold merge_float_values node.node_float_values new_values)
 
 
-let create_dependency ~allow_folding g v1 dependency_kind v2 =
+let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
   let same_kind (_,e,_) =
     e.dependency_kind = dependency_kind
   in
@@ -124,18 +127,30 @@ let create_dependency ~allow_folding g v1 dependency_kind v2 =
         None
     with Not_found -> None
   in
-  match matching_edge with
-  | Some (_,e,_) ->
-    e.dependency_multiple <- true
-  | None ->
-    let e = {
-      dependency_key = !next_key;
-      dependency_kind;
-      dependency_multiple = false;
-    }
-    in
-    incr next_key;
-    add_edge_e g (v1,e,v2)
+  let e = match matching_edge with
+    | Some (_,e,_) ->
+      e.dependency_multiple <- true;
+      e
+    | None ->
+      let e = {
+        dependency_key = fresh_key ();
+        dependency_kind;
+        dependency_multiple = false;
+        dependency_origins = []
+      }
+      in
+      add_edge_e g (v1,e,v2);
+      e
+  in
+  (* Add origins *)
+  match kinstr with
+  | Cil_types.Kglobal -> ()
+  | Kstmt stmt ->
+    let compare = Cil_datatype.Stmt.compare in
+    let add_to l = List.sort_uniq compare (stmt :: l) in
+    e.dependency_origins <- add_to e.dependency_origins;
+    v2.node_write_stmts <- add_to v2.node_write_stmts
+
 
 let remove_dependency g edge =
   remove_edge_e g edge
@@ -247,6 +262,10 @@ let ouptput_to_dot out_channel g =
 
 module JsonPrinter =
 struct
+  let output_stmt stmt =
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Server.Kernel_ast.Marker.to_json (PStmt (kf, stmt))
+
   let output_kinstr = function
     | Cil_types.Kglobal -> `String "global"
     | Cil_types.Kstmt stmt -> `Int stmt.Cil_types.sid
@@ -330,6 +349,7 @@ struct
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
         ("explored", `Bool node.node_deps_computed) ;
+        ("writes", `List (List.map output_stmt node.node_write_stmts)) ;
       ] @
         begin match node.node_int_values with
           | None -> []
@@ -355,7 +375,8 @@ struct
       ("src", `Int n1.node_key) ;
       ("dst", `Int n2.node_key) ;
       ("kind", output_dep_kind dep.dependency_kind) ;
-      ("multiple", `Bool dep.dependency_multiple)
+      ("multiple", `Bool dep.dependency_multiple) ;
+      ("origins", `List (List.map output_stmt dep.dependency_origins)) ;
     ]
 
   let output_graph g =
@@ -365,7 +386,10 @@ struct
     ]
 
   let output_diff g diff =
-    let added_nodes = List.map output_node diff.added_nodes
+    let root = match diff.last_root with
+      | None -> `Null
+      | Some root -> `Int root.node_key
+    and added_nodes = List.map output_node diff.added_nodes
     and added_deps =
       let module Set = Set.Make (struct
           type t = edge
@@ -383,6 +407,7 @@ struct
       List.map (fun node -> `Int node.node_key) diff.removed_nodes
     in
     `Assoc [
+      ("root", root) ;
       ("add", `Assoc [
           ("nodes", `List added_nodes) ;
           ("deps", `List added_deps)

@@ -96,12 +96,14 @@ class Dive {
   cy: Cytoscape.Core;
   layoutName = '';
   layoutOptions: Cytoscape.LayoutOptions | undefined;
+  currentSelection: string | null = null;
+  onSelect: ((marker: string | null) => void) | null = null;
 
   constructor(cy: Cytoscape.Core | null = null) {
     this.cy = cy || Cytoscape();
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
-    this.cy.off('select');
+    this.cy.off('click');
 
     this.layout = 'cose-bilkent';
 
@@ -114,10 +116,9 @@ class Dive {
   }
 
   setupSelection(): void {
-    /* when a node is selected, also select neighbor edges */
-    this.cy.on('select', 'node', (event) => {
+    this.cy.on('click', 'node', (event) => {
       const node = event.target;
-      node.neighborhood('edge').select();
+      node.select();
       this.explore(node);
     });
   }
@@ -304,7 +305,7 @@ class Dive {
     for (const dep of data.deps)
     {
       const ele = this.cy.add({
-        data: { id: dep.id, source: dep.src, target: dep.dst },
+        data: { ...dep, source: dep.src, target: dep.dst },
         group: 'edges',
         classes: dep.kind,
       });
@@ -323,6 +324,8 @@ class Dive {
     const newEles = this.receiveGraph(data.add);
 
     this.cy.endBatch();
+
+    this.selectNode(this.cy.$id(data.root));
 
     if (newEles)
       this.recomputeLayout();
@@ -405,13 +408,28 @@ class Dive {
     if (id)
       this.exec('dive.hide', id);
   }
+
+  selectNode(node: Cytoscape.NodeSingular): void {
+    const { writes } = node.data(); // List of localizable for writes
+    const index = writes.indexOf(this.currentSelection);
+    this.currentSelection = writes[index + 1 in writes ? index + 1 : 0];
+
+    const hasOrigin = (ele: Cytoscape.NodeSingular) => (
+      ele.data().origins.includes(this.currentSelection)
+    );
+
+    node.select();
+    node.incomers('edge').filter(hasOrigin).select();
+
+    this.onSelect?.(this.currentSelection);
+  }
 }
 
 
 const GraphView = () => {
 
   // Hooks
-  const [dive, setDive] = useState(new Dive());
+  const [dive, setDive] = useState(() => new Dive());
   const node: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
@@ -433,13 +451,9 @@ const GraphView = () => {
   useEffect(() => {
     if (!lock && marker && marker !== node.current) {
       node.current = marker;
-      const kind = markers[marker]?.kind;
-      if (kind === 'variable' || kind === 'lvalue' || kind === 'declaration'
-          || kind === 'property') {
-        if (selectionMode === 'follow')
-          dive.clear();
-        dive.addNode(marker);
-      }
+      if (selectionMode === 'follow')
+        dive.clear();
+      dive.addNode(marker);
     }
   }, [dive, lock, marker, markers, selectionMode]);
 

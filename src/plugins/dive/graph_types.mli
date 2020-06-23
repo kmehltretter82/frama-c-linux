@@ -49,6 +49,7 @@ type node = {
   mutable node_int_values : (Integer.t node_values) option;
   mutable node_float_values : (float node_values) option;
   mutable node_deps_computed : bool;
+  mutable node_write_stmts : Cil_types.stmt list;
 }
 
 type dependency_kind = Callee | Data | Address | Control | Composition
@@ -57,9 +58,11 @@ type dependency = {
   dependency_key : int;
   dependency_kind : dependency_kind;
   mutable dependency_multiple : bool;
+  mutable dependency_origins : Cil_types.stmt list;
 }
 
 type graph_diff = {
+  last_root: node option;
   added_nodes: node list;
   removed_nodes: node list;
 }

@@ -41,8 +41,8 @@ val remove_node : t -> node -> unit
 val update_node_int_values : node -> Integer.t node_values -> unit
 val update_node_float_values : node -> float node_values -> unit
 
-val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
-  node -> unit
+val create_dependency : allow_folding:bool -> t -> Cil_types.kinstr ->
+  node -> dependency_kind -> node -> unit
 
 val remove_dependency : t -> node * dependency * node -> unit
 
