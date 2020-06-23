@@ -222,9 +222,9 @@ let relativize page target =
         go_up p1 @ l2
       | d2 :: p2 when d2 = d1 -> remove_common p1 p2
       | _ -> go_up p1 @ l2
-    in
-    let relative = remove_common page_dir target_dir in
-    String.concat "/" relative
+  in
+  let relative = remove_common page_dir target_dir in
+  String.concat "/" relative
 
 let pp_href ?(page="") fmt = function
   | URL s -> Format.pp_print_string fmt s
