@@ -3,6 +3,7 @@ import { strict as assert } from 'assert';
 import Cytoscape from 'cytoscape';
 import React, { useState } from 'react';
 import { renderToString } from 'react-dom/server';
+import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
@@ -12,8 +13,9 @@ import 'tippy.js/themes/light-border.css';
 import 'tippy.js/animations/shift-away.css';
 import './dive_tippy.css';
 
-import { Vfill } from 'dome/layout/boxes';
-import { Component } from 'frama-c/LabViews';
+import { IconButton } from 'dome/controls/buttons';
+import { Space } from 'dome/frame/toolbars';
+import { Component, TitleBar } from 'frama-c/LabViews';
 import { Data } from './graph_elements';
 import { Graph } from './graph_viewports';
 
@@ -328,6 +330,7 @@ class Dive {
     let extendedOptions = {};
     if (layoutName in layouts)
       extendedOptions = (layouts as {[key: string]: object})[layoutName];
+    this.layoutName = layoutName;
     this.layoutOptions = {
       name: layoutName,
       fit: true,
@@ -401,33 +404,39 @@ const GraphView = () => {
     }
   }, [dive, marker, markers]);
 
+  // Layout selection
+  const selectLayout = (layout?: string) => {
+    if (layout) {
+      dive.layout = layout;
+      dive.recomputeLayout();
+    }
+  };
+  const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
+  const layoutItem = (id: string) => (
+    { id, label: id, checked: (id === dive.layout) }
+  );
+  const layoutMenu = () => {
+    Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
+  };
+
   // Component
   return (
-    <Vfill>
-      <form onSubmit={(event) => {
-        dive.clear();
-        event.preventDefault();
-      }}
-      >
-        <button type="button">Clear graph</button>
-      </form>
-      <div>
-        Layout:
-        <select
-          defaultValue="{dive.layout}"
-          onChange={(event) => {
-            dive.layout = event.target.value;
-            dive.recomputeLayout();
-          }}
-        >
-          <option value="cose-bilkent">cose-bilkent</option>
-          <option value="dagre">dagre</option>
-          <option value="cola">cola</option>
-          <option value="klay">klay</option>
-        </select>
-      </div>
+    <>
+      <TitleBar>
+        <IconButton
+          icon="DISPLAY"
+          onClick={layoutMenu}
+          title="Choose the graph layout"
+        />
+        <Space />
+        <IconButton
+          icon="TRASH"
+          onClick={() => dive.clear()}
+          title="Clear the graph"
+        />
+      </TitleBar>
       <Graph data={dive.graph} />
-    </Vfill>
+    </>
   );
 
 };
