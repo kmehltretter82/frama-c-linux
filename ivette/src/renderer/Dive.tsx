@@ -389,20 +389,23 @@ const GraphView = () => {
 
   // Hooks
   const [dive] = useState(() => new Dive());
+  const node: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
   const markers = States.useSyncArray('kernel.ast.markerKind');
+  const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
 
   // Updates the graph according to the selected marker.
   React.useEffect(() => {
-    if (marker) {
+    if (!lock && marker && marker !== node.current) {
+      node.current = marker;
       const kind = markers[marker]?.kind;
       if (kind === 'variable' || kind === 'lvalue' || kind === 'declaration'
           || kind === 'property') {
         dive.addNode(marker);
       }
     }
-  }, [dive, marker, markers]);
+  }, [dive, lock, marker, markers]);
 
   // Layout selection
   const selectLayout = (layout?: string) => {
@@ -423,6 +426,14 @@ const GraphView = () => {
   return (
     <>
       <TitleBar>
+        <IconButton
+          icon="LOCK"
+          onClick={flipLock}
+          kind={lock ? 'negative' : 'positive'}
+          title={lock ?
+            'Unlock the graph: update the graph with the selection' :
+            'Lock the graph: do not update the graph with the selection'}
+        />
         <IconButton
           icon="DISPLAY"
           onClick={layoutMenu}
