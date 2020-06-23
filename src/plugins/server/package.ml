@@ -30,21 +30,17 @@ module Md = Markdown
 type plugin = Kernel | Plugin of string
 type ident = { plugin: plugin; package: string list; name: string }
 
-let pp_plugin fmt = function
-  | Kernel -> Format.pp_print_string fmt "Kernel"
-  | Plugin p -> Format.fprintf fmt "Plugin %s" p
-
 let pp_step fmt a =
   ( Format.pp_print_string fmt a ; Format.pp_print_char fmt '.' )
 
-let pp_plugin_step fmt = function
-  | Kernel -> ()
+let pp_plugin fmt = function
+  | Kernel -> pp_step fmt "kernel"
   | Plugin p -> pp_step fmt p
 
 let pp_ident fmt { plugin ; package ; name } =
-  ( pp_plugin_step fmt plugin ;
+  ( pp_plugin fmt plugin ;
     List.iter (pp_step fmt) package ;
-    pp_step fmt name )
+    Format.pp_print_string fmt name )
 
 (* -------------------------------------------------------------------------- *)
 (* --- Name Resolution                                                    --- *)
@@ -246,7 +242,7 @@ let name_of_pkginfo ?sep { p_plugin ; p_package } =
   name_of_pkg ?sep p_plugin p_package
 
 let pp_pkgname fmt { p_plugin ; p_package } =
-  ( pp_plugin_step fmt p_plugin ;
+  ( pp_plugin fmt p_plugin ;
     List.iter (pp_step fmt) p_package )
 
 (* -------------------------------------------------------------------------- *)
