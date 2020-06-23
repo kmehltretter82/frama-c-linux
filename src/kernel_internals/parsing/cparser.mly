@@ -66,7 +66,7 @@ let smooth_expression lst =
       let end_loc = snd (Extlib.last lst).expr_loc in
       { expr_loc = (beg_loc,end_loc); expr_node = COMMA (lst) }
 
-let merge_string (c1,(b1,_)) (c2,(_,e2)) = c1 @ c2, (b1,e2)
+let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
 
 (* To be called only inside a grammar rule. *)
 let make_expr e =
@@ -213,12 +213,13 @@ let int64_to_char value =
     Char.chr (Int64.to_int value)
 
 (* takes a not-nul-terminated list, and converts it to a string. *)
-let intlist_to_string (str: int64 list):string =
-  let buffer = Buffer.create (List.length str) in
+let intlist_to_string str =
+  let buffer = Buffer.create 64 in
   let add_char c =
     Buffer.add_char buffer (int64_to_char c)
   in
-  List.iter add_char str ;
+  let add_char_list l = List.iter add_char l in
+  List.iter add_char_list str ;
   Buffer.contents buffer
 
 let fst3 (result, _, _) = result
@@ -407,8 +408,6 @@ let in_ghost_block ?(battrs=[]) l =
 %type <Cabs.expression list> paren_comma_expression
 %type <Cabs.expression list> arguments
 %type <Cabs.expression list> bracket_comma_expression
-%type <int64 list * cabsloc> string_list
-%type <int64 list * cabsloc> wstring_list
 
 %type <Cabs.initwhat * Cabs.init_expression> initializer_single
 %type <(Cabs.initwhat * Cabs.init_expression) list> initializer_list
@@ -746,12 +745,12 @@ expression:           /*(* 6.5.17 *)*/
 
 
 constant:
-    CST_INT				{CONST_INT (fst $1), snd $1}
-|   CST_FLOAT				{CONST_FLOAT (fst $1), snd $1}
-|   CST_CHAR				{CONST_CHAR (fst $1), snd $1}
-|   CST_WCHAR				{CONST_WCHAR (fst $1), snd $1}
-|   string_constant		        {CONST_STRING (fst $1), snd $1}
-|   wstring_list			{CONST_WSTRING (fst $1), snd $1}
+    CST_INT			{CONST_INT (fst $1), snd $1}
+|   CST_FLOAT			{CONST_FLOAT (fst $1), snd $1}
+|   CST_CHAR			{CONST_CHAR (fst $1), snd $1}
+|   CST_WCHAR			{CONST_WCHAR (fst $1), snd $1}
+|   string_constant		{CONST_STRING (fst $1), snd $1}
+|   wstring_list		{CONST_WSTRING (List.concat (fst $1)), snd $1}
 ;
 
 string_constant:
@@ -761,15 +760,15 @@ string_constant:
 ;
 
 string_list:
-    one_string                          { fst $1, snd $1 }
-|   string_list one_string              { merge_string $1 $2 }
+    one_string                          { [fst $1], snd $1 }
+|   one_string string_list              { merge_string $1 $2 }
 ;
 
 wstring_list:
-    CST_WSTRING                         { $1 }
-|   wstring_list one_string             { merge_string $1 $2 }
-|   wstring_list CST_WSTRING            { merge_string $1 $2 }
-|   string_list  CST_WSTRING            { merge_string $1 $2 }
+    CST_WSTRING                         { [fst $1], snd $1 }
+|   one_string wstring_list             { merge_string $1 $2 }
+|   CST_WSTRING wstring_list            { merge_string $1 $2 }
+|   CST_WSTRING string_list             { merge_string $1 $2 }
 /* If a wstring is present anywhere in the list, the whole is a wstring */
 
 one_string:
@@ -1751,8 +1750,8 @@ asmattr:
 |    CONST asmattr                      { ("const", []) :: $2 }
 ;
 asmtemplate:
-    one_string                         { [intlist_to_string (fst $1)] }
-|   one_string asmtemplate             { intlist_to_string (fst $1) :: $2 }
+    one_string                         { [intlist_to_string [fst $1]] }
+|   one_string asmtemplate             { intlist_to_string [fst $1] :: $2 }
 ;
 asmoutputs:
   /* empty */           { None }

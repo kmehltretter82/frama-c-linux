@@ -509,6 +509,7 @@ type execnow =
                              Shared between all copies of this EXECNOW. Do
                              NOT use a mutable field here, as execnows
                              are duplicated using OCaml 'with' syntax. *)
+    ex_timeout: string;
   }
 
 
@@ -595,11 +596,12 @@ type config =
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
                                        standard output *)
-    dc_toplevels    : (string * string * string list * Macros.t) list;
+    dc_toplevels    : (string * string * string list * Macros.t * string) list;
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
     dc_default_log: string list;
+    dc_timeout: string
   }
 
 let default_macros () =
@@ -615,9 +617,10 @@ let default_config () =
     dc_execnow = [];
     dc_filter = None ;
     dc_default_toplevel = !toplevel_path;
-    dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty ];
+    dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
     dc_dont_run = false;
-    dc_default_log = []
+    dc_default_log = [];
+    dc_timeout = "";
   }
 
 let launch command_string =
@@ -646,7 +649,7 @@ let launch command_string =
       exit 1
 
 
-let scan_execnow ~once dir (s:string) =
+let scan_execnow ~once dir ex_timeout (s:string) =
   let rec aux (s:execnow) =
     try
       Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -672,12 +675,15 @@ let scan_execnow ~once dir (s:string) =
       ex_bin = [];
       ex_dir = dir;
       ex_once = once;
-      ex_done = ref false }
+      ex_done = ref false;
+      ex_timeout;
+    }
 
 (* the default toplevel for the current level of options. *)
 let current_default_toplevel = ref !toplevel_path
 let current_default_log = ref []
-let current_default_cmds = ref [!toplevel_path,default_options,[], Macros.empty]
+let current_default_cmds =
+  ref [!toplevel_path,default_options,[], Macros.empty, ""]
 
 let make_custom_opts =
   let space = Str.regexp " " in
@@ -711,7 +717,9 @@ let make_custom_opts =
 
 (* how to process options *)
 let config_exec ~once dir s current =
-  { current with dc_execnow = scan_execnow ~once dir s :: current.dc_execnow }
+  { current with
+    dc_execnow =
+      scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -745,7 +753,13 @@ let config_options =
 
     "OPT",
     (fun _ s current ->
-       let t = current.dc_default_toplevel, s, current.dc_default_log, current.dc_macros in
+       let t =
+         current.dc_default_toplevel,
+         s,
+         current.dc_default_log,
+         current.dc_macros,
+         current.dc_timeout
+       in
        { current with
          (*           dc_default_toplevel = !current_default_toplevel;*)
          dc_default_log = !current_default_log;
@@ -755,7 +769,9 @@ let config_options =
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log, macros) -> cmd, make_custom_opts opts s, log, current.dc_macros)
+           (fun (cmd,opts, log, macros,_) ->
+              cmd, make_custom_opts opts s, log,
+              current.dc_macros, current.dc_timeout)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
@@ -783,8 +799,9 @@ let config_options =
     "MODULE", config_module;
     "LOG",
     (fun _ s current ->
-       { current with dc_default_log = s :: current.dc_default_log })
-
+       { current with dc_default_log = s :: current.dc_default_log });
+    "TIMEOUT",
+    (fun _ s current -> { current with dc_timeout = s });
   ]
 
 let scan_options dir scan_buffer default =
@@ -871,7 +888,8 @@ type toplevel_command =
     filter : string option ;
     directory : SubDir.t ;
     n : int;
-    execnow:bool
+    execnow:bool;
+    timeout: string;
   }
 
 type command =
@@ -997,12 +1015,16 @@ let basic_command_string =
       end else options
     in
     let options = if !use_byte then opt_to_byte_options options else options in
-    if has_ptest_file_t || has_ptest_file_o || command.execnow then
-      toplevel ^ " " ^ options
-    else begin
-      let file = Filename.sanitize @@ get_ptest_file command in
-      toplevel ^ " " ^ file ^ " " ^ options
-    end
+    let raw_command =
+      if has_ptest_file_t || has_ptest_file_o || command.execnow then
+        toplevel ^ " " ^ options
+      else begin
+        let file = Filename.sanitize @@ get_ptest_file command in
+        toplevel ^ " " ^ file ^ " " ^ options
+      end
+    in
+    if command.timeout = "" then raw_command
+    else "timeout " ^ command.timeout ^ " " ^ raw_command
 
 (* Searches for executable [s] in the directories contained in the PATH
    environment variable. Returns [None] if not found, or
@@ -1088,6 +1110,16 @@ let command_string command =
   in
   let res = Filename.sanitize (log_prefix ^ ".res.log") in
   let command_string = command_string ^ " >" ^ res in
+  let command_string =
+    match command.timeout with
+    | "" -> command_string
+    | s ->
+      Printf.sprintf
+        "%s; if test $? -eq 124; then \
+         echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+         fi"
+        command_string s (Filename.sanitize stderr)
+  in
   let command_string = match filter with
     | None -> command_string
     | Some filter ->
@@ -1664,14 +1696,14 @@ let dispatcher () =
       let i = ref 0 in
       let e = ref 0 in
       let nb_files = List.length config.dc_toplevels in
-      let make_toplevel_cmd (toplevel, options, log_files, macros) =
+      let make_toplevel_cmd (toplevel, options, log_files, macros, timeout) =
         let n = !i in
         {file; options; toplevel; nb_files; directory; n; log_files;
          filter = config.dc_filter; macros;
-         execnow=false;
+         execnow=false; timeout;
         }
       in
-      let mk_cmd s =
+      let mk_cmd (s, timeout) =
         {
           file = file;
           nb_files = nb_files;
@@ -1683,20 +1715,22 @@ let dispatcher () =
           filter = config.dc_filter;
           macros = config.dc_macros;
           execnow = true;
+          timeout;
         }
       in
       let process_macros_cmd s = basic_command_string (mk_cmd s) in
-      let macros = get_macros (mk_cmd "/bin/true") in
+      let macros = get_macros (mk_cmd ("/bin/true","")) in
       let process_macros s = Macros.expand macros s in
       let make_execnow_cmd execnow =
         let res =
           {
-            ex_cmd = process_macros_cmd execnow.ex_cmd;
+            ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
             ex_log = List.map process_macros execnow.ex_log;
             ex_bin = List.map process_macros execnow.ex_bin;
             ex_dir = execnow.ex_dir;
             ex_once = execnow.ex_once;
             ex_done = execnow.ex_done;
+            ex_timeout = execnow.ex_timeout;
           }
         in
         incr e; res
