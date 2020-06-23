@@ -394,6 +394,8 @@ const GraphView = () => {
   const marker = selection?.current?.marker;
   const markers = States.useSyncArray('kernel.ast.markerKind');
   const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
+  const [selectionMode, flipSelectionMode] =
+        Dome.useGlobalSetting('dive.selectionMode', 'follow');
 
   // Updates the graph according to the selected marker.
   React.useEffect(() => {
@@ -402,10 +404,12 @@ const GraphView = () => {
       const kind = markers[marker]?.kind;
       if (kind === 'variable' || kind === 'lvalue' || kind === 'declaration'
           || kind === 'property') {
+        if (selectionMode === 'follow')
+          dive.clear();
         dive.addNode(marker);
       }
     }
-  }, [dive, lock, marker, markers]);
+  }, [dive, lock, marker, markers, selectionMode]);
 
   // Layout selection
   const selectLayout = (layout?: string) => {
@@ -422,6 +426,20 @@ const GraphView = () => {
     Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
   };
 
+  // Selection mode
+  const selectMode = (id?: boolean) => id && flipSelectionMode(id);
+  const modes =
+        [{ id: 'follow', label: 'Follow selection' },
+          { id: 'add', label: 'Add selection to the graph' },
+        ];
+  const checkMode =
+        (item: { id: string }) => (
+          { checked: item.id === selectionMode, ...item }
+        );
+  const modeMenu = () => {
+    Dome.popupMenu(modes.map(checkMode), selectMode);
+  };
+
   // Component
   return (
     <>
@@ -433,6 +451,11 @@ const GraphView = () => {
           title={lock ?
             'Unlock the graph: update the graph with the selection' :
             'Lock the graph: do not update the graph with the selection'}
+        />
+        <IconButton
+          icon="SETTINGS"
+          onClick={modeMenu}
+          title="Choose the selection mode"
         />
         <IconButton
           icon="DISPLAY"
