@@ -35,7 +35,7 @@ let add_allocates_loop stmt =
   let all_default = Annotations.fold_code_annot all_default stmt true in
   if all_default then
     let ca = AAllocation ([], FreeAlloc ([], [])) in
-    Annotations.add_code_annot Emitter.kernel stmt
+    Annotations.add_code_annot ~keep_empty:false Emitter.kernel stmt
       (Logic_const.new_code_annotation ca)
 
 let add_allocates_nothing_funspec kf =
