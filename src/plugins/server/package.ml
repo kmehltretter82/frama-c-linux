@@ -44,7 +44,7 @@ let pp_plugin_step fmt = function
 let pp_ident fmt { plugin ; package ; name } =
   ( pp_plugin_step fmt plugin ;
     List.iter (pp_step fmt) package ;
-    Format.pp_print_string fmt name )
+    pp_step fmt name )
 
 (* -------------------------------------------------------------------------- *)
 (* --- Name Resolution                                                    --- *)
@@ -232,15 +232,22 @@ type packageInfo = {
   p_content : declInfo list ;
 }
 
-let name_of_ident id =
-  String.concat "." @@ match id.plugin with
+let name_of_ident ?(sep=".") id =
+  String.concat sep @@ match id.plugin with
   | Kernel -> "kernel" :: id.package @ [ id.name ]
   | Plugin p -> p :: (id.package @ [id.name ])
 
-let name_of_pkginfo pkg =
-  String.concat "." @@ match pkg.p_plugin with
-  | Kernel -> "kernel" :: pkg.p_package
-  | Plugin p -> p :: pkg.p_package
+let name_of_pkg ?(sep=".") plugin package =
+  String.concat sep @@ match plugin with
+  | Kernel -> "kernel" :: package
+  | Plugin p -> p :: package
+
+let name_of_pkginfo ?sep { p_plugin ; p_package } =
+  name_of_pkg ?sep p_plugin p_package
+
+let pp_pkgname fmt { p_plugin ; p_package } =
+  ( pp_plugin_step fmt p_plugin ;
+    List.iter (pp_step fmt) p_package )
 
 (* -------------------------------------------------------------------------- *)
 (* --- Visitors                                                           --- *)
@@ -293,7 +300,7 @@ type package = {
   mutable revDecl : declInfo list ; (* in reverse order *)
 }
 
-let name_of_package pkg = name_of_pkginfo pkg.pkgInfo
+let name_of_package ?sep pkg = name_of_pkginfo ?sep pkg.pkgInfo
 
 let registry = ref IdSet.empty (* including packages *)
 let packages = ref [] (* in reverse order *)

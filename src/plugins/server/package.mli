@@ -97,6 +97,7 @@ type packageInfo = {
 (* -------------------------------------------------------------------------- *)
 
 val pp_plugin : Format.formatter -> plugin -> unit
+val pp_pkgname : Format.formatter -> packageInfo -> unit
 val pp_ident : Format.formatter -> ident -> unit
 val pp_jtype : Format.formatter -> jtype -> unit
 
@@ -185,9 +186,10 @@ val iter : (packageInfo -> unit) -> unit
 (** Assigns non-classing names for each identifier. *)
 val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 
-val name_of_pkginfo : packageInfo -> string
-val name_of_package : package -> string
-val name_of_ident : ident -> string
+val name_of_pkg : ?sep:string -> plugin -> string list -> string
+val name_of_pkginfo : ?sep:string -> packageInfo -> string
+val name_of_package : ?sep:string -> package -> string
+val name_of_ident : ?sep:string -> ident -> string
 
 (* -------------------------------------------------------------------------- *)
 (* --- Markdown Generation                                                --- *)
