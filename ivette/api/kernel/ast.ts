@@ -1,28 +1,11 @@
 /* --- Generated Frama-C Server API --- */
+
 /** Ast Services
    @packageDocumentation
    @module frama-c/kernel/ast
 */
+
 import * as Json from 'dome/data/json'
-import { compute } from 'api/kernel/ast';
-import { functions } from 'api/kernel/ast';
-import { functionsFetch } from 'api/kernel/ast';
-import { functionsReload } from 'api/kernel/ast';
-import { functionsRow } from 'api/kernel/ast';
-import { functionsSig } from 'api/kernel/ast';
-import { getFiles } from 'api/kernel/ast';
-import { getFunctions } from 'api/kernel/ast';
-import { getInfo } from 'api/kernel/ast';
-import { marker } from 'api/kernel/ast';
-import { markerData } from 'api/kernel/ast';
-import { markerDataFetch } from 'api/kernel/ast';
-import { markerDataReload } from 'api/kernel/ast';
-import { markerDataRow } from 'api/kernel/ast';
-import { markerDataSig } from 'api/kernel/ast';
-import { markerKind } from 'api/kernel/ast';
-import { markerKindTags } from 'api/kernel/ast';
-import { printFunction } from 'api/kernel/ast';
-import { setFiles } from 'api/kernel/ast';
 import { tag } from 'api/kernel/data';
 import { text } from 'api/kernel/data';
 
@@ -31,6 +14,26 @@ import { text } from 'api/kernel/data';
 
 
 /** Marker kind */
+export enum markerKind {
+  /** Expression */
+  expression = 'expression';
+  /** Lvalue */
+  lvalue = 'lvalue';
+  /** Variable */
+  variable = 'variable';
+  /** Function */
+  function = 'function';
+  /** Declaration */
+  declaration = 'declaration';
+  /** Statement */
+  statement = 'statement';
+  /** Global */
+  global = 'global';
+  /** Term */
+  term = 'term';
+  /** Property */
+  property = 'property';
+}
 
 
 /** Returns all registered tags for the above type. */
@@ -44,6 +47,16 @@ import { text } from 'api/kernel/data';
 
 /** Data rows for array [`markerData`](#markerdata)
  */
+export interface markerDataRow {
+  /** Entry identifier. */
+  key: Json.Key<'markerData'>;
+  /** Marker kind */
+  kind: markerKind;
+  /** Marker short name */
+  name: string;
+  /** Marker declaration or description */
+  descr: string;
+}
 
 
 /** Data fetcher for array [`markerData`](#markerdata)
@@ -55,9 +68,9 @@ import { text } from 'api/kernel/data';
 
 
 /** Localizable AST markers */
-type marker = Json.Key<'stmt'> | Json.Key<'decl'> | Json.Key<'lval'>
-                | Json.Key<'expr'> | Json.Key<'term'> | Json.Key<'global'>
-                | Json.Key<'property'>;
+export type marker =
+  Json.Key<'stmt'> | Json.Key<'decl'> | Json.Key<'lval'> | Json.Key<'expr'> |
+  Json.Key<'term'> | Json.Key<'global'> | Json.Key<'property'>;
 
 
 /** Collect all functions in the AST */
@@ -74,6 +87,14 @@ type marker = Json.Key<'stmt'> | Json.Key<'decl'> | Json.Key<'lval'>
 
 /** Data rows for array [`functions`](#functions)
  */
+export interface functionsRow {
+  /** Entry identifier. */
+  key: Json.Key<'functions'>;
+  /** Name */
+  name: string;
+  /** Signature */
+  signature: string;
+}
 
 
 /** Data fetcher for array [`functions`](#functions)

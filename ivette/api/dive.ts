@@ -1,20 +1,20 @@
 /* --- Generated Frama-C Server API --- */
+
 /** Dive Services
    @packageDocumentation
    @module frama-c/dive
 */
+
 import * as Json from 'dome/data/json'
-import { addFunctionAlarms } from 'api/dive';
-import { addVar } from 'api/dive';
-import { clear } from 'api/dive';
-import { explore } from 'api/dive';
-import { graph } from 'api/dive';
-import { hide } from 'api/dive';
-import { show } from 'api/dive';
-import { variableName } from 'api/dive';
 
 
 /** The name of variable of the program */
+export interface variableName {
+  /** owner function for a local variable */
+  funName?: string;
+  /** variable name */
+  varName: string;
+}
 
 
 /** Retrieve the whole graph */

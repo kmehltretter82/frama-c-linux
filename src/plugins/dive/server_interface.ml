@@ -55,28 +55,31 @@ module Variable = Data.Collection (struct
 
     let signature = Data.Record.signature ()
 
-    let _fun_field = Data.Record.option signature
+    let fun_field = Data.Record.option signature
+        ~name:"funName"
         ~descr:(Markdown.plain "owner function for a local variable")
         (module Data.Jstring)
 
-    let _var_field = Data.Record.field signature
+    let var_field = Data.Record.field signature
+        ~name:"varName"
         ~descr:(Markdown.plain "variable name")
         (module Data.Jstring)
 
     type t = Cil_types.varinfo
-    module R =
-      (val (Data.Record.publish ~package ~name ~descr signature): Data.Record.S with type r = t)
+
+    let data = Data.Record.publish ~package ~name ~descr signature
+    module R = (val data : Data.Record.S with type r = t)
 
     let jtype = R.jtype
 
     let to_json v =
       let varname = v.Cil_types.vname in
-      let fields =  [ "var", `String varname ] in
+      let fields = R.default |> R.set var_field varname in
       let fields = match Kernel_function.find_defining_kf v with
-        | Some kf -> ("fun", `String (Kernel_function.get_name kf)) :: fields
+        | Some kf -> fields |> R.set fun_field (Some (Kernel_function.get_name kf))
         | None -> fields
       in
-      `Assoc fields
+      R.to_json fields
 
     let of_json json =
       let open Yojson.Basic.Util in
