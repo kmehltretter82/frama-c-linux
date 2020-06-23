@@ -1,11 +1,14 @@
 import { strict as assert } from 'assert';
 
-import Cytoscape from 'cytoscape';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+
+import Cytoscape from 'cytoscape';
+import CytoscapeComponent from 'react-cytoscapejs';
+import './cytoscape_libs';
 
 import tippy, * as Tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
@@ -16,8 +19,6 @@ import './dive_tippy.css';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { Data } from './graph_elements';
-import { Graph } from './graph_viewports';
 
 import '@fortawesome/fontawesome-free/js/all';
 
@@ -47,7 +48,7 @@ export interface Interval {
 export type callstack = Callsite[];
 
 
-interface Cy extends Cytoscape.Core {
+interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: any): void;
 }
 
@@ -91,18 +92,25 @@ function range(interval: Interval, limit: Interval): number
 
 
 class Dive {
-  cy: Cy;
-  graph: Data;
+  headless: boolean;
+  cy: Cytoscape.Core;
   layoutName = '';
-  layoutOptions: object = {};
+  layoutOptions: Cytoscape.LayoutOptions | undefined;
 
-  constructor() {
+  constructor(cy: Cytoscape.Core | null = null) {
+    this.cy = cy || Cytoscape();
+    this.headless = this.cy.container() === null;
+    this.cy.elements().remove();
+    this.cy.off('select');
+
     this.layout = 'cose-bilkent';
-    this.graph = new Data({ style, autounselectify: false });
-    this.cy = (this.graph._cy as Cy);
 
-    this.setupSelection();
-    this.setupCtxMenu();
+    if (!this.headless) {
+      this.setupSelection();
+      this.setupCtxMenu();
+    }
+
+    this.refresh();
   }
 
   setupSelection(): void {
@@ -115,49 +123,46 @@ class Dive {
   }
 
   setupCtxMenu(): void {
-    this.graph.onmount = () =>
-    {
-      this.cy.cxtmenu({
-        selector: 'node',
-        commands: (ele: Cytoscape.NodeSingular) => {
-          const data = ele.data();
-          const commands = [{
-            content: renderToString(ctxmenu.explore),
-            select: () => this.explore(ele),
+    (this.cy as CytoscapeExtended).cxtmenu({
+      selector: 'node',
+      commands: (ele: Cytoscape.NodeSingular) => {
+        const data = ele.data();
+        const commands = [{
+          content: renderToString(ctxmenu.explore),
+          select: () => this.explore(ele),
+          enabled: true,
+        }];
+        if (data.kind === 'composite') {
+          commands.push({
+            content: renderToString(ctxmenu.unfold),
+            select: () => {},
+            enabled: false,
+          });
+        }
+        else {
+          commands.push({
+            content: '',
+            select: () => {},
+            enabled: false,
+          });
+        }
+        if (!data.explored) {
+          commands.push({
+            content: renderToString(ctxmenu.show),
+            select: () => this.show(ele),
             enabled: true,
-          }];
-          if (data.kind === 'composite') {
-            commands.push({
-              content: renderToString(ctxmenu.unfold),
-              select: () => {},
-              enabled: false,
-            });
-          }
-          else {
-            commands.push({
-              content: '',
-              select: () => {},
-              enabled: false,
-            });
-          }
-          if (!data.explored) {
-            commands.push({
-              content: renderToString(ctxmenu.show),
-              select: () => this.show(ele),
-              enabled: true,
-            });
-          }
-          else {
-            commands.push({
-              content: renderToString(ctxmenu.hide),
-              select: () => this.hide(ele),
-              enabled: true,
-            });
-          }
-          return commands;
-        },
-      });
-    };
+          });
+        }
+        else {
+          commands.push({
+            content: renderToString(ctxmenu.hide),
+            select: () => this.hide(ele),
+            enabled: true,
+          });
+        }
+        return commands;
+      },
+    });
   }
 
   remove(node: Cytoscape.NodeCollection): void {
@@ -197,6 +202,10 @@ class Dive {
   }
 
   createTips(node: Cytoscape.NodeSingular): Tippy.Instance[] {
+    const container = this.cy.container();
+    if (!container)
+      return [];
+
     const common = {
       interactive: true,
       multiple: true,
@@ -211,10 +220,6 @@ class Dive {
           popperInstance.reference = (node as any).popperRef();
       },
     };
-
-    const container = this.cy.container();
-    if (!container)
-      return [];
 
     const tips = [];
 
@@ -261,19 +266,10 @@ class Dive {
   }
 
   /* eslint-disable no-restricted-syntax */
-  receiveData(data: any): void
-  {
-    this.cy.startBatch();
+  receiveGraph(data: any): Cytoscape.CollectionReturnValue {
+    let newEles = this.cy.collection();
 
-    for (const id of data.sub)
-    {
-      const node = this.cy.$id(id);
-      this.remove(node);
-    }
-
-    let addedEles = this.cy.collection();
-
-    for (const node of data.add.nodes)
+    for (const node of data.nodes)
     {
       if (node.float_values) {
         const { computed, limits } = node.float_values;
@@ -301,25 +297,35 @@ class Dive {
 
         const ele = this.cy.add({ data: { ...node, parent } });
         this.addTips(ele);
-        addedEles = this.cy.add(ele).union(addedEles);
+        newEles = this.cy.add(ele).union(newEles);
       }
     }
 
-    for (const dep of data.add.deps)
+    for (const dep of data.deps)
     {
       const ele = this.cy.add({
         data: { id: dep.id, source: dep.src, target: dep.dst },
         group: 'edges',
         classes: dep.kind,
       });
-      addedEles = this.cy.add(ele).union(addedEles);
+      newEles = this.cy.add(ele).union(newEles);
     }
+
+    return newEles;
+  }
+
+  receiveData(data: any): void {
+    this.cy.startBatch();
+
+    for (const id of data.sub)
+      this.remove(this.cy.$id(id));
+
+    const newEles = this.receiveGraph(data.add);
 
     this.cy.endBatch();
 
-    if (addedEles) {
+    if (newEles)
       this.recomputeLayout();
-    }
   }
 
   get layout(): string {
@@ -338,22 +344,39 @@ class Dive {
       randomize: true, /* Not all layouts supports that */
       ...extendedOptions,
     };
+
+    this.recomputeLayout();
   }
 
   recomputeLayout(): void {
-    this.graph.layout(this.layoutOptions);
+    if (this.layoutOptions && this.cy.container())
+      this.cy.layout(this.layoutOptions).run();
   }
 
-  exec(endpoint: string, params: any): void {
-    Server.EXEC({
-      endpoint,
-      params,
-    }).then((data) => {
-      if (data)
-        this.receiveData(data);
-    }).catch((err) => {
+  async exec(endpoint: string, params: any): Promise<void> {
+    try {
+      if (Server.isRunning()) {
+        const data = await Server.EXEC({ endpoint, params });
+        if (data)
+          this.receiveData(data);
+      }
+    }
+    catch (err) {
       console.error(err);
-    });
+    }
+  }
+
+  async refresh(): Promise<void> {
+    try {
+      if (Server.isRunning()) {
+        const data = await Server.GET({ endpoint: 'dive.graph', params: {} });
+        await this.receiveGraph(data);
+        this.recomputeLayout();
+      }
+    }
+    catch (err) {
+      console.error(err);
+    }
   }
 
   clear(): void {
@@ -388,7 +411,7 @@ class Dive {
 const GraphView = () => {
 
   // Hooks
-  const [dive] = useState(() => new Dive());
+  const [dive, setDive] = useState(new Dive());
   const node: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
@@ -397,8 +420,17 @@ const GraphView = () => {
   const [selectionMode, flipSelectionMode] =
         Dome.useGlobalSetting('dive.selectionMode', 'follow');
 
+  function setCy(cy: Cytoscape.Core) {
+    if (cy !== dive.cy)
+      setDive(new Dive(cy));
+  }
+
+  useEffect(() => {
+    setDive(new Dive(dive.cy));
+  }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Updates the graph according to the selected marker.
-  React.useEffect(() => {
+  useEffect(() => {
     if (!lock && marker && marker !== node.current) {
       node.current = marker;
       const kind = markers[marker]?.kind;
@@ -415,7 +447,6 @@ const GraphView = () => {
   const selectLayout = (layout?: string) => {
     if (layout) {
       dive.layout = layout;
-      dive.recomputeLayout();
     }
   };
   const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
@@ -469,7 +500,11 @@ const GraphView = () => {
           title="Clear the graph"
         />
       </TitleBar>
-      <Graph data={dive.graph} />
+      <CytoscapeComponent
+        stylesheet={style}
+        cy={setCy}
+        style={{ width: '100%', height: '100%' }}
+      />
     </>
   );
 
