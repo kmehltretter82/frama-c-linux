@@ -1159,20 +1159,19 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
       let filter e ca = Emitter.equal e emitter && filter_ca ca in
       let ca_e = code_annot_emitter ~filter stmt in
       let ca_total = code_annot ~filter:filter_ca stmt in
-      let new_a =
+      let old_a =
         match ca_e with
-        | [] -> a
+        | [] -> WritesAny
         | [ { annot_content = AAssigns(_, assigns') } as ca,_ ] ->
           remove_code_annot_internal emitter ~kf stmt ca;
-          let merged =
-            merge_assigns ~keep_empty assigns' assigns
-          in
-          { a with annot_content = AAssigns (bhvs, merged) }
+          assigns'
         | _ ->
           Kernel.fatal
             "More than one loop assigns clause for a statement. \
              Annotations internal state broken."
       in
+      let merged = merge_assigns ~keep_empty old_a assigns in
+      let new_a = { a with annot_content = AAssigns (bhvs, merged) } in
       let ips =
         match ca_total with
         | [] -> Property.ip_of_code_annot kf stmt a
