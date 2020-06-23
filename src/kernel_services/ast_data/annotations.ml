@@ -1037,6 +1037,21 @@ let add_ensures e kf ?stmt ?active ?behavior l =
   in
   extend_behavior e kf ?stmt ?active ?behavior set_bhv
 
+let get_full_spec kf ?stmt ?(behavior=[]) () =
+  match stmt with
+  | None ->
+    (try funspec ~populate:false kf with Not_found -> Cil.empty_funspec())
+  | Some stmt ->
+    let filter a =
+      match a.annot_content with
+      | AStmtSpec(bhvs,_) when is_same_behavior_set bhvs behavior -> true
+      | _ -> false
+    in
+    (match code_annot ~filter stmt with
+     | [] -> Cil.empty_funspec ()
+     | [ { annot_content = AStmtSpec(_,s)} ] -> s
+     | _ -> Kernel.fatal "More than one contract associated to a statement")
+
 let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
   let set_bhv full_bhv e_bhv =
     let keep_empty = keep_empty && full_bhv.b_assigns = WritesAny in
@@ -1059,7 +1074,20 @@ let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
          (Property.ip_from_of_behavior kf ki active full_bhv);
     )
   in
-  extend_behavior e kf ?stmt ?active ?behavior set_bhv
+  let old_spec = get_full_spec kf ?stmt ?behavior:active () in
+  let bhv =
+    match behavior with
+    | None -> Cil.find_default_behavior old_spec
+    | Some name ->
+      List.find_opt (fun { b_name } -> b_name = name) old_spec.spec_behavior
+  in
+  let is_empty =
+    match bhv with
+    | None -> true
+    | Some b -> b.b_assigns = WritesAny
+  in
+  if not (keep_empty && is_empty) then
+    extend_behavior e kf ?stmt ?active ?behavior set_bhv
 
 let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
   let ki = kinstr stmt in
@@ -1153,7 +1181,7 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
           of the contract, they do not need any update here.
        *)
        remove_code_annot_internal emitter ~remove_statuses:false ~kf stmt ca';
-       fill_tables ca []
+       fill_tables ca' []
      | _ ->
        Kernel.fatal
          "more than one contract attached to a given statement for \

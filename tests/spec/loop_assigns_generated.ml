@@ -3,7 +3,7 @@ open Cil_types
 let e1 = Emitter.(create "emitter1" [ Code_annot ] [] [])
 let e2 = Emitter.(create "emitter2" [ Code_annot ] [] [])
 
-let add_assigns e kf stmt v =
+let mk_assigns e v =
   let lv = Cil.cvar_to_lvar v in
   let term_v  = Logic_const.tvar lv in
   let named_term_v =
@@ -11,12 +11,15 @@ let add_assigns e kf stmt v =
       term_name = ("added_by_"^(Emitter.get_name e))::term_v.term_name }
   in
   let id_v = Logic_const.new_identified_term named_term_v  in
-  Annotations.add_code_annot e ~kf stmt
+  Writes[id_v,FromAny]
+
+let add_assigns ?(keep_empty=false) e kf stmt v =
+  Annotations.add_code_annot ~keep_empty e ~kf stmt
     (Logic_const.new_code_annotation
-       (AAssigns ([], Writes [id_v, FromAny])));
+       (AAssigns ([], mk_assigns e v)));
   Filecheck.check_ast ("after insertion of loop assigns " ^ v.vname)
 
-let add_allocates e kf stmt v =
+let add_allocates ?(keep_empty=false) e kf stmt v =
   let lv = Cil.cvar_to_lvar v in
   let term_v = Logic_const.tvar lv in
   let named_term_v =
@@ -24,7 +27,7 @@ let add_allocates e kf stmt v =
       term_name = ("added_by_"^(Emitter.get_name e))::term_v.term_name }
   in
   let id_v = Logic_const.new_identified_term named_term_v in
-  Annotations.add_code_annot e ~kf stmt
+  Annotations.add_code_annot ~keep_empty e ~kf stmt
     (Logic_const.new_code_annotation
        (AAllocation([],FreeAlloc ([],[id_v]))));
   Filecheck.check_ast ("after insertion of loop allocates " ^ v.vname )
@@ -47,6 +50,12 @@ let main () =
     List.find
       (fun s -> match s.skind with Loop _ -> true | _ -> false) def.sallstmts
   in
+  let s2 =
+    List.find
+      (fun s' -> s!=s' && (match s'.skind with Loop _ -> true | _ -> false))
+      def.sallstmts
+  in
+  let s3 = Kernel_function.find_return kf in
   let j = Cil.makeLocalVar def ~insert:true "j" Cil.intType in
   let k = Cil.makeLocalVar def ~insert:true "k" Cil.intType in
   let l = Cil.makeLocalVar def ~insert:true "l" Cil.intType in
@@ -55,6 +64,8 @@ let main () =
   add_assigns e1 kf s j;
   add_assigns e2 kf s k;
   add_assigns e1 kf s l;
+  add_assigns ~keep_empty:true e2 kf s2 j;
+  Annotations.add_assigns ~keep_empty:true e1 kf ~stmt:s3 (mk_assigns e1 k);
   add_allocates e1 kf s p;
   add_allocates e2 kf s q;
   Annotations.iter_code_annot (check_only_one Logic_utils.is_assigns) s;

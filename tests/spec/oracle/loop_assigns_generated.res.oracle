@@ -13,6 +13,7 @@ void f(void)
       loop allocates (added_by_emitter1: p), (added_by_emitter2: q);
   */
   while (i < 10) i ++;
+  while (i > 0) i --;
   return;
 }
 
