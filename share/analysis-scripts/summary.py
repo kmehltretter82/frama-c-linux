@@ -45,14 +45,22 @@ def build_env(framac):
         bindir = framac + '/build/bin'
         return { **os.environ,  'PATH' : bindir + ':' + os.environ['PATH'] }
 
-def list_targets():
+def list_targets(dir):
     env = build_env(framac)
     res = subprocess.run(
-        ["make", "--quiet", "display-targets"],
+        ["make", "--directory", dir, "--quiet", "display-targets"],
         env=env,
         stdout=subprocess.PIPE,
         encoding='ascii')
-    return res.stdout.split()
+    targets = res.stdout.split()
+    res = []
+    for target in targets:
+        if target.endswith(".eva") or target.endswith(".parse"):
+            res.append(dir + "/" + target)
+        else:
+            res += [dir + "/" + t for t in list_targets(target)]
+    print(f"list_targets returning: {res}")
+    return res
 
 def clone_frama_c(clonedir, hash):
     print("Cloning Frama-C", hash, "...")
@@ -74,7 +82,7 @@ def run_make(framac, benchmark_tag=None):
             'FRAMAC_DIR=' + bindir,
             'FRAMAC=' + bindir + '/frama-c']
     if benchmark_tag is None:
-        args += ['-j', '8']
+        args += ['-j', str(os.cpu_count ())]
     else:
         args += ['BENCHMARK=' + benchmark_tag]
     return subprocess.Popen(args, env=env,
@@ -95,8 +103,10 @@ def terminate_process(process):
         return errors
 
 def smart_rename(target):
+    target = re.sub('^\./', '', target)
     target = re.sub('main\.eva$', '', target)
     target = re.sub('\.eva$', '', target)
+    target = re.sub('\.frama-c/', '', target)
     target = re.sub('qds/frama-c', 'qds', target)
     return target
 
@@ -118,7 +128,7 @@ def poll_results(targets, benchmark_tag):
 
 def run_analyses(display, database, framac, benchmark_tag):
     results = []
-    targets = list_targets()
+    targets = list_targets(".")
     process = run_make(framac, benchmark_tag)
     errors = b""
     next_poll = time.time()

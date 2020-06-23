@@ -35,3 +35,6 @@ all: eva
 ifeq ($(TARGETS),)
 	@echo "error: TARGETS is empty"
 endif
+
+display-targets:
+	@echo "$(addprefix .frama-c/,$(TARGETS))"
