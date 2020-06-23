@@ -382,7 +382,9 @@ class Dive {
 }
 
 
-export default () => {
+const GraphView = () => {
+
+  // Hooks
   const [dive] = useState(() => new Dive());
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
@@ -399,37 +401,49 @@ export default () => {
     }
   }, [dive, marker, markers]);
 
+  // Component
   return (
-    <Component
-      id="dive.graph"
-      label="Imprecision graph"
-      title="Imprecision graph"
-    >
-      <Vfill>
-        <form onSubmit={(event) => {
-          dive.clear();
-          event.preventDefault();
-        }}
+    <Vfill>
+      <form onSubmit={(event) => {
+        dive.clear();
+        event.preventDefault();
+      }}
+      >
+        <button type="button">Clear graph</button>
+      </form>
+      <div>
+        Layout:
+        <select
+          defaultValue="{dive.layout}"
+          onChange={(event) => {
+            dive.layout = event.target.value;
+            dive.recomputeLayout();
+          }}
         >
-          <button type="button">Clear graph</button>
-        </form>
-        <div>
-          Layout:
-          <select
-            defaultValue="{dive.layout}"
-            onChange={(event) => {
-              dive.layout = event.target.value;
-              dive.recomputeLayout();
-            }}
-          >
-            <option value="cose-bilkent">cose-bilkent</option>
-            <option value="dagre">dagre</option>
-            <option value="cola">cola</option>
-            <option value="klay">klay</option>
-          </select>
-        </div>
-        <Graph data={dive.graph} />
-      </Vfill>
-    </Component>
+          <option value="cose-bilkent">cose-bilkent</option>
+          <option value="dagre">dagre</option>
+          <option value="cola">cola</option>
+          <option value="klay">klay</option>
+        </select>
+      </div>
+      <Graph data={dive.graph} />
+    </Vfill>
   );
+
 };
+
+// --------------------------------------------------------------------------
+// --- Export Component
+// --------------------------------------------------------------------------
+
+export default () => (
+  <Component
+    id="dive.graph"
+    label="Imprecision graph"
+    title="Imprecision graph"
+  >
+    <GraphView />
+  </Component>
+);
+
+// --------------------------------------------------------------------------
