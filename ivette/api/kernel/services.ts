@@ -5,14 +5,23 @@
    @module frama-c/kernel/services
 */
 
-import * as Json from 'dome/data/json'
+import * as Json from 'dome/data/json';
+import * as Server from 'frama-c/server';
 import { tag } from 'api/kernel/data';
 
 
 /** Frama-C Kernel configuration */
+export const getConfig: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.services.getConfig',
+};
 
 
 /** Load a save file. Returns an error, if not successfull. */
+export const load: Server.SetRequest = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.services.load',
+};
 
 
 /** Source file positions. */
@@ -38,6 +47,10 @@ export enum logkind {
 
 
 /** Returns all registered tags for the above type. */
+export const logkindTags: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.services.logkindTags',
+};
 
 
 /** Message event record. */
@@ -56,6 +69,14 @@ export interface log {
 
 
 /** Turn logs monitoring on/off */
+export const setLogs: Server.SetRequest = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.services.setLogs',
+};
 
 
 /** Flush the last emitted logs since last call (max 100) */
+export const getLogs: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.services.getLogs',
+};

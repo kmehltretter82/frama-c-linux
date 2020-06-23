@@ -5,7 +5,8 @@
    @module frama-c/kernel/properties
 */
 
-import * as Json from 'dome/data/json'
+import * as Json from 'dome/data/json';
+import * as Server from 'frama-c/server';
 import { tag } from 'api/kernel/data';
 import { source } from 'api/kernel/services';
 
@@ -84,6 +85,10 @@ export enum propKind {
 
 
 /** Returns all registered tags for the above type. */
+export const propKindTags: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.properties.propKindTags',
+};
 
 
 /** Property Status (consolidated) */
@@ -114,6 +119,10 @@ export enum propStatus {
 
 
 /** Returns all registered tags for the above type. */
+export const propStatusTags: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.properties.propStatusTags',
+};
 
 
 /** Alarm Kinds */
@@ -158,12 +167,20 @@ export enum alarms {
 
 
 /** Returns all registered tags for the above type. */
+export const alarmsTags: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.properties.alarmsTags',
+};
 
 
 /** Status of Registered Properties */
 
 
-/** Signal for array [`status`](#status)  */
+/** Signal for array [`status`](#status)
+ */
+export const statusSig: Server.Signal = {
+  name: 'kernel.properties.statusSig',
+};
 
 
 /** Data rows for array [`status`](#status)
@@ -196,7 +213,15 @@ export interface statusRow {
 
 /** Data fetcher for array [`status`](#status)
  */
+export const statusFetch: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.properties.statusFetch',
+};
 
 
 /** Force full reload for array [`status`](#status)
  */
+export const statusReload: Server.GetRequest = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.properties.statusReload',
+};

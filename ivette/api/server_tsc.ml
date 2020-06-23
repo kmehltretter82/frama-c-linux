@@ -44,6 +44,11 @@ let keywords = [
 
 let pp_descr = Md.pp_text ?page:None
 
+let name_of_kind = function
+  | `GET -> "GET"
+  | `SET -> "SET"
+  | `EXEC -> "EXEC"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Jtype Generator                                                    --- *)
 (* -------------------------------------------------------------------------- *)
@@ -91,7 +96,7 @@ let makeDeclaration fmt names d =
   let jtype = makeJtype ~self ~names in
   match d.d_kind with
   | D_type js ->
-    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self jtype js
+    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self jtype js ;
   | D_record fjs ->
     Format.fprintf fmt "export interface %s {@\n" self ;
     List.iter
@@ -112,6 +117,17 @@ let makeDeclaration fmt names d =
          Format.fprintf fmt "  %s = '%s';@\n" tag tag ;
       ) tgs ;
     Format.fprintf fmt "}@\n" ;
+  | D_request rq ->
+    let kind = name_of_kind rq.rq_kind in
+    let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
+    Format.fprintf fmt "export const %s: Server.%sRequest = {@\n" self prefix ;
+    Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
+    Format.fprintf fmt "};@\n" ;
+  | D_signal ->
+    Format.fprintf fmt "export const %s: Server.Signal = {@\n" self ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
+    Format.fprintf fmt "};@\n" ;
   | _ -> ()
 
 (* -------------------------------------------------------------------------- *)
@@ -129,7 +145,8 @@ let makePackage pkg name fmt =
     Format.fprintf fmt "   @@module frama-c/%s@\n" name ;
     Format.fprintf fmt "*/@\n@\n" ;
     let names = Pkg.resolve ~keywords pkg in
-    Format.fprintf fmt "import * as Json from 'dome/data/json'@\n" ;
+    Format.fprintf fmt "import * as Json from 'dome/data/json';@\n" ;
+    Format.fprintf fmt "import * as Server from 'frama-c/server';@\n" ;
     Pkg.IdMap.iter
       (fun id name ->
          if id.plugin <> pkg.p_plugin ||

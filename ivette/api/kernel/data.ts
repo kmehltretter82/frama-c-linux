@@ -5,7 +5,8 @@
    @module frama-c/kernel/data
 */
 
-import * as Json from 'dome/data/json'
+import * as Json from 'dome/data/json';
+import * as Server from 'frama-c/server';
 
 
 /** Markdown (inlined) text. */
