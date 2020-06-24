@@ -132,9 +132,18 @@ let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
 let neg_unop v = { v with neg = v.pos; pos = v.neg }
 
-let forward_unop _ op v =
+let bitwise_not typ v =
+  match Cil.unrollType typ with
+  | TInt (ikind, _) | TEnum ({ekind=ikind}, _) ->
+    if Cil.isSigned ikind
+    then { pos = v.neg; neg = v.pos || v.zero; zero = v.neg }
+    else { pos = v.pos || v.zero; neg = false; zero = v.pos }
+  | _ -> top
+
+let forward_unop typ op v =
   match op with
   | Neg -> `Value (neg_unop v)
+  | BNot -> `Value (bitwise_not typ v)
   | _ -> `Value top
 
 let plus v1 v2 =
