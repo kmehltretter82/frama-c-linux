@@ -126,6 +126,7 @@ type 'a content = {
 
 type 'a array = {
   signal : Request.signal ;
+  fkey : string ;
   key : 'a -> string ;
   iter : ('a -> unit) -> unit ;
   getter : (string * ('a -> json)) list ;
@@ -205,21 +206,22 @@ type buffer = {
   mutable updated : json list ;
 }
 
-let add_entry buffer cols key v =
+let add_entry buffer cols fkey key v =
   let fjs = List.fold_left (fun fjs (fd,to_json) ->
       try (fd , to_json v) :: fjs
       with Not_found -> fjs
     ) [] cols in
-  buffer.updated <- `Assoc( ("key", `String key):: fjs) :: buffer.updated ;
+  let row = (fkey, `String key) :: fjs in
+  buffer.updated <- `Assoc row :: buffer.updated ;
   buffer.capacity <- pred buffer.capacity
 
 let remove_entry buffer key =
   buffer.removed <- key :: buffer.removed ;
   buffer.capacity <- pred buffer.capacity
 
-let update_entry buffer cols key = function
+let update_entry buffer cols fkey key = function
   | Remove -> remove_entry buffer key
-  | Add v -> add_entry buffer cols key v
+  | Add v -> add_entry buffer cols fkey key v
 
 let fetch array n =
   let m = content array in
@@ -239,7 +241,7 @@ let fetch array n =
           begin fun v ->
             let key = array.key v in
             if buffer.capacity > 0 then
-              add_entry buffer array.getter key v
+              add_entry buffer array.getter array.fkey key v
             else
               ( m.updates <- Kmap.add key (Add v) m.updates ;
                 buffer.pending <- succ buffer.pending ) ;
@@ -249,7 +251,7 @@ let fetch array n =
       m.updates <- Kmap.filter
           begin fun key upd ->
             if buffer.capacity > 0 then
-              ( update_entry buffer array.getter key upd ; false )
+              ( update_entry buffer array.getter array.fkey key upd ; false )
             else
               ( buffer.pending <- succ buffer.pending ; true )
           end m.updates ;
@@ -260,7 +262,9 @@ let fetch array n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_array ~package ~name ~descr ~key ?(keyKind=name)
+let register_array ~package ~name ~descr ~key
+    ?(keyName="key")
+    ?(keyKind=name)
     ~(iter : 'a callback)
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
@@ -275,7 +279,7 @@ let register_array ~package ~name ~descr ~key ?(keyKind=name)
       fd_descr = plain "Entry identifier." ;
     } :: List.map fst columns in
   let id = Package.declare_id ~package:package ~name:name ~descr
-      (D_array keyKind) in
+      (D_array { arr_key = keyName ; arr_kind = keyKind }) in
   let signal = Request.signal
       ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for array" @ href) in
@@ -286,7 +290,7 @@ let register_array ~package ~name ~descr ~key ?(keyKind=name)
   let getter =
     List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) !model in
   let array = {
-    key ; iter ; getter ; signal ;
+    fkey = keyName ; key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
   } in
   let signature = Request.signature ~input:(module Jint) () in

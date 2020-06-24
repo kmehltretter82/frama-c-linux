@@ -71,6 +71,8 @@ export const markerKindTags: Server.GetRequest<null,tag[]> = {
 
 /** Markers data */
 export const markerData: State.Array<'#markerData',markerDataData> = {
+  name: 'kernel.ast.markerData',
+  key: 'key',
   signal: signalMarkerData,
   fetch: fetchMarkerData,
   reload: reloadMarkerData,
@@ -162,6 +164,8 @@ export const printFunction: Server.GetRequest<Json.Key<'#fct'>,text> = {
 
 /** AST Functions */
 export const functions: State.Array<'#functions',functionsData> = {
+  name: 'kernel.ast.functions',
+  key: 'key',
   signal: signalFunctions,
   fetch: fetchFunctions,
   reload: reloadFunctions,

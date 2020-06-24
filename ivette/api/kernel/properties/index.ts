@@ -215,6 +215,8 @@ export const alarmsTags: Server.GetRequest<null,tag[]> = {
 
 /** Status of Registered Properties */
 export const status: State.Array<'#status',statusData> = {
+  name: 'kernel.properties.status',
+  key: 'key',
   signal: signalStatus,
   fetch: fetchStatus,
   reload: reloadStatus,

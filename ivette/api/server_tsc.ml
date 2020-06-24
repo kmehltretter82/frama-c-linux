@@ -309,6 +309,7 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt
       "@[<hov 2>export const %s: State.Value<@,%a@,> = {@]@\n"
       self.name jtype js ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
     Format.fprintf fmt "  getter: %a,@\n"
@@ -319,6 +320,7 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt
       "@[<hov 2>export const %s: State.State<@,%a@,> = {@]@\n"
       self.name jtype js ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
     Format.fprintf fmt "  getter: %a,@\n"
@@ -327,11 +329,13 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.setter self) ;
     Format.fprintf fmt "};@\n"
 
-  | D_array kd ->
+  | D_array { arr_key ; arr_kind } ->
     let data = Pkg.Derived.data self in
     Format.fprintf fmt
       "@[<hov 2>export const %s: State.Array<@,'#%s',@,%a@,> = {@]@\n"
-      self.name kd (jcall names) data ;
+      self.name arr_kind (jcall names) data ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
+    Format.fprintf fmt "  key: '%s',@\n" arr_key ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
     Format.fprintf fmt "  fetch: %a,@\n"

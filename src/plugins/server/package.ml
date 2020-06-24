@@ -205,6 +205,11 @@ type requestInfo = {
   rq_output: paramInfo ;
 }
 
+type arrayInfo = {
+  arr_key: string;
+  arr_kind: string;
+}
+
 type declKindInfo =
   | D_signal
   | D_type of jtype
@@ -213,7 +218,7 @@ type declKindInfo =
   | D_request of requestInfo
   | D_value of jtype
   | D_state of jtype
-  | D_array of string (* key kind *)
+  | D_array of arrayInfo (* key kind *)
   | D_safe of ident * jtype (* safe decoder *)
   | D_loose of ident * jtype (* loose decoder *)
   | D_order of ident * jtype (* natural ordering *)
