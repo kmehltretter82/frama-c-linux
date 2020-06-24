@@ -9,7 +9,13 @@
 import * as Json from 'dome/data/json';
 import * as Server from 'frama-c/server';
 
+import { byTag } from 'api/kernel/data';
+import { jTag } from 'api/kernel/data';
+import { jTagSafe } from 'api/kernel/data';
 import { tag } from 'api/kernel/data';
+import { bySource } from 'api/kernel/services';
+import { jSource } from 'api/kernel/services';
+import { jSourceSafe } from 'api/kernel/services';
 import { source } from 'api/kernel/services';
 
 /** Property Kinds */
@@ -94,9 +100,11 @@ export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
 /** Natural order for `propKind` */
 
 /** Registered tags for the above type. */
-export const propKindTags: Server.GetRequest = {
+export const propKindTags: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.propKindTags',
+  name:   'kernel.properties.propKindTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
 };
 
 /** Property Status (consolidated) */
@@ -135,9 +143,11 @@ export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
 /** Natural order for `propStatus` */
 
 /** Registered tags for the above type. */
-export const propStatusTags: Server.GetRequest = {
+export const propStatusTags: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.propStatusTags',
+  name:   'kernel.properties.propStatusTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
 };
 
 /** Alarm Kinds */
@@ -190,13 +200,15 @@ export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
 /** Natural order for `alarms` */
 
 /** Registered tags for the above type. */
-export const alarmsTags: Server.GetRequest = {
+export const alarmsTags: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.alarmsTags',
+  name:   'kernel.properties.alarmsTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
 };
 
 /** Status of Registered Properties */
-export const status: State.Array<'status',statusData> = {
+export const status: State.Array<'#status',statusData> = {
   signal: signalStatus,
   fetch: fetchStatus,
   reload: reloadStatus,
@@ -210,7 +222,7 @@ export const signalStatus: Server.Signal = {
 /** Data for array rows [`status`](#status)  */
 export interface statusData {
   /** Entry identifier. */
-  key: Json.Key<'status'>;
+  key: Json.Key<'#status'>;
   /** Full description */
   descr: string;
   /** Kind */
@@ -220,9 +232,9 @@ export interface statusData {
   /** Status */
   status: propStatus;
   /** Function */
-  function?: Json.Key<'fct'>;
+  function?: Json.Key<'#fct'>;
   /** Instruction */
-  kinstr?: Json.Key<'stmt'>;
+  kinstr?: Json.Key<'#stmt'>;
   /** Position */
   source: source;
   /** Alarm name (if the property is an alarm) */
@@ -234,15 +246,27 @@ export interface statusData {
 }
 
 /** Data fetcher for array [`status`](#status)  */
-export const fetchStatus: Server.GetRequest = {
+export const fetchStatus: Server.GetRequest<number,
+  { pending: number, updated: statusData[], removed: Json.Key<'#status'>[],
+    reload: boolean }> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.fetchStatus',
+  name:   'kernel.properties.fetchStatus',
+  input:  Json.jNumber,
+  output: Json.jTry(
+            Json.jObject({
+              pending: Json.jFail(Json.jNumber,'Number expected'),
+              updated: Json.jList(jStatusData),
+              removed: Json.jList(Json.jKey('#status')),
+              reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            })),
 };
 
 /** Force full reload for array [`status`](#status)  */
-export const reloadStatus: Server.GetRequest = {
+export const reloadStatus: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.reloadStatus',
+  name:   'kernel.properties.reloadStatus',
+  input:  Json.jNull,
+  output: Json.jNull,
 };
 
 /* ------------------------------------- */

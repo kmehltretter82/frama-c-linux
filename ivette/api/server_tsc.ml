@@ -53,11 +53,15 @@ let makeDescr ?(indent="") fmt descr =
   if descr <> [] then
     Format.fprintf fmt "%s/** @[<hov 0>%a@] */@." indent pp_descr descr
 
+let getSelf = function
+  | None -> Self.fatal "Unexpected recursive type"
+  | Some id -> id
+
 (* -------------------------------------------------------------------------- *)
 (* --- Jtype Generator                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let makeJtype ~self ~names =
+let makeJtype ?self ~names =
   let open Pkg in
   let pp_ident fmt id =
     match IdMap.find id names with
@@ -65,14 +69,14 @@ let makeJtype ~self ~names =
     | exception Not_found -> Self.abort "Undefined '%a'" pp_ident id in
   let rec pp fmt = function
     | Jany -> Format.pp_print_string fmt "Json.json"
-    | Jself -> Format.pp_print_string fmt self.name
+    | Jself -> Format.pp_print_string fmt (getSelf self).name
     | Jnull -> Format.pp_print_string fmt "null"
     | Jnumber -> Format.pp_print_string fmt "number"
     | Jboolean -> Format.pp_print_string fmt "boolean"
     | Jstring | Jalpha -> Format.pp_print_string fmt "string"
-    | Jkey kd -> Format.fprintf fmt "Json.Key<'%s'>" kd
-    | Jindex kd -> Format.fprintf fmt "Json.Index<'%s'>" kd
-    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dict<'%s',%a>" kd pp js
+    | Jkey kd -> Format.fprintf fmt "Json.Key<'#%s'>" kd
+    | Jindex kd -> Format.fprintf fmt "Json.Index<'#%s'>" kd
+    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dict<'#%s',%a>" kd pp js
     | Jdata id | Jenum id -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->
@@ -93,8 +97,8 @@ let makeJtype ~self ~names =
 (* -------------------------------------------------------------------------- *)
 
 let jprim fmt name = Format.fprintf fmt "Json.%s" name
-let jkey fmt kd = Format.fprintf fmt "Json.jKey('%s')" kd
-let jindex fmt kd = Format.fprintf fmt "Json.jIndex('%s')" kd
+let jkey fmt kd = Format.fprintf fmt "Json.jKey('#%s')" kd
+let jindex fmt kd = Format.fprintf fmt "Json.jIndex('#%s')" kd
 
 let jcall names fmt id =
   try Format.pp_print_string fmt (Pkg.IdMap.find id names)
@@ -147,10 +151,10 @@ let jtuple ~makeSafe fmt jts =
     Format.fprintf fmt "@]@,)@]" ;
   end
 
-let rec makeDecoder ~safe ~self ~names fmt js =
+let rec makeDecoder ~safe ?self ~names fmt js =
   let open Pkg in
-  let makeSafe = makeDecoder ~self ~names ~safe:true in
-  let makeLoose = makeDecoder ~self ~names ~safe:false in
+  let makeSafe = makeDecoder ?self ~names ~safe:true in
+  let makeLoose = makeDecoder ?self ~names ~safe:false in
   match js with
   | Jany -> jprim fmt "jAny"
   | Jnull -> jprim fmt "jNull"
@@ -158,13 +162,13 @@ let rec makeDecoder ~safe ~self ~names fmt js =
   | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
   | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
   | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
-  | Jindex kd -> jsafe ~safe ("#0" ^ kd) jindex fmt kd
+  | Jindex kd -> jsafe ~safe ("#" ^ kd) jindex fmt kd
   | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
   | Jenum id -> jsafe ~safe (Pkg.name_of_ident id) (jenum names) fmt id
-  | Jself -> jcall names fmt (Pkg.Derived.decode ~safe self)
+  | Jself -> jcall names fmt (Pkg.Derived.decode ~safe (getSelf self))
   | Joption js -> makeLoose fmt js
   | Jdict(kd,js) ->
-    Format.fprintf fmt "@[<hov 2>Json.jDict('%s',@,%a)@]" kd makeLoose js
+    Format.fprintf fmt "@[<hov 2>Json.jDict('#%s',@,%a)@]" kd makeLoose js
   | Jlist js ->
     Format.fprintf fmt "@[<hov 2>Json.jList(%a)@]" makeLoose js
   | Jarray js ->
@@ -172,7 +176,7 @@ let rec makeDecoder ~safe ~self ~names fmt js =
     then Format.fprintf fmt "@[<hov 2>Json.jArray(%a)@]" makeSafe js
     else Format.fprintf fmt "@[<hov 2>Json.jTry(jArray(%a))@]" makeSafe js
   | Junion jts ->
-    let jtype = makeJtype ~self ~names in
+    let jtype = makeJtype ?self ~names in
     jsafe ~safe "Union" (junion ~jtype ~makeLoose) fmt jts
   | Jrecord jfs -> jtry ~safe (jrecord ~makeSafe) fmt jfs
   | Jtuple jts -> jtry ~safe (jtuple ~makeSafe) fmt jts
@@ -190,6 +194,16 @@ let makeRootDecoder ~safe ~self ~names fmt js =
       (jcall names) (Pkg.Derived.loose self)
       (String.capitalize_ascii self.name)
   | _ -> makeDecoder ~safe ~self ~names fmt js
+
+(* -------------------------------------------------------------------------- *)
+(* --- Parameter Decoder                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let typeOfParam = function
+  | Pkg.P_value js -> js
+  | Pkg.P_named fjs ->
+    let field fd = fd.Pkg.fd_name , fd.Pkg.fd_type in
+    Jrecord (List.map field fjs)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declaration Generator                                              --- *)
@@ -224,20 +238,27 @@ let makeDeclaration fmt names d =
          Format.fprintf fmt "  %s = '%s';@\n" tag tag ;
       ) tgs ;
     Format.fprintf fmt "}@\n" ;
-  | D_request rq ->
-    let kind = name_of_kind rq.rq_kind in
-    let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
-    Format.fprintf fmt "export const %s: Server.%sRequest = {@\n"
-      self.name prefix ;
-    Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
-    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
-    Format.fprintf fmt "};@\n" ;
   | D_signal ->
     Format.fprintf fmt "export const %s: Server.Signal = {@\n" self.name ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "};@\n" ;
+  | D_request rq ->
+    let kind = name_of_kind rq.rq_kind in
+    let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
+    let input = typeOfParam rq.rq_input in
+    let output = typeOfParam rq.rq_output in
+    let makeParam fmt js = makeDecoder ~safe:false ~names fmt js in
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: Server.%sRequest<@,%a,@,%a@,> = {@]@\n"
+      self.name prefix jtype input jtype output ;
+    Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
+    Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
+    Format.fprintf fmt "  input:  %a,@\n" makeParam input ;
+    Format.fprintf fmt "  output: %a,@\n" makeParam output ;
+    Format.fprintf fmt "};@\n" ;
   | D_value js ->
-    Format.fprintf fmt "export const %s: State.Value<%a> = {@\n"
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: State.Value<@,%a@,> = {@]@\n"
       self.name jtype js ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
@@ -245,7 +266,8 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.getter self) ;
     Format.fprintf fmt "};@\n" ;
   | D_state js ->
-    Format.fprintf fmt "export const %s: State.State<%a> = {@\n"
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: State.State<@,%a@,> = {@]@\n"
       self.name jtype js ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
@@ -256,7 +278,8 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt "};@\n" ;
   | D_array kd ->
     let data = Pkg.Derived.data self in
-    Format.fprintf fmt "export const %s: State.Array<'%s',%a> = {@\n"
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: State.Array<@,'#%s',@,%a@,> = {@]@\n"
       self.name kd (jcall names) data ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
@@ -266,11 +289,13 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.reload self) ;
     Format.fprintf fmt "};@\n" ;
   | D_safe(id,js) ->
-    Format.fprintf fmt "@[<hov 2>export const %s: Json.Safe<%a> =@ %a;@]\n"
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: Json.Safe<@,%a@,> =@ %a;@]\n"
       self.name (jcall names) id
       (makeRootDecoder ~safe:true ~self:id ~names) js ;
   | D_loose(id,js) ->
-    Format.fprintf fmt "@[<hov 2>export const %s: Json.Loose<%a> =@ %a;@]\n"
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: Json.Loose<@,%a@,> =@ %a;@]\n"
       self.name (jcall names) id
       (makeRootDecoder ~safe:false ~self:id ~names) js ;
   | D_order _ -> ()

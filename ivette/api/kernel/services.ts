@@ -9,18 +9,33 @@
 import * as Json from 'dome/data/json';
 import * as Server from 'frama-c/server';
 
+import { byTag } from 'api/kernel/data';
+import { jTag } from 'api/kernel/data';
+import { jTagSafe } from 'api/kernel/data';
 import { tag } from 'api/kernel/data';
 
 /** Frama-C Kernel configuration */
-export const getConfig: Server.GetRequest = {
+export const getConfig: Server.GetRequest<null,
+  { pluginpath: string[], libdir: string, datadir: string, version: string }
+  > = {
   kind: Server.RqKind.GET,
-  name: 'kernel.services.getConfig',
+  name:   'kernel.services.getConfig',
+  input:  Json.jNull,
+  output: Json.jTry(
+            Json.jObject({
+              pluginpath: Json.jList(Json.jString),
+              libdir: Json.jFail(Json.jString,'String expected'),
+              datadir: Json.jFail(Json.jString,'String expected'),
+              version: Json.jFail(Json.jString,'String expected'),
+            })),
 };
 
 /** Load a save file. Returns an error, if not successfull. */
-export const load: Server.SetRequest = {
+export const load: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
-  name: 'kernel.services.load',
+  name:   'kernel.services.load',
+  input:  Json.jString,
+  output: Json.jString,
 };
 
 /** Source file positions. */
@@ -67,9 +82,11 @@ export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
 /** Natural order for `logkind` */
 
 /** Registered tags for the above type. */
-export const logkindTags: Server.GetRequest = {
+export const logkindTags: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.services.logkindTags',
+  name:   'kernel.services.logkindTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
 };
 
 /** Message event record. */
@@ -102,15 +119,19 @@ export const jLog: Json.Loose<log> = Json.jTry(jLogSafe);
 /** Natural order for `log` */
 
 /** Turn logs monitoring on/off */
-export const setLogs: Server.SetRequest = {
+export const setLogs: Server.SetRequest<boolean,null> = {
   kind: Server.RqKind.SET,
-  name: 'kernel.services.setLogs',
+  name:   'kernel.services.setLogs',
+  input:  Json.jBoolean,
+  output: Json.jNull,
 };
 
 /** Flush the last emitted logs since last call (max 100) */
-export const getLogs: Server.GetRequest = {
+export const getLogs: Server.GetRequest<null,log[]> = {
   kind: Server.RqKind.GET,
-  name: 'kernel.services.getLogs',
+  name:   'kernel.services.getLogs',
+  input:  Json.jNull,
+  output: Json.jList(jLog),
 };
 
 /* ------------------------------------- */

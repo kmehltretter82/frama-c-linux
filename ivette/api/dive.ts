@@ -32,45 +32,61 @@ export const jVariableName: Json.Loose<variableName> =
 /** Natural order for `variableName` */
 
 /** Retrieve the whole graph */
-export const graph: Server.GetRequest = {
+export const graph: Server.GetRequest<null,Json.json> = {
   kind: Server.RqKind.GET,
-  name: 'dive.graph',
+  name:   'dive.graph',
+  input:  Json.jNull,
+  output: Json.jAny,
 };
 
 /** Erase the graph and start over with an empty one */
-export const clear: Server.ExecRequest = {
+export const clear: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.clear',
+  name:   'dive.clear',
+  input:  Json.jNull,
+  output: Json.jNull,
 };
 
 /** Add a variable to the graph */
-export const addVar: Server.ExecRequest = {
+export const addVar: Server.ExecRequest<variableName,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.addVar',
+  name:   'dive.addVar',
+  input:  jVariableName,
+  output: Json.jAny,
 };
 
 /** Add all alarms of the given function */
-export const addFunctionAlarms: Server.ExecRequest = {
+export const addFunctionAlarms: Server.ExecRequest<Json.Key<'#fct'>,Json.json
+  > = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.addFunctionAlarms',
+  name:   'dive.addFunctionAlarms',
+  input:  Json.jKey('#fct'),
+  output: Json.jAny,
 };
 
 /** Explore the graph starting from an existing vertex */
-export const explore: Server.ExecRequest = {
+export const explore: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json
+  > = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.explore',
+  name:   'dive.explore',
+  input:  Json.jIndex('#dive-node'),
+  output: Json.jAny,
 };
 
 /** Show the dependencies of an existing vertex */
-export const show: Server.ExecRequest = {
+export const show: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.show',
+  name:   'dive.show',
+  input:  Json.jIndex('#dive-node'),
+  output: Json.jAny,
 };
 
 /** Hide the dependencies of an existing vertex */
-export const hide: Server.ExecRequest = {
+export const hide: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name: 'dive.hide',
+  name:   'dive.hide',
+  input:  Json.jIndex('#dive-node'),
+  output: Json.jAny,
 };
 
 /* ------------------------------------- */

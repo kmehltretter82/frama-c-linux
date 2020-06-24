@@ -251,6 +251,32 @@ let pp_pkgname fmt { p_plugin ; p_package } =
     List.iter (pp_step fmt) p_package )
 
 (* -------------------------------------------------------------------------- *)
+(* --- Derived Names                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let derived ?prefix ?suffix id =
+  let capitalize = String.capitalize_ascii in
+  match prefix , suffix with
+  | None , None -> id
+  | Some p , None -> { id with name = p ^ capitalize id.name }
+  | None , Some q -> { id with name = id.name ^ q }
+  | Some p , Some q -> { id with name = p ^ capitalize id.name ^ q }
+
+module Derived =
+struct
+  let signal id = derived ~prefix:"signal" id
+  let getter id = derived ~prefix:"get" id
+  let setter id = derived ~prefix:"set" id
+  let data id = derived ~suffix:"Data" id
+  let fetch id = derived ~prefix:"fetch" id
+  let reload id = derived ~prefix:"reload" id
+  let order id = derived ~prefix:"by" id
+  let loose id = derived ~prefix:"j" id
+  let safe id = derived ~prefix:"j" ~suffix:"Safe" id
+  let decode ~safe:ok id = if ok then safe id else loose id
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Visitors                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -260,7 +286,13 @@ let rec visit_jtype fn = function
   | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
-  | Jdata id | Jenum id -> fn id
+  | Jdata id | Jenum id ->
+    begin
+      fn id ;
+      fn (Derived.safe id) ;
+      fn (Derived.loose id) ;
+      fn (Derived.order id) ;
+    end
 
 let visit_field f { fd_type } = visit_jtype f fd_type
 
@@ -292,32 +324,6 @@ let resolve ?(keywords=[]) pkg =
   visit_package_decl (Scope.declare scope) pkg ;
   visit_package_used (Scope.use scope) pkg ;
   Scope.resolve scope
-
-(* -------------------------------------------------------------------------- *)
-(* --- Derived Names                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
-let derived ?prefix ?suffix id =
-  let capitalize = String.capitalize_ascii in
-  match prefix , suffix with
-  | None , None -> id
-  | Some p , None -> { id with name = p ^ capitalize id.name }
-  | None , Some q -> { id with name = id.name ^ q }
-  | Some p , Some q -> { id with name = p ^ capitalize id.name ^ q }
-
-module Derived =
-struct
-  let signal id = derived ~prefix:"signal" id
-  let getter id = derived ~prefix:"get" id
-  let setter id = derived ~prefix:"set" id
-  let data id = derived ~suffix:"Data" id
-  let fetch id = derived ~prefix:"fetch" id
-  let reload id = derived ~prefix:"reload" id
-  let order id = derived ~prefix:"by" id
-  let loose id = derived ~prefix:"j" id
-  let safe id = derived ~prefix:"j" ~suffix:"Safe" id
-  let decode ~safe:ok id = if ok then safe id else loose id
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server API                                                         --- *)
