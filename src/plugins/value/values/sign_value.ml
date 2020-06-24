@@ -158,12 +158,39 @@ let div v1 v2 =
   let zero = true in (* zero can appear with large enough v2 *)
   { neg; pos; zero }
 
+let bitwise_and v1 v2 =
+  let pos = (v1.pos && (v2.pos || v2.neg)) || (v2.pos && v1.neg) in
+  let neg = v1.neg && v2.neg in
+  let zero = v1.zero || v1.pos || v2.zero || v2.pos in
+  { neg; pos; zero }
+
+let bitwise_or v1 v2 =
+  let pos = (v1.pos && (v2.pos || v2.zero)) || (v1.zero && v2.pos) in
+  let neg = v1.neg || v2.neg in
+  let zero = v1.zero && v2.zero in
+  { neg; pos; zero }
+
+let bitwise_xor v1 v2 =
+  let pos =
+    (v1.pos && v2.pos) || (v1.pos && v2.zero) || (v1.zero && v2.pos)
+    || (v1.neg && v2.neg)
+  in
+  let neg =
+    (v1.neg && (v2.pos || v2.zero)) ||
+    (v2.neg && (v1.pos || v1.zero))
+  in
+  let zero = (v1.zero && v2.zero) || (v1.pos && v2.pos) || (v1.neg && v2.neg) in
+  { neg; pos; zero }
+
 let forward_binop _ op v1 v2 =
   match op with
   | PlusA  -> `Value (plus v1 v2)
   | MinusA -> `Value (plus v1 (neg_unop v2))
   | Mult   -> `Value (mul v1 v2)
   | Div    -> if equal zero v2 then `Bottom else `Value (div v1 v2)
+  | BAnd -> `Value (bitwise_and v1 v2)
+  | BOr -> `Value (bitwise_or v1 v2)
+  | BXor -> `Value (bitwise_xor v1 v2)
   | _      -> `Value top
 
 let rewrap_integer range v =
