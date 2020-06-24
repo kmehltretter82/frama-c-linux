@@ -50,8 +50,6 @@ module MarkerKind = struct
   let kind name = Enum.tag t ~name ~descr:(Md.plain name) ()
   let expr = kind "expression"
   let lval = kind "lvalue"
-  let var = kind "variable"
-  let fct = kind "function"
   let decl = kind "declaration"
   let stmt = kind "statement"
   let glob = kind "global"
@@ -64,13 +62,35 @@ module MarkerKind = struct
     | PStmt _ -> stmt
     | PStmtStart _ -> stmt
     | PVDecl _ -> decl
-    | PLval (_, _, (Var vi, NoOffset)) ->
-      if Cil.isFunctionType vi.vtype then fct else var
     | PLval _ -> lval
     | PExp _ -> expr
     | PTermLval _ -> term
     | PGlobal _ -> glob
     | PIP _ -> prop
+
+  let data = Enum.publish t ~tag ()
+  include (val data : S with type t = Printer_tag.localizable)
+end
+
+module MarkerVar = struct
+  let t =
+    Enum.dictionary ~page ~name:"markervar" ~title:"Marker variable"
+      ~descr:(Md.plain "Identifies markers that are variables") ()
+
+  let kind name = Enum.tag t ~name ~descr:(Md.plain name) ()
+  let none = kind "no"
+  let var = kind "variable"
+  let fct = kind "function"
+  let tag =
+    let open Printer_tag in
+    function
+    | PLval (_, _, (Var vi, NoOffset))
+    | PVDecl (_, _, vi)
+    | PGlobal (GVar (vi, _, _)  | GVarDecl (vi, _)) ->
+      if Cil.isFunctionType vi.vtype then fct else var
+    | PGlobal (GFun _ | GFunDecl _) -> fct
+    | PLval _ | PStmt _ | PStmtStart _
+    | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> none
 
   let data = Enum.publish t ~tag ()
   include (val data : S with type t = Printer_tag.localizable)
@@ -119,6 +139,11 @@ struct
       States.column ~model
         ~name:"kind" ~descr:(Md.plain "Marker kind")
         ~data:(module MarkerKind) ~get:fst ()
+    in
+    let () =
+      States.column ~model
+        ~name:"var" ~descr:(Md.plain "Marker variable")
+        ~data:(module MarkerVar) ~get:fst ()
     in
     let () =
       States.column ~model
