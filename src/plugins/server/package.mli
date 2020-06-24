@@ -34,17 +34,17 @@ type jtype =
   | Jnumber
   | Jstring
   | Jalpha (** string primarily compared without case *)
-  | Jtag of string
   | Jkey of string (** kind of a string used for indexing *)
   | Jindex of string (** kind of an integer used for indexing *)
   | Joption of jtype
-  | Jassoc of string * jtype (** kind of keys *)
+  | Jdict of string * jtype (** kind of keys *)
   | Jlist of jtype (** order does not matter *)
   | Jarray of jtype (** order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
+  | Jenum of ident (** data that is an enum *)
   | Jself (** for (simply) recursive types *)
 
 type fieldInfo = {
@@ -78,6 +78,9 @@ type declKindInfo =
   | D_value of jtype
   | D_state of jtype
   | D_array of string
+  | D_safe of ident * jtype (* safe decoder *)
+  | D_loose of ident * jtype (* loose decoder *)
+  | D_order of ident * jtype (* natural ordering *)
 
 type declInfo = {
   d_ident : ident;
@@ -103,7 +106,6 @@ val pp_pkgname : Format.formatter -> packageInfo -> unit
 val pp_ident : Format.formatter -> ident -> unit
 val pp_jtype : Format.formatter -> jtype -> unit
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Derived Names                                                      --- *)
 (* -------------------------------------------------------------------------- *)
@@ -118,6 +120,10 @@ sig
   val data : ident -> ident
   val fetch : ident -> ident
   val reload : ident -> ident
+  val safe : ident -> ident
+  val loose : ident -> ident
+  val order : ident -> ident
+  val decode : safe:bool -> ident -> ident
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -180,16 +186,6 @@ val declare_id :
   ?descr:Markdown.text ->
   declKindInfo ->
   ident
-
-(**
-   Declare a new type and returns its alias.
-   Same as [Jdata (declare_id ~package ~name (D_type js))]`
-*)
-val datatype :
-  package:package ->
-  name:string ->
-  ?descr:Markdown.text ->
-  jtype -> jtype
 
 (**
    Replace the declaration for the given name in the package.

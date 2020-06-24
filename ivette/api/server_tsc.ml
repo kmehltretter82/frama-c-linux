@@ -49,6 +49,10 @@ let name_of_kind = function
   | `SET -> "SET"
   | `EXEC -> "EXEC"
 
+let makeDescr ?(indent="") fmt descr =
+  if descr <> [] then
+    Format.fprintf fmt "%s/** @[<hov 0>%a@] */@." indent pp_descr descr
+
 (* -------------------------------------------------------------------------- *)
 (* --- Jtype Generator                                                    --- *)
 (* -------------------------------------------------------------------------- *)
@@ -61,15 +65,15 @@ let makeJtype ~self ~names =
     | exception Not_found -> Self.abort "Undefined '%a'" pp_ident id in
   let rec pp fmt = function
     | Jany -> Format.pp_print_string fmt "Json.json"
-    | Jself -> Format.pp_print_string fmt self
+    | Jself -> Format.pp_print_string fmt self.name
     | Jnull -> Format.pp_print_string fmt "null"
     | Jnumber -> Format.pp_print_string fmt "number"
     | Jboolean -> Format.pp_print_string fmt "boolean"
-    | Jstring -> Format.pp_print_string fmt "string"
-    | Jtag tag -> Format.fprintf fmt "'%s'" tag
+    | Jstring | Jalpha -> Format.pp_print_string fmt "string"
     | Jkey kd -> Format.fprintf fmt "Json.Key<'%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.Index<'%s'>" kd
-    | Jdata id -> pp_ident fmt id
+    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dict<'%s',%a>" kd pp js
+    | Jdata id | Jenum id -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->
       Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]" pp fmt js
@@ -77,8 +81,7 @@ let makeJtype ~self ~names =
       Pretty_utils.pp_list ~pre:"@[<hov 0>" ~sep:" |@ " ~suf:"@]" protect fmt js
     | Jrecord fjs ->
       Pretty_utils.pp_list ~pre:"@[<hov 2>{ " ~sep:",@ " ~suf:"@ }@]" field fmt fjs
-    | Jarray js -> Format.fprintf fmt "%a[]" protect js
-    | Jassoc (kd,js) -> Format.fprintf fmt "Json.Dict<'%s',%a>" kd pp js
+    | Jarray js | Jlist js -> Format.fprintf fmt "%a[]" protect js
   and protect fmt js = match js with
     | Junion _ | Joption _ -> Format.fprintf fmt "@[<hov 2>(%a)@]" pp js
     | _ -> pp fmt js
@@ -86,22 +89,126 @@ let makeJtype ~self ~names =
   in pp
 
 (* -------------------------------------------------------------------------- *)
+(* --- Jtype Decoder                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let jprim fmt name = Format.fprintf fmt "Json.%s" name
+let jkey fmt kd = Format.fprintf fmt "Json.jKey('%s')" kd
+let jindex fmt kd = Format.fprintf fmt "Json.jIndex('%s')" kd
+
+let jcall names fmt id =
+  try Format.pp_print_string fmt (Pkg.IdMap.find id names)
+  with Not_found -> Self.abort "Undefined identifier '%a'" Pkg.pp_ident id
+
+let jsafe ~safe msg pp fmt d =
+  if safe then
+    Format.fprintf fmt "@[<hov 2>Json.jFail(@,%a,@,'%s expected')@]" pp d msg
+  else
+    pp fmt d
+
+let jtry ~safe pp fmt d =
+  if safe then
+    pp fmt d
+  else
+    Format.fprintf fmt "@[<hov 2>Json.jTry(@,%a)@]" pp d
+
+let jenum names fmt id = Format.fprintf fmt "Json.jEnum(%a)" (jcall names) id
+
+let junion ~jtype ~makeLoose fmt jts =
+  begin
+    Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.jUnion<%a>("
+      jtype (Pkg.Junion jts) ;
+    List.iter
+      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," makeLoose js) jts ;
+    Format.fprintf fmt "@]@,)@]" ;
+  end
+
+let jrecord ~makeSafe fmt jts =
+  begin
+    Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.jObject({" ;
+    List.iter
+      (fun (fd,js) ->
+         Format.fprintf fmt "@ @[<hov 2>%s: %a@]," fd makeSafe js) jts ;
+    Format.fprintf fmt "@]@,})@]" ;
+  end
+
+let jtuple ~makeSafe fmt jts =
+  begin
+    let name = match List.length jts with
+      | 2 -> "jPair"
+      | 3 -> "jTriple"
+      | 4 -> "jTuple4"
+      | 5 -> "jTuple5"
+      | n -> Self.fatal "No jTuple%d defined" n
+    in
+    Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.%s(" name ;
+    List.iter
+      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," makeSafe js) jts ;
+    Format.fprintf fmt "@]@,)@]" ;
+  end
+
+let rec makeDecoder ~safe ~self ~names fmt js =
+  let open Pkg in
+  let makeSafe = makeDecoder ~self ~names ~safe:true in
+  let makeLoose = makeDecoder ~self ~names ~safe:false in
+  match js with
+  | Jany -> jprim fmt "jAny"
+  | Jnull -> jprim fmt "jNull"
+  | Jboolean -> jsafe ~safe "Boolean" jprim fmt "jBoolean"
+  | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
+  | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
+  | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
+  | Jindex kd -> jsafe ~safe ("#0" ^ kd) jindex fmt kd
+  | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
+  | Jenum id -> jsafe ~safe (Pkg.name_of_ident id) (jenum names) fmt id
+  | Jself -> jcall names fmt (Pkg.Derived.decode ~safe self)
+  | Joption js -> makeLoose fmt js
+  | Jdict(kd,js) ->
+    Format.fprintf fmt "@[<hov 2>Json.jDict('%s',@,%a)@]" kd makeLoose js
+  | Jlist js ->
+    Format.fprintf fmt "@[<hov 2>Json.jList(%a)@]" makeLoose js
+  | Jarray js ->
+    if safe
+    then Format.fprintf fmt "@[<hov 2>Json.jArray(%a)@]" makeSafe js
+    else Format.fprintf fmt "@[<hov 2>Json.jTry(jArray(%a))@]" makeSafe js
+  | Junion jts ->
+    let jtype = makeJtype ~self ~names in
+    jsafe ~safe "Union" (junion ~jtype ~makeLoose) fmt jts
+  | Jrecord jfs -> jtry ~safe (jrecord ~makeSafe) fmt jfs
+  | Jtuple jts -> jtry ~safe (jtuple ~makeSafe) fmt jts
+
+let makeRootDecoder ~safe ~self ~names fmt js =
+  let open Pkg in
+  match js with
+  | Joption _ | Jdict _ | Jlist _ when safe ->
+    jcall names fmt (Pkg.Derived.loose self)
+  | Jrecord _ | Jtuple _ | Jarray _ when not safe ->
+    Format.fprintf fmt "Json.jTry(%a)"
+      (jcall names) (Pkg.Derived.safe self)
+  | Junion _ when safe ->
+    Format.fprintf fmt "Json.jFail(%a,'%s expected')"
+      (jcall names) (Pkg.Derived.loose self)
+      (String.capitalize_ascii self.name)
+  | _ -> makeDecoder ~safe ~self ~names fmt js
+
+(* -------------------------------------------------------------------------- *)
 (* --- Declaration Generator                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 let makeDeclaration fmt names d =
   let open Pkg in
-  Format.fprintf fmt "@\n@\n/** %a */@\n" pp_descr d.d_descr ;
-  let self = d.d_ident.name in
+  Format.pp_print_newline fmt () ;
+  makeDescr fmt d.d_descr ;
+  let self = d.d_ident in
   let jtype = makeJtype ~self ~names in
   match d.d_kind with
   | D_type js ->
-    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self jtype js ;
+    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self.name jtype js ;
   | D_record fjs ->
-    Format.fprintf fmt "export interface %s {@\n" self ;
+    Format.fprintf fmt "export interface %s {@\n" self.name ;
     List.iter
       (fun { fd_name = fd ; fd_type = js ; fd_descr = doc } ->
-         if doc<>[] then Format.fprintf fmt "  /** %a */@\n" pp_descr doc ;
+         makeDescr ~indent:"  " fmt doc ;
          match js with
          | Joption js ->
            Format.fprintf fmt "  @[<hov 2>%s?: %a;@]@\n" fd jtype js
@@ -110,25 +217,63 @@ let makeDeclaration fmt names d =
       ) fjs ;
     Format.fprintf fmt "}@\n" ;
   | D_enum tgs ->
-    Format.fprintf fmt "export enum %s {@\n" self ;
+    Format.fprintf fmt "export enum %s {@\n" self.name ;
     List.iter
       (fun { tg_name = tag ; tg_descr = doc } ->
-         if doc<>[] then Format.fprintf fmt "  /** %a */@\n" pp_descr doc ;
+         makeDescr ~indent:"  " fmt doc ;
          Format.fprintf fmt "  %s = '%s';@\n" tag tag ;
       ) tgs ;
     Format.fprintf fmt "}@\n" ;
   | D_request rq ->
     let kind = name_of_kind rq.rq_kind in
     let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
-    Format.fprintf fmt "export const %s: Server.%sRequest = {@\n" self prefix ;
+    Format.fprintf fmt "export const %s: Server.%sRequest = {@\n"
+      self.name prefix ;
     Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "};@\n" ;
   | D_signal ->
-    Format.fprintf fmt "export const %s: Server.Signal = {@\n" self ;
+    Format.fprintf fmt "export const %s: Server.Signal = {@\n" self.name ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "};@\n" ;
-  | _ -> ()
+  | D_value js ->
+    Format.fprintf fmt "export const %s: State.Value<%a> = {@\n"
+      self.name jtype js ;
+    Format.fprintf fmt "  signal: %a,@\n"
+      (jcall names) (Pkg.Derived.signal self) ;
+    Format.fprintf fmt "  getter: %a,@\n"
+      (jcall names) (Pkg.Derived.getter self) ;
+    Format.fprintf fmt "};@\n" ;
+  | D_state js ->
+    Format.fprintf fmt "export const %s: State.State<%a> = {@\n"
+      self.name jtype js ;
+    Format.fprintf fmt "  signal: %a,@\n"
+      (jcall names) (Pkg.Derived.signal self) ;
+    Format.fprintf fmt "  getter: %a,@\n"
+      (jcall names) (Pkg.Derived.getter self) ;
+    Format.fprintf fmt "  setter: %a,@\n"
+      (jcall names) (Pkg.Derived.setter self) ;
+    Format.fprintf fmt "};@\n" ;
+  | D_array kd ->
+    let data = Pkg.Derived.data self in
+    Format.fprintf fmt "export const %s: State.Array<'%s',%a> = {@\n"
+      self.name kd (jcall names) data ;
+    Format.fprintf fmt "  signal: %a,@\n"
+      (jcall names) (Pkg.Derived.signal self) ;
+    Format.fprintf fmt "  fetch: %a,@\n"
+      (jcall names) (Pkg.Derived.fetch self) ;
+    Format.fprintf fmt "  reload: %a,@\n"
+      (jcall names) (Pkg.Derived.reload self) ;
+    Format.fprintf fmt "};@\n" ;
+  | D_safe(id,js) ->
+    Format.fprintf fmt "@[<hov 2>export const %s: Json.Safe<%a> =@ %a;@]\n"
+      self.name (jcall names) id
+      (makeRootDecoder ~safe:true ~self:id ~names) js ;
+  | D_loose(id,js) ->
+    Format.fprintf fmt "@[<hov 2>export const %s: Json.Loose<%a> =@ %a;@]\n"
+      self.name (jcall names) id
+      (makeRootDecoder ~safe:false ~self:id ~names) js ;
+  | D_order _ -> ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Package Generator                                                  --- *)
@@ -138,15 +283,16 @@ let makePackage pkg name fmt =
   begin
     let open Pkg in
     Format.fprintf fmt "/* --- Generated Frama-C Server API --- */@\n@\n" ;
-    Format.fprintf fmt "/** %s@\n" pkg.p_title ;
+    Format.fprintf fmt "/**@\n   %s@\n" pkg.p_title ;
     if pkg.p_descr <> [] then
-      Format.fprintf fmt "@\n@\n%a@\n" pp_descr pkg.p_descr ;
+      Format.fprintf fmt "@\n   @[<hov 0>%a@]@\n@\n" pp_descr pkg.p_descr ;
     Format.fprintf fmt "   @@packageDocumentation@\n" ;
     Format.fprintf fmt "   @@module frama-c/%s@\n" name ;
-    Format.fprintf fmt "*/@\n@\n" ;
+    Format.fprintf fmt "*/@\n@." ;
     let names = Pkg.resolve ~keywords pkg in
     Format.fprintf fmt "import * as Json from 'dome/data/json';@\n" ;
     Format.fprintf fmt "import * as Server from 'frama-c/server';@\n" ;
+    Format.pp_print_newline fmt () ;
     Pkg.IdMap.iter
       (fun id name ->
          if id.plugin <> pkg.p_plugin ||
@@ -160,7 +306,9 @@ let makePackage pkg name fmt =
              Format.fprintf fmt "import { %s: %s } from 'api/%s';@\n"
                id.name name pkg
       ) names ;
-    List.iter (makeDeclaration fmt names) pkg.p_content
+    List.iter (makeDeclaration fmt names) pkg.p_content ;
+    Format.pp_print_newline fmt () ;
+    Format.fprintf fmt "/* ------------------------------------- */@." ;
   end
 
 (* -------------------------------------------------------------------------- *)

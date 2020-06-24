@@ -58,6 +58,28 @@ let failure_from_type_error msg json =
 let package = Package.package ~name:"data" ~title:"Informations" ()
 
 (* -------------------------------------------------------------------------- *)
+(* --- Declared Type                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let derived ~package ~id jtype =
+  let module Md = Markdown in
+  begin
+    declare ~package ~name:(Derived.safe id).name
+      ~descr:(Md.plain "Safe decoder for" @ Md.code id.name)
+      (D_safe(id,jtype)) ;
+    declare ~package ~name:(Derived.loose id).name
+      ~descr:(Md.plain "Loose decoder for" @ Md.code id.name)
+      (D_loose(id,jtype)) ;
+    declare ~package ~name:(Derived.order id).name
+      ~descr:(Md.plain "Natural order for" @ Md.code id.name)
+      (D_order(id,jtype)) ;
+  end
+
+let declare ~package ~name ?descr jtype =
+  let id = declare_id ~package ~name ?descr (D_type jtype) in
+  derived ~package ~id jtype ; Jdata id
+
+(* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -195,12 +217,16 @@ struct
   let to_json s = `String s
 end
 
+(* -------------------------------------------------------------------------- *)
+(* --- Text Datatypes                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
 module Jmarkdown : S with type t = Markdown.text =
 struct
   type t = Markdown.text
   let jtype =
     let descr = Markdown.plain "Markdown (inlined) text." in
-    datatype ~package ~name:"markdown" ~descr Jstring
+    declare ~package ~name:"markdown" ~descr Jstring
   let of_json js = Markdown.plain (Ju.to_string js)
   let to_json txt = `String (Pretty_utils.to_string Markdown.pp_text txt)
 end
@@ -213,8 +239,8 @@ struct
         "Rich text format uses `[tag; …text ]` to apply \
          the tag `tag` to the enclosed text. \
          Empty tag `\"\"` can also used to simply group text together." in
-    let jdef = Junion [ Jnull; Jstring; Jarray Jself ] in
-    datatype ~package ~name:"text" ~descr jdef
+    let jdef = Junion [ Jnull; Jstring; Jlist Jself ] in
+    declare ~package ~name:"text" ~descr jdef
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -350,8 +376,11 @@ struct
       type nonrec r = r
       type t = r record
       let jtype =
-        let record = D_record (List.rev s.fields) in
-        Jdata (Package.declare_id ~package ~name ~descr record)
+        let fields = List.rev s.fields in
+        let id = Package.declare_id ~package ~name ~descr (D_record fields) in
+        let field fd = fd.fd_name, fd.fd_type in
+        derived ~package ~id (Jrecord (List.map field fields)) ;
+        Jdata id
       let default = s.default
       let has fd r = fd.member r
       let get fd r = fd.getter r
@@ -380,8 +409,7 @@ module Tag =
 struct
   type t = Package.tagInfo
 
-  let jtype =
-    datatype ~package ~name:"tag"
+  let jtype = declare ~package ~name:"tag"
       ~descr:(Markdown.plain "Enum Tag Description")
       (Jrecord [
           "name",Jstring ;
@@ -520,7 +548,9 @@ struct
       type t = a
       let jtype =
         let enums = D_enum (List.rev d.tags) in
-        Jdata (Package.declare_id ~package ~name ~descr enums)
+        let id = Package.declare_id ~package ~name ~descr enums in
+        let js = Jenum id in
+        derived ~package ~id js ; js
       let of_json = of_json name d.values
       let to_json = to_json name d.lookup d.vindex
     end in

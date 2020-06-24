@@ -115,6 +115,23 @@ val jalist : 'a data -> 'a list data
 val jarray : 'a data -> 'a array data
 val joption : 'a data -> 'a option data
 
+(**
+   Declare the derived names for the provided type.
+   Shall not be used directely.
+*)
+val derived : package:package -> id:ident -> jtype -> unit
+
+(**
+   Declare a new type and returns its alias.
+   Same as [Jdata (declare_id ~package ~name (D_type js))].
+   Automatically declare the derived names.
+*)
+val declare :
+  package:package ->
+  name:string ->
+  ?descr:Markdown.text ->
+  jtype -> jtype
+
 (* -------------------------------------------------------------------------- *)
 (** {2 Records} *)
 (* -------------------------------------------------------------------------- *)

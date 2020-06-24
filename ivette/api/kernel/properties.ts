@@ -1,15 +1,16 @@
 /* --- Generated Frama-C Server API --- */
 
-/** Property Services
+/**
+   Property Services
    @packageDocumentation
    @module frama-c/kernel/properties
 */
 
 import * as Json from 'dome/data/json';
 import * as Server from 'frama-c/server';
+
 import { tag } from 'api/kernel/data';
 import { source } from 'api/kernel/services';
-
 
 /** Property Kinds */
 export enum propKind {
@@ -83,13 +84,20 @@ export enum propKind {
   prop:<prop> = 'prop:<prop>';
 }
 
+/** Safe decoder for `propKind` */
+export const jPropKindSafe: Json.Safe<propKind> =
+  Json.jFail(Json.jEnum(propKind),'kernel.properties.propKind expected');
 
-/** Returns all registered tags for the above type. */
+/** Loose decoder for `propKind` */
+export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
+
+/** Natural order for `propKind` */
+
+/** Registered tags for the above type. */
 export const propKindTags: Server.GetRequest = {
   kind: Server.RqKind.GET,
   name: 'kernel.properties.propKindTags',
 };
-
 
 /** Property Status (consolidated) */
 export enum propStatus {
@@ -117,13 +125,20 @@ export enum propStatus {
   unknown_but_dead = 'unknown_but_dead';
 }
 
+/** Safe decoder for `propStatus` */
+export const jPropStatusSafe: Json.Safe<propStatus> =
+  Json.jFail(Json.jEnum(propStatus),'kernel.properties.propStatus expected');
 
-/** Returns all registered tags for the above type. */
+/** Loose decoder for `propStatus` */
+export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
+
+/** Natural order for `propStatus` */
+
+/** Registered tags for the above type. */
 export const propStatusTags: Server.GetRequest = {
   kind: Server.RqKind.GET,
   name: 'kernel.properties.propStatusTags',
 };
-
 
 /** Alarm Kinds */
 export enum alarms {
@@ -165,27 +180,35 @@ export enum alarms {
   bool_value = 'bool_value';
 }
 
+/** Safe decoder for `alarms` */
+export const jAlarmsSafe: Json.Safe<alarms> =
+  Json.jFail(Json.jEnum(alarms),'kernel.properties.alarms expected');
 
-/** Returns all registered tags for the above type. */
+/** Loose decoder for `alarms` */
+export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
+
+/** Natural order for `alarms` */
+
+/** Registered tags for the above type. */
 export const alarmsTags: Server.GetRequest = {
   kind: Server.RqKind.GET,
   name: 'kernel.properties.alarmsTags',
 };
 
-
 /** Status of Registered Properties */
-
-
-/** Signal for array [`status`](#status)
- */
-export const statusSig: Server.Signal = {
-  name: 'kernel.properties.statusSig',
+export const status: State.Array<'status',statusData> = {
+  signal: signalStatus,
+  fetch: fetchStatus,
+  reload: reloadStatus,
 };
 
+/** Signal for array [`status`](#status)  */
+export const signalStatus: Server.Signal = {
+  name: 'kernel.properties.signalStatus',
+};
 
-/** Data rows for array [`status`](#status)
- */
-export interface statusRow {
+/** Data for array rows [`status`](#status)  */
+export interface statusData {
   /** Entry identifier. */
   key: Json.Key<'status'>;
   /** Full description */
@@ -210,18 +233,16 @@ export interface statusRow {
   predicate?: string;
 }
 
-
-/** Data fetcher for array [`status`](#status)
- */
-export const statusFetch: Server.GetRequest = {
+/** Data fetcher for array [`status`](#status)  */
+export const fetchStatus: Server.GetRequest = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.statusFetch',
+  name: 'kernel.properties.fetchStatus',
 };
 
-
-/** Force full reload for array [`status`](#status)
- */
-export const statusReload: Server.GetRequest = {
+/** Force full reload for array [`status`](#status)  */
+export const reloadStatus: Server.GetRequest = {
   kind: Server.RqKind.GET,
-  name: 'kernel.properties.statusReload',
+  name: 'kernel.properties.reloadStatus',
 };
+
+/* ------------------------------------- */

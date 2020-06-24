@@ -185,7 +185,7 @@ struct
   let jglobal = jmarker "global"
   let jproperty = jmarker "property"
 
-  let jtype = Pkg.datatype ~package ~name:"marker"
+  let jtype = Data.declare ~package ~name:"marker"
       ~descr:(Md.plain "Localizable AST markers")
       Pkg.(Junion (List.rev !markers))
 

@@ -79,7 +79,7 @@ module LogSource =
 struct
   type t = Filepath.position
 
-  let jtype = Pkg.datatype ~package ~name:"source"
+  let jtype = Data.declare ~package ~name:"source"
       ~descr:(Md.plain "Source file positions.")
       (Jrecord [
           "dir", Jstring;

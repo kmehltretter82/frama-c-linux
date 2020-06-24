@@ -1,6 +1,7 @@
 /* --- Generated Frama-C Server API --- */
 
-/** Dive Services
+/**
+   Dive Services
    @packageDocumentation
    @module frama-c/dive
 */
@@ -17,6 +18,18 @@ export interface variableName {
   varName: string;
 }
 
+/** Safe decoder for `variableName` */
+export const jVariableNameSafe: Json.Safe<variableName> =
+  Json.jObject({
+    funName: Json.jString,
+    varName: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Loose decoder for `variableName` */
+export const jVariableName: Json.Loose<variableName> =
+  Json.jTry(jVariableNameSafe);
+
+/** Natural order for `variableName` */
 
 /** Retrieve the whole graph */
 export const graph: Server.GetRequest = {
@@ -24,13 +37,11 @@ export const graph: Server.GetRequest = {
   name: 'dive.graph',
 };
 
-
 /** Erase the graph and start over with an empty one */
 export const clear: Server.ExecRequest = {
   kind: Server.RqKind.EXEC,
   name: 'dive.clear',
 };
-
 
 /** Add a variable to the graph */
 export const addVar: Server.ExecRequest = {
@@ -38,13 +49,11 @@ export const addVar: Server.ExecRequest = {
   name: 'dive.addVar',
 };
 
-
 /** Add all alarms of the given function */
 export const addFunctionAlarms: Server.ExecRequest = {
   kind: Server.RqKind.EXEC,
   name: 'dive.addFunctionAlarms',
 };
-
 
 /** Explore the graph starting from an existing vertex */
 export const explore: Server.ExecRequest = {
@@ -52,16 +61,16 @@ export const explore: Server.ExecRequest = {
   name: 'dive.explore',
 };
 
-
 /** Show the dependencies of an existing vertex */
 export const show: Server.ExecRequest = {
   kind: Server.RqKind.EXEC,
   name: 'dive.show',
 };
 
-
 /** Hide the dependencies of an existing vertex */
 export const hide: Server.ExecRequest = {
   kind: Server.RqKind.EXEC,
   name: 'dive.hide',
 };
+
+/* ------------------------------------- */

@@ -37,7 +37,7 @@ module ProjectId = (val jkey ~kind:"project")
 module ProjectInfo =
 struct
   type t = Project.t
-  let jtype = Pkg.datatype ~package
+  let jtype = Data.declare ~package
       ~name:"projectInfo"
       ~descr:(Md.plain "Project informations")
       Pkg.(Jrecord [
@@ -68,7 +68,7 @@ struct
 
   type t = Project.t * string * json
 
-  let jtype = Pkg.datatype ~package ~name:"projectRequest"
+  let jtype = Data.declare ~package ~name:"projectRequest"
       ~descr:(Md.plain "Request to be executed on the specified project.")
       (Jrecord [
           "project",ProjectId.jtype;

@@ -166,17 +166,17 @@ type jtype =
   | Jnumber
   | Jstring
   | Jalpha (* string primarily compared without case *)
-  | Jtag of string
   | Jkey of string (* kind of a string used for indexing *)
   | Jindex of string (* kind of an integer used for indexing *)
   | Joption of jtype
-  | Jassoc of string * jtype (* kind of keys *)
+  | Jdict of string * jtype (* kind of keys *)
   | Jlist of jtype (* order does not matter *)
   | Jarray of jtype (* order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
+  | Jenum of ident (* data that is an enum *)
   | Jself (* for (simply) recursive types *)
 
 (* -------------------------------------------------------------------------- *)
@@ -214,6 +214,9 @@ type declKindInfo =
   | D_value of jtype
   | D_state of jtype
   | D_array of string (* key kind *)
+  | D_safe of ident * jtype (* safe decoder *)
+  | D_loose of ident * jtype (* loose decoder *)
+  | D_order of ident * jtype (* natural ordering *)
 
 type declInfo = {
   d_ident : ident;
@@ -253,11 +256,11 @@ let pp_pkgname fmt { p_plugin ; p_package } =
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
-  | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> ()
-  | Joption js | Jassoc(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
+  | Jstring | Jalpha | Jkey _ | Jindex _ -> ()
+  | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
-  | Jdata id -> fn id
+  | Jdata id | Jenum id -> fn id
 
 let visit_field f { fd_type } = visit_jtype f fd_type
 
@@ -271,6 +274,7 @@ let visit_request f { rq_input ; rq_output } =
 let visit_dkind f = function
   | D_signal | D_enum _ | D_array _ -> ()
   | D_type js | D_state js | D_value js -> visit_jtype f js
+  | D_loose(id,js) | D_safe(id,js) | D_order(id,js) -> f id ; visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq
 
@@ -303,12 +307,16 @@ let derived ?prefix ?suffix id =
 
 module Derived =
 struct
-  let signal id = derived ~prefix:"sig" id
+  let signal id = derived ~prefix:"signal" id
   let getter id = derived ~prefix:"get" id
   let setter id = derived ~prefix:"set" id
   let data id = derived ~suffix:"Data" id
   let fetch id = derived ~prefix:"fetch" id
   let reload id = derived ~prefix:"reload" id
+  let order id = derived ~prefix:"by" id
+  let loose id = derived ~prefix:"j" id
+  let safe id = derived ~prefix:"j" ~suffix:"Safe" id
+  let decode ~safe:ok id = if ok then safe id else loose id
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -399,9 +407,6 @@ let update ~package:pkg ~name decl =
          else curr
       ) pkg.revDecl
 
-let datatype ~package ~name ?descr jtype =
-  Jdata (declare_id ~package ~name ?descr (D_type jtype))
-
 let iter f =
   List.iter f @@
   match !collection with
@@ -434,16 +439,15 @@ let rec md_jtype pp = function
   | Jnumber -> Md.emph "number"
   | Jboolean -> Md.emph "boolean"
   | Jstring | Jalpha -> Md.emph "string"
-  | Jtag tag -> escaped tag
   | Jkey kd -> key kd
   | Jindex kd -> index kd
-  | Jdata id -> pp.ident id
+  | Jdata id | Jenum id -> pp.ident id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
   | Jarray js | Jlist js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
-  | Jassoc (id,js) ->
+  | Jdict (id,js) ->
     Md.code "{[" @ key id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
 
 and md_jlist pp sep js =
