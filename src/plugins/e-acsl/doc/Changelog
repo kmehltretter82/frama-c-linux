@@ -38,7 +38,6 @@ Plugin E-ACSL 21.0 (Scandium)
                 model analysis is running.
 -* E-ACSL       [2020-03-10] Fix frama-c/e-acsl#105 about misplaced
                 `__e_acsl_delete_block` in presence of gotos to return statements.
--  E-ACSL       [2020-03-09] Improve verdict messages emitted by e_acsl_assert.
 -* E-ACSL       [2020-03-16] Fix #?1386 and frama-c/e-acsl#91 about the tracking
                 of variables declared inside the body of switches.
 -  E-ACSL       [2020-02-09] Improve verdict messages emitted by e_acsl_assert.
@@ -146,7 +145,7 @@ Plugin E-ACSL 16.0 (Sulfur-20171101)
                 respective shadow spaces.
 
 ########################################
-Plugin E-ACSL 15.0 (Phosphorus-20170515)
+Plugin E-ACSL 15.0 (Phosphorus-20170501)
 ########################################
 
 -  runtime      [2017-03-29] The (much more efficient) shadow memory model is
@@ -173,9 +172,9 @@ Plugin E-ACSL 15.0 (Phosphorus-20170515)
                 operations in a few cases: the generated code might have
                 overflowed.
 
-###########################
-Plugin E-ACSL 0.8 (Silicon)
-###########################
+####################################
+Plugin E-ACSL 0.8 (Silicon-20161101)
+####################################
 
 -* e-acsl-gcc   [2016-11-07] Added --rte-select feature to e-acsl-gcc.sh.
 -* e-acsl-gcc   [2016-08-02] Added --rt-debug feature to e-acsl-gcc.sh.
@@ -211,9 +210,9 @@ Plugin E-ACSL 0.8 (Silicon)
                 initialization of tracked memory blocks in the E-ACSL
                 memory model library.
 
-#############################
-Plugin E-ACSL 0.6 (Magnesium)
-#############################
+######################################
+Plugin E-ACSL 0.6 (Magnesium_20151002)
+######################################
 
 -* e-acsl-gcc   [2016-01-22] Add an e-acsl-gcc.sh option allowing to skip
                 compilation of original sources.
@@ -227,9 +226,9 @@ Plugin E-ACSL 0.6 (Magnesium)
 -* runtime      [2015-11-06] Fix a crash occuring when using a recent libc
                 while GMP headers provided by E-ACSL are used.
 
-##########################
-Plugin E-ACSL 0.5 (Sodium)
-##########################
+###################################
+Plugin E-ACSL 0.5 (Sodium_20150201)
+###################################
 
 -  E-ACSL       [2015-06-01] Support of \freeable. Thus illegal calls to
                 free (e.g. double free) are detected.
@@ -245,9 +244,9 @@ o  E-ACSL       [2014-12-17] Export a minimal API for other plug-ins.
 -* E-ACSL       [2014-10-27] Add a missing cast when translating an integral
                 type used in a floating point/real context in an annotation.
 
-##########################
-Plugin E-ACSL 0.4.1 (Neon)
-##########################
+###################################
+Plugin E-ACSL 0.4.1 (Neon_20140301)
+###################################
 
 -* E-ACSL       [2014-08-05] Fix bug #1838 about memset.
 -* E-ACSL       [2014-08-05] Fix bug #1818 about initialization of globals.
