@@ -168,7 +168,7 @@ let rec makeDecoder ~safe ?self ~names fmt js =
   | Jself -> jcall names fmt (Pkg.Derived.decode ~safe (getSelf self))
   | Joption js -> makeLoose fmt js
   | Jdict(kd,js) ->
-    Format.fprintf fmt "@[<hov 2>Json.jDict('#%s',@,%a)@]" kd makeLoose js
+    Format.fprintf fmt "@[<hov 2>Json.jDictionary('#%s',@,%a)@]" kd makeLoose js
   | Jlist js ->
     Format.fprintf fmt "@[<hov 2>Json.jList(%a)@]" makeLoose js
   | Jarray js ->
