@@ -378,8 +378,7 @@ struct
       let jtype =
         let fields = List.rev s.fields in
         let id = Package.declare_id ~package ~name ~descr (D_record fields) in
-        let field fd = fd.fd_name, fd.fd_type in
-        derived ~package ~id (Jrecord (List.map field fields)) ;
+        derived ~package ~id (Jrecord (List.map Package.field fields)) ;
         Jdata id
       let default = s.default
       let has fd r = fd.member r
@@ -440,6 +439,7 @@ struct
     mutable syntax : Markdown.text ;
     mutable published : (package * string) option ;
     mutable tags : tagInfo list ;
+    mutable prefix : tagInfo list ;
     mutable lookup : ('a -> string) option ;
   }
 
@@ -456,6 +456,7 @@ struct
     values = Hashtbl.create 0 ;
     vindex = Hashtbl.create 0 ;
     syntax = [] ;
+    prefix = [] ;
     tags = [] ;
     lookup = None ;
   }
@@ -499,7 +500,7 @@ struct
   let set_lookup (d : 'a dictionary) (tag : 'a -> 'a tag) =
     d.lookup <- Some tag
 
-  let instance_name = Printf.sprintf "%s:%s"
+  let instance_name = Printf.sprintf "%s_%s"
 
   let instance (_,prefix) = instance_name prefix
 
@@ -509,7 +510,7 @@ struct
         tg_label = tag_label (name ^ ".") label ;
         tg_descr = descr ;
       } in
-    d.tags <- tg :: d.tags ; d , name
+    d.prefix <- tg :: d.prefix ; d , name
 
   let extends ~name ?label ~descr ?value ((d,prefix) : 'a prefix) : 'a tag =
     let name = tag ~name:(instance_name prefix name) ?label ~descr ?value d in

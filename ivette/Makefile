@@ -41,7 +41,6 @@ api:
 	@find api -name "*.ts" -exec rm -f {} \;
 	../bin/frama-c.byte -load-module api/server_tsc.ml -server-tsc
 	@find api -name "*.ts" -exec chmod a-w {} \;
-	@touch $@
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation

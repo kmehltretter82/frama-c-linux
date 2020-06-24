@@ -287,6 +287,8 @@ let register_array ~package ~name ~descr ~key
       ~package ~name:(Package.Derived.data id).name
       ~descr:(plain "Data for array rows" @ href)
       (D_record fields) in
+  let fs = List.map Package.field fields in
+  Data.derived ~package ~id:row (Jrecord fs) ;
   let getter =
     List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) !model in
   let array = {

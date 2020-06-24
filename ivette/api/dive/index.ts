@@ -6,9 +6,13 @@
    @module frama-c/dive
 */
 
+//@ts-ignore
 import * as Json from 'dome/data/json';
+//@ts-ignore
 import * as Compare from 'dome/data/compare';
+//@ts-ignore
 import * as Server from 'frama-c/server';
+//@ts-ignore
 import * as State from 'frama-c/states';
 
 
@@ -22,18 +26,19 @@ export interface variableName {
 
 /** Safe decoder for `variableName` */
 export const jVariableNameSafe: Json.Safe<variableName> =
+  Json.jFail(jVariableName,'VariableName expected');
+
+/** Loose decoder for `variableName` */
+export const jVariableName: Json.Loose<variableName> =
   Json.jObject({
     funName: Json.jString,
     varName: Json.jFail(Json.jString,'String expected'),
   });
 
-/** Loose decoder for `variableName` */
-export const jVariableName: Json.Loose<variableName> =
-  Json.jTry(jVariableNameSafe);
-
 /** Natural order for `variableName` */
 export const byVariableName: Compare.Order<variableName> =
-  Compare.byFields({
+  Compare.byFields
+    <{ funName?: string, varName: string }>({
     funName: Compare.defined(Compare.alpha),
     varName: Compare.alpha,
   });
@@ -63,7 +68,7 @@ export const addVar: Server.ExecRequest<variableName,Json.json> = {
 };
 
 /** Add all alarms of the given function */
-export const addFunctionAlarms: Server.ExecRequest<Json.Key<'#fct'>,Json.json
+export const addFunctionAlarms: Server.ExecRequest<Json.key<'#fct'>,Json.json
   > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.addFunctionAlarms',
@@ -72,7 +77,7 @@ export const addFunctionAlarms: Server.ExecRequest<Json.Key<'#fct'>,Json.json
 };
 
 /** Explore the graph starting from an existing vertex */
-export const explore: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json
+export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json
   > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.explore',
@@ -81,7 +86,7 @@ export const explore: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json
 };
 
 /** Show the dependencies of an existing vertex */
-export const show: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json> = {
+export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.show',
   input:  Json.jIndex('#dive-node'),
@@ -89,7 +94,7 @@ export const show: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json> = {
 };
 
 /** Hide the dependencies of an existing vertex */
-export const hide: Server.ExecRequest<Json.Index<'#dive-node'>,Json.json> = {
+export const hide: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.hide',
   input:  Json.jIndex('#dive-node'),

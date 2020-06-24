@@ -88,13 +88,13 @@ export function useProject() {
 export async function setProject(project: string) {
   if (Server.isRunning()) {
     try {
-      const sr: Server.SetRequest<null, null> = {
+      const sr: Server.SetRequest<string, null> = {
         kind: Server.RqKind.SET,
         name: 'kernel.project.setCurrent',
-        input: Json.jNull,
+        input: Json.jString,
         output: Json.jNull,
       };
-      await Server.send(sr, null);
+      await Server.send(sr, project);
       currentProject = project;
       Dome.emit(PROJECT);
     } catch (error) {
@@ -167,8 +167,8 @@ export function useRequest<In, Out>(
 
 export type Tag = {
   name: string;
-  label: string;
-  descr: string;
+  label?: string;
+  descr?: string;
 }
 
 const holdCurrent = { offline: null, pending: null, onError: null };
@@ -213,13 +213,13 @@ export interface Array<K, A> {
   key: keyof A;
   signal: Server.Signal;
   fetch: Server.GetRequest<number, Fetches<K, A>>;
-  reload: Server.SetRequest<null, null>;
+  reload: Server.GetRequest<null, null>;
 }
 
 type id = { project: string, state: string };
 
 // --------------------------------------------------------------------------
-// --- Handler for Synchronized States
+// --- Handler for Synchronized St byates
 // --------------------------------------------------------------------------
 
 interface Handler<A> {
@@ -328,16 +328,23 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 // --- Synchronized Arrays
 // --------------------------------------------------------------------------
 
+export interface Model<A> {
+  clear(): void;
+  remove(key: string): void;
+  add(entry: A): void;
+  clear(): void;
+}
+
 // one per project
 class SyncArray<K, A> {
   handler: Array<K, A>;
-  model: ArrayModel<A>;
+  model: Model<A>;
   insync: boolean;
 
-  constructor(h: Array<K, A>) {
+  constructor(h: Array<K, A>, m?: Model<A>) {
     this.handler = h;
     this.insync = false;
-    this.model = new ArrayModel<A>(h.key);
+    this.model = m ?? new ArrayModel<A>(h.key);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
   }
@@ -381,12 +388,18 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<id, SyncArray<any, any>>();
 
-function getSyncArray<K, A>(arr: Array<K, A>): SyncArray<K, A> {
+function getSyncArray<K, A>(arr: Array<K, A>, model?: Model<A>): SyncArray<K, A> {
   const id = { project: currentProject ?? '', state: arr.name };
   let a = syncArrays.get(id);
   if (!a) {
-    a = new SyncArray(arr);
+    a = new SyncArray(arr, model);
     syncArrays.set(id, a);
+  } else {
+    if (model && a.model !== model) {
+      model.clear();
+      a.reload();
+      a.model = model;
+    }
   }
   return a;
 }
@@ -407,8 +420,8 @@ export function reloadArray<K, A>(arr: Array<K, A>) {
 /**
    Use Synchronized Array (Custom React Hook).
  */
-export function useSyncArray<K, A>(arr: Array<K, A>): ArrayModel<A> {
-  const a = getSyncArray(arr);
+export function useSyncArray<K, A>(arr: Array<K, A>, model?: Model<A>): Model<A> {
+  const a = getSyncArray(arr, model);
   Dome.useUpdate(PROJECT);
   Server.useSignal(arr.signal, a.fetch);
   return a.model;

@@ -6,18 +6,30 @@
    @module frama-c/kernel/ast
 */
 
+//@ts-ignore
 import * as Json from 'dome/data/json';
+//@ts-ignore
 import * as Compare from 'dome/data/compare';
+//@ts-ignore
 import * as Server from 'frama-c/server';
+//@ts-ignore
 import * as State from 'frama-c/states';
 
+//@ts-ignore
 import { byTag } from 'api/kernel/data';
+//@ts-ignore
 import { byText } from 'api/kernel/data';
+//@ts-ignore
 import { jTag } from 'api/kernel/data';
+//@ts-ignore
 import { jTagSafe } from 'api/kernel/data';
+//@ts-ignore
 import { jText } from 'api/kernel/data';
+//@ts-ignore
 import { jTextSafe } from 'api/kernel/data';
+//@ts-ignore
 import { tag } from 'api/kernel/data';
+//@ts-ignore
 import { text } from 'api/kernel/data';
 
 /** Ensures that AST is computed */
@@ -31,23 +43,23 @@ export const compute: Server.ExecRequest<null,null> = {
 /** Marker kind */
 export enum markerKind {
   /** Expression */
-  expression = 'expression';
+  expression = 'expression',
   /** Lvalue */
-  lvalue = 'lvalue';
+  lvalue = 'lvalue',
   /** Variable */
-  variable = 'variable';
+  variable = 'variable',
   /** Function */
-  function = 'function';
+  function = 'function',
   /** Declaration */
-  declaration = 'declaration';
+  declaration = 'declaration',
   /** Statement */
-  statement = 'statement';
+  statement = 'statement',
   /** Global */
-  global = 'global';
+  global = 'global',
   /** Term */
-  term = 'term';
+  term = 'term',
   /** Property */
-  property = 'property';
+  property = 'property',
 }
 
 /** Safe decoder for `markerKind` */
@@ -59,7 +71,7 @@ export const jMarkerKind: Json.Loose<markerKind> = Json.jEnum(markerKind);
 
 /** Natural order for `markerKind` */
 export const byMarkerKind: Compare.Order<markerKind> =
-  Compare.byEnym(markerKind);
+  Compare.byEnum(markerKind);
 
 /** Registered tags for the above type. */
 export const markerKindTags: Server.GetRequest<null,tag[]> = {
@@ -69,24 +81,24 @@ export const markerKindTags: Server.GetRequest<null,tag[]> = {
   output: Json.jList(jTag),
 };
 
-/** Markers data */
-export const markerData: State.Array<'#markerData',markerDataData> = {
-  name: 'kernel.ast.markerData',
+/** Marker informations */
+export const markerInfo: State.Array<'#markerInfo',markerInfoData> = {
+  name: 'kernel.ast.markerInfo',
   key: 'key',
-  signal: signalMarkerData,
-  fetch: fetchMarkerData,
-  reload: reloadMarkerData,
+  signal: signalMarkerInfo,
+  fetch: fetchMarkerInfo,
+  reload: reloadMarkerInfo,
 };
 
-/** Signal for array [`markerData`](#markerdata)  */
-export const signalMarkerData: Server.Signal = {
-  name: 'kernel.ast.signalMarkerData',
+/** Signal for array [`markerInfo`](#markerinfo)  */
+export const signalMarkerInfo: Server.Signal = {
+  name: 'kernel.ast.signalMarkerInfo',
 };
 
-/** Data for array rows [`markerData`](#markerdata)  */
-export interface markerDataData {
+/** Data for array rows [`markerInfo`](#markerinfo)  */
+export interface markerInfoData {
   /** Entry identifier. */
-  key: Json.Key<'#markerData'>;
+  key: Json.key<'#markerInfo'>;
   /** Marker kind */
   kind: markerKind;
   /** Marker short name */
@@ -95,35 +107,58 @@ export interface markerDataData {
   descr: string;
 }
 
-/** Data fetcher for array [`markerData`](#markerdata)  */
-export const fetchMarkerData: Server.GetRequest<number,
-  { pending: number, updated: markerDataData[],
-    removed: Json.Key<'#markerData'>[], reload: boolean }> = {
+/** Safe decoder for `markerInfoData` */
+export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
+  Json.jFail(jMarkerInfoData,'MarkerInfoData expected');
+
+/** Loose decoder for `markerInfoData` */
+export const jMarkerInfoData: Json.Loose<markerInfoData> =
+  Json.jObject({
+    key: Json.jFail(Json.jKey('#markerInfo'),'#markerInfo expected'),
+    kind: jMarkerKindSafe,
+    name: Json.jFail(Json.jString,'String expected'),
+    descr: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Natural order for `markerInfoData` */
+export const byMarkerInfoData: Compare.Order<markerInfoData> =
+  Compare.byFields
+    <{ key: Json.key<'#markerInfo'>, kind: markerKind, name: string,
+       descr: string }>({
+    key: Compare.primitive,
+    kind: byMarkerKind,
+    name: Compare.alpha,
+    descr: Compare.primitive,
+  });
+
+/** Data fetcher for array [`markerInfo`](#markerinfo)  */
+export const fetchMarkerInfo: Server.GetRequest<number,
+  { pending: number, updated: markerInfoData[],
+    removed: Json.key<'#markerInfo'>[], reload: boolean }> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchMarkerData',
+  name:   'kernel.ast.fetchMarkerInfo',
   input:  Json.jNumber,
-  output: Json.jTry(
-            Json.jObject({
-              pending: Json.jFail(Json.jNumber,'Number expected'),
-              updated: Json.jList(jMarkerDataData),
-              removed: Json.jList(Json.jKey('#markerData')),
-              reload: Json.jFail(Json.jBoolean,'Boolean expected'),
-            })),
+  output: Json.jObject({
+            pending: Json.jFail(Json.jNumber,'Number expected'),
+            updated: Json.jList(jMarkerInfoData),
+            removed: Json.jList(Json.jKey('#markerInfo')),
+            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+          }),
 };
 
-/** Force full reload for array [`markerData`](#markerdata)  */
-export const reloadMarkerData: Server.GetRequest<null,null> = {
+/** Force full reload for array [`markerInfo`](#markerinfo)  */
+export const reloadMarkerInfo: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadMarkerData',
+  name:   'kernel.ast.reloadMarkerInfo',
   input:  Json.jNull,
   output: Json.jNull,
 };
 
 /** Localizable AST markers */
 export type marker =
-  Json.Key<'#stmt'> | Json.Key<'#decl'> | Json.Key<'#lval'> |
-  Json.Key<'#expr'> | Json.Key<'#term'> | Json.Key<'#global'> |
-  Json.Key<'#property'>;
+  Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
+  Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
+  Json.key<'#property'>;
 
 /** Safe decoder for `marker` */
 export const jMarkerSafe: Json.Safe<marker> =
@@ -131,9 +166,9 @@ export const jMarkerSafe: Json.Safe<marker> =
 
 /** Loose decoder for `marker` */
 export const jMarker: Json.Loose<marker> =
-  Json.jUnion<Json.Key<'#stmt'> | Json.Key<'#decl'> | Json.Key<'#lval'> |
-              Json.Key<'#expr'> | Json.Key<'#term'> | Json.Key<'#global'> |
-              Json.Key<'#property'>>(
+  Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
+              Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
+              Json.key<'#property'>>(
     Json.jKey('#stmt'),
     Json.jKey('#decl'),
     Json.jKey('#lval'),
@@ -147,7 +182,7 @@ export const jMarker: Json.Loose<marker> =
 export const byMarker: Compare.Order<marker> = Compare.structural;
 
 /** Collect all functions in the AST */
-export const getFunctions: Server.GetRequest<null,Json.Key<'#fct'>[]> = {
+export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
@@ -155,7 +190,7 @@ export const getFunctions: Server.GetRequest<null,Json.Key<'#fct'>[]> = {
 };
 
 /** Print the AST of a function */
-export const printFunction: Server.GetRequest<Json.Key<'#fct'>,text> = {
+export const printFunction: Server.GetRequest<Json.key<'#fct'>,text> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.printFunction',
   input:  Json.jKey('#fct'),
@@ -179,27 +214,47 @@ export const signalFunctions: Server.Signal = {
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
   /** Entry identifier. */
-  key: Json.Key<'#functions'>;
+  key: Json.key<'#functions'>;
   /** Name */
   name: string;
   /** Signature */
   signature: string;
 }
 
+/** Safe decoder for `functionsData` */
+export const jFunctionsDataSafe: Json.Safe<functionsData> =
+  Json.jFail(jFunctionsData,'FunctionsData expected');
+
+/** Loose decoder for `functionsData` */
+export const jFunctionsData: Json.Loose<functionsData> =
+  Json.jObject({
+    key: Json.jFail(Json.jKey('#functions'),'#functions expected'),
+    name: Json.jFail(Json.jString,'String expected'),
+    signature: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Natural order for `functionsData` */
+export const byFunctionsData: Compare.Order<functionsData> =
+  Compare.byFields
+    <{ key: Json.key<'#functions'>, name: string, signature: string }>({
+    key: Compare.primitive,
+    name: Compare.alpha,
+    signature: Compare.primitive,
+  });
+
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<number,
   { pending: number, updated: functionsData[],
-    removed: Json.Key<'#functions'>[], reload: boolean }> = {
+    removed: Json.key<'#functions'>[], reload: boolean }> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchFunctions',
   input:  Json.jNumber,
-  output: Json.jTry(
-            Json.jObject({
-              pending: Json.jFail(Json.jNumber,'Number expected'),
-              updated: Json.jList(jFunctionsData),
-              removed: Json.jList(Json.jKey('#functions')),
-              reload: Json.jFail(Json.jBoolean,'Boolean expected'),
-            })),
+  output: Json.jObject({
+            pending: Json.jFail(Json.jNumber,'Number expected'),
+            updated: Json.jList(jFunctionsData),
+            removed: Json.jList(Json.jKey('#functions')),
+            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+          }),
 };
 
 /** Force full reload for array [`functions`](#functions)  */

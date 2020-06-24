@@ -285,6 +285,15 @@ end
 (* --- Visitors                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+let rec isRecursive = function
+  | Jself -> true
+  | Jdata _ | Jenum _
+  | Jany | Jnull | Jboolean | Jnumber
+  | Jstring | Jalpha | Jkey _ | Jindex _ -> false
+  | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> isRecursive js
+  | Jtuple js | Junion js -> List.exists isRecursive js
+  | Jrecord fjs -> List.exists (fun (_,js) -> isRecursive js) fjs
+
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
   | Jstring | Jalpha | Jkey _ | Jindex _ -> ()
@@ -338,6 +347,8 @@ type package = {
   pkgInfo : packageInfo ; (* with empty decl *)
   mutable revDecl : declInfo list ; (* in reverse order *)
 }
+
+let field fd = fd.fd_name , fd.fd_type
 
 let name_of_package ?sep pkg = name_of_pkginfo ?sep pkg.pkgInfo
 

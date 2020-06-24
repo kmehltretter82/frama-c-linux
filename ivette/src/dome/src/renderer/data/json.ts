@@ -156,7 +156,7 @@ export function jOption<A>(fn: Safe<A>, defaultValue?: A): Loose<A> {
    Fail when the loose decoder returns `undefined`.
    See also [[jCatch]] and [[jTry]].
  */
-export function jFail<A>(fn: Loose<A>, error: Error): Safe<A> {
+export function jFail<A>(fn: Loose<A>, error: string | Error): Safe<A> {
   return (js: json) => {
     const d = fn(js);
     if (d !== undefined) return d;

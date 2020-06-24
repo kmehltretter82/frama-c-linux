@@ -44,7 +44,7 @@ struct
     t_kind name (Printf.sprintf "Clause `@%s`" name)
 
   let t_loop name =
-    t_kind ("loop-" ^ name) (Printf.sprintf "Clause `@loop %s`" name)
+    t_kind ("loop_" ^ name) (Printf.sprintf "Clause `@loop %s`" name)
 
   let t_behavior = t_kind "behavior" "Contract behavior"
   let t_complete = t_kind "complete" "Complete behaviors clause"
@@ -66,17 +66,17 @@ struct
 
   let t_assert = t_kind "assert" "Assertion"
   let t_check = t_kind "check" "Check"
-  let t_loop_invariant = t_kind "invariant" "Loop invariant"
+  let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
-  let t_loop_variant = t_kind "variant" "Loop termination argument"
+  let t_loop_variant = t_loop "variant"
   let t_loop_allocates = t_loop "allocates"
   let t_loop_pragma = t_loop "pragma"
 
   let t_reachable = t_kind "reachable" "Reachable statement"
-  let t_code_contract = t_kind "code-contract" "Statement contract"
-  let t_code_invariant = t_kind "code-invariant" "Generalized loop invariant"
-  let t_type_invariant = t_kind "type-invariant" "Type invariant"
-  let t_global_invariant = t_kind "global-invariant" "Global invariant"
+  let t_code_contract = t_kind "code_contract" "Statement contract"
+  let t_code_invariant = t_kind "code_invariant" "Generalized loop invariant"
+  let t_type_invariant = t_kind "type_invariant" "Type invariant"
+  let t_global_invariant = t_kind "global_invariant" "Global invariant"
 
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
   let t_axiom = t_kind "axiom" "Logical axiom"
@@ -85,7 +85,7 @@ struct
   let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL extension `<clause>`")
 
-  let p_loop_ext = Enum.prefix kinds ~name:"loop-ext" ~var:"<clause>"
+  let p_loop_ext = Enum.prefix kinds ~name:"loop_ext" ~var:"<clause>"
       ~descr:(Md.plain "ACSL loop extension `loop <clause>`")
 
   let p_other = Enum.prefix kinds ~name:"prop" ~var:"<prop>"

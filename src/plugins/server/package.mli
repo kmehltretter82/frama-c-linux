@@ -147,6 +147,7 @@ sig
   val resolve : t -> string IdMap.t
 end
 
+val isRecursive : jtype -> bool
 val visit_jtype : (ident -> unit) -> jtype -> unit
 val visit_field: (ident -> unit) -> fieldInfo -> unit
 val visit_param: (ident -> unit) -> paramInfo -> unit
@@ -206,6 +207,7 @@ val iter : (packageInfo -> unit) -> unit
 (** Assigns non-classing names for each identifier. *)
 val resolve : ?keywords: string list -> packageInfo -> string IdMap.t
 
+val field : fieldInfo -> string * jtype
 val name_of_pkg : ?sep:string -> plugin -> string list -> string
 val name_of_pkginfo : ?sep:string -> packageInfo -> string
 val name_of_package : ?sep:string -> package -> string

@@ -6,14 +6,22 @@
    @module frama-c/kernel/services
 */
 
+//@ts-ignore
 import * as Json from 'dome/data/json';
+//@ts-ignore
 import * as Compare from 'dome/data/compare';
+//@ts-ignore
 import * as Server from 'frama-c/server';
+//@ts-ignore
 import * as State from 'frama-c/states';
 
+//@ts-ignore
 import { byTag } from 'api/kernel/data';
+//@ts-ignore
 import { jTag } from 'api/kernel/data';
+//@ts-ignore
 import { jTagSafe } from 'api/kernel/data';
+//@ts-ignore
 import { tag } from 'api/kernel/data';
 
 /** Frama-C Kernel configuration */
@@ -23,13 +31,12 @@ export const getConfig: Server.GetRequest<null,
   kind: Server.RqKind.GET,
   name:   'kernel.services.getConfig',
   input:  Json.jNull,
-  output: Json.jTry(
-            Json.jObject({
-              pluginpath: Json.jList(Json.jString),
-              libdir: Json.jFail(Json.jString,'String expected'),
-              datadir: Json.jFail(Json.jString,'String expected'),
-              version: Json.jFail(Json.jString,'String expected'),
-            })),
+  output: Json.jObject({
+            pluginpath: Json.jList(Json.jString),
+            libdir: Json.jFail(Json.jString,'String expected'),
+            datadir: Json.jFail(Json.jString,'String expected'),
+            version: Json.jFail(Json.jString,'String expected'),
+          }),
 };
 
 /** Load a save file. Returns an error, if not successfull. */
@@ -46,6 +53,10 @@ export type source =
 
 /** Safe decoder for `source` */
 export const jSourceSafe: Json.Safe<source> =
+  Json.jFail(jSource,'Source expected');
+
+/** Loose decoder for `source` */
+export const jSource: Json.Loose<source> =
   Json.jObject({
     dir: Json.jFail(Json.jString,'String expected'),
     base: Json.jFail(Json.jString,'String expected'),
@@ -53,12 +64,10 @@ export const jSourceSafe: Json.Safe<source> =
     line: Json.jFail(Json.jNumber,'Number expected'),
   });
 
-/** Loose decoder for `source` */
-export const jSource: Json.Loose<source> = Json.jTry(jSourceSafe);
-
 /** Natural order for `source` */
 export const bySource: Compare.Order<source> =
-  Compare.byFields({
+  Compare.byFields
+    <{ dir: string, base: string, file: string, line: number }>({
     dir: Compare.primitive,
     base: Compare.primitive,
     file: Compare.primitive,
@@ -68,17 +77,17 @@ export const bySource: Compare.Order<source> =
 /** Log messages categories. */
 export enum logkind {
   /** User Error */
-  ERROR = 'ERROR';
+  ERROR = 'ERROR',
   /** User Warning */
-  WARNING = 'WARNING';
+  WARNING = 'WARNING',
   /** Plugin Feedback */
-  FEEDBACK = 'FEEDBACK';
+  FEEDBACK = 'FEEDBACK',
   /** Plugin Result */
-  RESULT = 'RESULT';
+  RESULT = 'RESULT',
   /** Plugin Failure */
-  FAILURE = 'FAILURE';
+  FAILURE = 'FAILURE',
   /** Analyser Debug */
-  DEBUG = 'DEBUG';
+  DEBUG = 'DEBUG',
 }
 
 /** Safe decoder for `logkind` */
@@ -89,7 +98,7 @@ export const jLogkindSafe: Json.Safe<logkind> =
 export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
 
 /** Natural order for `logkind` */
-export const byLogkind: Compare.Order<logkind> = Compare.byEnym(logkind);
+export const byLogkind: Compare.Order<logkind> = Compare.byEnum(logkind);
 
 /** Registered tags for the above type. */
 export const logkindTags: Server.GetRequest<null,tag[]> = {
@@ -114,7 +123,10 @@ export interface log {
 }
 
 /** Safe decoder for `log` */
-export const jLogSafe: Json.Safe<log> =
+export const jLogSafe: Json.Safe<log> = Json.jFail(jLog,'Log expected');
+
+/** Loose decoder for `log` */
+export const jLog: Json.Loose<log> =
   Json.jObject({
     kind: jLogkindSafe,
     plugin: Json.jFail(Json.jString,'String expected'),
@@ -123,12 +135,11 @@ export const jLogSafe: Json.Safe<log> =
     source: jSource,
   });
 
-/** Loose decoder for `log` */
-export const jLog: Json.Loose<log> = Json.jTry(jLogSafe);
-
 /** Natural order for `log` */
 export const byLog: Compare.Order<log> =
-  Compare.byFields({
+  Compare.byFields
+    <{ kind: logkind, plugin: string, message: string, category?: string,
+       source?: source }>({
     kind: byLogkind,
     plugin: Compare.alpha,
     message: Compare.primitive,

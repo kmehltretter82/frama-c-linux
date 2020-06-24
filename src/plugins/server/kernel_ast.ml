@@ -144,8 +144,8 @@ struct
     in
     States.register_array
       ~package
-      ~name:"markerData"
-      ~descr:(Md.plain "Markers data")
+      ~name:"markerInfo"
+      ~descr:(Md.plain "Marker informations")
       ~key:snd
       ~iter model
 
