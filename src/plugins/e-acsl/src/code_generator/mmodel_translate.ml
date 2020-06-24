@@ -159,7 +159,7 @@ let gmp_to_sizet ~loc kf env size p =
       None
       sizet
       (fun vi _ ->
-         [ Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf guard p;
+         [ Constructor.mk_runtime_check Constructor.RTE kf guard p;
            Constructor.mk_lib_call ~loc
              ~result:(Cil.var vi)
              "__gmpz_get_ui"

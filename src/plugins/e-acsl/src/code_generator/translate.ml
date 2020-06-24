@@ -370,6 +370,7 @@ and context_insensitive_term_to_exp kf env t =
         assert (Gmp_types.Z.is_t ty);
         let cond =
           Constructor.mk_runtime_check
+            ~reverse:true
             (Env.annotation_kind env)
             kf
             guard
@@ -454,7 +455,6 @@ and context_insensitive_term_to_exp kf env t =
           let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
           let pred = { pred with pred_name = pname :: pred.pred_name } in
           let cond = Constructor.mk_runtime_check
-              ~reverse:true
               Constructor.RTE
               kf
               coerce_guard
@@ -516,7 +516,6 @@ and context_insensitive_term_to_exp kf env t =
           let e1_guard_cond =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
             let cond = Constructor.mk_runtime_check
-                ~reverse:true
                 Constructor.RTE
                 kf
                 e1_guard
@@ -1058,7 +1057,6 @@ and translate_named_predicate kf env p =
     env
     kf
     (Constructor.mk_runtime_check
-       ~reverse:true
        (Env.annotation_kind env)
        kf
        e
