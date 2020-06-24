@@ -412,7 +412,7 @@ struct
   let jtype = declare ~package ~name:"tag"
       ~descr:(Markdown.plain "Enum Tag Description")
       (Jrecord [
-          "name",Jstring ;
+          "name",Jalpha ;
           "label",Jmarkdown.jtype ;
           "descr",Jmarkdown.jtype ;
         ])

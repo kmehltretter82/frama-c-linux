@@ -42,7 +42,7 @@ struct
       ~descr:(Md.plain "Project informations")
       Pkg.(Jrecord [
           "id",ProjectId.jtype;
-          "name",Jstring;
+          "name",Jalpha;
           "current",Jboolean;
         ])
 

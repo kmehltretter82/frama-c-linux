@@ -162,7 +162,7 @@ struct
   let kind = Record.field jlog ~name:"kind"
       ~descr:(Md.plain "Message kind") (module LogKind)
   let plugin = Record.field jlog ~name:"plugin"
-      ~descr:(Md.plain "Emitter plugin") (module Jstring)
+      ~descr:(Md.plain "Emitter plugin") (module Jalpha)
   let message = Record.field jlog ~name:"message"
       ~descr:(Md.plain "Message text") (module Jstring)
   let category = Record.option jlog ~name:"category"

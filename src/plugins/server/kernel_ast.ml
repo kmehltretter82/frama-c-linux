@@ -130,7 +130,7 @@ struct
       States.column
         ~name:"name"
         ~descr:(Md.plain "Marker short name")
-        ~data:(module Jstring)
+        ~data:(module Jalpha)
         ~get:(fun (tag, _) -> Printer_tag.label tag)
         model
     in
@@ -275,7 +275,7 @@ struct
       States.column model
         ~name:"name"
         ~descr:(Md.plain "Name")
-        ~data:(module Data.Jstring)
+        ~data:(module Data.Jalpha)
         ~get:Kernel_function.get_name ;
       States.column model
         ~name:"signature"
