@@ -20,6 +20,7 @@ import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
 import Globals from './Globals';
 import Properties from './Properties';
+import MultipleSelection from './MultipleSelection';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -99,6 +100,7 @@ export default (() => {
             <Properties />
             <ASTview />
             <ASTinfo />
+            <MultipleSelection />
           </Group>
         </LabView>
       </Splitter>
