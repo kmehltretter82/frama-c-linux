@@ -51,10 +51,6 @@ export const load: Server.SetRequest<string,string | undefined> = {
 export type source =
   { dir: string, base: string, file: string, line: number };
 
-/** Safe decoder for `source` */
-export const jSourceSafe: Json.Safe<source> =
-  Json.jFail(jSource,'Source expected');
-
 /** Loose decoder for `source` */
 export const jSource: Json.Loose<source> =
   Json.jObject({
@@ -63,6 +59,10 @@ export const jSource: Json.Loose<source> =
     file: Json.jFail(Json.jString,'String expected'),
     line: Json.jFail(Json.jNumber,'Number expected'),
   });
+
+/** Safe decoder for `source` */
+export const jSourceSafe: Json.Safe<source> =
+  Json.jFail(jSource,'Source expected');
 
 /** Natural order for `source` */
 export const bySource: Compare.Order<source> =
@@ -90,12 +90,12 @@ export enum logkind {
   DEBUG = 'DEBUG',
 }
 
+/** Loose decoder for `logkind` */
+export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
+
 /** Safe decoder for `logkind` */
 export const jLogkindSafe: Json.Safe<logkind> =
   Json.jFail(Json.jEnum(logkind),'kernel.services.logkind expected');
-
-/** Loose decoder for `logkind` */
-export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
 
 /** Natural order for `logkind` */
 export const byLogkind: Compare.Order<logkind> = Compare.byEnum(logkind);
@@ -122,9 +122,6 @@ export interface log {
   source?: source;
 }
 
-/** Safe decoder for `log` */
-export const jLogSafe: Json.Safe<log> = Json.jFail(jLog,'Log expected');
-
 /** Loose decoder for `log` */
 export const jLog: Json.Loose<log> =
   Json.jObject({
@@ -134,6 +131,9 @@ export const jLog: Json.Loose<log> =
     category: Json.jString,
     source: jSource,
   });
+
+/** Safe decoder for `log` */
+export const jLogSafe: Json.Safe<log> = Json.jFail(jLog,'Log expected');
 
 /** Natural order for `log` */
 export const byLog: Compare.Order<log> =

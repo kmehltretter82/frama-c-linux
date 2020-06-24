@@ -380,7 +380,45 @@ let makeDeclaration fmt names d =
 (* --- Declaration Ranking                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let byRank _ _ = 0
+type ranking = {
+  mutable rank : int ;
+  mutable mark : int Pkg.IdMap.t ;
+}
+
+let depends d =
+  match d.Pkg.d_kind with
+  | D_loose(id,(Jtuple _ | Jarray _)) -> [Pkg.Derived.safe id]
+  | D_safe(id,_) -> [Pkg.Derived.loose id]
+  | D_array _ ->
+    let id = d.d_ident in
+    let data = Pkg.Derived.data id in
+    [
+      data ;
+      Pkg.Derived.loose data ;
+      Pkg.Derived.safe data ;
+      Pkg.Derived.order data ;
+      Pkg.Derived.signal id ;
+      Pkg.Derived.reload id ;
+      Pkg.Derived.fetch id ;
+    ]
+  | _ -> []
+
+let next m id =
+  let r = m.rank in
+  m.mark <- Pkg.IdMap.add id r m.mark ;
+  m.rank <- succ r
+
+let mark m d =
+  let id = d.Pkg.d_ident in
+  if not (Pkg.IdMap.mem id m.mark) then
+    ( List.iter (next m) (depends d) ; next m id )
+
+let ranking ds =
+  let m = { rank = 0 ; mark = Pkg.IdMap.empty } in
+  List.iter (mark m) ds ;
+  let rk = m.mark in
+  let getRank a = try Pkg.IdMap.find a.Pkg.d_ident rk with Not_found -> 0 in
+  List.sort (fun a b -> getRank a - getRank b) ds
 
 (* -------------------------------------------------------------------------- *)
 (* --- Package Generator                                                  --- *)
@@ -421,7 +459,7 @@ let makePackage pkg name fmt =
       ) names ;
     List.iter
       (makeDeclaration fmt names)
-      (List.sort byRank pkg.p_content) ;
+      (ranking pkg.p_content) ;
     Format.pp_print_newline fmt () ;
     Format.fprintf fmt "/* ------------------------------------- */@." ;
   end

@@ -98,12 +98,12 @@ export enum propKind {
   lemma = 'lemma',
 }
 
+/** Loose decoder for `propKind` */
+export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
+
 /** Safe decoder for `propKind` */
 export const jPropKindSafe: Json.Safe<propKind> =
   Json.jFail(Json.jEnum(propKind),'kernel.properties.propKind expected');
-
-/** Loose decoder for `propKind` */
-export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
 
 /** Natural order for `propKind` */
 export const byPropKind: Compare.Order<propKind> = Compare.byEnum(propKind);
@@ -142,12 +142,12 @@ export enum propStatus {
   unknown_but_dead = 'unknown_but_dead',
 }
 
+/** Loose decoder for `propStatus` */
+export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
+
 /** Safe decoder for `propStatus` */
 export const jPropStatusSafe: Json.Safe<propStatus> =
   Json.jFail(Json.jEnum(propStatus),'kernel.properties.propStatus expected');
-
-/** Loose decoder for `propStatus` */
-export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
 
 /** Natural order for `propStatus` */
 export const byPropStatus: Compare.Order<propStatus> =
@@ -201,12 +201,12 @@ export enum alarms {
   bool_value = 'bool_value',
 }
 
+/** Loose decoder for `alarms` */
+export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
+
 /** Safe decoder for `alarms` */
 export const jAlarmsSafe: Json.Safe<alarms> =
   Json.jFail(Json.jEnum(alarms),'kernel.properties.alarms expected');
-
-/** Loose decoder for `alarms` */
-export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
 
 /** Natural order for `alarms` */
 export const byAlarms: Compare.Order<alarms> = Compare.byEnum(alarms);
@@ -217,20 +217,6 @@ export const alarmsTags: Server.GetRequest<null,tag[]> = {
   name:   'kernel.properties.alarmsTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
-};
-
-/** Status of Registered Properties */
-export const status: State.Array<'#status',statusData> = {
-  name: 'kernel.properties.status',
-  key: 'key',
-  signal: signalStatus,
-  fetch: fetchStatus,
-  reload: reloadStatus,
-};
-
-/** Signal for array [`status`](#status)  */
-export const signalStatus: Server.Signal = {
-  name: 'kernel.properties.signalStatus',
 };
 
 /** Data for array rows [`status`](#status)  */
@@ -259,10 +245,6 @@ export interface statusData {
   predicate?: string;
 }
 
-/** Safe decoder for `statusData` */
-export const jStatusDataSafe: Json.Safe<statusData> =
-  Json.jFail(jStatusData,'StatusData expected');
-
 /** Loose decoder for `statusData` */
 export const jStatusData: Json.Loose<statusData> =
   Json.jObject({
@@ -278,6 +260,10 @@ export const jStatusData: Json.Loose<statusData> =
     alarm_descr: Json.jString,
     predicate: Json.jString,
   });
+
+/** Safe decoder for `statusData` */
+export const jStatusDataSafe: Json.Safe<statusData> =
+  Json.jFail(jStatusData,'StatusData expected');
 
 /** Natural order for `statusData` */
 export const byStatusData: Compare.Order<statusData> =
@@ -299,6 +285,19 @@ export const byStatusData: Compare.Order<statusData> =
     predicate: Compare.defined(Compare.primitive),
   });
 
+/** Signal for array [`status`](#status)  */
+export const signalStatus: Server.Signal = {
+  name: 'kernel.properties.signalStatus',
+};
+
+/** Force full reload for array [`status`](#status)  */
+export const reloadStatus: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.properties.reloadStatus',
+  input:  Json.jNull,
+  output: Json.jNull,
+};
+
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<number,
   { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
@@ -314,12 +313,13 @@ export const fetchStatus: Server.GetRequest<number,
           }),
 };
 
-/** Force full reload for array [`status`](#status)  */
-export const reloadStatus: Server.GetRequest<null,null> = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.properties.reloadStatus',
-  input:  Json.jNull,
-  output: Json.jNull,
+/** Status of Registered Properties */
+export const status: State.Array<'#status',statusData> = {
+  name: 'kernel.properties.status',
+  key: 'key',
+  signal: signalStatus,
+  fetch: fetchStatus,
+  reload: reloadStatus,
 };
 
 /* ------------------------------------- */

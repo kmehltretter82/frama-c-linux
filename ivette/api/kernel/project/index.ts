@@ -20,10 +20,6 @@ import * as State from 'frama-c/states';
 export type projectInfo =
   { id: Json.key<'#project'>, name: string, current: boolean };
 
-/** Safe decoder for `projectInfo` */
-export const jProjectInfoSafe: Json.Safe<projectInfo> =
-  Json.jFail(jProjectInfo,'ProjectInfo expected');
-
 /** Loose decoder for `projectInfo` */
 export const jProjectInfo: Json.Loose<projectInfo> =
   Json.jObject({
@@ -31,6 +27,10 @@ export const jProjectInfo: Json.Loose<projectInfo> =
     name: Json.jFail(Json.jString,'String expected'),
     current: Json.jFail(Json.jBoolean,'Boolean expected'),
   });
+
+/** Safe decoder for `projectInfo` */
+export const jProjectInfoSafe: Json.Safe<projectInfo> =
+  Json.jFail(jProjectInfo,'ProjectInfo expected');
 
 /** Natural order for `projectInfo` */
 export const byProjectInfo: Compare.Order<projectInfo> =
@@ -45,10 +45,6 @@ export const byProjectInfo: Compare.Order<projectInfo> =
 export type projectRequest =
   { project: Json.key<'#project'>, request: string, data: Json.json };
 
-/** Safe decoder for `projectRequest` */
-export const jProjectRequestSafe: Json.Safe<projectRequest> =
-  Json.jFail(jProjectRequest,'ProjectRequest expected');
-
 /** Loose decoder for `projectRequest` */
 export const jProjectRequest: Json.Loose<projectRequest> =
   Json.jObject({
@@ -56,6 +52,10 @@ export const jProjectRequest: Json.Loose<projectRequest> =
     request: Json.jFail(Json.jString,'String expected'),
     data: Json.jAny,
   });
+
+/** Safe decoder for `projectRequest` */
+export const jProjectRequestSafe: Json.Safe<projectRequest> =
+  Json.jFail(jProjectRequest,'ProjectRequest expected');
 
 /** Natural order for `projectRequest` */
 export const byProjectRequest: Compare.Order<projectRequest> =

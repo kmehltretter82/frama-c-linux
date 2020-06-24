@@ -24,16 +24,16 @@ export interface variableName {
   varName: string;
 }
 
-/** Safe decoder for `variableName` */
-export const jVariableNameSafe: Json.Safe<variableName> =
-  Json.jFail(jVariableName,'VariableName expected');
-
 /** Loose decoder for `variableName` */
 export const jVariableName: Json.Loose<variableName> =
   Json.jObject({
     funName: Json.jString,
     varName: Json.jFail(Json.jString,'String expected'),
   });
+
+/** Safe decoder for `variableName` */
+export const jVariableNameSafe: Json.Safe<variableName> =
+  Json.jFail(jVariableName,'VariableName expected');
 
 /** Natural order for `variableName` */
 export const byVariableName: Compare.Order<variableName> =
