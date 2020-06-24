@@ -140,11 +140,13 @@ let bitwise_not typ v =
     else { pos = v.pos || v.zero; neg = false; zero = v.pos }
   | _ -> top
 
+let logical_not v = { pos = v.zero; neg = false; zero = v.pos || v.neg }
+
 let forward_unop typ op v =
   match op with
   | Neg -> `Value (neg_unop v)
   | BNot -> `Value (bitwise_not typ v)
-  | _ -> `Value top
+  | LNot -> `Value (logical_not v)
 
 let plus v1 v2 =
   let neg = v1.neg || v2.neg in
@@ -191,6 +193,18 @@ let bitwise_xor v1 v2 =
   let zero = (v1.zero && v2.zero) || (v1.pos && v2.pos) || (v1.neg && v2.neg) in
   { neg; pos; zero }
 
+let logical_and v1 v2 =
+  let pos = (v1.pos || v1.neg) && (v2.pos || v2.neg) in
+  let neg = false in
+  let zero = v1.zero || v2.zero in
+  { pos; neg; zero }
+
+let logical_or v1 v2 =
+  let pos = v1.pos || v1.neg || v2.pos || v2.neg in
+  let neg = false in
+  let zero = v1.zero && v2.zero in
+  { pos; neg; zero }
+
 let forward_binop _ op v1 v2 =
   match op with
   | PlusA  -> `Value (plus v1 v2)
@@ -200,6 +214,8 @@ let forward_binop _ op v1 v2 =
   | BAnd -> `Value (bitwise_and v1 v2)
   | BOr -> `Value (bitwise_or v1 v2)
   | BXor -> `Value (bitwise_xor v1 v2)
+  | LAnd -> `Value (logical_and v1 v2)
+  | LOr -> `Value (logical_or v1 v2)
   | _      -> `Value top
 
 let rewrap_integer range v =
