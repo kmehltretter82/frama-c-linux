@@ -176,7 +176,7 @@ type jtype =
   | Junion of jtype list
   | Jrecord of (string * jtype) list
   | Jdata of ident
-  | Jenum of ident (* data that is an enum *)
+  | Jenum of ident (* enum type declaration *)
   | Jself (* for (simply) recursive types *)
 
 (* -------------------------------------------------------------------------- *)

@@ -80,6 +80,7 @@ module Jbool : S with type t = bool
 module Jint : S with type t = int
 module Jfloat : S with type t = float
 module Jstring : S with type t = string
+module Jalpha : S with type t = string
 module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
 module Jmarkdown : S with type t = Markdown.text
 

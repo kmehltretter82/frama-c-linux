@@ -7,7 +7,9 @@
 */
 
 import * as Json from 'dome/data/json';
+import * as Compare from 'dome/data/compare';
 import * as Server from 'frama-c/server';
+import * as State from 'frama-c/states';
 
 
 /** Project informations */
@@ -27,6 +29,12 @@ export const jProjectInfo: Json.Loose<projectInfo> =
   Json.jTry(jProjectInfoSafe);
 
 /** Natural order for `projectInfo` */
+export const byProjectInfo: Compare.Order<projectInfo> =
+  Compare.byFields({
+    id: Compare.primitive,
+    name: Compare.primitive,
+    current: Compare.primitive,
+  });
 
 /** Request to be executed on the specified project. */
 export type projectRequest =
@@ -45,6 +53,12 @@ export const jProjectRequest: Json.Loose<projectRequest> =
   Json.jTry(jProjectRequestSafe);
 
 /** Natural order for `projectRequest` */
+export const byProjectRequest: Compare.Order<projectRequest> =
+  Compare.byFields({
+    project: Compare.primitive,
+    request: Compare.primitive,
+    data: Compare.structural,
+  });
 
 /** Returns the current project */
 export const getCurrent: Server.GetRequest<null,projectInfo> = {

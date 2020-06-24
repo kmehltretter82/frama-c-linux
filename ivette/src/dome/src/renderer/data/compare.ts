@@ -131,8 +131,24 @@ export function array<A>(order: Order<A>): Order<A[]> {
   };
 }
 
+/** Order by dictionary order.
+    Can be used directly with an enum type declaration.
+ */
+export function byEnum<A extends string>(d: { [key: string]: A }): Order<A> {
+  const ranks: { [index: string]: number } = {};
+  const values = Object.keys(d);
+  const wildcard = values.length;
+  values.forEach((C, k) => ranks[C] = k);
+  return (x: A, y: A) => {
+    if (x === y) return 0;
+    const rx = ranks[x] ?? wildcard;
+    const ry = ranks[y] ?? wildcard;
+    return rx - ry;
+  };
+}
+
 /** Order string enumeration constants.
-    `enums(v1,...,vN)` will order constant following the order of arguments.
+    `byRank(v1,...,vN)` will order constant following the order of arguments.
     Non-listed constants appear at the end, or at the rank specified by `'*'`. */
 export function byRank(...args: string[]): Order<string> {
   const ranks: { [index: string]: number } = {};

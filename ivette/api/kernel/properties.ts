@@ -7,7 +7,9 @@
 */
 
 import * as Json from 'dome/data/json';
+import * as Compare from 'dome/data/compare';
 import * as Server from 'frama-c/server';
+import * as State from 'frama-c/states';
 
 import { byTag } from 'api/kernel/data';
 import { jTag } from 'api/kernel/data';
@@ -98,6 +100,7 @@ export const jPropKindSafe: Json.Safe<propKind> =
 export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
 
 /** Natural order for `propKind` */
+export const byPropKind: Compare.Order<propKind> = Compare.byEnym(propKind);
 
 /** Registered tags for the above type. */
 export const propKindTags: Server.GetRequest<null,tag[]> = {
@@ -141,6 +144,8 @@ export const jPropStatusSafe: Json.Safe<propStatus> =
 export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
 
 /** Natural order for `propStatus` */
+export const byPropStatus: Compare.Order<propStatus> =
+  Compare.byEnym(propStatus);
 
 /** Registered tags for the above type. */
 export const propStatusTags: Server.GetRequest<null,tag[]> = {
@@ -198,6 +203,7 @@ export const jAlarmsSafe: Json.Safe<alarms> =
 export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
 
 /** Natural order for `alarms` */
+export const byAlarms: Compare.Order<alarms> = Compare.byEnym(alarms);
 
 /** Registered tags for the above type. */
 export const alarmsTags: Server.GetRequest<null,tag[]> = {

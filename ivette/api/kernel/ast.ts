@@ -7,7 +7,9 @@
 */
 
 import * as Json from 'dome/data/json';
+import * as Compare from 'dome/data/compare';
 import * as Server from 'frama-c/server';
+import * as State from 'frama-c/states';
 
 import { byTag } from 'api/kernel/data';
 import { byText } from 'api/kernel/data';
@@ -56,6 +58,8 @@ export const jMarkerKindSafe: Json.Safe<markerKind> =
 export const jMarkerKind: Json.Loose<markerKind> = Json.jEnum(markerKind);
 
 /** Natural order for `markerKind` */
+export const byMarkerKind: Compare.Order<markerKind> =
+  Compare.byEnym(markerKind);
 
 /** Registered tags for the above type. */
 export const markerKindTags: Server.GetRequest<null,tag[]> = {
@@ -138,6 +142,7 @@ export const jMarker: Json.Loose<marker> =
   );
 
 /** Natural order for `marker` */
+export const byMarker: Compare.Order<marker> = Compare.structural;
 
 /** Collect all functions in the AST */
 export const getFunctions: Server.GetRequest<null,Json.Key<'#fct'>[]> = {

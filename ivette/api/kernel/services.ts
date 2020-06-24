@@ -7,7 +7,9 @@
 */
 
 import * as Json from 'dome/data/json';
+import * as Compare from 'dome/data/compare';
 import * as Server from 'frama-c/server';
+import * as State from 'frama-c/states';
 
 import { byTag } from 'api/kernel/data';
 import { jTag } from 'api/kernel/data';
@@ -55,6 +57,13 @@ export const jSourceSafe: Json.Safe<source> =
 export const jSource: Json.Loose<source> = Json.jTry(jSourceSafe);
 
 /** Natural order for `source` */
+export const bySource: Compare.Order<source> =
+  Compare.byFields({
+    dir: Compare.primitive,
+    base: Compare.primitive,
+    file: Compare.primitive,
+    line: Compare.primitive,
+  });
 
 /** Log messages categories. */
 export enum logkind {
@@ -80,6 +89,7 @@ export const jLogkindSafe: Json.Safe<logkind> =
 export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
 
 /** Natural order for `logkind` */
+export const byLogkind: Compare.Order<logkind> = Compare.byEnym(logkind);
 
 /** Registered tags for the above type. */
 export const logkindTags: Server.GetRequest<null,tag[]> = {
@@ -106,7 +116,7 @@ export interface log {
 /** Safe decoder for `log` */
 export const jLogSafe: Json.Safe<log> =
   Json.jObject({
-    kind: Json.jFail(Json.jEnum(logkind),'kernel.services.logkind expected'),
+    kind: jLogkindSafe,
     plugin: Json.jFail(Json.jString,'String expected'),
     message: Json.jFail(Json.jString,'String expected'),
     category: Json.jString,
@@ -117,6 +127,14 @@ export const jLogSafe: Json.Safe<log> =
 export const jLog: Json.Loose<log> = Json.jTry(jLogSafe);
 
 /** Natural order for `log` */
+export const byLog: Compare.Order<log> =
+  Compare.byFields({
+    kind: byLogkind,
+    plugin: Compare.primitive,
+    message: Compare.primitive,
+    category: Compare.defined(Compare.primitive),
+    source: Compare.defined(bySource),
+  });
 
 /** Turn logs monitoring on/off */
 export const setLogs: Server.SetRequest<boolean,null> = {

@@ -7,7 +7,9 @@
 */
 
 import * as Json from 'dome/data/json';
+import * as Compare from 'dome/data/compare';
 import * as Server from 'frama-c/server';
+import * as State from 'frama-c/states';
 
 
 /** The name of variable of the program */
@@ -30,6 +32,11 @@ export const jVariableName: Json.Loose<variableName> =
   Json.jTry(jVariableNameSafe);
 
 /** Natural order for `variableName` */
+export const byVariableName: Compare.Order<variableName> =
+  Compare.byFields({
+    funName: Compare.defined(Compare.alpha),
+    varName: Compare.alpha,
+  });
 
 /** Retrieve the whole graph */
 export const graph: Server.GetRequest<null,Json.json> = {

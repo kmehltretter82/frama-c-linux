@@ -549,8 +549,7 @@ struct
       let jtype =
         let enums = D_enum (List.rev d.tags) in
         let id = Package.declare_id ~package ~name ~descr enums in
-        let js = Jenum id in
-        derived ~package ~id js ; js
+        derived ~package ~id (Jenum id) ; Jdata id
       let of_json = of_json name d.values
       let to_json = to_json name d.lookup d.vindex
     end in

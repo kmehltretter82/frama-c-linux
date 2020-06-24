@@ -59,12 +59,12 @@ struct
   let fun_field = Data.Record.option signature
       ~name:"funName"
       ~descr:(Markdown.plain "owner function for a local variable")
-      (module Data.Jstring)
+      (module Data.Jalpha)
 
   let var_field = Data.Record.field signature
       ~name:"varName"
       ~descr:(Markdown.plain "variable name")
-      (module Data.Jstring)
+      (module Data.Jalpha)
 
   type t = Cil_types.varinfo
 

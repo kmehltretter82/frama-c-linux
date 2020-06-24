@@ -39,7 +39,7 @@ let keywords = [
   "let"; "package"; "private"; "protected"; "public"; "static"; "yield"; "any";
   "boolean"; "constructor"; "declare"; "get"; "module"; "require"; "number";
   "set"; "string"; "symbol"; "type"; "from"; "of";
-  "Json";
+  "Json"; "Compare"; "Server"; "State";
 ]
 
 let pp_descr = Md.pp_text ?page:None
@@ -206,6 +206,49 @@ let typeOfParam = function
     Jrecord (List.map field fjs)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Jtype Order                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let makeOrder ~self ~names fmt js =
+  let open Pkg in
+  let rec pp fmt = function
+    | Jnull -> Format.pp_print_string fmt "Compare.equal"
+    | Jalpha -> Format.pp_print_string fmt "Compare.alpha"
+    | Jnumber | Jstring | Jboolean | Jkey _ | Jindex _
+      -> Format.pp_print_string fmt "Compare.primitive"
+    | Jself -> jcall names fmt (Pkg.Derived.order self)
+    | Jdata id -> jcall names fmt (Pkg.Derived.order id)
+    | Joption js ->
+      Format.fprintf fmt "@[<hov 2>Compare.defined(@,%a)@]" pp js
+    | Jany | Junion _ -> (* Can not find a better solution *)
+      Format.fprintf fmt "Compare.structural"
+    | Jenum id ->
+      Format.fprintf fmt "@[<hov 2>Compare.byEnym(@,%a)@]" (jcall names) id
+    | Jlist js | Jarray js ->
+      Format.fprintf fmt "@[<hov 2>Compare.array(@,%a)@]" pp js
+    | Jtuple jts ->
+      let name = match List.length jts with
+        | 2 -> "pair"
+        | 3 -> "triple"
+        | 4 -> "tuple4"
+        | 5 -> "tuple5"
+        | n -> Self.abort "No comparison for %d-tuples" n in
+      Format.fprintf fmt "@[<hv 0>@[<hv 2>Compare.%s(" name ;
+      List.iter (fun js -> Format.fprintf fmt "@,%a," pp js) jts ;
+      Format.fprintf fmt "@]@,)@]" ;
+    | Jrecord jfs ->
+      Format.fprintf fmt "@[<hv 0>@[<hv 2>Compare.byFields({" ;
+      List.iter
+        (fun (fd,js) -> Format.fprintf fmt "@ @[<hov 2>%s: %a,@]" fd pp js) jfs ;
+      Format.fprintf fmt "@]@ })@]" ;
+    | Jdict(kd,js) ->
+      let jtype fmt js = makeJtype ~names fmt js in
+      Format.fprintf fmt
+        "@[<hov 2>Compare.dictionary<@,Json.dict<'#%s'@,%a>>(@,%a)@]"
+        kd jtype js pp js
+  in pp fmt js
+
+(* -------------------------------------------------------------------------- *)
 (* --- Declaration Generator                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -216,8 +259,10 @@ let makeDeclaration fmt names d =
   let self = d.d_ident in
   let jtype = makeJtype ~self ~names in
   match d.d_kind with
+
   | D_type js ->
-    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self.name jtype js ;
+    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self.name jtype js
+
   | D_record fjs ->
     Format.fprintf fmt "export interface %s {@\n" self.name ;
     List.iter
@@ -229,7 +274,8 @@ let makeDeclaration fmt names d =
          | _ ->
            Format.fprintf fmt "  @[<hov 2>%s: %a;@]@\n" fd jtype js
       ) fjs ;
-    Format.fprintf fmt "}@\n" ;
+    Format.fprintf fmt "}@\n"
+
   | D_enum tgs ->
     Format.fprintf fmt "export enum %s {@\n" self.name ;
     List.iter
@@ -237,11 +283,13 @@ let makeDeclaration fmt names d =
          makeDescr ~indent:"  " fmt doc ;
          Format.fprintf fmt "  %s = '%s';@\n" tag tag ;
       ) tgs ;
-    Format.fprintf fmt "}@\n" ;
+    Format.fprintf fmt "}@\n"
+
   | D_signal ->
     Format.fprintf fmt "export const %s: Server.Signal = {@\n" self.name ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
-    Format.fprintf fmt "};@\n" ;
+    Format.fprintf fmt "};@\n"
+
   | D_request rq ->
     let kind = name_of_kind rq.rq_kind in
     let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
@@ -255,7 +303,8 @@ let makeDeclaration fmt names d =
     Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
     Format.fprintf fmt "  input:  %a,@\n" makeParam input ;
     Format.fprintf fmt "  output: %a,@\n" makeParam output ;
-    Format.fprintf fmt "};@\n" ;
+    Format.fprintf fmt "};@\n"
+
   | D_value js ->
     Format.fprintf fmt
       "@[<hov 2>export const %s: State.Value<@,%a@,> = {@]@\n"
@@ -264,7 +313,8 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.signal self) ;
     Format.fprintf fmt "  getter: %a,@\n"
       (jcall names) (Pkg.Derived.getter self) ;
-    Format.fprintf fmt "};@\n" ;
+    Format.fprintf fmt "};@\n"
+
   | D_state js ->
     Format.fprintf fmt
       "@[<hov 2>export const %s: State.State<@,%a@,> = {@]@\n"
@@ -275,7 +325,8 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.getter self) ;
     Format.fprintf fmt "  setter: %a,@\n"
       (jcall names) (Pkg.Derived.setter self) ;
-    Format.fprintf fmt "};@\n" ;
+    Format.fprintf fmt "};@\n"
+
   | D_array kd ->
     let data = Pkg.Derived.data self in
     Format.fprintf fmt
@@ -287,18 +338,25 @@ let makeDeclaration fmt names d =
       (jcall names) (Pkg.Derived.fetch self) ;
     Format.fprintf fmt "  reload: %a,@\n"
       (jcall names) (Pkg.Derived.reload self) ;
-    Format.fprintf fmt "};@\n" ;
+    Format.fprintf fmt "};@\n"
+
   | D_safe(id,js) ->
     Format.fprintf fmt
       "@[<hov 2>export const %s: Json.Safe<@,%a@,> =@ %a;@]\n"
       self.name (jcall names) id
-      (makeRootDecoder ~safe:true ~self:id ~names) js ;
+      (makeRootDecoder ~safe:true ~self:id ~names) js
+
   | D_loose(id,js) ->
     Format.fprintf fmt
       "@[<hov 2>export const %s: Json.Loose<@,%a@,> =@ %a;@]\n"
       self.name (jcall names) id
-      (makeRootDecoder ~safe:false ~self:id ~names) js ;
-  | D_order _ -> ()
+      (makeRootDecoder ~safe:false ~self:id ~names) js
+
+  | D_order(id,js) ->
+    Format.fprintf fmt
+      "@[<hov 2>export const %s: Compare.Order<@,%a@,> =@ %a;@]\n"
+      self.name (jcall names) id
+      (makeOrder ~self:id ~names) js
 
 (* -------------------------------------------------------------------------- *)
 (* --- Package Generator                                                  --- *)
@@ -316,7 +374,9 @@ let makePackage pkg name fmt =
     Format.fprintf fmt "*/@\n@." ;
     let names = Pkg.resolve ~keywords pkg in
     Format.fprintf fmt "import * as Json from 'dome/data/json';@\n" ;
+    Format.fprintf fmt "import * as Compare from 'dome/data/compare';@\n" ;
     Format.fprintf fmt "import * as Server from 'frama-c/server';@\n" ;
+    Format.fprintf fmt "import * as State from 'frama-c/states';@\n" ;
     Format.pp_print_newline fmt () ;
     Pkg.IdMap.iter
       (fun id name ->
