@@ -163,8 +163,8 @@ let mk_runtime_check_with_msg ?(reverse=false) ~loc msg kind kf e =
   let line = (fst loc).Filepath.pos_lnum in
   let e =
     if reverse
-    then e
-    else Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
+    then Cil.new_exp ~loc:e.eloc (UnOp(LNot, e, Cil.intType))
+    else e
   in
   mk_rtl_call ~loc
     "assert"
@@ -177,6 +177,11 @@ let mk_runtime_check_with_msg ?(reverse=false) ~loc msg kind kf e =
 
 let mk_runtime_check ?(reverse=false) kind kf e p =
   let loc = p.pred_loc in
+  let p =
+    if reverse
+    then Logic_const.pnot ~loc p
+    else p
+  in
   let msg =
     Kernel.Unicode.without_unicode
       (Format.asprintf "%a@?" Printer.pp_predicate) p
