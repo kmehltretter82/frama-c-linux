@@ -2,6 +2,7 @@
 # --- Template .gitignore file for Dome
 # --------------------------------------------------------------------------
 
+.ivette
 .dome-*.stamp
 .dome-*.back
 .server-tsc

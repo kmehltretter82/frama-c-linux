@@ -50,83 +50,136 @@ export const platform = System.platform ;
 // --- Settings
 // --------------------------------------------------------------------------
 
-const APP_DIR = app.getPath('userData');
-const APP_SETTINGS = path.join( APP_DIR , 'Settings.json' );
-
-var s_frames = {} ;
-var s_globals = {} ;
-var s_application = {} ;
-var s_preferences = {} ;
-
-function loadSettings() {
+function loadSettings( file ) {
   try {
-    if (!fstat( APP_SETTINGS )) return;
-    const content = fs.readFileSync( APP_SETTINGS, { encoding: 'utf8' } );
-    const loaded = JSON.parse( content );
-    const MERGE = (store,field) => _.merge( store , _.get( loaded , field ));
-    s_frames = MERGE( s_frames , 'frames' );
-    s_globals = MERGE( s_globals, 'globals' );
-    s_application = MERGE( s_application, 'application' );
-    s_preferences = MERGE( s_preferences, 'preferences' );
+    if (!fstat(file))
+      return {};
+    const text = fs.readFileSync(file, { encoding: 'utf8' } );
+    return Object.assign({}, JSON.parse(text));
   } catch(err) {
-    console.error("[Dome] Can not load application settings\n" + err);
+    console.error("[Dome] Can not load settings", file, err);
+    return {};
   }
 }
 
-function saveSettings() {
+function saveSettings( file, data={} ) {
+  try {
+    const text = JSON.stringify( data, undefined, DEVEL ? 2 : 0 );
+    fs.writeFileSync( file, text, { encoding: 'utf8' }, (err) => { throw(err); } );
+  } catch(err) {
+    console.error("[Dome] Can not save settings", file, err);
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Global Settings
+// --------------------------------------------------------------------------
+
+var GlobalSettings; // Current Dictionnary
+
+const APP_DIR = app.getPath('userData');
+const PATH_WINDOW_SETTINGS = path.join( APP_DIR, 'WindowSettings.json' );
+const PATH_GLOBAL_SETTINGS = path.join( APP_DIR, 'GlobalSettings.json' );
+
+function saveGlobalSettings() {
   try {
     if (!fstat( APP_DIR )) fs.mkdirSync( APP_DIR );
-    const saved = {
-      globals: s_globals,
-      application: s_application,
-      preferences: s_preferences,
-      frames: s_frames
-    };
-    const content = JSON.stringify( saved, undefined, DEVEL ? 2 : 0 );
-    fs.writeFileSync( APP_SETTINGS, content, { encoding: 'utf8' }, errorSettings );
+    saveSettings( PATH_GLOBAL_SETTINGS, GlobalSettings );
   } catch(err) {
-    errorSettings(err);
+    console.error("[Dome] Can not save global settings", err);
   }
 }
 
-const fireSaveSettings = _.debounce( saveSettings , 50 );
-
-function errorSettings(err) {
-  if (err) console.error("[Dome] Can not save application settings\n" + err);
+function obtainGlobalSettings() {
+  if (!GlobalSettings) {
+    GlobalSettings = loadSettings( PATH_GLOBAL_SETTINGS );
+  }
+  return GlobalSettings;
 }
 
-function remoteSyncSettings(event)
-{
-  const isSetting = windowSettings && windowSettings.id === event.frameId ;
+// --------------------------------------------------------------------------
+// --- Window Settings & Frames
+// --------------------------------------------------------------------------
+
+/* Window Handle:
+   {
+     window: BrowserWindow ; // Also prevents Gc
+     config: path;           // Path to config file
+     frame: { x,y,w,h };     // Frame position
+     settings: object;       // Current settings
+     reload: boolean;        // Reloaded window
+   }
+ */
+
+const WindowHandles = {}; // Indexed by *webContents* id
+
+function saveWindowConfig(handle) {
+  const settings = {
+    frame: handle.frame,
+    settings: handle.settings,
+    devtools: handle.devtools
+  };
+  saveSettings( handle.config, settings );
+}
+
+function windowSyncSettings(event) {
+  const handle = WindowHandles[event.sender.id];
   event.returnValue = {
-    globals: s_globals,
-    settings: isSetting ? s_preferences : s_application
+    globals: obtainGlobalSettings(),
+    settings: handle && handle.settings
   };
 }
 
-function remoteSaveWindowSettings(event,patches)
-{
-  const isSetting = windowSettings && windowSettings.id === event.frameId ;
-  _.merge( isSetting ? s_preferences : s_application , patches );
-  saveSettings();
-}
+ipcMain.on('dome.ipc.settings.sync', windowSyncSettings );
 
-function remoteSaveGlobalSettings(event,patches)
-{
-  _.merge( s_globals , patches );
-  saveSettings();
-  BrowserWindow.getAllWindows().forEach((win) => {
-    if (win.id !== event.frameId)
-      win.send('dome.ipc.settings.update',patches);
+// --------------------------------------------------------------------------
+// --- Patching Settings
+// --------------------------------------------------------------------------
+
+function applyPatches( data, args ) {
+  args.forEach(({ key, value }) => {
+    if (value === null) {
+      delete data[key];
+    } else {
+      data[key] = value;
+    }
   });
 }
 
-ipcMain.on('dome.ipc.settings.sync', remoteSyncSettings );
-ipcMain.on('dome.ipc.settings.window', remoteSaveWindowSettings );
-ipcMain.on('dome.ipc.settings.global', remoteSaveGlobalSettings );
+function applyWindowSettings(event,args) {
+  const handle = WindowHandles[event.sender.id];
+  if (handle) {
+    applyPatches( handle.settings, args );
+    if (DEVEL) saveWindowConfig( handle );
+  }
+}
+
+function applyGlobalSettings(event,args) {
+  applyPatches( obtainGlobalSettings(), args );
+  BrowserWindow.getAllWindows().forEach((w) => {
+    if (w.webContents.id !== event.sender.id) {
+      w.send('dome.ipc.settings.update',args);
+    }
+  });
+  if (DEVEL) saveGlobalSettings();
+}
+
+ipcMain.on('dome.ipc.settings.window', applyWindowSettings );
+ipcMain.on('dome.ipc.settings.global', applyGlobalSettings );
 
 // --------------------------------------------------------------------------
-// --- Active Windows
+// --- Renderer-Process Communication
+// --------------------------------------------------------------------------
+
+function broadcast( event, ...args )
+{
+  BrowserWindow.getAllWindows().forEach((w) => {
+    w.send( event, ...args );
+  });
+}
+
+// --------------------------------------------------------------------------
+// --- Window Activities
 // --------------------------------------------------------------------------
 
 var appName = 'Dome' ;
@@ -141,21 +194,24 @@ export function setName(title) {
 }
 
 function setTitle(event,title) {
-  let w = BrowserWindow.fromId( event.frameId );
-  w.setTitle( title || appName );
+  let handle = WindowHandles[event.sender.id];
+  handle && handle.setTitle( title || appName );
 }
 
 function setModified(event,modified) {
-  let w = BrowserWindow.frameId( event.frameId );
-  if (platform == 'macos')
-    w.setDocumentEdited( modified );
-  else {
-    let title = w.getTitle();
-    if (title.startsWith(MODIFIED))
-      title = title.substring(MODIFIED.length);
-    if (modified)
-      title = MODIFIED + title ;
-    w.setTitle(title);
+  let handle = WindowHandles[event.sender.id];
+  if (handle) {
+    const w = handle.window;
+    if (platform == 'macos')
+      w.setDocumentEdited( modified );
+    else {
+      let title = w.getTitle();
+      if (title.startsWith(MODIFIED))
+        title = title.substring(MODIFIED.length);
+      if (modified)
+        title = MODIFIED + title ;
+      w.setTitle(title);
+    }
   }
 }
 
@@ -192,34 +248,55 @@ function navigateURL( event , url ) {
 }
 
 // --------------------------------------------------------------------------
+// --- Lookup for config file
+// --------------------------------------------------------------------------
+
+function lookupConfig(wdir) {
+  let cwd = wdir = path.resolve(wdir);
+  let cfg = '.' + appName.toLowerCase();
+  for(;;) {
+    const here = path.join(cwd,cfg);
+    if (fstat(here)) return here;
+    let up = path.dirname(cwd);
+    if (up === cwd) break;
+    cwd = up;
+  }
+  const home = path.resolve(app.getPath('home'));
+  const user = wdir.startsWith(home) ? wdir : home ;
+  return path.join( user, cfg );
+}
+
+// --------------------------------------------------------------------------
 // --- Browser Window SetUp
 // --------------------------------------------------------------------------
 
-const windowsHandle = {} ; // Prevent live windows to be garbage collected
-const windowsReload = {} ; // Reloaded windows
-
-function createBrowserWindow( config, isMain=true )
+function createBrowserWindow( config, argv, wdir )
 {
 
-  const argv = isMain
+  const isAppWindow = (argv !== undefined && wdir !== undefined);
+
+  const browserArguments = isAppWindow
         ? SYS.WINDOW_APPLICATION_ARGV
         : SYS.WINDOW_PREFERENCES_ARGV ;
 
-  const options = _.merge(
+  const options = Object.assign(
     {
       show: false,
       backgroundColor: '#f0f0f0',
       webPreferences: {
         nodeIntegration:true,
-        additionalArguments: [ argv ]
+        additionalArguments: [ browserArguments ]
       }
-    }
-    , config );
+    },
+    config
+  );
 
-  const frameId = isMain ? 'application' : 'preferences' ;
-  const frame = _.get( s_frames, frameId );
-  const getInt = (v) => v && _.toSafeInteger(v);
+  const configFile = isAppWindow ? lookupConfig( wdir ) : PATH_WINDOW_SETTINGS ;
+  const configData = loadSettings( configFile );
+
+  const { frame, devtools, settings={} } = configData;
   if (frame) {
+    const getInt = (v) => v && _.toSafeInteger(v);
     options.x = getInt(frame.x);
     options.y = getInt(frame.y);
     options.width = getInt(frame.width);
@@ -227,8 +304,25 @@ function createBrowserWindow( config, isMain=true )
   }
 
   const theWindow = new BrowserWindow( options );
-  const wid = theWindow.id;
-  
+  const wid = theWindow.webContents.id;
+
+  const handle = {
+    window: theWindow,
+    config: configFile,
+    frame, settings, devtools,
+    reload: false
+  };
+
+  // Keep the window reference (prevent garbage collection)
+  WindowHandles[wid] = handle;
+
+  // Emitted when the window is closed.
+  theWindow.on('closed', () => {
+    saveWindowConfig(handle);
+    // Dereference the window object (allow garbage collection)
+    delete WindowHandles[wid] ;
+  });
+
   // Load the index.html of the app.
   if (DEVEL || LOCAL)
     process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -239,7 +333,7 @@ function createBrowserWindow( config, isMain=true )
   theWindow.once('ready-to-show' , () => {
     if (DEVEL || LOCAL)
       process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'false';
-    if (DEVEL)
+    if (DEVEL && devtools)
       theWindow.openDevTools();
     theWindow.show();
   });
@@ -251,57 +345,44 @@ function createBrowserWindow( config, isMain=true )
   // URL Navigation
   theWindow.webContents.on('will-navigate', navigateURL );
   theWindow.webContents.on('did-navigate-in-page', navigateURL );
+
+  // Application Startup
   theWindow.webContents.on('did-finish-load', () => {
-    const isLoaded = windowsReload[wid];
-    if (!isLoaded) {
-      windowsReload[wid] = true;
+    if (!handle.reload) {
+      handle.reload = true;
     } else {
       broadcast('dome.ipc.reload');
     }
+    theWindow.send('dome.ipc.command',argv,wdir);
   });
 
   // Emitted when the window want's to close.
   theWindow.on('close', (evt) => {
+    handle.frame = theWindow.getBounds();
+    handle.devtools = theWindow.isDevToolsOpened();
     theWindow.send('dome.ipc.closing');
-    const frame = theWindow.getBounds();
-    _.set( s_frames, frameId , frame );
   });
 
   // Keep track of frame positions (in DEVEL)
   if (DEVEL) {
-    const reframe = _.debounce( (evt) => {
-      const frame = theWindow.getBounds();
-      _.set( s_frames, frameId , frame );
-      saveSettings();
+    const saveFrame = _.debounce( (evt) => {
+      handle.frame = theWindow.getBounds();
+      handle.devtools = theWindow.isDevToolsOpened();
+      saveWindowConfig(handle);
     } , 300);
-    theWindow.on('resize',reframe);
-    theWindow.on('moved',reframe);
+    theWindow.on('resize',saveFrame);
+    theWindow.on('moved',saveFrame);
   }
-
-  // Keep the window reference to prevent destruction
-  windowsHandle[ wid ] = theWindow ;
-
-  // Emitted when the window is closed.
-  theWindow.on('closed', () => {
-    // Dereference the window object to actually destroy it
-    delete windowsHandle[ wid ] ;
-  });
 
   return theWindow ;
 }
 
 // --------------------------------------------------------------------------
-// --- Application Window(s)
+// --- Application Window(s) & Command Line
 // --------------------------------------------------------------------------
 
-function filterArgv( argv ) {
-  return argv.slice( DEVEL ? 3 : (LOCAL ? 2 : 1) ).filter((p) => p);
-}
-
-function sendCommand( win, argv, wdir ) {
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('dome.ipc.command',argv,wdir);
-  });
+function stripElectronArgv( argv ) {
+  return argv.slice( DEVEL ? 3 : (LOCAL ? 2 : 1) ).filter((p) => !!p);
 }
 
 function createPrimaryWindow()
@@ -309,31 +390,28 @@ function createPrimaryWindow()
   // Initialize Menubar
   Menubar.install();
 
-  // Initialize Settings
-  loadSettings();
-
   // React Developper Tools
   if (DEVEL)
     installExtension(REACT_DEVELOPER_TOOLS,true);
-
-  const primary = createBrowserWindow({ title: appName } , true);
-  const wdir = process.cwd() === '/' ? app.getPath('home') : process.cwd() ;
-  sendCommand( primary , filterArgv(process.argv) , wdir );
+  const cwd = process.cwd();
+  const wdir = cwd === '/' ? app.getPath('home') : cwd ;
+  const argv = stripElectronArgv(process.argv);
+  createBrowserWindow({ title: appName } , argv, wdir );
 }
 
 var appCount = 1;
 
-function createSecondaryWindow(_event,argv,wdir)
+function createSecondaryWindow(_event,process_argv,wdir)
 {
-  const secondary = createBrowserWindow({ title: `${appName} #${++appCount}` }, true);
-  sendCommand( secondary, filterArgv(argv), wdir );
+  const argv = stripElectronArgv(process_argv);
+  createBrowserWindow({ title: `${appName} #${++appCount}` }, argv, wdir);
 }
 
 function createDesktopWindow()
 {
   const instance = appCount++ ;
-  const secondary = createBrowserWindow({ title: `${appName} #${++appCount}` }, true);
-  sendCommand( secondary , [] , app.getPath('home') );
+  const wdir = app.getPath('home');
+  createBrowserWindow({ title: `${appName} #${++appCount}` }, [], wdir);
 }
 
 // --------------------------------------------------------------------------
@@ -361,31 +439,35 @@ function activateWindows() {
 // --- Settings Window
 // --------------------------------------------------------------------------
 
-var windowSettings = undefined ; // Preference Window
+var PreferenceWindow = undefined ; // Preference Window
 
 function showSettingsWindow()
 {
-  if (!windowSettings)
-    windowSettings = createBrowserWindow({
+  if (!PreferenceWindow)
+    PreferenceWindow = createBrowserWindow({
       title: appName + ' Settings',
       width: 256,
       height: 248,
       fullscreen: false,
       maximizable: false,
       minimizable: false
-    }, false);
-  windowSettings.show();
-  windowSettings.on('closed',() => windowSettings = undefined);
+    });
+  PreferenceWindow.show();
+  PreferenceWindow.on('closed',() => PreferenceWindow = undefined);
 }
 
 function restoreDefaultSettings()
 {
-  s_globals = {} ;
-  s_preferences = {} ;
-  s_application = {} ;
-  s_frames = {} ;
-  fireSaveSettings();
-  fireSaveSettings.flush();
+  GlobalSettings = {};
+  if (DEVEL) saveGlobalSettings();
+
+  _.forEach( WindowHandles, (handle) => {
+    // Keep frame for user comfort
+    handle.settings = {};
+    handle.devtools = handle.window.isDevToolsOpened();
+    if (DEVEL) saveWindowConfig(handle);
+  });
+
   broadcast( 'dome.ipc.settings.defaults' );
 }
 
@@ -402,39 +484,27 @@ export function start() {
   // Change default locale
   app.commandLine.appendSwitch('lang','en');
 
-  // Listen to window events
+  // Listen to application events
   app.on( 'ready', createPrimaryWindow ); // Wait for Electron init
   app.on( 'activate', activateWindows ); // Mac OSX response to dock
   app.on( 'second-instance', createSecondaryWindow );
   app.on( 'dome.menu.settings', showSettingsWindow );
   app.on( 'dome.menu.defaults', restoreDefaultSettings );
 
-  // Performing on-exit callbacks
+  // At-exit callbacks
   app.on( 'will-quit' , () => {
+    saveGlobalSettings();
     System.doExit() ;
-    fireSaveSettings();
-    fireSaveSettings.flush();
   });
 
-  // On OS X menu bar stay active until the user quits explicitly from menu.
-  // On other systems, quit when all windows are closed.
+  // On macOS the menu bar stays active until the user explicitly quits.
+  // On other systems, automatically quit when all windows are closed.
   // Warning: when no event handler is registered, the app automatically
   // quit when all windows are closed.
   app.on( 'window-all-closed', () => {
     if (System.platform !== 'macos') app.quit();
   });
 
-}
-
-// --------------------------------------------------------------------------
-// --- Renderer-Process Communication
-// --------------------------------------------------------------------------
-
-function broadcast( event, ...args )
-{
-  BrowserWindow.getAllWindows().forEach((w) => {
-    w.send( event, ...args );
-  });
 }
 
 // --------------------------------------------------------------------------
