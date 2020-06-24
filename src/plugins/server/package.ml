@@ -207,13 +207,13 @@ type requestInfo = {
 
 type declKindInfo =
   | D_signal
-  | D_value
-  | D_state
-  | D_array
   | D_type of jtype
   | D_enum of tagInfo list
   | D_record of fieldInfo list
   | D_request of requestInfo
+  | D_value of jtype
+  | D_state of jtype
+  | D_array of string (* key kind *)
 
 type declInfo = {
   d_ident : ident;
@@ -269,8 +269,8 @@ let visit_request f { rq_input ; rq_output } =
   ( visit_param f rq_input ; visit_param f rq_output )
 
 let visit_dkind f = function
-  | D_signal | D_state | D_value | D_array | D_enum _ -> ()
-  | D_type js -> visit_jtype f js
+  | D_signal | D_enum _ | D_array _ -> ()
+  | D_type js | D_state js | D_value js -> visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq
 
@@ -288,6 +288,28 @@ let resolve ?(keywords=[]) pkg =
   visit_package_decl (Scope.declare scope) pkg ;
   visit_package_used (Scope.use scope) pkg ;
   Scope.resolve scope
+
+(* -------------------------------------------------------------------------- *)
+(* --- Derived Names                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let derived ?prefix ?suffix id =
+  let capitalize = String.capitalize_ascii in
+  match prefix , suffix with
+  | None , None -> id
+  | Some p , None -> { id with name = p ^ capitalize id.name }
+  | None , Some q -> { id with name = id.name ^ q }
+  | Some p , Some q -> { id with name = p ^ capitalize id.name ^ q }
+
+module Derived =
+struct
+  let signal id = derived ~prefix:"sig" id
+  let getter id = derived ~prefix:"get" id
+  let setter id = derived ~prefix:"set" id
+  let data id = derived ~suffix:"Data" id
+  let fetch id = derived ~prefix:"fetch" id
+  let reload id = derived ~prefix:"reload" id
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server API                                                         --- *)

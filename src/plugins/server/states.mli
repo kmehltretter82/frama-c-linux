@@ -124,6 +124,7 @@ val register_array :
   name:string ->
   descr:Markdown.text ->
   key:('a -> string) ->
+  ?keyKind:string ->
   iter:('a callback) ->
   ?add_update_hook:('a callback) ->
   ?add_remove_hook:('a callback) ->

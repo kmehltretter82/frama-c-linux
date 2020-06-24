@@ -71,13 +71,13 @@ type requestInfo = {
 
 type declKindInfo =
   | D_signal
-  | D_value
-  | D_state
-  | D_array
   | D_type of jtype
   | D_enum of tagInfo list
   | D_record of fieldInfo list
   | D_request of requestInfo
+  | D_value of jtype
+  | D_state of jtype
+  | D_array of string
 
 type declInfo = {
   d_ident : ident;
@@ -102,6 +102,23 @@ val pp_plugin : Format.formatter -> plugin -> unit
 val pp_pkgname : Format.formatter -> packageInfo -> unit
 val pp_ident : Format.formatter -> ident -> unit
 val pp_jtype : Format.formatter -> jtype -> unit
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Derived Names                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+val derived : ?prefix:string -> ?suffix:string -> ident -> ident
+
+module Derived :
+sig
+  val signal : ident -> ident
+  val getter : ident -> ident
+  val setter : ident -> ident
+  val data : ident -> ident
+  val fetch : ident -> ident
+  val reload : ident -> ident
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Names Resolution                                                   --- *)

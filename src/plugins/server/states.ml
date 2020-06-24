@@ -49,13 +49,14 @@ let register_value (type a) ~package ~name ~descr
   =
   let open Markdown in
   let href = link ~name () in
-  let () = Package.declare
-      ~package ~name ~descr D_value in
+  let module D = (val output) in
+  let id = Package.declare_id
+      ~package ~name ~descr (D_value D.jtype) in
   let signal = Request.signal
-      ~package ~name:(name ^ "Sig")
+      ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for state" @ href) in
   let () = Request.register
-      ~package ~name:(name ^ "Get")
+      ~package ~name:(Package.Derived.getter id).name
       ~descr:(plain "Getter for state" @ href)
       ~kind:`GET ~input:(module Junit) ~output get in
   install_emit signal add_hook ;
@@ -71,17 +72,17 @@ let register_state (type a) ~package ~name ~descr
   let open Markdown in
   let module D = (val data) in
   let href = link ~name () in
-  let () = Package.declare
-      ~package ~name ~descr D_state in
+  let id = Package.declare_id
+      ~package ~name ~descr (D_state D.jtype) in
   let signal = Request.signal
-      ~package ~name:(name ^ "Sig")
+      ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for state" @ href) in
   let () = Request.register
-      ~package ~name:(name ^ "Get")
+      ~package ~name:(Package.Derived.getter id).name
       ~descr:(plain "Getter for state" @ href)
       ~kind:`GET ~input:(module Junit) ~output:(module D) get in
   let () = Request.register
-      ~package ~name:(name ^ "Set")
+      ~package ~name:(Package.Derived.setter id).name
       ~descr:(plain "Setter for state" @ href)
       ~kind:`SET ~input:(module D) ~output:(module Junit) set in
   install_emit signal add_hook ;
@@ -259,7 +260,7 @@ let fetch array n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register_array ~package ~name ~descr ~key
+let register_array ~package ~name ~descr ~key ?(keyKind=name)
     ~(iter : 'a callback)
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
@@ -270,19 +271,20 @@ let register_array ~package ~name ~descr ~key
   let columns = List.rev !model in
   let fields = Package.{
       fd_name = "key" ;
-      fd_type = Jkey name ;
+      fd_type = Jkey keyKind ;
       fd_descr = plain "Entry identifier." ;
     } :: List.map fst columns in
-  let () = Package.declare ~package:package ~name:name ~descr D_array in
+  let id = Package.declare_id ~package:package ~name:name ~descr
+      (D_array keyKind) in
   let signal = Request.signal
-      ~package ~name:(name ^ "Sig")
+      ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for array" @ href) in
   let row = Package.declare_id
-      ~package ~name:(name ^ "Row")
-      ~descr:(plain "Data rows for array" @ href)
+      ~package ~name:(Package.Derived.data id).name
+      ~descr:(plain "Data for array rows" @ href)
       (D_record fields) in
   let getter =
-    List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) columns in
+    List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) !model in
   let array = {
     key ; iter ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
@@ -309,10 +311,9 @@ let register_array ~package ~name ~descr ~key
       ~name:"pending" ~descr:(plain "remaining entries to be fetched")
       (module Jint) in
   Request.register_sig
-    ~package ~name:(name ^ "Fetch")
+    ~package ~name:(Package.Derived.fetch id).name
     ~descr:(plain "Data fetcher for array" @ href)
-    ~kind:`GET
-    signature
+    ~kind:`GET signature
     begin fun rq n ->
       let buffer = fetch array n in
       set_reload rq buffer.reload ;
@@ -321,9 +322,9 @@ let register_array ~package ~name ~descr ~key
       set_pending rq buffer.pending ;
     end ;
   Request.register
-    ~package ~name:(name ^ "Reload") ~kind:`GET
+    ~package ~name:(Package.Derived.reload id).name
     ~descr:(plain "Force full reload for array" @ href)
-    ~input:(module Junit) ~output:(module Junit)
+    ~kind:`GET ~input:(module Junit) ~output:(module Junit)
     (fun () -> reload array) ;
   synchronize array ;
   install signal (update array) add_update_hook ;
