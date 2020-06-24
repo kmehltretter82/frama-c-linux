@@ -64,6 +64,21 @@ async function loadAST(
   }
 }
 
+async function callers(updateSelection: any, kf: string) {
+  try {
+    const data = await Server.GET({
+      endpoint: 'eva.callers',
+      params: kf,
+    });
+    const locations = data.map((d: string[2]) => (
+      { function: d[0], marker: d[1] }
+    ));
+    updateSelection({ locations });
+  } catch (err) {
+    PP.error('Fail to retrieve callers of function', kf, err);
+  }
+}
+
 // --------------------------------------------------------------------------
 // --- AST Printer
 // --------------------------------------------------------------------------
@@ -107,17 +122,27 @@ const ASTview = () => {
   }
 
   function onContextMenu(id: string) {
+    const items = [];
     const marker = markers[id];
-    if (marker && marker.kind === 'function') {
-      const item = {
+    if (marker?.kind === 'lvalue' && marker?.var === 'function') {
+      items.push({
         label: `Go to definition of ${marker.name}`,
         onClick: () => {
           const location = { function: marker.name };
           updateSelection({ location });
         },
-      };
-      Dome.popupMenu([item]);
+      });
     }
+    if (marker?.kind === 'declaration'
+        && marker?.var === 'function'
+        && marker?.name) {
+      items.push({
+        label: 'Go to callers',
+        onClick: () => callers(updateSelection, marker.name),
+      });
+    }
+    if (items.length > 0)
+      Dome.popupMenu(items);
   }
 
   // Theme Popup
