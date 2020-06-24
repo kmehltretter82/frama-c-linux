@@ -522,14 +522,19 @@ export interface FullLocation {
  *  but at least one of the two must be set.
  */
 export type Location = AtLeastOne<FullLocation>;
-export interface Selection {
 
+export interface Selection {
   /** Current selection. */
   current?: Location;
   /** Previous locations with respect to the [[current]] one. */
   prevSelections: Location[];
   /** Next locations with respect to the [[current]] one. */
   nextSelections: Location[];
+  /** Selection of multiple locations at once. Can be cycled through
+      'NEXT' and 'PREV' actions. */
+  multiple: Location[];
+  /** The index of the last selected location from [[multiple]]. */
+  index: number;
 }
 
 /** A select action on a location. */
@@ -537,45 +542,93 @@ export interface SelectAction {
   readonly location: Location;
 }
 
+/** A select action on an array of location. */
+export interface SelectArrayAction {
+  readonly locations: Location[];
+}
+
+/** Select the [[index]]-nth location of the current multiple selection. */
+export interface GotoAction {
+  readonly index: number;
+}
+
 /** Actions on selection:
  * - [[SelectAction]].
  * - `GO_BACK` jumps to previous location (first in [[prevSelections]]).
  * - `GO_FORWARD` jumps to next location (first in [[nextSelections]]).
  */
-export type SelectionActions = SelectAction | 'GO_BACK' | 'GO_FORWARD';
+export type SelectionActions =
+  SelectAction | SelectArrayAction | GotoAction
+  | 'GO_BACK' | 'GO_FORWARD' | 'NEXT' | 'PREV' | 'CLEAR';
 
 function isSelect(a: SelectionActions): a is SelectAction {
   return (a as SelectAction).location !== undefined;
 }
 
+function isSelectArray(a: SelectionActions): a is SelectArrayAction {
+  return (a as SelectArrayAction).locations !== undefined;
+}
+
+function isGoto(a: SelectionActions): a is GotoAction {
+  return (a as GotoAction).index !== undefined;
+}
+
+function select(s: Selection, location: Location): Selection {
+  const [prevSelections, nextSelections] =
+    s.current && s.current.function !== location.function ?
+      [[s.current, ...s.prevSelections], []] :
+      [s.prevSelections, s.nextSelections];
+  return { ...s, current: location, prevSelections, nextSelections };
+}
+
 /** Compute the next selection based on the current one and the given action. */
 function reducer(s: Selection, action: SelectionActions): Selection {
   if (isSelect(action)) {
-    const [prevSelections, nextSelections] =
-      s.current && s.current.function !== action.location.function ?
-        [[s.current, ...s.prevSelections], []] :
-        [s.prevSelections, s.nextSelections];
-    return {
-      current: action.location,
-      prevSelections,
-      nextSelections,
-    };
+    return select(s, action.location);
+  }
+  if (isSelectArray(action)) {
+    if (action.locations.length === 0)
+      return s;
+    if (action.locations.length === 1)
+      return select(s, action.locations[0]);
+    const selection = select(s, action.locations[0]);
+    return { ...selection, multiple: action.locations, index: 0 };
+
+  }
+  if (isGoto(action)) {
+    const { index } = action;
+    if (0 <= index && index < s.multiple.length) {
+      const location = s?.multiple[index];
+      const selection = select(s, location);
+      return { ...selection, index: action.index };
+    }
+    return s;
   }
   const [pS, ...prevS] = s.prevSelections;
   const [nS, ...nextS] = s.nextSelections;
+  const index = action === 'NEXT' ? s.index + 1 : s.index - 1;
   switch (action) {
     case 'GO_BACK':
       return {
+        ...s,
         current: pS,
         prevSelections: prevS,
         nextSelections: [(s.current as Location), ...s.nextSelections],
       };
     case 'GO_FORWARD':
       return {
+        ...s,
         current: nS,
         prevSelections: [(s.current as Location), ...s.prevSelections],
         nextSelections: nextS,
       };
+    case 'NEXT':
+    case 'PREV':
+      if (0 <= index && index < s.multiple.length)
+        return select({ ...s, index }, s.multiple[index]);
+      return s;
+    case 'CLEAR':
+      return { ...s, multiple: [], index: 0 };
     default:
       return s;
   }
@@ -587,6 +640,8 @@ const initialSelection = {
   current: undefined,
   prevSelections: [],
   nextSelections: [],
+  multiple: [],
+  index: 0,
 };
 setStateDefault(SELECTION, initialSelection);
 
