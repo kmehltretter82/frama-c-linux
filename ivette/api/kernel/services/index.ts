@@ -130,7 +130,7 @@ export const jLog: Json.Loose<log> = Json.jTry(jLogSafe);
 export const byLog: Compare.Order<log> =
   Compare.byFields({
     kind: byLogkind,
-    plugin: Compare.primitive,
+    plugin: Compare.alpha,
     message: Compare.primitive,
     category: Compare.defined(Compare.primitive),
     source: Compare.defined(bySource),

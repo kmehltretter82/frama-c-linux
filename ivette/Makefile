@@ -36,15 +36,12 @@ tsc: typecheck fixlint
 
 .PHONY: api
 
-api: .server-tsc
-
-.server-tsc: ../bin/toplevel.byte api/server_tsc.ml
+api:
 	@echo "[Ivette] Generating TypeScript API"
+	@find api -name "*.ts" -exec rm -f {} \;
 	../bin/frama-c.byte -load-module api/server_tsc.ml -server-tsc
+	@find api -name "*.ts" -exec chmod a-w {} \;
 	@touch $@
-
-../bin/toplevel.byte:
-	make -C .. -kj byte
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation

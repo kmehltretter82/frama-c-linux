@@ -59,7 +59,7 @@ export const jTag: Json.Loose<tag> = Json.jTry(jTagSafe);
 /** Natural order for `tag` */
 export const byTag: Compare.Order<tag> =
   Compare.byFields({
-    name: Compare.primitive,
+    name: Compare.alpha,
     label: byMarkdown,
     descr: byMarkdown,
   });

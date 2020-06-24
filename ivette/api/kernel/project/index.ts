@@ -32,7 +32,7 @@ export const jProjectInfo: Json.Loose<projectInfo> =
 export const byProjectInfo: Compare.Order<projectInfo> =
   Compare.byFields({
     id: Compare.primitive,
-    name: Compare.primitive,
+    name: Compare.alpha,
     current: Compare.primitive,
   });
 

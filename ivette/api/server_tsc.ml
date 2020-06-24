@@ -406,7 +406,7 @@ let generate () =
       begin fun pkg ->
         Self.feedback "Package %a" Pkg.pp_pkgname pkg ;
         let name = Pkg.name_of_pkginfo ~sep:"/" pkg in
-        let file = Printf.sprintf "%s/%s.ts" (OUT.get ()) name in
+        let file = Printf.sprintf "%s/%s/index.ts" (OUT.get ()) name in
         let dir = Filename.dirname file in
         if not (Sys.file_exists dir && Sys.is_directory dir) then
           Extlib.mkdir ~parents:true dir 0o755 ;
