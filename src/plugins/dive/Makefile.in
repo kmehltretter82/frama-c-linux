@@ -41,7 +41,7 @@ PLUGIN_ENABLE:=@ENABLE_DIVE@
 PLUGIN_NAME := Dive
 PLUGIN_CMO := self callstack node_kind imprecision_graph build main \
   server_interface
-PLUGIN_CMI:= graph_types
+PLUGIN_CMI := dive_types
 PLUGIN_DEPENDENCIES:= Eva Studia Server
 PLUGIN_HAS_MLI:= yes
 PLUGIN_TESTS_DIRS:=dive

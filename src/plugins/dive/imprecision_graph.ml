@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Dive_types
 
 module Node =
 struct
@@ -167,6 +167,24 @@ let find_independant_nodes g roots =
   let table = Table.create 13 in
   List.iter (Dfs.prefix_component (fun n -> Table.add table n true) g) roots;
   fold_vertex (fun n acc -> if Table.mem table n then acc else n :: acc) g []
+
+
+let bfs ?(iter_succ=iter_succ) ?(limit=max_int) g roots =
+  let module Table = Hashtbl.Make (Node) in
+  let explored : int Table.t = Table.create 13
+  and queue : (node * int) Queue.t = Queue.create () in
+  (* Add roots to queue *)
+  List.iter (fun root -> Queue.add (root,0) queue) roots;
+  (* Iterate over the queue *)
+  while not (Queue.is_empty queue) do
+    let (n,d) = Queue.take queue in
+    if d <= limit && not (Table.mem explored n) then begin
+      Table.add explored n d;
+      iter_succ (fun n' -> Queue.add (n',d+1) queue) g n
+    end
+  done;
+  (* Convert the result to list *)
+  Table.fold (fun n _ l -> n :: l) explored []
 
 
 let ouptput_to_dot out_channel g =

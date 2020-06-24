@@ -91,10 +91,13 @@ function range(interval: Interval, limit: Interval): number
 }
 
 
+export type mode = 'explore' | 'overview';
+
 class Dive {
   headless: boolean;
   cy: Cytoscape.Core;
-  layoutName = '';
+  mode: mode = 'explore';
+  _layout = '';
   layoutOptions: Cytoscape.LayoutOptions | undefined;
   currentSelection: string | null = null;
   onSelect: ((marker: string | null) => void) | null = null;
@@ -332,16 +335,16 @@ class Dive {
   }
 
   get layout(): string {
-    return this.layoutName;
+    return this._layout;
   }
 
-  set layout(layoutName: string) {
+  set layout(layout: string) {
     let extendedOptions = {};
-    if (layoutName in layouts)
-      extendedOptions = (layouts as {[key: string]: object})[layoutName];
-    this.layoutName = layoutName;
+    if (layout in layouts)
+      extendedOptions = (layouts as {[key: string]: object})[layout];
+    this._layout = layout;
     this.layoutOptions = {
-      name: layoutName,
+      name: layout,
       fit: true,
       animate: true,
       randomize: true, /* Not all layouts supports that */
@@ -359,6 +362,7 @@ class Dive {
   async exec(endpoint: string, params: any): Promise<void> {
     try {
       if (Server.isRunning()) {
+        await this.setMode();
         const data = await Server.EXEC({ endpoint, params });
         if (data)
           this.receiveData(data);
@@ -379,6 +383,30 @@ class Dive {
     }
     catch (err) {
       console.error(err);
+    }
+  }
+
+  static async setWindow(window: any): Promise<void> {
+    if (Server.isRunning())
+      await Server.SET({ endpoint: 'dive.window', params: window });
+  }
+
+  async setMode(): Promise<void> {
+    switch (this.mode) {
+      case 'explore':
+        await Dive.setWindow({
+          perception: { backward: 2, forward: 0 },
+          horizon: { backward: 3, forward: 1 },
+        });
+        break;
+      case 'overview':
+        await Dive.setWindow({
+          perception: { backward: 3, forward: 0 },
+          horizon: { backward: null, forward: null },
+        });
+        break;
+      default: /* This is useless and impossible if the program is correctly
+        typed, but the linter wants it */
     }
   }
 
@@ -447,12 +475,15 @@ const GraphView = () => {
     setDive(new Dive(dive.cy));
   }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Follow mode
+  useEffect(() => {
+    dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
+  }, [dive, selectionMode]);
+
   // Updates the graph according to the selected marker.
   useEffect(() => {
     if (!lock && marker && marker !== node.current) {
       node.current = marker;
-      if (selectionMode === 'follow')
-        dive.clear();
       dive.addNode(marker);
     }
   }, [dive, lock, marker, markers, selectionMode]);

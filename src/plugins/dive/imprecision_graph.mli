@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Dive_types
 
 include Graph.Sig.G
   with type V.t = node
@@ -47,6 +47,8 @@ val create_dependency : allow_folding:bool -> t -> Cil_types.kinstr ->
 val remove_dependency : t -> node * dependency * node -> unit
 
 val find_independant_nodes : t -> node list -> node list
+val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
+  t -> node list -> node list
 
 val ouptput_to_dot : out_channel -> t -> unit
 val ouptput_to_json : out_channel -> t -> unit

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Graph_types
+open Dive_types
 
 let dkey = Self.register_category "build"
 
@@ -584,69 +584,58 @@ let explore ~depth context root =
     end;
   done
 
-let complete_in_depth ~depth context root =
+let complete context root =
   context.roots <- root :: context.roots;
-  explore ~depth context root
+  root
 
-let add_var ?(depth=1) context varinfo =
+let add_var context varinfo =
   let callstack = [] in
   let node = build_var context callstack varinfo in
-  complete_in_depth ~depth context node
+  complete context node
 
-let add_lval ?(depth=1) context kinstr lval =
+let add_lval context kinstr lval =
   let callstack = match kinstr with
     | Kglobal -> []
     | Kstmt stmt -> Callstack.init (Kernel_function.find_englobing_kf stmt)
   in
   let node = build_lval context callstack kinstr lval in
-  complete_in_depth ~depth context node
+  complete context node
 
-let add_alarm ?(depth=1) context stmt alarm =
+let add_alarm context stmt alarm =
   let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
   let node = build_alarm context callstack stmt alarm in
-  complete_in_depth ~depth context node
+  complete context node
 
-let add_function_alarms ?(depth=1) context kf =
-  let add_one_alarm _emitter kf' stmt ~rank:_ alarm _code_annot =
-    if Kernel_function.equal kf' kf then
-      add_alarm ~depth context stmt alarm
-  in
-  Alarms.iter add_one_alarm
-
-let add_code_annotation ?(depth=1) context stmt annot =
+let add_annotation context stmt annot =
   (* Only do something for alarms notations *)
-  Extlib.may (add_alarm ~depth context stmt) (Alarms.find annot)
+  Extlib.opt_map (add_alarm context stmt) (Alarms.find annot)
 
-let add_instr ?(depth=1) context stmt = function
+let add_instr context stmt = function
   | Set (lval, _, _)
-  | Call (Some lval, _, _, _) -> add_lval ~depth context (Kstmt stmt) lval
-  | Local_init (vi, _, _) -> add_var ~depth context vi
-  | Code_annot (annot, _) -> add_code_annotation ~depth context stmt annot
-  | _ -> () (* Do nothing for any other instruction *)
+  | Call (Some lval, _, _, _) -> Some (add_lval context (Kstmt stmt) lval)
+  | Local_init (vi, _, _) -> Some (add_var context vi)
+  | Code_annot (annot, _) -> add_annotation context stmt annot
+  | _ -> None (* Do nothing for any other instruction *)
 
-let add_stmt ?(depth=1) context stmt =
+let add_stmt context stmt =
   match stmt.skind with
-  | Instr instr -> add_instr ~depth context stmt instr
-  | _ -> () (* Do nothing for any other statements *)
+  | Instr instr -> add_instr context stmt instr
+  | _ -> None (* Do nothing for any other statements *)
 
-let add_property ?(depth=1) context = function
+let add_property context = function
   | Property.IPCodeAnnot { ica_stmt ; ica_ca } ->
-    add_code_annotation ~depth context ica_stmt ica_ca
-  | _ -> () (* Do nothing fo any other property *)
+    add_annotation context ica_stmt ica_ca
+  | _ -> None (* Do nothing fo any other property *)
 
-let add_localizable ?(depth=1) context = function
-  | Printer_tag.PLval (_kf, kinstr, lval) -> add_lval ~depth context kinstr lval
-  | PVDecl (_kf, _kinstr, varinfo) -> add_var ~depth context varinfo
-  | PIP (prop) -> add_property ~depth context prop
-  | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt ~depth context stmt
-  | _ -> () (* Do nothing for any other localizable *)
+let add_localizable context = function
+  | Printer_tag.PLval (_kf, kinstr, lval) -> Some (add_lval context kinstr lval)
+  | PVDecl (_kf, _kinstr, varinfo) -> Some (add_var context varinfo)
+  | PIP (prop) -> add_property context prop
+  | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt context stmt
+  | _ -> None (* Do nothing for any other localizable *)
 
-let explore_from_node ~depth context node =
-  explore ~depth context node
-
-let show ?(depth=1) context node =
-  node.node_hidden <- false;
-  explore ~depth context node
+let show _context node =
+  node.node_hidden <- false
 
 let hide context node =
   if not node.node_hidden then
@@ -657,15 +646,47 @@ let hide context node =
       (* Remove incomming edges *)
       let incomming_edges = Graph.pred_e g node in
       List.iter (Graph.remove_dependency g) incomming_edges;
-      (* Remove disconnected vertices *)
-      let disconnected_nodes = Graph.find_independant_nodes g context.roots in
-      List.iter (remove_node context) disconnected_nodes;
       (* Dependencies are not there anymore *)
       node.node_deps_computed <- false;
       node.node_write_stmts <- [];
       (* Notify node update *)
       update_node context node
     end
+
+let remove_disconnected context =
+  let l = Graph.find_independant_nodes context.graph context.roots in
+  List.iter (remove_node context) l
+
+let hide_and_reduce context node =
+  hide context node;
+  remove_disconnected context
+
+let reduce_to_horizon ({ graph } as context) range new_root =
+  (* Reduce to one root *)
+  context.roots <- [ new_root ];
+  (* List visible nodes *)
+  let bacward_nodes =
+    Imprecision_graph.bfs ~iter_succ:Imprecision_graph.iter_pred
+      ?limit:range.backward graph context.roots
+  and forward_nodes =
+    Imprecision_graph.bfs ~iter_succ:Imprecision_graph.iter_succ
+      ?limit:range.forward graph context.roots
+  in
+  (* Table of visible nodes *)
+  let module Table = Hashtbl.Make (Imprecision_graph.Node) in
+  let visible = Table.create 13 in
+  let is_visible = Table.mem visible in
+  List.iter (fun n -> Table.add visible n true) (bacward_nodes @ forward_nodes);
+  (* Find nodes to hide / remove *)
+  let update node =
+    if not (is_visible node) then
+      if List.exists is_visible (Imprecision_graph.succ graph node) then
+        hide context node
+      else
+        remove_node context node
+  in
+  Graph.iter_vertex update graph
+
 
 let take_last_differences context =
   let pp_node fmt n = Format.pp_print_int fmt n.node_key in

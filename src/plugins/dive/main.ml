@@ -42,11 +42,17 @@ let main () =
     Self.HiddenBases.iter (Build.hide_base context);
     let depth = Self.DepthLimit.get () in
     (* Add targeted vars to it *)
-    Self.FromBases.iter (Build.add_var ~depth context);
+    let add_var vi =
+      let node = Build.add_var context vi in
+      Build.explore ~depth context node
+    in
+    Self.FromBases.iter add_var;
     (* Add alarms *)
     let add_alarm _emitter kf stmt ~rank:_ alarm _code_annot =
-      if Self.FromFunctionAlarms.mem kf then
-        Build.add_alarm ~depth context stmt alarm
+      if Self.FromFunctionAlarms.mem kf then begin
+        let node = Build.add_alarm context stmt alarm in
+        Build.explore ~depth context node
+      end
     in
     if not (Self.FromFunctionAlarms.is_empty ()) then
       Alarms.iter add_alarm;

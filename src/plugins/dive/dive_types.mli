@@ -66,3 +66,13 @@ type graph_diff = {
   added_nodes: node list;
   removed_nodes: node list;
 }
+
+type 'a range = {
+  backward: 'a;
+  forward: 'a;
+}
+
+type window = {
+  perception: int range; (* depth of exploration *)
+  horizon: int option range; (* hide beyond horizon ; None for infinite *)
+}

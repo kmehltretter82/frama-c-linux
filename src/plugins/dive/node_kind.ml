@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Dive_types
 
 module DatatypeInput =
 struct
