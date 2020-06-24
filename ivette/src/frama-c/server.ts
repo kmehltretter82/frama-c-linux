@@ -12,6 +12,7 @@ import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
+import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Request as ZmqRequest } from 'zeromq';
 import { ChildProcess } from 'child_process';
@@ -123,7 +124,8 @@ let rqCount = 0;
 type IndexedPair<T, U> = {
   [index: string]: [T, U];
 };
-type ResolvePromise = (value?: any) => void;
+
+type ResolvePromise = (value: Json.json) => void;
 type RejectPromise = (error: Error) => void;
 
 /** Pending promise callbacks (pairs of (resolve, reject)). */
@@ -583,7 +585,7 @@ function _exit(error?: Error) {
 // --- Signal Management
 // --------------------------------------------------------------------------
 
-class Signal {
+class SignalHandler {
   id: any;
   event: string;
   active: boolean;
@@ -646,12 +648,12 @@ class Signal {
 
 // --- Memo
 
-const signals: Map<string, Signal> = new Map();
+const signals: Map<string, SignalHandler> = new Map();
 
 function _signal(id: any) {
   let s = signals.get(id);
   if (!s) {
-    s = new Signal(id);
+    s = new SignalHandler(id);
     signals.set(id, s);
   }
   return s;
@@ -667,8 +669,8 @@ function _signal(id: any) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function onSignal(id: string, callback: any) {
-  _signal(id).on(callback);
+export function onSignal(s: Signal, callback: any) {
+  _signal(s.name).on(callback);
 }
 
 /**
@@ -679,8 +681,8 @@ export function onSignal(id: string, callback: any) {
  *  @param {string} id The signal identifier that was listen to.
  *  @param {function} callback The callback to remove.
  */
-export function offSignal(id: string, callback: any) {
-  _signal(id).off(callback);
+export function offSignal(s: Signal, callback: any) {
+  _signal(s.name).off(callback);
 }
 
 /**
@@ -688,25 +690,25 @@ export function offSignal(id: string, callback: any) {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function useSignal(id: string, callback: any) {
+export function useSignal(s: Signal, callback: any) {
   React.useEffect(() => {
-    onSignal(id, callback);
-    return () => { offSignal(id, callback); };
+    onSignal(s, callback);
+    return () => { offSignal(s, callback); };
   });
 }
 
 // --- Server Synchro
 
 Dome.on(READY, () => {
-  signals.forEach((signal: Signal) => {
-    signal.sigon();
+  signals.forEach((h: SignalHandler) => {
+    h.sigon();
   });
 });
 
 Dome.on(SHUTDOWN, () => {
-  signals.forEach((signal: Signal) => {
-    signal.unplug();
-    (signal.sigoff as unknown as _.Cancelable).cancel();
+  signals.forEach((h: SignalHandler) => {
+    h.unplug();
+    (h.sigoff as unknown as _.Cancelable).cancel();
   });
 });
 
@@ -715,45 +717,37 @@ Dome.on(SHUTDOWN, () => {
 // --------------------------------------------------------------------------
 
 /** Request kind. */
-enum RqKind {
+export enum RqKind {
   /** Used to read data from the Frama-C server. */
-  R_GET = 'GET',
+  GET = 'GET',
   /** Used to write data into the Frama-C server. */
-  R_SET = 'SET',
+  SET = 'SET',
   /** Used to make the Frama-C server execute a task. */
-  R_EXEC = 'EXEC'
+  EXEC = 'EXEC'
 }
 
 /** Server request. */
-export interface Request {
-  /** The request identifier on the Frama-C server. */
-  endpoint: string;
-  /** The request parameters. */
-  params: any;
+export interface Request<Kd extends RqKind, In, Out> {
+  kind: Kd;
+  /** The request full name. */
+  name: string;
+  /** Encoder of input parameters. */
+  input: Json.Loose<In>;
+  /** Decoder of output parameters. */
+  output: Json.Loose<Out>;
 }
 
-/**
- * Read data from the Frama-C server.
- * @param {Request} sr
- */
-export async function GET(sr: Request) {
-  return send(RqKind.R_GET, sr);
+/** Server signal. */
+export interface Signal {
+  name: string;
 }
 
-/**
- * Write data into the Frama-C server.
- * @param {Request} sr
- */
-export async function SET(sr: Request) {
-  return send(RqKind.R_SET, sr);
-}
+export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;
+export type SetRequest<In, Out> = Request<RqKind.SET, In, Out>;
+export type ExecRequest<In, Out> = Request<RqKind.EXEC, In, Out>;
 
-/**
- * Make the Frama-C server execute a task.
- * @param {Request} sr
- */
-export async function EXEC(sr: Request) {
-  return send(RqKind.R_EXEC, sr);
+export interface Killable<Data> extends Promise<Data> {
+  kill?: () => void;
 }
 
 /**
@@ -762,14 +756,18 @@ export async function EXEC(sr: Request) {
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-function send(kind: RqKind, request: Request) {
+export function send<In, Out>(request: Request<RqKind, In, Out>, param: In): Killable<Out> {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
-  if (!request.endpoint) return Promise.reject(new Error('Undefined request'));
+  if (!request.name) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
-  const data = JSON.stringify(request.params);
-  const promise: any = new Promise((resolve, reject) => {
-    pending[rid] = [resolve, reject];
+  const data = JSON.stringify(param);
+  const promise: Killable<Out> = new Promise<Out>((resolve, reject) => {
+    const decodedResolve = (js: Json.json) => {
+      const result = Json.jTry(request.output)(js);
+      resolve(result);
+    };
+    pending[rid] = [decodedResolve, reject];
   });
   promise.kill = () => {
     if (zmqSocket && pending[rid]) {
@@ -777,7 +775,7 @@ function send(kind: RqKind, request: Request) {
       _flush();
     }
   };
-  queueCmd.push(kind, rid, request.endpoint, data);
+  queueCmd.push(request.kind, rid, request.name, data);
   queueId.push(rid);
   _flush();
   return promise;

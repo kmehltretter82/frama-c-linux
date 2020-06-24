@@ -9,9 +9,10 @@
    Manage the current Frama-C project and projectified state values.
 */
 
-import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import { ArrayModel } from 'dome/table/arrays';
 import * as Server from './server';
 
 /**
@@ -44,16 +45,16 @@ const PP = new Dome.PP('States');
 // --------------------------------------------------------------------------
 
 let currentProject: string | undefined;
-let states: any = {};
-const stateDefaults: any = {};
 
 Server.onReady(async () => {
   try {
-    const sr: Server.Request = {
-      endpoint: 'kernel.project.getCurrent',
-      params: {},
+    const sr: Server.GetRequest<null, { id?: string }> = {
+      kind: Server.RqKind.GET,
+      name: 'kernel.project.getCurrent',
+      input: Json.jNull,
+      output: Json.jObject({ id: Json.jString }),
     };
-    const current: { id: string } = await Server.GET(sr);
+    const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
     Dome.emit(PROJECT);
   } catch (error) {
@@ -63,7 +64,6 @@ Server.onReady(async () => {
 
 Server.onShutdown(() => {
   currentProject = '';
-  states = {};
   Dome.emit(PROJECT);
 });
 
@@ -72,8 +72,7 @@ Server.onShutdown(() => {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Current Project (Custom React Hook).
- *  @return {string} the current project identifier, or `undefined`.
+   Current Project (Custom React Hook).
  */
 export function useProject() {
   Dome.useUpdate(PROJECT);
@@ -81,17 +80,21 @@ export function useProject() {
 }
 
 /**
- *  @summary Update Current Project.
- *  @param {string} project - the project identifier
- *  @description
- *  Make all states switching to their projectified value.
- *  Emits `PROJECT`.
+   Update Current Project.
+   Make all states switching to their projectified value.
+   Emits `PROJECT`.
+   @param project - the project identifier
  */
 export async function setProject(project: string) {
   if (Server.isRunning()) {
     try {
-      const sr = { endpoint: 'kernel.project.setCurrent', params: project };
-      await Server.SET(sr);
+      const sr: Server.SetRequest<null, null> = {
+        kind: Server.RqKind.SET,
+        name: 'kernel.project.setCurrent',
+        input: Json.jNull,
+        output: Json.jNull,
+      };
+      await Server.send(sr, null);
       currentProject = project;
       Dome.emit(PROJECT);
     } catch (error) {
@@ -101,95 +104,50 @@ export async function setProject(project: string) {
 }
 
 // --------------------------------------------------------------------------
-// --- Projectified State
-// --------------------------------------------------------------------------
-
-function getValue(id: string, project?: string) {
-  if (!project) return undefined;
-  return _.get(states, [project, id], stateDefaults[id]);
-}
-
-function setValue(id: string, project: string | undefined, value: any) {
-  if (!project) return;
-  _.set(states, [project, id], value);
-  Dome.emit(STATE + id, value);
-}
-
-/**
- *  @summary Define the default state value.
- *  @param {string} id - the state identifier (mandatory)
- *  @param {any} value - the new default state
- */
-export function setStateDefault(id: string, value: any) {
-  stateDefaults[id] = value;
-}
-
-/**
- *  @summary Projectified State (Custom React Hook).
- *  @param {string} id - the state identifier (mandatory)
- *  @return {array} `[state,setState]` for the specified project
- *  @description
- *  Returns a getter and a setter for the specified state
- *  in the specified or current project.
- *  The initial value of states is always `undefined`.
- *
- *  Each state is associated to a specific event `frama-c-state.<id>` which is
- *  is used to notify updates. The hook also updates on `PROJECT` notifications.
- */
-export function useState(id: string) {
-  Dome.useUpdate(PROJECT, STATE + id);
-  const project = currentProject;
-  const value = getValue(id, project);
-  return [value, (v: any) => setValue(id, project, v)];
-}
-
-// --------------------------------------------------------------------------
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
+export interface UseRequestOptions<A> {
+  offline?: A | null;
+  pending?: A | null;
+  onError?: A | null;
+}
+
 /**
- *  @summary Cached GET request (Custom React Hook).
- *  @param {string} rq - GET request name
- *  @param {any} [params] - GET request parameter
- *  @param {object} [options] - Special values
- *  @param {any} [options.offline] - Returned value when off-line
- *  @param {any} [options.pending] - Returned value when pending response
- *  @param {any} [options.error] - Returned value on request error
- *  @return {any} [result] GET request response (when available)
- *  @description
- *  Sends the specified GET request and returns its result.
- *  The request is send asynchronously and cached until any change in
- *  `rq`, `params`, current project or server activity.
- *
- *  The request is considered off-line as soon as either `rq` or `params` or
- *  current project takes a falsy value.
- *
- *  Default values for various situations can be defined in the options
- *  parameter, which is `undefined` unless specified, or `null` to keep the
- *  current value.
- *  For instance `{ pending: null }` will return `undefined` when off-line and
- *  in case of errors, but will keep the last received value until a new one is
- *  actually received.
+   Cached GET request (Custom React Hook).
+
+   Sends the specified GET request and returns its result.
+   The request is send asynchronously and cached until any change.
+
+   Null values in options mean that the last obtained value is kept.
  */
-export function useRequest(rq: string, params: any, options: any = {}) {
+export function useRequest<In, Out>(
+  rq: Server.GetRequest<In, Out>,
+  params: In | undefined,
+  options: UseRequestOptions<Out> = {},
+): Out | undefined {
   const state = React.useRef<string>();
   const project = useProject();
-  const [response, setResponse] = React.useState(options.offline);
-  const footprint = project ? JSON.stringify([project, rq, params]) : undefined;
+  const [response, setResponse] =
+    React.useState<Out | undefined>(options.offline ?? undefined);
+  const footprint = project ? JSON.stringify([project, rq.name, params]) : undefined;
+
+  const update = (opt: Out | undefined | null) => {
+    if (opt !== null) setResponse(opt);
+  }
 
   async function trigger() {
     if (project && rq && params !== undefined) {
       try {
-        const r = await Server.GET({ endpoint: rq, params });
-        setResponse(r);
+        update(options.pending);
+        const r = await Server.send(rq, params);
+        update(r);
       } catch (error) {
-        PP.error(`Fail in useRequest '${rq}'. ${error.toString()}`);
-        const err = options.error;
-        setResponse(err);
+        PP.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        update(options.onError);
       }
     } else {
-      const off = options.offline;
-      setResponse(off);
+      update(options.offline);
     }
   }
 
@@ -207,80 +165,84 @@ export function useRequest(rq: string, params: any, options: any = {}) {
 // --- Dictionaries
 // --------------------------------------------------------------------------
 
-/**
- *  @summary Cached GET request (Custom React Hook).
- *  @param {string} rq - GET request name
- *  @param {any} [params] - GET request parameter (default `'null'`)
- *  @param {object} [options] - Dictionary options
- *  @param {boolean} [options.key] - The property to index an item
- *         (default `'name'`)
- *  @param {boolean} [options.offline] - Keep the dictionary when offline
- *         (default `true`)
- *  @param {boolean} [options.pending] - Keep the dictionary when pending
- *         (default `true`)
- *  @param {boolean} [options.error] - Keep the dictionary on error
- *         (default `false`)
- *  @param {function} [options.filter] - Only index items satisfying the filter
- *         (default `undefined`)
- *  @return {object} [result] GET request response indexed by key
- *  @description
- *  Sends the specified GET request and returns its returned collection indexed
- *  by the provided key.
- *  Items in the collection that do have the key are not indexed.
- */
-export function useDictionary(
-  rq: string,
-  params: any = null,
-  options: any = {},
-) {
-  const {
-    offline = true,
-    pending = true,
-    error = false,
-    key = 'name',
-    filter,
-  } = options;
-  const tags = useRequest(rq, params, {
-    offline: offline ? null : undefined,
-    pending: pending ? null : undefined,
-    error: error ? null : undefined,
-  });
-  const dict = React.useMemo(() => {
-    const d: any = {};
-    _.forEach(tags, (tg) => {
-      const k: any = tg[key];
-      if (k && (!filter || filter(tg))) d[k] = tg;
-    });
-    return d;
-  }, [key, tags, filter]);
-  return dict;
+export type Tag = {
+  name: string;
+  label: string;
+  descr: string;
+}
+
+const holdCurrent = { offline: null, pending: null, onError: null };
+
+export type GetTags = Server.GetRequest<null, Tag[]>;
+
+export function useTags(rq: GetTags): Map<string, Tag> {
+  const tags = useRequest(rq, null, holdCurrent);
+  return React.useMemo(() => {
+    const m = new Map<string, Tag>();
+    tags && tags.forEach((tg) => m.set(tg.name, tg));
+    return m;
+  }, tags);
 }
 
 // --------------------------------------------------------------------------
 // --- Synchronized States
 // --------------------------------------------------------------------------
 
-// shared for all projects
-class SyncState {
-  id: any;
-  UPDATE: string;
-  signal: string;
-  getRq: string;
-  setRq: string;
-  insync: boolean;
-  effect: any;
-  value: undefined;
+export interface Value<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+}
 
-  constructor(id: any) {
-    this.id = id;
-    this.UPDATE = STATE + id;
-    this.signal = `${id}.sig`;
-    this.getRq = `${id}.get`;
-    this.setRq = `${id}.set`;
+export interface State<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+  setter: Server.SetRequest<A, null>;
+}
+
+export interface Fetches<K, A> {
+  reload: boolean;
+  pending: number;
+  updated: A[];
+  removed: Json.key<K>[]
+}
+
+export interface Array<K, A> {
+  name: string;
+  key: keyof A;
+  signal: Server.Signal;
+  fetch: Server.GetRequest<number, Fetches<K, A>>;
+  reload: Server.SetRequest<null, null>;
+}
+
+type id = { project: string, state: string };
+
+// --------------------------------------------------------------------------
+// --- Handler for Synchronized States
+// --------------------------------------------------------------------------
+
+interface Handler<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+  setter?: Server.SetRequest<A, null>;
+}
+
+// shared for all projects
+class SyncState<A> {
+  UPDATE: string;
+  handler: Handler<A>;
+  insync: boolean;
+  value?: A;
+
+  constructor(h: Handler<A>) {
+    this.handler = h;
+    this.UPDATE = STATE + h.name;
     this.insync = false;
     this.value = undefined;
     this.update = this.update.bind(this);
-    this.effect = this.effect.bind(this);
+    this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
     Dome.on(PROJECT, this.update);
   }
@@ -292,16 +254,18 @@ class SyncState {
     return this.value;
   }
 
-  async setValue(v: any) {
+  async setValue(v: A) {
     try {
       this.insync = true;
       this.value = v;
-      const sr: Server.Request = { endpoint: this.setRq, params: v };
-      await Server.SET(sr);
+      const setter = this.handler.getter;
+      if (setter) {
+        await Server.send(setter, v);
+      }
       Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
-        `Fail to set value of syncState '${this.id}'. ${error.toString()}`,
+        `Fail to set value of syncState '${this.handler.name}'. ${error.toString()}`,
       );
     }
   }
@@ -309,12 +273,11 @@ class SyncState {
   async update() {
     try {
       this.insync = true;
-      const sr: Server.Request = { endpoint: this.getRq, params: {} };
-      const v = await Server.GET(sr);
+      const v = await Server.send(this.handler.getter, null);
       this.value = v;
       Dome.emit(this.UPDATE);
     } catch (error) {
-      PP.error(`Fail to update syncState '${this.id}'. ${error.toString()}`);
+      PP.error(`Fail to update syncState '${this.handler.name}'. ${error.toString()}`);
     }
   }
 }
@@ -323,54 +286,42 @@ class SyncState {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-let syncStates: any = {};
+const syncStates = new Map<id, SyncState<any>>();
 
-function getSyncState(id: any) {
-  let s: any = syncStates[id];
+function getSyncState<A>(h: Handler<A>): SyncState<A> {
+  const id = { project: currentProject ?? '', state: h.name };
+  let s = syncStates.get(id);
   if (!s) {
-    syncStates[id] = new SyncState(id);
-    s = syncStates[id];
+    s = new SyncState(h);
+    syncStates.set(id, s);
   }
   return s;
 }
 
-Server.onShutdown(() => (syncStates = {}));
+Server.onShutdown(() => syncStates.clear());
 
 // --------------------------------------------------------------------------
 // --- Synchronized State Hooks
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Use Synchronized State (Custom React Hook).
- *  @parameter {string} id - name of the server state
- *  @return {Array} `[ value , setValue ]` of the synchronized state
- *  @description
- *  Synchronization with some (projectified) server state:
- *  - sends a `<id>.get` request to obtain the current value of the state;
- *  - sends a `<id>.set` request to update the value of the state;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
+   Synchronization with a (projectified) server state.
  */
-export function useSyncState(id: string) {
-  const s = getSyncState(id);
+export function useSyncState<A>(st: State<A>): [A | undefined, (value: A) => void] {
+  const s = getSyncState(st);
   Dome.useUpdate(PROJECT, s.UPDATE);
-  Server.useSignal(s.signal, s.update);
-  return [s.value(), s.setValue];
+  Server.useSignal(s.handler.signal, s.update);
+  return [s.getValue(), s.setValue];
 }
 
 /**
- *  @summary Use Synchronized Value (Custom React Hook).
- *  @parameter {string} id - name of the server state
- *  @return {any} current `value` of the state
- *  @description
- *  Synchronization with some (projectified) server value:
- *  - sends a `<id>.get` request to obtain the current value of the state;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
+   Synchronization with a (projectified) server value.
  */
-export function useSyncValue(id: string) {
-  const s = getSyncState(id);
+export function useSyncValue<A>(va: Value<A>): A | undefined {
+  const s = getSyncState(va);
   Dome.useUpdate(s.update);
-  Server.useSignal(s.signal, s.update);
-  return s.value();
+  Server.useSignal(s.handler.signal, s.update);
+  return s.getValue();
 }
 
 // --------------------------------------------------------------------------
@@ -378,63 +329,32 @@ export function useSyncValue(id: string) {
 // --------------------------------------------------------------------------
 
 // one per project
-class SyncArray {
-  id: string;
-  UPDATE: string;
-  signal: string;
-  fetchRq: string;
-  reloadRq: string;
-  index: any;
+class SyncArray<K, A> {
+  handler: Array<K, A>;
+  model: ArrayModel<A>;
   insync: boolean;
 
-  constructor(id: string) {
-    this.id = id;
-    this.UPDATE = STATE + id;
-    this.signal = `${id}.sig`;
-    this.fetchRq = `${id}.fetch`;
-    this.reloadRq = `${id}.reload`;
-    this.index = {};
+  constructor(h: Array<K, A>) {
+    this.handler = h;
     this.insync = false;
+    this.model = new ArrayModel<A>(h.key);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
-  }
-
-  getItems() {
-    if (!this.insync && Server.isRunning()) this.fetch();
-    return this.index;
-  }
-
-  isEmpty() {
-    return _.find(this.index, () => true) !== undefined;
   }
 
   async fetch() {
     try {
       this.insync = true;
-      const sr: Server.Request = { endpoint: this.fetchRq, params: 50 };
-      const data = await Server.GET(sr);
+      const data = await Server.send(this.handler.fetch, 50);
       const { reload = false, removed = [], updated = [], pending = 0 } = data;
-      let reloaded = false;
-      if (reload) {
-        reloaded = this.isEmpty();
-        this.index = {};
-      }
-      removed.forEach((key: any) => {
-        delete this.index[key];
-      });
-      updated.forEach((item: any) => {
-        this.index[item.key] = item;
-      });
-      if (reloaded || removed.length || updated.length) {
-        this.index = { ...this.index };
-        Dome.emit(this.UPDATE);
-      }
-      if (pending > 0) {
-        this.fetch();
-      }
+      const model = this.model;
+      if (reload) model.clear();
+      removed.forEach((k) => model.remove(k));
+      updated.forEach((d) => model.add(d));
+      if (pending > 0) setImmediate(this.fetch);
     } catch (error) {
       PP.error(
-        `Fail to retrieve the value of syncArray '${this.id}. ` +
+        `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
     }
@@ -442,72 +362,63 @@ class SyncArray {
 
   async reload() {
     try {
-      const sr: Server.Request = { endpoint: this.reloadRq, params: {} };
-      await Server.SET(sr);
-      this.index = {};
+      await Server.send(this.handler.reload, null);
+      this.model.clear();
       this.insync = false;
-      Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
-        `Fail to set reload of syncArray '${this.id}'. ${error.toString()}`,
+        `Fail to set reload of syncArray '${this.handler.name}'.`,
+        `${error.toString()}`,
       );
     }
   }
+
 }
 
 // --------------------------------------------------------------------------
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-let syncArrays = {}; // Model by project & id
+const syncArrays = new Map<id, SyncArray<any, any>>();
 
-function getSyncArray(id: string) {
-  const path = [currentProject || '', id];
-  let a = _.get(syncArrays, path);
+function getSyncArray<K, A>(arr: Array<K, A>): SyncArray<K, A> {
+  const id = { project: currentProject ?? '', state: arr.name };
+  let a = syncArrays.get(id);
   if (!a) {
-    a = new SyncArray(id);
-    _.set(syncArrays, path, a);
+    a = new SyncArray(arr);
+    syncArrays.set(id, a);
   }
   return a;
 }
 
-Server.onShutdown(() => (syncArrays = {}));
+Server.onShutdown(() => syncArrays.clear());
 
 // --------------------------------------------------------------------------
 // --- Synchronized Array Hooks
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Force a Synchronized Array to Reload.
- *  @description
- *  Sends the `<id>.reload` request to the server for
- *  triggering a complete array reload.
- */
-export function reloadArray(id: string) {
-  getSyncArray(id).reload();
+   Force a Synchronized Array to Reload.
+*/
+export function reloadArray<K, A>(arr: Array<K, A>) {
+  getSyncArray(arr).reload();
 }
 
 /**
- *  @summary Use Synchronized Array (Custom React Hook).
- *  @parameter {string} id - name of the server array
- *  @return {object} items indexed by their identifiers
- *  @description
- *  Synchronization with some (projectified) server array:
- *  - sends `<id>.fetch` requests to obtain the updated entries;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
+   Use Synchronized Array (Custom React Hook).
  */
-export function useSyncArray(id: string) {
-  const a = getSyncArray(id);
-  Dome.useUpdate(PROJECT, a.UPDATE);
-  Server.useSignal(a.signal, a.fetch);
-  return a.getItems();
+export function useSyncArray<K, A>(arr: Array<K, A>): ArrayModel<A> {
+  const a = getSyncArray(arr);
+  Dome.useUpdate(PROJECT);
+  Server.useSignal(arr.signal, a.fetch);
+  return a.model;
 }
 
 // --------------------------------------------------------------------------
 // --- Selection
 // --------------------------------------------------------------------------
 
-type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
 
 export interface FullLocation {
   /** Function name. */
@@ -581,21 +492,17 @@ function reducer(s: Selection, action: SelectionActions): Selection {
   }
 }
 
-const SELECTION = 'kernel.selection';
-
-const initialSelection = {
+const initialSelection: Selection = {
   current: undefined,
   prevSelections: [],
   nextSelections: [],
 };
-setStateDefault(SELECTION, initialSelection);
 
 /**
- *  Current selection.
- *  @return {array} The current selection and the function to update it.
+   Current selection.
  */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = useState(SELECTION);
+  const [selection, setSelection] = React.useState(initialSelection);
 
   function update(action: SelectionActions) {
     const nextSelection = reducer(selection, action);
