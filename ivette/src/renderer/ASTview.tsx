@@ -89,6 +89,7 @@ const ASTview = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection, updateSelection] = States.useSelection();
+  const multiple = selection?.multiple;
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
@@ -104,6 +105,15 @@ const ASTview = () => {
       loadAST(buffer, theFunction, theMarker);
     }
   });
+
+  React.useEffect(() => {
+    const decorator = (marker: string) => {
+      if (multiple.some((location) => location?.marker === marker))
+        return 'highlighted-marker';
+      return undefined;
+    };
+    buffer.setDecorator(decorator);
+  }, [buffer, multiple]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
