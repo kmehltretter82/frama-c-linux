@@ -49,104 +49,88 @@ struct
   let to_json = fun (g,d) -> Imprecision_graph.diff_to_json g d
 end
 
-module Variable = Data.Collection (struct
-    let name = "variableName"
-    let descr = Markdown.plain "The name of variable of the program"
+module Variable =
+struct
+  let name = "variableName"
+  let descr = Markdown.plain "The name of variable of the program"
 
-    let signature = Data.Record.signature ()
+  let signature = Data.Record.signature ()
 
-    let fun_field = Data.Record.option signature
-        ~name:"funName"
-        ~descr:(Markdown.plain "owner function for a local variable")
-        (module Data.Jstring)
+  let fun_field = Data.Record.option signature
+      ~name:"funName"
+      ~descr:(Markdown.plain "owner function for a local variable")
+      (module Data.Jstring)
 
-    let var_field = Data.Record.field signature
-        ~name:"varName"
-        ~descr:(Markdown.plain "variable name")
-        (module Data.Jstring)
+  let var_field = Data.Record.field signature
+      ~name:"varName"
+      ~descr:(Markdown.plain "variable name")
+      (module Data.Jstring)
 
-    type t = Cil_types.varinfo
+  type t = Cil_types.varinfo
 
-    let data = Data.Record.publish ~package ~name ~descr signature
-    module R = (val data : Data.Record.S with type r = t)
+  let data = Data.Record.publish ~package ~name ~descr signature
+  module R = (val data : Data.Record.S with type r = t)
 
-    let jtype = R.jtype
+  let jtype = R.jtype
 
-    let to_json v =
-      let varname = v.Cil_types.vname in
-      let fields = R.default |> R.set var_field varname in
-      let fields = match Kernel_function.find_defining_kf v with
-        | Some kf -> fields |> R.set fun_field (Some (Kernel_function.get_name kf))
-        | None -> fields
+  let to_json v =
+    let varname = v.Cil_types.vname in
+    let fields = R.default |> R.set var_field varname in
+    let fields = match Kernel_function.find_defining_kf v with
+      | Some kf -> fields |> R.set fun_field (Some (Kernel_function.get_name kf))
+      | None -> fields
+    in
+    R.to_json fields
+
+  let of_json json =
+    let open Yojson.Basic.Util in
+    let funname =
+      try Some (json |> member "fun" |> to_string)
+      with Not_found -> None
+    and varname = json |> member "var" |> to_string in
+    match funname with
+    | Some name ->
+      let kf =
+        try
+          Globals.Functions.find_by_name name
+        with Not_found ->
+          Data.failure "no function '%s'" name
       in
-      R.to_json fields
-
-    let of_json json =
-      let open Yojson.Basic.Util in
-      let funname =
-        try Some (json |> member "fun" |> to_string)
-        with Not_found -> None
-      and varname = json |> member "var" |> to_string in
-      match funname with
-      | Some name ->
-        let kf =
-          try
-            Globals.Functions.find_by_name name
-          with Not_found ->
-            Data.failure "no function '%s'" name
-        in
-        let vi =
-          try Globals.Vars.find_from_astinfo varname (Cil_types.VLocal kf)
-          with Not_found ->
-          try Globals.Vars.find_from_astinfo varname (Cil_types.VFormal kf)
-          with Not_found ->
-            Data.failure "no variable '%s' in function '%s'"
-              varname name
-        in
-        vi
+      let vi =
+        try Globals.Vars.find_from_astinfo varname (Cil_types.VLocal kf)
+        with Not_found ->
+        try Globals.Vars.find_from_astinfo varname (Cil_types.VFormal kf)
+        with Not_found ->
+          Data.failure "no variable '%s' in function '%s'"
+            varname name
+      in
+      vi
+    | None ->
+      match
+        Globals.Syntactic_search.find_in_scope varname Cil_types.Program
+      with
+      | Some vi -> vi
       | None ->
-        match
-          Globals.Syntactic_search.find_in_scope varname Cil_types.Program
-        with
-        | Some vi -> vi
-        | None ->
-          Data.failure "no global variable '%s'" varname
-  end)
+        Data.failure "no global variable '%s'" varname
+end
 
-module Function = Data.Collection (struct
-    type t = Cil_types.kernel_function
+module Node : Data.S with type t = Graph_types.node =
+struct
+  type t = Graph_types.node
 
-    let jtype = Package.Jkey "fct-name"
+  let jtype = Package.Jindex "dive-node"
 
-    let to_json kf =
-      `String (Kernel_function.get_name kf)
+  let to_json node =
+    `Int node.Graph_types.node_key
 
-    let of_json json =
-      let open Yojson.Basic.Util in
-      let name = to_string json in
-      try
-        Globals.Functions.find_by_name name
-      with Not_found ->
-        Data.failure "no function '%s'" name
-  end)
-
-module Node = Data.Collection (struct
-    type t = Graph_types.node
-
-    let jtype = Package.Jindex "dive-node"
-
-    let to_json node =
-      `Int node.Graph_types.node_key
-
-    let of_json json =
-      let open Yojson.Basic.Util in
-      let node_key = to_int json in
-      try
-        Build.find_node (get_graph ()) node_key
-      with Not_found ->
-        Data.failure "no node '%d' in the current graph" node_key
-  end)
-
+  let of_json json =
+    let open Yojson.Basic.Util in
+    let node_key = to_int json in
+    try
+      Build.find_node (get_graph ()) node_key
+    with Not_found ->
+      Data.failure "no node '%d' in the current graph" node_key
+end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"graph"
@@ -174,7 +158,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"addFunctionAlarms"
     ~descr:(Markdown.plain "Add all alarms of the given function")
-    ~input:(module Function) ~output:(module GraphDiff)
+    ~input:(module Kernel_ast.Kf) ~output:(module GraphDiff)
     begin fun kf ->
       let depth = Self.DepthLimit.get () in
       let g = get_graph () in

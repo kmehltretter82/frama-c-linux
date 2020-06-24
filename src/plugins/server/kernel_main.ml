@@ -44,8 +44,9 @@ let () =
   let set_datadir = result "datadir" "Shared directory (FRAMAC_SHARE)" in
   let set_libdir = result "libdir" "Lib directory (FRAMAC_LIB)" in
   let set_pluginpath = Request.result signature
-      ~name:"pluginpath" ~descr:(Md.plain "Plugin directories (FRAMAC_PLUGIN)")
-      (module Jstring.Jlist) in
+      ~name:"pluginpath"
+      ~descr:(Md.plain "Plugin directories (FRAMAC_PLUGIN)")
+      (module Jlist(Jstring)) in
   Request.register_sig
     ~package ~kind:`GET ~name:"getConfig"
     ~descr:(Md.plain "Frama-C Kernel configuration")
@@ -65,7 +66,7 @@ let () =
   Request.register ~package ~kind:`SET ~name:"load"
     ~descr:(Md.plain "Load a save file. Returns an error, if not successfull.")
     ~input:(module Jstring)
-    ~output:(module Jstring.Joption)
+    ~output:(module Joption(Jstring))
     (fun file ->
        try Project.load_all (Filepath.Normalized.of_string file); None
        with Project.IOError err -> Some err)
@@ -74,42 +75,42 @@ let () =
 (* --- File Positions                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-module LogSource = Collection
-    (struct
-      type t = Filepath.position
+module LogSource =
+struct
+  type t = Filepath.position
 
-      let jtype = Pkg.datatype ~package ~name:"source"
-          ~descr:(Md.plain "Source file positions.")
-          (Jrecord [
-              "dir", Jstring;
-              "base", Jstring;
-              "file", Jstring;
-              "line", Jnumber;
-            ])
+  let jtype = Pkg.datatype ~package ~name:"source"
+      ~descr:(Md.plain "Source file positions.")
+      (Jrecord [
+          "dir", Jstring;
+          "base", Jstring;
+          "file", Jstring;
+          "line", Jnumber;
+        ])
 
-      let to_json p =
-        let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
-        `Assoc [
-          "dir"  , `String (Filename.dirname path) ;
-          "base" , `String (Filename.basename path) ;
-          "file" , `String (p.Filepath.pos_path :> string) ;
-          "line" , `Int p.Filepath.pos_lnum ;
-        ]
+  let to_json p =
+    let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    `Assoc [
+      "dir"  , `String (Filename.dirname path) ;
+      "base" , `String (Filename.basename path) ;
+      "file" , `String (p.Filepath.pos_path :> string) ;
+      "line" , `Int p.Filepath.pos_lnum ;
+    ]
 
-      let of_json js =
-        let fail () = failure_from_type_error "Invalid source format" js in
-        match js with
-        | `Assoc assoc ->
-          begin
-            match List.assoc "file" assoc, List.assoc "line" assoc with
-            | `String path, `Int line ->
-              Log.source ~file:(Filepath.Normalized.of_string path) ~line
-            | _, _ -> fail ()
-            | exception Not_found -> fail ()
-          end
-        | _ -> fail ()
+  let of_json js =
+    let fail () = failure_from_type_error "Invalid source format" js in
+    match js with
+    | `Assoc assoc ->
+      begin
+        match List.assoc "file" assoc, List.assoc "line" assoc with
+        | `String path, `Int line ->
+          Log.source ~file:(Filepath.Normalized.of_string path) ~line
+        | _, _ -> fail ()
+        | exception Not_found -> fail ()
+      end
+    | _ -> fail ()
 
-    end)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Lind                                                           --- *)
@@ -151,53 +152,53 @@ end
 (* --- Log Events                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-module LogEvent = Collection
-    (struct
+module LogEvent =
+struct
 
-      type rlog
+  type rlog
 
-      let jlog : rlog Record.signature = Record.signature ()
+  let jlog : rlog Record.signature = Record.signature ()
 
-      let kind = Record.field jlog ~name:"kind"
-          ~descr:(Md.plain "Message kind") (module LogKind)
-      let plugin = Record.field jlog ~name:"plugin"
-          ~descr:(Md.plain "Emitter plugin") (module Jstring)
-      let message = Record.field jlog ~name:"message"
-          ~descr:(Md.plain "Message text") (module Jstring)
-      let category = Record.option jlog ~name:"category"
-          ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
-      let source = Record.option jlog ~name:"source"
-          ~descr:(Md.plain "Source file position") (module LogSource)
+  let kind = Record.field jlog ~name:"kind"
+      ~descr:(Md.plain "Message kind") (module LogKind)
+  let plugin = Record.field jlog ~name:"plugin"
+      ~descr:(Md.plain "Emitter plugin") (module Jstring)
+  let message = Record.field jlog ~name:"message"
+      ~descr:(Md.plain "Message text") (module Jstring)
+  let category = Record.option jlog ~name:"category"
+      ~descr:(Md.plain "Message category (DEBUG or WARNING)") (module Jstring)
+  let source = Record.option jlog ~name:"source"
+      ~descr:(Md.plain "Source file position") (module LogSource)
 
-      let data = Record.publish ~package ~name:"log"
-          ~descr:(Md.plain "Message event record.") jlog
+  let data = Record.publish ~package ~name:"log"
+      ~descr:(Md.plain "Message event record.") jlog
 
-      module R : Record.S with type r = rlog = (val data)
+  module R : Record.S with type r = rlog = (val data)
 
-      type t = Log.event
+  type t = Log.event
 
-      let jtype = R.jtype
+  let jtype = R.jtype
 
-      let to_json evt =
-        R.default |>
-        R.set plugin evt.Log.evt_plugin |>
-        R.set kind evt.Log.evt_kind |>
-        R.set category evt.Log.evt_category |>
-        R.set source evt.Log.evt_source |>
-        R.set message evt.Log.evt_message |>
-        R.to_json
+  let to_json evt =
+    R.default |>
+    R.set plugin evt.Log.evt_plugin |>
+    R.set kind evt.Log.evt_kind |>
+    R.set category evt.Log.evt_category |>
+    R.set source evt.Log.evt_source |>
+    R.set message evt.Log.evt_message |>
+    R.to_json
 
-      let of_json js =
-        let r = R.of_json js in
-        {
-          Log.evt_plugin = R.get plugin r ;
-          Log.evt_kind = R.get kind r ;
-          Log.evt_category = R.get category r ;
-          Log.evt_source = R.get source r ;
-          Log.evt_message = R.get message r ;
-        }
+  let of_json js =
+    let r = R.of_json js in
+    {
+      Log.evt_plugin = R.get plugin r ;
+      Log.evt_kind = R.get kind r ;
+      Log.evt_category = R.get category r ;
+      Log.evt_source = R.get source r ;
+      Log.evt_message = R.get message r ;
+    }
 
-    end)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Monitoring                                                     --- *)
@@ -245,7 +246,7 @@ let () = Request.register
 let () = Request.register
     ~package ~kind:`GET ~name:"getLogs"
     ~descr:(Md.plain "Flush the last emitted logs since last call (max 100)")
-    ~input:(module Junit) ~output:(module LogEvent.Jlist)
+    ~input:(module Junit) ~output:(module Jlist(LogEvent))
     begin fun () ->
       let pool = ref [] in
       let count = ref 100 in

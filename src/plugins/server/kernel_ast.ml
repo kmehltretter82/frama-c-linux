@@ -202,43 +202,43 @@ module Printer = Printer_tag.Make(Marker)
 (* --- Ast Data                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Stmt = Data.Collection
-    (struct
-      type t = stmt
-      let jtype = Marker.jstmt
-      let to_json st =
-        let kf = Kernel_function.find_englobing_kf st in
-        Marker.to_json (PStmt(kf,st))
-      let of_json js =
-        let open Printer_tag in
-        match Marker.of_json js with
-        | PStmt(_,st) | PStmtStart(_,st) -> st
-        | _ -> Data.failure "not a stmt marker"
-    end)
+module Stmt =
+struct
+  type t = stmt
+  let jtype = Marker.jstmt
+  let to_json st =
+    let kf = Kernel_function.find_englobing_kf st in
+    Marker.to_json (PStmt(kf,st))
+  let of_json js =
+    let open Printer_tag in
+    match Marker.of_json js with
+    | PStmt(_,st) | PStmtStart(_,st) -> st
+    | _ -> Data.failure "not a stmt marker"
+end
 
-module Ki = Data.Collection
-    (struct
-      type t = kinstr
-      let jtype = Pkg.Joption Marker.jstmt
-      let to_json = function
-        | Kglobal -> `Null
-        | Kstmt st -> Stmt.to_json st
-      let of_json = function
-        | `Null -> Kglobal
-        | js -> Kstmt (Stmt.of_json js)
-    end)
+module Ki =
+struct
+  type t = kinstr
+  let jtype = Pkg.Joption Marker.jstmt
+  let to_json = function
+    | Kglobal -> `Null
+    | Kstmt st -> Stmt.to_json st
+  let of_json = function
+    | `Null -> Kglobal
+    | js -> Kstmt (Stmt.of_json js)
+end
 
-module Kf = Data.Collection
-    (struct
-      type t = kernel_function
-      let jtype = Pkg.Jkey "fct"
-      let to_json kf =
-        `String (Kernel_function.get_name kf)
-      let of_json js =
-        let key = Js.to_string js in
-        try Globals.Functions.find_by_name key
-        with Not_found -> Data.failure "Undefined function '%s'" key
-    end)
+module Kf =
+struct
+  type t = kernel_function
+  let jtype = Pkg.Jkey "fct"
+  let to_json kf =
+    `String (Kernel_function.get_name kf)
+  let of_json js =
+    let key = Js.to_string js in
+    try Globals.Functions.find_by_name key
+    with Not_found -> Data.failure "Undefined function '%s'" key
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
@@ -247,7 +247,7 @@ module Kf = Data.Collection
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Kf.Jlist)
+    ~input:(module Junit) ~output:(module Jlist(Kf))
     begin fun () ->
       let pool = ref [] in
       Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
@@ -376,7 +376,7 @@ let () =
     ~descr:(Md.plain "Get the currently analyzed source file names")
     ~kind:`GET
     ~name:"getFiles"
-    ~input:(module Junit) ~output:(module Jstring.Jlist)
+    ~input:(module Junit) ~output:(module Jlist(Jstring))
     get_files
 
 let set_files files =
@@ -389,7 +389,7 @@ let () =
     ~descr:(Md.plain "Set the source file names to analyze.")
     ~kind:`SET
     ~name:"setFiles"
-    ~input:(module Jstring.Jlist)
+    ~input:(module Jlist(Jstring))
     ~output:(module Junit)
     set_files
 

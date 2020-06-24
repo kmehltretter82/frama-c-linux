@@ -273,7 +273,7 @@ let () = States.column model ~name:"kind"
 
 let () = States.column model ~name:"names"
     ~descr:(Md.plain "Names")
-    ~data:(module Jstring.Jlist)
+    ~data:(module Jlist(Jstring))
     ~get:Property.get_names
 
 let () = States.column model ~name:"status"
@@ -283,7 +283,7 @@ let () = States.column model ~name:"status"
 
 let () = States.column model ~name:"function"
     ~descr:(Md.plain "Function")
-    ~data:(module Kf.Joption) ~get:Property.get_kf
+    ~data:(module Joption(Kf)) ~get:Property.get_kf
 
 let () = States.column model ~name:"kinstr"
     ~descr:(Md.plain "Instruction")
@@ -296,17 +296,17 @@ let () = States.column model ~name:"source"
 
 let () = States.column model ~name:"alarm"
     ~descr:(Md.plain "Alarm name (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
+    ~data:(module Joption(Jstring))
     ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip))
 
 let () = States.column model ~name:"alarm_descr"
     ~descr:(Md.plain "Alarm description (if the property is an alarm)")
-    ~data:(module Jstring.Joption)
+    ~data:(module Joption(Jstring))
     ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip))
 
 let () = States.column model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
-    ~data:(module Jstring.Joption)
+    ~data:(module Joption(Jstring))
     ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
 
 let is_relevant ip =

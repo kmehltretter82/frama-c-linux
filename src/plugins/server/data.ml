@@ -110,6 +110,14 @@ end
 module Jlist(A : S) : S with type t = A.t list =
 struct
   type t = A.t list
+  let jtype = Jlist A.jtype
+  let to_json xs = `List (List.map A.to_json xs)
+  let of_json js = List.map A.of_json (Ju.to_list js)
+end
+
+module Jalist(A : S) : S with type t = A.t list =
+struct
+  type t = A.t list
   let jtype = Jarray A.jtype
   let to_json xs = `List (List.map A.to_json xs)
   let of_json js = List.map A.of_json (Ju.to_list js)
@@ -125,26 +133,6 @@ struct
   let jtype = Jarray A.jtype
   let to_json xs = `List (List.map A.to_json (Array.to_list xs))
   let of_json js = Array.of_list @@ List.map A.of_json (Ju.to_list js)
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Collections                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-module type S_collection =
-sig
-  include S
-  module Joption : S with type t = t option
-  module Jlist : S with type t = t list
-  module Jarray : S with type t = t array
-end
-
-module Collection(A : S) : S_collection with type t = A.t =
-struct
-  include A
-  module Joption = Joption(A)
-  module Jlist = Jlist(A)
-  module Jarray = Jarray(A)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -167,52 +155,55 @@ struct
   let to_json js = js
 end
 
-module Jbool : S_collection with type t = bool =
-  Collection
-    (struct
-      type t = bool
-      let jtype = Jboolean
-      let of_json = Ju.to_bool
-      let to_json b = `Bool b
-    end)
+module Jbool : S with type t = bool =
+struct
+  type t = bool
+  let jtype = Jboolean
+  let of_json = Ju.to_bool
+  let to_json b = `Bool b
+end
 
-module Jint : S_collection with type t = int =
-  Collection
-    (struct
-      type t = int
-      let jtype = Jnumber
-      let of_json = Ju.to_int
-      let to_json n = `Int n
-    end)
+module Jint : S with type t = int =
+struct
+  type t = int
+  let jtype = Jnumber
+  let of_json = Ju.to_int
+  let to_json n = `Int n
+end
 
-module Jfloat : S_collection with type t = float =
-  Collection
-    (struct
-      type t = float
-      let jtype = Jnumber
-      let of_json = Ju.to_number
-      let to_json v = `Float v
-    end)
+module Jfloat : S with type t = float =
+struct
+  type t = float
+  let jtype = Jnumber
+  let of_json = Ju.to_number
+  let to_json v = `Float v
+end
 
-module Jstring : S_collection with type t = string =
-  Collection
-    (struct
-      type t = string
-      let jtype = Jstring
-      let of_json = Ju.to_string
-      let to_json s = `String s
-    end)
+module Jstring : S with type t = string =
+struct
+  type t = string
+  let jtype = Jstring
+  let of_json = Ju.to_string
+  let to_json s = `String s
+end
 
-module Jmarkdown : S_collection with type t = Markdown.text =
-  Collection
-    (struct
-      type t = Markdown.text
-      let jtype =
-        let descr = Markdown.plain "Markdown (inlined) text." in
-        datatype ~package ~name:"markdown" ~descr Jstring
-      let of_json js = Markdown.plain (Ju.to_string js)
-      let to_json txt = `String (Pretty_utils.to_string Markdown.pp_text txt)
-    end)
+module Jalpha : S with type t = string =
+struct
+  type t = string
+  let jtype = Jalpha
+  let of_json = Ju.to_string
+  let to_json s = `String s
+end
+
+module Jmarkdown : S with type t = Markdown.text =
+struct
+  type t = Markdown.text
+  let jtype =
+    let descr = Markdown.plain "Markdown (inlined) text." in
+    datatype ~package ~name:"markdown" ~descr Jstring
+  let of_json js = Markdown.plain (Ju.to_string js)
+  let to_json txt = `String (Pretty_utils.to_string Markdown.pp_text txt)
+end
 
 module Jtext =
 struct
@@ -238,6 +229,7 @@ let jbool : bool data = (module Jbool)
 let jint : int data = (module Jint)
 let jfloat : float data = (module Jfloat)
 let jstring : string data = (module Jstring)
+let jalpha : string data = (module Jalpha)
 
 let jkey ~kind =
   let module JkeyKind =
@@ -261,6 +253,10 @@ let joption (type a) (d : a data) : a option data =
 
 let jlist (type a) (d : a data) : a list data =
   let module A = Jlist(val d) in
+  (module A : S with type t = a list)
+
+let jalist (type a) (d : a data) : a list data =
+  let module A = Jalist(val d) in
   (module A : S with type t = a list)
 
 let jarray (type a) (d : a data) : a array data =
@@ -380,32 +376,32 @@ end
 (* --- Enums                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Tag = Collection
-    (struct
-      type t = Package.tagInfo
+module Tag =
+struct
+  type t = Package.tagInfo
 
-      let jtype =
-        datatype ~package ~name:"tag"
-          ~descr:(Markdown.plain "Enum Tag Description")
-          (Jrecord [
-              "name",Jstring ;
-              "label",Jmarkdown.jtype ;
-              "descr",Jmarkdown.jtype ;
-            ])
+  let jtype =
+    datatype ~package ~name:"tag"
+      ~descr:(Markdown.plain "Enum Tag Description")
+      (Jrecord [
+          "name",Jstring ;
+          "label",Jmarkdown.jtype ;
+          "descr",Jmarkdown.jtype ;
+        ])
 
-      let to_json tg = `Assoc Package.[
-          "name", `String tg.tg_name ;
-          "label", Jmarkdown.to_json tg.tg_label ;
-          "descr" , Jmarkdown.to_json tg.tg_descr ;
-        ]
+  let to_json tg = `Assoc Package.[
+      "name", `String tg.tg_name ;
+      "label", Jmarkdown.to_json tg.tg_label ;
+      "descr" , Jmarkdown.to_json tg.tg_descr ;
+    ]
 
-      let of_json js = Package.{
-          tg_name = Ju.member "name" js |> Ju.to_string ;
-          tg_label = Ju.member "label" js |> Jmarkdown.of_json ;
-          tg_descr = Ju.member "descr" js |> Jmarkdown.of_json ;
-        }
+  let of_json js = Package.{
+      tg_name = Ju.member "name" js |> Ju.to_string ;
+      tg_label = Ju.member "label" js |> Jmarkdown.of_json ;
+      tg_descr = Ju.member "descr" js |> Jmarkdown.of_json ;
+    }
 
-    end)
+end
 
 module Enum =
 struct
@@ -551,14 +547,14 @@ end
 
 module type Index =
 sig
-  type t
+  include S
   val kind : string
   val get : t -> int
   val find : int -> t
   val clear : unit -> unit
 end
 
-module INDEXER(M : Map)(D : S_collection)(I : Index with type t = D.t) :
+module INDEXER(M : Map)(D : S)(I : Index with type t = D.t) :
 sig
   type index
   val create : unit -> index
@@ -608,7 +604,7 @@ struct
 
 end
 
-module Static(M : Map)(S : S_collection)(I : Index with type t = S.t)
+module Static(M : Map)(S : S)(I : Index with type t = S.t)
   : Index with type t = M.key =
 struct
   module INDEX = INDEXER(M)(S)(I)
@@ -617,16 +613,16 @@ struct
   let clear () = INDEX.clear index
   let get = INDEX.get index
   let find = INDEX.find index
-  include Collection
-      (struct
-        type t = M.key
-        let jtype = Jindex I.kind
-        let of_json = INDEX.of_json index
-        let to_json = INDEX.to_json index
-      end)
+  include
+    (struct
+      type t = M.key
+      let jtype = Jindex I.kind
+      let of_json = INDEX.of_json index
+      let to_json = INDEX.to_json index
+    end)
 end
 
-module Index(M : Map)(S : S_collection)(I : Index with type t = S.t)
+module Index(M : Map)(S : S)(I : Index with type t = S.t)
   : Index with type t = M.key =
 struct
   module INDEX = INDEXER(M)(S)(I)
@@ -653,13 +649,13 @@ struct
   let get a = INDEX.get (index()) a
   let find id = INDEX.find (index()) id
 
-  include Collection
-      (struct
-        type t = M.key
-        let jtype = Jindex I.kind
-        let of_json js = INDEX.of_json (index()) js
-        let to_json v = INDEX.to_json (index()) v
-      end)
+  include
+    (struct
+      type t = M.key
+      let jtype = Jindex I.kind
+      let of_json js = INDEX.of_json (index()) js
+      let to_json v = INDEX.to_json (index()) v
+    end)
 
 end
 
@@ -669,7 +665,7 @@ sig
   val id : t -> int
 end
 
-module Identified(A : IdentifiedType)(S : S_collection)
+module Identified(A : IdentifiedType)(S : S)
     (I : Index with type t = S.t) : Index with type t = A.t =
 struct
 
@@ -700,16 +696,16 @@ struct
   let get = A.id
   let find id = Hashtbl.find (lookup()) id
 
-  include Collection
-      (struct
-        type t = A.t
-        let jtype = Jindex kind
-        let to_json a = `Int (get a)
-        let of_json js =
-          let k = Ju.to_int js in
-          try find k
-          with Not_found -> failure "[%s] No registered id #%d" I.kind k
-      end)
+  include
+    (struct
+      type t = A.t
+      let jtype = Jindex kind
+      let to_json a = `Int (get a)
+      let of_json js =
+        let k = Ju.to_int js in
+        try find k
+        with Not_found -> failure "[%s] No registered id #%d" I.kind k
+    end)
 
 end
 

@@ -291,15 +291,16 @@ let register ~package ~kind ~name ~descr ~input ~output process =
     (fun _rq v -> process v)
 
 let dictionary (type a) ~package ~name ~descr (d : a Data.Enum.dictionary) =
-  let data = Data.Enum.publish ~package ~name ~descr d in
+  let open Data in
+  let data = Enum.publish ~package ~name ~descr d in
   let module T = (val data) in
-  let descr = Markdown.plain "Returns all registered tags for the above type." in
+  let descr = Markdown.plain "Registered tags for the above type." in
   let name = name ^ "Tags" in
   register ~kind:`GET ~package
     ~name ~descr
-    ~input:(module Data.Junit)
-    ~output:(module Data.Tag.Jlist)
-    (fun () -> Data.Enum.tags d) ;
+    ~input:(module Junit)
+    ~output:(module Jlist(Tag))
+    (fun () -> Enum.tags d) ;
   data
 
 (* -------------------------------------------------------------------------- *)

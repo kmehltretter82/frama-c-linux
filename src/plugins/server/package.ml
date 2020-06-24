@@ -165,12 +165,14 @@ type jtype =
   | Jboolean
   | Jnumber
   | Jstring
+  | Jalpha (* string primarily compared without case *)
   | Jtag of string
   | Jkey of string (* kind of a string used for indexing *)
-  | Jindex of string (* kind of a number used for indexing *)
+  | Jindex of string (* kind of an integer used for indexing *)
   | Joption of jtype
   | Jassoc of string * jtype (* kind of keys *)
-  | Jarray of jtype
+  | Jlist of jtype (* order does not matter *)
+  | Jarray of jtype (* order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
@@ -251,8 +253,8 @@ let pp_pkgname fmt { p_plugin ; p_package } =
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
-  | Jstring | Jindex _ | Jkey _ | Jtag _ -> ()
-  | Joption js | Jassoc(_,js)  | Jarray js -> visit_jtype fn js
+  | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> ()
+  | Joption js | Jassoc(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
   | Jdata id -> fn id
@@ -409,7 +411,7 @@ let rec md_jtype pp = function
   | Jnull -> Md.emph "null"
   | Jnumber -> Md.emph "number"
   | Jboolean -> Md.emph "boolean"
-  | Jstring -> Md.emph "string"
+  | Jstring | Jalpha -> Md.emph "string"
   | Jtag tag -> escaped tag
   | Jkey kd -> key kd
   | Jindex kd -> index kd
@@ -417,7 +419,7 @@ let rec md_jtype pp = function
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
-  | Jarray js -> protect pp js @ Md.code "[]"
+  | Jarray js | Jlist js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
   | Jassoc (id,js) ->
     Md.code "{[" @ key id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"

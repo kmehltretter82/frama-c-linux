@@ -71,29 +71,15 @@ sig
 end
 
 (* -------------------------------------------------------------------------- *)
-(** {2 Collections} *)
-(* -------------------------------------------------------------------------- *)
-
-module type S_collection =
-sig
-  include S
-  module Joption : S with type t = t option
-  module Jlist : S with type t = t list
-  module Jarray : S with type t = t array
-end
-
-module Collection(A : S) : S_collection with type t = A.t
-
-(* -------------------------------------------------------------------------- *)
 (** {2 Atomic Data} *)
 (* -------------------------------------------------------------------------- *)
 
 module Junit : S with type t = unit
 module Jany : S with type t = json
-module Jbool : S_collection with type t = bool
-module Jint : S_collection with type t = int
-module Jfloat : S_collection with type t = float
-module Jstring : S_collection with type t = string
+module Jbool : S with type t = bool
+module Jint : S with type t = int
+module Jfloat : S with type t = float
+module Jstring : S with type t = string
 module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
 module Jmarkdown : S with type t = Markdown.text
 
@@ -105,6 +91,7 @@ module Joption(A : S) : S with type t = A.t option
 module Jpair(A : S)(B : S) : S with type t = A.t * B.t
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
 module Jlist(A : S) : S with type t = A.t list
+module Jalist(A : S) : S with type t = A.t list
 module Jarray(A : S) : S with type t = A.t array
 
 (* -------------------------------------------------------------------------- *)
@@ -120,9 +107,11 @@ val jbool : bool data
 val jint : int data
 val jfloat : float data
 val jstring : string data
+val jalpha : string data
 val jindex : kind:string -> int data
 val jkey : kind:string -> string data
 val jlist : 'a data -> 'a list data
+val jalist : 'a data -> 'a list data
 val jarray : 'a data -> 'a array data
 val joption : 'a data -> 'a option data
 
@@ -196,7 +185,7 @@ end
 (** {2 Enums} *)
 (* -------------------------------------------------------------------------- *)
 
-module Tag : S_collection with type t = tagInfo
+module Tag : S with type t = tagInfo
 
 (** Enum factory.
 
@@ -329,7 +318,7 @@ end
 (** Datatype extended with access to value identifiers. *)
 module type Index =
 sig
-  type t
+  include S
   val kind : string
   val get : t -> int
   val find : int -> t (** @raise Not_found if not registered. *)
@@ -338,11 +327,11 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(S : S_collection)
+module Static(M : Map)(S : S)
     (I : Index with type t = S.t) : Index with type t = M.key
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(S : S_collection)
+module Index(M : Map)(S : S)
     (I : Index with type t = S.t) : Index with type t = M.key
 
 (** Datatype already identified by unique integers. *)
@@ -353,8 +342,7 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)
-    (S : S_collection)
+module Identified(A : IdentifiedType)(S : S)
     (I : Index with type t = S.t) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)

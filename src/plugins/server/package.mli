@@ -33,12 +33,14 @@ type jtype =
   | Jboolean
   | Jnumber
   | Jstring
-  | Jtag of string (** Enum constant tag *)
-  | Jkey of string (** Kind of numbers used for indexing *)
-  | Jindex of string (** Kind of strings used for indexing *)
-  | Joption of jtype (** Value or 'null' *)
-  | Jassoc of string * jtype (** Dictionary for kind of ids *)
-  | Jarray of jtype
+  | Jalpha (** string primarily compared without case *)
+  | Jtag of string
+  | Jkey of string (** kind of a string used for indexing *)
+  | Jindex of string (** kind of an integer used for indexing *)
+  | Joption of jtype
+  | Jassoc of string * jtype (** kind of keys *)
+  | Jlist of jtype (** order does not matter *)
+  | Jarray of jtype (** order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
