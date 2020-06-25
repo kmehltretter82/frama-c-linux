@@ -35,6 +35,8 @@ type 'a interval = {min: 'a; max: 'a}
 
 type precision_grade = Singleton | Normal | Wide
 
+type 'a computation = NotDone | Partial of 'a | Done
+
 type 'a node_values = {
   values_interval : 'a interval;
   values_limits : 'a interval;
@@ -48,8 +50,8 @@ type node = {
   mutable node_hidden : bool;
   mutable node_int_values : (Integer.t node_values) option;
   mutable node_float_values : (float node_values) option;
-  mutable node_deps_computed : bool;
-  mutable node_write_stmts : Cil_types.stmt list;
+  mutable node_writes_computation : (Cil_types.stmt list) computation;
+  mutable node_writes_stmts : Cil_types.stmt list;
 }
 
 type dependency_kind = Callee | Data | Address | Control | Composition

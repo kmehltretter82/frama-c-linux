@@ -66,8 +66,8 @@ let create_node ~node_kind ~node_locality g =
     node_hidden = false;
     node_int_values = None;
     node_float_values = None;
-    node_deps_computed = false;
-    node_write_stmts = [];
+    node_writes_computation = NotDone;
+    node_writes_stmts = [];
   }
   in
   add_vertex g node;
@@ -114,7 +114,6 @@ let update_node_float_values node new_values =
   node.node_float_values <-
     Some (Extlib.opt_fold merge_float_values node.node_float_values new_values)
 
-
 let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
   let same_kind (_,e,_) =
     e.dependency_kind = dependency_kind
@@ -146,10 +145,10 @@ let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
   match kinstr with
   | Cil_types.Kglobal -> ()
   | Kstmt stmt ->
-    let compare = Cil_datatype.Stmt.compare in
-    let add_to l = List.sort_uniq compare (stmt :: l) in
-    e.dependency_origins <- add_to e.dependency_origins;
-    v2.node_write_stmts <- add_to v2.node_write_stmts
+    let add_uniq l x =
+      List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
+    in
+    e.dependency_origins <- add_uniq e.dependency_origins stmt
 
 
 let remove_dependency g edge =
@@ -257,7 +256,7 @@ let ouptput_to_dot out_channel g =
             [ `Color 0xff0000 ; `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
         l := values @ kind @ !l;
-        if not v.node_deps_computed then
+        if v.node_writes_computation <> Done then
           l := [ `Style `Dotted ] @ !l;
         !l
       let get_subgraph v =
@@ -366,8 +365,8 @@ struct
         ("label", `String label) ;
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
-        ("explored", `Bool node.node_deps_computed) ;
-        ("writes", `List (List.map output_stmt node.node_write_stmts)) ;
+        ("explored", `Bool (node.node_writes_computation = Done)) ;
+        ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;
       ] @
         begin match node.node_int_values with
           | None -> []

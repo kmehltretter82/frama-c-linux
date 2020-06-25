@@ -27,6 +27,17 @@ let dkey = Self.register_category "build"
 
 exception Too_many_deps
 
+(* --- Utility function --- *)
+
+(* Breaks a list at n-th element into two sublists *)
+let rec list_break n l =
+  if n <= 0 then ([], l)
+  else match l with
+    | [] -> ([], [])
+    | a :: l ->
+      let l1, l2 = list_break (n - 1) l in
+      (a :: l1, l2)
+
 
 (* --- Precision evaluation --- *)
 
@@ -235,11 +246,12 @@ module FunctionMap = Kernel_function.Map
 
 type t = {
   mutable graph: Graph.t;
-  mutable vertex_table: node Index.t;
-  mutable node_table: node NodeTable.t;
+  mutable vertex_table: node Index.t; (* node_key -> node *)
+  mutable node_table: node NodeTable.t; (* node_kind * callstack -> node *)
   mutable unfolded_bases: BaseSet.t;
   mutable hidden_bases: BaseSet.t;
   mutable focus: bool FunctionMap.t;
+  mutable max_dep_fetch_count: int;
   mutable roots: node list;
   mutable graph_diff: graph_diff;
 }
@@ -333,12 +345,19 @@ let build_node_deps context node =
     build_write_deps callstack zone
 
   and build_write_deps callstack zone =
-    Self.debug ~dkey "computing deps for %a" Node_kind.pretty node.node_kind;
-    let writes = Studia.Writes.compute zone
-    and add_deps (stmt,effects) =
-      match stmt.skind with
-      | Instr _ when not effects.Studia.Writes.direct -> ()
-      | Instr instr ->
+    let writes = match node.node_writes_computation with
+      | Done -> []
+      | Partial writes -> writes
+      | NotDone ->
+        Self.debug ~dkey "computing deps for %a" Node_kind.pretty node.node_kind;
+        let result = Studia.Writes.compute zone in
+        let is_direct (_,{Studia.Writes.direct}) = direct in
+        let writes = Extlib.filter_map is_direct fst result in
+        Self.debug ~dkey "%d found" (List.length writes);
+        node.node_writes_stmts <- writes;
+        writes
+    and add_deps = function
+      | { skind=Instr instr } as stmt ->
         let callstacks =
           if callstack <> [] &&
              Kernel_function.(equal
@@ -364,14 +383,11 @@ let build_node_deps context node =
         in
         (* Create a dependency for each of them *)
         List.iter (fun cs -> build_instr_deps cs stmt instr) callstacks
-      | _ -> assert false
+      | _ -> assert false (* Studia invariant *)
     in
-    let count = List.length writes in
-    Self.debug ~dkey "%d found" count;
-    if count > 20 then
-      raise Too_many_deps
-    else
-      List.iter add_deps writes
+    let sub,rest = list_break context.max_dep_fetch_count writes in
+    List.iter add_deps sub;
+    node.node_writes_computation <- if rest = [] then Done else Partial rest
 
   and build_arg_deps callstack vi =
     assert vi.vformal;
@@ -517,6 +533,7 @@ let create () =
     unfolded_bases = BaseSet.empty;
     hidden_bases = BaseSet.empty;
     focus = FunctionMap.empty;
+    max_dep_fetch_count = 10;
     roots = [];
     graph_diff = { last_root = None ; added_nodes=[] ; removed_nodes=[] };
   }
@@ -526,6 +543,7 @@ let clear context =
   context.vertex_table <- Index.create 13;
   context.node_table <- NodeTable.create 13;
   context.focus <- FunctionMap.empty;
+  context.max_dep_fetch_count <- 10;
   context.roots <- [];
   context.graph_diff <- { last_root = None ; added_nodes=[] ; removed_nodes=[] }
 
@@ -569,7 +587,7 @@ let explore ~depth context root =
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
     if d < depth then begin
-      if not (n.node_deps_computed) && should_auto_explore n then
+      if n.node_writes_computation <> Done && should_auto_explore n then
         begin
           begin try
               build_node_deps context n;
@@ -578,7 +596,6 @@ let explore ~depth context root =
               Self.warning "Too many dependencies for %a ; throwing them out"
                 Node_kind.pretty n.node_kind;
           end;
-          n.node_deps_computed <- true;
         end;
       Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n
     end;
@@ -647,8 +664,8 @@ let hide context node =
       let incomming_edges = Graph.pred_e g node in
       List.iter (Graph.remove_dependency g) incomming_edges;
       (* Dependencies are not there anymore *)
-      node.node_deps_computed <- false;
-      node.node_write_stmts <- [];
+      node.node_writes_computation <- NotDone;
+      node.node_writes_stmts <- [];
       (* Notify node update *)
       update_node context node
     end
