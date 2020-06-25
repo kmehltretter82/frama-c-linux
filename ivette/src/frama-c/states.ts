@@ -218,8 +218,6 @@ export interface Array<K, A> {
   reload: Server.GetRequest<null, null>;
 }
 
-type id = { project: string; state: string };
-
 // --------------------------------------------------------------------------
 // --- Handler for Synchronized St byates
 // --------------------------------------------------------------------------
@@ -290,10 +288,10 @@ class SyncState<A> {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-const syncStates = new Map<id, SyncState<any>>();
+const syncStates = new Map<string, SyncState<any>>();
 
 function getSyncState<A>(h: Handler<A>): SyncState<A> {
-  const id = { project: currentProject ?? '', state: h.name };
+  const id = currentProject + '@' + h.name;
   let s = syncStates.get(id);
   if (!s) {
     s = new SyncState(h);
@@ -338,18 +336,25 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 class SyncArray<K, A> {
   handler: Array<K, A>;
   model: ArrayModel<A>;
+  upToDate: boolean;
   fetching: boolean;
 
   constructor(h: Array<K, A>, m?: ArrayModel<A>) {
     this.handler = h;
     this.fetching = false;
+    this.upToDate = false;
     this.model = m ?? new ArrayModel<A>(h.key);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
+    this.update = this.update.bind(this);
+  }
+
+  update() {
+    if (!this.upToDate && Server.isRunning()) this.fetch();
   }
 
   async fetch() {
-    if (this.fetching) return;
+    if (this.fetching || !Server.isRunning()) return;
     try {
       this.fetching = true;
       let pending;
@@ -369,13 +374,18 @@ class SyncArray<K, A> {
       );
     } finally {
       this.fetching = false;
+      this.upToDate = true;
     }
   }
 
   async reload() {
     try {
       this.model.clear();
-      await Server.send(this.handler.reload, null);
+      this.upToDate = false;
+      if (Server.isRunning()) {
+        await Server.send(this.handler.reload, null);
+        this.fetch();
+      }
     } catch (error) {
       PP.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
@@ -390,23 +400,22 @@ class SyncArray<K, A> {
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-const syncArrays = new Map<id, SyncArray<any, any>>();
+const syncArrays = new Map<string, SyncArray<any, any>>();
 
 function getSyncArray<K, A>(
-  arr: Array<K, A>,
+  array: Array<K, A>,
   model?: ArrayModel<A>,
 ): SyncArray<K, A> {
-  const id = { project: currentProject ?? '', state: arr.name };
-  let a = syncArrays.get(id);
-  if (!a) {
-    a = new SyncArray(arr, model);
-    syncArrays.set(id, a);
-  } else if (model && a.model !== model) {
-    model.clear();
-    a.reload();
-    a.model = model;
+  const id = currentProject + '@' + array.name;
+  let st = syncArrays.get(id);
+  if (!st) {
+    st = new SyncArray(array, model);
+    syncArrays.set(id, st);
+  } else if (model && st.model !== model) {
+    st.model = model;
+    st.reload();
   }
-  return a;
+  return st;
 }
 
 Server.onShutdown(() => syncArrays.clear());
@@ -429,10 +438,11 @@ export function useSyncArray<K, A>(
   arr: Array<K, A>,
   model?: ArrayModel<A>,
 ): ArrayModel<A> {
-  const a = getSyncArray(arr, model);
   Dome.useUpdate(PROJECT);
-  Server.useSignal(arr.signal, a.fetch);
-  return a.model;
+  const st = getSyncArray(arr, model);
+  React.useEffect(st.update);
+  Server.useSignal(arr.signal, st.fetch);
+  return st.model;
 }
 
 // --------------------------------------------------------------------------
