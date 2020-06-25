@@ -7,6 +7,7 @@
    @module dome/table/models
 */
 
+import React from 'react';
 import { SortDirectionType } from 'react-virtualized';
 
 // --------------------------------------------------------------------------
@@ -126,6 +127,7 @@ export abstract class Model<Key, Row> {
 
   private clients = new Map<number, Watcher>();
   private clientsId = 0;
+  private callback?: Trigger;
 
   constructor() {
     this.reload = this.reload.bind(this);
@@ -224,5 +226,38 @@ export abstract class Model<Key, Row> {
   }
 
 }
+
+// --------------------------------------------------------------------------
+// --- Model Array as React Hook
+// --------------------------------------------------------------------------
+
+/**
+   React Hook returning the array of all rows in the table.
+   Automatically updates on reload.
+*/
+export function useModelArray<K, A>(model?: Model<K, A>): A[] {
+  const [age, setAge] = React.useState(0);
+  React.useEffect(() => {
+    if (model) {
+      const client = model.link();
+      const reload = () => setAge(age + 1);
+      client.onUpdate(reload);
+      client.onReload(reload);
+      return client.unlink;
+    }
+    return undefined;
+  }, [model]);
+  return React.useMemo(() => {
+    if (model) {
+      const n = model.getRowCount();
+      const a = new Array(n);
+      for (let i = 0; i < n; i++)
+        a[i] = model.getRowAt(i);
+      return a;
+    }
+    return [];
+  }, [model, age]);
+}
+
 
 // --------------------------------------------------------------------------
