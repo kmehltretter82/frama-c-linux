@@ -235,13 +235,13 @@ interface Handler<A> {
 class SyncState<A> {
   UPDATE: string;
   handler: Handler<A>;
-  insync: boolean;
+  upToDate: boolean;
   value?: A;
 
   constructor(h: Handler<A>) {
     this.handler = h;
     this.UPDATE = STATE + h.name;
-    this.insync = false;
+    this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
     this.getValue = this.getValue.bind(this);
@@ -250,7 +250,7 @@ class SyncState<A> {
   }
 
   getValue() {
-    if (!this.insync && Server.isRunning()) {
+    if (!this.upToDate && Server.isRunning()) {
       this.update();
     }
     return this.value;
@@ -258,12 +258,10 @@ class SyncState<A> {
 
   async setValue(v: A) {
     try {
-      this.insync = true;
+      this.upToDate = true;
       this.value = v;
       const setter = this.handler.getter;
-      if (setter) {
-        await Server.send(setter, v);
-      }
+      if (setter) await Server.send(setter, v);
       Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
@@ -275,7 +273,7 @@ class SyncState<A> {
 
   async update() {
     try {
-      this.insync = true;
+      this.upToDate = true;
       const v = await Server.send(this.handler.getter, null);
       this.value = v;
       Dome.emit(this.UPDATE);
@@ -340,39 +338,44 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 class SyncArray<K, A> {
   handler: Array<K, A>;
   model: ArrayModel<A>;
-  insync: boolean;
+  fetching: boolean;
 
   constructor(h: Array<K, A>, m?: ArrayModel<A>) {
     this.handler = h;
-    this.insync = false;
+    this.fetching = false;
     this.model = m ?? new ArrayModel<A>(h.key);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
   }
 
   async fetch() {
+    if (this.fetching) return;
     try {
-      this.insync = true;
-      const data = await Server.send(this.handler.fetch, 50);
-      const { reload = false, removed = [], updated = [], pending = 0 } = data;
-      const { model } = this;
-      if (reload) model.clear();
-      removed.forEach((k) => model.remove(k));
-      updated.forEach((d) => model.add(d));
-      if (pending > 0) setImmediate(this.fetch);
+      this.fetching = true;
+      let pending;
+      do {
+        const data = await Server.send(this.handler.fetch, 50);
+        const { reload = false, removed = [], updated = [] } = data;
+        const { model } = this;
+        if (reload) model.clear();
+        removed.forEach((k) => model.remove(k));
+        updated.forEach((d) => model.add(d));
+        pending = data.pending ?? 0;
+      } while (pending > 0);
     } catch (error) {
       PP.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
+    } finally {
+      this.fetching = false;
     }
   }
 
   async reload() {
     try {
-      await Server.send(this.handler.reload, null);
       this.model.clear();
-      this.insync = false;
+      await Server.send(this.handler.reload, null);
     } catch (error) {
       PP.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
