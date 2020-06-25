@@ -45,6 +45,7 @@ val create_dependency : allow_folding:bool -> t -> Cil_types.kinstr ->
   node -> dependency_kind -> node -> unit
 
 val remove_dependency : t -> node * dependency * node -> unit
+val remove_dependencies : t -> node -> unit
 
 val find_independant_nodes : t -> node list -> node list
 val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->

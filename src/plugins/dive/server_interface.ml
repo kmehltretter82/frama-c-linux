@@ -253,6 +253,6 @@ let () = Request.register ~page
     ~input:(module Node) ~output:(module GraphDiff)
     begin fun node ->
       let context = get_context () in
-      Build.hide_and_reduce context node;
+      Build.hide context node;
       finalize' context None
     end

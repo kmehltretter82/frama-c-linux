@@ -651,32 +651,20 @@ let add_localizable context = function
   | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt context stmt
   | _ -> None (* Do nothing for any other localizable *)
 
-let show _context node =
-  node.node_hidden <- false
 
-let hide context node =
-  if not node.node_hidden then
-    begin
-      let g = get_graph context in
-      (* Set the node as hidden *)
-      node.node_hidden <- true;
-      (* Remove incomming edges *)
-      let incomming_edges = Graph.pred_e g node in
-      List.iter (Graph.remove_dependency g) incomming_edges;
-      (* Dependencies are not there anymore *)
-      node.node_writes_computation <- NotDone;
-      node.node_writes_stmts <- [];
-      (* Notify node update *)
-      update_node context node
-    end
+let remove_dependencies context node =
+  (* Remove incomming edges *)
+  Graph.remove_dependencies (context.graph) node;
+  (* Dependencies are not there anymore *)
+  node.node_writes_computation <- NotDone;
+  node.node_writes_stmts <- [];
+  (* Notify node update *)
+  update_node context node
 
 let remove_disconnected context =
   let l = Graph.find_independant_nodes context.graph context.roots in
   List.iter (remove_node context) l
 
-let hide_and_reduce context node =
-  hide context node;
-  remove_disconnected context
 
 let reduce_to_horizon ({ graph } as context) range new_root =
   (* Reduce to one root *)
@@ -698,12 +686,24 @@ let reduce_to_horizon ({ graph } as context) range new_root =
   let update node =
     if not (is_visible node) then
       if List.exists is_visible (Imprecision_graph.succ graph node) then
-        hide context node
+        remove_dependencies context node
       else
         remove_node context node
   in
   Graph.iter_vertex update graph
 
+let show context node =
+  if node.node_hidden then begin
+    node.node_hidden <- false;
+    explore ~depth:0 context node
+  end
+
+let hide context node =
+  if not node.node_hidden then begin
+    node.node_hidden <- true;
+    remove_dependencies context node;
+    remove_disconnected context
+  end
 
 let take_last_differences context =
   let pp_node fmt n = Format.pp_print_int fmt n.node_key in

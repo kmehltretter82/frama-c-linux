@@ -154,6 +154,8 @@ let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
 let remove_dependency g edge =
   remove_edge_e g edge
 
+let remove_dependencies g node =
+  iter_pred_e (remove_dependency g) g node
 
 let find_independant_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
