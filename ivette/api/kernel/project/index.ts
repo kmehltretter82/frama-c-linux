@@ -23,7 +23,7 @@ export type projectInfo =
 /** Loose decoder for `projectInfo` */
 export const jProjectInfo: Json.Loose<projectInfo> =
   Json.jObject({
-    id: Json.jFail(Json.jKey('#project'),'#project expected'),
+    id: Json.jFail(Json.jKey<'#project'>('#project'),'#project expected'),
     name: Json.jFail(Json.jString,'String expected'),
     current: Json.jFail(Json.jBoolean,'Boolean expected'),
   });
@@ -48,7 +48,8 @@ export type projectRequest =
 /** Loose decoder for `projectRequest` */
 export const jProjectRequest: Json.Loose<projectRequest> =
   Json.jObject({
-    project: Json.jFail(Json.jKey('#project'),'#project expected'),
+    project: Json.jFail(Json.jKey<'#project'>('#project'),
+               '#project expected'),
     request: Json.jFail(Json.jString,'String expected'),
     data: Json.jAny,
   });
@@ -78,7 +79,7 @@ export const getCurrent: Server.GetRequest<null,projectInfo> = {
 export const setCurrent: Server.SetRequest<Json.key<'#project'>,null> = {
   kind: Server.RqKind.SET,
   name:   'kernel.project.setCurrent',
-  input:  Json.jKey('#project'),
+  input:  Json.jKey<'#project'>('#project'),
   output: Json.jNull,
 };
 

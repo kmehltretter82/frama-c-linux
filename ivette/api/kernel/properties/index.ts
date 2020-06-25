@@ -248,13 +248,13 @@ export interface statusData {
 /** Loose decoder for `statusData` */
 export const jStatusData: Json.Loose<statusData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey('#status'),'#status expected'),
+    key: Json.jFail(Json.jKey<'#status'>('#status'),'#status expected'),
     descr: Json.jFail(Json.jString,'String expected'),
     kind: jPropKindSafe,
     names: Json.jList(Json.jString),
     status: jPropStatusSafe,
-    function: Json.jKey('#fct'),
-    kinstr: Json.jKey('#stmt'),
+    function: Json.jKey<'#fct'>('#fct'),
+    kinstr: Json.jKey<'#stmt'>('#stmt'),
     source: jSourceSafe,
     alarm: Json.jString,
     alarm_descr: Json.jString,
@@ -308,7 +308,7 @@ export const fetchStatus: Server.GetRequest<number,
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jStatusData),
-            removed: Json.jList(Json.jKey('#status')),
+            removed: Json.jList(Json.jKey<'#status'>('#status')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };

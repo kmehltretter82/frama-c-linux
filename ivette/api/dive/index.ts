@@ -72,7 +72,7 @@ export const addFunctionAlarms: Server.ExecRequest<Json.key<'#fct'>,Json.json
   > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.addFunctionAlarms',
-  input:  Json.jKey('#fct'),
+  input:  Json.jKey<'#fct'>('#fct'),
   output: Json.jAny,
 };
 
@@ -81,7 +81,7 @@ export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json
   > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.explore',
-  input:  Json.jIndex('#dive-node'),
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
 
@@ -89,7 +89,7 @@ export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json
 export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.show',
-  input:  Json.jIndex('#dive-node'),
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
 
@@ -97,7 +97,7 @@ export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
 export const hide: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.hide',
-  input:  Json.jIndex('#dive-node'),
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
 

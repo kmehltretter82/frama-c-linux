@@ -101,8 +101,6 @@ let model () = ref []
 let column (type a b) ~name ~descr
     ~(data: b Request.output) ~(get : a -> b) (model : a model) =
   let module D = (val data) in
-  if name = "key" || name = "index" then
-    raise (Invalid_argument "Server.States.column: invalid name") ;
   if List.exists (fun (fd,_) -> fd.Package.fd_name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
   let fd = Package.{
@@ -273,8 +271,10 @@ let register_array ~package ~name ~descr ~key
   let open Markdown in
   let href = link ~name () in
   let columns = List.rev !model in
+  if List.exists (fun (fd,_) -> fd.Package.fd_name = keyName) columns then
+    raise (Invalid_argument "States.array: key name overrides column name") ;
   let fields = Package.{
-      fd_name = "key" ;
+      fd_name = keyName ;
       fd_type = Jkey keyKind ;
       fd_descr = plain "Entry identifier." ;
     } :: List.map fst columns in
@@ -298,7 +298,7 @@ let register_array ~package ~name ~descr ~key
   let signature = Request.signature ~input:(module Jint) () in
   let module Jkeys = Jlist(struct
       include Jstring
-      let jtype = Package.Jkey name
+      let jtype = Package.Jkey keyKind
     end) in
   let module Jrows = Jlist (struct
       include Jany

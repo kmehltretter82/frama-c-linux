@@ -102,8 +102,8 @@ let makeJtype ?self ~names =
 (* -------------------------------------------------------------------------- *)
 
 let jprim fmt name = Format.fprintf fmt "Json.%s" name
-let jkey fmt kd = Format.fprintf fmt "Json.jKey('#%s')" kd
-let jindex fmt kd = Format.fprintf fmt "Json.jIndex('#%s')" kd
+let jkey fmt kd = Format.fprintf fmt "Json.jKey<'#%s'>('#%s')" kd kd
+let jindex fmt kd = Format.fprintf fmt "Json.jIndex<'#%s'>('#%s')" kd kd
 
 let jcall names fmt id =
   try Format.pp_print_string fmt (Pkg.IdMap.find id names)

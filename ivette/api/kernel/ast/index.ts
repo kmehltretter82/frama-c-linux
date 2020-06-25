@@ -96,7 +96,8 @@ export interface markerInfoData {
 /** Loose decoder for `markerInfoData` */
 export const jMarkerInfoData: Json.Loose<markerInfoData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey('#markerInfo'),'#markerInfo expected'),
+    key: Json.jFail(Json.jKey<'#markerInfo'>('#markerInfo'),
+           '#markerInfo expected'),
     kind: jMarkerKindSafe,
     name: Json.jFail(Json.jString,'String expected'),
     descr: Json.jFail(Json.jString,'String expected'),
@@ -140,7 +141,7 @@ export const fetchMarkerInfo: Server.GetRequest<number,
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jMarkerInfoData),
-            removed: Json.jList(Json.jKey('#markerInfo')),
+            removed: Json.jList(Json.jKey<'#markerInfo'>('#markerInfo')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
@@ -165,13 +166,13 @@ export const jMarker: Json.Loose<marker> =
   Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
               Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
               Json.key<'#property'>>(
-    Json.jKey('#stmt'),
-    Json.jKey('#decl'),
-    Json.jKey('#lval'),
-    Json.jKey('#expr'),
-    Json.jKey('#term'),
-    Json.jKey('#global'),
-    Json.jKey('#property'),
+    Json.jKey<'#stmt'>('#stmt'),
+    Json.jKey<'#decl'>('#decl'),
+    Json.jKey<'#lval'>('#lval'),
+    Json.jKey<'#expr'>('#expr'),
+    Json.jKey<'#term'>('#term'),
+    Json.jKey<'#global'>('#global'),
+    Json.jKey<'#property'>('#property'),
   );
 
 /** Safe decoder for `marker` */
@@ -186,14 +187,14 @@ export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
-  output: Json.jList(Json.jKey('#fct')),
+  output: Json.jList(Json.jKey<'#fct'>('#fct')),
 };
 
 /** Print the AST of a function */
 export const printFunction: Server.GetRequest<Json.key<'#fct'>,text> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.printFunction',
-  input:  Json.jKey('#fct'),
+  input:  Json.jKey<'#fct'>('#fct'),
   output: jText,
 };
 
@@ -210,7 +211,8 @@ export interface functionsData {
 /** Loose decoder for `functionsData` */
 export const jFunctionsData: Json.Loose<functionsData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey('#functions'),'#functions expected'),
+    key: Json.jFail(Json.jKey<'#functions'>('#functions'),
+           '#functions expected'),
     name: Json.jFail(Json.jString,'String expected'),
     signature: Json.jFail(Json.jString,'String expected'),
   });
@@ -251,7 +253,7 @@ export const fetchFunctions: Server.GetRequest<number,
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jFunctionsData),
-            removed: Json.jList(Json.jKey('#functions')),
+            removed: Json.jList(Json.jKey<'#functions'>('#functions')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
