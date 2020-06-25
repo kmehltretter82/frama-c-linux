@@ -8,7 +8,7 @@
  */
 
 import React, { ReactNode } from 'react';
-import { forEach, debounce } from 'lodash';
+import { forEach, debounce, throttle } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
 import { DraggableCore } from 'react-draggable';
@@ -295,9 +295,9 @@ class TableState<Key, Row> {
 
   constructor() {
     this.unwind = this.unwind.bind(this);
-    this.forceUpdate = this.forceUpdate.bind(this);
+    this.forceUpdate = throttle(this.forceUpdate.bind(this), 200);
+    this.updateGrid = throttle(this.updateGrid.bind(this), 200);
     this.fullReload = this.fullReload.bind(this);
-    this.updateGrid = this.updateGrid.bind(this);
     this.onRowsRendered = this.onRowsRendered.bind(this);
     this.rowClassName = this.rowClassName.bind(this);
     this.onHeaderMenu = this.onHeaderMenu.bind(this);
