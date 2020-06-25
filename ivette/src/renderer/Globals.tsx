@@ -3,22 +3,11 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { toArray, Dictionary } from 'lodash';
+import * as Dome from 'dome';
 import { Section, Item } from 'dome/frame/sidebars';
 import * as States from 'frama-c/states';
 import { alpha } from 'dome/data/compare';
-
-// --------------------------------------------------------------------------
-// --- Globals API
-// --------------------------------------------------------------------------
-
-interface Gfun {
-  key: string;
-  name: string;
-  signature: string;
-}
-
-type Gfuns = undefined | Dictionary<Gfun>;
+import { functions, functionsData } from 'api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Globals Section
@@ -28,13 +17,25 @@ export default () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const gfuns: Gfuns = States.useSyncArray('kernel.ast.functions');
+  const model = States.useSyncArray(functions);
+  const forceUpdate = Dome.useForceUpdate() as (() => void);
+  React.useEffect(() => {
+    model.setNaturalOrder((f1, f2) => alpha(f1.name, f2.name));
+    const client = model.link();
+    client.onReload(forceUpdate);
+    client.onUpdate(forceUpdate);
+    return client.unlink;
+  }, [model, forceUpdate]);
 
   // Functions
-  const functions = toArray(gfuns).sort((f1, f2) => alpha(f1.name, f2.name));
+  const n = model.getRowCount();
+  const fcts: functionsData[] = [];
+  for (let i = 0; i < n; i++) {
+    fcts.push(model.getRowAt(i));
+  }
 
   const current: undefined | string = selection?.current?.function;
-  const makeFctItem = (fct: Gfun) => {
+  const makeFctItem = (fct: functionsData) => {
     const kf = fct.name;
     return (
       <Item
@@ -49,7 +50,7 @@ export default () => {
 
   return (
     <Section label="Functions">
-      {functions.map(makeFctItem)}
+      {fcts.map(makeFctItem)}
     </Section>
   );
 

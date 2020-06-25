@@ -756,7 +756,10 @@ export interface Killable<Data> extends Promise<Data> {
  *  You may _kill_ the request before its normal termination by
  *  invoking `kill()` on the returned promised.
  */
-export function send<In, Out>(request: Request<RqKind, In, Out>, param: In): Killable<Out> {
+export function send<In, Out>(
+  request: Request<RqKind, In, Out>,
+  param: In,
+): Killable<Out> {
   if (!isRunning()) return Promise.reject(new Error('Server not running'));
   if (!request.name) return Promise.reject(new Error('Undefined request'));
   const rid = `RQ.${rqCount}`;

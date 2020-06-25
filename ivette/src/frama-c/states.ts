@@ -130,11 +130,12 @@ export function useRequest<In, Out>(
   const project = useProject();
   const [response, setResponse] =
     React.useState<Out | undefined>(options.offline ?? undefined);
-  const footprint = project ? JSON.stringify([project, rq.name, params]) : undefined;
+  const footprint =
+    project ? JSON.stringify([project, rq.name, params]) : undefined;
 
   const update = (opt: Out | undefined | null) => {
     if (opt !== null) setResponse(opt);
-  }
+  };
 
   async function trigger() {
     if (project && rq && params !== undefined) {
@@ -169,7 +170,7 @@ export type Tag = {
   name: string;
   label?: string;
   descr?: string;
-}
+};
 
 const holdCurrent = { offline: null, pending: null, onError: null };
 
@@ -179,9 +180,10 @@ export function useTags(rq: GetTags): Map<string, Tag> {
   const tags = useRequest(rq, null, holdCurrent);
   return React.useMemo(() => {
     const m = new Map<string, Tag>();
-    tags && tags.forEach((tg) => m.set(tg.name, tg));
+    if (tags !== undefined)
+      tags.forEach((tg) => m.set(tg.name, tg));
     return m;
-  }, tags);
+  }, [tags]);
 }
 
 // --------------------------------------------------------------------------
@@ -205,7 +207,7 @@ export interface Fetches<K, A> {
   reload: boolean;
   pending: number;
   updated: A[];
-  removed: Json.key<K>[]
+  removed: Json.key<K>[];
 }
 
 export interface Array<K, A> {
@@ -216,7 +218,7 @@ export interface Array<K, A> {
   reload: Server.GetRequest<null, null>;
 }
 
-type id = { project: string, state: string };
+type id = { project: string; state: string };
 
 // --------------------------------------------------------------------------
 // --- Handler for Synchronized St byates
@@ -265,7 +267,8 @@ class SyncState<A> {
       Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
-        `Fail to set value of syncState '${this.handler.name}'. ${error.toString()}`,
+        `Fail to set value of syncState '${this.handler.name}'.`,
+        `${error.toString()}`,
       );
     }
   }
@@ -277,7 +280,10 @@ class SyncState<A> {
       this.value = v;
       Dome.emit(this.UPDATE);
     } catch (error) {
-      PP.error(`Fail to update syncState '${this.handler.name}'. ${error.toString()}`);
+      PP.error(
+        `Fail to update syncState '${this.handler.name}'.`,
+        `${error.toString()}`,
+      );
     }
   }
 }
@@ -307,7 +313,9 @@ Server.onShutdown(() => syncStates.clear());
 /**
    Synchronization with a (projectified) server state.
  */
-export function useSyncState<A>(st: State<A>): [A | undefined, (value: A) => void] {
+export function useSyncState<A>(
+  st: State<A>,
+): [A | undefined, (value: A) => void] {
   const s = getSyncState(st);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
@@ -328,20 +336,13 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 // --- Synchronized Arrays
 // --------------------------------------------------------------------------
 
-export interface Model<A> {
-  clear(): void;
-  remove(key: string): void;
-  add(entry: A): void;
-  clear(): void;
-}
-
 // one per project
 class SyncArray<K, A> {
   handler: Array<K, A>;
-  model: Model<A>;
+  model: ArrayModel<A>;
   insync: boolean;
 
-  constructor(h: Array<K, A>, m?: Model<A>) {
+  constructor(h: Array<K, A>, m?: ArrayModel<A>) {
     this.handler = h;
     this.insync = false;
     this.model = m ?? new ArrayModel<A>(h.key);
@@ -354,7 +355,7 @@ class SyncArray<K, A> {
       this.insync = true;
       const data = await Server.send(this.handler.fetch, 50);
       const { reload = false, removed = [], updated = [], pending = 0 } = data;
-      const model = this.model;
+      const { model } = this;
       if (reload) model.clear();
       removed.forEach((k) => model.remove(k));
       updated.forEach((d) => model.add(d));
@@ -388,18 +389,19 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<id, SyncArray<any, any>>();
 
-function getSyncArray<K, A>(arr: Array<K, A>, model?: Model<A>): SyncArray<K, A> {
+function getSyncArray<K, A>(
+  arr: Array<K, A>,
+  model?: ArrayModel<A>,
+): SyncArray<K, A> {
   const id = { project: currentProject ?? '', state: arr.name };
   let a = syncArrays.get(id);
   if (!a) {
     a = new SyncArray(arr, model);
     syncArrays.set(id, a);
-  } else {
-    if (model && a.model !== model) {
-      model.clear();
-      a.reload();
-      a.model = model;
-    }
+  } else if (model && a.model !== model) {
+    model.clear();
+    a.reload();
+    a.model = model;
   }
   return a;
 }
@@ -420,7 +422,10 @@ export function reloadArray<K, A>(arr: Array<K, A>) {
 /**
    Use Synchronized Array (Custom React Hook).
  */
-export function useSyncArray<K, A>(arr: Array<K, A>, model?: Model<A>): Model<A> {
+export function useSyncArray<K, A>(
+  arr: Array<K, A>,
+  model?: ArrayModel<A>,
+): ArrayModel<A> {
   const a = getSyncArray(arr, model);
   Dome.useUpdate(PROJECT);
   Server.useSignal(arr.signal, a.fetch);
@@ -431,7 +436,8 @@ export function useSyncArray<K, A>(arr: Array<K, A>, model?: Model<A>): Model<A>
 // --- Selection
 // --------------------------------------------------------------------------
 
-type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> =
+  Partial<T> & U[keyof U];
 
 export interface FullLocation {
   /** Function name. */

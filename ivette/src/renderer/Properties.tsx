@@ -87,7 +87,10 @@ const defaultFilter =
 };
 
 
-function filterStatus(f: typeof defaultStatusFilter, status: Properties.propStatus) {
+function filterStatus(
+  f: typeof defaultStatusFilter,
+  status: Properties.propStatus,
+) {
   switch (status) {
     case 'valid':
     case 'valid_but_dead': return f.valid;
@@ -104,7 +107,10 @@ function filterStatus(f: typeof defaultStatusFilter, status: Properties.propStat
   }
 }
 
-function filterKind(f: typeof defaultKindFilter, kind: Properties.propKind) {
+function filterKind(
+  f: typeof defaultKindFilter,
+  kind: Properties.propKind,
+) {
   switch (kind) {
     case 'assert': return f.assert;
     case 'loop_invariant':
@@ -232,7 +238,7 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.ArrayModel<Property> implements States.Model<Property> {
+class PropertyModel extends Arrays.ArrayModel<Property> {
 
   private filterFun?: string;
   private filterProp = _.cloneDeep(defaultFilter);
@@ -431,7 +437,7 @@ const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
 
-  States.useSyncArray<"#status", Property>(Properties.status, model);
+  States.useSyncArray<'#status', Property>(Properties.status, model);
 
   const [selection, updateSelection] = States.useSelection();
 
