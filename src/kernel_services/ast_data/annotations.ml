@@ -1103,7 +1103,20 @@ let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
     Extlib.may Property_status.register
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
   in
-  extend_behavior e kf ?stmt ?active ?behavior set_bhv
+  let old_spec = get_full_spec kf ?stmt ?behavior:active () in
+  let bhv =
+    match behavior with
+    | None -> Cil.find_default_behavior old_spec
+    | Some name ->
+      List.find_opt (fun { b_name } -> b_name = name) old_spec.spec_behavior
+  in
+  let is_empty =
+    match bhv with
+    | None -> true
+    | Some b -> b.b_allocation = FreeAllocAny
+  in
+  if not (keep_empty && is_empty) then
+    extend_behavior e kf ?stmt ?active ?behavior set_bhv
 
 let add_extended e kf ?stmt ?active ?behavior ext =
   let set_bhv _ e_bhv =
@@ -1235,54 +1248,43 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
          "More than one loop assigns clause for a statement. \
           Annotations internal state broken.")
   | AAllocation (bhvs, alloc) ->
-    let filter ca =
+    let filter_ca ca =
       match ca.annot_content with
       | AAllocation(bhvs',_) -> is_same_behavior_set bhvs bhvs'
       | _ -> false
     in
-    (match code_annot ~filter stmt with
+    let filter e ca = Emitter.equal e emitter && filter_ca ca in
+    let ca_e = code_annot_emitter ~filter stmt in
+    let ca_total = code_annot ~filter:filter_ca stmt in
+    (match ca_total with
      | [] when keep_empty -> ()
      | [] -> fill_tables ca (Property.ip_of_code_annot kf stmt ca)
-     | l ->
-       let merge_alloc_ca acc alloc =
-         match alloc.annot_content with
-         | AAllocation(_,a) -> merge_allocation ~keep_empty acc a
-         | _ -> acc
-       in
-       let alloc' = List.fold_left merge_alloc_ca FreeAllocAny l in
-       let merged_a =
-         { ca with annot_content = AAllocation(bhvs,alloc') }
-       in
-       let ip =
-         Property.(
-           ip_of_allocation kf (Kstmt stmt)
-             (Id_loop merged_a) alloc')
-       in
-       Extlib.may Property_status.remove ip;
-       let new_alloc = merge_allocation ~keep_empty alloc' alloc in
-       let new_a =
-         { ca with annot_content = AAllocation(bhvs,new_alloc) }
-       in
-       let ip =
-         Property.(
-           ip_of_allocation
-             kf (Kstmt stmt) (Id_loop new_a) new_alloc)
-       in
-       let emit_a =
-         match code_annot ~emitter ~filter stmt with
-         | [] -> ca
-         | [ { annot_content = AAllocation(_,alloc') } as ca ] ->
+     | [{ annot_content = AAllocation(_,alloc_total)}] ->
+       let alloc_e =
+         match ca_e with
+         | [] -> FreeAllocAny
+         | [ { annot_content = AAllocation(_, alloc') } as ca,_ ] ->
            remove_code_annot_internal emitter ~kf stmt ca;
-           { ca with annot_content =
-                      AAllocation(
-                        bhvs,
-                        merge_allocation ~keep_empty alloc' alloc) }
+           alloc'
          | _ ->
            Kernel.fatal
-             "More than one allocation clause for a statement. \
-              Annotations internal state broken"
+             "More than one loop assigns clause for a statement. \
+              Annotations internal state broken."
        in
-       fill_tables emit_a (Extlib.list_of_opt ip))
+       (* we have assigns at statement level, just not from this
+          emitter yet, hence merge at emitter level regardless of keep_empty *)
+       let merged_e = merge_allocation ~keep_empty:false alloc_e alloc in
+       let new_a = { ca with annot_content = AAllocation(bhvs,merged_e) } in
+       let merged_total = merge_allocation ~keep_empty alloc_total alloc in
+       let ips =
+         Property.ip_of_code_annot kf stmt
+           { ca with annot_content = AAllocation(bhvs,merged_total) }
+       in
+       fill_tables new_a ips
+     | _ ->
+       Kernel.fatal
+         "More than one loop assigns clause for a statement. \
+          Annotations internal state broken.")
   | APragma _ | AExtended _ ->
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 

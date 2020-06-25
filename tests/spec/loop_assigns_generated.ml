@@ -19,7 +19,7 @@ let add_assigns ?(keep_empty=false) e kf stmt v =
        (AAssigns ([], mk_assigns e v)));
   Filecheck.check_ast ("after insertion of loop assigns " ^ v.vname)
 
-let add_allocates ?(keep_empty=false) e kf stmt v =
+let mk_allocates e v =
   let lv = Cil.cvar_to_lvar v in
   let term_v = Logic_const.tvar lv in
   let named_term_v =
@@ -27,9 +27,11 @@ let add_allocates ?(keep_empty=false) e kf stmt v =
       term_name = ("added_by_"^(Emitter.get_name e))::term_v.term_name }
   in
   let id_v = Logic_const.new_identified_term named_term_v in
+  FreeAlloc ([],[id_v])
+
+let add_allocates ?(keep_empty=false) e kf stmt v =
   Annotations.add_code_annot ~keep_empty e ~kf stmt
-    (Logic_const.new_code_annotation
-       (AAllocation([],FreeAlloc ([],[id_v]))));
+    (Logic_const.new_code_annotation (AAllocation([],mk_allocates e v)));
   Filecheck.check_ast ("after insertion of loop allocates " ^ v.vname )
 
 let check_only_one f =
@@ -61,6 +63,7 @@ let main () =
   let l = Cil.makeLocalVar def ~insert:true "l" Cil.intType in
   let p = Cil.makeLocalVar def ~insert:true "p" Cil.intPtrType in
   let q = Cil.makeLocalVar def ~insert:true "q" Cil.intPtrType in
+  let r = Cil.makeLocalVar def ~insert:true "r" Cil.intPtrType in
   add_assigns e1 kf s j;
   add_assigns e2 kf s k;
   add_assigns e1 kf s l;
@@ -68,6 +71,9 @@ let main () =
   Annotations.add_assigns ~keep_empty:true e1 kf ~stmt:s3 (mk_assigns e1 k);
   add_allocates e1 kf s p;
   add_allocates e2 kf s q;
+  add_allocates e1 kf s r;
+  add_allocates ~keep_empty:true e2 kf s2 p;
+  Annotations.add_allocates ~keep_empty:true e1 kf ~stmt:s3 (mk_allocates e1 k);
   Annotations.iter_code_annot (check_only_one Logic_utils.is_assigns) s;
   Annotations.iter_code_annot (check_only_one Logic_utils.is_allocation) s;
   let lassigns =
