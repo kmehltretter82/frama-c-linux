@@ -160,8 +160,15 @@ let remove_dependencies g node =
 let find_independant_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
       include G
-      let iter_succ = G.iter_pred
-      let fold_succ = G.fold_pred
+      (* Consider the graph as unoriented *)
+      let iter_succ f g n =
+        iter_pred f g n;
+        iter_succ f g n
+
+      let fold_succ f g n acc =
+        let acc = fold_pred f g n acc in
+        let acc = fold_succ f g n acc in
+        acc
     end)
   in
   let module Table = Hashtbl.Make (Node) in
