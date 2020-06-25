@@ -442,28 +442,33 @@ let hash_list f l =
     | _ -> acc
   in aux 47 3 l
 
-let hash_ext_kind = function
-  | Ext_id i -> Datatype.Int.hash i
-  | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
-  | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
-
-let compare_ext_kind k1 k2 =
-  match k1, k2 with
-  | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
-  | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
-  | Ext_terms terms1, Ext_terms terms2 ->
-    Extlib.list_compare Logic_utils.compare_term terms1 terms2
-  | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
-  | Ext_preds p1, Ext_preds p2 ->
-    Extlib.list_compare Logic_utils.compare_predicate p1 p2
 
 module ExtMerging =
   Merging
     (struct
       type t = acsl_extension
-      let hash (e : acsl_extension) =
+      let rec hash (e : acsl_extension) =
+        let hash_ext_kind = function
+          | Ext_id i -> Datatype.Int.hash i
+          | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
+          | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
+          | Ext_annot annots -> 5 * (hash_list hash annots)
+        in
         Datatype.String.hash e.ext_name + 5 * hash_ext_kind e.ext_kind
-      let compare (e1 : acsl_extension) (e2 : acsl_extension) =
+      let rec compare (e1 : acsl_extension) (e2 : acsl_extension) =
+        let compare_ext_kind k1 k2 =
+          match k1, k2 with
+          | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
+          | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
+          | Ext_terms terms1, Ext_terms terms2 ->
+            Extlib.list_compare Logic_utils.compare_term terms1 terms2
+          | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
+          | Ext_preds p1, Ext_preds p2 ->
+            Extlib.list_compare Logic_utils.compare_predicate p1 p2
+          | Ext_preds _, _ -> 1 | _, Ext_preds _ -> -1
+          | Ext_annot a1 , Ext_annot a2  ->
+            Extlib.list_compare compare a1 a2
+        in
         let res = Datatype.String.compare e1.ext_name e2.ext_name in
         if res <> 0 then res
         else

@@ -1994,6 +1994,9 @@ and childrenCilExtended vis p =
   | Ext_preds preds ->
     let preds' = mapNoCopy (visitCilPredicate vis) preds in
     if preds == preds' then p else Ext_preds preds'
+  | Ext_annot annots ->
+    let annots' = mapNoCopy (visitCilExtended vis) annots in
+    if annots == annots' then p else Ext_annot annots'
 
 and visitCilPredicates vis ps = mapNoCopy (visitCilIdPredicate vis) ps
 

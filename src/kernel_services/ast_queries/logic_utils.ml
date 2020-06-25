@@ -1186,7 +1186,7 @@ let is_same_pragma p1 p2 =
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
   | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
 
-let is_same_extension x1 x2 =
+let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
   (x1.ext_has_status = x2.ext_has_status) &&
   match x1.ext_kind, x2.ext_kind with
@@ -1195,7 +1195,9 @@ let is_same_extension x1 x2 =
     is_same_list is_same_term t1 t2
   | Ext_preds p1, Ext_preds p2 ->
     is_same_list is_same_predicate p1 p2
-  | (Ext_id _ | Ext_preds _ | Ext_terms _), _ -> false
+  | Ext_annot a1, Ext_annot a2 ->
+    is_same_list is_same_extension a1 a2
+  | (Ext_id _ | Ext_preds _ | Ext_terms _ | Ext_annot _ ), _ -> false
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with

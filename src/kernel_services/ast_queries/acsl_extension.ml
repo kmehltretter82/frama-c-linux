@@ -47,6 +47,7 @@ let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
+  | Ext_annot an -> Pretty_utils.pp_list ~sep:",@ " printer#extended fmt an
 
 let default_short_printer name _printer fmt _ext_kind =
   Format.fprintf fmt "%s" name
