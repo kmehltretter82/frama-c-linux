@@ -701,7 +701,7 @@ let emit_all_statuses _ =
 let () = Ast.apply_after_computed emit_all_statuses
 
 let add_annotation kf st a =
-  Annotations.add_code_annot Emitter.end_user ~kf st a;
+  Annotations.add_code_annot ~keep_empty:false Emitter.end_user ~kf st a;
   (* Now check if the annotation is valid by construction
      (provided normalization is correct). *)
   match a.annot_content with
@@ -741,7 +741,7 @@ let synchronize_source_annot has_new_stmt kf =
                       st_ann.skind <- (Block (Cil.mkBlockNonScoping [st]));
                       has_new_stmt := true;
                       Annotations.add_code_annot
-                        Emitter.end_user ~kf st_ann annot;
+                        ~keep_empty:false Emitter.end_user ~kf st_ann annot;
                       (true, st_ann)
                     end else begin
                       add_annotation kf st annot;

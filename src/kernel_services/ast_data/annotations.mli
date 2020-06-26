@@ -261,6 +261,7 @@ val fold_decreases:
 (**************************************************************************)
 
 val add_code_annot:
+  ?keep_empty:bool ->
   Emitter.t -> ?kf:kernel_function -> stmt -> code_annotation -> unit
 (** Add a new code annotation attached to the given statement. If [kf] is
     provided, the function runs faster.
@@ -270,9 +271,16 @@ val add_code_annot:
     Trying to associate more than one will result in a merge of the contracts.
 
     The same things happens with loop assigns and allocates/frees.
+    The [keep_empty] argument is only used for loop assigns
+    and loop allocates, where it is used to decide whether to add the given
+    code annot in case the corresponding category was empty. It defaults to
+    [true], which is sound wrt ACSL semantics of equating an absence of
+    annotation with assigns/allocates \everything.
 
     There can be at most one loop variant registered per statement.
     Attempting to register a second one will result in a fatal error.
+
+    @modify Frama-C+dev: add keep_empty argument
  *)
 
 val add_assert:

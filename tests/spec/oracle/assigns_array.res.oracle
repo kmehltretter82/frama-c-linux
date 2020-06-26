@@ -36,8 +36,8 @@ int h(int reset, int n)
   int i;
   int r = 0;
   i = 0;
-  /*@ for bar: loop assigns \nothing;
-      for foo: loop assigns Tab[0 .. i]; */
+  /*@ for foo: loop assigns Tab[0 .. i];
+      for bar: loop assigns \nothing; */
   while (i < n) {
     r += Tab[i];
     if (reset) Tab[i] = 0;

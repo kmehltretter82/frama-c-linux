@@ -9,9 +9,9 @@ int f(int z)
   int y = 2;
   /*@ assigns y; */
   __asm__ ("mov %1, %0\n\t" : "=r" (y) : "r" (x));
+  /*@ for b: assigns x, y; */
   /*@ assigns x;
       assigns x \from y; */
-  /*@ for b: assigns x, y; */
   __asm__ ("mov %1, %0\n\t" : "=r" (x) : "r" (y));
   /*@ assigns x, y;
       
