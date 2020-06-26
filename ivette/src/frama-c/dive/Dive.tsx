@@ -62,7 +62,7 @@ class Dive {
   _layout = '';
   layoutOptions: Cytoscape.LayoutOptions | undefined;
   currentSelection: string | null = null;
-  onSelect: ((marker: string | null) => void) | null = null;
+  onSelect: ((_: States.Location[]) => void) | null = null;
 
   constructor(cy: Cytoscape.Core | null = null) {
     this.cy = cy || Cytoscape();
@@ -83,6 +83,9 @@ class Dive {
   setupSelection(): void {
     this.cy.on('click', 'node', (event) => {
       const node = event.target;
+      const data = node?.data();
+      if (data?.writes)
+        this.onSelect?.(data.writes);
       node.select();
       this.explore(node);
     });
@@ -435,8 +438,6 @@ class Dive {
 
     node.select();
     node.incomers('edge').filter(hasOrigin).select();
-
-    this.onSelect?.(this.currentSelection);
   }
 }
 
@@ -445,7 +446,7 @@ const GraphView = () => {
   // Hooks
   const [dive, setDive] = useState(() => new Dive());
   const node: React.MutableRefObject<string | undefined> = React.useRef();
-  const [selection] = States.useSelection();
+  const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
   const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
   const [selectionMode, flipSelectionMode] =
@@ -464,6 +465,26 @@ const GraphView = () => {
   useEffect(() => {
     dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
   }, [dive, selectionMode]);
+
+  /* When clicking on a node, select its writes locations as a multiple
+     selection. If these locations were already selected, select the next
+     location in the multiple selection. */
+  useEffect(() => {
+    dive.onSelect = (locations) => {
+      if (updateSelection) {
+        /* TODO: implements an equality test between arrays. */
+        if (locations === selection?.multiple?.allSelections) {
+          updateSelection('MULTIPLE_NEXT');
+        }
+        else {
+          updateSelection({
+            locations,
+            index: 0
+          });
+        }
+      }
+    };
+  }, [dive, selection, updateSelection]);
 
   // Updates the graph according to the selected marker.
   useEffect(() => {
