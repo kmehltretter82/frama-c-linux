@@ -194,9 +194,6 @@ module Location_Bytes : sig
 
   (** {2 Misc} *)
 
-  val iter_on_strings :
-    skip:Base.t option -> (Base.t -> string -> int -> int -> unit) -> t -> unit
-
   (** [is_relationable loc] returns [true] iff [loc] represents a single
       memory location. *)
   val is_relationable: t -> bool

@@ -28,28 +28,54 @@ open Abstract_value
                                Comparison
    -------------------------------------------------------------------------- *)
 
+(* Representation of a pointer value to a literal string, with the string
+   itself, its length and the offsets pointed to in the string. *)
+type str = { string: string; offset: Ival.t; length: int; }
+
+(* Returns true if one string is a suffix of the other, and if there are offsets
+   pointing to the same point in this suffix. *)
+let may_be_suffix s1 s2 =
+  (* Requires [s1.length] <= [s2.length]. *)
+  let is_suffix s1 s2 =
+    let sub2 = String.sub s2.string (s2.length - s1.length) s1.length in
+    String.equal s1.string sub2 &&
+    let delta = Integer.of_int (s1.length - s2.length) in
+    let off2 = Ival.add_singleton_int delta s2.offset in
+    not (Ival.is_bottom (Ival.narrow s1.offset off2))
+  in
+  if s1.length <= s2.length then is_suffix s1 s2 else is_suffix s2 s1
+
+(* Returns true if [s1] may be shared with [s2] or a substring of [s2]. *)
+let rec may_be_shared_within s1 s2 =
+  may_be_suffix s1 s2 ||
+  match String.rindex_opt s2.string '\x00' with
+  | None -> false
+  | Some i ->
+    let s2 = { s2 with string = String.sub s2.string 0 i; length = i } in
+    may_be_shared_within s1 s2
+
+(* Returns true if [s1] and [s2] might point to the same literal string. *)
+let may_be_shared str1 off1 str2 off2 =
+  let s1 = { string = str1; offset = off1; length = String.length str1 }
+  and s2 = { string = str2; offset = off2; length = String.length str2 } in
+  may_be_shared_within s1 s2 || may_be_shared_within s2 s1
+
+(* Checks if all string bases of [v] satisfy [f]. *)
+let for_all_string v f =
+  Locations.Location_Bytes.for_all
+    (fun base off -> match base with
+       | Base.String (_, Base.CSString str) -> f base str off
+       | Base.String (_, Base.CSWstring _ ) -> false (* Not implemented yet *)
+       | _ -> true)
+    v
+
 (* Literal strings can only be compared if their contents are recognizably
    different (or the strings are physically the same). *)
-let are_comparable_string pointer1 pointer2 =
-  try
-    Locations.Location_Bytes.iter_on_strings ~skip:None
-      (fun base1 s1 offs1 len1 ->
-         Locations.Location_Bytes.iter_on_strings ~skip:(Some base1)
-           (fun _ s2 offs2 len2 ->
-              let delta = offs1 - offs2 in
-              let start = if delta <= 0 then -delta else 0
-              and max = min len2 (len1 - delta) in
-              let length = max - start + 1 in
-              let sub1 = String.sub s1 (start + delta) length
-              and sub2 = String.sub s2 start length in
-              if String.compare sub1 sub2 = 0
-              then raise Not_found)
-           pointer1)
-      pointer2;
-    true
-  with
-  | Not_found -> false
-  | Invalid_argument _s -> assert false
+let are_comparable_string v1 v2 =
+  for_all_string v1 (fun base1 str1 off1 ->
+      for_all_string v2 (fun base2 str2 off2 ->
+          Base.equal base1 base2 ||
+          not (may_be_shared str1 off1 str2 off2)))
 
 (* Under-approximation of the fact that a pointer is actually correct w.r.t.
    what can be created through pointer arithmetics. See C99 6.5.6 and 6.5.8
