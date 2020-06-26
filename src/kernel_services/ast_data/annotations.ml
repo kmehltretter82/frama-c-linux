@@ -1052,6 +1052,10 @@ let get_full_spec kf ?stmt ?(behavior=[]) () =
      | [ { annot_content = AStmtSpec(_,s)} ] -> s
      | _ -> Kernel.fatal "More than one contract associated to a statement")
 
+let get_spec_behavior s = function
+  | None -> Cil.find_default_behavior s
+  | Some name -> List.find_opt (fun { b_name } -> b_name = name) s.spec_behavior
+
 let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
   let set_bhv full_bhv e_bhv =
     let keep_empty = keep_empty && full_bhv.b_assigns = WritesAny in
@@ -1075,12 +1079,7 @@ let add_assigns ~keep_empty e kf ?stmt ?active ?behavior a =
     )
   in
   let old_spec = get_full_spec kf ?stmt ?behavior:active () in
-  let bhv =
-    match behavior with
-    | None -> Cil.find_default_behavior old_spec
-    | Some name ->
-      List.find_opt (fun { b_name } -> b_name = name) old_spec.spec_behavior
-  in
+  let bhv = get_spec_behavior old_spec behavior in
   let is_empty =
     match bhv with
     | None -> true
@@ -1104,12 +1103,7 @@ let add_allocates ~keep_empty e kf ?stmt ?active ?behavior a =
       (Property.ip_allocation_of_behavior kf ki active full_bhv);
   in
   let old_spec = get_full_spec kf ?stmt ?behavior:active () in
-  let bhv =
-    match behavior with
-    | None -> Cil.find_default_behavior old_spec
-    | Some name ->
-      List.find_opt (fun { b_name } -> b_name = name) old_spec.spec_behavior
-  in
+  let bhv = get_spec_behavior old_spec behavior in
   let is_empty =
     match bhv with
     | None -> true
