@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "21.0+dev"
+version: "21.1+dev"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -65,7 +65,7 @@ authors: [
 homepage: "http://frama-c.com/"
 license: "GNU Lesser General Public License version 2.1"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-21.0-Scandium.pdf"
+doc: "http://frama-c.com/download/user-manual-21.1-Scandium.pdf"
 bug-reports: "https://bts.frama-c.com/"
 tags: [
   "deductive"
