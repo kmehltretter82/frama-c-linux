@@ -247,7 +247,7 @@ module JsonPrinter =
 struct
   let output_stmt stmt =
     let kf = Kernel_function.find_englobing_kf stmt in
-    Server.Kernel_ast.Marker.to_json (PStmt (kf, stmt))
+    Server.Kernel_ast.KfMarker.to_json (kf, PStmtStart (kf, stmt))
 
   let output_kinstr = function
     | Cil_types.Kglobal -> `String "global"

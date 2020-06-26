@@ -182,7 +182,7 @@ struct
       "locality", NodeLocality.jtype;
       "backward_explored", Jstring;
       "forward_explored", Jstring;
-      "writes", Jarray Kernel_ast.Marker.jtype;
+      "writes", Jarray Kernel_ast.KfMarker.jtype;
       "values", Joption Jstring;
       "range", Junion [ Jnumber ; Jstring ];
       "type", Joption Jstring
@@ -198,7 +198,7 @@ struct
       "src", NodeId.jtype ;
       "dst", NodeId.jtype ;
       "kind", Jstring ;
-      "origins", Jarray Kernel_ast.Marker.jtype
+      "origins", Jarray Kernel_ast.KfMarker.jtype
     ])
 end
 
