@@ -82,7 +82,8 @@ let unsupported_specifications =
     "posix_memalign", "stdlib.c";
     "putenv", "stdlib.c";
     "setenv", "stdlib.c";
-    "unsetenv", "stdlib.c"
+    "unsetenv", "stdlib.c";
+    "realpath", "stdlib.c"
   ]
 
 let unsupported_specs_tbl =

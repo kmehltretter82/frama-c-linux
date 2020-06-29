@@ -2,13 +2,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
-/*@ assigns \result, *(x_0 + (0 ..)), *(x_1 + (0 ..));
-    assigns \result \from *(x_0 + (0 ..)), *(x_1 + (0 ..));
-    assigns *(x_0 + (0 ..)) \from *(x_0 + (0 ..)), *(x_1 + (0 ..));
-    assigns *(x_1 + (0 ..)) \from *(x_0 + (0 ..)), *(x_1 + (0 ..));
- */
-extern int ( /* missing proto */ realpath)(char *x_0, char *x_1);
-
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -25,12 +18,8 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  int tmp_0;
-  int tmp_1;
   __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& tmp_1),(size_t)4);
-  __e_acsl_store_block((void *)(& tmp_0),(size_t)4);
   char *c = (char *)__gen_e_acsl_literal_string;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
@@ -80,23 +69,19 @@ int main(void)
                     16);
   }
   /*@ assert \valid(q) ∧ \valid(p); */ ;
-  __e_acsl_full_init((void *)(& tmp_0));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
-  tmp_0 = realpath(c,q);
-  char *path = (char *)tmp_0;
-  __e_acsl_temporal_store_nblock((void *)(& path),(void *)((char *)tmp_0));
+  char *path = realpath((char const *)c,q);
+  __e_acsl_temporal_store_nblock((void *)(& path),(void *)*(& path));
   __e_acsl_store_block((void *)(& path),(size_t)8);
   __e_acsl_full_init((void *)(& path));
-  __e_acsl_full_init((void *)(& tmp_1));
+  __e_acsl_full_init((void *)(& path));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
-  tmp_1 = realpath(c,q);
-  __e_acsl_full_init((void *)(& path));
-  __e_acsl_temporal_store_nblock((void *)(& path),(void *)((char *)tmp_1));
-  path = (char *)tmp_1;
+  path = realpath((char const *)c,q);
+  __e_acsl_temporal_store_nblock((void *)(& path),(void *)*(& path));
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;
@@ -155,8 +140,6 @@ int main(void)
   }
   /*@ assert ¬\valid(p) ∧ ¬\valid(path); */ ;
   __retres = 0;
-  __e_acsl_delete_block((void *)(& tmp_1));
-  __e_acsl_delete_block((void *)(& tmp_0));
   __e_acsl_delete_block((void *)(& path));
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));

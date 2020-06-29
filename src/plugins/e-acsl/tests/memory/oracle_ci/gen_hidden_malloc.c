@@ -2,13 +2,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 char *__gen_e_acsl_literal_string;
-/*@ assigns \result, *((char *)x_1 + (0 ..));
-    assigns \result \from *(x_0 + (0 ..)), *((char *)x_1 + (0 ..));
-    assigns *((char *)x_1 + (0 ..))
-      \from *(x_0 + (0 ..)), *((char *)x_1 + (0 ..));
- */
-extern int ( /* missing proto */ realpath)(char const *x_0, void *x_1);
-
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -25,11 +18,9 @@ void __e_acsl_globals_init(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  int tmp;
   __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
   __e_acsl_globals_init();
-  tmp = realpath(__gen_e_acsl_literal_string,(void *)0);
-  char *cwd = (char *)tmp;
+  char *cwd = realpath(__gen_e_acsl_literal_string,(char *)0);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
