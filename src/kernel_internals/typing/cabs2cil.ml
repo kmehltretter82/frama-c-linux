@@ -448,6 +448,19 @@ let process_pack_pragma name args =
             current_packing_pragma:= new_pragma; None
           end else
             Some (Attr (name, args))
+        | ACons ("push",[]) :: args (* unknown push directive *) ->
+          Kernel.warning ~current:true
+            "Unsupported argument for pragma pack push directive: `%a'."
+            Format.(
+              pp_print_list
+                ~pp_sep:(fun fmt ()->pp_print_string fmt ", ")
+                Cil_printer.pp_attrparam)
+            args;
+          (* We don't change the current packing directive, but
+             nevertheless push it on the stack, to avoid a mismatched
+             pop somewhere later. *)
+          Stack.push !current_packing_pragma packing_pragma_stack;
+          None
         | [ACons ("pop",[])] (* #pragma pack(pop) *) ->
           begin try
               current_packing_pragma := Stack.pop packing_pragma_stack;
