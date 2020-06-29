@@ -12,27 +12,14 @@
 import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
-import { ArrayModel } from 'dome/table/arrays';
+import { Order } from 'dome/data/compare';
+import * as GlobalStates from 'dome/data/states';
+import { useModel } from 'dome/table/models';
+import { CompactModel } from 'dome/table/arrays';
 import * as Server from './server';
 
-/**
- *  @event
- *  @name 'frama-c.project'
- *  @summary Current Project Updates
- *  @description
- *  Exported as `State.PROJECT` in public API.
- */
-export const PROJECT = 'frama-c.project';
-
-/**
- *  @event
- *  @name 'frama-c.state.*'
- *  @summary State Notification Events.
- *  @description
- *  Event `'frama-c.state.<id>'` for project `<id>`.
- *  The prefix `'frama-c.state.'` is exported as `States.STATE` in public API.
- */
-export const STATE = 'frama-c.state.';
+const PROJECT = 'frama-c.project';
+const STATE_PREFIX = 'frama-c.state.';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -207,15 +194,16 @@ export interface Fetches<K, A> {
   reload: boolean;
   pending: number;
   updated: A[];
-  removed: Json.key<K>[];
+  removed: K[];
 }
 
 export interface Array<K, A> {
   name: string;
-  key: keyof A;
+  order: Order<A>;
+  getkey: (row: A) => K;
   signal: Server.Signal;
-  fetch: Server.GetRequest<number, Fetches<K, A>>;
   reload: Server.GetRequest<null, null>;
+  fetch: Server.GetRequest<number, Fetches<K, A>>;
 }
 
 // --------------------------------------------------------------------------
@@ -238,7 +226,7 @@ class SyncState<A> {
 
   constructor(h: Handler<A>) {
     this.handler = h;
-    this.UPDATE = STATE + h.name;
+    this.UPDATE = STATE_PREFIX + h.name;
     this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
@@ -291,7 +279,7 @@ class SyncState<A> {
 const syncStates = new Map<string, SyncState<any>>();
 
 function getSyncState<A>(h: Handler<A>): SyncState<A> {
-  const id = currentProject + '@' + h.name;
+  const id = `${currentProject}@${h.name}`;
   let s = syncStates.get(id);
   if (!s) {
     s = new SyncState(h);
@@ -335,15 +323,16 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 // one per project
 class SyncArray<K, A> {
   handler: Array<K, A>;
-  model: ArrayModel<A>;
   upToDate: boolean;
   fetching: boolean;
+  model: CompactModel<K, A>;
 
-  constructor(h: Array<K, A>, m?: ArrayModel<A>) {
+  constructor(h: Array<K, A>) {
     this.handler = h;
     this.fetching = false;
     this.upToDate = false;
-    this.model = m ?? new ArrayModel<A>(h.key);
+    this.model = new CompactModel(h.getkey);
+    this.model.setNaturalOrder(h.order);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
     this.update = this.update.bind(this);
@@ -358,15 +347,19 @@ class SyncArray<K, A> {
     try {
       this.fetching = true;
       let pending;
+      /* eslint-disable no-await-in-loop */
       do {
         const data = await Server.send(this.handler.fetch, 50);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
-        if (reload) model.clear();
-        removed.forEach((k) => model.remove(k));
-        updated.forEach((d) => model.add(d));
+        if (reload) model.removeAllData();
+        model.updateData(updated);
+        model.removeData(removed);
+        if (reload || updated.length > 0 || removed.length > 0)
+          model.reload();
         pending = data.pending ?? 0;
       } while (pending > 0);
+      /* eslint-enable no-await-in-loop */
     } catch (error) {
       PP.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
@@ -404,16 +397,12 @@ const syncArrays = new Map<string, SyncArray<any, any>>();
 
 function getSyncArray<K, A>(
   array: Array<K, A>,
-  model?: ArrayModel<A>,
 ): SyncArray<K, A> {
-  const id = currentProject + '@' + array.name;
+  const id = `${currentProject}@${array.name}`;
   let st = syncArrays.get(id);
   if (!st) {
-    st = new SyncArray(array, model);
+    st = new SyncArray(array);
     syncArrays.set(id, st);
-  } else if (model && st.model !== model) {
-    st.model = model;
-    st.reload();
   }
   return st;
 }
@@ -433,16 +422,37 @@ export function reloadArray<K, A>(arr: Array<K, A>) {
 
 /**
    Use Synchronized Array (Custom React Hook).
+   This React Hook is _not_ responsive to model updates, it only
+   returns the array model.
+   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
+   Array views automatically listen to model updates.
  */
-export function useSyncArray<K, A>(
+export function useSyncModel<K, A>(
   arr: Array<K, A>,
-  model?: ArrayModel<A>,
-): ArrayModel<A> {
+): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
-  const st = getSyncArray(arr, model);
+  const st = getSyncArray(arr);
   React.useEffect(st.update);
   Server.useSignal(arr.signal, st.fetch);
   return st.model;
+}
+
+/**
+   Use Synchronized Array (Custom React Hook).
+   This React Hook is _not_ responsive to model updates, it only
+   returns the array model.
+   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
+   Array views automatically listen to model updates.
+ */
+export function useSyncArray<K, A>(
+  arr: Array<K, A>,
+): A[] {
+  Dome.useUpdate(PROJECT);
+  const st = getSyncArray(arr);
+  React.useEffect(st.update);
+  Server.useSignal(arr.signal, st.fetch);
+  useModel(st.model);
+  return st.model.getArray();
 }
 
 // --------------------------------------------------------------------------
@@ -524,17 +534,17 @@ function reducer(s: Selection, action: SelectionActions): Selection {
   }
 }
 
-const initialSelection: Selection = {
+const GlobalSelection = new GlobalStates.State<Selection>({
   current: undefined,
   prevSelections: [],
   nextSelections: [],
-};
+});
 
 /**
    Current selection.
  */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = React.useState(initialSelection);
+  const [selection, setSelection] = GlobalStates.useState(GlobalSelection);
 
   function update(action: SelectionActions) {
     const nextSelection = reducer(selection, action);
