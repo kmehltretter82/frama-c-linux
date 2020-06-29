@@ -5,6 +5,7 @@
 import React from 'react';
 import { Section, Item } from 'dome/frame/sidebars';
 import * as States from 'frama-c/states';
+import { alpha } from 'dome/data/compare';
 import { functions, functionsData } from 'api/kernel/ast';
 
 // --------------------------------------------------------------------------
@@ -15,7 +16,9 @@ export default () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const fcts = States.useSyncArray(functions);
+  const fcts = States.useSyncArray(functions).sort(
+    (f, g) => alpha(f.name, g.name),
+  );
 
   // Items
   const current: undefined | string = selection?.current?.function;
