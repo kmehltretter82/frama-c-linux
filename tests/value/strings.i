@@ -100,6 +100,21 @@ int string_comparison() {
   return cc;
 }
 
+/* Currently, Eva does not support wide string comparisons: alarms are emitted
+   on any comparison involving a wide string. Tests are minimal for now. */
+int wide_string_comparison() {
+  char* w1 = L"abcdef";
+  char* w2 = L"def";
+  char* w3 = L"abc";
+  int res = 0;
+  /* Must emit a comparison alarm. */
+  if (w1 == w2)
+    res = 1;
+  /* Ideally, should not emit a comparison alarm. */
+  if (w2 == w3)
+    res = -1;
+  return res;
+}
 
 int strcmp(const char *s1, const char *s2)
 {
@@ -127,5 +142,6 @@ void main() {
   string_reads ();
   string_writes ();
   string_comparison ();
+  wide_string_comparison ();
   long_chain ();
 }

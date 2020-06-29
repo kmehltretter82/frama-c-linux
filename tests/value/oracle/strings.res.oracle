@@ -39,7 +39,7 @@
   Y ∈ {0}
   Z ∈ {0}
 [eva] computing for function string_reads <- main.
-  Called from tests/value/strings.i:127.
+  Called from tests/value/strings.i:142.
 [eva] computing for function u <- string_reads <- main.
   Called from tests/value/strings.i:39.
 [kernel:annot:missing-spec] tests/value/strings.i:39: Warning: 
@@ -81,7 +81,7 @@
 [eva] Recording results for string_reads
 [eva] Done for function string_reads
 [eva] computing for function string_writes <- main.
-  Called from tests/value/strings.i:128.
+  Called from tests/value/strings.i:143.
 [eva:alarm] tests/value/strings.i:64: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from nondet?s5 + 2:& c)
@@ -91,12 +91,12 @@
   out of bounds write. assert \valid(s6);
 [eva] Recording results for string_writes
 [eva] Done for function string_writes
-[eva:locals-escaping] tests/value/strings.i:128: Warning: 
+[eva:locals-escaping] tests/value/strings.i:143: Warning: 
   locals {c} escaping the scope of string_writes through s5
-[eva:locals-escaping] tests/value/strings.i:128: Warning: 
+[eva:locals-escaping] tests/value/strings.i:143: Warning: 
   locals {c} escaping the scope of string_writes through s6
 [eva] computing for function string_comparison <- main.
-  Called from tests/value/strings.i:129.
+  Called from tests/value/strings.i:144.
 [eva] computing for function u <- string_comparison <- main.
   Called from tests/value/strings.i:78.
 [eva] Done for function u
@@ -153,17 +153,25 @@
   assert \pointer_comparable((void *)("oh, hello" + 4), (void *)s7);
 [eva] Recording results for string_comparison
 [eva] Done for function string_comparison
+[eva] computing for function wide_string_comparison <- main.
+  Called from tests/value/strings.i:145.
+[eva:alarm] tests/value/strings.i:111: Warning: 
+  pointer comparison. assert \pointer_comparable((void *)w1, (void *)w2);
+[eva:alarm] tests/value/strings.i:114: Warning: 
+  pointer comparison. assert \pointer_comparable((void *)w2, (void *)w3);
+[eva] Recording results for wide_string_comparison
+[eva] Done for function wide_string_comparison
 [eva] computing for function long_chain <- main.
-  Called from tests/value/strings.i:130.
+  Called from tests/value/strings.i:146.
 [eva] computing for function assigns <- long_chain <- main.
-  Called from tests/value/strings.i:120.
+  Called from tests/value/strings.i:135.
 [eva] using specification for function assigns
-[eva] tests/value/strings.i:114: Warning: 
+[eva] tests/value/strings.i:129: Warning: 
   no \from part for clause 'assigns *(p + (0 .. s - 1));'
 [eva] Done for function assigns
 [eva] computing for function strcmp <- long_chain <- main.
-  Called from tests/value/strings.i:121.
-[eva:alarm] tests/value/strings.i:108: Warning: 
+  Called from tests/value/strings.i:136.
+[eva:alarm] tests/value/strings.i:123: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from s2_0++)
 [eva] Recording results for strcmp
@@ -261,6 +269,11 @@
   T ∈ {0; 101}
   p ∈ {{ &s1[5] ; &s2[3] }}
   __retres ∈ {5}
+[eva:final-states] Values at end of function wide_string_comparison:
+  w1 ∈ {{ L"abcdef" }}
+  w2 ∈ {{ L"def" }}
+  w3 ∈ {{ L"abc" }}
+  res ∈ {0}
 [eva:final-states] Values at end of function main:
   s1[0] ∈ {104}
     [1] ∈ {101}
@@ -307,6 +320,8 @@
 [from] Done for function string_comparison
 [from] Computing for function string_reads
 [from] Done for function string_reads
+[from] Computing for function wide_string_comparison
+[from] Done for function wide_string_comparison
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -349,6 +364,8 @@
   S FROM \nothing (and SELF)
   T FROM s1[1] (and SELF)
   \result FROM s1{[0..2]; [4]}; cc
+[from] Function wide_string_comparison:
+  \result FROM \nothing
 [from] Function main:
   s1{[3]; [6]} FROM cc
   s5 FROM s3; s8
@@ -401,6 +418,10 @@
     tmp_3; tmp_4; __retres
 [inout] Inputs for function string_reads:
     s1[0..5]; cc
+[inout] Out (internal) for function wide_string_comparison:
+    w1; w2; w3; res
+[inout] Inputs for function wide_string_comparison:
+    \nothing
 [inout] Out (internal) for function main:
     s1{[3]; [6]}; s5; s6; cc; Q; R; S; T; U; V; W; X; Y; Z
 [inout] Inputs for function main:
