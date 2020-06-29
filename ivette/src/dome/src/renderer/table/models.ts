@@ -127,7 +127,6 @@ export abstract class Model<Key, Row> {
 
   private clients = new Map<number, Watcher>();
   private clientsId = 0;
-  private callback?: Trigger;
 
   constructor() {
     this.reload = this.reload.bind(this);
@@ -197,22 +196,26 @@ export abstract class Model<Key, Row> {
      Re-render all views.
      Bound to this.
   */
-  reload() { this.clients.forEach(({ reload }) => reload && reload()); }
+  reload() {
+    this.clients.forEach(({ reload }) => reload && reload());
+  }
 
   /**
      Connect a client view to the model.
      The initial watching range is empty with no trigger.
      You normally never call this method directly.
      It is automatically called by table views.
+     @param onReload - optional callback for reloads (and updates, unless specified)
+     @param onUpdate - optional callback for updates (when different from reloads)
   */
-  link(): Client {
+  link(onReload?: Trigger, onUpdate?: Trigger): Client {
     const id = this.clientsId++;
     const m = this.clients;
     const w: Watcher & Client = {
       lower: 0,
       upper: 0,
-      update: undefined,
-      reload: undefined,
+      reload: onReload,
+      update: onUpdate ?? onReload,
       onUpdate(s?: Trigger) { w.update = s; },
       onReload(s?: Trigger) { w.reload = s; },
       unlink() { m.delete(id); },
@@ -228,36 +231,21 @@ export abstract class Model<Key, Row> {
 }
 
 // --------------------------------------------------------------------------
-// --- Model Array as React Hook
+// --- Model Hooks
 // --------------------------------------------------------------------------
 
 /**
-   React Hook returning the array of all rows in the table.
-   Automatically updates on reload.
-*/
-export function useModelArray<K, A>(model?: Model<K, A>): A[] {
+   For a component to re-render on any updates and reloads.
+   The returned number can be used to memoise effects and callbacks.
+ */
+
+export function useModel(model: Model<any, any>): number {
   const [age, setAge] = React.useState(0);
   React.useEffect(() => {
-    if (model) {
-      const client = model.link();
-      const reload = () => setAge(age + 1);
-      client.onUpdate(reload);
-      client.onReload(reload);
-      return client.unlink;
-    }
-    return undefined;
-  }, [model]);
-  return React.useMemo(() => {
-    if (model) {
-      const n = model.getRowCount();
-      const a = new Array(n);
-      for (let i = 0; i < n; i++)
-        a[i] = model.getRowAt(i);
-      return a;
-    }
-    return [];
-  }, [model, age]);
+    const w = model.link(() => setImmediate(() => setAge(age + 1)));
+    return w.unlink;
+  });
+  return age;
 }
-
 
 // --------------------------------------------------------------------------

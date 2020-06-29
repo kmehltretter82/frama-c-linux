@@ -9,105 +9,51 @@
 */
 
 import React from 'react';
+import Emitter from 'events';
 import isEqual from 'react-fast-compare';
 import { DEVEL } from 'dome/misc/system';
 import * as Dome from 'dome';
 import * as JSON from './json';
 
-export type NonFunction =
-  undefined | null | boolean | number | string | object | any[] | bigint | symbol;
-
-/** State updater. New value or updating function applied to the current,
-    lastly updated value. Use `null` to restore default value. */
-export type updateAction<A extends NonFunction> =
-  null | A | ((current: A) => A);
-
-/** The type of updater callbacks. Typically used for `[A,setState<A>]` hooks. */
-export type setState<A extends NonFunction> = (action: updateAction<A>) => void;
+const UPDATE = 'dome.states.update';
 
 /** Base state interface. */
-export interface State<A extends NonFunction> {
-  readonly get: () => A;
-  readonly set: (value: A) => void;
-  readonly update: setState<A>;
-  on(callback: (value: A) => void): void;
-  off(callback: (value: A) => void): void;
+export class State<A> {
+  private value: A;
+  private emitter: Emitter;
+  constructor(initValue: A) {
+    this.value = initValue;
+    this.emitter = new Emitter;
+    this.getValue = this.getValue.bind(this);
+    this.setValue = this.setValue.bind(this);
+  }
+  getValue() { return this.value; }
+  setValue(value: A) {
+    if (!isEqual(value, this.value)) {
+      this.value = value;
+      this.emitter.emit(UPDATE, value);
+    }
+  }
+
+  on(callback: (value: A) => void) {
+    this.emitter.on(UPDATE, callback);
+  }
+
+  off(callback: (value: A) => void) {
+    this.emitter.off(UPDATE, callback);
+  }
+
 }
 
 /** React Hook, similar to `React.useState()`. */
-export function useState<A extends NonFunction>(s: State<A>): [A, setState<A>] {
-  const [current, setCurrent] = React.useState<A>(s.get);
+export function useState<A>(s: State<A>): [A, (update: A) => void] {
+  const [current, setCurrent] = React.useState<A>(s.getValue);
   React.useEffect(() => {
     s.on(setCurrent);
     return () => s.off(setCurrent);
   });
-  return [current, s.update];
+  return [current, s.setValue];
 };
-
-/**
-   State with initial default value.
- */
-export class StateDef<A extends NonFunction> implements State<A> {
-  protected value: A;
-  protected defaultValue: A;
-  protected event: symbol;
-
-  constructor(defaultValue: A) {
-    this.value = this.defaultValue = defaultValue;
-    this.event = Symbol('dome.state');
-    this.get = this.get.bind(this);
-    this.set = this.get.bind(this);
-    this.reset = this.reset.bind(this);
-    this.update = this.update.bind(this);
-  }
-
-  get(): A { return this.value; }
-
-  /** Notify callbacks on change, using _deep_ structural comparison. */
-  set(value: A) {
-    if (!isEqual(value, this.value)) {
-      this.value = value;
-      Dome.emit(this.event, value);
-    }
-  }
-
-  /** State updater. */
-  update(upd: updateAction<A>) {
-    if (upd === null)
-      this.reset();
-    else {
-      if (typeof upd === 'function')
-        this.set(upd(this.value));
-      else
-        this.set(upd);
-    }
-  }
-
-  /** Restore default value. */
-  reset() {
-    this.set(this.defaultValue);
-  }
-
-  /** Callback Emitter. */
-  on(callback: (value: A) => void) {
-    Dome.emitter.on(this.event, callback);
-  }
-
-  /** Callback Emitter. */
-  off(callback: (value: A) => void) {
-    Dome.emitter.off(this.event, callback);
-  }
-
-}
-
-/**
-   State with possibly undefined initial value.
- */
-export class StateOpt<A extends NonFunction> extends StateDef<undefined | A> {
-  constructor(defaultValue?: A) {
-    super(defaultValue);
-  }
-}
 
 // --------------------------------------------------------------------------
 // --- Settings
