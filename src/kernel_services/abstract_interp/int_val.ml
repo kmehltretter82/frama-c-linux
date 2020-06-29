@@ -660,6 +660,8 @@ end
 
 module type BitOperator =
 sig
+  (* Concrete version of the bitwise operator *)
+  val concrete_bitwise : Int.t -> Int.t -> Int.t
   (* Printable version of the operator *)
   val representation : string
   (* forward is given here as the lifted function of some bit operator op
@@ -682,6 +684,8 @@ end
 
 module And : BitOperator =
 struct
+  let concrete_bitwise = Int.logand
+
   let representation = "&"
 
   let forward v1 v2 =
@@ -701,6 +705,8 @@ end
 
 module Or : BitOperator =
 struct
+  let concrete_bitwise = Int.logor
+
   let representation = "|"
 
   let forward v1 v2 =
@@ -720,6 +726,8 @@ end
 
 module Xor : BitOperator =
 struct
+  let concrete_bitwise = Int.logxor
+
   let representation = "^"
 
   let forward v1 v2 =
@@ -893,7 +901,15 @@ struct
       acc := List.fold_left (set_bit (Bit i)) [] !acc;
       if List.length !acc > small_cardinal () then raise Do_not_fit_small_sets
     done;
-    let list = List.map (fun (r, _, _) -> r) !acc in
+    (* Keep only values that can actually be obtained *)
+    let is_admissible (r, v1, v2) =
+      match v1, v2 with
+      | Set s1, Set s2 ->
+        let op = Op.concrete_bitwise in
+        Int_set.(exists (fun i1 -> exists (fun i2 -> op i1 i2 = r) s2) s1)
+      | _, _ -> true
+    in
+    let list = Extlib.filter_map is_admissible (fun (r, _, _) -> r) !acc in
     Set (Int_set.inject_list list)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of
