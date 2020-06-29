@@ -85,7 +85,7 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
+FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi

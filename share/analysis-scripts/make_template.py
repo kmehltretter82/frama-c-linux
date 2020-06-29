@@ -74,7 +74,7 @@ if "PTESTS_TESTING" in os.environ:
 
 bindir = Path(os.path.dirname(os.path.abspath(framac)))
 frama_c_config = bindir / "frama-c-config"
-process = Popen([frama_c_config, "-print-share-path"], stdout=PIPE)
+process = Popen([frama_c_config, "-share"], stdout=PIPE)
 (output, err) = process.communicate()
 output = output.decode('utf-8')
 exit_code = process.wait()
