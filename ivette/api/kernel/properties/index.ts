@@ -299,9 +299,11 @@ export const reloadStatus: Server.GetRequest<null,null> = {
 };
 
 /** Data fetcher for array [`status`](#status)  */
-export const fetchStatus: Server.GetRequest<number,
+export const fetchStatus: Server.GetRequest<
+  number,
   { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
-    reload: boolean }> = {
+    reload: boolean }
+  > = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.fetchStatus',
   input:  Json.jNumber,
@@ -314,12 +316,13 @@ export const fetchStatus: Server.GetRequest<number,
 };
 
 /** Status of Registered Properties */
-export const status: State.Array<'#status',statusData> = {
+export const status: State.Array<Json.key<'#status'>,statusData> = {
   name: 'kernel.properties.status',
-  key: 'key',
+  getkey: ((d:statusData) => d.key),
   signal: signalStatus,
   fetch: fetchStatus,
   reload: reloadStatus,
+  order: byStatusData,
 };
 
 /* ------------------------------------- */

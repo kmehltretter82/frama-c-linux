@@ -25,7 +25,8 @@ import { jTagSafe } from 'api/kernel/data';
 import { tag } from 'api/kernel/data';
 
 /** Frama-C Kernel configuration */
-export const getConfig: Server.GetRequest<null,
+export const getConfig: Server.GetRequest<
+  null,
   { pluginpath: string[], libdir: string, datadir: string, version: string }
   > = {
   kind: Server.RqKind.GET,

@@ -132,9 +132,11 @@ export const reloadMarkerInfo: Server.GetRequest<null,null> = {
 };
 
 /** Data fetcher for array [`markerInfo`](#markerinfo)  */
-export const fetchMarkerInfo: Server.GetRequest<number,
+export const fetchMarkerInfo: Server.GetRequest<
+  number,
   { pending: number, updated: markerInfoData[],
-    removed: Json.key<'#markerInfo'>[], reload: boolean }> = {
+    removed: Json.key<'#markerInfo'>[], reload: boolean }
+  > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchMarkerInfo',
   input:  Json.jNumber,
@@ -147,12 +149,13 @@ export const fetchMarkerInfo: Server.GetRequest<number,
 };
 
 /** Marker informations */
-export const markerInfo: State.Array<'#markerInfo',markerInfoData> = {
+export const markerInfo: State.Array<Json.key<'#markerInfo'>,markerInfoData> = {
   name: 'kernel.ast.markerInfo',
-  key: 'key',
+  getkey: ((d:markerInfoData) => d.key),
   signal: signalMarkerInfo,
   fetch: fetchMarkerInfo,
   reload: reloadMarkerInfo,
+  order: byMarkerInfoData,
 };
 
 /** Localizable AST markers */
@@ -244,9 +247,11 @@ export const reloadFunctions: Server.GetRequest<null,null> = {
 };
 
 /** Data fetcher for array [`functions`](#functions)  */
-export const fetchFunctions: Server.GetRequest<number,
+export const fetchFunctions: Server.GetRequest<
+  number,
   { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }> = {
+    removed: Json.key<'#functions'>[], reload: boolean }
+  > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchFunctions',
   input:  Json.jNumber,
@@ -259,12 +264,13 @@ export const fetchFunctions: Server.GetRequest<number,
 };
 
 /** AST Functions */
-export const functions: State.Array<'#functions',functionsData> = {
+export const functions: State.Array<Json.key<'#functions'>,functionsData> = {
   name: 'kernel.ast.functions',
-  key: 'key',
+  getkey: ((d:functionsData) => d.key),
   signal: signalFunctions,
   fetch: fetchFunctions,
   reload: reloadFunctions,
+  order: byFunctionsData,
 };
 
 /** Get textual information about a marker */

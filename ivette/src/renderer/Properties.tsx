@@ -3,12 +3,14 @@
 // --------------------------------------------------------------------------
 
 import _ from 'lodash';
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as Dome from 'dome';
+import { key } from 'dome/data/json';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar, Component } from 'frama-c/LabViews';
@@ -238,13 +240,13 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.ArrayModel<Property> {
+class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
 
   private filterFun?: string;
   private filterProp = _.cloneDeep(defaultFilter);
 
   constructor() {
-    super('key');
+    super((p: Property) => p.key);
     this.setOrderingByFields(byProperty);
     this.setColumnOrder(byColumn);
     this.setFilter(this.filterItem.bind(this));
@@ -410,19 +412,13 @@ const PropertyColumns = () => {
 };
 
 function FilterRatio({ model }: { model: PropertyModel }) {
-  const forceUpdate = Dome.useForceUpdate() as (() => void);
-  React.useEffect(() => {
-    const client = model.link();
-    client.onReload(forceUpdate);
-    return client.unlink;
-  });
-  const filtered = model.getRowCount();
-  const total = model.getTotalRowCount();
+  Models.useModel(model);
+  const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   return (
     <Label
       className="component-info"
       title="Displayed Properties / Total"
-      display={filtered !== total}
+      display={filtered !== total || true}
     >
       {filtered} / {total}
     </Label>
@@ -436,8 +432,12 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-
-  States.useSyncArray<'#status', Property>(Properties.status, model);
+  const data = States.useSyncArray(Properties.status);
+  useEffect(() => {
+    model.removeAllData();
+    model.updateData(data);
+    model.reload();
+  }, [model, data]);
 
   const [selection, updateSelection] = States.useSelection();
 
@@ -454,8 +454,8 @@ const RenderTable = () => {
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    ({ key, function: fct }: Property) => {
-      const location = { function: fct, marker: key };
+    ({ key: propKey, function: fct }: Property) => {
+      const location = { function: fct, marker: propKey };
       updateSelection({ location });
     }, [updateSelection],
   );

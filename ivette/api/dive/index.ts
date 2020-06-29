@@ -68,7 +68,9 @@ export const addVar: Server.ExecRequest<variableName,Json.json> = {
 };
 
 /** Add all alarms of the given function */
-export const addFunctionAlarms: Server.ExecRequest<Json.key<'#fct'>,Json.json
+export const addFunctionAlarms: Server.ExecRequest<
+  Json.key<'#fct'>,
+  Json.json
   > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.addFunctionAlarms',
@@ -77,8 +79,7 @@ export const addFunctionAlarms: Server.ExecRequest<Json.key<'#fct'>,Json.json
 };
 
 /** Explore the graph starting from an existing vertex */
-export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json
-  > = {
+export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.explore',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),

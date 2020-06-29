@@ -311,7 +311,7 @@ let makeDeclaration fmt names d =
     let output = typeOfParam rq.rq_output in
     let makeParam fmt js = makeDecoder ~safe:false ~names fmt js in
     Format.fprintf fmt
-      "@[<hov 2>export const %s: Server.%sRequest<@,%a,@,%a@,> = {@]@\n"
+      "@[<hv 2>export const %s: Server.%sRequest<@,%a,@,%a@,>@] = {@\n"
       self.name prefix jtype input jtype output ;
     Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
     Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
@@ -321,7 +321,7 @@ let makeDeclaration fmt names d =
 
   | D_value js ->
     Format.fprintf fmt
-      "@[<hov 2>export const %s: State.Value<@,%a@,> = {@]@\n"
+      "@[<hv 2>export const %s: State.Value<@,%a@,>@] = {\n"
       self.name jtype js ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
     Format.fprintf fmt "  signal: %a,@\n"
@@ -332,7 +332,7 @@ let makeDeclaration fmt names d =
 
   | D_state js ->
     Format.fprintf fmt
-      "@[<hov 2>export const %s: State.State<@,%a@,> = {@]@\n"
+      "@[<hv 2>export const %s: State.State<@,%a@,>@] = {@\n"
       self.name jtype js ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
     Format.fprintf fmt "  signal: %a,@\n"
@@ -345,34 +345,38 @@ let makeDeclaration fmt names d =
 
   | D_array { arr_key ; arr_kind } ->
     let data = Pkg.Derived.data self in
+    let jkey = (Pkg.Jkey arr_kind) in
+    let jrow = (Pkg.Jdata data) in
     Format.fprintf fmt
-      "@[<hov 2>export const %s: State.Array<@,'#%s',@,%a@,> = {@]@\n"
-      self.name arr_kind (jcall names) data ;
+      "@[<hv 2>export const %s: State.Array<@,%a,@,%a@,>@] = {@\n"
+      self.name jtype jkey jtype jrow ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident self) ;
-    Format.fprintf fmt "  key: '%s',@\n" arr_key ;
+    Format.fprintf fmt "  getkey: ((d:%a) => d.%s),@\n" jtype jrow arr_key ;
     Format.fprintf fmt "  signal: %a,@\n"
       (jcall names) (Pkg.Derived.signal self) ;
     Format.fprintf fmt "  fetch: %a,@\n"
       (jcall names) (Pkg.Derived.fetch self) ;
     Format.fprintf fmt "  reload: %a,@\n"
       (jcall names) (Pkg.Derived.reload self) ;
+    Format.fprintf fmt "  order: %a,@\n"
+      (jcall names) (Pkg.Derived.order data) ;
     Format.fprintf fmt "};@\n"
 
   | D_safe(id,js) ->
     Format.fprintf fmt
-      "@[<hov 2>export const %s: Json.Safe<@,%a@,> =@ %a;@]\n"
+      "@[<hov 2>@[<hv 0>export const %s: Json.Safe<@,%a@,>@] =@ %a;@]\n"
       self.name (jcall names) id
       (makeRecursive (makeRootDecoder ~safe:true ~self:id ~names)) js
 
   | D_loose(id,js) ->
     Format.fprintf fmt
-      "@[<hov 2>export const %s: Json.Loose<@,%a@,> =@ %a;@]\n"
+      "@[<hov 2>@[<hv 0>export const %s: Json.Loose<@,%a@,>@] =@ %a;@]\n"
       self.name (jcall names) id
       (makeRecursive (makeRootDecoder ~safe:false ~self:id ~names)) js
 
   | D_order(id,js) ->
     Format.fprintf fmt
-      "@[<hov 2>export const %s: Compare.Order<@,%a@,> =@ %a;@]\n"
+      "@[<hov 2>@[<hv 0>export const %s: Compare.Order<@,%a@,>@] =@ %a;@]\n"
       self.name (jcall names) id
       (makeRecursive2 (makeOrder ~self:id ~names)) js
 
