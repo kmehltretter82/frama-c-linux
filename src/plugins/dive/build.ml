@@ -200,12 +200,17 @@ let enumerate_cells ~is_folded_base ~limit lval kinstr =
   with Abstract_interp.Error_Top -> raise Unknown_location
 
 let build_node_kind ~is_folded_base lval kinstr =
-  match enumerate_cells ~is_folded_base ~limit:1 lval kinstr with
-  | [node_kind] -> node_kind
-  | [] (* happens if kinstr is dead code *) -> Scattered (lval, kinstr)
-  | _ -> assert false
-  | exception (Too_many_deps _) -> Scattered (lval, kinstr)
-  | exception Unknown_location -> Unknown (lval, kinstr)
+  match lval with
+  | Var vi, offset ->
+    (* Build a scalar node even if kinstr is dead *)
+    Scalar (vi, Cil.typeOfLval lval, offset)
+  | Mem _, _ ->
+    match enumerate_cells ~is_folded_base ~limit:1 lval kinstr with
+    | [node_kind] -> node_kind
+    | [] (* happens if kinstr is dead code *) -> Scattered (lval, kinstr)
+    | _ -> assert false
+    | exception (Too_many_deps _) -> Scattered (lval, kinstr)
+    | exception Unknown_location -> Unknown (lval, kinstr)
 
 let default_node_locality callstack =
   match callstack with
