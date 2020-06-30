@@ -24,7 +24,11 @@ type node_kind =
   | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
   | Composite of Cil_types.varinfo
   | Scattered of Cil_types.lval * Cil_types.kinstr
+  | Unknown of Cil_types.lval * Cil_types.kinstr
   | Alarm of Cil_types.stmt * Alarms.alarm
+  | AbsoluteMemory
+  | String of int * Base.cstring
+  | Error of string
 
 type node_locality = {
   loc_file : string;

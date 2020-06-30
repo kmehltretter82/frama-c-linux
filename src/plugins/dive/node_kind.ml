@@ -55,8 +55,23 @@ struct
       LvalStructEq.compare lv1 lv2 <?> (Kinstr.compare, ki1, ki2)
     | Scattered _, _ -> 1
     | _, Scattered _ -> -1
+    | Unknown (lv1,ki1), Unknown (lv2,ki2) ->
+      LvalStructEq.compare lv1 lv2 <?> (Kinstr.compare, ki1, ki2)
+    | Unknown _, _ -> 1
+    | _, Unknown _ -> -1
     | Alarm (stmt1, alarm1), Alarm (stmt2, alarm2) ->
       Stmt.compare stmt1 stmt2 <?> (Alarms.compare, alarm1, alarm2)
+    | Alarm _, _ -> 1
+    | _, Alarm _ -> -1
+    | AbsoluteMemory, AbsoluteMemory -> 0
+    | AbsoluteMemory, _ -> 1
+    | _, AbsoluteMemory -> -1
+    | String (i1,_), String (i2,_) ->
+      Datatype.Int.compare i1 i2
+    | String _, _ -> 1
+    | _, String _ -> -1
+    | Error s1, Error s2 ->
+      Datatype.String.compare s1 s2
 
   let equal k1 k2 =
     match k1, k2 with
@@ -65,8 +80,13 @@ struct
     | Composite vi1, Composite vi2 -> Varinfo.equal vi1 vi2
     | Scattered (lv1, ki1), Scattered (lv2, ki2) ->
       LvalStructEq.equal lv1 lv2 && Kinstr.equal ki1 ki2
+    | Unknown (lv1, ki1), Unknown (lv2, ki2) ->
+      LvalStructEq.equal lv1 lv2 && Kinstr.equal ki1 ki2
     | Alarm (stmt1, alarm1), Alarm (stmt2, alarm2) ->
       Stmt.equal stmt1 stmt2 && Alarms.equal alarm1 alarm2
+    | AbsoluteMemory, AbsoluteMemory -> true
+    | String (i,_), String (j,_) -> Datatype.Int.equal i j
+    | Error s1, Error s2 -> Datatype.String.equal s1 s2
     | _ -> false
 
   let hash k =
@@ -76,8 +96,13 @@ struct
     | Composite vi -> Hashtbl.hash (2, Varinfo.hash vi)
     | Scattered (lv, ki) ->
       Hashtbl.hash (3, LvalStructEq.hash lv, Kinstr.hash ki)
+    | Unknown (lv, ki) ->
+      Hashtbl.hash (4, LvalStructEq.hash lv, Kinstr.hash ki)
     | Alarm (stmt, alarm) ->
-      Hashtbl.hash (4, Stmt.hash stmt, Alarms.hash alarm)
+      Hashtbl.hash (5, Stmt.hash stmt, Alarms.hash alarm)
+    | AbsoluteMemory -> 6
+    | String (i, _) -> Hashtbl.hash (7, i)
+    | Error s -> Hashtbl.hash (8, s)
 end
 
 include Datatype.Make (DatatypeInput)
@@ -85,16 +110,26 @@ include Datatype.Make (DatatypeInput)
 
 let get_base = function
   | Scalar (vi,_,_) | Composite (vi) -> Some vi
-  | Scattered _ | Alarm _ -> None
+  | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory | String _ | Error _ ->
+    None
 
 let to_lval = function
   | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
   | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (lval,_) -> Some lval
-  | Alarm (_,_) -> None
+  | Unknown (lval,_) -> Some lval
+  | Alarm (_,_) | AbsoluteMemory | String _ | Error _ -> None
 
 let pretty fmt = function
-  | (Scalar _ | Composite _ | Scattered _) as kind ->
+  | (Scalar _ | Composite _ | Scattered _ | Unknown _) as kind ->
     Cil_printer.pp_lval fmt (Extlib.the (to_lval kind))
   | Alarm (_stmt,alarm) ->
     Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
+  | AbsoluteMemory ->
+    Format.fprintf fmt "%s" (Kernel.AbsoluteValidRange.get ())
+  | String (_, CSString s) ->
+    Format.fprintf fmt "%S" s
+  | String (_, CSWstring s) ->
+    Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
+  | Error s ->
+    Format.fprintf fmt "%s" s

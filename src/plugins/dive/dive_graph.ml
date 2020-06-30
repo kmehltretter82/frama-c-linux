@@ -252,9 +252,12 @@ let ouptput_to_dot out_channel g =
           | Scalar _ -> [`Shape `Box]
           | Composite _ -> [ `Shape `Box3d ]
           | Scattered _ -> [ `Shape `Parallelogram ]
+          | Unknown _ -> [`Shape `Diamond ; `Color 0xff0000]
           | Alarm _ ->  [ `Shape `Doubleoctagon ;
                           `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
+          | AbsoluteMemory | String _ -> [`Shape `Box3d]
+          | Error _ -> [`Color 0xff0000]
         and values = match grade with
           | None -> []
           | Some Singleton ->
@@ -310,7 +313,11 @@ struct
       | Scalar _ -> "scalar"
       | Composite _ -> "composite"
       | Scattered _ -> "scattered"
+      | Unknown _ -> "unknown"
       | Alarm _ -> "alarm"
+      | AbsoluteMemory -> "absolute"
+      | String _ -> "string"
+      | Error _ -> "error"
     in
     `String s
 

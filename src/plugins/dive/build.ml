@@ -157,54 +157,55 @@ let is_foldable_type typ =
   | TBuiltin_va_list _ -> false
   | TNamed _ -> assert false (* the type have been unrolled *)
 
-exception NoMatchingOffset
 
-let cell_to_scalar typ vi offset =
-  (* TODO: exceptions must be shown to the user somehow *)
-  try
-    let matching = Bit_utils.MatchType typ in
-    let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
-    Scalar (vi, typ, offset')
-  with Bit_utils.NoMatchingOffset -> raise NoMatchingOffset
-
-exception NotACell
 exception Too_many_deps of node_kind list
+exception Unknown_location
 
 let enumerate_cells ~is_folded_base ~limit lval kinstr =
-  (* TODO: non-variable bases must be shown to the user somehow *)
   (* If possible, refine the lval to a non-symbolic one *)
-  let location = !Db.Value.lval_to_loc kinstr lval
-  and typ = Cil.typeOfLval lval in
+  let typ = Cil.typeOfLval lval in
+  let state = Db.Value.get_state kinstr in
+  let location = !Db.Value.lval_to_loc_state state lval in
   let open Locations in
   let add (acc,count) node_kind =
-    if count > limit then
+    if count >= limit then
       raise (Too_many_deps acc);
     (node_kind :: acc, count+1)
   in
   let add_base base ival (acc,count) =
     match base with
-    | Base.Var (vi,_) ->
+    | Base.Var (vi,_) | Allocated (vi,_,_) ->
       begin
         if is_foldable_type vi.vtype && is_folded_base vi then
           add (acc,count) (Composite (vi))
         else
-          let add_cells offset (acc,count) =
-            add (acc,count) (cell_to_scalar typ vi offset)
+          let add_cell offset (acc,count) =
+            let matching = Bit_utils.MatchType typ in
+            let offset', _ = Bit_utils.find_offset vi.vtype ~offset matching in
+            let node_kind = Scalar (vi, typ, offset') in
+            add (acc,count) node_kind
           in
           try
-            Ival.fold_int add_cells ival (acc,count)
-          with Abstract_interp.Error_Top -> raise NotACell
+            Ival.fold_int add_cell ival (acc,count)
+          with Abstract_interp.Error_Top | Bit_utils.NoMatchingOffset ->
+            (* fallback to composite node *)
+            add (acc,count) (Composite (vi))
       end
-    | _ -> raise NotACell
+    | CLogic_Var _ -> add (acc,count) (Error "logic variables not supported")
+    | Null -> add (acc,count) AbsoluteMemory
+    | String (i,cs) -> add (acc,count) (String (i, cs))
   in
   try
     fst (Location_Bits.fold_i add_base location.loc ([],0))
-  with Abstract_interp.Error_Top | NoMatchingOffset -> raise NotACell
+  with Abstract_interp.Error_Top -> raise Unknown_location
 
 let build_node_kind ~is_folded_base lval kinstr =
   match enumerate_cells ~is_folded_base ~limit:1 lval kinstr with
   | [node_kind] -> node_kind
-  | _ | exception (NotACell | Too_many_deps _) -> Scattered (lval, kinstr)
+  | [] (* happens if kinstr is dead code *) -> Scattered (lval, kinstr)
+  | _ -> assert false
+  | exception (Too_many_deps _) -> Scattered (lval, kinstr)
+  | exception Unknown_location -> Unknown (lval, kinstr)
 
 let default_node_locality callstack =
   match callstack with
@@ -310,23 +311,20 @@ let build_node context callstack lval kinstr =
 
 let build_all_scattered_node ~limit context callstack kinstr lval =
   let is_folded_base = is_folded context in
-  try
-    let cells, complete =
-      try
-        enumerate_cells ~is_folded_base ~limit lval kinstr, true
-      with Too_many_deps cells -> cells, false
-    in
-    let add node_kind =
-      let node = add_or_update_node context callstack node_kind in
-      let new_lval = Extlib.the (Node_kind.to_lval node_kind) in
-      update_node_values node kinstr new_lval;
-      node
-    in
-    List.map add cells, complete
-  with NotACell ->
-    Self.warning "Unable to enumerate cells for %a"
-      Cil_printer.pp_lval lval;
-    [], true
+  let cells, complete =
+    try
+      enumerate_cells ~is_folded_base ~limit lval kinstr, true
+    with Too_many_deps cells -> cells, false
+  in
+  let add node_kind =
+    let node = add_or_update_node context callstack node_kind in
+    begin match Node_kind.to_lval node_kind with
+      | Some lval' -> update_node_values node kinstr lval';
+      | _ -> ()
+    end;
+    node
+  in
+  List.map add cells, complete
 
 let build_var context callstack varinfo =
   let lval = Var varinfo, NoOffset in
@@ -524,6 +522,8 @@ let build_node_deps context node =
     | Alarm (stmt,alarm) ->
       build_alarm_deps callstack stmt alarm;
       Done
+    | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+      Done
   in
   node.node_writes_computation <- writes_computation;
   begin match Node_kind.get_base node.node_kind with
@@ -587,8 +587,8 @@ let explore ~depth context root =
   let should_auto_explore node =
     let is_root = Graph.Node.equal node root (* the root is always explored *)
     and is_intersting_kind = match node.node_kind with
-      | Scalar _ | Composite _ | Alarm _ -> true
       | Scattered _ -> false
+      | _ -> true
     in
     is_root || (not node.node_hidden && is_intersting_kind)
   in
@@ -597,7 +597,7 @@ let explore ~depth context root =
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
-    if d < depth then begin
+    if d <= depth then begin
       if n.node_writes_computation <> Done && should_auto_explore n then
         build_node_deps context n;
       Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n;
