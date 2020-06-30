@@ -286,41 +286,6 @@ module Location_Bytes = struct
      | Base.Variable { Base.weak } -> not weak
    with Not_found -> false
 
- let iter_on_strings =
-   let z = "\000" in
-   fun ~skip f l ->
-     match l with
-     | Top _ ->
-         assert false
-     | Map m ->
-         M.iter
-           (fun base offs ->
-             match skip with
-               Some base_to_skip when Base.equal base base_to_skip -> ()
-             | _ ->
-                 match base with
-                   Base.String (_, strid) ->
-                     let str = 
-		       match strid with
-		       | Base.CSString s -> s
-		       | Base.CSWstring _ -> 
-			   failwith "Unimplemented: wide strings"
-		     in
-                     let strz = str ^ z in
-                     let len = String.length str in
-                     let range =
-                       Ival.inject_range
-                         (Some Int.zero)
-                         (Some (Int.of_int len))
-                     in
-                     let roffs = Ival.narrow range offs in
-                     Ival.fold_int
-                       (fun i () -> f base strz (Int.to_int i) len)
-                       roffs
-                       ()
-                 | _ -> ())
-           m
-
  let topify_merge_origin v =
    topify_with_origin_kind Origin.K_Merge v
 
