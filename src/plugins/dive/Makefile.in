@@ -39,7 +39,7 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_DIVE@
 PLUGIN_NAME := Dive
-PLUGIN_CMO := self callstack node_kind imprecision_graph build main \
+PLUGIN_CMO := self callstack node_kind dive_graph build main \
   server_interface
 PLUGIN_CMI := dive_types
 PLUGIN_DEPENDENCIES:= Eva Studia Server

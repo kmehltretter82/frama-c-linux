@@ -24,8 +24,8 @@ type format = Dot | Json
 
 let output format context basename =
   let filename, output_function = match format with
-    | Dot -> basename ^ ".dot", Imprecision_graph.ouptput_to_dot
-    | Json -> basename ^ ".json", Imprecision_graph.ouptput_to_json
+    | Dot -> basename ^ ".dot", Dive_graph.ouptput_to_dot
+    | Json -> basename ^ ".json", Dive_graph.ouptput_to_json
   in
   Self.result "output to %s" filename;
   let out_channel = open_out filename in

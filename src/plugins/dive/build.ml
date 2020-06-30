@@ -23,6 +23,8 @@
 open Cil_types
 open Dive_types
 
+module Graph = Dive_graph
+
 let dkey = Self.register_category "build"
 
 
@@ -122,7 +124,7 @@ let update_node_values node kinstr lval =
         | Some min, Some max -> min, max
         | _, _ -> assert false (* ival have been reinterpreted *)
       in
-      Imprecision_graph.update_node_int_values node {
+      Graph.update_node_int_values node {
         values_interval = {min;max};
         values_limits = ikind_limits ikind;
         values_grade = int_grade ikind (min,max)
@@ -133,7 +135,7 @@ let update_node_values node kinstr lval =
         | None, _can_be_nan -> ()
         | Some (min, max), _can_be_nan ->
           let min = Fval.F.to_float min and max = Fval.F.to_float max in
-          Imprecision_graph.update_node_float_values node {
+          Graph.update_node_float_values node {
             values_interval = {min;max};
             values_limits = fkind_limits fkind;
             values_grade = float_grade fkind (min,max);
@@ -236,7 +238,6 @@ module NodeRef = Datatype.Pair_with_collections
     (Node_kind) (Callstack)
     (struct let module_name = "Build.NodeRef" end)
 
-module Graph = Imprecision_graph
 module Index = Datatype.Int.Hashtbl
 module NodeTable = FCHashtbl.Make (NodeRef)
 module BaseSet = Cil_datatype.Varinfo.Set
@@ -312,7 +313,7 @@ let build_all_scattered_node ~limit context callstack kinstr lval =
   try
     let cells, complete =
       try
-       enumerate_cells ~is_folded_base ~limit lval kinstr, true
+        enumerate_cells ~is_folded_base ~limit lval kinstr, true
       with Too_many_deps cells -> cells, false
     in
     let add node_kind =
@@ -672,22 +673,19 @@ let reduce_to_horizon ({ graph } as context) range new_root =
   (* Reduce to one root *)
   context.roots <- [ new_root ];
   (* List visible nodes *)
-  let bacward_nodes =
-    Imprecision_graph.bfs ~iter_succ:Imprecision_graph.iter_pred
-      ?limit:range.backward graph context.roots
-  and forward_nodes =
-    Imprecision_graph.bfs ~iter_succ:Imprecision_graph.iter_succ
-      ?limit:range.forward graph context.roots
-  in
+  let backward_bfs = Graph.bfs ~iter_succ:Graph.iter_pred ?limit:range.backward
+  and forward_bfs = Graph.bfs ~iter_succ:Graph.iter_succ ?limit:range.forward in
+  let bacward_nodes = backward_bfs graph context.roots
+  and forward_nodes = forward_bfs graph context.roots in
   (* Table of visible nodes *)
-  let module Table = Hashtbl.Make (Imprecision_graph.Node) in
+  let module Table = Hashtbl.Make (Graph.Node) in
   let visible = Table.create 13 in
   let is_visible = Table.mem visible in
   List.iter (fun n -> Table.add visible n true) (bacward_nodes @ forward_nodes);
   (* Find nodes to hide / remove *)
   let update node =
     if not (is_visible node) then
-      if List.exists is_visible (Imprecision_graph.succ graph node) then
+      if List.exists is_visible (Graph.succ graph node) then
         remove_dependencies context node
       else
         remove_node context node

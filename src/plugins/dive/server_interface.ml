@@ -146,17 +146,17 @@ end
 
 module Graph =
 struct
-  type t = Imprecision_graph.t
+  type t = Dive_graph.t
   let syntax = Syntax.any
-  let to_json = Imprecision_graph.to_json
+  let to_json = Dive_graph.to_json
 end
 
 
 module GraphDiff =
 struct
-  type t = Imprecision_graph.t * graph_diff
+  type t = Dive_graph.t * graph_diff
   let syntax = Syntax.any
-  let to_json = fun (g,d) -> Imprecision_graph.diff_to_json g d
+  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
 end
 
 

@@ -29,7 +29,7 @@ val create : unit -> t
 val clear : t -> unit (* reset to almost an empty context,
                          but keeps folded and hidden bases *)
 
-val get_graph : t -> Imprecision_graph.t
+val get_graph : t -> Dive_graph.t
 val get_roots : t -> node list
 
 val unfold_base : t -> varinfo -> unit
