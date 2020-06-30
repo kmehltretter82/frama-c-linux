@@ -8,9 +8,9 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_bts/issue_898.i, line 8) in 'job':
-Let r = job_0.F1_S_value.
-Assume { (* Pre-condition *) Have: is_finite_f64(r). }
-Prove: eq_f64(r, r).
+Let a = job_0.F1_S_value.
+Assume { (* Pre-condition *) Have: is_finite_f64(a). }
+Prove: eq_f64(a, a).
 
 ------------------------------------------------------------
 
