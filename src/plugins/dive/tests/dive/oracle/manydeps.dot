@@ -22,13 +22,13 @@ digraph G {
   cp21 [label=<t6>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
   cp23 [label=<t5>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-        style="filled,dotted", ];
+        style="filled", ];
   cp25 [label=<t4>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-        style="filled,dotted", ];
+        style="filled", ];
   cp27 [label=<t3>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-        style="filled,dotted", ];
+        style="filled", ];
   cp29 [label=<t2>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
-        style="filled,dotted", ];
+        style="filled", ];
   cp31 [label=<__retres>, shape=box, ];
   cp32 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
         color="#88AAFF", style="filled,dotted", ];

@@ -5,7 +5,7 @@ digraph G {
   cp4 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp6 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-       style="filled,dotted", ];
+       style="filled", ];
   
   subgraph cluster_cs_1 { label=<main>; cp6;cp4;cp1;
      };
@@ -14,6 +14,7 @@ digraph G {
   
   cp2 -> cp1;
   cp4 -> cp1;
+  cp4 -> cp6;
   cp6 -> cp2;
   
   }

@@ -9,9 +9,11 @@ digraph G {
   cp8 [label=<__retres>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
   cp10 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp12 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled,dotted", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp2;cp1;
+  subgraph cluster_cs_1 { label=<main>; cp12;cp2;cp1;
     subgraph cluster_cs_2 { label=<f>; cp10;cp4;
       subgraph cluster_cs_3 { label=<g>; cp6;
         subgraph cluster_cs_4 { label=<h>; cp8;
@@ -25,5 +27,6 @@ digraph G {
   cp6 -> cp4;
   cp8 -> cp6;
   cp10 -> cp8;
+  cp12 -> cp10;
   
   }
