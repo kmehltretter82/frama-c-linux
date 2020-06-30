@@ -174,10 +174,6 @@ wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
 	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 
-wp-qualif-env:
-	echo "FRAMAC_WP_CACHE=update"
-	echo "FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE)"
-
 wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	@echo "[CACHE] pull cache"
 	@echo "[CACHE] $(WP_QUALIF_CACHE)"
