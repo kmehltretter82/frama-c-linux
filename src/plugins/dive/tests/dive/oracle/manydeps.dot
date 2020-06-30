@@ -1,0 +1,60 @@
+digraph G {
+  cp1 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp3 [label=<t14>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp5 [label=<t13>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp7 [label=<t12>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp9 [label=<t11>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp11 [label=<t10>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp13 [label=<t1>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp15 [label=<t9>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp17 [label=<t8>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp19 [label=<t7>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp21 [label=<t6>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp23 [label=<t5>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled,dotted", ];
+  cp25 [label=<t4>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled,dotted", ];
+  cp27 [label=<t3>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled,dotted", ];
+  cp29 [label=<t2>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled,dotted", ];
+  cp31 [label=<__retres>, shape=box, ];
+  cp32 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
+        color="#88AAFF", style="filled,dotted", ];
+  
+  subgraph cluster_cs_1 { label=<many_writes>; cp1;
+     };
+  subgraph cluster_cs_2 { label=<many_values>; cp32;cp31;
+     };
+  subgraph cluster_file_1 { label=<tests/dive/manydeps.i>; cp29;cp27;cp25;cp23;cp21;cp19;cp17;cp15;cp13;cp11;cp9;cp7;cp5;cp3;
+     };
+  
+  cp1 -> cp1 [style="bold", ];
+  cp3 -> cp1;
+  cp5 -> cp1;
+  cp7 -> cp1;
+  cp9 -> cp1;
+  cp11 -> cp1;
+  cp13 -> cp1 [style="bold", ];
+  cp15 -> cp1;
+  cp17 -> cp1;
+  cp19 -> cp1;
+  cp21 -> cp1;
+  cp23 -> cp1;
+  cp25 -> cp1;
+  cp27 -> cp1;
+  cp29 -> cp1;
+  cp32 -> cp31;
+  
+  }

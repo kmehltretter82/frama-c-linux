@@ -25,7 +25,6 @@ open Dive_types
 
 let dkey = Self.register_category "build"
 
-exception Too_many_deps
 
 (* --- Utility function --- *)
 
@@ -167,17 +166,17 @@ let cell_to_scalar typ vi offset =
   with Bit_utils.NoMatchingOffset -> raise NoMatchingOffset
 
 exception NotACell
+exception Too_many_deps of node_kind list
 
 let enumerate_cells ~is_folded_base ~limit lval kinstr =
   (* TODO: non-variable bases must be shown to the user somehow *)
-  (* TODO: exceptions must be shown to the user somehow *)
   (* If possible, refine the lval to a non-symbolic one *)
   let location = !Db.Value.lval_to_loc kinstr lval
   and typ = Cil.typeOfLval lval in
   let open Locations in
   let add (acc,count) node_kind =
     if count > limit then
-      raise Too_many_deps;
+      raise (Too_many_deps acc);
     (node_kind :: acc, count+1)
   in
   let add_base base ival (acc,count) =
@@ -203,8 +202,7 @@ let enumerate_cells ~is_folded_base ~limit lval kinstr =
 let build_node_kind ~is_folded_base lval kinstr =
   match enumerate_cells ~is_folded_base ~limit:1 lval kinstr with
   | [node_kind] -> node_kind
-  | _ -> Scattered (lval, kinstr)
-  | exception NotACell -> Scattered (lval, kinstr)
+  | _ | exception (NotACell | Too_many_deps _) -> Scattered (lval, kinstr)
 
 let default_node_locality callstack =
   match callstack with
@@ -309,21 +307,25 @@ let build_node context callstack lval kinstr =
   let node_kind = build_node_kind ~is_folded_base lval kinstr in
   add_or_update_node context callstack node_kind
 
-let build_all_scattered_node context callstack kinstr lval =
+let build_all_scattered_node ~limit context callstack kinstr lval =
   let is_folded_base = is_folded context in
   try
-    let cells = enumerate_cells ~is_folded_base ~limit:20 lval kinstr in
+    let cells, complete =
+      try
+       enumerate_cells ~is_folded_base ~limit lval kinstr, true
+      with Too_many_deps cells -> cells, false
+    in
     let add node_kind =
       let node = add_or_update_node context callstack node_kind in
       let new_lval = Extlib.the (Node_kind.to_lval node_kind) in
       update_node_values node kinstr new_lval;
       node
     in
-    List.map add cells
+    List.map add cells, complete
   with NotACell ->
     Self.warning "Unable to enumerate cells for %a"
       Cil_printer.pp_lval lval;
-    []
+    [], true
 
 let build_var context callstack varinfo =
   let lval = Var varinfo, NoOffset in
@@ -349,7 +351,7 @@ let build_node_deps context node =
       | Done -> []
       | Partial writes -> writes
       | NotDone ->
-        Self.debug ~dkey "computing deps for %a" Node_kind.pretty node.node_kind;
+        Self.debug ~dkey "computing writes for %a" Node_kind.pretty node.node_kind;
         let result = Studia.Writes.compute zone in
         let is_direct (_,{Studia.Writes.direct}) = direct in
         let writes = Extlib.filter_map is_direct fst result in
@@ -387,7 +389,7 @@ let build_node_deps context node =
     in
     let sub,rest = list_break context.max_dep_fetch_count writes in
     List.iter add_deps sub;
-    node.node_writes_computation <- if rest = [] then Done else Partial rest
+    if rest = [] then Done else Partial rest
 
   and build_arg_deps callstack vi =
     assert vi.vformal;
@@ -492,18 +494,24 @@ let build_node_deps context node =
       context.graph kinstr dst kind node
 
   and build_scattered_deps callstack kinstr lval =
-    let nodes = build_all_scattered_node context callstack kinstr lval in
+    let succ_count = List.length (Graph.pred context.graph node) in
+    let limit = succ_count + context.max_dep_fetch_count in
+    let nodes, complete =
+      build_all_scattered_node ~limit context callstack kinstr lval
+    in
     let kind = Composition in
     let add_dep dst =
       Graph.create_dependency ~allow_folding:true
         context.graph kinstr dst kind node
     in
-    List.iter add_dep nodes
+    List.iter add_dep nodes;
+    if complete then Done else NotDone
 
   in
   update_node context node;
   let callstack = node.node_locality.loc_callstack in
-  begin match node.node_kind with
+  let writes_computation =
+    match node.node_kind with
     | Scalar (vi,_typ,offset) ->
       let lval = (Cil_types.Var vi, offset) in
       build_lval_write_deps callstack Kglobal lval
@@ -513,8 +521,10 @@ let build_node_deps context node =
     | Scattered (lval,kinstr) ->
       build_scattered_deps callstack kinstr lval
     | Alarm (stmt,alarm) ->
-      build_alarm_deps callstack stmt alarm
-  end;
+      build_alarm_deps callstack stmt alarm;
+      Done
+  in
+  node.node_writes_computation <- writes_computation;
   begin match Node_kind.get_base node.node_kind with
     (* TODO refine formal dependency computation for non-scalar formals *)
     | Some vi when vi.vformal -> build_arg_deps callstack vi
@@ -588,16 +598,8 @@ let explore ~depth context root =
     let (n,d) = Queue.take queue in
     if d < depth then begin
       if n.node_writes_computation <> Done && should_auto_explore n then
-        begin
-          begin try
-              build_node_deps context n;
-            with Too_many_deps ->
-              (* TODO: give a mean to explore more dependencies *)
-              Self.warning "Too many dependencies for %a ; throwing them out"
-                Node_kind.pretty n.node_kind;
-          end;
-        end;
-      Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n
+        build_node_deps context n;
+      Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n;
     end;
   done
 
