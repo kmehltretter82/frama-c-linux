@@ -74,49 +74,28 @@ export default [
     }
   },
   {
-    selector: 'node[float_range]',
+    selector: 'node[stops]',
     style: {
+      'border-color': '#8e6',
+      'background-gradient-stop-colors': '#5d3 #5d3 #9f7 #9f7',
       'background-width-relative-to': 'include-padding',
-      backgroundFill: 'linear-gradient',
-      backgroundGradientDirection: 'to-left',
-      backgroundGradientStopPositions: (ele) => {
-        let r = ele.data('float_range') / 2;
-        return `0% 0% ${r}% ${100-r}% 100% 100%`;
-      }
+      'background-fill': 'linear-gradient',
+      'background-gradient-direction': 'to-top',
+      'background-gradient-stop-positions': 'data(stops)'
     }
   },
   {
-    selector: 'node[int_range]',
+    selector: 'node[range="singleton"]',
     style: {
-      'background-width-relative-to': 'include-padding',
-      backgroundFill: 'linear-gradient',
-      backgroundGradientDirection: 'to-left',
-      backgroundGradientStopPositions: (ele) => {
-        let r = ele.data('int_range') / 2;
-        return `0% ${r}% ${r}% ${100-r}% ${100-r}% 100%`;
-      }
+      'border-color': '#8af',
+      'background-color': '#acf'
     }
   },
   {
-    selector: 'node[grade="singleton"]',
+    selector: 'node[range="wide"]',
     style: {
-      'background-gradient-stop-colors': '#acf #acf #acf #acf #acf #acf',
-      'background-color': '#acf',
-      'border-color': '#8af'
-    }
-  },
-  {
-    selector: 'node[grade="normal"]',
-    style: {
-      'background-gradient-stop-colors': '#4c2 #4c2 #bea #bea #4c2 #4c2',
-      'border-color': '#898'
-    }
-  },
-  {
-    selector: 'node[grade="wide"]',
-    style: {
-      'background-gradient-stop-colors': '#e44 #e44 #faa #faa #e44 #e44',
-      'border-color': '#f88'
+      'border-color': '#f88',
+      'background-color': '#e44'
     }
   },
   {

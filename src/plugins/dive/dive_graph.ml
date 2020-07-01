@@ -64,8 +64,8 @@ let create_node ~node_kind ~node_locality g =
     node_kind;
     node_locality;
     node_hidden = false;
-    node_int_values = None;
-    node_float_values = None;
+    node_values = None;
+    node_range = Empty;
     node_writes_computation = NotDone;
     node_writes_stmts = [];
   }
@@ -75,44 +75,11 @@ let create_node ~node_kind ~node_locality g =
 
 let remove_node = remove_vertex
 
-let union_int_interval i1 i2 =
-  { min = Integer.min i1.min i2.min ; max = Integer.max i1.max i2.max }
-
-let union_float_interval i1 i2 =
-  { min = min i1.min i2.min ; max = max i1.max i2.max }
-
-let worst_precision_grade q1 q2 =
-  match q1, q2 with
-  | Wide, _ | _, Wide -> Wide
-  | Normal, _ | _, Normal -> Normal
-  | Singleton, Singleton -> Singleton
-
-let merge_int_values p1 p2 =
-  (* TODO: prevent assertion failure *)
-  assert (Integer.equal p1.values_limits.min p2.values_limits.min);
-  assert (Integer.equal p1.values_limits.max p2.values_limits.max);
-  {
-    values_interval = union_int_interval p1.values_interval p2.values_interval;
-    values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
-  }
-
-let merge_float_values p1 p2 =
-  (* TODO: prevent assertion failure *)
-  assert (p1.values_limits = p2.values_limits);
-  {
-    values_interval = union_float_interval p1.values_interval p2.values_interval;
-    values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
-  }
-
-let update_node_int_values node new_values =
-  node.node_int_values <-
-    Some (Extlib.opt_fold merge_int_values node.node_int_values new_values)
-
-let update_node_float_values node new_values =
-  node.node_float_values <-
-    Some (Extlib.opt_fold merge_float_values node.node_float_values new_values)
+let update_node_values node new_values typ =
+  node.node_values <-
+    Some (Extlib.opt_fold Cvalue.V.join node.node_values new_values);
+  node.node_range <-
+    Node_range.(upper_bound node.node_range (evaluate new_values typ))
 
 let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
   let same_kind (_,e,_) =
@@ -237,13 +204,6 @@ let ouptput_to_dot out_channel g =
       let default_vertex_attributes _g = []
       let vertex_name v = "cp" ^ (string_of_int v.node_key)
       let vertex_attributes v =
-        let grade = match v.node_int_values, v.node_float_values with
-          | Some v1, Some v2 ->
-            Some (worst_precision_grade v1.values_grade v2.values_grade)
-          | Some v, _ -> Some v.values_grade
-          | _, Some v -> Some v.values_grade
-          | None, None -> None
-        in
         let l = ref [] in
         let text = Pretty_utils.to_string Node_kind.pretty v.node_kind in
         if text <> "" then
@@ -258,16 +218,16 @@ let ouptput_to_dot out_channel g =
                           `Style `Filled ; `Fillcolor 0xff0000 ]
           | AbsoluteMemory | String _ -> [`Shape `Box3d]
           | Error _ -> [`Color 0xff0000]
-        and values = match grade with
-          | None -> []
-          | Some Singleton ->
+        and range = match v.node_range with
+          | Empty -> []
+          | Singleton ->
             [`Color 0x88aaff ; `Style `Filled ; `Fillcolor 0xaaccff ]
-          | Some Normal ->
+          | Normal _ ->
             [ `Color 0x004400 ; `Style `Filled ; `Fillcolor 0xeeffee ]
-          | Some Wide ->
+          | Wide ->
             [ `Color 0xff0000 ; `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
-        l := values @ kind @ !l;
+        l := range @ kind @ !l;
         if v.node_writes_computation <> Done then
           l := [ `Style `Dotted ] @ !l;
         !l
@@ -329,13 +289,12 @@ struct
     in
     `Assoc fields
 
-  let output_node_precision_grade grade =
-    let s = match grade with
-      | Singleton -> "singleton"
-      | Normal -> "normal"
-      | Wide -> "wide"
-    in
-    `String s
+  let output_range range =
+    match range with
+    | Empty -> `String "empty"
+    | Singleton -> `String "singleton"
+    | Normal range_grade -> `Int range_grade
+    | Wide -> `String "wide"
 
   let output_dep_kind kind =
     let s = match kind with
@@ -347,32 +306,10 @@ struct
     in
     `String s
 
-  let output_int_interval interval =
-    (* TODO: handle overflow *)
-    `Assoc [
-      ("min", `Int (Integer.to_int interval.min)) ;
-      ("max", `Int (Integer.to_int interval.max)) ;
-    ]
-
-  let output_float_interval interval =
-    `Assoc [
-      ("min", `Float interval.min) ;
-      ("max", `Float interval.max) ;
-    ]
-
-  let output_node_int_values values =
-    `Assoc [
-      ("computed", output_int_interval values.values_interval) ;
-      ("limits", output_int_interval values.values_limits) ;
-      ("grade", output_node_precision_grade values.values_grade) ;
-    ]
-
-  let output_node_float_values values =
-    `Assoc [
-      ("computed", output_float_interval values.values_interval) ;
-      ("limits", output_float_interval values.values_limits) ;
-      ("grade", output_node_precision_grade values.values_grade) ;
-    ]
+  let output_node_values values =
+    match values with
+    | None -> `Null
+    | Some cvalue -> `String (Pretty_utils.to_string Cvalue.V.pretty cvalue)
 
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
@@ -383,17 +320,9 @@ struct
         ("locality", output_node_locality node.node_locality) ;
         ("explored", `Bool (node.node_writes_computation = Done)) ;
         ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;
+        ("values",  output_node_values node.node_values) ;
+        ("range",  output_range node.node_range) ;
       ] @
-        begin match node.node_int_values with
-          | None -> []
-          | Some node_values ->
-            [("int_values", output_node_int_values node_values)]
-        end @
-        begin match node.node_float_values with
-          | None -> []
-          | Some node_values ->
-            [("float_values", output_node_float_values node_values)]
-        end @
         begin match Node_kind.to_lval node.node_kind with
           | None -> []
           | Some lval ->

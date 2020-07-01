@@ -1,5 +1,3 @@
-import { strict as assert } from 'assert';
-
 import React, { useState, useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 import * as Dome from 'dome';
@@ -55,39 +53,6 @@ interface CytoscapeExtended extends Cytoscape.Core {
 
 function callstackToString(callstack: callstack): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
-}
-
-function nodeToIntervalString(node: Cytoscape.NodeSingular): string
-{
-  const data = node.data();
-  let interval;
-
-  if (data.float_values) {
-    interval = data.float_values.computed;
-  }
-  else if (data.int_values) {
-    interval = data.int_values.computed;
-  }
-
-  return `[${interval.min} ; ${interval.max}]`;
-}
-
-function range(interval: Interval, limit: Interval): number
-{
-  const l = Math.max(Math.abs(limit.min), Math.abs(limit.max));
-  const x = Math.max(Math.abs(interval.min), Math.abs(interval.max));
-
-  if (x === Infinity) {
-    return 100;
-  }
-
-  if (x <= Math.E) {
-    return 1;
-  }
-
-  const r = Math.log(Math.log(x)) / Math.log(Math.log(l));
-  assert(0.0 <= r && r <= 1.0);
-  return Math.max(1, Math.min(100, Math.floor(r * 100)));
 }
 
 
@@ -227,10 +192,10 @@ class Dive {
 
     const tips = [];
 
-    if (node.data().float_values || node.data().int_values) {
+    if (node.data().values) {
       tips.push(tippy(container, {
         ...common,
-        content: nodeToIntervalString(node),
+        content: node.data().values,
         placement: 'top',
         distance: 10,
         arrow: true,
@@ -275,16 +240,8 @@ class Dive {
 
     for (const node of data.nodes)
     {
-      if (node.float_values) {
-        const { computed, limits } = node.float_values;
-        node.float_range = range(computed, limits);
-        node.grade = node.float_values.grade;
-      }
-      else if (node.int_values) {
-        const { computed, limits } = node.int_values;
-        node.int_range = range(computed, limits);
-        node.grade = node.int_values.grade;
-      }
+      if (typeof node.range === 'number')
+        node.stops = `0% ${node.range}% ${node.range}% 100%`;
 
       const previous = this.cy.$id(node.id);
       if (previous.nonempty()) {

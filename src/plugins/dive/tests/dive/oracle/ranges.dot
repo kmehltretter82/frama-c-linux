@@ -1,0 +1,62 @@
+digraph G {
+  cp1 [label=<res>, shape=box, ];
+  cp2 [label=<i>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp4 [label=<f>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+       style="filled", ];
+  cp6 [label=<i0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+       style="filled", ];
+  cp8 [label=<i1>, shape=box, fillcolor="#EEFFEE", color="#004400",
+       style="filled", ];
+  cp10 [label=<i2>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp12 [label=<i3>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp14 [label=<i4>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp16 [label=<i5>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp18 [label=<i6>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp20 [label=<i7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp22 [label=<f0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled", ];
+  cp24 [label=<f1>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp26 [label=<f2>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp28 [label=<f3>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp30 [label=<f4>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp32 [label=<f5>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp34 [label=<f6>, shape=box, fillcolor="#EEFFEE", color="#004400",
+        style="filled", ];
+  cp36 [label=<f7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  
+  subgraph cluster_cs_1 { label=<main>; cp36;cp34;cp32;cp30;cp28;cp26;cp24;cp22;cp20;cp18;cp16;cp14;cp12;cp10;cp8;cp6;cp4;cp2;cp1;
+     };
+  
+  cp2 -> cp1;
+  cp4 -> cp1;
+  cp6 -> cp2;
+  cp8 -> cp2;
+  cp10 -> cp2;
+  cp12 -> cp2;
+  cp14 -> cp2;
+  cp16 -> cp2;
+  cp18 -> cp2;
+  cp20 -> cp2;
+  cp22 -> cp4;
+  cp24 -> cp4;
+  cp26 -> cp4;
+  cp28 -> cp4;
+  cp30 -> cp4;
+  cp32 -> cp4;
+  cp34 -> cp4;
+  cp36 -> cp4;
+  
+  }

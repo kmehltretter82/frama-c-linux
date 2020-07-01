@@ -201,8 +201,8 @@ struct
       "locality", NodeLocality.syntax;
       "explored", Syntax.boolean;
       "writes", Syntax.array Kernel_ast.Marker.syntax;
-      "int_values", Syntax.any;
-      "float_values", Syntax.any;
+      "values", Syntax.option Syntax.string;
+      "range", Syntax.union [ Syntax.string ; Syntax.int ];
       "type", Syntax.option Syntax.string
     ]
 
