@@ -19,18 +19,19 @@ const SelectionTable = () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const length = selection?.multiple?.length;
-  const multiple: States.Location[] = selection?.multiple;
   const model = React.useMemo(() => new ArrayModel('id'), []);
+
+  const multiple = selection?.multiple;
+  const numblerOfSelections = multiple?.allSelections?.length;
 
   // Updates [[model]] with the current multiple selection.
   React.useEffect(() => {
-    if (multiple?.length > 0) {
-      const array = multiple.map((d, i) => ({ ...d, id: i }));
+    if (numblerOfSelections > 0) {
+      const array = multiple.allSelections.map((d, i) => ({ ...d, id: i }));
       model.replace(array);
     } else
       model.clear();
-  }, [multiple, model]);
+  }, [numblerOfSelections, multiple, model]);
 
   // Callbacks
   const onTableSelection = React.useCallback(
@@ -39,7 +40,7 @@ const SelectionTable = () => {
   );
 
   const reload = () => {
-    const location = multiple[selection?.index];
+    const location = multiple.allSelections[multiple.index];
     updateSelection({ location });
   };
 
@@ -50,41 +51,44 @@ const SelectionTable = () => {
         <Toolbar.Button
           icon="RELOAD"
           onClick={reload}
-          enabled={length > 1}
+          enabled={numblerOfSelections > 1}
           title="Reload the current location of the multiple selection"
         />
         <Toolbar.ButtonGroup>
           <Toolbar.Button
             icon="ANGLE.LEFT"
-            onClick={() => updateSelection('PREV')}
-            enabled={length > 1 && selection?.index > 0}
+            onClick={() => updateSelection('MULTIPLE_PREV')}
+            enabled={numblerOfSelections > 1 && multiple?.index > 0}
             title="Previous location of the multiple selection"
           />
           <Toolbar.Button
             icon="ANGLE.RIGHT"
-            onClick={() => updateSelection('NEXT')}
-            enabled={length > 1 && selection?.index < length - 1}
+            onClick={() => updateSelection('MULTIPLE_NEXT')}
+            enabled={
+              numblerOfSelections > 1 &&
+              multiple?.index < numblerOfSelections - 1
+            }
             title="Next location of the multiple selection"
           />
         </Toolbar.ButtonGroup>
         <Label
           className="component-info"
-          title={`${length} selected locations`}
-          display={length > 1}
+          title={`${numblerOfSelections} selected locations`}
+          display={numblerOfSelections > 1}
         >
-          {selection?.index + 1} / {length}
+          {multiple?.index + 1} / {numblerOfSelections}
         </Label>
         <Toolbar.Filler />
         <Toolbar.Button
           icon="CIRC.CLOSE"
-          onClick={() => updateSelection('CLEAR')}
-          enabled={length > 1}
+          onClick={() => updateSelection('MULTIPLE_CLEAR')}
+          enabled={numblerOfSelections > 1}
           title="Clear the multiple selection"
         />
       </Toolbar.ToolBar>
       <Table
         model={model}
-        selection={selection?.index}
+        selection={multiple?.index}
         onSelection={onTableSelection}
       >
         <Column
@@ -92,7 +96,7 @@ const SelectionTable = () => {
           label="#"
           align="center"
           width={25}
-          getter={(r: {id: number}) => r.id + 1}
+          getter={(r: { id: number }) => r.id + 1}
         />
         <Column id="function" label="Function" width={120} />
         <Column id="marker" label="Marker" fill />

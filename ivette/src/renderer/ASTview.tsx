@@ -64,7 +64,10 @@ async function loadAST(
   }
 }
 
-async function callers(updateSelection: any, kf: string) {
+async function functionCallers(
+  updateSelection: (a: States.SelectionActions) => void,
+  kf: string,
+) {
   try {
     const data = await Server.GET({
       endpoint: 'eva.callers',
@@ -75,7 +78,7 @@ async function callers(updateSelection: any, kf: string) {
     ));
     updateSelection({ locations });
   } catch (err) {
-    PP.error('Fail to retrieve callers of function', kf, err);
+    PP.error(`Fail to retrieve callers of function ${kf}`, err);
   }
 }
 
@@ -89,7 +92,7 @@ const ASTview = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection, updateSelection] = States.useSelection();
-  const multiple = selection?.multiple;
+  const multipleSelections = selection?.multiple.allSelections;
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
@@ -108,12 +111,12 @@ const ASTview = () => {
 
   React.useEffect(() => {
     const decorator = (marker: string) => {
-      if (multiple.some((location) => location?.marker === marker))
+      if (multipleSelections?.some((location) => location?.marker === marker))
         return 'highlighted-marker';
       return undefined;
     };
     buffer.setDecorator(decorator);
-  }, [buffer, multiple]);
+  }, [buffer, multipleSelections]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
@@ -144,11 +147,11 @@ const ASTview = () => {
       });
     }
     if (marker?.kind === 'declaration'
-        && marker?.var === 'function'
-        && marker?.name) {
+      && marker?.var === 'function'
+      && marker?.name) {
       items.push({
         label: 'Go to callers',
-        onClick: () => callers(updateSelection, marker.name),
+        onClick: () => functionCallers(updateSelection, marker.name),
       });
     }
     if (items.length > 0)
