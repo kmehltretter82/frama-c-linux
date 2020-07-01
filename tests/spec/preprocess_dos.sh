@@ -1,3 +1,3 @@
 #!/bin/sh
-gcc -C -E -I. -o $2 $1
-dos2unix -q $2
+gcc -C -E -I. -o $3 $2
+$1 -q $3

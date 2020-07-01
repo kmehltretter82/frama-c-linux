@@ -2338,7 +2338,25 @@ PTESTS_SRC=ptests/ptests_config.ml ptests/ptests.ml
 # that does not contain a 'tests' dir
 PTESTS_CONFIG:= $(shell if test -d tests; then echo tests/ptests_config; fi)
 
-ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG)
+ifneq ("$(PTESTS_CONFIG)","")
+GENERATED_TESTS:=tests/spec/preprocess_dos.c
+else
+GENERATED_TESTS:=
+endif
+
+ifneq ("$(HAS_UNIX2DOS)","no")
+tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in
+	$(SED) -e "s|@UNIX2DOS@|$(UNIX2DOS)|g" \
+               -e "s|@DONTRUN@||g" \
+               $< > $@
+else
+tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in
+	$(SED) -e "s|@DONTRUN@|DONTRUN: no unix2dos found|g" \
+               -e "s|@UNIX2DOS|unix2dos|g" \
+               $< > $@
+endif
+
+ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG) $(GENERATED_TESTS)
 
 bin/ptests.byte$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
@@ -2350,7 +2368,7 @@ bin/ptests.opt$(EXE): $(PTESTS_SRC)
 	$(OCAMLOPT) -I ptests -dtypes -thread -o $@ \
 	    unix.cmxa threads.cmxa str.cmxa dynlink.cmxa $^
 
-GENERATED+=ptests/ptests_config.ml tests/ptests_config
+GENERATED+=ptests/ptests_config.ml tests/ptests_config $(GENERATED_TESTS)
 
 #######################
 # Source distribution #
