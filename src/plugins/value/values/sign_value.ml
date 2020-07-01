@@ -125,10 +125,10 @@ let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
 (** {2 Forward transfer functions} *)
 
-(* The three functions below are forward transformers for the mathematical
-   operations +, *, /, and the unary negation -. The potential overflows for the
-   operations on machine integers are taken into account by the functions
-   [truncate_integer] and [rewrap_integer]. *)
+(* Functions [neg_unop], [plus], [mul] and [div] below are forward transformers
+   for the mathematical operations -, +, *, /. The potential overflows and
+   wrappings for the operations on machine integers are taken into account by
+   the functions [truncate_integer] and [rewrap_integer]. *)
 
 let neg_unop v = { v with neg = v.pos; pos = v.neg }
 
@@ -168,6 +168,22 @@ let div v1 v2 =
   let neg = (v1.pos && v2.neg) || (v1.neg && v2.pos) in
   let zero = true in (* zero can appear with large enough v2 *)
   { neg; pos; zero }
+
+(* The implementation of the bitwise operators below relies on this table
+   giving the sign of the result according to the sign of both operands.
+
+       v1  v2   v1&v2   v1|v2   v1^v2
+   -----------------------------------
+   |   +   +      +0      +       +0
+   |   +   0      0       +       +
+   |   +   -      +0      -       -
+   |   0   +      0       +       +
+   |   0   0      0       0       0
+   |   0   -      0       -       -
+   |   -   +      +0      -       -
+   |   -   0      0       -       -
+   |   -   -      -       -       +0
+*)
 
 let bitwise_and v1 v2 =
   let pos = (v1.pos && (v2.pos || v2.neg)) || (v2.pos && v1.neg) in
