@@ -20,7 +20,7 @@ import { Component, TitleBar } from 'frama-c/LabViews';
 
 import '@fortawesome/fontawesome-free/js/all';
 
-import style from './dive_style';
+import style from './dive_style.json';
 import layouts from './dive_layouts.json';
 
 
