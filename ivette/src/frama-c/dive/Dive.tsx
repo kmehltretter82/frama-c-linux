@@ -12,7 +12,7 @@ import tippy, * as Tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
 import 'tippy.js/animations/shift-away.css';
-import './dive_tippy.css';
+import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
@@ -20,8 +20,8 @@ import { Component, TitleBar } from 'frama-c/LabViews';
 
 import '@fortawesome/fontawesome-free/js/all';
 
-import style from './dive_style.json';
-import layouts from './dive_layouts.json';
+import style from './style.json';
+import layouts from './layouts.json';
 
 
 const ctxmenu = {
