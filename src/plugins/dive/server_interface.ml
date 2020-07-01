@@ -144,28 +144,12 @@ struct
 end
 
 
-module Graph =
-struct
-  type t = Dive_graph.t
-  let syntax = Syntax.any
-  let to_json = Dive_graph.to_json
-end
-
-
-module GraphDiff =
-struct
-  type t = Dive_graph.t * graph_diff
-  let syntax = Syntax.any
-  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
-end
-
-
-module Node = Data.Collection (struct
+module NodeId = Data.Collection (struct
     type t = node
+    let name = "dive-node-id"
+    let descr = Markdown.plain "A node identifier in the graph"
 
-    let syntax = Syntax.publish ~page ~name:"dive-node"
-        ~synopsis:Syntax.int
-        ~descr:(Markdown.plain "A node identifier in the graph") ()
+    let syntax = Syntax.publish ~page ~name ~synopsis:Syntax.int ~descr ()
 
     let to_json node =
       `Int node.node_key
@@ -178,6 +162,106 @@ module Node = Data.Collection (struct
       with Not_found ->
         Data.failure "no node '%d' in the current graph" node_key
   end)
+
+module Callstack =
+struct
+  let name = "dive-callstack"
+  let descr = Markdown.plain "The callstack context for a node"
+
+  let synopsis = Syntax.array (Syntax.record [
+      "fun", Syntax.string;
+      "instr", Syntax.union [ Syntax.string ; Syntax.int ]
+    ])
+
+  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+end
+
+module NodeLocality =
+struct
+  let name = "dive-node-locality"
+  let descr = Markdown.plain "The description of a node locality"
+
+  let synopsis = Syntax.record [
+      "file", Syntax.string;
+      "callstack", Syntax.option Callstack.syntax
+    ]
+
+  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+end
+
+module Node =
+struct
+  let name = "dive-node"
+  let descr = Markdown.plain "A dive graph node"
+
+  let synopsis = Syntax.record [
+      "id", NodeId.syntax;
+      "label", Syntax.string;
+      "kind", Syntax.string;
+      "locality", NodeLocality.syntax;
+      "explored", Syntax.boolean;
+      "writes", Syntax.array Kernel_ast.Marker.syntax;
+      "int_values", Syntax.any;
+      "float_values", Syntax.any;
+      "type", Syntax.option Syntax.string
+    ]
+
+  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+end
+
+module Dependency =
+struct
+  let name = "dive-dependency"
+  let descr = Markdown.plain "The dependency between two nodes."
+
+  let synopsis = Syntax.record [
+      "id", Syntax.int ;
+      "src", NodeId.syntax ;
+      "dst", NodeId.syntax ;
+      "kind", Syntax.string ;
+      "multiple", Syntax.boolean ;
+      "origins", Syntax.array Kernel_ast.Marker.syntax
+    ]
+
+  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+end
+
+module Graph =
+struct
+  type t = Dive_graph.t
+  let name = "dive-graph"
+  let descr = Markdown.plain "The whole graph being built."
+
+  let synopsis = Syntax.record [
+      "nodes", Syntax.array Node.syntax;
+      "deps", Syntax.array Dependency.syntax
+    ]
+
+  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+  let to_json = Dive_graph.to_json
+end
+
+
+module GraphDiff =
+struct
+  type t = Dive_graph.t * graph_diff
+  let name = "dive-graph-diff"
+  let descr = Markdown.plain "Graph differences from the last action."
+
+  let synopsis = Syntax.record [
+      "root", NodeId.syntax;
+      "add", Syntax.record [
+        "nodes", Syntax.array Node.syntax;
+        "deps", Syntax.array Dependency.syntax
+      ];
+      "sub", Syntax.array NodeId.syntax
+    ]
+
+  let _syntax = Syntax.publish ~page ~name ~synopsis ~descr ()
+
+  let syntax = Syntax.any
+  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
+end
 
 
 (* -------------------------------------------------------------------------- *)
@@ -231,7 +315,7 @@ let () = Request.register ~page
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
       let context = get_context () in
       finalize context node
@@ -240,7 +324,7 @@ let () = Request.register ~page
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
       let context = get_context () in
       Build.show context node;
@@ -250,7 +334,7 @@ let () = Request.register ~page
 let () = Request.register ~page
     ~kind:`EXEC ~name:"dive.hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
       let context = get_context () in
       Build.hide context node;
