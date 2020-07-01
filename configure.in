@@ -952,6 +952,8 @@ configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
 configure_tool([UNIX2DOS],[unix2dos],
                [unix2dos not found: you should install tofrodos],no)
 
+plugin_use_external(tests,unix2dos)
+
 ########################
 # Plug-in dependencies #
 ########################
