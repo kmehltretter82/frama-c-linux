@@ -2350,6 +2350,7 @@ tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
 	$(SED) -e "s|@UNIX2DOS@|$(UNIX2DOS)|g" \
                -e "s|@DONTRUN@||g" \
                $< > $@
+	$(CHMOD_RO) $@
 else
 tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
                              Makefile share/Makefile.config
@@ -2357,6 +2358,7 @@ tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
 	$(SED) -e "s|@DONTRUN@|DONTRUN: no unix2dos found|g" \
                -e "s|@UNIX2DOS|unix2dos|g" \
                $< > $@
+	$(CHMOD_RO) $@
 endif
 
 ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG) $(GENERATED_TESTS)
