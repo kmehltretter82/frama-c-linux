@@ -57,6 +57,7 @@
 #define valid                 export_alias(valid)
 #define initialized           export_alias(initialized)
 #define freeable              export_alias(freeable)
+#define separated             export_alias(separated)
 
 /* Block initialization  */
 #define mark_readonly         export_alias(mark_readonly)
@@ -323,6 +324,27 @@ size_t offset(void * ptr)
   @ disjoint behaviors;
   @ */
 int initialized(void * ptr, size_t size)
+  __attribute__((FC_BUILTIN));
+
+/*! \brief Implementation of the \b \\separated predicate of E-ACSL.
+ *
+ * The function should be called with `count` being the number of pointers to
+ * check, and the variadic arguments filled with `count` successions of pointers
+ * and sizes of the memory location.
+ *
+ * For instance, the ACSL notation `\separated(a[0..3], b[0..4])` could
+ * correspond to the following call: `separated(2, a, 4, b, 5)`.
+ *
+ * \param count Number of couple (ptr, size) that are to be checked for
+ * separation.
+ * \param ... Pointer and size in succession that are to be checked for
+ * separation.
+ * \return A non-zero value if the memory locations given as parameters are
+ * separated.
+ */
+/*@ assigns \result \from indirect:count;
+  @ ensures \result == 0 || \result == 1; */
+int separated(size_t count, ...)
   __attribute__((FC_BUILTIN));
 
 /* }}} */
