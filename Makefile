@@ -2347,6 +2347,7 @@ endif
 ifneq ("$(HAS_UNIX2DOS)","no")
 tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
                              Makefile share/Makefile.config
+	$(RM) $@
 	$(SED) -e "s|@UNIX2DOS@|$(UNIX2DOS)|g" \
                -e "s|@DONTRUN@||g" \
                $< > $@
