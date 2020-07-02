@@ -219,7 +219,6 @@ struct
       "src", NodeId.syntax ;
       "dst", NodeId.syntax ;
       "kind", Syntax.string ;
-      "multiple", Syntax.boolean ;
       "origins", Syntax.array Kernel_ast.Marker.syntax
     ]
 
@@ -272,9 +271,11 @@ let finalize' context node_opt =
   begin match node_opt with
     | None -> ()
     | Some node ->
-      let depth = !global_window.perception.backward
+      let depth_backward = !global_window.perception.backward
+      and depth_forward = !global_window.perception.forward
       and horizon = !global_window.horizon in
-      Build.explore ~depth context node;
+      Build.explore_backward ~depth:depth_backward context node;
+      Build.explore_forward ~depth:depth_forward context node;
       if Extlib.has_some horizon.forward ||
          Extlib.has_some horizon.backward
       then

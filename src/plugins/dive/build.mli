@@ -47,7 +47,8 @@ val add_stmt : t -> stmt -> node option
 val add_property : t -> Property.t -> node option
 val add_localizable : t -> Printer_tag.localizable -> node option
 
-val explore : depth:int -> t -> node -> unit
+val explore_forward : depth:int -> t -> node -> unit
+val explore_backward : depth:int -> t -> node -> unit
 
 val show : t -> node -> unit
 val hide : t -> node -> unit

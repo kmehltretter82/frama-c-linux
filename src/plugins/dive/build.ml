@@ -40,12 +40,107 @@ let rec list_break n l =
       (a :: l1, l2)
 
 
+(* --- Lval enumeration --- *)
+
+module IterLval =
+struct
+  let visitor f =
+    object
+      inherit Visitor.frama_c_inplace
+      method! vlval lval = f lval; SkipChildren
+    end
+
+  let from_exp f exp =
+    ignore (Visitor.visitFramacExpr (visitor f) exp)
+
+  let from_init f vi init =
+    ignore (Visitor.visitFramacInit (visitor f) vi NoOffset init)
+
+  let from_alarm f = function
+    | Alarms.Division_by_zero e | Index_out_of_bound (e, _) | Invalid_shift (e,_)
+    | Overflow (_,e,_,_) | Float_to_int (e,_,_) | Is_nan_or_infinite (e,_)
+    | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e ->
+      from_exp f e
+    | Pointer_comparison (opt_e1,e2) ->
+      Extlib.may (from_exp f) opt_e1;
+      from_exp f e2
+    | Differing_blocks (e1,e2) ->
+      from_exp f e1; from_exp f e2
+    | Memory_access _ | Not_separated _ | Overlap _
+    | Uninitialized _ | Dangling _ | Uninitialized_union _ -> ()
+    | Invalid_bool lv -> f lv
+end
+
+
+(* --- Evaluation from analysis results --- *)
+
+module Eval =
+struct
+  let to_kf_list kinstr expr =
+    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None expr in
+    Kernel_function.Hptset.fold (fun kf acc -> kf :: acc) set []
+
+  let to_cvalue kinstr lval =
+    let state = Db.Value.get_state kinstr in
+    let _,cvalue = !Db.Value.eval_lval None state lval in
+    cvalue
+
+  let to_location kinstr lval =
+    let state = Db.Value.get_state kinstr in
+    !Db.Value.lval_to_loc_state state lval
+
+  let to_zone kinstr lval =
+    !Db.Value.lval_to_zone kinstr lval
+
+  let to_callstacks stmt =
+    let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
+    match states with
+    | None -> assert false
+    | Some table ->
+      let module Table = Value_types.Callstack.Hashtbl in
+      Table.fold (fun cs _ acc -> cs :: acc) table []
+
+  let studia_is_direct (_,{Studia.Writes.direct}) = direct
+
+  let writes kinstr lval =
+    let zone = to_zone kinstr lval in
+    Self.debug ~dkey "computing writes for %a" Cil_printer.pp_lval lval;
+    let result = Studia.Writes.compute zone in
+    let writes = Extlib.filter_map studia_is_direct fst result in
+    Self.debug ~dkey "%d found" (List.length writes);
+    writes
+
+  let reads kinstr lval =
+    let zone = to_zone kinstr lval in
+    Self.debug ~dkey "computing reads for %a" Cil_printer.pp_lval lval;
+    let result = Studia.Reads.compute zone in
+    let reads = Extlib.filter_map studia_is_direct fst result in
+    Self.debug ~dkey "%d found" (List.length reads);
+    reads
+
+  let does_cil_read_zone iter stmt cil zone =
+    let intersects lval =
+      let zone' = to_zone (Kstmt stmt) lval in
+      Locations.Zone.intersects zone' zone
+    in
+    try iter (fun lval -> if intersects lval then raise Exit) cil; false
+    with Exit -> true
+
+  let does_exp_read_zone stmt exp zone =
+    does_cil_read_zone IterLval.from_exp stmt exp zone
+
+  let does_init_read_zone stmt vi init zone =
+    does_cil_read_zone
+      (fun f init -> IterLval.from_init f vi init)
+      stmt init zone
+end
+
+
 (* --- Precision evaluation --- *)
 
 let update_node_values node kinstr lval =
-  let typ = Cil.typeOfLval lval in
-  let state = Db.Value.get_state kinstr in
-  let _,cvalue = !Db.Value.eval_lval None state lval in
+  let typ = Cil.typeOfLval lval
+  and cvalue = Eval.to_cvalue kinstr lval in
   Graph.update_node_values node cvalue typ
 
 
@@ -68,8 +163,7 @@ exception Unknown_location
 let enumerate_cells ~is_folded_base ~limit lval kinstr =
   (* If possible, refine the lval to a non-symbolic one *)
   let typ = Cil.typeOfLval lval in
-  let state = Db.Value.get_state kinstr in
-  let location = !Db.Value.lval_to_loc_state state lval in
+  let location = Eval.to_location kinstr lval in
   let open Locations in
   let add (acc,count) node_kind =
     if count >= limit then
@@ -140,6 +234,21 @@ let build_node_locality callstack node_kind =
       default_node_locality callstack
     | None ->
       { loc_file = get_loc_filename vi.vdecl ; loc_callstack = [] }
+
+let find_compatible_callstacks stmt callstack =
+  let kf = Kernel_function.find_englobing_kf stmt in
+  if callstack <> [] && Kernel_function.equal kf (Callstack.top_kf callstack)
+  then
+    (* slight improvement which only work when there is no recursion
+       and which is only usefull because you currently can't have
+       all callstacks due to memexec -> in this particular case
+       we are sure not to miss the only admissible callstack *)
+    [callstack]
+  else
+    (* Keep only callstacks which are a compatible with the current one *)
+    let callstacks = Eval.to_callstacks stmt in
+    (* TODO: missing callstacks filtered by memexec *)
+    Callstack.filter_truncate callstacks callstack
 
 
 (* --- Context object --- *)
@@ -249,49 +358,22 @@ let build_alarm context callstack stmt alarm =
   let node_locality = build_node_locality callstack node_kind in
   add_node context ~node_kind ~node_locality
 
-let build_node_deps context node =
-  let rec build_lval_write_deps callstack kinstr lval =
-    let zone = !Db.Value.lval_to_zone kinstr lval in
-    build_write_deps callstack zone
 
-  and build_write_deps callstack zone =
+
+
+let build_node_writes context node =
+
+  let rec build_write_deps callstack kinstr lval =
     let writes = match node.node_writes_computation with
       | Done -> []
       | Partial writes -> writes
       | NotDone ->
-        Self.debug ~dkey "computing writes for %a" Node_kind.pretty node.node_kind;
-        let result = Studia.Writes.compute zone in
-        let is_direct (_,{Studia.Writes.direct}) = direct in
-        let writes = Extlib.filter_map is_direct fst result in
-        Self.debug ~dkey "%d found" (List.length writes);
-        node.node_writes_stmts <- writes;
+        let writes = Eval.writes kinstr lval in
+        node.node_writes_stmts <- writes @ build_arg_deps callstack;
         writes
     and add_deps = function
       | { skind=Instr instr } as stmt ->
-        let callstacks =
-          if callstack <> [] &&
-             Kernel_function.(equal
-                                (find_englobing_kf stmt)
-                                (Callstack.top_kf callstack))
-          then
-            (* slight improvement which only work when there is no recursion
-               and which is only usefull because you currently can't have
-               all callstacks due to memexec -> in this particular case
-               we are sure not to miss the only admissible callstack *)
-            [callstack]
-          else
-            (* Keep only callstacks which are a compatible with the current one *)
-            let states = Db.Value.get_stmt_state_callstack ~after:false stmt in
-            let callstacks = match states with
-              | None -> assert false
-              | Some table ->
-                let module Table = Value_types.Callstack.Hashtbl in
-                Table.fold (fun cs _ acc -> cs :: acc) table []
-            in
-            (* TODO: missing callstacks filtered by memexec *)
-            Callstack.filter_truncate callstacks callstack
-        in
-        (* Create a dependency for each of them *)
+        let callstacks = find_compatible_callstacks stmt callstack in
         List.iter (fun cs -> build_instr_deps cs stmt instr) callstacks
       | _ -> assert false (* Studia invariant *)
     in
@@ -299,28 +381,49 @@ let build_node_deps context node =
     List.iter add_deps sub;
     if rest = [] then Done else Partial rest
 
-  and build_arg_deps callstack vi =
-    assert vi.vformal;
-    let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
-    let pos = Kernel_function.get_formal_position vi kf in
-    let callsites =
-      match Callstack.pop callstack with
-      | Some (kf',stmt,callstack) ->
-        assert (Kernel_function.equal kf' kf);
-        [(stmt,callstack)]
-      | None ->
-        let callsites = Kernel_function.find_syntactic_callsites kf in
-        List.map (fun (kf,stmt) -> (stmt,Callstack.init kf)) callsites
-    and add_deps (stmt,callstack) =
-      match stmt.skind with
-      | Instr (Call (_,_,args,_))
-      | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
-        let exp = List.nth args pos in
-        build_exp_deps callstack stmt Data exp
-      | _ ->
-        assert false (* Callsites can only be Call or ConsInit *)
-    in
-    List.iter add_deps callsites
+  and build_alarm_deps callstack stmt alarm =
+    IterLval.from_alarm (build_lval_deps callstack stmt Data) alarm
+
+  and build_instr_deps callstack stmt = function
+    | Set (_, exp, _) ->
+      build_exp_deps callstack stmt Data exp
+    | Call (_, callee, args, _) ->
+      build_call_deps callstack stmt callee args
+    | Local_init (dest, ConsInit (f, args, k), loc) ->
+      let as_func _dest callee args _loc =
+        build_call_deps callstack stmt callee args
+      in
+      Cil.treat_constructor_as_func as_func dest f args k loc
+    | Local_init (vi, AssignInit init, _)  ->
+      IterLval.from_init (build_lval_deps callstack stmt Data) vi init
+    | Asm _ | Skip _ | Code_annot _ -> () (* Cases not returned by Studia *)
+
+  and build_arg_deps callstack =
+    match Node_kind.get_base node.node_kind with
+    (* TODO refine formal dependency computation for non-scalar formals *)
+    | Some vi when vi.vformal ->
+      let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+      let pos = Kernel_function.get_formal_position vi kf in
+      let callsites =
+        match Callstack.pop callstack with
+        | Some (kf',stmt,callstack) ->
+          assert (Kernel_function.equal kf' kf);
+          [(stmt,callstack)]
+        | None ->
+          let callsites = Kernel_function.find_syntactic_callsites kf in
+          List.map (fun (kf,stmt) -> (stmt,Callstack.init kf)) callsites
+      and add_deps (stmt,callstack) =
+        match stmt.skind with
+        | Instr (Call (_,_,args,_))
+        | Instr (Local_init (_, ConsInit (_, args, _), _)) ->
+          let exp = List.nth args pos in
+          build_exp_deps callstack stmt Data exp
+        | _ ->
+          assert false (* Callsites can only be Call or ConsInit *)
+      in
+      List.iter add_deps callsites;
+      List.map fst callsites
+    | _ -> []
 
   and build_return_deps callstack stmt args kf =
     match Kernel_function.find_return kf with
@@ -342,64 +445,16 @@ let build_node_deps context node =
         Self.warning "Cannot compute all callee dependencies for %a"
           Cil_printer.pp_stmt stmt;
     end;
-    let kinstr = Kstmt stmt in
-    let _,set = !Db.Value.expr_to_kernel_function kinstr ~deps:None callee in
-    Kernel_function.Hptset.iter (build_return_deps callstack stmt args) set
-
-  and build_alarm_deps callstack stmt alarm =
-    let for_exp e =
-      build_exp_deps callstack stmt Data e
-    in
-    let open Alarms in
-    match alarm with
-    | Division_by_zero e | Index_out_of_bound (e, _) | Invalid_shift (e,_)
-    | Overflow (_,e,_,_) | Float_to_int (e,_,_) | Is_nan_or_infinite (e,_)
-    | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e -> for_exp e
-    | Pointer_comparison (opt_e1,e2) -> Extlib.may for_exp opt_e1; for_exp e2
-    | Differing_blocks (e1,e2) -> for_exp e1; for_exp e2
-    | Memory_access _ | Not_separated _ | Overlap _
-    | Uninitialized _ | Dangling _ | Uninitialized_union _ -> ()
-    (* TODO: adress depencies inside lval *)
-    | Invalid_bool lv -> build_lval_deps callstack stmt Data lv
-
-  and build_instr_deps callstack stmt = function
-    | Set (_, exp, _) ->
-      build_exp_deps callstack stmt Data exp
-    | Call (_, callee, args, _) -> build_call_deps callstack stmt callee args
-    | Local_init (dest, ConsInit (f, args, k), loc) ->
-      let as_func _dest callee args _loc =
-        build_call_deps callstack stmt callee args
-      in
-      Cil.treat_constructor_as_func as_func dest f args k loc
-    | Local_init (_, AssignInit init, _)  ->
-      build_init_deps callstack stmt init
-    | Asm _ | Skip _ | Code_annot _ -> () (* Cases not returned by Studia *)
-
-  and build_init_deps callstack stmt = function
-    | SingleInit exp ->
-      build_exp_deps callstack stmt Data exp
-    | CompoundInit (_typ, initl) ->
-      List.iter (fun (_off,init) -> build_init_deps callstack stmt init) initl
+    let l = Eval.to_kf_list (Kstmt stmt) callee in
+    List.iter (build_return_deps callstack stmt args) l
 
   and build_exp_deps callstack stmt kind exp =
-    match exp.enode with
-    | Const _
-    | SizeOf _ | SizeOfE _ | SizeOfStr _
-    | AlignOf _  | AlignOfE _
-    | AddrOf _ | StartOf _ -> ()
-    | Lval lval ->
-      build_lval_deps callstack stmt kind lval
-    | UnOp (_,e,_) | CastE (_,e) | Info (e,_) ->
-      build_exp_deps callstack stmt kind e
-    | BinOp (_,e1,e2,_) ->
-      build_exp_deps callstack stmt kind e1;
-      build_exp_deps callstack stmt kind e2
+    IterLval.from_exp (build_lval_deps callstack stmt kind) exp
 
   and build_lval_deps callstack stmt kind lval =
     let kinstr = Kstmt stmt in
     let dst = build_lval context callstack kinstr lval in
-    Graph.create_dependency ~allow_folding:true
-      context.graph kinstr dst kind node
+    Graph.create_dependency context.graph kinstr dst kind node
 
   and build_scattered_deps callstack kinstr lval =
     let succ_count = List.length (Graph.pred context.graph node) in
@@ -409,23 +464,19 @@ let build_node_deps context node =
     in
     let kind = Composition in
     let add_dep dst =
-      Graph.create_dependency ~allow_folding:true
-        context.graph kinstr dst kind node
+      Graph.create_dependency context.graph kinstr dst kind node
     in
     List.iter add_dep nodes;
     if complete then Done else NotDone
 
   in
-  update_node context node;
   let callstack = node.node_locality.loc_callstack in
   let writes_computation =
     match node.node_kind with
     | Scalar (vi,_typ,offset) ->
-      let lval = (Cil_types.Var vi, offset) in
-      build_lval_write_deps callstack Kglobal lval
+      build_write_deps callstack Kglobal (Cil_types.Var vi, offset)
     | Composite (vi) ->
-      let lval = (Cil_types.Var vi, Cil_types.NoOffset) in
-      build_lval_write_deps callstack Kglobal lval
+      build_write_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
     | Scattered (lval,kinstr) ->
       build_scattered_deps callstack kinstr lval
     | Alarm (stmt,alarm) ->
@@ -435,11 +486,123 @@ let build_node_deps context node =
       Done
   in
   node.node_writes_computation <- writes_computation;
-  begin match Node_kind.get_base node.node_kind with
-    (* TODO refine formal dependency computation for non-scalar formals *)
-    | Some vi when vi.vformal -> build_arg_deps callstack vi
+  update_node context node
+
+
+let build_node_reads context node =
+  let rec build_reads_deps callstack kinstr lval =
+    let reads = match node.node_reads_computation with
+      | Done -> []
+      | Partial reads -> reads
+      | NotDone -> Eval.reads kinstr lval
+    and add_deps stmt =
+      let zone = Some (Eval.to_zone kinstr lval) in
+      let callstacks = find_compatible_callstacks stmt callstack in
+      List.iter (fun cs -> build_stmt_deps cs zone stmt) callstacks
+    in
+    let sub,rest = list_break context.max_dep_fetch_count reads in
+    List.iter add_deps sub;
+    if rest = [] then Done else Partial rest
+
+  and exp_contains_read zone stmt exp =
+    match zone with
+    | None -> true
+    | Some zone' ->
+      Eval.does_exp_read_zone stmt exp zone'
+
+  and init_contains_read zone stmt vi init =
+    match zone with
+    | None -> true
+    | Some zone' ->
+      Eval.does_init_read_zone stmt vi init zone'
+
+  and build_kinstr_deps callstack zone = function
+    | Kglobal -> () (* Do nothing *)
+    | Kstmt stmt -> build_stmt_deps callstack zone stmt
+
+  and build_stmt_deps callstack zone stmt =
+    match stmt.skind with
+    | Instr instr -> build_instr_deps callstack zone stmt instr
+    | Return (Some exp,_) ->
+      if exp_contains_read zone stmt exp then
+        build_return_deps callstack stmt
     | _ -> ()
-  end
+
+  and build_instr_deps callstack zone stmt = function
+    | Set (lval, exp, _) ->
+      if exp_contains_read zone stmt exp then
+        build_lval_deps callstack stmt lval
+    | Local_init (dest, ConsInit (f, args, k), loc) ->
+      let as_func _dest callee args _loc =
+        build_call_deps callstack zone stmt callee args
+      in
+      Cil.treat_constructor_as_func as_func dest f args k loc
+    | Local_init (vi, AssignInit init, _)  ->
+      if init_contains_read zone stmt vi init then
+        build_var_deps callstack stmt vi
+    | Call (_, callee, args, _) ->
+      build_call_deps callstack zone stmt callee args
+    | _ -> ()
+
+  and build_return_deps callstack stmt =
+    let kf = Kernel_function.find_englobing_kf stmt in
+    let callsites =
+      match Callstack.pop callstack with
+      | Some (kf',stmt,callstack) ->
+        assert (Kernel_function.equal kf' kf);
+        [(stmt,callstack)]
+      | None ->
+        let callsites = Kernel_function.find_syntactic_callsites kf in
+        List.map (fun (kf,stmt) -> (stmt,Callstack.init kf)) callsites
+    and add_deps (stmt,callstack) =
+      match stmt.skind with
+      | Instr (Call (None,_,_,_)) -> ()
+      | Instr (Call (Some lval,_,_,_)) ->
+        build_lval_deps callstack stmt lval
+      | Instr (Local_init (vi,_,_)) ->
+        build_var_deps callstack stmt vi
+      | _ ->
+        assert false (* Callsites can only be Call or ConsInit *)
+    in
+    List.iter add_deps callsites;
+
+  and build_call_deps callstack zone stmt callee args =
+    let l = Eval.to_kf_list (Kstmt stmt) callee in
+    List.iter (build_args_deps callstack zone stmt args) l
+
+  and build_args_deps callstack zone stmt args callee_kf =
+    let callstack = Callstack.push (callee_kf,stmt) callstack in
+    let formals = Kernel_function.get_formals callee_kf in
+    List.iter2 (build_arg_dep callstack stmt zone) args formals
+
+  and build_arg_dep callstack stmt zone arg formal =
+    if exp_contains_read zone stmt arg then
+      build_var_deps callstack stmt formal
+
+  and build_lval_deps callstack stmt lval =
+    let kinstr = Kstmt stmt in
+    let src = build_lval context callstack kinstr lval in
+    Graph.create_dependency context.graph kinstr node Data src
+
+  and build_var_deps callstack stmt vi =
+    build_lval_deps callstack stmt (Cil.var vi)
+
+  in
+  let callstack = node.node_locality.loc_callstack in
+  let reads_computation =
+    match node.node_kind with
+    | Scalar (vi,_typ,offset) ->
+      build_reads_deps callstack Kglobal (Cil_types.Var vi, offset)
+    | Composite (vi) ->
+      build_reads_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
+    | Scattered (_lval,kinstr) ->
+      build_kinstr_deps callstack None kinstr;
+      Done
+    | Alarm _ | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+      Done
+  in
+  node.node_reads_computation <- reads_computation;
+  update_node context node
 
 
 (* --- Graph initialization --- *)
@@ -491,27 +654,37 @@ let hide_base context vi =
 let unhide_base context vi =
   context.hidden_bases <- BaseSet.add vi context.hidden_bases
 
-let explore ~depth context root =
-  context.graph_diff <- { context.graph_diff with last_root = Some root };
-  let should_auto_explore node =
-    let is_root = Graph.Node.equal node root (* the root is always explored *)
-    and is_intersting_kind = match node.node_kind with
-      | Scattered _ -> false
-      | _ -> true
-    in
-    is_root || (not node.node_hidden && is_intersting_kind)
-  in
-  (* Breadth first search *)
+let should_explore node =
+  match node.node_kind with
+  | Scattered _ -> false
+  | _ -> not node.node_hidden
+
+let bfs ~depth ~iter_succ f root =
   let queue : (node * int) Queue.t = Queue.create () in
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
-    if d <= depth then begin
-      if n.node_writes_computation <> Done && should_auto_explore n then
-        build_node_deps context n;
-      Graph.iter_pred (fun n' -> Queue.add (n',d+1) queue) context.graph n;
-    end;
+    f n d;
+    if d < depth then
+      iter_succ (fun n' -> Queue.add (n',d+1) queue) n
   done
+
+let explore_backward ~depth context root =
+  context.graph_diff <- { context.graph_diff with last_root = Some root };
+  let iter_succ f n = Graph.iter_pred f context.graph n
+  and explore_node n d =
+    if n.node_writes_computation <> Done && (should_explore n || d <= 0) then
+      build_node_writes context n
+  in
+  bfs ~depth ~iter_succ explore_node root
+
+let explore_forward ~depth context root =
+  let iter_succ f n = Graph.iter_succ f context.graph n
+  and explore_node n d =
+    if n.node_reads_computation <> Done && (should_explore n || d <= 0) then
+      build_node_reads context n;
+  in
+  bfs ~depth ~iter_succ explore_node root
 
 let complete context root =
   context.roots <- root :: context.roots;
@@ -604,7 +777,7 @@ let reduce_to_horizon ({ graph } as context) range new_root =
 let show context node =
   if node.node_hidden then begin
     node.node_hidden <- false;
-    explore ~depth:0 context node
+    explore_backward ~depth:0 context node
   end
 
 let hide context node =

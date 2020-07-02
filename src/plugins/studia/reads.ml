@@ -62,7 +62,7 @@ class find_read zlval = object
           if Zone.intersects inputs zlval then
             if !Db.Value.use_spec_instead_of_definition kf then
               (* Direst, as there is no body for this funtion. *)
-              { effects with direct = true } 
+              { effects with direct = true }
             else
               { effects with indirect = true } (* Indirect effect *)
           else
@@ -78,7 +78,7 @@ class find_read zlval = object
     match stmt.skind with
     | Instr (Call (lvopt, f, args, loc)) ->
       aux_call lvopt f args loc;
-      Cil.SkipChildren          
+      Cil.SkipChildren
     | Instr (Local_init(v, ConsInit(f, args, k), l)) ->
       Cil.treat_constructor_as_func aux_call v f args k l;
       Cil.SkipChildren

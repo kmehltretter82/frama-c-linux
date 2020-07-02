@@ -39,7 +39,6 @@ struct
   let default = {
     dependency_key = -1;
     dependency_kind = Data;
-    dependency_multiple = false;
     dependency_origins = []
   }
 end
@@ -67,6 +66,7 @@ let create_node ~node_kind ~node_locality g =
     node_values = None;
     node_range = Empty;
     node_writes_computation = NotDone;
+    node_reads_computation = NotDone;
     node_writes_stmts = [];
   }
   in
@@ -81,27 +81,21 @@ let update_node_values node new_values typ =
   node.node_range <-
     Node_range.(upper_bound node.node_range (evaluate new_values typ))
 
-let create_dependency ~allow_folding g kinstr v1 dependency_kind v2 =
+let create_dependency g kinstr v1 dependency_kind v2 =
   let same_kind (_,e,_) =
     e.dependency_kind = dependency_kind
   in
   let matching_edge =
     try
-      if allow_folding then
-        Some (List.find same_kind (G.find_all_edges g v1 v2))
-      else
-        None
+      Some (List.find same_kind (G.find_all_edges g v1 v2))
     with Not_found -> None
   in
   let e = match matching_edge with
-    | Some (_,e,_) ->
-      e.dependency_multiple <- true;
-      e
+    | Some (_,e,_) -> e
     | None ->
       let e = {
         dependency_key = fresh_key ();
         dependency_kind;
-        dependency_multiple = false;
         dependency_origins = []
       }
       in
@@ -241,9 +235,9 @@ let ouptput_to_dot out_channel g =
         let kind_attribute = match e.dependency_kind with
           | Callee -> [`Color 0x00ff00 ]
           | _ -> []
-        and folding_attribute = match e.dependency_multiple with
-          | true -> [ `Style `Bold ]
-          | false -> []
+        and folding_attribute = match e.dependency_origins with
+          | [] | [_] -> [ `Style `Bold ]
+          | _ -> []
         in kind_attribute @ folding_attribute
     end)
   in
@@ -337,7 +331,6 @@ struct
       ("src", `Int n1.node_key) ;
       ("dst", `Int n2.node_key) ;
       ("kind", output_dep_kind dep.dependency_kind) ;
-      ("multiple", `Bool dep.dependency_multiple) ;
       ("origins", `List (List.map output_stmt dep.dependency_origins)) ;
     ]
 

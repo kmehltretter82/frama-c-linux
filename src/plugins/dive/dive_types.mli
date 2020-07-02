@@ -51,6 +51,7 @@ type node = {
   mutable node_values : Cvalue.V.t option;
   mutable node_range : node_range;
   mutable node_writes_computation : (Cil_types.stmt list) computation;
+  mutable node_reads_computation : (Cil_types.stmt list) computation;
   mutable node_writes_stmts : Cil_types.stmt list;
 }
 
@@ -59,7 +60,6 @@ type dependency_kind = Callee | Data | Address | Control | Composition
 type dependency = {
   dependency_key : int;
   dependency_kind : dependency_kind;
-  mutable dependency_multiple : bool;
   mutable dependency_origins : Cil_types.stmt list;
 }
 

@@ -44,14 +44,14 @@ let main () =
     (* Add targeted vars to it *)
     let add_var vi =
       let node = Build.add_var context vi in
-      Build.explore ~depth context node
+      Build.explore_backward ~depth context node
     in
     Self.FromBases.iter add_var;
     (* Add alarms *)
     let add_alarm _emitter kf stmt ~rank:_ alarm _code_annot =
       if Self.FromFunctionAlarms.mem kf then begin
         let node = Build.add_alarm context stmt alarm in
-        Build.explore ~depth context node
+        Build.explore_backward ~depth context node
       end
     in
     if not (Self.FromFunctionAlarms.is_empty ()) then

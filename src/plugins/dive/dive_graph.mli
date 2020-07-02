@@ -40,7 +40,7 @@ val remove_node : t -> node -> unit
 
 val update_node_values : node -> Cvalue.V.t -> Cil_types.typ -> unit
 
-val create_dependency : allow_folding:bool -> t -> Cil_types.kinstr ->
+val create_dependency : t -> Cil_types.kinstr ->
   node -> dependency_kind -> node -> unit
 
 val remove_dependency : t -> node * dependency * node -> unit
