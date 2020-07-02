@@ -303,6 +303,7 @@ struct
   let output_node_values values =
     match values with
     | None -> `Null
+    | Some cvalue when Cvalue.V.is_bottom cvalue -> `Null
     | Some cvalue -> `String (Pretty_utils.to_string Cvalue.V.pretty cvalue)
 
   let output_node node =
