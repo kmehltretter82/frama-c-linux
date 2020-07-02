@@ -5,7 +5,7 @@
 /**
    Typed States & Settings
    @packageDocumentation
-   @package dome/data/states
+   @module dome/data/states
 */
 
 import React from 'react';
@@ -15,14 +15,16 @@ import * as Dome from 'dome';
 import * as JSON from './json';
 
 export type NonFunction =
-  undefined | null | boolean | number | string | object | any[] | bigint | symbol;
+  undefined | null | boolean | number | string
+  | object | any[] | bigint | symbol;
 
 /** State updater. New value or updating function applied to the current,
     lastly updated value. Use `null` to restore default value. */
 export type updateAction<A extends NonFunction> =
   null | A | ((current: A) => A);
 
-/** The type of updater callbacks. Typically used for `[A,setState<A>]` hooks. */
+/** The type of updater callbacks. Typically used for `[A, setState<A>]`
+    hooks. */
 export type setState<A extends NonFunction> = (action: updateAction<A>) => void;
 
 /** Base state interface. */
@@ -127,18 +129,19 @@ export class StateOpt<A extends NonFunction> extends StateDef<undefined | A> {
    When several components share the same setting `dataKey` the behavior will be
    different depending on the situation:
    - for Window Settings, each component in each window retains its own
-   setting value, although the last modified value from _any_ of them will be saved
-   and used for any further initial value;
+   setting value, although the last modified value from _any_ of them will be
+   saved and used for any further initial value;
    - for Global Settings, all components synchronize to the last modified value
    from any component of any window.
 
    Type safety is ensured by safe JSON encoders and decoders, however, they
    might fail at runtime, causing settings value to be initialized to their
-   fallback and not to be saved or synchronized. This is not harmfull but annoying.
+   fallback and not to be saved nor synchronized.
+   This is not harmful but annoying.
 
    To mitigate this effect, each instance of a Settings class has its
    own, private, unique symbol that we call its « role ». A given `dataKey`
-   shall always be used with the same « role » otherwized it is discarded,
+   shall always be used with the same « role » otherwise it is discarded,
    and an error message is logged when in DEVEL mode.
  */
 abstract class Settings<A> {
@@ -153,11 +156,12 @@ abstract class Settings<A> {
      Encoders shall be protected against exception.
      Use [[JSON.jTry]] and [[JSON.jCatch]] in case of uncertainty.
      Decoders are automatically protected internally to the Settings class.
-     @param role - Debugging name of instance roles (each instance has its unique role, though)
-     @param decoder - JSON decoder for the setting values
-     @param encoder - JSON encoder for the setting values
-     @param fallback -
-     If provided, used to automatically protect your encoders against exceptions.
+     @param role Debugging name of instance roles (each instance has its unique
+     role, though)
+     @param decoder JSON decoder for the setting values
+     @param encoder JSON encoder for the setting values
+     @param fallback If provided, used to automatically protect your encoders
+     against exceptions.
    */
   constructor(
     role: string,
@@ -185,7 +189,7 @@ abstract class Settings<A> {
     } else {
       if (rk !== rq) {
         if (DEVEL) console.error(
-          `[Dome.settings] key ${dataKey} used with incompatible roles`, rk, rq,
+          `[Dome.settings] Key ${dataKey} used with incompatible roles`, rk, rq,
         );
         return undefined;
       }
@@ -209,13 +213,13 @@ abstract class Settings<A> {
   }
 
   /** Push the new setting value for the provided data key.
-      You only use validated keys otherwise further loads
+      You shall only use validated keys otherwise further loads
       might fail and fallback to defaults. */
   saveValue(dataKey: string, value: A) {
     try { this.saveData(dataKey, this.encoder(value)); }
     catch (err) {
       if (DEVEL) console.error(
-        '[Dome.settings] error while encoding value',
+        '[Dome.settings] Error while encoding value',
         dataKey, value, err,
       );
     }
@@ -228,8 +232,8 @@ abstract class Settings<A> {
    You may share `dataKey` between components, or change it dynamically.
    However, a given data key shall always be used for the same Setting instance.
    See [[Settings]] documentation for details.
-   @param S - the instance settings to be used
-   @param dataKey - identifies which value in the settings to be used
+   @param S The instance settings to be used.
+   @param dataKey Identifies which value in the settings to be used.
  */
 export function useSettings<A>(
   S: Settings<A>,
