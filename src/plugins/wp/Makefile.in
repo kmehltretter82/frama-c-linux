@@ -169,15 +169,23 @@ $(Wp_DIR)/Makefile: $(WP_CONFIGURE_MAKEFILE)
 WP_QUALIF_CACHE?=$(abspath $(Wp_DIR)/../wp-cache)
 WP_QUALIF_ENTRIES=git -C $(WP_QUALIF_CACHE) ls-files --others --exclude-standard | wc -l
 
+WP_CHECKOUT_CACHE=\
+	echo "[CACHE] repo: $(WP_QUALIF_CACHE)" && \
+	git -C $(WP_QUALIF_CACHE) checkout master
+
 wp-qualif: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
+	$(WP_CHECKOUT_CACHE)
 	FRAMAC_WP_CACHE=replay \
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
 	  ./bin/ptests.opt src/plugins/wp/tests -config qualif -error-code
 
-wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
-	@echo "[CACHE] pull cache"
-	@echo "[CACHE] $(WP_QUALIF_CACHE)"
+WP_PULL_CACHE=\
+	echo "[CACHE] pull cache" && \
+	$(WP_CHECKOUT_CACHE) && \
 	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
+
+wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
+	$(WP_PULL_CACHE)
 	@echo "[TESTS] updating wp-qualif"
 	FRAMAC_WP_CACHE=update \
 	FRAMAC_WP_CACHEDIR=$(WP_QUALIF_CACHE) \
@@ -187,9 +195,7 @@ wp-qualif-update: ./bin/toplevel.opt ./bin/ptests.opt $(WP_QUALIF_CACHE)
 	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
 
 wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
-	@echo "[CACHE] pull cache"
-	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
-	git -C $(WP_QUALIF_CACHE) pull --rebase --prune
+	$(WP_PULL_CACHE)
 	@echo "[TESTS] upgrading wp-qualif (cache & scripts)"
 	FRAMAC_WP_CACHE=update \
 	FRAMAC_WP_SCRIPT=update \
@@ -201,14 +207,14 @@ wp-qualif-upgrade: ./bin/toplevel.opt ./bin/ptests.opt
 
 wp-qualif-push:
 	@echo "[CACHE] pushing updates"
-	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
+	$(WP_CHECKOUT_CACHE)
 	git -C $(WP_QUALIF_CACHE) add -A
 	git -C $(WP_QUALIF_CACHE) commit -m "[wp] cache updates"
 	git -C $(WP_QUALIF_CACHE) push -f
 
 wp-qualif-status:
 	@echo "[CACHE] status"
-	@echo "[CACHE] repo: $(WP_QUALIF_CACHE)"
+	$(WP_CHECKOUT_CACHE)
 	git -C $(WP_QUALIF_CACHE) status -s -b -u no
 	@echo "New entries: `$(WP_QUALIF_ENTRIES)`"
 
