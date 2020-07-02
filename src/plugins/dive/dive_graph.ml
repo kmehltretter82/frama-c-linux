@@ -306,6 +306,11 @@ struct
     | Some cvalue when Cvalue.V.is_bottom cvalue -> `Null
     | Some cvalue -> `String (Pretty_utils.to_string Cvalue.V.pretty cvalue)
 
+  let output_computation = function
+    | Done -> `String "yes"
+    | Partial _ -> `String "partial"
+    | NotDone -> `String "no"
+
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
     `Assoc ([
@@ -313,7 +318,8 @@ struct
         ("label", `String label) ;
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
-        ("explored", `Bool (node.node_writes_computation = Done)) ;
+        ("backward_explored", output_computation node.node_writes_computation) ;
+        ("forward_explored", output_computation node.node_reads_computation) ;
         ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;
         ("values",  output_node_values node.node_values) ;
         ("range",  output_range node.node_range) ;

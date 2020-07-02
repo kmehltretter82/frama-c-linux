@@ -199,7 +199,8 @@ struct
       "label", Syntax.string;
       "kind", Syntax.string;
       "locality", NodeLocality.syntax;
-      "explored", Syntax.boolean;
+      "backward_explored", Syntax.string;
+      "forward_explored", Syntax.string;
       "writes", Syntax.array Kernel_ast.Marker.syntax;
       "values", Syntax.option Syntax.string;
       "range", Syntax.union [ Syntax.string ; Syntax.int ];

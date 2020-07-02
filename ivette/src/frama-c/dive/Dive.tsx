@@ -243,11 +243,11 @@ class Dive {
       if (typeof node.range === 'number')
         node.stops = `0% ${node.range}% ${node.range}% 100%`;
 
-      const previous = this.cy.$id(node.id);
-      if (previous.nonempty()) {
-        previous.removeData();
-        previous.data(node);
-        previous.neighborhood('edge').remove();
+      let ele = this.cy.$id(node.id);
+      if (ele.nonempty()) {
+        ele.removeData();
+        ele.data(node);
+        ele.neighborhood('edge').remove();
       }
       else {
         let parent = null;
@@ -256,9 +256,25 @@ class Dive {
         else
           parent = this.referenceFile(node.locality.file).id();
 
-        const ele = this.cy.add({ data: { ...node, parent } });
+        ele = this.cy.add({ group: 'nodes', data: { ...node, parent } });
         this.addTips(ele);
-        newEles = this.cy.add(ele).union(newEles);
+        newEles = ele.union(newEles);
+      }
+
+      // Add a node for the user to ask for more dependencies
+      const idmore = `${node.id}-more`;
+      this.cy.remove(`#${idmore}`);
+      if (node.backward_explored === 'partial') {
+        let elemore = this.cy.add({
+           group: 'nodes',
+           data: { id: idmore, parent: ele.data('parent') },
+           classes: ['more'] });
+        newEles = elemore.union(newEles);
+        let depmore = this.cy.add({
+          group: 'edges',
+          data: { source: idmore, target: node.id }
+        });
+        newEles = this.cy.add(depmore).union(newEles);
       }
     }
 
@@ -400,7 +416,7 @@ class Dive {
     this.currentSelection = writes[index + 1 in writes ? index + 1 : 0];
 
     const hasOrigin = (ele: Cytoscape.NodeSingular) => (
-      ele.data().origins.includes(this.currentSelection)
+      ele.data().origins?.includes(this.currentSelection)
     );
 
     node.select();

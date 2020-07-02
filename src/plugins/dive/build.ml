@@ -467,7 +467,7 @@ let build_node_writes context node =
       Graph.create_dependency context.graph kinstr dst kind node
     in
     List.iter add_dep nodes;
-    if complete then Done else NotDone
+    if complete then Done else Partial []
 
   in
   let callstack = node.node_locality.loc_callstack in
