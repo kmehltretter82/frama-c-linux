@@ -2346,12 +2346,14 @@ endif
 
 ifneq ("$(HAS_UNIX2DOS)","no")
 tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
-                             Makefile share/Makefile.config.in
+                             Makefile share/Makefile.config
 	$(SED) -e "s|@UNIX2DOS@|$(UNIX2DOS)|g" \
                -e "s|@DONTRUN@||g" \
                $< > $@
 else
-tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in
+tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
+                             Makefile share/Makefile.config
+	$(RM) $@
 	$(SED) -e "s|@DONTRUN@|DONTRUN: no unix2dos found|g" \
                -e "s|@UNIX2DOS|unix2dos|g" \
                $< > $@
