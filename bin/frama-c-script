@@ -37,6 +37,11 @@ usage() {
    echo "      and non-POSIX external libraries."
    echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
    echo ""
+   echo "  - creduce <args>"
+   echo "      Use the external tool C-Reduce to minimize C files when"
+   echo "      debugging crashes and fatal errors. Run without arguments for"
+   echo "      more details."
+   echo ""
    echo "  - estimate-difficulty file..."
    echo "      Applies several heuristics to try and estimate the difficulty"
    echo "      of analyzing the specified files with Frama-C."
@@ -258,6 +263,10 @@ case "$command" in
     "normalize-jcdb")
         shift;
         "${FRAMAC_SHARE}"/analysis-scripts/normalize_jcdb.py "$@";
+        ;;
+    "creduce")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/creduce.sh "$@";
         ;;
     *)
         echo "error: unrecognized command: $command";
