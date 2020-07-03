@@ -20,14 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Sign domain: abstraction of integer numerical values by their signs. *)
+(** Currently tested by this file:
+    - semantics of sign values. *)
 
-type signs = {
-  pos: bool;  (** true: maybe positive, false: never positive *)
-  zero: bool; (** true: maybe zero, false: never zero *)
-  neg: bool;  (** true: maybe negative, false: never negative *)
-}
-
-include Abstract_value.Leaf with type t = signs
-
-val pretty_debug: t Pretty_utils.formatter
+(** Runs some programmatic tests on Eva. *)
+val run: unit -> unit
