@@ -2344,22 +2344,20 @@ else
 GENERATED_TESTS:=
 endif
 
+tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
+                             Makefile share/Makefile.config
+	$(RM) $@
+	$(SED) -e "s|@UNIX2DOS@|$(PP_DOS_UNIX2DOS)|g" \
+               -e "s|@DONTRUN@|$(PP_DOS_DONTRUN)|g" \
+               $< > $@
+	$(CHMOD_RO) $@
+
 ifneq ("$(HAS_UNIX2DOS)","no")
-tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
-                             Makefile share/Makefile.config
-	$(RM) $@
-	$(SED) -e "s|@UNIX2DOS@|$(UNIX2DOS)|g" \
-               -e "s|@DONTRUN@||g" \
-               $< > $@
-	$(CHMOD_RO) $@
+tests/spec/preprocess_dos.c: PP_DOS_UNIX2DOS=$(UNIX2DOS)
+tests/spec/preprocess_dos.c: PP_DOS_DONTRUN=
 else
-tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
-                             Makefile share/Makefile.config
-	$(RM) $@
-	$(SED) -e "s|@DONTRUN@|DONTRUN: no unix2dos found|g" \
-               -e "s|@UNIX2DOS|unix2dos|g" \
-               $< > $@
-	$(CHMOD_RO) $@
+tests/spec/preprocess_dos.c: PP_DOS_UNIX2DOS=unix2dos
+tests/spec/preprocess_dos.c: PP_DOS_DONTRUN=DONTRUN: no unix2dos found
 endif
 
 ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG) $(GENERATED_TESTS)
