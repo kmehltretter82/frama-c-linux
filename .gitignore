@@ -55,6 +55,7 @@ autom4te.cache
 /tests/journal/intra.byte
 /tests/misc/my_visitor_plugin/my_visitor.opt
 /tests/misc/my_visitor.sav
+/tests/spec/preprocess_dos.c
 /tests/*/*.opt
 /tests/pdg/*.dot
 
@@ -92,6 +93,8 @@ autom4te.cache
 
 /doc/acsl/
 
+/doc/aorai/aorai-example.tgz
+/doc/aorai/aorai-example/
 /doc/aorai/frama-c-aorai-example.tgz
 /doc/aorai/frama-c-aorai-example
 /doc/aorai/main.pdf
