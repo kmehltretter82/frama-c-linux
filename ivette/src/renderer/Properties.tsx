@@ -88,7 +88,6 @@ const defaultFilter =
   alarms: defaultAlarmsFilter,
 };
 
-
 function filterStatus(
   f: typeof defaultStatusFilter,
   status: Properties.propStatus,
@@ -449,7 +448,6 @@ const RenderTable = () => {
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
   }, [model, selectedFunction]);
-
 
   // Callbacks
 

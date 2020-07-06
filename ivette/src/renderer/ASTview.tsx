@@ -15,7 +15,6 @@ import { Component, TitleBar } from 'frama-c/LabViews';
 
 import { printFunction, markerInfo } from 'api/kernel/ast';
 
-
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
