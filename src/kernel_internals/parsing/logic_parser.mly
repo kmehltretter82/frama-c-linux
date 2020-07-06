@@ -107,6 +107,8 @@
 
   let loc_decl d = { decl_node = d; decl_loc = loc () }
 
+  let loc_ext d = { extended_node = d; extended_loc = loc () }
+
   let concat_froms a1 a2 =
     let compare_pair (b1,_) (b2,_) = is_same_lexpr b1 b2 in
     (* NB: the following has an horrible complexity, but the order of
@@ -253,7 +255,7 @@
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
 %token CHECK_REQUIRES CHECK_LOOP CHECK_INVARIANT CHECK_LEMMA
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
-%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_CONTRACT
+%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOMATIC AXIOM LEMMA LBRACE RBRACE
@@ -1532,11 +1534,32 @@ decl:
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
-| EXT_GLOBAL grammar_extension SEMICOLON {
-    let processed = Logic_env.preprocess_extension $1 $2 in
-	  LDextended ($1, processed)
-  }
+| ext_decl { LDextended $1 }
 | deprecated_logic_decl { $1 }
+;
+
+ext_decl:
+| EXT_GLOBAL grammar_extension SEMICOLON {
+     let processed = Logic_env.preprocess_extension $1 $2 in
+     Ext_lexpr($1, processed)
+   }
+| EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
+    let processed_id,processed_block =
+       Logic_env.preprocess_extension_block $1 ($2,$4)
+    in
+    Ext_extension($1,processed_id,processed_block)
+   }
+;
+
+ext_decls:
+| /* epsilon */
+    { [] }
+| ext_decl_loc ext_decls
+    { $1::$2 }
+;
+
+ext_decl_loc:
+| ext_decl { loc_ext $1 }
 ;
 
 volatile_opt:
@@ -1893,6 +1916,7 @@ is_acsl_spec:
 is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { $1 }
 | EXT_GLOBAL     { $1 }
+| EXT_GLOBAL_BLOCK     { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }

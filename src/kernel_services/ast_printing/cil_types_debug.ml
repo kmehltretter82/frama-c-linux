@@ -921,7 +921,8 @@ and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
   | Ext_terms(term_list) -> Format.fprintf fmt "Ext_terms(%a)"  (pp_list pp_term) term_list
   | Ext_preds(predicate_list) -> Format.fprintf fmt "Ext_preds(%a)"  (pp_list pp_predicate) predicate_list
-  | Ext_annot(annotation_list ) -> Format.fprintf fmt "Ext_annots(%a)" (pp_list pp_acsl_extension) annotation_list
+  | Ext_annot(string,annotation_list) ->
+    Format.fprintf fmt "Ext_annots(%a,%a)" pp_string string (pp_list pp_acsl_extension) annotation_list
 
 and pp_behavior fmt behavior =
   Format.fprintf fmt

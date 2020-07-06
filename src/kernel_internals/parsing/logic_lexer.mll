@@ -207,7 +207,12 @@
             match Logic_env.extension_category s with
             | exception Not_found -> None
             | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
-            | Cil_types.Ext_global -> Some (EXT_GLOBAL s)
+            | Cil_types.Ext_global ->
+              begin
+                match Logic_env.is_extension_block s with
+                | false -> Some (EXT_GLOBAL s)
+                | true -> Some (EXT_GLOBAL_BLOCK s)
+              end
             | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
           end
           else None

@@ -38,6 +38,10 @@ type extension_typer =
 (** Visitor functions for ACSL extensions *)
 type extension_visitor =
   Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
+type extension_preprocessor_block =
+  string * extended_decl list -> string * extended_decl list
+type extension_typer_block =
+  typing_context -> location -> string * extended_decl list -> acsl_extension_kind
 (** Pretty printers for ACSL extensions *)
 type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
@@ -102,6 +106,16 @@ val register_behavior:
 *)
 val register_global:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  unit
+
+(** Registers extension for global block annotation. See [register_behavior].
+
+    @plugin development guide
+*)
+val register_global_block:
+  string -> ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit

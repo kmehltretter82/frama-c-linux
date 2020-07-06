@@ -389,11 +389,28 @@ val set_extension_handler:
   is_extension:(string -> bool) ->
   typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
          (bool * acsl_extension_kind)) ->
+  typer_block:(string -> typing_context ->
+               Filepath.position * Filepath.position ->
+               string * Logic_ptree.extended_decl list ->
+               bool * Cil_types.acsl_extension_kind) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
 *)
+
+val get_typer :
+  string ->
+  typing_context:typing_context ->
+  loc:Filepath.position * Filepath.position ->
+  Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
+
+val get_typer_block:
+  string ->
+  typing_context:typing_context ->
+  loc:Logic_ptree.location ->
+  string * Logic_ptree.extended_decl list ->
+  bool * Cil_types.acsl_extension_kind
 
 (**/**)
 val set_deprecated_extension_handler:

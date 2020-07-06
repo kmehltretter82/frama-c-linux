@@ -1195,8 +1195,8 @@ let rec is_same_extension x1 x2 =
     is_same_list is_same_term t1 t2
   | Ext_preds p1, Ext_preds p2 ->
     is_same_list is_same_predicate p1 p2
-  | Ext_annot a1, Ext_annot a2 ->
-    is_same_list is_same_extension a1 a2
+  | Ext_annot (id1, a1), Ext_annot (id2, a2) ->
+    is_same_string id1 id2 && is_same_list is_same_extension a1 a2
   | (Ext_id _ | Ext_preds _ | Ext_terms _ | Ext_annot _ ), _ -> false
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =

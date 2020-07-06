@@ -452,7 +452,7 @@ module ExtMerging =
           | Ext_id i -> Datatype.Int.hash i
           | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
           | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
-          | Ext_annot annots -> 5 * (hash_list hash annots)
+          | Ext_annot (id, annots) -> Datatype.String.hash id + 5 * (hash_list hash annots)
         in
         Datatype.String.hash e.ext_name + 5 * hash_ext_kind e.ext_kind
       let rec compare (e1 : acsl_extension) (e2 : acsl_extension) =
@@ -466,8 +466,10 @@ module ExtMerging =
           | Ext_preds p1, Ext_preds p2 ->
             Extlib.list_compare Logic_utils.compare_predicate p1 p2
           | Ext_preds _, _ -> 1 | _, Ext_preds _ -> -1
-          | Ext_annot a1 , Ext_annot a2  ->
-            Extlib.list_compare compare a1 a2
+          | Ext_annot (id1, a1) , Ext_annot (id2, a2)  ->
+            match String.compare id1 id2 with
+            | 0 -> Extlib.list_compare compare a1 a2
+            | n -> n
         in
         let res = Datatype.String.compare e1.ext_name e2.ext_name in
         if res <> 0 then res
