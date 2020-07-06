@@ -24,15 +24,9 @@
 Plugin WP <next-release>
 #########################
 
-- WP          [2020-XX-XX] Removed debug keys:
-                           - no-time-info
-                           - no-steps-info
-                           - no-goals-info
-                           - no-cache-info
-                           - success-only
-- WP          [2020-XX-XX] "shell" debug key replaces previous debug keys
-- WP          [2020-XX-XX] -wp-cache-env defaults to false
-- WP          [2020-XX-XX] New option -wp-cache-print
+- WP          [2020-07-06] Removed debug keys "no-xxx-info" (subsumed by "shell")
+- WP          [2020-07-06] Option -wp-cache-env now defaults to false
+- WP          [2020-07-06] New option -wp-cache-print
 - WP          [2020-06-12] Supports the \initialized ACSL predicate
 
 #########################
