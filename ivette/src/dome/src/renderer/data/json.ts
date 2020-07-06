@@ -5,7 +5,7 @@
 /**
    Safe JSON utilities.
    @packageDocumentation
-   @package dome/data/json
+   @module dome/data/json
 */
 
 import { DEVEL } from 'dome/system';
@@ -25,7 +25,7 @@ export function parse(text: string, noError = false): json {
     try {
       return JSON.parse(text);
     } catch (err) {
-      if (DEVEL) console.error('[Dome.json] invalid format:', err);
+      if (DEVEL) console.error('[Dome.json] Invalid format:', err);
       return undefined;
     }
   } else
@@ -141,12 +141,13 @@ export function jDefault<A>(
   fn: Loose<A>,
   defaultValue: A,
 ): Safe<A> {
-  return (js: json) => js === undefined ? defaultValue : (fn(js) ?? defaultValue);
+  return (js: json) =>
+    js === undefined ? defaultValue : (fn(js) ?? defaultValue);
 }
 
 /**
    Force returning `undefined` or a default value for `undefined` _or_ `null` JSON input.
-   Typically usefull to leverage an existing `Safe<A>` decoder.
+   Typically useful to leverage an existing `Safe<A>` decoder.
  */
 export function jOption<A>(fn: Safe<A>, defaultValue?: A): Loose<A> {
   return (js: json) => (js === undefined || js === null ? defaultValue : fn(js));
@@ -194,7 +195,7 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
 }
 
 /**
-   Converts maps to dictionnaries.
+   Converts maps to dictionaries.
  */
 export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
   return (js: json) => {
@@ -210,7 +211,7 @@ export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
 }
 
 /**
-   Converts dictionnaries to maps.
+   Converts dictionaries to maps.
  */
 export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
   return m => {
@@ -226,10 +227,10 @@ export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
 }
 
 /**
-   Apply the decoder on each item of a JSON array, or return `[]` otherwize.
+   Apply the decoder on each item of a JSON array, or return `[]` otherwise.
    Can be also applied on a _loose_ decoder, but you will get
    an array with possibly `undefined` elements. Use [[jList]]
-   to discard undefined elements, or use a true « safe » decoder.
+   to discard undefined elements, or use a true _safe_ decoder.
  */
 export function jArray<A>(fn: Safe<A>): Safe<A[]> {
   return (js: json) => Array.isArray(js) ? js.map(fn) : [];
@@ -237,7 +238,7 @@ export function jArray<A>(fn: Safe<A>): Safe<A[]> {
 
 /**
    Apply the loose decoder on each item of a JSON array, discarding
-   all `undefined` elements. To keep all, possibly undefined array entries,
+   all `undefined` elements. To keep the all possibly undefined array entries,
    use [[jArray]] instead.
  */
 export function jList<A>(fn: Loose<A>): Safe<A[]> {
@@ -443,7 +444,7 @@ export function index<K, A>(d: dict<K, A>, key: key<K>, value: A) {
 }
 
 /**
-   Decode a JSON dictionary, dicarding all inconsistent entries.
+   Decode a JSON dictionary, discarding all inconsistent entries.
    If the JSON contains no valid entry, still returns `{}`.
 */
 export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
@@ -463,7 +464,7 @@ export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
 }
 
 /**
-   Encode a dictionary into JSON, dicarding all inconsistent entries.
+   Encode a dictionary into JSON, discarding all inconsistent entries.
    If the dictionary contains no valid entry, still returns `{}`.
 */
 export function eDictionary<K, A>(fn: Encoder<A>): Encoder<dict<K, A>> {

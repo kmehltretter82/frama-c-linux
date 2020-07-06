@@ -57,7 +57,7 @@ function loadSettings( file ) {
     const text = fs.readFileSync(file, { encoding: 'utf8' } );
     return Object.assign({}, JSON.parse(text));
   } catch(err) {
-    console.error("[Dome] Can not load settings", file, err);
+    console.error("[Dome] Unable to load settings", file, err);
     return {};
   }
 }
@@ -67,7 +67,7 @@ function saveSettings( file, data={} ) {
     const text = JSON.stringify( data, undefined, DEVEL ? 2 : 0 );
     fs.writeFileSync( file, text, { encoding: 'utf8' }, (err) => { throw(err); } );
   } catch(err) {
-    console.error("[Dome] Can not save settings", file, err);
+    console.error("[Dome] Unable to save settings", file, err);
   }
 }
 
@@ -86,7 +86,7 @@ function saveGlobalSettings() {
     if (!fstat( APP_DIR )) fs.mkdirSync( APP_DIR );
     saveSettings( PATH_GLOBAL_SETTINGS, GlobalSettings );
   } catch(err) {
-    console.error("[Dome] Can not save global settings", err);
+    console.error("[Dome] Unable to save global settings", err);
   }
 }
 

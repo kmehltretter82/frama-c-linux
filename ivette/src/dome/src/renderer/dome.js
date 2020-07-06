@@ -424,7 +424,7 @@ const writeSetting = ( local, key, value ) => {
     patches.set(key,value);
   }
   if (local) {
-    if (DEVEL) fireSaveSettings();
+    fireSaveSettings();
   } else {
     emitter.emit('dome.settings');
     fireSaveGlobals();

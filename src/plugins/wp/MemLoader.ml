@@ -131,8 +131,8 @@ struct
     begin
       let prefix = Fun.debug phi in
       let sigma = Sigma.create () in
-      List.iter
-        (fun chunk ->
+      List.iteri
+        (fun i chunk ->
            List.iter
              (fun (name,triggers,conditions,m1,m2) ->
                 let mem1 = assigned sigma chunk m1 chunks in
@@ -151,8 +151,8 @@ struct
                     [ (Trigger.of_term value1 :: triggers );
                       (Trigger.of_term value2 :: triggers ) ]
                 in
-                let l_name = Pretty_utils.sfprintf "%s_%s_%a"
-                    prefix name Chunk.pretty chunk in
+                let l_name = Pretty_utils.sfprintf "%s_%s_%a%d"
+                    prefix name Chunk.pretty chunk i in
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
                   l_assumed = true ;

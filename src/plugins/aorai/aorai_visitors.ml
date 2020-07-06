@@ -272,7 +272,10 @@ let update_loop_assigns kf stmt state vi code_annot =
         (AAssigns (bhvs, Logic_utils.concat_assigns old_assigns assigns))
     | _ -> Aorai_option.fatal "Expecting an assigns clause here"
   in
-  Annotations.add_code_annot Aorai_option.emitter ~kf stmt new_assigns
+  (* we're putting the annotation on a new statement, with an empty
+     loop assigns by construction. Don't keep_empty *)
+  Annotations.add_code_annot
+    ~keep_empty:false Aorai_option.emitter ~kf stmt new_assigns
 
 let get_action_post_cond kf ?init_trans return_states =
   let to_consider pre_state int_states =

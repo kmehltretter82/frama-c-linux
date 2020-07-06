@@ -123,7 +123,7 @@ let inline_call loc caller callee return args =
              fd.sbody.bstmts <- inits @ fd.sbody.bstmts;
            end else begin
              (* put a statement contract on top of the function's body,
-                but only after we have assigned the formals. Not that there
+                but only after we have assigned the formals. Note that there
                 is no need to rename behaviors: they will only shadow behaviors
                 of the caller within callee's body, just as we need.
              *)

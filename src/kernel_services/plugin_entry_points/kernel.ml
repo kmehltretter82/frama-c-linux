@@ -592,6 +592,7 @@ module Time =
     end)
 
 let () = Parameter_customize.set_group messages
+let () = Parameter_customize.do_not_projectify ()
 module SymbolicPath =
   String_set (* TODO: to be replaced by an hashtbl *)
     (struct

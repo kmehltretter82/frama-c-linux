@@ -1367,6 +1367,8 @@ src/plugins/value/utils/state_import.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/state_import.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/unit_tests.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/unit_tests.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_perf.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_perf.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/value_results.ml: CEA_LGPL_OR_PROPRIETARY

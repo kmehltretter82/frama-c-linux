@@ -676,6 +676,18 @@ let rec add_attribute_glob_annot a g =
   | Dcustom_annot(c,n,al,l) -> Dcustom_annot(c,n,Cil.addAttribute a al, l)
   | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
 
+let behavior_has_only_assigns bhvs =
+  bhvs.b_requires = [] && bhvs.b_assumes = [] &&
+  bhvs.b_post_cond = [] && bhvs.b_allocation = FreeAllocAny &&
+  bhvs.b_extended = []
+
+let funspec_has_only_assigns spec =
+  List.for_all behavior_has_only_assigns spec.spec_behavior &&
+  spec.spec_variant = None &&
+  spec.spec_terminates = None &&
+  spec.spec_complete_behaviors = [] &&
+  spec.spec_disjoint_behaviors = []
+
 let is_same_list f l1 l2 =
   try List.for_all2 f l1 l2 with Invalid_argument _ -> false
 

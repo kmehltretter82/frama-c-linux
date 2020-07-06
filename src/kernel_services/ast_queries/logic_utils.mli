@@ -312,6 +312,18 @@ val is_annot_next_stmt: code_annotation -> bool
 val add_attribute_glob_annot:
   attribute -> global_annotation -> global_annotation
 
+(** {2 Contracts } *)
+
+(** [true] if the behavior has only an assigns clause.
+    @since Frama-C+dev
+*)
+val behavior_has_only_assigns: behavior -> bool
+
+(** [true] if the only non-empty fields of the contract are assigns clauses
+    @since Frama-C+dev
+*)
+val funspec_has_only_assigns: funspec -> bool
+
 (** {2 Structural equality between annotations} *)
 
 val is_same_list: ('a -> 'a -> bool) -> 'a list -> 'a list -> bool

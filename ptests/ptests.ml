@@ -819,13 +819,16 @@ let scan_options dir scan_buffer default =
              r := (List.assoc name config_options) dir opt !r
            with Not_found ->
              lock_eprintf "@[unknown configuration option: %s@\n%!@]" name)
-    with Scanf.Scan_failure _ ->
+    with
+    | Scanf.Scan_failure _ ->
       if str_string_match end_comment s 0
       then raise End_of_file
       else ()
+    | End_of_file -> (* ignore blank lines. *) ()
   in
   try
     while true do
+      if Scanf.Scanning.end_of_input scan_buffer then raise End_of_file;
       Scanf.bscanf scan_buffer "%s@\n" treat_line
     done;
     assert false

@@ -105,11 +105,10 @@ environment. To run individual tests, you may now use:
     $ export FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
     $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
 
-The necessary environment variables can also be displayed by the makefile:
+An utility script is provided to export the necessary environment variables
+(dont forget the `.` to execute the script in the current shell environment):
 
-    $ make wp-qualif-env
-    FRAMAC_WP_CACHE=update
-    FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
+    $ . bin/wp_qualif.sh
 
 As mentionned above, it is _not_ recommanded to globally set the
 `FRAMAC_WP_XXX` variables in your default shell environment, because WP will

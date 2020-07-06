@@ -42,7 +42,7 @@ val non_bottom: 'a or_bottom -> 'a
 
 val equal:       ('a -> 'a -> bool) -> 'a or_bottom -> 'a or_bottom -> bool
 val compare:     ('a -> 'a -> int)  -> 'a or_bottom -> 'a or_bottom -> int
-val is_included: ('a -> 'a -> bool) -> 'a or_bottom -> 'a or_bottom -> bool
+val is_included: ('a -> 'b -> bool) -> 'a or_bottom -> 'b or_bottom -> bool
 val join:        ('a -> 'a -> 'a) -> 'a or_bottom -> 'a or_bottom -> 'a or_bottom
 val join_list:   ('a -> 'a -> 'a) -> 'a or_bottom list -> 'a or_bottom
 val narrow:      ('a -> 'a -> 'a or_bottom) -> 'a or_bottom -> 'a or_bottom -> 'a or_bottom

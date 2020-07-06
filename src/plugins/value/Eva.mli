@@ -60,3 +60,9 @@ module Eval_terms: sig
       @return None on either an evaluation error or on unsupported construct. *)
   val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
 end
+
+
+module Unit_tests: sig
+  (** Runs the unit tests of Eva. *)
+  val run: unit -> unit
+end

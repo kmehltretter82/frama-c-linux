@@ -657,14 +657,6 @@ REQUIRE_LABLGTK=
 USE_LABLGTK=
 HAS_LABLGTK=
 
-# Tool declarations
-####################
-
-DOT=
-REQUIRE_DOT=
-USE_DOT=
-HAS_DOT=
-
 ### Now plugin declarations
 
 PLUGINS_FORCE_LIST=
@@ -957,6 +949,11 @@ configure_library([LABLGTK],
 
 configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
 
+configure_tool([UNIX2DOS],[unix2dos],
+               [unix2dos not found: you should install tofrodos],no)
+
+plugin_use_external(tests,unix2dos)
+
 ########################
 # Plug-in dependencies #
 ########################
@@ -974,8 +971,6 @@ EXTERNAL_PLUGINS="${EXTERNAL_PLUGINS} ${EXTRA_EXTERNAL_PLUGINS}"
 AC_SUBST(PLATFORM)
 AC_SUBST(VERBOSEMAKE)
 AC_SUBST(DEVELOPMENT)
-AC_SUBST(DOT)
-AC_SUBST(HAS_DOT)
 AC_SUBST(HAS_APRON)
 AC_SUBST(HAS_MPFR)
 AC_SUBST(HAS_LANDMARKS)

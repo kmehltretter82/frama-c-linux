@@ -239,32 +239,33 @@ let parse_entry jcdb_dir r =
   | Not_found ->
     Flags.add path flags
 
+let compute_flags_from_file () =
+  let database = Kernel.JsonCompilationDatabase.get () in
+  let jcdb_dir, jcdb_path =
+    if Sys.is_directory database then
+      database, Filename.concat database "compile_commands.json"
+    else Filename.dirname database, database
+  in
+  Kernel.feedback ~dkey:Kernel.dkey_compilation_db
+    "using compilation database: %s" jcdb_path;
+  begin
+    try
+      let r_list =
+        Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
+      in
+      List.iter (parse_entry jcdb_dir) r_list;
+    with
+    | Sys_error msg
+    | Yojson.Json_error msg
+    | Yojson.Basic.Util.Type_error (msg, _) ->
+      Kernel.abort "could not parse compilation database: %s@ %s"
+        database msg
+  end;
+  Flags.mark_as_computed ()
+
 let get_flags f =
   if Kernel.JsonCompilationDatabase.get () <> "" then begin
-    if not (Flags.is_computed ()) then begin
-      let database = Kernel.JsonCompilationDatabase.get () in
-      let jcdb_dir, jcdb_path =
-        if Sys.is_directory database then
-          database, Filename.concat database "compile_commands.json"
-        else Filename.dirname database, database
-      in
-      Kernel.feedback ~dkey:Kernel.dkey_compilation_db
-        "using compilation database: %s" jcdb_path;
-      begin
-        try
-          let r_list =
-            Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
-          in
-          List.iter (parse_entry jcdb_dir) r_list;
-        with
-        | Sys_error msg
-        | Yojson.Json_error msg
-        | Yojson.Basic.Util.Type_error (msg, _) ->
-          Kernel.abort "could not parse compilation database: %s@ %s"
-            database msg
-      end;
-      Flags.mark_as_computed ()
-    end;
+    if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let flags = Flags.find f in
       Kernel.feedback ~dkey:Kernel.dkey_compilation_db
@@ -276,3 +277,7 @@ let get_flags f =
       []
   end
   else []
+
+let has_entry f =
+  if not (Flags.is_computed ()) then compute_flags_from_file ();
+  Flags.mem f

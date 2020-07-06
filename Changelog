@@ -31,6 +31,10 @@ Open Source Release <next-release>
 -   Kernel    [2020-05-18] Support for C11's _Noreturn function specifier
 
 ###################################
+Open Source Release 21.1 (Scandium)
+###################################
+
+###################################
 Open Source Release 21.0 (Scandium)
 ###################################
 
@@ -3517,11 +3521,11 @@ Open Source Release 4.1 (Beryllium-20090901)
 
 -! Syntactic_callgraph [2009-08-27] New design of the callgraph in the GUI.
               Frama-C now requires ocamlgraph 1.2.
--  Logic      "reads" clauses on logic functions and predicates, which
-              disappeared with the introduction of axiomatic blocks, have been
-              resurected. Beware that the semantics is slightly different
-              from before: see ACSL document for details. It is used to
-              automatically generate footprint axioms.
+-  Logic      [2009-08-25]"reads" clauses on logic functions and predicates,
+              which disappeared with the introduction of axiomatic blocks,
+              have been ressurrected. Beware that the semantics is slightly
+              different from before: see ACSL document for details. It is used
+              to automatically generate footprint axioms.
 -  GUI        [2009-08-18] Improved display of summary information when
               selecting a file.
 -  Kernel     [2009-08-05] New options -kernel-help, -kernel-verbose and
@@ -3980,7 +3984,7 @@ Binary Release 1.0 (Hydrogen-20080302)
 Open Source Release 1.0 (Hydrogen-20080301)
 ###########################################
 
-- First release
+-  Kernel     [2008-03-01] First release.
 
 
 
