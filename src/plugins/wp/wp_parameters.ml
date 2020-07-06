@@ -639,15 +639,15 @@ module Cache = String
          - 'replay': update mode with no cache update\n\
          - 'rebuild': always run provers and update cache\n\
          - 'offline': use cache but never run provers\n\
-         This option is overriden by environment variable FRAMAC_WP_CACHE,\
-         unless -wp-no-cache-env is used."
+         You can also use the environment variable FRAMAC_WP_CACHE instead."
     end)
 
 let () = Parameter_customize.set_group wp_prover
 module CacheEnv = False
     (struct
       let option_name = "-wp-cache-env"
-      let help = "Use environment variables for cache.\n\
+      let help = "Gives environment variables precedence over command line\n\
+                  for cache management:\n\
                   - FRAMAC_WP_CACHE overrides -wp-cache\n\
                   - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
                   Disabled by default."
@@ -661,8 +661,8 @@ module CacheDir = String
       let default = ""
       let help =
         "Specify global cache directory (no cleanup mode).\n\
-         This option is overriden by environment variable FRAMAC_WP_CACHEDIR \
-         if -wp-cache-env is used."
+         By default, cache entries are stored in the WP session directory.\n\
+         You can also use the environment variable FRAMAC_WP_CACHEDIR instead."
     end)
 
 let () = Parameter_customize.set_group wp_prover
