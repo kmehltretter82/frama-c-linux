@@ -5,7 +5,6 @@
 .ivette
 .dome-*.stamp
 .dome-*.back
-.server-tsc
 node_modules
 yarn.lock
 yarn-error.log

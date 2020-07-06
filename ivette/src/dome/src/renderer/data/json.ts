@@ -123,8 +123,7 @@ export function jEnum<A>(d: { [tag: string]: A }): Loose<A> {
 /**
    One of the enumerated _constants_ or `undefined`.
    The typechecker will prevent you from listing values that are not in
-   type `A`. However, it will not protected you
-   from missings constants in `A`.
+   type `A`. However, it will not protected you from missings constants in `A`.
 */
 export function jTags<A>(...values: ((string | number) & A)[]): Loose<A> {
   var m = new Map<string | number, A>();
