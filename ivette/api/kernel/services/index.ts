@@ -3,7 +3,7 @@
 /**
    Kernel Services
    @packageDocumentation
-   @module frama-c/kernel/services
+   @module api/kernel/services
 */
 
 //@ts-ignore

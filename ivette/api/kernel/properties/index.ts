@@ -3,7 +3,7 @@
 /**
    Property Services
    @packageDocumentation
-   @module frama-c/kernel/properties
+   @module api/kernel/properties
 */
 
 //@ts-ignore

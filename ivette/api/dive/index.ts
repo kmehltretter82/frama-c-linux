@@ -3,7 +3,7 @@
 /**
    Dive Services
    @packageDocumentation
-   @module frama-c/dive
+   @module api/dive
 */
 
 //@ts-ignore

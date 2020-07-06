@@ -258,12 +258,12 @@ let makeOrder ~self ~names fmt js =
 
 let makeRecursive fn fmt js =
   if Pkg.isRecursive js then
-    Format.fprintf fmt "(_x) => %a(_x)" fn js
+    Format.fprintf fmt "(_x: any) => %a(_x)" fn js
   else fn fmt js
 
 let makeRecursive2 fn fmt js =
   if Pkg.isRecursive js then
-    Format.fprintf fmt "(_x,_y) => %a(_x,_y)" fn js
+    Format.fprintf fmt "(_x: any, _y: any) => %a(_x,_y)" fn js
   else fn fmt js
 
 let makeDeclaration fmt names d =
@@ -440,7 +440,7 @@ let makePackage pkg name fmt =
     if pkg.p_descr <> [] then
       Format.fprintf fmt "@\n   @[<hov 0>%a@]@\n@\n" pp_descr pkg.p_descr ;
     Format.fprintf fmt "   @@packageDocumentation@\n" ;
-    Format.fprintf fmt "   @@module frama-c/%s@\n" name ;
+    Format.fprintf fmt "   @@module api/%s@\n" name ;
     Format.fprintf fmt "*/@\n@." ;
     let names = Pkg.resolve ~keywords pkg in
     makeIgnore fmt "import * as Json from 'dome/data/json';@\n" ;

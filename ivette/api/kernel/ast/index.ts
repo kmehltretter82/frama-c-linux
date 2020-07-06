@@ -3,7 +3,7 @@
 /**
    Ast Services
    @packageDocumentation
-   @module frama-c/kernel/ast
+   @module api/kernel/ast
 */
 
 //@ts-ignore

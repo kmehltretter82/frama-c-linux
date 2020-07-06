@@ -3,7 +3,7 @@
 /**
    Informations
    @packageDocumentation
-   @module frama-c/kernel/data
+   @module api/kernel/data
 */
 
 //@ts-ignore
@@ -34,19 +34,19 @@ export type text = null | string | text[];
 
 /** Loose decoder for `text` */
 export const jText: Json.Loose<text> =
-  (_x) => Json.jUnion<null | string | text[]>(
-            Json.jNull,
-            Json.jString,
-            Json.jList(jText),
-          )(_x);
+  (_x: any) => Json.jUnion<null | string | text[]>(
+                 Json.jNull,
+                 Json.jString,
+                 Json.jList(jText),
+               )(_x);
 
 /** Safe decoder for `text` */
 export const jTextSafe: Json.Safe<text> =
-  (_x) => Json.jFail(jText,'Text expected')(_x);
+  (_x: any) => Json.jFail(jText,'Text expected')(_x);
 
 /** Natural order for `text` */
 export const byText: Compare.Order<text> =
-  (_x,_y) => Compare.structural(_x,_y);
+  (_x: any, _y: any) => Compare.structural(_x,_y);
 
 /** Enum Tag Description */
 export type tag = { name: string, label: markdown, descr: markdown };

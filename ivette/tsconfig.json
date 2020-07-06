@@ -98,8 +98,8 @@
     "readme": "./README.md",
     "inputFiles": [
       "doc/pages",
-      "src/frama-c",
-      "src/dome/src/renderer"
+      "src/frama-c", "api",
+      "src/dome/src/renderer",
     ]
   }
 }
