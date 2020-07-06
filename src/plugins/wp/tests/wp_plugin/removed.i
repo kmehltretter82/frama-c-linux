@@ -1,6 +1,5 @@
 /* run.config_qualif
-   CMD: @frama-c@ -wp-share ./share -wp-msg-key shell -wp-par 1 -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache replay -wp-cache-env
-   OPT: -eva -eva-msg-key=-summary -then -wp -then -no-eva -warn-unsigned-overflow -wp
+   OPT: -load-module eva,scope -no-wp -eva -eva-msg-key=-summary -then -wp -then -no-eva -warn-unsigned-overflow -wp
  */
 
 /* run.config
