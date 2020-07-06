@@ -183,7 +183,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
 /**
    Maps each field of `A` to some _optional_ comparison of the associated type.
    Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Order<T>, …}`.
-   See [[fields]] comparison function.
+   See [[byFields]] comparison function.
  */
 export type ByFields<A> = {
   [P in keyof A]?: Order<A[P]>;
@@ -192,7 +192,7 @@ export type ByFields<A> = {
 /**
    Maps each field of `A` to some comparison of the associated type.
    Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Order<T>, …}`.
-   See [[fieldsComplete]] comparison function.
+   See [[byAllFields]] comparison function.
 */
 export type ByAllFields<A> = {
   [P in keyof A]: Order<A[P]>;

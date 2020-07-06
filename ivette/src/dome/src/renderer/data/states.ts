@@ -96,7 +96,7 @@ export function useState<A>(s: State<A>): [A, (update: A) => void] {
    shall always be used with the same « role » otherwise it is discarded,
    and an error message is logged when in DEVEL mode.
  */
-abstract class Settings<A> {
+export abstract class Settings<A> {
 
   private static keyRoles = new Map<string, symbol>();
 
@@ -106,7 +106,7 @@ abstract class Settings<A> {
 
   /**
      Encoders shall be protected against exception.
-     Use [[JSON.jTry]] and [[JSON.jCatch]] in case of uncertainty.
+     Use [[dome/data/json.jTry]] and [[dome/data/json.jCatch]] in case of uncertainty.
      Decoders are automatically protected internally to the Settings class.
      @param role Debugging name of instance roles (each instance has its unique
      role, though)
@@ -217,7 +217,7 @@ export function useSettings<A>(
 
 /** Window Settings for non-JSON data.
     In most situations, you can use [[WindowSettings]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class WindowSettingsData<A> extends Settings<A> {
 
   constructor(
@@ -237,7 +237,7 @@ export class WindowSettingsData<A> extends Settings<A> {
 
 /** Global Settings for non-JSON data.
     In most situations, you can use [[WindowSettings]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class GlobalSettingsData<A> extends Settings<A> {
 
   constructor(
@@ -256,8 +256,8 @@ export class GlobalSettingsData<A> extends Settings<A> {
 }
 
 /** Window Settings.
-    For non-JSON data, use [[WindowSettingsdata]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    For non-JSON data, use [[WindowSettingsData]] instead.
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
 
   constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {
@@ -267,8 +267,8 @@ export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
 }
 
 /** Global Settings.
-    For non-JSON data, use [[WindowSettingsdata]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    For non-JSON data, use [[WindowSettingsData]] instead.
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class GlobalSettings<A extends JSON.json> extends GlobalSettingsData<A> {
 
   constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {

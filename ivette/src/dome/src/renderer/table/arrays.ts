@@ -166,7 +166,7 @@ export class ArrayModel<Key, Row>
       comparison for un-specified columns are kept unchanged, if any.
       This will be used to refine
       [[setNaturalOrder]] in response to user column selection with
-      [[setSortBy]] provided you enable by-column sorting from the table view.
+      [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
   setColumnOrder(columns?: ByColumns<Row>) {
     this.columns = { ...this.columns, ...columns };
@@ -176,7 +176,7 @@ export class ArrayModel<Key, Row>
   /** Sets natural ordering of the rows.
       It defines in which order the entries are rendered in the table.  This
       primary ordering can be refined in response to user column selection with
-      [[setSortBy]] provided you enable by-column sorting from the table view.
+      [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
   setNaturalOrder(order?: Order<Row>) {
     this.natural = order;
@@ -186,7 +186,7 @@ export class ArrayModel<Key, Row>
   /**
      Sets both natural ordering and column ordering with the provided
      orders by fields. This is a combination of [[setColumnOrder]] and
-     [[setNaturalOrder]] with [[Compare.byFields]].
+     [[setNaturalOrder]] with [[dome/data/compare.byFields]].
    */
   setOrderingByFields(byfields: ByFields<Row>) {
     this.natural = Compare.byFields(byfields);
