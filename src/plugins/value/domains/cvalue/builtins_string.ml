@@ -199,22 +199,23 @@ let fold_offsm kind ~validity ~start ~max offsetmap acc =
   let process_range (start, max) (v, v_size, v_shift) acc =
     if acc.stop then acc else
       let min = Integer.round_up_to_r ~min:start ~r:Integer.zero ~modu in
+      if Integer.gt min max then acc else
         let v_start = Abstract_interp.Rel.add_abs start v_shift in
-      (* Only one read of the value is needed when:
-         - the ending cut is aligned with the reads, meaning that no read
-           overlaps between two ranges of the offsetmap.
-         - and either the value is isotropic, or the repeated value has the
-           same size than the reads. *)
-      if Integer.is_zero (Integer.e_rem (Integer.succ max) modu) &&
-         (Cvalue.V_Or_Uninitialized.is_isotropic v ||
-          Integer.equal min v_start && Integer.equal v_size kind.size)
-      then
-        let offset = make_interval ~min ~max ~rem:Integer.zero ~modu in
-        read_char kind offset v acc
-      else
-        (* Otherwise, search the range by reading the offsetmap for each
-           required offset. Less efficient, but equally precise. *)
-        search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc
+        (* Only one read of the value is needed when:
+           - the ending cut is aligned with the reads, meaning that no read
+             overlaps between two ranges of the offsetmap.
+           - and either the value is isotropic, or the repeated value has the
+             same size than the reads. *)
+        if Integer.is_zero (Integer.e_rem (Integer.succ max) modu) &&
+           (Cvalue.V_Or_Uninitialized.is_isotropic v ||
+            Integer.equal min v_start && Integer.equal v_size kind.size)
+        then
+          let offset = make_interval ~min ~max ~rem:Integer.zero ~modu in
+          read_char kind offset v acc
+        else
+          (* Otherwise, search the range by reading the offsetmap for each
+             required offset. Less efficient, but equally precise. *)
+          search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc
   in
   Cvalue.V_Offsetmap.fold_between
     ~entire:false (start, max) process_range offsetmap acc
