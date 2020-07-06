@@ -24,7 +24,6 @@ open Factory
 
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
-let dkey_shell = Wp_parameters.register_category "shell"
 let wkey_smoke = Wp_parameters.register_warn_category "smoke"
 
 (* --------- Command Line ------------------- *)
@@ -264,20 +263,17 @@ let add_time s t =
     end
 
 let do_list_scheduled iter_on_goals =
-  if not (Wp_parameters.has_dkey VCS.dkey_no_goals_info) then
-    begin
-      clear_scheduled () ;
-      iter_on_goals
-        (fun goal ->
-           begin
-             incr scheduled ;
-             if !spy then session := GOALS.add goal !session ;
-           end) ;
-      match !scheduled with
-      | 0 -> Wp_parameters.warning ~current:false "No goal generated"
-      | 1 -> Wp_parameters.feedback "1 goal scheduled"
-      | n -> Wp_parameters.feedback "%d goals scheduled" n
-    end
+  clear_scheduled () ;
+  iter_on_goals
+    (fun goal ->
+       begin
+         incr scheduled ;
+         if !spy then session := GOALS.add goal !session ;
+       end) ;
+  match !scheduled with
+  | 0 -> Wp_parameters.warning ~current:false "No goal generated"
+  | 1 -> Wp_parameters.feedback "1 goal scheduled"
+  | n -> Wp_parameters.feedback "%d goals scheduled" n
 
 let dkey_prover = Wp_parameters.register_category "prover"
 
@@ -306,11 +302,10 @@ let do_progress goal msg =
 
 let do_report_cache_usage mode =
   if !exercised > 0 &&
-     not (Wp_parameters.has_dkey dkey_shell) &&
-     not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
+     not (Wp_parameters.has_dkey VCS.dkey_shell)
   then
-    let hits = ProverWhy3.get_hits () in
-    let miss = ProverWhy3.get_miss () in
+    let hits = Cache.get_hits () in
+    let miss = Cache.get_miss () in
     if hits <= 0 && miss <= 0 then
       Wp_parameters.result "[Cache] not used"
     else
@@ -321,20 +316,20 @@ let do_report_cache_usage mode =
             if n > 0 then
               ( Format.fprintf fmt "%s%s:%d" !sep job n ; sep := ", " ) in
           match mode with
-          | ProverWhy3.NoCache -> ()
-          | ProverWhy3.Replay ->
+          | Cache.NoCache -> ()
+          | Cache.Replay ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "missed" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Offline ->
+          | Cache.Offline ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "failed" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Update | ProverWhy3.Cleanup ->
+          | Cache.Update | Cache.Cleanup ->
               pp_cache fmt hits "found" ;
               pp_cache fmt miss "updated" ;
               Format.pp_print_newline fmt () ;
-          | ProverWhy3.Rebuild ->
+          | Cache.Rebuild ->
               pp_cache fmt hits "replaced" ;
               pp_cache fmt miss "updated" ;
               Format.pp_print_newline fmt () ;
@@ -451,8 +446,7 @@ let do_report_time fmt s =
   begin
     if s.n_time > 0 &&
        s.u_time > Rformat.epsilon &&
-       not (Wp_parameters.has_dkey VCS.dkey_no_time_info) &&
-       not (Wp_parameters.has_dkey VCS.dkey_success_only)
+       not (Wp_parameters.has_dkey VCS.dkey_shell)
     then
       let mean = s.a_time /. float s.n_time in
       let epsilon = 0.05 *. mean in
@@ -475,14 +469,13 @@ let do_report_time fmt s =
 let do_report_steps fmt s =
   begin
     if s.steps > 0 &&
-       not (Wp_parameters.has_dkey VCS.dkey_no_step_info) &&
-       not (Wp_parameters.has_dkey VCS.dkey_success_only)
+       not (Wp_parameters.has_dkey VCS.dkey_shell)
     then
       Format.fprintf fmt " (%d)" s.steps ;
   end
 
 let do_report_stopped fmt s =
-  if Wp_parameters.has_dkey VCS.dkey_success_only then
+  if Wp_parameters.has_dkey VCS.dkey_shell then
     begin
       let n = s.interrupted + s.unknown in
       if n > 0 then
@@ -511,27 +504,26 @@ let do_report_prover_stats pp_prover fmt (p,s) =
   end
 
 let do_report_scheduled () =
-  if not (Wp_parameters.has_dkey VCS.dkey_no_goals_info) then
-    if Wp_parameters.Generate.get () then
-      let plural = if !exercised > 1 then "s" else "" in
-      Wp_parameters.result "%d goal%s generated" !exercised plural
-    else
-    if !scheduled > 0 then
-      begin
-        let proved = GOALS.cardinal !proved in
-        let mode = ProverWhy3.get_mode () in
-        if mode <> ProverWhy3.NoCache then do_report_cache_usage mode ;
-        Wp_parameters.result "%t"
-          begin fun fmt ->
-            Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
-            Pretty_utils.pp_items
-              ~min:12 ~align:`Left
-              ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-              ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-              ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-              ~pp_item:do_report_prover_stats fmt ;
-          end ;
-      end
+  if Wp_parameters.Generate.get () then
+    let plural = if !exercised > 1 then "s" else "" in
+    Wp_parameters.result "%d goal%s generated" !exercised plural
+  else
+  if !scheduled > 0 then
+    begin
+      let proved = GOALS.cardinal !proved in
+      let mode = Cache.get_mode () in
+      if mode <> Cache.NoCache then do_report_cache_usage mode ;
+      Wp_parameters.result "%t"
+        begin fun fmt ->
+          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+          Pretty_utils.pp_items
+            ~min:12 ~align:`Left
+            ~title:(fun (prover,_) -> VCS.title_of_prover prover)
+            ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
+            ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
+            ~pp_item:do_report_prover_stats fmt ;
+        end ;
+    end
 
 let do_list_scheduled_result () =
   begin
@@ -736,12 +728,10 @@ let do_wp_proofs_for goals = do_wp_proofs_iter (fun f -> Bag.iter f goals)
 (* registered at frama-c (normal) exit *)
 let do_cache_cleanup () =
   begin
-    let mode = ProverWhy3.get_mode () in
-    ProverWhy3.cleanup_cache ~mode ;
-    let removed = ProverWhy3.get_removed () in
+    Cache.cleanup_cache () ;
+    let removed = Cache.get_removed () in
     if removed > 0 &&
-       not (Wp_parameters.has_dkey dkey_shell) &&
-       not (Wp_parameters.has_dkey VCS.dkey_no_cache_info)
+       not (Wp_parameters.has_dkey VCS.dkey_shell)
     then
       Wp_parameters.result "[Cache] removed:%d" removed
   end
@@ -812,6 +802,8 @@ let cmdline_run () =
       end ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
+  if Wp_parameters.CachePrint.get () then
+    Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
   let fct = Wp_parameters.get_wp () in
   match fct with
   | Wp_parameters.Fct_none -> ()
@@ -905,7 +897,10 @@ let pp_wp_parameters fmt =
     if Wp_parameters.RTE.get () then Format.pp_print_string fmt " -wp-rte" ;
     let spec = Wp_parameters.Model.get () in
     if spec <> [] && spec <> ["Typed"] then
-      ( let descr = Factory.descr (Factory.parse spec) in
+      ( let descr =
+          if spec = ["Dump"] then "Dump"
+          else Factory.descr (Factory.parse spec)
+        in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
     if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
         " -wp-no-let" ;
@@ -932,7 +927,7 @@ let pp_wp_parameters fmt =
 
 let () = Cmdline.run_after_setting_files
     (fun _ ->
-       if Wp_parameters.has_dkey dkey_shell then
+       if Wp_parameters.has_dkey VCS.dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
 (* -------------------------------------------------------------------------- *)

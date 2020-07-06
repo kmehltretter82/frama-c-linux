@@ -8,7 +8,6 @@
 [wp] [CFG] Goal init_t2_v2_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v3_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
-[wp] Computing [100 goals...]
 ------------------------------------------------------------
   Function init
 ------------------------------------------------------------

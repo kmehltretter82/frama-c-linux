@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -load-script tests/wp/stmtcompiler_test_rela.ml -wp-msg-key success-only
+   OPT: -load-script tests/wp/stmtcompiler_test_rela.ml -wp-msg-key shell
 */
 
 int empty (int c){
