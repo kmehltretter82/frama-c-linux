@@ -564,7 +564,7 @@ is blocked.
     } else if (typeof text === 'string') {
       this.append(text);
     } else if (text !== null) {
-      console.error('[Dome.buffers] unexpected text',text);
+      console.error('[Dome.buffers] Unexpected text', text);
     }
   }
 

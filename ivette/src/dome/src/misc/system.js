@@ -593,7 +593,7 @@ export function spawn(command,args,options) {
     }
 
     if ( !process ) {
-      throw "[Dome] Can not create process ('"+command+"')";
+      throw `[Dome] Unable to create process ('${command}')`;
       return;
     }
 

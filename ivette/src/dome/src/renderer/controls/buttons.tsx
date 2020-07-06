@@ -161,8 +161,6 @@ export function Button(props: ButtonProps) {
     + (display ? '' : ' dome-control-erased')
     + (className ? ' ' + className : '');
   const nofocus = focusable ? undefined : true;
-  console.log('ICON', Icon);
-  console.log('LABEL', LABEL);
   return (
     <button type='button'
       className={theClass}

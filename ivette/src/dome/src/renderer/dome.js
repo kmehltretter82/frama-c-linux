@@ -149,10 +149,6 @@ ipcRenderer.on('dome.ipc.command', (_event,argv,wdir) => {
 });
 
 // --------------------------------------------------------------------------
-// --- Main-Process Communication
-// --------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------
 // --- Window Management
 // --------------------------------------------------------------------------
 
@@ -395,55 +391,69 @@ export function popupMenu( items, callback )
 // --- Settings
 // --------------------------------------------------------------------------
 
-var globals = {} ;
-var globalPatches = {} ;
+var globalSettings = new Map();
+var globalPatches = new Map();
 
-var settings = {} ;
-var settingsPatches = {} ;
+var windowSettings = new Map();
+var windowPatches = new Map();
+
+const initSetting =
+      (m, data) => _.forEach(data,(value,key) => m.set(key,value));
 
 // initial values => synchronized event
-function syncSettings() {
+const syncSettings = () => {
   const fullSettings = ipcRenderer.sendSync('dome.ipc.settings.sync');
-  globals = fullSettings.globals ;
-  settings = fullSettings.settings ;
-}
+  initSetting( globalSettings, fullSettings.globals );
+  initSetting( windowSettings, fullSettings.settings );
+};
 
 const readSetting = ( local, key, defaultValue ) => {
-  const value = _.get( local ? settings : globals , key );
+  const store = local ? windowSettings : globalSettings;
+  const value = store.get(key);
   return value === undefined ? defaultValue : value ;
 };
 
 const writeSetting = ( local, key, value ) => {
-  if (key) {
-    const theValue = value===undefined ? null : value ;
-    const store = local ? settings : globals ;
-    const patches = local ? settingsPatches : globalPatches ;
-    _.set( store, key, theValue );
-    _.set( patches,  key, theValue );
-    emitter.emit('dome.settings');
-    if (local) {
-      if (DEVEL) fireSaveSettings();
-    } else {
-      fireSaveGlobals();
-    }
+  const store = local ? windowSettings : globalSettings;
+  const patches = local ? windowPatches : globalPatches;
+  if (value === undefined) {
+    store.delete(key);
+    patches.set(key,null);
+  } else {
+    store.set(key,value);
+    patches.set(key,value);
   }
+  if (local) {
+    fireSaveSettings();
+  } else {
+    emitter.emit('dome.settings');
+    fireSaveGlobals();
+  }
+};
+
+const flushPatches = (m) => {
+  if (m.size > 0) {
+    const args = [];
+    m.forEach((value,key) => {
+      args.push({ key, value });
+    });
+    m.clear();
+    return args;
+  }
+  return undefined;
 };
 
 const fireSaveSettings = _.debounce(
   () => {
-    if (!_.isEmpty(settingsPatches)) {
-      ipcRenderer.send( 'dome.ipc.settings.window', settingsPatches ) ;
-      settingsPatches = {} ;
-    }
+    const args = flushPatches(windowPatches);
+    args && ipcRenderer.send( 'dome.ipc.settings.window', args ) ;
   }, 100
 );
 
 const fireSaveGlobals = _.debounce(
   () => {
-    if (!_.isEmpty(globalPatches)) {
-      ipcRenderer.send( 'dome.ipc.settings.global', globalPatches ) ;
-      globalPatches = {} ;
-    }
+    const args = flushPatches(globalPatches);
+    args && ipcRenderer.send( 'dome.ipc.settings.global', args ) ;
   }, 100
 );
 
@@ -456,25 +466,32 @@ ipcRenderer.on('dome.ipc.closing', (_evt) => {
 });
 
 /** @event 'dome.settings'
-    @description Emitted when the settings have been updated. */
+    @description Emitted when the global settings have been updated. */
 
 /** @event 'dome.defaults'
-    @description Emitted when the settings have been reset to default. */
+    @description Emitted when the window settings have re-initialized. */
 
 ipcRenderer.on('dome.ipc.settings.defaults',(sender) => {
   fireSaveSettings.cancel();
   fireSaveGlobals.cancel();
-  settingsPatches = {};
-  globalPatches = {};
-  settings = {};
-  globals = {};
-  emitter.emit('dome.defaults');
+  windowPatches.clear();
+  globalPatches.clear();
+  windowSettings.clear();
+  globalSettings.clear();
   emitter.emit('dome.settings');
+  emitter.emit('dome.defaults');
 });
 
 ipcRenderer.on('dome.ipc.settings.update',(sender,patches) => {
-  // Don't cancel local updates
-  _.merge( globals , patches , globalPatches );
+  patches.forEach(({ key, value }) => {
+    // Don't cancel local updates
+    if (!globalPatches.has(key)) {
+      if (value === null)
+        globalSettings.delete(key);
+      else
+        globalSettings.set(key,value);
+    }
+  });
   emitter.emit('dome.settings');
 });
 
@@ -493,7 +510,7 @@ export function getWindowSetting( key, defaultValue ) {
 }
 
 /** @summary Set value into local window (persistent) settings.
-    @param {string} key to store the data
+    @param {string} [key] to store the data
     @param {any} value associated value or object
     @description
     This settings are local to the current window, but persistently
@@ -501,7 +518,7 @@ export function getWindowSetting( key, defaultValue ) {
     For global application settings, use `setGlobal()` instead.
 */
 export function setWindowSetting( key , value ) {
-  writeSetting( true, key, value );
+  key && writeSetting( true, key, value );
 }
 
 /**
@@ -524,7 +541,8 @@ export function getGlobalSetting( key, defaultValue ) {
     @description
     These settings are global to the current window, but persistently
     saved in the user's home directory. Updated values are broadcasted
-    in batch to all other windows, which in turn receive a `'dome.settings'`
+    in batch to all other windows,
+    which in turn receive a `'dome.settings'`
     event for synchronizing.<br/>
     For local window settings, use `set()` instead.
 */
@@ -684,25 +702,21 @@ export function useCommand() {
 
 function useSettings( local, settings, defaultValue )
 {
-  const [ value, setValue ] = React.useState(() => readSetting( local, settings, defaultValue ));
+  const [ value, setValue ] =
+        React.useState(() => readSetting( local, settings, defaultValue ));
   React.useEffect(() => {
-    if (settings) {
-      let callback = () => {
-        let v = readSetting( local, settings , defaultValue );
-        setValue(v);
-      };
-      emitter.on('dome.settings',callback);
-      return () => emitter.off( 'dome.settings', callback );
-    } else {
-      let callback = () => setValue(defaultValue);
-      emitter.on('dome.defaults',callback);
-      return () => emitter.off( 'dome.defaults', callback );
-    }
+    let callback = () => {
+      let v = readSetting( local, settings , defaultValue );
+      setValue(v);
+    };
+    const event = local ? 'dome.defaults' : 'dome.settings' ;
+    emitter.on(event,callback);
+    return () => emitter.off(event, callback);
   });
   const doUpdate = (upd) => {
     const theValue = typeof(upd)==='function' ? upd(value) : upd ;
     if (settings) writeSetting( local, settings, theValue );
-    else setValue(theValue);
+    if (local) setValue(theValue);
   };
   return [ value, doUpdate ];
 }
@@ -715,8 +729,7 @@ function useSettings( local, settings, defaultValue )
    @description
    Similar to `React.useState()` with persistent _window_ settings.
    When the settings key is undefined, it simply uses a local React state.
-   Also responds to `'dome.settings'` to update the state and `'dome.defaults'`
-   to restore the default value.
+   Also responds to `'dome.defaults'`.
 
    The `setValue` callback accepts either a value, or a function to be applied
    on current value.
@@ -750,8 +763,7 @@ export function useSwitch( settings, defaultValue=false )
    @description
    Similar to `React.useState()` with persistent _global_ settings.
    When the settings key is undefined, it simply uses a local React state.
-   Also responds to `'dome.settings'` to update the state and `'dome.defaults'`
-   to restore the default value.
+   Also responds to `'dome.settings'` to update the state.
 
    The `setValue` callback accepts either a value, or a function to be applied
    on current value.

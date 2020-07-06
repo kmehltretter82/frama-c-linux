@@ -212,7 +212,7 @@ function makeDataGetter(
       if (rowData !== undefined) return getter(rowData, dataKey);
     } catch (err) {
       console.error(
-        '[Dome.table] custom getter error',
+        '[Dome.table] Custom getter error',
         'rowData:', rowData,
         'dataKey:', dataKey,
         err,
@@ -240,7 +240,7 @@ function makeDataRenderer(
       return contents;
     } catch (err) {
       console.error(
-        '[Dome.table] custom renderer error',
+        '[Dome.table] Custom renderer error',
         'dataKey:', props.dataKey,
         'cellData:', cellData,
         err,
