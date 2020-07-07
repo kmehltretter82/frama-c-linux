@@ -35,7 +35,7 @@ let pp_step fmt a =
 
 let pp_plugin fmt = function
   | Kernel -> pp_step fmt "kernel"
-  | Plugin p -> pp_step fmt p
+  | Plugin p -> pp_step fmt "plugins" ; pp_step fmt p
 
 let pp_ident fmt { plugin ; package ; name } =
   ( pp_plugin fmt plugin ;
@@ -69,7 +69,7 @@ struct
   let target p ids =
     match p with
     | Kernel -> "kernel" :: ids
-    | Plugin p -> "plugin" :: p :: ids
+    | Plugin p -> "plugins" :: p :: ids
 
   (* propose various abbreviations ; finally render full qualified name *)
   let ranked source { plugin ; package ; name } k =
@@ -241,12 +241,12 @@ type packageInfo = {
 let name_of_ident ?(sep=".") id =
   String.concat sep @@ match id.plugin with
   | Kernel -> "kernel" :: id.package @ [ id.name ]
-  | Plugin p -> p :: (id.package @ [id.name ])
+  | Plugin p -> "plugins" :: p :: (id.package @ [id.name ])
 
 let name_of_pkg ?(sep=".") plugin package =
   String.concat sep @@ match plugin with
   | Kernel -> "kernel" :: package
-  | Plugin p -> p :: package
+  | Plugin p -> "plugins" :: p :: package
 
 let name_of_pkginfo ?sep { p_plugin ; p_package } =
   name_of_pkg ?sep p_plugin p_package

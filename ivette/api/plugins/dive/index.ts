@@ -3,7 +3,7 @@
 /**
    Dive Services
    @packageDocumentation
-   @module api/dive
+   @module api/plugins/dive
 */
 
 //@ts-ignore
@@ -45,7 +45,7 @@ export const byVariableName: Compare.Order<variableName> =
 
 const graph_internal: Server.GetRequest<null,Json.json> = {
   kind: Server.RqKind.GET,
-  name:   'dive.graph',
+  name:   'plugins.dive.graph',
   input:  Json.jNull,
   output: Json.jAny,
 };
@@ -54,7 +54,7 @@ export const graph: Server.GetRequest<null,Json.json>= graph_internal;
 
 const clear_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.clear',
+  name:   'plugins.dive.clear',
   input:  Json.jNull,
   output: Json.jNull,
 };
@@ -63,7 +63,7 @@ export const clear: Server.ExecRequest<null,null>= clear_internal;
 
 const addVar_internal: Server.ExecRequest<variableName,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.addVar',
+  name:   'plugins.dive.addVar',
   input:  jVariableName,
   output: Json.jAny,
 };
@@ -75,7 +75,7 @@ const addFunctionAlarms_internal: Server.ExecRequest<
   Json.json
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.addFunctionAlarms',
+  name:   'plugins.dive.addFunctionAlarms',
   input:  Json.jKey<'#fct'>('#fct'),
   output: Json.jAny,
 };
@@ -90,7 +90,7 @@ const explore_internal: Server.ExecRequest<
   Json.json
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.explore',
+  name:   'plugins.dive.explore',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
@@ -99,7 +99,7 @@ export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= ex
 
 const show_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.show',
+  name:   'plugins.dive.show',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
@@ -108,7 +108,7 @@ export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= show_
 
 const hide_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
-  name:   'dive.hide',
+  name:   'plugins.dive.hide',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
