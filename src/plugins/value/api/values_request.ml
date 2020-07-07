@@ -25,11 +25,9 @@ open Data
 open Cil_types
 module Md = Markdown
 
-let chapter = `Plugin "Eva"
-
 let package =
   Package.package
-    ~plugin:"Eva"
+    ~plugin:"eva"
     ~name:"eva"
     ~title:"Eva Values"
     ~readme:"eva.md"
@@ -70,11 +68,10 @@ let get_after_value =
     (function Unchanged -> "unchanged" | Reduced eval -> get_value eval)
 
 module CallStackId =
-  Data.Index (Value_types.Callstack.Map)
+  Data.Index
+    (Value_types.Callstack.Map)
     (struct
-      let page = page
       let name = "eva-callstack-id"
-      let descr = Md.plain "CallStack"
     end)
 
 (* This pretty-printer drops the toplevel kf, which is always the function
@@ -129,11 +126,13 @@ module CallStack = struct
     (val
       (Record.publish
          ~package
-         ~name:"eva-callstack"
+         ~name:"evaCallstack"
          ~descr:(Md.plain "CallStack")
          record) : Record.S with type r = record)
 
   type t = Value_types.callstack option
+
+  let jtype = R.jtype
 
   let pp_callstack ~short = function
     | None -> "all"
@@ -205,7 +204,7 @@ let array =
   in
   States.register_array
     ~package
-    ~name:"eva.values"
+    ~name:"evaValues"
     ~descr:(Md.plain "Abstract values inferred by the Eva analysis")
     ~key:(fun (cs, _) -> CallStack.key cs)
     ~iter
@@ -351,7 +350,7 @@ let () =
   Server.Request.register
     ~package
     ~kind:`GET
-    ~name:"eva.values.compute"
+    ~name:"getEvaValues"
     ~descr:(Md.plain "Get the abstract values computed for an expression or lvalue")
     ~input:(module Kernel_ast.Marker)
     ~output:(module Junit)
