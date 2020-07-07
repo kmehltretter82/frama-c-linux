@@ -27,7 +27,13 @@ module Md = Markdown
 
 let chapter = `Plugin "Eva"
 
-let page = Doc.page chapter ~title:"Eva Values" ~filename:"eva.md"
+let package =
+  Package.package
+    ~plugin:"Eva"
+    ~name:"eva"
+    ~title:"Eva Values"
+    ~readme:"eva.md"
+    ()
 
 type value =
   { value: string;
@@ -110,9 +116,7 @@ let pretty_callstack_short fmt cs =
 module CallStack = struct
   type record
 
-  let record: record Record.signature =
-    Record.signature ~page
-      ~name:"eva-callstack" ~descr:(Md.plain "CallStack") ()
+  let record: record Record.signature = Record.signature ()
 
   let id = Record.field record ~name:"id"
       ~descr:(Md.plain "Callstack id") (module Jint)
@@ -121,10 +125,15 @@ module CallStack = struct
   let full = Record.field record ~name:"full"
       ~descr:(Md.plain "Full name for the callstack") (module Jstring)
 
-  module R = (val (Record.publish record) : Record.S with type r = record)
+  module R =
+    (val
+      (Record.publish
+         ~package
+         ~name:"eva-callstack"
+         ~descr:(Md.plain "CallStack")
+         record) : Record.S with type r = record)
 
   type t = Value_types.callstack option
-  let syntax = R.syntax
 
   let pp_callstack ~short = function
     | None -> "all"
@@ -163,36 +172,39 @@ let iter f =
 let array =
   let model = States.model () in
   let () =
-    States.column ~model
-      ~name:"callstack" ~descr:(Md.plain "CallStack")
-      ~data:(module CallStack) ~get:fst ()
+    States.column
+      ~name:"callstack"
+      ~descr:(Md.plain "CallStack")
+      ~data:(module CallStack)
+      ~get:fst
+      model
   in
   let () =
-    States.column ~model
+    States.column
       ~name:"value_before"
       ~descr:(Md.plain "Value inferred just before the selected point")
       ~data:(module Jstring)
       ~get:(fun (_, e) -> get_value e.before)
-      ()
+      model
   in
   let () =
-    States.column ~model
+    States.column
       ~name:"alarm"
       ~descr:(Md.plain "Did the evaluation led to an alarm?")
       ~data:(module Jbool)
       ~get:(fun (_, e) -> get_alarm e.before)
-      ()
+      model
   in
   let () =
-    States.column ~model
+    States.column
       ~name:"value_after"
       ~descr:(Md.plain "Value inferred just after the selected point")
-      ~data:(module Jstring.Joption)
+      ~data:(module Joption(Jstring))
       ~get:(fun (_, e) -> get_after_value e.after_instr)
-      ()
+      model
   in
   States.register_array
-    ~page
+    ~package
     ~name:"eva.values"
     ~descr:(Md.plain "Abstract values inferred by the Eva analysis")
     ~key:(fun (cs, _) -> CallStack.key cs)
@@ -335,8 +347,12 @@ let update tag =
     update_values (Request.lvaluate kinstr (Var varinfo, NoOffset))
   | _ -> ()
 
-let () = Server.Request.register ~page
-    ~kind:`GET ~name:"eva.values.compute"
+let () =
+  Server.Request.register
+    ~package
+    ~kind:`GET
+    ~name:"eva.values.compute"
     ~descr:(Md.plain "Get the abstract values computed for an expression or lvalue")
-    ~input:(module Kernel_ast.Marker) ~output:(module Junit)
+    ~input:(module Kernel_ast.Marker)
+    ~output:(module Junit)
     update
