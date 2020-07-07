@@ -4,7 +4,7 @@ OPT: -journal-disable -wp-model Typed -wp-verbose 2 -wp-prop @assigns
 */
 
 /* run.config_qualif
-OPT: -journal-disable -rte -wp -wp-model Hoare -wp-par 1 -wp-msg-key "success-only"
+OPT: -journal-disable -rte -wp -wp-model Hoare -wp-par 1 -wp-msg-key shell
 */
 /*----------------------------------------------------------------------------*/
 
@@ -89,7 +89,7 @@ int default_behaviors (int c, int x) {
   int y;
 
   //@ ensures qed_ok: stmt_p: x > 0; assigns qed_ok: x;
-  if (c) x = 1; 
+  if (c) x = 1;
   else {
     //@ assert qed_ok: x >= 0;
     x++;

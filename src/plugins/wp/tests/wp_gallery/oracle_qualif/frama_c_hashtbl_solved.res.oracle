@@ -3,7 +3,6 @@
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
-[wp] Computing [100 goals...]
 [wp] 102 goals scheduled
 [wp] [Alt-Ergo] Goal typed_add_complete_full_nominal : Valid
 [wp] [Alt-Ergo] Goal typed_add_disjoint_full_nominal : Valid

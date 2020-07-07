@@ -659,7 +659,7 @@ let add g =
         Gmap.iter
           (fun _ ws -> WPOset.iter (fun _ -> incr added) ws)
           system.wpo_idx ;
-        if not (Wp_parameters.has_dkey VCS.dkey_no_goals_info) then
+        if not (Wp_parameters.has_dkey VCS.dkey_shell) then
           Wp_parameters.feedback ~ontty:`Feedback "Computing [%d goals...]" !added ;
         added := 0 ;
       end ;

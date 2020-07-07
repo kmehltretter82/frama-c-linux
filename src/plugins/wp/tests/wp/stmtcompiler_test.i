@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -load-script tests/wp/stmtcompiler_test.ml -wp-msg-key success-only
+   OPT: -load-script tests/wp/stmtcompiler_test.ml -wp-msg-key shell
 */
 
 int empty (int c){

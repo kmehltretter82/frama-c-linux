@@ -1451,6 +1451,8 @@ src/plugins/wp/.gitignore: .ignore
 src/plugins/wp/.ocp-indent: .ignore
 src/plugins/wp/Auto.ml: CEA_WP
 src/plugins/wp/Auto.mli: CEA_WP
+src/plugins/wp/Cache.ml: CEA_WP
+src/plugins/wp/Cache.mli: CEA_WP
 src/plugins/wp/Cfloat.ml: CEA_WP
 src/plugins/wp/Cfloat.mli: CEA_WP
 src/plugins/wp/Changelog: .ignore
