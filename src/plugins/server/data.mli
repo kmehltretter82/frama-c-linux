@@ -326,7 +326,7 @@ end
 (** Datatype information. *)
 module type Info =
 sig
-  val kind: string
+  val name: string
 end
 
 (** Simplified [Map.S]. *)
@@ -343,7 +343,6 @@ end
 module type Index =
 sig
   include S
-  val kind : string
   val get : t -> int
   val find : int -> t (** @raise Not_found if not registered. *)
   val clear : unit -> unit
