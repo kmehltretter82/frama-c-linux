@@ -63,24 +63,31 @@ type extension = {
   short_printer: extension_printer ;
 }
 
-let default_printer printer fmt = function
-  | Ext_id i -> Format.fprintf fmt "%d" i
-  | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
-  | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
-  | Ext_annot (id,an) -> Format.fprintf fmt "@[<v 2>@[%s@ {@]@\n%a}@]@\n"
-                           id (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
-                                 printer#extended) an
+let default_printer name printer fmt = function
+  | Ext_id i ->
+    Format.fprintf fmt "@[<hov 2>%s %d;@]" name i
+  | Ext_terms ts ->
+    Format.fprintf fmt "@[<hov 2>%s %a;@]" name
+    (Pretty_utils.pp_list ~sep:",@ " printer#term) ts
+  | Ext_preds ps ->
+    Format.fprintf fmt "@[<hov 2>%s %a;@]" name
+    (Pretty_utils.pp_list ~sep:",@ " printer#predicate) ps
+  | Ext_annot (id,an) ->
+    Format.fprintf fmt "@[<v 2>@[%s %s {@]@\n%a}@]" name id
+      (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+            printer#extended) an
 
 let default_short_printer name printer fmt = function
   | Ext_id _ | Ext_terms _ | Ext_preds _ -> Format.fprintf fmt "%s" name
-  | Ext_annot (id,an) -> Format.fprintf fmt "%s@ {@\n%a@]@\n}" id (Pretty_utils.pp_list ~sep:"@\n" printer#extended) an
+  | Ext_annot (id,an) ->
+    Format.fprintf fmt "%s@ {@\n%a@]@\n}" id (Pretty_utils.pp_list ~sep:"@\n" printer#extended) an
 
 let make
     name category
     ?(preprocessor=Extlib.id)
     typer
     ?(visitor=fun _ _ -> Cil.DoChildren)
-    ?(printer=default_printer)
+    ?(printer=default_printer name)
     ?(short_printer=default_short_printer name)
     status : extension_part1*extension_part2 =
   { preprocessor; typer; status},{ category; visitor; printer; short_printer }
@@ -90,7 +97,7 @@ let make_block
     ?(preprocessor=Extlib.id)
     typer
     ?(visitor=fun _ _ -> Cil.DoChildren)
-    ?(printer=default_printer)
+    ?(printer=default_printer name)
     ?(short_printer=default_short_printer name)
     status : extension_part3*extension_part2 =
   { preprocessor; typer; status},{ category; visitor; printer; short_printer }
@@ -194,8 +201,8 @@ module Extensions = struct
   let visit name = (find_part2 name).visitor
 
   let print name printer fmt kind =
-    let pp = (find_part2 name).printer printer in
-    Format.fprintf fmt "@[<hov 2>%s %a;@]" name pp kind
+    let pp = (find_part2 name).printer in
+    pp printer fmt kind
 
   let short_print name printer fmt kind =
     let pp = (find_part2 name).short_printer in
