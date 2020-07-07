@@ -323,6 +323,12 @@ end
 *)
 (* -------------------------------------------------------------------------- *)
 
+(** Datatype information. *)
+module type Info =
+sig
+  val kind: string
+end
+
 (** Simplified [Map.S]. *)
 module type Map =
 sig
@@ -345,12 +351,10 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(S : S)
-    (I : Index with type t = S.t) : Index with type t = M.key
+module Static(M : Map)(I : Info) : Index with type t = M.key
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(S : S)
-    (I : Index with type t = S.t) : Index with type t = M.key
+module Index(M : Map)(I : Info) : Index with type t = M.key
 
 (** Datatype already identified by unique integers. *)
 module type IdentifiedType =
@@ -360,8 +364,7 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)(S : S)
-    (I : Index with type t = S.t) : Index with type t = A.t
+module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling}

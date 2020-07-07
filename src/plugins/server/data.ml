@@ -565,6 +565,11 @@ end
 (* --- Index                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
+module type Info =
+sig
+  val kind: string
+end
+
 (** Simplified [Map.S] *)
 module type Map =
 sig
@@ -584,7 +589,7 @@ sig
   val clear : unit -> unit
 end
 
-module INDEXER(M : Map)(D : S)(I : Index with type t = D.t) :
+module INDEXER(M : Map)(I : Info) :
 sig
   type index
   val create : unit -> index
@@ -634,10 +639,10 @@ struct
 
 end
 
-module Static(M : Map)(S : S)(I : Index with type t = S.t)
+module Static(M : Map)(I : Info)
   : Index with type t = M.key =
 struct
-  module INDEX = INDEXER(M)(S)(I)
+  module INDEX = INDEXER(M)(I)
   let kind = I.kind
   let index = INDEX.create ()
   let clear () = INDEX.clear index
@@ -652,10 +657,10 @@ struct
     end)
 end
 
-module Index(M : Map)(S : S)(I : Index with type t = S.t)
+module Index(M : Map)(I : Info)
   : Index with type t = M.key =
 struct
-  module INDEX = INDEXER(M)(S)(I)
+  module INDEX = INDEXER(M)(I)
   module TYPE : Datatype.S with type t = INDEX.index =
     Datatype.Make
       (struct
@@ -695,8 +700,7 @@ sig
   val id : t -> int
 end
 
-module Identified(A : IdentifiedType)(S : S)
-    (I : Index with type t = S.t) : Index with type t = A.t =
+module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t =
 struct
 
   type index = (int,A.t) Hashtbl.t
