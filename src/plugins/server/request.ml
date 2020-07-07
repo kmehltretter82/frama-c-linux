@@ -293,7 +293,6 @@ let register ~package ~kind ~name ~descr ~input ~output process =
 let dictionary (type a) ~package ~name ~descr (d : a Data.Enum.dictionary) =
   let open Data in
   let data = Enum.publish ~package ~name ~descr d in
-  let module T = (val data) in
   let descr = Markdown.plain "Registered tags for the above type." in
   let name = name ^ "Tags" in
   register ~kind:`GET ~package
