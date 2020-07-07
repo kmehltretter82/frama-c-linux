@@ -25,8 +25,8 @@
    The limit is defined by the option -eva-auto-loop-unroll. *)
 
 (* Gist of the heuristic:
-   - find a loop exit condition, in the form of a statement "if(cond) break;".
-     such that exactly one lvalue [lval] in the condition [cond] is modified
+   - collect loop exit conditions [cond] from statements "if (cond) break;"
+   - find a loop exit condition in which only one lvalue [lval] is modified
      within the loop; all other lvalues must be constant in the loop.
    - find a value [v_exit] such that [lval] ∈ [v_exit] ⇒ [cond] holds.
    - evaluate [lval] to its initial value [v_init] in the loop entry state.
@@ -34,7 +34,7 @@
      iteration of the loop.
 
    If [v_init] + k × [v_delta] ⊂ [v_exit], then the number of iterations
-   is bounded by the limit [k].
+   is bounded by [k].
 
    The heuristic is syntactic and limited to the current function: it does not
    handle assignment through pointers or function calls.
@@ -42,12 +42,16 @@
    whose address is never taken (they cannot be modified through pointers). If
    the loop contains a function call, the condition [cond] should not contain
    global variables (as they may be modified in the function called).
-   A first analyze of the loop gathers all such variables modified within the
+   A first analysis of the loop gathers all such variables modified within the
    loop; all others are constant, and can be evaluated in the loop entry state.
 
    When computing the increment [v_delta] of a lvalue [v] in the loop, the
-   heuristic searches assignments "v = v ± i;". Any other assignment of [v]
-   cancels the heuristic. *)
+   heuristic searches assignments "v = v ± i;". Otherwise, if [v] is only
+   modified within the loop through an assignement "v = v2", the heuristic
+   computes the initial value and delta increment of variable [v2] instead.
+   This is required to deal with temporary variables introduced by the Frama-C
+   normalization.
+   Any other assignment of [v] cancels the heuristic. *)
 
 open Cil_types
 
