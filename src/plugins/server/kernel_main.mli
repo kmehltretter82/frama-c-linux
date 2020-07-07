@@ -24,7 +24,7 @@
 (** Kernel Services *)
 (* -------------------------------------------------------------------------- *)
 
-module LogSource : Data.S_collection with type t = Filepath.position
-module LogEvent : Data.S_collection with type t = Log.event
+module LogSource : Data.S with type t = Filepath.position
+module LogEvent : Data.S with type t = Log.event
 
 (* -------------------------------------------------------------------------- *)

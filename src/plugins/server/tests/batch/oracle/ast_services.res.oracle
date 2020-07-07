@@ -1,7 +1,7 @@
 [kernel] Parsing tests/batch/ast_services.i (no preprocessing)
 [server] Script "tests/batch/ast_services.json"
-[server] [GET] kernel.ast.functions.fetch
-[server] [GET] kernel.ast.functions.fetch
+[server] [GET] kernel.ast.fetchFunctions
+[server] [GET] kernel.ast.fetchFunctions
 [server] [GET] kernel.ast.printFunction
 [server] [GET] kernel.ast.printFunction
 [server] [GET] kernel.ast.printFunction

@@ -3,18 +3,24 @@
 // --------------------------------------------------------------------------
 
 import _ from 'lodash';
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as Dome from 'dome';
+import { key } from 'dome/data/json';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar, Component } from 'frama-c/LabViews';
 import { Vfill } from 'dome/layout/boxes';
 import { Splitter } from 'dome/layout/splitters';
 import { Form, Section, FieldCheckbox } from 'dome/layout/forms';
+
+import { source as SourceLoc } from 'api/kernel/services';
+import { statusData as Property } from 'api/kernel/properties';
+import * as Properties from 'api/kernel/properties';
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -29,7 +35,6 @@ const defaultStatusFilter =
   invalid_hyp: true,
   considered_valid: false,
   untried: false,
-  dead: false,
   inconsistent: true,
 };
 
@@ -83,8 +88,10 @@ const defaultFilter =
   alarms: defaultAlarmsFilter,
 };
 
-
-function filterStatus(f: typeof defaultStatusFilter, status: string) {
+function filterStatus(
+  f: typeof defaultStatusFilter,
+  status: Properties.propStatus,
+) {
   switch (status) {
     case 'valid':
     case 'valid_but_dead': return f.valid;
@@ -96,27 +103,30 @@ function filterStatus(f: typeof defaultStatusFilter, status: string) {
     case 'unknown_but_dead': return f.unknown;
     case 'considered_valid': return f.considered_valid;
     case 'never_tried': return f.untried;
-    case 'dead': return f.dead;
     case 'inconsistent': return f.inconsistent;
     default: return true;
   }
 }
 
-function filterKind(f: typeof defaultKindFilter, kind: string) {
+function filterKind(
+  f: typeof defaultKindFilter,
+  kind: Properties.propKind,
+) {
   switch (kind) {
     case 'assert': return f.assert;
-    case 'invariant': return f.invariant;
-    case 'variant': return f.variant;
+    case 'loop_invariant':
+      return f.invariant;
+    case 'loop_variant': return f.variant;
     case 'requires': return f.requires;
     case 'ensures': return f.ensures;
     case 'instance': return f.instance;
     case 'assigns': return f.assigns;
-    case 'from': return f.from;
+    case 'froms': return f.from;
     case 'allocates': return f.allocates;
     case 'behavior': return f.behavior;
     case 'reachable': return f.reachable;
     case 'axiomatic': return f.axiomatic;
-    case 'pragma': return f.pragma;
+    case 'loop_pragma': return f.pragma;
     default: return f.others;
   }
 }
@@ -160,10 +170,8 @@ function filterProperty(f: typeof defaultFilter, item: Property) {
 const renderCode: Renderer<string> =
   (text: string) => (<Code className="code-column" title={text}>{text}</Code>);
 
-interface Tag { name: string; label: string; descr: string }
-
-const renderTag: Renderer<Tag> =
-  (d: Tag) => <Label label={d.label} title={d.descr} />;
+const renderTag: Renderer<States.Tag> =
+  (d: States.Tag) => <Label label={d.label ?? d.name} title={d.descr} />;
 
 const renderNames: Renderer<string[]> =
   (names: string[]) => {
@@ -185,33 +193,13 @@ function ColumnCode<Row>(props: ColumnProps<Row, string>) {
   return <Column render={renderCode} {...props} />;
 }
 
-function ColumnTag<Row>(props: ColumnProps<Row, Tag>) {
+function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>) {
   return <Column render={renderTag} {...props} />;
 }
 
 // --------------------------------------------------------------------------
 // --- Properties Table
 // -------------------------------------------------------------------------
-
-interface SourceLoc {
-  dir: string;
-  base: string;
-  file: string;
-  line: number;
-}
-
-interface Property {
-  key: string;
-  descr: string;
-  kind: string;
-  alarm?: string;
-  names: string[];
-  predicate: string;
-  status: string;
-  function?: string;
-  kinstr: string;
-  source: SourceLoc;
-}
 
 const bySource =
   Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.primitive });
@@ -235,12 +223,12 @@ const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
   function: Compare.defined(Compare.alpha),
   source: bySource,
-  kind: Compare.primitive,
+  kind: Compare.structural,
   alarm: Compare.defined(Compare.alpha),
   names: Compare.array(Compare.alpha),
   predicate: Compare.defined(Compare.alpha),
   key: Compare.primitive,
-  kinstr: Compare.primitive,
+  kinstr: Compare.structural,
 };
 
 const byDir = Compare.byFields<SourceLoc>({ dir: Compare.alpha });
@@ -251,13 +239,13 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.ArrayModel<Property> {
+class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
 
   private filterFun?: string;
   private filterProp = _.cloneDeep(defaultFilter);
 
   constructor() {
-    super('key');
+    super((p: Property) => p.key);
     this.setOrderingByFields(byProperty);
     this.setColumnOrder(byColumn);
     this.setFilter(this.filterItem.bind(this));
@@ -359,26 +347,23 @@ const PropertyFilter =
 
 const PropertyColumns = () => {
 
-  const statusDict: { [status: string]: Tag } =
-    States.useDictionary('kernel.dictionary.propstatus');
-  const kindDict: { [kind: string]: Tag } =
-    States.useDictionary('kernel.dictionary.propkind');
-  const alarmDict: { [alarm: string]: Tag } =
-    States.useDictionary('kernel.dictionary.alarmkind');
+  const statusDict = States.useTags(Properties.propStatusTags);
+  const kindDict = States.useTags(Properties.propKindTags);
+  const alarmDict = States.useTags(Properties.alarmsTags);
 
   const getStatus = React.useCallback(
-    ({ status: st }: Property) => (statusDict[st] ?? { label: st }),
+    ({ status: st }: Property) => (statusDict.get(st) ?? { name: st }),
     [statusDict],
   );
 
   const getKind = React.useCallback(
-    ({ kind }: Property) => (kindDict[kind] ?? { label: kind }),
+    ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd }),
     [kindDict],
   );
 
   const getAlarm = React.useCallback(
     ({ alarm }: Property) => (
-      alarm === undefined ? alarm : (alarmDict[alarm] ?? { label: alarm })
+      alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })
     ),
     [alarmDict],
   );
@@ -426,19 +411,13 @@ const PropertyColumns = () => {
 };
 
 function FilterRatio({ model }: { model: PropertyModel }) {
-  const forceUpdate = Dome.useForceUpdate() as (() => void);
-  React.useEffect(() => {
-    const client = model.link();
-    client.onReload(forceUpdate);
-    return client.unlink;
-  });
-  const filtered = model.getRowCount();
-  const total = model.getTotalRowCount();
+  Models.useModel(model);
+  const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   return (
     <Label
       className="component-info"
       title="Displayed Properties / Total"
-      display={filtered !== total}
+      display={filtered !== total || true}
     >
       {filtered} / {total}
     </Label>
@@ -452,19 +431,17 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const properties: { [key: string]: Property } =
-    States.useSyncArray('kernel.properties');
+  const data = States.useSyncArray(Properties.status);
+  useEffect(() => {
+    model.removeAllData();
+    model.updateData(data);
+    model.reload();
+  }, [model, data]);
 
   const [selection, updateSelection] = States.useSelection();
 
   const [showFilter, flipFilter] =
     Dome.useSwitch('ivette.properties.showFilter', true);
-
-  // Populating the model
-  React.useEffect(() => {
-    const data = _.toArray(properties);
-    model.replace(data);
-  }, [model, properties]);
 
   // Updating the filter
   const selectedFunction = selection?.current?.function;
@@ -472,12 +449,11 @@ const RenderTable = () => {
     model.setFilterFunction(selectedFunction);
   }, [model, selectedFunction]);
 
-
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    ({ key, function: fct }: Property) => {
-      const location = { function: fct, marker: key };
+    ({ key: propKey, function: fct }: Property) => {
+      const location = { function: fct, marker: propKey };
       updateSelection({ location });
     }, [updateSelection],
   );

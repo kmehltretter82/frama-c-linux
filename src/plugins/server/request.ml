@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Package
+
 module Senv = Server_parameters
 module Jutil = Yojson.Basic.Util
 
@@ -33,14 +35,14 @@ type kind = [ `GET | `SET | `EXEC ]
 module type Input =
 sig
   type t
-  val syntax : Syntax.t
+  val jtype : jtype
   val of_json : json -> t
 end
 
 module type Output =
 sig
   type t
-  val syntax : Syntax.t
+  val jtype : jtype
   val to_json : t -> json
 end
 
@@ -48,60 +50,14 @@ type 'a input = (module Input with type t = 'a)
 type 'a output = (module Output with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sanity Checks                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
-let re_name = Str.regexp_case_fold "[a-zA-Z0-9._]+$"
-
-let wpage = Senv.register_warn_category "inconsistent-page"
-let wkind = Senv.register_warn_category "inconsistent-kind"
-
-let check_name name =
-  if not (Str.string_match re_name name 0) then
-    Senv.warning ~wkey:Senv.wname
-      "Request %S is not a dot-separated list of (camlCased) identifiers" name
-
-let check_plugin plugin name =
-  let p = String.lowercase_ascii plugin in
-  let n = String.lowercase_ascii name in
-  let k = String.length plugin in
-  if not (String.length name > k &&
-          String.sub n 0 k = p &&
-          String.get n k = '.')
-  then
-    Senv.warning ~wkey:wpage
-      "Request '%s' shall be named « %s.* »"
-      name (String.capitalize_ascii plugin)
-
-let check_page page name =
-  match Doc.chapter page with
-  | `Kernel -> check_plugin "kernel" name
-  | `Plugin plugin -> check_plugin plugin name
-  | `Protocol ->
-    Senv.warning ~wkey:wkind
-      "Request '%s' shall not be published in protocol pages" name
-
-let page_prefix page =
-  match Doc.chapter page with
-  | `Kernel -> "kernel"
-  | `Plugin plugin -> plugin
-  | `Protocol -> "protocol"
-
-(* -------------------------------------------------------------------------- *)
 (* --- Signals                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 type signal = Main.signal
 
-let signal ~page ~name ~descr  ?(details=[]) () =
-  let open Markdown in
-  check_name name ;
-  check_page page name ;
-  let title =  Printf.sprintf "`SIG` %s" name in
-  let index = [ Printf.sprintf "%s (`SIGNAL`)" name ] in
-  let contents = [ Block [Text descr] ; Block details] in
-  let _ = Doc.publish ~page ~name ~title ~index ~contents () in
-  Main.signal name
+let signal ~package ~name ~descr =
+  let id = Package.declare_id ~package ~name ~descr D_signal in
+  Main.signal (Package.name_of_ident id)
 
 let emit = Main.emit
 let on_signal = Main.on_signal
@@ -135,51 +91,32 @@ type 'a result = rq -> 'a -> unit
 type _ rq_input =
   | Pnone
   | Pdata : 'a input -> 'a rq_input
-  | Pfields : Syntax.field list -> unit rq_input
+  | Pfields : fieldInfo list -> unit rq_input
 
 type _ rq_output =
   | Rnone
   | Rdata : 'a output -> 'a rq_output
-  | Rfields : Syntax.field list -> unit rq_output
+  | Rfields : fieldInfo list -> unit rq_output
 
 (* json input syntax *)
-let sy_input (type a) (input : a rq_input) : Syntax.t =
+let rq_input (type a) (input : a rq_input) : paramInfo =
   match input with
   | Pnone -> assert false
-  | Pdata d -> let module D = (val d) in D.syntax
-  | Pfields _ -> Syntax.record []
+  | Pdata d -> let module D = (val d) in P_value D.jtype
+  | Pfields fds -> P_named fds
 
 (* json output syntax *)
-let sy_output (type b) (output : b rq_output) : Syntax.t =
+let rq_output (type b) (output : b rq_output) : paramInfo =
   match output with
   | Rnone -> assert false
-  | Rdata d -> let module D = (val d) in D.syntax
-  | Rfields _ -> Syntax.record []
-
-(* json input documentation *)
-let doc_input (type a) (input : a rq_input) =
-  match input with
-  | Pnone -> assert false
-  | Pdata _ -> []
-  | Pfields fs -> [Syntax.fields ~title:"Input Params" (List.rev fs)]
-
-(* json output syntax *)
-let doc_output (type b) (output : b rq_output) =
-  match output with
-  | Rnone -> assert false
-  | Rdata _ -> []
-  | Rfields fs -> [Syntax.fields ~title:"Output Params" (List.rev fs)]
+  | Rdata d -> let module D = (val d) in P_value D.jtype
+  | Rfields fds -> P_named fds
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 type ('a,'b) signature = {
-  page : Doc.page ;
-  kind : kind ;
-  name : string ;
-  descr : Markdown.text ;
-  details : Markdown.block ;
   mutable defined : bool ;
   mutable defaults : json Fmap.t ;
   mutable required : string list ;
@@ -198,21 +135,22 @@ let check_required fmap fd =
 (* -------------------------------------------------------------------------- *)
 
 (* current input fields *)
-let fds_input s : Syntax.field list =
-  if s.defined then Senv.failure "Request '%s' has been finalized." s.name ;
+let fds_input s : fieldInfo list =
+  if s.defined then
+    raise (Invalid_argument "Server.Request: already published");
   match s.input with
   | Pdata _ ->
-    Senv.fatal "Can not define named parameters for request '%s'" s.name
+    raise (Invalid_argument "Server.Request: request has not named input");
   | Pnone -> []
   | Pfields fds -> fds
 
 let param (type a b) (s : (unit,b) signature) ~name ~descr
     ?default (input : a input) : a param =
   let module D = (val input) in
-  let syntax = if default = None then D.syntax else Syntax.option D.syntax in
-  let fd = Syntax.{
+  let ftype = if default = None then D.jtype else Joption D.jtype in
+  let fd = Package.{
       fd_name = name ;
-      fd_syntax = syntax ;
+      fd_type = ftype ;
       fd_descr = descr ;
     } in
   s.input <- Pfields (fd :: fds_input s) ;
@@ -226,9 +164,9 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
 let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
     (input : a input) : a option param =
   let module D = (val input) in
-  let fd = Syntax.{
+  let fd = Package.{
       fd_name = name ;
-      fd_syntax = Syntax.option D.syntax ;
+      fd_type = Joption D.jtype ;
       fd_descr = descr ;
     } in
   s.input <- Pfields (fd :: fds_input s) ;
@@ -241,19 +179,21 @@ let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
 (* -------------------------------------------------------------------------- *)
 
 (* current output fields *)
-let fds_output s : Syntax.field list =
-  if s.defined then Senv.failure "Request '%s' has been finalized." s.name ;
+let fds_output s : fieldInfo list =
+  if s.defined then
+    raise (Invalid_argument "Server.Request: already published");
   match s.output with
-  | Rdata _ -> Senv.fatal "Can not define named results request '%s'" s.name
+  | Rdata _ ->
+    raise (Invalid_argument "Server.Request: request has not named input");
   | Rnone -> []
   | Rfields fds -> fds
 
 let result (type a b) (s : (a,unit) signature) ~name ~descr
     ?default (output : b output) : b result =
   let module D = (val output) in
-  let fd = Syntax.{
+  let fd = Package.{
       fd_name = name ;
-      fd_syntax = D.syntax ;
+      fd_type = D.jtype ;
       fd_descr = descr ;
     } in
   s.output <- Rfields (fd :: fds_output s) ;
@@ -267,9 +207,9 @@ let result (type a b) (s : (a,unit) signature) ~name ~descr
 let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
     (output : b output) : b option result =
   let module D = (val output) in
-  let fd = Syntax.{
+  let fd = Package.{
       fd_name = name ;
-      fd_syntax = option D.syntax ;
+      fd_type = Joption D.jtype ;
       fd_descr = descr ;
     } in
   s.output <- Rfields (fd :: fds_output s) ;
@@ -281,14 +221,10 @@ let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
 (* --- Opened Signature Definition                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let signature
-    ~page ~kind ~name ~descr ?(details=[]) ?input ?output () =
-  check_name name ;
-  check_page page name ;
+let signature ?input ?output () =
   let input = match input with None -> Pnone | Some d -> Pdata d in
   let output = match output with None -> Rnone | Some d -> Rdata d in
   {
-    page ; kind ; name ; descr ; details ;
     defaults = Fmap.empty ; required = [] ;
     input ; output ; defined = false ;
   }
@@ -325,49 +261,46 @@ let mk_output (type b) name required (output : b rq_output) : (rq -> b -> json) 
        List.iter (check_required rq.result) required ;
        fmap_to_json rq.result)
 
-let register_sig (type a b) (s : (a,b) signature) (process : rq -> a -> b) =
-  let open Markdown in
+let register_sig (type a b)
+    ~package ~kind ~name ~descr
+    (s : (a,b) signature) (process : rq -> a -> b) =
   if s.defined then
-    Senv.fatal "Request '%s' is defined twice" s.name ;
-  let input = mk_input s.name s.defaults s.input in
-  let output = mk_output s.name s.required s.output in
+    Senv.fatal "Request '%s' is defined twice" name ;
+  let input = mk_input name s.defaults s.input in
+  let output = mk_output name s.required s.output in
   let processor js =
     let rq = { param = Fmap.empty ; result = Fmap.empty } in
     js |> input rq |> process rq |> output rq
   in
-  let skind = Main.string_of_kind s.kind in
-  let title =  Printf.sprintf "`%s` %s" skind s.name in
-  let index = [ Printf.sprintf "%s (`%s`)" s.name skind ] in
-  let input =
-    Syntax.define (plain "Input") (Syntax.text @@ sy_input s.input) in
-  let output =
-    Syntax.define (plain "Output") (Syntax.text @@ sy_output s.output) in
-  let contents =
-    Block ( Text s.descr :: input :: output :: s.details ) ::
-    ( doc_input s.input @ doc_output s.output )
-  in
-  let _ = Doc.publish ~page:s.page ~name:s.name ~title ~index ~contents () in
-  Main.register s.kind s.name processor ;
+  let request = D_request {
+      rq_kind = kind ;
+      rq_input = rq_input s.input ;
+      rq_output = rq_output s.output ;
+    } in
+  let id = declare_id ~package ~name ~descr request in
+  Main.register kind (name_of_ident id) processor ;
   s.defined <- true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request Registration                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register ~page ~kind ~name ~descr ?details ~input ~output process =
-  register_sig
-    (signature ~page ~kind ~name ~descr ?details ~input ~output ())
+let register ~package ~kind ~name ~descr ~input ~output process =
+  register_sig  ~package ~kind ~name ~descr
+    (signature ~input ~output ())
     (fun _rq v -> process v)
 
-let dictionary (d : 'a Data.Enum.dictionary) =
-  let name = Data.Enum.name d in
-  let page = Data.Enum.page d in
-  let descr = Markdown.plain "Returns all tags registered for" @
-              Data.Enum.syntax d in
-  register ~kind:`GET ~page
-    ~name:(Printf.sprintf "%s.dictionary.%s" (page_prefix page) name) ~descr
-    ~input:(module Data.Junit)
-    ~output:(module Data.Tag.Jlist)
-    (fun () -> Data.Enum.tags d)
+let dictionary (type a) ~package ~name ~descr (d : a Data.Enum.dictionary) =
+  let open Data in
+  let data = Enum.publish ~package ~name ~descr d in
+  let module T = (val data) in
+  let descr = Markdown.plain "Registered tags for the above type." in
+  let name = name ^ "Tags" in
+  register ~kind:`GET ~package
+    ~name ~descr
+    ~input:(module Junit)
+    ~output:(module Jlist(Tag))
+    (fun () -> Enum.tags d) ;
+  data
 
 (* -------------------------------------------------------------------------- *)

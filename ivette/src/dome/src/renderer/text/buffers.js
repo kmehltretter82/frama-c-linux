@@ -546,11 +546,11 @@ is blocked.
 
   /**
      @summary Print text containing tags into buffer (bound to `this`).
-     @param {string|string[]} text - Text to print.
+     @param {any} text - Text to print.
      @param {object} options - CodeMirror
        [text marker](https://codemirror.net/doc/manual.html#api_marker) options.
   */
-  printTextWithTags(text = '', options = {}) {
+  printTextWithTags(text, options = {}) {
     if (Array.isArray(text)) {
       const tag = text.shift();
       if (tag !== '') {
@@ -563,8 +563,8 @@ is blocked.
       }
     } else if (typeof text === 'string') {
       this.append(text);
-    } else if (text !== null) {
-      console.error('[Dome.buffers] Unexpected text', text);
+    } else if (text !== null && text !== undefined) {
+      console.error('[Dome.buffers] unexpected text',text);
     }
   }
 

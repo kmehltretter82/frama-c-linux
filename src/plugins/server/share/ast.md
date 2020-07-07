@@ -12,4 +12,3 @@ Hence, most AST services might fail or return empty data if the AST has not been
 actually computed before. However, in typical usage of Frama-C from the
 command-line, the AST would have been computed just before any other plug-in,
 including the Server.
-

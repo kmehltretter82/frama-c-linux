@@ -9,107 +9,59 @@
 */
 
 import React from 'react';
+import Emitter from 'events';
 import isEqual from 'react-fast-compare';
 import { DEVEL } from 'dome/misc/system';
 import * as Dome from 'dome';
 import * as JSON from './json';
 
-export type NonFunction =
-  undefined | null | boolean | number | string
-  | object | any[] | bigint | symbol;
+const UPDATE = 'dome.states.update';
 
-/** State updater. New value or updating function applied to the current,
-    lastly updated value. Use `null` to restore default value. */
-export type updateAction<A extends NonFunction> =
-  null | A | ((current: A) => A);
+/** Cross-component State. */
+export class State<A> {
 
-/** The type of updater callbacks. Typically used for `[A, setState<A>]`
-    hooks. */
-export type setState<A extends NonFunction> = (action: updateAction<A>) => void;
+  private value: A;
+  private emitter: Emitter;
 
-/** Base state interface. */
-export interface State<A extends NonFunction> {
-  readonly get: () => A;
-  readonly set: (value: A) => void;
-  readonly update: setState<A>;
-  on(callback: (value: A) => void): void;
-  off(callback: (value: A) => void): void;
-}
-
-/** React Hook, similar to `React.useState()`. */
-export function useState<A extends NonFunction>(s: State<A>): [A, setState<A>] {
-  const [current, setCurrent] = React.useState<A>(s.get);
-  React.useEffect(() => {
-    s.on(setCurrent);
-    return () => s.off(setCurrent);
-  });
-  return [current, s.update];
-};
-
-/**
-   State with initial default value.
- */
-export class StateDef<A extends NonFunction> implements State<A> {
-  protected value: A;
-  protected defaultValue: A;
-  protected event: symbol;
-
-  constructor(defaultValue: A) {
-    this.value = this.defaultValue = defaultValue;
-    this.event = Symbol('dome.state');
-    this.get = this.get.bind(this);
-    this.set = this.get.bind(this);
-    this.reset = this.reset.bind(this);
-    this.update = this.update.bind(this);
+  constructor(initValue: A) {
+    this.value = initValue;
+    this.emitter = new Emitter;
+    this.getValue = this.getValue.bind(this);
+    this.setValue = this.setValue.bind(this);
   }
 
-  get(): A { return this.value; }
+  /** Current state value. */
+  getValue() { return this.value; }
 
   /** Notify callbacks on change, using _deep_ structural comparison. */
-  set(value: A) {
+  setValue(value: A) {
     if (!isEqual(value, this.value)) {
       this.value = value;
-      Dome.emit(this.event, value);
+      this.emitter.emit(UPDATE, value);
     }
-  }
-
-  /** State updater. */
-  update(upd: updateAction<A>) {
-    if (upd === null)
-      this.reset();
-    else {
-      if (typeof upd === 'function')
-        this.set(upd(this.value));
-      else
-        this.set(upd);
-    }
-  }
-
-  /** Restore default value. */
-  reset() {
-    this.set(this.defaultValue);
   }
 
   /** Callback Emitter. */
   on(callback: (value: A) => void) {
-    Dome.emitter.on(this.event, callback);
+    this.emitter.on(UPDATE, callback);
   }
 
   /** Callback Emitter. */
   off(callback: (value: A) => void) {
-    Dome.emitter.off(this.event, callback);
+    this.emitter.off(UPDATE, callback);
   }
 
 }
 
-/**
-   State with possibly undefined initial value.
- */
-export class StateOpt<A extends NonFunction> extends StateDef<undefined | A> {
-  constructor(defaultValue?: A) {
-    super(defaultValue);
-  }
-}
+/** React Hook, similar to `React.useState()`. */
+export function useState<A>(s: State<A>): [A, (update: A) => void] {
+  const [current, setCurrent] = React.useState<A>(s.getValue);
+  React.useEffect(() => {
+    s.on(setCurrent);
+    return () => s.off(setCurrent);
+  });
+  return [current, s.setValue];
+};
 
 // --------------------------------------------------------------------------
 // --- Settings
@@ -144,7 +96,7 @@ export class StateOpt<A extends NonFunction> extends StateDef<undefined | A> {
    shall always be used with the same « role » otherwise it is discarded,
    and an error message is logged when in DEVEL mode.
  */
-abstract class Settings<A> {
+export abstract class Settings<A> {
 
   private static keyRoles = new Map<string, symbol>();
 
@@ -154,7 +106,7 @@ abstract class Settings<A> {
 
   /**
      Encoders shall be protected against exception.
-     Use [[JSON.jTry]] and [[JSON.jCatch]] in case of uncertainty.
+     Use [[dome/data/json.jTry]] and [[dome/data/json.jCatch]] in case of uncertainty.
      Decoders are automatically protected internally to the Settings class.
      @param role Debugging name of instance roles (each instance has its unique
      role, though)
@@ -265,7 +217,7 @@ export function useSettings<A>(
 
 /** Window Settings for non-JSON data.
     In most situations, you can use [[WindowSettings]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class WindowSettingsData<A> extends Settings<A> {
 
   constructor(
@@ -285,7 +237,7 @@ export class WindowSettingsData<A> extends Settings<A> {
 
 /** Global Settings for non-JSON data.
     In most situations, you can use [[WindowSettings]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class GlobalSettingsData<A> extends Settings<A> {
 
   constructor(
@@ -304,8 +256,8 @@ export class GlobalSettingsData<A> extends Settings<A> {
 }
 
 /** Window Settings.
-    For non-JSON data, use [[WindowSettingsdata]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    For non-JSON data, use [[WindowSettingsData]] instead.
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
 
   constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {
@@ -315,8 +267,8 @@ export class WindowSettings<A extends JSON.json> extends WindowSettingsData<A> {
 }
 
 /** Global Settings.
-    For non-JSON data, use [[WindowSettingsdata]] instead.
-    You can use a [[JSON.Loose]] decoder for optional values. */
+    For non-JSON data, use [[WindowSettingsData]] instead.
+    You can use a [[dome/data/json.Loose]] decoder for optional values. */
 export class GlobalSettings<A extends JSON.json> extends GlobalSettingsData<A> {
 
   constructor(role: string, decoder: JSON.Safe<A>, fallback?: A) {

@@ -131,8 +131,24 @@ export function array<A>(order: Order<A>): Order<A[]> {
   };
 }
 
+/** Order by dictionary order.
+    Can be used directly with an enum type declaration.
+ */
+export function byEnum<A extends string>(d: { [key: string]: A }): Order<A> {
+  const ranks: { [index: string]: number } = {};
+  const values = Object.keys(d);
+  const wildcard = values.length;
+  values.forEach((C, k) => ranks[C] = k);
+  return (x: A, y: A) => {
+    if (x === y) return 0;
+    const rx = ranks[x] ?? wildcard;
+    const ry = ranks[y] ?? wildcard;
+    return rx - ry;
+  };
+}
+
 /** Order string enumeration constants.
-    `enums(v1,...,vN)` will order constant following the order of arguments.
+    `byRank(v1,...,vN)` will order constant following the order of arguments.
     Non-listed constants appear at the end, or at the rank specified by `'*'`. */
 export function byRank(...args: string[]): Order<string> {
   const ranks: { [index: string]: number } = {};
@@ -167,7 +183,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
 /**
    Maps each field of `A` to some _optional_ comparison of the associated type.
    Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Order<T>, …}`.
-   See [[fields]] comparison function.
+   See [[byFields]] comparison function.
  */
 export type ByFields<A> = {
   [P in keyof A]?: Order<A[P]>;
@@ -176,7 +192,7 @@ export type ByFields<A> = {
 /**
    Maps each field of `A` to some comparison of the associated type.
    Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Order<T>, …}`.
-   See [[fieldsComplete]] comparison function.
+   See [[byAllFields]] comparison function.
 */
 export type ByAllFields<A> = {
   [P in keyof A]: Order<A[P]>;

@@ -1,0 +1,118 @@
+/* --- Generated Frama-C Server API --- */
+
+/**
+   Dive Services
+   @packageDocumentation
+   @module api/plugins/dive
+*/
+
+//@ts-ignore
+import * as Json from 'dome/data/json';
+//@ts-ignore
+import * as Compare from 'dome/data/compare';
+//@ts-ignore
+import * as Server from 'frama-c/server';
+//@ts-ignore
+import * as State from 'frama-c/states';
+
+
+/** The name of variable of the program */
+export interface variableName {
+  /** owner function for a local variable */
+  funName?: string;
+  /** variable name */
+  varName: string;
+}
+
+/** Loose decoder for `variableName` */
+export const jVariableName: Json.Loose<variableName> =
+  Json.jObject({
+    funName: Json.jString,
+    varName: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Safe decoder for `variableName` */
+export const jVariableNameSafe: Json.Safe<variableName> =
+  Json.jFail(jVariableName,'VariableName expected');
+
+/** Natural order for `variableName` */
+export const byVariableName: Compare.Order<variableName> =
+  Compare.byFields
+    <{ funName?: string, varName: string }>({
+    funName: Compare.defined(Compare.alpha),
+    varName: Compare.alpha,
+  });
+
+const graph_internal: Server.GetRequest<null,Json.json> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.graph',
+  input:  Json.jNull,
+  output: Json.jAny,
+};
+/** Retrieve the whole graph */
+export const graph: Server.GetRequest<null,Json.json>= graph_internal;
+
+const clear_internal: Server.ExecRequest<null,null> = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.clear',
+  input:  Json.jNull,
+  output: Json.jNull,
+};
+/** Erase the graph and start over with an empty one */
+export const clear: Server.ExecRequest<null,null>= clear_internal;
+
+const addVar_internal: Server.ExecRequest<variableName,Json.json> = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.addVar',
+  input:  jVariableName,
+  output: Json.jAny,
+};
+/** Add a variable to the graph */
+export const addVar: Server.ExecRequest<variableName,Json.json>= addVar_internal;
+
+const addFunctionAlarms_internal: Server.ExecRequest<
+  Json.key<'#fct'>,
+  Json.json
+  > = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.addFunctionAlarms',
+  input:  Json.jKey<'#fct'>('#fct'),
+  output: Json.jAny,
+};
+/** Add all alarms of the given function */
+export const addFunctionAlarms: Server.ExecRequest<
+  Json.key<'#fct'>,
+  Json.json
+  >= addFunctionAlarms_internal;
+
+const explore_internal: Server.ExecRequest<
+  Json.index<'#dive-node'>,
+  Json.json
+  > = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.explore',
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
+  output: Json.jAny,
+};
+/** Explore the graph starting from an existing vertex */
+export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= explore_internal;
+
+const show_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.show',
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
+  output: Json.jAny,
+};
+/** Show the dependencies of an existing vertex */
+export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= show_internal;
+
+const hide_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.dive.hide',
+  input:  Json.jIndex<'#dive-node'>('#dive-node'),
+  output: Json.jAny,
+};
+/** Hide the dependencies of an existing vertex */
+export const hide: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= hide_internal;
+
+/* ------------------------------------- */

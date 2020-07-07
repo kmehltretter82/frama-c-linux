@@ -58,7 +58,7 @@ module Client = Senv.String
          as first and unique argument."
     end)
 
-let _ = Doc.page `Protocol ~title:"ZeroMQ Protocol" ~filename:"server_zmq.md"
+let _ = Server_doc.protocole ~title:"ZeroMQ Protocol" ~readme:"server_zmq.md"
 
 (* -------------------------------------------------------------------------- *)
 (* --- ZMQ Context                                                        --- *)
