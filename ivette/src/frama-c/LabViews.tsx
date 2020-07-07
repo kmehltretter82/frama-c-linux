@@ -329,7 +329,7 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
       <Vfill className="labview-content">
         <Hbox className="labview-titlebar">
           <Hfill>
-            <Catch title={id}>
+            <Catch label={id}>
               <RenderItem id={`labview.title.${id}`}>
                 <Label className="labview-handle" label={label} title={title} />
               </RenderItem>
@@ -338,7 +338,7 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
           {CLOSING}
         </Hbox>
         <TitleContext.Provider value={{ id, label, title }}>
-          <Catch title={id}>{children}</Catch>
+          <Catch label={id}>{children}</Catch>
         </TitleContext.Provider>
       </Vfill>
     </Grids.GridItem>
