@@ -77,6 +77,11 @@ let find_loop_exit_condition loop =
   in
   aux loop.bstmts
 
+let is_frama_c_builtin exp =
+  match exp.enode with
+  | Lval (Var vi, NoOffset) -> Ast_info.is_frama_c_builtin vi.vname
+  | _ -> false
+
 (* Effects of a loop:
    - set of varinfos that are directly modified within the loop. Pointer
      accesses are ignored.
@@ -111,7 +116,7 @@ let loop_effect_visitor = object (self)
     in
     let () = match instr with
       | Asm _ -> assembly <- true
-      | Call _ -> call <- true
+      | Call (_, exp, _, _) when not (is_frama_c_builtin exp) -> call <- true
       | _ -> ()
     in
     Cil.SkipChildren
