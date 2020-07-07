@@ -52,17 +52,23 @@ export function pretty(js: any) {
 
 /** Decoder for values of type `D`.
     You can abbreviate `Safe<D | undefined>` with `Loose<D>`. */
-export type Safe<D> = (js?: json) => D;
+export interface Safe<D> {
+  (js?: json): D;
+}
 
 /** Decoder for values of type `D`, if any.
     Same as `Safe<D | undefined>`. */
-export type Loose<D> = (js?: json) => D | undefined;
+export interface Loose<D> {
+  (js?: json): D | undefined;
+}
 
 /**
    Encoder for value of type `D`.
    In most cases, you only need [[identity]].
  */
-export type Encoder<D> = (v: D) => json;
+export interface Encoder<D> {
+  (v: D): json;
+}
 
 /** Can be used for most encoders. */
 export function identity<A>(v: A): A { return v; };
