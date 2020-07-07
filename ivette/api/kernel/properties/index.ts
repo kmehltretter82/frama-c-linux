@@ -108,13 +108,14 @@ export const jPropKindSafe: Json.Safe<propKind> =
 /** Natural order for `propKind` */
 export const byPropKind: Compare.Order<propKind> = Compare.byEnum(propKind);
 
-/** Registered tags for the above type. */
-export const propKindTags: Server.GetRequest<null,tag[]> = {
+const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
 };
+/** Registered tags for the above type. */
+export const propKindTags: Server.GetRequest<null,tag[]>= propKindTags_internal;
 
 /** Property Status (consolidated) */
 export enum propStatus {
@@ -153,13 +154,14 @@ export const jPropStatusSafe: Json.Safe<propStatus> =
 export const byPropStatus: Compare.Order<propStatus> =
   Compare.byEnum(propStatus);
 
-/** Registered tags for the above type. */
-export const propStatusTags: Server.GetRequest<null,tag[]> = {
+const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propStatusTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
 };
+/** Registered tags for the above type. */
+export const propStatusTags: Server.GetRequest<null,tag[]>= propStatusTags_internal;
 
 /** Alarm Kinds */
 export enum alarms {
@@ -211,13 +213,14 @@ export const jAlarmsSafe: Json.Safe<alarms> =
 /** Natural order for `alarms` */
 export const byAlarms: Compare.Order<alarms> = Compare.byEnum(alarms);
 
-/** Registered tags for the above type. */
-export const alarmsTags: Server.GetRequest<null,tag[]> = {
+const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.alarmsTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
 };
+/** Registered tags for the above type. */
+export const alarmsTags: Server.GetRequest<null,tag[]>= alarmsTags_internal;
 
 /** Data for array rows [`status`](#status)  */
 export interface statusData {
@@ -290,16 +293,16 @@ export const signalStatus: Server.Signal = {
   name: 'kernel.properties.signalStatus',
 };
 
-/** Force full reload for array [`status`](#status)  */
-export const reloadStatus: Server.GetRequest<null,null> = {
+const reloadStatus_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.reloadStatus',
   input:  Json.jNull,
   output: Json.jNull,
 };
+/** Force full reload for array [`status`](#status)  */
+export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
 
-/** Data fetcher for array [`status`](#status)  */
-export const fetchStatus: Server.GetRequest<
+const fetchStatus_internal: Server.GetRequest<
   number,
   { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
     reload: boolean }
@@ -314,9 +317,14 @@ export const fetchStatus: Server.GetRequest<
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
+/** Data fetcher for array [`status`](#status)  */
+export const fetchStatus: Server.GetRequest<
+  number,
+  { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
+    reload: boolean }
+  >= fetchStatus_internal;
 
-/** Status of Registered Properties */
-export const status: State.Array<Json.key<'#status'>,statusData> = {
+const status_internal: State.Array<Json.key<'#status'>,statusData> = {
   name: 'kernel.properties.status',
   getkey: ((d:statusData) => d.key),
   signal: signalStatus,
@@ -324,5 +332,7 @@ export const status: State.Array<Json.key<'#status'>,statusData> = {
   reload: reloadStatus,
   order: byStatusData,
 };
+/** Status of Registered Properties */
+export const status: State.Array<Json.key<'#status'>,statusData> = status_internal;
 
 /* ------------------------------------- */

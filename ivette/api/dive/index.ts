@@ -43,32 +43,34 @@ export const byVariableName: Compare.Order<variableName> =
     varName: Compare.alpha,
   });
 
-/** Retrieve the whole graph */
-export const graph: Server.GetRequest<null,Json.json> = {
+const graph_internal: Server.GetRequest<null,Json.json> = {
   kind: Server.RqKind.GET,
   name:   'dive.graph',
   input:  Json.jNull,
   output: Json.jAny,
 };
+/** Retrieve the whole graph */
+export const graph: Server.GetRequest<null,Json.json>= graph_internal;
 
-/** Erase the graph and start over with an empty one */
-export const clear: Server.ExecRequest<null,null> = {
+const clear_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.clear',
   input:  Json.jNull,
   output: Json.jNull,
 };
+/** Erase the graph and start over with an empty one */
+export const clear: Server.ExecRequest<null,null>= clear_internal;
 
-/** Add a variable to the graph */
-export const addVar: Server.ExecRequest<variableName,Json.json> = {
+const addVar_internal: Server.ExecRequest<variableName,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.addVar',
   input:  jVariableName,
   output: Json.jAny,
 };
+/** Add a variable to the graph */
+export const addVar: Server.ExecRequest<variableName,Json.json>= addVar_internal;
 
-/** Add all alarms of the given function */
-export const addFunctionAlarms: Server.ExecRequest<
+const addFunctionAlarms_internal: Server.ExecRequest<
   Json.key<'#fct'>,
   Json.json
   > = {
@@ -77,29 +79,40 @@ export const addFunctionAlarms: Server.ExecRequest<
   input:  Json.jKey<'#fct'>('#fct'),
   output: Json.jAny,
 };
+/** Add all alarms of the given function */
+export const addFunctionAlarms: Server.ExecRequest<
+  Json.key<'#fct'>,
+  Json.json
+  >= addFunctionAlarms_internal;
 
-/** Explore the graph starting from an existing vertex */
-export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
+const explore_internal: Server.ExecRequest<
+  Json.index<'#dive-node'>,
+  Json.json
+  > = {
   kind: Server.RqKind.EXEC,
   name:   'dive.explore',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
+/** Explore the graph starting from an existing vertex */
+export const explore: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= explore_internal;
 
-/** Show the dependencies of an existing vertex */
-export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
+const show_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.show',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
+/** Show the dependencies of an existing vertex */
+export const show: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= show_internal;
 
-/** Hide the dependencies of an existing vertex */
-export const hide: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
+const hide_internal: Server.ExecRequest<Json.index<'#dive-node'>,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'dive.hide',
   input:  Json.jIndex<'#dive-node'>('#dive-node'),
   output: Json.jAny,
 };
+/** Hide the dependencies of an existing vertex */
+export const hide: Server.ExecRequest<Json.index<'#dive-node'>,Json.json>= hide_internal;
 
 /* ------------------------------------- */

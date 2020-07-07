@@ -67,60 +67,67 @@ export const byProjectRequest: Compare.Order<projectRequest> =
     data: Compare.structural,
   });
 
-/** Returns the current project */
-export const getCurrent: Server.GetRequest<null,projectInfo> = {
+const getCurrent_internal: Server.GetRequest<null,projectInfo> = {
   kind: Server.RqKind.GET,
   name:   'kernel.project.getCurrent',
   input:  Json.jNull,
   output: jProjectInfo,
 };
+/** Returns the current project */
+export const getCurrent: Server.GetRequest<null,projectInfo>= getCurrent_internal;
 
-/** Switches the current project */
-export const setCurrent: Server.SetRequest<Json.key<'#project'>,null> = {
+const setCurrent_internal: Server.SetRequest<Json.key<'#project'>,null> = {
   kind: Server.RqKind.SET,
   name:   'kernel.project.setCurrent',
   input:  Json.jKey<'#project'>('#project'),
   output: Json.jNull,
 };
+/** Switches the current project */
+export const setCurrent: Server.SetRequest<Json.key<'#project'>,null>= setCurrent_internal;
 
-/** Returns the list of all projects */
-export const getList: Server.GetRequest<null,projectInfo[]> = {
+const getList_internal: Server.GetRequest<null,projectInfo[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.project.getList',
   input:  Json.jNull,
   output: Json.jList(jProjectInfo),
 };
+/** Returns the list of all projects */
+export const getList: Server.GetRequest<null,projectInfo[]>= getList_internal;
 
-/** Execute a GET request within the given project */
-export const getOn: Server.GetRequest<projectRequest,Json.json> = {
+const getOn_internal: Server.GetRequest<projectRequest,Json.json> = {
   kind: Server.RqKind.GET,
   name:   'kernel.project.getOn',
   input:  jProjectRequest,
   output: Json.jAny,
 };
+/** Execute a GET request within the given project */
+export const getOn: Server.GetRequest<projectRequest,Json.json>= getOn_internal;
 
-/** Execute a SET request within the given project */
-export const setOn: Server.SetRequest<projectRequest,Json.json> = {
+const setOn_internal: Server.SetRequest<projectRequest,Json.json> = {
   kind: Server.RqKind.SET,
   name:   'kernel.project.setOn',
   input:  jProjectRequest,
   output: Json.jAny,
 };
+/** Execute a SET request within the given project */
+export const setOn: Server.SetRequest<projectRequest,Json.json>= setOn_internal;
 
-/** Execute an EXEC request within the given project */
-export const execOn: Server.ExecRequest<projectRequest,Json.json> = {
+const execOn_internal: Server.ExecRequest<projectRequest,Json.json> = {
   kind: Server.RqKind.EXEC,
   name:   'kernel.project.execOn',
   input:  jProjectRequest,
   output: Json.jAny,
 };
+/** Execute an EXEC request within the given project */
+export const execOn: Server.ExecRequest<projectRequest,Json.json>= execOn_internal;
 
-/** Create a new project */
-export const create: Server.SetRequest<string,projectInfo> = {
+const create_internal: Server.SetRequest<string,projectInfo> = {
   kind: Server.RqKind.SET,
   name:   'kernel.project.create',
   input:  Json.jString,
   output: jProjectInfo,
 };
+/** Create a new project */
+export const create: Server.SetRequest<string,projectInfo>= create_internal;
 
 /* ------------------------------------- */

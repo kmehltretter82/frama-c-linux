@@ -32,13 +32,14 @@ import { tag } from 'api/kernel/data';
 //@ts-ignore
 import { text } from 'api/kernel/data';
 
-/** Ensures that AST is computed */
-export const compute: Server.ExecRequest<null,null> = {
+const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
   name:   'kernel.ast.compute',
   input:  Json.jNull,
   output: Json.jNull,
 };
+/** Ensures that AST is computed */
+export const compute: Server.ExecRequest<null,null>= compute_internal;
 
 /** Marker kind */
 export enum markerKind {
@@ -73,13 +74,14 @@ export const jMarkerKindSafe: Json.Safe<markerKind> =
 export const byMarkerKind: Compare.Order<markerKind> =
   Compare.byEnum(markerKind);
 
-/** Registered tags for the above type. */
-export const markerKindTags: Server.GetRequest<null,tag[]> = {
+const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.markerKindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
 };
+/** Registered tags for the above type. */
+export const markerKindTags: Server.GetRequest<null,tag[]>= markerKindTags_internal;
 
 /** Data for array rows [`markerInfo`](#markerinfo)  */
 export interface markerInfoData {
@@ -123,16 +125,16 @@ export const signalMarkerInfo: Server.Signal = {
   name: 'kernel.ast.signalMarkerInfo',
 };
 
-/** Force full reload for array [`markerInfo`](#markerinfo)  */
-export const reloadMarkerInfo: Server.GetRequest<null,null> = {
+const reloadMarkerInfo_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.reloadMarkerInfo',
   input:  Json.jNull,
   output: Json.jNull,
 };
+/** Force full reload for array [`markerInfo`](#markerinfo)  */
+export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_internal;
 
-/** Data fetcher for array [`markerInfo`](#markerinfo)  */
-export const fetchMarkerInfo: Server.GetRequest<
+const fetchMarkerInfo_internal: Server.GetRequest<
   number,
   { pending: number, updated: markerInfoData[],
     removed: Json.key<'#markerInfo'>[], reload: boolean }
@@ -147,9 +149,17 @@ export const fetchMarkerInfo: Server.GetRequest<
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
+/** Data fetcher for array [`markerInfo`](#markerinfo)  */
+export const fetchMarkerInfo: Server.GetRequest<
+  number,
+  { pending: number, updated: markerInfoData[],
+    removed: Json.key<'#markerInfo'>[], reload: boolean }
+  >= fetchMarkerInfo_internal;
 
-/** Marker informations */
-export const markerInfo: State.Array<Json.key<'#markerInfo'>,markerInfoData> = {
+const markerInfo_internal: State.Array<
+  Json.key<'#markerInfo'>,
+  markerInfoData
+  > = {
   name: 'kernel.ast.markerInfo',
   getkey: ((d:markerInfoData) => d.key),
   signal: signalMarkerInfo,
@@ -157,6 +167,8 @@ export const markerInfo: State.Array<Json.key<'#markerInfo'>,markerInfoData> = {
   reload: reloadMarkerInfo,
   order: byMarkerInfoData,
 };
+/** Marker informations */
+export const markerInfo: State.Array<Json.key<'#markerInfo'>,markerInfoData> = markerInfo_internal;
 
 /** Localizable AST markers */
 export type marker =
@@ -185,21 +197,23 @@ export const jMarkerSafe: Json.Safe<marker> =
 /** Natural order for `marker` */
 export const byMarker: Compare.Order<marker> = Compare.structural;
 
-/** Collect all functions in the AST */
-export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]> = {
+const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
   output: Json.jList(Json.jKey<'#fct'>('#fct')),
 };
+/** Collect all functions in the AST */
+export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]>= getFunctions_internal;
 
-/** Print the AST of a function */
-export const printFunction: Server.GetRequest<Json.key<'#fct'>,text> = {
+const printFunction_internal: Server.GetRequest<Json.key<'#fct'>,text> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.printFunction',
   input:  Json.jKey<'#fct'>('#fct'),
   output: jText,
 };
+/** Print the AST of a function */
+export const printFunction: Server.GetRequest<Json.key<'#fct'>,text>= printFunction_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
@@ -238,16 +252,16 @@ export const signalFunctions: Server.Signal = {
   name: 'kernel.ast.signalFunctions',
 };
 
-/** Force full reload for array [`functions`](#functions)  */
-export const reloadFunctions: Server.GetRequest<null,null> = {
+const reloadFunctions_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.reloadFunctions',
   input:  Json.jNull,
   output: Json.jNull,
 };
+/** Force full reload for array [`functions`](#functions)  */
+export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_internal;
 
-/** Data fetcher for array [`functions`](#functions)  */
-export const fetchFunctions: Server.GetRequest<
+const fetchFunctions_internal: Server.GetRequest<
   number,
   { pending: number, updated: functionsData[],
     removed: Json.key<'#functions'>[], reload: boolean }
@@ -262,9 +276,14 @@ export const fetchFunctions: Server.GetRequest<
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
+/** Data fetcher for array [`functions`](#functions)  */
+export const fetchFunctions: Server.GetRequest<
+  number,
+  { pending: number, updated: functionsData[],
+    removed: Json.key<'#functions'>[], reload: boolean }
+  >= fetchFunctions_internal;
 
-/** AST Functions */
-export const functions: State.Array<Json.key<'#functions'>,functionsData> = {
+const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
   name: 'kernel.ast.functions',
   getkey: ((d:functionsData) => d.key),
   signal: signalFunctions,
@@ -272,29 +291,34 @@ export const functions: State.Array<Json.key<'#functions'>,functionsData> = {
   reload: reloadFunctions,
   order: byFunctionsData,
 };
+/** AST Functions */
+export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
-/** Get textual information about a marker */
-export const getInfo: Server.GetRequest<marker,text> = {
+const getInfo_internal: Server.GetRequest<marker,text> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getInfo',
   input:  jMarker,
   output: jText,
 };
+/** Get textual information about a marker */
+export const getInfo: Server.GetRequest<marker,text>= getInfo_internal;
 
-/** Get the currently analyzed source file names */
-export const getFiles: Server.GetRequest<null,string[]> = {
+const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFiles',
   input:  Json.jNull,
   output: Json.jList(Json.jString),
 };
+/** Get the currently analyzed source file names */
+export const getFiles: Server.GetRequest<null,string[]>= getFiles_internal;
 
-/** Set the source file names to analyze. */
-export const setFiles: Server.SetRequest<string[],null> = {
+const setFiles_internal: Server.SetRequest<string[],null> = {
   kind: Server.RqKind.SET,
   name:   'kernel.ast.setFiles',
   input:  Json.jList(Json.jString),
   output: Json.jNull,
 };
+/** Set the source file names to analyze. */
+export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 
 /* ------------------------------------- */

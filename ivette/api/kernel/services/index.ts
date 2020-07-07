@@ -24,8 +24,7 @@ import { jTagSafe } from 'api/kernel/data';
 //@ts-ignore
 import { tag } from 'api/kernel/data';
 
-/** Frama-C Kernel configuration */
-export const getConfig: Server.GetRequest<
+const getConfig_internal: Server.GetRequest<
   null,
   { pluginpath: string[], libdir: string, datadir: string, version: string }
   > = {
@@ -39,14 +38,20 @@ export const getConfig: Server.GetRequest<
             version: Json.jFail(Json.jString,'String expected'),
           }),
 };
+/** Frama-C Kernel configuration */
+export const getConfig: Server.GetRequest<
+  null,
+  { pluginpath: string[], libdir: string, datadir: string, version: string }
+  >= getConfig_internal;
 
-/** Load a save file. Returns an error, if not successfull. */
-export const load: Server.SetRequest<string,string | undefined> = {
+const load_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
   name:   'kernel.services.load',
   input:  Json.jString,
   output: Json.jString,
 };
+/** Load a save file. Returns an error, if not successfull. */
+export const load: Server.SetRequest<string,string | undefined>= load_internal;
 
 /** Source file positions. */
 export type source =
@@ -101,13 +106,14 @@ export const jLogkindSafe: Json.Safe<logkind> =
 /** Natural order for `logkind` */
 export const byLogkind: Compare.Order<logkind> = Compare.byEnum(logkind);
 
-/** Registered tags for the above type. */
-export const logkindTags: Server.GetRequest<null,tag[]> = {
+const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.logkindTags',
   input:  Json.jNull,
   output: Json.jList(jTag),
 };
+/** Registered tags for the above type. */
+export const logkindTags: Server.GetRequest<null,tag[]>= logkindTags_internal;
 
 /** Message event record. */
 export interface log {
@@ -148,20 +154,22 @@ export const byLog: Compare.Order<log> =
     source: Compare.defined(bySource),
   });
 
-/** Turn logs monitoring on/off */
-export const setLogs: Server.SetRequest<boolean,null> = {
+const setLogs_internal: Server.SetRequest<boolean,null> = {
   kind: Server.RqKind.SET,
   name:   'kernel.services.setLogs',
   input:  Json.jBoolean,
   output: Json.jNull,
 };
+/** Turn logs monitoring on/off */
+export const setLogs: Server.SetRequest<boolean,null>= setLogs_internal;
 
-/** Flush the last emitted logs since last call (max 100) */
-export const getLogs: Server.GetRequest<null,log[]> = {
+const getLogs_internal: Server.GetRequest<null,log[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.getLogs',
   input:  Json.jNull,
   output: Json.jList(jLog),
 };
+/** Flush the last emitted logs since last call (max 100) */
+export const getLogs: Server.GetRequest<null,log[]>= getLogs_internal;
 
 /* ------------------------------------- */
