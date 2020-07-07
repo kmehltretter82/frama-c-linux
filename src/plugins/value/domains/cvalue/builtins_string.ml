@@ -194,11 +194,11 @@ let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   if acc.stop then acc else search_until ~max acc
 
 (* Folds the [offsetmap] from [start] to [max]. *)
-let fold_offsm kind ~validity ~start ~max offsetmap acc =
+let fold_offsm kind ~validity ~start ~max ~rem offsetmap acc =
   let modu = kind.size in
   let process_range (start, max) (v, v_size, v_shift) acc =
     if acc.stop then acc else
-      let min = Integer.round_up_to_r ~min:start ~r:Integer.zero ~modu in
+      let min = Integer.round_up_to_r ~min:start ~r:rem ~modu in
       if Integer.gt min max then acc else
         let v_start = Abstract_interp.Rel.add_abs start v_shift in
         (* Only one read of the value is needed when:
@@ -206,11 +206,11 @@ let fold_offsm kind ~validity ~start ~max offsetmap acc =
              overlaps between two ranges of the offsetmap.
            - and either the value is isotropic, or the repeated value has the
              same size than the reads. *)
-        if Integer.is_zero (Integer.e_rem (Integer.succ max) modu) &&
+        if Integer.equal rem (Integer.e_rem (Integer.succ max) modu) &&
            (Cvalue.V_Or_Uninitialized.is_isotropic v ||
             Integer.equal min v_start && Integer.equal v_size kind.size)
         then
-          let offset = make_interval ~min ~max ~rem:Integer.zero ~modu in
+          let offset = make_interval ~min ~max ~rem ~modu in
           read_char kind offset v acc
         else
           (* Otherwise, search the range by reading the offsetmap for each
@@ -221,7 +221,7 @@ let fold_offsm kind ~validity ~start ~max offsetmap acc =
     ~entire:false (start, max) process_range offsetmap acc
 
 (* Performs the search in the [offsetmap]. *)
-let search_offsm kind ~validity ~offset offsetmap =
+let search_offsm kind ~validity ~offset ~rem offsetmap =
   let start = pos_min_int offset in
   (* Compute the maximal bit that can be read in the offsetmap. *)
   let base_max = match Base.valid_range validity with
@@ -239,7 +239,7 @@ let search_offsm kind ~validity ~offset offsetmap =
   in
   (* Starts the search with an empty accumulator. *)
   let acc = { read = empty; from = offset; stop = false } in
-  let acc = fold_offsm kind ~validity ~start ~max offsetmap acc in
+  let acc = fold_offsm kind ~validity ~start ~max ~rem offsetmap acc in
   (* Alarm if the search does not stop before the end of the offsetmap. *)
   if not acc.stop && Integer.gt (Integer.add max kind.size) base_max
   then { acc.read with alarm = true }
@@ -261,9 +261,14 @@ let search_base kind ~offset base state =
   | `Top -> assert false
   | `Value offsetmap ->
     let validity = Base.validity base in
-    let search_one_char offset char =
+    let search_one_rem ~offset ~char ~rem acc =
       let kind = { kind with search = char } in
-      search_offsm kind ~validity ~offset offsetmap
+      let res = search_offsm kind ~validity ~offset ~rem offsetmap in
+      join acc res
+    in
+    let search_one_char offset char =
+      let rems = Ival.scale_rem ~pos:true kind.size offset in
+      Ival.fold_int (fun rem -> search_one_rem ~offset ~char ~rem) rems empty
     in
     let search_one_offset offset =
       search_by_folding kind.search (search_one_char offset)
