@@ -13,7 +13,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { Order } from 'dome/data/compare';
-import * as GlobalStates from 'dome/data/states';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import { useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Server from './server';
@@ -534,7 +534,7 @@ function reducer(s: Selection, action: SelectionActions): Selection {
   }
 }
 
-const GlobalSelection = new GlobalStates.State<Selection>({
+const GlobalSelection = new GlobalState<Selection>({
   current: undefined,
   prevSelections: [],
   nextSelections: [],
@@ -544,7 +544,7 @@ const GlobalSelection = new GlobalStates.State<Selection>({
    Current selection.
  */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = GlobalStates.useState(GlobalSelection);
+  const [selection, setSelection] = useGlobalState(GlobalSelection);
 
   function update(action: SelectionActions) {
     const nextSelection = reducer(selection, action);
