@@ -11,7 +11,7 @@
 import { DEVEL } from 'dome/system';
 
 export type json =
-  undefined | null | number | string | json[] | { [key: string]: json }
+  undefined | null | boolean | number | string | json[] | { [key: string]: json }
 
 /**
    Parse without _revivals_.
