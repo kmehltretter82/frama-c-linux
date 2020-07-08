@@ -53,7 +53,7 @@ const Values = () => {
   const selectMarker = States.useSelection()[0]?.current?.marker;
   const t = States.useRequest(Eva.getValues, selectMarker);
   const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
     if (selectMarker && evaValues) {
@@ -71,11 +71,11 @@ const Values = () => {
             evaValues.forEach((i) => model.setData(i.key, i));
             break;
           default:
-            setName('');
+            setName(undefined);
         }
       }
     } else {
-      setName('');
+      setName(undefined);
     }
     model.reload();
   }, [model, evaValues, t, selectMarker, markerInfo]);
@@ -87,7 +87,8 @@ const Values = () => {
         <ColumnCallstack />
         <Column
           id="value_before"
-          label={`${name} (before)`}
+          visible={!!name}
+          label={name && `${name} (before)`}
           title="Values inferred by Eva just before the selected point"
           disableSort
           fill
@@ -95,7 +96,8 @@ const Values = () => {
         <ColumnAlarm />
         <Column
           id="value_after"
-          label={`${name} (after)`}
+          visible={!!name}
+          label={name && `${name} (after)`}
           title="Values inferred by Eva just after the selected point"
           disableSort
           fill
