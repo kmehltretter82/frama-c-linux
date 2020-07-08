@@ -133,18 +133,8 @@ const ASTview = () => {
   async function onContextMenu(id: key<'#markerInfo'>) {
     const items = [];
     const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
-    switch (selectedMarkerInfo?.kind) {
-      case 'function': {
-        items.push({
-          label: `Go to definition of ${selectedMarkerInfo.name}`,
-          onClick: () => {
-            const location = { function: selectedMarkerInfo.name };
-            updateSelection({ location });
-          },
-        });
-        break;
-      }
-      case 'declaration': {
+    if (selectedMarkerInfo?.var === 'function') {
+      if (selectedMarkerInfo.kind === 'declaration') {
         if (selectedMarkerInfo?.name) {
           const locations = await functionCallers(selectedMarkerInfo.name);
           const locationsByFunction = _.groupBy(locations, (e) => e.function);
@@ -162,10 +152,15 @@ const ASTview = () => {
               });
             });
         }
-        break;
+      } else {
+        items.push({
+          label: `Go to definition of ${selectedMarkerInfo.name}`,
+          onClick: () => {
+            const location = { function: selectedMarkerInfo.name };
+            updateSelection({ location });
+          },
+        });
       }
-      default:
-        break;
     }
     if (items.length > 0)
       Dome.popupMenu(items);

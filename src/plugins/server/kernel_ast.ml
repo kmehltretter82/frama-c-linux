@@ -52,8 +52,6 @@ module MarkerKind = struct
       ~descr:(Md.plain (String.capitalize_ascii name))
       kinds
 
-  let var  = kind "variable"
-  let fct  = kind "function"
   let expr = kind "expression"
   let lval = kind "lvalue"
   let decl = kind "declaration"
