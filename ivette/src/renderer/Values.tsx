@@ -49,23 +49,36 @@ const Values = () => {
     [],
   );
 
-  const items = States.useSyncArray(Eva.values).getArray();
-  const marker = States.useSelection()[0]?.current?.marker;
-  const t = States.useRequest(Eva.getValues, marker);
+  const evaValues = States.useSyncArray(Eva.values).getArray();
+  const selectMarker = States.useSelection()[0]?.current?.marker;
+  const t = States.useRequest(Eva.getValues, selectMarker);
   const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
   const [name, setName] = React.useState('');
 
   React.useEffect(() => {
-    if (marker && items) {
-      const m = markerInfo.find((e) => e.key === marker);
-      if (m) {
-        setName(m.descr);
-      }
+    if (selectMarker && evaValues) {
       model.removeAllData();
-      items.forEach((i) => model.setData(i.key, i));
-      model.reload();
+      const selectMarkerInfo = markerInfo.find((e) => e.key === selectMarker);
+      if (selectMarkerInfo && selectMarkerInfo.var !== 'function') {
+        switch (selectMarkerInfo.kind) {
+          case 'expression':
+          case 'lvalue':
+            setName(selectMarkerInfo.descr);
+            evaValues.forEach((i) => model.setData(i.key, i));
+            break;
+          case 'declaration':
+            setName(selectMarkerInfo.name);
+            evaValues.forEach((i) => model.setData(i.key, i));
+            break;
+          default:
+            setName('');
+        }
+      }
+    } else {
+      setName('');
     }
-  }, [model, items, t, marker, markerInfo]);
+    model.reload();
+  }, [model, evaValues, t, selectMarker, markerInfo]);
 
   // Component
   return (
