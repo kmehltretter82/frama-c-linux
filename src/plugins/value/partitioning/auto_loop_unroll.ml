@@ -202,40 +202,39 @@ let is_safe_instruction lval = function
 (* Returns true if the statement may assign [lval] during an iteration of the
    loop [loop]. [lval] is a candidate for the automatic loop unroll heuristic,
    and thus is modified within the loop. *)
-let is_safe lval ~loop stmt =
-  (* The current block being checked for a goto statement. *)
-  let current_block = ref None in
-  let rec is_safe_stmt stmt =
+let is_safe lval kf ~loop stmt =
+  let rec is_safe_stmt ~goto stmt =
     match stmt.skind with
     | Instr instr -> is_safe_instruction lval instr
     | Return _ | Break _ | Continue _ -> true
-    | If (_, b_then, b_else, _) -> is_safe_block b_then && is_safe_block b_else
+    | If (_, b_then, b_else, _) ->
+      is_safe_block ~goto b_then && is_safe_block ~goto b_else
     | Block b
     | Switch (_, b, _, _)
-    | Loop (_, b, _, _, _) -> is_safe_block b
+    | Loop (_, b, _, _, _) -> is_safe_block ~goto b
     | UnspecifiedSequence list ->
-      List.for_all (fun (stmt, _, _, _, _) -> is_safe_stmt stmt) list
-    | Goto (dest, _) -> begin
-        let dest_blocks = Kernel_function.find_all_enclosing_blocks !dest in
-        (* If the goto leaves the loop, then it is safe. *)
-        if List.mem loop dest_blocks then true else
-          (* If the goto moves into the block currently being checked, then it
-             is safe if the block is safe (which we are currently checking). *)
-          match !current_block with
-          | Some current_block when List.mem current_block dest_blocks -> true
-          | _ ->
-            (* Otherwise, we need to check that the whole block englobing
-               both the source and the destination of the goto is safe. *)
-            let block = Kernel_function.common_block !dest stmt in
-            current_block := Some block;
-            (* If this block is the loop itself, then it is not safe, as [lval]
-               is modified within the loop. *)
-            not (block = loop) && is_safe_block block
-      end
+      List.for_all (fun (stmt, _, _, _, _) -> is_safe_stmt ~goto stmt) list
+    | Goto (dest, _) ->
+      (* If [goto] holds, we are already checking a block for a [goto]. Do not
+         process goto statements again here. *)
+      goto ||
+      let first_stmt = List.hd loop.bstmts in
+      (* If the loop cannot be reached from [dest], then it is safe. *)
+      not (Stmts_graph.stmt_can_reach kf !dest first_stmt) ||
+      (* Otherwise, if the goto leaves the loop, then it forms another loop
+         that contains the current loop, which we don't want to unroll. *)
+      let dest_blocks = Kernel_function.find_all_enclosing_blocks !dest in
+      List.exists (Cil_datatype.Block.equal loop) dest_blocks &&
+      (* Otherwise, the goto stays within the loop: check that the block
+         englobing both the source and the destination is safe. *)
+      let block = Kernel_function.common_block !dest stmt in
+      (* If this block is the loop itself, then it is not safe,
+         as [lval] is modified within the loop. *)
+      not (block == loop) && is_safe_block ~goto:true block
     | _ -> false
   (* A block is safe if all its statements are safe. *)
-  and is_safe_block block = List.for_all is_safe_stmt block.bstmts in
-  is_safe_stmt stmt
+  and is_safe_block ~goto b = List.for_all (is_safe_stmt ~goto) b.bstmts in
+  is_safe_stmt ~goto:false stmt
 
 
 module Make (Abstract: Abstractions.Eva) = struct
@@ -393,7 +392,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      should be a direct access to a variable whose address is not taken,
      and which should not be global if the loop contains function calls.
      Returns None if no increment can be computed. *)
-  let compute_delta lval loop =
+  let compute_delta kf lval loop =
     let rec delta_stmt acc stmt =
       match stmt.skind with
       | Instr instr -> delta_instruction lval acc instr
@@ -410,7 +409,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         List.fold_left (fun acc (s, _, _, _, _) -> delta_stmt acc s) acc list
       | _ ->
         (* For other statements, we only check that they do not modify [lval]. *)
-        if is_safe lval ~loop stmt then acc else raise NoIncrement
+        if is_safe lval kf ~loop stmt then acc else raise NoIncrement
     and delta_block acc block =
       List.fold_left delta_stmt acc block.bstmts
     in
@@ -508,7 +507,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       evaluate_lvalue state lval >>: fun v_init ->
       (* Computes an over-approximation [v_delta] of the increment of [lval]
          in one iteration of the loop. *)
-      compute_delta lval loop_block >>: fun v_delta ->
+      compute_delta kf lval loop_block >>: fun v_delta ->
       let typ = Cil.typeOfLval lval in
       let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
       (* Possible iterations numbers to exit the loop. *)
