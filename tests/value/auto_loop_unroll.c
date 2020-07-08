@@ -243,6 +243,51 @@ void temporary_variables () {
   Frama_C_show_each_21(res);
 }
 
+/* Examples of loops with goto statements. */
+void loops_with_goto () {
+  int i, res = 0;
+  for (i = 0; i < 30; i++) {
+    res++;
+    if (undet)
+      goto middle;
+  }
+  Frama_C_show_each_30(res);
+  res = 0;
+ middle: ;
+  /* Should never be unrolled. */
+  for (i = 0; i < 31; i++) {
+    res++;
+    if (undet)
+      goto middle;
+  }
+  Frama_C_show_each_top(res);
+  res = 0;
+  /* Should be unrolled, and [res] should be precise. */
+  for (i = 0; i < 32; i++) {
+    res++;
+    if (undet)
+      goto L1;
+  L1:;
+  }
+  Frama_C_show_each_32(res);
+  res = 0;
+  /* Should be unrolled, but [res] should still be imprecise. */
+  for (i = 0; i < 33; i++) {
+  L2:res++;
+    if (undet)
+      goto L2;
+  }
+  Frama_C_show_each_33_inf(res);
+  res = 0;
+  /* Should never be unrolled. */
+  for (i = 0; i < 34; res++) {
+  L3:i++;
+    if (undet)
+      goto L3;
+  }
+  Frama_C_show_each_top(res);
+  res = 0;
+}
 
 void main () {
   simple_loops ();
@@ -250,4 +295,5 @@ void main () {
   complex_loops ();
   various_conditions ();
   temporary_variables ();
+  loops_with_goto ();
 }

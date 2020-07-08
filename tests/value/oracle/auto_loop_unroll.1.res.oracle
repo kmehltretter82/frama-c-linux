@@ -6,7 +6,7 @@
   undet ∈ [--..--]
   g ∈ {0}
 [eva] computing for function simple_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:248.
+  Called from tests/value/auto_loop_unroll.c:293.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:24: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:24: 
   Trace partitioning superposing up to 100 states
@@ -25,7 +25,7 @@
 [eva] Recording results for simple_loops
 [eva] Done for function simple_loops
 [eva] computing for function various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:249.
+  Called from tests/value/auto_loop_unroll.c:294.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:57: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:59: Frama_C_show_each_64: {64}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:62: Automatic loop unrolling.
@@ -281,7 +281,7 @@
 [eva] Recording results for various_loops
 [eva] Done for function various_loops
 [eva] computing for function complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:250.
+  Called from tests/value/auto_loop_unroll.c:295.
 [eva] tests/value/auto_loop_unroll.c:133: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:135: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -340,7 +340,7 @@
 [eva] Recording results for complex_loops
 [eva] Done for function complex_loops
 [eva] computing for function various_conditions <- main.
-  Called from tests/value/auto_loop_unroll.c:251.
+  Called from tests/value/auto_loop_unroll.c:296.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:192: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:197: Automatic loop unrolling.
@@ -358,13 +358,41 @@
 [eva] Recording results for various_conditions
 [eva] Done for function various_conditions
 [eva] computing for function temporary_variables <- main.
-  Called from tests/value/auto_loop_unroll.c:252.
+  Called from tests/value/auto_loop_unroll.c:297.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:235: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: {20}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:240: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: {21}
 [eva] Recording results for temporary_variables
 [eva] Done for function temporary_variables
+[eva] computing for function loops_with_goto <- main.
+  Called from tests/value/auto_loop_unroll.c:298.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:249: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:254: Frama_C_show_each_30: {30}
+[eva] tests/value/auto_loop_unroll.c:258: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:259: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:263: Frama_C_show_each_top: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:266: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:272: Frama_C_show_each_32: {32}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:275: Automatic loop unrolling.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:276: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:276: 
+  Trace partitioning superposing up to 100 states
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:278: 
+  loop not completely unrolled
+[eva:alarm] tests/value/auto_loop_unroll.c:276: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:280: 
+  Frama_C_show_each_33_inf: [33..2147483647]
+[eva:alarm] tests/value/auto_loop_unroll.c:284: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:283: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:283: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:288: Frama_C_show_each_top: [0..2147483647]
+[eva] Recording results for loops_with_goto
+[eva] Done for function loops_with_goto
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -388,6 +416,9 @@
    [7] ∈ {7}
    [8] ∈ {8}
    [9] ∈ {9}
+[eva:final-states] Values at end of function loops_with_goto:
+  i ∈ [34..2147483647]
+  res ∈ {0}
 [eva:final-states] Values at end of function simple_loops:
   res ∈ {100}
 [eva:final-states] Values at end of function temporary_variables:
@@ -411,6 +442,8 @@
 [from] Done for function incr_g
 [from] Computing for function complex_loops
 [from] Done for function complex_loops
+[from] Computing for function loops_with_goto
+[from] Done for function loops_with_goto
 [from] Computing for function simple_loops
 [from] Done for function simple_loops
 [from] Computing for function temporary_variables
@@ -434,6 +467,8 @@
   g FROM g
 [from] Function complex_loops:
   g FROM \nothing
+[from] Function loops_with_goto:
+  NO EFFECTS
 [from] Function simple_loops:
   NO EFFECTS
 [from] Function temporary_variables:
@@ -459,6 +494,10 @@
     g; res; i; j; p; j_0; t[0..9]
 [inout] Inputs for function complex_loops:
     undet; g
+[inout] Out (internal) for function loops_with_goto:
+    i; res
+[inout] Inputs for function loops_with_goto:
+    undet
 [inout] Out (internal) for function simple_loops:
     res; i; i_0; i_1; i_2
 [inout] Inputs for function simple_loops:
