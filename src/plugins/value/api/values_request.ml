@@ -26,7 +26,12 @@ open Cil_types
 module Md = Markdown
 
 let package =
-  Package.package ~plugin:"eva" ~title:"Eva Values" ~readme:"eva.md" ()
+  Package.package
+    ~plugin:"eva"
+    ~name:"values"
+    ~title:"Eva Values"
+    ~readme:"eva.md"
+    ()
 
 type value =
   { value: string;

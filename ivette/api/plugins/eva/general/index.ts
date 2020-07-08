@@ -3,7 +3,7 @@
 /**
    Eva General Services
    @packageDocumentation
-   @module api/plugins/eva
+   @module api/plugins/eva/general
 */
 
 //@ts-ignore
@@ -21,7 +21,7 @@ const getCallers_internal: Server.GetRequest<
   [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.getCallers',
+  name:   'plugins.eva.general.getCallers',
   input:  Json.jKey<'#fct'>('#fct'),
   output: Json.jList(Json.jTry(
                        Json.jPair(

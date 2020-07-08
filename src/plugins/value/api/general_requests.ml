@@ -22,8 +22,13 @@
 
 open Server
 
-let package = Package.package ~plugin:"eva"
-    ~title:"Eva General Services" ~readme:"eva.md" ()
+let package =
+  Package.package
+    ~plugin:"eva"
+    ~name:"general"
+    ~title:"Eva General Services"
+    ~readme:"eva.md"
+    ()
 
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 

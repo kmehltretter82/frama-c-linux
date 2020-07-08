@@ -2,9 +2,11 @@
 // --- Eva Values
 // --------------------------------------------------------------------------
 
-import _ from 'lodash';
 import React from 'react';
 import * as States from 'frama-c/states';
+import * as Json from 'dome/data/json';
+import * as Eva from 'api/plugins/eva/values';
+import * as Ast from 'api/kernel/ast';
 
 import { Table, Column } from 'dome/table/views';
 import { ArrayModel } from 'dome/table/arrays';
@@ -16,19 +18,13 @@ import { Label } from 'dome/controls/labels';
 // --- Columns
 // --------------------------------------------------------------------------
 
-interface Callstack {
-  id: number;
-  short: string;
-  full: string;
-}
-
 const ColumnCallstack = () => Column({
   id: 'callstack',
   label: 'Callstack',
   title: 'Context of the evaluation',
   align: 'left',
   width: 100,
-  render: (cs: Callstack) => <Label label={cs.short} title={cs.full} />,
+  render: (cs: Eva.callstack) => <Label label={cs.short} title={cs.full} />,
 });
 
 const ColumnAlarm = () => Column({
@@ -46,33 +42,30 @@ const ColumnAlarm = () => Column({
 // --- Values Panel
 // --------------------------------------------------------------------------
 
-interface Value {
-  key: string;
-  callstack: Callstack;
-  value_before: string;
-  alarm: boolean;
-  value_after?: string;
-}
-
 const Values = () => {
 
-  const model = React.useMemo(() => new ArrayModel<Value>('key'), []);
-  const items = States.useSyncArray('eva.values');
-  const [select] = States.useSelection();
-  const marker = select?.current?.marker;
-  const t = States.useRequest('eva.values.compute', marker || '');
-  const markerKinds = States.useSyncArray('kernel.ast.markerKind');
-  const name = React.useRef('');
+  const model = React.useMemo(
+    () => new ArrayModel<Json.key<'#values'>, Eva.valuesData>(),
+    [],
+  );
+
+  const items = States.useSyncArray(Eva.values).getArray();
+  const marker = States.useSelection()[0]?.current?.marker;
+  const t = States.useRequest(Eva.getValues, marker);
+  const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
+  const [name, setName] = React.useState('');
 
   React.useEffect(() => {
     if (marker && items) {
-      const mark = markerKinds[marker];
-      if (mark && mark.name) {
-        name.current = mark.name;
+      const m = markerInfo.find((e) => e.key === marker);
+      if (m) {
+        setName(m.descr);
       }
-      model.replace(_.toArray(items));
+      model.removeAllData();
+      items.forEach((i) => model.setData(i.key, i));
+      model.reload();
     }
-  }, [model, items, t, name, marker, markerKinds]);
+  }, [model, items, t, marker, markerInfo]);
 
   // Component
   return (
@@ -81,7 +74,7 @@ const Values = () => {
         <ColumnCallstack />
         <Column
           id="value_before"
-          label={`${name.current} (before)`}
+          label={`${name} (before)`}
           title="Values inferred by Eva just before the selected point"
           disableSort
           fill
@@ -89,7 +82,7 @@ const Values = () => {
         <ColumnAlarm />
         <Column
           id="value_after"
-          label={`${name.current} (after)`}
+          label={`${name} (after)`}
           title="Values inferred by Eva just after the selected point"
           disableSort
           fill

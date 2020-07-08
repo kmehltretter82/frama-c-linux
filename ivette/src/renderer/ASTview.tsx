@@ -15,7 +15,7 @@ import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers } from 'api/plugins/eva';
+import { getCallers } from 'api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -123,7 +123,7 @@ const ASTview = () => {
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: key<'#markerIndo'>) {
+  function onTextSelection(id: key<'#markerInfo'>) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
