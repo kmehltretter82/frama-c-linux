@@ -192,17 +192,16 @@ let find_lonely_candidate loop_effect expr =
   in
   aux None lvalues
 
-(* Returns true if the instruction assigns [lval]. *)
+(* Returns true if the instruction does not modify [lval]. *)
 let is_safe_instruction lval = function
   | Set (lv, _, _)
   | Call (Some lv, _, _, _) -> not (Cil_datatype.LvalStructEq.equal lval lv)
   | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> true
   | Asm _ -> false
 
-(* Returns true if the statement may assign [lval] during an iteration of the
-   loop [loop]. [lval] is a candidate for the automatic loop unroll heuristic,
-   and thus is modified within the loop. *)
-let is_safe lval kf ~loop stmt =
+(* Returns true if the statement [stmt] of function [kf] does not modify [lval].
+   [lval] is a candidate for the automatic loop unrolling of [loop] [loop]. *)
+let is_constant kf ~loop lval stmt =
   let rec is_safe_stmt ~goto stmt =
     match stmt.skind with
     | Instr instr -> is_safe_instruction lval instr
@@ -409,7 +408,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         List.fold_left (fun acc (s, _, _, _, _) -> delta_stmt acc s) acc list
       | _ ->
         (* For other statements, we only check that they do not modify [lval]. *)
-        if is_safe lval kf ~loop stmt then acc else raise NoIncrement
+        if is_constant kf ~loop lval stmt then acc else raise NoIncrement
     and delta_block acc block =
       List.fold_left delta_stmt acc block.bstmts
     in
