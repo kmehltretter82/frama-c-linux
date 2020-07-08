@@ -26,12 +26,7 @@ open Cil_types
 module Md = Markdown
 
 let package =
-  Package.package
-    ~plugin:"eva"
-    ~name:"eva"
-    ~title:"Eva Values"
-    ~readme:"eva.md"
-    ()
+  Package.package ~plugin:"eva" ~title:"Eva Values" ~readme:"eva.md" ()
 
 type value =
   { value: string;
@@ -126,7 +121,7 @@ module CallStack = struct
     (val
       (Record.publish
          ~package
-         ~name:"evaCallstack"
+         ~name:"callstack"
          ~descr:(Md.plain "CallStack")
          record) : Record.S with type r = record)
 
@@ -204,7 +199,7 @@ let array =
   in
   States.register_array
     ~package
-    ~name:"evaValues"
+    ~name:"values"
     ~descr:(Md.plain "Abstract values inferred by the Eva analysis")
     ~key:(fun (cs, _) -> CallStack.key cs)
     ~iter
@@ -350,7 +345,7 @@ let () =
   Server.Request.register
     ~package
     ~kind:`GET
-    ~name:"getEvaValues"
+    ~name:"getValues"
     ~descr:(Md.plain "Get the abstract values computed for an expression or lvalue")
     ~input:(module Kernel_ast.Marker)
     ~output:(module Junit)
