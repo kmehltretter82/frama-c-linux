@@ -8,5 +8,3 @@ coverage
 lib
 # don't lint the generated API
 src/api
-# lint Dome step by step
-src/dome/src/renderer/layout
