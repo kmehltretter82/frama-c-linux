@@ -18,14 +18,14 @@ int main(void) {
   a  = malloc(10*sizeof(int));
   /*@ assert \valid(a + (0 .. 4)); */ ;
   int j = 2;
-  /*@ assert \valid(a + (4 .. 8+j)); */ ;
+  /*@ assert \valid(a + (4 .. 7+j)); */ ;
   /*@ assert !\valid(a + (10 .. 11)); */ ;
   free(a);
 
   char *b;
   b  = malloc(10*sizeof(char));
- /*@ assert \valid(b + (0 .. 10)); */ ;
- /*@ assert !\valid(b + (11 .. 15)); */ ;
+ /*@ assert \valid(b + (0 .. 9)); */ ;
+ /*@ assert !\valid(b + (10 .. 15)); */ ;
 
   long t[3] = {7l, 8l, 9l};
   /*@ assert \valid(&t[0..2]); */ ;
@@ -38,7 +38,7 @@ int main(void) {
   /*@ assert \initialized(&t2[0..1]); */ ;
   /*@ assert !\initialized(&t2[2..3]); */ ;
 
-  /*@ assert !\initialized(b + (0 .. 10));*/
+  /*@ assert !\initialized(b + (0 .. 9));*/
   free(b);
 
   int n = 2;
@@ -50,7 +50,7 @@ int main(void) {
 
   struct S s;
   s.a[0] = 7; s.a[1] = 8;
-  /*@ assert \initialized(&s.a[0] + (1..2)); */ ;
+  /*@ assert \initialized(&s.a[0] + (1..1)); */ ;
   /*@ assert !\initialized(s.b + (0..1)); */ ;
 
   int **multi_dynamic;
