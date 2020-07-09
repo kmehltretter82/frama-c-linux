@@ -219,8 +219,9 @@ let makeOrder ~self ~names fmt js =
   let rec pp fmt = function
     | Jnull -> Format.pp_print_string fmt "Compare.equal"
     | Jalpha -> Format.pp_print_string fmt "Compare.alpha"
-    | Jnumber | Jstring | Jboolean | Jkey _ | Jindex _
-      -> Format.pp_print_string fmt "Compare.primitive"
+    | Jnumber | Jindex _ -> Format.pp_print_string fmt "Compare.number"
+    | Jstring | Jkey _ -> Format.pp_print_string fmt "Compare.string"
+    | Jboolean -> Format.pp_print_string fmt "Compare.boolean"
     | Jself -> jcall names fmt (Pkg.Derived.order self)
     | Jdata id -> jcall names fmt (Pkg.Derived.order id)
     | Joption js ->
