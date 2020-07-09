@@ -22,8 +22,8 @@
 
 open Server
 
-let chapter = `Plugin "Eva"
-let page = Doc.page chapter ~title:"Eva general services" ~filename:"eva.md"
+let package = Package.package ~plugin:"eva"
+    ~title:"Eva General Services" ~readme:"eva.md" ()
 
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
@@ -31,8 +31,10 @@ let callers kf =
   let list = !Db.Value.callers kf in
   List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"eva.callers"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallers"
     ~descr:(Markdown.plain "Get the list of call site of a function")
     ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
     callers
+
+(**************************************************************************)

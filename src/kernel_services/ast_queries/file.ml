@@ -533,11 +533,31 @@ let parse_cabs = function
     let cpp_command = build_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
+      let possible_cause =
+        if Kernel.JsonCompilationDatabase.is_set () then
+          if not (Json_compilation_database.has_entry f) then
+            Format.asprintf "note: %s is set but \
+                             contains no entries for '%a'.@ "
+              Kernel.JsonCompilationDatabase.option_name
+              Datatype.Filepath.pretty f
+          else ""
+        else
+        if not (Kernel.CppExtraArgs.is_set ()) &&
+           not (Kernel.CppExtraArgsPerFile.is_set ()) &&
+           not (Kernel.CppCommand.is_set ()) then
+          Format.asprintf
+            "this is possibly due to missing preprocessor flags;@ \
+             consider options %s, %s or %s.@ "
+            Kernel.CppExtraArgs.option_name
+            Kernel.JsonCompilationDatabase.option_name
+            Kernel.CppCommand.option_name
+        else ""
+      in
       Kernel.abort
         "failed to run: %s@\n\
-         you may set the CPP environment variable to select the proper \
-         preprocessor command or use the option \"-cpp-command\"."
-        cpp_command
+         %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
+         for more details."
+        cpp_command possible_cause
     end;
     let ppf =
       if Kernel.ReadAnnot.get() &&

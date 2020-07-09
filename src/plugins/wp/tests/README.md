@@ -59,11 +59,16 @@ doing so would causing WP to add new cache entries to the global « qualif » ca
 from all your projects around. Consult the section « Global WP Cache Setup »
 below for details.
 
+Note that this cache is meant to be global, including for the different merge
+requests. Thus, when working on a new merge request for WP, **do not** create a
+branch (and MR) on the WP-cache repository: just push the new cache entries into
+the global cache using `make wp-qualif-push`.
+
 # Qualified Test Results
 
 To be accepted by Frama-CI, tests in « qualif » configuration must be easily
 reproducible on any platform. This is checked by running WP with flag
-`-wp-msg-key success-only` which is set by the default in the qualif test
+`-wp-msg-key shell` which is set by the default in the qualif test
 configuration. Hence, a qualified test result only contains proof status that
 are either:
 - failed
@@ -75,7 +80,7 @@ are either:
 This excludes any timeout with native Alt-Ergo, which must be turned into some
 reproducible stepout by setting `-wp-steps` and `-wp-timeout` options
 accordingly. Please choose a step limit that makes large enough to ensure the
-goal is not provable, but small enough to make alt-ergo decide quickly.
+goal is provable, but small enough to make alt-ergo decide quickly.
 
 # Global WP Cache Setup (for wp-qualif)
 
@@ -105,11 +110,10 @@ environment. To run individual tests, you may now use:
     $ export FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
     $ ./bin/ptests.opt src/plugins/wp/tests/xxx/yyy.i -config qualif [-show|-update]
 
-The necessary environment variables can also be displayed by the makefile:
+An utility script is provided to export the necessary environment variables
+(dont forget the `.` to execute the script in the current shell environment):
 
-    $ make wp-qualif-env
-    FRAMAC_WP_CACHE=update
-    FRAMAC_WP_CACHEDIR=$WP_QUALIF_CACHE
+    $ . bin/wp_qualif.sh
 
 As mentionned above, it is _not_ recommanded to globally set the
 `FRAMAC_WP_XXX` variables in your default shell environment, because WP will

@@ -31,6 +31,18 @@ fixlint: dome-pkg dome-templ
 tsc: typecheck fixlint
 
 # --------------------------------------------------------------------------
+# --- Frama-C API
+# --------------------------------------------------------------------------
+
+.PHONY: api
+
+api:
+	@echo "[Ivette] Generating TypeScript API"
+	@find api -name "*.ts" -exec rm -f {} \;
+	../bin/frama-c.byte -load-module api/server_tsc.ml -server-tsc
+	@find api -name "*.ts" -exec chmod a-w {} \;
+
+# --------------------------------------------------------------------------
 # --- Ivette Documentation
 # --------------------------------------------------------------------------
 

@@ -53,7 +53,7 @@ let options = Arg.([
 
   "-scripts",
   Unit (fun _ -> Format.printf "%s%!"
-           (Filename.concat Fc_config.datadir "analyis-scripts"); exit 0),
+           (Filename.concat Fc_config.datadir "analysis-scripts"); exit 0),
   " Print the path of Frama-C analysis-scripts directory";
 
   "-print-libpath",

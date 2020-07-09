@@ -224,14 +224,14 @@ let wp_panel
   hbox#pack prover_cfg#coerce ;
 
   Gtk_form.menu [
-    "No Cache" ,    ProverWhy3.NoCache ;
-    "Update" ,  ProverWhy3.Update ;
-    "Cleanup" , ProverWhy3.Cleanup ;
-    "Rebuild" , ProverWhy3.Rebuild ;
-    "Replay" ,  ProverWhy3.Replay ;
-    "Offline" , ProverWhy3.Offline ;
+    "No Cache" ,    Cache.NoCache ;
+    "Update" ,  Cache.Update ;
+    "Cleanup" , Cache.Cleanup ;
+    "Rebuild" , Cache.Rebuild ;
+    "Replay" ,  Cache.Replay ;
+    "Offline" , Cache.Offline ;
   ] ~packing:hbox#pack ~tooltip:"Proof Cache Mode"
-    ProverWhy3.get_mode ProverWhy3.set_mode demon ;
+    Cache.get_mode Cache.set_mode demon ;
 
   let pbox = GPack.hbox ~packing ~show:false () in
   let progress = GRange.progress_bar ~packing:(pbox#pack ~expand:true ~fill:true) () in

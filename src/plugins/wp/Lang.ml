@@ -165,8 +165,8 @@ let ext_compare a b = Datatype.Int.compare a.ext_id b.ext_id
 
 let sort_of_object = function
   | C_int _ -> Logic.Sint
-  | C_float _ -> Logic.Sreal
   | C_pointer _ | C_comp _ | C_array _ -> Logic.Sdata
+  | C_float f -> Qed.Kind.of_tau (Context.get floats f)
 
 let init_sort_of_object = function
   | C_int _ | C_float _ | C_pointer _ -> Logic.Sbool

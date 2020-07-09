@@ -24,8 +24,9 @@
 (* --- Server Documentation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Markdown
+open Package
 type json = Yojson.Basic.t
+module Md = Markdown
 module Senv = Server_parameters
 module Pages = Map.Make(String)
 
@@ -43,7 +44,8 @@ type page = {
   chapter : chapter ;
   title : string ;
   order : int ;
-  intro : Markdown.elements ;
+  descr : Markdown.elements ;
+  readme: string option ;
   mutable sections : section list ;
 }
 
@@ -60,32 +62,24 @@ let href page name : Markdown.href = Section( page.path , name )
 
 let chapter pg = pg.chapter
 
-let page chapter ~title ~filename =
-  let rootdir,path = match chapter with
-    | `Protocol -> "." , filename
-    | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
-    | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
-  in
+let path_for chapter filename =
+  match chapter with
+  | `Protocol -> "." , filename
+  | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
+  | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
+
+let page chapter ~title ?(descr=[]) ?readme ~filename () =
+  let rootdir , path = path_for chapter filename in
   try
     let other = Pages.find path !pages in
     Senv.failure "Duplicate page '%s' path@." path ; other
   with Not_found ->
-    let intro = match chapter with
-      | `Protocol ->
-        Printf.sprintf "%s/server/protocol/%s" Fc_config.datadir filename
-      | `Kernel ->
-        Printf.sprintf "%s/server/kernel/%s" Fc_config.datadir filename
-      | `Plugin name ->
-        if not (List.mem name !plugins) then plugins := name :: !plugins ;
-        Printf.sprintf "%s/%s/server/%s" Fc_config.datadir name filename in
-    let intro =
-      if Sys.file_exists intro
-      then Markdown.rawfile intro
-      else Markdown.(section ~title []) in
     let order = incr order ; !order in
-    let page = { order ; rootdir ; path ;
-                 chapter ; title ; intro ;
-                 sections=[] } in
+    let page = {
+      order ; rootdir ; path ;
+      chapter ; title ; descr ; readme ;
+      sections=[] ;
+    } in
     pages := Pages.add path page !pages ; page
 
 let static () = []
@@ -95,20 +89,128 @@ let publish ~page ?name ?(index=[]) ~title
     ?(generated=static)
     () =
   let id = match name with Some id -> id | None -> title in
-  let href = Section( page.path , id ) in
+  let href = Md.Section( page.path , id ) in
   let section () = Markdown.section ?name ~title (contents @ generated ()) in
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
-let _ = page `Protocol ~title:"Architecture" ~filename:"server.md"
+let protocole ~title ~readme:filename =
+  let readme = Printf.sprintf "%s/server/%s" Fc_config.datadir filename in
+  ignore (page `Protocol ~title ~readme ~filename ())
+
+let () = protocole ~title:"Architecture" ~readme:"server.md"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Package Publication                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let href_of_ident names id =
+  let chapter = match id.plugin with
+    | Kernel -> `Kernel | Plugin p -> `Plugin p in
+  let filename = String.concat "_" id.package ^ ".md" in
+  let page = snd @@ path_for chapter filename in
+  let text = try IdMap.find id names with Not_found -> id.name in
+  Md.link ~text:(Md.code text) ~page ~name:id.name ()
+
+let page_of_package pkg =
+  let chapter = match pkg.p_plugin with
+    | Kernel -> `Kernel | Plugin p -> `Plugin p in
+  let filename = String.concat "_" pkg.p_package ^ ".md" in
+  try
+    let _,path = path_for chapter filename in
+    Pages.find path !pages
+  with Not_found ->
+    page chapter
+      ~title:pkg.p_title
+      ~descr:(Markdown.par pkg.p_descr)
+      ?readme:pkg.p_readme
+      ~filename ()
+
+let kind_of_decl = function
+  | D_signal -> "SIGNAL"
+  | D_value _ | D_state _ -> "STATE"
+  | D_array _ -> "ARRAY"
+  | D_type _ | D_record _ | D_enum _ -> "DATA"
+  | D_request { rq_kind=`GET } -> "GET"
+  | D_request { rq_kind=`SET } -> "SET"
+  | D_request { rq_kind=`EXEC } -> "EXEC"
+  | D_loose _ | D_safe _ | D_order _ -> assert false
+
+let pp_for ?decl names =
+  let self =
+    match decl with
+    | Some d ->
+      let name = d.d_ident.name in
+      Md.link ~text:(Md.code name) ~name ()
+    | None ->
+      Md.code "self"
+  in Package.{ self ; ident = href_of_ident names }
+
+let md_param ~kind pp prm =
+  Md.emph kind @ Md.code "::=" @ match prm with
+  | P_value jt -> Package.md_jtype pp jt
+  | P_named _ -> Md.code "{" @ Md.emph (kind ^ "…") @ Md.code "}"
+
+let md_named ~kind pp = function
+  | P_value _ -> []
+  | P_named prms ->
+    let title = String.capitalize_ascii kind in
+    Md.table (Package.md_fields ~title pp prms)
+
+let descr_of_decl names decl =
+  match decl.d_kind with
+  | D_safe _ | D_loose _  | D_order _ -> assert false
+  | D_signal -> []
+  | D_state _ -> [] (* TBC *)
+  | D_value _ -> [] (* TBC *)
+  | D_array _ -> [] (* TBC *)
+  | D_type data ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::=" @ Package.md_jtype pp data)
+  | D_record fields ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::= {" @ Md.emph "fields…" @ Md.code "}") @
+    Md.table (Package.md_fields pp fields)
+  | D_enum tags ->
+    let pp = pp_for ~decl names in
+    Md.quote (pp.self @ Md.code "::=" @ Md.emph "tags…") @
+    Md.table (Package.md_tags tags)
+  | D_request rq ->
+    let pp = pp_for names in
+    Md.quote (md_param ~kind:"input" pp rq.rq_input) @
+    Md.quote (md_param ~kind:"output" pp rq.rq_output) @
+    md_named ~kind:"input" pp rq.rq_input @
+    md_named ~kind:"output" pp rq.rq_output
+
+let declaration page names decl =
+  match decl.d_kind with
+  | D_safe _ | D_loose _ | D_order _ -> ()
+  | _ ->
+    let name = decl.d_ident.name in
+    let fullname = name_of_ident decl.d_ident in
+    let kind = kind_of_decl decl.d_kind in
+    (* let title = Printf.sprintf "`%s` %s" kind fullname in *)
+    let title = Printf.sprintf "%s (`%s`)" fullname kind in
+    let index = [ title ] in
+    let contents = Markdown.par decl.d_descr in
+    let generated () = descr_of_decl names decl in
+    let href = publish ~page ~name ~title ~index ~contents ~generated () in
+    ignore href
+
+let package pkg =
+  begin
+    let page = page_of_package pkg in
+    let names = Package.resolve pkg in
+    List.iter (declaration page names) pkg.p_content ;
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tables of Content                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
 let title_of_chapter = function
-  | `Protocol -> "Server Protocols"
-  | `Kernel -> "Kernel Services"
+  | `Protocol -> "Protocols"
+  | `Kernel -> "Kernel"
   | `Plugin name -> "Plugin " ^ String.capitalize_ascii name
 
 let pages_of_chapter c =
@@ -117,11 +219,12 @@ let pages_of_chapter c =
     (fun _ p -> if p.chapter = c then w := p :: !w) !pages ;
   List.sort (fun p q -> p.order - q.order) !w
 
+let table_of_page p =
+  Md.text (Md.link ~text:(Md.plain p.title) ~page:p.path ())
+
 let table_of_chapter c =
-  [H2 (Markdown.plain (title_of_chapter c), None);
-   Block (list (List.map
-                  (fun p -> text (link ~text:(plain p.title) ~page:p.path ()))
-                  (pages_of_chapter c)))]
+  [Md.H2 (Markdown.plain (title_of_chapter c), None);
+   Md.Block (Md.list (List.map table_of_page (pages_of_chapter c)))]
 
 let table_of_contents () =
   table_of_chapter `Protocol @
@@ -138,7 +241,7 @@ module Cmap = Map.Make
     end)
 
 let index_entry (title,href) =
-  text @@ Markdown.href ~text:(plain title) href
+  Md.text @@ Markdown.href ~text:(Md.plain title) href
 
 let index () =
   let category name =
@@ -159,12 +262,13 @@ let index () =
   begin
     List.fold_left
       (fun elements (c,es) ->
-         let entries = Block (list @@ List.map index_entry es) :: elements in
+         let entries =
+           Md.Block (Md.list @@ List.map index_entry es) :: elements in
          if c = [] then entries
          else
            let cname = String.concat "." c in
            let title = Printf.sprintf "Index of `%s`" cname in
-           H3(plain title,None) :: entries
+           Md.H3(Md.plain title,None) :: entries
       ) [] categories
   end
 
@@ -185,7 +289,7 @@ let link_page page : json list =
 let maindata : json =
   `Assoc [
     "document", `String "Frama-C Server" ;
-    "title",`String "Documentation" ;
+    "title",`String "Presentation" ;
     "root", `String "." ;
   ]
 
@@ -209,7 +313,7 @@ let pp_one_page ~root ~page ~title body =
   try
     let chan = open_out full_path in
     let fmt = Format.formatter_of_out_channel chan in
-    let title = plain title in
+    let title = Md.plain title in
     Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
   with Sys_error e ->
     Senv.fatal "Could not open file %s for writing: %s" full_path e
@@ -222,9 +326,17 @@ let dump ~root ?(meta=true) () =
     Pages.iter
       (fun path page ->
          Senv.feedback "[doc] Page: '%s'" path ;
-         let body = Markdown.subsections page.intro (build [] page.sections) in
          let title = page.title in
-         pp_one_page ~root ~page:path ~title body ;
+         let intro = match page.readme with
+           | None -> Markdown.section ~title page.descr
+           | Some file ->
+             if Sys.file_exists file
+             then Markdown.rawfile file @ page.descr
+             else (Senv.warning "Can not find %S file" file ;
+                   Markdown.section ~title page.descr)
+         in
+         let body = Markdown.subsections page.descr (build [] page.sections) in
+         pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
            let path = Printf.sprintf "%s/%s.json" root path in
            Yojson.Basic.to_file path (metadata page) ;
@@ -234,16 +346,16 @@ let dump ~root ?(meta=true) () =
       let path = Printf.sprintf "%s/readme.md.json" root in
       Yojson.Basic.to_file path maindata ;
       let body =
-        [ H1 (plain "Documentation", None);
-          Block (text (format "Version %s" Fc_config.version))]
+        [ Md.H1 (Md.plain "Presentation", None);
+          Md.Block (Md.text (Md.format "Version %s" Fc_config.version))]
         @
         table_of_contents ()
         @
-        [H2 (plain "Index", None)]
+        [Md.H2 (Md.plain "Index", None)]
         @
         index ()
       in
-      let title = "Documentation" in
+      let title = "Presentation" in
       pp_one_page ~root ~page:"readme.md" ~title body
   end
 
@@ -255,6 +367,7 @@ let () =
         if Sys.file_exists root && Sys.is_directory root then
           begin
             Senv.feedback "[doc] Root: '%s'" root ;
+            Package.iter package ;
             dump ~root () ;
           end
         else

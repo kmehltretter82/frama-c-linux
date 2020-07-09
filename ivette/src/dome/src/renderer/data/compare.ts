@@ -8,6 +8,8 @@
    @module dome/data/compare
 */
 
+import FastCompare from 'react-fast-compare';
+
 /**
    Interface for comparison functions.
    These function shall fullfill the following contract:
@@ -22,11 +24,19 @@ export interface Order<A> {
   (x: A, y: A): number;
 }
 
+/**
+   Deep structural equality.
+   Provided by [react-fast-compare]().
+*/
+export const isEqual = FastCompare;
+
+/** Always returns 0. */
 export function equal(_x: any, _y: any): 0 { return 0; }
 
+/** Primitive comparison works on this type. */
 export type bignum = bigint | number;
 
-/** Non-NaN numbers and big-ints */
+/** Detect Non-NaN numbers and big-ints. */
 export function isBigNum(x: any): x is bignum {
   return typeof (x) === 'bigint' || (typeof (x) === 'number' && !Number.isNaN(x));
 }
@@ -121,8 +131,24 @@ export function array<A>(order: Order<A>): Order<A[]> {
   };
 }
 
+/** Order by dictionary order.
+    Can be used directly with an enum type declaration.
+ */
+export function byEnum<A extends string>(d: { [key: string]: A }): Order<A> {
+  const ranks: { [index: string]: number } = {};
+  const values = Object.keys(d);
+  const wildcard = values.length;
+  values.forEach((C, k) => ranks[C] = k);
+  return (x: A, y: A) => {
+    if (x === y) return 0;
+    const rx = ranks[x] ?? wildcard;
+    const ry = ranks[y] ?? wildcard;
+    return rx - ry;
+  };
+}
+
 /** Order string enumeration constants.
-    `enums(v1,...,vN)` will order constant following the order of arguments.
+    `byRank(v1,...,vN)` will order constant following the order of arguments.
     Non-listed constants appear at the end, or at the rank specified by `'*'`. */
 export function byRank(...args: string[]): Order<string> {
   const ranks: { [index: string]: number } = {};
@@ -157,7 +183,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
 /**
    Maps each field of `A` to some _optional_ comparison of the associated type.
    Hence, `ByFields<{…, f: T, …}>` is `{…, f?: Order<T>, …}`.
-   See [[fields]] comparison function.
+   See [[byFields]] comparison function.
  */
 export type ByFields<A> = {
   [P in keyof A]?: Order<A[P]>;
@@ -166,7 +192,7 @@ export type ByFields<A> = {
 /**
    Maps each field of `A` to some comparison of the associated type.
    Hence, `ByAllFields<{…, f: T, …}>` is `{…, f: Order<T>, …}`.
-   See [[fieldsComplete]] comparison function.
+   See [[byAllFields]] comparison function.
 */
 export type ByAllFields<A> = {
   [P in keyof A]: Order<A[P]>;
@@ -219,6 +245,34 @@ export function byAllFields<A>(order: ByAllFields<A>): Order<A> {
       if (cmp != 0) return cmp;
     }
     return 0;
+  };
+}
+
+export type dict<A> = undefined | null | { [key: string]: A };
+
+/**
+   Compare dictionaries _wrt_ lexicographic order of entries.
+*/
+export function dictionary<A>(order: Order<A>): Order<dict<A>> {
+  return (x: dict<A>, y: dict<A>) => {
+    if (x === y) return 0;
+    const dx = x ?? {};
+    const dy = y ?? {};
+    const phi = option(order);
+    const fs = Object.getOwnPropertyNames(dx).sort();
+    const gs = Object.getOwnPropertyNames(dy).sort();
+    const p = fs.length;
+    const q = gs.length;
+    for (let i = 0, j = 0; i < p && j < q;) {
+      let a = undefined, b = undefined;
+      const f = fs[i];
+      const g = gs[j];
+      if (f <= g) { a = dx[f]; i++; }
+      if (g <= f) { b = dy[g]; j++; }
+      const cmp = phi(a, b);
+      if (cmp != 0) return cmp;
+    }
+    return p - q;
   };
 }
 

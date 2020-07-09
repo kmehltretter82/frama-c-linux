@@ -43,6 +43,7 @@
     "resolveJsonModule": true,                /* Allow to load JSON files as module. */
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+      "api/*": [ "api/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
       "dome": [ "src/dome/src/renderer/dome.js" ],
       "dome/system": [ "src/dome/src/misc/system.js" ],
@@ -71,7 +72,8 @@
     "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "api/**/*"
   ],
   "exclude": [
     "node_modules",
@@ -96,8 +98,8 @@
     "readme": "./README.md",
     "inputFiles": [
       "doc/pages",
-      "src/frama-c",
-      "src/dome/src/renderer"
+      "src/frama-c", "api",
+      "src/dome/src/renderer",
     ]
   }
 }

@@ -125,17 +125,28 @@ let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
 (** {2 Forward transfer functions} *)
 
-(* The three functions below are forward transformers for the mathematical
-   operations +, *, /, and the unary negation -. The potential overflows for the
-   operations on machine integers are taken into account by the functions
-   [truncate_integer] and [rewrap_integer]. *)
+(* Functions [neg_unop], [plus], [mul] and [div] below are forward transformers
+   for the mathematical operations -, +, *, /. The potential overflows and
+   wrappings for the operations on machine integers are taken into account by
+   the functions [truncate_integer] and [rewrap_integer]. *)
 
 let neg_unop v = { v with neg = v.pos; pos = v.neg }
 
-let forward_unop _ op v =
+let bitwise_not typ v =
+  match Cil.unrollType typ with
+  | TInt (ikind, _) | TEnum ({ekind=ikind}, _) ->
+    if Cil.isSigned ikind
+    then { pos = v.neg; neg = v.pos || v.zero; zero = v.neg }
+    else { pos = v.pos || v.zero; neg = false; zero = v.pos }
+  | _ -> top
+
+let logical_not v = { pos = v.zero; neg = false; zero = v.pos || v.neg }
+
+let forward_unop typ op v =
   match op with
   | Neg -> `Value (neg_unop v)
-  | _ -> `Value top
+  | BNot -> `Value (bitwise_not typ v)
+  | LNot -> `Value (logical_not v)
 
 let plus v1 v2 =
   let neg = v1.neg || v2.neg in
@@ -158,12 +169,69 @@ let div v1 v2 =
   let zero = true in (* zero can appear with large enough v2 *)
   { neg; pos; zero }
 
+(* The implementation of the bitwise operators below relies on this table
+   giving the sign of the result according to the sign of both operands.
+
+       v1  v2   v1&v2   v1|v2   v1^v2
+   -----------------------------------
+   |   +   +      +0      +       +0
+   |   +   0      0       +       +
+   |   +   -      +0      -       -
+   |   0   +      0       +       +
+   |   0   0      0       0       0
+   |   0   -      0       -       -
+   |   -   +      +0      -       -
+   |   -   0      0       -       -
+   |   -   -      -       -       +0
+*)
+
+let bitwise_and v1 v2 =
+  let pos = (v1.pos && (v2.pos || v2.neg)) || (v2.pos && v1.neg) in
+  let neg = v1.neg && v2.neg in
+  let zero = v1.zero || v1.pos || v2.zero || v2.pos in
+  { neg; pos; zero }
+
+let bitwise_or v1 v2 =
+  let pos = (v1.pos && (v2.pos || v2.zero)) || (v1.zero && v2.pos) in
+  let neg = v1.neg || v2.neg in
+  let zero = v1.zero && v2.zero in
+  { neg; pos; zero }
+
+let bitwise_xor v1 v2 =
+  let pos =
+    (v1.pos && v2.pos) || (v1.pos && v2.zero) || (v1.zero && v2.pos)
+    || (v1.neg && v2.neg)
+  in
+  let neg =
+    (v1.neg && (v2.pos || v2.zero)) ||
+    (v2.neg && (v1.pos || v1.zero))
+  in
+  let zero = (v1.zero && v2.zero) || (v1.pos && v2.pos) || (v1.neg && v2.neg) in
+  { neg; pos; zero }
+
+let logical_and v1 v2 =
+  let pos = (v1.pos || v1.neg) && (v2.pos || v2.neg) in
+  let neg = false in
+  let zero = v1.zero || v2.zero in
+  { pos; neg; zero }
+
+let logical_or v1 v2 =
+  let pos = v1.pos || v1.neg || v2.pos || v2.neg in
+  let neg = false in
+  let zero = v1.zero && v2.zero in
+  { pos; neg; zero }
+
 let forward_binop _ op v1 v2 =
   match op with
   | PlusA  -> `Value (plus v1 v2)
   | MinusA -> `Value (plus v1 (neg_unop v2))
   | Mult   -> `Value (mul v1 v2)
   | Div    -> if equal zero v2 then `Bottom else `Value (div v1 v2)
+  | BAnd -> `Value (bitwise_and v1 v2)
+  | BOr -> `Value (bitwise_or v1 v2)
+  | BXor -> `Value (bitwise_xor v1 v2)
+  | LAnd -> `Value (logical_and v1 v2)
+  | LOr -> `Value (logical_or v1 v2)
   | _      -> `Value top
 
 let rewrap_integer range v =

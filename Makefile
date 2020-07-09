@@ -911,6 +911,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
 	api/general_requests \
+	utils/unit_tests \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
@@ -2339,7 +2340,29 @@ PTESTS_SRC=ptests/ptests_config.ml ptests/ptests.ml
 # that does not contain a 'tests' dir
 PTESTS_CONFIG:= $(shell if test -d tests; then echo tests/ptests_config; fi)
 
-ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG)
+ifneq ("$(PTESTS_CONFIG)","")
+GENERATED_TESTS:=tests/spec/preprocess_dos.c
+else
+GENERATED_TESTS:=
+endif
+
+tests/spec/preprocess_dos.c: tests/spec/preprocess_dos.c.in \
+                             Makefile share/Makefile.config
+	$(RM) $@
+	$(SED) -e "s|@UNIX2DOS@|$(PP_DOS_UNIX2DOS)|g" \
+               -e "s|@DONTRUN@|$(PP_DOS_DONTRUN)|g" \
+               $< > $@
+	$(CHMOD_RO) $@
+
+ifneq ("$(HAS_UNIX2DOS)","no")
+tests/spec/preprocess_dos.c: PP_DOS_UNIX2DOS=$(UNIX2DOS)
+tests/spec/preprocess_dos.c: PP_DOS_DONTRUN=
+else
+tests/spec/preprocess_dos.c: PP_DOS_UNIX2DOS=unix2dos
+tests/spec/preprocess_dos.c: PP_DOS_DONTRUN=DONTRUN: no unix2dos found
+endif
+
+ptests: bin/ptests.$(OCAMLBEST)$(EXE) $(PTESTS_CONFIG) $(GENERATED_TESTS)
 
 bin/ptests.byte$(EXE): $(PTESTS_SRC)
 	$(PRINT_LINKING) $@
@@ -2351,7 +2374,7 @@ bin/ptests.opt$(EXE): $(PTESTS_SRC)
 	$(OCAMLOPT) -I ptests -dtypes -thread -o $@ \
 	    unix.cmxa threads.cmxa str.cmxa dynlink.cmxa $^
 
-GENERATED+=ptests/ptests_config.ml tests/ptests_config
+GENERATED+=ptests/ptests_config.ml tests/ptests_config $(GENERATED_TESTS)
 
 #######################
 # Source distribution #

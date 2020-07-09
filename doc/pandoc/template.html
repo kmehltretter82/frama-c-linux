@@ -23,7 +23,7 @@
           $if(toc)$
             $for(link)$
               $if(link.toc)$
-                $table-of-contents$
+                <div class="TOC">$table-of-contents$</div>
               $else$
                 <li><a href="$link.href$.html">$link.title$</a></li>
               $endif$

@@ -5,7 +5,7 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 
-import { ArrayModel } from 'dome/table/arrays';
+import { CompactModel } from 'dome/table/arrays';
 import { Table, Column } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -15,20 +15,23 @@ import { Component } from 'frama-c/LabViews';
 // --- Multiple Selection Panel
 // --------------------------------------------------------------------------
 
+type SelectionId = States.Location & { id: number };
+
 const SelectionTable = () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const model = React.useMemo(() => new ArrayModel('id'), []);
-
-  const multiple = selection?.multiple;
+  const model = React.useMemo(() => (
+    new CompactModel<number, SelectionId>(({ id }: SelectionId) => id)
+  ), []);
+  const multiple: States.MultipleSelection = selection?.multiple;
   const numblerOfSelections = multiple?.allSelections?.length;
 
   // Updates [[model]] with the current multiple selection.
   React.useEffect(() => {
     if (numblerOfSelections > 0) {
-      const array = multiple.allSelections.map((d, i) => ({ ...d, id: i }));
-      model.replace(array);
+      const array: SelectionId[] = multiple.allSelections.map((d, i) => ({ ...d, id: i }));
+
     } else
       model.clear();
   }, [numblerOfSelections, multiple, model]);

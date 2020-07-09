@@ -21,58 +21,57 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(** JSON Encoding Documentation *)
+(** Server Documentation *)
 (* -------------------------------------------------------------------------- *)
 
-type t
+open Markdown
 
-val text : t -> Markdown.text
+(** The main chapters of the documentation. *)
+type chapter = [ `Protocol | `Kernel | `Plugin of string ]
 
-(** The provided synopsis must be very short, to fit in one line.
-    Extended definition, like record fields and such, must be detailed in
-    the description block. *)
+(** A page of the server documentation. *)
+type page
+
+val path : page -> string
+val href : page -> string -> href
+val chapter : page -> chapter
+
+(** Obtain the given page in the server documentation.
+
+    The readme introductory section is
+    read from the share directory:
+    - [frama-c/share/<filename>] server and kernel pages,
+    - [frama-c/share/<plugin>/server/<filename>] for plugin's pages.
+*)
+val page : chapter ->
+  title:string ->
+  ?descr:elements ->
+  ?readme:string ->
+  filename:string ->
+  unit ->page
+
+(** Adds a section in the corresponding page.
+    Returns an href to the published section.
+    If index items are provided, they are added to the server documentation
+    index.
+*)
 val publish :
-  page:Doc.page -> name:string -> descr:Markdown.text ->
-  synopsis:t ->
-  ?details:Markdown.elements ->
+  page:page ->
+  ?name:string ->
+  ?index:string list ->
+  title:string ->
+  ?contents:Markdown.elements ->
   ?generated:(unit -> Markdown.elements) ->
-  unit -> t
+  unit -> Markdown.href
 
-val unit : t
-val any : t
-val int : t (* small, non-decimal, number *)
-val ident : t (* integer of string *)
-val string : t
-val number : t
-val boolean : t
+(** Publish a protocole. *)
+val protocole : title:string -> readme:string -> unit
 
-val tag : string -> t
-val array : t -> t
-val tuple : t list -> t
-val union : t list -> t
-val option : t -> t
-val record : (string * t) list -> t
-val data : string -> Markdown.href -> t
+(** Publish a package. *)
+val package : Package.packageInfo -> unit
 
-type tag = {
-  tag_name : string ;
-  tag_label : Markdown.text ;
-  tag_descr : Markdown.text ;
-}
-
-(** Syntactic definition: LEFT := RIGHT *)
-val define : Markdown.text -> Markdown.text -> Markdown.block_element
-
-(** Builds a table with tags description.
-    The [~title] is applied to the tag name column
-    (shall be capitalized, defaults to ["Tag"]). *)
-val tags : ?title:string -> tag list -> Markdown.element
-
-type field = { fd_name : string ; fd_syntax : t ; fd_descr : Markdown.text }
-
-(** Builds a table with fields description.
-    The [~title] is applied to the field name column
-    (shall be capitalized, defaults to ["Field"]). *)
-val fields : ?title:string -> field list -> Markdown.element
+(** Dumps all published pages of documentations. Unless [~meta:false], also
+    generates METADATA for each page in [<filename>.json] for each page. *)
+val dump : root:string -> ?meta:bool -> unit -> unit
 
 (* -------------------------------------------------------------------------- *)

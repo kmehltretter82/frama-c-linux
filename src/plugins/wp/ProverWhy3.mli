@@ -30,14 +30,4 @@ val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
   Wpo.t -> VCS.result Task.task
 (** Return NoResult if it is already proved by Qed *)
 
-type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
-
-val set_mode : mode -> unit
-val get_mode : unit -> mode
-val get_hits : unit -> int
-val get_miss : unit -> int
-val get_removed : unit -> int
-
-val cleanup_cache : mode:mode -> unit
-
 (**************************************************************************)

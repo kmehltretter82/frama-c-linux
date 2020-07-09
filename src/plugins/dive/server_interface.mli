@@ -20,4 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Variable : Server.Data.S_collection with type t = Cil_types.varinfo
+module Variable : Server.Data.S with type t = Cil_types.varinfo
