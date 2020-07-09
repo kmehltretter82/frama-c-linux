@@ -37,7 +37,7 @@ type jtype =
   | Jkey of string (** kind of a string used for indexing *)
   | Jindex of string (** kind of an integer used for indexing *)
   | Joption of jtype
-  | Jdict of string * jtype (** kind of keys *)
+  | Jdict of jtype (** dictionaries *)
   | Jlist of jtype (** order does not matter *)
   | Jarray of jtype (** order matters *)
   | Jtuple of jtype list

@@ -169,7 +169,7 @@ type jtype =
   | Jkey of string (* kind of a string used for indexing *)
   | Jindex of string (* kind of an integer used for indexing *)
   | Joption of jtype
-  | Jdict of string * jtype (* kind of keys *)
+  | Jdict of jtype (* dictionaries *)
   | Jlist of jtype (* order does not matter *)
   | Jarray of jtype (* order matters *)
   | Jtuple of jtype list
@@ -290,14 +290,14 @@ let rec isRecursive = function
   | Jdata _ | Jenum _
   | Jany | Jnull | Jboolean | Jnumber
   | Jstring | Jalpha | Jkey _ | Jindex _ -> false
-  | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> isRecursive js
+  | Joption js | Jdict js  | Jarray js | Jlist js -> isRecursive js
   | Jtuple js | Junion js -> List.exists isRecursive js
   | Jrecord fjs -> List.exists (fun (_,js) -> isRecursive js) fjs
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
   | Jstring | Jalpha | Jkey _ | Jindex _ -> ()
-  | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
+  | Joption js | Jdict js  | Jarray js | Jlist js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
   | Jdata id | Jenum id ->
@@ -469,8 +469,8 @@ let rec md_jtype pp = function
   | Junion js -> md_jlist pp "|" js
   | Jarray js | Jlist js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
-  | Jdict (id,js) ->
-    Md.code "{[" @ key id @ Md.code "]:" @ md_jtype pp js @ Md.code "}"
+  | Jdict js ->
+    Md.code "{[key]:" @ md_jtype pp js @ Md.code "}"
 
 and md_jlist pp sep js =
   Md.glue ~sep:(Md.plain sep)  (List.map (md_jtype pp) js)

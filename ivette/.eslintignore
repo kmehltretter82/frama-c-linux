@@ -11,4 +11,3 @@ src/api
 # lint Dome step by step
 src/dome/src/renderer/layout
 src/dome/src/renderer/table
-src/dome/src/renderer/data
