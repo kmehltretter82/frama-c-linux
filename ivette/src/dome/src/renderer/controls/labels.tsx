@@ -8,6 +8,7 @@
 */
 
 import React from 'react';
+import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
 import './style.css';
 
@@ -34,14 +35,17 @@ export interface LabelProps {
 
 const makeLabel = (className: string, props: LabelProps) => {
   const { display = true } = props;
-  const allClasses =
-    className +
-    (display ? ' ' : ' dome-control-erased ') +
-    (props.className || '');
+  const allClasses = classes(
+    className,
+    !display && 'dome-control-erased',
+    props.className,
+  );
   return (
-    <label className={allClasses}
+    <label
+      className={allClasses}
       title={props.title}
-      style={props.style} >
+      style={props.style}
+    >
       {props.icon && <Icon title={props.title} id={props.icon} />}
       {props.label}
       {props.children}
@@ -53,11 +57,11 @@ const makeLabel = (className: string, props: LabelProps) => {
 // --- CSS Classes
 // --------------------------------------------------------------------------
 
-const LABEL = "dome-xLabel dome-text-label";
-const TITLE = "dome-xLabel dome-text-title";
-const DESCR = "dome-xLabel dome-text-descr";
-const TDATA = "dome-xLabel dome-text-data";
-const TCODE = "dome-xLabel dome-text-code";
+const LABEL = 'dome-xLabel dome-text-label';
+const TITLE = 'dome-xLabel dome-text-title';
+const DESCR = 'dome-xLabel dome-text-descr';
+const TDATA = 'dome-xLabel dome-text-data';
+const TCODE = 'dome-xLabel dome-text-code';
 
 // --------------------------------------------------------------------------
 // --- Components

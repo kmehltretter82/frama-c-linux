@@ -12,11 +12,12 @@
 
 import _ from 'lodash';
 import React from 'react';
+import { classes } from 'dome/misc/utils';
 import Gallery from './gallery.json';
 import './style.css';
 
-/*@ internal */
-const Icons: { [id: string]: { viewBox?: string, path: string } } = Gallery;
+/* @ internal */
+const Icons: { [id: string]: { viewBox?: string; path: string } } = Gallery;
 
 // --------------------------------------------------------------------------
 // --- Raw SVG element
@@ -48,9 +49,9 @@ export function SVG(props: SVGprops): null | JSX.Element {
   const {
     title,
     size = 12,
-    offset = _.floor(- size * 0.125),
+    offset = _.floor(-size * 0.125),
   } = props;
-  const { path, viewBox = "0 0 24 24" } = icon;
+  const { path, viewBox = '0 0 24 24' } = icon;
   return (
     <svg
       height={size}
@@ -77,7 +78,7 @@ export interface IconProps extends SVGprops {
   /** Fill style property. */
   fill?: string;
   /** Click callback. */
-  onClick?: (event?: React.MouseEvent) => void;
+  onClick?: (event?: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 /**
@@ -85,8 +86,11 @@ export interface IconProps extends SVGprops {
    Consult the [Icon Gallery](../guides/icons.md.html) for default icons.
  */
 export function Icon(props: IconProps) {
-  const { id, title, onClick, fill, size, className = '', offset, style } = props;
-  const divClass = 'dome-xIcon ' + className;
+  const {
+    id, title, onClick, fill,
+    size, className = '', offset, style,
+  } = props;
+  const divClass = classes('dome-xIcon', className);
   const divStyle = fill ? { fill, ...style } : style;
   return (
     <div
@@ -130,13 +134,16 @@ export function Badge(props: BadgeProps) {
   } else {
     const style =
       (typeof (value) === 'number' && value < 10) ||
-        (typeof (value) === 'string' && value.length == 1) ?
+        (typeof (value) === 'string' && value.length === 1) ?
         { paddingLeft: 2, paddingRight: 2 } : {};
-    content = <label style={style} className='dome-text-label'>{value}</label>;
+    content = <label style={style} className="dome-text-label">{value}</label>;
   }
   return (
-    <div className="dome-xBadge"
-      title={title} onClick={onClick}>
+    <div
+      className="dome-xBadge"
+      title={title}
+      onClick={onClick}
+    >
       {content}
     </div>
   );
@@ -169,10 +176,11 @@ export function register(icon: CustomIcon) {
    See [[register]] to add custom icons to the gallery.
  */
 export function forEach(fn: (ico: CustomIcon) => void) {
-  for (let id in Icons) {
+  const ids = Object.keys(Icons);
+  ids.forEach((id) => {
     const jsicon = Icons[id];
     fn({ id, ...jsicon });
-  }
+  });
 }
 
 // --------------------------------------------------------------------------
