@@ -979,7 +979,7 @@ static void unset_heap_segment(void *ptr, int init, const char *function) {
   /* Nullify shadow block */
   memset(base_shadow, ZERO, alloc_size);
   /* Adjust tracked allocation size */
-  heap_allocation_size -= length;
+  update_heap_allocation(-length);
 #ifdef E_ACSL_TEMPORAL /*{{{*/
   /* Nullify temporal shadow */
   uintptr_t *t_base_shadow = (uintptr_t*)TEMPORAL_HEAP_SHADOW(ptr);
