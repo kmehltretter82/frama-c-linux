@@ -27,7 +27,7 @@ const ColumnCallstack = () => Column({
   render: (cs: Eva.callstack) => <Label label={cs.short} title={cs.full} />,
 });
 
-const ColumnAlarm = () => Column({
+const ColumnAlarm = (props: { visible: boolean }) => Column({
   id: 'alarm',
   label: 'Alarm',
   title: 'Did the evaluation emit an alarm?',
@@ -35,6 +35,7 @@ const ColumnAlarm = () => Column({
   width: 26,
   fixed: true,
   icon: 'WARNING',
+  visible: props.visible,
   render: (alarm: boolean) => <>{alarm && <Icon id="ATTENTION" />}</>,
 });
 
@@ -54,8 +55,9 @@ const Values = () => {
   const t = States.useRequest(Eva.getValues, selectMarker);
   const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
   const [name, setName] = React.useState<string | undefined>(undefined);
+  const [alarmOccurred, setAlarmOccurred] = React.useState(false);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (selectMarker && evaValues) {
       model.removeAllData();
       const selectMarkerInfo = markerInfo.find((e) => e.key === selectMarker);
@@ -65,17 +67,21 @@ const Values = () => {
           case 'lvalue':
             setName(selectMarkerInfo.descr);
             evaValues.forEach((i) => model.setData(i.key, i));
+            setAlarmOccurred(evaValues.some((e) => e.alarm));
             break;
           case 'declaration':
             setName(selectMarkerInfo.name);
             evaValues.forEach((i) => model.setData(i.key, i));
+            setAlarmOccurred(evaValues.some((e) => e.alarm));
             break;
           default:
             setName(undefined);
+            setAlarmOccurred(false);
         }
       }
     } else {
       setName(undefined);
+      setAlarmOccurred(false);
     }
     model.reload();
   }, [model, evaValues, t, selectMarker, markerInfo]);
@@ -93,7 +99,7 @@ const Values = () => {
           disableSort
           fill
         />
-        <ColumnAlarm />
+        <ColumnAlarm visible={alarmOccurred} />
         <Column
           id="value_after"
           visible={!!name}
