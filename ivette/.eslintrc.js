@@ -81,5 +81,13 @@ module.exports = {
     "react/destructuring-assignment": "off",
     // Allow console errors and warnings
     "no-console": ["error", { allow: ["warn", "error"] }],
+    // Disable accessibility rules
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-autofocus": "off",
+    // Completely broken rule
+    "react/prop-types": "off",
   }
 };
