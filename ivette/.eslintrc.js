@@ -55,6 +55,8 @@ module.exports = {
     "padded-blocks": "off",
     // Allow braces on their own line
     "@typescript-eslint/brace-style": "off",
+    // Already has built-in compiler checks in TSC for that
+    "@typescript-eslint/no-unused-vars": "off",
     // Allow range conditions such as 0 <= x && x < 10
     "yoda": [2, "never", { "onlyEquality": true }],
     // Allow single command on new line after 'if' statement
@@ -89,5 +91,12 @@ module.exports = {
     "jsx-a11y/no-autofocus": "off",
     // Completely broken rule
     "react/prop-types": "off",
+    // Enable ++ and --
+    "no-plusplus": "off",
+    // Enable nested ternary operations
+    "no-nested-ternary": "off",
+    // Checked by TSC compiler
+    "default-case": "off",
+    "consistent-return": "off",
   }
 };

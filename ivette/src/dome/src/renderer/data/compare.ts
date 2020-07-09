@@ -13,7 +13,7 @@ import FastCompare from 'react-fast-compare';
 /**
    Interface for comparison functions.
    These function shall fullfill the following contract:
-   - `compare(x,y) == 0` shall be an equivalence relation
+   - `compare(x,y) === 0` shall be an equivalence relation
      (reflexive, symmetric, transitive)
    - `compare(x,y) <= 0` shall be a complete order
      (reflexive, antisymetric, transitive)
@@ -38,7 +38,10 @@ export type bignum = bigint | number;
 
 /** Detect Non-NaN numbers and big-ints. */
 export function isBigNum(x: any): x is bignum {
-  return typeof (x) === 'bigint' || (typeof (x) === 'number' && !Number.isNaN(x));
+  return (
+    (typeof (x) === 'bigint') ||
+    (typeof (x) === 'number' && !Number.isNaN(x))
+  );
 }
 
 /** @internal */
@@ -88,17 +91,18 @@ export function number(x: number, y: number) {
 */
 export function alpha(x: string, y: string) {
   const cmp = primitive(x.toLowerCase(), y.toLowerCase());
-  return cmp != 0 ? cmp : primitive(x, y);
+  return cmp !== 0 ? cmp : primitive(x, y);
 }
 
 /** Combine comparison orders in sequence. */
 export function sequence<A>(...orders: (Order<A> | undefined)[]): Order<A> {
   return (x: A, y: A) => {
     if (x === y) return 0;
-    for (const order of orders) {
+    for (let k = 0; k < orders.length; k++) {
+      const order = orders[k];
       if (order) {
         const cmp = order(x, y);
-        if (cmp != 0) return cmp;
+        if (cmp !== 0) return cmp;
       }
     }
     return 0;
@@ -108,9 +112,9 @@ export function sequence<A>(...orders: (Order<A> | undefined)[]): Order<A> {
 /** Compare optional values. Undefined values come first. */
 export function option<A>(order: Order<A>): Order<undefined | A> {
   return (x?: A, y?: A) => {
-    if (x == undefined && y == undefined) return 0;
-    if (x == undefined) return -1;
-    if (y == undefined) return 1;
+    if (x === undefined && y === undefined) return 0;
+    if (x === undefined) return -1;
+    if (y === undefined) return 1;
     return order(x, y);
   };
 }
@@ -118,9 +122,9 @@ export function option<A>(order: Order<A>): Order<undefined | A> {
 /** Compare optional values. Undefined values come last. */
 export function defined<A>(order: Order<A>): Order<undefined | A> {
   return (x?: A, y?: A) => {
-    if (x == undefined && y == undefined) return 0;
-    if (x == undefined) return 1;
-    if (y == undefined) return -1;
+    if (x === undefined && y === undefined) return 0;
+    if (x === undefined) return 1;
+    if (y === undefined) return -1;
     return order(x, y);
   };
 }
@@ -134,7 +138,7 @@ export function array<A>(order: Order<A>): Order<A[]> {
     const m = p < q ? p : q;
     for (let k = 0; k < m; k++) {
       const cmp = order(x[k], y[k]);
-      if (cmp != 0) return cmp;
+      if (cmp !== 0) return cmp;
     }
     return p - q;
   };
@@ -143,11 +147,13 @@ export function array<A>(order: Order<A>): Order<A[]> {
 /** Order by dictionary order.
     Can be used directly with an enum type declaration.
  */
-export function byEnum<A extends string>(d: { [key: string]: A }): Order<A> {
+export function byEnum<A extends string>(
+  d: { [key: string]: A },
+): Order<A> {
   const ranks: { [index: string]: number } = {};
   const values = Object.keys(d);
   const wildcard = values.length;
-  values.forEach((C, k) => ranks[C] = k);
+  values.forEach((C, k) => { ranks[C] = k; });
   return (x: A, y: A) => {
     if (x === y) return 0;
     const rx = ranks[x] ?? wildcard;
@@ -157,20 +163,21 @@ export function byEnum<A extends string>(d: { [key: string]: A }): Order<A> {
 }
 
 /** Order string enumeration constants.
-    `byRank(v1,...,vN)` will order constant following the order of arguments.
-    Non-listed constants appear at the end, or at the rank specified by `'*'`. */
+    `byRank(v1,...,vN)` will order constant following the
+    order of arguments.
+    Non-listed constants appear at the end, or at the rank
+    specified by `'*'`. */
 export function byRank(...args: string[]): Order<string> {
   const ranks: { [index: string]: number } = {};
-  args.forEach((C, k) => ranks[C] = k);
+  args.forEach((C, k) => { ranks[C] = k; });
   const wildcard = ranks['*'] ?? ranks.length;
   return (x: string, y: string) => {
     if (x === y) return 0;
     const rx = ranks[x] ?? wildcard;
     const ry = ranks[y] ?? wildcard;
-    if (rx == wildcard && ry == wildcard)
+    if (rx === wildcard && ry === wildcard)
       return primitive(x, y);
-    else
-      return rx - ry;
+    return rx - ry;
   };
 }
 
@@ -196,7 +203,7 @@ export function getKeys<T>(a: T): (keyof T)[] {
  */
 export type ByFields<A> = {
   [P in keyof A]?: Order<A[P]>;
-}
+};
 
 /**
    Maps each field of `A` to some comparison of the associated type.
@@ -205,36 +212,39 @@ export type ByFields<A> = {
 */
 export type ByAllFields<A> = {
   [P in keyof A]: Order<A[P]>;
-}
+};
 
-/** Object comparison by (some) fields.
+/**
+   Object comparison by (some) fields.
 
-    Compare objects field by field, using the comparison orders provided by the
-    `order` argument. Order of field comparison is taken from the `order`
-    argument, not from the compared values.
+   Compare objects field by field, using the comparison orders provided by the
+   `order` argument. Order of field comparison is taken from the `order`
+   argument, not from the compared values.
 
-    You may not compare _all_ fields of the compared values.  For optional
-    fields, you shall provide a comparison function compatible with type
-    `undefined`.
+   You may not compare _all_ fields of the compared values.  For optional
+   fields, you shall provide a comparison function compatible with type
+   `undefined`.
 
-    It might be difficult for Typescript to typecheck `byFields(…)` expressions
-    when dealing with optional types. In such cases, you shall use `byFields<A>(…)`
-    and explicitly mention the type of compared values.
+   It might be difficult for Typescript to typecheck `byFields(…)` expressions
+   when dealing with optional types. In such cases, you shall use
+   `byFields<A>(…)` and explicitly mention the type of compared values.
 
-    Example:
+   Example:
 
-        type foo = { id: number, name?: string, descr?: string }
-        const compare = fields<foo>({ id: number, name: option(alpha) });
+   *   type foo = { id: number, name?: string, descr?: string }
+   *   const compare = fields<foo>({ id: number, name: option(alpha) });
 
 */
 export function byFields<A>(order: ByFields<A>): Order<A> {
   return (x: A, y: A) => {
     if (x === y) return 0;
-    for (const fd of getKeys(order)) {
+    const fds = getKeys(order);
+    for (let k = 0; k < fds.length; k++) {
+      const fd = fds[k];
       const byFd = order[fd];
       if (byFd !== undefined) {
         const cmp = byFd(x[fd], y[fd]);
-        if (cmp != 0) return cmp;
+        if (cmp !== 0) return cmp;
       }
     }
     return 0;
@@ -248,10 +258,12 @@ export function byFields<A>(order: ByFields<A>): Order<A> {
 export function byAllFields<A>(order: ByAllFields<A>): Order<A> {
   return (x: A, y: A) => {
     if (x === y) return 0;
-    for (const fd of getKeys<ByFields<A>>(order)) {
+    const fds = getKeys<ByFields<A>>(order);
+    for (let k = 0; k < fds.length; k++) {
+      const fd = fds[k];
       const byFd = order[fd];
       const cmp = byFd(x[fd], y[fd]);
-      if (cmp != 0) return cmp;
+      if (cmp !== 0) return cmp;
     }
     return 0;
   };
@@ -273,13 +285,14 @@ export function dictionary<A>(order: Order<A>): Order<dict<A>> {
     const p = fs.length;
     const q = gs.length;
     for (let i = 0, j = 0; i < p && j < q;) {
-      let a = undefined, b = undefined;
+      let a;
+      let b;
       const f = fs[i];
       const g = gs[j];
       if (f <= g) { a = dx[f]; i++; }
       if (g <= f) { b = dy[g]; j++; }
       const cmp = phi(a, b);
-      if (cmp != 0) return cmp;
+      if (cmp !== 0) return cmp;
     }
     return p - q;
   };
@@ -292,7 +305,7 @@ export function pair<A, B>(ordA: Order<A>, ordB: Order<B>): Order<[A, B]> {
     const [x1, y1] = u;
     const [x2, y2] = v;
     const cmp = ordA(x1, x2);
-    return cmp != 0 ? cmp : ordB(y1, y2);
+    return cmp !== 0 ? cmp : ordB(y1, y2);
   };
 }
 
@@ -307,9 +320,9 @@ export function triple<A, B, C>(
     const [x1, y1, z1] = u;
     const [x2, y2, z2] = v;
     const cmp1 = ordA(x1, x2);
-    if (cmp1 != 0) return cmp1;
+    if (cmp1 !== 0) return cmp1;
     const cmp2 = ordB(y1, y2);
-    if (cmp2 != 0) return cmp2;
+    if (cmp2 !== 0) return cmp2;
     return ordC(z1, z2);
   };
 }
@@ -326,11 +339,11 @@ export function tuple4<A, B, C, D>(
     const [x1, y1, z1, t1] = u;
     const [x2, y2, z2, t2] = v;
     const cmp1 = ordA(x1, x2);
-    if (cmp1 != 0) return cmp1;
+    if (cmp1 !== 0) return cmp1;
     const cmp2 = ordB(y1, y2);
-    if (cmp2 != 0) return cmp2;
+    if (cmp2 !== 0) return cmp2;
     const cmp3 = ordC(z1, z2);
-    if (cmp3 != 0) return cmp3;
+    if (cmp3 !== 0) return cmp3;
     return ordD(t1, t2);
   };
 }
@@ -348,13 +361,13 @@ export function tuple5<A, B, C, D, E>(
     const [x1, y1, z1, t1, w1] = u;
     const [x2, y2, z2, t2, w2] = v;
     const cmp1 = ordA(x1, x2);
-    if (cmp1 != 0) return cmp1;
+    if (cmp1 !== 0) return cmp1;
     const cmp2 = ordB(y1, y2);
-    if (cmp2 != 0) return cmp2;
+    if (cmp2 !== 0) return cmp2;
     const cmp3 = ordC(z1, z2);
-    if (cmp3 != 0) return cmp3;
+    if (cmp3 !== 0) return cmp3;
     const cmp4 = ordD(t1, t2);
-    if (cmp4 != 0) return cmp4;
+    if (cmp4 !== 0) return cmp4;
     return ordE(w1, w2);
   };
 }
@@ -364,11 +377,16 @@ export function tuple5<A, B, C, D, E>(
 // --------------------------------------------------------------------------
 
 /** @internal */
-enum RANK { UNDEFINED, BOOLEAN, SYMBOL, NAN, BIGNUM, STRING, ARRAY, OBJECT, FUNCTION };
+enum RANK {
+  UNDEFINED,
+  BOOLEAN, SYMBOL, NAN, BIGNUM,
+  STRING,
+  ARRAY, OBJECT, FUNCTION
+}
 
 /** @internal */
 function rank(x: any): RANK {
-  let t = typeof x;
+  const t = typeof x;
   switch (t) {
     case 'undefined': return RANK.UNDEFINED;
     case 'boolean': return RANK.BOOLEAN;
@@ -378,14 +396,16 @@ function rank(x: any): RANK {
     case 'bigint':
       return RANK.BIGNUM;
     case 'string': return RANK.STRING;
-    case 'object': return Array.isArray(x) ? RANK.ARRAY : RANK.OBJECT;
     case 'function': return RANK.FUNCTION;
+    case 'object':
+      return Array.isArray(x) ? RANK.ARRAY : RANK.OBJECT;
   }
 }
 
 /**
    Universal structural comparison.
-   Values are ordered by _rank_, each being associated with some type of values:
+   Values are ordered by _rank_, each being
+   associated with some type of values:
    1. undefined values;
    2. booleans;
    3. symbols;
@@ -398,10 +418,9 @@ function rank(x: any): RANK {
    For values of same primitive type, primitive ordering is performed.
 
    For array values, lexicographic ordering is performed.
-
-   For object values, lexicographic ordering is performed over their properties:
-   properties are ordered by name, and recursive structural ordering is performed
-   on property values.
+   For object values, lexicographic ordering is performed over their
+   properties: they are ordered by name, and recursive structural
+   ordering is performed on property values.
 
    All functions are compared equal.
  */
@@ -418,17 +437,18 @@ export function structural(x: any, y: any): number {
     const p = fs.length;
     const q = gs.length;
     for (let i = 0, j = 0; i < p && j < q;) {
-      let a = undefined, b = undefined;
+      let a;
+      let b;
       const f = fs[i];
       const g = gs[j];
       if (f <= g) { a = x[f]; i++; }
       if (g <= f) { b = y[g]; j++; }
       const cmp = structural(a, b);
-      if (cmp != 0) return cmp;
+      if (cmp !== 0) return cmp;
     }
     return p - q;
   }
   return rank(x) - rank(y);
-};
+}
 
 // --------------------------------------------------------------------------
