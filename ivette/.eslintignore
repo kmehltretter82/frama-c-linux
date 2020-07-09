@@ -7,4 +7,4 @@ coverage
 # don't lint tsc output, if any
 lib
 # don't lint the generated API
-src/api
+api
