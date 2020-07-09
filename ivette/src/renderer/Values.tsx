@@ -52,10 +52,12 @@ const Values = () => {
 
   const evaValues = States.useSyncArray(Eva.values).getArray();
   const selectMarker = States.useSelection()[0]?.current?.marker;
-  const t = States.useRequest(Eva.getValues, selectMarker);
   const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
   const [name, setName] = React.useState<string | undefined>(undefined);
   const [alarmOccurred, setAlarmOccurred] = React.useState(false);
+  const [unchanged, setUnchanged] = React.useState(false);
+
+  States.useRequest(Eva.getValues, selectMarker);
 
   React.useLayoutEffect(() => {
     if (selectMarker && evaValues) {
@@ -65,26 +67,30 @@ const Values = () => {
         switch (selectMarkerInfo.kind) {
           case 'expression':
           case 'lvalue':
-            setName(selectMarkerInfo.descr);
             evaValues.forEach((i) => model.setData(i.key, i));
+            setName(selectMarkerInfo.descr);
             setAlarmOccurred(evaValues.some((e) => e.alarm));
+            setUnchanged(evaValues.some((e) => e.value_after === 'unchanged'));
             break;
           case 'declaration':
-            setName(selectMarkerInfo.name);
             evaValues.forEach((i) => model.setData(i.key, i));
+            setName(selectMarkerInfo.name);
             setAlarmOccurred(evaValues.some((e) => e.alarm));
+            setUnchanged(evaValues.some((e) => e.value_after === 'unchanged'));
             break;
           default:
             setName(undefined);
             setAlarmOccurred(false);
+            setUnchanged(false);
         }
       }
+      model.reload();
     } else {
       setName(undefined);
       setAlarmOccurred(false);
+      setUnchanged(false);
     }
-    model.reload();
-  }, [model, evaValues, t, selectMarker, markerInfo]);
+  }, [evaValues, selectMarker, markerInfo, model]);
 
   // Component
   return (
@@ -102,7 +108,7 @@ const Values = () => {
         <ColumnAlarm visible={alarmOccurred} />
         <Column
           id="value_after"
-          visible={!!name}
+          visible={!!name && !unchanged}
           label={name && `${name} (after)`}
           title="Values inferred by Eva just after the selected point"
           disableSort
