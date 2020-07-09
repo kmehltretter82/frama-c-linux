@@ -34,6 +34,7 @@ type jtype =
   | Jnumber
   | Jstring
   | Jalpha (** string primarily compared without case *)
+  | Jtag of string (** single constant string *)
   | Jkey of string (** kind of a string used for indexing *)
   | Jindex of string (** kind of an integer used for indexing *)
   | Joption of jtype
@@ -222,7 +223,8 @@ type pp = {
   ident: ident -> Markdown.text ;
 }
 
-val escaped : string -> Markdown.text
+(** Quoted string *)
+val litteral : string -> Markdown.text
 
 val md_jtype : pp -> jtype -> Markdown.text
 val md_tags : ?title:string -> tagInfo list -> Markdown.table
