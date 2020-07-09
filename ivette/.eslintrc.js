@@ -98,5 +98,7 @@ module.exports = {
     // Checked by TSC compiler
     "default-case": "off",
     "consistent-return": "off",
+    // Allow modify properties of object passed in parameter
+    "no-param-reassign": [ "error", { "props": false } ],
   }
 };

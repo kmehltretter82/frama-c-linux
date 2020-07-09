@@ -100,7 +100,8 @@ export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
    individual updates.
 
    The model might not hold the entire collection of data at the same time, but
-   serves as a proxy for fetching data on demand. A model makes a distinction between:
+   serves as a proxy for fetching data on demand. A model makes a distinction
+   between:
    - `Key`: a key identifies a given entry in the table at any time;
    - `Row`: the row data associated to some `Key` at a given time;
 
@@ -115,10 +116,13 @@ export function forEach<A>(data: Collection<A>, fn: (elt: A) => void) {
 
    When your data change over time, you shall invoke the following methods
    of the model to keep views in sync:
-   - [[update]] or [[updateIndex]] when single or contiguous row data changes over time;
-   - [[reload]] when the number of rows, their ordering, or (many) row data has been changed.
+   - [[update]] or [[updateIndex]] when single or contiguous row data
+   changes over time;
+   - [[reload]] when the number of rows, their ordering, or (many) row data
+   has been changed.
 
-   It is always safe to use `reload` instead of `update` although it might be less performant.
+   It is always safe to use `reload` instead of `update` although it might be
+   less performant.
 
    @template Key - identification of some entry
    @template Row - dynamic row data associated to some key
@@ -139,16 +143,16 @@ export abstract class Model<Key, Row> {
   abstract getRowCount(): number;
 
   /**
-     Shall return the current row data at a given index in the table, with respect to
-     current filtering and ordering (if any).
-     Might return `undefined` if the index is invalid or not (yet) available.
+     Shall return the current row data at a given index in the table, with
+     respect to current filtering and ordering (if any).  Might return
+     `undefined` if the index is invalid or not (yet) available.
   */
   abstract getRowAt(index: number): undefined | Row;
 
   /**
-     Shall return the key at the given index. The specified index and data
-     are those of the last corresponding call to [[getRowAt]].
-     Might return `undefined` if the index is invalid.
+     Shall return the key at the given index. The specified index and data are
+     those of the last corresponding call to [[getRowAt]].  Might return
+     `undefined` if the index is invalid.
   */
   abstract getKeyAt(index: number): undefined | Key;
 
@@ -160,11 +164,12 @@ export abstract class Model<Key, Row> {
   abstract getKeyFor(index: number, data: Row): undefined | Key;
 
   /**
-     Shall return the index of a given entry in the table, identified by its key, with
-     respect to current filtering and ordering (if any).
-     Shall return `undefined` if the specified key no longer belong to the table or
-     when it is currently filtered out.
-     Out-of-range indices would be treated as `undefined`.
+     Shall return the index of a given entry in the table, identified by its
+     key, with respect to current filtering and ordering (if any).
+     Shall return
+     `undefined` if the specified key no longer belong to the table or when it
+     is currently filtered out.  Out-of-range indices would be treated as
+     `undefined`.
   */
   abstract getIndexOf(key: Key): undefined | number;
 
@@ -205,8 +210,10 @@ export abstract class Model<Key, Row> {
      The initial watching range is empty with no trigger.
      You normally never call this method directly.
      It is automatically called by table views.
-     @param onReload - optional callback for reloads (and updates, unless specified)
-     @param onUpdate - optional callback for updates (when different from reloads)
+     @param onReload - optional callback for reloads
+     (and updates, unless specified)
+     @param onUpdate - optional callback for updates
+     (when different from reloads)
   */
   link(onReload?: Trigger, onUpdate?: Trigger): Client {
     const id = this.clientsId++;
@@ -222,7 +229,7 @@ export abstract class Model<Key, Row> {
       watch(lower: number, upper: number) {
         w.lower = lower;
         w.upper = upper;
-      }
+      },
     };
     m.set(id, w);
     return w;
