@@ -332,18 +332,21 @@ struct
     if s.published then
       raise (Invalid_argument "Server.Data.Record: already published")
 
-  let is_valid_field_name s name =
-    if List.exists (fun f -> String.equal f.Package.fd_name name) s.fields then
-      raise (Invalid_argument ("Server.Data.Record: a field with name '" ^ name
-                               ^ "' already exists")) ;
-    if not (Str.string_match (Str.regexp "[a-zA-Z0-9 _-]+$") name 0) then
-      raise (Invalid_argument ("Server.Data.Record: field names must not be \
-                                exotic ('" ^ name ^ "')"))
+  let check_field_name s name =
+    begin
+      if List.exists (fun f -> f.Package.fd_name = name) s.fields then
+        (let msg = Printf.sprintf "Server.Data.Record: duplicate field %S" name
+         in raise (Invalid_argument msg));
+      if not (Str.string_match (Str.regexp "[a-zA-Z0-9 _-]+$") name 0) then
+        (let msg = Printf.sprintf
+             "Server.Data.Record: invalid characters for field %S" name in
+         raise (Invalid_argument msg));
+    end
 
   let field (type a r) (s : r signature)
       ~name ~descr ?default (d : a data) : (r,a) field =
     not_published s ;
-    is_valid_field_name s name ;
+    check_field_name s name ;
     let module D = (val d) in
     begin match default with
       | None -> ()
@@ -363,7 +366,7 @@ struct
   let option (type a r) (s : r signature)
       ~name ~descr (d : a data) : (r,a option) field =
     not_published s ;
-    is_valid_field_name s name ;
+    check_field_name s name ;
     let module D = (val d) in
     let field = Package.{
         fd_name = name ;
