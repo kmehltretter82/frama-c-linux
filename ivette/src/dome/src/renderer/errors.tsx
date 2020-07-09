@@ -19,7 +19,7 @@ import { Button } from 'dome/controls/buttons';
    Alternative renderer in case of error.
    @param reload - callback for re-rendering the faulty component
  */
-export interface renderError {
+export interface ErrorRenderer {
   (error: any, info: any, reload: () => void): JSX.Element;
 }
 
@@ -27,7 +27,7 @@ export interface CatchProps {
   /** Name of the error boundary. */
   label?: string;
   /** Alternative renderer callback in case of errors. */
-  onError?: JSX.Element | renderError;
+  onError?: JSX.Element | ErrorRenderer;
 }
 
 interface CatchState {
@@ -66,16 +66,18 @@ export class Catch extends React.Component<CatchProps, CatchState, {}> {
       const { onError, label = 'Error' } = this.props;
       if (typeof (onError) === 'function')
         return onError(error, info, this.reload);
-      else
-        return (
-          <div>
-            <Button icon='WARNING' kind='warning'
-              title={error}
-              onClick={this.logerr} />
-            <Button icon='RELOAD' onClick={this.reload} />
-            <Label>{label}</Label>
-          </div>
-        );
+      return (
+        <div>
+          <Button
+            icon="WARNING"
+            kind="warning"
+            title={error}
+            onClick={this.logerr}
+          />
+          <Button icon="RELOAD" onClick={this.reload} />
+          <Label>{label}</Label>
+        </div>
+      );
     }
     return this.props.children || null;
   }

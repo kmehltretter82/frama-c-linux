@@ -15,11 +15,11 @@ import * as System from 'dome/system';
 export interface DialogButton<A> {
   label?: string;
   value?: A;
-};
+}
 
 const defaultItems: DialogButton<boolean>[] = [
   { value: undefined },
-  { value: true, label: 'Ok' }
+  { value: true, label: 'Ok' },
 ];
 
 const valueLabel = (v: any) => {
@@ -27,19 +27,21 @@ const valueLabel = (v: any) => {
     case undefined: return 'Cancel';
     case true: return 'Ok';
     case false: return 'No';
-    default: return '' + v;
+    default: return `${v}`;
   }
 };
 
-const itemLabel = ({ value, label }: DialogButton<any>) =>
-  (label || valueLabel(value));
+const itemLabel = ({ value, label }: DialogButton<any>) => (
+  (label || valueLabel(value))
+);
 
-const isDefault = ({ value, label }: DialogButton<any>) =>
-  (value === true || label === 'Ok' || label === 'Yes');
+const isDefault = ({ value, label }: DialogButton<any>) => (
+  (value === true || label === 'Ok' || label === 'Yes')
+);
 
-const isCancel = ({ value, label }: DialogButton<any>) =>
-  (!value || label === 'Cancel' || label === 'No');
-
+const isCancel = ({ value, label }: DialogButton<any>) => (
+  (!value || label === 'Cancel' || label === 'No')
+);
 
 export type MessageKind = 'none' | 'info' | 'error' | 'warning';
 
@@ -50,7 +52,7 @@ export interface MessageProps<A> {
   message: string;
   /** Message details (short sentence). */
   details?: string;
-  /** Message buttons.*/
+  /** Message buttons. */
   buttons?: DialogButton<A>[];
   /** Default button's value. */
   defaultValue?: A;
@@ -83,11 +85,11 @@ export async function showMessageBox<A>(
     details,
     defaultValue,
     cancelValue,
-    buttons = (defaultItems as DialogButton<A | boolean>[])
+    buttons = (defaultItems as DialogButton<A | boolean>[]),
   } = props;
 
   const labels = buttons.map(itemLabel);
-  let defaultId =
+  const defaultId =
     defaultValue === undefined
       ? buttons.findIndex(isDefault)
       : buttons.findIndex((a) => a.value === defaultValue);
@@ -101,11 +103,15 @@ export async function showMessageBox<A>(
   return remote.dialog.showMessageBox(
     remote.getCurrentWindow(),
     {
-      type: kind, message,
-      detail: details, defaultId, cancelId, buttons: labels
-    }
+      type: kind,
+      message,
+      detail: details,
+      defaultId,
+      cancelId,
+      buttons: labels,
+    },
   ).then((result) => {
-    let itemIndex = result ? result.response : -1;
+    const itemIndex = result ? result.response : -1;
     return itemIndex ? buttons[itemIndex].value : cancelValue;
   });
 }
@@ -115,7 +121,7 @@ export async function showMessageBox<A>(
 // --------------------------------------------------------------------------
 
 const defaultPath =
-  (path: string) => filepath.extname(path) ? filepath.dirname(path) : path;
+  (path: string) => (filepath.extname(path) ? filepath.dirname(path) : path);
 
 export interface FileFilter {
   /** Filter name. */
@@ -165,34 +171,39 @@ export interface OpenDirProps extends FileDialogProps {
 
    The promise is never rejected.
  */
-export async function showOpenFile(props: OpenFileProps): Promise<string | undefined> {
+export async function showOpenFile(
+  props: OpenFileProps,
+): Promise<string | undefined> {
   const { message, label, path, hidden = false, filters } = props;
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message, buttonLabel: label,
+      message,
+      buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (hidden ? ['openFile', 'showHiddenFiles'] : ['openFile']),
       filters,
-    }
-  ).then(result => {
+    },
+  ).then((result) => {
     if (!result.canceled && result.filePaths && result.filePaths.length > 0)
       return result.filePaths[0];
-    else
-      return undefined;
+    return undefined;
   });
 }
 
 /**
    Show a dialog for opening files multiple files.
 */
-export async function showOpenFiles(props: OpenFileProps): Promise<string[] | undefined> {
+export async function showOpenFiles(
+  props: OpenFileProps,
+): Promise<string[] | undefined> {
   const { message, label, path, hidden, filters } = props;
 
   return remote.dialog.showOpenDialog(
     remote.getCurrentWindow(),
     {
-      message, buttonLabel: label,
+      message,
+      buttonLabel: label,
       defaultPath: path && defaultPath(path),
       properties: (
         hidden
@@ -200,15 +211,13 @@ export async function showOpenFiles(props: OpenFileProps): Promise<string[] | un
           : ['openFile', 'multiSelections']
       ),
       filters,
-    }
-  ).then(result => {
+    },
+  ).then((result) => {
     if (!result.canceled && result.filePaths && result.filePaths.length > 0)
       return result.filePaths;
-    else
-      return undefined;
+    return undefined;
   });
 }
-
 
 // --------------------------------------------------------------------------
 // --- saveFile dialog
@@ -230,11 +239,12 @@ export async function showSaveFile(
   return remote.dialog.showSaveDialog(
     remote.getCurrentWindow(),
     {
-      message, buttonLabel: label,
+      message,
+      buttonLabel: label,
       defaultPath: path,
-      filters
-    }
-  ).then(({ canceled, filePath }) => canceled ? undefined : filePath);
+      filters,
+    },
+  ).then(({ canceled, filePath }) => (canceled ? undefined : filePath));
 }
 
 // --------------------------------------------------------------------------
@@ -257,6 +267,7 @@ export async function showOpenDir(
   switch (System.platform) {
     case 'macos': properties.push('createDirectory'); break;
     case 'windows': properties.push('promptToCreate'); break;
+    default: break;
   }
 
   return remote.dialog.showOpenDialog(
@@ -265,13 +276,12 @@ export async function showOpenDir(
       message,
       buttonLabel: label,
       defaultPath: path,
-      properties
-    }
-  ).then(result => {
+      properties,
+    },
+  ).then((result) => {
     if (!result.canceled && result.filePaths && result.filePaths.length > 0)
       return result.filePaths[0];
-    else
-      return undefined;
+    return undefined;
   });
 }
 
