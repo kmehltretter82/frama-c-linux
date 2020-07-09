@@ -26,11 +26,12 @@
    - [[Scroll]] scrolls its content
 
    Inside a box, you may add `<Space/>` and `<Filler/>` to separate items.
-   Inside a grid, you may also use `<Space/>` or an empty `<div/>` for empty cells.
+   Inside a grid, you may also use `<Space/>` or an empty `<div/>` for empty
+   cells.
 
    <strong>Warning:</strong> large elements will be clipped if they overflow.
-   If you want to add scrolling capabilities to some item that does not manage overflow
-   natively, place it inside a `<Scroll/>` sub-container.
+   If you want to add scrolling capabilities to some item that does not manage
+   overflow natively, place it inside a `<Scroll/>` sub-container.
 
    @packageDocumentation
    @module dome/layout/boxes
@@ -39,6 +40,7 @@
 import React from 'react';
 import * as Dome from 'dome';
 import { Title } from 'dome/controls/labels';
+import { classes, styles } from 'dome/misc/utils';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -54,10 +56,10 @@ const makeBox = (
   morestyle?: React.CSSProperties,
 ) => {
   const { children, className, style, ...others } = props;
-  const allClasses = className ? boxClasses + ' ' + className : boxClasses;
-  const allStyles = morestyle ? (style ? Object.assign({}, style, morestyle) : morestyle) : style;
+  const allClasses = classes(className, boxClasses);
+  const allStyles = styles(style, morestyle);
   return (
-    <div className={allClasses} style={allStyles} {...others} >
+    <div className={allClasses} style={allStyles} {...others}>
       {children}
     </div>
   );
@@ -70,32 +72,38 @@ const makeBox = (
 /**
    Horizontal box (extends horizontally, no overflow).
 */
-export const Hbox = (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-box', props);
+export const Hbox =
+  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-box', props);
 
 /**
    Vertical box (extends vertically, no overflow).
 */
-export const Vbox = (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-box', props);
+export const Vbox =
+  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-box', props);
 
 /**
    Compact Horizontal box (fixed dimensions, no overflow).
 */
-export const Hpack = (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-pack', props);
+export const Hpack =
+  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-pack', props);
 
 /**
    Compact Vertical box (fixed dimensions, no overflow).
 */
-export const Vpack = (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-pack', props);
+export const Vpack =
+  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-pack', props);
 
 /**
    Horizontally filled box (fixed height, maximal width, no overflow).
 */
-export const Hfill = (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-fill', props);
+export const Hfill =
+  (props: DivProps) => makeBox('dome-xBoxes-hbox dome-xBoxes-fill', props);
 
 /**
    Vertically filled box (fixed width, maximal height, no overflow).
 */
-export const Vfill = (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-fill', props);
+export const Vfill =
+  (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-fill', props);
 
 // --------------------------------------------------------------------------
 // --- Scrolling & Spacing
@@ -104,23 +112,26 @@ export const Vfill = (props: DivProps) => makeBox('dome-xBoxes-vbox dome-xBoxes-
 /**
    Scrolling container.
 */
-export const Scroll = (props: DivProps) => makeBox('dome-xBoxes-scroll dome-container', props);
+export const Scroll =
+  (props: DivProps) => makeBox('dome-xBoxes-scroll dome-container', props);
 
 /**
    Rigid space between items in a box.
 */
-export const Space = (props: DivProps) => makeBox('dome-xBoxes-space', props);
+export const Space =
+  (props: DivProps) => makeBox('dome-xBoxes-space', props);
 
 /**
    Extensible space between items in a box.
 */
-export const Filler = (props: DivProps) => makeBox('dome-xBoxes-filler', props);
+export const Filler =
+  (props: DivProps) => makeBox('dome-xBoxes-filler', props);
 
 // --------------------------------------------------------------------------
 // --- Grids
 // --------------------------------------------------------------------------
 
-export interface GridProps extends DivProps { columns?: string; }
+export interface GridProps extends DivProps { columns?: string }
 
 /**
    Grid box container.
@@ -128,8 +139,9 @@ export interface GridProps extends DivProps { columns?: string; }
    Layout its children in a multi-column grid. Each column is specified by its
    width, following the CSS Grid Layout `grid-template-columns` property.
 
-   The rows are populated with children from left-to-right, using one column at a time.
-   Items layout can be modified by using CSS Grid Layout item properties.
+   The rows are populated with children from left-to-right, using one column at
+   a time.  Items layout can be modified by using CSS Grid Layout item
+   properties.
 
    Example: `<Grid columns="25% auto auto"> ... </Grid>`
 */
@@ -162,13 +174,20 @@ export interface FolderProps {
    The head label is clickable to fold/unfold its contents.
 */
 export const Folder = (props: FolderProps) => {
-  const { settings, defaultUnfold = false, indent = 18, label, title, children } = props;
+  const {
+    settings,
+    defaultUnfold = false,
+    indent = 18,
+    label, title, children,
+  } = props;
   const [unfold, onClick] = Dome.useSwitch(settings, defaultUnfold);
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
   const display = unfold ? 'none' : 'block';
   return (
     <Vpack>
-      <Hpack onClick={onClick}><Title icon={icon} label={label} title={title} /></Hpack>
+      <Hpack onClick={onClick}>
+        <Title icon={icon} label={label} title={title} />
+      </Hpack>
       <Vpack style={{ display, marginLeft: indent }}>
         {children}
       </Vpack>
