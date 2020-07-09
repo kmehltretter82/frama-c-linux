@@ -370,8 +370,8 @@ static void _format(void* putp, putcf putf, char *fmt, va_list va) {
   }
 }
 
-static void _charc_stdout (void* p, char c) { write(1,&c,1); }
-static void _charc_stderr (void* p, char c) { write(2,&c,1); }
+static void _charc_stdout (void* p, char c) { write(STDOUT_FILENO,&c,1); }
+static void _charc_stderr (void* p, char c) { write(STDERR_FILENO,&c,1); }
 static void _charc_file (void* p, char c) { write((size_t)p,&c,1); }
 
 static void _charc_literal  (void* p, char c) {
