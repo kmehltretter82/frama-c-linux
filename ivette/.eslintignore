@@ -6,5 +6,10 @@ dist
 coverage
 # don't lint tsc output, if any
 lib
-# don't lint dome, for the moment
-src/dome
+# don't lint the generated API
+src/api
+# lint Dome step by step
+src/dome/src/renderer/controls
+src/dome/src/renderer/layout
+src/dome/src/renderer/table
+src/dome/src/renderer/data

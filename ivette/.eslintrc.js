@@ -15,6 +15,10 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
   },
+  settings: {
+    // Electron is in devDependencies because of its special build system
+    "import/core-modules": [ "electron" ]
+  },
   rules: {
     "react/display-name": "off",
     // Be more strict on usage of useMemo and useRef
