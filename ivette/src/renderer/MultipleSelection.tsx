@@ -30,7 +30,8 @@ const SelectionTable = () => {
   // Updates [[model]] with the current multiple selection.
   React.useEffect(() => {
     if (numblerOfSelections > 0) {
-      const data: SelectionId[] = multiple.allSelections.map((d, i) => ({ ...d, id: i }));
+      const data: SelectionId[] =
+        multiple.allSelections.map((d, i) => ({ ...d, id: i }));
       model.replaceAllDataWith(data);
     } else
       model.clear();

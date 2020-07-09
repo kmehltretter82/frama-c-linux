@@ -519,7 +519,6 @@ type MultipleSelectActions =
   MultipleSelect | NthSelect
   | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR';
 
-
 export interface Selection {
   /** Current selection. May be one in [[history]] or [[multiple]]. */
   current?: Location;
@@ -685,7 +684,7 @@ const GlobalSelection = new GlobalStates.State<Selection>({
     prevSelections: [],
     nextSelections: [],
   },
-  multiple: { index: 0, allSelections: [] }
+  multiple: { index: 0, allSelections: [] },
 });
 
 /**
