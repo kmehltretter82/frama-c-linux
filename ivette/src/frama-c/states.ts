@@ -684,7 +684,10 @@ const GlobalSelection = new GlobalStates.State<Selection>({
     prevSelections: [],
     nextSelections: [],
   },
-  multiple: { index: 0, allSelections: [] },
+  multiple: {
+    index: 0,
+    allSelections: [],
+  },
 });
 
 /**

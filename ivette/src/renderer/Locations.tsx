@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------
-// --- Table of multiple selection
+// --- Table of (multiple) locations
 // --------------------------------------------------------------------------
 
 import React from 'react';
@@ -12,30 +12,30 @@ import * as Toolbar from 'dome/frame/toolbars';
 import { Component } from 'frama-c/LabViews';
 
 // --------------------------------------------------------------------------
-// --- Multiple Selection Panel
+// --- Locations Panel
 // --------------------------------------------------------------------------
 
-type SelectionId = States.Location & { id: number };
+type LocationId = States.Location & { id: number };
 
-const SelectionTable = () => {
+const LocationsTable = () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
   const model = React.useMemo(() => (
-    new CompactModel<number, SelectionId>(({ id }: SelectionId) => id)
+    new CompactModel<number, LocationId>(({ id }: LocationId) => id)
   ), []);
   const multiple: States.MultipleSelection = selection?.multiple;
-  const numblerOfSelections = multiple?.allSelections?.length;
+  const numberOfSelections = multiple?.allSelections?.length;
 
   // Updates [[model]] with the current multiple selection.
   React.useEffect(() => {
-    if (numblerOfSelections > 0) {
-      const data: SelectionId[] =
+    if (numberOfSelections > 0) {
+      const data: LocationId[] =
         multiple.allSelections.map((d, i) => ({ ...d, id: i }));
       model.replaceAllDataWith(data);
     } else
       model.clear();
-  }, [numblerOfSelections, multiple, model]);
+  }, [numberOfSelections, multiple, model]);
 
   // Callbacks
   const onTableSelection = React.useCallback(
@@ -55,38 +55,38 @@ const SelectionTable = () => {
         <Toolbar.Button
           icon="RELOAD"
           onClick={reload}
-          enabled={numblerOfSelections > 1}
+          enabled={numberOfSelections > 1}
           title="Reload the current location of the multiple selection"
         />
         <Toolbar.ButtonGroup>
           <Toolbar.Button
             icon="ANGLE.LEFT"
             onClick={() => updateSelection('MULTIPLE_PREV')}
-            enabled={numblerOfSelections > 1 && multiple?.index > 0}
+            enabled={numberOfSelections > 1 && multiple?.index > 0}
             title="Previous location of the multiple selection"
           />
           <Toolbar.Button
             icon="ANGLE.RIGHT"
             onClick={() => updateSelection('MULTIPLE_NEXT')}
             enabled={
-              numblerOfSelections > 1 &&
-              multiple?.index < numblerOfSelections - 1
+              numberOfSelections > 1 &&
+              multiple?.index < numberOfSelections - 1
             }
             title="Next location of the multiple selection"
           />
         </Toolbar.ButtonGroup>
         <Label
           className="component-info"
-          title={`${numblerOfSelections} selected locations`}
-          display={numblerOfSelections > 1}
+          title={`${numberOfSelections} selected locations`}
+          display={numberOfSelections > 1}
         >
-          {multiple?.index + 1} / {numblerOfSelections}
+          {multiple?.index + 1} / {numberOfSelections}
         </Label>
         <Toolbar.Filler />
         <Toolbar.Button
           icon="CIRC.CLOSE"
           onClick={() => updateSelection('MULTIPLE_CLEAR')}
-          enabled={numblerOfSelections > 1}
+          enabled={numberOfSelections > 1}
           title="Clear the multiple selection"
         />
       </Toolbar.ToolBar>
@@ -116,10 +116,10 @@ const SelectionTable = () => {
 export default () => (
   <Component
     id="frama-c.selection"
-    label="Multiple Selection"
+    label="Locations"
     title="Browse a selection of multiple locations"
   >
-    <SelectionTable />
+    <LocationsTable />
   </Component>
 );
 
