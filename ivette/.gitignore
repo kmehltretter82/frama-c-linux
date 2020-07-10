@@ -5,6 +5,7 @@
 .ivette
 .dome-*.stamp
 .dome-*.back
+.eslint-cache
 node_modules
 yarn.lock
 yarn-error.log

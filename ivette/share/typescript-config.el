@@ -48,4 +48,24 @@
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx$" . web-mode))
 
+;; Column mode
+
+(safe-require fill-column-indicator
+  (setq-default fill-column 80)
+  (setq fci-rule-color "#8f8f8f")
+  (add-hook 'typescript-mode-hook 'fci-mode t)
+  (add-hook 'web-mode-hook 'fci-mode t))
+
+;; Compilation mode
+
+(require 'compile)
+
+;;; TSC output
+(add-to-list 'compilation-error-regexp-alist
+             '("^\\([a-zA-Z0-9_/.-]+.tsx?\\):\\([0-9]+\\):\\([0-9]+\\) - error" 1 2 3))
+
+;;; ES-Lint output
+(add-to-list 'compilation-error-regexp-alist
+             '("^\\([a-zA-Z0-9_/.-]+.tsx?\\): line \\([0-9]+\\), col \\([0-9]+\\), Error" 1 2 3))
+
 ;;; -------------------------------------------------------------------------

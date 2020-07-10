@@ -25,8 +25,8 @@ lint: dome-pkg dome-templ
 	yarn run lint
 
 fixlint: dome-pkg dome-templ
-	@echo "[Ivette] running ts linter (with fix)"
-	yarn run lint --fix
+	@echo "[Ivette] running ts linter (with cache and fix)"
+	yarn run lint --fix --cache --cache-location .eslint-cache
 
 tsc: typecheck fixlint
 
