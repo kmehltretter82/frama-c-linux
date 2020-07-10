@@ -70,7 +70,7 @@ async function functionCallers(
   kf: string,
 ) {
   try {
-    const data = await Server.send(getCallers, null);
+    const data = await Server.send(getCallers, kf);
     const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
     updateSelection({ locations });
   } catch (err) {
