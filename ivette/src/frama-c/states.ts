@@ -25,7 +25,7 @@ const STATE_PREFIX = 'frama-c.state.';
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('States');
+const D = new Dome.Debug('States');
 
 // --------------------------------------------------------------------------
 // --- Synchronized Current Project
@@ -45,7 +45,7 @@ Server.onReady(async () => {
     currentProject = current.id;
     Dome.emit(PROJECT);
   } catch (error) {
-    PP.error(`Fail to retrieve the current project. ${error.toString()}`);
+    D.error(`Fail to retrieve the current project. ${error.toString()}`);
   }
 });
 
@@ -85,7 +85,7 @@ export async function setProject(project: string) {
       currentProject = project;
       Dome.emit(PROJECT);
     } catch (error) {
-      PP.error(`Fail to set the current project. ${error.toString()}`);
+      D.error(`Fail to set the current project. ${error.toString()}`);
     }
   }
 }
@@ -131,7 +131,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         update(r);
       } catch (error) {
-        PP.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        D.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
         update(options.onError);
       }
     } else {
@@ -250,7 +250,7 @@ class SyncState<A> {
       if (setter) await Server.send(setter, v);
       Dome.emit(this.UPDATE);
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set value of syncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -264,7 +264,7 @@ class SyncState<A> {
       this.value = v;
       Dome.emit(this.UPDATE);
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to update syncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -311,7 +311,7 @@ export function useSyncState<A>(
  */
 export function useSyncValue<A>(va: Value<A>): A | undefined {
   const s = getSyncState(va);
-  Dome.useUpdate(s.update);
+  Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
   return s.getValue();
 }
@@ -361,7 +361,7 @@ class SyncArray<K, A> {
       } while (pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
@@ -380,7 +380,7 @@ class SyncArray<K, A> {
         this.fetch();
       }
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
         `${error.toString()}`,
       );

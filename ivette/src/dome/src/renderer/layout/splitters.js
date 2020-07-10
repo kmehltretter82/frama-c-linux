@@ -10,6 +10,8 @@
 import _ from 'lodash' ;
 import * as React from 'react' ;
 import * as Dome from 'dome' ;
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { Layout } from 'dome/misc/layout' ;
 
 import './style.css' ;
@@ -165,22 +167,12 @@ export class Splitter extends React.Component {
   // --------------------------------------------------------------------------
 
   componentDidMount() {
-    if (this.refs.container && this.refs.splitter) {
-      const container = this.refs.container.getBoundingClientRect() ;
-      const dimension = this.lr ? container.width : container.height ;
-      this.range = dimension - this.margin ;
-      const settings = this.props.settings ;
-      if (settings) {
-        const offset = Dome.getWindowSetting(settings,-1);
-        if (this.margin <= offset && offset <= this.range)
-          this.setState({ absolute: true, offset });
-      }
-    }
-    Dome.on( 'dome.defaults', this.handleReset );
+    this.handleReload();
+    Dome.on( 'dome.settings.window', this.handleReload );
   }
 
   componentWillUnmount() {
-    Dome.off( 'dome.defaults', this.handleReset );
+    Dome.off( 'dome.settings.window', this.handleReload );
   }
 
   componentDidUpdate() {
@@ -194,12 +186,26 @@ export class Splitter extends React.Component {
 
   handleReset() {
     this.setState({ absolute: false, dragging: false, anchor: 0, offset: 0 });
-    Dome.setWindowSetting(this.props.settings, -1);
+    Settings.setWindowSettings(this.props.settings, -1);
   }
 
   handleClick(event) {
     if (event.altKey || event.ctrlKey || event.cmdKey || event.shiftKey)
       this.handleReset();
+  }
+
+  handleReload() {
+    if (this.refs.container && this.refs.splitter) {
+      const container = this.refs.container.getBoundingClientRect() ;
+      const dimension = this.lr ? container.width : container.height ;
+      this.range = dimension - this.margin ;
+      const settings = this.props.settings ;
+      if (settings) {
+        const offset = Settings.getWindowSettings(settings,JSON.jNumber,-1);
+        if (this.margin <= offset && offset <= this.range)
+          this.setState({ absolute: true, offset });
+      }
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -285,7 +291,7 @@ export class Splitter extends React.Component {
   // --------------------------------------------------------------------------
 
   handleDragStop(evt) {
-    Dome.setWindowSetting( this.props.settings, this.state.offset );
+    Settings.setWindowSettings( this.props.settings, this.state.offset );
     this.setState({ dragging: false });
   }
 

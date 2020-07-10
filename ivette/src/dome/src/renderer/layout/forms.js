@@ -9,7 +9,7 @@
 
 import _ from 'lodash' ;
 import React from 'react' ;
-import * as Dome from 'dome' ;
+import { useBoolSettings } from 'dome';
 import { SVG } from 'dome/controls/icons' ;
 import { Checkbox, Radio, Select as Selector } from 'dome/controls/buttons' ;
 import './style.css' ;
@@ -400,9 +400,7 @@ const TITLE_DISABLED = 'dome-text-title dome-disabled' ;
 export function Section(props)
 {
 
-  let [ unfold, setUnfold ] = Dome.useState(props.settings,props.unfold);
-
-  const onSwitch = () => setUnfold(!unfold);
+  let [ unfold, flipUnfold ] = useBoolSettings(props.settings,props.unfold);
 
   const { label, title, path, children, ...otherProps } = props ;
 
@@ -411,7 +409,7 @@ export function Section(props)
       {(context) => (
         <React.Fragment>
           <div className='dome-xForm-section'>
-            <div className='dome-xForm-fold' onClick={onSwitch}>
+            <div className='dome-xForm-fold' onClick={flipUnfold}>
               <SVG id={unfold?'TRIANGLE.DOWN':'TRIANGLE.RIGHT'} size={11}/>
             </div>
             <label className={ (path && context.disabled) ? TITLE_DISABLED : TITLE_ENABLED }

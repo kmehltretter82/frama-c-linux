@@ -76,7 +76,7 @@ let makeJtype ?self ~names =
     | Jstring | Jalpha -> Format.pp_print_string fmt "string"
     | Jkey kd -> Format.fprintf fmt "Json.key<'#%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.index<'#%s'>" kd
-    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dict<'#%s',%a>" kd pp js
+    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dictionary<'#%s',%a>" kd pp js
     | Jdata id | Jenum id -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->

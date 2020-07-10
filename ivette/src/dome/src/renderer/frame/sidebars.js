@@ -8,7 +8,7 @@
 */
 
 import React from 'react' ;
-import * as Dome from 'dome' ;
+import { useBoolSettings } from 'dome';
 import { Badge } from 'dome/controls/icons' ;
 import { Label } from 'dome/controls/labels' ;
 
@@ -107,9 +107,8 @@ const disableAll = (children) =>
 export function Section(props) {
 
   const context = React.useContext( SideBarContext );
-  const [ state=true, setState ] = Dome.useState(
-    makeSettings(context.settings,props),
-    props.defaultUnfold
+  const [ state=true, setState ] = useBoolSettings(
+    makeSettings(context.settings,props), props.defaultUnfold
   );
   const { enabled=true, disabled=false, unfold, children } = props ;
 

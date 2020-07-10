@@ -38,7 +38,7 @@
 */
 
 import React from 'react';
-import * as Dome from 'dome';
+import { useBoolSettings } from 'dome';
 import { Title } from 'dome/controls/labels' ;
 import './style.css' ;
 
@@ -168,12 +168,13 @@ export const Grid = ({columns='auto',...props}) =>
 export const Folder =
   ({ settings, defaultUnfold=false, indent=18, label, title, children }) =>
 {
-  const [ unfold , setUnfold ] = Dome.useState( settings, defaultUnfold );
+  const [ unfold , flipUnfold ] = useBoolSettings( settings, defaultUnfold );
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT' ;
-  const onClick = () => setUnfold( !unfold );
   return (
     <Vpack>
-      <Hpack onClick={onClick}><Title icon={icon} label={label} title={title} /></Hpack>
+      <Hpack onClick={flipUnfold}>
+        <Title icon={icon} label={label} title={title} />
+      </Hpack>
       <Vpack style={{ marginLeft:indent }}>
         { unfold && children }
       </Vpack>

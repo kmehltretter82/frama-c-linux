@@ -14,12 +14,17 @@
 import React from 'react' ;
 
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { Form, Section, FieldSelect, FieldCheckbox, FieldSlider } from 'dome/layout/forms' ;
+
+export const Theme = new Settings.GString('ASTview.theme','default');
+export const FontSize = new Settings.GNumber('ASTview.fontSize',12);
 
 const ASTviewPrefs = () => {
 
-  const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
-  const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
+  const [theme, setTheme] = Settings.useGlobalSettings(Theme);
+  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
 
   return (
     <React.Fragment>

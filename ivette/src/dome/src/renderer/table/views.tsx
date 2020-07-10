@@ -11,6 +11,8 @@ import React, { ReactNode } from 'react';
 import { forEach, debounce, throttle } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
 import {
   AutoSizer, Size,
@@ -254,12 +256,15 @@ function makeDataRenderer(
 // --- Table Settings
 // --------------------------------------------------------------------------
 
-type ColSettings<A> = { [id: string]: undefined | null | A };
-
 type TableSettings = {
-  resize?: ColSettings<number>;
-  visible?: ColSettings<boolean>;
+  resize?: Json.dict<number>;
+  visible?: Json.dict<boolean>;
 }
+
+const jTableSettings = Json.jObject({
+  resize: Json.jDict(Json.jNumber),
+  visible: Json.jDict(Json.jBoolean),
+});
 
 // --------------------------------------------------------------------------
 // --- Table State
@@ -305,7 +310,7 @@ class TableState<Key, Row> {
     this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
-    this.clearSettings = this.clearSettings.bind(this);
+    this.reloadSettings = this.reloadSettings.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
   }
@@ -383,49 +388,48 @@ class TableState<Key, Row> {
 
   // --- Table settings
 
-  clearSettings() {
-    this.resize.clear();
-    this.visible.clear();
-    this.forceUpdate();
-  }
-
   updateSettings() {
     const userSettings = this.settings;
     if (userSettings) {
-      const cws: ColSettings<number> = {};
-      const cvs: ColSettings<boolean> = {};
+      const cws: Json.dict<number> = {};
+      const cvs: Json.dict<boolean> = {};
       const resize = this.resize;
       const visible = this.visible;
       this.columns.forEach(({ id }) => {
         const cw = resize.get(id);
         const cv = visible.get(id);
-        cws[id] = cw === undefined ? null : cw;
-        cvs[id] = cv === undefined ? null : cv;
+        if (cw) cws[id] = cw;
+        if (cv) cvs[id] = cv;
       });
       const theSettings: TableSettings = { resize: cws, visible: cvs };
-      Dome.setWindowSetting(userSettings, theSettings);
+      Settings.setWindowSettings(userSettings, theSettings);
     }
     this.forceUpdate();
+  }
+
+  reloadSettings() {
+    const settings = this.settings;
+    const resize = this.resize;
+    const visible = this.visible;
+    resize.clear();
+    visible.clear();
+    const theSettings: undefined | TableSettings =
+      Settings.getWindowSettings(settings, jTableSettings, undefined);
+    if (theSettings) {
+      forEach(theSettings.resize, (cw, cid) => {
+        this.resize.set(cid, cw);
+      });
+      forEach(theSettings.visible, (cv, cid) => {
+        this.visible.set(cid, cv);
+      });
+      this.forceUpdate();
+    }
   }
 
   importSettings(settings?: string) {
     if (settings !== this.settings) {
       this.settings = settings;
-      const resize = this.resize;
-      const visible = this.visible;
-      resize.clear();
-      visible.clear();
-      const theSettings: undefined | TableSettings =
-        Dome.getWindowSetting(settings);
-      if (theSettings) {
-        forEach(theSettings.resize, (cw, cid) => {
-          if (typeof cw === 'number') this.resize.set(cid, cw);
-        });
-        forEach(theSettings.visible, (cv, cid) => {
-          if (typeof cv === 'boolean') this.visible.set(cid, cv);
-        });
-        this.forceUpdate();
-      }
+      this.reloadSettings();
     }
   }
 
@@ -1083,7 +1087,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
-  Dome.useEvent('dome.defaults', state.clearSettings);
+  Dome.useEvent('dome.settings.window', state.reloadSettings);
   return (
     <div className='dome-xTable'>
       <React.Fragment key='columns'>

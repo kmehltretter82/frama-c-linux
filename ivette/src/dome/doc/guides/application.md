@@ -85,14 +85,9 @@ your data flow.
 - **Global States** are necessary to implement the unidirectional data-flow. These
   data are stored in the renderer process, but outside of the view hierarchy of
   **React** components actually mounted in the DOM. Hence, it remains consistent whatever
-  the evolution of the view. See `Dome.State` class and the associated custom **React** hooks
+  the evolution of the view. See `dome/state` module and the associated custom **React** hooks
   to implement global states. You may also use global JavaScript variables and emit events
   on your own.
-
-- **Local States** are necessary to maintain local states associated
-  to views.  We strongly encourage the use of the `Dome.useState()` hook for this
-  purpose, since it generalizes `React.useState()` with persistent window settings
-  (see below).
 
 - **View Updates** to make your views listening for updates of the various data
   sources, we encourage to use the **React** hooks we provide, since they
@@ -110,12 +105,12 @@ your data flow.
   **Dome** components with presentation options can be assigned a `settings` key
   to make their state persistent. Contrary to Global Settings, however, they are
   not shared across several windows. You may also access these data by using
-  `Dome.setWindowSetting()` and `Dome.getWindowSetting()`, or the **React** hook
-  `Dome.useWindowSetting()`.
+  `Settings.setWindowSetting()` and `Settings.getWindowSetting()`, or the **React** hook
+  `Settings.useWindowSetting()`. See also helpers `Dome.useXxxSettings()`.
 
 - **Global Settings** are stored in the user's home directory and automatically
   saved and load with your application; they are typically modified _via_ the
   Settings Window, which is accessible from the application menubar. In **Dome**,
-  you access these data by using `Dome.setGlobalSetting()` and
-  `Dome.getGlobalSetting()`, or the **React** hook `Dome.useGlobalSetting()`.
-  Settings must be JSON serializable JavaScript values.
+  you can shall define a global settings by creating an instance of
+  `Settings.GlobalSettings` class and use it with
+  the `Settings.useGlobalSettings()` hook.

@@ -9,6 +9,8 @@
 
 import _ from 'lodash' ;
 import React from 'react' ;
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/dnd' ;
 import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
@@ -1179,11 +1181,11 @@ export class GridLayout extends React.Component
   }
 
   componentDidMount() {
-    Dome.on('dome.defaults',this.onReloadSettings);
+    Dome.on('dome.settings.window',this.onReloadSettings);
   }
 
   componentWillUnmont() {
-    Dome.off('dome.defaults',this.onReloadSettings);
+    Dome.off('dome.settings.window',this.onReloadSettings);
   }
 
   computeTargetProposal(target) {
@@ -1226,7 +1228,7 @@ export class GridLayout extends React.Component
   onReloadSettings() {
     const { settings, onReshape } = this.props ;
     if (!settings) return;
-    const newShape = Dome.getWindowSetting( settings );
+    const newShape = Settings.getWindowSettings( settings, Json.jAny, undefined );
     this.setState({ shape: newShape });
     if (onReshape) onReshape( newShape );
   }
@@ -1234,7 +1236,7 @@ export class GridLayout extends React.Component
   onReshape(newShape) {
     const { settings, shape:setShape, onReshape } = this.props ;
     if (!setShape) this.setState({ shape: newShape });
-    if (settings) Dome.setWindowSetting( settings, newShape );
+    if (settings) Settings.setWindowSettings( settings, newShape );
     if (onReshape) onReshape( newShape );
   }
 
@@ -1299,7 +1301,8 @@ export class GridLayout extends React.Component
     const setShape = propShape === null ? {} : propShape ;
     const insert = inserted ? inserted.id : undefined ;
     const render = DRAGGABLEITEM(this.dnd,anchor,this.onSelfDrag,insert);
-    const shape = holdedShape || setShape || newShape || Dome.getWindowSetting(settings) ;
+    const shape = holdedShape || setShape || newShape ||
+          Settings.getWindowSettings(settings,Json.jAny,undefined) ;
     return (
       <DropTarget
         dnd={this.dnd}

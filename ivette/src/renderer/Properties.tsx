@@ -5,7 +5,7 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import * as Dome from 'dome';
-import { key } from 'dome/data/json';
+import * as Json from 'dome/data/json';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
@@ -239,7 +239,7 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
+class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
 
   private filterFun?: string;
   private filterProp = _.cloneDeep(defaultFilter);
@@ -438,10 +438,11 @@ const RenderTable = () => {
     model.reload();
   }, [model, data]);
 
-  const [selection, updateSelection] = States.useSelection();
+  const [selection, updateSelection] =
+    States.useSelection();
 
   const [showFilter, flipFilter] =
-    Dome.useSwitch('ivette.properties.showFilter', true);
+    Dome.useBoolSettings('ivette.properties.showFilter');
 
   // Updating the filter
   const selectedFunction = selection?.current?.function;

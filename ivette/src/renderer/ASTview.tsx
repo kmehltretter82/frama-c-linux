@@ -7,6 +7,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
+import * as Settings from 'dome/data/settings';
 import { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
@@ -19,6 +20,8 @@ import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
 
+import { Theme, FontSize } from './Preferences';
+
 const THEMES = [
   { id: 'default', label: 'Default' },
   { id: 'ambiance', label: 'Ambiance' },
@@ -30,7 +33,7 @@ const THEMES = [
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('AST View');
+const D = new Dome.Debug('AST View');
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
@@ -55,7 +58,7 @@ async function loadAST(
             buffer.scroll(theMarker, undefined);
         });
       } catch (err) {
-        PP.error(
+        D.error(
           'Fail to retrieve the AST of function', theFunction,
           'marker:', theMarker, err,
         );
@@ -74,9 +77,9 @@ const ASTview = () => {
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const printed: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection, updateSelection] = States.useSelection();
-  const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
-  const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
-  const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
+  const [theme, setTheme] = Settings.useGlobalSettings(Theme);
+  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
+  const [wrapText, flipWrapText] = Dome.useBoolSettings('ASTview.wrapText');
   const markers = States.useSyncModel(markerInfo);
 
   const theFunction = selection?.current?.function;
@@ -122,10 +125,10 @@ const ASTview = () => {
 
   // Theme Popup
   const selectTheme = (id?: string) => id && setTheme(id);
-  const checkTheme =
-    (th: { id: string }) => ({ checked: th.id === theme, ...th });
-  const themePopup =
-    () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
+  const themeItem = (th: { id: string; label: string }) => (
+    { checked: th.id === theme, ...th }
+  );
+  const themePopup = () => Dome.popupMenu(THEMES.map(themeItem), selectTheme);
 
   // Component
   return (
@@ -151,7 +154,7 @@ const ASTview = () => {
         <IconButton
           icon="WRAPTEXT"
           selected={wrapText}
-          onClick={setWrapText}
+          onClick={flipWrapText}
           title="Wrap text"
         />
       </TitleBar>

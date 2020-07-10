@@ -21,7 +21,7 @@ import { ChildProcess } from 'child_process';
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('Server');
+const D = new Dome.Debug('Server');
 
 // --------------------------------------------------------------------------
 // --- Events
@@ -223,7 +223,7 @@ export function onActivity(signal: string, callback: any) {
 
 function _status(newStatus: Status) {
   if (Dome.DEVEL && hasErrorStatus(newStatus)) {
-    PP.error(newStatus.error);
+    D.error(newStatus.error);
   }
 
   if (newStatus !== status) {
@@ -256,7 +256,7 @@ export async function start() {
         await _launch();
         _status(okStatus(Stage.ON));
       } catch (error) {
-        PP.error(error.toString());
+        D.error(error.toString());
         buffer.append(error.toString(), '\n');
         _exit(error);
       }
@@ -484,7 +484,7 @@ async function _launch() {
   process?.stdout?.on('data', logger);
   process?.stderr?.on('data', logger);
   process?.on('exit', (code: number | null, signal: string | null) => {
-    PP.log('Process exited');
+    D.log('Process exited');
 
     if (signal) {
       // [signal] is non-null.
@@ -514,7 +514,7 @@ async function _launch() {
 // --------------------------------------------------------------------------
 
 function _reset() {
-  PP.log('Reset to initial configuration');
+  D.log('Reset to initial configuration');
 
   rqCount = 0;
   queueCmd = [];
@@ -536,7 +536,7 @@ function _reset() {
 }
 
 function _kill() {
-  PP.log('Hard kill');
+  D.log('Hard kill');
 
   _reset();
   if (process) {
@@ -545,7 +545,7 @@ function _kill() {
 }
 
 async function _shutdown() {
-  PP.log('Shutdown');
+  D.log('Shutdown');
 
   _reset();
   queueCmd.push('SHUTDOWN');
@@ -602,7 +602,7 @@ class SignalHandler {
   }
 
   on(callback: any) {
-    const n = Dome.emitter.listenerCount(this.event);
+    const n = System.emitter.listenerCount(this.event);
     Dome.on(this.event, callback);
     if (n === 0) {
       this.active = true;
@@ -612,7 +612,7 @@ class SignalHandler {
 
   off(callback: any) {
     Dome.off(this.event, callback);
-    const n = Dome.emitter.listenerCount(this.event);
+    const n = System.emitter.listenerCount(this.event);
     if (n === 0) {
       this.active = false;
       if (isRunning()) this.sigoff();
@@ -846,7 +846,7 @@ async function _send() {
         const resp = await zmqSocket?.receive();
         _receive(resp);
       } catch (error) {
-        PP.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
+        D.error(`Error in send/receive on ZMQ socket. ${error.toString()}`);
         _cancel(ids);
       }
       zmqIsBusy = false;
@@ -895,10 +895,10 @@ function _receive(resp: any) {
           break;
         case 'WRONG':
           err = shift();
-          PP.error(`ZMQ Protocol Error: ${err}`);
+          D.error(`ZMQ Protocol Error: ${err}`);
           break;
         default:
-          PP.error(`Unknown Response: ${cmd}`);
+          D.error(`Unknown Response: ${cmd}`);
           unknownResponse = true;
           break;
       }

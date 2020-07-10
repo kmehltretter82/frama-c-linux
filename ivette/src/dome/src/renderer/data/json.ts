@@ -429,32 +429,55 @@ export function jIndex<K>(kd: K): Loose<index<K>> {
   return (js: json) => typeof js === 'number' ? forge(kd, js) : undefined;
 }
 
-/** Dictionaries with « typed » keys. */
-export type dict<K, A> = phantom<K, { [key: string]: A }>
-
-/** Lookup into dictionary.
-    Better than a direct access to `d[k]` for undefined values. */
-export function lookup<K, A>(d: dict<K, A>, k: key<K>): A | undefined {
-  return d[k];
-}
-
-/** Empty dictionary. */
-export function empty<K, A>(kd: K): dict<K, A> {
-  return forge(kd, {} as any);
-}
-
-/** Dictionary extension. */
-export function index<K, A>(d: dict<K, A>, key: key<K>, value: A) {
-  d[key] = value;
-}
+/** Dictionaries with « untyped » keys. */
+export type dict<A> = { [key: string]: A };
 
 /**
    Decode a JSON dictionary, discarding all inconsistent entries.
    If the JSON contains no valid entry, still returns `{}`.
 */
-export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
+export function jDict<A>(fn: Loose<A>): Safe<dict<A>> {
   return (js: json) => {
-    const buffer: dict<K, A> = empty(kd);
+    const buffer: dict<A> = {}
+    if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
+      for (var key of Object.keys(js)) {
+        const fd = js[key];
+        if (fd !== undefined) {
+          const fv = fn(fd);
+          if (fv !== undefined) buffer[key] = fv;
+        }
+      }
+    }
+    return buffer;
+  };
+}
+
+/** Dictionaries with « typed » keys. */
+export type dictionary<K, A> = phantom<K, { [key: string]: A }>
+
+/** Lookup into dictionary.
+    Better than a direct access to `d[k]` for undefined values. */
+export function lookup<K, A>(d: dictionary<K, A>, k: key<K>): A | undefined {
+  return d[k];
+}
+
+/** Empty dictionary. */
+export function empty<K, A>(kd: K): dictionary<K, A> {
+  return forge(kd, {} as any);
+}
+
+/** Dictionary extension. */
+export function index<K, A>(d: dictionary<K, A>, key: key<K>, value: A) {
+  d[key] = value;
+}
+
+/**
+   Decode a JSON dictionary with typed keys, discarding all inconsistent entries.
+   If the JSON contains no valid entry, still returns `{}`.
+*/
+export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dictionary<K, A>> {
+  return (js: json) => {
+    const buffer: dictionary<K, A> = empty(kd);
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
       for (var key of Object.keys(js)) {
         const fd = js[key];
@@ -472,8 +495,8 @@ export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
    Encode a dictionary into JSON, discarding all inconsistent entries.
    If the dictionary contains no valid entry, still returns `{}`.
 */
-export function eDictionary<K, A>(fn: Encoder<A>): Encoder<dict<K, A>> {
-  return (d: dict<K, A>) => {
+export function eDictionary<K, A>(fn: Encoder<A>): Encoder<dictionary<K, A>> {
+  return (d: dictionary<K, A>) => {
     const js: json = {};
     for (var k of Object.keys(d)) {
       const fv = d[k];

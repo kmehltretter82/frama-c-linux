@@ -54,14 +54,8 @@ const SelectionControls = () => {
 // --------------------------------------------------------------------------
 
 export default (() => {
-  const [sidebar, flipSidebar] = Dome.useSwitch(
-    'frama-c.sidebar.unfold',
-    false,
-  );
-  const [viewbar, flipViewbar] = Dome.useSwitch(
-    'frama-c.viewbar.unfold',
-    false,
-  );
+  const [sidebar, flipSidebar] = Dome.useBoolSettings('frama-c.sidebar.unfold');
+  const [viewbar, flipViewbar] = Dome.useBoolSettings('frama-c.viewbar.unfold');
 
   return (
     <Vfill>

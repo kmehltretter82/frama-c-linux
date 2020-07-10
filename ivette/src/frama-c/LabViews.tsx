@@ -10,6 +10,8 @@
 import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { Catch } from 'dome/errors';
 import { DnD, DragSource } from 'dome/dnd';
 import { SideBar, Section, Item } from 'dome/frame/sidebars';
@@ -349,9 +351,13 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
 // --- Customization Views
 // --------------------------------------------------------------------------
 
+const Stock = new Settings.GDefault('frama-c.labView', Json.jAny, {});
+
 function CustomViews({ settings, shape, setShape, views: libViews }: any) {
-  const [local, setLocal] = Dome.useState(settings, {});
-  const [customs, setCustoms] = Dome.useGlobalSetting(settings, {});
+  const [local, setLocal] = Settings.useWindowSettings(
+    settings, Json.jAny, {},
+  ) as any;
+  const [customs, setCustoms] = Settings.useGlobalSettings(Stock) as any;
   const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
@@ -633,10 +639,15 @@ export function LabView(props: any) {
   const settingShape = settings && `${settings}.shape`;
   const settingPanel = settings && `${settings}.panel`;
   // Hooks & State
-  Dome.useUpdate('labview.library', 'dome.defaults');
+  Dome.useUpdate(
+    'labview.library',
+    'dome.settings.window',
+    'dome.settings.global',
+  );
   const dnd = React.useMemo(() => new DnD(), []);
   const lib = React.useMemo(() => new Library(), []);
-  const [shape, setShape] = Dome.useState(settingShape);
+  const [shape, setShape] =
+    Settings.useWindowSettings(settingShape, Json.jAny, undefined);
   const [dragging, setDragging] = React.useState();
   // Preparation
   const onClose =
