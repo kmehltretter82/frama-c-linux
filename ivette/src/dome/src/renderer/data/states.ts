@@ -17,7 +17,7 @@ import isEqual from 'react-fast-compare';
 // --------------------------------------------------------------------------
 
 /** Alias to `[state,setState]` returned values*/
-export type State<A> = [A, (update: A) => void];
+export type State<A> = [A, (newValue: A) => void];
 
 /** State field of an object state. */
 export function key<A, K extends keyof A>(

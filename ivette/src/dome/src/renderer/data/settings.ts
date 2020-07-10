@@ -11,9 +11,8 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
 import { debounce } from 'lodash';
-import * as Dome from 'dome';
 import isEqual from 'react-fast-compare';
-import { DEVEL } from 'dome/misc/system';
+import { DEVEL, emitter as SysEmitter } from 'dome/misc/system';
 import * as JSON from './json';
 import type { State } from './states';
 
@@ -130,35 +129,50 @@ class Driver {
         ipcRenderer.send(ipc, patches);
       }
     }, 100);
-    // --- Init Events
+    // --- Restore Defaults Events
     ipcRenderer.on('dome.ipc.settings.defaults', () => {
       this.fire.cancel();
       this.store.clear();
       this.diffs.clear();
-      Dome.emit(this.evt);
+      SysEmitter.emit(this.evt);
     });
     // --- Broadcast Events
     if (this.broadcast) {
-      ipcRenderer.on('dome.ipc.settings.update', (_sender, patches: patch[]) => {
-        const m = this.store;
-        const d = this.diffs;
-        patches.forEach(({ key, value }) => {
-          // Don't cancel local updates
-          if (!d.has(key)) {
-            if (value === null)
-              m.delete(key);
-            else
-              m.set(key, value);
-          }
+      ipcRenderer.on(
+        'dome.ipc.settings.broadcast',
+        (_sender, updates: patch[]) => {
+          const m = this.store;
+          const d = this.diffs;
+          updates.forEach(({ key, value }) => {
+            // Don't cancel local updates
+            if (!d.has(key)) {
+              if (value === null)
+                m.delete(key);
+              else
+                m.set(key, value);
+            }
+          });
+          SysEmitter.emit(this.evt);
         });
-        Dome.emit('dome.settings');
-      });
     }
     // --- Closing Events
     ipcRenderer.on('dome.ipc.closing', () => {
       this.fire();
       this.fire.flush();
     });
+  }
+
+  // --- Initial Data
+
+  sync(data: patch[]) {
+    this.fire.cancel();
+    this.store.clear();
+    this.diffs.clear();
+    const m = this.store;
+    data.forEach(({ key, value }) => {
+      m.set(key, value);
+    });
+    SysEmitter.emit(this.evt);
   }
 
   // --- Load Data
@@ -178,7 +192,7 @@ class Driver {
       this.store.set(key, data);
       this.diffs.set(key, data);
     }
-    if (this.broadcast) Dome.emit(this.evt);
+    if (this.broadcast) SysEmitter.emit(this.evt);
     this.fire();
   }
 
@@ -216,8 +230,10 @@ function useSettings<A>(
   // Broadcast
   React.useEffect(() => {
     if (K) {
+      const event = D.evt;
       const callback = () => setValue(loader());
-      return () => Dome.off(D.evt, callback);
+      SysEmitter.on(event, callback);
+      return () => { SysEmitter.off(event, callback); }
     }
     return undefined;
   });
@@ -248,10 +264,10 @@ export function getWindowSettings<A>(
   key: string | undefined,
   decoder: JSON.Loose<A>,
   defaultValue: A,
-) {
+): A {
   return key ?
     JSON.jCatch(decoder, defaultValue)(WindowDriver.load(key))
-    : undefined;
+    : defaultValue;
 }
 
 /**
@@ -315,6 +331,22 @@ const GlobalDriver = new Driver({
  */
 export function useGlobalSettings<A>(S: GlobalSettings<A>) {
   return useSettings(S, GlobalDriver, S.name);
+}
+
+// --------------------------------------------------------------------------
+// --- Settings Synchronization
+// --------------------------------------------------------------------------
+
+/*@ internal */
+export function synchronize() {
+  ipcRenderer.sendSync(
+    'dome.ipc.settings.sync',
+    (_event: string, data: any) => {
+      const globals: patch[] = data.globals ?? [];
+      GlobalDriver.sync(globals);
+      const settings: patch[] = data.settings ?? [];
+      WindowDriver.sync(settings);
+    });
 }
 
 // --------------------------------------------------------------------------

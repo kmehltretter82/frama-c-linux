@@ -158,7 +158,7 @@ function applyGlobalSettings(event,args) {
   applyPatches( obtainGlobalSettings(), args );
   BrowserWindow.getAllWindows().forEach((w) => {
     if (w.webContents.id !== event.sender.id) {
-      w.send('dome.ipc.settings.update',args);
+      w.send('dome.ipc.settings.broadcast',args);
     }
   });
   if (DEVEL) saveGlobalSettings();
