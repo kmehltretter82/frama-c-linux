@@ -645,8 +645,6 @@ function reducer(s: Selection, action: SelectionActions): Selection {
     if (action.locations.length === 0)
       return s;
     const selection = selectLocation(s, action.locations[0]);
-    if (action.locations.length === 1)
-      return selection;
     return {
       ...selection,
       multiple: {

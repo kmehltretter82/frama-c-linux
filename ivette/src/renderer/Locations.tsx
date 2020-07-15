@@ -8,8 +8,9 @@ import * as States from 'frama-c/states';
 import { CompactModel } from 'dome/table/arrays';
 import { Table, Column } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
-import * as Toolbar from 'dome/frame/toolbars';
-import { Component } from 'frama-c/LabViews';
+import { IconButton } from 'dome/controls/buttons';
+import { Space } from 'dome/frame/toolbars';
+import { Component, TitleBar } from 'frama-c/LabViews';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
@@ -51,45 +52,44 @@ const LocationsTable = () => {
   // Component
   return (
     <>
-      <Toolbar.ToolBar>
-        <Toolbar.Button
+      <TitleBar>
+        <IconButton
           icon="RELOAD"
           onClick={reload}
-          enabled={numberOfSelections > 1}
-          title="Reload the current location of the multiple selection"
+          enabled={numberOfSelections > 0}
+          title="Reload the current location"
         />
-        <Toolbar.ButtonGroup>
-          <Toolbar.Button
-            icon="ANGLE.LEFT"
-            onClick={() => updateSelection('MULTIPLE_PREV')}
-            enabled={numberOfSelections > 1 && multiple?.index > 0}
-            title="Previous location of the multiple selection"
-          />
-          <Toolbar.Button
-            icon="ANGLE.RIGHT"
-            onClick={() => updateSelection('MULTIPLE_NEXT')}
-            enabled={
-              numberOfSelections > 1 &&
-              multiple?.index < numberOfSelections - 1
-            }
-            title="Next location of the multiple selection"
-          />
-        </Toolbar.ButtonGroup>
+        <IconButton
+          icon="ANGLE.LEFT"
+          onClick={() => updateSelection('MULTIPLE_PREV')}
+          enabled={numberOfSelections > 1 && multiple?.index > 0}
+          title="Previous location"
+        />
+        <IconButton
+          icon="ANGLE.RIGHT"
+          onClick={() => updateSelection('MULTIPLE_NEXT')}
+          enabled={
+            numberOfSelections > 1 &&
+            multiple?.index < numberOfSelections - 1
+          }
+          title="Next location"
+        />
+        <Space />
         <Label
           className="component-info"
-          title={`${numberOfSelections} selected locations`}
-          display={numberOfSelections > 1}
+          title={`${numberOfSelections} selected location(s)`}
         >
-          {multiple?.index + 1} / {numberOfSelections}
+          {multiple?.allSelections.length === 0 ?
+            '0 / 0' : `${multiple?.index + 1} / ${numberOfSelections}`}
         </Label>
-        <Toolbar.Filler />
-        <Toolbar.Button
-          icon="CIRC.CLOSE"
+        <Space />
+        <IconButton
+          icon="TRASH"
           onClick={() => updateSelection('MULTIPLE_CLEAR')}
-          enabled={numberOfSelections > 1}
-          title="Clear the multiple selection"
+          enabled={numberOfSelections > 0}
+          title="Clear the location(s)"
         />
-      </Toolbar.ToolBar>
+      </TitleBar>
       <Table
         model={model}
         selection={multiple?.index}
