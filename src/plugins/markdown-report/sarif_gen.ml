@@ -63,7 +63,7 @@ let gen_remark alarm =
   [ Block
       [ Text
           (plain
-             (Printf.sprintf "This alarms represents a potential %s."
+             (Printf.sprintf "This alarm represents a potential %s."
                 (Alarms.get_description alarm)
              )
           )
@@ -172,7 +172,7 @@ let gen_run remarks =
     | [] -> rules
     | _ ->
       Datatype.String.Map.add
-        "user-spec" "User written ACSL specification" rules
+        "user-spec" "User-written ACSL specification" rules
   in
   let rules = make_rule_dictionary rules in
   let resources = Resources.create ~rules () in
