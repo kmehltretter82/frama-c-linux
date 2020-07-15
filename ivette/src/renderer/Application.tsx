@@ -35,13 +35,13 @@ const HistorySelectionControls = () => {
   return (
     <Toolbar.ButtonGroup>
       <Toolbar.Button
-        icon="MEDIA.PREV"
+        icon="ANGLE.LEFT"
         onClick={doPrevSelect}
         disabled={!selection || selection.history.prevSelections.length === 0}
         title="Previous location"
       />
       <Toolbar.Button
-        icon="MEDIA.NEXT"
+        icon="ANGLE.RIGHT"
         onClick={doNextSelect}
         disabled={!selection || selection.history.nextSelections.length === 0}
         title="Next location"
