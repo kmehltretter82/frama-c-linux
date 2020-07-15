@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2020-07-10] Fix translation of trange (incorrect length).
 -* E-ACSL       [2020-07-09] Decrease the number of allocated blocks when one
 	        block is freed.
 -  E-ACSL       [2020-06-19] Add support of bitwise operators for C integers.

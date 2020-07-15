@@ -204,13 +204,17 @@ let call_memory_block ~loc kf name ctx env ptr r p =
        we need to clone them in order to force retyping *)
     let s = { s with term_node = s.term_node } in
     let n1 = { n1 with term_node = n1.term_node } in
-    Logic_const.term
-      ~loc
-      (TBinOp(
-          Mult,
-          s,
-          Logic_const.term ~loc (TBinOp(MinusA, n2, n1)) Linteger))
-      Linteger
+    (* The range are inclusives, so the total number of elements is
+       [n2 - n1 + 1] *)
+    let count = Logic_const.term
+        ~loc
+        (TBinOp (
+            PlusA,
+            Logic_const.term ~loc (TBinOp (MinusA, n2, n1)) Linteger,
+            Logic_const.tinteger ~loc 1))
+        Linteger
+    in
+    Logic_const.term ~loc (TBinOp (Mult, s, count)) Linteger
   in
   Typing.type_term ~use_gmp_opt:false size_term;
   let size, env = match Typing.get_number_ty size_term with
