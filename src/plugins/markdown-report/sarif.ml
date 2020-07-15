@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** OCaml representation for the sarif 2.0 schema. *)
+(** OCaml representation for the sarif 2.1 schema. *)
 
 (** ppx_deriving_yojson generates parser and printer that are recursive
     by default: we must thus silence spurious let rec warning (39). *)
@@ -63,17 +63,17 @@ end
 struct
   type t = string[@@deriving yojson]
   let sarif_github =
-    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.0-CSD.1/sarif-schema.json"
+    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.1.0-CSD.1/sarif-schema-2.1.0.json"
 end
 
 module Version: sig
   include Json_type with type t = private string
-  val v2_0_0: t
+  val v2_1_0: t
 end
 =
 struct
   type t = string[@@deriving yojson]
-  let v2_0_0 = "2.0.0"
+  let v2_1_0 = "2.1.0"
 end
 
 module Message = struct
@@ -107,7 +107,7 @@ module Message = struct
   let default = create ()
 end
 
-module FileLocation = struct
+module ArtifactLocation = struct
   type t = {
     uri: string;
     uriBaseId: (string [@default ""])
@@ -230,26 +230,26 @@ end
 module PhysicalLocation = struct
   type t = {
     id: (string [@default ""]);
-    fileLocation: FileLocation.t;
+    artifactLocation: ArtifactLocation.t;
     region: (Region.t [@default Region.default]);
     contextRegion: (Region.t [@default Region.default]);
   }[@@deriving yojson]
 
   let create
       ?(id = "")
-      ~fileLocation
+      ~artifactLocation
       ?(region = Region.default)
       ?(contextRegion = Region.default)
       ()
     =
-    { id; fileLocation; region; contextRegion }
+    { id; artifactLocation; region; contextRegion }
 
-  let default = create ~fileLocation:FileLocation.default ()
+  let default = create ~artifactLocation:ArtifactLocation.default ()
 
   let of_loc loc =
-    let fileLocation = FileLocation.of_loc loc in
+    let artifactLocation = ArtifactLocation.of_loc loc in
     let region = Region.of_loc loc in
-    create ~fileLocation ~region ()
+    create ~artifactLocation ~region ()
 
 end
 
@@ -356,7 +356,7 @@ end
 module Attachment = struct
   type t = {
     description: (Message.t [@default Message.default ]);
-    fileLocation: FileLocation.t;
+    artifactLocation: ArtifactLocation.t;
     regions: (Region.t list [@default []]);
     rectangles: (Rectangle.t list [@default []])
   } [@@deriving yojson]
@@ -416,7 +416,7 @@ module Notification = struct
   }[@@deriving yojson]
 end
 
-module Tool = struct
+module Driver = struct
   type t = {
     name: string;
     fullName: (string [@default ""]);
@@ -445,7 +445,16 @@ module Tool = struct
       downloadUri; sarifLoggerVersion; language; properties }
 
   let default = create ~name:"" ()
+end
 
+module Tool = struct
+  type t = {
+    driver: Driver.t
+  }[@@deriving yojson]
+
+  let create driver = { driver; }
+
+  let default = create Driver.default
 end
 
 module Invocation = struct
@@ -453,7 +462,7 @@ module Invocation = struct
   type t =  {
     commandLine: string;
     arguments: string list;
-    responseFiles: (FileLocation.t list [@default []]);
+    responseFiles: (ArtifactLocation.t list [@default []]);
     attachments: (Attachment.t list [@default []]);
     startTime: (string [@default ""]);
     endTime: (string [@default ""]);
@@ -464,18 +473,18 @@ module Invocation = struct
     exitSignalName: (string [@default ""]);
     exitSignalNumber: (int [@default 0]);
     processStartFailureMessage: (string [@default ""]);
-    toolExecutionSuccessful: bool;
+    executionSuccessful: bool;
     machine: (string [@default ""]);
     account: (string [@default ""]);
     processId: (int [@default 0]);
-    executableLocation: (FileLocation.t [@default FileLocation.default]);
-    workingDirectory: (FileLocation.t [@default FileLocation.default]);
+    executableLocation: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    workingDirectory: (ArtifactLocation.t [@default ArtifactLocation.default]);
     environmentVariables:
       (Additional_properties.t [@default Additional_properties.default]);
-    stdin: (FileLocation.t [@default FileLocation.default]);
-    stdout: (FileLocation.t [@default FileLocation.default]);
-    stderr: (FileLocation.t [@default FileLocation.default]);
-    stdoutStderr: (FileLocation.t [@default FileLocation.default]);
+    stdin: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    stdout: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    stderr: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    stdoutStderr: (ArtifactLocation.t [@default ArtifactLocation.default]);
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
 
@@ -493,17 +502,17 @@ module Invocation = struct
       ?(exitSignalName = "")
       ?(exitSignalNumber = 0)
       ?(processStartFailureMessage = "")
-      ?(toolExecutionSuccessful = true)
+      ?(executionSuccessful = true)
       ?(machine = "")
       ?(account = "")
       ?(processId = 0)
-      ?(executableLocation = FileLocation.default)
-      ?(workingDirectory = FileLocation.default)
+      ?(executableLocation = ArtifactLocation.default)
+      ?(workingDirectory = ArtifactLocation.default)
       ?(environmentVariables = Additional_properties.default)
-      ?(stdin = FileLocation.default)
-      ?(stdout = FileLocation.default)
-      ?(stderr = FileLocation.default)
-      ?(stdoutStderr = FileLocation.default)
+      ?(stdin = ArtifactLocation.default)
+      ?(stdout = ArtifactLocation.default)
+      ?(stderr = ArtifactLocation.default)
+      ?(stdoutStderr = ArtifactLocation.default)
       ?(properties = Properties.default)
       ()
     =
@@ -521,7 +530,7 @@ module Invocation = struct
       exitSignalName;
       exitSignalNumber;
       processStartFailureMessage;
-      toolExecutionSuccessful;
+      executionSuccessful;
       machine;
       account;
       processId;
@@ -543,13 +552,13 @@ module Conversion = struct
   type t = {
     tool: Tool.t;
     invocation: (Invocation.t [@default Invocation.default]);
-    analysisToolLogFiles: (FileLocation.t [@default FileLocation.default]);
+    analysisToolLogFiles: (ArtifactLocation.t [@default ArtifactLocation.default]);
   } [@@deriving yojson]
 
   let default = {
-    tool = Tool.default;
+    tool = {driver = Driver.default};
     invocation = Invocation.default;
-    analysisToolLogFiles = FileLocation.default;
+    analysisToolLogFiles = ArtifactLocation.default;
   }
 end
 
@@ -656,7 +665,7 @@ end
 
 module File = struct
   type t = {
-    fileLocation: (FileLocation.t [@default FileLocation.default]);
+    artifactLocation: (ArtifactLocation.t [@default ArtifactLocation.default]);
     parentKey: (string [@default ""]);
     offset: (int [@default 0]);
     length: (int [@default 0]);
@@ -670,7 +679,7 @@ module File = struct
   }[@@deriving yojson]
 
   let create
-      ?(fileLocation = FileLocation.default)
+      ?(artifactLocation = ArtifactLocation.default)
       ?(parentKey = "")
       ?(offset = 0)
       ?(length = 0)
@@ -684,14 +693,14 @@ module File = struct
       ()
     =
     {
-      fileLocation; parentKey; offset; length; roles; mimeType; contents;
+      artifactLocation; parentKey; offset; length; roles; mimeType; contents;
       encoding; hashes; lastModifiedTime; properties
     }
 end
 
 module FileChange = struct
   type t = {
-    fileLocation: FileLocation.t;
+    artifactLocation: ArtifactLocation.t;
     replacements: Replacement.t list
   }[@@deriving yojson]
 end
@@ -705,13 +714,13 @@ end
 
 module ExternalFiles = struct
   type t = {
-    conversion: (FileLocation.t [@default FileLocation.default]);
-    files: (FileLocation.t [@default FileLocation.default]);
-    graphs: (FileLocation.t [@default FileLocation.default]);
-    invocations: (FileLocation.t list [@default []]);
-    logicalLocations: (FileLocation.t [@default FileLocation.default]);
-    resources: (FileLocation.t [@default FileLocation.default]);
-    results: (FileLocation.t [@default FileLocation.default]);
+    conversion: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    files: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    graphs: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    invocations: (ArtifactLocation.t list [@default []]);
+    logicalLocations: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    resources: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    results: (ArtifactLocation.t [@default ArtifactLocation.default]);
   }[@@deriving yojson]
 end
 
@@ -821,11 +830,34 @@ module Resources = struct
     { messageStrings; rules }
 end
 
-module Result_level:
+module Result_kind:
 sig
   type t = private string
   val notApplicable: t
   val pass: t
+  val fail: t
+  val review: t
+  val open_: t
+  val informational: t
+
+  val to_yojson: t -> Yojson.Safe.t
+  val of_yojson: Yojson.Safe.t -> (t,string) result
+end
+=
+struct
+  type t = string[@@deriving yojson]
+  let notApplicable = "notApplicable"
+  let pass = "pass"
+  let fail = "fail"
+  let review = "review"
+  let open_ = "open"
+  let informational = "informational"
+end
+
+module Result_level:
+sig
+  type t = private string
+  val none: t
   val note: t
   val warning: t
   val error: t
@@ -836,8 +868,7 @@ end
 =
 struct
   type t = string[@@deriving yojson]
-  let notApplicable = "notApplicable"
-  let pass = "pass"
+  let none = "none"
   let note = "note"
   let warning = "warning"
   let error = "error"
@@ -875,9 +906,10 @@ end
 module Sarif_result = struct
   type t = {
     ruleId: (string [@default ""]);
-    level: (Result_level.t[@default Result_level.notApplicable]);
+    kind: (Result_kind.t[@default Result_kind.fail]);
+    level: (Result_level.t[@default Result_level.warning]);
     message: (Message.t [@default Message.default]);
-    analysisTarget: (FileLocation.t [@default FileLocation.default]);
+    analysisTarget: (ArtifactLocation.t [@default ArtifactLocation.default]);
     locations: (Location.t list [@default []]);
     instanceGuid: (string [@default ""]);
     correlationGuid: (string [@default ""]);
@@ -903,9 +935,10 @@ module Sarif_result = struct
 
   let create
       ?(ruleId = "")
-      ?(level=Result_level.notApplicable)
+      ?(kind=Result_kind.pass)
+      ?(level=Result_level.none)
       ?(message=Message.default)
-      ?(analysisTarget=FileLocation.default)
+      ?(analysisTarget=ArtifactLocation.default)
       ?(locations=[])
       ?(instanceGuid="")
       ?(correlationGuid="")
@@ -927,7 +960,7 @@ module Sarif_result = struct
       ()
     =
     {
-      ruleId;level; message; analysisTarget; locations; instanceGuid;
+      ruleId; kind; level; message; analysisTarget; locations; instanceGuid;
       correlationGuid; occurrenceCount; partialFingerprints; fingerprints;
       stacks; codeFlows; graphs; graphTraversals; relatedLocations;
       suppressionStates; baselineState; attachments; workItemsUris;
@@ -1031,6 +1064,6 @@ module Schema = struct
     runs: Run.t list
   } [@@deriving yojson]
 
-  let create ?(schema=Uri.sarif_github) ?(version=Version.v2_0_0) ~runs () =
+  let create ?(schema=Uri.sarif_github) ?(version=Version.v2_1_0) ~runs () =
     { schema; version; runs }
 end

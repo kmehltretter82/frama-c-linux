@@ -29,7 +29,7 @@ let frama_c_sarif =
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
   Tool.create
-    ~name ~version ~semanticVersion ~fullName ~downloadUri ()
+    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri ())
 
 
 let get_remarks () =
@@ -70,15 +70,25 @@ let gen_remark alarm =
       ]
   ]
 
+let kind_of_status =
+  let open Property_status.Feedback in
+  let open Sarif.Result_kind in
+  function
+  | Never_tried -> notApplicable
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
+  | Unknown | Unknown_but_dead -> open_
+  | Invalid | Invalid_under_hyp | Invalid_but_dead -> fail
+  | Inconsistent -> review
+
 let level_of_status =
   let open Property_status.Feedback in
   let open Sarif.Result_level in
   function
-  | Never_tried -> notApplicable
-  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
-  | Unknown | Unknown_but_dead -> warning
+  | Never_tried -> none
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> none
+  | Unknown | Unknown_but_dead -> none
   | Invalid | Invalid_under_hyp | Invalid_but_dead -> error
-  | Inconsistent -> note
+  | Inconsistent -> none
 
 let make_message alarm annot remark =
   let open Markdown in
@@ -110,12 +120,13 @@ let gen_results remarks =
       Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
     in
     let label = "Alarm-" ^ string_of_int i in
+    let kind = kind_of_status (Property_status.Feedback.get prop) in
     let level = level_of_status (Property_status.Feedback.get prop) in
     let remark = get_remark remarks label in
     let message = make_message alarm annot remark in
     let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
     let res =
-      Sarif_result.create ~level ~ruleId ~message ~locations ()
+      Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
     in
     (i+1, rules, res :: content)
   in
@@ -151,10 +162,10 @@ let gen_files () =
       let fname = Filepath.Normalized.to_pretty_string f in
       Filename.chop_extension (Filename.basename fname)
     in
-    let fileLocation = FileLocation.create ~uri:(f :> string) () in
+    let artifactLocation = ArtifactLocation.create ~uri:(f :> string) () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
-    key, File.create ~fileLocation ~roles ~mimeType ()
+    key, File.create ~artifactLocation ~roles ~mimeType ()
   in
   List.map add_src_file (Kernel.Files.get ())
 
