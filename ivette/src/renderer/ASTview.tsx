@@ -85,13 +85,13 @@ const ASTview = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const printed: React.MutableRefObject<string | undefined> = React.useRef();
+  const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const multipleSelections = selection?.multiple.allSelections;
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
-  const markers = States.useSyncModel(markerInfo);
+  const markers = States.useSyncArray(markerInfo);
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
@@ -131,7 +131,7 @@ const ASTview = () => {
 
   function onContextMenu(id: key<'#markerInfo'>) {
     const items = [];
-    const marker = markers.getData(id);
+    const marker = markers.find((e) => e.key === id);
     if (marker?.kind === 'function') {
       items.push({
         label: `Go to definition of ${marker.name}`,
