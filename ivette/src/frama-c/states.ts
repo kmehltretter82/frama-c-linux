@@ -676,7 +676,8 @@ function reducer(s: Selection, action: SelectionActions): Selection {
   }
 }
 
-const GlobalSelection = new GlobalStates.State<Selection>({
+/** The initial selection is empty. */
+const emptySelection = {
   current: undefined,
   history: {
     prevSelections: [],
@@ -686,7 +687,10 @@ const GlobalSelection = new GlobalStates.State<Selection>({
     index: 0,
     allSelections: [],
   },
-});
+};
+
+const GlobalSelection = new GlobalStates.State<Selection>(emptySelection);
+Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
 /**
    Current selection.
