@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -12,17 +14,17 @@
 int testno = 0;
 
 void signal_eval(int status, int expect_signal, const char *at) {
-  printf("TEST %d: ", ++testno);
+  fprintf(stderr, "TEST %d: ", ++testno);
   int signalled = WIFSIGNALED(status);
   if (signalled && expect_signal)
-    printf("OK: Expected signal at %s\n", at);
+    fprintf(stderr, "OK: Expected signal at %s\n", at);
   else if (!signalled && !expect_signal)
-    printf("OK: Expected execution at %s\n", at);
+    fprintf(stderr, "OK: Expected execution at %s\n", at);
   else if (!signalled && expect_signal) {
-    printf("FAIL: Unexpected execution at %s\n", at);
+    fprintf(stderr, "FAIL: Unexpected execution at %s\n", at);
     exit(1);
   } else if (signalled && !expect_signal) {
-    printf("FAIL: Unexpected signal at %s\n", at);
+    fprintf(stderr, "FAIL: Unexpected signal at %s\n", at);
     exit(2);
   }
 }

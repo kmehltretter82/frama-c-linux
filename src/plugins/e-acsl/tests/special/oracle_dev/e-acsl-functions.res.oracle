@@ -1,5 +1,1 @@
-[kernel] User Error: cannot load plug-in 'frama-c-e_acsl': cannot load module
-  Details: error loading shared library: Dynlink.Error (Dynlink.Cannot_open_dll "Failure(\"./top/E_ACSL.cmxs: cannot open shared object file: No such file or directory\")")
-[kernel] User Error: compilation of './tests/print.ml' failed
-[kernel] User Error: Deferred error message was emitted during execution. See above messages for more information.
-[kernel] Frama-C aborted: invalid user input.
+[kernel] Parsing tests/special/e-acsl-functions.c (with preprocessing)

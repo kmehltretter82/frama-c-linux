@@ -1,8 +1,8 @@
-/* run.config_ci
+/* run.config_ci, run.config_dev
    COMMENT: test option -e-acsl-no-valid
-   DONTRUN:
-   LOG: gen_@PTEST_NAME@.c
    STDOPT: #"-e-acsl-prepare -e-acsl-share ./share/e-acsl -eva -eva-verbose 0 -then -e-acsl-no-valid"
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -eva -eva-verbose 0
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --then --e-acsl-extra -e-acsl-no-valid
 */
 
 #include <stdlib.h>

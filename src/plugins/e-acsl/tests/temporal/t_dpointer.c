@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci, run.config_dev
    COMMENT: Simple case of double pointer dereference
 */
 

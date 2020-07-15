@@ -1,6 +1,1 @@
 [kernel] Parsing tests/special/builtin.i (no preprocessing)
-[kernel:annot-error] tests/special/builtin.i:9: Warning: 
-  unbound function incr. Ignoring logic specification of function f
-[kernel] User Error: warning annot-error treated as fatal error.
-[kernel] User Error: stopping on file "tests/special/builtin.i" that has errors.
-[kernel] Frama-C aborted: invalid user input.
