@@ -65,16 +65,15 @@ async function loadAST(
   }
 }
 
-async function functionCallers(
-  updateSelection: (a: States.SelectionActions) => void,
-  kf: string,
-) {
+/** Compute the [[functionName]] caller locations. */
+async function functionCallers(functionName: string) {
   try {
-    const data = await Server.send(getCallers, kf);
+    const data = await Server.send(getCallers, functionName);
     const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
-    updateSelection({ locations });
+    return locations;
   } catch (err) {
-    PP.error(`Fail to retrieve callers of function ${kf}`, err);
+    PP.error(`Fail to retrieve callers of function ${functionName}.`, err);
+    return [];
   }
 }
 
@@ -145,7 +144,10 @@ const ASTview = () => {
     if (marker?.kind === 'declaration' && marker?.name) {
       items.push({
         label: 'Go to callers',
-        onClick: () => functionCallers(updateSelection, marker.name),
+        onClick: async () => {
+          const locations = await functionCallers(marker.name);
+          updateSelection({ locations });
+        },
       });
     }
     if (items.length > 0)
