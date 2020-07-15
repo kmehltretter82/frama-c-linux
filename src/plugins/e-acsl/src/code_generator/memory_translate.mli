@@ -51,6 +51,14 @@ val call_valid:
    [t] can denote ranges of memory locations.
    [p] is the predicate under testing. *)
 
+val call_separated:
+  loc:location -> kernel_function -> typ -> Env.t -> term list -> predicate ->
+  exp * Env.t
+(* [call_separated ~loc kf ctx env tlist p] creates a call to the E-ACSL memory
+   builtin [separated].
+   Each [term] in [tlist] can denote ranges of memory locations.
+   [p] is the predicate under testing. *)
+
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)

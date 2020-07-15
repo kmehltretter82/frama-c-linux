@@ -133,16 +133,16 @@ let call ~loc kf name ctx env t =
 
 (* Take the term [size] that has been typed into GMP
    and return an expression of type [size_t].
-   The case where [!(0 <= size < SIZE_MAX)] is an UB ==> guard against it. *)
+   The case where [!(0 <= size <= SIZE_MAX)] is an UB ==> guard against it.
+   Since the case [0 <= size] is already checked before calling this function,
+   only [size <= SIZE_MAX] is added as a guard. *)
 let gmp_to_sizet ~loc kf env size p =
   let sizet = Cil.(theMachine.typeOfSizeOf) in
   (* The guard *)
   let sizet_max = Logic_const.tint
       ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
   in
-  let guard_upper = Logic_const.prel ~loc (Rlt, size, sizet_max) in
-  let guard_lower = Logic_const.prel ~loc (Rle, Cil.lzero ~loc (), size) in
-  let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+  let guard = Logic_const.prel ~loc (Rle, size, sizet_max) in
   Typing.type_named_predicate ~must_clear:false guard;
   let guard, env = !predicate_to_exp_ref kf env guard in
   (* Translate term [size] into an exp of type [size_t] *)
@@ -163,10 +163,12 @@ let gmp_to_sizet ~loc kf env size p =
   in
   e, env
 
-(* Call to [__e_acsl_<name>] for terms of the form [ptr + r]
-   when [<name> = valid or initialized or valid_read] and
-   where [ptr] is an address and [r] a range offset *)
-let call_memory_block ~loc kf name ctx env ptr r p =
+(* Take a term of the form [ptr + r] where [ptr] is an address and [r] a range
+   offset, and return a tuple [(ptr, size, env)] where [ptr] is the address of
+   the start of the range, [size] is the size of the range in bytes and [env] is
+   the current environment.
+   [p] is the predicate under test. *)
+let range_to_ptr_and_size ~loc kf env ptr r p =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
       n1, n2
@@ -192,8 +194,7 @@ let call_memory_block ~loc kf name ctx env ptr r p =
       (Ctype typ_charptr)
   in
   Typing.type_term ~use_gmp_opt:false ~ctx:Typing.nan ptr;
-  let term_to_exp = !term_to_exp_ref in
-  let ptr, env = term_to_exp kf (Env.rte env true) ptr in
+  let ptr, env = !term_to_exp_ref kf (Env.rte env true) ptr in
   (* size *)
   let size_term =
     (* Since [s] and [n1] have been typed through [ptr],
@@ -210,18 +211,47 @@ let call_memory_block ~loc kf name ctx env ptr r p =
             Logic_const.tinteger ~loc 1))
         Linteger
     in
-    Logic_const.term ~loc (TBinOp (Mult, s, count)) Linteger
+    let size_term = Logic_const.term ~loc (TBinOp (Mult, s, count)) Linteger in
+    (* Create a let binding with the value of the size *)
+    let size_term_info =
+      { l_var_info = Cil_const.make_logic_var_local "size" Linteger;
+        l_type = None;
+        l_tparams = [];
+        l_labels = [];
+        l_profile = [];
+        l_body = LBterm size_term;
+      }
+    in
+    let size_term_lv = Logic_const.tvar ~loc size_term_info.l_var_info in
+    (* If [size_term <= 0], then the range represents an empty set and the size
+       should be set to exactly [0]. *)
+    let tzero = Logic_const.tinteger ~loc 0 in
+    let size_term_if =
+      Logic_const.term
+        ~loc
+        (Tif (Logic_const.term ~loc (TBinOp (Le, size_term_lv, tzero)) Linteger,
+              tzero,
+              size_term_lv))
+        Linteger
+    in
+    Logic_const.term ~loc (Tlet (size_term_info, size_term_if)) Linteger
   in
   Typing.type_term ~use_gmp_opt:false size_term;
   let size, env = match Typing.get_number_ty size_term with
     | Typing.Gmpz ->
       gmp_to_sizet ~loc kf env size_term p
     | Typing.(C_integer _ | C_float _) ->
-      let size, env = term_to_exp kf env size_term in
-      Cil.constFold false size, env
+      !term_to_exp_ref kf env size_term
     | Typing.(Rational | Real | Nan) ->
       assert false
   in
+  ptr, size, env
+
+(* Call to [__e_acsl_<name>] for terms of the form [ptr + r]
+   when [<name> = valid or initialized or valid_read] and
+   where [ptr] is an address and [r] a range offset *)
+let call_memory_block ~loc kf name ctx env ptr r p =
+  let ptr, size, env = range_to_ptr_and_size ~loc kf env ptr r p in
   (* base and base_addr *)
   let base, _ = Misc.ptr_index ~loc ptr in
   let base_addr  = match base.enode with
@@ -390,6 +420,69 @@ let call_valid ~loc kf name ctx env t p =
     t
     p
     call_for_unsupported_constructs
+
+(* \separated *)
+let call_separated ~loc kf ctx env tlist p =
+  let term_to_ptr_and_size kf env t =
+    let term_to_exp = !term_to_exp_ref in
+    let e, env = term_to_exp kf (Env.rte env true) t in
+    let ty = Misc.cty t.term_type in
+    let sizeof = Misc.mk_ptr_sizeof ty loc in
+    e, sizeof, env
+  in
+  let n_args, args, env =
+    List.fold_left
+      (fun (n_args, args, env) t ->
+         let ptr, size, env =
+           if Misc.is_bitfield_pointers t.term_type then
+             Error.not_yet "bitfield pointer in \\separated";
+           match t.term_node with
+           | TBinOp((PlusPI | IndexPI),
+                    ptr,
+                    ({ term_node = Trange _ } as r)) ->
+             if Misc.is_set_of_ptr_or_array ptr.term_type then
+               Error.not_yet
+                 "arithmetic over set of pointers or arrays in \\separated"
+             else
+               range_to_ptr_and_size ~loc kf env ptr r p
+           | TAddrOf(TVar lv, TIndex({ term_node = Trange _ } as r, TNoOffset)) ->
+             (* Case A *)
+             assert (Logic_const.is_set_type t.term_type);
+             let lty_noset = Logic_const.type_of_element t.term_type in
+             let ptr =
+               Logic_const.taddrof ~loc (TVar lv, TNoOffset) lty_noset
+             in
+             range_to_ptr_and_size ~loc kf env ptr r p
+           | TAddrOf(TVar ({ lv_type = Ctype (TArray _) } as _lv), toffset) ->
+             if has_set_as_index toffset then
+               Error.not_yet "range elimination for \\separated"
+             else
+               term_to_ptr_and_size kf env t
+           | _ ->
+             term_to_ptr_and_size kf env t
+         in
+         let ptr = Cil.mkCast ~force:false ~e:ptr ~newt:Cil.voidPtrType in
+         let n_args = n_args + 1 in
+         let args = ptr :: size :: args in
+         n_args, args, env
+      )
+      (0, [], env)
+      tlist
+  in
+  let args = (Cil.integer ~loc n_args) :: args in
+  let _, e, env =
+    Env.new_var
+      ~loc
+      ~name:"separated"
+      env
+      kf
+      None
+      ctx
+      (fun v _ -> [
+           Constructor.mk_rtl_call ~loc ~result:(Cil.var v) "separated" args
+         ])
+  in
+  e, env
 
 (*
 Local Variables:

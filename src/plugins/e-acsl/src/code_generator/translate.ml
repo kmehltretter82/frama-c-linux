@@ -882,7 +882,6 @@ and predicate_content_to_exp ?name kf env p =
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
     let e, env = term_to_exp kf env tapp in
     e, env
-  | Pseparated _ -> Env.not_yet env "\\separated"
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
@@ -982,6 +981,34 @@ and predicate_content_to_exp ?name kf env p =
     end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
+  | Pseparated tlist ->
+    let env =
+      List.fold_left
+        (fun env t ->
+           let name = "separated_guard" in
+           let p = Logic_const.pvalid_read ~loc (BuiltinLabel Here, t) in
+           let p = { p with pred_name = name :: p.pred_name } in
+           let e, env =
+             predicate_content_to_exp
+               ~name
+               kf
+               env
+               p
+           in
+           let stmt =
+             Smart_stmt.runtime_check
+               Smart_stmt.RTE
+               kf
+               e
+               p
+           in
+           Env.add_assert kf stmt p;
+           Env.add_stmt env kf stmt
+        )
+        env
+        tlist
+    in
+    Memory_translate.call_separated ~loc kf Cil.intType env tlist p
   | Pinitialized(BuiltinLabel Here, t) ->
     (match t.term_node with
      (* optimisation when we know that the initialisation is ok *)
