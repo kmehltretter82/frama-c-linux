@@ -77,7 +77,10 @@ const LocationsTable = () => {
         <Space />
         <Label
           className="component-info"
-          title={`${numberOfSelections} selected location(s)`}
+          title={
+            `${numberOfSelections} selected ` +
+            `location${numberOfSelections > 1 ? 's' : ''}`
+          }
         >
           {multiple?.allSelections.length === 0 ?
             '0 / 0' : `${multiple?.index + 1} / ${numberOfSelections}`}
@@ -87,7 +90,7 @@ const LocationsTable = () => {
           icon="TRASH"
           onClick={() => updateSelection('MULTIPLE_CLEAR')}
           enabled={numberOfSelections > 0}
-          title="Clear the location(s)"
+          title={`Clear location${numberOfSelections > 1 ? 's' : ''}`}
         />
       </TitleBar>
       <Table
