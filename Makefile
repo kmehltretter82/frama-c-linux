@@ -827,7 +827,7 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 PLUGIN_ENABLE:=$(ENABLE_EVA)
 PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
-PLUGIN_EXTRA_DIRS:=engine values domains domains/cvalue domains/apron \
+PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
 	values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
@@ -910,11 +910,12 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
+	api/general_requests \
 	utils/unit_tests \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
-PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen
+PLUGIN_DEPENDENCIES:=Callgraph LoopAnalysis RteGen Server
 
 # These files are used by the GUI, but do not depend on Lablgtk
 VALUE_GUI_AUX:=gui_files/gui_types gui_files/gui_eval \

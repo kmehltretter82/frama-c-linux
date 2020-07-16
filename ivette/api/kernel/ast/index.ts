@@ -43,14 +43,14 @@ export const compute: Server.ExecRequest<null,null>= compute_internal;
 
 /** Marker kind */
 export enum markerKind {
-  /** Expression */
-  expression = 'expression',
-  /** Lvalue */
-  lvalue = 'lvalue',
   /** Variable */
   variable = 'variable',
   /** Function */
   function = 'function',
+  /** Expression */
+  expression = 'expression',
+  /** Lvalue */
+  lvalue = 'lvalue',
   /** Declaration */
   declaration = 'declaration',
   /** Statement */
@@ -114,10 +114,10 @@ export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
     <{ key: Json.key<'#markerInfo'>, kind: markerKind, name: string,
        descr: string }>({
-    key: Compare.primitive,
+    key: Compare.string,
     kind: byMarkerKind,
     name: Compare.alpha,
-    descr: Compare.primitive,
+    descr: Compare.string,
   });
 
 /** Signal for array [`markerInfo`](#markerinfo)  */
@@ -242,9 +242,9 @@ export const jFunctionsDataSafe: Json.Safe<functionsData> =
 export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string }>({
-    key: Compare.primitive,
+    key: Compare.string,
     name: Compare.alpha,
-    signature: Compare.primitive,
+    signature: Compare.string,
   });
 
 /** Signal for array [`functions`](#functions)  */

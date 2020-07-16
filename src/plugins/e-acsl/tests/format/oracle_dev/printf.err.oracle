@@ -1,6 +1,0 @@
-gcc: error: ./tests/print.cmxs.startup.o: No such file or directory
-gcc: error: ./tests/print.o: No such file or directory
-gcc: fatal error: no input files
-compilation terminated.
-File "caml_startup", line 1:
-Error: Error during linking

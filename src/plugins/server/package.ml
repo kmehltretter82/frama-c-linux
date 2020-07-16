@@ -166,6 +166,7 @@ type jtype =
   | Jnumber
   | Jstring
   | Jalpha (* string primarily compared without case *)
+  | Jtag of string (* single constant string *)
   | Jkey of string (* kind of a string used for indexing *)
   | Jindex of string (* kind of an integer used for indexing *)
   | Joption of jtype
@@ -289,14 +290,14 @@ let rec isRecursive = function
   | Jself -> true
   | Jdata _ | Jenum _
   | Jany | Jnull | Jboolean | Jnumber
-  | Jstring | Jalpha | Jkey _ | Jindex _ -> false
+  | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> false
   | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> isRecursive js
   | Jtuple js | Junion js -> List.exists isRecursive js
   | Jrecord fjs -> List.exists (fun (_,js) -> isRecursive js) fjs
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
-  | Jstring | Jalpha | Jkey _ | Jindex _ -> ()
+  | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> ()
   | Joption js | Jdict(_,js)  | Jarray js | Jlist js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
@@ -447,7 +448,7 @@ let iter f =
 
 let key kd = Md.plain (Printf.sprintf "`#%s`" kd)
 let index kd = Md.plain (Printf.sprintf "`#0%s`" kd)
-let escaped tag = Md.plain (Printf.sprintf "`\"%s\"`" @@ String.escaped tag)
+let litteral tag = Md.plain (Printf.sprintf "`\"%s\"`" tag)
 
 type pp = {
   self: Md.text ;
@@ -461,6 +462,7 @@ let rec md_jtype pp = function
   | Jnumber -> Md.emph "number"
   | Jboolean -> Md.emph "boolean"
   | Jstring | Jalpha -> Md.emph "string"
+  | Jtag a -> litteral a
   | Jkey kd -> key kd
   | Jindex kd -> index kd
   | Jdata id | Jenum id -> pp.ident id
@@ -478,7 +480,7 @@ and md_jlist pp sep js =
 and fields pp fjs =
   Md.glue ~sep:(Md.plain ",") @@
   List.map (fun (fd,js) ->
-      escaped fd @
+      litteral fd @
       match js with
       | Joption js -> Md.code ":?" @ md_jtype pp js
       | _ -> Md.code ":" @ md_jtype pp js
@@ -501,7 +503,7 @@ let md_tags ?(title="Tags") (tags : tagInfo list) =
     ] in
   let row tg = [
     tg.tg_label ;
-    escaped tg.tg_name ;
+    litteral tg.tg_name ;
     tg.tg_descr ;
   ] in
   Md.{ caption = None ; header ; content = List.map row tags  }
@@ -515,12 +517,12 @@ let md_fields ?(title="Field") pp (fields : fieldInfo list) =
   let row f =
     match f.fd_type with
     | Joption js -> [
-        escaped (f.fd_name ^ "?") ;
+        litteral f.fd_name @ Md.plain "(opt.)" ;
         md_jtype pp js ;
         f.fd_descr ;
       ]
     | _ -> [
-        escaped f.fd_name ;
+        litteral f.fd_name ;
         md_jtype pp f.fd_type ;
         f.fd_descr ;
       ]

@@ -4,5 +4,17 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] tests/memory/ranges_in_builtins.c:21: Warning: 
-  assertion got status invalid (stopping propagation).
+[eva:alarm] tests/memory/ranges_in_builtins.c:7: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
+  function __gmpz_init_set: precondition ¬\initialized(z) got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
+  function __gmpz_init_set: precondition ¬\initialized(z) got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:49: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:54: Warning: 
+  accessing uninitialized left-value. assert \initialized(&s.b);

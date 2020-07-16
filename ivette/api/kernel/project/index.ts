@@ -36,9 +36,9 @@ export const jProjectInfoSafe: Json.Safe<projectInfo> =
 export const byProjectInfo: Compare.Order<projectInfo> =
   Compare.byFields
     <{ id: Json.key<'#project'>, name: string, current: boolean }>({
-    id: Compare.primitive,
+    id: Compare.string,
     name: Compare.alpha,
-    current: Compare.primitive,
+    current: Compare.boolean,
   });
 
 /** Request to be executed on the specified project. */
@@ -62,8 +62,8 @@ export const jProjectRequestSafe: Json.Safe<projectRequest> =
 export const byProjectRequest: Compare.Order<projectRequest> =
   Compare.byFields
     <{ project: Json.key<'#project'>, request: string, data: Json.json }>({
-    project: Compare.primitive,
-    request: Compare.primitive,
+    project: Compare.string,
+    request: Compare.string,
     data: Compare.structural,
   });
 

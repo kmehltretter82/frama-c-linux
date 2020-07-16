@@ -1,6 +1,6 @@
 /* run.config_ci,run.config_dev
    COMMENT: Check detection of format-string vulnerabilities via printf
-   DONTRUN:
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
 */
 
 #include <stddef.h>
@@ -289,8 +289,8 @@ int main(int argc, const char **argv) {
   OK(printf("%tu", lu)); OK(printf("%to", lu));
   OK(printf("%tx", lu)); OK(printf("%tX", lu));
 #elif  __WORDSIZE == 32
-  OK(printf("%tu", u)); OK(printf("%to", u));
-  OK(printf("%tx", u)); OK(printf("%tX", u));
+  OK(printf("%tu", ui)); OK(printf("%to", ui));
+  OK(printf("%tx", ui)); OK(printf("%tX", ui));
 #endif
   OK(printf("%td", ptrdf));  OK(printf("%ti", ptrdf));
   OK(printf("%tn", &ptrdf));

@@ -201,4 +201,35 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
   return 0;
 }
 
+char *realpath(const char *restrict file_name, char *restrict resolved_name)
+{
+  if (!file_name) {
+    errno = EINVAL;
+    return NULL;
+  }
+  // do path search
+
+  // simulate possible errors
+  switch (Frama_C_interval(0, 6)) {
+  case 0: errno = EACCES; return NULL;
+  case 1: errno = EIO; return NULL;
+  case 2: errno = ELOOP; return NULL;
+  case 3: errno = ENAMETOOLONG; return NULL;
+  case 4: errno = ENOENT; return NULL;
+  case 5: errno = ENOTDIR; return NULL;
+  default: break;
+  }
+  int realpath_len = Frama_C_interval(1, PATH_MAX);
+  if (!resolved_name) {
+    resolved_name = malloc(PATH_MAX);
+    if (!resolved_name) {
+      errno = ENOMEM;
+      return NULL;
+    }
+  }
+  Frama_C_make_unknown(resolved_name, realpath_len);
+  resolved_name[realpath_len-1] = '\0';
+  return resolved_name;
+}
+
 __POP_FC_STDLIB

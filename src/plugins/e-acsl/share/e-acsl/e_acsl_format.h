@@ -179,7 +179,7 @@ static abbrev_t size2abbri(int size, int sign) {
     return sign ? ILong : IULong;
   else if (size == sizeof(long long int))
     return sign ? ILongLong : IULongLong;
-  vabort(INT_ERROR "integral type corresponding to size %d unknown", size);
+  vabort(INT_ERROR "integral type corresponding to size %d unknown\n", size);
   return '\0';
 }
 
@@ -192,7 +192,7 @@ static abbrev_t size2abbrf(int size) {
   else if (size == sizeof(long double))
     return FLongDouble;
   vabort
-    (INT_ERROR "floating point type corresponding to size %d unknown", size);
+    (INT_ERROR "floating point type corresponding to size %d unknown\n", size);
   return '\0';
 }
 
@@ -370,7 +370,7 @@ static char *fetch_format_flags(char *fmt, format_directive *dir) {
   if (!dir->flags._f) \
     { dir->flags._f = 1; } \
   else  \
-    { vabort(FMT_ERROR "flag %s has already been set", #_f); }
+    { vabort(FMT_ERROR "flag %s has already been set\n", #_f); }
 
   while (is_flag_char(*fmt)) {
     dir->flags.specified = 1;
@@ -590,7 +590,7 @@ static void release_directives(const char *fmt, format_directive ** dirs) {
 /* Format string validation (well-formedness) {{{ */
 static inline void validate_application(format_directive *dir, char *allowed,
   char* kind, char *desc) {
-  vassert(strchr(allowed, dir->specifier) != '\0', FMT_ERROR
+  vassert(strchr(allowed, dir->specifier) != NULL, FMT_ERROR
     "wrong application of %s [%s] to format specifier [%c]\n",
     desc, kind, dir->specifier);
 }
@@ -605,7 +605,7 @@ static void validate_applications(format_directive *dir) {
      i, d, u, f, F, g, or G conversion specifiers. For other specifiers
      its behaviour is undefined. */
   if (dir->flags.apostroph)
-    validate_application(dir, "idufFgG", "\\", desc);
+    validate_application(dir, "idufFgG", "'", desc);
 
   /* # flag converts a value to an alternative form. It is applicable only to
      x, X, a, A, e, E, f, F, g, and G conversion specifiers. */
@@ -619,7 +619,7 @@ static void validate_applications(format_directive *dir) {
 
   /* No flags should be used if 'n' specifier is given */
   if (dir->flags.specified && dir->specifier == 'n')
-    vabort(FMT_ERROR "one of more flags with [n] specifier", NULL);
+    vabort(FMT_ERROR "one of more flags with [n] specifier\n", NULL);
 
   /* ==== Precision ==== */
   desc = "precision";
@@ -637,7 +637,7 @@ static void validate_applications(format_directive *dir) {
   desc = "field width";
 
   if (dir->specifier == 'n' && dir->field_width != INT_MIN)
-    vabort(FMT_ERROR "field width used with [n] specifier", NULL);
+    vabort(FMT_ERROR "field width used with [n] specifier\n", NULL);
 
   /* ==== Length modifiers ==== */
   desc = "length modifier";
@@ -1006,7 +1006,7 @@ int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
      characters to write, it does not matter */
   if (size > 0 && !writeable((uintptr_t)buffer, size, (uintptr_t)buffer))
     vabort("sprintf: output buffer is unallocated or has insufficient length "
-      "to store %d characters and \0 terminator or not writeable\n", size);
+      "to store %d characters and \\0 terminator or not writeable\n", size);
   va_start(ap, fmt);
   return vsnprintf(buffer, size, fmt, ap);
 }

@@ -1,4 +1,4 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[kernel:annot:missing-spec] tests/memory/constructor.c:20: Warning: 
+[kernel:annot:missing-spec] tests/memory/constructor.c:16: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype

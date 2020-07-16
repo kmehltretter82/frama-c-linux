@@ -1,7 +1,7 @@
-/* run.config_ci
+/* run.config_ci, run.config_dev
    COMMENT: test option -e-acsl-functions
-   LOG: gen_@PTEST_NAME@.c
    STDOPT: #"-e-acsl-functions f"
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-functions f
 */
 
 /*@ requires \initialized(p);

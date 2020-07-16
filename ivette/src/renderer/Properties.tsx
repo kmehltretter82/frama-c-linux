@@ -202,7 +202,7 @@ function ColumnTag<Row>(props: ColumnProps<Row, States.Tag>) {
 // -------------------------------------------------------------------------
 
 const bySource =
-  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.primitive });
+  Compare.byFields<SourceLoc>({ file: Compare.alpha, line: Compare.number });
 
 const byStatus =
   Compare.byRank(
@@ -227,7 +227,7 @@ const byProperty: Compare.ByFields<Property> = {
   alarm: Compare.defined(Compare.alpha),
   names: Compare.array(Compare.alpha),
   predicate: Compare.defined(Compare.alpha),
-  key: Compare.primitive,
+  key: Compare.string,
   kinstr: Compare.structural,
 };
 

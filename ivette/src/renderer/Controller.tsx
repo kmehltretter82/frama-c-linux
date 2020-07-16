@@ -263,13 +263,13 @@ const RenderConsole = () => {
           title="Discard changes"
         />
         <IconButton
-          icon="MEDIA.PREV"
+          icon="ANGLE.LEFT"
           display={edited}
           onClick={doPrev}
           title="Previous command"
         />
         <IconButton
-          icon="MEDIA.NEXT"
+          icon="ANGLE.RIGHT"
           display={edited}
           onClick={doNext}
           title="Next command"
