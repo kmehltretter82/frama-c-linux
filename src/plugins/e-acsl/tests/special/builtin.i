@@ -1,7 +1,7 @@
-/* run.config_ci
+/* run.config_ci, run.config_dev
   COMMENT: -e-acsl-builtins
-  LOG: gen_builtin.c
   STDOPT: #"-e-acsl-builtins incr"
+  MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-builtins incr
 */
 
 int incr(int);

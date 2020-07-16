@@ -1,7 +1,7 @@
-/* run.config_ci
+/* run.config_ci, run.config_dev
    COMMENT: test option -e-acsl-instrument; cannot run Eva on this example
-   LOG: gen_@PTEST_NAME@.c
    STDOPT:#"-e-acsl-instrument='@@all,-uninstrument1,-uninstrument2'"
+   MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -e-acsl-instrument @@@@all,-uninstrument1,-uninstrument2
 */
 
 #include <stdarg.h>
@@ -43,7 +43,7 @@ int vol(int n, ...) {
   va_start(vl, n);
   int r = va_arg(vl, int);
   va_end(vl);
-  return 1;
+  return 0;
 }
 
 int main(void) {

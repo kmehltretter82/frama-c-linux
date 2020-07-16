@@ -44,28 +44,37 @@ export function isBigNum(x: any): x is bignum {
   );
 }
 
-/**
-   Primitive comparison.
-   Can only compare arguments that have
-   comparable primitive type.
-
-   This includes symbols, boolean, non-NaN numbers, bigints and strings.
-   Numbers and big-ints can also be compared with each others.
-*/
-export function primitive(x: symbol, y: symbol): number;
-export function primitive(x: boolean, y: boolean): number;
-export function primitive(x: bignum, y: bignum): number;
-export function primitive(x: string, y: string): number;
-export function primitive(x: any, y: any) {
+/** @internal */
+function primitive(x: any, y: any) {
   if (x < y) return -1;
   if (x > y) return 1;
   return 0;
 }
 
 /**
-   Primitive comparison for numbers (NaN included).
+   Primitive comparison for symbols.
+*/
+export const symbol: Order<symbol> = primitive;
+
+/**
+   Primitive comparison for booleans.
+*/
+export const boolean: Order<boolean> = primitive;
+
+/**
+   Primitive comparison for strings. See also [[alpha]].
+*/
+export const string: Order<string> = primitive;
+
+/**
+   Primitive comparison for (big) integers (non NaN numbers included).
  */
-export function float(x: number, y: number) {
+export const bignum: Order<bignum> = primitive;
+
+/**
+   Primitive comparison for number (NaN included).
+ */
+export function number(x: number, y: number) {
   const nx = Number.isNaN(x);
   const ny = Number.isNaN(y);
   if (nx && ny) return 0;

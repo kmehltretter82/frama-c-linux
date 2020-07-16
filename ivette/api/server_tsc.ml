@@ -74,6 +74,7 @@ let makeJtype ?self ~names =
     | Jnumber -> Format.pp_print_string fmt "number"
     | Jboolean -> Format.pp_print_string fmt "boolean"
     | Jstring | Jalpha -> Format.pp_print_string fmt "string"
+    | Jtag a -> Format.fprintf fmt "\"%s\"" a
     | Jkey kd -> Format.fprintf fmt "Json.key<'#%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.index<'#%s'>" kd
     | Jdict js -> Format.fprintf fmt "@[<hov 2>Json.Dict<@,%a>@]" pp js
@@ -166,6 +167,7 @@ let rec makeDecoder ~safe ?self ~names fmt js =
   | Jboolean -> jsafe ~safe "Boolean" jprim fmt "jBoolean"
   | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
   | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
+  | Jtag a -> Format.fprintf fmt "jTag(\"%s\")" a
   | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
   | Jindex kd -> jsafe ~safe ("#" ^ kd) jindex fmt kd
   | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
@@ -217,14 +219,13 @@ let makeOrder ~self ~names fmt js =
   let rec pp fmt = function
     | Jnull -> Format.pp_print_string fmt "Compare.equal"
     | Jalpha -> Format.pp_print_string fmt "Compare.alpha"
-    | Jnumber | Jstring | Jboolean | Jkey _ | Jindex _
-      -> Format.pp_print_string fmt "Compare.primitive"
+    | Jnumber | Jindex _ -> Format.pp_print_string fmt "Compare.number"
+    | Jstring | Jkey _ -> Format.pp_print_string fmt "Compare.string"
+    | Jboolean -> Format.pp_print_string fmt "Compare.boolean"
     | Jself -> jcall names fmt (Pkg.Derived.order self)
     | Jdata id -> jcall names fmt (Pkg.Derived.order id)
     | Joption js ->
       Format.fprintf fmt "@[<hov 2>Compare.defined(@,%a)@]" pp js
-    | Jany | Junion _ -> (* Can not find a better solution *)
-      Format.fprintf fmt "Compare.structural"
     | Jenum id ->
       Format.fprintf fmt "@[<hov 2>Compare.byEnum(@,%a)@]" (jcall names) id
     | Jlist js | Jarray js ->
@@ -248,8 +249,10 @@ let makeOrder ~self ~names fmt js =
     | Jdict js ->
       let jtype fmt js = makeJtype ~names fmt js in
       Format.fprintf fmt
-        "@[<hov 2>Compare.dictionary<@,Json.dict<%a>>(@,%a)@]"
+        "@[<hov 2>Compare.dictionary<@,%a>(@,%a)@]"
         jtype js pp js
+    | Jany | Junion _ | Jtag _ ->
+      Format.fprintf fmt "Compare.structural"
   in pp fmt js
 
 (* -------------------------------------------------------------------------- *)

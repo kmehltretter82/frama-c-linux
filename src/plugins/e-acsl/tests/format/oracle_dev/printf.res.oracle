@@ -1,5 +1,242 @@
-[kernel] User Error: cannot load plug-in 'frama-c-e_acsl': cannot load module
-  Details: error loading shared library: Dynlink.Error (Dynlink.Cannot_open_dll "Failure(\"./top/E_ACSL.cmxs: cannot open shared object file: No such file or directory\")")
-[kernel] User Error: compilation of './tests/print.ml' failed
-[kernel] User Error: Deferred error message was emitted during execution. See above messages for more information.
-[kernel] Frama-C aborted: invalid user input.
+[kernel] Parsing tests/format/printf.c (with preprocessing)
+[kernel:parser:decimal-float] tests/format/printf.c:89: Warning: 
+  Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3.
+  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
+[variadic] tests/format/printf.c:29: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:31: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:33: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:35: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:37: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:39: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:186: Warning: 
+  Not enough arguments: expected 5, given 4.
+[variadic] tests/format/printf.c:189: Warning: 
+  Too many arguments: expected 5, given 6. Superfluous arguments will be removed.
+[variadic] tests/format/printf.c:194: Warning: 
+  Call to function printf with non-static format argument:
+  no specification will be generated.
+[variadic] tests/format/printf.c:197: Warning: Unknown conversion specifier $.
+[variadic] tests/format/printf.c:199: Warning: Unknown conversion specifier $.
+[variadic] tests/format/printf.c:201: Warning: Unknown conversion specifier $.
+[variadic] tests/format/printf.c:204: Warning: Unknown conversion specifier $.
+[variadic] tests/format/printf.c:206: Warning: Unknown conversion specifier $.
+[variadic] tests/format/printf.c:226: Warning: Unknown conversion specifier l.
+[variadic] tests/format/printf.c:257: Warning: 
+  Incorrect type for argument 2. The argument will be cast from wint_t to intmax_t.
+[variadic] tests/format/printf.c:279: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to size_t.
+[variadic] tests/format/printf.c:279: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to size_t.
+[variadic] tests/format/printf.c:292: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to ptrdiff_t.
+[variadic] tests/format/printf.c:292: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to ptrdiff_t.
+[variadic] tests/format/printf.c:293: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to ptrdiff_t.
+[variadic] tests/format/printf.c:293: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to ptrdiff_t.
+[variadic] tests/format/printf.c:307: Warning: Unknown conversion specifier C.
+[variadic] tests/format/printf.c:308: Warning: Unknown conversion specifier S.
+[variadic] tests/format/printf.c:309: Warning: Unknown conversion specifier m.
+[variadic] tests/format/printf.c:315: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to int.
+[variadic] tests/format/printf.c:315: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to int.
+[variadic] tests/format/printf.c:316: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to int.
+[variadic] tests/format/printf.c:316: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to int.
+[variadic] tests/format/printf.c:317: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to int.
+[variadic] tests/format/printf.c:317: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to int.
+[variadic] tests/format/printf.c:318: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to int.
+[variadic] tests/format/printf.c:318: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to int.
+[variadic] tests/format/printf.c:328: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to size_t.
+[variadic] tests/format/printf.c:328: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to size_t.
+[variadic] tests/format/printf.c:334: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to unsigned int.
+[variadic] tests/format/printf.c:334: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to unsigned int.
+[variadic] tests/format/printf.c:334: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to unsigned int.
+[variadic] tests/format/printf.c:334: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to unsigned int.
+[variadic] tests/format/printf.c:335: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
+[variadic] tests/format/printf.c:335: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
+[variadic] tests/format/printf.c:335: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
+[variadic] tests/format/printf.c:335: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
+[variadic] tests/format/printf.c:336: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to unsigned int.
+[variadic] tests/format/printf.c:336: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to unsigned int.
+[variadic] tests/format/printf.c:336: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to unsigned int.
+[variadic] tests/format/printf.c:336: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to unsigned int.
+[variadic] tests/format/printf.c:337: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to unsigned int.
+[variadic] tests/format/printf.c:337: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to unsigned int.
+[variadic] tests/format/printf.c:337: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to unsigned int.
+[variadic] tests/format/printf.c:337: Warning: 
+  Incorrect type for argument 2. The argument will be cast from void * to unsigned int.
+[variadic] tests/format/printf.c:338: Warning: 
+  Incorrect type for argument 2. The argument will be cast from char * to unsigned int.
+[variadic] tests/format/printf.c:338: Warning: 
+  Incorrect type for argument 2. The argument will be cast from char * to unsigned int.
+[variadic] tests/format/printf.c:338: Warning: 
+  Incorrect type for argument 2. The argument will be cast from char * to unsigned int.
+[variadic] tests/format/printf.c:338: Warning: 
+  Incorrect type for argument 2. The argument will be cast from char * to unsigned int.
+[variadic] tests/format/printf.c:355: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:355: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:356: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:356: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:357: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:357: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:359: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:359: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:360: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:360: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:361: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:361: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:363: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:363: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:364: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:364: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:365: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:365: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:367: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:367: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long double to double.
+[variadic] tests/format/printf.c:368: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:368: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to double.
+[variadic] tests/format/printf.c:369: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:369: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to double.
+[variadic] tests/format/printf.c:372: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:372: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:374: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:374: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:375: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:375: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:376: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:376: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:378: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:378: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:379: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:379: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:380: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:380: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:382: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:382: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:383: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:383: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:384: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:384: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to long double.
+[variadic] tests/format/printf.c:386: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:386: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long double.
+[variadic] tests/format/printf.c:387: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:387: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to long double.
+[variadic] tests/format/printf.c:393: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to int.
+[variadic] tests/format/printf.c:394: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to int.
+[variadic] tests/format/printf.c:395: Warning: 
+  Incorrect type for argument 2. The argument will be cast from double to int.
+[variadic] tests/format/printf.c:396: Warning: 
+  Incorrect type for argument 2. The argument will be cast from char * to int.
+[variadic] tests/format/printf.c:399: Warning: 
+  Incorrect type for argument 2. The argument will be cast from wint_t to intmax_t.
+[variadic] tests/format/printf.c:400: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to intmax_t.
+[variadic] tests/format/printf.c:409: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to char *.
+[variadic] tests/format/printf.c:464: Warning: Unknown conversion specifier '.
+[variadic] tests/format/printf.c:465: Warning: 
+  Flag 0 and conversion specififer n are not compatibles.
+[variadic] tests/format/printf.c:466: Warning: 
+  Flag # and conversion specififer n are not compatibles.
+[variadic] tests/format/printf.c:467: Warning: 
+  Flag ' ' and conversion specififer n are not compatibles.
+[variadic] tests/format/printf.c:468: Warning: 
+  Flag + and conversion specififer n are not compatibles.
+[variadic] tests/format/printf.c:469: Warning: 
+  Flag - and conversion specififer n are not compatibles.
+[variadic] tests/format/printf.c:470: Warning: 
+  Conversion specifier n does not expect a field width.
+[variadic] tests/format/printf.c:471: Warning: 
+  Conversion specifier n does not expect a field width.
+[variadic] tests/format/printf.c:472: Warning: 
+  Conversion specifier n does not expect a field width.
+[variadic] tests/format/printf.c:473: Warning: 
+  Conversion specifier n does not expect a precision.
+[variadic] tests/format/printf.c:476: Warning: Unknown conversion specifier '.

@@ -118,6 +118,15 @@ export const jString: Loose<string> = (js: json) => (
   typeof js === 'string' ? js : undefined
 );
 
+/** JSON constant.
+    Capture the tag or returns `undefined`.
+    Can be used with [[jUnion]], although [[jEnum]]
+    might be more efficient.
+*/
+export function jTag<A>(tg: A): Loose<A> {
+  return (js: json) => (Object.is(js, tg) ? tg : undefined);
+}
+
 /**
    Lookup tags in a dictionary.
    Can be used directly for enum types, eg. `jEnum(myEnumType)`.

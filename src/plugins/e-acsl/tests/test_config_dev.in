@@ -6,7 +6,7 @@ MACRO: EACSL_ERR @PTEST_NAME@.e-acsl.err.log
 COMMENT: Define the following macro to "no" in a test to stop the execution of `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_ENABLE yes
 COMMENT: Default options for `e-acsl-gcc.sh`
-MACRO: ROOT_EACSL_GCC_MISC_OPTS -D -q -X
+MACRO: ROOT_EACSL_GCC_MISC_OPTS -q -X
 COMMENT: Default options for the frama-c invocation
 MACRO: ROOT_EACSL_GCC_FC_EXTRA -journal-disable -verbose 0 -kernel-warn-key *=inactive
 COMMENT: Define the following macro in a test to pass extra options to the frama-c invocation

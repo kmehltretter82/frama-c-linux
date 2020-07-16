@@ -332,9 +332,21 @@ struct
     if s.published then
       raise (Invalid_argument "Server.Data.Record: already published")
 
+  let check_field_name s name =
+    begin
+      if List.exists (fun f -> f.Package.fd_name = name) s.fields then
+        (let msg = Printf.sprintf "Server.Data.Record: duplicate field %S" name
+         in raise (Invalid_argument msg));
+      if not (Str.string_match (Str.regexp "[a-zA-Z0-9 _-]+$") name 0) then
+        (let msg = Printf.sprintf
+             "Server.Data.Record: invalid characters for field %S" name in
+         raise (Invalid_argument msg));
+    end
+
   let field (type a r) (s : r signature)
       ~name ~descr ?default (d : a data) : (r,a) field =
     not_published s ;
+    check_field_name s name ;
     let module D = (val d) in
     begin match default with
       | None -> ()
@@ -354,6 +366,7 @@ struct
   let option (type a r) (s : r signature)
       ~name ~descr (d : a data) : (r,a option) field =
     not_published s ;
+    check_field_name s name ;
     let module D = (val d) in
     let field = Package.{
         fd_name = name ;
@@ -565,6 +578,11 @@ end
 (* --- Index                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
+module type Info =
+sig
+  val name: string
+end
+
 (** Simplified [Map.S] *)
 module type Map =
 sig
@@ -578,13 +596,12 @@ end
 module type Index =
 sig
   include S
-  val kind : string
   val get : t -> int
   val find : int -> t
   val clear : unit -> unit
 end
 
-module INDEXER(M : Map)(D : S)(I : Index with type t = D.t) :
+module INDEXER(M : Map)(I : Info) :
 sig
   type index
   val create : unit -> index
@@ -630,15 +647,14 @@ struct
     let id = Ju.to_int js in
     try find m id
     with Not_found ->
-      failure "[%s] No registered id #%d" I.kind id
+      failure "[%s] No registered id #%d" I.name id
 
 end
 
-module Static(M : Map)(S : S)(I : Index with type t = S.t)
+module Static(M : Map)(I : Info)
   : Index with type t = M.key =
 struct
-  module INDEX = INDEXER(M)(S)(I)
-  let kind = I.kind
+  module INDEX = INDEXER(M)(I)
   let index = INDEX.create ()
   let clear () = INDEX.clear index
   let get = INDEX.get index
@@ -646,33 +662,32 @@ struct
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.kind
+      let jtype = Jindex I.name
       let of_json = INDEX.of_json index
       let to_json = INDEX.to_json index
     end)
 end
 
-module Index(M : Map)(S : S)(I : Index with type t = S.t)
+module Index(M : Map)(I : Info)
   : Index with type t = M.key =
 struct
-  module INDEX = INDEXER(M)(S)(I)
+  module INDEX = INDEXER(M)(I)
   module TYPE : Datatype.S with type t = INDEX.index =
     Datatype.Make
       (struct
         type t = INDEX.index
         include Datatype.Undefined
         let reprs = [INDEX.create()]
-        let name = "Server.Data.Index.Type." ^ I.kind
+        let name = "Server.Data.Index.Type." ^ I.name
         let mem_project = Datatype.never_any_project
       end)
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Data.Index.State." ^ I.kind
+        let name = "Server.Data.Index.State." ^ I.name
         let dependencies = []
         let default = INDEX.create
       end)
 
-  let kind = I.kind
   let index () = STATE.get ()
   let clear () = INDEX.clear (index())
 
@@ -682,7 +697,7 @@ struct
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.kind
+      let jtype = Jindex I.name
       let of_json js = INDEX.of_json (index()) js
       let to_json v = INDEX.to_json (index()) v
     end)
@@ -695,13 +710,10 @@ sig
   val id : t -> int
 end
 
-module Identified(A : IdentifiedType)(S : S)
-    (I : Index with type t = S.t) : Index with type t = A.t =
+module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t =
 struct
 
   type index = (int,A.t) Hashtbl.t
-
-  let kind = I.kind
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -709,13 +721,13 @@ struct
         type t = index
         include Datatype.Undefined
         let reprs = [Hashtbl.create 0]
-        let name = "Server.Data.Identified.Type." ^ I.kind
+        let name = "Server.Data.Identified.Type." ^ I.name
         let mem_project = Datatype.never_any_project
       end)
 
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Data.Identified.State." ^ I.kind
+        let name = "Server.Data.Identified.State." ^ I.name
         let dependencies = []
         let default () = Hashtbl.create 0
       end)
@@ -729,12 +741,12 @@ struct
   include
     (struct
       type t = A.t
-      let jtype = Jindex kind
+      let jtype = Jindex I.name
       let to_json a = `Int (get a)
       let of_json js =
         let k = Ju.to_int js in
         try find k
-        with Not_found -> failure "[%s] No registered id #%d" I.kind k
+        with Not_found -> failure "[%s] No registered id #%d" I.name k
     end)
 
 end

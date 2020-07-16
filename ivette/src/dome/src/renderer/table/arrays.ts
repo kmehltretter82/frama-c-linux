@@ -450,13 +450,17 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
       Requires a final trigger to update views. */
   updateData(data: Collection<Row>) {
     forEach(data, (row: Row) => this.setData(this.getkey(row), row));
-    this.reload();
   }
 
   /**
-     Replace all previous data with the new one.
+     Replace all previous data with the new ones.
      Finally triggers a reload.
    */
+  replaceAllDataWith(data: Collection<Row>) {
+    this.removeAllData();
+    this.updateData(data);
+    this.reload();
+  }
 
 }
 

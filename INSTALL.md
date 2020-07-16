@@ -41,7 +41,7 @@ macOS has opam through Homebrew.
 Windows users can install opam via WSL (Windows Subsystem for Linux).
 
 If your system does not have an opam package >= 2.0.0, you can
-[compile it from source]((#compiling-from-source)),
+[compile it from source](#compiling-from-source),
 or use the provided opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html

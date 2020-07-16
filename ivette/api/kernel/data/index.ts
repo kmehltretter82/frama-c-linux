@@ -27,7 +27,7 @@ export const jMarkdownSafe: Json.Safe<markdown> =
   Json.jFail(Json.jString,'String expected');
 
 /** Natural order for `markdown` */
-export const byMarkdown: Compare.Order<markdown> = Compare.primitive;
+export const byMarkdown: Compare.Order<markdown> = Compare.string;
 
 /** Rich text format uses `[tag; …text ]` to apply the tag `tag` to the enclosed text. Empty tag `""` can also used to simply group text together. */
 export type text = null | string | text[];

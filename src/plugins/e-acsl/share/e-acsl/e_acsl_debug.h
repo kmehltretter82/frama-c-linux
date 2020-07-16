@@ -73,7 +73,7 @@ static int dlog_fd = -1;
 #endif
 
 /*! \brief Debug-time assertion based on assert (see e_acsl_assert.h) */
-#define DASSERT(_e) vassert(_e,"",NULL)
+#define DASSERT(_e) vassert(_e,TOSTRING(_e),NULL)
 
 /*! \brief Debug-time assertion based on vassert (see e_acsl_assert.h) */
 #define DVASSERT(_expr, _fmt, ...) vassert(_expr, _fmt, __VA_ARGS__)
