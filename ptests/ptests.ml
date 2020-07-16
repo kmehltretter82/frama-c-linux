@@ -600,6 +600,7 @@ type config =
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
+    dc_framac     : bool;
     dc_default_log: string list;
     dc_timeout: string
   }
@@ -619,6 +620,7 @@ let default_config () =
     dc_default_toplevel = !toplevel_path;
     dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
     dc_dont_run = false;
+    dc_framac = true;
     dc_default_log = [];
     dc_timeout = "";
   }
@@ -802,6 +804,8 @@ let config_options =
        { current with dc_default_log = s :: current.dc_default_log });
     "TIMEOUT",
     (fun _ s current -> { current with dc_timeout = s });
+    "NOFRAMAC",
+    (fun _ _ current -> { current with dc_toplevels = []; dc_framac = false; });
   ]
 
 let scan_options dir scan_buffer default =
@@ -835,7 +839,7 @@ let scan_options dir scan_buffer default =
   with
     End_of_file ->
     (match !r.dc_toplevels with
-     | [] -> { !r with dc_toplevels = default.dc_toplevels }
+     | [] when !r.dc_framac -> { !r with dc_toplevels = default.dc_toplevels }
      | l -> { !r with dc_toplevels = List.rev l })
 
 let split_config = Str.regexp ",[ ]*"
