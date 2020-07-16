@@ -1,3 +1,4 @@
+NOFRAMAC: only the EXEC command below is useful in this config
 MACRO: SEDCMD @SEDCMD@
 MACRO: DEST @PTEST_RESULT@/@PTEST_NAME@
 MACRO: OUT @PTEST_NAME@.res.log
