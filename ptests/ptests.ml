@@ -844,6 +844,11 @@ let scan_options dir scan_buffer default =
 
 let split_config = Str.regexp ",[ ]*"
 
+let is_config name =
+  let prefix = "run.config" in
+  let len = String.length prefix in
+  String.length name >= len && String.sub name 0 len = prefix
+
 let scan_test_file default dir f =
   let f = SubDir.make_file dir f in
   let exists_as_file =
@@ -868,9 +873,10 @@ let scan_test_file default dir f =
              scan_options dir scan_buffer default
            else (* config name does not match: eat config and continue.
                    But only if the comment is still opened by the end of
-                   the line...
+                   the line and we are indeed reading a config
                 *)
-             (if not (str_string_match end_comment names 0) then
+             (if List.exists is_config configs &&
+                 not (str_string_match end_comment names 0) then
                 ignore (scan_options dir scan_buffer default);
               scan_config ()))
     in
