@@ -1353,6 +1353,7 @@ let do_command command =
           if !verbosity >= 1 then begin
             lock_printf "%% launch %s@." cmd;
           end;
+          shared.summary_run <- succ shared.summary_run;
           let r = launch cmd in
           (* mark as already executed. For EXECNOW in test_config files,
              other instances (for example another test of the same
