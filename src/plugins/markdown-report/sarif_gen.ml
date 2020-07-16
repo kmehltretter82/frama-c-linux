@@ -98,6 +98,10 @@ let make_message alarm annot remark =
   in
   Message.create ~text ~richText ()
 
+let opt_physical_location_of_loc loc =
+  if loc = Cil_datatype.Location.unknown then []
+  else [ Location.of_loc loc ]
+
 let gen_results remarks =
   let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
     let prop = Property.ip_of_code_annot_single kf s annot in
@@ -109,7 +113,7 @@ let gen_results remarks =
     let level = level_of_status (Property_status.Feedback.get prop) in
     let remark = get_remark remarks label in
     let message = make_message alarm annot remark in
-    let locations = [ Location.of_loc (Cil_datatype.Stmt.loc s) ] in
+    let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
     let res =
       Sarif_result.create ~level ~ruleId ~message ~locations ()
     in
@@ -131,7 +135,7 @@ let make_ip_message ip =
 let gen_status ip =
   let status = Property_status.Feedback.get ip in
   let level = level_of_status status in
-  let locations = [ Location.of_loc (Property.location ip) ] in
+  let locations = opt_physical_location_of_loc (Property.location ip) in
   let message = make_ip_message ip in
   Sarif_result.create ~level ~locations ~message ()
 
