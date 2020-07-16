@@ -475,70 +475,227 @@ export interface FullLocation {
  *  but at least one of the two must be set.
  */
 export type Location = AtLeastOne<FullLocation>;
-export interface Selection {
 
-  /** Current selection. */
-  current?: Location;
+export interface HistorySelection {
   /** Previous locations with respect to the [[current]] one. */
   prevSelections: Location[];
   /** Next locations with respect to the [[current]] one. */
   nextSelections: Location[];
 }
 
+/** Actions on history selections:
+ * - `HISTORY_PREV` jumps to previous history location
+ *   (first in [[prevSelections]]).
+ * - `HISTORY_NEXT` jumps to next history location
+ *   (first in [[nextSelections]]).
+ */
+type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
+
+/** A selection of multiple locations. */
+export interface MultipleSelection {
+  /** The index of the current selected location in [[possibleSelections]]. */
+  index: number;
+  /** All locations forming a multiple selection. */
+  allSelections: Location[];
+}
+
+/** A select action on multiple locations. */
+export interface MultipleSelect {
+  readonly index: number;
+  readonly locations: Location[];
+}
+
+/** Select the [[index]]-nth location of the current multiple selection. */
+export interface NthSelect {
+  readonly index: number;
+}
+
+/** Actions on multiple selections:
+ * - [[MultipleSelect]].
+ * - [[NthSelect]].
+ * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
+ * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
+ */
+type MultipleSelectActions =
+  MultipleSelect | NthSelect
+  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR';
+
+export interface Selection {
+  /** Current selection. May be one in [[history]] or [[multiple]]. */
+  current?: Location;
+  /** History of selections. */
+  history: HistorySelection;
+  /** Multiple selections at once. */
+  multiple: MultipleSelection;
+}
+
 /** A select action on a location. */
-export interface SelectAction {
+export interface SingleSelect {
   readonly location: Location;
 }
 
 /** Actions on selection:
- * - [[SelectAction]].
- * - `GO_BACK` jumps to previous location (first in [[prevSelections]]).
- * - `GO_FORWARD` jumps to next location (first in [[nextSelections]]).
+ * - [[SingleSelect]].
+ * - [[HistorySelectActions]].
+ * - [[MultipleSelectActions]].
  */
-export type SelectionActions = SelectAction | 'GO_BACK' | 'GO_FORWARD';
+export type SelectionActions =
+  SingleSelect | HistorySelectActions | MultipleSelectActions;
 
-function isSelect(a: SelectionActions): a is SelectAction {
-  return (a as SelectAction).location !== undefined;
+function isSingleSelect(a: SelectionActions): a is SingleSelect {
+  return (a as SingleSelect).location !== undefined;
 }
 
-/** Compute the next selection based on the current one and the given action. */
-function reducer(s: Selection, action: SelectionActions): Selection {
-  if (isSelect(action)) {
-    const [prevSelections, nextSelections] =
-      s.current && s.current.function !== action.location.function ?
-        [[s.current, ...s.prevSelections], []] :
-        [s.prevSelections, s.nextSelections];
-    return {
-      current: action.location,
-      prevSelections,
-      nextSelections,
-    };
-  }
-  const [pS, ...prevS] = s.prevSelections;
-  const [nS, ...nextS] = s.nextSelections;
+function isMultipleSelect(a: SelectionActions): a is MultipleSelect {
+  return (
+    (a as MultipleSelect).locations !== undefined &&
+    (a as MultipleSelect).index !== undefined
+  );
+}
+
+function isNthSelect(a: SelectionActions): a is NthSelect {
+  return (a as NthSelect).index !== undefined;
+}
+
+/** Update selection to the given location. */
+function selectLocation(s: Selection, location: Location): Selection {
+  const [prevSelections, nextSelections] =
+    s.current && s.current.function !== location.function ?
+      [[s.current, ...s.history.prevSelections], []] :
+      [s.history.prevSelections, s.history.nextSelections];
+  return {
+    ...s,
+    current: location,
+    history: { prevSelections, nextSelections },
+  };
+}
+
+/** Compute the next selection picking from the current history, depending on
+ *  action.
+ */
+function fromHistory(s: Selection, action: HistorySelectActions): Selection {
   switch (action) {
-    case 'GO_BACK':
+    case 'HISTORY_PREV': {
+      const [pS, ...prevS] = s.history.prevSelections;
       return {
+        ...s,
         current: pS,
-        prevSelections: prevS,
-        nextSelections: [(s.current as Location), ...s.nextSelections],
+        history: {
+          prevSelections: prevS,
+          nextSelections:
+            [(s.current as Location), ...s.history.nextSelections],
+        },
       };
-    case 'GO_FORWARD':
+    }
+    case 'HISTORY_NEXT': {
+      const [nS, ...nextS] = s.history.nextSelections;
       return {
+        ...s,
         current: nS,
-        prevSelections: [(s.current as Location), ...s.prevSelections],
-        nextSelections: nextS,
+        history: {
+          prevSelections:
+            [(s.current as Location), ...s.history.prevSelections],
+          nextSelections: nextS,
+        },
+      };
+    }
+    default:
+      return s;
+  }
+}
+
+/** Compute the next selection picking from the current multiple, depending on
+ *  action.
+ */
+function fromMultipleSelections(
+  s: Selection,
+  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR',
+): Selection {
+  switch (action) {
+    case 'MULTIPLE_PREV':
+    case 'MULTIPLE_NEXT': {
+      const index =
+        action === 'MULTIPLE_NEXT' ?
+          s.multiple.index + 1 :
+          s.multiple.index - 1;
+      if (0 <= index && index < s.multiple.allSelections.length) {
+        const multiple = { ...s.multiple, index };
+        return selectLocation(
+          { ...s, multiple },
+          s.multiple.allSelections[index],
+        );
+      }
+      return s;
+    }
+    case 'MULTIPLE_CLEAR':
+      return {
+        ...s,
+        multiple: {
+          index: 0,
+          allSelections: [],
+        },
       };
     default:
       return s;
   }
 }
 
-const GlobalSelection = new GlobalStates.State<Selection>({
+/** Compute the next selection based on the current one and the given action. */
+function reducer(s: Selection, action: SelectionActions): Selection {
+  if (isSingleSelect(action)) {
+    return selectLocation(s, action.location);
+  }
+  if (isMultipleSelect(action)) {
+    if (action.locations.length === 0)
+      return s;
+    const index = action.index > 0 ? action.index : 0;
+    const selection = selectLocation(s, action.locations[index]);
+    return {
+      ...selection,
+      multiple: {
+        allSelections: action.locations,
+        index,
+      },
+    };
+  }
+  if (isNthSelect(action)) {
+    const { index } = action;
+    if (0 <= index && index < s.multiple.allSelections.length) {
+      const location = s?.multiple.allSelections[index];
+      const selection = selectLocation(s, location);
+      const multiple = { ...selection.multiple, index };
+      return { ...selection, multiple };
+    }
+    return s;
+  }
+  switch (action) {
+    case 'HISTORY_PREV':
+    case 'HISTORY_NEXT':
+      return fromHistory(s, action);
+    case 'MULTIPLE_PREV':
+    case 'MULTIPLE_NEXT':
+    case 'MULTIPLE_CLEAR':
+      return fromMultipleSelections(s, action);
+    default:
+      return s;
+  }
+}
+
+/** The initial selection is empty. */
+const emptySelection = {
   current: undefined,
-  prevSelections: [],
-  nextSelections: [],
-});
+  history: {
+    prevSelections: [],
+    nextSelections: [],
+  },
+  multiple: {
+    index: 0,
+    allSelections: [],
+  },
+};
+
+const GlobalSelection = new GlobalStates.State<Selection>(emptySelection);
+Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
 /**
    Current selection.

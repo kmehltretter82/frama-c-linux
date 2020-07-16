@@ -49,10 +49,10 @@ module MarkerKind = struct
   let kind name = Enum.tag ~name
       ~descr:(Md.plain (String.capitalize_ascii name)) kinds
 
+  let var  = kind "variable"
+  let fct  = kind "function"
   let expr = kind "expression"
   let lval = kind "lvalue"
-  let var = kind "variable"
-  let fct = kind "function"
   let decl = kind "declaration"
   let stmt = kind "statement"
   let glob = kind "global"

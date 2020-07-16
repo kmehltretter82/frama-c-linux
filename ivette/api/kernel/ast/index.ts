@@ -43,14 +43,14 @@ export const compute: Server.ExecRequest<null,null>= compute_internal;
 
 /** Marker kind */
 export enum markerKind {
-  /** Expression */
-  expression = 'expression',
-  /** Lvalue */
-  lvalue = 'lvalue',
   /** Variable */
   variable = 'variable',
   /** Function */
   function = 'function',
+  /** Expression */
+  expression = 'expression',
+  /** Lvalue */
+  lvalue = 'lvalue',
   /** Declaration */
   declaration = 'declaration',
   /** Statement */
