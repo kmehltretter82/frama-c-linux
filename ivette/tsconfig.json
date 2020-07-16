@@ -100,6 +100,7 @@
       "doc/pages",
       "src/frama-c", "api",
       "src/dome/src/renderer",
+      "src/dome/src/misc",
     ]
   }
 }
