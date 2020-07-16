@@ -1,12 +1,6 @@
-[kernel:typing:implicit-function-declaration] tests/temporal/t_fun_lib.c:20: Warning: 
-  Calling undeclared function realpath. Old style K&R code?
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [kernel:annot:missing-spec] tests/temporal/t_fun_lib.c:20: Warning: 
   Neither code nor specification for function realpath, generating default assigns from the prototype
-[eva:invalid-assigns] tests/temporal/t_fun_lib.c:20: 
-  Completely invalid destination for assigns clause *(x_0 + (0 ..)). Ignoring.
-[eva:invalid-assigns] tests/temporal/t_fun_lib.c:21: 
-  Completely invalid destination for assigns clause *(x_0 + (0 ..)). Ignoring.
 [eva:alarm] tests/temporal/t_fun_lib.c:23: Warning: 
   function __e_acsl_assert: precondition got status invalid.
