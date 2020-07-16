@@ -74,10 +74,10 @@ export const jSourceSafe: Json.Safe<source> =
 export const bySource: Compare.Order<source> =
   Compare.byFields
     <{ dir: string, base: string, file: string, line: number }>({
-    dir: Compare.primitive,
-    base: Compare.primitive,
-    file: Compare.primitive,
-    line: Compare.primitive,
+    dir: Compare.string,
+    base: Compare.string,
+    file: Compare.string,
+    line: Compare.number,
   });
 
 /** Log messages categories. */
@@ -149,8 +149,8 @@ export const byLog: Compare.Order<log> =
        source?: source }>({
     kind: byLogkind,
     plugin: Compare.alpha,
-    message: Compare.primitive,
-    category: Compare.defined(Compare.primitive),
+    message: Compare.string,
+    category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
   });
 

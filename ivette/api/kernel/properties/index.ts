@@ -275,17 +275,17 @@ export const byStatusData: Compare.Order<statusData> =
        names: string[], status: propStatus, function?: Json.key<'#fct'>,
        kinstr?: Json.key<'#stmt'>, source: source, alarm?: string,
        alarm_descr?: string, predicate?: string }>({
-    key: Compare.primitive,
-    descr: Compare.primitive,
+    key: Compare.string,
+    descr: Compare.string,
     kind: byPropKind,
-    names: Compare.array(Compare.primitive),
+    names: Compare.array(Compare.string),
     status: byPropStatus,
-    function: Compare.defined(Compare.primitive),
-    kinstr: Compare.defined(Compare.primitive),
+    function: Compare.defined(Compare.string),
+    kinstr: Compare.defined(Compare.string),
     source: bySource,
-    alarm: Compare.defined(Compare.primitive),
-    alarm_descr: Compare.defined(Compare.primitive),
-    predicate: Compare.defined(Compare.primitive),
+    alarm: Compare.defined(Compare.string),
+    alarm_descr: Compare.defined(Compare.string),
+    predicate: Compare.defined(Compare.string),
   });
 
 /** Signal for array [`status`](#status)  */
