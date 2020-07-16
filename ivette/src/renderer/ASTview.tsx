@@ -3,6 +3,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
@@ -57,8 +58,8 @@ async function loadAST(
         });
       } catch (err) {
         PP.error(
-          'Fail to retrieve the AST of function', theFunction,
-          'marker:', theMarker, err,
+          `Fail to retrieve the AST of function '${theFunction}' ` +
+          `and marker '${theMarker}':`, err,
         );
       }
     })();
@@ -72,7 +73,7 @@ async function functionCallers(functionName: string) {
     const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
     return locations;
   } catch (err) {
-    PP.error(`Fail to retrieve callers of function ${functionName}.`, err);
+    PP.error(`Fail to retrieve callers of function '${functionName}':`, err);
     return [];
   }
 }
@@ -91,7 +92,7 @@ const ASTview = () => {
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
-  const markers = States.useSyncArray(markerInfo);
+  const markersInfo = States.useSyncArray(markerInfo);
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
@@ -129,26 +130,42 @@ const ASTview = () => {
     }
   }
 
-  function onContextMenu(id: key<'#markerInfo'>) {
+  async function onContextMenu(id: key<'#markerInfo'>) {
     const items = [];
-    const marker = markers.find((e) => e.key === id);
-    if (marker?.kind === 'function') {
-      items.push({
-        label: `Go to definition of ${marker.name}`,
-        onClick: () => {
-          const location = { function: marker.name };
-          updateSelection({ location });
-        },
-      });
-    }
-    if (marker?.kind === 'declaration' && marker?.name) {
-      items.push({
-        label: 'Go to callers',
-        onClick: async () => {
-          const locations = await functionCallers(marker.name);
-          updateSelection({ locations });
-        },
-      });
+    const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
+    switch (selectedMarkerInfo?.kind) {
+      case 'function': {
+        items.push({
+          label: `Go to definition of ${selectedMarkerInfo.name}`,
+          onClick: () => {
+            const location = { function: selectedMarkerInfo.name };
+            updateSelection({ location });
+          },
+        });
+        break;
+      }
+      case 'declaration': {
+        if (selectedMarkerInfo?.name) {
+          const locations = await functionCallers(selectedMarkerInfo.name);
+          const locationsByFunction = _.groupBy(locations, (e) => e.function);
+          _.forEach(locationsByFunction,
+            (e) => {
+              const callerName = e[0].function;
+              items.push({
+                label:
+                  `Go to caller ${callerName} ` +
+                  `${e.length > 1 ? `(${e.length} call sites)` : ''}`,
+                onClick: () => updateSelection({
+                  locations,
+                  index: locations.findIndex((l) => l.function === callerName),
+                }),
+              });
+            });
+        }
+        break;
+      }
+      default:
+        break;
     }
     if (items.length > 0)
       Dome.popupMenu(items);

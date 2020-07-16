@@ -501,6 +501,7 @@ export interface MultipleSelection {
 
 /** A select action on multiple locations. */
 export interface MultipleSelect {
+  readonly index: number;
   readonly locations: Location[];
 }
 
@@ -546,7 +547,10 @@ function isSingleSelect(a: SelectionActions): a is SingleSelect {
 }
 
 function isMultipleSelect(a: SelectionActions): a is MultipleSelect {
-  return (a as MultipleSelect).locations !== undefined;
+  return (
+    (a as MultipleSelect).locations !== undefined &&
+    (a as MultipleSelect).index !== undefined
+  );
 }
 
 function isNthSelect(a: SelectionActions): a is NthSelect {
@@ -644,12 +648,13 @@ function reducer(s: Selection, action: SelectionActions): Selection {
   if (isMultipleSelect(action)) {
     if (action.locations.length === 0)
       return s;
-    const selection = selectLocation(s, action.locations[0]);
+    const index = action.index > 0 ? action.index : 0;
+    const selection = selectLocation(s, action.locations[index]);
     return {
       ...selection,
       multiple: {
         allSelections: action.locations,
-        index: 0,
+        index,
       },
     };
   }

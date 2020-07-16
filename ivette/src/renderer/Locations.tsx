@@ -25,18 +25,18 @@ const LocationsTable = () => {
   const model = React.useMemo(() => (
     new CompactModel<number, LocationId>(({ id }: LocationId) => id)
   ), []);
-  const multiple: States.MultipleSelection = selection?.multiple;
-  const numberOfSelections = multiple?.allSelections?.length;
+  const multipleSelections = selection?.multiple;
+  const numberOfSelections = multipleSelections?.allSelections?.length;
 
-  // Updates [[model]] with the current multiple selection.
+  // Updates [[model]] with the current multiple selections.
   React.useEffect(() => {
     if (numberOfSelections > 0) {
       const data: LocationId[] =
-        multiple.allSelections.map((d, i) => ({ ...d, id: i }));
+        multipleSelections.allSelections.map((d, i) => ({ ...d, id: i }));
       model.replaceAllDataWith(data);
     } else
       model.clear();
-  }, [numberOfSelections, multiple, model]);
+  }, [numberOfSelections, multipleSelections, model]);
 
   // Callbacks
   const onTableSelection = React.useCallback(
@@ -45,7 +45,7 @@ const LocationsTable = () => {
   );
 
   const reload = () => {
-    const location = multiple.allSelections[multiple.index];
+    const location = multipleSelections.allSelections[multipleSelections.index];
     updateSelection({ location });
   };
 
@@ -62,7 +62,7 @@ const LocationsTable = () => {
         <IconButton
           icon="ANGLE.LEFT"
           onClick={() => updateSelection('MULTIPLE_PREV')}
-          enabled={numberOfSelections > 1 && multiple?.index > 0}
+          enabled={numberOfSelections > 1 && multipleSelections?.index > 0}
           title="Previous location"
         />
         <IconButton
@@ -70,7 +70,7 @@ const LocationsTable = () => {
           onClick={() => updateSelection('MULTIPLE_NEXT')}
           enabled={
             numberOfSelections > 1 &&
-            multiple?.index < numberOfSelections - 1
+            multipleSelections?.index < numberOfSelections - 1
           }
           title="Next location"
         />
@@ -82,8 +82,9 @@ const LocationsTable = () => {
             `location${numberOfSelections > 1 ? 's' : ''}`
           }
         >
-          {multiple?.allSelections.length === 0 ?
-            '0 / 0' : `${multiple?.index + 1} / ${numberOfSelections}`}
+          {multipleSelections?.allSelections.length === 0 ?
+            '0 / 0' :
+            `${multipleSelections?.index + 1} / ${numberOfSelections}`}
         </Label>
         <Space />
         <IconButton
@@ -95,7 +96,7 @@ const LocationsTable = () => {
       </TitleBar>
       <Table
         model={model}
-        selection={multiple?.index}
+        selection={multipleSelections?.index}
         onSelection={onTableSelection}
       >
         <Column
@@ -118,9 +119,9 @@ const LocationsTable = () => {
 
 export default () => (
   <Component
-    id="frama-c.selection"
+    id="frama-c.locations"
     label="Locations"
-    title="Browse a selection of multiple locations"
+    title="Browse multiple locations"
   >
     <LocationsTable />
   </Component>
