@@ -699,6 +699,9 @@ extern int posix_memalign(void **memptr, size_t alignment, size_t size);
  */
 extern int mkstemp(char *templat);
 
+extern char *realpath(const char *restrict file_name,
+                      char *restrict resolved_name);
+
 __END_DECLS
 
 __POP_FC_STDLIB
