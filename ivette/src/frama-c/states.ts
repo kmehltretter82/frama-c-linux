@@ -422,37 +422,23 @@ export function reloadArray<K, A>(arr: Array<K, A>) {
 
 /**
    Use Synchronized Array (Custom React Hook).
-   This React Hook is _not_ responsive to model updates, it only
-   returns the array model.
-   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
-   Array views automatically listen to model updates.
+
+   Unless specified, the hook makes the component re-rendering on every
+   updates. Disabling this automatic re-renderer can be an option when
+   you only use the model to make a table view,
+   which automatically synchronizes on model updates.
+   @param sync - whether the component re-render on updates (default is `true`)
  */
-export function useSyncModel<K, A>(
+export function useSyncArray<K, A>(
   arr: Array<K, A>,
+  sync = true,
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
   const st = getSyncArray(arr);
   React.useEffect(st.update);
   Server.useSignal(arr.signal, st.fetch);
+  useModel(st.model, sync);
   return st.model;
-}
-
-/**
-   Use Synchronized Array (Custom React Hook).
-   This React Hook is _not_ responsive to model updates, it only
-   returns the array model.
-   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
-   Array views automatically listen to model updates.
- */
-export function useSyncArray<K, A>(
-  arr: Array<K, A>,
-): A[] {
-  Dome.useUpdate(PROJECT);
-  const st = getSyncArray(arr);
-  React.useEffect(st.update);
-  Server.useSignal(arr.signal, st.fetch);
-  useModel(st.model);
-  return st.model.getArray();
 }
 
 // --------------------------------------------------------------------------

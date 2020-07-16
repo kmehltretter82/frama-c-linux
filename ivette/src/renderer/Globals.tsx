@@ -16,7 +16,7 @@ export default () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const fcts = States.useSyncArray(functions).sort(
+  const fcts = States.useSyncArray(functions).getArray().sort(
     (f, g) => alpha(f.name, g.name),
   );
 

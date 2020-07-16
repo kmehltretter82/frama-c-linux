@@ -92,7 +92,7 @@ const ASTview = () => {
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
-  const markersInfo = States.useSyncArray(markerInfo);
+  const markersInfo = States.useSyncArray(markerInfo).getArray();
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
