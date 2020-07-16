@@ -994,6 +994,11 @@ test
 & kill the test after the given duration and report a failure
 & \textit{None}
 \\
+& \texttt{NOFRAMAC}\nscodeidxdef{Test!Directive}{NOFRAMAC}
+& empty the list of frama-c commands to be launched
+(\texttt{EXEC} and \texttt{EXECNOW} directives are still executed).
+& \textit{None}
+\\
 \hline \multirow{2}{23mm}{\centering{Test suite}}
 & \texttt{DONTRUN}\nscodeidxdef{Test!Directive}{DONTRUN}
 & Do not execute this test
@@ -1021,10 +1026,16 @@ test
 Any directive can identify a file using a relative path.
 The default directory considered for \texttt{.} is always the parent
 directory of directory \texttt{tests}\codeidx{tests}. The
-\texttt{DONTRUN} directive does not need to have any content, but it
-is useful to provide an explanation of why the test should not be run
-({\it e.g} test of a feature that is currently developed and not fully
+\texttt{DONTRUN} and \texttt{NOFRAMAC} directives
+do not need to have any content, but it might be
+useful to provide an explanation of why the test should not be run
+({\it e.g} test of a feature that is under development and not fully
 operational yet).
+
+If there are \texttt{OPT}/\texttt{STDOPT} directives \textit{after} a
+\texttt{NOFRAMAC} directive, they will be executed, unless
+they are themselves discarded by another subsequent \texttt{NOFRAMAC}
+directive.
 
 As said in Section~\ref{ptests:configuration}, these directives can be
 found in different places:
