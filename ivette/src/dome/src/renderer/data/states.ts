@@ -71,7 +71,7 @@ export class GlobalState<A> {
 
   constructor(initValue: A) {
     this.value = initValue;
-    this.emitter = new Emitter;
+    this.emitter = new Emitter();
     this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
   }
@@ -107,7 +107,7 @@ export function useGlobalState<A>(s: GlobalState<A>): State<A> {
   React.useEffect(() => {
     s.on(setCurrent);
     return () => s.off(setCurrent);
-  });
+  }, [s]);
   return [current, s.setValue];
 };
 

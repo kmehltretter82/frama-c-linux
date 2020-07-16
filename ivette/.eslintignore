@@ -6,5 +6,5 @@ dist
 coverage
 # don't lint tsc output, if any
 lib
-# don't lint dome, for the moment
-src/dome
+# don't lint the generated API
+api
