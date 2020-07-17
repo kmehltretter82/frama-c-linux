@@ -235,15 +235,21 @@ export abstract class Model<Key, Row> {
 // --------------------------------------------------------------------------
 
 /**
-   For a component to re-render on any updates and reloads.
-   The returned number can be used to memoise effects and callbacks.
+   Make the component to synchronize with the model and re-render on
+   every updates.
+   @param sync - whether to synchronize on model updates or not, `true`
+   by default.
+   @return a number that can be used to memoize other effects
  */
 
-export function useModel(model: Model<any, any>): number {
+export function useModel(model: Model<any, any>, sync = true): number {
   const [age, setAge] = React.useState(0);
   React.useEffect(() => {
-    const w = model.link(() => setImmediate(() => setAge(age + 1)));
-    return w.unlink;
+    if (sync) {
+      const w = model.link(() => setImmediate(() => setAge(age + 1)));
+      return w.unlink;
+    }
+    return undefined;
   });
   return age;
 }
