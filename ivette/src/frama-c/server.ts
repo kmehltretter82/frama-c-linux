@@ -32,7 +32,7 @@ const D = new Dome.Debug('Server');
 
  *  This event is emitted whenever the server status changes.
  */
-const STATUS = 'frama-c.server.status';
+const STATUS = new Dome.Event<Status>('frama-c.server.status');
 
 /**
  *  Server is actually started and running.
@@ -40,7 +40,7 @@ const STATUS = 'frama-c.server.status';
  *  This event is emitted when ther server _enters_ the `ON` state.
  *  The server is now ready to handle requests.
  */
-const READY = 'frama-c.server.ready';
+const READY = new Dome.Event('frama-c.server.ready');
 
 /**
  *  Server Status Notification Event
@@ -48,21 +48,18 @@ const READY = 'frama-c.server.ready';
  *  This event is emitted when ther server _leaves_ the `ON` state.
  *  The server is no more able to handle requests until restart.
  */
-const SHUTDOWN = 'frama-c.server.shutdown';
+const SHUTDOWN = new Dome.Event('frama-c.server.shutdown');
 
 /**
- *  Server Signal Prefix
+ *  Server Signal event constructor.
 
  *  Event `frama-c.server.signal.<id>'` for signal `<id>`.
  */
-const SIGNAL = 'frama-c.server.signal.';
-
-/**
- *  Server Signal Activity Prefix
-
- *  Event `frama-c.server.activity.<id>'` for signal `<id>`.
- */
-const ACTIVITY = 'frama-c.server.activity.';
+export class SIGNAL extends Dome.Event {
+  constructor(signal: string) {
+    super(`frama-c.server.signal.${signal}`);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -200,22 +197,13 @@ export function getPending(): number {
  *  Register callback on `READY` event.
  *  @param {function} callback Invoked when the server enters [[ON]] stage.
  */
-export function onReady(callback: any) { Dome.on(READY, callback); }
+export function onReady(callback: () => void) { READY.on(callback); }
 
 /**
  *  Register callback on `SHUTDOWN` event.
  *  @param {function} callback Invoked when the server leaves [[ON]] stage.
  */
-export function onShutdown(callback: any) { Dome.on(SHUTDOWN, callback); }
-
-/**
- *  Register callback on a signal `ACTIVITY` event.
- *  @param {string} id The signal identifier to listen to.
- *  @param {function} callback Invoked with `callback(signal, active)`.
- */
-export function onActivity(signal: string, callback: any) {
-  Dome.on(ACTIVITY + signal, callback);
-}
+export function onShutdown(callback: () => void) { SHUTDOWN.on(callback); }
 
 // --------------------------------------------------------------------------
 // --- Status Update
@@ -229,9 +217,9 @@ function _status(newStatus: Status) {
   if (newStatus !== status) {
     const oldStatus = status;
     status = newStatus;
-    Dome.emit(STATUS);
-    if (oldStatus.stage === Stage.ON) Dome.emit(SHUTDOWN);
-    if (newStatus.stage === Stage.ON) Dome.emit(READY);
+    STATUS.emit(newStatus);
+    if (oldStatus.stage === Stage.ON) SHUTDOWN.emit();
+    if (newStatus.stage === Stage.ON) READY.emit();
   }
 }
 
@@ -368,12 +356,9 @@ export function restart() {
 export function clear() {
   switch (status.stage) {
     case Stage.FAILURE:
-      buffer.clear();
-      _status(okStatus(Stage.OFF));
-      return;
     case Stage.OFF:
       buffer.clear();
-      Dome.emit(STATUS);
+      _status(okStatus(Stage.OFF));
       return;
     default:
       return;
@@ -587,7 +572,7 @@ function _exit(error?: Error) {
 
 class SignalHandler {
   id: any;
-  event: string;
+  event: Dome.Event;
   active: boolean;
   listen: boolean;
 
@@ -601,18 +586,20 @@ class SignalHandler {
     this.unplug = this.unplug.bind(this);
   }
 
-  on(callback: any) {
-    const n = System.emitter.listenerCount(this.event);
-    Dome.on(this.event, callback);
+  on(callback: () => void) {
+    const e = this.event;
+    const n = e.listenerCount();
+    e.on(callback);
     if (n === 0) {
       this.active = true;
       if (isRunning()) this.sigon();
     }
   }
 
-  off(callback: any) {
-    Dome.off(this.event, callback);
-    const n = System.emitter.listenerCount(this.event);
+  off(callback: () => void) {
+    const e = this.event;
+    e.off(callback);
+    const n = e.listenerCount();
     if (n === 0) {
       this.active = false;
       if (isRunning()) this.sigoff();
@@ -622,7 +609,6 @@ class SignalHandler {
   /* Bound to this */
   sigon() {
     if (this.active && !this.listen) {
-      Dome.emit(ACTIVITY + this.id, true);
       this.listen = true;
       queueCmd.push('SIGON', this.id);
       _flush();
@@ -632,7 +618,6 @@ class SignalHandler {
   /* Bound to this, Debounced */
   sigoff() {
     if (!this.active && this.listen) {
-      Dome.emit(ACTIVITY + this.id, false);
       if (isRunning()) {
         this.listen = false;
         queueCmd.push('SIGOFF', this.id);
@@ -699,13 +684,13 @@ export function useSignal(s: Signal, callback: any) {
 
 // --- Server Synchro
 
-Dome.on(READY, () => {
+READY.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.sigon();
   });
 });
 
-Dome.on(SHUTDOWN, () => {
+SHUTDOWN.on(() => {
   signals.forEach((h: SignalHandler) => {
     h.unplug();
     (h.sigoff as unknown as _.Cancelable).cancel();
@@ -854,7 +839,7 @@ async function _send() {
       // No pending command nor pending response
       rqCount = 0;
     }
-    Dome.emit(STATUS);
+    STATUS.emit(status);
   }
 }
 
@@ -891,7 +876,7 @@ function _receive(resp: any) {
           break;
         case 'SIGNAL':
           rid = shift();
-          Dome.emit(SIGNAL + rid);
+          (new SIGNAL(rid)).emit();
           break;
         case 'WRONG':
           err = shift();

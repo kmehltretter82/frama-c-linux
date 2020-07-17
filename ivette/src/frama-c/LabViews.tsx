@@ -38,6 +38,8 @@ class Library {
   collection: {};
   items: any[];
 
+  static update = new Dome.Event('labview.library');
+
   constructor() {
     this.modified = false;
     this.virtual = {};
@@ -50,7 +52,7 @@ class Library {
       this.collection = { ...this.virtual };
       this.items = _.sortBy(this.collection, ['order', 'id']);
       this.modified = false;
-      Dome.emit('labview.library');
+      Library.update.emit();
     }
   }
 
@@ -351,13 +353,12 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
 // --- Customization Views
 // --------------------------------------------------------------------------
 
-const Stock = new Settings.GDefault('frama-c.labView', Json.jAny, {});
-
 function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   const [local, setLocal] = Settings.useWindowSettings(
     settings, Json.jAny, {},
   ) as any;
-  const [customs, setCustoms] = Settings.useGlobalSettings(Stock) as any;
+  const [customs, setCustoms] =
+    Dome.useGlobalSettings<any>('frama-c.labview', Json.jAny, {});
   const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
@@ -571,7 +572,7 @@ function CustomGroup({
 function CustomizePanel(
   { dnd, settings, library, shape, setShape, setDragging }: any,
 ) {
-  Dome.useUpdate('labview.library');
+  Dome.useUpdate(Library.update);
   const { items } = library;
   const views = getItems(items, 'views');
   const groups = getItems(items, 'groups');
@@ -640,9 +641,9 @@ export function LabView(props: any) {
   const settingPanel = settings && `${settings}.panel`;
   // Hooks & State
   Dome.useUpdate(
-    'labview.library',
-    'dome.settings.window',
-    'dome.settings.global',
+    Library.update,
+    Dome.windowSettings,
+    Dome.globalSettings,
   );
   const dnd = React.useMemo(() => new DnD(), []);
   const lib = React.useMemo(() => new Library(), []);

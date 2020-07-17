@@ -18,8 +18,12 @@ import { useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Server from './server';
 
-const PROJECT = 'frama-c.project';
-const STATE_PREFIX = 'frama-c.state.';
+const PROJECT = new Dome.Event('frama-c.project');
+class STATE extends Dome.Event {
+  constructor(id: string) {
+    super(`frama-c.state.${id}`);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -43,7 +47,7 @@ Server.onReady(async () => {
     };
     const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
-    Dome.emit(PROJECT);
+    PROJECT.emit();
   } catch (error) {
     D.error(`Fail to retrieve the current project. ${error.toString()}`);
   }
@@ -51,7 +55,7 @@ Server.onReady(async () => {
 
 Server.onShutdown(() => {
   currentProject = '';
-  Dome.emit(PROJECT);
+  PROJECT.emit();
 });
 
 // --------------------------------------------------------------------------
@@ -83,7 +87,7 @@ export async function setProject(project: string) {
       };
       await Server.send(sr, project);
       currentProject = project;
-      Dome.emit(PROJECT);
+      PROJECT.emit();
     } catch (error) {
       D.error(`Fail to set the current project. ${error.toString()}`);
     }
@@ -219,20 +223,20 @@ interface Handler<A> {
 
 // shared for all projects
 class SyncState<A> {
-  UPDATE: string;
+  UPDATE: Dome.Event;
   handler: Handler<A>;
   upToDate: boolean;
   value?: A;
 
   constructor(h: Handler<A>) {
     this.handler = h;
-    this.UPDATE = STATE_PREFIX + h.name;
+    this.UPDATE = new STATE(h.name);
     this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
     this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
-    Dome.on(PROJECT, this.update);
+    PROJECT.on(this.update);
   }
 
   getValue() {
@@ -248,7 +252,7 @@ class SyncState<A> {
       this.value = v;
       const setter = this.handler.getter;
       if (setter) await Server.send(setter, v);
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to set value of syncState '${this.handler.name}'.`,
@@ -262,7 +266,7 @@ class SyncState<A> {
       this.upToDate = true;
       const v = await Server.send(this.handler.getter, null);
       this.value = v;
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to update syncState '${this.handler.name}'.`,

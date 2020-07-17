@@ -1,26 +1,24 @@
 /**
-   @packageDocumentation
-   @module dome(renderer)
-   @description
-
-   ## Dome Application (Renderer Process)
+   Dome Application (Renderer Process)
 
    This modules manages your main application window
    and its interaction with the main process.
 
    Example:
 
-   ```typescript
-   // File 'src/renderer/index.js':
-   import Application from './Application.js' ;
-   Dome.setContent( Application );
-   ```
+   * ```ts
+   *   // File 'src/renderer/index.js':
+   *   import Application from './Application.js' ;
+   *   Dome.setContent( Application );
+   * ```
+
+   @packageDocumentation
+   @module dome
  */
 
 import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import type Emitter from 'events';
 import { AppContainer } from 'react-hot-loader';
 import { remote, ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
@@ -33,14 +31,14 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 // main window focus
-var focus = true;
+let windowFocus = true;
 
 function setContextAppNode() {
   const node = document.getElementById('app');
   if (node) {
     node.className =
-      'dome-container dome-platform-' + System.platform +
-      (focus ? ' dome-window-active' : ' dome-window-inactive');
+      `dome-container dome-platform-${System.platform
+      }${windowFocus ? ' dome-window-active' : ' dome-window-inactive'}`;
   }
   return node;
 }
@@ -50,7 +48,7 @@ function setContextAppNode() {
 // --------------------------------------------------------------------------
 
 /** Configured to be `'true'` when in development mode. */
-export const DEVEL = System.DEVEL;
+export const { DEVEL } = System;
 
 export type PlatformKind = 'linux' | 'macos' | 'windows';
 
@@ -61,49 +59,146 @@ export const platform: PlatformKind = (System.platform as PlatformKind);
 // --- Application Emitter
 // --------------------------------------------------------------------------
 
-/** Register a callback on Dome event. */
-export function on(
-  evt: string,
-  job: (...args: any[]) => void,
-) { System.emitter.on(evt, job); }
+/** Typed Dome Event.
 
-/** Register a callback on Dome event. */
-export function off(
-  evt: string,
-  job: (...args: any[]) => void,
-) { System.emitter.off(evt, job); }
+    To register an event with no argument, simply use `new Event('myEvent')`.
+*/
+export class Event<A = void> {
 
-/** Emit a Dome event (Same as [[dome/misc/system.event]]). */
-export function emit(
-  evt: string,
-  ...args: any[]
-) { System.emitter.emit(evt, ...args); }
+  private name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    this.emit = this.emit.bind(this);
+  }
+
+  on(callback: (arg: A) => void) {
+    System.emitter.on(this.name, callback);
+  }
+
+  off(callback: (arg: A) => void) {
+    System.emitter.off(this.name, callback);
+  }
+
+  /**
+     Notify all listeners with the provided argument.
+     This methods is bound to the event, so you may use `myEvent.emit`
+     as a callback function, instead of eg. `(arg) => myEvent.emit(arg)`.
+  */
+  emit(arg: A) {
+    System.emitter.emit(this.name, arg);
+  }
+
+  /**
+     Number of currenty registered listeners.
+   */
+  listenerCount() {
+    return System.emitter.listenerCount(this.name);
+  }
+
+}
+
+export function useEvent<A>(
+  evt: Event<A>,
+  callback: (arg: A) => void,
+) {
+  return React.useEffect(() => {
+    evt.on(callback);
+    return () => evt.off(callback);
+  });
+}
 
 // --------------------------------------------------------------------------
 // --- Application Events
 // --------------------------------------------------------------------------
 
-/** Emits the `dome.update` event. */
-export function update() { emit('dome.update'); }
+/**
+   Dome update event.
+   It is emitted when a general re-rendering is required, typically when
+   the window frame is resized.
+   You can use it for your own components as an easy-to-use global
+   re-render event.
+*/
+export const update = new Event('dome.update');
 
-/** Update event handler. */
-export function onUpdate(job: () => void) { on('dome.update', job); }
+/**
+   Dome reload event.
+   It is emitted when the entire window is reloaded.
+*/
+export const reload = new Event('dome.reload');
 
-/** Unregister an update event handler. */
-export function offUpdate(job: () => void) { off('dome.update', job); }
-
-/** Reload event handler. */
-export function onReload(job: () => void) { on('dome.reload', job); }
-ipcRenderer.on('dome.ipc.reload', () => emit('dome.reload'));
+ipcRenderer.on('dome.ipc.reload', () => reload.emit());
 
 /** Command-line arguments event handler. */
 export function onCommand(
-  job: (argv: string[], workingDir: string) => void
-) { on('dome.command', job); }
+  job: (argv: string[], workingDir: string) => void,
+) {
+  System.emitter.on('dome.command', job);
+}
+
 ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
   SYS.SET_COMMAND(argv, wdir);
-  emit('dome.command', argv, wdir);
+  System.emitter.emit('dome.command', argv, wdir);
 });
+
+/** Window Settings event.
+    Emitted when window settings are reset or restored. */
+export const windowSettings = new Event(Settings.window);
+
+/** Global Settings event.
+    Emiited when global settings are updated. */
+export const globalSettings = new Event(Settings.global);
+
+// --------------------------------------------------------------------------
+// --- Closing
+// --------------------------------------------------------------------------
+
+ipcRenderer.on('dome.ipc.closing', System.doExit);
+
+/** Register a callback to be executed when the window is closing. */
+export function atExit(callback: () => void) {
+  System.atExit(callback);
+}
+
+// --------------------------------------------------------------------------
+// --- Focus Management
+// --------------------------------------------------------------------------
+
+/** Window focus event. */
+export const focus = new Event<boolean>('dome.focus');
+
+/** Current focus state of the main window. See also [[useWindowFocus]]. */
+export function isFocused() { return windowFocus; }
+
+ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
+  windowFocus = value;
+  setContextAppNode();
+  focus.emit(value);
+});
+
+/** Return the current window focus. See [[isfocused]]. */
+export function useWindowFocus(): boolean {
+  useUpdate(focus);
+  return windowFocus;
+}
+
+// --------------------------------------------------------------------------
+// --- Web Navigation
+// --------------------------------------------------------------------------
+
+/**
+   DOM href events for internal URLs.
+
+   This event is emitted whenever some `<a href/>` DOM element
+   is clicked with an internal link. External links will be automatically
+   opened with the user's default Web navigator.
+ */
+export const navigate = new Event<string>('dome.href');
+
+ipcRenderer.on(
+  'dome.ipc.href',
+  (_sender, href) => navigate.emit(href),
+);
 
 // --------------------------------------------------------------------------
 // --- Window Management
@@ -137,7 +232,7 @@ export function setTitle(title: string) {
 // --------------------------------------------------------------------------
 
 function setContainer(
-  Component: React.FunctionComponent | React.ComponentClass
+  Component: React.FunctionComponent | React.ComponentClass,
 ) {
   Settings.synchronize();
   const appNode = setContextAppNode();
@@ -153,16 +248,16 @@ function setContainer(
 /**
    Defines the user's main window content.
 
-   Binds the component to the main window.
-   <strong>Notes:</strong> a `<Component/>` instance is generated and rendered in the `#app`
-   window element. Its class name is set to `dome-platform-<platform>` with
-   the `<platform>` set to the `Dome.platform` value. This class name can be used
-   as a CSS selector for platform-dependent styling.
+   Binds the component to the main window.  A `<Component/>` instance is
+   generated and rendered in the `#app` window element. Its class name is set to
+   `dome-platform-<platform>` with the `<platform>` set to the `Dome.platform`
+   value. This class name can be used as a CSS selector for platform-dependent
+   styling.
 
    @param Component - to be rendered in the main window
 */
 export function setApplicationWindow(
-  Component: React.FunctionComponent | React.ComponentClass
+  Component: React.FunctionComponent | React.ComponentClass,
 ) {
   if (isApplicationWindow()) setContainer(Component);
 }
@@ -174,15 +269,15 @@ export function setApplicationWindow(
 /**
    Defines the user's preferences window content.
 
-   <strong>Notes:</strong> a `<Component/>` instance is generated and rendered in the `#app`
-   window element. Its class name is set to `dome-platform-<platform>` with
-   the `<platform>` set to the `Dome.platform` value. This class name can be used
-   as a CSS selector for platform-dependent styling.
+   A `<Component/>` instance is generated and rendered in the `#app` window
+   element. Its class name is set to `dome-platform-<platform>` with the
+   `<platform>` set to the `Dome.platform` value. This class name can be used as
+   a CSS selector for platform-dependent styling.
 
    @param Component - to be rendered in the preferences window
 */
 export function setPreferencesWindow(
-  Component: React.FunctionComponent | React.ComponentClass
+  Component: React.FunctionComponent | React.ComponentClass,
 ) {
   if (isPreferencesWindow()) setContainer(Component);
 }
@@ -191,7 +286,8 @@ export function setPreferencesWindow(
 // --- MenuBar Management
 // --------------------------------------------------------------------------
 
-const customItemCallbacks = new Map<string, (() => void)>();
+type callback = () => void;
+const customItemCallbacks = new Map<string, callback>();
 
 /**
    Create a new custom menu in the menu bar.
@@ -293,7 +389,7 @@ export function setMenuItem(options: MenuItemOptions) {
 
 ipcRenderer.on('dome.ipc.menu.clicked', (_sender, id: string) => {
   const callback = customItemCallbacks.get(id);
-  callback && callback();
+  if (callback) callback();
 });
 
 // --------------------------------------------------------------------------
@@ -343,19 +439,19 @@ export function popupMenu(
 ) {
   const { Menu, MenuItem } = remote;
   const menu = new Menu();
-  var selected = '';
-  var kid = 0;
+  let selected = '';
+  let kid = 0;
   items.forEach((item) => {
     if (item === 'separator')
       menu.append(new MenuItem({ type: 'separator' }));
     else if (item) {
       const { display = true, enabled, checked } = item;
       if (display) {
-        const label = item.label || '#' + (++kid);
+        const label = item.label || `#${++kid}`;
         const id = item.id || label;
         const click = () => {
           selected = id;
-          item.onClick && item.onClick();
+          if (item.onClick) item.onClick();
         };
         const type = checked !== undefined ? 'checkbox' : 'normal';
         menu.append(new MenuItem({ label, enabled, type, checked, click }));
@@ -364,53 +460,6 @@ export function popupMenu(
   });
   const job = callback ? () => callback(selected) : undefined;
   menu.popup({ window: remote.getCurrentWindow(), callback: job });
-}
-
-// --------------------------------------------------------------------------
-// --- Closing
-// --------------------------------------------------------------------------
-
-ipcRenderer.on('dome.ipc.closing', System.doExit);
-
-// --------------------------------------------------------------------------
-// --- Focus Management
-// --------------------------------------------------------------------------
-
-/** Current focus state of the main window. See also [[useWindowFocus]]. */
-export function isFocused() { return focus; }
-
-ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
-  focus = value;
-  setContextAppNode();
-  System.emitter.emit('dome.focus', value);
-});
-
-/** Return the current window focus. See [[isfocused]]. */
-export function useWindowFocus(): boolean {
-  useUpdate('dome.focus');
-  return focus;
-}
-
-// --------------------------------------------------------------------------
-// --- Web Navigation
-// --------------------------------------------------------------------------
-
-ipcRenderer.on(
-  'dome.ipc.href',
-  (href) => System.emitter.emit('dome.href', href)
-);
-
-/**
-   Register a callback to handle clicks on a local `<a href=...>`
-   with non-http protocoles.
-
-   URL with an `http://` protocole are opened externally
-   by the user's default browser.
-
-   Other URLs shall be treated by the application _via_ this callback.
-*/
-export function onDOMhref(callback: (href: string) => void) {
-  System.emitter.on('dome.href', callback);
 }
 
 // --------------------------------------------------------------------------
@@ -430,65 +479,15 @@ export function useForceUpdate() {
    Hook to re-render on Dome events (Custom React Hook).
    @param events - event names, defaults to a single `'dome.update'`.
 */
-export function useUpdate(...events: string[]) {
-  const update = useForceUpdate();
+export function useUpdate(...events: Event<any>[]) {
+  const fn = useForceUpdate();
   React.useEffect(() => {
-    const trigger = () => setImmediate(update);
-    if (events.length == 0) events.push('dome.update');
-    events.forEach((evt) => System.emitter.on(evt, trigger));
-    return () => events.forEach((evt) => System.emitter.off(evt, trigger));
-  });
-}
-
-/**
-   Hook to register callbacks to Dome events (Custom React Hook).
-
-   Register the callback on event until the component is unmount.
-   Do not force the component to re-render (unless the callback does).
-
-   @param event - Event to register on
-   @param callback - The callback to register
-*/
-export function useEvent(event: string, callback: () => void) {
-  React.useEffect(() => {
-    System.emitter.on(event, callback);
-    return () => { System.emitter.off(event, callback); };
-  });
-}
-
-/**
-   Hook to register callbacks to events on an emitter (Custom React Hook).
-   Similar to [[useEvent]].
-*/
-export function useEmitter(
-  emitter: Emitter,
-  evt: string,
-  callback: () => void,
-) {
-  React.useEffect(() => {
-    emitter.on(evt, callback);
-    return () => { emitter.off(evt, callback); };
-  });
-}
-
-// --------------------------------------------------------------------------
-// --- Commands Hooks
-// --------------------------------------------------------------------------
-
-/**
-   Hook for command-line interface (Custom React Hook).
-   Returns the command-line arguments and working directory for the application
-   instance running in the window. Automatically updated on `dome.command` events.
-
-   @returns `[argv,wdir]` command-line arguments and working directory
-
-   See also [[onCommand]] event handler.
-*/
-export function useCommand(): [string[], string] {
-  useUpdate('dome.command');
-  const wdir = System.getWorkingDir();
-  const argv = System.getArguments();
-  return [argv, wdir];
+    const trigger = () => setImmediate(fn);
+    if (events.length === 0) events.push(update);
+    events.forEach((evt) => evt.on(trigger));
+    return () => events.forEach((evt) => evt.off(trigger));
+  }, [fn, ...events]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The rule signals events is missing, probably because of « … »
 }
 
 // --------------------------------------------------------------------------
@@ -501,12 +500,12 @@ interface Clock {
   time: number; // Ellapsed time since firts pending
   event: string; // Tic events
   period: number; // Period
-};
+}
 
 // Collection of clocks indexed by period
 const CLOCKS = new Map<number, Clock>();
 
-const CLOCKEVENT = (period: number) => 'dome.clock.' + period;
+const CLOCKEVENT = (period: number) => `dome.clock.${period}`;
 
 const TIC_CLOCK = (clk: Clock) => () => {
   if (0 < clk.pending) {
@@ -521,8 +520,8 @@ const TIC_CLOCK = (clk: Clock) => () => {
 const INC_CLOCK = (period: number) => {
   let clk = CLOCKS.get(period);
   if (!clk) {
-    let event = CLOCKEVENT(period);
-    let time = (new Date()).getTime();
+    const event = CLOCKEVENT(period);
+    const time = (new Date()).getTime();
     clk = { pending: 0, time, period, event };
     clk.timer = setInterval(TIC_CLOCK(clk), period);
     CLOCKS.set(period, clk);
@@ -532,7 +531,7 @@ const INC_CLOCK = (period: number) => {
 };
 
 const DEC_CLOCK = (period: number) => {
-  let clk = CLOCKS.get(period);
+  const clk = CLOCKS.get(period);
   if (clk) clk.pending--;
 };
 
@@ -582,9 +581,8 @@ export function useClock(period: number, initStart: boolean): Timer {
         System.emitter.off(event, callback);
         DEC_CLOCK(period);
       };
-    } else
-      return undefined;
-  }, [running]);
+    } return undefined;
+  }, [period, running]);
   return { time, running, start, stop };
 }
 
@@ -606,11 +604,11 @@ export function useBoolSettings(
   defaultValue = false,
 ): FlipState {
   const [state, setState] = Settings.useWindowSettings(
-    key, Json.jBoolean, defaultValue
+    key, Json.jBoolean, defaultValue,
   );
   const flipState = React.useCallback(
     (v) => setState(v === undefined ? !state : v),
-    [state, setState]
+    [state, setState],
   );
   return [state, flipState];
 }
@@ -618,26 +616,26 @@ export function useBoolSettings(
 /** Number window settings helper. Default is `0` unless specified. */
 export function useNumberSettings(key: string | undefined, defaultValue = 0) {
   return Settings.useWindowSettings(
-    key, Json.jNumber, defaultValue
+    key, Json.jNumber, defaultValue,
   );
 }
 
 /** String window settings. Default is `''` unless specified). */
 export function useStringSettings(key: string | undefined, defaultValue = '') {
   return Settings.useWindowSettings(
-    key, Json.jString, defaultValue
+    key, Json.jString, defaultValue,
   );
 }
 
 /** Optional string window settings. Default is `undefined`. */
 export function useStringOptSettings(key: string | undefined) {
   return Settings.useWindowSettings(
-    key, Json.jString, undefined
+    key, Json.jString, undefined,
   );
 }
 
 /** Direct shortcut to [[dome/data/settings.useWindowSettings]]. */
-export const useWindowSettings = Settings.useWindowSettings;
+export const { useWindowSettings } = Settings;
 
 /**
    Utility shortcut to [[dome/data/settings.useGlobalSettings]]
@@ -646,11 +644,11 @@ export const useWindowSettings = Settings.useWindowSettings;
 export function useGlobalSettings<A extends Json.json>(
   globalKey: string,
   decoder: Json.Loose<A>,
-  defaultValue: A
+  defaultValue: A,
 ) {
   // Object creation is cheaper than useMemo...
   const G = new Settings.GlobalSettings(
-    globalKey, decoder, Json.identity, defaultValue
+    globalKey, decoder, Json.identity, defaultValue,
   );
   return Settings.useGlobalSettings(G);
 }
@@ -664,15 +662,22 @@ export class Debug {
   constructor(moduleName: string) {
     this.moduleName = moduleName;
   }
+
+  /* eslint-disable no-console */
+
   log(...args: any) {
     if (DEVEL) console.log(`[${this.moduleName}]`, ...args);
   }
+
   warn(...args: any) {
     if (DEVEL) console.warn(`[${this.moduleName}]`, ...args);
   }
+
   error(...args: any) {
     if (DEVEL) console.error(`[${this.moduleName}]`, ...args);
   }
+
+  /* eslint-enable */
 }
 
 // --------------------------------------------------------------------------

@@ -345,7 +345,13 @@ export function useGlobalSettings<A>(S: GlobalSettings<A>) {
 // --- Settings Synchronization
 // --------------------------------------------------------------------------
 
-/*@ internal */
+/* @ internal */
+export const window = WindowDriver.evt;
+
+/* @ internal */
+export const global = GlobalDriver.evt;
+
+/* @ internal */
 export function synchronize() {
   ipcRenderer.sendSync(
     'dome.ipc.settings.sync',
@@ -354,7 +360,8 @@ export function synchronize() {
       GlobalDriver.sync(globals);
       const settings: patch[] = data.settings ?? [];
       WindowDriver.sync(settings);
-    });
+    },
+  );
 }
 
 // --------------------------------------------------------------------------

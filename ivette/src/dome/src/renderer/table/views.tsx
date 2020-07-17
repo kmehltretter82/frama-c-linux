@@ -259,7 +259,7 @@ function makeDataRenderer(
 type TableSettings = {
   resize?: Json.dict<number>;
   visible?: Json.dict<boolean>;
-}
+};
 
 const jTableSettings = Json.jObject({
   resize: Json.jDict(Json.jNumber),
@@ -1094,7 +1094,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
-  Dome.useEvent('dome.settings.window', state.reloadSettings);
+  Dome.useEvent(Dome.windowSettings, state.reloadSettings);
   return (
     <div className="dome-xTable">
       <React.Fragment key="columns">

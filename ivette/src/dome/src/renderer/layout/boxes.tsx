@@ -180,12 +180,13 @@ export const Folder = (props: FolderProps) => {
     indent = 18,
     label, title, children,
   } = props;
-  const [unfold, onClick] = Dome.useSwitch(settings, defaultUnfold);
+  const [unfold, onClick] = Dome.useBoolSettings(settings, defaultUnfold);
+  const foldUnfold = React.useCallback(() => onClick(), [onClick]);
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
   const display = unfold ? 'none' : 'block';
   return (
     <Vpack>
-      <Hpack onClick={onClick}>
+      <Hpack onClick={foldUnfold}>
         <Title icon={icon} label={label} title={title} />
       </Hpack>
       <Vpack style={{ display, marginLeft: indent }}>

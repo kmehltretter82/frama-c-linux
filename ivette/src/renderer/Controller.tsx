@@ -98,7 +98,7 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 
 let reloadCommand: string | undefined;
 
-Dome.onReload(() => {
+Dome.reload.on(() => {
   const [lastCmd] = Settings.getWindowSettings(
     'Controller.history', Json.jList(Json.jString), [],
   );
@@ -179,10 +179,14 @@ const RenderConsole = () => {
     'Controller.history', Json.jList(Json.jString), [],
   );
 
-  Dome.useEmitter(editor, 'change', () => {
-    const cmd = editor.getValue().trim();
-    setEmpty(cmd === '');
-    setNoTrash(cursor === 0 && history.length === 1 && cmd === history[0]);
+  React.useEffect(() => {
+    const callback = () => {
+      const cmd = editor.getValue().trim();
+      setEmpty(cmd === '');
+      setNoTrash(noTrash && cmd === history[0]);
+    };
+    editor.on('change', callback);
+    return () => { editor.off('change', callback); };
   });
 
   const doReload = () => {
