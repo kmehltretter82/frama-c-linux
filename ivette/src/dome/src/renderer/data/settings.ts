@@ -29,6 +29,14 @@ interface Settings<A> {
 
 /**
    Global settings.
+   This utility class allows you to share accross several
+   components and windows the parameters associated to global settings.
+
+   However, it is important to note that global settings are uniquely identified
+   by their `name`. If you have multiple definitions of global settings class
+   with the same name, they will actually share the same value. Hence, if they
+   have different default values or decoders, this might leads to strange
+   results.
  */
 export class GlobalSettings<A> {
   name: string;

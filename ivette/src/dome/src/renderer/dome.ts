@@ -636,6 +636,25 @@ export function useStringOptSettings(key: string | undefined) {
   );
 }
 
+/** Direct shortcut to [[dome/data/settings.useWindowSettings]]. */
+export const useWindowSettings = Settings.useWindowSettings;
+
+/**
+   Utility shortcut to [[dome/data/settings.useGlobalSettings]]
+   with global settings class created on-the-fly.
+ */
+export function useGlobalSettings<A extends Json.json>(
+  globalKey: string,
+  decoder: Json.Loose<A>,
+  defaultValue: A
+) {
+  // Object creation is cheaper than useMemo...
+  const G = new Settings.GlobalSettings(
+    globalKey, decoder, Json.identity, defaultValue
+  );
+  return Settings.useGlobalSettings(G);
+}
+
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
