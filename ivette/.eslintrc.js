@@ -17,7 +17,7 @@ module.exports = {
   },
   settings: {
     // Electron is in devDependencies because of its special build system
-    "import/core-modules": [ "electron" ]
+    "import/core-modules": [ 'electron', 'react-hot-loader' ]
   },
   rules: {
     "react/display-name": "off",

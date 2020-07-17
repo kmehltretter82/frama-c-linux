@@ -445,7 +445,7 @@ export function jKey<K>(kd: K): Loose<key<K>> {
 
 /** Decoder for `index<K>` numbers. */
 export function jIndex<K>(kd: K): Loose<index<K>> {
-  return (js: json) => typeof js === 'number' ? forge(kd, js) : undefined;
+  return (js: json) => (typeof js === 'number' ? forge(kd, js) : undefined);
 }
 
 export type dict<A> = { [key: string]: A };

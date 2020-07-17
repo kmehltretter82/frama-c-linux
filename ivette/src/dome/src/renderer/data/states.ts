@@ -16,17 +16,17 @@ import isEqual from 'react-fast-compare';
 // --- State utilities
 // --------------------------------------------------------------------------
 
-/** Alias to `[state,setState]` returned values*/
+/** Alias to `[state,setState]` returned values */
 export type State<A> = [A, (newValue: A) => void];
 
 /** State field of an object state. */
-export function key<A, K extends keyof A>(
+export function keyOf<A, K extends keyof A>(
   state: State<A>,
   key: K,
 ): State<A[K]> {
   const [props, setProps] = state;
   return [props[key], (value: A[K]) => {
-    const newProps = Object.assign({}, props);
+    const newProps = { ...props };
     newProps[key] = value;
     setProps(newProps);
   }];
@@ -35,12 +35,12 @@ export function key<A, K extends keyof A>(
 /** State index of an array state. */
 export function index<A>(
   state: State<A[]>,
-  index: number,
+  idx: number,
 ): State<A> {
   const [array, setArray] = state;
-  return [array[index], (value: A) => {
+  return [array[idx], (value: A) => {
     const newArray = array.slice();
-    newArray[index] = value;
+    newArray[idx] = value;
     setArray(newArray);
   }];
 }
@@ -48,13 +48,16 @@ export function index<A>(
 /** Log state updates in the console. */
 export function debug<A>(msg: string, st: State<A>): State<A> {
   const [value, setValue] = st;
-  return [value, (v) => { console.log(msg, v); setValue(v); }];
+  return [value, (v) => {
+    setValue(v);
+    console.log(msg, v); // eslint-disable-line no-console
+  }];
 }
 
 /** Purely local value. No hook, no events, just a ref. */
 export function local<A>(init: A): State<A> {
   const ref = { current: init };
-  return [ref.current, (v) => ref.current = v];
+  return [ref.current, (v) => { ref.current = v; }];
 }
 
 // --------------------------------------------------------------------------
@@ -109,6 +112,6 @@ export function useGlobalState<A>(s: GlobalState<A>): State<A> {
     return () => s.off(setCurrent);
   }, [s]);
   return [current, s.setValue];
-};
+}
 
 // --------------------------------------------------------------------------

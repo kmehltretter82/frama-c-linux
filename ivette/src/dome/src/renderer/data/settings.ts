@@ -62,26 +62,30 @@ export class GlobalSettings<A> {
 
 /** Boolean settings with `true` default. */
 export class GTrue extends GlobalSettings<boolean> {
-  constructor(name: string) { super(name, JSON.jBoolean, JSON.identity, true); }
+  constructor(name: string) {
+    super(name, JSON.jBoolean, JSON.identity, true);
+  }
 }
 
 /** Boolean settings with `false` default. */
 export class GFalse extends GlobalSettings<boolean> {
-  constructor(name: string) { super(name, JSON.jBoolean, JSON.identity, false); }
+  constructor(name: string) {
+    super(name, JSON.jBoolean, JSON.identity, false);
+  }
 }
 
 /** Numeric settings (default is zero unless specified). */
 export class GNumber extends GlobalSettings<number> {
-  constructor(name: string, defaultValue: number = 0) {
+  constructor(name: string, defaultValue = 0) {
     super(name, JSON.jNumber, JSON.identity, defaultValue);
-  };
+  }
 }
 
 /** String settings (default is `""` unless specified). */
 export class GString extends GlobalSettings<string> {
-  constructor(name: string, defaultValue: string = '') {
+  constructor(name: string, defaultValue = '') {
     super(name, JSON.jString, JSON.identity, defaultValue);
-  };
+  }
 }
 
 /** Smart constructor for optional (JSON serializable) data. */
@@ -111,8 +115,8 @@ export class GObject<A extends JSON.json> extends GlobalSettings<A> {
 // --- Generic Settings (private)
 // --------------------------------------------------------------------------
 
-type patch = { key: string, value: JSON.json };
-type driver = { evt: string, ipc: string, broadcast: boolean };
+type patch = { key: string; value: JSON.json };
+type driver = { evt: string; ipc: string; broadcast: boolean };
 
 class Driver {
 
@@ -161,7 +165,8 @@ class Driver {
             }
           });
           SysEmitter.emit(this.evt);
-        });
+        },
+      );
     }
     // --- Closing Events
     ipcRenderer.on('dome.ipc.closing', () => {
@@ -241,7 +246,7 @@ function useSettings<A>(
       const event = D.evt;
       const callback = () => setValue(loader());
       SysEmitter.on(event, callback);
-      return () => { SysEmitter.off(event, callback); }
+      return () => { SysEmitter.off(event, callback); };
     }
     return undefined;
   });
@@ -251,7 +256,7 @@ function useSettings<A>(
       setValue(newValue);
       if (K) D.save(K, S.encoder(newValue));
     }
-  }, [S, D, K]);
+  }, [S, D, K, value]);
   return [value, updateValue];
 }
 
@@ -304,7 +309,7 @@ export function useWindowSettings<A extends JSON.json>(
   return useSettings({
     decoder,
     encoder: JSON.identity,
-    defaultValue
+    defaultValue,
   }, WindowDriver, key);
 }
 
@@ -318,7 +323,7 @@ export function useWindowSettingsData<A>(
   return useSettings({
     decoder,
     encoder,
-    defaultValue
+    defaultValue,
   }, WindowDriver, key);
 }
 
