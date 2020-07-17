@@ -124,7 +124,7 @@ export const jString: Loose<string> = (js: json) => (
     might be more efficient.
 */
 export function jTag<A>(tg: A): Loose<A> {
-  return (js: json) => Object.is(js, tg) ? tg : undefined;
+  return (js: json) => (Object.is(js, tg) ? tg : undefined);
 }
 
 /**

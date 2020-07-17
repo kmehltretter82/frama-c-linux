@@ -462,7 +462,6 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
     this.reload();
   }
 
-
 }
 
 // --------------------------------------------------------------------------
