@@ -100,20 +100,18 @@ const Values = () => {
         <Column
           id="value_before"
           visible={!!name}
-          label={name && `${name} (before)`}
+          label={name && (unchanged ? name : `${name} (before)`)}
           title="Values inferred by Eva just before the selected point"
           disableSort
-          fill
         />
-        <ColumnAlarm visible={alarmOccurred} />
         <Column
           id="value_after"
           visible={!!name && !unchanged}
           label={name && `${name} (after)`}
           title="Values inferred by Eva just after the selected point"
           disableSort
-          fill
         />
+        <ColumnAlarm visible={alarmOccurred} />
       </Table>
     </>
   );
