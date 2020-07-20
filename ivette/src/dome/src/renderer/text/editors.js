@@ -246,10 +246,10 @@ class CodeMirrorWrapper extends React.Component {
   // --- Scrolling
   // --------------------------------------------------------------------------
 
-  handleScrollTo(position) {
+  handleScrollTo(line) {
     try {
       const cm = this.codeMirror;
-      cm && cm.scrollIntoView(position);
+      cm && cm.scrollIntoView({ line, ch: 0 });
     } catch(_error) { } // Out of range
   }
 

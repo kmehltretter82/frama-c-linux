@@ -7,31 +7,81 @@
    @module dome/text/buffers
 */
 
-import Emitter from 'events' ;
-import CodeMirror from 'codemirror/lib/codemirror.js' ;
+import Emitter from 'events';
+import CodeMirror, { TextMarker } from 'codemirror/lib/codemirror.js';
 
-const combineClass = (a,b) => a ? (b ? (a + " " + b) : a) : b ;
+export type Range = { from: CodeMirror.Position, to: CodeMirror.Position };
+
+export interface Decorator {
+  /** @return a className to apply on markers with the identifier. */
+  (id: string): string | undefined;
+}
+
+export interface TextMarkerProxy {
+  clear(): void;
+  changed(): void;
+  find(): Range | undefined;
+}
+
+export interface MarkerProps extends CodeMirror.TextMarkerOptions {
+  id?: string;
+  hover?: boolean;
+  className?: string;
+}
+
+/**
+   Text with tags.
+
+   In the object form, a text marker is created with given attributes
+   and text.
+ */
+export type MarkedText = undefined | null | string
+  | MarkedText[]
+  | MarkerProps & { text: MarkedText }
+  ;
 
 // --------------------------------------------------------------------------
-// --- Marker Proxy
+// --- Markers Proxy
 // --------------------------------------------------------------------------
 
-class Proxy {
+class Proxy implements TextMarkerProxy {
+  private marker?: TextMarker;
+  clear() { this.marker?.clear(); }
+  changed() { this.marker?.changed(); }
+  find() { return this.marker?.find(); }
+  _link(marker: TextMarker) { this.marker = marker; }
+}
 
-  clear() { this.marker && this.marker.clear(); }
-  changed() { this.marker && this.marker.changed(); }
-  find() { return this.marker && this.marker.find(); }
-  _link(marker) { this.marker = marker ; }
+interface StackedMarker {
+  id?: string;
+  hover?: boolean;
+  className?: string;
+  options: CodeMirror.TextMarkerOptions;
+  start: CodeMirror.Position;
+  proxy: Proxy;
+}
 
+interface CSSMarker {
+  id: string | undefined;
+  length: number;
 }
 
 // --------------------------------------------------------------------------
 // --- Buffer
 // --------------------------------------------------------------------------
 
+export interface RichTextBufferProps {
+
+  /** CodeMirror [mode](https://codemirror.net/mode/index.html) specification. */
+  mode?: any;
+
+  /** Maximum number of lines in the buffer. */
+  maxlines?: number;
+
+}
+
 /**
-   @summary Rich Text Content and State.
-   @description
+   Rich Text Content and State.
 
    A buffer encapsulate a CodeMirror document instance inside an standard
    Node event emitter. CodeMirror signals are automatically linked back to
@@ -73,23 +123,27 @@ class Proxy {
 
 export class RichTextBuffer extends Emitter {
 
-  /**
-     @param {object} [props] - Constructor properties (see below)
-     @param {string | object} [props.mode] - CodeMirror [mode](https://codemirror.net/mode/index.html) specification
-     @param {number} [props.maxlines] - Maximum number of lines in the buffer
-  */
-  constructor(props = {}) {
+  private _doc: CodeMirror.Doc;
+  private _maxlines: number = 10000;
+  private _operations: number = 0; // cm started operations
+  private _editors: CodeMirror.Editor[] = [];
+  private _stacked: StackedMarker[] = [];
+
+  // Indexed by CSS property dome-xHover-nnnn
+  private _mhovers = new Map<string, CSSMarker>();
+
+  // Indexed by marker user identifier
+  private _markers = new Map<string, CodeMirror.TextMarker[]>();
+
+  private _decorator?: Decorator;
+  private _edited = false;
+  private _focused = false;
+  private _markid = 0;
+
+  constructor(props: RichTextBufferProps = {}) {
     super();
-    const { mode , maxlines } = props ;
-    this._doc = new CodeMirror.Doc('',mode);
-    this._operations = 0 ;
-    this._editors = [] ;
-    this._stacked = [] ;
-    this._edited = false ;
-    this._focused = false ;
-    this._markid = 0 ;
-    this._markers = {} ;
-    this._decorator = undefined ;
+    const { mode, maxlines } = props;
+    this._doc = new CodeMirror.Doc('', mode);
     this.setMaxlines(maxlines);
     this.setEdited = this.setEdited.bind(this);
     this.setFocused = this.setFocused.bind(this);
@@ -97,25 +151,16 @@ export class RichTextBuffer extends Emitter {
     this.append = this.append.bind(this);
     this.setValue = this.setValue.bind(this);
     this.getValue = this.getValue.bind(this);
+    this.updateDecorations = this.updateDecorations.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.log = this.log.bind(this);
-    this._doc.on('change', ( _target , { origin } ) => {
-      if (origin !== 'buffer') this.setEdited(true);
-      this.emit('change');
-    });
   }
 
   /**
-     @summary CodeMirror document instance.
-     @return {CodeMirror.Doc} internal [document](https://codemirror.net/doc/manual.html#api_doc)
-     @description
-     Returns the `CodeMirror.Doc` instance holding the buffer contents.
-     This can be used for further customization.
-     <p>
-     This document will never be bound to a `CodeMirror` instance. Instead, `Text` views
-     will use _linked_ documents to the buffer one. This allows for several views to
-     share the same document (and history).
+     Internal CodeMirror
+     [document](https://codemirror.net/doc/manual.html#api_doc) instance.
   */
-  getDoc() { return this._doc; }
+  getDoc(): CodeMirror.Doc { return this._doc; }
 
   // --------------------------------------------------------------------------
   // --- Buffer Manipulation
@@ -125,184 +170,168 @@ export class RichTextBuffer extends Emitter {
   clear() { this.setValue(''); }
 
   /**
-     @summary Writes in the buffer.
-     @param {any} [value] - content to append in the buffer
-     @description
-     Appends textual contents to the end of the buffer.
-     All parameters are converted to string and joined with spaces.
-     The generated change event has origin `'buffer'` and it does not
-     modifies the _edited_ internal state.
+     Writes in the buffer. All parameters are converted to string and joined
+     with spaces.  The generated change event has origin `'buffer'` and it does
+     not modifies the _edited_ internal state.
   */
-  append(...value) {
-    if (value.length > 0) {
-      const doc = this._doc ;
-      const from = doc.posFromIndex(Infinity);
-      const text = value.join(' ');
-      doc.replaceRange(text,from,undefined,'buffer');
+  append(...values: any[]) {
+    if (values.length > 0) {
+      const doc = this._doc;
+      const start = doc.posFromIndex(Infinity);
+      const text = values.join(' ');
+      doc.replaceRange(text, start, undefined, 'buffer');
       this.shrink();
     }
   }
 
   /**
-     @summary Starts a new line in the buffer.
-     @description
-     If the current buffer content does not finish at the beginning of a fresh line,
-     inserts a newline character.
+     Starts a new line in the buffer. If the current buffer content does not
+     finish at the beginning of a fresh line, inserts a newline character.
   */
   flushline() {
-    const doc = this._doc ;
-    const from = doc.posFromIndex(Infinity);
-    if (from.ch > 0) doc.replaceRange('\n',from,undefined,'flush');
+    const doc = this._doc;
+    const start = doc.posFromIndex(Infinity);
+    if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'flush');
   }
 
   /**
-     @summary Appends with newline and auto-scrolling.
-     @param {any} [value] - content to append in the buffer
-     @description
-     This is a short-cut to `flushline()` followed by `append(...value,'\n')` and `scroll()`.
+     Appends with newline and auto-scrolling. This is a short-cut to
+     `flushline()` followed by `append(...value,'\n')` and `scroll()`.
    */
-  log(...value) {
+  log(...values: any[]) {
     this.flushline();
-    this.append(...value,'\n');
+    this.append(...values, '\n');
     this.scroll();
   }
 
   /**
-     @summary Replace textual content with the given value.
-     @param {string} [txt] - new text content
-     @description
+     Replace all textual content with the given string.
      Also remove all markers.
    */
-  setValue(txt='') {
+  setValue(txt = '') {
     this._doc.setValue(txt);
     this._edited = false;
-    this._stacked = [] ;
-    this._focused = false ;
-    this._markid = 0 ;
-    this._markers = {} ;
+    this._stacked = [];
+    this._focused = false;
+    this._markid = 0;
+    this._mhovers.clear();
   }
 
-  /**
-     @summary Return textual content.
-     @return {string}
-  */
+  /** Return the textual contents of the buffer. */
   getValue() { return this._doc.getValue(); }
 
   /**
-     @summary Opens a text marker.
-     @param {object} options - CodeMirror
-       [text marker](https://codemirror.net/doc/manual.html#api_marker) options
-     @return {CodeMirror.TextMarker} the associated
-       [text marker](https://codemirror.net/doc/manual.html#api_marker) (proxy)
-     @description
-Opens a text marker at the current (end) position in the buffer.
+     Opens a text marker.
 
-The text marker is stacked and would be actually created on the
-matching `closeTextMarker()` call. It will be applied to the full range of text
-inserted between its associated `openTextMarker()` and `closeTextMarker()` calls.
+     Opens a text marker at the current (end) position in the buffer.
 
-The returned text marker is actually a _proxy_ to the text marker that
-will be eventually created by `closeTextMarker()`. Its methods (`find`, `clear` and `changed`)
-are automatically forwarded to the actual `CodeMirror.TextMarker` instance, once created.
-Hence, you can safely invoke these methods on either the _proxy_ or the _final_
-text marker at your convenience.
+     The text marker is stacked and would be actually created on the matching
+     [[closeTextMarker]] call. It will be applied to the full range of text
+     inserted between its associated [[openTextMarker]] and [[closeTextMarker]]
+     calls.
 
-Additionnaly to standard `CodeMirror.TextMarker` options, you may also the
-following Dome specific ones:
-- `id: string` assigns an identifier to the marker (expected to be unique) ;
-- `hover: boolean` makes the text-marker highlighted on mouse-hover ; this is compatible with
-  _nested_ markers, which is not possible with CSS `:hover` pseudo selectors ; defaults to `true` for
-  identified text markers and `false` otherwize.
-*/
+     The returned text marker is actually a _proxy_ to the text marker that will be
+     eventually created by [[closeTextMarker]]. Its methods are automatically
+     forwarded to the actual `CodeMirror.TextMarker`
+     instance, once created.  Hence, you can safely invoke these methods on either
+     the _proxy_ or the _final_ text marker at your convenience.
+  */
 
-  openTextMarker( { id , hover, className, ...options } ) {
-    const from = this._doc.posFromIndex(Infinity);
+  openTextMarker(props: MarkerProps): TextMarkerProxy {
+    const { id, hover, className, ...options } = props;
+    const start = this._doc.posFromIndex(Infinity);
     const proxy = new Proxy();
-    this._stacked.push( { from , id , hover, className, options , proxy } );
-    return proxy ;
+    this._stacked.push({ start, id, hover, className, options, proxy });
+    return proxy;
   }
 
   /**
-     @summary Close last opened marker.
-     @return {CodeMirror.TextMarker} the (actual)
-     [text marker](https://codemirror.net/doc/manual.html#api_marker)
-     @description
-     Closes the lastly opened text marker with `openTextMarker()`.
-     The method returns the _actual_
-     text marker ; the _proxy_ text marker provided by the corresponding
-     call to `openTextMarker()` is automatically bound to the actual one.
+     Closes the last opened marker.
+
+     Returns the (actual) [text marker]
+     (https://codemirror.net/doc/manual.html#api_marker) ; the proxy
+     returned by the corresponding call to [[openTextMarker]] is automatically
+     bound to the actual one.
+
   */
-  closeTextMarker() {
+  closeTextMarker(): TextMarker | undefined {
     const tag = this._stacked.pop();
+    const doc = this._doc;
     if (tag) {
-      const { id, hover, from } = tag ;
-      const to = this._doc.posFromIndex(Infinity);
-      var classNameWithId ;
-      var tagid ;
-      if ( id || hover ) {
-        const mhover = hover !== undefined ? hover : (id !== undefined) ;
-        const cid = id ? 'dome-xMark-' + id : ('dome-xHover-' + (++this._markid)) ;
-        const p = this._doc.indexFromPos(from);
-        const q = this._doc.indexFromPos(to);
-        const m = this._markers[cid];
-        if (m) console.warn('[Dome.text.buffers] duplicate marker',id);
-        tagid = this._markers[cid] = { id, hover:mhover, classNameId:cid, length: q-p } ;
-        classNameWithId = id ? "dome-xMarked " + cid : cid ;
+      const { id, hover, start, className } = tag;
+      const stop = doc.posFromIndex(Infinity);
+      var chover;
+      if (id || hover) {
+        chover = 'dome-xHover-' + (this._markid++);
+        const p = doc.indexFromPos(start);
+        const q = doc.indexFromPos(stop);
+        this._mhovers.set(chover, { id, length: q - p });
       }
-      const className = combineClass( tag.className, classNameWithId );
-      const options = Object.assign( { shared:true, className } , tag.options );
-      const marker = this._doc.markText( from , to , options );
+      const fullClassName = [
+        'dome-xMarked',
+        id && ('dome-xMark-' + id),
+        chover,
+        className,
+      ].filter((s) => !!s).join(' ');
+      const options = {
+        shared: true,
+        className: fullClassName,
+        ...tag.options,
+      };
+      const marker = doc.markText(start, stop, options);
+      if (id) {
+        const markers = this._markers;
+        const ms = markers.get(id);
+        if (ms === undefined)
+          markers.set(id, [marker]);
+        else
+          ms.push(marker);
+      }
       tag.proxy._link(marker);
-      if (tagid) tagid.marker = marker ;
       this.shrink();
-      return marker ;
+      return marker;
     } else
-      return undefined ;
+      return undefined;
   }
 
-  /**
-     @description Lookup a text marker
-     @param {string} id - requested identifier
-     @return {CodeMirror.TextMarker} the identified text marker, or `undefined` if not found.
-  */
-  findTextMarker(id) {
-    if (id) {
-      const m = this._markers['dome-xMark-' + id] ;
-      if (m) return m.marker ;
-    }
-    return undefined;
+  /** Lookup for the text markers associated with a marker identifier. */
+  findTextMarker(id: string): CodeMirror.TextMarker[] {
+    return this._markers.get(id) || [];
   }
 
-  /**
-     @summary Lookup a hover class.
-     @param {string} className - a class name, possibly identifying a hover element
-     @return {hover} the associated hovered element `{id, classNameId, length}`, or
-     `undefined` if the provided `className` does not identify any such element.
-   */
-  findHover(name) { return this._markers[name]; }
+  /** Lopokup for a hover class. */
+  findHover(className: string) { return this._mhovers.get(className); }
 
   // --------------------------------------------------------------------------
   // --- Highlighter
   // --------------------------------------------------------------------------
 
   /**
-     @summary Define highlighter.
-     @param {function} highlighter - the function that computes
-     the decoration class of a marker id.
+     Define highlighter.
+
+     @param fn - highlighter, `fn(id)` shall return a className to apply
+     on text markers with the provided identifier.
   */
-  setDecorator(f) { this._decorator = f ; this.emit('decorated'); }
+  setDecorator(fn: Decorator) {
+    this._decorator = fn;
+    this.emit('decorated');
+  }
 
   /**
-     @summary Current highlighter.
-     @return {function} the current highlighting function
+     Current highlighter.
    */
-  getDecorator() { return this._decorator ; }
+  getDecorator() { return this._decorator; }
 
   /**
-     @summary Rehighlight document.
-     @description
+     Rehighlight document.
+
      Emits the `'decorated'` event to make editors
      updating the decorations of identified text markers.
+
+     This can be used when decoration shall be re-computed,
+     even if the decoration function was not modified.
+
+     The method is bound to `this`.
   */
   updateDecorations() { this.emit('decorated'); }
 
@@ -311,46 +340,46 @@ following Dome specific ones:
   // --------------------------------------------------------------------------
 
   /**
-     @summary Set edited state.
-     @param {boolean} [state] - the new edited state (defaults to `true`).
-     @description
+     Set edited state.
 
-Set the _edited_ internal state. The method is automatically invoked by editor
-views when the user actually edit the document.  The state is _not_ modified
-when modifying the document from buffer's own methods, _eg._ `append()` and
-`clear()`.
+     The method is automatically invoked by editor views when the user actually
+     edit the document.  The state is _not_ modified when modifying the document
+     from buffer's own methods, _eg._ `append()` and `clear()`.
 
-The method fires the `'edited'` event on modifications.  This method is bound to
-`this`, hence `this.setEdited` can be used as a valid callback function.
+     The method fires the `'edited'` event on modifications.  This method is
+     bound to `this`, hence `this.setEdited` can be used as a valid callback
+     function.
+
+     @param state - the new edited state (defaults to `true`).
   */
   setEdited(state = true) {
-    if ( state !== this._edited ) {
-      this._edited = state ;
-      this.emit('edited',state);
+    if (state !== this._edited) {
+      this._edited = state;
+      this.emit('edited', state);
     }
   }
 
   /**
-     @summary Set focused state.
-     @param {boolean} [focus] - the new focused state (defaults to `true`).
-     @description
+     Set focused state.
 
-Set the _focused_ internal state. The method is automatically invoked by editor
-views when they gain or lose focus or when the user actually interact with the
-view, eg. mouse-scrolling, edition, cursor move, etc.  The escape key `ESC`
-explicitly relax the _focused_ state, although the editor view might actually
-keep the _focus_.
+     The method is automatically invoked by editor views when they gain or lose
+     focus or when the user actually interact with the view,
+     eg. mouse-scrolling, edition, cursor move, etc.  The escape key `ESC`
+     explicitly relax the _focused_ state, although the editor view might
+     actually keep the _focus_.
 
-When a buffer is _focused_, shrinking and auto-scrolling are temporarily deactivated
-to avoid confusing user's experience.
+     When a buffer is _focused_, shrinking and auto-scrolling are temporarily
+     deactivated to avoid confusing user's experience.
 
-The method fires `'focused'` events on modifications. This method is bound to
-`this`, hence `this.setEdited` can be used as a valid callback function.
+     The method fires `'focused'` events on modifications. This method is bound
+     to `this`, hence `this.setEdited` can be used as a valid callback function.
+
+     @param focus - the new focused state (defaults to `true`).
   */
   setFocused(state = true) {
-    if ( state !== this._focused ) {
-      this._focused = state ;
-      this.emit('focused',state);
+    if (state !== this._focused) {
+      this._focused = state;
+      this.emit('focused', state);
       this.shrink();
     }
   }
@@ -366,90 +395,69 @@ The method fires `'focused'` events on modifications. This method is bound to
   // --------------------------------------------------------------------------
 
   /**
-     @summary Set (or unset) the maximum number of lines.
-     @param {number} [maxlines] - maximum number of lines
-     @description
+     Set (or unset) the maximum number of lines.
 
-By default, the maximum number of lines is set to `10,000` to avoid
-unwanted memory leaks. Setting `null`, `0` of any negative value cancel
-the management of maximum number of lines.
+     By default, the maximum number of lines is set to `10,000` to avoid
+     unwanted memory leaks. Setting `null`, `0` of any negative value cancel the
+     management of maximum number of lines.
 
-Although CodeMirror is powerfull enough to manage huge buffers,
-you should turn this limit _off_ with care.
+     Although CodeMirror is powerfull enough to manage huge buffers, you should
+     turn this limit _off_ with care.
   */
-  setMaxlines(maxlines=10000) {
-    this._maxlines = maxlines > 0 ? 1 + maxlines : 0 ;
+  setMaxlines(maxlines = 10000) {
+    this._maxlines = maxlines > 0 ? 1 + maxlines : 0;
     this.shrink();
   }
 
   /**
-      @summary Remove head lines to fits into maximum lines.
-      @description
+     Remove head lines to fits into maximum lines.
 
-Shrinking is activated when `maxlines` property is set to a strictly
-positive number. When the number of lines in the buffer is larger than
-the max, buffer is trimmed by removing extra _heading_ lines.
+     Shrinking is activated when `maxlines` property is set to a strictly
+     positive number. When the number of lines in the buffer is larger than the
+     max, buffer is trimmed by removing extra _heading_ lines.
 
-When the buffer if _focused_ or when there are still opened text marks pending,
-shrinking is automatically postponed until focus is lost and all pending marks
-have been closed.
+     When the buffer if _focused_ or when there are still opened text marks
+     pending, shrinking is automatically postponed until focus is lost and all
+     pending marks have been closed.
    */
-  shrink()
-  {
+  shrink() {
     if (!this._focused && this._maxlines > 0 && this._stacked.length == 0) {
-        const lines = this._doc.lineCount();
-        if (lines > this._maxlines) {
-          const p = this._doc.firstLine();
-          const q = p + lines - this._maxlines ;
-          this._doc.replaceRange('',{line:p,ch:0},{line:q,ch:0},'buffer');
-        }
+      const lines = this._doc.lineCount();
+      if (lines > this._maxlines) {
+        const p = this._doc.firstLine();
+        const q = p + lines - this._maxlines;
+        this._doc.replaceRange(
+          '',
+          { line: p, ch: 0 },
+          { line: q, ch: 0 },
+          'buffer'
+        );
+      }
     }
   }
 
   /**
-     @summary Requires all connected views to scroll to the specified position in the buffer.
-     @param {...any} [args] - the position or range to be made visible
-     @description
-Typical usage:
- - `scroll()` to the end of buffer
- - `scroll(id)` to identified marked `id`;
- - `scroll(p)` a position: line number or `{line,ch?}` CodeMirror position;
- - `scroll(p,q)` a range of two positions (like above);
- - `scroll({from,to})` an object range of two positions (like above).
+     Requires all connected views to scroll to the
+     specified line or identified marker.
 
-When the buffer is _focused_, programmatic auto-scrolling with `scroll()`
-is blocked.
-   */
-  scroll(a,b) {
-    switch(typeof(a)) {
-    case 'undefined':
-      if (this._focused) return;
-      this.emit('scroll',{line:this._doc.lastLine(),ch:0});
-      break;
-    case 'string':
-      const tm = this.findTextMarker(a);
-      const rg = tm && tm.find();
-      if (rg) this.emit('scroll',rg);
-      break;
-    default:
-      const isLineCh = (a) => (
-        a && Number.isInteger(a.line)
-          && (a.ch === undefined || Number.isInteger(a.ch))
-      );
-      const getPos = (a) => (
-        Number.isInteger(a) ? { line: a, ch:0 } :
-        isLineCh(a) ? a : console.warn('[Dome.text.buffers] can not scroll to',a)
-      );
-      var from,to ;
-      if (a && a.from && a.to) {
-        from = getPos(a.from);
-        to = getPos(a.to);
-      } else {
-        from = getPos(a);
-        to = b && getPos(b);
-      }
-      if (from && to) this.emit('scroll',{from,to});
-      else if (from) this.emit('scroll',from);
+     @param position -
+     defaults to the end of buffer (when not focused).
+  */
+  scroll(position?: string | number): void {
+    if (position === undefined) {
+      if (!this._focused)
+        this.emit('scroll', this._doc.lastLine());
+    } else if (typeof position === 'number') {
+      this.emit('scroll', position);
+    } else if (typeof position === 'string') {
+      var line = Infinity;
+      this.findTextMarker(position).forEach((tm) => {
+        const rg = tm.find();
+        const ln = rg.from.line;
+        if (ln < line) line = ln;
+      });
+      if (line !== Infinity)
+        this.emit('scroll', line);
     }
   }
 
@@ -457,41 +465,54 @@ is blocked.
   // --- Document Linking
   // --------------------------------------------------------------------------
 
+  private onChange(
+    _editor: CodeMirror.Editor,
+    change: CodeMirror.EditorChangeLinkedList
+  ) {
+    if (change.origin !== 'buffer') this.setEdited(true);
+    this.emit('change');
+  }
+
   /**
-     @summary Bind this buffer to a CodeMirror instance.
-     @param {CodeMirror} cm - code mirror instance to link this document in.
-     @description
-     Uses CodeMirror linked documents to allow several CodeMirror instances to be linked
-     to the same buffer.
+     Binds this buffer to a CodeMirror instance.
+
+     Uses CodeMirror linked documents to allow several CodeMirror instances to
+     be linked to the same buffer. Can be released with [[unlink]].
+
+     @param cm - code mirror instance to link this document in.
   */
-  link(cm) {
-    const newDoc = this._doc.linkedDoc( { sharedHist: true } );
-    cm.swapDoc( newDoc );
+  link(cm: CodeMirror.Editor) {
+    const newDoc = this._doc.linkedDoc({ sharedHist: true, mode: undefined });
+    cm.swapDoc(newDoc);
+    cm.on('change', this.onChange);
     this._editors.push(cm);
     if (this._operations > 0) cm.startOperation();
   }
 
   /**
-     @summary Release a linked CodeMirror document.
-     @param {CodeMirror} cm - the code mirror instance to unlink
-     @param {Document} previous document of the instance.
-     @description
-     Unlinks a CodeMirror document previously linked by `link(cm)`.
+     Release a linked CodeMirror document previously linked with [[link]].
+     @param cm - the code mirror instance to unlink
   */
-  unlink(cm) {
+  unlink(cm: CodeMirror.Editor) {
     const oldDoc = cm.getDoc();
-    this._doc.unlinkDoc( oldDoc );
-    this._editors = this._editors.filter((cm0) => cm0 !== cm);
+    this._doc.unlinkDoc(oldDoc);
+    this._editors = this._editors.filter((cm0) => {
+      if (cm === cm0) {
+        cm.off('change', this.onChange);
+        return false;
+      }
+      return true;
+    });
     if (this._operations > 0) cm.endOperation();
   }
 
   /**
-     @summary Iterates over each linked CodeMirror instances
-     @description
+     Iterates over each linked CodeMirror instances
+
      The operation `fn` is performed on each code mirror
      instance currently linked to this buffer.
    */
-  forEach(fn) {
+  forEach(fn: (editor: CodeMirror.Editor) => void) {
     this._editors.forEach(fn);
   };
 
@@ -500,20 +521,21 @@ is blocked.
   // --------------------------------------------------------------------------
 
   /**
-     @summary Batch heavy operations on editors
-     @param {function} job - a function performing the operations (can return a promise)
-     @return {promise} the promised job
-     @description
+     Batch heavy operations on editors
+
      Uses code mirror `cm.startOperation()` and `cm.sendOperation()` on all
      linked editors to batch the updating operations performed on the
      buffer. The batched updates can run asynchronously.
+
+     @param fn - function performing the operations (can return a promise)
+     @returns the promised job
   */
-  operation(job) {
+  operation<A = void>(job: () => Promise<A> | A): Promise<A> {
 
     // Protect each start/end call against error
-    const forEachEditor = (fn) => {
+    const forEachEditor = (fn: (cm: CodeMirror.Editor) => void) => {
       this._editors.forEach((cm) => {
-        try { fn(cm); } catch(e) { console.error('[Dome.text.buffers]',e); }
+        try { fn(cm); } catch (e) { console.error('[Dome.text.buffers]', e); }
       });
     };
 
@@ -522,13 +544,13 @@ is blocked.
     // Second invariant is also maintained by link and unlink methods
 
     const startOperation = () => {
-      this._operations ++;
+      this._operations++;
       if (this._operations == 1)
         forEachEditor((cm) => cm.startOperation());
     };
 
     const endOperation = () => {
-      this._operations --;
+      this._operations--;
       if (this._operations == 0) {
         forEachEditor((cm) => cm.endOperation());
       }
@@ -545,26 +567,39 @@ is blocked.
   // --------------------------------------------------------------------------
 
   /**
-     @summary Print text containing tags into buffer (bound to `this`).
-     @param {any} text - Text to print.
-     @param {object} options - CodeMirror
-       [text marker](https://codemirror.net/doc/manual.html#api_marker) options.
+     Print text containing tags into buffer.
+     It is recommended to call this method within an [[operation]].
+
+     @param implicitTag - when true,
+     uses the first element of arrays as an marker identifier for the
+     the rest of text. This implicit tag policy is recursively applied to
+     sub-arrays.
   */
-  printTextWithTags(text, options = {}) {
-    if (Array.isArray(text)) {
-      const tag = text.shift();
-      if (tag !== '') {
-        const markerOptions = { id: tag, ...options };
-        this.openTextMarker(markerOptions);
-      }
-      text.forEach((txt) => this.printTextWithTags(txt, options));
-      if (tag !== '') {
+  printTextWithTags(contents: MarkedText, implicitTag = false) {
+    if (contents !== undefined && contents !== null) {
+      if (Array.isArray(contents)) {
+        var marker = false;
+        if (implicitTag) {
+          const id = contents.shift();
+          if (typeof id === 'object') {
+            contents.unshift(id);
+          } else {
+            this.openTextMarker({ id });
+            marker = true;
+          }
+        }
+        contents.forEach((txt) => this.printTextWithTags(txt, implicitTag));
+        if (marker) this.closeTextMarker();
+      } else if (typeof contents === 'object') {
+        const { text, ...tag } = contents;
+        this.openTextMarker(tag);
+        this.printTextWithTags(text, implicitTag);
         this.closeTextMarker();
+      } else if (typeof contents === 'string') {
+        this.append(contents);
+      } else {
+        console.error('[Dome.buffers] unexpected text', contents);
       }
-    } else if (typeof text === 'string') {
-      this.append(text);
-    } else if (text !== null && text !== undefined) {
-      console.error('[Dome.buffers] unexpected text',text);
     }
   }
 

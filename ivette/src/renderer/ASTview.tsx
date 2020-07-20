@@ -52,9 +52,9 @@ async function loadAST(
           if (!data) {
             buffer.log('// No code for function', theFunction);
           }
-          buffer.printTextWithTags(data);
+          buffer.printTextWithTags(data, true);
           if (theMarker)
-            buffer.scroll(theMarker, undefined);
+            buffer.scroll(theMarker);
         });
       } catch (err) {
         PP.error(
@@ -116,7 +116,7 @@ const ASTview = () => {
 
   // Hook: marker scrolling
   React.useEffect(() => {
-    if (theMarker) buffer.scroll(theMarker, undefined);
+    if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
   // Callbacks
