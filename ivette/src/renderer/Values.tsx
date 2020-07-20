@@ -28,7 +28,7 @@ const ColumnCallstack = () => Column({
   title: 'Context of the evaluation',
   align: 'left',
   width: 100,
-  render: CallstackRenderer
+  render: CallstackRenderer,
 });
 
 const AlarmRenderer = (
@@ -44,7 +44,7 @@ const ColumnAlarm = (props: { visible: boolean }) => Column({
   fixed: true,
   icon: 'WARNING',
   visible: props.visible,
-  render: AlarmRenderer
+  render: AlarmRenderer,
 });
 
 // --------------------------------------------------------------------------
