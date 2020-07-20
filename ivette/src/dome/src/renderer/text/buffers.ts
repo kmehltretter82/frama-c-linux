@@ -8,7 +8,7 @@
 */
 
 import Emitter from 'events';
-import CodeMirror, { TextMarker } from 'codemirror/lib/codemirror.js';
+import CodeMirror from 'codemirror/lib/codemirror.js';
 
 export type Range = { from: CodeMirror.Position, to: CodeMirror.Position };
 
@@ -45,11 +45,11 @@ export type MarkedText = undefined | null | string
 // --------------------------------------------------------------------------
 
 class Proxy implements TextMarkerProxy {
-  private marker?: TextMarker;
+  private marker?: CodeMirror.TextMarker;
   clear() { this.marker?.clear(); }
   changed() { this.marker?.changed(); }
   find() { return this.marker?.find(); }
-  _link(marker: TextMarker) { this.marker = marker; }
+  _link(marker: CodeMirror.TextMarker) { this.marker = marker; }
 }
 
 interface StackedMarker {
@@ -215,6 +215,7 @@ export class RichTextBuffer extends Emitter {
     this._focused = false;
     this._markid = 0;
     this._mhovers.clear();
+    this._markers.clear();
   }
 
   /** Return the textual contents of the buffer. */
@@ -254,7 +255,7 @@ export class RichTextBuffer extends Emitter {
      bound to the actual one.
 
   */
-  closeTextMarker(): TextMarker | undefined {
+  closeTextMarker(): CodeMirror.TextMarker | undefined {
     const tag = this._stacked.pop();
     const doc = this._doc;
     if (tag) {
@@ -296,7 +297,7 @@ export class RichTextBuffer extends Emitter {
 
   /** Lookup for the text markers associated with a marker identifier. */
   findTextMarker(id: string): CodeMirror.TextMarker[] {
-    return this._markers.get(id) || [];
+    return this._markers.get(id) ?? [];
   }
 
   /** Lopokup for a hover class. */
@@ -421,7 +422,12 @@ export class RichTextBuffer extends Emitter {
      pending marks have been closed.
    */
   shrink() {
-    if (!this._focused && this._maxlines > 0 && this._stacked.length == 0) {
+    if (
+      !this._operations
+      && !this._focused
+      && this._maxlines > 0
+      && this._stacked.length == 0
+    ) {
       const lines = this._doc.lineCount();
       if (lines > this._maxlines) {
         const p = this._doc.firstLine();
@@ -553,6 +559,7 @@ export class RichTextBuffer extends Emitter {
       this._operations--;
       if (this._operations == 0) {
         forEachEditor((cm) => cm.endOperation());
+        this.shrink();
       }
     };
 
