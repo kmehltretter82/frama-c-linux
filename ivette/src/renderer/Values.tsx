@@ -18,14 +18,22 @@ import { Label } from 'dome/controls/labels';
 // --- Columns
 // --------------------------------------------------------------------------
 
+const CallstackRenderer = (
+  (cs: Eva.callstack) => <Label label={cs.short} title={cs.full} />
+);
+
 const ColumnCallstack = () => Column({
   id: 'callstack',
   label: 'Callstack',
   title: 'Context of the evaluation',
   align: 'left',
   width: 100,
-  render: (cs: Eva.callstack) => <Label label={cs.short} title={cs.full} />,
+  render: CallstackRenderer
 });
+
+const AlarmRenderer = (
+  (alarm: boolean) => <>{alarm && <Icon id="ATTENTION" />}</>
+);
 
 const ColumnAlarm = (props: { visible: boolean }) => Column({
   id: 'alarm',
@@ -36,7 +44,7 @@ const ColumnAlarm = (props: { visible: boolean }) => Column({
   fixed: true,
   icon: 'WARNING',
   visible: props.visible,
-  render: (alarm: boolean) => <>{alarm && <Icon id="ATTENTION" />}</>,
+  render: AlarmRenderer
 });
 
 // --------------------------------------------------------------------------
