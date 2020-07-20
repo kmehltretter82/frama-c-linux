@@ -288,18 +288,6 @@ void __gen_e_acsl_k(int x)
   return;
 }
 
-int __gen_e_acsl_g(int x)
-{
-  int __gen_e_acsl_g_hidden_2;
-  __gen_e_acsl_g_hidden_2 = __gen_e_acsl_g_hidden(x);
-  return __gen_e_acsl_g_hidden_2;
-}
-
-mystruct __gen_e_acsl_t1(mystruct m)
-{
-  return m;
-}
-
 int __gen_e_acsl_p1(int x, int y)
 {
   __e_acsl_mpz_t __gen_e_acsl_x;
@@ -321,25 +309,6 @@ int __gen_e_acsl_p1(int x, int y)
   __gmpz_clear(__gen_e_acsl_add);
   __gmpz_clear(__gen_e_acsl_);
   return __retres;
-}
-
-void __gen_e_acsl_t2(__e_acsl_mpz_t *__retres_arg, mystruct m)
-{
-  __e_acsl_mpz_t __gen_e_acsl__10;
-  __e_acsl_mpz_t __gen_e_acsl__11;
-  __e_acsl_mpz_t __gen_e_acsl_add_7;
-  __gmpz_init_set_si(__gen_e_acsl__10,(long)m.k);
-  __gmpz_init_set_si(__gen_e_acsl__11,(long)m.l);
-  __gmpz_init(__gen_e_acsl_add_7);
-  __gmpz_add(__gen_e_acsl_add_7,
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
-  __gmpz_init_set(*__retres_arg,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
-  __gmpz_clear(__gen_e_acsl__10);
-  __gmpz_clear(__gen_e_acsl__11);
-  __gmpz_clear(__gen_e_acsl_add_7);
-  return;
 }
 
 int __gen_e_acsl_p2(int x, int y)
@@ -384,21 +353,6 @@ int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y)
   __gmpz_clear(__gen_e_acsl_x_3);
   __gmpz_clear(__gen_e_acsl_add_3);
   __gmpz_clear(__gen_e_acsl__4);
-  return __retres;
-}
-
-int __gen_e_acsl_k_pred(int x)
-{
-  __e_acsl_mpz_t __gen_e_acsl_x;
-  __e_acsl_mpz_t __gen_e_acsl_;
-  int __gen_e_acsl_gt;
-  __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
-  __gmpz_init_set_si(__gen_e_acsl_,0L);
-  __gen_e_acsl_gt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_x),
-                               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
-  int __retres = __gen_e_acsl_gt > 0;
-  __gmpz_clear(__gen_e_acsl_x);
-  __gmpz_clear(__gen_e_acsl_);
   return __retres;
 }
 
@@ -464,6 +418,52 @@ int __gen_e_acsl_h_short(int s)
 int __gen_e_acsl_g_hidden(int x)
 {
   return x;
+}
+
+int __gen_e_acsl_g(int x)
+{
+  int __gen_e_acsl_g_hidden_2;
+  __gen_e_acsl_g_hidden_2 = __gen_e_acsl_g_hidden(x);
+  return __gen_e_acsl_g_hidden_2;
+}
+
+mystruct __gen_e_acsl_t1(mystruct m)
+{
+  return m;
+}
+
+void __gen_e_acsl_t2(__e_acsl_mpz_t *__retres_arg, mystruct m)
+{
+  __e_acsl_mpz_t __gen_e_acsl__10;
+  __e_acsl_mpz_t __gen_e_acsl__11;
+  __e_acsl_mpz_t __gen_e_acsl_add_7;
+  __gmpz_init_set_si(__gen_e_acsl__10,(long)m.k);
+  __gmpz_init_set_si(__gen_e_acsl__11,(long)m.l);
+  __gmpz_init(__gen_e_acsl_add_7);
+  __gmpz_add(__gen_e_acsl_add_7,
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
+             (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
+  __gmpz_init_set(*__retres_arg,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
+  __gmpz_clear(__gen_e_acsl__10);
+  __gmpz_clear(__gen_e_acsl__11);
+  __gmpz_clear(__gen_e_acsl_add_7);
+  return;
+}
+
+int __gen_e_acsl_k_pred(int x)
+{
+  __e_acsl_mpz_t __gen_e_acsl_x;
+  __e_acsl_mpz_t __gen_e_acsl_;
+  int __gen_e_acsl_gt;
+  __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
+  __gmpz_init_set_si(__gen_e_acsl_,0L);
+  __gen_e_acsl_gt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_x),
+                               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+  int __retres = __gen_e_acsl_gt > 0;
+  __gmpz_clear(__gen_e_acsl_x);
+  __gmpz_clear(__gen_e_acsl_);
+  return __retres;
 }
 
 double __gen_e_acsl_f2(double x)

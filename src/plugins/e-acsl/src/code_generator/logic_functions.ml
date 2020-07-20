@@ -260,7 +260,7 @@ let add_generated_functions globals =
            GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
            :: acc
          in
-         aux (Params_ty.Hashtbl.fold (fun _ -> add_fundecl) params acc) l
+         aux (Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundecl) params acc) l
        with Not_found ->
          aux acc l)
     | g :: l ->
@@ -276,8 +276,8 @@ let add_generated_functions globals =
     GFun(fundec, Location.unknown) :: globals
   in
   let rev_globals =
-    Logic_info.Hashtbl.fold
-      (fun _ -> Params_ty.Hashtbl.fold (fun _ -> add_fundec))
+    Logic_info.Hashtbl.fold_sorted
+      (fun _ -> Params_ty.Hashtbl.fold_sorted (fun _ -> add_fundec))
       memo_tbl
       rev_globals
   in
