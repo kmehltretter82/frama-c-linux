@@ -1,5 +1,5 @@
 /* run.config*
-TIMEOUT: 45s
+TIMEOUT: 45
 OPT: -eva
 */
 
