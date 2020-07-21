@@ -8,7 +8,6 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
-import { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
@@ -123,14 +122,14 @@ const ASTview = () => {
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: key<'#markerIndo'>) {
+  function onTextSelection(id: string) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
     }
   }
 
-  async function onContextMenu(id: key<'#markerInfo'>) {
+  async function onContextMenu(id: string) {
     const items = [];
     const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
     switch (selectedMarkerInfo?.kind) {

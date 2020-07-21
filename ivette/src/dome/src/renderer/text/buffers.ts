@@ -61,8 +61,14 @@ interface StackedMarker {
   proxy: Proxy;
 }
 
-interface CSSMarker {
+export interface CSSMarker {
+  /** Hover class `'dome-xHover-nnn'` */
+  classNameId: string;
+  /** Marker id */
   id: string | undefined;
+  /** Hovered marker */
+  hover: boolean;
+  /** Size in character */
   length: number;
 }
 
@@ -261,17 +267,23 @@ export class RichTextBuffer extends Emitter {
     if (tag) {
       const { id, hover, start, className } = tag;
       const stop = doc.posFromIndex(Infinity);
-      var chover;
+      var markerId;
       if (id || hover) {
-        chover = 'dome-xHover-' + (this._markid++);
+        markerId = 'dome-xHover-' + (this._markid++);
         const p = doc.indexFromPos(start);
         const q = doc.indexFromPos(stop);
-        this._mhovers.set(chover, { id, length: q - p });
+        const cmark = {
+          id,
+          classNameId: markerId,
+          hover: hover ?? (id !== undefined),
+          length: q - p,
+        };
+        this._mhovers.set(markerId, cmark);
       }
       const fullClassName = [
         'dome-xMarked',
         id && ('dome-xMark-' + id),
-        chover,
+        markerId,
         className,
       ].filter((s) => !!s).join(' ');
       const options = {
@@ -301,7 +313,9 @@ export class RichTextBuffer extends Emitter {
   }
 
   /** Lopokup for a hover class. */
-  findHover(className: string) { return this._mhovers.get(className); }
+  findHover(className: string): CSSMarker | undefined {
+    return this._mhovers.get(className);
+  }
 
   // --------------------------------------------------------------------------
   // --- Highlighter
