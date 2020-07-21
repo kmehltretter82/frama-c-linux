@@ -66,8 +66,8 @@ const Values = () => {
   States.useRequest(Eva.getValues, selectMarker);
 
   React.useEffect(() => {
+    model.removeAllData();
     if (selectMarker && evaValues) {
-      model.removeAllData();
       const selectMarkerInfo = markerInfo.find((e) => e.key === selectMarker);
       if (selectMarkerInfo && selectMarkerInfo.var !== 'function') {
         switch (selectMarkerInfo.kind) {
@@ -84,10 +84,10 @@ const Values = () => {
             setName(undefined);
         }
       }
-      model.reload();
     } else {
       setName(undefined);
     }
+    model.reload();
   }, [evaValues, selectMarker, markerInfo, model]);
 
   // Component
