@@ -16,11 +16,19 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byLocation } from 'api/kernel/ast';
+//@ts-ignore
 import { byMarker } from 'api/kernel/ast';
+//@ts-ignore
+import { jLocation } from 'api/kernel/ast';
+//@ts-ignore
+import { jLocationSafe } from 'api/kernel/ast';
 //@ts-ignore
 import { jMarker } from 'api/kernel/ast';
 //@ts-ignore
 import { jMarkerSafe } from 'api/kernel/ast';
+//@ts-ignore
+import { location } from 'api/kernel/ast';
 //@ts-ignore
 import { marker } from 'api/kernel/ast';
 
@@ -134,7 +142,7 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
 /** A graph node */
 export type node =
   { id: nodeId, label: string, kind: string, locality: nodeLocality,
-    backward_explored: string, forward_explored: string, writes: marker[],
+    backward_explored: string, forward_explored: string, writes: location[],
     values?: string, range: number | string, type?: string };
 
 /** Loose decoder for `node` */
@@ -146,7 +154,7 @@ export const jNode: Json.Loose<node> =
     locality: jNodeLocalitySafe,
     backward_explored: Json.jFail(Json.jString,'String expected'),
     forward_explored: Json.jFail(Json.jString,'String expected'),
-    writes: Json.jArray(jMarkerSafe),
+    writes: Json.jArray(jLocationSafe),
     values: Json.jString,
     range: Json.jFail(
              Json.jUnion<number | string>( Json.jNumber, Json.jString,),
@@ -161,15 +169,16 @@ export const jNodeSafe: Json.Safe<node> = Json.jFail(jNode,'Node expected');
 export const byNode: Compare.Order<node> =
   Compare.byFields
     <{ id: nodeId, label: string, kind: string, locality: nodeLocality,
-       backward_explored: string, forward_explored: string, writes: marker[],
-       values?: string, range: number | string, type?: string }>({
+       backward_explored: string, forward_explored: string,
+       writes: location[], values?: string, range: number | string,
+       type?: string }>({
     id: byNodeId,
     label: Compare.string,
     kind: Compare.string,
     locality: byNodeLocality,
     backward_explored: Compare.string,
     forward_explored: Compare.string,
-    writes: Compare.array(byMarker),
+    writes: Compare.array(byLocation),
     values: Compare.defined(Compare.string),
     range: Compare.structural,
     type: Compare.defined(Compare.string),
@@ -177,7 +186,7 @@ export const byNode: Compare.Order<node> =
 
 /** The dependency between two nodes */
 export type dependency =
-  { id: number, src: nodeId, dst: nodeId, kind: string, origins: marker[] };
+  { id: number, src: nodeId, dst: nodeId, kind: string, origins: location[] };
 
 /** Loose decoder for `dependency` */
 export const jDependency: Json.Loose<dependency> =
@@ -186,7 +195,7 @@ export const jDependency: Json.Loose<dependency> =
     src: jNodeIdSafe,
     dst: jNodeIdSafe,
     kind: Json.jFail(Json.jString,'String expected'),
-    origins: Json.jArray(jMarkerSafe),
+    origins: Json.jArray(jLocationSafe),
   });
 
 /** Safe decoder for `dependency` */
@@ -196,13 +205,13 @@ export const jDependencySafe: Json.Safe<dependency> =
 /** Natural order for `dependency` */
 export const byDependency: Compare.Order<dependency> =
   Compare.byFields
-    <{ id: number, src: nodeId, dst: nodeId, kind: string, origins: marker[]
-       }>({
+    <{ id: number, src: nodeId, dst: nodeId, kind: string,
+       origins: location[] }>({
     id: Compare.number,
     src: byNodeId,
     dst: byNodeId,
     kind: Compare.string,
-    origins: Compare.array(byMarker),
+    origins: Compare.array(byLocation),
   });
 
 /** The whole graph being built */
