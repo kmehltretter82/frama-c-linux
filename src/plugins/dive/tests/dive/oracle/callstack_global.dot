@@ -34,8 +34,8 @@ digraph G {
   cp8 -> cp4;
   cp10 -> cp6;
   cp10 -> cp8;
-  cp10 -> cp10 [style="bold", ];
-  cp14 -> cp10 [style="bold", ];
+  cp10 -> cp10;
+  cp14 -> cp10;
   cp16 -> cp14;
   cp18 -> cp14;
   

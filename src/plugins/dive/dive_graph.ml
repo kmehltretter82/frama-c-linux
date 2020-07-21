@@ -236,8 +236,8 @@ let ouptput_to_dot out_channel g =
           | Callee -> [`Color 0x00ff00 ]
           | _ -> []
         and folding_attribute = match e.dependency_origins with
-          | [] | [_] -> [ `Style `Bold ]
-          | _ -> []
+          | [] | [_] -> []
+          | _ -> [ `Style `Bold ]
         in kind_attribute @ folding_attribute
     end)
   in

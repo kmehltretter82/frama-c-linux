@@ -1,11 +1,11 @@
 digraph G {
   cp1 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp2 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp2 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp4 [label=<x>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp4 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp8 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp7 [label=<g>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
   cp10 [label=<z>, shape=box, ];
   cp11 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
@@ -16,51 +16,53 @@ digraph G {
         style="filled", ];
   cp17 [label=<tmp_0>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp19 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp20 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   cp22 [label=<pf>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
   cp24 [label=<x2>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp27 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp27 [label=<f>, shape=box, ];
+  cp30 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp31 [label=<is_nan_or_infinite: \is_finite((float)\mul_double((double)y, (double)2.0))>,
+  cp33 [label=<is_nan_or_infinite: \is_finite((float)\mul_double((double)y, (double)2.0))>,
         fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
         style="filled,bold", ];
-  cp33 [label=<is_nan_or_infinite: \is_finite(\add_float(y, w))>,
+  cp35 [label=<is_nan_or_infinite: \is_finite(\add_float(y, w))>,
         fillcolor="#FF0000", color="#FF0000", shape=doubleoctagon,
         style="filled,bold", ];
   
-  subgraph cluster_cs_1 { label=<f>; cp31;cp2;cp1;
+  subgraph cluster_cs_1 { label=<f>; cp33;cp4;cp1;
      };
-  subgraph cluster_cs_2 { label=<main>; cp33;cp22;cp17;cp13;cp11;cp10;cp4;
-    subgraph cluster_cs_3 { label=<f>; cp19;cp15;
+  subgraph cluster_cs_2 { label=<main>; cp35;cp22;cp17;cp13;cp11;cp10;cp2;
+    subgraph cluster_cs_3 { label=<f>; cp20;cp15;
        };
-    subgraph cluster_cs_4 { label=<f>; cp27;cp24;
+    subgraph cluster_cs_4 { label=<f>; cp30;cp24;
        };
      };
-  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp8;
+  subgraph cluster_file_1 { label=<tests/dive/various.i>; cp27;cp7;
      };
   
-  cp1 -> cp2;
+  cp1 -> cp4;
   cp2 -> cp1;
-  cp2 -> cp31;
+  cp2 -> cp2;
+  cp2 -> cp15;
+  cp2 -> cp24;
   cp4 -> cp1;
-  cp4 -> cp4;
-  cp4 -> cp15;
-  cp4 -> cp24;
-  cp8 -> cp4;
+  cp4 -> cp33;
+  cp7 -> cp2;
   cp11 -> cp10;
-  cp11 -> cp33;
+  cp11 -> cp35;
   cp13 -> cp10;
-  cp13 -> cp33;
+  cp13 -> cp35;
   cp15 -> cp11;
-  cp15 -> cp19;
+  cp15 -> cp20;
   cp17 -> cp13;
-  cp19 -> cp15;
+  cp20 -> cp15;
   cp22 -> cp17 [color="#00FF00", ];
   cp24 -> cp17;
-  cp24 -> cp27;
-  cp27 -> cp24;
+  cp24 -> cp30;
+  cp27 -> cp22;
+  cp30 -> cp24;
   
   }
