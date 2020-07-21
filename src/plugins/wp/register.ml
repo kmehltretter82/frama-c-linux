@@ -105,7 +105,8 @@ let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let hyp = WpContext.compute_hypotheses m kf in
+        let partition = WpContext.compute_hypotheses m kf in
+        let hyp = MemoryContext.requires partition in
         if hyp <> [] then
           Wp_parameters.warning
             ~current:false
