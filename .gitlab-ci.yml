@@ -140,6 +140,19 @@ internal_nightly:
   tags:
    - nix
 
+frama-c-ocaml-4.09:
+  variables:
+    OCAML: "4_09"
+  <<: *frama-c-ocaml
+  only:
+  - schedules
+
+frama-c-ocaml-4.10:
+  variables:
+    OCAML: "4_10"
+  <<: *frama-c-ocaml
+
+
 caveat-importer:
   stage: tests
   script:
