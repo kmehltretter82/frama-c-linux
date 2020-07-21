@@ -21,36 +21,41 @@
 (**************************************************************************)
 
 open Data
-module Sy = Syntax
 module Md = Markdown
 module Js = Yojson.Basic.Util
+module Pkg = Package
 
-let page = Doc.page `Kernel ~title:"Project Management" ~filename:"project.md"
+let package = Pkg.package ~name:"project"
+    ~title:"Project Management" ~readme:"project.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Info                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+module ProjectId = (val jkey ~kind:"project")
+
 module ProjectInfo =
-  Collection
-    (struct
-      type t = Project.t
+struct
+  type t = Project.t
+  let jtype = Data.declare ~package
+      ~name:"projectInfo"
+      ~descr:(Md.plain "Project informations")
+      Pkg.(Jrecord [
+          "id",ProjectId.jtype;
+          "name",Jalpha;
+          "current",Jboolean;
+        ])
 
-      let syntax = Sy.publish ~page ~name:"project-info"
-          ~descr:(Md.plain "Project informations")
-          ~synopsis:Sy.(record[ "id",ident; "name",string; "current",boolean ])
-          ()
+  let of_json js =
+    Js.member "id" js |> Js.to_string |> Project.from_unique_name
 
-      let of_json js =
-        Js.member "id" js |> Js.to_string |> Project.from_unique_name
-
-      let to_json p =
-        `Assoc [
-          "id", `String (Project.get_unique_name p) ;
-          "name", `String (Project.get_name p) ;
-          "current", `Bool (Project.is_current p) ;
-        ]
-    end)
+  let to_json p =
+    `Assoc [
+      "id", `String (Project.get_unique_name p) ;
+      "name", `String (Project.get_name p) ;
+      "current", `Bool (Project.is_current p) ;
+    ]
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Requests                                                   --- *)
@@ -59,11 +64,17 @@ module ProjectInfo =
 module ProjectRequest =
 struct
 
+  (* forward request on a given project *)
+
   type t = Project.t * string * json
 
-  let syntax = Sy.publish ~page ~name:"project-request"
-      ~synopsis:(Sy.(record[ "project",ident; "request",string; "data",any; ]))
-      ~descr:(Md.plain "Request to be executed on the specified project.") ()
+  let jtype = Data.declare ~package ~name:"projectRequest"
+      ~descr:(Md.plain "Request to be executed on the specified project.")
+      (Jrecord [
+          "project",ProjectId.jtype;
+          "request",Jstring;
+          "data",Jany;
+        ])
 
   let of_json js =
     begin
@@ -84,38 +95,38 @@ end
 (* --- Project Requests                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.project.getCurrent"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCurrent"
     ~descr:(Md.plain "Returns the current project")
     ~input:(module Junit) ~output:(module ProjectInfo)
     Project.current
 
-let () = Request.register ~page
-    ~kind:`SET ~name:"kernel.project.setCurrent"
+let () = Request.register ~package
+    ~kind:`SET ~name:"setCurrent"
     ~descr:(Md.plain "Switches the current project")
-    ~input:(module Jident) ~output:(module Junit)
+    ~input:(module ProjectId) ~output:(module Junit)
     (fun pid -> Project.(set_current (from_unique_name pid)))
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.project.getList"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getList"
     ~descr:(Md.plain "Returns the list of all projects")
-    ~input:(module Junit) ~output:(module ProjectInfo.Jlist)
+    ~input:(module Junit) ~output:(module Jlist(ProjectInfo))
     (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"kernel.project.getOn"
+let () = Request.register ~package
+    ~kind:`GET ~name:"getOn"
     ~descr:(Md.plain "Execute a GET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `GET)
 
-let () = Request.register ~page
-    ~kind:`SET ~name:"kernel.project.setOn"
+let () = Request.register ~package
+    ~kind:`SET ~name:"setOn"
     ~descr:(Md.plain "Execute a SET request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `SET)
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"kernel.project.execOn"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"execOn"
     ~descr:(Md.plain "Execute an EXEC request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `EXEC)
@@ -126,10 +137,10 @@ let () = Request.register ~page
 
 let () =
   Request.register
-    ~page
+    ~package
     ~descr:(Md.plain "Create a new project")
     ~kind:`SET
-    ~name:"kernel.project.setCreate"
+    ~name:"create"
     ~input:(module Jstring)
     ~output:(module ProjectInfo)
     Project.create

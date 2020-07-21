@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:14.
+  Called from tests/libc/stdlib_c.c:15.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72
 [eva] computing for function memset <- calloc <- main.
@@ -18,15 +18,15 @@
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva] tests/libc/stdlib_c.c:16: assertion got status valid.
+[eva] tests/libc/stdlib_c.c:17: assertion got status valid.
 [eva] computing for function Frama_C_size_t_interval <- main.
-  Called from tests/libc/stdlib_c.c:20.
+  Called from tests/libc/stdlib_c.c:21.
 [eva] using specification for function Frama_C_size_t_interval
-[eva] tests/libc/stdlib_c.c:20: 
+[eva] tests/libc/stdlib_c.c:21: 
   function Frama_C_size_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_size_t_interval
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:21.
+  Called from tests/libc/stdlib_c.c:22.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_0
 [eva] computing for function memset <- calloc <- main.
@@ -36,14 +36,14 @@
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva:alarm] tests/libc/stdlib_c.c:23: Warning: assertion got status unknown.
+[eva:alarm] tests/libc/stdlib_c.c:24: Warning: assertion got status unknown.
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:27.
+  Called from tests/libc/stdlib_c.c:28.
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva] tests/libc/stdlib_c.c:28: assertion got status valid.
+[eva] tests/libc/stdlib_c.c:29: assertion got status valid.
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_1
 [eva] computing for function memset <- calloc <- main.
@@ -51,19 +51,19 @@
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva] tests/libc/stdlib_c.c:31: starting to merge loop iterations
+[eva] tests/libc/stdlib_c.c:32: starting to merge loop iterations
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva:alarm] tests/libc/stdlib_c.c:33: Warning: 
+[eva:alarm] tests/libc/stdlib_c.c:34: Warning: 
   out of bounds write. assert \valid(s + (unsigned int)(i - 1));
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -71,7 +71,7 @@
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -79,7 +79,7 @@
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -87,7 +87,7 @@
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/libc/stdlib_c.c:32.
+  Called from tests/libc/stdlib_c.c:33.
 [eva] share/libc/stdlib.c:72: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
   Called from share/libc/stdlib.c:73.
@@ -95,7 +95,7 @@
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function posix_memalign <- main.
-  Called from tests/libc/stdlib_c.c:37.
+  Called from tests/libc/stdlib_c.c:38.
 [eva] share/libc/stdlib.c:196: 
   assertion 'alignment_is_a_suitable_power_of_two' got status valid.
 [eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc
@@ -103,25 +103,77 @@
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
 [eva] computing for function free <- main.
-  Called from tests/libc/stdlib_c.c:38.
+  Called from tests/libc/stdlib_c.c:39.
 [eva] using specification for function free
-[eva] tests/libc/stdlib_c.c:38: Warning: ignoring unsupported \allocates clause
-[eva] tests/libc/stdlib_c.c:38: 
+[eva] tests/libc/stdlib_c.c:39: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/stdlib_c.c:39: 
   function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] computing for function posix_memalign <- main.
-  Called from tests/libc/stdlib_c.c:39.
+  Called from tests/libc/stdlib_c.c:40.
 [eva] share/libc/stdlib.c:199: Call to builtin Frama_C_malloc
 [eva] share/libc/stdlib.c:199: 
   allocating variable __malloc_posix_memalign_l199_0
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
 [eva] computing for function free <- main.
-  Called from tests/libc/stdlib_c.c:40.
-[eva] tests/libc/stdlib_c.c:40: Warning: ignoring unsupported \allocates clause
-[eva] tests/libc/stdlib_c.c:40: 
+  Called from tests/libc/stdlib_c.c:41.
+[eva] tests/libc/stdlib_c.c:41: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/stdlib_c.c:41: 
   function free: precondition 'freeable' got status valid.
 [eva] Done for function free
+[eva] tests/libc/stdlib_c.c:44: Call to builtin Frama_C_malloc
+[eva] tests/libc/stdlib_c.c:44: allocating variable __malloc_main_l44
+[eva] computing for function realpath <- main.
+  Called from tests/libc/stdlib_c.c:46.
+[eva] computing for function Frama_C_interval <- realpath <- main.
+  Called from share/libc/stdlib.c:213.
+[eva] using specification for function Frama_C_interval
+[eva] share/libc/stdlib.c:213: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- realpath <- main.
+  Called from share/libc/stdlib.c:222.
+[eva] share/libc/stdlib.c:222: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_make_unknown <- realpath <- main.
+  Called from share/libc/stdlib.c:230.
+[eva] using specification for function Frama_C_make_unknown
+[eva] share/libc/stdlib.c:230: 
+  function Frama_C_make_unknown: precondition 'valid_p' got status valid.
+[eva] Done for function Frama_C_make_unknown
+[eva] Recording results for realpath
+[eva] Done for function realpath
+[eva:alarm] tests/libc/stdlib_c.c:48: Warning: 
+  assertion 'valid_if_exact' got status unknown.
+[eva] computing for function Frama_C_nondet <- main.
+  Called from tests/libc/stdlib_c.c:50.
+[eva] using specification for function Frama_C_nondet
+[eva] Done for function Frama_C_nondet
+[eva:alarm] tests/libc/stdlib_c.c:51: Warning: 
+  assertion 'maybe_uninitialized' got status unknown.
+[eva] computing for function free <- main.
+  Called from tests/libc/stdlib_c.c:53.
+[eva] tests/libc/stdlib_c.c:53: Warning: ignoring unsupported \allocates clause
+[eva] tests/libc/stdlib_c.c:53: 
+  function free: precondition 'freeable' got status valid.
+[eva] Done for function free
+[eva] computing for function realpath <- main.
+  Called from tests/libc/stdlib_c.c:54.
+[eva] computing for function Frama_C_interval <- realpath <- main.
+  Called from share/libc/stdlib.c:213.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- realpath <- main.
+  Called from share/libc/stdlib.c:222.
+[eva] Done for function Frama_C_interval
+[eva] share/libc/stdlib.c:224: Call to builtin Frama_C_malloc
+[eva] share/libc/stdlib.c:224: allocating variable __malloc_realpath_l224
+[eva] computing for function Frama_C_make_unknown <- realpath <- main.
+  Called from share/libc/stdlib.c:230.
+[eva] Done for function Frama_C_make_unknown
+[eva] Recording results for realpath
+[eva] Done for function realpath
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -143,9 +195,22 @@
   p_al0 ∈ {{ NULL ; &__malloc_posix_memalign_l199[0] }}
   p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l199_0[0] }} or UNINITIALIZED
   __retres ∈ {0; 12}
+[eva:final-states] Values at end of function realpath:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  resolved_name ∈
+               {{ NULL ; &__malloc_main_l44[0] ;
+                  &__malloc_realpath_l224[0] }}
+  realpath_len ∈ [1..256]
+  __retres ∈
+          {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] }}
+  __malloc_main_l44[0..255] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l224[0..255] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ NULL ; (int *)&__malloc_calloc_l72 }}
   nmemb ∈ [1..4294967295]
   q ∈ {{ NULL ; (int *)&__malloc_calloc_l72_0 }}
@@ -155,7 +220,11 @@
   p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l199_0[0] }}
   p_memal_res ∈ {0; 12}
   p_memal_res2 ∈ {0; 12}
-  __retres ∈ {0}
+  resolved_name ∈ {{ NULL ; &__malloc_main_l44[0] }}
+  realpath_res ∈ {{ NULL ; &__malloc_realpath_l224[0] }}
+  __retres ∈ {0; 1}
   __malloc_calloc_l72[0..3] ∈ [--..--] or UNINITIALIZED
   __malloc_calloc_l72_0[0..4294967291] ∈ [--..--] or UNINITIALIZED
   __malloc_w_calloc_l72_1[0..4294967291] ∈ [--..--] or UNINITIALIZED
+  __malloc_main_l44[0..255] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l224[0..255] ∈ [--..--] or UNINITIALIZED

@@ -138,6 +138,9 @@ HAS_DOT		?=@HAS_DOT@
 
 HEADACHE 	?= headache -c $(FRAMAC_SRC)/headers/headache_config.txt
 
+UNIX2DOS        ?= @UNIX2DOS@
+HAS_UNIX2DOS    ?= @HAS_UNIX2DOS@
+
 ###########################
 # Miscellaneous variables #
 ###########################

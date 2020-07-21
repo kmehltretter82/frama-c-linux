@@ -3,14 +3,19 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
+import { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
+
+import { printFunction, markerInfo } from 'api/kernel/ast';
+import { getCallers } from 'api/plugins/eva';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -41,10 +46,7 @@ async function loadAST(
     buffer.log('// Loading', theFunction, '…');
     (async () => {
       try {
-        const data = await Server.GET({
-          endpoint: 'kernel.ast.printFunction',
-          params: theFunction,
-        });
+        const data = await Server.send(printFunction, theFunction);
         buffer.operation(() => {
           buffer.clear();
           if (!data) {
@@ -56,11 +58,23 @@ async function loadAST(
         });
       } catch (err) {
         PP.error(
-          'Fail to retrieve the AST of function', theFunction,
-          'marker:', theMarker, err,
+          `Fail to retrieve the AST of function '${theFunction}' ` +
+          `and marker '${theMarker}':`, err,
         );
       }
     })();
+  }
+}
+
+/** Compute the [[functionName]] caller locations. */
+async function functionCallers(functionName: string) {
+  try {
+    const data = await Server.send(getCallers, functionName);
+    const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
+    return locations;
+  } catch (err) {
+    PP.error(`Fail to retrieve callers of function '${functionName}':`, err);
+    return [];
   }
 }
 
@@ -72,12 +86,13 @@ const ASTview = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const printed: React.MutableRefObject<string | undefined> = React.useRef();
+  const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
+  const multipleSelections = selection?.multiple.allSelections;
   const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
   const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
   const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
-  const markers = States.useSyncArray('kernel.ast.markerKind');
+  const markersInfo = States.useSyncArray(markerInfo).getArray();
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
@@ -90,6 +105,15 @@ const ASTview = () => {
     }
   });
 
+  React.useEffect(() => {
+    const decorator = (marker: string) => {
+      if (multipleSelections?.some((location) => location?.marker === marker))
+        return 'highlighted-marker';
+      return undefined;
+    };
+    buffer.setDecorator(decorator);
+  }, [buffer, multipleSelections]);
+
   // Hook: marker scrolling
   React.useEffect(() => {
     if (theMarker) buffer.scroll(theMarker, undefined);
@@ -99,25 +123,52 @@ const ASTview = () => {
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: string) {
+  function onTextSelection(id: key<'#markerIndo'>) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
     }
   }
 
-  function onContextMenu(id: string) {
-    const marker = markers[id];
-    if (marker && marker.kind === 'function') {
-      const item = {
-        label: `Go to definition of ${marker.name}`,
-        onClick: () => {
-          const location = { function: marker.name };
-          updateSelection({ location });
-        },
-      };
-      Dome.popupMenu([item]);
+  async function onContextMenu(id: key<'#markerInfo'>) {
+    const items = [];
+    const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
+    switch (selectedMarkerInfo?.kind) {
+      case 'function': {
+        items.push({
+          label: `Go to definition of ${selectedMarkerInfo.name}`,
+          onClick: () => {
+            const location = { function: selectedMarkerInfo.name };
+            updateSelection({ location });
+          },
+        });
+        break;
+      }
+      case 'declaration': {
+        if (selectedMarkerInfo?.name) {
+          const locations = await functionCallers(selectedMarkerInfo.name);
+          const locationsByFunction = _.groupBy(locations, (e) => e.function);
+          _.forEach(locationsByFunction,
+            (e) => {
+              const callerName = e[0].function;
+              items.push({
+                label:
+                  `Go to caller ${callerName} ` +
+                  `${e.length > 1 ? `(${e.length} call sites)` : ''}`,
+                onClick: () => updateSelection({
+                  locations,
+                  index: locations.findIndex((l) => l.function === callerName),
+                }),
+              });
+            });
+        }
+        break;
+      }
+      default:
+        break;
     }
+    if (items.length > 0)
+      Dome.popupMenu(items);
   }
 
   // Theme Popup

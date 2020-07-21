@@ -131,13 +131,14 @@ let codeblock ?(lang="") content =
        [Code_block(lang,lines)]
     ) fmt content
 
-let text text = [Text text]
-let list items = [UL items]
-let enum items = [OL items]
-let description items = [DL items]
-
-let par text = [Block [Text text]]
-let block b = [Block b]
+let text text = if text = [] then [] else [Text text]
+let par text = if text = [] then [] else [Block [Text text]]
+let quote text = if text = [] then [] else [Block [Block_quote [Block [Text text]]]]
+let block block = if block = [] then [] else [Block block]
+let list items = if items = [] then [] else [UL items]
+let enum items = if items = [] then [] else [OL items]
+let table table = if table.content = [] then [] else [Table table]
+let description items = if items = [] then [] else [DL items]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sectioning                                                         --- *)
@@ -217,7 +218,7 @@ let relativize page target =
       | [] -> assert false
       | [_f2 ] ->
         (* it's the length of the argument to go_up that matters, not
-           its exact content *)
+             its exact content *)
         go_up p1 @ l2
       | d2 :: p2 when d2 = d1 -> remove_common p1 p2
       | _ -> go_up p1 @ l2
@@ -228,7 +229,8 @@ let relativize page target =
 let pp_href ?(page="") fmt = function
   | URL s -> Format.pp_print_string fmt s
   | Page s -> Format.pp_print_string fmt (relativize page s)
-  | Section (p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (label s)
+  | Section("",s) -> Format.fprintf fmt "#%s" (label s)
+  | Section(p,s) -> Format.fprintf fmt "%s#%s" (relativize page p) (label s)
 
 let rec pp_inline ?page fmt =
   function

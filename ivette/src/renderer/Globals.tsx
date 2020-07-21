@@ -3,22 +3,10 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { toArray, Dictionary } from 'lodash';
 import { Section, Item } from 'dome/frame/sidebars';
 import * as States from 'frama-c/states';
 import { alpha } from 'dome/data/compare';
-
-// --------------------------------------------------------------------------
-// --- Globals API
-// --------------------------------------------------------------------------
-
-interface Gfun {
-  key: string;
-  name: string;
-  signature: string;
-}
-
-type Gfuns = undefined | Dictionary<Gfun>;
+import { functions, functionsData } from 'api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Globals Section
@@ -28,13 +16,13 @@ export default () => {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const gfuns: Gfuns = States.useSyncArray('kernel.ast.functions');
+  const fcts = States.useSyncArray(functions).getArray().sort(
+    (f, g) => alpha(f.name, g.name),
+  );
 
-  // Functions
-  const functions = toArray(gfuns).sort((f1, f2) => alpha(f1.name, f2.name));
-
+  // Items
   const current: undefined | string = selection?.current?.function;
-  const makeFctItem = (fct: Gfun) => {
+  const makeFctItem = (fct: functionsData) => {
     const kf = fct.name;
     return (
       <Item
@@ -49,7 +37,7 @@ export default () => {
 
   return (
     <Section label="Functions">
-      {functions.map(makeFctItem)}
+      {fcts.map(makeFctItem)}
     </Section>
   );
 

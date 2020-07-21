@@ -29,7 +29,7 @@ int main(void)
   __e_acsl_full_init((void *)(& p));
   {
     int __gen_e_acsl_valid;
-    __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),(size_t)9,
+    __gen_e_acsl_valid = __e_acsl_valid((void *)(p + 1 * 0),(size_t)10,
                                         (void *)p,(void *)(& p));
     __e_acsl_assert(! __gen_e_acsl_valid,"Assertion","main",
                     "!\\valid(p + (0 .. 9))","tests/bts/bts2406.c",10);
@@ -37,7 +37,7 @@ int main(void)
   /*@ assert ¬\valid(p + (0 .. 9)); */ ;
   {
     int __gen_e_acsl_valid_2;
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& t + 1 * 0),(size_t)9,
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(& t + 1 * 0),(size_t)10,
                                           (void *)(& t),(void *)0);
     __e_acsl_assert(__gen_e_acsl_valid_2,"Assertion","main",
                     "\\valid(&t[0 .. 9])","tests/bts/bts2406.c",11);

@@ -107,7 +107,7 @@ int main(int argc, char const **argv)
     }
     __e_acsl_assert(__gen_e_acsl_or,"Assertion","main",
                     "g1 == \\null || \\valid(g1)",
-                    "tests/temporal/t_getenv.c",13);
+                    "tests/temporal/t_getenv.c",14);
   }
   /*@ assert g1 ≡ \null ∨ \valid(g1); */ ;
   {
@@ -132,7 +132,7 @@ int main(int argc, char const **argv)
     }
     __e_acsl_assert(__gen_e_acsl_or_2,"Assertion","main",
                     "g2 == \\null || \\valid(g2)",
-                    "tests/temporal/t_getenv.c",14);
+                    "tests/temporal/t_getenv.c",15);
   }
   /*@ assert g2 ≡ \null ∨ \valid(g2); */ ;
   __retres = 0;

@@ -4,6 +4,8 @@ import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
+import * as API from 'api/plugins/dive';
+
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 import './cytoscape_libs';
@@ -23,7 +25,6 @@ import '@fortawesome/fontawesome-free/js/all';
 import style from './style.json';
 import layouts from './layouts.json';
 
-
 const ctxmenu = {
   explore: <div><div className="fas fa-binoculars fa-2x" />Explore</div>,
   unfold: <div><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</div>,
@@ -31,7 +32,6 @@ const ctxmenu = {
   show: <div><div className="fa fa-eye fa-2x" />Show</div>,
   hide: <div><div className="fa fa-eye-slash fa-2x" />Hide</div>,
 };
-
 
 export interface Callsite {
   readonly fun: string;
@@ -45,16 +45,13 @@ export interface Interval {
 
 export type callstack = Callsite[];
 
-
 interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: any): void;
 }
 
-
 function callstackToString(callstack: callstack): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
 }
-
 
 export type mode = 'explore' | 'overview';
 
@@ -265,14 +262,15 @@ class Dive {
       const idmore = `${node.id}-more`;
       this.cy.remove(`#${idmore}`);
       if (node.backward_explored === 'partial') {
-        let elemore = this.cy.add({
-           group: 'nodes',
-           data: { id: idmore, parent: ele.data('parent') },
-           classes: ['more'] });
+        const elemore = this.cy.add({
+          group: 'nodes',
+          data: { id: idmore, parent: ele.data('parent') },
+          classes: 'more',
+        });
         newEles = elemore.union(newEles);
-        let depmore = this.cy.add({
+        const depmore = this.cy.add({
           group: 'edges',
-          data: { source: idmore, target: node.id }
+          data: { source: idmore, target: node.id },
         });
         newEles = this.cy.add(depmore).union(newEles);
       }
@@ -332,11 +330,14 @@ class Dive {
       this.cy.layout(this.layoutOptions).run();
   }
 
-  async exec(endpoint: string, params: any): Promise<void> {
+  async exec<In, Out>(
+    request: Server.ExecRequest<In, Out>,
+    param: In,
+  ): Promise<void> {
     try {
       if (Server.isRunning()) {
         await this.setMode();
-        const data = await Server.EXEC({ endpoint, params });
+        const data = await Server.send(request, param);
         if (data)
           this.receiveData(data);
       }
@@ -349,7 +350,7 @@ class Dive {
   async refresh(): Promise<void> {
     try {
       if (Server.isRunning()) {
-        const data = await Server.GET({ endpoint: 'dive.graph', params: {} });
+        const data = await Server.send(API.graph, {});
         await this.receiveGraph(data);
         this.recomputeLayout();
       }
@@ -361,7 +362,7 @@ class Dive {
 
   static async setWindow(window: any): Promise<void> {
     if (Server.isRunning())
-      await Server.SET({ endpoint: 'dive.window', params: window });
+      await Server.send(API.window, window);
   }
 
   async setMode(): Promise<void> {
@@ -385,29 +386,29 @@ class Dive {
 
   clear(): void {
     this.cy.elements().remove();
-    this.exec('dive.clear', null);
+    this.exec(API.clear, null);
   }
 
-  addNode(marker: any): void {
-    this.exec('dive.add_node', marker);
+  add(marker: any): void {
+    this.exec(API.add, marker);
   }
 
   explore(node: Cytoscape.NodeSingular): void {
     const id = parseInt(node.id(), 10);
     if (id)
-      this.exec('dive.explore', id);
+      this.exec(API.explore, id);
   }
 
   show(node: Cytoscape.NodeSingular): void {
     const id = parseInt(node.id(), 10);
     if (id)
-      this.exec('dive.show', id);
+      this.exec(API.show, id);
   }
 
   hide(node: Cytoscape.NodeSingular): void {
     const id = parseInt(node.id(), 10);
     if (id)
-      this.exec('dive.hide', id);
+      this.exec(API.hide, id);
   }
 
   selectNode(node: Cytoscape.NodeSingular): void {
@@ -426,7 +427,6 @@ class Dive {
   }
 }
 
-
 const GraphView = () => {
 
   // Hooks
@@ -434,7 +434,6 @@ const GraphView = () => {
   const node: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
-  const markers = States.useSyncArray('kernel.ast.markerKind');
   const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
   const [selectionMode, flipSelectionMode] =
         Dome.useGlobalSetting('dive.selectionMode', 'follow');
@@ -457,9 +456,9 @@ const GraphView = () => {
   useEffect(() => {
     if (!lock && marker && marker !== node.current) {
       node.current = marker;
-      dive.addNode(marker);
+      dive.add(marker);
     }
-  }, [dive, lock, marker, markers, selectionMode]);
+  }, [dive, lock, marker, selectionMode]);
 
   // Layout selection
   const selectLayout = (layout?: string) => {

@@ -24,9 +24,7 @@ open Server
 open Data
 open Dive_types
 
-let page = Doc.page (`Plugin "dive")
-    ~title:"Dive general services"
-    ~filename:"dive.md"
+let package = Package.package ~plugin:"dive" ~title:"Dive Services" ()
 
 
 (* -------------------------------------------------------------------------- *)
@@ -44,8 +42,9 @@ let get_context =
       context := Some c;
       c
 
+
 let global_window = ref {
-    perception = { backward = 2 ; forward = 0 };
+    perception = { backward = Some 2 ; forward = Some 0 };
     horizon = { backward = None ; forward = None };
   }
 
@@ -54,190 +53,165 @@ let global_window = ref {
 (* --- Data types                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let fail js =
-  failure_from_type_error "Invalid source format" js
-
-
 module Range : Data.S with type t = int option range =
 struct
   type t = int option range
-  let name = "dive-range"
-  let descr = Markdown.plain "Parametrization of the exploration range"
+  let name = "range"
+  let descr = Markdown.plain "Parametrization of the exploration range."
+  let sign : t Record.signature = Record.signature ()
 
-  let details = Markdown.([Block [Text [
-      Emph "Backward exploration"; Plain " gives the write dependencies while ";
-      Emph "forward exploration"; Plain " gives the read dependencies"]]])
+  module Fields =
+  struct
+    let backward = Record.field sign
+        ~name:"backward"
+        ~descr:(Markdown.plain "range for the write dependencies")
+        (module Joption (Jint))
 
-  let synopsis = Syntax.record [
-      "backward", Jint.Joption.syntax;
-      "forward", Jint.Joption.syntax;
-    ]
+    let forward = Record.field sign
+        ~name:"forward"
+        ~descr:(Markdown.plain "range for the read dependencies")
+        (module Joption (Jint))
+  end
 
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr ~details ()
+  module Record = (val Record.publish ~package ~name ~descr sign)
 
-  let to_json (r : int option range) =
-    `Assoc [
-      "backward", Jint.Joption.to_json r.backward ;
-      "forward" , Jint.Joption.to_json r.forward ;
-    ]
+  let jtype = Record.jtype
+
+  let to_json r =
+    Record.default |>
+    Record.set Fields.backward r.backward |>
+    Record.set Fields.forward r.forward |>
+    Record.to_json
 
   let of_json js =
-    match js with
-    | `Assoc assoc ->
-      begin try {
-        backward = Jint.Joption.of_json (List.assoc "backward" assoc);
-        forward = Jint.Joption.of_json (List.assoc "forward" assoc);
-      }
-        with Not_found -> fail js
-      end
-    | _ -> fail js
+    let r = Record.of_json js in
+    {
+      backward = Record.get Fields.backward r;
+      forward = Record.get Fields.forward r;
+    }
 end
 
 
 module Window : Data.S with type t = window =
 struct
   type t = window
-  let name = "dive-window"
-  let descr = Markdown.plain "Parametrization of the graph exploration."
+  let name = "explorationWindow"
+  let descr = Markdown.plain "Global parametrization of the exploration."
+  let sign : t Record.signature = Record.signature ()
 
-  let details = Markdown.([Block [Text [
-      Plain "The perception is how far dive will explore from root nodes and \
-             the horizon is the range beyond which the nodes must be hidden. ";
-      Inline_code "perception"; Plain " must be a finite range and ";
-      Inline_code "perception.forward"; Plain " is ignored for now."]]])
+  module Fields =
+  struct
+    let perception = Record.field sign
+        ~name:"perception"
+        ~descr:(Markdown.plain "how far dive will explore from root nodes ; \
+                                must be a finite range")
+        (module Range)
 
-  let synopsis = Syntax.record [
-      "perception", Range.syntax;
-      "horizon", Range.syntax;
-    ]
+    let horizon = Record.field sign
+        ~name:"horizon"
+        ~descr:(Markdown.plain "range beyond which the nodes must be hidden")
+        (module Range)
+  end
 
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr ~details ()
+  module Record = (val Record.publish ~package ~name ~descr sign)
+
+  let jtype = Record.jtype
 
   let to_json w =
-    `Assoc [
-      "perception", Range.to_json {
-        backward = Some w.perception.backward;
-        forward = Some w.perception.forward
-      } ;
-      "horizon" , Range.to_json w.horizon ;
-    ]
+    Record.default |>
+    Record.set Fields.perception w.perception |>
+    Record.set Fields.horizon w.horizon |>
+    Record.to_json
 
   let of_json js =
-    match js with
-    | `Assoc assoc ->
-      begin
-        let perception =
-          try Range.of_json (List.assoc "perception" assoc)
-          with Not_found -> fail js
-        and horizon =
-          try Range.of_json (List.assoc "horizon" assoc)
-          with Not_found -> fail js
-        in
-        match perception with
-        | { forward = None } | { backward = None } -> fail js
-        | { backward = Some backward ; forward = Some forward } -> {
-            perception = { backward ; forward };
-            horizon
-          }
-      end
-    | _ -> fail js
+    let r = Record.of_json js in
+    {
+      perception = Record.get Fields.perception r;
+      horizon = Record.get Fields.horizon r;
+    }
 end
 
 
-module NodeId = Data.Collection (struct
-    type t = node
-    let name = "dive-node-id"
-    let descr = Markdown.plain "A node identifier in the graph"
+module NodeId =
+struct
+  type t = node
+  let name = "nodeId"
+  let descr = Markdown.plain "A node identifier in the graph"
 
-    let syntax = Syntax.publish ~page ~name ~synopsis:Syntax.int ~descr ()
+  let jtype = Data.declare ~package ~name ~descr Data.Jint.jtype
 
-    let to_json node =
-      `Int node.node_key
+  let _to_json node =
+    `Int node.node_key
 
-    let of_json json =
-      let open Yojson.Basic.Util in
-      let node_key = to_int json in
-      try
-        Build.find_node (get_context ()) node_key
-      with Not_found ->
-        Data.failure "no node '%d' in the current graph" node_key
-  end)
+  let of_json json =
+    let node_key = Data.Jint.of_json json in
+    try
+      Build.find_node (get_context ()) node_key
+    with Not_found ->
+      Data.failure "no node '%d' in the current graph" node_key
+end
 
 module Callstack =
 struct
-  let name = "dive-callstack"
+  let name = "callstack"
   let descr = Markdown.plain "The callstack context for a node"
-
-  let synopsis = Syntax.array (Syntax.record [
-      "fun", Syntax.string;
-      "instr", Syntax.union [ Syntax.string ; Syntax.int ]
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "fun", Jstring;
+      "instr", Junion [ Jnumber ; Jstring ];
     ])
-
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
 end
 
 module NodeLocality =
 struct
-  let name = "dive-node-locality"
+  let name = "nodeLocality"
   let descr = Markdown.plain "The description of a node locality"
-
-  let synopsis = Syntax.record [
-      "file", Syntax.string;
-      "callstack", Syntax.option Callstack.syntax
-    ]
-
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "file", Jstring;
+      "callstack", Joption (Callstack.jtype)
+    ])
 end
 
 module Node =
 struct
-  let name = "dive-node"
-  let descr = Markdown.plain "A dive graph node"
-
-  let synopsis = Syntax.record [
-      "id", NodeId.syntax;
-      "label", Syntax.string;
-      "kind", Syntax.string;
-      "locality", NodeLocality.syntax;
-      "backward_explored", Syntax.string;
-      "forward_explored", Syntax.string;
-      "writes", Syntax.array Kernel_ast.Marker.syntax;
-      "values", Syntax.option Syntax.string;
-      "range", Syntax.union [ Syntax.string ; Syntax.int ];
-      "type", Syntax.option Syntax.string
-    ]
-
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+  let name = "node"
+  let descr = Markdown.plain "A graph node"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "id", NodeId.jtype;
+      "label", Jstring;
+      "kind", Jstring;
+      "locality", NodeLocality.jtype;
+      "backward_explored", Jstring;
+      "forward_explored", Jstring;
+      "writes", Jarray Kernel_ast.Marker.jtype;
+      "values", Joption Jstring;
+      "range", Junion [ Jnumber ; Jstring ];
+      "type", Joption Jstring
+    ])
 end
 
 module Dependency =
 struct
-  let name = "dive-dependency"
-  let descr = Markdown.plain "The dependency between two nodes."
-
-  let synopsis = Syntax.record [
-      "id", Syntax.int ;
-      "src", NodeId.syntax ;
-      "dst", NodeId.syntax ;
-      "kind", Syntax.string ;
-      "origins", Syntax.array Kernel_ast.Marker.syntax
-    ]
-
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
+  let name = "dependency"
+  let descr = Markdown.plain "The dependency between two nodes"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "id", Jnumber ;
+      "src", NodeId.jtype ;
+      "dst", NodeId.jtype ;
+      "kind", Jstring ;
+      "origins", Jarray Kernel_ast.Marker.jtype
+    ])
 end
 
 module Graph =
 struct
   type t = Dive_graph.t
-  let name = "dive-graph"
-  let descr = Markdown.plain "The whole graph being built."
+  let name = "graphData"
+  let descr = Markdown.plain "The whole graph being built"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "nodes", Jarray Node.jtype;
+      "deps", Jarray Dependency.jtype
+    ])
 
-  let synopsis = Syntax.record [
-      "nodes", Syntax.array Node.syntax;
-      "deps", Syntax.array Dependency.syntax
-    ]
-
-  let syntax = Syntax.publish ~page ~name ~synopsis ~descr  ()
   let to_json = Dive_graph.to_json
 end
 
@@ -245,21 +219,17 @@ end
 module GraphDiff =
 struct
   type t = Dive_graph.t * graph_diff
-  let name = "dive-graph-diff"
+  let name = "diffData"
   let descr = Markdown.plain "Graph differences from the last action."
-
-  let synopsis = Syntax.record [
-      "root", NodeId.syntax;
-      "add", Syntax.record [
-        "nodes", Syntax.array Node.syntax;
-        "deps", Syntax.array Dependency.syntax
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "root", NodeId.jtype;
+      "add", Jrecord [
+        "nodes", Jarray Node.jtype;
+        "deps", Jarray Dependency.jtype
       ];
-      "sub", Syntax.array NodeId.syntax
-    ]
+      "sub", Jarray NodeId.jtype
+    ])
 
-  let _syntax = Syntax.publish ~page ~name ~synopsis ~descr ()
-
-  let syntax = Syntax.any
   let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
 end
 
@@ -272,11 +242,12 @@ let finalize' context node_opt =
   begin match node_opt with
     | None -> ()
     | Some node ->
-      let depth_backward = !global_window.perception.backward
-      and depth_forward = !global_window.perception.forward
-      and horizon = !global_window.horizon in
-      Build.explore_backward ~depth:depth_backward context node;
-      Build.explore_forward ~depth:depth_forward context node;
+      let may_explore f =
+        Extlib.may (fun depth -> f ~depth context node)
+      in
+      may_explore Build.explore_backward !global_window.perception.backward;
+      may_explore Build.explore_forward !global_window.perception.forward;
+      let horizon = !global_window.horizon in
       if Extlib.has_some horizon.forward ||
          Extlib.has_some horizon.backward
       then
@@ -287,26 +258,26 @@ let finalize' context node_opt =
 let finalize context node =
   finalize' context (Some node)
 
-let () = Request.register ~page
-    ~kind:`SET ~name:"dive.window"
+let () = Request.register ~package
+    ~kind:`SET ~name:"window"
     ~descr:(Markdown.plain "Set the exploration window")
     ~input:(module Window) ~output:(module Data.Junit)
     (fun window -> global_window := window)
 
-let () = Request.register ~page
-    ~kind:`GET ~name:"dive.graph"
+let () = Request.register ~package
+    ~kind:`GET ~name:"graph"
     ~descr:(Markdown.plain "Retrieve the whole graph")
     ~input:(module Data.Junit) ~output:(module Graph)
     (fun () -> Build.get_graph (get_context ()))
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.clear"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
     (fun () -> Build.clear (get_context ()))
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.add_node"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"add"
     ~descr:(Markdown.plain "Add a node to the graph")
     ~input:(module Kernel_ast.Marker) ~output:(module GraphDiff)
     begin fun loc ->
@@ -314,8 +285,8 @@ let () = Request.register ~page
       finalize' context (Build.add_localizable context loc)
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.explore"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
     ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
@@ -323,8 +294,8 @@ let () = Request.register ~page
       finalize context node
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.show"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
     ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
@@ -333,8 +304,8 @@ let () = Request.register ~page
       finalize context node
     end
 
-let () = Request.register ~page
-    ~kind:`EXEC ~name:"dive.hide"
+let () = Request.register ~package
+    ~kind:`EXEC ~name:"hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
     ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->

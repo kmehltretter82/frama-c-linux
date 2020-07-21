@@ -3,35 +3,22 @@
 // --------------------------------------------------------------------------
 
 /**
-   @packageDocumentation
-   @module frama-c/states
-   @decsription
-   Manage the current Frama-C project and projectified state values.
+ * Manage the current Frama-C project and projectified state values.
+ * @packageDocumentation
+ * @module frama-c/states
 */
 
-import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import { Order } from 'dome/data/compare';
+import * as GlobalStates from 'dome/data/states';
+import { useModel } from 'dome/table/models';
+import { CompactModel } from 'dome/table/arrays';
 import * as Server from './server';
 
-/**
- *  @event
- *  @name 'frama-c.project'
- *  @summary Current Project Updates
- *  @description
- *  Exported as `State.PROJECT` in public API.
- */
-export const PROJECT = 'frama-c.project';
-
-/**
- *  @event
- *  @name 'frama-c.state.*'
- *  @summary State Notification Events.
- *  @description
- *  Event `'frama-c.state.<id>'` for project `<id>`.
- *  The prefix `'frama-c.state.'` is exported as `States.STATE` in public API.
- */
-export const STATE = 'frama-c.state.';
+const PROJECT = 'frama-c.project';
+const STATE_PREFIX = 'frama-c.state.';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -44,16 +31,16 @@ const PP = new Dome.PP('States');
 // --------------------------------------------------------------------------
 
 let currentProject: string | undefined;
-let states: any = {};
-const stateDefaults: any = {};
 
 Server.onReady(async () => {
   try {
-    const sr: Server.Request = {
-      endpoint: 'kernel.project.getCurrent',
-      params: {},
+    const sr: Server.GetRequest<null, { id?: string }> = {
+      kind: Server.RqKind.GET,
+      name: 'kernel.project.getCurrent',
+      input: Json.jNull,
+      output: Json.jObject({ id: Json.jString }),
     };
-    const current: { id: string } = await Server.GET(sr);
+    const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
     Dome.emit(PROJECT);
   } catch (error) {
@@ -63,7 +50,6 @@ Server.onReady(async () => {
 
 Server.onShutdown(() => {
   currentProject = '';
-  states = {};
   Dome.emit(PROJECT);
 });
 
@@ -72,8 +58,8 @@ Server.onShutdown(() => {
 // --------------------------------------------------------------------------
 
 /**
- *  @summary Current Project (Custom React Hook).
- *  @return {string} the current project identifier, or `undefined`.
+ * Current Project (Custom React Hook).
+ * @return The current project.
  */
 export function useProject() {
   Dome.useUpdate(PROJECT);
@@ -81,17 +67,23 @@ export function useProject() {
 }
 
 /**
- *  @summary Update Current Project.
- *  @param {string} project - the project identifier
- *  @description
- *  Make all states switching to their projectified value.
- *  Emits `PROJECT`.
+ * Update Current Project.
+ *
+ * Make all states switching to their projectified value.
+ *
+ * Emits `PROJECT`.
+ * @param project The project identifier.
  */
 export async function setProject(project: string) {
   if (Server.isRunning()) {
     try {
-      const sr = { endpoint: 'kernel.project.setCurrent', params: project };
-      await Server.SET(sr);
+      const sr: Server.SetRequest<string, null> = {
+        kind: Server.RqKind.SET,
+        name: 'kernel.project.setCurrent',
+        input: Json.jString,
+        output: Json.jNull,
+      };
+      await Server.send(sr, project);
       currentProject = project;
       Dome.emit(PROJECT);
     } catch (error) {
@@ -101,95 +93,51 @@ export async function setProject(project: string) {
 }
 
 // --------------------------------------------------------------------------
-// --- Projectified State
-// --------------------------------------------------------------------------
-
-function getValue(id: string, project?: string) {
-  if (!project) return undefined;
-  return _.get(states, [project, id], stateDefaults[id]);
-}
-
-function setValue(id: string, project: string | undefined, value: any) {
-  if (!project) return;
-  _.set(states, [project, id], value);
-  Dome.emit(STATE + id, value);
-}
-
-/**
- *  @summary Define the default state value.
- *  @param {string} id - the state identifier (mandatory)
- *  @param {any} value - the new default state
- */
-export function setStateDefault(id: string, value: any) {
-  stateDefaults[id] = value;
-}
-
-/**
- *  @summary Projectified State (Custom React Hook).
- *  @param {string} id - the state identifier (mandatory)
- *  @return {array} `[state,setState]` for the specified project
- *  @description
- *  Returns a getter and a setter for the specified state
- *  in the specified or current project.
- *  The initial value of states is always `undefined`.
- *
- *  Each state is associated to a specific event `frama-c-state.<id>` which is
- *  is used to notify updates. The hook also updates on `PROJECT` notifications.
- */
-export function useState(id: string) {
-  Dome.useUpdate(PROJECT, STATE + id);
-  const project = currentProject;
-  const value = getValue(id, project);
-  return [value, (v: any) => setValue(id, project, v)];
-}
-
-// --------------------------------------------------------------------------
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
+export interface UseRequestOptions<A> {
+  offline?: A | null;
+  pending?: A | null;
+  onError?: A | null;
+}
+
 /**
- *  @summary Cached GET request (Custom React Hook).
- *  @param {string} rq - GET request name
- *  @param {any} [params] - GET request parameter
- *  @param {object} [options] - Special values
- *  @param {any} [options.offline] - Returned value when off-line
- *  @param {any} [options.pending] - Returned value when pending response
- *  @param {any} [options.error] - Returned value on request error
- *  @return {any} [result] GET request response (when available)
- *  @description
- *  Sends the specified GET request and returns its result.
- *  The request is send asynchronously and cached until any change in
- *  `rq`, `params`, current project or server activity.
+ * Cached GET request (Custom React Hook).
  *
- *  The request is considered off-line as soon as either `rq` or `params` or
- *  current project takes a falsy value.
+ * Sends the specified GET request and returns its result. The request is send
+ * asynchronously and cached until any change.
  *
- *  Default values for various situations can be defined in the options
- *  parameter, which is `undefined` unless specified, or `null` to keep the
- *  current value.
- *  For instance `{ pending: null }` will return `undefined` when off-line and
- *  in case of errors, but will keep the last received value until a new one is
- *  actually received.
+ * Null values in options mean that the last obtained value is kept.
  */
-export function useRequest(rq: string, params: any, options: any = {}) {
+export function useRequest<In, Out>(
+  rq: Server.GetRequest<In, Out>,
+  params: In | undefined,
+  options: UseRequestOptions<Out> = {},
+): Out | undefined {
   const state = React.useRef<string>();
   const project = useProject();
-  const [response, setResponse] = React.useState(options.offline);
-  const footprint = project ? JSON.stringify([project, rq, params]) : undefined;
+  const [response, setResponse] =
+    React.useState<Out | undefined>(options.offline ?? undefined);
+  const footprint =
+    project ? JSON.stringify([project, rq.name, params]) : undefined;
+
+  const update = (opt: Out | undefined | null) => {
+    if (opt !== null) setResponse(opt);
+  };
 
   async function trigger() {
     if (project && rq && params !== undefined) {
       try {
-        const r = await Server.GET({ endpoint: rq, params });
-        setResponse(r);
+        update(options.pending);
+        const r = await Server.send(rq, params);
+        update(r);
       } catch (error) {
-        PP.error(`Fail in useRequest '${rq}'. ${error.toString()}`);
-        const err = options.error;
-        setResponse(err);
+        PP.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        update(options.onError);
       }
     } else {
-      const off = options.offline;
-      setResponse(off);
+      update(options.offline);
     }
   }
 
@@ -207,114 +155,121 @@ export function useRequest(rq: string, params: any, options: any = {}) {
 // --- Dictionaries
 // --------------------------------------------------------------------------
 
-/**
- *  @summary Cached GET request (Custom React Hook).
- *  @param {string} rq - GET request name
- *  @param {any} [params] - GET request parameter (default `'null'`)
- *  @param {object} [options] - Dictionary options
- *  @param {boolean} [options.key] - The property to index an item
- *         (default `'name'`)
- *  @param {boolean} [options.offline] - Keep the dictionary when offline
- *         (default `true`)
- *  @param {boolean} [options.pending] - Keep the dictionary when pending
- *         (default `true`)
- *  @param {boolean} [options.error] - Keep the dictionary on error
- *         (default `false`)
- *  @param {function} [options.filter] - Only index items satisfying the filter
- *         (default `undefined`)
- *  @return {object} [result] GET request response indexed by key
- *  @description
- *  Sends the specified GET request and returns its returned collection indexed
- *  by the provided key.
- *  Items in the collection that do have the key are not indexed.
- */
-export function useDictionary(
-  rq: string,
-  params: any = null,
-  options: any = {},
-) {
-  const {
-    offline = true,
-    pending = true,
-    error = false,
-    key = 'name',
-    filter,
-  } = options;
-  const tags = useRequest(rq, params, {
-    offline: offline ? null : undefined,
-    pending: pending ? null : undefined,
-    error: error ? null : undefined,
-  });
-  const dict = React.useMemo(() => {
-    const d: any = {};
-    _.forEach(tags, (tg) => {
-      const k: any = tg[key];
-      if (k && (!filter || filter(tg))) d[k] = tg;
-    });
-    return d;
-  }, [key, tags, filter]);
-  return dict;
+export type Tag = {
+  name: string;
+  label?: string;
+  descr?: string;
+};
+
+const holdCurrent = { offline: null, pending: null, onError: null };
+
+export type GetTags = Server.GetRequest<null, Tag[]>;
+
+export function useTags(rq: GetTags): Map<string, Tag> {
+  const tags = useRequest(rq, null, holdCurrent);
+  return React.useMemo(() => {
+    const m = new Map<string, Tag>();
+    if (tags !== undefined)
+      tags.forEach((tg) => m.set(tg.name, tg));
+    return m;
+  }, [tags]);
 }
 
 // --------------------------------------------------------------------------
 // --- Synchronized States
 // --------------------------------------------------------------------------
 
-// shared for all projects
-class SyncState {
-  id: any;
-  UPDATE: string;
-  signal: string;
-  getRq: string;
-  setRq: string;
-  insync: boolean;
-  effect: any;
-  value: undefined;
+export interface Value<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+}
 
-  constructor(id: any) {
-    this.id = id;
-    this.UPDATE = STATE + id;
-    this.signal = `${id}.sig`;
-    this.getRq = `${id}.get`;
-    this.setRq = `${id}.set`;
-    this.insync = false;
+export interface State<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+  setter: Server.SetRequest<A, null>;
+}
+
+export interface Fetches<K, A> {
+  reload: boolean;
+  pending: number;
+  updated: A[];
+  removed: K[];
+}
+
+export interface Array<K, A> {
+  name: string;
+  order: Order<A>;
+  getkey: (row: A) => K;
+  signal: Server.Signal;
+  reload: Server.GetRequest<null, null>;
+  fetch: Server.GetRequest<number, Fetches<K, A>>;
+}
+
+// --------------------------------------------------------------------------
+// --- Handler for Synchronized St byates
+// --------------------------------------------------------------------------
+
+interface Handler<A> {
+  name: string;
+  signal: Server.Signal;
+  getter: Server.GetRequest<null, A>;
+  setter?: Server.SetRequest<A, null>;
+}
+
+// shared for all projects
+class SyncState<A> {
+  UPDATE: string;
+  handler: Handler<A>;
+  upToDate: boolean;
+  value?: A;
+
+  constructor(h: Handler<A>) {
+    this.handler = h;
+    this.UPDATE = STATE_PREFIX + h.name;
+    this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
-    this.effect = this.effect.bind(this);
+    this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
     Dome.on(PROJECT, this.update);
   }
 
   getValue() {
-    if (!this.insync && Server.isRunning()) {
+    if (!this.upToDate && Server.isRunning()) {
       this.update();
     }
     return this.value;
   }
 
-  async setValue(v: any) {
+  async setValue(v: A) {
     try {
-      this.insync = true;
+      this.upToDate = true;
       this.value = v;
-      const sr: Server.Request = { endpoint: this.setRq, params: v };
-      await Server.SET(sr);
+      const setter = this.handler.getter;
+      if (setter) await Server.send(setter, v);
       Dome.emit(this.UPDATE);
     } catch (error) {
       PP.error(
-        `Fail to set value of syncState '${this.id}'. ${error.toString()}`,
+        `Fail to set value of SyncState '${this.handler.name}'.`,
+        `${error.toString()}`,
       );
     }
   }
 
   async update() {
     try {
-      this.insync = true;
-      const sr: Server.Request = { endpoint: this.getRq, params: {} };
-      const v = await Server.GET(sr);
+      this.upToDate = true;
+      const v = await Server.send(this.handler.getter, null);
       this.value = v;
       Dome.emit(this.UPDATE);
     } catch (error) {
-      PP.error(`Fail to update syncState '${this.id}'. ${error.toString()}`);
+      PP.error(
+        `Fail to update SyncState '${this.handler.name}'.`,
+        `${error.toString()}`,
+      );
     }
   }
 }
@@ -323,54 +278,40 @@ class SyncState {
 // --- Synchronized States Registry
 // --------------------------------------------------------------------------
 
-let syncStates: any = {};
+const syncStates = new Map<string, SyncState<any>>();
 
-function getSyncState(id: any) {
-  let s: any = syncStates[id];
+function getSyncState<A>(h: Handler<A>): SyncState<A> {
+  const id = `${currentProject}@${h.name}`;
+  let s = syncStates.get(id);
   if (!s) {
-    syncStates[id] = new SyncState(id);
-    s = syncStates[id];
+    s = new SyncState(h);
+    syncStates.set(id, s);
   }
   return s;
 }
 
-Server.onShutdown(() => (syncStates = {}));
+Server.onShutdown(() => syncStates.clear());
 
 // --------------------------------------------------------------------------
 // --- Synchronized State Hooks
 // --------------------------------------------------------------------------
 
-/**
- *  @summary Use Synchronized State (Custom React Hook).
- *  @parameter {string} id - name of the server state
- *  @return {Array} `[ value , setValue ]` of the synchronized state
- *  @description
- *  Synchronization with some (projectified) server state:
- *  - sends a `<id>.get` request to obtain the current value of the state;
- *  - sends a `<id>.set` request to update the value of the state;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
- */
-export function useSyncState(id: string) {
-  const s = getSyncState(id);
+/** Synchronization with a (projectified) server state. */
+export function useSyncState<A>(
+  st: State<A>,
+): [A | undefined, (value: A) => void] {
+  const s = getSyncState(st);
   Dome.useUpdate(PROJECT, s.UPDATE);
-  Server.useSignal(s.signal, s.update);
-  return [s.value(), s.setValue];
+  Server.useSignal(s.handler.signal, s.update);
+  return [s.getValue(), s.setValue];
 }
 
-/**
- *  @summary Use Synchronized Value (Custom React Hook).
- *  @parameter {string} id - name of the server state
- *  @return {any} current `value` of the state
- *  @description
- *  Synchronization with some (projectified) server value:
- *  - sends a `<id>.get` request to obtain the current value of the state;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
- */
-export function useSyncValue(id: string) {
-  const s = getSyncState(id);
+/** Synchronization with a (projectified) server value. */
+export function useSyncValue<A>(va: Value<A>): A | undefined {
+  const s = getSyncState(va);
   Dome.useUpdate(s.update);
-  Server.useSignal(s.signal, s.update);
-  return s.value();
+  Server.useSignal(s.handler.signal, s.update);
+  return s.getValue();
 }
 
 // --------------------------------------------------------------------------
@@ -378,136 +319,130 @@ export function useSyncValue(id: string) {
 // --------------------------------------------------------------------------
 
 // one per project
-class SyncArray {
-  id: string;
-  UPDATE: string;
-  signal: string;
-  fetchRq: string;
-  reloadRq: string;
-  index: any;
-  insync: boolean;
+class SyncArray<K, A> {
+  handler: Array<K, A>;
+  upToDate: boolean;
+  fetching: boolean;
+  model: CompactModel<K, A>;
 
-  constructor(id: string) {
-    this.id = id;
-    this.UPDATE = STATE + id;
-    this.signal = `${id}.sig`;
-    this.fetchRq = `${id}.fetch`;
-    this.reloadRq = `${id}.reload`;
-    this.index = {};
-    this.insync = false;
+  constructor(h: Array<K, A>) {
+    this.handler = h;
+    this.fetching = false;
+    this.upToDate = false;
+    this.model = new CompactModel(h.getkey);
+    this.model.setNaturalOrder(h.order);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
+    this.update = this.update.bind(this);
   }
 
-  getItems() {
-    if (!this.insync && Server.isRunning()) this.fetch();
-    return this.index;
-  }
-
-  isEmpty() {
-    return _.find(this.index, () => true) !== undefined;
+  update() {
+    if (!this.upToDate && Server.isRunning()) this.fetch();
   }
 
   async fetch() {
+    if (this.fetching || !Server.isRunning()) return;
     try {
-      this.insync = true;
-      const sr: Server.Request = { endpoint: this.fetchRq, params: 50 };
-      const data = await Server.GET(sr);
-      const { reload = false, removed = [], updated = [], pending = 0 } = data;
-      let reloaded = false;
-      if (reload) {
-        reloaded = this.isEmpty();
-        this.index = {};
-      }
-      removed.forEach((key: any) => {
-        delete this.index[key];
-      });
-      updated.forEach((item: any) => {
-        this.index[item.key] = item;
-      });
-      if (reloaded || removed.length || updated.length) {
-        this.index = { ...this.index };
-        Dome.emit(this.UPDATE);
-      }
-      if (pending > 0) {
-        this.fetch();
-      }
+      this.fetching = true;
+      let pending;
+      /* eslint-disable no-await-in-loop */
+      do {
+        const data = await Server.send(this.handler.fetch, 50);
+        const { reload = false, removed = [], updated = [] } = data;
+        const { model } = this;
+        if (reload) model.removeAllData();
+        model.updateData(updated);
+        model.removeData(removed);
+        if (reload || updated.length > 0 || removed.length > 0)
+          model.reload();
+        pending = data.pending ?? 0;
+      } while (pending > 0);
+      /* eslint-enable no-await-in-loop */
     } catch (error) {
       PP.error(
-        `Fail to retrieve the value of syncArray '${this.id}. ` +
+        `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
+    } finally {
+      this.fetching = false;
+      this.upToDate = true;
     }
   }
 
   async reload() {
     try {
-      const sr: Server.Request = { endpoint: this.reloadRq, params: {} };
-      await Server.SET(sr);
-      this.index = {};
-      this.insync = false;
-      Dome.emit(this.UPDATE);
+      this.model.clear();
+      this.upToDate = false;
+      if (Server.isRunning()) {
+        await Server.send(this.handler.reload, null);
+        this.fetch();
+      }
     } catch (error) {
       PP.error(
-        `Fail to set reload of syncArray '${this.id}'. ${error.toString()}`,
+        `Fail to set reload of syncArray '${this.handler.name}'.`,
+        `${error.toString()}`,
       );
     }
   }
+
 }
 
 // --------------------------------------------------------------------------
 // --- Synchronized Arrays Registry
 // --------------------------------------------------------------------------
 
-let syncArrays = {}; // Model by project & id
+const syncArrays = new Map<string, SyncArray<any, any>>();
 
-function getSyncArray(id: string) {
-  const path = [currentProject || '', id];
-  let a = _.get(syncArrays, path);
-  if (!a) {
-    a = new SyncArray(id);
-    _.set(syncArrays, path, a);
+function getSyncArray<K, A>(
+  array: Array<K, A>,
+): SyncArray<K, A> {
+  const id = `${currentProject}@${array.name}`;
+  let st = syncArrays.get(id);
+  if (!st) {
+    st = new SyncArray(array);
+    syncArrays.set(id, st);
   }
-  return a;
+  return st;
 }
 
-Server.onShutdown(() => (syncArrays = {}));
+Server.onShutdown(() => syncArrays.clear());
 
 // --------------------------------------------------------------------------
 // --- Synchronized Array Hooks
 // --------------------------------------------------------------------------
 
-/**
- *  @summary Force a Synchronized Array to Reload.
- *  @description
- *  Sends the `<id>.reload` request to the server for
- *  triggering a complete array reload.
- */
-export function reloadArray(id: string) {
-  getSyncArray(id).reload();
+/** Force a Synchronized Array to reload. */
+export function reloadArray<K, A>(arr: Array<K, A>) {
+  getSyncArray(arr).reload();
 }
 
 /**
- *  @summary Use Synchronized Array (Custom React Hook).
- *  @parameter {string} id - name of the server array
- *  @return {object} items indexed by their identifiers
- *  @description
- *  Synchronization with some (projectified) server array:
- *  - sends `<id>.fetch` requests to obtain the updated entries;
- *  - listens to `<id>.sig` signal to stay in sync with server updates.
+   Use Synchronized Array (Custom React Hook).
+
+   Unless specified, the hook makes the component re-render on every
+   update. Disabling this automatic re-rendering can be an option when
+   using the model to make a table view, which automatically synchronizes on
+   model updates.
+   @param sync Whether the component re-renders on updates (default is `true`).
  */
-export function useSyncArray(id: string) {
-  const a = getSyncArray(id);
-  Dome.useUpdate(PROJECT, a.UPDATE);
-  Server.useSignal(a.signal, a.fetch);
-  return a.getItems();
+export function useSyncArray<K, A>(
+  arr: Array<K, A>,
+  sync = true,
+): CompactModel<K, A> {
+  Dome.useUpdate(PROJECT);
+  const st = getSyncArray(arr);
+  React.useEffect(st.update);
+  Server.useSignal(arr.signal, st.fetch);
+  useModel(st.model, sync);
+  return st.model;
 }
 
 // --------------------------------------------------------------------------
 // --- Selection
 // --------------------------------------------------------------------------
 
-type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> =
+  Partial<T> & U[keyof U];
 
 export interface FullLocation {
   /** Function name. */
@@ -522,80 +457,231 @@ export interface FullLocation {
  *  but at least one of the two must be set.
  */
 export type Location = AtLeastOne<FullLocation>;
-export interface Selection {
 
-  /** Current selection. */
-  current?: Location;
+export interface HistorySelection {
   /** Previous locations with respect to the [[current]] one. */
   prevSelections: Location[];
   /** Next locations with respect to the [[current]] one. */
   nextSelections: Location[];
 }
 
+/** Actions on history selections:
+ * - `HISTORY_PREV` jumps to previous history location
+ *   (first in [[prevSelections]]).
+ * - `HISTORY_NEXT` jumps to next history location
+ *   (first in [[nextSelections]]).
+ */
+export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
+
+/** A selection of multiple locations. */
+export interface MultipleSelection {
+  /** The index of the current selected location in [[possibleSelections]]. */
+  index: number;
+  /** All locations forming a multiple selection. */
+  allSelections: Location[];
+}
+
+/** A select action on multiple locations. */
+export interface MultipleSelect {
+  readonly index: number;
+  readonly locations: Location[];
+}
+
+/** Select the [[index]]-nth location of the current multiple selection. */
+export interface NthSelect {
+  readonly index: number;
+}
+
+/** Actions on multiple selections:
+ * - [[MultipleSelect]].
+ * - [[NthSelect]].
+ * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
+ * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
+ */
+export type MultipleSelectActions =
+  MultipleSelect | NthSelect
+  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR';
+
+export interface Selection {
+  /** Current selection. May be one in [[history]] or [[multiple]]. */
+  current?: Location;
+  /** History of selections. */
+  history: HistorySelection;
+  /** Multiple selections at once. */
+  multiple: MultipleSelection;
+}
+
 /** A select action on a location. */
-export interface SelectAction {
+export interface SingleSelect {
   readonly location: Location;
 }
 
 /** Actions on selection:
- * - [[SelectAction]].
- * - `GO_BACK` jumps to previous location (first in [[prevSelections]]).
- * - `GO_FORWARD` jumps to next location (first in [[nextSelections]]).
+ * - [[SingleSelect]].
+ * - [[HistorySelectActions]].
+ * - [[MultipleSelectActions]].
  */
-export type SelectionActions = SelectAction | 'GO_BACK' | 'GO_FORWARD';
+export type SelectionActions =
+  SingleSelect | HistorySelectActions | MultipleSelectActions;
 
-function isSelect(a: SelectionActions): a is SelectAction {
-  return (a as SelectAction).location !== undefined;
+function isSingleSelect(a: SelectionActions): a is SingleSelect {
+  return (a as SingleSelect).location !== undefined;
 }
 
-/** Compute the next selection based on the current one and the given action. */
-function reducer(s: Selection, action: SelectionActions): Selection {
-  if (isSelect(action)) {
-    const [prevSelections, nextSelections] =
-      s.current && s.current.function !== action.location.function ?
-        [[s.current, ...s.prevSelections], []] :
-        [s.prevSelections, s.nextSelections];
-    return {
-      current: action.location,
-      prevSelections,
-      nextSelections,
-    };
-  }
-  const [pS, ...prevS] = s.prevSelections;
-  const [nS, ...nextS] = s.nextSelections;
+function isMultipleSelect(a: SelectionActions): a is MultipleSelect {
+  return (
+    (a as MultipleSelect).locations !== undefined &&
+    (a as MultipleSelect).index !== undefined
+  );
+}
+
+function isNthSelect(a: SelectionActions): a is NthSelect {
+  return (a as NthSelect).index !== undefined;
+}
+
+/** Update selection to the given location. */
+function selectLocation(s: Selection, location: Location): Selection {
+  const [prevSelections, nextSelections] =
+    s.current && s.current.function !== location.function ?
+      [[s.current, ...s.history.prevSelections], []] :
+      [s.history.prevSelections, s.history.nextSelections];
+  return {
+    ...s,
+    current: location,
+    history: { prevSelections, nextSelections },
+  };
+}
+
+/** Compute the next selection picking from the current history, depending on
+ *  action.
+ */
+function fromHistory(s: Selection, action: HistorySelectActions): Selection {
   switch (action) {
-    case 'GO_BACK':
+    case 'HISTORY_PREV': {
+      const [pS, ...prevS] = s.history.prevSelections;
       return {
+        ...s,
         current: pS,
-        prevSelections: prevS,
-        nextSelections: [(s.current as Location), ...s.nextSelections],
+        history: {
+          prevSelections: prevS,
+          nextSelections:
+            [(s.current as Location), ...s.history.nextSelections],
+        },
       };
-    case 'GO_FORWARD':
+    }
+    case 'HISTORY_NEXT': {
+      const [nS, ...nextS] = s.history.nextSelections;
       return {
+        ...s,
         current: nS,
-        prevSelections: [(s.current as Location), ...s.prevSelections],
-        nextSelections: nextS,
+        history: {
+          prevSelections:
+            [(s.current as Location), ...s.history.prevSelections],
+          nextSelections: nextS,
+        },
+      };
+    }
+    default:
+      return s;
+  }
+}
+
+/** Compute the next selection picking from the current multiple, depending on
+ *  action.
+ */
+function fromMultipleSelections(
+  s: Selection,
+  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR',
+): Selection {
+  switch (action) {
+    case 'MULTIPLE_PREV':
+    case 'MULTIPLE_NEXT': {
+      const index =
+        action === 'MULTIPLE_NEXT' ?
+          s.multiple.index + 1 :
+          s.multiple.index - 1;
+      if (0 <= index && index < s.multiple.allSelections.length) {
+        const multiple = { ...s.multiple, index };
+        return selectLocation(
+          { ...s, multiple },
+          s.multiple.allSelections[index],
+        );
+      }
+      return s;
+    }
+    case 'MULTIPLE_CLEAR':
+      return {
+        ...s,
+        multiple: {
+          index: 0,
+          allSelections: [],
+        },
       };
     default:
       return s;
   }
 }
 
-const SELECTION = 'kernel.selection';
+/** Compute the next selection based on the current one and the given action. */
+function reducer(s: Selection, action: SelectionActions): Selection {
+  if (isSingleSelect(action)) {
+    return selectLocation(s, action.location);
+  }
+  if (isMultipleSelect(action)) {
+    if (action.locations.length === 0)
+      return s;
+    const index = action.index > 0 ? action.index : 0;
+    const selection = selectLocation(s, action.locations[index]);
+    return {
+      ...selection,
+      multiple: {
+        allSelections: action.locations,
+        index,
+      },
+    };
+  }
+  if (isNthSelect(action)) {
+    const { index } = action;
+    if (0 <= index && index < s.multiple.allSelections.length) {
+      const location = s?.multiple.allSelections[index];
+      const selection = selectLocation(s, location);
+      const multiple = { ...selection.multiple, index };
+      return { ...selection, multiple };
+    }
+    return s;
+  }
+  switch (action) {
+    case 'HISTORY_PREV':
+    case 'HISTORY_NEXT':
+      return fromHistory(s, action);
+    case 'MULTIPLE_PREV':
+    case 'MULTIPLE_NEXT':
+    case 'MULTIPLE_CLEAR':
+      return fromMultipleSelections(s, action);
+    default:
+      return s;
+  }
+}
 
-const initialSelection = {
+/** The initial selection is empty. */
+const emptySelection = {
   current: undefined,
-  prevSelections: [],
-  nextSelections: [],
+  history: {
+    prevSelections: [],
+    nextSelections: [],
+  },
+  multiple: {
+    index: 0,
+    allSelections: [],
+  },
 };
-setStateDefault(SELECTION, initialSelection);
 
-/**
- *  Current selection.
- *  @return {array} The current selection and the function to update it.
- */
+const GlobalSelection = new GlobalStates.State<Selection>(emptySelection);
+Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+/** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = useState(SELECTION);
+  const [selection, setSelection] = GlobalStates.useState(GlobalSelection);
 
   function update(action: SelectionActions) {
     const nextSelection = reducer(selection, action);

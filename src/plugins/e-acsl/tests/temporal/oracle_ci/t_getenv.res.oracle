@@ -15,13 +15,13 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:488: Warning: 
   function __gen_e_acsl_getenv: postcondition 'null_or_valid_result' got status unknown.
-[eva:alarm] tests/temporal/t_getenv.c:13: Warning: 
-  pointer comparison. assert \pointer_comparable((void *)g1, (void *)0);
-[eva:alarm] tests/temporal/t_getenv.c:13: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/temporal/t_getenv.c:13: Warning: assertion got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: 
-  pointer comparison. assert \pointer_comparable((void *)g2, (void *)0);
+  pointer comparison. assert \pointer_comparable((void *)g1, (void *)0);
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/temporal/t_getenv.c:14: Warning: assertion got status unknown.
+[eva:alarm] tests/temporal/t_getenv.c:15: Warning: 
+  pointer comparison. assert \pointer_comparable((void *)g2, (void *)0);
+[eva:alarm] tests/temporal/t_getenv.c:15: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/temporal/t_getenv.c:15: Warning: assertion got status unknown.

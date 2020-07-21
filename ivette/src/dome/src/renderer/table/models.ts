@@ -7,6 +7,7 @@
    @module dome/table/models
 */
 
+import React from 'react';
 import { SortDirectionType } from 'react-virtualized';
 
 // --------------------------------------------------------------------------
@@ -195,22 +196,26 @@ export abstract class Model<Key, Row> {
      Re-render all views.
      Bound to this.
   */
-  reload() { this.clients.forEach(({ reload }) => reload && reload()); }
+  reload() {
+    this.clients.forEach(({ reload }) => reload && reload());
+  }
 
   /**
      Connect a client view to the model.
      The initial watching range is empty with no trigger.
      You normally never call this method directly.
      It is automatically called by table views.
+     @param onReload - optional callback for reloads (and updates, unless specified)
+     @param onUpdate - optional callback for updates (when different from reloads)
   */
-  link(): Client {
+  link(onReload?: Trigger, onUpdate?: Trigger): Client {
     const id = this.clientsId++;
     const m = this.clients;
     const w: Watcher & Client = {
       lower: 0,
       upper: 0,
-      update: undefined,
-      reload: undefined,
+      reload: onReload,
+      update: onUpdate ?? onReload,
       onUpdate(s?: Trigger) { w.update = s; },
       onReload(s?: Trigger) { w.reload = s; },
       unlink() { m.delete(id); },
@@ -223,6 +228,30 @@ export abstract class Model<Key, Row> {
     return w;
   }
 
+}
+
+// --------------------------------------------------------------------------
+// --- Model Hooks
+// --------------------------------------------------------------------------
+
+/**
+   Make the component to synchronize with the model and re-render on
+   every updates.
+   @param sync - whether to synchronize on model updates or not, `true`
+   by default.
+   @return a number that can be used to memoize other effects
+ */
+
+export function useModel(model: Model<any, any>, sync = true): number {
+  const [age, setAge] = React.useState(0);
+  React.useEffect(() => {
+    if (sync) {
+      const w = model.link(() => setImmediate(() => setAge(age + 1)));
+      return w.unlink;
+    }
+    return undefined;
+  });
+  return age;
 }
 
 // --------------------------------------------------------------------------

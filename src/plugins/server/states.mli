@@ -22,6 +22,8 @@
 
 (** Synchronized values between Server and Client *)
 
+open Package
+
 type 'a callback = ('a -> unit) -> unit
 
 (** Register a (projectified) value and generates the associated signal and
@@ -37,10 +39,9 @@ type 'a callback = ('a -> unit) -> unit
     synchronize with this value.
 *)
 val register_value :
-  page:Doc.page ->
+  package:package ->
   name:string ->
   descr:Markdown.text ->
-  ?details:Markdown.block ->
   output:'a Request.output ->
   get:(unit -> 'a) ->
   ?add_hook:(unit callback) ->
@@ -60,10 +61,9 @@ val register_value :
     synchronize with this state.
 *)
 val register_state :
-  page:Doc.page ->
+  package:package ->
   name:string ->
   descr:Markdown.text ->
-  ?details:Markdown.block ->
   data:'a Data.data ->
   get:(unit -> 'a) ->
   set:('a -> unit) ->
@@ -78,12 +78,11 @@ val model : unit -> 'a model
 (** Populate an array model with a new field.
     Columns with name `"id"` and `"_index"` are reserved for internal use. *)
 val column :
-  model:'a model ->
   name:string ->
   descr:Markdown.text ->
   data:('b Request.output) ->
   get:('a -> 'b) ->
-  unit -> unit
+  'a model -> unit
 
 (** Synchronized array state. *)
 type 'a array
@@ -121,11 +120,12 @@ val signal : 'a array -> Request.signal
     [States.useSyncArray()] hook.
 *)
 val register_array :
-  page:Doc.page ->
+  package:package ->
   name:string ->
   descr:Markdown.text ->
-  ?details:Markdown.block ->
   key:('a -> string) ->
+  ?keyName:string ->
+  ?keyKind:string ->
   iter:('a callback) ->
   ?add_update_hook:('a callback) ->
   ?add_remove_hook:('a callback) ->

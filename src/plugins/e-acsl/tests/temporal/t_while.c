@@ -1,4 +1,4 @@
-/* run.config
+/* run.config_ci, run.config_dev
    COMMENT: Off-by-one error where a pointer is made point to an adjacent block
    COMMENT: Note that this behaviour is not quaranteed by likely due to the
    COMMENT: way compiler allocates stack blocks

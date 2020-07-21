@@ -1,7 +1,5 @@
-/*
-  run.config_dev
+/* run.config_ci,run.config_dev
    COMMENT: Check behaviours of format functions
-   DONTRUN:
 */
 
 #include <stdlib.h>
@@ -21,7 +19,7 @@ int main(int argc, const char **argv) {
     OK(fprintf(fh, "foobar %s\n", "foobar"));
     fclose(fh);
     ABRT(fprintf(fh, "foobar %s\n", "foobar"));
-    ABRT(fprintf(&argc, "foobar %s\n", "foobar"));
+    ABRT(fprintf((FILE*)&argc, "foobar %s\n", "foobar"));
   }
 
   /* *** dprintf *** */

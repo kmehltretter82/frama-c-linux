@@ -34,7 +34,7 @@ The recommended versions for external provers are:
   \begin{tabular}{crlc}
     Prover & Versions & Download &\\
     \hline
-    \textsf{Why3} & \verb|1.2.0| &
+    \textsf{Why3} & \verb|1.3.1| &
     \url{http://why3.lri.fr} & \cite{Why3}\\
     \textsf{Alt-Ergo} & \verb|2.0.0|  &
     \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
@@ -48,7 +48,7 @@ Other versions might be supported as well, typically, as far as we know:
 \begin{itemize}
 \item \textsf{Alt-Ergo} \verb+2.2.0+ and \verb+2.3.0+, although distributed under a non-commercial licence.
 % \item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
-\item \textsf{Why3} \verb+1.0.0+ and \verb+1.1.1+, although only \verb+1.2.0+ is provided with Coq support.
+\item \textsf{Why3} \verb+1.3.1+.
 \end{itemize}
 
 Other provers, like \textsf{Coq}, \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
@@ -1290,12 +1290,17 @@ There are different ways of using the cache, depending on your precise needs.
 The main option to control cache usage is \verb+-wp-cache+, documented below:
 
 \begin{description}
-\item[\tt -wp-session <dir>] select the directory where cached results and proof scripts
-  are stored. If the local directory \verb+'.frama-c'+ already exists, the default session
-  directory \verb+'.frama-c/wp'+ will be used to setup the \textsf{WP} session.
-\item[\tt -wp-cache <mode>] selects the cache mode to use with \textsf{Why-3} provers. The default mode is \verb'update'
-  if a \textsf{WP} session is set, and \verb+none+ otherwise. The cache entries are stored in the session directory,
-  which is \verb+./.frama-c/wp/cache+ by default.
+\item[\tt -wp-cache <mode>] selects the cache mode to use with \textsf{Why-3}
+  provers. The default mode is \verb'update' if there is \textsf{WP} session
+  available, and \verb+none+ otherwise.  You can also use the environment
+  variable \texttt{FRAMAC\_WP\_CACHE} instead.
+\item[\tt -wp-cache-dir <dir>] select the directory where cached results are
+  stored. By default, the cache is store in the \textsf{WP} session
+  directory, when available.
+  You can also use the environment variable
+  \texttt{FRAMAC\_WP\_CACHEDIR} instead.
+\item[\tt -wp-cache-env] gives environment variables the precedence over command line options.
+  By default, the command line options take precedence, as usual.
 \end{description}
 
 The available cache modes are described below:
@@ -1309,7 +1314,6 @@ The available cache modes are described below:
 \end{description}
 
 When using cache with a non-\verb+offline+ mode, time and steps limits recorded in the cache are compared to the command line settings to produce meaningful and consistent results. Hence, if you provide more time or more steps from the command line than before, the prover would be run again. If you provide less or equal limits, the cache entries are reused, but \textsf{WP} still report the cached time and step limits to inform you of your previous attempts. For instance, if you have in the cache a « Valid » entry with time 12.4s and re-run it with a timeout of 5s, you will have a « Timeout » result with time 12.4s printed on the console.
-Cached usage is indicated on the standard output, unless you specify \verb+-wp-msg-key no-cache-info+.
 
 \section{Plug-in Developer Interface}
 \label{wp-api}

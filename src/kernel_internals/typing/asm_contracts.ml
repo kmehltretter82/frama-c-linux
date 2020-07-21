@@ -184,7 +184,7 @@ class visit_assembly =
            let ca =
              Logic_const.new_code_annotation (AStmtSpec ([],spec))
            in
-           Annotations.add_code_annot emitter ~kf stmt ca;
+           Annotations.add_code_annot ~keep_empty:false emitter ~kf stmt ca;
            if not mem_clobbered && Kernel.AsmContractsAutoValidate.get()
            then begin
              let active = [] in

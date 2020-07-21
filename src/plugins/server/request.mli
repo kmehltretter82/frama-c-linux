@@ -24,20 +24,22 @@
 (** Request Registry *)
 (* -------------------------------------------------------------------------- *)
 
+open Package
+
 type json = Data.json
 type kind = [ `GET | `SET | `EXEC ]
 
 module type Input =
 sig
   type t
-  val syntax : Syntax.t
+  val jtype : jtype
   val of_json : json -> t
 end
 
 module type Output =
 sig
   type t
-  val syntax : Syntax.t
+  val jtype : jtype
   val to_json : t -> json
 end
 
@@ -60,11 +62,10 @@ type signal
 
 (** Register a server signal. The signal [name] must be unique. *)
 val signal :
-  page:Doc.page ->
+  package:package ->
   name:string ->
   descr:Markdown.text ->
-  ?details:Markdown.block ->
-  unit -> signal
+  signal
 
 (** Emit the signal to the client. *)
 val emit : signal -> unit
@@ -87,11 +88,10 @@ val on_signal : signal -> (bool -> unit) -> unit
 
 *)
 val register :
-  page:Doc.page ->
+  package:package ->
   kind:kind ->
   name:string ->
   descr:Markdown.text ->
-  ?details:Markdown.block ->
   input:'a input ->
   output:'b output ->
   ('a -> 'b) -> unit
@@ -133,11 +133,6 @@ type ('a,'b) signature
     you shall define named parameters and results before registering the
     request processing function. *)
 val signature :
-  page:Doc.page ->
-  kind:kind ->
-  name:string ->
-  descr:Markdown.text ->
-  ?details:Markdown.block ->
   ?input:'a input ->
   ?output:'b output ->
   unit -> ('a,'b) signature
@@ -154,7 +149,12 @@ type 'b result = rq -> 'b -> unit
 (** Register the request JSON processing function.
     This call finalize the signature definition and shall be called
     once on the signature. *)
-val register_sig : ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
+val register_sig :
+  package:package ->
+  kind:kind ->
+  name:string ->
+  descr:Markdown.text ->
+  ('a,'b) signature -> (rq -> 'a -> 'b) -> unit
 
 (** {2 Named Parameters and Results}
 
@@ -224,6 +224,10 @@ val result_opt : ('a,unit) signature ->
 
 (** Register a [GET] request [dictionary.<name>] to retrieve all tags registered
     in the dictionary. *)
-val dictionary : 'a Data.Enum.dictionary -> unit
+val dictionary :
+  package:package ->
+  name:string ->
+  descr:Markdown.text ->
+  'a Data.Enum.dictionary -> (module Data.S with type t = 'a)
 
 (* -------------------------------------------------------------------------- *)

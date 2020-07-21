@@ -8,6 +8,7 @@
 #include "stdlib.c"
 #include "__fc_builtin.h"
 #include <stdint.h>
+#include <limits.h>
 
 int main() {
   // always succeeds if -eva-no-alloc-returns-null, otherwise may succeed
@@ -38,6 +39,19 @@ int main() {
   free(p_al0);
   int p_memal_res2 = posix_memalign((void**)&p_al1, 32, 42);
   free(p_al1);
+
+  //__fc_realpath test
+  char *resolved_name = malloc(PATH_MAX);
+  if (!resolved_name) return 1;
+  char *realpath_res = realpath("/bin/ls", resolved_name);
+  if (realpath_res) {
+    //@ assert valid_if_exact: valid_read_string(realpath_res);
+  }
+  if (Frama_C_nondet(0, 1)) {
+    //@ assert maybe_uninitialized: \initialized(resolved_name + PATH_MAX-1);
+  }
+  free(resolved_name);
+  realpath_res = realpath("/bin/ls", NULL);
 
   return 0;
 }

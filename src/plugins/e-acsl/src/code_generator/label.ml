@@ -48,7 +48,7 @@ let move kf ~old new_stmt =
     List.iter
       (fun (e, ca) ->
          Annotations.remove_code_annot ~kf e old ca;
-         Annotations.add_code_annot ~kf e new_stmt ca)
+         Annotations.add_code_annot ~keep_empty:false ~kf e new_stmt ca)
       l;
     (* update the gotos of the function jumping to one of the labels *)
     let f =

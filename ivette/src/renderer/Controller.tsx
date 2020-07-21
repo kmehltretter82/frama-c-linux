@@ -169,16 +169,9 @@ const editor = new RichTextBuffer();
 const RenderConsole = () => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
-  const [H0, setH0] = Dome.useState('Controller.history', []);
+  const [history, setHistory] = Dome.useState('Controller.history', []);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
-
-  // Cope with merge settings that keeps previous array entries (BUG in DOME)
-  const history = Array.isArray(H0) ? H0.filter((h) => h !== '') : [];
-  const setHistory = (hs: string[]) => {
-    const n = hs.length;
-    setH0(n < 50 ? hs.concat(Array(50 - n).fill('')) : hs);
-  };
 
   Dome.useEmitter(editor, 'change', () => {
     const cmd = editor.getValue().trim();
@@ -264,13 +257,13 @@ const RenderConsole = () => {
           title="Discard changes"
         />
         <IconButton
-          icon="MEDIA.PREV"
+          icon="ANGLE.LEFT"
           display={edited}
           onClick={doPrev}
           title="Previous command"
         />
         <IconButton
-          icon="MEDIA.NEXT"
+          icon="ANGLE.RIGHT"
           display={edited}
           onClick={doNext}
           title="Next command"

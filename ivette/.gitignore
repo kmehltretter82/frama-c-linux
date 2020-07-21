@@ -2,10 +2,10 @@
 # --- Template .gitignore file for Dome
 # --------------------------------------------------------------------------
 
+.ivette
 .dome-*.stamp
 .dome-*.back
 node_modules
-yarn.lock
 yarn-error.log
 /bin
 /dist

@@ -75,6 +75,6 @@ type 'a range = {
 }
 
 type window = {
-  perception: int range; (* depth of exploration *)
+  perception: int option range; (* depth of exploration *)
   horizon: int option range; (* hide beyond horizon ; None for infinite *)
 }

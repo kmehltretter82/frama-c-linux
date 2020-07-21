@@ -160,6 +160,9 @@ struct
   let compare a b = rank a - rank b
   let equal = (=)
   let pretty fmt c = Format.pp_print_string fmt (name c)
+  let detailed_pretty fmt = function
+    | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
+    | m -> Format.pp_print_string fmt (name m)
   let val_of_chunk = function
     | M_int _ | M_char -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
@@ -1150,7 +1153,7 @@ and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
 let mchunk c =
   match c with
   | T_init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
-  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
+  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.detailed_pretty c, KValue)
 
 let lookup s e =
   try mchunk (Tmap.find e s)

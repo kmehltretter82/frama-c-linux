@@ -56,13 +56,12 @@ function orderByRing<K, R>(
 // --------------------------------------------------------------------------
 
 type INDEX<K, R> = Map<K, PACK<K, R>>;
-type TABLE<K, R> = PACK<K, R>[];
 
 // --------------------------------------------------------------------------
 // --- Array Model
 // --------------------------------------------------------------------------
 
-export class MapModel<Key, Row>
+export class ArrayModel<Key, Row>
   extends Model<Key, Row>
   implements Sorting, Filtering<Key, Row>
 {
@@ -70,8 +69,11 @@ export class MapModel<Key, Row>
   // Hold raw data (unsorted, unfiltered)
   private index: INDEX<Key, Row> = new Map();
 
-  // Hold filtered & sorted data (computed on demand)
-  private table?: TABLE<Key, Row>;
+  // Hold filtered & sorted data (computed and cached on demand)
+  private table?: PACK<Key, Row>[];
+
+  // Hold filtered & sorted array of data (computed and cached on demand)
+  private array?: Row[];
 
   // Filtered-out Row Count
   private filtered: number = 0;
@@ -105,11 +107,11 @@ export class MapModel<Key, Row>
   }
 
   // Lazily compute table
-  protected rebuild(): TABLE<Key, Row> {
+  protected rebuild(): PACK<Key, Row>[] {
     const current = this.table;
     let filtered = 0;
     if (current !== undefined) return current;
-    let table: TABLE<Key, Row> = [];
+    let table: PACK<Key, Row>[] = [];
     try {
       this.index.forEach((packed) => {
         packed.index = undefined;
@@ -164,7 +166,7 @@ export class MapModel<Key, Row>
       comparison for un-specified columns are kept unchanged, if any.
       This will be used to refine
       [[setNaturalOrder]] in response to user column selection with
-      [[setSortBy]] provided you enable by-column sorting from the table view.
+      [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
   setColumnOrder(columns?: ByColumns<Row>) {
     this.columns = { ...this.columns, ...columns };
@@ -174,7 +176,7 @@ export class MapModel<Key, Row>
   /** Sets natural ordering of the rows.
       It defines in which order the entries are rendered in the table.  This
       primary ordering can be refined in response to user column selection with
-      [[setSortBy]] provided you enable by-column sorting from the table view.
+      [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
   setNaturalOrder(order?: Order<Row>) {
     this.natural = order;
@@ -184,7 +186,7 @@ export class MapModel<Key, Row>
   /**
      Sets both natural ordering and column ordering with the provided
      orders by fields. This is a combination of [[setColumnOrder]] and
-     [[setNaturalOrder]] with [[Compare.byFields]].
+     [[setNaturalOrder]] with [[dome/data/compare.byFields]].
    */
   setOrderingByFields(byfields: ByFields<Row>) {
     this.natural = Compare.byFields(byfields);
@@ -268,11 +270,10 @@ export class MapModel<Key, Row>
 
   /** Trigger a complete reload of the table. */
   reload() {
-    if (this.table || this.order) {
-      this.table = undefined;
-      this.order = undefined;
-      super.reload();
-    }
+    this.array = undefined;
+    this.table = undefined;
+    this.order = undefined;
+    super.reload();
   }
 
   /** Remove all data and reload. */
@@ -382,13 +383,13 @@ export class MapModel<Key, Row>
   }
 
   /**
-     Silently removes the entry.
+     Silently removes the entries.
      Modification will be only visible after a final [[reload]].
      Useful for a large number of batched updates.
      @param key - the removed entry.
    */
-  removeData(key: Key) {
-    this.index.delete(key);
+  removeData(keys: Collection<Key>) {
+    forEach(keys, (k) => this.index.delete(k));
   }
 
   /**
@@ -411,6 +412,16 @@ export class MapModel<Key, Row>
     return this.index.get(key)?.row;
   }
 
+  /** Returns an array of filtered and sorted entries.
+      Computed on demand and cached. */
+  getArray(): Row[] {
+    let arr = this.array;
+    if (arr === undefined) {
+      arr = this.array = this.rebuild().map((e) => e.row);
+    }
+    return arr;
+  }
+
 }
 
 // --------------------------------------------------------------------------
@@ -418,45 +429,37 @@ export class MapModel<Key, Row>
 // --------------------------------------------------------------------------
 
 /**
-   @template Row - object data that also contains « key »
+   @template Row - object data that also contains their « key »
 */
-export class ArrayModel<Row> extends MapModel<string, Row> {
+export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
 
-  private key: keyof Row
+  getkey: (d: Row) => Key;
 
   /** @param key - the key property of `Row` holding an entry identifier. */
-  constructor(key: keyof Row) {
+  constructor(getkey: any) {
     super();
-    this.key = key;
+    this.getkey = getkey;
   }
 
-  /** Optimized, see [[getKey]]. */
-  getKeyFor(_: number, data: Row) { return this.getKey(data); }
+  /** Use the key getter directly. */
+  getKeyFor(_: number, data: Row) { return this.getkey(data); }
 
-  /** Returns the key of data. */
-  getKey(data: Row): string { return (data as any)[this.key]; }
-
-  /** Adds a collection of data. Finally triggers a reload. */
-  add(data: Collection<Row>) {
-    forEach(data, (row: Row) => this.setData(this.getKey(row), row));
-    this.reload();
+  /** Silently add or update a collection of data.
+      Requires a final trigger to update views. */
+  updateData(data: Collection<Row>) {
+    forEach(data, (row: Row) => this.setData(this.getkey(row), row));
   }
 
-  /** Replaces all previous entries with new ones. Finally triggers a reload. */
-  replace(data: Collection<Row>) {
+  /**
+     Replace all previous data with the new ones.
+     Finally triggers a reload.
+   */
+  replaceAllDataWith(data: Collection<Row>) {
     this.removeAllData();
-    this.add(data);
-  }
-
-  /** Removes a colllection of data, identified by keys or (key of) rows.
-      Finally triggers a reload. */
-  remove(data: Collection<string | Row>) {
-    forEach(data, e => {
-      const k = typeof e === 'string' ? e : this.getKey(e);
-      this.removeData(k);
-    });
+    this.updateData(data);
     this.reload();
   }
+
 
 }
 

@@ -21,29 +21,30 @@ import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
 import Globals from './Globals';
 import Properties from './Properties';
+import Locations from './Locations';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
 // --------------------------------------------------------------------------
 
-const SelectionControls = () => {
+const HistorySelectionControls = () => {
   const [selection, updateSelection] = States.useSelection();
 
-  const doPrevSelect = () => { updateSelection('GO_BACK'); };
-  const doNextSelect = () => { updateSelection('GO_FORWARD'); };
+  const doPrevSelect = () => { updateSelection('HISTORY_PREV'); };
+  const doNextSelect = () => { updateSelection('HISTORY_NEXT'); };
 
   return (
     <Toolbar.ButtonGroup>
       <Toolbar.Button
-        icon="MEDIA.PREV"
+        icon="ANGLE.LEFT"
         onClick={doPrevSelect}
-        disabled={!selection || selection.prevSelections.length === 0}
+        disabled={!selection || selection.history.prevSelections.length === 0}
         title="Previous location"
       />
       <Toolbar.Button
-        icon="MEDIA.NEXT"
+        icon="ANGLE.RIGHT"
         onClick={doNextSelect}
-        disabled={!selection || selection.nextSelections.length === 0}
+        disabled={!selection || selection.history.nextSelections.length === 0}
         title="Next location"
       />
     </Toolbar.ButtonGroup>
@@ -74,7 +75,7 @@ export default (() => {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <SelectionControls />
+        <HistorySelectionControls />
         <Toolbar.Filler />
         <Toolbar.Button
           icon="ITEMS.GRID"
@@ -100,6 +101,7 @@ export default (() => {
             <Properties />
             <ASTview />
             <ASTinfo />
+            <Locations />
             <Dive />
           </Group>
         </LabView>

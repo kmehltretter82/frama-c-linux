@@ -2564,6 +2564,9 @@ int posix_memalign(void **memptr, size_t alignment, size_t size);
  */
 extern int mkstemp(char *templat);
 
+char *realpath(char const * __restrict file_name,
+               char * __restrict resolved_name);
+
 int glob(char const *pattern, int flags,
          int (*errfunc)(char const *epath, int eerrno), glob_t *pglob)
 {
@@ -5346,6 +5349,53 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
     goto return_label;
   }
   __retres = 0;
+  return_label: return __retres;
+}
+
+char *realpath(char const * __restrict file_name,
+               char * __restrict resolved_name)
+{
+  char *__retres;
+  int tmp;
+  if (! file_name) {
+    __fc_errno = 22;
+    __retres = (char *)0;
+    goto return_label;
+  }
+  tmp = Frama_C_interval(0,6);
+  switch (tmp) {
+    case 0: __fc_errno = 13;
+    __retres = (char *)0;
+    goto return_label;
+    case 1: __fc_errno = 5;
+    __retres = (char *)0;
+    goto return_label;
+    case 2: __fc_errno = 40;
+    __retres = (char *)0;
+    goto return_label;
+    case 3: __fc_errno = 36;
+    __retres = (char *)0;
+    goto return_label;
+    case 4: __fc_errno = 2;
+    __retres = (char *)0;
+    goto return_label;
+    case 5: __fc_errno = 20;
+    __retres = (char *)0;
+    goto return_label;
+    default: break;
+  }
+  int realpath_len = Frama_C_interval(1,256);
+  if (! resolved_name) {
+    resolved_name = (char *)malloc((unsigned int)256);
+    if (! resolved_name) {
+      __fc_errno = 12;
+      __retres = (char *)0;
+      goto return_label;
+    }
+  }
+  Frama_C_make_unknown(resolved_name,(unsigned int)realpath_len);
+  *(resolved_name + (realpath_len - 1)) = (char)'\000';
+  __retres = resolved_name;
   return_label: return __retres;
 }
 

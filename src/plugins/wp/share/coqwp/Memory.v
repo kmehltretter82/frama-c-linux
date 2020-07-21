@@ -249,7 +249,7 @@ Lemma separated_1 :
 Admitted.
 
 (* Why3 goal *)
-Definition region : array Z.
+Definition region : Z -> Z.
 Admitted.
 
 (* Why3 goal *)
@@ -262,7 +262,7 @@ Admitted.
 
 (* Why3 assumption *)
 Definition framed (m: farray addr addr) : Prop :=
-  forall (p:addr), ((region .[ (base (m .[ p ]))] ) <= 0%Z)%Z.
+  forall (p:addr), ((region (base (m .[ p ])) ) <= 0%Z)%Z.
 
 (* Why3 goal *)
 Lemma separated_included :

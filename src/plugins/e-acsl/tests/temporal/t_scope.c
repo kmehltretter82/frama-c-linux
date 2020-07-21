@@ -1,6 +1,7 @@
-/* run.config
+/* run.config_ci, run.config_dev
    COMMENT: Temporal analysis with respect to scopes
 */
+
 #include <stddef.h>
 
 int main() {

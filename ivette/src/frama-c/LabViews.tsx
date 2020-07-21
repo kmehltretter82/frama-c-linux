@@ -355,7 +355,6 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
-
   const theViews: any = {};
 
   _.forEach(libViews, (view) => {

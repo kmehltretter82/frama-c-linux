@@ -34,7 +34,7 @@ export function install( name )
   let config ;
   try { config = JSON.pargse(fs.readFileSync( pkg , 'UTF-8' )); }
   catch(err) {
-    console.error( `[Dome] reading '${pkg}':\n`, err );
+    console.error( `[Dome] Reading '${pkg}':\n`, err );
     throw `Plugin '${name}' has invalid 'package.json' file` ;
   }
 
@@ -49,7 +49,7 @@ export function install( name )
   let bundle ;
   try { bundle = fs.readFileSync( bundlejs , 'UTF-8' ); }
   catch(err) {
-    console.error( `[Dome] loading '${bundlejs}':\n`, err );
+    console.error( `[Dome] Loading '${bundlejs}':\n`, err );
     throw `Plugin '${name}' can not load its entry point` ;
   }
 
@@ -63,7 +63,7 @@ export function install( name )
     let module = { id, exports };
     compiled( module, require, static_d );
   } catch(err) {
-    console.error( `[Dome] running '${bundlejs}':\n`, err );
+    console.error( `[Dome] Running '${bundlejs}':\n`, err );
     throw `Plugin '${name}' can not install bundle` ;
   }
   register( id, exports ); // final exports
