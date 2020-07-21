@@ -1008,7 +1008,7 @@ and predicate_content_to_exp ?name kf env p =
         env
         tlist
     in
-    Memory_translate.call_separated ~loc kf Cil.intType env tlist p
+    Memory_translate.call_with_size ~loc kf "separated" Cil.intType env tlist p
   | Pinitialized(BuiltinLabel Here, t) ->
     (match t.term_node with
      (* optimisation when we know that the initialisation is ok *)
@@ -1024,7 +1024,7 @@ and predicate_content_to_exp ?name kf env p =
          "initialized"
          Cil.intType
          env
-         t
+         [ t ]
          p)
   | Pinitialized _ -> Env.not_yet env "labeled \\initialized"
   | Pallocable _ -> Env.not_yet env "\\allocate"
