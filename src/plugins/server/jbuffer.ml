@@ -41,7 +41,10 @@ let flush buffer () =
     Buffer.clear t
 
 let push_tag buffer stag =
-  let tag = Transitioning.Format.string_of_stag stag in
+  let tag = match stag with
+    | Format.String_tag tag -> tag
+    | _ -> raise (Invalid_argument "unsupported tag extension")
+  in
   flush buffer () ;
   buffer.stack <- ( tag , buffer.rjson ) :: buffer.stack ;
   buffer.rjson <- []
@@ -84,7 +87,7 @@ let create ?indent ?margin () =
       Format.pp_set_max_indent fmt (max 0 (min k (m-10)))
   end ;
   begin
-    let open Transitioning.Format in
+    let open Format in
     pp_set_formatter_stag_functions fmt {
       print_open_stag = no_mark ;
       print_close_stag = no_mark ;

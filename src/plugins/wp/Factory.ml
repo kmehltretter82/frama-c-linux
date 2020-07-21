@@ -304,7 +304,7 @@ module COMPILERS = Map.Make
     (struct
       type t = setup * driver
       let compare (s,d) (s',d') =
-        let cmp = Transitioning.Stdlib.compare s s' in
+        let cmp = Stdlib.compare s s' in
         if cmp <> 0 then cmp else LogicBuiltins.compare d d'
     end)
 

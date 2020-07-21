@@ -42,7 +42,7 @@ type 'a entry = int * int * 'a
 module Wmap = Map.Make
     (struct
       type t = int
-      let compare (a:t) (b:t) = Transitioning.Stdlib.compare a b
+      let compare (a:t) (b:t) = Stdlib.compare a b
     end)
 
 module Rmap = Map.Make

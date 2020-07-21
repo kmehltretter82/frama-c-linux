@@ -164,8 +164,8 @@ struct
            if (pe1 = pe2) then 0
            else
              (* most englobing comes first *)
-             Transitioning.Stdlib.compare pe2 pe1
-         else Transitioning.Stdlib.compare pb1 pb2
+             Stdlib.compare pe2 pe1
+         else Stdlib.compare pb1 pb2
       ) arr
     ;
     arr
@@ -275,14 +275,20 @@ let localizable_from_locs state ~file ~line =
 let buffer_formatter state source =
   let starts = Stack.create () in
   let emit_open_tag s =
-    let s = Transitioning.Format.string_of_stag s in
+    let s = match s with
+      | Format.String_tag tag -> tag
+      | _ -> raise (Invalid_argument "unsupported tag extension")
+    in
     (* Ignore tags that are not ours *)
     if Extlib.string_prefix "guitag:" s then
       Stack.push (source#end_iter#offset, Tag.get s) starts ;
     ""
   in
   let emit_close_tag s =
-    let s = Transitioning.Format.string_of_stag s in
+    let s = match s with
+      | Format.String_tag tag -> tag
+      | _ -> raise (Invalid_argument "unsupported tag extension")
+    in
     (try
        if Extlib.string_prefix "guitag:" s then
          let (p,sid) = Stack.pop starts in
@@ -295,7 +301,7 @@ let buffer_formatter state source =
   Format.pp_set_tags gtk_fmt true;
   Format.pp_set_print_tags gtk_fmt false;
   Format.pp_set_mark_tags gtk_fmt true;
-  let open Transitioning.Format in
+  let open Format in
   pp_set_formatter_stag_functions
     gtk_fmt {(pp_get_formatter_stag_functions gtk_fmt ())
              with

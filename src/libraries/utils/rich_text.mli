@@ -31,14 +31,14 @@ val char_at : message -> int -> char
 val string : message -> string
 val substring : message -> int -> int -> string
 
-val tags_at : message -> int -> (Transitioning.Format.stag * int * int) list
+val tags_at : message -> int -> (Format.stag * int * int) list
 (** Returns the list of tags at the given position.
     Inner tags come first, outer tags last. *)
 
 val visit :
   ?output:(string -> int -> int -> unit) ->
-  ?open_tag:(Transitioning.Format.stag -> int -> int -> unit) ->
-  ?close_tag:(Transitioning.Format.stag -> int -> int -> unit) ->
+  ?open_tag:(Format.stag -> int -> int -> unit) ->
+  ?close_tag:(Format.stag -> int -> int -> unit) ->
   message -> unit
 (** Visit the message, with depth-first recursion on tags.
     All methods are called with text or tag, position and length. *)

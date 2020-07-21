@@ -216,7 +216,7 @@ let compare_kind k1 k2 = match k1, k2 with
         if cmp <> 0 then cmp
         else
           Property.compare p1 p2
-  | _,_ -> Transitioning.Stdlib.compare (kind_order k1) (kind_order k2)
+  | _,_ -> Stdlib.compare (kind_order k1) (kind_order k2)
 
 let compare_prop_id pid1 pid2 =
   (* This order of comparison groups together prop_pids with same properties *)
@@ -228,7 +228,7 @@ let compare_prop_id pid1 pid2 =
     let cmp = compare_kind pid2.p_kind pid1.p_kind in
     if cmp <> 0 then cmp
     else
-      Transitioning.Stdlib.compare pid1.p_part pid2.p_part
+      Stdlib.compare pid1.p_part pid2.p_part
 
 module PropId =
   Datatype.Make_with_collections(

@@ -432,7 +432,7 @@ module Bool = struct
   type t = Top | True | False | Bottom
   let hash (b : t) = Hashtbl.hash b
   let equal (b1 : t) (b2 : t) = b1 = b2
-  let compare (b1 : t) (b2 : t) = Transitioning.Stdlib.compare b1 b2
+  let compare (b1 : t) (b2 : t) = Stdlib.compare b1 b2
   let pretty fmt = function
     | Top -> Format.fprintf fmt "Top"
     | True -> Format.fprintf fmt "True"

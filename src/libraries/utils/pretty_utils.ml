@@ -184,7 +184,7 @@ type marger = int ref
 let marger () = ref 0
 let add_margin marger ?(margin=0) ?(min=0) ?(max=80) text =
   let size = String.length text + margin in
-  let n = Transitioning.Stdlib.min max (Transitioning.Stdlib.max min size) in
+  let n = Stdlib.min max (Stdlib.max min size) in
   if n > !marger then marger := n
 
 type align = [ `Center | `Left | `Right ]

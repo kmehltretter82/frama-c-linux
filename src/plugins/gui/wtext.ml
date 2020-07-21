@@ -244,7 +244,10 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
         end
 
     method private open_tag name =
-      let name = Transitioning.Format.string_of_stag name in
+      let name = match name with
+        | Format.String_tag str -> str
+        | _ -> raise (Invalid_argument "unsupported tag extension")
+      in
       self#flush () ; style <- self#tag name :: style ; ""
 
     method private close_tag _name =
@@ -255,7 +258,7 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
       | (TAG _ | PLAIN) :: sty -> style <- sty ; ""
 
     method fmt = match fmtref with Some fmt -> fmt | None ->
-      let open Transitioning.Format in
+      let open Format in
       let output_string s a b = if b > 0 then Buffer.add_substring text s a b in
       let fmt = Format.make_formatter output_string self#flush in
       let tagger = pp_get_formatter_stag_functions fmt () in
@@ -308,10 +311,9 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
       begin
         let sid = hid <- succ hid ; Printf.sprintf ">%X" hid in
         Hashtbl.add marks sid (fun p q -> Hashtbl.remove marks sid ; f p q) ;
-        Transitioning.Format.pp_open_stag fmt
-          (Transitioning.Format.stag_of_string sid) ;
+        Format.pp_open_stag fmt (Format.String_tag sid) ;
         let () = pp fmt in
-        Transitioning.Format.pp_close_stag fmt () ;
+        Format.pp_close_stag fmt () ;
       end
 
     (* -------------------------------------------------------------------------- *)

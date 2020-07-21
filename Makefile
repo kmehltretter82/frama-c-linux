@@ -1575,10 +1575,6 @@ STDLIB_FILES:=\
 	weak \
 	ephemeron
 
-ifeq ($(HAS_OCAML407),no)
-  STDLIB_FILES+=pervasives
-endif
-
 STDLIB_FILES:=$(patsubst %,$(OCAMLLIB)/%.mli,$(STDLIB_FILES))
 
 .PHONY: doc-kernel
