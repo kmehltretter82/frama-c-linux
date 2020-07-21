@@ -233,7 +233,7 @@ class Dive {
 
   /* eslint-disable no-restricted-syntax */
   receiveGraph(data: any): Cytoscape.CollectionReturnValue {
-    let newEles = this.cy.collection();
+    let newNodes = this.cy.collection();
 
     for (const node of data.nodes)
     {
@@ -255,7 +255,7 @@ class Dive {
 
         ele = this.cy.add({ group: 'nodes', data: { ...node, parent } });
         this.addTips(ele);
-        newEles = ele.union(newEles);
+        newNodes = ele.union(newNodes);
       }
 
       // Add a node for the user to ask for more dependencies
@@ -267,26 +267,24 @@ class Dive {
           data: { id: idmore, parent: ele.data('parent') },
           classes: 'more',
         });
-        newEles = elemore.union(newEles);
-        const depmore = this.cy.add({
+        newNodes = elemore.union(newNodes);
+        this.cy.add({
           group: 'edges',
           data: { source: idmore, target: node.id },
         });
-        newEles = this.cy.add(depmore).union(newEles);
       }
     }
 
     for (const dep of data.deps)
     {
-      const ele = this.cy.add({
+      this.cy.add({
         data: { ...dep, source: dep.src, target: dep.dst },
         group: 'edges',
         classes: dep.kind,
       });
-      newEles = this.cy.add(ele).union(newEles);
     }
 
-    return newEles;
+    return newNodes;
   }
 
   receiveData(data: any): void {
@@ -295,14 +293,14 @@ class Dive {
     for (const id of data.sub)
       this.remove(this.cy.$id(id));
 
-    const newEles = this.receiveGraph(data.add);
+    const newNodes = this.receiveGraph(data.add);
 
     this.cy.endBatch();
 
     this.selectNode(this.cy.$id(data.root));
 
-    if (newEles)
-      this.recomputeLayout();
+    if (newNodes)
+      this.recomputeLayout(newNodes);
   }
 
   get layout(): string {
@@ -318,16 +316,31 @@ class Dive {
       name: layout,
       fit: true,
       animate: true,
-      randomize: true, /* Not all layouts supports that */
+      randomize: false, /* Keep previous positions if layout supports it */
       ...extendedOptions,
     };
 
     this.recomputeLayout();
   }
 
-  recomputeLayout(): void {
-    if (this.layoutOptions && this.cy.container())
-      this.cy.layout(this.layoutOptions).run();
+  recomputeLayout(newNodes: Cytoscape.Collection = this.cy.collection()): void {
+    if (this.layoutOptions && this.cy.container()) {
+      /* Animate opacity from 0 to 100 for new elements */
+      const newEles = newNodes.union(newNodes.neighborhood('edge'));
+      newEles.style('opacity', 0);
+
+      this.cy.layout({
+        animationEasing: 'ease-in-out-quad',
+        /* Do not move new nodes */
+        animateFilter: (node: Cytoscape.Singular) => !newNodes.contains(node),
+        /* But make them appear slowly */
+        stop: () => newEles.animate({
+          style: { opacity: 1.0 },
+          duration: 500,
+        }),
+        ...this.layoutOptions,
+      } as unknown as Cytoscape.LayoutOptions).run();
+    }
   }
 
   async exec<In, Out>(
