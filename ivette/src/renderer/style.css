@@ -27,4 +27,13 @@
     background-color: #FFFF66;
 }
 
+.dead-code {
+    background-color: #FF4242;
+    border-bottom: solid 0.1em #FF4242;
+}
+
+.non-terminating {
+    border-bottom: solid 0.2em #FF4242;
+}
+
 /* -------------------------------------------------------------------------- */
