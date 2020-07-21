@@ -1503,11 +1503,11 @@ endif
 
 $(DOC_DIR)/docgen.cmo: $(DOC_DIR)/docgen.ml
 	$(PRINT_OCAMLC) $@
-	$(OCAMLC) -c -I +ocamldoc -I $(CONFIG_DIR) $(DOC_DIR)/docgen.ml
+	$(OCAMLC) -c -I +ocamldoc -I +compiler-libs -I $(CONFIG_DIR) $(DOC_DIR)/docgen.ml
 
 $(DOC_DIR)/docgen.cmxs: $(DOC_DIR)/docgen.ml
 	$(PRINT_PACKING) $@
-	$(OCAMLOPT) -o $@ -shared -I +ocamldoc -I $(CONFIG_DIR) \
+	$(OCAMLOPT) -o $@ -shared -I +ocamldoc -I +compiler-libs -I $(CONFIG_DIR) \
 	  $(DOC_DIR)/docgen.ml
 
 clean-doc::
