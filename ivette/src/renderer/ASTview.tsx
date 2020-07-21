@@ -12,7 +12,6 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-
 import { printFunction, markerInfo } from 'api/kernel/ast';
 import { getCallers } from 'api/plugins/eva';
 
@@ -46,19 +45,16 @@ async function loadAST(
     (async () => {
       try {
         const data = await Server.send(printFunction, theFunction);
-        buffer.operation(() => {
-          buffer.clear();
-          if (!data) {
-            buffer.log('// No code for function', theFunction);
-          }
-          buffer.printTextWithTags(data, true);
-          if (theMarker)
-            buffer.scroll(theMarker);
-        });
+        buffer.clear();
+        if (!data) {
+          buffer.log('// No code for function', theFunction);
+        }
+        buffer.printTextWithTags(data, true);
+        if (theMarker)
+          buffer.scroll(theMarker);
       } catch (err) {
         PP.error(
-          `Fail to retrieve the AST of function '${theFunction}' ` +
-          `and marker '${theMarker}':`, err,
+          'Fail to obtain AST', theFunction, theMarker, err,
         );
       }
     })();

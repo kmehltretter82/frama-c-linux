@@ -29,15 +29,11 @@ export interface MarkerCallback {
 }
 
 /**
-   @property {Buffer} buffer - associated Buffer holding the text content
-   @property {string} className - additional class name(s)
-   @property {object} style - additional CSS style
-   @property {number} fontSize - editor font-size
-   @property {string} selection - currently selected markder identifier
-   @property {function} onSelection - callback used when an identified marker is clicked
-   @property {function} onContextMenu - selection callback on right-click
-   @property {object} [...options] - additional CodeMirror
-   [configuration](https://codemirror.net/doc/manual.html#config) properties
+   Text Editor configuration.
+
+   Inherits CodeMirror
+   [EditorConfiguration](https://codemirror.net/doc/manual.html#config)
+   options.
  */
 
 export interface TextProps extends CodeMirror.EditorConfiguration {
@@ -458,7 +454,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 // --------------------------------------------------------------------------
 
 /**
-   Text Editor.
+   #### Text Editor.
 
    A component rendering the content of a text buffer, that shall be instances
    of the `Buffer` base class.
@@ -473,7 +469,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    modifications (including buffer) are propagated to the internal CodeMirror instance.
    Undefined properties are set (or reset) to the CodeMirror defaults.
 
-   ##### Themes
+   #### Themes
 
    The CodeMirror `theme` option allow you to style your document,
    especially when using modes.
@@ -481,14 +477,14 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    For instance, to use the `'ambiance'` theme provided with CodeMirror, you shall
    import `'codemirror/theme/ambiance.css'` somewhere in your application.
 
-   ##### Modes & Adds-On
+   #### Modes & Adds-On
 
    You can install modes and adds-on provided by the CodeMirror distribution by
    simply importing (once, before being used) the associated modules in your
    application.  For instance, to use the `'javascript'` mode option, you shall
    import `'codemirror/mode/javascript/javascript.js'` file in your application.
 
-   ##### Further Customization
+   #### Further Customization
 
    You can register your own extensions directly into the global `CodeMirror`
    class instance.  However, the correct instance must be retrieved by using

@@ -23,6 +23,10 @@ export interface TextMarkerProxy {
   find(): Range | undefined;
 }
 
+/**
+   Text Marker options. Inherits
+   CodeMirror [TextMerkerOptions](https://codemirror.net/doc/manual.html#api_marker).
+ */
 export interface MarkerProps extends CodeMirror.TextMarkerOptions {
   id?: string;
   hover?: boolean;
@@ -40,25 +44,12 @@ export type MarkedText = undefined | null | string
   | MarkerProps & { text: MarkedText }
   ;
 
-// --------------------------------------------------------------------------
-// --- Markers Proxy
-// --------------------------------------------------------------------------
-
-class Proxy implements TextMarkerProxy {
-  private marker?: CodeMirror.TextMarker;
-  clear() { this.marker?.clear(); }
-  changed() { this.marker?.changed(); }
-  find() { return this.marker?.find(); }
-  _link(marker: CodeMirror.TextMarker) { this.marker = marker; }
-}
-
 interface StackedMarker {
   id?: string;
   hover?: boolean;
   className?: string;
   options: CodeMirror.TextMarkerOptions;
   start: CodeMirror.Position;
-  proxy: Proxy;
 }
 
 export interface CSSMarker {
@@ -71,6 +62,20 @@ export interface CSSMarker {
   /** Size in character */
   length: number;
 }
+
+// --------------------------------------------------------------------------
+// --- Batched Update
+// --------------------------------------------------------------------------
+
+type Append = { code: "append", text: string };
+type Flushline = { code: "flushline" };
+type Scroll = { code: "scroll", position: string | number | undefined };
+type OpenTextMarker = { code: "open", props: MarkerProps };
+type CloseTextMarker = { code: "close" };
+type Update = Append | Flushline | Scroll | OpenTextMarker | CloseTextMarker;
+
+const BATCH_OPS = 500
+const BATCH_DELAY = 5
 
 // --------------------------------------------------------------------------
 // --- Buffer
@@ -92,6 +97,9 @@ export interface RichTextBufferProps {
    A buffer encapsulate a CodeMirror document instance inside an standard
    Node event emitter. CodeMirror signals are automatically linked back to
    the event emitter (on a lazy basis).
+
+   All buffer modifications are stacked and executed asynchronously inside
+   CodeMirror batched operations to increase performance.
 
    The `maxlines` will control the maximum number of lines kept in the buffer.
    By default, it is set to `10000`, but you can use `null`, `0` or any negative
@@ -129,27 +137,28 @@ export interface RichTextBufferProps {
 
 export class RichTextBuffer extends Emitter {
 
-  private _doc: CodeMirror.Doc;
-  private _maxlines: number = 10000;
-  private _operations: number = 0; // cm started operations
-  private _editors: CodeMirror.Editor[] = [];
-  private _stacked: StackedMarker[] = [];
+  private document: CodeMirror.Doc;
+  private maxlines: number = 10000;
+  private editors: CodeMirror.Editor[] = [];
+  private stacked: StackedMarker[] = [];
+  private updates: Update[] = [];
+  private batched: boolean = false;
 
   // Indexed by CSS property dome-xHover-nnnn
-  private _mhovers = new Map<string, CSSMarker>();
+  private cssmarkers = new Map<string, CSSMarker>();
 
   // Indexed by marker user identifier
-  private _markers = new Map<string, CodeMirror.TextMarker[]>();
+  private textmarkers = new Map<string, CodeMirror.TextMarker[]>();
 
-  private _decorator?: Decorator;
-  private _edited = false;
-  private _focused = false;
-  private _markid = 0;
+  private decorator?: Decorator;
+  private edited = false;
+  private focused = false;
+  private markid = 0;
 
   constructor(props: RichTextBufferProps = {}) {
     super();
     const { mode, maxlines } = props;
-    this._doc = new CodeMirror.Doc('', mode);
+    this.document = new CodeMirror.Doc('', mode);
     this.setMaxlines(maxlines);
     this.setEdited = this.setEdited.bind(this);
     this.setFocused = this.setFocused.bind(this);
@@ -159,6 +168,7 @@ export class RichTextBuffer extends Emitter {
     this.getValue = this.getValue.bind(this);
     this.updateDecorations = this.updateDecorations.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.doBatch = this.doBatch.bind(this);
     this.log = this.log.bind(this);
   }
 
@@ -166,7 +176,7 @@ export class RichTextBuffer extends Emitter {
      Internal CodeMirror
      [document](https://codemirror.net/doc/manual.html#api_doc) instance.
   */
-  getDoc(): CodeMirror.Doc { return this._doc; }
+  getDoc(): CodeMirror.Doc { return this.document; }
 
   // --------------------------------------------------------------------------
   // --- Buffer Manipulation
@@ -182,11 +192,8 @@ export class RichTextBuffer extends Emitter {
   */
   append(...values: any[]) {
     if (values.length > 0) {
-      const doc = this._doc;
-      const start = doc.posFromIndex(Infinity);
       const text = values.join(' ');
-      doc.replaceRange(text, start, undefined, 'buffer');
-      this.shrink();
+      this.push({ code: "append", text });
     }
   }
 
@@ -195,9 +202,7 @@ export class RichTextBuffer extends Emitter {
      finish at the beginning of a fresh line, inserts a newline character.
   */
   flushline() {
-    const doc = this._doc;
-    const start = doc.posFromIndex(Infinity);
-    if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'flush');
+    this.push({ code: "flushline" });
   }
 
   /**
@@ -215,17 +220,22 @@ export class RichTextBuffer extends Emitter {
      Also remove all markers.
    */
   setValue(txt = '') {
-    this._doc.setValue(txt);
-    this._edited = false;
-    this._stacked = [];
-    this._focused = false;
-    this._markid = 0;
-    this._mhovers.clear();
-    this._markers.clear();
+    this.document.setValue(txt);
+    this.cssmarkers.clear();
+    this.textmarkers.clear();
+    this.stacked = [];
+    this.updates = [];
+    this.edited = false;
+    this.focused = false;
+    this.markid = 0;
   }
 
   /** Return the textual contents of the buffer. */
-  getValue() { return this._doc.getValue(); }
+  getValue() { return this.document.getValue(); }
+
+  // --------------------------------------------------------------------------
+  // ---  Text Markers
+  // --------------------------------------------------------------------------
 
   /**
      Opens a text marker.
@@ -243,13 +253,8 @@ export class RichTextBuffer extends Emitter {
      instance, once created.  Hence, you can safely invoke these methods on either
      the _proxy_ or the _final_ text marker at your convenience.
   */
-
-  openTextMarker(props: MarkerProps): TextMarkerProxy {
-    const { id, hover, className, ...options } = props;
-    const start = this._doc.posFromIndex(Infinity);
-    const proxy = new Proxy();
-    this._stacked.push({ start, id, hover, className, options, proxy });
-    return proxy;
+  openTextMarker(props: MarkerProps) {
+    this.push({ code: 'open', props });
   }
 
   /**
@@ -261,60 +266,18 @@ export class RichTextBuffer extends Emitter {
      bound to the actual one.
 
   */
-  closeTextMarker(): CodeMirror.TextMarker | undefined {
-    const tag = this._stacked.pop();
-    const doc = this._doc;
-    if (tag) {
-      const { id, hover, start, className } = tag;
-      const stop = doc.posFromIndex(Infinity);
-      var markerId;
-      if (id || hover) {
-        markerId = 'dome-xHover-' + (this._markid++);
-        const p = doc.indexFromPos(start);
-        const q = doc.indexFromPos(stop);
-        const cmark = {
-          id,
-          classNameId: markerId,
-          hover: hover ?? (id !== undefined),
-          length: q - p,
-        };
-        this._mhovers.set(markerId, cmark);
-      }
-      const fullClassName = [
-        'dome-xMarked',
-        id && ('dome-xMark-' + id),
-        markerId,
-        className,
-      ].filter((s) => !!s).join(' ');
-      const options = {
-        shared: true,
-        className: fullClassName,
-        ...tag.options,
-      };
-      const marker = doc.markText(start, stop, options);
-      if (id) {
-        const markers = this._markers;
-        const ms = markers.get(id);
-        if (ms === undefined)
-          markers.set(id, [marker]);
-        else
-          ms.push(marker);
-      }
-      tag.proxy._link(marker);
-      this.shrink();
-      return marker;
-    } else
-      return undefined;
+  closeTextMarker() {
+    this.push({ code: 'close' });
   }
 
   /** Lookup for the text markers associated with a marker identifier. */
   findTextMarker(id: string): CodeMirror.TextMarker[] {
-    return this._markers.get(id) ?? [];
+    return this.textmarkers.get(id) ?? [];
   }
 
   /** Lopokup for a hover class. */
   findHover(className: string): CSSMarker | undefined {
-    return this._mhovers.get(className);
+    return this.cssmarkers.get(className);
   }
 
   // --------------------------------------------------------------------------
@@ -328,14 +291,14 @@ export class RichTextBuffer extends Emitter {
      on text markers with the provided identifier.
   */
   setDecorator(fn: Decorator) {
-    this._decorator = fn;
+    this.decorator = fn;
     this.emit('decorated');
   }
 
   /**
      Current highlighter.
    */
-  getDecorator() { return this._decorator; }
+  getDecorator() { return this.decorator; }
 
   /**
      Rehighlight document.
@@ -368,8 +331,8 @@ export class RichTextBuffer extends Emitter {
      @param state - the new edited state (defaults to `true`).
   */
   setEdited(state = true) {
-    if (state !== this._edited) {
-      this._edited = state;
+    if (state !== this.edited) {
+      this.edited = state;
       this.emit('edited', state);
     }
   }
@@ -392,18 +355,18 @@ export class RichTextBuffer extends Emitter {
      @param focus - the new focused state (defaults to `true`).
   */
   setFocused(state = true) {
-    if (state !== this._focused) {
-      this._focused = state;
+    if (state !== this.focused) {
+      this.focused = state;
       this.emit('focused', state);
-      this.shrink();
+      this.doShrink();
     }
   }
 
   /** Returns the current _edited_ state. */
-  isEdited() { return this._edited; }
+  isEdited() { return this.edited; }
 
   /** Returns the current _focused_ state. */
-  isFocused() { return this._focused; }
+  isFocused() { return this.focused; }
 
   // --------------------------------------------------------------------------
   // --- Document Scrolling
@@ -420,40 +383,8 @@ export class RichTextBuffer extends Emitter {
      turn this limit _off_ with care.
   */
   setMaxlines(maxlines = 10000) {
-    this._maxlines = maxlines > 0 ? 1 + maxlines : 0;
-    this.shrink();
-  }
-
-  /**
-     Remove head lines to fits into maximum lines.
-
-     Shrinking is activated when `maxlines` property is set to a strictly
-     positive number. When the number of lines in the buffer is larger than the
-     max, buffer is trimmed by removing extra _heading_ lines.
-
-     When the buffer if _focused_ or when there are still opened text marks
-     pending, shrinking is automatically postponed until focus is lost and all
-     pending marks have been closed.
-   */
-  shrink() {
-    if (
-      !this._operations
-      && !this._focused
-      && this._maxlines > 0
-      && this._stacked.length == 0
-    ) {
-      const lines = this._doc.lineCount();
-      if (lines > this._maxlines) {
-        const p = this._doc.firstLine();
-        const q = p + lines - this._maxlines;
-        this._doc.replaceRange(
-          '',
-          { line: p, ch: 0 },
-          { line: q, ch: 0 },
-          'buffer'
-        );
-      }
-    }
+    this.maxlines = maxlines > 0 ? 1 + maxlines : 0;
+    this.doShrink();
   }
 
   /**
@@ -464,21 +395,7 @@ export class RichTextBuffer extends Emitter {
      defaults to the end of buffer (when not focused).
   */
   scroll(position?: string | number): void {
-    if (position === undefined) {
-      if (!this._focused)
-        this.emit('scroll', this._doc.lastLine());
-    } else if (typeof position === 'number') {
-      this.emit('scroll', position);
-    } else if (typeof position === 'string') {
-      var line = Infinity;
-      this.findTextMarker(position).forEach((tm) => {
-        const rg = tm.find();
-        const ln = rg.from.line;
-        if (ln < line) line = ln;
-      });
-      if (line !== Infinity)
-        this.emit('scroll', line);
-    }
+    this.push({ code: 'scroll', position });
   }
 
   // --------------------------------------------------------------------------
@@ -502,11 +419,10 @@ export class RichTextBuffer extends Emitter {
      @param cm - code mirror instance to link this document in.
   */
   link(cm: CodeMirror.Editor) {
-    const newDoc = this._doc.linkedDoc({ sharedHist: true, mode: undefined });
+    const newDoc = this.document.linkedDoc({ sharedHist: true, mode: undefined });
     cm.swapDoc(newDoc);
     cm.on('change', this.onChange);
-    this._editors.push(cm);
-    if (this._operations > 0) cm.startOperation();
+    this.editors.push(cm);
   }
 
   /**
@@ -515,15 +431,14 @@ export class RichTextBuffer extends Emitter {
   */
   unlink(cm: CodeMirror.Editor) {
     const oldDoc = cm.getDoc();
-    this._doc.unlinkDoc(oldDoc);
-    this._editors = this._editors.filter((cm0) => {
+    this.document.unlinkDoc(oldDoc);
+    this.editors = this.editors.filter((cm0) => {
       if (cm === cm0) {
         cm.off('change', this.onChange);
         return false;
       }
       return true;
     });
-    if (this._operations > 0) cm.endOperation();
   }
 
   /**
@@ -533,54 +448,162 @@ export class RichTextBuffer extends Emitter {
      instance currently linked to this buffer.
    */
   forEach(fn: (editor: CodeMirror.Editor) => void) {
-    this._editors.forEach(fn);
+    this.editors.forEach(fn);
   };
 
   // --------------------------------------------------------------------------
-  // --- Stacked Operations
+  // --- Update Operations
   // --------------------------------------------------------------------------
 
-  /**
-     Batch heavy operations on editors
+  /* Removes head lines to fits into maximum lines. */
+  private doShrink() {
+    const lines = this.document.lineCount();
+    if (lines > this.maxlines) {
+      const p = this.document.firstLine();
+      const q = p + lines - this.maxlines;
+      this.document.replaceRange(
+        '',
+        { line: p, ch: 0 },
+        { line: q, ch: 0 },
+        'buffer'
+      );
+    }
+  }
 
-     Uses code mirror `cm.startOperation()` and `cm.sendOperation()` on all
-     linked editors to batch the updating operations performed on the
-     buffer. The batched updates can run asynchronously.
+  /* Append Operation */
+  private doAppend(text: string) {
+    const doc = this.document;
+    const start = doc.posFromIndex(Infinity);
+    doc.replaceRange(text, start, undefined, 'buffer');
+  }
 
-     @param fn - function performing the operations (can return a promise)
-     @returns the promised job
-  */
-  operation<A = void>(job: () => Promise<A> | A): Promise<A> {
+  /* FlushLine Operation */
+  private doFlushLine() {
+    const doc = this.document;
+    const start = doc.posFromIndex(Infinity);
+    if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'flush');
+  }
 
-    // Protect each start/end call against error
-    const forEachEditor = (fn: (cm: CodeMirror.Editor) => void) => {
-      this._editors.forEach((cm) => {
-        try { fn(cm); } catch (e) { console.error('[Dome.text.buffers]', e); }
-      });
-    };
+  /* Open Operation */
+  private doOpen(props: MarkerProps) {
+    const { id, hover, className, ...options } = props;
+    const start = this.document.posFromIndex(Infinity);
+    this.stacked.push({ start, id, hover, className, options });
+  }
 
-    // Invariant: this._operations is the number of batched job still running
-    // Invariant: when pending job are running, all linked this._editors are started
-    // Second invariant is also maintained by link and unlink methods
-
-    const startOperation = () => {
-      this._operations++;
-      if (this._operations == 1)
-        forEachEditor((cm) => cm.startOperation());
-    };
-
-    const endOperation = () => {
-      this._operations--;
-      if (this._operations == 0) {
-        forEachEditor((cm) => cm.endOperation());
-        this.shrink();
+  /* Close Operation */
+  private doClose() {
+    const tag = this.stacked.pop();
+    const doc = this.document;
+    if (tag) {
+      const { id, hover, start, className } = tag;
+      const stop = doc.posFromIndex(Infinity);
+      var markerId;
+      if (id || hover) {
+        markerId = 'dome-xHover-' + (this.markid++);
+        const p = doc.indexFromPos(start);
+        const q = doc.indexFromPos(stop);
+        const cmark = {
+          id,
+          classNameId: markerId,
+          hover: hover ?? (id !== undefined),
+          length: q - p,
+        };
+        this.cssmarkers.set(markerId, cmark);
       }
-    };
+      const fullClassName = [
+        'dome-xMarked',
+        id && ('dome-xMark-' + id),
+        markerId,
+        className,
+      ].filter((s) => !!s).join(' ');
+      const options = {
+        shared: true,
+        className: fullClassName,
+        ...tag.options,
+      };
+      const marker = doc.markText(start, stop, options);
+      if (id) {
+        const markers = this.textmarkers;
+        const ms = markers.get(id);
+        if (ms === undefined)
+          markers.set(id, [marker]);
+        else
+          ms.push(marker);
+      }
+    }
+  }
 
-    return Promise.resolve()
-      .then(startOperation)
-      .then(job)
-      .finally(endOperation);
+  /* Scroll Operation */
+  private doScroll(position: string | number | undefined) {
+    if (position === undefined) {
+      if (!this.focused)
+        this.emit('scroll', this.document.lastLine());
+    } else if (typeof position === 'number') {
+      this.emit('scroll', position);
+    } else if (typeof position === 'string') {
+      var line = Infinity;
+      this.findTextMarker(position).forEach((tm) => {
+        const rg = tm.find();
+        const ln = rg.from.line;
+        if (ln < line) line = ln;
+      });
+      if (line !== Infinity)
+        this.emit('scroll', line);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // --- Batched Operations
+  // --------------------------------------------------------------------------
+
+  private armBatch() {
+    setTimeout(this.doBatch, BATCH_DELAY);
+  }
+
+  private push(op: Update) {
+    this.updates.push(op);
+    if (!this.batched) {
+      this.armBatch();
+      this.batched = true;
+    }
+  }
+
+  /* Batch Operation */
+  private doBatch() {
+    try {
+      // Prepate Batch
+      const ops = this.updates.splice(0, BATCH_OPS);
+      if (ops.length === 0) return;
+      // Protect each start/end call against error
+      const forEachEditor = (fn: (cm: CodeMirror.Editor) => void) => {
+        this.editors.forEach((cm) => {
+          try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
+        });
+      };
+      // Start Operations
+      var scroll: Scroll | undefined;
+      forEachEditor((cm) => cm.startOperation());
+      // Run Operations
+      ops.forEach((op: Update) => {
+        switch (op.code) {
+          case 'append': this.doAppend(op.text); break;
+          case 'flushline': this.doFlushLine(); break;
+          case 'open': this.doOpen(op.props); break;
+          case 'close': this.doClose(); break;
+          case 'scroll': scroll = op; break;
+        }
+      });
+      // Finalize Operations
+      this.doShrink();
+      forEachEditor((cm) => cm.endOperation());
+      if (scroll) this.doScroll(scroll.position);
+    } finally {
+      if (this.updates.length > 0)
+        this.armBatch();
+      else
+        this.batched = false;
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -589,7 +612,6 @@ export class RichTextBuffer extends Emitter {
 
   /**
      Print text containing tags into buffer.
-     It is recommended to call this method within an [[operation]].
 
      @param implicitTag - when true,
      uses the first element of arrays as an marker identifier for the
