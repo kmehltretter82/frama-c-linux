@@ -236,8 +236,10 @@ Prove: false.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'compare':
-  /*@ behavior typed: requires \separated(&p,q+(..)); */
+  /*@ behavior typed:
+        requires \separated(q + (..), &p); */
   void compare(int *q);
 [wp] Warning: Memory model hypotheses for function 'absurd':
-  /*@ behavior typed: requires \separated(&p,q+(..)); */
+  /*@ behavior typed:
+        requires \separated(q + (..), &p); */
   void absurd(int *q);

@@ -101,8 +101,10 @@
   array_in_struct_param     2        -        2       100%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'ref_bd':
-  /*@ behavior typed_ref: requires \valid(q); */
+  /*@ behavior typed_ref:
+        requires \valid(q); */
   int ref_bd(int *q);
 [wp] Warning: Memory model hypotheses for function 'g':
-  /*@ behavior typed_ref: requires \valid(pg); */
+  /*@ behavior typed_ref:
+        requires \valid(pg); */
   int g(int *pg);

@@ -17,5 +17,6 @@
   g3                        1        2        3       100%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f3':
-  /*@ behavior typed: requires \separated(&p->a,&p); */
+  /*@ behavior typed:
+        requires \separated(&p->a, &p); */
   void f3(void);

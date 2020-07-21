@@ -40,13 +40,11 @@ let pp_param fmt = function
 (* -------------------------------------------------------------------------- *)
 
 open Cil_types
-open Cil_datatype
 
 type zone =
   | Var of varinfo   (* &x     - the cell x *)
   | Ptr of varinfo   (* p      - the cell pointed by p *)
   | Arr of varinfo   (* p+(..) - the cell and its neighbors pointed by p *)
-  | Term of term
 
 type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
@@ -54,106 +52,6 @@ type partition = {
   context : zone list ; (* [ p+(..), ... ] *)
   assigned: identified_term list (* Must refer to pointed locations *)
 }
-
-type clause = Valid of zone | Separated of zone list list
-
-(* -------------------------------------------------------------------------- *)
-
-let is_separated_true = function [] | [_] -> true | _ -> false
-
-(* -------------------------------------------------------------------------- *)
-let pp_zone fmt = function
-  | Arr vi -> Format.fprintf fmt "%a+(..)" Varinfo.pretty vi
-  | Ptr vi -> Varinfo.pretty fmt vi
-  | Var vi -> Format.fprintf fmt "&%a" Varinfo.pretty vi
-  | Term t -> Format.fprintf fmt "%a" Cil_printer.pp_term t
-
-let pp_region fmt = function
-  | [] -> Format.pp_print_string fmt "\\empty"
-  | [z] -> pp_zone fmt z
-  | z::zs ->
-      Format.fprintf fmt "@[<hov 2>\\union(%a" pp_zone z ;
-      List.iter (fun z -> Format.fprintf fmt ",@,%a" pp_zone z) zs ;
-      Format.fprintf fmt ")@]"
-
-let pp_separation fmt = function
-  | [] | [_]  -> Format.pp_print_string fmt "\\true"
-  | r::rs ->
-      Format.fprintf fmt "@[<hov 2>\\separated(%a" pp_region r ;
-      List.iter (fun r -> Format.fprintf fmt ",@,%a" pp_region r) rs ;
-      Format.fprintf fmt ")@]"
-
-let pp_clause fmt = function
-  | Separated sep -> Format.fprintf fmt "@ @[<hov 2>requires %a;@]" pp_separation sep
-  | Valid zone -> Format.fprintf fmt "@ @[<hov 2>requires \\valid(%a);@]" pp_zone zone
-
-(* -------------------------------------------------------------------------- *)
-(* --- Memory Context                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-let rec ptr_of = function
-  | Ctype t -> Ctype (TPtr(t, []))
-  | t when Logic_typing.is_set_type t ->
-      let t = Logic_typing.type_of_set_elem t in
-      Logic_const.make_set_type (ptr_of t)
-  | _ -> assert false
-
-let rec addr_of_lval ?loc term =
-  let typ = ptr_of term.term_type in
-  match term.term_node with
-  | TLval lv ->
-      Logic_utils.mk_logic_AddrOf ?loc lv typ
-  | TCastE (_, t) | TLogic_coerce (_, t) ->
-      addr_of_lval ?loc t
-  | Tif(c, t, e) ->
-      let t = addr_of_lval ?loc t in
-      let e = addr_of_lval ?loc e in
-      Logic_const.term ?loc (Tif(c, t, e)) typ
-  | Tat( _, _) ->
-      term
-  | Tunion l ->
-      let l = List.map (addr_of_lval ?loc) l in
-      Logic_const.term ?loc (Tunion l) typ
-  | Tinter l ->
-      let l = List.map (addr_of_lval ?loc) l in
-      Logic_const.term ?loc (Tinter l) typ
-  | Tcomprehension (t, qs, p) ->
-      let t = addr_of_lval ?loc t in
-      Logic_const.term ?loc (Tcomprehension (t,qs,p)) typ
-  | _ -> term
-
-let add_region r s = if r = [] then s else r::s
-
-let main_separation partition =
-  let separated =
-    List.rev @@
-    add_region (List.rev partition.to_heap) @@
-    add_region (List.rev partition.globals) @@
-    List.map (fun z -> [z]) partition.context
-  in
-  Separated separated
-
-let assigns_separation partition =
-  if partition.globals = [] then []
-  else
-    let assign_zone t = Term (addr_of_lval t.it_content) in
-    List.map
-      (fun t -> Separated ([[assign_zone t]] @ [ partition.globals ]))
-      partition.assigned
-
-let validity partition =
-  List.rev @@ List.map (fun z -> Valid z) partition.context
-
-let requires partition =
-  let ms = main_separation partition in
-  let ass_sep = assigns_separation partition in
-  let not_trivial_separation = function
-    | Separated s -> not (is_separated_true s)
-    | Valid _ -> false
-  in
-  let s = List.filter not_trivial_separation (ms :: ass_sep) in
-  let v = validity partition in
-  s @ v
 
 (* -------------------------------------------------------------------------- *)
 (* --- Partition                                                          --- *)
@@ -205,3 +103,189 @@ let assigned t w =
   { w with assigned = assigned }
 
 (* -------------------------------------------------------------------------- *)
+(* ANNOTS                                                                     *)
+(* -------------------------------------------------------------------------- *)
+
+open Logic_const
+
+
+let rec ptr_of = function
+  | Ctype t -> Ctype (TPtr(t, []))
+  | t when Logic_typing.is_set_type t ->
+      let t = Logic_typing.type_of_set_elem t in
+      Logic_const.make_set_type (ptr_of t)
+  | _ -> assert false
+
+let rec addr_of_lval ?loc term =
+  let typ = ptr_of term.term_type in
+  match term.term_node with
+  | TLval lv ->
+      Logic_utils.mk_logic_AddrOf ?loc lv typ
+  | TCastE (_, t) | TLogic_coerce (_, t) ->
+      addr_of_lval ?loc t
+  | Tif(c, t, e) ->
+      let t = addr_of_lval ?loc t in
+      let e = addr_of_lval ?loc e in
+      Logic_const.term ?loc (Tif(c, t, e)) typ
+  | Tat( _, _) ->
+      term
+  | Tunion l ->
+      let l = List.map (addr_of_lval ?loc) l in
+      Logic_const.term ?loc (Tunion l) typ
+  | Tinter l ->
+      let l = List.map (addr_of_lval ?loc) l in
+      Logic_const.term ?loc (Tinter l) typ
+  | Tcomprehension (t, qs, p) ->
+      let t = addr_of_lval ?loc t in
+      Logic_const.term ?loc (Tcomprehension (t,qs,p)) typ
+  | _ -> term
+
+let type_of_zone = function
+  | Ptr vi -> vi.vtype
+  | Var vi -> TPtr(vi.vtype, [])
+  | Arr vi when Cil.isPointerType vi.vtype -> vi.vtype
+  | Arr vi -> TPtr(Cil.typeOf_array_elem vi.vtype, [])
+
+let zone_to_term ?(to_char=false) loc zone =
+  let typ = Ctype (type_of_zone zone) in
+  let lval vi = TVar (Cil.cvar_to_lvar vi), TNoOffset in
+  let loc_range ptr =
+    if not to_char then ptr
+    else
+      let pointed =
+        match typ with
+        | (Ctype (TPtr (t, []))) -> t
+        | _ -> assert false (* typ has been generated by type_of_zone *)
+      in
+      let len = Logic_utils.expr_to_term (Cil.sizeOf ~loc pointed) in
+      let last = term (TBinOp(MinusA, len, tinteger ~loc 1)) len.term_type in
+      let range = trange ~loc (Some (tinteger ~loc 0), Some last) in
+      let ptr = Logic_utils.mk_cast ~loc Cil.charPtrType ptr in
+      term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
+  in
+  match zone with
+  | Var vi -> loc_range (term ~loc (TAddrOf(lval vi)) typ)
+  | Ptr vi -> loc_range (term ~loc (TLval(lval vi)) typ)
+  | Arr vi ->
+      let ptr =
+        if Cil.isArrayType vi.vtype
+        then term ~loc (TStartOf (lval vi)) typ
+        else term ~loc (TLval(lval vi)) typ
+      in
+      let ptr =
+        if not to_char then ptr
+        else Logic_utils.mk_cast ~loc Cil.charPtrType ptr
+      in
+      let range = trange ~loc (None, None) in
+      term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
+
+let region_to_term loc = function
+  | [] -> term ~loc Tempty_set (Ctype Cil.charPtrType)
+  | [z] -> zone_to_term loc z
+  | x :: tl as l ->
+      let fst = type_of_zone x in
+      let tl = List.map type_of_zone tl in
+      let to_char = not (List.for_all (Cil_datatype.Typ.equal fst) tl) in
+      let set_typ =
+        make_set_type (Ctype (if to_char then Cil.charPtrType else fst))
+      in
+      term ~loc (Tunion (List.map (zone_to_term ~to_char loc) l)) set_typ
+
+let separated_list ?loc = function
+  | [] | [ _ ] -> ptrue
+  | l -> pseparated ?loc l
+
+let separated_from_term loc assigned l =
+  separated_list ~loc (assigned :: List.map (region_to_term loc) l)
+
+let separated_from_addr loc assigned =
+  separated_from_term loc (addr_of_lval ~loc assigned.it_content)
+
+let valid_region loc r =
+  let t = region_to_term loc r in
+  pvalid ~loc (here_label, t)
+
+let global_zones partition =
+  List.map (fun z -> [z]) partition.globals
+
+let context_zones partition =
+  List.map (fun z -> [z]) partition.context
+
+let heap_zones partition =
+  let comp a b = Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
+  List.sort comp partition.to_heap
+
+(* Note that this function does not return separated zone lists, but well-typed
+   zone lists.
+*)
+let heaps partition =
+  let rec partition_by_type t acc l =
+    match l, acc with
+    | [], _ ->
+        acc
+    | x :: l, [] ->
+        partition_by_type (type_of_zone x) [[x]] l
+    | x :: l, p :: acc' when Cil_datatype.Typ.equal t (type_of_zone x) ->
+        partition_by_type t ((x :: p) :: acc') l
+    | x :: l, acc ->
+        partition_by_type (type_of_zone x) ([x] :: acc) l
+  in
+  partition_by_type Cil.voidType [] (heap_zones partition)
+
+let main_separation loc globals context heaps =
+  match heaps, context with
+  | [], [] ->
+      (* In this case, separation is completely trivial *)
+      [ ptrue ]
+  | [], context ->
+      let zones = globals @ context in
+      [ separated_list ~loc (List.map (region_to_term loc) zones) ]
+  | heaps, context ->
+      let for_typed_heap h =
+        let zones = h :: globals @ context in
+        separated_list ~loc (List.map (region_to_term loc) zones)
+      in
+      List.map for_typed_heap heaps
+
+let clauses_of_partition loc p =
+  let globals = global_zones p in
+  let filter p = not (Logic_utils.is_trivially_true p) in
+  let main_sep =
+    main_separation loc globals (context_zones p) (heaps p)
+  in
+  let assigns_sep =
+    List.map (fun t -> separated_from_addr loc t globals) p.assigned
+  in
+  let context_validity =
+    List.map (valid_region loc) (context_zones p)
+  in
+  let reqs = main_sep @ assigns_sep @ context_validity in
+  let reqs = List.filter filter reqs in
+  let reqs = List.sort_uniq Logic_utils.compare_predicate reqs in
+  reqs, []
+
+let emitter =
+  Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
+
+let get_behavior kf name partition =
+  let loc = Kernel_function.get_location kf in
+  let reqs,enss = clauses_of_partition loc partition in
+  let reqs = List.map Logic_const.new_predicate reqs in
+  let enss = List.map (fun p -> Normal, Logic_const.new_predicate p) enss in
+  match reqs,enss with
+  | [], [] -> None
+  | l1, l2 ->
+      Some {
+        b_name = name ;
+        b_requires = l1 ;
+        b_assumes = [] ;
+        b_post_cond = l2 ;
+        b_assigns = WritesAny ;
+        b_allocation = FreeAllocAny ;
+        b_extended = []
+      }
+
+let add_behavior kf name partition =
+  match get_behavior kf name partition with
+  | None -> ()
+  | Some bhv -> Annotations.add_behaviors emitter kf [bhv]

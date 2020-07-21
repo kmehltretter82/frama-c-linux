@@ -71,5 +71,6 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'job_struct_assigns':
-  /*@ behavior typed: requires \separated(&sv,p); */
+  /*@ behavior typed:
+        requires \separated(p, &sv); */
   void job_struct_assigns(struct st_v *p);

@@ -28,5 +28,6 @@
   absurd                    -        -        2       0.0%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'absurd':
-  /*@ behavior typed: requires \separated(&p,q+(..)); */
+  /*@ behavior typed:
+        requires \separated(q + (..), &p); */
   void absurd(int *q);

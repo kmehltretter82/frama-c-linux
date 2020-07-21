@@ -403,11 +403,15 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'load_1_5':
-  /*@ behavior typed_ref: requires \separated(reg_load+(..),lp+(..)); */
+  /*@
+     behavior typed_ref:
+       requires \separated(lp + (..), (int *)reg_load + (..));
+     */
   void load_1_5(int (*lp)[5]);
 [wp] Warning: Memory model hypotheses for function 'add_1_5':
   /*@
      behavior typed_ref:
-     requires \separated(\union(reg_load+(..),reg_add+(..)),ap+(..));
+       requires
+         \separated(ap + (..), (int *)reg_add + (..), (int *)reg_load + (..));
      */
   void add_1_5(int (*ap)[5]);

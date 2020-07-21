@@ -89,13 +89,11 @@ let wp_iter_model ?ip ?index job =
     Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
   end
 
-let wp_print_memory_context kf m hyp fmt =
+let wp_print_memory_context kf bhv fmt =
   begin
     let printer = new Printer.extensible_printer () in
     let pp_vdecl = printer#without_annot printer#vdecl in
-    Format.fprintf fmt
-      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (WpContext.MODEL.id m) ;
-    List.iter (MemoryContext.pp_clause fmt) hyp ;
+    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
     let vkf = Kernel_function.get_vi kf in
     Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
       pp_vdecl vkf ;
@@ -106,13 +104,16 @@ let wp_warn_memory_context () =
     wp_iter_model
       begin fun kf m ->
         let partition = WpContext.compute_hypotheses m kf in
-        let hyp = MemoryContext.requires partition in
-        if hyp <> [] then
+        let model = WpContext.MODEL.id m in
+        let hyp = MemoryContext.get_behavior kf model partition in
+        match hyp with
+        | None -> ()
+        | Some bhv ->
           Wp_parameters.warning
             ~current:false
             "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
             (Kernel_function.get_name kf)
-            (wp_print_memory_context kf m hyp)
+            (wp_print_memory_context kf bhv)
       end
   end
 
