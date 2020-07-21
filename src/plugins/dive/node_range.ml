@@ -82,13 +82,15 @@ let evaluate cvalue typ =
     | TInt (ikind,_) ->
       begin match Ival.min_and_max (Cvalue.V.project_ival cvalue) with
         | Some l, Some u -> integer_range ikind l u
-        | _, _ | exception Cvalue.V.Not_based_on_null -> Wide
+        | _, _ -> Wide
+        | exception Cvalue.V.Not_based_on_null -> Wide
         | exception Abstract_interp.Error_Bottom -> Empty
       end
     | TFloat (fkind,_) ->
       begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
         | Some (l, u), _can_be_nan -> float_range fkind l u
-        | _, _ | exception Cvalue.V.Not_based_on_null -> Wide
+        | _, _ -> Wide
+        | exception Cvalue.V.Not_based_on_null -> Wide
         | exception Abstract_interp.Error_Bottom -> Empty
       end
     | _ ->
