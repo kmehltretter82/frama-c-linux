@@ -1235,8 +1235,8 @@ and user-friendly way.
 
 As a general rule, you should \emph{never} write to standard output
 and error channels through \ocaml standard libraries. For instance,
-you should never use \texttt{Pervasives.stdout} and
-\texttt{Pervasives.stderr} channels, nor \texttt{Format.printf}-like
+you should never use \texttt{Stdlib.stdout} and
+\texttt{Stdlib.stderr} channels, nor \texttt{Format.printf}-like
 routines.
 
 Instead, you should use \texttt{Format.fprintf} to implement
@@ -1615,7 +1615,7 @@ allows you to create such channels for your own purposes.
 
 Basically, \emph{channels} ensure that no message emission interfere
 with each others during echo on standard output. Hence the forbidden
-direct access to \lstinline{Pervasives.stdout}. However,
+direct access to \lstinline{Stdlib.stdout}. However,
 \lstinline{Log} interface allows you to create such channels on your
 own, in addition to the one automatically created for your plug-in.
 
@@ -1665,7 +1665,7 @@ another channel:
 \end{description}
 
 It is also possible to have a momentary direct access to
-\lstinline{Pervasives.stdout}, or whatever its redirection is:
+\lstinline{Stdlib.stdout}, or whatever its redirection is:
 \begin{description}
 %%item
   \logroutine{print\_on\_output}{ "..."}%
@@ -1843,7 +1843,7 @@ module AB =
            (Structural_desr.Sum [| [| Structural_descr.p_int |] |])
        (* equality, compare and hash are the standard OCaml ones *)
        let equal (x:t) y = x = y
-       let compare (x:t) y = Pervasives.compare x y
+       let compare (x:t) y = Stdlib.compare x y
        let hash (x:t) = Hashtbl.hash x
        (* the type ab is a standard functional type, thus copying and rehashing
           are simply identity. Rehashing is used when marshaling. *)
@@ -1967,7 +1967,7 @@ module Poly_ab =
          | A _, B _ | B _, A _ -> false
        let mk_compare f x y =  match x, y with
          | A x, A y -> f x y
-         | B x, B y -> Pervasives.compare x y
+         | B x, B y -> Stdlib.compare x y
          | A _, B _ -> 1
          | B _, A _ -> -1
       let mk_hash f = function A x -> f x | B x -> 257 * x

@@ -66,10 +66,10 @@ module type S_no_copy = sig
   (** List of representants of the descriptor. *)
 
   val equal: t -> t -> bool
-  (** Equality: same spec than [Pervasives.(=)]. *)
+  (** Equality: same spec than [Stdlib.(=)]. *)
 
   val compare: t -> t -> int
-  (** Comparison: same spec than [Pervasives.compare]. *)
+  (** Comparison: same spec than [Stdlib.compare]. *)
 
   val hash: t -> int
   (** Hash function: same spec than [Hashtbl.hash]. *)

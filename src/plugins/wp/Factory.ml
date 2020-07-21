@@ -34,7 +34,7 @@ type setup = {
   cfloat : Cfloat.model ;
 }
 
-(*[LC] All types in [model] must be Pervasives-comparable *)
+(*[LC] All types in [model] must be Stdlib-comparable *)
 
 type driver = LogicBuiltins.driver
 
