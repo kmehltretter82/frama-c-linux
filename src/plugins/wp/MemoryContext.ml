@@ -46,11 +46,13 @@ type zone =
   | Var of varinfo   (* &x     - the cell x *)
   | Ptr of varinfo   (* p      - the cell pointed by p *)
   | Arr of varinfo   (* p+(..) - the cell and its neighbors pointed by p *)
+  | Term of term
 
 type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
   to_heap : zone list ; (* [ p, ... ] *)
   context : zone list ; (* [ p+(..), ... ] *)
+  assigned: identified_term list (* Must refer to pointed locations *)
 }
 
 type clause = Valid of zone | Separated of zone list list
@@ -64,6 +66,7 @@ let pp_zone fmt = function
   | Arr vi -> Format.fprintf fmt "%a+(..)" Varinfo.pretty vi
   | Ptr vi -> Varinfo.pretty fmt vi
   | Var vi -> Format.fprintf fmt "&%a" Varinfo.pretty vi
+  | Term t -> Format.fprintf fmt "%a" Cil_printer.pp_term t
 
 let pp_region fmt = function
   | [] -> Format.pp_print_string fmt "\\empty"
@@ -87,21 +90,70 @@ let pp_clause fmt = function
 (* -------------------------------------------------------------------------- *)
 (* --- Memory Context                                                     --- *)
 (* -------------------------------------------------------------------------- *)
+
+let rec ptr_of = function
+  | Ctype t -> Ctype (TPtr(t, []))
+  | t when Logic_typing.is_set_type t ->
+      let t = Logic_typing.type_of_set_elem t in
+      Logic_const.make_set_type (ptr_of t)
+  | _ -> assert false
+
+let rec addr_of_lval ?loc term =
+  let typ = ptr_of term.term_type in
+  match term.term_node with
+  | TLval lv ->
+      Logic_utils.mk_logic_AddrOf ?loc lv typ
+  | TCastE (_, t) | TLogic_coerce (_, t) ->
+      addr_of_lval ?loc t
+  | Tif(c, t, e) ->
+      let t = addr_of_lval ?loc t in
+      let e = addr_of_lval ?loc e in
+      Logic_const.term ?loc (Tif(c, t, e)) typ
+  | Tat( _, _) ->
+      term
+  | Tunion l ->
+      let l = List.map (addr_of_lval ?loc) l in
+      Logic_const.term ?loc (Tunion l) typ
+  | Tinter l ->
+      let l = List.map (addr_of_lval ?loc) l in
+      Logic_const.term ?loc (Tinter l) typ
+  | Tcomprehension (t, qs, p) ->
+      let t = addr_of_lval ?loc t in
+      Logic_const.term ?loc (Tcomprehension (t,qs,p)) typ
+  | _ -> term
+
 let add_region r s = if r = [] then s else r::s
 
-let separated partition =
-  List.rev @@
-  add_region (List.rev partition.to_heap) @@
-  add_region (List.rev partition.globals) @@
-  List.map (fun z -> [z]) partition.context
+let main_separation partition =
+  let separated =
+    List.rev @@
+    add_region (List.rev partition.to_heap) @@
+    add_region (List.rev partition.globals) @@
+    List.map (fun z -> [z]) partition.context
+  in
+  Separated separated
+
+let assigns_separation partition =
+  if partition.globals = [] then []
+  else
+    let assign_zone t = Term (addr_of_lval t.it_content) in
+    List.map
+      (fun t -> Separated ([[assign_zone t]] @ [ partition.globals ]))
+      partition.assigned
 
 let validity partition =
   List.rev @@ List.map (fun z -> Valid z) partition.context
 
 let requires partition =
-  let s = separated partition in
+  let ms = main_separation partition in
+  let ass_sep = assigns_separation partition in
+  let not_trivial_separation = function
+    | Separated s -> not (is_separated_true s)
+    | Valid _ -> false
+  in
+  let s = List.filter not_trivial_separation (ms :: ass_sep) in
   let v = validity partition in
-  if not (is_separated_true s) then Separated s :: v else v
+  s @ v
 
 (* -------------------------------------------------------------------------- *)
 (* --- Partition                                                          --- *)
@@ -111,6 +163,7 @@ let empty = {
   globals = [] ;
   context = [] ;
   to_heap = [] ;
+  assigned = [] ;
 }
 
 let set x p w =
@@ -134,5 +187,21 @@ let set x p w =
         let z = if p = ByShift then Arr x else Ptr x in
         { w with to_heap = z :: w.to_heap }
       else w
+
+let assigned t w =
+  let rec assigned_via_pointer t =
+    match t.term_node with
+    | TLval (TMem _, _) -> true
+    | Tif (_, t, _) | Tat (t, _)
+    | TCastE (_, t) | TLogic_coerce (_, t)
+    | Tunion (t :: _) | Tinter (t :: _)
+    | Tcomprehension(t, _, _) -> assigned_via_pointer t
+    | _ -> false
+  in
+  let assigned =
+    if assigned_via_pointer t.it_content then t :: w.assigned
+    else w.assigned
+  in
+  { w with assigned = assigned }
 
 (* -------------------------------------------------------------------------- *)

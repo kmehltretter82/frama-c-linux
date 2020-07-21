@@ -255,3 +255,6 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'reset':
   /*@ behavior typed_ref: requires \valid(p); */
   void reset(struct T *p);
+[wp] Warning: Memory model hypotheses for function 'call_reset_5_tps':
+  /*@ behavior typed_ref: requires \separated(tps[9] + (0 .. 4),tps+(..)); */
+  void call_reset_5_tps(void);
