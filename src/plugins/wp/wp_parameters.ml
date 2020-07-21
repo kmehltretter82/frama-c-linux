@@ -1011,6 +1011,10 @@ module MemoryContext =
       let help = "Warn Against Memory Model Hypotheses"
     end)
 
+let wkey_imprecise_hypotheses_assigns =
+  register_warn_category "hypotheses:assigns"
+let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
+
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
   String(struct

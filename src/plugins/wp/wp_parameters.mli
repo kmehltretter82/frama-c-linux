@@ -152,6 +152,8 @@ module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
 
+val wkey_imprecise_hypotheses_assigns: warn_category
+
 (** {2 Getters} *)
 
 val has_out : unit -> bool
