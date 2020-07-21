@@ -121,8 +121,8 @@ Prove: true.
      behavior typed:
        requires
          \separated(
-           error, (int *)service_result + (..), (int *)service_id + (..),
-           &service_cpt, &seq
+           error, (int *)service_id + (..), (int *)service_result + (..), &seq,
+           &service_cpt
            );
      */
   int job(int a, int b, int *error);

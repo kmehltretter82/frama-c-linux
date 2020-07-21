@@ -101,7 +101,7 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'job':
   /*@
      behavior typed_caveat:
-       requires \separated(b + (..), p);
+       requires \separated(p, b + (..));
        requires \valid(b + (..));
        requires \valid(p);
      */

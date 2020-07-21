@@ -259,6 +259,6 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'call_reset_5_tps':
   /*@
      behavior typed_ref:
-       requires \separated(tps[9] + (0 .. 4), (struct T **)tps + (..));
+       requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
      */
   void call_reset_5_tps(void);

@@ -30,7 +30,7 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'duplet':
   /*@
      behavior typed_ref:
-       requires \separated(a + (..), pj, pi);
+       requires \separated(pi, pj, a + (..));
        requires \valid(pi);
        requires \valid(pj);
      */

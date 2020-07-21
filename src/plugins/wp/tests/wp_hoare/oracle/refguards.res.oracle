@@ -72,7 +72,7 @@ Prove: d != c.
 [wp] Warning: Memory model hypotheses for function 'f':
   /*@
      behavior typed_ref:
-       requires \separated({a + (..), b + (..)}, d, c);
+       requires \separated(c, d, {a + (..), b + (..)});
        requires \valid(c);
        requires \valid(d);
      */
@@ -80,7 +80,7 @@ Prove: d != c.
 [wp] Warning: Memory model hypotheses for function 'h':
   /*@
      behavior typed_ref:
-       requires \separated(d, c);
+       requires \separated(c, d);
        requires \valid(c);
        requires \valid(d);
      */
@@ -88,7 +88,7 @@ Prove: d != c.
 [wp] Warning: Memory model hypotheses for function 's':
   /*@
      behavior typed_ref:
-       requires \separated(d, c);
+       requires \separated(c, d);
        requires \valid(c);
        requires \valid(d);
      */

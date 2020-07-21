@@ -69,18 +69,18 @@ Prove: true.
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f2_p_a':
   /*@ behavior typed_caveat:
-        requires \separated(&a, p);
+        requires \separated(p, &a);
         requires \valid(p); */
   void f2_p_a(int *p);
 [wp] Warning: Memory model hypotheses for function 'f3_p_ab':
   /*@ behavior typed_caveat:
-        requires \separated(&b, &a, p);
+        requires \separated(p, &a, &b);
         requires \valid(p); */
   void f3_p_ab(int *p);
 [wp] Warning: Memory model hypotheses for function 'f4_pq_ab':
   /*@
      behavior typed_caveat:
-       requires \separated(&b, &a, q, p);
+       requires \separated(p, q, &a, &b);
        requires \valid(p);
        requires \valid(q);
      */
@@ -88,7 +88,7 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'f5_pq':
   /*@
      behavior typed_caveat:
-       requires \separated(q, p);
+       requires \separated(p, q);
        requires \valid(p);
        requires \valid(q);
      */
@@ -96,14 +96,14 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'f6_Pa':
   /*@
      behavior typed_caveat:
-       requires \separated(&a, p + (..));
+       requires \separated(p + (..), &a);
        requires \valid(p + (..));
      */
   void f6_Pa(int *p, int k);
 [wp] Warning: Memory model hypotheses for function 'f7_pq_ad':
   /*@
      behavior typed_caveat:
-       requires \separated(&d, &a, q, p);
+       requires \separated(p, q, &a, &d);
        requires \valid(p);
        requires \valid(q);
      */
@@ -111,7 +111,7 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'f8_pq_a':
   /*@
      behavior typed_caveat:
-       requires \separated(&a, q, p);
+       requires \separated(p, q, &a);
        requires \valid(p);
        requires \valid(q);
      */

@@ -197,7 +197,7 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'global_alias':
   /*@
      behavior typed:
-       requires \separated(g_alias, &g_alias, (int *)global + (..));
+       requires \separated(g_alias, (int *)global + (..), &g_alias);
      */
   void global_alias(void);
 [wp] Warning: Memory model hypotheses for function 'global_no_alias':
@@ -211,29 +211,29 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'formal_alias_array':
   /*@
      behavior typed:
-       requires \separated(&(*alias_array)[0 .. 1], (int *)global + (..));
+       requires \separated((int *)global + (..), &(*alias_array)[0 .. 1]);
        requires \separated(alias_array + (..), (int *)global + (..));
      */
   void formal_alias_array(int (*alias_array)[2]);
 [wp] Warning: Memory model hypotheses for function 'field_alias':
   /*@
      behavior typed:
-       requires \separated(&x->x, (int *)global + (..));
+       requires \separated((int *)global + (..), &x->x);
        requires \separated(x, (int *)global + (..));
      */
   void field_alias(struct X *x);
 [wp] Warning: Memory model hypotheses for function 'field_range_alias':
   /*@
      behavior typed:
-       requires \separated(&(x + (0 .. 3))->x, (int *)global + (..));
+       requires \separated((int *)global + (..), &(x + (0 .. 3))->x);
        requires \separated(x + (..), (int *)global + (..));
      */
   void field_range_alias(struct X *x);
 [wp] Warning: Memory model hypotheses for function 'set_alias':
   /*@
      behavior typed:
-       requires \separated({g_alias, f_alias}, &g_alias, (int *)global + (..));
-       requires \separated(f_alias, &g_alias, (int *)global + (..));
+       requires \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
+       requires \separated(f_alias, (int *)global + (..), &g_alias);
      */
   void set_alias(int *f_alias);
 [wp] Warning: Memory model hypotheses for function 'comprehension_alias':
@@ -241,15 +241,15 @@ Prove: true.
      behavior typed:
        requires
          \separated(
-           {alias | int *alias; alias ≡ \at(g_alias,Pre)}, &g_alias,
-           (int *)global + (..)
+           (int *)global + (..), &g_alias,
+           {alias | int *alias; alias ≡ \at(g_alias,Pre)}
            );
      */
   void comprehension_alias(void);
 [wp] Warning: Memory model hypotheses for function 'union_alias':
   /*@
      behavior typed:
-       requires \separated({g_alias, f_alias}, &g_alias, (int *)global + (..));
-       requires \separated(f_alias, &g_alias, (int *)global + (..));
+       requires \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
+       requires \separated(f_alias, (int *)global + (..), &g_alias);
      */
   void union_alias(int *f_alias);

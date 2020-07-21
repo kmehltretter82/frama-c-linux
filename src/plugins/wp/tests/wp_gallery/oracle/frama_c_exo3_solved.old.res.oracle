@@ -56,7 +56,7 @@
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
      behavior typed_ref:
-       requires \separated(a + (..), v2, v1);
+       requires \separated(v1, v2, a + (..));
        requires \valid(v1);
        requires \valid(v2);
      */

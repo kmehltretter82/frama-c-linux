@@ -24,7 +24,7 @@
 [wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior typed:
-       requires \separated(dst, src);
+       requires \separated(src, dst);
        requires \valid(dst);
        requires \valid(src);
      */

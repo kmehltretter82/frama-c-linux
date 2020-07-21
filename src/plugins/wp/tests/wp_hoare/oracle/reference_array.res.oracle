@@ -412,6 +412,6 @@ Prove: true.
   /*@
      behavior typed_ref:
        requires
-         \separated(ap + (..), (int *)reg_add + (..), (int *)reg_load + (..));
+         \separated(ap + (..), (int *)reg_load + (..), (int *)reg_add + (..));
      */
   void add_1_5(int (*ap)[5]);

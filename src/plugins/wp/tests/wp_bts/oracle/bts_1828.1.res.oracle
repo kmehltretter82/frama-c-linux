@@ -48,7 +48,7 @@ Prove: global(L_two_24) != one_0.
 [wp] Warning: Memory model hypotheses for function 'global_frame':
   /*@
      behavior typed_ref:
-       requires \separated(one, zero);
+       requires \separated(zero, one);
        requires \valid(one);
        requires \valid(zero);
      */

@@ -72,7 +72,7 @@ Prove: P_OBS(x_2, x_3, x_4).
 [wp] Warning: Memory model hypotheses for function 'implicit':
   /*@
      behavior typed_caveat:
-       requires \separated(r, a);
+       requires \separated(a, r);
        requires \valid(a);
        requires \valid(r);
      */
@@ -80,7 +80,7 @@ Prove: P_OBS(x_2, x_3, x_4).
 [wp] Warning: Memory model hypotheses for function 'explicit':
   /*@
      behavior typed_caveat:
-       requires \separated(r, a);
+       requires \separated(a, r);
        requires \valid(a);
        requires \valid(r);
      */
@@ -88,7 +88,7 @@ Prove: P_OBS(x_2, x_3, x_4).
 [wp] Warning: Memory model hypotheses for function 'observer':
   /*@
      behavior typed_caveat:
-       requires \separated(r, a);
+       requires \separated(a, r);
        requires \valid(a);
        requires \valid(r);
      */
