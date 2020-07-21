@@ -307,6 +307,9 @@ let add_node context ~node_kind ~node_locality =
 
 let remove_node context node =
   let node_ref = (node.node_kind, node.node_locality.loc_callstack) in
+  let graph = context.graph in
+  Graph.iter_succ (fun n -> n.node_writes_computation <- NotDone) graph node;
+  Graph.iter_pred (fun n -> n.node_reads_computation <- NotDone) graph node;
   Graph.remove_node context.graph node;
   Index.remove context.vertex_table node.node_key;
   NodeTable.remove context.node_table node_ref;
@@ -357,8 +360,6 @@ let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
   let node_locality = build_node_locality callstack node_kind in
   add_node context ~node_kind ~node_locality
-
-
 
 
 let build_node_writes context node =
