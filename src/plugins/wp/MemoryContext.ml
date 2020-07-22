@@ -89,12 +89,17 @@ let set x p w =
 let assigned t w =
   let rec assigned_via_pointer t =
     match t.term_node with
-    | TLval (TMem _, _) -> true
-    | Tif (_, t, _) | Tat (t, _)
+    | TLval (TMem _, _) ->
+        true
     | TCastE (_, t) | TLogic_coerce (_, t)
-    | Tunion (t :: _) | Tinter (t :: _)
-    | Tcomprehension(t, _, _) -> assigned_via_pointer t
-    | _ -> false
+    | Tcomprehension(t, _, _) | Tat (t, _) ->
+        assigned_via_pointer t
+    | Tunion l | Tinter l ->
+        List.exists assigned_via_pointer l
+    | Tif (_, t1, t2) ->
+        assigned_via_pointer t1 || assigned_via_pointer t2
+    | _ ->
+        false
   in
   let assigned =
     if assigned_via_pointer t.it_content then t :: w.assigned
