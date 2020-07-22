@@ -135,7 +135,7 @@ const ASTview = () => {
 
   async function onContextMenu(id: key<'#markerInfo'>) {
     const items = [];
-    const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
+    const selectedMarkerInfo = markersInfo.getData(id);
     switch (selectedMarkerInfo?.kind) {
       case 'function': {
         items.push({

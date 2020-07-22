@@ -431,7 +431,7 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 const RenderTable = () => {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const data = States.useSyncArray(Properties.status);
+  const data = States.useSyncArray(Properties.status).getArray();
   useEffect(() => {
     model.removeAllData();
     model.updateData(data);

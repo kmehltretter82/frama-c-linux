@@ -130,11 +130,11 @@ struct
 	  match_s
 	  rel
         in
-        if StringSet.mem match_s known_types_names then
+        if String.Set.mem match_s known_types_names then
 	  "<a href=\"" ^ self#path match_s ^ Naming.complete_target Naming.mark_type
 	    match_s ^"\">" ^ s_final ^ "</a>"
         else
-	  if StringSet.mem match_s known_classes_names then
+	  if String.Set.mem match_s known_classes_names then
             let (html_file, _) = Naming.html_files match_s in
             "<a href=\""^ self#path html_file ^ html_file^"\">"^s_final^"</a>"
 	  else
@@ -158,7 +158,7 @@ struct
 	  match_s
 	  rel
         in
-        if StringSet.mem match_s known_modules_names then
+        if String.Set.mem match_s known_modules_names then
 	  let (html_file, _) = Naming.html_files match_s in
 	  "<a href=\"" ^ self#path match_s ^ html_file^"\">"^s_final^"</a>"
         else
@@ -287,7 +287,7 @@ struct
       let types = Odoc_info.Search.types module_list in
       known_types_names <-
         List.fold_left
-        (fun acc t -> StringSet.add t.Odoc_type.ty_name acc)
+        (fun acc t -> String.Set.add t.Odoc_type.ty_name acc)
         known_types_names
         types ;
 
@@ -296,12 +296,12 @@ struct
       let class_types = Odoc_info.Search.class_types module_list in
       known_classes_names <-
         List.fold_left
-        (fun acc c -> StringSet.add c.Odoc_class.cl_name acc)
+        (fun acc c -> String.Set.add c.Odoc_class.cl_name acc)
         known_classes_names
         classes ;
       known_classes_names <-
         List.fold_left
-        (fun acc ct -> StringSet.add ct.Odoc_class.clt_name acc)
+        (fun acc ct -> String.Set.add ct.Odoc_class.clt_name acc)
         known_classes_names
         class_types ;
 
@@ -310,12 +310,12 @@ struct
       let modules = Odoc_info.Search.modules module_list in
       known_modules_names <-
         List.fold_left
-        (fun acc m -> StringSet.add m.m_name acc)
+        (fun acc m -> String.Set.add m.m_name acc)
         known_modules_names
         modules ;
       known_modules_names <-
         List.fold_left
-        (fun acc mt -> StringSet.add mt.mt_name acc)
+        (fun acc mt -> String.Set.add mt.mt_name acc)
         known_modules_names
         module_types ;
 

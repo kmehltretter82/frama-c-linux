@@ -3,10 +3,9 @@
 // --------------------------------------------------------------------------
 
 /**
-   @packageDocumentation
-   @module frama-c/states
-   @decsription
-   Manage the current Frama-C project and projectified state values.
+ * Manage the current Frama-C project and projectified state values.
+ * @packageDocumentation
+ * @module frama-c/states
 */
 
 import React from 'react';
@@ -63,7 +62,8 @@ Server.onShutdown(() => {
 // --------------------------------------------------------------------------
 
 /**
-   Current Project (Custom React Hook).
+ * Current Project (Custom React Hook).
+ * @return The current project.
  */
 export function useProject() {
   Dome.useUpdate(PROJECT);
@@ -71,10 +71,12 @@ export function useProject() {
 }
 
 /**
-   Update Current Project.
-   Make all states switching to their projectified value.
-   Emits `PROJECT`.
-   @param project - the project identifier
+ * Update Current Project.
+ *
+ * Make all states switching to their projectified value.
+ *
+ * Emits `PROJECT`.
+ * @param project The project identifier.
  */
 export async function setProject(project: string) {
   if (Server.isRunning()) {
@@ -105,12 +107,12 @@ export interface UseRequestOptions<A> {
 }
 
 /**
-   Cached GET request (Custom React Hook).
-
-   Sends the specified GET request and returns its result.
-   The request is send asynchronously and cached until any change.
-
-   Null values in options mean that the last obtained value is kept.
+ * Cached GET request (Custom React Hook).
+ *
+ * Sends the specified GET request and returns its result. The request is send
+ * asynchronously and cached until any change.
+ *
+ * Null values in options mean that the last obtained value is kept.
  */
 export function useRequest<In, Out>(
   rq: Server.GetRequest<In, Out>,
@@ -255,7 +257,7 @@ class SyncState<A> {
       this.UPDATE.emit();
     } catch (error) {
       D.error(
-        `Fail to set value of syncState '${this.handler.name}'.`,
+        `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
     }
@@ -269,7 +271,7 @@ class SyncState<A> {
       this.UPDATE.emit();
     } catch (error) {
       D.error(
-        `Fail to update syncState '${this.handler.name}'.`,
+        `Fail to update SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
     }
@@ -298,9 +300,7 @@ Server.onShutdown(() => syncStates.clear());
 // --- Synchronized State Hooks
 // --------------------------------------------------------------------------
 
-/**
-   Synchronization with a (projectified) server state.
- */
+/** Synchronization with a (projectified) server state. */
 export function useSyncState<A>(
   st: State<A>,
 ): [A | undefined, (value: A) => void] {
@@ -310,9 +310,7 @@ export function useSyncState<A>(
   return [s.getValue(), s.setValue];
 }
 
-/**
-   Synchronization with a (projectified) server value.
- */
+/** Synchronization with a (projectified) server value. */
 export function useSyncValue<A>(va: Value<A>): A | undefined {
   const s = getSyncState(va);
   Dome.useUpdate(PROJECT, s.UPDATE);
@@ -417,46 +415,30 @@ Server.onShutdown(() => syncArrays.clear());
 // --- Synchronized Array Hooks
 // --------------------------------------------------------------------------
 
-/**
-   Force a Synchronized Array to Reload.
-*/
+/** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>) {
   getSyncArray(arr).reload();
 }
 
 /**
    Use Synchronized Array (Custom React Hook).
-   This React Hook is _not_ responsive to model updates, it only
-   returns the array model.
-   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
-   Array views automatically listen to model updates.
+
+   Unless specified, the hook makes the component re-render on every
+   update. Disabling this automatic re-rendering can be an option when
+   using the model to make a table view, which automatically synchronizes on
+   model updates.
+   @param sync Whether the component re-renders on updates (default is `true`).
  */
-export function useSyncModel<K, A>(
+export function useSyncArray<K, A>(
   arr: Array<K, A>,
+  sync = true,
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
   const st = getSyncArray(arr);
   React.useEffect(st.update);
   Server.useSignal(arr.signal, st.fetch);
+  useModel(st.model, sync);
   return st.model;
-}
-
-/**
-   Use Synchronized Array (Custom React Hook).
-   This React Hook is _not_ responsive to model updates, it only
-   returns the array model.
-   To listen to array updates, use `Models.useModel(model)` or `useSyncArray()`.
-   Array views automatically listen to model updates.
- */
-export function useSyncArray<K, A>(
-  arr: Array<K, A>,
-): A[] {
-  Dome.useUpdate(PROJECT);
-  const st = getSyncArray(arr);
-  React.useEffect(st.update);
-  Server.useSignal(arr.signal, st.fetch);
-  useModel(st.model);
-  return st.model.getArray();
 }
 
 // --------------------------------------------------------------------------
@@ -493,7 +475,7 @@ export interface HistorySelection {
  * - `HISTORY_NEXT` jumps to next history location
  *   (first in [[nextSelections]]).
  */
-type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
+export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
 
 /** A selection of multiple locations. */
 export interface MultipleSelection {
@@ -520,7 +502,7 @@ export interface NthSelect {
  * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
  * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
  */
-type MultipleSelectActions =
+export type MultipleSelectActions =
   MultipleSelect | NthSelect
   | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR';
 
@@ -701,9 +683,7 @@ const emptySelection = {
 const GlobalSelection = new GlobalState<Selection>(emptySelection);
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
-/**
-   Current selection.
- */
+/** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [selection, setSelection] = useGlobalState(GlobalSelection);
 
