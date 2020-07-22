@@ -258,7 +258,14 @@ let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
-    (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+    begin fun kf ->
+      let libc = Kernel.PrintLibc.get () in
+      if not libc then Kernel.PrintLibc.set true ;
+      let global = Kernel_function.get_global kf in
+      let ast = Jbuffer.to_json Printer.pp_global global in
+      if not libc then Kernel.PrintLibc.set false ;
+      ast
+    end
 
 module Functions =
 struct
