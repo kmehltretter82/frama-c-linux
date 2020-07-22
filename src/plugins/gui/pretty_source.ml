@@ -275,20 +275,14 @@ let localizable_from_locs state ~file ~line =
 let buffer_formatter state source =
   let starts = Stack.create () in
   let emit_open_tag s =
-    let s = match s with
-      | Format.String_tag tag -> tag
-      | _ -> raise (Invalid_argument "unsupported tag extension")
-    in
+    let s = Extlib.format_string_of_stag s in
     (* Ignore tags that are not ours *)
     if Extlib.string_prefix "guitag:" s then
       Stack.push (source#end_iter#offset, Tag.get s) starts ;
     ""
   in
   let emit_close_tag s =
-    let s = match s with
-      | Format.String_tag tag -> tag
-      | _ -> raise (Invalid_argument "unsupported tag extension")
-    in
+    let s = Extlib.format_string_of_stag s in
     (try
        if Extlib.string_prefix "guitag:" s then
          let (p,sid) = Stack.pop starts in

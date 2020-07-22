@@ -320,6 +320,13 @@ val strip_underscore: string -> string
 
 val html_escape: string -> string
 
+(** [format_string_of_stag stag] returns the string corresponding to [stag],
+    or raises an exception if the tag extension is unsupported.
+
+    @since Frama-C+dev
+ *)
+val format_string_of_stag: Format.stag -> string
+
 (* ************************************************************************* *)
 (** {2 Performance} *)
 (* ************************************************************************* *)

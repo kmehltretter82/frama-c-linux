@@ -41,10 +41,7 @@ let flush buffer () =
     Buffer.clear t
 
 let push_tag buffer stag =
-  let tag = match stag with
-    | Format.String_tag tag -> tag
-    | _ -> raise (Invalid_argument "unsupported tag extension")
-  in
+  let tag = Extlib.format_string_of_stag stag in
   flush buffer () ;
   buffer.stack <- ( tag , buffer.rjson ) :: buffer.stack ;
   buffer.rjson <- []

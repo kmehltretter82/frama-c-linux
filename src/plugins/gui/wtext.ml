@@ -244,10 +244,7 @@ class text ?(autoscroll=false) ?(width=80) ?(indent=60) () =
         end
 
     method private open_tag name =
-      let name = match name with
-        | Format.String_tag str -> str
-        | _ -> raise (Invalid_argument "unsupported tag extension")
-      in
+      let name = Extlib.format_string_of_stag name in
       self#flush () ; style <- self#tag name :: style ; ""
 
     method private close_tag _name =

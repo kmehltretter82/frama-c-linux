@@ -26,16 +26,10 @@ open Cil_types (* vname, vaddrof *)
 (* Formatting html with Format.formatters *)
 let html_stag_functions =
   let mark_open_stag t =
-    let t = match t with
-      | Format.String_tag tag -> tag
-      | _ -> raise (Invalid_argument "unsupported tag extension")
-    in
+    let t = Extlib.format_string_of_stag t in
     Format.sprintf "<%s>" t
   and mark_close_stag t =
-    let t = match t with
-      | Format.String_tag tag -> tag
-      | _ -> raise (Invalid_argument "unsupported tag extension")
-    in
+    let t = Extlib.format_string_of_stag t in
     try
       let index = String.index t ' ' in
       Format.sprintf "</%s>" (String.sub t 0 index)

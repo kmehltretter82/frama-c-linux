@@ -512,6 +512,10 @@ let html_escape s =
     ) s ;
   Buffer.contents buf
 
+let format_string_of_stag = function
+  | Format.String_tag tag -> tag
+  | _ -> raise (Invalid_argument "unsupported tag extension")
+
 (* ************************************************************************* *)
 (** Comparison functions *)
 (* ************************************************************************* *)
