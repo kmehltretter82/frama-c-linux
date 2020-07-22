@@ -109,13 +109,24 @@ let wp_warn_memory_context () =
         match hyp with
         | None -> ()
         | Some bhv ->
-          Wp_parameters.warning
-            ~current:false
-            "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-            (Kernel_function.get_name kf)
-            (wp_print_memory_context kf bhv)
+            Wp_parameters.warning
+              ~current:false
+              "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+              (Kernel_function.get_name kf)
+              (wp_print_memory_context kf bhv)
       end
   end
+
+let wp_insert_memory_context model =
+  begin
+    Globals.Functions.iter
+      begin fun kf ->
+        let hyp = WpContext.compute_hypotheses model kf in
+        let model_id = WpContext.MODEL.id model in
+        MemoryContext.add_behavior kf model_id hyp
+      end
+  end
+
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Printing informations                                           --- *)
@@ -802,6 +813,8 @@ let cmdline_run () =
         WpContext.on_context (computer#model,WpContext.Global)
           LogicBuiltins.dump ();
       end ;
+    if Wp_parameters.CheckModelHypotheses.get () then
+      wp_insert_memory_context computer#model ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   if Wp_parameters.CachePrint.get () then

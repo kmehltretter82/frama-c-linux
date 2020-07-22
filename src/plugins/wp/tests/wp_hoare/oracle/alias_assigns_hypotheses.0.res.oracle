@@ -7,18 +7,18 @@
   Function comprehension_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 85) in 'comprehension_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 90) in 'comprehension_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 86) in 'comprehension_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 91) in 'comprehension_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 84) in 'comprehension_alias':
-Effect at line 88
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 89) in 'comprehension_alias':
+Effect at line 93
 Prove: true.
 
 ------------------------------------------------------------
@@ -26,18 +26,18 @@ Prove: true.
   Function field_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 54) in 'field_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 59) in 'field_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 55) in 'field_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 60) in 'field_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 53) in 'field_alias':
-Effect at line 57
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 58) in 'field_alias':
+Effect at line 62
 Prove: true.
 
 ------------------------------------------------------------
@@ -45,18 +45,18 @@ Prove: true.
   Function field_range_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 66) in 'field_range_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 71) in 'field_range_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 67) in 'field_range_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 72) in 'field_range_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 65) in 'field_range_alias':
-Effect at line 69
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 70) in 'field_range_alias':
+Effect at line 74
 Prove: true.
 
 ------------------------------------------------------------
@@ -64,18 +64,18 @@ Prove: true.
   Function formal_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 25) in 'formal_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 30) in 'formal_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 26) in 'formal_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 31) in 'formal_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 24) in 'formal_alias':
-Effect at line 28
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 29) in 'formal_alias':
+Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
@@ -83,29 +83,29 @@ Prove: true.
   Function formal_alias_array
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 40) in 'formal_alias_array':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 45) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 41) in 'formal_alias_array':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 46) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 42) in 'formal_alias_array':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 47) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 39) in 'formal_alias_array' (1/2):
-Effect at line 44
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 44) in 'formal_alias_array' (1/2):
+Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 39) in 'formal_alias_array' (2/2):
-Effect at line 45
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 44) in 'formal_alias_array' (2/2):
+Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
@@ -113,13 +113,13 @@ Prove: true.
   Function formal_no_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 33) in 'formal_no_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 38) in 'formal_no_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 32) in 'formal_no_alias':
-Effect at line 35
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 37) in 'formal_no_alias':
+Effect at line 40
 Prove: true.
 
 ------------------------------------------------------------
@@ -127,18 +127,18 @@ Prove: true.
   Function global_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 10) in 'global_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 15) in 'global_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 11) in 'global_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 16) in 'global_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 9) in 'global_alias':
-Effect at line 13
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 14) in 'global_alias':
+Effect at line 18
 Prove: true.
 
 ------------------------------------------------------------
@@ -146,13 +146,13 @@ Prove: true.
   Function global_no_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 18) in 'global_no_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 23) in 'global_no_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 17) in 'global_no_alias':
-Effect at line 20
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 22) in 'global_no_alias':
+Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
@@ -160,18 +160,18 @@ Prove: true.
   Function set_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 74) in 'set_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 79) in 'set_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 75) in 'set_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 80) in 'set_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 73) in 'set_alias':
-Effect at line 77
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 78) in 'set_alias':
+Effect at line 82
 Prove: true.
 
 ------------------------------------------------------------
@@ -179,18 +179,18 @@ Prove: true.
   Function union_alias
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 95) in 'union_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 100) in 'union_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 96) in 'union_alias':
+Goal Post-condition (file tests/wp_hoare/alias_assigns_hypotheses.i, line 101) in 'union_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 94) in 'union_alias':
-Effect at line 98
+Goal Assigns (file tests/wp_hoare/alias_assigns_hypotheses.i, line 99) in 'union_alias':
+Effect at line 103
 Prove: true.
 
 ------------------------------------------------------------

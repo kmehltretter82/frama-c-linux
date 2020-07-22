@@ -1,3 +1,8 @@
+/* run.config
+   OPT:
+   OPT:-wp-no-warn-memory-model -wp-check-model-hypotheses -then -print
+*/
+
 /* run.config_qualif
 	 DONT_RUN:
 */

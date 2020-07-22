@@ -194,8 +194,8 @@ let region_to_term loc = function
 let separated_list ?loc = function
   | [] | [ _ ] -> ptrue
   | l ->
-    let comp = Cil_datatype.Term.compare in
-    pseparated ?loc (List.sort comp l)
+      let comp = Cil_datatype.Term.compare in
+      pseparated ?loc (List.sort comp l)
 
 let separated_from_term loc assigned l =
   separated_list ~loc (assigned :: List.map (region_to_term loc) l)
