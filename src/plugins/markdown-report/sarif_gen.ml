@@ -156,26 +156,23 @@ let gen_statuses () =
   in
   List.rev (Property_status.fold f [])
 
-let gen_files () =
+let gen_artifacts () =
   let add_src_file f =
-    let key =
-      let fname = Filepath.Normalized.to_pretty_string f in
-      Filename.chop_extension (Filename.basename fname)
-    in
-    let artifactLocation = ArtifactLocation.create ~uri:(f :> string) () in
+    let uri = (f:Filepath.Normalized.t :> string) in
+    let location = ArtifactLocation.create ~uri () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
-    key, File.create ~artifactLocation ~roles ~mimeType ()
+    Artifact.create ~location ~roles ~mimeType ()
   in
   List.map add_src_file (Kernel.Files.get ())
 
 let add_rule id desc l =
   let text = desc ^ "." in
-  let shortDescription = Message.plain_text ~text () in
-  let rule = Rule.create ~id ~shortDescription () in
-  (id, rule) :: l
+  let shortDescription = MultiformatMessageString.create ~text () in
+  let rule = ReportingDescriptor.create ~id ~shortDescription () in
+  rule :: l
 
-let make_rule_dictionary rules = Datatype.String.Map.fold add_rule rules []
+let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 
 let gen_run remarks =
   let tool = frama_c_sarif in
@@ -189,11 +186,12 @@ let gen_run remarks =
       Datatype.String.Map.add
         "user-spec" "User-written ACSL specification" rules
   in
-  let rules = make_rule_dictionary rules in
-  let resources = Resources.create ~rules () in
+  let rules = make_taxonomies rules in
+  ignore(rules);
+  let taxonomies = [ToolComponent.create (* ~rules*) ()] in
   let results = results @ user_annot_results in
-  let files = gen_files () in
-  Run.create ~tool ~invocations ~results ~resources ~files ()
+  let artifacts = gen_artifacts () in
+  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts ()
 
 let generate () =
   let remarks = get_remarks () in
