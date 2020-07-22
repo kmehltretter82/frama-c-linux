@@ -49,7 +49,7 @@ async function loadAST(
         if (!data) {
           buffer.log('// No code for function', theFunction);
         }
-        buffer.printTextWithTags(data, true);
+        buffer.printTextWithTags(data, {});
         if (theMarker)
           buffer.scroll(theMarker);
       } catch (err) {

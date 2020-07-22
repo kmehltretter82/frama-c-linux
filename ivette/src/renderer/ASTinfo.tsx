@@ -25,7 +25,7 @@ const ASTinfo = () => {
 
   React.useEffect(() => {
     buffer.clear();
-    buffer.printTextWithTags({ text: data, css: 'color: blue' }, true);
+    buffer.printTextWithTags(data, { css: 'color: blue' });
   }, [buffer, data]);
 
   // Callbacks

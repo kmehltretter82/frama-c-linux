@@ -612,31 +612,28 @@ export class RichTextBuffer extends Emitter {
 
   /**
      Print text containing tags into buffer.
-
-     @param implicitTag - when true,
-     uses the first element of arrays as an marker identifier for the
-     the rest of text. This implicit tag policy is recursively applied to
-     sub-arrays.
+     @param blockTag - if specified, prints `[tag, ...text]`
+     as if it is a marked block with `tag` identifier and `blockTag` options.
   */
-  printTextWithTags(contents: MarkedText, implicitTag = false) {
+  printTextWithTags(contents: MarkedText, blockTag?: MarkerProps) {
     if (contents !== undefined && contents !== null) {
       if (Array.isArray(contents)) {
         var marker = false;
-        if (implicitTag) {
+        if (blockTag && contents[0]) {
           const id = contents.shift();
           if (typeof id === 'object') {
             contents.unshift(id);
           } else {
-            this.openTextMarker({ id });
+            this.openTextMarker({ id, ...blockTag });
             marker = true;
           }
         }
-        contents.forEach((txt) => this.printTextWithTags(txt, implicitTag));
+        contents.forEach((txt) => this.printTextWithTags(txt, blockTag));
         if (marker) this.closeTextMarker();
       } else if (typeof contents === 'object') {
         const { text, ...tag } = contents;
         this.openTextMarker(tag);
-        this.printTextWithTags(text, implicitTag);
+        this.printTextWithTags(text, blockTag);
         this.closeTextMarker();
       } else if (typeof contents === 'string') {
         this.append(contents);
