@@ -39,10 +39,8 @@ export interface MarkerProps extends CodeMirror.TextMarkerOptions {
    In the object form, a text marker is created with given attributes
    and text.
  */
-export type MarkedText = undefined | null | string
-  | MarkedText[]
-  | MarkerProps & { text: MarkedText }
-  ;
+export type MarkedText =
+  undefined | null | string | MarkedText[]| MarkerProps & { text: MarkedText }
 
 export interface CSSMarker {
   /** Hover class `'dome-xHover-nnn'` */
@@ -661,33 +659,33 @@ export class RichTextBuffer extends Emitter {
      as if it is a marked block with `tag` identifier and `blockTag` options.
   */
   printTextWithTags(contents: MarkedText, blockTag?: MarkerProps) {
-    if (contents !== undefined && contents !== null) {
-      if (Array.isArray(contents)) {
-        var marker = false;
-        if (blockTag && contents[0]) {
-          const id = contents.shift();
-          if (typeof id === 'object') {
-            contents.unshift(id);
-          } else {
-            this.openTextMarker({ id, ...blockTag });
-            marker = true;
-          }
+    if (contents === undefined || contents === null) return;
+    const asTaggedBlock = blockTag ?? {};
+
+    if (Array.isArray(contents)) {
+      let marker = false;
+      if (contents[0]) {
+        const id = contents.shift();
+        if (typeof id === 'object') {
+          contents.unshift(id);
+        } else {
+          this.openTextMarker({ id, ...asTaggedBlock });
+          marker = true;
         }
-        contents.forEach((txt) => this.printTextWithTags(txt, blockTag));
-        if (marker) this.closeTextMarker();
-      } else if (typeof contents === 'object') {
-        const { text, ...tag } = contents;
-        this.openTextMarker(tag);
-        this.printTextWithTags(text, blockTag);
-        this.closeTextMarker();
-      } else if (typeof contents === 'string') {
-        this.append(contents);
-      } else {
-        console.error('[Dome.buffers] unexpected text', contents);
       }
+      contents.forEach((txt) => this.printTextWithTags(txt, asTaggedBlock));
+      if (marker) this.closeTextMarker();
+    } else if (typeof contents === 'object') {
+      const { text, ...tag } = contents;
+      this.openTextMarker(tag);
+      this.printTextWithTags(text, asTaggedBlock);
+      this.closeTextMarker();
+    } else if (typeof contents === 'string') {
+      this.append(contents);
+    } else {
+      console.error('[Dome.buffers] Unexpected text', contents);
     }
   }
-
 }
 
 // --------------------------------------------------------------------------
