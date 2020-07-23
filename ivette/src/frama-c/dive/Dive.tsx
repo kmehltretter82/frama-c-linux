@@ -71,26 +71,14 @@ class Dive {
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
     this.cy.off('click');
+    this.cy.on('click', 'node', (event) => this.clickNode(event.target));
 
     this.layout = 'cose-bilkent';
 
-    if (!this.headless) {
-      this.setupSelection();
+    if (!this.headless)
       this.setupCtxMenu();
-    }
 
     this.refresh();
-  }
-
-  setupSelection(): void {
-    this.cy.on('click', 'node', (event) => {
-      const node = event.target;
-      const data = node?.data();
-      if (data?.writes)
-        this.onSelect?.(data.writes);
-      node.select();
-      this.explore(node);
-    });
   }
 
   setupCtxMenu(): void {
@@ -292,7 +280,7 @@ class Dive {
     return newNodes;
   }
 
-  receiveData(data: any): void {
+  receiveData(data: any): Cytoscape.NodeSingular {
     this.cy.startBatch();
 
     for (const id of data.sub)
@@ -302,10 +290,10 @@ class Dive {
 
     this.cy.endBatch();
 
-    this.selectNode(this.cy.$id(data.root));
-
     if (newNodes)
       this.recomputeLayout(newNodes);
+
+    return this.cy.$id(data.root);
   }
 
   get layout(): string {
@@ -351,18 +339,20 @@ class Dive {
   async exec<In, Out>(
     request: Server.ExecRequest<In, Out>,
     param: In,
-  ): Promise<void> {
+  ) {
     try {
       if (Server.isRunning()) {
         await this.setMode();
         const data = await Server.send(request, param);
         if (data)
-          this.receiveData(data);
+          return this.receiveData(data);
       }
     }
     catch (err) {
       console.error(err);
     }
+
+    return null;
   }
 
   async refresh(): Promise<void> {
@@ -407,8 +397,10 @@ class Dive {
     this.exec(API.clear, null);
   }
 
-  add(marker: any): void {
-    this.exec(API.add, marker);
+  async add(marker: string) {
+    const node = await this.exec(API.add, marker);
+    if (node)
+      this.selectNode(node);
   }
 
   explore(node: Cytoscape.NodeSingular): void {
@@ -429,12 +421,36 @@ class Dive {
       this.exec(API.hide, id);
   }
 
+  clickNode(node: Cytoscape.NodeSingular): void {
+    this.explore(node);
+
+    const writes = node.data()?.writes;
+    if (writes)
+      this.onSelect?.(writes);
+
+    this.selectNode(node);
+  }
+
+  selectLocation(location: States.Location) {
+    const selectNode = this.cy.$(':selected');
+    const writes = selectNode?.data()?.writes;
+    if (location.marker && !_.some(writes, location)) {
+      this.add(location.marker);
+    }
+    else {
+      this.selectNode(selectNode); // Update selection
+    }
+  }
+
   selectNode(node: Cytoscape.NodeSingular): void {
     const hasOrigin = (ele: Cytoscape.NodeSingular) => (
       _.some(ele.data().origins, this.selectedLocation)
     );
+    this.cy.$(':selected').unselect();
     node.select();
-    node.incomers('edge').filter(hasOrigin).select();
+    const edges = node.incomers('edge');
+    edges.unselect();
+    edges.filter(hasOrigin).select();
   }
 }
 
@@ -442,9 +458,7 @@ const GraphView = () => {
 
   // Hooks
   const [dive, setDive] = useState(() => new Dive());
-  const node: React.MutableRefObject<string | undefined> = React.useRef();
   const [selection, updateSelection] = States.useSelection();
-  const marker = selection?.current?.marker;
   const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
   const [selectionMode, flipSelectionMode] =
         Dome.useGlobalSetting('dive.selectionMode', 'follow');
@@ -493,11 +507,10 @@ const GraphView = () => {
 
   // Updates the graph according to the selected marker.
   useEffect(() => {
-    if (!lock && marker && marker !== node.current) {
-      node.current = marker;
-      dive.add(marker);
+    if (!lock && selection?.current) {
+      dive.selectLocation(selection?.current);
     }
-  }, [dive, lock, marker, selectionMode]);
+  }, [dive, lock, selection, selectionMode]);
 
   // Layout selection
   const selectLayout = (layout?: string) => {
