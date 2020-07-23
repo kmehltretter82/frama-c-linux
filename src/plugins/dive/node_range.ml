@@ -73,29 +73,33 @@ let default_range n =
   Normal (logscale (Integer.to_float n) 100.)
 
 let evaluate cvalue typ =
-  try
-    let size = Integer.of_int (Cil.bitsSizeOf typ) in
-    let cardinal = Cvalue.V.cardinal_estimate ~size cvalue in
-    match typ with
-    | _ when Integer.is_zero cardinal -> Empty
-    | _ when Integer.is_one cardinal -> Singleton
-    | TInt (ikind,_) ->
-      begin match Ival.min_and_max (Cvalue.V.project_ival cvalue) with
-        | Some l, Some u -> integer_range ikind l u
-        | _, _ -> Wide
-        | exception Cvalue.V.Not_based_on_null -> Wide
-        | exception Abstract_interp.Error_Bottom -> Empty
-      end
-    | TFloat (fkind,_) ->
-      begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
-        | Some (l, u), _can_be_nan -> float_range fkind l u
-        | _, _ -> Wide
-        | exception Cvalue.V.Not_based_on_null -> Wide
-        | exception Abstract_interp.Error_Bottom -> Empty
-      end
-    | _ ->
-      default_range cardinal
-  with Cil.SizeOfError _ -> Empty
+  let cardinal = Cvalue.V.cardinal cvalue in
+  match typ, cardinal with
+  | _, Some card when Integer.is_zero card -> Empty
+  | _, Some card when Integer.is_one card -> Singleton
+  | Cil_types.TInt (ikind,_), _ ->
+    begin match Ival.min_and_max (Cvalue.V.project_ival cvalue) with
+      | Some l, Some u -> integer_range ikind l u
+      | _, _ -> Wide
+      | exception Cvalue.V.Not_based_on_null -> Wide
+      | exception Abstract_interp.Error_Bottom -> Empty
+    end
+  | Cil_types.TFloat (fkind,_), _ ->
+    begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
+      | Some (l, u), _can_be_nan -> float_range fkind l u
+      | _, _ -> Wide
+      | exception Cvalue.V.Not_based_on_null -> Wide
+      | exception Abstract_interp.Error_Bottom -> Empty
+    end
+  | _, Some cardinal ->
+    default_range cardinal
+  | _, None ->
+    try
+      let size = Integer.of_int (Cil.bitsSizeOf typ) in
+      if Integer.(le size sixteen)
+      then default_range (Integer.two_power size)
+      else Wide
+    with Cil.SizeOfError _ -> Empty
 
 let upper_bound r1 r2 =
   match r1, r2 with
