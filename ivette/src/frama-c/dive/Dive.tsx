@@ -64,6 +64,7 @@ class Dive {
   layoutOptions: Cytoscape.LayoutOptions | undefined;
   currentSelection: string | null = null;
   onSelect: ((_: States.Location[]) => void) | null = null;
+  selectedLocation: (States.Location | undefined) = undefined;
 
   constructor(cy: Cytoscape.Core | null = null) {
     this.cy = cy || Cytoscape();
@@ -429,14 +430,9 @@ class Dive {
   }
 
   selectNode(node: Cytoscape.NodeSingular): void {
-    const { writes } = node.data(); // List of localizable for writes
-    const index = writes.indexOf(this.currentSelection);
-    this.currentSelection = writes[index + 1 in writes ? index + 1 : 0];
-
     const hasOrigin = (ele: Cytoscape.NodeSingular) => (
-      ele.data().origins?.includes(this.currentSelection)
+      _.some(ele.data().origins, this.selectedLocation)
     );
-
     node.select();
     node.incomers('edge').filter(hasOrigin).select();
   }
@@ -485,6 +481,15 @@ const GraphView = () => {
       }
     };
   }, [dive, selection, updateSelection]);
+
+  useEffect(() => {
+    const index = selection?.multiple?.index;
+    const allSelections = selection?.multiple?.allSelections;
+    if (allSelections && 0 <= index && index < allSelections.length) {
+      const selected = allSelections[index];
+      dive.selectedLocation = selected;
+    }
+  }, [dive, selection]);
 
   // Updates the graph according to the selected marker.
   useEffect(() => {
