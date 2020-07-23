@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
 import { renderToString } from 'react-dom/server';
 import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
@@ -472,8 +473,7 @@ const GraphView = () => {
   useEffect(() => {
     dive.onSelect = (locations) => {
       if (updateSelection) {
-        /* TODO: implements an equality test between arrays. */
-        if (locations === selection?.multiple?.allSelections) {
+        if (_.isEqual(locations, selection?.multiple?.allSelections)) {
           updateSelection('MULTIPLE_CYCLE');
         }
         else {
