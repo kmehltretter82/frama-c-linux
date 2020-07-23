@@ -290,8 +290,7 @@ class Dive {
 
     this.cy.endBatch();
 
-    if (newNodes)
-      this.recomputeLayout(newNodes);
+    this.recomputeLayout(newNodes);
 
     return this.cy.$id(data.root);
   }
@@ -317,7 +316,7 @@ class Dive {
   }
 
   recomputeLayout(newNodes: Cytoscape.Collection = this.cy.collection()): void {
-    if (this.layoutOptions && this.cy.container()) {
+    if (this.layoutOptions && this.cy.container() && !newNodes.empty()) {
       /* Animate opacity from 0 to 100 for new elements */
       const newEles = newNodes.union(newNodes.neighborhood('edge'));
       newEles.style('opacity', 0);
@@ -355,12 +354,11 @@ class Dive {
     return null;
   }
 
-  async refresh(): Promise<void> {
+  async refresh() {
     try {
       if (Server.isRunning()) {
         const data = await Server.send(API.graph, {});
-        await this.receiveGraph(data);
-        this.recomputeLayout();
+        this.receiveGraph(data);
       }
     }
     catch (err) {
