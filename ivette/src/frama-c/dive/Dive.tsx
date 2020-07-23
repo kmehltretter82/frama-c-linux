@@ -474,12 +474,12 @@ const GraphView = () => {
       if (updateSelection) {
         /* TODO: implements an equality test between arrays. */
         if (locations === selection?.multiple?.allSelections) {
-          updateSelection('MULTIPLE_NEXT');
+          updateSelection('MULTIPLE_CYCLE');
         }
         else {
           updateSelection({
             locations,
-            index: 0
+            index: 0,
           });
         }
       }
