@@ -487,6 +487,8 @@ let build_node_writes context node =
       Done
   in
   node.node_writes_computation <- writes_computation;
+  let compare_stmt = Cil_datatype.Stmt_Id.compare in
+  node.node_writes_stmts <- List.sort compare_stmt node.node_writes_stmts;
   update_node context node
 
 
