@@ -54,6 +54,21 @@ function callstackToString(callstack: callstack): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
 }
 
+/* The Dive class handles the selection of nodes according to user actions.
+   To prevent cytoscape to automatically select (and unselect) nodes wrongly,
+   we make some nodes unselectable. We then use the functions below to make
+   the nodes selectable before (un)selecting them. */
+
+function select(node: Cytoscape.NodeSingular): void {
+  node.selectify();
+  node.select();
+}
+
+function unselect(node: Cytoscape.NodeSingular): void {
+  node.selectify();
+  node.unselect();
+}
+
 export type mode = 'explore' | 'overview';
 
 class Dive {
@@ -425,12 +440,15 @@ class Dive {
     const writes = node.data()?.writes;
     if (writes)
       this.onSelect?.(writes);
-
     this.selectNode(node);
+    /* Cytoscape automatically selects the node clicked, and unselects all other
+       nodes and edges. As we want some incoming edges to remain selected, we
+       make the node unselectable, preventing cytoscape to select it. */
+    node.unselectify();
   }
 
   selectLocation(location: States.Location) {
-    const selectNode = this.cy.$(':selected');
+    const selectNode = this.cy.$('node:selected');
     const writes = selectNode?.data()?.writes;
     if (location.marker && !_.some(writes, location)) {
       this.add(location.marker);
@@ -444,8 +462,8 @@ class Dive {
     const hasOrigin = (ele: Cytoscape.NodeSingular) => (
       _.some(ele.data().origins, this.selectedLocation)
     );
-    this.cy.$(':selected').unselect();
-    node.select();
+    this.cy.$(':selected').forEach(unselect);
+    select(node);
     const edges = node.incomers('edge');
     edges.unselect();
     edges.filter(hasOrigin).select();
