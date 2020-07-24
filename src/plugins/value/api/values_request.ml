@@ -165,8 +165,9 @@ let consolidated = ref None
 let table = Hashtbl.create 100
 
 let iter f =
-  Hashtbl.iter (fun key data -> f (Some key, data)) table;
-  Extlib.may (fun values -> f (None, values)) !consolidated
+  if Hashtbl.length table > 1
+  then Extlib.may (fun values -> f (None, values)) !consolidated;
+  Hashtbl.iter (fun key data -> f (Some key, data)) table
 
 let array =
   let model = States.model () in
