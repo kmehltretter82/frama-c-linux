@@ -28,7 +28,7 @@ const ColumnCallstack = () => Column({
   label: 'Callstack',
   title: 'Context of the evaluation',
   align: 'left',
-  width: 100,
+  width: 150,
   render: CallstackRenderer,
 });
 
@@ -108,6 +108,7 @@ const Values = () => {
           label={name && `${name} (before)`}
           title="Values inferred by Eva just before the selected point"
           disableSort
+          width={300}
         />
         <ColumnAlarm visible={!!name} />
         <Column
@@ -116,6 +117,7 @@ const Values = () => {
           label={name && `${name} (after)`}
           title="Values inferred by Eva just after the selected point"
           disableSort
+          width={300}
         />
       </Table>
     </>
