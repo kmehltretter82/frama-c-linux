@@ -238,12 +238,13 @@ export const byGraphData: Compare.Order<graphData> =
 
 /** Graph differences from the last action. */
 export type diffData =
-  { root: nodeId, add: { nodes: node[], deps: dependency[] }, sub: nodeId[] };
+  { root?: nodeId, add: { nodes: node[], deps: dependency[] }, sub: nodeId[]
+    };
 
 /** Loose decoder for `diffData` */
 export const jDiffData: Json.Loose<diffData> =
   Json.jObject({
-    root: jNodeIdSafe,
+    root: jNodeId,
     add: Json.jFail(
            Json.jObject({
              nodes: Json.jArray(jNodeSafe),
@@ -259,9 +260,9 @@ export const jDiffDataSafe: Json.Safe<diffData> =
 /** Natural order for `diffData` */
 export const byDiffData: Compare.Order<diffData> =
   Compare.byFields
-    <{ root: nodeId, add: { nodes: node[], deps: dependency[] },
+    <{ root?: nodeId, add: { nodes: node[], deps: dependency[] },
        sub: nodeId[] }>({
-    root: byNodeId,
+    root: Compare.defined(byNodeId),
     add: Compare.byFields
            <{ nodes: node[], deps: dependency[] }>({
            nodes: Compare.array(byNode),

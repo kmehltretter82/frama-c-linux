@@ -222,7 +222,7 @@ struct
   let name = "diffData"
   let descr = Markdown.plain "Graph differences from the last action."
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
-      "root", NodeId.jtype;
+      "root", Joption NodeId.jtype;
       "add", Jrecord [
         "nodes", Jarray Node.jtype;
         "deps", Jarray Dependency.jtype

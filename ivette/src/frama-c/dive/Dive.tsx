@@ -26,32 +26,30 @@ import '@fortawesome/fontawesome-free/js/all';
 import style from './style.json';
 import layouts from './layouts.json';
 
-const ctxmenu = {
-  explore: <div><div className="fas fa-binoculars fa-2x" />Explore</div>,
-  unfold: <div><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</div>,
-  fold: <div><div className="fa fa-compress-arrows-alt fa-2x" />Fold</div>,
-  show: <div><div className="fa fa-eye fa-2x" />Show</div>,
-  hide: <div><div className="fa fa-eye-slash fa-2x" />Hide</div>,
-};
-
-export interface Callsite {
-  readonly fun: string;
-  readonly instr: string;
+interface Cxtcommand {
+  content: string;
+  select: () => void;
+  enabled: boolean;
 }
-
-export interface Interval {
-  readonly min: number;
-  readonly max: number;
-}
-
-export type callstack = Callsite[];
 
 interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: any): void;
 }
 
-function callstackToString(callstack: callstack): string {
+function callstackToString(callstack: API.callstack[]): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
+}
+
+function buildCxtMenu(
+  commands: Cxtcommand[],
+  content? : JSX.Element,
+  action? : () => void,
+) {
+  commands.push({
+    content: content ? renderToString(content) : '',
+    select: action || (() => {}),
+    enabled: !!action,
+  });
 }
 
 /* The Dive class handles the selection of nodes according to user actions.
@@ -85,58 +83,42 @@ class Dive {
     this.cy = cy || Cytoscape();
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
-    this.cy.off('click');
+    this.cy.off('click'); // Remove previous listeners
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
 
     this.layout = 'cose-bilkent';
 
-    if (!this.headless)
-      this.setupCtxMenu();
+    if (!this.headless) {
+      this.cy.scratch('cxtmenu')?.destroy?.(); // Remove previous menu
+      this.cy.scratch('cxtmenu', (this.cy as CytoscapeExtended).cxtmenu({
+        selector: 'node',
+        commands: (node: Cytoscape.NodeSingular) => this.onCxtMenu(node),
+      }));
+    }
 
     this.refresh();
   }
 
-  setupCtxMenu(): void {
-    (this.cy as CytoscapeExtended).cxtmenu({
-      selector: 'node',
-      commands: (ele: Cytoscape.NodeSingular) => {
-        const data = ele.data();
-        const commands = [{
-          content: renderToString(ctxmenu.explore),
-          select: () => { this.explore(ele); },
-          enabled: true,
-        }];
-        if (data.kind === 'composite') {
-          commands.push({
-            content: renderToString(ctxmenu.unfold),
-            select: () => {},
-            enabled: false,
-          });
-        }
-        else {
-          commands.push({
-            content: '',
-            select: () => {},
-            enabled: false,
-          });
-        }
-        if (!data.explored) {
-          commands.push({
-            content: renderToString(ctxmenu.show),
-            select: () => this.show(ele),
-            enabled: true,
-          });
-        }
-        else {
-          commands.push({
-            content: renderToString(ctxmenu.hide),
-            select: () => this.hide(ele),
-            enabled: true,
-          });
-        }
-        return commands;
-      },
-    });
+  onCxtMenu(node: Cytoscape.NodeSingular) {
+    const data = node.data();
+    const commands = [] as Cxtcommand[];
+    buildCxtMenu(commands,
+      <><div className="fas fa-binoculars fa-2x" />Explore</>,
+      () => { this.explore(node); });
+    if (data.kind === 'composite')
+      buildCxtMenu(commands,
+        <><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</>);
+    else
+      buildCxtMenu(commands);
+    if (data.backward_explored === 'no')
+      buildCxtMenu(commands,
+        <div><div className="fa fa-eye fa-2x" />Show</div>,
+        () => this.show(node));
+    else
+      buildCxtMenu(commands,
+        <><div className="fa fa-eye-slash fa-2x" />Hide</>,
+        () => this.hide(node));
+    return commands;
   }
 
   remove(node: Cytoscape.NodeCollection): void {
@@ -156,7 +138,8 @@ class Dive {
     return this.cy.add({ data: { id, label: fileName }, classes: 'file' });
   }
 
-  referenceCallstack(callstack: callstack): Cytoscape.NodeSingular | null {
+  referenceCallstack(callstack: API.callstack[]): Cytoscape.NodeSingular | null
+  {
     const name = callstackToString(callstack);
     const elt = callstack.shift();
 
