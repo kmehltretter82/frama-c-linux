@@ -231,32 +231,26 @@ end
 
 module Make (Eva: Analysis.S) : S = struct
 
-  let eval f state elt =
-    let value, alarms = f state elt in
-    let alarm = not (Alarmset.is_empty alarms) in
-    let str = Format.asprintf "%a" (Bottom.pretty Eva.Val.pretty) value in
-    { value = str; alarm }
-
-  let make_before f before elt =
+  let make_before eval before =
     let before =
       match before with
       | `Bottom -> Unreachable
-      | `Value state -> Evaluation (eval f state elt)
+      | `Value state -> Evaluation (eval state)
     in
     { before; after_instr = None; after_then = None; after_else = None; }
 
-  let make_callstack stmt f elt =
+  let make_callstack stmt eval =
     let before = Eva.get_stmt_state_by_callstack ~after:false stmt in
     match before with
     | (`Bottom | `Top) -> []
     | `Value before ->
       let aux callstack before acc =
-        let before_after = make_before f (`Value before) elt in
+        let before_after = make_before eval (`Value before) in
         (callstack, before_after) :: acc
       in
       Value_types.Callstack.Hashtbl.fold aux before []
 
-  let make_before_after f ~before ~after elt =
+  let make_before_after eval ~before ~after =
     match before with
     | `Bottom ->
       { before = Unreachable;
@@ -264,12 +258,12 @@ module Make (Eva: Analysis.S) : S = struct
         after_then = None;
         after_else = None; }
     | `Value before ->
-      let before = eval f before elt in
+      let before = eval before in
       let after_instr =
         match after with
         | `Bottom -> Some (Reduced Unreachable)
         | `Value after ->
-          let after = eval f after elt in
+          let after = eval after in
           if String.equal before.value after.value
           then Some Unchanged
           else Some (Reduced (Evaluation after))
@@ -277,7 +271,7 @@ module Make (Eva: Analysis.S) : S = struct
       { before = Evaluation before;
         after_instr; after_then = None; after_else = None; }
 
-  let make_instr_callstack stmt f elt =
+  let make_instr_callstack stmt eval =
     let before = Eva.get_stmt_state_by_callstack ~after:false stmt in
     let after = Eva.get_stmt_state_by_callstack ~after:true stmt in
     match before, after with
@@ -290,38 +284,52 @@ module Make (Eva: Analysis.S) : S = struct
           try `Value (Value_types.Callstack.Hashtbl.find after callstack)
           with Not_found -> `Bottom
         in
-        let before_after = make_before_after f ~before ~after elt in
+        let before_after = make_before_after eval ~before ~after in
         (callstack, before_after) :: acc
       in
       Value_types.Callstack.Hashtbl.fold aux before []
 
-  let make f elt kinstr =
+  let make eval kinstr =
     let before = Eva.get_kinstr_state ~after:false kinstr in
     let values, callstack =
       match kinstr with
       | Cil_types.Kglobal ->
-        make_before f before elt, None
+        make_before eval before, None
       | Cil_types.Kstmt stmt ->
         match stmt.skind with
         | Instr _ ->
           let after = Eva.get_kinstr_state ~after:true kinstr in
-          let values = make_before_after f ~before ~after elt in
-          let callstack = make_instr_callstack stmt f elt in
+          let values = make_before_after eval ~before ~after in
+          let callstack = make_instr_callstack stmt eval in
           values, Some callstack
         | _ ->
-          make_before f before elt,
-          Some (make_callstack stmt f elt)
+          make_before eval before, Some (make_callstack stmt eval)
     in
     { values; callstack; }
 
 
   let evaluate kinstr expr =
-    make (Eva.eval_expr) expr kinstr
+    let eval state =
+      let value, alarms = Eva.eval_expr state expr in
+      let alarm = not (Alarmset.is_empty alarms) in
+      let str = Format.asprintf "%a" (Bottom.pretty Eva.Val.pretty) value in
+      { value = str; alarm }
+    in
+    make eval kinstr
 
   let lvaluate kinstr lval =
-    let loc = Cil_datatype.Location.unknown in
-    let expr = Cil.new_exp ~loc (Lval lval) in
-    make (Eva.eval_expr) expr kinstr
+    let eval state =
+      let value, alarms = Eva.copy_lvalue state lval in
+      let alarm = not (Alarmset.is_empty alarms) in
+      let flagged_value = match value with
+        | `Bottom -> Eval.Flagged_Value.bottom
+        | `Value v -> v
+      in
+      let pretty = Eval.Flagged_Value.pretty Eva.Val.pretty in
+      let str = Format.asprintf "%a" pretty flagged_value in
+      { value = str; alarm }
+    in
+    make eval kinstr
 end
 
 
