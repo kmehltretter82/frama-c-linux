@@ -135,7 +135,7 @@ module CallStack = struct
   let jtype = R.jtype
 
   let pp_callstack ~short = function
-    | None -> "all"
+    | None -> if short then "all" else ""
     | Some callstack ->
       let pp_text =
         if short

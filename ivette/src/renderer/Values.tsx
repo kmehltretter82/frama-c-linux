@@ -7,6 +7,7 @@ import * as States from 'frama-c/states';
 import * as Json from 'dome/data/json';
 import * as Eva from 'api/plugins/eva/values';
 import * as Ast from 'api/kernel/ast';
+import * as Compare from 'dome/data/compare';
 
 import { Table, Column } from 'dome/table/views';
 import { ArrayModel } from 'dome/table/arrays';
@@ -47,17 +48,23 @@ const ColumnAlarm = (props: { visible: boolean }) => Column({
   render: AlarmRenderer,
 });
 
+const byValues: Compare.ByFields<Eva.valuesData> =
+  { callstack: Compare.defined(Compare.byFields({ full: Compare.string })) };
+
+class ValuesModel extends ArrayModel<Json.key<'#values'>, Eva.valuesData> {
+  constructor() {
+    super();
+    this.setOrderingByFields(byValues);
+  }
+}
+
 // --------------------------------------------------------------------------
 // --- Values Panel
 // --------------------------------------------------------------------------
 
 const Values = () => {
 
-  const model = React.useMemo(
-    () => new ArrayModel<Json.key<'#values'>, Eva.valuesData>(),
-    [],
-  );
-
+  const model = React.useMemo(() => new ValuesModel(), []);
   const evaValues = States.useSyncArray(Eva.values).getArray();
   const selectMarker = States.useSelection()[0]?.current?.marker;
   const markerInfo = States.useSyncArray(Ast.markerInfo).getArray();
