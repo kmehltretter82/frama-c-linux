@@ -21,6 +21,7 @@ import ASTinfo from './ASTinfo';
 import Globals from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
+import Values from './Values';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -101,6 +102,7 @@ export default (() => {
             <ASTview />
             <ASTinfo />
             <Locations />
+            <Values />
           </Group>
         </LabView>
       </Splitter>

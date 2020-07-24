@@ -15,7 +15,7 @@ import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers } from 'api/plugins/eva';
+import { getCallers } from 'api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -123,7 +123,7 @@ const ASTview = () => {
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: key<'#markerIndo'>) {
+  function onTextSelection(id: key<'#markerInfo'>) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
@@ -133,18 +133,8 @@ const ASTview = () => {
   async function onContextMenu(id: key<'#markerInfo'>) {
     const items = [];
     const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
-    switch (selectedMarkerInfo?.kind) {
-      case 'function': {
-        items.push({
-          label: `Go to definition of ${selectedMarkerInfo.name}`,
-          onClick: () => {
-            const location = { function: selectedMarkerInfo.name };
-            updateSelection({ location });
-          },
-        });
-        break;
-      }
-      case 'declaration': {
+    if (selectedMarkerInfo?.var === 'function') {
+      if (selectedMarkerInfo.kind === 'declaration') {
         if (selectedMarkerInfo?.name) {
           const locations = await functionCallers(selectedMarkerInfo.name);
           const locationsByFunction = _.groupBy(locations, (e) => e.function);
@@ -162,10 +152,15 @@ const ASTview = () => {
               });
             });
         }
-        break;
+      } else {
+        items.push({
+          label: `Go to definition of ${selectedMarkerInfo.name}`,
+          onClick: () => {
+            const location = { function: selectedMarkerInfo.name };
+            updateSelection({ location });
+          },
+        });
       }
-      default:
-        break;
     }
     if (items.length > 0)
       Dome.popupMenu(items);
