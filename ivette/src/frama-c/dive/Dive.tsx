@@ -103,7 +103,7 @@ class Dive {
         const data = ele.data();
         const commands = [{
           content: renderToString(ctxmenu.explore),
-          select: () => this.explore(ele),
+          select: () => { this.explore(ele); },
           enabled: true,
         }];
         if (data.kind === 'composite') {
@@ -414,13 +414,13 @@ class Dive {
   async add(marker: string) {
     const node = await this.exec(API.add, marker);
     if (node)
-      this.selectNode(node);
+      this.updateNodeSelection(node);
   }
 
-  explore(node: Cytoscape.NodeSingular): void {
+  async explore(node: Cytoscape.NodeSingular) {
     const id = parseInt(node.id(), 10);
     if (id)
-      this.exec(API.explore, id);
+      await this.exec(API.explore, id);
   }
 
   show(node: Cytoscape.NodeSingular): void {
@@ -435,12 +435,12 @@ class Dive {
       this.exec(API.hide, id);
   }
 
-  clickNode(node: Cytoscape.NodeSingular): void {
-    this.selectNode(node);
-    this.explore(node);
+  async clickNode(node: Cytoscape.NodeSingular) {
+    this.updateNodeSelection(node);
+    await this.explore(node);
 
     const writes = node.data()?.writes;
-    if (writes)
+    if (writes && writes.length)
       this.onSelect?.(writes);
 
     /* Cytoscape automatically selects the node clicked, and unselects all other
@@ -449,18 +449,21 @@ class Dive {
     node.unselectify();
   }
 
-  selectLocation(location: States.Location) {
-    const selectNode = this.cy.$('node:selected');
-    const writes = selectNode?.data()?.writes;
-    if (location.marker && !_.some(writes, location)) {
-      this.add(location.marker);
-    }
-    else {
-      this.selectNode(selectNode); // Update selection
+  selectLocation(location: States.Location, doExplore: boolean) {
+    if (location !== this.selectedLocation) {
+      this.selectedLocation = location;
+      const selectNode = this.cy.$('node:selected');
+      const writes = selectNode?.data()?.writes;
+      if (doExplore && location.marker && !_.some(writes, location)) {
+        this.add(location.marker);
+      }
+      else {
+        this.updateNodeSelection(selectNode);
+      }
     }
   }
 
-  selectNode(node: Cytoscape.NodeSingular): void {
+  updateNodeSelection(node: Cytoscape.NodeSingular): void {
     const hasOrigin = (ele: Cytoscape.NodeSingular) => (
       _.some(ele.data().origins, this.selectedLocation)
     );
@@ -468,7 +471,11 @@ class Dive {
     select(node);
     const edges = node.incomers('edge');
     edges.unselect();
-    edges.filter(hasOrigin).select();
+    const relevantEdges = edges.filter(hasOrigin);
+    if (relevantEdges.empty())
+      edges.select();
+    else
+      relevantEdges.select();
   }
 }
 
@@ -495,40 +502,21 @@ const GraphView = () => {
     dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
   }, [dive, selectionMode]);
 
-  /* When clicking on a node, select its writes locations as a multiple
-     selection. If these locations were already selected, select the next
-     location in the multiple selection. */
   useEffect(() => {
+    /* When clicking on a node, select its writes locations as a multiple
+       selection. If these locations were already selected, select the next
+       location in the multiple selection. */
     dive.onSelect = (locations) => {
-      if (updateSelection) {
-        if (_.isEqual(locations, selection?.multiple?.allSelections)) {
-          updateSelection('MULTIPLE_CYCLE');
-        }
-        else {
-          updateSelection({
-            locations,
-            index: 0,
-          });
-        }
-      }
+      if (_.isEqual(locations, selection?.multiple?.allSelections))
+        updateSelection('MULTIPLE_CYCLE');
+      else
+        updateSelection({ locations, index: 0 });
     };
-  }, [dive, selection, updateSelection]);
 
-  useEffect(() => {
-    const index = selection?.multiple?.index;
-    const allSelections = selection?.multiple?.allSelections;
-    if (allSelections && 0 <= index && index < allSelections.length) {
-      const selected = allSelections[index];
-      dive.selectedLocation = selected;
-    }
-  }, [dive, selection]);
-
-  // Updates the graph according to the selected marker.
-  useEffect(() => {
-    if (!lock && selection?.current) {
-      dive.selectLocation(selection?.current);
-    }
-  }, [dive, lock, selection, selectionMode]);
+    // Updates the graph according to the selected marker.
+    if (selection?.current)
+      dive.selectLocation(selection?.current, !lock);
+  }, [dive, lock, selection, updateSelection]);
 
   // Layout selection
   const selectLayout = (layout?: string) => {
