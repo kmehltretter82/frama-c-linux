@@ -373,7 +373,8 @@ class Dive {
     try {
       if (Server.isRunning()) {
         const data = await Server.send(API.graph, {});
-        this.receiveGraph(data);
+        const newNodes = this.receiveGraph(data);
+        this.recomputeLayout(newNodes);
       }
     }
     catch (err) {
