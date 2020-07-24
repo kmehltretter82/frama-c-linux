@@ -436,12 +436,13 @@ class Dive {
   }
 
   clickNode(node: Cytoscape.NodeSingular): void {
+    this.selectNode(node);
     this.explore(node);
 
     const writes = node.data()?.writes;
     if (writes)
       this.onSelect?.(writes);
-    this.selectNode(node);
+
     /* Cytoscape automatically selects the node clicked, and unselects all other
        nodes and edges. As we want some incoming edges to remain selected, we
        make the node unselectable, preventing cytoscape to select it. */
