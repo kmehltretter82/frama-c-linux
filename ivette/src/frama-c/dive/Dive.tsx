@@ -36,7 +36,7 @@ interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: any): void;
 }
 
-function callstackToString(callstack: API.callstack[]): string {
+function callstackToString(callstack: API.callstack): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
 }
 
@@ -139,8 +139,7 @@ class Dive {
     return this.cy.add({ data: { id, label: fileName }, classes: 'file' });
   }
 
-  referenceCallstack(callstack: API.callstack[]): Cytoscape.NodeSingular | null
-  {
+  referenceCallstack(callstack: API.callstack): Cytoscape.NodeSingular | null {
     const name = callstackToString(callstack);
     const elt = callstack.shift();
 

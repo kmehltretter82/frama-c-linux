@@ -151,14 +151,21 @@ struct
       Data.failure "no node '%d' in the current graph" node_key
 end
 
-module Callstack =
+module Callsite =
 struct
-  let name = "callstack"
-  let descr = Markdown.plain "The callstack context for a node"
+  let name = "callsite"
+  let descr = Markdown.plain "A callsite"
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
       "fun", Jstring;
       "instr", Junion [ Jnumber ; Jstring ];
     ])
+end
+
+module Callstack =
+struct
+  let name = "callstack"
+  let descr = Markdown.plain "The callstack context for a node"
+  let jtype = Data.declare ~package ~name ~descr (Jarray Callsite.jtype)
 end
 
 module NodeLocality =

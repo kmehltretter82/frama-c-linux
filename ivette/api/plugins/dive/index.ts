@@ -93,11 +93,11 @@ export const jNodeIdSafe: Json.Safe<nodeId> =
 /** Natural order for `nodeId` */
 export const byNodeId: Compare.Order<nodeId> = Compare.number;
 
-/** The callstack context for a node */
-export type callstack = { fun: string, instr: number | string };
+/** A callsite */
+export type callsite = { fun: string, instr: number | string };
 
-/** Loose decoder for `callstack` */
-export const jCallstack: Json.Loose<callstack> =
+/** Loose decoder for `callsite` */
+export const jCallsite: Json.Loose<callsite> =
   Json.jObject({
     fun: Json.jFail(Json.jString,'String expected'),
     instr: Json.jFail(
@@ -105,17 +105,31 @@ export const jCallstack: Json.Loose<callstack> =
              'Union expected'),
   });
 
-/** Safe decoder for `callstack` */
-export const jCallstackSafe: Json.Safe<callstack> =
-  Json.jFail(jCallstack,'Callstack expected');
+/** Safe decoder for `callsite` */
+export const jCallsiteSafe: Json.Safe<callsite> =
+  Json.jFail(jCallsite,'Callsite expected');
 
-/** Natural order for `callstack` */
-export const byCallstack: Compare.Order<callstack> =
+/** Natural order for `callsite` */
+export const byCallsite: Compare.Order<callsite> =
   Compare.byFields
     <{ fun: string, instr: number | string }>({
     fun: Compare.string,
     instr: Compare.structural,
   });
+
+/** The callstack context for a node */
+export type callstack = callsite[];
+
+/** Safe decoder for `callstack` */
+export const jCallstackSafe: Json.Safe<callstack> =
+  Json.jArray(jCallsiteSafe);
+
+/** Loose decoder for `callstack` */
+export const jCallstack: Json.Loose<callstack> = Json.jTry(jCallstackSafe);
+
+/** Natural order for `callstack` */
+export const byCallstack: Compare.Order<callstack> =
+  Compare.array(byCallsite);
 
 /** The description of a node locality */
 export type nodeLocality = { file: string, callstack?: callstack };
