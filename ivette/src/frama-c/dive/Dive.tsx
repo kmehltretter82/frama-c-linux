@@ -244,7 +244,11 @@ class Dive {
         else
           parent = this.referenceFile(node.locality.file).id();
 
-        ele = this.cy.add({ group: 'nodes', data: { ...node, parent } });
+        ele = this.cy.add({
+          group: 'nodes',
+          data: { ...node, parent },
+          classes: 'new',
+        });
         this.addTips(ele);
         newNodes = ele.union(newNodes);
       }
@@ -256,12 +260,13 @@ class Dive {
         const elemore = this.cy.add({
           group: 'nodes',
           data: { id: idmore, parent: ele.data('parent') },
-          classes: 'more',
+          classes: 'new more',
         });
         newNodes = elemore.union(newNodes);
         this.cy.add({
           group: 'edges',
           data: { source: idmore, target: node.id },
+          classes: 'new',
         });
       }
     }
@@ -271,7 +276,9 @@ class Dive {
       this.cy.add({
         data: { ...dep, source: dep.src, target: dep.dst },
         group: 'edges',
-        classes: dep.kind,
+        classes:
+          this.cy.$id(dep.src).hasClass('new') ||
+          this.cy.$id(dep.dst).hasClass('new') ? 'new' : ''
       });
     }
 
@@ -315,19 +322,13 @@ class Dive {
 
   recomputeLayout(newNodes: Cytoscape.Collection = this.cy.collection()): void {
     if (this.layoutOptions && this.cy.container() && !newNodes.empty()) {
-      /* Animate opacity from 0 to 100 for new elements */
-      const newEles = newNodes.union(newNodes.neighborhood('edge'));
-      newEles.style('opacity', 0);
-
       this.cy.layout({
         animationEasing: 'ease-in-out-quad',
         /* Do not move new nodes */
         animateFilter: (node: Cytoscape.Singular) => !newNodes.contains(node),
-        /* But make them appear slowly */
-        stop: () => newEles.animate({
-          style: { opacity: 1.0 },
-          duration: 500,
-        }),
+        stop: () => {
+            this.cy.$(".new").addClass('old').removeClass('new');
+          },
         ...this.layoutOptions,
       } as unknown as Cytoscape.LayoutOptions).run();
     }
@@ -356,7 +357,9 @@ class Dive {
     try {
       if (Server.isRunning()) {
         const data = await Server.send(API.graph, {});
+        this.cy.startBatch();
         const newNodes = this.receiveGraph(data);
+        this.cy.endBatch();
         this.recomputeLayout(newNodes);
       }
     }

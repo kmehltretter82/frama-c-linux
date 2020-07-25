@@ -84,6 +84,25 @@
     }
   },
   {
+    "selector": "node[backward_explored='no']",
+    "style": {
+      "opacity" : 0.3
+    }
+  },
+  {
+    "selector": ".new",
+    "style": {
+      "opacity": 0
+    }
+  },
+  {
+    "selector": ".old",
+    "style": {
+      "transition-property": "opacity",
+      "transition-duration": "0.5s"
+    }
+  },
+  {
     "selector": "node[stops]",
     "style": {
       "border-color": "#8e6",
@@ -132,13 +151,7 @@
     }
   },
   {
-    "selector": "node[kind][backward_explored='no']",
-    "style": {
-      "opacity" : "0.3"
-    }
-  },
-  {
-    "selector": ".callee",
+    "selector": "edge[kind='callee']",
     "style": {
       "line-color": "#8f8",
       "target-arrow-color": "#8f8"
