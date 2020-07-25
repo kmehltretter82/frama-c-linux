@@ -121,12 +121,12 @@ class Dive {
     return commands;
   }
 
-  remove(node: Cytoscape.NodeCollection): void {
+  remove(node: Cytoscape.NodeSingular) {
     const parent = node.parent();
     node.remove();
     this.cy.$id(`${node.id()}-more`).remove();
     if (parent.nonempty() && parent.children().empty())
-      this.remove(parent); // Recursively remove parents
+      this.remove(parent as Cytoscape.NodeSingular); // Recursively remove parents
   }
 
   referenceFile(fileName: string): Cytoscape.NodeSingular {
