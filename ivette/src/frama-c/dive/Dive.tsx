@@ -581,8 +581,8 @@ const GraphView = () => {
 export default () => (
   <Component
     id="dive.graph"
-    label="Imprecision graph"
-    title="Imprecision graph"
+    label="Data-flow graph"
+    title="Data-flow graph"
   >
     <GraphView />
   </Component>
