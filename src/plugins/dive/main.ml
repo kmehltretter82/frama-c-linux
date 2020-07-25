@@ -29,17 +29,17 @@ let output format context basename =
   in
   Self.result "output to %s" filename;
   let out_channel = open_out filename in
-  output_function out_channel (Build.get_graph context);
+  output_function out_channel (Context.get_graph context);
   close_out out_channel
 
 let main () =
   if not (Self.FromBases.is_empty () &&
           Self.FromFunctionAlarms.is_empty ()) then begin
     (* Create the initial graph  *)
-    let context = Build.create () in
+    let context = Context.create () in
     (* Handle parameters *)
-    Self.UnfoldedBases.iter (Build.unfold_base context);
-    Self.HiddenBases.iter (Build.hide_base context);
+    Self.UnfoldedBases.iter (Context.unfold context);
+    Self.HiddenBases.iter (Context.hide context);
     let depth = Self.DepthLimit.get () in
     (* Add targeted vars to it *)
     let add_var vi =

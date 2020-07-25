@@ -30,9 +30,11 @@ type node_kind =
   | String of int * Base.cstring
   | Error of string
 
+type callstack = Callstack.t
+
 type node_locality = {
   loc_file : string;
-  loc_callstack : Callstack.t;
+  loc_callstack : callstack;
 }
 
 type node_range =
@@ -47,6 +49,7 @@ type node = {
   node_key : int;
   node_kind : node_kind;
   node_locality : node_locality;
+  mutable node_is_root : bool;
   mutable node_hidden : bool;
   mutable node_values : Cvalue.V.t option;
   mutable node_range : node_range;

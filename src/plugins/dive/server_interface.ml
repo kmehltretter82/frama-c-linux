@@ -38,7 +38,7 @@ let get_context =
     match !context with
     | Some c -> c
     | None ->
-      let c = Build.create () in
+      let c = Context.create () in
       context := Some c;
       c
 
@@ -146,7 +146,7 @@ struct
   let of_json json =
     let node_key = Data.Jint.of_json json in
     try
-      Build.find_node (get_context ()) node_key
+      Context.find_node (get_context ()) node_key
     with Not_found ->
       Data.failure "no node '%d' in the current graph" node_key
 end
@@ -180,6 +180,7 @@ struct
       "label", Jstring;
       "kind", Jstring;
       "locality", NodeLocality.jtype;
+      "is_root", Jboolean;
       "backward_explored", Jstring;
       "forward_explored", Jstring;
       "writes", Jarray Kernel_ast.KfMarker.jtype;
@@ -238,8 +239,9 @@ end
 (* --- Actions                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let result context =
-  Build.get_graph context, Build.take_last_differences context
+let result context last_root =
+  let diff = Context.take_last_diff context in
+  Context.get_graph context, { diff with last_root }
 
 let finalize' context node_opt =
   begin match node_opt with
@@ -256,7 +258,7 @@ let finalize' context node_opt =
       then
         Build.reduce_to_horizon context horizon node
   end;
-  result context
+  result context node_opt
 
 let finalize context node =
   finalize' context (Some node)
@@ -271,13 +273,13 @@ let () = Request.register ~package
     ~kind:`GET ~name:"graph"
     ~descr:(Markdown.plain "Retrieve the whole graph")
     ~input:(module Data.Junit) ~output:(module Graph)
-    (fun () -> Build.get_graph (get_context ()))
+    (fun () -> Context.get_graph (get_context ()))
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
-    (fun () -> Build.clear (get_context ()))
+    (fun () -> Context.clear (get_context ()))
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"add"
@@ -306,7 +308,7 @@ let () = Request.register ~package
       let context = get_context () in
       Build.show context node;
       Build.explore_backward ~depth:1 context node;
-      result context
+      finalize' context None
     end
 
 let () = Request.register ~package
@@ -316,5 +318,5 @@ let () = Request.register ~package
     begin fun node ->
       let context = get_context () in
       Build.hide context node;
-      result context
+      finalize' context None
     end

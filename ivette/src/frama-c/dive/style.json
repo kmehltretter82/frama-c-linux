@@ -24,21 +24,19 @@
     }
   },
   {
-    "selector": "edge:selected",
-    "style": {
-      "color": "#48f",
-      "overlay-color": "#8bf",
-      "overlay-padding": "10px",
-      "overlay-opacity": 0.4
-    }
-  },
-  {
     "selector": "node[label]",
     "style": {
       "label": "data(label)"
 
     }
   },
+  {
+    "selector": "node[?is_root]",
+    "style": {
+      "border-width": "2px"
+    }
+  },
+
   {
     "selector": "node.more",
     "style": {
@@ -57,6 +55,21 @@
       "target-arrow-shape": "vee",
       "target-arrow-color": "#888",
       "arrow-scale": 2.0
+    }
+  },
+  {
+    "selector": "edge:selected",
+    "style": {
+      "color": "#48f",
+      "overlay-color": "#8bf",
+      "overlay-padding": "10px",
+      "overlay-opacity": 0.4
+    }
+  },
+  {
+    "selector": "edge[?is_root]",
+    "style": {
+      "width": 4
     }
   },
   {

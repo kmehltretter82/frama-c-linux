@@ -22,36 +22,40 @@
 
 open Dive_types
 
-include Graph.Sig.G
-  with type V.t = node
-   and type E.t = node * dependency * node
+(*
+module NodeRef : Datatype.S with type t = node_kind * callstack
+module Index : Datatype.Hashtbl with type key = int
+module NodeTable : Datatype.Hashtbl with type key = NodeRef.t
+module NodeSet : Datatype.Set with type elt = node
+module BaseSet : Datatype.Set with type elt = Cil_types.varinfo
+module FunctionMap : Datatype.Map with type key = Cil_types.kernel_function
+*)
 
-module Node : Datatype.S_with_collections with type t = node
+type t
 
-module Dependency : Graph.Sig.COMPARABLE with type t = dependency
+val create : unit -> t
+val clear : t -> unit (* reset to almost an empty context,
+                         but keeps folded and hidden bases *)
 
-val create : ?size:int -> unit -> t
+val get_graph : t -> Dive_graph.t
+val find_node : t -> int -> node
+val get_max_dep_fetch_count : t -> int
 
-val create_node :
-  node_kind:node_kind ->
-  node_locality:node_locality -> t -> node
+val get_roots : t -> node list
+val set_unique_root : t -> node -> unit
+val add_root : t -> node -> unit
+val remove_root : t -> node -> unit
 
+val is_folded : t -> Cil_types.varinfo -> bool
+val unfold : t -> Cil_types.varinfo -> unit
+val fold : t -> Cil_types.varinfo -> unit
+
+val is_hidden : t -> node_kind -> bool
+val hide : t -> Cil_types.varinfo -> unit
+val show : t -> Cil_types.varinfo -> unit
+
+val add_node : t -> node_kind:node_kind -> node_locality:node_locality -> node
 val remove_node : t -> node -> unit
 
-val update_node_values : node -> Cvalue.V.t -> Cil_types.typ -> unit
-
-val create_dependency : t -> Cil_types.kinstr ->
-  node -> dependency_kind -> node -> unit
-
-val remove_dependency : t -> node * dependency * node -> unit
-val remove_dependencies : t -> node -> unit
-
-val find_independant_nodes : t -> node list -> node list
-val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
-  t -> node list -> node list
-
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
-
-val to_json : t -> Json.t
-val diff_to_json : t -> graph_diff -> Json.t
+val update_diff : t -> node -> unit
+val take_last_diff : t -> graph_diff

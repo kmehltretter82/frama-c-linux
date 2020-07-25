@@ -768,6 +768,8 @@ src/plugins/dive/build.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/callstack.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/callstack.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/configure.ac: CEA_LGPL_OR_PROPRIETARY
+src/plugins/dive/context.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/dive/context.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/dive_graph.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/dive_graph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/dive/dive_types.mli: CEA_LGPL_OR_PROPRIETARY

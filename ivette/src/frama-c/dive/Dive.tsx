@@ -273,12 +273,13 @@ class Dive {
 
     for (const dep of data.deps)
     {
+      const src = this.cy.$id(dep.src);
+      const dst = this.cy.$id(dep.dst);
+      const isRoot = dst?.data('is_root');
       this.cy.add({
-        data: { ...dep, source: dep.src, target: dep.dst },
+        data: { ...dep, source: dep.src, target: dep.dst, is_root: isRoot },
         group: 'edges',
-        classes:
-          this.cy.$id(dep.src).hasClass('new') ||
-          this.cy.$id(dep.dst).hasClass('new') ? 'new' : ''
+        classes: src?.hasClass('new') || dst?.hasClass('new') ? 'new' : '',
       });
     }
 
@@ -327,8 +328,8 @@ class Dive {
         /* Do not move new nodes */
         animateFilter: (node: Cytoscape.Singular) => !newNodes.contains(node),
         stop: () => {
-            this.cy.$(".new").addClass('old').removeClass('new');
-          },
+          this.cy.$('.new').addClass('old').removeClass('new');
+        },
         ...this.layoutOptions,
       } as unknown as Cytoscape.LayoutOptions).run();
     }

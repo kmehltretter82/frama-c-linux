@@ -1,42 +1,42 @@
 digraph G {
-  cp1 [label=<r>, shape=box, ];
-  cp2 [label=<tmp>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp2 [label=<r>, shape=box, style="bold", ];
+  cp3 [label=<tmp>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp4 [label=<tmp_0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp5 [label=<tmp_0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp6 [label=<__retres>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp7 [label=<__retres>, shape=box, fillcolor="#EEFFEE", color="#004400",
        style="filled", ];
-  cp8 [label=<__retres>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp9 [label=<__retres>, shape=box, fillcolor="#EEFFEE", color="#004400",
        style="filled", ];
-  cp10 [label=<g>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp11 [label=<g>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp14 [label=<x>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp15 [label=<x>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp16 [label=<x2>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp17 [label=<x2>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
-  cp18 [label=<x1>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp19 [label=<x1>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp18;cp16;cp4;cp2;cp1;
-    subgraph cluster_cs_2 { label=<f>; cp6;
+  subgraph cluster_cs_1 { label=<main>; cp19;cp17;cp5;cp3;cp2;
+    subgraph cluster_cs_2 { label=<f>; cp7;
        };
-    subgraph cluster_cs_3 { label=<f>; cp8;
+    subgraph cluster_cs_3 { label=<f>; cp9;
        };
      };
-  subgraph cluster_cs_4 { label=<f>; cp14;
+  subgraph cluster_cs_4 { label=<f>; cp15;
      };
-  subgraph cluster_file_1 { label=<tests/dive/callstack_global.i>; cp10;
+  subgraph cluster_file_1 { label=<tests/dive/callstack_global.i>; cp11;
      };
   
-  cp2 -> cp1;
-  cp4 -> cp1;
-  cp6 -> cp2;
-  cp8 -> cp4;
-  cp10 -> cp6;
-  cp10 -> cp8;
-  cp10 -> cp10;
-  cp14 -> cp10;
-  cp16 -> cp14;
-  cp18 -> cp14;
+  cp3 -> cp2;
+  cp5 -> cp2;
+  cp7 -> cp3;
+  cp9 -> cp5;
+  cp11 -> cp7;
+  cp11 -> cp9;
+  cp11 -> cp11;
+  cp15 -> cp11;
+  cp17 -> cp15;
+  cp19 -> cp15;
   
   }

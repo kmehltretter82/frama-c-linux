@@ -22,22 +22,7 @@
 
 open Cil_types
 open Dive_types
-
-type t
-
-val create : unit -> t
-val clear : t -> unit (* reset to almost an empty context,
-                         but keeps folded and hidden bases *)
-
-val get_graph : t -> Dive_graph.t
-val get_roots : t -> node list
-
-val unfold_base : t -> varinfo -> unit
-val fold_base : t -> varinfo -> unit
-val hide_base : t -> varinfo -> unit
-val unhide_base : t -> varinfo -> unit
-
-val find_node : t -> int -> node
+open Context
 
 val add_lval : t -> kinstr -> lval -> node
 val add_var : t -> varinfo -> node
@@ -54,5 +39,3 @@ val show : t -> node -> unit
 val hide : t -> node -> unit
 
 val reduce_to_horizon : t -> int option range -> node -> unit
-
-val take_last_differences : t -> graph_diff

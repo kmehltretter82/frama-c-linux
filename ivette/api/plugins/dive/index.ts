@@ -142,8 +142,9 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
 /** A graph node */
 export type node =
   { id: nodeId, label: string, kind: string, locality: nodeLocality,
-    backward_explored: string, forward_explored: string, writes: location[],
-    values?: string, range: number | string, type?: string };
+    is_root: boolean, backward_explored: string, forward_explored: string,
+    writes: location[], values?: string, range: number | string,
+    type?: string };
 
 /** Loose decoder for `node` */
 export const jNode: Json.Loose<node> =
@@ -152,6 +153,7 @@ export const jNode: Json.Loose<node> =
     label: Json.jFail(Json.jString,'String expected'),
     kind: Json.jFail(Json.jString,'String expected'),
     locality: jNodeLocalitySafe,
+    is_root: Json.jFail(Json.jBoolean,'Boolean expected'),
     backward_explored: Json.jFail(Json.jString,'String expected'),
     forward_explored: Json.jFail(Json.jString,'String expected'),
     writes: Json.jArray(jLocationSafe),
@@ -169,13 +171,14 @@ export const jNodeSafe: Json.Safe<node> = Json.jFail(jNode,'Node expected');
 export const byNode: Compare.Order<node> =
   Compare.byFields
     <{ id: nodeId, label: string, kind: string, locality: nodeLocality,
-       backward_explored: string, forward_explored: string,
+       is_root: boolean, backward_explored: string, forward_explored: string,
        writes: location[], values?: string, range: number | string,
        type?: string }>({
     id: byNodeId,
     label: Compare.string,
     kind: Compare.string,
     locality: byNodeLocality,
+    is_root: Compare.boolean,
     backward_explored: Compare.string,
     forward_explored: Compare.string,
     writes: Compare.array(byLocation),

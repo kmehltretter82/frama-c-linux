@@ -1,62 +1,62 @@
 digraph G {
-  cp1 [label=<res>, shape=box, ];
-  cp2 [label=<i>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp2 [label=<res>, shape=box, style="bold", ];
+  cp3 [label=<i>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp4 [label=<f>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp5 [label=<f>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp6 [label=<i0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp7 [label=<i0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
        style="filled", ];
-  cp8 [label=<i1>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp9 [label=<i1>, shape=box, fillcolor="#EEFFEE", color="#004400",
        style="filled", ];
-  cp10 [label=<i2>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp11 [label=<i2>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp12 [label=<i3>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp13 [label=<i3>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp14 [label=<i4>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp15 [label=<i4>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp16 [label=<i5>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp17 [label=<i5>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp18 [label=<i6>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp19 [label=<i6>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp20 [label=<i7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp21 [label=<i7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp22 [label=<f0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+  cp23 [label=<f0>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
-  cp24 [label=<f1>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp25 [label=<f1>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp26 [label=<f2>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp27 [label=<f2>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp28 [label=<f3>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp29 [label=<f3>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp30 [label=<f4>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp31 [label=<f4>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp32 [label=<f5>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp33 [label=<f5>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp34 [label=<f6>, shape=box, fillcolor="#EEFFEE", color="#004400",
+  cp35 [label=<f6>, shape=box, fillcolor="#EEFFEE", color="#004400",
         style="filled", ];
-  cp36 [label=<f7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp37 [label=<f7>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp36;cp34;cp32;cp30;cp28;cp26;cp24;cp22;cp20;cp18;cp16;cp14;cp12;cp10;cp8;cp6;cp4;cp2;cp1;
+  subgraph cluster_cs_1 { label=<main>; cp37;cp35;cp33;cp31;cp29;cp27;cp25;cp23;cp21;cp19;cp17;cp15;cp13;cp11;cp9;cp7;cp5;cp3;cp2;
      };
   
-  cp2 -> cp1;
-  cp4 -> cp1;
-  cp6 -> cp2;
-  cp8 -> cp2;
-  cp10 -> cp2;
-  cp12 -> cp2;
-  cp14 -> cp2;
-  cp16 -> cp2;
-  cp18 -> cp2;
-  cp20 -> cp2;
-  cp22 -> cp4;
-  cp24 -> cp4;
-  cp26 -> cp4;
-  cp28 -> cp4;
-  cp30 -> cp4;
-  cp32 -> cp4;
-  cp34 -> cp4;
-  cp36 -> cp4;
+  cp3 -> cp2;
+  cp5 -> cp2;
+  cp7 -> cp3;
+  cp9 -> cp3;
+  cp11 -> cp3;
+  cp13 -> cp3;
+  cp15 -> cp3;
+  cp17 -> cp3;
+  cp19 -> cp3;
+  cp21 -> cp3;
+  cp23 -> cp5;
+  cp25 -> cp5;
+  cp27 -> cp5;
+  cp29 -> cp5;
+  cp31 -> cp5;
+  cp33 -> cp5;
+  cp35 -> cp5;
+  cp37 -> cp5;
   
   }

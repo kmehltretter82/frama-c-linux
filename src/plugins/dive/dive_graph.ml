@@ -22,13 +22,37 @@
 
 open Dive_types
 
-module Node =
-struct
-  type t = node
-  let compare v1 v2 = v1.node_key - v2.node_key
-  let hash v = v.node_key
-  let equal v1 v2 = v1.node_key = v2.node_key
-end
+let fresh_key =
+  let next_key = ref 0 in
+  fun () -> incr next_key; !next_key
+
+let new_node
+    ?(node_kind=Error "no kind")
+    ?(node_locality={loc_file=""; loc_callstack=[]})
+    () = {
+  node_key = fresh_key ();
+  node_kind;
+  node_locality;
+  node_is_root = false;
+  node_hidden = false;
+  node_values = None;
+  node_range = Empty;
+  node_writes_computation = NotDone;
+  node_reads_computation = NotDone;
+  node_writes_stmts = [];
+}
+
+module Node = Datatype.Make_with_collections
+    (struct
+      type t = node
+      include Datatype.Serializable_undefined
+      let name = "Dive.Node"
+      let reprs = [ new_node () ]
+      let compare n1 n2 = Datatype.Int.compare n1.node_key n2.node_key
+      let hash n = n.node_key
+      let equal n1 n2 = n1.node_key = n2.node_key
+      let pretty fmt n = Format.pp_print_int fmt n.node_key
+    end)
 
 module Dependency =
 struct
@@ -47,39 +71,13 @@ module G =
   Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Node) (Dependency)
 include G
 
-let vertices g =
-  fold_vertex (fun n acc -> n ::acc) g []
-
-let edges g =
-  fold_edges_e (fun d acc -> d ::acc) g []
-
-let fresh_key =
-  let next_key = ref 0 in
-  fun () -> incr next_key; !next_key
 
 let create_node ~node_kind ~node_locality g =
-  let node = {
-    node_key = fresh_key ();
-    node_kind;
-    node_locality;
-    node_hidden = false;
-    node_values = None;
-    node_range = Empty;
-    node_writes_computation = NotDone;
-    node_reads_computation = NotDone;
-    node_writes_stmts = [];
-  }
-  in
+  let node = new_node ~node_kind ~node_locality () in
   add_vertex g node;
   node
 
 let remove_node = remove_vertex
-
-let update_node_values node new_values typ =
-  node.node_values <-
-    Some (Extlib.opt_fold Cvalue.V.join node.node_values new_values);
-  node.node_range <-
-    Node_range.(upper_bound node.node_range (evaluate new_values typ))
 
 let create_dependency g kinstr v1 dependency_kind v2 =
   let same_kind (_,e,_) =
@@ -117,6 +115,19 @@ let remove_dependency g edge =
 
 let remove_dependencies g node =
   iter_pred_e (remove_dependency g) g node
+
+let vertices g =
+  fold_vertex (fun n acc -> n ::acc) g []
+
+let edges g =
+  fold_edges_e (fun d acc -> d ::acc) g []
+
+
+let update_node_values node new_values typ =
+  node.node_values <-
+    Some (Extlib.opt_fold Cvalue.V.join node.node_values new_values);
+  node.node_range <-
+    Node_range.(upper_bound node.node_range (evaluate new_values typ))
 
 let find_independant_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
@@ -224,6 +235,8 @@ let ouptput_to_dot out_channel g =
         l := range @ kind @ !l;
         if v.node_writes_computation <> Done then
           l := [ `Style `Dotted ] @ !l;
+        if v.node_is_root then
+          l := [ `Style `Bold ] @ !l;
         !l
       let get_subgraph v =
         let {loc_file ; loc_callstack} = v.node_locality in
@@ -318,6 +331,7 @@ struct
         ("label", `String label) ;
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
+        ("is_root", `Bool node.node_is_root) ;
         ("backward_explored", output_computation node.node_writes_computation) ;
         ("forward_explored", output_computation node.node_reads_computation) ;
         ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;

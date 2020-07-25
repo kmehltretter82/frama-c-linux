@@ -39,8 +39,8 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_DIVE@
 PLUGIN_NAME := Dive
-PLUGIN_CMO := self callstack node_kind node_range dive_graph build main \
-  server_interface
+PLUGIN_CMO := self callstack node_kind node_range dive_graph context build \
+  main server_interface
 PLUGIN_CMI := dive_types
 PLUGIN_DEPENDENCIES:= Eva Studia Server
 PLUGIN_HAS_MLI:= yes
