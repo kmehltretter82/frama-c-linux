@@ -557,11 +557,14 @@ let should_explore node =
   | _ -> not node.node_hidden
 
 let bfs ~depth ~iter_succ f root =
+  let module NodeSet = Graph.Node.Set in
   let queue : (node * int) Queue.t = Queue.create () in
+  let marks = ref NodeSet.empty in
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
-    if d < depth then begin
+    if not (NodeSet.mem n !marks) && d < depth then begin
+      marks := NodeSet.add n !marks;
       f n;
       iter_succ (fun n' -> Queue.add (n',d+1) queue) n
     end
