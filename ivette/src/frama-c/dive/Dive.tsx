@@ -321,12 +321,14 @@ class Dive {
     this.recomputeLayout();
   }
 
-  recomputeLayout(newNodes: Cytoscape.Collection = this.cy.collection()): void {
-    if (this.layoutOptions && this.cy.container() && !newNodes.empty()) {
+  recomputeLayout(newNodes?: Cytoscape.Collection): void {
+    if (this.layoutOptions && this.cy.container() &&
+        (newNodes === undefined || !newNodes.empty())) {
       this.cy.layout({
         animationEasing: 'ease-in-out-quad',
         /* Do not move new nodes */
-        animateFilter: (node: Cytoscape.Singular) => !newNodes.contains(node),
+        animateFilter: (node: Cytoscape.Singular) => newNodes === undefined ||
+          !newNodes.contains(node),
         stop: () => {
           this.cy.$('.new').addClass('old').removeClass('new');
         },
