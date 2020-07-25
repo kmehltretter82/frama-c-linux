@@ -377,13 +377,13 @@ class Dive {
     switch (this.mode) {
       case 'explore':
         await Dive.setWindow({
-          perception: { backward: 2, forward: 0 },
+          perception: { backward: 3, forward: 1 },
           horizon: { backward: 3, forward: 1 },
         });
         break;
       case 'overview':
         await Dive.setWindow({
-          perception: { backward: 3, forward: 0 },
+          perception: { backward: 4, forward: 1 },
           horizon: { backward: null, forward: null },
         });
         break;

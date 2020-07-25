@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-dive-from-variables main::res -dive-depth-limit 4"
+STDOPT: +"-dive-from-variables main::res -dive-depth-limit 5"
 */
 
 int f(int x, int y)

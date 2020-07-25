@@ -44,7 +44,7 @@ let get_context =
 
 
 let global_window = ref {
-    perception = { backward = Some 2 ; forward = Some 0 };
+    perception = { backward = Some 2 ; forward = Some 1 };
     horizon = { backward = None ; forward = None };
   }
 
@@ -238,6 +238,9 @@ end
 (* --- Actions                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+let result context =
+  Build.get_graph context, Build.take_last_differences context
+
 let finalize' context node_opt =
   begin match node_opt with
     | None -> ()
@@ -253,7 +256,7 @@ let finalize' context node_opt =
       then
         Build.reduce_to_horizon context horizon node
   end;
-  Build.get_graph context, Build.take_last_differences context
+  result context
 
 let finalize context node =
   finalize' context (Some node)
@@ -291,6 +294,7 @@ let () = Request.register ~package
     ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
       let context = get_context () in
+      Build.show context node;
       finalize context node
     end
 
@@ -301,7 +305,8 @@ let () = Request.register ~package
     begin fun node ->
       let context = get_context () in
       Build.show context node;
-      finalize context node
+      Build.explore_backward ~depth:1 context node;
+      result context
     end
 
 let () = Request.register ~package
@@ -311,5 +316,5 @@ let () = Request.register ~package
     begin fun node ->
       let context = get_context () in
       Build.hide context node;
-      finalize' context None
+      result context
     end

@@ -667,24 +667,25 @@ let bfs ~depth ~iter_succ f root =
   Queue.add (root,0) queue;
   while not (Queue.is_empty queue) do
     let (n,d) = Queue.take queue in
-    f n d;
-    if d < depth then
+    if d < depth then begin
+      f n;
       iter_succ (fun n' -> Queue.add (n',d+1) queue) n
+    end
   done
 
 let explore_backward ~depth context root =
   context.graph_diff <- { context.graph_diff with last_root = Some root };
   let iter_succ f n = Graph.iter_pred f context.graph n
-  and explore_node n d =
-    if n.node_writes_computation <> Done && (should_explore n || d <= 0) then
+  and explore_node n =
+    if n.node_writes_computation <> Done && should_explore n then
       build_node_writes context n
   in
   bfs ~depth ~iter_succ explore_node root
 
 let explore_forward ~depth context root =
   let iter_succ f n = Graph.iter_succ f context.graph n
-  and explore_node n d =
-    if n.node_reads_computation <> Done && (should_explore n || d <= 0) then
+  and explore_node n =
+    if n.node_reads_computation <> Done && should_explore n then
       build_node_reads context n;
   in
   bfs ~depth ~iter_succ explore_node root
@@ -777,11 +778,8 @@ let reduce_to_horizon ({ graph } as context) range new_root =
   in
   Graph.iter_vertex update graph
 
-let show context node =
-  if node.node_hidden then begin
-    node.node_hidden <- false;
-    explore_backward ~depth:0 context node
-  end
+let show _context node =
+  node.node_hidden <- false
 
 let hide context node =
   if not node.node_hidden then begin
