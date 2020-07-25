@@ -124,6 +124,7 @@ class Dive {
   remove(node: Cytoscape.NodeCollection): void {
     const parent = node.parent();
     node.remove();
+    this.cy.$id(`${node.id()}-more`).remove();
     if (parent.nonempty() && parent.children().empty())
       this.remove(parent); // Recursively remove parents
   }
@@ -255,7 +256,7 @@ class Dive {
 
       // Add a node for the user to ask for more dependencies
       const idmore = `${node.id}-more`;
-      this.cy.remove(`#${idmore}`);
+      this.cy.$id(idmore).remove();
       if (node.backward_explored === 'partial') {
         const elemore = this.cy.add({
           group: 'nodes',
