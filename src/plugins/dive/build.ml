@@ -551,9 +551,9 @@ let build_node_reads context node =
 
 (* --- Exploration --- *)
 
-let should_explore node =
+let should_explore node root =
   match node.node_kind with
-  | Scattered _ -> false
+  | Scattered _ -> Graph.Node.equal node root
   | _ -> not node.node_hidden
 
 let bfs ~depth ~iter_succ f root =
@@ -573,7 +573,7 @@ let bfs ~depth ~iter_succ f root =
 let explore_backward ~depth context root =
   let iter_succ f n = Graph.iter_pred f (Context.get_graph context) n
   and explore_node n =
-    if n.node_writes_computation <> Done && should_explore n then
+    if n.node_writes_computation <> Done && should_explore n root then
       build_node_writes context n
   in
   bfs ~depth ~iter_succ explore_node root
@@ -581,7 +581,7 @@ let explore_backward ~depth context root =
 let explore_forward ~depth context root =
   let iter_succ f n = Graph.iter_succ f (Context.get_graph context) n
   and explore_node n =
-    if n.node_reads_computation <> Done && should_explore n then
+    if n.node_reads_computation <> Done && should_explore n root then
       build_node_reads context n;
   in
   bfs ~depth ~iter_succ explore_node root
