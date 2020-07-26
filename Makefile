@@ -829,7 +829,7 @@ PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
-	values/numerors domains/numerors
+	api values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
 
 # Files for the binding to Apron domains. Only available if Apron is available.
@@ -912,6 +912,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	engine/compute_functions engine/analysis register \
 	api/general_requests \
 	utils/unit_tests \
+	api/values_request \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
@@ -1503,11 +1504,11 @@ endif
 
 $(DOC_DIR)/docgen.cmo: $(DOC_DIR)/docgen.ml
 	$(PRINT_OCAMLC) $@
-	$(OCAMLC) -c -I +ocamldoc -I $(CONFIG_DIR) $(DOC_DIR)/docgen.ml
+	$(OCAMLC) -c -I +ocamldoc -I +compiler-libs -I $(CONFIG_DIR) $(DOC_DIR)/docgen.ml
 
 $(DOC_DIR)/docgen.cmxs: $(DOC_DIR)/docgen.ml
 	$(PRINT_PACKING) $@
-	$(OCAMLOPT) -o $@ -shared -I +ocamldoc -I $(CONFIG_DIR) \
+	$(OCAMLOPT) -o $@ -shared -I +ocamldoc -I +compiler-libs -I $(CONFIG_DIR) \
 	  $(DOC_DIR)/docgen.ml
 
 clean-doc::

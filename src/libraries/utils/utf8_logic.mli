@@ -49,6 +49,7 @@ val boolean: string
 val integer: string
 val real: string
 val pi: string
+val infinity: string
 
 (*
 Local Variables:

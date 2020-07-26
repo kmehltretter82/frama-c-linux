@@ -140,21 +140,16 @@ internal_nightly:
   tags:
    - nix
 
-frama-c-ocaml-4.06:
+frama-c-ocaml-4.09:
   variables:
-    OCAML: "4_06"
+    OCAML: "4_09"
   <<: *frama-c-ocaml
   only:
   - schedules
 
-frama-c-ocaml-4.07:
+frama-c-ocaml-4.10:
   variables:
-    OCAML: "4_07"
-  <<: *frama-c-ocaml
-
-frama-c-ocaml-4.05:
-  variables:
-    OCAML: "4_05"
+    OCAML: "4_10"
   <<: *frama-c-ocaml
 
 

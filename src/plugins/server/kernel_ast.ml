@@ -46,11 +46,12 @@ module MarkerKind = struct
 
   let kinds = Enum.dictionary ()
 
-  let kind name = Enum.tag ~name
-      ~descr:(Md.plain (String.capitalize_ascii name)) kinds
+  let kind name =
+    Enum.tag
+      ~name
+      ~descr:(Md.plain (String.capitalize_ascii name))
+      kinds
 
-  let var  = kind "variable"
-  let fct  = kind "function"
   let expr = kind "expression"
   let lval = kind "lvalue"
   let decl = kind "declaration"
@@ -59,24 +60,65 @@ module MarkerKind = struct
   let term = kind "term"
   let prop = kind "property"
 
-  let () = Enum.set_lookup kinds
-      begin
-        let open Printer_tag in
-        function
-        | PStmt _ -> stmt
-        | PStmtStart _ -> stmt
-        | PVDecl _ -> decl
-        | PLval (_, _, (Var vi, NoOffset)) ->
-          if Cil.isFunctionType vi.vtype then fct else var
-        | PLval _ -> lval
-        | PExp _ -> expr
-        | PTermLval _ -> term
-        | PGlobal _ -> glob
-        | PIP _ -> prop
-      end
+  let () =
+    Enum.set_lookup
+      kinds
+      (fun localizable ->
+         let open Printer_tag in
+         match localizable with
+         | PStmt _ -> stmt
+         | PStmtStart _ -> stmt
+         | PVDecl _ -> decl
+         | PLval _ -> lval
+         | PExp _ -> expr
+         | PTermLval _ -> term
+         | PGlobal _ -> glob
+         | PIP _ -> prop)
 
-  let data = Request.dictionary ~package
-      ~name:"markerKind" ~descr:(Md.plain "Marker kind") kinds
+  let data =
+    Request.dictionary
+      ~package
+      ~name:"markerKind"
+      ~descr:(Md.plain "Marker kind")
+      kinds
+
+  include (val data : S with type t = Printer_tag.localizable)
+end
+
+module MarkerVar = struct
+
+  let vars = Enum.dictionary ()
+
+  let kind name =
+    Enum.tag
+      ~name
+      ~descr:(Md.plain (String.capitalize_ascii name))
+      vars
+
+  let none = kind "none"
+  let var = kind "variable"
+  let fct = kind "function"
+
+  let () =
+    Enum.set_lookup
+      vars
+      (fun localizable ->
+         let open Printer_tag in
+         match localizable with
+         | PLval (_, _, (Var vi, NoOffset))
+         | PVDecl (_, _, vi)
+         | PGlobal (GVar (vi, _, _)  | GVarDecl (vi, _)) ->
+           if Cil.isFunctionType vi.vtype then fct else var
+         | PGlobal (GFun _ | GFunDecl _) -> fct
+         | PLval _ | PStmt _ | PStmtStart _
+         | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> none)
+
+  let data =
+    Request.dictionary
+      ~package
+      ~name:"markerVar"
+      ~descr:(Md.plain "Marker variable")
+      vars
 
   include (val data : S with type t = Printer_tag.localizable)
 end
@@ -122,8 +164,18 @@ struct
     let model = States.model () in
     let () =
       States.column
-        ~name:"kind" ~descr:(Md.plain "Marker kind")
-        ~data:(module MarkerKind) ~get:fst
+        ~name:"kind"
+        ~descr:(Md.plain "Marker kind")
+        ~data:(module MarkerKind)
+        ~get:fst
+        model
+    in
+    let () =
+      States.column
+        ~name:"var"
+        ~descr:(Md.plain "Marker variable")
+        ~data:(module MarkerVar)
+        ~get:fst
         model
     in
     let () =
@@ -284,7 +336,14 @@ let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
     ~input:(module Kf) ~output:(module Jtext)
-    (fun kf -> Jbuffer.to_json Printer.pp_global (Kernel_function.get_global kf))
+    begin fun kf ->
+      let libc = Kernel.PrintLibc.get () in
+      if not libc then Kernel.PrintLibc.set true ;
+      let global = Kernel_function.get_global kf in
+      let ast = Jbuffer.to_json Printer.pp_global global in
+      if not libc then Kernel.PrintLibc.set false ;
+      ast
+    end
 
 module Functions =
 struct
