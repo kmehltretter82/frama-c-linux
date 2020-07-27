@@ -46,6 +46,9 @@ def build_env(framac):
         return { **os.environ,  'PATH' : bindir + ':' + os.environ['PATH'] }
 
 def list_targets(dir):
+    if not os.path.isdir(dir):
+        raise OperationException(f"target is not a directory: {dir}")
+
     env = build_env(framac)
     res = subprocess.run(
         ["make", "--directory", dir, "--quiet", "display-targets"],
@@ -56,10 +59,9 @@ def list_targets(dir):
     res = []
     for target in targets:
         if target.endswith(".eva") or target.endswith(".parse"):
-            res.append(dir + "/" + target)
+            res += [f"{dir}/{target}"]
         else:
-            res += [dir + "/" + t for t in list_targets(target)]
-    print(f"list_targets returning: {res}")
+            res += list_targets(target)
     return res
 
 def clone_frama_c(clonedir, hash):
