@@ -81,20 +81,18 @@ void various_loops () {
   }
   Frama_C_show_each_32_80(res);
   res = 0;
-  /* Other loop breaking condition. */
-  for (int i = 0; i < 111; i++) {
-    res++;
-    if (undet && res > 10)
-      break;
-  }
-  Frama_C_show_each_11_111(res);
-  res = 0;
   /* More complex loop condition. */
   int x = 24;
   int k = Frama_C_interval(0, 10);
   for (int i = 75; i + x > 2 * k; i -= 2)
     res++;
   Frama_C_show_each_40_50(res);
+  res = 0;
+  /* Global loop counter. */
+  for (g = 0; g < 101; g++) {
+    res++;
+  }
+  Frama_C_show_each_101(res);
   res = 0;
   /* Loop calling some functions that do not modify the loop counter. */
   for (int i = 0; i < 25; i++) {
@@ -113,6 +111,16 @@ void various_loops () {
   }
   Frama_C_show_each_120(res);
   res = 0;
+  /* Loop counter modified on both sides of a conditional statement. */
+  for (int i = 0; i < 64;) {
+    if (undet)
+      i++;
+    else
+      i+=2;
+    res++;
+  }
+  Frama_C_show_each_32_64(res);
+  res = 0;
 }
 
 /* Loops that cannot be unrolled. */
@@ -120,8 +128,9 @@ void complex_loops () {
   /* Loop counter modified through a pointer. */
   int res = 0;
   int i = 0;
-  int *p = &i;
-  while (i < 64) {
+  int j = 0;
+  int *p = &j;
+  while (j < 64) {
     (*p)++;
     res++;
   }
@@ -147,17 +156,7 @@ void complex_loops () {
   }
   Frama_C_show_each_imprecise(res);
   res = 0;
-  i = 0;
-  while (i < 10) {
-    if (undet)
-      i++;
-    else
-      i++;
-    res++;
-  }
-  Frama_C_show_each_imprecise(res);
   /* Loop counter modified by a function. */
-  res = 0;
   g = 0;
   while (g < 64) {
     incr_g();
@@ -177,16 +176,124 @@ void complex_loops () {
   res = 0;
   /* Random loop condition. */
   i = 0;
-  while (i < 64 && undet) {
+  while (i < 64 || undet) {
     i++;
     res++;
   }
   Frama_C_show_each_imprecise(res);
 }
 
+/* Examples of loops with other exit conditions than simple comparisons.
+   All loops could be automatically unrolled on the second run, but should
+   not be unrolled on the first run. */
+void various_conditions () {
+  int i, res = 0;
+  /* Exit conditions using equality. */
+  for (i = 11; i; i--) {
+    res++;
+  }
+  Frama_C_show_each_11(res);
+  res = 0;
+  for (i = 0; i != 12; i++) {
+    res++;
+  }
+  Frama_C_show_each_12(res);
+  res = 0;
+  /* Loops with conjonction of exit conditions. */
+  for (int i = 13 ; i-- && undet; ) {
+    res ++;
+  }
+  Frama_C_show_each_0_13(res);
+  res = 0;
+  for (int i = 14 ; undet && i-- ; ) {
+    res ++;
+  }
+  Frama_C_show_each_0_14(res);
+  res = 0;
+  /* Loops with several exit conditions. */
+  for (int i = 0 ; undet ; i++) {
+    if (undet || i >= 15)
+      break;
+    res ++;
+  }
+  Frama_C_show_each_0_15(res);
+  res = 0;
+  for (int i = 0; i < 111; i++) {
+    res++;
+    if (undet && res > 10)
+      break;
+  }
+  Frama_C_show_each_11_111(res);
+  res = 0;
+}
+
+/* Examples of loops where temporary variables are introduced by Frama-C.
+   All loops could be automatically unrolled on the second run, but should
+   not be unrolled on the first run. */
+void temporary_variables () {
+  int i, res = 0;
+  for (i = 0; i++ < 20;) {
+    res++;
+  }
+  Frama_C_show_each_20(res);
+  res = 0;
+  for (i = 21; i--;) {
+    res++;
+  }
+  Frama_C_show_each_21(res);
+}
+
+/* Examples of loops with goto statements. */
+void loops_with_goto () {
+  int i, res = 0;
+  for (i = 0; i < 30; i++) {
+    res++;
+    if (undet)
+      goto middle;
+  }
+  Frama_C_show_each_30(res);
+  res = 0;
+ middle: ;
+  /* Should never be unrolled. */
+  for (i = 0; i < 31; i++) {
+    res++;
+    if (undet)
+      goto middle;
+  }
+  Frama_C_show_each_top(res);
+  res = 0;
+  /* Should be unrolled, and [res] should be precise. */
+  for (i = 0; i < 32; i++) {
+    res++;
+    if (undet)
+      goto L1;
+  L1:;
+  }
+  Frama_C_show_each_32(res);
+  res = 0;
+  /* Should be unrolled, but [res] should still be imprecise. */
+  for (i = 0; i < 33; i++) {
+  L2:res++;
+    if (undet)
+      goto L2;
+  }
+  Frama_C_show_each_33_inf(res);
+  res = 0;
+  /* Should never be unrolled. */
+  for (i = 0; i < 34; res++) {
+  L3:i++;
+    if (undet)
+      goto L3;
+  }
+  Frama_C_show_each_top(res);
+  res = 0;
+}
 
 void main () {
   simple_loops ();
   various_loops ();
   complex_loops ();
+  various_conditions ();
+  temporary_variables ();
+  loops_with_goto ();
 }

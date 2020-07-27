@@ -25,8 +25,8 @@
    The limit is defined by the option -eva-auto-loop-unroll. *)
 
 (* Gist of the heuristic:
-   - find a loop exit condition, in the form of a statement "if(cond) break;".
-     such that exactly one lvalue [lval] in the condition [cond] is modified
+   - collect loop exit conditions [cond] from statements "if (cond) break;"
+   - find a loop exit condition in which only one lvalue [lval] is modified
      within the loop; all other lvalues must be constant in the loop.
    - find a value [v_exit] such that [lval] ∈ [v_exit] ⇒ [cond] holds.
    - evaluate [lval] to its initial value [v_init] in the loop entry state.
@@ -34,7 +34,7 @@
      iteration of the loop.
 
    If [v_init] + k × [v_delta] ⊂ [v_exit], then the number of iterations
-   is bounded by the limit [k].
+   is bounded by [k].
 
    The heuristic is syntactic and limited to the current function: it does not
    handle assignment through pointers or function calls.
@@ -42,34 +42,49 @@
    whose address is never taken (they cannot be modified through pointers). If
    the loop contains a function call, the condition [cond] should not contain
    global variables (as they may be modified in the function called).
-   A first analyze of the loop gathers all such variables modified within the
+   A first analysis of the loop gathers all such variables modified within the
    loop; all others are constant, and can be evaluated in the loop entry state.
 
    When computing the increment [v_delta] of a lvalue [v] in the loop, the
-   heuristic searches assignments "v = v ± i;". Any other assignment of [v]
-   cancels the heuristic. *)
+   heuristic searches assignments "v = v ± i;". Otherwise, if [v] is only
+   modified within the loop through an assignement "v = v2", the heuristic
+   computes the initial value and delta increment of variable [v2] instead.
+   This is required to deal with temporary variables introduced by the Frama-C
+   normalization.
+   Any other assignment of [v] cancels the heuristic. *)
 
 open Cil_types
 
-(* Is a statement a loop exit condition? If so, returns the condition and
-   whether the condition must hold to exit the loop. Otherwise, returns None. *)
-let is_conditional_break stmt =
-  match stmt.skind with
-  | If (cond, {bstmts=[{skind=Break _}]}, _, _) -> Some (cond, true)
-  | If (cond, _, {bstmts=[{skind=Break _}]}, _) -> Some (cond, false)
-  | _ -> None
+let is_true = function
+  | `True | `TrueReduced _ -> true
+  | _ -> false
 
-(* Returns a loop exit condition, as the conditional expression and whether
-   the condition must be zero or non-zero to exit the loop. *)
+(* Does a block exits a loop? *)
+let is_break block =
+  match block.bstmts with
+  | [{skind = Break _}] -> true
+  | _ -> false
+
+(* Returns a list of loop exit conditions. Each condition is expressed as an
+   expression and whether it must be zero or non-zero to exit the loop. *)
 let find_loop_exit_condition loop =
   let rec aux = function
-    | [] -> None
+    | [] -> []
     | stmt :: tl ->
-      match is_conditional_break stmt with
-      | Some _ as x -> x
-      | None -> aux tl
+      match stmt.skind with
+      | If (cond, b1, b2, _) when is_break b1 || is_break b2 ->
+        if is_break b1
+        then (cond, true) :: aux (b2.bstmts @ tl)
+        else (cond, false) :: aux (b1.bstmts @ tl)
+      | Block b -> aux (b.bstmts @ tl)
+      | _ -> aux tl
   in
   aux loop.bstmts
+
+let is_frama_c_builtin exp =
+  match exp.enode with
+  | Lval (Var vi, NoOffset) -> Ast_info.is_frama_c_builtin vi.vname
+  | _ -> false
 
 (* Effects of a loop:
    - set of varinfos that are directly modified within the loop. Pointer
@@ -105,7 +120,7 @@ let loop_effect_visitor = object (self)
     in
     let () = match instr with
       | Asm _ -> assembly <- true
-      | Call _ -> call <- true
+      | Call (_, exp, _, _) when not (is_frama_c_builtin exp) -> call <- true
       | _ -> ()
     in
     Cil.SkipChildren
@@ -143,7 +158,7 @@ let classify loop_effect lval =
       else
         (* If the address of the variable is taken, it could be modified within
            the loop. We suppose here that this is not the case, but this could
-           lead to some loop unrolling. *)
+           lead to some untimely loop unrolling. *)
         Constant
     | Mem _, _ -> Unsuitable (* Pointers are not supported by the heuristic. *)
   and is_const_offset = function
@@ -177,50 +192,48 @@ let find_lonely_candidate loop_effect expr =
   in
   aux None lvalues
 
-(* Returns true if the instruction assigns [lval]. *)
+(* Returns true if the instruction does not modify [lval]. *)
 let is_safe_instruction lval = function
   | Set (lv, _, _)
   | Call (Some lv, _, _, _) -> not (Cil_datatype.LvalStructEq.equal lval lv)
   | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> true
   | Asm _ -> false
 
-(* Returns true if the statement may assign [lval] during an iteration of the
-   loop [loop]. [lval] is a candidate for the automatic loop unroll heuristic,
-   and thus is modified within the loop. *)
-let is_safe lval ~loop stmt =
-  (* The current block being checked for a goto statement. *)
-  let current_block = ref None in
-  let rec is_safe_stmt stmt =
+(* Returns true if the statement [stmt] of function [kf] does not modify [lval].
+   [lval] is a candidate for the automatic loop unrolling of [loop] [loop]. *)
+let is_constant kf ~loop lval stmt =
+  let rec is_safe_stmt ~goto stmt =
     match stmt.skind with
     | Instr instr -> is_safe_instruction lval instr
     | Return _ | Break _ | Continue _ -> true
-    | If (_, b_then, b_else, _) -> is_safe_block b_then && is_safe_block b_else
+    | If (_, b_then, b_else, _) ->
+      is_safe_block ~goto b_then && is_safe_block ~goto b_else
     | Block b
     | Switch (_, b, _, _)
-    | Loop (_, b, _, _, _) -> is_safe_block b
+    | Loop (_, b, _, _, _) -> is_safe_block ~goto b
     | UnspecifiedSequence list ->
-      List.for_all (fun (stmt, _, _, _, _) -> is_safe_stmt stmt) list
-    | Goto (dest, _) -> begin
-        let dest_blocks = Kernel_function.find_all_enclosing_blocks !dest in
-        (* If the goto leaves the loop, then it is safe. *)
-        if List.mem loop dest_blocks then true else
-          (* If the goto moves into the block currently being checked, then it
-             is safe if the block is safe (which we are currently checking). *)
-          match !current_block with
-          | Some current_block when List.mem current_block dest_blocks -> true
-          | _ ->
-            (* Otherwise, we need to check that the whole block englobing
-               both the source and the destination of the goto is safe. *)
-            let block = Kernel_function.common_block !dest stmt in
-            current_block := Some block;
-            (* If this block is the loop itself, then it is not safe, as [lval]
-               is modified within the loop. *)
-            not (block = loop) && is_safe_block block
-      end
+      List.for_all (fun (stmt, _, _, _, _) -> is_safe_stmt ~goto stmt) list
+    | Goto (dest, _) ->
+      (* If [goto] holds, we are already checking a block for a [goto]. Do not
+         process goto statements again here. *)
+      goto ||
+      let first_stmt = List.hd loop.bstmts in
+      (* If the loop cannot be reached from [dest], then it is safe. *)
+      not (Stmts_graph.stmt_can_reach kf !dest first_stmt) ||
+      (* Otherwise, if the goto leaves the loop, then it forms another loop
+         that contains the current loop, which we don't want to unroll. *)
+      let dest_blocks = Kernel_function.find_all_enclosing_blocks !dest in
+      List.exists (Cil_datatype.Block.equal loop) dest_blocks &&
+      (* Otherwise, the goto stays within the loop: check that the block
+         englobing both the source and the destination is safe. *)
+      let block = Kernel_function.common_block !dest stmt in
+      (* If this block is the loop itself, then it is not safe,
+         as [lval] is modified within the loop. *)
+      not (block == loop) && is_safe_block ~goto:true block
     | _ -> false
   (* A block is safe if all its statements are safe. *)
-  and is_safe_block block = List.for_all is_safe_stmt block.bstmts in
-  is_safe_stmt stmt
+  and is_safe_block ~goto b = List.for_all (is_safe_stmt ~goto) b.bstmts in
+  is_safe_stmt ~goto:false stmt
 
 
 module Make (Abstract: Abstractions.Eva) = struct
@@ -262,9 +275,23 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* If the new value of [expr] is top, no reduction has been performed. *)
       if Val.(equal top value) then None else Some (value, record)
     in
-    (* Different strategies whether cvalue is present. *)
-    match Val.get Main_values.CVal.key with
-    | Some get_cvalue ->
+    (* Assumes that [condition] is [positive]. Returns an over-approximation
+       of the values for which [condition] is [positive]. *)
+    reduce positive >>= fun (value, record) ->
+    (* Evaluates [condition] with the hypothesis [expr] ∈ [value], to check
+       whether [expr] ∈ [value] ⇒ [condition] = [positive]. *)
+    let valuation = Valuation.add valuation expr record in
+    fst (Eval.evaluate ~valuation ~reduction:false state condition)
+    >> fun (_valuation, v) ->
+    let satisfied =
+      if positive
+      then not Val.(is_included zero v)
+      else Val.(equal zero v)
+    in
+    (* If the condition is satisfied, returns [value]. Otherwise, uses a
+       specific feature to cvalue (if possible) to compute a better value. *)
+    if satisfied then Some value else
+      Val.get Main_values.CVal.key >>= fun get_cvalue ->
       (* Assumes that [condition] is NOT [positive]. *)
       reduce (not positive) >>= fun (value, _record) ->
       (* [value] is an over-approximation of the values of [expr] for which
@@ -273,21 +300,6 @@ module Make (Abstract: Abstractions.Eva) = struct
       let cvalue = get_cvalue value in
       cvalue_complement (Cil.typeOf expr) cvalue >>= fun cvalue ->
       Some (Val.set Main_values.CVal.key cvalue Val.top)
-    | None ->
-      (* Assumes that [condition] is [positive]. Returns an over-approximation
-         of the values for which [condition] is [positive]. *)
-      reduce positive >>= fun (value, record) ->
-      (* Evaluates [condition] with the hypothesis [expr] ∈ [value], to check
-         whether [expr] ∈ [value] ⇒ [condition] = [positive]. *)
-      let valuation = Valuation.add valuation expr record in
-      fst (Eval.evaluate ~valuation ~reduction:false state condition)
-      >> fun (_valuation, v) ->
-      let satisfied =
-        if positive
-        then not Val.(is_included zero v)
-        else Val.(equal zero v)
-      in
-      if satisfied then Some value else None
 
   (* Same as [reduce_to_expr] above, but builds the proper valuation from the
      [state]. [state] is the entry state of the loop, and [expr] is the only
@@ -379,7 +391,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      should be a direct access to a variable whose address is not taken,
      and which should not be global if the loop contains function calls.
      Returns None if no increment can be computed. *)
-  let compute_delta lval loop =
+  let compute_delta kf lval loop =
     let rec delta_stmt acc stmt =
       match stmt.skind with
       | Instr instr -> delta_instruction lval acc instr
@@ -392,9 +404,11 @@ module Make (Abstract: Abstractions.Eva) = struct
       | If (_e, b1, b2, _loc) ->
         join_delta (delta_block acc b1) (delta_block acc b2)
       | Block b -> delta_block acc b
+      | UnspecifiedSequence list ->
+        List.fold_left (fun acc (s, _, _, _, _) -> delta_stmt acc s) acc list
       | _ ->
         (* For other statements, we only check that they do not modify [lval]. *)
-        if is_safe lval ~loop stmt then acc else raise NoIncrement
+        if is_constant kf ~loop lval stmt then acc else raise NoIncrement
     and delta_block acc block =
       List.fold_left delta_stmt acc block.bstmts
     in
@@ -404,6 +418,57 @@ module Make (Abstract: Abstractions.Eva) = struct
       final_delta delta >> fun d -> Some d
     with NoIncrement -> None
 
+  (* If in the block [loop], [lval] is assigned once to the value of another
+     lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
+  let cross_equality lval loop =
+    (* If no such single equality can be found, return [lval] unchanged. *)
+    let exception No_equality in
+    let rec find_lval acc expr =
+      if acc <> None then raise No_equality else
+        match expr.enode with
+        | Lval lval -> Some lval
+        | Info (e, _) -> find_lval acc e
+        | _ -> raise No_equality
+    in
+    let cross_instr acc = function
+      | Set (lv, expr, _loc) when Cil_datatype.LvalStructEq.equal lv lval ->
+        find_lval acc expr
+      | Local_init (varinfo, AssignInit (SingleInit expr), _loc)
+        when Cil_datatype.LvalStructEq.equal (Cil.var varinfo) lval ->
+        find_lval acc expr
+      | Call (Some lv, _, _, _) when Cil_datatype.LvalStructEq.equal lval lv ->
+        raise No_equality
+      | _ -> acc
+    in
+    let rec cross_stmt acc stmt =
+      match stmt.skind with
+      | Instr instr -> cross_instr acc instr
+      | Block block -> cross_block acc block
+      | UnspecifiedSequence list ->
+        List.fold_left (fun acc (s, _, _, _, _) -> cross_stmt acc s) acc list
+      | If (_, {bstmts=[{skind=Break _}]}, block, _)
+      | If (_, block, {bstmts=[{skind=Break _}]}, _) -> cross_block acc block
+      | _ -> acc
+    and cross_block acc block =
+      List.fold_left cross_stmt acc block.bstmts
+    in
+    match cross_block None loop with
+    | None -> lval
+    | Some lval -> lval
+    | exception No_equality -> lval
+
+  (* If [lval] is a varinfo out-of-scope at statement [stmt] of function [kf],
+     introduces it to the [state]. *)
+  let enter_scope state kf stmt lval =
+    match lval with
+    | Var vi, _ when not (vi.vglob || vi.vformal
+                          || Kernel_function.var_is_in_scope stmt vi) ->
+      let kind = Abstract_domain.Local kf in
+      let state = Abstract.Dom.enter_scope kind [vi] state in
+      let location = Abstract.Loc.eval_varinfo vi in
+      Abstract.Dom.logic_assign None location state
+    | _ -> state
+
   (* Evaluates the lvalue [lval] in the state [state]. Returns None if the value
      may be undeterminate. *)
   let evaluate_lvalue state lval =
@@ -412,30 +477,55 @@ module Make (Abstract: Abstractions.Eva) = struct
     then None
     else flagged_value.v >> fun v -> Some v
 
+  let (>>:) v f = match v with Some v -> f v | None -> false
+
   (* Is the number of iterations of a loop bounded by [limit]?
      [state] is the loop entry state, and [loop_block] the block of the loop. *)
-  let is_bounded_loop state limit loop_block =
+  let is_bounded_loop kf stmt state limit loop_block =
     (* Computes the effect of the loop. Stops if it contains assembly code. *)
-    loop_effect_visitor#compute_effect loop_block >>= fun loop_effect ->
-    (* Finds the first loop exit condition, or stops. *)
-    find_loop_exit_condition loop_block >>= fun (condition, positive) ->
-    (* Finds the unique integer lvalue modified within the loop in [condition].
-       Stops if it does not exist is not a good candidate for the heuristic. *)
-    find_lonely_candidate loop_effect condition >>= fun lval ->
-    (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
-       if [lval] ∈ [v_exit] then [condition = positive]. *)
-    reduce_to_lval_from_state state lval condition positive >>= fun v_exit ->
-    (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
-    evaluate_lvalue state lval >>= fun v_init ->
-    (* Computes an over-approximation [v_delta] of the increment of [lval]
-       in one iteration of the loop. *)
-    compute_delta lval loop_block >>= fun v_delta ->
-    let typ = Cil.typeOfLval lval in
-    let limit = Val.inject_int typ (Integer.of_int limit) in
-    (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
-    let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
-    let value = binop PlusA v_init (binop Mult limit v_delta) in
-    Some (Val.is_included value v_exit)
+    loop_effect_visitor#compute_effect loop_block >>: fun loop_effect ->
+    (* Finds loop exit conditions. *)
+    let exit_conditions = find_loop_exit_condition loop_block in
+    (* Does the condition [condition = positive] limits the number of iterations
+       of the loop by [limit]? *)
+    let is_bounded_by_condition (condition, positive) =
+      (* Finds the unique integer lvalue modified within the loop in [condition].
+         Stops if it does not exist is not a good candidate for the heuristic. *)
+      find_lonely_candidate loop_effect condition >>: fun lval ->
+      (* If [lval] is not in scope at [stmt], introduces it into [state] so that
+         [lval] can be properly evaluated in [state]. *)
+      let state = enter_scope state kf stmt lval in
+      (* Reduce [condition] to a sufficient hypothesis over the [lval] value:
+         if [lval] ∈ [v_exit] then [condition = positive]. *)
+      reduce_to_lval_from_state state lval condition positive >>: fun v_exit ->
+      (* If [lval] is only assigned to the value of another lvalue, uses it
+         instead. This is especially useful to deal with temporary variables
+         introduced by the Frama-C normalization. *)
+      let lval = cross_equality lval loop_block in
+      (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
+      evaluate_lvalue state lval >>: fun v_init ->
+      (* Computes an over-approximation [v_delta] of the increment of [lval]
+         in one iteration of the loop. *)
+      compute_delta kf lval loop_block >>: fun v_delta ->
+      let typ = Cil.typeOfLval lval in
+      let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
+      (* Possible iterations numbers to exit the loop. *)
+      let iter_nb = binop Div (binop MinusA v_exit v_init) v_delta in
+      let bound = Abstract_value.Int (Integer.of_int limit) in
+      (* Use the iteration number if it is always smaller than the [limit].
+         Otherwise use [limit]. *)
+      let limit =
+        if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
+        then iter_nb
+        else Val.inject_int typ (Integer.of_int limit)
+      in
+      (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
+      let value = binop PlusA v_init (binop Mult limit v_delta) in
+      Val.is_included value v_exit
+    in
+    (* Tests whether at least one of the exit conditions limits the number of
+       iteration by [limit]. *)
+    List.exists is_bounded_by_condition exit_conditions
 
   (* Computes an automatic loop unrolling for statement [stmt] in state [state],
      with a maximum limit. Returns None for no automatic loop unrolling. *)
@@ -445,8 +535,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       let loop_stmt = Kernel_function.find_enclosing_loop kf stmt in
       match loop_stmt.skind with
       | Loop (_code_annot, block, _loc, _, _) ->
-        is_bounded_loop state max_unroll block >>= fun bounded ->
-        if bounded then Some max_unroll else None
+        if is_bounded_loop kf stmt state max_unroll block
+        then Some max_unroll
+        else None
       | _ -> None
     with Not_found -> None
 end
