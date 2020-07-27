@@ -582,7 +582,8 @@ export default () => (
   <Component
     id="dive.graph"
     label="Data-flow graph"
-    title="Data-flow graph"
+    title={'Data dependency graph according to an Eva analysis.\nNodes color ' +
+           'represents the precision of the values inferred by Eva.'}
   >
     <GraphView />
   </Component>
