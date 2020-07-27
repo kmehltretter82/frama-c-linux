@@ -58,20 +58,6 @@ struct
       | WpContext.Kf f -> Some f, WpStrategy.is_main_init f in
     let w = ref p in
     V.iter ?kf ~init (fun vi -> w := MemoryContext.set vi (V.param vi) !w) ;
-    let add_assign kf _emitter  = function
-      | WritesAny ->
-          Wp_parameters.warning
-            ~wkey:Wp_parameters.wkey_imprecise_hypotheses_assigns
-            "No assigns for function '%a', %s hypotheses will be imprecise"
-            Kernel_function.pretty kf datatype
-      | Writes l ->
-          List.iter (fun (e,_ds) -> w := MemoryContext.assigned e !w) l
-    in
-    begin match kf with
-      | None -> ()
-      | Some kf ->
-          Annotations.iter_assigns (add_assign kf) kf Cil.default_behavior_name
-    end ;
     M.hypotheses !w
 
   (* -------------------------------------------------------------------------- *)

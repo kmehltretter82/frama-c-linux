@@ -30,7 +30,6 @@ type partition
 
 val empty : partition
 val set : varinfo -> param -> partition -> partition
-val assigned : identified_term -> partition -> partition
 
 val add_behavior : kernel_function -> string -> partition -> unit
 val get_behavior : kernel_function -> string -> partition -> behavior option

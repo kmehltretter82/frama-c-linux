@@ -50,7 +50,6 @@ type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
   to_heap : zone list ; (* [ p, ... ] *)
   context : zone list ; (* [ p+(..), ... ] *)
-  assigned: identified_term list (* Must refer to pointed locations *)
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -61,7 +60,6 @@ let empty = {
   globals = [] ;
   context = [] ;
   to_heap = [] ;
-  assigned = [] ;
 }
 
 let set x p w =
@@ -85,27 +83,6 @@ let set x p w =
         let z = if p = ByShift then Arr x else Ptr x in
         { w with to_heap = z :: w.to_heap }
       else w
-
-let assigned t w =
-  let rec assigned_via_pointer t =
-    match t.term_node with
-    | TLval (TMem _, _) ->
-        true
-    | TCastE (_, t) | TLogic_coerce (_, t)
-    | Tcomprehension(t, _, _) | Tat (t, _) ->
-        assigned_via_pointer t
-    | Tunion l | Tinter l ->
-        List.exists assigned_via_pointer l
-    | Tif (_, t1, t2) ->
-        assigned_via_pointer t1 || assigned_via_pointer t2
-    | _ ->
-        false
-  in
-  let assigned =
-    if assigned_via_pointer t.it_content then t :: w.assigned
-    else w.assigned
-  in
-  { w with assigned = assigned }
 
 (* -------------------------------------------------------------------------- *)
 (* ANNOTS                                                                     *)
@@ -254,14 +231,48 @@ let main_separation loc globals context heaps =
       in
       List.map for_typed_heap heaps
 
-let clauses_of_partition loc p =
+let assigned_locations kf filter =
+  let add_from l (e, _ds) =
+    if filter e.it_content then e :: l else l
+  in
+  let add_assign kf _emitter assigns l = match assigns with
+    | WritesAny ->
+        Wp_parameters.warning
+          ~wkey:Wp_parameters.wkey_imprecise_hypotheses_assigns ~once:true
+          "No assigns for function '%a', model hypotheses will be imprecise"
+          Kernel_function.pretty kf ;
+        l
+    | Writes froms -> List.fold_left add_from l froms
+  in
+  Annotations.fold_assigns (add_assign kf) kf Cil.default_behavior_name []
+
+let assigned_via_pointers kf =
+  let rec assigned_via_pointer t =
+    match t.term_node with
+    | TLval (TMem _, _) ->
+        true
+    | TCastE (_, t) | TLogic_coerce (_, t)
+    | Tcomprehension(t, _, _) | Tat (t, _) ->
+        assigned_via_pointer t
+    | Tunion l | Tinter l ->
+        List.exists assigned_via_pointer l
+    | Tif (_, t1, t2) ->
+        assigned_via_pointer t1 || assigned_via_pointer t2
+    | _ ->
+        false
+  in
+  assigned_locations kf assigned_via_pointer
+
+let clauses_of_partition kf loc p =
   let globals = global_zones p in
   let filter p = not (Logic_utils.is_trivially_true p) in
   let main_sep =
     main_separation loc globals (context_zones p) (heaps p)
   in
   let assigns_sep =
-    List.map (fun t -> separated_from_addr loc t globals) p.assigned
+    List.map
+      (fun t -> separated_from_addr loc t globals)
+      (assigned_via_pointers kf)
   in
   let context_validity =
     List.map (valid_region loc) (context_zones p)
@@ -269,24 +280,23 @@ let clauses_of_partition loc p =
   let reqs = main_sep @ assigns_sep @ context_validity in
   let reqs = List.filter filter reqs in
   let reqs = List.sort_uniq Logic_utils.compare_predicate reqs in
-  reqs, []
+  reqs
 
 let emitter =
   Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
 
 let get_behavior kf name partition =
   let loc = Kernel_function.get_location kf in
-  let reqs,enss = clauses_of_partition loc partition in
+  let reqs = clauses_of_partition kf loc partition in
   let reqs = List.map Logic_const.new_predicate reqs in
-  let enss = List.map (fun p -> Normal, Logic_const.new_predicate p) enss in
-  match reqs,enss with
-  | [], [] -> None
-  | l1, l2 ->
+  match reqs with
+  | [] -> None
+  | l1 ->
       Some {
         b_name = name ;
         b_requires = l1 ;
         b_assumes = [] ;
-        b_post_cond = l2 ;
+        b_post_cond = [] ;
         b_assigns = WritesAny ;
         b_allocation = FreeAllocAny ;
         b_extended = []
