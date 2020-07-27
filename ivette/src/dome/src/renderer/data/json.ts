@@ -202,7 +202,8 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
   return (js: json) => {
     try {
       return fn(js) ?? defaultValue;
-    } catch (_err) {
+    } catch (err) {
+      if (DEVEL) console.error('[Dome.json]', err);
       return defaultValue;
     }
   };
