@@ -1,3 +1,0 @@
-[kernel] Parsing tests/bts/bts2252.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/bts/bts2252.c:22: Warning: 
-  Calling undeclared function strncpy. Old style K&R code?

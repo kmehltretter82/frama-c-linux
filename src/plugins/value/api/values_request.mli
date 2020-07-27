@@ -19,27 +19,3 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
-open Server
-
-let package =
-  Package.package
-    ~plugin:"eva"
-    ~name:"general"
-    ~title:"Eva General Services"
-    ~readme:"eva.md"
-    ()
-
-module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
-
-let callers kf =
-  let list = !Db.Value.callers kf in
-  List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
-
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCallers"
-    ~descr:(Markdown.plain "Get the list of call site of a function")
-    ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
-    callers
-
-(**************************************************************************)

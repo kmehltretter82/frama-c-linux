@@ -8,5 +8,5 @@ export const REACT_DEVELOPER_TOOLS = undefined ;
 
 // Shall not be used in non-development mode
 export default function installExtension(_id) {
-  return Promise.reject();
+  return Promise.resolve();
 }
