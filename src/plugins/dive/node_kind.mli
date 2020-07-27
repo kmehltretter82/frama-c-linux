@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Datatype.S with type t = Graph_types.node_kind
+include Datatype.S with type t = Dive_types.node_kind
 
 val get_base : t -> Cil_types.varinfo option
 val to_lval : t -> Cil_types.lval option

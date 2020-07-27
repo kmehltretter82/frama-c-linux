@@ -24,29 +24,35 @@ type format = Dot | Json
 
 let output format context basename =
   let filename, output_function = match format with
-    | Dot -> basename ^ ".dot", Imprecision_graph.ouptput_to_dot
-    | Json -> basename ^ ".json", Imprecision_graph.ouptput_to_json
+    | Dot -> basename ^ ".dot", Dive_graph.ouptput_to_dot
+    | Json -> basename ^ ".json", Dive_graph.ouptput_to_json
   in
   Self.result "output to %s" filename;
   let out_channel = open_out filename in
-  output_function out_channel (Build.get_graph context);
+  output_function out_channel (Context.get_graph context);
   close_out out_channel
 
 let main () =
   if not (Self.FromBases.is_empty () &&
           Self.FromFunctionAlarms.is_empty ()) then begin
     (* Create the initial graph  *)
-    let context = Build.create () in
+    let context = Context.create () in
     (* Handle parameters *)
-    Self.UnfoldedBases.iter (Build.unfold_base context);
-    Self.HiddenBases.iter (Build.hide_base context);
+    Self.UnfoldedBases.iter (Context.unfold context);
+    Self.HiddenBases.iter (Context.hide context);
     let depth = Self.DepthLimit.get () in
     (* Add targeted vars to it *)
-    Self.FromBases.iter (Build.add_var ~depth context);
+    let add_var vi =
+      let node = Build.add_var context vi in
+      Build.explore_backward ~depth context node
+    in
+    Self.FromBases.iter add_var;
     (* Add alarms *)
     let add_alarm _emitter kf stmt ~rank:_ alarm _code_annot =
-      if Self.FromFunctionAlarms.mem kf then
-        Build.add_alarm ~depth context stmt alarm
+      if Self.FromFunctionAlarms.mem kf then begin
+        let node = Build.add_alarm context stmt alarm in
+        Build.explore_backward ~depth context node
+      end
     in
     if not (Self.FromFunctionAlarms.is_empty ()) then
       Alarms.iter add_alarm;

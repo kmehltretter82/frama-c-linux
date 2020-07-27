@@ -47,6 +47,8 @@ sig
   val lookup : string -> t (** Get back the localizable, if any. *)
 end
 
+module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
+
 (* -------------------------------------------------------------------------- *)
 (** Ast Printer *)
 (* -------------------------------------------------------------------------- *)

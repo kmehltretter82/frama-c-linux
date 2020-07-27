@@ -292,6 +292,32 @@ struct
     with Not_found -> Data.failure "Undefined function '%s'" key
 end
 
+module KfMarker = struct
+  type record
+  let record : record Record.signature = Record.signature ()
+  let fct = Record.field record ~name:"function"
+      ~descr:(Md.plain "Function") (module Kf)
+  let marker = Record.field record ~name:"marker"
+      ~descr:(Md.plain "Marker") (module Marker)
+
+  let data =
+    Record.publish ~package ~name:"location"
+      ~descr:(Md.plain "Location: function and marker") record
+  module R : Record.S with type r = record = (val data)
+  type t = kernel_function * Printer_tag.localizable
+  let jtype = R.jtype
+
+  let to_json (kf, loc) =
+    R.default |>
+    R.set fct kf |>
+    R.set marker loc |>
+    R.to_json
+
+  let of_json json =
+    let r = R.of_json json in
+    R.get fct r, R.get marker r
+end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
