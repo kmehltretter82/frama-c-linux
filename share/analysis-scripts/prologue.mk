@@ -31,12 +31,6 @@ makefile_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 # Improves analysis time, at the cost of extra memory usage
 export FRAMA_C_MEMORY_FOOTPRINT = 8
 
-# path.mk contains variables which are specific to each
-# user and should not be versioned, such as the path to the
-# frama-c binaries (e.g. FRAMAC and FRAMAC_GUI).
-# It is an optional include, unnecessary if frama-c is in the PATH
--include path.mk
-
 # FRAMAC is defined in path.mk when it is included, so the
 # line below will be safely ignored if this is the case.
 # Otherwise, the user may supply it to indicate which Frama-C binary to use.

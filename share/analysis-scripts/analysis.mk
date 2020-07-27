@@ -113,8 +113,6 @@ fc_list = $(subst $(space),$(comma),$(strip $1))
 FRAMAC     ?= frama-c
 FRAMAC_SCRIPT = $(FRAMAC)-script
 FRAMAC_GUI ?= frama-c-gui
-MACHDEP    ?= x86_32
-SLEVEL     ?=
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
@@ -158,7 +156,7 @@ SHELL        := /bin/bash
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
-%.parse: PARSE = $(FRAMAC) $(FCFLAGS) -machdep $(MACHDEP) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
+%.parse: PARSE = $(FRAMAC) $(FCFLAGS) $(if $(value MACHDEP),-machdep $(MACHDEP),) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@

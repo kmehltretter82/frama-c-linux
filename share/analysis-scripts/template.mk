@@ -2,12 +2,15 @@
 # For details and usage information, see the Frama-C User Manual.
 
 ### Prologue. Do not modify this block. #######################################
--include path.mk
-FRAMAC ?= frama-c
+-include path.mk # path.mk contains variables specific to each user
+                 # (e.g. FRAMAC, FRAMAC_GUI) and should not be versioned. It is
+                 # an optional include, unnecessary if frama-c is in the PATH.
+FRAMAC ?= frama-c # FRAMAC is defined in path.mk when it is included, but the
+                  # user can override it in the command-line.
 include $(shell $(FRAMAC)-config -scripts)/prologue.mk
 ###############################################################################
 
-# Edit below as needed. MACHDEP is mandatory. Suggested flags are optional.
+# Edit below as needed. Suggested flags are optional.
 
 MACHDEP = x86_32
 
