@@ -28,12 +28,12 @@
 }
 
 .dead-code {
-    background-color: #FF4242;
-    border-bottom: solid 0.1em #FF4242;
+    background-color: #BBB;
+    border-bottom: solid 0.1em #BBB;
 }
 
 .non-terminating {
-    border-bottom: solid 0.2em #FF4242;
+    border-bottom: solid 0.2em #BBB;
 }
 
 /* -------------------------------------------------------------------------- */
