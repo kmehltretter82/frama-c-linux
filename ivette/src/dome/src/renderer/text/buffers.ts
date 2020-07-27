@@ -44,14 +44,6 @@ export type MarkedText = undefined | null | string
   | MarkerProps & { text: MarkedText }
   ;
 
-interface StackedMarker {
-  id?: string;
-  hover?: boolean;
-  className?: string;
-  options: CodeMirror.TextMarkerOptions;
-  start: CodeMirror.Position;
-}
-
 export interface CSSMarker {
   /** Hover class `'dome-xHover-nnn'` */
   classNameId: string;
@@ -67,15 +59,41 @@ export interface CSSMarker {
 // --- Batched Update
 // --------------------------------------------------------------------------
 
-type Append = { code: "append", text: string };
-type Flushline = { code: "flushline" };
-type Scroll = { code: "scroll", position: string | number | undefined };
-type OpenTextMarker = { code: "open", props: MarkerProps };
-type CloseTextMarker = { code: "close" };
-type Update = Append | Flushline | Scroll | OpenTextMarker | CloseTextMarker;
-
 const BATCH_OPS = 500
 const BATCH_DELAY = 5
+const BATCH_RMAX = 1000
+
+interface MarkerOptions {
+  id?: string,
+  hover?: boolean,
+  className?: string,
+  options: CodeMirror.TextMarkerOptions,
+}
+
+interface StackedMarker extends MarkerOptions {
+  startIndex: number,
+}
+
+interface BufferedMarker extends MarkerOptions {
+  startIndex: number,
+  stopIndex: number,
+}
+
+type BufferedTag = BufferedMarker | undefined;
+
+function rankTag(lmin: number, lmax: number, tg: BufferedTag) {
+  if (tg && (lmin <= tg.stopIndex || tg.startIndex <= lmax)) {
+    const size = tg.stopIndex - tg.startIndex;
+    return size < BATCH_RMAX ? size : BATCH_RMAX;
+  }
+  return BATCH_RMAX;
+}
+
+function byVisibleTag(lmin: number, lmax: number) {
+  return (a: BufferedTag, b: BufferedTag) => (
+    rankTag(lmin, lmax, a) - rankTag(lmin, lmax, b)
+  );
+}
 
 // --------------------------------------------------------------------------
 // --- Buffer
@@ -140,8 +158,10 @@ export class RichTextBuffer extends Emitter {
   private document: CodeMirror.Doc;
   private maxlines: number = 10000;
   private editors: CodeMirror.Editor[] = [];
+  private cacheIndex: number = 0; // document index, negative if not computed
+  private bufferedText: string; // buffered text to append
+  private bufferedTags: BufferedTag[];
   private stacked: StackedMarker[] = [];
-  private updates: Update[] = [];
   private batched: boolean = false;
 
   // Indexed by CSS property dome-xHover-nnnn
@@ -159,6 +179,9 @@ export class RichTextBuffer extends Emitter {
     super();
     const { mode, maxlines } = props;
     this.document = new CodeMirror.Doc('', mode);
+    this.cacheIndex = -1;
+    this.bufferedTags = [];
+    this.bufferedText = '';
     this.setMaxlines(maxlines);
     this.setEdited = this.setEdited.bind(this);
     this.setFocused = this.setFocused.bind(this);
@@ -193,7 +216,8 @@ export class RichTextBuffer extends Emitter {
   append(...values: any[]) {
     if (values.length > 0) {
       const text = values.join(' ');
-      this.push({ code: "append", text });
+      this.bufferedText += text;
+      this.armBatch();
     }
   }
 
@@ -202,7 +226,15 @@ export class RichTextBuffer extends Emitter {
      finish at the beginning of a fresh line, inserts a newline character.
   */
   flushline() {
-    this.push({ code: "flushline" });
+    const doc = this.document;
+    const buf = this.bufferedText;
+    if (buf === '') {
+      const start = doc.posFromIndex(Infinity);
+      if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'buffer');
+      this.cacheIndex = -1;
+    } else {
+      if (buf[buf.length - 1] !== '\n') this.bufferedText += '\n';
+    }
   }
 
   /**
@@ -224,7 +256,9 @@ export class RichTextBuffer extends Emitter {
     this.cssmarkers.clear();
     this.textmarkers.clear();
     this.stacked = [];
-    this.updates = [];
+    this.bufferedTags = [];
+    this.bufferedText = '';
+    this.cacheIndex = 0;
     this.edited = false;
     this.focused = false;
     this.markid = 0;
@@ -254,7 +288,9 @@ export class RichTextBuffer extends Emitter {
      the _proxy_ or the _final_ text marker at your convenience.
   */
   openTextMarker(props: MarkerProps) {
-    this.push({ code: 'open', props });
+    const { id, hover, className, ...options } = props;
+    const startIndex = this.getLastIndex() + this.bufferedText.length;
+    this.stacked.push({ startIndex, id, hover, className, options });
   }
 
   /**
@@ -267,11 +303,23 @@ export class RichTextBuffer extends Emitter {
 
   */
   closeTextMarker() {
-    this.push({ code: 'close' });
+    const tag = this.stacked.pop();
+    if (tag) {
+      const stopIndex = this.getLastIndex() + this.bufferedText.length;
+      this.bufferedTags.push({ stopIndex, ...tag });
+      this.armBatch();
+    }
   }
 
   /** Lookup for the text markers associated with a marker identifier. */
   findTextMarker(id: string): CodeMirror.TextMarker[] {
+    this.doFlushText();
+    this.bufferedTags.forEach((tg, idx, arr) => {
+      if (tg?.id === id) {
+        this.doMark(tg);
+        arr[idx] = undefined;
+      }
+    });
     return this.textmarkers.get(id) ?? [];
   }
 
@@ -395,7 +443,24 @@ export class RichTextBuffer extends Emitter {
      defaults to the end of buffer (when not focused).
   */
   scroll(position?: string | number): void {
-    this.push({ code: 'scroll', position });
+    if (position === undefined) {
+      if (!this.focused) {
+        this.doFlushText();
+        this.emit('scroll', this.document.lastLine());
+      }
+    } else if (typeof position === 'number') {
+      this.doFlushText();
+      this.emit('scroll', position);
+    } else if (typeof position === 'string') {
+      var line = Infinity;
+      this.findTextMarker(position).forEach((tm) => {
+        const rg = tm.find();
+        const ln = rg.from.line;
+        if (ln < line) line = ln;
+      });
+      if (line !== Infinity)
+        this.emit('scroll', line);
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -406,7 +471,10 @@ export class RichTextBuffer extends Emitter {
     _editor: CodeMirror.Editor,
     change: CodeMirror.EditorChangeLinkedList
   ) {
-    if (change.origin !== 'buffer') this.setEdited(true);
+    if (change.origin !== 'buffer') {
+      this.setEdited(true);
+      this.cacheIndex = -1;
+    }
     this.emit('change');
   }
 
@@ -446,16 +514,33 @@ export class RichTextBuffer extends Emitter {
 
      The operation `fn` is performed on each code mirror
      instance currently linked to this buffer.
+
+     Exceptions raised by `fn` are catched and dumped in the console.
    */
   forEach(fn: (editor: CodeMirror.Editor) => void) {
-    this.editors.forEach(fn);
+    this.editors.forEach((cm) => {
+      try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
+    });
   };
 
   // --------------------------------------------------------------------------
   // --- Update Operations
   // --------------------------------------------------------------------------
 
-  /* Removes head lines to fits into maximum lines. */
+  /* Append Operation */
+  private doFlushText() {
+    const text = this.bufferedText;
+    if (text.length > 0) {
+      this.bufferedText = '';
+      const doc = this.document;
+      const start = doc.posFromIndex(Infinity);
+      doc.replaceRange(text, start, undefined, 'buffer');
+      this.cacheIndex = -1;
+      this.doShrink();
+    }
+  }
+
+  /* Shrink Operation */
   private doShrink() {
     const lines = this.document.lineCount();
     if (lines > this.maxlines) {
@@ -467,90 +552,72 @@ export class RichTextBuffer extends Emitter {
         { line: q, ch: 0 },
         'buffer'
       );
+      this.cacheIndex = -1;
     }
-  }
-
-  /* Append Operation */
-  private doAppend(text: string) {
-    const doc = this.document;
-    const start = doc.posFromIndex(Infinity);
-    doc.replaceRange(text, start, undefined, 'buffer');
-  }
-
-  /* FlushLine Operation */
-  private doFlushLine() {
-    const doc = this.document;
-    const start = doc.posFromIndex(Infinity);
-    if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'flush');
-  }
-
-  /* Open Operation */
-  private doOpen(props: MarkerProps) {
-    const { id, hover, className, ...options } = props;
-    const start = this.document.posFromIndex(Infinity);
-    this.stacked.push({ start, id, hover, className, options });
   }
 
   /* Close Operation */
-  private doClose() {
-    const tag = this.stacked.pop();
-    const doc = this.document;
-    if (tag) {
-      const { id, hover, start, className } = tag;
-      const stop = doc.posFromIndex(Infinity);
-      var markerId;
-      if (id || hover) {
-        markerId = 'dome-xHover-' + (this.markid++);
-        const p = doc.indexFromPos(start);
-        const q = doc.indexFromPos(stop);
-        const cmark = {
-          id,
-          classNameId: markerId,
-          hover: hover ?? (id !== undefined),
-          length: q - p,
-        };
-        this.cssmarkers.set(markerId, cmark);
-      }
-      const fullClassName = [
-        'dome-xMarked',
-        id && ('dome-xMark-' + id),
-        markerId,
-        className,
-      ].filter((s) => !!s).join(' ');
-      const options = {
-        shared: true,
-        className: fullClassName,
-        ...tag.options,
+  private doMark(tag: BufferedMarker) {
+    const { id, hover, className, startIndex, stopIndex } = tag;
+    var markerId;
+    if (id || hover) {
+      markerId = 'dome-xHover-' + (this.markid++);
+      const cmark = {
+        id,
+        classNameId: markerId,
+        hover: hover ?? (id !== undefined),
+        length: stopIndex - startIndex,
       };
-      const marker = doc.markText(start, stop, options);
-      if (id) {
-        const markers = this.textmarkers;
-        const ms = markers.get(id);
-        if (ms === undefined)
-          markers.set(id, [marker]);
-        else
-          ms.push(marker);
-      }
+      this.cssmarkers.set(markerId, cmark);
+    }
+    const fullClassName = [
+      'dome-xMarked',
+      id && ('dome-xMark-' + id),
+      markerId,
+      className,
+    ].filter((s) => !!s).join(' ');
+    const options = {
+      shared: true,
+      className: fullClassName,
+      ...tag.options,
+    };
+    const doc = this.document;
+    const start = doc.posFromIndex(startIndex);
+    const stop = doc.posFromIndex(stopIndex);
+    const marker = doc.markText(start, stop, options);
+    if (id) {
+      const markers = this.textmarkers;
+      const ms = markers.get(id);
+      if (ms === undefined)
+        markers.set(id, [marker]);
+      else
+        ms.push(marker);
     }
   }
 
-  /* Scroll Operation */
-  private doScroll(position: string | number | undefined) {
-    if (position === undefined) {
-      if (!this.focused)
-        this.emit('scroll', this.document.lastLine());
-    } else if (typeof position === 'number') {
-      this.emit('scroll', position);
-    } else if (typeof position === 'string') {
-      var line = Infinity;
-      this.findTextMarker(position).forEach((tm) => {
-        const rg = tm.find();
-        const ln = rg.from.line;
-        if (ln < line) line = ln;
+  private doFilterTags() {
+    const tgs = this.bufferedTags;
+    if (tgs.length > 0 && this.editors.length > 0) {
+      let lmin = Infinity;
+      let lmax = 0;
+      this.forEach((cm) => {
+        const { from: fr, to } = cm.getViewport();
+        if (to > lmax) lmax = to;
+        if (fr < lmin) lmin = fr;
       });
-      if (line !== Infinity)
-        this.emit('scroll', line);
+      tgs.sort(byVisibleTag(lmin, lmax));
     }
+    return tgs.splice(0, BATCH_OPS);
+  }
+
+  private getLastIndex() {
+    let idx = this.cacheIndex;
+    if (idx < 0) {
+      const doc = this.document;
+      const line = doc.lastLine() + 1;
+      this.cacheIndex = idx = doc.indexFromPos({ line, ch: 0 });
+    }
+    return idx;
   }
 
   // --------------------------------------------------------------------------
@@ -558,51 +625,30 @@ export class RichTextBuffer extends Emitter {
   // --------------------------------------------------------------------------
 
   private armBatch() {
-    setTimeout(this.doBatch, BATCH_DELAY);
-  }
-
-  private push(op: Update) {
-    this.updates.push(op);
     if (!this.batched) {
-      this.armBatch();
       this.batched = true;
+      setTimeout(this.doBatch, BATCH_DELAY);
     }
   }
 
   /* Batch Operation */
   private doBatch() {
+    this.batched = false;
+    if (!this.bufferedText.length && !this.bufferedTags.length) return;
     try {
-      // Prepate Batch
-      const ops = this.updates.splice(0, BATCH_OPS);
-      if (ops.length === 0) return;
-      // Protect each start/end call against error
-      const forEachEditor = (fn: (cm: CodeMirror.Editor) => void) => {
-        this.editors.forEach((cm) => {
-          try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
-        });
-      };
       // Start Operations
-      var scroll: Scroll | undefined;
-      forEachEditor((cm) => cm.startOperation());
-      // Run Operations
-      ops.forEach((op: Update) => {
-        switch (op.code) {
-          case 'append': this.doAppend(op.text); break;
-          case 'flushline': this.doFlushLine(); break;
-          case 'open': this.doOpen(op.props); break;
-          case 'close': this.doClose(); break;
-          case 'scroll': scroll = op; break;
-        }
-      });
-      // Finalize Operations
-      this.doShrink();
-      forEachEditor((cm) => cm.endOperation());
-      if (scroll) this.doScroll(scroll.position);
+      this.forEach((cm) => cm.startOperation());
+      // Flush Text
+      console.log('TEXT', this.bufferedText.substr(0, 40));
+      this.doFlushText();
+      // Mark Tags
+      console.log('TAGS', this.bufferedTags.length);
+      this.doFilterTags().forEach((tg) => { if (tg) this.doMark(tg); });
+      // End Operations
+      this.forEach((cm) => cm.endOperation());
     } finally {
-      if (this.updates.length > 0)
+      if (this.bufferedTags.length > 0)
         this.armBatch();
-      else
-        this.batched = false;
     }
   }
 
