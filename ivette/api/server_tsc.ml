@@ -167,7 +167,7 @@ let rec makeDecoder ~safe ?self ~names fmt js =
   | Jboolean -> jsafe ~safe "Boolean" jprim fmt "jBoolean"
   | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
   | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
-  | Jtag a -> Format.fprintf fmt "jTag(\"%s\")" a
+  | Jtag a -> Format.fprintf fmt "Json.jTag(\"%s\")" a
   | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
   | Jindex kd -> jsafe ~safe ("#" ^ kd) jindex fmt kd
   | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
