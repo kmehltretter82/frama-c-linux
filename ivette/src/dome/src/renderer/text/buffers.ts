@@ -443,7 +443,7 @@ export class RichTextBuffer extends Emitter {
       this.doFlushText();
       this.emit('scroll', position);
     } else if (typeof position === 'string') {
-      var line = Infinity;
+      let line = Infinity;
       this.findTextMarker(position).forEach((tm) => {
         const rg = tm.find();
         const ln = rg.from.line;
@@ -550,7 +550,7 @@ export class RichTextBuffer extends Emitter {
   /* Close Operation */
   private doMark(tag: BufferedMarker) {
     const { id, hover, className, startIndex, stopIndex } = tag;
-    var markerId;
+    let markerId;
     if (id || hover) {
       markerId = 'dome-xHover-' + (this.markid++);
       const cmark = {
