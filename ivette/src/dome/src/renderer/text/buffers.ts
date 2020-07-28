@@ -8,7 +8,6 @@
 */
 
 import Emitter from 'events';
-import * as KernelData from 'api/kernel/data';
 import CodeMirror from 'codemirror/lib/codemirror.js';
 
 export type Range = { from: CodeMirror.Position, to: CodeMirror.Position };
@@ -33,6 +32,11 @@ export interface MarkerProps extends CodeMirror.TextMarkerOptions {
   hover?: boolean;
   className?: string;
 }
+
+/**
+ * Text with tags.
+ */
+export type TextWithTags = null | string | TextWithTags[]
 
 export interface CSSMarker {
   /** Hover class `'dome-xHover-nnn'` */
@@ -649,7 +653,7 @@ export class RichTextBuffer extends Emitter {
    * Print text containing tags into buffer.
    * @param options Specify particular marker options.
    */
-  printTextWithTags(contents: KernelData.text, options?: MarkerProps) {
+  printTextWithTags(contents: TextWithTags, options?: MarkerProps) {
     if (Array.isArray(contents)) {
       let marker = false;
       const tag = contents.shift();
