@@ -31,7 +31,6 @@ let frama_c_sarif =
   Tool.create
     (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri ())
 
-
 let get_remarks () =
   let f = Mdr_params.Remarks.get () in
   if f <> "" then Parse_remarks.get_remarks f
@@ -176,6 +175,7 @@ let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 
 let gen_run remarks =
   let tool = frama_c_sarif in
+  let name = "frama-c" in
   let invocations = [gen_invocation ()] in
   let rules, results = gen_results remarks in
   let user_annot_results = gen_statuses () in
@@ -187,8 +187,7 @@ let gen_run remarks =
         "user-spec" "User-written ACSL specification" rules
   in
   let rules = make_taxonomies rules in
-  ignore(rules);
-  let taxonomies = [ToolComponent.create (* ~rules*) ()] in
+  let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
   Run.create ~tool ~invocations ~results ~taxonomies ~artifacts ()

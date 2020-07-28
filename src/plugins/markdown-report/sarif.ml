@@ -1077,37 +1077,265 @@ struct
 end
 
 module RunAutomationDetails = struct
-  type t = unit [@@deriving yojson]
-  let default = ()
+  type t = {
+    description: (Message.t [@default Message.default]);
+    id: (string [@default ""]);
+    guid: (string [@default ""]);
+    correlationGuid: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+      ?(description=Message.default) ?(id="") ?(guid="") ?(correlationGuid="")
+      ?(properties=Properties.default) () =
+    { description; id; guid; correlationGuid; properties }
+
+  let default = create ()
 end
 
 module ExternalPropertyFileReferences = struct
-  type t = unit [@@deriving yojson]
-  let default = ()
+  type t = {
+    location: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    guid: (string [@default ""]);
+    itemCount: (int [@default -1]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+    ?(location = ArtifactLocation.default)
+    ?(guid = "")
+    ?(itemCount = -1)
+    ?(properties = Properties.default)
+    () =
+    { location; guid; itemCount; properties }
+
+  let default = create ()
+end
+
+module TranslationMetadata = struct
+  type t = {
+    name: (string [@default ""]);
+    fullName: (string [@default ""]);
+    shortDescription:
+      (MultiformatMessageString.t [@default MultiformatMessageString.default]);
+    fullDescription:
+      (MultiformatMessageString.t [@default MultiformatMessageString.default]);
+    downloadUri: (string [@default ""]);
+    informationUri: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+      ~name
+      ?(fullName = "")
+      ?(shortDescription = MultiformatMessageString.default)
+      ?(fullDescription = MultiformatMessageString.default)
+      ?(downloadUri = "")
+      ?(informationUri = "")
+      ?(properties = Properties.default)
+      ()
+    =
+    { name; fullName; shortDescription; fullDescription;
+      downloadUri; informationUri; properties }
+
+  let default = create ~name:"" ()
 end
 
 module ToolComponent = struct
-  type t = unit [@@deriving yojson]
-  let create () = ()
-  let default = ()
+  module Contents: sig
+    include Json_type with type t = private string
+    val localizedData: t
+    val nonLocalizedData: t
+  end = struct
+    type t = string [@@deriving yojson]
+    let localizedData = "localizedData"
+    let nonLocalizedData = "nonLocalizedData"
+  end
+  type t = {
+    guid: (string [@default ""]);
+    name: (string [@default ""]);
+    organization: (string [@default ""]);
+    product: (string [@default ""]);
+    productSuite: (string [@default ""]);
+    shortDescription:
+      (MultiformatMessageString.t [@default MultiformatMessageString.default]);
+    fullDescription:
+      (MultiformatMessageString.t [@default MultiformatMessageString.default]);
+    fullName: (string [@default ""]);
+    version: (string [@default ""]);
+    semanticVersion: (string [@default ""]);
+    dottedQuadFileVersion: (string [@default ""]);
+    releaseDateUtc: (string [@default ""]);
+    downloadUri: (string [@default ""]);
+    informationUri: (string [@default ""]);
+    globalMessageStrings: (MultiformatMessageStringDictionary.t [@default []]);
+    notifications: (ReportingDescriptor.t list [@default []]);
+    rules: (ReportingDescriptor.t list [@default []]);
+    taxa: (ReportingDescriptor.t list [@default []]);
+    locations: (ArtifactLocation.t list [@default []]);
+    language: (string [@default "en-US"]);
+    contents: (Contents.t list [@default []]);
+    isComprehensive: (bool [@default false]);
+    localizedDataSemanticVersion: (string [@default ""]);
+    minimumRequiredLocalizedDataSemanticVersion: (string [@default ""]);
+    associateComponent:
+      (ToolComponentReference.t [@default ToolComponentReference.default]);
+    translationMetadata:
+      (TranslationMetadata.t [@default TranslationMetadata.default]);
+    supportedTaxonomies: (ToolComponentReference.t list [@default []]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+  let create
+    ?(guid="")
+    ~name
+    ?(organization="")
+    ?(product="")
+    ?(productSuite="")
+    ?(shortDescription=MultiformatMessageString.default)
+    ?(fullDescription=MultiformatMessageString.default)
+    ?(fullName="")
+    ?(version="")
+    ?(semanticVersion="")
+    ?(dottedQuadFileVersion="")
+    ?(releaseDateUtc="")
+    ?(downloadUri="")
+    ?(informationUri="")
+    ?(globalMessageStrings=[])
+    ?(notifications=[])
+    ?(rules=[])
+    ?(taxa=[])
+    ?(locations=[])
+    ?(language="en-US")
+    ?(contents=[Contents.nonLocalizedData])
+    ?(isComprehensive=false)
+    ?(localizedDataSemanticVersion="")
+    ?(minimumRequiredLocalizedDataSemanticVersion="")
+    ?(associateComponent=ToolComponentReference.default)
+    ?(translationMetadata=TranslationMetadata.default)
+    ?(supportedTaxonomies=[])
+    ?(properties=Properties.default)
+    ()
+    =
+    { guid; name; organization; product; productSuite; shortDescription;
+      fullDescription; fullName; version; semanticVersion;
+      dottedQuadFileVersion; releaseDateUtc; downloadUri; informationUri;
+      globalMessageStrings; notifications; rules; taxa; locations; language;
+      contents; isComprehensive; localizedDataSemanticVersion;
+      minimumRequiredLocalizedDataSemanticVersion;
+      associateComponent; translationMetadata; supportedTaxonomies; properties }
+  let default = create ~name:"" ()
 end
 
 module Address = struct
-  type t = unit [@@deriving yojson]
-  let default = []
+  type t = {
+    absoluteAddress: (int [@default -1]);
+    relativeAddress: (int [@default 0]);
+    length: (int [@default 0]);
+    kind: (string [@default ""]);
+    name: (string [@default ""]);
+    fullyQualifiedName: (string [@default ""]);
+    offsetFromParent: (int [@default 0]);
+    index: (int [@default -1]);
+    parentIndex: (int [@default -1]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+    ?(absoluteAddress = -1)
+    ?(relativeAddress = 0)
+    ?(length = 0)
+    ?(kind = "")
+    ?(name = "")
+    ?(fullyQualifiedName = "")
+    ?(offsetFromParent = 0)
+    ?(index = -1)
+    ?(parentIndex = -1)
+    ?(properties = Properties.default)
+    ()
+    =
+    { absoluteAddress; relativeAddress; length; kind; name;
+      fullyQualifiedName; offsetFromParent; index; parentIndex; properties }
+
+  let default = create ()
 end
 
 module WebRequest = struct
-  type t = unit [@@deriving yojson]
+  type t = {
+    index: (int [@default -1]);
+    protocol: (string [@default ""]);
+    version: (string [@default ""]);
+    target: (string [@default ""]);
+    method_: (string [@default ""]) [@key "method"];
+    headers: (JsonStringDictionary.t [@default []]);
+    parameters: (JsonStringDictionary.t [@default []]);
+    body: (ArtifactContent.t [@default ArtifactContent.default]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+    ?(index = -1)
+    ?(protocol = "")
+    ?(version = "")
+    ?(target = "")
+    ?(method_ = "")
+    ?(headers = [])
+    ?(parameters = [])
+    ?(body = ArtifactContent.default)
+    ?(properties = Properties.default)
+    ()
+    =
+    { index; protocol; version; target; method_; headers; parameters;
+      body; properties }
+
+  let default = create ()
+
 end
 
 module WebResponse = struct
-  type t = unit [@@deriving yojson]
+  type t = {
+    index: (int [@default -1]);
+    protocol: (string [@default ""]);
+    version: (string [@default ""]);
+    statusCode: (int [@default 0]);
+    reasonPhrase: (string [@default ""]);
+    headers: (JsonStringDictionary.t [@default []]);
+    body: (ArtifactContent.t [@default ArtifactContent.default]);
+    noResponseReceived: (bool [@default false]);
+    properties: (Properties.t [@default Properties.default]);
+  } [@@deriving yojson]
+
+  let create
+    ?(index = -1)
+    ?(protocol = "")
+    ?(version = "")
+    ?(statusCode = 0)
+    ?(reasonPhrase = "")
+    ?(headers = [])
+    ?(body = ArtifactContent.default)
+    ?(noResponseReceived = false)
+    ?(properties = Properties.default)
+    ()
+    =
+    { index; protocol; version; statusCode; reasonPhrase;
+      headers; body; noResponseReceived; properties }
+
+  let default = create ()
+
 end
 
 module SpecialLocations = struct
-  type t = unit [@@deriving yojson]
-  let default = ()
+  type t = {
+    displayBase: (ArtifactLocation.t [@default ArtifactLocation.default]);
+    properties: (Properties.t [@default Properties.default])
+  } [@@deriving yojson]
+  let create
+    ?(displayBase = ArtifactLocation.default)
+    ?(properties = Properties.default)
+    ()
+    =
+    { displayBase; properties }
+
+  let default = create ()
 end
 
 module Run = struct
