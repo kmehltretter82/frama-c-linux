@@ -61,7 +61,8 @@ export interface CSSMarker {
 
 const BATCH_OPS = 500
 const BATCH_DELAY = 5
-const BATCH_RMAX = 1000
+const BATCH_RMAX = 1000 // max tag range for sorting
+const BATCH_MARGINS = 20 // visible lines above the viewport
 
 interface MarkerOptions {
   id?: string,
@@ -605,7 +606,7 @@ export class RichTextBuffer extends Emitter {
         if (to > lmax) lmax = to;
         if (fr < lmin) lmin = fr;
       });
-      tgs.sort(byVisibleTag(lmin, lmax));
+      if (lmin <= lmax) tgs.sort(byVisibleTag(lmin, lmax + BATCH_MARGINS));
     }
     return tgs.splice(0, BATCH_OPS);
   }
