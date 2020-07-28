@@ -80,6 +80,11 @@ end
 module Z = Make(struct end)
 module Q = Make(struct end)
 
+let bitcnt_type_info_ref = mk_dummy_type_info_ref ()
+
+let set_bitcnt_t tinfo = bitcnt_type_info_ref := tinfo
+let bitcnt_t () = TNamed(!bitcnt_type_info_ref, [])
+
 (**************************************************************************)
 (******************* Initialization of mpz and mpq types ******************)
 (**************************************************************************)
@@ -89,14 +94,18 @@ let init () =
   let set_mp_t = object (self)
     inherit Cil.nopCilVisitor
 
-    (* exit after having initialized the 4 values (for Z.t and Q.t) *)
+    (* exit after having initialized the 5 values:
+       - mp_bitcnt_t
+       - 2 for Z.t
+       - 2 for Q.t *)
+    val nb_to_visit = 5
     val mutable visited = 0
     method private set f info =
       f info;
-      if visited = 3 then
+      visited <- visited + 1;
+      if visited = nb_to_visit then
         raise Exit
       else begin
-        visited <- visited + 1;
         Cil.SkipChildren
       end
 
@@ -106,6 +115,7 @@ let init () =
         else if name = "__e_acsl_mpz_struct" then self#set Z.set_t_struct info
         else if name = "__e_acsl_mpq_t" then self#set Q.set_t info
         else if name = "__e_acsl_mpq_struct" then self#set Q.set_t_struct info
+        else if name = "__e_acsl_mp_bitcnt_t" then self#set set_bitcnt_t info
         else Cil.SkipChildren
       | _ ->
         Cil.SkipChildren
