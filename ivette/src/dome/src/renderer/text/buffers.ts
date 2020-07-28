@@ -33,11 +33,6 @@ export interface MarkerProps extends CodeMirror.TextMarkerOptions {
   className?: string;
 }
 
-/**
- * Text with tags.
- */
-export type TextWithTags = null | string | TextWithTags[]
-
 export interface CSSMarker {
   /** Hover class `'dome-xHover-nnn'` */
   classNameId: string;
@@ -645,37 +640,6 @@ export class RichTextBuffer extends Emitter {
     }
   }
 
-  // --------------------------------------------------------------------------
-  // --- Print Utilities
-  // --------------------------------------------------------------------------
-
-  /**
-   * Print text containing tags into buffer.
-   * @param options Specify particular marker options.
-   */
-  printTextWithTags(contents: TextWithTags, options?: MarkerProps) {
-    if (Array.isArray(contents)) {
-      let marker = false;
-      const tag = contents.shift();
-      if (tag) {
-        if (Array.isArray(tag)) {
-          contents.unshift(tag);
-        } else {
-          this.openTextMarker({ id: tag, ...options ?? {} });
-          marker = true;
-        }
-      }
-      contents.forEach((txt) => this.printTextWithTags(txt, options ?? {}));
-      if (marker) {
-        marker = false;
-        this.closeTextMarker();
-      }
-    } else if (typeof contents === 'string') {
-      this.append(contents);
-    } else {
-      console.error('[Dome.buffers] Unexpected text', contents);
-    }
-  }
 }
 
 // --------------------------------------------------------------------------

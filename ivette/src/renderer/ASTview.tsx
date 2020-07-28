@@ -6,6 +6,7 @@ import React from 'react';
 import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -49,7 +50,7 @@ async function loadAST(
         if (!data) {
           buffer.log('// No code for function', theFunction);
         }
-        buffer.printTextWithTags(data);
+        Utils.printTextWithTags(buffer, data);
         if (theMarker)
           buffer.scroll(theMarker);
       } catch (err) {

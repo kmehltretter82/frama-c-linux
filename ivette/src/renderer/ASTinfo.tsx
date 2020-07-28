@@ -4,6 +4,7 @@
 
 import React from 'react';
 import * as States from 'frama-c/states';
+import * as Utils from 'frama-c/utils';
 
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
@@ -26,7 +27,7 @@ const ASTinfo = () => {
   React.useEffect(() => {
     buffer.clear();
     if (data) {
-      buffer.printTextWithTags(data, { css: 'color: blue' });
+      Utils.printTextWithTags(buffer, data, { css: 'color: blue' });
     }
   }, [buffer, data]);
 
