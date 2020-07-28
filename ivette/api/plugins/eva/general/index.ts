@@ -15,6 +15,14 @@ import * as Server from 'frama-c/server';
 //@ts-ignore
 import * as State from 'frama-c/states';
 
+//@ts-ignore
+import { byMarker } from 'api/kernel/ast';
+//@ts-ignore
+import { jMarker } from 'api/kernel/ast';
+//@ts-ignore
+import { jMarkerSafe } from 'api/kernel/ast';
+//@ts-ignore
+import { marker } from 'api/kernel/ast';
 
 const getCallers_internal: Server.GetRequest<
   Json.key<'#fct'>,
@@ -36,5 +44,41 @@ export const getCallers: Server.GetRequest<
   Json.key<'#fct'>,
   [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
   >= getCallers_internal;
+
+/** Dead code. */
+export interface deadCode {
+  /** List of unreachable statements of a function */
+  unreachable: marker[];
+  /** List of reachable but non terminating statements. */
+  nonTerminating: marker[];
+}
+
+/** Loose decoder for `deadCode` */
+export const jDeadCode: Json.Loose<deadCode> =
+  Json.jObject({
+    unreachable: Json.jList(jMarker),
+    nonTerminating: Json.jList(jMarker),
+  });
+
+/** Safe decoder for `deadCode` */
+export const jDeadCodeSafe: Json.Safe<deadCode> =
+  Json.jFail(jDeadCode,'DeadCode expected');
+
+/** Natural order for `deadCode` */
+export const byDeadCode: Compare.Order<deadCode> =
+  Compare.byFields
+    <{ unreachable: marker[], nonTerminating: marker[] }>({
+    unreachable: Compare.array(byMarker),
+    nonTerminating: Compare.array(byMarker),
+  });
+
+const getDeadCode_internal: Server.GetRequest<Json.key<'#fct'>,deadCode> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getDeadCode',
+  input:  Json.jKey<'#fct'>('#fct'),
+  output: jDeadCode,
+};
+/** Get the list of unreachable statements and non terminating statements in a function */
+export const getDeadCode: Server.GetRequest<Json.key<'#fct'>,deadCode>= getDeadCode_internal;
 
 /* ------------------------------------- */

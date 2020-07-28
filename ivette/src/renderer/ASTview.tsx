@@ -15,7 +15,7 @@ import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 
 import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers } from 'api/plugins/eva/general';
+import { getCallers, getDeadCode } from 'api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -97,6 +97,8 @@ const ASTview = () => {
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
 
+  const deadCode = States.useRequest(getDeadCode, theFunction);
+
   // Hook: async loading
   React.useEffect(() => {
     if (printed.current !== theFunction) {
@@ -109,10 +111,14 @@ const ASTview = () => {
     const decorator = (marker: string) => {
       if (multipleSelections?.some((location) => location?.marker === marker))
         return 'highlighted-marker';
+      if (deadCode?.unreachable?.some((m) => m === marker))
+        return 'dead-code';
+      if (deadCode?.nonTerminating?.some((m) => m === marker))
+        return 'non-terminating';
       return undefined;
     };
     buffer.setDecorator(decorator);
-  }, [buffer, multipleSelections]);
+  }, [buffer, multipleSelections, deadCode]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
