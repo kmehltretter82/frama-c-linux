@@ -7,8 +7,11 @@
  * @module frama-c/utils
 */
 
+import * as Dome from 'dome';
 import * as DomeBuffers from 'dome/text/buffers';
 import * as KernelData from 'api/kernel/data';
+
+const PP = new Dome.PP('Utils');
 
 // --------------------------------------------------------------------------
 // --- Print Utilities
@@ -44,6 +47,6 @@ export function printTextWithTags(
   } else if (typeof contents === 'string') {
     buffer.append(contents);
   } else {
-    console.error('[Dome.buffers] Unexpected text', contents);
+    PP.error('Unexpected text', contents);
   }
 }
