@@ -16,6 +16,8 @@ import * as KernelData from 'api/kernel/data';
 
 /**
  * Print text containing tags into buffer.
+ * @param buffer Rich text buffer to print into.
+ * @param contents Actual text containing tags.
  * @param options Specify particular marker options.
  */
 export function printTextWithTags(
