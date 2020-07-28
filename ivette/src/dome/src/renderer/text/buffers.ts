@@ -639,10 +639,8 @@ export class RichTextBuffer extends Emitter {
       // Start Operations
       this.forEach((cm) => cm.startOperation());
       // Flush Text
-      console.log('TEXT', this.bufferedText.substr(0, 40));
       this.doFlushText();
       // Mark Tags
-      console.log('TAGS', this.bufferedTags.length);
       this.doFilterTags().forEach((tg) => { if (tg) this.doMark(tg); });
       // End Operations
       this.forEach((cm) => cm.endOperation());
