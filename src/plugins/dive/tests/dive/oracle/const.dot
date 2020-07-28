@@ -1,29 +1,29 @@
 digraph G {
-  cp0 [label=<res>, shape=box, ];
-  cp1 [label=<__retres>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp2 [label=<res>, shape=box, style="bold", ];
+  cp3 [label=<__retres>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp3 [label=<c>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp5 [label=<c>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp5 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp7 [label=<w>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp7 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+  cp9 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
        style="filled", ];
-  cp9 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-       style="filled", ];
-  cp11 [label=<i>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-        style="filled,dotted", ];
+  cp11 [label=<y>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
+  cp13 [label=<i>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
+        style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp11;cp0;
-    subgraph cluster_cs_2 { label=<f>; cp9;cp7;cp5;cp3;cp1;
+  subgraph cluster_cs_1 { label=<main>; cp13;cp2;
+    subgraph cluster_cs_2 { label=<f>; cp11;cp9;cp7;cp5;cp3;
        };
      };
   
-  cp1 -> cp0;
-  cp3 -> cp1;
-  cp5 -> cp1;
+  cp3 -> cp2;
+  cp5 -> cp3;
   cp7 -> cp3;
   cp9 -> cp5;
   cp11 -> cp7;
-  cp11 -> cp9;
+  cp13 -> cp9;
+  cp13 -> cp11;
   
   }

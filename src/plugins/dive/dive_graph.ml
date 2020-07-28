@@ -20,15 +20,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Dive_types
 
-module Node =
-struct
-  type t = node
-  let compare v1 v2 = v1.node_key - v2.node_key
-  let hash v = v.node_key
-  let equal v1 v2 = v1.node_key = v2.node_key
-end
+let fresh_key =
+  let next_key = ref 0 in
+  fun () -> incr next_key; !next_key
+
+let new_node
+    ?(node_kind=Error "no kind")
+    ?(node_locality={loc_file=""; loc_callstack=[]})
+    () = {
+  node_key = fresh_key ();
+  node_kind;
+  node_locality;
+  node_is_root = false;
+  node_hidden = false;
+  node_values = None;
+  node_range = Empty;
+  node_writes_computation = NotDone;
+  node_reads_computation = NotDone;
+  node_writes_stmts = [];
+}
+
+module Node = Datatype.Make_with_collections
+    (struct
+      type t = node
+      include Datatype.Serializable_undefined
+      let name = "Dive.Node"
+      let reprs = [ new_node () ]
+      let compare n1 n2 = Datatype.Int.compare n1.node_key n2.node_key
+      let hash n = n.node_key
+      let equal n1 n2 = n1.node_key = n2.node_key
+      let pretty fmt n = Format.pp_print_int fmt n.node_key
+    end)
 
 module Dependency =
 struct
@@ -39,7 +63,7 @@ struct
   let default = {
     dependency_key = -1;
     dependency_kind = Data;
-    dependency_multiple = false;
+    dependency_origins = []
   }
 end
 
@@ -47,111 +71,100 @@ module G =
   Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Node) (Dependency)
 include G
 
+
+let create_node ~node_kind ~node_locality g =
+  let node = new_node ~node_kind ~node_locality () in
+  add_vertex g node;
+  node
+
+let remove_node = remove_vertex
+
+let create_dependency g kinstr v1 dependency_kind v2 =
+  let same_kind (_,e,_) =
+    e.dependency_kind = dependency_kind
+  in
+  let matching_edge =
+    try
+      Some (List.find same_kind (G.find_all_edges g v1 v2))
+    with Not_found -> None
+  in
+  let e = match matching_edge with
+    | Some (_,e,_) -> e
+    | None ->
+      let e = {
+        dependency_key = fresh_key ();
+        dependency_kind;
+        dependency_origins = []
+      }
+      in
+      add_edge_e g (v1,e,v2);
+      e
+  in
+  (* Add origins *)
+  match kinstr with
+  | Cil_types.Kglobal -> ()
+  | Kstmt stmt ->
+    let add_uniq l x =
+      List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
+    in
+    e.dependency_origins <- add_uniq e.dependency_origins stmt
+
+
+let remove_dependency g edge =
+  remove_edge_e g edge
+
+let remove_dependencies g node =
+  iter_pred_e (remove_dependency g) g node
+
 let vertices g =
   fold_vertex (fun n acc -> n ::acc) g []
 
 let edges g =
   fold_edges_e (fun d acc -> d ::acc) g []
 
-let next_key = ref 0
 
-let create_node ~node_kind ~node_locality g =
-  let node = {
-    node_key = !next_key;
-    node_kind;
-    node_locality;
-    node_hidden = false;
-    node_int_values = None;
-    node_float_values = None;
-    node_deps_computed = false;
-  }
-  in
-  incr next_key;
-  add_vertex g node;
-  node
-
-let remove_node = remove_vertex
-
-let union_int_interval i1 i2 =
-  { min = Integer.min i1.min i2.min ; max = Integer.max i1.max i2.max }
-
-let union_float_interval i1 i2 =
-  { min = min i1.min i2.min ; max = max i1.max i2.max }
-
-let worst_precision_grade q1 q2 =
-  match q1, q2 with
-  | Wide, _ | _, Wide -> Wide
-  | Normal, _ | _, Normal -> Normal
-  | Singleton, Singleton -> Singleton
-
-let merge_int_values p1 p2 =
-  (* TODO: prevent assertion failure *)
-  assert (Integer.equal p1.values_limits.min p2.values_limits.min);
-  assert (Integer.equal p1.values_limits.max p2.values_limits.max);
-  {
-    values_interval = union_int_interval p1.values_interval p2.values_interval;
-    values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
-  }
-
-let merge_float_values p1 p2 =
-  (* TODO: prevent assertion failure *)
-  assert (p1.values_limits = p2.values_limits);
-  {
-    values_interval = union_float_interval p1.values_interval p2.values_interval;
-    values_limits = p1.values_limits;
-    values_grade = worst_precision_grade p1.values_grade p2.values_grade;
-  }
-
-let update_node_int_values node new_values =
-  node.node_int_values <-
-    Some (Extlib.opt_fold merge_int_values node.node_int_values new_values)
-
-let update_node_float_values node new_values =
-  node.node_float_values <-
-    Some (Extlib.opt_fold merge_float_values node.node_float_values new_values)
-
-
-let create_dependency ~allow_folding g v1 dependency_kind v2 =
-  let same_kind (_,e,_) =
-    e.dependency_kind = dependency_kind
-  in
-  let matching_edge =
-    try
-      if allow_folding then
-        Some (List.find same_kind (G.find_all_edges g v1 v2))
-      else
-        None
-    with Not_found -> None
-  in
-  match matching_edge with
-  | Some (_,e,_) ->
-    e.dependency_multiple <- true
-  | None ->
-    let e = {
-      dependency_key = !next_key;
-      dependency_kind;
-      dependency_multiple = false;
-    }
-    in
-    incr next_key;
-    add_edge_e g (v1,e,v2)
-
-let remove_dependency g edge =
-  remove_edge_e g edge
-
+let update_node_values node new_values typ =
+  node.node_values <-
+    Some (Extlib.opt_fold Cvalue.V.join node.node_values new_values);
+  node.node_range <-
+    Node_range.(upper_bound node.node_range (evaluate new_values typ))
 
 let find_independant_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
       include G
-      let iter_succ = G.iter_pred
-      let fold_succ = G.fold_pred
+      (* Consider the graph as unoriented *)
+      let iter_succ f g n =
+        iter_pred f g n;
+        iter_succ f g n
+
+      let fold_succ f g n acc =
+        let acc = fold_pred f g n acc in
+        let acc = fold_succ f g n acc in
+        acc
     end)
   in
   let module Table = Hashtbl.Make (Node) in
   let table = Table.create 13 in
   List.iter (Dfs.prefix_component (fun n -> Table.add table n true) g) roots;
   fold_vertex (fun n acc -> if Table.mem table n then acc else n :: acc) g []
+
+
+let bfs ?(iter_succ=iter_succ) ?(limit=max_int) g roots =
+  let module Table = Hashtbl.Make (Node) in
+  let explored : int Table.t = Table.create 13
+  and queue : (node * int) Queue.t = Queue.create () in
+  (* Add roots to queue *)
+  List.iter (fun root -> Queue.add (root,0) queue) roots;
+  (* Iterate over the queue *)
+  while not (Queue.is_empty queue) do
+    let (n,d) = Queue.take queue in
+    if d <= limit && not (Table.mem explored n) then begin
+      Table.add explored n d;
+      iter_succ (fun n' -> Queue.add (n',d+1) queue) g n
+    end
+  done;
+  (* Convert the result to list *)
+  Table.fold (fun n _ l -> n :: l) explored []
 
 
 let ouptput_to_dot out_channel g =
@@ -196,13 +209,6 @@ let ouptput_to_dot out_channel g =
       let default_vertex_attributes _g = []
       let vertex_name v = "cp" ^ (string_of_int v.node_key)
       let vertex_attributes v =
-        let grade = match v.node_int_values, v.node_float_values with
-          | Some v1, Some v2 ->
-            Some (worst_precision_grade v1.values_grade v2.values_grade)
-          | Some v, _ -> Some v.values_grade
-          | _, Some v -> Some v.values_grade
-          | None, None -> None
-        in
         let l = ref [] in
         let text = Pretty_utils.to_string Node_kind.pretty v.node_kind in
         if text <> "" then
@@ -211,21 +217,26 @@ let ouptput_to_dot out_channel g =
           | Scalar _ -> [`Shape `Box]
           | Composite _ -> [ `Shape `Box3d ]
           | Scattered _ -> [ `Shape `Parallelogram ]
+          | Unknown _ -> [`Shape `Diamond ; `Color 0xff0000]
           | Alarm _ ->  [ `Shape `Doubleoctagon ;
                           `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
-        and values = match grade with
-          | None -> []
-          | Some Singleton ->
+          | AbsoluteMemory | String _ -> [`Shape `Box3d]
+          | Error _ -> [`Color 0xff0000]
+        and range = match v.node_range with
+          | Empty -> []
+          | Singleton ->
             [`Color 0x88aaff ; `Style `Filled ; `Fillcolor 0xaaccff ]
-          | Some Normal ->
+          | Normal _ ->
             [ `Color 0x004400 ; `Style `Filled ; `Fillcolor 0xeeffee ]
-          | Some Wide ->
+          | Wide ->
             [ `Color 0xff0000 ; `Style `Filled ; `Fillcolor 0xffbbbb ]
         in
-        l := values @ kind @ !l;
-        if not v.node_deps_computed then
+        l := range @ kind @ !l;
+        if v.node_writes_computation <> Done then
           l := [ `Style `Dotted ] @ !l;
+        if v.node_is_root then
+          l := [ `Style `Bold ] @ !l;
         !l
       let get_subgraph v =
         let {loc_file ; loc_callstack} = v.node_locality in
@@ -237,9 +248,9 @@ let ouptput_to_dot out_channel g =
         let kind_attribute = match e.dependency_kind with
           | Callee -> [`Color 0x00ff00 ]
           | _ -> []
-        and folding_attribute = match e.dependency_multiple with
-          | true -> [ `Style `Bold ]
-          | false -> []
+        and folding_attribute = match e.dependency_origins with
+          | [] | [_] -> []
+          | _ -> [ `Style `Bold ]
         in kind_attribute @ folding_attribute
     end)
   in
@@ -247,6 +258,10 @@ let ouptput_to_dot out_channel g =
 
 module JsonPrinter =
 struct
+  let output_stmt stmt =
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Server.Kernel_ast.KfMarker.to_json (kf, PStmtStart (kf, stmt))
+
   let output_kinstr = function
     | Cil_types.Kglobal -> `String "global"
     | Cil_types.Kstmt stmt -> `Int stmt.Cil_types.sid
@@ -265,7 +280,11 @@ struct
       | Scalar _ -> "scalar"
       | Composite _ -> "composite"
       | Scattered _ -> "scattered"
+      | Unknown _ -> "unknown"
       | Alarm _ -> "alarm"
+      | AbsoluteMemory -> "absolute"
+      | String _ -> "string"
+      | Error _ -> "error"
     in
     `String s
 
@@ -277,13 +296,12 @@ struct
     in
     `Assoc fields
 
-  let output_node_precision_grade grade =
-    let s = match grade with
-      | Singleton -> "singleton"
-      | Normal -> "normal"
-      | Wide -> "wide"
-    in
-    `String s
+  let output_range range =
+    match range with
+    | Empty -> `String "empty"
+    | Singleton -> `String "singleton"
+    | Normal range_grade -> `Int range_grade
+    | Wide -> `String "wide"
 
   let output_dep_kind kind =
     let s = match kind with
@@ -295,32 +313,16 @@ struct
     in
     `String s
 
-  let output_int_interval interval =
-    (* TODO: handle overflow *)
-    `Assoc [
-      ("min", `Int (Integer.to_int interval.min)) ;
-      ("max", `Int (Integer.to_int interval.max)) ;
-    ]
+  let output_node_values values =
+    match values with
+    | None -> `Null
+    | Some cvalue when Cvalue.V.is_bottom cvalue -> `Null
+    | Some cvalue -> `String (Pretty_utils.to_string Cvalue.V.pretty cvalue)
 
-  let output_float_interval interval =
-    `Assoc [
-      ("min", `Float interval.min) ;
-      ("max", `Float interval.max) ;
-    ]
-
-  let output_node_int_values values =
-    `Assoc [
-      ("computed", output_int_interval values.values_interval) ;
-      ("limits", output_int_interval values.values_limits) ;
-      ("grade", output_node_precision_grade values.values_grade) ;
-    ]
-
-  let output_node_float_values values =
-    `Assoc [
-      ("computed", output_float_interval values.values_interval) ;
-      ("limits", output_float_interval values.values_limits) ;
-      ("grade", output_node_precision_grade values.values_grade) ;
-    ]
+  let output_computation = function
+    | Done -> `String "yes"
+    | Partial _ -> `String "partial"
+    | NotDone -> `String "no"
 
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
@@ -329,18 +331,13 @@ struct
         ("label", `String label) ;
         ("kind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
-        ("explored", `Bool node.node_deps_computed) ;
+        ("is_root", `Bool node.node_is_root) ;
+        ("backward_explored", output_computation node.node_writes_computation) ;
+        ("forward_explored", output_computation node.node_reads_computation) ;
+        ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;
+        ("values",  output_node_values node.node_values) ;
+        ("range",  output_range node.node_range) ;
       ] @
-        begin match node.node_int_values with
-          | None -> []
-          | Some node_values ->
-            [("int_values", output_node_int_values node_values)]
-        end @
-        begin match node.node_float_values with
-          | None -> []
-          | Some node_values ->
-            [("float_values", output_node_float_values node_values)]
-        end @
         begin match Node_kind.to_lval node.node_kind with
           | None -> []
           | Some lval ->
@@ -355,7 +352,7 @@ struct
       ("src", `Int n1.node_key) ;
       ("dst", `Int n2.node_key) ;
       ("kind", output_dep_kind dep.dependency_kind) ;
-      ("multiple", `Bool dep.dependency_multiple)
+      ("origins", `List (List.map output_stmt dep.dependency_origins)) ;
     ]
 
   let output_graph g =
@@ -365,7 +362,10 @@ struct
     ]
 
   let output_diff g diff =
-    let added_nodes = List.map output_node diff.added_nodes
+    let root = match diff.last_root with
+      | None -> `Null
+      | Some root -> `Int root.node_key
+    and added_nodes = List.map output_node diff.added_nodes
     and added_deps =
       let module Set = Set.Make (struct
           type t = edge
@@ -383,6 +383,7 @@ struct
       List.map (fun node -> `Int node.node_key) diff.removed_nodes
     in
     `Assoc [
+      ("root", root) ;
       ("add", `Assoc [
           ("nodes", `List added_nodes) ;
           ("deps", `List added_deps)

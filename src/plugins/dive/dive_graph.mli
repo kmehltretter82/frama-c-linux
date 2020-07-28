@@ -20,13 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph_types
+open Dive_types
 
 include Graph.Sig.G
   with type V.t = node
    and type E.t = node * dependency * node
 
-module Node : Graph.Sig.COMPARABLE with type t = node
+module Node : Datatype.S_with_collections with type t = node
 
 module Dependency : Graph.Sig.COMPARABLE with type t = dependency
 
@@ -38,15 +38,17 @@ val create_node :
 
 val remove_node : t -> node -> unit
 
-val update_node_int_values : node -> Integer.t node_values -> unit
-val update_node_float_values : node -> float node_values -> unit
+val update_node_values : node -> Cvalue.V.t -> Cil_types.typ -> unit
 
-val create_dependency : allow_folding:bool -> t -> node -> dependency_kind ->
-  node -> unit
+val create_dependency : t -> Cil_types.kinstr ->
+  node -> dependency_kind -> node -> unit
 
 val remove_dependency : t -> node * dependency * node -> unit
+val remove_dependencies : t -> node -> unit
 
 val find_independant_nodes : t -> node list -> node list
+val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
+  t -> node list -> node list
 
 val ouptput_to_dot : out_channel -> t -> unit
 val ouptput_to_json : out_channel -> t -> unit

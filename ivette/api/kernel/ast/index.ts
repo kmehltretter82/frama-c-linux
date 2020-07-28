@@ -227,6 +227,33 @@ export const jMarkerSafe: Json.Safe<marker> =
 /** Natural order for `marker` */
 export const byMarker: Compare.Order<marker> = Compare.structural;
 
+/** Location: function and marker */
+export interface location {
+  /** Function */
+  function: Json.key<'#fct'>;
+  /** Marker */
+  marker: marker;
+}
+
+/** Loose decoder for `location` */
+export const jLocation: Json.Loose<location> =
+  Json.jObject({
+    function: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+    marker: jMarkerSafe,
+  });
+
+/** Safe decoder for `location` */
+export const jLocationSafe: Json.Safe<location> =
+  Json.jFail(jLocation,'Location expected');
+
+/** Natural order for `location` */
+export const byLocation: Compare.Order<location> =
+  Compare.byFields
+    <{ function: Json.key<'#fct'>, marker: marker }>({
+    function: Compare.string,
+    marker: byMarker,
+  });
+
 const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
