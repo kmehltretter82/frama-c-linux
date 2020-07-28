@@ -952,18 +952,22 @@ struct
     bound
 
   let bitwise_forward (v1 : t) (v2 : t) : t =
-    let r, modu = compute_modulo v1 v2 in
-    match result_size v1 v2 with
-    | None ->
-      (* We could do better here, as one of the bound may be finite. However,
-         this case should occur rarely or not at all. *)
-      inject_interval None None r modu
-    | Some size ->
-      try compute_small_set ~size v1 v2 r modu
-      with Do_not_fit_small_sets ->
-        let min = compute_bound ~size v1 v2 true
-        and max = compute_bound ~size v1 v2 false in
-        inject_interval (Some min) (Some max) r modu
+    match v1, v2 with
+    | Set s1, Set s2 ->
+      inject_set_or_top (Int_set.apply2 Op.concrete_bitwise s1 s2)
+    | _, _ ->
+      let r, modu = compute_modulo v1 v2 in
+      match result_size v1 v2 with
+      | None ->
+        (* We could do better here, as one of the bound may be finite. However,
+           this case should occur rarely or not at all. *)
+        inject_interval None None r modu
+      | Some size ->
+        try compute_small_set ~size v1 v2 r modu
+        with Do_not_fit_small_sets ->
+          let min = compute_bound ~size v1 v2 true
+          and max = compute_bound ~size v1 v2 false in
+          inject_interval (Some min) (Some max) r modu
 end
 
 let bitwise_or = let module M = BitwiseOperator (Or) in M.bitwise_forward

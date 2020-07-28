@@ -97,6 +97,9 @@ type set_or_top =
 
 type set_or_top_or_bottom = [ `Bottom | set_or_top ]
 
+(** [apply2 f s1 s2] applies [f i1 i2] for all integers i1 in s1 and i2 in s2. *)
+val apply2: (Integer.t -> Integer.t -> Integer.t) -> t -> t -> set_or_top
+
 (** {2 Lattice structure.} *)
 
 val is_included: t -> t -> bool
