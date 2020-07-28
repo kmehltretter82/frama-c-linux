@@ -364,19 +364,19 @@ and context_insensitive_term_to_exp kf env t =
       let guard, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
         comparison_to_exp
-          ~loc kf env Typing.gmpz ~e1:e2 ~name Eq t2 zero t
+          ~loc kf env Typing.gmpz ~e1:e2 ~name Ne t2 zero t
       in
+      let p = Logic_const.prel ~loc (Rneq, t2, zero) in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let cond =
           Constructor.mk_runtime_check
-            ~reverse:true
             (Env.annotation_kind env)
             kf
             guard
-            (Logic_const.prel ~loc (Req, t2, zero))
+            p
         in
-        Env.add_assert kf cond (Logic_const.prel (Rneq, t2, zero));
+        Env.add_assert kf cond p;
         let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
         [ cond; instr ]
       in
