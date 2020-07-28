@@ -8,6 +8,7 @@
 */
 
 import Emitter from 'events';
+import * as KernelData from 'api/kernel/data';
 import CodeMirror from 'codemirror/lib/codemirror.js';
 
 export type Range = { from: CodeMirror.Position, to: CodeMirror.Position };
@@ -32,15 +33,6 @@ export interface MarkerProps extends CodeMirror.TextMarkerOptions {
   hover?: boolean;
   className?: string;
 }
-
-/**
-   Text with tags.
-
-   In the object form, a text marker is created with given attributes
-   and text.
- */
-export type MarkedText =
-  undefined | null | string | MarkedText[]| MarkerProps & { text: MarkedText }
 
 export interface CSSMarker {
   /** Hover class `'dome-xHover-nnn'` */
@@ -654,32 +646,26 @@ export class RichTextBuffer extends Emitter {
   // --------------------------------------------------------------------------
 
   /**
-     Print text containing tags into buffer.
-     @param blockTag - if specified, prints `[tag, ...text]`
-     as if it is a marked block with `tag` identifier and `blockTag` options.
-  */
-  printTextWithTags(contents: MarkedText, blockTag?: MarkerProps) {
-    if (contents === undefined || contents === null) return;
-    const asTaggedBlock = blockTag ?? {};
-
+   * Print text containing tags into buffer.
+   * @param options Specify particular marker options.
+   */
+  printTextWithTags(contents: KernelData.text, options?: MarkerProps) {
     if (Array.isArray(contents)) {
       let marker = false;
-      if (contents[0]) {
-        const id = contents.shift();
-        if (typeof id === 'object') {
-          contents.unshift(id);
+      const tag = contents.shift();
+      if (tag) {
+        if (Array.isArray(tag)) {
+          contents.unshift(tag);
         } else {
-          this.openTextMarker({ id, ...asTaggedBlock });
+          this.openTextMarker({ id: tag, ...options ?? {} });
           marker = true;
         }
       }
-      contents.forEach((txt) => this.printTextWithTags(txt, asTaggedBlock));
-      if (marker) this.closeTextMarker();
-    } else if (typeof contents === 'object') {
-      const { text, ...tag } = contents;
-      this.openTextMarker(tag);
-      this.printTextWithTags(text, asTaggedBlock);
-      this.closeTextMarker();
+      contents.forEach((txt) => this.printTextWithTags(txt, options ?? {}));
+      if (marker) {
+        marker = false;
+        this.closeTextMarker();
+      }
     } else if (typeof contents === 'string') {
       this.append(contents);
     } else {
