@@ -1,7 +1,7 @@
 /* run.config_ci
    COMMENT: test of a local initializer which contains an annotation
    LOG: gen_@PTEST_NAME@.c
-   STDOPT: #"-lib-entry -eva -e-acsl-prepare -e-acsl-share ./share/e-acsl -then -no-lib-entry"
+   STDOPT: #"@MACHDEP@ @EACSL_PREPARE@ -lib-entry -eva -then -no-lib-entry"
 */
 
 int X = 0;
