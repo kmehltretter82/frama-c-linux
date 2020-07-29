@@ -6,14 +6,13 @@ import React from 'react';
 import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
-import { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-
 import { printFunction, markerInfo } from 'api/kernel/ast';
 import { getCallers, getDeadCode } from 'api/plugins/eva/general';
 
@@ -47,19 +46,16 @@ async function loadAST(
     (async () => {
       try {
         const data = await Server.send(printFunction, theFunction);
-        buffer.operation(() => {
-          buffer.clear();
-          if (!data) {
-            buffer.log('// No code for function', theFunction);
-          }
-          buffer.printTextWithTags(data);
-          if (theMarker)
-            buffer.scroll(theMarker, undefined);
-        });
+        buffer.clear();
+        if (!data) {
+          buffer.log('// No code for function', theFunction);
+        }
+        Utils.printTextWithTags(buffer, data);
+        if (theMarker)
+          buffer.scroll(theMarker);
       } catch (err) {
         PP.error(
-          `Fail to retrieve the AST of function '${theFunction}' ` +
-          `and marker '${theMarker}':`, err,
+          'Fail to obtain AST', theFunction, theMarker, err,
         );
       }
     })();
@@ -122,21 +118,21 @@ const ASTview = () => {
 
   // Hook: marker scrolling
   React.useEffect(() => {
-    if (theMarker) buffer.scroll(theMarker, undefined);
+    if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
   // Callbacks
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: key<'#markerInfo'>) {
+  function onTextSelection(id: string) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
     }
   }
 
-  async function onContextMenu(id: key<'#markerInfo'>) {
+  async function onContextMenu(id: string) {
     const items = [];
     const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
     if (selectedMarkerInfo?.var === 'function') {

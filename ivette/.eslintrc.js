@@ -77,5 +77,9 @@ module.exports = {
     "react/destructuring-assignment": "off",
     // Allow console errors and warnings
     "no-console": ["error", { allow: ["warn", "error"] }],
+    // Disallow the use of var in favor of let and const
+    "no-var": "error",
+    // Do not favor default import
+    "import/prefer-default-export": "off",
   }
 };
