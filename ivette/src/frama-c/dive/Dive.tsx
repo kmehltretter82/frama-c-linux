@@ -438,8 +438,11 @@ class Dive {
     node.unselectify();
   }
 
-  selectLocation(location: States.Location, doExplore: boolean) {
-    if (location !== this.selectedLocation) {
+  selectLocation(location: States.Location | undefined, doExplore: boolean) {
+    if (!location) {
+      // Reset whole graph if no location is selected.
+      this.clear();
+    } else if (location !== this.selectedLocation) {
       this.selectedLocation = location;
       const selectNode = this.cy.$('node:selected');
       const writes = selectNode?.data()?.writes;
@@ -503,7 +506,6 @@ const GraphView = () => {
     };
 
     // Updates the graph according to the selected marker.
-    if (selection?.current)
       dive.selectLocation(selection?.current, !lock);
   }, [dive, lock, selection, updateSelection]);
 
