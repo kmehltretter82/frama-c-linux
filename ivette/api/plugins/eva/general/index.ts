@@ -31,13 +31,12 @@ const getCallers_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.getCallers',
   input:  Json.jKey<'#fct'>('#fct'),
-  output: Json.jList(Json.jTry(
-                       Json.jPair(
-                         Json.jFail(Json.jKey<'#fct'>('#fct'),
-                           '#fct expected'),
-                         Json.jFail(Json.jKey<'#stmt'>('#stmt'),
-                           '#stmt expected'),
-                       ))),
+  output: Json.jList(
+            Json.jTry(
+              Json.jPair(
+                Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+                Json.jFail(Json.jKey<'#stmt'>('#stmt'),'#stmt expected'),
+              ))),
 };
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<
@@ -45,9 +44,9 @@ export const getCallers: Server.GetRequest<
   [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
   >= getCallers_internal;
 
-/** Dead code. */
+/** Unreachable and non terminating statements. */
 export interface deadCode {
-  /** List of unreachable statements of a function */
+  /** List of unreachable statements. */
   unreachable: marker[];
   /** List of reachable but non terminating statements. */
   nonTerminating: marker[];
@@ -78,7 +77,7 @@ const getDeadCode_internal: Server.GetRequest<Json.key<'#fct'>,deadCode> = {
   input:  Json.jKey<'#fct'>('#fct'),
   output: jDeadCode,
 };
-/** Get the list of unreachable statements and non terminating statements in a function */
+/** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<Json.key<'#fct'>,deadCode>= getDeadCode_internal;
 
 /* ------------------------------------- */
