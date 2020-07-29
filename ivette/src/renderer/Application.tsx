@@ -13,6 +13,7 @@ import * as Sidebar from 'dome/frame/sidebars';
 import './style.css';
 
 import { LabView, View, Group } from 'frama-c/LabViews';
+import Dive from 'frama-c/dive/Dive';
 import { GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
 
@@ -21,6 +22,7 @@ import ASTinfo from './ASTinfo';
 import Globals from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
+import Values from './Values';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -101,6 +103,8 @@ export default (() => {
             <ASTview />
             <ASTinfo />
             <Locations />
+            <Dive />
+            <Values />
           </Group>
         </LabView>
       </Splitter>

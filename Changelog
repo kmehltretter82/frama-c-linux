@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2020-07-27] Improved automatic loop unroll (-eva-auto-loop-unroll
+              option) on loops with several exit conditions, conditions using
+              equality operators, temporary variables introduced by the Frama-C
+              normalization or goto statements.
 -   Eva       [2020-05-29] New builtins for trigonometric functions acos, asin
               and atan (and their single-precision version acosf, asinf, atanf).
 -   Kernel    [2020-05-28] Support for C11's _Thread_local storage specifier

@@ -57,8 +57,13 @@ let name_of_mpz_arith_bop = function
   | Mult -> "__gmpz_mul"
   | Div -> "__gmpz_tdiv_q"
   | Mod -> "__gmpz_tdiv_r"
-  | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-  | Shiftlt | Shiftrt | PlusPI | IndexPI | MinusPI | MinusPP -> assert false
+  | BAnd -> "__gmpz_and"
+  | BOr -> "__gmpz_ior"
+  | BXor -> "__gmpz_xor"
+  | Shiftlt -> "__gmpz_mul_2exp"
+  | Shiftrt -> "__gmpz_tdiv_q_2exp"
+  | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | PlusPI | IndexPI | MinusPI
+  | MinusPP -> assert false
 
 (* Type of a string that represents a number.
    Used when a string is required to encode a constant number because it is not
@@ -396,7 +401,143 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
-      not_yet env "left/right shift on arbitrary precision"
+      (* If the given term is an lvalue variable or a cast from an lvalue
+         variable, retrieve the name of this variable. Otherwise return
+         default *)
+      let rec term_to_name t =
+        match t.term_node with
+        | TConst _ -> "cst_"
+        | TLval (TVar { lv_name }, _) -> lv_name ^ "_"
+        | TCastE (_, t) -> term_to_name t
+        | TLogic_coerce (_, t) -> term_to_name t
+        | _ -> ""
+      in
+      let ctx = Typing.get_number_ty t in
+      let bop_name = Misc.name_of_binop bop in
+      let e1_name = term_to_name t1 in
+      let e2_name = term_to_name t2 in
+      let zero = Logic_const.tinteger 0 in
+      Typing.type_term ~use_gmp_opt:true ~ctx zero;
+
+      (* Check that e2 is representable in mp_bitcnt_t *)
+      let coerce_guard, env =
+        let name = e2_name ^ bop_name ^ "_guard" in
+        let _vi, e, env =
+          Env.new_var
+            ~loc
+            ~scope:Varname.Block
+            ~name
+            env
+            kf
+            None
+            Cil.intType
+            (fun vi _e ->
+               let result = Cil.var vi in
+               let fname = "__gmpz_fits_ulong_p" in
+               [ Constructor.mk_lib_call ~loc ~result fname [ e2 ] ])
+        in
+        e, env
+      in
+      (* Coerce e2 to mp_bitcnt_t *)
+      let mk_coerce_stmts vi _e =
+        let coerce_guard_cond =
+          let max_bitcnt =
+            Cil.max_unsigned_number (Cil.bitsSizeOf (Gmp_types.bitcnt_t ()))
+          in
+          let max_bitcnt_term = Cil.lconstant ~loc max_bitcnt in
+          let pred =
+            Logic_const.pand
+              ~loc
+              (Logic_const.prel ~loc (Rle, zero, t2),
+               Logic_const.prel ~loc (Rle, t2, max_bitcnt_term))
+          in
+          let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
+          let pred = { pred with pred_name = pname :: pred.pred_name } in
+          let cond = Constructor.mk_runtime_check
+              ~reverse:true
+              Constructor.RTE
+              kf
+              coerce_guard
+              pred
+          in
+          Env.add_assert kf cond pred;
+          cond
+        in
+        let result = Cil.var vi in
+        let name = "__gmpz_get_ui" in
+        let instr = Constructor.mk_lib_call ~loc ~result name [ e2 ] in
+        [ coerce_guard_cond; instr ]
+      in
+      let name = e2_name ^ bop_name ^ "_coerced" in
+      let _e2_as_bitcnt_vi, e2_as_bitcnt_e, env =
+        Env.new_var
+          ~loc
+          ~scope:Varname.Block
+          ~name
+          env
+          kf
+          None
+          (Gmp_types.bitcnt_t ())
+          mk_coerce_stmts
+      in
+
+      (* Create the shift instruction *)
+      let mk_shift_instr result_e =
+        let name = name_of_mpz_arith_bop bop in
+        Constructor.mk_lib_call ~loc name [ result_e; e1; e2_as_bitcnt_e ]
+      in
+
+      (* Put t in an option to use with comparison_to_exp and
+         Env.new_var_and_mpz_init *)
+      let t = Some t in
+
+      (* TODO: let RTE generate the undef behaviors assertions *)
+
+      (* Boolean to choose whether the guard [e1 >= 0] should be added *)
+      let should_guard_e1 =
+        match bop with
+        | Shiftlt -> Kernel.LeftShiftNegative.get ()
+        | Shiftrt -> Kernel.RightShiftNegative.get ()
+        | _ -> assert false
+      in
+
+      (* Create the statements to initialize [e1 shift e2] *)
+      let e1_guard_opt, env =
+        if should_guard_e1 then
+          (* Future RTE:
+             if (warn left shift negative and left shift)
+                or (warn right shift negative and right shift)
+             then check e1 >= 0 *)
+          let e1_guard, env =
+            let name = e1_name ^ bop_name ^ "_guard" in
+            comparison_to_exp
+              ~loc kf env Typing.gmpz ~e1 ~name Ge t1 zero t
+          in
+          let e1_guard_cond =
+            let pred = Logic_const.prel ~loc (Rge, t1, zero) in
+            let cond = Constructor.mk_runtime_check
+                ~reverse:true
+                Constructor.RTE
+                kf
+                e1_guard
+                pred
+            in
+            Env.add_assert kf cond pred;
+            cond
+          in
+          Some e1_guard_cond, env
+        else
+          None, env
+      in
+      let mk_stmts _ e =
+        let shift_instr = mk_shift_instr e in
+        match e1_guard_opt with
+        | None -> [ shift_instr ]
+        | Some e1_guard -> [ e1_guard; shift_instr ]
+      in
+      let name = bop_name in
+      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""
@@ -426,7 +567,15 @@ and context_insensitive_term_to_exp kf env t =
     let e1, env = term_to_exp kf env t1 in
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
-      not_yet env "bitwise operator on arbitrary precision"
+      let mk_stmts _v e =
+        let name = name_of_mpz_arith_bop bop in
+        let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
+        [ instr ]
+      in
+      let name = Misc.name_of_binop bop in
+      let t = Some t in
+      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      e, env, C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)), env, C_number, ""

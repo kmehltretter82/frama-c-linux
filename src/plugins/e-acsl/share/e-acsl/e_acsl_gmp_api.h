@@ -36,10 +36,11 @@
 #include "stdlib.h"
 #include "e_acsl_alias.h"
 
-#define mpz_struct export_alias(mpz_struct)
-#define mpz_t      export_alias(mpz_t)
-#define mpq_struct export_alias(mpq_struct)
-#define mpq_t      export_alias(mpq_t)
+#define mpz_struct  export_alias(mpz_struct)
+#define mpz_t       export_alias(mpz_t)
+#define mpq_struct  export_alias(mpq_struct)
+#define mpq_t       export_alias(mpq_t)
+#define mp_bitcnt_t export_alias(mp_bitcnt_t)
 
 struct mpz_struct {
   int _mp_alloc;
@@ -57,6 +58,14 @@ struct mpq_struct {
 
 typedef struct mpq_struct mpq_struct;
 typedef mpq_struct (__attribute__((__FC_BUILTIN__)) mpq_t)[1];
+
+/**
+ * Counts of bits of a multi-precision number are represented in the C type
+ * mp_bitcnt_t. Currently this is always an unsigned long, but on some systems
+ * it will be an unsigned long long in the future.
+ * @see https://gmplib.org/manual/Nomenclature-and-Types#Nomenclature-and-Types
+ */
+typedef unsigned long int mp_bitcnt_t;
 
 /****************/
 /* Initializers */
@@ -262,6 +271,12 @@ extern void __gmpq_sub(mpq_t q1, const mpq_t q2, const mpq_t q3)
 extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ assigns *z1 \from *z2, n; */
+extern void __gmpz_mul_2exp(mpz_t z1, const mpz_t z2, mp_bitcnt_t n)
+  __attribute__((FC_BUILTIN));
+
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
@@ -283,6 +298,12 @@ extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3)
 extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
   __attribute__((FC_BUILTIN));
 
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ assigns *z1 \from *z2, n; */
+extern void __gmpz_tdiv_q_2exp(mpz_t z1, const mpz_t z2, mp_bitcnt_t n)
+  __attribute__((FC_BUILTIN));
+
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
@@ -296,6 +317,27 @@ extern void __gmpq_div(mpq_t q1, const mpq_t q2, const mpq_t q3)
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_and(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_ior(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
+  @ requires \valid_read(z3);
+  @ assigns *z1 \from *z2, *z3; */
+extern void __gmpz_xor(mpz_t z1, const mpz_t z2, const mpz_t z3)
+  __attribute__((FC_BUILTIN));
+
+/*@ requires \valid(z1);
+  @ requires \valid_read(z2);
   @ assigns *z1 \from *z2;
   @ assigns \result \from *z1,*z2; */
 extern int __gmpz_com(mpz_t z1, const mpz_t z2)
@@ -304,6 +346,18 @@ extern int __gmpz_com(mpz_t z1, const mpz_t z2)
 /************************/
 /* Coercions to C types */
 /************************/
+
+/** Return non-zero iff the value of z fits in an unsigned long */
+/*@ requires \valid_read(z);
+  @ assigns \result \from *z; */
+extern int __gmpz_fits_ulong_p(const mpz_t z)
+  __attribute__((FC_BUILTIN));
+
+/** Return non-zero iff the value of z fits in a signed long */
+/*@ requires \valid_read(z);
+  @ assigns \result \from *z; */
+extern int __gmpz_fits_slong_p(const mpz_t z)
+  __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */

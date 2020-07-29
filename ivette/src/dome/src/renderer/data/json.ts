@@ -192,7 +192,7 @@ export function jCatch<A>(fn: Loose<A>, fallBack: A): Safe<A> {
     try {
       return fn(js) ?? fallBack;
     } catch (err) {
-      if (DEVEL) console.error('[Dome.json]', err);
+      if (DEVEL) console.warn('[Dome.json]', err);
       return fallBack;
     }
   };
@@ -206,7 +206,8 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
   return (js: json) => {
     try {
       return fn(js) ?? defaultValue;
-    } catch (_err) {
+    } catch (err) {
+      if (DEVEL) console.warn('[Dome.json]', err);
       return defaultValue;
     }
   };

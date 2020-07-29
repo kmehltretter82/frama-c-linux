@@ -1,4 +1,0 @@
-[kernel] Parsing tests/arith/rationals.c (with preprocessing)
-[kernel:parser:decimal-float] tests/arith/rationals.c:19: Warning: 
-  Floating-point constant 0.2f is not represented exactly. Will use 0x1.99999a0000000p-3.
-  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)

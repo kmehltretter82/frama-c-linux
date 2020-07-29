@@ -431,7 +431,7 @@ export class ArrayModel<Key, Row>
 // --------------------------------------------------------------------------
 
 /**
-   @template Row - object data that also contains their « key »
+   @template Row - object data that also contains their « key ».
 */
 export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
 

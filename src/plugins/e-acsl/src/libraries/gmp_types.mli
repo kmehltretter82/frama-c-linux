@@ -54,6 +54,10 @@ module Z: S
 (** Representation of the rational type at runtime *)
 module Q: S
 
+val bitcnt_t: unit -> typ
+(** @return the C Type representing the count of bits of a multi-precision
+    number at runtime *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

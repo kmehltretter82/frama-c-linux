@@ -48,7 +48,8 @@
       "dome": [ "src/dome/src/renderer/dome.js" ],
       "dome/system": [ "src/dome/src/misc/system.js" ],
       "dome/misc/*": [ "src/dome/src/misc/*"],
-      "dome/*": [ "src/dome/src/renderer/*" ]
+      "dome/*": [ "src/dome/src/renderer/*" ],
+      "codemirror/lib/codemirror.js": ["node_modules/@types/codemirror/index.d.ts"],
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */

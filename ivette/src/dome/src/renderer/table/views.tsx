@@ -59,6 +59,14 @@ export type RenderByFields<Row> = {
 export type index = number | number[];
 
 /**
+   Column Properties.
+
+   __Warning:__ callback properties, namely `getter`, `render`
+   and `onContextMenu`, shall be as stable as possible to prevent
+   the table from constantly re-rendering.
+   Use constant callbacks whenever possible, or memoize them with
+   `React.useCallback()` hook.
+
    @template Row - table row data of some table entries
    @template Cell - type of cell data to render in this column
  */
@@ -104,14 +112,17 @@ export interface ColumnProps<Row, Cell> {
   visible?: boolean | 'never' | 'always';
   /**
      Data getter for this column.
+     Shall be constant or protected by `React.useCallback`.
    */
   getter?: (row: Row, dataKey: string) => Cell | undefined;
   /**
      Override table by-fields cell renderers.
+     Shall be constant or protected by `React.useCallback`.
    */
   render?: Renderer<Cell>;
   /**
      Override table right-click callback.
+     Shall be constant or protected by `React.useCallback`.
    */
   onContextMenu?: (row: Row, index: number, dataKey: string) => void;
 }
