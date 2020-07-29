@@ -8,9 +8,9 @@
 */
 
 import Emitter from 'events';
-import CodeMirror from 'codemirror/lib/codemirror.js';
+import CodeMirror from 'codemirror/lib/codemirror';
 
-export type Range = { from: CodeMirror.Position, to: CodeMirror.Position };
+export type Range = { from: CodeMirror.Position; to: CodeMirror.Position };
 
 export interface Decorator {
   /** @return a className to apply on markers with the identifier. */
@@ -24,8 +24,10 @@ export interface TextMarkerProxy {
 }
 
 /**
-   Text Marker options. Inherits
-   CodeMirror [TextMerkerOptions](https://codemirror.net/doc/manual.html#api_marker).
+   Text Marker options.
+
+   Inherits CodeMirror
+   [TextMerkerOptions](https://codemirror.net/doc/manual.html#api_marker).
  */
 export interface MarkerProps extends CodeMirror.TextMarkerOptions {
   id?: string;
@@ -48,25 +50,25 @@ export interface CSSMarker {
 // --- Batched Update
 // --------------------------------------------------------------------------
 
-const BATCH_OPS = 500
-const BATCH_DELAY = 5
-const BATCH_RMAX = 1000 // max tag range for sorting
-const BATCH_MARGINS = 20 // visible lines above the viewport
+const BATCH_OPS = 500;
+const BATCH_DELAY = 5;
+const BATCH_RMAX = 1000; // max tag range for sorting
+const BATCH_MARGINS = 20; // visible lines above the viewport
 
 interface MarkerOptions {
-  id?: string,
-  hover?: boolean,
-  className?: string,
-  options: CodeMirror.TextMarkerOptions,
+  id?: string;
+  hover?: boolean;
+  className?: string;
+  options: CodeMirror.TextMarkerOptions;
 }
 
 interface StackedMarker extends MarkerOptions {
-  startIndex: number,
+  startIndex: number;
 }
 
 interface BufferedMarker extends MarkerOptions {
-  startIndex: number,
-  stopIndex: number,
+  startIndex: number;
+  stopIndex: number;
 }
 
 type BufferedTag = BufferedMarker | undefined;
@@ -91,7 +93,9 @@ function byVisibleTag(lmin: number, lmax: number) {
 
 export interface RichTextBufferProps {
 
-  /** CodeMirror [mode](https://codemirror.net/mode/index.html) specification. */
+  /**
+   * CodeMirror [mode](https://codemirror.net/mode/index.html) specification.
+   */
   mode?: any;
 
   /** Maximum number of lines in the buffer. */
@@ -124,9 +128,9 @@ export interface RichTextBufferProps {
    the _edited_ state to `false`, but sill emit an `'edited'` event if the
    buffer was not empty.
 
-   Buffers can also be updated programmatically by various methods. In addition to
-   specified CodeMirror modes, you can also attach text markers programmatically with
-   a push/pop API.
+   Buffers can also be updated programmatically by various methods. In addition
+   to specified CodeMirror modes, you can also attach text markers
+   programmatically with a push/pop API.
 
    Text markers can be associated with an identifier, that can be used for
    dynamic highlighting, called Decorations. Decorations are class names that
@@ -146,13 +150,13 @@ export interface RichTextBufferProps {
 export class RichTextBuffer extends Emitter {
 
   private document: CodeMirror.Doc;
-  private maxlines: number = 10000;
+  private maxlines = 10000;
   private editors: CodeMirror.Editor[] = [];
-  private cacheIndex: number = 0; // document index, negative if not computed
+  private cacheIndex = 0; // document index, negative if not computed
   private bufferedText: string; // buffered text to append
   private bufferedTags: BufferedTag[];
   private stacked: StackedMarker[] = [];
-  private batched: boolean = false;
+  private batched = false;
 
   // Indexed by CSS property dome-xHover-nnnn
   private cssmarkers = new Map<string, CSSMarker>();
@@ -222,9 +226,7 @@ export class RichTextBuffer extends Emitter {
       const start = doc.posFromIndex(Infinity);
       if (start.ch > 0) doc.replaceRange('\n', start, undefined, 'buffer');
       this.cacheIndex = -1;
-    } else {
-      if (buf[buf.length - 1] !== '\n') this.bufferedText += '\n';
-    }
+    } else if (buf[buf.length - 1] !== '\n') this.bufferedText += '\n';
   }
 
   /**
@@ -271,11 +273,11 @@ export class RichTextBuffer extends Emitter {
      inserted between its associated [[openTextMarker]] and [[closeTextMarker]]
      calls.
 
-     The returned text marker is actually a _proxy_ to the text marker that will be
-     eventually created by [[closeTextMarker]]. Its methods are automatically
-     forwarded to the actual `CodeMirror.TextMarker`
-     instance, once created.  Hence, you can safely invoke these methods on either
-     the _proxy_ or the _final_ text marker at your convenience.
+     The returned text marker is actually a _proxy_ to the text marker that will
+     be eventually created by [[closeTextMarker]]. Its methods are automatically
+     forwarded to the actual `CodeMirror.TextMarker` instance, once created.
+     Hence, you can safely invoke these methods on either the _proxy_ or the
+     _final_ text marker at your convenience.
   */
   openTextMarker(props: MarkerProps) {
     const { id, hover, className, ...options } = props;
@@ -459,7 +461,7 @@ export class RichTextBuffer extends Emitter {
 
   private onChange(
     _editor: CodeMirror.Editor,
-    change: CodeMirror.EditorChangeLinkedList
+    change: CodeMirror.EditorChangeLinkedList,
   ) {
     if (change.origin !== 'buffer') {
       this.setEdited(true);
@@ -477,7 +479,9 @@ export class RichTextBuffer extends Emitter {
      @param cm - code mirror instance to link this document in.
   */
   link(cm: CodeMirror.Editor) {
-    const newDoc = this.document.linkedDoc({ sharedHist: true, mode: undefined });
+    const newDoc = this.document.linkedDoc(
+      { sharedHist: true, mode: undefined },
+    );
     cm.swapDoc(newDoc);
     cm.on('change', this.onChange);
     this.editors.push(cm);
@@ -511,7 +515,7 @@ export class RichTextBuffer extends Emitter {
     this.editors.forEach((cm) => {
       try { fn(cm); } catch (e) { console.error('[Dome.text]', e); }
     });
-  };
+  }
 
   // --------------------------------------------------------------------------
   // --- Update Operations
@@ -540,7 +544,7 @@ export class RichTextBuffer extends Emitter {
         '',
         { line: p, ch: 0 },
         { line: q, ch: 0 },
-        'buffer'
+        'buffer',
       );
       this.cacheIndex = -1;
     }
@@ -551,7 +555,7 @@ export class RichTextBuffer extends Emitter {
     const { id, hover, className, startIndex, stopIndex } = tag;
     let markerId;
     if (id || hover) {
-      markerId = 'dome-xHover-' + (this.markid++);
+      markerId = `dome-xHover-${this.markid++}`;
       const cmark = {
         id,
         classNameId: markerId,
@@ -562,7 +566,7 @@ export class RichTextBuffer extends Emitter {
     }
     const fullClassName = [
       'dome-xMarked',
-      id && ('dome-xMark-' + id),
+      id && (`dome-xMark-${id}`),
       markerId,
       className,
     ].filter((s) => !!s).join(' ');
@@ -601,13 +605,12 @@ export class RichTextBuffer extends Emitter {
   }
 
   private getLastIndex() {
-    let idx = this.cacheIndex;
-    if (idx < 0) {
+    if (this.cacheIndex < 0) {
       const doc = this.document;
       const line = doc.lastLine() + 1;
-      this.cacheIndex = idx = doc.indexFromPos({ line, ch: 0 });
+      this.cacheIndex = doc.indexFromPos({ line, ch: 0 });
     }
-    return idx;
+    return this.cacheIndex;
   }
 
   // --------------------------------------------------------------------------

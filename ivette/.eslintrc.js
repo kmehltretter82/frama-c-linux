@@ -20,7 +20,10 @@ module.exports = {
     "import/core-modules": [ "electron" ]
   },
   rules: {
+    // Do not enforce a displayName
     "react/display-name": "off",
+    // Do not enforce component methods order
+    "react/sort-comp": "off",
     // Be more strict on usage of useMemo and useRef
     "react-hooks/exhaustive-deps": "error",
     // Allow type any, even if it should be avoided
