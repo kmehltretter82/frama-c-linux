@@ -813,18 +813,18 @@ module ReportingConfiguration = struct
 end
 
 module ToolComponentReference =struct
-type t = {
-  name: (string [@default ""]);
-  index: (int [@default -1]);
-  guid: (string [@default ""]);
-  properties: (Properties.t [@default Properties.default]);
-}[@@deriving yojson]
+  type t = {
+    name: (string [@default ""]);
+    index: (int [@default -1]);
+    guid: (string [@default ""]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
 
-let create
-    ?(name="") ?(index = -1) ?(guid = "") ?(properties=Properties.default) () =
-  { name; index; guid; properties }
+  let create
+      ?(name="") ?(index = -1) ?(guid = "") ?(properties=Properties.default) () =
+    { name; index; guid; properties }
 
-let default = create ()
+  let default = create ()
 
 end
 
@@ -1102,11 +1102,11 @@ module ExternalPropertyFileReferences = struct
   } [@@deriving yojson]
 
   let create
-    ?(location = ArtifactLocation.default)
-    ?(guid = "")
-    ?(itemCount = -1)
-    ?(properties = Properties.default)
-    () =
+      ?(location = ArtifactLocation.default)
+      ?(guid = "")
+      ?(itemCount = -1)
+      ?(properties = Properties.default)
+      () =
     { location; guid; itemCount; properties }
 
   let default = create ()
@@ -1186,35 +1186,35 @@ module ToolComponent = struct
     properties: (Properties.t [@default Properties.default]);
   }[@@deriving yojson]
   let create
-    ?(guid="")
-    ~name
-    ?(organization="")
-    ?(product="")
-    ?(productSuite="")
-    ?(shortDescription=MultiformatMessageString.default)
-    ?(fullDescription=MultiformatMessageString.default)
-    ?(fullName="")
-    ?(version="")
-    ?(semanticVersion="")
-    ?(dottedQuadFileVersion="")
-    ?(releaseDateUtc="")
-    ?(downloadUri="")
-    ?(informationUri="")
-    ?(globalMessageStrings=[])
-    ?(notifications=[])
-    ?(rules=[])
-    ?(taxa=[])
-    ?(locations=[])
-    ?(language="en-US")
-    ?(contents=[Contents.nonLocalizedData])
-    ?(isComprehensive=false)
-    ?(localizedDataSemanticVersion="")
-    ?(minimumRequiredLocalizedDataSemanticVersion="")
-    ?(associateComponent=ToolComponentReference.default)
-    ?(translationMetadata=TranslationMetadata.default)
-    ?(supportedTaxonomies=[])
-    ?(properties=Properties.default)
-    ()
+      ?(guid="")
+      ~name
+      ?(organization="")
+      ?(product="")
+      ?(productSuite="")
+      ?(shortDescription=MultiformatMessageString.default)
+      ?(fullDescription=MultiformatMessageString.default)
+      ?(fullName="")
+      ?(version="")
+      ?(semanticVersion="")
+      ?(dottedQuadFileVersion="")
+      ?(releaseDateUtc="")
+      ?(downloadUri="")
+      ?(informationUri="")
+      ?(globalMessageStrings=[])
+      ?(notifications=[])
+      ?(rules=[])
+      ?(taxa=[])
+      ?(locations=[])
+      ?(language="en-US")
+      ?(contents=[Contents.nonLocalizedData])
+      ?(isComprehensive=false)
+      ?(localizedDataSemanticVersion="")
+      ?(minimumRequiredLocalizedDataSemanticVersion="")
+      ?(associateComponent=ToolComponentReference.default)
+      ?(translationMetadata=TranslationMetadata.default)
+      ?(supportedTaxonomies=[])
+      ?(properties=Properties.default)
+      ()
     =
     { guid; name; organization; product; productSuite; shortDescription;
       fullDescription; fullName; version; semanticVersion;
@@ -1241,17 +1241,17 @@ module Address = struct
   } [@@deriving yojson]
 
   let create
-    ?(absoluteAddress = -1)
-    ?(relativeAddress = 0)
-    ?(length = 0)
-    ?(kind = "")
-    ?(name = "")
-    ?(fullyQualifiedName = "")
-    ?(offsetFromParent = 0)
-    ?(index = -1)
-    ?(parentIndex = -1)
-    ?(properties = Properties.default)
-    ()
+      ?(absoluteAddress = -1)
+      ?(relativeAddress = 0)
+      ?(length = 0)
+      ?(kind = "")
+      ?(name = "")
+      ?(fullyQualifiedName = "")
+      ?(offsetFromParent = 0)
+      ?(index = -1)
+      ?(parentIndex = -1)
+      ?(properties = Properties.default)
+      ()
     =
     { absoluteAddress; relativeAddress; length; kind; name;
       fullyQualifiedName; offsetFromParent; index; parentIndex; properties }
@@ -1273,16 +1273,16 @@ module WebRequest = struct
   } [@@deriving yojson]
 
   let create
-    ?(index = -1)
-    ?(protocol = "")
-    ?(version = "")
-    ?(target = "")
-    ?(method_ = "")
-    ?(headers = [])
-    ?(parameters = [])
-    ?(body = ArtifactContent.default)
-    ?(properties = Properties.default)
-    ()
+      ?(index = -1)
+      ?(protocol = "")
+      ?(version = "")
+      ?(target = "")
+      ?(method_ = "")
+      ?(headers = [])
+      ?(parameters = [])
+      ?(body = ArtifactContent.default)
+      ?(properties = Properties.default)
+      ()
     =
     { index; protocol; version; target; method_; headers; parameters;
       body; properties }
@@ -1305,16 +1305,16 @@ module WebResponse = struct
   } [@@deriving yojson]
 
   let create
-    ?(index = -1)
-    ?(protocol = "")
-    ?(version = "")
-    ?(statusCode = 0)
-    ?(reasonPhrase = "")
-    ?(headers = [])
-    ?(body = ArtifactContent.default)
-    ?(noResponseReceived = false)
-    ?(properties = Properties.default)
-    ()
+      ?(index = -1)
+      ?(protocol = "")
+      ?(version = "")
+      ?(statusCode = 0)
+      ?(reasonPhrase = "")
+      ?(headers = [])
+      ?(body = ArtifactContent.default)
+      ?(noResponseReceived = false)
+      ?(properties = Properties.default)
+      ()
     =
     { index; protocol; version; statusCode; reasonPhrase;
       headers; body; noResponseReceived; properties }
@@ -1329,9 +1329,9 @@ module SpecialLocations = struct
     properties: (Properties.t [@default Properties.default])
   } [@@deriving yojson]
   let create
-    ?(displayBase = ArtifactLocation.default)
-    ?(properties = Properties.default)
-    ()
+      ?(displayBase = ArtifactLocation.default)
+      ?(properties = Properties.default)
+      ()
     =
     { displayBase; properties }
 
