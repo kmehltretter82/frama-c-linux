@@ -14,7 +14,7 @@ import './style.css';
 
 import { LabView, View, Group } from 'frama-c/LabViews';
 import Dive from 'frama-c/dive/Dive';
-import { GridItem } from 'dome/layout/grids';
+import { GridHbox, GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
 
 import ASTview from './ASTview';
@@ -59,11 +59,11 @@ const HistorySelectionControls = () => {
 export default (() => {
   const [sidebar, flipSidebar] = Dome.useSwitch(
     'frama-c.sidebar.unfold',
-    false,
+    true,
   );
   const [viewbar, flipViewbar] = Dome.useSwitch(
     'frama-c.viewbar.unfold',
-    false,
+    true,
   );
 
   return (
@@ -94,8 +94,26 @@ export default (() => {
           customize={viewbar}
           settings="frama-c.labview"
         >
-          <View id="dashboard" label="Dashboard" defaultView>
+          <View id="console" label="Console" defaultView>
             <GridItem id="frama-c.console" />
+          </View>
+          <View id="values" label="Values">
+            <GridHbox>
+              <GridItem id="frama-c.astview" />
+              <GridItem id="frama-c.values" />
+            </GridHbox>
+            <GridItem id="frama-c.properties" />
+          </View>
+          <View id="dive" label="Dive">
+            <GridHbox>
+              <GridItem id="frama-c.astview" />
+              <GridItem id="dive.graph" />
+              <GridItem id="frama-c.locations" />
+            </GridHbox>
+            <GridHbox>
+              <GridItem id="frama-c.properties" />
+              <GridItem id="frama-c.console" />
+            </GridHbox>
           </View>
           <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
             <Controller.Console />
