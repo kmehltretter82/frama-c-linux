@@ -1,70 +1,43 @@
-# TEMPLATE FOR MAKEFILE TO USE IN FRAMA-C/EVA CASE STUDIES
+# Makefile template for Frama-C/Eva case studies.
+# For details and usage information, see the Frama-C User Manual.
 
-# DO NOT EDIT THE LINES BETWEEN THE '#'S
-
-###############################################################################
-# Improves analysis time, at the cost of extra memory usage
-export FRAMA_C_MEMORY_FOOTPRINT = 8
-#
-# frama-c-path.mk contains variables which are specific to each
-# user and should not be versioned, such as the path to the
-# frama-c binaries (e.g. FRAMAC and FRAMAC_GUI).
-# It is an optional include, unnecessary if frama-c is in the PATH
--include frama-c-path.mk
-#
-# FRAMAC is defined in frama-c-path.mk when it is included, so the
-# line below will be safely ignored if this is the case
-FRAMAC ?= frama-c
-#
-# frama-c.mk contains the main rules and targets
--include $(shell $(FRAMAC)-config -print-share-path)/analysis-scripts/frama-c.mk
-#
+### Prologue. Do not modify this block. #######################################
+-include path.mk # path.mk contains variables specific to each user
+                 # (e.g. FRAMAC, FRAMAC_GUI) and should not be versioned. It is
+                 # an optional include, unnecessary if frama-c is in the PATH.
+FRAMAC ?= frama-c # FRAMAC is defined in path.mk when it is included, but the
+                  # user can override it in the command-line.
+include $(shell $(FRAMAC)-config -scripts)/prologue.mk
 ###############################################################################
 
-# EDIT VARIABLES AND TARGETS BELOW AS NEEDED
-# The flags below are only suggestions to use with Eva, and can be removed
+# Edit below as needed. Suggested flags are optional.
 
-# (Optional) preprocessing flags, usually handled by -json-compilation-database
-CPPFLAGS    +=
+MACHDEP = x86_32
 
-# (Optional) Frama-C general flags (parsing and kernel)
+## Preprocessing flags (for -cpp-extra-args)
+CPPFLAGS    += \
+
+## General flags
 FCFLAGS     += \
+  -add-symbolic-path=.:.. \
   -kernel-warn-key annot:missing-spec=abort \
   -kernel-warn-key typing:implicit-function-declaration=abort \
 
-# (Optional) Eva-specific flags
+## Eva-specific flags
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
 
-# (MANDATORY) Name of the main target
-MAIN_TARGET :=
+## GUI-only flags
+FCGUIFLAGS += \
+  -add-symbolic-path=.:.. \
 
-# Remove these lines after defining the main target
-ifeq ($(MAIN_TARGET),)
-$(error MAIN_TARGET not defined in $(firstword $(MAKEFILE_LIST)))
-endif
+## Analysis targets (suffixed with .eva)
+TARGETS = main.eva
 
-# Add other targets if needed
-TARGETS = $(MAIN_TARGET).eva
+### Each target <t>.eva needs a rule <t>.parse with source files as prerequisites
+main.parse: \
+  main.c \
 
-# Default target
-all: $(TARGETS)
-
-# (MANDATORY) List of source files used by MAIN_TARGET.
-# If there is a JSON compilation database,
-# 'frama-c-script list-files' can help obtain it
-$(MAIN_TARGET).parse:
-
-
-# The following targets are optional and provided for convenience only
-parse: $(TARGETS:%.eva=%.parse)
-loop: $(TARGETS:%.eva=%.parse.loop) $(TARGETS:%=%.loop)
-gui: $(MAIN_TARGET).eva.gui
-
-# Run 'make <TARGET>.eva.loop' to obtain a .loop file, fine-tune it by hand,
-# then rename it to <TARGET>.slevel to prevent it from being overwritten.
-# If such file exists, use it to define per-function slevel values.
-ifneq (,$(wildcard $(MAIN_TARGET).slevel))
-$(MAIN_TARGET).eva: \
-  EVAFLAGS += $(shell cat $(MAIN_TARGET).slevel | tr -d '\n\\')
-endif
+### Epilogue. Do not modify this block. #######################################
+include $(shell $(FRAMAC)-config -scripts)/epilogue.mk
+###############################################################################
