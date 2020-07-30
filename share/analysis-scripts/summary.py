@@ -38,20 +38,25 @@ import benchmark_database
 class OperationException(Exception):
     pass
 
-def build_env(framac):
+def build_make_environment(framac):
     if framac is None:
-        return { **os.environ }
+        env = { **os.environ }
+        args = []
     else:
-        bindir = framac + '/build/bin'
-        return { **os.environ,  'PATH' : bindir + ':' + os.environ['PATH'] }
+        env = { **os.environ,  'PATH' : f"{framac}/bin:{os.environ['PATH']}" }
+        args = [
+            f"FRAMAC_DIR={framac}/bin",
+            f"FRAMAC={framac}/bin/frama-c"
+        ]
+    return env, args
 
 def list_targets(dir):
     if not os.path.isdir(dir):
         raise OperationException(f"target is not a directory: {dir}")
 
-    env = build_env(framac)
+    env, args = build_make_environment(framac)
     res = subprocess.run(
-        ["make", "--directory", dir, "--quiet", "display-targets"],
+        ["make", "--directory", dir, "--quiet", "display-targets"] + args,
         env=env,
         stdout=subprocess.PIPE,
         encoding='ascii')
@@ -73,21 +78,16 @@ def clone_frama_c(clonedir, hash):
     if res.returncode != 0:
         raise OperationException("Cannot clone repository. Try to manually"
             "remove the broken clone in " + clonedir)
-    return res.stdout.strip()
+    return res.stdout.strip() + '/build'
 
 def run_make(framac, benchmark_tag=None):
     args = ['make', '--keep-going', 'all']
-    env = build_env(framac)
-    if not framac is None:
-        bindir = framac + '/build/bin'
-        args += [
-            'FRAMAC_DIR=' + bindir,
-            'FRAMAC=' + bindir + '/frama-c']
+    env, var_args = build_make_environment(framac)
     if benchmark_tag is None:
         args += ['-j', str(os.cpu_count ())]
     else:
         args += ['BENCHMARK=' + benchmark_tag]
-    return subprocess.Popen(args, env=env,
+    return subprocess.Popen(args + var_args, env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         preexec_fn=os.setsid)
@@ -200,7 +200,7 @@ try:
             gitdir = clonedir + "/frama-c.git"
             framac = clone_frama_c(clonedir, args.rev)
     else:
-        framac = args.repository_path
+        framac = os.path.abspath(args.repository_path)
         gitdir = framac
 
     if args.benchmark:
