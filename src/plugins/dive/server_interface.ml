@@ -38,9 +38,16 @@ let get_context =
     match !context with
     | Some c -> c
     | None ->
-      let c = Context.create () in
-      context := Some c;
-      c
+      if Db.Value.is_computed () then
+        let c = Context.create () in
+        context := Some c;
+        c
+      else
+        begin
+          Self.error ~once:true
+            "A prior Eva analysis is required to build the graphs.";
+          Server.Data.failure "Eva analysis not computed"
+        end
 
 
 let global_window = ref {
