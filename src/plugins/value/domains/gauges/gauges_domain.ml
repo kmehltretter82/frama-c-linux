@@ -502,7 +502,7 @@ module G = struct
 
         let compare ii1 ii2 = match ii1, ii2 with
           | PreciseIteration i1, PreciseIteration i2 ->
-            Transitioning.Stdlib.compare i1 i2
+            Stdlib.compare i1 i2
           | MultipleIterations i1, MultipleIterations i2 ->
             MultipleIterations.compare i1 i2
           | PreciseIteration _, MultipleIterations _ -> -1

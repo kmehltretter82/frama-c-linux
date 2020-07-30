@@ -33,7 +33,7 @@ module type S = sig
   val iter_sorted:
     ?cmp:(key -> key -> int) -> (key -> 'a -> unit) -> 'a t -> unit
     (** Iter on the hashtbl, but respecting the order on keys induced
-	by [cmp]. Use [Pervasives.compare] if [cmp] not given.
+        by [cmp]. Use [Stdlib.compare] if [cmp] not given.
 
 	If the table contains several bindings for the same key, they
 	are passed to [f] in reverse order of introduction, that is,
@@ -42,7 +42,7 @@ module type S = sig
   val fold_sorted:
     ?cmp:(key -> key -> int) -> (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     (** Fold on the hashtbl, but respecting the order on keys induced
-	by [cmp]. Use [Pervasives.compare] if [cmp] not given.
+        by [cmp]. Use [Stdlib.compare] if [cmp] not given.
 
 	If the table contains several bindings for the same key, they
 	are passed to [f] in reverse order of introduction, that is,

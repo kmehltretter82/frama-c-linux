@@ -499,7 +499,7 @@ struct
     | NoneInfo, NoneInfo -> 0
     | NoneInfo, _ -> -1
     | _ , NoneInfo -> 1
-    | LoopHead i, LoopHead j -> Transitioning.Stdlib.compare j i
+    | LoopHead i, LoopHead j -> Stdlib.compare j i
 
   module Automata = Interpreted_automata.UnrollUnnatural.Version
   type nodes = {

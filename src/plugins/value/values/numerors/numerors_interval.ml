@@ -52,7 +52,7 @@ let prec = function NaN p -> p | I (x, _, _) -> F.prec x
 
 let get_max_exponent = function
   | NaN _ -> Value_parameters.fatal "Numerors: can't return the exponent of a NaN"
-  | I (x, y, _) -> Transitioning.Stdlib.max (F.exponent x) (F.exponent y)
+  | I (x, y, _) -> Stdlib.max (F.exponent x) (F.exponent y)
 
 let get_exponents = function
   | NaN _ -> Value_parameters.fatal "Numerors: can't return the exponent of a NaN"
@@ -171,7 +171,7 @@ let compare a b = (a, b) >>+ fun _ ->
   match a, b with
   | NaN _, NaN _ -> 0 | NaN _, _ ->  1 | _, NaN _ -> -1
   | I (x, y, n), I (x', y', n') ->
-    let c = Transitioning.Stdlib.compare n n' in
+    let c = Stdlib.compare n n' in
     if c = 0 then
       let c = F.compare x x' in
       if c = 0 then F.compare y y'

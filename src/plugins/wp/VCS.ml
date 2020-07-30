@@ -354,11 +354,11 @@ let compare p q =
   in
   let r = rank q.verdict - rank p.verdict in
   if r <> 0 then r else
-    let s = Transitioning.Stdlib.compare p.prover_steps q.prover_steps in
+    let s = Stdlib.compare p.prover_steps q.prover_steps in
     if s <> 0 then s else
-      let t = Transitioning.Stdlib.compare p.prover_time q.prover_time in
+      let t = Stdlib.compare p.prover_time q.prover_time in
       if t <> 0 then t else
-        Transitioning.Stdlib.compare p.solver_time q.solver_time
+        Stdlib.compare p.solver_time q.solver_time
 
 let combine v1 v2 =
   match v1 , v2 with

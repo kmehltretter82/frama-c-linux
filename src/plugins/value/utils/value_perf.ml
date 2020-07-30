@@ -88,7 +88,7 @@ module Call_info = struct
 
   (* Sorts call_infos by decreasing execution time.  *)
   let cmp current_time ci1 ci2 =
-    - (Transitioning.Stdlib.compare (total_duration current_time ci1) (total_duration current_time ci2))
+    - (Stdlib.compare (total_duration current_time ci1) (total_duration current_time ci2))
   ;;
 
   (* From an iteration, filter and sort by call_info, and returns the

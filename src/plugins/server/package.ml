@@ -46,7 +46,7 @@ let pp_ident fmt { plugin ; package ; name } =
 (* --- Name Resolution                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Std = Transitioning.Stdlib
+module Std = Stdlib
 module Id = struct type t = ident let compare = Std.compare end
 module IdMap = Map.Make(Id)
 module IdSet = Set.Make(Id)

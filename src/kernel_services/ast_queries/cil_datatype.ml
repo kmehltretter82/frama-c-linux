@@ -1639,7 +1639,7 @@ and compare_toffset off1 off2 =
 and compare_logic_label l1 l2 = match l1, l2 with
   | StmtLabel s1 , StmtLabel s2 -> Stmt.compare !s1 !s2
   | FormalLabel s1, FormalLabel s2 -> String.compare s1 s2
-  | BuiltinLabel l1, BuiltinLabel l2 -> Transitioning.Stdlib.compare l1 l2
+  | BuiltinLabel l1, BuiltinLabel l2 -> Stdlib.compare l1 l2
   | (StmtLabel _ | FormalLabel _), (FormalLabel _ | BuiltinLabel _) -> -1
   | (BuiltinLabel _ | FormalLabel _), (StmtLabel _ | FormalLabel _) -> 1
 

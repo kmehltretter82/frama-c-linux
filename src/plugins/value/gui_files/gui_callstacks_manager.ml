@@ -261,7 +261,7 @@ module Make (Input: Input) = struct
   module Data = Indexer.Make(
     struct
       type t = int * value row
-      let compare (x,_) (y,_) = Transitioning.Stdlib.compare x y
+      let compare (x,_) (y,_) = Stdlib.compare x y
     end)
 
   (* This function creates a single GTree that displays per-callstack

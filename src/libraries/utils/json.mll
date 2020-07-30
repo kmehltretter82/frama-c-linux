@@ -37,7 +37,7 @@ type json =
 
 type t = json
 let equal = (=)
-let compare = Transitioning.Stdlib.compare
+let compare = Stdlib.compare
 
 type token = EOF | TRUE | FALSE | NULL | KEY of char
            | STR of string | INT of string | DEC of string

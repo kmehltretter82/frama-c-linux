@@ -135,7 +135,7 @@ end = struct
     | Assume (_, e1, b1), Assume (_, e2, b2) ->
       let c = ExpStructEq.compare e1 e2 in
       if c <> 0 then c else
-        Transitioning.Stdlib.compare b1 b2
+        Stdlib.compare b1 b2
     | EnterScope (_, vs1), EnterScope (_, vs2) ->
       Extlib.list_compare Varinfo.compare vs1 vs2
     | LeaveScope (_, vs1), LeaveScope (_, vs2) ->

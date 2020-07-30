@@ -237,7 +237,7 @@ let table_of_contents () =
 module Cmap = Map.Make
     (struct
       type t = string list
-      let compare = Transitioning.Stdlib.compare
+      let compare = Stdlib.compare
     end)
 
 let index_entry (title,href) =

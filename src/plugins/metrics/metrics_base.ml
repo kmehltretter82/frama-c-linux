@@ -26,10 +26,10 @@ open Cil_types (* vname, vaddrof *)
 (* Formatting html with Format.formatters *)
 let html_stag_functions =
   let mark_open_stag t =
-    let t = Transitioning.Format.string_of_stag t in
+    let t = Extlib.format_string_of_stag t in
     Format.sprintf "<%s>" t
   and mark_close_stag t =
-    let t = Transitioning.Format.string_of_stag t in
+    let t = Extlib.format_string_of_stag t in
     try
       let index = String.index t ' ' in
       Format.sprintf "</%s>" (String.sub t 0 index)
@@ -38,7 +38,7 @@ let html_stag_functions =
   and print_open_stag _ = ()
   and print_close_stag _ = ()
   in
-  { Transitioning.Format.mark_open_stag; mark_close_stag;
+  { Format.mark_open_stag; mark_close_stag;
     print_open_stag; print_close_stag; }
 ;;
 
@@ -265,7 +265,7 @@ let get_file_type filename =
 
 module VarinfoByName = struct
   type t = Cil_types.varinfo
-  let compare v1 v2 = Transitioning.Stdlib.compare v1.vname v2.vname
+  let compare v1 v2 = Stdlib.compare v1.vname v2.vname
 end
 
 (** Map and sets of varinfos sorted by name (and not by ids) *)

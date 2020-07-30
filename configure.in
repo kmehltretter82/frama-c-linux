@@ -108,8 +108,8 @@ AC_MSG_CHECKING(version of OCaml)
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p' `
 AC_MSG_RESULT($OCAMLVERSION)
 case $OCAMLVERSION in
-  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.*|4.03.*|4.04.*)
-     AC_MSG_ERROR(Incompatible OCaml version; use 4.05+.);;
+  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.*|4.03.*|4.04.*|4.05.*|4.06.*|4.07.*|4.08.0)
+     AC_MSG_ERROR(Incompatible OCaml version; use 4.08.1+.);;
    *)
      OCAML_ANNOT_OPTION="-bin-annot";;
 esac
@@ -118,24 +118,24 @@ AC_SUBST(OCAMLMAJORNB)
 AC_SUBST(OCAMLMINORNB)
 AC_SUBST(OCAMLPATCHNB)
 
-AC_SUBST(HAS_OCAML407)
-AC_SUBST(HAS_OCAML408)
+AC_SUBST(HAS_OCAML409)
+AC_SUBST(HAS_OCAML410)
 
 OCAMLMAJORNB=$(echo $OCAMLVERSION | cut -f 1 -d .)
 OCAMLMINORNB=$(echo $OCAMLVERSION | cut -f 2 -d .)
 OCAMLPATCHNB=$(echo $OCAMLVERSION | cut -f 3 -d .)
 
 if test $OCAMLMAJORNB -gt 4; then
-  HAS_OCAML407=yes;
-  HAS_OCAML408=yes;
+  HAS_OCAML409=yes;
+  HAS_OCAML410=yes;
 else
-  HAS_OCAML407=no;
-  HAS_OCAML408=no;
-  if test $OCAMLMINORNB -ge 7; then
-    HAS_OCAML407=yes;
+  HAS_OCAML409=no;
+  HAS_OCAML410=no;
+  if test $OCAMLMINORNB -ge 9; then
+    HAS_OCAML409=yes;
   fi;
-  if test $OCAMLMINORNB -ge 8; then
-    HAS_OCAML408=yes;
+  if test $OCAMLMINORNB -ge 10; then
+    HAS_OCAML410=yes;
   fi;
 fi;   # MAJORNB -gt 4
 
@@ -300,10 +300,14 @@ AC_MSG_CHECKING(for zarith)
 
 ZARITH=$($OCAMLFIND query zarith -format %v)
 if test -z "$ZARITH" ; then
-  AC_MSG_ERROR(Cannot find zarith via ocamlfind.)
-else
-  AC_MSG_RESULT(found $ZARITH)
+  AC_MSG_ERROR(Cannot find zarith via ocamlfind (requires zarith 1.5 or higher).)
 fi
+case ZARITH in
+      1.[[01234]].*)
+        AC_MSG_ERROR(found $ZARITH: requires 1.5 or higher.);;
+      *)
+        AC_MSG_RESULT(found $ZARITH);;
+esac
 
 # yojson
 ########
@@ -839,7 +843,7 @@ AC_ARG_ENABLE(external,
 ])
 
 AC_FOREACH([__plugin],m4_esyscmd([ls src/plugins]),
-  [ m4_if(m4_regexp(KNOWN_SRC_DIRS,`\<__plugin\>'),[-1],
+  [ m4_if(m4_bregexp(KNOWN_SRC_DIRS,`\<__plugin\>'),[-1],
       [
         m4_define([plugin_dir],[src/plugins/__plugin])
         m4_syscmd(test -r plugin_dir/configure.in)

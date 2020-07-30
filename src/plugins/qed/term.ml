@@ -464,7 +464,7 @@ struct
       | Constructor -> 1
       | Operator _ -> 0
 
-    let cmp_size a b = Transitioning.Stdlib.compare a.size b.size
+    let cmp_size a b = Stdlib.compare a.size b.size
     let rank_bind = function Forall -> 0 | Exists -> 1 | Lambda -> 2
     let cmp_bind p q = rank_bind p - rank_bind q
     let cmp_field phi (f,x) (g,y) =
@@ -1413,7 +1413,7 @@ struct
     | _ -> (k,t) :: acc
 
   (* sorts monoms by terms *)
-  let compare_monoms (_,t1) (_,t2) = Transitioning.Stdlib.compare t1.id t2.id
+  let compare_monoms (_,t1) (_,t2) = Stdlib.compare t1.id t2.id
 
   (* factorized monoms *)
   let fold_monom ts k t =

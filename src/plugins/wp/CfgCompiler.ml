@@ -437,7 +437,7 @@ struct
       let pp fmt = function | Node i -> Node.pp fmt i | Assume (i,_) -> Format.fprintf fmt "ass%i" i
                             | Check (i,_) -> Format.fprintf fmt "chk%i" i
       let equal x y = (tag x) = (tag y)
-      let compare x y = Transitioning.Stdlib.compare (tag x) (tag y)
+      let compare x y = Stdlib.compare (tag x) (tag y)
       let hash x = tag x
     end in
     let module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (V)(E) in
