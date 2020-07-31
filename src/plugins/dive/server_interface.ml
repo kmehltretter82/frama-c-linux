@@ -36,31 +36,6 @@ end
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- State handling                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* TODO: project state *)
-let get_context =
-  let context = ref None in
-  fun () ->
-    match !context with
-    | Some c -> c
-    | None ->
-      if Eva.Analysis.is_computed () then
-        let c = Context.create () in
-        context := Some c;
-        c
-      else
-        Server.Data.failure "Eva analysis not computed"
-
-
-let global_window = ref {
-    perception = { backward = Some 2 ; forward = Some 1 };
-    horizon = { backward = None ; forward = None };
-  }
-
-
-(* -------------------------------------------------------------------------- *)
 (* --- Data types                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -151,15 +126,8 @@ struct
 
   let jtype = Data.declare ~package ~name ~descr Data.Jint.jtype
 
-  let _to_json node =
+  let to_json node =
     `Int node.node_key
-
-  let of_json json =
-    let node_key = Data.Jint.of_json json in
-    try
-      Context.find_node (get_context ()) node_key
-    with Not_found ->
-      Data.failure "no node '%d' in the current graph" node_key
 end
 
 module Callsite =
@@ -288,40 +256,88 @@ struct
       "id", Jnumber ;
       "src", NodeId.jtype ;
       "dst", NodeId.jtype ;
-      "kind", Jstring ;
+      "dkind", Jstring ;
       "origins", Jarray Kernel_ast.Location.jtype
     ])
 end
 
-module Graph =
+module Element =
 struct
-  type t = Dive_graph.t
-  let name = "graphData"
-  let descr = Markdown.plain "The whole graph being built"
-  let jtype = Data.declare ~package ~name ~descr (Jrecord [
-      "nodes", Jarray Node.jtype;
-      "deps", Jarray Dependency.jtype
-    ])
+  type t = Context.element = Node of node | Edge of (node * dependency * node)
+  let name = "element"
+  let descr = Markdown.plain "A graph element, either a node or a dependency"
+  let jtype = Data.declare ~package ~name ~descr
+      (Junion [Node.jtype ; Dependency.jtype])
 
-  let to_json = Dive_graph.to_json
+  let to_json = function
+    | Context.Node v -> Dive_graph.JsonPrinter.output_node v
+    | Edge edge -> Dive_graph.JsonPrinter.output_dep edge
 end
 
 
-module GraphDiff =
-struct
-  type t = Dive_graph.t * graph_diff
-  let name = "diffData"
-  let descr = Markdown.plain "Graph differences from the last action."
-  let jtype = Data.declare ~package ~name ~descr (Jrecord [
-      "root", Joption NodeId.jtype;
-      "add", Jrecord [
-        "nodes", Jarray Node.jtype;
-        "deps", Jarray Dependency.jtype
-      ];
-      "sub", Jarray NodeId.jtype
-    ])
 
-  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
+(* -------------------------------------------------------------------------- *)
+(* --- State handling                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let global_window = ref {
+    perception = { backward = Some 2 ; forward = Some 1 };
+    horizon = { backward = None ; forward = None };
+  }
+
+let get_context = (* TODO: projectify ? *)
+  let context = Context.create () in
+  fun () ->
+    if Eva.Analysis.is_computed () then
+      context
+    else
+      Server.Data.failure "Eva analysis not computed"
+
+
+module Graph =
+struct
+  let name = "graph"
+  let model = States.model ()
+  let descr = Markdown.plain "The graph being built as a set of vertices and \
+                              edges"
+
+  let key = function
+    | Element.Node v -> Format.sprintf "n%d" v.node_key
+    | Edge (_,dep,_) -> Format.sprintf "d%d" dep.dependency_key
+
+  let () = States.column model ~name:"element"
+      ~descr:(Markdown.plain "a graph element")
+      ~data:(module Element)
+      ~get:(fun el -> el)
+
+  let iter f =
+    let context = get_context () in
+    let graph = Context.get_graph context in
+    Dive_graph.output_to_json stdout graph;
+    Dive_graph.iter_vertex (fun v -> f (Element.Node v)) graph;
+    Dive_graph.iter_edges_e (fun e -> f (Element.Edge e)) graph
+
+  let _array =
+    let hook f =
+      fun g -> f (get_context ()) g
+    in
+    States.register_array ~package ~name ~descr ~key ~iter model
+      ~add_update_hook:(hook Context.set_update_hook)
+      ~add_remove_hook:(hook Context.set_remove_hook)
+      ~add_reload_hook:(hook Context.set_clear_hook)
+end
+
+
+module NodeId' =
+struct
+  include NodeId
+
+  let of_json json =
+    let node_key = Data.Jint.of_json json in
+    try
+      Context.find_node (get_context ()) node_key
+    with Not_found ->
+      Data.failure "no node '%d' in the current graph" node_key
 end
 
 
@@ -329,26 +345,19 @@ end
 (* --- Actions                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let result context last_root =
-  let diff = Context.take_last_diff context in
-  Context.get_graph context, { diff with last_root }
-
-let finalize' context node_opt =
-  begin match node_opt with
-    | None -> ()
-    | Some node ->
-      let may_explore f =
-        Option.iter (fun depth -> f ~depth context node)
-      in
-      may_explore Build.explore_backward !global_window.perception.backward;
-      may_explore Build.explore_forward !global_window.perception.forward;
-      let horizon = !global_window.horizon in
-      if Option.is_some horizon.forward ||
-         Option.is_some horizon.backward
-      then
-        Build.reduce_to_horizon context horizon node
-  end;
-  result context node_opt
+let finalize' context = function
+  | None -> ()
+  | Some node ->
+    let may_explore f =
+      Option.iter (fun depth -> f ~depth context node)
+    in
+    may_explore Build.explore_backward !global_window.perception.backward;
+    may_explore Build.explore_forward !global_window.perception.forward;
+    let horizon = !global_window.horizon in
+    if Option.is_some horizon.forward ||
+       Option.is_some horizon.backward
+    then
+      Build.reduce_to_horizon context horizon node
 
 let finalize context node =
   finalize' context (Some node)
@@ -360,12 +369,6 @@ let () = Request.register ~package
     (fun window -> global_window := window)
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"graph"
-    ~descr:(Markdown.plain "Retrieve the whole graph")
-    ~input:(module Data.Junit) ~output:(module Graph)
-    (fun () -> Context.get_graph (get_context ()))
-
-let () = Request.register ~package
     ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
@@ -374,16 +377,18 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"add"
     ~descr:(Markdown.plain "Add a node to the graph")
-    ~input:(module Kernel_ast.Marker) ~output:(module GraphDiff)
+    ~input:(module Kernel_ast.Marker) ~output:(module Joption (NodeId'))
     begin fun loc ->
       let context = get_context () in
-      finalize' context (Build.add_localizable context loc)
+      let node = Build.add_localizable context loc in
+      finalize' context node;
+      node
     end
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.show context node;
@@ -393,7 +398,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.show context node;
@@ -404,7 +409,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.hide context node;

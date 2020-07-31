@@ -43,7 +43,7 @@ val update_node_values : node ->
   unit
 
 val create_dependency : t -> Cil_types.kinstr ->
-  node -> dependency_kind -> node -> unit
+  node -> dependency_kind -> node -> node * dependency * node
 
 val remove_dependency : t -> node * dependency * node -> unit
 val remove_dependencies : t -> node -> unit
@@ -55,5 +55,10 @@ val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
 val output_to_dot : out_channel -> t -> unit
 val output_to_json : out_channel -> t -> unit
 
-val to_json : t -> Json.t
-val diff_to_json : t -> graph_diff -> Json.t
+module JsonPrinter :
+sig
+  val output_node : node ->  Json.t
+  val output_dep : edge -> Json.t
+  val output_graph : t -> Json.t
+  val output_diff : t -> graph_diff -> Json.t
+end

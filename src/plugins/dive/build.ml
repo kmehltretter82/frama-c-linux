@@ -148,14 +148,14 @@ end
 (* --- Precision evaluation --- *)
 
 (* For folded bases, lval may be strictly included in the node zone *)
-let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) rq =
+let update_node_values context node ?(lval=Node_kind.to_lval node.node_kind) rq =
   match lval with
   | None -> () (* can't evaluate node *)
   | Some lval ->
     let typ = Cil.typeOfLval lval
     and cvalue = Eval.to_cvalue rq lval
     and taint = Eval.is_tainted rq lval in
-    Graph.update_node_values node ~typ ~cvalue ~taint
+    Context.update_node_values context node ~typ ~cvalue ~taint
 
 
 (* --- Locations handling --- *)
@@ -279,7 +279,7 @@ let build_var context callstack varinfo =
 
 let build_lval context callstack kinstr lval =
   let node = build_node context callstack lval kinstr in
-  update_node_values ~lval:(Some lval) node (Eval.after_kinstr kinstr);
+  update_node_values context ~lval:(Some lval) node (Eval.after_kinstr kinstr);
   node
 
 let build_const context callstack exp =
@@ -296,14 +296,13 @@ let build_alarm context callstack stmt alarm =
 type deps_builder = unit Seq.t
 
 let build_node_writes context node =
-  let graph = Context.get_graph context
-  and is_folded_base = Context.is_folded context in
+  let is_folded_base = Context.is_folded context in
 
   let rec build_write_deps callstack kinstr lval : deps_builder =
     let add_deps = function
       | { skind=Instr instr } as stmt ->
         (* Update the values at the light of new discovered write *)
-        update_node_values node (Eval.after stmt);
+        update_node_values context node (Eval.after stmt);
         (* Add dependencies for each callstack *)
         List.to_seq (find_compatible_callstacks stmt callstack) |>
         Seq.flat_map (fun cs -> build_instr_deps cs stmt instr)
@@ -311,8 +310,7 @@ let build_node_writes context node =
     in
     let writes = Eval.writes kinstr lval in
     let args_seq, call_stmts = build_arg_deps callstack in
-    let compare = Cil_datatype.Stmt_Id.compare in
-    node.node_writes_stmts <- List.sort_uniq compare (writes @ call_stmts);
+    Context.set_node_writes context node (writes @ call_stmts);
     Seq.append args_seq (Seq.flat_map add_deps (List.to_seq writes))
 
   and build_alarm_deps callstack stmt alarm : deps_builder =
@@ -365,7 +363,7 @@ let build_node_writes context node =
           assert false (* Callsites can only be Call or ConsInit *)
       in
       (* Evaluate the parameter values at the start of its defining function *)
-      update_node_values node (Eval.at_start_of kf);
+      update_node_values context node (Eval.at_start_of kf);
       Seq.flat_map add_deps (List.to_seq callsites), List.map fst callsites
     | _ -> Seq.empty, []
 
@@ -412,18 +410,18 @@ let build_node_writes context node =
   and build_lval_deps callstack stmt kind lval : deps_builder =
     let kinstr = Kstmt stmt in
     let dst = build_lval context callstack kinstr lval in
-    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+    Seq.return (Context.add_dep context kinstr dst kind node)
 
   and build_const_deps callstack stmt kind exp : deps_builder =
     let kinstr = Kstmt stmt in
     let dst = build_const context callstack exp in
-    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+    Seq.return (Context.add_dep context kinstr dst kind node)
 
   and build_scattered_deps callstack kinstr lval : deps_builder =
     let add_cell node_kind =
-      let node' = add_or_update_node context callstack node_kind in
-      update_node_values node (Eval.after_kinstr kinstr);
-      Graph.create_dependency graph kinstr node' Composition node
+      let dst = add_or_update_node context callstack node_kind in
+      update_node_values context node (Eval.after_kinstr kinstr);
+      Context.add_dep context kinstr dst Composition node
     in
     enumerate_cells ~is_folded_base lval kinstr |> Seq.map add_cell
   in
@@ -445,8 +443,6 @@ let build_node_writes context node =
 (* --- Reads --- *)
 
 let build_node_reads context node =
-  let graph = Context.get_graph context in
-
   let rec build_reads_deps callstack kinstr lval : deps_builder =
     let add_deps stmt =
       let zone = Some (Eval.to_zone kinstr lval) in
@@ -539,7 +535,7 @@ let build_node_reads context node =
   and build_lval_deps callstack stmt lval =
     let kinstr = Kstmt stmt in
     let src = build_lval context callstack kinstr lval in
-    Seq.return (Graph.create_dependency graph kinstr node Data src)
+    Seq.return (Context.add_dep context kinstr node Data src)
 
   and build_var_deps callstack stmt vi =
     build_lval_deps callstack stmt (Cil.var vi)
@@ -594,8 +590,7 @@ let explore_backward ~depth context root =
         | Partial builder -> builder
         | NotDone -> build_node_writes context n
       in
-      n.node_writes_computation <- advance_computation context deps_builder;
-      Context.update_diff context n
+      n.node_writes_computation <- advance_computation context deps_builder
     end
   in
   bfs ~depth ~iter_succ explore_node root
@@ -610,8 +605,7 @@ let explore_forward ~depth context root =
         | Partial builder -> builder
         | NotDone -> build_node_reads context n
       in
-      n.node_reads_computation <- advance_computation context deps_builder;
-      Context.update_diff context n
+      n.node_reads_computation <- advance_computation context deps_builder
     end
   in
   bfs ~depth ~iter_succ explore_node root
@@ -674,12 +668,10 @@ let add_localizable context = function
 
 let remove_dependencies context node =
   (* Remove incomming edges *)
-  Graph.remove_dependencies (Context.get_graph context) node;
-  (* Dependencies are not there anymore *)
+  Context.remove_node_deps context node;
+  (* Reset the writes computation status *)
   node.node_writes_computation <- NotDone;
-  node.node_writes_stmts <- [];
-  (* Notify node update *)
-  Context.update_diff context node
+  Context.set_node_writes context node []
 
 let remove_disconnected context =
   let roots = Context.get_roots context in

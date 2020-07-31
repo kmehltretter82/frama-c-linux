@@ -35,6 +35,8 @@ let output format context filename =
 let main () =
   if not (Self.FromBases.is_empty () &&
           Self.FromFunctionAlarms.is_empty ()) then begin
+    (* Make sure Eva is computed *)
+    Eva.Analysis.compute ();
     (* Create the initial graph  *)
     let context = Context.create () in
     (* Handle parameters *)
