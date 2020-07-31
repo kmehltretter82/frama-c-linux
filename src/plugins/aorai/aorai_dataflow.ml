@@ -276,8 +276,7 @@ let make_start_transition ?(is_main=false) kf init_states =
     let my_trans = Path_analysis.get_transitions_of_state state auto in
     let treat_one_trans acc trans =
         if is_crossable trans kf then begin
-          let (_,action) = trans.cross in
-          let bindings = actions_to_range action in
+          let bindings = actions_to_range trans.actions in
           let fst_set =
             Data_for_aorai.Aorai_state.Set.singleton trans.stop
           in
@@ -309,8 +308,7 @@ let make_return_transition kf state =
     let last = Data_for_aorai.Aorai_state.Set.singleton state in
     let treat_one_trans acc trans =
       if Aorai_utils.isCrossable trans kf Promelaast.Return then begin
-        let (_,action) = trans.cross in
-        let my_bindings = actions_to_range action in
+        let my_bindings = actions_to_range trans.actions in
         let new_bindings = compose_actions bindings (last, last, my_bindings) in
         add_or_merge trans.stop new_bindings acc
       end else acc

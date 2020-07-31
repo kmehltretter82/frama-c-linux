@@ -90,10 +90,9 @@ struct
     Format.pp_print_string fmt st.Promelaast.name
 
   let pretty_trans fmt tr =
-    let cond,act = tr.cross in
-    Promelaoutput.print_condition fmt cond;
-    if act <> [] then
-      Format.fprintf fmt "{@[%a@]}" Promelaoutput.print_action act
+    Promelaoutput.Typed.print_condition fmt tr.cross;
+    if tr.actions <> [] then
+      Format.fprintf fmt "{@[%a@]}" Promelaoutput.Typed.print_actionl tr.actions
 
   let pretty_set fmt set =
     let l = Set.elements set in
@@ -115,18 +114,17 @@ struct
   let analyze ((src,tr,dst) as edge) = function
     | Bottom -> Bottom
     | InitializedSet initialized ->
-      let cond,act = tr.cross in
       (* Check that the condition uses only initialized variables *)
-      let used = used_metavariables cond in
+      let used = used_metavariables tr.cross in
       let diff = Set.diff used initialized in
       if not (Set.is_empty diff) then
         alarm edge diff;
       (* Add variables initialized by the condition *)
-      let add_initialized set = function
+      let add set = function
         | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
         | _ -> set
       in
-      let initialized' = List.fold_left add_initialized initialized act in
+      let initialized' = List.fold_left add initialized tr.actions in
       Aorai_option.debug ~dkey "%a {%a} -> %a {%a}"
         pretty_state src pretty_set initialized
         pretty_state dst pretty_set initialized';

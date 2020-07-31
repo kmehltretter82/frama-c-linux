@@ -7,7 +7,7 @@ $x : int;
 a : { CALL(main) } -> b;
 
 b :
-  { CALL(f) && $x := f().x } -> c
+  { CALL(f) } $x := f().x -> c
 | { CALL(g) } -> d
 ;
 
@@ -24,6 +24,6 @@ f : { RETURN(h) } -> g;
 
 g : { CALL(i) } -> h;
 
-h : { RETURN(i) && $x := 1 } -> e;
+h : { RETURN(i) } $x := 1 -> e;
 
 i : -> i;

@@ -47,7 +47,6 @@ type condition =
   | PCall of string * string option
       (** Call might be done in a given behavior *)
   | PReturn of string
-  | PAssign of string * expression
 
 and seq_elt =
     { condition: condition option;
@@ -62,7 +61,10 @@ and sequence = seq_elt list
     otherwise keyword. A single condition is expressed with a singleton
     having an empty nested sequence and min_rep and max_rep being equal to one.
 *)
-type parsed_condition = Seq of sequence | Otherwise
+type guard = Seq of sequence | Otherwise
+
+type action = 
+  | Metavar_assign of string * expression
 
 type typed_condition =
     | TOr of typed_condition * typed_condition  (** Logical OR *)
@@ -80,7 +82,11 @@ type typed_condition =
            tied to the corresponding value.
         *)
 
-type single_action =
+(** Additional actions to perform when crossing a transition.
+    There is at most one Pebble_* action for each transition, and
+    each transition leading to a state with multi-state has such an action.
+ *)
+type typed_action =
   | Counter_init of Cil_types.term_lval
   | Counter_incr of Cil_types.term_lval
   | Pebble_init of
@@ -96,14 +102,9 @@ type single_action =
             moves pebbles from [old_set] to [new_set], governed by the
             corresponding aux variables. *)
   | Copy_value of Cil_types.term_lval * Cil_types.term
-      (** copy the current value of the given term into the given location
-          so that it can be accessed by a later state. *)
+  (** copy the current value of the given term into the given location
+      so that it can be accessed by a later state. *)
 
-(** Additional actions to perform when crossing a transition.
-    There is at most one Pebble_* action for each transition, and
-    each transition leading to a state with multi-state has such an action.
- *)
-type action = single_action list
 
 (** Internal representation of a State from the Buchi automata. *)
 type state =
@@ -125,23 +126,28 @@ type state =
     }
 
 (** Internal representation of a transition from the Buchi automata. *)
-type 'condition trans =
-    { start : state ;     (** Starting state of the transition *)
-      stop : state ;      (** Ending state of the transition *)
-      mutable cross : 'condition ; (** Cross condition of the transition *)
-      mutable numt : int  (** Numerical ID of the transition *)
+type ('c,'a) trans =
+    { start : state ;            (** Starting state of the transition *)
+      stop : state ;             (** Ending state of the transition *)
+      mutable cross : 'c;        (** Cross condition of the transition *)
+      mutable actions : 'a list; (** Actions to execute while crossing *)
+      mutable numt : int         (** Numerical ID of the transition *)
     }
 
+type parsed_trans = (guard, action) trans
+
+type typed_trans = (typed_condition, typed_action) trans
+
 (** Internal representation of a Buchi automata : a list of states and a list of transitions.*)
-type 'condition automaton = {
+type ('c,'a) automaton = {
   states: state list;
-  trans: ('condition trans) list;
+  trans: (('c,'a) trans) list;
   metavariables: Cil_types.varinfo Datatype.String.Map.t;
 }
 
-type parsed_automaton = parsed_condition automaton
+type parsed_automaton = (guard, action) automaton
 
-type typed_automaton = (typed_condition * action) automaton
+type typed_automaton = (typed_condition, typed_action) automaton
 
 (** An operation can have two status: currently calling or returning. *)
 type funcStatus =

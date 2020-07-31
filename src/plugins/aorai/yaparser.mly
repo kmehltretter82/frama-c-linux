@@ -158,7 +158,7 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %left DOT
 %nonassoc NOT TRUE FALSE
 %nonassoc QUESTION
-%right SEMICOLON
+%right SEMI_COLON
 %nonassoc lowest
 
 %type <Promelaast.parsed_automaton> main
@@ -214,7 +214,7 @@ state
       let start_state = fetch_and_create_state $1 in
       let (_, transitions) =
         List.fold_left
-          (fun (otherwise, transitions) (cross,stop_state) ->
+          (fun (otherwise, transitions) (cross,actions,stop_state) ->
             if otherwise then
               Aorai_option.abort
                 "'other' directive in definition of %s \
@@ -222,7 +222,7 @@ state
             else begin
               let trans =
                 { start=start_state; stop=stop_state;
-                  cross=cross;       numt=(-1) }::transitions
+                  cross; actions; numt=(-1) }::transitions
               in
               let otherwise =
                 match cross with
@@ -242,10 +242,12 @@ transitions  /*=>  [transition; ...] */
 
 
 transition:  /*=>  (guard, state) */
-  | LCURLY seq_elt RCURLY RARROW IDENTIFIER
-      { (Seq $2, prefetch_and_create_state $5) }
-  | OTHERWISE RARROW IDENTIFIER {(Otherwise, prefetch_and_create_state $3) }
-  | RARROW IDENTIFIER { (Seq (to_seq PTrue), prefetch_and_create_state $2) }
+  | LCURLY seq_elt RCURLY actions RARROW IDENTIFIER
+      { (Seq $2, $4, prefetch_and_create_state $6) }
+  | OTHERWISE actions RARROW IDENTIFIER
+      { (Otherwise, $2, prefetch_and_create_state $4) }
+  | actions RARROW IDENTIFIER
+      { (Seq (to_seq PTrue), $1, prefetch_and_create_state $3) }
   ;
 
 non_empty_seq:
@@ -338,7 +340,6 @@ single_cond:
   | single_cond OR single_cond { POr ($1,$3) }
   | LPAREN single_cond RPAREN { $2 }
   | logic_relation { $1 }
-  | METAVAR AFF arith_relation { PAssign ($1, $3) }
 ;
 
 logic_relation
@@ -391,4 +392,18 @@ access_leaf
   | IDENTIFIER { PVar $1 }
   | LPAREN access RPAREN { $2 }
   | METAVAR { PMetavar $1 }
+  ;
+
+actions
+  : /* epsilon */     { [] }
+  | non_empty_actions { $1 }
+  ;
+
+non_empty_actions
+  : non_empty_actions action { $1 @ [$2] }
+  | action                   { [$1] }
+  ;
+
+action
+  : METAVAR AFF arith_relation { Metavar_assign ($1, $3) }
   ;

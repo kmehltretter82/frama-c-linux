@@ -48,7 +48,7 @@ let convert_ltl_exprs t =
         POr(c1,c2) -> POr (convert_cond c1, convert_cond c2)
       | PAnd(c1,c2) -> PAnd(convert_cond c1, convert_cond c2)
       | PNot c -> PNot (convert_cond c)
-      | PCall _ | PReturn _ | PTrue | PFalse | PAssign _ -> cond
+      | PCall _ | PReturn _ | PTrue | PFalse -> cond
       | PRel(Neq,PVar x,PCst _) ->
         (try
            let (rel,t1,t2) = Hashtbl.find ltl_to_promela x in PRel(rel,t1,t2)
@@ -259,7 +259,7 @@ let output () =
   (* Dot file *)
   if (Aorai_option.Dot.get()) then
     begin
-      Promelaoutput.output_dot_automata (Data_for_aorai.getAutomata ())
+      Promelaoutput.Typed.output_dot_automata (Data_for_aorai.getAutomata ())
         (!dot_file:>string);
       printverb "Generating dot file    : done\n"
     end;

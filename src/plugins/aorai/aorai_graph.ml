@@ -26,7 +26,7 @@
 open Promelaast
 
 type state = Promelaast.state
-type transition = (typed_condition * action) trans
+type transition = Promelaast.typed_trans
 
 module Vertex =
 struct
@@ -46,7 +46,7 @@ struct
   let compare x y = Pervasives.compare x.numt y.numt
   let default = {
     numt = -1; start = Vertex.default; stop = Vertex.default;
-    cross = TTrue,[]
+    cross = TTrue; actions = []
   }
 end
 

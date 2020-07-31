@@ -45,8 +45,8 @@ val simplifyCond:
     simplifyCond done on each cross condition. Uncrossable transition are
     removed. *) 
 val simplifyTrans: 
-  Promelaast.typed_condition Promelaast.trans list -> 
-  (Promelaast.typed_condition Promelaast.trans list)*
+  Promelaast.typed_trans list ->
+  (Promelaast.typed_trans list)*
     (Promelaast.typed_condition list list list)
 
 val dnfToCond : 

@@ -382,7 +382,7 @@ let possible_start kf (start,int) =
   let trans = Path_analysis.get_edges start int auto in
   let treat_one_trans cond tr =
     Logic_const.por
-      (cond, Aorai_utils.crosscond_to_pred (fst tr.cross) kf Promelaast.Call)
+      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
   in
   let cond = List.fold_left treat_one_trans Logic_const.pfalse trans in
   Logic_const.pand (Aorai_utils.is_state_pred start, cond)
@@ -409,7 +409,7 @@ let neg_trans kf trans =
              List.fold_left
                (fun cond tr ->
                   Logic_simplification.tand
-                    cond (Logic_simplification.tnot (fst tr.cross)))
+                    cond (Logic_simplification.tnot tr.cross))
                cond trans)
           TTrue same_start
       in

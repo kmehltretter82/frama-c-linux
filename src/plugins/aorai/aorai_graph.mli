@@ -24,8 +24,7 @@
 (**************************************************************************)
 
 type state = Promelaast.state
-type transition =
-  (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+type transition = Promelaast.typed_trans
 type edge = state * transition * state
 
 include Graph.Sig.I

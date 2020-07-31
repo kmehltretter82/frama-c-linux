@@ -66,8 +66,7 @@ let isCrossable tr func st =
     | TFalse -> False
     | TRel _ -> Undefined
   in
-  let cond,_ = tr.cross in
-  let res = isCross cond <> False in
+  let res = isCross tr.cross <> False in
   Aorai_option.debug ~level:2 "Function %a %s-state, \
                                transition %s -> %s is%s possible" Kernel_function.pretty func
     (if st=Call then "pre" else "post")
@@ -307,8 +306,7 @@ let isCrossableAtInit tr func =
     | TRel(rel,t1,t2) -> eval_rel_at_init rel t1 t2
 
   in
-  let (cond,_) = tr.cross in
-  match isCross cond with
+  match isCross tr.cross with
   | Bool3.True | Bool3.Undefined -> true
   | Bool3.False -> false
 
@@ -557,7 +555,7 @@ let mk_behavior_call generated_kf kf bhv =
 (* Translate the cross condition of an automaton edge to an expression.
    Used in mk_stmt. This might generate calls to auxiliary functions, to
    take into account a guard that uses a function behavior. *)
-let crosscond_to_exp generated_kf curr_f curr_status loc (cond,_) res =
+let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
   let check_current_event f status =
     Kernel_function.equal curr_f f && curr_status = status
   in
@@ -1059,10 +1057,10 @@ let mk_deterministic_lemma () =
         let subst = Cil_datatype.Logic_var.Hashtbl.create 5 in
         let subst_res = Kernel_function.Hashtbl.create 5 in
         let guard1 =
-          pred_of_condition subst subst_res label (fst trans1.cross)
+          pred_of_condition subst subst_res label trans1.cross
         in
         let guard2 =
-          pred_of_condition subst subst_res label (fst trans2.cross)
+          pred_of_condition subst subst_res label trans2.cross
         in
         let pred = Logic_const.pnot (Logic_const.pand (guard1, guard2)) in
         let quants =
@@ -1288,7 +1286,7 @@ let action_assigns trans =
       add_if_needed caux (Logic_const.tvar aux) empty
     | _ -> empty
   in
-  let _,res = List.fold_left treat_one_action empty_pebble (snd trans.cross) in
+  let _,res = List.fold_left treat_one_action empty_pebble trans.actions in
   Writes res
 
 let get_reachable_trans state st auto current_state =
@@ -1354,7 +1352,7 @@ let force_transition loc f st current_state =
     *)
     let add_one_trans (has_crossable_trans, crossable_non_reject) trans =
       let has_crossable_trans =
-        Logic_simplification.tor has_crossable_trans (fst trans.cross)
+        Logic_simplification.tor has_crossable_trans trans.cross
       in
       let crossable_non_reject =
         crossable_non_reject ||
@@ -1428,7 +1426,7 @@ let partition_action trans =
                                            *)
   in
   let treat_one_trans acc tr =
-    List.fold_left (treat_one_action tr.start) acc (snd tr.cross)
+    List.fold_left (treat_one_action tr.start) acc tr.actions
   in
   List.fold_left treat_one_trans Cil_datatype.Term_lval.Map.empty trans
 
@@ -1530,7 +1528,8 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
     let set = Data_for_aorai.pebble_set_at set Logic_const.here_label in
     let treat_action guard res action =
       match action with
-      | Copy_value _ | Counter_incr _ | Counter_init _ -> res
+      | Copy_value _ | Counter_incr _ | Counter_init _ ->
+        res
       | Pebble_init (_,_,v) ->
         let a = Cil_const.make_logic_var_quant aux.lv_name aux.lv_type in
         let guard = rename_pred aux a guard in
@@ -1558,9 +1557,9 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
         :: res
     in
     let treat_one_trans acc tr =
-      let guard = crosscond_to_pred (fst tr.cross) f st in
+      let guard = crosscond_to_pred tr.cross f st in
       let guard = Logic_const.pold guard in
-      List.fold_left (treat_action guard) acc (snd tr.cross)
+      List.fold_left (treat_action guard) acc tr.actions
     in
     let res = List.fold_left treat_one_trans [] trans in
     let res = Logic_const.term (Tunion res) set.term_type in
@@ -1639,8 +1638,7 @@ let mk_unchanged_aux_vars trans =
     | Pebble_init _ | Pebble_move _ -> acc
   in
   let add_one_trans acc tr =
-    let (_,actions) = tr.cross in
-    List.fold_left add_one_action acc actions
+    List.fold_left add_one_action acc tr.actions
   in
   let my_aux_vars = List.fold_left add_one_trans my_aux_vars trans in
   let treat_lval lv acc =
@@ -1672,15 +1670,14 @@ let mk_behavior ~loc auto kf e status state =
           List.fold_left
             (fun (in_guard, out_guard, all_assigns, action_bhvs) trans ->
                Aorai_option.debug "examining transition %d" trans.numt;
-               let (cond,actions) = trans.cross in
                Aorai_option.debug "transition %d is active" trans.numt;
-               let guard = crosscond_to_pred cond kf e in
+               let guard = crosscond_to_pred trans.cross kf e in
                let my_in_guard,my_out_guard =
                  match state.multi_state with
                  | None -> guard, Logic_const.pnot ~loc guard
                  | Some (_,aux) ->
                    let set =
-                     find_pebble_origin Logic_const.here_label actions
+                     find_pebble_origin Logic_const.here_label trans.actions
                    in
                    pebble_guard ~loc set aux guard,
                    pebble_guard_neg ~loc set aux guard
@@ -1689,7 +1686,7 @@ let mk_behavior ~loc auto kf e status state =
                  Logic_const.pand ~loc (out_guard, my_out_guard)
                in
                let in_guard, all_assigns, action_bhvs =
-                 match actions with
+                 match trans.actions with
                  | [] ->
                    (Logic_const.por ~loc (in_guard,my_in_guard),
                     all_assigns,
@@ -1721,7 +1718,7 @@ let mk_behavior ~loc auto kf e status state =
                      | Some (_,aux) ->
                        let set =
                          find_pebble_origin
-                           Logic_const.pre_label actions
+                           Logic_const.pre_label trans.actions
                        in
                        acc @
                        List.map
@@ -1732,7 +1729,7 @@ let mk_behavior ~loc auto kf e status state =
                          posts
                    in
                    let post_cond =
-                     List.fold_left treat_one_action [post_cond] actions
+                     List.fold_left treat_one_action [post_cond] trans.actions
                    in
                    let assigns = action_assigns trans in
                    let all_assigns = concat_assigns assigns all_assigns in
@@ -1879,7 +1876,7 @@ let auto_func_behaviors loc f st state =
   global_behavior :: (List.rev behaviors)
 
 
-let act_convert loc (_,act) res =
+let act_convert loc act res =
   let treat_one_act =
     function
     | Counter_init t_lval ->
@@ -1929,7 +1926,7 @@ let mk_stmt generated_kf loc (states, tr) f fst status ((st,_) as state) res =
            Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
            Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp
            ::exp_from_trans,
-           act_convert loc trans.cross res :: stmt_from_action))
+           act_convert loc trans.actions res :: stmt_from_action))
         useful_trans
         ([],[],Cil_datatype.Varinfo.Set.empty, [], [])
     in
@@ -2079,7 +2076,7 @@ let auto_func_block generated_kf loc f st status res =
 
 let get_preds_wrt_params_reachable_states state f status =
   let auto = Data_for_aorai.getGraph () in
-  let treat_one_trans acc tr = Logic_simplification.tor acc (fst tr.cross) in
+  let treat_one_trans acc tr = Logic_simplification.tor acc tr.cross in
   let find_trans state prev tr =
     Path_analysis.get_edges prev state auto @ tr
   in

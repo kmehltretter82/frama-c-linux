@@ -42,10 +42,8 @@ exception Empty_automaton
 
 module Aorai_state: Datatype.S_with_collections with type t = Promelaast.state
 
-module Aorai_typed_trans: 
-  Datatype.S_with_collections 
-  with 
-    type t = (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+module Aorai_typed_trans:
+  Datatype.S_with_collections with type t = Promelaast.typed_trans
 
 (** Initializes some tables according to data from Cil AST. *)
 val setCData : unit -> unit
@@ -201,13 +199,13 @@ val buch_sync    : string
 
 val new_state: string -> state
 
-val new_trans: state -> state -> 'a -> 'a trans
+val new_trans: state -> state -> 'c -> 'a list -> ('c,'a) trans
 
 (** Return the buchi automata as stored after parsing *)
 val getAutomata : unit -> Promelaast.typed_automaton
 
 (** Return only the graph part of the automata *)
-val getGraph : unit -> state list * (typed_condition * action) trans list
+val getGraph : unit -> state list * typed_trans list
 
 (** Type-checks the parsed automaton and stores the result.
     This might introduce new global variables in case of sequences.
@@ -249,8 +247,7 @@ val is_reject_state: state -> bool
 (** returns the transition having the corresponding id.
     @raise Not_found if this is not the case.
 *)
-val getTransition:
-  int -> (Promelaast.typed_condition * Promelaast.action) Promelaast.trans
+val getTransition: int -> Promelaast.typed_trans
 
 (* ************************************************************************* *)
 (**{b Variables information} Usually it seems very useful to access to varinfo
