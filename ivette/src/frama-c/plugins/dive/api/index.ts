@@ -53,6 +53,14 @@ import { locationDefault } from 'frama-c/kernel/api/ast';
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { byTag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { jTag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** Parametrization of the exploration range. */
 export interface range {
@@ -118,19 +126,20 @@ export const byNodeId: Compare.Order<nodeId> = Compare.number;
 export const nodeIdDefault: nodeId = 0;
 
 /** A callsite */
-export type callsite = { fun: string, instr: number | string };
+export type callsite = { fun: string, instr: number | "global" };
 
 /** Decoder for `callsite` */
 export const jCallsite: Json.Decoder<callsite> =
   Json.jObject({
     fun: Json.jString,
-    instr: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
+    instr: Json.jUnion<number | "global">( Json.jNumber, Json.jTag("global"),
+           ),
   });
 
 /** Natural order for `callsite` */
 export const byCallsite: Compare.Order<callsite> =
   Compare.byFields
-    <{ fun: string, instr: number | string }>({
+    <{ fun: string, instr: number | "global" }>({
     fun: Compare.string,
     instr: Compare.structural,
   });
@@ -170,61 +179,189 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
 export const nodeLocalityDefault: nodeLocality =
   { file: '', callstack: undefined };
 
+/** The nature of a node. */
+export enum nodeKind {
+  /** a numeric constant literal */
+  const = 'const',
+  /** a placeholder node when an error prevented the generationprocess */
+  error = 'error',
+  /** a string literal */
+  string = 'string',
+  /** a memory location designated by a range of adresses */
+  absolute = 'absolute',
+  /** an alarm emitted by Frama-C */
+  alarm = 'alarm',
+  /** an unresolved memory location */
+  unknown = 'unknown',
+  /** a set of memory locations designated by an lvalue */
+  scattered = 'scattered',
+  /** a memory bloc containing cells */
+  composite = 'composite',
+  /** a single memory cell */
+  scalar = 'scalar',
+}
+
+/** Decoder for `nodeKind` */
+export const jNodeKind: Json.Decoder<nodeKind> = Json.jEnum(nodeKind);
+
+/** Natural order for `nodeKind` */
+export const byNodeKind: Compare.Order<nodeKind> = Compare.byEnum(nodeKind);
+
+/** Default value for `nodeKind` */
+export const nodeKindDefault: nodeKind = nodeKind.const;
+
+const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.nodeKindTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const nodeKindTags: Server.GetRequest<null,tag[]>= nodeKindTags_internal;
+
+/** Taint of a memory location. */
+export enum taint {
+  /** not tainted by anything */
+  untainted = 'untainted',
+  /** tainted by control */
+  indirect = 'indirect',
+  /** tainted by data */
+  direct = 'direct',
+}
+
+/** Decoder for `taint` */
+export const jTaint: Json.Decoder<taint> = Json.jEnum(taint);
+
+/** Natural order for `taint` */
+export const byTaint: Compare.Order<taint> = Compare.byEnum(taint);
+
+/** Default value for `taint` */
+export const taintDefault: taint = taint.untainted;
+
+const taintTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.taintTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const taintTags: Server.GetRequest<null,tag[]>= taintTags_internal;
+
+/** The computation state of a node read or write dependencies. */
+export enum exploration {
+  /** all dependencies have been computed */
+  yes = 'yes',
+  /** some dependencies have been exploreread/tainted by control */
+  partial = 'partial',
+  /** dependencies have not been computed */
+  no = 'no',
+}
+
+/** Decoder for `exploration` */
+export const jExploration: Json.Decoder<exploration> =
+  Json.jEnum(exploration);
+
+/** Natural order for `exploration` */
+export const byExploration: Compare.Order<exploration> =
+  Compare.byEnum(exploration);
+
+/** Default value for `exploration` */
+export const explorationDefault: exploration = exploration.yes;
+
+const explorationTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.explorationTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const explorationTags: Server.GetRequest<null,tag[]>= explorationTags_internal;
+
+/** A qualitative description of the range of values that this node can take. */
+export enum nodeRange {
+  /** this node can take almost all values of its type */
+  wide = 'wide',
+  /** this node can only have one value */
+  singleton = 'singleton',
+  /** no value ever computed for this node */
+  empty = 'empty',
+}
+
+/** Decoder for `nodeRange` */
+export const jNodeRange: Json.Decoder<nodeRange> = Json.jEnum(nodeRange);
+
+/** Natural order for `nodeRange` */
+export const byNodeRange: Compare.Order<nodeRange> =
+  Compare.byEnum(nodeRange);
+
+/** Default value for `nodeRange` */
+export const nodeRangeDefault: nodeRange = nodeRange.wide;
+
+const nodeRangeTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.nodeRangeTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const nodeRangeTags: Server.GetRequest<null,tag[]>= nodeRangeTags_internal;
+
 /** A graph node */
 export type node =
-  { id: nodeId, label: string, kind: string, locality: nodeLocality,
-    is_root: boolean, backward_explored: string, forward_explored: string,
-    writes: location[], values?: string, range: number | string,
-    type?: string, taint?: "direct" | "indirect" | "untainted" };
+  { id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
+    is_root: boolean, backward_explored: exploration,
+    forward_explored: exploration, writes: location[], values?: string,
+    range: number | nodeRange, type?: string, taint?: taint };
 
 /** Decoder for `node` */
 export const jNode: Json.Decoder<node> =
   Json.jObject({
     id: jNodeId,
     label: Json.jString,
-    kind: Json.jString,
+    nkind: jNodeKind,
     locality: jNodeLocality,
     is_root: Json.jBoolean,
-    backward_explored: Json.jString,
-    forward_explored: Json.jString,
+    backward_explored: jExploration,
+    forward_explored: jExploration,
     writes: Json.jArray(jLocation),
     values: Json.jOption(Json.jString),
-    range: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
+    range: Json.jUnion<number | nodeRange>( Json.jNumber, jNodeRange,),
     type: Json.jOption(Json.jString),
-    taint: Json.jOption(
-             Json.jUnion<"direct" | "indirect" | "untainted">(
-               Json.jTag("direct"),
-               Json.jTag("indirect"),
-               Json.jTag("untainted"),
-             )),
+    taint: Json.jOption(jTaint),
   });
 
 /** Natural order for `node` */
 export const byNode: Compare.Order<node> =
   Compare.byFields
-    <{ id: nodeId, label: string, kind: string, locality: nodeLocality,
-       is_root: boolean, backward_explored: string, forward_explored: string,
-       writes: location[], values?: string, range: number | string,
-       type?: string, taint?: "direct" | "indirect" | "untainted" }>({
+    <{ id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
+       is_root: boolean, backward_explored: exploration,
+       forward_explored: exploration, writes: location[], values?: string,
+       range: number | nodeRange, type?: string, taint?: taint }>({
     id: byNodeId,
     label: Compare.string,
-    kind: Compare.string,
+    nkind: byNodeKind,
     locality: byNodeLocality,
     is_root: Compare.boolean,
-    backward_explored: Compare.string,
-    forward_explored: Compare.string,
+    backward_explored: byExploration,
+    forward_explored: byExploration,
     writes: Compare.array(byLocation),
     values: Compare.defined(Compare.string),
     range: Compare.structural,
     type: Compare.defined(Compare.string),
-    taint: Compare.defined(Compare.structural),
+    taint: Compare.defined(byTaint),
   });
 
 /** Default value for `node` */
 export const nodeDefault: node =
-  { id: nodeIdDefault, label: '', kind: '', locality: nodeLocalityDefault,
-    is_root: false, backward_explored: '', forward_explored: '', writes: [],
-    values: undefined, range: 0, type: undefined, taint: undefined };
+  { id: nodeIdDefault, label: '', nkind: nodeKindDefault,
+    locality: nodeLocalityDefault, is_root: false,
+    backward_explored: explorationDefault,
+    forward_explored: explorationDefault, writes: [], values: undefined,
+    range: 0, type: undefined, taint: undefined };
 
 /** The dependency between two nodes */
 export type dependency =

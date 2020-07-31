@@ -26,6 +26,14 @@ open Dive_types
 
 let package = Package.package ~plugin:"dive" ~title:"Dive Services" ()
 
+module Enum () =
+struct
+  include Enum
+  let dictionary = Enum.dictionary ()
+  let tag name descr =
+    Enum.tag ~name ~descr:(Markdown.plain descr) dictionary
+end
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- State handling                                                     --- *)
@@ -160,7 +168,7 @@ struct
   let descr = Markdown.plain "A callsite"
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
       "fun", Jstring;
-      "instr", Junion [ Jnumber ; Jstring ];
+      "instr", Junion [ Jnumber ; Jtag "global" ];
     ])
 end
 
@@ -181,6 +189,77 @@ struct
     ])
 end
 
+module NodeKind = struct
+  include Enum ()
+
+  let _tags = [
+    tag "scalar" "a single memory cell";
+    tag "composite" "a memory bloc containing cells";
+    tag "scattered" "a set of memory locations designated by an lvalue";
+    tag "unknown" "an unresolved memory location";
+    tag "alarm" "an alarm emitted by Frama-C";
+    tag "absolute" "a memory location designated by a range of adresses";
+    tag "string" "a string literal";
+    tag "error" "a placeholder node when an error prevented the generation\
+                 process";
+    tag "const" "a numeric constant literal";
+  ]
+
+  let data = Request.dictionary ~package ~name:"nodeKind"
+      ~descr:(Markdown.plain "The nature of a node.") dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module Taint = struct
+  include Enum ()
+
+  let _tags = [
+    tag "direct" "tainted by data";
+    tag "indirect" "tainted by control";
+    tag "untainted" "not tainted by anything";
+  ]
+
+  let data = Request.dictionary ~package ~name:"taint"
+      ~descr:(Markdown.plain "Taint of a memory location.") dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module Computation = struct
+  include Enum ()
+
+  let _tags = [
+    tag "no" "dependencies have not been computed";
+    tag "partial" "some dependencies have been exploreread/tainted by control";
+    tag "yes" "all dependencies have been computed";
+  ]
+
+  let data = Request.dictionary ~package ~name:"exploration"
+      ~descr:(Markdown.plain
+                "The computation state of a node read or write dependencies.")
+      dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module NodeRange = struct
+  include Enum ()
+
+  let _tags = [
+    tag "empty" "no value ever computed for this node";
+    tag "singleton" "this node can only have one value";
+    tag "wide" "this node can take almost all values of its type";
+  ]
+
+  let data = Request.dictionary ~package ~name:"nodeRange"
+      ~descr:(Markdown.plain "A qualitative description of the range of values \
+                              that this node can take.")
+      dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
 module Node =
 struct
   let name = "node"
@@ -188,17 +267,16 @@ struct
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
       "id", NodeId.jtype;
       "label", Jstring;
-      "kind", Jstring;
+      "nkind", NodeKind.jtype;
       "locality", NodeLocality.jtype;
       "is_root", Jboolean;
-      "backward_explored", Jstring;
-      "forward_explored", Jstring;
+      "backward_explored", Computation.jtype;
+      "forward_explored", Computation.jtype;
       "writes", Jarray Kernel_ast.Location.jtype;
       "values", Joption Jstring;
-      "range", Junion [ Jnumber ; Jstring ];
+      "range", Junion [ Jnumber ; NodeRange.jtype ];
       "type", Joption Jstring;
-      "taint", Joption (Junion [
-          Jtag "direct"; Jtag "indirect"; Jtag "untainted"])
+      "taint", Joption Taint.jtype;
     ])
 end
 
