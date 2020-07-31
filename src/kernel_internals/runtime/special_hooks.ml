@@ -161,6 +161,61 @@ let on_call_to_undeclared_function vi =
 let () =
   Cabs2cil.register_implicit_prototype_hook on_call_to_undeclared_function
 
+let run_list_all_plugin_options () =
+  if not (Kernel.AutocompleteHelp.is_empty ()) then begin
+    let filter = Kernel.AutocompleteHelp.get () in
+    Plugin.iter_on_plugins
+      (fun plugin ->
+         if Datatype.String.Set.mem plugin.p_shortname filter then begin
+           Format.printf "Plugin: %s@." plugin.Plugin.p_name;
+           let plugins_opts = Hashtbl.fold
+               (fun group_name group_options acc ->
+                  (* note: boolean options with negative counterparts
+                     generate 2 strings *)
+                  let strings_of_typed_parameter tp =
+                    let name = tp.Typed_parameter.name in
+                    match tp.Typed_parameter.accessor with
+                    | Typed_parameter.Bool (_, opt_neg) ->
+                      begin
+                        match opt_neg with
+                        | None -> [(name, "bool")]
+                        | Some neg -> [(name, "bool"); (neg, "bool")]
+                      end
+                    | Int (_, frange) ->
+                      let (min, max) = frange () in
+                      if min = min_int && max = max_int then [(name, "int")]
+                      else [(name, Format.asprintf "int (%d, %d)" min max)]
+                    | String (_, fvalues) ->
+                      let values = fvalues () in
+                      if values = [] then [(name, "string")]
+                      else
+                        [(name, Format.asprintf "string (%a)"
+                            (Pretty_utils.pp_list ~sep:", "
+                               Format.pp_print_string) values)]
+                  in
+                  let group_options =
+                    List.flatten
+                      (List.map strings_of_typed_parameter group_options)
+                  in
+                  (group_name, group_options) :: acc
+               ) plugin.Plugin.p_parameters []
+           in
+           let plugin_option_strings =
+             List.fold_left (fun acc (_gn, go) -> acc @ go) [] plugins_opts
+           in
+           let cmp_options (n1, _) (n2, _) = String.compare n1 n2 in
+           let sorted_options =
+             List.sort cmp_options plugin_option_strings
+           in
+           let pp_option fmt (n, a) = Format.fprintf fmt "  %s: %s@." n a in
+           Format.printf "%a" (Pretty_utils.pp_list ~sep:"" pp_option) sorted_options
+         end
+      );
+    raise Cmdline.Exit
+  end
+  else Cmdline.nop
+let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

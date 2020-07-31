@@ -25,6 +25,7 @@
 (* ************************************************************************* *)
 
 module CamlString = String
+module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
 
@@ -420,17 +421,27 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module AutocompleteHelp =
-  False
+  P.String_set
     (struct
       let option_name = "-autocomplete"
-      let help = "displays all plugin options. Used for zsh autocompletion"
-      let module_name = "AutocompleteHelp"
+      let arg_name = "[+]p1,p2,..."
+      let help = "displays all Frama-C options, used for shell autocompletion. \
+                  Prints options for the specified plugin names (or '@all' for \
+                  all plugins). If the first character is '+', \
+                  only prints visible options."
     end)
-let run_list_all_plugin_options () =
-  if AutocompleteHelp.get () then
-    Cmdline.list_all_plugin_options ~print_invisible:true
-  else Cmdline.nop
-let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
+
+let _ =
+  AutocompleteHelp.Category.enable_all
+    []
+    (object
+      method fold: 'a. (string -> 'a -> 'a) -> 'a -> 'a =
+        fun f acc ->
+        FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
+      method mem name =
+        FcPlugin.fold_on_plugins
+          (fun p found -> found || name = p.FcPlugin.p_shortname) false
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending

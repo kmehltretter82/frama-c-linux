@@ -169,8 +169,12 @@ val get: string -> plugin
     @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
-(** Iterate on each registered plug-ins.
+(** Iterate on each registered plug-in.
     @since Beryllium-20090901 *)
+
+val fold_on_plugins: (plugin -> 'a -> 'a) -> 'a -> 'a
+(** Fold [f] on each registered plug-in.
+    @since Frama-C+dev *)
 
 (**/**)
 (* ************************************************************************* *)
