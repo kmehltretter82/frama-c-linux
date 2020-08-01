@@ -27,6 +27,7 @@ type slevel_annotation =
   | SlevelMerge
   | SlevelDefault
   | SlevelLocal of int
+  | SlevelFull
 
 type unroll_annotation = term option
 
@@ -112,6 +113,7 @@ module Slevel = Register (struct
     let parse ~typing_context:_ = function
       | [{lexpr_node = PLvar "default"}] -> SlevelDefault
       | [{lexpr_node = PLvar "merge"}] -> SlevelMerge
+      | [{lexpr_node = PLvar "full"}] -> SlevelFull
       | [{lexpr_node = PLconstant (IntConstant i)}] ->
         let i =
           try int_of_string i
@@ -125,12 +127,14 @@ module Slevel = Register (struct
       | SlevelDefault -> Ext_terms [Logic_const.tstring "default"]
       | SlevelMerge -> Ext_terms [Logic_const.tstring "merge"]
       | SlevelLocal i -> Ext_terms [Logic_const.tinteger i]
+      | SlevelFull -> Ext_terms [Logic_const.tstring "full"]
 
     let import = function
       | Ext_terms [{term_node}] ->
         begin match term_node with
           | TConst (LStr "default") -> SlevelDefault
           | TConst (LStr "merge") -> SlevelMerge
+          | TConst (LStr "full") -> SlevelFull
           | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int i)
           | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor
                                   that will simplify our term into something
@@ -142,6 +146,7 @@ module Slevel = Register (struct
       | SlevelDefault -> Format.pp_print_string fmt "default"
       | SlevelMerge -> Format.pp_print_string fmt "merge"
       | SlevelLocal i -> Format.pp_print_int fmt i
+      | SlevelFull -> Format.pp_print_string fmt "full"
   end)
 
 module SimpleTermAnnotation =

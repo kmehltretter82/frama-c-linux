@@ -6,7 +6,7 @@
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
    STDOPT: #"-main test_history -eva-partition-history 0"
    STDOPT: #"-main test_history -eva-partition-history 1"
-   STDOPT: #"-main test_slevel"
+   STDOPT: #"-main test_slevel -eva-slevel-full-cap 100"
    */
 
 #include "__fc_builtin.h"
@@ -138,7 +138,7 @@ volatile nondet;
 
 void test_slevel()
 {
-  int a[N], b[N], c[N], d[N];
+  int a[N], b[N], c[N], d[N], e[100];
   //@slevel 10;
   for (int i = 0; i < N; i++) {
     a[i] = 42;
@@ -165,6 +165,16 @@ void test_slevel()
       d[i] = 33;
     //@slevel merge;
     ; // Otherwise previous annotation is ignored
+  }
+  
+  //@slevel 0;
+  ;
+  //@slevel full;
+  for (int i = 0; i < N; i++) {
+    if (nondet)
+      e[i] = 42;
+    else
+      e[i] = 33;
   }
 }
 

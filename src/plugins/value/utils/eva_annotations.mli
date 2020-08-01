@@ -32,6 +32,7 @@ type slevel_annotation =
   | SlevelMerge
   | SlevelDefault
   | SlevelLocal of int
+  | SlevelFull
 
 type unroll_annotation = Cil_types.term option
 

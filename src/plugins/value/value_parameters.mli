@@ -76,7 +76,7 @@ module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = int
-
+module SlevelFullCap: Parameter_sig.Int
 module SlevelMergeAfterLoop: Parameter_sig.Kernel_function_set
 
 module MinLoopUnroll : Parameter_sig.Int

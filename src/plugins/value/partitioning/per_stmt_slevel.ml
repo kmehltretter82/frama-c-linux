@@ -90,6 +90,11 @@ let compute kf =
         if debug then Format.printf "Vising split %d, pushing %d@." s.sid i;
         Cil_datatype.Stmt.Hashtbl.add h_local s i;
         Stack.push i local_slevel;
+      | Some SlevelFull ->
+        let cap = Value_parameters.SlevelFullCap.get () in
+        if debug then Format.printf "Vising split %d, pushing %d@." s.sid cap;
+        Cil_datatype.Stmt.Hashtbl.add h_local s cap;
+        Stack.push cap local_slevel;
       | Some SlevelDefault ->
         let top = Stack.pop local_slevel in
         if debug then
@@ -102,7 +107,7 @@ let compute kf =
     and post s =
       match get_slevel_annot s with
       | None | Some SlevelMerge -> ()
-      | Some (SlevelLocal _) ->
+      | Some (SlevelLocal _) | Some SlevelFull ->
         if debug then Format.printf "Leaving split %d, poping@." s.sid;
         ignore (Stack.pop local_slevel);
       | Some SlevelDefault ->
