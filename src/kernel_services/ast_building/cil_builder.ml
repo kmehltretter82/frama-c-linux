@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
 (* --- C & Logic expressions builder --- *)
 
 module Exp =
@@ -376,14 +377,19 @@ module Stateful (Location : T) =
 struct
   include Exp
 
-  type block =
+  type stmt =
+    | Label of Cil_types.label
+    | CilStmt of Cil_types.stmt
+    | CilStmtkind of Cil_types.stmtkind
+    | CilInstr of Cil_types.instr
+
+  type scope =
     {
-      block_type: block_type;
-      mutable stmts: Cil_types.stmt list; (* In reverse order *)
-      mutable locals: Cil_types.varinfo list; (* In reverse order *)
-      mutable pending_labels: Cil_types.label list;
+      scope_type: scope_type;
+      mutable stmts: stmt list; (* In reverse order *)
+      mutable vars: Cil_types.varinfo list; (* In reverse order *)
     }
-  and block_type =
+  and scope_type =
     | Block
     | IfThen of {ifthen_exp: Cil_types.exp}
     | IfThenElse of {ifthenelse_exp: Cil_types.exp; then_block: Cil_types.block}
@@ -395,12 +401,12 @@ struct
 
   (* State management *)
 
-  let stack : block list ref = ref []
+  let stack : scope list ref = ref []
   let owner: Cil_types.fundec option ref = ref None
 
   let pretty_stack fmt =
-    let pretty_block fmt b =
-      match b.block_type with
+    let pretty_stack_type fmt b =
+      match b.scope_type with
       | Block -> Format.pp_print_string fmt "block"
       | IfThen _ -> Format.pp_print_string fmt "if-then"
       | IfThenElse _ -> Format.pp_print_string fmt "if-then-else"
@@ -408,7 +414,7 @@ struct
       | Function _ -> Format.pp_print_string fmt "function"
     in
     Pretty_utils.pp_list ~pre:"[@[" ~sep:";@," ~last:"@]]"
-      pretty_block fmt !stack
+      pretty_stack_type fmt !stack
 
   let check_empty () =
     if !stack <> [] then
@@ -452,28 +458,40 @@ struct
     | None -> raise (WrongContext "not in an opened function")
     | Some fundec -> fundec
 
-  (* Block management *)
-
   let append_stmt b s =
-    if b.pending_labels <> [] then begin
-      s.Cil_types.labels <- List.rev b.pending_labels @ s.Cil_types.labels;
-      b.pending_labels <- [];
-    end;
     b.stmts <- s :: b.stmts
 
   (* Conversion to Cil *)
 
+  let build_stmt_list l =
+    let rev_build_one acc = function
+      | Label l ->
+        begin match acc with
+          | [] -> (* No generated statement to attach the label to *)
+            let stmt = Cil.mkEmptyStmt ~loc () in
+            stmt.Cil_types.labels <- [l];
+            stmt :: acc
+          | stmt :: _ -> (* There is a statement to attach the label to *)
+            stmt.Cil_types.labels <- l :: stmt.Cil_types.labels;
+            acc
+        end
+      | CilStmt stmt ->
+        stmt :: acc
+      | CilStmtkind sk ->
+        Cil.mkStmt sk :: acc
+      | CilInstr instr ->
+        Cil.mkStmt (Cil_types.Instr instr) :: acc
+    in
+    List.fold_left rev_build_one [] l
+
   let build_block b =
-    if b.pending_labels <> [] then begin
-      append_stmt b (Cil.mkEmptyStmt ~loc ())
-    end;
-    let block = Cil.mkBlock (List.rev b.stmts) in
-    block.Cil_types.blocals <- List.rev b.locals;
+    let block = Cil.mkBlock (build_stmt_list b.stmts) in
+    block.Cil_types.blocals <- List.rev b.vars;
     block
 
   let build_stmtkind b =
     let block = build_block b in
-    match b.block_type with
+    match b.scope_type with
     | Block ->
       Cil_types.Block block
     | IfThen { ifthen_exp } ->
@@ -495,20 +513,19 @@ struct
 
   let stmt s =
     let b = top () in
-    append_stmt b s
+    append_stmt b (CilStmt s)
 
   let stmts l =
-    let b = top () in
-    List.iter (append_stmt b) l
+    List.iter stmt l
 
   let stmtkind sk =
-    stmt (Cil.mkStmt sk)
+    let b = top () in
+    append_stmt b (CilStmtkind sk)
 
-  let new_block block_type = {
-    block_type;
+  let new_block scope_type = {
+    scope_type;
     stmts = [];
-    locals = [];
-    pending_labels = [];
+    vars = [];
   }
 
   let open_function name =
@@ -531,7 +548,7 @@ struct
 
   let open_else () =
     let b = pop () in
-    let ifthenelse_exp = match b.block_type with
+    let ifthenelse_exp = match b.scope_type with
       | IfThen {ifthen_exp} -> ifthen_exp
       | _ -> raise (WrongContext "not in an opened if-then-else context")
     in
@@ -555,7 +572,7 @@ struct
 
   let finish_function ?(register=true) () =
     let b = finish () in
-    match b.block_type with
+    match b.scope_type with
     | Function {fundec} ->
       let open Cil_types in
       fundec.sbody <- build_block b;
@@ -573,10 +590,10 @@ struct
 
   let case exp =
     let b = top () in
-    match b.block_type with
+    match b.scope_type with
     | Switch _context ->
       let label = Cil_types.Case (cil_exp ~loc exp, loc) in
-      b.pending_labels <- label :: b.pending_labels
+      append_stmt b (Label label)
     | _ -> raise (WrongContext "no in a opened switch context")
 
   let break () =
@@ -588,7 +605,8 @@ struct
   (* Instructions *)
 
   let instr i =
-    stmtkind (Cil_types.Instr i)
+    let b = top () in
+    append_stmt b (CilInstr i)
 
   let assign lval exp =
     let lval' = cil_lval ~loc lval
@@ -620,7 +638,7 @@ struct
     let v = Cil.copyVarinfo vi (vi.Cil_types.vname ^ suffix) in
     Cil.refresh_local_name fundec v;
     fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
-    b.locals <- v :: b.locals;
+    b.vars <- v :: b.vars;
     `var v
 
   let parameter ?(attributes=[]) typ name =
