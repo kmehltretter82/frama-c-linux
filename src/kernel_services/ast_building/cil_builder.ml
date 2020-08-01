@@ -287,6 +287,7 @@ struct
     | CilStmtkind of Cil_types.stmtkind
     | Instr of instr'
     | Sequence of stmt' list
+    | Ghost of stmt'
 
   type instr = [ `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
@@ -325,6 +326,8 @@ struct
   let stmt s = `stmt (CilStmt s)
   let stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
   let block l = `stmt (Sequence (List.map harden_stmt l))
+  let ghost s = `stmt (Ghost (harden_stmt s))
+  
 
   (* Convert *)
 
@@ -340,25 +343,27 @@ struct
       and args' = List.map (build_exp ~loc) args in
       Cil_types.Call (dest', callee', args', loc)
 
-  let rec build_stmtkind ~loc = function
+  let rec build_stmtkind ~loc ~ghost = function
     | CilStmt s -> s.Cil_types.skind
     | CilStmtkind sk -> sk
     | Instr i -> Cil_types.Instr (build_instr ~loc i)
-    | Sequence l -> Cil_types.Block (build_block ~loc l)
+    | Sequence l -> Cil_types.Block (build_block ~loc ~ghost l)
+    | Ghost s -> Cil_types.Block (build_block ~loc ~ghost:true [s])
 
-  and build_stmt ~loc = function
+  and build_stmt ~loc ~ghost = function
     | CilStmt s -> s
-    | stmt -> Cil.mkStmt (build_stmtkind ~loc stmt)
+    | Ghost s -> build_stmt ~loc ~ghost:true s
+    | stmt -> Cil.mkStmt ~ghost (build_stmtkind ~loc ~ghost stmt)
 
-  and build_block ~loc l =
-    let bstmts = List.map (build_stmt ~loc) (flatten_sequences l) in
+  and build_block ~loc ~ghost l =
+    let bstmts = List.map (build_stmt ~ghost ~loc) (flatten_sequences l) in
     Cil.mkBlock bstmts
 
   (* Export *)
 
   let cil_instr ~loc i = build_instr ~loc (harden_instr i)
-  let cil_stmtkind ~loc s = build_stmtkind ~loc (harden_stmt s)
-  let cil_stmt ~loc s = build_stmt ~loc (harden_stmt s)
+  let cil_stmtkind ~loc s = build_stmtkind ~loc ~ghost:false (harden_stmt s)
+  let cil_stmt ~loc s = build_stmt ~loc ~ghost:false (harden_stmt s)
 end
 
 
@@ -386,6 +391,7 @@ struct
   type scope =
     {
       scope_type: scope_type;
+      ghost: bool;
       mutable stmts: stmt list; (* In reverse order *)
       mutable vars: Cil_types.varinfo list; (* In reverse order *)
     }
@@ -430,7 +436,11 @@ struct
     | state :: _ -> state
 
   let push state =
-    stack := state :: !stack;
+    let parent_ghost = match !stack with
+      | [] -> false
+      | s :: _ -> s.ghost
+    in
+    stack := { state  with ghost = parent_ghost || state.ghost } :: !stack;
     Kernel.debug ~dkey "push onto %t" pretty_stack
 
   let pop () =
@@ -463,12 +473,12 @@ struct
 
   (* Conversion to Cil *)
 
-  let build_stmt_list l =
+  let build_stmt_list ~ghost l =
     let rev_build_one acc = function
       | Label l ->
         begin match acc with
           | [] -> (* No generated statement to attach the label to *)
-            let stmt = Cil.mkEmptyStmt ~loc () in
+            let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
             stmt.Cil_types.labels <- [l];
             stmt :: acc
           | stmt :: _ -> (* There is a statement to attach the label to *)
@@ -478,14 +488,14 @@ struct
       | CilStmt stmt ->
         stmt :: acc
       | CilStmtkind sk ->
-        Cil.mkStmt sk :: acc
+        Cil.mkStmt ~ghost sk :: acc
       | CilInstr instr ->
-        Cil.mkStmt (Cil_types.Instr instr) :: acc
+        Cil.mkStmt ~ghost (Cil_types.Instr instr) :: acc
     in
     List.fold_left rev_build_one [] l
 
   let build_block b =
-    let block = Cil.mkBlock (build_stmt_list b.stmts) in
+    let block = Cil.mkBlock (build_stmt_list ~ghost:b.ghost b.stmts) in
     block.Cil_types.blocals <- List.rev b.vars;
     block
 
@@ -522,21 +532,25 @@ struct
     let b = top () in
     append_stmt b (CilStmtkind sk)
 
-  let new_block scope_type = {
+  let new_block ?(ghost=false) scope_type = {
     scope_type;
+    ghost;
     stmts = [];
     vars = [];
   }
 
-  let open_function name =
+  let open_function ?ghost name =
     check_empty ();
     let fundec = Cil.emptyFunction name in
     set_owner fundec;
-    push (new_block (Function {fundec}));
+    push (new_block ?ghost (Function {fundec}));
     `var fundec.Cil_types.svar
 
   let open_block () =
     push (new_block Block)
+
+  let open_ghost () =
+    push (new_block ~ghost:true Block)
 
   let open_switch exp =
     let switch_exp = cil_exp ~loc exp in
@@ -568,7 +582,7 @@ struct
 
   let finish_stmt () =
     let b = finish () in
-    Cil.mkStmt (build_stmtkind b)
+    Cil.mkStmt ~ghost:b.ghost (build_stmtkind b)
 
   let finish_function ?(register=true) () =
     let b = finish () in
@@ -577,6 +591,7 @@ struct
       let open Cil_types in
       fundec.sbody <- build_block b;
       fundec.svar.vdefined <- true;
+      fundec.svar.vghost <- b.ghost;
       if register then begin
         let funspec = Cil.empty_funspec () in
         Globals.Functions.replace_by_definition funspec fundec loc;
@@ -628,22 +643,26 @@ struct
     let fundec = get_owner () in
     Cil.setReturnType fundec typ
 
-  let local typ name =
-    let fundec = get_owner () in
-    let v = Cil.makeLocalVar fundec ~insert:false name typ in
+  let local ?(ghost=false) typ name =
+    let fundec = get_owner () and b = top () in
+    let ghost = ghost || b.ghost in
+    let v = Cil.makeLocalVar fundec ~insert:false ~ghost ~loc name typ in
     `var v
 
-  let local_copy ?(suffix="_tmp") (`var vi) =
+  let local_copy ?(ghost=false) ?(suffix="_tmp") (`var vi) =
     let fundec = get_owner () and b = top () in
+    let ghost = ghost || b.ghost in
     let v = Cil.copyVarinfo vi (vi.Cil_types.vname ^ suffix) in
+    v.vghost <- v.vghost || ghost;
     Cil.refresh_local_name fundec v;
     fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
     b.vars <- v :: b.vars;
     `var v
 
-  let parameter ?(attributes=[]) typ name =
-    let fundec = get_owner () in
-    let v = Cil.makeFormalVar fundec name typ in
+  let parameter ?(ghost=false) ?(attributes=[]) typ name =
+    let fundec = get_owner () and b = top () in
+    let ghost = ghost || b.ghost in
+    let v = Cil.makeFormalVar ~ghost ~loc fundec name typ in
     v.Cil_types.vattr <- attributes;
     `var v
 end

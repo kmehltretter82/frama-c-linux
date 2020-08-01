@@ -149,6 +149,7 @@ sig
   val stmt : Cil_types.stmt -> [> stmt]
   val stmts : Cil_types.stmt list -> [> stmt]
   val block : [< stmt] list -> [> stmt]
+  val ghost : [< stmt] -> [> stmt]
 
   val cil_instr : loc:Cil_types.location -> instr -> Cil_types.instr
   val cil_stmtkind : loc:Cil_types.location -> stmt -> Cil_types.stmtkind
@@ -174,8 +175,9 @@ sig
   val stmtkind : Cil_types.stmtkind -> unit
   val stmt : Cil_types.stmt -> unit
   val stmts : Cil_types.stmt list -> unit
-  val open_function : string -> [> var]
+  val open_function : ?ghost:bool -> string -> [> var]
   val open_block : unit -> unit
+  val open_ghost : unit -> unit
   val open_switch : [< exp] -> unit
   val open_if : [< exp] -> unit
   val open_else : unit -> unit
@@ -192,8 +194,8 @@ sig
 
   (* Variables *)
   val return_type : Cil_types.typ -> unit
-  val local : Cil_types.typ -> string -> [> var]
-  val local_copy : ?suffix:string -> [< var] -> [> var]
-  val parameter : ?attributes:Cil_types.attributes ->
+  val local : ?ghost:bool -> Cil_types.typ -> string -> [> var]
+  val local_copy : ?ghost:bool -> ?suffix:string -> [< var] -> [> var]
+  val parameter : ?ghost:bool -> ?attributes:Cil_types.attributes ->
     Cil_types.typ -> string -> [> var]
 end
