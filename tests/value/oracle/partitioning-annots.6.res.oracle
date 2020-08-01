@@ -5,9 +5,9 @@
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
   nondet ∈ [--..--]
-[eva] tests/value/partitioning-annots.c:148: starting to merge loop iterations
-[eva] tests/value/partitioning-annots.c:153: starting to merge loop iterations
-[eva] tests/value/partitioning-annots.c:173: 
+[eva] tests/value/partitioning-annots.c:154: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:159: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:179: 
   Trace partitioning superposing up to 100 states
 [eva] Recording results for test_slevel
 [eva] done for function test_slevel

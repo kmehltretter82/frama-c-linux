@@ -15,7 +15,7 @@
 
 void test_unroll()
 {
-  int a[N], b[N], c[N], d[2*N], e[N];
+  int a[N], b[N], c[N], d[2*N], e[N], f[2*N];
 
   // The inner loop needs to be unrolled to allow strong updates
   // The outer loops doesn't need to be unrolled
@@ -59,6 +59,12 @@ void test_unroll()
     for (int j = i - 1 ; j > 0 ; j--) {
       e[j] += e[j-1];
     }
+  }
+
+  // Full unroll is limited by option -eva-default-loop-unroll
+  //@ loop unroll full;
+  for (int i = 0 ; i < 2*N ; i++) {
+    f[i] = i % 2;
   }
 }
 

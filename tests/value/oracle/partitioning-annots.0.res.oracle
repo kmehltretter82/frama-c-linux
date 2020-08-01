@@ -15,6 +15,9 @@
 [eva:loop-unroll] tests/value/partitioning-annots.c:50: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:50: starting to merge loop iterations
+[eva:loop-unroll] tests/value/partitioning-annots.c:66: 
+  loop not completely unrolled
+[eva] tests/value/partitioning-annots.c:66: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] done for function test_unroll
 [eva] ====== VALUES COMPUTED ======
@@ -33,6 +36,17 @@
    [7] ∈ {36}
    [8] ∈ {9}
    [9] ∈ {1}
+  f[0] ∈ {0}
+   [1] ∈ {1}
+   [2] ∈ {0}
+   [3] ∈ {1}
+   [4] ∈ {0}
+   [5] ∈ {1}
+   [6] ∈ {0}
+   [7] ∈ {1}
+   [8] ∈ {0}
+   [9] ∈ {1}
+   [10..19] ∈ {0; 1} or UNINITIALIZED
 [from] Computing for function test_unroll
 [from] Done for function test_unroll
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -41,7 +55,7 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function test_unroll:
-    a[0..9]; b[0..9]; c[0..9]; d[0..19]; e[0..9]; i; j; i_0; j_0; i_1; 
-    i_2; i_3; j_1
+    a[0..9]; b[0..9]; c[0..9]; d[0..19]; e[0..9]; f[0..19]; i; j; i_0; 
+    j_0; i_1; i_2; i_3; j_1; i_4
 [inout] Inputs for function test_unroll:
     \nothing

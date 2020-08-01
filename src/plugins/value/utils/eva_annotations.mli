@@ -34,7 +34,9 @@ type slevel_annotation =
   | SlevelLocal of int
   | SlevelFull
 
-type unroll_annotation = Cil_types.term option
+type unroll_annotation =
+  | UnrollAmount of Cil_types.term
+  | UnrollFull
 
 type flow_annotation =
   | FlowSplit of Cil_types.term

@@ -29,7 +29,9 @@ type slevel_annotation =
   | SlevelLocal of int
   | SlevelFull
 
-type unroll_annotation = term option
+type unroll_annotation =
+  | UnrollAmount of Cil_types.term
+  | UnrollFull
 
 type flow_annotation =
   | FlowSplit of term
@@ -169,31 +171,32 @@ struct
   let print = Printer.pp_term
 end
 
-module OptionalTermAnnotation =
-struct
-  type t = term option
-
-  let parse ~typing_context = function
-    | [] -> None
-    | [t] ->
-      let open Logic_typing in
-      Some (typing_context.type_term typing_context typing_context.pre_state t)
-    | _ -> raise Parse_error
-
-  let export t =
-    Ext_terms (Extlib.list_of_opt t)
-
-  let import = function
-    | Ext_terms l -> Extlib.opt_of_list l
-    | _ -> assert false
-
-  let print = Pretty_utils.pp_opt Printer.pp_term
-end
-
 module Unroll = Register (struct
-    include OptionalTermAnnotation
+    type t = unroll_annotation
+
     let name = "unroll"
     let is_loop_annot = true
+
+    let parse ~typing_context = function
+      | [{lexpr_node = PLvar "full"}] -> UnrollFull
+      | [t] ->
+        let open Logic_typing in
+        UnrollAmount
+          (typing_context.type_term typing_context typing_context.pre_state t)
+      | _ -> raise Parse_error
+
+    let export = function
+      | UnrollFull -> Ext_terms [Logic_const.tstring "full"]
+      | UnrollAmount t -> Ext_terms [t]
+
+    let import = function
+      | Ext_terms [{term_node=TConst (LStr "full")}] -> UnrollFull
+      | Ext_terms [t] -> UnrollAmount t
+      | _ -> assert false
+
+    let print fmt = function
+      | UnrollFull -> Format.pp_print_string fmt "full"
+      | UnrollAmount t -> Printer.pp_term fmt t
   end)
 
 module Split = Register (struct
