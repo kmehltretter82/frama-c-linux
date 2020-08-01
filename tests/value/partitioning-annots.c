@@ -6,12 +6,12 @@
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
    STDOPT: #"-main test_history -eva-partition-history 0"
    STDOPT: #"-main test_history -eva-partition-history 1"
+   STDOPT: #"-main test_slevel"
    */
 
 #include "__fc_builtin.h"
 
 #define N 10
-
 
 void test_unroll()
 {
@@ -134,8 +134,43 @@ void test_history()
     k = k / j;
 }
 
+volatile nondet;
+
+void test_slevel()
+{
+  int a[N], b[N], c[N], d[N];
+  //@slevel 10;
+  for (int i = 0; i < N; i++) {
+    a[i] = 42;
+  }
+  
+  //@slevel default;
+  for (int i = 0; i < N; i++) {
+    b[i] = 42;
+  }
+
+  //@slevel 20;
+  for (int i = 0; i < N; i++) {
+    if (nondet)
+      c[i] = 42;
+    else
+      c[i] = 33;
+  }
+
+  //@slevel 20;
+  for (int i = 0; i < N; i++) {
+    if (nondet)
+      d[i] = 42;
+    else
+      d[i] = 33;
+    //@slevel merge;
+    ; // Otherwise previous annotation is ignored
+  }
+}
+
 void main(void)
 {
+  test_slevel();
   test_unroll();
   test_split();
   test_loop_split();

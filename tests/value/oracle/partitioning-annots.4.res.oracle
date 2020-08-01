@@ -4,6 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
+  nondet ∈ [--..--]
 [eva] computing for function Frama_C_interval <- test_history.
   Called from tests/value/partitioning-annots.c:125.
 [eva] using specification for function Frama_C_interval

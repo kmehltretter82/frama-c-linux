@@ -4,6 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
+  nondet ∈ [--..--]
 [eva:loop-unroll] tests/value/partitioning-annots.c:26: 
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:26: starting to merge loop iterations
