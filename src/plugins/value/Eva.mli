@@ -66,3 +66,37 @@ module Unit_tests: sig
   (** Runs the unit tests of Eva. *)
   val run: unit -> unit
 end
+
+
+module Eva_annotations: sig
+  type slevel_annotation =
+    | SlevelMerge
+    | SlevelDefault
+    | SlevelLocal of int
+    | SlevelFull
+
+  type unroll_annotation =
+    | UnrollAmount of Cil_types.term
+    | UnrollFull
+
+  type flow_annotation =
+    | FlowSplit of Cil_types.term
+    | FlowMerge of Cil_types.term
+
+  type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
+
+  val get_slevel_annot : Cil_types.stmt -> slevel_annotation option
+  val get_unroll_annot : Cil_types.stmt -> unroll_annotation list
+  val get_flow_annot : Cil_types.stmt -> flow_annotation list
+  val get_subdivision_annot : Cil_types.stmt -> int list
+  val get_allocation: Cil_types.stmt -> allocation_kind
+
+  val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+    Cil_types.stmt -> slevel_annotation -> unit
+  val add_unroll_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+    Cil_types.stmt -> unroll_annotation -> unit
+  val add_flow_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+    Cil_types.stmt -> flow_annotation -> unit
+  val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
+    Cil_types.stmt -> int -> unit
+end
