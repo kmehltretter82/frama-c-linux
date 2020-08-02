@@ -27,20 +27,57 @@
 - Interface unifiée vers les smart constructors
 *)
 
+module Type :
+sig
+  type ('value,'shape) typ
+
+  val typ : Cil_types.typ -> ('v,'v) typ
+  val void : ('v,'v) typ
+  val bool : ('v,'v) typ
+  val char : ('v,'v) typ
+  val schar : ('v,'v) typ
+  val uchar : ('v,'v) typ
+  val int : ('v,'v) typ
+  val unit : ('v,'v) typ
+  val short : ('v,'v) typ
+  val ushort : ('v,'v) typ
+  val long : ('v,'v) typ
+  val ulong : ('v,'v) typ
+  val longlong : ('v,'v) typ
+  val ulonglong : ('v,'v) typ
+  val float : ('v,'v) typ
+  val double : ('v,'v) typ
+  val longdouble : ('v,'v) typ
+
+  val ptr : ('v,'s) typ -> ('v,'v) typ
+  val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
+
+  val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list
+    -> ('v,'s) typ
+  val const : ('v,'s) typ -> ('v,'s) typ
+  val stdlib_generated : ('v,'s) typ -> ('v,'s) typ
+
+  val cil_typ : ('v,'s) typ -> Cil_types.typ
+end
+
 
 (* --- C & Logic expressions builder --- *)
 
 module Exp :
 sig
+  include module type of Type
+
   type const'
   type var'
   type lval'
   type exp'
+  type init'
 
   type const = [ `const of const' ]
   type var = [ `var of var' ]
   type lval = [  var | `lval of lval' ]
   type exp = [ const | lval | `exp of exp' ]
+  type init = [ exp | `init of init']
 
   (* Build Constants *)
 
@@ -89,6 +126,9 @@ sig
   val term : Cil_types.term -> [> exp]
   val none : [> `none]
   val range :  [< exp | `none] -> [< exp | `none] -> [> exp]
+  val init : Cil_types.init -> [> init]
+  val compound : Cil_types.typ -> init list -> [> init]
+  val values : (init,'values) typ -> 'values -> init
 
   exception EmptyList
 
@@ -125,6 +165,7 @@ sig
     [< lval] -> Cil_types.term_lval
   val cil_term : loc:Cil_types.location -> restyp:Cil_types.typ ->
     [< exp] -> Cil_types.term
+  val cil_init : loc:Cil_types.location -> [< init] -> Cil_types.init
 end
 
 
@@ -194,7 +235,8 @@ sig
 
   (* Variables *)
   val return_type : Cil_types.typ -> unit
-  val local : ?ghost:bool -> Cil_types.typ -> string -> [> var]
+  val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string -> [> var]
+  val local' : ?ghost:bool -> ?init:init -> Cil_types.typ -> string -> [> var]
   val local_copy : ?ghost:bool -> ?suffix:string -> [< var] -> [> var]
   val parameter : ?ghost:bool -> ?attributes:Cil_types.attributes ->
     Cil_types.typ -> string -> [> var]

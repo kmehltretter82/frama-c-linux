@@ -21,10 +21,72 @@
 (**************************************************************************)
 
 
+(* --- Types --- *)
+
+module Type =
+struct
+  type ('value,'shape) morphology =
+    | Single : ('value,'value) morphology
+    | Listed : ('value,'shape) typ -> ('value,'shape list) morphology
+
+  and ('value,'shape) typ = ('value,'shape) morphology * Cil_types.typ
+
+  open Cil_types
+
+  let typ t = Single, t
+  let void = Single, TVoid []
+  let bool = Single, TInt (IBool, [])
+  let char = Single, TInt (IChar, [])
+  let schar = Single, TInt (ISChar, [])
+  let uchar = Single, TInt (IUChar, [])
+  let int = Single, TInt (IInt, [])
+  let unit = Single, TInt (IUInt, [])
+  let short = Single, TInt (IShort, [])
+  let ushort = Single, TInt (IUShort, [])
+  let long = Single, TInt (ILong, [])
+  let ulong = Single, TInt (IULong, [])
+  let longlong = Single, TInt (ILongLong, [])
+  let ulonglong = Single, TInt (IULongLong, [])
+  let float = Single, TFloat (FFloat, [])
+  let double = Single, TFloat (FDouble, [])
+  let longdouble = Single, TFloat (FLongDouble, [])
+
+  let ptr (_,t) = Single, TPtr (t, [])
+
+  let array ?size (_,t as typ) =
+    let size = Extlib.opt_map (Cil.integer ~loc:Cil_datatype.Location.unknown) size in
+    Listed typ,
+    TArray (t, size, Cil.empty_size_cache (), [])
+
+  let attribute (s,t) name params =
+    let add_to = Cil.addAttribute (Attr (name, params)) in
+    let t = match t with
+      | TVoid l -> TVoid (add_to l)
+      | TInt (kind, l) -> TInt (kind, add_to l)
+      | TFloat (kind, l) -> TFloat (kind, add_to l)
+      | TPtr (typ, l) -> TPtr (typ, add_to l)
+      | TArray (typ, size, cache, l) -> TArray (typ, size, cache, add_to l)
+      | TFun (typ, args, variadic, l) -> TFun (typ, args, variadic, add_to l)
+      | TNamed (typeinfo, l) -> TNamed (typeinfo, add_to l)
+      | TComp (compinfo, cache, l) -> TComp (compinfo, cache, add_to l)
+      | TEnum (enuminfo, l) -> TEnum (enuminfo, add_to l)
+      | TBuiltin_va_list l -> TBuiltin_va_list (add_to l)
+    in
+    (s,t)
+
+  let const typ = attribute typ "const" []
+  let stdlib_generated typ = attribute typ "fc_stdlib_generated" []
+
+  let cil_typ (_,t) = t
+end
+
+
 (* --- C & Logic expressions builder --- *)
 
 module Exp =
 struct
+  include Type
+
   (*
     This modules exportes polymorphic variant to simulate subtyping.
     It uses regular variant internally though, instead of using only the
@@ -36,7 +98,8 @@ struct
   *)
 
   type const' =
-    | Int of Integer.t
+    | Int of int
+    | Integer of Integer.t
     | CilConstant of Cil_types.constant
   and var' =
     Cil_types.varinfo
@@ -56,11 +119,16 @@ struct
     | Range of exp' option * exp' option
     | Unop of Cil_types.unop * exp'
     | Binop of Cil_types.binop * exp' * exp'
+  and init' =
+    | CilInit of Cil_types.init
+    | SingleInit of exp'
+    | CompoundInit of Cil_types.typ * init' list
 
   type const = [ `const of const' ]
   type var = [ `var of var' ]
   type lval = [  var | `lval of lval' ]
   type exp = [ const | lval | `exp of exp' ]
+  type init = [ exp | `init of init']
 
   (* Depolymorphize *)
 
@@ -94,11 +162,16 @@ struct
   let harden_exp_list l =
     List.map harden_exp l
 
+  let harden_init i =
+    match (i :> init) with
+    | #exp as exp -> SingleInit (harden_exp exp)
+    | `init init -> init
+
   (* Build *)
 
   let constant c = `const (CilConstant c)
-  let integer i = `const (Int i)
-  let int i = `const (Int (Integer.of_int i))
+  let integer i = `const (Integer i)
+  let int i = `const (Int i)
   let zero = int 0
   let one = int 1
   let var v = `var v
@@ -135,6 +208,14 @@ struct
   let term t = `exp (CilTerm t)
   let none = `none
   let range e1 e2 = `exp (Range (harden_exp_opt e1, harden_exp_opt e2))
+  let init i = `init (CilInit i)
+  let compound t l = `init (CompoundInit (t, List.map harden_init l))
+
+  let rec values : type a. (init, a) typ -> a -> [> init] =
+    fun (morph,typ) x ->
+    match morph with
+    | Single -> x
+    | Listed sub -> compound typ (List.map (values sub) x)
 
   exception EmptyList
 
@@ -177,7 +258,8 @@ struct
 
   let rec build_constant = function
     | CilConstant const -> const
-    | Int i -> Cil_types.(CInt64 (i, IInt, None))
+    | Int i -> build_constant (Integer (Integer.of_int i))
+    | Integer i -> Cil_types.(CInt64 (i, IInt, None))
 
   and build_lval ~loc = function
     | CilLval lval -> lval
@@ -234,6 +316,8 @@ struct
     | Const (CilConstant _) | CilExp _ | CilExpCopy _ -> raise CInLogic
     | CilTerm term -> term
     | Const (Int i) ->
+      Logic_const.tinteger ~loc i
+    | Const (Integer i) ->
       Logic_const.tint ~loc i
     | Lval lval ->
       let tlval = build_term_lval ~loc ~restyp lval in
@@ -254,6 +338,16 @@ struct
       and t2' = Extlib.opt_map (build_term ~loc ~restyp) t2 in
       Logic_const.trange ~loc (t1',t2')
 
+  let rec build_init ~loc = function
+    | CilInit init -> init
+    | SingleInit e ->
+      Cil_types.SingleInit (build_exp ~loc e)
+    | CompoundInit (typ,l) ->
+      let index i = Cil_types.(Index (Cil.integer ~loc i, NoOffset)) in
+      let initl = List.mapi (fun i sub -> index i, build_init ~loc sub) l in
+      Cil_types.CompoundInit (typ, initl)
+
+
   (* Export *)
 
   let cil_varinfo v = harden_var v
@@ -267,6 +361,7 @@ struct
   let cil_term_lval ~loc ~restyp lv =
     build_term_lval ~loc ~restyp (harden_lval lv)
   let cil_term ~loc ~restyp e = build_term ~loc ~restyp (harden_exp e)
+  let cil_init ~loc i = build_init ~loc (harden_init i)
 end
 
 
@@ -327,7 +422,7 @@ struct
   let stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
   let block l = `stmt (Sequence (List.map harden_stmt l))
   let ghost s = `stmt (Ghost (harden_stmt s))
-  
+
 
   (* Convert *)
 
@@ -643,11 +738,22 @@ struct
     let fundec = get_owner () in
     Cil.setReturnType fundec typ
 
-  let local ?(ghost=false) typ name =
+  let local' ?(ghost=false) ?init typ name =
     let fundec = get_owner () and b = top () in
     let ghost = ghost || b.ghost in
     let v = Cil.makeLocalVar fundec ~insert:false ~ghost ~loc name typ in
+    begin match init with
+      | None -> ()
+      | Some init ->
+        let local_init = Cil_types.AssignInit (cil_init ~loc init) in
+        instr (Cil_types.Local_init (v, local_init, loc));
+        v.vdefined <- true
+    end;
     `var v
+
+  let local ?ghost ?init typ name =
+    let init = Extlib.opt_map (values typ) init in
+    local' ?ghost ?init (snd typ) name
 
   let local_copy ?(ghost=false) ?(suffix="_tmp") (`var vi) =
     let fundec = get_owner () and b = top () in
