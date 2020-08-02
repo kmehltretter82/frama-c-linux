@@ -184,6 +184,8 @@ struct
   let bwnot e = unop Cil_types.BNot e
   let binop op e1 e2 = `exp (Binop (op, harden_exp e1, harden_exp e2))
   let add e1 e2 = binop Cil_types.PlusA e1 e2
+  let succ e = add e1 one
+  let increment e i = add e1 (int i)
   let sub e1 e2 = binop Cil_types.MinusA e1 e2
   let mul e1 e2 = binop Cil_types.Mult e1 e2
   let div e1 e2 = binop Cil_types.Div e1 e2
@@ -208,6 +210,8 @@ struct
   let term t = `exp (CilTerm t)
   let none = `none
   let range e1 e2 = `exp (Range (harden_exp_opt e1, harden_exp_opt e2))
+  let whole = `exp (Range (None, None))
+  let whole_right = `exp (Range (Some (Const (Int 0)), None))
   let init i = `init (CilInit i)
   let compound t l = `init (CompoundInit (t, List.map harden_init l))
 
@@ -294,7 +298,13 @@ struct
     | Binop (op,e1,e2) ->
       let e1' = build_exp ~loc e1
       and e2' = build_exp ~loc e2 in
-      Cil.mkBinOp ~loc op e1' e2'
+      let op' = match op with (* Normalize operation *)
+        | PlusA when Cil.isPointerType e1' -> PlusPI
+        | MinusA when Cil.isPointerType e1' -> MinusPI
+        | PlusPI when not Cil.isPointerType e1' -> PlusA
+        | MinusPI when not Cil.isPointerType e1' -> MinusA
+      in
+      Cil.mkBinOp ~loc op' e1' e2'
 
   let rec build_term_lval ~loc ~restyp = function
     | CilLval _ -> raise CInLogic

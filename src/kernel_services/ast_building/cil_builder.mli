@@ -100,6 +100,8 @@ sig
   val neg : [< exp] -> [> exp]
   val lognot : [< exp] -> [> exp]
   val bwnot : [< exp] -> [> exp]
+  val succ : [< exp] -> [> exp] (* e + 1 *)
+  val increment : [< exp] -> int -> [> exp] (* e + i *)
   val binop : Cil_types.binop -> [< exp] -> [< exp] -> [> exp]
   val add : [< exp] -> [< exp] -> [> exp]
   val sub : [< exp] -> [< exp] -> [> exp]
@@ -126,6 +128,8 @@ sig
   val term : Cil_types.term -> [> exp]
   val none : [> `none]
   val range :  [< exp | `none] -> [< exp | `none] -> [> exp]
+  val whole : [> exp] (* Whole range, i.e. .. *)
+  val whole_right : [> exp] (* Whole range right side, i.e. 0.. *)
   val init : Cil_types.init -> [> init]
   val compound : Cil_types.typ -> init list -> [> init]
   val values : (init,'values) typ -> 'values -> init
