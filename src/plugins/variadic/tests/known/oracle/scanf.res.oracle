@@ -33,17 +33,13 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
+/*@ requires \valid(param1);
     requires \valid(param2);
-    requires \valid(param1);
-    ensures \initialized(param2);
+    requires valid_read_string(format);
     ensures \initialized(param1);
-    assigns \result, __fc_stdin->__fc_FILE_data, *param2, *param1,
-            *(param0 + (0 ..));
-    assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id),
-            (indirect: __fc_stdin->__fc_FILE_data),
-            (indirect: *(format + (0 ..)));
+    ensures \initialized(param2);
+    assigns __fc_stdin->__fc_FILE_data, *param2, *param1, *(param0 + (0 ..)),
+            \result;
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
@@ -55,6 +51,10 @@
             (indirect: *(format + (0 ..)));
     assigns *(param0 + (0 ..))
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
+            (indirect: *(format + (0 ..)));
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
  */
 int scanf_va_1(char const * __restrict format, char *param0, char *param1,

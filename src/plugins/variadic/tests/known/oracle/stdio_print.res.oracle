@@ -67,72 +67,72 @@
 #include "stdarg.h"
 #include "stddef.h"
 #include "stdio.h"
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
-    assigns \result, stream->__fc_FILE_data;
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
+    assigns stream->__fc_FILE_data, \result;
+    assigns stream->__fc_FILE_data
+      \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
+            (indirect: *(format + (0 ..))), param2, *(param1 + (0 ..)),
+            param0;
     assigns \result
       \from (indirect: stream->__fc_FILE_id),
             (indirect: stream->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param2),
             (indirect: *(param1 + (0 ..))), (indirect: param0);
-    assigns stream->__fc_FILE_data
-      \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
-            (indirect: *(format + (0 ..))), param2, *(param1 + (0 ..)),
-            param0;
  */
 int fprintf_va_1(FILE * __restrict stream, char const * __restrict format,
                  int param0, char *param1, int param2);
 
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
-    assigns \result, __fc_stdout->__fc_FILE_data;
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
+    assigns __fc_stdout->__fc_FILE_data, \result;
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param2, *(param1 + (0 ..)), param0;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param2),
             (indirect: *(param1 + (0 ..))), (indirect: param0);
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param2, *(param1 + (0 ..)), param0;
  */
 int printf_va_1(char const * __restrict format, int param0, char *param1,
                 int param2);
 
-/*@ requires
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
+    requires
       \valid(s + (0 .. n - 1)) ∨
       \valid(s + (0 .. format_length(format) - 1));
-    requires valid_read_string(format);
-    requires valid_read_string(param1);
-    assigns \result, *(s + (0 ..));
+    assigns *(s + (0 ..)), \result;
+    assigns *(s + (0 ..))
+      \from (indirect: n), (indirect: *(format + (0 ..))), param2,
+            *(param1 + (0 ..)), param0;
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
             (indirect: param2), (indirect: *(param1 + (0 ..))),
             (indirect: param0);
-    assigns *(s + (0 ..))
-      \from (indirect: n), (indirect: *(format + (0 ..))), param2,
-            *(param1 + (0 ..)), param0;
  */
 int snprintf_va_1(char * __restrict s, size_t n,
                   char const * __restrict format, int param0, char *param1,
                   int param2);
 
-/*@ requires valid_read_string(format);
-    requires valid_read_string(param1);
-    assigns \result, *(s + (0 ..));
-    assigns \result
-      \from (indirect: *(format + (0 ..))), (indirect: param2),
-            (indirect: *(param1 + (0 ..))), (indirect: param0);
+/*@ requires valid_read_string(param1);
+    requires valid_read_string(format);
+    assigns *(s + (0 ..)), \result;
     assigns *(s + (0 ..))
       \from (indirect: *(format + (0 ..))), param2, *(param1 + (0 ..)),
             param0;
+    assigns \result
+      \from (indirect: *(format + (0 ..))), (indirect: param2),
+            (indirect: *(param1 + (0 ..))), (indirect: param0);
  */
 int sprintf_va_1(char * __restrict s, char const * __restrict format,
                  int param0, char *param1, int param2);
 
-/*@ requires valid_read_string(format);
+/*@ requires valid_read_string(param1);
     requires valid_read_string(param2);
-    requires valid_read_string(param1);
+    requires valid_read_string(format);
     assigns \result;
     assigns \result
       \from (indirect: fd), (indirect: *(format + (0 ..))),

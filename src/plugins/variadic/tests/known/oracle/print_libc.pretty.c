@@ -4,14 +4,14 @@
 #include "stddef.h"
 #include "stdio.h"
 /*@ requires valid_read_string(format);
-    assigns \result, __fc_stdout->__fc_FILE_data;
+    assigns __fc_stdout->__fc_FILE_data, \result;
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
 int printf_va_1(char const * __restrict format);
 
@@ -30,14 +30,14 @@ int main(void)
 #include "stddef.h"
 #include "stdio.h"
 /*@ requires valid_read_string(format);
-    assigns \result, __fc_stdout->__fc_FILE_data;
+    assigns __fc_stdout->__fc_FILE_data, \result;
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
 int printf_va_1(char const * __restrict format);
 

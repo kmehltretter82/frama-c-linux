@@ -45,7 +45,7 @@ let translate_variadics (file : file) =
   (* Environment filled with global symbols. *)
   let env = Environment.from_file file in
 
-  (* Table associating varinfo of variadic functions to a variadic_function 
+  (* Table associating varinfo of variadic functions to a variadic_function
      description *)
   let module Table = Cil_datatype.Varinfo.Hashtbl in
   let classification : variadic_function Table.t = Table.create 17 in

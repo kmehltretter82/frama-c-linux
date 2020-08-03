@@ -62,32 +62,32 @@
 #include "time.h"
 #include "wchar.h"
 int volatile nondet;
-/*@ requires
+/*@ requires valid_read_wstring(param0);
+    requires valid_read_wstring(format);
+    requires
       \valid(ws + (0 .. n - 1)) ∨
       \valid(ws + (0 .. wformat_length(format) - 1));
-    requires valid_read_wstring(format);
-    requires valid_read_wstring(param0);
-    assigns \result, *(ws + (0 ..));
+    assigns *(ws + (0 ..)), \result;
+    assigns *(ws + (0 ..))
+      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
             (indirect: *(param0 + (0 ..)));
-    assigns *(ws + (0 ..))
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
 int swprintf_va_1(wchar_t *ws, size_t n, wchar_t const *format,
                   wchar_t *param0);
 
-/*@ requires
+/*@ requires valid_read_wstring(param0);
+    requires valid_read_wstring(format);
+    requires
       \valid(ws + (0 .. n - 1)) ∨
       \valid(ws + (0 .. wformat_length(format) - 1));
-    requires valid_read_wstring(format);
-    requires valid_read_wstring(param0);
-    assigns \result, *(ws + (0 ..));
+    assigns *(ws + (0 ..)), \result;
+    assigns *(ws + (0 ..))
+      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
             (indirect: *(param0 + (0 ..)));
-    assigns *(ws + (0 ..))
-      \from (indirect: n), (indirect: *(format + (0 ..))), *(param0 + (0 ..));
  */
 int swprintf_va_2(wchar_t *ws, size_t n, wchar_t const *format,
                   wchar_t *param0);
