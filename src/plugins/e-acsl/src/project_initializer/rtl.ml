@@ -34,8 +34,7 @@ let create_rtl_ast prj =
   Project.on
     prj
     (fun () ->
-       (* compute the RTL AST in the same settings as the user source code.
-          Modifying these settings purposely kills the current AST (if any) *)
+       (* compute the RTL AST in the standard E-ACSL setting *)
        if Plugin.is_present "variadic" then
          Dynamic.Parameter.Bool.off "-variadic-translation" ();
        Kernel.Keep_unused_specified_functions.off ();

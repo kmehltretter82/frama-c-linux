@@ -482,10 +482,6 @@ class prepare_visitor = object (self)
              [ new_decl; g ]
            | _ -> assert false)
 
-    | GVarDecl(vi, _loc) | GFunDecl(_, vi, _loc) | GFun({ svar = vi }, _loc)
-      when Misc.is_fc_or_compiler_builtin vi ->
-      Cil.DoChildren
-
     | _ ->
       Cil.DoChildren
 

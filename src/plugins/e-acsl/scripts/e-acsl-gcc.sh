@@ -754,7 +754,9 @@ CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
 # Extra Frama-C Flags E-ACSL needs
-FRAMAC_FLAGS="$FRAMAC_FLAGS -variadic-no-translation"
+FRAMAC_FLAGS="$FRAMAC_FLAGS \
+  -remove-unused-specified-functions \
+  -variadic-no-translation"
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
