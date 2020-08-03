@@ -229,13 +229,14 @@ sig
   val stmt : Cil_types.stmt -> unit
   val stmts : Cil_types.stmt list -> unit
   val open_function : ?ghost:bool -> string -> [> var]
-  val open_block : unit -> unit
-  val open_ghost : unit -> unit
-  val open_switch : [< exp] -> unit
-  val open_if : [< exp] -> unit
+  val open_block : ?into:Cil_types.fundec -> ?ghost:bool -> unit -> unit
+  val open_ghost : ?into:Cil_types.fundec -> unit -> unit
+  val open_switch : ?into:Cil_types.fundec -> [< exp] -> unit
+  val open_if : ?into:Cil_types.fundec -> [< exp] -> unit
   val open_else : unit -> unit
   val close : unit -> unit
   val finish_block : unit -> Cil_types.block
+  val finish_instr_list : ?scope:Cil_types.block -> unit -> Cil_types.instr list
   val finish_stmt : unit -> Cil_types.stmt
   val finish_function : ?register:bool -> unit -> Cil_types.global
   val case : [< exp] -> unit

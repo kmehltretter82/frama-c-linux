@@ -537,73 +537,16 @@ struct
 
   let loc = Location.loc
 
-  (* State management *)
-
-  let stack : scope list ref = ref []
-  let owner: Cil_types.fundec option ref = ref None
-
-  let pretty_stack fmt =
-    let pretty_stack_type fmt b =
-      match b.scope_type with
-      | Block -> Format.pp_print_string fmt "block"
-      | IfThen _ -> Format.pp_print_string fmt "if-then"
-      | IfThenElse _ -> Format.pp_print_string fmt "if-then-else"
-      | Switch _ -> Format.pp_print_string fmt "switch"
-      | Function _ -> Format.pp_print_string fmt "function"
-    in
-    Pretty_utils.pp_list ~pre:"[@[" ~sep:";@," ~last:"@]]"
-      pretty_stack_type fmt !stack
-
-  let check_empty () =
-    if !stack <> [] then
-      raise (WrongContext "some contextes have not been closed")
-
-  let check_not_empty () =
-    if !stack = [] then
-      raise (WrongContext "only a finish_* function can close all contextes")
-
-  let top () =
-    match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
-    | state :: _ -> state
-
-  let push state =
-    let parent_ghost = match !stack with
-      | [] -> false
-      | s :: _ -> s.ghost
-    in
-    stack := { state  with ghost = parent_ghost || state.ghost } :: !stack;
-    Kernel.debug ~dkey "push onto %t" pretty_stack
-
-  let pop () =
-    Kernel.debug ~dkey "pop from %t" pretty_stack;
-    match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
-    | hd :: tail ->
-      stack := tail;
-      hd
-
-  let finish () =
-    match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
-    | [b] -> b
-    | _ :: _ :: _ -> raise (WrongContext "all contextes have not been closed")
-
-  let reset_owner () =
-    owner := None
-
-  let set_owner o =
-    owner := Some o
-
-  let get_owner () =
-    match !owner with
-    | None -> raise (WrongContext "not in an opened function")
-    | Some fundec -> fundec
-
-  let append_stmt b s =
-    b.stmts <- s :: b.stmts
 
   (* Conversion to Cil *)
+
+  let build_instr_list l =
+    let rev_build_one acc = function
+      | Label _ | CilStmt _ | CilStmtkind _ ->
+        raise (WrongContext "not convertible to instr")
+      | CilInstr instr -> instr :: acc
+    in
+    List.fold_left rev_build_one [] l
 
   let build_stmt_list ~ghost l =
     let rev_build_one acc = function
@@ -651,6 +594,84 @@ struct
     | Function _ ->
       raise (WrongContext "not convertible to stmtkind")
 
+
+  (* State management *)
+
+  let owner: Cil_types.fundec option ref = ref None
+
+  let reset_owner () =
+    owner := None
+
+  let set_owner o =
+    if Extlib.has_some !owner then
+      raise (WrongContext "already in a function");
+    owner := Some o
+
+  let get_owner () =
+    match !owner with
+    | None -> raise (WrongContext "function context not set")
+    | Some fundec -> fundec
+
+
+  let stack : scope list ref = ref []
+
+  let pretty_stack fmt =
+    let pretty_stack_type fmt b =
+      match b.scope_type with
+      | Block -> Format.pp_print_string fmt "block"
+      | IfThen _ -> Format.pp_print_string fmt "if-then"
+      | IfThenElse _ -> Format.pp_print_string fmt "if-then-else"
+      | Switch _ -> Format.pp_print_string fmt "switch"
+      | Function _ -> Format.pp_print_string fmt "function"
+    in
+    Pretty_utils.pp_list ~pre:"[@[" ~sep:";@," ~last:"@]]"
+      pretty_stack_type fmt !stack
+
+  let check_empty () =
+    if !stack <> [] then
+      raise (WrongContext "some contextes have not been closed")
+
+  let check_not_empty () =
+    if !stack = [] then
+      raise (WrongContext "only a finish_* function can close all contextes")
+
+  let top () =
+    match !stack with
+    | [] -> raise (WrongContext "not in an opened context")
+    | state :: _ -> state
+
+  let push state =
+    let parent_ghost = match !stack with
+      | [] -> false
+      | s :: _ -> s.ghost
+    in
+    stack := { state  with ghost = parent_ghost || state.ghost } :: !stack;
+    Kernel.debug ~dkey "push onto %t" pretty_stack
+
+  let pop () =
+    Kernel.debug ~dkey "pop from %t" pretty_stack;
+    match !stack with
+    | [] -> raise (WrongContext "not in an opened context")
+    | hd :: tail ->
+      stack := tail;
+      hd
+
+  let finish () =
+    reset_owner ();
+    match !stack with
+    | [] -> raise (WrongContext "not in an opened context")
+    | [b] -> b
+    | _ :: _ :: _ -> raise (WrongContext "all contextes have not been closed")
+
+  let append_stmt b s =
+    b.stmts <- s :: b.stmts
+
+  let append_local v =
+    let fundec = get_owner () and b = top () in
+    fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
+    b.vars <- v :: b.vars
+
+
   (* Statements *)
 
   let stmt s =
@@ -678,17 +699,20 @@ struct
     push (new_block ?ghost (Function {fundec}));
     `var fundec.Cil_types.svar
 
-  let open_block () =
-    push (new_block Block)
+  let open_block ?into ?ghost () =
+    Extlib.may set_owner into;
+    push (new_block ?ghost Block)
 
-  let open_ghost () =
-    push (new_block ~ghost:true Block)
+  let open_ghost ?into () =
+    open_block ?into ~ghost:true ()
 
-  let open_switch exp =
+  let open_switch ?into exp =
+    Extlib.may set_owner into;
     let switch_exp = cil_exp ~loc exp in
     push (new_block (Switch {switch_exp}))
 
-  let open_if exp =
+  let open_if ?into exp =
+    Extlib.may set_owner into;
     let ifthen_exp = cil_exp ~loc exp in
     push (new_block (IfThen {ifthen_exp}))
 
@@ -712,6 +736,17 @@ struct
     | Cil_types.Block b -> b
     | _ -> raise (WrongContext "not in an opened simple block context")
 
+  let finish_instr_list ?scope () =
+    let b = finish () in
+    begin match scope, b.vars with
+      | None, [] -> () (* Nothing to do *)
+      | Some block, vars ->
+        block.Cil_types.blocals <- List.rev vars @ block.Cil_types.blocals
+      | None, _ :: _ ->
+        raise (WrongContext "a scope must be provide to insert local variables")
+    end;
+    build_instr_list b.stmts
+
   let finish_stmt () =
     let b = finish () in
     Cil.mkStmt ~ghost:b.ghost (build_stmtkind b)
@@ -731,7 +766,6 @@ struct
         Cfg.prepareCFG ~keepSwitch fundec;
         Cfg.cfgFun fundec;
       end;
-      reset_owner ();
       GFun (fundec,loc)
     | _ -> raise (WrongContext "not in a opened function context")
 
@@ -778,7 +812,7 @@ struct
   let local' ?(ghost=false) ?init typ name =
     let fundec = get_owner () and b = top () in
     let ghost = ghost || b.ghost in
-    let v = Cil.makeLocalVar fundec ~insert:false ~ghost ~loc name typ in
+    let v = Cil.makeLocalVar ~insert:false ~ghost ~loc fundec name typ in
     begin match init with
       | None -> ()
       | Some init ->
@@ -786,6 +820,7 @@ struct
         instr (Cil_types.Local_init (v, local_init, loc));
         v.vdefined <- true
     end;
+    append_local v;
     `var v
 
   let local ?ghost ?init typ name =
@@ -798,8 +833,7 @@ struct
     let v = Cil.copyVarinfo vi (vi.Cil_types.vname ^ suffix) in
     v.vghost <- v.vghost || ghost;
     Cil.refresh_local_name fundec v;
-    fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
-    b.vars <- v :: b.vars;
+    append_local v;
     `var v
 
   let parameter ?(ghost=false) ?(attributes=[]) typ name =
