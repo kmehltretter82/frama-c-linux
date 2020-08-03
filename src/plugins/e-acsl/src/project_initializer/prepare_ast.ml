@@ -426,6 +426,12 @@ class prepare_visitor = object (self)
                      (Extlib.the self#current_kf)))
            && (* its annotations must be monitored *)
            Functions.check kf))
+        && (* it is neither malloc nor free *)
+        (* [TODO:] this special case preserves the former behavior.
+           Should be generalized latter by considering only preconditions of
+           libc functions *)
+        vi.vname <> "malloc" && vi.vname <> "calloc" && vi.vname <> "realloc"
+        && vi.vname <> "free"
       ->
       let name = Functions.RTL.mk_gen_name vi.vname in
       let new_vi = Cil.makeGlobalVar name vi.vtype in
@@ -437,9 +443,7 @@ class prepare_visitor = object (self)
              let kf = Extlib.the self#current_kf in
              (match g with
               | GFunDecl _ ->
-                if not (Kernel_function.is_definition kf)
-                && vi.vname <> "malloc" && vi.vname <> "free"
-                then
+                if not (Kernel_function.is_definition kf) then
                   Options.warning
                     "@[annotating undefined function `%a':@ \
                      the generated program may miss memory instrumentation@ \
