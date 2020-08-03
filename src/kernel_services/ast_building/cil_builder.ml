@@ -187,7 +187,7 @@ struct
   let binop op e1 e2 = `exp (Binop (op, harden_exp e1, harden_exp e2))
   let add e1 e2 = binop Cil_types.PlusA e1 e2
   let succ e = add e one
-  let increment e i = add e (int i)
+  let add_int e i = add e (int i)
   let sub e1 e2 = binop Cil_types.MinusA e1 e2
   let mul e1 e2 = binop Cil_types.Mult e1 e2
   let div e1 e2 = binop Cil_types.Div e1 e2
@@ -489,6 +489,13 @@ struct
   let cil_instr ~loc i = build_instr ~loc (harden_instr i)
   let cil_stmtkind ~loc s = build_stmtkind ~loc ~ghost:false (harden_stmt s)
   let cil_stmt ~loc s = build_stmt ~loc ~ghost:false (harden_stmt s)
+
+
+  (* Operators *)
+
+  let (:=) = assign
+  let (+=) lv e = assign lv (add lv e)
+  let (-=) lv e = assign lv (sub lv e)
 end
 
 
@@ -801,4 +808,10 @@ struct
     let v = Cil.makeFormalVar ~ghost ~loc fundec name typ in
     v.Cil_types.vattr <- attributes;
     `var v
+
+  (* Operators *)
+
+  let (:=) = assign
+  let (+=) lv e = assign lv (add lv e)
+  let (-=) lv e = assign lv (sub lv e)
 end

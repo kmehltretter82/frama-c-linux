@@ -101,7 +101,7 @@ sig
   val lognot : [< exp] -> [> exp]
   val bwnot : [< exp] -> [> exp]
   val succ : [< exp] -> [> exp] (* e + 1 *)
-  val increment : [< exp] -> int -> [> exp] (* e + i *)
+  val add_int : [< exp] -> int -> [> exp] (* e + i *)
   val binop : Cil_types.binop -> [< exp] -> [< exp] -> [> exp]
   val add : [< exp] -> [< exp] -> [> exp]
   val sub : [< exp] -> [< exp] -> [> exp]
@@ -202,6 +202,11 @@ sig
   val cil_instr : loc:Cil_types.location -> instr -> Cil_types.instr
   val cil_stmtkind : loc:Cil_types.location -> stmt -> Cil_types.stmtkind
   val cil_stmt : loc:Cil_types.location -> stmt -> Cil_types.stmt
+
+  (* Operators *)
+  val (:=) : [< lval] -> [< exp] -> [> instr] (* assign *)
+  val (+=) : [< lval] -> [< exp] -> [> instr]
+  val (-=) : [< lval] -> [< exp] -> [> instr]
 end
 
 
@@ -247,4 +252,9 @@ sig
   val local_copy : ?ghost:bool -> ?suffix:string -> [< var] -> [> var]
   val parameter : ?ghost:bool -> ?attributes:Cil_types.attributes ->
     Cil_types.typ -> string -> [> var]
+
+  (* Operators *)
+  val (:=) : [< lval] -> [< exp] -> unit (* assign *)
+  val (+=) : [< lval] -> [< exp] -> unit
+  val (-=) : [< lval] -> [< exp] -> unit
 end
