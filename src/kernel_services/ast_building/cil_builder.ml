@@ -119,6 +119,8 @@ struct
     | Range of exp' option * exp' option
     | Unop of Cil_types.unop * exp'
     | Binop of Cil_types.binop * exp' * exp'
+    | Cast of Cil_types.typ * exp'
+    | Addr of lval'
   and init' =
     | CilInit of Cil_types.init
     | SingleInit of exp'
@@ -184,8 +186,8 @@ struct
   let bwnot e = unop Cil_types.BNot e
   let binop op e1 e2 = `exp (Binop (op, harden_exp e1, harden_exp e2))
   let add e1 e2 = binop Cil_types.PlusA e1 e2
-  let succ e = add e1 one
-  let increment e i = add e1 (int i)
+  let succ e = add e one
+  let increment e i = add e (int i)
   let sub e1 e2 = binop Cil_types.MinusA e1 e2
   let mul e1 e2 = binop Cil_types.Mult e1 e2
   let div e1 e2 = binop Cil_types.Div e1 e2
@@ -203,6 +205,9 @@ struct
   let bwxor e1 e2 = binop Cil_types.BXor e1 e2
   let logand e1 e2 = binop Cil_types.LAnd e1 e2
   let logor e1 e2 = binop Cil_types.LOr e1 e2
+  let cast' t e = `exp (Cast (t,harden_exp e))
+  let cast (_,t) e = cast' t e
+  let addr lv = `exp (Addr (harden_lval lv))
   let mem e = `lval (Mem (harden_exp e))
   let field lv fi = `lval (Field (harden_lval lv, fi))
   let fieldnamed lv s = `lval (FieldNamed (harden_lval lv, s))
@@ -296,15 +301,23 @@ struct
       let t' = Cil.integralPromotion t in
       Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT e' t t', t')))
     | Binop (op,e1,e2) ->
+      let is_pointer_type e =
+        Cil.(isPointerType (typeOf e))
+      in
       let e1' = build_exp ~loc e1
       and e2' = build_exp ~loc e2 in
       let op' = match op with (* Normalize operation *)
-        | PlusA when Cil.isPointerType e1' -> PlusPI
-        | MinusA when Cil.isPointerType e1' -> MinusPI
-        | PlusPI when not Cil.isPointerType e1' -> PlusA
-        | MinusPI when not Cil.isPointerType e1' -> MinusA
+        | PlusA when is_pointer_type e1' -> Cil_types.PlusPI
+        | MinusA when is_pointer_type e1' -> Cil_types.MinusPI
+        | PlusPI when not (is_pointer_type e1') -> Cil_types.PlusA
+        | MinusPI when not (is_pointer_type e1') -> Cil_types.MinusA
+        | op -> op
       in
       Cil.mkBinOp ~loc op' e1' e2'
+    | Cast (newt, e) ->
+      Cil.mkCast ~force:false ~e:(build_exp ~loc e) ~newt
+    | Addr lv ->
+      Cil.mkAddrOrStartOf ~loc (build_lval ~loc lv)
 
   let rec build_term_lval ~loc ~restyp = function
     | CilLval _ -> raise CInLogic
@@ -332,17 +345,24 @@ struct
     | Lval lval ->
       let tlval = build_term_lval ~loc ~restyp lval in
       Logic_const.term ~loc Cil_types.(TLval tlval) (Cil.typeOfTermLval tlval)
-    | Unop (op,e) ->
-      let t = build_term e ~loc ~restyp in
-      let ty = t.Cil_types.term_type in
+    | Unop (op,t) ->
+      let t' = build_term t ~loc ~restyp in
+      let ty = t'.Cil_types.term_type in
       (* TODO: type conversion *)
-      Logic_const.term ~loc Cil_types.(TUnOp (op,t)) ty
+      Logic_const.term ~loc Cil_types.(TUnOp (op,t')) ty
     | Binop (op,t1,t2) ->
-      let t1 = build_term ~loc ~restyp t1
-      and t2 = build_term ~loc ~restyp t2 in
-      let ty = t1.Cil_types.term_type in
+      let t1' = build_term ~loc ~restyp t1
+      and t2' = build_term ~loc ~restyp t2 in
+      let ty = t1'.Cil_types.term_type in
       (* TODO: type conversion *)
-      Logic_const.term ~loc Cil_types.(TBinOp (op,t1,t2)) ty
+      Logic_const.term ~loc Cil_types.(TBinOp (op,t1',t2')) ty
+    | Cast (ct, t) ->
+      let t' = build_term ~loc ~restyp t in
+      Logic_const.term ~loc Cil_types.(TCastE (ct, t')) (Ctype ct)
+    | Addr lval ->
+      let tlval = build_term_lval ~loc ~restyp lval in
+      let ty = Cil.typeOfTermLval tlval in
+      Logic_utils.mk_logic_AddrOf ~loc tlval ty
     | Range (t1,t2) ->
       let t1' = Extlib.opt_map (build_term ~loc ~restyp) t1
       and t2' = Extlib.opt_map (build_term ~loc ~restyp) t2 in
