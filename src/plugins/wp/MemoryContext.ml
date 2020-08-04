@@ -46,7 +46,7 @@ type zone =
   | Var of varinfo   (* &x     - the cell x *)
   | Ptr of varinfo   (* p      - the cell pointed by p *)
   | Arr of varinfo   (* p+(..) - the cell and its neighbors pointed by p *)
-  | Term of term
+  | Term of term     (* use the ACSL term as is *)
 
 type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
