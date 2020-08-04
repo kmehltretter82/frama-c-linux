@@ -447,6 +447,7 @@ struct
   let incr dest = `instr (Assign (harden_lval dest, harden_exp (add dest one)))
   let call res callee args =
     `instr (Call (harden_lval_opt res, harden_exp callee, harden_exp_list args))
+
   let stmtkind sk = `stmt (CilStmtkind sk)
   let stmt s = `stmt (CilStmt s)
   let stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
@@ -666,6 +667,9 @@ struct
   let append_stmt b s =
     b.stmts <- s :: b.stmts
 
+  let append_instr b i =
+    append_stmt b (CilInstr i)
+
   let append_local v =
     let fundec = get_owner () and b = top () in
     fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
@@ -783,26 +787,6 @@ struct
   let return exp =
     stmtkind (Cil_types.Return (cil_exp_opt ~loc exp, loc))
 
-  (* Instructions *)
-
-  let instr i =
-    let b = top () in
-    append_stmt b (CilInstr i)
-
-  let assign lval exp =
-    let lval' = cil_lval ~loc lval
-    and exp' = cil_exp ~loc exp in
-    instr (Cil_types.Set (lval', exp', loc))
-
-  let incr lval =
-    assign lval (add lval (int 1))
-
-  let call dest callee args =
-    let dest' = cil_lval_opt ~loc dest
-    and callee' = cil_exp ~loc callee
-    and args' = cil_exp_list ~loc args in
-    instr (Cil_types.Call (dest', callee', args', loc))
-
   (* Variables *)
 
   let return_type typ =
@@ -817,7 +801,7 @@ struct
       | None -> ()
       | Some init ->
         let local_init = Cil_types.AssignInit (cil_init ~loc init) in
-        instr (Cil_types.Local_init (v, local_init, loc));
+        append_instr b (Cil_types.Local_init (v, local_init, loc));
         v.vdefined <- true
     end;
     append_local v;
@@ -842,6 +826,36 @@ struct
     let v = Cil.makeFormalVar ~ghost ~loc fundec name typ in
     v.Cil_types.vattr <- attributes;
     `var v
+
+
+  (* Instructions *)
+
+  let instr i =
+    let b = top () in
+    append_instr b i
+
+  let assign lval exp =
+    let lval' = cil_lval ~loc lval
+    and exp' = cil_exp ~loc exp in
+    instr (Cil_types.Set (lval', exp', loc))
+
+  let incr lval =
+    assign lval (add lval (int 1))
+
+  let call dest callee args =
+    let dest' = cil_lval_opt ~loc dest
+    and callee' = cil_exp ~loc callee
+    and args' = cil_exp_list ~loc args in
+    instr (Cil_types.Call (dest', callee', args', loc))
+
+  let pure exp =
+    let exp' = cil_exp ~loc exp in
+    let `var v = local' (Cil.typeOf exp') "tmp" ~init:(Exp.exp exp') in
+    v.vdescr <- Some (Format.asprintf "%a" !Cil.pp_exp_ref exp')
+
+  let skip () =
+    instr (Cil_types.Skip (loc))
+
 
   (* Operators *)
 

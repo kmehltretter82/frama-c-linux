@@ -188,11 +188,14 @@ sig
   type instr = [ `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
 
+  (* Instructions *)
   val instr : Cil_types.instr -> [> instr]
   val skip : [> instr]
   val assign : [< lval] -> [< exp] -> [> instr]
   val incr : [< lval] -> [> instr]
   val call : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
+
+  (* Statements *)
   val stmtkind : Cil_types.stmtkind -> [> stmt]
   val stmt : Cil_types.stmt -> [> stmt]
   val stmts : Cil_types.stmt list -> [> stmt]
@@ -224,7 +227,6 @@ sig
   include module type of Exp
 
   (* Statements *)
-  val instr : Cil_types.instr -> unit
   val stmtkind : Cil_types.stmtkind -> unit
   val stmt : Cil_types.stmt -> unit
   val stmts : Cil_types.stmt list -> unit
@@ -242,9 +244,14 @@ sig
   val case : [< exp] -> unit
   val break : unit -> unit
   val return : [< exp | `none] -> unit
+
+  (* Instructions *)
+  val instr : Cil_types.instr -> unit
+  val skip : unit -> unit
   val assign : [< lval] -> [< exp] -> unit
   val incr : [< lval] -> unit
   val call : [< lval | `none] -> [< exp] -> [< exp] list -> unit
+  val pure : [< exp ] -> unit
 
   (* Variables *)
   val return_type : Cil_types.typ -> unit
