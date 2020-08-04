@@ -119,7 +119,6 @@ EVAFLAGS   ?= \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix \
   -memexec-all -calldeps -permissive -from-verbose 0 \
-  $(SLEVEL) \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 FCFLAGS    ?=
@@ -181,7 +180,6 @@ SHELL        := /bin/bash
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevents remake if nothing changes
 
-%.slevel.eva: SLEVEL = -slevel $(word 2,$(subst ., ,$*))
 %.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
 %.eva: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
