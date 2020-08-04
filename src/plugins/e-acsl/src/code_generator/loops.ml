@@ -212,7 +212,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         Env.Middle
     in
     (* generate the guard [x bop t2] *)
-    let block_to_stmt b = mkStmt ~valid_sid:true (Block b) in
+    let block_to_stmt b = Constructor.mk_block_stmt b in
     let tlv = Logic_const.tvar ~loc logic_x in
     let guard =
       (* must copy [t2] to force being typed again *)
@@ -221,16 +221,14 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
     let guard_exp, env = term_to_exp kf (Env.push env) guard in
-    let break_stmt = mkStmt ~valid_sid:true (Break guard_exp.eloc) in
+    let break_stmt = Constructor.mk_break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
         env
-        (mkStmt
-           ~valid_sid:true
-           (If(
-               guard_exp,
-               mkBlock [ mkEmptyStmt ~loc () ],
-               mkBlock [ break_stmt ],
-               guard_exp.eloc)))
+        (Constructor.mk_if
+           ~loc:guard_exp.eloc
+           ~cond:guard_exp
+           (mkBlock [ mkEmptyStmt ~loc () ])
+           ~else_blk:(mkBlock [ break_stmt ]))
         ~global_clear:false
         Env.Middle
     in
@@ -256,7 +254,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           Constructor.mk_runtime_check Constructor.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
-        let guard_for_small_type = Cil.mkStmt ~valid_sid:true (Block b) in
+        let guard_for_small_type = Constructor.mk_block_stmt b in
         guard_for_small_type :: guard :: body @ [ next ], env
     in
     let start = block_to_stmt init_blk in

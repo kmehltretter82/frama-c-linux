@@ -98,7 +98,7 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
        function (by reference). *)
     let set =
       let lv_star_ret = Cil.mkMem ~addr:(Cil.evar ~loc ret_vi) ~off:NoOffset in
-      let star_ret = Cil.new_exp ~loc (Lval lv_star_ret) in
+      let star_ret = Constructor.mk_lval ~loc lv_star_ret in
       Gmp.init_set ~loc lv_star_ret star_ret e
     in
     let return_void = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in

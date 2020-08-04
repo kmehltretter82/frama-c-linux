@@ -262,7 +262,7 @@ end = struct
   (* Update local environment with a statement tracking temporal metadata
      associated with assignment [ret] = [func(args)]. *)
   let call_with_ret ?(alloc=false) current_stmt loc ret env kf =
-    let rhs = Cil.new_exp ~loc (Lval ret) in
+    let rhs = Constructor.mk_lval ~loc ret in
     let vals = assign ret rhs loc in
     (* Track referent numbers of assignments via function calls.
        Library functions (i.e., with no source code available) that return

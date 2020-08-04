@@ -295,14 +295,14 @@ let to_exp ~loc kf env pot label =
       let e, env = named_predicate_to_exp kf env p in
       let e = Cil.constFold false e in
       let storing_stmt =
-        Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
+        Constructor.mk_assigns ~loc ~result:lval e
       in
       let block, env =
         Env.pop_and_get env storing_stmt ~global_clear:false Env.After
       in
       (* We CANNOT return [block.bstmts] because it does NOT contain
         variable declarations. *)
-      [ Cil.mkStmt ~valid_sid:true (Block block) ], env
+      [ Constructor.mk_block_stmt block ], env
     | Misc.PoT_term t ->
       begin match Typing.get_number_ty t with
       | Typing.(C_integer _ | C_float _ | Nan) ->
@@ -311,14 +311,14 @@ let to_exp ~loc kf env pot label =
         let e, env = term_to_exp kf env t in
         let e = Cil.constFold false e in
         let storing_stmt =
-          Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
+         Constructor.mk_assigns ~loc ~result:lval e
         in
         let block, env =
           Env.pop_and_get env storing_stmt ~global_clear:false Env.After
         in
         (* We CANNOT return [block.bstmts] because it does NOT contain
           variable declarations. *)
-        [ Cil.mkStmt ~valid_sid:true (Block block) ], env
+        [ Constructor.mk_block_stmt block ], env
       | Typing.(Rational | Real) ->
         Error.not_yet "\\at on purely logic variables and over real type"
       | Typing.Gmpz ->
@@ -334,7 +334,7 @@ let to_exp ~loc kf env pot label =
   let storing_loops_block = Cil.mkBlock storing_loops_stmts in
   let storing_loops_block, env = Env.pop_and_get
     env
-    (Cil.mkStmt ~valid_sid:true (Block storing_loops_block))
+    (Constructor.mk_block_stmt storing_loops_block)
     ~global_clear:false
     Env.After
   in
@@ -342,7 +342,7 @@ let to_exp ~loc kf env pot label =
   let env = put_block_at_label env kf storing_loops_block label in
   (* Returning *)
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-  let e = Cil.new_exp ~loc (Lval lval_at_index) in
+  let e = Constructor.mk_lval ~loc lval_at_index in
   e, env
 
 (*

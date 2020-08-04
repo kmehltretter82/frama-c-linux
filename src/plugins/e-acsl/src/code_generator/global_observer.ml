@@ -136,7 +136,7 @@ let mk_init_function () =
          let loc = Location.unknown in
          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
          let str_size = Cil.new_exp loc (SizeOfStr s) in
-         Cil.mkStmtOneInstr ~valid_sid:true (Set(Cil.var vi, e, loc))
+         Constructor.mk_assigns ~loc ~result:(Cil.var vi) e
          :: Constructor.mk_store_stmt ~str_size vi
          :: Constructor.mk_full_init_stmt vi
          :: Constructor.mk_mark_readonly vi
@@ -150,7 +150,7 @@ let mk_init_function () =
       let b, _env = Env.pop_and_get env stmt ~global_clear:true Env.Before in
       b, stmts
   in
-  let stmts = Cil.mkStmt ~valid_sid:true (Block b) :: stmts in
+  let stmts = Constructor.mk_block_stmt b :: stmts in
   (* prevent multiple calls to [__e_acsl_globals_init] *)
   let loc = Location.unknown in
   let vi_already_run =
@@ -168,14 +168,18 @@ let mk_init_function () =
       (Local_init (vi_already_run, init, loc))
   in
   let already_run =
-    Cil.mkStmtOneInstr ~valid_sid:true
-      (Set (Cil.var vi_already_run, Cil.one ~loc, loc))
+    Constructor.mk_assigns
+      ~loc
+      ~result:(Cil.var vi_already_run)
+      (Cil.one ~loc)
   in
   let stmts = already_run :: stmts in
   let guard =
-    Cil.mkStmt
-      ~valid_sid:true
-      (If (Cil.evar vi_already_run, Cil.mkBlock [], Cil.mkBlock stmts, loc))
+    Constructor.mk_if
+      ~loc
+      ~cond:(Cil.evar vi_already_run)
+      (Cil.mkBlock [])
+      ~else_blk:(Cil.mkBlock stmts)
   in
   let return = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
   let stmts = [ init_stmt; guard; return ] in

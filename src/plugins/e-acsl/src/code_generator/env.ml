@@ -336,9 +336,9 @@ let add_stmt ?(post=false) ?before env kf stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
-  let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
+  let new_stmt = Constructor.mk_block_stmt block in
   let sk = stmt.skind in
-  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
+  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Constructor.mk_stmt sk ]);
   let pre = match label with
     | BuiltinLabel(Here | Post) -> true
     | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
@@ -432,7 +432,7 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
        add the given [stmt] afterwards. This way, we have the guarantee that
        the final block does not contain any local, so may be transient. *)
     if split then
-      let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
+      let sblock = Constructor.mk_block_stmt b in
       Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
     else
       b

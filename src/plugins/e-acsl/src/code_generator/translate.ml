@@ -221,15 +221,15 @@ let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
              Gmp.init_set
            in
            let affect e = init_set ~loc lv ev e in
-           let then_block, _ =
+           let then_blk, _ =
              let s = affect e2 in
              Env.pop_and_get env2 s ~global_clear:false Env.Middle
            in
-           let else_block, _ =
+           let else_blk, _ =
              let s = affect e3 in
              Env.pop_and_get env3 s ~global_clear:false Env.Middle
            in
-           [ Cil.mkStmt ~valid_sid:true (If(e1, then_block, else_block, loc)) ])
+           [ Constructor.mk_if ~loc ~cond:e1 then_blk ~else_blk ])
     in
     e, env
 
@@ -276,7 +276,7 @@ and context_insensitive_term_to_exp kf env t =
     c, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
-    Cil.new_exp ~loc (Lval lv), env, C_number, name
+    Constructor.mk_lval ~loc lv, env, C_number, name
   | TSizeOf ty -> Cil.sizeOf ~loc ty, env, C_number, "sizeof"
   | TSizeOfE t ->
     let e, env = term_to_exp kf env t in
@@ -838,7 +838,7 @@ and env_of_li li kf env loc =
   let e, env = term_to_exp kf env t in
   let stmt = match Typing.get_number_ty t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
-      Cil.mkStmtOneInstr ~valid_sid:true (Set (Cil.var vi, e, loc))
+      Constructor.mk_assigns ~loc ~result:(Cil.var vi) e
     | Typing.Gmpz ->
       Gmp.init_set ~loc (Cil.var vi) vi_e e
     | Typing.Rational ->

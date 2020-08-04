@@ -92,7 +92,7 @@ let generic_affect ~loc fname lv ev e =
     let suf, args = get_set_suffix_and_arg ty e in
     Constructor.mk_lib_call ~loc (fname ^ suf) (ev :: args)
   end else
-    Cil.mkStmtOneInstr ~valid_sid:true (Set(lv, e, e.eloc))
+    Constructor.mk_assigns ~loc:e.eloc ~result:lv e
 
 let init_set ~loc lv ev e =
   let fname =
@@ -121,7 +121,7 @@ let init_set ~loc lv ev e =
              Cil.zero ~loc;
              Cil.mkAddrOf ~loc elv ]
        in
-       Cil.mkStmt ~valid_sid:true (Block (Cil.mkBlock [ init ~loc ev; call ]))
+       Constructor.mk_block_stmt (Cil.mkBlock [ init ~loc ev; call ])
      | _ ->
        Error.not_yet "unsigned long long expression requiring GMP")
   | Longlong ILongLong ->
