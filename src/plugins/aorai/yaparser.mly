@@ -400,8 +400,8 @@ actions
   ;
 
 non_empty_actions
-  : non_empty_actions action { $1 @ [$2] }
-  | action                   { [$1] }
+  : non_empty_actions SEMI_COLON action { $1 @ [$3] }
+  | action                              { [$1] }
   ;
 
 action
