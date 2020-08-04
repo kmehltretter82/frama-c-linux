@@ -246,6 +246,21 @@ let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
     (Gmp_types.Z.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
+let rtl_call_to_new_var ~loc ?scope ?name env kf t ty func_name args =
+  let _, exp, env =
+    new_var
+      ~loc
+      ?scope
+      ?name
+      env
+      kf
+      t
+      ty
+      (fun v _ ->
+         [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) func_name args ])
+  in
+  exp, env
+
 module Logic_binding = struct
 
   let add_binding env logic_v vi =
