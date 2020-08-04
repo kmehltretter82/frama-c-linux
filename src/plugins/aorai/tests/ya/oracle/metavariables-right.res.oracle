@@ -57,10 +57,12 @@ lemma e_deterministic_trans{L}:
      \at(aorai_CurOperation,L) ≡ op_h ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ \at(aorai_x,L) > 0);
  */
+/*@ ghost int aorai_y = 0; */
 /*@ ghost
   /@ ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
-     assigns aorai_x, aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_y, aorai_x, aorai_CurOpStatus, aorai_CurOperation,
+             aorai_CurStates;
      
      behavior buch_state_a_out:
        ensures aorai_CurStates ≢ a;
@@ -71,11 +73,13 @@ lemma e_deterministic_trans{L}:
      behavior buch_state_c_in_0:
        assumes aorai_CurStates ≡ b;
        ensures aorai_CurStates ≡ c;
+       ensures aorai_y ≡ \old(aorai_x);
        ensures aorai_x ≡ \old(x);
      
      behavior buch_state_c_out:
        assumes aorai_CurStates ≢ b;
        ensures aorai_CurStates ≢ c;
+       ensures aorai_y ≡ \old(aorai_y);
        ensures aorai_x ≡ \old(aorai_x);
      
      behavior buch_state_d_out:
@@ -104,6 +108,7 @@ lemma e_deterministic_trans{L}:
     aorai_CurStates_tmp = aorai_CurStates;
     if (1 == aorai_CurStates) {
       aorai_CurStates_tmp = c;
+      aorai_y = aorai_x;
       aorai_x = x;
     }
     aorai_CurStates = aorai_CurStates_tmp;
@@ -167,6 +172,9 @@ lemma e_deterministic_trans{L}:
     
     behavior Buchi_property_behavior:
       ensures aorai_CurStates ≡ e;
+      ensures
+        \at(aorai_CurStates ≡ b,Pre) ∧ aorai_CurStates ≡ e ⇒
+        aorai_y ≡ \at(aorai_x,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ b,Pre) ∧ aorai_CurStates ≡ e ⇒
         aorai_x ≡ \at(x,Pre) + 0;
@@ -460,7 +468,8 @@ void h(int x)
   /@ requires aorai_CurStates ≡ h_0;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_i;
-     assigns aorai_x, aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_y, aorai_x, aorai_CurOpStatus, aorai_CurOperation,
+             aorai_CurStates;
      
      behavior buch_state_a_out:
        ensures aorai_CurStates ≢ a;
@@ -477,11 +486,13 @@ void h(int x)
      behavior buch_state_e_in_0:
        assumes aorai_CurStates ≡ h_0;
        ensures aorai_CurStates ≡ e;
+       ensures aorai_y ≡ \old(0);
        ensures aorai_x ≡ \old(1);
      
      behavior buch_state_e_out:
        assumes aorai_CurStates ≢ h_0;
        ensures aorai_CurStates ≢ e;
+       ensures aorai_y ≡ \old(aorai_y);
        ensures aorai_x ≡ \old(aorai_x);
      
      behavior buch_state_f_0_out:
@@ -504,6 +515,7 @@ void h(int x)
     aorai_CurStates_tmp = aorai_CurStates;
     if (7 == aorai_CurStates) {
       aorai_CurStates_tmp = e;
+      aorai_y = 0;
       aorai_x = 1;
     }
     aorai_CurStates = aorai_CurStates_tmp;
@@ -516,6 +528,9 @@ void h(int x)
     
     behavior Buchi_property_behavior:
       ensures aorai_CurStates ≡ e;
+      ensures
+        \at(aorai_CurStates ≡ g_0,Pre) ∧ aorai_CurStates ≡ e ⇒
+        aorai_y ≡ 0;
       ensures
         \at(aorai_CurStates ≡ g_0,Pre) ∧ aorai_CurStates ≡ e ⇒
         aorai_x ≡ \at(1,Pre) + 0;
@@ -634,6 +649,9 @@ void i(void)
       ensures aorai_CurStates ≡ i_0;
       ensures
         \at(aorai_CurStates ≡ a,Pre) ∧ aorai_CurStates ≡ i_0 ⇒
+        aorai_y ≡ 0 ∨ aorai_y ≡ \at(aorai_x,Pre) + 0;
+      ensures
+        \at(aorai_CurStates ≡ a,Pre) ∧ aorai_CurStates ≡ i_0 ⇒
         aorai_x ≡ \at(1,Pre) + 0 ∨ aorai_x ≡ \at((int)42,Pre) + 0;
  */
 void main(int t)
@@ -657,6 +675,10 @@ void main(int t)
       loop invariant Aorai: aorai_CurStates ≢ g_0;
       loop invariant Aorai: aorai_CurStates ≢ h_0;
       loop invariant Aorai: aorai_CurStates ≢ i_0;
+      loop invariant
+        Aorai:
+          \at(aorai_CurStates ≡ e,aorai_loop_15) ∧ aorai_CurStates ≡ e ⇒
+          aorai_y ≡ 0;
       loop invariant
         Aorai:
           \at(aorai_CurStates ≡ e,aorai_loop_15) ∧ aorai_CurStates ≡ e ⇒

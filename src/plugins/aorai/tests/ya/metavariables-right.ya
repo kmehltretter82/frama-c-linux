@@ -25,6 +25,6 @@ f : { RETURN(h) } -> g;
 
 g : { CALL(i) } -> h;
 
-h : { RETURN(i) } $x := 1 -> e;
+h : { RETURN(i) } $y := 0; $x := 1; -> e;
 
 i : -> i;

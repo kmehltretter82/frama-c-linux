@@ -395,8 +395,8 @@ access_leaf
   ;
 
 actions
-  : /* epsilon */     { [] }
-  | non_empty_actions { $1 }
+  : /* epsilon */                   { [] }
+  | non_empty_actions opt_semicolon { $1 }
   ;
 
 non_empty_actions
@@ -406,4 +406,9 @@ non_empty_actions
 
 action
   : METAVAR AFF arith_relation { Metavar_assign ($1, $3) }
+  ;
+
+opt_semicolon
+  : /* empty */ {}
+  | SEMI_COLON  {}
   ;
