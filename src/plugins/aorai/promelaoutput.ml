@@ -32,13 +32,13 @@ open Format
 
 type 'a printer = Format.formatter -> 'a -> unit
 
+let bool3_to_string = function
+  | True -> "True"
+  | False -> "False"
+  | Undefined -> "Undef"
 
 let print_bool3 fmt b =
-  Format.pp_print_string fmt
-    (match b with
-      | True -> "True"
-      | False -> "False"
-      | Undefined -> "Undef")
+  Format.pp_print_string fmt (bool3_to_string b)
 
 let print_state fmt st =
   Format.fprintf fmt "@[<2>%s@ (acc=%a;@ init=%a;@ num=%d)@]"
@@ -60,7 +60,7 @@ struct
     | Ustar -> "*"
     | Uamp -> "&"
     | Ubw_not -> "~"
-    
+
   let rec print_expression fmt = function
     | PVar s -> Format.fprintf fmt "%s" s
     | PPrm (f,s) -> Format.fprintf fmt "%s().%s" f s
@@ -73,11 +73,13 @@ struct
       Format.fprintf fmt "(@[%a@])@ %a@ (@[%a@])"
         print_expression e1 Printer.pp_binop (Logic_typing.type_binop bop)
         print_expression e2
-    | PUnop(uop,e) -> Format.fprintf fmt "%s@;(@[%a@])"
-      (string_of_unop uop)
-      print_expression e
-    | PArrget(e1,e2) -> Format.fprintf fmt "%a@;[@(%a@]]"
-      print_expression e1 print_expression e2
+    | PUnop(uop,e) ->
+      Format.fprintf fmt "%s@;(@[%a@])"
+        (string_of_unop uop)
+        print_expression e
+    | PArrget(e1,e2) ->
+      Format.fprintf fmt "%a@;[@(%a@]]"
+        print_expression e1 print_expression e2
     | PField(e,s) -> Format.fprintf fmt "%a.%s" print_expression e s
     | PArrow(e,s) -> Format.fprintf fmt "%a->%s" print_expression e s
 
@@ -89,12 +91,15 @@ struct
         print_expression e2
     | PTrue -> Format.pp_print_string fmt "true"
     | PFalse -> Format.pp_print_string fmt "false"
-    | POr(e1,e2) -> Format.fprintf fmt "(@[%a@])@ or@ (@[%a@])"
-      print_condition e1 print_condition e2
-    | PAnd(e1,e2) -> Format.fprintf fmt "(@[%a@])@ and@ (@[%a@])"
-      print_condition e1 print_condition e2
-    | PNot c -> Format.fprintf fmt "not(@[%a@])"
-      print_condition c
+    | POr(e1,e2) ->
+      Format.fprintf fmt "(@[%a@])@ or@ (@[%a@])"
+        print_condition e1 print_condition e2
+    | PAnd(e1,e2) ->
+      Format.fprintf fmt "(@[%a@])@ and@ (@[%a@])"
+        print_condition e1 print_condition e2
+    | PNot c ->
+      Format.fprintf fmt "not(@[%a@])"
+        print_condition c
     | PCall (s,None) -> Format.fprintf fmt "CALL(%s)" s
     | PCall (s, Some b) -> Format.fprintf fmt "CALL(%s::%s)" s b
     | PReturn s -> Format.fprintf fmt "RETURN(%s)" s
@@ -107,7 +112,7 @@ struct
       (Pretty_utils.pp_opt print_expression) elt.max_rep
 
   and print_sequence fmt l =
-      Pretty_utils.pp_list ~pre:"[@[" ~sep:";@ " ~suf:"@]]" print_seq_elt fmt l
+    Pretty_utils.pp_list ~pre:"[@[" ~sep:";@ " ~suf:"@]]" print_seq_elt fmt l
 
   let print_guard fmt = function
     | Seq l -> print_sequence fmt l
@@ -140,8 +145,10 @@ struct
         print_condition c1 print_condition c2
     | TNot c ->
       Format.fprintf fmt "@[<hov 4>@[<hov 5>not(%a@])@]" print_condition c
-    | TTrue            -> Format.pp_print_string fmt "True"
-    | TFalse           -> Format.pp_print_string fmt "False"
+    | TTrue ->
+      Format.pp_print_string fmt "True"
+    | TFalse ->
+      Format.pp_print_string fmt "False"
     | TRel(rel,exp1,exp2) ->
       (* \result will be printed as such, not as f().return *)
       Format.fprintf fmt "@[(%a)@]@ %a@ @[(%a)@]"
@@ -258,10 +265,10 @@ struct
       (Pretty_utils.pp_list dot_state) states
       (Pretty_utils.pp_list dot_trans) trans
       (fun fmt ->
-        if DotSeparatedLabels.get () then
-          (Format.fprintf fmt
-             "/* guards of transitions */@\ncomment=\"%a\";@\n"
-             (Pretty_utils.pp_list ~sep:"@\n" print_trans) trans));
+         if DotSeparatedLabels.get () then
+           (Format.fprintf fmt
+              "/* guards of transitions */@\ncomment=\"%a\";@\n"
+              (Pretty_utils.pp_list ~sep:"@\n" print_trans) trans));
     Format.pp_set_formatter_out_functions fmt output_functions;
     close_out cout
 end
