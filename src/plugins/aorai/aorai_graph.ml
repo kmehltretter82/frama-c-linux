@@ -31,7 +31,7 @@ type transition = Promelaast.typed_trans
 module Vertex =
 struct
   type t = state
-  let compare x y = Pervasives.compare x.nums y.nums
+  let compare x y = Stdlib.compare x.nums y.nums
   let hash x = Hashtbl.hash x.nums
   let equal x y = x.nums = y.nums
   let default = {
@@ -43,7 +43,7 @@ end
 module Edge =
 struct
   type t = transition
-  let compare x y = Pervasives.compare x.numt y.numt
+  let compare x y = Stdlib.compare x.numt y.numt
   let default = {
     numt = -1; start = Vertex.default; stop = Vertex.default;
     cross = TTrue; actions = []
