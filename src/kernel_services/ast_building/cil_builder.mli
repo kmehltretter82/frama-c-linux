@@ -29,9 +29,17 @@
 
 module Type :
 sig
+  exception NotACType
+
   type ('value,'shape) typ
 
-  val typ : Cil_types.typ -> ('v,'v) typ
+  (* Logic types *)
+  val of_ltyp : Cil_types.logic_type -> (unit,unit) typ
+  val integer : (unit,unit) typ
+  val real : (unit,unit) typ
+
+  (* C base types *)
+  val of_ctyp : Cil_types.typ -> ('v,'v) typ
   val void : ('v,'v) typ
   val bool : ('v,'v) typ
   val char : ('v,'v) typ
@@ -52,12 +60,15 @@ sig
   val ptr : ('v,'s) typ -> ('v,'v) typ
   val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
 
+  (* Attrbutes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list
     -> ('v,'s) typ
   val const : ('v,'s) typ -> ('v,'s) typ
   val stdlib_generated : ('v,'s) typ -> ('v,'s) typ
 
+  (* Conversion *)
   val cil_typ : ('v,'s) typ -> Cil_types.typ
+  val cil_logic_type : ('v,'s) typ -> Cil_types.logic_type
 end
 
 
@@ -73,29 +84,44 @@ sig
   type exp'
   type init'
 
+  type label
   type const = [ `const of const' ]
   type var = [ `var of var' ]
   type lval = [  var | `lval of lval' ]
   type exp = [ const | lval | `exp of exp' ]
   type init = [ exp | `init of init']
 
-  (* Build Constants *)
+  val none : [> `none]
 
-  val constant : Cil_types.constant -> [> const]
-  val int : int -> [> const]
-  val integer : Integer.t -> [> const]
+  (* Labels *)
+
+  val here : label
+  val old : label
+  val pre : label
+  val post : label
+  val loop_entry : label
+  val loop_current : label
+  val program_init : label
+
+  (* Constants *)
+
+  val of_constant : Cil_types.constant -> [> const]
+  val of_int : int -> [> const]
+  val of_integer : Integer.t -> [> const]
   val zero : [> const]
   val one : [> const]
 
-  (* Build LValues *)
+  (* LValues *)
 
   val var : Cil_types.varinfo -> [> var]
-  val lval : Cil_types.lval -> [> lval]
+  val of_lval : Cil_types.lval -> [> lval]
 
-  (* Build Expressions *)
+  (* Expressions *)
 
-  val exp : Cil_types.exp -> [> exp]
-  val exp_copy : Cil_types.exp -> [> exp]
+  exception EmptyList
+
+  val of_exp : Cil_types.exp -> [> exp]
+  val of_exp_copy : Cil_types.exp -> [> exp]
   val unop : Cil_types.unop -> [< exp] -> [> exp]
   val neg : [< exp] -> [> exp]
   val lognot : [< exp] -> [> exp]
@@ -118,6 +144,8 @@ sig
   val ne : [< exp] -> [< exp] -> [> exp]
   val logor : [< exp] -> [< exp] -> [> exp]
   val logand : [< exp] -> [< exp] -> [> exp]
+  val logor_list : [< exp] list -> exp
+  val logand_list : [< exp] list -> exp
   val bwand : [< exp] -> [< exp] -> [> exp]
   val bwor : [< exp] -> [< exp] -> [> exp]
   val bwxor : [< exp] -> [< exp] -> [> exp]
@@ -125,22 +153,30 @@ sig
   val cast' : Cil_types.typ -> [< exp] -> [> exp]
   val addr : [< lval] -> [> exp]
   val mem : [< exp] -> [> lval]
+  val index : [< lval] -> [< exp] -> [> lval]
   val field : [< lval] -> Cil_types.fieldinfo -> [> lval]
   val fieldnamed : [< lval] -> string -> [> lval]
+
   val result : [> lval]
   val term : Cil_types.term -> [> exp]
-  val none : [> `none]
   val range :  [< exp | `none] -> [< exp | `none] -> [> exp]
   val whole : [> exp] (* Whole range, i.e. .. *)
   val whole_right : [> exp] (* Whole range right side, i.e. 0.. *)
-  val init : Cil_types.init -> [> init]
+  val app : Cil_types.logic_info -> label list -> [< exp] list -> [> exp]
+
+  val object_pointer : ?at:label -> [< exp] -> [> exp]
+  val valid : ?at:label -> [< exp] -> [> exp]
+  val valid_read : ?at:label -> [< exp] -> [> exp]
+  val initialized : ?at:label -> [< exp] -> [> exp]
+  val dangling : ?at:label -> [< exp] -> [> exp]
+  val allocable : ?at:label -> [< exp] -> [> exp]
+  val freeable : ?at:label -> [< exp] -> [> exp]
+  val fresh : label -> label -> [< exp] -> [< exp] -> [> exp]
+
+  val of_init : Cil_types.init -> [> init]
   val compound : Cil_types.typ -> init list -> [> init]
   val values : (init,'values) typ -> 'values -> init
 
-  exception EmptyList
-
-  val logor_list : [< exp] list -> exp
-  val logand_list : [< exp] list -> exp
 
   (* Redefined operators *)
 
@@ -157,22 +193,35 @@ sig
   val (>=) : [< exp] -> [< exp] -> [> exp]
   val (==) : [< exp] -> [< exp] -> [> exp]
   val (!=) : [< exp] -> [< exp] -> [> exp]
+  val (--) : [< exp] -> [< exp] -> [> exp]
 
   (* Export CIL objects from built expressions *)
 
-  exception LogicInC
-  exception CInLogic
+  exception LogicInC of exp
+  exception CInLogic of exp
+  exception NotATerm of exp
+  exception NotAPredicate of exp
+  exception NotAFunction of Cil_types.logic_info
   exception Typing_error of string
 
+  val cil_logic_label : label -> Cil_types.logic_label
   val cil_constant : [< const] -> Cil_types.constant
   val cil_varinfo : [< var] -> Cil_types.varinfo
   val cil_lval : loc:Cil_types.location -> [< lval] -> Cil_types.lval
   val cil_exp : loc:Cil_types.location -> [< exp] -> Cil_types.exp
-  val cil_term_lval : loc:Cil_types.location -> restyp:Cil_types.typ ->
+  val cil_term_lval : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
     [< lval] -> Cil_types.term_lval
-  val cil_term : loc:Cil_types.location -> restyp:Cil_types.typ ->
+  val cil_term : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.term
+  val cil_iterm : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+    [< exp] -> Cil_types.identified_term
+  val cil_pred : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+    [< exp] -> Cil_types.predicate
+  val cil_ipred : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
+    [< exp] -> Cil_types.identified_predicate
   val cil_init : loc:Cil_types.location -> [< init] -> Cil_types.init
+
+  val cil_typeof : [< var] -> Cil_types.typ
 end
 
 
@@ -189,16 +238,16 @@ sig
   type stmt = [ instr | `stmt of stmt' ]
 
   (* Instructions *)
-  val instr : Cil_types.instr -> [> instr]
+  val of_instr : Cil_types.instr -> [> instr]
   val skip : [> instr]
   val assign : [< lval] -> [< exp] -> [> instr]
   val incr : [< lval] -> [> instr]
   val call : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
 
   (* Statements *)
-  val stmtkind : Cil_types.stmtkind -> [> stmt]
-  val stmt : Cil_types.stmt -> [> stmt]
-  val stmts : Cil_types.stmt list -> [> stmt]
+  val of_stmtkind : Cil_types.stmtkind -> [> stmt]
+  val of_stmt : Cil_types.stmt -> [> stmt]
+  val of_stmts : Cil_types.stmt list -> [> stmt]
   val block : [< stmt] list -> [> stmt]
   val ghost : [< stmt] -> [> stmt]
 
@@ -226,11 +275,27 @@ module Stateful (Location : T) :
 sig
   include module type of Exp
 
+  (* Functions *)
+  val open_function : ?ghost:bool -> ?vorig_name:string -> string -> [> var]
+  val set_return_type : ('s,'v) typ -> unit
+  val set_return_type' : Cil_types.typ -> unit
+  val add_attribute : Cil_types.attribute -> unit
+  val add_new_attribute : string -> Cil_types.attrparam list -> unit
+  val add_stdlib_generated : unit -> unit
+  val finish_function : ?register:bool -> unit -> Cil_types.global
+  val finish_declaration : ?register:bool -> unit -> Cil_types.global
+
+  (* Behaviors *)
+  type source = [exp | `indirect of exp]
+  val indirect: [< source] -> [> source]
+  val assigns: [< exp] list -> [< exp | `indirect of [< exp]] list -> unit
+  val requires: [< exp] -> unit
+  val ensures: [< exp] -> unit
+
   (* Statements *)
-  val stmtkind : Cil_types.stmtkind -> unit
-  val stmt : Cil_types.stmt -> unit
-  val stmts : Cil_types.stmt list -> unit
-  val open_function : ?ghost:bool -> string -> [> var]
+  val of_stmtkind : Cil_types.stmtkind -> unit
+  val of_stmt : Cil_types.stmt -> unit
+  val of_stmts : Cil_types.stmt list -> unit
   val open_block : ?into:Cil_types.fundec -> ?ghost:bool -> unit -> unit
   val open_ghost : ?into:Cil_types.fundec -> unit -> unit
   val open_switch : ?into:Cil_types.fundec -> [< exp] -> unit
@@ -240,26 +305,24 @@ sig
   val finish_block : unit -> Cil_types.block
   val finish_instr_list : ?scope:Cil_types.block -> unit -> Cil_types.instr list
   val finish_stmt : unit -> Cil_types.stmt
-  val finish_function : ?register:bool -> unit -> Cil_types.global
   val case : [< exp] -> unit
   val break : unit -> unit
   val return : [< exp | `none] -> unit
 
-  (* Instructions *)
-  val instr : Cil_types.instr -> unit
-  val skip : unit -> unit
-  val assign : [< lval] -> [< exp] -> unit
-  val incr : [< lval] -> unit
-  val call : [< lval | `none] -> [< exp] -> [< exp] list -> unit
-  val pure : [< exp ] -> unit
-
   (* Variables *)
-  val return_type : Cil_types.typ -> unit
   val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string -> [> var]
   val local' : ?ghost:bool -> ?init:init -> Cil_types.typ -> string -> [> var]
   val local_copy : ?ghost:bool -> ?suffix:string -> [< var] -> [> var]
   val parameter : ?ghost:bool -> ?attributes:Cil_types.attributes ->
     Cil_types.typ -> string -> [> var]
+
+  (* Instructions *)
+  val of_instr : Cil_types.instr -> unit
+  val skip : unit -> unit
+  val assign : [< lval] -> [< exp] -> unit
+  val incr : [< lval] -> unit
+  val call : [< lval | `none] -> [< exp] -> [< exp] list -> unit
+  val pure : [< exp ] -> unit
 
   (* Operators *)
   val (:=) : [< lval] -> [< exp] -> unit (* assign *)
