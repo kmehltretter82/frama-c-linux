@@ -91,6 +91,8 @@ sig
   type exp = [ const | lval | `exp of exp' ]
   type init = [ exp | `init of init']
 
+  val pretty : Format.formatter -> [init | `none] -> unit
+
   val none : [> `none]
 
   (* Labels *)

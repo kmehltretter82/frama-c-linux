@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let unknown_loc = Cil_datatype.Location.unknown
+
 
 (* --- Types --- *)
 
@@ -67,7 +69,7 @@ struct
 
   let array ?size = function
     | (_,Ctype t) as typ ->
-      let to_exp = Cil.integer ~loc:Cil_datatype.Location.unknown in
+      let to_exp = Cil.integer ~loc:unknown_loc in
       let size = Extlib.opt_map to_exp size in
       Listed typ,
       Ctype (TArray (t, size, Cil.empty_size_cache (), []))
@@ -175,6 +177,72 @@ struct
   type exp = [ const | lval | `exp of exp' ]
   type init = [ exp | `init of init']
 
+  (* Pretty printing *)
+
+  let rec pretty_const fmt = function
+    | Int i -> Format.pp_print_int fmt i
+    | Integer i -> Integer.pretty fmt i
+    | CilConstant c -> Printer.pp_constant fmt c
+  and pretty_var fmt v =
+    Printer.pp_varinfo fmt v
+  and pretty_lval fmt = function
+    | CilLval lv -> Printer.pp_lval fmt lv
+    | Var v -> pretty_var fmt v
+    | Result -> Format.fprintf fmt "%s" "\result"
+    | Mem e -> Format.fprintf fmt "*(%a)" pretty_exp e
+    | Index (lv,e) -> Format.fprintf fmt "%a[%a]" pretty_lval lv pretty_exp e
+    | Field (lv,fi) ->
+      Format.fprintf fmt "%a.%s" pretty_lval lv fi.Cil_types.fname
+    | FieldNamed (lv,s) -> Format.fprintf fmt "%a.%s" pretty_lval lv s
+  and pretty_exp fmt = function
+    | CilExp e -> Printer.pp_exp fmt e
+    | CilExpCopy e -> Printer.pp_exp fmt e
+    | CilTerm t -> Printer.pp_term fmt t
+    | Lval lv -> pretty_lval fmt lv
+    | Const c -> pretty_const fmt c
+    | Range (o1,o2) ->
+      Format.fprintf fmt "(%a .. %a)" pretty_exp_opt o1 pretty_exp_opt o2
+    | Unop (op,e) -> Format.fprintf fmt "%a%a" Printer.pp_unop op pretty_exp e
+    | Binop (op,e1,e2) ->
+      Format.fprintf fmt "(%a %a %a)"
+        pretty_exp e1
+        Printer.pp_binop op
+        pretty_exp e2
+    | Cast (lty, e) ->
+      Format.fprintf fmt "(%a)%a" Printer.pp_logic_type lty pretty_exp e
+    | Addr lv -> Format.fprintf fmt "&%a" pretty_lval lv
+    | App (li,labels,args) -> pretty_app fmt (li.l_var_info.lv_name,labels,args)
+    | Pred pred ->
+      pretty_pred fmt pred
+  and pretty_exp_opt fmt o =
+    Extlib.may (pretty_exp fmt) o
+  and pretty_app fmt (name,labels,args) =
+    Format.fprintf fmt "%s{%a}(%a)"
+      name
+      (Pretty_utils.pp_list ~sep:",@ " Printer.pp_logic_label) labels
+      (Pretty_utils.pp_list ~sep:",@ " pretty_exp) args
+  and pretty_pred fmt = function
+    | ObjectPointer (l,e) -> pretty_app fmt ("object_pointer",[l],[e])
+    | Valid (l,e) -> pretty_app fmt ("valid",[l],[e])
+    | ValidRead (l,e) -> pretty_app fmt ("valid_read",[l],[e])
+    | Initialized (l,e) -> pretty_app fmt ("initialized",[l],[e])
+    | Dangling (l,e) -> pretty_app fmt ("dangling",[l],[e])
+    | Allocable (l,e) -> pretty_app fmt ("allocable",[l],[e])
+    | Freeable (l,e) -> pretty_app fmt ("freeable",[l],[e])
+    | Fresh (l1,l2,e1,e2) -> pretty_app fmt ("fresh",[l1;l2],[e1;e2])
+  and pretty_init fmt = function
+    | CilInit init -> Printer.pp_init fmt init
+    | SingleInit e -> pretty_exp fmt e
+    | CompoundInit (_,l) ->
+      Format.fprintf fmt "{%a}" (Pretty_utils.pp_list ~sep:",@ " pretty_init) l
+
+  let pretty fmt = function
+    | `none -> ()
+    | `const c -> pretty_const fmt c
+    | `var v -> pretty_var fmt v
+    | `lval lv -> pretty_lval fmt lv
+    | `exp e -> pretty_exp fmt e
+    | `init i -> pretty_init fmt i
 
   (* Depolymorphize *)
 
@@ -212,7 +280,6 @@ struct
     match (i :> init) with
     | #exp as exp -> SingleInit (harden_exp exp)
     | `init init -> init
-
 
   (* None *)
 
