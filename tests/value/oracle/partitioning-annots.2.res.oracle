@@ -6,49 +6,49 @@
   k ∈ {0}
   nondet ∈ [--..--]
 [eva] computing for function Frama_C_interval <- test_split.
-  Called from tests/value/partitioning-annots.c:75.
+  Called from tests/value/partitioning-annots.c:71.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:75: 
+[eva] tests/value/partitioning-annots.c:71: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- test_split.
-  Called from tests/value/partitioning-annots.c:76.
-[eva] tests/value/partitioning-annots.c:76: 
+  Called from tests/value/partitioning-annots.c:72.
+[eva] tests/value/partitioning-annots.c:72: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:82: 
+[eva] tests/value/partitioning-annots.c:78: 
   Frama_C_show_each_before_first_split: {0; 1}, {0; 1; 2}, {0}
-[eva] tests/value/partitioning-annots.c:85: 
+[eva] tests/value/partitioning-annots.c:81: 
   Frama_C_show_each_before_second_split: {1}, {0; 1; 2}, {1}
-[eva] tests/value/partitioning-annots.c:85: 
+[eva] tests/value/partitioning-annots.c:81: 
   Frama_C_show_each_before_second_split: {0}, {0; 1; 2}, {0}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {1}, {2}, {1}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {1}, {1}, {1}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {1}, {0}, {1}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {0}, {2}, {0}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {0}, {1}, {0}
-[eva] tests/value/partitioning-annots.c:87: 
+[eva] tests/value/partitioning-annots.c:83: 
   Frama_C_show_each_before_first_merge: {0}, {0}, {0}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {1}, {2}, {1}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {0}, {2}, {0}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {1}, {1}, {1}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {0}, {1}, {0}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {1}, {0}, {1}
-[eva] tests/value/partitioning-annots.c:89: 
+[eva] tests/value/partitioning-annots.c:85: 
   Frama_C_show_each_before_second_merge: {0}, {0}, {0}
-[eva] tests/value/partitioning-annots.c:91: 
+[eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_end: {1}, {0; 1; 2}, {1}
-[eva] tests/value/partitioning-annots.c:91: 
+[eva] tests/value/partitioning-annots.c:87: 
   Frama_C_show_each_end: {0}, {0; 1; 2}, {0}
 [eva] Recording results for test_split
 [eva] done for function test_split
