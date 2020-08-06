@@ -1040,9 +1040,14 @@ and translate_rte_annots:
   is_visiting_valid := old_valid;
   Env.set_annotation_kind env old_kind
 
-and translate_rte kf env e =
+and translate_rte ?filter kf env e =
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
   let l = Rte.exp kf stmt e in
+  let l =
+    match filter with
+    | Some f -> List.filter f l
+    | None -> l
+  in
   translate_rte_annots Printer.pp_exp e kf env l
 
 and translate_named_predicate kf env p =
