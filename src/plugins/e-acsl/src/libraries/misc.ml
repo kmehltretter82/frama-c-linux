@@ -189,6 +189,15 @@ module Id_term =
       let mem_project = Datatype.never_any_project
     end)
 
+let extract_uncoerced_lval e =
+  let rec aux e =
+    match e.enode with
+    | Lval _ -> Some e
+    | CastE (_, e) -> aux e
+    | _ -> None
+  in
+  aux e
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

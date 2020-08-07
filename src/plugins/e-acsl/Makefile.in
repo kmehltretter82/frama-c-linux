@@ -64,7 +64,8 @@ SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
 SRC_CODE_GENERATOR:= \
-	constructor \
+	smart_exp \
+	smart_stmt \
 	gmp \
 	label \
 	env \
