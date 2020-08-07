@@ -64,6 +64,13 @@ genassigns:
   tags:
    - nix
 
+frama-clang:
+  stage: tests
+  script:
+   - nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/0c0fe6d85b92c4e992e314bd6f9943413af9a309.tar.gz -p nix --run "nix/frama-ci.sh build -A frama-clang.tests"
+  tags:
+   - nix
+
 counter-examples:
   stage: tests
   script:
