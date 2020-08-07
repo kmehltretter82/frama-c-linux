@@ -253,7 +253,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | Some p ->
         let e, env = !named_predicate_ref kf (Env.push env) p in
         let stmt, env =
-          Constructor.mk_runtime_check ~reverse:true Constructor.RTE kf e p, env
+          Constructor.mk_runtime_check Constructor.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Cil.mkStmt ~valid_sid:true (Block b) in
