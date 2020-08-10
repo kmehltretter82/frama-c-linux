@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 
 let dkey = Options.dkey_prepare
 
@@ -28,81 +29,69 @@ let dkey = Options.dkey_prepare
 (* Environment *)
 (* ********************************************************************** *)
 
-let fct_tbl: unit Kernel_function.Hashtbl.t = Kernel_function.Hashtbl.create 7
-
-(* The purpose of [actions] is similar to the Frama-C visitor's
-   [get_filling_actions] but we need to fill it outside the visitor. So it is
-   our own version. *)
-let actions = Queue.create ()
-
-(* global table for ensuring that logic info are not shared between a function
-   definition and its duplicate *)
-module Global: sig
-  val add_logic_info: logic_info -> unit
-  val mem_logic_info: logic_info -> bool
+module Dup_functions: sig
+  val generate_vi: varinfo -> varinfo (* return the new varinfo *)
+  val mem: varinfo -> bool
+  val find: varinfo -> varinfo
   val reset: unit -> unit
 end = struct
 
-  let tbl = Cil_datatype.Logic_info.Hashtbl.create 7
-  let add_logic_info x = Cil_datatype.Logic_info.Hashtbl.add tbl x ()
-  let mem_logic_info x = Cil_datatype.Logic_info.Hashtbl.mem tbl x
-  let reset () = Cil_datatype.Logic_info.Hashtbl.clear tbl
+  let tbl: varinfo Varinfo.Hashtbl.t = Varinfo.Hashtbl.create 7
+
+  (* assume [vi] is not already in [tbl] *)
+  let generate_vi vi =
+    let new_name = Functions.RTL.mk_gen_name vi.vname in
+    let new_vi =
+      Cil.makeGlobalVar
+        ~referenced:vi.vreferenced
+        ~loc:vi.vdecl
+        new_name
+        vi.vtype
+    in
+    Varinfo.Hashtbl.add tbl vi new_vi;
+    new_vi
+
+  let mem = Varinfo.Hashtbl.mem tbl
+  let find = Varinfo.Hashtbl.find tbl
+  let reset () = Varinfo.Hashtbl.clear tbl
 
 end
-
-let reset () =
-  Kernel_function.Hashtbl.clear fct_tbl;
-  Global.reset ();
-  Queue.clear actions
 
 (* ********************************************************************** *)
 (* Duplicating a function *)
 (* ********************************************************************** *)
 
-(* [tbl] associates the old formals to the new ones *)
-let dup_funspec tbl bhv spec =
+(* [formals] associates the old formals to the new ones in order to
+   substitute them in [spec]. *)
+let dup_funspec formals spec =
   (*  Options.feedback "DUP SPEC %a" Cil.d_funspec spec;*)
   let o = object
-    inherit Cil.genericCilVisitor bhv
+    inherit Visitor.frama_c_refresh (Project.current ())
 
-    val already_visited = Cil_datatype.Logic_var.Hashtbl.create 7
+    val already_visited = Logic_var.Hashtbl.create 7
 
-    method !vlogic_info_use li =
-      if Global.mem_logic_info li then
-        Cil.ChangeDoChildrenPost
-          ({ li with l_var_info = li.l_var_info } (* force a copy *),
-           Visitor_behavior.Get.logic_info bhv)
-      else
-        Cil.JustCopy
-
-    method !vterm_offset _ =
-      Cil.DoChildrenPost
-        (function (* no way to directly visit fieldinfo and model_info uses *)
-          | TField(fi, off) ->
-            TField(Visitor_behavior.Get.fieldinfo bhv fi, off)
-          | TModel(mi, off) ->
-            TModel(Visitor_behavior.Get.model_info bhv mi, off)
-          | off ->
-            off)
-
+    (* just substituting in [!vvrbl] (when using a varinfo) does not work
+       because varinfo's occurrences are shared in logic_vars, so modifying the
+       varinfo would modify any logic_var based on it, even if it is not part of
+       this [spec] (e.g., if it is in another annotation of the same
+       function) *)
     method !vlogic_var_use orig_lvi =
       match orig_lvi.lv_origin with
       | None ->
         Cil.JustCopy
       | Some vi ->
         try
-          let new_lvi =
-            Cil_datatype.Logic_var.Hashtbl.find already_visited orig_lvi
-          in
+          let new_lvi = Logic_var.Hashtbl.find already_visited orig_lvi in
+          (* recreate sharing of the logic_var in this [spec] *)
           Cil.ChangeTo new_lvi
         with Not_found ->
+          (* first time visiting this logic var *)
           Cil.ChangeDoChildrenPost
             ({ orig_lvi with lv_id = orig_lvi.lv_id } (* force a copy *),
              fun lvi ->
                try
-                 let new_vi = Cil_datatype.Varinfo.Hashtbl.find tbl vi in
-                 Cil_datatype.Logic_var.Hashtbl.add
-                   already_visited orig_lvi lvi;
+                 let new_vi = Varinfo.Hashtbl.find formals vi in
+                 Logic_var.Hashtbl.add already_visited orig_lvi lvi;
                  (* [lvi] is the logic counterpart of a formal varinfo that has
                     been replaced by a new one: propagate this change *)
                  lvi.lv_id <- new_vi.vid;
@@ -112,20 +101,12 @@ let dup_funspec tbl bhv spec =
                  lvi
                with Not_found ->
                  assert vi.vglob;
-                 (* using [Visitor_behavior.Get.logic_var bhv lvi] is correct
-                    only because the lv_id used to compare the lvi does not
-                    change between the original one and this copy *)
-                 Visitor_behavior.Get.logic_var bhv lvi)
+                 lvi)
 
-    method !videntified_term _ =
-      Cil.DoChildrenPost Logic_const.refresh_identified_term
-
-    method !videntified_predicate _ =
-      Cil.DoChildrenPost Logic_const.refresh_predicate
   end in
-  Cil.visitCilFunspec o spec
+  Cil.visitCilFunspec (o :> Cil.cilVisitor) spec
 
-let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
+let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
   new_vi.vdefined <- true;
   let formals = Kernel_function.get_formals kf in
   let mk_formal vi =
@@ -174,9 +155,9 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
   let locals = match res with None -> [] | Some r -> [ r ] in
   let body = Cil.mkBlock stmts in
   body.blocals <- locals;
-  let tbl = Cil_datatype.Varinfo.Hashtbl.create 7 in
-  List.iter2 (Cil_datatype.Varinfo.Hashtbl.add tbl) formals new_formals;
-  let new_spec = dup_funspec tbl bhv spec in
+  let tbl = Varinfo.Hashtbl.create 7 in
+  List.iter2 (Varinfo.Hashtbl.add tbl) formals new_formals;
+  let new_spec = dup_funspec tbl spec in
   let fundec =
     { svar = new_vi;
       sformals = new_formals;
@@ -192,54 +173,69 @@ let dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi =
   Cfg.cfgFun fundec;
   fundec
 
-let dup_global loc actions spec bhv sound_verdict_vi kf vi new_vi =
+let dup_global loc spec sound_verdict_vi kf vi new_vi =
   let name = vi.vname in
   Options.feedback ~dkey ~level:2 "entering in function %s" name;
-  let fundec = dup_fundec loc spec bhv sound_verdict_vi kf vi new_vi  in
-  let fct = Definition(fundec, loc) in
-  let new_spec = fundec.sspec in
-  let new_kf = { fundec = fct; spec = new_spec } in
-  Queue.add
-    (fun () ->
-       Kernel_function.Hashtbl.add fct_tbl new_kf ();
-       Globals.Functions.register new_kf;
-       Globals.Functions.replace_by_definition new_spec fundec loc;
-       Annotations.register_funspec new_kf;
-       if new_vi.vname = "main" then begin
-         (* recompute the info about the old main since its name has changed;
-            see the corresponding part in the main visitor *)
-         Globals.Functions.remove vi;
-         Globals.Functions.register kf
-       end)
-    actions;
-  (* remove the specs attached to the previous kf iff it is a definition:
-     it is necessary to keep stable the number of annotations in order to get
-     [Keep_status] working fine. *)
-  let kf = Visitor_behavior.Get.kernel_function bhv kf in
-  if Kernel_function.is_definition kf then begin
-    Queue.add
-      (fun () ->
-         let bhvs =
-           Annotations.fold_behaviors (fun e b acc -> (e, b) :: acc) kf []
-         in
-         List.iter
-           (fun (e, b) -> Annotations.remove_behavior ~force:true e kf b)
-           bhvs;
-         Annotations.iter_decreases
-           (fun e _ -> Annotations.remove_decreases e kf)
-           kf;
-         Annotations.iter_terminates
-           (fun e _ -> Annotations.remove_terminates e kf)
-           kf;
-         Annotations.iter_complete
-           (fun e l -> Annotations.remove_complete e kf l)
-           kf;
-         Annotations.iter_disjoint
-           (fun e l -> Annotations.remove_disjoint e kf l)
-           kf)
-      actions
+  let new_fundec = dup_fundec loc spec sound_verdict_vi kf vi new_vi  in
+  let new_fct = Definition(new_fundec, loc) in
+  let new_spec = new_fundec.sspec in
+  let new_kf = { fundec = new_fct; spec = new_spec } in
+  Globals.Functions.register new_kf;
+  Globals.Functions.replace_by_definition new_spec new_fundec loc;
+  Annotations.register_funspec new_kf;
+  if Datatype.String.equal new_vi.vname "main" then begin
+    (* recompute kernel's info about the old main since its name has changed;
+       see the corresponding part in the main visitor *)
+    Globals.Functions.remove vi;
+    Globals.Functions.register kf
   end;
-  GFun(fundec, loc), GFunDecl(new_spec, new_vi, loc)
+  (* copy property statuses to the new spec *)
+  let copy old_ip new_ip =
+    let open Property_status in
+    let cp status ep =
+      let e = Emitter.Usable_emitter.get ep.emitter in
+      if ep.logical_consequence
+      then logical_consequence e new_ip ep.properties
+      else emit e new_ip ~hyps:ep.properties status
+    in
+    match get old_ip with
+    | Never_tried ->
+      ()
+    | Best(s, epl) ->
+      List.iter (cp s) epl
+    | Inconsistent icst ->
+      List.iter (cp True) icst.valid;
+      (* either the program is reachable and [False_and_reachable] is
+         fine, or the program point is not reachable and it does not
+         matter for E-ACSL that checks it at runtime. *)
+      List.iter (cp False_and_reachable) icst.invalid
+  in
+  let ips kf s = Property.ip_of_spec kf Kglobal ~active:[] s in
+  List.iter2 copy (ips kf spec) (ips new_kf new_spec);
+  (* remove annotations from the old spec. Yet keep them in functions only
+     declared since, otherwise, the kernel would complain about functions
+     with neither contract nor body  *)
+  if Kernel_function.is_definition kf then begin
+    let old_bhvs =
+      Annotations.fold_behaviors (fun e b acc -> (e, b) :: acc) kf []
+    in
+    List.iter
+      (fun (e, b) -> Annotations.remove_behavior ~force:true e kf b)
+      old_bhvs;
+    Annotations.iter_decreases
+      (fun e _ -> Annotations.remove_decreases e kf)
+      kf;
+    Annotations.iter_terminates
+      (fun e _ -> Annotations.remove_terminates e kf)
+      kf;
+    Annotations.iter_complete
+      (fun e l -> Annotations.remove_complete e kf l)
+      kf;
+    Annotations.iter_disjoint
+      (fun e l -> Annotations.remove_disjoint e kf l)
+      kf
+  end;
+  GFun(new_fundec, loc), GFunDecl(new_spec, new_vi, loc)
 
 (* ********************************************************************** *)
 (* Alignment *)
@@ -293,230 +289,187 @@ let require_alignment vi algn =
   Cil.bitsSizeOf vi.vtype < algn*8 && not (sufficiently_aligned vi algn)
 
 (* ********************************************************************** *)
-(* Visitor *)
+(* Visiting the globals *)
 (* ********************************************************************** *)
 
-class prepare_visitor = object (self)
-  inherit Visitor.frama_c_inplace
+(* perform a few modifications in the [kf]'s code and annotations that are
+   required by E-ACSL's analyses and transformations *)
+let prepare_fundec kf =
+  let o = object
+    inherit Visitor.frama_c_inplace
 
-  val mutable has_new_stmt_in_fundec = false
+    (* table for ensuring absence of term sharing *)
+    val terms = Misc.Id_term.Hashtbl.create 7
 
-  (* ---------------------------------------------------------------------- *)
-  (* visitor's local variable *)
-  (* ---------------------------------------------------------------------- *)
+    (* substitute function's varinfos by their duplicate in function calls *)
+    method !vvrbl vi =
+      try Cil.ChangeTo (Dup_functions.find vi)
+      with Not_found -> Cil.SkipChildren
 
-  val terms = Misc.Id_term.Hashtbl.create 7
-  (* table for ensuring absence of term sharing *)
+    (* temporal analysis requires that attributes are aligned to local
+       variables *)
+    method !vblock _ =
+      if Options.Temporal_validity.get () then
+        Cil.DoChildrenPost
+          (fun blk ->
+             List.iter
+               (fun vi ->
+                  (* 4 bytes alignment is required to allow sufficient space for
+                     storage of 32-bit timestamps in a 1:1 shadow. *)
+                  if require_alignment vi 4 then
+                    vi.vattr <-
+                      Attr("aligned", [ AInt Integer.four ]) :: vi.vattr)
+               blk.blocals;
+             blk)
+      else
+        Cil.DoChildren
 
-  val unduplicable_functions =
-    let white_list =
-      [ "__builtin_va_arg";
-        "__builtin_va_end";
-        "__builtin_va_start";
-        "__builtin_va_copy" ]
-    in
-    List.fold_left
-      (fun acc s -> Datatype.String.Set.add s acc)
-      Datatype.String.Set.empty
-      white_list
-
-  val fct_tbl = Cil_datatype.Varinfo.Hashtbl.create 7
-  val mutable new_definitions: global list = []
-  (* new definitions of the annotated functions which will contain the
-     translation of the E-ACSL contract *)
-
-  (* the variable [sound_verdict] belongs to the E-ACSL's RTL and indicates
-     whether the verdict emitted by E-ACSL is sound. It needs to be visible at
-     that point because it is set in all function duplicates
-     (see [dup_fundec]). *)
-  val mutable sound_verdict_vi =
-    let name = Functions.RTL.mk_api_name "sound_verdict" in
-    let vi = Cil.makeGlobalVar name Cil.intType in
-    vi.vstorage <- Extern;
-    vi.vreferenced <- true;
-    vi
-
-  (* ---------------------------------------------------------------------- *)
-  (* visitor's private methods *)
-  (* ---------------------------------------------------------------------- *)
-
-  method private is_variadic_function vi =
-    match Cil.unrollType vi.vtype with
-    | TFun(_, _, variadic, _) -> variadic
-    | _ -> true
-
-  (* ---------------------------------------------------------------------- *)
-  (* visitor's method overloading *)
-  (* ---------------------------------------------------------------------- *)
-
-  method !vlogic_info_decl li =
-    Global.add_logic_info li;
-    Cil.SkipChildren
-
-  method !vvrbl vi =
-    try
-      let new_vi = Cil_datatype.Varinfo.Hashtbl.find fct_tbl vi in
-      (* replace functions at callsite by its duplicated version *)
-      Cil.ChangeTo new_vi
-    with Not_found ->
-      Cil.SkipChildren
-
-  method !vterm _t =
-    Cil.DoChildrenPost
-      (fun t ->
-         if Misc.Id_term.Hashtbl.mem terms t then
-           (* remove term sharing for soundness of E-ACSL typing
-              (see typing.ml) *)
-           { t with term_node = t.term_node }
-         else begin
-           Misc.Id_term.Hashtbl.add terms t ();
-           t
-         end)
-
-  (* Add align attributes to local variables (required by temporal analysis) *)
-  method !vblock _ =
-    if Options.Temporal_validity.get () then
+    (* remove term sharing introduced by the Frama-C kernel. For instance, an
+       annotation such as [a <= t <= b] is replaced by [a <= t && t <= b] with
+       both occurrences of [t] being shared. Yet, the E-ACSL type system may
+       require to assign them different types. *)
+    method !vterm _ =
       Cil.DoChildrenPost
-        (fun blk ->
-           List.iter
-             (fun vi ->
-                (* 4 bytes alignment is required to allow sufficient space for
-                   storage of 32-bit timestamps in a 1:1 shadow. *)
-                if require_alignment vi 4 then
-                  vi.vattr <-
-                    Attr("aligned", [ AInt Integer.four ]) :: vi.vattr)
-             blk.blocals;
-           blk)
-    else
+        (fun t ->
+           if Misc.Id_term.Hashtbl.mem terms t then
+             { t with term_node = t.term_node }
+           else begin
+             Misc.Id_term.Hashtbl.add terms t ();
+             t
+           end)
+
+    method !videntified_predicate _ =
+      (* when entering a new annotation, clear the context to keep it small:
+         anyway, no sharing is possible between two identified predicates *)
+      Misc.Id_term.Hashtbl.clear terms;
       Cil.DoChildren
 
-  method !vfunc fundec =
-    Cil.DoChildrenPost
-      (fun _ ->
-         if has_new_stmt_in_fundec then begin
-           has_new_stmt_in_fundec <- false;
-           (* recompute the CFG *)
-           Cfg.clearCFGinfo ~clear_id:false fundec;
-           Cfg.cfgFun fundec;
-         end;
-         fundec)
+  end in
+  ignore (Visitor.visitFramacKf o kf)
 
-  method !vglob_aux = function
-    | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc)
-      when (* duplicate a function iff: *)
-        (* it is not already duplicated *)
-        not (Cil_datatype.Varinfo.Hashtbl.mem fct_tbl vi)
-        && (* it is duplicable *)
-        not (Datatype.String.Set.mem vi.vname unduplicable_functions)
-        && (* it is not a variadic function *)
-        not (self#is_variadic_function vi)
-        && (* it is not a built-in *)
-        not (Misc.is_fc_or_compiler_builtin vi)
-        &&
-        (let kf =
-           try Globals.Functions.get vi with Not_found -> assert false
-         in
-         (* either explicitely listed as to be not instrumented *)
-         not (Functions.instrument kf)
-         ||
-         (* or: *)
-         ((* it has a function contract *)
-           not (Cil.is_empty_funspec
-                  (Annotations.funspec ~populate:false
-                     (Extlib.the self#current_kf)))
-           && (* its annotations must be monitored *)
-           Functions.check kf))
-        && (* it is neither malloc nor free *)
-        (* [TODO:] this special case preserves the former behavior.
-           Should be generalized latter by considering only preconditions of
-           libc functions *)
-        vi.vname <> "malloc" && vi.vname <> "calloc" && vi.vname <> "realloc"
-        && vi.vname <> "free"
-      ->
-      let name = Functions.RTL.mk_gen_name vi.vname in
-      let new_vi = Cil.makeGlobalVar name vi.vtype in
-      Cil_datatype.Varinfo.Hashtbl.add fct_tbl vi new_vi;
-      Cil.DoChildrenPost
-        (fun l -> match l with
-           | [ GFunDecl(_, vi, _) | GFun({ svar = vi }, _) as g ]
-             ->
-             let kf = Extlib.the self#current_kf in
-             (match g with
-              | GFunDecl _ ->
-                if not (Kernel_function.is_definition kf) then
-                  Options.warning
-                    "@[annotating undefined function `%a':@ \
-                     the generated program may miss memory instrumentation@ \
-                     if there are memory-related annotations.@]"
-                    Printer.pp_varinfo vi
-              | GFun _ -> ()
-              | _ -> assert false);
-             let tmp = vi.vname in
-             if tmp = "main" then begin
-               (* the new function becomes the new main: *)
-               (* 1. swap the name of both functions *)
-               vi.vname <- new_vi.vname;
-               new_vi.vname <- tmp;
-               (* 2. force recomputation of the entry point if necessary *)
-               if Kernel.MainFunction.get () = tmp then begin
-                 let selection =
-                   State_selection.with_dependencies Kernel.MainFunction.self
-                 in
-                 Project.clear ~selection ()
-               end
-               (* 3. recompute what is necessary in [Globals.Functions]:
-                  done in [dup_global] *)
-             end;
-             let new_g, new_decl =
-               dup_global
-                 loc
-                 self#get_filling_actions
-                 (Annotations.funspec ~populate:false kf)
-                 self#behavior
-                 sound_verdict_vi
-                 kf
-                 vi
-                 new_vi
-             in
-             (* postpone the introduction of the new function definition to the
-                end *)
-             new_definitions <- new_g :: new_definitions;
-             (* put the declaration before the original function in order to
-                solve issue with recursive functions *)
-             [ new_decl; g ]
-           | _ -> assert false)
+(* the variable [sound_verdict] belongs to the E-ACSL's RTL and indicates
+   whether the verdict emitted by E-ACSL is sound. It needs to be visible at
+   that point because it is set in all function duplicates (see
+   [dup_fundec]). *)
+let sound_verdict_vi =
+  lazy
+    (let name = Functions.RTL.mk_api_name "sound_verdict" in
+     let vi = Cil.makeGlobalVar name Cil.intType in
+     vi.vstorage <- Extern;
+     vi.vreferenced <- true;
+     vi)
 
-    | _ ->
-      Cil.DoChildren
+let is_variadic_function vi = match Cil.unrollType vi.vtype with
+  | TFun(_, _, variadic, _) -> variadic
+  | _ -> false
 
-  method !vfile f =
-    Cil.DoChildrenPost
-      (fun _ ->
-         match new_definitions with
-         | [] -> f
-         | _ :: _ ->
-           (* add the generated definitions of libc at the end of
-              [new_definitions]. This way, we are sure that they have access to
-              all of it (in particular, the memory model, GMP and the soundness
-              variable). Also add the [__e_acsl_sound_verdict] variable at the
-              beginning *)
-           let new_globals =
-             GVarDecl(sound_verdict_vi, Cil_datatype.Location.unknown)
-             :: f.globals
-             @ new_definitions
-           in
-           f.globals <- new_globals;
-           f)
+(* set of functions that must never be duplicated *)
+let unduplicable_functions =
+  let white_list =
+    [ "__builtin_va_arg";
+      "__builtin_va_end";
+      "__builtin_va_start";
+      "__builtin_va_copy";
+      (* *alloc and free should not be duplicated. *)
+      (* [TODO:] it preserves the former behavior. Should be modified latter by
+         checking only preconditions for any libc functions *)
+      "malloc";
+      "calloc";
+      "realloc";
+      "free" ]
+  in
+  List.fold_left
+    (fun acc s -> Datatype.String.Set.add s acc)
+    Datatype.String.Set.empty
+    white_list
 
-  initializer
-    reset ()
+let must_duplicate kf vi =
+  (* it is not already duplicated *)
+  not (Dup_functions.mem vi)
+  && (* it is duplicable *)
+  not (Datatype.String.Set.mem vi.vname unduplicable_functions)
+  && (* it is not a variadic function *)
+  not (is_variadic_function vi)
+  && (* it is not a built-in *)
+  not (Misc.is_fc_or_compiler_builtin vi)
+  &&
+  ((* either explicitely listed as to be not instrumented *)
+    not (Functions.instrument kf)
+    ||
+    (* or: *)
+    ((* it has a function contract *)
+      not (Cil.is_empty_funspec (Annotations.funspec ~populate:false kf))
+      && (* its annotations must be monitored *)
+      Functions.check kf))
 
-end
+let prepare_global (globals, new_defs) = function
+  | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc) as g ->
+    let kf = try Globals.Functions.get vi with Not_found -> assert false in
+    if must_duplicate kf vi then begin
+      let new_vi = Dup_functions.generate_vi vi in
+      if Kernel_function.is_definition kf then
+        prepare_fundec kf
+      else
+        (* TODO: this warning could be more precise if emitted during code
+           generation; see also E-ACSL issue #85 about partial verdicts *)
+        Options.warning
+          "@[annotating undefined function `%a':@ \
+           the generated program may miss memory instrumentation@ \
+           if there are memory-related annotations.@]"
+          Printer.pp_varinfo vi;
+      let tmp = vi.vname in
+      if Datatype.String.equal tmp "main" then begin
+        (* the new function becomes the new main: *)
+        (* 1. swap the name of both functions *)
+        vi.vname <- new_vi.vname;
+        new_vi.vname <- tmp;
+        (* 2. force recomputation of the entry point if necessary *)
+        if Kernel.MainFunction.get () = tmp then begin
+          let selection =
+            State_selection.with_dependencies Kernel.MainFunction.self
+          in
+          Project.clear ~selection ()
+        end
+      end;
+      let new_def, new_decl =
+        dup_global
+          loc
+          (Annotations.funspec ~populate:false kf)
+          (Lazy.force sound_verdict_vi)
+          kf
+          vi
+          new_vi
+      in
+      (* postpone the introduction of the new function definition *)
+      let new_defs = new_def :: new_defs in
+      (* put the declaration before the original function in order to solve
+         issues with recursive functions *)
+      g :: new_decl :: globals, new_defs
+    end else begin (* not duplicated *)
+      prepare_fundec kf;
+      g :: globals, new_defs
+    end
+  | g ->
+    (* nothing to do for globals that are not functions *)
+    g :: globals, new_defs
+
+let prepare_file file =
+  Dup_functions.reset ();
+  let rev_globals, new_defs =
+    List.fold_left prepare_global ([], []) file.globals
+  in
+  match new_defs with
+  | [] -> ()
+  | _ :: _ ->
+    (* insert the new_definitions at the end and reverse back the globals *)
+    let globals = List.fold_left (fun acc g -> g :: acc) new_defs rev_globals in
+    (* insert [__e_acsl_sound_verdict] at the beginning *)
+    let sg = GVarDecl(Lazy.force sound_verdict_vi, Location.unknown) in
+    file.globals <- sg :: globals
 
 let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";
-  Visitor.visitFramacFile (new prepare_visitor) (Ast.get ());
-  Queue.iter (fun f -> f ()) actions;
+  prepare_file (Ast.get ());
   Ast.mark_as_grown ()
 
 (*
