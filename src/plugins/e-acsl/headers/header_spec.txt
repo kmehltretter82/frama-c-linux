@@ -100,8 +100,8 @@ src/local_config.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/main.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/options.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/project_initializer/keep_status.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/project_initializer/keep_status.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/project_initializer/rtl.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/project_initializer/rtl.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/project_initializer/prepare_ast.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 tests/print.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
