@@ -37,18 +37,18 @@ type extension_visitor =
 type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
-type extension_part1 = {
+type extension_standard = {
   preprocessor: extension_preprocessor ;
   typer: extension_typer ;
   status: bool ;
 }
-type extension_part2 = {
+type extension_commun = {
   category: ext_category ;
   visitor: extension_visitor ;
   printer: extension_printer ;
   short_printer: extension_printer ;
 }
-type extension_part3 = {
+type extension_block = {
   preprocessor: extension_preprocessor_block ;
   typer: extension_typer_block ;
   status: bool ;
@@ -89,7 +89,7 @@ let make
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer name)
     ?(short_printer=default_short_printer name)
-    status : extension_part1*extension_part2 =
+    status : extension_standard*extension_commun =
   { preprocessor; typer; status},{ category; visitor; printer; short_printer }
 
 let make_block
@@ -99,7 +99,7 @@ let make_block
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer name)
     ?(short_printer=default_short_printer name)
-    status : extension_part3*extension_part2 =
+    status : extension_block*extension_commun =
   { preprocessor; typer; status},{ category; visitor; printer; short_printer }
 
 module Extensions = struct
@@ -112,15 +112,15 @@ module Extensions = struct
   (*hash table for status, preprocessor and visitor of block extensions*)
   let ext_block_tbl = Hashtbl.create 5
 
-  let find_part1 name :extension_part1 =
+  let find_standard name :extension_standard =
     try Hashtbl.find ext_sta_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
-  let find_part2 name :extension_part2 =
+  let find_commun name :extension_commun =
     try Hashtbl.find ext_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
-  let find_part3 name :extension_part3 =
+  let find_block name :extension_block =
     try Hashtbl.find ext_block_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
@@ -162,12 +162,12 @@ module Extensions = struct
         Hashtbl.add ext_tbl name info2
       end
 
- let preprocess name = (find_part1 name).preprocessor
+ let preprocess name = (find_standard name).preprocessor
 
- let preprocess_block name = (find_part3 name).preprocessor
+ let preprocess_block name = (find_block name).preprocessor
 
  let typing name typing_context loc es =
-    let ext_info = find_part1 name in
+    let ext_info = find_standard name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
     let normal_error = ref false in
@@ -183,7 +183,7 @@ module Extensions = struct
         name (Printexc.to_string exn)
 
  let typing_block name typing_context loc es =
-    let ext_info = find_part3 name in
+    let ext_info = find_block name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
     let normal_error = ref false in
@@ -198,14 +198,14 @@ module Extensions = struct
       Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
         name (Printexc.to_string exn)
 
-  let visit name = (find_part2 name).visitor
+  let visit name = (find_commun name).visitor
 
   let print name printer fmt kind =
-    let pp = (find_part2 name).printer in
+    let pp = (find_commun name).printer in
     pp printer fmt kind
 
   let short_print name printer fmt kind =
-    let pp = (find_part2 name).short_printer in
+    let pp = (find_commun name).short_printer in
     Format.fprintf fmt "%a" (pp printer) kind
 end
 
@@ -248,13 +248,13 @@ let () =
 (* For Deprecation: *)
 
 let deprecated_replace name ext =
-  let info1:extension_part1 = {
+  let info1:extension_standard = {
     preprocessor = ext.preprocessor ;
     typer = ext.typer ;
     status = ext.status ;
   }
   in
-  let info2:extension_part2  = {
+  let info2:extension_commun  = {
     category = ext.category ;
     visitor = ext.visitor ;
     printer = ext.printer ;
@@ -268,7 +268,7 @@ let strong_cat = Hashtbl.create 5
 
 let default_typer _typing_context _loc _l = assert false
 
-let merge ((info1:extension_part1),(info2:extension_part2)) :extension =
+let merge ((info1:extension_standard),(info2:extension_commun)) :extension =
     {preprocessor = info1.preprocessor ;
     typer = info1.typer ;
     status = info1.status ;
@@ -283,7 +283,7 @@ let deprecated_find ?(strong=true) name cat op_name =
     if strong then Hashtbl.add strong_cat name cat ;
     merge (make name cat default_typer false)
   | Some ext1 ->
-    let ext2 = Extensions.find_part2 name in
+    let ext2 = Extensions.find_commun name in
     if strong && Hashtbl.mem strong_cat name then begin
       if ext2.category = cat then merge (ext1,ext2)
       else
