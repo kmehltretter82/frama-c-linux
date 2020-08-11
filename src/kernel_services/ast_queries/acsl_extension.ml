@@ -68,7 +68,7 @@ let default_printer printer fmt = function
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
   | Ext_annot (_,an) -> Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
-                                 printer#extended fmt an
+                          printer#extended fmt an
 
 let default_short_printer name printer fmt = function
   | Ext_id _ | Ext_terms _ | Ext_preds _ -> Format.fprintf fmt "%s" name
@@ -140,7 +140,7 @@ module Extensions = struct
         Hashtbl.add ext_tbl name info2
       end
 
- let register_block
+  let register_block
       cat name ?preprocessor typer ?visitor ?printer ?short_printer status =
     let info1,info2 =
       make_block name cat ?preprocessor typer ?visitor ?printer ?short_printer status
@@ -155,11 +155,11 @@ module Extensions = struct
         Hashtbl.add ext_tbl name info2
       end
 
- let preprocess name = (find_standard name).preprocessor
+  let preprocess name = (find_standard name).preprocessor
 
- let preprocess_block name = (find_block name).preprocessor
+  let preprocess_block name = (find_block name).preprocessor
 
- let typing name typing_context loc es =
+  let typing name typing_context loc es =
     let ext_info = find_standard name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
@@ -175,7 +175,7 @@ module Extensions = struct
       Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
         name (Printexc.to_string exn)
 
- let typing_block name typing_context loc es =
+  let typing_block name typing_context loc es =
     let ext_info = find_block name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
@@ -266,13 +266,13 @@ let strong_cat = Hashtbl.create 5
 let default_typer _typing_context _loc _l = assert false
 
 let merge ((info1:extension_standard),(info2:extension_commun)) :extension =
-    {preprocessor = info1.preprocessor ;
-    typer = info1.typer ;
-    status = info1.status ;
-    category = info2.category ;
-    visitor = info2.visitor ;
-    printer = info2.printer ;
-    short_printer = info2.printer}
+  {preprocessor = info1.preprocessor ;
+   typer = info1.typer ;
+   status = info1.status ;
+   category = info2.category ;
+   visitor = info2.visitor ;
+   printer = info2.printer ;
+   short_printer = info2.printer}
 
 let deprecated_find ?(strong=true) name cat op_name =
   match Hashtbl.find_opt Extensions.ext_sta_tbl name with
