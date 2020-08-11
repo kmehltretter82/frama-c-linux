@@ -40,7 +40,7 @@ let print_bar prt fmt ext =
     let l = Bar_table.find idx in
     Pretty_utils.pp_list
       ~pre:"@[<hov 2>" ~sep:",@ " ~suf:"@]" prt#predicate fmt l
-  | Ext_preds _ | Ext_terms _ ->
+  | Ext_preds _ | Ext_terms _ | Ext_annot _->
     Kernel.fatal "bar extension should have ids as arguments"
 
 let visit_bar vis ext =
@@ -56,7 +56,7 @@ let visit_bar vis ext =
       Bar_table.replace idx l';
       Cil.SkipChildren
     end
-  | Ext_terms _ | Ext_preds _ ->
+  | Ext_terms _ | Ext_preds _ | Ext_annot _ ->
       Kernel.fatal "bar extension should have ids as arguments"
 
 let type_baz typing_context _loc l =
