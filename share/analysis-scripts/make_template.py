@@ -250,7 +250,7 @@ gnumakefile.write_text("".join(lines))
 
 print(f"Template created: {gnumakefile}")
 
-if not framac_in_path:
+if not "PTESTS_TESTING" in os.environ and not framac_in_path:
     print(f"Frama-C not in path, adding path.mk to {dir}")
     frama_c_script = bindir / "frama-c-script"
     os.system(f"{frama_c_script} make-path {dir}")
