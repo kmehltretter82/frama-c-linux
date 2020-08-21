@@ -410,7 +410,7 @@ let safe_remove_file (f : Datatype.Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
     Extlib.safe_remove (f :> string)
 
-let build_cpp_cmd cmdl supp_args in_file out_file =
+let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
   let in_file = Filename.quote in_file
@@ -428,16 +428,10 @@ let build_cpp_cmd cmdl supp_args in_file out_file =
     ignore (Str.search_forward regexp cmdl 0); (* Try to find one match *)
     Str.global_substitute regexp substitute cmdl
   with Not_found ->
-    Format.sprintf "%s %s -o %s %s" cmdl supp_args out_file in_file
+    Format.sprintf "%s %s %s -o %s" cmdl supp_args in_file out_file
 
-let parse_cabs = function
-  | NoCPP f ->
-    if not (Sys.file_exists (f:>string)) then
-      Kernel.abort "preprocessed file %a does not exist"
-        Filepath.Normalized.pretty f;
-    Kernel.feedback "Parsing %a (no preprocessing)"
-      Datatype.Filepath.pretty f;
-    Frontc.parse f ()
+let build_cpp_cmd = function
+  | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, is_gnu_like) ->
     if not (Sys.file_exists (f :> string)) then
       Kernel.abort "source file %a does not exist"
@@ -525,12 +519,24 @@ let parse_cabs = function
         (Kernel.CppExtraArgs.get () @ extra_args @ supported_cpp_arch_args)
         include_args define_args
     in
+    let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     Kernel.feedback ~dkey:Kernel.dkey_pp
-      "@{<i>preprocessing@} with \"%s %s %a\""
-      cmdl supp_args Filepath.Normalized.pretty f;
+      "@{<i>preprocessing@} with \"%s\""
+      cpp_command;
+    Some (cpp_command, ppf, supported_cpp_arch_args)
+
+let parse_cabs cpp_command_no_output = function
+  | NoCPP f ->
+    if not (Sys.file_exists (f:>string)) then
+      Kernel.abort "preprocessed file %a does not exist"
+        Filepath.Normalized.pretty f;
+    Kernel.feedback "Parsing %a (no preprocessing)"
+      Datatype.Filepath.pretty f;
+    Frontc.parse f ()
+  | NeedCPP (f, cmdl, is_gnu_like) ->
+    let cpp_command, ppf, supported_cpp_arch_args = Extlib.the cpp_command_no_output in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
-    let cpp_command = build_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
       let possible_cause =
@@ -579,7 +585,7 @@ let parse_cabs = function
         in
         let ppf' =
           try Logic_preprocess.file ".c"
-                (build_cpp_cmd cmdl pp_annot_supp_args)
+                (replace_in_cpp_cmd cmdl pp_annot_supp_args)
                 (ppf : Filepath.Normalized.t :> string)
           with Sys_error _ as e ->
             safe_remove_file ppf;
@@ -607,9 +613,10 @@ let parse_cabs = function
         "could not find a suitable plugin for parsing %a."
         Filepath.Normalized.pretty f
 
-let to_cil_cabs f =
+let to_cil_cabs cpp_cmds_and_args f =
   try
-    let a,c = parse_cabs f in
+    let cpp_command = List.assoc f cpp_cmds_and_args in
+    let a,c = parse_cabs cpp_command f in
     Kernel.debug ~dkey:Kernel.dkey_file_print_one "result of parsing %s:@\n%a"
       (get_name f) Cil_printer.pp_file a;
     if Errorloc.had_errors () then raise Exit;
@@ -630,7 +637,7 @@ let to_cil_cabs f =
 let () =
   let handle f =
     let preprocess =
-      build_cpp_cmd (fst (get_preprocessor_command ())) "-nostdinc"
+      replace_in_cpp_cmd (fst (get_preprocessor_command ())) "-nostdinc"
     in
     let ppf =
       try Logic_preprocess.file ".c" preprocess f
@@ -667,12 +674,12 @@ let isRoot g =
     keepTypes
   | _ -> false
 
-let files_to_cabs_cil files =
+let files_to_cabs_cil files cpp_commands =
   Kernel.feedback ~level:2 "parsing";
   (* Parsing and merging must occur in the very same order.
      Otherwise the order of files on the command line will not be consistently
      handled. *)
-  let cil_cabs = List.fold_left (fun acc f -> to_cil_cabs f :: acc) [] files in
+  let cil_cabs = List.fold_left (fun acc f -> to_cil_cabs cpp_commands f :: acc) [] files in
   let cil_files, cabs_files = List.split cil_cabs in
   (* fold_left reverses the list order.
      This is an issue with pre-registered files. *)
@@ -1601,7 +1608,18 @@ let init_cil () =
 let prepare_from_c_files () =
   init_cil ();
   let files = Files.get () in (* Allow pre-registration of prolog files *)
-  let cil, cabs_files = files_to_cabs_cil files in
+  let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
+  if Kernel.PrintCppCommands.get () then begin
+    List.iter (fun (_f, opt_cpp_cmd) ->
+        match opt_cpp_cmd with
+        | None -> ()
+        | Some (cpp_cmd, _ppf, _) ->
+          Kernel.result
+            "Preprocessing command:@.%s" cpp_cmd
+      ) cpp_commands;
+    raise Cmdline.Exit
+  end;
+  let cil, cabs_files = files_to_cabs_cil files cpp_commands in
   prepare_cil_file cil;
   (* prepare_cil_file may call syntactic transformers, that will ultimately
      reset the untyped AST. Restore it here. *)
