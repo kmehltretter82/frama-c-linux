@@ -218,7 +218,7 @@ rec {
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
-        frama-clang_src = plugins.frama-clang.src;
+        frama_clang_src = plugins.frama-clang.src;
         pathcrawler_src = plugins.pathcrawler.src;
         mthread_src = plugins.mthread.src;
         caveat_importer_src = plugins.caveat-importer.src;
@@ -234,7 +234,7 @@ rec {
            chmod -R u+w -- "$sourceRoot/src/plugins/counter-examples"
            cp -r --preserve=mode "$genassigns_src" "$sourceRoot/src/plugins/genassigns"
            chmod -R u+w -- "$sourceRoot/src/plugins/genassigns"
-           cp -r --preserve=mode "${frama-clang_src}" "$sourceRoot/src/plugins/frama-clang"
+           cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
            chmod -R u+w -- "$sourceRoot/src/plugins/frama-clang"
            cp -r --preserve=mode "$pathcrawler_src" "$sourceRoot/src/plugins/pathcrawler"
            chmod -R u+w -- "$sourceRoot/src/plugins/pathcrawler"
