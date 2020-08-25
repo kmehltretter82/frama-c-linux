@@ -404,6 +404,10 @@ val add_listener : ?plugin:string -> ?kind:kind list -> (event -> unit) -> unit
 (** Register a hook that is called each time an event is
     emitted. Applies to all channel unless specified,
     and all kind of messages unless specified.
+
+    Warning: when executing the listener, all listeners will be
+    temporarily deactivated in order to avoid infinite recursion.
+
     @since Beryllium-20090601-beta1
     @plugin development guide *)
 

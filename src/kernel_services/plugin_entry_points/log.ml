@@ -419,7 +419,17 @@ let check_not_yet = ref (fun _evt -> false)
 (* --- Listeners                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let do_fire e f = f e
+let firelock = ref false
+
+let do_fire e f =
+  if !firelock then f e else
+    try
+      firelock := true ;
+      f e ;
+      firelock := false
+    with exn ->
+      firelock := false ;
+      raise exn
 
 let iter_kind ?kind f ems =
   match kind with
@@ -518,7 +528,8 @@ let logwithfinal finally channel
                  if echo && e.echo then
                    do_echo channel.terminal event ;
                  Extlib.may (do_fire event) emitwith;
-                 if fire then List.iter (do_fire event) e.listeners ;
+                 if fire && not !firelock then
+                   List.iter (do_fire event) e.listeners ;
                  Some event
                end
              else None
