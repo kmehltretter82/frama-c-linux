@@ -303,13 +303,14 @@ export class RichTextBuffer extends Emitter {
     }
   }
 
-  /** Lookup for the text markers associated with a marker identifier. */
+  /** Lookup for the text markers associated with a marker identifier.
+      Remove the marked tags from the buffered tag array. */
   findTextMarker(id: string): CodeMirror.TextMarker[] {
     this.doFlushText();
-    this.bufferedTags.forEach((tg, idx, arr) => {
+    this.bufferedTags.forEach((tg, idx) => {
       if (tg?.id === id) {
         this.doMark(tg);
-        arr[idx] = undefined;
+        this.bufferedTags[idx] = undefined;
       }
     });
     return this.textmarkers.get(id) ?? [];

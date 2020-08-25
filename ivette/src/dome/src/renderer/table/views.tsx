@@ -1000,6 +1000,7 @@ function makeResizers(
 const CSS_HEADER_HEIGHT = 22;
 const CSS_ROW_HEIGHT = 20;
 
+// Modifies state in place
 function makeTable<Key, Row>(
   props: TableProps<Key, Row>,
   state: TableState<Key, Row>,
@@ -1017,11 +1018,13 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
+  /* eslint-disable no-param-reassign */
   state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
+  /* eslint-enable no-param-reassign */
 
   return (
     <div onKeyDown={state.onKeyDown}>
@@ -1087,7 +1090,7 @@ function makeTable<Key, Row>(
 
    @template Key - unique identifiers of table entries.
    @template Row - data associated to each key in the table entries.
-*/
+ */
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 

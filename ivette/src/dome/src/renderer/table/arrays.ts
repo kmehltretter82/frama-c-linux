@@ -108,7 +108,8 @@ export class ArrayModel<Key, Row>
     return current;
   }
 
-  // Lazily compute table
+  // Lazily compute table ; modifies packed entries in place
+  /* eslint-disable no-param-reassign */
   protected rebuild(): PACK<Key, Row>[] {
     const current = this.table;
     let filtered = 0;
@@ -127,11 +128,12 @@ export class ArrayModel<Key, Row>
     } catch (err) {
       console.warn('[Dome] error when rebuilding table:', err);
     }
-    table.forEach((pack, index) => { pack.index = index; });
+    table.forEach((packed, index) => { packed.index = index; });
     this.table = table;
     this.filtered = filtered;
     return table;
   }
+  /* eslint-enable no-param-reassign */
 
   // --------------------------------------------------------------------------
   // --- Proxy
