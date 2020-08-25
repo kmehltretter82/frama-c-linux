@@ -81,9 +81,15 @@ let syntax_error loc msg =
     ((snd loc).Lexing.pos_cnum - (fst loc).Lexing.pos_bol)
     msg
 
+(* Performs some checks before calling [open_in f].
+   Raises [Not_found] in case of error. *)
+let safe_open_in f =
+  if not (Sys.file_exists f) || (Sys.is_directory f) then raise Not_found;
+  open_in f
+
 let ltl_to_ltlLight f_ltl f_out =
   try
-    let c = open_in f_ltl in
+    let c = safe_open_in f_ltl in
     let (ltl_form,exprs) = Ltllexer.parse c in
     close_in c;
     Ltl_output.output ltl_form f_out;
@@ -94,7 +100,7 @@ let ltl_to_ltlLight f_ltl f_out =
 
 let load_ya_file f  =
   try
-    let c = open_in f in
+    let c = safe_open_in f in
     let automata = Yalexer.parse c  in
     close_in c;
     Data_for_aorai.setAutomata automata;
@@ -104,7 +110,7 @@ let load_ya_file f  =
 
 let load_promela_file f  =
   try
-    let c = open_in f in
+    let c = safe_open_in f in
     let (s,t) = Promelalexer.parse c  in
     let t = convert_ltl_exprs t in
     close_in c;
@@ -115,7 +121,7 @@ let load_promela_file f  =
 
 let load_promela_file_withexps f  =
   try
-    let c = open_in f in
+    let c = safe_open_in f in
     let automata = Promelalexer_withexps.parse c  in
     close_in c;
     Data_for_aorai.setAutomata automata;
@@ -170,25 +176,25 @@ let init_file_names () =
 
   (* The output C file has to be a valid file name if it is used. *)
   output_c_file := (Aorai_option.Output_C_File.get ()) ;
-  if (!output_c_file="") then output_c_file:=freshname ((Filename.chop_extension !c_file)^"_annot") ".c";
+  if (!output_c_file="") then output_c_file:=freshname ((Filename.remove_extension !c_file)^"_annot") ".c";
   (*   else if Sys.file_exists !output_c_file then dispErr "already exists" !output_c_file; *)
 
   if Aorai_option.Dot.get () then
-    dot_file:=freshname (Filename.chop_extension !c_file) ".dot";
+    dot_file:=freshname (Filename.remove_extension !c_file) ".dot";
 
   if Aorai_option.Ya.get () = "" then
     if Aorai_option.Buchi.get () = "" then begin
       (* ltl_file name is given and has to point out a valid file. *)
       ltl_file := Aorai_option.Ltl_File.get ();
-      if (!ltl_file="") then dispErr ": invalid LTL file name" !ltl_file;
       if (not (Sys.file_exists !ltl_file)) then dispErr "not found" !ltl_file;
+      if (!ltl_file="" || Sys.is_directory !ltl_file) then dispErr ": invalid LTL file name" !ltl_file;
 
       (* The LTL file is always used. *)
       (* The promela file can be given or not. *)
       if Aorai_option.To_Buchi.get () <> "" then begin
         ltl_tmp_file:=
           freshname
-          (Filename.chop_extension
+          (Filename.remove_extension
              (Aorai_option.promela_file ())) ".ltl";
         promela_file:= Aorai_option.promela_file ();
         Extlib.cleanup_at_exit !ltl_tmp_file
@@ -200,7 +206,7 @@ let init_file_names () =
            with Extlib.Temp_file_error s ->
              Aorai_option.abort "cannot create temporary file: %s" s);
         promela_file:=
-          freshname (Filename.chop_extension !ltl_tmp_file) ".promela";
+          freshname (Filename.remove_extension !ltl_tmp_file) ".promela";
         Extlib.cleanup_at_exit !promela_file;
       end
     end else begin
