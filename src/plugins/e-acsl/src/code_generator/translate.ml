@@ -141,7 +141,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
             None
             new_ty
             (fun v _ ->
-               [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname [ e ] ])
+               [ Smart_stmt.lib_call ~loc ~result:(Cil.var v) fname [ e ] ])
         in
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
@@ -229,7 +229,7 @@ let conditional_to_exp ?(name="if") loc kf t_opt e1 (e2, env2) (e3, env3) =
              let s = affect e3 in
              Env.pop_and_get env3 s ~global_clear:false Env.Middle
            in
-           [ Constructor.mk_if ~loc ~cond:e1 then_blk ~else_blk ])
+           [ Smart_stmt.if_stmt ~loc ~cond:e1 then_blk ~else_blk ])
     in
     e, env
 
@@ -276,7 +276,7 @@ and context_insensitive_term_to_exp kf env t =
     c, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
-    Constructor.mk_lval ~loc lv, env, C_number, name
+    Smart_exp.lval ~loc lv, env, C_number, name
   | TSizeOf ty -> Cil.sizeOf ~loc ty, env, C_number, "sizeof"
   | TSizeOfE t ->
     let e, env = term_to_exp kf env t in
@@ -303,7 +303,7 @@ and context_insensitive_term_to_exp kf env t =
           kf
           ~name:vname
           (Some t)
-          (fun _ ev -> [ Constructor.mk_lib_call ~loc name [ ev; e ] ])
+          (fun _ ev -> [ Smart_stmt.lib_call ~loc name [ ev; e ] ])
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
@@ -332,7 +332,7 @@ and context_insensitive_term_to_exp kf env t =
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
       let name = name_of_mpz_arith_bop bop in
-      let mk_stmts _ e = [ Constructor.mk_lib_call ~loc name [ e; e1; e2 ] ] in
+      let mk_stmts _ e = [ Smart_stmt.lib_call ~loc name [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
         Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
@@ -370,14 +370,14 @@ and context_insensitive_term_to_exp kf env t =
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let cond =
-          Constructor.mk_runtime_check
+          Smart_stmt.runtime_check
             (Env.annotation_kind env)
             kf
             guard
             p
         in
         Env.add_assert kf cond p;
-        let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -435,7 +435,7 @@ and context_insensitive_term_to_exp kf env t =
             (fun vi _e ->
                let result = Cil.var vi in
                let fname = "__gmpz_fits_ulong_p" in
-               [ Constructor.mk_lib_call ~loc ~result fname [ e2 ] ])
+               [ Smart_stmt.lib_call ~loc ~result fname [ e2 ] ])
         in
         e, env
       in
@@ -454,8 +454,8 @@ and context_insensitive_term_to_exp kf env t =
           in
           let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
           let pred = { pred with pred_name = pname :: pred.pred_name } in
-          let cond = Constructor.mk_runtime_check
-              Constructor.RTE
+          let cond = Smart_stmt.runtime_check
+              Smart_stmt.RTE
               kf
               coerce_guard
               pred
@@ -465,7 +465,7 @@ and context_insensitive_term_to_exp kf env t =
         in
         let result = Cil.var vi in
         let name = "__gmpz_get_ui" in
-        let instr = Constructor.mk_lib_call ~loc ~result name [ e2 ] in
+        let instr = Smart_stmt.lib_call ~loc ~result name [ e2 ] in
         [ coerce_guard_cond; instr ]
       in
       let name = e2_name ^ bop_name ^ "_coerced" in
@@ -484,7 +484,7 @@ and context_insensitive_term_to_exp kf env t =
       (* Create the shift instruction *)
       let mk_shift_instr result_e =
         let name = name_of_mpz_arith_bop bop in
-        Constructor.mk_lib_call ~loc name [ result_e; e1; e2_as_bitcnt_e ]
+        Smart_stmt.lib_call ~loc name [ result_e; e1; e2_as_bitcnt_e ]
       in
 
       (* Put t in an option to use with comparison_to_exp and
@@ -515,8 +515,8 @@ and context_insensitive_term_to_exp kf env t =
           in
           let e1_guard_cond =
             let pred = Logic_const.prel ~loc (Rge, t1, zero) in
-            let cond = Constructor.mk_runtime_check
-                Constructor.RTE
+            let cond = Smart_stmt.runtime_check
+                Smart_stmt.RTE
                 kf
                 e1_guard
                 pred
@@ -568,7 +568,7 @@ and context_insensitive_term_to_exp kf env t =
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
         let name = name_of_mpz_arith_bop bop in
-        let instr = Constructor.mk_lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
         [ instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -646,7 +646,7 @@ and context_insensitive_term_to_exp kf env t =
           (Some t)
           (Misc.cty (Extlib.the li.l_type))
           (fun vi _ ->
-             [ Constructor.mk_lib_call ~loc ~result:(Cil.var vi) fname args ])
+             [ Smart_stmt.lib_call ~loc ~result:(Cil.var vi) fname args ])
       else
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, env =
@@ -788,7 +788,7 @@ and comparison_to_exp
             ~name
             Cil.intType
             (fun v _ ->
-               [ Constructor.mk_lib_call ~loc
+               [ Smart_stmt.lib_call ~loc
                    ~result:(Cil.var v)
                    "__gmpz_cmp"
                    [ e1; e2 ] ])
@@ -855,7 +855,7 @@ and env_of_li li kf env loc =
   let e, env = term_to_exp kf env t in
   let stmt = match Typing.get_number_ty t with
     | Typing.(C_integer _ | C_float _ | Nan) ->
-      Constructor.mk_assigns ~loc ~result:(Cil.var vi) e
+      Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
     | Typing.Gmpz ->
       Gmp.init_set ~loc (Cil.var vi) vi_e e
     | Typing.Rational ->
@@ -1033,7 +1033,7 @@ and translate_rte_annots:
   fun pp elt kf env l ->
   let old_valid = !is_visiting_valid in
   let old_kind = Env.annotation_kind env in
-  let env = Env.set_annotation_kind env Constructor.RTE in
+  let env = Env.set_annotation_kind env Smart_stmt.RTE in
   let env =
     List.fold_left
       (fun env a -> match a.annot_content with
@@ -1078,7 +1078,7 @@ and translate_named_predicate kf env p =
   Env.add_stmt
     env
     kf
-    (Constructor.mk_runtime_check
+    (Smart_stmt.runtime_check
        (Env.annotation_kind env)
        kf
        e
@@ -1168,7 +1168,7 @@ let assumes_predicate bhv =
     bhv.b_assumes
 
 let translate_preconditions kf kinstr env behaviors =
-  let env = Env.set_annotation_kind env Constructor.Precondition in
+  let env = Env.set_annotation_kind env Smart_stmt.Precondition in
   let do_behavior env b =
     let assumes_pred = assumes_predicate b in
     List.fold_left
@@ -1193,7 +1193,7 @@ let translate_preconditions kf kinstr env behaviors =
   List.fold_left do_behavior env behaviors
 
 let translate_postconditions kf kinstr env behaviors =
-  let env = Env.set_annotation_kind env Constructor.Postcondition in
+  let env = Env.set_annotation_kind env Smart_stmt.Postcondition in
   (* generate one guard by postcondition of each behavior *)
   let do_behavior env b =
     let env =
@@ -1284,7 +1284,7 @@ let translate_pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
     | AAssert(l, _, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
-        let env = Env.set_annotation_kind env Constructor.Assertion in
+        let env = Env.set_annotation_kind env Smart_stmt.Assertion in
         if l <> [] then
           not_yet env "@[assertion applied only on some behaviors@]";
         translate_named_predicate kf env p
@@ -1296,7 +1296,7 @@ let translate_pre_code_annotation kf stmt env annot =
       translate_pre_spec kf (Kstmt stmt) env spec ;
     | AInvariant(l, loop_invariant, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
-        let env = Env.set_annotation_kind env Constructor.Invariant in
+        let env = Env.set_annotation_kind env Smart_stmt.Invariant in
         if l <> [] then
           not_yet env "@[invariant applied only on some behaviors@]";
         let env = translate_named_predicate kf env p in

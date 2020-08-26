@@ -260,7 +260,7 @@ let to_exp ~loc kf env pot label =
              let e_size, _ = term_to_exp kf env t_size in
              let e_size = Cil.constFold false e_size in
              let malloc_stmt =
-               Constructor.mk_lib_call ~loc
+               Smart_stmt.lib_call ~loc
                  ~result:(Cil.var vi)
                  "malloc"
                  [ e_size ]
@@ -273,7 +273,7 @@ let to_exp ~loc kf env pot label =
            | Typing.(Rational | Real | Nan) ->
              Error.not_yet "quantification over non-integer type"
          in
-         let free_stmt = Constructor.mk_lib_call ~loc "free" [e] in
+         let free_stmt = Smart_stmt.lib_call ~loc "free" [e] in
          (* The list of stmts returned by the current closure are inserted
             LOCALLY to the block where the new var is FIRST used, whatever scope
             is indicated to [Env.new_var].
@@ -296,14 +296,14 @@ let to_exp ~loc kf env pot label =
       let e, env = named_predicate_to_exp kf env p in
       let e = Cil.constFold false e in
       let storing_stmt =
-        Constructor.mk_assigns ~loc ~result:lval e
+        Smart_stmt.assigns ~loc ~result:lval e
       in
       let block, env =
         Env.pop_and_get env storing_stmt ~global_clear:false Env.After
       in
       (* We CANNOT return [block.bstmts] because it does NOT contain
          variable declarations. *)
-      [ Constructor.mk_block_stmt block ], env
+      [ Smart_stmt.block_stmt block ], env
     | Lscope.PoT_term t ->
       begin match Typing.get_number_ty t with
         | Typing.(C_integer _ | C_float _ | Nan) ->
@@ -312,14 +312,14 @@ let to_exp ~loc kf env pot label =
           let e, env = term_to_exp kf env t in
           let e = Cil.constFold false e in
           let storing_stmt =
-            Constructor.mk_assigns ~loc ~result:lval e
+            Smart_stmt.assigns ~loc ~result:lval e
           in
           let block, env =
             Env.pop_and_get env storing_stmt ~global_clear:false Env.After
           in
           (* We CANNOT return [block.bstmts] because it does NOT contain
              variable declarations. *)
-          [ Constructor.mk_block_stmt block ], env
+          [ Smart_stmt.block_stmt block ], env
         | Typing.(Rational | Real) ->
           Error.not_yet "\\at on purely logic variables and over real type"
         | Typing.Gmpz ->
@@ -335,7 +335,7 @@ let to_exp ~loc kf env pot label =
   let storing_loops_block = Cil.mkBlock storing_loops_stmts in
   let storing_loops_block, env = Env.pop_and_get
       env
-      (Constructor.mk_block_stmt storing_loops_block)
+      (Smart_stmt.block_stmt storing_loops_block)
       ~global_clear:false
       Env.After
   in
@@ -343,7 +343,7 @@ let to_exp ~loc kf env pot label =
   let env = put_block_at_label env kf storing_loops_block label in
   (* Returning *)
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-  let e = Constructor.mk_lval ~loc lval_at_index in
+  let e = Smart_exp.lval ~loc lval_at_index in
   e, env
 
 (*
