@@ -214,7 +214,9 @@ rec {
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt
-                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
+                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
+                      pkgs.swiProlog
+                      stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
@@ -226,6 +228,7 @@ rec {
         volatile_src = plugins.volatile.src;
         security_src = plugins.security.src;
         context_from_precondition_src = plugins.context-from-precondition.src;
+        metacsl_src = plugins.meta.src;
         postPatch = ''
                patchShebangs .
         '';

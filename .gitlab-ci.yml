@@ -92,6 +92,13 @@ volatile:
   tags:
    - nix
 
+metacsl:
+  stage: tests
+  script:
+  - nix/frama-ci.sh build -A meta.tests
+  tags:
+  - nix
+
 Security:
   stage: tests
   script:
