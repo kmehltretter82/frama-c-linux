@@ -26,7 +26,7 @@
 
 (**
     Structural representation of logic labels.
-    Compatible with pervasives comparison and structural equality.
+    Compatible with stdlib comparison and structural equality.
 *)
 
 type c_label

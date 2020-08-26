@@ -34,7 +34,7 @@ type t =
 module Data = Indexer.Make(
   struct
     type t = int*row
-    let compare (x,_) (y,_) = Transitioning.Stdlib.compare x y
+    let compare (x,_) (y,_) = Stdlib.compare x y
   end)
 
 let make ~packing ~callback =

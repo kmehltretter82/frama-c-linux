@@ -27,7 +27,7 @@
 type tag = {
   p : int ; (* first position *)
   q : int ; (* last position (excluded) *)
-  tag : Transitioning.Format.stag ;
+  tag : Format.stag ;
   children : tag list ;
 }
 
@@ -50,8 +50,8 @@ let tags_at (_,tags) k = lookup [] k tags
 type env = {
   text : string ;
   output : (string -> int -> int -> unit) option ;
-  open_tag : (Transitioning.Format.stag -> int -> int -> unit) option ;
-  close_tag : (Transitioning.Format.stag -> int -> int -> unit) option ;
+  open_tag : (Format.stag -> int -> int -> unit) option ;
+  close_tag : (Format.stag -> int -> int -> unit) option ;
 }
 
 let signal f tag p q =
@@ -86,8 +86,8 @@ let rec output_vbox fmt text k n =
       end
 
 let output_fmt fmt text k n = Format.pp_print_string fmt (String.sub text k n)
-let open_tag fmt tag _k _n = Transitioning.Format.pp_open_stag fmt tag
-let close_tag fmt _tag _k _n = Transitioning.Format.pp_close_stag fmt ()
+let open_tag fmt tag _k _n = Format.pp_open_stag fmt tag
+let close_tag fmt _tag _k _n = Format.pp_close_stag fmt ()
 
 let pretty ?vbox fmt message =
   let open_tag = open_tag fmt in
@@ -208,8 +208,8 @@ let create ?indent ?margin () =
       Format.pp_set_max_indent fmt (max 0 (min k (m-10)))
   end ;
   let open Format in
-  Transitioning.Format.pp_set_formatter_stag_functions fmt {
-    Transitioning.Format.print_open_stag = push_tag buffer ;
+  Format.pp_set_formatter_stag_functions fmt {
+    Format.print_open_stag = push_tag buffer ;
     print_close_stag = pop_tag buffer ;
     mark_open_stag = no_mark ;
     mark_close_stag = no_mark ;

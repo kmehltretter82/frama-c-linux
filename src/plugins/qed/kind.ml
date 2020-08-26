@@ -177,7 +177,7 @@ let rec compare_tau cfield cadt t1 t2 =
   | Prop , Prop -> 0
   | Prop , _ -> (-1)
   | _ , Prop -> 1
-  | Tvar k , Tvar k' -> Transitioning.Stdlib.compare k k'
+  | Tvar k , Tvar k' -> Stdlib.compare k k'
   | Tvar _ , _ -> (-1)
   | _ , Tvar _ -> 1
   | Array(ta,tb) , Array(ta',tb') ->

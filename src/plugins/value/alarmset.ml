@@ -48,7 +48,7 @@ module Status = struct
         let reprs = [ True; False; False; Unknown ]
         let mem_project = Datatype.never_any_project
         let pretty = pretty_status
-        let compare (s1:t) (s2:t) = Transitioning.Stdlib.compare s1 s2
+        let compare (s1:t) (s2:t) = Stdlib.compare s1 s2
         let equal (s1:t) (s2:t) = s1 = s2
         let hash (s:t) = Hashtbl.hash s
       end)

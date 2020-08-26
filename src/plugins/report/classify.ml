@@ -241,7 +241,7 @@ let json_of_event e =
 module EVENTS = Set.Make
     (struct
       type t = event
-      let compare = Transitioning.Stdlib.compare
+      let compare = Stdlib.compare
     end)
 
 let events_queue = Queue.create ()

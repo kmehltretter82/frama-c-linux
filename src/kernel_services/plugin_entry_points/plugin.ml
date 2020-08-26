@@ -679,7 +679,7 @@ struct
            (* the level of verbose is at least the level of debug *)
            if n > Verbose.get () then Verbose.set n;
            if n = 0 then decr positive_debug_ref
-           else if old = 0 then Transitioning.Stdlib.incr positive_debug_ref);
+           else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Cmdline.kernel_debug_atleast_ref := (fun n -> get () >= n);
         match !Cmdline.Kernel_debug_level.value_if_set with

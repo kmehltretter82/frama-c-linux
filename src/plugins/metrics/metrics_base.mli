@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Tag functions handling html tags for Format *)
-val html_stag_functions : Transitioning.Format.formatter_stag_functions;;
+val html_stag_functions : Format.formatter_stag_functions;;
 
 (** mk_hdr [level] [ppf] [hdr_strg] produces a title from [hdr_strg] with an
     underline of the same length.

@@ -128,7 +128,7 @@ let close dot =
     begin
       Format.fprintf dot.fmt "}@." ;
       dot.fmt <- Format.err_formatter ;
-      Transitioning.Stdlib.flush out ; close_out out ;
+      Stdlib.flush out ; close_out out ;
       dot.out <- None ;
     end
 

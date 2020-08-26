@@ -385,10 +385,10 @@ module Info = struct
   open Printer_tag
 
   let print_function fmt name =
-    let stag = Transitioning.Format.stag_of_string name in
-    Transitioning.Format.pp_open_stag fmt stag;
+    let stag = Format.String_tag name in
+    Format.pp_open_stag fmt stag;
     Format.pp_print_string fmt name;
-    Transitioning.Format.pp_close_stag fmt ()
+    Format.pp_close_stag fmt ()
 
   let print_kf fmt kf = print_function fmt (Kernel_function.get_name kf)
 
@@ -399,7 +399,7 @@ module Info = struct
     let pp_kf fmt kf = Format.fprintf fmt " of function %a" print_kf kf in
     Format.fprintf fmt "It is a %s variable%a.@."
       (if vi.vglob then "global" else if vi.vformal then "formal" else "local")
-      (Transitioning.Format.pp_print_option pp_kf) kf;
+      (Format.pp_print_option pp_kf) kf;
     if vi.vtemp then
       Format.fprintf fmt "This is a temporary variable%s.@."
         (match vi.vdescr with None -> "" | Some descr -> " for " ^ descr);

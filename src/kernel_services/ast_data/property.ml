@@ -658,7 +658,7 @@ include Datatype.Make_with_collections
           let n = Extlib.opt_compare Kf.compare kf1 kf2 in
           if n = 0 then
             let n = Kinstr.compare ki1 ki2 in
-            if n = 0 then Transitioning.Stdlib.compare ba1 ba2 else n
+            if n = 0 then Stdlib.compare ba1 ba2 else n
           else
             n
         | IPAxiom {il_name=s1}, IPAxiom {il_name=s2}

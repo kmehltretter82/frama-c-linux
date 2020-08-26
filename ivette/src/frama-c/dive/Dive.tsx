@@ -42,12 +42,12 @@ function callstackToString(callstack: API.callstack): string {
 
 function buildCxtMenu(
   commands: Cxtcommand[],
-  content? : JSX.Element,
-  action? : () => void,
+  content?: JSX.Element,
+  action?: () => void,
 ) {
   commands.push({
     content: content ? renderToString(content) : '',
-    select: action || (() => {}),
+    select: action || (() => { }),
     enabled: !!action,
   });
 }
@@ -226,8 +226,7 @@ class Dive {
   receiveGraph(data: any): Cytoscape.CollectionReturnValue {
     let newNodes = this.cy.collection();
 
-    for (const node of data.nodes)
-    {
+    for (const node of data.nodes) {
       if (typeof node.range === 'number')
         node.stops = `0% ${node.range}% ${node.range}% 100%`;
 
@@ -271,8 +270,7 @@ class Dive {
       }
     }
 
-    for (const dep of data.deps)
-    {
+    for (const dep of data.deps) {
       const src = this.cy.$id(dep.src);
       const dst = this.cy.$id(dep.dst);
       const isRoot = dst?.data('is_root');
@@ -308,7 +306,7 @@ class Dive {
   set layout(layout: string) {
     let extendedOptions = {};
     if (layout in layouts)
-      extendedOptions = (layouts as {[key: string]: object})[layout];
+      extendedOptions = (layouts as { [key: string]: object })[layout];
     this._layout = layout;
     this.layoutOptions = {
       name: layout,
@@ -323,7 +321,7 @@ class Dive {
 
   recomputeLayout(newNodes?: Cytoscape.Collection): void {
     if (this.layoutOptions && this.cy.container() &&
-        (newNodes === undefined || !newNodes.empty())) {
+      (newNodes === undefined || !newNodes.empty())) {
       this.cy.layout({
         animationEasing: 'ease-in-out-quad',
         /* Do not move new nodes */
@@ -438,8 +436,11 @@ class Dive {
     node.unselectify();
   }
 
-  selectLocation(location: States.Location, doExplore: boolean) {
-    if (location !== this.selectedLocation) {
+  selectLocation(location: States.Location | undefined, doExplore: boolean) {
+    if (!location) {
+      // Reset whole graph if no location is selected.
+      this.clear();
+    } else if (location !== this.selectedLocation) {
       this.selectedLocation = location;
       const selectNode = this.cy.$('node:selected');
       const writes = selectNode?.data()?.writes;
@@ -475,7 +476,7 @@ const GraphView = () => {
   const [selection, updateSelection] = States.useSelection();
   const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
   const [selectionMode, flipSelectionMode] =
-        Dome.useGlobalSetting('dive.selectionMode', 'follow');
+    Dome.useGlobalSetting('dive.selectionMode', 'follow');
 
   function setCy(cy: Cytoscape.Core) {
     if (cy !== dive.cy)
@@ -503,8 +504,7 @@ const GraphView = () => {
     };
 
     // Updates the graph according to the selected marker.
-    if (selection?.current)
-      dive.selectLocation(selection?.current, !lock);
+    dive.selectLocation(selection?.current, !lock);
   }, [dive, lock, selection, updateSelection]);
 
   // Layout selection
@@ -523,14 +523,14 @@ const GraphView = () => {
 
   // Selection mode
   const selectMode = (id?: boolean) => id && flipSelectionMode(id);
-  const modes =
-        [{ id: 'follow', label: 'Follow selection' },
-          { id: 'add', label: 'Add selection to the graph' },
-        ];
+  const modes = [
+    { id: 'follow', label: 'Follow selection' },
+    { id: 'add', label: 'Add selection to the graph' },
+  ];
   const checkMode =
-        (item: { id: string }) => (
-          { checked: item.id === selectionMode, ...item }
-        );
+    (item: { id: string }) => (
+      { checked: item.id === selectionMode, ...item }
+    );
   const modeMenu = () => {
     Dome.popupMenu(modes.map(checkMode), selectMode);
   };
@@ -583,7 +583,7 @@ export default () => (
     id="dive.graph"
     label="Data-flow graph"
     title={'Data dependency graph according to an Eva analysis.\nNodes color ' +
-           'represents the precision of the values inferred by Eva.'}
+      'represents the precision of the values inferred by Eva.'}
   >
     <GraphView />
   </Component>

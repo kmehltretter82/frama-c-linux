@@ -251,11 +251,11 @@ and pp_raw_stmt fmt = function
       pp_block bl1 pp_block bl2 pp_cabsloc loc
   |     THROW(e,loc) ->
     fprintf fmt "@[<hov 2>THROW %a, loc(%a)@]"
-      (Transitioning.Format.pp_print_option pp_exp) e pp_cabsloc loc
+      (Format.pp_print_option pp_exp) e pp_cabsloc loc
   |     TRY_CATCH(s,l,loc) ->
     let print_one_catch fmt (v,s) =
       fprintf fmt "@[<v 2>@[CATCH %a {@]@;%a@]@;}"
-        (Transitioning.Format.pp_print_option pp_single_name) v
+        (Format.pp_print_option pp_single_name) v
         pp_stmt s
     in
     fprintf fmt "@[<v 2>@[TRY %a (loc %a) {@]@;%a@]@;}"

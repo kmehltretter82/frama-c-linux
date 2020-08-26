@@ -128,7 +128,7 @@ struct
   type t = region
   let id a = a.id
   let equal a b = (a.id = b.id)
-  let compare a b = Transitioning.Stdlib.compare a.id b.id
+  let compare a b = Stdlib.compare a.id b.id
   let pp_rid fmt id = Format.fprintf fmt "R%03d" id
   let pretty fmt r = pp_rid fmt r.id
 end

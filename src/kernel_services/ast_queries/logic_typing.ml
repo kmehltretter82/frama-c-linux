@@ -478,7 +478,7 @@ module Type_namespace =
     let reprs = [Typedef]
     let name = "Logic_typing.type_namespace"
     type t = type_namespace
-    let compare : t -> t -> int = Transitioning.Stdlib.compare
+    let compare : t -> t -> int = Stdlib.compare
     let equal : t -> t -> bool = (=)
     let hash : t -> int = Hashtbl.hash
   end)
@@ -3614,7 +3614,7 @@ struct
     struct
       type t = string list
       let compare s1 s2 =
-        Transitioning.Stdlib.(compare (List.sort compare s1) (List.sort compare s2))
+        Stdlib.(compare (List.sort compare s1) (List.sort compare s2))
     end)
 
   let type_spec old_behaviors loc is_stmt_contract result env s =

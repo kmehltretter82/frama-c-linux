@@ -52,7 +52,7 @@ module Make () = struct
     then Some ((Obj.magic (Eq : (a,a) eq)) : (a,b) eq)
     else None
 
-  let compare x y = Transitioning.Stdlib.compare x.tag y.tag
+  let compare x y = Stdlib.compare x.tag y.tag
   let hash x = x.tag
   let tag x = x.tag
 

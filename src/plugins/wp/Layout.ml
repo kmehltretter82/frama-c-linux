@@ -52,7 +52,7 @@ struct
       | _ , Field _ -> 1
       | Index(ta,n) , Index(tb,m) ->
           let cmp = Typ.compare ta tb in
-          if cmp <> 0 then cmp else Transitioning.Stdlib.compare n m
+          if cmp <> 0 then cmp else Stdlib.compare n m
 
   let equal a b = (compare a b = 0)
 
@@ -175,7 +175,7 @@ struct
     Usage.pretty fmt usage
 
   let compare ((da,ta):t) ((db,tb):t) =
-    let cmp = Transitioning.Stdlib.compare da db in
+    let cmp = Stdlib.compare da db in
     if cmp <> 0 then cmp else Typ.compare ta tb
 
   let equal a b = (compare a b = 0)

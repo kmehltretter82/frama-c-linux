@@ -39,8 +39,8 @@ int main(void)
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
     __gmpz_init(__gen_e_acsl_div);
     /*@ assert E_ACSL: 0xffffffffffffffffffffff ≢ 0; */
-    __e_acsl_assert(! (__gen_e_acsl_div_guard == 0),"Assertion","main",
-                    "0xffffffffffffffffffffff == 0","tests/arith/arith.i",18);
+    __e_acsl_assert(__gen_e_acsl_div_guard != 0,"Assertion","main",
+                    "0xffffffffffffffffffffff != 0","tests/arith/arith.i",18);
     __gmpz_tdiv_q(__gen_e_acsl_div,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
@@ -108,8 +108,8 @@ int main(void)
                                           (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
     __gmpz_init(__gen_e_acsl_div_2);
     /*@ assert E_ACSL: y - 123456789123456789 ≢ 0; */
-    __e_acsl_assert(! (__gen_e_acsl_div_guard_2 == 0),"Assertion","main",
-                    "y - 123456789123456789 == 0","tests/arith/arith.i",34);
+    __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,"Assertion","main",
+                    "y - 123456789123456789 != 0","tests/arith/arith.i",34);
     __gmpz_tdiv_q(__gen_e_acsl_div_2,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));

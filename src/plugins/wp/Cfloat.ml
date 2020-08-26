@@ -145,7 +145,7 @@ let fmake ulp value = match ulp with
   | Float32 -> F.e_fun ~result:t32 fq32 [F.e_float (rfloat value)]
   | Float64 -> F.e_fun ~result:t64 fq64 [F.e_float value]
 
-let qmake ulp q = fmake ulp (Transitioning.Q.to_float q)
+let qmake ulp q = fmake ulp (Q.to_float q)
 let re_mantissa = "\\([-+]?[0-9]*\\)"
 let re_comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
 let re_exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
@@ -219,8 +219,8 @@ let force_float r =
 
 let float_lit ulp (q : Q.t) =
   let v = match ulp with
-    | Float32 -> rfloat @@ Transitioning.Q.to_float q
-    | Float64 -> Transitioning.Q.to_float q in
+    | Float32 -> rfloat @@ Q.to_float q
+    | Float64 -> Q.to_float q in
   let reparse ulp r =
     match ulp with
     | Float32 -> rfloat @@ float_of_string r
@@ -314,7 +314,7 @@ module Compute = WpContext.StaticGenerator
     (struct
       type t = model * c_float * op
 
-      let compare = Transitioning.Stdlib.compare
+      let compare = Stdlib.compare
 
       let pretty fmt (m, ft, op) =
         Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)

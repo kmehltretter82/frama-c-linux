@@ -102,7 +102,13 @@ let execute () =
     List.iter
       begin fun file ->
         Senv.feedback "Script %S" file ;
-        let response = execute_batch (Js.from_file file) in
+        let response =
+          try
+            execute_batch (Js.from_file file)
+          with Yojson.Json_error msg ->
+            Senv.error "[batch] error in JSON file:@\n%s@." msg;
+            `Null
+        in
         let output = Filename.remove_extension file ^ ".out.json" in
         let output = match BatchOutputDir.get () with
           | "" -> output

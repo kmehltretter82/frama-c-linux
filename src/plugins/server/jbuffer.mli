@@ -48,8 +48,8 @@ val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
 
 val append : buffer -> string -> int -> int -> unit
 val flush : buffer -> unit -> unit
-val push_tag : buffer -> Transitioning.Format.stag -> unit
-val pop_tag : buffer -> Transitioning.Format.stag -> unit
+val push_tag : buffer -> Format.stag -> unit
+val pop_tag : buffer -> Format.stag -> unit
 
 (** Flushes the buffer and returns its JSON enoding. This pops all pending
     tags. *)

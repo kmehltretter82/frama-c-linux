@@ -64,6 +64,13 @@ genassigns:
   tags:
    - nix
 
+frama-clang:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A frama-clang.tests
+  tags:
+   - nix
+
 counter-examples:
   stage: tests
   script:

@@ -66,7 +66,7 @@ let lines () =
      emitted on statements copied through loop unrolling. This is the desired
      semantics for now. However, since we compare entire locations, textually
      identical lines that refer to different expressions are kept separate *)
-  Extlib.sort_unique Transitioning.Stdlib.compare l
+  Extlib.sort_unique Stdlib.compare l
 
 let output file =
   let ch = open_out file in

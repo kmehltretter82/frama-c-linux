@@ -225,7 +225,7 @@ let update_hints_for_goal goal hints =
   try
     let old_hints,script,qed = Hashtbl.find scriptbase goal in
     let new_hints = List.sort String.compare hints in
-    if Transitioning.Stdlib.compare new_hints old_hints <> 0 then
+    if Stdlib.compare new_hints old_hints <> 0 then
       begin
         Hashtbl.replace scriptbase goal (new_hints,script,qed) ;
         needsave := true ;

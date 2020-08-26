@@ -53,8 +53,8 @@ module D =
             Ival.compare i1 i2
           | Float (k1, f1), Float (k2, f2) ->
             (* faster to compare a kind than a float *)
-            let n = Transitioning.Stdlib.compare k1 k2 in
-            if n = 0 then Transitioning.Stdlib.compare f1 f2 else n
+            let n = Stdlib.compare k1 k2 in
+            if n = 0 then Stdlib.compare f1 f2 else n
           | Ival _, (Float _ | Rational | Real | Nan)
           | Float _, (Rational | Real | Nan)
           | Rational, (Real | Nan)
@@ -92,7 +92,7 @@ module D =
 let is_included i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 -> Ival.is_included i1 i2
   | Float(k1, f1), Float(k2, f2) ->
-    Transitioning.Stdlib.compare k1 k2 <= 0
+    Stdlib.compare k1 k2 <= 0
     && (match f1, f2 with
         | None, None | Some _, None -> true
         | None, Some _ -> false
@@ -126,7 +126,7 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 ->
     Ival (f i1 i2)
   | Float(k1, _), Float(k2, _) when safe_float ->
-    let k = if Transitioning.Stdlib.compare k1 k2 >= 0 then k1 else k2 in
+    let k = if Stdlib.compare k1 k2 >= 0 then k1 else k2 in
     Float(k, None (* lost value, if any before *))
   | Ival iv, Float(k, _)
   | Float(k, _), Ival iv ->
@@ -147,8 +147,8 @@ let lift_binop ~safe_float f i1 i2 = match i1, i2 with
                Floating_point.most_negative_single_precision_float,
                Floating_point.max_single_precision_float
              | FDouble ->
-               -. Transitioning.Float.max_float,
-               Transitioning.Float.max_float
+               -. Float.max_float,
+               Float.max_float
              | FLongDouble ->
                raise Exit
            in

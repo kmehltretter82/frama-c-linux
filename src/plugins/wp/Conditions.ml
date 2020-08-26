@@ -270,7 +270,7 @@ struct
             | _ -> 2
           in
           let r = rank s1.condition - rank s2.condition in
-          if r = 0 then Transitioning.Stdlib.compare k2 k1 else r
+          if r = 0 then Stdlib.compare k2 k1 else r
       end)
 
   type t = Vars.t * SEQ.t

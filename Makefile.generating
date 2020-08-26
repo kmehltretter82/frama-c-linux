@@ -126,56 +126,12 @@ endif
 
 GENERATED+= src/libraries/utils/json.ml src/libraries/stdlib/transitioning.ml
 
-ifeq ($(HAS_OCAML408),yes)
-  DYNLINK_INIT=fun () -> ()
-  FORMAT_STAG=stag
-  FORMAT_STRING_OF_STAG=match s with \
-        Format.String_tag str -> str \
-      | _ -> raise (Invalid_argument "unsupported tag extension")
-  FORMAT_STAG_OF_STRING=Format.String_tag s
-  FORMAT_PP_OPT=Format.pp_print_option
-  HAS_OCAML407_OR_408=yes
-else
-  DYNLINK_INIT=Dynlink.init
-  FORMAT_STAG=tag
-  FORMAT_STRING_OF_STAG=s
-  FORMAT_STAG_OF_STRING=s
-  ifeq ($(HAS_OCAML407),yes)
-    HAS_OCAML407_OR_408=yes
-  else
-    HAS_OCAML407_OR_408=no
-  endif
-  FORMAT_PP_OPT=fun ?(none=(fun _ () -> ())) pp fmt o -> \
-    match o with \
-    | None -> none fmt () \
-    | Some v -> pp fmt v
-endif
-
-ifeq ($(HAS_OCAML407_OR_408),yes)
-  FLOAT_MAX_FLOAT=Float.max_float
-else
-  FLOAT_MAX_FLOAT=Pervasives.max_float
-endif
-
 src/libraries/stdlib/transitioning.ml: \
   src/libraries/stdlib/transitioning.ml.in \
   Makefile.generating share/Makefile.config
 	$(PRINT_MAKING) $@
 	rm -f $@
-	sed \
-         -e 's/@SPLIT_ON_CHAR@/$(SPLIT_ON_CHAR)/g' \
-         -e 's/@STACK_FOLD@/$(STACK_FOLD)/g' \
-         -e 's/@NTH_OPT@/$(NTH_OPT)/g' \
-         -e 's/@FIND_OPT@/$(FIND_OPT)/g' \
-         -e 's/@ASSOC_OPT@/$(ASSOC_OPT)/g' \
-         -e 's/@ASSQ_OPT@/$(ASSQ_OPT)/g' \
-         -e 's/@DYNLINK_INIT@/$(DYNLINK_INIT)/g' \
-         -e 's/@FLOAT_MAX_FLOAT@/$(FLOAT_MAX_FLOAT)/g' \
-         -e 's/@FORMAT_STAG@/$(FORMAT_STAG)/g' \
-         -e 's/@FORMAT_STRING_OF_STAG@/$(FORMAT_STRING_OF_STAG)/g' \
-         -e 's/@FORMAT_STAG_OF_STRING@/$(FORMAT_STAG_OF_STRING)/g' \
-         -e 's/@FORMAT_PP_OPT@/$(FORMAT_PP_OPT)/g' \
-        $< > $@
+	cat $< > $@
 	$(CHMOD_RO) $@
 
 ##################

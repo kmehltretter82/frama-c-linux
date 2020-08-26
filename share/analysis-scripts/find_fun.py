@@ -29,6 +29,7 @@ import sys
 import os
 import re
 import glob
+import function_finder
 
 MIN_PYTHON = (3, 5) # for glob(recursive)
 if sys.version_info < MIN_PYTHON:
@@ -67,36 +68,16 @@ for d in dirs:
    files += glob.glob(d + "/**/*.[ich]", recursive=True)
 
 print("Looking for '%s' inside %d file(s)..." % (fname, len(files)))
-#print("\n".join(files))
-
-# To minimize the amount of false positives, we try to match the following:
-# - the line must begin with a C identifier (declarations and definitions in C
-#   rarely start with spaces in the line), or with the function name itself
-#   (supposing the return type is in the previous line)
-# - any number of identifiers are allowed (to allow for 'struct', 'volatile',
-#   'extern', etc)
-# - asterisks are allowed both before and after identifiers, except for the
-#   first one (to allow for 'char *', 'struct **ptr', etc)
-# - identifiers are allowed after the parentheses, to allow for some macros/
-#   modifiers
 
 possible_declarators = []
 possible_definers = []
-c_identifier = "[a-zA-Z_][a-zA-Z0-9_]*"
-c_id_maybe_pointer = c_identifier + "\**"
-type_prefix = c_id_maybe_pointer + "(?:\s+\**" + c_id_maybe_pointer + ")*\s+\**"
-parentheses_suffix = "\s*\([^)]*\)"
-re_fun = re.compile("^(?:" + type_prefix + "\s*)?" + fname + parentheses_suffix
-                  + "\s*(?:" + c_identifier + ")?\s*(;|{)", flags=re.MULTILINE)
+re_fun = function_finder.prepare(fname)
 for f in files:
-   with open(f, encoding="ascii", errors='ignore') as content_file:
-      content = content_file.read()
-      has_decl_or_def = re_fun.search(content)
-      if has_decl_or_def is not None:
-         is_decl = has_decl_or_def.group(1) == ";"
-         if is_decl:
+    found = function_finder.find(re_fun, f)
+    if found:
+        if found == 1:
             possible_declarators.append(f)
-         else:
+        else:
             possible_definers.append(f)
 
 if possible_declarators == [] and possible_definers == []:

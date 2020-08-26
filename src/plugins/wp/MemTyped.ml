@@ -390,7 +390,7 @@ let shift l obj k = e_fun (Shift.get obj) [l;k]
 module LITERAL =
 struct
   type t = int * Cstring.cst
-  let compare (a:t) (b:t) = Transitioning.Stdlib.compare (fst a) (fst b)
+  let compare (a:t) (b:t) = Stdlib.compare (fst a) (fst b)
   let pretty fmt (eid,cst) = Format.fprintf fmt "%a@%d" Cstring.pretty cst eid
 end
 

@@ -285,7 +285,7 @@ let merge_funspec s1 s2 =
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
-module Behavior_set_map = Transitioning.Stdlib.Map.Make(Datatype.String.Set)
+module Behavior_set_map = Stdlib.Map.Make(Datatype.String.Set)
 
 let is_same_behavior_set l1 l2 =
   Datatype.String.Set.(equal (of_list l1) (of_list l2))

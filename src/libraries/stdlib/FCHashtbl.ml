@@ -50,7 +50,7 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t  = struct
 
   include Hashtbl.Make(H)
 
-  let fold_sorted ?(cmp=Transitioning.Stdlib.compare) f h acc =
+  let fold_sorted ?(cmp=Stdlib.compare) f h acc =
     let module Aux = struct type t = key let compare = cmp end in
     let module M = Map.Make(Aux) in
     let add k v m =
