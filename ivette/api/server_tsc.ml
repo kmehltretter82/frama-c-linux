@@ -167,7 +167,7 @@ let rec makeDecoder ~safe ?self ~names fmt js =
   | Jboolean -> jsafe ~safe "Boolean" jprim fmt "jBoolean"
   | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
   | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
-  | Jtag a -> Format.fprintf fmt "jTag(\"%s\")" a
+  | Jtag a -> Format.fprintf fmt "Json.jTag(\"%s\")" a
   | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
   | Jindex kd -> jsafe ~safe ("#" ^ kd) jindex fmt kd
   | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
@@ -187,6 +187,10 @@ let rec makeDecoder ~safe ?self ~names fmt js =
     jsafe ~safe "Union" (junion ~jtype ~makeLoose) fmt jts
   | Jrecord jfs -> jsafe ~safe "Record" (jrecord ~makeSafe) fmt jfs
   | Jtuple jts -> jtry ~safe (jtuple ~makeSafe) fmt jts
+
+let makeLooseNeedSafe = function
+  | Pkg.Jtuple _ | Pkg.Jarray _ -> true
+  | _ -> false
 
 let makeRootDecoder ~safe ~self ~names fmt js =
   let open Pkg in
@@ -249,7 +253,7 @@ let makeOrder ~self ~names fmt js =
     | Jdict js ->
       let jtype fmt js = makeJtype ~names fmt js in
       Format.fprintf fmt
-        "@[<hov 2>Compare.dictionary<@,%a>(@,%a)@]"
+        "@[<hov 2>Compare.dictionary<@,Json.dict<%a>>(@,%a)@]"
         jtype js pp js
     | Jany | Junion _ | Jtag _ ->
       Format.fprintf fmt "Compare.structural"
@@ -414,12 +418,13 @@ let makeDeclaration fmt names d =
 type ranking = {
   mutable rank : int ;
   mutable mark : int Pkg.IdMap.t ;
+  index : Pkg.declInfo Pkg.IdMap.t ;
 }
 
 let depends d =
   match d.Pkg.d_kind with
-  | D_loose(id,(Jtuple _ | Jarray _)) -> [Pkg.Derived.safe id]
-  | D_safe(id,_) -> [Pkg.Derived.loose id]
+  | D_loose(id,t) when makeLooseNeedSafe t -> [Pkg.Derived.safe id]
+  | D_safe(id,t) when not (makeLooseNeedSafe t) -> [Pkg.Derived.loose id]
   | D_array _ ->
     let id = d.d_ident in
     let data = Pkg.Derived.data id in
@@ -439,13 +444,20 @@ let next m id =
   m.mark <- Pkg.IdMap.add id r m.mark ;
   m.rank <- succ r
 
-let mark m d =
+let rec mark m d =
   let id = d.Pkg.d_ident in
   if not (Pkg.IdMap.mem id m.mark) then
-    ( List.iter (next m) (depends d) ; next m id )
+    ( List.iter (mark_id m) (depends d) ; next m id )
+
+and mark_id m id =
+  try mark m (Pkg.IdMap.find id m.index)
+  with Not_found -> ()
 
 let ranking ds =
-  let m = { rank = 0 ; mark = Pkg.IdMap.empty } in
+  let index = List.fold_left
+      (fun m d -> Pkg.IdMap.add d.Pkg.d_ident d m)
+      Pkg.IdMap.empty ds in
+  let m = { rank = 0 ; mark = Pkg.IdMap.empty ; index } in
   List.iter (mark m) ds ;
   let rk = m.mark in
   let getRank a = try Pkg.IdMap.find a.Pkg.d_ident rk with Not_found -> 0 in

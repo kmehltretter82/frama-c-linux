@@ -501,10 +501,12 @@ export interface NthSelect {
  * - [[NthSelect]].
  * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
  * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
+ * - `MULTIPLE_CYCLE` cycles between the multiple selections.
+ * - `MULTIPLE_CLEAR` clears the multiple selection.
  */
 export type MultipleSelectActions =
   MultipleSelect | NthSelect
-  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR';
+  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR';
 
 export interface Selection {
   /** Current selection. May be one in [[history]] or [[multiple]]. */
@@ -595,15 +597,21 @@ function fromHistory(s: Selection, action: HistorySelectActions): Selection {
  */
 function fromMultipleSelections(
   s: Selection,
-  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CLEAR',
+  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE'
+  | 'MULTIPLE_CLEAR',
 ): Selection {
   switch (action) {
     case 'MULTIPLE_PREV':
-    case 'MULTIPLE_NEXT': {
+    case 'MULTIPLE_NEXT':
+    case 'MULTIPLE_CYCLE': {
+      const idx =
+        action === 'MULTIPLE_PREV' ?
+          s.multiple.index - 1 :
+          s.multiple.index + 1;
       const index =
-        action === 'MULTIPLE_NEXT' ?
-          s.multiple.index + 1 :
-          s.multiple.index - 1;
+        action === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
+          0 :
+          idx;
       if (0 <= index && index < s.multiple.allSelections.length) {
         const multiple = { ...s.multiple, index };
         return selectLocation(
@@ -660,6 +668,7 @@ function reducer(s: Selection, action: SelectionActions): Selection {
       return fromHistory(s, action);
     case 'MULTIPLE_PREV':
     case 'MULTIPLE_NEXT':
+    case 'MULTIPLE_CYCLE':
     case 'MULTIPLE_CLEAR':
       return fromMultipleSelections(s, action);
     default:

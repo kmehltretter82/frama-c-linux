@@ -1657,12 +1657,12 @@ let rec compare_term t1 t2 =
   | TAlignOfE _, _ -> 1
   | _, TAlignOfE _ -> -1
   | TUnOp (o1,t1), TUnOp(o2,t2) ->
-    let res = Transitioning.Stdlib.compare o1 o2 in
+    let res = Stdlib.compare o1 o2 in
     if res = 0 then compare_term t1 t2 else res
   | TUnOp _, _ -> 1
   | _, TUnOp _ -> -1
   | TBinOp(o1,l1,r1), TBinOp(o2,l2,r2) ->
-    let res = Transitioning.Stdlib.compare o1 o2 in
+    let res = Stdlib.compare o1 o2 in
     if res = 0 then
       let res = compare_term l1 l2 in
       if res = 0 then compare_term r1 r2 else res
@@ -1852,7 +1852,7 @@ and compare_predicate_node p1 p2 =
   | Papp _, _ -> 1
   | _, Papp _ -> -1
   | Prel(r1,lt1,rt1), Prel(r2,lt2,rt2) ->
-    let res = Transitioning.Stdlib.compare r1 r2 in
+    let res = Stdlib.compare r1 r2 in
     if res = 0 then
       let res = compare_term lt1 lt2 in
       if res = 0 then compare_term rt1 rt2 else res

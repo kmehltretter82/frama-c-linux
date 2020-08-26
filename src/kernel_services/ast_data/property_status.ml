@@ -47,7 +47,7 @@ module Emitted_status =
            | True -> "VALID"
            | False_if_reachable | False_and_reachable -> "**NOT** VALID"
            | Dont_know -> "unknown")
-      let compare (s1:t) s2 = Transitioning.Stdlib.compare s1 s2
+      let compare (s1:t) s2 = Stdlib.compare s1 s2
       let equal (s1:t) s2 = s1 = s2
       let hash (s:t) = Caml_hashtbl.hash s
     end)

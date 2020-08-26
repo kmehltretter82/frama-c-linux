@@ -2,12 +2,41 @@
 // --- Utilities
 // --------------------------------------------------------------------------
 
+/**
+   @packageDocumentation
+   @module dome/misc/utils
+ */
+
 import type { CSSProperties } from 'react';
 
-export type ClassSpec =
-  undefined | boolean | null | string |
-  { [cname: string]: boolean | null | undefined };
+type falsy = undefined | boolean | null | '';
 
+export type ClassSpec = string | falsy | { [cname: string]: true | falsy };
+
+/**
+   Utility function to merge various HTML class properties
+   into a `className` property.
+   Class specifications can be made of:
+    - a string, interpreted as a CSS class specification
+    - an object, with keys corresponding to CSS class associated
+      to true of falsy value.
+    - any falsy value, which is discarded
+
+    Example of usage:
+
+    * ```ts
+    *    const className = classes(
+    *       'my-base-class',
+    *        condition && 'my-class-when-condition',
+    *        {
+    *           'my-class-1': cond-1,
+    *           'my-class-2': cond-2,
+    *           'my-class-3': cond-3,
+    *        }
+    *    );
+    * ```
+
+ */
 export function classes(
   ...args: ClassSpec[]
 ): string {
@@ -24,8 +53,25 @@ export function classes(
   return buffer.join(' ');
 }
 
-export type StyleSpec =
-  undefined | boolean | null | CSSProperties;
+export type StyleSpec = falsy | CSSProperties;
+
+/**
+   Utility function to merge various CSS style properties
+   into a single CSS style object.
+
+   Each style specification can be made of a CSS object or (discarded)
+   falsy values.
+   Example of usage:
+
+   * ```ts
+   *    const sty = styles(
+   *        { ... },
+   *        cond-1 && { ... },
+   *        cond-2 && { ... },
+   *    );
+   * ```
+
+*/
 
 export function styles(
   ...args: StyleSpec[]

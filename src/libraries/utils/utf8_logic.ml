@@ -78,6 +78,9 @@ let integer = from_unichar 0x2124
 let real = from_unichar 0x211D
 
 let pi = from_unichar 0x3C0
+
+let infinity = from_unichar 0x221E
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

@@ -193,7 +193,7 @@ export function jCatch<A>(fn: Loose<A>, fallBack: A): Safe<A> {
     try {
       return fn(js) ?? fallBack;
     } catch (err) {
-      if (DEVEL) console.error('[Dome.json]', err);
+      if (DEVEL) console.warn('[Dome.json]', err);
       return fallBack;
     }
   };
@@ -207,7 +207,8 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
   return (js: json) => {
     try {
       return fn(js) ?? defaultValue;
-    } catch (_err) {
+    } catch (err) {
+      if (DEVEL) console.warn('[Dome.json]', err);
       return defaultValue;
     }
   };
@@ -448,7 +449,13 @@ export function jIndex<K>(kd: K): Loose<index<K>> {
   return (js: json) => (typeof js === 'number' ? forge(kd, js) : undefined);
 }
 
+/** Dictionaries. */
 export type dict<A> = { [key: string]: A };
+
+/**
+   Decode a JSON dictionary, discarding all inconsistent entries.
+   If the JSON contains no valid entry, still returns `{}`.
+*/
 export function jDict<A>(fn: Loose<A>): Safe<dict<A>> {
   return (js: json) => {
     const buffer: dict<A> = {};

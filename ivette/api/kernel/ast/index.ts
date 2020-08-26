@@ -43,10 +43,6 @@ export const compute: Server.ExecRequest<null,null>= compute_internal;
 
 /** Marker kind */
 export enum markerKind {
-  /** Variable */
-  variable = 'variable',
-  /** Function */
-  function = 'function',
   /** Expression */
   expression = 'expression',
   /** Lvalue */
@@ -83,12 +79,44 @@ const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
 /** Registered tags for the above type. */
 export const markerKindTags: Server.GetRequest<null,tag[]>= markerKindTags_internal;
 
+/** Marker variable */
+export enum markerVar {
+  /** None */
+  none = 'none',
+  /** Variable */
+  variable = 'variable',
+  /** Function */
+  function = 'function',
+}
+
+/** Loose decoder for `markerVar` */
+export const jMarkerVar: Json.Loose<markerVar> = Json.jEnum(markerVar);
+
+/** Safe decoder for `markerVar` */
+export const jMarkerVarSafe: Json.Safe<markerVar> =
+  Json.jFail(Json.jEnum(markerVar),'kernel.ast.markerVar expected');
+
+/** Natural order for `markerVar` */
+export const byMarkerVar: Compare.Order<markerVar> =
+  Compare.byEnum(markerVar);
+
+const markerVarTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.markerVarTags',
+  input:  Json.jNull,
+  output: Json.jList(jTag),
+};
+/** Registered tags for the above type. */
+export const markerVarTags: Server.GetRequest<null,tag[]>= markerVarTags_internal;
+
 /** Data for array rows [`markerInfo`](#markerinfo)  */
 export interface markerInfoData {
   /** Entry identifier. */
   key: Json.key<'#markerInfo'>;
   /** Marker kind */
   kind: markerKind;
+  /** Marker variable */
+  var: markerVar;
   /** Marker short name */
   name: string;
   /** Marker declaration or description */
@@ -101,6 +129,7 @@ export const jMarkerInfoData: Json.Loose<markerInfoData> =
     key: Json.jFail(Json.jKey<'#markerInfo'>('#markerInfo'),
            '#markerInfo expected'),
     kind: jMarkerKindSafe,
+    var: jMarkerVarSafe,
     name: Json.jFail(Json.jString,'String expected'),
     descr: Json.jFail(Json.jString,'String expected'),
   });
@@ -112,10 +141,11 @@ export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
 /** Natural order for `markerInfoData` */
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
-    <{ key: Json.key<'#markerInfo'>, kind: markerKind, name: string,
-       descr: string }>({
+    <{ key: Json.key<'#markerInfo'>, kind: markerKind, var: markerVar,
+       name: string, descr: string }>({
     key: Compare.string,
     kind: byMarkerKind,
+    var: byMarkerVar,
     name: Compare.alpha,
     descr: Compare.string,
   });
@@ -196,6 +226,33 @@ export const jMarkerSafe: Json.Safe<marker> =
 
 /** Natural order for `marker` */
 export const byMarker: Compare.Order<marker> = Compare.structural;
+
+/** Location: function and marker */
+export interface location {
+  /** Function */
+  function: Json.key<'#fct'>;
+  /** Marker */
+  marker: marker;
+}
+
+/** Loose decoder for `location` */
+export const jLocation: Json.Loose<location> =
+  Json.jObject({
+    function: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+    marker: jMarkerSafe,
+  });
+
+/** Safe decoder for `location` */
+export const jLocationSafe: Json.Safe<location> =
+  Json.jFail(jLocation,'Location expected');
+
+/** Natural order for `location` */
+export const byLocation: Compare.Order<location> =
+  Compare.byFields
+    <{ function: Json.key<'#fct'>, marker: marker }>({
+    function: Compare.string,
+    marker: byMarker,
+  });
 
 const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,

@@ -35,27 +35,27 @@ usage() {
    echo "      Display this help message and exit."
    echo ""
    echo "  - make-template [dir]"
-   echo "      Interactively prepares a template for running analysis scripts,"
-   echo "      writing it to [dir/GNUmakefile]. [dir] is [.] if omitted."
+   echo "      Interactively prepares a template for analyses,"
+   echo "      writing it to dir/GNUmakefile [default: .frama-c]."
    echo ""
-   echo "  - make-path"
+   echo "  - make-path [dir]"
    echo "      [for Frama-C developers and advanced users without Frama-C in the path]"
-   echo "      Creates a frama-c-path.mk file in the current working directory."
+   echo "      Creates a path.mk file in dir [default: .frama-c]."
    echo ""
    echo "  - list-files [path/to/compile_commands.json]"
    echo "      Lists all sources in the given compile_commands.json"
-   echo "      (defaults to './compile_commands.json' if omitted)."
+   echo "      [default: ./compile_commands.json]."
    echo "      Also lists files defining a 'main' function"
    echo "      (heuristics-based; neither correct nor complete)."
    echo ""
-   echo "  - flamegraph <flamegraph.txt> [dir]"
-   echo "      Generates flamegraph.svg and flamegraph.html in [dir]"
-   echo "      (or in the FRAMAC_SESSION directory by default)."
+   echo "  - flamegraph flamegraph.txt [dir]"
+   echo "      Generates flamegraph.svg and flamegraph.html in dir"
+   echo "      [default: FRAMAC_SESSION]."
    echo "      Also opens it in a browser, unless variable NOGUI is set."
    echo ""
-   echo "  - find-fun <function-name> [dirs]"
-   echo "      Lists files in [dirs] declaring or defining <function-name>"
-   echo "      (defaults to PWD + /usr/include)."
+   echo "  - find-fun function-name [dir...]"
+   echo "      Lists files in dir... declaring or defining function-name"
+   echo "      [default: PWD /usr/include]."
    echo "      Heuristics-based: neither correct nor complete."
    echo ""
    echo "  - summary [options]"
@@ -63,20 +63,20 @@ usage() {
    echo "      in the current PWD."
    echo "      Use $0 summary --help for more informations."
    echo ""
-   echo "  - configure <machdep>"
+   echo "  - configure machdep"
    echo "      Runs an existing configure script to only consider files"
    echo "      in Frama-C's libc; this will hopefully disable non-essential"
    echo "      and non-POSIX external libraries."
-   echo "      <machdep> is necessary to define a required preprocessor symbol"
-   echo "      (run 'frama-c -machdep' help to get the list of machdeps)."
+   echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
    echo ""
-   echo "  - make-wrapper <target> <args>"
-   echo "      Runs 'make <target> <args>', parsing the output to suggest"
+   echo "  - make-wrapper target arg..."
+   echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
    echo ""
    echo "  - normalize-jcdb [path/to/compile_commands.json]"
    echo "      Applies some transformations to an existing compile_commands.json"
-   echo "      (such as relativizing paths) to improve portability"
+   echo "      (such as relativizing paths) to improve portability."
+   echo "      [default: ./compile_commands.json]"
    exit $1
 }
 
@@ -85,7 +85,7 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
+FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
@@ -121,17 +121,31 @@ open_file() {
 }
 
 make_path() {
-    cat <<EOF > frama-c-path.mk
+    dir=".frama-c"
+    if [ "$#" -gt 0 ]; then
+        dir="$1"
+    fi
+    if [ ! -d "$dir" ]; then
+        read -p "Directory '$dir' does not exist. Create it? [y/N] " yn
+        case $yn in
+            [Yy])
+                mkdir -p "$dir"
+            ;;
+            *)
+                echo "Exiting without creating."
+                exit 0;;
+        esac
+    fi
+    cat <<EOF > "${dir}/path.mk"
 FRAMAC_DIR=${DIR}
 ifeq (\$(wildcard \$(FRAMAC_DIR)),)
 # Frama-C not installed locally; using the version in the PATH
 else
 FRAMAC=\$(FRAMAC_DIR)/frama-c
 FRAMAC_GUI=\$(FRAMAC_DIR)/frama-c-gui
-FRAMAC_CONFIG=\$(FRAMAC_DIR)/frama-c-config
 endif
 EOF
-    echo "Wrote to: frama-c-path.mk"
+    echo "Wrote to: ${dir}/path.mk"
 }
 
 flamegraph() {
@@ -232,11 +246,12 @@ case "$command" in
         ;;
     "make-template")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$0" "$@";
+        export FRAMAC="${DIR}/frama-c"
+        ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$@";
         ;;
     "make-path")
         shift;
-        make_path;
+        make_path "$@";
         ;;
     "list-files")
         shift;

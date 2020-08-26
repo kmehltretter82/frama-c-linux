@@ -223,7 +223,7 @@ let bitwise_op4 size op4 a b c d =
 
 
 let equal = (=);;          (* String equality. *)
-let compare = Transitioning.Stdlib.compare
+let compare = Stdlib.compare
 let hash = Hashtbl.hash
 
 let concat bv1 size1 bv2 size2 =

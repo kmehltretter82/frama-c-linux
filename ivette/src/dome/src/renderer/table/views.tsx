@@ -61,6 +61,14 @@ export type RenderByFields<Row> = {
 export type index = number | number[];
 
 /**
+   Column Properties.
+
+   __Warning:__ callback properties, namely `getter`, `render`
+   and `onContextMenu`, shall be as stable as possible to prevent
+   the table from constantly re-rendering.
+   Use constant callbacks whenever possible, or memoize them with
+   `React.useCallback()` hook.
+
    @template Row - table row data of some table entries
    @template Cell - type of cell data to render in this column
  */
@@ -106,14 +114,17 @@ export interface ColumnProps<Row, Cell> {
   visible?: boolean | 'never' | 'always';
   /**
      Data getter for this column.
+     Shall be constant or protected by `React.useCallback`.
    */
   getter?: (row: Row, dataKey: string) => Cell | undefined;
   /**
      Override table by-fields cell renderers.
+     Shall be constant or protected by `React.useCallback`.
    */
   render?: Renderer<Cell>;
   /**
      Override table right-click callback.
+     Shall be constant or protected by `React.useCallback`.
    */
   onContextMenu?: (row: Row, index: number, dataKey: string) => void;
 }
@@ -310,7 +321,6 @@ class TableState<Key, Row> {
     this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
-    this.reloadSettings = this.reloadSettings.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
   }
@@ -407,27 +417,24 @@ class TableState<Key, Row> {
     this.forceUpdate();
   }
 
-  reloadSettings() {
-    const { settings, resize, visible } = this;
-    resize.clear();
-    visible.clear();
-    const theSettings: undefined | TableSettings =
-      Settings.getWindowSettings(settings, jTableSettings, undefined);
-    if (theSettings) {
-      forEach(theSettings.resize, (cw, cid) => {
-        this.resize.set(cid, cw);
-      });
-      forEach(theSettings.visible, (cv, cid) => {
-        this.visible.set(cid, cv);
-      });
-      this.forceUpdate();
-    }
-  }
-
   importSettings(settings?: string) {
     if (settings !== this.settings) {
       this.settings = settings;
-      this.reloadSettings();
+      const { resize } = this;
+      const { visible } = this;
+      resize.clear();
+      visible.clear();
+      const theSettings: undefined | TableSettings =
+        Settings.getWindowSettings(settings, jTableSettings, undefined);
+      if (theSettings) {
+        forEach(theSettings.resize, (cw, cid) => {
+          if (typeof cw === 'number') this.resize.set(cid, cw);
+        });
+        forEach(theSettings.visible, (cv, cid) => {
+          if (typeof cv === 'boolean') this.visible.set(cid, cv);
+        });
+        this.forceUpdate();
+      }
     }
   }
 
@@ -991,6 +998,7 @@ function makeResizers(
 const CSS_HEADER_HEIGHT = 22;
 const CSS_ROW_HEIGHT = 20;
 
+// Modifies state in place
 function makeTable<Key, Row>(
   props: TableProps<Key, Row>,
   state: TableState<Key, Row>,
@@ -1008,11 +1016,13 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
+  /* eslint-disable no-param-reassign */
   state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
+  /* eslint-enable no-param-reassign */
 
   return (
     <div onKeyDown={state.onKeyDown}>
@@ -1078,7 +1088,7 @@ function makeTable<Key, Row>(
 
    @template Key - unique identifiers of table entries.
    @template Row - data associated to each key in the table entries.
-*/
+ */
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 
@@ -1094,7 +1104,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
-  Dome.useEvent(Dome.windowSettings, state.reloadSettings);
+  Settings.useGlobalSettingsEvent(state.importSettings);
   return (
     <div className="dome-xTable">
       <React.Fragment key="columns">

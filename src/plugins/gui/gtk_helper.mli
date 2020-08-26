@@ -151,7 +151,7 @@ module Configuration: sig
   val config_values : key:string -> default:'a ->
     values:('a * string) list -> 'a #selector -> unit
   (** The [values] field is used as a dictionary of available values.
-      They are compared with [Pervasives.(=)]. *)
+      They are compared with [Stdlib.(=)]. *)
 
 end
 

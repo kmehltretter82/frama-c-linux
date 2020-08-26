@@ -39,7 +39,7 @@ module Mode = struct
         type t = mode
         let name = "Domain_mode.Mode"
         let reprs = [ default ]
-        let compare = Transitioning.Stdlib.compare
+        let compare = Stdlib.compare
         let equal = Datatype.from_compare
         let hash = Hashtbl.hash
       end)

@@ -67,7 +67,7 @@ module D =
             if i1 = i2 then 0
             else if Cil.intTypeIncluded i1 i2 then -1 else 1
           | C_float f1, C_float f2 ->
-            Transitioning.Stdlib.compare f1 f2
+            Stdlib.compare f1 f2
           | (C_integer _ | C_float _ | Gmpz | Rational | Real), Nan
           | (C_integer _ | C_float _ | Gmpz | Rational ), Real
           | (C_integer _ | C_float _ | Gmpz), Rational

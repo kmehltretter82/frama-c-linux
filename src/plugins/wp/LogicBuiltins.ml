@@ -182,14 +182,14 @@ let iter_table f =
   Hashtbl.iter
     (fun a sigs -> List.iter (fun (ks,lnk) -> items := (a,ks,lnk)::!items) sigs)
     (cdriver_ro ()).hlogic ;
-  List.iter f (List.sort Transitioning.Stdlib.compare !items)
+  List.iter f (List.sort Stdlib.compare !items)
 
 let iter_libs f =
   let items = ref [] in
   Hashtbl.iter
     (fun a libs -> items := (a,libs) :: !items)
     (cdriver_ro ()).hdeps ;
-  List.iter f (List.sort Transitioning.Stdlib.compare !items)
+  List.iter f (List.sort Stdlib.compare !items)
 
 let dump () =
   Log.print_on_output

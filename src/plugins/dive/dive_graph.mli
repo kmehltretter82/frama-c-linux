@@ -20,46 +20,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type node_kind =
-  | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
-  | Composite of Cil_types.varinfo
-  | Scattered of Cil_types.lval * Cil_types.kinstr
-  | Alarm of Cil_types.stmt * Alarms.alarm
+open Dive_types
 
-type node_locality = {
-  loc_file : string;
-  loc_callstack : Callstack.t;
-}
+include Graph.Sig.G
+  with type V.t = node
+   and type E.t = node * dependency * node
 
-type 'a interval = {min: 'a; max: 'a}
+module Node : Datatype.S_with_collections with type t = node
 
-type precision_grade = Singleton | Normal | Wide
+module Dependency : Graph.Sig.COMPARABLE with type t = dependency
 
-type 'a node_values = {
-  values_interval : 'a interval;
-  values_limits : 'a interval;
-  values_grade : precision_grade;
-}
+val create : ?size:int -> unit -> t
 
-type node = {
-  node_key : int;
-  node_kind : node_kind;
-  node_locality : node_locality;
-  mutable node_hidden : bool;
-  mutable node_int_values : (Integer.t node_values) option;
-  mutable node_float_values : (float node_values) option;
-  mutable node_deps_computed : bool;
-}
+val create_node :
+  node_kind:node_kind ->
+  node_locality:node_locality -> t -> node
 
-type dependency_kind = Callee | Data | Address | Control | Composition
+val remove_node : t -> node -> unit
 
-type dependency = {
-  dependency_key : int;
-  dependency_kind : dependency_kind;
-  mutable dependency_multiple : bool;
-}
+val update_node_values : node -> Cvalue.V.t -> Cil_types.typ -> unit
 
-type graph_diff = {
-  added_nodes: node list;
-  removed_nodes: node list;
-}
+val create_dependency : t -> Cil_types.kinstr ->
+  node -> dependency_kind -> node -> unit
+
+val remove_dependency : t -> node * dependency * node -> unit
+val remove_dependencies : t -> node -> unit
+
+val find_independant_nodes : t -> node list -> node list
+val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
+  t -> node list -> node list
+
+val ouptput_to_dot : out_channel -> t -> unit
+val ouptput_to_json : out_channel -> t -> unit
+
+val to_json : t -> Json.t
+val diff_to_json : t -> graph_diff -> Json.t

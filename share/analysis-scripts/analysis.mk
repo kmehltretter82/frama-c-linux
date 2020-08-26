@@ -20,23 +20,19 @@
 #                                                                        #
 ##########################################################################
 
-# This file is intended to be included by a classic Makefile when doing
-# non-trivial analyses with Frama-C and its Eva plugin. For instance, you
-# can start your Makefile with the following line:
-#
-# include path/to/frama-c.mk
+# Makefile for Frama-C/Eva case studies.
+# This file is included by epilogue.mk, when using template.mk.
+# See the Frama-C User Manual for more details.
 #
 # This Makefile uses the following variables.
 #
-# FRAMAC        the frama-c binary
-# FRAMAC_GUI    the frama-c gui binary
+# FRAMAC        frama-c binary
+# FRAMAC_GUI    frama-c gui binary
 # CPPFLAGS      preprocessing flags
+# MACHDEP       machdep
 # FCFLAGS       general flags to use with frama-c
 # FCGUIFLAGS    flags to use with frama-c-gui
 # EVAFLAGS      flags to use with the Eva plugin
-# SLEVEL        the part of the frama-c command line concerning slevel
-#               (you can use EVAFLAGS for this, if you don't intend
-#               to use slevel-tweaker.sh)
 # EVABUILTINS   Eva builtins to be set (via -eva-builtin)
 # EVAUSESPECS   Eva functions to be overridden by specs (-eva-use-spec)
 #
@@ -52,15 +48,14 @@
 # With command line arguments:
 #   make FRAMAC=~/bin/frama-c
 #
-# In your Makefile, when you want to change a parameter for all analyses :
+# In your Makefile, when you want to change a parameter for all analyses:
 #   FCFLAGS += -verbose 2
 #
 # In your Makefile, for a single target :
 #   target.eva: FCFLAGS += -main my_main
 #
-# In order to define an analysis target named target, you must in addition
-# give the list of source files containing the code to be analyzed by adding
-# them as dependencies of target.parse, a in
+# For each analysis target, you must give the list of sources to be analyzed
+# by adding them as prerequisites of target.parse, as in:
 #
 # target.parse: file1.c file2.c file3.c...
 #
@@ -71,6 +66,8 @@ ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
 endif
 
 # Test if on a Mac (and therefore sed has fewer options)
+# Also test if /usr/bin/time is available, otherwise use the shell builtin
+# (which has less options)
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   SED_UNBUFFERED:=sed
@@ -116,14 +113,12 @@ fc_list = $(subst $(space),$(comma),$(strip $1))
 FRAMAC     ?= frama-c
 FRAMAC_SCRIPT = $(FRAMAC)-script
 FRAMAC_GUI ?= frama-c-gui
-SLEVEL     ?=
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix \
   -memexec-all -calldeps -permissive -from-verbose 0 \
-  $(SLEVEL) \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 FCFLAGS    ?=
@@ -146,7 +141,6 @@ clean-backups:
 
 # --- Generic rules ---
 
-TIMESTAMP    := $(shell date +"%Y-%m-%d_%H-%M-%S")
 HR_TIMESTAMP := $(shell date +"%H:%M:%S %d/%m/%Y")# Human readable
 DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
 SHELL        := /bin/bash
@@ -161,7 +155,7 @@ SHELL        := /bin/bash
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
-%.parse: PARSE = $(FRAMAC) $(FCFLAGS) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
+%.parse: PARSE = $(FRAMAC) $(FCFLAGS) $(if $(value MACHDEP),-machdep $(MACHDEP),) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
@@ -186,7 +180,6 @@ SHELL        := /bin/bash
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevents remake if nothing changes
 
-%.slevel.eva: SLEVEL = -slevel $(word 2,$(subst ., ,$*))
 %.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
 %.eva: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
@@ -226,7 +219,6 @@ SHELL        := /bin/bash
 	fi
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevents remake if nothing changes
-	cp -r $@ $*_$(TIMESTAMP).eva
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &

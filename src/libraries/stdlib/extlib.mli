@@ -320,6 +320,13 @@ val strip_underscore: string -> string
 
 val html_escape: string -> string
 
+(** [format_string_of_stag stag] returns the string corresponding to [stag],
+    or raises an exception if the tag extension is unsupported.
+
+    @since Frama-C+dev
+ *)
+val format_string_of_stag: Format.stag -> string
+
 (* ************************************************************************* *)
 (** {2 Performance} *)
 (* ************************************************************************* *)
@@ -351,9 +358,9 @@ val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
       @since 19.0-Potassium  *)
 
 val safe_at_exit : (unit -> unit) -> unit
-  (** Register function to call with [Pervasives.at_exit], but only
+  (** Register function to call with [Stdlib.at_exit], but only
       for non-child process (fork). The order of execution is preserved 
-      {i wrt} ordinary calls to [Pervasives.at_exit]. *)
+      {i wrt} ordinary calls to [Stdlib.at_exit]. *)
 
 val cleanup_at_exit: string -> unit
   (** [cleanup_at_exit file] indicates that [file] must be removed when the
@@ -386,7 +393,7 @@ val safe_remove_dir: string -> unit
 (** Comparison functions *)
 (* ************************************************************************* *)
 
-(** Use this function instead of [Pervasives.compare], as this makes
+(** Use this function instead of [Stdlib.compare], as this makes
     it easier to find incorrect uses of the latter *)
 external compare_basic: 'a -> 'a -> int = "%compare"
 

@@ -327,6 +327,15 @@ export function useWindowSettingsData<A>(
   }, WindowDriver, key);
 }
 
+/** Call the callback function on window settings events. */
+export function useWindowSettingsEvent(callback: () => void) {
+  React.useEffect(() => {
+    const { evt } = WindowDriver;
+    SysEmitter.on(evt, callback);
+    return () => { SysEmitter.off(evt, callback); };
+  });
+}
+
 // --------------------------------------------------------------------------
 // --- Global Settings
 // --------------------------------------------------------------------------
@@ -344,6 +353,15 @@ const GlobalDriver = new Driver({
  */
 export function useGlobalSettings<A>(S: GlobalSettings<A>) {
   return useSettings(S, GlobalDriver, S.name);
+}
+
+/** Call the callback function on global settings events. */
+export function useGlobalSettingsEvent(callback: () => void) {
+  React.useEffect(() => {
+    const { evt } = GlobalDriver;
+    SysEmitter.on(evt, callback);
+    return () => { SysEmitter.off(evt, callback); };
+  });
 }
 
 // --------------------------------------------------------------------------

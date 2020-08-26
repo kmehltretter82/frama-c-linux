@@ -21,179 +21,316 @@
 (**************************************************************************)
 
 open Server
-
-(* TODO: state *)
-let get_graph =
-  let graph = ref None in
-  fun () ->
-    match !graph with
-    | Some g -> g
-    | None ->
-      let g = Build.create () in
-      graph := Some g;
-      g
+open Data
+open Dive_types
 
 let package = Package.package ~plugin:"dive" ~title:"Dive Services" ()
 
-module Graph =
-struct
-  type t = Imprecision_graph.t
-  let jtype = Data.Jany.jtype
-  let to_json = Imprecision_graph.to_json
-end
 
-module GraphDiff =
-struct
-  type t = Imprecision_graph.t * Graph_types.graph_diff
-  let jtype = Data.Jany.jtype
-  let to_json = fun (g,d) -> Imprecision_graph.diff_to_json g d
-end
+(* -------------------------------------------------------------------------- *)
+(* --- State handling                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
-module Variable =
-struct
-  let name = "variableName"
-  let descr = Markdown.plain "The name of variable of the program"
-
-  let signature = Data.Record.signature ()
-
-  let fun_field = Data.Record.option signature
-      ~name:"funName"
-      ~descr:(Markdown.plain "owner function for a local variable")
-      (module Data.Jalpha)
-
-  let var_field = Data.Record.field signature
-      ~name:"varName"
-      ~descr:(Markdown.plain "variable name")
-      (module Data.Jalpha)
-
-  type t = Cil_types.varinfo
-
-  let data = Data.Record.publish ~package ~name ~descr signature
-  module R = (val data : Data.Record.S with type r = t)
-
-  let jtype = R.jtype
-
-  let to_json v =
-    let varname = v.Cil_types.vname in
-    let fields = R.default |> R.set var_field varname in
-    let fields = match Kernel_function.find_defining_kf v with
-      | Some kf -> fields |> R.set fun_field (Some (Kernel_function.get_name kf))
-      | None -> fields
-    in
-    R.to_json fields
-
-  let of_json json =
-    let open Yojson.Basic.Util in
-    let funname =
-      try Some (json |> member "fun" |> to_string)
-      with Not_found -> None
-    and varname = json |> member "var" |> to_string in
-    match funname with
-    | Some name ->
-      let kf =
-        try
-          Globals.Functions.find_by_name name
-        with Not_found ->
-          Data.failure "no function '%s'" name
-      in
-      let vi =
-        try Globals.Vars.find_from_astinfo varname (Cil_types.VLocal kf)
-        with Not_found ->
-        try Globals.Vars.find_from_astinfo varname (Cil_types.VFormal kf)
-        with Not_found ->
-          Data.failure "no variable '%s' in function '%s'"
-            varname name
-      in
-      vi
+(* TODO: project state *)
+let get_context =
+  let context = ref None in
+  fun () ->
+    match !context with
+    | Some c -> c
     | None ->
-      match
-        Globals.Syntactic_search.find_in_scope varname Cil_types.Program
-      with
-      | Some vi -> vi
-      | None ->
-        Data.failure "no global variable '%s'" varname
+      if Db.Value.is_computed () then
+        let c = Context.create () in
+        context := Some c;
+        c
+      else
+        begin
+          Self.error ~once:true
+            "A prior Eva analysis is required to build the graphs.";
+          Server.Data.failure "Eva analysis not computed"
+        end
+
+
+let global_window = ref {
+    perception = { backward = Some 2 ; forward = Some 1 };
+    horizon = { backward = None ; forward = None };
+  }
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Data types                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Range : Data.S with type t = int option range =
+struct
+  type t = int option range
+  let name = "range"
+  let descr = Markdown.plain "Parametrization of the exploration range."
+  let sign : t Record.signature = Record.signature ()
+
+  module Fields =
+  struct
+    let backward = Record.field sign
+        ~name:"backward"
+        ~descr:(Markdown.plain "range for the write dependencies")
+        (module Joption (Jint))
+
+    let forward = Record.field sign
+        ~name:"forward"
+        ~descr:(Markdown.plain "range for the read dependencies")
+        (module Joption (Jint))
+  end
+
+  module Record = (val Record.publish ~package ~name ~descr sign)
+
+  let jtype = Record.jtype
+
+  let to_json r =
+    Record.default |>
+    Record.set Fields.backward r.backward |>
+    Record.set Fields.forward r.forward |>
+    Record.to_json
+
+  let of_json js =
+    let r = Record.of_json js in
+    {
+      backward = Record.get Fields.backward r;
+      forward = Record.get Fields.forward r;
+    }
 end
 
-module Node : Data.S with type t = Graph_types.node =
+
+module Window : Data.S with type t = window =
 struct
-  type t = Graph_types.node
+  type t = window
+  let name = "explorationWindow"
+  let descr = Markdown.plain "Global parametrization of the exploration."
+  let sign : t Record.signature = Record.signature ()
 
-  let jtype = Package.Jindex "dive-node"
+  module Fields =
+  struct
+    let perception = Record.field sign
+        ~name:"perception"
+        ~descr:(Markdown.plain "how far dive will explore from root nodes ; \
+                                must be a finite range")
+        (module Range)
 
-  let to_json node =
-    `Int node.Graph_types.node_key
+    let horizon = Record.field sign
+        ~name:"horizon"
+        ~descr:(Markdown.plain "range beyond which the nodes must be hidden")
+        (module Range)
+  end
+
+  module Record = (val Record.publish ~package ~name ~descr sign)
+
+  let jtype = Record.jtype
+
+  let to_json w =
+    Record.default |>
+    Record.set Fields.perception w.perception |>
+    Record.set Fields.horizon w.horizon |>
+    Record.to_json
+
+  let of_json js =
+    let r = Record.of_json js in
+    {
+      perception = Record.get Fields.perception r;
+      horizon = Record.get Fields.horizon r;
+    }
+end
+
+
+module NodeId =
+struct
+  type t = node
+  let name = "nodeId"
+  let descr = Markdown.plain "A node identifier in the graph"
+
+  let jtype = Data.declare ~package ~name ~descr Data.Jint.jtype
+
+  let _to_json node =
+    `Int node.node_key
 
   let of_json json =
-    let open Yojson.Basic.Util in
-    let node_key = to_int json in
+    let node_key = Data.Jint.of_json json in
     try
-      Build.find_node (get_graph ()) node_key
+      Context.find_node (get_context ()) node_key
     with Not_found ->
       Data.failure "no node '%d' in the current graph" node_key
 end
+
+module Callsite =
+struct
+  let name = "callsite"
+  let descr = Markdown.plain "A callsite"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "fun", Jstring;
+      "instr", Junion [ Jnumber ; Jstring ];
+    ])
+end
+
+module Callstack =
+struct
+  let name = "callstack"
+  let descr = Markdown.plain "The callstack context for a node"
+  let jtype = Data.declare ~package ~name ~descr (Jarray Callsite.jtype)
+end
+
+module NodeLocality =
+struct
+  let name = "nodeLocality"
+  let descr = Markdown.plain "The description of a node locality"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "file", Jstring;
+      "callstack", Joption (Callstack.jtype)
+    ])
+end
+
+module Node =
+struct
+  let name = "node"
+  let descr = Markdown.plain "A graph node"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "id", NodeId.jtype;
+      "label", Jstring;
+      "kind", Jstring;
+      "locality", NodeLocality.jtype;
+      "is_root", Jboolean;
+      "backward_explored", Jstring;
+      "forward_explored", Jstring;
+      "writes", Jarray Kernel_ast.KfMarker.jtype;
+      "values", Joption Jstring;
+      "range", Junion [ Jnumber ; Jstring ];
+      "type", Joption Jstring
+    ])
+end
+
+module Dependency =
+struct
+  let name = "dependency"
+  let descr = Markdown.plain "The dependency between two nodes"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "id", Jnumber ;
+      "src", NodeId.jtype ;
+      "dst", NodeId.jtype ;
+      "kind", Jstring ;
+      "origins", Jarray Kernel_ast.KfMarker.jtype
+    ])
+end
+
+module Graph =
+struct
+  type t = Dive_graph.t
+  let name = "graphData"
+  let descr = Markdown.plain "The whole graph being built"
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "nodes", Jarray Node.jtype;
+      "deps", Jarray Dependency.jtype
+    ])
+
+  let to_json = Dive_graph.to_json
+end
+
+
+module GraphDiff =
+struct
+  type t = Dive_graph.t * graph_diff
+  let name = "diffData"
+  let descr = Markdown.plain "Graph differences from the last action."
+  let jtype = Data.declare ~package ~name ~descr (Jrecord [
+      "root", Joption NodeId.jtype;
+      "add", Jrecord [
+        "nodes", Jarray Node.jtype;
+        "deps", Jarray Dependency.jtype
+      ];
+      "sub", Jarray NodeId.jtype
+    ])
+
+  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
+end
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Actions                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let result context last_root =
+  let diff = Context.take_last_diff context in
+  Context.get_graph context, { diff with last_root }
+
+let finalize' context node_opt =
+  begin match node_opt with
+    | None -> ()
+    | Some node ->
+      let may_explore f =
+        Extlib.may (fun depth -> f ~depth context node)
+      in
+      may_explore Build.explore_backward !global_window.perception.backward;
+      may_explore Build.explore_forward !global_window.perception.forward;
+      let horizon = !global_window.horizon in
+      if Extlib.has_some horizon.forward ||
+         Extlib.has_some horizon.backward
+      then
+        Build.reduce_to_horizon context horizon node
+  end;
+  result context node_opt
+
+let finalize context node =
+  finalize' context (Some node)
+
+let () = Request.register ~package
+    ~kind:`SET ~name:"window"
+    ~descr:(Markdown.plain "Set the exploration window")
+    ~input:(module Window) ~output:(module Data.Junit)
+    (fun window -> global_window := window)
 
 let () = Request.register ~package
     ~kind:`GET ~name:"graph"
     ~descr:(Markdown.plain "Retrieve the whole graph")
     ~input:(module Data.Junit) ~output:(module Graph)
-    (fun () -> Build.get_graph (get_graph ()))
+    (fun () -> Context.get_graph (get_context ()))
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
-    (fun () -> Build.clear (get_graph ()))
+    (fun () -> Context.clear (get_context ()))
 
 let () = Request.register ~package
-    ~kind:`EXEC ~name:"addVar"
-    ~descr:(Markdown.plain "Add a variable to the graph")
-    ~input:(module Variable) ~output:(module GraphDiff)
-    begin fun var ->
-      let depth = Self.DepthLimit.get () in
-      let g = get_graph () in
-      Build.add_var ~depth g var;
-      Build.get_graph g, Build.take_last_differences g
-    end
-
-let () = Request.register ~package
-    ~kind:`EXEC ~name:"addFunctionAlarms"
-    ~descr:(Markdown.plain "Add all alarms of the given function")
-    ~input:(module Kernel_ast.Kf) ~output:(module GraphDiff)
-    begin fun kf ->
-      let depth = Self.DepthLimit.get () in
-      let g = get_graph () in
-      Build.add_function_alarms ~depth g kf;
-      Build.get_graph g, Build.take_last_differences g
+    ~kind:`EXEC ~name:"add"
+    ~descr:(Markdown.plain "Add a node to the graph")
+    ~input:(module Kernel_ast.Marker) ~output:(module GraphDiff)
+    begin fun loc ->
+      let context = get_context () in
+      finalize' context (Build.add_localizable context loc)
     end
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
-      let depth = Self.DepthLimit.get () in
-      let g = get_graph () in
-      Build.explore_from_node ~depth g node;
-      Build.get_graph g, Build.take_last_differences g
+      let context = get_context () in
+      Build.show context node;
+      finalize context node
     end
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
-      let depth = Self.DepthLimit.get () in
-      let g = get_graph () in
-      Build.show ~depth g node;
-      Build.get_graph g, Build.take_last_differences g
+      let context = get_context () in
+      Build.show context node;
+      Build.explore_backward ~depth:1 context node;
+      finalize' context None
     end
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
-    ~input:(module Node) ~output:(module GraphDiff)
+    ~input:(module NodeId) ~output:(module GraphDiff)
     begin fun node ->
-      let g = get_graph () in
-      Build.hide g node;
-      Build.get_graph g, Build.take_last_differences g
+      let context = get_context () in
+      Build.hide context node;
+      finalize' context None
     end

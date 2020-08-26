@@ -18,7 +18,7 @@ STRING=$*
 
 if
   [ ! -e $FILE ] ||
-  ! (diff --brief --ignore-space-change $FILE - <<< "$STRING")
+  ! (diff --brief --ignore-space-change $FILE - >/dev/null <<< "$STRING")
 then
   mkdir -p $(dirname "$FILE")
   echo $STRING > "$FILE"

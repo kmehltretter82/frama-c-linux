@@ -13,7 +13,8 @@ import * as Sidebar from 'dome/frame/sidebars';
 import './style.css';
 
 import { LabView, View, Group } from 'frama-c/LabViews';
-import { GridItem } from 'dome/layout/grids';
+import Dive from 'frama-c/dive/Dive';
+import { GridHbox, GridItem } from 'dome/layout/grids';
 import * as Controller from './Controller';
 
 import ASTview from './ASTview';
@@ -21,6 +22,7 @@ import ASTinfo from './ASTinfo';
 import Globals from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
+import Values from './Values';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -55,8 +57,10 @@ const HistorySelectionControls = () => {
 // --------------------------------------------------------------------------
 
 export default (() => {
-  const [sidebar, flipSidebar] = Dome.useBoolSettings('frama-c.sidebar.unfold');
-  const [viewbar, flipViewbar] = Dome.useBoolSettings('frama-c.viewbar.unfold');
+  const [sidebar, flipSidebar] =
+    Dome.useBoolSettings('frama-c.sidebar.unfold', true);
+  const [viewbar, flipViewbar] =
+    Dome.useBoolSettings('frama-c.viewbar.unfold', true);
 
   return (
     <Vfill>
@@ -86,8 +90,26 @@ export default (() => {
           customize={viewbar}
           settings="frama-c.labview"
         >
-          <View id="dashboard" label="Dashboard" defaultView>
+          <View id="console" label="Console" defaultView>
             <GridItem id="frama-c.console" />
+          </View>
+          <View id="values" label="Values">
+            <GridHbox>
+              <GridItem id="frama-c.astview" />
+              <GridItem id="frama-c.values" />
+            </GridHbox>
+            <GridItem id="frama-c.properties" />
+          </View>
+          <View id="dive" label="Dive">
+            <GridHbox>
+              <GridItem id="frama-c.astview" />
+              <GridItem id="dive.graph" />
+              <GridItem id="frama-c.locations" />
+            </GridHbox>
+            <GridHbox>
+              <GridItem id="frama-c.properties" />
+              <GridItem id="frama-c.console" />
+            </GridHbox>
           </View>
           <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
             <Controller.Console />
@@ -95,6 +117,8 @@ export default (() => {
             <ASTview />
             <ASTinfo />
             <Locations />
+            <Dive />
+            <Values />
           </Group>
         </LabView>
       </Splitter>

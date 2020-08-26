@@ -828,7 +828,7 @@ struct
                 (fun (s1,e1) (s2,e2) ->
                    match s1,s2 with
                    | true,true | false,false ->
-                       Transitioning.Stdlib.compare (T.weigth e1) (T.weigth e2)
+                       Stdlib.compare (T.weigth e1) (T.weigth e2)
                    | true,false -> (-1)
                    | false,true -> 1
                 ) sxs in

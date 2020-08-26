@@ -46,9 +46,9 @@ let configure =
         begin try
             Arg.parse_argv ~current:(ref 0) args
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
-              (fun _ -> raise (Arg.Help "Unknown why3 option"))
+              (fun opt -> raise (Arg.Bad ("unknown option: " ^ opt)))
               "Why3 options"
-          with Arg.Bad s -> Wp_parameters.abort "%s" s
+          with Arg.Bad s | Arg.Help s -> Wp_parameters.abort "%s" s
         end;
         ignore (Why3.Debug.Args.option_list ());
         Why3.Debug.Args.set_flags_selected ();

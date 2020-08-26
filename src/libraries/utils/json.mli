@@ -44,8 +44,8 @@ type json =
   | `String of string ]
 
 type t = json
-val equal : t -> t -> bool (** Pervasives *)
-val compare : t -> t -> int (** Pervasives *)
+val equal : t -> t -> bool (** Stdlib *)
+val compare : t -> t -> int (** Stdlib *)
 val pp : Format.formatter -> t -> unit
 val pp_dump : Format.formatter -> t -> unit (** without formatting *)
 

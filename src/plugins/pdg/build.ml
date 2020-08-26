@@ -45,7 +45,7 @@ exception Err_Bot of string
 
 (** set of nodes of the graph *)
 module BoolNodeSet =
-  Transitioning.Stdlib.Set.Make(Datatype.Pair(Datatype.Bool)(PdgTypes.Node))
+  Stdlib.Set.Make(Datatype.Pair(Datatype.Bool)(PdgTypes.Node))
 
 let pretty_node ?(key=false) fmt n = 
   PdgTypes.Node.pretty fmt n;

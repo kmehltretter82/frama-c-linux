@@ -6,17 +6,17 @@ import React from 'react';
 import _ from 'lodash';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-import { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-
 import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers } from 'api/plugins/eva';
+import { getCallers, getDeadCode } from 'api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -50,15 +50,13 @@ async function loadAST(
     (async () => {
       try {
         const data = await Server.send(printFunction, theFunction);
-        buffer.operation(() => {
-          buffer.clear();
-          if (!data) {
-            buffer.log('// No code for function', theFunction);
-          }
-          buffer.printTextWithTags(data);
-          if (theMarker)
-            buffer.scroll(theMarker, undefined);
-        });
+        buffer.clear();
+        if (!data) {
+          buffer.log('// No code for function', theFunction);
+        }
+        Utils.printTextWithTags(buffer, data);
+        if (theMarker)
+          buffer.scroll(theMarker);
       } catch (err) {
         D.error(
           `Fail to retrieve the AST of function '${theFunction}' ` +
@@ -100,6 +98,8 @@ const ASTview = () => {
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
 
+  const deadCode = States.useRequest(getDeadCode, theFunction);
+
   // Hook: async loading
   React.useEffect(() => {
     if (printed.current !== theFunction) {
@@ -112,42 +112,37 @@ const ASTview = () => {
     const decorator = (marker: string) => {
       if (multipleSelections?.some((location) => location?.marker === marker))
         return 'highlighted-marker';
+      if (deadCode?.unreachable?.some((m) => m === marker))
+        return 'dead-code';
+      if (deadCode?.nonTerminating?.some((m) => m === marker))
+        return 'non-terminating';
       return undefined;
     };
     buffer.setDecorator(decorator);
-  }, [buffer, multipleSelections]);
+  }, [buffer, multipleSelections, deadCode]);
 
   // Hook: marker scrolling
   React.useEffect(() => {
-    if (theMarker) buffer.scroll(theMarker, undefined);
+    if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
   // Callbacks
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
   const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
-  function onTextSelection(id: key<'#markerIndo'>) {
+  function onTextSelection(id: string) {
     if (selection.current) {
       const location = { ...selection.current, marker: id };
       updateSelection({ location });
     }
   }
 
-  async function onContextMenu(id: key<'#markerInfo'>) {
+  async function onContextMenu(id: string) {
     const items = [];
-    const selectedMarkerInfo = markersInfo.getData(id);
-    switch (selectedMarkerInfo?.kind) {
-      case 'function': {
-        items.push({
-          label: `Go to definition of ${selectedMarkerInfo.name}`,
-          onClick: () => {
-            const location = { function: selectedMarkerInfo.name };
-            updateSelection({ location });
-          },
-        });
-        break;
-      }
-      case 'declaration': {
+    const markerId = (id as Json.key<'#markerInfo'>);
+    const selectedMarkerInfo = markersInfo.getData(markerId);
+    if (selectedMarkerInfo?.var === 'function') {
+      if (selectedMarkerInfo.kind === 'declaration') {
         if (selectedMarkerInfo?.name) {
           const locations = await functionCallers(selectedMarkerInfo.name);
           const locationsByFunction = _.groupBy(locations, (e) => e.function);
@@ -165,10 +160,15 @@ const ASTview = () => {
               });
             });
         }
-        break;
+      } else {
+        items.push({
+          label: `Go to definition of ${selectedMarkerInfo.name}`,
+          onClick: () => {
+            const location = { function: selectedMarkerInfo.name };
+            updateSelection({ location });
+          },
+        });
       }
-      default:
-        break;
     }
     if (items.length > 0)
       Dome.popupMenu(items);

@@ -135,7 +135,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
          Format.fprintf fmt "%a" self#pp_file_metrics filename) metrics_map
 
   method print_stats fmt =
-    Transitioning.Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
+    Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
     Format.pp_set_tags fmt true;
     let pr_hdr fmt hdr_name =
       Format.fprintf fmt "@{<th>%s@}" hdr_name in
@@ -547,7 +547,7 @@ let pretty_used_files used_files =
 
 let dump_html fmt cil_visitor =
   (* Activate tagging for html *)
-  Transitioning.Format.pp_set_formatter_stag_functions fmt html_stag_functions;
+  Format.pp_set_formatter_stag_functions fmt html_stag_functions;
   Format.pp_set_tags fmt true;
 
   let pr_row s fmt n =

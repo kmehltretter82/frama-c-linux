@@ -509,7 +509,7 @@ const CLOCKEVENT = (period: number) => `dome.clock.${period}`;
 
 const TIC_CLOCK = (clk: Clock) => () => {
   if (0 < clk.pending) {
-    clk.time += clk.period;
+    clk.time += clk.period; // eslint-disable-line no-param-reassign
     System.emitter.emit(clk.event, clk.time);
   } else {
     if (clk.timer) clearInterval(clk.timer);

@@ -254,22 +254,24 @@ DISTRIB_FILES:=\
       Changelog config.h.in						\
       VERSION VERSION_CODENAME $(wildcard licenses/*)                   \
       $(LIBC_FILES)							\
+      share/analysis-scripts/analysis.mk                                \
       share/analysis-scripts/benchmark_database.py                      \
       share/analysis-scripts/cmd-dep.sh                                 \
       share/analysis-scripts/concat-csv.sh                              \
       share/analysis-scripts/clone.sh                                   \
       share/analysis-scripts/creduce.sh                                 \
-      $(wildcard share/analysis-scripts/examples/*)                     \
+      share/analysis-scripts/epilogue.mk                                \
       share/analysis-scripts/fc_stubs.c                                 \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
-      share/analysis-scripts/frama-c.mk                                 \
       share/analysis-scripts/frama_c_results.py                         \
+      share/analysis-scripts/function_finder.py                         \
       share/analysis-scripts/git_utils.py                               \
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
       share/analysis-scripts/parse-coverage.sh                          \
+      share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/summary.py                                 \
@@ -829,7 +831,7 @@ PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
-	values/numerors domains/numerors
+	api values/numerors domains/numerors
 PLUGIN_TESTS_DIRS+=value/traces
 
 # Files for the binding to Apron domains. Only available if Apron is available.
@@ -912,6 +914,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	engine/compute_functions engine/analysis register \
 	api/general_requests \
 	utils/unit_tests \
+	api/values_request \
 	$(APRON_CMO) $(NUMERORS_CMO)
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
@@ -1574,10 +1577,6 @@ STDLIB_FILES:=\
 	weak \
 	ephemeron
 
-ifeq ($(HAS_OCAML407),no)
-  STDLIB_FILES+=pervasives
-endif
-
 STDLIB_FILES:=$(patsubst %,$(OCAMLLIB)/%.mli,$(STDLIB_FILES))
 
 .PHONY: doc-kernel
@@ -1937,29 +1936,30 @@ install:: install-lib-$(OCAMLBEST)
 	  share/configure.ac share/autocomplete_frama-c share/_frama-c \
 	  $(FRAMAC_DATADIR)
 	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts
-	$(CP) share/analysis-scripts/benchmark_database.py \
+	$(CP) \
+	  share/analysis-scripts/analysis.mk \
+	  share/analysis-scripts/benchmark_database.py \
 	  share/analysis-scripts/cmd-dep.sh \
 	  share/analysis-scripts/concat-csv.sh \
 	  share/analysis-scripts/clone.sh \
 	  share/analysis-scripts/creduce.sh \
+	  share/analysis-scripts/epilogue.mk \
 	  share/analysis-scripts/fc_stubs.c \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
-	  share/analysis-scripts/frama-c.mk \
 	  share/analysis-scripts/frama_c_results.py \
+	  share/analysis-scripts/function_finder.py \
 	  share/analysis-scripts/git_utils.py \
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
 	  share/analysis-scripts/parse-coverage.sh \
+	  share/analysis-scripts/prologue.mk \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/summary.py \
 	  share/analysis-scripts/template.mk \
 	  $(FRAMAC_DATADIR)/analysis-scripts
-	$(MKDIR) $(FRAMAC_DATADIR)/analysis-scripts/examples
-	$(CP) share/analysis-scripts/examples/* \
-	  $(FRAMAC_DATADIR)/analysis-scripts/examples
 	$(MKDIR) $(FRAMAC_DATADIR)/compliance
 	$(CP) share/compliance/c11_functions.json \
 	  share/compliance/glibc_functions.json \

@@ -51,15 +51,15 @@ module Precisions = struct
   (* Defined by the IEEE-754 standard *)
   let exponent = function
     | Simple      -> 8      | Double      -> 11
-    | Long_Double -> 15     | Real        -> Transitioning.Stdlib.max_int
+    | Long_Double -> 15     | Real        -> Stdlib.max_int
 
   (* Computed as - ((2 - 2^(e-1)) - (m - 1)) where e is the number of bits of
      the exponent and m is the number of bits of the significand *)
   let denormalized = function
     | Simple      -> -149    | Double  -> -1074
-    | Long_Double -> -16494  | Real    -> Transitioning.Stdlib.min_int
+    | Long_Double -> -16494  | Real    -> Stdlib.min_int
 
-  let compare a b = Transitioning.Stdlib.compare (get a) (get b)
+  let compare a b = Stdlib.compare (get a) (get b)
   let eq a b = compare a b =  0
 
   let max a b = if compare a b <= 0 then b else a

@@ -1037,7 +1037,7 @@ let basic_command_string =
       end
     in
     if command.timeout = "" then raw_command
-    else "timeout " ^ command.timeout ^ " " ^ raw_command
+    else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
 (* Searches for executable [s] in the directories contained in the PATH
    environment variable. Returns [None] if not found, or
@@ -1128,7 +1128,7 @@ let command_string command =
     | "" -> command_string
     | s ->
       Printf.sprintf
-        "%s; if test $? -eq 124; then \
+        "%s; if test $? -gt 127; then \
          echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
          fi"
         command_string s (Filename.sanitize stderr)

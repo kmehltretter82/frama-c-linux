@@ -463,7 +463,7 @@ async function _launch() {
   const logger = (text: string | string[]) => {
     buffer.append(text);
     if (text.indexOf('\n') >= 0) {
-      buffer.scroll(undefined, undefined);
+      buffer.scroll();
     }
   };
   process?.stdout?.on('data', logger);

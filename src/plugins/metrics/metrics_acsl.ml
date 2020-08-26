@@ -284,7 +284,7 @@ let dump_acsl_stats fmt =
     
 
 let dump_acsl_stats_html fmt =
-  Transitioning.Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
+  Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
   Format.fprintf fmt
     "@[<v 0> <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\
           \"http://www.w3.org/TR/html4/strict.dtd\">@ \

@@ -46,7 +46,6 @@ let dynlib_init () =
   if not !dynlib_init then
     begin
       dynlib_init := true ;
-      Transitioning.Dynlink.init () ;
       Dynlink.allow_unsafe_modules true ;
     end
 

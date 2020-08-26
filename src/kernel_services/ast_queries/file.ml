@@ -303,7 +303,7 @@ module DatatypeMachdep = Datatype.Make_with_collections(struct
     let reprs = [Machdeps.x86_32]
     let name = "File.Machdep"
     type t = Cil_types.mach
-    let compare : t -> t -> int = Transitioning.Stdlib.compare
+    let compare : t -> t -> int = Stdlib.compare
     let equal : t -> t -> bool = (=)
     let hash : t -> int = Hashtbl.hash
     let copy = Datatype.identity

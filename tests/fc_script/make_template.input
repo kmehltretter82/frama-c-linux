@@ -1,7 +1,10 @@
+y
 fc_script_main
-file1.c file*.c dir/more_files.c
+for-find*.c main*.c
+y
 y
 y
 invalid_machdep
 n
 x86_64
+y

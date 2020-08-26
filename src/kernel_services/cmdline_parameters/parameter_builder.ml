@@ -338,8 +338,6 @@ struct
   (** {3 String} *)
   (* ************************************************************************ *)
 
-  module Pervasives_string = String
-
   module String
       (X: sig include Parameter_sig.Input_with_arg val default: string end) =
   struct
@@ -711,7 +709,7 @@ struct
 
     (* return the list of tokens, in reverse order *)
     let parse s =
-      let len = Pervasives_string.length s in
+      let len = Stdlib.String.length s in
       let rec aux acc pos i s =
         if i = len then acc
         else
@@ -730,7 +728,7 @@ struct
             read_char_in_word
               (fun acc -> add_char c (add_char '\\' acc)) (Word false)
           in
-          match Pervasives_string.get s i, pos with
+          match Stdlib.String.get s i, pos with
           | '+', Start when use_category ->
             aux (add_action Add acc) (Word true) next s
           | '-', Start when use_category ->
@@ -1552,7 +1550,7 @@ struct
         in
         let r = Str.regexp "[^:]:[^:]" in
         let split_delim d =
-          (Pervasives_string.sub d 0 1, Pervasives_string.sub d 2 1)
+          (Stdlib.String.sub d 0 1, Stdlib.String.sub d 2 1)
         in
         let remove_none_and_rev l =
           List.fold_left

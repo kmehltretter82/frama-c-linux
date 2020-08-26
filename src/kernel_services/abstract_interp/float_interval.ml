@@ -172,7 +172,7 @@ module Make (F: Float_sig.S) = struct
   let compare x y =
     match x, y with
     | FRange.Itv (b1, e1, n1), FRange.Itv (b2, e2, n2) ->
-      let c = Transitioning.Stdlib.compare n1 n2 in
+      let c = Stdlib.compare n1 n2 in
       if c <> 0 then c else
         let r = F.compare b1 b2 in
         if r <> 0 then r else F.compare e1 e2

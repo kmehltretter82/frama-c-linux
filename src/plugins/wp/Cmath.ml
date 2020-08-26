@@ -71,7 +71,7 @@ let builtin_truncate f e =
       begin
         try
           (* Waiting for Z-Arith to have truncation to big-int *)
-          let truncated = int_of_float (Transitioning.Q.to_float r) in
+          let truncated = int_of_float (Q.to_float r) in
           let reversed = Q.of_int truncated in
           let base = F.e_int truncated in
           if Q.equal r reversed then base else

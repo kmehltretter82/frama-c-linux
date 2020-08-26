@@ -19,5 +19,3 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
-module Variable : Server.Data.S with type t = Cil_types.varinfo

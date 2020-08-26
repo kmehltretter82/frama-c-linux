@@ -1,7 +1,5 @@
 [eva:alarm] tests/special/e-acsl-valid.c:37: Warning: 
   function f: precondition \valid(y) got status unknown.
-[eva:alarm] tests/special/e-acsl-valid.c:37: Warning: 
-  function f: precondition \valid(y) got status unknown.
 [e-acsl] beginning translation.
 [e-acsl] tests/special/e-acsl-valid.c:25: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.

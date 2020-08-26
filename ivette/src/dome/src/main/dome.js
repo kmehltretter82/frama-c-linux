@@ -392,7 +392,10 @@ function createPrimaryWindow()
 
   // React Developper Tools
   if (DEVEL)
-    installExtension(REACT_DEVELOPER_TOOLS,true);
+    installExtension(REACT_DEVELOPER_TOOLS,true)
+    .catch((err) => {
+      console.error('[Dome] Enable to install React dev-tools',err);
+    });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd ;
   const argv = stripElectronArgv(process.argv);
