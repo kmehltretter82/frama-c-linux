@@ -26,7 +26,31 @@ open Cil_types
 (* Expressions *)
 (* ********************************************************************** *)
 
-let mk_deref ~loc lv = Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
+let extract_uncoerced_lval e =
+  let rec aux e =
+    match e.enode with
+    | Lval _ -> Some e
+    | CastE (_, e) -> aux e
+    | _ -> None
+  in
+  aux e
+
+let mk_lval ~loc lval =
+  Cil.new_exp ~loc (Lval lval)
+
+let mk_deref ~loc lv = mk_lval ~loc (Mem lv, NoOffset)
+
+let mk_subscript ~loc array idx =
+  match extract_uncoerced_lval array with
+  | Some { enode = Lval lval } ->
+    let subscript_lval = Cil.addOffsetLval (Index(idx, NoOffset)) lval in
+    mk_lval ~loc subscript_lval
+  | Some _ | None ->
+    Options.fatal
+      ~current:true
+      "Trying to create a subscript on an array that is not an Lval: %a"
+      Cil_types_debug.pp_exp
+      array
 
 (* ********************************************************************** *)
 (* Statements *)
@@ -34,7 +58,15 @@ let mk_deref ~loc lv = Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
 
 let mk_stmt sk = Cil.mkStmt ~valid_sid:true sk
 let mk_instr i = mk_stmt (Instr i)
+let mk_block_stmt blk = mk_stmt (Block blk)
 let mk_call ~loc ?result e args = mk_instr (Call(result, e, args, loc))
+
+let mk_assigns ~loc ~result e = mk_instr (Set(result, e, loc))
+
+let mk_if ~loc ~cond ?(else_blk=Cil.mkBlock []) then_blk =
+  mk_stmt (If (cond, then_blk, else_blk, loc))
+
+let mk_break ~loc = mk_stmt (Break loc)
 
 type annotation_kind =
   | Assertion
@@ -59,7 +91,7 @@ let mk_block stmt b = match b.bstmts with
      | Instr(Skip _) -> stmt
      | _ -> assert false)
   | [ s ] -> s
-  |  _ :: _ -> mk_stmt (Block b)
+  |  _ :: _ -> mk_block_stmt b
 
 (* ********************************************************************** *)
 (* E-ACSL specific code *)

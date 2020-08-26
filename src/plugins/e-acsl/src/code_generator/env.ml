@@ -246,6 +246,21 @@ let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
     (Gmp_types.Z.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
+let rtl_call_to_new_var ~loc ?scope ?name env kf t ty func_name args =
+  let _, exp, env =
+    new_var
+      ~loc
+      ?scope
+      ?name
+      env
+      kf
+      t
+      ty
+      (fun v _ ->
+         [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) func_name args ])
+  in
+  exp, env
+
 module Logic_binding = struct
 
   let add_binding env logic_v vi =
@@ -336,9 +351,9 @@ let add_stmt ?(post=false) ?before env kf stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
-  let new_stmt = Cil.mkStmt ~valid_sid:true (Block block) in
+  let new_stmt = Constructor.mk_block_stmt block in
   let sk = stmt.skind in
-  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Cil.mkStmt ~valid_sid:true sk ]);
+  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Constructor.mk_stmt sk ]);
   let pre = match label with
     | BuiltinLabel(Here | Post) -> true
     | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
@@ -432,7 +447,7 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
        add the given [stmt] afterwards. This way, we have the guarantee that
        the final block does not contain any local, so may be transient. *)
     if split then
-      let sblock = Cil.mkStmt ~valid_sid:true (Block b) in
+      let sblock = Constructor.mk_block_stmt b in
       Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
     else
       b

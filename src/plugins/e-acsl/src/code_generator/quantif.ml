@@ -174,7 +174,7 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
           intType
           (fun v _ ->
              let lv = var v in
-             [ mkStmtOneInstr ~valid_sid:true (Set(lv, init_val, loc)) ])
+             [ Constructor.mk_assigns ~loc ~result:lv init_val ])
       in
       let end_loop_ref = ref dummyStmt in
       (* innermost block *)
@@ -183,29 +183,28 @@ let convert kf env loc is_forall p bounded_vars hyps goal =
            to evaluation of the goal *)
         let named_predicate_to_exp = !predicate_to_exp_ref in
         let test, env = named_predicate_to_exp kf (Env.push env) goal in
-        let then_block = mkBlock [ mkEmptyStmt ~loc () ] in
-        let else_block =
+        let then_blk = mkBlock [ mkEmptyStmt ~loc () ] in
+        let else_blk =
           (* use a 'goto', not a simple 'break' in order to handle 'forall' with
              multiple binders (leading to imbricated loops) *)
           mkBlock
-            [ mkStmtOneInstr ~valid_sid:true (Set(var var_res, found_val, loc));
+            [ Constructor.mk_assigns ~loc ~result:(var var_res) found_val;
               mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
         in
         let blk, env = Env.pop_and_get
             env
-            (mkStmt ~valid_sid:true
-               (If(mk_guard test, then_block, else_block, loc)))
+            (Constructor.mk_if ~loc ~cond:(mk_guard test) then_blk ~else_blk)
             ~global_clear:false
             Env.After
         in
         let blk = Cil.flatten_transient_sub_blocks blk in
-        [ mkStmt ~valid_sid:true (Block blk) ], env
+        [ Constructor.mk_block_stmt blk ], env
       in
       let stmts, env =
         Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
       in
       let env =
-        Env.add_stmt env kf (mkStmt ~valid_sid:true (Block (mkBlock stmts)))
+        Env.add_stmt env kf (Constructor.mk_block_stmt (mkBlock stmts))
       in
       (* where to jump to go out of the loop *)
       let end_loop = mkEmptyStmt ~loc () in

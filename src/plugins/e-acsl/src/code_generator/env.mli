@@ -59,6 +59,15 @@ val new_var_and_mpz_init:
 (** Same as [new_var], but dedicated to mpz_t variables initialized by
     {!Mpz.init}. *)
 
+val rtl_call_to_new_var:
+  loc:location -> ?scope:Varname.scope -> ?name:string ->
+  t -> kernel_function -> term option -> typ ->
+  string -> exp list ->
+  exp * t
+(** [rtl_call_to_new_var env t ty name args] Same as [new_var] but initialize
+    the variable with a call to the RTL function [name] with the given [args].
+*)
+
 module Logic_binding: sig
   val add: ?ty:typ -> t -> kernel_function -> logic_var -> varinfo * exp * t
   (* Add a new C binding to the list of bindings for the logic variable. *)

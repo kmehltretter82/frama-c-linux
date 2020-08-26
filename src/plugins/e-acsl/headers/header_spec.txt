@@ -66,6 +66,8 @@ src/code_generator/label.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/label.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/literal_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/literal_observer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/logic_array.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/logic_array.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/logic_functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/logic_functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/loops.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

@@ -74,6 +74,7 @@ SRC_CODE_GENERATOR:= \
 	at_with_lscope \
 	mmodel_translate \
 	logic_functions \
+	logic_array \
 	translate \
 	temporal \
 	memory_observer \
