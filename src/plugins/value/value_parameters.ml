@@ -960,6 +960,7 @@ let () = add_correctness_dep BuiltinsAuto.parameter
 let () = BuiltinsAuto.add_aliases ["-val-builtins-auto"]
 
 let () = Parameter_customize.set_group precision_tuning
+let () = Parameter_customize.set_negative_option_name ""
 module BuiltinsList =
   False
     (struct
