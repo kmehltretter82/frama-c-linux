@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 
 (* Convert \at on terms or predicates in which we can find purely
-  logic variable. *)
+   logic variable. *)
 
 (**************************************************************************)
 (*************************** Translation **********************************)
@@ -39,8 +39,8 @@ val to_exp:
 (*****************************************************************************)
 
 (* The different possible evaluations of the [\at] under study are
-  stored in a memory location that needs to be alloted then freed.
-  This part is designed for that purpose. *)
+   stored in a memory location that needs to be alloted then freed.
+   This part is designed for that purpose. *)
 
 module Malloc: sig
   val find_all: kernel_function -> stmt list

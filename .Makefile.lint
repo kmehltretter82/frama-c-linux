@@ -344,10 +344,3 @@ ML_LINT_KO+=src/plugins/variadic/standard.ml
 ML_LINT_KO+=src/plugins/variadic/translate.ml
 ML_LINT_KO+=src/plugins/variadic/va_build.ml
 ML_LINT_KO+=src/plugins/variadic/va_types.mli
-ML_LINT_KO+=src/plugins/e-acsl/src/analyses/mmodel_analysis.ml
-ML_LINT_KO+=src/plugins/e-acsl/src/analyses/rte.ml
-ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/at_with_lscope.ml
-ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/at_with_lscope.mli
-ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.ml
-ML_LINT_KO+=src/plugins/e-acsl/src/code_generator/temporal.mli
-
