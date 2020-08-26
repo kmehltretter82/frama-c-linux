@@ -25,19 +25,19 @@
 Plugin E-ACSL <next-release>
 ############################
 
--  E-ACSL       [2020-08-07] Add support for logical array comparison.
-                (frama-c/e-acsl#99)
--  E-ACSL       [2020-07-28] Add support of bitwise operators.
-                (frama-c/e-acsl#33)
--* E-ACSL       [2020-07-20] Fix unstable order of generated globals.
-                (frama-c/e-acsl#124)
+-  E-ACSL       [2020-08-07] Add support for logical array comparison
+                (frama-c/e-acsl#99).
+-  E-ACSL       [2020-07-28] Add support of bitwise operators
+                (frama-c/e-acsl#33).
+-* E-ACSL       [2020-07-20] Fix unstable order of generated globals
+                (frama-c/e-acsl#124).
 -* E-ACSL       [2020-07-10] Fix translation of trange (incorrect length).
 -* E-ACSL       [2020-07-09] Decrease the number of allocated blocks when one
                 block is freed.
 -  E-ACSL       [2020-06-19] Add support to create GMP rational from GMP
-                integer. (frama-c/e-acsl#120)
--* E-ACSL       [2020-06-18] Fix support of VLA memory tracking.
-                (frama-c/e-acsl#119)
+                integer (frama-c/e-acsl#120).
+-* E-ACSL       [2020-06-18] Fix support of VLA memory tracking
+                (frama-c/e-acsl#119).
 
 #############################
 Plugin E-ACSL 21.0 (Scandium)
