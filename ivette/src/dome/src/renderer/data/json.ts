@@ -11,7 +11,7 @@
 import { DEVEL } from 'dome/system';
 
 export type json =
-  undefined | null | number | string | json[] | { [key: string]: json }
+  undefined | null | number | string | json[] | { [key: string]: json };
 
 /**
    Parse without _revivals_.
@@ -71,14 +71,14 @@ export interface Encoder<D> {
 }
 
 /** Can be used for most encoders. */
-export function identity<A>(v: A): A { return v; };
+export function identity<A>(v: A): A { return v; }
 
 // --------------------------------------------------------------------------
 // --- Primitives
 // --------------------------------------------------------------------------
 
 /** Always returns `undefined` on any input. */
-export const jNull: Safe<undefined> = (_: json) => undefined;
+export const jNull: Safe<undefined> = () => undefined;
 
 /** Identity. */
 export const jAny: Safe<json> = (js: json) => js;
@@ -124,7 +124,7 @@ export const jString: Loose<string> = (js: json) => (
     might be more efficient.
 */
 export function jTag<A>(tg: A): Loose<A> {
-  return (js: json) => Object.is(js, tg) ? tg : undefined;
+  return (js: json) => (Object.is(js, tg) ? tg : undefined);
 }
 
 /**
@@ -132,7 +132,7 @@ export function jTag<A>(tg: A): Loose<A> {
    Can be used directly for enum types, eg. `jEnum(myEnumType)`.
  */
 export function jEnum<A>(d: { [tag: string]: A }): Loose<A> {
-  return (v: json) => typeof v === 'string' ? d[v] : undefined;
+  return (v: json) => (typeof v === 'string' ? d[v] : undefined);
 }
 
 /**
@@ -141,8 +141,8 @@ export function jEnum<A>(d: { [tag: string]: A }): Loose<A> {
    type `A`. However, it will not protected you from missings constants in `A`.
 */
 export function jTags<A>(...values: ((string | number) & A)[]): Loose<A> {
-  var m = new Map<string | number, A>();
-  values.forEach(v => m.set(v, v));
+  const m = new Map<string | number, A>();
+  values.forEach((v) => m.set(v, v));
   return (v: json) => (typeof v === 'string' ? m.get(v) : undefined);
 }
 
@@ -155,16 +155,20 @@ export function jDefault<A>(
   fn: Loose<A>,
   defaultValue: A,
 ): Safe<A> {
-  return (js: json) =>
-    js === undefined ? defaultValue : (fn(js) ?? defaultValue);
+  return (js: json) => (
+    js === undefined ? defaultValue : (fn(js) ?? defaultValue)
+  );
 }
 
 /**
-   Force returning `undefined` or a default value for `undefined` _or_ `null` JSON input.
+   Force returning `undefined` or a default value for
+   `undefined` _or_ `null` JSON input.
    Typically useful to leverage an existing `Safe<A>` decoder.
  */
 export function jOption<A>(fn: Safe<A>, defaultValue?: A): Loose<A> {
-  return (js: json) => (js === undefined || js === null ? defaultValue : fn(js));
+  return (js: json) => (
+    js === undefined || js === null ? defaultValue : fn(js)
+  );
 }
 
 /**
@@ -175,7 +179,7 @@ export function jFail<A>(fn: Loose<A>, error: string | Error): Safe<A> {
   return (js: json) => {
     const d = fn(js);
     if (d !== undefined) return d;
-    throw error;
+    throw (typeof (error) === 'string' ? new Error(error) : error);
   };
 }
 
@@ -216,10 +220,11 @@ export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
   return (js: json) => {
     const m = new Map<string, A>();
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      for (let k of Object.keys(js)) {
+      const keys = Object.keys(js);
+      keys.forEach((k) => {
         const v = fn(js[k]);
         if (v !== undefined) m.set(k, v);
-      }
+      });
     }
     return m;
   };
@@ -229,7 +234,7 @@ export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
    Converts dictionaries to maps.
  */
 export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
-  return m => {
+  return (m) => {
     const js: json = {};
     m.forEach((v, k) => {
       if (v !== undefined) {
@@ -248,7 +253,7 @@ export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
    to discard undefined elements, or use a true _safe_ decoder.
  */
 export function jArray<A>(fn: Safe<A>): Safe<A[]> {
-  return (js: json) => Array.isArray(js) ? js.map(fn) : [];
+  return (js: json) => (Array.isArray(js) ? js.map(fn) : []);
 }
 
 /**
@@ -259,7 +264,7 @@ export function jArray<A>(fn: Safe<A>): Safe<A[]> {
 export function jList<A>(fn: Loose<A>): Safe<A[]> {
   return (js: json) => {
     const buffer: A[] = [];
-    if (Array.isArray(js)) js.forEach(vj => {
+    if (Array.isArray(js)) js.forEach((vj) => {
       const d = fn(vj);
       if (d !== undefined) buffer.push(d);
     });
@@ -271,9 +276,9 @@ export function jList<A>(fn: Loose<A>): Safe<A[]> {
    Exports all non-undefined elements.
  */
 export function eList<A>(fn: Encoder<A>): Encoder<(A | undefined)[]> {
-  return m => {
+  return (m) => {
     const js: json[] = [];
-    m.forEach(v => {
+    m.forEach((v) => {
       if (v !== undefined) {
         const u = fn(v);
         if (u !== undefined) js.push(u);
@@ -288,10 +293,10 @@ export function jPair<A, B>(
   fa: Safe<A>,
   fb: Safe<B>,
 ): Loose<[A, B]> {
-  return (js: json) => Array.isArray(js) ? [
+  return (js: json) => (Array.isArray(js) ? [
     fa(js[0]),
     fb(js[1]),
-  ] : undefined;
+  ] : undefined);
 }
 
 /** Similar to [[jPair]]. */
@@ -300,11 +305,11 @@ export function jTriple<A, B, C>(
   fb: Safe<B>,
   fc: Safe<C>,
 ): Loose<[A, B, C]> {
-  return (js: json) => Array.isArray(js) ? [
+  return (js: json) => (Array.isArray(js) ? [
     fa(js[0]),
     fb(js[1]),
     fc(js[2]),
-  ] : undefined;
+  ] : undefined);
 }
 
 /** Similar to [[jPair]]. */
@@ -314,12 +319,12 @@ export function jTuple4<A, B, C, D>(
   fc: Safe<C>,
   fd: Safe<D>,
 ): Loose<[A, B, C, D]> {
-  return (js: json) => Array.isArray(js) ? [
+  return (js: json) => (Array.isArray(js) ? [
     fa(js[0]),
     fb(js[1]),
     fc(js[2]),
     fd(js[3]),
-  ] : undefined;
+  ] : undefined);
 }
 
 /** Similar to [[jPair]]. */
@@ -330,13 +335,13 @@ export function jTuple5<A, B, C, D, E>(
   fd: Safe<D>,
   fe: Safe<E>,
 ): Loose<[A, B, C, D, E]> {
-  return (js: json) => Array.isArray(js) ? [
+  return (js: json) => (Array.isArray(js) ? [
     fa(js[0]),
     fb(js[1]),
     fc(js[2]),
     fd(js[3]),
     fe(js[4]),
-  ] : undefined;
+  ] : undefined);
 }
 
 /**
@@ -345,7 +350,7 @@ export function jTuple5<A, B, C, D, E>(
 */
 export type Props<A> = {
   [P in keyof A]: Safe<A[P]>;
-}
+};
 
 /**
    Decode an object given the decoders of its fields.
@@ -355,7 +360,8 @@ export function jObject<A>(fp: Props<A>): Loose<A> {
   return (js: json) => {
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
       const buffer = {} as A;
-      for (var k of Object.keys(fp)) {
+      const keys = Object.keys(fp);
+      keys.forEach((k) => {
         const fn = fp[k as keyof A];
         if (fn !== undefined) {
           const fj = js[k];
@@ -364,7 +370,7 @@ export function jObject<A>(fp: Props<A>): Loose<A> {
             if (fv !== undefined) buffer[k as keyof A] = fv;
           }
         }
-      }
+      });
       return buffer;
     }
     return undefined;
@@ -376,8 +382,8 @@ export function jObject<A>(fp: Props<A>): Loose<A> {
  */
 export function jUnion<A>(...cases: Loose<A>[]): Loose<A> {
   return (js: json) => {
-    for (var fn of cases) {
-      const fv = fn(js);
+    for (let i = 0; i < cases.length; i++) {
+      const fv = cases[i](js);
       if (fv !== undefined) return fv;
     }
     return undefined;
@@ -389,7 +395,7 @@ export function jUnion<A>(...cases: Loose<A>[]): Loose<A> {
 */
 export type EProps<A> = {
   [P in keyof A]?: Encoder<A[P]>;
-}
+};
 
 /**
    Encode an object given the provided encoders by fields.
@@ -399,7 +405,8 @@ export type EProps<A> = {
 export function eObject<A>(fp: EProps<A>): Encoder<A> {
   return (m: A) => {
     const js: json = {};
-    for (var k of Object.keys(fp)) {
+    const keys = Object.keys(fp);
+    keys.forEach((k) => {
       const fn = fp[k as keyof A];
       if (fn !== undefined) {
         const fv = m[k as keyof A];
@@ -408,9 +415,9 @@ export function eObject<A>(fp: EProps<A>): Encoder<A> {
           if (r !== undefined) js[k] = r;
         }
       }
-    }
+    });
     return js;
-  }
+  };
 }
 
 // Intentionnaly internal and only declared
@@ -423,56 +430,43 @@ export function forge<K, A>(_tag: K, data: A): phantom<K, A> {
   return data as any;
 }
 
-/** String key with kind. Can be used as a `string` but shall be created with [forge]. */
+/** String key with kind.
+    Can be used as a `string` but shall be created with [forge]. */
 export type key<K> = phantom<K, string>;
 
-/** Number index with kind. Can be used as a `number` but shall be created with [forge]. */
+/** Number index with kind.
+    Can be used as a `number` but shall be created with [forge]. */
 export type index<K> = phantom<K, number>;
 
 /** Decoder for `key<K>` strings. */
 export function jKey<K>(kd: K): Loose<key<K>> {
-  return (js: json) => typeof js === 'string' ? forge(kd, js) : undefined;
+  return (js: json) => (typeof js === 'string' ? forge(kd, js) : undefined);
 }
 
 /** Decoder for `index<K>` numbers. */
 export function jIndex<K>(kd: K): Loose<index<K>> {
-  return (js: json) => typeof js === 'number' ? forge(kd, js) : undefined;
+  return (js: json) => (typeof js === 'number' ? forge(kd, js) : undefined);
 }
 
-/** Dictionaries with « typed » keys. */
-export type dict<K, A> = phantom<K, { [key: string]: A }>
-
-/** Lookup into dictionary.
-    Better than a direct access to `d[k]` for undefined values. */
-export function lookup<K, A>(d: dict<K, A>, k: key<K>): A | undefined {
-  return d[k];
-}
-
-/** Empty dictionary. */
-export function empty<K, A>(kd: K): dict<K, A> {
-  return forge(kd, {} as any);
-}
-
-/** Dictionary extension. */
-export function index<K, A>(d: dict<K, A>, key: key<K>, value: A) {
-  d[key] = value;
-}
+/** Dictionaries. */
+export type dict<A> = { [key: string]: A };
 
 /**
    Decode a JSON dictionary, discarding all inconsistent entries.
    If the JSON contains no valid entry, still returns `{}`.
 */
-export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
+export function jDict<A>(fn: Loose<A>): Safe<dict<A>> {
   return (js: json) => {
-    const buffer: dict<K, A> = empty(kd);
+    const buffer: dict<A> = {};
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      for (var key of Object.keys(js)) {
+      const keys = Object.keys(js);
+      keys.forEach((key) => {
         const fd = js[key];
         if (fd !== undefined) {
           const fv = fn(fd);
-          if (fv !== undefined) index(buffer, forge(kd, key), fv);
+          if (fv !== undefined) buffer[key] = fv;
         }
-      }
+      });
     }
     return buffer;
   };
@@ -482,16 +476,17 @@ export function jDictionary<K, A>(kd: K, fn: Loose<A>): Safe<dict<K, A>> {
    Encode a dictionary into JSON, discarding all inconsistent entries.
    If the dictionary contains no valid entry, still returns `{}`.
 */
-export function eDictionary<K, A>(fn: Encoder<A>): Encoder<dict<K, A>> {
-  return (d: dict<K, A>) => {
+export function eDict<A>(fn: Encoder<A>): Encoder<dict<A>> {
+  return (d: dict<A>) => {
     const js: json = {};
-    for (var k of Object.keys(d)) {
+    const keys = Object.keys(d);
+    keys.forEach((k) => {
       const fv = d[k];
       if (fv !== undefined) {
         const fr = fn(fv);
         if (fr !== undefined) js[k] = fr;
       }
-    }
+    });
     return js;
   };
 }

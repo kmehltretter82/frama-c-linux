@@ -30,7 +30,7 @@ import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
 
 import './style.css';
 
-const SVG = SVGraw as (props: { id: string, size?: number }) => JSX.Element;
+const SVG = SVGraw as (props: { id: string; size?: number }) => JSX.Element;
 
 // --------------------------------------------------------------------------
 // --- Rendering Interfaces
@@ -56,7 +56,7 @@ export type RenderByFields<Row> = {
    You may use hierarchical index to order columns.
    See [[ColumnGroup]].
  */
-export type index = number | number[]
+export type index = number | number[];
 
 /**
    Column Properties.
@@ -169,7 +169,7 @@ interface ColumnData {
   title?: string;
   headerMenu: () => void;
   headerRef: divRef;
-};
+}
 
 interface PopupItem {
   label: string;
@@ -177,11 +177,11 @@ interface PopupItem {
   enabled?: boolean;
   display?: boolean;
   onClick?: Trigger;
-};
+}
 
 type PopupMenu = ('separator' | PopupItem)[];
 
-type Cmap<A> = Map<string, A>
+type Cmap<A> = Map<string, A>;
 type Cprops = ColProps<any>;
 type ColProps<R> = ColumnProps<R, any>;
 
@@ -206,13 +206,13 @@ const defaultGetter = (row: any, dataKey: string) => {
 
 const defaultRenderer = (d: any) => (
   <div className="dome-xTable-renderer dome-text-label">
-    {new String(d)}
+    {String(d)}
   </div>
 );
 
 function makeRowGetter<Key, Row>(model?: Model<Key, Row>) {
   return ({ index }: Index) => model && model.getRowAt(index);
-};
+}
 
 function makeDataGetter(
   getter: ((row: any, dataKey: string) => any) = defaultGetter,
@@ -237,8 +237,8 @@ function makeDataRenderer(
   render: ((data: any) => ReactNode) = defaultRenderer,
   onContextMenu?: (row: any, index: number, dataKey: string) => void,
 ): TableCellRenderer {
-  return (props => {
-    const cellData = props.cellData;
+  return ((props) => {
+    const { cellData } = props;
     try {
       const contents = cellData ? render(cellData) : null;
       if (onContextMenu) {
@@ -270,7 +270,7 @@ type ColSettings<A> = { [id: string]: undefined | null | A };
 type TableSettings = {
   resize?: ColSettings<number>;
   visible?: ColSettings<boolean>;
-}
+};
 
 // --------------------------------------------------------------------------
 // --- Table State
@@ -384,7 +384,7 @@ class TableState<Key, Row> {
     const wl = cwl ? cwl + offset : 0;
     const wr = cwr ? cwr - offset : 0;
     if (wl > 40 && wr > 40) {
-      const resize = this.resize;
+      const { resize } = this;
       resize.set(lcol, wl);
       resize.set(rcol, wr);
       this.offset = offset;
@@ -405,8 +405,8 @@ class TableState<Key, Row> {
     if (userSettings) {
       const cws: ColSettings<number> = {};
       const cvs: ColSettings<boolean> = {};
-      const resize = this.resize;
-      const visible = this.visible;
+      const { resize } = this;
+      const { visible } = this;
       this.columns.forEach(({ id }) => {
         const cw = resize.get(id);
         const cv = visible.get(id);
@@ -422,8 +422,8 @@ class TableState<Key, Row> {
   importSettings(settings?: string) {
     if (settings !== this.settings) {
       this.settings = settings;
-      const resize = this.resize;
-      const visible = this.visible;
+      const { resize } = this;
+      const { visible } = this;
       resize.clear();
       visible.clear();
       const theSettings: undefined | TableSettings =
@@ -482,11 +482,12 @@ class TableState<Key, Row> {
   onSelection?: (data: Row, key: Key, index: number) => void;
 
   onRowClick(info: RowMouseEventHandlerParams) {
-    const index = info.index;
+    const { index } = info;
     const data = info.rowData as (Row | undefined);
-    const model = this.model;
-    const key = (data !== undefined) ? model?.getKeyFor(index, data) : undefined;
-    const onSelection = this.onSelection;
+    const { model } = this;
+    const key =
+      (data !== undefined) ? model?.getKeyFor(index, data) : undefined;
+    const { onSelection } = this;
     if (key !== undefined && data !== undefined && onSelection)
       onSelection(data, key, index);
   }
@@ -498,11 +499,11 @@ class TableState<Key, Row> {
 
   rowClassName({ index }: Index): string {
     if (this.selectedIndex === index) return 'dome-xTable-selected';
-    return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd');
+    return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'); // eslint-disable-line no-bitwise
   }
 
   keyStepper(index: number) {
-    const onSelection = this.onSelection;
+    const { onSelection } = this;
     const key = this.model?.getKeyAt(index);
     const data = this.model?.getRowAt(index);
     if (key !== undefined && data !== undefined && onSelection) {
@@ -521,7 +522,7 @@ class TableState<Key, Row> {
   }
 
   onSorting(ord?: SortingInfo) {
-    const sorting = this.sorting;
+    const { sorting } = this;
     if (sorting) {
       sorting.setSorting(ord);
       this.sortBy = ord?.sortBy;
@@ -561,16 +562,16 @@ class TableState<Key, Row> {
   // ---- Header Context Menu
 
   onHeaderMenu() {
-    let has_order = false;
-    let has_resize = false;
-    let has_visible = false;
-    const visible = this.visible;
-    const columns = this.columns;
-    columns.forEach(col => {
-      if (!col.disableSort) has_order = true;
-      if (!col.fixed) has_resize = true;
+    let hasOrder = false;
+    let hasResize = false;
+    let hasVisible = false;
+    const { visible } = this;
+    const { columns } = this;
+    columns.forEach((col) => {
+      if (!col.disableSort) hasOrder = true;
+      if (!col.fixed) hasResize = true;
       if (col.visible !== 'never' && col.visible !== 'always')
-        has_visible = true;
+        hasVisible = true;
     });
     const resetSizing = () => {
       this.resize.clear();
@@ -584,27 +585,27 @@ class TableState<Key, Row> {
     const items: PopupMenu = [
       {
         label: 'Reset ordering',
-        display: has_order && this.sorting,
+        display: hasOrder && this.sorting,
         onClick: this.onSorting,
       },
       {
         label: 'Reset column widths',
-        display: has_resize,
+        display: hasResize,
         onClick: resetSizing,
       },
       {
         label: 'Restore column defaults',
-        display: has_visible,
+        display: hasVisible,
         onClick: resetColumns,
       },
       'separator',
     ];
-    columns.forEach(col => {
+    columns.forEach((col) => {
       switch (col.visible) {
         case 'never':
         case 'always':
           break;
-        default:
+        default: {
           const { id, label, title } = col;
           const checked = isVisible(visible, col);
           const onClick = () => {
@@ -612,6 +613,7 @@ class TableState<Key, Row> {
             this.updateSettings();
           };
           items.push({ label: label || title || id, checked, onClick });
+        }
       }
     });
     Dome.popupMenu(items);
@@ -654,7 +656,7 @@ class TableState<Key, Row> {
     path: number[],
     index: number,
   ): Trigger {
-    const id = props.id;
+    const { id } = props;
     const theIndex = props.index ?? index;
     const thePath = path.concat(theIndex);
     this.setRegistry(id, { ...props, index: thePath });
@@ -705,7 +707,7 @@ export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
 function spawnIndex(
   state: TableState<any, any>,
   path: number[],
-  children: any
+  children: any,
 ) {
   const indexChild = (elt: React.ReactElement, k: number) => (
     <ColumnContext.Provider value={{ state, path, index: k }}>
@@ -758,7 +760,7 @@ function spawnIndex(
    this implicit root column group, just pack your columns inside a classical
    React fragment: `<Table … ><>{children}</></Table>`.
  */
-export function ColumnGroup(props: { index?: index, children: any }) {
+export function ColumnGroup(props: { index?: index; children: any }) {
   const context = React.useContext(ColumnContext);
   if (!context) return null;
   const { state, path, index: defaultIndex } = context;
@@ -787,7 +789,7 @@ function makeColumn<Key, Row>(
   };
   const width = state.resize.get(id) || props.width || 60;
   const flexGrow = fill ? 1 : 0;
-  const sorting = state.sorting;
+  const { sorting } = state;
   const disableSort =
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
   const getter = state.computeGetter(id, dataKey, props);
@@ -807,7 +809,7 @@ function makeColumn<Key, Row>(
       style={align}
     />
   );
-};
+}
 
 const byIndex = (a: Cprops, b: Cprops) => {
   const ak = a.index ?? 0;
@@ -815,7 +817,7 @@ const byIndex = (a: Cprops, b: Cprops) => {
   if (ak < bk) return -1;
   if (bk < ak) return 1;
   return 0;
-}
+};
 
 function makeCprops<Key, Row>(state: TableState<Key, Row>) {
   const cols: Cprops[] = [];
@@ -846,20 +848,24 @@ function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
 
 const headerIcon = (icon?: string) => (
   icon &&
-  (<div className='dome-xTable-header-icon'>
-    <SVG id={icon} />
-  </div>)
+  (
+    <div className="dome-xTable-header-icon">
+      <SVG id={icon} />
+    </div>
+  )
 );
 
 const headerLabel = (label?: string) => (
   label &&
-  (<label className='dome-xTable-header-label dome-text-label'>
-    {label}
-  </label>)
+  (
+    <label className="dome-xTable-header-label dome-text-label">
+      {label}
+    </label>
+  )
 );
 
 const makeSorter = (id: string) => (
-  <div className='dome-xTable-header-sorter'>
+  <div className="dome-xTable-header-sorter">
     <SVG id={id} size={8} />
   </div>
 );
@@ -889,7 +895,7 @@ function headerRenderer(props: TableHeaderProps) {
       : undefined;
   return (
     <div
-      className='dome-xTable-header'
+      className="dome-xTable-header"
       title={title}
       ref={headerRef}
       onContextMenu={headerMenu}
@@ -930,15 +936,17 @@ const Resizer = (props: ResizerProps) => (
   </DraggableCore>
 );
 
-type ResizeInfo = { id: string, fixed: boolean, left?: string, right?: string };
+type ResizeInfo = { id: string; fixed: boolean; left?: string; right?: string };
 
 function makeResizers(
   state: TableState<any, any>,
   columns: Cprops[],
 ): null | JSX.Element[] {
   if (columns.length < 2) return null;
-  const resizing: ResizeInfo[] = columns.map(({ id, fixed = false }) => ({ id, fixed }));
-  var k: number, cid; // last non-fixed from left/right
+  const resizing: ResizeInfo[] =
+    columns.map(({ id, fixed = false }) => ({ id, fixed }));
+  let k: number; let
+    cid; // last non-fixed from left/right
   for (cid = undefined, k = 0; k < columns.length; k++) {
     const r = resizing[k];
     r.left = cid;
@@ -949,8 +957,9 @@ function makeResizers(
     r.right = cid;
     if (!r.fixed) cid = r.id;
   }
-  const cwidth = columns.map(col => state.computeWidth(col.id));
-  var position = 0, resizers = [];
+  const cwidth = columns.map((col) => state.computeWidth(col.id));
+  let position = 0; const
+    resizers = [];
   for (k = 0; k < columns.length - 1; k++) {
     const width = cwidth[k];
     if (!width) return null;
@@ -991,6 +1000,7 @@ function makeResizers(
 const CSS_HEADER_HEIGHT = 22;
 const CSS_ROW_HEIGHT = 20;
 
+// Modifies state in place
 function makeTable<Key, Row>(
   props: TableProps<Key, Row>,
   state: TableState<Key, Row>,
@@ -998,7 +1008,7 @@ function makeTable<Key, Row>(
 ) {
 
   const { width, height } = size;
-  const model = props.model;
+  const { model } = props;
   const itemCount = model.getRowCount();
   const tableHeight = CSS_HEADER_HEIGHT + CSS_ROW_HEIGHT * itemCount;
   const smallHeight = itemCount > 0 && tableHeight < height;
@@ -1008,11 +1018,13 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
+  /* eslint-disable no-param-reassign */
   state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
+  /* eslint-enable no-param-reassign */
 
   return (
     <div onKeyDown={state.onKeyDown}>
@@ -1041,9 +1053,9 @@ function makeTable<Key, Row>(
         {columns}
       </VTable>
       {resizers}
-    </div >
+    </div>
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Table View
@@ -1052,7 +1064,7 @@ function makeTable<Key, Row>(
 /** Table View.
 
    This component is base on
-   [React-Virtualized](https://bvaughn.github.io/react-virtualized/#/components/Table)
+   [React-Virtualized](https://bvaughn.github.io/react-virtualized)
    which offers a super-optimized lazy rendering process that scales on huge
    datasets.
 
@@ -1078,7 +1090,7 @@ function makeTable<Key, Row>(
 
    @template Key - unique identifiers of table entries.
    @template Row - data associated to each key in the table entries.
-*/
+ */
 
 export function Table<Key, Row>(props: TableProps<Key, Row>) {
 
@@ -1096,14 +1108,14 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
   });
   Dome.useEvent('dome.defaults', state.clearSettings);
   return (
-    <div className='dome-xTable'>
-      <React.Fragment key='columns'>
+    <div className="dome-xTable">
+      <React.Fragment key="columns">
         {spawnIndex(state, [], props.children)}
       </React.Fragment>
-      <AutoSizer key='table'>
+      <AutoSizer key="table">
         {(size: Size) => makeTable(props, state, size)}
       </AutoSizer>
-    </div >
+    </div>
   );
 }
 

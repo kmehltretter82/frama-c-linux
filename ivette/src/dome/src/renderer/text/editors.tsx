@@ -11,7 +11,7 @@ import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
-import CodeMirror, { EditorConfiguration } from 'codemirror/lib/codemirror.js';
+import CodeMirror, { EditorConfiguration } from 'codemirror/lib/codemirror';
 import { RichTextBuffer, CSSMarker, Decorator } from './buffers';
 
 import './style.css';
@@ -133,33 +133,33 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       // Mounting...
       const { buffer } = this.props;
       const config = getConfig(this.props);
-      const cm = this.codeMirror = CodeMirror(elt, { value: '' });
+      this.codeMirror = CodeMirror(elt, { value: '' });
       if (buffer) {
-        buffer.link(cm);
+        buffer.link(this.codeMirror);
         buffer.on('decorated', this.handleUpdate);
         buffer.on('scroll', this.handleScrollTo);
       }
       // Passing all options to constructor does not work (Cf. CodeMirror's BTS)
-      forEachOption(config, (opt) => cm.setOption(opt, config[opt]));
+      forEachOption(
+        config, (opt) => this.codeMirror?.setOption(opt, config[opt]),
+      );
       // Binding events to view
-      cm.on('update', this.handleUpdate);
-      cm.on('keyHandled', this.handleKey);
+      this.codeMirror.on('update', this.handleUpdate);
+      this.codeMirror.on('keyHandled', this.handleKey);
       Dome.on('dome.update', this.refresh);
       // Auto refresh
       this.refreshPolling = setInterval(this.autoRefresh, 250);
       this.handleUpdate();
     } else {
       // Unmounting...
-      const polling = this.refreshPolling;
-      if (polling) {
-        clearInterval(polling);
+      if (this.refreshPolling) {
+        clearInterval(this.refreshPolling);
         this.refreshPolling = undefined;
       }
-      const cm = this.codeMirror;
       Dome.off('dome.update', this.refresh);
       const { buffer } = this.props;
-      if (cm && buffer) {
-        buffer.unlink(cm);
+      if (this.codeMirror && buffer) {
+        buffer.unlink(this.codeMirror);
         buffer.off('decorated', this.handleUpdate);
         buffer.off('scroll', this.handleScrollTo);
       }
@@ -210,7 +210,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   _findMarker(elt: Element): CSSMarker | undefined {
     const { buffer } = this.props;
     if (buffer) {
-      var best: CSSMarker | undefined;
+      let best: CSSMarker | undefined;
       elt.classList.forEach((name) => {
         const marker = buffer.findHover(name);
         if (marker && (!best || marker.length < best.length)) best = marker;
@@ -220,33 +220,35 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     return undefined;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _findDecoration(
     classes: DOMTokenList,
     buffer: RichTextBuffer,
     decorator: Decorator,
   ) {
-    var best_marker: CSSMarker | undefined;
-    var best_decorated: CSSMarker | undefined;
-    var best_decoration: string | undefined;
+    let bestMarker: CSSMarker | undefined;
+    let bestDecorated: CSSMarker | undefined;
+    let bestDecoration: string | undefined;
     classes.forEach((name) => {
 
       const marker = buffer.findHover(name);
       const id = marker && marker.id;
       const decoration = id && decorator(id);
 
-      if (marker && (!best_marker || marker.length < best_marker.length)) {
-        best_marker = marker;
+      if (marker && (!bestMarker || marker.length < bestMarker.length)) {
+        bestMarker = marker;
       }
 
-      if (marker && decoration && (!best_decorated || marker.length < best_decorated.length)) {
-        best_decorated = marker;
-        best_decoration = decoration;
+      if (marker && decoration &&
+        (!bestDecorated || marker.length < bestDecorated.length)) {
+        bestDecorated = marker;
+        bestDecoration = decoration;
       }
 
     });
-    return best_marker ? {
-      classNameId: best_marker.classNameId,
-      decoration: best_decoration,
+    return bestMarker ? {
+      classNameId: bestMarker.classNameId,
+      decoration: bestDecoration,
     } : undefined;
   }
 
@@ -256,7 +258,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     if (toMark) {
       const n = toMark.length;
       if (n === 0) return;
-      for (var k = 0; k < n; k++) toMark[k].classList.add(className);
+      for (let k = 0; k < n; k++) toMark[k].classList.add(className);
     }
   }
 
@@ -266,21 +268,21 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     if (toUnmark) {
       const n = toUnmark.length;
       if (n === 0) return;
-      const elts: Element[] = new Array(n);;
-      for (var k = 0; k < n; k++) elts[k] = toUnmark[k];
+      const elts: Element[] = new Array(n);
+      for (let k = 0; k < n; k++) elts[k] = toUnmark[k];
       elts.forEach((elt) => elt.classList.remove(className));
     }
   }
 
   handleHover(target: Element) {
     // Throttled (see constructor)
-    const old_marker = this.marker;
-    const new_marker = this._findMarker(target);
-    if (old_marker !== new_marker) {
-      if (old_marker) this._unmarkElementsWith(CSS_HOVERED);
-      if (new_marker && new_marker.hover)
-        this._markElementsWith(new_marker.classNameId, CSS_HOVERED);
-      this.marker = new_marker;
+    const oldMarker = this.marker;
+    const newMarker = this._findMarker(target);
+    if (oldMarker !== newMarker) {
+      if (oldMarker) this._unmarkElementsWith(CSS_HOVERED);
+      if (newMarker && newMarker.hover)
+        this._markElementsWith(newMarker.classNameId, CSS_HOVERED);
+      this.marker = newMarker;
     }
   }
 
@@ -290,15 +292,15 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     if (!marked) return;
     const n = marked.length;
     if (n === 0) return;
-    const marker = this.marker;
+    const { marker } = this;
     const hovered = (marker && marker.hover) ? marker.classNameId : undefined;
-    const selection = this.props.selection;
-    const selected = selection && ('dome-xMark-' + selection);
+    const { selection } = this.props;
+    const selected = selection && (`dome-xMark-${selection}`);
     const { buffer } = this.props;
     const decorator = buffer?.getDecorator();
     if (!hovered && !selection && !decorator) return;
     const newDecorations = new Map<string, string>();
-    for (var k = 0; k < n; k++) {
+    for (let k = 0; k < n; k++) {
       const elt = marked[k];
       const classes = elt.classList;
       if (hovered && classes.contains(hovered)) classes.add(CSS_HOVERED);
@@ -327,7 +329,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 
   onMouseClick(evt: MouseEvt, callback: MarkerCallback | undefined) {
     // No need for throttling
-    const target = evt.target;
+    const { target } = evt;
     if (target instanceof Element && callback) {
       const marker = this._findMarker(target);
       if (marker && marker.id) callback(marker.id);
@@ -350,8 +352,10 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   handleScrollTo(line: number) {
     try {
       const cm = this.codeMirror;
-      cm && cm.scrollIntoView({ line, ch: 0 });
-    } catch (_error) { } // Out of range
+      return cm && cm.scrollIntoView({ line, ch: 0 });
+    } catch (_error) {
+      console.warn(`[Dome] Unable to scroll to line ${line}: out of range.`);
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -392,12 +396,12 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       const {
         buffer: oldBuffer,
         selection: oldSelect,
-        fontSize: oldFont
+        fontSize: oldFont,
       } = this.props;
       const {
         buffer: newBuffer,
         selection: newSelect,
-        fontSize: newFont
+        fontSize: newFont,
       } = newProps;
       if (oldBuffer !== newBuffer) {
         if (oldBuffer) oldBuffer.unlink(cm);
@@ -423,7 +427,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       });
       // Update selection
       if (oldSelect !== newSelect) {
-        const selected = 'dome-xMark-' + newSelect;
+        const selected = `dome-xMark-${newSelect}`;
         if (oldSelect) this._unmarkElementsWith(CSS_SELECTED);
         if (newSelect) this._markElementsWith(selected, CSS_SELECTED);
       }
@@ -436,7 +440,8 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 
   render() {
     return (
-      <div className={'dome-xText'}
+      <div
+        className="dome-xText"
         ref={this.mountPoint}
         onClick={this.onClick}
         onContextMenu={this.onContextMenu}
@@ -444,7 +449,8 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
         onFocus={this.onFocus}
         onScroll={this.onScroll}
         onMouseMove={this.onMouseMove}
-      />);
+      />
+    );
   }
 
 }
@@ -459,23 +465,24 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    A component rendering the content of a text buffer, that shall be instances
    of the `Buffer` base class.
 
-   The view is based on a [CodeMirror](https://codemirror.net) component linked with
-   the internal Code Mirror Document from the associated buffer.
+   The view is based on a [CodeMirror](https://codemirror.net) component linked
+   with the internal Code Mirror Document from the associated buffer.
 
-   Multiple views might share the same buffer as source content. The buffer will be
-   kept in sync with all its linked views.
+   Multiple views might share the same buffer as source content. The buffer will
+   be kept in sync with all its linked views.
 
-   The Text component never update its mounted NODE element, however, all property
-   modifications (including buffer) are propagated to the internal CodeMirror instance.
-   Undefined properties are set (or reset) to the CodeMirror defaults.
+   The Text component never update its mounted NODE element, however, all
+   property modifications (including buffer) are propagated to the internal
+   CodeMirror instance. Undefined properties are set (or reset) to the
+   CodeMirror defaults.
 
    #### Themes
 
    The CodeMirror `theme` option allow you to style your document,
    especially when using modes.
    Themes are only accessible if you load the associated CSS style sheet.
-   For instance, to use the `'ambiance'` theme provided with CodeMirror, you shall
-   import `'codemirror/theme/ambiance.css'` somewhere in your application.
+   For instance, to use the `'ambiance'` theme provided with CodeMirror, you
+   shall import `'codemirror/theme/ambiance.css'` somewhere in your application.
 
    #### Modes & Adds-On
 
@@ -491,16 +498,13 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    `import CodeMirror from 'codemirror/lib/codemirror.js'` ; using `from
    'codemirror'` returns a different instance of `CodeMirror` class and will
    not work.
-
  */
 export function Text(props: TextProps) {
   let { className, style, fontSize, ...cmprops } = props;
   if (fontSize !== undefined && fontSize < 4) fontSize = 4;
   if (fontSize !== undefined && fontSize > 48) fontSize = 48;
-  const theStyle = Object.assign({}, style);
-  theStyle.fontSize = fontSize;
   return (
-    <Vfill className={className} style={theStyle}>
+    <Vfill className={className} style={{ ...style, fontSize }}>
       <CodeMirrorWrapper fontSize={fontSize} {...cmprops} />
     </Vfill>
   );

@@ -10,7 +10,9 @@
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
 import {
-  SortingInfo, Sorting, Filter, Filtering, Model, Collection, forEach
+  SortingInfo, Sorting,
+  Filter, Filtering,
+  Model, Collection, forEach,
 } from './models';
 
 // --------------------------------------------------------------------------
@@ -23,7 +25,7 @@ interface PACK<Key, Row> {
   index: number | undefined;
   key: Key;
   row: Row;
-};
+}
 
 type SORT<K, R> = Order<PACK<K, R>>;
 
@@ -76,8 +78,7 @@ export class ArrayModel<Key, Row>
   private array?: Row[];
 
   // Filtered-out Row Count
-  private filtered: number = 0;
-
+  private filtered = 0;
 
   // Filtering function
   private filter?: Filter<Key, Row>;
@@ -102,16 +103,18 @@ export class ArrayModel<Key, Row>
   protected sorter(): SORT<Key, Row> {
     let current = this.order;
     if (current) return current;
-    current = this.order = orderByRing(this.natural, this.columns, this.ring);
+    current = this.order = // eslint-disable-line no-multi-assign
+      orderByRing(this.natural, this.columns, this.ring);
     return current;
   }
 
-  // Lazily compute table
+  // Lazily compute table ; modifies packed entries in place
+  /* eslint-disable no-param-reassign */
   protected rebuild(): PACK<Key, Row>[] {
     const current = this.table;
     let filtered = 0;
     if (current !== undefined) return current;
-    let table: PACK<Key, Row>[] = [];
+    const table: PACK<Key, Row>[] = [];
     try {
       this.index.forEach((packed) => {
         packed.index = undefined;
@@ -125,11 +128,12 @@ export class ArrayModel<Key, Row>
     } catch (err) {
       console.warn('[Dome] error when rebuilding table:', err);
     }
-    table.forEach((pack, index) => pack.index = index);
+    table.forEach((packed, index) => { packed.index = index; });
     this.table = table;
     this.filtered = filtered;
     return table;
   }
+  /* eslint-enable no-param-reassign */
 
   // --------------------------------------------------------------------------
   // --- Proxy
@@ -191,8 +195,9 @@ export class ArrayModel<Key, Row>
   setOrderingByFields(byfields: ByFields<Row>) {
     this.natural = Compare.byFields(byfields);
     const columns = this.columns ?? {};
-    for (let k of Object.keys(byfields)) {
-      const dataKey = k as (string & keyof Row);
+    const keys = Object.keys(byfields);
+    for (let i = 0; i < keys.length; i++) {
+      const dataKey = keys[i] as (string & keyof Row);
       const fn = byfields[dataKey];
       if (fn) columns[dataKey] = (x: Row, y: Row) => {
         const dx = x[dataKey];
@@ -211,9 +216,9 @@ export class ArrayModel<Key, Row>
      Remove the sorting function for the provided column.
    */
   deleteColumnOrder(dataKey: string) {
-    const columns = this.columns;
+    const { columns } = this;
     if (columns) delete columns[dataKey];
-    this.ring = this.ring.filter(ord => ord.sortBy !== dataKey);
+    this.ring = this.ring.filter((ord) => ord.sortBy !== dataKey);
     this.reload();
   }
 
@@ -222,7 +227,7 @@ export class ArrayModel<Key, Row>
       Use `undefined` or `null` to reset the natural ordering. */
   setSorting(ord?: undefined | null | SortingInfo) {
     if (ord) {
-      const ring = this.ring;
+      const { ring } = this;
       const cur = ring[0];
       const fd = ord.sortBy;
       if (
@@ -235,11 +240,9 @@ export class ArrayModel<Key, Row>
         this.ring = newRing;
         this.reload();
       }
-    } else {
-      if (this.ring.length > 0) {
-        this.ring = [];
-        this.reload();
-      }
+    } else if (this.ring.length > 0) {
+      this.ring = [];
+      this.reload();
     }
   }
 
@@ -294,11 +297,11 @@ export class ArrayModel<Key, Row>
     const k = pack.index ?? -1;
     const n = current ? current.length : 0;
     const phi = this.filter;
-    const old_ok = 0 <= k && k < n;
-    const now_ok = phi ? phi(pack.row, pack.key) : true;
-    if (old_ok !== now_ok) return true;
+    const oldOk = 0 <= k && k < n;
+    const nowOk = phi ? phi(pack.row, pack.key) : true;
+    if (oldOk !== nowOk) return true;
     // Case where element was not displayed and will still not be
-    if (!old_ok) return false;
+    if (!oldOk) return false;
     // Detecting if ordering is preserved
     const order = this.sorter();
     const prev = k - 1;
@@ -360,11 +363,11 @@ export class ArrayModel<Key, Row>
       if (row === null) {
         // Nop
         return;
-      } else {
-        const newPack = { key, row, index: undefined };
-        this.index.set(key, newPack);
-        doReload = this.needReloadForInsert(newPack);
       }
+      const newPack = { key, row, index: undefined };
+      this.index.set(key, newPack);
+      doReload = this.needReloadForInsert(newPack);
+
     }
     if (doReload) this.reload();
   }
@@ -417,7 +420,8 @@ export class ArrayModel<Key, Row>
   getArray(): Row[] {
     let arr = this.array;
     if (arr === undefined) {
-      arr = this.array = this.rebuild().map((e) => e.row);
+      arr = this.array = // eslint-disable-line no-multi-assign
+        this.rebuild().map((e) => e.row);
     }
     return arr;
   }

@@ -8,18 +8,21 @@
 */
 
 import React from 'react';
+import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
 import { LabelProps } from './labels';
 import './style.css';
-
-const DISABLED = ({ disabled = false, enabled = true }) => !!disabled || !enabled;
 
 interface EVENT {
   stopPropagation: () => void;
 }
 
+const DISABLED = ({ disabled = false, enabled = true }) => (
+  !!disabled || !enabled
+);
+
 const TRIGGER = (onClick?: () => void) => (evt?: EVENT) => {
-  evt && evt.stopPropagation();
+  evt?.stopPropagation();
   if (onClick) onClick();
 };
 
@@ -27,13 +30,15 @@ const TRIGGER = (onClick?: () => void) => (evt?: EVENT) => {
 // --- LCD
 // --------------------------------------------------------------------------
 
-const LCDCLASS = 'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ';
-
 /** Button-like label. */
 export function LCD(props: LabelProps) {
+  const className = classes(
+    'dome-xButton dome-xBoxButton dome-text-code dome-xButton-lcd ',
+    props.className,
+  );
   return (
     <label
-      className={LCDCLASS + (props.className || '')}
+      className={className}
       title={props.title}
       style={props.style}
     >
@@ -42,7 +47,7 @@ export function LCD(props: LabelProps) {
       {props.children}
     </label>
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Led
@@ -72,11 +77,15 @@ export interface LEDprops {
 }
 
 export const LED = (props: LEDprops) => {
-  const classes = 'dome-xButton-led dome-xButton-led-'
-    + (props.status || 'inactive')
-    + (props.blink ? ' dome-xButton-blink' : '')
-    + (props.className ? ' ' + props.className : '');
-  return (<div className={classes} title={props.title} style={props.style} />);
+  const className = classes(
+    'dome-xButton-led',
+    `dome-xButton-led-${props.status || 'inactive'}`,
+    props.blink && 'dome-xButton-blink',
+    props.className,
+  );
+  return (
+    <div className={className} title={props.title} style={props.style} />
+  );
 };
 
 // --------------------------------------------------------------------------
@@ -89,19 +98,26 @@ const HIDDEN: React.CSSProperties = { visibility: 'hidden' };
 interface LABELprops {
   disabled: boolean;
   label: string;
-};
+}
 
 const LABEL = ({ disabled, label }: LABELprops) => (
-  <div className="dome-xButton-label" >
-    <div className="dome-xButton-label dome-control-enabled"
-      style={disabled ? HIDDEN : VISIBLE} >{label}</div>
-    <div className="dome-xButton-label dome-control-disabled"
-      style={disabled ? VISIBLE : HIDDEN}>{label}</div>
+  <div className="dome-xButton-label">
+    <div
+      className="dome-xButton-label dome-control-enabled"
+      style={disabled ? HIDDEN : VISIBLE}
+    >{label}
+    </div>
+    <div
+      className="dome-xButton-label dome-control-disabled"
+      style={disabled ? VISIBLE : HIDDEN}
+    >{label}
+    </div>
   </div>
 );
 
 export type ButtonKind =
-  undefined | 'default' | 'active' | 'primary' | 'warning' | 'positive' | 'negative';
+  undefined | 'default' |
+  'active' | 'primary' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps {
   /** Text of the label. Prepend to other children elements. */
@@ -151,18 +167,23 @@ export interface ButtonProps {
 /** Standard button. */
 export function Button(props: ButtonProps) {
   const disabled = props.onClick ? DISABLED(props) : true;
-  const { focusable = false, kind = 'default',
+  const {
+    focusable = false, kind = 'default',
     visible = true, display = true, blink = false,
-    selected, icon, label, className = '' } = props;
-  const theClass = 'dome-xButton dome-xBoxButton dome-xButton-'
-    + (selected ? 'selected' : kind)
-    + (!blink ? '' : ' dome-xButton-blink')
-    + (visible ? '' : ' dome-control-hidden')
-    + (display ? '' : ' dome-control-erased')
-    + (className ? ' ' + className : '');
+    selected, icon, label, className = '',
+  } = props;
+  const theClass = classes(
+    'dome-xButton dome-xBoxButton',
+    `dome-xButton-${selected ? 'selected' : kind}`,
+    blink && 'dome-xButton-blink',
+    !visible && 'dome-control-hidden',
+    !display && 'dome-control-erased',
+    className,
+  );
   const nofocus = focusable ? undefined : true;
   return (
-    <button type='button'
+    <button
+      type="button"
       className={theClass}
       disabled={disabled}
       onClick={TRIGGER(props.onClick)}
@@ -175,7 +196,7 @@ export function Button(props: ButtonProps) {
       {label && <LABEL disabled={disabled} label={label} />}
     </button>
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Icon Button
@@ -184,18 +205,23 @@ export function Button(props: ButtonProps) {
 /** Circled Icon Button. The label property is ignored. */
 export const CircButton = (props: ButtonProps) => {
   const disabled = props.onClick ? DISABLED(props) : true;
-  const { focusable = false, kind = 'default',
+  const {
+    focusable = false, kind = 'default',
     visible = true, display = true,
-    selected, icon, blink, className = '' } = props;
-  const theClass = 'dome-xButton dome-xCircButton dome-xButton-'
-    + (selected ? 'selected' : kind)
-    + (!blink ? '' : ' dome-xButton-blink')
-    + (visible ? '' : ' dome-control-hidden')
-    + (display ? '' : ' dome-control-erased')
-    + (className ? ' ' + className : '');
+    selected, icon, blink, className = '',
+  } = props;
+  const theClass = classes(
+    'dome-xButton dome-xCircButton',
+    `dome-xButton-${selected ? 'selected' : kind}`,
+    blink && 'dome-xButton-blink',
+    !visible && 'dome-control-hidden',
+    !display && 'dome-control-erased',
+    className,
+  );
   const nofocus = focusable ? undefined : true;
   return (
-    <button type='button'
+    <button
+      type="button"
       className={theClass}
       disabled={disabled}
       onClick={TRIGGER(props.onClick)}
@@ -259,15 +285,17 @@ export function IconButton(props: IconButtonProps) {
   const {
     icon, title, className,
     visible = true, display = true, selected,
-    kind = 'default'
+    kind = 'default',
   } = props;
   if (!icon) return null;
-  const theClass = 'dome-xIconButton'
-    + ' dome-xIconButton-' + (selected ? 'selected' : kind)
-    + (disabled ? ' dome-control-disabled' : ' dome-control-enabled')
-    + (visible ? '' : ' dome-control-hidden')
-    + (display ? '' : ' dome-control-erased')
-    + (className ? ' ' + className : '');
+  const theClass = classes(
+    'dome-xIconButton',
+    `dome-xIconButton-${selected ? 'selected' : kind}`,
+    (disabled ? 'dome-control-disabled' : 'dome-control-enabled'),
+    !visible && 'dome-control-hidden',
+    !display && 'dome-control-erased',
+    className,
+  );
   return (
     <Icon
       id={icon}
@@ -279,7 +307,7 @@ export function IconButton(props: IconButtonProps) {
       onClick={TRIGGER(disabled ? undefined : props.onClick)}
     />
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- CheckBox
@@ -318,11 +346,14 @@ export const Checkbox = (props: CheckProps) => {
     <label
       title={props.title}
       style={props.style}
-      className={baseClass + labelClass} >
-      <input type="checkbox"
+      className={baseClass + labelClass}
+    >
+      <input
+        type="checkbox"
         disabled={disabled}
         checked={value}
-        onChange={callback} />
+        onChange={callback}
+      />
       {props.label}
     </label>
   );
@@ -334,9 +365,11 @@ export const Switch = (props: CheckProps) => {
   const disabled = onChange ? DISABLED(props) : true;
   const iconId = props.value ? 'SWITCH.ON' : 'SWITCH.OFF';
   const onClick = onChange && (() => onChange(!value));
-  const className = 'dome-xSwitch '
-    + (disabled ? 'dome-control-disabled' : 'dome-control-enabled')
-    + (props.className ? ' ' + props.className : '');
+  const className = classes(
+    'dome-xSwitch',
+    (disabled ? 'dome-control-disabled' : 'dome-control-enabled'),
+    props.className,
+  );
   return (
     <label
       title={props.title}
@@ -387,13 +420,18 @@ export function Radio<A>(props: RadioProps<A>) {
     <label
       title={props.title}
       style={props.style}
-      className={baseClass + labelClass} >
-      <input type="radio"
-        disabled={disabled} checked={checked} onChange={onChange} />
+      className={baseClass + labelClass}
+    >
+      <input
+        type="radio"
+        disabled={disabled}
+        checked={checked}
+        onChange={onChange}
+      />
       {props.label}
     </label>
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Radio Group
@@ -410,15 +448,15 @@ export interface RadioGroupProps<A> {
   onChange?: (newValue: A) => void;
   /** Default selected value. */
   className?: string;
-  /** Additional style for the `<dov/>` container of Raiods */
+  /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
   /** [[Radio]] Buttons. */
   children: any;
-};
+}
 
 /**
-   Selector of Radio Buttons.
-   Childrens of the `RadioGroup` shall be [[Radio]] buttons.
+   Selector of Radio Buttons.  Childrens of the `RadioGroup` shall be [[Radio]]
+   buttons.
 
    The selected value of the group is broadcasted to the radio buttons. Their
    callbacks are activated _before_ the radio group one, if any.
@@ -428,26 +466,34 @@ export interface RadioGroupProps<A> {
    group is enabled, the `disabled` property of each radio button is taken into
    account.
 
-   The radio buttons inside a group are laidout in a vertical box with the additional
-   styling properties.
- */
+   The radio buttons inside a group are laidout in a vertical box with the
+   additional styling properties.
+*/
 export function RadioGroup<A>(props: RadioGroupProps<A>) {
-  const { className = '', style, value: selection, onChange: onGroupSelect } = props;
+  const {
+    className = '',
+    style,
+    value: selection,
+    onChange: onGroupSelect,
+  } = props;
   const disabledGroup = onGroupSelect ? DISABLED(props) : true;
   const makeRadio = (elt: any) => {
     const radioProps = elt.props as RadioProps<A>;
     const disabled = disabledGroup || DISABLED(radioProps);
     const { onSelection: onRadioSelect } = radioProps;
     const onSelection = (v: A) => {
-      onRadioSelect && onRadioSelect(v);
-      onGroupSelect && onGroupSelect(v);
+      if (onRadioSelect) onRadioSelect(v);
+      if (onGroupSelect) onGroupSelect(v);
     };
     return React.cloneElement(elt, {
-      disabled, enabled: !disabled, selection, onSelection
+      disabled,
+      enabled: !disabled,
+      selection,
+      onSelection,
     });
   };
   return (
-    <div className={'dome-xRadio-group ' + className} style={style}>
+    <div className={`dome - xRadio - group ${className} `} style={style}>
       {React.Children.map(props.children, makeRadio)}
     </div>
   );
@@ -474,7 +520,7 @@ export interface SelectProps {
   onChange?: (newValue?: string) => void;
   /** Default selected value. */
   className?: string;
-  /** Additional style for the `<dov/>` container of Raiods */
+  /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
   /** Shall be [[Item]] elements. */
   children: any;
@@ -483,34 +529,37 @@ export interface SelectProps {
 /**
    Menu Button.
 
-   The different options shall be specified with HTML `<option/>` and `<optgroup />` elements.
+   The different options shall be specified with HTML
+   `< option/>` and `<optgroup/>` elements.
    Options and group shall be specified as follows:
 
-       <optgroup label='…'>…</optgroup>
-       <option value='…' disabled=… >…</option>
+   *   <optgroup label='…'>…</optgroup>
+   *   <option value='…' disabled=… >…</option>
 
-   **Warning:** most non-positionning CSS properties might not work on the`<select>` element due
-   to the native rendering used by Chrome.
-   You might use`-webkit-appearance: none` to cancel this behavior, you will have to restyle the
+   **Warning:** most non-positionning CSS properties might not
+   work on the`<select>` element due to the native rendering used
+   by Chrome.
+   You might use `-webkit-appearance: none` to cancel this behavior,
+   you will have to restyle the
    component entirely, which is quite ugly by default.
  */
 export function Select(props: SelectProps) {
   const { onChange, className = '', placeholder } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange && onChange(evt.target.value);
+    if (onChange) onChange(evt.target.value);
   };
   return (
     <select
       id={props.id}
       disabled={disabled}
-      className={'dome-xSelect ' + className}
+      className={`dome - xSelect ${className} `}
       style={props.style}
       title={props.title}
       value={props.value}
       onChange={callback}
     >
-      {placeholder && <option value=''>— {placeholder} —</option>}
+      {placeholder && <option value="">— {placeholder} —</option>}
       {props.children}
     </select>
   );
@@ -533,7 +582,7 @@ export interface FieldProps {
   disabled?: boolean;
   /** Default fo `false`. */
   autoFocus?: boolean;
-  /** Currently selected value (updated on `ENTER` key)*/
+  /** Currently selected value (updated on `ENTER` key) */
   value?: string;
   /** Callback on `ENTER` key. */
   onChange?: (newValue: string) => void;
@@ -541,7 +590,7 @@ export interface FieldProps {
   onEdited?: (tmpValue: string) => void;
   /** Default selected value. */
   className?: string;
-  /** Additional style for the `<dov/>` container of Raiods */
+  /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
 }
 
@@ -554,31 +603,36 @@ export const Field = (props: FieldProps) => {
   const disabled = onChange ? DISABLED(props) : true;
   const theValue = current ?? value;
   const ONCHANGE = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    let text = evt.target.value || '';
+    const text = evt.target.value || '';
     setCurrent(text);
-    onEdited && onEdited(text);
+    if (onEdited) onEdited(text);
   };
   const ONKEYPRESS = (evt: React.KeyboardEvent) => {
     switch (evt.key) {
       case 'Enter':
         setCurrent(undefined);
-        onChange && current && onChange(current);
+        if (onChange && current) onChange(current);
         break;
       case 'Escape':
         setCurrent(undefined);
         break;
-    };
+      default:
+        break;
+    }
   };
   return (
-    <input id={props.id} type='text'
+    <input
+      id={props.id}
+      type="text"
       autoFocus={!disabled && props.autoFocus}
       value={theValue}
-      className={'dome-xField ' + className}
+      className={`dome - xField ${className} `}
       style={props.style}
       disabled={disabled}
       placeholder={props.placeholder}
       onKeyPress={ONKEYPRESS}
-      onChange={ONCHANGE} />
+      onChange={ONCHANGE}
+    />
   );
 };
 

@@ -15,8 +15,15 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
   },
+  settings: {
+    // Electron is in devDependencies because of its special build system
+    "import/core-modules": [ "electron" ]
+  },
   rules: {
+    // Do not enforce a displayName
     "react/display-name": "off",
+    // Do not enforce component methods order
+    "react/sort-comp": "off",
     // Be more strict on usage of useMemo and useRef
     "react-hooks/exhaustive-deps": "error",
     // Allow type any, even if it should be avoided
@@ -51,6 +58,8 @@ module.exports = {
     "padded-blocks": "off",
     // Allow braces on their own line
     "@typescript-eslint/brace-style": "off",
+    // Already has built-in compiler checks in TSC for that
+    "@typescript-eslint/no-unused-vars": "off",
     // Allow range conditions such as 0 <= x && x < 10
     "yoda": [2, "never", { "onlyEquality": true }],
     // Allow single command on new line after 'if' statement
@@ -77,6 +86,23 @@ module.exports = {
     "react/destructuring-assignment": "off",
     // Allow console errors and warnings
     "no-console": ["error", { allow: ["warn", "error"] }],
+    // Disable accessibility rules
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-autofocus": "off",
+    // Completely broken rule
+    "react/prop-types": "off",
+    // Enable ++ and --
+    "no-plusplus": "off",
+    // Enable nested ternary operations
+    "no-nested-ternary": "off",
+    // Checked by TSC compiler
+    "default-case": "off",
+    "consistent-return": "off",
+    // Allow modify properties of object passed in parameter
+    "no-param-reassign": "error", //[ "error", { "props": false } ],
     // Disallow the use of var in favor of let and const
     "no-var": "error",
     // Do not favor default import

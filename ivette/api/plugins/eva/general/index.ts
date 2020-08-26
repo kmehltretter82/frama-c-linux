@@ -31,13 +31,12 @@ const getCallers_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.getCallers',
   input:  Json.jKey<'#fct'>('#fct'),
-  output: Json.jList(Json.jTry(
-                       Json.jPair(
-                         Json.jFail(Json.jKey<'#fct'>('#fct'),
-                           '#fct expected'),
-                         Json.jFail(Json.jKey<'#stmt'>('#stmt'),
-                           '#stmt expected'),
-                       ))),
+  output: Json.jList(
+            Json.jTry(
+              Json.jPair(
+                Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+                Json.jFail(Json.jKey<'#stmt'>('#stmt'),'#stmt expected'),
+              ))),
 };
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<

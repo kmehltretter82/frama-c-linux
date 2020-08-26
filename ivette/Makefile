@@ -8,27 +8,23 @@ DOME_API=./src/frama-c
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc serve dist typecheck lint tsc
+.PHONY: all app dev doc serve dist lint fixlint
 
-all: typecheck lint app
+all: lint app
 
 app: dome-app
 dev: dome-dev
 dist: dome-dist
 
-typecheck: dome-pkg dome-templ
-	@echo "[Ivette] running ts typechecker"
-	yarn run typecheck
-
 lint: dome-pkg dome-templ
-	@echo "[Ivette] running ts linter"
+	@echo "[Ivette] running typechecker & linter"
+	yarn run typecheck
 	yarn run lint
 
 fixlint: dome-pkg dome-templ
-	@echo "[Ivette] running ts linter (with fix)"
+	@echo "[Ivette] running typechecker & linter (fix mode)"
+	yarn run typecheck
 	yarn run lint --fix
-
-tsc: typecheck fixlint
 
 # --------------------------------------------------------------------------
 # --- Frama-C API

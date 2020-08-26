@@ -77,7 +77,7 @@ let makeJtype ?self ~names =
     | Jtag a -> Format.fprintf fmt "\"%s\"" a
     | Jkey kd -> Format.fprintf fmt "Json.key<'#%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.index<'#%s'>" kd
-    | Jdict(kd,js) -> Format.fprintf fmt "Json.Dict<'#%s',%a>" kd pp js
+    | Jdict js -> Format.fprintf fmt "@[<hov 2>Json.dict<@,%a>@]" pp js
     | Jdata id | Jenum id -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->
@@ -174,10 +174,10 @@ let rec makeDecoder ~safe ?self ~names fmt js =
   | Jenum id -> jsafe ~safe (Pkg.name_of_ident id) (jenum names) fmt id
   | Jself -> jcall names fmt (Pkg.Derived.decode ~safe (getSelf self))
   | Joption js -> makeLoose fmt js
-  | Jdict(kd,js) ->
-    Format.fprintf fmt "@[<hov 2>Json.jDictionary('#%s',@,%a)@]" kd makeLoose js
+  | Jdict js ->
+    Format.fprintf fmt "@[<hov 2>Json.jDict(@,%a)@]" makeLoose js
   | Jlist js ->
-    Format.fprintf fmt "@[<hov 2>Json.jList(%a)@]" makeLoose js
+    Format.fprintf fmt "@[<hov 2>Json.jList(@,%a)@]" makeLoose js
   | Jarray js ->
     if safe
     then Format.fprintf fmt "@[<hov 2>Json.jArray(%a)@]" makeSafe js
@@ -250,11 +250,11 @@ let makeOrder ~self ~names fmt js =
       List.iter
         (fun (fd,js) -> Format.fprintf fmt "@ @[<hov 2>%s: %a,@]" fd pp js) jfs ;
       Format.fprintf fmt "@]@ })@]" ;
-    | Jdict(kd,js) ->
+    | Jdict js ->
       let jtype fmt js = makeJtype ~names fmt js in
       Format.fprintf fmt
-        "@[<hov 2>Compare.dictionary<@,Json.dict<'#%s'@,%a>>(@,%a)@]"
-        kd jtype js pp js
+        "@[<hov 2>Compare.dictionary<@,Json.dict<%a>>(@,%a)@]"
+        jtype js pp js
     | Jany | Junion _ | Jtag _ ->
       Format.fprintf fmt "Compare.structural"
   in pp fmt js
