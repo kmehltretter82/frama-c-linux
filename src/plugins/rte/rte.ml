@@ -451,13 +451,18 @@ let finite_float_assertion ~remove_trivial:_ ~on_alarm (fkind, exp) =
 let pointer_call ~remove_trivial:_ ~on_alarm (e, args) =
   on_alarm ~invalid:false (Alarms.Function_pointer (e, Some args))
 
+let rec is_safe_offset = function
+  | NoOffset -> true
+  | Field(fi,o) -> fi.fcomp.cstruct && not fi.faddrof && is_safe_offset o
+  | Index(_,o) -> is_safe_offset o
+
 let is_safe_pointer_value = function
   | Lval (Var vi, offset) ->
     (* Reading a pointer variable must emit an alarm if an invalid pointer value
        could have been written without previous alarm, through:
        - an union type, in which case [offset] is not NoOffset;
        - an untyped write, in which case the address of [vi] is taken. *)
-    not vi.vaddrof && offset = NoOffset
+    not vi.vaddrof && is_safe_offset offset
   | AddrOf (_, NoOffset) | StartOf (_, NoOffset) -> true
   | CastE (_typ, e) ->
     (* 0 can always be converted into a NULL pointer. *)
