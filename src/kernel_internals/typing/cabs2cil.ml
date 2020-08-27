@@ -7784,11 +7784,7 @@ and doCondExp local_env asconst
              end else CEAnd (ce1, ce2))
         | CEExp(se1, e1'), CEExp (se2, e2') when
             theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
-          CEExp
-            (empty,
-             new_exp ~loc
-               (BinOp(LAnd,
-                      makeCast e1' intType, makeCast e2' intType, intType)))
+          CEExp (empty, new_exp ~loc (BinOp(LAnd, e1', e2', intType)))
         | _ -> CEAnd (ce1, ce2)
       end
 
@@ -7807,11 +7803,7 @@ and doCondExp local_env asconst
              end else CEOr (ce1, ce2))
         | CEExp (se1, e1'), CEExp (se2, e2') when
             theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
-          CEExp
-            (empty,
-             new_exp ~loc
-               (BinOp(LOr,
-                      makeCast e1' intType, makeCast e2' intType, intType)))
+          CEExp (empty, new_exp ~loc (BinOp(LOr, e1', e2', intType)))
         | _ -> CEOr (ce1, ce2)
       end
 

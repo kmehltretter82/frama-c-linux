@@ -14,7 +14,7 @@ int test(int a, int b, int c)
 int test_ptr(int *a, int *b, int *c)
 {
   int __retres;
-  if ((int)a && ((int)b || (int)c)) {
+  if (a && (b || c)) {
     __retres = 1;
     goto return_label;
   }
