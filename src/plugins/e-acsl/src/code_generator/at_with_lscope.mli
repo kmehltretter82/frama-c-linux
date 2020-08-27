@@ -32,7 +32,7 @@ open Cil_datatype
 
 val to_exp:
   loc:Location.t -> kernel_function -> Env.t ->
-  Misc.pred_or_term -> logic_label -> exp * Env.t
+  Lscope.pred_or_term -> logic_label -> exp * Env.t
 
 (*****************************************************************************)
 (**************************** Handling memory ********************************)
@@ -70,6 +70,6 @@ val term_to_exp_ref:
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

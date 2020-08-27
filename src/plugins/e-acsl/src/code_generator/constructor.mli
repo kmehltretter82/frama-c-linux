@@ -79,7 +79,7 @@ val mk_break: loc:location -> stmt
 
 val mk_lib_call: loc:Location.t -> ?result:lval -> string -> exp list -> stmt
 (** Construct a call to a library function with the given name.
-    @raise Unregistered_library_function if the given string does not represent
+    @raise Rtl.Symbols.Unregistered if the given string does not represent
     such a function or if library functions were never registered (only possible
     when using E-ACSL through its API). *)
 

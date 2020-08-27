@@ -35,6 +35,6 @@ val update: string -> Cil_types.varinfo -> unit
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)

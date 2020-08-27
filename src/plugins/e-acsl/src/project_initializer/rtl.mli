@@ -20,41 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Make the property statuses of the initial project accessible when
-    doing the main translation *)
+(** This module links the E-ACSL's RTL to the user source code. *)
 
-type kind =
-  | K_Assert
-  | K_Invariant
-  | K_Variant
-  | K_StmtSpec
-  | K_Allocation
-  | K_Assigns
-  | K_Decreases
-  | K_Terminates (* TODO: should be removed: not part of the E-ACSL subset *)
-  | K_Complete
-  | K_Disjoint
-  | K_Requires
-  | K_Ensures
+val link: Project.t -> unit
+(** [link prj] links the RTL's AST contained in [prj] to the AST of the current
+    project. *)
 
-val clear: unit -> unit
-(** to be called before any program transformation *)
+(** Tables that contain RTL's symbols. Useful to know whether some symbols is
+    part of the RTL. *)
+module Symbols: sig
+  open Cil_types
 
-val push: Kernel_function.t -> kind -> Property.t -> unit
-(** store the given property of the given kind for the given function *)
+  val mem_global: global -> bool
+  val mem_kf: kernel_function -> bool
 
-val before_translation: unit -> unit
-(** to be called just before injecting the code *)
+  val mem_vi: string -> bool
+  exception Unregistered of string
+  val find_vi: string -> varinfo
+  (** @raise Unregistered if the given name is not part of the RTL. *)
 
-val must_translate: Kernel_function.t -> kind -> bool
-(** To be called just before transforming a property of the given kind for the
-    given function.
-    VERY IMPORTANT: the property of the n-th call to this function exactly
-    correspond to the n-th pushed property (see {!push}).
-    @return true if and only if the translation must occur. *)
+end
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

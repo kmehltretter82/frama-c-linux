@@ -1,6 +1,6 @@
 /* run.config_ci, run.config_dev
    COMMENT: test option -e-acsl-no-valid
-   STDOPT: #"@MACHDEP@ @EACSL_PREPARE@ -eva -eva-verbose 0 -then -no-eva -e-acsl-no-valid"
+   STDOPT: #"@GLOBAL@ -eva -eva-verbose 0 -then -no-eva -e-acsl-no-valid"
    MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT -eva -eva-verbose 0
    MACRO: ROOT_EACSL_GCC_OPTS_EXT --then --e-acsl-extra -e-acsl-no-valid
 */

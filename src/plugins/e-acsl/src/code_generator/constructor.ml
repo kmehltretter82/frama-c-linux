@@ -98,7 +98,12 @@ let mk_block stmt b = match b.bstmts with
 (* ********************************************************************** *)
 
 let mk_lib_call ~loc ?result fname args =
-  let vi = Misc.get_lib_fun_vi fname in
+  let vi =
+    try Rtl.Symbols.find_vi fname
+    with Rtl.Symbols.Unregistered _ as exn ->
+    try Builtins.find fname
+    with Not_found -> raise exn
+  in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =

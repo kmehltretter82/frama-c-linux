@@ -526,8 +526,20 @@ module Value = struct
 
   let add_formals_to_state = mk_fun "add_formals_to_state"
 
+  let get_fundec_from_stmt stmt =
+    let kf =
+      try
+        Kernel_function.find_englobing_kf stmt
+      with Not_found ->
+        Kernel.fatal "Unknown statement '%a'" Printer.pp_stmt stmt
+    in
+    try
+      Kernel_function.get_definition kf
+    with Kernel_function.No_Definition ->
+      Kernel.fatal "No definition for function %a" Kernel_function.pretty kf
+
   let noassert_get_stmt_state ~after s =
-    if !no_results (Kernel_function.(get_definition (find_englobing_kf s)))
+    if !no_results (get_fundec_from_stmt s)
     then Cvalue.Model.top
     else
       let (find, add), find_by_callstack =
@@ -586,7 +598,7 @@ module Value = struct
 
   exception Is_reachable
   let is_reachable_stmt stmt =
-    if !no_results (Kernel_function.(get_definition (find_englobing_kf stmt)))
+    if !no_results (get_fundec_from_stmt stmt)
     then true
     else
       let ho = try Some (Table_By_Callstack.find stmt) with Not_found -> None in

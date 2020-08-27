@@ -359,6 +359,27 @@ module Functions = struct
     else
       res
 
+  let mem_name fct_name =
+    try
+      ignore (find_by_name fct_name);
+      true
+    with Not_found ->
+      false
+
+  let mem_def_name fct_name =
+    try
+      ignore (find_def_by_name fct_name);
+      true
+    with Not_found ->
+      false
+
+  let mem_decl_name fct_name =
+    try
+      ignore (find_decl_by_name fct_name);
+      true
+    with Not_found ->
+      false
+
   let () =
     Parameter_builder.find_kf_by_name := find_by_name;
     Parameter_builder.find_kf_def_by_name := find_def_by_name;
@@ -741,9 +762,17 @@ module Types = struct
       TypeNameToGlobal.mark_as_computed ()
     end
 
+  let mem_enum_tag x =
+    resolve_types ();
+    Enums.mem x
+
   let find_enum_tag x =
     resolve_types ();
     Enums.find x
+
+  let mem_type namespace s =
+    resolve_types ();
+    Types.mem (s, namespace)
 
   let find_type namespace s =
     resolve_types ();
