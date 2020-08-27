@@ -63,7 +63,8 @@ let generate_code =
        end;
        (* slightly more efficient to copy the project before computing the AST
           if it is not yet computed *)
-       let rtl_prj = Project.create_by_copy ~last:false "E_ACSL RTL" in
+       let rtl_prj_name = Options.Project_name.get () ^ " RTL" in
+       let rtl_prj = Project.create_by_copy ~last:false rtl_prj_name in
        (* TODO: remove [rtl_prj] after use if no debug mode *)
        (* force AST computation before copying the project it belongs to *)
        Ast.compute ();
