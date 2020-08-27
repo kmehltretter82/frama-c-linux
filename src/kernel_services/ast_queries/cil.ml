@@ -6197,9 +6197,9 @@ let mkBinOp ~loc op e1 e2 =
     (Mult|Div) -> doArithmetic ()
   | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
   | LAnd | LOr ->
-      check_scalar "logical operator" e1 t1;
-      check_scalar "logical operator" e2 t2;
-      constFoldBinOp ~loc machdep op e1 e2 intType
+    check_scalar "logical operator" e1 t1;
+    check_scalar "logical operator" e2 t2;
+    constFoldBinOp ~loc machdep op e1 e2 intType
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if msvcMode () then

@@ -548,13 +548,13 @@ val isArithmeticType: typ -> bool
 
 (** True if the argument is a scalar type (i.e. integral, enum,
     floating point or pointer
-  @since Frama-C+dev
- *)
+    @since Frama-C+dev
+*)
 val isScalarType: typ -> bool
 
 (** alias of isScalarType.
     @deprecated Frama-C+dev use isScalarType instead
- *)
+*)
 val isArithmeticOrPointerType: typ -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
