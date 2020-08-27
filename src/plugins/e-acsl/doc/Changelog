@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2020-08-28] Fix crash that may occur when translating
+	        properties that have been proved valid by another plug-in
+	        (frama-c/e-acsl#106).
 -! E-ACSL       [2020-08-28] Remove option -e-acsl-prepare-ast.
 -! E-ACSL       [2020-08-28] Remove option -e-acsl-check.
 -  E-ACSL       [2020-08-07] Add support for logical array comparison
