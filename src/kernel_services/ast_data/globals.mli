@@ -103,6 +103,20 @@ module Functions: sig
   val get_params: kernel_function -> varinfo list
   val get_vi: kernel_function -> varinfo
 
+  (** {2 Membership} *)
+
+  val mem_name: string -> bool
+  (** @return true iff there is a function with such a name
+      @since Frama-C+dev *)
+
+  val mem_def_name: string -> bool
+  (** @return true iff there is a function definition with such a name
+      @since Frama-C+dev *)
+
+  val mem_decl_name: string -> bool
+  (** @return true iff there is a function declaration with such a name
+      @since Frama-C+dev *)
+
   (** {2 Searching} *)
 
   val find_by_name : string -> kernel_function

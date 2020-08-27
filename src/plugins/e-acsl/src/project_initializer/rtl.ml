@@ -139,9 +139,8 @@ let lookup_rtl_globals rtl_ast =
     | GVarDecl(vi, (pos, _)) | GVar(vi, _, (pos, _)) as g :: l  ->
       let tunit = Translation_unit pos.Filepath.pos_path in
       let mem _g =
-        match Globals.Syntactic_search.find_in_scope vi.vorig_name tunit with
-        | None -> false
-        | Some _ -> true
+        let g = Globals.Syntactic_search.find_in_scope vi.vorig_name tunit in
+        Option.is_some g
       in
       let add g =
         Symbols.add_vi vi.vname vi;
@@ -152,16 +151,12 @@ let lookup_rtl_globals rtl_ast =
       in
       do_it ~add mem acc l g
     | GFunDecl(_, vi, _loc) | GFun({ svar = vi }, _loc) as g :: l ->
-      let mem _g =
-        try ignore (Globals.Functions.find_by_name vi.vname); true
-        with Not_found -> false
-      in
       let add _g =
         Symbols.add_vi vi.vname vi;
         (* functions will be registered in kernel's table after substitution of
            RTL's symbols inside them *)
       in
-      do_it ~add mem acc l g
+      do_it ~add (fun _ -> Globals.Functions.mem_name vi.vname) acc l g
     | GAnnot _ :: l ->
       (* ignoring annotations from the AST *)
       do_globals acc l
