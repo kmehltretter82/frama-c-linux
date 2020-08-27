@@ -371,7 +371,7 @@ module UnrollingForce: Parameter_sig.Bool
     called for well preparing the AST. *)
 module Machdep: Parameter_sig.String
 
-(** Behavior of invisible option -keep-logical operator:
+(** Behavior of invisible option -keep-logical-operators:
     Tries to avoid converting && and || into conditional statements.
     Note that this option is incompatible with many (most) plug-ins of the
     platform and thus should only be enabled with great care and for very
