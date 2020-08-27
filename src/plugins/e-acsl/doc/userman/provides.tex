@@ -416,7 +416,7 @@ script.
 mathematical integers which does not fit in any integral \C type. To circumvent
 this issue, \eacsl uses the \gmp library\footnote{\url{http://gmplib.org}}.
 Thus, even if \eacsl does its best to use standard integral types instead of
-\gmp~\cite{sac13,jfla15}, it may generate such integers from time to time. It is
+\gmp~\cite{kosmatov20rv}, it may generate such integers from time to time. It is
 notably the case if your program contains \lstinline|long long|, either signed
 or unsigned.
 
@@ -544,8 +544,8 @@ model~\cite{pldi16}.
 \subsubsection{Maximized Memory Tracking}
 
 By default \eacsl uses static analysis to reduce instrumentation and therefore
-runtime and memory overheads~\cite{scp16}. With respect to memory tracking this
-means that
+runtime and memory overheads~\cite{ly18hilt}. With respect to memory tracking
+this means that
 \eacsl may omit recording memory blocks irrelevant for runtime analysis.  It
 is, however, still possible to systematically instrument the code for handling
 potential memory-related annotations even when it is not required.  This
@@ -980,22 +980,6 @@ The present implementation of \eacslgcc does not fully support combining \eacsl
 with other \framac plug-ins. However it is still possible to instrument programs
 with \eacsl directly and use \eacslgcc to compile the generated code.
 
-If you run the \eacsl plug-in after another one, it first generates
-a new temporary project in which it links the analyzed program against its own
-library in order to generate the \framac internal representation of the \C
-program (\emph{aka} AST), as explained in Section~\ref{sec:run}. Consequently,
-even if the \eacsl plug-in keeps the maximum amount of information, the results
-of already executed analyzers (such as validity status of annotations) are not
-known in this new project.
-
-\begin{important}
-If you want to keep results of former analysis, you have to set the option
-\shortopt{e-acsl-prepare} when the first analysis is asked for. The standard
-example is running \eacsl after \Eva\index{Eva}: in such a case,
-\shortopt{e-acsl-prepare} must be provided together with the \Eva's
-\shortopt{val} option.
-\end{important}
-
 In this context, the \eacsl plug-in does not generate code for annotations
 proven valid by another plug-in, except if you explicitly set the option
 \shortopt{e-acsl-valid}. For instance, \Eva~\cite{eva} is able to
@@ -1003,21 +987,14 @@ prove that there is no potential overflow in the previous program, so the \eacsl
 plug-in does not generate additional code for checking them if you run the
 following command.
 \begin{shell}
-\$ frama-c -e-acsl-prepare -rte combine.i -then -val -then -e-acsl \
-          -then-last -print -ocode monitored_combine.i
-\end{shell}
-The additional code will be generated with one of the two following commands.
-\begin{shell}
-\$ frama-c -e-acsl-prepare -rte combine.i -then -val -then -e-acsl \
-          -e-acsl-valid -then-last -print -ocode monitored_combine.i
 \$ frama-c -rte combine.i -then -val -then -e-acsl \
           -then-last -print -ocode monitored_combine.i
 \end{shell}
-In the first case, that is because it is explicitly required by the option
-\shortopt{e-acsl-valid} while, in the second case, that is because the option
-\shortopt{e-acsl-prepare} is not provided on the command line which results in
-the fact that the result of the value analysis are unknown when the \eacsl
-plug-in is running.
+The additional code will be generated with the two following command.
+\begin{shell}
+\$ frama-c -rte combine.i -then -val -then -e-acsl \
+          -e-acsl-valid -then-last -print -ocode monitored_combine.i
+\end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1042,20 +1019,6 @@ you can pass it using \shortopt{F} switch:
 check.i:4:[e-acsl] warning: E-ACSL construct `right shift' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "foobar".
-\end{shell}
-
-Further, the \eacsl plug-in option \shortopt{e-acsl-check} does not generate a
-new project but verifies that each annotation is translatable. Then it produces
-a summary as shown in the following example (left or right shifts in annotations
-are not yet supported by the \eacsl plug-in~\cite{eacsl-implem}).
-
-\begin{shell}
-\$ frama-c -e-acsl-check check.i
-<skip preprocessing commands>
-check.i:4:[e-acsl] warning: E-ACSL construct `left/right shift' is not yet supported.
-  Ignoring annotation.
-[e-acsl] 0 annotation was ignored, being untypable.
-[e-acsl] 1 annotation was ignored, being unsupported.
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
