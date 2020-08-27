@@ -741,9 +741,17 @@ module Types = struct
       TypeNameToGlobal.mark_as_computed ()
     end
 
+  let mem_enum_tag x =
+    resolve_types ();
+    Enums.mem x
+
   let find_enum_tag x =
     resolve_types ();
     Enums.find x
+
+  let mem_type namespace s =
+    resolve_types ();
+    Types.mem (s, namespace)
 
   let find_type namespace s =
     resolve_types ();

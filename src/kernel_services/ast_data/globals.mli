@@ -219,9 +219,19 @@ module Types : sig
   (** The two functions below are suitable for use in functor
       {!Logic_typing.Make} *)
 
+  val mem_enum_tag: string -> bool
+    (** @return true iff there is an enum constant with the given name in the
+        AST.
+        @since Frama-C+dev *)
+
   val find_enum_tag: string -> exp * typ
   (** Find an enum constant from its name in the AST.
       @raise Not_found when no such constant exists. *)
+
+  val mem_type: Logic_typing.type_namespace -> string -> bool
+    (** @return true iff there is a type with the given name in the given
+        namespace in the AST.
+        @since Frama-C+dev *)
 
   val find_type: Logic_typing.type_namespace -> string -> typ
   (** Find a type from its name in the AST.

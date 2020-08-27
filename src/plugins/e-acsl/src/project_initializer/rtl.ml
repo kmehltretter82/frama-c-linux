@@ -124,14 +124,7 @@ let lookup_rtl_globals rtl_ast =
     end
   (* [do_ty] is [do_it] for types *)
   and do_ty acc l g kind tname =
-    let mem _g =
-      try
-        ignore (Globals.Types.find_type kind tname);
-        true
-      with Not_found ->
-        false
-    in
-    do_it mem acc l g
+    do_it (fun _ -> Globals.Types.mem_type kind tname) acc l g
   and do_globals acc globs =
     match globs with
     | [] ->
