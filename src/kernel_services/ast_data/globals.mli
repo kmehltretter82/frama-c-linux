@@ -106,15 +106,15 @@ module Functions: sig
   (** {2 Membership} *)
 
   val mem_name: string -> bool
-  (** @return true iff there is a function with such a name
+  (** @return [true] iff there is a function with such a name
       @since Frama-C+dev *)
 
   val mem_def_name: string -> bool
-  (** @return true iff there is a function definition with such a name
+  (** @return [true] iff there is a function definition with such a name
       @since Frama-C+dev *)
 
   val mem_decl_name: string -> bool
-  (** @return true iff there is a function declaration with such a name
+  (** @return [true] iff there is a function declaration with such a name
       @since Frama-C+dev *)
 
   (** {2 Searching} *)
@@ -234,18 +234,18 @@ module Types : sig
       {!Logic_typing.Make} *)
 
   val mem_enum_tag: string -> bool
-    (** @return true iff there is an enum constant with the given name in the
-        AST.
-        @since Frama-C+dev *)
+  (** @return [true] iff there is an enum constant with the given name in the
+      AST.
+      @since Frama-C+dev *)
 
   val find_enum_tag: string -> exp * typ
   (** Find an enum constant from its name in the AST.
       @raise Not_found when no such constant exists. *)
 
   val mem_type: Logic_typing.type_namespace -> string -> bool
-    (** @return true iff there is a type with the given name in the given
-        namespace in the AST.
-        @since Frama-C+dev *)
+  (** @return [true] iff there is a type with the given name in the given
+      namespace in the AST.
+      @since Frama-C+dev *)
 
   val find_type: Logic_typing.type_namespace -> string -> typ
   (** Find a type from its name in the AST.
