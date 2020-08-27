@@ -557,7 +557,6 @@ do
     --then)
       shift;
       OPTION_THEN=-then
-      FRAMAC_FLAGS="$FRAMAC_FLAGS"
     ;;
     # Extra E-ACSL options
     --e-acsl-extra)
