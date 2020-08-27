@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-! E-ACSL       [2020-08-28] Remove option -e-acsl-prepare-ast.
+-! E-ACSL       [2020-08-28] Remove option -e-acsl-check.
 -  E-ACSL       [2020-08-07] Add support for logical array comparison
                 (frama-c/e-acsl#99).
 -  E-ACSL       [2020-07-28] Add support of bitwise operators
