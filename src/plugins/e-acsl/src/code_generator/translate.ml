@@ -1149,7 +1149,8 @@ let must_translate ppt =
     (* [TODO] generating code for "valid under hypotheses" properties could be
        useful for some use cases (in particular, when E-ACSL does not stop on
        the very first error).
-       ==> introduce a new option or modify the behavior of -e-acsl-valid *)
+       ==> introduce a new option or modify the behavior of -e-acsl-valid,
+       see e-acsl#35 *)
     false
 
 let must_translate_opt = function
@@ -1198,7 +1199,7 @@ let translate_postconditions kf kinstr env behaviors =
     let env =
       handle_error
         (fun env ->
-           let active = [] in (* TODO: 'for' behaviors *)
+           let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
            let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
            if b.b_assigns <> WritesAny && must_translate_opt ppt
            then not_yet env "assigns clause in behavior";
@@ -1250,7 +1251,7 @@ let translate_pre_spec kf kinstr env spec =
          let ppt = Property.ip_terminates_of_spec kf kinstr spec in
          if must_translate_opt ppt then not_yet env "terminates clause")
       spec;
-    let active = [] in (* TODO: 'for' behaviors *)
+    let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
     let ppts = Property.ip_complete_of_spec kf kinstr ~active spec in
     unsupported
       (fun ppts ->
@@ -1307,7 +1308,8 @@ let translate_pre_code_annotation kf stmt env annot =
       then not_yet env "variant"
       else env
     | AAssigns _ ->
-      (* TODO: it is not a precondition *)
+      (* TODO: it is not a precondition --> should not be handled here,
+         to be fixed when implementing e-acsl#29 *)
       let ppts = Property.ip_of_code_annot kf stmt annot in
       List.iter
         (fun ppt -> if must_translate ppt then not_yet env "assigns")

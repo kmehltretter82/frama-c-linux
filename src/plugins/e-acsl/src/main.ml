@@ -20,16 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let check () = assert false (* [TODO ARCHI] kill check *)
-
-let check =
-  Dynamic.register
-    ~plugin:"e-acsl"
-    ~journalize:true
-    "check"
-    (Datatype.func Datatype.unit Datatype.bool)
-    check
-
 module Resulting_projects =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -65,7 +55,6 @@ let generate_code =
           if it is not yet computed *)
        let rtl_prj_name = Options.Project_name.get () ^ " RTL" in
        let rtl_prj = Project.create_by_copy ~last:false rtl_prj_name in
-       (* TODO: remove [rtl_prj] after use if no debug mode *)
        (* force AST computation before copying the project it belongs to *)
        Ast.compute ();
        let copied_prj = Project.create_by_copy ~last:true name in
@@ -94,7 +83,8 @@ let generate_code =
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)
-            (* [TODO ARCHI] what if RTE was already computed? *)
+            (* [TODO] what if RTE was already computed? To be fixed when
+               redoing the RTE management system  *)
             let selection =
               State_selection.union
                 (State_selection.with_dependencies !Db.RteGen.self)
@@ -103,6 +93,7 @@ let generate_code =
             Project.clear ~selection ~project:copied_prj ();
             Resulting_projects.mark_as_computed ())
          ();
+       if not (Options.debug_atleast 1) then Project.remove ~project:rtl_prj ();
        Options.feedback "translation done in project \"%s\"."
          (Options.Project_name.get ());
        copied_prj)

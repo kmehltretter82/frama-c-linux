@@ -372,7 +372,7 @@ let unduplicable_functions =
       "__builtin_va_copy";
       (* *alloc and free should not be duplicated. *)
       (* [TODO:] it preserves the former behavior. Should be modified latter by
-         checking only preconditions for any libc functions *)
+         checking only preconditions for any libc functions, see e-acsl#35 *)
       "malloc";
       "calloc";
       "realloc";
