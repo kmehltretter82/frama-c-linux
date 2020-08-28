@@ -87,37 +87,6 @@ struct
   let v2_1_0 = "2.1.0"
 end
 
-module Message = struct
-  type t = {
-    text: (string [@default ""]);
-    messageId: (string [@default ""]);
-    richText: (string [@default ""]);
-    richMessageId: (string [@default ""]);
-    arguments: (string list [@default []]);
-  }[@@deriving yojson]
-
-  let create
-      ?(text="")
-      ?(messageId="")
-      ?(richText="")
-      ?(richMessageId="")
-      ?(arguments=[])
-      ()
-    =
-    { text; messageId; richText; richMessageId; arguments }
-
-  let plain_text ~text ?id:messageId ?arguments () =
-    create ~text ?messageId ?arguments ()
-
-  let markdown ~markdown ?id:richMessageId ?arguments () =
-    let pp fmt = Markdown.pp_elements fmt in
-    let richText = String.trim (Format.asprintf "@[%a@]" pp markdown)
-    in
-    create ~richText ?richMessageId ?arguments ()
-
-  let default = create ()
-end
-
 module ArtifactLocation = struct
   type t = {
     uri: string;
@@ -175,6 +144,37 @@ module Properties = struct
     match tags with
     | [] -> `Null
     | _ -> `Assoc (("tags", tags_to_yojson tags)::additional_properties)
+end
+
+module Message = struct
+  type t = {
+    text: (string [@default ""]);
+    id: (string [@default ""]);
+    markdown: (string [@default ""]);
+    arguments: (string list [@default []]);
+    properties: (Properties.t [@default Properties.default]);
+  }[@@deriving yojson]
+
+  let create
+      ?(text="")
+      ?(id="")
+      ?(markdown="")
+      ?(arguments=[])
+      ?(properties=Properties.default)
+      ()
+    =
+    { text; id; markdown; arguments; properties }
+
+  let plain_text ~text ?id ?arguments () =
+    create ~text ?id ?arguments ()
+
+  let markdown ~markdown ?id ?arguments () =
+    let pp fmt = Markdown.pp_elements fmt in
+    let markdown = String.trim (Format.asprintf "@[%a@]" pp markdown)
+    in
+    create ~markdown ?id ?arguments ()
+
+  let default = create ()
 end
 
 module MultiformatMessageString = struct
@@ -1019,7 +1019,7 @@ module Sarif_result = struct
   }[@@deriving yojson]
 
   let create
-      ?(ruleId = "")
+      ~ruleId
       ?(kind=Result_kind.pass)
       ?(level=Result_level.none)
       ?(message=Message.default)
@@ -1420,7 +1420,7 @@ end
 
 module Schema = struct
   type t = {
-    schema: (Uri.t [@default Uri.sarif_github]) [@key "$schema"];
+    schema: Uri.t [@key "$schema"];
     version: Version.t;
     runs: Run.t list
   } [@@deriving yojson]

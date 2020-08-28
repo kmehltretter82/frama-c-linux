@@ -101,11 +101,11 @@ let make_message alarm annot remark =
     | [] -> summary :: gen_remark alarm
     | _ -> summary :: remark
   in
-  let richText =
+  let markdown =
     String.trim
       (Format.asprintf "@[%a@]" (Markdown.pp_elements ~page:"") markdown)
   in
-  Message.create ~text ~richText ()
+  Message.create ~text ~markdown ()
 
 let opt_physical_location_of_loc loc =
   if loc = Cil_datatype.Location.unknown then []
@@ -142,12 +142,14 @@ let make_ip_message ip =
   let text = Format.asprintf "@[%a.@]" Property.short_pretty ip in
   Message.plain_text ~text ()
 
+let user_annot_id = "user-spec"
+
 let gen_status ip =
   let status = Property_status.Feedback.get ip in
   let level = level_of_status status in
   let locations = opt_physical_location_of_loc (Property.location ip) in
   let message = make_ip_message ip in
-  Sarif_result.create ~level ~locations ~message ()
+  Sarif_result.create ~ruleId:user_annot_id ~level ~locations ~message ()
 
 let gen_statuses () =
   let f ip content =
@@ -184,7 +186,7 @@ let gen_run remarks =
     | [] -> rules
     | _ ->
       Datatype.String.Map.add
-        "user-spec" "User-written ACSL specification" rules
+        user_annot_id "User-written ACSL specification" rules
   in
   let rules = make_taxonomies rules in
   let taxonomies = [ToolComponent.create ~name ~rules ()] in
