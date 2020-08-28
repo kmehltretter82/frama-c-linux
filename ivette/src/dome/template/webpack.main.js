@@ -26,6 +26,9 @@ function domeDevtools() {
 }
 
 module.exports = {
+  module: {
+    strictExportPresence: true
+  },
   resolve: {
     alias: {
       'dome$':         path.resolve( DOME , 'src/main/dome.js' ),

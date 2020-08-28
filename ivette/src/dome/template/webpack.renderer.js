@@ -18,7 +18,8 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, use: [ 'css-loader' ] }
-    ]
+    ],
+    strictExportPresence: true
   },
   resolve: {
     alias: {
