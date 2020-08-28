@@ -19,6 +19,7 @@
 
 import _ from 'lodash' ;
 import React from 'react';
+import { emitter } from 'dome/system';
 import * as Dome from 'dome' ;
 
 // --------------------------------------------------------------------------
@@ -39,7 +40,7 @@ const getItem = (id) => {
 const trigger = (item) => {
   if (item.rendered) {
     item.rendered = false ;
-    setImmediate(() => Dome.emit(item.evt));
+    setImmediate(() => emitter.emit(item.evt));
   }
 };
 
@@ -100,7 +101,13 @@ export function Item({ id, children })
 */
 export function Render({ id, children=null })
 {
-  Dome.useUpdate(EVENT(id));
+  const [ age, setAge ] = React.useState(0);
+  React.useEffect(() => {
+    const evt = EVENT(id);
+    const fn = () => setAge(age+1);
+    emitter.on(evt,fn);
+    return () => emitter.off(evt,fn);
+  });
   let item = getItem(id);
   item.rendered = true ;
   if (typeof(children)==='function')
