@@ -15,7 +15,7 @@
   (optional)
   (modules studia_gui)
   (flags -open Frama_c_kernel -open Frama_c_gui -open Studia)
-  (libraries studia frama-c.kernel frama-c.gui)
+  (libraries studia frama-c.kernel frama-c.gui frama-c-eva.gui)
 )
 
 (plugin (name frama-c-plugins-studia) (libraries frama-c-studia.gui) (site (frama-c plugins_gui)))
