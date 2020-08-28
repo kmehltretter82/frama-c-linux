@@ -197,7 +197,7 @@ export class Splitter extends React.Component {
   }
 
   handleReload() {
-    if (this.refs.container && this.refs.splitter) {
+    if (this.refs && this.refs.container && this.refs.splitter) {
       const container = this.refs.container.getBoundingClientRect() ;
       const dimension = this.lr ? container.width : container.height ;
       this.range = dimension - this.margin ;

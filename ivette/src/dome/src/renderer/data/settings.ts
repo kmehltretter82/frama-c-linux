@@ -12,7 +12,7 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
-import { DEVEL, emitter as SysEmitter } from 'dome/misc/system';
+import { emitter as SysEmitter } from 'dome/misc/system';
 import * as JSON from './json';
 import type { State } from './states';
 
@@ -115,6 +115,7 @@ export class GObject<A extends JSON.json> extends GlobalSettings<A> {
 // --- Generic Settings (private)
 // --------------------------------------------------------------------------
 
+type store = { [key: string]: JSON.json };
 type patch = { key: string; value: JSON.json };
 type driver = { evt: string; ipc: string; broadcast: boolean };
 
@@ -177,14 +178,12 @@ class Driver {
 
   // --- Initial Data
 
-  sync(data: patch[]) {
+  sync(data: store) {
     this.fire.cancel();
     this.store.clear();
     this.diffs.clear();
     const m = this.store;
-    data.forEach(({ key, value }) => {
-      m.set(key, value);
-    });
+    Object.keys(data).forEach((k) => { m.set(k, data[k]); });
     SysEmitter.emit(this.evt);
   }
 
@@ -215,25 +214,11 @@ class Driver {
 // --- Generic Settings Hook
 // --------------------------------------------------------------------------
 
-const keys = new Set<string>();
-
 function useSettings<A>(
   S: Settings<A>,
   D: Driver,
   K?: string,
 ): State<A> {
-  // Check for unique key
-  React.useEffect(() => {
-    if (K) {
-      if (keys.has(K) && DEVEL)
-        console.error('[Dome.settings] Duplicate key', K);
-      else {
-        keys.add(K);
-        return () => { keys.delete(K); };
-      }
-    }
-    return undefined;
-  });
   // Load value
   const loader = () => (
     JSON.jCatch(S.decoder, S.defaultValue)(D.load(K))
@@ -354,7 +339,7 @@ export function offWindowSettings(callback: () => void) {
 
 const GlobalSettingsDriver = new Driver({
   evt: 'dome.settings.global',
-  ipc: 'dome.ipc.settings.window',
+  ipc: 'dome.ipc.settings.global',
   broadcast: true,
 });
 
@@ -388,15 +373,11 @@ export const global = GlobalSettingsDriver.evt;
 
 /* @ internal */
 export function synchronize() {
-  ipcRenderer.sendSync(
-    'dome.ipc.settings.sync',
-    (_event: string, data: any) => {
-      const globals: patch[] = data.globals ?? [];
-      GlobalSettingsDriver.sync(globals);
-      const settings: patch[] = data.settings ?? [];
-      WindowSettingsDriver.sync(settings);
-    },
-  );
+  const data = ipcRenderer.sendSync('dome.ipc.settings.sync');
+  const globals: store = data.store ?? {};
+  GlobalSettingsDriver.sync(globals);
+  const settings: store = data.settings ?? {};
+  WindowSettingsDriver.sync(settings);
 }
 
 // --------------------------------------------------------------------------
