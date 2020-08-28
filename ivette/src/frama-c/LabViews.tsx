@@ -518,7 +518,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   }
 
   return (
-    <Section label="Views">
+    <Section label="Views" defaultUnfold>
       {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
     </Section>
   );
@@ -557,9 +557,13 @@ function CustomGroup({
       </DragSource>
     );
   };
-
   return (
-    <Section id={sectionId} label={sectionLabel} title={sectionTitle}>
+    <Section
+      id={sectionId}
+      label={sectionLabel}
+      title={sectionTitle}
+      defaultUnfold={sectionId === 'groups.frama-c'}
+    >
       {components.map(makeComponent)}
     </Section>
   );

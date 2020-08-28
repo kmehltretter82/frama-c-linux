@@ -36,7 +36,7 @@ export default () => {
   };
 
   return (
-    <Section label="Functions">
+    <Section label="Functions" defaultUnfold>
       {fcts.map(makeFctItem)}
     </Section>
   );
