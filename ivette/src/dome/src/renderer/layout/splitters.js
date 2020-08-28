@@ -168,11 +168,13 @@ export class Splitter extends React.Component {
 
   componentDidMount() {
     this.handleReload();
-    Dome.on( 'dome.settings.window', this.handleReload );
+    // DEPRECATED
+    Settings.onWindowSettings(this.handleReload);
   }
 
   componentWillUnmount() {
-    Dome.off( 'dome.settings.window', this.handleReload );
+    // DEPRECATED
+    Settings.offWindowSettings(this.handleReload);
   }
 
   componentDidUpdate() {

@@ -1181,11 +1181,13 @@ export class GridLayout extends React.Component
   }
 
   componentDidMount() {
-    Dome.on('dome.settings.window',this.onReloadSettings);
+    // DEPRECATED
+    Settings.onWindowSettings(this.onReloadSettings);
   }
 
   componentWillUnmont() {
-    Dome.off('dome.settings.window',this.onReloadSettings);
+    // DEPRECATED
+    Settings.offWindowSettings(this.onReloadSettings);
   }
 
   computeTargetProposal(target) {

@@ -264,7 +264,7 @@ function useSettings<A>(
 // --- Window Settings
 // --------------------------------------------------------------------------
 
-const WindowDriver = new Driver({
+const WindowSettingsDriver = new Driver({
   evt: 'dome.settings.window',
   ipc: 'dome.ipc.settings.window',
   broadcast: false,
@@ -279,7 +279,7 @@ export function getWindowSettings<A>(
   defaultValue: A,
 ): A {
   return key ?
-    JSON.jCatch(decoder, defaultValue)(WindowDriver.load(key))
+    JSON.jCatch(decoder, defaultValue)(WindowSettingsDriver.load(key))
     : defaultValue;
 }
 
@@ -293,7 +293,7 @@ export function setWindowSettings(
   key: string | undefined,
   value: JSON.json,
 ) {
-  if (key) WindowDriver.save(key, value);
+  if (key) WindowSettingsDriver.save(key, value);
 }
 
 /**
@@ -310,7 +310,7 @@ export function useWindowSettings<A extends JSON.json>(
     decoder,
     encoder: JSON.identity,
     defaultValue,
-  }, WindowDriver, key);
+  }, WindowSettingsDriver, key);
 }
 
 /** Same as [[useWindowSettings]] with a specific encoder. */
@@ -324,23 +324,35 @@ export function useWindowSettingsData<A>(
     decoder,
     encoder,
     defaultValue,
-  }, WindowDriver, key);
+  }, WindowSettingsDriver, key);
 }
 
 /** Call the callback function on window settings events. */
 export function useWindowSettingsEvent(callback: () => void) {
   React.useEffect(() => {
-    const { evt } = WindowDriver;
+    const { evt } = WindowSettingsDriver;
     SysEmitter.on(evt, callback);
     return () => { SysEmitter.off(evt, callback); };
   });
+}
+
+/** @ignore DEPRECATED */
+export function onWindowSettings(callback: () => void) {
+  const { evt } = WindowSettingsDriver;
+  SysEmitter.on(evt, callback);
+}
+
+/** @ignore DEPRECATED */
+export function offWindowSettings(callback: () => void) {
+  const { evt } = WindowSettingsDriver;
+  SysEmitter.off(evt, callback);
 }
 
 // --------------------------------------------------------------------------
 // --- Global Settings
 // --------------------------------------------------------------------------
 
-const GlobalDriver = new Driver({
+const GlobalSettingsDriver = new Driver({
   evt: 'dome.settings.global',
   ipc: 'dome.ipc.settings.window',
   broadcast: true,
@@ -352,13 +364,13 @@ const GlobalDriver = new Driver({
    the usual place for the application with respect to the underlying system.
  */
 export function useGlobalSettings<A>(S: GlobalSettings<A>) {
-  return useSettings(S, GlobalDriver, S.name);
+  return useSettings(S, GlobalSettingsDriver, S.name);
 }
 
 /** Call the callback function on global settings events. */
 export function useGlobalSettingsEvent(callback: () => void) {
   React.useEffect(() => {
-    const { evt } = GlobalDriver;
+    const { evt } = GlobalSettingsDriver;
     SysEmitter.on(evt, callback);
     return () => { SysEmitter.off(evt, callback); };
   });
@@ -369,10 +381,10 @@ export function useGlobalSettingsEvent(callback: () => void) {
 // --------------------------------------------------------------------------
 
 /* @ internal */
-export const window = WindowDriver.evt;
+export const window = WindowSettingsDriver.evt;
 
 /* @ internal */
-export const global = GlobalDriver.evt;
+export const global = GlobalSettingsDriver.evt;
 
 /* @ internal */
 export function synchronize() {
@@ -380,9 +392,9 @@ export function synchronize() {
     'dome.ipc.settings.sync',
     (_event: string, data: any) => {
       const globals: patch[] = data.globals ?? [];
-      GlobalDriver.sync(globals);
+      GlobalSettingsDriver.sync(globals);
       const settings: patch[] = data.settings ?? [];
-      WindowDriver.sync(settings);
+      WindowSettingsDriver.sync(settings);
     },
   );
 }
