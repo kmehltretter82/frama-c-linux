@@ -26,7 +26,7 @@ module.exports = {
       '@plugins':     path.resolve( __dirname , 'src/plugins' ),
       'dome/misc':    path.resolve( DOME , 'src/misc' ),
       'dome/system':  path.resolve( DOME , 'src/misc/system.js' ),
-      'dome$':        path.resolve( DOME , 'src/renderer/dome.ts' ),
+      'dome$':        path.resolve( DOME , 'src/renderer/dome.tsx' ),
       'dome':         path.resolve( DOME , 'src/renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }

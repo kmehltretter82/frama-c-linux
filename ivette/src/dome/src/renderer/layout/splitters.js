@@ -203,7 +203,7 @@ export class Splitter extends React.Component {
       this.range = dimension - this.margin ;
       const settings = this.props.settings ;
       if (settings) {
-        const offset = Settings.getWindowSettings(settings,JSON.jNumber,-1);
+        const offset = Settings.getWindowSettings(settings,Json.jNumber,-1);
         if (this.margin <= offset && offset <= this.range)
           this.setState({ absolute: true, offset });
       }

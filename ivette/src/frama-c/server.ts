@@ -578,7 +578,7 @@ class SignalHandler {
 
   constructor(id: any) {
     this.id = id;
-    this.event = SIGNAL + id;
+    this.event = new SIGNAL(id);
     this.active = false;
     this.listen = false;
     this.sigon = this.sigon.bind(this);
@@ -588,6 +588,7 @@ class SignalHandler {
 
   on(callback: () => void) {
     const e = this.event;
+
     const n = e.listenerCount();
     e.on(callback);
     if (n === 0) {

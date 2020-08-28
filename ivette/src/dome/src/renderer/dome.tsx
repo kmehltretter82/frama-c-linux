@@ -236,9 +236,8 @@ function setContainer(
 ) {
   Settings.synchronize();
   const appNode = setContextAppNode();
-  const appContents = React.createElement(Component);
-  const appContainer = React.createElement(AppContainer, {}, [appContents]);
-  ReactDOM.render(appContainer, appNode);
+  const contents = <AppContainer><Component /></AppContainer>;
+  ReactDOM.render(contents, appNode);
 }
 
 // --------------------------------------------------------------------------
