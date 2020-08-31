@@ -26,7 +26,6 @@ open Options
 module Cil = Extends.Cil
 module List = Extends.List
 module Typ = Extends.Typ
-module Build = Cil_builder.Pure
 
 let pp_prototype name fmt tparams =
   Format.fprintf fmt "%s(%a)"
