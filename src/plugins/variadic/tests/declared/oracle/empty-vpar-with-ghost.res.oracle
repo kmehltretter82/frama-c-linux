@@ -25,7 +25,7 @@ int main(void)
 {
   int __retres;
   {
-    void *__va_args[0] = {};
+    void *__va_args[1] = {(void *)0};
     f(1,2,3,(void * const *)(__va_args)) /*@ ghost (4) */;
   }
   __retres = 0;

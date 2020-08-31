@@ -159,8 +159,12 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
   let vis = List.mapi add_var v_exps in
 
   (* Build an array to store addresses *)
-  let ty = Build.(array (ptr void) ~size:(List.length vis)) in
-  let vargs = Build.(local ty "__va_args" ~init:(List.map addr vis)) in
+  let init = match vis with (* C standard forbids arrays of size 0 *)
+    | [] -> [Build.of_init (Cil.makeZeroInit ~loc Cil.voidPtrType)]
+    | l -> List.map Build.addr l
+  in
+  let ty = Build.(array (ptr void) ~size:(List.length init)) in
+  let vargs = Build.(local ty "__va_args" ~init) in
 
   (* Translate the call *)
   let new_arg = Build.(cil_exp ~loc (cast' (vpar_typ []) (addr vargs))) in

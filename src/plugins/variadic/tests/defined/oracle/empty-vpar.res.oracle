@@ -37,7 +37,7 @@ int main(void)
 {
   int tmp;
   {
-    void *__va_args[0] = {};
+    void *__va_args[1] = {(void *)0};
     tmp = sum(0,(void * const *)(__va_args));
   }
   return tmp;

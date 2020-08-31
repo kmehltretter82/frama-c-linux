@@ -28,7 +28,7 @@ int f(int a, void * const *__va_params)
   else {
     int tmp;
     {
-      void *__va_args[0] = {};
+      void *__va_args[1] = {(void *)0};
       tmp = f(a - 1,(void * const *)(__va_args));
     }
     __retres = tmp;
@@ -41,7 +41,7 @@ int main(void)
 {
   int tmp;
   {
-    void *__va_args[0] = {};
+    void *__va_args[1] = {(void *)0};
     tmp = f(7,(void * const *)(__va_args));
   }
   return tmp;

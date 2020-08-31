@@ -219,8 +219,11 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
 
   let module Build = Cil_builder.Stateful (struct let loc = loc end) in
   Build.open_block ~into:fundec ~ghost ();
-  let init = List.map Build.of_exp args_middle
-  and size = List.length args_middle in
+  let init = match args_middle with (* C standard forbids arrays of size 0 *)
+    | [] -> [Build.of_init (Cil.makeZeroInit ~loc ptyp)]
+    | l -> List.map Build.of_exp l
+  in
+  let size = List.length init in
   let vaggr = Build.(local (array ~size (of_ctyp ptyp)) pname ~init) in
   let new_args = args_left @ [Build.(cil_exp ~loc (addr vaggr))] @ args_right in
   let new_args,_ = match_args tparams new_args in
