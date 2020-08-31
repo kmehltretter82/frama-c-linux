@@ -45,17 +45,17 @@ type 'a pretty_printer =
 (**
     Generic type for the various logging channels which are not aborting
     Frama-C.
-    - When [current] is [false] (default for most of the channels),
-   no location is output. When it is [true], the last registered location
-   is used as current (see {!Cil_const.CurrentLoc}).
+   - When [current] is [false] (default for most of the channels),
+     no location is output. When it is [true], the last registered location
+     is used as current (see {!Cil_const.CurrentLoc}).
    - [source] is the location to be output. If nil, [current] is used to
-   determine if a location should be output
+     determine if a location should be output
    - [emitwith] function which is called each time an event is processed
    - [echo] is [true] if the event should be output somewhere in addition
-   to [stdout]
+     to [stdout]
    - [append] adds some actions performed on the formatter after the event
-   has been processed.
-   @since Beryllium-20090601-beta1 *)
+     has been processed.
+     @since Beryllium-20090601-beta1 *)
 
 type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
@@ -120,7 +120,7 @@ module type Messages = sig
 
   type category
   (** category for debugging/verbose messages. Must be registered before
-      any use. 
+      any use.
       Each column in the string defines a sub-category, e.g.
       a:b:c defines a subcategory c of b, which is itself a subcategory of a.
       Enabling a category (via -plugin-msg-category) will enable all its
@@ -140,7 +140,7 @@ module type Messages = sig
   val debug_atleast : int -> bool
   (** @since Beryllium-20090601-beta1 *)
 
-  val printf : ?level:int -> ?dkey:category -> 
+  val printf : ?level:int -> ?dkey:category ->
     ?current:bool -> ?source:Filepath.position ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
@@ -202,7 +202,7 @@ module type Messages = sig
       [false].
 
       The intended usage is: [assert (verify e "Bla...") ;].
-      @since Beryllium-20090601-beta1 
+      @since Beryllium-20090601-beta1
       @plugin development guide *)
 
   val not_yet_implemented : ('a,formatter,unit,'b) format4 -> 'a
@@ -242,13 +242,13 @@ module type Messages = sig
   (** Generic log routine. The default kind is [Result]. Use cases (with
       [n,m > 0]):
       - [log ~verbose:n]: emit the message only when verbosity level is
-      at least [n].
+        at least [n].
       - [log ~debug:n]: emit the message only when debugging level is
-      at least [n].
+        at least [n].
       - [log ~verbose:n ~debug:m]: any debugging or verbosity level is
-      sufficient.
-      @since Beryllium-20090901
-      @plugin development guide *)
+        sufficient.
+        @since Beryllium-20090901
+        @plugin development guide *)
 
   val logwith : (event option -> 'b) ->
     ?wkey:warn_category -> ?emitwith:(event -> unit) -> ?once:bool ->
@@ -397,14 +397,18 @@ module Register
 val set_echo : ?plugin:string -> ?kind:kind list -> bool -> unit
 (** Turns echo on or off. Applies to all channel unless specified,
     and all kind of messages unless specified.
-    @since Beryllium-20090601-beta1 
+    @since Beryllium-20090601-beta1
     @plugin development guide *)
 
 val add_listener : ?plugin:string -> ?kind:kind list -> (event -> unit) -> unit
 (** Register a hook that is called each time an event is
     emitted. Applies to all channel unless specified,
     and all kind of messages unless specified.
-    @since Beryllium-20090601-beta1 
+
+    Warning: when executing the listener, all listeners will be
+    temporarily deactivated in order to avoid infinite recursion.
+
+    @since Beryllium-20090601-beta1
     @plugin development guide *)
 
 val echo : event -> unit
@@ -426,7 +430,7 @@ type channel
 (** @since Beryllium-20090601-beta1 *)
 
 val new_channel : string -> channel
-(** @since Beryllium-20090901 
+(** @since Beryllium-20090901
     @plugin development guide *)
 
 val log_channel : channel ->
@@ -447,7 +451,7 @@ val kernel_label_name: string
 val source : file:Filepath.Normalized.t -> line:int -> Filepath.position
 (** @since Chlorine-20180501
     @modify 18.0-Argon change type of [file]
- *)
+*)
 
 val get_current_source : unit -> Filepath.position
 
@@ -463,7 +467,7 @@ val clean : unit -> unit
 val null : formatter
 [@@ deprecated "Use 'Pretty_utils.null' instead"]
 (** Prints nothing.
-    @since Beryllium-20090901 
+    @since Beryllium-20090901
     @deprecated Chlorine-20180501 use {!Pretty_utils} instead. *)
 
 val nullprintf :  ('a,formatter,unit) format -> 'a
@@ -480,7 +484,7 @@ val with_null : (unit -> 'b) -> ('a,formatter,unit,'b) format4 -> 'a
 
 val set_output : ?isatty:bool -> (string -> int -> int -> unit) -> (unit -> unit) -> unit
 (** This function has the same parameters as Format.make_formatter.
-    @since Beryllium-20090901 
+    @since Beryllium-20090901
     @plugin development guide *)
 
 val print_on_output : (Format.formatter -> unit) -> unit
@@ -490,8 +494,8 @@ val print_on_output : (Format.formatter -> unit) -> unit
     Notification of listeners is not delayed, however.
 
     Can not be recursively invoked.
-    @since Beryllium-20090901 
-    @modify Nitrogen-20111001 signature changed 
+    @since Beryllium-20090901
+    @modify Nitrogen-20111001 signature changed
     @plugin development guide *)
 
 val print_delayed : (Format.formatter -> unit) -> unit
@@ -502,7 +506,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 
     Can not be recursively invoked.
     @since Beryllium-20090901
-    @modify Nitrogen-20111001 signature changed 
+    @modify Nitrogen-20111001 signature changed
     @plugin development guide *)
 
 (**/**)
@@ -528,7 +532,7 @@ val treat_deferred_error: unit -> unit
    a delayed error or failure. Currently done:
    - after each command-line stage.
    - after each analysis step (as separated by -then and its derivatives),
-   including the last one.
+     including the last one.
 *)
 
 (**/**)
