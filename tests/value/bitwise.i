@@ -2,11 +2,16 @@
    STDOPT: +"-big-ints-hex 256"
 */
 
-/*@ assigns \result \from min, max;
-    ensures min <= \result <= max ;
+/*@ assigns \result \from a, b;
+    ensures result_a_or_b: \result == a || \result == b ;
  */
-int Frama_C_interval(int min, int max);
+extern int Frama_C_nondet(int a, int b);
 
+/*@ requires order: min <= max;
+    assigns \result \from min, max;
+    ensures result_bounded: min <= \result <= max ;
+ */
+extern int Frama_C_interval(int min, int max);
 
 volatile long v;
 volatile unsigned char input[3];
@@ -67,11 +72,20 @@ int test4(void)
   if (something & 0x80000000) {
     Frama_C_show_each_true(something);
     return 0;
-  } 
+  }
   else {
     Frama_C_show_each_false(something);
     return 1;
   }
+}
+
+void test5(void)
+{
+  int x = Frama_C_nondet(-1, 0);
+  int y = Frama_C_nondet(-1, 0);
+  int a = x & y;
+  int b = x | y;
+  int c = x ^ y;
 }
 
 void and_or_rel(void)
@@ -150,6 +164,7 @@ void main(void) {
   test2();
   test3();
   test4();
+  test5();
   and_or_rel();
   double_neg();
   bug1();
