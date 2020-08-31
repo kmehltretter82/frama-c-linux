@@ -227,13 +227,10 @@ function useSettings<A>(
   const [value, setValue] = React.useState<A>(loader);
   // Broadcast
   React.useEffect(() => {
-    if (K) {
-      const event = D.evt;
-      const callback = () => setValue(loader());
-      SysEmitter.on(event, callback);
-      return () => { SysEmitter.off(event, callback); };
-    }
-    return undefined;
+    const event = D.evt;
+    const callback = () => setValue(loader());
+    SysEmitter.on(event, callback);
+    return () => { SysEmitter.off(event, callback); };
   });
   // Updates
   const updateValue = React.useCallback((newValue: A) => {
