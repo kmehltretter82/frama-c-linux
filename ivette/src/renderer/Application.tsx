@@ -24,6 +24,8 @@ import Properties from './Properties';
 import Locations from './Locations';
 import Values from './Values';
 
+import { LSplit } from 'dome/layout/split';
+
 // --------------------------------------------------------------------------
 // --- Selection Controls
 // --------------------------------------------------------------------------
@@ -81,7 +83,7 @@ export default (() => {
           onClick={flipViewbar}
         />
       </Toolbar.ToolBar>
-      <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
+      <LSplit unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
           <Globals key="globals" />
@@ -121,7 +123,7 @@ export default (() => {
             <Values />
           </Group>
         </LabView>
-      </Splitter>
+      </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
         <Toolbar.Filler />

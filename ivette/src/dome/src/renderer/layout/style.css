@@ -93,6 +93,104 @@
     height: 100% ;
 }
 
+.dome-xSplitter-no-cursor { }
+.dome-xSplitter-h-cursor  { cursor: col-resize ; }
+.dome-xSplitter-v-cursor  { cursor: row-resize ; }
+
+.dome-xSplitter-hidden {
+    display: none;
+}
+
+.dome-xSplitter-block {
+    display: block;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.dome-xSplitter-hflex {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.dome-xSplitter-vflex {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.dome-xSplitter-hfold {
+    flex: none;
+    min-width: 30px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.dome-xSplitter-vfold {
+    flex: none;
+    min-height: 30px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.dome-xSplitter-hpane {
+    flex: auto;
+    width: auto;
+    height: 100%;
+    overflow: hidden;
+}
+
+.dome-xSplitter-vpane {
+    flex: auto;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.dome-xSplitter-hline {
+    width: 1px;
+    height: 100%;
+}
+
+.dome-xSplitter-vline {
+    width: 100%;
+    height: 1px;
+}
+
+.dome-xSplitter-hgrab {
+    position: relative ;
+    z-index: 1 ;
+    left: -1px ;
+    width: 3px ;
+    height: 100% ;
+    cursor: col-resize ;
+    border: 0px ;
+}
+
+.dome-xSplitter-vgrab {
+    position: relative ;
+    z-index: 1 ;
+    top: -1px ;
+    height: 3px ;
+    width: 100% ;
+    border: 0px ;
+    cursor: row-resize ;
+}
+
+.dome-window-active .dome-xSplitter-hline,
+.dome-window-active .dome-xSplitter-vline
+{
+    background: #afafaf ;
+}
+
+.dome-window-inactive .dome-xSplitter-hline
+.dome-window-inactive .dome-xSplitter-vline
+{
+    background: #d6d6d6 ;
+}
+
+/* --- DEPRECATED --- */
+
 .dome-xSplitPane {
     position: relative ;
 }
@@ -116,10 +214,6 @@
     width: 100% ;
     cursor: row-resize ;
 }
-
-.dome-xSplitter-no-cursor { }
-.dome-xSplitter-h-cursor  { cursor: col-resize ; }
-.dome-xSplitter-v-cursor  { cursor: row-resize ; }
 
 .dome-window-active .dome-xSplitLine {
     background: #afafaf ;

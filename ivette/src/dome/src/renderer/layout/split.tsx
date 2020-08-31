@@ -62,17 +62,20 @@ type Layout = {
   cssB: string;
 };
 
+const PANEL = 'dome-container';
+const DRAGGING = 'dome-color-dragging';
+const DRAGZONE = 'dome-color-dragzone';
+
 const CONTAINER = 'dome-xSplitter-container';
 const NOCURSOR = 'dome-xSplitter-no-cursor';
 const HCURSOR = 'dome-xSplitter-h-cursor';
 const VCURSOR = 'dome-xSplitter-v-cursor';
 
 const HIDDEN = 'dome-xSplitter-hidden';
-const BLOCK = 'dome-xSplitter-block';
 const HFLEX = 'dome-xSplitter-hflex';
 const VFLEX = 'dome-xSplitter-vflex';
 
-const PANEL = 'dome-container';
+const BLOCK = 'dome-xSplitter-block';
 const HPANE = 'dome-xSplitter-hpane';
 const VPANE = 'dome-xSplitter-vpane';
 const HFOLD = 'dome-xSplitter-hfold';
@@ -81,8 +84,6 @@ const HLINE = 'dome-xSplitter-hline';
 const VLINE = 'dome-xSplitter-vline';
 const HGRAB = 'dome-xSplitter-hgrab';
 const VGRAB = 'dome-xSplitter-vgrab';
-const DRAGGING = 'dome-color-dragging';
-const DRAGZONE = 'dome-color-dragzone';
 
 type CSS = {
   container: string;
@@ -100,15 +101,15 @@ const getCSS = (
   if (!unfold) return {
     container: BLOCK,
     resizer: HIDDEN,
-    primary: (cssA === HFOLD || cssA === VFOLD) ? HIDDEN : PANEL,
-    secondary: (cssB === HFOLD || cssB === VFOLD) ? HIDDEN : PANEL,
+    primary: (cssA === HFOLD || cssA === VFOLD) ? HIDDEN : BLOCK,
+    secondary: (cssB === HFOLD || cssB === VFOLD) ? HIDDEN : BLOCK,
   };
   // POSITION
   if (position > 0) return {
     container: BLOCK,
     resizer: hsplit ? HLINE : VLINE,
-    primary: PANEL,
-    secondary: PANEL,
+    primary: BLOCK,
+    secondary: BLOCK,
   };
   // FLEX
   return {
