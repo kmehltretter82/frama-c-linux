@@ -25,6 +25,7 @@ let kernel_parameters_correctness = [
   Kernel.MainFunction.parameter;
   Kernel.LibEntry.parameter;
   Kernel.AbsoluteValidRange.parameter;
+  Kernel.InitializedPaddingLocals.parameter;
   Kernel.SafeArrays.parameter;
   Kernel.UnspecifiedAccess.parameter;
   Kernel.SignedOverflow.parameter;
@@ -33,6 +34,10 @@ let kernel_parameters_correctness = [
   Kernel.RightShiftNegative.parameter;
   Kernel.SignedDowncast.parameter;
   Kernel.UnsignedDowncast.parameter;
+  Kernel.PointerDowncast.parameter;
+  Kernel.SpecialFloat.parameter;
+  Kernel.InvalidBool.parameter;
+  Kernel.InvalidPointer.parameter;
 ]
 
 let parameters_correctness = ref Typed_parameter.Set.empty
