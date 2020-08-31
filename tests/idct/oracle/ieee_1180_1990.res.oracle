@@ -3900,15 +3900,15 @@
             assigns \result, __fc_stdout->__fc_FILE_data;
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 195)
-            assigns __fc_stdout->__fc_FILE_data
-              \from (indirect: __fc_stdout->__fc_FILE_id),
-                    __fc_stdout->__fc_FILE_data,
-                    (indirect: *(format + (0 ..)));
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 195)
             assigns \result
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     (indirect: __fc_stdout->__fc_FILE_data),
+                    (indirect: *(format + (0 ..)));
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 195)
+            assigns __fc_stdout->__fc_FILE_data
+              \from (indirect: __fc_stdout->__fc_FILE_id),
+                    __fc_stdout->__fc_FILE_data,
                     (indirect: *(format + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3926,15 +3926,15 @@
             assigns \result, __fc_stdout->__fc_FILE_data;
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 196)
-            assigns __fc_stdout->__fc_FILE_data
-              \from (indirect: __fc_stdout->__fc_FILE_id),
-                    __fc_stdout->__fc_FILE_data,
-                    (indirect: *(format + (0 ..)));
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 196)
             assigns \result
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     (indirect: __fc_stdout->__fc_FILE_data),
+                    (indirect: *(format + (0 ..)));
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file tests/idct/ieee_1180_1990.c, line 196)
+            assigns __fc_stdout->__fc_FILE_data
+              \from (indirect: __fc_stdout->__fc_FILE_id),
+                    __fc_stdout->__fc_FILE_data,
                     (indirect: *(format + (0 ..)));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior

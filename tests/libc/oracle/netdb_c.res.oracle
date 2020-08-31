@@ -135,9 +135,9 @@
   Called from tests/libc/netdb_c.c:44.
 [eva] using specification for function fprintf_va_1
 [eva] tests/libc/netdb_c.c:44: 
-  function fprintf_va_1: precondition valid_read_string(format) got status valid.
-[eva] tests/libc/netdb_c.c:44: 
   function fprintf_va_1: precondition valid_read_string(param0) got status valid.
+[eva] tests/libc/netdb_c.c:44: 
+  function fprintf_va_1: precondition valid_read_string(format) got status valid.
 [eva] Done for function fprintf_va_1
 [eva] computing for function exit <- main.
   Called from tests/libc/netdb_c.c:45.
