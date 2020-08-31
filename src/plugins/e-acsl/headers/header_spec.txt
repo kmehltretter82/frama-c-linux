@@ -52,8 +52,6 @@ src/analyses/typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/typing.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/constructor.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/constructor.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/global_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -80,6 +78,10 @@ src/code_generator/quantif.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/quantif.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/rational.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/rational.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/smart_exp.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/smart_exp.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/smart_stmt.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/smart_stmt.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

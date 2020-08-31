@@ -148,8 +148,8 @@ end
 (** {2 Current annotation kind} *)
 (* ************************************************************************** *)
 
-val annotation_kind: t -> Constructor.annotation_kind
-val set_annotation_kind: t -> Constructor.annotation_kind -> t
+val annotation_kind: t -> Smart_stmt.annotation_kind
+val set_annotation_kind: t -> Smart_stmt.annotation_kind -> t
 
 (* ************************************************************************** *)
 (** {2 Loop invariants} *)

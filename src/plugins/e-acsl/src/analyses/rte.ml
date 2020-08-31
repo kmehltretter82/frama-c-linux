@@ -27,7 +27,7 @@
 let warn_rte warn exn =
   if warn then
     Options.warning "@[@[cannot run RTE:@ %s.@]@ \
-Ignoring potential runtime errors in annotations." 
+                     Ignoring potential runtime errors in annotations."
       (Printexc.to_string exn)
 
 (* ************************************************************************** *)
@@ -45,8 +45,8 @@ let stmt ?(warn=true) =
          (let module L = Datatype.List(Code_annotation) in L.ty))
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
-      warn_rte warn exn;
-      fun _ _ -> []
+    warn_rte warn exn;
+    fun _ _ -> []
 
 let exp ?(warn=true) =
   try
@@ -57,8 +57,8 @@ let exp ?(warn=true) =
          (let module L = Datatype.List(Code_annotation) in L.ty))
   with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
     ->
-      warn_rte warn exn;
-      fun _ _ _ -> []
+    warn_rte warn exn;
+    fun _ _ _ -> []
 
 (*
 Local Variables:

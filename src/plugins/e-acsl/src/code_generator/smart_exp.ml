@@ -20,34 +20,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Transformations to detect temporal memory errors (e.g., dereference of
-    stale pointers). *)
-
 open Cil_types
 
-(* [TODO ARCHI]: change the call convention in this module *)
+let lval ~loc lv =
+  Cil.new_exp ~loc (Lval lv)
 
-val enable: bool -> unit
-(** Enable/disable temporal transformations *)
+let deref ~loc lv = lval ~loc (Mem lv, NoOffset)
 
-val is_enabled: unit -> bool
-(** Return a boolean value indicating whether temporal analysis is enabled *)
-
-val handle_function_parameters: kernel_function -> Env.t -> Env.t
-(** [handle_function_parameters kf env] updates the local environment [env],
-    according to the parameters of [kf], with statements allowing to track
-    referent numbers across function calls. *)
-
-val handle_stmt: stmt -> Env.t -> kernel_function -> Env.t
-(** Update local environment ([Env.t]) with statements tracking temporal
-    properties of memory blocks *)
-
-val generate_global_init: varinfo -> offset -> init -> stmt option
-(** Generate [Some s], where [s] is a statement tracking global initializer
-    or [None] if there is no need to track it *)
+let subscript ~loc array idx =
+  match Misc.extract_uncoerced_lval array with
+  | Some { enode = Lval lv } ->
+    let subscript_lval = Cil.addOffsetLval (Index(idx, NoOffset)) lv in
+    lval ~loc subscript_lval
+  | Some _ | None ->
+    Options.fatal
+      ~current:true
+      "Trying to create a subscript on an array that is not an Lval: %a"
+      Cil_types_debug.pp_exp
+      array
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

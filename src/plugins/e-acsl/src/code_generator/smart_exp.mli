@@ -20,34 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Transformations to detect temporal memory errors (e.g., dereference of
-    stale pointers). *)
-
 open Cil_types
 
-(* [TODO ARCHI]: change the call convention in this module *)
+(* ********************************************************************** *)
+(* Helper functions to build expressions *)
+(* ********************************************************************** *)
 
-val enable: bool -> unit
-(** Enable/disable temporal transformations *)
+val lval: loc:location -> lval -> exp
+(** Construct an lval expression from an lval. *)
 
-val is_enabled: unit -> bool
-(** Return a boolean value indicating whether temporal analysis is enabled *)
+val deref: loc:location -> exp -> exp
+(** Construct a dereference of an expression. *)
 
-val handle_function_parameters: kernel_function -> Env.t -> Env.t
-(** [handle_function_parameters kf env] updates the local environment [env],
-    according to the parameters of [kf], with statements allowing to track
-    referent numbers across function calls. *)
-
-val handle_stmt: stmt -> Env.t -> kernel_function -> Env.t
-(** Update local environment ([Env.t]) with statements tracking temporal
-    properties of memory blocks *)
-
-val generate_global_init: varinfo -> offset -> init -> stmt option
-(** Generate [Some s], where [s] is a statement tracking global initializer
-    or [None] if there is no need to track it *)
+val subscript: loc:location -> exp -> exp -> exp
+(** [mk_subscript ~loc array idx] Create an expression to access the [idx]'th
+    element of the [array]. *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

@@ -39,7 +39,7 @@ let store ?before env kf vars =
   tracking_stmt
     ?before
     List.fold_right (* small list *)
-    Constructor.mk_store_stmt
+    Smart_stmt.store_stmt
     env
     kf
     vars
@@ -48,7 +48,7 @@ let duplicate_store ?before env kf vars =
   tracking_stmt
     ?before
     Varinfo.Set.fold
-    Constructor.mk_duplicate_store_stmt
+    Smart_stmt.duplicate_store_stmt
     env
     kf
     vars
@@ -57,7 +57,7 @@ let delete_from_list ?before env kf vars =
   tracking_stmt
     ?before
     List.fold_right (* small list *)
-    Constructor.mk_delete_stmt
+    Smart_stmt.delete_stmt
     env
     kf
     vars
@@ -66,7 +66,7 @@ let delete_from_set ?before env kf vars =
   tracking_stmt
     ?before
     Varinfo.Set.fold
-    Constructor.mk_delete_stmt
+    Smart_stmt.delete_stmt
     env
     kf
     vars

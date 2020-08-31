@@ -60,7 +60,7 @@ let inject_in_local_init loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
-    let store = Constructor.mk_store_stmt ~str_size:sz vi in
+    let store = Smart_stmt.store_stmt ~str_size:sz vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
@@ -145,13 +145,13 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)
         if Cil.isBitfield lv then Cil.mkEmptyStmt ()
-        else Constructor.mk_initialize ~loc lv
+        else Smart_stmt.initialize ~loc lv
       in
       let env = Env.add_stmt ~post ~before env kf new_stmt in
       let env = match vi with
         | None -> env
         | Some vi ->
-          let new_stmt = Constructor.mk_store_stmt vi in
+          let new_stmt = Smart_stmt.store_stmt vi in
           Env.add_stmt ~post ~before env kf new_stmt
       in
       env
@@ -189,7 +189,7 @@ let inject_in_instr env kf stmt = function
       if Functions.Libc.is_vla_free caller then
         match args with
         | [ { enode = CastE (_, { enode = Lval (Var vi, NoOffset) }) } ] ->
-          let delete_block = Constructor.mk_delete_stmt ~is_addr:true vi in
+          let delete_block = Smart_stmt.delete_stmt ~is_addr:true vi in
           Env.add_stmt env kf delete_block
         | _ -> Options.fatal "The normalization of __fc_vla_free() has changed"
       else
@@ -263,7 +263,7 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      let new_stmt = Constructor.mk_block stmt b in
+      let new_stmt = Smart_stmt.block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to
            evaluate the postcondition when jumping to them. *)
@@ -293,7 +293,7 @@ let add_new_block_in_stmt env kf stmt =
       let post_block, env =
         Env.pop_and_get
           env
-          (Constructor.mk_block new_stmt pre_block)
+          (Smart_stmt.block new_stmt pre_block)
           ~global_clear:false
           Env.Before
       in
@@ -302,7 +302,7 @@ let add_new_block_in_stmt env kf stmt =
         then Cil.transient_block post_block
         else post_block
       in
-      let res = Constructor.mk_block new_stmt post_block in
+      let res = Smart_stmt.block new_stmt post_block in
       if not (Cil_datatype.Stmt.equal new_stmt res) then
         E_acsl_label.move kf new_stmt res;
       res, env
@@ -337,7 +337,7 @@ let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
     match return_stmt with
     | Some return_stmt ->
       let b = Cil.mkBlock new_stmts in
-      let new_stmt = Constructor.mk_block return_stmt b in
+      let new_stmt = Smart_stmt.block return_stmt b in
       E_acsl_label.move kf return_stmt new_stmt;
       [ new_stmt ]
     | None -> new_stmts
@@ -516,7 +516,7 @@ and inject_in_block (env: Env.t) kf blk =
         List.fold_left
           (fun acc vi ->
              if Mmodel_analysis.must_model_vi ~kf vi
-             then Constructor.mk_delete_stmt vi :: acc
+             then Smart_stmt.delete_stmt vi :: acc
              else acc)
           stmts
           blk.blocals
@@ -531,7 +531,7 @@ and inject_in_block (env: Env.t) kf blk =
         List.fold_left
           (fun acc vi ->
              if Mmodel_analysis.must_model_vi vi && not vi.vdefined
-             then Constructor.mk_store_stmt vi :: acc
+             then Smart_stmt.store_stmt vi :: acc
              else acc)
           blk.bstmts
           blk.blocals;
@@ -821,8 +821,8 @@ let inject_mmodel_handler main =
       in
       let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
       let args = args @ [ ptr_size ] in
-      let init = Constructor.mk_rtl_call loc "memory_init" args in
-      let clean = Constructor.mk_rtl_call loc "memory_clean" [] in
+      let init = Smart_stmt.rtl_call loc "memory_init" args in
+      let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
       surround_function_with main fundec init (Some clean)
     in
     Extlib.may handle_main main

@@ -123,8 +123,8 @@ let mk_init_function () =
          if Misc.is_fc_or_compiler_builtin vi then stmts
          else
            (* a global is both allocated and initialized *)
-           Constructor.mk_store_stmt vi
-           :: Constructor.mk_initialize ~loc:Location.unknown (Cil.var vi)
+           Smart_stmt.store_stmt vi
+           :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
            :: stmts)
       tbl
       stmts
@@ -136,10 +136,10 @@ let mk_init_function () =
          let loc = Location.unknown in
          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
          let str_size = Cil.new_exp loc (SizeOfStr s) in
-         Constructor.mk_assigns ~loc ~result:(Cil.var vi) e
-         :: Constructor.mk_store_stmt ~str_size vi
-         :: Constructor.mk_full_init_stmt vi
-         :: Constructor.mk_mark_readonly vi
+         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
+         :: Smart_stmt.store_stmt ~str_size vi
+         :: Smart_stmt.full_init_stmt vi
+         :: Smart_stmt.mark_readonly vi
          :: stmts)
       stmts
   in
@@ -150,7 +150,7 @@ let mk_init_function () =
       let b, _env = Env.pop_and_get env stmt ~global_clear:true Env.Before in
       b, stmts
   in
-  let stmts = Constructor.mk_block_stmt b :: stmts in
+  let stmts = Smart_stmt.block_stmt b :: stmts in
   (* prevent multiple calls to [__e_acsl_globals_init] *)
   let loc = Location.unknown in
   let vi_already_run =
@@ -168,14 +168,14 @@ let mk_init_function () =
       (Local_init (vi_already_run, init, loc))
   in
   let already_run =
-    Constructor.mk_assigns
+    Smart_stmt.assigns
       ~loc
       ~result:(Cil.var vi_already_run)
       (Cil.one ~loc)
   in
   let stmts = already_run :: stmts in
   let guard =
-    Constructor.mk_if
+    Smart_stmt.if_stmt
       ~loc
       ~cond:(Cil.evar vi_already_run)
       (Cil.mkBlock [])
@@ -195,7 +195,7 @@ let mk_delete_function () =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _l acc ->
          if Misc.is_fc_or_compiler_builtin vi then acc
-         else Constructor.mk_delete_stmt vi :: acc)
+         else Smart_stmt.delete_stmt vi :: acc)
       tbl
       []
   in

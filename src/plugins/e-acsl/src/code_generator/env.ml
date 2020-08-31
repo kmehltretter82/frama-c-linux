@@ -56,7 +56,7 @@ type local_env = {
 type t = {
   lscope: Lscope.t;
   lscope_reset: bool;
-  annotation_kind: Constructor.annotation_kind;
+  annotation_kind: Smart_stmt.annotation_kind;
   new_global_vars: (varinfo * localized_scope) list;
   (* generated variables. The scope indicates the level where the variable
      should be added. *)
@@ -88,7 +88,7 @@ let empty_local_env =
 let empty =
   { lscope = Lscope.empty;
     lscope_reset = true;
-    annotation_kind = Constructor.Assertion;
+    annotation_kind = Smart_stmt.Assertion;
     new_global_vars = [];
     global_mp_tbl = empty_mp_tbl;
     env_stack = [];
@@ -257,7 +257,7 @@ let rtl_call_to_new_var ~loc ?scope ?name env kf t ty func_name args =
       t
       ty
       (fun v _ ->
-         [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) func_name args ])
+         [ Smart_stmt.rtl_call ~loc ~result:(Cil.var v) func_name args ])
   in
   exp, env
 
@@ -351,9 +351,9 @@ let add_stmt ?(post=false) ?before env kf stmt =
   { env with env_stack = local_env :: tl }
 
 let extend_stmt_in_place env stmt ~label block =
-  let new_stmt = Constructor.mk_block_stmt block in
+  let new_stmt = Smart_stmt.block_stmt block in
   let sk = stmt.skind in
-  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Constructor.mk_stmt sk ]);
+  stmt.skind <- Block (Cil.mkBlock [ new_stmt; Smart_stmt.stmt sk ]);
   let pre = match label with
     | BuiltinLabel(Here | Post) -> true
     | BuiltinLabel(Old | Pre | LoopEntry | LoopCurrent | Init)
@@ -447,7 +447,7 @@ let pop_and_get ?(split=false) env stmt ~global_clear where =
        add the given [stmt] afterwards. This way, we have the guarantee that
        the final block does not contain any local, so may be transient. *)
     if split then
-      let sblock = Constructor.mk_block_stmt b in
+      let sblock = Smart_stmt.block_stmt b in
       Cil.transient_block (Cil.mkBlock [ sblock; stmt ])
     else
       b
