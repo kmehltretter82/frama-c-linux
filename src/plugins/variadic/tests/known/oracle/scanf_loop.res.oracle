@@ -34,16 +34,16 @@ int volatile nondet;
 /*@ requires \valid(param0);
     requires valid_read_string(format);
     ensures \initialized(param0);
-    assigns __fc_stdin->__fc_FILE_data, *param0, \result;
+    assigns \result, __fc_stdin->__fc_FILE_data, *param0;
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
     assigns *param0
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
-            (indirect: *(format + (0 ..)));
-    assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id),
-            (indirect: __fc_stdin->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
  */
 int scanf_va_1(char const * __restrict format, int *param0);

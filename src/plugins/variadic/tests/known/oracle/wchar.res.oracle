@@ -91,90 +91,90 @@
 #include "time.h"
 #include "wchar.h"
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param1, param0;
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param1),
             (indirect: param0);
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param1, param0;
  */
 int wprintf_va_1(wchar_t const *format, int param0, long param1);
 
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param1, param0;
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param1),
             (indirect: param0);
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param1, param0;
  */
 int wprintf_va_2(wchar_t const *format, int param0, int param1);
 
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param4, param3, param2, param1, param0;
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param4),
             (indirect: param3), (indirect: param2), (indirect: param1),
             (indirect: param0);
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param4, param3, param2, param1, param0;
  */
 int wprintf_va_3(wchar_t const *format, int param0, unsigned int param1,
                  unsigned int param2, unsigned int param3,
                  unsigned int param4);
 
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param2, param1, param0;
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param2),
             (indirect: param1), (indirect: param0);
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param2, param1, param0;
  */
 int wprintf_va_4(wchar_t const *format, double param0, double param1,
                  double param2);
 
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            param1, param0;
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: param1),
             (indirect: param0);
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            param1, param0;
  */
 int wprintf_va_5(wchar_t const *format, int param0, int param1);
 
 /*@ requires valid_read_wstring(param0);
     requires valid_read_wstring(format);
-    assigns __fc_stdout->__fc_FILE_data, \result;
-    assigns __fc_stdout->__fc_FILE_data
-      \from (indirect: __fc_stdout->__fc_FILE_id),
-            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
-            *(param0 + (0 ..));
+    assigns \result, __fc_stdout->__fc_FILE_data;
     assigns \result
       \from (indirect: __fc_stdout->__fc_FILE_id),
             (indirect: __fc_stdout->__fc_FILE_data),
             (indirect: *(format + (0 ..))), (indirect: *(param0 + (0 ..)));
+    assigns __fc_stdout->__fc_FILE_data
+      \from (indirect: __fc_stdout->__fc_FILE_id),
+            __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
+            *(param0 + (0 ..));
  */
 int wprintf_va_6(wchar_t const *format, wchar_t *param0);
 
@@ -183,28 +183,28 @@ int wprintf_va_6(wchar_t const *format, wchar_t *param0);
     requires
       \valid(ws + (0 .. n - 1)) ∨
       \valid(ws + (0 .. wformat_length(format) - 1));
-    assigns *(ws + (0 ..)), \result;
-    assigns *(ws + (0 ..))
-      \from (indirect: n), (indirect: *(format + (0 ..))), param1,
-            *(param0 + (0 ..));
+    assigns \result, *(ws + (0 ..));
     assigns \result
       \from (indirect: n), (indirect: *(format + (0 ..))),
             (indirect: param1), (indirect: *(param0 + (0 ..)));
+    assigns *(ws + (0 ..))
+      \from (indirect: n), (indirect: *(format + (0 ..))), param1,
+            *(param0 + (0 ..));
  */
 int swprintf_va_1(wchar_t *ws, size_t n, wchar_t const *format, char *param0,
                   int param1);
 
 /*@ requires valid_read_wstring(format);
-    assigns __fc_stdin->__fc_FILE_data, *(param0 + (0 ..)), \result;
+    assigns \result, __fc_stdin->__fc_FILE_data, *(param0 + (0 ..));
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
     assigns *(param0 + (0 ..))
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
-            (indirect: *(format + (0 ..)));
-    assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id),
-            (indirect: __fc_stdin->__fc_FILE_data),
             (indirect: *(format + (0 ..)));
  */
 int wscanf_va_1(wchar_t const *format, wchar_t *param0);
@@ -214,7 +214,11 @@ int wscanf_va_1(wchar_t const *format, wchar_t *param0);
     requires valid_read_wstring(format);
     ensures \initialized(param0);
     ensures \initialized(param1);
-    assigns __fc_stdin->__fc_FILE_data, *param1, *param0, \result;
+    assigns \result, __fc_stdin->__fc_FILE_data, *param1, *param0;
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
@@ -224,10 +228,6 @@ int wscanf_va_1(wchar_t const *format, wchar_t *param0);
     assigns *param0
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
-    assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id),
-            (indirect: __fc_stdin->__fc_FILE_data),
-            (indirect: *(format + (0 ..)));
  */
 int wscanf_va_2(wchar_t const *format, int *param0, int *param1);
 
@@ -235,12 +235,12 @@ int wscanf_va_2(wchar_t const *format, int *param0, int *param1);
     requires valid_read_wstring(format);
     requires valid_read_wstring(str);
     ensures \initialized(param1);
-    assigns *param1, *(param0 + (0 ..)), \result;
+    assigns \result, *param1, *(param0 + (0 ..));
+    assigns \result
+      \from (indirect: *(str + (0 ..))), (indirect: *(format + (0 ..)));
     assigns *param1
       \from (indirect: *(str + (0 ..))), (indirect: *(format + (0 ..)));
     assigns *(param0 + (0 ..))
-      \from (indirect: *(str + (0 ..))), (indirect: *(format + (0 ..)));
-    assigns \result
       \from (indirect: *(str + (0 ..))), (indirect: *(format + (0 ..)));
  */
 int swscanf_va_1(wchar_t const *str, wchar_t const *format, wchar_t *param0,

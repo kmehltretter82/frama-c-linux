@@ -517,14 +517,11 @@ let build_specialized_fun env loc vf format_fun tvparams =
     | Syslog, _ -> ()
   end;
 
-  (* Build the assigns clause (without \result, for now; it will be added
-     separately) *)
-  Build.assigns !dests !sources;
-
-  (* Add return value dest: it is different from above since it is _indirectly_
-     assigned from all sources *)
+  (* assign \result \from indirect:sources *)
   if not (Cil.isVoidType ret_typ) then
     Build.(assigns [result] (List.map indirect !sources));
+  (* assigns dests \from sources *)
+  Build.assigns !dests !sources;
 
   (* Build the default behaviour *)
   let glob = Build.finish_declaration ~register:false () in

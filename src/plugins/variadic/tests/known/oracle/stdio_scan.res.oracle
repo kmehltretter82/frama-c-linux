@@ -56,8 +56,12 @@
     requires valid_read_string(format);
     ensures \initialized(param0);
     ensures \initialized(param2);
-    assigns stream->__fc_FILE_data, *param2, *(param1 + (0 ..)), *param0,
-            \result;
+    assigns \result, stream->__fc_FILE_data, *param2, *(param1 + (0 ..)),
+            *param0;
+    assigns \result
+      \from (indirect: stream->__fc_FILE_id),
+            (indirect: stream->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns stream->__fc_FILE_data
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
@@ -70,10 +74,6 @@
     assigns *param0
       \from (indirect: stream->__fc_FILE_id), stream->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
-    assigns \result
-      \from (indirect: stream->__fc_FILE_id),
-            (indirect: stream->__fc_FILE_data),
-            (indirect: *(format + (0 ..)));
  */
 int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
                 int *param0, char *param1, int *param2);
@@ -83,8 +83,12 @@ int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
     requires valid_read_string(format);
     ensures \initialized(param0);
     ensures \initialized(param2);
-    assigns __fc_stdin->__fc_FILE_data, *param2, *(param1 + (0 ..)), *param0,
-            \result;
+    assigns \result, __fc_stdin->__fc_FILE_data, *param2, *(param1 + (0 ..)),
+            *param0;
+    assigns \result
+      \from (indirect: __fc_stdin->__fc_FILE_id),
+            (indirect: __fc_stdin->__fc_FILE_data),
+            (indirect: *(format + (0 ..)));
     assigns __fc_stdin->__fc_FILE_data
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
@@ -97,10 +101,6 @@ int fscanf_va_1(FILE * __restrict stream, char const * __restrict format,
     assigns *param0
       \from (indirect: __fc_stdin->__fc_FILE_id), __fc_stdin->__fc_FILE_data,
             (indirect: *(format + (0 ..)));
-    assigns \result
-      \from (indirect: __fc_stdin->__fc_FILE_id),
-            (indirect: __fc_stdin->__fc_FILE_data),
-            (indirect: *(format + (0 ..)));
  */
 int scanf_va_1(char const * __restrict format, int *param0, char *param1,
                int *param2);
@@ -111,14 +111,14 @@ int scanf_va_1(char const * __restrict format, int *param0, char *param1,
     requires valid_read_string(s);
     ensures \initialized(param0);
     ensures \initialized(param2);
-    assigns *param2, *(param1 + (0 ..)), *param0, \result;
+    assigns \result, *param2, *(param1 + (0 ..)), *param0;
+    assigns \result
+      \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
     assigns *param2
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
     assigns *(param1 + (0 ..))
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
     assigns *param0
-      \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
-    assigns \result
       \from (indirect: *(s + (0 ..))), (indirect: *(format + (0 ..)));
  */
 int sscanf_va_1(char const * __restrict s, char const * __restrict format,
