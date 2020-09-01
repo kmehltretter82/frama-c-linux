@@ -4,7 +4,7 @@
 
 /**
     @packageDocumentation
-    @module dome/layout/split
+    @module dome/layout/splitters
 */
 
 import * as React from 'react';
@@ -18,16 +18,19 @@ import { AutoSizer, Size } from 'react-virtualized';
 // --------------------------------------------------------------------------
 
 export interface SplitterBaseProps {
-  /** Use window settings to store the splitter position */
+  /** Window settings to store the splitter position. */
   settings?: string;
-  /** Minimal margin from container edges (minimum 32) */
+  /** Minimal margin from container edges (minimum `32`). */
   margin?: number;
   /** Splitter children components. */
   children: [JSX.Element, JSX.Element];
 }
 
 export interface SplitterFoldProps extends SplitterBaseProps {
-  /** Visibility of the folder component. */
+  /**
+     Visibility of the foldable component.
+     Only applies to left, right, top and bottom layout.
+   */
   unfold?: boolean;
 }
 
@@ -293,35 +296,43 @@ const getLayout = (d: Direction): Layout => {
   }
 };
 
-/** Splitter with specified direction. */
-export const Splitter = ({ direction, ...props }: SplitterDirProps) => (
-  <SplitterLayout layout={getLayout(direction)} {...props} />
-);
-
-const BASE = (L: Layout) => (props: SplitterBaseProps) => (
-  <SplitterLayout layout={L} {...props} />
-);
-
-const FOLD = (L: Layout) => (props: SplitterFoldProps) => (
-  <SplitterLayout layout={L} {...props} />
-);
+/** Splitter with specified direction.
+   @category Base Component
+*/
+export function Splitter(props: SplitterDirProps) {
+  const { direction, ...others } = props;
+  const layout = getLayout(direction);
+  return <SplitterLayout layout={layout} {...others} />;
+}
 
 /** Horizontal Splitter. */
-export const HSplit = BASE(HLayout);
+export function HSplit(props: SplitterBaseProps) {
+  return <SplitterLayout layout={HLayout} {...props} />;
+}
 
 /** Vertical Splitter. */
-export const VSplit = BASE(VLayout);
-
-/** Horizontal Splitter with stacked and foldable top element. */
-export const TSplit = FOLD(TLayout);
-
-/** Horizontal Splitter with stacked and foldable bottom element. */
-export const BSplit = FOLD(BLayout);
+export function VSplit(props: SplitterBaseProps) {
+  return <SplitterLayout layout={VLayout} {...props} />;
+}
 
 /** Horizontal Splitter with stacked and foldable left element. */
-export const LSplit = FOLD(LLayout);
+export function LSplit(props: SplitterFoldProps) {
+  return <SplitterLayout layout={LLayout} {...props} />;
+}
 
 /** Horizontal Splitter with stacked and foldable right element. */
-export const RSplit = FOLD(RLayout);
+export function RSplit(props: SplitterFoldProps) {
+  return <SplitterLayout layout={RLayout} {...props} />;
+}
+
+/** Vertical Splitter with stacked and foldable top element. */
+export function TSplit(props: SplitterFoldProps) {
+  return <SplitterLayout layout={TLayout} {...props} />;
+}
+
+/** Vertical Splitter with stacked and foldable bottom element. */
+export function BSplit(props: SplitterFoldProps) {
+  return <SplitterLayout layout={BLayout} {...props} />;
+}
 
 // --------------------------------------------------------------------------
