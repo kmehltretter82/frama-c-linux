@@ -82,6 +82,7 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
+let dkey_correctness = register_category "correctness"
 
 let () =
   let activate dkey = add_debug_keys dkey in
@@ -1424,6 +1425,16 @@ let parameters_correctness =
 let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
 
+let print_correctness_parameters () =
+  feedback ~dkey:dkey_correctness
+    "Parameters affecting the correctness of the analysis:";
+  let print param =
+    let name = param.Typed_parameter.name in
+    let value = Typed_parameter.get_value param in
+    printf "  %s: %s" name value
+  in
+  if is_debug_key_enabled dkey_correctness
+  then List.iter print parameters_correctness
 
 
 (*

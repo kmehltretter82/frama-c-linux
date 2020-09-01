@@ -153,6 +153,8 @@ val configure_precision: unit -> unit
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list
 
+val print_correctness_parameters: unit -> unit
+
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
     -value-msg-key="-initial_state,-final_state" *)
