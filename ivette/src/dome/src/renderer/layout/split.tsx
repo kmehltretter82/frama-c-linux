@@ -7,7 +7,6 @@
     @module dome/layout/split
 */
 
-import _ from 'lodash';
 import * as React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
@@ -58,8 +57,8 @@ export interface SplitterDirProps extends SplitterFoldProps {
 
 type Layout = {
   hsplit: boolean;
-  cssA: string;
-  cssB: string;
+  foldA: boolean;
+  foldB: boolean;
 };
 
 const PANEL = 'dome-container';
@@ -82,41 +81,52 @@ const HFOLD = 'dome-xSplitter-hfold';
 const VFOLD = 'dome-xSplitter-vfold';
 const HLINE = 'dome-xSplitter-hline';
 const VLINE = 'dome-xSplitter-vline';
-const HGRAB = 'dome-xSplitter-hgrab';
-const VGRAB = 'dome-xSplitter-vgrab';
+const HANDLE = '.dome-xSplitter-grab';
+const HGRAB = 'dome-xSplitter-grab dome-xSplitter-hgrab';
+const VGRAB = 'dome-xSplitter-grab dome-xSplitter-vgrab';
+const HPOSA = 'dome-xSplitter-hpos-A';
+const VPOSA = 'dome-xSplitter-vpos-A';
+const HPOSB = 'dome-xSplitter-hpos-B';
+const VPOSB = 'dome-xSplitter-vpos-B';
+const HPOSR = 'dome-xSplitter-hline dome-xSplitter-hpos-R';
+const VPOSR = 'dome-xSplitter-vline dome-xSplitter-vpos-R';
 
 type CSS = {
   container: string;
-  primary: string;
-  resizer: string;
-  secondary: string;
+  sideA: string;
+  sideB: string;
+  split: string;
 };
+
+const getFlexCSS = (hsplit: boolean, fold: boolean) => (
+  hsplit ? (fold ? HFOLD : HPANE) : (fold ? VFOLD : VPANE)
+);
 
 const getCSS = (
   unfold: boolean,
-  position: number,
-  { hsplit, cssA, cssB }: Layout,
+  dragged: boolean,
+  { hsplit, foldA, foldB }: Layout,
 ): CSS => {
   // FOLDED
   if (!unfold) return {
     container: BLOCK,
-    resizer: HIDDEN,
-    primary: (cssA === HFOLD || cssA === VFOLD) ? HIDDEN : BLOCK,
-    secondary: (cssB === HFOLD || cssB === VFOLD) ? HIDDEN : BLOCK,
+    sideA: foldA ? HIDDEN : BLOCK,
+    split: HIDDEN,
+    sideB: foldB ? HIDDEN : BLOCK,
   };
-  // POSITION
-  if (position > 0) return {
+  // DRAGGED
+  if (dragged) return {
     container: BLOCK,
-    resizer: hsplit ? HLINE : VLINE,
-    primary: BLOCK,
-    secondary: BLOCK,
+    sideA: hsplit ? HPOSA : VPOSA,
+    split: hsplit ? HPOSR : VPOSR,
+    sideB: hsplit ? HPOSB : VPOSB,
   };
   // FLEX
   return {
     container: hsplit ? HFLEX : VFLEX,
-    resizer: hsplit ? HLINE : VLINE,
-    primary: cssA,
-    secondary: cssB,
+    sideA: getFlexCSS(hsplit, foldA),
+    split: hsplit ? HLINE : VLINE,
+    sideB: getFlexCSS(hsplit, foldB),
   };
 };
 
@@ -132,41 +142,76 @@ interface SplitterEngineProps extends SplitterLayoutProps {
   size: Size;
 }
 
+type Dragging = undefined | {
+  position: number;
+  anchor: number;
+  offset: number;
+}
+
 function SplitterEngine(props: SplitterEngineProps) {
-  const [position] = Dome.useNumberSettings(props.settings, 0);
-  const [dragging, setDragging] = React.useState(false);
+  const [position, setPosition] = Dome.useNumberSettings(props.settings, 0);
+  const [dragging, setDragging] = React.useState<Dragging>(undefined);
   const { hsplit } = props.layout;
   const dimension = hsplit ? props.size.width : props.size.height;
   const savedim = React.useRef(dimension);
   const { unfold = true } = props;
   const [A, B] = props.children;
-  const css = getCSS(unfold, position, props.layout);
+  const dragged = position > 0 || dragging !== undefined;
+  const css = getCSS(unfold, dragged, props.layout);
   const cursor = dragging ? (hsplit ? HCURSOR : VCURSOR) : NOCURSOR;
   const container = Utils.classes(css.container, cursor);
-  const primary = Utils.classes(css.primary, PANEL);
-  const secondary = Utils.classes(css.secondary, PANEL);
+  const sideA = Utils.classes(css.sideA, PANEL);
+  const sideB = Utils.classes(css.sideB, PANEL);
   const dragger = Utils.classes(
     hsplit ? HGRAB : VGRAB,
     dragging ? DRAGGING : DRAGZONE,
   );
 
-  const onStart: DraggableEventHandler = (_elt, _data) => {
-    // const p = hsplit ? data.x : data.y;
-    // console.log('START', p);
-    setDragging(true);
-  };
-  const onDrag: DraggableEventHandler = (_elt, _data) => {
-    // const p = hsplit ? data.x : data.y;
-    // console.log('DRAG', p);
-  };
-  const onStop: DraggableEventHandler = (_elt, _data) => {
-    // const p = hsplit ? data.x : data.y;
-    // console.log('STOP', p);
-    setDragging(false);
-  };
+  let styleA: undefined | React.CSSProperties;
+  let styleB: undefined | React.CSSProperties;
+  let styleR: undefined | React.CSSProperties;
+
+  if (dragged) {
+    const { margin = 32, size } = props;
+    const M = Math.max(margin, 32);
+    const D = hsplit ? size.width : size.height;
+    const P = dragging ? dragging.position : position;
+    const X = dragging ? dragging.offset - dragging.anchor : 0;
+    const Q = D < M ? D / 2 : Math.min(Math.max(P + X, M), D - M);
+    styleA = hsplit ? { width: Q } : { height: Q };
+    styleR = hsplit ? { left: Q } : { top: Q };
+    styleB = hsplit ? { left: Q + 1 } : { top: Q + 1 };
+  }
+
+  const onStart: DraggableEventHandler =
+    (_evt, data) => {
+      const client = data.node.getBoundingClientRect();
+      const position = hsplit ? client.x : client.y;
+      const anchor = hsplit ? data.x : data.y;
+      setDragging({ position, offset: anchor, anchor });
+    };
+
+  const onDrag: DraggableEventHandler =
+    (_evt, data) => {
+      if (dragging) {
+        const { position, anchor } = dragging;
+        const offset = hsplit ? data.x : data.y;
+        setDragging({ position, anchor, offset });
+      }
+    };
+
+  const onStop: DraggableEventHandler =
+    (evt, _data) => {
+      if (evt.metaKey || evt.altKey || evt.ctrlKey) {
+        setPosition(0);
+      } else if (dragging) {
+        setPosition(dragging.position + dragging.offset - dragging.anchor);
+      }
+      setDragging(undefined);
+    };
 
   if (savedim.current !== dimension) {
-    // console.log('RESIZED', dimension);
+    console.log('RESIZED', dimension);
     savedim.current = dimension;
   }
 
@@ -177,29 +222,30 @@ function SplitterEngine(props: SplitterEngineProps) {
       style={props.size}
     >
       <div
-        key="primary"
-        className={primary}
-        style={{}}
+        key="sideA"
+        className={sideA}
+        style={styleA}
       >
         {A}
       </div>
-      <div
-        key="resizer"
-        className={css.resizer}
-        style={{}}
+      <DraggableCore
+        handle={HANDLE}
+        onStart={onStart}
+        onDrag={onDrag}
+        onStop={onStop}
       >
-        <DraggableCore
-          onStart={onStart}
-          onDrag={onDrag}
-          onStop={onStop}
+        <div
+          key="split"
+          className={css.split}
+          style={styleR}
         >
-          <div className={dragger} style={{}} />
-        </DraggableCore>
-      </div>
+          <div className={dragger} />
+        </div>
+      </DraggableCore>
       <div
-        key="secondary"
-        className={secondary}
-        style={{}}
+        key="sideB"
+        className={sideB}
+        style={styleB}
       >
         {B}
       </div>
@@ -221,12 +267,12 @@ const SplitterLayout = (props: SplitterLayoutProps) => (
 // --- Short Cuts
 // --------------------------------------------------------------------------
 
-const HLayout = { hsplit: true, cssA: HPANE, cssB: HPANE };
-const LLayout = { hsplit: true, cssA: HFOLD, cssB: HPANE };
-const RLayout = { hsplit: true, cssA: HPANE, cssB: HFOLD };
-const VLayout = { hsplit: false, cssA: VPANE, cssB: VPANE };
-const TLayout = { hsplit: false, cssA: VFOLD, cssB: VPANE };
-const BLayout = { hsplit: false, cssA: VPANE, cssB: VFOLD };
+const HLayout = { hsplit: true, foldA: false, foldB: false };
+const LLayout = { hsplit: true, foldA: true, foldB: false };
+const RLayout = { hsplit: true, foldA: false, foldB: true };
+const VLayout = { hsplit: false, foldA: false, foldB: false };
+const TLayout = { hsplit: false, foldA: true, foldB: false };
+const BLayout = { hsplit: false, foldA: false, foldB: true };
 
 const getLayout = (d: Direction): Layout => {
   switch (d) {
