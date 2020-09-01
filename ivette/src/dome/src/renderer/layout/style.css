@@ -121,14 +121,14 @@
 
 .dome-xSplitter-hfold {
     flex: none;
-    min-width: 30px;
+    min-width: 32px;
     height: 100%;
     overflow: hidden;
 }
 
 .dome-xSplitter-vfold {
     flex: none;
-    min-height: 30px;
+    min-height: 32px;
     width: 100%;
     overflow: hidden;
 }
@@ -195,44 +195,6 @@
 .dome-window-inactive .dome-xSplitter-vline
 {
     background: #d6d6d6 ;
-}
-
-/* --- DEPRECATED --- */
-
-.dome-xSplitPane {
-    position: relative ;
-}
-
-.dome-xSplitter-grab {
-    z-index: 1 ;
-    position: relative ;
-    border: 0 ;
-}
-
-.dome-xSplitter-h {
-    left: -1px ;
-    width: 3px ;
-    height: 100% ;
-    cursor: col-resize ;
-}
-
-.dome-xSplitter-v {
-    top: -1px ;
-    height: 3px ;
-    width: 100% ;
-    cursor: row-resize ;
-}
-
-.dome-window-active .dome-xSplitLine {
-    background: #afafaf ;
-}
-
-.dome-window-inactive .dome-xSplitLine {
-    background: #d6d6d6 ;
-}
-
-.dome-xSplitPane, .dome-xSplitLine {
-    transition: all 0.1s ease-out ;
 }
 
 /* -------------------------------------------------------------------------- */
