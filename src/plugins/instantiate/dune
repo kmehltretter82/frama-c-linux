@@ -5,4 +5,4 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name frama-c-plugins-instantiate) (libraries frama-c-instantiate.core) (site (frama-c plugins)))
+(plugin (name instantiate) (libraries frama-c-instantiate.core) (site (frama-c plugins)))

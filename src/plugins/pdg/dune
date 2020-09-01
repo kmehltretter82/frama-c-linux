@@ -5,4 +5,4 @@
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-from.core frama-c-eva.core)
 )
 
-(plugin (name frama-c-plugins-pdg) (libraries frama-c-pdg.core) (site (frama-c plugins)))
+(plugin (name pdg) (libraries frama-c-pdg.core) (site (frama-c plugins)))

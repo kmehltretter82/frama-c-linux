@@ -5,4 +5,4 @@
   (libraries frama-c.kernel frama-c-pdg.core frama-c-sparecode.core)
 )
 
-(plugin (name frama-c-plugins-slicing) (libraries frama-c-slicing.core) (site (frama-c plugins)))
+(plugin (name slicing) (libraries frama-c-slicing.core) (site (frama-c plugins)))

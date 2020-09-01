@@ -43,7 +43,7 @@ VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 .PHONY: all
 
 all: config.sed
-	dune build
+	dune build @install
 
 ifeq ($(HAS_DOT),yes)
 OPTDOT=Some \"$(DOT)\"

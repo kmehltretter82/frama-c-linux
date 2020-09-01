@@ -5,7 +5,7 @@
   (libraries frama-c.kernel why3 qed zarith ocamlgraph)
 )
 
-(plugin (name frama-c-plugins-wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
+(plugin (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
 
 
 (ocamllex driver rformat script)

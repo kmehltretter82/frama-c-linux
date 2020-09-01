@@ -58,7 +58,7 @@
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core frama-c-scope.core)
 )
 
-(plugin (name frama-c-plugins-eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
+(plugin (name eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
 
 ( library
   (name numerors)
@@ -69,7 +69,7 @@
   (optional)
 )
 
-;(plugin (name frama-c-plugins-eva-numerors) (libraries frama-c-eva.numerors) (site (frama-c plugins)))
+;(plugin (name eva-numerors) (libraries frama-c-eva.numerors) (site (frama-c plugins)))
 
 ( library
   (name apron_domain)
@@ -92,7 +92,7 @@
   (libraries eva frama-c.kernel frama-c.gui)
 )
 
-(plugin (name frama-c-plugins-eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
+(plugin (name eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
 
 (copy_files# domains/*)
 (copy_files# domains/equality/*)

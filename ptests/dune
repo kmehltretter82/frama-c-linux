@@ -1,5 +1,6 @@
 (executable
  (package frama-c)
  (public_name ptests)
+ (modules ptests)
  (libraries unix threads str)
 )

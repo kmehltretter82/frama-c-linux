@@ -153,6 +153,8 @@ val load_module: string -> unit
 (** Load the module specification. See -load-module option.
     @modify Magnesium-20151001 new API. *)
 
+val load_plugin: string -> unit
+
 (** Sets the load path for modules in FRAMAC_PLUGIN, prepending it with [path].
     Does not load any plugins.
     Must be invoked only once from boot during extending stage.

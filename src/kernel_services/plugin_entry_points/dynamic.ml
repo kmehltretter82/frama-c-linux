@@ -198,7 +198,7 @@ let load_module m =
       | Some _ -> load_script base
       | None -> Klog.error "Missing source file '%s'" m
     end
-  | "" | "." | ".cmo" | ".cma" | ".cmxs" ->
+  | _ ->
     begin
       (* load object or compile script or find package *)
       match is_object base with
@@ -207,15 +207,16 @@ let load_module m =
         match is_file base ".ml" with
         | Some _ -> load_script base
         | None ->
-          if is_package m then load_packages [m]
+          if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
           else
             let fc =
               "frama-c-" ^ String.lowercase_ascii m
             in
             load_packages [fc]
     end
-  | _ ->
-    Klog.error "don't know what to do with '%s' (unexpected %s)" m ext
+
+let load_plugin m =
+  Config_data.Plugins.Plugins.load m
 
 (* ************************************************************************* *)
 (** {2 Registering and accessing dynamic values} *)

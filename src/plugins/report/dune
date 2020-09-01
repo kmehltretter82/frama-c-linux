@@ -7,4 +7,4 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name frama-c-plugins-report) (libraries frama-c-report.core) (site (frama-c plugins)))
+(plugin (name report) (libraries frama-c-report.core) (site (frama-c plugins)))
