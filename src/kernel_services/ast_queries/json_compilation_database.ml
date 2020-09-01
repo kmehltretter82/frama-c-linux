@@ -240,11 +240,8 @@ let parse_entry jcdb_dir r =
     Flags.add path flags
 
 let compute_flags_from_file () =
-  let database = Kernel.JsonCompilationDatabase.get () in
+  let database = (Kernel.JsonCompilationDatabase.get () :> string) in
   let jcdb_dir, jcdb_path =
-    if not (Sys.file_exists database) then
-      Kernel.abort "invalid path for option %s: %s"
-        Kernel.JsonCompilationDatabase.option_name database;
     if Sys.is_directory database then
       database, Filename.concat database "compile_commands.json"
     else Filename.dirname database, database
@@ -267,7 +264,7 @@ let compute_flags_from_file () =
   Flags.mark_as_computed ()
 
 let get_flags f =
-  if Kernel.JsonCompilationDatabase.get () <> "" then begin
+  if not (Filepath.Normalized.is_unknown (Kernel.JsonCompilationDatabase.get ())) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let flags = Flags.find f in
