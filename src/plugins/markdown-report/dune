@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "markdown-report:" %{lib-available:frama-c-markdown-report.core} "\n")
+          (echo "  - ppx_deriving_yojson:" %{lib-available:ppx_deriving_yojson} "\n")
+  )
+  )
+)
+
 ( library
   (name markdown_report)
   (public_name frama-c-markdown-report.core)

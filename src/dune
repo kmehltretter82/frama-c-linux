@@ -1,3 +1,20 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Frama-C:" %{lib-available:frama-c.kernel} "\n")
+          (echo "  - str:" %{lib-available:str} "\n")
+          (echo "  - unix:" %{lib-available:unix} "\n")
+          (echo "  - zarith:" %{lib-available:zarith} "\n")
+          (echo "  - ocamlgraph:" %{lib-available:ocamlgraph} "\n")
+          (echo "  - dynlink:" %{lib-available:dynlink} "\n")
+          (echo "  - bytes:" %{lib-available:bytes} "\n")
+          (echo "  - yojson:" %{lib-available:yojson} "\n")
+          (echo "  - dune-site.plugins:" %{lib-available:dune-site.plugins} "\n")
+  )
+  )
+)
+
 (library
   (name frama_c_kernel)
   (public_name frama-c.kernel)

@@ -1,3 +1,19 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "Numerors:" %{lib-available:frama-c-eva.numerors} "\n")
+          (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
+          (echo "Apron domains:" %{lib-available:frama-c-eva.apron} "\n")
+          (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
+          (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
+          (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
+          (echo " - apron.apron:" %{lib-available:apron.apron} "\n")
+  )
+  )
+)
+
 ( library
   (name eva)
   (public_name frama-c-eva.core)

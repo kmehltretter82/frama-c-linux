@@ -51,9 +51,6 @@ else
 OPTDOT=None
 endif
 
-ALL_LIBRARY_NAMES=$(shell ocamlfind query -r -p-format $(LIBRARY_NAMES) $(LIBRARY_NAMES_GUI)) \
-	frama-c.init frama-c.kernel frama-c.gui
-
 ifeq ($(HAS_OCAML408),yes)
   DYNLINK_INIT=fun () -> ()
   FORMAT_STAG=stag
@@ -107,7 +104,6 @@ config.sed: VERSION share/Makefile.config Makefile configure.in
 	@echo "s|@FRAMAC_GNU_CPP@|$(FRAMAC_GNU_CPP)|" >> $@
 	@echo "s|@DEFAULT_CPP_KEEP_COMMENTS@|$(DEFAULT_CPP_KEEP_COMMENTS)|" >> $@
 	@echo "s|@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@|$(DEFAULT_CPP_SUPPORTED_ARCH_OPTS)|" >> $@
-	@echo "s|@LIBRARY_NAMES@|$(foreach p,$(ALL_LIBRARY_NAMES),\"$p\";)|" >> $@
 	@echo "s|@OPTDOT@|$(OPTDOT)|" >> $@
 	@echo "s|@EXE@|$(EXE)|" >> $@
 	@echo "s/@SPLIT_ON_CHAR@/$(SPLIT_ON_CHAR)/g" >> $@
@@ -129,12 +125,6 @@ config.sed: VERSION share/Makefile.config Makefile configure.in
 clean:
 	dune clean
 	rm -rf _build .merlin config.sed
-
-%.cmxs: %.ml
-	dune exec -- ocamlfind ocamlopt -package frama-c.kernel -open Frama_c_kernel -shared -o $@ $<
-
-%.o: %.ml
-	dune exec -- ocamlfind ocamlopt -package frama-c.kernel -open Frama_c_kernel -c -o $@ $<
 
 ########################################################################
 # Makefile.config is rebuilt whenever configure.in is modified         #

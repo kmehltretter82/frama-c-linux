@@ -1,3 +1,17 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "GUI:" %{lib-available:frama-c.gui} "\n")
+          (echo "  - lablgtk2:" %{lib-available:lablgtk2} "\n")
+          (echo "  - lablgtk2.gnomecanvas:" %{lib-available:lablgtk2.gnomecanvas} "\n")
+          (echo "  - lablgtk2.sourceview2:" %{lib-available:lablgtk2.sourceview2} "\n")
+          (echo "  - lablgtk3:" %{lib-available:lablgtk3} "\n")
+          (echo "  - lablgtk3-sourceview3:" %{lib-available:lablgtk3-sourceview3} "\n")
+  )
+  )
+)
+
 ( library
   (name frama_c_gui)
   (public_name frama-c.gui)
