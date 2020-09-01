@@ -107,7 +107,7 @@ let compute kf =
     and post s =
       match get_slevel_annot s with
       | None | Some SlevelMerge -> ()
-      | Some (SlevelLocal _) | Some SlevelFull ->
+      | Some (SlevelLocal _ | SlevelFull) ->
         if debug then Format.printf "Leaving split %d, poping@." s.sid;
         ignore (Stack.pop local_slevel);
       | Some SlevelDefault ->
