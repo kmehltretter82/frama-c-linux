@@ -4,7 +4,7 @@
  (action (progn
           (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
           (echo "Numerors:" %{lib-available:frama-c-eva.numerors} "\n")
-          (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
+          (echo " - MLGMPIDL (gmp):" %{lib-available:gmp} "\n")
           (echo "Apron domains:" %{lib-available:frama-c-eva.apron} "\n")
           (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
           (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
@@ -82,7 +82,7 @@
   (public_name frama-c-eva.numerors)
   (flags -open Frama_c_kernel -open Eva)
   (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
-  (libraries frama-c.kernel frama-c-eva.core gmp mlmpfr)
+  (libraries frama-c.kernel frama-c-eva.core gmp)
   (optional)
 )
 
