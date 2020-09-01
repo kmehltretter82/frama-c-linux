@@ -17,4 +17,4 @@
   (preprocess (pps ppx_deriving_yojson))
 )
 
-(plugin (name markdown-report) (libraries frama-c-markdown-report.core) (site (frama-c plugins)))
+(plugin (optional) (name markdown-report) (libraries frama-c-markdown-report.core) (site (frama-c plugins)))

@@ -5,4 +5,4 @@
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-from.core)
 )
 
-(plugin (name inout) (libraries frama-c-inout.core) (site (frama-c plugins)))
+(plugin (optional) (name inout) (libraries frama-c-inout.core) (site (frama-c plugins)))

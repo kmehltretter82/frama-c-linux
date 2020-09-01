@@ -5,4 +5,4 @@
   (libraries frama-c.kernel frama-c-slicing.core frama-c-callgraph.core frama-c-inout.core)
 )
 
-(plugin (name impact) (libraries frama-c-impact.core) (site (frama-c plugins)))
+(plugin (optional) (name impact) (libraries frama-c-impact.core) (site (frama-c plugins)))

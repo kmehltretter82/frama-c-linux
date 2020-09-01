@@ -5,4 +5,4 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name variadic) (libraries frama-c-variadic.core) (site (frama-c plugins)))
+(plugin (optional) (name variadic) (libraries frama-c-variadic.core) (site (frama-c plugins)))

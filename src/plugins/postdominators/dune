@@ -5,4 +5,4 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name postdominators) (libraries frama-c-postdominators.core) (site (frama-c plugins)))
+(plugin (optional) (name postdominators) (libraries frama-c-postdominators.core) (site (frama-c plugins)))

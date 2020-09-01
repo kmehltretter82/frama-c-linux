@@ -5,4 +5,4 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name nonterm) (libraries frama-c-nonterm.core) (site (frama-c plugins)))
+(plugin (optional) (name nonterm) (libraries frama-c-nonterm.core) (site (frama-c plugins)))

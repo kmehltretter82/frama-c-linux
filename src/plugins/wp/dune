@@ -1,11 +1,22 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "WP:" %{lib-available:frama-c-wp.core} "\n")
+          (echo "  - why3:" %{lib-available:why3} "\n")
+  )
+  )
+)
+
 (library
-  (name wp)
+ (name wp)
+  (optional)
   (public_name frama-c-wp.core)
   (flags (-open Frama_c_kernel))
   (libraries frama-c.kernel why3 qed zarith ocamlgraph)
 )
 
-(plugin (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
+(plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
 
 
 (ocamllex driver rformat script)

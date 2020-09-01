@@ -6,7 +6,7 @@
   (libraries frama-c.kernel)
 )
 
-(plugin (name studia) (libraries frama-c-studia.core) (site (frama-c plugins)))
+(plugin (optional) (name studia) (libraries frama-c-studia.core) (site (frama-c plugins)))
 
 
 ( library
@@ -18,4 +18,4 @@
   (libraries studia frama-c.kernel frama-c.gui frama-c-eva.gui)
 )
 
-(plugin (name studia) (libraries frama-c-studia.gui) (site (frama-c plugins_gui)))
+(plugin (optional) (name studia) (libraries frama-c-studia.gui) (site (frama-c plugins_gui)))

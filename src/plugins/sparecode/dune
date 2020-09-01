@@ -6,4 +6,4 @@
   (libraries frama-c.kernel frama-c-users.core frama-c-eva.core frama-c-pdg.core)
 )
 
-(plugin (name sparecode) (libraries frama-c-sparecode.core) (site (frama-c plugins)))
+(plugin (optional) (name sparecode) (libraries frama-c-sparecode.core) (site (frama-c plugins)))
