@@ -1,5 +1,15 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "PDG:" %{lib-available:frama-c-pdg.core} "\n")
+  )
+  )
+)
+
 ( library
-  (name pdg)
+ (name pdg)
+  (optional)
   (public_name frama-c-pdg.core)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-from.core frama-c-eva.core)

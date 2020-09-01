@@ -22,4 +22,4 @@
 ##########################################################################
 
 
-dune exec --root=$(dirname $0)/.. frama-c-gui -- "$@"
+dune exec --root=$(dirname $0)/.. --no-build frama-c-gui -- "$@"

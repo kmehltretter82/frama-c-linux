@@ -1,5 +1,15 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "From:" %{lib-available:frama-c-from.core} "\n")
+  )
+  )
+)
+
 ( library
-  (name from)
+ (name from)
+  (optional)
   (public_name frama-c-from.core)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-postdominators.core)
