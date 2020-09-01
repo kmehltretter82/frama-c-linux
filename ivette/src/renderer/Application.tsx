@@ -6,7 +6,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
-import { Splitter } from 'dome/layout/splitters';
+import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
 
@@ -23,8 +23,6 @@ import Globals from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
 import Values from './Values';
-
-import { LSplit } from 'dome/layout/split';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls

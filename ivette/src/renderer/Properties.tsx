@@ -15,7 +15,7 @@ import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar, Component } from 'frama-c/LabViews';
 import { Vfill } from 'dome/layout/boxes';
-import { Splitter } from 'dome/layout/splitters';
+import { RSplit } from 'dome/layout/splitters';
 import { Form, Section, FieldCheckbox } from 'dome/layout/forms';
 
 import { source as SourceLoc } from 'api/kernel/services';
@@ -472,7 +472,10 @@ const RenderTable = () => {
           title="Toggle filters panel"
         />
       </TitleBar>
-      <Splitter dir="RIGHT" unfold={showFilter}>
+      <RSplit
+        settings="ivette.properties.filterSplit"
+        unfold={showFilter}
+      >
         <Table<string, Property>
           model={model}
           sorting={model}
@@ -483,7 +486,7 @@ const RenderTable = () => {
           <PropertyColumns />
         </Table>
         <PropertyFilter model={model} />
-      </Splitter>
+      </RSplit>
     </>
   );
 };

@@ -15,7 +15,7 @@ import * as Settings from 'dome/data/settings';
 import { Catch } from 'dome/errors';
 import { DnD, DragSource } from 'dome/dnd';
 import { SideBar, Section, Item } from 'dome/frame/sidebars';
-import { Splitter } from 'dome/layout/splitters';
+import { RSplit } from 'dome/layout/splitters';
 import * as Grids from 'dome/layout/grids';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
@@ -669,7 +669,7 @@ export function LabView(props: any) {
       <UseLibrary library={lib}>
         {children}
       </UseLibrary>
-      <Splitter settings={settingSplit} unfold={customize} dir="RIGHT">
+      <RSplit settings={settingSplit} unfold={customize}>
         <Grids.GridLayout
           dnd={dnd}
           padding={2}
@@ -687,7 +687,7 @@ export function LabView(props: any) {
           setDragging={setDragging}
           library={lib}
         />
-      </Splitter>
+      </RSplit>
     </>
   );
 }

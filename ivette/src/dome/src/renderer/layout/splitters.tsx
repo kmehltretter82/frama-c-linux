@@ -134,24 +134,25 @@ const getCSS = (
 /* --- Splitter Engine                                                    ---*/
 /* --------------------------------------------------------------------------*/
 
-interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout; }
-interface SplitterEngineProps extends SplitterLayoutProps { size: Size; }
+interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
+interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
 type Dragging = undefined | {
   position: number;
   anchor: number;
   offset: number;
-}
+};
 
 const getResized = (layout: Layout, D0: number, D: number, P: number) => {
   if (layout.foldA) return P;
   if (layout.foldB) return P + D - D0;
-  if (D0 > 0) return Math.round(P * D / D0);
+  if (D0 > 0) return Math.round(P * (D / D0));
   return P;
 };
 
-const inRange = (M: number, D: number, P: number) =>
-  (D < M ? D / 2 : Math.min(Math.max(P, M), D - M));
+const inRange = (M: number, D: number, P: number) => (
+  D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
+);
 
 function SplitterEngine(props: SplitterEngineProps) {
   const [position, setPosition] = Dome.useNumberSettings(props.settings, 0);
@@ -189,17 +190,16 @@ function SplitterEngine(props: SplitterEngineProps) {
 
   const onStart: DraggableEventHandler =
     (_evt, data) => {
-      const position = hsplit ? data.node.offsetLeft : data.node.offsetTop;
+      const startPos = hsplit ? data.node.offsetLeft : data.node.offsetTop;
       const anchor = hsplit ? data.x : data.y;
-      setDragging({ position, offset: anchor, anchor });
+      setDragging({ position: startPos, offset: anchor, anchor });
     };
 
   const onDrag: DraggableEventHandler =
     (_evt, data) => {
       if (dragging) {
-        const { position, anchor } = dragging;
         const offset = hsplit ? data.x : data.y;
-        setDragging({ position, anchor, offset });
+        setDragging({ ...dragging, offset });
       }
     };
 
