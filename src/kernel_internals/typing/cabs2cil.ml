@@ -5995,7 +5995,8 @@ and doExp local_env
       let res =
         if Cil.isCompleteType typ then new_exp ~loc (SizeOf typ)
         else begin
-          Kernel.error ~once:true ~current:true "sizeof on incomplete type";
+          Kernel.error ~once:true ~current:true
+            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
           new_exp ~loc (Const (CStr ("booo sizeof(incomplete)")))
         end
       in
