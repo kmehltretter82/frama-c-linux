@@ -173,7 +173,7 @@ let reset_analyzer () =
 let force_compute () =
   Ast.compute ();
   Value_parameters.configure_precision ();
-  Value_parameters.print_correctness_parameters ();
+  Value_parameters.print_configuration ();
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in

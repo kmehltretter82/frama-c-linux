@@ -61,13 +61,15 @@ let add_precision_dep p =
 
 let () = List.iter add_correctness_dep kernel_parameters_correctness
 
-include Plugin.Register
+module Eva =
+  Plugin.Register
     (struct
       let name = "Eva"
       let shortname = "eva"
       let help =
         "automatically computes variation domains for the variables of the program"
     end)
+include Eva
 
 let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
 let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
@@ -1433,8 +1435,29 @@ let print_correctness_parameters () =
     let value = Typed_parameter.get_value param in
     printf "  %s: %s" name value
   in
+  List.iter print parameters_correctness
+
+let print_warning_status name (module Plugin: Log.Messages) =
+  let warning_categories = Plugin.get_all_warn_categories_status () in
+  let is_active = function
+    | Log.Winactive | Wfeedback_once | Wfeedback -> false
+    | Wonce | Wactive | Werror_once | Werror | Wabort -> true
+  in
+  let is_enabled (_key, status) = is_active status in
+  let enabled, disabled = List.partition is_enabled warning_categories in
+  let pp_categories = Pretty_utils.pp_list ~sep:",@ " Plugin.pp_warn_category in
+  feedback ~dkey:dkey_correctness "%s warning categories:" name;
+  printf "  Enabled: @[%a@]" pp_categories (List.map fst enabled);
+  printf "  Disabled: @[%a@]" pp_categories (List.map fst disabled)
+
+let print_configuration () =
   if is_debug_key_enabled dkey_correctness
-  then List.iter print parameters_correctness
+  then
+    begin
+      print_correctness_parameters ();
+      print_warning_status "Kernel" (module Kernel);
+      print_warning_status "Eva" (module Eva);
+    end
 
 
 (*
