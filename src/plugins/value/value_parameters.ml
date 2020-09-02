@@ -84,7 +84,7 @@ let dkey_incompatible_states = register_category "incompatible-states"
 let dkey_iterator = register_category "iterator"
 let dkey_callbacks = register_category "callbacks"
 let dkey_widening = register_category "widening"
-let dkey_correctness = register_category "correctness"
+let dkey_config = register_category "config"
 
 let () =
   let activate dkey = add_debug_keys dkey in
@@ -1428,8 +1428,8 @@ let parameters_tuning =
   Typed_parameter.Set.elements !parameters_tuning
 
 let print_correctness_parameters () =
-  feedback ~dkey:dkey_correctness
-    "Parameters affecting the correctness of the analysis:";
+  feedback ~dkey:dkey_config
+    "Correctness parameters of the analysis:";
   let print param =
     let name = param.Typed_parameter.name in
     let value = Typed_parameter.get_value param in
@@ -1446,12 +1446,12 @@ let print_warning_status name (module Plugin: Log.Messages) =
   let is_enabled (_key, status) = is_active status in
   let enabled, disabled = List.partition is_enabled warning_categories in
   let pp_categories = Pretty_utils.pp_list ~sep:",@ " Plugin.pp_warn_category in
-  feedback ~dkey:dkey_correctness "%s warning categories:" name;
+  feedback ~dkey:dkey_config "%s warning categories:" name;
   printf "  Enabled: @[%a@]" pp_categories (List.map fst enabled);
   printf "  Disabled: @[%a@]" pp_categories (List.map fst disabled)
 
 let print_configuration () =
-  if is_debug_key_enabled dkey_correctness
+  if is_debug_key_enabled dkey_config
   then
     begin
       print_correctness_parameters ();
