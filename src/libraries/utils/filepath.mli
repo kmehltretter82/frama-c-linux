@@ -144,6 +144,12 @@ module Normalized: sig
 
   (** @since 20.0-Calcium *)
   val is_unknown: t -> bool
+
+  (** [is_file f] returns [true] iff [f] points to a regular file
+      (or a symbolic link pointing to a file).
+      Returns [false] if any errors happen when [stat]'ing the file.
+      @since Frama-C+dev *)
+  val is_file: t -> bool
 end
 
 (** Describes a position in a source file.
