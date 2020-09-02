@@ -252,7 +252,6 @@ type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
   | String of (string -> unit)
-  | String_list of (string list -> unit)
 
 exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
@@ -309,10 +308,6 @@ let parse known_options_list then_expected options_list =
         | String f ->
             check_string_argname ();
             f arg;
-            true
-        | String_list f ->
-            check_string_argname ();
-            f (Str.split (Str.regexp "[ \t]*,[ \t]*") arg);
             true
       in
       unknown_options, use_arg && not explicit, true
@@ -896,7 +891,6 @@ let low_print_option_help fmt print_invisible o =
         | Unit _ -> ""
         | Int _ -> " <n>"
         | String _ -> " <s>"
-        | String_list _ -> " <s1, ..., sn>"
       else
         " <" ^ s ^ ">"
     in
