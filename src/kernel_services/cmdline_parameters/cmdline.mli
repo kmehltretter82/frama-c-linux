@@ -270,7 +270,6 @@ type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
   | String of (string -> unit)
-  | String_list of (string list -> unit)
 
 val add_option:
   string ->
