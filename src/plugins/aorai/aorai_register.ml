@@ -27,13 +27,13 @@ open Logic_ptree
 open Promelaast
 
 (* [VP] Need to get rid of those global references at some point. *)
-let promela_file = ref ""
-let ya_file = ref ""
-let c_file = ref ""
-let output_c_file = ref ""
-let ltl_tmp_file = ref ""
-let ltl_file = ref ""
-let dot_file = ref ""
+let promela_file = ref Filepath.Normalized.unknown
+let ya_file = ref Filepath.Normalized.unknown
+let c_file = ref Filepath.Normalized.unknown
+let output_c_file = ref Filepath.Normalized.unknown
+let ltl_tmp_file = ref Filepath.Normalized.unknown
+let ltl_file = ref Filepath.Normalized.unknown
+let dot_file = ref Filepath.Normalized.unknown
 let generatesCFile = ref true
 let ltl2ba_params = " -l -p -o "
 
@@ -81,69 +81,66 @@ let syntax_error loc msg =
     ((snd loc).Lexing.pos_cnum - (fst loc).Lexing.pos_bol)
     msg
 
-(* Performs some checks before calling [open_in f].
-   Raises [Not_found] in case of error. *)
-let safe_open_in f =
-  if not (Sys.file_exists f) || (Sys.is_directory f) then raise Not_found;
-  open_in f
+(* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
+   in case of error. *)
+let check_and_open_in (f : Filepath.Normalized.t) errmsg =
+  if Sys.is_directory (f :> string) then
+    Aorai_option.abort "%s: %a" errmsg Filepath.Normalized.pretty f;
+  open_in (f :> string)
 
-let ltl_to_ltlLight f_ltl f_out =
+let ltl_to_ltlLight f_ltl (f_out : Filepath.Normalized.t) =
   try
-    let c = safe_open_in f_ltl in
+    let c = check_and_open_in f_ltl "invalid LTL file" in
     let (ltl_form,exprs) = Ltllexer.parse c in
     close_in c;
-    Ltl_output.output ltl_form f_out;
+    Ltl_output.output ltl_form (f_out :> string);
     set_ltl_correspondence exprs
-  with 
-    | Not_found -> Aorai_option.abort "Unknown LTL file %s" f_ltl
-    | Ltllexer.Error (loc,msg) -> syntax_error loc msg
+  with
+  | Ltllexer.Error (loc,msg) -> syntax_error loc msg
 
-let load_ya_file f  =
+let load_ya_file f =
   try
-    let c = safe_open_in f in
+    let c = check_and_open_in f "invalid Ya file" in
     let automata = Yalexer.parse c  in
     close_in c;
     Data_for_aorai.setAutomata automata;
   with
-    | Not_found -> Aorai_option.abort "Unknown Ya file %s" f
-    | Yalexer.Error (loc,msg) -> syntax_error loc msg
+  | Yalexer.Error (loc,msg) -> syntax_error loc msg
 
 let load_promela_file f  =
   try
-    let c = safe_open_in f in
+    let c = check_and_open_in f "invalid Promela file" in
     let (s,t) = Promelalexer.parse c  in
     let t = convert_ltl_exprs t in
     close_in c;
     Data_for_aorai.setAutomata (s,t);
   with 
-    | Not_found -> Aorai_option.abort "Unknown Promela file %s" f
-    | Promelalexer.Error(loc,msg) -> syntax_error loc msg
+  | Promelalexer.Error(loc,msg) -> syntax_error loc msg
 
-let load_promela_file_withexps f  =
+let load_promela_file_withexps f =
   try
-    let c = safe_open_in f in
+    let c = check_and_open_in f "invalid Promela file" in
     let automata = Promelalexer_withexps.parse c  in
     close_in c;
     Data_for_aorai.setAutomata automata;
   with 
-    | Not_found -> Aorai_option.abort "Unknown Promela file %s" f
-    | Promelalexer_withexps.Error(loc,msg) -> syntax_error loc msg
+  | Promelalexer_withexps.Error(loc,msg) -> syntax_error loc msg
 
 let display_status () =
   if Aorai_option.verbose_atleast 2 then begin
     Aorai_option.feedback "\n"  ;
-    Aorai_option.feedback "C file:            '%s'\n" !c_file ;
+    Aorai_option.feedback "C file:            '%a'\n" Filepath.Normalized.pretty !c_file ;
     Aorai_option.feedback "Entry point:       '%a'\n" 
       Kernel_function.pretty (fst (Globals.entry_point())) ;
-    Aorai_option.feedback "LTL property:      '%s'\n" !ltl_file ;
-    Aorai_option.feedback "Files to generate: '%s' (Annotated code)\n"
-      (if !generatesCFile then !output_c_file else "(none)");
+    Aorai_option.feedback "LTL property:      '%a'\n" Filepath.Normalized.pretty !ltl_file ;
+    Aorai_option.feedback "Files to generate: '%a' (Annotated code)\n"
+      (if !generatesCFile then Filepath.Normalized.pretty else (fun fmt _ -> Format.fprintf fmt "(none)")) !output_c_file;
     if Aorai_option.Dot.get () then
-      Aorai_option.feedback "Dot file:          '%s'\n"  !dot_file;
-    Aorai_option.feedback "Tmp files:         '%s' (Light LTL file)\n"
-      !ltl_tmp_file ;
-    Aorai_option.feedback "                   '%s' (Promela file)\n"
-      !promela_file ;
+      Aorai_option.feedback "Dot file:          '%a'\n" Filepath.Normalized.pretty !dot_file;
+    Aorai_option.feedback "Tmp files:         '%a' (Light LTL file)\n"
+      Filepath.Normalized.pretty !ltl_tmp_file ;
+    Aorai_option.feedback "                   '%a' (Promela file)\n"
+      Filepath.Normalized.pretty !promela_file ;
     Aorai_option.feedback "\n"
   end
 
@@ -152,10 +149,13 @@ let init_file_names () =
      generation *)
   let err= ref false in
   let dispErr mesg f =
-    Aorai_option.error "Error. File '%s' %s.\n" f mesg;
+    Aorai_option.error "Error. File '%a' %s.\n" Filepath.Normalized.pretty f mesg;
     err:=true
   in
-  let freshname pre suf =
+  let freshname ?opt_suf file suf =
+    let name = Filepath.Normalized.to_pretty_string file in
+    let pre = Filename.remove_extension name in
+    let pre = match opt_suf with None -> pre | Some s -> pre ^ s in
     let rec fn p s n =
       if not (Sys.file_exists (p^(string_of_int n)^s)) then (p^(string_of_int n)^s)
       else fn p s (n+1)
@@ -163,55 +163,53 @@ let init_file_names () =
     let name =
       if not (Sys.file_exists (pre^suf)) then pre^suf
       else fn pre suf 0
-    in name
+    in Filepath.Normalized.of_string name
   in
 
   (* c_file name is given and has to point out a valid file. *)
   c_file :=
     (match Kernel.Files.get () with
-      | [] -> "dummy.i"
-      | f :: _ -> Filepath.Normalized.to_pretty_string f);
-  if (!c_file="") then dispErr ": invalid C file name" !c_file;
-  if (not (Sys.file_exists !c_file)) then dispErr "not found" !c_file;
+      | [] -> Filepath.Normalized.of_string "dummy.i"
+      | f :: _ -> f);
+  if (Filepath.Normalized.is_unknown !c_file) then dispErr ": invalid C file name" !c_file;
 
   (* The output C file has to be a valid file name if it is used. *)
-  output_c_file := (Aorai_option.Output_C_File.get ()) ;
-  if (!output_c_file="") then output_c_file:=freshname ((Filename.remove_extension !c_file)^"_annot") ".c";
+  output_c_file := Aorai_option.Output_C_File.get ();
+  if (Filepath.Normalized.is_unknown !output_c_file) then
+    output_c_file := freshname ~opt_suf:"_annot" !c_file ".c";
   (*   else if Sys.file_exists !output_c_file then dispErr "already exists" !output_c_file; *)
 
   if Aorai_option.Dot.get () then
-    dot_file:=freshname (Filename.remove_extension !c_file) ".dot";
+    dot_file:= freshname !c_file ".dot";
 
-  if Aorai_option.Ya.get () = "" then
-    if Aorai_option.Buchi.get () = "" then begin
+  if Filepath.Normalized.is_unknown (Aorai_option.Ya.get ()) then
+    if Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ()) then begin
       (* ltl_file name is given and has to point out a valid file. *)
       ltl_file := Aorai_option.Ltl_File.get ();
-      if (not (Sys.file_exists !ltl_file)) then dispErr "not found" !ltl_file;
-      if (!ltl_file="" || Sys.is_directory !ltl_file) then dispErr ": invalid LTL file name" !ltl_file;
+      if (Sys.is_directory (!ltl_file:>string)) then dispErr ": invalid LTL file name" !ltl_file;
 
       (* The LTL file is always used. *)
       (* The promela file can be given or not. *)
-      if Aorai_option.To_Buchi.get () <> "" then begin
+      if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) then begin
         ltl_tmp_file:=
-          freshname
-          (Filename.remove_extension
-             (Aorai_option.promela_file ())) ".ltl";
+          freshname (Aorai_option.promela_file ()) ".ltl";
         promela_file:= Aorai_option.promela_file ();
-        Extlib.cleanup_at_exit !ltl_tmp_file
+        Extlib.cleanup_at_exit (!ltl_tmp_file :> string)
       end else begin
         ltl_tmp_file:=
           (try
-             Extlib.temp_file_cleanup_at_exit
-               (Filename.basename !c_file) ".ltl"
+             Filepath.Normalized.of_string
+               (Extlib.temp_file_cleanup_at_exit
+                  (Filename.basename (!c_file:>string)) ".ltl")
            with Extlib.Temp_file_error s ->
              Aorai_option.abort "cannot create temporary file: %s" s);
         promela_file:=
-          freshname (Filename.remove_extension !ltl_tmp_file) ".promela";
-        Extlib.cleanup_at_exit !promela_file;
+          freshname !ltl_tmp_file ".promela";
+        Extlib.cleanup_at_exit (!promela_file :> string);
       end
     end else begin
-      if Aorai_option.To_Buchi.get () <> "" &&
-        Aorai_option.Ltl_File.get () <> ""
+      if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) &&
+         not (Filepath.Normalized.is_unknown (Aorai_option.Ltl_File.get ()))
       then begin
         Aorai_option.error
           "Error. '-buchi' option is incompatible with '-to-buchi' and '-ltl' \
@@ -224,8 +222,7 @@ options.";
     end
   else begin
     ya_file := Aorai_option.Ya.get ();
-    if (!ya_file="") then dispErr ": invalid Ya file name" !ya_file;
-    if (not (Sys.file_exists !ya_file)) then dispErr "not found" !ya_file
+    if (Filepath.Normalized.is_unknown !ya_file) then dispErr ": invalid Ya file name" !ya_file;
   end;
   display_status ();
   !err
@@ -242,7 +239,7 @@ let output () =
   if (Aorai_option.Dot.get()) then
     begin
       Promelaoutput.output_dot_automata (Data_for_aorai.getAutomata ())
-        !dot_file;
+        (!dot_file:>string);
       printverb "Generating dot file    : done\n"
     end;
 
@@ -251,7 +248,7 @@ let output () =
     printverb "C file generation      : skipped\n"
   else
     begin
-      let cout = open_out !output_c_file in
+      let cout = open_out (!output_c_file:>string) in
       let fmt = Format.formatter_of_out_channel cout in
       Kernel.Unicode.without_unicode
         (fun () ->
@@ -264,32 +261,34 @@ let output () =
   printverb "Finished.\n";
   (* Some test traces. *)
   Data_for_aorai.debug_computed_state ();
-  if !generatesCFile then Kernel.Files.set [ Datatype.Filepath.of_string !output_c_file ]
+  if !generatesCFile then Kernel.Files.set [ !output_c_file ]
 
 let work () =
   let file = Ast.get () in
   Aorai_utils.initFile file;
   printverb "C file loading         : done\n";
-  if Aorai_option.Ya.get () = "" then
-    if Aorai_option.Buchi.get () = "" then begin
+  if Filepath.Normalized.is_unknown (Aorai_option.Ya.get ()) then
+    if Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ()) then begin
       ltl_to_ltlLight !ltl_file !ltl_tmp_file;
       printverb "LTL loading            : done\n";
-      let cmd = Format.sprintf "ltl2ba %s -F %s > %s"
-        ltl2ba_params !ltl_tmp_file !promela_file
+      let cmd = Format.asprintf "ltl2ba %s -F %a > %a"
+          ltl2ba_params
+          Filepath.Normalized.pretty !ltl_tmp_file
+          Filepath.Normalized.pretty !promela_file
       in if Sys.command cmd <> 0 then
           Aorai_option.abort "failed to run: %s" cmd ;
       printverb "LTL ~> Promela (ltl2ba): done\n"
     end;
-  if Aorai_option.To_Buchi.get () <> "" then
-    printverb ("Finished.\nGenerated file: '"^(!promela_file)^"'\n")
+  if not (Filepath.Normalized.is_unknown (Aorai_option.To_Buchi.get ())) then
+    printverb ("Finished.\nGenerated file: '"^(Filepath.Normalized.to_pretty_string !promela_file)^"'\n")
   else
     begin
         (* Step 3 : Loading promela_file and checking the consistency between informations from C code and LTL property *)
         (*          Such as functions name and global variables. *)
 
-      if Aorai_option.Buchi.get () <> "" then
+      if not (Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ())) then
         load_promela_file_withexps !promela_file
-      else if Aorai_option.Ya.get  () <> "" then
+      else if not (Filepath.Normalized.is_unknown (Aorai_option.Ya.get ())) then
         load_ya_file !ya_file
       else
         load_promela_file !promela_file;
