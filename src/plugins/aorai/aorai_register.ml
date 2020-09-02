@@ -28,7 +28,6 @@ open Promelaast
 
 (* [VP] Need to get rid of those global references at some point. *)
 let promela_file = ref Filepath.Normalized.unknown
-let ya_file = ref Filepath.Normalized.unknown
 let c_file = ref Filepath.Normalized.unknown
 let output_c_file = ref Filepath.Normalized.unknown
 let ltl_tmp_file = ref Filepath.Normalized.unknown
@@ -84,7 +83,7 @@ let syntax_error loc msg =
 (* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
    in case of error. *)
 let check_and_open_in (f : Filepath.Normalized.t) errmsg =
-  if Sys.is_directory (f :> string) then
+  if not (Filepath.Normalized.is_file f) then
     Aorai_option.abort "%s: %a" errmsg Filepath.Normalized.pretty f;
   open_in (f :> string)
 
@@ -186,7 +185,6 @@ let init_file_names () =
     if Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ()) then begin
       (* ltl_file name is given and has to point out a valid file. *)
       ltl_file := Aorai_option.Ltl_File.get ();
-      if (Sys.is_directory (!ltl_file:>string)) then dispErr ": invalid LTL file name" !ltl_file;
 
       (* The LTL file is always used. *)
       (* The promela file can be given or not. *)
@@ -221,8 +219,8 @@ options.";
       promela_file := Aorai_option.promela_file ();
     end
   else begin
-    ya_file := Aorai_option.Ya.get ();
-    if (Filepath.Normalized.is_unknown !ya_file) then dispErr ": invalid Ya file name" !ya_file;
+   let ya_file = Aorai_option.Ya.get () in
+    if (Filepath.Normalized.is_unknown ya_file) then dispErr ": invalid Ya file name" ya_file;
   end;
   display_status ();
   !err
@@ -289,7 +287,7 @@ let work () =
       if not (Filepath.Normalized.is_unknown (Aorai_option.Buchi.get ())) then
         load_promela_file_withexps !promela_file
       else if not (Filepath.Normalized.is_unknown (Aorai_option.Ya.get ())) then
-        load_ya_file !ya_file
+        load_ya_file (Aorai_option.Ya.get ())
       else
         load_promela_file !promela_file;
       printverb "Loading promela        : done\n";
