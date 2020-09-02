@@ -1,5 +1,5 @@
 /* run.config
-MACRO: TMP @PTEST_DIR@/result/@PTEST_NAME@.i
+MACRO: TMP @PTEST_NAME@.i
 OPT: -print -then -print -ocode @TMP@ -then @TMP@ -print -ocode=""
 */
 struct s { int i; };

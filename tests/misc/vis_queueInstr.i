@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -print -then-on A -print
+CMXS: @PTEST_NAME@
+OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -print -then-on A -print
 */
 
 int main(){

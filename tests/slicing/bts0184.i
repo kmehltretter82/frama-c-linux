@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-slice-pragma x  -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+   STDOPT: +"-slice-pragma x  -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
  **/
 int x(int y, int z)
 {

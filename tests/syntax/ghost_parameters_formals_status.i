@@ -1,6 +1,6 @@
 /* run.config
-  EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-  OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs
+  CMXS: @PTEST_NAME@
+  OPT: -load-module %{dep:@PTEST_NAME@.cmxs}
 */
 
 void declaration_void(void) /*@ ghost (int x, int y) */ ;

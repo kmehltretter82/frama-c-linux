@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -journal-disable -print -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -variadic-no-translation
+   CMXS: @PTEST_NAME@
+   OPT: -journal-disable -print -load-module %{dep:@PTEST_NAME@.cmxs} -variadic-no-translation
 */
 #include <stdio.h>
 

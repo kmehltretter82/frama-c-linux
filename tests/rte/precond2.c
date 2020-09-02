@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/compute_annot/compute_annot.cmxs
-   OPT: -warn-special-float none -load-module @PTEST_DIR@/compute_annot/compute_annot -journal-disable
+   CMXS: compute_annot
+   OPT: -warn-special-float none -load-module %{dep:compute_annot.cmxs} -journal-disable
 */
 
 int global = 15;

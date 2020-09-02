@@ -1,5 +1,5 @@
 /* run.config
-OPT: -load-script tests/misc/interpreted_automata_dataflow.ml
+OPT: -load-script %{dep:interpreted_automata_dataflow.ml}
 */
 
 /* Tests the dataflow functor of interpreted automata via a caml script

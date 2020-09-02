@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   STDOPT: +"-load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -deps"
+   CMXS: @PTEST_NAME@
+   STDOPT: +"-load-module %{dep:@PTEST_NAME@.cmxs} -deps"
 */
 
 

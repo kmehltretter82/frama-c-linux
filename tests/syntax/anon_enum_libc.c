@@ -1,6 +1,6 @@
 /* run.config
 FILTER: sed -e 's|#include *"\([^/]*[/]\)*\([^/]*\)"|#include "PTESTS_DIR/\2"|'
-OPT: -cpp-extra-args="-I @PTEST_DIR@" -ocode @PTEST_DIR@/result/@PTEST_NAME@.c -print -then -ocode="" @PTEST_DIR@/result/@PTEST_NAME@.c -print
+OPT: -cpp-extra-args="-I @PTEST_DIR@" -ocode @PTEST_NAME@.c -print -then -ocode="" @PTEST_NAME@.c -print
 */
 
 struct { int x; float y; } s1;

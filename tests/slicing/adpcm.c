@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-   STDOPT: +"-load-module ./tests/slicing/libSelect.cmxs -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -ulevel -1 -deps -slicing-level 2 -journal-disable"
+   DEPS: ../test/adpcm.c
+   STDOPT: +"-add-symbolic-path TESTS_DIR:../.. -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs} -ulevel -1 -deps -slicing-level 2 -journal-disable"
 */
 
-#include "tests/test/adpcm.c"
+#include "../../test/adpcm.c"

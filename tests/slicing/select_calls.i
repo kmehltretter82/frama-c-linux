@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"-lib-entry -main f -slice-calls send -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
-   STDOPT: +"-lib-entry -main g -slice-calls nothing -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-lib-entry -main f -slice-calls send -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-lib-entry -main g -slice-calls nothing -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
    */
 
 void nothing (void);

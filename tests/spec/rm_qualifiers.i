@@ -1,5 +1,5 @@
 /* run.config
-OPT: @PTEST_FILE@ -ocode @PTEST_DIR@/result/@PTEST_NAME@_res.i -print -then @PTEST_DIR@/result/@PTEST_NAME@_res.i -ocode="" -print
+OPT: @PTEST_FILE@ -ocode @PTEST_NAME@_res.i -print -then @PTEST_NAME@_res.i -ocode="" -print
 */
 extern void G(const void* p);
 typedef volatile int ARR[42][3];

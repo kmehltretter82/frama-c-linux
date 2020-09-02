@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/typedef_multi.cmxs
+   CMXS: typedef_multi
    OPT: -load-module @PTEST_DIR@/typedef_multi tests/syntax/typedef_multi_2.c
 */
 

@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/rte_api/rte_get_annot.cmxs
-   OPT: -rte-select @@all -load-module @PTEST_DIR@/rte_api/rte_get_annot -journal-disable
+   CMXS: rte_get_annot
+   OPT: -rte-select @@all -load-module %{dep:rte_get_annot} -journal-disable
 */
 
 

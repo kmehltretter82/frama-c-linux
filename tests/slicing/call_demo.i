@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"-slice-calls call1 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-slice-calls call2 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-slice-calls call1 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-slice-calls call2 -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
 */
 
 //@ assigns \result \from v;

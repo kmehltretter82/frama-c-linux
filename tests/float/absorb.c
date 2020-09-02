@@ -1,8 +1,8 @@
 /* run.config
    COMMENT: run.config is intentionally not-*
-   EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err FRAMAC_PLUGIN=tests/.empty @frama-c@ -journal-disable -save @PTEST_DIR@/result/absorb.sav @PTEST_FILE@ > @PTEST_DIR@/result/absorb_sav.res 2> @PTEST_DIR@/result/absorb_sav.err
-   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load @PTEST_DIR@/result/absorb.sav -eva @EVA_CONFIG@ -journal-disable -float-hex -save @PTEST_DIR@/result/absorb.sav2 > @PTEST_DIR@/result/absorb_sav2.res 2> @PTEST_DIR@/result/absorb_sav2.err
-   OPT: -load @PTEST_DIR@/result/absorb.sav2 -deps -out -input
+   EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err FRAMAC_PLUGIN=tests/.empty @frama-c@ -journal-disable -save absorb.sav @PTEST_FILE@ > absorb_sav.res 2> absorb_sav.err
+   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load absorb.sav -eva @EVA_CONFIG@ -journal-disable -float-hex -save absorb.sav2 > absorb_sav2.res 2> absorb_sav2.err
+   OPT: -load absorb.sav2 -deps -out -input
 */
 /* run.config*
    DONTRUN:

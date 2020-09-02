@@ -1,5 +1,5 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/logic_env_script.cmxs
+CMXS: logic_env_script
 OPT: -load-module @PTEST_DIR@/logic_env_script
 */
 

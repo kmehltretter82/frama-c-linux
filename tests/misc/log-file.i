@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/plugin_log.cmxs
+   CMXS: plugin_log
    LOG: log-file-kernel-warnings.txt
    LOG: log-file-kernel-results.txt
    LOG: log-file-feedback.txt

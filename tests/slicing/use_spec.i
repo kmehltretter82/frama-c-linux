@@ -1,5 +1,5 @@
 /* run.config
- STDOPT: +" -eva-use-spec f -slice-return main -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i"
+ STDOPT: +" -eva-use-spec f -slice-return main -journal-disable -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i"
  STDOPT: +"-main main2 -slicing-level 3 -slice-undef-functions -eva-use-spec h -slice-return main2 -journal-disable -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -eva @EVA_OPTIONS@ -eva-use-spec='-@all'"
 
 

@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: make -s tests/spec/Type_of_term.cmxs
-   OPT: -load-module tests/spec/Type_of_term.cmxs -print
+   CMXS: Type_of_term
+   OPT: -load-module %{dep:Type_of_term.cmxs} -print
 */
 
 int t [42];

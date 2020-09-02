@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/my_annotation/my_annotation.cmxs
-OPT: -load-module @PTEST_DIR@/my_annotation/my_annotation
+CMXS: my_annotation
+OPT: -load-module %{dep:my_annotation.cmxs}
 */
 
 

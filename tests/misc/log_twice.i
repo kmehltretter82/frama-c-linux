@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
+   CMXS: @PTEST_NAME@
    OPT: @EVA_CONFIG@ -load-module @PTEST_DIR@/@PTEST_NAME@
 */
 

@@ -1,5 +1,5 @@
 /* run.config
-OPT: -load-script tests/cil/change_to_instr.ml -print
+OPT: -load-script %{dep:change_to_instr.ml} -print
 */
 
 

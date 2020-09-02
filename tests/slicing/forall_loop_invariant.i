@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-slice-assert main -then-on 'Slicing export' -print -then-on default -slice-value t -then-on 'Slicing export 2' -print -check -set-project-as-default -then -print -ocode @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then @PTEST_DIR@/result/ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
+   STDOPT: +"-slice-assert main -then-on 'Slicing export' -print -then-on default -slice-value t -then-on 'Slicing export 2' -print -check -set-project-as-default -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
  **/
 
 

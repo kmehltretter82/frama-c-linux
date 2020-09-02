@@ -1,7 +1,7 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/@PTEST_NAME@.cmxs
-EXECNOW: LOG my_visitor_sav.res LOG my_visitor_sav.err BIN my_visitor.sav FRAMAC_PLUGIN=./lib/plugins @frama-c@ @PTEST_FILE@ -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -main f -save @PTEST_DIR@/@PTEST_NAME@.sav > @PTEST_DIR@/result/@PTEST_NAME@_sav.res 2> @PTEST_DIR@/result/@PTEST_NAME@_sav.err
-OPT: -load @PTEST_DIR@/@PTEST_NAME@.sav -no-autoload-plugins -load-module @PTEST_DIR@/@PTEST_NAME@.cmxs -no-my-visitor -print
+CMXS: @PTEST_NAME@
+EXECNOW: LOG my_visitor_sav.res LOG my_visitor_sav.err BIN my_visitor.sav FRAMAC_PLUGIN=./lib/plugins @frama-c@ @PTEST_FILE@ -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -main f -save @PTEST_DIR@/@PTEST_NAME@.sav > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+OPT: -load @PTEST_DIR@/@PTEST_NAME@.sav -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -no-my-visitor -print
 OPT: -load @PTEST_DIR@/@PTEST_NAME@.sav -no-autoload-plugins -print
 */
 int f() {

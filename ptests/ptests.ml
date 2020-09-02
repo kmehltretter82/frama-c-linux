@@ -569,6 +569,10 @@ struct
     add name (get name macros ^ expand macros def) macros
 end
 
+type compile_cmxs =
+  { dir: SubDir.t;
+    cmxs: string;
+  }
 
 (** configuration of a directory/test. *)
 type config =
@@ -577,6 +581,8 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
+    dc_cmxs    : compile_cmxs list; (** cmxs to compile *)
+    dc_deps    : string list; (** deps *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -602,6 +608,8 @@ let default_config () =
   { dc_test_regexp = test_file_regexp ;
     dc_macros = default_macros ();
     dc_execnow = [];
+    dc_cmxs = [];
+    dc_deps = [];
     dc_filter = None ;
     dc_default_toplevel = !toplevel_path;
     dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
@@ -686,6 +694,12 @@ let config_exec ~once dir s current =
     dc_execnow =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
+let config_cmxs dir s current =
+  { current with dc_cmxs = {dir;cmxs=s} :: current.dc_cmxs }
+
+let config_deps _dir s current =
+  { current with dc_deps = (String.split_on_char ' ' s) @ current.dc_deps }
+
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
   Mutex.lock str_mutex;
@@ -760,6 +774,8 @@ let config_options =
 
     "EXECNOW", config_exec ~once:true;
     "EXEC", config_exec ~once:false;
+    "CMXS", config_cmxs;
+    "DEPS", config_deps;
     "MACRO", config_macro;
     "MODULE", config_module;
     "LOG",
@@ -866,6 +882,7 @@ type toplevel_command =
     n : int;
     execnow:bool;
     timeout: string;
+    deps: string list;
   }
 
 type command =
@@ -944,7 +961,7 @@ let gen_prefix gen_file cmd =
 let log_prefix = gen_prefix SubDir.make_result_file
 let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
-let get_ptest_file cmd = Filename.concat ".." cmd.file
+let get_ptest_file cmd = cmd.file
 
 let get_macros cmd =
   let ptest_config =
@@ -1037,86 +1054,130 @@ let find_in_path s =
   with Exit ->
     Some !found
 
-let command_string cout command =
+let command_string ~result_cout ~oracle_cout command =
   let log_prefix = log_prefix command in
   let errlog = log_prefix ^ ".err.log" in
-  let stderr = match command.filter with
-      None -> errlog
-    | Some _ ->
-      let stderr =
-        Filename.temp_file (Filename.basename log_prefix) ".err.log"
-      in
-      at_exit (fun () ->  unlink stderr);
-      stderr
-  in
-  let filter = match command.filter with
-    | None -> None
-    | Some filter ->
-      let len = String.length filter in
-      let rec split_filter i =
-        if i < len && filter.[i] = ' ' then split_filter (i+1)
-        else
-          try
-            let idx = String.index_from filter i ' ' in
-            String.sub filter i idx,
-            String.sub filter idx (len - idx)
-          with Not_found ->
-            String.sub filter i (len - i), ""
-      in
-      let exec_name, params = split_filter 0 in
-      let exec_name =
-        if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
-        then exec_name
-        else
-          match find_in_path exec_name with
-          | Some full_exec_name -> full_exec_name
-          | None ->
-            Filename.concat
-              (Filename.dirname (Filename.dirname log_prefix))
-              (Filename.basename exec_name)
-      in
-      Some (exec_name ^ params)
-  in
+  (* let stderr = match command.filter with
+   *     None -> errlog
+   *   | Some _ ->
+   *     let stderr =
+   *       Filename.temp_file (Filename.basename log_prefix) ".err.log"
+   *     in
+   *     at_exit (fun () ->  unlink stderr);
+   *     stderr
+   * in *)
+  (* let filter = match command.filter with
+   *   | None -> None
+   *   | Some filter ->
+   *     let len = String.length filter in
+   *     let rec split_filter i =
+   *       if i < len && filter.[i] = ' ' then split_filter (i+1)
+   *       else
+   *         try
+   *           let idx = String.index_from filter i ' ' in
+   *           String.sub filter i idx,
+   *           String.sub filter idx (len - idx)
+   *         with Not_found ->
+   *           String.sub filter i (len - i), ""
+   *     in
+   *     let exec_name, params = split_filter 0 in
+   *     let exec_name =
+   *       if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
+   *       then exec_name
+   *       else
+   *         match find_in_path exec_name with
+   *         | Some full_exec_name -> full_exec_name
+   *         | None ->
+   *           Filename.concat
+   *             (Filename.dirname (Filename.dirname log_prefix))
+   *             (Filename.basename exec_name)
+   *     in
+   *     Some (exec_name ^ params)
+   * in *)
   let command_string = basic_command_string command in
-  let command_string =
-    command_string ^ " 2>" ^ (Filename.sanitize stderr)
-  in
-  let command_string = match filter with
-    | None -> command_string
-    | Some filter -> command_string ^ " | " ^ filter
-  in
-  let res = Filename.sanitize (log_prefix ^ ".res.log") in
-  let command_string = command_string ^ " >" ^ res in
-  let command_string =
-    match command.timeout with
-    | "" -> command_string
-    | s ->
-      Printf.sprintf
-        "%s; if test $? -gt 127; then \
-         echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-         fi"
-        command_string s (Filename.sanitize stderr)
-  in
-  let command_string = match filter with
-    | None -> command_string
-    | Some filter ->
-      Printf.sprintf "%s && %s < %s >%s && rm -f %s"
-        command_string
-        filter
-        (Filename.sanitize stderr)
-        (Filename.sanitize errlog)
-        (Filename.sanitize stderr)
-  in
-  Printf.fprintf cout
+  (* let command_string = match filter with
+   *   | None -> command_string
+   *   | Some filter -> command_string ^ " | " ^ filter
+   * in *)
+  let res = (log_prefix ^ ".res.log") in
+  (* let command_string =
+   *   match command.timeout with
+   *   | "" -> command_string
+   *   | s ->
+   *     Printf.sprintf
+   *       "%s; if test $? -gt 127; then \
+   *        echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
+   *        fi"
+   *       command_string s (Filename.sanitize stderr)
+   * in *)
+  (* let command_string = match filter with
+   *   | None -> command_string
+   *   | Some filter ->
+   *     Printf.sprintf "%s && %s < %s >%s && rm -f %s"
+   *       command_string
+   *       filter
+   *       (Filename.sanitize stderr)
+   *       (Filename.sanitize errlog)
+   *       (Filename.sanitize stderr)
+   * in *)
+  Printf.fprintf result_cout
     "(rule\n  \
      (targets %S %S %t)\n  \
-     (deps   (universe))\n  \
-     (action (system %S))\n\
+     (deps   %t %S (package frama-c) (universe))\n  \
+     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1) (system %S)))))\n\
      )\n"
     errlog
     res
     (fun cout -> List.iter (Printf.fprintf cout "%S") command.log_files)
-    command_string
+    (fun cout -> List.iter (fun d -> Printf.fprintf cout "%S" (Filename.concat ".." d)) command.deps)
+    (get_ptest_file command)
+    errlog
+    res
+    command_string;
+    Printf.fprintf result_cout
+    "(rule\n  \
+     (alias %S)\n  \
+     (deps   %S (package frama-c) (universe))\n  \
+     (action (system %S))\n\
+     )\n"
+    command.file
+    (get_ptest_file command)
+    command_string;
+
+  let oracle_prefix = oracle_prefix command in
+  (* Update oracle *)
+  Printf.fprintf result_cout
+    "(rule\n  \
+     (alias %S)\n  \
+     (action (diff %S %S))\n\
+     )\n"
+    ("diff-"^log_prefix)
+    (Filename.concat ".." (oracle_prefix ^ ".res.oracle"))
+    (log_prefix ^ ".res.log");
+  Printf.fprintf result_cout
+    "(rule\n  \
+     (alias %S)\n  \
+     (action (diff %S %S))\n\
+     )\n"
+    ("diff-"^log_prefix)
+    (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
+    (log_prefix ^ ".err.log");
+  Printf.fprintf result_cout
+    "(alias (deps (alias %S)) (name ptests))\n"
+    ("diff-"^log_prefix);
+  Printf.fprintf oracle_cout
+    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
+    (Filename.basename (oracle_prefix ^ ".err.oracle"))
+    (Filename.basename (oracle_prefix ^ ".err.oracle"));
+  Printf.fprintf oracle_cout
+    "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
+    (Filename.basename (oracle_prefix ^ ".res.oracle"))
+    (Filename.basename (oracle_prefix ^ ".res.oracle"));
+  ()
+
+
+
+
 
 let update_log_files dir file =
   mv (SubDir.make_result_file dir file) (SubDir.make_oracle_file dir file)
@@ -1575,8 +1636,7 @@ let update_dir_ref dir config =
   let dc_execnow = List.map update_execnow config.dc_execnow in
   { config with dc_execnow }
 
-let dispatcher cout file directory config =
-  Printf.fprintf cout "(alias (name ptests) (deps %S))\n" file;
+let dispatcher ~result_cout ~oracle_cout file directory config =
   let config =
     scan_test_file config directory file in
   let i = ref 0 in
@@ -1587,6 +1647,7 @@ let dispatcher cout file directory config =
     {file; options; toplevel; nb_files; directory; n; log_files;
      filter = config.dc_filter; macros;
      execnow=false; timeout;
+     deps = config.dc_deps;
     }
   in
   let mk_cmd (s, timeout) =
@@ -1602,6 +1663,7 @@ let dispatcher cout file directory config =
       macros = config.dc_macros;
       execnow = true;
       timeout;
+      deps = config.dc_deps;
     }
   in
   let process_macros_cmd s = basic_command_string (mk_cmd s) in
@@ -1623,9 +1685,16 @@ let dispatcher cout file directory config =
   in
   let treat_option option =
     let toplevel = make_toplevel_cmd option in
-    command_string cout toplevel;
+    command_string ~result_cout ~oracle_cout toplevel;
     incr i
   in
+  List.iter (fun cmxs ->
+      let file = Macros.expand macros cmxs.cmxs in
+      Printf.fprintf result_cout "\
+      (executable (name %s) (modules %s) (modes plugin) (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel) (flags -open Frama_c_kernel))\n \
+"
+        file file
+    ) config.dc_cmxs;
   begin
     (match config.dc_execnow with
      | hd :: tl ->
@@ -1670,8 +1739,11 @@ let () =
        if !verbosity >= 2 then lock_printf "%% producer now treating test %s\n%!" suite;
        (* the "suite" may be a directory or a single file *)
        let directory = SubDir.create suite in
-       let dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
-       let cout = open_out dune_file in
+       let result_dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
+       let result_cout = open_out result_dune_file in
+       Printf.fprintf result_cout "(copy_files ../*.*)\n";
+       let oracle_dune_file = Filename.concat (SubDir.make_file directory SubDir.oracle_dirname) "dune" in
+       let oracle_cout = open_out oracle_dune_file in
        let config = SubDir.make_file directory dir_config_file in
        let default = default_config () in
        let default = update_dir_ref directory default in
@@ -1689,10 +1761,11 @@ let () =
          assert (Filename.is_relative file);
          if test_pattern dir_config file
          then begin
-           dispatcher cout file directory dir_config;
+           dispatcher ~result_cout ~oracle_cout file directory dir_config;
          end;
        done;
-       close_out cout;
+       close_out result_cout;
+       close_out oracle_cout;
     )
     suites
 

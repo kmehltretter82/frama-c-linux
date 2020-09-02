@@ -1,6 +1,6 @@
 /* run.config
-EXECNOW: make -s @PTEST_DIR@/my_annot_proxy/my_annot_proxy.cmxs
-OPT: -load-module @PTEST_DIR@/my_annot_proxy/my_annot_proxy
+CMXS: my_annot_proxy
+OPT: -load-module %{dep:my_annot_proxy.cmxs}
 */
 
 
