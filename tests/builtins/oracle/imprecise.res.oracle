@@ -53,8 +53,7 @@
 [eva] imprecise.c:19: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {imprecise.c:19}
-[eva:alarm] imprecise.c:20: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -92,31 +91,23 @@
   Called from imprecise.c:146.
 [eva:alarm] imprecise.c:37: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] imprecise.c:37: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:37: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] imprecise.c:40: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] imprecise.c:40: Warning: 
-  out of bounds read. assert \valid_read(p);
-[eva:alarm] imprecise.c:45: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] imprecise.c:46: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:40: Warning: out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:45: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] imprecise.c:46: Warning: out of bounds read. assert \valid_read(p);
 [eva] imprecise.c:51: Call to builtin memset
 [eva:alarm] imprecise.c:51: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva] share/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva:alarm] imprecise.c:53: Warning: 
-  out of bounds write. assert \valid(p2);
+[eva:alarm] imprecise.c:53: Warning: out of bounds write. assert \valid(p2);
 [eva:alarm] imprecise.c:53: Warning: 
   pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
-[eva:alarm] imprecise.c:56: Warning: 
-  out of bounds write. assert \valid(p4);
-[eva:alarm] imprecise.c:58: Warning: 
-  out of bounds write. assert \valid(p5);
-[eva:alarm] imprecise.c:60: Warning: 
-  out of bounds write. assert \valid(p6);
+[eva:alarm] imprecise.c:56: Warning: out of bounds write. assert \valid(p4);
+[eva:alarm] imprecise.c:58: Warning: out of bounds write. assert \valid(p5);
+[eva:alarm] imprecise.c:60: Warning: out of bounds write. assert \valid(p6);
 [eva] Recording results for abstract_structs
 [from] Computing for function abstract_structs
 [from] Done for function abstract_structs
@@ -227,8 +218,7 @@
   accessing out of bounds index. assert v < 300;
 [kernel] imprecise.c:111: 
   more than 200(300) locations to update in array. Approximating.
-[eva:alarm] imprecise.c:112: Warning: 
-  assertion got status unknown.
+[eva:alarm] imprecise.c:112: Warning: assertion got status unknown.
 [eva:alarm] imprecise.c:114: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] imprecise.c:114: Warning: 
@@ -236,8 +226,7 @@
 [kernel] imprecise.c:114: 
   more than 200(300) locations to update in array. Approximating.
 [kernel] imprecise.c:114: approximating value to write.
-[eva:alarm] imprecise.c:116: Warning: 
-  assertion got status unknown.
+[eva:alarm] imprecise.c:116: Warning: assertion got status unknown.
 [eva] Recording results for many_writes
 [kernel] imprecise.c:111: 
   more than 200(300) elements to enumerate. Approximating.
@@ -261,12 +250,9 @@
 [eva] computing for function paste_big <- main.
   Called from imprecise.c:152.
 [eva] imprecise.c:133: Call to builtin memset
-[eva] imprecise.c:133: 
-  function memset: precondition 'valid_s' got status valid.
-[eva:alarm] imprecise.c:136: Warning: 
-  assertion got status unknown.
-[kernel] imprecise.c:137: 
-  too many locations to update in array. Approximating.
+[eva] imprecise.c:133: function memset: precondition 'valid_s' got status valid.
+[eva:alarm] imprecise.c:136: Warning: assertion got status unknown.
+[kernel] imprecise.c:137: too many locations to update in array. Approximating.
 [eva:alarm] imprecise.c:140: Warning: 
   accessing uninitialized left-value.
   assert \initialized((int *)(&t_big) + 48);
@@ -283,9 +269,7 @@
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈
-    {{ garbled mix of &{x}
-     (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -329,13 +313,11 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k}
-       (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k}
-    (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
@@ -626,8 +608,7 @@
   Called from imprecise.c:145.
 [eva:alarm] imprecise.c:19: Warning: 
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
-[eva:alarm] imprecise.c:20: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -672,27 +653,19 @@
   Called from imprecise.c:146.
 [eva:alarm] imprecise.c:37: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] imprecise.c:37: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:37: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] imprecise.c:40: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] imprecise.c:40: Warning: 
-  out of bounds read. assert \valid_read(p);
-[eva:alarm] imprecise.c:45: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] imprecise.c:46: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:40: Warning: out of bounds read. assert \valid_read(p);
+[eva:alarm] imprecise.c:45: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] imprecise.c:46: Warning: out of bounds read. assert \valid_read(p);
 [eva] imprecise.c:51: Call to builtin memset
-[eva:alarm] imprecise.c:53: Warning: 
-  out of bounds write. assert \valid(p2);
+[eva:alarm] imprecise.c:53: Warning: out of bounds write. assert \valid(p2);
 [eva:alarm] imprecise.c:53: Warning: 
   pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
-[eva:alarm] imprecise.c:56: Warning: 
-  out of bounds write. assert \valid(p4);
-[eva:alarm] imprecise.c:58: Warning: 
-  out of bounds write. assert \valid(p5);
-[eva:alarm] imprecise.c:60: Warning: 
-  out of bounds write. assert \valid(p6);
+[eva:alarm] imprecise.c:56: Warning: out of bounds write. assert \valid(p4);
+[eva:alarm] imprecise.c:58: Warning: out of bounds write. assert \valid(p5);
+[eva:alarm] imprecise.c:60: Warning: out of bounds write. assert \valid(p6);
 [eva] Recording results for abstract_structs
 [from] Computing for function abstract_structs
 [from] Done for function abstract_structs
@@ -839,9 +812,7 @@
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈
-    {{ garbled mix of &{x}
-     (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -882,13 +853,11 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k}
-       (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k}
-    (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR

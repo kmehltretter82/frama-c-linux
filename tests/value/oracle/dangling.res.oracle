@@ -20,8 +20,7 @@
 [eva] dangling.i:33: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
-[eva] dangling.i:24: 
-  assertion 'Eva,dangling_pointer' got final status invalid.
+[eva] dangling.i:24: assertion 'Eva,dangling_pointer' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

@@ -4,10 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] abs.i:6: Warning: 
-  function main: precondition got status unknown.
-[eva:alarm] abs.i:9: Warning: 
-  signed overflow. assert -*p ≤ 2147483647;
+[eva:alarm] abs.i:6: Warning: function main: precondition got status unknown.
+[eva:alarm] abs.i:9: Warning: signed overflow. assert -*p ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -9,8 +9,7 @@
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {0}
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {1}
 [eva] malloc-optimistic.c:17: Call to builtin malloc
-[eva] malloc-optimistic.c:17: 
-  allocating variable __malloc_main1_l17
+[eva] malloc-optimistic.c:17: allocating variable __malloc_main1_l17
 [eva] malloc-optimistic.c:17: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:17: 
   resizing variable `__malloc_main1_l17' (0..31) to fit 0..63
@@ -21,15 +20,13 @@
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] malloc-optimistic.c:136: Call to builtin free
-[eva:malloc] malloc-optimistic.c:136: 
-  strong free on bases: {__malloc_main1_l17}
+[eva:malloc] malloc-optimistic.c:136: strong free on bases: {__malloc_main1_l17}
 [eva] computing for function main2 <- main.
   Called from malloc-optimistic.c:137.
 [eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {2}
 [eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {1}
 [eva] malloc-optimistic.c:27: Call to builtin malloc
-[eva] malloc-optimistic.c:27: 
-  allocating variable __malloc_main2_l27
+[eva] malloc-optimistic.c:27: allocating variable __malloc_main2_l27
 [eva] malloc-optimistic.c:27: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:27: 
   resizing variable `__malloc_main2_l27' (0..95) to fit 0..63
@@ -40,15 +37,13 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] malloc-optimistic.c:138: Call to builtin free
-[eva:malloc] malloc-optimistic.c:138: 
-  strong free on bases: {__malloc_main2_l27}
+[eva:malloc] malloc-optimistic.c:138: strong free on bases: {__malloc_main2_l27}
 [eva] computing for function main3 <- main.
   Called from malloc-optimistic.c:139.
 [eva] computing for function main_3_aux <- main3 <- main.
   Called from malloc-optimistic.c:48.
 [eva] malloc-optimistic.c:34: Call to builtin malloc
-[eva] malloc-optimistic.c:34: 
-  allocating variable __malloc_main_3_aux_l34
+[eva] malloc-optimistic.c:34: allocating variable __malloc_main_3_aux_l34
 [eva] Recording results for main_3_aux
 [eva] Done for function main_3_aux
 [eva] computing for function main_3_aux <- main3 <- main.
@@ -70,8 +65,7 @@
 [eva] computing for function main_4_aux <- main4 <- main.
   Called from malloc-optimistic.c:56.
 [eva] malloc-optimistic.c:40: Call to builtin malloc
-[eva] malloc-optimistic.c:40: 
-  allocating variable __malloc_main_4_aux_l40
+[eva] malloc-optimistic.c:40: allocating variable __malloc_main_4_aux_l40
 [eva] Recording results for main_4_aux
 [eva] Done for function main_4_aux
 [eva] computing for function main_4_aux <- main4 <- main.
@@ -89,8 +83,7 @@
 [eva] computing for function main5 <- main.
   Called from malloc-optimistic.c:144.
 [eva] malloc-optimistic.c:64: Call to builtin malloc
-[eva] malloc-optimistic.c:64: 
-  allocating variable __malloc_main5_l64
+[eva] malloc-optimistic.c:64: allocating variable __malloc_main5_l64
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31) to fit 0..63
@@ -124,11 +117,9 @@
                     [1] ∈ {0}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/63) to fit 0..63
@@ -162,11 +153,9 @@
                     [2] ∈ {1}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/95) to fit 0..95
@@ -200,11 +189,9 @@
                     [3] ∈ {2}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/127) to fit 0..127
@@ -238,11 +225,9 @@
                     [4] ∈ {3}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/159) to fit 0..159
@@ -276,11 +261,9 @@
                     [5] ∈ {4}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/191) to fit 0..191
@@ -314,11 +297,9 @@
                     [6] ∈ {5}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/223) to fit 0..223
@@ -352,11 +333,9 @@
                     [7] ∈ {6}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/255) to fit 0..255
@@ -390,11 +369,9 @@
                     [8] ∈ {7}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/287) to fit 0..287
@@ -428,11 +405,9 @@
                     [9] ∈ {8}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/319) to fit 0..319
@@ -466,18 +441,15 @@
                     [10] ∈ {9}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] malloc-optimistic.c:68: Call to builtin free
-[eva:malloc] malloc-optimistic.c:68: 
-  strong free on bases: {__malloc_main5_l64}
+[eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
   Called from malloc-optimistic.c:145.
 [eva] malloc-optimistic.c:77: Call to builtin malloc
-[eva] malloc-optimistic.c:77: 
-  allocating variable __malloc_main6_l77
+[eva] malloc-optimistic.c:77: allocating variable __malloc_main6_l77
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_main6_l77' (0..31) to fit 0..63
@@ -511,8 +483,7 @@
                     [1] ∈ {0}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  strong free on bases: {__malloc_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: strong free on bases: {__malloc_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc:weak] malloc-optimistic.c:77: 
   marking variable `__malloc_main6_l77' as weak
@@ -551,8 +522,7 @@
                       [2] ∈ {1} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/95) to fit 0..95
@@ -589,8 +559,7 @@
                       [3] ∈ {2} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/127) to fit 0..127
@@ -629,8 +598,7 @@
                       [4] ∈ {3} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/159) to fit 0..159
@@ -671,8 +639,7 @@
                       [5] ∈ {4} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/191) to fit 0..191
@@ -715,8 +682,7 @@
                       [6] ∈ {5} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/223) to fit 0..223
@@ -761,8 +727,7 @@
                       [7] ∈ {6} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/255) to fit 0..255
@@ -809,8 +774,7 @@
                       [8] ∈ {7} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/287) to fit 0..287
@@ -859,8 +823,7 @@
                       [9] ∈ {8} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/319) to fit 0..319
@@ -911,15 +874,13 @@
                       [10] ∈ {9} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:81: Call to builtin free
-[eva:malloc] malloc-optimistic.c:81: 
-  weak free on bases: {__malloc_w_main6_l77}
+[eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
   Called from malloc-optimistic.c:148.
 [eva] malloc-optimistic.c:90: Call to builtin malloc
-[eva] malloc-optimistic.c:90: 
-  allocating variable __malloc_main7_l90
+[eva] malloc-optimistic.c:90: allocating variable __malloc_main7_l90
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31) to fit 0..63
@@ -975,11 +936,9 @@
                     [1] ∈ {0}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/63) to fit 0..63
@@ -1035,11 +994,9 @@
                     [2] ∈ {1}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/95) to fit 0..95
@@ -1095,11 +1052,9 @@
                     [3] ∈ {2}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/127) to fit 0..127
@@ -1155,11 +1110,9 @@
                     [4] ∈ {3}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/159) to fit 0..159
@@ -1215,11 +1168,9 @@
                     [5] ∈ {4}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/191) to fit 0..191
@@ -1275,11 +1226,9 @@
                     [6] ∈ {5}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/223) to fit 0..223
@@ -1335,11 +1284,9 @@
                     [7] ∈ {6}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/255) to fit 0..255
@@ -1395,11 +1342,9 @@
                     [8] ∈ {7}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/287) to fit 0..287
@@ -1455,11 +1400,9 @@
                     [9] ∈ {8}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/319) to fit 0..319
@@ -1515,11 +1458,9 @@
                     [10] ∈ {9}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/351) to fit 0..351
@@ -1575,11 +1516,9 @@
                     [11] ∈ {10}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/383) to fit 0..383
@@ -1635,11 +1574,9 @@
                     [12] ∈ {11}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/415) to fit 0..415
@@ -1695,11 +1632,9 @@
                     [13] ∈ {12}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/447) to fit 0..447
@@ -1755,11 +1690,9 @@
                     [14] ∈ {13}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/479) to fit 0..479
@@ -1815,11 +1748,9 @@
                     [15] ∈ {14}
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/511) to fit 0..511/543
@@ -1850,8 +1781,7 @@
                     [15..16] ∈ {15} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:88: starting to merge loop iterations
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
@@ -1881,8 +1811,7 @@
                     [15..17] ∈ {15; 16} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/575) to fit 0..511/607
@@ -1911,8 +1840,7 @@
                     [15..18] ∈ {15; 16; 17} or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/607) to fit 0..511/3231
@@ -1941,15 +1869,13 @@
                     [15..100] ∈ [15..99] or UNINITIALIZED
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
-[eva:malloc] malloc-optimistic.c:94: 
-  strong free on bases: {__malloc_main7_l90}
+[eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
   Called from malloc-optimistic.c:149.
 [eva] malloc-optimistic.c:103: Call to builtin malloc
-[eva] malloc-optimistic.c:103: 
-  allocating variable __malloc_main8_l103
+[eva] malloc-optimistic.c:103: allocating variable __malloc_main8_l103
 [eva] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_main8_l103' (0..31) to fit 0..63
@@ -3194,8 +3120,7 @@
 [eva] computing for function main9 <- main.
   Called from malloc-optimistic.c:150.
 [eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:119: 
-  allocating variable __malloc_main9_l119
+[eva] malloc-optimistic.c:119: allocating variable __malloc_main9_l119
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {0}, {{ &__malloc_main9_l119 }}
 [eva] malloc-optimistic.c:122: Frama_C_show_each: {0}
@@ -3232,8 +3157,7 @@
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {4}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: 
-  Frama_C_show_each: {-20; 1; 2; 3; 4}
+[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4}
 [eva] computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux
@@ -3241,8 +3165,7 @@
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {5}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: 
-  Frama_C_show_each: {-20; 1; 2; 3; 4; 5}
+[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5}
 [eva] computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux
@@ -3250,8 +3173,7 @@
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {6}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: 
-  Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6}
+[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6}
 [eva] computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux
@@ -3259,8 +3181,7 @@
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {7}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: 
-  Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6; 7}
+[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6; 7}
 [eva] computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux

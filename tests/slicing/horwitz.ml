@@ -1,8 +1,8 @@
 (* 
-ledit bin/toplevel.top  -deps tests/slicing/horwitz.c
-#use "tests/slicing/select.ml";;
+ledit bin/toplevel.top  -deps horwitz.c
+#use "select.ml";;
 
-tests/slicing/horwitz.byte -deps tests/slicing/horwitz.c
+horwitz.byte -deps horwitz.c
 * *)
 
 include LibSelect;;

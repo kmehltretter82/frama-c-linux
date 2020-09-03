@@ -75,8 +75,7 @@
 [eva] computing for function dup <- main.
   Called from unistd_h.c:22.
 [eva] using specification for function dup
-[eva] unistd_h.c:22: 
-  function dup: precondition 'valid_fildes' got status valid.
+[eva] unistd_h.c:22: function dup: precondition 'valid_fildes' got status valid.
 [eva] Done for function dup
 [eva] computing for function dup <- main.
   Called from unistd_h.c:22.
@@ -85,8 +84,7 @@
 [eva] computing for function lseek <- main.
   Called from unistd_h.c:27.
 [eva] using specification for function lseek
-[eva] unistd_h.c:27: 
-  function lseek: precondition 'valid_fd' got status valid.
+[eva] unistd_h.c:27: function lseek: precondition 'valid_fd' got status valid.
 [eva] unistd_h.c:27: 
   function lseek: precondition 'valid_whence' got status valid.
 [eva] Done for function lseek
@@ -182,8 +180,7 @@
 [eva] computing for function getcwd <- main.
   Called from unistd_h.c:46.
 [eva] using specification for function getcwd
-[eva] unistd_h.c:46: 
-  function getcwd: precondition 'valid_buf' got status valid.
+[eva] unistd_h.c:46: function getcwd: precondition 'valid_buf' got status valid.
 [eva] Done for function getcwd
 [eva] unistd_h.c:48: assertion got status valid.
 [eva:alarm] unistd_h.c:49: Warning: assertion got status unknown.

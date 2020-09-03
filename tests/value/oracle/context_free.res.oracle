@@ -76,13 +76,11 @@
 [eva:initial-state] creating variable S_0_S_vvv with imprecise size (type void)
 [eva:initial-state] creating variable S_1_S_vvv with imprecise size (type void)
 [eva:initial-state] creating variable S_vv with imprecise size (type void)
-[eva:alarm] context_free.i:46: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] context_free.i:46: Warning: out of bounds write. assert \valid(p);
 [eva] context_free.i:51: 
   Assigning imprecise value to vv.
   The imprecision originates from Well
-[eva:alarm] context_free.i:52: Warning: 
-  out of bounds write. assert \valid(vvv);
+[eva:alarm] context_free.i:52: Warning: out of bounds write. assert \valid(vvv);
 [eva] context_free.i:52: 
   Assigning imprecise value to *vvv (pointing to S_vvv with offsets {0}).
   The imprecision originates from Well

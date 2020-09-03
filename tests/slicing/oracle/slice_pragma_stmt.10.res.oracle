@@ -38,4 +38,4 @@ void double_effect2(void)
 }
 
 
-[kernel] Parsing result/ocode_10_slice_pragma_stmt.i (no preprocessing)
+[kernel] Parsing ocode_10_slice_pragma_stmt.i (no preprocessing)

@@ -44,4 +44,4 @@ void main(int x)
 }
 
 
-[kernel] Parsing result/ocode_0_undef-fun.i (no preprocessing)
+[kernel] Parsing ocode_0_undef-fun.i (no preprocessing)

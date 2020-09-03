@@ -9,6 +9,6 @@
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   50    
   51    comp array_of_comp[1] = {{.a = 17, .b = 45, .e = {}}};
-[kernel] User Error: stopping on file "empty_base.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
+[kernel] User Error: stopping on file "empty_base.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

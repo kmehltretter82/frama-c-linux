@@ -17,10 +17,8 @@
 [eva] leaf2.i:6: 
   Assigning imprecise value to G.
   The imprecision originates from Library function {leaf2.i:6}
-[eva:alarm] leaf2.i:7: Warning: 
-  signed overflow. assert -2147483648 ≤ G + 1;
-[eva:alarm] leaf2.i:7: Warning: 
-  signed overflow. assert G + 1 ≤ 2147483647;
+[eva:alarm] leaf2.i:7: Warning: signed overflow. assert -2147483648 ≤ G + 1;
+[eva:alarm] leaf2.i:7: Warning: signed overflow. assert G + 1 ≤ 2147483647;
 [eva] leaf2.i:7: 
   Assigning imprecise value to G.
   The imprecision originates from Library function {leaf2.i:6}
@@ -28,12 +26,8 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  G ∈
-   {{ garbled mix of &{I}
-    (origin: Library function {leaf2.i:6}) }}
-  H ∈
-   {{ garbled mix of &{I}
-    (origin: Library function {leaf2.i:6}) }}
+  G ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}
+  H ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}
 [from] Computing for function main
 [from] Computing for function f <-main
 [from] Done for function f

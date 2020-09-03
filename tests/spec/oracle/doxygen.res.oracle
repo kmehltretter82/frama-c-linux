@@ -24,9 +24,16 @@ void main();
 /*  run.config
   OPT: -keep-comments -print -then -pp-annot
  */
+/*  run.config
+  OPT: -keep-comments -print -then -pp-annot
+ */
+/* @{ */
 /* @{ */
 /* @{ Bla  */
+/* @{ Bla  */
 /* @{ */
+/* @{ */
+/* @{ Blu */
 /* @{ Blu */
 void doxygen_group(void)
 {
@@ -34,8 +41,12 @@ void doxygen_group(void)
 }
 
 /* @} Bli  */
+/* @} Bli  */
+/* @}  */
 /* @}  */
 /* @} */
+/* @} */
+/* @} Bly */
 /* @} Bly */
 void main();
 

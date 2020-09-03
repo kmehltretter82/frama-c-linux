@@ -118,8 +118,7 @@
   Called from split_return.i:209.
 [eva] computing for function f6 <- main6 <- main.
   Called from split_return.i:135.
-[eva:alarm] split_return.i:130: Warning: 
-  assertion got status unknown.
+[eva:alarm] split_return.i:130: Warning: assertion got status unknown.
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] Recording results for main6

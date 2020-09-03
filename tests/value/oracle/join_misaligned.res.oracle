@@ -49,14 +49,11 @@
    [3..4] ∈ {0}
   y{[0]; [1][bits 0 to 15]#} ∈ {0x22222222} repeated %32, bits 0 to 47 
    [1][bits 16 to 23] ∈
-   {{ garbled mix of &{t}
-    (origin: Merge {join_misaligned.i:42}) }}
+   {{ garbled mix of &{t} (origin: Merge {join_misaligned.i:42}) }}
    {[1][bits 24 to 31]; [2][bits 0 to 15]} ∈
-   {{ garbled mix of &{t; u}
-    (origin: Merge {join_misaligned.i:42}) }}
+   {{ garbled mix of &{t; u} (origin: Merge {join_misaligned.i:42}) }}
    [2][bits 16 to 23] ∈
-   {{ garbled mix of &{u}
-    (origin: Merge {join_misaligned.i:42}) }}
+   {{ garbled mix of &{u} (origin: Merge {join_misaligned.i:42}) }}
    [2][bits 24 to 31]# ∈ {0x22222222}%32, bits 24 to 31 
    [3..6] ∈ {1}
   z[0..2] ∈ {255}

@@ -43,7 +43,7 @@
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva:alarm] share/libc/stdlib.h:394: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:394: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
 [eva] Recording results for malloc
 [eva] Done for function malloc
@@ -615,8 +615,7 @@
 [eva] computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
 [eva] using specification for function printf_va_1
-[eva] linked_list.c:51: 
-  function printf_va_1: precondition got status valid.
+[eva] linked_list.c:51: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
 [eva] linked_list.c:50: starting to merge loop iterations
 [eva:alarm] linked_list.c:51: Warning: 
@@ -642,8 +641,7 @@
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈
                      {{ garbled mix of &{MEMORY}
-                      (origin: Library function
-                      {linked_list.c:51}) }}
+                      (origin: Library function {linked_list.c:51}) }}
   curr ∈ {0}
   head ∈ {{ NULL ; &MEMORY + [0..0x3F8],0%8 }}
   i ∈ {11}

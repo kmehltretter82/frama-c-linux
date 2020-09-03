@@ -5,21 +5,17 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] bts345.i:27: Warning: 
-  signed overflow. assert y + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:27: Warning: signed overflow. assert y + 1 ≤ 2147483647;
 [eva] computing for function top <- call_top.
   Called from bts345.i:28.
-[eva:alarm] bts345.i:21: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:21: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] computing for function called_by_top <- top <- call_top.
   Called from bts345.i:22.
-[eva:alarm] bts345.i:15: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:15: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] computing for function called_indirectly_by_top <- called_by_top <- top <- 
                           call_top.
   Called from bts345.i:16.
-[eva:alarm] bts345.i:10: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:10: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for called_indirectly_by_top
 [eva] Done for function called_indirectly_by_top
 [eva] Recording results for called_by_top
@@ -83,4 +79,4 @@ int call_top(int y)
 }
 
 
-[kernel] Parsing result/ocode_0_bts345.i (no preprocessing)
+[kernel] Parsing ocode_0_bts345.i (no preprocessing)

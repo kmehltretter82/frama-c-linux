@@ -23,10 +23,8 @@
   Called from tab.c:11.
 [eva] using specification for function any_int
 [eva] Done for function any_int
-[eva:alarm] tab.c:12: Warning: 
-  accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] tab.c:12: Warning: 
-  accessing out of bounds index. assert i < 4;
+[eva:alarm] tab.c:12: Warning: accessing out of bounds index. assert 0 ≤ i;
+[eva:alarm] tab.c:12: Warning: accessing out of bounds index. assert i < 4;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

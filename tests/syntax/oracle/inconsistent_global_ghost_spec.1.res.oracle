@@ -8,6 +8,6 @@
         ^^^^^^^^^^^^^^^^^^^^^^
   23    
   24    void user(void){
-[kernel] User Error: stopping on file "inconsistent_global_ghost_spec.c" that has
-  errors. Add '-kernel-msg-key pp' for preprocessing command.
+[kernel] User Error: stopping on file "inconsistent_global_ghost_spec.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

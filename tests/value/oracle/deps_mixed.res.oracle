@@ -51,8 +51,7 @@
   r ∈ {2}
   s ∈ [--..--]
   __retres ∈
-          {{ garbled mix of &{a; b}
-           (origin: Arithmetic {deps_mixed.i:24}) }}
+          {{ garbled mix of &{a; b} (origin: Arithmetic {deps_mixed.i:24}) }}
 [from] Computing for function f
 [from] Done for function f
 [from] Computing for function g

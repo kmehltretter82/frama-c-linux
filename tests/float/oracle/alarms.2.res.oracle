@@ -43,8 +43,7 @@
 [eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert vd < 9223372036854775808;
-[eva:alarm] alarms.i:24: Warning: 
-  non-finite float value. assert \is_finite(vf);
+[eva:alarm] alarms.i:24: Warning: non-finite float value. assert \is_finite(vf);
 [eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vf;

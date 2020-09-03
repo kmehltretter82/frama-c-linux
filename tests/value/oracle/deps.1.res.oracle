@@ -4,14 +4,11 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] deps.i:17: Warning: 
-  signed overflow. assert -2147483648 ≤ a + b;
-[eva:alarm] deps.i:17: Warning: 
-  signed overflow. assert a + b ≤ 2147483647;
+[eva:alarm] deps.i:17: Warning: signed overflow. assert -2147483648 ≤ a + b;
+[eva:alarm] deps.i:17: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva:alarm] deps.i:24: Warning: 
   signed overflow. assert -2147483648 ≤ w + v2.x;
-[eva:alarm] deps.i:24: Warning: 
-  signed overflow. assert w + v2.x ≤ 2147483647;
+[eva:alarm] deps.i:24: Warning: signed overflow. assert w + v2.x ≤ 2147483647;
 [eva:alarm] deps.i:24: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(w + v2.x) + v3.x;
 [eva:alarm] deps.i:24: Warning: 

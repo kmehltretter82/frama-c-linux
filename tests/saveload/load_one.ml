@@ -1,10 +1,10 @@
-let () = at_exit (fun _ -> Sys.remove "tests/saveload/result/load_one.sav")
+let () = at_exit (fun _ -> Sys.remove "result/load_one.sav")
 
 let main () =
   let sparecode () =
     Sparecode.Register.get ~select_annot:false ~select_slice_pragma:false
   in
-  let fp = Filepath.Normalized.of_string "tests/saveload/result/load_one.sav" in
+  let fp = Filepath.Normalized.of_string "result/load_one.sav" in
   let p = sparecode () in
   Project.save fp;
   Project.remove ~project:p ();

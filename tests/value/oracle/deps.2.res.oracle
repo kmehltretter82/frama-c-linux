@@ -4,10 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] deps.i:32: Warning: 
-  signed overflow. assert -2147483648 ≤ a + b;
-[eva:alarm] deps.i:32: Warning: 
-  signed overflow. assert a + b ≤ 2147483647;
+[eva:alarm] deps.i:32: Warning: signed overflow. assert -2147483648 ≤ a + b;
+[eva:alarm] deps.i:32: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva] Recording results for fonc2
 [eva] done for function fonc2
 [eva] ====== VALUES COMPUTED ======

@@ -11,8 +11,7 @@
   out of bounds read. assert \valid_read((int *)l);
 [eva] Recording results for main
 [eva] done for function main
-[eva] copy_paste.i:9: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] copy_paste.i:9: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0..2] ∈ {0}

@@ -155,14 +155,12 @@
 [eva] computing for function f <- main.
   Called from precise_locations.i:48.
 [eva] using specification for function f
-[eva] precise_locations.i:48: 
-  function f: precondition got status valid.
+[eva] precise_locations.i:48: function f: precondition got status valid.
 [eva] Done for function f
 [eva] computing for function g <- main.
   Called from precise_locations.i:49.
 [eva] using specification for function g
-[eva] precise_locations.i:49: 
-  function g: precondition got status valid.
+[eva] precise_locations.i:49: function g: precondition got status valid.
 [eva] Done for function g
 [eva] precise_locations.i:45: starting to merge loop iterations
 [eva] computing for function f <- main.

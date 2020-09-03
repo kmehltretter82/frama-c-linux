@@ -1,8 +1,7 @@
 [kernel] Parsing summary.i (no preprocessing)
 [rte] annotating function alarms
 [rte] annotating function bottom
-[rte] summary.i:15: Warning: 
-  guaranteed RTE: assert division_by_zero: 0 ≢ 0;
+[rte] summary.i:15: Warning: guaranteed RTE: assert division_by_zero: 0 ≢ 0;
 [rte] annotating function dead
 [rte] annotating function logic
 [rte] annotating function main
@@ -27,18 +26,15 @@
   accessing out of bounds index. assert undet < 10;
 [eva:alarm] summary.i:31: Warning: 
   assertion 'rte,division_by_zero' got status unknown.
-[eva:alarm] summary.i:31: Warning: 
-  division by zero. assert undet ≢ 0;
+[eva:alarm] summary.i:31: Warning: division by zero. assert undet ≢ 0;
 [eva:alarm] summary.i:32: Warning: 
   assertion 'rte,signed_overflow' got status unknown.
 [eva:alarm] summary.i:32: Warning: 
   signed overflow. assert -2147483648 ≤ undet + undet;
 [eva:alarm] summary.i:32: Warning: 
   signed overflow. assert undet + undet ≤ 2147483647;
-[eva:alarm] summary.i:33: Warning: 
-  assertion 'rte,shift' got status unknown.
-[eva:alarm] summary.i:33: Warning: 
-  assertion 'rte,shift' got status unknown.
+[eva:alarm] summary.i:33: Warning: assertion 'rte,shift' got status unknown.
+[eva:alarm] summary.i:33: Warning: assertion 'rte,shift' got status unknown.
 [eva:alarm] summary.i:33: Warning: 
   assertion 'rte,signed_overflow' got status unknown.
 [eva:alarm] summary.i:33: Warning: 

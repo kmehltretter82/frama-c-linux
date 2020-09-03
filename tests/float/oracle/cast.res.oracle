@@ -4,8 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] cast.i:11: Warning: 
-  non-finite double value. assert \is_finite(v);
+[eva:alarm] cast.i:11: Warning: non-finite double value. assert \is_finite(v);
 [eva:alarm] cast.i:11: Warning: 
   non-finite float value. assert \is_finite((float)v);
 [eva] computing for function assert_subnormal <- main.

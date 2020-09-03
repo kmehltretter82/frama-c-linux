@@ -12,10 +12,8 @@
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from alarms.i:70.
-[eva:alarm] alarms.i:16: Warning: 
-  NaN float value. assert ¬\is_NaN(u1.f);
-[eva:alarm] alarms.i:18: Warning: 
-  NaN double value. assert ¬\is_NaN(u2.d);
+[eva:alarm] alarms.i:16: Warning: NaN float value. assert ¬\is_NaN(u1.f);
+[eva:alarm] alarms.i:18: Warning: NaN double value. assert ¬\is_NaN(u2.d);
 [eva] alarms.i:19: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -45,16 +43,14 @@
 [eva] Done for function fd
 [eva:alarm] alarms.i:23: Warning: 
   non-finite double value. assert \is_finite(vd);
-[eva:alarm] alarms.i:23: Warning: 
-  NaN double value. assert ¬\is_NaN(vd);
+[eva:alarm] alarms.i:23: Warning: NaN double value. assert ¬\is_NaN(vd);
 [eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vd;
 [eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert vd < 9223372036854775808;
-[eva:alarm] alarms.i:24: Warning: 
-  non-finite float value. assert \is_finite(vf);
+[eva:alarm] alarms.i:24: Warning: non-finite float value. assert \is_finite(vf);
 [eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vf;
@@ -64,8 +60,7 @@
 [eva] computing for function fd <- main1 <- main.
   Called from alarms.i:25.
 [eva] Done for function fd
-[eva:alarm] alarms.i:26: Warning: 
-  NaN double value. assert ¬\is_NaN(vd);
+[eva:alarm] alarms.i:26: Warning: NaN double value. assert ¬\is_NaN(vd);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
@@ -86,8 +81,7 @@
 [eva] computing for function fd <- main3 <- main.
   Called from alarms.i:64.
 [eva] Done for function fd
-[eva:alarm] alarms.i:65: Warning: 
-  NaN double value. assert ¬\is_NaN(d_0);
+[eva:alarm] alarms.i:65: Warning: NaN double value. assert ¬\is_NaN(d_0);
 [eva] computing for function fabs <- main3 <- main.
   Called from alarms.i:65.
 [eva] Recording results for fabs

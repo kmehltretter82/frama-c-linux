@@ -155,4 +155,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_3_unravel-flavors.i (no preprocessing)
+[kernel] Parsing ocode_3_unravel-flavors.i (no preprocessing)

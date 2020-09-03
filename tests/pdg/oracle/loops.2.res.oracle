@@ -5,10 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva] loops.c:65: starting to merge loop iterations
-[eva:alarm] loops.c:66: Warning: 
-  signed overflow. assert s + 2 ≤ 2147483647;
-[eva:alarm] loops.c:67: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
+[eva:alarm] loops.c:66: Warning: signed overflow. assert s + 2 ≤ 2147483647;
+[eva:alarm] loops.c:67: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for infinite
 [eva] done for function infinite
 [pdg] computing for function infinite

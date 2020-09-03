@@ -16,10 +16,8 @@
 [eva] Done for function f
 [eva] computing for function g <- main.
   Called from false.i:19.
-[eva:alarm] false.i:10: Warning: 
-  function g: postcondition got status invalid.
-[eva] false.i:11: 
-  function g: no state left, postcondition got status valid.
+[eva:alarm] false.i:10: Warning: function g: postcondition got status invalid.
+[eva] false.i:11: function g: no state left, postcondition got status valid.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

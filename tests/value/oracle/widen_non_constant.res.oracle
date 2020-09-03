@@ -21,11 +21,9 @@
 [eva] widen_non_constant.i:11: Frama_C_show_each_out: {0; 1}
 [eva] widen_non_constant.i:13: Frama_C_show_each_in: {0; 1}, [1..23]
 [eva] widen_non_constant.i:11: Frama_C_show_each_out: {0; 1; 2}
-[eva] widen_non_constant.i:13: 
-  Frama_C_show_each_in: {0; 1; 2}, [1..23]
+[eva] widen_non_constant.i:13: Frama_C_show_each_in: {0; 1; 2}, [1..23]
 [eva] widen_non_constant.i:11: Frama_C_show_each_out: [0..22]
-[eva] widen_non_constant.i:13: 
-  Frama_C_show_each_in: [0..22], [1..23]
+[eva] widen_non_constant.i:13: Frama_C_show_each_in: [0..22], [1..23]
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
@@ -40,11 +38,9 @@
 [eva] widen_non_constant.i:27: Frama_C_show_each_out: {0; 1}
 [eva] widen_non_constant.i:29: Frama_C_show_each_in: {0; 1}, [1..23]
 [eva] widen_non_constant.i:27: Frama_C_show_each_out: {0; 1; 2}
-[eva] widen_non_constant.i:29: 
-  Frama_C_show_each_in: {0; 1; 2}, [1..23]
+[eva] widen_non_constant.i:29: Frama_C_show_each_in: {0; 1; 2}, [1..23]
 [eva] widen_non_constant.i:27: Frama_C_show_each_out: [0..22]
-[eva] widen_non_constant.i:29: 
-  Frama_C_show_each_in: [0..22], [1..23]
+[eva] widen_non_constant.i:29: Frama_C_show_each_in: [0..22], [1..23]
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
@@ -59,11 +55,9 @@
 [eva] widen_non_constant.i:46: Frama_C_show_each_out: {0; 1}
 [eva] widen_non_constant.i:48: Frama_C_show_each_in: {0; 1}, [1..23]
 [eva] widen_non_constant.i:46: Frama_C_show_each_out: {0; 1; 2}
-[eva] widen_non_constant.i:48: 
-  Frama_C_show_each_in: {0; 1; 2}, [1..23]
+[eva] widen_non_constant.i:48: Frama_C_show_each_in: {0; 1; 2}, [1..23]
 [eva] widen_non_constant.i:46: Frama_C_show_each_out: [0..22]
-[eva] widen_non_constant.i:48: 
-  Frama_C_show_each_in: [0..22], [1..23]
+[eva] widen_non_constant.i:48: Frama_C_show_each_in: [0..22], [1..23]
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.

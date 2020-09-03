@@ -34,12 +34,9 @@
 [eva] Done for function invalid_bool
 [eva] Recording results for main
 [eva] done for function main
-[eva] bool.i:33: 
-  assertion 'Eva,bool_value' got final status invalid.
-[eva] bool.i:42: 
-  assertion 'Eva,bool_value' got final status invalid.
-[eva] bool.i:52: 
-  assertion 'Eva,bool_value' got final status invalid.
+[eva] bool.i:33: assertion 'Eva,bool_value' got final status invalid.
+[eva] bool.i:42: assertion 'Eva,bool_value' got final status invalid.
+[eva] bool.i:52: assertion 'Eva,bool_value' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function invalid_bool:
   ub{.b; .c; .s[bits 0 to 7]} ∈ {0; 1}

@@ -38,13 +38,10 @@
   The imprecision originates from Arithmetic {arith_pointer.c:54}
 [eva] arith_pointer.c:57: 
   Frama_C_show_each:
-  {{ garbled mix of &{x}
-  (origin: Arithmetic {arith_pointer.c:54}) }}
-[eva:alarm] arith_pointer.c:60: Warning: 
-  assertion got status unknown.
+  {{ garbled mix of &{x} (origin: Arithmetic {arith_pointer.c:54}) }}
+[eva:alarm] arith_pointer.c:60: Warning: assertion got status unknown.
 [eva] arith_pointer.c:64: Frama_C_show_each: [-3..5]
-[eva:alarm] arith_pointer.c:65: Warning: 
-  assertion got status unknown.
+[eva:alarm] arith_pointer.c:65: Warning: assertion got status unknown.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -124,8 +121,7 @@
   The imprecision originates from Arithmetic {arith_pointer.c:30}
 [eva] arith_pointer.c:31: 
   Frama_C_show_each:
-  {{ garbled mix of &{x; y}
-  (origin: Arithmetic {arith_pointer.c:30}) }}
+  {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:30}) }}
 [eva] arith_pointer.c:36: Frama_C_show_each: {-1}
 [eva] arith_pointer.c:40: Frama_C_show_each: {0}
 [eva:alarm] arith_pointer.c:49: Warning: 
@@ -137,8 +133,7 @@
   The imprecision originates from Arithmetic {arith_pointer.c:49}
 [eva] arith_pointer.c:50: 
   Frama_C_show_each:
-  {{ garbled mix of &{x; y}
-  (origin: Arithmetic {arith_pointer.c:49}) }}
+  {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:49}) }}
 [eva:alarm] arith_pointer.c:51: Warning: 
   signed overflow. assert -2147483648 ≤ p2 - p2;
 [eva:alarm] arith_pointer.c:51: Warning: 
@@ -148,8 +143,7 @@
   The imprecision originates from Arithmetic {arith_pointer.c:51}
 [eva] arith_pointer.c:52: 
   Frama_C_show_each:
-  {{ garbled mix of &{x; y}
-  (origin: Arithmetic {arith_pointer.c:51}) }}
+  {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:51}) }}
 [eva:alarm] arith_pointer.c:54: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] arith_pointer.c:56: Warning: 

@@ -9,11 +9,9 @@
   out of bounds read. assert \valid_read(p_str + i);
 [eva] computing for function strlen <- main.
   Called from top.i:27.
-[eva:alarm] top.i:21: Warning: 
-  out of bounds read. assert \valid_read(q);
+[eva:alarm] top.i:21: Warning: out of bounds read. assert \valid_read(q);
 [eva] top.i:21: starting to merge loop iterations
-[eva:alarm] top.i:21: Warning: 
-  signed overflow. assert k + 1 ≤ 2147483647;
+[eva:alarm] top.i:21: Warning: signed overflow. assert k + 1 ≤ 2147483647;
 [eva] Recording results for strlen
 [eva] Done for function strlen
 [eva] Recording results for main
@@ -56,4 +54,4 @@ void main(char **p_str, int i)
 }
 
 
-[kernel] Parsing result/ocode_2_top.i (no preprocessing)
+[kernel] Parsing ocode_2_top.i (no preprocessing)

@@ -10,8 +10,7 @@
   Called from conv.i:105.
 [eva] conv.i:15: Frama_C_show_each: {0}
 [eva] conv.i:18: Frama_C_show_each: {1.40129846432e-45}
-[eva] conv.i:22: 
-  Frama_C_show_each: [1.40129846432e-43 .. 2.40330263757e+12]
+[eva] conv.i:22: Frama_C_show_each: [1.40129846432e-43 .. 2.40330263757e+12]
 [eva:alarm] conv.i:24: Warning: assertion got status unknown.
 [eva] conv.i:28: Frama_C_show_each: {3.40282346639e+38}
 [eva] conv.i:29: assertion got status valid.
@@ -36,8 +35,7 @@
   Called from conv.i:106.
 [eva] conv.i:63: Frama_C_show_each: {0}
 [eva] conv.i:66: Frama_C_show_each: {4.94065645841e-324}
-[eva] conv.i:69: 
-  Frama_C_show_each: [4.94065645841e-322 .. 9.22442153475e+159]
+[eva] conv.i:69: Frama_C_show_each: [4.94065645841e-322 .. 9.22442153475e+159]
 [eva] conv.i:73: Frama_C_show_each: {1.79769313486e+308}
 [eva] conv.i:74: assertion got status valid.
 [eva] conv.i:77: Frama_C_show_each: Bottom
@@ -54,14 +52,10 @@
 [eva] Done for function main2
 [eva] Recording results for main
 [eva] done for function main
-[eva] conv.i:32: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] conv.i:41: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] conv.i:49: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] conv.i:55: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] conv.i:32: assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] conv.i:41: assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] conv.i:49: assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] conv.i:55: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   f ∈ {0}

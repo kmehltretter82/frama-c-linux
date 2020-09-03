@@ -7,37 +7,31 @@
 [eva] computing for function calloc <- main.
   Called from calloc.c:14.
 [eva] using specification for function calloc
-[eva] calloc.c:14: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:14: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from calloc.c:17.
-[eva] calloc.c:17: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:17: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from calloc.c:20.
-[eva] calloc.c:20: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:20: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from calloc.c:23.
-[eva] calloc.c:23: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:23: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva:alarm] calloc.c:26: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] computing for function calloc <- main.
   Called from calloc.c:30.
-[eva] calloc.c:30: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:30: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva:alarm] calloc.c:33: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] computing for function calloc <- main.
   Called from calloc.c:38.
-[eva] calloc.c:38: Warning: 
-  ignoring unsupported \allocates clause
+[eva] calloc.c:38: Warning: ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] calloc.c:40: assertion got status valid.
 [eva] Recording results for main

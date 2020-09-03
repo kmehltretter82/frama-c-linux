@@ -62,10 +62,8 @@
 [pdg] computing for function f
 [pdg] done for function f
 [impact] impacted statements of stmt(s) 17 are:
-    loop2.i:17 (sid 11): int v_0 = t[i];
-    loop2.i:18 (sid 12): w[i] = i;
-    loop2.i:19 (sid 13): t[i] = u[i];
-    loop2.i:26 (sid 26): if(t[i]) <..>
+    loop2.i:17 (sid 11): int v_0 = t[i];loop2.i:18 (sid 12): w[i] = i;
+    loop2.i:19 (sid 13): t[i] = u[i];loop2.i:26 (sid 26): if(t[i]) <..>
     loop2.i:27 (sid 27): f(i);
 [impact] analysis done
 [kernel] Parsing loop2.i (no preprocessing)
@@ -211,15 +209,10 @@
 [pdg] computing for function f
 [pdg] done for function f
 [impact] impacted statements of stmt(s) 83 are:
-    loop2.i:19 (sid 79): t[i] = u[i];
-    loop2.i:27 (sid 201): f(i);
-    loop2.i:27 (sid 208): f(i);
-    loop2.i:27 (sid 215): f(i);
-    loop2.i:27 (sid 222): f(i);
-    loop2.i:27 (sid 229): f(i);
-    loop2.i:27 (sid 236): f(i);
-    loop2.i:27 (sid 243): f(i);
-    loop2.i:27 (sid 250): f(i);
-    loop2.i:27 (sid 257): f(i);
+    loop2.i:19 (sid 79): t[i] = u[i];loop2.i:27 (sid 201): f(i);
+    loop2.i:27 (sid 208): f(i);loop2.i:27 (sid 215): f(i);
+    loop2.i:27 (sid 222): f(i);loop2.i:27 (sid 229): f(i);
+    loop2.i:27 (sid 236): f(i);loop2.i:27 (sid 243): f(i);
+    loop2.i:27 (sid 250): f(i);loop2.i:27 (sid 257): f(i);
     loop2.i:27 (sid 264): f(i);
 [impact] analysis done

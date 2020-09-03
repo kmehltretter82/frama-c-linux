@@ -83,15 +83,13 @@
 [eva] period.c:51: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {period.c:51}
-[eva:alarm] period.c:52: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] period.c:52: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] period.c:53: Warning: 
   pointer downcast. assert (unsigned int)(&g) ≤ 2147483647;
 [eva] period.c:53: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {period.c:53}
-[eva:alarm] period.c:54: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] period.c:54: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] period.c:55: Warning: 
   pointer downcast. assert (unsigned int)(&vg) ≤ 2147483647;
 [eva] Recording results for main
@@ -99,8 +97,7 @@
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  g[0..9] ∈
-   {{ garbled mix of &{vg} (origin: Misaligned {period.c:55}) }}
+  g[0..9] ∈ {{ garbled mix of &{vg} (origin: Misaligned {period.c:55}) }}
   Frama_C_periodic_t_320[0] ∈ {1}
                         [1..3] ∈ {0}
                         [4] ∈ {24}

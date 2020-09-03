@@ -29,12 +29,9 @@
 [eva] eval_separated.c:12: 
   Assigning imprecise value to r.
   The imprecision originates from Arithmetic {eval_separated.c:12}
-[eva:alarm] eval_separated.c:13: Warning: 
-  assertion got status unknown.
-[eva:alarm] eval_separated.c:14: Warning: 
-  assertion got status unknown.
-[eva:alarm] eval_separated.c:15: Warning: 
-  assertion got status unknown.
+[eva:alarm] eval_separated.c:13: Warning: assertion got status unknown.
+[eva:alarm] eval_separated.c:14: Warning: assertion got status unknown.
+[eva:alarm] eval_separated.c:15: Warning: assertion got status unknown.
 [eva] eval_separated.c:17: assertion got status valid.
 [eva] eval_separated.c:18: assertion got status valid.
 [eva] eval_separated.c:20: assertion got status valid.
@@ -50,21 +47,15 @@
 [eva] eval_separated.c:36: assertion got status valid.
 [eva] eval_separated.c:38: assertion got status valid.
 [eva] eval_separated.c:41: assertion got status valid.
-[eva:alarm] eval_separated.c:43: Warning: 
-  assertion got status unknown.
-[eva:alarm] eval_separated.c:45: Warning: 
-  assertion got status unknown.
+[eva:alarm] eval_separated.c:43: Warning: assertion got status unknown.
+[eva:alarm] eval_separated.c:45: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &t1 + [-8589934592..8589934588],0%4 }}
-  q ∈
-   {{ garbled mix of &{q}
-    (origin: Arithmetic {eval_separated.c:11}) }}
-  r ∈
-   {{ garbled mix of &{r}
-    (origin: Arithmetic {eval_separated.c:12}) }}
+  q ∈ {{ garbled mix of &{q} (origin: Arithmetic {eval_separated.c:11}) }}
+  r ∈ {{ garbled mix of &{r} (origin: Arithmetic {eval_separated.c:12}) }}
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

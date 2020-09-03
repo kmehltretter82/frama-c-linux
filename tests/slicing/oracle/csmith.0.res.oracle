@@ -46,8 +46,7 @@
 [eva] computing for function bts899 <- main.
   Called from csmith.i:243.
 [eva] csmith.i:135: starting to merge loop iterations
-[eva:alarm] csmith.i:141: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] csmith.i:141: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for bts899
 [eva] Done for function bts899
 [eva:alarm] csmith.i:243: Warning: 
@@ -379,4 +378,4 @@ int main(int n)
 }
 
 
-[kernel] Parsing result/ocode_0_csmith.i (no preprocessing)
+[kernel] Parsing ocode_0_csmith.i (no preprocessing)

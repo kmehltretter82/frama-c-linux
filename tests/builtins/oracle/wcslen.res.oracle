@@ -92,9 +92,8 @@
 [eva] computing for function init_array_nondet <- wcslen_large <- main.
   Called from wcslen.c:168.
 [eva] wcslen.c:161: Call to builtin memset
-[eva] wcslen.c:161: 
-  function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] wcslen.c:161: function memset: precondition 'valid_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
@@ -283,12 +282,9 @@
 [eva] Done for function escaping
 [eva] computing for function big_array <- main.
   Called from wcslen.c:348.
-[eva:alarm] wcslen.c:287: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] wcslen.c:291: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] wcslen.c:294: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] wcslen.c:287: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] wcslen.c:291: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] wcslen.c:294: Warning: out of bounds write. assert \valid(p);
 [eva] wcslen.c:301: Call to builtin wcslen
 [eva:alarm] wcslen.c:301: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.

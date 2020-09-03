@@ -23,20 +23,16 @@
   accessing uninitialized left-value. assert \initialized(&T3[3]);
 [eva:alarm] extern.i:19: Warning: 
   out of bounds read. assert \valid_read(&T3[3]);
-[eva:alarm] extern.i:20: Warning: 
-  out of bounds write. assert \valid(pT2);
+[eva:alarm] extern.i:20: Warning: out of bounds write. assert \valid(pT2);
 [kernel] extern.i:20: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva:alarm] extern.i:22: Warning: 
-  out of bounds write. assert \valid(pT2);
+[eva:alarm] extern.i:22: Warning: out of bounds write. assert \valid(pT2);
 [kernel] extern.i:22: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
 [eva] done for function main
-[eva] extern.i:20: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] extern.i:22: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] extern.i:20: assertion 'Eva,mem_access' got final status invalid.
+[eva] extern.i:22: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

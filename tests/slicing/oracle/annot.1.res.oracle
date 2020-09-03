@@ -37,4 +37,4 @@ void f2(void)
 }
 
 
-[kernel] Parsing result/ocode_1_annot.i (no preprocessing)
+[kernel] Parsing ocode_1_annot.i (no preprocessing)

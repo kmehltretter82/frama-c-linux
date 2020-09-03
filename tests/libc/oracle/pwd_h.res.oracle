@@ -15,8 +15,7 @@
 [eva] computing for function getpwnam <- main.
   Called from pwd_h.c:18.
 [eva] using specification for function getpwnam
-[eva] pwd_h.c:18: 
-  function getpwnam: precondition 'valid_name' got status valid.
+[eva] pwd_h.c:18: function getpwnam: precondition 'valid_name' got status valid.
 [eva] Done for function getpwnam
 [eva:alarm] pwd_h.c:21: Warning: assertion got status unknown.
 [eva:alarm] pwd_h.c:22: Warning: assertion got status unknown.

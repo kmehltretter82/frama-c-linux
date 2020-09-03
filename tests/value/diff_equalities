@@ -1,4 +1,4 @@
-diff tests/value/oracle/CruiseControl.res.oracle tests/value/oracle_equalities/CruiseControl.res.oracle
+diff oracle/CruiseControl.res.oracle oracle_equalities/CruiseControl.res.oracle
 980c980
 <        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {0; 1}
 ---
@@ -44,26 +44,26 @@ diff tests/value/oracle/CruiseControl.res.oracle tests/value/oracle_equalities/C
 <        [-1.9999998807907104*2^127 .. 1.9999998807907104*2^127]
 ---
 >        [-0.0000000000000000 .. 1.9999998807907104*2^127]
-diff tests/value/oracle/addition.res.oracle tests/value/oracle_equalities/addition.res.oracle
+diff oracle/addition.res.oracle oracle_equalities/addition.res.oracle
 138,141d137
-< [eva:alarm] tests/value/addition.i:61: Warning: 
+< [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
-< [eva:alarm] tests/value/addition.i:61: Warning: 
+< [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 168c164
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [scope:rm_asserts] removing 7 assertion(s)
 407,410d402
-< [eva:alarm] tests/value/addition.i:61: Warning: 
+< [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
-< [eva:alarm] tests/value/addition.i:61: Warning: 
+< [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 433c425
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [scope:rm_asserts] removing 7 assertion(s)
-diff tests/value/oracle/alias.0.res.oracle tests/value/oracle_equalities/alias.0.res.oracle
+diff oracle/alias.0.res.oracle oracle_equalities/alias.0.res.oracle
 103,104c103,104
 <   t ∈ {1; 2; 4}
 <   u ∈ {2; 3; 4; 5}
@@ -74,7 +74,7 @@ diff tests/value/oracle/alias.0.res.oracle tests/value/oracle_equalities/alias.0
 <   t2 ∈ {0; 3; 6}
 ---
 >   t2 ∈ {6}
-diff tests/value/oracle/alias.1.res.oracle tests/value/oracle_equalities/alias.1.res.oracle
+diff oracle/alias.1.res.oracle oracle_equalities/alias.1.res.oracle
 85c85
 <   z ∈ {0; 1; 2}
 ---
@@ -93,171 +93,171 @@ diff tests/value/oracle/alias.1.res.oracle tests/value/oracle_equalities/alias.1
 <   t2 FROM p2[0..2]; c
 ---
 >   t2 FROM p2[0..1]; c
-diff tests/value/oracle/alias.2.res.oracle tests/value/oracle_equalities/alias.2.res.oracle
+diff oracle/alias.2.res.oracle oracle_equalities/alias.2.res.oracle
 76c76
 <   z ∈ {-5; -4; -3; -2; -1; 0; 1; 1000}
 ---
 >   z ∈ {-2; -1; 0; 1000}
-diff tests/value/oracle/alias.3.res.oracle tests/value/oracle_equalities/alias.3.res.oracle
+diff oracle/alias.3.res.oracle oracle_equalities/alias.3.res.oracle
 67c67
 <   z ∈ {0; 1; 2}
 ---
 >   z ∈ {0; 2}
-diff tests/value/oracle/alias.4.res.oracle tests/value/oracle_equalities/alias.4.res.oracle
+diff oracle/alias.4.res.oracle oracle_equalities/alias.4.res.oracle
 81c81
 <   y ∈ {0; 3; 77}
 ---
 >   y ∈ {77}
-diff tests/value/oracle/alias.5.res.oracle tests/value/oracle_equalities/alias.5.res.oracle
+diff oracle/alias.5.res.oracle oracle_equalities/alias.5.res.oracle
 59a60
-> [eva] tests/value/alias.i:260: starting to merge loop iterations
+> [eva] alias.i:260: starting to merge loop iterations
 170c171
 <   y ∈ {0; 3; 77}
 ---
 >   y ∈ {77}
-diff tests/value/oracle/alias.6.res.oracle tests/value/oracle_equalities/alias.6.res.oracle
+diff oracle/alias.6.res.oracle oracle_equalities/alias.6.res.oracle
 86c86
 <   x ∈ {0; 4; 33}
 ---
 >   x ∈ {33}
-diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_equalities/auto_loop_unroll.0.res.oracle
+diff oracle/auto_loop_unroll.0.res.oracle oracle_equalities/auto_loop_unroll.0.res.oracle
 82c82,85
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] auto_loop_unroll.c:103: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from auto_loop_unroll.c:103.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 91c94,97
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] auto_loop_unroll.c:103: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from auto_loop_unroll.c:103.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_equalities/backward_add_ptr.res.oracle
+diff oracle/backward_add_ptr.res.oracle oracle_equalities/backward_add_ptr.res.oracle
 12c12
 <   Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
 ---
 >   Frama_C_show_each_only_a: {0}, {{ &a }}, {0}
 93c93,96
-< [eva] tests/value/backward_add_ptr.c:110: Reusing old results for call to gm
+< [eva] backward_add_ptr.c:110: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
->   Called from tests/value/backward_add_ptr.c:110.
+>   Called from backward_add_ptr.c:110.
 > [eva] Recording results for gm
 > [eva] Done for function gm
 107c110,113
-< [eva] tests/value/backward_add_ptr.c:125: Reusing old results for call to gm
+< [eva] backward_add_ptr.c:125: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
->   Called from tests/value/backward_add_ptr.c:125.
+>   Called from backward_add_ptr.c:125.
 > [eva] Recording results for gm
 > [eva] Done for function gm
 119c125
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }},
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
 157,160c163,167
 <   {{ garbled mix of &{b}
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }},
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 <   [0..4294967295]
-< [eva] tests/value/backward_add_ptr.c:160: Reusing old results for call to gm
+< [eva] backward_add_ptr.c:160: Reusing old results for call to gm
 ---
 >   {{ garbled mix of &{b} (origin: Arithmetic Bottom) }}, [0..4294967295]
 > [eva] computing for function gm <- main4 <- main.
->   Called from tests/value/backward_add_ptr.c:160.
+>   Called from backward_add_ptr.c:160.
 > [eva] Recording results for gm
 > [eva] Done for function gm
 178c185
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }},
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
 180c187
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }}
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }}
 ---
 >   (origin: Arithmetic Bottom) }}
 188c195
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }}
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }}
 ---
 >   (origin: Arithmetic Bottom) }}
 194c201
-<   (origin: Arithmetic {tests/value/backward_add_ptr.c:68}) }},
+<   (origin: Arithmetic {backward_add_ptr.c:68}) }},
 ---
 >   (origin: Arithmetic Bottom) }},
 211a219,222
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:33}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:33}) }}
 >   {{ garbled mix of &{a}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:33}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:33}) }}
 >   {{ garbled mix of &{b}
 232a244,245
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:106}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:106}) }}
 234a248,251
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:107}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:107}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:115}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:115}) }}
 238c255,257
-<     (origin: Arithmetic {tests/value/backward_add_ptr.c:115}) }}
+<     (origin: Arithmetic {backward_add_ptr.c:115}) }}
 ---
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:116}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:116}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:121}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:121}) }}
 240a260,263
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:122}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:122}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:130}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:130}) }}
 242a266,267
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:136}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:136}) }}
 245a271,272
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:137}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:137}) }}
 >   {{ garbled mix of &{a; b}
 246a274,275
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:145}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:145}) }}
 248a278,285
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:150}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:150}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:151}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:151}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:156}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:156}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:157}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:157}) }}
 250a288,311
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:165}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:165}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:165}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:165}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:166}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:166}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:166}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:166}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:171}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:171}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:171}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:171}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:172}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:172}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:172}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:172}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:177}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:177}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:177}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:177}) }}
 >   {{ garbled mix of &{a; b}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:178}) }}
+>     (origin: Arithmetic {backward_add_ptr.c:178}) }}
 >   {{ garbled mix of &{b; c}
->     (origin: Arithmetic {tests/value/backward_add_ptr.c:178}) }}
-diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_equalities/bitfield.res.oracle
+>     (origin: Arithmetic {backward_add_ptr.c:178}) }}
+diff oracle/bitfield.res.oracle oracle_equalities/bitfield.res.oracle
 138a139,141
-> [eva] tests/value/bitfield.i:71: 
+> [eva] bitfield.i:71: 
 >   Frama_C_show_each:
->   {{ garbled mix of &{b} (origin: Misaligned {tests/value/bitfield.i:70}) }}
-diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_equalities/bitwise_pointer.res.oracle
+>   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+diff oracle/bitwise_pointer.res.oracle oracle_equalities/bitwise_pointer.res.oracle
 62c62
 <   x ∈ [0..9]
 ---
@@ -266,14 +266,14 @@ diff tests/value/oracle/bitwise_pointer.res.oracle tests/value/oracle_equalities
 <   x1 ∈ [0..9]
 ---
 >   x1 ∈ {5}
-diff tests/value/oracle/call_simple.res.oracle tests/value/oracle_equalities/call_simple.res.oracle
+diff oracle/call_simple.res.oracle oracle_equalities/call_simple.res.oracle
 28c28
 <   c ∈ [--..--]
 ---
 >   c ∈ [-2147483648..2147483646]
-diff tests/value/oracle/case_analysis.res.oracle tests/value/oracle_equalities/case_analysis.res.oracle
+diff oracle/case_analysis.res.oracle oracle_equalities/case_analysis.res.oracle
 11a12,15
-> [eva] tests/value/case_analysis.i:18: 
+> [eva] case_analysis.i:18: 
 >   The evaluation of the expression r * r
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
@@ -281,57 +281,57 @@ diff tests/value/oracle/case_analysis.res.oracle tests/value/oracle_equalities/c
 <   rq ∈ [-0.0000000000000000 .. 100.0000000000000000]
 ---
 >   rq ∈ [0.0000000000000000 .. 100.0000000000000000]
-diff tests/value/oracle/descending.res.oracle tests/value/oracle_equalities/descending.res.oracle
+diff oracle/descending.res.oracle oracle_equalities/descending.res.oracle
 42c42
 <   i ∈ {31; 32}
 ---
 >   i ∈ {31}
-diff tests/value/oracle/domains_function.res.oracle tests/value/oracle_equalities/domains_function.res.oracle
+diff oracle/domains_function.res.oracle oracle_equalities/domains_function.res.oracle
 19,20c19
-< [eva] tests/value/domains_function.c:92: 
+< [eva] domains_function.c:92: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:92: Frama_C_show_each_top: {3}
+> [eva] domains_function.c:92: Frama_C_show_each_top: {3}
 28,29c27
-< [eva] tests/value/domains_function.c:77: 
+< [eva] domains_function.c:77: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:77: Frama_C_show_each_top: {1}
+> [eva] domains_function.c:77: Frama_C_show_each_top: {1}
 32,33c30
-< [eva] tests/value/domains_function.c:96: 
+< [eva] domains_function.c:96: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:96: Frama_C_show_each_top: {1}
+> [eva] domains_function.c:96: Frama_C_show_each_top: {1}
 36,37c33
-< [eva] tests/value/domains_function.c:84: 
+< [eva] domains_function.c:84: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+> [eva] domains_function.c:84: Frama_C_show_each_top: {2}
 40,41c36
-< [eva] tests/value/domains_function.c:98: 
+< [eva] domains_function.c:98: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:98: Frama_C_show_each_top: {2}
+> [eva] domains_function.c:98: Frama_C_show_each_top: {2}
 60,61c55
-< [eva] tests/value/domains_function.c:84: 
+< [eva] domains_function.c:84: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:84: Frama_C_show_each_top: {2}
+> [eva] domains_function.c:84: Frama_C_show_each_top: {2}
 64,65c58
-< [eva] tests/value/domains_function.c:113: 
+< [eva] domains_function.c:113: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:113: Frama_C_show_each_top: {2}
+> [eva] domains_function.c:113: Frama_C_show_each_top: {2}
 78,79c71
-< [eva] tests/value/domains_function.c:55: 
+< [eva] domains_function.c:55: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:55: Frama_C_show_each_top: {42}
+> [eva] domains_function.c:55: Frama_C_show_each_top: {42}
 108,109c100
-< [eva] tests/value/domains_function.c:64: 
+< [eva] domains_function.c:64: 
 <   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] tests/value/domains_function.c:64: Frama_C_show_each_top: {42}
+> [eva] domains_function.c:64: Frama_C_show_each_top: {42}
 116c107
 <   result ∈ [--..--]
 ---
@@ -348,7 +348,7 @@ diff tests/value/oracle/domains_function.res.oracle tests/value/oracle_equalitie
 <   result ∈ [--..--]
 ---
 >   result ∈ {2}
-diff tests/value/oracle/downcast.2.res.oracle tests/value/oracle_equalities/downcast.2.res.oracle
+diff oracle/downcast.2.res.oracle oracle_equalities/downcast.2.res.oracle
 114c114
 <   ux ∈ [--..--]
 ---
@@ -357,76 +357,76 @@ diff tests/value/oracle/downcast.2.res.oracle tests/value/oracle_equalities/down
 <   ux ∈ [--..--]
 ---
 >   ux ∈ [0..65535]
-diff tests/value/oracle/fptr.1.res.oracle tests/value/oracle_equalities/fptr.1.res.oracle
+diff oracle/fptr.1.res.oracle oracle_equalities/fptr.1.res.oracle
 55,57d54
-< [eva] tests/value/fptr.i:67: 
+< [eva] fptr.i:67: 
 <   Frama_C_show_each_F: {{ NULL + [0..4294967295] ; &h ; &hh }}
-< [eva] tests/value/fptr.i:68: Reusing old results for call to f
+< [eva] fptr.i:68: Reusing old results for call to f
 69c66
 <   n ∈ {0; 1; 2}
 ---
 >   n ∈ {0; 1}
-diff tests/value/oracle/from_call.0.res.oracle tests/value/oracle_equalities/from_call.0.res.oracle
+diff oracle/from_call.0.res.oracle oracle_equalities/from_call.0.res.oracle
 68c68,73
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
 78c83,88
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g
 > [eva] Done for function g
-diff tests/value/oracle/from_call.1.res.oracle tests/value/oracle_equalities/from_call.1.res.oracle
+diff oracle/from_call.1.res.oracle oracle_equalities/from_call.1.res.oracle
 64c64,67
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [eva] Done for function g
 72c75,78
-< [eva] tests/value/from_call.i:20: Reusing old results for call to g
+< [eva] from_call.i:20: Reusing old results for call to g
 ---
 > [eva] computing for function g <- f <- main.
->   Called from tests/value/from_call.i:20.
+>   Called from from_call.i:20.
 > [eva] Recording results for g
 > [eva] Done for function g
-diff tests/value/oracle/from_termin.res.oracle tests/value/oracle_equalities/from_termin.res.oracle
+diff oracle/from_termin.res.oracle oracle_equalities/from_termin.res.oracle
 9a10
-> [eva] tests/value/from_termin.i:8: starting to merge loop iterations
-diff tests/value/oracle/imprecise_invalid_write.res.oracle tests/value/oracle_equalities/imprecise_invalid_write.res.oracle
+> [eva] from_termin.i:8: starting to merge loop iterations
+diff oracle/imprecise_invalid_write.res.oracle oracle_equalities/imprecise_invalid_write.res.oracle
 29a30,31
-> [kernel] tests/value/imprecise_invalid_write.i:9: 
+> [kernel] imprecise_invalid_write.i:9: 
 >   imprecise size for variable main1 (Undefined sizeof on a function.)
-diff tests/value/oracle/incompatible_states.res.oracle tests/value/oracle_equalities/incompatible_states.res.oracle
+diff oracle/incompatible_states.res.oracle oracle_equalities/incompatible_states.res.oracle
 14a15,18
-> [eva] tests/value/incompatible_states.c:24: 
+> [eva] incompatible_states.c:24: 
 >   The evaluation of the expression x * x
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
 27,29c31,34
-< [eva:alarm] tests/value/incompatible_states.c:41: Warning: 
+< [eva:alarm] incompatible_states.c:41: Warning: 
 <   accessing uninitialized left-value.
 <   assert \initialized(&t[(int)((int)(2 * i) / 2)]);
 ---
-> [eva] tests/value/incompatible_states.c:41: 
+> [eva] incompatible_states.c:41: 
 >   The evaluation of the expression t[(2 * i) / 2]
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
 41,42d45
-< [eva:alarm] tests/value/incompatible_states.c:53: Warning: 
+< [eva:alarm] incompatible_states.c:53: Warning: 
 <   division by zero. assert t[i] ≢ 0;
 47,49d49
-< [eva] tests/value/incompatible_states.c:41: 
+< [eva] incompatible_states.c:41: 
 <   assertion 'Eva,initialization' got final status invalid.
 < [scope:rm_asserts] removing 2 assertion(s)
 55c55
@@ -437,262 +437,262 @@ diff tests/value/oracle/incompatible_states.res.oracle tests/value/oracle_equali
 <   t[0] ∈ {0; 1}
 ---
 >   t[0] ∈ {0}
-diff tests/value/oracle/library.res.oracle tests/value/oracle_equalities/library.res.oracle
+diff oracle/library.res.oracle oracle_equalities/library.res.oracle
 129,132d128
-< [eva:alarm] tests/value/library.i:44: Warning: 
+< [eva:alarm] library.i:44: Warning: 
 <   non-finite float value. assert \is_finite(*pf);
-< [eva:alarm] tests/value/library.i:44: Warning: 
+< [eva:alarm] library.i:44: Warning: 
 <   non-finite float value. assert \is_finite(\add_float(*pf, *pf));
-diff tests/value/oracle/long_const.0.res.oracle tests/value/oracle_equalities/long_const.0.res.oracle
+diff oracle/long_const.0.res.oracle oracle_equalities/long_const.0.res.oracle
 19c19,22
-< [eva] tests/value/long_const.i:25: Reusing old results for call to LL_ABS
+< [eva] long_const.i:25: Reusing old results for call to LL_ABS
 ---
 > [eva] computing for function LL_ABS <- div64 <- main.
->   Called from tests/value/long_const.i:25.
+>   Called from long_const.i:25.
 > [eva] Recording results for LL_ABS
 > [eva] Done for function LL_ABS
-diff tests/value/oracle/long_const.1.res.oracle tests/value/oracle_equalities/long_const.1.res.oracle
+diff oracle/long_const.1.res.oracle oracle_equalities/long_const.1.res.oracle
 19c19,22
-< [eva] tests/value/long_const.i:25: Reusing old results for call to LL_ABS
+< [eva] long_const.i:25: Reusing old results for call to LL_ABS
 ---
 > [eva] computing for function LL_ABS <- div64 <- main.
->   Called from tests/value/long_const.i:25.
+>   Called from long_const.i:25.
 > [eva] Recording results for LL_ABS
 > [eva] Done for function LL_ABS
-diff tests/value/oracle/modulo.res.oracle tests/value/oracle_equalities/modulo.res.oracle
+diff oracle/modulo.res.oracle oracle_equalities/modulo.res.oracle
 40a41,119
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: [-10..-1], [-9..-1], [-8..0]
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: [-10..-1], [1..9], [-8..0]
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: [1..10], [-9..-1], [0..8]
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: [1..10], [1..9], [0..8]
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [-9..-1], [-8..0]
+> [eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [1..9], [-8..0]
+> [eva] modulo.i:41: Frama_C_show_each_1: [1..10], [-9..-1], [0..8]
+> [eva] modulo.i:41: Frama_C_show_each_1: [1..10], [1..9], [0..8]
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   [1..9], {1; 2; 3; 4; 5; 6; 7; 8}, {0; 1; 2; 3; 4; 5; 6; 7}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   [-9..-1], {1; 2; 3; 4; 5; 6; 7; 8}, {-7; -6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   [1..9], {-8; -7; -6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5; 6; 7}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   [-9..-1], {-8; -7; -6; -5; -4; -3; -2; -1}, {-7; -6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-8; -7; -6; -5; -4; -3; -2; -1},
 >   {-7; -6; -5; -4; -3; -2; -1},
 >   {-6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-8; -7; -6; -5; -4; -3; -2; -1},
 >   {1; 2; 3; 4; 5; 6; 7},
 >   {-6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {1; 2; 3; 4; 5; 6; 7; 8}, {-7; -6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5; 6}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {1; 2; 3; 4; 5; 6; 7; 8}, {1; 2; 3; 4; 5; 6; 7}, {0; 1; 2; 3; 4; 5; 6}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {1; 2; 3; 4; 5; 6; 7}, {1; 2; 3; 4; 5; 6}, {0; 1; 2; 3; 4; 5}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-7; -6; -5; -4; -3; -2; -1}, {1; 2; 3; 4; 5; 6}, {-5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {1; 2; 3; 4; 5; 6; 7}, {-6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-7; -6; -5; -4; -3; -2; -1},
 >   {-6; -5; -4; -3; -2; -1},
 >   {-5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-6; -5; -4; -3; -2; -1}, {-5; -4; -3; -2; -1}, {-4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {-6; -5; -4; -3; -2; -1}, {1; 2; 3; 4; 5}, {-4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1:
 >   {1; 2; 3; 4; 5; 6}, {-5; -4; -3; -2; -1}, {0; 1; 2; 3; 4}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {1; 2; 3; 4; 5; 6}, {1; 2; 3; 4; 5}, {0; 1; 2; 3; 4}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {1; 2; 3; 4; 5}, {1; 2; 3; 4}, {0; 1; 2; 3}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-5; -4; -3; -2; -1}, {1; 2; 3; 4}, {-3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {1; 2; 3; 4; 5}, {-4; -3; -2; -1}, {0; 1; 2; 3}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-5; -4; -3; -2; -1}, {-4; -3; -2; -1}, {-3; -2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-4; -3; -2; -1}, {-3; -2; -1}, {-2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-4; -3; -2; -1}, {1; 2; 3}, {-2; -1; 0}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {1; 2; 3; 4}, {-3; -2; -1}, {0; 1; 2}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {1; 2; 3; 4}, {1; 2; 3}, {0; 1; 2}
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: {1; 2; 3}, {1; 2}, {0; 1}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: Frama_C_show_each_1: {1; 2; 3}, {1; 2}, {0; 1}
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-3; -2; -1}, {1; 2}, {-1; 0}
-> [eva] tests/value/modulo.i:41: Frama_C_show_each_1: {1; 2; 3}, {-2; -1}, {0; 1}
-> [eva] tests/value/modulo.i:41: 
+> [eva] modulo.i:41: Frama_C_show_each_1: {1; 2; 3}, {-2; -1}, {0; 1}
+> [eva] modulo.i:41: 
 >   Frama_C_show_each_1: {-3; -2; -1}, {-2; -1}, {-1; 0}
 50a130,208
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: [-10..-1], [1..9], [-8..0]
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: [-10..-1], [-9..-1], [-8..0]
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: [1..10], [1..9], [0..8]
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: [1..10], [-9..-1], [0..8]
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: Frama_C_show_each_2: [-10..-1], [1..9], [-8..0]
+> [eva] modulo.i:53: Frama_C_show_each_2: [-10..-1], [-9..-1], [-8..0]
+> [eva] modulo.i:53: Frama_C_show_each_2: [1..10], [1..9], [0..8]
+> [eva] modulo.i:53: Frama_C_show_each_2: [1..10], [-9..-1], [0..8]
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   [-9..-1], {1; 2; 3; 4; 5; 6; 7; 8}, {-7; -6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   [1..9], {1; 2; 3; 4; 5; 6; 7; 8}, {0; 1; 2; 3; 4; 5; 6; 7}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   [-9..-1], {-8; -7; -6; -5; -4; -3; -2; -1}, {-7; -6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   [1..9], {-8; -7; -6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5; 6; 7}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-8; -7; -6; -5; -4; -3; -2; -1},
 >   {1; 2; 3; 4; 5; 6; 7},
 >   {-6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-8; -7; -6; -5; -4; -3; -2; -1},
 >   {-7; -6; -5; -4; -3; -2; -1},
 >   {-6; -5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {1; 2; 3; 4; 5; 6; 7; 8}, {1; 2; 3; 4; 5; 6; 7}, {0; 1; 2; 3; 4; 5; 6}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {1; 2; 3; 4; 5; 6; 7; 8}, {-7; -6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5; 6}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-7; -6; -5; -4; -3; -2; -1}, {1; 2; 3; 4; 5; 6}, {-5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {1; 2; 3; 4; 5; 6; 7}, {1; 2; 3; 4; 5; 6}, {0; 1; 2; 3; 4; 5}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-7; -6; -5; -4; -3; -2; -1},
 >   {-6; -5; -4; -3; -2; -1},
 >   {-5; -4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {1; 2; 3; 4; 5; 6; 7}, {-6; -5; -4; -3; -2; -1}, {0; 1; 2; 3; 4; 5}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-6; -5; -4; -3; -2; -1}, {1; 2; 3; 4; 5}, {-4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {-6; -5; -4; -3; -2; -1}, {-5; -4; -3; -2; -1}, {-4; -3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {1; 2; 3; 4; 5; 6}, {1; 2; 3; 4; 5}, {0; 1; 2; 3; 4}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2:
 >   {1; 2; 3; 4; 5; 6}, {-5; -4; -3; -2; -1}, {0; 1; 2; 3; 4}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-5; -4; -3; -2; -1}, {1; 2; 3; 4}, {-3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {1; 2; 3; 4; 5}, {1; 2; 3; 4}, {0; 1; 2; 3}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-5; -4; -3; -2; -1}, {-4; -3; -2; -1}, {-3; -2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {1; 2; 3; 4; 5}, {-4; -3; -2; -1}, {0; 1; 2; 3}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-4; -3; -2; -1}, {1; 2; 3}, {-2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-4; -3; -2; -1}, {-3; -2; -1}, {-2; -1; 0}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {1; 2; 3; 4}, {1; 2; 3}, {0; 1; 2}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {1; 2; 3; 4}, {-3; -2; -1}, {0; 1; 2}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-3; -2; -1}, {1; 2}, {-1; 0}
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: {1; 2; 3}, {1; 2}, {0; 1}
-> [eva] tests/value/modulo.i:53: 
+> [eva] modulo.i:53: Frama_C_show_each_2: {1; 2; 3}, {1; 2}, {0; 1}
+> [eva] modulo.i:53: 
 >   Frama_C_show_each_2: {-3; -2; -1}, {-2; -1}, {-1; 0}
-> [eva] tests/value/modulo.i:53: Frama_C_show_each_2: {1; 2; 3}, {-2; -1}, {0; 1}
+> [eva] modulo.i:53: Frama_C_show_each_2: {1; 2; 3}, {-2; -1}, {0; 1}
 60a219,231
-> [eva] tests/value/modulo.i:64: Frama_C_show_each_3: [-10..10], [-9..9], [-8..8]
-> [eva] tests/value/modulo.i:64: Frama_C_show_each_3: [-9..9], [-8..8], [-7..7]
-> [eva] tests/value/modulo.i:64: Frama_C_show_each_3: [-8..8], [-7..7], [-6..6]
-> [eva] tests/value/modulo.i:64: Frama_C_show_each_3: [-7..7], [-6..6], [-5..5]
-> [eva] tests/value/modulo.i:64: Frama_C_show_each_3: [-6..6], [-5..5], [-4..4]
-> [eva] tests/value/modulo.i:64: 
+> [eva] modulo.i:64: Frama_C_show_each_3: [-10..10], [-9..9], [-8..8]
+> [eva] modulo.i:64: Frama_C_show_each_3: [-9..9], [-8..8], [-7..7]
+> [eva] modulo.i:64: Frama_C_show_each_3: [-8..8], [-7..7], [-6..6]
+> [eva] modulo.i:64: Frama_C_show_each_3: [-7..7], [-6..6], [-5..5]
+> [eva] modulo.i:64: Frama_C_show_each_3: [-6..6], [-5..5], [-4..4]
+> [eva] modulo.i:64: 
 >   Frama_C_show_each_3:
 >   [-5..5], {-4; -3; -2; -1; 1; 2; 3; 4}, {-3; -2; -1; 0; 1; 2; 3}
-> [eva] tests/value/modulo.i:64: 
+> [eva] modulo.i:64: 
 >   Frama_C_show_each_3:
 >   {-4; -3; -2; -1; 1; 2; 3; 4}, {-3; -2; -1; 1; 2; 3}, {-2; -1; 0; 1; 2}
-> [eva] tests/value/modulo.i:64: 
+> [eva] modulo.i:64: 
 >   Frama_C_show_each_3: {-3; -2; -1; 1; 2; 3}, {-2; -1; 1; 2}, {-1; 0; 1}
-diff tests/value/oracle/non_natural.res.oracle tests/value/oracle_equalities/non_natural.res.oracle
+diff oracle/non_natural.res.oracle oracle_equalities/non_natural.res.oracle
 58a59,60
-> [kernel] tests/value/non_natural.i:30: 
+> [kernel] non_natural.i:30: 
 >   more than 200(12500) elements to enumerate. Approximating.
 65a68,71
-> [kernel] tests/value/non_natural.i:23: 
+> [kernel] non_natural.i:23: 
 >   more than 200(12500) elements to enumerate. Approximating.
-> [kernel] tests/value/non_natural.i:23: 
+> [kernel] non_natural.i:23: 
 >   more than 200(12501) elements to enumerate. Approximating.
 70a77,80
-> [kernel] tests/value/non_natural.i:24: 
+> [kernel] non_natural.i:24: 
 >   more than 200(12500) elements to enumerate. Approximating.
-> [kernel] tests/value/non_natural.i:24: 
+> [kernel] non_natural.i:24: 
 >   more than 200(12501) elements to enumerate. Approximating.
 78a89,90
-> [kernel] tests/value/non_natural.i:25: 
+> [kernel] non_natural.i:25: 
 >   more than 200(12500) elements to enumerate. Approximating.
 86a99,100
-> [kernel] tests/value/non_natural.i:26: 
+> [kernel] non_natural.i:26: 
 >   more than 200(12500) elements to enumerate. Approximating.
 94a109,110
-> [kernel] tests/value/non_natural.i:27: 
+> [kernel] non_natural.i:27: 
 >   more than 200(12500) elements to enumerate. Approximating.
 102a119,120
-> [kernel] tests/value/non_natural.i:28: 
+> [kernel] non_natural.i:28: 
 >   more than 200(12500) elements to enumerate. Approximating.
 110a129,130
-> [kernel] tests/value/non_natural.i:29: 
+> [kernel] non_natural.i:29: 
 >   more than 200(12500) elements to enumerate. Approximating.
 127,146d146
-< [kernel] tests/value/non_natural.i:23: 
+< [kernel] non_natural.i:23: 
 <   more than 200(12501) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:23: 
+< [kernel] non_natural.i:23: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:24: 
+< [kernel] non_natural.i:24: 
 <   more than 200(12501) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:24: 
+< [kernel] non_natural.i:24: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:25: 
+< [kernel] non_natural.i:25: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:26: 
+< [kernel] non_natural.i:26: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:27: 
+< [kernel] non_natural.i:27: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:28: 
+< [kernel] non_natural.i:28: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:29: 
+< [kernel] non_natural.i:29: 
 <   more than 200(12500) elements to enumerate. Approximating.
-< [kernel] tests/value/non_natural.i:30: 
+< [kernel] non_natural.i:30: 
 <   more than 200(12500) elements to enumerate. Approximating.
 199a200,201
-> [kernel] tests/value/non_natural.i:39: 
+> [kernel] non_natural.i:39: 
 >   more than 200(12500) elements to enumerate. Approximating.
-diff tests/value/oracle/nonlin.res.oracle tests/value/oracle_equalities/nonlin.res.oracle
+diff oracle/nonlin.res.oracle oracle_equalities/nonlin.res.oracle
 188c188
 <   q ∈ {{ &x + [-400..400],0%4 }}
 ---
 >   q ∈ {{ &x }}
-diff tests/value/oracle/octagons.res.oracle tests/value/oracle_equalities/octagons.res.oracle
+diff oracle/octagons.res.oracle oracle_equalities/octagons.res.oracle
 29c29
 <   Frama_C_show_each_unreduced_unsigned: [0..4294967295], [0..4294967295]
 ---
@@ -701,17 +701,17 @@ diff tests/value/oracle/octagons.res.oracle tests/value/oracle_equalities/octago
 <   t ∈ [--..--] or UNINITIALIZED
 ---
 >   t ∈ [6..4294967295] or UNINITIALIZED
-diff tests/value/oracle/offsetmap.0.res.oracle tests/value/oracle_equalities/offsetmap.0.res.oracle
+diff oracle/offsetmap.0.res.oracle oracle_equalities/offsetmap.0.res.oracle
 40d39
 < [eva] Recording results for g
 42a42
 > [eva] Recording results for g
-diff tests/value/oracle/offsetmap.1.res.oracle tests/value/oracle_equalities/offsetmap.1.res.oracle
+diff oracle/offsetmap.1.res.oracle oracle_equalities/offsetmap.1.res.oracle
 40d39
 < [eva] Recording results for g
 42a42
 > [eva] Recording results for g
-diff tests/value/oracle/origin.0.res.oracle tests/value/oracle_equalities/origin.0.res.oracle
+diff oracle/origin.0.res.oracle oracle_equalities/origin.0.res.oracle
 249,250c249
 <   pm2[bits 0 to 15]# ∈ {{ (? *)&a }}%32, bits 16 to 31 
 <      [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
@@ -722,45 +722,45 @@ diff tests/value/oracle/origin.0.res.oracle tests/value/oracle_equalities/origin
 <      [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
 ---
 >   pm2 ∈ {{ &a + {-4} ; &b + {-4} }}
-diff tests/value/oracle/period.res.oracle tests/value/oracle_equalities/period.res.oracle
+diff oracle/period.res.oracle oracle_equalities/period.res.oracle
 88,94d87
-< [eva:alarm] tests/value/period.c:53: Warning: 
+< [eva:alarm] period.c:53: Warning: 
 <   pointer downcast. assert (unsigned int)(&g) ≤ 2147483647;
-< [eva] tests/value/period.c:53: 
+< [eva] period.c:53: 
 <   Assigning imprecise value to p.
-<   The imprecision originates from Arithmetic {tests/value/period.c:53}
-< [eva:alarm] tests/value/period.c:54: Warning: 
+<   The imprecision originates from Arithmetic {period.c:53}
+< [eva:alarm] period.c:54: Warning: 
 <   out of bounds read. assert \valid_read(p);
 99d91
 < [scope:rm_asserts] removing 1 assertion(s)
-diff tests/value/oracle/plevel.res.oracle tests/value/oracle_equalities/plevel.res.oracle
+diff oracle/plevel.res.oracle oracle_equalities/plevel.res.oracle
 12d11
 < [eva] Recording results for main
 14a14
 > [eva] Recording results for main
-diff tests/value/oracle/pointer_comp.res.oracle tests/value/oracle_equalities/pointer_comp.res.oracle
+diff oracle/pointer_comp.res.oracle oracle_equalities/pointer_comp.res.oracle
 30a31,34
-> [kernel] tests/value/pointer_comp.c:43: 
+> [kernel] pointer_comp.c:43: 
 >   imprecise size for variable g (Undefined sizeof on a function.)
-> [kernel] tests/value/pointer_comp.c:43: 
+> [kernel] pointer_comp.c:43: 
 >   imprecise size for variable f (Undefined sizeof on a function.)
-diff tests/value/oracle/ptr_relation.0.res.oracle tests/value/oracle_equalities/ptr_relation.0.res.oracle
+diff oracle/ptr_relation.0.res.oracle oracle_equalities/ptr_relation.0.res.oracle
 23c23
 <   i ∈ {0; 77; 333}
 ---
 >   i ∈ {77}
-diff tests/value/oracle/redundant_alarms.res.oracle tests/value/oracle_equalities/redundant_alarms.res.oracle
+diff oracle/redundant_alarms.res.oracle oracle_equalities/redundant_alarms.res.oracle
 10,13d9
-< [eva:alarm] tests/value/redundant_alarms.c:11: Warning: 
+< [eva:alarm] redundant_alarms.c:11: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);
-< [eva:alarm] tests/value/redundant_alarms.c:12: Warning: 
+< [eva:alarm] redundant_alarms.c:12: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);
 24,25d19
-< [eva:alarm] tests/value/redundant_alarms.c:21: Warning: 
+< [eva:alarm] redundant_alarms.c:21: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&t[i]);
 63,65c57
 < [scope:rm_asserts] removing 3 assertion(s)
-< [scope:rm_asserts] tests/value/redundant_alarms.c:12: 
+< [scope:rm_asserts] redundant_alarms.c:12: 
 <   removing redundant assert Eva: initialization: \initialized(p);
 ---
 > [scope:rm_asserts] removing 2 assertion(s)
@@ -776,11 +776,11 @@ diff tests/value/oracle/redundant_alarms.res.oracle tests/value/oracle_equalitie
 <   *p = 1;
 <   int z = *p + 1;
 <   int w = *p + 2;
-diff tests/value/oracle/relation_reduction.res.oracle tests/value/oracle_equalities/relation_reduction.res.oracle
+diff oracle/relation_reduction.res.oracle oracle_equalities/relation_reduction.res.oracle
 24,27d23
-< [eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+< [eva:alarm] relation_reduction.i:20: Warning: 
 <   accessing out of bounds index. assert 0 ≤ y;
-< [eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+< [eva:alarm] relation_reduction.i:20: Warning: 
 <   accessing out of bounds index. assert y < 9;
 34,37c30,33
 <   R1 ∈ [-2147483648..2147483637]
@@ -800,7 +800,7 @@ diff tests/value/oracle/relation_reduction.res.oracle tests/value/oracle_equalit
 <     y; t; tab[0..8]
 ---
 >     y; t; tab[0..5]
-diff tests/value/oracle/relation_shift.res.oracle tests/value/oracle_equalities/relation_shift.res.oracle
+diff oracle/relation_shift.res.oracle oracle_equalities/relation_shift.res.oracle
 35,36c35,36
 <   x ∈ [-2147483647..2147483647]
 <   y ∈ [-2147483648..2147483646]
@@ -813,7 +813,7 @@ diff tests/value/oracle/relation_shift.res.oracle tests/value/oracle_equalities/
 ---
 >   x ∈ [-2147483647..2147483642]
 >   y ∈ [-2147483648..2147483645]
-diff tests/value/oracle/relations.res.oracle tests/value/oracle_equalities/relations.res.oracle
+diff oracle/relations.res.oracle oracle_equalities/relations.res.oracle
 60,61c60
 <   u[0] ∈ [-2147483648..2147483646]
 <    [1] ∈ [--..--]
@@ -829,23 +829,23 @@ diff tests/value/oracle/relations.res.oracle tests/value/oracle_equalities/relat
 >   R2 ∈ {0; 3}
 >   R3 ∈ {0; 2}
 >   R4 ∈ {0; 2}
-diff tests/value/oracle/relations2.res.oracle tests/value/oracle_equalities/relations2.res.oracle
+diff oracle/relations2.res.oracle oracle_equalities/relations2.res.oracle
 59c59
 <   n ∈ [0..512]
 ---
 >   n ∈ [1..512]
 133d132
-< [eva] tests/value/relations2.i:57: Frama_C_show_each_NO2:
-diff tests/value/oracle/struct2.res.oracle tests/value/oracle_equalities/struct2.res.oracle
+< [eva] relations2.i:57: Frama_C_show_each_NO2:
+diff oracle/struct2.res.oracle oracle_equalities/struct2.res.oracle
 55a56,57
-> [kernel] tests/value/struct2.i:78: Warning: 
+> [kernel] struct2.i:78: Warning: 
 >   all target addresses were invalid. This path is assumed to be dead.
 59,60d60
 <   accessing out of bounds index. assert 0 ≤ (int)(tab2[i] + j);
-< [eva:alarm] tests/value/struct2.i:82: Warning: 
+< [eva:alarm] struct2.i:82: Warning: 
 83,84d82
 <   accessing out of bounds index. assert (int)(i + j) < 2;
-< [eva:alarm] tests/value/struct2.i:185: Warning: 
+< [eva:alarm] struct2.i:185: Warning: 
 106c104
 < [scope:rm_asserts] removing 2 assertion(s)
 ---

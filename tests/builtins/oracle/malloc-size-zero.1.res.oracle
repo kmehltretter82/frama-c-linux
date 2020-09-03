@@ -7,8 +7,7 @@
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:16.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_main_l16
+[eva] malloc-size-zero.c:10: allocating variable __malloc_main_l16
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] malloc-size-zero.c:20: Frama_C_show_each_not_NULL_p1:
@@ -17,8 +16,7 @@
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_main_l29
+[eva] malloc-size-zero.c:10: allocating variable __malloc_main_l29
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] malloc-size-zero.c:27: starting to merge loop iterations
@@ -59,10 +57,8 @@
 [eva] malloc-size-zero.c:37: Call to builtin free
 [eva] malloc-size-zero.c:37: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc-size-zero.c:37: 
-  strong free on bases: {__malloc_main_l16}
-[eva] malloc-size-zero.c:39: 
-  Frama_C_show_each: {{ &__malloc_w_main_l29 }}
+[eva:malloc] malloc-size-zero.c:37: strong free on bases: {__malloc_main_l16}
+[eva] malloc-size-zero.c:39: Frama_C_show_each: {{ &__malloc_w_main_l29 }}
 [eva] malloc-size-zero.c:40: assertion got status valid.
 [eva:alarm] malloc-size-zero.c:42: Warning: 
   accessing uninitialized left-value. assert \initialized(&q1);
@@ -75,8 +71,7 @@
 [eva] malloc-size-zero.c:44: Call to builtin free
 [eva] malloc-size-zero.c:44: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc-size-zero.c:44: 
-  weak free on bases: {__malloc_w_main_l29}
+[eva:malloc] malloc-size-zero.c:44: weak free on bases: {__malloc_w_main_l29}
 [eva] Recording results for main
 [eva] done for function main
 [eva] malloc-size-zero.c:35: 

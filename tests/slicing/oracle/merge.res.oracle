@@ -7,25 +7,22 @@
   G2 ∈ {0}
   G3 ∈ {0}
 [eva] computing for function g <- main.
-  Called from merge.i:26.
+  Called from merge.i:25.
 [eva] computing for function init <- g <- main.
-  Called from merge.i:21.
+  Called from merge.i:20.
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function add <- g <- main.
-  Called from merge.i:22.
-[eva:alarm] merge.i:17: Warning: 
+  Called from merge.i:21.
+[eva:alarm] merge.i:16: Warning: 
   signed overflow. assert -2147483648 ≤ G1 + a1;
-[eva:alarm] merge.i:17: Warning: 
-  signed overflow. assert G1 + a1 ≤ 2147483647;
-[eva:alarm] merge.i:17: Warning: 
+[eva:alarm] merge.i:16: Warning: signed overflow. assert G1 + a1 ≤ 2147483647;
+[eva:alarm] merge.i:16: Warning: 
   signed overflow. assert -2147483648 ≤ G2 + a2;
-[eva:alarm] merge.i:17: Warning: 
-  signed overflow. assert G2 + a2 ≤ 2147483647;
-[eva:alarm] merge.i:17: Warning: 
+[eva:alarm] merge.i:16: Warning: signed overflow. assert G2 + a2 ≤ 2147483647;
+[eva:alarm] merge.i:16: Warning: 
   signed overflow. assert -2147483648 ≤ G3 + a3;
-[eva:alarm] merge.i:17: Warning: 
-  signed overflow. assert G3 + a3 ≤ 2147483647;
+[eva:alarm] merge.i:16: Warning: signed overflow. assert G3 + a3 ≤ 2147483647;
 [eva] Recording results for add
 [eva] Done for function add
 [eva] Recording results for g

@@ -97,10 +97,8 @@
 [eva] Done for function f1
 [eva] Recording results for main
 [from] Computing for function main
-[from] cast_fun.i:60: Warning: 
-  variadic call detected. Using only 0 argument(s).
-[from] cast_fun.i:65: Warning: 
-  variadic call detected. Using only 0 argument(s).
+[from] cast_fun.i:60: Warning: variadic call detected. Using only 0 argument(s).
+[from] cast_fun.i:65: Warning: variadic call detected. Using only 0 argument(s).
 [from] cast_fun.i:110: Warning: 
   variadic call detected. Using only 0 argument(s).
 [from] cast_fun.i:121: Warning: 
@@ -111,18 +109,12 @@
   variadic call detected. Using only 0 argument(s).
 [from] Done for function main
 [eva] done for function main
-[eva] cast_fun.i:80: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] cast_fun.i:85: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] cast_fun.i:95: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] cast_fun.i:100: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] cast_fun.i:126: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] cast_fun.i:131: 
-  assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:80: assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:85: assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:95: assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:100: assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:126: assertion 'Eva,function_pointer' got final status invalid.
+[eva] cast_fun.i:131: assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p1 ∈ {{ &f1 ; (int (*)(int ))&f2 ; &f3 }} or UNINITIALIZED
@@ -142,8 +134,7 @@
 [from] Done for function f3
 [from] Computing for function f5 <-main
 [from] Done for function f5
-[from] cast_fun.i:85: Warning: 
-  variadic call detected. Using only 1 argument(s).
+[from] cast_fun.i:85: Warning: variadic call detected. Using only 1 argument(s).
 [from] Computing for function f6 <-main
 [from] Done for function f6
 [from] Computing for function f9 <-main

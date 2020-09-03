@@ -10,20 +10,17 @@
   function main: precondition c + d ≡ 3 got status unknown.
 [eva] computing for function f <- main.
   Called from disjoint_status.i:18.
-[eva] disjoint_status.i:18: 
-  function f: precondition 'ReqTrue' got status valid.
+[eva] disjoint_status.i:18: function f: precondition 'ReqTrue' got status valid.
 [eva:alarm] disjoint_status.i:8: Warning: 
   assertion 'A1' got status invalid (stopping propagation).
 [eva] disjoint_status.i:6: 
   function f: no state left, postcondition 'PostTrue' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] disjoint_status.i:19: Warning: 
-  assertion got status unknown.
+[eva:alarm] disjoint_status.i:19: Warning: assertion got status unknown.
 [eva] computing for function f <- main.
   Called from disjoint_status.i:20.
-[eva] disjoint_status.i:20: 
-  function f: precondition 'ReqTrue' got status valid.
+[eva] disjoint_status.i:20: function f: precondition 'ReqTrue' got status valid.
 [eva] disjoint_status.i:8: assertion 'A1' got status valid.
 [eva] disjoint_status.i:9: assertion 'A2' got status valid.
 [eva] disjoint_status.i:6: 

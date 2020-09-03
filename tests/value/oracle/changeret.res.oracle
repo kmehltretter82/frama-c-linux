@@ -19,8 +19,7 @@
   Called from changeret.i:32.
 [eva] computing for function g <- main2 <- main.
   Called from changeret.i:27.
-[eva:alarm] changeret.i:19: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] changeret.i:19: Warning: out of bounds read. assert \valid_read(p);
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main2

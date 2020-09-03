@@ -11,12 +11,10 @@
 [eva:alarm] bug_0244.i:12: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[eva:alarm] bug_0244.i:12: Warning: 
-  out of bounds read. assert \valid_read(p);
+[eva:alarm] bug_0244.i:12: Warning: out of bounds read. assert \valid_read(p);
 [eva] Recording results for main
 [eva] done for function main
-[eva] bug_0244.i:12: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] bug_0244.i:12: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

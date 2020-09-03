@@ -85,10 +85,8 @@
 [eva:alarm] strings.i:64: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from nondet?s5 + 2:& c)
-[eva:alarm] strings.i:66: Warning: 
-  out of bounds write. assert \valid(s5);
-[eva:alarm] strings.i:68: Warning: 
-  out of bounds write. assert \valid(s6);
+[eva:alarm] strings.i:66: Warning: out of bounds write. assert \valid(s5);
+[eva:alarm] strings.i:68: Warning: out of bounds write. assert \valid(s6);
 [eva] Recording results for string_writes
 [eva] Done for function string_writes
 [eva:locals-escaping] strings.i:143: Warning: 
@@ -180,12 +178,9 @@
 [eva] Done for function long_chain
 [eva] Recording results for main
 [eva] done for function main
-[eva] strings.i:23: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] strings.i:39: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] strings.i:42: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] strings.i:23: assertion 'Eva,mem_access' got final status invalid.
+[eva] strings.i:39: assertion 'Eva,mem_access' got final status invalid.
+[eva] strings.i:42: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function strcmp:
   s1_0 ∈ {{ &long_chain_0 + [0..29] }}

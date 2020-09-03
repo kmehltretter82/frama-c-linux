@@ -50,8 +50,7 @@
 [eva] computing for function get <- k <- f <- g.
   Called from select_return_bis.i:28.
 [eva] Done for function get
-[eva] select_return_bis.i:30: 
-  Reusing old results for call to k_bis
+[eva] select_return_bis.i:30: Reusing old results for call to k_bis
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function k <- f <- g.
@@ -59,8 +58,7 @@
 [eva] computing for function get <- k <- f <- g.
   Called from select_return_bis.i:28.
 [eva] Done for function get
-[eva] select_return_bis.i:30: 
-  Reusing old results for call to k_bis
+[eva] select_return_bis.i:30: Reusing old results for call to k_bis
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function send <- f <- g.
@@ -144,4 +142,4 @@ void f_slice_1(int y)
 }
 
 
-[kernel] Parsing result/ocode_4_select_return_bis.i (no preprocessing)
+[kernel] Parsing ocode_4_select_return_bis.i (no preprocessing)

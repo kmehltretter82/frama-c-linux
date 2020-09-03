@@ -7,8 +7,7 @@
   G ∈ [--..--]
   H ∈ [--..--]
   J ∈ [--..--]
-[eva:alarm] modifies.i:8: Warning: 
-  signed overflow. assert J + 1 ≤ 2147483647;
+[eva:alarm] modifies.i:8: Warning: signed overflow. assert J + 1 ≤ 2147483647;
 [eva:alarm] modifies.i:8: Warning: 
   signed overflow. assert -2147483648 ≤ TAB[4] - 1;
 [eva:alarm] modifies.i:11: Warning: 

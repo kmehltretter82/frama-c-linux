@@ -40,12 +40,10 @@
 [eva] initialized_copy.i:85: 
   Frama_C_show_each: .i1 ∈ {1}
                      .i2 ∈ UNINITIALIZED
-[eva:alarm] initialized_copy.i:90: Warning: 
-  assertion got status unknown.
+[eva:alarm] initialized_copy.i:90: Warning: assertion got status unknown.
 [eva:alarm] initialized_copy.i:92: Warning: 
   accessing uninitialized left-value. assert \initialized(&v_0[i]);
-[eva:alarm] initialized_copy.i:98: Warning: 
-  assertion got status unknown.
+[eva:alarm] initialized_copy.i:98: Warning: assertion got status unknown.
 [eva:alarm] initialized_copy.i:101: Warning: 
   accessing uninitialized left-value. assert \initialized(&v_1[i_0]);
 [eva] initialized_copy.i:102: 
@@ -60,8 +58,7 @@
      [2..9] ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] initialized_copy.i:108: Warning: 
-  assertion got status unknown.
+[eva:alarm] initialized_copy.i:108: Warning: assertion got status unknown.
 [eva:alarm] initialized_copy.i:111: Warning: 
   accessing uninitialized left-value. assert \initialized(&v_2[i_1]);
 [eva] initialized_copy.i:112: 

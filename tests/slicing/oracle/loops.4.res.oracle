@@ -46,4 +46,4 @@ void test_infinite_loop_3(int ctrl1, int ctrl2, int data1, int data2)
 }
 
 
-[kernel] Parsing result/ocode_4_loops.i (no preprocessing)
+[kernel] Parsing ocode_4_loops.i (no preprocessing)

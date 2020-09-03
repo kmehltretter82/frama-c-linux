@@ -89,9 +89,8 @@
 [eva] computing for function init_array_nondet <- strchr_large <- main.
   Called from strchr.c:197.
 [eva] strchr.c:189: Call to builtin memset
-[eva] strchr.c:189: 
-  function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] strchr.c:189: function memset: precondition 'valid_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
@@ -334,12 +333,9 @@
 [eva] Done for function strchr_escaping
 [eva] computing for function strchr_big_array <- main.
   Called from strchr.c:557.
-[eva:alarm] strchr.c:353: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strchr.c:355: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strchr.c:357: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:353: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:355: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:357: Warning: out of bounds write. assert \valid(p);
 [eva] strchr.c:366: Call to builtin strchr
 [eva:alarm] strchr.c:366: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -373,12 +369,9 @@
 [eva] strchr.c:378: assertion got status valid.
 [eva] strchr.c:379: assertion got status valid.
 [eva] strchr.c:380: assertion got status valid.
-[eva:alarm] strchr.c:381: Warning: 
-  assertion 'refined' got status unknown.
-[eva:alarm] strchr.c:382: Warning: 
-  assertion 'refined' got status unknown.
-[eva:alarm] strchr.c:383: Warning: 
-  assertion 'refined' got status unknown.
+[eva:alarm] strchr.c:381: Warning: assertion 'refined' got status unknown.
+[eva:alarm] strchr.c:382: Warning: assertion 'refined' got status unknown.
+[eva:alarm] strchr.c:383: Warning: assertion 'refined' got status unknown.
 [eva] computing for function init_array_nondet <- strchr_big_array <- main.
   Called from strchr.c:385.
 [eva] strchr.c:189: Call to builtin memset
@@ -394,12 +387,9 @@
 [eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
-[eva:alarm] strchr.c:389: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strchr.c:391: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strchr.c:393: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:389: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:391: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strchr.c:393: Warning: out of bounds write. assert \valid(p);
 [eva] strchr.c:394: Call to builtin strchr
 [eva:alarm] strchr.c:394: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -412,8 +402,7 @@
 [eva:alarm] strchr.c:396: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
 [eva] strchr.c:396: Frama_C_show_each_mystrchr: [0..3999999]
-[eva] strchr.c:397: 
-  Frama_C_show_each: [0..799], [0..803], [0..3999999]
+[eva] strchr.c:397: Frama_C_show_each: [0..799], [0..803], [0..3999999]
 [eva] strchr.c:398: assertion got status valid.
 [eva] strchr.c:399: assertion got status valid.
 [eva] strchr.c:400: assertion got status valid.
@@ -429,8 +418,7 @@
 [eva:alarm] strchr.c:404: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
 [eva] strchr.c:404: Frama_C_show_each_mystrchr: [0..3999999]
-[eva] strchr.c:405: 
-  Frama_C_show_each: [0..799], [0..803], [0..3999999]
+[eva] strchr.c:405: Frama_C_show_each: [0..799], [0..803], [0..3999999]
 [eva] strchr.c:406: assertion got status valid.
 [eva] strchr.c:407: assertion got status valid.
 [eva] strchr.c:408: assertion got status valid.
@@ -459,8 +447,7 @@
 [eva] strchr.c:430: Call to builtin strchr
 [eva:alarm] strchr.c:430: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] strchr.c:430: 
-  Frama_C_show_each_mystrchr: {10; 14; 15; 16; 17; 18; 19}
+[eva] strchr.c:430: Frama_C_show_each_mystrchr: {10; 14; 15; 16; 17; 18; 19}
 [eva] strchr.c:431: assertion got status valid.
 [eva] strchr.c:433: Call to builtin strchr
 [eva:alarm] strchr.c:433: Warning: 
@@ -492,8 +479,7 @@
 [eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] strchr.c:465: 
-  Frama_C_show_each_res: {-1; 0}, {-1}, {-1}, {-1}, {-1; 0; 1}
+[eva] strchr.c:465: Frama_C_show_each_res: {-1; 0}, {-1}, {-1}, {-1}, {-1; 0; 1}
 [eva] strchr.c:466: assertion got status valid.
 [eva] strchr.c:467: assertion got status valid.
 [eva] strchr.c:468: assertion got status valid.
@@ -608,8 +594,7 @@
   Frama_C_show_each_res:
   {-1; 1; 2; 3}, {-1; 0; 1; 2; 3}, {-1; 0}, {-1; 0; 1; 2; 3}, {-1; 0; 1; 3}
 [eva] strchr.c:507: assertion got status valid.
-[eva:alarm] strchr.c:508: Warning: 
-  assertion 'refined' got status unknown.
+[eva:alarm] strchr.c:508: Warning: assertion 'refined' got status unknown.
 [eva] strchr.c:509: assertion got status valid.
 [eva] strchr.c:510: assertion got status valid.
 [eva] strchr.c:511: assertion got status valid.
@@ -621,8 +606,7 @@
 [eva] strchr.c:519: Call to builtin strchr
 [eva] strchr.c:519: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] strchr.c:519: 
-  Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3; 4}
+[eva] strchr.c:519: Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3; 4}
 [eva] strchr.c:520: assertion got status valid.
 [eva] strchr.c:524: Call to builtin strchr
 [eva:alarm] strchr.c:524: Warning: 
@@ -665,8 +649,7 @@
   signed overflow. assert -2147483648 ≤ _ss - s;
 [eva:alarm] strchr.c:536: Warning: 
   signed overflow. assert _ss - s ≤ 2147483647;
-[eva] strchr.c:536: 
-  Frama_C_show_each_mystrchr: [-2147483648..2147483647]
+[eva] strchr.c:536: Frama_C_show_each_mystrchr: [-2147483648..2147483647]
 [eva] Recording results for strchr_invalid
 [eva] Done for function strchr_invalid
 [eva] computing for function strchr_garbled_mix_in_char <- main.
@@ -733,9 +716,7 @@
   z1 ∈ {0}
   z2 ∈ {0}
 [eva:final-states] Values at end of function strchr_garbled_mix_in_char:
-  garbled ∈
-         {{ garbled mix of &{x}
-          (origin: Arithmetic {strchr.c:541}) }}
+  garbled ∈ {{ garbled mix of &{x} (origin: Arithmetic {strchr.c:541}) }}
 [eva:final-states] Values at end of function strchr_initialization:
   c ∈ {0}
   empty_or_uninitialized[0] ∈ {0} or UNINITIALIZED

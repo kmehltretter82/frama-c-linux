@@ -19,24 +19,17 @@
   Called from cond_integer_cast_of_float.i:121.
 [eva:alarm] cond_integer_cast_of_float.i:121: Warning: 
   function main1: precondition got status unknown.
-[eva] cond_integer_cast_of_float.i:17: 
-  Frama_C_show_each_float_: [2. .. 8.]
+[eva] cond_integer_cast_of_float.i:17: Frama_C_show_each_float_: [2. .. 8.]
 [eva] cond_integer_cast_of_float.i:20: 
   Frama_C_show_each_float_: [-0. .. 4.99999952316]
-[eva] cond_integer_cast_of_float.i:23: 
-  Frama_C_show_each_float_: [1. .. 8.]
+[eva] cond_integer_cast_of_float.i:23: Frama_C_show_each_float_: [1. .. 8.]
 [eva] cond_integer_cast_of_float.i:26: 
   Frama_C_show_each_float_: [3. .. 3.99999976158]
-[eva] cond_integer_cast_of_float.i:29: 
-  Frama_C_show_each_double: [2. .. 8.]
-[eva] cond_integer_cast_of_float.i:32: 
-  Frama_C_show_each_double: [-0. .. 5.]
-[eva] cond_integer_cast_of_float.i:35: 
-  Frama_C_show_each_double: [1. .. 8.]
-[eva] cond_integer_cast_of_float.i:38: 
-  Frama_C_show_each_double: [3. .. 4.]
-[eva] cond_integer_cast_of_float.i:73: 
-  Frama_C_show_each: [-0. .. 8.], [0..8]
+[eva] cond_integer_cast_of_float.i:29: Frama_C_show_each_double: [2. .. 8.]
+[eva] cond_integer_cast_of_float.i:32: Frama_C_show_each_double: [-0. .. 5.]
+[eva] cond_integer_cast_of_float.i:35: Frama_C_show_each_double: [1. .. 8.]
+[eva] cond_integer_cast_of_float.i:38: Frama_C_show_each_double: [3. .. 4.]
+[eva] cond_integer_cast_of_float.i:73: Frama_C_show_each: [-0. .. 8.], [0..8]
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.

@@ -71,8 +71,7 @@
 [eva] Done for function f4_11
 [eva] computing for function f4_12 <- f4_2 <- f4 <- main.
   Called from memexec.c:76.
-[eva:alarm] memexec.c:63: Warning: 
-  accessing out of bounds index. assert i < 10;
+[eva:alarm] memexec.c:63: Warning: accessing out of bounds index. assert i < 10;
 [kernel] memexec.c:63: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for f4_12

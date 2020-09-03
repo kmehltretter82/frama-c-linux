@@ -13,8 +13,8 @@
   Called from recursion.i:67.
 [eva] recursion.i:8: Warning: 
   recursive call during value analysis
-  of ff (ff <- ff :: recursion.i:67 <- main). Assuming the call has
-  no effect. The analysis will be unsound.
+  of ff (ff <- ff :: recursion.i:67 <- main). Assuming the call has no effect.
+  The analysis will be unsound.
 [eva] computing for function ff <- ff <- main.
   Called from recursion.i:8.
 [eva] using specification for function ff
@@ -24,9 +24,8 @@
 [eva] computing for function g <- main.
   Called from recursion.i:68.
 [eva] recursion.i:39: Warning: 
-  recursive call during value analysis
-  of g (g <- g :: recursion.i:68 <- main). Assuming the call has
-  no effect. The analysis will be unsound.
+  recursive call during value analysis of g (g <- g :: recursion.i:68 <- main).
+  Assuming the call has no effect. The analysis will be unsound.
 [eva] computing for function g <- g <- main.
   Called from recursion.i:39.
 [eva] using specification for function g
@@ -36,9 +35,8 @@
 [eva] computing for function h <- main.
   Called from recursion.i:70.
 [eva] recursion.i:44: Warning: 
-  recursive call during value analysis
-  of h (h <- h :: recursion.i:70 <- main). Assuming the call has
-  no effect. The analysis will be unsound.
+  recursive call during value analysis of h (h <- h :: recursion.i:70 <- main).
+  Assuming the call has no effect. The analysis will be unsound.
 [eva] computing for function h <- h <- main.
   Called from recursion.i:44.
 [eva] using specification for function h
@@ -48,8 +46,7 @@
 [eva] recursion.i:71: Frama_C_show_each: Bottom, Bottom
 [eva] computing for function escaping_formal <- main.
   Called from recursion.i:72.
-[eva] recursion.i:72: 
-  function escaping_formal: precondition got status valid.
+[eva] recursion.i:72: function escaping_formal: precondition got status valid.
 [eva] recursion.i:58: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
 [eva] recursion.i:59: Warning: 
   recursive call during value analysis
@@ -63,17 +60,15 @@
 [eva] using specification for function escaping_formal
 [eva] Done for function escaping_formal
 [eva] recursion.i:62: Frama_C_show_each: {{ &i }}, {10}, {0}, {10}
-[eva] recursion.i:54: 
-  function escaping_formal: postcondition got status valid.
+[eva] recursion.i:54: function escaping_formal: postcondition got status valid.
 [eva] Recording results for escaping_formal
 [eva] Done for function escaping_formal
 [eva] computing for function f <- main.
   Called from recursion.i:73.
 [eva] recursion.i:28: Frama_C_show_each: {2}, {0}
 [eva] recursion.i:30: Warning: 
-  recursive call during value analysis
-  of f (f <- f :: recursion.i:73 <- main). Assuming the call has
-  no effect. The analysis will be unsound.
+  recursive call during value analysis of f (f <- f :: recursion.i:73 <- main).
+  Assuming the call has no effect. The analysis will be unsound.
 [eva] computing for function f <- f <- main.
   Called from recursion.i:30.
 [eva] using specification for function f

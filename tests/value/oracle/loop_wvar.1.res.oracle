@@ -18,10 +18,8 @@
 [eva] loop_wvar.i:71: Frama_C_show_each: {0}, {0}, {0}
 [eva] loop_wvar.i:69: starting to merge loop iterations
 [eva] loop_wvar.i:71: Frama_C_show_each: {0; 1}, {0; 1}, {0; 1}
-[eva] loop_wvar.i:71: 
-  Frama_C_show_each: {0; 1; 2}, {0; 1; 2}, {0; 1; 2}
-[eva] loop_wvar.i:71: 
-  Frama_C_show_each: [0..9], {0; 1; 2; 3}, {0; 1; 2; 3}
+[eva] loop_wvar.i:71: Frama_C_show_each: {0; 1; 2}, {0; 1; 2}, {0; 1; 2}
+[eva] loop_wvar.i:71: Frama_C_show_each: [0..9], {0; 1; 2; 3}, {0; 1; 2; 3}
 [eva] loop_wvar.i:71: 
   Frama_C_show_each: [0..9], {0; 1; 2; 3; 4}, {0; 1; 2; 3; 4}
 [eva] loop_wvar.i:71: Frama_C_show_each: [0..9], [0..17], [0..11]

@@ -146,8 +146,7 @@
   (tmp_0 from any_int())
 [eva] Recording results for main
 [eva] done for function main
-[eva] array_access.c:19: 
-  assertion 'Eva,index_bound' got final status invalid.
+[eva] array_access.c:19: assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   R ∈ {16777472; 16777473}

@@ -8,8 +8,7 @@
 [eva] logic_ptr_cast.i:8: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {logic_ptr_cast.i:8}
-[eva:alarm] logic_ptr_cast.i:9: Warning: 
-  assertion got status unknown.
+[eva:alarm] logic_ptr_cast.i:9: Warning: assertion got status unknown.
 [eva] logic_ptr_cast.i:14: 
   Frama_C_show_each: {{ &t + {0; 1; 2; 3; 4; 5; 6; 7} }}
 [eva] Recording results for main

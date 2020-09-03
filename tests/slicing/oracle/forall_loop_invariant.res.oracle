@@ -9,14 +9,12 @@
 [eva] forall_loop_invariant.i:10: loop invariant got status valid.
 [eva] forall_loop_invariant.i:11: loop invariant got status valid.
 [eva] forall_loop_invariant.i:12: loop invariant got status valid.
-[eva] forall_loop_invariant.i:14: 
-  starting to merge loop iterations
+[eva] forall_loop_invariant.i:14: starting to merge loop iterations
 [eva:alarm] forall_loop_invariant.i:11: Warning: 
   loop invariant got status unknown.
 [eva:alarm] forall_loop_invariant.i:12: Warning: 
   loop invariant got status unknown.
-[eva:alarm] forall_loop_invariant.i:18: Warning: 
-  assertion got status unknown.
+[eva:alarm] forall_loop_invariant.i:18: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
 [slicing] initializing slicing ...
@@ -90,4 +88,4 @@ int main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_forall_loop_invariant.i (no preprocessing)
+[kernel] Parsing ocode_0_forall_loop_invariant.i (no preprocessing)

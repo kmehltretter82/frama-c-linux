@@ -9,8 +9,7 @@
 [eva] Recording results for f_valid
 [from] Computing for function f_valid
 [from] Done for function f_valid
-[eva] assigns_from_direct.i:21: 
-  function f_valid: assigns got status valid.
+[eva] assigns_from_direct.i:21: function f_valid: assigns got status valid.
 [eva] assigns_from_direct.i:21: 
   function f_valid: \from ... part in assign clause got status valid.
 [eva] Done for function f_valid

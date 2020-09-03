@@ -45,10 +45,8 @@
   Frama_C_show_each_before_second_merge: {1}, {0}, {1}
 [eva] partitioning-annots.c:83: 
   Frama_C_show_each_before_second_merge: {0}, {0}, {0}
-[eva] partitioning-annots.c:85: 
-  Frama_C_show_each_end: {1}, {0; 1; 2}, {1}
-[eva] partitioning-annots.c:85: 
-  Frama_C_show_each_end: {0}, {0; 1; 2}, {0}
+[eva] partitioning-annots.c:85: Frama_C_show_each_end: {1}, {0; 1; 2}, {1}
+[eva] partitioning-annots.c:85: Frama_C_show_each_end: {0}, {0; 1; 2}, {0}
 [eva] Recording results for test_split
 [eva] done for function test_split
 [eva] ====== VALUES COMPUTED ======

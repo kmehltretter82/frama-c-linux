@@ -4,8 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] test.i:11: Warning: 
-  out of bounds read. assert \valid_read(v + j);
+[eva:alarm] test.i:11: Warning: out of bounds read. assert \valid_read(v + j);
 [eva:alarm] test.i:11: Warning: 
   out of bounds read. assert \valid_read(v + (int)(j + ecart));
 [eva:alarm] test.i:13: Warning: 

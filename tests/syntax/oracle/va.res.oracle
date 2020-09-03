@@ -7,6 +7,6 @@
   Previous declaration was at va.c:12
 [kernel] va.c:21: User Error: 
   The last argument in call to __builtin_va_start should be the last formal argument of f
-[kernel] User Error: stopping on file "va.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
+[kernel] User Error: stopping on file "va.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

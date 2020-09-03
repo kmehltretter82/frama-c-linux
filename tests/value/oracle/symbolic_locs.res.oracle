@@ -8,8 +8,7 @@
   u[0..9] ∈ [--..--]
 [eva] computing for function main2_kill_direct <- main.
   Called from symbolic_locs.i:119.
-[eva:alarm] symbolic_locs.i:29: Warning: 
-  assertion got status unknown.
+[eva:alarm] symbolic_locs.i:29: Warning: assertion got status unknown.
 [eva] symbolic_locs.i:32: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -34,8 +33,7 @@
 [eva] Done for function main2_kill_direct
 [eva] computing for function main3_kill_indirect <- main.
   Called from symbolic_locs.i:120.
-[eva:alarm] symbolic_locs.i:41: Warning: 
-  assertion got status unknown.
+[eva:alarm] symbolic_locs.i:41: Warning: assertion got status unknown.
 [eva] symbolic_locs.i:44: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -62,8 +60,7 @@
 [eva] Done for function main3_kill_indirect
 [eva] computing for function main4_scope_right <- main.
   Called from symbolic_locs.i:121.
-[eva:alarm] symbolic_locs.i:51: Warning: 
-  assertion got status unknown.
+[eva:alarm] symbolic_locs.i:51: Warning: assertion got status unknown.
 [eva:alarm] symbolic_locs.i:54: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva] symbolic_locs.i:55: 
@@ -95,8 +92,7 @@
 [eva] Done for function main4_scope_right
 [eva] computing for function main5_scope_lv <- main.
   Called from symbolic_locs.i:122.
-[eva:alarm] symbolic_locs.i:63: Warning: 
-  assertion got status unknown.
+[eva:alarm] symbolic_locs.i:63: Warning: assertion got status unknown.
 [eva] symbolic_locs.i:65: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -120,10 +116,8 @@
 [eva] Done for function main5_scope_lv
 [eva] computing for function main6_ghost_dep <- main.
   Called from symbolic_locs.i:123.
-[eva:alarm] symbolic_locs.i:83: Warning: 
-  assertion got status unknown.
-[eva:alarm] symbolic_locs.i:86: Warning: 
-  assertion got status unknown.
+[eva:alarm] symbolic_locs.i:83: Warning: assertion got status unknown.
+[eva:alarm] symbolic_locs.i:86: Warning: assertion got status unknown.
 [eva] symbolic_locs.i:98: 
   Frama_C_dump_each:
   # Cvalue domain:

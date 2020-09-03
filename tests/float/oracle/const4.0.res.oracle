@@ -7,8 +7,7 @@
 [eva] Computing initial state
 [eva:alarm] const4.i:7: Warning: 
   non-finite float value. assert \is_finite((float)3.405e38f);
-[eva] const4.i:7: Warning: 
-  evaluation of initializer '(double)3.405e38f' failed
+[eva] const4.i:7: Warning: evaluation of initializer '(double)3.405e38f' failed
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NOT ACCESSIBLE

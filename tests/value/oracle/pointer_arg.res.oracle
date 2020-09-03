@@ -26,10 +26,8 @@
   out of bounds write. assert \valid(*(argv + 0) + 0);
 [eva] Recording results for main
 [eva] done for function main
-[eva] pointer_arg.i:6: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] pointer_arg.i:7: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] pointer_arg.i:6: assertion 'Eva,mem_access' got final status invalid.
+[eva] pointer_arg.i:7: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

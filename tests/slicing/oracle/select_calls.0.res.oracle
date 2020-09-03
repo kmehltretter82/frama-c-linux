@@ -93,4 +93,4 @@ void f(void)
 }
 
 
-[kernel] Parsing result/ocode_0_select_calls.i (no preprocessing)
+[kernel] Parsing ocode_0_select_calls.i (no preprocessing)

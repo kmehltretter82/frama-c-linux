@@ -46,4 +46,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts0190.i (no preprocessing)
+[kernel] Parsing ocode_0_bts0190.i (no preprocessing)

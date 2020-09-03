@@ -19,10 +19,8 @@
   assert ¬\dangling(&q);
 [eva] Recording results for main
 [eva] done for function main
-[eva] bug0245.i:23: 
-  assertion 'Eva,dangling_pointer' got final status invalid.
-[eva] bug0245.i:24: 
-  assertion 'Eva,dangling_pointer' got final status invalid.
+[eva] bug0245.i:23: assertion 'Eva,dangling_pointer' got final status invalid.
+[eva] bug0245.i:24: assertion 'Eva,dangling_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   R ∈ {0}

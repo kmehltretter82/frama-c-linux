@@ -11,8 +11,7 @@
 [eva] Done for function f
 [eva] empty_struct.c:99: 
   Assigning imprecise value to r.
-  The imprecision originates from Library function
-  {empty_struct.c:99}
+  The imprecision originates from Library function {empty_struct.c:99}
 [eva] computing for function g <- main4.
   Called from empty_struct.c:100.
 [kernel:annot:missing-spec] empty_struct.c:100: Warning: 
@@ -24,8 +23,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main4:
   r ∈
-   {{ garbled mix of &{gs}
-    (origin: Library function {empty_struct.c:99}) }}
+   {{ garbled mix of &{gs} (origin: Library function {empty_struct.c:99}) }}
 [from] Computing for function main4
 [from] Computing for function f <-main4
 [from] Done for function f

@@ -11,54 +11,30 @@
   d ∈ [--..--]
 [eva:alarm] sort4.i:25: Warning: 
   function sort4_4: precondition got status unknown.
-[eva:alarm] sort4.i:29: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:29: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:29: Warning: 
-  out of bounds write. assert \valid(t + 1);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds read. assert \valid_read(t + 3);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds write. assert \valid(t + 2);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds read. assert \valid_read(t + 3);
-[eva:alarm] sort4.i:30: Warning: 
-  out of bounds write. assert \valid(t + 3);
-[eva:alarm] sort4.i:31: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:31: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:31: Warning: 
-  out of bounds write. assert \valid(t + 2);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds read. assert \valid_read(t + 3);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds write. assert \valid(t + 1);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds read. assert \valid_read(t + 3);
-[eva:alarm] sort4.i:32: Warning: 
-  out of bounds write. assert \valid(t + 3);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds read. assert \valid_read(t + 1);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds write. assert \valid(t + 1);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds read. assert \valid_read(t + 2);
-[eva:alarm] sort4.i:33: Warning: 
-  out of bounds write. assert \valid(t + 2);
+[eva:alarm] sort4.i:29: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:29: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:29: Warning: out of bounds write. assert \valid(t + 1);
+[eva:alarm] sort4.i:30: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:30: Warning: out of bounds read. assert \valid_read(t + 3);
+[eva:alarm] sort4.i:30: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:30: Warning: out of bounds write. assert \valid(t + 2);
+[eva:alarm] sort4.i:30: Warning: out of bounds read. assert \valid_read(t + 3);
+[eva:alarm] sort4.i:30: Warning: out of bounds write. assert \valid(t + 3);
+[eva:alarm] sort4.i:31: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:31: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:31: Warning: out of bounds write. assert \valid(t + 2);
+[eva:alarm] sort4.i:32: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:32: Warning: out of bounds read. assert \valid_read(t + 3);
+[eva:alarm] sort4.i:32: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:32: Warning: out of bounds write. assert \valid(t + 1);
+[eva:alarm] sort4.i:32: Warning: out of bounds read. assert \valid_read(t + 3);
+[eva:alarm] sort4.i:32: Warning: out of bounds write. assert \valid(t + 3);
+[eva:alarm] sort4.i:33: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:33: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:33: Warning: out of bounds read. assert \valid_read(t + 1);
+[eva:alarm] sort4.i:33: Warning: out of bounds write. assert \valid(t + 1);
+[eva:alarm] sort4.i:33: Warning: out of bounds read. assert \valid_read(t + 2);
+[eva:alarm] sort4.i:33: Warning: out of bounds write. assert \valid(t + 2);
 [eva:alarm] sort4.i:26: Warning: 
   function sort4_4: postcondition got status unknown.
 [eva] Recording results for sort4_4

@@ -7,10 +7,8 @@
   x ∈ [--..--]
   z ∈ [--..--]
   t[0..9] ∈ {0}
-[eva:alarm] annot.i:11: Warning: 
-  signed overflow. assert -2147483648 ≤ x + x;
-[eva:alarm] annot.i:11: Warning: 
-  signed overflow. assert x + x ≤ 2147483647;
+[eva:alarm] annot.i:11: Warning: signed overflow. assert -2147483648 ≤ x + x;
+[eva:alarm] annot.i:11: Warning: signed overflow. assert x + x ≤ 2147483647;
 [eva:alarm] annot.i:11: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(x + x) - x;
 [eva:alarm] annot.i:11: Warning: 
@@ -44,4 +42,4 @@ void f1(void)
 }
 
 
-[kernel] Parsing result/ocode_0_annot.i (no preprocessing)
+[kernel] Parsing ocode_0_annot.i (no preprocessing)

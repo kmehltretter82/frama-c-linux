@@ -22,8 +22,7 @@
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
 [eva] done for function main
-[eva] offset_neg.i:9: 
-  assertion 'Eva,index_bound' got final status invalid.
+[eva] offset_neg.i:9: assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

@@ -39,8 +39,7 @@
 [eva] Done for function strlen
 [eva] Recording results for main
 [eva] done for function main
-[eva] top_pdg_input.c:40: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] top_pdg_input.c:40: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f1:
 Cannot filter: dumping raw memory (including unchanged variables)

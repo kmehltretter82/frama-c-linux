@@ -12,18 +12,15 @@
 [eva] realloc_imprecise.c:13: Call to builtin realloc
 [eva] realloc_imprecise.c:13: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] realloc_imprecise.c:13: 
-  weak free on bases: {__alloc_w_main}
+[eva:malloc] realloc_imprecise.c:13: weak free on bases: {__alloc_w_main}
 [eva] realloc_imprecise.c:15: Call to builtin realloc
 [eva] realloc_imprecise.c:15: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] realloc_imprecise.c:15: 
-  weak free on bases: {__alloc_w_main}
+[eva:malloc] realloc_imprecise.c:15: weak free on bases: {__alloc_w_main}
 [eva] realloc_imprecise.c:16: Call to builtin free
 [eva] realloc_imprecise.c:16: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc_imprecise.c:16: 
-  weak free on bases: {__alloc_w_main}
+[eva:malloc] realloc_imprecise.c:16: weak free on bases: {__alloc_w_main}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

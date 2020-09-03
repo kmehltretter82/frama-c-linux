@@ -4,15 +4,12 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
-[eva:loop-unroll] partitioning-annots.c:26: 
-  loop not completely unrolled
+[eva:loop-unroll] partitioning-annots.c:26: loop not completely unrolled
 [eva] partitioning-annots.c:26: starting to merge loop iterations
-[eva:loop-unroll] partitioning-annots.c:34: 
-  loop not completely unrolled
+[eva:loop-unroll] partitioning-annots.c:34: loop not completely unrolled
 [eva] partitioning-annots.c:34: starting to merge loop iterations
 [eva] partitioning-annots.c:36: starting to merge loop iterations
-[eva:loop-unroll] partitioning-annots.c:50: 
-  loop not completely unrolled
+[eva:loop-unroll] partitioning-annots.c:50: loop not completely unrolled
 [eva] partitioning-annots.c:50: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] done for function test_unroll

@@ -45,9 +45,7 @@
 [pdg] computing for function p2
 [pdg] done for function p2
 [impact] impacted statements of stmt(s) 16 are:
-    call.i:16 (sid 2): if(X) <..>
-    call.i:16 (sid 3): p1(1);
-    call.i:16 (sid 4): p2(0);
-    call.i:30 (sid 12): test();
+    call.i:16 (sid 2): if(X) <..>call.i:16 (sid 3): p1(1);
+    call.i:16 (sid 4): p2(0);call.i:30 (sid 12): test();
     call.i:36 (sid 17): call_test();
 [impact] analysis done

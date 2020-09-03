@@ -15,7 +15,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] write-const.c:18: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] FRAMAC_SHARE/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] write-const.c:19: 
   Frama_C_dump_each:
@@ -42,7 +42,7 @@
 [eva] write-const.c:25: Call to builtin memset
 [eva:alarm] write-const.c:25: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva] share/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] write-const.c:26: 
   Frama_C_dump_each:
@@ -66,8 +66,7 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from write-const.c:46.
-[eva:alarm] write-const.c:32: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] write-const.c:32: Warning: out of bounds write. assert \valid(p);
 [eva] write-const.c:33: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -89,8 +88,7 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from write-const.c:47.
-[eva:alarm] write-const.c:39: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] write-const.c:39: Warning: out of bounds write. assert \valid(p);
 [eva] write-const.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:

@@ -6,15 +6,12 @@
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from zero.i:55.
-[eva:alarm] zero.i:55: Warning: 
-  function main1: precondition got status unknown.
+[eva:alarm] zero.i:55: Warning: function main1: precondition got status unknown.
 [eva] zero.i:10: Frama_C_show_each: {1}
 [eva] zero.i:17: Frama_C_show_each: {1}
-[eva] zero.i:23: 
-  Frama_C_show_each_1: [1.40129846432e-45 .. 3.40282346639e+38]
+[eva] zero.i:23: Frama_C_show_each_1: [1.40129846432e-45 .. 3.40282346639e+38]
 [eva] zero.i:25: Frama_C_show_each_2: [-0. .. 0.]
-[eva] zero.i:29: 
-  Frama_C_show_each_3: [-3.40282346639e+38 .. -1.40129846432e-45]
+[eva] zero.i:29: Frama_C_show_each_3: [-3.40282346639e+38 .. -1.40129846432e-45]
 [eva] zero.i:31: Frama_C_show_each_4: [-0. .. 0.]
 [eva] Recording results for main1
 [eva] Done for function main1

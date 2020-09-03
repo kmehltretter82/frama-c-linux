@@ -21,9 +21,8 @@
   ts[0..4] ∈ {0}
   vol ∈ [--..--]
 [eva] memset.c:33: Call to builtin memset
-[eva] memset.c:33: 
-  function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] memset.c:33: function memset: precondition 'valid_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] memset.c:34: Warning: 
   pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
@@ -32,9 +31,8 @@
   function memset: precondition 'valid_s' got status unknown.
 [eva:imprecision] memset.c:34: 
   Call to builtin precise_memset(({{ garbled mix of &{t2}
-                                  (origin: Arithmetic
-                                  {memset.c:34}) }},{18},
-                                  {400})) failed; destination is not exact
+                                  (origin: Arithmetic {memset.c:34}) }},
+                                  {18},{400})) failed; destination is not exact
 [eva] memset.c:35: Call to builtin memset
 [eva:alarm] memset.c:35: Warning: 
   function memset: precondition 'valid_s' got status unknown.
@@ -47,13 +45,11 @@
 [eva:alarm] memset.c:41: Warning: 
   pointer downcast. assert (unsigned int)((int *)t1) ≤ 2147483647;
 [eva] memset.c:41: Call to builtin memset
-[eva] memset.c:41: 
-  function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:41: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:41: 
   Call to builtin precise_memset(({{ (void *)&t5 }},{{ (int)&t1 }},{400})) failed; value to write is imprecise
 [eva] memset.c:44: Call to builtin memset
-[eva] memset.c:44: 
-  function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:44: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:44: 
   Call to builtin precise_memset(({{ (void *)&t6[10] ; (void *)&t7 }},{34},
                                   {16})) failed; destination is not exact
@@ -69,23 +65,18 @@
 [eva:imprecision] memset.c:54: 
   Call to builtin precise_memset(({{ &t9 + [80..--],0%4 }},{2302},{4})) failed; destination is not exact
 [eva] memset.c:58: Call to builtin memset
-[eva] memset.c:58: 
-  function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:58: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:58: 
   Call to builtin precise_memset(({{ (void *)&t10[4] }},{136},{12; 36})) failed; size is imprecise
 [eva] memset.c:65: Call to builtin memset
-[eva] memset.c:65: 
-  function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:65: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:65: 
   Call to builtin precise_memset(({{ (void *)&t11{[2], [3]} }},{153},{8; 16})) failed; size is imprecise
 [eva] memset.c:68: Call to builtin memset
-[eva] memset.c:68: 
-  function memset: precondition 'valid_s' got status valid.
-[eva:alarm] memset.c:71: Warning: 
-  assertion 'Assume' got status unknown.
+[eva] memset.c:68: function memset: precondition 'valid_s' got status valid.
+[eva:alarm] memset.c:71: Warning: assertion 'Assume' got status unknown.
 [eva] memset.c:72: Call to builtin memset
-[eva] memset.c:72: 
-  function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:72: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:72: 
   Call to builtin precise_memset(({{ &t12 + [0..384],0%32 }},{1},{4})) failed; destination is not exact
 [eva] Recording results for main
@@ -99,9 +90,7 @@
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
-  t5[0..99] ∈
-    {{ garbled mix of &{t1}
-     (origin: Misaligned {memset.c:41}) }}
+  t5[0..99] ∈ {{ garbled mix of &{t1} (origin: Misaligned {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}

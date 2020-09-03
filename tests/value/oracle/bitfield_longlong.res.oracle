@@ -11,8 +11,7 @@
   s32.z ∈ {-1}
 [eva] bitfield_longlong.c:25: 
   Frama_C_show_each: {{ "%zu %zu %zu %zu\n" }}, {8}, {4}, {8}, {4}
-[eva] bitfield_longlong.c:31: 
-  Frama_C_show_each: {{ "%d %d\n" }}, {1}, {0}
+[eva] bitfield_longlong.c:31: Frama_C_show_each: {{ "%d %d\n" }}, {1}, {0}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

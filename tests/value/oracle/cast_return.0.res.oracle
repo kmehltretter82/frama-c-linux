@@ -23,8 +23,7 @@
   Called from cast_return.c:31.
 [eva] Recording results for h
 [eva] Done for function h
-[eva:alarm] cast_return.c:31: Warning: 
-  out of bounds write. assert \valid(*p);
+[eva:alarm] cast_return.c:31: Warning: out of bounds write. assert \valid(*p);
 [kernel] cast_return.c:31: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main1
@@ -61,10 +60,8 @@
 [eva] Done for function main3
 [eva] Recording results for main
 [eva] done for function main
-[eva] cast_return.c:31: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] cast_return.c:50: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] cast_return.c:31: assertion 'Eva,mem_access' got final status invalid.
+[eva] cast_return.c:50: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   
@@ -287,8 +284,7 @@ void main(void)
   Called from cast_return.c:31.
 [eva] Recording results for h
 [eva] Done for function h
-[eva:alarm] cast_return.c:31: Warning: 
-  out of bounds write. assert \valid(*p);
+[eva:alarm] cast_return.c:31: Warning: out of bounds write. assert \valid(*p);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
@@ -318,8 +314,7 @@ void main(void)
 [eva] Done for function main3
 [eva] Recording results for main
 [eva] done for function main
-[eva] cast_return.c:38: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] cast_return.c:38: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   

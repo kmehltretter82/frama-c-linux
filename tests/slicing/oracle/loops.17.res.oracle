@@ -9,8 +9,7 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva:alarm] loops.i:82: Warning: 
-  signed overflow. assert c + 10 ≤ 2147483647;
+[eva:alarm] loops.i:82: Warning: signed overflow. assert c + 10 ≤ 2147483647;
 [eva:alarm] loops.i:88: Warning: assertion got status unknown.
 [eva] computing for function stop <- stop_f2.
   Called from loops.i:89.
@@ -58,4 +57,4 @@ void stop_f2(int c)
 }
 
 
-[kernel] Parsing result/ocode_17_loops.i (no preprocessing)
+[kernel] Parsing ocode_17_loops.i (no preprocessing)

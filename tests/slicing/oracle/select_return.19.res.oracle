@@ -121,4 +121,4 @@ void f_slice_1(int y)
 }
 
 
-[kernel] Parsing result/ocode_19_select_return.i (no preprocessing)
+[kernel] Parsing ocode_19_select_return.i (no preprocessing)

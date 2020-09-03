@@ -179,8 +179,7 @@
 [eva] done for function main
 [eva] reevaluate_alarms.i:14: 
   assertion 'Eva,signed_overflow' got final status valid.
-[eva] reevaluate_alarms.i:14: 
-  assertion 'Eva,mem_access' got final status valid.
+[eva] reevaluate_alarms.i:14: assertion 'Eva,mem_access' got final status valid.
 [eva] reevaluate_alarms.i:20: 
   assertion 'Eva,signed_overflow' got final status valid.
 [eva] reevaluate_alarms.i:30: 

@@ -30,99 +30,75 @@
   fp_ilogb0 ∈ {-2147483648.}
   fp_ilogbnan ∈ {-2147483648.}
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
-[eva] math_h.c:45: 
-  function atan: precondition 'finite_arg' got status valid.
+[eva] math_h.c:45: function atan: precondition 'finite_arg' got status valid.
 [eva] math_h.c:45: Call to builtin atan
 [eva:alarm] math_h.c:45: Warning: 
   function atan: precondition 'finite_arg' got status unknown.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
-[eva] math_h.c:46: 
-  function atanf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:46: function atanf: precondition 'finite_arg' got status valid.
 [eva] math_h.c:46: Call to builtin atanf
 [eva:alarm] math_h.c:46: Warning: 
   function atanf: precondition 'finite_arg' got status unknown.
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
 [eva] using specification for function atanl
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
-[eva] math_h.c:47: 
-  function atanl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:47: function atanl: precondition 'finite_arg' got status valid.
 [eva] Done for function atanl
 [eva] computing for function atanl <- main.
   Called from math_h.c:47.
@@ -132,43 +108,35 @@
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
 [eva] using specification for function fabs
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
-[eva] math_h.c:48: 
-  function fabs: precondition 'finite_arg' got status valid.
+[eva] math_h.c:48: function fabs: precondition 'finite_arg' got status valid.
 [eva] Done for function fabs
 [eva] computing for function fabs <- main.
   Called from math_h.c:48.
@@ -178,43 +146,35 @@
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
 [eva] using specification for function fabsf
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
-[eva] math_h.c:49: 
-  function fabsf: precondition 'finite_arg' got status valid.
+[eva] math_h.c:49: function fabsf: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsf
 [eva] computing for function fabsf <- main.
   Called from math_h.c:49.
@@ -224,43 +184,35 @@
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
 [eva] using specification for function fabsl
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.
-[eva] math_h.c:50: 
-  function fabsl: precondition 'finite_arg' got status valid.
+[eva] math_h.c:50: function fabsl: precondition 'finite_arg' got status valid.
 [eva] Done for function fabsl
 [eva] computing for function fabsl <- main.
   Called from math_h.c:50.

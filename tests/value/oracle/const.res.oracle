@@ -20,8 +20,7 @@
 [eva] computing for function const_formal <- main.
   Called from const.i:116.
 [eva] const.i:20: Frama_C_show_each: [-2147483648..2147483647]
-[eva:alarm] const.i:21: Warning: 
-  out of bounds write. assert \valid(&i);
+[eva:alarm] const.i:21: Warning: out of bounds write. assert \valid(&i);
 [kernel] const.i:21: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for const_formal
@@ -37,8 +36,7 @@
 [eva] computing for function pointer_to_const <- modify_I <- main.
   Called from const.i:38.
 [eva] const.i:25: Frama_C_show_each: {2}
-[eva:alarm] const.i:26: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] const.i:26: Warning: out of bounds write. assert \valid(p);
 [kernel] const.i:26: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for pointer_to_const
@@ -46,8 +44,7 @@
 [eva] computing for function const_destination <- modify_I <- main.
   Called from const.i:39.
 [eva] const.i:31: Frama_C_show_each: {2}
-[eva:alarm] const.i:32: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] const.i:32: Warning: out of bounds write. assert \valid(p);
 [kernel] const.i:32: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for const_destination
@@ -139,10 +136,8 @@
 [eva] const.i:130: Frama_C_show_each_S2: {45}, {2}
 [eva] Recording results for main
 [eva] done for function main
-[eva] const.i:21: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] const.i:26: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] const.i:21: assertion 'Eva,mem_access' got final status invalid.
+[eva] const.i:26: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function aux_ret_const:
   __retres ∈ {1}

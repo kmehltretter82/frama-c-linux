@@ -32,12 +32,10 @@
   __malloc_main1_l12 ∈ {17}
   ==END OF DUMP==
 [eva] realloc.c:16: Call to builtin realloc
-[eva] realloc.c:16: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:16: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
 [eva] realloc.c:16: allocating variable __realloc_main1_l16
-[eva:malloc] realloc.c:16: 
-  strong free on bases: {__malloc_main1_l12}
+[eva:malloc] realloc.c:16: strong free on bases: {__malloc_main1_l12}
 [eva] realloc.c:17: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -64,10 +62,8 @@
                      [1] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] realloc.c:18: Call to builtin free
-[eva] realloc.c:18: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:18: 
-  strong free on bases: {__realloc_main1_l16}
+[eva] realloc.c:18: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:18: strong free on bases: {__realloc_main1_l16}
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
@@ -80,15 +76,12 @@
 [eva] Done for function Frama_C_interval
 [eva] realloc.c:23: Call to builtin malloc
 [eva] realloc.c:23: allocating variable __malloc_main2_l23
-[eva:alarm] realloc.c:24: Warning: 
-  out of bounds write. assert \valid(r + i);
+[eva:alarm] realloc.c:24: Warning: out of bounds write. assert \valid(r + i);
 [eva] realloc.c:26: Call to builtin realloc
-[eva] realloc.c:26: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:26: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main2_l23}
 [eva] realloc.c:26: allocating variable __realloc_main2_l26
-[eva:malloc] realloc.c:26: 
-  strong free on bases: {__malloc_main2_l23}
+[eva:malloc] realloc.c:26: strong free on bases: {__malloc_main2_l23}
 [eva] realloc.c:27: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -116,10 +109,8 @@
                      [4..5] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] realloc.c:28: Call to builtin free
-[eva] realloc.c:28: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:28: 
-  strong free on bases: {__realloc_main2_l26}
+[eva] realloc.c:28: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:28: strong free on bases: {__realloc_main2_l26}
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
@@ -160,8 +151,7 @@
   __malloc_main3_l35[0..5] ∈ {6}
   ==END OF DUMP==
 [eva] realloc.c:46: Call to builtin realloc
-[eva] realloc.c:46: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:46: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main3_l32, __malloc_main3_l35}
 [eva] realloc.c:46: allocating variable __realloc_main3_l46
 [eva:malloc] realloc.c:46: 
@@ -200,23 +190,17 @@
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&q);
 [eva] realloc.c:49: Call to builtin free
-[eva] realloc.c:49: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:49: 
-  strong free on bases: {__malloc_main3_l32}
+[eva] realloc.c:49: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:49: strong free on bases: {__malloc_main3_l32}
 [eva:alarm] realloc.c:49: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&r);
 [eva] realloc.c:49: Call to builtin free
-[eva] realloc.c:49: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:49: 
-  strong free on bases: {__malloc_main3_l35}
+[eva] realloc.c:49: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:49: strong free on bases: {__malloc_main3_l35}
 [eva] realloc.c:49: Call to builtin free
-[eva] realloc.c:49: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:49: 
-  strong free on bases: {__realloc_main3_l46}
+[eva] realloc.c:49: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:49: strong free on bases: {__realloc_main3_l46}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -235,10 +219,8 @@
 [eva] realloc.c:55: allocating variable __malloc_main4_l55
 [eva] realloc.c:56: Call to builtin malloc
 [eva] realloc.c:56: allocating variable __malloc_main4_l56
-[eva:alarm] realloc.c:59: Warning: 
-  out of bounds write. assert \valid(q + i);
-[eva:alarm] realloc.c:58: Warning: 
-  out of bounds write. assert \valid(p + i);
+[eva:alarm] realloc.c:59: Warning: out of bounds write. assert \valid(q + i);
+[eva:alarm] realloc.c:58: Warning: out of bounds write. assert \valid(p + i);
 [eva] realloc.c:61: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -284,19 +266,15 @@
                     [9] ∈ {9}
   ==END OF DUMP==
 [eva] realloc.c:67: Call to builtin realloc
-[eva] realloc.c:67: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:67: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main4_l55}
 [eva] realloc.c:67: allocating variable __realloc_main4_l67
-[eva:malloc] realloc.c:67: 
-  strong free on bases: {__malloc_main4_l55}
+[eva:malloc] realloc.c:67: strong free on bases: {__malloc_main4_l55}
 [eva] realloc.c:68: Call to builtin realloc
-[eva] realloc.c:68: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:68: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main4_l56}
 [eva] realloc.c:68: allocating variable __realloc_main4_l68
-[eva:malloc] realloc.c:68: 
-  strong free on bases: {__malloc_main4_l56}
+[eva:malloc] realloc.c:68: strong free on bases: {__malloc_main4_l56}
 [eva] realloc.c:69: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -343,15 +321,11 @@
                      [7] ∈ {7} or UNINITIALIZED
   ==END OF DUMP==
 [eva] realloc.c:72: Call to builtin free
-[eva] realloc.c:72: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:72: 
-  strong free on bases: {__realloc_main4_l67}
+[eva] realloc.c:72: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:72: strong free on bases: {__realloc_main4_l67}
 [eva] realloc.c:72: Call to builtin free
-[eva] realloc.c:72: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:72: 
-  strong free on bases: {__realloc_main4_l68}
+[eva] realloc.c:72: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:72: strong free on bases: {__realloc_main4_l68}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -388,12 +362,10 @@
   __malloc_main5_l76 ∈ {1}
   ==END OF DUMP==
 [eva] realloc.c:85: Call to builtin realloc
-[eva] realloc.c:85: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:85: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main5_l76}
 [eva] realloc.c:85: allocating variable __realloc_main5_l85
-[eva:malloc] realloc.c:85: 
-  weak free on bases: {__malloc_main5_l76}
+[eva:malloc] realloc.c:85: weak free on bases: {__malloc_main5_l76}
 [eva] realloc.c:86: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -425,15 +397,11 @@
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
 [eva] realloc.c:88: Call to builtin free
-[eva] realloc.c:88: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:88: 
-  strong free on bases: {__malloc_main5_l76}
+[eva] realloc.c:88: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:88: strong free on bases: {__malloc_main5_l76}
 [eva] realloc.c:88: Call to builtin free
-[eva] realloc.c:88: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:88: 
-  strong free on bases: {__realloc_main5_l85}
+[eva] realloc.c:88: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:88: strong free on bases: {__realloc_main5_l85}
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
@@ -445,16 +413,13 @@
 [eva] Done for function Frama_C_interval
 [eva] realloc.c:93: Call to builtin malloc
 [eva] realloc.c:93: allocating variable __malloc_main6_l93
-[eva] realloc.c:102: 
-  Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
+[eva] realloc.c:102: Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
 [eva] realloc.c:103: Call to builtin realloc
 [eva:alarm] realloc.c:103: Warning: 
   function realloc: precondition 'freeable' got status invalid.
 [eva] realloc.c:106: Call to builtin free
-[eva] realloc.c:106: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:106: 
-  strong free on bases: {__malloc_main6_l93}
+[eva] realloc.c:106: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:106: strong free on bases: {__malloc_main6_l93}
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
@@ -462,12 +427,10 @@
 [eva] realloc.c:110: Call to builtin malloc
 [eva] realloc.c:110: allocating variable __malloc_main7_l110
 [eva] realloc.c:115: Call to builtin realloc
-[eva] realloc.c:115: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:115: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main7_l110}
 [eva] realloc.c:115: allocating variable __realloc_main7_l115
-[eva:malloc] realloc.c:115: 
-  strong free on bases: {__malloc_main7_l110}
+[eva:malloc] realloc.c:115: strong free on bases: {__malloc_main7_l110}
 [eva] realloc.c:116: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -520,10 +483,8 @@
                       [1] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] realloc.c:119: Call to builtin free
-[eva] realloc.c:119: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:119: 
-  strong free on bases: {__realloc_main7_l115}
+[eva] realloc.c:119: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:119: strong free on bases: {__realloc_main7_l115}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
@@ -531,12 +492,10 @@
 [eva] realloc.c:123: Call to builtin malloc
 [eva] realloc.c:123: allocating variable __malloc_main8_l123
 [eva] realloc.c:126: Call to builtin realloc
-[eva] realloc.c:126: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:126: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main8_l123}
 [eva] realloc.c:126: allocating variable __realloc_main8_l126
-[eva:malloc] realloc.c:126: 
-  strong free on bases: {__malloc_main8_l123}
+[eva:malloc] realloc.c:126: strong free on bases: {__malloc_main8_l123}
 [eva] realloc.c:127: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -561,10 +520,8 @@
   __realloc_main8_l126∈ ∅
   ==END OF DUMP==
 [eva] realloc.c:128: Call to builtin free
-[eva] realloc.c:128: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:128: 
-  strong free on bases: {__realloc_main8_l126}
+[eva] realloc.c:128: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:128: strong free on bases: {__realloc_main8_l126}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
@@ -572,12 +529,10 @@
 [eva] realloc.c:132: Call to builtin malloc
 [eva] realloc.c:132: allocating variable __malloc_main9_l132
 [eva] realloc.c:135: Call to builtin realloc
-[eva] realloc.c:135: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:135: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main9_l132}
 [eva] realloc.c:135: allocating variable __realloc_main9_l135
-[eva:malloc] realloc.c:135: 
-  strong free on bases: {__malloc_main9_l132}
+[eva:malloc] realloc.c:135: strong free on bases: {__malloc_main9_l132}
 [eva] realloc.c:136: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -602,10 +557,8 @@
   __realloc_main9_l135# ∈ {1}%32, bits 0 to 7 
   ==END OF DUMP==
 [eva] realloc.c:137: Call to builtin free
-[eva] realloc.c:137: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc.c:137: 
-  strong free on bases: {__realloc_main9_l135}
+[eva] realloc.c:137: function free: precondition 'freeable' got status valid.
+[eva:malloc] realloc.c:137: strong free on bases: {__realloc_main9_l135}
 [eva] Recording results for main9
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
@@ -613,12 +566,10 @@
 [eva] realloc.c:147: Call to builtin malloc
 [eva] realloc.c:147: allocating variable __malloc_main10_l147
 [eva] realloc.c:152: Call to builtin realloc
-[eva] realloc.c:152: 
-  function realloc: precondition 'freeable' got status valid.
+[eva] realloc.c:152: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main10_l147}
 [eva] realloc.c:152: allocating variable __realloc_main10_l152
-[eva:malloc] realloc.c:152: 
-  strong free on bases: {__malloc_main10_l147}
+[eva:malloc] realloc.c:152: strong free on bases: {__malloc_main10_l147}
 [eva] realloc.c:154: Frama_C_show_each_main10: {4}
 [eva] realloc.c:155: 
   Frama_C_dump_each:
@@ -648,8 +599,7 @@
 [eva:malloc] bases_to_realloc: {__realloc_main10_l152}
 [eva:malloc:weak] realloc.c:152: 
   marking variable `__realloc_main10_l152' as weak
-[eva:malloc] realloc.c:152: 
-  weak free on bases: {__realloc_w_main10_l152}
+[eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
 [eva] realloc.c:154: Frama_C_show_each_main10: {4}
 [eva] realloc.c:155: 
   Frama_C_dump_each:

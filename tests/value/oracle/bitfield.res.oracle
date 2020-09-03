@@ -68,8 +68,7 @@
   y ∈ [--..--]
   v.a ∈ {0}
    .b ∈ {7}
-   .c ∈
-   {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123}) }}
    .[bits 28 to 31] ∈ UNINITIALIZED
    .d ∈ {{ &v + {9} }}
   l_161{.f0; .f1[bits 0 to 31]} ∈ {-1}
@@ -111,8 +110,7 @@
   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
 [eva] bitfield.i:73: 
   Frama_C_show_each:
-  .next ∈
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  .next ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
@@ -188,11 +186,8 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈
-   {{ garbled mix of &{b; ee}
-    (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈
-    {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
   foo ∈ [--..--]
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -211,8 +206,7 @@
 [eva] Done for function char_short
 [eva] Recording results for main
 [eva] done for function main
-[eva] bitfield.i:102: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function char_short:
@@ -230,12 +224,8 @@
   r ∈ {1}
 [eva:final-states] Values at end of function imprecise_bts_1671:
   b ∈ {0}
-  c ∈
-   {{ garbled mix of &{b; ee}
-    (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈
-    {{ garbled mix of &{b}
-     (origin: Misaligned {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
 [eva:final-states] Values at end of function logic:
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -247,9 +237,7 @@
 [eva:final-states] Values at end of function main_old:
   h.a ∈ {0}
    .b ∈ [--..--]
-   .c ∈
-   {{ garbled mix of &{v}
-    (origin: Arithmetic {bitfield.i:130}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:130}) }}
    {.d; .[bits 28 to 31]} ∈ {0}
   k8.a ∈ {0}
     .b ∈ {-8}
@@ -265,9 +253,7 @@
   H ∈ {0}
   v.a ∈ {0}
    .b ∈ {7}
-   .c ∈
-   {{ garbled mix of &{v}
-    (origin: Arithmetic {bitfield.i:123}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123}) }}
    .[bits 28 to 31] ∈ UNINITIALIZED
    .d ∈ {{ &v + {9} }}
   l_161{.f0; .f1[bits 0 to 31]} ∈ {-1}
@@ -289,12 +275,8 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈
-   {{ garbled mix of &{b; ee}
-    (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈
-    {{ garbled mix of &{b}
-     (origin: Misaligned {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
    .v5_31 ∈ [--..--]

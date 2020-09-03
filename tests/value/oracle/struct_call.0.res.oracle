@@ -35,8 +35,7 @@
 [eva] Done for function main1
 [eva] computing for function h <- main.
   Called from struct_call.i:47.
-[eva] struct_call.i:42: 
-  Frama_C_show_each: [-32768..32767], {{ NULL ; &S_c2_C }}
+[eva] struct_call.i:42: Frama_C_show_each: [-32768..32767], {{ NULL ; &S_c2_C }}
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for main

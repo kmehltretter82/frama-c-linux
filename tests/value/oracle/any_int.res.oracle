@@ -4,17 +4,12 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] any_int.c:9: Warning: 
-  signed overflow. assert y + 1 ≤ 2147483647;
-[eva:alarm] any_int.c:9: Warning: 
-  signed overflow. assert y + 1 ≤ 2147483647;
-[eva:alarm] any_int.c:9: Warning: 
-  signed overflow. assert -2147483648 ≤ y - 1;
+[eva:alarm] any_int.c:9: Warning: signed overflow. assert y + 1 ≤ 2147483647;
+[eva:alarm] any_int.c:9: Warning: signed overflow. assert y + 1 ≤ 2147483647;
+[eva:alarm] any_int.c:9: Warning: signed overflow. assert -2147483648 ≤ y - 1;
 [eva] any_int.c:9: starting to merge loop iterations
-[eva:alarm] any_int.c:9: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
-[eva:alarm] any_int.c:9: Warning: 
-  signed overflow. assert -2147483648 ≤ x - 1;
+[eva:alarm] any_int.c:9: Warning: signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] any_int.c:9: Warning: signed overflow. assert -2147483648 ≤ x - 1;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

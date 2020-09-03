@@ -2,9 +2,9 @@
 * Small example to test function merge_slices.
 * To try it, use the following commands :
 
-  make tests/slicing/merge.byte; \
-  tests/slicing/merge.byte -deps -lib-entry g -slicing-level 3 \
-                          tests/slicing/merge.c
+  make merge.byte; \
+  merge.byte -deps -lib-entry g -slicing-level 3 \
+                          merge.c
 *)
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)

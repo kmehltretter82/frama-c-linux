@@ -24,15 +24,11 @@
    [2] ∈ {3}
    [3..4] ∈ {0}
   p ∈ {0}
-[eva:alarm] div.i:14: Warning: 
-  signed overflow. assert c + 1 ≤ 2147483647;
-[eva:alarm] div.i:17: Warning: 
-  signed overflow. assert c + 2 ≤ 2147483647;
+[eva:alarm] div.i:14: Warning: signed overflow. assert c + 1 ≤ 2147483647;
+[eva:alarm] div.i:17: Warning: signed overflow. assert c + 2 ≤ 2147483647;
 [eva] div.i:14: starting to merge loop iterations
-[eva:alarm] div.i:17: Warning: 
-  signed overflow. assert -2147483648 ≤ X - 1;
-[eva:alarm] div.i:16: Warning: 
-  signed overflow. assert X + 1 ≤ 2147483647;
+[eva:alarm] div.i:17: Warning: signed overflow. assert -2147483648 ≤ X - 1;
+[eva:alarm] div.i:16: Warning: signed overflow. assert X + 1 ≤ 2147483647;
 [eva:alarm] div.i:32: Warning: division by zero. assert Z2 ≢ 0;
 [eva:alarm] div.i:33: Warning: division by zero. assert Z2 ≢ 0;
 [eva:alarm] div.i:33: Warning: 
@@ -46,8 +42,7 @@
   The imprecision originates from Arithmetic {div.i:33}
 [eva:alarm] div.i:34: Warning: 
   pointer downcast. assert (unsigned int)(&X + 2) ≤ 2147483647;
-[eva:alarm] div.i:34: Warning: 
-  division by zero. assert (int)(&X + 2) ≢ 0;
+[eva:alarm] div.i:34: Warning: division by zero. assert (int)(&X + 2) ≢ 0;
 [eva:alarm] div.i:34: Warning: 
   signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 2);
 [eva:alarm] div.i:34: Warning: 
@@ -98,14 +93,10 @@
   W1 ∈ [-41..111]
   W2 ∈ [-25..66]
   a ∈ [-40000..40000]
-  b ∈
-   {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33}) }}
-  d1 ∈
-    {{ garbled mix of &{X} (origin: Arithmetic {div.i:35}) }}
-  d2 ∈
-    {{ garbled mix of &{X} (origin: Arithmetic {div.i:34}) }}
-  d0 ∈
-    {{ garbled mix of &{X} (origin: Arithmetic {div.i:36}) }}
+  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33}) }}
+  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35}) }}
+  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34}) }}
+  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36}) }}
   e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37}) }}
   p ∈ {{ &t[3] }}
   c ∈ [--..--]

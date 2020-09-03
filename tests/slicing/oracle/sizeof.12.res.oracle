@@ -124,4 +124,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_12_sizeof.i (no preprocessing)
+[kernel] Parsing ocode_12_sizeof.i (no preprocessing)

@@ -8,8 +8,7 @@
   function main: precondition \valid(b) got status unknown.
 [eva:alarm] FP5.i:2: Warning: 
   function main: precondition \valid(c) got status unknown.
-[eva] FP5.i:3: 
-  function main: precondition \valid(&a) got status valid.
+[eva] FP5.i:3: function main: precondition \valid(&a) got status valid.
 [eva] FP5.i:23: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main

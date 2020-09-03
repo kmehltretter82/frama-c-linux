@@ -60,8 +60,7 @@
 [eva] alias.i:185: starting to merge loop iterations
 [eva:alarm] alias.i:191: Warning: 
   pointer comparison. assert \pointer_comparable((void *)PTR2, (void *)PTR1);
-[eva:alarm] alias.i:199: Warning: 
-  signed overflow. assert c + 1 ≤ 2147483647;
+[eva:alarm] alias.i:199: Warning: signed overflow. assert c + 1 ≤ 2147483647;
 [eva] Recording results for main6
 [eva] done for function main6
 [eva] ====== VALUES COMPUTED ======

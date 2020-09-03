@@ -82,8 +82,7 @@
   Called from horwitz.i:27.
 [eva] computing for function add <- A <- main.
   Called from horwitz.i:18.
-[eva:alarm] horwitz.i:12: Warning: 
-  signed overflow. assert a + b ≤ 2147483647;
+[eva:alarm] horwitz.i:12: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva] Recording results for add
 [eva] Done for function add
 [eva] horwitz.i:19: Reusing old results for call to incr

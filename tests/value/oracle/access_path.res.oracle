@@ -4,10 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] access_path.i:2: Warning: 
-  out of bounds read. assert \valid_read(p);
-[eva:alarm] access_path.i:2: Warning: 
-  out of bounds write. assert \valid(*p);
+[eva:alarm] access_path.i:2: Warning: out of bounds read. assert \valid_read(p);
+[eva:alarm] access_path.i:2: Warning: out of bounds write. assert \valid(*p);
 [eva:alarm] access_path.i:2: Warning: 
   signed overflow. assert *(*p) + 1 ≤ 2147483647;
 [eva] Recording results for main

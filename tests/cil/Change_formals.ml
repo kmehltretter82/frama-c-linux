@@ -92,6 +92,6 @@ let () = Db.Main.extend main
 
 (*
 Local Variables:
-compile-command: "make -C ../.. tests/misc/Change_formals.cmo"
+compile-command: "make -C ../.. Change_formals.cmo"
 End:
 *)

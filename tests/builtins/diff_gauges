@@ -1,54 +1,54 @@
-diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_gauges/Longinit_sequencer.res.oracle
+diff oracle/Longinit_sequencer.res.oracle oracle_gauges/Longinit_sequencer.res.oracle
 320c320
-<   tests/builtins/result/Longinit_sequencer.sav
+<   result/Longinit_sequencer.sav
 ---
->   tests/builtins/result_gauges/Longinit_sequencer.sav
+>   result_gauges/Longinit_sequencer.sav
 556c556
-<   tests/builtins/result/Longinit_sequencer.sav
+<   result/Longinit_sequencer.sav
 ---
->   tests/builtins/result_gauges/Longinit_sequencer.sav
-diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges/linked_list.0.res.oracle
+>   result_gauges/Longinit_sequencer.sav
+diff oracle/linked_list.0.res.oracle oracle_gauges/linked_list.0.res.oracle
 1122a1123,1128
 > [eva] computing for function printf_va_1 <- main.
->   Called from tests/builtins/linked_list.c:51.
+>   Called from linked_list.c:51.
 > [eva] Done for function printf_va_1
 > [eva] computing for function printf_va_1 <- main.
->   Called from tests/builtins/linked_list.c:51.
+>   Called from linked_list.c:51.
 > [eva] Done for function printf_va_1
-diff tests/builtins/oracle/linked_list.1.res.oracle tests/builtins/oracle_gauges/linked_list.1.res.oracle
+diff oracle/linked_list.1.res.oracle oracle_gauges/linked_list.1.res.oracle
 626a627,632
 > [eva] computing for function printf_va_1 <- main.
->   Called from tests/builtins/linked_list.c:51.
+>   Called from linked_list.c:51.
 > [eva] Done for function printf_va_1
 > [eva] computing for function printf_va_1 <- main.
->   Called from tests/builtins/linked_list.c:51.
+>   Called from linked_list.c:51.
 > [eva] Done for function printf_va_1
-diff tests/builtins/oracle/malloc-size-zero.1.res.oracle tests/builtins/oracle_gauges/malloc-size-zero.1.res.oracle
+diff oracle/malloc-size-zero.1.res.oracle oracle_gauges/malloc-size-zero.1.res.oracle
 31a32,41
 > [eva] computing for function my_calloc <- main.
->   Called from tests/builtins/malloc-size-zero.c:29.
-> [eva] tests/builtins/malloc-size-zero.c:10: Call to builtin malloc
+>   Called from malloc-size-zero.c:29.
+> [eva] malloc-size-zero.c:10: Call to builtin malloc
 > [eva] Recording results for my_calloc
 > [eva] Done for function my_calloc
 > [eva] computing for function my_calloc <- main.
->   Called from tests/builtins/malloc-size-zero.c:29.
-> [eva] tests/builtins/malloc-size-zero.c:10: Call to builtin malloc
+>   Called from malloc-size-zero.c:29.
+> [eva] malloc-size-zero.c:10: Call to builtin malloc
 > [eva] Recording results for my_calloc
 > [eva] Done for function my_calloc
-diff tests/builtins/oracle/memcpy.res.oracle tests/builtins/oracle_gauges/memcpy.res.oracle
+diff oracle/memcpy.res.oracle oracle_gauges/memcpy.res.oracle
 176a177,178
-> [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
-> [eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
+> [eva] memcpy.c:96: Call to builtin memcpy
+> [eva] memcpy.c:96: Call to builtin memcpy
 457a460
-> [eva] tests/builtins/memcpy.c:230: starting to merge loop iterations
-diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/realloc.res.oracle
+> [eva] memcpy.c:230: starting to merge loop iterations
+diff oracle/realloc.res.oracle oracle_gauges/realloc.res.oracle
 677a678,1026
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -72,12 +72,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -101,12 +101,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -130,12 +130,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -159,12 +159,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -188,12 +188,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -217,12 +217,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -246,12 +246,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -275,12 +275,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -304,13 +304,13 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:150: starting to merge loop iterations
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:150: starting to merge loop iterations
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -334,12 +334,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]
@@ -363,12 +363,12 @@ diff tests/builtins/oracle/realloc.res.oracle tests/builtins/oracle_gauges/reall
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] tests/builtins/realloc.c:152: Call to builtin realloc
+> [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
-> [eva:malloc] tests/builtins/realloc.c:152: 
+> [eva:malloc] realloc.c:152: 
 >   weak free on bases: {__realloc_w_main10_l152}
-> [eva] tests/builtins/realloc.c:154: Frama_C_show_each_main10: {4}
-> [eva] tests/builtins/realloc.c:155: 
+> [eva] realloc.c:154: Frama_C_show_each_main10: {4}
+> [eva] realloc.c:155: 
 >   Frama_C_dump_each:
 >   # Cvalue domain:
 >   __fc_heap_status ∈ [--..--]

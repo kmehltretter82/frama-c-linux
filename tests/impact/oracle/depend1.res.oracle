@@ -27,7 +27,6 @@
 [pdg] computing for function find
 [pdg] done for function find
 [impact] impacted statements of stmt(s) 6 are:
-    depend1.i:6 (sid 2): return x;
-    depend1.i:13 (sid 7): int c = find(b);
+    depend1.i:6 (sid 2): return x;depend1.i:13 (sid 7): int c = find(b);
     depend1.i:15 (sid 10): return c;
 [impact] analysis done

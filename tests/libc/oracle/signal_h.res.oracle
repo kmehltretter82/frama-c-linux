@@ -126,7 +126,7 @@
   function sigaction: precondition 'valid_read_act_or_null' got status valid.
 [eva] signal_h.c:48: 
   function sigaction: precondition 'separation,separated_acts' got status valid.
-[eva] share/libc/signal.h:216: 
+[eva] FRAMAC_SHARE/libc/signal.h:216: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic coercion struct sigaction -> set<struct sigaction>
 [eva] Done for function sigaction
 [eva] computing for function sigaction <- main.

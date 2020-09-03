@@ -7,16 +7,13 @@
   volatile_d ∈ [--..--]
 [eva] computing for function alarms <- main.
   Called from summary.i:62.
-[eva:alarm] summary.i:27: Warning: 
-  out of bounds read. assert \valid_read(p);
-[eva:alarm] summary.i:29: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] summary.i:27: Warning: out of bounds read. assert \valid_read(p);
+[eva:alarm] summary.i:29: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] summary.i:30: Warning: 
   accessing out of bounds index. assert 0 ≤ undet;
 [eva:alarm] summary.i:30: Warning: 
   accessing out of bounds index. assert undet < 10;
-[eva:alarm] summary.i:31: Warning: 
-  division by zero. assert undet ≢ 0;
+[eva:alarm] summary.i:31: Warning: division by zero. assert undet ≢ 0;
 [eva:alarm] summary.i:32: Warning: 
   signed overflow. assert -2147483648 ≤ undet + undet;
 [eva:alarm] summary.i:32: Warning: 

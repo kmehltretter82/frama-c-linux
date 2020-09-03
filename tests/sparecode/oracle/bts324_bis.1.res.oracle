@@ -80,8 +80,7 @@
 [from] Computing for function f <-loop_body
 [from] Done for function f
 [from] Done for function loop_body
-[pdg] bts324_bis.i:57: Warning: 
-  no final state. Probably unreachable...
+[pdg] bts324_bis.i:57: Warning: no final state. Probably unreachable...
 [pdg] done for function main_bis
 [sparecode] add selection in function 'main_bis'
 [sparecode] selecting output zones ki[0..1]; k; s0; s1; is_ok; f_si[0..1]; f_so[0..1]

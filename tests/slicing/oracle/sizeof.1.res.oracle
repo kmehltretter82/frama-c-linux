@@ -118,4 +118,4 @@ unsigned int SizeOf_1_slice_1(void)
 }
 
 
-[kernel] Parsing result/ocode_1_sizeof.i (no preprocessing)
+[kernel] Parsing ocode_1_sizeof.i (no preprocessing)

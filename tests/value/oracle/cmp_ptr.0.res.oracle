@@ -37,10 +37,8 @@
   invalid pointer comparison: invalid pointer(s)
 [eva:alarm] cmp_ptr.i:21: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&T[5]));
-[eva:alarm] cmp_ptr.i:21: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] cmp_ptr.i:21: Warning: 
-  out of bounds write. assert \valid(q);
+[eva:alarm] cmp_ptr.i:21: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] cmp_ptr.i:21: Warning: out of bounds write. assert \valid(q);
 [eva:pointer-comparison] cmp_ptr.i:22: 
   invalid pointer comparison: invalid pointer(s)
 [eva:alarm] cmp_ptr.i:22: Warning: 

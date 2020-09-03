@@ -4,8 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] user_assertion_uninit_var.i:3: 
-  starting to merge loop iterations
+[eva] user_assertion_uninit_var.i:3: starting to merge loop iterations
 [eva:alarm] user_assertion_uninit_var.i:4: Warning: 
   assertion got status unknown.
 [eva:alarm] user_assertion_uninit_var.i:6: Warning: 

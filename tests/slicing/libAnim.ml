@@ -1,5 +1,5 @@
 (* Some useful function to use the graphical representation of a slicing
-* project. (see tests/slicing/anim.ml for a test) *)
+* project. (see anim.ml for a test) *)
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
 let use_dot =

@@ -31,8 +31,7 @@
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{s1} (origin: Arithmetic {struct3.i:46}) }}
-[eva] struct3.i:42: 
-  assertion 'Eva,index_bound' got final status invalid.
+[eva] struct3.i:42: assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s1.a ∈ {2}
@@ -43,9 +42,7 @@
     .b.a ∈ {3}
     {.b.b; .e[0..9]} ∈ {0}
     .c ∈ {{ &s1 }}
-  s2.a ∈
-    {{ garbled mix of &{s1}
-     (origin: Arithmetic {struct3.i:46}) }}
+  s2.a ∈ {{ garbled mix of &{s1} (origin: Arithmetic {struct3.i:46}) }}
     .d[0] ∈ {1}
     .d[1..2] ∈ {2}
     .d[3..7] ∈ {0}

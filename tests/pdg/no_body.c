@@ -3,8 +3,8 @@
 *    STDOPT: +"-fct-pdg main -inout "
 */
 /*
- * ledit bin/toplevel.top  tests/slicing/no_body.c -fct-pdg main
- * #use "tests/slicing/select.ml";;
+ * ledit bin/toplevel.top  no_body.c -fct-pdg main
+ * #use "select.ml";;
  * test "loop" (select_data "G");;
 */
 

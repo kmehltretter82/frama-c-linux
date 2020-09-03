@@ -9,8 +9,7 @@
   u ∈ {0}
   v ∈ {0}
   w ∈ {0}
-[eva:alarm] annot.i:5: Warning: 
-  function main: precondition got status unknown.
+[eva:alarm] annot.i:5: Warning: function main: precondition got status unknown.
 [eva] annot.i:15: assertion got status valid.
 [eva] annot.i:16: Frama_C_show_each_diff: {1}
 [eva] annot.i:21: assertion got status valid.
@@ -26,8 +25,7 @@
 [eva:alarm] annot.i:51: Warning: assertion got status unknown.
 [eva:alarm] annot.i:53: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] annot.i:7: 
-  function main: no state left, postcondition got status valid.
+[eva] annot.i:7: function main: no state left, postcondition got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

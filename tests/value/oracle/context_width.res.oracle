@@ -77,8 +77,7 @@ void main(int *p)
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
 [eva] done for function main
-[eva] context_width.i:15: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] context_width.i:15: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

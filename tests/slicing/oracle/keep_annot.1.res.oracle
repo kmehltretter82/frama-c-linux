@@ -8,15 +8,12 @@
 [eva] computing for function g <- f.
   Called from keep_annot.i:26.
 [eva] keep_annot.i:15: starting to merge loop iterations
-[eva:alarm] keep_annot.i:20: Warning: 
-  assertion got status unknown.
-[eva:alarm] keep_annot.i:21: Warning: 
-  assertion got status unknown.
+[eva:alarm] keep_annot.i:20: Warning: assertion got status unknown.
+[eva:alarm] keep_annot.i:21: Warning: assertion got status unknown.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] keep_annot.i:27: assertion got status valid.
-[eva:alarm] keep_annot.i:28: Warning: 
-  assertion got status unknown.
+[eva:alarm] keep_annot.i:28: Warning: assertion got status unknown.
 [eva] Recording results for f
 [eva] done for function f
 [slicing] initializing slicing ...
@@ -65,4 +62,4 @@ void f(las *p, int n, int m)
 }
 
 
-[kernel] Parsing result/ocode_1_keep_annot.i (no preprocessing)
+[kernel] Parsing ocode_1_keep_annot.i (no preprocessing)

@@ -35,4 +35,4 @@ void foo(void)
 }
 
 
-[kernel] Parsing result/ocode_0_same_sliced_name_bts1422.i (no preprocessing)
+[kernel] Parsing ocode_0_same_sliced_name_bts1422.i (no preprocessing)

@@ -68,8 +68,7 @@
 [eva] shift.i:35: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:36: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:40: assertion 'Eva,shift' got final status invalid.
-[eva] shift.i:58: 
-  assertion 'Eva,unsigned_overflow' got final status invalid.
+[eva] shift.i:58: assertion 'Eva,unsigned_overflow' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ {314; 1256; 5024}

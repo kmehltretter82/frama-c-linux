@@ -98,10 +98,8 @@
 [eva] Done for function f4
 [eva] computing for function f4 <- main4.
   Called from bts336.i:78.
-[eva:alarm] bts336.i:62: Warning: 
-  signed overflow. assert *p + 1 ≤ 2147483647;
-[eva:alarm] bts336.i:63: Warning: 
-  signed overflow. assert *q + 1 ≤ 2147483647;
+[eva:alarm] bts336.i:62: Warning: signed overflow. assert *p + 1 ≤ 2147483647;
+[eva:alarm] bts336.i:63: Warning: signed overflow. assert *q + 1 ≤ 2147483647;
 [eva] Recording results for f4
 [from] Computing for function f4
 [from] Done for function f4
@@ -199,4 +197,4 @@ int main4(int volatile c)
 }
 
 
-[kernel] Parsing result/ocode_6_bts336.i (no preprocessing)
+[kernel] Parsing ocode_6_bts336.i (no preprocessing)

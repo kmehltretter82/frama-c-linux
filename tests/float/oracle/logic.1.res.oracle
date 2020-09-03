@@ -147,8 +147,7 @@
   Frama_C_show_each_lt_double: {0}, [-inf .. -0x0.0000000000001p-1022]
 [eva] logic.i:104: 
   Frama_C_show_each_le_double: {0}, [-inf .. 0x0.0000000000000p0]
-[eva] logic.i:108: 
-  Frama_C_show_each_ne_double: {0}, [-inf .. inf] ∪ {NaN}
+[eva] logic.i:108: Frama_C_show_each_ne_double: {0}, [-inf .. inf] ∪ {NaN}
 [eva] Recording results for test_comparison_reduction
 [eva] Done for function test_comparison_reduction
 [eva] computing for function test_comparison_reduction <- 
@@ -289,12 +288,9 @@
 [eva] computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
   Called from logic.i:133.
-[eva] logic.i:84: 
-  Frama_C_show_each_eq: {inf}, [-inf .. inf] ∪ {NaN}
-[eva] logic.i:88: 
-  Frama_C_show_each_lt: {inf}, [-inf .. inf] ∪ {NaN}
-[eva] logic.i:92: 
-  Frama_C_show_each_lt: {inf}, [-inf .. inf] ∪ {NaN}
+[eva] logic.i:84: Frama_C_show_each_eq: {inf}, [-inf .. inf] ∪ {NaN}
+[eva] logic.i:88: Frama_C_show_each_lt: {inf}, [-inf .. inf] ∪ {NaN}
+[eva] logic.i:92: Frama_C_show_each_lt: {inf}, [-inf .. inf] ∪ {NaN}
 [eva] logic.i:96: Frama_C_show_each_eq_double: {inf}, {inf}
 [eva] logic.i:100: 
   Frama_C_show_each_lt_double: {inf}, [-inf .. 0x1.fffffffffffffp1023]
@@ -320,8 +316,7 @@
 [eva:alarm] logic.i:103: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] logic.i:107: assertion got status valid.
-[eva] logic.i:108: 
-  Frama_C_show_each_ne_double: NaN, [-inf .. inf] ∪ {NaN}
+[eva] logic.i:108: Frama_C_show_each_ne_double: NaN, [-inf .. inf] ∪ {NaN}
 [eva] Recording results for test_comparison_reduction
 [eva] Done for function test_comparison_reduction
 [eva] Recording results for test_builtin_comparisons
@@ -349,10 +344,8 @@
 [eva] computing for function my_fabs <- my_ratio_body <- test_is_finite <- main.
   Called from logic.i:148.
 [eva] Done for function my_fabs
-[eva] logic.i:146: 
-  function my_ratio_body: postcondition got status valid.
-[eva] logic.i:147: 
-  function my_ratio_body: postcondition got status valid.
+[eva] logic.i:146: function my_ratio_body: postcondition got status valid.
+[eva] logic.i:147: function my_ratio_body: postcondition got status valid.
 [eva] Recording results for my_ratio_body
 [eva] Done for function my_ratio_body
 [eva] Recording results for test_is_finite

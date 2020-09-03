@@ -73,50 +73,38 @@
 [eva] computing for function f_empty_tset <- empty_tset <- main.
   Called from logic.c:166.
 [eva] using specification for function f_empty_tset
-[eva] logic.c:166: 
-  function f_empty_tset: precondition 'r1' got status valid.
-[eva] logic.c:166: 
-  function f_empty_tset: precondition 'r2' got status valid.
+[eva] logic.c:166: function f_empty_tset: precondition 'r1' got status valid.
+[eva] logic.c:166: function f_empty_tset: precondition 'r2' got status valid.
 [eva] Done for function f_empty_tset
 [eva] logic.c:167: assertion got status valid.
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
   Called from logic.c:445.
-[eva:alarm] logic.c:172: Warning: 
-  accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] logic.c:172: Warning: 
-  accessing out of bounds index. assert v < 10;
+[eva:alarm] logic.c:172: Warning: accessing out of bounds index. assert 0 ≤ v;
+[eva:alarm] logic.c:172: Warning: accessing out of bounds index. assert v < 10;
 [eva:alarm] logic.c:173: Warning: assertion got status unknown.
 [eva:alarm] logic.c:174: Warning: assertion got status unknown.
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
   Called from logic.c:446.
-[eva:alarm] logic.c:182: Warning: 
-  assertion 'ASSUME' got status unknown.
-[eva:alarm] logic.c:184: Warning: 
-  assertion 'UNK' got status unknown.
+[eva:alarm] logic.c:182: Warning: assertion 'ASSUME' got status unknown.
+[eva:alarm] logic.c:184: Warning: assertion 'UNK' got status unknown.
 [eva] logic.c:185: Frama_C_show_each: {-1; 1}
-[eva:alarm] logic.c:186: Warning: 
-  assertion 'UNK' got status unknown.
+[eva:alarm] logic.c:186: Warning: assertion 'UNK' got status unknown.
 [eva] logic.c:187: Frama_C_show_each: {-1; 1}
-[eva:alarm] logic.c:189: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] logic.c:189: Warning: assertion 'ASSUME' got status unknown.
 [eva] logic.c:190: assertion 'OK' got status valid.
 [eva] logic.c:191: Frama_C_show_each: {1}
 [eva] logic.c:192: assertion 'OK' got status valid.
 [eva] logic.c:193: Frama_C_show_each: {1}
-[eva:alarm] logic.c:197: Warning: 
-  assertion 'ASSUME' got status unknown.
-[eva:alarm] logic.c:198: Warning: 
-  assertion 'UNK' got status unknown.
+[eva:alarm] logic.c:197: Warning: assertion 'ASSUME' got status unknown.
+[eva:alarm] logic.c:198: Warning: assertion 'UNK' got status unknown.
 [eva] logic.c:199: Frama_C_show_each: {0; 1}
-[eva:alarm] logic.c:200: Warning: 
-  assertion 'UNK' got status unknown.
+[eva:alarm] logic.c:200: Warning: assertion 'UNK' got status unknown.
 [eva] logic.c:201: Frama_C_show_each: {0; 1}
-[eva:alarm] logic.c:203: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] logic.c:203: Warning: assertion 'ASSUME' got status unknown.
 [eva] logic.c:204: assertion 'OK' got status valid.
 [eva] logic.c:205: Frama_C_show_each: {1}
 [eva] logic.c:206: assertion 'OK' got status valid.
@@ -155,11 +143,9 @@
   Called from logic.c:448.
 [eva] logic.c:90: assertion got status valid.
 [eva] logic.c:91: assertion got status valid.
-[eva] logic.c:31: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] logic.c:31: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] logic.c:92: Warning: assertion got status unknown.
-[eva] logic.c:92: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] logic.c:92: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva] logic.c:93: assertion got status valid.
 [eva] computing for function f <- pred <- main.
   Called from logic.c:94.
@@ -172,11 +158,9 @@
 [eva] logic.c:55: assertion got status valid.
 [eva] logic.c:56: assertion got status valid.
 [eva] logic.c:57: assertion got status valid.
-[eva] logic.c:35: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] logic.c:35: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] logic.c:58: Warning: assertion got status unknown.
-[eva] logic.c:58: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] logic.c:58: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function unsup <- pred <- main.
@@ -248,8 +232,7 @@
 [eva] logic.c:296: Frama_C_show_each_42: {42}
 [eva] logic.c:297: check got status valid.
 [eva:alarm] logic.c:299: Warning: check got status unknown.
-[eva] logic.c:300: 
-  Frama_C_show_each_imprecise: [-2147483648..2147483647]
+[eva] logic.c:300: Frama_C_show_each_imprecise: [-2147483648..2147483647]
 [eva:alarm] logic.c:301: Warning: assertion got status unknown.
 [eva:alarm] logic.c:303: Warning: 
   assertion got status invalid (stopping propagation).
@@ -267,10 +250,8 @@
 [eva] logic.c:326: check 'valid' got status valid.
 [eva:alarm] logic.c:327: Warning: check 'valid' got status unknown.
 [eva:alarm] logic.c:328: Warning: check 'valid' got status unknown.
-[eva:alarm] logic.c:329: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:330: Warning: 
-  check 'unknown' got status unknown.
+[eva:alarm] logic.c:329: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:330: Warning: check 'unknown' got status unknown.
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
   Called from logic.c:331.
 [eva] logic.c:331: 
@@ -285,14 +266,10 @@
 [eva] logic.c:334: check 'valid' got status valid.
 [eva] logic.c:335: check 'valid' got status valid.
 [eva] logic.c:336: check 'valid' got status valid.
-[eva:alarm] logic.c:337: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:338: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:339: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:340: Warning: 
-  check 'unknown' got status unknown.
+[eva:alarm] logic.c:337: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:338: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:339: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:340: Warning: check 'unknown' got status unknown.
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
   Called from logic.c:341.
 [eva] logic.c:341: 
@@ -307,14 +284,10 @@
 [eva] logic.c:344: check 'valid' got status valid.
 [eva] logic.c:345: check 'valid' got status valid.
 [eva] logic.c:346: check 'valid' got status valid.
-[eva:alarm] logic.c:347: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:348: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:349: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:350: Warning: 
-  check 'unknown' got status unknown.
+[eva:alarm] logic.c:347: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:348: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:349: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:350: Warning: check 'unknown' got status unknown.
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
   Called from logic.c:351.
 [eva] logic.c:351: 
@@ -325,10 +298,8 @@
 [eva] logic.c:352: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] logic.c:353: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] logic.c:354: Warning: 
-  check 'unknown' got status unknown.
+[eva:alarm] logic.c:353: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:354: Warning: check 'unknown' got status unknown.
 [eva] Recording results for min_max_quantifier
 [eva] Done for function min_max_quantifier
 [eva] computing for function int_abs <- main.
@@ -450,8 +421,7 @@
   The imprecision originates from Library function {logic.c:411}
 [eva] logic.c:412: 
   Frama_C_show_each_gm:
-  {{ garbled mix of &{x_0}
-  (origin: Library function {logic.c:411}) }}
+  {{ garbled mix of &{x_0} (origin: Library function {logic.c:411}) }}
 [eva] Recording results for int_abs
 [eva] Done for function int_abs
 [eva] computing for function float_abs <- main.
@@ -566,8 +536,7 @@
   ten ∈ {10}
   eleven ∈ {11}
   x_0 ∈
-     {{ garbled mix of &{x_0}
-      (origin: Library function {logic.c:411}) }}
+     {{ garbled mix of &{x_0} (origin: Library function {logic.c:411}) }}
 [eva:final-states] Values at end of function min_max:
   Frama_C_entropy_source ∈ [--..--]
   x_0 ∈ [3..17]

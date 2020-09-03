@@ -33,10 +33,8 @@
    [10] ∈ {10}
    [11] ∈ {11}
    [12] ∈ {0}
-[eva:alarm] cond.i:14: Warning: 
-  out of bounds read. assert \valid_read(argv);
-[eva:alarm] cond.i:14: Warning: 
-  out of bounds read. assert \valid_read(*argv);
+[eva:alarm] cond.i:14: Warning: out of bounds read. assert \valid_read(argv);
+[eva:alarm] cond.i:14: Warning: out of bounds read. assert \valid_read(*argv);
 [eva] computing for function f <- main.
   Called from cond.i:20.
 [eva] Recording results for f
@@ -56,8 +54,7 @@
 [eva] computing for function unknf <- main.
   Called from cond.i:48.
 [eva] Done for function unknf
-[eva:alarm] cond.i:49: Warning: 
-  accessing out of bounds index. assert w < 13;
+[eva:alarm] cond.i:49: Warning: accessing out of bounds index. assert w < 13;
 [eva] cond.i:52: Frama_C_show_each_w: [1..11]
 [eva] cond.i:53: assertion got status valid.
 [eva] Recording results for main

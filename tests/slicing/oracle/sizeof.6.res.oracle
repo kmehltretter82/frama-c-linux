@@ -120,4 +120,4 @@ unsigned int SizeOfE_pt_deref_1_slice_1(void)
 }
 
 
-[kernel] Parsing result/ocode_6_sizeof.i (no preprocessing)
+[kernel] Parsing ocode_6_sizeof.i (no preprocessing)

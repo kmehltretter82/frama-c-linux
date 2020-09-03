@@ -20,8 +20,7 @@
   ==END OF DUMP==
 [eva] Recording results for main
 [eva] done for function main
-[eva] const4.i:7: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] const4.i:7: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   d2 ∈ {3.40282346639e+38}

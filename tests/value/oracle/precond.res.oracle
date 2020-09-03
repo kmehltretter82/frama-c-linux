@@ -7,15 +7,13 @@
   pf2 ∈ {{ &f2 }}
 [eva] computing for function f <- main.
   Called from precond.c:31.
-[eva] precond.c:31: 
-  function f: precondition 'i_plus_one' got status valid.
+[eva] precond.c:31: function f: precondition 'i_plus_one' got status valid.
 [eva] precond.c:31: function f: precondition 'i' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
   Called from precond.c:32.
-[eva] precond.c:32: 
-  function f: precondition 'i_plus_one' got status valid.
+[eva] precond.c:32: function f: precondition 'i_plus_one' got status valid.
 [eva] precond.c:32: function f: precondition 'i' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
@@ -24,8 +22,7 @@
 [kernel] precond.c:34: Warning: 
   No code nor implicit assigns clause for function g, generating default assigns from the prototype
 [eva] using specification for function g
-[eva:alarm] precond.c:34: Warning: 
-  function g: precondition got status unknown.
+[eva:alarm] precond.c:34: Warning: function g: precondition got status unknown.
 [eva] Done for function g
 [eva] computing for function aux <- main.
   Called from precond.c:36.
@@ -42,19 +39,16 @@
   Called from precond.c:37.
 [eva] computing for function f2 <- aux <- main.
   Called from precond.c:21.
-[eva:alarm] precond.c:21: Warning: 
-  function f2: precondition got status unknown.
+[eva:alarm] precond.c:21: Warning: function f2: precondition got status unknown.
 [eva] Done for function f2
 [eva] Recording results for aux
 [eva] Done for function aux
-[eva] precond.c:39: 
-  function f: precondition 'i_plus_one' got status valid.
+[eva] precond.c:39: function f: precondition 'i_plus_one' got status valid.
 [eva] precond.c:39: function f: precondition 'i' got status valid.
 [eva] precond.c:39: Reusing old results for call to f
 [eva] computing for function f <- main.
   Called from precond.c:40.
-[eva] precond.c:40: 
-  function f: precondition 'i_plus_one' got status valid.
+[eva] precond.c:40: function f: precondition 'i_plus_one' got status valid.
 [eva:alarm] precond.c:40: Warning: 
   function f: precondition 'i' got status invalid.
 [eva] Recording results for f

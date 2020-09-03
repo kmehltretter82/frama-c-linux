@@ -11,10 +11,8 @@
   Z ∈ [--..--]
 [eva:alarm] loops.i:56: Warning: assertion got status unknown.
 [eva] loops.i:50: starting to merge loop iterations
-[eva:alarm] loops.i:52: Warning: 
-  signed overflow. assert x1 + 1 ≤ 2147483647;
-[eva:alarm] loops.i:54: Warning: 
-  signed overflow. assert x2 + 1 ≤ 2147483647;
+[eva:alarm] loops.i:52: Warning: signed overflow. assert x1 + 1 ≤ 2147483647;
+[eva:alarm] loops.i:54: Warning: signed overflow. assert x2 + 1 ≤ 2147483647;
 [eva] Recording results for f2
 [eva] done for function f2
 [from] Computing for function f2
@@ -53,4 +51,4 @@ void f2(int c)
 }
 
 
-[kernel] Parsing result/ocode_2_loops.i (no preprocessing)
+[kernel] Parsing ocode_2_loops.i (no preprocessing)

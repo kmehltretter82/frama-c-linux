@@ -32,8 +32,7 @@
 [eva] octagons.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] octagons.c:37: 
-  Frama_C_show_each_reduced_char: [-7..3], [6..127]
+[eva] octagons.c:37: Frama_C_show_each_reduced_char: [-7..3], [6..127]
 [eva] Recording results for integer_types
 [eva] Done for function integer_types
 [eva] computing for function arith <- main.
@@ -198,8 +197,7 @@
   Called from octagons.c:171.
 [eva] Recording results for diff
 [eva] Done for function diff
-[eva] octagons.c:174: 
-  Frama_C_show_each_equal: [0..16], [0..16], [0..16]
+[eva] octagons.c:174: Frama_C_show_each_equal: [0..16], [0..16], [0..16]
 [eva] Recording results for interprocedural
 [eva] Done for function interprocedural
 [eva] computing for function dump <- main.

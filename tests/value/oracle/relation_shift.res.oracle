@@ -13,8 +13,7 @@
   signed overflow. assert -2147483648 ≤ y - 1;
 [eva:alarm] relation_shift.i:11: Warning: 
   signed overflow. assert z + t ≤ 2147483647;
-[eva:alarm] relation_shift.i:12: Warning: 
-  out of bounds write. assert \valid(q);
+[eva:alarm] relation_shift.i:12: Warning: out of bounds write. assert \valid(q);
 [eva:alarm] relation_shift.i:15: Warning: 
   signed overflow. assert -2147483648 ≤ x - y;
 [eva:alarm] relation_shift.i:15: Warning: 

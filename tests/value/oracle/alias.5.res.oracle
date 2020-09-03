@@ -125,15 +125,12 @@
   ==END OF DUMP==
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva:alarm] alias.i:271: Warning: 
-  signed overflow. assert c2 + 1 ≤ 2147483647;
-[eva:alarm] alias.i:273: Warning: 
-  signed overflow. assert c2 + 2 ≤ 2147483647;
+[eva:alarm] alias.i:271: Warning: signed overflow. assert c2 + 1 ≤ 2147483647;
+[eva:alarm] alias.i:273: Warning: signed overflow. assert c2 + 2 ≤ 2147483647;
 [eva] alias.i:279: starting to merge loop iterations
 [eva:alarm] alias.i:285: Warning: 
   pointer comparison. assert \pointer_comparable((void *)PTR2, (void *)PTR1);
-[eva:alarm] alias.i:292: Warning: 
-  signed overflow. assert c1 + 1 ≤ 2147483647;
+[eva:alarm] alias.i:292: Warning: signed overflow. assert c1 + 1 ≤ 2147483647;
 [eva] alias.i:292: starting to merge loop iterations
 [eva] Recording results for main11
 [eva] done for function main11

@@ -34,8 +34,7 @@
 [eva] Recording results for func
 [eva] Done for function func
 [eva] bts709.c:46: starting to merge loop iterations
-[eva] bts709.c:47: 
-  Reusing old results for call to inputsOf_testcase_func
+[eva] bts709.c:47: Reusing old results for call to inputsOf_testcase_func
 [eva] Recording results for main
 [eva] done for function main
 [slicing] initializing slicing ...
@@ -88,8 +87,7 @@ void func_slice_1(void)
         var2 = 3;
       }
   /*@ slice pragma stmt; */
-  if (65 != var2) __FC_assert((5 != var1) != 0,"bts709.c",38,
-                              "5 != var1");
+  if (65 != var2) __FC_assert((5 != var1) != 0,"bts709.c",38,"5 != var1");
   return;
 }
 
@@ -116,6 +114,6 @@ void inputsOf_testcase_func_slice_1(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts709.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] result/ocode_0_bts709.i:25: Warning: 
+[kernel] Parsing ocode_0_bts709.i (no preprocessing)
+[kernel:typing:implicit-function-declaration] ocode_0_bts709.i:25: Warning: 
   Calling undeclared function __FC_assert. Old style K&R code?

@@ -8,26 +8,19 @@
 [eva] computing for function allocate_T <- main.
   Called from malloc_multiple.c:42.
 [eva] malloc_multiple.c:11: Call to builtin malloc
-[eva] malloc_multiple.c:11: 
-  allocating variable __malloc_allocate_T_l11
+[eva] malloc_multiple.c:11: allocating variable __malloc_allocate_T_l11
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_0
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_0
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_1
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_1
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_2
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_2
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_3
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_3
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_4
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_4
 [eva] malloc_multiple.c:14: Call to builtin malloc
 [eva:malloc:weak] malloc_multiple.c:14: 
   marking variable `__malloc_allocate_T_l14_4' as weak
@@ -38,26 +31,19 @@
 [eva] computing for function allocate_T <- main.
   Called from malloc_multiple.c:43.
 [eva] malloc_multiple.c:11: Call to builtin malloc
-[eva] malloc_multiple.c:11: 
-  allocating variable __malloc_allocate_T_l11_0
+[eva] malloc_multiple.c:11: allocating variable __malloc_allocate_T_l11_0
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_5
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_5
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_6
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_6
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_7
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_7
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_8
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_8
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_9
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_9
 [eva] malloc_multiple.c:14: Call to builtin malloc
-[eva] malloc_multiple.c:14: 
-  allocating variable __malloc_allocate_T_l14_10
+[eva] malloc_multiple.c:14: allocating variable __malloc_allocate_T_l14_10
 [eva] malloc_multiple.c:14: Call to builtin malloc
 [eva:malloc:weak] malloc_multiple.c:14: 
   marking variable `__malloc_allocate_T_l14_10' as weak
@@ -117,10 +103,8 @@
 [eva:malloc] malloc_multiple.c:34: 
   weak free on bases: {__malloc_w_allocate_and_free_last_l29_4}
 [eva] malloc_multiple.c:35: assertion got status valid.
-[eva:alarm] malloc_multiple.c:36: Warning: 
-  assertion got status unknown.
-[eva:alarm] malloc_multiple.c:37: Warning: 
-  assertion got status unknown.
+[eva:alarm] malloc_multiple.c:36: Warning: assertion got status unknown.
+[eva:alarm] malloc_multiple.c:37: Warning: assertion got status unknown.
 [eva] Recording results for allocate_and_free_last
 [eva] Done for function allocate_and_free_last
 [eva] Recording results for main

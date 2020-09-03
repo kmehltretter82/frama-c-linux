@@ -22,8 +22,7 @@
 [eva] Done for function g
 [eva] Recording results for main
 [eva] done for function main
-[eva] unitialized.c:30: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] unitialized.c:30: assertion 'Eva,initialization' got final status invalid.
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main
@@ -36,8 +35,7 @@
 [from] Done for function printf
 [from] Non-terminating function g (no dependencies)
 [from] Done for function g
-[pdg] unitialized.c:43: Warning: 
-  no final state. Probably unreachable...
+[pdg] unitialized.c:43: Warning: no final state. Probably unreachable...
 [pdg] done for function main
 [slicing] applying all slicing requests...
 [slicing] applying 0 actions...
@@ -57,4 +55,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_2_unitialized.i (no preprocessing)
+[kernel] Parsing ocode_2_unitialized.i (no preprocessing)

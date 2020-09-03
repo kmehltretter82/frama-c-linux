@@ -8,8 +8,7 @@
   accessing uninitialized left-value. assert \initialized(&f);
 [eva] Recording results for main
 [eva] done for function main
-[eva] uninit.i:5: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] uninit.i:5: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   f ∈ UNINITIALIZED

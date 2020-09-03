@@ -85,4 +85,4 @@ void main(int n)
 }
 
 
-[kernel] Parsing result/ocode_0_call_demo.i (no preprocessing)
+[kernel] Parsing ocode_0_call_demo.i (no preprocessing)

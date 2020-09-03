@@ -43,8 +43,7 @@
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
   Called from redundant_alarms.c:65.
-[eva:alarm] redundant_alarms.c:41: Warning: 
-  assertion got status unknown.
+[eva:alarm] redundant_alarms.c:41: Warning: assertion got status unknown.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -52,8 +51,7 @@
 [eva] redundant_alarms.c:55: assertion got status valid.
 [eva:locals-escaping] redundant_alarms.c:55: Warning: 
   locals {x} escaping the scope of a block of main5 through p
-[eva:alarm] redundant_alarms.c:58: Warning: 
-  assertion got status unknown.
+[eva:alarm] redundant_alarms.c:58: Warning: assertion got status unknown.
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] Recording results for main

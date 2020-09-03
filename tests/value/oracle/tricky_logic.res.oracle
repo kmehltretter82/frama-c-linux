@@ -7,8 +7,7 @@
   str ∈ {{ "abc" }}
   x ∈ {0}
   y ∈ {0}
-[eva] tricky_logic.i:56: 
-  function main: precondition got status valid.
+[eva] tricky_logic.i:56: function main: precondition got status valid.
 [eva] computing for function f1 <- main.
   Called from tricky_logic.i:58.
 [eva] tricky_logic.i:15: assertion got status valid.
@@ -25,8 +24,7 @@
   Called from tricky_logic.i:65.
 [eva] tricky_logic.i:29: assertion got status valid.
 [eva] tricky_logic.i:30: assertion got status valid.
-[eva:alarm] tricky_logic.i:31: Warning: 
-  assertion got status unknown.
+[eva:alarm] tricky_logic.i:31: Warning: assertion got status unknown.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f4 <- main.
@@ -34,8 +32,7 @@
 [eva] computing for function g4 <- f4 <- main.
   Called from tricky_logic.i:51.
 [eva] tricky_logic.i:38: assertion got status valid.
-[eva:alarm] tricky_logic.i:39: Warning: 
-  assertion got status unknown.
+[eva:alarm] tricky_logic.i:39: Warning: assertion got status unknown.
 [eva] Recording results for g4
 [eva] Done for function g4
 [eva] tricky_logic.i:52: assertion got status valid.

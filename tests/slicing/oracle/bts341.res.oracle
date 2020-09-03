@@ -30,4 +30,4 @@ void main(int c)
 }
 
 
-[kernel] Parsing result/ocode_0_bts341.i (no preprocessing)
+[kernel] Parsing ocode_0_bts341.i (no preprocessing)

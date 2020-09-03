@@ -42,8 +42,7 @@
 [eva] fptr.i:9: Reusing old results for call to h
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:67: 
-  Frama_C_show_each_F: {{ NULL + [0..4294967295] ; &h ; &hh }}
+[eva] fptr.i:67: Frama_C_show_each_F: {{ NULL + [0..4294967295] ; &h ; &hh }}
 [eva] computing for function f <- main_uninit.
   Called from fptr.i:68.
 [eva:alarm] fptr.i:9: Warning: 
@@ -52,8 +51,7 @@
 [eva] fptr.i:9: Reusing old results for call to h
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:67: 
-  Frama_C_show_each_F: {{ NULL + [0..4294967295] ; &h ; &hh }}
+[eva] fptr.i:67: Frama_C_show_each_F: {{ NULL + [0..4294967295] ; &h ; &hh }}
 [eva] fptr.i:68: Reusing old results for call to f
 [eva] Recording results for main_uninit
 [eva] done for function main_uninit

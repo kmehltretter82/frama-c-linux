@@ -11,14 +11,12 @@
 [eva] computing for function init <- main_bis.
   Called from bts324.i:26.
 [eva] using specification for function init
-[eva] bts324.i:14: Warning: 
-  no \from part for clause 'assigns *p_res;'
+[eva] bts324.i:14: Warning: no \from part for clause 'assigns *p_res;'
 [eva] Done for function init
 [eva] computing for function loop_body <- main_bis.
   Called from bts324.i:29.
 [eva] using specification for function loop_body
-[eva] bts324.i:11: Warning: 
-  no \from part for clause 'assigns i0, o0;'
+[eva] bts324.i:11: Warning: no \from part for clause 'assigns i0, o0;'
 [eva] Done for function loop_body
 [eva] bts324.i:28: starting to merge loop iterations
 [eva] computing for function loop_body <- main_bis.

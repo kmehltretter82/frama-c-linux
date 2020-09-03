@@ -38,8 +38,7 @@
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
   Called from invalid_pointer.c:173.
-[eva] invalid_pointer.c:43: 
-  Trace partitioning superposing up to 100 states
+[eva] invalid_pointer.c:43: Trace partitioning superposing up to 100 states
 [eva:alarm] invalid_pointer.c:52: Warning: 
   invalid pointer creation. assert \object_pointer(q - 1);
 [eva] Recording results for pointer_in_loops
@@ -109,8 +108,7 @@
   invalid pointer creation. assert \object_pointer(p + undet);
 [eva] invalid_pointer.c:139: assertion got status valid.
 [eva] invalid_pointer.c:140: assertion got status valid.
-[eva] invalid_pointer.c:141: 
-  Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
+[eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
 [eva:alarm] invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
@@ -136,16 +134,13 @@
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
 [eva] invalid_pointer.c:155: assertion got status valid.
-[eva:alarm] invalid_pointer.c:158: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:158: Warning: assertion got status unknown.
 [eva:alarm] invalid_pointer.c:160: Warning: 
   invalid pointer creation. assert \object_pointer((int *)50);
-[eva:alarm] invalid_pointer.c:161: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:161: Warning: assertion got status unknown.
 [eva:alarm] invalid_pointer.c:162: Warning: 
   invalid pointer creation. assert \object_pointer((int *)undet);
-[eva:alarm] invalid_pointer.c:163: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:163: Warning: assertion got status unknown.
 [eva:alarm] invalid_pointer.c:165: Warning: 
   invalid pointer creation. assert \object_pointer((int *)100);
 [eva] Recording results for object_pointer_predicate

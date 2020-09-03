@@ -12,8 +12,7 @@
 [eva] Recording results for test_infinite_loop_2
 [eva] done for function test_infinite_loop_2
 [pdg] computing for function test_infinite_loop_2
-[pdg] pb_infinite_loop.c:37: Warning: 
-  no final state. Probably unreachable...
+[pdg] pb_infinite_loop.c:37: Warning: no final state. Probably unreachable...
 [pdg] done for function test_infinite_loop_2
 [pdg] PDG for test_infinite_loop_2
  {n1}: InCtrl

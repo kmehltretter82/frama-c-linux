@@ -15,23 +15,17 @@
   t ∈ {0}
   u ∈ {0}
 [eva] cond2.i:52: starting to merge loop iterations
-[eva:alarm] cond2.i:52: Warning: 
-  signed overflow. assert x + 2 ≤ 2147483647;
+[eva:alarm] cond2.i:52: Warning: signed overflow. assert x + 2 ≤ 2147483647;
 [eva] cond2.i:53: starting to merge loop iterations
-[eva:alarm] cond2.i:53: Warning: 
-  signed overflow. assert y + 2 ≤ 2147483647;
+[eva:alarm] cond2.i:53: Warning: signed overflow. assert y + 2 ≤ 2147483647;
 [eva] cond2.i:59: starting to merge loop iterations
-[eva:alarm] cond2.i:59: Warning: 
-  signed overflow. assert x + 4 ≤ 2147483647;
+[eva:alarm] cond2.i:59: Warning: signed overflow. assert x + 4 ≤ 2147483647;
 [eva] cond2.i:60: starting to merge loop iterations
-[eva:alarm] cond2.i:60: Warning: 
-  signed overflow. assert y + 4 ≤ 2147483647;
+[eva:alarm] cond2.i:60: Warning: signed overflow. assert y + 4 ≤ 2147483647;
 [eva] cond2.i:66: starting to merge loop iterations
-[eva:alarm] cond2.i:66: Warning: 
-  out of bounds write. assert \valid(px);
+[eva:alarm] cond2.i:66: Warning: out of bounds write. assert \valid(px);
 [eva] cond2.i:67: starting to merge loop iterations
-[eva:alarm] cond2.i:67: Warning: 
-  out of bounds write. assert \valid(py);
+[eva:alarm] cond2.i:67: Warning: out of bounds write. assert \valid(py);
 [eva] Recording results for un_1
 [eva] done for function un_1
 [eva] ====== VALUES COMPUTED ======

@@ -10,8 +10,7 @@
   Neither code nor specification for function __builtin_va_start, generating default assigns from the prototype
 [eva] using specification for function __builtin_va_start
 [eva] Done for function __builtin_va_start
-[eva:alarm] va_list2.c:12: Warning: 
-  out of bounds read. assert \valid_read(fmt);
+[eva:alarm] va_list2.c:12: Warning: out of bounds read. assert \valid_read(fmt);
 [eva] computing for function __builtin_va_arg <- main.
   Called from va_list2.c:15.
 [kernel:annot:missing-spec] va_list2.c:15: Warning: 
@@ -30,8 +29,7 @@
   assert \initialized(&tmp_0);
   (tmp_0 from vararg)
 [eva] va_list2.c:12: starting to merge loop iterations
-[eva:alarm] va_list2.c:13: Warning: 
-  out of bounds read. assert \valid_read(fmt);
+[eva:alarm] va_list2.c:13: Warning: out of bounds read. assert \valid_read(fmt);
 [eva] computing for function __builtin_va_arg <- main.
   Called from va_list2.c:15.
 [eva] Done for function __builtin_va_arg
@@ -46,10 +44,8 @@
 [eva] Done for function __builtin_va_end
 [eva] Recording results for main
 [eva] done for function main
-[eva] va_list2.c:15: 
-  assertion 'Eva,initialization' got final status invalid.
-[eva] va_list2.c:20: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] va_list2.c:15: assertion 'Eva,initialization' got final status invalid.
+[eva] va_list2.c:20: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

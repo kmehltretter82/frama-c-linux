@@ -54,8 +54,7 @@
 [eva] Done for function i
 [eva] Recording results for main
 [eva] done for function main
-[eva] local.i:14: 
-  assertion 'Eva,dangling_pointer' got final status invalid.
+[eva] local.i:14: assertion 'Eva,dangling_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   X ∈ {{ &a }}

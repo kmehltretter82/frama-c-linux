@@ -5,12 +5,10 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   a ∈ {7}
-[eva:missing-loop-unroll] loopfun.i:23: 
-  while loop without unroll annotation
+[eva:missing-loop-unroll] loopfun.i:23: while loop without unroll annotation
 [eva:missing-loop-unroll:for] loopfun.i:26: Warning: 
   for loop without unroll annotation
-[eva:missing-loop-unroll] loopfun.i:27: 
-  dowhile loop without unroll annotation
+[eva:missing-loop-unroll] loopfun.i:27: dowhile loop without unroll annotation
 [eva] Recording results for main2
 [eva] done for function main2
 [eva] ====== VALUES COMPUTED ======

@@ -10,8 +10,7 @@
 [kernel] plevel.i:21: 
   more than 40(65) locations to update in array. Approximating.
 [eva] Recording results for main
-[kernel] plevel.i:21: 
-  more than 40(65) elements to enumerate. Approximating.
+[kernel] plevel.i:21: more than 40(65) elements to enumerate. Approximating.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
@@ -104,8 +103,7 @@
   i2 ∈ [0..64]
   p ∈ {{ &t + [0x2000..0x2040] }}
 [from] Computing for function main
-[kernel] plevel.i:21: 
-  more than 40(65) dependencies to update. Approximating.
+[kernel] plevel.i:21: more than 40(65) dependencies to update. Approximating.
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:

@@ -1,34 +1,8 @@
 [kernel] Parsing wide_string.c (with preprocessing)
-[eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  
-[eva:alarm] wide_string.c:16: Warning: 
-  accessing out of bounds index. assert 4 < 4;
-[eva:alarm] wide_string.c:19: Warning: 
-  accessing out of bounds index. assert 4 < 4;
-[eva] Recording results for main
-[eva] done for function main
-[eva] wide_string.c:16: 
-  assertion 'Eva,index_bound' got final status invalid.
-[eva] wide_string.c:19: 
-  assertion 'Eva,index_bound' got final status invalid.
-[eva] ====== VALUES COMPUTED ======
-[eva:final-states] Values at end of function main:
-  p ∈ {{ "bar" }}
-  q ∈ {{ L"foO" }}
-  __retres ∈ {0}
-[from] Computing for function main
-[from] Done for function main
-[from] ====== DEPENDENCIES COMPUTED ======
-  These dependencies hold at termination for the executions that terminate:
-[from] Function main:
-  \result FROM "bar"{[bits 8 to 15]; [bits 24 to 31]};
-               L"foO"{[bits 32 to 63]; [bits 96 to 127]}
-[from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function main:
-    p; q; c; wc; __retres
-[inout] Inputs for function main:
-    "bar"{[bits 8 to 15]; [bits 24 to 31]};
-    L"foO"{[bits 32 to 63]; [bits 96 to 127]}
+[kernel] User Error: failed to run: gcc -E -C -I.  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32 -o '/tmp/wide_string.c2787c3.i' '/home/bobot/Sources/frama-c/_build/default/result/wide_string.c'
+  this is possibly due to missing preprocessor flags;
+  consider options -cpp-extra-args, -json-compilation-database or -cpp-command.
+  See chapter "Preparing the Sources" in the Frama-C user manual for more details.
+[kernel] User Error: stopping on file "wide_string.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.

@@ -33,7 +33,7 @@ let main () =
   let tmpfile = tmpfile () in
   let fmt = Format.std_formatter in
   let display_results state = Format.fprintf fmt "@[%a@]@\n" !Db.Value.display state in
-  Dynamic.Parameter.String.set "" "tests/builtins/long_init.c";
+  Dynamic.Parameter.String.set "" "long_init.c";
   Dynamic.Parameter.String.set "-eva-save-fun-state" ("init_inner:" ^ tmpfile);
   Dynamic.Parameter.String.set "-eva-alloc-builtin" "fresh";
   Dynamic.Parameter.Bool.set "-eva-alloc-returns-null" false;
@@ -41,7 +41,7 @@ let main () =
   !Db.Value.compute ();
   Callgraph.Uses.iter_in_rev_order display_results;
   Files.clear ();
-  Dynamic.Parameter.String.set "" "tests/builtins/long_init2.c";
+  Dynamic.Parameter.String.set "" "long_init2.c";
   (* clear and set parameters to the same value to recompute
      kernel function IDs *)
   Dynamic.Parameter.String.clear "-eva-save-fun-state" ();
@@ -53,7 +53,7 @@ let main () =
   !Db.Value.compute ();
   Callgraph.Uses.iter_in_rev_order display_results;
   Files.clear ();
-  Dynamic.Parameter.String.set "" "tests/builtins/long_init3.c";
+  Dynamic.Parameter.String.set "" "long_init3.c";
   Dynamic.Parameter.String.clear "-eva-save-fun-state" ();
   Dynamic.Parameter.String.clear "-eva-load-fun-state" ();
   Dynamic.Parameter.String.set "-eva-load-fun-state" ("init_outer:" ^ tmpfile);

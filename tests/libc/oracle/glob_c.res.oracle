@@ -7,126 +7,126 @@
 [eva] computing for function glob <- main.
   Called from glob_c.c:30.
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:32.
+  Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] using specification for function Frama_C_interval
-[eva] share/libc/glob.c:32: 
+[eva] FRAMAC_SHARE/libc/glob.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:66: Call to builtin realloc
-[eva] share/libc/glob.c:66: 
+[eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:66: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/glob.c:66: allocating variable __realloc_glob_l66
-[eva] share/libc/glob.c:71: starting to merge loop iterations
-[eva] share/libc/glob.c:73: starting to merge loop iterations
-[eva:alarm] share/libc/glob.c:74: Warning: 
+[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66
+[eva] FRAMAC_SHARE/libc/glob.c:71: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/glob.c:73: starting to merge loop iterations
+[eva:alarm] FRAMAC_SHARE/libc/glob.c:74: Warning: 
   out of bounds write.
   assert
   \valid(pglob->gl_pathv +
          (unsigned int)((unsigned int)(reserve_offs + prev_len) + i_1));
-[eva:alarm] share/libc/glob.c:76: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/glob.c:76: Warning: 
   out of bounds write.
   assert
   \valid(pglob->gl_pathv +
          (unsigned int)((unsigned int)(prev_len + reserve_offs) +
                         pglob->gl_pathc));
 [eva] computing for function Frama_C_nondet <- glob <- main.
-  Called from share/libc/glob.c:77.
+  Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] using specification for function Frama_C_nondet
 [eva] Done for function Frama_C_nondet
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:82.
-[eva] share/libc/glob.c:82: 
+  Called from FRAMAC_SHARE/libc/glob.c:82.
+[eva] FRAMAC_SHARE/libc/glob.c:82: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function globerr0 <- glob <- main.
-  Called from share/libc/glob.c:82.
+  Called from FRAMAC_SHARE/libc/glob.c:82.
 [eva] Recording results for globerr0
 [eva] Done for function globerr0
 [eva] Recording results for glob
 [eva] Done for function glob
 [eva] computing for function globfree <- main.
   Called from glob_c.c:31.
-[eva:alarm] share/libc/glob.c:93: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/glob.c:93: Warning: 
   accessing uninitialized left-value. assert \initialized(&pglob->gl_pathv);
-[eva] share/libc/glob.c:93: Call to builtin free
-[eva] share/libc/glob.c:93: 
+[eva] FRAMAC_SHARE/libc/glob.c:93: Call to builtin free
+[eva] FRAMAC_SHARE/libc/glob.c:93: 
   function free: precondition 'freeable' got status valid.
 [eva] Recording results for globfree
 [eva] Done for function globfree
 [eva] computing for function glob <- main.
   Called from glob_c.c:33.
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:32.
+  Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:66: Call to builtin realloc
-[eva] share/libc/glob.c:66: allocating variable __realloc_glob_l66_0
+[eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_0
 [eva] computing for function Frama_C_nondet <- glob <- main.
-  Called from share/libc/glob.c:77.
+  Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:82.
+  Called from FRAMAC_SHARE/libc/glob.c:82.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:82: Reusing old results for call to globerr0
+[eva] FRAMAC_SHARE/libc/glob.c:82: Reusing old results for call to globerr0
 [eva] Recording results for glob
 [eva] Done for function glob
 [eva] computing for function globfree <- main.
   Called from glob_c.c:34.
-[eva:alarm] share/libc/glob.c:93: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/glob.c:93: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&pglob->gl_pathv);
-[eva] share/libc/glob.c:93: Call to builtin free
+[eva] FRAMAC_SHARE/libc/glob.c:93: Call to builtin free
 [eva] Recording results for globfree
 [eva] Done for function globfree
 [eva] computing for function glob <- main.
   Called from glob_c.c:36.
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:32.
+  Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:50: Call to builtin realloc
-[eva] share/libc/glob.c:50: 
+[eva] FRAMAC_SHARE/libc/glob.c:50: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:50: 
   function realloc: precondition 'freeable' got status valid.
-[eva] share/libc/glob.c:50: allocating variable __realloc_glob_l50
-[eva] share/libc/glob.c:66: Call to builtin realloc
-[eva] share/libc/glob.c:66: allocating variable __realloc_glob_l66_1
+[eva] FRAMAC_SHARE/libc/glob.c:50: allocating variable __realloc_glob_l50
+[eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_1
 [eva] computing for function Frama_C_nondet <- glob <- main.
-  Called from share/libc/glob.c:77.
+  Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:82.
+  Called from FRAMAC_SHARE/libc/glob.c:82.
 [eva] Done for function Frama_C_interval
 [eva] computing for function globerr1 <- glob <- main.
-  Called from share/libc/glob.c:82.
+  Called from FRAMAC_SHARE/libc/glob.c:82.
 [eva] Recording results for globerr1
 [eva] Done for function globerr1
 [eva] Recording results for glob
 [eva] Done for function glob
 [eva] computing for function globfree <- main.
   Called from glob_c.c:37.
-[eva] share/libc/glob.c:93: Call to builtin free
+[eva] FRAMAC_SHARE/libc/glob.c:93: Call to builtin free
 [eva] Recording results for globfree
 [eva] Done for function globfree
 [eva] computing for function glob <- main.
   Called from glob_c.c:40.
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:32.
+  Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:50: Call to builtin realloc
-[eva] share/libc/glob.c:50: allocating variable __realloc_glob_l50_0
-[eva] share/libc/glob.c:54: starting to merge loop iterations
-[eva] share/libc/glob.c:66: Call to builtin realloc
-[eva] share/libc/glob.c:66: allocating variable __realloc_glob_l66_2
+[eva] FRAMAC_SHARE/libc/glob.c:50: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:50: allocating variable __realloc_glob_l50_0
+[eva] FRAMAC_SHARE/libc/glob.c:54: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_2
 [eva] computing for function Frama_C_nondet <- glob <- main.
-  Called from share/libc/glob.c:77.
+  Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet
 [eva] computing for function Frama_C_interval <- glob <- main.
-  Called from share/libc/glob.c:82.
+  Called from FRAMAC_SHARE/libc/glob.c:82.
 [eva] Done for function Frama_C_interval
-[eva] share/libc/glob.c:82: Reusing old results for call to globerr1
+[eva] FRAMAC_SHARE/libc/glob.c:82: Reusing old results for call to globerr1
 [eva] Recording results for glob
 [eva] Done for function glob
 [eva] computing for function globfree <- main.
   Called from glob_c.c:41.
-[eva] share/libc/glob.c:93: Call to builtin free
+[eva] FRAMAC_SHARE/libc/glob.c:93: Call to builtin free
 [eva] Recording results for globfree
 [eva] Done for function globfree
 [eva] Recording results for main

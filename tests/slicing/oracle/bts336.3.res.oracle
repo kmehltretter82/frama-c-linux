@@ -83,4 +83,4 @@ int main3(void)
 }
 
 
-[kernel] Parsing result/ocode_3_bts336.i (no preprocessing)
+[kernel] Parsing ocode_3_bts336.i (no preprocessing)

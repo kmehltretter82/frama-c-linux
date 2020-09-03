@@ -8,8 +8,7 @@
   accessing uninitialized left-value. assert \initialized(&t[100]);
 [eva] Recording results for f
 [eva] done for function f
-[eva] test.i:21: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] test.i:21: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   t[0] ∈ {99}

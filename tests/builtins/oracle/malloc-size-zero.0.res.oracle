@@ -7,8 +7,7 @@
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:16.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_my_calloc_l10
+[eva] malloc-size-zero.c:10: allocating variable __malloc_my_calloc_l10
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] malloc-size-zero.c:20: Frama_C_show_each_not_NULL_p1:
@@ -17,30 +16,26 @@
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_my_calloc_l10_0
+[eva] malloc-size-zero.c:10: allocating variable __malloc_my_calloc_l10_0
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] malloc-size-zero.c:27: starting to merge loop iterations
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_my_calloc_l10_1
+[eva] malloc-size-zero.c:10: allocating variable __malloc_my_calloc_l10_1
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_my_calloc_l10_2
+[eva] malloc-size-zero.c:10: allocating variable __malloc_my_calloc_l10_2
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc
-[eva] malloc-size-zero.c:10: 
-  allocating variable __malloc_my_calloc_l10_3
+[eva] malloc-size-zero.c:10: allocating variable __malloc_my_calloc_l10_3
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
 [eva] computing for function my_calloc <- main.

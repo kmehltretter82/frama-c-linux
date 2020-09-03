@@ -6,12 +6,9 @@
   
 [eva:alarm] call_2.i:15: Warning: 
   accessing uninitialized left-value. assert \initialized(&z);
-[eva:alarm] call_2.i:15: Warning: 
-  non-finite float value. assert \is_finite(f);
-[eva:alarm] call_2.i:15: Warning: 
-  signed overflow. assert -2147483648 ≤ i + j;
-[eva:alarm] call_2.i:15: Warning: 
-  signed overflow. assert i + j ≤ 2147483647;
+[eva:alarm] call_2.i:15: Warning: non-finite float value. assert \is_finite(f);
+[eva:alarm] call_2.i:15: Warning: signed overflow. assert -2147483648 ≤ i + j;
+[eva:alarm] call_2.i:15: Warning: signed overflow. assert i + j ≤ 2147483647;
 [eva] computing for function ff <- main.
   Called from call_2.i:15.
 [eva] call_2.i:6: 

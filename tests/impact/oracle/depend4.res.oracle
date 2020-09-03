@@ -66,8 +66,6 @@
 [pdg] computing for function aux
 [pdg] done for function aux
 [impact] impacted statements of stmt(s) 18 are:
-    depend4.i:13 (sid 6): r1 = *p;
-    depend4.i:15 (sid 7): r2 = *p;
-    depend4.i:23 (sid 13): aux(& a,1);
-    depend4.i:30 (sid 19): g2();
+    depend4.i:13 (sid 6): r1 = *p;depend4.i:15 (sid 7): r2 = *p;
+    depend4.i:23 (sid 13): aux(& a,1);depend4.i:30 (sid 19): g2();
 [impact] analysis done

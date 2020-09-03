@@ -21,8 +21,7 @@
 [eva] using specification for function stat
 [eva] sys_stat_h.c:14: 
   function stat: precondition 'valid_pathname' got status valid.
-[eva] sys_stat_h.c:14: 
-  function stat: precondition 'valid_buf' got status valid.
+[eva] sys_stat_h.c:14: function stat: precondition 'valid_buf' got status valid.
 [eva] Done for function stat
 [eva] computing for function mkdir <- main.
   Called from sys_stat_h.c:17.

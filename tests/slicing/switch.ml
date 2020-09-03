@@ -1,4 +1,4 @@
-(* ledit bin/toplevel.top -deps tests/slicing/switch.c
+(* ledit bin/toplevel.top -deps switch.c
 * *)
 
 include LibSelect ;;

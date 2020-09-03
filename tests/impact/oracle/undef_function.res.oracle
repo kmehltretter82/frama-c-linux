@@ -20,6 +20,5 @@
 [pdg] computing for function g
 [pdg] done for function g
 [impact] impacted statements of stmt(s) 2 are:
-    undef_function.i:10 (sid 3): g(y);
-    undef_function.i:11 (sid 5): return y;
+    undef_function.i:10 (sid 3): g(y);undef_function.i:11 (sid 5): return y;
 [impact] analysis done

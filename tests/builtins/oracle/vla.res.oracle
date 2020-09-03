@@ -19,13 +19,10 @@
 [eva] computing for function f <- main.
   Called from vla.c:20.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
-[eva:malloc] vla.c:6: 
-  resizing variable `__malloc_f_l6' (0..63) to fit 0..95
+[eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63) to fit 0..95
 [eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva:alarm] vla.c:8: Warning: 
-  out of bounds write. assert \valid(t + i);
-[eva:alarm] vla.c:9: Warning: 
-  out of bounds read. assert \valid_read(t + i);
+[eva:alarm] vla.c:8: Warning: out of bounds write. assert \valid(t + i);
+[eva:alarm] vla.c:9: Warning: out of bounds read. assert \valid_read(t + i);
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -34,8 +31,7 @@
 [eva] computing for function f <- main.
   Called from vla.c:20.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
-[eva:malloc] vla.c:6: 
-  resizing variable `__malloc_f_l6' (0..63/95) to fit 0..127
+[eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63/95) to fit 0..127
 [eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}

@@ -76,4 +76,4 @@ PTF h(int a, int b)
 }
 
 
-[kernel] Parsing result/ocode_0_ptr_fct.i (no preprocessing)
+[kernel] Parsing ocode_0_ptr_fct.i (no preprocessing)

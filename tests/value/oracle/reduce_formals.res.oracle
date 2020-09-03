@@ -6,8 +6,7 @@
   g ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from reduce_formals.i:69.
-[eva:alarm] reduce_formals.i:2: Warning: 
-  assertion got status unknown.
+[eva:alarm] reduce_formals.i:2: Warning: assertion got status unknown.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
@@ -40,16 +39,13 @@
   Called from reduce_formals.i:76.
 [eva] computing for function f_main4_1 <- main4 <- main.
   Called from reduce_formals.i:33.
-[eva:alarm] reduce_formals.i:24: Warning: 
-  assertion got status unknown.
+[eva:alarm] reduce_formals.i:24: Warning: assertion got status unknown.
 [eva] Recording results for f_main4_1
 [eva] Done for function f_main4_1
-[eva] reduce_formals.i:34: 
-  Frama_C_show_each_v: {10; 11; 12; 13; 14; 15}
+[eva] reduce_formals.i:34: Frama_C_show_each_v: {10; 11; 12; 13; 14; 15}
 [eva] computing for function f_main4_2 <- main4 <- main.
   Called from reduce_formals.i:36.
-[eva:alarm] reduce_formals.i:28: Warning: 
-  assertion got status unknown.
+[eva:alarm] reduce_formals.i:28: Warning: assertion got status unknown.
 [eva] Recording results for f_main4_2
 [eva] Done for function f_main4_2
 [eva] reduce_formals.i:37: Frama_C_show_each_v: {16; 17; 18; 19; 20}
@@ -69,12 +65,10 @@
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
   Called from reduce_formals.i:78.
-[eva:alarm] reduce_formals.i:63: Warning: 
-  assertion got status unknown.
+[eva:alarm] reduce_formals.i:63: Warning: assertion got status unknown.
 [eva] computing for function f_main6 <- main6 <- main.
   Called from reduce_formals.i:64.
-[eva:alarm] reduce_formals.i:58: Warning: 
-  assertion got status unknown.
+[eva:alarm] reduce_formals.i:58: Warning: assertion got status unknown.
 [eva] Recording results for f_main6
 [eva] Done for function f_main6
 [eva] reduce_formals.i:65: Frama_C_show_each_6: {3}

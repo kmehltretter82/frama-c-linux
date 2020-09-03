@@ -10,11 +10,9 @@
   r ∈ {0}
   A ∈ {0}
   offs ∈ {0}
-[eva:alarm] reduce_valid.i:9: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] reduce_valid.i:9: Warning: out of bounds write. assert \valid(p);
 [eva] reduce_valid.i:16: Frama_C_show_each_ici: {0}
-[eva:alarm] reduce_valid.i:17: Warning: 
-  out of bounds write. assert \valid(q);
+[eva:alarm] reduce_valid.i:17: Warning: out of bounds write. assert \valid(q);
 [kernel] reduce_valid.i:17: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] reduce_valid.i:24: Warning: 
@@ -24,8 +22,7 @@
   accessing out of bounds index. assert (int)((int)h + 1) < 2;
 [eva] Recording results for main
 [eva] done for function main
-[eva] reduce_valid.i:17: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] reduce_valid.i:17: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {4}

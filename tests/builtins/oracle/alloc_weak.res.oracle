@@ -11,8 +11,7 @@
 [eva] alloc_weak.c:23: Call to builtin malloc
 [eva] alloc_weak.c:23: allocating variable __malloc_main1_l23
 [eva] alloc_weak.c:23: Call to builtin malloc
-[eva:malloc:weak] alloc_weak.c:23: 
-  marking variable `__malloc_main1_l23' as weak
+[eva:malloc:weak] alloc_weak.c:23: marking variable `__malloc_main1_l23' as weak
 [eva] computing for function copy <- main1 <- main.
   Called from alloc_weak.c:27.
 [eva] alloc_weak.c:14: Call to builtin memcpy
@@ -22,7 +21,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] alloc_weak.c:14: 
   function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] FRAMAC_SHARE/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for copy
 [eva] Done for function copy
@@ -31,8 +30,7 @@
 [eva] alloc_weak.c:14: Call to builtin memcpy
 [eva] Recording results for copy
 [eva] Done for function copy
-[eva:alarm] alloc_weak.c:29: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] alloc_weak.c:29: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] alloc_weak.c:30: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for main1
@@ -45,22 +43,14 @@
   pointer downcast.
   assert (unsigned int)tmp ≤ 2147483647;
   (tmp from malloc(sizeof(int)))
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 100 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 200 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 300 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 400 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 500 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 600 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 700 states
-[eva] alloc_weak.c:40: 
-  Trace partitioning superposing up to 800 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 100 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 200 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 300 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 400 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 500 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 600 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 700 states
+[eva] alloc_weak.c:40: Trace partitioning superposing up to 800 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
@@ -69,8 +59,7 @@
 [eva] alloc_weak.c:51: allocating variable __malloc_main3_l51
 [eva] alloc_weak.c:50: starting to merge loop iterations
 [eva] alloc_weak.c:51: Call to builtin malloc
-[eva:malloc:weak] alloc_weak.c:51: 
-  marking variable `__malloc_main3_l51' as weak
+[eva:malloc:weak] alloc_weak.c:51: marking variable `__malloc_main3_l51' as weak
 [eva] alloc_weak.c:51: Call to builtin malloc
 [eva] alloc_weak.c:51: Call to builtin malloc
 [eva:alarm] alloc_weak.c:62: Warning: 

@@ -8,8 +8,7 @@
 [eva:alarm] bts927.i:15: Warning: assertion got status unknown.
 [eva] computing for function f <- main.
   Called from bts927.i:17.
-[eva:alarm] bts927.i:10: Warning: 
-  signed overflow. assert a + 1 ≤ 2147483647;
+[eva:alarm] bts927.i:10: Warning: signed overflow. assert a + 1 ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.

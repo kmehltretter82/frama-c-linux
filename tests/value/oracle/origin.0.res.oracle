@@ -63,8 +63,7 @@
 [eva] origin.i:14: 
   Assigning imprecise value to pa1.
   The imprecision originates from Arithmetic {origin.i:14}
-[eva:alarm] origin.i:15: Warning: 
-  out of bounds write. assert \valid(pa1);
+[eva:alarm] origin.i:15: Warning: out of bounds write. assert \valid(pa1);
 [eva] Recording results for origin_arithmetic_1
 [eva] Done for function origin_arithmetic_1
 [eva] computing for function origin_arithmetic_2 <- main.
@@ -90,8 +89,7 @@
 [eva] origin.i:20: 
   Assigning imprecise value to qa2.
   The imprecision originates from Arithmetic {origin.i:20}
-[eva:alarm] origin.i:21: Warning: 
-  out of bounds write. assert \valid(qa2);
+[eva:alarm] origin.i:21: Warning: out of bounds write. assert \valid(qa2);
 [eva:alarm] origin.i:21: Warning: 
   pointer downcast. assert (unsigned int)(&aa2) ≤ 2147483647;
 [eva] Recording results for origin_arithmetic_2
@@ -107,8 +105,7 @@
 [eva] origin.i:25: 
   Assigning imprecise value to pa3.
   The imprecision originates from Arithmetic {origin.i:25}
-[eva:alarm] origin.i:26: Warning: 
-  out of bounds write. assert \valid(pa3);
+[eva:alarm] origin.i:26: Warning: out of bounds write. assert \valid(pa3);
 [eva] Recording results for origin_arithmetic_3
 [eva] Done for function origin_arithmetic_3
 [eva] computing for function origin_leaf_1 <- main.
@@ -137,15 +134,13 @@
 [eva] origin.i:100: 
   Assigning imprecise value to pl.
   The imprecision originates from Library function {origin.i:100}
-[eva:alarm] origin.i:101: Warning: 
-  out of bounds read. assert \valid_read(pl);
+[eva:alarm] origin.i:101: Warning: out of bounds read. assert \valid_read(pl);
 [eva] computing for function origin_misalign_1 <- main.
   Called from origin.i:102.
 [eva] origin.i:48: 
   Assigning imprecise value to pm1.
   The imprecision originates from Misaligned {origin.i:48}
-[eva:alarm] origin.i:49: Warning: 
-  out of bounds write. assert \valid(pm1);
+[eva:alarm] origin.i:49: Warning: out of bounds write. assert \valid(pm1);
 [eva] Recording results for origin_misalign_1
 [eva] Done for function origin_misalign_1
 [eva] computing for function origin_misalign_2 <- main.
@@ -156,8 +151,7 @@
 [eva] origin.i:55: 
   Frama_C_show_each:
   {{ garbled mix of &{a; b} (origin: Misaligned {origin.i:54}) }}
-[eva:alarm] origin.i:56: Warning: 
-  out of bounds write. assert \valid(qm2);
+[eva:alarm] origin.i:56: Warning: out of bounds write. assert \valid(qm2);
 [eva:alarm] origin.i:56: Warning: 
   pointer downcast. assert (unsigned int)(&a) ≤ 2147483647;
 [eva] Recording results for origin_misalign_2
@@ -207,16 +201,13 @@
   locals {local1} escaping the scope of local_escape_1 through esc4
 [eva] Recording results for main
 [eva] done for function main
-[eva] origin.i:75: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] origin.i:75: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function local_escape_1:
   esc1 ∈ {{ (int)&arg }}
   esc2 ∈ {{ (int)&local1 }}
-  esc3 ∈
-      {{ garbled mix of &{arg}
-       (origin: Arithmetic {origin.i:85}) }}
+  esc3 ∈ {{ garbled mix of &{arg} (origin: Arithmetic {origin.i:85}) }}
   esc4 ∈ {{ NULL + {12} ; (int)&local1 }}
   esc5 ∈ {{ (int)&esc1 }}
   local2 ∈ {{ (int)&local1 }}
@@ -224,16 +215,12 @@
   pa1 ∈ {{ &ta1 + [0..36] }}
   ta1[0..9] ∈ {0}
 [eva:final-states] Values at end of function origin_arithmetic_2:
-  pa2 ∈
-     {{ garbled mix of &{ta2}
-      (origin: Arithmetic {origin.i:19}) }}
+  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19}) }}
   qa2 ∈ {{ &ta2 + [0..36] ; &tta2 + [0..36] }}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2}
-      (origin: Misaligned {origin.i:21}) }}
+     {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2}
-       (origin: Misaligned {origin.i:21}) }}
+      {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
 [eva:final-states] Values at end of function origin_arithmetic_3:
   pa3 ∈ {{ &ta3 + [0..36] }}
   ta3[0..9] ∈ [--..--]
@@ -262,25 +249,20 @@
   p[bits 0 to 15]# ∈ {{ (? *)&a }}%32, bits 16 to 31 
    [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
   pa1 ∈ {{ &ta1 + [0..36] }}
-  pa2 ∈
-     {{ garbled mix of &{ta2}
-      (origin: Arithmetic {origin.i:19}) }}
+  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19}) }}
   qa2 ∈ {{ &ta2 + [0..36] ; &tta2 + [0..36] }}
   pa3 ∈ {{ &ta3 + [0..36] }}
-  q[bits 0 to 7] ∈
-   {{ garbled mix of &{a} (origin: Merge {origin.i:106}) }}
+  q[bits 0 to 7] ∈ {{ garbled mix of &{a} (origin: Merge {origin.i:106}) }}
    [bits 8 to 15] ∈
    {{ garbled mix of &{a; b} (origin: Merge {origin.i:106}) }}
    [bits 16 to 31] ∈
    {{ garbled mix of &{b} (origin: Merge {origin.i:106}) }}
   ta1[0..9] ∈ {0}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2}
-      (origin: Misaligned {origin.i:21}) }}
+     {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
   ta3[0..9] ∈ [--..--]
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2}
-       (origin: Misaligned {origin.i:21}) }}
+      {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
   l1 ∈ [--..--]
   l2 ∈ [--..--]
   l3 ∈ [--..--]

@@ -47,10 +47,8 @@
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] split_return.i:74: Frama_C_show_each_f3: {-2; 7}, {0; 5}
-[eva:alarm] split_return.i:76: Warning: 
-  assertion got status unknown.
-[eva:alarm] split_return.i:78: Warning: 
-  assertion got status unknown.
+[eva:alarm] split_return.i:76: Warning: assertion got status unknown.
+[eva:alarm] split_return.i:78: Warning: assertion got status unknown.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -60,10 +58,8 @@
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] split_return.i:95: Frama_C_show_each_f4: {4; 7}, {0; 5}
-[eva:alarm] split_return.i:97: Warning: 
-  assertion got status unknown.
-[eva:alarm] split_return.i:99: Warning: 
-  assertion got status unknown.
+[eva:alarm] split_return.i:97: Warning: assertion got status unknown.
+[eva:alarm] split_return.i:99: Warning: assertion got status unknown.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -82,8 +78,7 @@
   Called from split_return.i:209.
 [eva] computing for function f6 <- main6 <- main.
   Called from split_return.i:135.
-[eva:alarm] split_return.i:130: Warning: 
-  assertion got status unknown.
+[eva:alarm] split_return.i:130: Warning: assertion got status unknown.
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] Recording results for main6
@@ -94,8 +89,7 @@
   Called from split_return.i:148.
 [eva] Recording results for f7
 [eva] Done for function f7
-[eva] split_return.i:153: 
-  Frama_C_show_each_NULL: {{ NULL ; &v }}, {0; 1}
+[eva] split_return.i:153: Frama_C_show_each_NULL: {{ NULL ; &v }}, {0; 1}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
@@ -104,8 +98,7 @@
   Called from split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:172: 
-  Frama_C_show_each_then8: {-1; 4}, {{ NULL ; &x }}
+[eva] split_return.i:172: Frama_C_show_each_then8: {-1; 4}, {{ NULL ; &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.

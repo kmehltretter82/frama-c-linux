@@ -8,8 +8,7 @@
   m ∈ {0}
   i ∈ {0}
   X ∈ {-992}
-[eva:alarm] threat_if.i:14: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] threat_if.i:14: Warning: out of bounds write. assert \valid(p);
 [eva] threat_if.i:18: Frama_C_show_each: {-126}
 [eva] Recording results for main
 [eva] done for function main

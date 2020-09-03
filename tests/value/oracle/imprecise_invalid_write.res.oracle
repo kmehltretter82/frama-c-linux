@@ -25,8 +25,7 @@
   pointer downcast. assert (unsigned int)(&main1) ≤ 2147483647;
 [eva] imprecise_invalid_write.i:9: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {imprecise_invalid_write.i:9}
+  The imprecision originates from Arithmetic {imprecise_invalid_write.i:9}
 [eva:alarm] imprecise_invalid_write.i:10: Warning: 
   out of bounds write. assert \valid((int *)p);
 [kernel] imprecise_invalid_write.i:10: Warning: 
@@ -39,8 +38,7 @@
   pointer downcast. assert (unsigned int)s ≤ 2147483647;
 [eva] imprecise_invalid_write.i:16: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {imprecise_invalid_write.i:16}
+  The imprecision originates from Arithmetic {imprecise_invalid_write.i:16}
 [eva:alarm] imprecise_invalid_write.i:17: Warning: 
   out of bounds write. assert \valid(p);
 [kernel] imprecise_invalid_write.i:17: Warning: 

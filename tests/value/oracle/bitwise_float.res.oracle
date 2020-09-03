@@ -6,8 +6,7 @@
   
 [eva:alarm] bitwise_float.c:1: Warning: 
   function main: precondition got status unknown.
-[eva] bitwise_float.c:5: 
-  Frama_C_show_each_x: [1028443341..1084227584]
+[eva] bitwise_float.c:5: Frama_C_show_each_x: [1028443341..1084227584]
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

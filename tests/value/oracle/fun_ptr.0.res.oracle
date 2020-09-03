@@ -82,14 +82,10 @@
 [eva] Done for function test_too_much_benign
 [eva] Recording results for main
 [eva] done for function main
-[eva] fun_ptr.i:38: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] fun_ptr.i:73: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] fun_ptr.i:83: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] fun_ptr.i:85: 
-  assertion 'Eva,function_pointer' got final status invalid.
+[eva] fun_ptr.i:38: assertion 'Eva,function_pointer' got final status invalid.
+[eva] fun_ptr.i:73: assertion 'Eva,function_pointer' got final status invalid.
+[eva] fun_ptr.i:83: assertion 'Eva,function_pointer' got final status invalid.
+[eva] fun_ptr.i:85: assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function benign:
   q ∈ {{ &x }}
@@ -131,8 +127,7 @@
 [from] Computing for function test1
 [from] Done for function test1
 [from] Computing for function test2
-[from] fun_ptr.i:33: Warning: 
-  variadic call detected. Using only 1 argument(s).
+[from] fun_ptr.i:33: Warning: variadic call detected. Using only 1 argument(s).
 [from] Done for function test2
 [from] Computing for function test3
 [from] Non-terminating function test3 (no dependencies)
@@ -142,15 +137,13 @@
 [from] Computing for function too_much
 [from] Done for function too_much
 [from] Computing for function test_too_much_benign
-[from] fun_ptr.i:70: Warning: 
-  variadic call detected. Using only 1 argument(s).
+[from] fun_ptr.i:70: Warning: variadic call detected. Using only 1 argument(s).
 [from] Computing for function too_much2 <-test_too_much_benign
 [from] Non-terminating function too_much2 (no dependencies)
 [from] Done for function too_much2
 [from] Done for function test_too_much_benign
 [from] Computing for function main
-[from] fun_ptr.i:85: Warning: 
-  variadic call detected. Using only 0 argument(s).
+[from] fun_ptr.i:85: Warning: variadic call detected. Using only 0 argument(s).
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:

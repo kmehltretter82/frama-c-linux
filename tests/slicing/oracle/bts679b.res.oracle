@@ -5,8 +5,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {1}
-[eva] bts679b.i:11: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] bts679b.i:11: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] bts679b.i:11: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
@@ -37,4 +36,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts679b.i (no preprocessing)
+[kernel] Parsing ocode_0_bts679b.i (no preprocessing)

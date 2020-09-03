@@ -10,8 +10,7 @@
 [eva] using specification for function getchar
 [eva] Done for function getchar
 [eva] value_rte.c:13: assertion 'rte,index_bound' got status valid.
-[eva] value_rte.c:15: 
-  assertion 'rte,signed_overflow' got status valid.
+[eva] value_rte.c:15: assertion 'rte,signed_overflow' got status valid.
 [eva] value_rte.c:11: starting to merge loop iterations
 [eva] computing for function getchar <- main.
   Called from value_rte.c:12.
@@ -29,10 +28,8 @@
   assertion 'rte,index_bound' got status unknown.
 [eva] Recording results for main
 [eva] done for function main
-[eva] value_rte.c:13: 
-  assertion 'rte,index_bound' got final status valid.
-[eva] value_rte.c:15: 
-  assertion 'rte,signed_overflow' got final status valid.
+[eva] value_rte.c:13: assertion 'rte,index_bound' got final status valid.
+[eva] value_rte.c:15: assertion 'rte,signed_overflow' got final status valid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {1}
@@ -156,7 +153,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 76)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 76)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -169,7 +166,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 85)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 85)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -182,7 +179,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 95)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 95)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -193,13 +190,13 @@
 
 [ Extern  ] Post-condition 'result_string_or_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 109)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 109)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 109)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 109)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 111)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 111)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 112)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 112)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -212,7 +209,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 121)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 121)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -223,25 +220,25 @@
 
 [ Extern  ] Post-condition 'result_zero_or_EOF'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 130)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 130)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'flush_all' (file share/libc/stdio.h, line 137)
+[ Extern  ] Assigns for 'flush_all' (file FRAMAC_SHARE/libc/stdio.h, line 137)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'flush_stream' (file share/libc/stdio.h, line 142)
+[ Extern  ] Assigns for 'flush_stream' (file FRAMAC_SHARE/libc/stdio.h, line 142)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 130)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 130)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 132)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 132)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'flush_all' (file share/libc/stdio.h, line 137)
+[ Extern  ] Froms for 'flush_all' (file FRAMAC_SHARE/libc/stdio.h, line 137)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'flush_all' (file share/libc/stdio.h, line 139)
+[ Extern  ] Froms for 'flush_all' (file FRAMAC_SHARE/libc/stdio.h, line 139)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'flush_stream' (file share/libc/stdio.h, line 142)
+[ Extern  ] Froms for 'flush_stream' (file FRAMAC_SHARE/libc/stdio.h, line 142)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'flush_stream' (file share/libc/stdio.h, line 143)
+[ Extern  ] Froms for 'flush_stream' (file FRAMAC_SHARE/libc/stdio.h, line 143)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -258,7 +255,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 152)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 152)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -269,11 +266,11 @@
 
 [ Extern  ] Post-condition 'result_null_or_valid_fd'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 162)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 162)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 162)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 162)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 162)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 162)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -286,11 +283,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'stream_opened'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 174)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 174)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 174)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 174)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 176)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 176)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -299,9 +296,9 @@
 --- Properties of Function 'setbuf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 187)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 187)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 187)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 187)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -310,9 +307,9 @@
 --- Properties of Function 'setvbuf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 191)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 191)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 191)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 191)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -321,9 +318,9 @@
 --- Properties of Function 'vfprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 220)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 220)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 220)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 220)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -332,9 +329,9 @@
 --- Properties of Function 'vfscanf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 225)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 225)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 225)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 225)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -343,9 +340,9 @@
 --- Properties of Function 'vprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 231)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 231)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 231)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 231)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -354,9 +351,9 @@
 --- Properties of Function 'vscanf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 235)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 235)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 235)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 235)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -365,9 +362,9 @@
 --- Properties of Function 'vsnprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 240)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 240)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 240)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 240)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -376,9 +373,9 @@
 --- Properties of Function 'vsprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 246)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 246)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 246)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 246)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -389,11 +386,11 @@
 
 [ Extern  ] Post-condition 'result_uchar_or_eof'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 259)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 259)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 259)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 259)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 260)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 260)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -408,11 +405,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'terminated_string_on_success'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 268)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 268)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 268)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 268)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 269)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 269)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -421,11 +418,11 @@
 --- Properties of Function 'fputc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 282)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 282)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 282)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 282)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 283)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 283)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -434,11 +431,11 @@
 --- Properties of Function 'fputs'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 289)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 289)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 289)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 289)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 290)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 290)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -447,11 +444,11 @@
 --- Properties of Function 'getc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 297)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 297)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 297)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 297)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 297)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 297)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -460,11 +457,11 @@
 --- Properties of Function 'getchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 302)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 302)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 302)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 302)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 302)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 302)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -475,13 +472,13 @@
 
 [ Extern  ] Post-condition 'result_null_or_same'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 315)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 315)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 315)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 315)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 316)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 316)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 317)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 317)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -490,11 +487,11 @@
 --- Properties of Function 'putc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 324)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 324)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 324)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 324)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 325)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 325)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -503,11 +500,11 @@
 --- Properties of Function 'putchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 330)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 330)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 330)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 330)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 331)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 331)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -516,11 +513,11 @@
 --- Properties of Function 'puts'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 337)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 337)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 337)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 337)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 338)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 338)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -531,11 +528,11 @@
 
 [ Extern  ] Post-condition 'result_ok_or_error'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 344)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 344)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 344)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 344)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 345)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 345)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -548,13 +545,13 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'initialization'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 353)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 353)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 353)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 353)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 353)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 353)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 355)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 355)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -565,11 +562,11 @@
 
 [ Extern  ] Post-condition 'size_written'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 366)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 366)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 366)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 366)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 366)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 366)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -578,11 +575,11 @@
 --- Properties of Function 'fgetpos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 377)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 377)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 377)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 377)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 378)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 378)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -591,13 +588,13 @@
 --- Properties of Function 'fseek'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 386)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 386)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 386)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 386)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 387)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 387)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 387)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 387)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -606,13 +603,13 @@
 --- Properties of Function 'fseeko'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 395)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 395)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 395)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 395)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 396)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 396)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 396)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 396)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -621,9 +618,9 @@
 --- Properties of Function 'fsetpos'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 405)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 405)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 405)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 405)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -634,11 +631,11 @@
 
 [ Extern  ] Post-condition 'success_or_error'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 411)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 411)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 411)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 411)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 411)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 411)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -649,11 +646,11 @@
 
 [ Extern  ] Post-condition 'success_or_error'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 419)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 419)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 419)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 419)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 419)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 419)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -662,9 +659,9 @@
 --- Properties of Function 'rewind'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 427)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 427)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 427)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 427)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -673,9 +670,9 @@
 --- Properties of Function 'clearerr'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 433)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 433)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 433)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 433)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -686,7 +683,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 439)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 439)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -697,7 +694,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 445)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 445)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -706,9 +703,9 @@
 --- Properties of Function 'flockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 451)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 451)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 451)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 451)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -717,9 +714,9 @@
 --- Properties of Function 'funlockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 457)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 457)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 457)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 457)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -728,11 +725,11 @@
 --- Properties of Function 'ftrylockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 463)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 463)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 463)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 463)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 463)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 463)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -743,7 +740,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 469)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 469)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -752,9 +749,9 @@
 --- Properties of Function 'perror'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 475)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 475)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 475)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 475)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -763,11 +760,11 @@
 --- Properties of Function 'getc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 481)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 481)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 481)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 481)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 481)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 481)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -778,7 +775,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 486)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 486)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -787,11 +784,11 @@
 --- Properties of Function 'putc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 492)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 492)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 492)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 492)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 493)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 493)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -800,11 +797,11 @@
 --- Properties of Function 'putchar_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 498)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 498)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 498)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 498)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 499)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 499)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -813,9 +810,9 @@
 --- Properties of Function 'clearerr_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/stdio.h, line 505)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 505)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 505)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 505)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -826,7 +823,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 511)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 511)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -837,7 +834,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 517)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 517)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -848,7 +845,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 523)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 523)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -859,11 +856,11 @@
 
 [ Extern  ] Post-condition 'result_error_or_valid_open_pipe'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/stdio.h, line 550)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 550)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 550)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 550)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 552)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 552)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -876,7 +873,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/stdio.h, line 564)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 564)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.

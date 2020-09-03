@@ -109,8 +109,7 @@
 [eva] computing for function ctime <- main.
   Called from time_h.c:43.
 [eva] using specification for function ctime
-[eva] time_h.c:43: 
-  function ctime: precondition 'valid_timer' got status valid.
+[eva] time_h.c:43: function ctime: precondition 'valid_timer' got status valid.
 [eva] time_h.c:43: 
   function ctime: precondition 'initialization,init_timer' got status valid.
 [eva] Done for function ctime
@@ -203,8 +202,7 @@
 [eva] computing for function gmtime <- main.
   Called from time_h.c:60.
 [eva] using specification for function gmtime
-[eva] time_h.c:60: 
-  function gmtime: precondition 'valid_timer' got status valid.
+[eva] time_h.c:60: function gmtime: precondition 'valid_timer' got status valid.
 [eva] Done for function gmtime
 [eva] computing for function gmtime <- main.
   Called from time_h.c:60.

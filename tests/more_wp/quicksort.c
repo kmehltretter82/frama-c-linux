@@ -1,4 +1,4 @@
-/* FRAMAC_SHARE=share  bin/viewer.opt -pp-annot tests/wp/quicksort.c */
+/* FRAMAC_SHARE=share  bin/viewer.opt -pp-annot quicksort.c */
 
 /*external permut_ij : ptr -> ptr -> int -> int -> Prop : Quicksort ;
 external permut : ptr -> ptr -> Prop : Quicksort ;

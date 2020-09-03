@@ -7,8 +7,7 @@
 [eva] computing for function fact <- main.
   Called from bug0196.c:16.
 [eva] bug0196.c:8: assertion got status valid.
-[eva] bug0196.c:11: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] bug0196.c:11: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] bug0196.c:11: Warning: assertion got status unknown.
 [eva] bug0196.c:7: starting to merge loop iterations
 [eva:alarm] bug0196.c:10: Warning: 

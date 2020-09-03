@@ -46,10 +46,8 @@
   evaluating condition to {0; 1} instead of {0} because of UPCPA
 [eva:alarm] cmp_ptr.i:21: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&T[5]));
-[eva:alarm] cmp_ptr.i:21: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] cmp_ptr.i:21: Warning: 
-  out of bounds write. assert \valid(q);
+[eva:alarm] cmp_ptr.i:21: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] cmp_ptr.i:21: Warning: out of bounds write. assert \valid(q);
 [eva:pointer-comparison] cmp_ptr.i:21: 
   not reducing {{ &T + [-8589934588..8589934592],0%4 }} to {{ &T +
                                                               [-8589934588..16],0%4 }} because of UPCPA

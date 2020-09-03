@@ -17,8 +17,7 @@
   Called from loops.i:202.
 [eva] loops.i:183: assertion got status valid.
 [eva] loops.i:176: starting to merge loop iterations
-[eva:alarm] loops.i:179: Warning: 
-  signed overflow. assert X + 1 ≤ 2147483647;
+[eva:alarm] loops.i:179: Warning: signed overflow. assert X + 1 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] Recording results for main
@@ -44,8 +43,7 @@
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function loop
-[pdg] loops.i:187: Warning: 
-  no final state. Probably unreachable...
+[pdg] loops.i:187: Warning: no final state. Probably unreachable...
 [pdg] done for function loop
 [pdg] computing for function may_write_Y_from_Z
 [pdg] done for function may_write_Y_from_Z
@@ -55,8 +53,7 @@
 [slicing] applying 2 actions...
 [slicing] applying actions: 1/2...
 [pdg] computing for function main
-[pdg] loops.i:204: Warning: 
-  no final state. Probably unreachable...
+[pdg] loops.i:204: Warning: no final state. Probably unreachable...
 [pdg] done for function main
 [slicing] applying actions: 2/2...
 [slicing] exporting project to 'Slicing export'...
@@ -95,4 +92,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_21_loops.i (no preprocessing)
+[kernel] Parsing ocode_21_loops.i (no preprocessing)

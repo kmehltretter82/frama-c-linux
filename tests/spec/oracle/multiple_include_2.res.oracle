@@ -1,4 +1,8 @@
 [kernel] Parsing multiple_include_2.c (with preprocessing)
-[kernel] Parsing multiple_include_1.c (with preprocessing)
-[kernel] User Error: multiple inclusion of logic function p referring to a static variable
+[kernel] User Error: failed to run: gcc -E -C -I.  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32 -o '/tmp/multiple_include_2.cd49d12.i' '/home/bobot/Sources/frama-c/_build/default/result/multiple_include_2.c'
+  this is possibly due to missing preprocessor flags;
+  consider options -cpp-extra-args, -json-compilation-database or -cpp-command.
+  See chapter "Preparing the Sources" in the Frama-C user manual for more details.
+[kernel] User Error: stopping on file "multiple_include_2.c" that has errors. Add
+  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

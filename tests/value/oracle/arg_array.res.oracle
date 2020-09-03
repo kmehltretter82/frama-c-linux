@@ -4,12 +4,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] arg_array.i:2: Warning: 
-  out of bounds write. assert \valid(T);
-[eva:alarm] arg_array.i:4: Warning: 
-  out of bounds write. assert \valid(ptr + 1);
-[eva:alarm] arg_array.i:5: Warning: 
-  out of bounds write. assert \valid(ptr + 2);
+[eva:alarm] arg_array.i:2: Warning: out of bounds write. assert \valid(T);
+[eva:alarm] arg_array.i:4: Warning: out of bounds write. assert \valid(ptr + 1);
+[eva:alarm] arg_array.i:5: Warning: out of bounds write. assert \valid(ptr + 2);
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

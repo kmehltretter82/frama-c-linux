@@ -18,8 +18,7 @@
 [eva] computing for function fprintf_va_1 <- init_sockets <- main.
   Called from socket.c:52.
 [eva] using specification for function fprintf_va_1
-[eva] socket.c:52: 
-  function fprintf_va_1: precondition got status valid.
+[eva] socket.c:52: function fprintf_va_1: precondition got status valid.
 [eva] Done for function fprintf_va_1
 [eva] computing for function exit <- init_sockets <- main.
   Called from socket.c:53.
@@ -41,20 +40,16 @@
 [eva] computing for function write <- init_reception <- test_read <- main.
   Called from socket.c:44.
 [eva] using specification for function write
-[eva] socket.c:44: 
-  function write: precondition 'valid_fd' got status valid.
-[eva] socket.c:44: 
-  function write: precondition 'buf_has_room' got status valid.
+[eva] socket.c:44: function write: precondition 'valid_fd' got status valid.
+[eva] socket.c:44: function write: precondition 'buf_has_room' got status valid.
 [eva] Done for function write
 [eva] Recording results for init_reception
 [eva] Done for function init_reception
 [eva] computing for function read <- test_read <- main.
   Called from socket.c:61.
 [eva] using specification for function read
-[eva] socket.c:61: 
-  function read: precondition 'valid_fd' got status valid.
-[eva] socket.c:61: 
-  function read: precondition 'buf_has_room' got status valid.
+[eva] socket.c:61: function read: precondition 'valid_fd' got status valid.
+[eva] socket.c:61: function read: precondition 'buf_has_room' got status valid.
 [eva] Done for function read
 [eva] computing for function printf_va_1 <- test_read <- main.
   Called from socket.c:62.
@@ -83,7 +78,7 @@
 [eva] using specification for function readv
 [eva] socket.c:69: 
   function readv: precondition 'valid_read_iov' got status valid.
-[eva] share/libc/sys/uio.h:37: Warning: 
+[eva] FRAMAC_SHARE/libc/sys/uio.h:37: Warning: 
   no \from part
   for clause 'assigns *((char *)(iov + (0 .. iovcnt - 1))->iov_base + (0 ..));'
 [eva] Done for function readv
@@ -141,9 +136,8 @@
 [eva] computing for function memset <- test_server_echo <- main.
   Called from socket.c:103.
 [eva] using specification for function memset
-[eva] socket.c:103: 
-  function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] socket.c:103: function memset: precondition 'valid_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] computing for function bind <- test_server_echo <- main.
@@ -183,28 +177,23 @@
 [eva] Done for function accept
 [eva] computing for function read <- test_server_echo <- main.
   Called from socket.c:115.
-[eva] socket.c:115: 
-  function read: precondition 'valid_fd' got status valid.
-[eva] socket.c:115: 
-  function read: precondition 'buf_has_room' got status valid.
+[eva] socket.c:115: function read: precondition 'valid_fd' got status valid.
+[eva] socket.c:115: function read: precondition 'buf_has_room' got status valid.
 [eva] Done for function read
 [eva] computing for function write <- test_server_echo <- main.
   Called from socket.c:117.
-[eva] socket.c:117: 
-  function write: precondition 'valid_fd' got status valid.
+[eva] socket.c:117: function write: precondition 'valid_fd' got status valid.
 [eva] socket.c:117: 
   function write: precondition 'buf_has_room' got status valid.
 [eva] Done for function write
 [eva] computing for function close <- test_server_echo <- main.
   Called from socket.c:118.
 [eva] using specification for function close
-[eva] socket.c:118: 
-  function close: precondition 'valid_fd' got status valid.
+[eva] socket.c:118: function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] computing for function close <- test_server_echo <- main.
   Called from socket.c:119.
-[eva] socket.c:119: 
-  function close: precondition 'valid_fd' got status valid.
+[eva] socket.c:119: function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] Recording results for test_server_echo
 [eva] Done for function test_server_echo

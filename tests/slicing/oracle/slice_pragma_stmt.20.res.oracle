@@ -44,4 +44,4 @@ void test7(int c1, int c2)
 }
 
 
-[kernel] Parsing result/ocode_20_slice_pragma_stmt.i (no preprocessing)
+[kernel] Parsing ocode_20_slice_pragma_stmt.i (no preprocessing)

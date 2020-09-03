@@ -34,11 +34,9 @@
 [eva] computing for function test4 <- main.
   Called from bitwise.i:152.
 [eva] bitwise.i:62: assertion got status valid.
-[eva] bitwise.i:64: 
-  Frama_C_show_each_1: [0x80000000..0xFFFFFFFF], {0x80000000}
+[eva] bitwise.i:64: Frama_C_show_each_1: [0x80000000..0xFFFFFFFF], {0x80000000}
 [eva] bitwise.i:64: Frama_C_show_each_1: [0..0x7FFFFFFF], {0}
-[eva] bitwise.i:66: 
-  Frama_C_show_each_2: [0..0x7FFFFFFF], {0}, {0x80000000}
+[eva] bitwise.i:66: Frama_C_show_each_2: [0..0x7FFFFFFF], {0}, {0x80000000}
 [eva] bitwise.i:66: Frama_C_show_each_2: [0..0x7FFFFFFF], {0}, {0}
 [eva] bitwise.i:72: Frama_C_show_each_false: [0..0x7FFFFFFF]
 [eva] bitwise.i:72: Frama_C_show_each_false: [0..0x7FFFFFFF]

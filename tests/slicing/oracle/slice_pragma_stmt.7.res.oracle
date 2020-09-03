@@ -30,4 +30,4 @@ void nop7(void)
 }
 
 
-[kernel] Parsing result/ocode_7_slice_pragma_stmt.i (no preprocessing)
+[kernel] Parsing ocode_7_slice_pragma_stmt.i (no preprocessing)

@@ -9,16 +9,13 @@
   creating variable S_0_S___va_params with imprecise size (type void)
 [eva:initial-state] 
   creating variable S_1_S___va_params with imprecise size (type void)
-[eva:alarm] bts345.i:21: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:21: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] computing for function called_by_top <- top.
   Called from bts345.i:22.
-[eva:alarm] bts345.i:15: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:15: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] computing for function called_indirectly_by_top <- called_by_top <- top.
   Called from bts345.i:16.
-[eva:alarm] bts345.i:10: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] bts345.i:10: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for called_indirectly_by_top
 [eva] Done for function called_indirectly_by_top
 [eva] Recording results for called_by_top
@@ -69,4 +66,4 @@ void top(int x)
 }
 
 
-[kernel] Parsing result/ocode_3_bts345.i (no preprocessing)
+[kernel] Parsing ocode_3_bts345.i (no preprocessing)

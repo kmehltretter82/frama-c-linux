@@ -45,12 +45,9 @@
   evaluating condition to {0; 1} instead of {0} because of UPCPA
 [eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
 [eva] pointer_comparison.c:18: starting to merge loop iterations
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva:pointer-comparison] pointer_comparison.c:18: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
 [eva] Recording results for main
@@ -127,12 +124,9 @@
   assert \pointer_comparable((void *)tmp_3, (void *)(&y));
   (tmp_3 from p++)
 [eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -230,12 +224,9 @@
   assert \pointer_comparable((void *)tmp_3, (void *)(&y));
   (tmp_3 from p++)
 [eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
-[eva] pointer_comparison.c:18: 
-  Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
+[eva] pointer_comparison.c:18: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

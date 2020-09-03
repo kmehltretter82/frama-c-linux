@@ -36,8 +36,7 @@
 [eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [1..10], [-9..0]
 [eva] modulo.i:41: Frama_C_show_each_1: [1..10], [-10..-1], [0..9]
 [eva] modulo.i:41: Frama_C_show_each_1: {0}, [-10..-1], {0}
-[eva] modulo.i:41: 
-  Frama_C_show_each_1: [-10..-1], [-10..-1], [-9..0]
+[eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [-10..-1], [-9..0]
 [eva] Recording results for pgcd1
 [eva] Done for function pgcd1
 [eva] computing for function pgcd2 <- main.
@@ -46,30 +45,23 @@
   function pgcd2: precondition got status unknown.
 [eva] modulo.i:50: loop invariant got status valid.
 [eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [1..10], [-9..9]
-[eva] modulo.i:53: 
-  Frama_C_show_each_2: [-10..10], [-10..-1], [-9..9]
+[eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [-10..-1], [-9..9]
 [eva] Recording results for pgcd2
 [eva] Done for function pgcd2
 [eva] computing for function pgcd3 <- main.
   Called from modulo.i:153.
 [eva:alarm] modulo.i:153: Warning: 
   function pgcd3: precondition got status unknown.
-[eva:alarm] modulo.i:63: Warning: 
-  division by zero. assert b_0 ≢ 0;
-[eva] modulo.i:64: 
-  Frama_C_show_each_3: [-10..10], [-10..10], [-9..9]
+[eva:alarm] modulo.i:63: Warning: division by zero. assert b_0 ≢ 0;
+[eva] modulo.i:64: Frama_C_show_each_3: [-10..10], [-10..10], [-9..9]
 [eva] Recording results for pgcd3
 [eva] Done for function pgcd3
 [eva] computing for function main2 <- main.
   Called from modulo.i:155.
-[eva:alarm] modulo.i:9: Warning: 
-  signed overflow. assert -2147483648 ≤ 4 * i;
-[eva:alarm] modulo.i:9: Warning: 
-  signed overflow. assert 4 * i ≤ 2147483647;
-[eva:alarm] modulo.i:10: Warning: 
-  signed overflow. assert -2147483648 ≤ 4 * i;
-[eva:alarm] modulo.i:10: Warning: 
-  signed overflow. assert 4 * i ≤ 2147483647;
+[eva:alarm] modulo.i:9: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
+[eva:alarm] modulo.i:9: Warning: signed overflow. assert 4 * i ≤ 2147483647;
+[eva:alarm] modulo.i:10: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
+[eva:alarm] modulo.i:10: Warning: signed overflow. assert 4 * i ≤ 2147483647;
 [eva:alarm] modulo.i:11: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:13: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:27: Warning: division by zero. assert G ≢ 0;

@@ -9,16 +9,13 @@
 [eva] using specification for function fopen
 [eva] stdio_h.c:6: 
   function fopen: precondition 'valid_filename' got status valid.
-[eva] stdio_h.c:6: 
-  function fopen: precondition 'valid_mode' got status valid.
+[eva] stdio_h.c:6: function fopen: precondition 'valid_mode' got status valid.
 [eva] Done for function fopen
 [eva] computing for function fseek <- main.
   Called from stdio_h.c:8.
 [eva] using specification for function fseek
-[eva] stdio_h.c:8: 
-  function fseek: precondition 'valid_stream' got status valid.
-[eva] stdio_h.c:8: 
-  function fseek: precondition 'whence_enum' got status valid.
+[eva] stdio_h.c:8: function fseek: precondition 'valid_stream' got status valid.
+[eva] stdio_h.c:8: function fseek: precondition 'whence_enum' got status valid.
 [eva] Done for function fseek
 [eva] computing for function fseek <- main.
   Called from stdio_h.c:10.
@@ -48,8 +45,7 @@
   Called from stdio_h.c:25.
 [eva] stdio_h.c:25: 
   function fseek: precondition 'valid_stream' got status valid.
-[eva] stdio_h.c:25: 
-  function fseek: precondition 'whence_enum' got status valid.
+[eva] stdio_h.c:25: function fseek: precondition 'whence_enum' got status valid.
 [eva] Done for function fseek
 [eva] computing for function fseeko <- main.
   Called from stdio_h.c:26.
@@ -90,8 +86,7 @@
 [eva] computing for function printf_va_1 <- main.
   Called from stdio_h.c:33.
 [eva] using specification for function printf_va_1
-[eva] stdio_h.c:33: 
-  function printf_va_1: precondition got status valid.
+[eva] stdio_h.c:33: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
 [eva] computing for function fclose <- main.
   Called from stdio_h.c:34.
@@ -103,8 +98,7 @@
 [eva] using specification for function fgets
 [eva] stdio_h.c:37: 
   function fgets: precondition 'valid_stream' got status valid.
-[eva] stdio_h.c:37: 
-  function fgets: precondition 'room_s' got status valid.
+[eva] stdio_h.c:37: function fgets: precondition 'room_s' got status valid.
 [eva] Done for function fgets
 [eva:alarm] stdio_h.c:39: Warning: check got status unknown.
 [eva] computing for function fgets <- main.

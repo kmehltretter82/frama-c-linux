@@ -31,8 +31,7 @@
   signed overflow. assert -2147483648 ≤ y + *PX;
 [eva:alarm] glob_decls.i:47: Warning: 
   signed overflow. assert y + *PX ≤ 2147483647;
-[eva:alarm] glob_decls.i:48: Warning: 
-  assertion got status unknown.
+[eva:alarm] glob_decls.i:48: Warning: assertion got status unknown.
 [eva:alarm] glob_decls.i:49: Warning: 
   signed overflow. assert X + x ≤ 2147483647;
 [eva] Recording results for main

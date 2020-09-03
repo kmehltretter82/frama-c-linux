@@ -219,4 +219,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts1768.i (no preprocessing)
+[kernel] Parsing ocode_0_bts1768.i (no preprocessing)

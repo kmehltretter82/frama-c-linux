@@ -100,8 +100,7 @@
 [eva] computing for function ff3 <- main2 <- main.
   Called from assigns.i:78.
 [eva] using specification for function ff3
-[eva] assigns.i:68: Warning: 
-  no \from part for clause 'assigns y1, y3;'
+[eva] assigns.i:68: Warning: no \from part for clause 'assigns y1, y3;'
 [eva] Done for function ff3
 [eva] computing for function ff4 <- main2 <- main.
   Called from assigns.i:79.

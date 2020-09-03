@@ -10,8 +10,7 @@
   Called from cast2.i:7.
 [eva] using specification for function any_int
 [eva] Done for function any_int
-[eva:alarm] cast2.i:9: Warning: 
-  signed overflow. assert t + 1 ≤ 2147483647;
+[eva:alarm] cast2.i:9: Warning: signed overflow. assert t + 1 ≤ 2147483647;
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function h <- main.

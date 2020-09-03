@@ -16,8 +16,7 @@
 [eva] loop.i:8: Frama_C_show_each_F: [0..48],0%2
 [eva] loop.i:8: Frama_C_show_each_F: [0..48],0%2
 [eva] loop.i:8: Frama_C_show_each_F: [0..48],0%2
-[eva:alarm] loop.i:9: Warning: 
-  signed overflow. assert i_0 + r ≤ 2147483647;
+[eva:alarm] loop.i:9: Warning: signed overflow. assert i_0 + r ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

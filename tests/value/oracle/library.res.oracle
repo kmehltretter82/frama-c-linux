@@ -89,16 +89,12 @@
 [eva] library.i:31: 
   Assigning imprecise value to G1.
   The imprecision originates from Library function {library.i:31}
-[eva:alarm] library.i:32: Warning: 
-  out of bounds write. assert \valid(G1);
-[eva:alarm] library.i:33: Warning: 
-  out of bounds read. assert \valid_read(G);
-[eva:alarm] library.i:33: Warning: 
-  out of bounds read. assert \valid_read(*G);
+[eva:alarm] library.i:32: Warning: out of bounds write. assert \valid(G1);
+[eva:alarm] library.i:33: Warning: out of bounds read. assert \valid_read(G);
+[eva:alarm] library.i:33: Warning: out of bounds read. assert \valid_read(*G);
 [eva:alarm] library.i:33: Warning: 
   out of bounds read. assert \valid_read(*(*G));
-[eva:alarm] library.i:33: Warning: 
-  out of bounds write. assert \valid(*(*(*G)));
+[eva:alarm] library.i:33: Warning: out of bounds write. assert \valid(*(*(*G)));
 [eva] computing for function gen <- main.
   Called from library.i:37.
 [kernel:annot:missing-spec] library.i:37: Warning: 
@@ -118,14 +114,11 @@
 [eva] library.i:41: 
   Assigning imprecise value to pf.
   The imprecision originates from Library function {library.i:41}
-[eva:alarm] library.i:42: Warning: 
-  out of bounds read. assert \valid_read(pf);
+[eva:alarm] library.i:42: Warning: out of bounds read. assert \valid_read(pf);
 [eva:alarm] library.i:42: Warning: 
   non-finite float value. assert \is_finite(*pf);
-[eva:alarm] library.i:43: Warning: 
-  out of bounds write. assert \valid(pf);
-[eva:alarm] library.i:44: Warning: 
-  out of bounds write. assert \valid(pf);
+[eva:alarm] library.i:43: Warning: out of bounds write. assert \valid(pf);
+[eva:alarm] library.i:44: Warning: out of bounds write. assert \valid(pf);
 [eva:alarm] library.i:44: Warning: 
   non-finite float value. assert \is_finite(*pf);
 [eva:alarm] library.i:44: Warning: 
@@ -137,16 +130,12 @@
 [eva] library.i:45: 
   Assigning imprecise value to pd.
   The imprecision originates from Library function {library.i:45}
-[eva:alarm] library.i:46: Warning: 
-  out of bounds write. assert \valid(pd);
+[eva:alarm] library.i:46: Warning: out of bounds write. assert \valid(pd);
 [eva] Recording results for main
 [eva] done for function main
-[eva] library.i:38: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] library.i:39: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] library.i:40: 
-  assertion 'Eva,function_pointer' got final status invalid.
+[eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
+[eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
+[eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
@@ -281,15 +270,12 @@
   S_1_0_S_q_ss_0[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_0_1_S_q_ss_0[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_1_1_S_q_ss_0[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[eva:alarm] library.i:69: Warning: 
-  assertion 'Unknown' got status unknown.
+[eva:alarm] library.i:69: Warning: assertion 'Unknown' got status unknown.
 [eva] library.i:70: assertion got status valid.
 [eva] library.i:71: assertion got status valid.
-[eva:alarm] library.i:73: Warning: 
-  assertion 'Unknown' got status unknown.
+[eva:alarm] library.i:73: Warning: assertion 'Unknown' got status unknown.
 [eva] library.i:74: Frama_C_show_each_reached_1:
-[eva:alarm] library.i:77: Warning: 
-  assertion 'Unknown' got status unknown.
+[eva:alarm] library.i:77: Warning: assertion 'Unknown' got status unknown.
 [eva] library.i:78: Frama_C_show_each_reached_2:
 [eva:alarm] library.i:81: Warning: 
   assertion 'Unknown_Invalid' got status invalid (stopping propagation).

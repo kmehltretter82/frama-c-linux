@@ -10,8 +10,7 @@
   signed overflow. assert (int)(y * 1000) * 1000 ≤ 2147483647;
 [eva:alarm] overflow.i:22: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(-y) * 10000000;
-[eva:alarm] overflow.i:31: Warning: 
-  signed overflow. assert -c ≤ 2147483647;
+[eva:alarm] overflow.i:31: Warning: signed overflow. assert -c ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

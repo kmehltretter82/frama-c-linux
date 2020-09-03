@@ -25,8 +25,7 @@
        [32..35] ∈ {0}
 [eva] computing for function subdivide_integer <- main.
   Called from nonlin.c:119.
-[eva:nonlin] nonlin.c:31: 
-  non-linear '((int)z + 675) * ((int)z + 675)', lv 'z'
+[eva:nonlin] nonlin.c:31: non-linear '((int)z + 675) * ((int)z + 675)', lv 'z'
 [eva:nonlin] nonlin.c:31: subdividing on z
 [eva:nonlin] nonlin.c:32: 
   non-linear '((int)z + 17817) * ((int)z + 17817)', lv 'z'
@@ -105,14 +104,11 @@
 [eva:nonlin] nonlin.c:60: subdividing on y
 [eva:nonlin] nonlin.c:62: non-linear 'x * y - y * x', lv 'y, x'
 [eva:nonlin] nonlin.c:62: subdividing on x, y
-[eva:nonlin] nonlin.c:65: 
-  non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
+[eva:nonlin] nonlin.c:65: non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
 [eva:nonlin] nonlin.c:65: subdividing on x, y
-[eva:nonlin] nonlin.c:66: 
-  non-linear '(x * x + y * y) - (2 * x) * y', lv 'y, x'
+[eva:nonlin] nonlin.c:66: non-linear '(x * x + y * y) - (2 * x) * y', lv 'y, x'
 [eva:nonlin] nonlin.c:66: subdividing on x, y
-[eva:nonlin] nonlin.c:68: 
-  non-linear '(z * x + x * y) + y * z', lv 'z, y, x'
+[eva:nonlin] nonlin.c:68: non-linear '(z * x + x * y) + y * z', lv 'z, y, x'
 [eva:nonlin] nonlin.c:68: non-linear 'w * w', lv 'w'
 [eva:nonlin] nonlin.c:68: subdividing on x, y, z
 [eva:nonlin] nonlin.c:68: subdividing on w
@@ -122,8 +118,7 @@
   Called from nonlin.c:122.
 [eva] nonlin.c:87: loop invariant got status valid.
 [eva] nonlin.c:88: starting to merge loop iterations
-[eva:nonlin] nonlin.c:89: 
-  non-linear '(4 + ((x >> 2) * 3 << 2)) + x % 4', lv 'x'
+[eva:nonlin] nonlin.c:89: non-linear '(4 + ((x >> 2) * 3 << 2)) + x % 4', lv 'x'
 [eva:nonlin] nonlin.c:89: subdividing on x
 [eva] Recording results for subdivide_table
 [eva] Done for function subdivide_table
@@ -133,8 +128,7 @@
 [eva:nonlin] nonlin.c:101: subdividing on i
 [eva:alarm] nonlin.c:101: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] nonlin.c:101: Warning: 
-  accessing out of bounds index. assert i < 2;
+[eva:alarm] nonlin.c:101: Warning: accessing out of bounds index. assert i < 2;
 [eva] Recording results for subdivide_reduced_value
 [eva] Done for function subdivide_reduced_value
 [eva] computing for function local_subdivide <- main.
@@ -149,8 +143,7 @@
 [eva] nonlin.c:108: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:nonlin] nonlin.c:112: 
-  non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
+[eva:nonlin] nonlin.c:112: non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
 [eva:nonlin] nonlin.c:112: subdividing on x, y
 [eva:nonlin] nonlin.c:113: subdividing on x, y
 [eva:nonlin] nonlin.c:115: subdividing on x, y

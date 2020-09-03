@@ -52,12 +52,10 @@
 [eva] non_natural.i:21: starting to merge loop iterations
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32} }}
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32; 64} }}
-[eva] non_natural.i:22: 
-  Frama_C_show_each: {{ &p2 + {0; 32; 64; 96} }}
+[eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32; 64; 96} }}
 [kernel] non_natural.i:30: 
   more than 200(12500) locations to update in array. Approximating.
-[eva] non_natural.i:22: 
-  Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
+[eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
 [eva:alarm] non_natural.i:23: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from to++)
@@ -114,8 +112,7 @@
 [eva:alarm] non_natural.i:30: Warning: 
   out of bounds read. assert \valid_read(tmp_14);
                       (tmp_14 from from++)
-[eva] non_natural.i:22: 
-  Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
+[eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
 [eva:alarm] non_natural.i:23: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from from++)
@@ -186,12 +183,10 @@
   (tmp_14 from from++)
 [eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + {0; 32} }}
 [eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + {0; 32; 64} }}
-[eva] non_natural.i:38: 
-  Frama_C_show_each: {{ &p2 + {0; 32; 64; 96} }}
+[eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + {0; 32; 64; 96} }}
 [kernel] non_natural.i:46: 
   more than 200(12500) locations to update in array. Approximating.
-[eva] non_natural.i:38: 
-  Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
+[eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
 [eva:alarm] non_natural.i:39: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from to++)
@@ -248,8 +243,7 @@
 [eva:alarm] non_natural.i:46: Warning: 
   out of bounds read. assert \valid_read(tmp_14);
                       (tmp_14 from from++)
-[eva] non_natural.i:38: 
-  Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
+[eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + [0..400032],0%32 }}
 [eva:alarm] non_natural.i:39: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from from++)

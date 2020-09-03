@@ -5,8 +5,7 @@ Start
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] Refresh_visitor.i:17: Warning: 
-  assertion got status unknown.
+[eva:alarm] Refresh_visitor.i:17: Warning: assertion got status unknown.
 [eva] Refresh_visitor.i:23: loop invariant got status valid.
 [eva] Refresh_visitor.i:24: loop invariant got status valid.
 [eva] Refresh_visitor.i:29: loop invariant got status valid.

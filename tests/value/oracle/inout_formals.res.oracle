@@ -5,8 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
-[eva:alarm] inout_formals.i:7: Warning: 
-  out of bounds write. assert \valid(i);
+[eva:alarm] inout_formals.i:7: Warning: out of bounds write. assert \valid(i);
 [eva] inout_formals.i:8: Frama_C_show_each: {{ &S_i }}
 [eva] Recording results for main
 [eva] done for function main

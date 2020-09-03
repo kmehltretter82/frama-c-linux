@@ -6,10 +6,8 @@
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from bitwise_reduction.i:33.
-[eva:alarm] bitwise_reduction.i:10: Warning: 
-  assertion got status unknown.
-[eva:alarm] bitwise_reduction.i:11: Warning: 
-  assertion got status unknown.
+[eva:alarm] bitwise_reduction.i:10: Warning: assertion got status unknown.
+[eva:alarm] bitwise_reduction.i:11: Warning: assertion got status unknown.
 [eva:alarm] bitwise_reduction.i:14: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
 [eva:alarm] bitwise_reduction.i:14: Warning: 
@@ -23,8 +21,7 @@
   {0; 1}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}
 [eva:alarm] bitwise_reduction.i:23: Warning: 
   out of bounds read. assert \valid_read(p);
-[eva] bitwise_reduction.i:24: 
-  Frama_C_show_each_then2: {{ &t + {4} }}, {0; 1}
+[eva] bitwise_reduction.i:24: Frama_C_show_each_then2: {{ &t + {4} }}, {0; 1}
 [eva] bitwise_reduction.i:26: 
   Frama_C_show_each_else2:
   {{ &t + {0; 4} }}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}

@@ -7,8 +7,7 @@
 [eva] computing for function make_fam <- main.
   Called from gcc_zero_length_array.c:24.
 [eva] gcc_zero_length_array.c:15: Call to builtin malloc
-[eva] gcc_zero_length_array.c:15: 
-  allocating variable __malloc_make_fam_l15
+[eva] gcc_zero_length_array.c:15: allocating variable __malloc_make_fam_l15
 [eva] Recording results for make_fam
 [eva] Done for function make_fam
 [eva] gcc_zero_length_array.c:26: Call to builtin free

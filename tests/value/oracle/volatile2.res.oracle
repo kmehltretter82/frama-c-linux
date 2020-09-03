@@ -44,10 +44,8 @@
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
   Called from volatile2.i:140.
-[eva:alarm] volatile2.i:76: Warning: 
-  signed overflow. assert i + 1 ≤ 32767;
-[eva:alarm] volatile2.i:76: Warning: 
-  signed overflow. assert j + 1 ≤ 32767;
+[eva:alarm] volatile2.i:76: Warning: signed overflow. assert i + 1 ≤ 32767;
+[eva:alarm] volatile2.i:76: Warning: signed overflow. assert j + 1 ≤ 32767;
 [eva:alarm] volatile2.i:76: Warning: 
   signed overflow.
   assert -32768 ≤ tmp + tmp_0;
@@ -55,14 +53,10 @@
 [eva:alarm] volatile2.i:76: Warning: 
   signed overflow. assert tmp + tmp_0 ≤ 32767;
                    (tmp from i++, tmp_0 from j++)
-[eva:alarm] volatile2.i:78: Warning: 
-  signed overflow. assert i + 1 ≤ 32767;
-[eva:alarm] volatile2.i:78: Warning: 
-  signed overflow. assert j + 1 ≤ 32767;
-[eva:alarm] volatile2.i:78: Warning: 
-  signed overflow. assert -32768 ≤ i + j;
-[eva:alarm] volatile2.i:78: Warning: 
-  signed overflow. assert i + j ≤ 32767;
+[eva:alarm] volatile2.i:78: Warning: signed overflow. assert i + 1 ≤ 32767;
+[eva:alarm] volatile2.i:78: Warning: signed overflow. assert j + 1 ≤ 32767;
+[eva:alarm] volatile2.i:78: Warning: signed overflow. assert -32768 ≤ i + j;
+[eva:alarm] volatile2.i:78: Warning: signed overflow. assert i + j ≤ 32767;
 [eva] volatile2.i:80: 
   Frama_C_dump_each:
   # Cvalue domain:

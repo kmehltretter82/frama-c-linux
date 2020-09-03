@@ -6,8 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] keep_annot.i:50: assertion got status valid.
-[eva:alarm] keep_annot.i:52: Warning: 
-  assertion got status unknown.
+[eva:alarm] keep_annot.i:52: Warning: assertion got status unknown.
 [eva] Recording results for bts1110
 [eva] done for function bts1110
 [slicing] initializing slicing ...
@@ -33,4 +32,4 @@ int bts1110(int x)
 }
 
 
-[kernel] Parsing result/ocode_4_keep_annot.i (no preprocessing)
+[kernel] Parsing ocode_4_keep_annot.i (no preprocessing)

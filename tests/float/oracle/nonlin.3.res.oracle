@@ -190,8 +190,7 @@
 [eva] Done for function other
 [eva] computing for function split_alarm <- main.
   Called from nonlin.c:146.
-[eva:alarm] nonlin.c:76: Warning: 
-  non-finite float value. assert \is_finite(v);
+[eva:alarm] nonlin.c:76: Warning: non-finite float value. assert \is_finite(v);
 [eva:alarm] nonlin.c:77: Warning: 
   non-finite double value.
   assert
@@ -202,10 +201,8 @@
 [eva] Done for function split_alarm
 [eva] computing for function norm <- main.
   Called from nonlin.c:147.
-[eva:alarm] nonlin.c:81: Warning: 
-  non-finite float value. assert \is_finite(v);
-[eva:alarm] nonlin.c:82: Warning: 
-  non-finite float value. assert \is_finite(v);
+[eva:alarm] nonlin.c:81: Warning: non-finite float value. assert \is_finite(v);
+[eva:alarm] nonlin.c:82: Warning: non-finite float value. assert \is_finite(v);
 [eva] computing for function Frama_C_float_interval <- norm <- main.
   Called from nonlin.c:84.
 [eva] nonlin.c:84: 
@@ -301,9 +298,7 @@
   f ∈ [-0x0.0000000000000p0 .. 0x1.0000000000000p-149]
   res ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
 [eva:final-states] Values at end of function garbled:
-  a_0 ∈
-     {{ garbled mix of &{x_0}
-      (origin: Arithmetic {nonlin.c:98}) }}
+  a_0 ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
   f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic) }}
 [eva:final-states] Values at end of function nonlin_f:
   Frama_C_entropy_source ∈ [--..--]

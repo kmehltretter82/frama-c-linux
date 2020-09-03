@@ -24,10 +24,8 @@
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
   Called from invalid_pointer.c:173.
-[eva] invalid_pointer.c:43: 
-  Trace partitioning superposing up to 100 states
-[eva] invalid_pointer.c:54: 
-  Frama_C_show_each_bottom: {{ &t + {-4} }}
+[eva] invalid_pointer.c:43: Trace partitioning superposing up to 100 states
+[eva] invalid_pointer.c:54: Frama_C_show_each_bottom: {{ &t + {-4} }}
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
@@ -69,13 +67,10 @@
 [eva] invalid_pointer.c:133: assertion got status valid.
 [eva:alarm] invalid_pointer.c:136: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:alarm] invalid_pointer.c:139: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:139: Warning: assertion got status unknown.
 [eva] invalid_pointer.c:140: assertion got status valid.
-[eva] invalid_pointer.c:141: 
-  Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
-[eva:alarm] invalid_pointer.c:143: Warning: 
-  assertion got status unknown.
+[eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
+[eva:alarm] invalid_pointer.c:143: Warning: assertion got status unknown.
 [eva] invalid_pointer.c:144: assertion got status valid.
 [eva] invalid_pointer.c:145: 
   Frama_C_show_each_object_pointer_char: {{ &x + {0; 1; 2; 3; 4} }}
@@ -85,20 +80,15 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] invalid_pointer.c:148: assertion got status valid.
-[eva:alarm] invalid_pointer.c:150: Warning: 
-  assertion got status unknown.
-[eva:alarm] invalid_pointer.c:152: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:150: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:152: Warning: assertion got status unknown.
 [eva] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
 [eva] invalid_pointer.c:155: assertion got status valid.
-[eva:alarm] invalid_pointer.c:158: Warning: 
-  assertion got status unknown.
-[eva:alarm] invalid_pointer.c:161: Warning: 
-  assertion got status unknown.
-[eva:alarm] invalid_pointer.c:163: Warning: 
-  assertion got status unknown.
+[eva:alarm] invalid_pointer.c:158: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:161: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:163: Warning: assertion got status unknown.
 [eva:alarm] invalid_pointer.c:166: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for object_pointer_predicate

@@ -1,22 +1,14 @@
 [kernel] Parsing ghost_cv_var_decl.c (with preprocessing)
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:12: 
-  'g1' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:22: 
-  'g1' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:23: 
-  'g2' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:12: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:22: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:23: 'g2' is already ghost
 [kernel:ghost:already-ghost] ghost_cv_var_decl.c:32: 
   'g0' elements are already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:45: 
-  'g0' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:175: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:184: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:191: 
-  'b' is already ghost
-[kernel:ghost:already-ghost] ghost_cv_var_decl.c:200: 
-  'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:45: 'g0' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:175: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:184: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:191: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:200: 'b' is already ghost
 [kernel:ghost:already-ghost] ghost_cv_var_decl.c:207: 
   'b' elements are already ghost
 [kernel:ghost:already-ghost] ghost_cv_var_decl.c:216: 

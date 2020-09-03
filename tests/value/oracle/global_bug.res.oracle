@@ -3,8 +3,7 @@
 [eva] Computing initial state
 [eva:alarm] global_bug.i:6: Warning: 
   invalid RHS operand for shift. assert 0 ≤ 63 < 32;
-[eva] global_bug.i:7: Warning: 
-  evaluation of initializer '99 << 63' failed
+[eva] global_bug.i:7: Warning: evaluation of initializer '99 << 63' failed
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NOT ACCESSIBLE

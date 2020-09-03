@@ -43,8 +43,7 @@
   Assigning imprecise value to p.
   The imprecision originates from Library function {leaf.i:50}
 [eva] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
-[eva:alarm] leaf.i:52: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] leaf.i:52: Warning: out of bounds write. assert \valid(p);
 [eva] leaf.i:53: Frama_C_show_each_F: {5}
 [eva] computing for function f_int_star_int_star_int <- main.
   Called from leaf.i:55.
@@ -153,9 +152,7 @@
   st_tab3_int_1 ∈ [--..--]
   st_tab3_int_3 ∈ [--..--]
   p ∈ {{ &g }}
-  pp ∈
-    {{ garbled mix of &{pg}
-     (origin: Library function {leaf.i:55}) }}
+  pp ∈ {{ garbled mix of &{pg} (origin: Library function {leaf.i:55}) }}
 [from] Computing for function main
 [from] Computing for function f_int_int <-main
 [from] Done for function f_int_int

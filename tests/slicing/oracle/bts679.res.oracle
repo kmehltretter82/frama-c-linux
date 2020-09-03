@@ -9,8 +9,7 @@
   Called from bts679.i:7.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] bts679.i:8: 
-  cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva] bts679.i:8: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] bts679.i:8: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
@@ -39,4 +38,4 @@ int main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts679.i (no preprocessing)
+[kernel] Parsing ocode_0_bts679.i (no preprocessing)

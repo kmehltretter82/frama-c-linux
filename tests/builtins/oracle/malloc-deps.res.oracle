@@ -5,23 +5,20 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] malloc-deps.c:12: Call to builtin malloc
-[eva] malloc-deps.c:12: 
-  allocating weak variable __malloc_w_main_l12
+[eva] malloc-deps.c:12: allocating weak variable __malloc_w_main_l12
 [eva] malloc-deps.c:17: Call to builtin malloc
 [eva] malloc-deps.c:17: allocating variable __malloc_main_l17
 [eva] malloc-deps.c:25: Call to builtin malloc
 [eva] malloc-deps.c:25: allocating variable __malloc_main_l25
 [eva] computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva:alarm] malloc-deps.c:7: Warning: 
-  out of bounds write. assert \valid(p + k);
+[eva:alarm] malloc-deps.c:7: Warning: out of bounds write. assert \valid(p + k);
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
 [eva] malloc-deps.c:25: Call to builtin malloc
-[eva:malloc:weak] malloc-deps.c:25: 
-  marking variable `__malloc_main_l25' as weak
+[eva:malloc:weak] malloc-deps.c:25: marking variable `__malloc_main_l25' as weak
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31) to fit 0..63
 [eva:alarm] malloc-deps.c:26: Warning: 

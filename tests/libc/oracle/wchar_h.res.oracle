@@ -9,8 +9,7 @@
 [eva] using specification for function fopen
 [eva] wchar_h.c:5: 
   function fopen: precondition 'valid_filename' got status valid.
-[eva] wchar_h.c:5: 
-  function fopen: precondition 'valid_mode' got status valid.
+[eva] wchar_h.c:5: function fopen: precondition 'valid_mode' got status valid.
 [eva] Done for function fopen
 [eva] computing for function fgetws <- main.
   Called from wchar_h.c:8.
@@ -22,55 +21,48 @@
 [eva] Done for function fgetws
 [eva] wchar_h.c:10: assertion got status valid.
 [eva] wchar_h.c:13: Call to builtin wmemchr
-[eva] wchar_h.c:13: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:13: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_h.c:13: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_h.c:13: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_h.c:14: check 'ok' got status valid.
 [eva] wchar_h.c:15: Call to builtin wmemchr
-[eva] wchar_h.c:15: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:15: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_h.c:15: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_h.c:15: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_h.c:16: check 'ok' got status valid.
 [eva] wchar_h.c:18: Call to builtin wmemchr
-[eva] wchar_h.c:18: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:18: function wmemchr: precondition 'valid' got status valid.
 [eva:alarm] wchar_h.c:18: Warning: 
   function wmemchr: precondition 'initialization' got status invalid.
 [eva] wchar_h.c:18: 
   function wmemchr: no state left, precondition 'danglingness' got status valid.
 [eva] wchar_h.c:21: Call to builtin wmemchr
-[eva] wchar_h.c:21: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:21: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_h.c:21: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_h.c:21: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_h.c:22: check 'ok' got status valid.
 [eva] wchar_h.c:24: Call to builtin wmemchr
-[eva] wchar_h.c:24: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:24: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_h.c:24: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_h.c:24: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_h.c:25: check 'ok' got status valid.
 [eva] wchar_h.c:26: Call to builtin wmemchr
-[eva] wchar_h.c:26: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:26: function wmemchr: precondition 'valid' got status valid.
 [eva:alarm] wchar_h.c:26: Warning: 
   function wmemchr: precondition 'initialization' got status unknown.
 [eva] wchar_h.c:26: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_h.c:27: check 'ok' got status valid.
 [eva] wchar_h.c:29: Call to builtin wmemchr
-[eva] wchar_h.c:29: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_h.c:29: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_h.c:29: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_h.c:29: 

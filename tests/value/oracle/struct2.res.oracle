@@ -43,14 +43,12 @@
   P ∈ {0}
 [eva:alarm] struct2.i:74: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] struct2.i:74: Warning: 
-  accessing out of bounds index. assert i < 2;
+[eva:alarm] struct2.i:74: Warning: accessing out of bounds index. assert i < 2;
 [eva:alarm] struct2.i:76: Warning: 
   accessing out of bounds index. assert 0 ≤ (int)(i + j);
 [eva:alarm] struct2.i:76: Warning: 
   accessing out of bounds index. assert (int)(i + j) < 2;
-[eva:alarm] struct2.i:76: Warning: 
-  signed overflow. assert i + j ≤ 2147483647;
+[eva:alarm] struct2.i:76: Warning: signed overflow. assert i + j ≤ 2147483647;
 [eva:alarm] struct2.i:78: Warning: 
   accessing out of bounds index. assert tab2[i] < 2;
 [eva:alarm] struct2.i:80: Warning: 
@@ -67,28 +65,24 @@
   signed overflow. assert -2147483648 ≤ *p + x;
 [eva:alarm] struct2.i:117: Warning: 
   signed overflow. assert *p + x ≤ 2147483647;
-[eva:alarm] struct2.i:124: Warning: 
-  out of bounds read. assert \valid_read(r);
+[eva:alarm] struct2.i:124: Warning: out of bounds read. assert \valid_read(r);
 [kernel] struct2.i:124: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] struct2.i:130: Warning: 
   out of bounds read. assert \valid_read(p3 + 2);
 [eva:alarm] struct2.i:138: Warning: 
   signed overflow. assert *((int *)0x1020) + i ≤ 2147483647;
-[eva:alarm] struct2.i:149: Warning: 
-  out of bounds write. assert \valid(*t + i);
+[eva:alarm] struct2.i:149: Warning: out of bounds write. assert \valid(*t + i);
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert 0 ≤ (int)(i + j);
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert (int)(i + j) < 2;
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert 0 ≤ k;
-[eva:alarm] struct2.i:185: Warning: 
-  accessing out of bounds index. assert k < 2;
+[eva:alarm] struct2.i:185: Warning: accessing out of bounds index. assert k < 2;
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert 0 ≤ l;
-[eva:alarm] struct2.i:185: Warning: 
-  accessing out of bounds index. assert l < 2;
+[eva:alarm] struct2.i:185: Warning: accessing out of bounds index. assert l < 2;
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert 0 ≤ (int)(tab3[l] + m);
 [eva:alarm] struct2.i:185: Warning: 
@@ -99,10 +93,8 @@
   signed overflow. assert tab3[l] + m ≤ 2147483647;
 [eva] Recording results for f_precis
 [eva] done for function f_precis
-[eva] struct2.i:124: 
-  assertion 'Eva,mem_access' got final status invalid.
-[eva] struct2.i:130: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] struct2.i:124: assertion 'Eva,mem_access' got final status invalid.
+[eva] struct2.i:130: assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_precis:

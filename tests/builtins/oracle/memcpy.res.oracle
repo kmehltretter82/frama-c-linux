@@ -28,11 +28,9 @@
 [eva] memcpy.c:28: Call to builtin memcpy
 [eva:alarm] memcpy.c:28: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:28: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:28: 
-  function memcpy: precondition 'separation' got status valid.
-[eva] share/libc/string.h:98: 
+[eva] memcpy.c:28: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:28: function memcpy: precondition 'separation' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for buggy
 [from] Computing for function buggy
@@ -42,113 +40,80 @@
   Called from memcpy.c:63.
 [eva:alarm] memcpy.c:44: Warning: assertion got status unknown.
 [eva] memcpy.c:47: Call to builtin memcpy
-[eva] memcpy.c:47: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:47: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:47: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:47: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:47: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:47: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:47: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:47: too many locations to update in array. Approximating.
 [eva] memcpy.c:49: Call to builtin memcpy
-[eva] memcpy.c:49: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:49: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:49: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:49: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:49: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:49: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:49: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:49: too many locations to update in array. Approximating.
 [kernel] memcpy.c:49: 
   more than 150(1000) locations to update in array. Approximating.
-[kernel] memcpy.c:49: 
-  more than 150(1000) elements to enumerate. Approximating.
+[kernel] memcpy.c:49: more than 150(1000) elements to enumerate. Approximating.
 [eva] memcpy.c:53: Call to builtin memcpy
-[eva] memcpy.c:53: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:53: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:53: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:53: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:53: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:53: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:53: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:53: too many locations to update in array. Approximating.
 [eva] Recording results for many
 [from] Computing for function many
 [from] Done for function many
 [eva] Done for function many
 [eva] computing for function init <- main <- main_all.
   Called from memcpy.c:65.
-[eva] memcpy.c:20: 
-  Trace partitioning superposing up to 100 states
+[eva] memcpy.c:20: Trace partitioning superposing up to 100 states
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
 [eva] Done for function init
 [eva:alarm] memcpy.c:67: Warning: assertion got status unknown.
 [eva] memcpy.c:68: Call to builtin memcpy
-[eva] memcpy.c:68: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:68: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:68: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:68: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:68: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:68: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:70: Call to builtin memcpy
 [eva:alarm] memcpy.c:70: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:70: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:70: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:70: function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:72: Warning: assertion got status unknown.
 [eva] memcpy.c:73: Call to builtin memcpy
-[eva] memcpy.c:73: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:73: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:73: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:73: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:73: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:73: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:75: Call to builtin memcpy
 [eva:alarm] memcpy.c:75: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:75: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:75: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:75: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:83: Call to builtin memcpy
-[eva] memcpy.c:83: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:83: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:83: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:83: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:83: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:83: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:85: Call to builtin memcpy
-[eva] memcpy.c:85: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:85: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:85: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:85: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:85: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:85: function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:87: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva] memcpy.c:87: Call to builtin memcpy
-[eva] memcpy.c:87: 
-  function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:87: function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:87: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:87: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:87: function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:89: Warning: 
   pointer downcast. assert (unsigned int)(&v4) ≤ 2147483647;
 [eva] memcpy.c:89: Call to builtin memcpy
 [eva:alarm] memcpy.c:89: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:89: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:89: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:89: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:89: function memcpy: precondition 'separation' got status valid.
 [kernel] memcpy.c:89: 
-  writing somewhere in {NULL; v4} because of Arithmetic
-                                 {memcpy.c:89}.
+  writing somewhere in {NULL; v4} because of Arithmetic {memcpy.c:89}.
 [eva:alarm] memcpy.c:90: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:alarm] memcpy.c:91: Warning: 
@@ -156,13 +121,10 @@
 [eva] memcpy.c:91: Call to builtin memcpy
 [eva:alarm] memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:91: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:91: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:91: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:91: function memcpy: precondition 'separation' got status valid.
 [kernel] memcpy.c:91: 
-  writing somewhere in {NULL; v5} because of Arithmetic
-                                 {memcpy.c:91}.
+  writing somewhere in {NULL; v5} because of Arithmetic {memcpy.c:91}.
 [eva] memcpy.c:96: Call to builtin memcpy
 [eva:alarm] memcpy.c:96: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -175,69 +137,50 @@
 [eva] memcpy.c:95: starting to merge loop iterations
 [eva] memcpy.c:96: Call to builtin memcpy
 [eva] memcpy.c:101: Call to builtin memcpy
-[eva] memcpy.c:101: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:101: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:101: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:101: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:101: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:101: function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:103: Warning: assertion got status unknown.
 [eva] memcpy.c:105: Call to builtin memcpy
-[eva] memcpy.c:105: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:105: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:105: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:105: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:105: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:105: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:105: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva] memcpy.c:110: starting to merge loop iterations
 [eva] memcpy.c:114: Call to builtin memcpy
 [eva:alarm] memcpy.c:114: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:114: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:114: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:114: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:114: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:114: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:114: too many locations to update in array. Approximating.
 [eva] memcpy.c:118: starting to merge loop iterations
 [eva] memcpy.c:122: Call to builtin memcpy
 [eva:alarm] memcpy.c:122: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:122: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:122: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:122: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:122: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:122: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:122: too many locations to update in array. Approximating.
 [eva] memcpy.c:126: starting to merge loop iterations
 [eva] memcpy.c:131: Call to builtin memcpy
 [eva:alarm] memcpy.c:131: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:131: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:131: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:131: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:131: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:131: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:131: too many locations to update in array. Approximating.
 [eva] memcpy.c:135: starting to merge loop iterations
 [eva] memcpy.c:140: Call to builtin memcpy
 [eva:alarm] memcpy.c:140: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:140: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:140: 
-  function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:140: 
-  too many locations to update in array. Approximating.
+[eva] memcpy.c:140: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:140: function memcpy: precondition 'separation' got status valid.
+[kernel] memcpy.c:140: too many locations to update in array. Approximating.
 [eva] memcpy.c:145: Call to builtin memcpy
 [eva:alarm] memcpy.c:145: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:145: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:145: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:145: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:145: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:150: Warning: assertion got status unknown.
@@ -246,18 +189,14 @@
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:151: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:151: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:151: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:151: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:152: Warning: assertion got status unknown.
 [eva] memcpy.c:153: Call to builtin memcpy
-[eva] memcpy.c:153: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:153: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:153: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:153: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:153: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:153: function memcpy: precondition 'separation' got status valid.
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
@@ -265,12 +204,9 @@
 [eva] computing for function main_uninit <- main_all.
   Called from memcpy.c:227.
 [eva] memcpy.c:172: Call to builtin memcpy
-[eva] memcpy.c:172: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:172: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:172: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:172: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:172: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:172: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:172: 
   In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
 [eva] memcpy.c:173: assertion got status valid.
@@ -279,12 +215,9 @@
 [eva] using specification for function itv
 [eva] Done for function itv
 [eva] memcpy.c:174: Call to builtin memcpy
-[eva] memcpy.c:174: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:174: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:174: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:174: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:174: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:174: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:174: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:174: 
@@ -293,27 +226,20 @@
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:178.
 [eva] using specification for function make_unknown
-[eva] memcpy.c:178: 
-  function make_unknown: precondition got status valid.
+[eva] memcpy.c:178: function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
 [eva] memcpy.c:179: Call to builtin memcpy
-[eva] memcpy.c:179: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:179: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:179: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:179: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:179: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:179: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:180: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:181.
 [eva] Done for function itv
 [eva] memcpy.c:181: Call to builtin memcpy
-[eva] memcpy.c:181: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:181: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:181: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:181: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:181: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:181: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:181: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:181: 
@@ -322,16 +248,12 @@
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:185.
-[eva] memcpy.c:185: 
-  function make_unknown: precondition got status valid.
+[eva] memcpy.c:185: function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
 [eva] memcpy.c:187: Call to builtin memcpy
-[eva] memcpy.c:187: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:187: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:187: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:187: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:187: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:187: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:187: 
   In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
 [eva] memcpy.c:188: assertion got status valid.
@@ -339,12 +261,9 @@
   Called from memcpy.c:190.
 [eva] Done for function itv
 [eva] memcpy.c:190: Call to builtin memcpy
-[eva] memcpy.c:190: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:190: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:190: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:190: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:190: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:190: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:190: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:190: 
@@ -354,32 +273,24 @@
   accessing uninitialized left-value. assert \initialized(&b[8]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:196.
-[eva] memcpy.c:196: 
-  function make_unknown: precondition got status valid.
+[eva] memcpy.c:196: function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:197.
-[eva] memcpy.c:197: 
-  function make_unknown: precondition got status valid.
+[eva] memcpy.c:197: function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
 [eva] memcpy.c:198: Call to builtin memcpy
-[eva] memcpy.c:198: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:198: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:198: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:198: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:198: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:198: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:199: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:200.
 [eva] Done for function itv
 [eva] memcpy.c:200: Call to builtin memcpy
-[eva] memcpy.c:200: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:200: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:200: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:200: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:200: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:200: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:200: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:200: 
@@ -393,12 +304,9 @@
 [eva] computing for function main_local <- main_all.
   Called from memcpy.c:228.
 [eva] memcpy.c:209: Call to builtin memcpy
-[eva] memcpy.c:209: 
-  function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:209: 
-  function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:209: 
-  function memcpy: precondition 'separation' got status valid.
+[eva] memcpy.c:209: function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:209: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:209: function memcpy: precondition 'separation' got status valid.
 [eva:locals-escaping] memcpy.c:210: Warning: 
   locals {y} escaping the scope of a block of main_local through p
 [eva] memcpy.c:212: 
@@ -445,8 +353,7 @@
 [eva] memcpy.c:220: 
   function memcpy: no state left, precondition 'separation' got status valid.
 [eva] memcpy.c:221: Call to builtin memcpy
-[eva] memcpy.c:221: 
-  function memcpy: precondition 'valid_dest' got status valid.
+[eva] memcpy.c:221: function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:221: Warning: 
   function memcpy: precondition 'valid_src' got status invalid.
 [eva] memcpy.c:221: 
@@ -658,15 +565,11 @@
   v2.x ∈ {5}
     .y ∈ {7}
     {.p; .padding[0..23]} ∈ {0}
-  v3 ∈
-    {{ garbled mix of &{v1}
-     (origin: Misaligned {memcpy.c:87}) }}
+  v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned {memcpy.c:87}) }}
   v4.x ∈ [--..--]
     .y ∈ {{ (int)&t }}
     {.p; .padding[0..23]} ∈ [--..--]
-  v5 ∈
-    {{ garbled mix of &{t}
-     (origin: Misaligned {memcpy.c:91}) }}
+  v5 ∈ {{ garbled mix of &{t} (origin: Misaligned {memcpy.c:91}) }}
   t{[0]; [1]{.x; .y}} ∈ {0}
    [1].p ∈ {{ &v1.y }}
    {[1].padding[0..23]; [2]; [3]{.x; .y}} ∈ {0}
@@ -1101,7 +1004,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 61)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 61)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1120,7 +1023,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 76)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 76)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1181,11 +1084,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 96)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 96)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 96)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 96)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 97)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 97)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1198,11 +1101,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 106)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 106)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 106)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 106)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 107)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 107)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1215,11 +1118,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 116)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 116)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 116)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 116)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 117)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 117)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1232,7 +1135,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 126)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 126)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1245,7 +1148,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 132)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 132)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1258,7 +1161,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 139)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 139)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1271,7 +1174,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 146)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 146)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1282,7 +1185,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 153)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 153)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1307,7 +1210,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 158)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 158)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'default'
             by Frama-C kernel.
@@ -1326,7 +1229,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 176)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 176)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1347,7 +1250,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 182)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 182)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'default'
             by Frama-C kernel.
@@ -1366,7 +1269,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 199)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 199)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1377,11 +1280,11 @@
 
 [ Extern  ] Post-condition 'result_bounded'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 206)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 206)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 206)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 206)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 207)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 207)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1394,7 +1297,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 214)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 214)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1407,7 +1310,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 222)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 222)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1420,7 +1323,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 233)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 233)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1437,31 +1340,31 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'resume_str' 'ptr_subset'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 246)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 246)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'new_str' (file share/libc/string.h, line 261)
+[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 261)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'resume_str' (file share/libc/string.h, line 269)
+[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 269)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 246)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 246)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 248)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 248)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 250)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 250)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 252)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 252)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 261)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 261)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 262)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 262)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 263)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 263)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 269)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 269)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 272)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 272)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 275)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 275)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1484,31 +1387,31 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'resume_str' 'saveptr_subset'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 288)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 288)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'new_str' (file share/libc/string.h, line 303)
+[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 303)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'resume_str' (file share/libc/string.h, line 313)
+[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 313)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 288)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 288)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 290)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 290)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 292)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 292)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 294)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 294)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 303)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 303)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 304)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 304)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file share/libc/string.h, line 305)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 305)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 313)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 313)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 316)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 316)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file share/libc/string.h, line 319)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 319)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1521,11 +1424,11 @@
 --- Properties of Function 'strsep'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/string.h, line 331)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 331)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 331)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 331)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 332)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 332)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1542,7 +1445,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 342)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 342)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1555,11 +1458,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 355)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 355)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 355)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 355)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 356)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 356)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1576,11 +1479,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'partial' 'equal_prefix'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 367)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 367)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 367)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 367)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 368)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 368)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'complete'
             by Frama-C kernel.
@@ -1597,11 +1500,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 388)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 388)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 388)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 388)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 389)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 389)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1614,11 +1517,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'points_to_end'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 400)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 400)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 400)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 400)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 401)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 401)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1635,11 +1538,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 411)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 411)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 411)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 411)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 414)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 414)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1654,23 +1557,23 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'partial' 'sum_of_bounded_lengths'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'complete' (file share/libc/string.h, line 431)
+[ Extern  ] Assigns for 'complete' (file FRAMAC_SHARE/libc/string.h, line 431)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 425)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 425)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'partial' (file share/libc/string.h, line 439)
+[ Extern  ] Assigns for 'partial' (file FRAMAC_SHARE/libc/string.h, line 439)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'complete' (file share/libc/string.h, line 431)
+[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 431)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'complete' (file share/libc/string.h, line 433)
+[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 433)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 425)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 425)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 426)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 426)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'partial' (file share/libc/string.h, line 439)
+[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 439)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'partial' (file share/libc/string.h, line 441)
+[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 441)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'complete'
             by Frama-C kernel.
@@ -1685,11 +1588,11 @@
 
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/string.h, line 451)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 451)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 451)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 451)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 452)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 452)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1698,11 +1601,11 @@
 --- Properties of Function 'strxfrm'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file share/libc/string.h, line 460)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 460)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 460)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 460)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 461)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 461)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1717,19 +1620,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 473)
+[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 473)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 473)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 473)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 474)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 474)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 470)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 470)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 480)
+[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 480)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1737,7 +1640,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 469) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 469) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1752,19 +1655,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file share/libc/string.h, line 492)
+[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 492)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 492)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 492)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file share/libc/string.h, line 493)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 493)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 488)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 488)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file share/libc/string.h, line 502)
+[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 502)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1772,7 +1675,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file share/libc/string.h, line 487) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 487) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1789,7 +1692,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/string.h, line 518)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 518)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1802,9 +1705,9 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'zero_initialized'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file share/libc/strings.h, line 37)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/strings.h, line 37)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/strings.h, line 37)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 37)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1815,7 +1718,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/strings.h, line 48)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 48)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1826,7 +1729,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/strings.h, line 55)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 55)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.

@@ -44,7 +44,6 @@
 [pdg] computing for function p3
 [pdg] done for function p3
 [impact] impacted statements of stmt(s) 30 are:
-    call.i:45 (sid 22): p3(1);
-    call.i:49 (sid 26): test3();
+    call.i:45 (sid 22): p3(1);call.i:49 (sid 26): test3();
     call.i:55 (sid 31): call_test3();
 [impact] analysis done

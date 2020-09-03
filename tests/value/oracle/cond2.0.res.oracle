@@ -15,11 +15,9 @@
   t ∈ {0}
   u ∈ {0}
 [eva] cond2.i:26: starting to merge loop iterations
-[eva:alarm] cond2.i:26: Warning: 
-  signed overflow. assert x + 2 ≤ 2147483647;
+[eva:alarm] cond2.i:26: Warning: signed overflow. assert x + 2 ≤ 2147483647;
 [eva] cond2.i:27: starting to merge loop iterations
-[eva:alarm] cond2.i:27: Warning: 
-  signed overflow. assert y + 5 ≤ 2147483647;
+[eva:alarm] cond2.i:27: Warning: signed overflow. assert y + 5 ≤ 2147483647;
 [eva] Recording results for zero_ou_un_0
 [eva] done for function zero_ou_un_0
 [eva] ====== VALUES COMPUTED ======

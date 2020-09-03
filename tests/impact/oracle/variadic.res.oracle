@@ -47,12 +47,10 @@
 [pdg] computing for function g1
 [pdg] done for function g1
 [impact] impacted statements of stmt(s) 12 are:
-    variadic.i:19 (sid 7): y = x + y;
-    variadic.i:31 (sid 15): return y;
+    variadic.i:19 (sid 7): y = x + y;variadic.i:31 (sid 15): return y;
     variadic.i:29 (sid 52): int __va_arg0 = 2;
     variadic.i:29 (sid 53): int __va_arg1 = 3;
-    variadic.i:29 (sid 54): void *__va_args[2] =
-                                           {& __va_arg0, & __va_arg1};
+    variadic.i:29 (sid 54): void *__va_args[2] = {& __va_arg0, & __va_arg1};
     variadic.i:29 (sid 55): g1(1,(void * const *)(__va_args));
     variadic.i:30 (sid 58): g1(1,(void * const *)(__va_args_8));
 [impact] analysis done
@@ -81,8 +79,7 @@
 [impact] impacted statements of stmt(s) 19 are:
     variadic.i:37 (sid 60): int __va_arg0 = 2;
     variadic.i:37 (sid 61): int __va_arg1 = 3;
-    variadic.i:37 (sid 62): void *__va_args[2] =
-                                           {& __va_arg0, & __va_arg1};
+    variadic.i:37 (sid 62): void *__va_args[2] = {& __va_arg0, & __va_arg1};
     variadic.i:37 (sid 63): g2(1,(void * const *)(__va_args));
 [impact] analysis done
 [impact] beginning analysis
@@ -129,8 +126,7 @@
 [pdg] computing for function g1
 [pdg] done for function g1
 [impact] impacted statements of stmt(s) 26 are:
-    variadic.i:19 (sid 7): y = x + y;
-    variadic.i:53 (sid 29): return y;
+    variadic.i:19 (sid 7): y = x + y;variadic.i:53 (sid 29): return y;
     variadic.i:59 (sid 34): return y;
     variadic.i:51 (sid 68): void *__va_args[1] = {(void *)0};
     variadic.i:51 (sid 69): g1(t,(void * const *)(__va_args));
@@ -171,9 +167,7 @@
 [from] Done for function aux4bis
 [pdg] done for function main4
 [impact] impacted statements of stmt(s) 37 are:
-    variadic.i:69 (sid 42): return y;
-    variadic.i:75 (sid 47): return y;
+    variadic.i:69 (sid 42): return y;variadic.i:75 (sid 47): return y;
     variadic.i:73 (sid 82): aux4bis(1,(void * const *)(__va_args));
-    variadic.i:74 (sid 86): aux4bis(1,
-                                                 (void * const *)(__va_args_7));
+    variadic.i:74 (sid 86): aux4bis(1,(void * const *)(__va_args_7));
 [impact] analysis done

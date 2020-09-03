@@ -70,8 +70,7 @@
 [eva] fptr.i:52: Frama_C_show_each: {0; 1}
 [eva] fptr.i:51: Frama_C_show_each_F: {{ NULL ; &h ; &hh }}
 [eva] fptr.i:52: Reusing old results for call to f
-[eva:alarm] fptr.i:56: Warning: 
-  division by zero. assert (int)(c & 64) ≢ 0;
+[eva:alarm] fptr.i:56: Warning: division by zero. assert (int)(c & 64) ≢ 0;
 [eva] computing for function hh <- main.
   Called from fptr.i:56.
 [eva] Recording results for hh
@@ -82,10 +81,8 @@
 [eva] Done for function h
 [eva] Recording results for main
 [eva] done for function main
-[eva] fptr.i:44: 
-  assertion 'Eva,function_pointer' got final status invalid.
-[eva] fptr.i:45: 
-  assertion 'Eva,function_pointer' got final status invalid.
+[eva] fptr.i:44: assertion 'Eva,function_pointer' got final status invalid.
+[eva] fptr.i:45: assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h:
   X ∈ {0; 1}

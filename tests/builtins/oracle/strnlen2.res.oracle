@@ -92,9 +92,8 @@
 [eva] computing for function init_array_nondet <- large <- main.
   Called from strnlen2.c:144.
 [eva] strnlen2.c:138: Call to builtin memset
-[eva] strnlen2.c:138: 
-  function memset: precondition 'valid_s' got status valid.
-[eva] share/libc/string.h:118: 
+[eva] strnlen2.c:138: function memset: precondition 'valid_s' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
@@ -277,12 +276,9 @@
 [eva] Done for function escaping
 [eva] computing for function big_array <- main.
   Called from strnlen2.c:523.
-[eva:alarm] strnlen2.c:261: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strnlen2.c:263: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strnlen2.c:265: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:261: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:263: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:265: Warning: out of bounds write. assert \valid(p);
 [eva] strnlen2.c:272: Call to builtin strnlen
 [eva:alarm] strnlen2.c:272: Warning: 
   function strnlen: precondition 'valid_string_s' got status unknown.
@@ -324,12 +320,9 @@
 [eva] strnlen2.c:138: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
-[eva:alarm] strnlen2.c:295: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strnlen2.c:297: Warning: 
-  out of bounds write. assert \valid(p);
-[eva:alarm] strnlen2.c:299: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:295: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:297: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] strnlen2.c:299: Warning: out of bounds write. assert \valid(p);
 [eva] strnlen2.c:300: Call to builtin strnlen
 [eva] strnlen2.c:300: 
   function strnlen: precondition 'valid_string_s' got status valid.
@@ -342,8 +335,7 @@
 [eva] strnlen2.c:303: assertion got status valid.
 [eva] strnlen2.c:304: assertion got status valid.
 [eva] strnlen2.c:305: assertion got status valid.
-[eva] strnlen2.c:306: 
-  Frama_C_show_each: [0..800], [0..804], [0..4000000]
+[eva] strnlen2.c:306: Frama_C_show_each: [0..800], [0..804], [0..4000000]
 [eva] strnlen2.c:308: Call to builtin strnlen
 [eva:alarm] strnlen2.c:308: Warning: 
   function strnlen: precondition 'valid_string_s' got status unknown.
@@ -356,8 +348,7 @@
 [eva] strnlen2.c:311: assertion got status valid.
 [eva] strnlen2.c:312: assertion got status valid.
 [eva] strnlen2.c:313: assertion got status valid.
-[eva] strnlen2.c:314: 
-  Frama_C_show_each: [0..799], [0..803], [0..3999999]
+[eva] strnlen2.c:314: Frama_C_show_each: [0..799], [0..803], [0..3999999]
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function no_zero_but_ok <- main.

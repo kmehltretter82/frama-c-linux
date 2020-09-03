@@ -1,2 +1,2 @@
 [kernel] Parsing cpp-command.c (with preprocessing)
-[cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [/tmp/FILE.i /tmp/FILE.i /tmp/FILE.i /tmp/FILE.i] [ -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32]
+[cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [/tmp/cpp-command.c94773e.i /tmp/cpp-command.c94773e.i /tmp/cpp-command.c94773e.i /tmp/cpp-command.c94773e.i] [ -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32]

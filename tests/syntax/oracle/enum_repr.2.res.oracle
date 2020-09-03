@@ -17,8 +17,7 @@
   Inserted implicit cast from signed char to enum __anonenum_bd1_11
 [kernel] enum_repr.i:48: 
   Inserted implicit cast from unsigned char to enum __anonenum_bd2_12
-[kernel] enum_repr.i:49: 
-  Inserted implicit cast from int to unsigned int
+[kernel] enum_repr.i:49: Inserted implicit cast from int to unsigned int
 [kernel] enum_repr.i:49: Inserted implicit cast from bar to int
 [kernel] enum_repr.i:63: 
   Inserted implicit cast from int to enum __anonenum_foo_1

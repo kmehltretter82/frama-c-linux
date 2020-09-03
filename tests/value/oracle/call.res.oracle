@@ -8,8 +8,7 @@
   r ∈ {0}
   res ∈ {0}
   x ∈ {0}
-[eva:alarm] call.i:19: Warning: 
-  out of bounds read. assert \valid_read(v + 1);
+[eva:alarm] call.i:19: Warning: out of bounds read. assert \valid_read(v + 1);
 [eva:alarm] call.i:19: Warning: 
   pointer downcast. assert (unsigned int)*(v + 1) ≤ 2147483647;
 [eva] computing for function leaf_fun_int <- main.
@@ -18,8 +17,7 @@
   Neither code nor specification for function leaf_fun_int, generating default assigns from the prototype
 [eva] using specification for function leaf_fun_int
 [eva] Done for function leaf_fun_int
-[eva:alarm] call.i:20: Warning: 
-  out of bounds read. assert \valid_read(v + 1);
+[eva:alarm] call.i:20: Warning: out of bounds read. assert \valid_read(v + 1);
 [eva] computing for function leaf_fun_charp <- main.
   Called from call.i:20.
 [kernel:annot:missing-spec] call.i:20: Warning: 

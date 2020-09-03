@@ -5,10 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] sqrt.c:11: Call to builtin sqrt
-[eva] sqrt.c:11: 
-  function sqrt: precondition 'finite_arg' got status valid.
-[eva] sqrt.c:11: 
-  function sqrt: precondition 'arg_positive' got status valid.
+[eva] sqrt.c:11: function sqrt: precondition 'finite_arg' got status valid.
+[eva] sqrt.c:11: function sqrt: precondition 'arg_positive' got status valid.
 [eva] sqrt.c:12: assertion got status valid.
 [eva] sqrt.c:14: assertion got status valid.
 [eva] sqrt.c:19: 

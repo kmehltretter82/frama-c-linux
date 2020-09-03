@@ -9,8 +9,7 @@
 [eva] realloc_multiple.c:9: Call to builtin malloc
 [eva] realloc_multiple.c:9: allocating variable __malloc_main1_l9
 [eva] realloc_multiple.c:12: Call to builtin malloc
-[eva] realloc_multiple.c:12: 
-  allocating variable __malloc_main1_l12
+[eva] realloc_multiple.c:12: allocating variable __malloc_main1_l12
 [eva] computing for function Frama_C_interval <- main1 <- main.
   Called from realloc_multiple.c:16.
 [eva] using specification for function Frama_C_interval
@@ -47,11 +46,9 @@
 [eva] realloc_multiple.c:23: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
-[eva] realloc_multiple.c:23: 
-  allocating variable __realloc_main1_l23
+[eva] realloc_multiple.c:23: allocating variable __realloc_main1_l23
 [eva:malloc] bases_to_realloc: {__malloc_main1_l9}
-[eva] realloc_multiple.c:23: 
-  allocating variable __realloc_main1_l23_0
+[eva] realloc_multiple.c:23: allocating variable __realloc_main1_l23_0
 [eva:malloc] realloc_multiple.c:23: 
   weak free on bases: {__malloc_main1_l9, __malloc_main1_l12}
 [eva] realloc_multiple.c:25: 
@@ -95,11 +92,9 @@
 [eva] computing for function main2 <- main.
   Called from realloc_multiple.c:76.
 [eva] realloc_multiple.c:30: Call to builtin malloc
-[eva] realloc_multiple.c:30: 
-  allocating variable __malloc_main2_l30
+[eva] realloc_multiple.c:30: allocating variable __malloc_main2_l30
 [eva] realloc_multiple.c:33: Call to builtin malloc
-[eva] realloc_multiple.c:33: 
-  allocating variable __malloc_main2_l33
+[eva] realloc_multiple.c:33: allocating variable __malloc_main2_l33
 [eva] computing for function Frama_C_interval <- main2 <- main.
   Called from realloc_multiple.c:37.
 [eva] realloc_multiple.c:37: 
@@ -135,14 +130,11 @@
 [eva] realloc_multiple.c:45: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main2_l33}
-[eva] realloc_multiple.c:45: 
-  allocating variable __realloc_main2_l45
+[eva] realloc_multiple.c:45: allocating variable __realloc_main2_l45
 [eva:malloc] bases_to_realloc: {__malloc_main2_l30}
-[eva] realloc_multiple.c:45: 
-  allocating variable __realloc_main2_l45_0
+[eva] realloc_multiple.c:45: allocating variable __realloc_main2_l45_0
 [eva:malloc] bases_to_realloc: {}
-[eva] realloc_multiple.c:45: 
-  allocating variable __realloc_main2_l45_1
+[eva] realloc_multiple.c:45: allocating variable __realloc_main2_l45_1
 [eva:malloc] realloc_multiple.c:45: 
   weak free on bases: {__malloc_main2_l30, __malloc_main2_l33}
 [eva] realloc_multiple.c:47: 
@@ -191,11 +183,9 @@
 [eva] computing for function main3 <- main.
   Called from realloc_multiple.c:77.
 [eva] realloc_multiple.c:52: Call to builtin malloc
-[eva] realloc_multiple.c:52: 
-  allocating variable __malloc_main3_l52
+[eva] realloc_multiple.c:52: allocating variable __malloc_main3_l52
 [eva] realloc_multiple.c:53: Call to builtin malloc
-[eva] realloc_multiple.c:53: 
-  allocating variable __malloc_main3_l53
+[eva] realloc_multiple.c:53: allocating variable __malloc_main3_l53
 [eva] computing for function Frama_C_interval <- main3 <- main.
   Called from realloc_multiple.c:59.
 [eva] realloc_multiple.c:59: 
@@ -234,14 +224,11 @@
 [eva] realloc_multiple.c:65: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_main3_l53}
-[eva] realloc_multiple.c:65: 
-  allocating variable __realloc_main3_l65
+[eva] realloc_multiple.c:65: allocating variable __realloc_main3_l65
 [eva:malloc] bases_to_realloc: {__malloc_main3_l52}
-[eva] realloc_multiple.c:65: 
-  allocating variable __realloc_main3_l65_0
+[eva] realloc_multiple.c:65: allocating variable __realloc_main3_l65_0
 [eva:malloc] bases_to_realloc: {}
-[eva] realloc_multiple.c:65: 
-  allocating variable __realloc_main3_l65_1
+[eva] realloc_multiple.c:65: allocating variable __realloc_main3_l65_1
 [eva:malloc] realloc_multiple.c:65: 
   weak free on bases: {__malloc_main3_l52, __malloc_main3_l53}
 [eva:alarm] realloc_multiple.c:66: Warning: 
@@ -325,8 +312,7 @@
 [eva] realloc_multiple.c:70: Call to builtin free
 [eva] realloc_multiple.c:70: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] realloc_multiple.c:70: 
-  strong free on bases: {__malloc_main3_l53}
+[eva:malloc] realloc_multiple.c:70: strong free on bases: {__malloc_main3_l53}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main

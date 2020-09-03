@@ -14,44 +14,29 @@
 [eva] computing for function is_infinite <- main.
   Called from special_floats.c:95.
 [eva] special_floats.c:29: check 'true' got status valid.
-[eva:alarm] special_floats.c:30: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:31: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:32: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:34: Warning: 
-  check 'false' got status invalid.
+[eva:alarm] special_floats.c:30: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:31: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:32: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:34: Warning: check 'false' got status invalid.
 [eva] special_floats.c:35: check 'true' got status valid.
 [eva] special_floats.c:36: check 'true' got status valid.
-[eva:alarm] special_floats.c:37: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:39: Warning: 
-  check 'false' got status invalid.
+[eva:alarm] special_floats.c:37: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:39: Warning: check 'false' got status invalid.
 [eva] special_floats.c:40: check 'true' got status valid.
-[eva:alarm] special_floats.c:41: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:42: Warning: 
-  check 'false' got status invalid.
-[eva:alarm] special_floats.c:46: Warning: 
-  assertion got status unknown.
+[eva:alarm] special_floats.c:41: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:42: Warning: check 'false' got status invalid.
+[eva:alarm] special_floats.c:46: Warning: assertion got status unknown.
 [eva] special_floats.c:47: Frama_C_show_each_pos_infinity: {inf}
-[eva:alarm] special_floats.c:50: Warning: 
-  assertion got status unknown.
+[eva:alarm] special_floats.c:50: Warning: assertion got status unknown.
 [eva] special_floats.c:51: Frama_C_show_each_neg_infinity: {-inf}
-[eva:alarm] special_floats.c:54: Warning: 
-  assertion got status unknown.
-[eva:alarm] special_floats.c:55: Warning: 
-  assertion got status unknown.
+[eva:alarm] special_floats.c:54: Warning: assertion got status unknown.
+[eva:alarm] special_floats.c:55: Warning: assertion got status unknown.
 [eva] special_floats.c:56: 
   Frama_C_show_each_finite_nan:
   [-1.79769313486e+308 .. 1.79769313486e+308] ∪ {NaN}
-[eva:alarm] special_floats.c:59: Warning: 
-  assertion got status unknown.
-[eva] special_floats.c:60: 
-  Frama_C_show_each_top: [-inf .. inf] ∪ {NaN}
-[eva:alarm] special_floats.c:63: Warning: 
-  assertion got status unknown.
+[eva:alarm] special_floats.c:59: Warning: assertion got status unknown.
+[eva] special_floats.c:60: Frama_C_show_each_top: [-inf .. inf] ∪ {NaN}
+[eva:alarm] special_floats.c:63: Warning: assertion got status unknown.
 [eva] special_floats.c:64: Frama_C_show_each_pos_infinity: {inf;NaN}
 [eva] Recording results for is_infinite
 [eva] Done for function is_infinite

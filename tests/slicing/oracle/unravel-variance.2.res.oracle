@@ -236,4 +236,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_2_unravel-variance.i (no preprocessing)
+[kernel] Parsing ocode_2_unravel-variance.i (no preprocessing)

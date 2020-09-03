@@ -27,15 +27,12 @@
 [eva] computing for function k <- main.
   Called from bts283.i:35.
 [eva] bts283.i:35: function k: precondition got status valid.
-[eva:alarm] bts283.i:27: Warning: 
-  signed overflow. assert Y + 1 ≤ 2147483647;
+[eva:alarm] bts283.i:27: Warning: signed overflow. assert Y + 1 ≤ 2147483647;
 [eva] bts283.i:22: function k: postcondition got status valid.
-[eva:alarm] bts283.i:23: Warning: 
-  function k: postcondition got status unknown.
+[eva:alarm] bts283.i:23: Warning: function k: postcondition got status unknown.
 [eva] Recording results for k
 [eva] Done for function k
-[eva:alarm] bts283.i:36: Warning: 
-  signed overflow. assert X + z ≤ 2147483647;
+[eva:alarm] bts283.i:36: Warning: signed overflow. assert X + z ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [slicing] initializing slicing ...
@@ -100,4 +97,4 @@ int main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts283.i (no preprocessing)
+[kernel] Parsing ocode_0_bts283.i (no preprocessing)

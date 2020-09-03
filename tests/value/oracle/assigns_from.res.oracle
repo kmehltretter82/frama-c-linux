@@ -140,8 +140,7 @@
 [eva] Recording results for main6_right
 [from] Computing for function main6_right
 [from] Done for function main6_right
-[eva] assigns_from.i:111: 
-  function main6_right: assigns got status valid.
+[eva] assigns_from.i:111: function main6_right: assigns got status valid.
 [eva] Done for function main6_right
 [eva] computing for function main6_wrong <- main.
   Called from assigns_from.i:235.
@@ -206,8 +205,7 @@
 [eva] computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
 [eva] Done for function c
-[eva:alarm] assigns_from.i:154: Warning: 
-  assertion got status unknown.
+[eva:alarm] assigns_from.i:154: Warning: assertion got status unknown.
 [eva] Recording results for main10
 [from] Computing for function main10
 [from] Done for function main10

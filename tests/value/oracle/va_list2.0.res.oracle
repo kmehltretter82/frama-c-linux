@@ -8,8 +8,7 @@
   creating variable S_0_S___va_params with imprecise size (type void)
 [eva:initial-state] 
   creating variable S_1_S___va_params with imprecise size (type void)
-[eva:alarm] va_list2.c:12: Warning: 
-  out of bounds read. assert \valid_read(fmt);
+[eva:alarm] va_list2.c:12: Warning: out of bounds read. assert \valid_read(fmt);
 [eva:alarm] va_list2.c:15: Warning: 
   out of bounds read. assert \valid_read(args);
 [eva:alarm] va_list2.c:15: Warning: 
@@ -40,8 +39,7 @@
 [eva] va_list2.c:21: 
   Frama_C_show_each_f: {{ garbled mix of &{S_0_S___va_params} (origin: Well) }}
 [eva] va_list2.c:12: starting to merge loop iterations
-[eva:alarm] va_list2.c:13: Warning: 
-  out of bounds read. assert \valid_read(fmt);
+[eva:alarm] va_list2.c:13: Warning: out of bounds read. assert \valid_read(fmt);
 [eva] va_list2.c:16: 
   Frama_C_show_each_i:
   {{ garbled mix of &{S_0_S___va_params; S_1_S___va_params} (origin: Well) }}

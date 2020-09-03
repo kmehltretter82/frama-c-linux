@@ -35,8 +35,7 @@
   a ∈ {{ &d + {4} }}
   b ∈ {1; 2}
   i ∈ {4}
-  p ∈
-   {{ garbled mix of &{a; b} (origin: Misaligned {label.i:18}) }}
+  p ∈ {{ garbled mix of &{a; b} (origin: Misaligned {label.i:18}) }}
   q ∈ {{ &a }}
 [from] Computing for function main
 [from] Done for function main

@@ -205,23 +205,17 @@
 [eva] Done for function other
 [eva] computing for function split_alarm <- main.
   Called from nonlin.c:146.
-[eva:alarm] nonlin.c:76: Warning: 
-  non-finite float value. assert \is_finite(v);
-[eva:nonlin] nonlin.c:77: 
-  non-linear '(double)ff * (double)ff', lv 'ff'
+[eva:alarm] nonlin.c:76: Warning: non-finite float value. assert \is_finite(v);
+[eva:nonlin] nonlin.c:77: non-linear '(double)ff * (double)ff', lv 'ff'
 [eva:nonlin] nonlin.c:77: subdividing on ff
 [eva] Recording results for split_alarm
 [eva] Done for function split_alarm
 [eva] computing for function norm <- main.
   Called from nonlin.c:147.
-[eva:alarm] nonlin.c:81: Warning: 
-  non-finite float value. assert \is_finite(v);
-[eva:alarm] nonlin.c:82: Warning: 
-  non-finite float value. assert \is_finite(v);
-[eva:nonlin] nonlin.c:83: 
-  non-linear '(double)v1 * (double)v1', lv 'v1'
-[eva:nonlin] nonlin.c:83: 
-  non-linear '(double)v2 * (double)v2', lv 'v2'
+[eva:alarm] nonlin.c:81: Warning: non-finite float value. assert \is_finite(v);
+[eva:alarm] nonlin.c:82: Warning: non-finite float value. assert \is_finite(v);
+[eva:nonlin] nonlin.c:83: non-linear '(double)v1 * (double)v1', lv 'v1'
+[eva:nonlin] nonlin.c:83: non-linear '(double)v2 * (double)v2', lv 'v2'
 [eva:nonlin] nonlin.c:83: subdividing on v1
 [eva:nonlin] nonlin.c:83: subdividing on v2
 [eva] computing for function Frama_C_float_interval <- norm <- main.
@@ -282,8 +276,7 @@
   function Frama_C_float_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:nonlin] nonlin.c:113: non-linear '(f + f) - f', lv 'f'
-[eva:nonlin] nonlin.c:113: 
-  non-linear 'f1 / (((f + f) - f) - f1)', lv 'f1'
+[eva:nonlin] nonlin.c:113: non-linear 'f1 / (((f + f) - f) - f1)', lv 'f1'
 [eva:nonlin] nonlin.c:113: subdividing on f
 [eva:alarm] nonlin.c:113: Warning: 
   non-finite float value.
@@ -304,8 +297,7 @@
 [eva:nonlin] nonlin.c:130: subdividing on x_0
 [eva:alarm] nonlin.c:131: Warning: 
   non-finite float value. assert \is_finite(nondet);
-[eva:nonlin] nonlin.c:135: 
-  non-linear '(x_0 - d_0) * (x_0 - d_0)', lv 'd_0, x_0'
+[eva:nonlin] nonlin.c:135: non-linear '(x_0 - d_0) * (x_0 - d_0)', lv 'd_0, x_0'
 [eva:nonlin] nonlin.c:135: subdividing on x_0
 [eva:alarm] nonlin.c:135: Warning: 
   non-finite float value.
@@ -333,9 +325,7 @@
   f ∈ [-0x0.0000000000000p0 .. 0x0.0000000000000p0]
   res ∈ {-0x1.0000000000000p0}
 [eva:final-states] Values at end of function garbled:
-  a_0 ∈
-     {{ garbled mix of &{x_0}
-      (origin: Arithmetic {nonlin.c:98}) }}
+  a_0 ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
   f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic) }}
 [eva:final-states] Values at end of function nonlin_f:
   Frama_C_entropy_source ∈ [--..--]

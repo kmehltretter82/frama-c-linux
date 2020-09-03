@@ -13,7 +13,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] share/libc/string.h:140: 
+[eva] FRAMAC_SHARE/libc/string.h:140: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
 [eva:alarm] string_h.c:6: Warning: assertion got status unknown.
@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] share/libc/string.h:227: 
+[eva] FRAMAC_SHARE/libc/string.h:227: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] string_h.c:25: Warning: assertion got status unknown.
@@ -245,7 +245,8 @@
 [eva] using specification for function strdup
 [eva:libc:unsupported-spec] string_h.c:146: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
-  Consider adding ./share/libc/string.c to the analyzed source files.
+  Consider adding /home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc/string.c
+  to the analyzed source files.
 [eva] string_h.c:146: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:146: 
   function strdup: precondition 'valid_string_s' got status valid.
@@ -255,7 +256,8 @@
 [eva] using specification for function strndup
 [eva:libc:unsupported-spec] string_h.c:147: Warning: 
   The specification of function 'strndup' is currently not supported by Eva.
-  Consider adding ./share/libc/string.c to the analyzed source files.
+  Consider adding /home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc/string.c
+  to the analyzed source files.
 [eva] string_h.c:147: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:147: 
   function strndup: precondition 'valid_string_s' got status valid.

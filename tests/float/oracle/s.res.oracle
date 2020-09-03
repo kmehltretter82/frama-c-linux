@@ -250,37 +250,29 @@
   Neither code nor specification for function F1, generating default assigns from the prototype
 [eva] using specification for function F1
 [eva] Done for function F1
-[eva:alarm] s.i:231: Warning: 
-  accessing out of bounds index. assert 0 ≤ V4;
-[eva:alarm] s.i:231: Warning: 
-  accessing out of bounds index. assert V4 < 64;
+[eva:alarm] s.i:231: Warning: accessing out of bounds index. assert 0 ≤ V4;
+[eva:alarm] s.i:231: Warning: accessing out of bounds index. assert V4 < 64;
 [eva] computing for function F2 <- F4 <- main.
   Called from s.i:233.
 [kernel:annot:missing-spec] s.i:233: Warning: 
   Neither code nor specification for function F2, generating default assigns from the prototype
 [eva] using specification for function F2
 [eva] Done for function F2
-[eva:alarm] s.i:238: Warning: 
-  accessing out of bounds index. assert 0 ≤ V5;
-[eva:alarm] s.i:238: Warning: 
-  accessing out of bounds index. assert V5 < 64;
+[eva:alarm] s.i:238: Warning: accessing out of bounds index. assert 0 ≤ V5;
+[eva:alarm] s.i:238: Warning: accessing out of bounds index. assert V5 < 64;
 [eva] computing for function F2 <- F4 <- main.
   Called from s.i:241.
 [eva] Done for function F2
-[eva:alarm] s.i:242: Warning: 
-  accessing out of bounds index. assert 0 ≤ V6;
-[eva:alarm] s.i:242: Warning: 
-  accessing out of bounds index. assert V6 < 64;
+[eva:alarm] s.i:242: Warning: accessing out of bounds index. assert 0 ≤ V6;
+[eva:alarm] s.i:242: Warning: accessing out of bounds index. assert V6 < 64;
 [eva] computing for function F3 <- F4 <- main.
   Called from s.i:244.
 [kernel:annot:missing-spec] s.i:244: Warning: 
   Neither code nor specification for function F3, generating default assigns from the prototype
 [eva] using specification for function F3
 [eva] Done for function F3
-[eva:alarm] s.i:245: Warning: 
-  accessing out of bounds index. assert 0 ≤ V7;
-[eva:alarm] s.i:245: Warning: 
-  accessing out of bounds index. assert V7 < 32;
+[eva:alarm] s.i:245: Warning: accessing out of bounds index. assert 0 ≤ V7;
+[eva:alarm] s.i:245: Warning: accessing out of bounds index. assert V7 < 32;
 [eva] Recording results for F4
 [eva] Done for function F4
 [eva] Recording results for main

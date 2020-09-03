@@ -12,8 +12,7 @@
 [eva:alarm] null_lt_valid.i:5: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)p, (void *)((int *)t));
-[eva:alarm] null_lt_valid.i:6: Warning: 
-  out of bounds write. assert \valid(p);
+[eva:alarm] null_lt_valid.i:6: Warning: out of bounds write. assert \valid(p);
 [kernel] null_lt_valid.i:6: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for f
@@ -39,8 +38,7 @@
   pointer comparison. assert \pointer_comparable((void *)r, (void *)(&t[22]));
 [eva] Recording results for main
 [eva] done for function main
-[eva] null_lt_valid.i:6: 
-  assertion 'Eva,mem_access' got final status invalid.
+[eva] null_lt_valid.i:6: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION

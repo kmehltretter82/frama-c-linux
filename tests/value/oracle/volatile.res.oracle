@@ -107,8 +107,7 @@
   accessing out of bounds index. assert (int)(v + 1) < 1;
 [eva:alarm] volatile.c:118: Warning: 
   signed overflow. assert v + 1 ≤ 2147483647;
-[eva] volatile.c:118: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:118: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:118: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] volatile.c:118: Warning: 
@@ -129,10 +128,8 @@
   accessing out of bounds index. assert v < 2;
 [eva:alarm] volatile.c:118: Warning: 
   accessing out of bounds index. assert a_0[v] < 1;
-[eva] volatile.c:118: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:119: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:118: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:119: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:123: Warning: 
   accessing out of bounds index. assert 0 ≤ *v_ptr;
 [eva:alarm] volatile.c:123: Warning: 
@@ -144,8 +141,7 @@
   accessing out of bounds index. assert (int)(*v_ptr + 1) < 1;
 [eva:alarm] volatile.c:123: Warning: 
   signed overflow. assert *v_ptr + 1 ≤ 2147483647;
-[eva] volatile.c:123: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:123: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:123: Warning: 
   accessing out of bounds index. assert 0 ≤ *v_ptr;
 [eva:alarm] volatile.c:123: Warning: 
@@ -166,10 +162,8 @@
   accessing out of bounds index. assert *v_ptr < 2;
 [eva:alarm] volatile.c:123: Warning: 
   accessing out of bounds index. assert a_0[*v_ptr] < 1;
-[eva] volatile.c:123: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:124: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:123: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:124: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:131: Warning: 
   accessing out of bounds index. assert 0 ≤ svol.f[0];
 [eva:alarm] volatile.c:131: Warning: 
@@ -181,8 +175,7 @@
   accessing out of bounds index. assert (int)(svol.f[0] + 1) < 1;
 [eva:alarm] volatile.c:131: Warning: 
   signed overflow. assert svol.f[0] + 1 ≤ 2147483647;
-[eva] volatile.c:131: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:131: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:131: Warning: 
   accessing out of bounds index. assert 0 ≤ svol.f[0];
 [eva:alarm] volatile.c:131: Warning: 
@@ -203,10 +196,8 @@
   accessing out of bounds index. assert svol.f[0] < 2;
 [eva:alarm] volatile.c:131: Warning: 
   accessing out of bounds index. assert a_0[svol.f[0]] < 1;
-[eva] volatile.c:131: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:132: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:131: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:132: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:136: Warning: 
   accessing out of bounds index. assert 0 ≤ svol_ptr->f[0];
 [eva:alarm] volatile.c:136: Warning: 
@@ -218,8 +209,7 @@
   accessing out of bounds index. assert (int)(svol_ptr->f[0] + 1) < 1;
 [eva:alarm] volatile.c:136: Warning: 
   signed overflow. assert svol_ptr->f[0] + 1 ≤ 2147483647;
-[eva] volatile.c:136: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:136: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:136: Warning: 
   accessing out of bounds index. assert 0 ≤ svol_ptr->f[0];
 [eva:alarm] volatile.c:136: Warning: 
@@ -240,10 +230,8 @@
   accessing out of bounds index. assert svol_ptr->f[0] < 2;
 [eva:alarm] volatile.c:136: Warning: 
   accessing out of bounds index. assert a_0[svol_ptr->f[0]] < 1;
-[eva] volatile.c:136: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:137: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:136: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:137: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:144: Warning: 
   accessing out of bounds index. assert 0 ≤ sdeepvol.g[0];
 [eva:alarm] volatile.c:144: Warning: 
@@ -255,8 +243,7 @@
   accessing out of bounds index. assert (int)(sdeepvol.g[0] + 1) < 1;
 [eva:alarm] volatile.c:144: Warning: 
   signed overflow. assert sdeepvol.g[0] + 1 ≤ 2147483647;
-[eva] volatile.c:144: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:144: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:144: Warning: 
   accessing out of bounds index. assert 0 ≤ sdeepvol.g[0];
 [eva:alarm] volatile.c:144: Warning: 
@@ -277,10 +264,8 @@
   accessing out of bounds index. assert sdeepvol.g[0] < 2;
 [eva:alarm] volatile.c:144: Warning: 
   accessing out of bounds index. assert a_0[sdeepvol.g[0]] < 1;
-[eva] volatile.c:144: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:145: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:144: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:145: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:149: Warning: 
   accessing out of bounds index. assert 0 ≤ volt[0].f[0];
 [eva:alarm] volatile.c:149: Warning: 
@@ -292,8 +277,7 @@
   accessing out of bounds index. assert (int)(volt[0].f[0] + 1) < 1;
 [eva:alarm] volatile.c:149: Warning: 
   signed overflow. assert volt[0].f[0] + 1 ≤ 2147483647;
-[eva] volatile.c:149: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:149: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:149: Warning: 
   accessing out of bounds index. assert 0 ≤ volt[0].f[0];
 [eva:alarm] volatile.c:149: Warning: 
@@ -314,10 +298,8 @@
   accessing out of bounds index. assert volt[0].f[0] < 2;
 [eva:alarm] volatile.c:149: Warning: 
   accessing out of bounds index. assert a_0[volt[0].f[0]] < 1;
-[eva] volatile.c:149: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:150: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:149: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:150: Warning: assertion 'NORED' got status unknown.
 [eva:alarm] volatile.c:154: Warning: 
   accessing out of bounds index. assert 0 ≤ deepvolt[0].g[0];
 [eva:alarm] volatile.c:154: Warning: 
@@ -329,8 +311,7 @@
   accessing out of bounds index. assert (int)(deepvolt[0].g[0] + 1) < 1;
 [eva:alarm] volatile.c:154: Warning: 
   signed overflow. assert deepvolt[0].g[0] + 1 ≤ 2147483647;
-[eva] volatile.c:154: 
-  Frama_C_show_each_v_plus: [-2147483647..2147483647]
+[eva] volatile.c:154: Frama_C_show_each_v_plus: [-2147483647..2147483647]
 [eva:alarm] volatile.c:154: Warning: 
   accessing out of bounds index. assert 0 ≤ deepvolt[0].g[0];
 [eva:alarm] volatile.c:154: Warning: 
@@ -351,10 +332,8 @@
   accessing out of bounds index. assert deepvolt[0].g[0] < 2;
 [eva:alarm] volatile.c:154: Warning: 
   accessing out of bounds index. assert a_0[deepvolt[0].g[0]] < 1;
-[eva] volatile.c:154: 
-  Frama_C_show_each_av: [-2147483648..2147483647]
-[eva:alarm] volatile.c:155: Warning: 
-  assertion 'NORED' got status unknown.
+[eva] volatile.c:154: Frama_C_show_each_av: [-2147483648..2147483647]
+[eva:alarm] volatile.c:155: Warning: assertion 'NORED' got status unknown.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.

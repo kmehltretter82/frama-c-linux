@@ -11,8 +11,8 @@
    STDOPT: +"-fct-pdg main"
    STDOPT: +"-fct-pdg multiple_global_inputs"
 */
-/* bin/toplevel.opt -deps -main g tests/slicing/dpds_intra.c */
-/* bin/toplevel.opt -fct-pdg test_goto_simple tests/slicing/dpds_intra.c -pdg-dot */
+/* bin/toplevel.opt -deps -main g dpds_intra.c */
+/* bin/toplevel.opt -fct-pdg test_goto_simple dpds_intra.c -pdg-dot */
 
 extern int G;
 
@@ -81,7 +81,7 @@ int test_goto_else (void) {
 }
 
 /* ne passe pas l'analyse de valeur (bouclage)
-./bin/toplevel.opt  -eva -main test_ctrl_dpd_multiple tests/slicing/dpds_intra.c
+./bin/toplevel.opt  -eva -main test_ctrl_dpd_multiple dpds_intra.c
  * cf. mail Pascal Re: loop_pragma UNROLL_LOOP du 09.05.2006 15:03 */
 int test_ctrl_dpd_multiple (void) {
   int x = 0;

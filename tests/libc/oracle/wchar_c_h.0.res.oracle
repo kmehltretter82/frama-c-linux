@@ -8,8 +8,7 @@
   t ∈ {0}
   nondet ∈ [--..--]
 [eva] wchar_c_h.c:31: Call to builtin wmemchr
-[eva] wchar_c_h.c:31: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:31: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:31: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:31: 
@@ -138,15 +137,15 @@
 [eva] Done for function wcsstr
 [eva] computing for function wcscat <- main.
   Called from wchar_c_h.c:52.
-[eva] share/libc/wchar.c:74: Call to builtin wcslen
-[eva] share/libc/wchar.c:74: 
+[eva] FRAMAC_SHARE/libc/wchar.c:74: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:74: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for wcscat
 [eva] Done for function wcscat
 [eva] computing for function wcsncat <- main.
   Called from wchar_c_h.c:54.
-[eva] share/libc/wchar.c:84: Call to builtin wcslen
-[eva] share/libc/wchar.c:84: 
+[eva] FRAMAC_SHARE/libc/wchar.c:84: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:84: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for wcsncat
 [eva] Done for function wcsncat
@@ -172,15 +171,13 @@
 [eva] wchar_c_h.c:68: 
   function wcschr: precondition 'valid_wstring_src' got status valid.
 [eva] wchar_c_h.c:69: Call to builtin wmemchr
-[eva] wchar_c_h.c:69: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:69: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:69: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:69: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_c_h.c:70: Call to builtin wmemchr
-[eva] wchar_c_h.c:70: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:70: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:70: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:70: 

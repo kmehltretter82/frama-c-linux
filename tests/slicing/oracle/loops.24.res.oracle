@@ -10,8 +10,7 @@
   Y ∈ [--..--]
   Z ∈ [--..--]
 [eva] loops.i:210: assertion got status valid.
-[eva:alarm] loops.i:211: Warning: 
-  signed overflow. assert j + 1 ≤ 2147483647;
+[eva:alarm] loops.i:211: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for alarm
 [eva] done for function alarm
 [from] Computing for function alarm
@@ -45,4 +44,4 @@ void alarm(void)
 }
 
 
-[kernel] Parsing result/ocode_24_loops.i (no preprocessing)
+[kernel] Parsing ocode_24_loops.i (no preprocessing)

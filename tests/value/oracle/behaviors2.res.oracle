@@ -9,8 +9,7 @@
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:178.
 [eva] using specification for function divi
-[eva] behaviors2.c:178: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:178: function divi: precondition got status valid.
 [eva] behaviors2.c:178: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:178: 
@@ -24,8 +23,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:180.
-[eva] behaviors2.c:180: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:180: function divi: precondition got status valid.
 [eva] behaviors2.c:180: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:180: 
@@ -39,8 +37,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:182.
-[eva] behaviors2.c:182: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:182: function divi: precondition got status valid.
 [eva] behaviors2.c:182: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:182: 
@@ -54,8 +51,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:184.
-[eva] behaviors2.c:184: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:184: function divi: precondition got status valid.
 [eva] behaviors2.c:184: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:184: 
@@ -75,8 +71,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:186.
-[eva] behaviors2.c:186: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:186: function divi: precondition got status valid.
 [eva] behaviors2.c:186: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:186: 
@@ -96,8 +91,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:188.
-[eva] behaviors2.c:188: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:188: function divi: precondition got status valid.
 [eva] behaviors2.c:188: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:188: 
@@ -117,8 +111,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:190.
-[eva] behaviors2.c:190: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:190: function divi: precondition got status valid.
 [eva] behaviors2.c:190: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:190: 
@@ -138,8 +131,7 @@
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
   Called from behaviors2.c:192.
-[eva] behaviors2.c:192: 
-  function divi: precondition got status valid.
+[eva] behaviors2.c:192: function divi: precondition got status valid.
 [eva] behaviors2.c:192: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
 [eva] behaviors2.c:192: 

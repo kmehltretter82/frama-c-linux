@@ -119,4 +119,4 @@ void f_slice_1(int y)
 }
 
 
-[kernel] Parsing result/ocode_3_select_return.i (no preprocessing)
+[kernel] Parsing ocode_3_select_return.i (no preprocessing)

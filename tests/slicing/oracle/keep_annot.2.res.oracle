@@ -7,8 +7,7 @@
   
 [eva:alarm] keep_annot.i:40: Warning: 
   signed overflow. assert -2147483648 ≤ nn - 2;
-[eva:alarm] keep_annot.i:39: Warning: 
-  loop invariant got status unknown.
+[eva:alarm] keep_annot.i:39: Warning: loop invariant got status unknown.
 [eva:alarm] keep_annot.i:41: Warning: 
   out of bounds read. assert \valid_read(dabs + (int)(ii + 1));
 [eva:alarm] keep_annot.i:41: Warning: 
@@ -17,8 +16,7 @@
   \is_finite((float)\sub_double((double)u,
                                \mul_double((double)*(dabs + (int)(ii + 1)),
                                           (double)2.0)));
-[eva:alarm] keep_annot.i:42: Warning: 
-  assertion got status unknown.
+[eva:alarm] keep_annot.i:42: Warning: assertion got status unknown.
 [eva] Recording results for L
 [eva] done for function L
 [slicing] initializing slicing ...
@@ -51,4 +49,4 @@ void L(float u, int nn, float *dabs, float *y)
 }
 
 
-[kernel] Parsing result/ocode_2_keep_annot.i (no preprocessing)
+[kernel] Parsing ocode_2_keep_annot.i (no preprocessing)

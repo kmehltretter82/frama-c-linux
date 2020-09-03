@@ -8,8 +8,7 @@
 [eva:alarm] summary.i:15: Warning: division by zero. assert 0 ≢ 0;
 [eva] Recording results for bottom
 [eva] done for function bottom
-[eva] summary.i:15: 
-  assertion 'Eva,division_by_zero' got final status invalid.
+[eva] summary.i:15: assertion 'Eva,division_by_zero' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function bottom:
   NON TERMINATING FUNCTION

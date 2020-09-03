@@ -13,23 +13,15 @@
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {7}, {431}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {8}, {1294}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {9}, {647}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {10}, {1942}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {10}, {1942}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {11}, {971}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {12}, {2914}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {13}, {1457}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {14}, {4372}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {15}, {2186}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {16}, {1093}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {17}, {3280}
-[eva] interpreter-mode-syracuse.i:18: 
-  Frama_C_show_each: {18}, {1640}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {12}, {2914}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {13}, {1457}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {14}, {4372}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {15}, {2186}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {16}, {1093}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {17}, {3280}
+[eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {18}, {1640}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {19}, {820}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {20}, {410}
 [eva] interpreter-mode-syracuse.i:18: Frama_C_show_each: {21}, {205}

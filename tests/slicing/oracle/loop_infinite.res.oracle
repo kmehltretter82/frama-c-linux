@@ -39,4 +39,4 @@ int main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_loop_infinite.i (no preprocessing)
+[kernel] Parsing ocode_0_loop_infinite.i (no preprocessing)

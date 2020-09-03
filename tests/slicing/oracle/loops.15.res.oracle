@@ -56,4 +56,4 @@ void stop_f1(void)
 }
 
 
-[kernel] Parsing result/ocode_15_loops.i (no preprocessing)
+[kernel] Parsing ocode_15_loops.i (no preprocessing)

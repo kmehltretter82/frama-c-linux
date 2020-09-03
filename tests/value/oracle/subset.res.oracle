@@ -32,14 +32,10 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from subset.c:82.
-[eva:alarm] subset.c:49: Warning: 
-  accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] subset.c:49: Warning: 
-  accessing out of bounds index. assert v < 10;
-[eva:alarm] subset.c:50: Warning: 
-  accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] subset.c:50: Warning: 
-  accessing out of bounds index. assert v < 300;
+[eva:alarm] subset.c:49: Warning: accessing out of bounds index. assert 0 ≤ v;
+[eva:alarm] subset.c:49: Warning: accessing out of bounds index. assert v < 10;
+[eva:alarm] subset.c:50: Warning: accessing out of bounds index. assert 0 ≤ v;
+[eva:alarm] subset.c:50: Warning: accessing out of bounds index. assert v < 300;
 [eva:alarm] subset.c:51: Warning: assertion got status unknown.
 [eva:alarm] subset.c:52: Warning: assertion got status unknown.
 [eva:alarm] subset.c:54: Warning: assertion got status unknown.
@@ -50,10 +46,8 @@
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
   Called from subset.c:83.
-[eva:alarm] subset.c:64: Warning: 
-  accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] subset.c:64: Warning: 
-  accessing out of bounds index. assert v < 10;
+[eva:alarm] subset.c:64: Warning: accessing out of bounds index. assert 0 ≤ v;
+[eva:alarm] subset.c:64: Warning: accessing out of bounds index. assert v < 10;
 [eva:alarm] subset.c:65: Warning: assertion got status unknown.
 [eva:alarm] subset.c:66: Warning: assertion got status unknown.
 [eva:alarm] subset.c:68: Warning: assertion got status unknown.

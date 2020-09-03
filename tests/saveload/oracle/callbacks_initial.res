@@ -1,4 +1,4 @@
-[kernel] Parsing tests/saveload/callbacks.i (no preprocessing)
+[kernel] Parsing callbacks.i (no preprocessing)
 [eva] Analyzing a complete application starting at main1
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,9 +6,9 @@
   x ∈ {0}
   y ∈ {0}
 [eva] computing for function g1 <- main1.
-  Called from tests/saveload/callbacks.i:25.
+  Called from callbacks.i:25.
 [eva] computing for function f <- g1 <- main1.
-  Called from tests/saveload/callbacks.i:16.
+  Called from callbacks.i:16.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -18,9 +18,9 @@
 [from] Done for function g1
 [eva] Done for function g1
 [eva] computing for function g2 <- main1.
-  Called from tests/saveload/callbacks.i:26.
+  Called from callbacks.i:26.
 [eva] computing for function f <- g2 <- main1.
-  Called from tests/saveload/callbacks.i:21.
+  Called from callbacks.i:21.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -45,13 +45,13 @@
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at tests/saveload/callbacks.i:16 (by g1):
+[from] call to f at callbacks.i:16 (by g1):
   x FROM p
-[from] call to f at tests/saveload/callbacks.i:21 (by g2):
+[from] call to f at callbacks.i:21 (by g2):
   y FROM p
-[from] call to g1 at tests/saveload/callbacks.i:25 (by main1):
+[from] call to g1 at callbacks.i:25 (by main1):
   x FROM \nothing
-[from] call to g2 at tests/saveload/callbacks.i:26 (by main1):
+[from] call to g2 at callbacks.i:26 (by main1):
   y FROM \nothing
 [from] entry point:
   x FROM \nothing

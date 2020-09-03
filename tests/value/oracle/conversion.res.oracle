@@ -13,8 +13,7 @@
   f ∈ {1.40129846432e-45}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] conversion.i:19: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] conversion.i:19: Warning: assertion 'ASSUME' got status unknown.
 [eva] conversion.i:21: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -24,8 +23,7 @@
   f ∈ [0. .. 96.921875]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] conversion.i:24: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] conversion.i:24: Warning: assertion 'ASSUME' got status unknown.
 [eva] conversion.i:26: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -35,8 +33,7 @@
   f ∈ [0. .. 1.40129846432e-44] ∪ {NaN}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] conversion.i:29: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] conversion.i:29: Warning: assertion 'ASSUME' got status unknown.
 [eva] conversion.i:31: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -46,8 +43,7 @@
   f ∈ [0. .. 1.40129846432e-44] ∪ {NaN}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] conversion.i:34: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] conversion.i:34: Warning: assertion 'ASSUME' got status unknown.
 [eva] conversion.i:36: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -79,8 +75,7 @@
    [bits 16 to 31] ∈ {2}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] conversion.i:50: Warning: 
-  assertion 'ASSUME' got status unknown.
+[eva:alarm] conversion.i:50: Warning: assertion 'ASSUME' got status unknown.
 [eva] conversion.i:53: 
   Frama_C_dump_each:
   # Cvalue domain:
@@ -176,8 +171,7 @@
   v ∈ [--..--]
   x ∈ {{ (int)&x }}
   y ∈ [--..--]
-  f ∈
-   {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39}) }}
+  f ∈ {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39}) }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] conversion.i:45: 

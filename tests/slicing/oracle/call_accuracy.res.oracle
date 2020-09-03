@@ -332,4 +332,4 @@ int main(int x, int y, int z)
 }
 
 
-[kernel] Parsing result/ocode_0_call_accuracy.i (no preprocessing)
+[kernel] Parsing ocode_0_call_accuracy.i (no preprocessing)

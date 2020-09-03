@@ -6,8 +6,7 @@
   
 [eva] computing for function f <- main.
   Called from topbot.c:15.
-[eva:alarm] topbot.c:15: Warning: 
-  function f: precondition got status invalid.
+[eva:alarm] topbot.c:15: Warning: function f: precondition got status invalid.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
@@ -57,6 +56,5 @@
    -[-c-]-> 2
 [impact] beginning analysis
 [impact] impacted statements of stmt(s) 4 are:
-    topbot.c:14 (sid 7): y = x;
-    topbot.c:18 (sid 11): z = x;
+    topbot.c:14 (sid 7): y = x;topbot.c:18 (sid 11): z = x;
 [impact] analysis done

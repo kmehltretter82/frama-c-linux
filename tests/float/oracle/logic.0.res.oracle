@@ -342,20 +342,16 @@
 [eva] computing for function my_fabs <- my_ratio_body <- test_is_finite <- main.
   Called from logic.i:148.
 [eva] Done for function my_fabs
-[eva] logic.i:146: 
-  function my_ratio_body: postcondition got status valid.
-[eva] logic.i:147: 
-  function my_ratio_body: postcondition got status valid.
+[eva] logic.i:146: function my_ratio_body: postcondition got status valid.
+[eva] logic.i:147: function my_ratio_body: postcondition got status valid.
 [eva] Recording results for my_ratio_body
 [eva] Done for function my_ratio_body
 [eva] Recording results for test_is_finite
 [eva] Done for function test_is_finite
 [eva] Recording results for main
 [eva] done for function main
-[eva] logic.i:45: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] logic.i:133: 
-  assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] logic.i:45: assertion 'Eva,is_nan_or_infinite' got final status invalid.
+[eva] logic.i:133: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function my_ratio_body:
   __retres ∈ {-0x1.bca1b00000000p-1}

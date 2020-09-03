@@ -1,2 +1,2 @@
-[kernel] Warning: 1 state in saved file ignored. It is invalid in this Frama-C configuration.
-[kernel] Warning: ignoring source files specified on the command line while loading a global initial context.
+[kernel] User Error: Frama-C state file 'result/basic.sav' does not exist
+[kernel] Frama-C aborted: invalid user input.

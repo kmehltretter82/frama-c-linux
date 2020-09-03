@@ -4,18 +4,12 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] propagate_bottom.i:5: Warning: 
-  division by zero. assert 0 ≢ 0;
-[eva:alarm] propagate_bottom.i:8: Warning: 
-  division by zero. assert 0 ≢ 0;
-[eva:alarm] propagate_bottom.i:11: Warning: 
-  division by zero. assert 0 ≢ 0;
-[eva:alarm] propagate_bottom.i:14: Warning: 
-  division by zero. assert 0 ≢ 0;
-[eva:alarm] propagate_bottom.i:17: Warning: 
-  division by zero. assert 0 ≢ 0;
-[eva:alarm] propagate_bottom.i:20: Warning: 
-  division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:5: Warning: division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:8: Warning: division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:11: Warning: division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:14: Warning: division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:17: Warning: division by zero. assert 0 ≢ 0;
+[eva:alarm] propagate_bottom.i:20: Warning: division by zero. assert 0 ≢ 0;
 [eva:alarm] propagate_bottom.i:25: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0));

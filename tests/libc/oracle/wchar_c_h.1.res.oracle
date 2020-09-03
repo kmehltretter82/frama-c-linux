@@ -8,8 +8,7 @@
   t ∈ {0}
   nondet ∈ [--..--]
 [eva] wchar_c_h.c:31: Call to builtin wmemchr
-[eva] wchar_c_h.c:31: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:31: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:31: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:31: 
@@ -202,15 +201,13 @@
 [eva] wchar_c_h.c:68: 
   function wcschr: precondition 'valid_wstring_src' got status valid.
 [eva] wchar_c_h.c:69: Call to builtin wmemchr
-[eva] wchar_c_h.c:69: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:69: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:69: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:69: 
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] wchar_c_h.c:70: Call to builtin wmemchr
-[eva] wchar_c_h.c:70: 
-  function wmemchr: precondition 'valid' got status valid.
+[eva] wchar_c_h.c:70: function wmemchr: precondition 'valid' got status valid.
 [eva] wchar_c_h.c:70: 
   function wmemchr: precondition 'initialization' got status valid.
 [eva] wchar_c_h.c:70: 

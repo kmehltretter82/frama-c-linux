@@ -8,8 +8,7 @@
   Called from backward_add_ptr.c:185.
 [eva:alarm] backward_add_ptr.c:25: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
-[eva] backward_add_ptr.c:26: 
-  Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
+[eva] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
 [eva:alarm] backward_add_ptr.c:32: Warning: 
   out of bounds read. assert \valid_read((char *)p + (unsigned int)q);
 [eva] backward_add_ptr.c:33: 
@@ -28,15 +27,13 @@
 [eva:alarm] backward_add_ptr.c:54: Warning: 
   out of bounds read. assert \valid_read((int *)((char *)p + (unsigned int)q));
 [eva] backward_add_ptr.c:55: Frama_C_show_each_int_if: {{ &a }}, {0}
-[eva] backward_add_ptr.c:57: 
-  Frama_C_show_each_int_else: {0}, {{ &b }}
+[eva] backward_add_ptr.c:57: Frama_C_show_each_int_else: {0}, {{ &b }}
 [eva:alarm] backward_add_ptr.c:60: Warning: 
   out of bounds read. assert \valid_read((char *)p + (unsigned int)q);
 [eva] backward_add_ptr.c:61: 
   Frama_C_show_each_char_if:
   {{ NULL + {1; 2; 3} ; &a }}, {{ NULL + {0; 1; 2; 3} ; &b }}
-[eva] backward_add_ptr.c:63: 
-  Frama_C_show_each_char_else: {0}, {{ &b }}
+[eva] backward_add_ptr.c:63: Frama_C_show_each_char_else: {0}, {{ &b }}
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
@@ -45,18 +42,15 @@
   Called from backward_add_ptr.c:75.
 [eva] backward_add_ptr.c:68: 
   Assigning imprecise value to __retres.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] backward_add_ptr.c:68: 
   Assigning imprecise value to \result<gm>.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] Recording results for gm
 [eva] Done for function gm
 [eva] backward_add_ptr.c:75: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:81: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
 [eva] backward_add_ptr.c:82: 
@@ -71,8 +65,7 @@
 [eva] backward_add_ptr.c:91: Reusing old results for call to gm
 [eva] backward_add_ptr.c:91: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:96: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
 [eva] computing for function gm <- main3 <- main.
@@ -81,8 +74,7 @@
 [eva] Done for function gm
 [eva] backward_add_ptr.c:100: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:106: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
 [eva] backward_add_ptr.c:107: 
@@ -93,12 +85,10 @@
 [eva] backward_add_ptr.c:110: Reusing old results for call to gm
 [eva] backward_add_ptr.c:110: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:115: Warning: 
   out of bounds read. assert \valid_read((char *)p + (unsigned int)q);
-[eva] backward_add_ptr.c:116: 
-  Frama_C_show_each_GM_only_c: {0}, {{ &c }}
+[eva] backward_add_ptr.c:116: Frama_C_show_each_GM_only_c: {0}, {{ &c }}
 [eva:alarm] backward_add_ptr.c:121: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
 [eva] backward_add_ptr.c:122: 
@@ -107,8 +97,7 @@
 [eva] backward_add_ptr.c:125: Reusing old results for call to gm
 [eva] backward_add_ptr.c:125: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:130: Warning: 
   out of bounds read. assert \valid_read((char *)p + (unsigned int)q);
 [eva:alarm] backward_add_ptr.c:136: Warning: 
@@ -128,20 +117,17 @@
 [eva] Done for function gm
 [eva] backward_add_ptr.c:145: 
   Assigning imprecise value to tmp_0.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] backward_add_ptr.c:145: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] computing for function gm <- main4 <- main.
   Called from backward_add_ptr.c:146.
 [eva] Recording results for gm
 [eva] Done for function gm
 [eva] backward_add_ptr.c:146: 
   Assigning imprecise value to q.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:150: Warning: 
   out of bounds read. assert \valid_read(p + (unsigned int)q);
 [eva] backward_add_ptr.c:151: 
@@ -160,16 +146,14 @@
 [eva] backward_add_ptr.c:160: Reusing old results for call to gm
 [eva] backward_add_ptr.c:160: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] computing for function gm <- main4 <- main.
   Called from backward_add_ptr.c:161.
 [eva] Recording results for gm
 [eva] Done for function gm
 [eva] backward_add_ptr.c:161: 
   Assigning imprecise value to q.
-  The imprecision originates from Arithmetic
-  {backward_add_ptr.c:68}
+  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:165: Warning: 
   out of bounds read. assert \valid_read((char *)p + (unsigned int)q);
 [eva] backward_add_ptr.c:166: 
@@ -200,54 +184,30 @@
 [eva] done for function main
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:25}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:25}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:32}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:32}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:38}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:38}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:54}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:54}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:60}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:60}) }}
-  {{ garbled mix of &{a}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:81}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:87}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:96}) }}
-  {{ garbled mix of &{a; b}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:106}) }}
-  {{ garbled mix of &{c}
-    (origin: Arithmetic {backward_add_ptr.c:115}) }}
-  {{ garbled mix of &{a; b}
-    (origin: Arithmetic {backward_add_ptr.c:115}) }}
-  {{ garbled mix of &{c}
-    (origin: Arithmetic {backward_add_ptr.c:121}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:130}) }}
-  {{ garbled mix of &{b}
-    (origin: Arithmetic {backward_add_ptr.c:136}) }}
-  {{ garbled mix of &{a; b}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{c}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b; c}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:25}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:25}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:32}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:32}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:38}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:38}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:54}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:54}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:60}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:60}) }}
+  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:81}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:87}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:96}) }}
+  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:106}) }}
+  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
+  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:115}) }}
+  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:121}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:130}) }}
+  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:136}) }}
+  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:68}) }}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function gm:
   __retres ∈
@@ -273,8 +233,7 @@
   c[bits 0 to 7] ∈ {2}
    [bits 8 to 31]# ∈ {2}%32, bits 8 to 31 
   p ∈
-   {{ garbled mix of &{a; b}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
+   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
   q ∈ {{ NULL + [--..--] ; &b }}
   v ∈ {0; 1} or UNINITIALIZED
   w ∈ {0; 1} or UNINITIALIZED
@@ -285,11 +244,9 @@
   c[bits 0 to 7] ∈ {2}
    [bits 8 to 31]# ∈ {2}%32, bits 8 to 31 
   p ∈
-   {{ garbled mix of &{a; b}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
+   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
   q ∈
-   {{ garbled mix of &{b; c}
-    (origin: Arithmetic {backward_add_ptr.c:68}) }}
+   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:68}) }}
   v ∈ {0; 1; 2} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

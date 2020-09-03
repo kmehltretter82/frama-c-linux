@@ -170,4 +170,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_2_unravel-point.i (no preprocessing)
+[kernel] Parsing ocode_2_unravel-point.i (no preprocessing)

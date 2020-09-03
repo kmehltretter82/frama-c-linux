@@ -6,8 +6,7 @@
   G ∈ {0}
 [eva:alarm] annot.c:22: Warning: loop invariant got status unknown.
 [eva] annot.c:25: starting to merge loop iterations
-[eva:alarm] annot.c:26: Warning: 
-  signed overflow. assert s + 2 ≤ 2147483647;
+[eva:alarm] annot.c:26: Warning: signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] done for function loop
 [pdg] computing for function loop

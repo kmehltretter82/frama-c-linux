@@ -63,8 +63,7 @@
    .y ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] narrow_behaviors.i:61: Warning: 
-  assertion got status unknown.
+[eva:alarm] narrow_behaviors.i:61: Warning: assertion got status unknown.
 [eva] computing for function f1 <- main.
   Called from narrow_behaviors.i:62.
 [eva] narrow_behaviors.i:62: 

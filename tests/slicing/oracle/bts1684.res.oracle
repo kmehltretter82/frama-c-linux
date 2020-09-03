@@ -58,5 +58,6 @@ int main(void)
 }
 
 
-[kernel] Parsing result/ocode_0_bts1684.i (no preprocessing)
-[kernel] writing journal in file `frama_c_journal.ml'.
+[kernel] Parsing ocode_0_bts1684.i (no preprocessing)
+[kernel] Warning: creating session directory `/home/bobot/Sources/frama-c/_build/default/result/.frama-c'
+[kernel] writing journal in file `.frama-c/frama_c_journal.ml'.

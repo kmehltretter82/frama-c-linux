@@ -13,8 +13,7 @@
   Called from enum.i:12.
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] enum.i:13: Warning: 
-  signed overflow. assert B + c ≤ 2147483647;
+[eva:alarm] enum.i:13: Warning: signed overflow. assert B + c ≤ 2147483647;
 [eva:alarm] enum.i:15: Warning: 
   signed overflow. assert (int)(y + z) + t ≤ 2147483647;
 [eva:alarm] enum.i:15: Warning: 

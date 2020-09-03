@@ -39,8 +39,7 @@
 [eva] partitioning-annots.c:115: Frama_C_show_each: {1}, {42}
 [eva] partitioning-annots.c:115: Frama_C_show_each: {0}, {42}
 [eva] partitioning-annots.c:116: assertion got status valid.
-[eva] partitioning-annots.c:119: 
-  Frama_C_show_each: {{ "Value 42 not found" }}
+[eva] partitioning-annots.c:119: Frama_C_show_each: {{ "Value 42 not found" }}
 [eva] Recording results for test_loop_split
 [eva] done for function test_loop_split
 [eva] ====== VALUES COMPUTED ======

@@ -57,14 +57,10 @@
   U ∈ {0}
   char1 ∈ {0}
   ll1 ∈ {0}
-[eva:alarm] alias.i:142: Warning: 
-  signed overflow. assert c + 1 ≤ 2147483647;
-[eva:alarm] alias.i:142: Warning: 
-  signed overflow. assert c + 2 ≤ 2147483647;
-[eva:alarm] alias.i:144: Warning: 
-  signed overflow. assert c + 3 ≤ 2147483647;
-[eva:alarm] alias.i:144: Warning: 
-  signed overflow. assert c + 4 ≤ 2147483647;
+[eva:alarm] alias.i:142: Warning: signed overflow. assert c + 1 ≤ 2147483647;
+[eva:alarm] alias.i:142: Warning: signed overflow. assert c + 2 ≤ 2147483647;
+[eva:alarm] alias.i:144: Warning: signed overflow. assert c + 3 ≤ 2147483647;
+[eva:alarm] alias.i:144: Warning: signed overflow. assert c + 4 ≤ 2147483647;
 [eva] Recording results for main4
 [eva] done for function main4
 [eva] ====== VALUES COMPUTED ======

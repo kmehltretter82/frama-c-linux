@@ -2,7 +2,7 @@
 [metrics] Cil AST
   
   Stats for function <reach.c/baz>
-  ============================================== 
+  ================================ 
   Sloc = 1
   Decision point = 0
   Global variables = 0
@@ -17,7 +17,7 @@
   Cyclomatic complexity = 1
   
   Stats for function <reach.c/foo>
-  ============================================== 
+  ================================ 
   Sloc = 2
   Decision point = 0
   Global variables = 0
@@ -32,7 +32,7 @@
   Cyclomatic complexity = 1
   
   Stats for function <reach.c/main>
-  =============================================== 
+  ================================= 
   Sloc = 12
   Decision point = 1
   Global variables = 0

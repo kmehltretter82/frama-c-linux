@@ -20,8 +20,7 @@
 [eva] using specification for function release_lock
 [eva:alarm] lock.i:52: Warning: 
   function release_lock: precondition got status unknown.
-[eva] lock.i:29: Warning: 
-  no \from part for clause 'assigns ghost_loctable[..];'
+[eva] lock.i:29: Warning: no \from part for clause 'assigns ghost_loctable[..];'
 [eva] Done for function release_lock
 [eva] Recording results for locks0_good
 [eva] done for function locks0_good
