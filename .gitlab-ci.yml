@@ -3,11 +3,10 @@ stages:
  - build
  - tests
  - distrib_and_compatibility
- - make_public
-
+ 
 variables:
     CURRENT: $CI_COMMIT_REF_NAME
-    DEFAULT: "stable/scandium"
+    DEFAULT: "indus/THS"
     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
     OCAML: "4_08"
 
@@ -57,45 +56,10 @@ wp-qualif:
    - nix
   allow_failure: true
 
-genassigns:
+meta:
   stage: tests
   script:
-   - nix/frama-ci.sh build -A genassigns.tests
-  tags:
-   - nix
-
-counter-examples:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A counter-examples.tests
-  tags:
-   - nix
-
-acsl-importer:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A acsl-importer.tests
-  tags:
-   - nix
-
-volatile:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A volatile.tests
-  tags:
-   - nix
-
-Security:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A security.tests
-  tags:
-   - nix
-
-CFP:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A context-from-precondition.tests
+   - nix/frama-ci.sh build -A meta.tests
   tags:
    - nix
 
@@ -113,26 +77,6 @@ build-from-distrib-tarball:
   tags:
    - nix
 
-.build_template: &internal_template
-  stage: distrib_and_compatibility
-  tags:
-   - nix
-
-internal:
-  <<: *internal_template
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
-  when: manual
-
-
-internal_nightly:
-  <<: *internal_template
-  script:
-   - nix/frama-ci.sh build -A frama-c.internal
-  only:
-  - schedules
-
-
 .build_template: &frama-c-ocaml
   stage: distrib_and_compatibility
   script:
@@ -140,44 +84,10 @@ internal_nightly:
   tags:
    - nix
 
-frama-c-ocaml-4.06:
+frama-c-ocaml-4.10:
   variables:
-    OCAML: "4_06"
+    OCAML: "4_10"
   <<: *frama-c-ocaml
-  only:
-  - schedules
-
-frama-c-ocaml-4.07:
-  variables:
-    OCAML: "4_07"
-  <<: *frama-c-ocaml
-
-frama-c-ocaml-4.05:
-  variables:
-    OCAML: "4_05"
-  <<: *frama-c-ocaml
-
-
-caveat-importer:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A caveat-importer.tests
-  tags:
-   - nix
-
-mthread:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A mthread.tests
-  tags:
-   - nix
-
-pathcrawler:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A pathcrawler.tests
-  tags:
-   - nix
 
 e-acsl-tests-dev:
   stage: tests
@@ -199,15 +109,3 @@ ivette:
    - make -C ivette
   tags:
     - docker
-
-make_public:
-  stage: make_public
-  script:
-   - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
-   - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
-   - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
-   - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
-  tags:
-  - nix
-  only:
-  - schedules
