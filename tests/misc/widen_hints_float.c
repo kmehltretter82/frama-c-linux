@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-val-subdivide-non-linear 20"
+   STDOPT: #"-eva-subdivide-non-linear 20"
 */
 
 

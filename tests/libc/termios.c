@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-slevel 2"
+   STDOPT: +"-eva-slevel 2"
 */
 #include <termios.h>
 #include <fcntl.h>

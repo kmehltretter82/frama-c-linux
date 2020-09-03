@@ -1,6 +1,6 @@
 /* run.config_ci
    COMMENT: invariant
-   STDOPT: +"-slevel 11"
+   STDOPT: +"-eva-slevel 11"
 */
 
 int main(void) {

@@ -1,6 +1,6 @@
 /* run.config*
    STDOPT: +" -load-module report -report-print-properties -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
-   STDOPT: +" -load-module report -report-print-properties -undefined-pointer-comparison-propagate-all -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
+   STDOPT: +" -load-module report -report-print-properties -eva-undefined-pointer-comparison-propagate-all -eva-warn-undefined-pointer-comparison none -eva-msg-key pointer-comparison -then -report -then -eva-warn-undefined-pointer-comparison pointer -then -report -then -eva-warn-undefined-pointer-comparison all -then -report"
 */
 int x,y,*p;
 int main(){
