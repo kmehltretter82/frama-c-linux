@@ -21,10 +21,7 @@ import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
-import {
-  Item as ItemToRender,
-  Render as RenderItem,
-} from 'dome/layout/dispatch';
+import { DefineElement, RenderElement } from 'dome/layout/dispatch';
 
 import './style.css';
 
@@ -252,7 +249,7 @@ const TitleContext: any = React.createContext(undefined);
 export const TitleBar = ({ icon, label, title, children }: any) => {
   const context: any = React.useContext(TitleContext);
   return (
-    <ItemToRender id={`labview.title.${context.id}`}>
+    <DefineElement id={`labview.title.${context.id}`}>
       <Label
         className="labview-handle"
         icon={icon}
@@ -260,7 +257,7 @@ export const TitleBar = ({ icon, label, title, children }: any) => {
         title={title || context.title}
       />
       {children}
-    </ItemToRender>
+    </DefineElement>
   );
 };
 
@@ -334,9 +331,9 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
         <Hbox className="labview-titlebar">
           <Hfill>
             <Catch label={id}>
-              <RenderItem id={`labview.title.${id}`}>
+              <RenderElement id={`labview.title.${id}`}>
                 <Label className="labview-handle" label={label} title={title} />
-              </RenderItem>
+              </RenderElement>
             </Catch>
           </Hfill>
           {CLOSING}
@@ -669,7 +666,7 @@ export function LabView(props: any) {
       <UseLibrary library={lib}>
         {children}
       </UseLibrary>
-      <RSplit settings={settingSplit} unfold={customize}>
+      <RSplit margin={120} settings={settingSplit} unfold={customize}>
         <Grids.GridLayout
           dnd={dnd}
           padding={2}

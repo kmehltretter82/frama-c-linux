@@ -147,7 +147,7 @@ function getPositionFromSettings(
   dragging: Dragging,
   L: Layout,
   S: number,
-  D: number
+  D: number,
 ): number {
   if (dragging) return dragging.position;
   if (L.foldA) return S;
