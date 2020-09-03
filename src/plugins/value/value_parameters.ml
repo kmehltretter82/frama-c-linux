@@ -493,23 +493,6 @@ let () = WarnPointerComparison.set_possible_values ["all"; "pointer"; "none"]
 let () = add_correctness_dep WarnPointerComparison.parameter
 let () = WarnPointerComparison.add_aliases ["-val-warn-undefined-pointer-comparison"]
 
-
-let () = Parameter_customize.set_group alarms
-let () = Parameter_customize.is_invisible ()
-module WarnLeftShiftNegative =
-  True
-    (struct
-      let option_name = "-val-warn-left-shift-negative"
-      let help =
-        "Emit alarms when left-shifting negative integers"
-    end)
-let () = add_correctness_dep WarnLeftShiftNegative.parameter
-let () = WarnLeftShiftNegative.add_update_hook
-    (fun _ v ->
-       warning "This option is deprecated. Use %s instead"
-         Kernel.LeftShiftNegative.name;
-       Kernel.LeftShiftNegative.set v)
-
 let () = Parameter_customize.set_group alarms
 module WarnSignedConvertedDowncast =
   False
@@ -1193,28 +1176,6 @@ module ValShowProgress =
 let () = ValShowProgress.add_aliases ["-val-show-progress"]
 
 let () = Parameter_customize.set_group messages
-let () = Parameter_customize.is_invisible ()
-module ValShowInitialState =
-  True
-    (struct
-      let option_name = "-val-show-initial-state"
-      (* deprecated in Silicon *)
-      let help = "[deprecated] Show initial state before analysis starts. \
-                  This option has been replaced by \
-                  -eva-msg-key=[-]initial-state and has no effect anymore."
-    end)
-let () =
-  ValShowInitialState.add_set_hook
-    (fun _ new_ ->
-       if new_ then
-         Kernel.warning "@[Option -val-show-initial-state has no effect, \
-                         it has been replaced by -eva-msg-key=initial-state@]"
-       else
-         Kernel.warning "@[Option -no-val-show-initial-state has no effect, \
-                         it has been replaced by -eva-msg-key=-initial-state@]"
-    )
-
-let () = Parameter_customize.set_group messages
 module ValShowPerf =
   False
     (struct
@@ -1259,34 +1220,6 @@ module PrintCallstacks =
 let () = PrintCallstacks.add_aliases ["-val-print-callstacks"]
 
 let () = Parameter_customize.set_group messages
-let () = Parameter_customize.is_invisible ()
-module AlarmsWarnings =
-  True
-    (struct
-      let option_name = "-val-warn-on-alarms"
-      let help = "[DEPRECATED: use warning key alarm to manage alarms] \
-                  If set (default), possible alarms are printed in \
-                  the analysis log as warnings, otherwise as plain feedback"
-    end)
-
-let () =
-  AlarmsWarnings.add_set_hook
-    (fun _ f ->
-       match get_warn_status wkey_alarm with
-       | Log.Wabort | Log.Werror | Log.Werror_once ->
-         warning "alarms already set to produce an error. \
-                  Ignoring -val-warn-on-alarms"
-       | Log.Winactive | Log.Wactive | Log.Wfeedback ->
-         set_warn_status wkey_alarm (if f then Log.Wactive else Log.Wfeedback)
-       | Log.Wonce | Log.Wfeedback_once ->
-         (* Keep the 'once' status. Note that this will only happen if user
-            is mixing old and new style of warning management, thus it becomes
-            difficult to interpret the desired action.
-         *)
-         set_warn_status wkey_alarm
-           (if f then Log.Wonce else Log.Wfeedback_once))
-
-let () = Parameter_customize.set_group messages
 module ReportRedStatuses =
   String
     (struct
@@ -1323,35 +1256,6 @@ module InterpreterMode =
                   arguments, on undecided branches"
     end)
 let () = InterpreterMode.add_aliases ["-val-interpreter-mode"]
-
-let () = Parameter_customize.set_group interpreter
-let () = Parameter_customize.is_invisible ()
-module ObviouslyTerminatesFunctions =
-  Fundec_set
-    (struct
-      let option_name = "-obviously-terminates-function"
-      let arg_name = "f"
-      let help = "deprecated"
-    end)
-let () = add_dep ObviouslyTerminatesFunctions.parameter
-let () = ObviouslyTerminatesFunctions.add_update_hook
-    (fun _ _ ->
-       warning "Option -obviously-terminates-function is no longer supported. \
-                Ignoring.")
-
-let () = Parameter_customize.set_group interpreter
-let () = Parameter_customize.is_invisible ()
-module ObviouslyTerminatesAll =
-  False
-    (struct
-      let option_name = "-obviously-terminates"
-      let help = "undocumented and deprecated"
-    end)
-let () = add_dep ObviouslyTerminatesAll.parameter
-let () = ObviouslyTerminatesAll.add_update_hook
-    (fun _ _ ->
-       warning "Option -obviously-terminates is no longer supported. \
-                Ignoring.")
 
 let () = Parameter_customize.set_group interpreter
 module StopAtNthAlarm =
