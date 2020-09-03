@@ -1039,6 +1039,7 @@ let () = ArrayPrecisionLevel.add_update_hook
    and mutually dependent for sanity checking.
    Also, they depend on BuiltinsOverrides, so they cannot be defined before it. *)
 let () = Parameter_customize.set_group initial_context
+let () = Parameter_customize.is_invisible ()
 module SaveFunctionState =
   Kernel_function_map
     (struct
@@ -1055,6 +1056,7 @@ module SaveFunctionState =
     end)
 let () = SaveFunctionState.add_aliases ["-val-save-fun-state"]
 let () = Parameter_customize.set_group initial_context
+let () = Parameter_customize.is_invisible ()
 module LoadFunctionState =
   Kernel_function_map
     (struct
