@@ -1,5 +1,5 @@
 /* run.config*
-   DEPS: CruiseControl.h
+   DEPS: CruiseControl.h CruiseControl_extern.h scade_types.h config_types.h definitions.h
    GCC:
    STDOPT: #"-float-normal CruiseControl_const.c -lib-entry -main CruiseControl -context-depth 10 -context-valid-pointers"
 

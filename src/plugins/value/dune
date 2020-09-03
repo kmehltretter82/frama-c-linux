@@ -18,7 +18,7 @@
   (name eva)
   (optional)
   (public_name frama-c-eva.core)
-  (modules
+  (modules unit_tests
    split_strategy value_parameters
         value_perf value_util
         mark_noresults

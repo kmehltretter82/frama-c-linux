@@ -722,6 +722,7 @@ let config_module _dir s current =
   let k = "PTEST_LOAD_MODULES" and v = " -load-module " ^ s in
   { current with
     dc_cmxs = (Filename.chop_suffix s ".cmxs") :: current.dc_cmxs;
+    dc_deps = s :: current.dc_deps;
     dc_macros = Macros.append_expand k v current.dc_macros;
   }
 
@@ -1006,7 +1007,7 @@ let basic_command_string =
             (Macros.get "PTEST_LOAD_MODULES" macros) in
         let opt_pre = Macros.expand macros !additional_options_pre in
         let opt_post = Macros.expand macros !additional_options in
-        let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-module %s") command.plugins) in
+        let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
         String.concat " " ["-check -no-autoload-plugins";opt_plugin;opt_modules;opt_pre;options;opt_post]
       end else options
     in
@@ -1125,6 +1126,8 @@ let command_string ~result_cout ~oracle_cout command =
    *       (Filename.sanitize errlog)
    *       (Filename.sanitize stderr)
    * in *)
+  let macros = get_macros command in
+  let deps = List.map (Macros.expand macros) command.deps in
   Printf.fprintf result_cout
     "(rule\n  \
      (targets %S %S %a)\n  \
@@ -1134,7 +1137,7 @@ let command_string ~result_cout ~oracle_cout command =
     errlog
     res
     print_list command.log_files
-    print_list (List.map (Filename.concat "..") command.deps)
+    print_list deps
     (get_ptest_file command)
     (fun cout ->
        List.iter
@@ -1146,11 +1149,16 @@ let command_string ~result_cout ~oracle_cout command =
     Printf.fprintf result_cout
     "(rule\n  \
      (alias %S)\n  \
-     (deps   %S (package frama-c) (universe))\n  \
+     (deps  %a %S (package frama-c)%t (universe))\n  \
      (action (system %S))\n\
      )\n"
     command.file
+    print_list deps
     (get_ptest_file command)
+    (fun cout ->
+       List.iter
+         (fun d -> Printf.fprintf cout " (package %S)" ("frama-c-"^d))
+         command.plugins)
     command_string;
 
   let oracle_prefix = oracle_prefix command in
@@ -1648,70 +1656,71 @@ let update_dir_ref dir config =
 let dispatcher ~result_cout ~oracle_cout file directory config =
   let config =
     scan_test_file config directory file in
-  let i = ref 0 in
-  let e = ref 0 in
-  let nb_files = List.length config.dc_toplevels in
-  let make_toplevel_cmd (toplevel, options, log_files, macros, timeout) =
-    let n = !i in
-    {file; options; toplevel; nb_files; directory; n; log_files;
-     filter = config.dc_filter; macros;
-     execnow=false; timeout;
-     deps = config.dc_deps;
-     plugins = config.dc_plugins;
-    }
-  in
-  let mk_cmd (s, timeout) =
-    {
-      file = file;
-      nb_files = nb_files;
-      log_files = [];
-      options = "";
-      toplevel = s;
-      n = !e;
-      directory = directory;
-      filter = config.dc_filter;
-      macros = config.dc_macros;
-      execnow = true;
-      timeout;
-      deps = config.dc_deps;
-      plugins = config.dc_plugins;
-    }
-  in
-  let process_macros_cmd s = basic_command_string (mk_cmd s) in
-  let macros = get_macros (mk_cmd ("/bin/true","")) in
-  let process_macros s = Macros.expand macros s in
-  let make_execnow_cmd execnow =
-    let res =
-      {
-        ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
-        ex_log = List.map process_macros execnow.ex_log;
-        ex_bin = List.map process_macros execnow.ex_bin;
-        ex_dir = execnow.ex_dir;
-        ex_once = execnow.ex_once;
-        ex_done = execnow.ex_done;
-        ex_timeout = execnow.ex_timeout;
+  if not config.dc_dont_run then
+    let i = ref 0 in
+    let e = ref 0 in
+    let nb_files = List.length config.dc_toplevels in
+    let make_toplevel_cmd (toplevel, options, log_files, macros, timeout) =
+      let n = !i in
+      {file; options; toplevel; nb_files; directory; n; log_files;
+       filter = config.dc_filter; macros;
+       execnow=false; timeout;
+       deps = config.dc_deps;
+       plugins = config.dc_plugins;
       }
     in
-    Printf.fprintf result_cout "\
+    let mk_cmd (s, timeout) =
+      {
+        file = file;
+        nb_files = nb_files;
+        log_files = [];
+        options = "";
+        toplevel = s;
+        n = !e;
+        directory = directory;
+        filter = config.dc_filter;
+        macros = config.dc_macros;
+        execnow = true;
+        timeout;
+        deps = config.dc_deps;
+        plugins = config.dc_plugins;
+      }
+    in
+    let process_macros_cmd s = basic_command_string (mk_cmd s) in
+    let macros = get_macros (mk_cmd ("/bin/true","")) in
+    let process_macros s = Macros.expand macros s in
+    let make_execnow_cmd execnow =
+      let res =
+        {
+          ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
+          ex_log = List.map process_macros execnow.ex_log;
+          ex_bin = List.map process_macros execnow.ex_bin;
+          ex_dir = execnow.ex_dir;
+          ex_once = execnow.ex_once;
+          ex_done = execnow.ex_done;
+          ex_timeout = execnow.ex_timeout;
+        }
+      in
+      Printf.fprintf result_cout "\
       (rule
        (targets %a %a)
 (action (system %S))
 )
 "
-      print_list res.ex_log
-      print_list res.ex_bin
-      res.ex_cmd
-    ;
-    incr e
-  in
-  let treat_option option =
-    let toplevel = make_toplevel_cmd option in
-    command_string ~result_cout ~oracle_cout toplevel;
-    incr i
-  in
-  List.iter (fun cmxs ->
-      let file = Macros.expand macros cmxs in
-      Printf.fprintf result_cout "\
+        print_list res.ex_log
+        print_list res.ex_bin
+        res.ex_cmd
+      ;
+      incr e
+    in
+    let treat_option option =
+      let toplevel = make_toplevel_cmd option in
+      command_string ~result_cout ~oracle_cout toplevel;
+      incr i
+    in
+    List.iter (fun cmxs ->
+        let file = Macros.expand macros cmxs in
+        Printf.fprintf result_cout "\
       (executable \
       (name %s) \
       (modules %s) \
@@ -1719,11 +1728,11 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
       (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a) \
       (flags -open Frama_c_kernel))\n \
       "
-        file file
-        print_list (List.map (Printf.sprintf "frama-c-%s.core") config.dc_plugins)
-    ) config.dc_cmxs;
-  List.iter treat_option config.dc_toplevels;
-  List.iter make_execnow_cmd config.dc_execnow
+          file file
+          print_list (List.map (Printf.sprintf "frama-c-%s.core") config.dc_plugins)
+      ) config.dc_cmxs;
+    List.iter treat_option config.dc_toplevels;
+    List.iter make_execnow_cmd config.dc_execnow
 
 let () =
   (* enqueue the test files *)
