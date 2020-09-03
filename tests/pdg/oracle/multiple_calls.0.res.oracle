@@ -47,27 +47,6 @@
   G4 FROM c; d (and SELF)
   \result FROM G1; G2; c; d
 [from] ====== END OF DEPENDENCIES ======
-[inout] InOut (internal) for function fct1:
-  Operational inputs:
-    x; y; z
-  Operational inputs on termination:
-    x; y; z
-  Sure outputs:
-    G1; G3; G4
-[inout] InOut (internal) for function fct2:
-  Operational inputs:
-    x; y; z
-  Operational inputs on termination:
-    x; y; z
-  Sure outputs:
-    G2; G3
-[inout] InOut (internal) for function appel_ptr_fct:
-  Operational inputs:
-    G1; G2; c; d
-  Operational inputs on termination:
-    G1; G2; c; d
-  Sure outputs:
-    G3; a; b; pf; tmp; x; tmp_0; __retres
 [pdg] computing for function appel_ptr_fct
 [pdg] done for function appel_ptr_fct
 [pdg] PDG for appel_ptr_fct
@@ -178,3 +157,24 @@
    -[--d]-> 30
  {n32}: In(G1)
  {n33}: In(G2)
+[inout] InOut (internal) for function fct1:
+  Operational inputs:
+    x; y; z
+  Operational inputs on termination:
+    x; y; z
+  Sure outputs:
+    G1; G3; G4
+[inout] InOut (internal) for function fct2:
+  Operational inputs:
+    x; y; z
+  Operational inputs on termination:
+    x; y; z
+  Sure outputs:
+    G2; G3
+[inout] InOut (internal) for function appel_ptr_fct:
+  Operational inputs:
+    G1; G2; c; d
+  Operational inputs on termination:
+    G1; G2; c; d
+  Sure outputs:
+    G3; a; b; pf; tmp; x; tmp_0; __retres

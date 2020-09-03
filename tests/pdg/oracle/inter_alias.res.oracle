@@ -39,14 +39,6 @@
 [from] entry point:
   \result FROM G
 [from] ====== END OF CALLWISE DEPENDENCIES ======
-[inout] Out (internal) for function f1:
-    a; b; __retres
-[inout] Inputs for function f1:
-    G; a; b
-[inout] Out (internal) for function main:
-    a; b; __retres
-[inout] Inputs for function main:
-    G
 [pdg] computing for function f1
 [pdg] done for function f1
 [pdg] computing for function main
@@ -146,3 +138,11 @@
  {n30}: OutRet
    -[--d]-> 29
  {n31}: In(G)
+[inout] Out (internal) for function f1:
+    a; b; __retres
+[inout] Inputs for function f1:
+    G; a; b
+[inout] Out (internal) for function main:
+    a; b; __retres
+[inout] Inputs for function main:
+    G

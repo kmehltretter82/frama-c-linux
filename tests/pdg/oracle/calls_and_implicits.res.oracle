@@ -24,34 +24,6 @@
 [eva] Done for function swap
 [eva] Recording results for main
 [eva] done for function main
-[inout] InOut (internal) for function f:
-  Operational inputs:
-    G
-  Operational inputs on termination:
-    G
-  Sure outputs:
-    G; __retres
-[inout] InOut (internal) for function f2:
-  Operational inputs:
-    G
-  Operational inputs on termination:
-    G
-  Sure outputs:
-    G2; __retres
-[inout] InOut (internal) for function swap:
-  Operational inputs:
-    G; G2
-  Operational inputs on termination:
-    G; G2
-  Sure outputs:
-    G; G2; tmp
-[inout] InOut (internal) for function main:
-  Operational inputs:
-    \nothing
-  Operational inputs on termination:
-    \nothing
-  Sure outputs:
-    t{[0]; [2]}; G; G2; __retres
 [pdg] computing for function main
 [from] Computing for function f
 [from] Done for function f
@@ -116,3 +88,31 @@
    -[--d]-> 17
  {n19}: OutRet
    -[--d]-> 18
+[inout] InOut (internal) for function f:
+  Operational inputs:
+    G
+  Operational inputs on termination:
+    G
+  Sure outputs:
+    G; __retres
+[inout] InOut (internal) for function f2:
+  Operational inputs:
+    G
+  Operational inputs on termination:
+    G
+  Sure outputs:
+    G2; __retres
+[inout] InOut (internal) for function swap:
+  Operational inputs:
+    G; G2
+  Operational inputs on termination:
+    G; G2
+  Sure outputs:
+    G; G2; tmp
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    \nothing
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    t{[0]; [2]}; G; G2; __retres

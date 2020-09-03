@@ -129,26 +129,6 @@ Cannot filter: dumping raw memory (including unchanged variables)
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function no_results:
-    __retres
-[inout] Inputs for function no_results:
-    \nothing
-[inout] Out (internal) for function f1:
-    ANYTHING(origin:Unknown)
-[inout] Inputs for function f1:
-    nondet; tab[1]; G
-[inout] Out (internal) for function f2:
-    ANYTHING(origin:Unknown)
-[inout] Inputs for function f2:
-    nondet; S
-[inout] Out (internal) for function strlen:
-    q; k
-[inout] Inputs for function strlen:
-    S_0_S_p_str[0..1]
-[inout] Out (internal) for function main:
-    ANYTHING(origin:Unknown)
-[inout] Inputs for function main:
-    nondet; tab[1]; S; G; S_p_str[0]; S_0_S_p_str[0..1]
 [pdg] computing for function no_results
 [pdg] Top for function no_results
 [pdg] computing for function f1
@@ -230,6 +210,26 @@ Cannot filter: dumping raw memory (including unchanged variables)
  {n33}: In(S_0_S_p_str[0..1])
 [pdg] PDG for main
  Top PDG
+[inout] Out (internal) for function no_results:
+    __retres
+[inout] Inputs for function no_results:
+    \nothing
+[inout] Out (internal) for function f1:
+    ANYTHING(origin:Unknown)
+[inout] Inputs for function f1:
+    nondet; tab[1]; G
+[inout] Out (internal) for function f2:
+    ANYTHING(origin:Unknown)
+[inout] Inputs for function f2:
+    nondet; S
+[inout] Out (internal) for function strlen:
+    q; k
+[inout] Inputs for function strlen:
+    S_0_S_p_str[0..1]
+[inout] Out (internal) for function main:
+    ANYTHING(origin:Unknown)
+[inout] Inputs for function main:
+    nondet; tab[1]; S; G; S_p_str[0]; S_0_S_p_str[0..1]
 [eva] Analyzing a complete application starting at main_asm
 [eva] Computing initial state
 [eva] Initial state computed
@@ -268,18 +268,6 @@ Cannot filter: dumping raw memory (including unchanged variables)
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function fun_asm:
-    __retres
-[inout] Inputs for function fun_asm:
-    \nothing
-[inout] Out (internal) for function main_asm:
-    j; tmp
-[inout] Inputs for function main_asm:
-    \nothing
-[inout] Out (internal) for function no_results:
-    __retres
-[inout] Inputs for function no_results:
-    \nothing
 [pdg] computing for function fun_asm
 [pdg] top_pdg_input.c:45: Warning: Ignoring inline assembly code
 [pdg] done for function fun_asm
@@ -335,3 +323,15 @@ Cannot filter: dumping raw memory (including unchanged variables)
    -[--d]-> 62
 [pdg] PDG for no_results
  Top PDG
+[inout] Out (internal) for function fun_asm:
+    __retres
+[inout] Inputs for function fun_asm:
+    \nothing
+[inout] Out (internal) for function main_asm:
+    j; tmp
+[inout] Inputs for function main_asm:
+    \nothing
+[inout] Out (internal) for function no_results:
+    __retres
+[inout] Inputs for function no_results:
+    \nothing

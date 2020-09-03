@@ -31,20 +31,6 @@
 [eva] Done for function loop
 [eva] Recording results for main
 [eva] done for function main
-[inout] InOut (internal) for function loop:
-  Operational inputs:
-    G; x
-  Operational inputs on termination:
-    G; x
-  Sure outputs:
-    tmp
-[inout] InOut (internal) for function main:
-  Operational inputs:
-    \nothing
-  Operational inputs on termination:
-    \nothing
-  Sure outputs:
-    G; x
 [pdg] computing for function main
 [from] Computing for function f
 [from] Done for function f
@@ -82,3 +68,17 @@
    -[--d]-> 8
  {n10}: return;
    -[-c-]-> 1
+[inout] InOut (internal) for function loop:
+  Operational inputs:
+    G; x
+  Operational inputs on termination:
+    G; x
+  Sure outputs:
+    tmp
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    \nothing
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    G; x

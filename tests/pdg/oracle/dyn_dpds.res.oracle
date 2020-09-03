@@ -8,8 +8,7 @@
   signed overflow. assert -2147483648 ≤ a + b;
 [eva:alarm] dyn_dpds.c:20: Warning: 
   signed overflow. assert a + b ≤ 2147483647;
-[eva:alarm] dyn_dpds.c:23: Warning: 
-  signed overflow. assert -x ≤ 2147483647;
+[eva:alarm] dyn_dpds.c:23: Warning: signed overflow. assert -x ≤ 2147483647;
 [eva:alarm] dyn_dpds.c:24: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] done for function main
