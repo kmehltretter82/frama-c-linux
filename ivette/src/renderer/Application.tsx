@@ -81,7 +81,7 @@ export default (() => {
           onClick={flipViewbar}
         />
       </Toolbar.ToolBar>
-      <LSplit unfold={sidebar}>
+      <LSplit settings='frama-c.sidebar.split' unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
           <Globals key="globals" />

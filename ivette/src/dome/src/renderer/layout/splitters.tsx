@@ -134,11 +134,8 @@ const getCSS = (
 };
 
 /* --------------------------------------------------------------------------*/
-/* --- Splitter Engine                                                    ---*/
+/* --- Sizing Utility Engine                                              ---*/
 /* --------------------------------------------------------------------------*/
-
-interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
-interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
 type Dragging = undefined | {
   position: number;
@@ -146,28 +143,45 @@ type Dragging = undefined | {
   offset: number;
 };
 
-const getResized = (layout: Layout, D0: number, D: number, P: number) => {
-  if (layout.foldA) return P;
-  if (layout.foldB) return P + D - D0;
-  if (D0 > 0) return Math.round(P * (D / D0));
-  return P;
-};
+function getPositionFromSettings(
+  dragging: Dragging,
+  L: Layout,
+  S: number,
+  D: number
+): number {
+  if (dragging) return dragging.position;
+  if (L.foldA) return S;
+  if (L.foldB) return D - S;
+  return D * S;
+}
+
+function getSettingsFromPosition(L: Layout, P: number, D: number): number {
+  if (L.foldA) return P;
+  if (L.foldB) return D - P;
+  return P / D;
+}
 
 const inRange = (M: number, D: number, P: number) => (
   D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
 );
 
+/* --------------------------------------------------------------------------*/
+/* --- Splitter Engine                                                    ---*/
+/* --------------------------------------------------------------------------*/
+
+interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
+interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
+
 function SplitterEngine(props: SplitterEngineProps) {
-  const [position, setPosition] = Dome.useNumberSettings(props.settings, 0);
+  const [settings, setSettings] = Dome.useNumberSettings(props.settings, 0);
   const [dragging, setDragging] = React.useState<Dragging>(undefined);
   const { size, margin = 32, layout } = props;
   const { hsplit } = layout;
   const M = Math.max(margin, 32);
   const D = hsplit ? size.width : size.height;
-  const savedim = React.useRef(D);
   const { unfold = true } = props;
   const [A, B] = props.children;
-  const dragged = position > 0 || dragging !== undefined;
+  const dragged = settings > 0 || dragging !== undefined;
   const css = getCSS(unfold, dragged, layout);
   const cursor = dragging ? (hsplit ? HCURSOR : VCURSOR) : NOCURSOR;
   const container = Utils.classes(css.container, cursor);
@@ -182,8 +196,8 @@ function SplitterEngine(props: SplitterEngineProps) {
   let styleB: undefined | React.CSSProperties;
   let styleR: undefined | React.CSSProperties;
 
-  if (dragged) {
-    const P = dragging ? dragging.position : position;
+  if (unfold && dragged) {
+    const P = getPositionFromSettings(dragging, layout, settings, D);
     const X = dragging ? dragging.offset - dragging.anchor : 0;
     const Q = inRange(M, D, P + X);
     styleA = hsplit ? { width: Q } : { height: Q };
@@ -209,22 +223,14 @@ function SplitterEngine(props: SplitterEngineProps) {
   const onStop: DraggableEventHandler =
     (evt, _data) => {
       if (evt.metaKey || evt.altKey || evt.ctrlKey) {
-        setPosition(0);
-      } else if (dragging) {
-        const newPos = dragging.position + dragging.offset - dragging.anchor;
-        setPosition(inRange(M, D, newPos));
+        setSettings(0);
+      } else if (unfold && dragging) {
+        const offsetPos = dragging.position + dragging.offset - dragging.anchor;
+        const newPos = inRange(M, D, offsetPos);
+        setSettings(getSettingsFromPosition(layout, newPos, D));
       }
       setDragging(undefined);
     };
-
-  if (savedim.current !== D) {
-    const D0 = savedim.current;
-    savedim.current = D;
-    if (position > 0 && !dragging) {
-      const newPos = getResized(layout, D0, D, position);
-      setPosition(inRange(M, D, newPos));
-    }
-  }
 
   return (
     <div
