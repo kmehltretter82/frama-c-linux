@@ -1,8 +1,8 @@
 /* run.config
 
-   CMD: @frama-c@ -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
+   CMD: @frama-c@ -load-plugin slicing -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: @EVA_OPTIONS@ -deps -lib-entry -main main -journal-disable
-   CMD: bin/toplevel.opt
+   CMD: frama-c
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-assert main -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps
    OPT: @EVA_OPTIONS@ -check -deps -lib-entry -main main -slice-pragma modifS -no-slice-callers -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps

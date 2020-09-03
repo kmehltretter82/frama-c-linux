@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 module CamlString = String
+module FramacFilepath = Filepath
 
 let empty_string = ""
 
@@ -322,12 +323,13 @@ struct
         end)
 
     let mk_dir d =
+      let d' = FramacFilepath.Normalized.of_string d in
       try
         Extlib.mkdir ~parents:true d 0o755;
-        L.warning "creating %s directory `%s'" O.option_name d;
+        L.warning "creating %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%s'" O.option_name d
+        L.abort "cannot create %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d'
 
     let set filepath = Dir_name.set filepath
     let get () = Dir_name.get ()

@@ -1,5 +1,5 @@
 ( library
-  (name constant_propagation)
+  (name Constant_Propagation)
   (public_name frama-c-constant_propagation.core)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel)

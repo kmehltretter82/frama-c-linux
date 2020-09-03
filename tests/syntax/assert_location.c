@@ -1,3 +1,8 @@
+/* run.config
+DEPS: assert_location.h
+
+*/
+
 #include "assert_location.h"
 
 void c() {

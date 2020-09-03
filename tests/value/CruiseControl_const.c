@@ -1,4 +1,5 @@
 /* run.config*
+   DEPS: CruiseControl.h
    GCC:
    DONTRUN:
 */

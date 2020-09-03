@@ -5,7 +5,7 @@
 */
 
 
-#include "share/libc/stdlib.c"
+#include "stdlib.c"
 
 int *p,*q,*r,a,b;
 char *t,*u,*v;

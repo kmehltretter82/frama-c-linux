@@ -8,7 +8,7 @@
 /* This file presents the basic version of the allocator.                    */
 /*****************************************************************************/
 
-#include "share/libc/stdlib.h"
+#include "stdlib.h"
 
 #define DEFAULT_BLOCK_SIZE 1000
 

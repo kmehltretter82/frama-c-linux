@@ -1,6 +1,6 @@
 /* run.config
 
-   CMD: @frama-c@ -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
+   CMD: @frama-c@ -load-plugin slicing -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: @EVA_OPTIONS@ -deps -slicing-level 0 -journal-disable
 */
 

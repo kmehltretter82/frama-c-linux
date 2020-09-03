@@ -1,1 +1,2 @@
+PLUGIN: constant_propagation
 OPT: -journal-disable -scf @EVA_OPTIONS@

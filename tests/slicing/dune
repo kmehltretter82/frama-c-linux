@@ -15,7 +15,7 @@
 (executables
  (names merge adpcm ex_spec_interproc horwitz mark_all_slices min_call select_by_annot select_simple simple_intra_slice slice_no_body switch)
  (modes plugin)
- (modules merge adpcm ex_spec_interproc combine horwitz mark_all_slices min_call select_by_annot select_simple simple_intra_slice slice_no_body switch)
+ (modules merge adpcm ex_spec_interproc horwitz mark_all_slices min_call select_by_annot select_simple simple_intra_slice slice_no_body switch)
  (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel frama-c-slicing.core libSelect libAnim)
  (flags -open Frama_c_kernel)
 )
@@ -25,6 +25,6 @@
  (names combine)
  (modes plugin)
  (modules combine)
- (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel frama-c-slicing.core frama-c-constant-propagation.core libSelect libAnim)
+ (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel frama-c-slicing.core frama-c-constant_propagation.core libSelect libAnim)
  (flags -open Frama_c_kernel)
 )

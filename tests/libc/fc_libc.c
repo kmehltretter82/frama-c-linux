@@ -22,7 +22,7 @@
 #define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
-#include "share/libc/__fc_runtime.c"
+#include "__fc_runtime.c"
 
 #include "alloca.h"
 #include "arpa/inet.h"

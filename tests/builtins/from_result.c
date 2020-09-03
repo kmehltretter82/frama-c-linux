@@ -2,7 +2,7 @@
    OPT:  @EVA_CONFIG@ -eva-alloc-builtin fresh -deps -journal-disable
 */
 
-#include "../../share/libc/stdlib.c"
+#include "stdlib.c"
 
 struct T { int a; int b; };
 

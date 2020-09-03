@@ -26,14 +26,12 @@
 [eva] Done for function new_int
 [eva] computing for function f1 <- main.
   Called from select_by_annot.i:141.
-[eva:alarm] select_by_annot.i:29: Warning: 
-  assertion got status unknown.
+[eva:alarm] select_by_annot.i:29: Warning: assertion got status unknown.
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
   Called from select_by_annot.i:142.
-[eva:alarm] select_by_annot.i:39: Warning: 
-  assertion got status unknown.
+[eva:alarm] select_by_annot.i:39: Warning: assertion got status unknown.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
@@ -62,10 +60,8 @@
 [eva] Done for function f7
 [eva] computing for function f8 <- main.
   Called from select_by_annot.i:148.
-[eva:alarm] select_by_annot.i:97: Warning: 
-  loop invariant got status unknown.
-[eva:alarm] select_by_annot.i:100: Warning: 
-  assertion got status unknown.
+[eva:alarm] select_by_annot.i:97: Warning: loop invariant got status unknown.
+[eva:alarm] select_by_annot.i:100: Warning: assertion got status unknown.
 [eva:alarm] select_by_annot.i:104: Warning: 
   signed overflow. assert S.a + 1 ≤ 2147483647;
 [eva] Recording results for f8
@@ -176,4 +172,4 @@ void main(void)
 }
 
 
-[kernel] Parsing result/ocode_1_select_by_annot.i (no preprocessing)
+[kernel] Parsing ocode_1_select_by_annot.i (no preprocessing)

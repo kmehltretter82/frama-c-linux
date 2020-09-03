@@ -596,7 +596,6 @@ type config =
 let default_macros () =
   let l = [
     "frama-c", !toplevel_path;
-    "PTEST_MAKE_MODULE", "make -s"
   ] in
   Macros.add_list l Macros.empty
 
@@ -1007,7 +1006,8 @@ let basic_command_string =
             (Macros.get "PTEST_LOAD_MODULES" macros) in
         let opt_pre = Macros.expand macros !additional_options_pre in
         let opt_post = Macros.expand macros !additional_options in
-        "-check " ^ opt_modules ^ " " ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
+        let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-module %s") command.plugins) in
+        String.concat " " ["-check -no-autoload-plugins";opt_plugin;opt_modules;opt_pre;options;opt_post]
       end else options
     in
     let options = if !use_byte then opt_to_byte_options options else options in
