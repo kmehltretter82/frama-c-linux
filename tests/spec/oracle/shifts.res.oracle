@@ -1,15 +1,15 @@
-[kernel] Parsing tests/spec/shifts.c (with preprocessing)
+[kernel] Parsing shifts.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   e ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/spec/shifts.c:19.
-[eva] tests/spec/shifts.c:13: assertion got status valid.
-[eva] tests/spec/shifts.c:8: 
+  Called from shifts.c:19.
+[eva] shifts.c:13: assertion got status valid.
+[eva] shifts.c:8: 
   function f, behavior a: postcondition got status valid.
-[eva] tests/spec/shifts.c:9: 
+[eva] shifts.c:9: 
   function f, behavior b: postcondition got status valid.
 [eva] Recording results for f
 [eva] Done for function f

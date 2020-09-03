@@ -1,18 +1,18 @@
-[kernel] Parsing tests/slicing/top.i (no preprocessing)
+[kernel] Parsing top.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/slicing/top.i:27: Warning: 
+[eva:alarm] top.i:27: Warning: 
   out of bounds read. assert \valid_read(p_str + i);
 [eva] computing for function strlen <- main.
-  Called from tests/slicing/top.i:27.
-[eva:alarm] tests/slicing/top.i:21: Warning: 
+  Called from top.i:27.
+[eva:alarm] top.i:21: Warning: 
   out of bounds read. assert \valid_read(q);
-[eva] tests/slicing/top.i:21: starting to merge loop iterations
-[eva:alarm] tests/slicing/top.i:21: Warning: 
+[eva] top.i:21: starting to merge loop iterations
+[eva:alarm] top.i:21: Warning: 
   signed overflow. assert k + 1 ≤ 2147483647;
 [eva] Recording results for strlen
 [eva] Done for function strlen
@@ -56,4 +56,4 @@ void main(char **p_str, int i)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_top.i (no preprocessing)
+[kernel] Parsing result/ocode_2_top.i (no preprocessing)

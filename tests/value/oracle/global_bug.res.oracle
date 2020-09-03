@@ -1,9 +1,9 @@
-[kernel] Parsing tests/value/global_bug.i (no preprocessing)
+[kernel] Parsing global_bug.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/value/global_bug.i:6: Warning: 
+[eva:alarm] global_bug.i:6: Warning: 
   invalid RHS operand for shift. assert 0 ≤ 63 < 32;
-[eva] tests/value/global_bug.i:7: Warning: 
+[eva] global_bug.i:7: Warning: 
   evaluation of initializer '99 << 63' failed
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -18,7 +18,7 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion 'Eva,shift' (file tests/value/global_bug.i, line 7)
+[   Bug   ] Assertion 'Eva,shift' (file global_bug.i, line 7)
             by Eva.
 
 --------------------------------------------------------------------------------

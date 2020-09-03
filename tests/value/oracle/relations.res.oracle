@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/relations.i (no preprocessing)
+[kernel] Parsing relations.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -29,25 +29,25 @@
   B7 ∈ {0}
   S8 ∈ {0}
   B8 ∈ {0}
-[eva:alarm] tests/value/relations.i:35: Warning: 
+[eva:alarm] relations.i:35: Warning: 
   signed overflow. assert u[0] + 1 ≤ 2147483647;
-[eva:alarm] tests/value/relations.i:41: Warning: 
+[eva:alarm] relations.i:41: Warning: 
   signed overflow. assert -2147483648 ≤ u[5] - u[0];
-[eva:alarm] tests/value/relations.i:41: Warning: 
+[eva:alarm] relations.i:41: Warning: 
   signed overflow. assert u[5] - u[0] ≤ 2147483647;
-[eva:alarm] tests/value/relations.i:46: Warning: 
+[eva:alarm] relations.i:46: Warning: 
   signed overflow. assert -2147483648 ≤ u[10] - u[11];
-[eva:alarm] tests/value/relations.i:46: Warning: 
+[eva:alarm] relations.i:46: Warning: 
   signed overflow. assert u[10] - u[11] ≤ 2147483647;
-[eva:alarm] tests/value/relations.i:48: Warning: 
+[eva:alarm] relations.i:48: Warning: 
   signed overflow. assert -2147483648 ≤ u[1] - u[0];
-[eva:alarm] tests/value/relations.i:48: Warning: 
+[eva:alarm] relations.i:48: Warning: 
   signed overflow. assert u[1] - u[0] ≤ 2147483647;
-[eva:alarm] tests/value/relations.i:52: Warning: 
+[eva:alarm] relations.i:52: Warning: 
   signed overflow. assert -2147483648 ≤ u[5] - u[1];
-[eva:alarm] tests/value/relations.i:52: Warning: 
+[eva:alarm] relations.i:52: Warning: 
   signed overflow. assert u[5] - u[1] ≤ 2147483647;
-[eva:alarm] tests/value/relations.i:56: Warning: 
+[eva:alarm] relations.i:56: Warning: 
   out of bounds read. assert \valid_read(&pCs->L0);
 [eva] Recording results for main
 [eva] done for function main

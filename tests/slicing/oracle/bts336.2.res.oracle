@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts336.i (no preprocessing)
+[kernel] Parsing bts336.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main3
 [eva] Computing initial state
@@ -7,15 +7,15 @@
   T[0..9] ∈ {0}
   x5 ∈ {0}
 [eva] computing for function f3 <- main3.
-  Called from tests/slicing/bts336.i:53.
+  Called from bts336.i:53.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f3 <- main3.
-  Called from tests/slicing/bts336.i:54.
+  Called from bts336.i:54.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f3 <- main3.
-  Called from tests/slicing/bts336.i:55.
+  Called from bts336.i:55.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] Recording results for main3
@@ -57,4 +57,4 @@ int main3(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_bts336.i (no preprocessing)
+[kernel] Parsing result/ocode_2_bts336.i (no preprocessing)

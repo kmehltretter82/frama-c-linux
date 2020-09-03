@@ -1,34 +1,34 @@
-[kernel] Parsing tests/value/hierarchical_convergence.c (with preprocessing)
+[kernel] Parsing hierarchical_convergence.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/value/hierarchical_convergence.c:19.
-[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: {0}
-[eva] tests/value/hierarchical_convergence.c:7: 
+  Called from hierarchical_convergence.c:19.
+[eva] hierarchical_convergence.c:8: Frama_C_show_each: {0}
+[eva] hierarchical_convergence.c:7: 
   starting to merge loop iterations
-[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: {0; 1}
-[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: {1}, {0}
-[eva] tests/value/hierarchical_convergence.c:9: 
+[eva] hierarchical_convergence.c:8: Frama_C_show_each: {0; 1}
+[eva] hierarchical_convergence.c:10: Frama_C_show_each: {1}, {0}
+[eva] hierarchical_convergence.c:9: 
   starting to merge loop iterations
-[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: {0; 1; 2}
-[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: {1; 2}, {0}
-[eva] tests/value/hierarchical_convergence.c:10: 
+[eva] hierarchical_convergence.c:8: Frama_C_show_each: {0; 1; 2}
+[eva] hierarchical_convergence.c:10: Frama_C_show_each: {1; 2}, {0}
+[eva] hierarchical_convergence.c:10: 
   Frama_C_show_each: {1; 2}, {0; 1}
-[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
-[eva] tests/value/hierarchical_convergence.c:10: Frama_C_show_each: [1..99], {0}
-[eva] tests/value/hierarchical_convergence.c:10: 
+[eva] hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
+[eva] hierarchical_convergence.c:10: Frama_C_show_each: [1..99], {0}
+[eva] hierarchical_convergence.c:10: 
   Frama_C_show_each: [1..99], {0; 1}
-[eva] tests/value/hierarchical_convergence.c:10: 
+[eva] hierarchical_convergence.c:10: 
   Frama_C_show_each: [1..99], {0; 1; 2}
-[eva] tests/value/hierarchical_convergence.c:10: 
+[eva] hierarchical_convergence.c:10: 
   Frama_C_show_each: [1..99], [0..98]
-[eva] tests/value/hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
-[eva:alarm] tests/value/hierarchical_convergence.c:15: Warning: 
+[eva] hierarchical_convergence.c:8: Frama_C_show_each: [0..99]
+[eva:alarm] hierarchical_convergence.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(&j);
-[eva:alarm] tests/value/hierarchical_convergence.c:15: Warning: 
+[eva:alarm] hierarchical_convergence.c:15: Warning: 
   signed overflow. assert i * j ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f

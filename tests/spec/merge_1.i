@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"tests/spec/merge_2.i"
+   STDOPT: +"merge_2.i"
  */
 /*@ requires \valid(s);
   @ assigns \nothing;

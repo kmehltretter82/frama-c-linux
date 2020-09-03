@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/vis_spec.i (no preprocessing)
+[kernel] Parsing vis_spec.i (no preprocessing)
 Starting visit
 Considering spec of function g
 Function prototype; Funspec is 'assigns \nothing;'

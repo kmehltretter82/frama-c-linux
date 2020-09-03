@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/log-file.i (no preprocessing)
+[kernel] Parsing log-file.i (no preprocessing)
 [kernel:foo-category] result with dkey
 [kernel] result
 [kernel:foo-category] feedback with dkey

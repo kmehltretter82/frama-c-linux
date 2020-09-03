@@ -1,8 +1,8 @@
 /* run.config
-   EXECNOW: make -s ./tests/saveload/segfault_datatypes_A.cmxs ./tests/saveload/segfault_datatypes_B.cmxs
-   EXECNOW: LOG segfault_datatypes_sav.res LOG segfault_datatypes_sav.err BIN segfault_datatypes.sav @frama-c@ -load-module ./tests/saveload/segfault_datatypes_A -eva @EVA_OPTIONS@ -out -input -deps ./tests/saveload/segfault_datatypes.i -save ./tests/saveload/result/segfault_datatypes.sav > ./tests/saveload/result/segfault_datatypes_sav.res 2> ./tests/saveload/result/segfault_datatypes_sav.err
-   CMD: @frama-c@ -load-module ./tests/saveload/segfault_datatypes_B
-   STDOPT: +"-load ./tests/saveload/result/segfault_datatypes.sav -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
+   CMXS: segfault_datatypes_A segfault_datatypes_B
+   EXECNOW: LOG segfault_datatypes_sav.res LOG segfault_datatypes_sav.err BIN segfault_datatypes.sav @frama-c@ -load-module ./segfault_datatypes_A -eva @EVA_OPTIONS@ -out -input -deps ./segfault_datatypes.i -save ./result/segfault_datatypes.sav > ./result/segfault_datatypes_sav.res 2> ./result/segfault_datatypes_sav.err
+   CMD: @frama-c@ -load-module ./segfault_datatypes_B
+   STDOPT: +"-load ./result/segfault_datatypes.sav -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
 */
 
 

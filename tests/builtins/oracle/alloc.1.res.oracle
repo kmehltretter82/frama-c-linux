@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/alloc.c (with preprocessing)
+[kernel] Parsing alloc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_abs
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,24 +13,24 @@
   u ∈ {0}
   v ∈ {0}
   ch ∈ {44}
-[eva] tests/builtins/alloc.c:50: Call to builtin malloc
-[eva] tests/builtins/alloc.c:50: allocating variable __malloc_main_abs_l50
-[eva:alarm] tests/builtins/alloc.c:51: Warning: 
+[eva] alloc.c:50: Call to builtin malloc
+[eva] alloc.c:50: allocating variable __malloc_main_abs_l50
+[eva:alarm] alloc.c:51: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
-[eva:alarm] tests/builtins/alloc.c:51: Warning: 
+[eva:alarm] alloc.c:51: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)q);
-[eva:alarm] tests/builtins/alloc.c:51: Warning: 
+[eva:alarm] alloc.c:51: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;
-[eva] tests/builtins/alloc.c:51: 
+[eva] alloc.c:51: 
   Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {tests/builtins/alloc.c:51}
-[eva:alarm] tests/builtins/alloc.c:54: Warning: 
+  The imprecision originates from Arithmetic {alloc.c:51}
+[eva:alarm] alloc.c:54: Warning: 
   out of bounds write. assert \valid(r);
-[eva:alarm] tests/builtins/alloc.c:54: Warning: 
+[eva:alarm] alloc.c:54: Warning: 
   pointer downcast. assert (unsigned int)r ≤ 2147483647;
-[eva:alarm] tests/builtins/alloc.c:56: Warning: 
+[eva:alarm] alloc.c:56: Warning: 
   signed overflow. assert -2147483648 ≤ *q + 1;
-[eva:alarm] tests/builtins/alloc.c:56: Warning: 
+[eva:alarm] alloc.c:56: Warning: 
   signed overflow. assert *q + 1 ≤ 2147483647;
 [eva] Recording results for main_abs
 [eva] done for function main_abs
@@ -38,7 +38,7 @@
 [eva:final-states] Values at end of function main_abs:
   NULL[rbits 2048 to 4103] ∈
       {{ garbled mix of &{__malloc_main_abs_l50}
-       (origin: Misaligned {tests/builtins/alloc.c:54}) }}
+       (origin: Misaligned {alloc.c:54}) }}
   __fc_heap_status ∈ [--..--]
   q ∈ {{ &__malloc_main_abs_l50 }}
   r ∈ {{ NULL + [256..509] ; &__malloc_main_abs_l50 }}

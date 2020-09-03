@@ -1,17 +1,17 @@
-[kernel] Parsing tests/value/bug0196.c (with preprocessing)
+[kernel] Parsing bug0196.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function fact <- main.
-  Called from tests/value/bug0196.c:16.
-[eva] tests/value/bug0196.c:8: assertion got status valid.
-[eva] tests/value/bug0196.c:11: 
+  Called from bug0196.c:16.
+[eva] bug0196.c:8: assertion got status valid.
+[eva] bug0196.c:11: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
-[eva:alarm] tests/value/bug0196.c:11: Warning: assertion got status unknown.
-[eva] tests/value/bug0196.c:7: starting to merge loop iterations
-[eva:alarm] tests/value/bug0196.c:10: Warning: 
+[eva:alarm] bug0196.c:11: Warning: assertion got status unknown.
+[eva] bug0196.c:7: starting to merge loop iterations
+[eva:alarm] bug0196.c:10: Warning: 
   signed overflow. assert r * tmp ≤ 2147483647;
                    (tmp from n--)
 [eva] Recording results for fact

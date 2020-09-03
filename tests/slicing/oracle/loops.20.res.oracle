@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/loops.i (no preprocessing)
+[kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -10,14 +10,14 @@
   Y ∈ {0}
   Z ∈ {0}
 [eva] computing for function may_write_Y_from_Z <- main.
-  Called from tests/slicing/loops.i:199.
+  Called from loops.i:199.
 [eva] using specification for function may_write_Y_from_Z
 [eva] Done for function may_write_Y_from_Z
 [eva] computing for function loop <- main.
-  Called from tests/slicing/loops.i:202.
-[eva] tests/slicing/loops.i:183: assertion got status valid.
-[eva] tests/slicing/loops.i:176: starting to merge loop iterations
-[eva:alarm] tests/slicing/loops.i:179: Warning: 
+  Called from loops.i:202.
+[eva] loops.i:183: assertion got status valid.
+[eva] loops.i:176: starting to merge loop iterations
+[eva:alarm] loops.i:179: Warning: 
   signed overflow. assert X + 1 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] Done for function loop
@@ -46,7 +46,7 @@
 [slicing] Warning: No internal slicing request from the command line.
 [slicing] Warning: Adding an extra request on the entry point of function: main.
 [pdg] computing for function main
-[pdg] tests/slicing/loops.i:204: Warning: 
+[pdg] loops.i:204: Warning: 
   no final state. Probably unreachable...
 [pdg] done for function main
 [slicing] applying all slicing requests...
@@ -66,4 +66,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_20_loops.i (no preprocessing)
+[kernel] Parsing result/ocode_20_loops.i (no preprocessing)

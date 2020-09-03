@@ -1,26 +1,26 @@
-[kernel] Parsing tests/syntax/enum_repr.i (no preprocessing)
-[kernel] tests/syntax/enum_repr.i:37: 
+[kernel] Parsing enum_repr.i (no preprocessing)
+[kernel] enum_repr.i:37: 
   Inserted implicit cast from int to enum __anonenum_foo_1
-[kernel] tests/syntax/enum_repr.i:38: 
+[kernel] enum_repr.i:38: 
   Inserted implicit cast from int to enum __anonenum_bar_2
-[kernel] tests/syntax/enum_repr.i:39: 
+[kernel] enum_repr.i:39: 
   Inserted implicit cast from int to enum __anonenum_bu1_3
-[kernel] tests/syntax/enum_repr.i:41: 
+[kernel] enum_repr.i:41: 
   Inserted implicit cast from long long to enum __anonenum_bu3_5
-[kernel] tests/syntax/enum_repr.i:43: 
+[kernel] enum_repr.i:43: 
   Inserted implicit cast from unsigned int to enum __anonenum_bs2_7
-[kernel] tests/syntax/enum_repr.i:45: 
+[kernel] enum_repr.i:45: 
   Inserted implicit cast from signed char to enum __anonenum_bc1_9
-[kernel] tests/syntax/enum_repr.i:46: 
+[kernel] enum_repr.i:46: 
   Inserted implicit cast from unsigned char to enum __anonenum_bc2_10
-[kernel] tests/syntax/enum_repr.i:47: 
+[kernel] enum_repr.i:47: 
   Inserted implicit cast from signed char to enum __anonenum_bd1_11
-[kernel] tests/syntax/enum_repr.i:48: 
+[kernel] enum_repr.i:48: 
   Inserted implicit cast from unsigned char to enum __anonenum_bd2_12
-[kernel] tests/syntax/enum_repr.i:49: 
+[kernel] enum_repr.i:49: 
   Inserted implicit cast from int to unsigned int
-[kernel] tests/syntax/enum_repr.i:49: Inserted implicit cast from bar to int
-[kernel] tests/syntax/enum_repr.i:63: 
+[kernel] enum_repr.i:49: Inserted implicit cast from bar to int
+[kernel] enum_repr.i:63: 
   Inserted implicit cast from int to enum __anonenum_foo_1
 [kernel] Enum __anonenum_foo_1 is represented by unsigned int
 [kernel] Enum __anonenum_bar_2 is represented by unsigned char

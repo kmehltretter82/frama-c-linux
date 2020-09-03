@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/from_pb.i (no preprocessing)
+[kernel] Parsing from_pb.i (no preprocessing)
 [eva] Analyzing a complete application starting at main5bis
 [eva] Computing initial state
 [eva] Initial state computed

@@ -1,10 +1,10 @@
-[kernel] Parsing tests/value/conversion.i (no preprocessing)
+[kernel] Parsing conversion.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/value/conversion.i:16: 
+[eva] conversion.i:16: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -13,9 +13,9 @@
   f ∈ {1.40129846432e-45}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:19: Warning: 
+[eva:alarm] conversion.i:19: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/conversion.i:21: 
+[eva] conversion.i:21: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -24,9 +24,9 @@
   f ∈ [0. .. 96.921875]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:24: Warning: 
+[eva:alarm] conversion.i:24: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/conversion.i:26: 
+[eva] conversion.i:26: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -35,9 +35,9 @@
   f ∈ [0. .. 1.40129846432e-44] ∪ {NaN}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:29: Warning: 
+[eva:alarm] conversion.i:29: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/conversion.i:31: 
+[eva] conversion.i:31: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -46,9 +46,9 @@
   f ∈ [0. .. 1.40129846432e-44] ∪ {NaN}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:34: Warning: 
+[eva:alarm] conversion.i:34: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/conversion.i:36: 
+[eva] conversion.i:36: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -57,9 +57,9 @@
   f ∈ [3. .. 5.]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:38: Warning: 
+[eva:alarm] conversion.i:38: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva] tests/value/conversion.i:40: 
+[eva] conversion.i:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -68,7 +68,7 @@
   f ∈ {{ (float)&x }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/conversion.i:45: 
+[eva] conversion.i:45: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -79,9 +79,9 @@
    [bits 16 to 31] ∈ {2}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:50: Warning: 
+[eva:alarm] conversion.i:50: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/conversion.i:53: 
+[eva] conversion.i:53: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -116,7 +116,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/value/conversion.i:16: 
+[eva] conversion.i:16: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -125,7 +125,7 @@
   f ∈ {1.40129846432e-45}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/conversion.i:21: 
+[eva] conversion.i:21: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -134,9 +134,9 @@
   f ∈ [0. .. 96.921875]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:25: Warning: 
+[eva:alarm] conversion.i:25: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
-[eva] tests/value/conversion.i:26: 
+[eva] conversion.i:26: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -145,7 +145,7 @@
   f ∈ [0. .. 1.40129846432e-44]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/conversion.i:31: 
+[eva] conversion.i:31: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -154,7 +154,7 @@
   f ∈ [0. .. 1.40129846432e-44]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/conversion.i:36: 
+[eva] conversion.i:36: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -163,24 +163,24 @@
   f ∈ [3. .. 5.]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:38: Warning: 
+[eva:alarm] conversion.i:38: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:alarm] tests/value/conversion.i:39: Warning: 
+[eva:alarm] conversion.i:39: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
-[eva] tests/value/conversion.i:39: 
+[eva] conversion.i:39: 
   Assigning imprecise value to f.
-  The imprecision originates from Arithmetic {tests/value/conversion.i:39}
-[eva] tests/value/conversion.i:40: 
+  The imprecision originates from Arithmetic {conversion.i:39}
+[eva] conversion.i:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
   x ∈ {{ (int)&x }}
   y ∈ [--..--]
   f ∈
-   {{ garbled mix of &{x} (origin: Arithmetic {tests/value/conversion.i:39}) }}
+   {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39}) }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/conversion.i:45: 
+[eva] conversion.i:45: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -190,9 +190,9 @@
   f ∈ {1.83672393614e-40}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/conversion.i:52: Warning: 
+[eva:alarm] conversion.i:52: Warning: 
   accessing uninitialized left-value. assert \initialized((float *)(&l));
-[eva] tests/value/conversion.i:53: 
+[eva] conversion.i:53: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]

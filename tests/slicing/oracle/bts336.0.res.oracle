@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts336.i (no preprocessing)
+[kernel] Parsing bts336.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,13 +6,13 @@
   T[0..9] ∈ {0}
   x5 ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/slicing/bts336.i:20.
+  Called from bts336.i:20.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/slicing/bts336.i:21.
+  Called from bts336.i:21.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -22,10 +22,10 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at tests/slicing/bts336.i:20 (by main):
+[from] call to f at bts336.i:20 (by main):
   T[1] FROM T[1]; i
   \result FROM T[1]; i
-[from] call to f at tests/slicing/bts336.i:21 (by main):
+[from] call to f at bts336.i:21 (by main):
   T[2] FROM T[2]; i
   \result FROM T[2]; i
 [from] entry point:
@@ -67,4 +67,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts336.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts336.i (no preprocessing)

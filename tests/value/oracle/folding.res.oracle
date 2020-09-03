@@ -1,23 +1,23 @@
-[kernel] Parsing tests/value/folding.i (no preprocessing)
+[kernel] Parsing folding.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function g <- main.
-  Called from tests/value/folding.i:23.
+  Called from folding.i:23.
 [eva] computing for function f <- g <- main.
-  Called from tests/value/folding.i:11.
+  Called from folding.i:11.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function foo <- main.
-  Called from tests/value/folding.i:24.
+  Called from folding.i:24.
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva] computing for function foo <- main.
-  Called from tests/value/folding.i:24.
+  Called from folding.i:24.
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva] Recording results for main

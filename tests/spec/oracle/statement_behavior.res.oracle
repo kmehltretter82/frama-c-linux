@@ -1,18 +1,18 @@
-[kernel] Parsing tests/spec/statement_behavior.c (with preprocessing)
+[kernel] Parsing statement_behavior.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function pfsqopfc <- main.
-  Called from tests/spec/statement_behavior.c:23.
-[eva] tests/spec/statement_behavior.c:10: Warning: 
+  Called from statement_behavior.c:23.
+[eva] statement_behavior.c:10: Warning: 
   no \from part for clause 'assigns five_times;'
-[eva:alarm] tests/spec/statement_behavior.c:17: Warning: 
+[eva:alarm] statement_behavior.c:17: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/spec/statement_behavior.c:4: Warning: 
+[eva:alarm] statement_behavior.c:4: Warning: 
   function pfsqopfc: postcondition got status unknown.
-[eva:alarm] tests/spec/statement_behavior.c:18: Warning: 
+[eva:alarm] statement_behavior.c:18: Warning: 
   accessing uninitialized left-value. assert \initialized(&five_times);
 [eva] Recording results for pfsqopfc
 [eva] Done for function pfsqopfc

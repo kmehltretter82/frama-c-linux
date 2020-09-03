@@ -1,4 +1,4 @@
-[kernel] Parsing tests/rte/postcond.c (with preprocessing)
+[kernel] Parsing postcond.c (with preprocessing)
 [rte] annotating function f
 [rte] annotating function g
 [rte] annotating function main

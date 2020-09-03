@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/memexec.c (with preprocessing)
+[kernel] Parsing memexec.c (with preprocessing)
 [rte] annotating function fbug
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -19,74 +19,74 @@
   g_f5_2 ∈ {0}
   two_fields ∈ {0}
 [eva] computing for function f1 <- main.
-  Called from tests/value/memexec.c:189.
+  Called from memexec.c:189.
 [eva] computing for function f11 <- f1 <- main.
-  Called from tests/value/memexec.c:12.
+  Called from memexec.c:12.
 [eva] Recording results for f11
 [eva] Done for function f11
-[eva] tests/value/memexec.c:13: Reusing old results for call to f11
-[eva] tests/value/memexec.c:14: Reusing old results for call to f11
-[eva] tests/value/memexec.c:16: Reusing old results for call to f11
-[eva] tests/value/memexec.c:18: Reusing old results for call to f11
-[eva] tests/value/memexec.c:20: Reusing old results for call to f11
-[eva] tests/value/memexec.c:21: Reusing old results for call to f11
+[eva] memexec.c:13: Reusing old results for call to f11
+[eva] memexec.c:14: Reusing old results for call to f11
+[eva] memexec.c:16: Reusing old results for call to f11
+[eva] memexec.c:18: Reusing old results for call to f11
+[eva] memexec.c:20: Reusing old results for call to f11
+[eva] memexec.c:21: Reusing old results for call to f11
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/value/memexec.c:190.
+  Called from memexec.c:190.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
-  Called from tests/value/memexec.c:191.
+  Called from memexec.c:191.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function bug <- main.
-  Called from tests/value/memexec.c:192.
+  Called from memexec.c:192.
 [eva] computing for function fbug <- bug <- main.
-  Called from tests/value/memexec.c:40.
-[eva:alarm] tests/value/memexec.c:33: Warning: 
+  Called from memexec.c:40.
+[eva:alarm] memexec.c:33: Warning: 
   assertion 'rte,mem_access' got status invalid (stopping propagation).
 [eva] Recording results for fbug
 [eva] Done for function fbug
 [eva] computing for function fbug <- bug <- main.
-  Called from tests/value/memexec.c:42.
-[eva] tests/value/memexec.c:33: assertion 'rte,mem_access' got status valid.
+  Called from memexec.c:42.
+[eva] memexec.c:33: assertion 'rte,mem_access' got status valid.
 [eva] Recording results for fbug
 [eva] Done for function fbug
 [eva] Recording results for bug
 [eva] Done for function bug
-[eva:locals-escaping] tests/value/memexec.c:192: Warning: 
+[eva:locals-escaping] memexec.c:192: Warning: 
   locals {x} escaping the scope of bug through p
 [eva] computing for function f4 <- main.
-  Called from tests/value/memexec.c:193.
+  Called from memexec.c:193.
 [eva] computing for function f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:84.
+  Called from memexec.c:84.
 [eva] computing for function f4_11 <- f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:74.
-[eva:alarm] tests/value/memexec.c:59: Warning: 
+  Called from memexec.c:74.
+[eva:alarm] memexec.c:59: Warning: 
   accessing out of bounds index. assert ps->i < 10;
-[kernel] tests/value/memexec.c:59: Warning: 
+[kernel] memexec.c:59: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for f4_11
 [eva] Done for function f4_11
 [eva] computing for function f4_12 <- f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:76.
-[eva:alarm] tests/value/memexec.c:63: Warning: 
+  Called from memexec.c:76.
+[eva:alarm] memexec.c:63: Warning: 
   accessing out of bounds index. assert i < 10;
-[kernel] tests/value/memexec.c:63: Warning: 
+[kernel] memexec.c:63: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for f4_12
 [eva] Done for function f4_12
 [eva] Recording results for f4_2
 [eva] Done for function f4_2
 [eva] computing for function f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:87.
+  Called from memexec.c:87.
 [eva] computing for function f4_11 <- f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:74.
+  Called from memexec.c:74.
 [eva] Recording results for f4_11
 [eva] Done for function f4_11
 [eva] computing for function f4_12 <- f4_2 <- f4 <- main.
-  Called from tests/value/memexec.c:76.
+  Called from memexec.c:76.
 [eva] Recording results for f4_12
 [eva] Done for function f4_12
 [eva] Recording results for f4_2
@@ -94,105 +94,105 @@
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] computing for function f5 <- main.
-  Called from tests/value/memexec.c:194.
+  Called from memexec.c:194.
 [eva] computing for function f5_aux <- f5 <- main.
-  Called from tests/value/memexec.c:107.
-[eva:alarm] tests/value/memexec.c:94: Warning: assertion got status unknown.
-[eva:alarm] tests/value/memexec.c:96: Warning: assertion got status unknown.
+  Called from memexec.c:107.
+[eva:alarm] memexec.c:94: Warning: assertion got status unknown.
+[eva:alarm] memexec.c:96: Warning: assertion got status unknown.
 [eva] Recording results for f5_aux
 [eva] Done for function f5_aux
-[eva] tests/value/memexec.c:108: 
+[eva] memexec.c:108: 
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
-[eva] tests/value/memexec.c:113: Reusing old results for call to f5_aux
-[eva] tests/value/memexec.c:114: 
+[eva] memexec.c:113: Reusing old results for call to f5_aux
+[eva] memexec.c:114: 
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
-  Called from tests/value/memexec.c:195.
+  Called from memexec.c:195.
 [eva] computing for function f6_1 <- f6 <- main.
-  Called from tests/value/memexec.c:123.
+  Called from memexec.c:123.
 [eva] Recording results for f6_1
 [eva] Done for function f6_1
 [eva] computing for function f6_1 <- f6 <- main.
-  Called from tests/value/memexec.c:126.
+  Called from memexec.c:126.
 [eva] Recording results for f6_1
 [eva] Done for function f6_1
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
-  Called from tests/value/memexec.c:196.
+  Called from memexec.c:196.
 [eva] computing for function f7_1 <- f7 <- main.
-  Called from tests/value/memexec.c:136.
+  Called from memexec.c:136.
 [eva] Recording results for f7_1
 [eva] Done for function f7_1
-[eva] tests/value/memexec.c:137: Reusing old results for call to f7_1
+[eva] memexec.c:137: Reusing old results for call to f7_1
 [eva] Recording results for f7
 [eva] Done for function f7
 [eva] computing for function f8 <- main.
-  Called from tests/value/memexec.c:197.
+  Called from memexec.c:197.
 [eva] computing for function f8_1 <- f8 <- main.
-  Called from tests/value/memexec.c:147.
-[eva:alarm] tests/value/memexec.c:141: Warning: 
+  Called from memexec.c:147.
+[eva:alarm] memexec.c:141: Warning: 
   accessing uninitialized left-value. assert \initialized(q);
 [eva] Recording results for f8_1
 [eva] Done for function f8_1
 [eva] computing for function f8_1 <- f8 <- main.
-  Called from tests/value/memexec.c:149.
+  Called from memexec.c:149.
 [eva] Recording results for f8_1
 [eva] Done for function f8_1
-[eva] tests/value/memexec.c:150: Reusing old results for call to f8_1
+[eva] memexec.c:150: Reusing old results for call to f8_1
 [eva] Recording results for f8
 [eva] Done for function f8
 [eva] computing for function f9 <- main.
-  Called from tests/value/memexec.c:198.
+  Called from memexec.c:198.
 [eva] computing for function f9_1 <- f9 <- main.
-  Called from tests/value/memexec.c:171.
-[eva:alarm] tests/value/memexec.c:154: Warning: 
+  Called from memexec.c:171.
+[eva:alarm] memexec.c:154: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for f9_1
 [eva] Done for function f9_1
 [eva] computing for function f9_1 <- f9 <- main.
-  Called from tests/value/memexec.c:173.
-[eva] tests/value/memexec.c:154: assertion got status valid.
+  Called from memexec.c:173.
+[eva] memexec.c:154: assertion got status valid.
 [eva] Recording results for f9_1
 [eva] Done for function f9_1
 [eva] computing for function f9_2 <- f9 <- main.
-  Called from tests/value/memexec.c:176.
-[eva:alarm] tests/value/memexec.c:158: Warning: 
+  Called from memexec.c:176.
+[eva:alarm] memexec.c:158: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for f9_2
 [eva] Done for function f9_2
 [eva] computing for function f9_2 <- f9 <- main.
-  Called from tests/value/memexec.c:178.
-[eva] tests/value/memexec.c:158: assertion got status valid.
+  Called from memexec.c:178.
+[eva] memexec.c:158: assertion got status valid.
 [eva] Recording results for f9_2
 [eva] Done for function f9_2
 [eva] computing for function f9_3 <- f9 <- main.
-  Called from tests/value/memexec.c:179.
-[eva:alarm] tests/value/memexec.c:162: Warning: 
+  Called from memexec.c:179.
+[eva:alarm] memexec.c:162: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for f9_3
 [eva] Done for function f9_3
 [eva] computing for function f9_3 <- f9 <- main.
-  Called from tests/value/memexec.c:181.
-[eva] tests/value/memexec.c:162: assertion got status valid.
+  Called from memexec.c:181.
+[eva] memexec.c:162: assertion got status valid.
 [eva] Recording results for f9_3
 [eva] Done for function f9_3
 [eva] computing for function f9_4 <- f9 <- main.
-  Called from tests/value/memexec.c:183.
-[eva:alarm] tests/value/memexec.c:166: Warning: 
+  Called from memexec.c:183.
+[eva:alarm] memexec.c:166: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for f9_4
 [eva] Done for function f9_4
 [eva] computing for function f9_4 <- f9 <- main.
-  Called from tests/value/memexec.c:185.
-[eva] tests/value/memexec.c:166: assertion got status valid.
+  Called from memexec.c:185.
+[eva] memexec.c:166: assertion got status valid.
 [eva] Recording results for f9_4
 [eva] Done for function f9_4
 [eva] Recording results for f9
 [eva] Done for function f9
-[eva:locals-escaping] tests/value/memexec.c:198: Warning: 
+[eva:locals-escaping] memexec.c:198: Warning: 
   locals {x} escaping the scope of f9 through p
 [eva] Recording results for main
 [eva] done for function main

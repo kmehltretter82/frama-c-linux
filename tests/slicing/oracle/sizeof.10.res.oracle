@@ -1,48 +1,48 @@
-[kernel] Parsing tests/slicing/sizeof.i (no preprocessing)
+[kernel] Parsing sizeof.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   st ∈ {0}
-[eva] tests/slicing/sizeof.i:93: assertion got status valid.
+[eva] sizeof.i:93: assertion got status valid.
 [eva] computing for function SizeOf_1 <- main.
-  Called from tests/slicing/sizeof.i:94.
+  Called from sizeof.i:94.
 [eva] Recording results for SizeOf_1
 [eva] Done for function SizeOf_1
 [eva] computing for function SizeOf_2 <- main.
-  Called from tests/slicing/sizeof.i:95.
+  Called from sizeof.i:95.
 [eva] Recording results for SizeOf_2
 [eva] Done for function SizeOf_2
 [eva] computing for function SizeOfE_pt1 <- main.
-  Called from tests/slicing/sizeof.i:96.
+  Called from sizeof.i:96.
 [eva] Recording results for SizeOfE_pt1
 [eva] Done for function SizeOfE_pt1
 [eva] computing for function SizeOfE_pt2 <- main.
-  Called from tests/slicing/sizeof.i:97.
+  Called from sizeof.i:97.
 [eva] Recording results for SizeOfE_pt2
 [eva] Done for function SizeOfE_pt2
 [eva] computing for function SizeOfE_pt3 <- main.
-  Called from tests/slicing/sizeof.i:98.
+  Called from sizeof.i:98.
 [eva] Recording results for SizeOfE_pt3
 [eva] Done for function SizeOfE_pt3
 [eva] computing for function SizeOfE_pt_deref_1 <- main.
-  Called from tests/slicing/sizeof.i:99.
+  Called from sizeof.i:99.
 [eva] Recording results for SizeOfE_pt_deref_1
 [eva] Done for function SizeOfE_pt_deref_1
 [eva] computing for function SizeOfE_tab_1 <- main.
-  Called from tests/slicing/sizeof.i:100.
+  Called from sizeof.i:100.
 [eva] Recording results for SizeOfE_tab_1
 [eva] Done for function SizeOfE_tab_1
 [eva] computing for function SizeOfE_pt_tab_1 <- main.
-  Called from tests/slicing/sizeof.i:101.
+  Called from sizeof.i:101.
 [eva] Recording results for SizeOfE_pt_tab_1
 [eva] Done for function SizeOfE_pt_tab_1
 [eva] computing for function SizeOfE_pt_tab_2 <- main.
-  Called from tests/slicing/sizeof.i:102.
+  Called from sizeof.i:102.
 [eva] Recording results for SizeOfE_pt_tab_2
 [eva] Done for function SizeOfE_pt_tab_2
 [eva] computing for function SizeOfE_tab_acces_1 <- main.
-  Called from tests/slicing/sizeof.i:103.
+  Called from sizeof.i:103.
 [eva] Recording results for SizeOfE_tab_acces_1
 [eva] Done for function SizeOfE_tab_acces_1
 [eva] Recording results for main
@@ -120,4 +120,4 @@ unsigned int SizeOfE_tab_acces_1_slice_1(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_10_sizeof.i (no preprocessing)
+[kernel] Parsing result/ocode_10_sizeof.i (no preprocessing)

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/bts1194.c (with preprocessing)
+[kernel] Parsing bts1194.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,21 +7,21 @@
   X ∈ {0}
   v ∈ [--..--]
 [eva] computing for function f <- main.
-  Called from tests/pdg/bts1194.c:32.
+  Called from bts1194.c:32.
 [eva] computing for function input <- f <- main.
-  Called from tests/pdg/bts1194.c:13.
+  Called from bts1194.c:13.
 [eva] using specification for function input
 [eva] Done for function input
-[eva:alarm] tests/pdg/bts1194.c:17: Warning: assertion got status unknown.
+[eva:alarm] bts1194.c:17: Warning: assertion got status unknown.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function h <- main.
-  Called from tests/pdg/bts1194.c:33.
+  Called from bts1194.c:33.
 [eva] computing for function g <- h <- main.
-  Called from tests/pdg/bts1194.c:26.
-[eva] tests/pdg/bts1194.c:20: 
+  Called from bts1194.c:26.
+[eva] bts1194.c:20: 
   function g: no state left, postcondition got status valid.
 [eva] Recording results for g
 [from] Computing for function g
@@ -74,13 +74,13 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to g at tests/pdg/bts1194.c:26 (by h):
+[from] call to g at bts1194.c:26 (by h):
   NON TERMINATING - NO EFFECTS
-[from] call to input at tests/pdg/bts1194.c:13 (by f):
+[from] call to input at bts1194.c:13 (by f):
   \result FROM \nothing
-[from] call to f at tests/pdg/bts1194.c:32 (by main):
+[from] call to f at bts1194.c:32 (by main):
   Y FROM \nothing
-[from] call to h at tests/pdg/bts1194.c:33 (by main):
+[from] call to h at bts1194.c:33 (by main):
   X FROM X; v
 [from] entry point:
   Y FROM \nothing
@@ -116,7 +116,7 @@
   Sure outputs:
     Y; X
 [pdg] computing for function g
-[pdg] tests/pdg/bts1194.c:22: Warning: no final state. Probably unreachable...
+[pdg] bts1194.c:22: Warning: no final state. Probably unreachable...
 [pdg] done for function g
 [pdg] computing for function h
 [pdg] done for function h
@@ -214,14 +214,14 @@
 [eva:initial-state] Values of globals at initialization
   Y ∈ {0}
 [eva] computing for function f_slice_1 <- main.
-  Called from tests/pdg/bts1194.c:32.
+  Called from bts1194.c:32.
 [eva] computing for function input <- f_slice_1 <- main.
-  Called from tests/pdg/bts1194.c:13.
-[kernel:annot:missing-spec] tests/pdg/bts1194.c:13: Warning: 
+  Called from bts1194.c:13.
+[kernel:annot:missing-spec] bts1194.c:13: Warning: 
   Neither code nor specification for function input, generating default assigns from the prototype
 [eva] using specification for function input
 [eva] Done for function input
-[eva:alarm] tests/pdg/bts1194.c:17: Warning: assertion got status unknown.
+[eva:alarm] bts1194.c:17: Warning: assertion got status unknown.
 [eva] Recording results for f_slice_1
 [eva] Done for function f_slice_1
 [eva] Recording results for main

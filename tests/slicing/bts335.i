@@ -3,8 +3,8 @@
 */
 
 /*
-bin/toplevel.opt -slice-pragma g -calldeps -slicing-level 3 tests/slicing/bts335.c -debug 2
-bin/toplevel.opt -pdg-debug -pdg -pdg-debug "-pdg-pot bts335" tests/slicing/bts335.c 
+bin/toplevel.opt -slice-pragma g -calldeps -slicing-level 3 bts335.c -debug 2
+bin/toplevel.opt -pdg-debug -pdg -pdg-debug "-pdg-pot bts335" bts335.c 
  */
 int T[2]  = {0, 0};
 void f (int i) { T[i]++; }

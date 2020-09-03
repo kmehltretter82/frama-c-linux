@@ -1,8 +1,8 @@
-[kernel] Parsing tests/value/CruiseControl.c (with preprocessing)
-[kernel:parser:decimal-float] tests/value/CruiseControl.c:577: Warning: 
+[kernel] Parsing CruiseControl.c (with preprocessing)
+[kernel:parser:decimal-float] CruiseControl.c:577: Warning: 
   Floating-point constant 8.113 is not represented exactly. Will use 0x1.039db22d0e560p3.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
-[kernel] Parsing tests/value/CruiseControl_const.c (with preprocessing)
+[kernel] Parsing CruiseControl_const.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at CruiseControl
 [eva] Computing initial state
 [eva] Initial state computed
@@ -16,44 +16,44 @@
   Ki ∈ {1.0000000000000000*2^-1}
   RegThrottleMax ∈ {45.0000000000000000}
 [eva] computing for function DetectPedalsPressed <- CruiseControl.
-  Called from tests/value/CruiseControl.c:462.
+  Called from CruiseControl.c:462.
 [eva] Recording results for DetectPedalsPressed
 [eva] Done for function DetectPedalsPressed
 [eva] computing for function DetectSpeedLimits <- CruiseControl.
-  Called from tests/value/CruiseControl.c:473.
+  Called from CruiseControl.c:473.
 [eva] Recording results for DetectSpeedLimits
 [eva] Done for function DetectSpeedLimits
 [eva] computing for function CruiseStateMgt <- CruiseControl.
-  Called from tests/value/CruiseControl.c:486.
+  Called from CruiseControl.c:486.
 [eva] Recording results for CruiseStateMgt
 [eva] Done for function CruiseStateMgt
 [eva] computing for function CruiseSpeedMgt <- CruiseControl.
-  Called from tests/value/CruiseControl.c:508.
+  Called from CruiseControl.c:508.
 [eva] Recording results for CruiseSpeedMgt
 [eva] Done for function CruiseSpeedMgt
 [eva] computing for function ThrottleCmd <- CruiseControl.
-  Called from tests/value/CruiseControl.c:525.
+  Called from CruiseControl.c:525.
 [eva] computing for function ThrottleRegulation <- ThrottleCmd <- CruiseControl.
-  Called from tests/value/CruiseControl.c:242.
-[eva:alarm] tests/value/CruiseControl.c:172: Warning: 
+  Called from CruiseControl.c:242.
+[eva:alarm] CruiseControl.c:172: Warning: 
   non-finite float value.
   assert
   \is_finite(\sub_float(_C_->_L1_CruiseControl, _C_->_L2_CruiseControl));
-[eva:alarm] tests/value/CruiseControl.c:175: Warning: 
+[eva:alarm] CruiseControl.c:175: Warning: 
   non-finite float value.
   assert
   \is_finite(\mul_float(_C_->_L3_CruiseControl, _C_->_L6_CruiseControl));
-[eva:alarm] tests/value/CruiseControl.c:194: Warning: 
+[eva:alarm] CruiseControl.c:194: Warning: 
   non-finite float value.
   assert
   \is_finite(\add_float(_C_->_L16_CruiseControl, _C_->_L18_CruiseControl));
-[eva:alarm] tests/value/CruiseControl.c:199: Warning: 
+[eva:alarm] CruiseControl.c:199: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(_C_->ProportionnalAction, _C_->IntegralAction));
 [eva] computing for function SaturateThrottle <- ThrottleRegulation <- 
                           ThrottleCmd <- CruiseControl.
-  Called from tests/value/CruiseControl.c:202.
-[eva:alarm] tests/value/CruiseControl.c:162: Warning: 
+  Called from CruiseControl.c:202.
+[eva:alarm] CruiseControl.c:162: Warning: 
   assertion got status unknown.
 [eva] Recording results for SaturateThrottle
 [eva] Done for function SaturateThrottle

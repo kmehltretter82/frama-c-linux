@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/array_overlap.i (no preprocessing)
+[kernel] Parsing array_overlap.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,17 +12,17 @@
    [5] ∈ {3}
    [6..9] ∈ {0}
   rand ∈ [--..--]
-[eva:alarm] tests/value/array_overlap.i:12: Warning: 
+[eva:alarm] array_overlap.i:12: Warning: 
   partially overlapping lvalue assignment.
   assert
   ptr ≡ (struct S *)((char *)T) ∨ \separated(ptr, (struct S *)((char *)T));
-[eva:alarm] tests/value/array_overlap.i:16: Warning: 
+[eva:alarm] array_overlap.i:16: Warning: 
   partially overlapping lvalue assignment.
   assert
   ptr ≡ (struct S *)((char *)U) ∨ \separated(ptr, (struct S *)((char *)U));
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/array_overlap.i:12: 
+[eva] array_overlap.i:12: 
   assertion 'Eva,overlap' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

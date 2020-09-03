@@ -1,10 +1,10 @@
-[kernel] Parsing tests/misc/bts1201.i (no preprocessing)
+[kernel] Parsing bts1201.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/misc/bts1201.i:5: assertion got status valid.
+[eva] bts1201.i:5: assertion got status valid.
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

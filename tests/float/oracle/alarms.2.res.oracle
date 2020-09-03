@@ -1,4 +1,4 @@
-[kernel] Parsing tests/float/alarms.i (no preprocessing)
+[kernel] Parsing alarms.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -11,8 +11,8 @@
   ull ∈ {0}
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/float/alarms.i:70.
-[eva] tests/float/alarms.i:19: 
+  Called from alarms.i:70.
+[eva] alarms.i:19: 
   Frama_C_dump_each:
   # Cvalue domain:
   u1 ∈ [--..--]
@@ -27,53 +27,53 @@
   l ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:21.
-[kernel:annot:missing-spec] tests/float/alarms.i:21: Warning: 
+  Called from alarms.i:21.
+[kernel:annot:missing-spec] alarms.i:21: Warning: 
   Neither code nor specification for function fd, generating default assigns from the prototype
 [eva] using specification for function fd
 [eva] Done for function fd
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:22.
+  Called from alarms.i:22.
 [eva] Done for function fd
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   non-finite double value. assert \is_finite(vd);
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vd;
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert vd < 9223372036854775808;
-[eva:alarm] tests/float/alarms.i:24: Warning: 
+[eva:alarm] alarms.i:24: Warning: 
   non-finite float value. assert \is_finite(vf);
-[eva:alarm] tests/float/alarms.i:24: Warning: 
+[eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vf;
-[eva:alarm] tests/float/alarms.i:24: Warning: 
+[eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert vf < 9223372036854775808;
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:25.
+  Called from alarms.i:25.
 [eva] Done for function fd
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/float/alarms.i:71.
-[eva] tests/float/alarms.i:41: assertion got status valid.
-[eva] tests/float/alarms.i:42: assertion got status valid.
-[eva:alarm] tests/float/alarms.i:43: Warning: assertion got status unknown.
-[eva:alarm] tests/float/alarms.i:44: Warning: assertion got status unknown.
-[eva] tests/float/alarms.i:47: assertion got status valid.
-[eva:alarm] tests/float/alarms.i:51: Warning: 
+  Called from alarms.i:71.
+[eva] alarms.i:41: assertion got status valid.
+[eva] alarms.i:42: assertion got status valid.
+[eva:alarm] alarms.i:43: Warning: assertion got status unknown.
+[eva:alarm] alarms.i:44: Warning: assertion got status unknown.
+[eva] alarms.i:47: assertion got status valid.
+[eva:alarm] alarms.i:51: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/float/alarms.i:72.
+  Called from alarms.i:72.
 [eva] computing for function fd <- main3 <- main.
-  Called from tests/float/alarms.i:64.
+  Called from alarms.i:64.
 [eva] Done for function fd
 [eva] computing for function fabs <- main3 <- main.
-  Called from tests/float/alarms.i:65.
+  Called from alarms.i:65.
 [eva] Recording results for fabs
 [eva] Done for function fabs
 [eva] Recording results for main3

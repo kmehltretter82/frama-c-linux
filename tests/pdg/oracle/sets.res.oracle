@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/sets.c (with preprocessing)
+[kernel] Parsing sets.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +9,7 @@
   y ∈ [--..--]
   z ∈ [--..--]
   t ∈ [--..--]
-[eva:alarm] tests/pdg/sets.c:15: Warning: 
+[eva:alarm] sets.c:15: Warning: 
   signed overflow. assert b + y ≤ 2147483647;
 [eva] Recording results for f
 [eva] done for function f

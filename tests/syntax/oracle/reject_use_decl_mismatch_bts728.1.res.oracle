@@ -1,9 +1,9 @@
-[kernel] Parsing tests/syntax/reject_use_decl_mismatch_bts728.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/syntax/reject_use_decl_mismatch_bts728.c:15: Warning: 
+[kernel] Parsing reject_use_decl_mismatch_bts728.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] reject_use_decl_mismatch_bts728.c:15: Warning: 
   Calling undeclared function f. Old style K&R code?
-[kernel] tests/syntax/reject_use_decl_mismatch_bts728.c:19: User Error: 
-  Declaration of f does not match previous declaration from tests/syntax/reject_use_decl_mismatch_bts728.c:15 (different number of arguments).
-[kernel] tests/syntax/reject_use_decl_mismatch_bts728.c:19: User Error: 
+[kernel] reject_use_decl_mismatch_bts728.c:19: User Error: 
+  Declaration of f does not match previous declaration from reject_use_decl_mismatch_bts728.c:15 (different number of arguments).
+[kernel] reject_use_decl_mismatch_bts728.c:19: User Error: 
   Inconsistent formals
   17    }
   18    
@@ -11,6 +11,6 @@
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   20      x = 17;
   21      y=18;
-[kernel] User Error: stopping on file "tests/syntax/reject_use_decl_mismatch_bts728.c" that has
+[kernel] User Error: stopping on file "reject_use_decl_mismatch_bts728.c" that has
   errors. Add '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

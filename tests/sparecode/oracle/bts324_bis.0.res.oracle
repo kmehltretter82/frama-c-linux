@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/bts324_bis.i (no preprocessing)
+[kernel] Parsing bts324_bis.i (no preprocessing)
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main
@@ -15,58 +15,58 @@
   f_si[0..1] ∈ {0}
   f_so[0..1] ∈ {0}
 [eva] computing for function init <- main.
-  Called from tests/sparecode/bts324_bis.i:37.
+  Called from bts324_bis.i:37.
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:40.
+  Called from bts324_bis.i:40.
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:22.
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+  Called from bts324_bis.i:22.
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ ki[i] * (int)(vi - f_si[i]);
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert ki[i] * (int)(vi - f_si[i]) ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:23.
+  Called from bts324_bis.i:23.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for loop_body
 [eva] Done for function loop_body
-[eva] tests/sparecode/bts324_bis.i:39: starting to merge loop iterations
+[eva] bts324_bis.i:39: starting to merge loop iterations
 [eva] computing for function loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:40.
+  Called from bts324_bis.i:40.
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:22.
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+  Called from bts324_bis.i:22.
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ vi - f_si[i];
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert vi - f_si[i] ≤ 2147483647;
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow.
   assert
   -2147483648 ≤ (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i]));
-[eva:alarm] tests/sparecode/bts324_bis.i:10: Warning: 
+[eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow.
   assert
   (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i])) ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:23.
+  Called from bts324_bis.i:23.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for loop_body
 [eva] Done for function loop_body
 [eva] computing for function loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:40.
+  Called from bts324_bis.i:40.
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:22.
+  Called from bts324_bis.i:22.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- loop_body <- main.
-  Called from tests/sparecode/bts324_bis.i:23.
+  Called from bts324_bis.i:23.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for loop_body
@@ -80,7 +80,7 @@
 [from] Computing for function f <-loop_body
 [from] Done for function f
 [from] Done for function loop_body
-[pdg] tests/sparecode/bts324_bis.i:47: Warning: 
+[pdg] bts324_bis.i:47: Warning: 
   no final state. Probably unreachable...
 [pdg] done for function main
 [sparecode] add selection in function 'main'

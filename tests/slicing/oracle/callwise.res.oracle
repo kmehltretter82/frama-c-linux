@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/callwise.i (no preprocessing)
+[kernel] Parsing callwise.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,93 +9,93 @@
   d ∈ {1}
   p ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/slicing/callwise.i:39.
+  Called from callwise.i:39.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/slicing/callwise.i:40.
+  Called from callwise.i:40.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function choose <- main.
-  Called from tests/slicing/callwise.i:42.
+  Called from callwise.i:42.
 [eva] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
 [eva] Done for function choose
 [eva] computing for function choose <- main.
-  Called from tests/slicing/callwise.i:43.
+  Called from callwise.i:43.
 [eva] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
 [eva] Done for function choose
 [eva] computing for function fs163_main <- main.
-  Called from tests/slicing/callwise.i:45.
+  Called from callwise.i:45.
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:24.
+  Called from callwise.i:24.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:25.
+  Called from callwise.i:25.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:26.
+  Called from callwise.i:26.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:27.
+  Called from callwise.i:27.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:28.
+  Called from callwise.i:28.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:30.
+  Called from callwise.i:30.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
-[eva] tests/slicing/callwise.i:29: starting to merge loop iterations
+[eva] callwise.i:29: starting to merge loop iterations
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:30.
-[eva] Recording results for fs163_f
-[from] Computing for function fs163_f
-[from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:30.
+  Called from callwise.i:30.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:30.
+  Called from callwise.i:30.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
 [eva] computing for function fs163_f <- fs163_main <- main.
-  Called from tests/slicing/callwise.i:30.
+  Called from callwise.i:30.
 [eva] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
-[eva:alarm] tests/slicing/callwise.i:32: Warning: 
+[eva] computing for function fs163_f <- fs163_main <- main.
+  Called from callwise.i:30.
+[eva] Recording results for fs163_f
+[from] Computing for function fs163_f
+[from] Done for function fs163_f
+[eva] Done for function fs163_f
+[eva:alarm] callwise.i:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&T[3]);
 [eva] Recording results for fs163_main
 [from] Computing for function fs163_main
@@ -106,27 +106,27 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to fs163_f at tests/slicing/callwise.i:24 (by fs163_main):
+[from] call to fs163_f at callwise.i:24 (by fs163_main):
   A FROM p_0; n
-[from] call to fs163_f at tests/slicing/callwise.i:25 (by fs163_main):
+[from] call to fs163_f at callwise.i:25 (by fs163_main):
   B FROM p_0; n
-[from] call to fs163_f at tests/slicing/callwise.i:26 (by fs163_main):
+[from] call to fs163_f at callwise.i:26 (by fs163_main):
   C FROM p_0; n
-[from] call to fs163_f at tests/slicing/callwise.i:27 (by fs163_main):
+[from] call to fs163_f at callwise.i:27 (by fs163_main):
   T[0] FROM p_0; n
-[from] call to fs163_f at tests/slicing/callwise.i:28 (by fs163_main):
+[from] call to fs163_f at callwise.i:28 (by fs163_main):
   T[1] FROM p_0; n
-[from] call to fs163_f at tests/slicing/callwise.i:30 (by fs163_main):
+[from] call to fs163_f at callwise.i:30 (by fs163_main):
   T[0..4] FROM p_0; n (and SELF)
-[from] call to f at tests/slicing/callwise.i:39 (by main):
+[from] call to f at callwise.i:39 (by main):
   a FROM a; b; p_0; q
-[from] call to f at tests/slicing/callwise.i:40 (by main):
+[from] call to f at callwise.i:40 (by main):
   c FROM c; d; p_0; q
-[from] call to choose at tests/slicing/callwise.i:42 (by main):
+[from] call to choose at callwise.i:42 (by main):
   \result FROM cond; y
-[from] call to choose at tests/slicing/callwise.i:43 (by main):
+[from] call to choose at callwise.i:43 (by main):
   \result FROM cond; x
-[from] call to fs163_main at tests/slicing/callwise.i:45 (by main):
+[from] call to fs163_main at callwise.i:45 (by main):
   \result FROM \nothing
 [from] entry point:
   a FROM a; b
@@ -209,4 +209,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_callwise.i (no preprocessing)
+[kernel] Parsing result/ocode_0_callwise.i (no preprocessing)

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/divneg.i (no preprocessing)
+[kernel] Parsing divneg.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -17,8 +17,8 @@
   rn4 ∈ {-3}
   rn5 ∈ {0}
   vic ∈ {0}
-[eva] tests/value/divneg.i:13: Frama_C_show_each: [-185..-5],4%9, [1..61],1%3
-[eva] tests/value/divneg.i:42: 
+[eva] divneg.i:13: Frama_C_show_each: [-185..-5],4%9, [1..61],1%3
+[eva] divneg.i:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   i ∈ [-100..100]
@@ -39,7 +39,7 @@
   rc ∈ [-176..-14],4%18 or UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/value/divneg.i:52: Frama_C_show_each_should: {-1}
+[eva] divneg.i:52: Frama_C_show_each_should: {-1}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

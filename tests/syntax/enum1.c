@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"tests/syntax/enum2.c"
+   STDOPT: +"enum2.c"
 */
 
 

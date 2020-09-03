@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/const.i (no preprocessing)
+[kernel] Parsing const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -18,130 +18,130 @@
    [5] ∈ {6}
    [6..9] ∈ {0}
 [eva] computing for function const_formal <- main.
-  Called from tests/value/const.i:116.
-[eva] tests/value/const.i:20: Frama_C_show_each: [-2147483648..2147483647]
-[eva:alarm] tests/value/const.i:21: Warning: 
+  Called from const.i:116.
+[eva] const.i:20: Frama_C_show_each: [-2147483648..2147483647]
+[eva:alarm] const.i:21: Warning: 
   out of bounds write. assert \valid(&i);
-[kernel] tests/value/const.i:21: Warning: 
+[kernel] const.i:21: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for const_formal
 [eva] Done for function const_formal
 [eva] computing for function const_formal <- main.
-  Called from tests/value/const.i:117.
-[eva] tests/value/const.i:20: Frama_C_show_each: {42}
+  Called from const.i:117.
+[eva] const.i:20: Frama_C_show_each: {42}
 [eva] Recording results for const_formal
 [eva] Done for function const_formal
 [eva] computing for function modify_I <- main.
-  Called from tests/value/const.i:118.
-[eva] tests/value/const.i:37: Frama_C_show_each: {2}
+  Called from const.i:118.
+[eva] const.i:37: Frama_C_show_each: {2}
 [eva] computing for function pointer_to_const <- modify_I <- main.
-  Called from tests/value/const.i:38.
-[eva] tests/value/const.i:25: Frama_C_show_each: {2}
-[eva:alarm] tests/value/const.i:26: Warning: 
+  Called from const.i:38.
+[eva] const.i:25: Frama_C_show_each: {2}
+[eva:alarm] const.i:26: Warning: 
   out of bounds write. assert \valid(p);
-[kernel] tests/value/const.i:26: Warning: 
+[kernel] const.i:26: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for pointer_to_const
 [eva] Done for function pointer_to_const
 [eva] computing for function const_destination <- modify_I <- main.
-  Called from tests/value/const.i:39.
-[eva] tests/value/const.i:31: Frama_C_show_each: {2}
-[eva:alarm] tests/value/const.i:32: Warning: 
+  Called from const.i:39.
+[eva] const.i:31: Frama_C_show_each: {2}
+[eva:alarm] const.i:32: Warning: 
   out of bounds write. assert \valid(p);
-[kernel] tests/value/const.i:32: Warning: 
+[kernel] const.i:32: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for const_destination
 [eva] Done for function const_destination
 [eva] Recording results for modify_I
 [eva] Done for function modify_I
 [eva] computing for function modify_J <- main.
-  Called from tests/value/const.i:119.
-[eva] tests/value/const.i:43: Frama_C_show_each: {8}
+  Called from const.i:119.
+[eva] const.i:43: Frama_C_show_each: {8}
 [eva] computing for function pointer_to_const <- modify_J <- main.
-  Called from tests/value/const.i:45.
-[eva] tests/value/const.i:25: Frama_C_show_each: {8; 9}
-[eva] tests/value/const.i:27: Frama_C_show_each_dead:
+  Called from const.i:45.
+[eva] const.i:25: Frama_C_show_each: {8; 9}
+[eva] const.i:27: Frama_C_show_each_dead:
 [eva] Recording results for pointer_to_const
 [eva] Done for function pointer_to_const
 [eva] computing for function const_destination <- modify_J <- main.
-  Called from tests/value/const.i:46.
-[eva] tests/value/const.i:31: Frama_C_show_each: {0; 8; 9}
-[eva] tests/value/const.i:33: Frama_C_show_each: {{ &J }}
+  Called from const.i:46.
+[eva] const.i:31: Frama_C_show_each: {0; 8; 9}
+[eva] const.i:33: Frama_C_show_each: {{ &J }}
 [eva] Recording results for const_destination
 [eva] Done for function const_destination
 [eva] Recording results for modify_J
 [eva] Done for function modify_J
 [eva] computing for function modify_s <- main.
-  Called from tests/value/const.i:120.
-[eva] tests/value/const.i:50: Frama_C_show_each: {3}
+  Called from const.i:120.
+[eva] const.i:50: Frama_C_show_each: {3}
 [eva] computing for function pointer_to_const <- modify_s <- main.
-  Called from tests/value/const.i:51.
-[eva] tests/value/const.i:25: Frama_C_show_each: {4}
+  Called from const.i:51.
+[eva] const.i:25: Frama_C_show_each: {4}
 [eva] Recording results for pointer_to_const
 [eva] Done for function pointer_to_const
 [eva] computing for function const_destination <- modify_s <- main.
-  Called from tests/value/const.i:52.
-[eva] tests/value/const.i:31: Frama_C_show_each: {4}
+  Called from const.i:52.
+[eva] const.i:31: Frama_C_show_each: {4}
 [eva] Recording results for const_destination
 [eva] Done for function const_destination
 [eva] Recording results for modify_s
 [eva] Done for function modify_s
 [eva] computing for function modify_t <- main.
-  Called from tests/value/const.i:121.
-[eva] tests/value/const.i:56: Frama_C_show_each: {6}
+  Called from const.i:121.
+[eva] const.i:56: Frama_C_show_each: {6}
 [eva] computing for function pointer_to_const <- modify_t <- main.
-  Called from tests/value/const.i:57.
-[eva] tests/value/const.i:25: Frama_C_show_each: {4}
+  Called from const.i:57.
+[eva] const.i:25: Frama_C_show_each: {4}
 [eva] Recording results for pointer_to_const
 [eva] Done for function pointer_to_const
 [eva] computing for function const_destination <- modify_t <- main.
-  Called from tests/value/const.i:58.
-[eva] tests/value/const.i:31: Frama_C_show_each: {3}
+  Called from const.i:58.
+[eva] const.i:31: Frama_C_show_each: {3}
 [eva] Recording results for const_destination
 [eva] Done for function const_destination
 [eva] Recording results for modify_t
 [eva] Done for function modify_t
 [eva] computing for function constrain_G <- main.
-  Called from tests/value/const.i:122.
-[eva:alarm] tests/value/const.i:67: Warning: assertion got status unknown.
-[eva] tests/value/const.i:70: Frama_C_show_each: {1; 4}
+  Called from const.i:122.
+[eva:alarm] const.i:67: Warning: assertion got status unknown.
+[eva] const.i:70: Frama_C_show_each: {1; 4}
 [eva] Recording results for constrain_G
 [eva] Done for function constrain_G
 [eva] computing for function pointer_to_const_logic <- main.
-  Called from tests/value/const.i:123.
+  Called from const.i:123.
 [eva] Recording results for pointer_to_const_logic
 [eva] Done for function pointer_to_const_logic
 [eva] computing for function local_const <- main.
-  Called from tests/value/const.i:124.
+  Called from const.i:124.
 [eva] computing for function f <- local_const <- main.
-  Called from tests/value/const.i:84.
+  Called from const.i:84.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for local_const
 [eva] Done for function local_const
 [eva] computing for function ret_const <- main.
-  Called from tests/value/const.i:125.
+  Called from const.i:125.
 [eva] computing for function aux_ret_const <- ret_const <- main.
-  Called from tests/value/const.i:94.
+  Called from const.i:94.
 [eva] Recording results for aux_ret_const
 [eva] Done for function aux_ret_const
 [eva] Recording results for ret_const
 [eva] Done for function ret_const
 [eva] computing for function build_S <- main.
-  Called from tests/value/const.i:127.
+  Called from const.i:127.
 [eva] Recording results for build_S
 [eva] Done for function build_S
-[eva] tests/value/const.i:128: Frama_C_show_each_S1: {1}, {2}
+[eva] const.i:128: Frama_C_show_each_S1: {1}, {2}
 [eva] computing for function mutable_test <- main.
-  Called from tests/value/const.i:129.
+  Called from const.i:129.
 [eva] Recording results for mutable_test
 [eva] Done for function mutable_test
-[eva] tests/value/const.i:130: Frama_C_show_each_S2: {45}, {2}
+[eva] const.i:130: Frama_C_show_each_S2: {45}, {2}
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/const.i:21: 
+[eva] const.i:21: 
   assertion 'Eva,mem_access' got final status invalid.
-[eva] tests/value/const.i:26: 
+[eva] const.i:26: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function aux_ret_const:

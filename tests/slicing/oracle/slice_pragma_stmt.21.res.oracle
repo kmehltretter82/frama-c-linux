@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/slice_pragma_stmt.i (no preprocessing)
+[kernel] Parsing slice_pragma_stmt.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at test8
 [eva] Computing initial state
@@ -6,9 +6,9 @@
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
-[eva:alarm] tests/slicing/slice_pragma_stmt.i:152: Warning: 
+[eva:alarm] slice_pragma_stmt.i:152: Warning: 
   signed overflow. assert c1 + 1 ≤ 2147483647;
-[eva:alarm] tests/slicing/slice_pragma_stmt.i:152: Warning: 
+[eva:alarm] slice_pragma_stmt.i:152: Warning: 
   signed overflow. assert c2 + 1 ≤ 2147483647;
 [eva] Recording results for test8
 [eva] done for function test8
@@ -46,4 +46,4 @@ void test8(int c1, int c2)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_21_slice_pragma_stmt.i (no preprocessing)
+[kernel] Parsing result/ocode_21_slice_pragma_stmt.i (no preprocessing)

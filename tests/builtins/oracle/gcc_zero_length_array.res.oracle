@@ -1,20 +1,20 @@
-[kernel] Parsing tests/builtins/gcc_zero_length_array.c (with preprocessing)
+[kernel] Parsing gcc_zero_length_array.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function make_fam <- main.
-  Called from tests/builtins/gcc_zero_length_array.c:24.
-[eva] tests/builtins/gcc_zero_length_array.c:15: Call to builtin malloc
-[eva] tests/builtins/gcc_zero_length_array.c:15: 
+  Called from gcc_zero_length_array.c:24.
+[eva] gcc_zero_length_array.c:15: Call to builtin malloc
+[eva] gcc_zero_length_array.c:15: 
   allocating variable __malloc_make_fam_l15
 [eva] Recording results for make_fam
 [eva] Done for function make_fam
-[eva] tests/builtins/gcc_zero_length_array.c:26: Call to builtin free
-[eva] tests/builtins/gcc_zero_length_array.c:26: 
+[eva] gcc_zero_length_array.c:26: Call to builtin free
+[eva] gcc_zero_length_array.c:26: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/gcc_zero_length_array.c:26: 
+[eva:malloc] gcc_zero_length_array.c:26: 
   strong free on bases: {__malloc_make_fam_l15}
 [eva] Recording results for main
 [eva] done for function main

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/deps_mixed.i (no preprocessing)
+[kernel] Parsing deps_mixed.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,32 +12,32 @@
   v ∈ [--..--]
   t[0] ∈ {{ &f }}
    [1] ∈ {{ &g }}
-[eva:alarm] tests/value/deps_mixed.i:20: Warning: 
+[eva:alarm] deps_mixed.i:20: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
-[eva:alarm] tests/value/deps_mixed.i:20: Warning: 
+[eva:alarm] deps_mixed.i:20: Warning: 
   out of bounds read. assert \valid_read(p + (int)q);
-[eva:alarm] tests/value/deps_mixed.i:22: Warning: 
+[eva:alarm] deps_mixed.i:22: Warning: 
   accessing out of bounds index. assert 0 ≤ i0;
-[eva:alarm] tests/value/deps_mixed.i:22: Warning: 
+[eva:alarm] deps_mixed.i:22: Warning: 
   accessing out of bounds index. assert i0 < 2;
 [eva] computing for function g <- main.
-  Called from tests/value/deps_mixed.i:22.
+  Called from deps_mixed.i:22.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function f <- main.
-  Called from tests/value/deps_mixed.i:22.
+  Called from deps_mixed.i:22.
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] tests/value/deps_mixed.i:24: Warning: 
+[eva:alarm] deps_mixed.i:24: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
-[eva:alarm] tests/value/deps_mixed.i:24: Warning: 
+[eva:alarm] deps_mixed.i:24: Warning: 
   pointer downcast. assert (unsigned int)(p + (int)q) ≤ 2147483647;
-[eva] tests/value/deps_mixed.i:24: 
+[eva] deps_mixed.i:24: 
   Assigning imprecise value to __retres.
-  The imprecision originates from Arithmetic {tests/value/deps_mixed.i:24}
-[eva] tests/value/deps_mixed.i:24: 
+  The imprecision originates from Arithmetic {deps_mixed.i:24}
+[eva] deps_mixed.i:24: 
   Assigning imprecise value to \result<main>.
-  The imprecision originates from Arithmetic {tests/value/deps_mixed.i:24}
+  The imprecision originates from Arithmetic {deps_mixed.i:24}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -52,7 +52,7 @@
   s ∈ [--..--]
   __retres ∈
           {{ garbled mix of &{a; b}
-           (origin: Arithmetic {tests/value/deps_mixed.i:24}) }}
+           (origin: Arithmetic {deps_mixed.i:24}) }}
 [from] Computing for function f
 [from] Done for function f
 [from] Computing for function g

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/strlen.c (with preprocessing)
+[kernel] Parsing strlen.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -31,330 +31,330 @@
                      [11] ∈ {100}
   nondet ∈ [--..--]
 [eva] computing for function small_sets <- main.
-  Called from tests/builtins/strlen.c:334.
-[eva] tests/builtins/strlen.c:60: Call to builtin strlen
-[eva] tests/builtins/strlen.c:60: 
+  Called from strlen.c:334.
+[eva] strlen.c:60: Call to builtin strlen
+[eva] strlen.c:60: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:61: assertion got status valid.
-[eva] tests/builtins/strlen.c:65: Call to builtin strlen
-[eva] tests/builtins/strlen.c:65: 
+[eva] strlen.c:61: assertion got status valid.
+[eva] strlen.c:65: Call to builtin strlen
+[eva] strlen.c:65: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:66: assertion got status valid.
-[eva] tests/builtins/strlen.c:70: Call to builtin strlen
-[eva] tests/builtins/strlen.c:70: 
+[eva] strlen.c:66: assertion got status valid.
+[eva] strlen.c:70: Call to builtin strlen
+[eva] strlen.c:70: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:71: assertion got status valid.
-[eva] tests/builtins/strlen.c:75: Call to builtin strlen
-[eva] tests/builtins/strlen.c:75: 
+[eva] strlen.c:71: assertion got status valid.
+[eva] strlen.c:75: Call to builtin strlen
+[eva] strlen.c:75: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:76: assertion got status valid.
-[eva] tests/builtins/strlen.c:81: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:81: Warning: 
+[eva] strlen.c:76: assertion got status valid.
+[eva] strlen.c:81: Call to builtin strlen
+[eva:alarm] strlen.c:81: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:82: assertion got status valid.
+[eva] strlen.c:82: assertion got status valid.
 [eva] Recording results for small_sets
 [eva] Done for function small_sets
 [eva] computing for function zero_termination <- main.
-  Called from tests/builtins/strlen.c:335.
-[eva] tests/builtins/strlen.c:89: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:89: Warning: 
+  Called from strlen.c:335.
+[eva] strlen.c:89: Call to builtin strlen
+[eva:alarm] strlen.c:89: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:90: assertion got status valid.
-[eva] tests/builtins/strlen.c:93: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:93: Warning: 
+[eva] strlen.c:90: assertion got status valid.
+[eva] strlen.c:93: Call to builtin strlen
+[eva:alarm] strlen.c:93: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strlen.c:97: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:97: Warning: 
+[eva] strlen.c:97: Call to builtin strlen
+[eva:alarm] strlen.c:97: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for zero_termination
 [eva] Done for function zero_termination
 [eva] computing for function strlen_initialization <- main.
-  Called from tests/builtins/strlen.c:336.
-[eva] tests/builtins/strlen.c:105: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:105: Warning: 
+  Called from strlen.c:336.
+[eva] strlen.c:105: Call to builtin strlen
+[eva:alarm] strlen.c:105: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:106: assertion got status valid.
-[eva] tests/builtins/strlen.c:109: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:109: Warning: 
+[eva] strlen.c:106: assertion got status valid.
+[eva] strlen.c:109: Call to builtin strlen
+[eva:alarm] strlen.c:109: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strlen.c:116: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:116: Warning: 
+[eva] strlen.c:116: Call to builtin strlen
+[eva:alarm] strlen.c:116: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:117: assertion got status valid.
-[eva] tests/builtins/strlen.c:124: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:124: Warning: 
+[eva] strlen.c:117: assertion got status valid.
+[eva] strlen.c:124: Call to builtin strlen
+[eva:alarm] strlen.c:124: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:125: assertion got status valid.
+[eva] strlen.c:125: assertion got status valid.
 [eva] Recording results for strlen_initialization
 [eva] Done for function strlen_initialization
 [eva] computing for function strlen_large <- main.
-  Called from tests/builtins/strlen.c:337.
+  Called from strlen.c:337.
 [eva] computing for function init_array_nondet <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:168.
-[eva] tests/builtins/strlen.c:161: Call to builtin memset
-[eva] tests/builtins/strlen.c:161: 
+  Called from strlen.c:168.
+[eva] strlen.c:161: Call to builtin memset
+[eva] strlen.c:161: 
   function memset: precondition 'valid_s' got status valid.
 [eva] share/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:171.
+  Called from strlen.c:171.
 [eva] using specification for function Frama_C_interval
-[eva] tests/builtins/strlen.c:171: 
+[eva] strlen.c:171: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:172: Call to builtin strlen
-[eva] tests/builtins/strlen.c:172: 
+[eva] strlen.c:172: Call to builtin strlen
+[eva] strlen.c:172: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:173: assertion got status valid.
+[eva] strlen.c:173: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:175.
-[eva] tests/builtins/strlen.c:175: 
+  Called from strlen.c:175.
+[eva] strlen.c:175: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:176: Call to builtin strlen
-[eva] tests/builtins/strlen.c:176: 
+[eva] strlen.c:176: Call to builtin strlen
+[eva] strlen.c:176: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:177: assertion got status valid.
+[eva] strlen.c:177: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:179.
-[eva] tests/builtins/strlen.c:179: 
+  Called from strlen.c:179.
+[eva] strlen.c:179: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:180: Call to builtin strlen
-[eva] tests/builtins/strlen.c:180: 
+[eva] strlen.c:180: Call to builtin strlen
+[eva] strlen.c:180: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:181: assertion got status valid.
+[eva] strlen.c:181: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:183.
-[eva] tests/builtins/strlen.c:183: 
+  Called from strlen.c:183.
+[eva] strlen.c:183: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:184: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:184: Warning: 
+[eva] strlen.c:184: Call to builtin strlen
+[eva:alarm] strlen.c:184: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:185: assertion got status valid.
+[eva] strlen.c:185: assertion got status valid.
 [eva] computing for function init_array_nondet <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:187.
-[eva] tests/builtins/strlen.c:161: Call to builtin memset
+  Called from strlen.c:187.
+[eva] strlen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strlen_large <- main.
-  Called from tests/builtins/strlen.c:188.
-[eva] tests/builtins/strlen.c:188: 
+  Called from strlen.c:188.
+[eva] strlen.c:188: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:189: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:189: Warning: 
+[eva] strlen.c:189: Call to builtin strlen
+[eva:alarm] strlen.c:189: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:190: assertion got status valid.
+[eva] strlen.c:190: assertion got status valid.
 [eva] Recording results for strlen_large
 [eva] Done for function strlen_large
 [eva] computing for function strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:338.
+  Called from strlen.c:338.
 [eva] computing for function init_array_nondet <- strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:197.
-[eva] tests/builtins/strlen.c:161: Call to builtin memset
+  Called from strlen.c:197.
+[eva] strlen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function init_array_nondet <- strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:198.
-[eva] tests/builtins/strlen.c:161: Call to builtin memset
+  Called from strlen.c:198.
+[eva] strlen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:202.
-[eva] tests/builtins/strlen.c:202: 
+  Called from strlen.c:202.
+[eva] strlen.c:202: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:203: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:203: Warning: 
+[eva] strlen.c:203: Call to builtin strlen
+[eva:alarm] strlen.c:203: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:204: assertion got status valid.
+[eva] strlen.c:204: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:207.
-[eva] tests/builtins/strlen.c:207: 
+  Called from strlen.c:207.
+[eva] strlen.c:207: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:208: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:208: Warning: 
+[eva] strlen.c:208: Call to builtin strlen
+[eva:alarm] strlen.c:208: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:209: assertion got status valid.
+[eva] strlen.c:209: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strlen_large_uninit <- main.
-  Called from tests/builtins/strlen.c:211.
-[eva] tests/builtins/strlen.c:211: 
+  Called from strlen.c:211.
+[eva] strlen.c:211: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:212: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:212: Warning: 
+[eva] strlen.c:212: Call to builtin strlen
+[eva:alarm] strlen.c:212: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:213: assertion got status valid.
+[eva] strlen.c:213: assertion got status valid.
 [eva] Recording results for strlen_large_uninit
 [eva] Done for function strlen_large_uninit
 [eva] computing for function misc <- main.
-  Called from tests/builtins/strlen.c:339.
-[eva] tests/builtins/strlen.c:241: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:241: Warning: 
+  Called from strlen.c:339.
+[eva] strlen.c:241: Call to builtin strlen
+[eva:alarm] strlen.c:241: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strlen.c:244: Call to builtin strlen
-[eva] tests/builtins/strlen.c:244: 
+[eva] strlen.c:244: Call to builtin strlen
+[eva] strlen.c:244: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:245: assertion got status valid.
-[eva] tests/builtins/strlen.c:248: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:248: Warning: 
+[eva] strlen.c:245: assertion got status valid.
+[eva] strlen.c:248: Call to builtin strlen
+[eva:alarm] strlen.c:248: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:249: assertion got status valid.
+[eva] strlen.c:249: assertion got status valid.
 [eva] computing for function Frama_C_interval <- misc <- main.
-  Called from tests/builtins/strlen.c:250.
-[eva] tests/builtins/strlen.c:250: 
+  Called from strlen.c:250.
+[eva] strlen.c:250: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:252: Call to builtin strlen
-[eva] tests/builtins/strlen.c:252: 
+[eva] strlen.c:252: Call to builtin strlen
+[eva] strlen.c:252: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:253: assertion got status valid.
-[eva] tests/builtins/strlen.c:255: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:255: Warning: 
+[eva] strlen.c:253: assertion got status valid.
+[eva] strlen.c:255: Call to builtin strlen
+[eva:alarm] strlen.c:255: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strlen.c:256: Call to builtin strlen
-[eva] tests/builtins/strlen.c:256: 
+[eva] strlen.c:256: Call to builtin strlen
+[eva] strlen.c:256: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:257: assertion got status valid.
-[eva] tests/builtins/strlen.c:260: Call to builtin strlen
-[eva] tests/builtins/strlen.c:260: 
+[eva] strlen.c:257: assertion got status valid.
+[eva] strlen.c:260: Call to builtin strlen
+[eva] strlen.c:260: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:261: assertion got status valid.
-[eva] tests/builtins/strlen.c:265: Call to builtin strlen
-[eva] tests/builtins/strlen.c:265: 
+[eva] strlen.c:261: assertion got status valid.
+[eva] strlen.c:265: Call to builtin strlen
+[eva] strlen.c:265: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:266: assertion got status valid.
-[eva] tests/builtins/strlen.c:270: Call to builtin strlen
-[eva] tests/builtins/strlen.c:270: 
+[eva] strlen.c:266: assertion got status valid.
+[eva] strlen.c:270: Call to builtin strlen
+[eva] strlen.c:270: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:271: assertion got status valid.
-[eva] tests/builtins/strlen.c:269: starting to merge loop iterations
-[eva] tests/builtins/strlen.c:270: Call to builtin strlen
-[eva] tests/builtins/strlen.c:270: Call to builtin strlen
-[eva] tests/builtins/strlen.c:270: Call to builtin strlen
-[eva] tests/builtins/strlen.c:270: Call to builtin strlen
-[eva] tests/builtins/strlen.c:277: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:277: Warning: 
+[eva] strlen.c:271: assertion got status valid.
+[eva] strlen.c:269: starting to merge loop iterations
+[eva] strlen.c:270: Call to builtin strlen
+[eva] strlen.c:270: Call to builtin strlen
+[eva] strlen.c:270: Call to builtin strlen
+[eva] strlen.c:270: Call to builtin strlen
+[eva] strlen.c:277: Call to builtin strlen
+[eva:alarm] strlen.c:277: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:278: assertion got status valid.
+[eva] strlen.c:278: assertion got status valid.
 [eva] Recording results for misc
 [eva] Done for function misc
 [eva] computing for function bitfields <- main.
-  Called from tests/builtins/strlen.c:340.
-[eva] tests/builtins/strlen.c:140: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:140: Warning: 
+  Called from strlen.c:340.
+[eva] strlen.c:140: Call to builtin strlen
+[eva:alarm] strlen.c:140: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for bitfields
 [eva] Done for function bitfields
 [eva] computing for function bitfields2 <- main.
-  Called from tests/builtins/strlen.c:341.
-[eva] tests/builtins/strlen.c:155: Call to builtin strlen
-[eva] tests/builtins/strlen.c:155: 
+  Called from strlen.c:341.
+[eva] strlen.c:155: Call to builtin strlen
+[eva] strlen.c:155: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:156: assertion got status valid.
+[eva] strlen.c:156: assertion got status valid.
 [eva] Recording results for bitfields2
 [eva] Done for function bitfields2
 [eva] computing for function escaping <- main.
-  Called from tests/builtins/strlen.c:342.
-[eva:alarm] tests/builtins/strlen.c:222: Warning: 
+  Called from strlen.c:342.
+[eva:alarm] strlen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:locals-escaping] tests/builtins/strlen.c:222: Warning: 
+[eva:locals-escaping] strlen.c:222: Warning: 
   locals {x} escaping the scope of a block of escaping through s
-[eva] tests/builtins/strlen.c:225: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:225: Warning: 
+[eva] strlen.c:225: Call to builtin strlen
+[eva:alarm] strlen.c:225: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:226: assertion got status valid.
-[eva] tests/builtins/strlen.c:228: Call to builtin strlen
-[eva] tests/builtins/strlen.c:228: 
+[eva] strlen.c:226: assertion got status valid.
+[eva] strlen.c:228: Call to builtin strlen
+[eva] strlen.c:228: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strlen.c:229: assertion got status valid.
+[eva] strlen.c:229: assertion got status valid.
 [eva] Recording results for escaping
 [eva] Done for function escaping
 [eva] computing for function big_array <- main.
-  Called from tests/builtins/strlen.c:343.
-[eva:alarm] tests/builtins/strlen.c:287: Warning: 
+  Called from strlen.c:343.
+[eva:alarm] strlen.c:287: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strlen.c:289: Warning: 
+[eva:alarm] strlen.c:289: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strlen.c:291: Warning: 
+[eva:alarm] strlen.c:291: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/builtins/strlen.c:297: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:297: Warning: 
+[eva] strlen.c:297: Call to builtin strlen
+[eva:alarm] strlen.c:297: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:298: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:298: Warning: 
+[eva] strlen.c:298: Call to builtin strlen
+[eva:alarm] strlen.c:298: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:299: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:299: Warning: 
+[eva] strlen.c:299: Call to builtin strlen
+[eva:alarm] strlen.c:299: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:300: Frama_C_show_each: {1}, {1}, {1}
-[eva] tests/builtins/strlen.c:302: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:302: Warning: 
+[eva] strlen.c:300: Frama_C_show_each: {1}, {1}, {1}
+[eva] strlen.c:302: Call to builtin strlen
+[eva:alarm] strlen.c:302: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:303: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:303: Warning: 
+[eva] strlen.c:303: Call to builtin strlen
+[eva:alarm] strlen.c:303: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:304: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:304: Warning: 
+[eva] strlen.c:304: Call to builtin strlen
+[eva:alarm] strlen.c:304: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strlen.c:305: Frama_C_show_each: {1}, {1}, {1}
+[eva] strlen.c:305: Frama_C_show_each: {1}, {1}, {1}
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.
-  Called from tests/builtins/strlen.c:344.
-[eva] tests/builtins/strlen.c:310: starting to merge loop iterations
+  Called from strlen.c:344.
+[eva] strlen.c:310: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:314.
-[eva] tests/builtins/strlen.c:314: 
+  Called from strlen.c:314.
+[eva] strlen.c:314: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:315: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:315: Warning: 
+[eva] strlen.c:315: Call to builtin strlen
+[eva:alarm] strlen.c:315: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:318.
-[eva] tests/builtins/strlen.c:318: 
+  Called from strlen.c:318.
+[eva] strlen.c:318: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:319: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:319: Warning: 
+[eva] strlen.c:319: Call to builtin strlen
+[eva:alarm] strlen.c:319: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:321.
-[eva] tests/builtins/strlen.c:321: 
+  Called from strlen.c:321.
+[eva] strlen.c:321: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:322: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:322: Warning: 
+[eva] strlen.c:322: Call to builtin strlen
+[eva:alarm] strlen.c:322: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:323.
-[eva] tests/builtins/strlen.c:323: 
+  Called from strlen.c:323.
+[eva] strlen.c:323: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:324: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:324: Warning: 
+[eva] strlen.c:324: Call to builtin strlen
+[eva:alarm] strlen.c:324: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:325.
-[eva] tests/builtins/strlen.c:325: 
+  Called from strlen.c:325.
+[eva] strlen.c:325: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:326: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:326: Warning: 
+[eva] strlen.c:326: Call to builtin strlen
+[eva:alarm] strlen.c:326: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from tests/builtins/strlen.c:327.
-[eva] tests/builtins/strlen.c:327: 
+  Called from strlen.c:327.
+[eva] strlen.c:327: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strlen.c:329: Call to builtin strlen
-[eva:alarm] tests/builtins/strlen.c:329: Warning: 
+[eva] strlen.c:329: Call to builtin strlen
+[eva:alarm] strlen.c:329: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
 [eva] Recording results for negative_offsets
 [eva] Done for function negative_offsets

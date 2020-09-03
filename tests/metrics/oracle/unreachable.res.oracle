@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/unreachable.c (with preprocessing)
+[kernel] Parsing unreachable.c (with preprocessing)
 [metrics] Defined functions (2)
   =====================
    foo (1 call); main (0 call); 
@@ -53,10 +53,10 @@
   Coverage estimation = 50.0% 
   
   Unreached functions (1) =
-    <tests/metrics/unreachable.c>: foo;
+    <unreachable.c>: foo;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  Function main calls foo (at tests/metrics/unreachable.c:16)
+  Function main calls foo (at unreachable.c:16)
 [metrics] Statements analyzed by Eva
   --------------------------
   10 stmts in analyzed functions, 6 stmts analyzed (60.0%)

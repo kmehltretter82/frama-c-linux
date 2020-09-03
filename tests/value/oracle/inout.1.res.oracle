@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/inout.i (no preprocessing)
+[kernel] Parsing inout.i (no preprocessing)
 [eva] Analyzing a complete application starting at inout_11_3
 [eva] Computing initial state
 [eva] Initial state computed
@@ -20,8 +20,8 @@
       [6] ∈ {25}
       [7] ∈ {40}
   I5_nt ∈ {0}
-[eva] tests/value/inout.i:37: starting to merge loop iterations
-[eva:alarm] tests/value/inout.i:42: Warning: 
+[eva] inout.i:37: starting to merge loop iterations
+[eva:alarm] inout.i:42: Warning: 
   accessing uninitialized left-value. assert \initialized(&r);
 [eva] Recording results for inout_11_3
 [eva] done for function inout_11_3

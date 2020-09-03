@@ -1,19 +1,19 @@
-[kernel] Parsing tests/syntax/copy_logic.i (no preprocessing)
-[kernel] tests/syntax/copy_logic.i:5: Warning: 
+[kernel] Parsing copy_logic.i (no preprocessing)
+[kernel] copy_logic.i:5: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
-[kernel] tests/syntax/copy_logic.i:7: Warning: 
+[kernel] copy_logic.i:7: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/syntax/copy_logic.i:16: Warning: assertion got status unknown.
-[eva:alarm] tests/syntax/copy_logic.i:17: Warning: 
+[eva:alarm] copy_logic.i:16: Warning: assertion got status unknown.
+[eva:alarm] copy_logic.i:17: Warning: 
   signed overflow. assert y + x ≤ 2147483647;
-[eva] tests/syntax/copy_logic.i:18: 
+[eva] copy_logic.i:18: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function f
-[eva:alarm] tests/syntax/copy_logic.i:18: Warning: assertion got status unknown.
+[eva:alarm] copy_logic.i:18: Warning: assertion got status unknown.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

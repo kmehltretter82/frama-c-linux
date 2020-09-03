@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/from_res_2.i (no preprocessing)
+[kernel] Parsing from_res_2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,19 +14,19 @@
   y2 ∈ {0}
   y3 ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/from_res_2.i:26.
+  Called from from_res_2.i:26.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g1 <- main.
-  Called from tests/value/from_res_2.i:30.
+  Called from from_res_2.i:30.
 [eva] Recording results for g1
 [eva] Done for function g1
 [eva] computing for function g2 <- main.
-  Called from tests/value/from_res_2.i:34.
+  Called from from_res_2.i:34.
 [eva] Recording results for g2
 [eva] Done for function g2
 [eva] computing for function g3 <- main.
-  Called from tests/value/from_res_2.i:38.
+  Called from from_res_2.i:38.
 [eva] Recording results for g3
 [eva] Done for function g3
 [eva] Recording results for main

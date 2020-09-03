@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/cond2.i (no preprocessing)
+[kernel] Parsing cond2.i (no preprocessing)
 [eva] Analyzing a complete application starting at un_1
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,23 +14,23 @@
   s ∈ {0}
   t ∈ {0}
   u ∈ {0}
-[eva] tests/value/cond2.i:52: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:52: Warning: 
+[eva] cond2.i:52: starting to merge loop iterations
+[eva:alarm] cond2.i:52: Warning: 
   signed overflow. assert x + 2 ≤ 2147483647;
-[eva] tests/value/cond2.i:53: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:53: Warning: 
+[eva] cond2.i:53: starting to merge loop iterations
+[eva:alarm] cond2.i:53: Warning: 
   signed overflow. assert y + 2 ≤ 2147483647;
-[eva] tests/value/cond2.i:59: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:59: Warning: 
+[eva] cond2.i:59: starting to merge loop iterations
+[eva:alarm] cond2.i:59: Warning: 
   signed overflow. assert x + 4 ≤ 2147483647;
-[eva] tests/value/cond2.i:60: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:60: Warning: 
+[eva] cond2.i:60: starting to merge loop iterations
+[eva:alarm] cond2.i:60: Warning: 
   signed overflow. assert y + 4 ≤ 2147483647;
-[eva] tests/value/cond2.i:66: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:66: Warning: 
+[eva] cond2.i:66: starting to merge loop iterations
+[eva:alarm] cond2.i:66: Warning: 
   out of bounds write. assert \valid(px);
-[eva] tests/value/cond2.i:67: starting to merge loop iterations
-[eva:alarm] tests/value/cond2.i:67: Warning: 
+[eva] cond2.i:67: starting to merge loop iterations
+[eva:alarm] cond2.i:67: Warning: 
   out of bounds write. assert \valid(py);
 [eva] Recording results for un_1
 [eva] done for function un_1

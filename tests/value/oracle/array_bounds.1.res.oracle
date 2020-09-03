@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/array_bounds.i (no preprocessing)
+[kernel] Parsing array_bounds.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -32,14 +32,14 @@
    .T[10] ∈ {10}
    .T[11] ∈ {11}
    .b ∈ {20}
-[eva] tests/value/array_bounds.i:15: Frama_C_show_each: {0}
-[eva] tests/value/array_bounds.i:14: starting to merge loop iterations
-[eva] tests/value/array_bounds.i:15: Frama_C_show_each: {0; 1}
-[eva] tests/value/array_bounds.i:15: Frama_C_show_each: {0; 1; 2}
-[eva] tests/value/array_bounds.i:15: Frama_C_show_each: [0..11]
-[eva] tests/value/array_bounds.i:15: Frama_C_show_each: [0..11]
-[eva] tests/value/array_bounds.i:19: starting to merge loop iterations
-[eva:alarm] tests/value/array_bounds.i:19: Warning: 
+[eva] array_bounds.i:15: Frama_C_show_each: {0}
+[eva] array_bounds.i:14: starting to merge loop iterations
+[eva] array_bounds.i:15: Frama_C_show_each: {0; 1}
+[eva] array_bounds.i:15: Frama_C_show_each: {0; 1; 2}
+[eva] array_bounds.i:15: Frama_C_show_each: [0..11]
+[eva] array_bounds.i:15: Frama_C_show_each: [0..11]
+[eva] array_bounds.i:19: starting to merge loop iterations
+[eva:alarm] array_bounds.i:19: Warning: 
   signed overflow. assert j + 5 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main

@@ -1,11 +1,11 @@
-[kernel] Parsing tests/pdg/loops.c (with preprocessing)
+[kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at simple_with_break
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
-[eva] tests/pdg/loops.c:51: starting to merge loop iterations
-[eva:alarm] tests/pdg/loops.c:53: Warning: 
+[eva] loops.c:51: starting to merge loop iterations
+[eva:alarm] loops.c:53: Warning: 
   signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for simple_with_break
 [eva] done for function simple_with_break

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/redundant_alarms.c (with preprocessing)
+[kernel] Parsing redundant_alarms.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -6,66 +6,66 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/redundant_alarms.c:62.
-[eva:alarm] tests/value/redundant_alarms.c:11: Warning: 
+  Called from redundant_alarms.c:62.
+[eva:alarm] redundant_alarms.c:11: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] tests/value/redundant_alarms.c:12: Warning: 
+[eva:alarm] redundant_alarms.c:12: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva:alarm] tests/value/redundant_alarms.c:15: Warning: 
+[eva:alarm] redundant_alarms.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/redundant_alarms.c:63.
-[eva:alarm] tests/value/redundant_alarms.c:20: Warning: 
+  Called from redundant_alarms.c:63.
+[eva:alarm] redundant_alarms.c:20: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] tests/value/redundant_alarms.c:20: Warning: 
+[eva:alarm] redundant_alarms.c:20: Warning: 
   accessing out of bounds index. assert i < 10;
-[eva:alarm] tests/value/redundant_alarms.c:21: Warning: 
+[eva:alarm] redundant_alarms.c:21: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[i]);
-[eva:alarm] tests/value/redundant_alarms.c:22: Warning: 
+[eva:alarm] redundant_alarms.c:22: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[i]);
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/redundant_alarms.c:64.
-[eva:alarm] tests/value/redundant_alarms.c:64: Warning: 
+  Called from redundant_alarms.c:64.
+[eva:alarm] redundant_alarms.c:64: Warning: 
   function main3: precondition got status unknown.
-[eva:alarm] tests/value/redundant_alarms.c:31: Warning: 
+[eva:alarm] redundant_alarms.c:31: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[i]);
-[eva:alarm] tests/value/redundant_alarms.c:31: Warning: 
+[eva:alarm] redundant_alarms.c:31: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[j]);
-[eva:alarm] tests/value/redundant_alarms.c:32: Warning: 
+[eva:alarm] redundant_alarms.c:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[j]);
-[eva:alarm] tests/value/redundant_alarms.c:33: Warning: 
+[eva:alarm] redundant_alarms.c:33: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[i]);
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/redundant_alarms.c:65.
-[eva:alarm] tests/value/redundant_alarms.c:41: Warning: 
+  Called from redundant_alarms.c:65.
+[eva:alarm] redundant_alarms.c:41: Warning: 
   assertion got status unknown.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/redundant_alarms.c:66.
-[eva] tests/value/redundant_alarms.c:55: assertion got status valid.
-[eva:locals-escaping] tests/value/redundant_alarms.c:55: Warning: 
+  Called from redundant_alarms.c:66.
+[eva] redundant_alarms.c:55: assertion got status valid.
+[eva:locals-escaping] redundant_alarms.c:55: Warning: 
   locals {x} escaping the scope of a block of main5 through p
-[eva:alarm] tests/value/redundant_alarms.c:58: Warning: 
+[eva:alarm] redundant_alarms.c:58: Warning: 
   assertion got status unknown.
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/redundant_alarms.c:15: 
+[eva] redundant_alarms.c:15: 
   assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 3 assertion(s)
-[scope:rm_asserts] tests/value/redundant_alarms.c:12: 
+[scope:rm_asserts] redundant_alarms.c:12: 
   removing redundant assert Eva: initialization: \initialized(p);
-[scope:rm_asserts] tests/value/redundant_alarms.c:32: 
+[scope:rm_asserts] redundant_alarms.c:32: 
   removing redundant assert Eva: initialization: \initialized(&t[j]);
-[scope:rm_asserts] tests/value/redundant_alarms.c:33: 
+[scope:rm_asserts] redundant_alarms.c:33: 
   removing redundant assert Eva: initialization: \initialized(&t[i]);
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...

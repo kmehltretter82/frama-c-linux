@@ -476,4 +476,4 @@ refbin  '1b1111.1111.1111.1111.0000.0000.0000.0000'
 pp_bin  '                    1b0000.0000.0000.0000'
 pp_neg  '                    0b1111.1111.1111.1111'
 ----------------------------------------------------------------------
-[kernel] Parsing tests/misc/pp_int.i (no preprocessing)
+[kernel] Parsing pp_int.i (no preprocessing)

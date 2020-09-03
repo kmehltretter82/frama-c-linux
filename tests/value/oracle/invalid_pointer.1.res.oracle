@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/invalid_pointer.c (with preprocessing)
-[kernel:typing:int-conversion] tests/value/invalid_pointer.c:112: Warning: 
+[kernel] Parsing invalid_pointer.c (with preprocessing)
+[kernel:typing:int-conversion] invalid_pointer.c:112: Warning: 
   Conversion from a pointer to an integer without an explicit cast
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,110 +8,110 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:172.
+  Called from invalid_pointer.c:172.
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:31.
+  Called from invalid_pointer.c:31.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/invalid_pointer.c:31: 
+[eva] invalid_pointer.c:31: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from tests/value/invalid_pointer.c:33.
-[eva] tests/value/invalid_pointer.c:33: 
+  Called from invalid_pointer.c:33.
+[eva] invalid_pointer.c:33: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from tests/value/invalid_pointer.c:173.
-[eva] tests/value/invalid_pointer.c:43: 
+  Called from invalid_pointer.c:173.
+[eva] invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
-[eva] tests/value/invalid_pointer.c:54: 
+[eva] invalid_pointer.c:54: 
   Frama_C_show_each_bottom: {{ &t + {-4} }}
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:174.
+  Called from invalid_pointer.c:174.
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:66.
-[eva] tests/value/invalid_pointer.c:66: 
+  Called from invalid_pointer.c:66.
+[eva] invalid_pointer.c:66: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:68.
-[eva] tests/value/invalid_pointer.c:68: 
+  Called from invalid_pointer.c:68.
+[eva] invalid_pointer.c:68: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from tests/value/invalid_pointer.c:72.
-[eva] tests/value/invalid_pointer.c:72: 
+  Called from invalid_pointer.c:72.
+[eva] invalid_pointer.c:72: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from tests/value/invalid_pointer.c:175.
+  Called from invalid_pointer.c:175.
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from tests/value/invalid_pointer.c:176.
+  Called from invalid_pointer.c:176.
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from tests/value/invalid_pointer.c:177.
+  Called from invalid_pointer.c:177.
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from tests/value/invalid_pointer.c:178.
-[eva] tests/value/invalid_pointer.c:127: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:130: Warning: 
+  Called from invalid_pointer.c:178.
+[eva] invalid_pointer.c:127: assertion got status valid.
+[eva:alarm] invalid_pointer.c:130: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] tests/value/invalid_pointer.c:133: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:136: Warning: 
+[eva] invalid_pointer.c:133: assertion got status valid.
+[eva:alarm] invalid_pointer.c:136: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:alarm] tests/value/invalid_pointer.c:139: Warning: 
+[eva:alarm] invalid_pointer.c:139: Warning: 
   assertion got status unknown.
-[eva] tests/value/invalid_pointer.c:140: assertion got status valid.
-[eva] tests/value/invalid_pointer.c:141: 
+[eva] invalid_pointer.c:140: assertion got status valid.
+[eva] invalid_pointer.c:141: 
   Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
-[eva:alarm] tests/value/invalid_pointer.c:143: Warning: 
+[eva:alarm] invalid_pointer.c:143: Warning: 
   assertion got status unknown.
-[eva] tests/value/invalid_pointer.c:144: assertion got status valid.
-[eva] tests/value/invalid_pointer.c:145: 
+[eva] invalid_pointer.c:144: assertion got status valid.
+[eva] invalid_pointer.c:145: 
   Frama_C_show_each_object_pointer_char: {{ &x + {0; 1; 2; 3; 4} }}
 [eva] computing for function Frama_C_interval <- object_pointer_predicate <- main.
-  Called from tests/value/invalid_pointer.c:146.
-[eva] tests/value/invalid_pointer.c:146: 
+  Called from invalid_pointer.c:146.
+[eva] invalid_pointer.c:146: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/invalid_pointer.c:148: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:150: Warning: 
+[eva] invalid_pointer.c:148: assertion got status valid.
+[eva:alarm] invalid_pointer.c:150: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:152: Warning: 
+[eva:alarm] invalid_pointer.c:152: Warning: 
   assertion got status unknown.
-[eva] tests/value/invalid_pointer.c:153: 
+[eva] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
-[eva] tests/value/invalid_pointer.c:155: assertion got status valid.
-[eva:alarm] tests/value/invalid_pointer.c:158: Warning: 
+[eva] invalid_pointer.c:155: assertion got status valid.
+[eva:alarm] invalid_pointer.c:158: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:161: Warning: 
+[eva:alarm] invalid_pointer.c:161: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:163: Warning: 
+[eva:alarm] invalid_pointer.c:163: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/invalid_pointer.c:166: Warning: 
+[eva:alarm] invalid_pointer.c:166: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:180.
+  Called from invalid_pointer.c:180.
 [eva] using specification for function signal
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:181.
+  Called from invalid_pointer.c:181.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from tests/value/invalid_pointer.c:182.
+  Called from invalid_pointer.c:182.
 [eva] Done for function signal
 [eva] Recording results for main
 [eva] done for function main

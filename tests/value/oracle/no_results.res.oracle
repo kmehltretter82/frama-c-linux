@@ -1,75 +1,75 @@
-[kernel] Parsing tests/value/no_results.c (with preprocessing)
+[kernel] Parsing no_results.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..2999] ∈ {0}
 [eva] computing for function init <- main.
-  Called from tests/value/no_results.c:19.
-[eva] tests/value/no_results.c:10: 
+  Called from no_results.c:19.
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 100 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 200 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 300 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 400 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 500 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 600 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 700 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 800 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 900 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1000 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1100 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1200 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1300 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1400 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1500 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1600 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1700 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1800 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 1900 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2000 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2100 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2200 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2300 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2400 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2500 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2600 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2700 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2800 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 2900 states
-[eva] tests/value/no_results.c:10: 
+[eva] no_results.c:10: 
   Trace partitioning superposing up to 3000 states
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function f <- main.
-  Called from tests/value/no_results.c:20.
+  Called from no_results.c:20.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -6096,9 +6096,9 @@ Cannot filter: dumping raw memory (including unchanged variables)
   FROMTOP
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to init at tests/value/no_results.c:19 (by main):
+[from] call to init at no_results.c:19 (by main):
   FROMTOP
-[from] call to f at tests/value/no_results.c:20 (by main):
+[from] call to f at no_results.c:20 (by main):
   t[1] FROM t[0]
 [from] entry point:
   FROMTOP

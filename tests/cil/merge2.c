@@ -1,4 +1,4 @@
 /* run.config
-   OPT: tests/cil/merge.c -print
+   OPT: merge.c -print
  */
 int x =2;

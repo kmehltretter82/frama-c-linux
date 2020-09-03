@@ -1,22 +1,22 @@
-[kernel] Parsing tests/value/for_loops.c (with preprocessing)
+[kernel] Parsing for_loops.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/value/for_loops.c:24.
+  Called from for_loops.c:24.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/for_loops.c:24: 
+[eva] for_loops.c:24: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/for_loops.c:30: Frama_C_show_each_F: {0}
-[eva] tests/value/for_loops.c:27: starting to merge loop iterations
-[eva] tests/value/for_loops.c:29: starting to merge loop iterations
-[eva] tests/value/for_loops.c:30: Frama_C_show_each_F: {0; 1}
-[eva] tests/value/for_loops.c:30: Frama_C_show_each_F: {0; 1; 2}
-[eva] tests/value/for_loops.c:30: Frama_C_show_each_F: [0..2147483647]
-[eva:alarm] tests/value/for_loops.c:27: Warning: 
+[eva] for_loops.c:30: Frama_C_show_each_F: {0}
+[eva] for_loops.c:27: starting to merge loop iterations
+[eva] for_loops.c:29: starting to merge loop iterations
+[eva] for_loops.c:30: Frama_C_show_each_F: {0; 1}
+[eva] for_loops.c:30: Frama_C_show_each_F: {0; 1; 2}
+[eva] for_loops.c:30: Frama_C_show_each_F: [0..2147483647]
+[eva:alarm] for_loops.c:27: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main

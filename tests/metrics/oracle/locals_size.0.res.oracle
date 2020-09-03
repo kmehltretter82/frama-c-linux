@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/locals_size.i (no preprocessing)
+[kernel] Parsing locals_size.i (no preprocessing)
 [metrics] function	locals_size_no_temps	locals_size_with_temps	max_call_size_no_temps	max_call_size_with_temps
 [metrics] f	0	0	0	0
 [metrics] g	9	10	0	0

@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/ghost_else_bad.c (with preprocessing)
-[kernel] tests/syntax/ghost_else_bad.c:47: 
+[kernel] Parsing ghost_else_bad.c (with preprocessing)
+[kernel] ghost_else_bad.c:47: 
   syntax error:
   Location: between lines 47 and 49, before or at token: else
   45      if(x){

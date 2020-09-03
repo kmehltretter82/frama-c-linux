@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/memcpy.c (with preprocessing)
+[kernel] Parsing memcpy.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_all
 [eva] Computing initial state
 [eva] Initial state computed
@@ -22,15 +22,15 @@
   v5 ∈ {0}
   t[0..3] ∈ {0}
 [eva] computing for function main <- main_all.
-  Called from tests/builtins/memcpy.c:226.
+  Called from memcpy.c:226.
 [eva] computing for function buggy <- main <- main_all.
-  Called from tests/builtins/memcpy.c:61.
-[eva] tests/builtins/memcpy.c:28: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:28: Warning: 
+  Called from memcpy.c:61.
+[eva] memcpy.c:28: Call to builtin memcpy
+[eva:alarm] memcpy.c:28: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:28: 
+[eva] memcpy.c:28: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:28: 
+[eva] memcpy.c:28: 
   function memcpy: precondition 'separation' got status valid.
 [eva] share/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
@@ -39,369 +39,369 @@
 [from] Done for function buggy
 [eva] Done for function buggy
 [eva] computing for function many <- main <- main_all.
-  Called from tests/builtins/memcpy.c:63.
-[eva:alarm] tests/builtins/memcpy.c:44: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:47: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:47: 
+  Called from memcpy.c:63.
+[eva:alarm] memcpy.c:44: Warning: assertion got status unknown.
+[eva] memcpy.c:47: Call to builtin memcpy
+[eva] memcpy.c:47: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:47: 
+[eva] memcpy.c:47: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:47: 
+[eva] memcpy.c:47: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:47: 
+[kernel] memcpy.c:47: 
   too many locations to update in array. Approximating.
-[eva] tests/builtins/memcpy.c:49: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:49: 
+[eva] memcpy.c:49: Call to builtin memcpy
+[eva] memcpy.c:49: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:49: 
+[eva] memcpy.c:49: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:49: 
+[eva] memcpy.c:49: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:49: 
+[kernel] memcpy.c:49: 
   too many locations to update in array. Approximating.
-[kernel] tests/builtins/memcpy.c:49: 
+[kernel] memcpy.c:49: 
   more than 150(1000) locations to update in array. Approximating.
-[kernel] tests/builtins/memcpy.c:49: 
+[kernel] memcpy.c:49: 
   more than 150(1000) elements to enumerate. Approximating.
-[eva] tests/builtins/memcpy.c:53: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:53: 
+[eva] memcpy.c:53: Call to builtin memcpy
+[eva] memcpy.c:53: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:53: 
+[eva] memcpy.c:53: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:53: 
+[eva] memcpy.c:53: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:53: 
+[kernel] memcpy.c:53: 
   too many locations to update in array. Approximating.
 [eva] Recording results for many
 [from] Computing for function many
 [from] Done for function many
 [eva] Done for function many
 [eva] computing for function init <- main <- main_all.
-  Called from tests/builtins/memcpy.c:65.
-[eva] tests/builtins/memcpy.c:20: 
+  Called from memcpy.c:65.
+[eva] memcpy.c:20: 
   Trace partitioning superposing up to 100 states
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
 [eva] Done for function init
-[eva:alarm] tests/builtins/memcpy.c:67: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:68: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:68: 
+[eva:alarm] memcpy.c:67: Warning: assertion got status unknown.
+[eva] memcpy.c:68: Call to builtin memcpy
+[eva] memcpy.c:68: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:68: 
+[eva] memcpy.c:68: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:68: 
+[eva] memcpy.c:68: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:70: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:70: Warning: 
+[eva] memcpy.c:70: Call to builtin memcpy
+[eva:alarm] memcpy.c:70: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:70: Warning: 
+[eva:alarm] memcpy.c:70: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] tests/builtins/memcpy.c:70: 
+[eva] memcpy.c:70: 
   function memcpy: precondition 'separation' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:72: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:73: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:73: 
+[eva:alarm] memcpy.c:72: Warning: assertion got status unknown.
+[eva] memcpy.c:73: Call to builtin memcpy
+[eva] memcpy.c:73: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:73: 
+[eva] memcpy.c:73: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:73: 
+[eva] memcpy.c:73: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:75: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:75: Warning: 
+[eva] memcpy.c:75: Call to builtin memcpy
+[eva:alarm] memcpy.c:75: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:75: Warning: 
+[eva:alarm] memcpy.c:75: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] tests/builtins/memcpy.c:75: 
+[eva] memcpy.c:75: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:83: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:83: 
+[eva] memcpy.c:83: Call to builtin memcpy
+[eva] memcpy.c:83: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:83: 
+[eva] memcpy.c:83: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:83: 
+[eva] memcpy.c:83: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:85: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:85: 
+[eva] memcpy.c:85: Call to builtin memcpy
+[eva] memcpy.c:85: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:85: 
+[eva] memcpy.c:85: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:85: 
+[eva] memcpy.c:85: 
   function memcpy: precondition 'separation' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:87: Warning: 
+[eva:alarm] memcpy.c:87: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
-[eva] tests/builtins/memcpy.c:87: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:87: 
+[eva] memcpy.c:87: Call to builtin memcpy
+[eva] memcpy.c:87: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:87: Warning: 
+[eva:alarm] memcpy.c:87: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] tests/builtins/memcpy.c:87: 
+[eva] memcpy.c:87: 
   function memcpy: precondition 'separation' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:89: Warning: 
+[eva:alarm] memcpy.c:89: Warning: 
   pointer downcast. assert (unsigned int)(&v4) ≤ 2147483647;
-[eva] tests/builtins/memcpy.c:89: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:89: Warning: 
+[eva] memcpy.c:89: Call to builtin memcpy
+[eva:alarm] memcpy.c:89: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:89: 
+[eva] memcpy.c:89: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:89: 
+[eva] memcpy.c:89: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:89: 
+[kernel] memcpy.c:89: 
   writing somewhere in {NULL; v4} because of Arithmetic
-                                 {tests/builtins/memcpy.c:89}.
-[eva:alarm] tests/builtins/memcpy.c:90: Warning: 
+                                 {memcpy.c:89}.
+[eva:alarm] memcpy.c:90: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
-[eva:alarm] tests/builtins/memcpy.c:91: Warning: 
+[eva:alarm] memcpy.c:91: Warning: 
   pointer downcast. assert (unsigned int)(&v5) ≤ 2147483647;
-[eva] tests/builtins/memcpy.c:91: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:91: Warning: 
+[eva] memcpy.c:91: Call to builtin memcpy
+[eva:alarm] memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:91: 
+[eva] memcpy.c:91: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:91: 
+[eva] memcpy.c:91: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:91: 
+[kernel] memcpy.c:91: 
   writing somewhere in {NULL; v5} because of Arithmetic
-                                 {tests/builtins/memcpy.c:91}.
-[eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:96: Warning: 
+                                 {memcpy.c:91}.
+[eva] memcpy.c:96: Call to builtin memcpy
+[eva:alarm] memcpy.c:96: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:96: Warning: 
+[eva:alarm] memcpy.c:96: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:96: Warning: 
+[eva:alarm] memcpy.c:96: Warning: 
   function memcpy: precondition 'separation' got status unknown.
-[eva:imprecision] tests/builtins/memcpy.c:96: 
+[eva:imprecision] memcpy.c:96: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva] tests/builtins/memcpy.c:95: starting to merge loop iterations
-[eva] tests/builtins/memcpy.c:96: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:101: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:101: 
+[eva] memcpy.c:95: starting to merge loop iterations
+[eva] memcpy.c:96: Call to builtin memcpy
+[eva] memcpy.c:101: Call to builtin memcpy
+[eva] memcpy.c:101: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:101: 
+[eva] memcpy.c:101: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:101: 
+[eva] memcpy.c:101: 
   function memcpy: precondition 'separation' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:103: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:105: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:105: 
+[eva:alarm] memcpy.c:103: Warning: assertion got status unknown.
+[eva] memcpy.c:105: Call to builtin memcpy
+[eva] memcpy.c:105: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:105: 
+[eva] memcpy.c:105: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:105: 
+[eva] memcpy.c:105: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:105: 
+[eva:imprecision] memcpy.c:105: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva] tests/builtins/memcpy.c:110: starting to merge loop iterations
-[eva] tests/builtins/memcpy.c:114: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:114: Warning: 
+[eva] memcpy.c:110: starting to merge loop iterations
+[eva] memcpy.c:114: Call to builtin memcpy
+[eva:alarm] memcpy.c:114: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:114: 
+[eva] memcpy.c:114: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:114: 
+[eva] memcpy.c:114: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:114: 
+[kernel] memcpy.c:114: 
   too many locations to update in array. Approximating.
-[eva] tests/builtins/memcpy.c:118: starting to merge loop iterations
-[eva] tests/builtins/memcpy.c:122: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:122: Warning: 
+[eva] memcpy.c:118: starting to merge loop iterations
+[eva] memcpy.c:122: Call to builtin memcpy
+[eva:alarm] memcpy.c:122: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:122: 
+[eva] memcpy.c:122: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:122: 
+[eva] memcpy.c:122: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:122: 
+[kernel] memcpy.c:122: 
   too many locations to update in array. Approximating.
-[eva] tests/builtins/memcpy.c:126: starting to merge loop iterations
-[eva] tests/builtins/memcpy.c:131: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:131: Warning: 
+[eva] memcpy.c:126: starting to merge loop iterations
+[eva] memcpy.c:131: Call to builtin memcpy
+[eva:alarm] memcpy.c:131: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:131: 
+[eva] memcpy.c:131: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:131: 
+[eva] memcpy.c:131: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:131: 
+[kernel] memcpy.c:131: 
   too many locations to update in array. Approximating.
-[eva] tests/builtins/memcpy.c:135: starting to merge loop iterations
-[eva] tests/builtins/memcpy.c:140: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:140: Warning: 
+[eva] memcpy.c:135: starting to merge loop iterations
+[eva] memcpy.c:140: Call to builtin memcpy
+[eva:alarm] memcpy.c:140: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] tests/builtins/memcpy.c:140: 
+[eva] memcpy.c:140: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:140: 
+[eva] memcpy.c:140: 
   function memcpy: precondition 'separation' got status valid.
-[kernel] tests/builtins/memcpy.c:140: 
+[kernel] memcpy.c:140: 
   too many locations to update in array. Approximating.
-[eva] tests/builtins/memcpy.c:145: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:145: Warning: 
+[eva] memcpy.c:145: Call to builtin memcpy
+[eva:alarm] memcpy.c:145: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:145: Warning: 
+[eva:alarm] memcpy.c:145: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] tests/builtins/memcpy.c:145: 
+[eva] memcpy.c:145: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:145: 
+[eva:imprecision] memcpy.c:145: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:alarm] tests/builtins/memcpy.c:150: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:151: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:151: Warning: 
+[eva:alarm] memcpy.c:150: Warning: assertion got status unknown.
+[eva] memcpy.c:151: Call to builtin memcpy
+[eva:alarm] memcpy.c:151: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva:alarm] tests/builtins/memcpy.c:151: Warning: 
+[eva:alarm] memcpy.c:151: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] tests/builtins/memcpy.c:151: 
+[eva] memcpy.c:151: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:151: 
+[eva:imprecision] memcpy.c:151: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:alarm] tests/builtins/memcpy.c:152: Warning: assertion got status unknown.
-[eva] tests/builtins/memcpy.c:153: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:153: 
+[eva:alarm] memcpy.c:152: Warning: assertion got status unknown.
+[eva] memcpy.c:153: Call to builtin memcpy
+[eva] memcpy.c:153: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:153: 
+[eva] memcpy.c:153: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:153: 
+[eva] memcpy.c:153: 
   function memcpy: precondition 'separation' got status valid.
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
 [eva] computing for function main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:227.
-[eva] tests/builtins/memcpy.c:172: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:172: 
+  Called from memcpy.c:227.
+[eva] memcpy.c:172: Call to builtin memcpy
+[eva] memcpy.c:172: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:172: 
+[eva] memcpy.c:172: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:172: 
+[eva] memcpy.c:172: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:172: 
+[eva:imprecision] memcpy.c:172: 
   In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
-[eva] tests/builtins/memcpy.c:173: assertion got status valid.
+[eva] memcpy.c:173: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:174.
+  Called from memcpy.c:174.
 [eva] using specification for function itv
 [eva] Done for function itv
-[eva] tests/builtins/memcpy.c:174: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:174: 
+[eva] memcpy.c:174: Call to builtin memcpy
+[eva] memcpy.c:174: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:174: 
+[eva] memcpy.c:174: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:174: 
+[eva] memcpy.c:174: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:174: 
+[eva:imprecision] memcpy.c:174: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:imprecision] tests/builtins/memcpy.c:174: 
+[eva:imprecision] memcpy.c:174: 
   In memcpy builtin: imprecise copy of indeterminate values
-[eva] tests/builtins/memcpy.c:175: assertion got status valid.
+[eva] memcpy.c:175: assertion got status valid.
 [eva] computing for function make_unknown <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:178.
+  Called from memcpy.c:178.
 [eva] using specification for function make_unknown
-[eva] tests/builtins/memcpy.c:178: 
+[eva] memcpy.c:178: 
   function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
-[eva] tests/builtins/memcpy.c:179: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:179: 
+[eva] memcpy.c:179: Call to builtin memcpy
+[eva] memcpy.c:179: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:179: 
+[eva] memcpy.c:179: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:179: 
+[eva] memcpy.c:179: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:180: assertion got status valid.
+[eva] memcpy.c:180: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:181.
+  Called from memcpy.c:181.
 [eva] Done for function itv
-[eva] tests/builtins/memcpy.c:181: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:181: 
+[eva] memcpy.c:181: Call to builtin memcpy
+[eva] memcpy.c:181: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:181: 
+[eva] memcpy.c:181: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:181: 
+[eva] memcpy.c:181: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:181: 
+[eva:imprecision] memcpy.c:181: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:imprecision] tests/builtins/memcpy.c:181: 
+[eva:imprecision] memcpy.c:181: 
   In memcpy builtin: imprecise copy of indeterminate values
-[eva:alarm] tests/builtins/memcpy.c:182: Warning: 
+[eva:alarm] memcpy.c:182: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:185.
-[eva] tests/builtins/memcpy.c:185: 
+  Called from memcpy.c:185.
+[eva] memcpy.c:185: 
   function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
-[eva] tests/builtins/memcpy.c:187: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:187: 
+[eva] memcpy.c:187: Call to builtin memcpy
+[eva] memcpy.c:187: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:187: 
+[eva] memcpy.c:187: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:187: 
+[eva] memcpy.c:187: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:187: 
+[eva:imprecision] memcpy.c:187: 
   In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
-[eva] tests/builtins/memcpy.c:188: assertion got status valid.
+[eva] memcpy.c:188: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:190.
+  Called from memcpy.c:190.
 [eva] Done for function itv
-[eva] tests/builtins/memcpy.c:190: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:190: 
+[eva] memcpy.c:190: Call to builtin memcpy
+[eva] memcpy.c:190: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:190: 
+[eva] memcpy.c:190: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:190: 
+[eva] memcpy.c:190: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:190: 
+[eva:imprecision] memcpy.c:190: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:imprecision] tests/builtins/memcpy.c:190: 
+[eva:imprecision] memcpy.c:190: 
   In memcpy builtin: imprecise copy of indeterminate values
-[eva] tests/builtins/memcpy.c:191: assertion got status valid.
-[eva:alarm] tests/builtins/memcpy.c:192: Warning: 
+[eva] memcpy.c:191: assertion got status valid.
+[eva:alarm] memcpy.c:192: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[8]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:196.
-[eva] tests/builtins/memcpy.c:196: 
+  Called from memcpy.c:196.
+[eva] memcpy.c:196: 
   function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
 [eva] computing for function make_unknown <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:197.
-[eva] tests/builtins/memcpy.c:197: 
+  Called from memcpy.c:197.
+[eva] memcpy.c:197: 
   function make_unknown: precondition got status valid.
 [eva] Done for function make_unknown
-[eva] tests/builtins/memcpy.c:198: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:198: 
+[eva] memcpy.c:198: Call to builtin memcpy
+[eva] memcpy.c:198: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:198: 
+[eva] memcpy.c:198: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:198: 
+[eva] memcpy.c:198: 
   function memcpy: precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:199: assertion got status valid.
+[eva] memcpy.c:199: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
-  Called from tests/builtins/memcpy.c:200.
+  Called from memcpy.c:200.
 [eva] Done for function itv
-[eva] tests/builtins/memcpy.c:200: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:200: 
+[eva] memcpy.c:200: Call to builtin memcpy
+[eva] memcpy.c:200: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:200: 
+[eva] memcpy.c:200: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:200: 
+[eva] memcpy.c:200: 
   function memcpy: precondition 'separation' got status valid.
-[eva:imprecision] tests/builtins/memcpy.c:200: 
+[eva:imprecision] memcpy.c:200: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva:imprecision] tests/builtins/memcpy.c:200: 
+[eva:imprecision] memcpy.c:200: 
   In memcpy builtin: imprecise copy of indeterminate values
-[eva:alarm] tests/builtins/memcpy.c:201: Warning: 
+[eva:alarm] memcpy.c:201: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] Recording results for main_uninit
 [from] Computing for function main_uninit
 [from] Done for function main_uninit
 [eva] Done for function main_uninit
 [eva] computing for function main_local <- main_all.
-  Called from tests/builtins/memcpy.c:228.
-[eva] tests/builtins/memcpy.c:209: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:209: 
+  Called from memcpy.c:228.
+[eva] memcpy.c:209: Call to builtin memcpy
+[eva] memcpy.c:209: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/memcpy.c:209: 
+[eva] memcpy.c:209: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:209: 
+[eva] memcpy.c:209: 
   function memcpy: precondition 'separation' got status valid.
-[eva:locals-escaping] tests/builtins/memcpy.c:210: Warning: 
+[eva:locals-escaping] memcpy.c:210: Warning: 
   locals {y} escaping the scope of a block of main_local through p
-[eva] tests/builtins/memcpy.c:212: 
+[eva] memcpy.c:212: 
   Frama_C_dump_each:
   # Cvalue domain:
   NULL[rbits 800000 to 800015] ∈ [--..--]
@@ -436,20 +436,20 @@
 [from] Done for function main_local
 [eva] Done for function main_local
 [eva] computing for function copy_0 <- main_all.
-  Called from tests/builtins/memcpy.c:229.
-[eva] tests/builtins/memcpy.c:220: Call to builtin memcpy
-[eva:alarm] tests/builtins/memcpy.c:220: Warning: 
+  Called from memcpy.c:229.
+[eva] memcpy.c:220: Call to builtin memcpy
+[eva:alarm] memcpy.c:220: Warning: 
   function memcpy: precondition 'valid_dest' got status invalid.
-[eva] tests/builtins/memcpy.c:220: 
+[eva] memcpy.c:220: 
   function memcpy: no state left, precondition 'valid_src' got status valid.
-[eva] tests/builtins/memcpy.c:220: 
+[eva] memcpy.c:220: 
   function memcpy: no state left, precondition 'separation' got status valid.
-[eva] tests/builtins/memcpy.c:221: Call to builtin memcpy
-[eva] tests/builtins/memcpy.c:221: 
+[eva] memcpy.c:221: Call to builtin memcpy
+[eva] memcpy.c:221: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva:alarm] tests/builtins/memcpy.c:221: Warning: 
+[eva:alarm] memcpy.c:221: Warning: 
   function memcpy: precondition 'valid_src' got status invalid.
-[eva] tests/builtins/memcpy.c:221: 
+[eva] memcpy.c:221: 
   function memcpy: no state left, precondition 'separation' got status valid.
 [eva] Recording results for copy_0
 [from] Computing for function copy_0
@@ -660,13 +660,13 @@
     {.p; .padding[0..23]} ∈ {0}
   v3 ∈
     {{ garbled mix of &{v1}
-     (origin: Misaligned {tests/builtins/memcpy.c:87}) }}
+     (origin: Misaligned {memcpy.c:87}) }}
   v4.x ∈ [--..--]
     .y ∈ {{ (int)&t }}
     {.p; .padding[0..23]} ∈ [--..--]
   v5 ∈
     {{ garbled mix of &{t}
-     (origin: Misaligned {tests/builtins/memcpy.c:91}) }}
+     (origin: Misaligned {memcpy.c:91}) }}
   t{[0]; [1]{.x; .y}} ∈ {0}
    [1].p ∈ {{ &v1.y }}
    {[1].padding[0..23]; [2]; [3]{.x; .y}} ∈ {0}
@@ -701,150 +701,150 @@
 [eva:final-states] Values at end of function main_all:
   NON TERMINATING FUNCTION
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to memcpy at tests/builtins/memcpy.c:28 (by buggy):
+[from] call to memcpy at memcpy.c:28 (by buggy):
   c FROM "d"[bits 0 to 7]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:220 (by copy_0):
+[from] call to memcpy at memcpy.c:220 (by copy_0):
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:221 (by copy_0):
+[from] call to memcpy at memcpy.c:221 (by copy_0):
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:209 (by main_local):
+[from] call to memcpy at memcpy.c:209 (by main_local):
   p FROM q
   \result FROM dest
-[from] call to Frama_C_dump_each at tests/builtins/memcpy.c:212 (by main_local):
+[from] call to Frama_C_dump_each at memcpy.c:212 (by main_local):
   \result FROM \nothing
-[from] call to memcpy at tests/builtins/memcpy.c:172 (by main_uninit):
+[from] call to memcpy at memcpy.c:172 (by main_uninit):
   b[0..9] FROM a[0..9]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:174 (by main_uninit):
+[from] call to memcpy at memcpy.c:174 (by main_uninit):
   b[0..24] FROM a[0..24] (and SELF)
   \result FROM dest
-[from] call to itv at tests/builtins/memcpy.c:174 (by main_uninit):
+[from] call to itv at memcpy.c:174 (by main_uninit):
   \result FROM l; u
-[from] call to make_unknown at tests/builtins/memcpy.c:178 (by main_uninit):
+[from] call to make_unknown at memcpy.c:178 (by main_uninit):
   a[0..9] FROM maybe
-[from] call to memcpy at tests/builtins/memcpy.c:179 (by main_uninit):
+[from] call to memcpy at memcpy.c:179 (by main_uninit):
   b[0..9] FROM a[0..9]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:181 (by main_uninit):
+[from] call to memcpy at memcpy.c:181 (by main_uninit):
   b[0..24] FROM a[0..24] (and SELF)
   \result FROM dest
-[from] call to itv at tests/builtins/memcpy.c:181 (by main_uninit):
+[from] call to itv at memcpy.c:181 (by main_uninit):
   \result FROM l; u
-[from] call to make_unknown at tests/builtins/memcpy.c:185 (by main_uninit):
+[from] call to make_unknown at memcpy.c:185 (by main_uninit):
   b[0..9] FROM maybe
-[from] call to memcpy at tests/builtins/memcpy.c:187 (by main_uninit):
+[from] call to memcpy at memcpy.c:187 (by main_uninit):
   b[0..9] FROM a[0..9]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:190 (by main_uninit):
+[from] call to memcpy at memcpy.c:190 (by main_uninit):
   b[0..24] FROM a[0..24] (and SELF)
   \result FROM dest
-[from] call to itv at tests/builtins/memcpy.c:190 (by main_uninit):
+[from] call to itv at memcpy.c:190 (by main_uninit):
   \result FROM l; u
-[from] call to make_unknown at tests/builtins/memcpy.c:196 (by main_uninit):
+[from] call to make_unknown at memcpy.c:196 (by main_uninit):
   a[0..9] FROM maybe
-[from] call to make_unknown at tests/builtins/memcpy.c:197 (by main_uninit):
+[from] call to make_unknown at memcpy.c:197 (by main_uninit):
   b[0..9] FROM maybe
-[from] call to memcpy at tests/builtins/memcpy.c:198 (by main_uninit):
+[from] call to memcpy at memcpy.c:198 (by main_uninit):
   b[0..9] FROM a[0..9]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:200 (by main_uninit):
+[from] call to memcpy at memcpy.c:200 (by main_uninit):
   b[0..24] FROM a[0..24] (and SELF)
   \result FROM dest
-[from] call to itv at tests/builtins/memcpy.c:200 (by main_uninit):
+[from] call to itv at memcpy.c:200 (by main_uninit):
   \result FROM l; u
-[from] call to memcpy at tests/builtins/memcpy.c:47 (by many):
+[from] call to memcpy at memcpy.c:47 (by many):
   tm[0..999] FROM s[0..3] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:49 (by many):
+[from] call to memcpy at memcpy.c:49 (by many):
   um{[0..998]; [999][bits 0 to 15]} FROM s[0..1] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:53 (by many):
+[from] call to memcpy at memcpy.c:53 (by many):
   ttyp[0..999] FROM ty (and SELF)
   \result FROM dest
-[from] call to buggy at tests/builtins/memcpy.c:61 (by main):
+[from] call to buggy at memcpy.c:61 (by main):
   NO EFFECTS
-[from] call to many at tests/builtins/memcpy.c:63 (by main):
+[from] call to many at memcpy.c:63 (by main):
   tm[0] FROM \nothing
     [1..999] FROM \nothing (and SELF)
   um[0] FROM \nothing
     {[1..998]; [999][bits 0 to 15]} FROM \nothing (and SELF)
   ttyp[0] FROM \nothing
       [1..999] FROM \nothing (and SELF)
-[from] call to init at tests/builtins/memcpy.c:65 (by main):
+[from] call to init at memcpy.c:65 (by main):
   src[0..19] FROM \nothing (and SELF)
   dst1[0..19] FROM \nothing (and SELF)
   dst2[0..19] FROM \nothing (and SELF)
   dst3[0..19] FROM \nothing (and SELF)
   dst4[0..19] FROM \nothing (and SELF)
   dst5[0..99] FROM \nothing (and SELF)
-[from] call to memcpy at tests/builtins/memcpy.c:68 (by main):
+[from] call to memcpy at memcpy.c:68 (by main):
   dst1[1..5] FROM src[2..6]
       [6..15] FROM src[7..16] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:70 (by main):
+[from] call to memcpy at memcpy.c:70 (by main):
   dst2[1..10] FROM src[2..11]
       [11..19] FROM src[12..19] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:73 (by main):
+[from] call to memcpy at memcpy.c:73 (by main):
   dst3[5..9] FROM src[2..6]
       [10..18] FROM src[7..15] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:75 (by main):
+[from] call to memcpy at memcpy.c:75 (by main):
   dst4[5..14] FROM src[2..11]
       [15..19] FROM src[12..19] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:83 (by main):
+[from] call to memcpy at memcpy.c:83 (by main):
   v2 FROM v1
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:85 (by main):
+[from] call to memcpy at memcpy.c:85 (by main):
   t[2] FROM t[0]
    [3] FROM t[1] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:87 (by main):
+[from] call to memcpy at memcpy.c:87 (by main):
   v3 FROM t[0..3]
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:89 (by main):
+[from] call to memcpy at memcpy.c:89 (by main):
   v4 FROM v1{.x; .y; .p; .padding[0..3]} (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:91 (by main):
+[from] call to memcpy at memcpy.c:91 (by main):
   v5 FROM v4{.x; .y; .p; .padding[0..3]} (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:96 (by main):
+[from] call to memcpy at memcpy.c:96 (by main):
   x FROM x (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:101 (by main):
+[from] call to memcpy at memcpy.c:101 (by main):
   dst5[0..4] FROM src[0..4] (and SELF)
       {[5..19]; [25..33]} FROM src[5..13] (and SELF)
       [20..24] FROM src[0..13] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:105 (by main):
+[from] call to memcpy at memcpy.c:105 (by main):
   dst5[40] FROM src[0] (and SELF)
       {[41..69]; [71..88]} FROM src[1..18] (and SELF)
       [70] FROM src[0..18] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:114 (by main):
+[from] call to memcpy at memcpy.c:114 (by main):
   ptop1[4..799] FROM src[0..3] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:122 (by main):
+[from] call to memcpy at memcpy.c:122 (by main):
   ptop2[2..749] FROM src[1..4] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:131 (by main):
+[from] call to memcpy at memcpy.c:131 (by main):
   ptop3[2..797] FROM src[2..5] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:140 (by main):
+[from] call to memcpy at memcpy.c:140 (by main):
   ptop4[2..798] FROM src[2..6] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:145 (by main):
+[from] call to memcpy at memcpy.c:145 (by main):
   garbledsize[10..99] FROM src[0..19] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:151 (by main):
+[from] call to memcpy at memcpy.c:151 (by main):
   dstmaybesize1[0..14] FROM src[0..19] (and SELF)
   \result FROM dest
-[from] call to memcpy at tests/builtins/memcpy.c:153 (by main):
+[from] call to memcpy at memcpy.c:153 (by main):
   dstmaybesize2[0..5] FROM src[0..5] (and SELF)
   \result FROM dest
-[from] call to main at tests/builtins/memcpy.c:226 (by main_all):
+[from] call to main at memcpy.c:226 (by main_all):
   src[0..19] FROM \nothing (and SELF)
   dst1{[0]; [16..19]} FROM \nothing (and SELF)
       [1..5] FROM src[2..6]
@@ -880,11 +880,11 @@
   t[1] FROM v2
    [2] FROM t[0]
    [3] FROM v2 (and SELF)
-[from] call to main_uninit at tests/builtins/memcpy.c:227 (by main_all):
+[from] call to main_uninit at memcpy.c:227 (by main_all):
   NO EFFECTS
-[from] call to main_local at tests/builtins/memcpy.c:228 (by main_all):
+[from] call to main_local at memcpy.c:228 (by main_all):
   NO EFFECTS
-[from] call to copy_0 at tests/builtins/memcpy.c:229 (by main_all):
+[from] call to copy_0 at memcpy.c:229 (by main_all):
   NO EFFECTS
 [from] entry point:
   NON TERMINATING - NO EFFECTS
@@ -1135,45 +1135,45 @@
 
 [  Alarm  ] Pre-condition 'valid_dest'
             By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file tests/builtins/memcpy.c, line 220)
-             - Instance of 'Pre-condition 'valid_dest'' of 'buggy' at call 'memcpy' (file tests/builtins/memcpy.c, line 28)
+             - Unreachable call 'memcpy' (file memcpy.c, line 220)
+             - Instance of 'Pre-condition 'valid_dest'' of 'buggy' at call 'memcpy' (file memcpy.c, line 28)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 70)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 70)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 75)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 75)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 89)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 89)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 91)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 91)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 96)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 96)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 114)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 114)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 122)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 122)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 131)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 131)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 140)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 140)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 145)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 145)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 151)
+             - Instance of 'Pre-condition 'valid_dest'' of 'main' at call 'memcpy' (file memcpy.c, line 151)
 
 [  Alarm  ] Pre-condition 'valid_src'
             By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file tests/builtins/memcpy.c, line 221)
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 70)
+             - Unreachable call 'memcpy' (file memcpy.c, line 221)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 70)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 75)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 75)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 87)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 87)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 96)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 96)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 145)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 145)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file tests/builtins/memcpy.c, line 151)
+             - Instance of 'Pre-condition 'valid_src'' of 'main' at call 'memcpy' (file memcpy.c, line 151)
 
 [    -    ] Pre-condition 'separation'
             tried with Call Preconditions.
@@ -1835,13 +1835,13 @@
 --- Properties of Function 'buggy'
 --------------------------------------------------------------------------------
 
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 28)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 28)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 28)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 28)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 28)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 28)
 
             by Eva.
 
@@ -1849,33 +1849,33 @@
 --- Properties of Function 'many'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 44)
+[    -    ] Assertion (file memcpy.c, line 44)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 47)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 47)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 47)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 47)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 47)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 47)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 49)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 49)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 49)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 49)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 49)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 49)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 53)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 53)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 53)
 
             by Eva.
 
@@ -1883,194 +1883,194 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 67)
+[    -    ] Assertion (file memcpy.c, line 67)
             tried with Eva.
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 72)
+[    -    ] Assertion (file memcpy.c, line 72)
             tried with Eva.
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 103)
+[    -    ] Assertion (file memcpy.c, line 103)
             tried with Eva.
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 150)
+[    -    ] Assertion (file memcpy.c, line 150)
             tried with Eva.
-[    -    ] Assertion (file tests/builtins/memcpy.c, line 152)
+[    -    ] Assertion (file memcpy.c, line 152)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 87)
+[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 87)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 89)
+[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 89)
             tried with Eva.
-[ Partial ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 90)
+[ Partial ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 90)
             By RedundantAlarms, with pending:
-             - Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 87)
-[    -    ] Assertion 'Eva,pointer_downcast' (file tests/builtins/memcpy.c, line 91)
+             - Assertion 'Eva,pointer_downcast' (file memcpy.c, line 87)
+[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 91)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 68)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 68)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 68)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 68)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 68)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 68)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 70)
-
-            tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 70)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 70)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 70)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 73)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 73)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 73)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 75)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 70)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 75)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 70)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 73)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 73)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 73)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 75)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 75)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 83)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 83)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 83)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 85)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 85)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 85)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 87)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 87)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 75)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 87)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 75)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 89)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 83)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 83)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 83)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 85)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 85)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 85)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 87)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 87)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 89)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 87)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 89)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 91)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 89)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 91)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 89)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 91)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 89)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 96)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 91)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 96)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 91)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 91)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 96)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 96)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 96)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 101)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 101)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 101)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 105)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 105)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 105)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 114)
+[    -    ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 96)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 114)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 101)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 114)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 101)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 122)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 101)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 105)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 105)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 105)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 114)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 122)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 114)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 122)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 114)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 131)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 122)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 131)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 122)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 131)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 122)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 140)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 131)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 140)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 131)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 140)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 131)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 145)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 140)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 145)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 140)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 140)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 145)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 145)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 151)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 145)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 151)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 145)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 151)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 151)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 151)
+
+            tried with Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 151)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 153)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 153)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 153)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 153)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 153)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 153)
 
             by Eva.
 
@@ -2078,11 +2078,11 @@
 --- Properties of Function 'itv'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition (file tests/builtins/memcpy.c, line 158)
+[ Extern  ] Post-condition (file memcpy.c, line 158)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/builtins/memcpy.c, line 157)
+[ Extern  ] Froms (file memcpy.c, line 157)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -2091,13 +2091,13 @@
 --- Properties of Function 'make_unknown'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file tests/builtins/memcpy.c, line 161)
+[  Valid  ] Pre-condition (file memcpy.c, line 161)
             by Call Preconditions.
-[ Extern  ] Post-condition (file tests/builtins/memcpy.c, line 163)
+[ Extern  ] Post-condition (file memcpy.c, line 163)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file tests/builtins/memcpy.c, line 162)
+[ Extern  ] Assigns (file memcpy.c, line 162)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/builtins/memcpy.c, line 162)
+[ Extern  ] Froms (file memcpy.c, line 162)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -2106,106 +2106,106 @@
 --- Properties of Function 'main_uninit'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 173)
+[  Valid  ] Assertion (file memcpy.c, line 173)
             by Eva.
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 175)
+[  Valid  ] Assertion (file memcpy.c, line 175)
             by Eva.
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 180)
+[  Valid  ] Assertion (file memcpy.c, line 180)
             by Eva.
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 188)
+[  Valid  ] Assertion (file memcpy.c, line 188)
             by Eva.
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 191)
+[  Valid  ] Assertion (file memcpy.c, line 191)
             by Eva.
-[  Valid  ] Assertion (file tests/builtins/memcpy.c, line 199)
+[  Valid  ] Assertion (file memcpy.c, line 199)
             by Eva.
-[    -    ] Assertion 'Eva,initialization' (file tests/builtins/memcpy.c, line 182)
+[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 182)
             tried with Eva.
-[    -    ] Assertion 'Eva,initialization' (file tests/builtins/memcpy.c, line 192)
+[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 192)
             tried with Eva.
-[    -    ] Assertion 'Eva,initialization' (file tests/builtins/memcpy.c, line 201)
+[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 201)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 172)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 172)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 172)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 172)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 172)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 172)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 174)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 174)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 174)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 174)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 174)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 174)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file tests/builtins/memcpy.c, line 161)' at call 'make_unknown' (file tests/builtins/memcpy.c, line 178)
+[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 161)' at call 'make_unknown' (file memcpy.c, line 178)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 179)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 179)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 179)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 179)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 179)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 179)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 181)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 181)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 181)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 181)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 181)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 181)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file tests/builtins/memcpy.c, line 161)' at call 'make_unknown' (file tests/builtins/memcpy.c, line 185)
+[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 161)' at call 'make_unknown' (file memcpy.c, line 185)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 187)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 187)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 187)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 187)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 187)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 187)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 190)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 190)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 190)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 190)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 190)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 190)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file tests/builtins/memcpy.c, line 161)' at call 'make_unknown' (file tests/builtins/memcpy.c, line 196)
+[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 161)' at call 'make_unknown' (file memcpy.c, line 196)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file tests/builtins/memcpy.c, line 161)' at call 'make_unknown' (file tests/builtins/memcpy.c, line 197)
+[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 161)' at call 'make_unknown' (file memcpy.c, line 197)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 198)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 198)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 198)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 198)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 198)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 198)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 200)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 200)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 200)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 200)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 200)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 200)
 
             by Eva.
 
@@ -2213,13 +2213,13 @@
 --- Properties of Function 'main_local'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 209)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 209)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 209)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 209)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 209)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 209)
 
             by Eva.
 
@@ -2227,24 +2227,24 @@
 --- Properties of Function 'copy_0'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 220)
+[  Alarm  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 220)
 
             By Eva, with pending:
-             - Unreachable call 'memcpy' (file tests/builtins/memcpy.c, line 220)
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 220)
+             - Unreachable call 'memcpy' (file memcpy.c, line 220)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 220)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 220)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 220)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file tests/builtins/memcpy.c, line 221)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 221)
 
             by Eva.
-[  Alarm  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file tests/builtins/memcpy.c, line 221)
+[  Alarm  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 221)
 
             By Eva, with pending:
-             - Unreachable call 'memcpy' (file tests/builtins/memcpy.c, line 221)
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file tests/builtins/memcpy.c, line 221)
+             - Unreachable call 'memcpy' (file memcpy.c, line 221)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 221)
 
             by Eva.
 

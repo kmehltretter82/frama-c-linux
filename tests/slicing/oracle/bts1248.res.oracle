@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts1248.i (no preprocessing)
+[kernel] Parsing bts1248.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
@@ -30,4 +30,4 @@ void f(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts1248.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts1248.i (no preprocessing)

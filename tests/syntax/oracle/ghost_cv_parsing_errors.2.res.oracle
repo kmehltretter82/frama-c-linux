@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/ghost_cv_parsing_errors.c (with preprocessing)
-[kernel] tests/syntax/ghost_cv_parsing_errors.c:25: 
+[kernel] Parsing ghost_cv_parsing_errors.c (with preprocessing)
+[kernel] ghost_cv_parsing_errors.c:25: 
   Use of \ghost out of ghost code:
   Location: line 25, between columns 14 and 14
   23    #ifdef IN_GHOST_ATTR

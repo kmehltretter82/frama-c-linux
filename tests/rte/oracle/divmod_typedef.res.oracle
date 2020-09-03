@@ -1,22 +1,22 @@
-[kernel] Parsing tests/rte/divmod_typedef.c (with preprocessing)
+[kernel] Parsing divmod_typedef.c (with preprocessing)
 [rte] annotating function main
-[rte] tests/rte/divmod_typedef.c:15: Warning: 
+[rte] divmod_typedef.c:15: Warning: 
   guaranteed RTE:
   assert
   signed_overflow: (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
-[rte] tests/rte/divmod_typedef.c:18: Warning: 
+[rte] divmod_typedef.c:18: Warning: 
   guaranteed RTE: assert division_by_zero: 0 ≢ 0;
-[rte] tests/rte/divmod_typedef.c:19: Warning: 
+[rte] divmod_typedef.c:19: Warning: 
   guaranteed RTE:
   assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
-[rte] tests/rte/divmod_typedef.c:26: Warning: 
+[rte] divmod_typedef.c:26: Warning: 
   guaranteed RTE:
   assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
-[rte] tests/rte/divmod_typedef.c:27: Warning: 
+[rte] divmod_typedef.c:27: Warning: 
   guaranteed RTE:
   assert
   signed_overflow: (int)((int)(-0x7fffffff) - 1) / (int)(-1) ≤ 2147483647;
-[rte] tests/rte/divmod_typedef.c:38: Warning: 
+[rte] divmod_typedef.c:38: Warning: 
   guaranteed RTE:
   assert
   signed_downcast:

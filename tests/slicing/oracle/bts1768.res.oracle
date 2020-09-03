@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts1768.i (no preprocessing)
+[kernel] Parsing bts1768.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -9,102 +9,102 @@
   cumul ∈ {0}
   step ∈ {0}
 [eva] computing for function lecture <- main.
-  Called from tests/slicing/bts1768.i:45.
+  Called from bts1768.i:45.
 [eva] computing for function choisir <- lecture <- main.
-  Called from tests/slicing/bts1768.i:18.
-[kernel] tests/slicing/bts1768.i:18: Warning: 
+  Called from bts1768.i:18.
+[kernel] bts1768.i:18: Warning: 
   No code nor implicit assigns clause for function choisir, generating default assigns from the prototype
 [eva] using specification for function choisir
 [eva] Done for function choisir
 [eva] Recording results for lecture
 [eva] Done for function lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:44: starting to merge loop iterations
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:44: starting to merge loop iterations
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva:alarm] tests/slicing/bts1768.i:51: Warning: 
+[eva:alarm] bts1768.i:51: Warning: 
   signed overflow. assert step + 1 ≤ 2147483647;
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
+  Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] tests/slicing/bts1768.i:45: Reusing old results for call to lecture
+[eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
-  Called from tests/slicing/bts1768.i:46.
-[eva:alarm] tests/slicing/bts1768.i:25: Warning: 
+  Called from bts1768.i:46.
+[eva:alarm] bts1768.i:25: Warning: 
   signed overflow. assert cumul + 2 ≤ 2147483647;
-[eva:alarm] tests/slicing/bts1768.i:29: Warning: 
+[eva:alarm] bts1768.i:29: Warning: 
   signed overflow. assert cumul + 1 ≤ 2147483647;
-[eva:alarm] tests/slicing/bts1768.i:35: Warning: 
+[eva:alarm] bts1768.i:35: Warning: 
   signed overflow. assert cumul + 1 ≤ 2147483647;
-[eva:alarm] tests/slicing/bts1768.i:35: Warning: 
+[eva:alarm] bts1768.i:35: Warning: 
   signed overflow. assert cumul + 1 ≤ 2147483647;
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
@@ -219,4 +219,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts1768.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts1768.i (no preprocessing)

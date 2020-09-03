@@ -1,64 +1,64 @@
-[kernel] Parsing tests/value/propagate_bottom.i (no preprocessing)
+[kernel] Parsing propagate_bottom.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] tests/value/propagate_bottom.i:5: Warning: 
+[eva:alarm] propagate_bottom.i:5: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:8: Warning: 
+[eva:alarm] propagate_bottom.i:8: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:11: Warning: 
+[eva:alarm] propagate_bottom.i:11: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:14: Warning: 
+[eva:alarm] propagate_bottom.i:14: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:17: Warning: 
+[eva:alarm] propagate_bottom.i:17: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:20: Warning: 
+[eva:alarm] propagate_bottom.i:20: Warning: 
   division by zero. assert 0 ≢ 0;
-[eva:alarm] tests/value/propagate_bottom.i:25: Warning: 
+[eva:alarm] propagate_bottom.i:25: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0));
-[eva:alarm] tests/value/propagate_bottom.i:28: Warning: 
+[eva:alarm] propagate_bottom.i:28: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0));
-[eva:alarm] tests/value/propagate_bottom.i:31: Warning: 
+[eva:alarm] propagate_bottom.i:31: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0));
-[eva:alarm] tests/value/propagate_bottom.i:34: Warning: 
+[eva:alarm] propagate_bottom.i:34: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
-[eva:alarm] tests/value/propagate_bottom.i:37: Warning: 
+[eva:alarm] propagate_bottom.i:37: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
-[eva:alarm] tests/value/propagate_bottom.i:40: Warning: 
+[eva:alarm] propagate_bottom.i:40: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/propagate_bottom.i:5: 
+[eva] propagate_bottom.i:5: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:8: 
+[eva] propagate_bottom.i:8: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:11: 
+[eva] propagate_bottom.i:11: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:14: 
+[eva] propagate_bottom.i:14: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:17: 
+[eva] propagate_bottom.i:17: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:20: 
+[eva] propagate_bottom.i:20: 
   assertion 'Eva,division_by_zero' got final status invalid.
-[eva] tests/value/propagate_bottom.i:25: 
+[eva] propagate_bottom.i:25: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/value/propagate_bottom.i:28: 
+[eva] propagate_bottom.i:28: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/value/propagate_bottom.i:31: 
+[eva] propagate_bottom.i:31: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/value/propagate_bottom.i:34: 
+[eva] propagate_bottom.i:34: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/value/propagate_bottom.i:37: 
+[eva] propagate_bottom.i:37: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/value/propagate_bottom.i:40: 
+[eva] propagate_bottom.i:40: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

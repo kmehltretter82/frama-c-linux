@@ -1,9 +1,9 @@
-[kernel] Parsing tests/spec/model.i (no preprocessing)
-[kernel:annot-error] tests/spec/model.i:9: Warning: 
+[kernel] Parsing model.i (no preprocessing)
+[kernel:annot-error] model.i:9: Warning: 
   Cannot add model field x for type struct S: it already exists. Ignoring global annotation
-[kernel:annot-error] tests/spec/model.i:13: Warning: 
+[kernel:annot-error] model.i:13: Warning: 
   Cannot add model field z for type T: it already exists. Ignoring global annotation
-[kernel:annot-error] tests/spec/model.i:14: Warning: 
+[kernel:annot-error] model.i:14: Warning: 
   Cannot add model field x for type T: it already exists. Ignoring global annotation
 Model fields for type T:
 z, t, 

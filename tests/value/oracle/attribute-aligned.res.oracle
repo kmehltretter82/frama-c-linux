@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/attribute-aligned.c (with preprocessing)
+[kernel] Parsing attribute-aligned.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,31 +7,31 @@
   A ∈ {0}
   B ∈ {0}
 [eva] computing for function ct <- main.
-  Called from tests/value/attribute-aligned.c:97.
+  Called from attribute-aligned.c:97.
 [eva] Recording results for ct
 [eva] Done for function ct
 [eva] computing for function dt <- main.
-  Called from tests/value/attribute-aligned.c:98.
+  Called from attribute-aligned.c:98.
 [eva] Recording results for dt
 [eva] Done for function dt
 [eva] computing for function pt <- main.
-  Called from tests/value/attribute-aligned.c:99.
+  Called from attribute-aligned.c:99.
 [eva] Recording results for pt
 [eva] Done for function pt
 [eva] computing for function qt <- main.
-  Called from tests/value/attribute-aligned.c:100.
+  Called from attribute-aligned.c:100.
 [eva] Recording results for qt
 [eva] Done for function qt
 [eva] computing for function rt <- main.
-  Called from tests/value/attribute-aligned.c:101.
+  Called from attribute-aligned.c:101.
 [eva] Recording results for rt
 [eva] Done for function rt
 [eva] computing for function st <- main.
-  Called from tests/value/attribute-aligned.c:102.
+  Called from attribute-aligned.c:102.
 [eva] Recording results for st
 [eva] Done for function st
 [eva] computing for function tt <- main.
-  Called from tests/value/attribute-aligned.c:103.
+  Called from attribute-aligned.c:103.
 [eva] Recording results for tt
 [eva] Done for function tt
 [eva] Recording results for main

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/calls_and_struct.c (with preprocessing)
+[kernel] Parsing calls_and_struct.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,11 +8,11 @@
   B ∈ {0}
   C ∈ {0}
 [eva] computing for function asgn_struct <- main.
-  Called from tests/pdg/calls_and_struct.c:23.
+  Called from calls_and_struct.c:23.
 [eva] Recording results for asgn_struct
 [eva] Done for function asgn_struct
 [eva] computing for function f <- main.
-  Called from tests/pdg/calls_and_struct.c:27.
+  Called from calls_and_struct.c:27.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

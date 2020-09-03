@@ -1,5 +1,5 @@
-[kernel] Parsing tests/slicing/select_return_bis.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] tests/slicing/select_return_bis.i:36: Warning: 
+[kernel] Parsing select_return_bis.i (no preprocessing)
+[kernel:typing:implicit-function-declaration] select_return_bis.i:36: Warning: 
   Calling undeclared function f. Old style K&R code?
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at g
@@ -10,18 +10,18 @@
   H ∈ [--..--]
   I ∈ [--..--]
 [eva] computing for function k <- g.
-  Called from tests/slicing/select_return_bis.i:35.
+  Called from select_return_bis.i:35.
 [eva] computing for function get <- k <- g.
-  Called from tests/slicing/select_return_bis.i:28.
-[kernel:annot:missing-spec] tests/slicing/select_return_bis.i:28: Warning: 
+  Called from select_return_bis.i:28.
+[kernel:annot:missing-spec] select_return_bis.i:28: Warning: 
   Neither code nor specification for function get, generating default assigns from the prototype
 [eva] using specification for function get
 [eva] Done for function get
 [eva] computing for function k_bis <- k <- g.
-  Called from tests/slicing/select_return_bis.i:30.
+  Called from select_return_bis.i:30.
 [eva] computing for function send_bis <- k_bis <- k <- g.
-  Called from tests/slicing/select_return_bis.i:24.
-[kernel:annot:missing-spec] tests/slicing/select_return_bis.i:24: Warning: 
+  Called from select_return_bis.i:24.
+[kernel:annot:missing-spec] select_return_bis.i:24: Warning: 
   Neither code nor specification for function send_bis, generating default assigns from the prototype
 [eva] using specification for function send_bis
 [eva] Done for function send_bis
@@ -30,42 +30,42 @@
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function f <- g.
-  Called from tests/slicing/select_return_bis.i:36.
+  Called from select_return_bis.i:36.
 [eva] computing for function k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:40.
+  Called from select_return_bis.i:40.
 [eva] computing for function get <- k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:28.
+  Called from select_return_bis.i:28.
 [eva] Done for function get
 [eva] computing for function k_bis <- k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:30.
+  Called from select_return_bis.i:30.
 [eva] computing for function send_bis <- k_bis <- k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:24.
+  Called from select_return_bis.i:24.
 [eva] Done for function send_bis
 [eva] Recording results for k_bis
 [eva] Done for function k_bis
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:41.
+  Called from select_return_bis.i:41.
 [eva] computing for function get <- k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:28.
+  Called from select_return_bis.i:28.
 [eva] Done for function get
-[eva] tests/slicing/select_return_bis.i:30: 
+[eva] select_return_bis.i:30: 
   Reusing old results for call to k_bis
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:42.
+  Called from select_return_bis.i:42.
 [eva] computing for function get <- k <- f <- g.
-  Called from tests/slicing/select_return_bis.i:28.
+  Called from select_return_bis.i:28.
 [eva] Done for function get
-[eva] tests/slicing/select_return_bis.i:30: 
+[eva] select_return_bis.i:30: 
   Reusing old results for call to k_bis
 [eva] Recording results for k
 [eva] Done for function k
 [eva] computing for function send <- f <- g.
-  Called from tests/slicing/select_return_bis.i:44.
-[kernel:annot:missing-spec] tests/slicing/select_return_bis.i:44: Warning: 
+  Called from select_return_bis.i:44.
+[kernel:annot:missing-spec] select_return_bis.i:44: Warning: 
   Neither code nor specification for function send, generating default assigns from the prototype
 [eva] using specification for function send
 [eva] Done for function send
@@ -135,4 +135,4 @@ void f_slice_1(int y)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_select_return_bis.i (no preprocessing)
+[kernel] Parsing result/ocode_0_select_return_bis.i (no preprocessing)

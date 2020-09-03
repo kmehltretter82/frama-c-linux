@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/init_const_guard.i (no preprocessing)
+[kernel] Parsing init_const_guard.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,13 +7,13 @@
   q ∈ {{ &x }}
   p ∈ {{ &x }}
   v ∈ [--..--]
-[eva] tests/value/init_const_guard.i:14: 
+[eva] init_const_guard.i:14: 
   function f: postcondition 'Const' got status valid.
-[eva] tests/value/init_const_guard.i:15: 
+[eva] init_const_guard.i:15: 
   function f: postcondition 'Pointed_Valid' got status valid.
-[eva] tests/value/init_const_guard.i:16: 
+[eva] init_const_guard.i:16: 
   function f: postcondition 'Q_ReadOnly' got status valid.
-[eva] tests/value/init_const_guard.i:17: 
+[eva] init_const_guard.i:17: 
   function f: postcondition 'Q_NotWrite' got status valid.
 [eva] Recording results for f
 [eva] done for function f
@@ -52,17 +52,17 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion 'Read' (file tests/value/init_const_guard.i, line 32)
+[  Dead   ] Assertion 'Read' (file init_const_guard.i, line 32)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file tests/value/init_const_guard.i, line 32)
-[  Dead   ] Assertion 'Guard_against_Const' (file tests/value/init_const_guard.i, line 33)
+             - Unreachable program point (file init_const_guard.i, line 32)
+[  Dead   ] Assertion 'Guard_against_Const' (file init_const_guard.i, line 33)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file tests/value/init_const_guard.i, line 33)
-[Unreachable] Unreachable program point (file tests/value/init_const_guard.i, line 32)
+             - Unreachable program point (file init_const_guard.i, line 33)
+[Unreachable] Unreachable program point (file init_const_guard.i, line 32)
             by Eva.
-[Unreachable] Unreachable program point (file tests/value/init_const_guard.i, line 33)
+[Unreachable] Unreachable program point (file init_const_guard.i, line 33)
             by Eva.
 
 --------------------------------------------------------------------------------
@@ -81,10 +81,10 @@
   q ∈ {{ &x }}
   p ∈ {{ &x }}
   v ∈ [--..--]
-[eva] tests/value/init_const_guard.i:32: assertion 'Read' got status valid.
-[eva] tests/value/init_const_guard.i:33: 
+[eva] init_const_guard.i:32: assertion 'Read' got status valid.
+[eva] init_const_guard.i:33: 
   assertion 'Guard_against_Const' got status valid.
-[eva] tests/value/init_const_guard.i:27: 
+[eva] init_const_guard.i:27: 
   function g: postcondition 'P_not_Const' got status valid.
 [eva] Recording results for g
 [eva] done for function g
@@ -123,9 +123,9 @@
 
 [  Valid  ] Post-condition 'P_not_Const'
             by Eva.
-[  Valid  ] Assertion 'Read' (file tests/value/init_const_guard.i, line 32)
+[  Valid  ] Assertion 'Read' (file init_const_guard.i, line 32)
             by Eva.
-[  Valid  ] Assertion 'Guard_against_Const' (file tests/value/init_const_guard.i, line 33)
+[  Valid  ] Assertion 'Guard_against_Const' (file init_const_guard.i, line 33)
             by Eva.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -183,20 +183,20 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion 'Read' (file tests/value/init_const_guard.i, line 32)
+[  Dead   ] Assertion 'Read' (file init_const_guard.i, line 32)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file tests/value/init_const_guard.i, line 32)
-[  Dead   ] Assertion 'Guard_against_Const' (file tests/value/init_const_guard.i, line 33)
+             - Unreachable program point (file init_const_guard.i, line 32)
+[  Dead   ] Assertion 'Guard_against_Const' (file init_const_guard.i, line 33)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file tests/value/init_const_guard.i, line 33)
+             - Unreachable program point (file init_const_guard.i, line 33)
 [ Partial ] Default behavior
             By Frama-C kernel, with pending:
              - Post-condition 'P_not_Const'
-[Unreachable] Unreachable program point (file tests/value/init_const_guard.i, line 32)
+[Unreachable] Unreachable program point (file init_const_guard.i, line 32)
             by Eva.
-[Unreachable] Unreachable program point (file tests/value/init_const_guard.i, line 33)
+[Unreachable] Unreachable program point (file init_const_guard.i, line 33)
             by Eva.
 
 --------------------------------------------------------------------------------
@@ -254,9 +254,9 @@
 
 [  Valid  ] Post-condition 'P_not_Const'
             by Eva.
-[  Valid  ] Assertion 'Read' (file tests/value/init_const_guard.i, line 32)
+[  Valid  ] Assertion 'Read' (file init_const_guard.i, line 32)
             by Eva.
-[  Valid  ] Assertion 'Guard_against_Const' (file tests/value/init_const_guard.i, line 33)
+[  Valid  ] Assertion 'Guard_against_Const' (file init_const_guard.i, line 33)
             by Eva.
 [  Valid  ] Default behavior
             by Frama-C kernel.

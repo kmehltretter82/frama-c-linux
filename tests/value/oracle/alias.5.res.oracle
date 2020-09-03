@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/alias.i (no preprocessing)
+[kernel] Parsing alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main11
 [eva] Computing initial state
 [eva] Initial state computed
@@ -58,8 +58,8 @@
   char1 ∈ {0}
   ll1 ∈ {0}
 [eva] computing for function f2 <- main11.
-  Called from tests/value/alias.i:268.
-[eva] tests/value/alias.i:23: 
+  Called from alias.i:268.
+[eva] alias.i:23: 
   Frama_C_dump_each:
   # Cvalue domain:
   NULL[rbits 0 to 2047] ∈ [--..--]
@@ -125,16 +125,16 @@
   ==END OF DUMP==
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva:alarm] tests/value/alias.i:271: Warning: 
+[eva:alarm] alias.i:271: Warning: 
   signed overflow. assert c2 + 1 ≤ 2147483647;
-[eva:alarm] tests/value/alias.i:273: Warning: 
+[eva:alarm] alias.i:273: Warning: 
   signed overflow. assert c2 + 2 ≤ 2147483647;
-[eva] tests/value/alias.i:279: starting to merge loop iterations
-[eva:alarm] tests/value/alias.i:285: Warning: 
+[eva] alias.i:279: starting to merge loop iterations
+[eva:alarm] alias.i:285: Warning: 
   pointer comparison. assert \pointer_comparable((void *)PTR2, (void *)PTR1);
-[eva:alarm] tests/value/alias.i:292: Warning: 
+[eva:alarm] alias.i:292: Warning: 
   signed overflow. assert c1 + 1 ≤ 2147483647;
-[eva] tests/value/alias.i:292: starting to merge loop iterations
+[eva] alias.i:292: starting to merge loop iterations
 [eva] Recording results for main11
 [eva] done for function main11
 [eva] ====== VALUES COMPUTED ======

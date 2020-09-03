@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/function-types-compatible.i (no preprocessing)
-[kernel:typing:incompatible-types-call] tests/syntax/function-types-compatible.i:4: Warning: 
+[kernel] Parsing function-types-compatible.i (no preprocessing)
+[kernel:typing:incompatible-types-call] function-types-compatible.i:4: Warning: 
   implicit conversion between incompatible function types:
   void (*)()
   and

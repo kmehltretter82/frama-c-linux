@@ -1,8 +1,8 @@
 /* run.config
-DONTRUN: main test is in tests/spec/model1.c
+DONTRUN: main test is in model1.c
 */
 
-#include "tests/spec/model1.h"
+#include "model1.h"
 
 struct S { int bar; };
 

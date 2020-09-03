@@ -1,4 +1,4 @@
-[kernel] Parsing tests/spec/behavior_assert.c (with preprocessing)
+[kernel] Parsing behavior_assert.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,43 +7,43 @@
   G ∈ {0}
   c ∈ [--..--]
 [eva] computing for function f <- main.
-  Called from tests/spec/behavior_assert.c:90.
-[eva:alarm] tests/spec/behavior_assert.c:14: Warning: 
+  Called from behavior_assert.c:90.
+[eva:alarm] behavior_assert.c:14: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/spec/behavior_assert.c:91.
-[eva] tests/spec/behavior_assert.c:30: assertion got status valid.
-[eva] tests/spec/behavior_assert.c:28: starting to merge loop iterations
-[eva] tests/spec/behavior_assert.c:24: 
+  Called from behavior_assert.c:91.
+[eva] behavior_assert.c:30: assertion got status valid.
+[eva] behavior_assert.c:28: starting to merge loop iterations
+[eva] behavior_assert.c:24: 
   function g, behavior be: postcondition got status valid.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function h2 <- main.
-  Called from tests/spec/behavior_assert.c:92.
-[eva:alarm] tests/spec/behavior_assert.c:64: Warning: 
+  Called from behavior_assert.c:92.
+[eva:alarm] behavior_assert.c:64: Warning: 
   signed overflow. assert c + 1 ≤ 2147483647;
-[eva:alarm] tests/spec/behavior_assert.c:65: Warning: 
+[eva:alarm] behavior_assert.c:65: Warning: 
   signed overflow. assert c + 2 ≤ 2147483647;
 [eva] computing for function h1 <- h2 <- main.
-  Called from tests/spec/behavior_assert.c:73.
+  Called from behavior_assert.c:73.
 [eva] computing for function abs <- h1 <- h2 <- main.
-  Called from tests/spec/behavior_assert.c:52.
+  Called from behavior_assert.c:52.
 [eva] Recording results for abs
 [eva] Done for function abs
-[eva:alarm] tests/spec/behavior_assert.c:55: Warning: 
+[eva:alarm] behavior_assert.c:55: Warning: 
   assertion got status unknown.
-[eva] tests/spec/behavior_assert.c:45: 
+[eva] behavior_assert.c:45: 
   function h1, behavior not_null: postcondition got status valid.
 [eva] Recording results for h1
 [eva] Done for function h1
-[eva] tests/spec/behavior_assert.c:74: assertion got status valid.
+[eva] behavior_assert.c:74: assertion got status valid.
 [eva] Recording results for h2
 [eva] Done for function h2
 [eva] computing for function k <- main.
-  Called from tests/spec/behavior_assert.c:93.
-[eva:alarm] tests/spec/behavior_assert.c:86: Warning: 
+  Called from behavior_assert.c:93.
+[eva:alarm] behavior_assert.c:86: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for k
 [eva] Done for function k

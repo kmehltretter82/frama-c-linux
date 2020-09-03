@@ -1,5 +1,5 @@
-[kernel] Parsing tests/slicing/use_spec.i (no preprocessing)
-[kernel] tests/slicing/use_spec.i:18: Warning: 
+[kernel] Parsing use_spec.i (no preprocessing)
+[kernel] use_spec.i:18: Warning: 
   Body of function f falls-through. Adding a return statement
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
@@ -13,7 +13,7 @@
   G1 ∈ {0}
   G2 ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/slicing/use_spec.i:25.
+  Called from use_spec.i:25.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] Recording results for main
@@ -45,4 +45,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_use_spec.i (no preprocessing)
+[kernel] Parsing result/ocode_0_use_spec.i (no preprocessing)

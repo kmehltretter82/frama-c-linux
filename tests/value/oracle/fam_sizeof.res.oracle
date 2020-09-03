@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/fam_sizeof.i (no preprocessing)
+[kernel] Parsing fam_sizeof.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,9 +7,9 @@
   nested ∈ {0}
   fam2 ∈ {0}
   gcc_fam ∈ {0}
-[eva] tests/value/fam_sizeof.i:44: assertion got status valid.
-[eva] tests/value/fam_sizeof.i:48: assertion got status valid.
-[eva] tests/value/fam_sizeof.i:50: assertion got status valid.
+[eva] fam_sizeof.i:44: assertion got status valid.
+[eva] fam_sizeof.i:48: assertion got status valid.
+[eva] fam_sizeof.i:50: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

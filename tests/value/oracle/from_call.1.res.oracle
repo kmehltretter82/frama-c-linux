@@ -1,9 +1,9 @@
-[kernel] Parsing tests/value/from_call.i (no preprocessing)
+[kernel] Parsing from_call.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/value/from_call.i:70: Warning: 
+[eva:alarm] from_call.i:70: Warning: 
   pointer downcast. assert (unsigned int)(&AA) ≤ 2147483647;
-[eva:alarm] tests/value/from_call.i:71: Warning: 
+[eva:alarm] from_call.i:71: Warning: 
   pointer downcast. assert (unsigned int)(&AA) ≤ 2147483647;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -43,61 +43,61 @@
   Ap ∈ {{ &At[0] }}
   f_previous ∈ {{ &a }}
 [eva] computing for function f <- main.
-  Called from tests/value/from_call.i:81.
+  Called from from_call.i:81.
 [eva] computing for function h <- f <- main.
-  Called from tests/value/from_call.i:20.
-[kernel:annot:missing-spec] tests/value/from_call.i:20: Warning: 
+  Called from from_call.i:20.
+[kernel:annot:missing-spec] from_call.i:20: Warning: 
   Neither code nor specification for function h, generating default assigns from the prototype
 [eva] using specification for function h
 [eva] Done for function h
 [eva] computing for function g <- f <- main.
-  Called from tests/value/from_call.i:20.
+  Called from from_call.i:20.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/value/from_call.i:82.
+  Called from from_call.i:82.
 [eva] computing for function h <- f <- main.
-  Called from tests/value/from_call.i:20.
+  Called from from_call.i:20.
 [eva] Done for function h
-[eva] tests/value/from_call.i:20: Reusing old results for call to g
+[eva] from_call.i:20: Reusing old results for call to g
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/value/from_call.i:82.
+  Called from from_call.i:82.
 [eva] computing for function h <- f <- main.
-  Called from tests/value/from_call.i:20.
+  Called from from_call.i:20.
 [eva] Done for function h
-[eva] tests/value/from_call.i:20: Reusing old results for call to g
+[eva] from_call.i:20: Reusing old results for call to g
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] tests/value/from_call.i:82: Warning: 
+[eva:alarm] from_call.i:82: Warning: 
   signed overflow.
   assert -2147483648 ≤ tmp + tmp_0;
   (tmp from f(& c), tmp_0 from f(& d))
-[eva:alarm] tests/value/from_call.i:82: Warning: 
+[eva:alarm] from_call.i:82: Warning: 
   signed overflow.
   assert tmp + tmp_0 ≤ 2147483647;
   (tmp from f(& c), tmp_0 from f(& d))
 [eva] computing for function dispatcher <- main.
-  Called from tests/value/from_call.i:83.
+  Called from from_call.i:83.
 [eva] Recording results for dispatcher
 [eva] Done for function dispatcher
 [eva] computing for function dispatcher <- main.
-  Called from tests/value/from_call.i:84.
+  Called from from_call.i:84.
 [eva] Recording results for dispatcher
 [eva] Done for function dispatcher
 [eva] computing for function dispatcher <- main.
-  Called from tests/value/from_call.i:85.
+  Called from from_call.i:85.
 [eva] Recording results for dispatcher
 [eva] Done for function dispatcher
 [eva] computing for function call_dispatcher2_1 <- main.
-  Called from tests/value/from_call.i:86.
+  Called from from_call.i:86.
 [eva] computing for function dispatcher2 <- call_dispatcher2_1 <- main.
-  Called from tests/value/from_call.i:49.
+  Called from from_call.i:49.
 [eva] computing for function return_A1 <- dispatcher2 <- call_dispatcher2_1 <- main.
-  Called from tests/value/from_call.i:44.
+  Called from from_call.i:44.
 [eva] Recording results for return_A1
 [eva] Done for function return_A1
 [eva] Recording results for dispatcher2
@@ -105,11 +105,11 @@
 [eva] Recording results for call_dispatcher2_1
 [eva] Done for function call_dispatcher2_1
 [eva] computing for function call_dispatcher2_0 <- main.
-  Called from tests/value/from_call.i:87.
+  Called from from_call.i:87.
 [eva] computing for function dispatcher2 <- call_dispatcher2_0 <- main.
-  Called from tests/value/from_call.i:54.
+  Called from from_call.i:54.
 [eva] computing for function return_A2 <- dispatcher2 <- call_dispatcher2_0 <- main.
-  Called from tests/value/from_call.i:44.
+  Called from from_call.i:44.
 [eva] Recording results for return_A2
 [eva] Done for function return_A2
 [eva] Recording results for dispatcher2
@@ -117,29 +117,29 @@
 [eva] Recording results for call_dispatcher2_0
 [eva] Done for function call_dispatcher2_0
 [eva] computing for function call_dispatcher2 <- main.
-  Called from tests/value/from_call.i:88.
+  Called from from_call.i:88.
 [eva] computing for function dispatcher2 <- call_dispatcher2 <- main.
-  Called from tests/value/from_call.i:59.
-[eva] tests/value/from_call.i:44: Reusing old results for call to return_A1
-[eva] tests/value/from_call.i:44: Reusing old results for call to return_A2
+  Called from from_call.i:59.
+[eva] from_call.i:44: Reusing old results for call to return_A1
+[eva] from_call.i:44: Reusing old results for call to return_A2
 [eva] Recording results for dispatcher2
 [eva] Done for function dispatcher2
 [eva] Recording results for call_dispatcher2
 [eva] Done for function call_dispatcher2
 [eva] computing for function access_tab <- main.
-  Called from tests/value/from_call.i:92.
+  Called from from_call.i:92.
 [eva] Recording results for access_tab
 [eva] Done for function access_tab
 [eva] computing for function access_tab <- main.
-  Called from tests/value/from_call.i:93.
+  Called from from_call.i:93.
 [eva] Recording results for access_tab
 [eva] Done for function access_tab
 [eva] computing for function access_tab <- main.
-  Called from tests/value/from_call.i:94.
+  Called from from_call.i:94.
 [eva] Recording results for access_tab
 [eva] Done for function access_tab
 [eva] computing for function unavailable_f <- main.
-  Called from tests/value/from_call.i:96.
+  Called from from_call.i:96.
 [eva] using specification for function unavailable_f
 [eva] Done for function unavailable_f
 [eva] Recording results for main

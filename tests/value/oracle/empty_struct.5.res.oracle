@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/empty_struct.c (with preprocessing)
+[kernel] Parsing empty_struct.c (with preprocessing)
 [eva] Analyzing a complete application starting at main3
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,15 +7,15 @@
   s2 ∈ {0}
   nondet ∈ [--..--]
   pgs ∈ {{ &gs }}
-[eva] tests/value/empty_struct.c:78: Call to builtin malloc
-[eva] tests/value/empty_struct.c:78: allocating variable __malloc_main3_l78
-[eva] tests/value/empty_struct.c:79: Call to builtin realloc
-[eva] tests/value/empty_struct.c:79: 
+[eva] empty_struct.c:78: Call to builtin malloc
+[eva] empty_struct.c:78: allocating variable __malloc_main3_l78
+[eva] empty_struct.c:79: Call to builtin realloc
+[eva] empty_struct.c:79: 
   function realloc: precondition 'freeable' got status valid.
-[eva] tests/value/empty_struct.c:79: allocating variable __realloc_main3_l79
-[eva] tests/value/empty_struct.c:81: starting to merge loop iterations
-[eva] tests/value/empty_struct.c:86: Call to builtin free
-[eva] tests/value/empty_struct.c:86: 
+[eva] empty_struct.c:79: allocating variable __realloc_main3_l79
+[eva] empty_struct.c:81: starting to merge loop iterations
+[eva] empty_struct.c:86: Call to builtin free
+[eva] empty_struct.c:86: 
   function free: precondition 'freeable' got status valid.
 [eva] Recording results for main3
 [eva] done for function main3

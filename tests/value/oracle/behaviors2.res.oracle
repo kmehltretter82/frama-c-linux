@@ -1,221 +1,221 @@
-[kernel] Parsing tests/value/behaviors2.c (with preprocessing)
+[kernel] Parsing behaviors2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function test1 <- main.
-  Called from tests/value/behaviors2.c:328.
+  Called from behaviors2.c:328.
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:178.
+  Called from behaviors2.c:178.
 [eva] using specification for function divi
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi, behavior error: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:178: 
+[eva] behaviors2.c:178: 
   function divi, behavior ok_quotient_zero: assumes got status invalid; behavior not evaluated.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:180.
-[eva] tests/value/behaviors2.c:180: 
+  Called from behaviors2.c:180.
+[eva] behaviors2.c:180: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:180: 
+[eva] behaviors2.c:180: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:180: 
+[eva] behaviors2.c:180: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:180: 
+[eva] behaviors2.c:180: 
   function divi, behavior error: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:180: 
+[eva] behaviors2.c:180: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:180: 
+[eva] behaviors2.c:180: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:182.
-[eva] tests/value/behaviors2.c:182: 
+  Called from behaviors2.c:182.
+[eva] behaviors2.c:182: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:182: 
+[eva] behaviors2.c:182: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:182: 
+[eva] behaviors2.c:182: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:182: 
+[eva] behaviors2.c:182: 
   function divi, behavior error: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:182: 
+[eva] behaviors2.c:182: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:182: 
+[eva] behaviors2.c:182: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:184.
-[eva] tests/value/behaviors2.c:184: 
+  Called from behaviors2.c:184.
+[eva] behaviors2.c:184: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior ok: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior ok_res_sign_nonnegative: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior ok_quotient_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior division_by_zero: precondition got status valid.
-[eva] tests/value/behaviors2.c:184: 
+[eva] behaviors2.c:184: 
   function divi, behavior error: precondition got status valid.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:186.
-[eva] tests/value/behaviors2.c:186: 
+  Called from behaviors2.c:186.
+[eva] behaviors2.c:186: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior ok: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior ok_res_sign_nonnegative: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior ok_quotient_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior invalid_parameter: precondition got status valid.
-[eva] tests/value/behaviors2.c:186: 
+[eva] behaviors2.c:186: 
   function divi, behavior error: precondition got status valid.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:188.
-[eva] tests/value/behaviors2.c:188: 
+  Called from behaviors2.c:188.
+[eva] behaviors2.c:188: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior ok: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior ok_res_sign_nonnegative: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior ok_quotient_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior invalid_parameter: precondition got status valid.
-[eva] tests/value/behaviors2.c:188: 
+[eva] behaviors2.c:188: 
   function divi, behavior error: precondition got status valid.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:190.
-[eva] tests/value/behaviors2.c:190: 
+  Called from behaviors2.c:190.
+[eva] behaviors2.c:190: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior division_by_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior ok: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior ok_res_sign_nonnegative: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior ok_res_sign_nonpositive: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior ok_quotient_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior ok_quotient_non_zero: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior invalid_parameter: precondition got status valid.
-[eva] tests/value/behaviors2.c:190: 
+[eva] behaviors2.c:190: 
   function divi, behavior error: precondition got status valid.
 [eva] Done for function divi
 [eva] computing for function divi <- test1 <- main.
-  Called from tests/value/behaviors2.c:192.
-[eva] tests/value/behaviors2.c:192: 
+  Called from behaviors2.c:192.
+[eva] behaviors2.c:192: 
   function divi: precondition got status valid.
-[eva] tests/value/behaviors2.c:192: 
+[eva] behaviors2.c:192: 
   function divi, behavior invalid_parameter: assumes got status invalid; behavior not evaluated.
-[eva] tests/value/behaviors2.c:192: 
+[eva] behaviors2.c:192: 
   function divi, behavior error: precondition got status valid.
-[eva] tests/value/behaviors2.c:192: 
+[eva] behaviors2.c:192: 
   function divi, behavior division_by_zero: precondition got status valid.
 [eva] Done for function divi
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] computing for function test2 <- main.
-  Called from tests/value/behaviors2.c:329.
+  Called from behaviors2.c:329.
 [eva] computing for function f1 <- test2 <- main.
-  Called from tests/value/behaviors2.c:229.
+  Called from behaviors2.c:229.
 [eva] using specification for function f1
-[eva:alarm] tests/value/behaviors2.c:229: Warning: 
+[eva:alarm] behaviors2.c:229: Warning: 
   function f1: precondition got status unknown.
-[eva] tests/value/behaviors2.c:229: 
+[eva] behaviors2.c:229: 
   function f1, behavior b2: precondition \initialized(p2) got status valid.
-[eva] tests/value/behaviors2.c:229: 
+[eva] behaviors2.c:229: 
   function f1, behavior b2: precondition \valid(y) got status valid.
-[eva] tests/value/behaviors2.c:229: 
+[eva] behaviors2.c:229: 
   function f1, behavior b1: precondition \initialized(p1) got status valid.
-[eva] tests/value/behaviors2.c:229: 
+[eva] behaviors2.c:229: 
   function f1, behavior b1: precondition \valid(y) got status valid.
 [eva] Done for function f1
 [eva] Recording results for test2
 [eva] Done for function test2
 [eva] computing for function test3 <- main.
-  Called from tests/value/behaviors2.c:330.
+  Called from behaviors2.c:330.
 [eva] computing for function f2 <- test3 <- main.
-  Called from tests/value/behaviors2.c:265.
+  Called from behaviors2.c:265.
 [eva] using specification for function f2
-[eva:alarm] tests/value/behaviors2.c:265: Warning: 
+[eva:alarm] behaviors2.c:265: Warning: 
   function f2: precondition got status unknown.
-[eva] tests/value/behaviors2.c:265: 
+[eva] behaviors2.c:265: 
   function f2, behavior b2: precondition \initialized(p2) got status valid.
-[eva] tests/value/behaviors2.c:265: 
+[eva] behaviors2.c:265: 
   function f2, behavior b2: precondition \valid(y) got status valid.
-[eva] tests/value/behaviors2.c:265: 
+[eva] behaviors2.c:265: 
   function f2, behavior b1: precondition \initialized(p1) got status valid.
-[eva] tests/value/behaviors2.c:265: 
+[eva] behaviors2.c:265: 
   function f2, behavior b1: precondition \valid(y) got status valid.
 [eva] Done for function f2
 [eva] Recording results for test3
 [eva] Done for function test3
 [eva] computing for function test4 <- main.
-  Called from tests/value/behaviors2.c:331.
+  Called from behaviors2.c:331.
 [eva] computing for function f3 <- test4 <- main.
-  Called from tests/value/behaviors2.c:285.
+  Called from behaviors2.c:285.
 [eva] using specification for function f3
-[eva:alarm] tests/value/behaviors2.c:285: Warning: 
+[eva:alarm] behaviors2.c:285: Warning: 
   function f3: precondition got status unknown.
-[eva] tests/value/behaviors2.c:285: 
+[eva] behaviors2.c:285: 
   function f3, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f3
 [eva] Recording results for test4
 [eva] Done for function test4
 [eva] computing for function test5 <- main.
-  Called from tests/value/behaviors2.c:332.
+  Called from behaviors2.c:332.
 [eva] computing for function f4 <- test5 <- main.
-  Called from tests/value/behaviors2.c:306.
+  Called from behaviors2.c:306.
 [eva] using specification for function f4
-[eva:alarm] tests/value/behaviors2.c:306: Warning: 
+[eva:alarm] behaviors2.c:306: Warning: 
   function f4: precondition got status unknown.
-[eva] tests/value/behaviors2.c:306: 
+[eva] behaviors2.c:306: 
   function f4, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f4
 [eva] Recording results for test5
 [eva] Done for function test5
 [eva] computing for function test_red <- main.
-  Called from tests/value/behaviors2.c:333.
+  Called from behaviors2.c:333.
 [eva] computing for function opt_ptr <- test_red <- main.
-  Called from tests/value/behaviors2.c:319.
+  Called from behaviors2.c:319.
 [eva] using specification for function opt_ptr
 [eva] Done for function opt_ptr
-[eva] tests/value/behaviors2.c:320: assertion got status valid.
+[eva] behaviors2.c:320: assertion got status valid.
 [eva] Recording results for test_red
 [eva] Done for function test_red
 [eva] Recording results for main

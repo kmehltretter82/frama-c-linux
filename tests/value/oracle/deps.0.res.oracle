@@ -1,14 +1,14 @@
-[kernel] Parsing tests/value/deps.i (no preprocessing)
+[kernel] Parsing deps.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/value/deps.i:11: Warning: 
+[eva:alarm] deps.i:11: Warning: 
   accessing uninitialized left-value. assert \initialized(&w);
 [eva] Recording results for f
 [eva] done for function f
-[eva] tests/value/deps.i:11: 
+[eva] deps.i:11: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:

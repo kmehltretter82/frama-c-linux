@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/strings.i (no preprocessing)
+[kernel] Parsing strings.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -39,139 +39,139 @@
   Y ∈ {0}
   Z ∈ {0}
 [eva] computing for function string_reads <- main.
-  Called from tests/value/strings.i:142.
+  Called from strings.i:142.
 [eva] computing for function u <- string_reads <- main.
-  Called from tests/value/strings.i:39.
-[kernel:annot:missing-spec] tests/value/strings.i:39: Warning: 
+  Called from strings.i:39.
+[kernel:annot:missing-spec] strings.i:39: Warning: 
   Neither code nor specification for function u, generating default assigns from the prototype
 [eva] using specification for function u
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:39: Warning: 
+[eva:alarm] strings.i:39: Warning: 
   out of bounds read. assert \valid_read(p - 4);
 [eva] computing for function u <- string_reads <- main.
-  Called from tests/value/strings.i:42.
+  Called from strings.i:42.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:42: Warning: 
+[eva:alarm] strings.i:42: Warning: 
   out of bounds read. assert \valid_read(p + 12);
 [eva] computing for function u <- string_reads <- main.
-  Called from tests/value/strings.i:44.
+  Called from strings.i:44.
 [eva] Done for function u
 [eva] computing for function u <- string_reads <- main.
-  Called from tests/value/strings.i:48.
+  Called from strings.i:48.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:48: Warning: 
+[eva:alarm] strings.i:48: Warning: 
   out of bounds read. assert \valid_read(p - 4);
 [eva] computing for function u <- string_reads <- main.
-  Called from tests/value/strings.i:53.
+  Called from strings.i:53.
 [eva] Done for function u
 [eva] computing for function strcpy <- string_reads <- main.
-  Called from tests/value/strings.i:53.
-[eva:alarm] tests/value/strings.i:23: Warning: 
+  Called from strings.i:53.
+[eva:alarm] strings.i:23: Warning: 
   out of bounds write.
   assert \valid(tmp_unroll_46);
   (tmp_unroll_46 from ldst++)
-[kernel] tests/value/strings.i:23: Warning: 
+[kernel] strings.i:23: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy
 [eva] computing for function strlen <- string_reads <- main.
-  Called from tests/value/strings.i:58.
+  Called from strings.i:58.
 [eva] Recording results for strlen
 [eva] Done for function strlen
 [eva] Recording results for string_reads
 [eva] Done for function string_reads
 [eva] computing for function string_writes <- main.
-  Called from tests/value/strings.i:143.
-[eva:alarm] tests/value/strings.i:64: Warning: 
+  Called from strings.i:143.
+[eva:alarm] strings.i:64: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from nondet?s5 + 2:& c)
-[eva:alarm] tests/value/strings.i:66: Warning: 
+[eva:alarm] strings.i:66: Warning: 
   out of bounds write. assert \valid(s5);
-[eva:alarm] tests/value/strings.i:68: Warning: 
+[eva:alarm] strings.i:68: Warning: 
   out of bounds write. assert \valid(s6);
 [eva] Recording results for string_writes
 [eva] Done for function string_writes
-[eva:locals-escaping] tests/value/strings.i:143: Warning: 
+[eva:locals-escaping] strings.i:143: Warning: 
   locals {c} escaping the scope of string_writes through s5
-[eva:locals-escaping] tests/value/strings.i:143: Warning: 
+[eva:locals-escaping] strings.i:143: Warning: 
   locals {c} escaping the scope of string_writes through s6
 [eva] computing for function string_comparison <- main.
-  Called from tests/value/strings.i:144.
+  Called from strings.i:144.
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:78.
+  Called from strings.i:78.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:79: Warning: 
+[eva:alarm] strings.i:79: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s3, (void *)s4);
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:80.
+  Called from strings.i:80.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:82.
+  Called from strings.i:82.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:84.
+  Called from strings.i:84.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:85: Warning: 
+[eva:alarm] strings.i:85: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s7, (void *)s8);
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:86.
+  Called from strings.i:86.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:88.
+  Called from strings.i:88.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:89: Warning: 
+[eva:alarm] strings.i:89: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(s7 + 1), (void *)(s8 + 1));
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:90.
+  Called from strings.i:90.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:92.
+  Called from strings.i:92.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:93.
+  Called from strings.i:93.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:94.
+  Called from strings.i:94.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:95.
+  Called from strings.i:95.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:95.
+  Called from strings.i:95.
 [eva] Done for function u
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:96.
+  Called from strings.i:96.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:97: Warning: 
+[eva:alarm] strings.i:97: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s5, (void *)s6);
 [eva] computing for function u <- string_comparison <- main.
-  Called from tests/value/strings.i:98.
+  Called from strings.i:98.
 [eva] Done for function u
-[eva:alarm] tests/value/strings.i:99: Warning: 
+[eva:alarm] strings.i:99: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)("oh, hello" + 4), (void *)s7);
 [eva] Recording results for string_comparison
 [eva] Done for function string_comparison
 [eva] computing for function wide_string_comparison <- main.
-  Called from tests/value/strings.i:145.
-[eva:alarm] tests/value/strings.i:111: Warning: 
+  Called from strings.i:145.
+[eva:alarm] strings.i:111: Warning: 
   pointer comparison. assert \pointer_comparable((void *)w1, (void *)w2);
-[eva:alarm] tests/value/strings.i:114: Warning: 
+[eva:alarm] strings.i:114: Warning: 
   pointer comparison. assert \pointer_comparable((void *)w2, (void *)w3);
 [eva] Recording results for wide_string_comparison
 [eva] Done for function wide_string_comparison
 [eva] computing for function long_chain <- main.
-  Called from tests/value/strings.i:146.
+  Called from strings.i:146.
 [eva] computing for function assigns <- long_chain <- main.
-  Called from tests/value/strings.i:135.
+  Called from strings.i:135.
 [eva] using specification for function assigns
-[eva] tests/value/strings.i:129: Warning: 
+[eva] strings.i:129: Warning: 
   no \from part for clause 'assigns *(p + (0 .. s - 1));'
 [eva] Done for function assigns
 [eva] computing for function strcmp <- long_chain <- main.
-  Called from tests/value/strings.i:136.
-[eva:alarm] tests/value/strings.i:123: Warning: 
+  Called from strings.i:136.
+[eva:alarm] strings.i:123: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from s2_0++)
 [eva] Recording results for strcmp
@@ -180,11 +180,11 @@
 [eva] Done for function long_chain
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/strings.i:23: 
+[eva] strings.i:23: 
   assertion 'Eva,mem_access' got final status invalid.
-[eva] tests/value/strings.i:39: 
+[eva] strings.i:39: 
   assertion 'Eva,mem_access' got final status invalid.
-[eva] tests/value/strings.i:42: 
+[eva] strings.i:42: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function strcmp:

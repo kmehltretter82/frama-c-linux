@@ -1,4 +1,4 @@
-[kernel] Parsing tests/syntax/get_astinfo_bts1136.i (no preprocessing)
+[kernel] Parsing get_astinfo_bts1136.i (no preprocessing)
 found variable vid:22 formal in f
 found variable vid:25 formal in g
 found variable vid:28 formal in h

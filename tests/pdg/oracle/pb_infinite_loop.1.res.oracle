@@ -1,18 +1,18 @@
-[kernel] Parsing tests/pdg/pb_infinite_loop.c (with preprocessing)
+[kernel] Parsing pb_infinite_loop.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_infinite_loop_2
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[eva] tests/pdg/pb_infinite_loop.c:32: starting to merge loop iterations
-[eva:alarm] tests/pdg/pb_infinite_loop.c:34: Warning: 
+[eva] pb_infinite_loop.c:32: starting to merge loop iterations
+[eva:alarm] pb_infinite_loop.c:34: Warning: 
   signed overflow. assert G + 1 ≤ 2147483647;
-[eva:alarm] tests/pdg/pb_infinite_loop.c:35: Warning: 
+[eva:alarm] pb_infinite_loop.c:35: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for test_infinite_loop_2
 [eva] done for function test_infinite_loop_2
 [pdg] computing for function test_infinite_loop_2
-[pdg] tests/pdg/pb_infinite_loop.c:37: Warning: 
+[pdg] pb_infinite_loop.c:37: Warning: 
   no final state. Probably unreachable...
 [pdg] done for function test_infinite_loop_2
 [pdg] PDG for test_infinite_loop_2

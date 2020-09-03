@@ -1,5 +1,5 @@
-[kernel] Parsing tests/slicing/use_spec.i (no preprocessing)
-[kernel] tests/slicing/use_spec.i:18: Warning: 
+[kernel] Parsing use_spec.i (no preprocessing)
+[kernel] use_spec.i:18: Warning: 
   Body of function f falls-through. Adding a return statement
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main2
@@ -13,15 +13,15 @@
   G1 ∈ {0}
   G2 ∈ {0}
 [eva] computing for function h <- main2.
-  Called from tests/slicing/use_spec.i:38.
+  Called from use_spec.i:38.
 [eva] using specification for function h
 [eva] Done for function h
 [eva] computing for function h <- main2.
-  Called from tests/slicing/use_spec.i:40.
+  Called from use_spec.i:40.
 [eva] Done for function h
-[eva:alarm] tests/slicing/use_spec.i:41: Warning: 
+[eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert -2147483648 ≤ tmp + G2;
-[eva:alarm] tests/slicing/use_spec.i:41: Warning: 
+[eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert tmp + G2 ≤ 2147483647;
 [eva] Recording results for main2
 [eva] done for function main2
@@ -50,16 +50,16 @@
   G1 ∈ {0}
   G2 ∈ {0}
 [eva] computing for function h_slice_2 <- main2.
-  Called from tests/slicing/use_spec.i:38.
+  Called from use_spec.i:38.
 [eva] using specification for function h_slice_2
 [eva] Done for function h_slice_2
 [eva] computing for function h_slice_1 <- main2.
-  Called from tests/slicing/use_spec.i:40.
+  Called from use_spec.i:40.
 [eva] using specification for function h_slice_1
 [eva] Done for function h_slice_1
-[eva:alarm] tests/slicing/use_spec.i:41: Warning: 
+[eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert -2147483648 ≤ tmp + G2;
-[eva:alarm] tests/slicing/use_spec.i:41: Warning: 
+[eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert tmp + G2 ≤ 2147483647;
 [eva] Recording results for main2
 [eva] done for function main2

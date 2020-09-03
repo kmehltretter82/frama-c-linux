@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/inout.i (no preprocessing)
+[kernel] Parsing inout.i (no preprocessing)
 [eva] Analyzing a complete application starting at call_may_not_terminate
 [eva] Computing initial state
 [eva] Initial state computed
@@ -21,7 +21,7 @@
       [7] ∈ {40}
   I5_nt ∈ {0}
 [eva] computing for function may_not_terminate <- call_may_not_terminate.
-  Called from tests/value/inout.i:68.
+  Called from inout.i:68.
 [eva] Recording results for may_not_terminate
 [eva] Done for function may_not_terminate
 [eva] Recording results for call_may_not_terminate

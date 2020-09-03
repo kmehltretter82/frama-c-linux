@@ -1,16 +1,16 @@
-[kernel] Parsing tests/pdg/loops.c (with preprocessing)
+[kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at infinite2
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
-[eva] tests/pdg/loops.c:75: starting to merge loop iterations
-[eva:alarm] tests/pdg/loops.c:76: Warning: 
+[eva] loops.c:75: starting to merge loop iterations
+[eva:alarm] loops.c:76: Warning: 
   signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for infinite2
 [eva] done for function infinite2
 [pdg] computing for function infinite2
-[pdg] tests/pdg/loops.c:79: Warning: no final state. Probably unreachable...
+[pdg] loops.c:79: Warning: no final state. Probably unreachable...
 [pdg] done for function infinite2
 [pdg] PDG for infinite2
  {n1}: InCtrl

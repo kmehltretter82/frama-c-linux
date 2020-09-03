@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/not_ct_array_arg.i (no preprocessing)
+[kernel] Parsing not_ct_array_arg.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,12 +6,12 @@
   v ∈ [--..--]
 [eva:initial-state] 
   creating variable S_tb with imprecise size (type int [10][a])
-[eva] tests/value/not_ct_array_arg.i:9: Warning: 
+[eva] not_ct_array_arg.i:9: Warning: 
   during initialization of variable 'tb', size of type 'int [a]' cannot be
   computed (Array with non-constant length.)
-[eva:alarm] tests/value/not_ct_array_arg.i:10: Warning: 
+[eva:alarm] not_ct_array_arg.i:10: Warning: 
   out of bounds write. assert \valid((int *)tb);
-[eva] tests/value/not_ct_array_arg.i:11: 
+[eva] not_ct_array_arg.i:11: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -22,11 +22,11 @@
   S_tb[bits 0 to 31] ∈ {1}
       [bits 32 to ..] ∈ [--..--] or UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/not_ct_array_arg.i:12: Warning: 
+[eva:alarm] not_ct_array_arg.i:12: Warning: 
   out of bounds write. assert \valid(&(*(tb + 9))[100]);
-[eva:alarm] tests/value/not_ct_array_arg.i:12: Warning: 
+[eva:alarm] not_ct_array_arg.i:12: Warning: 
   pointer downcast. assert (unsigned int)(&tb) ≤ 2147483647;
-[eva] tests/value/not_ct_array_arg.i:13: 
+[eva] not_ct_array_arg.i:13: 
   Frama_C_dump_each:
   # Cvalue domain:
   v ∈ [--..--]
@@ -36,20 +36,20 @@
   S_tc[0..1][0..9] ∈ [--..--]
   S_tb[bits 0 to 31] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned {tests/value/not_ct_array_arg.i:12}) }}
+       (origin: Misaligned {not_ct_array_arg.i:12}) }}
       [bits 32 to ..] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned {tests/value/not_ct_array_arg.i:12}) }} or UNINITIALIZED
+       (origin: Misaligned {not_ct_array_arg.i:12}) }} or UNINITIALIZED
   ==END OF DUMP==
-[eva:alarm] tests/value/not_ct_array_arg.i:14: Warning: 
+[eva:alarm] not_ct_array_arg.i:14: Warning: 
   out of bounds write. assert \valid(&(*(tc + 1))[1]);
-[eva:alarm] tests/value/not_ct_array_arg.i:16: Warning: 
+[eva:alarm] not_ct_array_arg.i:16: Warning: 
   accessing out of bounds index. assert 16 < 10;
-[kernel] tests/value/not_ct_array_arg.i:16: Warning: 
+[kernel] not_ct_array_arg.i:16: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/not_ct_array_arg.i:16: 
+[eva] not_ct_array_arg.i:16: 
   assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
@@ -58,10 +58,10 @@
       [1][2..9] ∈ [--..--]
   S_tb[bits 0 to 31] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned {tests/value/not_ct_array_arg.i:12}) }}
+       (origin: Misaligned {not_ct_array_arg.i:12}) }}
       [bits 32 to ..] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned {tests/value/not_ct_array_arg.i:12}) }} or UNINITIALIZED
+       (origin: Misaligned {not_ct_array_arg.i:12}) }} or UNINITIALIZED
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

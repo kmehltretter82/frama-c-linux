@@ -1,17 +1,17 @@
-[kernel] Parsing tests/value/leaf_spec.i (no preprocessing)
+[kernel] Parsing leaf_spec.i (no preprocessing)
 [eva] Analyzing a complete application starting at main1
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main1.
-  Called from tests/value/leaf_spec.i:27.
-[kernel:annot:missing-spec] tests/value/leaf_spec.i:27: Warning: 
+  Called from leaf_spec.i:27.
+[kernel:annot:missing-spec] leaf_spec.i:27: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [eva] using specification for function f
-[eva:invalid-assigns] tests/value/leaf_spec.i:27: 
+[eva:invalid-assigns] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *x. Ignoring.
-[eva:invalid-assigns] tests/value/leaf_spec.i:27: 
+[eva:invalid-assigns] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *y. Ignoring.
 [eva] Done for function f
 [eva] Recording results for main1

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/rte/fptr_assert.c (with preprocessing)
+[kernel] Parsing fptr_assert.c (with preprocessing)
 [rte] annotating function f
 [rte] annotating function g
 [rte] annotating function h

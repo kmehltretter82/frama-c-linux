@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/inout_diff.i (no preprocessing)
+[kernel] Parsing inout_diff.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,9 +6,9 @@
   t[0..49] ∈ {0}
   u[0..49] ∈ {0}
   x ∈ {0}
-[eva:alarm] tests/value/inout_diff.i:18: Warning: 
+[eva:alarm] inout_diff.i:18: Warning: 
   accessing out of bounds index. assert c < 50;
-[eva:alarm] tests/value/inout_diff.i:20: Warning: 
+[eva:alarm] inout_diff.i:20: Warning: 
   accessing out of bounds index. assert (int)(c + 1) < 50;
 [eva] Recording results for main
 [eva] done for function main

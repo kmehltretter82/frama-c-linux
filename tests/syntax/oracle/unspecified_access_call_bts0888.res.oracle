@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/unspecified_access_call_bts0888.i (no preprocessing)
-[kernel] tests/syntax/unspecified_access_call_bts0888.i:9: Warning: 
+[kernel] Parsing unspecified_access_call_bts0888.i (no preprocessing)
+[kernel] unspecified_access_call_bts0888.i:9: Warning: 
   Unspecified sequence with side effect:
   /* y x <-  */
   y = 2;
@@ -8,14 +8,14 @@
   z = 3;
   /* y <-  */
   y = x + z;
-[kernel] tests/syntax/unspecified_access_call_bts0888.i:10: Warning: 
+[kernel] unspecified_access_call_bts0888.i:10: Warning: 
   Unspecified sequence with side effect:
   /* y x <-  */
   y = 2;
   x = f(y);
   /* z <- y */
   z = x + y;
-[kernel] tests/syntax/unspecified_access_call_bts0888.i:11: Warning: 
+[kernel] unspecified_access_call_bts0888.i:11: Warning: 
   Unspecified sequence with side effect:
   /* y x <-  */
   y = 2;

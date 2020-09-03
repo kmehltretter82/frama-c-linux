@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/call_alias.i (no preprocessing)
+[kernel] Parsing call_alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main0
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,7 +12,7 @@
   H ∈ {0}
   I ∈ {0}
 [eva] computing for function incr <- main0.
-  Called from tests/value/call_alias.i:23.
+  Called from call_alias.i:23.
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] Recording results for main0

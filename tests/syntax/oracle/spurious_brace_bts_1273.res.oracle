@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/spurious_brace_bts_1273.i (no preprocessing)
-[kernel] tests/syntax/spurious_brace_bts_1273.i:1: 
+[kernel] Parsing spurious_brace_bts_1273.i (no preprocessing)
+[kernel] spurious_brace_bts_1273.i:1: 
   syntax error:
   Location: between lines 1 and 3, before or at token: }
   

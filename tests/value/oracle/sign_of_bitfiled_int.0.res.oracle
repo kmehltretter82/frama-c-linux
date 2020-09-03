@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/sign_of_bitfiled_int.c (with preprocessing)
+[kernel] Parsing sign_of_bitfiled_int.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

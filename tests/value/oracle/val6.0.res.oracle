@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/val6.i (no preprocessing)
+[kernel] Parsing val6.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +9,7 @@
   b ∈ {0}
   y ∈ {0}
   x ∈ {0}
-[eva:alarm] tests/value/val6.i:13: Warning: 
+[eva:alarm] val6.i:13: Warning: 
   pointer downcast. assert (unsigned int)c ≤ 2147483647;
 [eva] Recording results for f
 [eva] done for function f

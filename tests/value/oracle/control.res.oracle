@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/control.i (no preprocessing)
+[kernel] Parsing control.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,8 +7,8 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva] tests/value/control.i:11: starting to merge loop iterations
-[eva:alarm] tests/value/control.i:14: Warning: 
+[eva] control.i:11: starting to merge loop iterations
+[eva:alarm] control.i:14: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [eva] done for function f

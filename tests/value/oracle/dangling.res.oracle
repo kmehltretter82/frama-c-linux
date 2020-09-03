@@ -1,26 +1,26 @@
-[kernel] Parsing tests/value/dangling.i (no preprocessing)
+[kernel] Parsing dangling.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:locals-escaping] tests/value/dangling.i:9: Warning: 
+[eva:locals-escaping] dangling.i:9: Warning: 
   locals {v_0} escaping the scope of a block of main through x
-[eva:alarm] tests/value/dangling.i:15: Warning: assertion got status unknown.
-[eva] tests/value/dangling.i:16: assertion got status valid.
-[eva:alarm] tests/value/dangling.i:19: Warning: 
+[eva:alarm] dangling.i:15: Warning: assertion got status unknown.
+[eva] dangling.i:16: assertion got status valid.
+[eva:alarm] dangling.i:19: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&x);
-[eva:alarm] tests/value/dangling.i:23: Warning: assertion got status unknown.
-[eva:alarm] tests/value/dangling.i:24: Warning: 
+[eva:alarm] dangling.i:23: Warning: assertion got status unknown.
+[eva:alarm] dangling.i:24: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&x);
-[eva:locals-escaping] tests/value/dangling.i:31: Warning: 
+[eva:locals-escaping] dangling.i:31: Warning: 
   locals {z} escaping the scope of a block of main through p
-[eva] tests/value/dangling.i:33: assertion got status valid.
+[eva] dangling.i:33: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/dangling.i:24: 
+[eva] dangling.i:24: 
   assertion 'Eva,dangling_pointer' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======

@@ -1,5 +1,5 @@
-[kernel] Parsing tests/builtins/big_local_array.i (no preprocessing)
-[kernel] Parsing tests/builtins/big_local_array.i (no preprocessing)
+[kernel] Parsing big_local_array.i (no preprocessing)
+[kernel] Parsing big_local_array.i (no preprocessing)
 [report] Computing properties status...
 --------------------------------------------------------------------------------
 --- No status to report

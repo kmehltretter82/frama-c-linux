@@ -1,16 +1,16 @@
-[kernel] Parsing tests/value/FP5.i (no preprocessing)
+[kernel] Parsing FP5.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/value/FP5.i:1: Warning: 
+[eva:alarm] FP5.i:1: Warning: 
   function main: precondition \valid(b) got status unknown.
-[eva:alarm] tests/value/FP5.i:2: Warning: 
+[eva:alarm] FP5.i:2: Warning: 
   function main: precondition \valid(c) got status unknown.
-[eva] tests/value/FP5.i:3: 
+[eva] FP5.i:3: 
   function main: precondition \valid(&a) got status valid.
-[eva] tests/value/FP5.i:23: starting to merge loop iterations
+[eva] FP5.i:23: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

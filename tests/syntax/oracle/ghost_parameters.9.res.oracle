@@ -1,7 +1,7 @@
-[kernel] Parsing tests/syntax/ghost_parameters.c (with preprocessing)
-[kernel] tests/syntax/ghost_parameters.c:170: User Error: 
-  Declaration of function does not match previous declaration from tests/syntax/ghost_parameters.c:166 (different number of arguments).
-[kernel] tests/syntax/ghost_parameters.c:170: User Error: 
+[kernel] Parsing ghost_parameters.c (with preprocessing)
+[kernel] ghost_parameters.c:170: User Error: 
+  Declaration of function does not match previous declaration from ghost_parameters.c:166 (different number of arguments).
+[kernel] ghost_parameters.c:170: User Error: 
   Inconsistent formals
   168   }
   169   
@@ -9,6 +9,6 @@
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   171   
   172   }
-[kernel] User Error: stopping on file "tests/syntax/ghost_parameters.c" that has errors. Add
+[kernel] User Error: stopping on file "ghost_parameters.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

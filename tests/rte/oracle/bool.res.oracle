@@ -1,4 +1,4 @@
-[kernel] Parsing tests/rte/bool.i (no preprocessing)
+[kernel] Parsing bool.i (no preprocessing)
 [rte] annotating function ko1
 [rte] annotating function ko2
 [rte] annotating function ok1

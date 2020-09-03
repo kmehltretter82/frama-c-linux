@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/select_by_annot.i (no preprocessing)
+[kernel] Parsing select_by_annot.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,69 +9,69 @@
   Y9 ∈ [--..--]
   Z9 ∈ [--..--]
   d ∈ [--..--]
-[eva] tests/slicing/select_by_annot.i:133: assertion got status valid.
-[eva:alarm] tests/slicing/select_by_annot.i:137: Warning: 
+[eva] select_by_annot.i:133: assertion got status valid.
+[eva:alarm] select_by_annot.i:137: Warning: 
   signed overflow. assert (int)((int)(a + b) + c) + d ≤ 2147483647;
 [eva] computing for function modifS <- main.
-  Called from tests/slicing/select_by_annot.i:138.
-[eva:alarm] tests/slicing/select_by_annot.i:122: Warning: 
+  Called from select_by_annot.i:138.
+[eva:alarm] select_by_annot.i:122: Warning: 
   signed overflow. assert S.a + a ≤ 2147483647;
 [eva] Recording results for modifS
 [eva] Done for function modifS
 [eva] computing for function new_int <- main.
-  Called from tests/slicing/select_by_annot.i:140.
-[kernel:annot:missing-spec] tests/slicing/select_by_annot.i:140: Warning: 
+  Called from select_by_annot.i:140.
+[kernel:annot:missing-spec] select_by_annot.i:140: Warning: 
   Neither code nor specification for function new_int, generating default assigns from the prototype
 [eva] using specification for function new_int
 [eva] Done for function new_int
 [eva] computing for function f1 <- main.
-  Called from tests/slicing/select_by_annot.i:141.
-[eva:alarm] tests/slicing/select_by_annot.i:29: Warning: 
+  Called from select_by_annot.i:141.
+[eva:alarm] select_by_annot.i:29: Warning: 
   assertion got status unknown.
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/slicing/select_by_annot.i:142.
-[eva:alarm] tests/slicing/select_by_annot.i:39: Warning: 
+  Called from select_by_annot.i:142.
+[eva:alarm] select_by_annot.i:39: Warning: 
   assertion got status unknown.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
-  Called from tests/slicing/select_by_annot.i:143.
+  Called from select_by_annot.i:143.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f4 <- main.
-  Called from tests/slicing/select_by_annot.i:144.
+  Called from select_by_annot.i:144.
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] computing for function f5 <- main.
-  Called from tests/slicing/select_by_annot.i:145.
+  Called from select_by_annot.i:145.
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
-  Called from tests/slicing/select_by_annot.i:146.
-[eva:alarm] tests/slicing/select_by_annot.i:77: Warning: 
+  Called from select_by_annot.i:146.
+[eva:alarm] select_by_annot.i:77: Warning: 
   signed overflow. assert Sa + 1 ≤ 2147483647;
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
-  Called from tests/slicing/select_by_annot.i:147.
-[eva:alarm] tests/slicing/select_by_annot.i:88: Warning: 
+  Called from select_by_annot.i:147.
+[eva:alarm] select_by_annot.i:88: Warning: 
   signed overflow. assert Sa + 1 ≤ 2147483647;
 [eva] Recording results for f7
 [eva] Done for function f7
 [eva] computing for function f8 <- main.
-  Called from tests/slicing/select_by_annot.i:148.
-[eva:alarm] tests/slicing/select_by_annot.i:97: Warning: 
+  Called from select_by_annot.i:148.
+[eva:alarm] select_by_annot.i:97: Warning: 
   loop invariant got status unknown.
-[eva:alarm] tests/slicing/select_by_annot.i:100: Warning: 
+[eva:alarm] select_by_annot.i:100: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/slicing/select_by_annot.i:104: Warning: 
+[eva:alarm] select_by_annot.i:104: Warning: 
   signed overflow. assert S.a + 1 ≤ 2147483647;
 [eva] Recording results for f8
 [eva] Done for function f8
 [eva] computing for function f9 <- main.
-  Called from tests/slicing/select_by_annot.i:149.
+  Called from select_by_annot.i:149.
 [eva] Recording results for f9
 [eva] Done for function f9
 [eva] Recording results for main
@@ -172,4 +172,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_select_by_annot.i (no preprocessing)
+[kernel] Parsing result/ocode_2_select_by_annot.i (no preprocessing)

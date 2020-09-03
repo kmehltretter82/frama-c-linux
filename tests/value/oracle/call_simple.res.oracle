@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/call_simple.i (no preprocessing)
+[kernel] Parsing call_simple.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -10,10 +10,10 @@
   w ∈ {0}
   G ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/call_simple.i:14.
+  Called from call_simple.i:14.
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] tests/value/call_simple.i:15: Warning: 
+[eva:alarm] call_simple.i:15: Warning: 
   signed overflow. assert ll + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main

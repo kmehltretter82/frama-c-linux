@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/select_calls.i (no preprocessing)
+[kernel] Parsing select_calls.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at g
 [eva] Computing initial state
@@ -7,8 +7,8 @@
   c ∈ [--..--]
   d ∈ [--..--]
 [eva] computing for function nothing <- g.
-  Called from tests/slicing/select_calls.i:42.
-[kernel:annot:missing-spec] tests/slicing/select_calls.i:42: Warning: 
+  Called from select_calls.i:42.
+[kernel:annot:missing-spec] select_calls.i:42: Warning: 
   Neither code nor specification for function nothing, generating default assigns from the prototype
 [eva] using specification for function nothing
 [eva] Done for function nothing
@@ -41,4 +41,4 @@ void g(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_1_select_calls.i (no preprocessing)
+[kernel] Parsing result/ocode_1_select_calls.i (no preprocessing)

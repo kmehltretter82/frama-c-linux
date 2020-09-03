@@ -1,13 +1,13 @@
-[kernel] Parsing tests/slicing/bts335.i (no preprocessing)
+[kernel] Parsing bts335.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0..1] ∈ {0}
 [eva] computing for function g <- main.
-  Called from tests/slicing/bts335.i:12.
+  Called from bts335.i:12.
 [eva] computing for function f <- g <- main.
-  Called from tests/slicing/bts335.i:11.
+  Called from bts335.i:11.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -17,7 +17,7 @@
 [from] Done for function g
 [eva] Done for function g
 [eva] computing for function f <- main.
-  Called from tests/slicing/bts335.i:12.
+  Called from bts335.i:12.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -27,11 +27,11 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at tests/slicing/bts335.i:11 (by g):
+[from] call to f at bts335.i:11 (by g):
   T[0] FROM T[0]; i
-[from] call to g at tests/slicing/bts335.i:12 (by main):
+[from] call to g at bts335.i:12 (by main):
   T[0] FROM T[0]
-[from] call to f at tests/slicing/bts335.i:12 (by main):
+[from] call to f at bts335.i:12 (by main):
   T[1] FROM T[1]; i
 [from] entry point:
   T[0] FROM T[0]; c (and SELF)
@@ -78,4 +78,4 @@ void main(int c)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts335.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts335.i (no preprocessing)

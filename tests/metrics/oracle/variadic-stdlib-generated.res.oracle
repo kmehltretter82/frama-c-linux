@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/variadic-stdlib-generated.c (with preprocessing)
+[kernel] Parsing variadic-stdlib-generated.c (with preprocessing)
 [metrics] Defined functions (2)
   =====================
    main (0 call); my_printf (1 call); 

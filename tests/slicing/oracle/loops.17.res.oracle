@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/loops.i (no preprocessing)
+[kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at stop_f2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,12 +9,12 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva:alarm] tests/slicing/loops.i:82: Warning: 
+[eva:alarm] loops.i:82: Warning: 
   signed overflow. assert c + 10 ≤ 2147483647;
-[eva:alarm] tests/slicing/loops.i:88: Warning: assertion got status unknown.
+[eva:alarm] loops.i:88: Warning: assertion got status unknown.
 [eva] computing for function stop <- stop_f2.
-  Called from tests/slicing/loops.i:89.
-[kernel:annot:missing-spec] tests/slicing/loops.i:89: Warning: 
+  Called from loops.i:89.
+[kernel:annot:missing-spec] loops.i:89: Warning: 
   Neither code nor specification for function stop, generating default assigns from the prototype
 [eva] using specification for function stop
 [eva] Done for function stop
@@ -58,4 +58,4 @@ void stop_f2(int c)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_17_loops.i (no preprocessing)
+[kernel] Parsing result/ocode_17_loops.i (no preprocessing)

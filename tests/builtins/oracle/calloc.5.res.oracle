@@ -1,25 +1,25 @@
-[kernel] Parsing tests/builtins/calloc.c (with preprocessing)
+[kernel] Parsing calloc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] tests/builtins/calloc.c:14: Call to builtin calloc
-[eva:malloc:imprecise] tests/builtins/calloc.c:14: Warning: 
+[eva] calloc.c:14: Call to builtin calloc
+[eva:malloc:imprecise] calloc.c:14: Warning: 
   allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
-[eva] tests/builtins/calloc.c:17: Call to builtin calloc
-[eva] tests/builtins/calloc.c:20: Call to builtin calloc
-[eva] tests/builtins/calloc.c:23: Call to builtin calloc
-[eva:alarm] tests/builtins/calloc.c:26: Warning: assertion got status unknown.
-[eva:alarm] tests/builtins/calloc.c:27: Warning: assertion got status unknown.
-[eva] tests/builtins/calloc.c:30: Call to builtin calloc
-[eva:alarm] tests/builtins/calloc.c:33: Warning: assertion got status unknown.
-[eva:alarm] tests/builtins/calloc.c:34: Warning: assertion got status unknown.
-[eva:alarm] tests/builtins/calloc.c:35: Warning: assertion got status unknown.
-[eva] tests/builtins/calloc.c:38: Call to builtin calloc
-[eva] tests/builtins/calloc.c:38: Warning: 
+[eva] calloc.c:17: Call to builtin calloc
+[eva] calloc.c:20: Call to builtin calloc
+[eva] calloc.c:23: Call to builtin calloc
+[eva:alarm] calloc.c:26: Warning: assertion got status unknown.
+[eva:alarm] calloc.c:27: Warning: assertion got status unknown.
+[eva] calloc.c:30: Call to builtin calloc
+[eva:alarm] calloc.c:33: Warning: assertion got status unknown.
+[eva:alarm] calloc.c:34: Warning: assertion got status unknown.
+[eva:alarm] calloc.c:35: Warning: assertion got status unknown.
+[eva] calloc.c:38: Call to builtin calloc
+[eva] calloc.c:38: Warning: 
   calloc out of bounds: assert(nmemb * size <= SIZE_MAX)
-[eva] tests/builtins/calloc.c:40: assertion got status valid.
+[eva] calloc.c:40: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -1,10 +1,10 @@
-[kernel] Parsing tests/slicing/loop_infinite.i (no preprocessing)
+[kernel] Parsing loop_infinite.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/slicing/loop_infinite.i:10: Warning: 
+[eva:alarm] loop_infinite.i:10: Warning: 
   signed overflow. assert a + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
@@ -39,4 +39,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_loop_infinite.i (no preprocessing)
+[kernel] Parsing result/ocode_0_loop_infinite.i (no preprocessing)

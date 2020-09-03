@@ -1,11 +1,11 @@
-[kernel] Parsing tests/slicing/loop_simple.i (no preprocessing)
+[kernel] Parsing loop_simple.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/slicing/loop_simple.i:10: starting to merge loop iterations
-[eva] tests/slicing/loop_simple.i:12: starting to merge loop iterations
+[eva] loop_simple.i:10: starting to merge loop iterations
+[eva] loop_simple.i:12: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [from] Computing for function main
@@ -52,4 +52,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_loop_simple.i (no preprocessing)
+[kernel] Parsing result/ocode_0_loop_simple.i (no preprocessing)

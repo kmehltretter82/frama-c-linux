@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/loop_test.i (no preprocessing)
+[kernel] Parsing loop_test.i (no preprocessing)
 [eva] Analyzing a complete application starting at test_onzes
 [eva] Computing initial state
 [eva] Initial state computed
@@ -24,53 +24,53 @@
   c8 ∈ {0}
   c9 ∈ {0}
 [eva] computing for function onze_0 <- test_onzes.
-  Called from tests/value/loop_test.i:43.
-[eva] tests/value/loop_test.i:9: starting to merge loop iterations
+  Called from loop_test.i:43.
+[eva] loop_test.i:9: starting to merge loop iterations
 [eva] Recording results for onze_0
 [eva] Done for function onze_0
 [eva] computing for function onze_1 <- test_onzes.
-  Called from tests/value/loop_test.i:44.
-[eva] tests/value/loop_test.i:12: starting to merge loop iterations
+  Called from loop_test.i:44.
+[eva] loop_test.i:12: starting to merge loop iterations
 [eva] Recording results for onze_1
 [eva] Done for function onze_1
 [eva] computing for function onze_2 <- test_onzes.
-  Called from tests/value/loop_test.i:45.
-[eva] tests/value/loop_test.i:15: starting to merge loop iterations
+  Called from loop_test.i:45.
+[eva] loop_test.i:15: starting to merge loop iterations
 [eva] Recording results for onze_2
 [eva] Done for function onze_2
 [eva] computing for function onze_3 <- test_onzes.
-  Called from tests/value/loop_test.i:46.
-[eva] tests/value/loop_test.i:18: starting to merge loop iterations
+  Called from loop_test.i:46.
+[eva] loop_test.i:18: starting to merge loop iterations
 [eva] Recording results for onze_3
 [eva] Done for function onze_3
 [eva] computing for function onze_4 <- test_onzes.
-  Called from tests/value/loop_test.i:47.
-[eva] tests/value/loop_test.i:21: starting to merge loop iterations
+  Called from loop_test.i:47.
+[eva] loop_test.i:21: starting to merge loop iterations
 [eva] Recording results for onze_4
 [eva] Done for function onze_4
 [eva] computing for function onze_5 <- test_onzes.
-  Called from tests/value/loop_test.i:48.
-[eva] tests/value/loop_test.i:25: starting to merge loop iterations
+  Called from loop_test.i:48.
+[eva] loop_test.i:25: starting to merge loop iterations
 [eva] Recording results for onze_5
 [eva] Done for function onze_5
 [eva] computing for function onze_6 <- test_onzes.
-  Called from tests/value/loop_test.i:49.
-[eva] tests/value/loop_test.i:28: starting to merge loop iterations
+  Called from loop_test.i:49.
+[eva] loop_test.i:28: starting to merge loop iterations
 [eva] Recording results for onze_6
 [eva] Done for function onze_6
 [eva] computing for function onze_7 <- test_onzes.
-  Called from tests/value/loop_test.i:50.
-[eva] tests/value/loop_test.i:31: starting to merge loop iterations
+  Called from loop_test.i:50.
+[eva] loop_test.i:31: starting to merge loop iterations
 [eva] Recording results for onze_7
 [eva] Done for function onze_7
 [eva] computing for function onze_8 <- test_onzes.
-  Called from tests/value/loop_test.i:51.
-[eva] tests/value/loop_test.i:34: starting to merge loop iterations
+  Called from loop_test.i:51.
+[eva] loop_test.i:34: starting to merge loop iterations
 [eva] Recording results for onze_8
 [eva] Done for function onze_8
 [eva] computing for function onze_9 <- test_onzes.
-  Called from tests/value/loop_test.i:52.
-[eva] tests/value/loop_test.i:37: starting to merge loop iterations
+  Called from loop_test.i:52.
+[eva] loop_test.i:37: starting to merge loop iterations
 [eva] Recording results for onze_9
 [eva] Done for function onze_9
 [eva] Recording results for test_onzes

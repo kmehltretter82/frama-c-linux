@@ -1,27 +1,27 @@
-[kernel] Parsing tests/builtins/alloc-vla.c (with preprocessing)
+[kernel] Parsing alloc-vla.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function f <- main.
-  Called from tests/builtins/alloc-vla.c:12.
-[eva] tests/builtins/alloc-vla.c:6: assertion 'alloca_bounds' got status valid.
-[eva] tests/builtins/alloc-vla.c:6: Call to builtin __fc_vla_alloc
-[eva] tests/builtins/alloc-vla.c:6: allocating variable __malloc_f_l6
-[eva] tests/builtins/alloc-vla.c:7: Call to builtin free
-[eva:alarm] tests/builtins/alloc-vla.c:7: Warning: 
+  Called from alloc-vla.c:12.
+[eva] alloc-vla.c:6: assertion 'alloca_bounds' got status valid.
+[eva] alloc-vla.c:6: Call to builtin __fc_vla_alloc
+[eva] alloc-vla.c:6: allocating variable __malloc_f_l6
+[eva] alloc-vla.c:7: Call to builtin free
+[eva:alarm] alloc-vla.c:7: Warning: 
   function free: precondition 'freeable' got status invalid.
-[eva] tests/builtins/alloc-vla.c:6: Call to builtin __fc_vla_free
-[eva:malloc] tests/builtins/alloc-vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva:alarm] tests/builtins/alloc-vla.c:8: Warning: 
+[eva] alloc-vla.c:6: Call to builtin __fc_vla_free
+[eva:malloc] alloc-vla.c:6: strong free on bases: {__malloc_f_l6}
+[eva:alarm] alloc-vla.c:8: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&a);
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/builtins/alloc-vla.c:8: 
+[eva] alloc-vla.c:8: 
   assertion 'Eva,dangling_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:

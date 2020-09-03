@@ -1,18 +1,18 @@
-[kernel] Parsing tests/value/wide_string.c (with preprocessing)
+[kernel] Parsing wide_string.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/value/wide_string.c:16: Warning: 
+[eva:alarm] wide_string.c:16: Warning: 
   accessing out of bounds index. assert 4 < 4;
-[eva:alarm] tests/value/wide_string.c:19: Warning: 
+[eva:alarm] wide_string.c:19: Warning: 
   accessing out of bounds index. assert 4 < 4;
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/wide_string.c:16: 
+[eva] wide_string.c:16: 
   assertion 'Eva,index_bound' got final status invalid.
-[eva] tests/value/wide_string.c:19: 
+[eva] wide_string.c:19: 
   assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/relation_reduction.i (no preprocessing)
+[kernel] Parsing relation_reduction.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -19,11 +19,11 @@
      [6] ∈ {103}
      [7] ∈ {102}
      [8] ∈ {101}
-[eva:alarm] tests/value/relation_reduction.i:9: Warning: 
+[eva:alarm] relation_reduction.i:9: Warning: 
   signed overflow. assert y + 10 ≤ 2147483647;
-[eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+[eva:alarm] relation_reduction.i:20: Warning: 
   accessing out of bounds index. assert 0 ≤ y;
-[eva:alarm] tests/value/relation_reduction.i:20: Warning: 
+[eva:alarm] relation_reduction.i:20: Warning: 
   accessing out of bounds index. assert y < 9;
 [eva] Recording results for main
 [eva] done for function main

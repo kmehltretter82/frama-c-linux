@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts0950_annot.i (no preprocessing)
+[kernel] Parsing bts0950_annot.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,8 +6,8 @@
   a ∈ {1}
   b ∈ {2}
 [eva] computing for function cpy <- main.
-  Called from tests/slicing/bts0950_annot.i:14.
-[eva] tests/slicing/bts0950_annot.i:14: 
+  Called from bts0950_annot.i:14.
+[eva] bts0950_annot.i:14: 
   function cpy: precondition got status valid.
 [eva] Recording results for cpy
 [eva] Done for function cpy
@@ -56,7 +56,7 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts0950_annot.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts0950_annot.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -64,8 +64,8 @@ void main(void)
   a ∈ {1}
   b ∈ {2}
 [eva] computing for function cpy <- main.
-  Called from tests/slicing/result/ocode_0_bts0950_annot.i:15.
-[eva] tests/slicing/result/ocode_0_bts0950_annot.i:15: 
+  Called from result/ocode_0_bts0950_annot.i:15.
+[eva] result/ocode_0_bts0950_annot.i:15: 
   function cpy: precondition got status valid.
 [eva] Recording results for cpy
 [eva] Done for function cpy

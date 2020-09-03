@@ -1,11 +1,11 @@
-[kernel] Parsing tests/misc/add_assigns.i (no preprocessing)
+[kernel] Parsing add_assigns.i (no preprocessing)
 [report] Computing properties status...
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assigns (file tests/misc/add_assigns.i, line 6)
+[  Valid  ] Assigns (file add_assigns.i, line 6)
             by assigns.
 [  Valid  ] Default behavior
             by Frama-C kernel.

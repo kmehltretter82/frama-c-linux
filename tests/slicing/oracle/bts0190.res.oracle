@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts0190.i (no preprocessing)
+[kernel] Parsing bts0190.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -6,11 +6,11 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function x <- main.
-  Called from tests/slicing/bts0190.i:15.
-[eva] tests/slicing/bts0190.i:8: assertion got status valid.
-[eva] tests/slicing/bts0190.i:9: assertion got status valid.
+  Called from bts0190.i:15.
+[eva] bts0190.i:8: assertion got status valid.
+[eva] bts0190.i:9: assertion got status valid.
 [eva] computing for function z1 <- x <- main.
-  Called from tests/slicing/bts0190.i:10.
+  Called from bts0190.i:10.
 [eva] Recording results for z1
 [eva] Done for function z1
 [eva] Recording results for x
@@ -46,4 +46,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts0190.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts0190.i (no preprocessing)

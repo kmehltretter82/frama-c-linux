@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/anonymous_field.i (no preprocessing)
-[kernel] tests/value/anonymous_field.i:1: Warning: 
+[kernel] Parsing anonymous_field.i (no preprocessing)
+[kernel] anonymous_field.i:1: Warning: 
   unnamed fields are a C11 extension (use -c11 to avoid this warning)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -7,8 +7,8 @@
 [eva:initial-state] Values of globals at initialization
   Sa ∈ {0}
 [eva] computing for function set_anonymous_struct <- main.
-  Called from tests/value/anonymous_field.i:19.
-[eva] tests/value/anonymous_field.i:10: 
+  Called from anonymous_field.i:19.
+[eva] anonymous_field.i:10: 
   function set_anonymous_struct: postcondition got status valid.
 [eva] Recording results for set_anonymous_struct
 [eva] Done for function set_anonymous_struct

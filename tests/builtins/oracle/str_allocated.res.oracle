@@ -1,29 +1,29 @@
-[kernel] Parsing tests/builtins/str_allocated.c (with preprocessing)
+[kernel] Parsing str_allocated.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function memchr_bug <- main.
-  Called from tests/builtins/str_allocated.c:19.
-[eva] tests/builtins/str_allocated.c:12: Call to builtin malloc
-[eva] tests/builtins/str_allocated.c:12: 
+  Called from str_allocated.c:19.
+[eva] str_allocated.c:12: Call to builtin malloc
+[eva] str_allocated.c:12: 
   allocating variable __malloc_memchr_bug_l12
-[eva] tests/builtins/str_allocated.c:11: starting to merge loop iterations
-[eva] tests/builtins/str_allocated.c:12: Call to builtin malloc
-[eva:malloc:weak] tests/builtins/str_allocated.c:12: 
+[eva] str_allocated.c:11: starting to merge loop iterations
+[eva] str_allocated.c:12: Call to builtin malloc
+[eva:malloc:weak] str_allocated.c:12: 
   marking variable `__malloc_memchr_bug_l12' as weak
-[eva:malloc] tests/builtins/str_allocated.c:12: 
+[eva:malloc] str_allocated.c:12: 
   resizing variable `__malloc_w_memchr_bug_l12' (0..-1) to fit 0..-1/7
-[eva] tests/builtins/str_allocated.c:12: Call to builtin malloc
-[eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
+[eva] str_allocated.c:12: Call to builtin malloc
+[eva:alarm] str_allocated.c:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&b);
-[eva] tests/builtins/str_allocated.c:14: Call to builtin memchr
-[eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
+[eva] str_allocated.c:14: Call to builtin memchr
+[eva:alarm] str_allocated.c:14: Warning: 
   function memchr: precondition 'valid' got status unknown.
-[eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
+[eva:alarm] str_allocated.c:14: Warning: 
   function memchr: precondition 'initialization' got status unknown.
-[eva:alarm] tests/builtins/str_allocated.c:14: Warning: 
+[eva:alarm] str_allocated.c:14: Warning: 
   function memchr: precondition 'danglingness' got status unknown.
 [eva] share/libc/string.h:78: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr

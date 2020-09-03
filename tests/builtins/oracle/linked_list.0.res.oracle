@@ -1,11 +1,11 @@
-[kernel] Parsing tests/builtins/linked_list.c (with preprocessing)
+[kernel] Parsing linked_list.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   MEMORY[0..1023] ∈ {0}
   malloc_next_free ∈ {0}
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[0..1023] ∈ {0}
@@ -42,12 +42,12 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva:alarm] share/libc/stdlib.h:394: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[0..1023] ∈ {0}
@@ -83,8 +83,8 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/builtins/linked_list.c:39: starting to merge loop iterations
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:39: starting to merge loop iterations
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1}
@@ -122,10 +122,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1}
@@ -162,7 +162,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
@@ -203,10 +203,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2}
@@ -246,7 +246,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
@@ -289,10 +289,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ {0; 1; 2; 3}
@@ -334,7 +334,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -379,10 +379,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -426,7 +426,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -473,10 +473,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -522,9 +522,9 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva:alarm] tests/builtins/linked_list.c:43: Warning: 
+[eva:alarm] linked_list.c:43: Warning: 
   out of bounds write. assert \valid(&curr->val);
-[eva] tests/builtins/linked_list.c:40: 
+[eva] linked_list.c:40: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -816,10 +816,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
-  Called from tests/builtins/linked_list.c:41.
+  Called from linked_list.c:41.
 [eva] Recording results for malloc
 [eva] Done for function malloc
-[eva] tests/builtins/linked_list.c:42: 
+[eva] linked_list.c:42: 
   Frama_C_dump_each:
   # Cvalue domain:
   MEMORY[bits 0 to 31] ∈ [0..10]
@@ -1111,14 +1111,14 @@
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function printf_va_1 <- main.
-  Called from tests/builtins/linked_list.c:51.
+  Called from linked_list.c:51.
 [eva] using specification for function printf_va_1
-[eva] tests/builtins/linked_list.c:51: 
+[eva] linked_list.c:51: 
   function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
-[eva] tests/builtins/linked_list.c:50: starting to merge loop iterations
+[eva] linked_list.c:50: starting to merge loop iterations
 [eva] computing for function printf_va_1 <- main.
-  Called from tests/builtins/linked_list.c:51.
+  Called from linked_list.c:51.
 [eva] Done for function printf_va_1
 [eva] Recording results for main
 [eva] done for function main

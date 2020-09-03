@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/mark_all_slices.i (no preprocessing)
+[kernel] Parsing mark_all_slices.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,30 +12,30 @@
   C2 ∈ {0}
   D2 ∈ {0}
 [eva] computing for function fA <- main.
-  Called from tests/slicing/mark_all_slices.i:23.
+  Called from mark_all_slices.i:23.
 [eva] computing for function all <- fA <- main.
-  Called from tests/slicing/mark_all_slices.i:17.
+  Called from mark_all_slices.i:17.
 [eva] Recording results for all
 [eva] Done for function all
 [eva] Recording results for fA
 [eva] Done for function fA
 [eva] computing for function fB <- main.
-  Called from tests/slicing/mark_all_slices.i:24.
-[eva] tests/slicing/mark_all_slices.i:18: Reusing old results for call to all
+  Called from mark_all_slices.i:24.
+[eva] mark_all_slices.i:18: Reusing old results for call to all
 [eva] Recording results for fB
 [eva] Done for function fB
 [eva] computing for function fC <- main.
-  Called from tests/slicing/mark_all_slices.i:25.
-[eva] tests/slicing/mark_all_slices.i:19: Reusing old results for call to all
+  Called from mark_all_slices.i:25.
+[eva] mark_all_slices.i:19: Reusing old results for call to all
 [eva] Recording results for fC
 [eva] Done for function fC
 [eva] computing for function fD <- main.
-  Called from tests/slicing/mark_all_slices.i:26.
-[eva] tests/slicing/mark_all_slices.i:20: Reusing old results for call to all
+  Called from mark_all_slices.i:26.
+[eva] mark_all_slices.i:20: Reusing old results for call to all
 [eva] Recording results for fD
 [eva] Done for function fD
 [eva] computing for function all <- main.
-  Called from tests/slicing/mark_all_slices.i:27.
+  Called from mark_all_slices.i:27.
 [eva] Recording results for all
 [eva] Done for function all
 [eva] Recording results for main

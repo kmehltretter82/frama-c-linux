@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"tests/spec/merge_different_assigns_bis.i"
+   STDOPT: +"merge_different_assigns_bis.i"
 */
 
 int x, z, t, u, v, w;

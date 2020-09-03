@@ -1,17 +1,17 @@
-[kernel] Parsing tests/value/partitioning-annots.c (with preprocessing)
+[kernel] Parsing partitioning-annots.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_history
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
 [eva] computing for function Frama_C_interval <- test_history.
-  Called from tests/value/partitioning-annots.c:125.
+  Called from partitioning-annots.c:125.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:125: 
+[eva] partitioning-annots.c:125: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {0; 1}, {0; 1}
-[eva:alarm] tests/value/partitioning-annots.c:134: Warning: 
+[eva] partitioning-annots.c:131: Frama_C_show_each: {0; 1}, {0; 1}
+[eva:alarm] partitioning-annots.c:134: Warning: 
   division by zero. assert j ≢ 0;
 [eva] Recording results for test_history
 [eva] done for function test_history

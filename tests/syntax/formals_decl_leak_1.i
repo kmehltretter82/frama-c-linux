@@ -1,5 +1,5 @@
 /* run.config
-DONTRUN: main test is located in tests/syntax/formals_decl_leak.i
+DONTRUN: main test is located in formals_decl_leak.i
 */
 
 void f(int y);

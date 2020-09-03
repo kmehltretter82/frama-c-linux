@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/pragma-pack.c (with preprocessing)
+[kernel] Parsing pragma-pack.c (with preprocessing)
 [kernel:typing:pragma] Pushing fc_stdlib stdint.h
 [kernel:typing:pragma] Pushing fc_stdlib __fc_gcc_builtins.h
 [kernel:typing:pragma] Popping fc_stdlib __fc_gcc_builtins.h
@@ -13,169 +13,169 @@
 [kernel:typing:pragma] Pushing fc_stdlib __fc_define_wchar_t.h
 [kernel:typing:pragma] Popping fc_stdlib __fc_define_wchar_t.h
 [kernel:typing:pragma] Popping fc_stdlib stddef.h
-[kernel:typing:pragma] tests/misc/pragma-pack.c:52: 
+[kernel:typing:pragma] pragma-pack.c:52: 
   packing pragma: setting alignment to 8
-[kernel:typing:pragma] tests/misc/pragma-pack.c:53: 
+[kernel:typing:pragma] pragma-pack.c:53: 
   adding aligned(1) attribute to field 'PACK8.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:53: 
+[kernel:typing:pragma] pragma-pack.c:53: 
   adding aligned(8) attribute to field 'PACK8.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:53: 
+[kernel:typing:pragma] pragma-pack.c:53: 
   adding aligned(8) attribute to comp 'PACK8' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:55: 
+[kernel:typing:pragma] pragma-pack.c:55: 
   packing pragma: setting alignment to 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:56: 
+[kernel:typing:pragma] pragma-pack.c:56: 
   adding aligned(1) attribute to field 'PACK1.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:56: 
+[kernel:typing:pragma] pragma-pack.c:56: 
   adding aligned(1) attribute to field 'PACK1.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:56: 
+[kernel:typing:pragma] pragma-pack.c:56: 
   adding aligned(1) attribute to comp 'PACK1' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:58: 
+[kernel:typing:pragma] pragma-pack.c:58: 
   packing pragma: pushing alignment 1, setting alignment to 4
-[kernel:typing:pragma] tests/misc/pragma-pack.c:60: 
+[kernel:typing:pragma] pragma-pack.c:60: 
   adding aligned(1) attribute to field 'PACKPUSH4.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:60: 
+[kernel:typing:pragma] pragma-pack.c:60: 
   adding aligned(4) attribute to field 'PACKPUSH4.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:60: 
+[kernel:typing:pragma] pragma-pack.c:60: 
   adding aligned(4) attribute to comp 'PACKPUSH4' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:62: 
+[kernel:typing:pragma] pragma-pack.c:62: 
   packing pragma: setting alignment to 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:63: 
+[kernel:typing:pragma] pragma-pack.c:63: 
   adding aligned(1) attribute to field 'PACK16.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:63: 
+[kernel:typing:pragma] pragma-pack.c:63: 
   adding aligned(16) attribute to field 'PACK16.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:63: 
+[kernel:typing:pragma] pragma-pack.c:63: 
   adding aligned(16) attribute to comp 'PACK16' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:65: 
+[kernel:typing:pragma] pragma-pack.c:65: 
   packing pragma: popped alignment 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:67: 
+[kernel:typing:pragma] pragma-pack.c:67: 
   adding aligned(1) attribute to field 'PACKPOP.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:67: 
+[kernel:typing:pragma] pragma-pack.c:67: 
   adding aligned(1) attribute to field 'PACKPOP.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:67: 
+[kernel:typing:pragma] pragma-pack.c:67: 
   adding aligned(1) attribute to comp 'PACKPOP' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:69: 
+[kernel:typing:pragma] pragma-pack.c:69: 
   packing pragma: pushing alignment 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:71: 
+[kernel:typing:pragma] pragma-pack.c:71: 
   adding aligned(1) attribute to field 'PACKPUSH.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:71: 
+[kernel:typing:pragma] pragma-pack.c:71: 
   adding aligned(1) attribute to field 'PACKPUSH.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:71: 
+[kernel:typing:pragma] pragma-pack.c:71: 
   adding aligned(1) attribute to comp 'PACKPUSH' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:73: 
+[kernel:typing:pragma] pragma-pack.c:73: 
   packing pragma: setting alignment to 2
-[kernel:typing:pragma] tests/misc/pragma-pack.c:74: 
+[kernel:typing:pragma] pragma-pack.c:74: 
   adding aligned(1) attribute to field 'PACK2.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:74: 
+[kernel:typing:pragma] pragma-pack.c:74: 
   adding aligned(2) attribute to field 'PACK2.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:74: 
+[kernel:typing:pragma] pragma-pack.c:74: 
   adding aligned(2) attribute to comp 'PACK2' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:76: 
+[kernel:typing:pragma] pragma-pack.c:76: 
   packing pragma: restoring alignment to default (16)
-[kernel:typing:pragma] tests/misc/pragma-pack.c:82: 
+[kernel:typing:pragma] pragma-pack.c:82: 
   packing pragma: popped alignment 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:84: 
+[kernel:typing:pragma] pragma-pack.c:84: 
   adding aligned(1) attribute to field 'PACKPOPAGAIN.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:84: 
+[kernel:typing:pragma] pragma-pack.c:84: 
   adding aligned(1) attribute to field 'PACKPOPAGAIN.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:84: 
+[kernel:typing:pragma] pragma-pack.c:84: 
   adding aligned(1) attribute to comp 'PACKPOPAGAIN' due to packing pragma
-[kernel] tests/misc/pragma-pack.c:87: Warning: 
+[kernel] pragma-pack.c:87: Warning: 
   ignoring #pragma pack(pop) with empty stack
-[kernel:typing:pragma] tests/misc/pragma-pack.c:88: 
+[kernel:typing:pragma] pragma-pack.c:88: 
   adding aligned(1) attribute to field 'PACKOVERPOP.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:88: 
+[kernel:typing:pragma] pragma-pack.c:88: 
   adding aligned(1) attribute to field 'PACKOVERPOP.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:88: 
+[kernel:typing:pragma] pragma-pack.c:88: 
   adding aligned(1) attribute to comp 'PACKOVERPOP' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:133: 
+[kernel:typing:pragma] pragma-pack.c:133: 
   packing pragma: restoring alignment to default (16)
-[kernel:typing:pragma] tests/misc/pragma-pack.c:135: 
+[kernel:typing:pragma] pragma-pack.c:135: 
   packing pragma: pushing alignment 16, setting alignment to 4
-[kernel:typing:pragma] tests/misc/pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:136: 
   adding aligned(1) attribute to field '__anonstruct_test1_1.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:136: 
   setting aligned(2) attribute to field '__anonstruct_test1_1.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:136: 
   adding aligned(4) attribute to field '__anonstruct_test1_1.k' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:136: 
   adding aligned(1) attribute to field '__anonstruct_test1_1.l' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:136: 
   adding aligned(4) attribute to comp '__anonstruct_test1_1' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:142: 
+[kernel:typing:pragma] pragma-pack.c:142: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:152: 
+[kernel:typing:pragma] pragma-pack.c:152: 
   packing pragma: pushing alignment 16, setting alignment to 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:153: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:153: 
   setting aligned(1) attribute to field '__anonstruct_test2_3.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:153: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.k' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:153: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.l' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:153: 
   adding aligned(1) attribute to comp '__anonstruct_test2_3' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:159: 
+[kernel:typing:pragma] pragma-pack.c:159: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:169: 
+[kernel:typing:pragma] pragma-pack.c:169: 
   packing pragma: pushing alignment 16, setting alignment to 4
-[kernel:typing:pragma] tests/misc/pragma-pack.c:176: 
+[kernel:typing:pragma] pragma-pack.c:176: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:186: 
+[kernel:typing:pragma] pragma-pack.c:186: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] tests/misc/pragma-pack.c:187: 
+[kernel:typing:pragma] pragma-pack.c:187: 
   setting aligned(2) attribute to field '__anonstruct_test4_7.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:193: 
+[kernel:typing:pragma] pragma-pack.c:193: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:203: 
+[kernel:typing:pragma] pragma-pack.c:203: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] tests/misc/pragma-pack.c:204: 
+[kernel:typing:pragma] pragma-pack.c:204: 
   setting aligned(2) attribute to field '__anonstruct_test5_9.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:210: 
+[kernel:typing:pragma] pragma-pack.c:210: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:220: 
+[kernel:typing:pragma] pragma-pack.c:220: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] tests/misc/pragma-pack.c:221: 
+[kernel:typing:pragma] pragma-pack.c:221: 
   setting aligned(2) attribute to field '__anonstruct_test6_11.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:227: 
+[kernel:typing:pragma] pragma-pack.c:227: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:237: 
+[kernel:typing:pragma] pragma-pack.c:237: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   setting aligned(2) attribute to field '__anonstruct_test7_13.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.q' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(2) attribute to field '__anonstruct_test7_13.p' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(2) attribute to field '__anonstruct_test7_13.k' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.l' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:238: 
   adding aligned(2) attribute to comp '__anonstruct_test7_13' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:246: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.i' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:246: 
   adding aligned(1) attribute to field '__anonstruct_test7_2_14.j' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:246: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.k' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:246: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.l' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:246: 
   adding aligned(2) attribute to comp '__anonstruct_test7_2_14' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:252: 
+[kernel:typing:pragma] pragma-pack.c:252: 
   packing pragma: popped alignment 16
-[kernel:typing:pragma] tests/misc/pragma-pack.c:336: 
+[kernel:typing:pragma] pragma-pack.c:336: 
   packing pragma: pushing alignment 16, setting alignment to 1
-[kernel:typing:pragma] tests/misc/pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:337: 
   adding aligned(1) attribute to field '__anonstruct_barcode_bmp_t_18.len' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:337: 
   adding aligned(1) attribute to field '__anonstruct_barcode_bmp_t_18.data' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:337: 
   adding aligned(1) attribute to comp '__anonstruct_barcode_bmp_t_18' due to packing pragma
-[kernel:typing:pragma] tests/misc/pragma-pack.c:341: 
+[kernel:typing:pragma] pragma-pack.c:341: 
   packing pragma: popped alignment 16
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -183,11 +183,11 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function tests1 <- main.
-  Called from tests/misc/pragma-pack.c:38.
+  Called from pragma-pack.c:38.
 [eva] Recording results for tests1
 [eva] Done for function tests1
 [eva] computing for function tests2 <- main.
-  Called from tests/misc/pragma-pack.c:38.
+  Called from pragma-pack.c:38.
 [eva] Recording results for tests2
 [eva] Done for function tests2
 [eva] Recording results for main

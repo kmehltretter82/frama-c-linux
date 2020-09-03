@@ -1,11 +1,11 @@
-[kernel] Parsing tests/slicing/bts341.i (no preprocessing)
+[kernel] Parsing bts341.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/slicing/bts341.i:7: assertion got status valid.
+[eva] bts341.i:7: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [slicing] initializing slicing ...
@@ -30,4 +30,4 @@ void main(int c)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts341.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts341.i (no preprocessing)

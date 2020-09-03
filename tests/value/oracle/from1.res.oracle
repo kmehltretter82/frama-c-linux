@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/from1.i (no preprocessing)
+[kernel] Parsing from1.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -11,11 +11,11 @@
   sy ∈ {0}
   s ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/value/from1.i:23.
+  Called from from1.i:23.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function sf <- main.
-  Called from tests/value/from1.i:25.
+  Called from from1.i:25.
 [eva] Recording results for sf
 [eva] Done for function sf
 [eva] Recording results for main

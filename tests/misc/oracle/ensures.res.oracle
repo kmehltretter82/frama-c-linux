@@ -1,10 +1,10 @@
-[kernel] Parsing tests/misc/ensures.i (no preprocessing)
+[kernel] Parsing ensures.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/misc/ensures.i:5: Warning: 
+[eva:alarm] ensures.i:5: Warning: 
   function main: postcondition got status invalid.
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======

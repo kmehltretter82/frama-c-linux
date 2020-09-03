@@ -1,22 +1,22 @@
-[kernel] Parsing tests/value/test.i (no preprocessing)
+[kernel] Parsing test.i (no preprocessing)
 [eva] Analyzing a complete application starting at inst_F6
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/value/test.i:11: Warning: 
+[eva:alarm] test.i:11: Warning: 
   out of bounds read. assert \valid_read(v + j);
-[eva:alarm] tests/value/test.i:11: Warning: 
+[eva:alarm] test.i:11: Warning: 
   out of bounds read. assert \valid_read(v + (int)(j + ecart));
-[eva:alarm] tests/value/test.i:13: Warning: 
+[eva:alarm] test.i:13: Warning: 
   out of bounds read. assert \valid_read(v + (int)(j + ecart));
-[eva:alarm] tests/value/test.i:14: Warning: 
+[eva:alarm] test.i:14: Warning: 
   out of bounds write. assert \valid(v + (int)(j + ecart));
-[eva] tests/value/test.i:11: starting to merge loop iterations
-[eva] tests/value/test.i:10: starting to merge loop iterations
-[eva:alarm] tests/value/test.i:11: Warning: 
+[eva] test.i:11: starting to merge loop iterations
+[eva] test.i:10: starting to merge loop iterations
+[eva:alarm] test.i:11: Warning: 
   signed overflow. assert j + ecart ≤ 2147483647;
-[eva] tests/value/test.i:9: starting to merge loop iterations
+[eva] test.i:9: starting to merge loop iterations
 [eva] Recording results for inst_F6
 [eva] done for function inst_F6
 [scope:rm_asserts] removing 1 assertion(s)

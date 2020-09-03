@@ -1,8 +1,8 @@
 /* run.config
-STDOPT: +"tests/spec/model2.c"
+STDOPT: +"model2.c"
 */
 
-#include "tests/spec/model1.h"
+#include "model1.h"
 
 void main () {
   struct S s;

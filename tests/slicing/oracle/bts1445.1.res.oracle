@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts1445.i (no preprocessing)
+[kernel] Parsing bts1445.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
@@ -10,7 +10,7 @@
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f
-[pdg] tests/slicing/bts1445.i:16: Warning: 
+[pdg] bts1445.i:16: Warning: 
   no final state. Probably unreachable...
 [pdg] done for function f
 [slicing] Nothing to select for unreachable return stmt of f
@@ -31,4 +31,4 @@ void f(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_1_bts1445.i (no preprocessing)
+[kernel] Parsing result/ocode_1_bts1445.i (no preprocessing)

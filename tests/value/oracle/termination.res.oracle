@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/termination.i (no preprocessing)
+[kernel] Parsing termination.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,7 +6,7 @@
   G[0..9] ∈ {0}
   X ∈ {0}
 [eva] computing for function loop <- main.
-  Called from tests/value/termination.i:33.
+  Called from termination.i:33.
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] Recording results for main

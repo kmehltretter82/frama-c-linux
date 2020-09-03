@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/top_pdg_input.c (with preprocessing)
+[kernel] Parsing top_pdg_input.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,37 +9,37 @@
   S ∈ {0}
   G ∈ {0}
 [eva] computing for function f1 <- main.
-  Called from tests/pdg/top_pdg_input.c:38.
+  Called from top_pdg_input.c:38.
 [eva] computing for function no_results <- f1 <- main.
-  Called from tests/pdg/top_pdg_input.c:13.
+  Called from top_pdg_input.c:13.
 [eva] Recording results for no_results
 [eva] Done for function no_results
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/pdg/top_pdg_input.c:39.
+  Called from top_pdg_input.c:39.
 [eva] computing for function no_results <- f2 <- main.
-  Called from tests/pdg/top_pdg_input.c:20.
+  Called from top_pdg_input.c:20.
 [eva] Recording results for no_results
 [eva] Done for function no_results
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva:alarm] tests/pdg/top_pdg_input.c:40: Warning: 
+[eva:alarm] top_pdg_input.c:40: Warning: 
   out of bounds read. assert \valid_read(p_str + i);
-[eva:alarm] tests/pdg/top_pdg_input.c:40: Warning: 
+[eva:alarm] top_pdg_input.c:40: Warning: 
   out of bounds read. assert \valid_read(p_str + 0);
 [eva] computing for function strlen <- main.
-  Called from tests/pdg/top_pdg_input.c:40.
-[eva:alarm] tests/pdg/top_pdg_input.c:31: Warning: 
+  Called from top_pdg_input.c:40.
+[eva:alarm] top_pdg_input.c:31: Warning: 
   out of bounds read. assert \valid_read(q);
-[eva] tests/pdg/top_pdg_input.c:31: starting to merge loop iterations
-[eva:alarm] tests/pdg/top_pdg_input.c:31: Warning: 
+[eva] top_pdg_input.c:31: starting to merge loop iterations
+[eva:alarm] top_pdg_input.c:31: Warning: 
   signed overflow. assert k + 1 ≤ 2147483647;
 [eva] Recording results for strlen
 [eva] Done for function strlen
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/pdg/top_pdg_input.c:40: 
+[eva] top_pdg_input.c:40: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f1:
@@ -241,8 +241,8 @@ Cannot filter: dumping raw memory (including unchanged variables)
   S ∈ {0}
   G ∈ {0}
 [eva] computing for function fun_asm <- main_asm.
-  Called from tests/pdg/top_pdg_input.c:51.
-[eva] tests/pdg/top_pdg_input.c:45: Warning: 
+  Called from top_pdg_input.c:51.
+[eva] top_pdg_input.c:45: Warning: 
   assuming assembly code has no effects in function fun_asm
 [eva] Recording results for fun_asm
 [eva] Done for function fun_asm
@@ -282,7 +282,7 @@ Cannot filter: dumping raw memory (including unchanged variables)
 [inout] Inputs for function no_results:
     \nothing
 [pdg] computing for function fun_asm
-[pdg] tests/pdg/top_pdg_input.c:45: Warning: Ignoring inline assembly code
+[pdg] top_pdg_input.c:45: Warning: Ignoring inline assembly code
 [pdg] done for function fun_asm
 [pdg] computing for function main_asm
 [pdg] done for function main_asm

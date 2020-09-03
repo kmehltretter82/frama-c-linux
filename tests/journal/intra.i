@@ -1,8 +1,8 @@
 /* run.config
    CMXS: @PTEST_NAME@
-   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -load-module %{dep:@PTEST_NAME@.cmxs} -journal-enable -journal-name tests/journal/result/intra_journal.ml @PTEST_DIR@/@PTEST_NAME@.i > /dev/null 2> /dev/null
+   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -load-module %{dep:@PTEST_NAME@.cmxs} -journal-enable -journal-name result/intra_journal.ml @PTEST_DIR@/@PTEST_NAME@.i > /dev/null 2> /dev/null
    CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
-   OPT: -load-script tests/journal/result/intra_journal -journal-disable
+   OPT: -load-script result/intra_journal -journal-disable
 */
 
 /* Waiting for results such as:

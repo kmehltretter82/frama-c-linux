@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/cert_exp35_c.i (no preprocessing)
+[kernel] Parsing cert_exp35_c.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,15 +6,15 @@
   __fc_stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
   S___fc_stdout[0..1] ∈ [--..--]
 [eva] computing for function addressee <- main.
-  Called from tests/value/cert_exp35_c.i:24.
+  Called from cert_exp35_c.i:24.
 [eva] Recording results for addressee
 [eva] Done for function addressee
 [eva] computing for function printf_va_1 <- main.
-  Called from tests/value/cert_exp35_c.i:24.
+  Called from cert_exp35_c.i:24.
 [eva] using specification for function printf_va_1
-[eva:alarm] tests/value/cert_exp35_c.i:24: Warning: 
+[eva:alarm] cert_exp35_c.i:24: Warning: 
   function printf_va_1: precondition valid_read_string(format) got status unknown.
-[eva:alarm] tests/value/cert_exp35_c.i:24: Warning: 
+[eva:alarm] cert_exp35_c.i:24: Warning: 
   function printf_va_1: precondition valid_read_string(param0) got status unknown.
 [eva] Done for function printf_va_1
 [eva] Recording results for main

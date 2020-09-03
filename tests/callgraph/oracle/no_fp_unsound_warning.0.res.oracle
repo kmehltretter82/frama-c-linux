@@ -1,4 +1,4 @@
-[kernel] Parsing tests/callgraph/no_fp_unsound_warning.i (no preprocessing)
+[kernel] Parsing no_fp_unsound_warning.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

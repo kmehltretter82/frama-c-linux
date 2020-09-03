@@ -1,4 +1,4 @@
-[kernel] Parsing tests/journal/control.i (no preprocessing)
+[kernel] Parsing control.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,8 +7,8 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva] tests/journal/control.i:18: starting to merge loop iterations
-[eva:alarm] tests/journal/control.i:21: Warning: 
+[eva] control.i:18: starting to merge loop iterations
+[eva:alarm] control.i:21: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [eva] done for function f
@@ -44,7 +44,7 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva:alarm] tests/journal/control.i:21: Warning: 
+[eva:alarm] control.i:21: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [from] Computing for function f

@@ -1,5 +1,5 @@
 /* run.config
-DONTRUN: main test is at tests/syntax/inconsistent_decl.c
+DONTRUN: main test is at inconsistent_decl.c
 */
 
 int f(double x);

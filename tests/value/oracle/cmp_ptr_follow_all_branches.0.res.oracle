@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/cmp_ptr_follow_all_branches.i (no preprocessing)
+[kernel] Parsing cmp_ptr_follow_all_branches.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,20 +6,20 @@
   a ∈ {0}
   p ∈ {{ (char *)&a }}
   q ∈ {{ &a }}
-[eva:pointer-comparison] tests/value/cmp_ptr_follow_all_branches.i:14: 
+[eva:pointer-comparison] cmp_ptr_follow_all_branches.i:14: 
   invalid pointer comparison: invalid pointer(s)
-[eva:alarm] tests/value/cmp_ptr_follow_all_branches.i:14: Warning: 
+[eva:alarm] cmp_ptr_follow_all_branches.i:14: Warning: 
   pointer comparison.
   assert
   \pointer_comparable((void *)(p + (unsigned int)((int)(-5))), (void *)p);
-[eva] tests/value/cmp_ptr_follow_all_branches.i:14: Frama_C_show_each_2:
-[eva:pointer-comparison] tests/value/cmp_ptr_follow_all_branches.i:15: 
+[eva] cmp_ptr_follow_all_branches.i:14: Frama_C_show_each_2:
+[eva:pointer-comparison] cmp_ptr_follow_all_branches.i:15: 
   invalid pointer comparison: invalid pointer(s)
-[eva:alarm] tests/value/cmp_ptr_follow_all_branches.i:15: Warning: 
+[eva:alarm] cmp_ptr_follow_all_branches.i:15: Warning: 
   pointer comparison.
   assert
   \pointer_comparable((void *)(q + (unsigned int)((int)(-5))), (void *)q);
-[eva] tests/value/cmp_ptr_follow_all_branches.i:15: Frama_C_show_each_4:
+[eva] cmp_ptr_follow_all_branches.i:15: Frama_C_show_each_4:
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

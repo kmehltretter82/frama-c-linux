@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/alias.i (no preprocessing)
+[kernel] Parsing alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main5
 [eva] Computing initial state
 [eva] Initial state computed
@@ -56,7 +56,7 @@
   U ∈ {0}
   char1 ∈ {0}
   ll1 ∈ {0}
-[eva:alarm] tests/value/alias.i:171: Warning: 
+[eva:alarm] alias.i:171: Warning: 
   signed overflow. assert c + 1 ≤ 2147483647;
 [eva] Recording results for main5
 [eva] done for function main5

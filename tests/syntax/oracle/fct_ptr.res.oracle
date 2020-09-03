@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/fct_ptr.i (no preprocessing)
-[kernel:typing:incompatible-types-call] tests/syntax/fct_ptr.i:20: Warning: 
+[kernel] Parsing fct_ptr.i (no preprocessing)
+[kernel:typing:incompatible-types-call] fct_ptr.i:20: Warning: 
   implicit conversion between incompatible function types:
   char *(*)(int a , ...)
   and

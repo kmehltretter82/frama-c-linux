@@ -1,44 +1,44 @@
-[kernel] Parsing tests/value/bool.i (no preprocessing)
+[kernel] Parsing bool.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
 [eva] computing for function valid_bool <- main.
-  Called from tests/value/bool.i:61.
-[eva] tests/value/bool.i:12: Frama_C_show_each: {0}
-[eva] tests/value/bool.i:14: Frama_C_show_each: {1}
-[eva] tests/value/bool.i:16: Frama_C_show_each: {1}, {2}
-[eva] tests/value/bool.i:18: Frama_C_show_each: {1}
-[eva] tests/value/bool.i:20: Frama_C_show_each: {1}
+  Called from bool.i:61.
+[eva] bool.i:12: Frama_C_show_each: {0}
+[eva] bool.i:14: Frama_C_show_each: {1}
+[eva] bool.i:16: Frama_C_show_each: {1}, {2}
+[eva] bool.i:18: Frama_C_show_each: {1}
+[eva] bool.i:20: Frama_C_show_each: {1}
 [eva] Recording results for valid_bool
 [eva] Done for function valid_bool
 [eva] computing for function invalid_bool <- main.
-  Called from tests/value/bool.i:62.
-[eva:alarm] tests/value/bool.i:33: Warning: 
+  Called from bool.i:62.
+[eva:alarm] bool.i:33: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
-[eva] tests/value/bool.i:36: Frama_C_show_each_zero: {0}
-[eva] tests/value/bool.i:39: Frama_C_show_each_one: {1}
-[eva:alarm] tests/value/bool.i:42: Warning: 
+[eva] bool.i:36: Frama_C_show_each_zero: {0}
+[eva] bool.i:39: Frama_C_show_each_one: {1}
+[eva:alarm] bool.i:42: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
-[eva:alarm] tests/value/bool.i:45: Warning: 
+[eva:alarm] bool.i:45: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
-[eva] tests/value/bool.i:46: Frama_C_show_each_zero_or_one: {0; 1}
-[eva] tests/value/bool.i:49: Frama_C_show_each_one: {1}
-[eva:alarm] tests/value/bool.i:52: Warning: 
+[eva] bool.i:46: Frama_C_show_each_zero_or_one: {0; 1}
+[eva] bool.i:49: Frama_C_show_each_one: {1}
+[eva:alarm] bool.i:52: Warning: 
   trap representation of a _Bool lvalue. assert b ≡ 0 ∨ b ≡ 1;
-[eva:alarm] tests/value/bool.i:56: Warning: 
+[eva:alarm] bool.i:56: Warning: 
   trap representation of a _Bool lvalue. assert *p ≡ 0 ∨ *p ≡ 1;
-[eva] tests/value/bool.i:57: Frama_C_show_each_zero_or_one: {0; 1}
+[eva] bool.i:57: Frama_C_show_each_zero_or_one: {0; 1}
 [eva] Recording results for invalid_bool
 [eva] Done for function invalid_bool
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/bool.i:33: 
+[eva] bool.i:33: 
   assertion 'Eva,bool_value' got final status invalid.
-[eva] tests/value/bool.i:42: 
+[eva] bool.i:42: 
   assertion 'Eva,bool_value' got final status invalid.
-[eva] tests/value/bool.i:52: 
+[eva] bool.i:52: 
   assertion 'Eva,bool_value' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function invalid_bool:

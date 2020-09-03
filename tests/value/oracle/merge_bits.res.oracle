@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/merge_bits.i (no preprocessing)
+[kernel] Parsing merge_bits.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,16 +14,16 @@
    [10..12] ∈ {1}
   nondet ∈ [--..--]
 [eva] computing for function join_offsetmap <- main.
-  Called from tests/value/merge_bits.i:35.
+  Called from merge_bits.i:35.
 [eva] Recording results for join_offsetmap
 [eva] Done for function join_offsetmap
 [eva] computing for function merge_bits <- main.
-  Called from tests/value/merge_bits.i:36.
-[eva] tests/value/merge_bits.i:24: Frama_C_show_each_F: {1}
-[eva] tests/value/merge_bits.i:25: Frama_C_show_each_F: {16777216}
-[eva] tests/value/merge_bits.i:26: Frama_C_show_each_F: {67305985}
-[eva] tests/value/merge_bits.i:27: Frama_C_show_each_F: {16843008}
-[eva] tests/value/merge_bits.i:29: Frama_C_show_each_F: {1048577}
+  Called from merge_bits.i:36.
+[eva] merge_bits.i:24: Frama_C_show_each_F: {1}
+[eva] merge_bits.i:25: Frama_C_show_each_F: {16777216}
+[eva] merge_bits.i:26: Frama_C_show_each_F: {67305985}
+[eva] merge_bits.i:27: Frama_C_show_each_F: {16843008}
+[eva] merge_bits.i:29: Frama_C_show_each_F: {1048577}
 [eva] Recording results for merge_bits
 [eva] Done for function merge_bits
 [eva] Recording results for main

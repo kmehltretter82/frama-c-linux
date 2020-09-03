@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/same_sliced_name_bts1422.i (no preprocessing)
+[kernel] Parsing same_sliced_name_bts1422.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at foo
 [eva] Computing initial state
@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   ptr ∈ {{ &foo }}
-[eva:alarm] tests/slicing/same_sliced_name_bts1422.i:9: Warning: 
+[eva:alarm] same_sliced_name_bts1422.i:9: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for foo
 [eva] done for function foo
@@ -35,4 +35,4 @@ void foo(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_same_sliced_name_bts1422.i (no preprocessing)
+[kernel] Parsing result/ocode_0_same_sliced_name_bts1422.i (no preprocessing)

@@ -1,28 +1,28 @@
-[kernel] Parsing tests/builtins/realloc_imprecise.c (with preprocessing)
+[kernel] Parsing realloc_imprecise.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/builtins/realloc_imprecise.c:10: Call to builtin malloc
-[eva:malloc:imprecise] tests/builtins/realloc_imprecise.c:10: Warning: 
+[eva] realloc_imprecise.c:10: Call to builtin malloc
+[eva:malloc:imprecise] realloc_imprecise.c:10: Warning: 
   allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main
-[eva:alarm] tests/builtins/realloc_imprecise.c:11: Warning: 
+[eva:alarm] realloc_imprecise.c:11: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/builtins/realloc_imprecise.c:13: Call to builtin realloc
-[eva] tests/builtins/realloc_imprecise.c:13: 
+[eva] realloc_imprecise.c:13: Call to builtin realloc
+[eva] realloc_imprecise.c:13: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/realloc_imprecise.c:13: 
+[eva:malloc] realloc_imprecise.c:13: 
   weak free on bases: {__alloc_w_main}
-[eva] tests/builtins/realloc_imprecise.c:15: Call to builtin realloc
-[eva] tests/builtins/realloc_imprecise.c:15: 
+[eva] realloc_imprecise.c:15: Call to builtin realloc
+[eva] realloc_imprecise.c:15: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/realloc_imprecise.c:15: 
+[eva:malloc] realloc_imprecise.c:15: 
   weak free on bases: {__alloc_w_main}
-[eva] tests/builtins/realloc_imprecise.c:16: Call to builtin free
-[eva] tests/builtins/realloc_imprecise.c:16: 
+[eva] realloc_imprecise.c:16: Call to builtin free
+[eva] realloc_imprecise.c:16: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/realloc_imprecise.c:16: 
+[eva:malloc] realloc_imprecise.c:16: 
   weak free on bases: {__alloc_w_main}
 [eva] Recording results for main
 [eva] done for function main

@@ -1,5 +1,5 @@
-[kernel] Parsing tests/metrics/func_ptr.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/metrics/func_ptr.c:28: Warning: 
+[kernel] Parsing func_ptr.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] func_ptr.c:28: Warning: 
   Calling undeclared function exit. Old style K&R code?
 [metrics] Defined functions (4)
   =====================
@@ -34,11 +34,11 @@
   Cyclomatic complexity = 6
 [metrics] Functions syntactically reachable from main: 3
   ----------------------------------------------
-  <tests/metrics/func_ptr.c>: exit; foo; main; 
+  <func_ptr.c>: exit; foo; main; 
   
   Functions syntactically unreachable from main: 2
   ------------------------------------------------
-  <tests/metrics/func_ptr.c>: baz; foobar;
+  <func_ptr.c>: baz; foobar;
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -66,11 +66,11 @@
   Coverage estimation = 33.3% 
   
   Unreached functions (2) =
-    <tests/metrics/func_ptr.c>: exit; foo;
+    <func_ptr.c>: exit; foo;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  Function main calls exit (at tests/metrics/func_ptr.c:28)
-  Function main references foo (at tests/metrics/func_ptr.c:29)
+  Function main calls exit (at func_ptr.c:28)
+  Function main references foo (at func_ptr.c:29)
 [metrics] Statements analyzed by Eva
   --------------------------
   13 stmts in analyzed functions, 6 stmts analyzed (46.2%)

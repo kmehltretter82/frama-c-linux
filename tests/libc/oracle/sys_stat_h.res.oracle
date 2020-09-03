@@ -1,75 +1,75 @@
-[kernel] Parsing tests/libc/sys_stat_h.c (with preprocessing)
+[kernel] Parsing sys_stat_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function __va_open_mode_t <- main.
-  Called from tests/libc/sys_stat_h.c:10.
+  Called from sys_stat_h.c:10.
 [eva] using specification for function __va_open_mode_t
-[eva] tests/libc/sys_stat_h.c:10: 
+[eva] sys_stat_h.c:10: 
   function __va_open_mode_t: precondition 'valid_filename' got status valid.
 [eva] Done for function __va_open_mode_t
 [eva] computing for function close <- main.
-  Called from tests/libc/sys_stat_h.c:12.
+  Called from sys_stat_h.c:12.
 [eva] using specification for function close
-[eva:alarm] tests/libc/sys_stat_h.c:12: Warning: 
+[eva:alarm] sys_stat_h.c:12: Warning: 
   function close: precondition 'valid_fd' got status unknown.
 [eva] Done for function close
 [eva] computing for function stat <- main.
-  Called from tests/libc/sys_stat_h.c:14.
+  Called from sys_stat_h.c:14.
 [eva] using specification for function stat
-[eva] tests/libc/sys_stat_h.c:14: 
+[eva] sys_stat_h.c:14: 
   function stat: precondition 'valid_pathname' got status valid.
-[eva] tests/libc/sys_stat_h.c:14: 
+[eva] sys_stat_h.c:14: 
   function stat: precondition 'valid_buf' got status valid.
 [eva] Done for function stat
 [eva] computing for function mkdir <- main.
-  Called from tests/libc/sys_stat_h.c:17.
+  Called from sys_stat_h.c:17.
 [eva] using specification for function mkdir
-[eva] tests/libc/sys_stat_h.c:17: 
+[eva] sys_stat_h.c:17: 
   function mkdir: precondition 'valid_path' got status valid.
 [eva] Done for function mkdir
 [eva] computing for function mkdir <- main.
-  Called from tests/libc/sys_stat_h.c:20.
-[eva:alarm] tests/libc/sys_stat_h.c:20: Warning: 
+  Called from sys_stat_h.c:20.
+[eva:alarm] sys_stat_h.c:20: Warning: 
   function mkdir: precondition 'valid_path' got status invalid.
 [eva] Done for function mkdir
 [eva] computing for function mkdir <- main.
-  Called from tests/libc/sys_stat_h.c:20.
+  Called from sys_stat_h.c:20.
 [eva] Done for function mkdir
 [eva] computing for function umask <- main.
-  Called from tests/libc/sys_stat_h.c:22.
+  Called from sys_stat_h.c:22.
 [eva] using specification for function umask
 [eva] Done for function umask
 [eva] computing for function umask <- main.
-  Called from tests/libc/sys_stat_h.c:22.
+  Called from sys_stat_h.c:22.
 [eva] Done for function umask
 [eva] computing for function lstat <- main.
-  Called from tests/libc/sys_stat_h.c:23.
+  Called from sys_stat_h.c:23.
 [eva] using specification for function lstat
-[eva] tests/libc/sys_stat_h.c:23: 
+[eva] sys_stat_h.c:23: 
   function lstat: precondition 'valid_path' got status valid.
-[eva] tests/libc/sys_stat_h.c:23: 
+[eva] sys_stat_h.c:23: 
   function lstat: precondition 'valid_buf' got status valid.
 [eva] Done for function lstat
 [eva] computing for function lstat <- main.
-  Called from tests/libc/sys_stat_h.c:23.
+  Called from sys_stat_h.c:23.
 [eva] Done for function lstat
 [eva] computing for function mkfifo <- main.
-  Called from tests/libc/sys_stat_h.c:24.
+  Called from sys_stat_h.c:24.
 [eva] using specification for function mkfifo
-[eva] tests/libc/sys_stat_h.c:24: 
+[eva] sys_stat_h.c:24: 
   function mkfifo: precondition 'valid_path' got status valid.
 [eva] Done for function mkfifo
 [eva] computing for function mknod <- main.
-  Called from tests/libc/sys_stat_h.c:25.
+  Called from sys_stat_h.c:25.
 [eva] using specification for function mknod
-[eva] tests/libc/sys_stat_h.c:25: 
+[eva] sys_stat_h.c:25: 
   function mknod: precondition 'valid_path' got status valid.
 [eva] Done for function mknod
 [eva] computing for function mknod <- main.
-  Called from tests/libc/sys_stat_h.c:25.
+  Called from sys_stat_h.c:25.
 [eva] Done for function mknod
 [eva] Recording results for main
 [eva] done for function main

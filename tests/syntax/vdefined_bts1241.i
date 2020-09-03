@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"tests/syntax/vdefined_bts1241_1.i"
+STDOPT: +"vdefined_bts1241_1.i"
  */
 
 int f();

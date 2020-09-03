@@ -1,16 +1,16 @@
-[kernel] Parsing tests/builtins/fam.c (with preprocessing)
+[kernel] Parsing fam.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/builtins/fam.c:15: Frama_C_show_each: {{ &buf + {11} }}
-[eva] tests/builtins/fam.c:16: Call to builtin memcpy
-[eva] tests/builtins/fam.c:16: 
+[eva] fam.c:15: Frama_C_show_each: {{ &buf + {11} }}
+[eva] fam.c:16: Call to builtin memcpy
+[eva] fam.c:16: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] tests/builtins/fam.c:16: 
+[eva] fam.c:16: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] tests/builtins/fam.c:16: 
+[eva] fam.c:16: 
   function memcpy: precondition 'separation' got status valid.
 [eva] share/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp

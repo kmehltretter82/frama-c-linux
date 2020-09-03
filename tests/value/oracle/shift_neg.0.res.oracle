@@ -1,37 +1,37 @@
-[kernel] Parsing tests/value/shift_neg.c (with preprocessing)
+[kernel] Parsing shift_neg.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/value/shift_neg.c:17.
+  Called from shift_neg.c:17.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/shift_neg.c:17: 
+[eva] shift_neg.c:17: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/value/shift_neg.c:21.
-[eva] tests/value/shift_neg.c:21: 
+  Called from shift_neg.c:21.
+[eva] shift_neg.c:21: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/shift_neg.c:22: Warning: 
+[eva:alarm] shift_neg.c:22: Warning: 
   invalid LHS operand for left shift. assert 0 ≤ x;
-[eva] tests/value/shift_neg.c:23: 
+[eva] shift_neg.c:23: 
   Frama_C_show_each_left_shift: [0..12], [0..48],0%4
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/value/shift_neg.c:24.
-[eva] tests/value/shift_neg.c:24: 
+  Called from shift_neg.c:24.
+[eva] shift_neg.c:24: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/shift_neg.c:26: 
+[eva] shift_neg.c:26: 
   Frama_C_show_each_right_shift: [-8..12], {-2; -1; 0; 1; 2; 3}
-[eva:alarm] tests/value/shift_neg.c:29: Warning: 
+[eva:alarm] shift_neg.c:29: Warning: 
   invalid LHS operand for left shift. assert 0 ≤ (int)(-44);
-[eva] tests/value/shift_neg.c:36: Frama_C_show_each_neg_right_shift: {-1}, {-6}
+[eva] shift_neg.c:36: Frama_C_show_each_neg_right_shift: {-1}, {-6}
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/shift_neg.c:29: 
+[eva] shift_neg.c:29: 
   assertion 'Eva,shift' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

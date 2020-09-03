@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/split_return.i (no preprocessing)
+[kernel] Parsing split_return.i (no preprocessing)
 [eva] Splitting return states on:
   \return(f7) == 0, 3 (user)
   \return(init) == 0 (auto)
@@ -21,102 +21,102 @@
   v7 ∈ {0}
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/split_return.i:204.
+  Called from split_return.i:204.
 [eva] computing for function init <- main1 <- main.
-  Called from tests/value/split_return.i:17.
+  Called from split_return.i:17.
 [eva] using specification for function init
 [eva] Done for function init
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/split_return.i:205.
+  Called from split_return.i:205.
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/split_return.i:48.
+  Called from split_return.i:48.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {0}, {0}
-[eva] tests/value/split_return.i:49: Frama_C_show_each_f2: {5; 7}, {5}
-[eva] tests/value/split_return.i:51: assertion got status valid.
-[eva] tests/value/split_return.i:53: Frama_C_show_each_f2_2: {5; 7}, {5}
-[eva] tests/value/split_return.i:54: assertion got status valid.
+[eva] split_return.i:49: Frama_C_show_each_f2: {0}, {0}
+[eva] split_return.i:49: Frama_C_show_each_f2: {5; 7}, {5}
+[eva] split_return.i:51: assertion got status valid.
+[eva] split_return.i:53: Frama_C_show_each_f2_2: {5; 7}, {5}
+[eva] split_return.i:54: assertion got status valid.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/split_return.i:206.
+  Called from split_return.i:206.
 [eva] computing for function f3 <- main3 <- main.
-  Called from tests/value/split_return.i:73.
+  Called from split_return.i:73.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
-[eva] tests/value/split_return.i:74: Frama_C_show_each_f3: {7}, {5}
-[eva] tests/value/split_return.i:76: assertion got status valid.
-[eva] tests/value/split_return.i:78: assertion got status valid.
+[eva] split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] split_return.i:74: Frama_C_show_each_f3: {7}, {5}
+[eva] split_return.i:76: assertion got status valid.
+[eva] split_return.i:78: assertion got status valid.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/split_return.i:207.
+  Called from split_return.i:207.
 [eva] computing for function f4 <- main4 <- main.
-  Called from tests/value/split_return.i:94.
+  Called from split_return.i:94.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {4}, {0}
-[eva] tests/value/split_return.i:95: Frama_C_show_each_f4: {7}, {5}
-[eva] tests/value/split_return.i:97: assertion got status valid.
-[eva] tests/value/split_return.i:99: assertion got status valid.
+[eva] split_return.i:95: Frama_C_show_each_f4: {4}, {0}
+[eva] split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:97: assertion got status valid.
+[eva] split_return.i:99: assertion got status valid.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/split_return.i:208.
+  Called from split_return.i:208.
 [eva] computing for function f5 <- main5 <- main.
-  Called from tests/value/split_return.i:117.
+  Called from split_return.i:117.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {-2}, {0}
-[eva] tests/value/split_return.i:118: Frama_C_show_each_f5: {7}, {5}
-[eva] tests/value/split_return.i:120: assertion got status valid.
-[eva] tests/value/split_return.i:122: assertion got status valid.
+[eva] split_return.i:118: Frama_C_show_each_f5: {-2}, {0}
+[eva] split_return.i:118: Frama_C_show_each_f5: {7}, {5}
+[eva] split_return.i:120: assertion got status valid.
+[eva] split_return.i:122: assertion got status valid.
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from tests/value/split_return.i:209.
+  Called from split_return.i:209.
 [eva] computing for function f6 <- main6 <- main.
-  Called from tests/value/split_return.i:135.
-[eva:alarm] tests/value/split_return.i:130: Warning: 
+  Called from split_return.i:135.
+[eva:alarm] split_return.i:130: Warning: 
   assertion got status unknown.
-[eva] tests/value/split_return.i:131: cannot properly split on \result == 0
+[eva] split_return.i:131: cannot properly split on \result == 0
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from tests/value/split_return.i:210.
+  Called from split_return.i:210.
 [eva] computing for function f7 <- main7 <- main.
-  Called from tests/value/split_return.i:148.
+  Called from split_return.i:148.
 [eva] Recording results for f7
 [eva] Done for function f7
-[eva] tests/value/split_return.i:153: Frama_C_show_each_NULL: {0}, {0}
-[eva] tests/value/split_return.i:153: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva] split_return.i:153: Frama_C_show_each_NULL: {0}, {0}
+[eva] split_return.i:153: Frama_C_show_each_NULL: {{ &v }}, {1}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from tests/value/split_return.i:211.
+  Called from split_return.i:211.
 [eva] computing for function f8 <- main8 <- main.
-  Called from tests/value/split_return.i:171.
+  Called from split_return.i:171.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
-[eva] tests/value/split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from tests/value/split_return.i:212.
+  Called from split_return.i:212.
 [eva] computing for function uninit <- main9 <- main.
-  Called from tests/value/split_return.i:199.
+  Called from split_return.i:199.
 [eva] Recording results for uninit
 [eva] Done for function uninit
 [eva] computing for function escaping <- main9 <- main.
-  Called from tests/value/split_return.i:200.
-[eva:locals-escaping] tests/value/split_return.i:192: Warning: 
+  Called from split_return.i:200.
+[eva:locals-escaping] split_return.i:192: Warning: 
   locals {x} escaping the scope of a block of escaping through p
 [eva] Recording results for escaping
 [eva] Done for function escaping
@@ -359,13 +359,13 @@
 --- Properties of Function 'init'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition (file tests/value/split_return.i, line 12)
+[ Extern  ] Post-condition (file split_return.i, line 12)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file tests/value/split_return.i, line 10)
+[ Extern  ] Assigns (file split_return.i, line 10)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/value/split_return.i, line 10)
+[ Extern  ] Froms (file split_return.i, line 10)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file tests/value/split_return.i, line 11)
+[ Extern  ] Froms (file split_return.i, line 11)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -374,54 +374,54 @@
 --- Properties of Function 'main1'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/value/split_return.i, line 27)
+[  Dead   ] Assertion (file split_return.i, line 27)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file tests/value/split_return.i, line 27)
-[Unreachable] Unreachable program point (file tests/value/split_return.i, line 27)
+             - Unreachable program point (file split_return.i, line 27)
+[Unreachable] Unreachable program point (file split_return.i, line 27)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main2'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/value/split_return.i, line 51)
+[  Valid  ] Assertion (file split_return.i, line 51)
             by Eva.
-[  Valid  ] Assertion (file tests/value/split_return.i, line 54)
+[  Valid  ] Assertion (file split_return.i, line 54)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main3'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/value/split_return.i, line 76)
+[  Valid  ] Assertion (file split_return.i, line 76)
             by Eva.
-[  Valid  ] Assertion (file tests/value/split_return.i, line 78)
+[  Valid  ] Assertion (file split_return.i, line 78)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main4'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/value/split_return.i, line 97)
+[  Valid  ] Assertion (file split_return.i, line 97)
             by Eva.
-[  Valid  ] Assertion (file tests/value/split_return.i, line 99)
+[  Valid  ] Assertion (file split_return.i, line 99)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main5'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/value/split_return.i, line 120)
+[  Valid  ] Assertion (file split_return.i, line 120)
             by Eva.
-[  Valid  ] Assertion (file tests/value/split_return.i, line 122)
+[  Valid  ] Assertion (file split_return.i, line 122)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'f6'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/value/split_return.i, line 130)
+[    -    ] Assertion (file split_return.i, line 130)
             tried with Eva.
 
 --------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
-[kernel] Parsing tests/builtins/Longinit_sequencer.i (no preprocessing)
-[kernel] Parsing tests/builtins/long_init.c (with preprocessing)
+[kernel] Parsing Longinit_sequencer.i (no preprocessing)
+[kernel] Parsing long_init.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/builtins/long_init.c:34: Warning: 
+[eva:alarm] long_init.c:34: Warning: 
   pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -21,74 +21,74 @@
   fp ∈ {{ &fun }}
   inited ∈ {0}
 [eva] computing for function init_outer <- main.
-  Called from tests/builtins/long_init.c:90.
+  Called from long_init.c:90.
 [eva] computing for function init_inner <- init_outer <- main.
-  Called from tests/builtins/long_init.c:85.
-[eva] tests/builtins/long_init.c:61: starting to merge loop iterations
+  Called from long_init.c:85.
+[eva] long_init.c:61: starting to merge loop iterations
 [eva] computing for function analyze <- init_inner <- init_outer <- main.
-  Called from tests/builtins/long_init.c:68.
+  Called from long_init.c:68.
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
 [eva] computing for function analyze <- init_inner <- init_outer <- main.
-  Called from tests/builtins/long_init.c:69.
-[eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init.c:29: Reusing old results for call to subanalyze
+  Called from long_init.c:69.
+[eva] long_init.c:29: Reusing old results for call to subanalyze
+[eva] long_init.c:29: Reusing old results for call to subanalyze
+[eva] long_init.c:29: Reusing old results for call to subanalyze
+[eva] long_init.c:29: Reusing old results for call to subanalyze
 [eva] computing for function subanalyze <- analyze <- init_inner <- init_outer <- 
                           main.
-  Called from tests/builtins/long_init.c:29.
+  Called from long_init.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
-[eva] tests/builtins/long_init.c:73: Call to builtin malloc
-[eva] tests/builtins/long_init.c:73: allocating variable __malloc_init_inner_l73
-[eva:alarm] tests/builtins/long_init.c:74: Warning: 
+[eva] long_init.c:73: Call to builtin malloc
+[eva] long_init.c:73: allocating variable __malloc_init_inner_l73
+[eva:alarm] long_init.c:74: Warning: 
   pointer downcast. assert (unsigned int)alloc1 ≤ 2147483647;
-[eva] tests/builtins/long_init.c:75: Call to builtin malloc
-[eva] tests/builtins/long_init.c:75: allocating variable __malloc_init_inner_l75
-[eva] tests/builtins/long_init.c:77: Call to builtin free
-[eva] tests/builtins/long_init.c:77: 
+[eva] long_init.c:75: Call to builtin malloc
+[eva] long_init.c:75: allocating variable __malloc_init_inner_l75
+[eva] long_init.c:77: Call to builtin free
+[eva] long_init.c:77: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/long_init.c:77: 
+[eva:malloc] long_init.c:77: 
   strong free on bases: {__malloc_init_inner_l75}
 [eva] Recording results for init_inner
 [eva] Done for function init_inner
-[eva:locals-escaping] tests/builtins/long_init.c:85: Warning: 
+[eva:locals-escaping] long_init.c:85: Warning: 
   locals {r, r2} escaping the scope of init_inner through pr
-[eva:locals-escaping] tests/builtins/long_init.c:85: Warning: 
+[eva:locals-escaping] long_init.c:85: Warning: 
   locals {r2} escaping the scope of init_inner through pr2
-[eva:locals-escaping] tests/builtins/long_init.c:85: Warning: 
+[eva:locals-escaping] long_init.c:85: Warning: 
   locals {r2} escaping the scope of init_inner through pr_escaping
 [eva] Recording results for init_outer
 [eva] Done for function init_outer
-[eva] tests/builtins/long_init.c:92: 
+[eva] long_init.c:92: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -145,26 +145,26 @@
   S_1___fc_env[0..1] ∈ [--..--]
   __malloc_init_inner_l73 ∈ {{ (int)&__malloc_init_inner_l73 }}
   ==END OF DUMP==
-[eva] tests/builtins/long_init.c:93: Reusing old results for call to analyze
-[eva] tests/builtins/long_init.c:94: Reusing old results for call to analyze
+[eva] long_init.c:93: Reusing old results for call to analyze
+[eva] long_init.c:94: Reusing old results for call to analyze
 [eva] computing for function dmin <- main.
-  Called from tests/builtins/long_init.c:98.
+  Called from long_init.c:98.
 [eva] Recording results for dmin
 [eva] Done for function dmin
 [eva] computing for function fun <- main.
-  Called from tests/builtins/long_init.c:99.
+  Called from long_init.c:99.
 [eva] Recording results for fun
 [eva] Done for function fun
-[eva] tests/builtins/long_init.c:103: Call to builtin free
-[eva] tests/builtins/long_init.c:103: 
+[eva] long_init.c:103: Call to builtin free
+[eva] long_init.c:103: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/long_init.c:103: 
+[eva:malloc] long_init.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init.c:104: Call to builtin malloc
-[eva] tests/builtins/long_init.c:104: allocating variable __malloc_main_l104
+[eva] long_init.c:104: Call to builtin malloc
+[eva] long_init.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/builtins/long_init.c:34: 
+[eva] long_init.c:34: 
   cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 [eva] Saving globals state after call to function: init_inner
 Values at end of function dmin:
@@ -290,10 +290,10 @@ Values at end of function main:
   res_from_fp ∈ {32}
   res ∈ {93}
   local ∈ {1}
-  __retres ∈ {0}[kernel] Parsing tests/builtins/long_init2.c (with preprocessing)
+  __retres ∈ {0}[kernel] Parsing long_init2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/builtins/long_init2.c:34: Warning: 
+[eva:alarm] long_init2.c:34: Warning: 
   pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -313,18 +313,18 @@ Values at end of function main:
   fp ∈ {{ &fun }}
   inited ∈ {0}
 [eva] computing for function init_outer <- main.
-  Called from tests/builtins/long_init2.c:90.
-[eva] tests/builtins/long_init2.c:85: 
+  Called from long_init2.c:90.
+[eva] long_init2.c:85: 
   Call to builtin Frama_C_load_state for function init_inner
 [eva] Skipping call to init_inner, loading globals state from file:
-  tests/builtins/result/Longinit_sequencer.sav
+  result/Longinit_sequencer.sav
 [eva] Warning: variable `r' is not global, possibly an escaping value; ignoring
 [eva] Warning: variable `r2' is not global, possibly an escaping value; ignoring
 [eva] Warning: variable `r2' is not global, possibly an escaping value; ignoring
 [eva] Warning: found new global variable `another_global'
 [eva] Recording results for init_outer
 [eva] Done for function init_outer
-[eva] tests/builtins/long_init2.c:92: 
+[eva] long_init2.c:92: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -383,59 +383,59 @@ Values at end of function main:
   __malloc_init_inner_l73 ∈ {{ (int)&__malloc_init_inner_l73 }}
   ==END OF DUMP==
 [eva] computing for function analyze <- main.
-  Called from tests/builtins/long_init2.c:93.
+  Called from long_init2.c:93.
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
 [eva] computing for function analyze <- main.
-  Called from tests/builtins/long_init2.c:94.
-[eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init2.c:29: Reusing old results for call to subanalyze
+  Called from long_init2.c:94.
+[eva] long_init2.c:29: Reusing old results for call to subanalyze
+[eva] long_init2.c:29: Reusing old results for call to subanalyze
+[eva] long_init2.c:29: Reusing old results for call to subanalyze
+[eva] long_init2.c:29: Reusing old results for call to subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init2.c:29.
+  Called from long_init2.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
 [eva] computing for function dmin <- main.
-  Called from tests/builtins/long_init2.c:98.
+  Called from long_init2.c:98.
 [eva] Recording results for dmin
 [eva] Done for function dmin
 [eva] computing for function fun <- main.
-  Called from tests/builtins/long_init2.c:99.
+  Called from long_init2.c:99.
 [eva] Recording results for fun
 [eva] Done for function fun
-[eva] tests/builtins/long_init2.c:103: Call to builtin free
-[eva] tests/builtins/long_init2.c:103: 
+[eva] long_init2.c:103: Call to builtin free
+[eva] long_init2.c:103: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/long_init2.c:103: 
+[eva:malloc] long_init2.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init2.c:104: Call to builtin malloc
-[eva] tests/builtins/long_init2.c:104: allocating variable __malloc_main_l104
+[eva] long_init2.c:104: Call to builtin malloc
+[eva] long_init2.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/builtins/long_init2.c:34: 
+[eva] long_init2.c:34: 
   cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 [eva] Saving globals state after call to function: init_outer
 
@@ -527,10 +527,10 @@ Values at end of function main:
   res_from_fp ∈ {32}
   res ∈ {93}
   local ∈ {42}
-  __retres ∈ {0}[kernel] Parsing tests/builtins/long_init3.c (with preprocessing)
+  __retres ∈ {0}[kernel] Parsing long_init3.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/builtins/long_init3.c:34: Warning: 
+[eva:alarm] long_init3.c:34: Warning: 
   pointer downcast. assert (unsigned int)"abc" ≤ 127;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -550,12 +550,12 @@ Values at end of function main:
   alloc3 ∈ {0}
   fp ∈ {{ &fun }}
   inited ∈ {0}
-[eva] tests/builtins/long_init3.c:90: 
+[eva] long_init3.c:90: 
   Call to builtin Frama_C_load_state for function init_outer
 [eva] Skipping call to init_outer, loading globals state from file:
-  tests/builtins/result/Longinit_sequencer.sav
+  result/Longinit_sequencer.sav
 [eva] Warning: found new global variable `yet_another_global'
-[eva] tests/builtins/long_init3.c:92: 
+[eva] long_init3.c:92: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -615,59 +615,59 @@ Values at end of function main:
   __malloc_init_inner_l73 ∈ {{ (int)&__malloc_init_inner_l73 }}
   ==END OF DUMP==
 [eva] computing for function analyze <- main.
-  Called from tests/builtins/long_init3.c:93.
+  Called from long_init3.c:93.
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
 [eva] computing for function analyze <- main.
-  Called from tests/builtins/long_init3.c:94.
-[eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
-[eva] tests/builtins/long_init3.c:29: Reusing old results for call to subanalyze
+  Called from long_init3.c:94.
+[eva] long_init3.c:29: Reusing old results for call to subanalyze
+[eva] long_init3.c:29: Reusing old results for call to subanalyze
+[eva] long_init3.c:29: Reusing old results for call to subanalyze
+[eva] long_init3.c:29: Reusing old results for call to subanalyze
 [eva] computing for function subanalyze <- analyze <- main.
-  Called from tests/builtins/long_init3.c:29.
+  Called from long_init3.c:29.
 [eva] Recording results for subanalyze
 [eva] Done for function subanalyze
 [eva] Recording results for analyze
 [eva] Done for function analyze
 [eva] computing for function dmin <- main.
-  Called from tests/builtins/long_init3.c:98.
+  Called from long_init3.c:98.
 [eva] Recording results for dmin
 [eva] Done for function dmin
 [eva] computing for function fun <- main.
-  Called from tests/builtins/long_init3.c:99.
+  Called from long_init3.c:99.
 [eva] Recording results for fun
 [eva] Done for function fun
-[eva] tests/builtins/long_init3.c:103: Call to builtin free
-[eva] tests/builtins/long_init3.c:103: 
+[eva] long_init3.c:103: Call to builtin free
+[eva] long_init3.c:103: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/long_init3.c:103: 
+[eva:malloc] long_init3.c:103: 
   strong free on bases: {__malloc_init_inner_l73}
-[eva] tests/builtins/long_init3.c:104: Call to builtin malloc
-[eva] tests/builtins/long_init3.c:104: allocating variable __malloc_main_l104
+[eva] long_init3.c:104: Call to builtin malloc
+[eva] long_init3.c:104: allocating variable __malloc_main_l104
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/builtins/long_init3.c:34: 
+[eva] long_init3.c:34: 
   cannot evaluate ACSL term, unsupported ACSL construct: constant strings
 
 

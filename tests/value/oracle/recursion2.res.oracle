@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/recursion2.i (no preprocessing)
+[kernel] Parsing recursion2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,17 +6,17 @@
   x ∈ {0}
   y ∈ {0}
 [eva] computing for function h2 <- main.
-  Called from tests/value/recursion2.i:21.
+  Called from recursion2.i:21.
 [eva] computing for function h1 <- h2 <- main.
-  Called from tests/value/recursion2.i:17.
+  Called from recursion2.i:17.
 [eva] Recording results for h1
 [eva] Done for function h1
 [eva] Recording results for h2
 [eva] Done for function h2
 [eva] computing for function h1 <- main.
-  Called from tests/value/recursion2.i:22.
+  Called from recursion2.i:22.
 [eva] computing for function h2 <- h1 <- main.
-  Called from tests/value/recursion2.i:12.
+  Called from recursion2.i:12.
 [eva] Recording results for h2
 [eva] Done for function h2
 [eva] Recording results for h1

@@ -1,5 +1,5 @@
 /* run.config
-   OPT: tests/cil/cpu_b.c -machdep x86_16 -print
+   OPT: cpu_b.c -machdep x86_16 -print
 */
 typedef unsigned short DWORD ;
 

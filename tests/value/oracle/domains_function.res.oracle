@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/domains_function.c (with preprocessing)
+[kernel] Parsing domains_function.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,105 +7,105 @@
   i ∈ {0}
   result ∈ {0}
   t[0..9] ∈ {0}
-[eva] tests/value/domains_function.c:117: starting to merge loop iterations
+[eva] domains_function.c:117: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- main.
-  Called from tests/value/domains_function.c:119.
+  Called from domains_function.c:119.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/domains_function.c:119: 
+[eva] domains_function.c:119: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function test <- main.
-  Called from tests/value/domains_function.c:120.
-[eva] tests/value/domains_function.c:92: 
+  Called from domains_function.c:120.
+[eva] domains_function.c:92: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] computing for function enabled <- test <- main.
-  Called from tests/value/domains_function.c:93.
+  Called from domains_function.c:93.
 [eva] Recording results for enabled
 [eva] Done for function enabled
-[eva] tests/value/domains_function.c:94: Frama_C_show_each_singleton: {0}
+[eva] domains_function.c:94: Frama_C_show_each_singleton: {0}
 [eva] computing for function not_enabled <- test <- main.
-  Called from tests/value/domains_function.c:95.
-[eva] tests/value/domains_function.c:77: 
+  Called from domains_function.c:95.
+[eva] domains_function.c:77: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for not_enabled
 [eva] Done for function not_enabled
-[eva] tests/value/domains_function.c:96: 
+[eva] domains_function.c:96: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] computing for function disabled <- test <- main.
-  Called from tests/value/domains_function.c:97.
-[eva] tests/value/domains_function.c:84: 
+  Called from domains_function.c:97.
+[eva] domains_function.c:84: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for disabled
 [eva] Done for function disabled
-[eva] tests/value/domains_function.c:98: 
+[eva] domains_function.c:98: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for test
 [eva] Done for function test
 [eva] computing for function recursively_enabled <- main.
-  Called from tests/value/domains_function.c:121.
-[eva] tests/value/domains_function.c:107: Frama_C_show_each_singleton: {4}
+  Called from domains_function.c:121.
+[eva] domains_function.c:107: Frama_C_show_each_singleton: {4}
 [eva] computing for function enabled <- recursively_enabled <- main.
-  Called from tests/value/domains_function.c:108.
+  Called from domains_function.c:108.
 [eva] Recording results for enabled
 [eva] Done for function enabled
-[eva] tests/value/domains_function.c:109: Frama_C_show_each_singleton: {0}
+[eva] domains_function.c:109: Frama_C_show_each_singleton: {0}
 [eva] computing for function not_enabled <- recursively_enabled <- main.
-  Called from tests/value/domains_function.c:110.
-[eva] tests/value/domains_function.c:77: Frama_C_show_each_top: {1}
+  Called from domains_function.c:110.
+[eva] domains_function.c:77: Frama_C_show_each_top: {1}
 [eva] Recording results for not_enabled
 [eva] Done for function not_enabled
-[eva] tests/value/domains_function.c:111: Frama_C_show_each_singleton: {1}
+[eva] domains_function.c:111: Frama_C_show_each_singleton: {1}
 [eva] computing for function disabled <- recursively_enabled <- main.
-  Called from tests/value/domains_function.c:112.
-[eva] tests/value/domains_function.c:84: 
+  Called from domains_function.c:112.
+[eva] domains_function.c:84: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for disabled
 [eva] Done for function disabled
-[eva] tests/value/domains_function.c:113: 
+[eva] domains_function.c:113: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for recursively_enabled
 [eva] Done for function recursively_enabled
 [eva] computing for function test_propagation <- main.
-  Called from tests/value/domains_function.c:122.
+  Called from domains_function.c:122.
 [eva] computing for function infer <- test_propagation <- main.
-  Called from tests/value/domains_function.c:53.
+  Called from domains_function.c:53.
 [eva] Recording results for infer
 [eva] Done for function infer
 [eva] computing for function no_use <- test_propagation <- main.
-  Called from tests/value/domains_function.c:54.
+  Called from domains_function.c:54.
 [eva] Recording results for no_use
 [eva] Done for function no_use
-[eva] tests/value/domains_function.c:55: 
+[eva] domains_function.c:55: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] computing for function nothing <- test_propagation <- main.
-  Called from tests/value/domains_function.c:56.
-[eva:alarm] tests/value/domains_function.c:21: Warning: 
+  Called from domains_function.c:56.
+[eva:alarm] domains_function.c:21: Warning: 
   signed overflow. assert -2147483648 ≤ t[i] - t[0];
-[eva:alarm] tests/value/domains_function.c:21: Warning: 
+[eva:alarm] domains_function.c:21: Warning: 
   signed overflow. assert t[i] - t[0] ≤ 2147483647;
 [eva] Recording results for nothing
 [eva] Done for function nothing
 [eva] computing for function use <- test_propagation <- main.
-  Called from tests/value/domains_function.c:57.
+  Called from domains_function.c:57.
 [eva] Recording results for use
 [eva] Done for function use
-[eva] tests/value/domains_function.c:58: Frama_C_show_each_singleton: {42}
+[eva] domains_function.c:58: Frama_C_show_each_singleton: {42}
 [eva] computing for function kill <- test_propagation <- main.
-  Called from tests/value/domains_function.c:59.
+  Called from domains_function.c:59.
 [eva] Recording results for kill
 [eva] Done for function kill
 [eva] computing for function use <- test_propagation <- main.
-  Called from tests/value/domains_function.c:60.
+  Called from domains_function.c:60.
 [eva] Recording results for use
 [eva] Done for function use
-[eva] tests/value/domains_function.c:61: 
+[eva] domains_function.c:61: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] computing for function no_infer <- test_propagation <- main.
-  Called from tests/value/domains_function.c:62.
+  Called from domains_function.c:62.
 [eva] Recording results for no_infer
 [eva] Done for function no_infer
-[eva] tests/value/domains_function.c:63: Reusing old results for call to use
-[eva] tests/value/domains_function.c:64: 
+[eva] domains_function.c:63: Reusing old results for call to use
+[eva] domains_function.c:64: 
   Frama_C_show_each_top: [-2147483648..2147483647]
 [eva] Recording results for test_propagation
 [eva] Done for function test_propagation

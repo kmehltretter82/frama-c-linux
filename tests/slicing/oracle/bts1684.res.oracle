@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts1684.i (no preprocessing)
+[kernel] Parsing bts1684.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -11,7 +11,7 @@
   x2 ∈ {0}
   x3 ∈ {0}
 [eva] computing for function main2 <- main.
-  Called from tests/slicing/bts1684.i:14.
+  Called from bts1684.i:14.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -58,5 +58,5 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts1684.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts1684.i (no preprocessing)
 [kernel] writing journal in file `frama_c_journal.ml'.

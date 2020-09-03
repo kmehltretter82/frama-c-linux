@@ -188,6 +188,9 @@ let load_plugin_path () =
   if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
   Config_data.Plugins.Plugins.load_all ()
 
+let load_plugin m =
+  Config_data.Plugins.Plugins.load m
+
 let load_module m =
   let base,ext = split_ext m in
   match ext with
@@ -209,14 +212,8 @@ let load_module m =
         | None ->
           if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
           else
-            let fc =
-              "frama-c-" ^ String.lowercase_ascii m
-            in
-            load_packages [fc]
+            load_plugin m
     end
-
-let load_plugin m =
-  Config_data.Plugins.Plugins.load m
 
 (* ************************************************************************* *)
 (** {2 Registering and accessing dynamic values} *)

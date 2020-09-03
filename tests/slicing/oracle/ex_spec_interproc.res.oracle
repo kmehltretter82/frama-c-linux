@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/ex_spec_interproc.i (no preprocessing)
+[kernel] Parsing ex_spec_interproc.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,13 +12,13 @@
   L ∈ {0}
   M ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/slicing/ex_spec_interproc.i:35.
+  Called from ex_spec_interproc.i:35.
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/ex_spec_interproc.i:21.
+  Called from ex_spec_interproc.i:21.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/ex_spec_interproc.i:22.
+  Called from ex_spec_interproc.i:22.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for f

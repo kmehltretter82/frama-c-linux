@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/ghost_else_bad_oneline.i (no preprocessing)
-[kernel] tests/syntax/ghost_else_bad_oneline.i:6: 
+[kernel] Parsing ghost_else_bad_oneline.i (no preprocessing)
+[kernel] ghost_else_bad_oneline.i:6: 
   syntax error:
   Location: between lines 6 and 8, before or at token: 
   

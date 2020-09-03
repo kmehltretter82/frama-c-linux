@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/remove_status_hyps.i (no preprocessing)
+[kernel] Parsing remove_status_hyps.i (no preprocessing)
 [rsh] initial statuses
 [rsh] assert P1: \true;: unknown (hyps: )
 [rsh] assert P2: \true;: unknown (hyps: assert P1: \true;)

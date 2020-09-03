@@ -1,104 +1,104 @@
-[kernel] Parsing tests/value/bts0506.i (no preprocessing)
+[kernel] Parsing bts0506.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/value/bts0506.i:47.
+  Called from bts0506.i:47.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function main2 <- main.
-  Called from tests/value/bts0506.i:49.
+  Called from bts0506.i:49.
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/bts0506.i:15.
-[kernel:annot:missing-spec] tests/value/bts0506.i:15: Warning: 
+  Called from bts0506.i:15.
+[kernel:annot:missing-spec] bts0506.i:15: Warning: 
   Neither code nor specification for function f1, generating default assigns from the prototype
 [eva] using specification for function f1
 [eva] Done for function f1
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/bts0506.i:16.
+  Called from bts0506.i:16.
 [eva] Done for function f1
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/bts0506.i:17.
+  Called from bts0506.i:17.
 [eva] Done for function f1
 [eva] computing for function f1 <- main2 <- main.
-  Called from tests/value/bts0506.i:18.
+  Called from bts0506.i:18.
 [eva] Done for function f1
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/bts0506.i:20.
-[kernel:annot:missing-spec] tests/value/bts0506.i:20: Warning: 
+  Called from bts0506.i:20.
+[kernel:annot:missing-spec] bts0506.i:20: Warning: 
   Neither code nor specification for function f2, generating default assigns from the prototype
 [eva] using specification for function f2
 [eva] Done for function f2
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/bts0506.i:21.
+  Called from bts0506.i:21.
 [eva] Done for function f2
 [eva] computing for function f2 <- main2 <- main.
-  Called from tests/value/bts0506.i:22.
+  Called from bts0506.i:22.
 [eva] Done for function f2
 [eva] computing for function f3 <- main2 <- main.
-  Called from tests/value/bts0506.i:24.
-[kernel:annot:missing-spec] tests/value/bts0506.i:24: Warning: 
+  Called from bts0506.i:24.
+[kernel:annot:missing-spec] bts0506.i:24: Warning: 
   Neither code nor specification for function f3, generating default assigns from the prototype
 [eva] using specification for function f3
 [eva] Done for function f3
 [eva] computing for function f3 <- main2 <- main.
-  Called from tests/value/bts0506.i:25.
+  Called from bts0506.i:25.
 [eva] Done for function f3
 [eva] computing for function f4 <- main2 <- main.
-  Called from tests/value/bts0506.i:27.
-[kernel:annot:missing-spec] tests/value/bts0506.i:27: Warning: 
+  Called from bts0506.i:27.
+[kernel:annot:missing-spec] bts0506.i:27: Warning: 
   Neither code nor specification for function f4, generating default assigns from the prototype
 [eva] using specification for function f4
 [eva] Done for function f4
-[eva:alarm] tests/value/bts0506.i:27: Warning: 
+[eva:alarm] bts0506.i:27: Warning: 
   non-finite float value. assert \is_finite(tmp_8);
                           (tmp_8 from f4())
 [eva] computing for function f4 <- main2 <- main.
-  Called from tests/value/bts0506.i:28.
+  Called from bts0506.i:28.
 [eva] Done for function f4
-[eva:alarm] tests/value/bts0506.i:28: Warning: 
+[eva:alarm] bts0506.i:28: Warning: 
   non-finite float value. assert \is_finite(tmp_9);
                           (tmp_9 from f4())
 [eva] computing for function f5 <- main2 <- main.
-  Called from tests/value/bts0506.i:30.
-[kernel:annot:missing-spec] tests/value/bts0506.i:30: Warning: 
+  Called from bts0506.i:30.
+[kernel:annot:missing-spec] bts0506.i:30: Warning: 
   Neither code nor specification for function f5, generating default assigns from the prototype
 [eva] using specification for function f5
 [eva] Done for function f5
-[eva:alarm] tests/value/bts0506.i:30: Warning: 
+[eva:alarm] bts0506.i:30: Warning: 
   non-finite double value. assert \is_finite(tmp_10);
                            (tmp_10 from f5())
-[eva:alarm] tests/value/bts0506.i:30: Warning: 
+[eva:alarm] bts0506.i:30: Warning: 
   non-finite float value. assert \is_finite((float)tmp_10);
                           (tmp_10 from f5())
 [eva] computing for function f5 <- main2 <- main.
-  Called from tests/value/bts0506.i:31.
+  Called from bts0506.i:31.
 [eva] Done for function f5
-[eva:alarm] tests/value/bts0506.i:31: Warning: 
+[eva:alarm] bts0506.i:31: Warning: 
   non-finite double value. assert \is_finite(tmp_11);
                            (tmp_11 from f5())
 [eva] computing for function f6 <- main2 <- main.
-  Called from tests/value/bts0506.i:33.
-[kernel:annot:missing-spec] tests/value/bts0506.i:33: Warning: 
+  Called from bts0506.i:33.
+[kernel:annot:missing-spec] bts0506.i:33: Warning: 
   Neither code nor specification for function f6, generating default assigns from the prototype
 [eva] using specification for function f6
 [eva] Done for function f6
 [eva] computing for function f6 <- main2 <- main.
-  Called from tests/value/bts0506.i:34.
+  Called from bts0506.i:34.
 [eva] Done for function f6
 [eva] computing for function f6 <- main2 <- main.
-  Called from tests/value/bts0506.i:35.
+  Called from bts0506.i:35.
 [eva] Done for function f6
 [eva] computing for function f7 <- main2 <- main.
-  Called from tests/value/bts0506.i:37.
-[kernel:annot:missing-spec] tests/value/bts0506.i:37: Warning: 
+  Called from bts0506.i:37.
+[kernel:annot:missing-spec] bts0506.i:37: Warning: 
   Neither code nor specification for function f7, generating default assigns from the prototype
 [eva] using specification for function f7
 [eva] Done for function f7
 [eva] computing for function f7 <- main2 <- main.
-  Called from tests/value/bts0506.i:38.
+  Called from bts0506.i:38.
 [eva] Done for function f7
 [eva] Recording results for main2
 [eva] Done for function main2

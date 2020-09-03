@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/loops.i (no preprocessing)
+[kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at f2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,11 +9,11 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva:alarm] tests/slicing/loops.i:56: Warning: assertion got status unknown.
-[eva] tests/slicing/loops.i:50: starting to merge loop iterations
-[eva:alarm] tests/slicing/loops.i:52: Warning: 
+[eva:alarm] loops.i:56: Warning: assertion got status unknown.
+[eva] loops.i:50: starting to merge loop iterations
+[eva:alarm] loops.i:52: Warning: 
   signed overflow. assert x1 + 1 ≤ 2147483647;
-[eva:alarm] tests/slicing/loops.i:54: Warning: 
+[eva:alarm] loops.i:54: Warning: 
   signed overflow. assert x2 + 1 ≤ 2147483647;
 [eva] Recording results for f2
 [eva] done for function f2
@@ -29,7 +29,7 @@
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f2
-[pdg] tests/slicing/loops.i:50: Warning: no final state. Probably unreachable...
+[pdg] loops.i:50: Warning: no final state. Probably unreachable...
 [pdg] done for function f2
 [slicing] applying all slicing requests...
 [slicing] applying 0 actions...
@@ -53,4 +53,4 @@ void f2(int c)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_loops.i (no preprocessing)
+[kernel] Parsing result/ocode_2_loops.i (no preprocessing)

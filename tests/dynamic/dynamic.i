@@ -1,6 +1,5 @@
 /*run.config
-  EXECNOW: make tests/dynamic/empty.cmo tests/dynamic/abstract.cmo tests/dynamic/abstract2.cmo
-  CMD: FRAMAC_PLUGIN=tests/dynamic bin/toplevel.byte
-  OPT: -add-path tests/dynamic/file_path -add-path tests/dynamic/directory_path -add-path tests/dynamic/none
-  OPT: -load-module tests/dynamic/empty.cmo,tests/dynamic/abstract.cmo,tests/dynamic/abstract2.cmo
+  CMXS: empty abstract abstract2
+  OPT: -add-path file_path -add-path directory_path -add-path none
+  OPT: -load-module %{dep:empty.cmxs},%{dep:abstract.cmxs},%{dep:abstract2.cmxs}
  */

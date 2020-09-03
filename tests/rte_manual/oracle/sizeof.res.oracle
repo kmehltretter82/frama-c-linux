@@ -1,18 +1,18 @@
-[kernel] Parsing tests/rte_manual/sizeof.c (with preprocessing)
+[kernel] Parsing sizeof.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function fsize3 <- main.
-  Called from tests/rte_manual/sizeof.c:9.
-[eva] tests/rte_manual/sizeof.c:4: assertion 'alloca_bounds' got status valid.
-[eva] tests/rte_manual/sizeof.c:4: Call to builtin __fc_vla_alloc
-[eva] tests/rte_manual/sizeof.c:4: allocating variable __malloc_fsize3_l4
-[eva] tests/rte_manual/sizeof.c:4: Call to builtin __fc_vla_free
+  Called from sizeof.c:9.
+[eva] sizeof.c:4: assertion 'alloca_bounds' got status valid.
+[eva] sizeof.c:4: Call to builtin __fc_vla_alloc
+[eva] sizeof.c:4: allocating variable __malloc_fsize3_l4
+[eva] sizeof.c:4: Call to builtin __fc_vla_free
 [eva] Recording results for fsize3
 [eva] Done for function fsize3
-[eva] tests/rte_manual/sizeof.c:9: freeing automatic bases: {__malloc_fsize3_l4}
+[eva] sizeof.c:9: freeing automatic bases: {__malloc_fsize3_l4}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/cabs.i (no preprocessing)
+[kernel] Parsing cabs.i (no preprocessing)
 [metrics] Halstead metrics
   ================
   Total operators: 15 

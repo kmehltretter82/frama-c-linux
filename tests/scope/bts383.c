@@ -3,7 +3,7 @@
 */
 /* 
    echo '!Db.Scope.check_asserts();;' \
-   | bin/toplevel.top -eva tests/scope/bts383.c 
+   | bin/toplevel.top -eva bts383.c 
 */
 int v;
 void if1 (int * p) {

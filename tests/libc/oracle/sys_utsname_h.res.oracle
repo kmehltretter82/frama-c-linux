@@ -1,16 +1,16 @@
-[kernel] Parsing tests/libc/sys_utsname_h.c (with preprocessing)
+[kernel] Parsing sys_utsname_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function uname <- main.
-  Called from tests/libc/sys_utsname_h.c:6.
+  Called from sys_utsname_h.c:6.
 [eva] using specification for function uname
-[eva] tests/libc/sys_utsname_h.c:6: 
+[eva] sys_utsname_h.c:6: 
   function uname: precondition 'valid_name' got status valid.
 [eva] Done for function uname
-[eva] tests/libc/sys_utsname_h.c:7: assertion got status valid.
+[eva] sys_utsname_h.c:7: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

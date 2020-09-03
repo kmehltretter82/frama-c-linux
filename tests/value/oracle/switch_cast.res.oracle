@@ -1,12 +1,12 @@
-[kernel] Parsing tests/value/switch_cast.i (no preprocessing)
+[kernel] Parsing switch_cast.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ [--..--]
 [eva] computing for function g <- main.
-  Called from tests/value/switch_cast.i:71.
-[eva] tests/value/switch_cast.i:67: Frama_C_show_each: [1..241],1%2
+  Called from switch_cast.i:71.
+[eva] switch_cast.i:67: Frama_C_show_each: [1..241],1%2
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

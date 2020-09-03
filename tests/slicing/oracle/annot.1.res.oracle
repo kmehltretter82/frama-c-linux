@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/annot.i (no preprocessing)
+[kernel] Parsing annot.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at f2
 [eva] Computing initial state
@@ -7,7 +7,7 @@
   x ∈ [--..--]
   z ∈ [--..--]
   t[0..9] ∈ {0}
-[eva] tests/slicing/annot.i:23: assertion got status valid.
+[eva] annot.i:23: assertion got status valid.
 [eva] Recording results for f2
 [eva] done for function f2
 [slicing] initializing slicing ...
@@ -37,4 +37,4 @@ void f2(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_1_annot.i (no preprocessing)
+[kernel] Parsing result/ocode_1_annot.i (no preprocessing)

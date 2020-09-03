@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/reduce_index.i (no preprocessing)
+[kernel] Parsing reduce_index.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -28,130 +28,130 @@
   k4 ∈ [--..--]
   nulli ∈ [--..--]
 [eva] computing for function f1 <- main.
-  Called from tests/value/reduce_index.i:130.
+  Called from reduce_index.i:130.
 [eva] computing for function f1_aux <- f1 <- main.
-  Called from tests/value/reduce_index.i:11.
+  Called from reduce_index.i:11.
 [eva] Recording results for f1_aux
 [eva] Done for function f1_aux
-[eva:alarm] tests/value/reduce_index.i:11: Warning: 
+[eva:alarm] reduce_index.i:11: Warning: 
   accessing out of bounds index. assert 0 ≤ c1;
-[eva:alarm] tests/value/reduce_index.i:11: Warning: 
+[eva:alarm] reduce_index.i:11: Warning: 
   accessing out of bounds index. assert c1 < 10;
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/value/reduce_index.i:131.
-[eva:alarm] tests/value/reduce_index.i:17: Warning: 
+  Called from reduce_index.i:131.
+[eva:alarm] reduce_index.i:17: Warning: 
   accessing out of bounds index. assert 0 ≤ c2;
-[eva:alarm] tests/value/reduce_index.i:17: Warning: 
+[eva:alarm] reduce_index.i:17: Warning: 
   accessing out of bounds index. assert c2 < 10;
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
-  Called from tests/value/reduce_index.i:132.
-[eva:alarm] tests/value/reduce_index.i:21: Warning: 
+  Called from reduce_index.i:132.
+[eva:alarm] reduce_index.i:21: Warning: 
   accessing out of bounds index. assert 0 ≤ c3;
-[eva:alarm] tests/value/reduce_index.i:21: Warning: 
+[eva:alarm] reduce_index.i:21: Warning: 
   accessing out of bounds index. assert c3 < 10;
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f4 <- main.
-  Called from tests/value/reduce_index.i:133.
-[eva:alarm] tests/value/reduce_index.i:27: Warning: 
+  Called from reduce_index.i:133.
+[eva:alarm] reduce_index.i:27: Warning: 
   accessing out of bounds index. assert 0 ≤ c4;
-[eva:alarm] tests/value/reduce_index.i:27: Warning: 
+[eva:alarm] reduce_index.i:27: Warning: 
   accessing out of bounds index. assert c4 < 10;
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] computing for function f5 <- main.
-  Called from tests/value/reduce_index.i:134.
-[eva:alarm] tests/value/reduce_index.i:35: Warning: 
+  Called from reduce_index.i:134.
+[eva:alarm] reduce_index.i:35: Warning: 
   accessing out of bounds index. assert 0 ≤ c5;
-[eva:alarm] tests/value/reduce_index.i:35: Warning: 
+[eva:alarm] reduce_index.i:35: Warning: 
   accessing out of bounds index. assert c5 < 10;
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
-  Called from tests/value/reduce_index.i:135.
-[eva:alarm] tests/value/reduce_index.i:42: Warning: 
+  Called from reduce_index.i:135.
+[eva:alarm] reduce_index.i:42: Warning: 
   accessing out of bounds index. assert 0 ≤ c6;
-[eva:alarm] tests/value/reduce_index.i:42: Warning: 
+[eva:alarm] reduce_index.i:42: Warning: 
   accessing out of bounds index. assert c6 < 11;
-[eva:alarm] tests/value/reduce_index.i:42: Warning: 
+[eva:alarm] reduce_index.i:42: Warning: 
   accessing out of bounds index. assert c6 < 10;
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
-  Called from tests/value/reduce_index.i:136.
-[eva:alarm] tests/value/reduce_index.i:48: Warning: 
+  Called from reduce_index.i:136.
+[eva:alarm] reduce_index.i:48: Warning: 
   accessing out of bounds index. assert 0 ≤ c7;
-[eva:alarm] tests/value/reduce_index.i:48: Warning: 
+[eva:alarm] reduce_index.i:48: Warning: 
   accessing out of bounds index. assert c7 < 10;
 [eva] Recording results for f7
 [eva] Done for function f7
 [eva] computing for function f8 <- main.
-  Called from tests/value/reduce_index.i:137.
-[eva:alarm] tests/value/reduce_index.i:64: Warning: 
+  Called from reduce_index.i:137.
+[eva:alarm] reduce_index.i:64: Warning: 
   out of bounds write. assert \valid(&p8->f1);
 [eva] Recording results for f8
 [eva] Done for function f8
 [eva] computing for function f9 <- main.
-  Called from tests/value/reduce_index.i:138.
-[eva:alarm] tests/value/reduce_index.i:72: Warning: 
+  Called from reduce_index.i:138.
+[eva:alarm] reduce_index.i:72: Warning: 
   accessing out of bounds index. assert 0 ≤ c9;
-[eva:alarm] tests/value/reduce_index.i:72: Warning: 
+[eva:alarm] reduce_index.i:72: Warning: 
   accessing out of bounds index. assert c9 < 10;
 [eva] Recording results for f9
 [eva] Done for function f9
 [eva] computing for function f10 <- main.
-  Called from tests/value/reduce_index.i:139.
-[eva:alarm] tests/value/reduce_index.i:86: Warning: 
+  Called from reduce_index.i:139.
+[eva:alarm] reduce_index.i:86: Warning: 
   accessing out of bounds index. assert 0 ≤ c10;
-[eva:alarm] tests/value/reduce_index.i:86: Warning: 
+[eva:alarm] reduce_index.i:86: Warning: 
   accessing out of bounds index. assert c10 < 7;
 [eva] Recording results for f10
 [eva] Done for function f10
 [eva] computing for function f11 <- main.
-  Called from tests/value/reduce_index.i:140.
-[eva:alarm] tests/value/reduce_index.i:93: Warning: 
+  Called from reduce_index.i:140.
+[eva:alarm] reduce_index.i:93: Warning: 
   accessing out of bounds index. assert 0 ≤ c11;
-[eva:alarm] tests/value/reduce_index.i:93: Warning: 
+[eva:alarm] reduce_index.i:93: Warning: 
   accessing out of bounds index. assert c11 < 7;
-[eva:alarm] tests/value/reduce_index.i:93: Warning: 
+[eva:alarm] reduce_index.i:93: Warning: 
   out of bounds write. assert \valid(&(*p7)[c11]);
 [eva] Recording results for f11
 [eva] Done for function f11
 [eva] computing for function f12 <- main.
-  Called from tests/value/reduce_index.i:141.
-[eva:alarm] tests/value/reduce_index.i:100: Warning: 
+  Called from reduce_index.i:141.
+[eva:alarm] reduce_index.i:100: Warning: 
   accessing out of bounds index. assert 0 ≤ c12;
-[eva:alarm] tests/value/reduce_index.i:100: Warning: 
+[eva:alarm] reduce_index.i:100: Warning: 
   accessing out of bounds index. assert c12 < 4;
 [eva] Recording results for f12
 [eva] Done for function f12
 [eva] computing for function pointer_index <- main.
-  Called from tests/value/reduce_index.i:143.
-[eva:alarm] tests/value/reduce_index.i:110: Warning: 
+  Called from reduce_index.i:143.
+[eva:alarm] reduce_index.i:110: Warning: 
   out of bounds read. assert \valid_read(p + k1);
-[eva:alarm] tests/value/reduce_index.i:113: Warning: 
+[eva:alarm] reduce_index.i:113: Warning: 
   out of bounds read. assert \valid_read(p + k2);
-[eva:alarm] tests/value/reduce_index.i:116: Warning: 
+[eva:alarm] reduce_index.i:116: Warning: 
   out of bounds read. assert \valid_read(p + k3);
-[eva:alarm] tests/value/reduce_index.i:119: Warning: 
+[eva:alarm] reduce_index.i:119: Warning: 
   out of bounds read. assert \valid_read(p + k4);
 [eva] Recording results for pointer_index
 [eva] Done for function pointer_index
 [eva] computing for function null_index <- main.
-  Called from tests/value/reduce_index.i:144.
-[eva:alarm] tests/value/reduce_index.i:126: Warning: 
+  Called from reduce_index.i:144.
+[eva:alarm] reduce_index.i:126: Warning: 
   out of bounds write. assert \valid((int *)0 + nulli);
-[kernel] tests/value/reduce_index.i:126: Warning: 
+[kernel] reduce_index.i:126: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for null_index
 [eva] Done for function null_index
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/reduce_index.i:126: 
+[eva] reduce_index.i:126: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f10:

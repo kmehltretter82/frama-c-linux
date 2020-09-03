@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/ilevel.i (no preprocessing)
+[kernel] Parsing ilevel.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,11 +8,11 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] tests/value/ilevel.i:9: starting to merge loop iterations
-[eva] tests/value/ilevel.i:12: starting to merge loop iterations
-[eva:alarm] tests/value/ilevel.i:20: Warning: assertion got status unknown.
-[eva:alarm] tests/value/ilevel.i:22: Warning: assertion got status unknown.
-[eva] tests/value/ilevel.i:24: Frama_C_show_each: [0..9]
+[eva] ilevel.i:9: starting to merge loop iterations
+[eva] ilevel.i:12: starting to merge loop iterations
+[eva:alarm] ilevel.i:20: Warning: assertion got status unknown.
+[eva:alarm] ilevel.i:22: Warning: assertion got status unknown.
+[eva] ilevel.i:24: Frama_C_show_each: [0..9]
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -48,9 +48,9 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] tests/value/ilevel.i:9: starting to merge loop iterations
-[eva] tests/value/ilevel.i:12: starting to merge loop iterations
-[eva:alarm] tests/value/ilevel.i:26: Warning: 
+[eva] ilevel.i:9: starting to merge loop iterations
+[eva] ilevel.i:12: starting to merge loop iterations
+[eva:alarm] ilevel.i:26: Warning: 
   signed overflow. assert (int)((int)(i + j) + k) + l ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
@@ -70,7 +70,7 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] tests/value/ilevel.i:24: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
+[eva] ilevel.i:24: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -89,7 +89,7 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] tests/value/ilevel.i:24: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
+[eva] ilevel.i:24: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

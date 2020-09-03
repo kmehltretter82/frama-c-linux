@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/logicdeps.i (no preprocessing)
+[kernel] Parsing logicdeps.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,12 +7,12 @@
   p ∈ {0}
   y ∈ [--..--]
   z ∈ [--..--]
-[eva:alarm] tests/value/logicdeps.i:19: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logicdeps.i:20: Warning: assertion got status unknown.
+[eva:alarm] logicdeps.i:19: Warning: assertion got status unknown.
+[eva:alarm] logicdeps.i:20: Warning: assertion got status unknown.
 [eva] computing for function g <- main.
-  Called from tests/value/logicdeps.i:23.
+  Called from logicdeps.i:23.
 [eva] computing for function f <- g <- main.
-  Called from tests/value/logicdeps.i:13.
+  Called from logicdeps.i:13.
 [eva] using specification for function f
 [eva] Done for function f
 [eva] Recording results for g
@@ -20,35 +20,35 @@
 [from] Done for function g
 [eva] Done for function g
 [eva] computing for function g <- main.
-  Called from tests/value/logicdeps.i:24.
+  Called from logicdeps.i:24.
 [eva] computing for function f <- g <- main.
-  Called from tests/value/logicdeps.i:13.
+  Called from logicdeps.i:13.
 [eva] Done for function f
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/value/logicdeps.i:25: Reusing old results for call to g
-[eva] tests/value/logicdeps.i:27: assertion got status valid.
+[eva] logicdeps.i:25: Reusing old results for call to g
+[eva] logicdeps.i:27: assertion got status valid.
 [eva] computing for function g <- main.
-  Called from tests/value/logicdeps.i:30.
+  Called from logicdeps.i:30.
 [eva] computing for function f <- g <- main.
-  Called from tests/value/logicdeps.i:13.
+  Called from logicdeps.i:13.
 [eva] Done for function f
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
 [eva] computing for function g <- main.
-  Called from tests/value/logicdeps.i:31.
+  Called from logicdeps.i:31.
 [eva] computing for function f <- g <- main.
-  Called from tests/value/logicdeps.i:13.
+  Called from logicdeps.i:13.
 [eva] Done for function f
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/value/logicdeps.i:32: Reusing old results for call to g
+[eva] logicdeps.i:32: Reusing old results for call to g
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
@@ -64,24 +64,24 @@
    [41..49] ∈ {0}
   p ∈ {{ &z }}
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at tests/value/logicdeps.i:13 (by g):
+[from] call to f at logicdeps.i:13 (by g):
   t[20..40] FROM t[0..20] (and SELF)
-[from] call to g at tests/value/logicdeps.i:23 (by main):
+[from] call to g at logicdeps.i:23 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at tests/value/logicdeps.i:24 (by main):
+[from] call to g at logicdeps.i:24 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at tests/value/logicdeps.i:25 (by main):
+[from] call to g at logicdeps.i:25 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at tests/value/logicdeps.i:30 (by main):
+[from] call to g at logicdeps.i:30 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
-[from] call to g at tests/value/logicdeps.i:31 (by main):
+[from] call to g at logicdeps.i:31 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
-[from] call to g at tests/value/logicdeps.i:32 (by main):
+[from] call to g at logicdeps.i:32 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
 [from] entry point:

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/dur.i (no preprocessing)
+[kernel] Parsing dur.i (no preprocessing)
 [eva] Analyzing a complete application starting at F2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -155,7 +155,7 @@
     {.M92[5]{.M2; .M3}; .M93[0..4]} ∈ [--..--]
   G6 ∈ [--..--]
   G7[0..160] ∈ [--..--]
-[eva] tests/value/dur.i:167: starting to merge loop iterations
+[eva] dur.i:167: starting to merge loop iterations
 [eva] Recording results for F2
 [eva] done for function F2
 [eva] ====== VALUES COMPUTED ======

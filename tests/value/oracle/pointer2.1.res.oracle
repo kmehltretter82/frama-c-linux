@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/pointer2.i (no preprocessing)
+[kernel] Parsing pointer2.i (no preprocessing)
 [eva] Analyzing a complete application starting at h
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +9,7 @@
   y ∈ {0}
   z ∈ {0}
 [eva] computing for function f <- h.
-  Called from tests/value/pointer2.i:18.
+  Called from pointer2.i:18.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for h

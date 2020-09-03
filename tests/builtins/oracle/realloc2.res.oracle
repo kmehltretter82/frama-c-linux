@@ -1,528 +1,528 @@
-[kernel] Parsing tests/builtins/realloc2.c (with preprocessing)
+[kernel] Parsing realloc2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function test_exact_null <- main.
-  Called from tests/builtins/realloc2.c:194.
-[eva] tests/builtins/realloc2.c:27: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:27: 
+  Called from realloc2.c:194.
+[eva] realloc2.c:27: Call to builtin realloc
+[eva] realloc2.c:27: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
-[eva] tests/builtins/realloc2.c:27: 
+[eva] realloc2.c:27: 
   allocating variable __realloc_test_exact_null_l27
-[eva:malloc] tests/builtins/realloc2.c:27: strong free on bases: {}
+[eva:malloc] realloc2.c:27: strong free on bases: {}
 [eva] computing for function fill <- test_exact_null <- main.
-  Called from tests/builtins/realloc2.c:28.
+  Called from realloc2.c:28.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_exact_null
 [eva] Done for function test_exact_null
 [eva] computing for function test_exact_null_free <- main.
-  Called from tests/builtins/realloc2.c:195.
-[eva] tests/builtins/realloc2.c:32: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:32: 
+  Called from realloc2.c:195.
+[eva] realloc2.c:32: Call to builtin realloc
+[eva] realloc2.c:32: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
-[eva] tests/builtins/realloc2.c:32: 
+[eva] realloc2.c:32: 
   allocating variable __realloc_test_exact_null_free_l32
-[eva:malloc] tests/builtins/realloc2.c:32: strong free on bases: {}
+[eva:malloc] realloc2.c:32: strong free on bases: {}
 [eva] Recording results for test_exact_null_free
 [eva] Done for function test_exact_null_free
 [eva] computing for function test_exact_nonnull_expand <- main.
-  Called from tests/builtins/realloc2.c:196.
-[eva] tests/builtins/realloc2.c:36: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:36: 
+  Called from realloc2.c:196.
+[eva] realloc2.c:36: Call to builtin malloc
+[eva] realloc2.c:36: 
   allocating variable __malloc_test_exact_nonnull_expand_l36
 [eva] computing for function fill <- test_exact_nonnull_expand <- main.
-  Called from tests/builtins/realloc2.c:37.
+  Called from realloc2.c:37.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:38: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:38: 
+[eva] realloc2.c:38: Call to builtin realloc
+[eva] realloc2.c:38: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_expand_l36}
-[eva] tests/builtins/realloc2.c:38: 
+[eva] realloc2.c:38: 
   allocating variable __realloc_test_exact_nonnull_expand_l38
-[eva:malloc] tests/builtins/realloc2.c:38: 
+[eva:malloc] realloc2.c:38: 
   strong free on bases: {__malloc_test_exact_nonnull_expand_l36}
 [eva] computing for function fill <- test_exact_nonnull_expand <- main.
-  Called from tests/builtins/realloc2.c:39.
+  Called from realloc2.c:39.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_exact_nonnull_expand
 [eva] Done for function test_exact_nonnull_expand
 [eva] computing for function test_exact_nonnull_shrink <- main.
-  Called from tests/builtins/realloc2.c:197.
-[eva] tests/builtins/realloc2.c:44: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:44: 
+  Called from realloc2.c:197.
+[eva] realloc2.c:44: Call to builtin malloc
+[eva] realloc2.c:44: 
   allocating variable __malloc_test_exact_nonnull_shrink_l44
 [eva] computing for function fill <- test_exact_nonnull_shrink <- main.
-  Called from tests/builtins/realloc2.c:45.
+  Called from realloc2.c:45.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:46: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:46: 
+[eva] realloc2.c:46: Call to builtin realloc
+[eva] realloc2.c:46: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_shrink_l44}
-[eva] tests/builtins/realloc2.c:46: 
+[eva] realloc2.c:46: 
   allocating variable __realloc_test_exact_nonnull_shrink_l46
-[eva:malloc] tests/builtins/realloc2.c:46: 
+[eva:malloc] realloc2.c:46: 
   strong free on bases: {__malloc_test_exact_nonnull_shrink_l44}
 [eva] computing for function fill <- test_exact_nonnull_shrink <- main.
-  Called from tests/builtins/realloc2.c:47.
+  Called from realloc2.c:47.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_exact_nonnull_shrink
 [eva] Done for function test_exact_nonnull_shrink
 [eva] computing for function test_exact_nonnull_free <- main.
-  Called from tests/builtins/realloc2.c:198.
-[eva] tests/builtins/realloc2.c:51: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:51: 
+  Called from realloc2.c:198.
+[eva] realloc2.c:51: Call to builtin malloc
+[eva] realloc2.c:51: 
   allocating variable __malloc_test_exact_nonnull_free_l51
 [eva] computing for function fill <- test_exact_nonnull_free <- main.
-  Called from tests/builtins/realloc2.c:52.
+  Called from realloc2.c:52.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:53: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:53: 
+[eva] realloc2.c:53: Call to builtin realloc
+[eva] realloc2.c:53: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_exact_nonnull_free_l51}
-[eva] tests/builtins/realloc2.c:53: 
+[eva] realloc2.c:53: 
   allocating variable __realloc_test_exact_nonnull_free_l53
-[eva:malloc] tests/builtins/realloc2.c:53: 
+[eva:malloc] realloc2.c:53: 
   strong free on bases: {__malloc_test_exact_nonnull_free_l51}
 [eva] Recording results for test_exact_nonnull_free
 [eva] Done for function test_exact_nonnull_free
 [eva] computing for function test_maybe_nonnull <- main.
-  Called from tests/builtins/realloc2.c:199.
-[eva] tests/builtins/realloc2.c:57: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:57: 
+  Called from realloc2.c:199.
+[eva] realloc2.c:57: Call to builtin malloc
+[eva] realloc2.c:57: 
   allocating variable __malloc_test_maybe_nonnull_l57
-[eva] tests/builtins/realloc2.c:58: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:58: 
+[eva] realloc2.c:58: Call to builtin realloc
+[eva] realloc2.c:58: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_maybe_nonnull_l57}
-[eva] tests/builtins/realloc2.c:58: 
+[eva] realloc2.c:58: 
   allocating variable __realloc_test_maybe_nonnull_l58
-[eva:malloc] tests/builtins/realloc2.c:58: 
+[eva:malloc] realloc2.c:58: 
   weak free on bases: {__malloc_test_maybe_nonnull_l57}
 [eva] computing for function fill <- test_maybe_nonnull <- main.
-  Called from tests/builtins/realloc2.c:59.
+  Called from realloc2.c:59.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_maybe_nonnull
 [eva] Done for function test_maybe_nonnull
 [eva] computing for function test_same_size <- main.
-  Called from tests/builtins/realloc2.c:200.
-[eva] tests/builtins/realloc2.c:63: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:63: 
+  Called from realloc2.c:200.
+[eva] realloc2.c:63: Call to builtin malloc
+[eva] realloc2.c:63: 
   allocating variable __malloc_test_same_size_l63
 [eva] computing for function fill <- test_same_size <- main.
-  Called from tests/builtins/realloc2.c:64.
+  Called from realloc2.c:64.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:65: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:65: 
+[eva] realloc2.c:65: Call to builtin realloc
+[eva] realloc2.c:65: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_same_size_l63}
-[eva] tests/builtins/realloc2.c:65: 
+[eva] realloc2.c:65: 
   allocating variable __realloc_test_same_size_l65
-[eva:malloc] tests/builtins/realloc2.c:65: 
+[eva:malloc] realloc2.c:65: 
   strong free on bases: {__malloc_test_same_size_l63}
 [eva] Recording results for test_same_size
 [eva] Done for function test_same_size
 [eva] computing for function test_imprecise_size <- main.
-  Called from tests/builtins/realloc2.c:201.
-[eva] tests/builtins/realloc2.c:70: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:70: 
+  Called from realloc2.c:201.
+[eva] realloc2.c:70: Call to builtin realloc
+[eva] realloc2.c:70: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
-[eva] tests/builtins/realloc2.c:70: 
+[eva] realloc2.c:70: 
   allocating variable __realloc_test_imprecise_size_l70
-[eva:malloc] tests/builtins/realloc2.c:70: strong free on bases: {}
+[eva:malloc] realloc2.c:70: strong free on bases: {}
 [eva] computing for function fill <- test_imprecise_size <- main.
-  Called from tests/builtins/realloc2.c:71.
-[eva:alarm] tests/builtins/realloc2.c:11: Warning: 
+  Called from realloc2.c:71.
+[eva:alarm] realloc2.c:11: Warning: 
   out of bounds write. assert \valid(b + i);
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_imprecise_size
 [eva] Done for function test_imprecise_size
 [eva] computing for function test_imprecise_size_but_precise_fill <- main.
-  Called from tests/builtins/realloc2.c:202.
-[eva] tests/builtins/realloc2.c:76: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:76: 
+  Called from realloc2.c:202.
+[eva] realloc2.c:76: Call to builtin realloc
+[eva] realloc2.c:76: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
-[eva] tests/builtins/realloc2.c:76: 
+[eva] realloc2.c:76: 
   allocating variable __realloc_test_imprecise_size_but_precise_fill_l76
-[eva:malloc] tests/builtins/realloc2.c:76: strong free on bases: {}
+[eva:malloc] realloc2.c:76: strong free on bases: {}
 [eva] computing for function fill <- test_imprecise_size_but_precise_fill <- main.
-  Called from tests/builtins/realloc2.c:77.
+  Called from realloc2.c:77.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_imprecise_size_but_precise_fill
 [eva] Done for function test_imprecise_size_but_precise_fill
 [eva] computing for function test_imprecise_size_free <- main.
-  Called from tests/builtins/realloc2.c:203.
-[eva] tests/builtins/realloc2.c:81: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:81: 
+  Called from realloc2.c:203.
+[eva] realloc2.c:81: Call to builtin malloc
+[eva] realloc2.c:81: 
   allocating variable __malloc_test_imprecise_size_free_l81
 [eva] computing for function fill <- test_imprecise_size_free <- main.
-  Called from tests/builtins/realloc2.c:82.
+  Called from realloc2.c:82.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:84: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:84: 
+[eva] realloc2.c:84: Call to builtin realloc
+[eva] realloc2.c:84: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_imprecise_size_free_l81}
-[eva] tests/builtins/realloc2.c:84: 
+[eva] realloc2.c:84: 
   allocating variable __realloc_test_imprecise_size_free_l84
-[eva:malloc] tests/builtins/realloc2.c:84: 
+[eva:malloc] realloc2.c:84: 
   strong free on bases: {__malloc_test_imprecise_size_free_l81}
 [eva] computing for function fill <- test_imprecise_size_free <- main.
-  Called from tests/builtins/realloc2.c:85.
+  Called from realloc2.c:85.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_imprecise_size_free
 [eva] Done for function test_imprecise_size_free
 [eva] computing for function test_imprecise_both <- main.
-  Called from tests/builtins/realloc2.c:204.
-[eva] tests/builtins/realloc2.c:89: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:89: 
+  Called from realloc2.c:204.
+[eva] realloc2.c:89: Call to builtin malloc
+[eva] realloc2.c:89: 
   allocating variable __malloc_test_imprecise_both_l89
-[eva] tests/builtins/realloc2.c:91: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:91: 
+[eva] realloc2.c:91: Call to builtin realloc
+[eva] realloc2.c:91: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_imprecise_both_l89}
-[eva] tests/builtins/realloc2.c:91: 
+[eva] realloc2.c:91: 
   allocating variable __realloc_test_imprecise_both_l91
-[eva:malloc] tests/builtins/realloc2.c:91: 
+[eva:malloc] realloc2.c:91: 
   weak free on bases: {__malloc_test_imprecise_both_l89}
 [eva] computing for function fill <- test_imprecise_both <- main.
-  Called from tests/builtins/realloc2.c:92.
+  Called from realloc2.c:92.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_imprecise_both
 [eva] Done for function test_imprecise_both
 [eva] computing for function test_possibly_invalid_realloc <- main.
-  Called from tests/builtins/realloc2.c:205.
-[eva] tests/builtins/realloc2.c:96: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:96: 
+  Called from realloc2.c:205.
+[eva] realloc2.c:96: Call to builtin malloc
+[eva] realloc2.c:96: 
   allocating variable __malloc_test_possibly_invalid_realloc_l96
-[eva] tests/builtins/realloc2.c:99: Call to builtin realloc
-[eva:alarm] tests/builtins/realloc2.c:99: Warning: 
+[eva] realloc2.c:99: Call to builtin realloc
+[eva:alarm] realloc2.c:99: Warning: 
   function realloc: precondition 'freeable' got status unknown.
 [eva:malloc] bases_to_realloc: {__malloc_test_possibly_invalid_realloc_l96}
-[eva] tests/builtins/realloc2.c:99: 
+[eva] realloc2.c:99: 
   allocating variable __realloc_test_possibly_invalid_realloc_l99
-[eva:malloc] tests/builtins/realloc2.c:99: 
+[eva:malloc] realloc2.c:99: 
   strong free on bases: {__malloc_test_possibly_invalid_realloc_l96}
 [eva] computing for function fill <- test_possibly_invalid_realloc <- main.
-  Called from tests/builtins/realloc2.c:100.
+  Called from realloc2.c:100.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_possibly_invalid_realloc
 [eva] Done for function test_possibly_invalid_realloc
 [eva] computing for function test_invalid_realloc <- main.
-  Called from tests/builtins/realloc2.c:206.
-[eva] tests/builtins/realloc2.c:104: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:104: 
+  Called from realloc2.c:206.
+[eva] realloc2.c:104: Call to builtin malloc
+[eva] realloc2.c:104: 
   allocating variable __malloc_test_invalid_realloc_l104
-[eva] tests/builtins/realloc2.c:106: Call to builtin realloc
-[eva:alarm] tests/builtins/realloc2.c:106: Warning: 
+[eva] realloc2.c:106: Call to builtin realloc
+[eva:alarm] realloc2.c:106: Warning: 
   function realloc: precondition 'freeable' got status invalid.
 [eva] Recording results for test_invalid_realloc
 [eva] Done for function test_invalid_realloc
 [eva] computing for function test_invalid_realloc2 <- main.
-  Called from tests/builtins/realloc2.c:207.
-[eva] tests/builtins/realloc2.c:111: Call to builtin realloc
-[eva:alarm] tests/builtins/realloc2.c:111: Warning: 
+  Called from realloc2.c:207.
+[eva] realloc2.c:111: Call to builtin realloc
+[eva:alarm] realloc2.c:111: Warning: 
   function realloc: precondition 'freeable' got status invalid.
 [eva] Recording results for test_invalid_realloc2
 [eva] Done for function test_invalid_realloc2
 [eva] computing for function test_invalid_realloc3 <- main.
-  Called from tests/builtins/realloc2.c:208.
-[eva] tests/builtins/realloc2.c:116: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:116: 
+  Called from realloc2.c:208.
+[eva] realloc2.c:116: Call to builtin malloc
+[eva] realloc2.c:116: 
   allocating variable __malloc_test_invalid_realloc3_l116
-[eva] tests/builtins/realloc2.c:119: Call to builtin realloc
-[eva:alarm] tests/builtins/realloc2.c:119: Warning: 
+[eva] realloc2.c:119: Call to builtin realloc
+[eva:alarm] realloc2.c:119: Warning: 
   function realloc: precondition 'freeable' got status invalid.
 [eva] Recording results for test_invalid_realloc3
 [eva] Done for function test_invalid_realloc3
 [eva] computing for function test_realloc_sequence <- main.
-  Called from tests/builtins/realloc2.c:209.
-[eva] tests/builtins/realloc2.c:124: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:124: 
+  Called from realloc2.c:209.
+[eva] realloc2.c:124: Call to builtin malloc
+[eva] realloc2.c:124: 
   allocating variable __malloc_test_realloc_sequence_l124
-[eva] tests/builtins/realloc2.c:125: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:125: 
+[eva] realloc2.c:125: Call to builtin realloc
+[eva] realloc2.c:125: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_realloc_sequence_l124}
-[eva] tests/builtins/realloc2.c:125: 
+[eva] realloc2.c:125: 
   allocating variable __realloc_test_realloc_sequence_l125
-[eva:malloc] tests/builtins/realloc2.c:125: 
+[eva:malloc] realloc2.c:125: 
   strong free on bases: {__malloc_test_realloc_sequence_l124}
-[eva] tests/builtins/realloc2.c:126: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:126: 
+[eva] realloc2.c:126: Call to builtin realloc
+[eva] realloc2.c:126: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__realloc_test_realloc_sequence_l125}
-[eva] tests/builtins/realloc2.c:126: 
+[eva] realloc2.c:126: 
   allocating variable __realloc_test_realloc_sequence_l126
-[eva:malloc] tests/builtins/realloc2.c:126: 
+[eva:malloc] realloc2.c:126: 
   strong free on bases: {__realloc_test_realloc_sequence_l125}
 [eva] computing for function fill <- test_realloc_sequence <- main.
-  Called from tests/builtins/realloc2.c:127.
+  Called from realloc2.c:127.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_realloc_sequence
 [eva] Done for function test_realloc_sequence
 [eva] computing for function test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:210.
-[eva] tests/builtins/realloc2.c:131: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:131: 
+  Called from realloc2.c:210.
+[eva] realloc2.c:131: Call to builtin malloc
+[eva] realloc2.c:131: 
   allocating variable __malloc_test_realloc_loop_l131
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:134.
+  Called from realloc2.c:134.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:138: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:138: 
+[eva] realloc2.c:138: Call to builtin realloc
+[eva] realloc2.c:138: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_realloc_loop_l131}
-[eva] tests/builtins/realloc2.c:138: 
+[eva] realloc2.c:138: 
   allocating variable __realloc_test_realloc_loop_l138
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   strong free on bases: {__malloc_test_realloc_loop_l131}
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:142.
+  Called from realloc2.c:142.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:138: Call to builtin realloc
+[eva] realloc2.c:138: Call to builtin realloc
 [eva:malloc] bases_to_realloc: {__realloc_test_realloc_loop_l138}
-[eva:malloc:weak] tests/builtins/realloc2.c:138: 
+[eva:malloc:weak] realloc2.c:138: 
   marking variable `__realloc_test_realloc_loop_l138' as weak
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   resizing variable `__realloc_w_test_realloc_loop_l138' (0..79) to fit 0..119
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   weak free on bases: {__realloc_w_test_realloc_loop_l138}
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:142.
+  Called from realloc2.c:142.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:138: Call to builtin realloc
+[eva] realloc2.c:138: Call to builtin realloc
 [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   resizing variable `__realloc_w_test_realloc_loop_l138'
   (0..79/119) to fit 0..159
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   weak free on bases: {__realloc_w_test_realloc_loop_l138}
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:142.
+  Called from realloc2.c:142.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:138: Call to builtin realloc
+[eva] realloc2.c:138: Call to builtin realloc
 [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   resizing variable `__realloc_w_test_realloc_loop_l138'
   (0..79/159) to fit 0..199
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   weak free on bases: {__realloc_w_test_realloc_loop_l138}
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:142.
+  Called from realloc2.c:142.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:138: Call to builtin realloc
+[eva] realloc2.c:138: Call to builtin realloc
 [eva:malloc] bases_to_realloc: {__realloc_w_test_realloc_loop_l138}
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   resizing variable `__realloc_w_test_realloc_loop_l138'
   (0..79/199) to fit 0..239
-[eva:malloc] tests/builtins/realloc2.c:138: 
+[eva:malloc] realloc2.c:138: 
   weak free on bases: {__realloc_w_test_realloc_loop_l138}
 [eva] computing for function fill <- test_realloc_loop <- main.
-  Called from tests/builtins/realloc2.c:142.
+  Called from realloc2.c:142.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_realloc_loop
 [eva] Done for function test_realloc_loop
 [eva] computing for function test_realloc_multiple_bases <- main.
-  Called from tests/builtins/realloc2.c:211.
-[eva] tests/builtins/realloc2.c:151: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:151: 
+  Called from realloc2.c:211.
+[eva] realloc2.c:151: Call to builtin malloc
+[eva] realloc2.c:151: 
   allocating variable __malloc_test_realloc_multiple_bases_l151
-[eva] tests/builtins/realloc2.c:154: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:154: 
+[eva] realloc2.c:154: Call to builtin malloc
+[eva] realloc2.c:154: 
   allocating variable __malloc_test_realloc_multiple_bases_l154
-[eva] tests/builtins/realloc2.c:156: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:156: 
+[eva] realloc2.c:156: Call to builtin realloc
+[eva] realloc2.c:156: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases_l151}
-[eva] tests/builtins/realloc2.c:156: 
+[eva] realloc2.c:156: 
   allocating variable __realloc_test_realloc_multiple_bases_l156
-[eva:malloc] tests/builtins/realloc2.c:156: 
+[eva:malloc] realloc2.c:156: 
   strong free on bases: {__malloc_test_realloc_multiple_bases_l151}
-[eva] tests/builtins/realloc2.c:158: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:158: 
+[eva] realloc2.c:158: Call to builtin realloc
+[eva] realloc2.c:158: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] 
   bases_to_realloc: {__malloc_test_realloc_multiple_bases_l154,
                      __realloc_test_realloc_multiple_bases_l156}
-[eva] tests/builtins/realloc2.c:158: 
+[eva] realloc2.c:158: 
   allocating variable __realloc_test_realloc_multiple_bases_l158
-[eva:malloc] tests/builtins/realloc2.c:158: 
+[eva:malloc] realloc2.c:158: 
   weak free on bases: {__malloc_test_realloc_multiple_bases_l154,
                        __realloc_test_realloc_multiple_bases_l156}
 [eva] computing for function fill <- test_realloc_multiple_bases <- main.
-  Called from tests/builtins/realloc2.c:159.
+  Called from realloc2.c:159.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_realloc_multiple_bases
 [eva] Done for function test_realloc_multiple_bases
 [eva] computing for function test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:212.
-[eva] tests/builtins/realloc2.c:163: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:163: 
+  Called from realloc2.c:212.
+[eva] realloc2.c:163: Call to builtin malloc
+[eva] realloc2.c:163: 
   allocating variable __malloc_test_realloc_multiple_bases2_l163
 [eva] computing for function fill <- test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:165.
+  Called from realloc2.c:165.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:166: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:166: 
+[eva] realloc2.c:166: Call to builtin realloc
+[eva] realloc2.c:166: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases2_l163}
-[eva] tests/builtins/realloc2.c:166: 
+[eva] realloc2.c:166: 
   allocating variable __realloc_test_realloc_multiple_bases2_l166
-[eva:malloc] tests/builtins/realloc2.c:166: 
+[eva:malloc] realloc2.c:166: 
   strong free on bases: {__malloc_test_realloc_multiple_bases2_l163}
-[eva] tests/builtins/realloc2.c:166: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:166: 
+[eva] realloc2.c:166: Call to builtin malloc
+[eva] realloc2.c:166: 
   allocating variable __malloc_test_realloc_multiple_bases2_l166
 [eva] computing for function fill2 <- test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:168.
+  Called from realloc2.c:168.
 [eva] Recording results for fill2
 [eva] Done for function fill2
-[eva] tests/builtins/realloc2.c:169: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:169: 
+[eva] realloc2.c:169: Call to builtin realloc
+[eva] realloc2.c:169: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] 
   bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l166,
                      __malloc_test_realloc_multiple_bases2_l166}
-[eva] tests/builtins/realloc2.c:169: 
+[eva] realloc2.c:169: 
   allocating variable __realloc_test_realloc_multiple_bases2_l169
-[eva:malloc] tests/builtins/realloc2.c:169: 
+[eva:malloc] realloc2.c:169: 
   weak free on bases: {__realloc_test_realloc_multiple_bases2_l166,
                        __malloc_test_realloc_multiple_bases2_l166}
-[eva] tests/builtins/realloc2.c:171: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:171: 
+[eva] realloc2.c:171: Call to builtin realloc
+[eva] realloc2.c:171: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l169}
-[eva] tests/builtins/realloc2.c:171: 
+[eva] realloc2.c:171: 
   allocating variable __realloc_test_realloc_multiple_bases2_l171
-[eva:malloc] tests/builtins/realloc2.c:171: 
+[eva:malloc] realloc2.c:171: 
   strong free on bases: {__realloc_test_realloc_multiple_bases2_l169}
 [eva] computing for function fill <- test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:173.
+  Called from realloc2.c:173.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:174: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:174: 
+[eva] realloc2.c:174: Call to builtin malloc
+[eva] realloc2.c:174: 
   allocating variable __malloc_test_realloc_multiple_bases2_l174
 [eva] computing for function fill2 <- test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:176.
+  Called from realloc2.c:176.
 [eva] Recording results for fill2
 [eva] Done for function fill2
-[eva] tests/builtins/realloc2.c:177: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:177: 
+[eva] realloc2.c:177: Call to builtin realloc
+[eva] realloc2.c:177: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] 
   bases_to_realloc: {__realloc_test_realloc_multiple_bases2_l171,
                      __malloc_test_realloc_multiple_bases2_l174}
-[eva] tests/builtins/realloc2.c:177: 
+[eva] realloc2.c:177: 
   allocating variable __realloc_test_realloc_multiple_bases2_l177
-[eva:malloc] tests/builtins/realloc2.c:177: 
+[eva:malloc] realloc2.c:177: 
   weak free on bases: {__realloc_test_realloc_multiple_bases2_l171,
                        __malloc_test_realloc_multiple_bases2_l174}
 [eva] computing for function fill <- test_realloc_multiple_bases2 <- main.
-  Called from tests/builtins/realloc2.c:179.
+  Called from realloc2.c:179.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_realloc_multiple_bases2
 [eva] Done for function test_realloc_multiple_bases2
 [eva] computing for function test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:213.
-[eva] tests/builtins/realloc2.c:184: Call to builtin malloc
-[eva] tests/builtins/realloc2.c:184: 
+  Called from realloc2.c:213.
+[eva] realloc2.c:184: Call to builtin malloc
+[eva] realloc2.c:184: 
   allocating variable __malloc_test_realloc_multiple_bases_loop_l184
-[eva] tests/builtins/realloc2.c:187: Call to builtin realloc
-[eva] tests/builtins/realloc2.c:187: 
+[eva] realloc2.c:187: Call to builtin realloc
+[eva] realloc2.c:187: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184}
-[eva] tests/builtins/realloc2.c:187: 
+[eva] realloc2.c:187: 
   allocating variable __realloc_test_realloc_multiple_bases_loop_l187
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   strong free on bases: {__malloc_test_realloc_multiple_bases_loop_l184}
 [eva] computing for function fill <- test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:189.
+  Called from realloc2.c:189.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:185: starting to merge loop iterations
-[eva] tests/builtins/realloc2.c:187: Call to builtin realloc
+[eva] realloc2.c:185: starting to merge loop iterations
+[eva] realloc2.c:187: Call to builtin realloc
 [eva:malloc] 
   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
                      __realloc_test_realloc_multiple_bases_loop_l187}
-[eva:malloc:weak] tests/builtins/realloc2.c:187: 
+[eva:malloc:weak] realloc2.c:187: 
   marking variable `__realloc_test_realloc_multiple_bases_loop_l187' as weak
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
   (0..79) to fit 0..79/95
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
                        __realloc_w_test_realloc_multiple_bases_loop_l187}
 [eva] computing for function fill <- test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:189.
+  Called from realloc2.c:189.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:187: Call to builtin realloc
+[eva] realloc2.c:187: Call to builtin realloc
 [eva:malloc] 
   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
                      __realloc_w_test_realloc_multiple_bases_loop_l187}
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
   (0..79/95) to fit 0..79/111
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
                        __realloc_w_test_realloc_multiple_bases_loop_l187}
 [eva] computing for function fill <- test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:189.
+  Called from realloc2.c:189.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:187: Call to builtin realloc
+[eva] realloc2.c:187: Call to builtin realloc
 [eva:malloc] 
   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
                      __realloc_w_test_realloc_multiple_bases_loop_l187}
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   resizing variable `__realloc_w_test_realloc_multiple_bases_loop_l187'
   (0..79/111) to fit 0..79/223
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
                        __realloc_w_test_realloc_multiple_bases_loop_l187}
 [eva] computing for function fill <- test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:189.
+  Called from realloc2.c:189.
 [eva] Recording results for fill
 [eva] Done for function fill
-[eva] tests/builtins/realloc2.c:187: Call to builtin realloc
+[eva] realloc2.c:187: Call to builtin realloc
 [eva:malloc] 
   bases_to_realloc: {__malloc_test_realloc_multiple_bases_loop_l184,
                      __realloc_w_test_realloc_multiple_bases_loop_l187}
-[eva:malloc] tests/builtins/realloc2.c:187: 
+[eva:malloc] realloc2.c:187: 
   weak free on bases: {__malloc_test_realloc_multiple_bases_loop_l184,
                        __realloc_w_test_realloc_multiple_bases_loop_l187}
 [eva] computing for function fill <- test_realloc_multiple_bases_loop <- main.
-  Called from tests/builtins/realloc2.c:189.
+  Called from realloc2.c:189.
 [eva] Recording results for fill
 [eva] Done for function fill
 [eva] Recording results for test_realloc_multiple_bases_loop

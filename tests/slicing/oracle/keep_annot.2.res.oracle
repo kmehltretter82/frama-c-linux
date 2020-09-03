@@ -1,23 +1,23 @@
-[kernel] Parsing tests/slicing/keep_annot.i (no preprocessing)
+[kernel] Parsing keep_annot.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at L
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva:alarm] tests/slicing/keep_annot.i:40: Warning: 
+[eva:alarm] keep_annot.i:40: Warning: 
   signed overflow. assert -2147483648 ≤ nn - 2;
-[eva:alarm] tests/slicing/keep_annot.i:39: Warning: 
+[eva:alarm] keep_annot.i:39: Warning: 
   loop invariant got status unknown.
-[eva:alarm] tests/slicing/keep_annot.i:41: Warning: 
+[eva:alarm] keep_annot.i:41: Warning: 
   out of bounds read. assert \valid_read(dabs + (int)(ii + 1));
-[eva:alarm] tests/slicing/keep_annot.i:41: Warning: 
+[eva:alarm] keep_annot.i:41: Warning: 
   non-finite float value.
   assert
   \is_finite((float)\sub_double((double)u,
                                \mul_double((double)*(dabs + (int)(ii + 1)),
                                           (double)2.0)));
-[eva:alarm] tests/slicing/keep_annot.i:42: Warning: 
+[eva:alarm] keep_annot.i:42: Warning: 
   assertion got status unknown.
 [eva] Recording results for L
 [eva] done for function L
@@ -51,4 +51,4 @@ void L(float u, int nn, float *dabs, float *y)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_keep_annot.i (no preprocessing)
+[kernel] Parsing result/ocode_2_keep_annot.i (no preprocessing)

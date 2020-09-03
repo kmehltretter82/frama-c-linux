@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/malloc_multiple.c (with preprocessing)
+[kernel] Parsing malloc_multiple.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,120 +6,120 @@
   T[0..9] ∈ {0}
   F[0..9] ∈ {0}
 [eva] computing for function allocate_T <- main.
-  Called from tests/builtins/malloc_multiple.c:42.
-[eva] tests/builtins/malloc_multiple.c:11: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:11: 
+  Called from malloc_multiple.c:42.
+[eva] malloc_multiple.c:11: Call to builtin malloc
+[eva] malloc_multiple.c:11: 
   allocating variable __malloc_allocate_T_l11
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_0
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_1
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_2
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_3
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_4
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva:malloc:weak] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva:malloc:weak] malloc_multiple.c:14: 
   marking variable `__malloc_allocate_T_l14_4' as weak
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: Call to builtin malloc
 [eva] Recording results for allocate_T
 [eva] Done for function allocate_T
 [eva] computing for function allocate_T <- main.
-  Called from tests/builtins/malloc_multiple.c:43.
-[eva] tests/builtins/malloc_multiple.c:11: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:11: 
+  Called from malloc_multiple.c:43.
+[eva] malloc_multiple.c:11: Call to builtin malloc
+[eva] malloc_multiple.c:11: 
   allocating variable __malloc_allocate_T_l11_0
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_5
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_6
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_7
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_8
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_9
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: 
   allocating variable __malloc_allocate_T_l14_10
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva:malloc:weak] tests/builtins/malloc_multiple.c:14: 
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva:malloc:weak] malloc_multiple.c:14: 
   marking variable `__malloc_allocate_T_l14_10' as weak
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: Call to builtin malloc
+[eva] malloc_multiple.c:14: Call to builtin malloc
 [eva] Recording results for allocate_T
 [eva] Done for function allocate_T
 [eva] computing for function allocate_and_free_last <- main.
-  Called from tests/builtins/malloc_multiple.c:44.
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+  Called from malloc_multiple.c:44.
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_0
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_0 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_1
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_1 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_2
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_2 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_3
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_3 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_4
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_4 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva:malloc:weak] tests/builtins/malloc_multiple.c:29: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva:malloc:weak] malloc_multiple.c:29: 
   marking variable `__malloc_allocate_and_free_last_l29_4' as weak
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
-[eva] tests/builtins/malloc_multiple.c:29: Call to builtin malloc
-[eva] tests/builtins/malloc_multiple.c:31: 
+[eva] malloc_multiple.c:29: Call to builtin malloc
+[eva] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
-[eva] tests/builtins/malloc_multiple.c:34: Call to builtin free
-[eva] tests/builtins/malloc_multiple.c:34: 
+[eva] malloc_multiple.c:34: Call to builtin free
+[eva] malloc_multiple.c:34: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/malloc_multiple.c:34: 
+[eva:malloc] malloc_multiple.c:34: 
   weak free on bases: {__malloc_w_allocate_and_free_last_l29_4}
-[eva] tests/builtins/malloc_multiple.c:35: assertion got status valid.
-[eva:alarm] tests/builtins/malloc_multiple.c:36: Warning: 
+[eva] malloc_multiple.c:35: assertion got status valid.
+[eva:alarm] malloc_multiple.c:36: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/builtins/malloc_multiple.c:37: Warning: 
+[eva:alarm] malloc_multiple.c:37: Warning: 
   assertion got status unknown.
 [eva] Recording results for allocate_and_free_last
 [eva] Done for function allocate_and_free_last

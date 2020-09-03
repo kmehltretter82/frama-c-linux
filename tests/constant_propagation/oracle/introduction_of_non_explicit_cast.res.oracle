@@ -1,4 +1,4 @@
-[kernel] Parsing tests/constant_propagation/introduction_of_non_explicit_cast.c (with preprocessing)
+[kernel] Parsing introduction_of_non_explicit_cast.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -11,42 +11,42 @@
   s2 ∈ {0}
   ull ∈ {0}
 [eva] computing for function test_ull <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:68.
+  Called from introduction_of_non_explicit_cast.c:68.
 [eva] Recording results for test_ull
 [eva] Done for function test_ull
 [eva] computing for function test_struct <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:69.
+  Called from introduction_of_non_explicit_cast.c:69.
 [eva] Recording results for test_struct
 [eva] Done for function test_struct
 [eva] computing for function test_struct_ptr <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:70.
+  Called from introduction_of_non_explicit_cast.c:70.
 [eva] Recording results for test_struct_ptr
 [eva] Done for function test_struct_ptr
 [eva] computing for function test_tab <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:71.
+  Called from introduction_of_non_explicit_cast.c:71.
 [eva] Recording results for test_tab
 [eva] Done for function test_tab
 [eva] computing for function init <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:73.
+  Called from introduction_of_non_explicit_cast.c:73.
 [eva] computing for function add3 <- init <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:57.
+  Called from introduction_of_non_explicit_cast.c:57.
 [eva] Recording results for add3
 [eva] Done for function add3
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function add3 <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:74.
+  Called from introduction_of_non_explicit_cast.c:74.
 [eva] Recording results for add3
 [eva] Done for function add3
 [eva] computing for function test_ptr <- main.
-  Called from tests/constant_propagation/introduction_of_non_explicit_cast.c:76.
+  Called from introduction_of_non_explicit_cast.c:76.
 [eva] Recording results for test_ptr
 [eva] Done for function test_ptr
-[eva] tests/constant_propagation/introduction_of_non_explicit_cast.c:77: 
+[eva] introduction_of_non_explicit_cast.c:77: 
   assertion got status valid.
-[eva:alarm] tests/constant_propagation/introduction_of_non_explicit_cast.c:80: Warning: 
+[eva:alarm] introduction_of_non_explicit_cast.c:80: Warning: 
   assertion got status unknown.
-[eva] tests/constant_propagation/introduction_of_non_explicit_cast.c:81: 
+[eva] introduction_of_non_explicit_cast.c:81: 
   assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main

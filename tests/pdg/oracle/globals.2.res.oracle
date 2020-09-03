@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/globals.c (with preprocessing)
+[kernel] Parsing globals.c (with preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed

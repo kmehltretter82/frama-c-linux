@@ -1,25 +1,25 @@
-[kernel] Parsing tests/value/overflow_cast_float_int.i (no preprocessing)
+[kernel] Parsing overflow_cast_float_int.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] tests/value/overflow_cast_float_int.i:16: Warning: 
+[eva:alarm] overflow_cast_float_int.i:16: Warning: 
   overflow in conversion from floating-point to integer.
   assert vf1 < 2147483648;
-[eva:alarm] tests/value/overflow_cast_float_int.i:20: Warning: 
+[eva:alarm] overflow_cast_float_int.i:20: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < -2147483649.5;
-[eva:alarm] tests/value/overflow_cast_float_int.i:24: Warning: 
+[eva:alarm] overflow_cast_float_int.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < dd;
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/overflow_cast_float_int.i:16: 
+[eva] overflow_cast_float_int.i:16: 
   assertion 'Eva,float_to_int' got final status invalid.
-[eva] tests/value/overflow_cast_float_int.i:20: 
+[eva] overflow_cast_float_int.i:20: 
   assertion 'Eva,float_to_int' got final status invalid.
-[eva] tests/value/overflow_cast_float_int.i:24: 
+[eva] overflow_cast_float_int.i:24: 
   assertion 'Eva,float_to_int' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

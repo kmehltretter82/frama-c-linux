@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/inversion2.i (no preprocessing)
+[kernel] Parsing inversion2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,9 +13,9 @@
     [2][0..1] ∈ {2}
     [2][2..4] ∈ {0}
   G ∈ {99}
-[eva] tests/value/inversion2.i:11: starting to merge loop iterations
-[eva] tests/value/inversion2.i:10: starting to merge loop iterations
-[eva:alarm] tests/value/inversion2.i:12: Warning: 
+[eva] inversion2.i:11: starting to merge loop iterations
+[eva] inversion2.i:10: starting to merge loop iterations
+[eva:alarm] inversion2.i:12: Warning: 
   division by zero. assert TT[i][j] ≢ 0;
 [eva] Recording results for main
 [eva] done for function main
@@ -49,7 +49,7 @@
     [2][0..1] ∈ {2}
     [2][2..4] ∈ {0}
   G ∈ {99}
-[eva:alarm] tests/value/inversion2.i:12: Warning: 
+[eva:alarm] inversion2.i:12: Warning: 
   division by zero. assert TT[i][j] ≢ 0;
 [eva] Recording results for main
 [eva] done for function main

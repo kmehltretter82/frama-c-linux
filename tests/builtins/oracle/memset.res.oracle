@@ -1,5 +1,5 @@
-[kernel] Parsing tests/builtins/memset.c (with preprocessing)
-[kernel] tests/builtins/memset.c:46: Warning: 
+[kernel] Parsing memset.c (with preprocessing)
+[kernel] memset.c:46: Warning: 
   A.QUESTION: char * does not match int * (different integer types:
   'char' and 'int')
 [eva] Analyzing a complete application starting at main
@@ -20,73 +20,73 @@
   t12[0..99] ∈ {0}
   ts[0..4] ∈ {0}
   vol ∈ [--..--]
-[eva] tests/builtins/memset.c:33: Call to builtin memset
-[eva] tests/builtins/memset.c:33: 
+[eva] memset.c:33: Call to builtin memset
+[eva] memset.c:33: 
   function memset: precondition 'valid_s' got status valid.
 [eva] share/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva:alarm] tests/builtins/memset.c:34: Warning: 
+[eva:alarm] memset.c:34: Warning: 
   pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
-[eva] tests/builtins/memset.c:34: Call to builtin memset
-[eva:alarm] tests/builtins/memset.c:34: Warning: 
+[eva] memset.c:34: Call to builtin memset
+[eva:alarm] memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] tests/builtins/memset.c:34: 
+[eva:imprecision] memset.c:34: 
   Call to builtin precise_memset(({{ garbled mix of &{t2}
                                   (origin: Arithmetic
-                                  {tests/builtins/memset.c:34}) }},{18},
+                                  {memset.c:34}) }},{18},
                                   {400})) failed; destination is not exact
-[eva] tests/builtins/memset.c:35: Call to builtin memset
-[eva:alarm] tests/builtins/memset.c:35: Warning: 
+[eva] memset.c:35: Call to builtin memset
+[eva:alarm] memset.c:35: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] tests/builtins/memset.c:35: 
+[eva:imprecision] memset.c:35: 
   Call to builtin precise_memset(({{ (void *)&t3[10] }},{17},
                                   {{ (unsigned int)&t1 }})) failed; size is imprecise
-[eva] tests/builtins/memset.c:38: Call to builtin memset
-[eva:alarm] tests/builtins/memset.c:38: Warning: 
+[eva] memset.c:38: Call to builtin memset
+[eva:alarm] memset.c:38: Warning: 
   function memset: precondition 'valid_s' got status invalid.
-[eva:alarm] tests/builtins/memset.c:41: Warning: 
+[eva:alarm] memset.c:41: Warning: 
   pointer downcast. assert (unsigned int)((int *)t1) ≤ 2147483647;
-[eva] tests/builtins/memset.c:41: Call to builtin memset
-[eva] tests/builtins/memset.c:41: 
+[eva] memset.c:41: Call to builtin memset
+[eva] memset.c:41: 
   function memset: precondition 'valid_s' got status valid.
-[eva:imprecision] tests/builtins/memset.c:41: 
+[eva:imprecision] memset.c:41: 
   Call to builtin precise_memset(({{ (void *)&t5 }},{{ (int)&t1 }},{400})) failed; value to write is imprecise
-[eva] tests/builtins/memset.c:44: Call to builtin memset
-[eva] tests/builtins/memset.c:44: 
+[eva] memset.c:44: Call to builtin memset
+[eva] memset.c:44: 
   function memset: precondition 'valid_s' got status valid.
-[eva:imprecision] tests/builtins/memset.c:44: 
+[eva:imprecision] memset.c:44: 
   Call to builtin precise_memset(({{ (void *)&t6[10] ; (void *)&t7 }},{34},
                                   {16})) failed; destination is not exact
-[eva] tests/builtins/memset.c:47: Call to builtin memset
-[eva:alarm] tests/builtins/memset.c:47: Warning: 
+[eva] memset.c:47: Call to builtin memset
+[eva:alarm] memset.c:47: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] tests/builtins/memset.c:47: 
+[eva:imprecision] memset.c:47: 
   Call to builtin precise_memset(({{ NULL ; (void *)&t8 }},{34},{16})) failed; destination is not exact
-[eva] tests/builtins/memset.c:50: starting to merge loop iterations
-[eva] tests/builtins/memset.c:54: Call to builtin memset
-[eva:alarm] tests/builtins/memset.c:54: Warning: 
+[eva] memset.c:50: starting to merge loop iterations
+[eva] memset.c:54: Call to builtin memset
+[eva:alarm] memset.c:54: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] tests/builtins/memset.c:54: 
+[eva:imprecision] memset.c:54: 
   Call to builtin precise_memset(({{ &t9 + [80..--],0%4 }},{2302},{4})) failed; destination is not exact
-[eva] tests/builtins/memset.c:58: Call to builtin memset
-[eva] tests/builtins/memset.c:58: 
+[eva] memset.c:58: Call to builtin memset
+[eva] memset.c:58: 
   function memset: precondition 'valid_s' got status valid.
-[eva:imprecision] tests/builtins/memset.c:58: 
+[eva:imprecision] memset.c:58: 
   Call to builtin precise_memset(({{ (void *)&t10[4] }},{136},{12; 36})) failed; size is imprecise
-[eva] tests/builtins/memset.c:65: Call to builtin memset
-[eva] tests/builtins/memset.c:65: 
+[eva] memset.c:65: Call to builtin memset
+[eva] memset.c:65: 
   function memset: precondition 'valid_s' got status valid.
-[eva:imprecision] tests/builtins/memset.c:65: 
+[eva:imprecision] memset.c:65: 
   Call to builtin precise_memset(({{ (void *)&t11{[2], [3]} }},{153},{8; 16})) failed; size is imprecise
-[eva] tests/builtins/memset.c:68: Call to builtin memset
-[eva] tests/builtins/memset.c:68: 
+[eva] memset.c:68: Call to builtin memset
+[eva] memset.c:68: 
   function memset: precondition 'valid_s' got status valid.
-[eva:alarm] tests/builtins/memset.c:71: Warning: 
+[eva:alarm] memset.c:71: Warning: 
   assertion 'Assume' got status unknown.
-[eva] tests/builtins/memset.c:72: Call to builtin memset
-[eva] tests/builtins/memset.c:72: 
+[eva] memset.c:72: Call to builtin memset
+[eva] memset.c:72: 
   function memset: precondition 'valid_s' got status valid.
-[eva:imprecision] tests/builtins/memset.c:72: 
+[eva:imprecision] memset.c:72: 
   Call to builtin precise_memset(({{ &t12 + [0..384],0%32 }},{1},{4})) failed; destination is not exact
 [eva] Recording results for main
 [from] Computing for function main
@@ -101,7 +101,7 @@
   t4[0..99] ∈ {0}
   t5[0..99] ∈
     {{ garbled mix of &{t1}
-     (origin: Misaligned {tests/builtins/memset.c:41}) }}
+     (origin: Misaligned {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}
@@ -148,43 +148,43 @@
   s1 ∈ {8; 16}
   k ∈ [0..12]
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to memset at tests/builtins/memset.c:33 (by main):
+[from] call to memset at memset.c:33 (by main):
   t1[0..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:34 (by main):
+[from] call to memset at memset.c:34 (by main):
   t2[0..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:35 (by main):
+[from] call to memset at memset.c:35 (by main):
   t3[10..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:38 (by main):
+[from] call to memset at memset.c:38 (by main):
   t4[1..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:41 (by main):
+[from] call to memset at memset.c:41 (by main):
   t5[0..99] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:44 (by main):
+[from] call to memset at memset.c:44 (by main):
   t6[10..13] FROM c (and SELF)
   t7[0..3] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:47 (by main):
+[from] call to memset at memset.c:47 (by main):
   t8[0..3] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:54 (by main):
+[from] call to memset at memset.c:54 (by main):
   t9[20..99] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:58 (by main):
+[from] call to memset at memset.c:58 (by main):
   t10[4..6] FROM c
      [7..12] FROM c (and SELF)
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:65 (by main):
+[from] call to memset at memset.c:65 (by main):
   t11{[2]; [4..6]} FROM c (and SELF)
      [3] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:68 (by main):
+[from] call to memset at memset.c:68 (by main):
   ts[0..4] FROM c
   \result FROM s
-[from] call to memset at tests/builtins/memset.c:72 (by main):
+[from] call to memset at memset.c:72 (by main):
   t12[0..96] FROM c (and SELF)
   \result FROM s
 [from] entry point:

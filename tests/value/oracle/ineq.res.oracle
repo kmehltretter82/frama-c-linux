@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/ineq.c (with preprocessing)
+[kernel] Parsing ineq.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,8 +13,8 @@
   m ∈ {-1}
   n ∈ {-1}
 [eva] computing for function any_int <- main.
-  Called from tests/value/ineq.c:6.
-[kernel:annot:missing-spec] tests/value/ineq.c:6: Warning: 
+  Called from ineq.c:6.
+[kernel:annot:missing-spec] ineq.c:6: Warning: 
   Neither code nor specification for function any_int, generating default assigns from the prototype
 [eva] using specification for function any_int
 [eva] Done for function any_int

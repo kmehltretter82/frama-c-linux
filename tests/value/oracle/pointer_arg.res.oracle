@@ -1,34 +1,34 @@
-[kernel] Parsing tests/value/pointer_arg.i (no preprocessing)
+[kernel] Parsing pointer_arg.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva:alarm] tests/value/pointer_arg.i:4: Warning: 
+[eva:alarm] pointer_arg.i:4: Warning: 
   out of bounds write. assert \valid(arg + 0);
-[eva:alarm] tests/value/pointer_arg.i:5: Warning: 
+[eva:alarm] pointer_arg.i:5: Warning: 
   out of bounds write. assert \valid(arg + 1);
-[eva:alarm] tests/value/pointer_arg.i:6: Warning: 
+[eva:alarm] pointer_arg.i:6: Warning: 
   out of bounds write. assert \valid(arg + 2);
-[kernel] tests/value/pointer_arg.i:6: Warning: 
+[kernel] pointer_arg.i:6: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva:alarm] tests/value/pointer_arg.i:7: Warning: 
+[eva:alarm] pointer_arg.i:7: Warning: 
   out of bounds write. assert \valid(arg + 1000);
-[kernel] tests/value/pointer_arg.i:7: Warning: 
+[kernel] pointer_arg.i:7: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva:alarm] tests/value/pointer_arg.i:8: Warning: 
+[eva:alarm] pointer_arg.i:8: Warning: 
   out of bounds write. assert \valid(arg + argc);
-[eva:alarm] tests/value/pointer_arg.i:11: Warning: 
+[eva:alarm] pointer_arg.i:11: Warning: 
   out of bounds write. assert \valid(argv + 1);
-[eva:alarm] tests/value/pointer_arg.i:15: Warning: 
+[eva:alarm] pointer_arg.i:15: Warning: 
   out of bounds read. assert \valid_read(argv + 0);
-[eva:alarm] tests/value/pointer_arg.i:15: Warning: 
+[eva:alarm] pointer_arg.i:15: Warning: 
   out of bounds write. assert \valid(*(argv + 0) + 0);
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/pointer_arg.i:6: 
+[eva] pointer_arg.i:6: 
   assertion 'Eva,mem_access' got final status invalid.
-[eva] tests/value/pointer_arg.i:7: 
+[eva] pointer_arg.i:7: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

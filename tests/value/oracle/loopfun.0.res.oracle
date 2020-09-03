@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/loopfun.i (no preprocessing)
+[kernel] Parsing loopfun.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,37 +6,37 @@
   v ∈ [--..--]
   a ∈ {7}
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
+  Called from loopfun.i:14.
 [eva] Recording results for test
 [eva] Done for function test
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
+  Called from loopfun.i:14.
 [eva] Recording results for test
 [eva] Done for function test
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:16.
+  Called from loopfun.i:16.
 [eva] Recording results for test
 [eva] Done for function test
-[eva] tests/value/loopfun.i:16: Frama_C_show_each_t: {5}
+[eva] loopfun.i:16: Frama_C_show_each_t: {5}
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
+  Called from loopfun.i:14.
 [eva] Recording results for test
 [eva] Done for function test
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:16.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] tests/value/loopfun.i:16: Frama_C_show_each_t: {2}
-[eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
+  Called from loopfun.i:14.
 [eva] Recording results for test
 [eva] Done for function test
 [eva] computing for function test <- main.
-  Called from tests/value/loopfun.i:14.
+  Called from loopfun.i:16.
+[eva] Recording results for test
+[eva] Done for function test
+[eva] loopfun.i:16: Frama_C_show_each_t: {2}
+[eva] computing for function test <- main.
+  Called from loopfun.i:14.
+[eva] Recording results for test
+[eva] Done for function test
+[eva] computing for function test <- main.
+  Called from loopfun.i:14.
 [eva] Recording results for test
 [eva] Done for function test
 [eva] Recording results for main

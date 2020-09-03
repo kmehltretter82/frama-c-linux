@@ -1,106 +1,106 @@
-[kernel] Parsing tests/builtins/malloc-deps.c (with preprocessing)
+[kernel] Parsing malloc-deps.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] tests/builtins/malloc-deps.c:12: Call to builtin malloc
-[eva] tests/builtins/malloc-deps.c:12: 
+[eva] malloc-deps.c:12: Call to builtin malloc
+[eva] malloc-deps.c:12: 
   allocating weak variable __malloc_w_main_l12
-[eva] tests/builtins/malloc-deps.c:17: Call to builtin malloc
-[eva] tests/builtins/malloc-deps.c:17: allocating variable __malloc_main_l17
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva] tests/builtins/malloc-deps.c:25: allocating variable __malloc_main_l25
+[eva] malloc-deps.c:17: Call to builtin malloc
+[eva] malloc-deps.c:17: allocating variable __malloc_main_l17
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva] malloc-deps.c:25: allocating variable __malloc_main_l25
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
-[eva:alarm] tests/builtins/malloc-deps.c:7: Warning: 
+  Called from malloc-deps.c:26.
+[eva:alarm] malloc-deps.c:7: Warning: 
   out of bounds write. assert \valid(p + k);
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc:weak] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc:weak] malloc-deps.c:25: 
   marking variable `__malloc_main_l25' as weak
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31) to fit 0..63
-[eva:alarm] tests/builtins/malloc-deps.c:26: Warning: 
+[eva:alarm] malloc-deps.c:26: Warning: 
   signed overflow. assert l + v ≤ 2147483647;
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/63) to fit 0..95
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/95) to fit 0..127
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/127) to fit 0..159
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/159) to fit 0..191
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:23: starting to merge loop iterations
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:23: starting to merge loop iterations
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/191) to fit 0..191/223
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/223) to fit 0..191/255
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/255) to fit 0..191/319
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva] tests/builtins/malloc-deps.c:25: Call to builtin malloc
-[eva:malloc] tests/builtins/malloc-deps.c:25: 
+[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/319) to fit 0..191/319
 [eva] computing for function g <- main.
-  Called from tests/builtins/malloc-deps.c:26.
+  Called from malloc-deps.c:26.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
@@ -142,16 +142,16 @@
   __malloc_w_main_l25[0..9] FROM __fc_heap_status; v (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to malloc at tests/builtins/malloc-deps.c:12 (by main):
+[from] call to malloc at malloc-deps.c:12 (by main):
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
-[from] call to malloc at tests/builtins/malloc-deps.c:17 (by main):
+[from] call to malloc at malloc-deps.c:17 (by main):
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
-[from] call to malloc at tests/builtins/malloc-deps.c:25 (by main):
+[from] call to malloc at malloc-deps.c:25 (by main):
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
   \result FROM __fc_heap_status; size
-[from] call to g at tests/builtins/malloc-deps.c:26 (by main):
+[from] call to g at malloc-deps.c:26 (by main):
   __malloc_w_main_l25[0..9] FROM p; k (and SELF)
 [from] entry point:
   __fc_heap_status FROM __fc_heap_status (and SELF)

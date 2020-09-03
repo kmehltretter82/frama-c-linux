@@ -569,11 +569,6 @@ struct
     add name (get name macros ^ expand macros def) macros
 end
 
-type compile_cmxs =
-  { dir: SubDir.t;
-    cmxs: string;
-  }
-
 (** configuration of a directory/test. *)
 type config =
   {
@@ -581,8 +576,9 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
-    dc_cmxs    : compile_cmxs list; (** cmxs to compile *)
+    dc_cmxs    : string list; (** cmxs to compile *)
     dc_deps    : string list; (** deps *)
+    dc_plugins : string list; (** only plugins to load *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -610,6 +606,7 @@ let default_config () =
     dc_execnow = [];
     dc_cmxs = [];
     dc_deps = [];
+    dc_plugins = [];
     dc_filter = None ;
     dc_default_toplevel = !toplevel_path;
     dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
@@ -694,11 +691,15 @@ let config_exec ~once dir s current =
     dc_execnow =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
-let config_cmxs dir s current =
-  { current with dc_cmxs = {dir;cmxs=s} :: current.dc_cmxs }
+let config_cmxs _dir s current =
+  let l = (String.split_on_char ' ' s) in
+  { current with dc_cmxs = l @ current.dc_cmxs }
 
 let config_deps _dir s current =
   { current with dc_deps = (String.split_on_char ' ' s) @ current.dc_deps }
+
+let config_plugin _dir s current =
+  { current with dc_plugins = (String.split_on_char ' ' s) @ current.dc_plugins }
 
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -718,12 +719,12 @@ let config_macro _dir s current =
     current
   end
 
-let config_module dir s current =
-  let make_cmd = "@PTEST_MAKE_MODULE@ " ^ s in
-  let make_cmd = Macros.expand current.dc_macros make_cmd in
-  let current = config_exec ~once:true dir make_cmd current in
+let config_module _dir s current =
   let k = "PTEST_LOAD_MODULES" and v = " -load-module " ^ s in
-  { current with dc_macros = Macros.append_expand k v current.dc_macros }
+  { current with
+    dc_cmxs = (Filename.chop_suffix s ".cmxs") :: current.dc_cmxs;
+    dc_macros = Macros.append_expand k v current.dc_macros;
+  }
 
 let config_options =
   [ "CMD",
@@ -778,6 +779,7 @@ let config_options =
     "DEPS", config_deps;
     "MACRO", config_macro;
     "MODULE", config_module;
+    "PLUGIN", config_plugin;
     "LOG",
     (fun _ s current ->
        { current with dc_default_log = s :: current.dc_default_log });
@@ -883,6 +885,7 @@ type toplevel_command =
     execnow:bool;
     timeout: string;
     deps: string list;
+    plugins: string list;
   }
 
 type command =
@@ -1054,6 +1057,8 @@ let find_in_path s =
   with Exit ->
     Some !found
 
+let print_list cout l = List.iter (Printf.fprintf cout " %S") l
+
 let command_string ~result_cout ~oracle_cout command =
   let log_prefix = log_prefix command in
   let errlog = log_prefix ^ ".err.log" in
@@ -1122,15 +1127,19 @@ let command_string ~result_cout ~oracle_cout command =
    * in *)
   Printf.fprintf result_cout
     "(rule\n  \
-     (targets %S %S %t)\n  \
-     (deps   %t %S (package frama-c) (universe))\n  \
+     (targets %S %S %a)\n  \
+     (deps   %a %S (package frama-c)%t (universe))\n  \
      (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1) (system %S)))))\n\
      )\n"
     errlog
     res
-    (fun cout -> List.iter (Printf.fprintf cout "%S") command.log_files)
-    (fun cout -> List.iter (fun d -> Printf.fprintf cout "%S" (Filename.concat ".." d)) command.deps)
+    print_list command.log_files
+    print_list (List.map (Filename.concat "..") command.deps)
     (get_ptest_file command)
+    (fun cout ->
+       List.iter
+         (fun d -> Printf.fprintf cout " (package %S)" ("frama-c-"^d))
+         command.plugins)
     errlog
     res
     command_string;
@@ -1648,6 +1657,7 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
      filter = config.dc_filter; macros;
      execnow=false; timeout;
      deps = config.dc_deps;
+     plugins = config.dc_plugins;
     }
   in
   let mk_cmd (s, timeout) =
@@ -1664,6 +1674,7 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
       execnow = true;
       timeout;
       deps = config.dc_deps;
+      plugins = config.dc_plugins;
     }
   in
   let process_macros_cmd s = basic_command_string (mk_cmd s) in
@@ -1681,7 +1692,17 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
         ex_timeout = execnow.ex_timeout;
       }
     in
-    incr e; res
+    Printf.fprintf result_cout "\
+      (rule
+       (targets %a %a)
+(action (system %S))
+)
+"
+      print_list res.ex_log
+      print_list res.ex_bin
+      res.ex_cmd
+    ;
+    incr e
   in
   let treat_option option =
     let toplevel = make_toplevel_cmd option in
@@ -1689,31 +1710,20 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
     incr i
   in
   List.iter (fun cmxs ->
-      let file = Macros.expand macros cmxs.cmxs in
+      let file = Macros.expand macros cmxs in
       Printf.fprintf result_cout "\
-      (executable (name %s) (modules %s) (modes plugin) (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel) (flags -open Frama_c_kernel))\n \
-"
+      (executable \
+      (name %s) \
+      (modules %s) \
+      (modes plugin) \
+      (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a) \
+      (flags -open Frama_c_kernel))\n \
+      "
         file file
+        print_list (List.map (Printf.sprintf "frama-c-%s.core") config.dc_plugins)
     ) config.dc_cmxs;
-  begin
-    (match config.dc_execnow with
-     | hd :: tl ->
-       let subworkqueue = Queue.create () in
-       List.iter treat_option config.dc_toplevels;
-       let target =
-         List.fold_left
-           (fun current_target execnow ->
-              let subworkqueue = Queue.create () in
-              Queue.add current_target subworkqueue;
-              Target(make_execnow_cmd execnow,subworkqueue))
-           (Target(make_execnow_cmd hd,subworkqueue)) tl
-       in
-       Queue.push target shared.commands
-     | [] ->
-       List.iter
-         treat_option
-         config.dc_toplevels)
-  end
+  List.iter treat_option config.dc_toplevels;
+  List.iter make_execnow_cmd config.dc_execnow
 
 let () =
   (* enqueue the test files *)

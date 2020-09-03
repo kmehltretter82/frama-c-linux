@@ -1,11 +1,11 @@
-[kernel] Parsing tests/slicing/initialized.i (no preprocessing)
+[kernel] Parsing initialized.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/slicing/initialized.i:12: assertion got status valid.
+[eva] initialized.i:12: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [slicing] initializing slicing ...
@@ -32,4 +32,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_initialized.i (no preprocessing)
+[kernel] Parsing result/ocode_0_initialized.i (no preprocessing)

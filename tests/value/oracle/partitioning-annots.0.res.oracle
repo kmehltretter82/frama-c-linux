@@ -1,19 +1,19 @@
-[kernel] Parsing tests/value/partitioning-annots.c (with preprocessing)
+[kernel] Parsing partitioning-annots.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_unroll
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
-[eva:loop-unroll] tests/value/partitioning-annots.c:26: 
+[eva:loop-unroll] partitioning-annots.c:26: 
   loop not completely unrolled
-[eva] tests/value/partitioning-annots.c:26: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:34: 
+[eva] partitioning-annots.c:26: starting to merge loop iterations
+[eva:loop-unroll] partitioning-annots.c:34: 
   loop not completely unrolled
-[eva] tests/value/partitioning-annots.c:34: starting to merge loop iterations
-[eva] tests/value/partitioning-annots.c:36: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:50: 
+[eva] partitioning-annots.c:34: starting to merge loop iterations
+[eva] partitioning-annots.c:36: starting to merge loop iterations
+[eva:loop-unroll] partitioning-annots.c:50: 
   loop not completely unrolled
-[eva] tests/value/partitioning-annots.c:50: starting to merge loop iterations
+[eva] partitioning-annots.c:50: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] done for function test_unroll
 [eva] ====== VALUES COMPUTED ======

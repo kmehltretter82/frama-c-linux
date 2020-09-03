@@ -1,4 +1,4 @@
-[kernel] Parsing tests/scope/zones.c (with preprocessing)
+[kernel] Parsing zones.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,50 +13,50 @@
   Yf ∈ {0}
   Yg ∈ {0}
 [eva] computing for function simple <- main.
-  Called from tests/scope/zones.c:73.
-[eva:alarm] tests/scope/zones.c:15: Warning: 
+  Called from zones.c:73.
+[eva:alarm] zones.c:15: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/zones.c:16: Warning: 
+[eva:alarm] zones.c:16: Warning: 
   signed overflow. assert y + z ≤ 2147483647;
 [eva] Recording results for simple
 [eva] Done for function simple
 [eva] computing for function array1 <- main.
-  Called from tests/scope/zones.c:74.
-[eva:alarm] tests/scope/zones.c:21: Warning: 
+  Called from zones.c:74.
+[eva:alarm] zones.c:21: Warning: 
   accessing out of bounds index. assert 0 ≤ x;
-[eva:alarm] tests/scope/zones.c:21: Warning: 
+[eva:alarm] zones.c:21: Warning: 
   accessing out of bounds index. assert x < 10;
-[eva:alarm] tests/scope/zones.c:22: Warning: 
+[eva:alarm] zones.c:22: Warning: 
   signed overflow. assert T[0] + y ≤ 2147483647;
 [eva] Recording results for array1
 [eva] Done for function array1
 [eva] computing for function struct1 <- main.
-  Called from tests/scope/zones.c:75.
+  Called from zones.c:75.
 [eva] Recording results for struct1
 [eva] Done for function struct1
 [eva] computing for function ctrl1 <- main.
-  Called from tests/scope/zones.c:76.
+  Called from zones.c:76.
 [eva] Recording results for ctrl1
 [eva] Done for function ctrl1
 [eva] computing for function caller <- main.
-  Called from tests/scope/zones.c:78.
+  Called from zones.c:78.
 [eva] computing for function f <- caller <- main.
-  Called from tests/scope/zones.c:66.
+  Called from zones.c:66.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- caller <- main.
-  Called from tests/scope/zones.c:67.
+  Called from zones.c:67.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function g <- caller <- main.
-  Called from tests/scope/zones.c:68.
-[eva:alarm] tests/scope/zones.c:60: Warning: 
+  Called from zones.c:68.
+[eva:alarm] zones.c:60: Warning: 
   signed overflow. assert a + b ≤ 2147483647;
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function f <- caller <- main.
-  Called from tests/scope/zones.c:68.
-[eva:alarm] tests/scope/zones.c:54: Warning: 
+  Called from zones.c:68.
+[eva:alarm] zones.c:54: Warning: 
   signed overflow. assert x + y ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f

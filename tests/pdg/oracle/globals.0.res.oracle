@@ -1,4 +1,4 @@
-[kernel] Parsing tests/pdg/globals.c (with preprocessing)
+[kernel] Parsing globals.c (with preprocessing)
 [eva] Analyzing a complete application starting at g
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,7 +7,7 @@
   S ∈ [--..--]
   P ∈ {{ &X }}
 [eva] computing for function f <- g.
-  Called from tests/pdg/globals.c:15.
+  Called from globals.c:15.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for g

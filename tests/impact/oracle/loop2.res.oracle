@@ -1,4 +1,4 @@
-[kernel] Parsing tests/impact/loop2.i (no preprocessing)
+[kernel] Parsing loop2.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,33 +8,33 @@
   u[0..9] ∈ [--..--]
   w[0..9] ∈ [--..--]
 [eva] computing for function init <- main.
-  Called from tests/impact/loop2.i:24.
-[eva] tests/impact/loop2.i:11: starting to merge loop iterations
+  Called from loop2.i:24.
+[eva] loop2.i:11: starting to merge loop iterations
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
 [eva] Done for function init
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
-[eva] tests/impact/loop2.i:25: starting to merge loop iterations
+[eva] loop2.i:25: starting to merge loop iterations
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
-[eva] Recording results for f
-[from] Computing for function f
-[from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
+[eva] Recording results for f
+[from] Computing for function f
+[from] Done for function f
+[eva] Done for function f
+[eva] computing for function f <- main.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -44,9 +44,9 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to init at tests/impact/loop2.i:24 (by main):
+[from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v (and SELF)
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[0..9] FROM u[0..9]; i (and SELF)
   w[0..9] FROM i (and SELF)
 [from] entry point:
@@ -62,13 +62,13 @@
 [pdg] computing for function f
 [pdg] done for function f
 [impact] impacted statements of stmt(s) 17 are:
-    tests/impact/loop2.i:17 (sid 11): int v_0 = t[i];
-    tests/impact/loop2.i:18 (sid 12): w[i] = i;
-    tests/impact/loop2.i:19 (sid 13): t[i] = u[i];
-    tests/impact/loop2.i:26 (sid 26): if(t[i]) <..>
-    tests/impact/loop2.i:27 (sid 27): f(i);
+    loop2.i:17 (sid 11): int v_0 = t[i];
+    loop2.i:18 (sid 12): w[i] = i;
+    loop2.i:19 (sid 13): t[i] = u[i];
+    loop2.i:26 (sid 26): if(t[i]) <..>
+    loop2.i:27 (sid 27): f(i);
 [impact] analysis done
-[kernel] Parsing tests/impact/loop2.i (no preprocessing)
+[kernel] Parsing loop2.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -78,67 +78,67 @@
   u[0..9] ∈ [--..--]
   w[0..9] ∈ [--..--]
 [eva] computing for function init <- main.
-  Called from tests/impact/loop2.i:24.
+  Called from loop2.i:24.
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
 [eva] Done for function init
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/impact/loop2.i:27.
+  Called from loop2.i:27.
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -148,36 +148,36 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to init at tests/impact/loop2.i:24 (by main):
+[from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[9] FROM u[9]; i
   w[9] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[8] FROM u[8]; i
   w[8] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[7] FROM u[7]; i
   w[7] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[6] FROM u[6]; i
   w[6] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[5] FROM u[5]; i
   w[5] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[4] FROM u[4]; i
   w[4] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[3] FROM u[3]; i
   w[3] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[2] FROM u[2]; i
   w[2] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[1] FROM u[1]; i
   w[1] FROM i
-[from] call to f at tests/impact/loop2.i:27 (by main):
+[from] call to f at loop2.i:27 (by main):
   t[0] FROM u[0]; i
   w[0] FROM i
 [from] entry point:
@@ -211,15 +211,15 @@
 [pdg] computing for function f
 [pdg] done for function f
 [impact] impacted statements of stmt(s) 83 are:
-    tests/impact/loop2.i:19 (sid 79): t[i] = u[i];
-    tests/impact/loop2.i:27 (sid 201): f(i);
-    tests/impact/loop2.i:27 (sid 208): f(i);
-    tests/impact/loop2.i:27 (sid 215): f(i);
-    tests/impact/loop2.i:27 (sid 222): f(i);
-    tests/impact/loop2.i:27 (sid 229): f(i);
-    tests/impact/loop2.i:27 (sid 236): f(i);
-    tests/impact/loop2.i:27 (sid 243): f(i);
-    tests/impact/loop2.i:27 (sid 250): f(i);
-    tests/impact/loop2.i:27 (sid 257): f(i);
-    tests/impact/loop2.i:27 (sid 264): f(i);
+    loop2.i:19 (sid 79): t[i] = u[i];
+    loop2.i:27 (sid 201): f(i);
+    loop2.i:27 (sid 208): f(i);
+    loop2.i:27 (sid 215): f(i);
+    loop2.i:27 (sid 222): f(i);
+    loop2.i:27 (sid 229): f(i);
+    loop2.i:27 (sid 236): f(i);
+    loop2.i:27 (sid 243): f(i);
+    loop2.i:27 (sid 250): f(i);
+    loop2.i:27 (sid 257): f(i);
+    loop2.i:27 (sid 264): f(i);
 [impact] analysis done

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/empty_struct.c (with preprocessing)
+[kernel] Parsing empty_struct.c (with preprocessing)
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,11 +6,11 @@
   NULL[rbits 0 to 15] ∈ [--..--]
   s2 ∈ {0}
   pgs ∈ {{ &gs }}
-[eva:alarm] tests/value/empty_struct.c:70: Warning: 
+[eva:alarm] empty_struct.c:70: Warning: 
   out of bounds read. assert \valid_read(ptr_ret);
 [eva] Recording results for main2
 [eva] done for function main2
-[eva] tests/value/empty_struct.c:70: 
+[eva] empty_struct.c:70: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:

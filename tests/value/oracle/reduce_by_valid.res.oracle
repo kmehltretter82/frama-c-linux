@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/reduce_by_valid.i (no preprocessing)
+[kernel] Parsing reduce_by_valid.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,168 +13,168 @@
   S_f1_0_S_vs[0..1] ∈ [--..--]
   S_f1_1_S_vs[0..1] ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/reduce_by_valid.i:260.
-[eva:alarm] tests/value/reduce_by_valid.i:14: Warning: 
+  Called from reduce_by_valid.i:260.
+[eva:alarm] reduce_by_valid.i:14: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:17: Warning: 
+[eva:alarm] reduce_by_valid.i:17: Warning: 
   assertion got status unknown.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/reduce_by_valid.i:261.
-[eva:alarm] tests/value/reduce_by_valid.i:29: Warning: 
+  Called from reduce_by_valid.i:261.
+[eva:alarm] reduce_by_valid.i:29: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:31: Warning: 
+[eva:alarm] reduce_by_valid.i:31: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:33: Warning: 
+[eva:alarm] reduce_by_valid.i:33: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:35: Warning: 
+[eva:alarm] reduce_by_valid.i:35: Warning: 
   assertion got status unknown.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/reduce_by_valid.i:262.
-[eva] tests/value/reduce_by_valid.i:48: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:49: Warning: 
+  Called from reduce_by_valid.i:262.
+[eva] reduce_by_valid.i:48: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:49: Warning: 
   assertion got status unknown.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/reduce_by_valid.i:263.
-[eva:alarm] tests/value/reduce_by_valid.i:54: Warning: 
+  Called from reduce_by_valid.i:263.
+[eva:alarm] reduce_by_valid.i:54: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:55: Warning: 
+[eva:alarm] reduce_by_valid.i:55: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:57: Warning: 
+[eva:alarm] reduce_by_valid.i:57: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:59: Warning: 
+[eva:alarm] reduce_by_valid.i:59: Warning: 
   assertion got status unknown.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/reduce_by_valid.i:264.
-[eva:locals-escaping] tests/value/reduce_by_valid.i:72: Warning: 
+  Called from reduce_by_valid.i:264.
+[eva:locals-escaping] reduce_by_valid.i:72: Warning: 
   locals {x} escaping the scope of a block of main5 through p
-[eva] tests/value/reduce_by_valid.i:74: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:75: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:76: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:80: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:82: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:85: Warning: 
+[eva] reduce_by_valid.i:74: assertion got status valid.
+[eva] reduce_by_valid.i:75: assertion got status valid.
+[eva] reduce_by_valid.i:76: assertion got status valid.
+[eva] reduce_by_valid.i:80: assertion got status valid.
+[eva] reduce_by_valid.i:82: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:85: Warning: 
   assertion got status unknown.
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from tests/value/reduce_by_valid.i:265.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+  Called from reduce_by_valid.i:265.
+[eva:alarm] reduce_by_valid.i:265: Warning: 
   function main6: precondition 'r1' got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] reduce_by_valid.i:265: Warning: 
   function main6: precondition 'r2' got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] reduce_by_valid.i:265: Warning: 
   function main6: precondition 'r3' got status unknown.
-[eva] tests/value/reduce_by_valid.i:265: 
+[eva] reduce_by_valid.i:265: 
   function main6: precondition 'r4' got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:265: Warning: 
+[eva:alarm] reduce_by_valid.i:265: Warning: 
   function main6: precondition 'r5' got status unknown.
-[eva] tests/value/reduce_by_valid.i:265: 
+[eva] reduce_by_valid.i:265: 
   function main6: precondition 'r6' got status valid.
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from tests/value/reduce_by_valid.i:266.
-[eva] tests/value/reduce_by_valid.i:111: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:112: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:113: assertion got status valid.
-[eva] tests/value/reduce_by_valid.i:117: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:120: Warning: 
+  Called from reduce_by_valid.i:266.
+[eva] reduce_by_valid.i:111: assertion got status valid.
+[eva] reduce_by_valid.i:112: assertion got status valid.
+[eva] reduce_by_valid.i:113: assertion got status valid.
+[eva] reduce_by_valid.i:117: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:120: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:121: assertion got status valid.
+[eva] reduce_by_valid.i:121: assertion got status valid.
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from tests/value/reduce_by_valid.i:267.
-[eva:alarm] tests/value/reduce_by_valid.i:137: Warning: 
+  Called from reduce_by_valid.i:267.
+[eva:alarm] reduce_by_valid.i:137: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:138: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:141: Warning: 
+[eva] reduce_by_valid.i:138: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:141: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:142: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:146: Warning: 
+[eva] reduce_by_valid.i:142: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:146: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:147: Warning: 
+[eva:alarm] reduce_by_valid.i:147: Warning: 
   assertion got status unknown.
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from tests/value/reduce_by_valid.i:268.
-[eva:alarm] tests/value/reduce_by_valid.i:162: Warning: 
+  Called from reduce_by_valid.i:268.
+[eva:alarm] reduce_by_valid.i:162: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:165: assertion got status valid.
+[eva] reduce_by_valid.i:165: assertion got status valid.
 [eva] Recording results for main9
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
-  Called from tests/value/reduce_by_valid.i:269.
-[eva:alarm] tests/value/reduce_by_valid.i:176: Warning: 
+  Called from reduce_by_valid.i:269.
+[eva:alarm] reduce_by_valid.i:176: Warning: 
   out of bounds write. assert \valid((int *)p);
-[eva] tests/value/reduce_by_valid.i:177: 
+[eva] reduce_by_valid.i:177: 
   Frama_C_show_each_main10_1: {{ &t_0 + [0..36] }}
-[eva] tests/value/reduce_by_valid.i:178: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:181: Warning: 
+[eva] reduce_by_valid.i:178: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:181: Warning: 
   out of bounds write. assert \valid((int *)p + 2);
-[eva] tests/value/reduce_by_valid.i:182: 
+[eva] reduce_by_valid.i:182: 
   Frama_C_show_each_main10_2: {{ &t_0 + [-8..28] }}
-[eva] tests/value/reduce_by_valid.i:183: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:186: Warning: 
+[eva] reduce_by_valid.i:183: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:186: Warning: 
   out of bounds write. assert \valid((int *)(p + 2));
-[eva] tests/value/reduce_by_valid.i:187: 
+[eva] reduce_by_valid.i:187: 
   Frama_C_show_each_main10_3: {{ &t_0 + [-2..34] }}
-[eva] tests/value/reduce_by_valid.i:188: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:197: Warning: 
+[eva] reduce_by_valid.i:188: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:197: Warning: 
   out of bounds write. assert \valid(&((struct s_1 *)p)->b);
-[eva] tests/value/reduce_by_valid.i:198: 
+[eva] reduce_by_valid.i:198: 
   Frama_C_show_each_main10_4: {{ &t_0 + [-4..32] }}
-[eva] tests/value/reduce_by_valid.i:200: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:203: Warning: 
+[eva] reduce_by_valid.i:200: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:203: Warning: 
   out of bounds write. assert \valid(&((struct s_1 *)p + 2)->b);
-[eva] tests/value/reduce_by_valid.i:204: 
+[eva] reduce_by_valid.i:204: 
   Frama_C_show_each_main10_4: {{ &t_0 + [-20..16] }}
-[eva] tests/value/reduce_by_valid.i:206: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:210: Warning: 
+[eva] reduce_by_valid.i:206: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:210: Warning: 
   out of bounds write. assert \valid((char *)q);
-[eva] tests/value/reduce_by_valid.i:211: Frama_C_show_each: {{ &u_0 + [0..79] }}
-[eva] tests/value/reduce_by_valid.i:213: assertion got status valid.
-[eva:alarm] tests/value/reduce_by_valid.i:216: Warning: 
+[eva] reduce_by_valid.i:211: Frama_C_show_each: {{ &u_0 + [0..79] }}
+[eva] reduce_by_valid.i:213: assertion got status valid.
+[eva:alarm] reduce_by_valid.i:216: Warning: 
   out of bounds write. assert \valid((char *)q + 2);
-[eva] tests/value/reduce_by_valid.i:217: 
+[eva] reduce_by_valid.i:217: 
   Frama_C_show_each: {{ &u_0 + [-2..77] }}
-[eva] tests/value/reduce_by_valid.i:219: assertion got status valid.
+[eva] reduce_by_valid.i:219: assertion got status valid.
 [eva] Recording results for main10
 [eva] Done for function main10
 [eva] computing for function main11 <- main.
-  Called from tests/value/reduce_by_valid.i:270.
-[eva:alarm] tests/value/reduce_by_valid.i:228: Warning: 
+  Called from reduce_by_valid.i:270.
+[eva:alarm] reduce_by_valid.i:228: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:230: 
+[eva] reduce_by_valid.i:230: 
   Frama_C_show_each: {{ &TC + [10..410] }}
-[eva:alarm] tests/value/reduce_by_valid.i:231: Warning: 
+[eva:alarm] reduce_by_valid.i:231: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:237: Warning: 
+[eva:alarm] reduce_by_valid.i:237: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:239: 
+[eva] reduce_by_valid.i:239: 
   Frama_C_show_each: {{ &TU + [40..1640],0%4 }}
-[eva:alarm] tests/value/reduce_by_valid.i:240: Warning: 
+[eva:alarm] reduce_by_valid.i:240: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:245: Warning: 
+[eva:alarm] reduce_by_valid.i:245: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:247: 
+[eva] reduce_by_valid.i:247: 
   Frama_C_show_each: {{ &TU + [40..840] }}
-[eva:alarm] tests/value/reduce_by_valid.i:248: Warning: 
+[eva:alarm] reduce_by_valid.i:248: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/reduce_by_valid.i:253: Warning: 
+[eva:alarm] reduce_by_valid.i:253: Warning: 
   assertion got status unknown.
-[eva] tests/value/reduce_by_valid.i:255: 
+[eva] reduce_by_valid.i:255: 
   Frama_C_show_each: {{ &TC + [10..410],2%4 }}
-[eva:alarm] tests/value/reduce_by_valid.i:256: Warning: 
+[eva:alarm] reduce_by_valid.i:256: Warning: 
   assertion got status unknown.
 [eva] Recording results for main11
 [eva] Done for function main11

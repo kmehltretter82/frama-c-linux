@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts808.i (no preprocessing)
+[kernel] Parsing bts808.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -6,11 +6,11 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f0 <- main.
-  Called from tests/slicing/bts808.i:21.
+  Called from bts808.i:21.
 [eva] Recording results for f0
 [eva] Done for function f0
 [eva] computing for function f1 <- main.
-  Called from tests/slicing/bts808.i:21.
+  Called from bts808.i:21.
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] Recording results for main
@@ -72,4 +72,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts808.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts808.i (no preprocessing)

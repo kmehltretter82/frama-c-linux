@@ -1,4 +1,4 @@
-[kernel] Parsing tests/float/alarms.i (no preprocessing)
+[kernel] Parsing alarms.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -11,12 +11,12 @@
   ull ∈ {0}
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/float/alarms.i:70.
-[eva:alarm] tests/float/alarms.i:16: Warning: 
+  Called from alarms.i:70.
+[eva:alarm] alarms.i:16: Warning: 
   non-finite float value. assert \is_finite(u1.f);
-[eva:alarm] tests/float/alarms.i:18: Warning: 
+[eva:alarm] alarms.i:18: Warning: 
   non-finite double value. assert \is_finite(u2.d);
-[eva] tests/float/alarms.i:19: 
+[eva] alarms.i:19: 
   Frama_C_dump_each:
   # Cvalue domain:
   u1{.l[bits 0 to 31]; .f; .d[bits 0 to 31]} ∈
@@ -33,83 +33,83 @@
   l ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:21.
-[kernel:annot:missing-spec] tests/float/alarms.i:21: Warning: 
+  Called from alarms.i:21.
+[kernel:annot:missing-spec] alarms.i:21: Warning: 
   Neither code nor specification for function fd, generating default assigns from the prototype
 [eva] using specification for function fd
 [eva] Done for function fd
-[eva:alarm] tests/float/alarms.i:21: Warning: 
+[eva:alarm] alarms.i:21: Warning: 
   non-finite double value. assert \is_finite(tmp);
                            (tmp from fd())
-[eva:alarm] tests/float/alarms.i:21: Warning: 
+[eva:alarm] alarms.i:21: Warning: 
   non-finite float value. assert \is_finite((float)tmp);
                           (tmp from fd())
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:22.
+  Called from alarms.i:22.
 [eva] Done for function fd
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   non-finite double value. assert \is_finite(vd);
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vd;
-[eva:alarm] tests/float/alarms.i:23: Warning: 
+[eva:alarm] alarms.i:23: Warning: 
   overflow in conversion from floating-point to integer.
   assert vd < 9223372036854775808;
-[eva:alarm] tests/float/alarms.i:24: Warning: 
+[eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert -9223372036854775809 < vf;
-[eva:alarm] tests/float/alarms.i:24: Warning: 
+[eva:alarm] alarms.i:24: Warning: 
   overflow in conversion from floating-point to integer.
   assert vf < 9223372036854775808;
 [eva] computing for function fd <- main1 <- main.
-  Called from tests/float/alarms.i:25.
+  Called from alarms.i:25.
 [eva] Done for function fd
-[eva:alarm] tests/float/alarms.i:26: Warning: 
+[eva:alarm] alarms.i:26: Warning: 
   non-finite double value. assert \is_finite(vd);
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/float/alarms.i:71.
-[eva:alarm] tests/float/alarms.i:38: Warning: 
+  Called from alarms.i:71.
+[eva:alarm] alarms.i:38: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
-[eva:alarm] tests/float/alarms.i:39: Warning: 
+[eva:alarm] alarms.i:39: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)0., (double)0.));
-[eva] tests/float/alarms.i:41: assertion got status valid.
-[eva] tests/float/alarms.i:42: assertion got status valid.
-[eva] tests/float/alarms.i:43: assertion got status valid.
-[eva] tests/float/alarms.i:44: assertion got status valid.
-[eva:alarm] tests/float/alarms.i:46: Warning: 
+[eva] alarms.i:41: assertion got status valid.
+[eva] alarms.i:42: assertion got status valid.
+[eva] alarms.i:43: assertion got status valid.
+[eva] alarms.i:44: assertion got status valid.
+[eva:alarm] alarms.i:46: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
-[eva:alarm] tests/float/alarms.i:50: Warning: 
+[eva:alarm] alarms.i:50: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)0., (double)0.));
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/float/alarms.i:72.
+  Called from alarms.i:72.
 [eva] computing for function fd <- main3 <- main.
-  Called from tests/float/alarms.i:64.
+  Called from alarms.i:64.
 [eva] Done for function fd
-[eva:alarm] tests/float/alarms.i:65: Warning: 
+[eva:alarm] alarms.i:65: Warning: 
   non-finite double value. assert \is_finite(d_0);
 [eva] computing for function fabs <- main3 <- main.
-  Called from tests/float/alarms.i:65.
+  Called from alarms.i:65.
 [eva] Recording results for fabs
 [eva] Done for function fabs
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/float/alarms.i:38: 
+[eva] alarms.i:38: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/float/alarms.i:39: 
+[eva] alarms.i:39: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/float/alarms.i:46: 
+[eva] alarms.i:46: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
-[eva] tests/float/alarms.i:50: 
+[eva] alarms.i:50: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fabs:

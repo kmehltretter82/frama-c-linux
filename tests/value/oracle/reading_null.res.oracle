@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/reading_null.i (no preprocessing)
+[kernel] Parsing reading_null.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -18,14 +18,14 @@
   X9 ∈ [--..--]
   S_0_T[0..1] ∈ [--..--]
   S_1_T[0..1] ∈ [--..--]
-[eva] tests/value/reading_null.i:25: 
+[eva] reading_null.i:25: 
   Frama_C_show_each_F: [-2147483648..2147483647], {0}
-[eva] tests/value/reading_null.i:24: starting to merge loop iterations
-[eva] tests/value/reading_null.i:25: 
+[eva] reading_null.i:24: starting to merge loop iterations
+[eva] reading_null.i:25: 
   Frama_C_show_each_F: [-2147483648..2147483647], {0; 1}
-[eva] tests/value/reading_null.i:25: 
+[eva] reading_null.i:25: 
   Frama_C_show_each_F: [-2147483648..2147483647], {0; 1; 2}
-[eva] tests/value/reading_null.i:25: 
+[eva] reading_null.i:25: 
   Frama_C_show_each_F: [-2147483648..2147483647], [0..9]
 [eva] Recording results for main
 [eva] done for function main

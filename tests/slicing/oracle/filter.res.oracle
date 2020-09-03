@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/filter.i (no preprocessing)
+[kernel] Parsing filter.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -6,20 +6,20 @@
 [eva:initial-state] Values of globals at initialization
   T[0..9] ∈ {0}
 [eva] computing for function bts806 <- main.
-  Called from tests/slicing/filter.i:42.
+  Called from filter.i:42.
 [eva] Recording results for bts806
 [eva] Done for function bts806
 [eva] computing for function unspec <- main.
-  Called from tests/slicing/filter.i:43.
+  Called from filter.i:43.
 [eva] computing for function f <- unspec <- main.
-  Called from tests/slicing/filter.i:36.
-[kernel:annot:missing-spec] tests/slicing/filter.i:36: Warning: 
+  Called from filter.i:36.
+[kernel:annot:missing-spec] filter.i:36: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [eva] using specification for function f
 [eva] Done for function f
 [eva] Recording results for unspec
 [eva] Done for function unspec
-[eva:alarm] tests/slicing/filter.i:43: Warning: 
+[eva:alarm] filter.i:43: Warning: 
   signed overflow. assert r + tmp_0 ≤ 2147483647;
                    (tmp_0 from unspec())
 [eva] Recording results for main
@@ -88,4 +88,4 @@ int main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_filter.i (no preprocessing)
+[kernel] Parsing result/ocode_0_filter.i (no preprocessing)

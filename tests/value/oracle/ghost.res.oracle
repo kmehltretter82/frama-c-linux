@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/ghost.i (no preprocessing)
+[kernel] Parsing ghost.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,8 +6,8 @@
   G ∈ {0}
   GHOST ∈ {0}
   H ∈ {0}
-[eva] tests/value/ghost.i:16: starting to merge loop iterations
-[eva:alarm] tests/value/ghost.i:17: Warning: 
+[eva] ghost.i:16: starting to merge loop iterations
+[eva:alarm] ghost.i:17: Warning: 
   signed overflow. assert G + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main

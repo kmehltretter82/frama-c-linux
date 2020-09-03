@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/ghost_cv_parsing_errors.c (with preprocessing)
-[kernel] tests/syntax/ghost_cv_parsing_errors.c:11: 
+[kernel] Parsing ghost_cv_parsing_errors.c (with preprocessing)
+[kernel] ghost_cv_parsing_errors.c:11: 
   Use of \ghost out of ghost code:
   Location: between lines 11 and 13, before or at token: \ghost
   9     #ifdef IN_TYPE

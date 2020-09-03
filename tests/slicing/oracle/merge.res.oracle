@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/merge.i (no preprocessing)
+[kernel] Parsing merge.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,24 +7,24 @@
   G2 ∈ {0}
   G3 ∈ {0}
 [eva] computing for function g <- main.
-  Called from tests/slicing/merge.i:26.
+  Called from merge.i:26.
 [eva] computing for function init <- g <- main.
-  Called from tests/slicing/merge.i:21.
+  Called from merge.i:21.
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function add <- g <- main.
-  Called from tests/slicing/merge.i:22.
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+  Called from merge.i:22.
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert -2147483648 ≤ G1 + a1;
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert G1 + a1 ≤ 2147483647;
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert -2147483648 ≤ G2 + a2;
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert G2 + a2 ≤ 2147483647;
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert -2147483648 ≤ G3 + a3;
-[eva:alarm] tests/slicing/merge.i:17: Warning: 
+[eva:alarm] merge.i:17: Warning: 
   signed overflow. assert G3 + a3 ≤ 2147483647;
 [eva] Recording results for add
 [eva] Done for function add

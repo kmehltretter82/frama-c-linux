@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/reevaluate_alarms.i (no preprocessing)
+[kernel] Parsing reevaluate_alarms.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,38 +7,38 @@
   T[0..4] ∈ {0}
   n ∈ {1}
 [eva] computing for function loop <- main.
-  Called from tests/value/reevaluate_alarms.i:34.
-[eva] tests/value/reevaluate_alarms.i:13: starting to merge loop iterations
-[eva:alarm] tests/value/reevaluate_alarms.i:14: Warning: 
+  Called from reevaluate_alarms.i:34.
+[eva] reevaluate_alarms.i:13: starting to merge loop iterations
+[eva:alarm] reevaluate_alarms.i:14: Warning: 
   signed overflow. assert S + i ≤ 2147483647;
-[eva:alarm] tests/value/reevaluate_alarms.i:14: Warning: 
+[eva:alarm] reevaluate_alarms.i:14: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p++)
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] computing for function compute_n <- main.
-  Called from tests/value/reevaluate_alarms.i:36.
-[eva] tests/value/reevaluate_alarms.i:19: starting to merge loop iterations
-[eva:alarm] tests/value/reevaluate_alarms.i:20: Warning: 
+  Called from reevaluate_alarms.i:36.
+[eva] reevaluate_alarms.i:19: starting to merge loop iterations
+[eva:alarm] reevaluate_alarms.i:20: Warning: 
   signed overflow. assert n * i ≤ 2147483647;
 [eva] Recording results for compute_n
 [eva] Done for function compute_n
 [eva] computing for function init_p <- main.
-  Called from tests/value/reevaluate_alarms.i:40.
+  Called from reevaluate_alarms.i:40.
 [eva] Recording results for init_p
 [eva] Done for function init_p
 [eva] computing for function initialized_p <- main.
-  Called from tests/value/reevaluate_alarms.i:41.
-[eva:alarm] tests/value/reevaluate_alarms.i:30: Warning: 
+  Called from reevaluate_alarms.i:41.
+[eva:alarm] reevaluate_alarms.i:30: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] computing for function init_p <- main.
-  Called from tests/value/reevaluate_alarms.i:43.
+  Called from reevaluate_alarms.i:43.
 [eva] Recording results for init_p
 [eva] Done for function init_p
 [eva] computing for function initialized_p <- main.
-  Called from tests/value/reevaluate_alarms.i:44.
+  Called from reevaluate_alarms.i:44.
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] Recording results for main
@@ -119,23 +119,23 @@
 --- Properties of Function 'loop'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,signed_overflow' (file tests/value/reevaluate_alarms.i, line 14)
+[    -    ] Assertion 'Eva,signed_overflow' (file reevaluate_alarms.i, line 14)
             tried with Eva.
-[    -    ] Assertion 'Eva,mem_access' (file tests/value/reevaluate_alarms.i, line 14)
+[    -    ] Assertion 'Eva,mem_access' (file reevaluate_alarms.i, line 14)
             tried with Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'compute_n'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,signed_overflow' (file tests/value/reevaluate_alarms.i, line 20)
+[    -    ] Assertion 'Eva,signed_overflow' (file reevaluate_alarms.i, line 20)
             tried with Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'initialized_p'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,initialization' (file tests/value/reevaluate_alarms.i, line 30)
+[    -    ] Assertion 'Eva,initialization' (file reevaluate_alarms.i, line 30)
             tried with Eva.
 
 --------------------------------------------------------------------------------
@@ -152,38 +152,38 @@
   T[0..4] ∈ {0}
   n ∈ {1}
 [eva] computing for function loop <- main.
-  Called from tests/value/reevaluate_alarms.i:34.
+  Called from reevaluate_alarms.i:34.
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] computing for function compute_n <- main.
-  Called from tests/value/reevaluate_alarms.i:36.
+  Called from reevaluate_alarms.i:36.
 [eva] Recording results for compute_n
 [eva] Done for function compute_n
 [eva] computing for function init_p <- main.
-  Called from tests/value/reevaluate_alarms.i:40.
+  Called from reevaluate_alarms.i:40.
 [eva] Recording results for init_p
 [eva] Done for function init_p
 [eva] computing for function initialized_p <- main.
-  Called from tests/value/reevaluate_alarms.i:41.
+  Called from reevaluate_alarms.i:41.
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] computing for function init_p <- main.
-  Called from tests/value/reevaluate_alarms.i:43.
+  Called from reevaluate_alarms.i:43.
 [eva] Recording results for init_p
 [eva] Done for function init_p
 [eva] computing for function initialized_p <- main.
-  Called from tests/value/reevaluate_alarms.i:44.
+  Called from reevaluate_alarms.i:44.
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/reevaluate_alarms.i:14: 
+[eva] reevaluate_alarms.i:14: 
   assertion 'Eva,signed_overflow' got final status valid.
-[eva] tests/value/reevaluate_alarms.i:14: 
+[eva] reevaluate_alarms.i:14: 
   assertion 'Eva,mem_access' got final status valid.
-[eva] tests/value/reevaluate_alarms.i:20: 
+[eva] reevaluate_alarms.i:20: 
   assertion 'Eva,signed_overflow' got final status valid.
-[eva] tests/value/reevaluate_alarms.i:30: 
+[eva] reevaluate_alarms.i:30: 
   assertion 'Eva,initialization' got final status valid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function compute_n:
@@ -269,23 +269,23 @@
 --- Properties of Function 'loop'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'Eva,signed_overflow' (file tests/value/reevaluate_alarms.i, line 14)
+[  Valid  ] Assertion 'Eva,signed_overflow' (file reevaluate_alarms.i, line 14)
             by Eva (v2).
-[  Valid  ] Assertion 'Eva,mem_access' (file tests/value/reevaluate_alarms.i, line 14)
+[  Valid  ] Assertion 'Eva,mem_access' (file reevaluate_alarms.i, line 14)
             by Eva (v2).
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'compute_n'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'Eva,signed_overflow' (file tests/value/reevaluate_alarms.i, line 20)
+[  Valid  ] Assertion 'Eva,signed_overflow' (file reevaluate_alarms.i, line 20)
             by Eva (v2).
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'initialized_p'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'Eva,initialization' (file tests/value/reevaluate_alarms.i, line 30)
+[  Valid  ] Assertion 'Eva,initialization' (file reevaluate_alarms.i, line 30)
             by Eva (v2).
 
 --------------------------------------------------------------------------------

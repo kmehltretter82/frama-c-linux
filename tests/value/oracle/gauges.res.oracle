@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/gauges.c (with preprocessing)
+[kernel] Parsing gauges.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -8,361 +8,361 @@
   u[0..99] ∈ {0}
   T[0..99] ∈ [--..--]
 [eva] computing for function main0 <- main.
-  Called from tests/value/gauges.c:350.
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:18: starting to merge loop iterations
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva:alarm] tests/value/gauges.c:23: Warning: 
+  Called from gauges.c:350.
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:18: starting to merge loop iterations
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva:alarm] gauges.c:23: Warning: 
   signed overflow. assert -2147483648 ≤ j - 4;
-[eva] tests/value/gauges.c:16: starting to merge loop iterations
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:19: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva:alarm] tests/value/gauges.c:26: Warning: 
+[eva] gauges.c:16: starting to merge loop iterations
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
+[eva:alarm] gauges.c:26: Warning: 
   signed overflow. assert l + 1 ≤ 2147483647;
 [eva] Recording results for main0
 [eva] Done for function main0
 [eva] computing for function main0_bis <- main.
-  Called from tests/value/gauges.c:351.
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:40: starting to merge loop iterations
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva:alarm] tests/value/gauges.c:45: Warning: 
+  Called from gauges.c:351.
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:40: starting to merge loop iterations
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva:alarm] gauges.c:45: Warning: 
   signed overflow. assert -2147483648 ≤ j - 4;
-[eva] tests/value/gauges.c:38: starting to merge loop iterations
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] tests/value/gauges.c:41: Frama_C_show_each_0: {{ "in" }}
-[eva] tests/value/gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva:alarm] tests/value/gauges.c:48: Warning: 
+[eva] gauges.c:38: starting to merge loop iterations
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
+[eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
+[eva:alarm] gauges.c:48: Warning: 
   signed overflow. assert l + 1 ≤ 2147483647;
 [eva] Recording results for main0_bis
 [eva] Done for function main0_bis
 [eva] computing for function main1 <- main.
-  Called from tests/value/gauges.c:352.
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] tests/value/gauges.c:57: starting to merge loop iterations
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] tests/value/gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva:alarm] tests/value/gauges.c:58: Warning: 
+  Called from gauges.c:352.
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva] gauges.c:57: starting to merge loop iterations
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
+[eva:alarm] gauges.c:58: Warning: 
   accessing out of bounds index. assert j < 38;
-[eva] tests/value/gauges.c:62: Frama_C_show_each: {{ "out" }}
+[eva] gauges.c:62: Frama_C_show_each: {{ "out" }}
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/gauges.c:353.
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:70: starting to merge loop iterations
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva:alarm] tests/value/gauges.c:71: Warning: 
+  Called from gauges.c:353.
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:70: starting to merge loop iterations
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
+[eva:alarm] gauges.c:71: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p++)
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
-[eva] tests/value/gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
+[eva] gauges.c:72: Frama_C_show_each:
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/gauges.c:354.
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:79: starting to merge loop iterations
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva:alarm] tests/value/gauges.c:81: Warning: 
+  Called from gauges.c:354.
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:79: starting to merge loop iterations
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva:alarm] gauges.c:81: Warning: 
   signed overflow. assert k + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:83: Frama_C_show_each: {{ "outer" }}
-[eva:alarm] tests/value/gauges.c:84: Warning: 
+[eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
+[eva:alarm] gauges.c:84: Warning: 
   signed overflow. assert k + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:78: starting to merge loop iterations
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:83: Frama_C_show_each: {{ "outer" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:83: Frama_C_show_each: {{ "outer" }}
-[eva] tests/value/gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] tests/value/gauges.c:83: Frama_C_show_each: {{ "outer" }}
-[eva] tests/value/gauges.c:86: Frama_C_show_each: [0..2147483647]
+[eva] gauges.c:78: starting to merge loop iterations
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
+[eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
+[eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
+[eva] gauges.c:86: Frama_C_show_each: [0..2147483647]
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/gauges.c:355.
+  Called from gauges.c:355.
 [eva] computing for function main4_search <- main4 <- main.
-  Called from tests/value/gauges.c:107.
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva] tests/value/gauges.c:96: starting to merge loop iterations
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva] tests/value/gauges.c:97: Frama_C_show_each:
-[eva:alarm] tests/value/gauges.c:99: Warning: 
+  Called from gauges.c:107.
+[eva] gauges.c:97: Frama_C_show_each:
+[eva] gauges.c:96: starting to merge loop iterations
+[eva] gauges.c:97: Frama_C_show_each:
+[eva] gauges.c:97: Frama_C_show_each:
+[eva] gauges.c:97: Frama_C_show_each:
+[eva] gauges.c:97: Frama_C_show_each:
+[eva] gauges.c:97: Frama_C_show_each:
+[eva:alarm] gauges.c:99: Warning: 
   signed overflow. assert c + 1 ≤ 2147483647;
 [eva] Recording results for main4_search
 [eva] Done for function main4_search
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/gauges.c:356.
-[eva] tests/value/gauges.c:116: Frama_C_show_each: {{ &x }}
-[eva] tests/value/gauges.c:113: starting to merge loop iterations
-[eva] tests/value/gauges.c:116: Frama_C_show_each: {{ &x + {0; 4} }}
-[eva] tests/value/gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8} }}
-[eva] tests/value/gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8; 12} ; &y }}
-[eva] tests/value/gauges.c:116: 
+  Called from gauges.c:356.
+[eva] gauges.c:116: Frama_C_show_each: {{ &x }}
+[eva] gauges.c:113: starting to merge loop iterations
+[eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4} }}
+[eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8} }}
+[eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8; 12} ; &y }}
+[eva] gauges.c:116: 
   Frama_C_show_each: {{ &x + {0; 4; 8; 12; 16} ; &y + {0; 4} }}
-[eva] tests/value/gauges.c:116: 
+[eva] gauges.c:116: 
   Frama_C_show_each: {{ &x + {0; 4; 8; 12; 16; 20} ; &y + {0; 4; 8} }}
-[eva] tests/value/gauges.c:116: 
+[eva] gauges.c:116: 
   Frama_C_show_each: {{ &x + {0; 4; 8; 12; 16; 20; 24} ; &y + {0; 4; 8; 12} }}
-[eva] tests/value/gauges.c:116: 
+[eva] gauges.c:116: 
   Frama_C_show_each: {{ &x + [0..36],0%4 ; &y + [0..36],0%4 }}
-[eva] tests/value/gauges.c:116: 
+[eva] gauges.c:116: 
   Frama_C_show_each: {{ &x + [0..40],0%4 ; &y + [0..40],0%4 }}
-[eva:alarm] tests/value/gauges.c:117: Warning: 
+[eva:alarm] gauges.c:117: Warning: 
   out of bounds write. assert \valid(p);
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main5_bis <- main.
-  Called from tests/value/gauges.c:357.
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &x }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &x + {4} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &x + {8} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + {4} }}
-[eva] tests/value/gauges.c:126: starting to merge loop iterations
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + {4; 8} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12; 16} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12; 16; 20} }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + [4..36],0%4 }}
-[eva] tests/value/gauges.c:129: Frama_C_show_each: {{ &y + [4..40],0%4 }}
-[eva:alarm] tests/value/gauges.c:130: Warning: 
+  Called from gauges.c:357.
+[eva] gauges.c:129: Frama_C_show_each: {{ &x }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &x + {4} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &x + {8} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + {4} }}
+[eva] gauges.c:126: starting to merge loop iterations
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12; 16} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12; 16; 20} }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + [4..36],0%4 }}
+[eva] gauges.c:129: Frama_C_show_each: {{ &y + [4..40],0%4 }}
+[eva:alarm] gauges.c:130: Warning: 
   out of bounds write. assert \valid(p);
 [eva] Recording results for main5_bis
 [eva] Done for function main5_bis
 [eva] computing for function main6 <- main.
-  Called from tests/value/gauges.c:358.
-[eva] tests/value/gauges.c:138: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:140: Warning: 
+  Called from gauges.c:358.
+[eva] gauges.c:138: starting to merge loop iterations
+[eva:alarm] gauges.c:140: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from tests/value/gauges.c:359.
+  Called from gauges.c:359.
 [eva] computing for function main7_aux <- main7 <- main.
-  Called from tests/value/gauges.c:164.
-[eva] tests/value/gauges.c:145: Frama_C_show_each:
-[eva] tests/value/gauges.c:147: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:149: Warning: 
+  Called from gauges.c:164.
+[eva] gauges.c:145: Frama_C_show_each:
+[eva] gauges.c:147: starting to merge loop iterations
+[eva:alarm] gauges.c:149: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p--)
 [eva] Recording results for main7_aux
 [eva] Done for function main7_aux
 [eva] computing for function main7_aux2 <- main7 <- main.
-  Called from tests/value/gauges.c:165.
-[eva] tests/value/gauges.c:154: Frama_C_show_each:
-[eva] tests/value/gauges.c:156: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:158: Warning: 
+  Called from gauges.c:165.
+[eva] gauges.c:154: Frama_C_show_each:
+[eva] gauges.c:156: starting to merge loop iterations
+[eva:alarm] gauges.c:158: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p--)
-[eva:alarm] tests/value/gauges.c:156: Warning: 
+[eva:alarm] gauges.c:156: Warning: 
   signed overflow. assert -2147483648 ≤ toCopy - 1;
 [eva] Recording results for main7_aux2
 [eva] Done for function main7_aux2
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from tests/value/gauges.c:360.
+  Called from gauges.c:360.
 [eva] computing for function main8_aux <- main8 <- main.
-  Called from tests/value/gauges.c:178.
-[eva] tests/value/gauges.c:172: Frama_C_show_each: {0}
-[eva] tests/value/gauges.c:172: Frama_C_show_each: {4294967295}
-[eva] tests/value/gauges.c:172: Frama_C_show_each: {4294967294}
-[eva] tests/value/gauges.c:171: starting to merge loop iterations
-[eva] tests/value/gauges.c:172: Frama_C_show_each: {4294967293; 4294967294}
-[eva] tests/value/gauges.c:172: 
+  Called from gauges.c:178.
+[eva] gauges.c:172: Frama_C_show_each: {0}
+[eva] gauges.c:172: Frama_C_show_each: {4294967295}
+[eva] gauges.c:172: Frama_C_show_each: {4294967294}
+[eva] gauges.c:171: starting to merge loop iterations
+[eva] gauges.c:172: Frama_C_show_each: {4294967293; 4294967294}
+[eva] gauges.c:172: 
   Frama_C_show_each: {4294967292; 4294967293; 4294967294}
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [2147483646..4294967294]
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
-[eva:alarm] tests/value/gauges.c:173: Warning: 
+[eva] gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [2147483646..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [1..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [1..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [1..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [1..4294967294]
+[eva:alarm] gauges.c:173: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p++)
-[eva] tests/value/gauges.c:172: Frama_C_show_each: [1..4294967294]
+[eva] gauges.c:172: Frama_C_show_each: [1..4294967294]
 [eva] Recording results for main8_aux
 [eva] Done for function main8_aux
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from tests/value/gauges.c:361.
-[eva] tests/value/gauges.c:186: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:188: Warning: 
+  Called from gauges.c:361.
+[eva] gauges.c:186: starting to merge loop iterations
+[eva:alarm] gauges.c:188: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] tests/value/gauges.c:188: Warning: 
+[eva:alarm] gauges.c:188: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
-[eva:alarm] tests/value/gauges.c:188: Warning: 
+[eva:alarm] gauges.c:188: Warning: 
   signed overflow. assert -2147483648 ≤ (int)p + (int)q;
-[eva:alarm] tests/value/gauges.c:188: Warning: 
+[eva:alarm] gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
-[eva] tests/value/gauges.c:188: 
+[eva] gauges.c:188: 
   Assigning imprecise value to z.
-  The imprecision originates from Arithmetic {tests/value/gauges.c:188}
-[eva] tests/value/gauges.c:189: 
+  The imprecision originates from Arithmetic {gauges.c:188}
+[eva] gauges.c:189: 
   Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {tests/value/gauges.c:188}
-[eva:alarm] tests/value/gauges.c:190: Warning: 
+  The imprecision originates from Arithmetic {gauges.c:188}
+[eva:alarm] gauges.c:190: Warning: 
   out of bounds write. assert \valid(r);
-[eva:alarm] tests/value/gauges.c:192: Warning: 
+[eva:alarm] gauges.c:192: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/value/gauges.c:193: Warning: 
+[eva:alarm] gauges.c:193: Warning: 
   out of bounds write. assert \valid(q);
 [eva] Recording results for main9
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
-  Called from tests/value/gauges.c:362.
+  Called from gauges.c:362.
 [eva] computing for function main10_aux <- main10 <- main.
-  Called from tests/value/gauges.c:211.
-[eva] tests/value/gauges.c:201: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:202: Warning: 
+  Called from gauges.c:211.
+[eva] gauges.c:201: starting to merge loop iterations
+[eva:alarm] gauges.c:202: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from A++)
-[eva:alarm] tests/value/gauges.c:202: Warning: 
+[eva:alarm] gauges.c:202: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from B++)
-[eva:alarm] tests/value/gauges.c:201: Warning: 
+[eva:alarm] gauges.c:201: Warning: 
   signed overflow. assert -2147483648 ≤ numNonZero - 1;
-[eva:alarm] tests/value/gauges.c:202: Warning: 
+[eva:alarm] gauges.c:202: Warning: 
   non-finite float value.
   assert \is_finite(\mul_float(*p, \mul_float(*tmp, *tmp_0)));
   (tmp from A++, tmp_0 from B++)
 [eva] Recording results for main10_aux
 [eva] Done for function main10_aux
-[eva:alarm] tests/value/gauges.c:211: Warning: 
+[eva:alarm] gauges.c:211: Warning: 
   overflow in conversion from floating-point to integer.
   assert tmp < 2147483648;
   (tmp from main10_aux(& p, (float const *)(A), (float const *)(B), 10))
 [eva] Recording results for main10
 [eva] Done for function main10
 [eva] computing for function main11 <- main.
-  Called from tests/value/gauges.c:363.
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:217: starting to merge loop iterations
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva:alarm] tests/value/gauges.c:219: Warning: 
+  Called from gauges.c:363.
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:217: starting to merge loop iterations
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:218: Frama_C_show_each:
+[eva:alarm] gauges.c:219: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva] tests/value/gauges.c:218: Frama_C_show_each:
-[eva:alarm] tests/value/gauges.c:220: Warning: 
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:218: Frama_C_show_each:
+[eva] gauges.c:218: Frama_C_show_each:
+[eva:alarm] gauges.c:220: Warning: 
   signed overflow. assert -2147483648 ≤ n - 1;
 [eva] Recording results for main11
 [eva] Done for function main11
 [eva] computing for function main12 <- main.
-  Called from tests/value/gauges.c:364.
-[eva] tests/value/gauges.c:225: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:225: Warning: 
+  Called from gauges.c:364.
+[eva] gauges.c:225: starting to merge loop iterations
+[eva:alarm] gauges.c:225: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for main12
 [eva] Done for function main12
 [eva] computing for function main13 <- main.
-  Called from tests/value/gauges.c:365.
+  Called from gauges.c:365.
 [eva] computing for function main13_1 <- main13 <- main.
-  Called from tests/value/gauges.c:280.
-[eva] tests/value/gauges.c:238: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:240: Warning: 
+  Called from gauges.c:280.
+[eva] gauges.c:238: starting to merge loop iterations
+[eva:alarm] gauges.c:240: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:242: 
+[eva] gauges.c:242: 
   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..2147483647]
 [eva] Recording results for main13_1
 [eva] Done for function main13_1
 [eva] computing for function main13_2 <- main13 <- main.
-  Called from tests/value/gauges.c:281.
-[eva] tests/value/gauges.c:249: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:251: Warning: 
+  Called from gauges.c:281.
+[eva] gauges.c:249: starting to merge loop iterations
+[eva:alarm] gauges.c:251: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:254: 
+[eva] gauges.c:254: 
   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..2147483647]
 [eva] Recording results for main13_2
 [eva] Done for function main13_2
 [eva] computing for function main13_3 <- main13 <- main.
-  Called from tests/value/gauges.c:282.
-[eva] tests/value/gauges.c:261: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:263: Warning: 
+  Called from gauges.c:282.
+[eva] gauges.c:261: starting to merge loop iterations
+[eva:alarm] gauges.c:263: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:265: 
+[eva] gauges.c:265: 
   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..2147483647]
 [eva] Recording results for main13_3
 [eva] Done for function main13_3
 [eva] computing for function main13_4 <- main13 <- main.
-  Called from tests/value/gauges.c:283.
-[eva] tests/value/gauges.c:272: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:274: Warning: 
+  Called from gauges.c:283.
+[eva] gauges.c:272: starting to merge loop iterations
+[eva:alarm] gauges.c:274: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:276: 
+[eva] gauges.c:276: 
   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..2147483647]
 [eva] Recording results for main13_4
 [eva] Done for function main13_4
 [eva] Recording results for main13
 [eva] Done for function main13
 [eva] computing for function main14 <- main.
-  Called from tests/value/gauges.c:366.
-[eva] tests/value/gauges.c:291: starting to merge loop iterations
-[eva:alarm] tests/value/gauges.c:293: Warning: 
+  Called from gauges.c:366.
+[eva] gauges.c:291: starting to merge loop iterations
+[eva:alarm] gauges.c:293: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] tests/value/gauges.c:297: 
+[eva] gauges.c:297: 
   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..2147483647]
 [eva] Recording results for main14
 [eva] Done for function main14
 [eva] computing for function main15 <- main.
-  Called from tests/value/gauges.c:367.
-[eva] tests/value/gauges.c:306: 
+  Called from gauges.c:367.
+[eva] gauges.c:306: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -421,8 +421,8 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/value/gauges.c:304: starting to merge loop iterations
-[eva] tests/value/gauges.c:306: 
+[eva] gauges.c:304: starting to merge loop iterations
+[eva] gauges.c:306: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -481,7 +481,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/value/gauges.c:306: 
+[eva] gauges.c:306: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -540,7 +540,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/value/gauges.c:306: 
+[eva] gauges.c:306: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -602,10 +602,10 @@
 [eva] Recording results for main15
 [eva] Done for function main15
 [eva] computing for function main16 <- main.
-  Called from tests/value/gauges.c:368.
-[eva] tests/value/gauges.c:323: starting to merge loop iterations
-[eva] tests/value/gauges.c:324: starting to merge loop iterations
-[eva] tests/value/gauges.c:325: 
+  Called from gauges.c:368.
+[eva] gauges.c:323: starting to merge loop iterations
+[eva] gauges.c:324: starting to merge loop iterations
+[eva] gauges.c:325: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -664,9 +664,9 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/value/gauges.c:326: starting to merge loop iterations
-[eva] tests/value/gauges.c:321: starting to merge loop iterations
-[eva] tests/value/gauges.c:325: 
+[eva] gauges.c:326: starting to merge loop iterations
+[eva] gauges.c:321: starting to merge loop iterations
+[eva] gauges.c:325: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -725,15 +725,15 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] tests/value/gauges.c:327: starting to merge loop iterations
+[eva] gauges.c:327: starting to merge loop iterations
 [eva] Recording results for main16
 [eva] Done for function main16
 [eva] computing for function main17 <- main.
-  Called from tests/value/gauges.c:369.
-[eva] tests/value/gauges.c:343: Call to builtin malloc
-[eva] tests/value/gauges.c:343: allocating variable __malloc_main17_l343
-[eva] tests/value/gauges.c:342: starting to merge loop iterations
-[eva] tests/value/gauges.c:343: Call to builtin malloc
+  Called from gauges.c:369.
+[eva] gauges.c:343: Call to builtin malloc
+[eva] gauges.c:343: allocating variable __malloc_main17_l343
+[eva] gauges.c:342: starting to merge loop iterations
+[eva] gauges.c:343: Call to builtin malloc
 [eva] Recording results for main17
 [eva] Done for function main17
 [eva] Recording results for main
@@ -880,7 +880,7 @@
   q ∈ {{ &y + [0..40],0%4 }}
   z ∈
    {{ garbled mix of &{x; y}
-    (origin: Arithmetic {tests/value/gauges.c:188}) }} or UNINITIALIZED
+    (origin: Arithmetic {gauges.c:188}) }} or UNINITIALIZED
 [eva:final-states] Values at end of function main17:
   __fc_heap_status ∈ [--..--]
   q ∈ {0}

@@ -1,6 +1,6 @@
 /* run.config
 #   CMXS: @PTEST_NAME@
-   OPT: -load-module @PTEST_DIR@/@PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
+   OPT: -load-module @PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
 */
 
 

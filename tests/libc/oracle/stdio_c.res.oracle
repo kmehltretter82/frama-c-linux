@@ -1,19 +1,19 @@
-[kernel] Parsing tests/libc/stdio_c.c (with preprocessing)
+[kernel] Parsing stdio_c.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function fopen <- main.
-  Called from tests/libc/stdio_c.c:11.
+  Called from stdio_c.c:11.
 [eva] using specification for function fopen
-[eva] tests/libc/stdio_c.c:11: 
+[eva] stdio_c.c:11: 
   function fopen: precondition 'valid_filename' got status valid.
-[eva] tests/libc/stdio_c.c:11: 
+[eva] stdio_c.c:11: 
   function fopen: precondition 'valid_mode' got status valid.
 [eva] Done for function fopen
 [eva] computing for function getline <- main.
-  Called from tests/libc/stdio_c.c:13.
+  Called from stdio_c.c:13.
 [eva] computing for function ferror <- getline <- main.
   Called from share/libc/stdio.c:46.
 [eva] using specification for function ferror
@@ -118,18 +118,18 @@
   out of bounds write. assert \valid(*lineptr + cur);
 [eva] Recording results for getline
 [eva] Done for function getline
-[eva:alarm] tests/libc/stdio_c.c:14: Warning: 
+[eva:alarm] stdio_c.c:14: Warning: 
   assertion 'read_ok' got status unknown.
-[eva] tests/libc/stdio_c.c:15: Call to builtin strlen
-[eva:alarm] tests/libc/stdio_c.c:15: Warning: 
+[eva] stdio_c.c:15: Call to builtin strlen
+[eva:alarm] stdio_c.c:15: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva:alarm] tests/libc/stdio_c.c:16: Warning: 
+[eva:alarm] stdio_c.c:16: Warning: 
   assertion 'read_bytes' got status unknown.
-[eva:alarm] tests/libc/stdio_c.c:17: Warning: 
+[eva:alarm] stdio_c.c:17: Warning: 
   assertion 'allocated_enough' got status unknown.
-[eva] tests/libc/stdio_c.c:13: starting to merge loop iterations
+[eva] stdio_c.c:13: starting to merge loop iterations
 [eva] computing for function getline <- main.
-  Called from tests/libc/stdio_c.c:13.
+  Called from stdio_c.c:13.
 [eva] computing for function ferror <- getline <- main.
   Called from share/libc/stdio.c:46.
 [eva] Done for function ferror
@@ -164,9 +164,9 @@
 [eva] Done for function feof
 [eva] Recording results for getline
 [eva] Done for function getline
-[eva] tests/libc/stdio_c.c:15: Call to builtin strlen
+[eva] stdio_c.c:15: Call to builtin strlen
 [eva] computing for function getline <- main.
-  Called from tests/libc/stdio_c.c:13.
+  Called from stdio_c.c:13.
 [eva] computing for function ferror <- getline <- main.
   Called from share/libc/stdio.c:46.
 [eva] Done for function ferror
@@ -201,9 +201,9 @@
 [eva] Done for function feof
 [eva] Recording results for getline
 [eva] Done for function getline
-[eva] tests/libc/stdio_c.c:15: Call to builtin strlen
+[eva] stdio_c.c:15: Call to builtin strlen
 [eva] computing for function getline <- main.
-  Called from tests/libc/stdio_c.c:13.
+  Called from stdio_c.c:13.
 [eva] computing for function ferror <- getline <- main.
   Called from share/libc/stdio.c:46.
 [eva] Done for function ferror
@@ -238,14 +238,14 @@
 [eva] Done for function feof
 [eva] Recording results for getline
 [eva] Done for function getline
-[eva] tests/libc/stdio_c.c:15: Call to builtin strlen
-[eva] tests/libc/stdio_c.c:19: Call to builtin free
-[eva] tests/libc/stdio_c.c:19: 
+[eva] stdio_c.c:15: Call to builtin strlen
+[eva] stdio_c.c:19: Call to builtin free
+[eva] stdio_c.c:19: 
   function free: precondition 'freeable' got status valid.
 [eva] computing for function fclose <- main.
-  Called from tests/libc/stdio_c.c:20.
+  Called from stdio_c.c:20.
 [eva] using specification for function fclose
-[eva] tests/libc/stdio_c.c:20: 
+[eva] stdio_c.c:20: 
   function fclose: precondition 'valid_stream' got status valid.
 [eva] Done for function fclose
 [eva] Recording results for main

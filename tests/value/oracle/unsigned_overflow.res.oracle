@@ -1,15 +1,15 @@
-[kernel] Parsing tests/value/unsigned_overflow.c (with preprocessing)
+[kernel] Parsing unsigned_overflow.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i1 ∈ [--..--]
   i2 ∈ [--..--]
-[eva:alarm] tests/value/unsigned_overflow.c:4: Warning: 
+[eva:alarm] unsigned_overflow.c:4: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/value/unsigned_overflow.c:5: Warning: 
+[eva:alarm] unsigned_overflow.c:5: Warning: 
   assertion got status unknown.
-[eva] tests/value/unsigned_overflow.c:10: Frama_C_show_each_dead:
+[eva] unsigned_overflow.c:10: Frama_C_show_each_dead:
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

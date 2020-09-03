@@ -1,11 +1,11 @@
-[kernel] Parsing tests/libc/stdlib_c_env.c (with preprocessing)
+[kernel] Parsing stdlib_c_env.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function putenv <- main.
-  Called from tests/libc/stdlib_c_env.c:8.
+  Called from stdlib_c_env.c:8.
 [eva] share/libc/stdlib.c:114: Call to builtin strchr
 [eva] share/libc/stdlib.c:114: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -61,7 +61,7 @@
 [eva] Recording results for putenv
 [eva] Done for function putenv
 [eva] computing for function putenv <- main.
-  Called from tests/libc/stdlib_c_env.c:10.
+  Called from stdlib_c_env.c:10.
 [eva] share/libc/stdlib.c:114: Call to builtin strchr
 [eva] computing for function __fc_initenv <- putenv <- main.
   Called from share/libc/stdlib.c:118.
@@ -82,7 +82,7 @@
 [eva] Recording results for putenv
 [eva] Done for function putenv
 [eva] computing for function getenv <- main.
-  Called from tests/libc/stdlib_c_env.c:11.
+  Called from stdlib_c_env.c:11.
 [eva] share/libc/stdlib.c:102: assertion got status valid.
 [eva] share/libc/stdlib.c:104: Reusing old results for call to __fc_initenv
 [eva] computing for function Frama_C_nondet <- getenv <- main.
@@ -95,21 +95,21 @@
 [eva] Done for function Frama_C_interval
 [eva] Recording results for getenv
 [eva] Done for function getenv
-[eva] tests/libc/stdlib_c_env.c:13: assertion got status valid.
+[eva] stdlib_c_env.c:13: assertion got status valid.
 [eva] computing for function strcpy <- main.
-  Called from tests/libc/stdlib_c_env.c:15.
+  Called from stdlib_c_env.c:15.
 [eva] using specification for function strcpy
-[eva] tests/libc/stdlib_c_env.c:15: 
+[eva] stdlib_c_env.c:15: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] tests/libc/stdlib_c_env.c:15: 
+[eva] stdlib_c_env.c:15: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] tests/libc/stdlib_c_env.c:15: 
+[eva] stdlib_c_env.c:15: 
   function strcpy: precondition 'separation' got status valid.
 [eva] share/libc/string.h:357: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcpy
 [eva] computing for function getenv <- main.
-  Called from tests/libc/stdlib_c_env.c:16.
+  Called from stdlib_c_env.c:16.
 [eva] share/libc/stdlib.c:104: Reusing old results for call to __fc_initenv
 [eva] computing for function Frama_C_nondet <- getenv <- main.
   Called from share/libc/stdlib.c:105.
@@ -120,7 +120,7 @@
 [eva] Recording results for getenv
 [eva] Done for function getenv
 [eva] computing for function setenv <- main.
-  Called from tests/libc/stdlib_c_env.c:17.
+  Called from stdlib_c_env.c:17.
 [eva] share/libc/stdlib.c:137: Call to builtin strchr
 [eva] share/libc/stdlib.c:137: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -152,7 +152,7 @@
 [eva] Recording results for setenv
 [eva] Done for function setenv
 [eva] computing for function setenv <- main.
-  Called from tests/libc/stdlib_c_env.c:18.
+  Called from stdlib_c_env.c:18.
 [eva] share/libc/stdlib.c:137: Call to builtin strchr
 [eva:alarm] share/libc/stdlib.c:137: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -178,7 +178,7 @@
 [eva] Recording results for setenv
 [eva] Done for function setenv
 [eva] computing for function setenv <- main.
-  Called from tests/libc/stdlib_c_env.c:19.
+  Called from stdlib_c_env.c:19.
 [eva] share/libc/stdlib.c:137: Call to builtin strchr
 [eva] share/libc/stdlib.c:141: Call to builtin strlen
 [eva] share/libc/stdlib.c:147: Reusing old results for call to __fc_initenv
@@ -200,7 +200,7 @@
 [eva] Recording results for setenv
 [eva] Done for function setenv
 [eva] computing for function unsetenv <- main.
-  Called from tests/libc/stdlib_c_env.c:20.
+  Called from stdlib_c_env.c:20.
 [eva] share/libc/stdlib.c:167: Call to builtin strchr
 [eva] share/libc/stdlib.c:167: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -218,15 +218,15 @@
 [eva] Done for function Frama_C_interval
 [eva] Recording results for unsetenv
 [eva] Done for function unsetenv
-[eva] tests/libc/stdlib_c_env.c:21: assertion got status valid.
+[eva] stdlib_c_env.c:21: assertion got status valid.
 [eva] computing for function unsetenv <- main.
-  Called from tests/libc/stdlib_c_env.c:22.
+  Called from stdlib_c_env.c:22.
 [eva] share/libc/stdlib.c:167: Call to builtin strchr
 [eva] Recording results for unsetenv
 [eva] Done for function unsetenv
-[eva] tests/libc/stdlib_c_env.c:23: assertion got status valid.
+[eva] stdlib_c_env.c:23: assertion got status valid.
 [eva] computing for function unsetenv <- main.
-  Called from tests/libc/stdlib_c_env.c:24.
+  Called from stdlib_c_env.c:24.
 [eva] share/libc/stdlib.c:167: Call to builtin strchr
 [eva:alarm] share/libc/stdlib.c:167: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -243,7 +243,7 @@
 [eva] Recording results for unsetenv
 [eva] Done for function unsetenv
 [eva] computing for function getenv <- main.
-  Called from tests/libc/stdlib_c_env.c:25.
+  Called from stdlib_c_env.c:25.
 [eva:alarm] share/libc/stdlib.c:102: Warning: assertion got status unknown.
 [eva] share/libc/stdlib.c:104: Reusing old results for call to __fc_initenv
 [eva] computing for function Frama_C_nondet <- getenv <- main.

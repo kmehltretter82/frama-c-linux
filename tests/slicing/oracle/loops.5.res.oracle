@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/loops.i (no preprocessing)
+[kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing a complete application starting at test_infinite_loop_4
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,22 +9,22 @@
   X ∈ {0}
   Y ∈ {0}
   Z ∈ {0}
-[eva:alarm] tests/slicing/loops.i:141: Warning: 
+[eva:alarm] loops.i:141: Warning: 
   signed overflow. assert -2147483648 ≤ G + data2;
-[eva:alarm] tests/slicing/loops.i:141: Warning: 
+[eva:alarm] loops.i:141: Warning: 
   signed overflow. assert G + data2 ≤ 2147483647;
-[eva] tests/slicing/loops.i:125: starting to merge loop iterations
-[eva:alarm] tests/slicing/loops.i:126: Warning: 
+[eva] loops.i:125: starting to merge loop iterations
+[eva:alarm] loops.i:126: Warning: 
   signed overflow. assert -2147483648 ≤ G + data1;
-[eva:alarm] tests/slicing/loops.i:126: Warning: 
+[eva:alarm] loops.i:126: Warning: 
   signed overflow. assert G + data1 ≤ 2147483647;
-[eva:alarm] tests/slicing/loops.i:129: Warning: 
+[eva:alarm] loops.i:129: Warning: 
   signed overflow. assert -2147483648 ≤ G + no_data;
-[eva:alarm] tests/slicing/loops.i:129: Warning: 
+[eva:alarm] loops.i:129: Warning: 
   signed overflow. assert G + no_data ≤ 2147483647;
-[eva:alarm] tests/slicing/loops.i:133: Warning: 
+[eva:alarm] loops.i:133: Warning: 
   signed overflow. assert -2147483648 ≤ G + no_data;
-[eva:alarm] tests/slicing/loops.i:133: Warning: 
+[eva:alarm] loops.i:133: Warning: 
   signed overflow. assert G + no_data ≤ 2147483647;
 [eva] Recording results for test_infinite_loop_4
 [eva] done for function test_infinite_loop_4
@@ -63,4 +63,4 @@ void test_infinite_loop_4(int ctrl1, int ctrl2, int data1, int data2)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_5_loops.i (no preprocessing)
+[kernel] Parsing result/ocode_5_loops.i (no preprocessing)

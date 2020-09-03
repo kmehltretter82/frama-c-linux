@@ -1,5 +1,5 @@
-[kernel] Parsing tests/misc/widen_hints_float.c (with preprocessing)
-[kernel:parser:decimal-float] tests/misc/widen_hints_float.c:42: Warning: 
+[kernel] Parsing widen_hints_float.c (with preprocessing)
+[kernel:parser:decimal-float] widen_hints_float.c:42: Warning: 
   Floating-point constant 0.01 is not represented exactly. Will use 0x1.47ae147ae147bp-7.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -8,33 +8,33 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function parabola <- main.
-  Called from tests/misc/widen_hints_float.c:70.
+  Called from widen_hints_float.c:70.
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
-  Called from tests/misc/widen_hints_float.c:17.
+  Called from widen_hints_float.c:17.
 [eva] using specification for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:17: 
+[eva] widen_hints_float.c:17: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:17: 
+[eva] widen_hints_float.c:17: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:20: starting to merge loop iterations
+[eva] widen_hints_float.c:20: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
-  Called from tests/misc/widen_hints_float.c:24.
-[eva] tests/misc/widen_hints_float.c:24: 
+  Called from widen_hints_float.c:24.
+[eva] widen_hints_float.c:24: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:24: 
+[eva] widen_hints_float.c:24: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:27: starting to merge loop iterations
+[eva] widen_hints_float.c:27: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
-  Called from tests/misc/widen_hints_float.c:31.
-[eva] tests/misc/widen_hints_float.c:31: 
+  Called from widen_hints_float.c:31.
+[eva] widen_hints_float.c:31: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:31: 
+[eva] widen_hints_float.c:31: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:33: starting to merge loop iterations
-[eva:alarm] tests/misc/widen_hints_float.c:34: Warning: 
+[eva] widen_hints_float.c:33: starting to merge loop iterations
+[eva:alarm] widen_hints_float.c:34: Warning: 
   non-finite double value.
   assert
   \is_finite(\mul_double(\sub_double(f3, (double)64),
@@ -42,94 +42,94 @@
 [eva] Recording results for parabola
 [eva] Done for function parabola
 [eva] computing for function trigo <- main.
-  Called from tests/misc/widen_hints_float.c:71.
+  Called from widen_hints_float.c:71.
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
-[eva] tests/misc/widen_hints_float.c:42: 
+  Called from widen_hints_float.c:42.
+[eva] widen_hints_float.c:42: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:42: 
+[eva] widen_hints_float.c:42: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
-[eva] tests/misc/widen_hints_float.c:42: 
+[eva] widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: 
   function sin: precondition 'finite_arg' got status valid.
-[eva] tests/misc/widen_hints_float.c:41: starting to merge loop iterations
+[eva] widen_hints_float.c:41: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
+  Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: Call to builtin sin
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
+  Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: Call to builtin sin
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
+  Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: Call to builtin sin
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
+  Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: Call to builtin sin
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
-  Called from tests/misc/widen_hints_float.c:42.
+  Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:42: Call to builtin sin
+[eva] widen_hints_float.c:42: Call to builtin sin
 [eva] Recording results for trigo
 [eva] Done for function trigo
 [eva] computing for function first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:72.
+  Called from widen_hints_float.c:72.
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
-[eva] tests/misc/widen_hints_float.c:49: 
+  Called from widen_hints_float.c:49.
+[eva] widen_hints_float.c:49: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:49: 
+[eva] widen_hints_float.c:49: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:48: starting to merge loop iterations
+[eva] widen_hints_float.c:48: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
+  Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
+  Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
+  Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
+  Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:49.
+  Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
-[eva] tests/misc/widen_hints_float.c:54: 
+  Called from widen_hints_float.c:54.
+[eva] widen_hints_float.c:54: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/misc/widen_hints_float.c:54: 
+[eva] widen_hints_float.c:54: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] tests/misc/widen_hints_float.c:53: starting to merge loop iterations
+[eva] widen_hints_float.c:53: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
+  Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
+  Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
+  Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
+  Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
-  Called from tests/misc/widen_hints_float.c:54.
+  Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
 [eva] Recording results for first_order_filter
 [eva] Done for function first_order_filter
 [eva] computing for function newton_sqrt <- main.
-  Called from tests/misc/widen_hints_float.c:73.
-[eva] tests/misc/widen_hints_float.c:59: starting to merge loop iterations
-[eva] tests/misc/widen_hints_float.c:64: starting to merge loop iterations
+  Called from widen_hints_float.c:73.
+[eva] widen_hints_float.c:59: starting to merge loop iterations
+[eva] widen_hints_float.c:64: starting to merge loop iterations
 [eva] Recording results for newton_sqrt
 [eva] Done for function newton_sqrt
 [eva] Recording results for main

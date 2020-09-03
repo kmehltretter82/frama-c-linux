@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/unitialized.c (with preprocessing)
+[kernel] Parsing unitialized.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -7,22 +7,22 @@
   X1 ∈ {0}
   X2 ∈ {0}
 [eva] computing for function f1 <- main.
-  Called from tests/slicing/unitialized.c:38.
+  Called from unitialized.c:38.
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from tests/slicing/unitialized.c:39.
+  Called from unitialized.c:39.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function g <- main.
-  Called from tests/slicing/unitialized.c:40.
-[eva:alarm] tests/slicing/unitialized.c:30: Warning: 
+  Called from unitialized.c:40.
+[eva:alarm] unitialized.c:30: Warning: 
   accessing uninitialized left-value. assert \initialized(&y);
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/slicing/unitialized.c:30: 
+[eva] unitialized.c:30: 
   assertion 'Eva,initialization' got final status invalid.
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
@@ -36,7 +36,7 @@
 [from] Done for function printf
 [from] Non-terminating function g (no dependencies)
 [from] Done for function g
-[pdg] tests/slicing/unitialized.c:43: Warning: 
+[pdg] unitialized.c:43: Warning: 
   no final state. Probably unreachable...
 [pdg] done for function main
 [slicing] applying all slicing requests...
@@ -57,4 +57,4 @@ void main(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_2_unitialized.i (no preprocessing)
+[kernel] Parsing result/ocode_2_unitialized.i (no preprocessing)

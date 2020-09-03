@@ -1,57 +1,57 @@
-[kernel] Parsing tests/value/assigns_from_direct.i (no preprocessing)
+[kernel] Parsing assigns_from_direct.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f_valid <- main.
-  Called from tests/value/assigns_from_direct.i:14.
+  Called from assigns_from_direct.i:14.
 [eva] Recording results for f_valid
 [from] Computing for function f_valid
 [from] Done for function f_valid
-[eva] tests/value/assigns_from_direct.i:21: 
+[eva] assigns_from_direct.i:21: 
   function f_valid: assigns got status valid.
-[eva] tests/value/assigns_from_direct.i:21: 
+[eva] assigns_from_direct.i:21: 
   function f_valid: \from ... part in assign clause got status valid.
 [eva] Done for function f_valid
 [eva] computing for function f_invalid_direct <- main.
-  Called from tests/value/assigns_from_direct.i:15.
+  Called from assigns_from_direct.i:15.
 [eva] Recording results for f_invalid_direct
 [from] Computing for function f_invalid_direct
 [from] Done for function f_invalid_direct
-[eva] tests/value/assigns_from_direct.i:30: 
+[eva] assigns_from_direct.i:30: 
   function f_invalid_direct: assigns got status valid.
-[eva:alarm] tests/value/assigns_from_direct.i:30: Warning: 
+[eva:alarm] assigns_from_direct.i:30: Warning: 
   function f_invalid_direct: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function f_invalid_direct
 [eva] computing for function f_invalid_address <- main.
-  Called from tests/value/assigns_from_direct.i:16.
+  Called from assigns_from_direct.i:16.
 [eva] Recording results for f_invalid_address
 [from] Computing for function f_invalid_address
 [from] Done for function f_invalid_address
-[eva] tests/value/assigns_from_direct.i:39: 
+[eva] assigns_from_direct.i:39: 
   function f_invalid_address: assigns got status valid.
-[eva:alarm] tests/value/assigns_from_direct.i:39: Warning: 
+[eva:alarm] assigns_from_direct.i:39: Warning: 
   function f_invalid_address: \from ... part in assign clause got status unknown (cannot validate indirect dependencies).
 [eva] Done for function f_invalid_address
 [eva] computing for function f_invalid_condition <- main.
-  Called from tests/value/assigns_from_direct.i:17.
+  Called from assigns_from_direct.i:17.
 [eva] Recording results for f_invalid_condition
 [from] Computing for function f_invalid_condition
 [from] Done for function f_invalid_condition
-[eva] tests/value/assigns_from_direct.i:48: 
+[eva] assigns_from_direct.i:48: 
   function f_invalid_condition: assigns got status valid.
-[eva:alarm] tests/value/assigns_from_direct.i:48: Warning: 
+[eva:alarm] assigns_from_direct.i:48: Warning: 
   function f_invalid_condition: \from ... part in assign clause got status unknown (cannot validate indirect dependencies).
 [eva] Done for function f_invalid_condition
 [eva] computing for function f_invalid_all <- main.
-  Called from tests/value/assigns_from_direct.i:18.
+  Called from assigns_from_direct.i:18.
 [eva] Recording results for f_invalid_all
 [from] Computing for function f_invalid_all
 [from] Done for function f_invalid_all
-[eva] tests/value/assigns_from_direct.i:57: 
+[eva] assigns_from_direct.i:57: 
   function f_invalid_all: assigns got status valid.
-[eva:alarm] tests/value/assigns_from_direct.i:57: Warning: 
+[eva:alarm] assigns_from_direct.i:57: Warning: 
   function f_invalid_all: \from ... part in assign clause got status unknown (cannot validate direct and indirect dependencies).
 [eva] Done for function f_invalid_all
 [eva] Recording results for main
@@ -100,15 +100,15 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f_valid at tests/value/assigns_from_direct.i:14 (by main):
+[from] call to f_valid at assigns_from_direct.i:14 (by main):
   y FROM a; b; c
-[from] call to f_invalid_direct at tests/value/assigns_from_direct.i:15 (by main):
+[from] call to f_invalid_direct at assigns_from_direct.i:15 (by main):
   y FROM a; b; c
-[from] call to f_invalid_address at tests/value/assigns_from_direct.i:16 (by main):
+[from] call to f_invalid_address at assigns_from_direct.i:16 (by main):
   y FROM a; b; c
-[from] call to f_invalid_condition at tests/value/assigns_from_direct.i:17 (by main):
+[from] call to f_invalid_condition at assigns_from_direct.i:17 (by main):
   y FROM a; b; c
-[from] call to f_invalid_all at tests/value/assigns_from_direct.i:18 (by main):
+[from] call to f_invalid_all at assigns_from_direct.i:18 (by main):
   y FROM a; b; c
 [from] entry point:
   NO EFFECTS

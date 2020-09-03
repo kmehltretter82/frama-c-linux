@@ -1,20 +1,20 @@
-[kernel] Parsing tests/value/strings_cond.i (no preprocessing)
+[kernel] Parsing strings_cond.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function foo <- main.
-  Called from tests/value/strings_cond.i:8.
-[eva] tests/value/strings_cond.i:3: 
+  Called from strings_cond.i:8.
+[eva] strings_cond.i:3: 
   Frama_C_dump_each:
   # Cvalue domain:
   s ∈ {{ "Bla" }}
   ==END OF DUMP==
-[eva] tests/value/strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" }}
-[eva] tests/value/strings_cond.i:4: starting to merge loop iterations
-[eva] tests/value/strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1} }}
-[eva] tests/value/strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1; 2} }}
+[eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" }}
+[eva] strings_cond.i:4: starting to merge loop iterations
+[eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1} }}
+[eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1; 2} }}
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva] Recording results for main

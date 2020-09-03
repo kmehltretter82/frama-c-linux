@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/change_main.i (no preprocessing)
+[kernel] Parsing change_main.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed

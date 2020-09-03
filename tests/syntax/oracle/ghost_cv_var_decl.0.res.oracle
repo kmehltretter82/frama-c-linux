@@ -1,39 +1,39 @@
-[kernel] Parsing tests/syntax/ghost_cv_var_decl.c (with preprocessing)
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:12: 
+[kernel] Parsing ghost_cv_var_decl.c (with preprocessing)
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:12: 
   'g1' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:22: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:22: 
   'g1' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:23: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:23: 
   'g2' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:32: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:32: 
   'g0' elements are already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:45: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:45: 
   'g0' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:175: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:175: 
   'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:184: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:184: 
   'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:191: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:191: 
   'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:200: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:200: 
   'b' is already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:207: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:207: 
   'b' elements are already ghost
-[kernel:ghost:already-ghost] tests/syntax/ghost_cv_var_decl.c:216: 
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:216: 
   'b' elements are already ghost
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:149: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:149: Warning: 
   No definition, nor assigns specification for ghost function 'decl_bad_return_type'
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:149: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:149: Warning: 
   Invalid return type: indirection from non-ghost to ghost
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:150: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:150: Warning: 
   No definition, nor assigns specification for ghost function 'decl_bad_parameter_type'
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:150: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:150: Warning: 
   Invalid type for 'param': indirection from non-ghost to ghost
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:151: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:151: Warning: 
   Invalid return type: indirection from non-ghost to ghost
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:154: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:154: Warning: 
   Invalid type for 'param': indirection from non-ghost to ghost
-[kernel:ghost:bad-use] tests/syntax/ghost_cv_var_decl.c:163: Warning: 
+[kernel:ghost:bad-use] ghost_cv_var_decl.c:163: Warning: 
   Invalid type for 'pptrg': indirection from non-ghost to ghost
 [kernel] Warning: warning ghost:bad-use treated as deferred error. See above messages for more information.
 [kernel] Frama-C aborted: invalid user input.

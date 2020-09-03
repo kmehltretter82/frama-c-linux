@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/volatile2.i (no preprocessing)
+[kernel] Parsing volatile2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -13,57 +13,57 @@
   S9 ∈ [--..--]
   u9[0..9] ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/volatile2.i:136.
-[eva:alarm] tests/value/volatile2.i:23: Warning: 
+  Called from volatile2.i:136.
+[eva:alarm] volatile2.i:23: Warning: 
   signed overflow. assert (int)c << 8 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:24: Warning: 
+[eva:alarm] volatile2.i:24: Warning: 
   signed overflow. assert (int)*p << 8 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:25: Warning: 
+[eva:alarm] volatile2.i:25: Warning: 
   signed overflow. assert (int)t[1] << 8 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:26: Warning: 
+[eva:alarm] volatile2.i:26: Warning: 
   signed overflow. assert (int)u.f1 << 8 ≤ 32767;
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/volatile2.i:137.
+  Called from volatile2.i:137.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from tests/value/volatile2.i:138.
-[eva:alarm] tests/value/volatile2.i:47: Warning: 
+  Called from volatile2.i:138.
+[eva:alarm] volatile2.i:47: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] tests/value/volatile2.i:52: assertion got status valid.
-[eva:alarm] tests/value/volatile2.i:55: Warning: assertion got status unknown.
-[eva:alarm] tests/value/volatile2.i:56: Warning: assertion got status unknown.
-[eva] tests/value/volatile2.i:59: assertion got status valid.
+[eva] volatile2.i:52: assertion got status valid.
+[eva:alarm] volatile2.i:55: Warning: assertion got status unknown.
+[eva:alarm] volatile2.i:56: Warning: assertion got status unknown.
+[eva] volatile2.i:59: assertion got status valid.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from tests/value/volatile2.i:139.
+  Called from volatile2.i:139.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from tests/value/volatile2.i:140.
-[eva:alarm] tests/value/volatile2.i:76: Warning: 
+  Called from volatile2.i:140.
+[eva:alarm] volatile2.i:76: Warning: 
   signed overflow. assert i + 1 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:76: Warning: 
+[eva:alarm] volatile2.i:76: Warning: 
   signed overflow. assert j + 1 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:76: Warning: 
+[eva:alarm] volatile2.i:76: Warning: 
   signed overflow.
   assert -32768 ≤ tmp + tmp_0;
   (tmp from i++, tmp_0 from j++)
-[eva:alarm] tests/value/volatile2.i:76: Warning: 
+[eva:alarm] volatile2.i:76: Warning: 
   signed overflow. assert tmp + tmp_0 ≤ 32767;
                    (tmp from i++, tmp_0 from j++)
-[eva:alarm] tests/value/volatile2.i:78: Warning: 
+[eva:alarm] volatile2.i:78: Warning: 
   signed overflow. assert i + 1 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:78: Warning: 
+[eva:alarm] volatile2.i:78: Warning: 
   signed overflow. assert j + 1 ≤ 32767;
-[eva:alarm] tests/value/volatile2.i:78: Warning: 
+[eva:alarm] volatile2.i:78: Warning: 
   signed overflow. assert -32768 ≤ i + j;
-[eva:alarm] tests/value/volatile2.i:78: Warning: 
+[eva:alarm] volatile2.i:78: Warning: 
   signed overflow. assert i + j ≤ 32767;
-[eva] tests/value/volatile2.i:80: 
+[eva] volatile2.i:80: 
   Frama_C_dump_each:
   # Cvalue domain:
   t[0..9] ∈ [--..--]
@@ -85,36 +85,36 @@
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from tests/value/volatile2.i:141.
+  Called from volatile2.i:141.
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from tests/value/volatile2.i:142.
+  Called from volatile2.i:142.
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from tests/value/volatile2.i:143.
-[eva] tests/value/volatile2.i:119: 
+  Called from volatile2.i:143.
+[eva] volatile2.i:119: 
   Frama_C_show_each: [--..--], [--..--], [--..--], [--..--], [--..--]
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from tests/value/volatile2.i:144.
-[eva:alarm] tests/value/volatile2.i:129: Warning: 
+  Called from volatile2.i:144.
+[eva:alarm] volatile2.i:129: Warning: 
   accessing out of bounds index. assert 0 ≤ S9.i1;
-[eva:alarm] tests/value/volatile2.i:129: Warning: 
+[eva:alarm] volatile2.i:129: Warning: 
   accessing out of bounds index. assert S9.i1 < 10;
-[eva:alarm] tests/value/volatile2.i:130: Warning: 
+[eva:alarm] volatile2.i:130: Warning: 
   accessing out of bounds index. assert 0 ≤ S9.i1;
-[eva:alarm] tests/value/volatile2.i:130: Warning: 
+[eva:alarm] volatile2.i:130: Warning: 
   accessing out of bounds index. assert S9.i1 < 10;
-[eva:alarm] tests/value/volatile2.i:131: Warning: 
+[eva:alarm] volatile2.i:131: Warning: 
   accessing out of bounds index. assert 0 ≤ u9[1];
-[eva:alarm] tests/value/volatile2.i:131: Warning: 
+[eva:alarm] volatile2.i:131: Warning: 
   accessing out of bounds index. assert u9[1] < 10;
-[eva:alarm] tests/value/volatile2.i:132: Warning: 
+[eva:alarm] volatile2.i:132: Warning: 
   accessing out of bounds index. assert 0 ≤ u9[1];
-[eva:alarm] tests/value/volatile2.i:132: Warning: 
+[eva:alarm] volatile2.i:132: Warning: 
   accessing out of bounds index. assert u9[1] < 10;
 [eva] Recording results for main9
 [eva] Done for function main9

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/keep_annot.i (no preprocessing)
+[kernel] Parsing keep_annot.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at f
 [eva] Computing initial state
@@ -6,16 +6,16 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function g <- f.
-  Called from tests/slicing/keep_annot.i:26.
-[eva] tests/slicing/keep_annot.i:15: starting to merge loop iterations
-[eva:alarm] tests/slicing/keep_annot.i:20: Warning: 
+  Called from keep_annot.i:26.
+[eva] keep_annot.i:15: starting to merge loop iterations
+[eva:alarm] keep_annot.i:20: Warning: 
   assertion got status unknown.
-[eva:alarm] tests/slicing/keep_annot.i:21: Warning: 
+[eva:alarm] keep_annot.i:21: Warning: 
   assertion got status unknown.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] tests/slicing/keep_annot.i:27: assertion got status valid.
-[eva:alarm] tests/slicing/keep_annot.i:28: Warning: 
+[eva] keep_annot.i:27: assertion got status valid.
+[eva:alarm] keep_annot.i:28: Warning: 
   assertion got status unknown.
 [eva] Recording results for f
 [eva] done for function f
@@ -62,4 +62,4 @@ void f(las *p, int n, int m)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_keep_annot.i (no preprocessing)
+[kernel] Parsing result/ocode_0_keep_annot.i (no preprocessing)

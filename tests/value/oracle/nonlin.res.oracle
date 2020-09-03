@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/nonlin.c (with preprocessing)
+[kernel] Parsing nonlin.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -24,136 +24,136 @@
        [31] ∈ {5}
        [32..35] ∈ {0}
 [eva] computing for function subdivide_integer <- main.
-  Called from tests/value/nonlin.c:119.
-[eva:nonlin] tests/value/nonlin.c:31: 
+  Called from nonlin.c:119.
+[eva:nonlin] nonlin.c:31: 
   non-linear '((int)z + 675) * ((int)z + 675)', lv 'z'
-[eva:nonlin] tests/value/nonlin.c:31: subdividing on z
-[eva:nonlin] tests/value/nonlin.c:32: 
+[eva:nonlin] nonlin.c:31: subdividing on z
+[eva:nonlin] nonlin.c:32: 
   non-linear '((int)z + 17817) * ((int)z + 17817)', lv 'z'
-[eva:nonlin] tests/value/nonlin.c:32: subdividing on z
-[eva:alarm] tests/value/nonlin.c:32: Warning: 
+[eva:nonlin] nonlin.c:32: subdividing on z
+[eva:alarm] nonlin.c:32: Warning: 
   signed overflow.
   assert (int)((int)z + 17817) * (int)((int)z + 17817) ≤ 2147483647;
-[eva:nonlin] tests/value/nonlin.c:39: 
+[eva:nonlin] nonlin.c:39: 
   non-linear '(i2 + (long long)3) * (i2 + (long long)3)', lv 'i2'
-[eva:nonlin] tests/value/nonlin.c:39: non-linear 'i1 * i1', lv 'i1'
-[eva:nonlin] tests/value/nonlin.c:39: subdividing on i2
-[eva:nonlin] tests/value/nonlin.c:39: subdividing on i1
-[eva:alarm] tests/value/nonlin.c:43: Warning: assertion got status unknown.
-[eva:nonlin] tests/value/nonlin.c:44: non-linear '(int)idx * (int)idx', lv 'idx'
-[eva:nonlin] tests/value/nonlin.c:44: subdividing on idx
+[eva:nonlin] nonlin.c:39: non-linear 'i1 * i1', lv 'i1'
+[eva:nonlin] nonlin.c:39: subdividing on i2
+[eva:nonlin] nonlin.c:39: subdividing on i1
+[eva:alarm] nonlin.c:43: Warning: assertion got status unknown.
+[eva:nonlin] nonlin.c:44: non-linear '(int)idx * (int)idx', lv 'idx'
+[eva:nonlin] nonlin.c:44: subdividing on idx
 [eva] Recording results for subdivide_integer
 [eva] Done for function subdivide_integer
 [eva] computing for function subdivide_pointer <- main.
-  Called from tests/value/nonlin.c:120.
+  Called from nonlin.c:120.
 [eva] computing for function Frama_C_interval <- subdivide_pointer <- main.
-  Called from tests/value/nonlin.c:12.
+  Called from nonlin.c:12.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/nonlin.c:12: 
+[eva] nonlin.c:12: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- subdivide_pointer <- main.
-  Called from tests/value/nonlin.c:14.
-[eva] tests/value/nonlin.c:14: 
+  Called from nonlin.c:14.
+[eva] nonlin.c:14: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/nonlin.c:18: Warning: 
+[eva:alarm] nonlin.c:18: Warning: 
   out of bounds read. assert \valid_read((&y + i) - i);
-[eva:nonlin] tests/value/nonlin.c:21: non-linear '(p + i) - i', lv 'i'
-[eva:nonlin] tests/value/nonlin.c:21: subdividing on i
-[eva:alarm] tests/value/nonlin.c:21: Warning: 
+[eva:nonlin] nonlin.c:21: non-linear '(p + i) - i', lv 'i'
+[eva:nonlin] nonlin.c:21: subdividing on i
+[eva:alarm] nonlin.c:21: Warning: 
   out of bounds read. assert \valid_read((p + i) - i);
-[eva:alarm] tests/value/nonlin.c:23: Warning: 
+[eva:alarm] nonlin.c:23: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:alarm] tests/value/nonlin.c:24: Warning: 
+[eva:alarm] nonlin.c:24: Warning: 
   out of bounds read. assert \valid_read((p + i) - i);
 [eva] Recording results for subdivide_pointer
 [eva] Done for function subdivide_pointer
 [eva] computing for function subdivide_several_variables <- main.
-  Called from tests/value/nonlin.c:121.
+  Called from nonlin.c:121.
 [eva] computing for function Frama_C_interval <- subdivide_several_variables <- 
                           main.
-  Called from tests/value/nonlin.c:51.
-[eva] tests/value/nonlin.c:51: 
+  Called from nonlin.c:51.
+[eva] nonlin.c:51: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- subdivide_several_variables <- 
                           main.
-  Called from tests/value/nonlin.c:52.
-[eva] tests/value/nonlin.c:52: 
+  Called from nonlin.c:52.
+[eva] nonlin.c:52: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- subdivide_several_variables <- 
                           main.
-  Called from tests/value/nonlin.c:53.
-[eva] tests/value/nonlin.c:53: 
+  Called from nonlin.c:53.
+[eva] nonlin.c:53: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- subdivide_several_variables <- 
                           main.
-  Called from tests/value/nonlin.c:54.
-[eva] tests/value/nonlin.c:54: 
+  Called from nonlin.c:54.
+[eva] nonlin.c:54: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:nonlin] tests/value/nonlin.c:56: non-linear 'x * x', lv 'x'
-[eva:nonlin] tests/value/nonlin.c:56: non-linear 'y * y', lv 'y'
-[eva:nonlin] tests/value/nonlin.c:56: subdividing on x
-[eva:nonlin] tests/value/nonlin.c:56: subdividing on y
-[eva:nonlin] tests/value/nonlin.c:60: non-linear 'x * x', lv 'x'
-[eva:nonlin] tests/value/nonlin.c:60: non-linear '((x * x) * y) * y', lv 'y'
-[eva:nonlin] tests/value/nonlin.c:60: subdividing on x
-[eva:nonlin] tests/value/nonlin.c:60: subdividing on y
-[eva:nonlin] tests/value/nonlin.c:62: non-linear 'x * y - y * x', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:62: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:65: 
+[eva:nonlin] nonlin.c:56: non-linear 'x * x', lv 'x'
+[eva:nonlin] nonlin.c:56: non-linear 'y * y', lv 'y'
+[eva:nonlin] nonlin.c:56: subdividing on x
+[eva:nonlin] nonlin.c:56: subdividing on y
+[eva:nonlin] nonlin.c:60: non-linear 'x * x', lv 'x'
+[eva:nonlin] nonlin.c:60: non-linear '((x * x) * y) * y', lv 'y'
+[eva:nonlin] nonlin.c:60: subdividing on x
+[eva:nonlin] nonlin.c:60: subdividing on y
+[eva:nonlin] nonlin.c:62: non-linear 'x * y - y * x', lv 'y, x'
+[eva:nonlin] nonlin.c:62: subdividing on x, y
+[eva:nonlin] nonlin.c:65: 
   non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:65: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:66: 
+[eva:nonlin] nonlin.c:65: subdividing on x, y
+[eva:nonlin] nonlin.c:66: 
   non-linear '(x * x + y * y) - (2 * x) * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:66: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:68: 
+[eva:nonlin] nonlin.c:66: subdividing on x, y
+[eva:nonlin] nonlin.c:68: 
   non-linear '(z * x + x * y) + y * z', lv 'z, y, x'
-[eva:nonlin] tests/value/nonlin.c:68: non-linear 'w * w', lv 'w'
-[eva:nonlin] tests/value/nonlin.c:68: subdividing on x, y, z
-[eva:nonlin] tests/value/nonlin.c:68: subdividing on w
+[eva:nonlin] nonlin.c:68: non-linear 'w * w', lv 'w'
+[eva:nonlin] nonlin.c:68: subdividing on x, y, z
+[eva:nonlin] nonlin.c:68: subdividing on w
 [eva] Recording results for subdivide_several_variables
 [eva] Done for function subdivide_several_variables
 [eva] computing for function subdivide_table <- main.
-  Called from tests/value/nonlin.c:122.
-[eva] tests/value/nonlin.c:87: loop invariant got status valid.
-[eva] tests/value/nonlin.c:88: starting to merge loop iterations
-[eva:nonlin] tests/value/nonlin.c:89: 
+  Called from nonlin.c:122.
+[eva] nonlin.c:87: loop invariant got status valid.
+[eva] nonlin.c:88: starting to merge loop iterations
+[eva:nonlin] nonlin.c:89: 
   non-linear '(4 + ((x >> 2) * 3 << 2)) + x % 4', lv 'x'
-[eva:nonlin] tests/value/nonlin.c:89: subdividing on x
+[eva:nonlin] nonlin.c:89: subdividing on x
 [eva] Recording results for subdivide_table
 [eva] Done for function subdivide_table
 [eva] computing for function subdivide_reduced_value <- main.
-  Called from tests/value/nonlin.c:123.
-[eva:nonlin] tests/value/nonlin.c:101: non-linear 't1[i] - t2[i]', lv 'i'
-[eva:nonlin] tests/value/nonlin.c:101: subdividing on i
-[eva:alarm] tests/value/nonlin.c:101: Warning: 
+  Called from nonlin.c:123.
+[eva:nonlin] nonlin.c:101: non-linear 't1[i] - t2[i]', lv 'i'
+[eva:nonlin] nonlin.c:101: subdividing on i
+[eva:alarm] nonlin.c:101: Warning: 
   accessing out of bounds index. assert 0 ≤ i;
-[eva:alarm] tests/value/nonlin.c:101: Warning: 
+[eva:alarm] nonlin.c:101: Warning: 
   accessing out of bounds index. assert i < 2;
 [eva] Recording results for subdivide_reduced_value
 [eva] Done for function subdivide_reduced_value
 [eva] computing for function local_subdivide <- main.
-  Called from tests/value/nonlin.c:124.
+  Called from nonlin.c:124.
 [eva] computing for function Frama_C_interval <- local_subdivide <- main.
-  Called from tests/value/nonlin.c:107.
-[eva] tests/value/nonlin.c:107: 
+  Called from nonlin.c:107.
+[eva] nonlin.c:107: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- local_subdivide <- main.
-  Called from tests/value/nonlin.c:108.
-[eva] tests/value/nonlin.c:108: 
+  Called from nonlin.c:108.
+[eva] nonlin.c:108: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:nonlin] tests/value/nonlin.c:112: 
+[eva:nonlin] nonlin.c:112: 
   non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] tests/value/nonlin.c:112: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:113: subdividing on x, y
-[eva:nonlin] tests/value/nonlin.c:115: subdividing on x, y
+[eva:nonlin] nonlin.c:112: subdividing on x, y
+[eva:nonlin] nonlin.c:113: subdividing on x, y
+[eva:nonlin] nonlin.c:115: subdividing on x, y
 [eva] Recording results for local_subdivide
 [eva] Done for function local_subdivide
 [eva] Recording results for main

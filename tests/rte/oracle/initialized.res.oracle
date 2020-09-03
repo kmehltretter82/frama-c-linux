@@ -1,5 +1,5 @@
-[kernel] Parsing tests/rte/initialized.c (with preprocessing)
-[kernel:parser:decimal-float] tests/rte/initialized.c:111: Warning: 
+[kernel] Parsing initialized.c (with preprocessing)
+[kernel:parser:decimal-float] initialized.c:111: Warning: 
   Floating-point constant 1.1234 is not represented exactly. Will use 0x1.1f972474538efp0.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [rte] annotating function f

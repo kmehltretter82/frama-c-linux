@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/callsite.i (no preprocessing)
+[kernel] Parsing callsite.i (no preprocessing)
 Call Sites for f:
 Call Sites for g:
   - From f at #003

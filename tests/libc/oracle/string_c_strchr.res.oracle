@@ -1,16 +1,16 @@
-[kernel] Parsing tests/libc/string_c_strchr.c (with preprocessing)
+[kernel] Parsing string_c_strchr.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/libc/string_c_strchr.c:57: 
+[eva] string_c_strchr.c:57: 
   Trace partitioning superposing up to 100 states
-[eva] tests/libc/string_c_strchr.c:59: 
+[eva] string_c_strchr.c:59: 
   Trace partitioning superposing up to 200 states
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:62.
-[eva] tests/libc/string_c_strchr.c:62: 
+  Called from string_c_strchr.c:62.
+[eva] string_c_strchr.c:62: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.h:168: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
@@ -19,45 +19,45 @@
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:63.
-[eva] tests/libc/string_c_strchr.c:63: 
+  Called from string_c_strchr.c:63.
+[eva] string_c_strchr.c:63: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:64.
-[eva] tests/libc/string_c_strchr.c:64: 
+  Called from string_c_strchr.c:64.
+[eva] string_c_strchr.c:64: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:65.
-[eva] tests/libc/string_c_strchr.c:65: 
+  Called from string_c_strchr.c:65.
+[eva] string_c_strchr.c:65: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:66.
-[eva] tests/libc/string_c_strchr.c:66: 
+  Called from string_c_strchr.c:66.
+[eva] string_c_strchr.c:66: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:67.
-[eva] tests/libc/string_c_strchr.c:67: 
+  Called from string_c_strchr.c:67.
+[eva] string_c_strchr.c:67: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.c:229: Trace partitioning superposing up to 100 states
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:68.
-[eva] tests/libc/string_c_strchr.c:68: 
+  Called from string_c_strchr.c:68.
+[eva] string_c_strchr.c:68: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:70.
-[eva] tests/libc/string_c_strchr.c:70: 
+  Called from string_c_strchr.c:70.
+[eva] string_c_strchr.c:70: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.h:161: 
   function strchr, behavior found: postcondition 'result_char' got status valid.
@@ -72,111 +72,111 @@
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:71.
-[eva] tests/libc/string_c_strchr.c:71: 
+  Called from string_c_strchr.c:71.
+[eva] string_c_strchr.c:71: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:72.
-[eva] tests/libc/string_c_strchr.c:72: 
+  Called from string_c_strchr.c:72.
+[eva] string_c_strchr.c:72: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:73.
-[eva] tests/libc/string_c_strchr.c:73: 
+  Called from string_c_strchr.c:73.
+[eva] string_c_strchr.c:73: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:74.
-[eva] tests/libc/string_c_strchr.c:74: 
+  Called from string_c_strchr.c:74.
+[eva] string_c_strchr.c:74: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:75.
-[eva] tests/libc/string_c_strchr.c:75: 
+  Called from string_c_strchr.c:75.
+[eva] string_c_strchr.c:75: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:76.
-[eva] tests/libc/string_c_strchr.c:76: 
+  Called from string_c_strchr.c:76.
+[eva] string_c_strchr.c:76: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:77.
-[eva] tests/libc/string_c_strchr.c:77: 
+  Called from string_c_strchr.c:77.
+[eva] string_c_strchr.c:77: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:78.
-[eva] tests/libc/string_c_strchr.c:78: 
+  Called from string_c_strchr.c:78.
+[eva] string_c_strchr.c:78: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:79.
-[eva] tests/libc/string_c_strchr.c:79: 
+  Called from string_c_strchr.c:79.
+[eva] string_c_strchr.c:79: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:80.
-[eva] tests/libc/string_c_strchr.c:80: 
+  Called from string_c_strchr.c:80.
+[eva] string_c_strchr.c:80: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:81.
-[eva] tests/libc/string_c_strchr.c:81: 
+  Called from string_c_strchr.c:81.
+[eva] string_c_strchr.c:81: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:82.
-[eva] tests/libc/string_c_strchr.c:82: 
+  Called from string_c_strchr.c:82.
+[eva] string_c_strchr.c:82: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:83.
-[eva] tests/libc/string_c_strchr.c:83: 
+  Called from string_c_strchr.c:83.
+[eva] string_c_strchr.c:83: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:84.
-[eva] tests/libc/string_c_strchr.c:84: 
+  Called from string_c_strchr.c:84.
+[eva] string_c_strchr.c:84: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:85.
-[eva] tests/libc/string_c_strchr.c:85: 
+  Called from string_c_strchr.c:85.
+[eva] string_c_strchr.c:85: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:86.
-[eva] tests/libc/string_c_strchr.c:86: 
+  Called from string_c_strchr.c:86.
+[eva] string_c_strchr.c:86: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:87.
-[eva] tests/libc/string_c_strchr.c:87: 
+  Called from string_c_strchr.c:87.
+[eva] string_c_strchr.c:87: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] share/libc/string.c:229: Trace partitioning superposing up to 200 states
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
-  Called from tests/libc/string_c_strchr.c:88.
-[eva] tests/libc/string_c_strchr.c:88: 
+  Called from string_c_strchr.c:88.
+[eva] string_c_strchr.c:88: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr

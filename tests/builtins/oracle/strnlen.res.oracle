@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/strnlen.c (with preprocessing)
+[kernel] Parsing strnlen.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,25 +14,25 @@
     [3] ∈ {100}
     [4] ∈ {101}
     [5] ∈ {0}
-[eva] tests/builtins/strnlen.c:9: Call to builtin strnlen
-[eva] tests/builtins/strnlen.c:9: 
+[eva] strnlen.c:9: Call to builtin strnlen
+[eva] strnlen.c:9: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strnlen.c:10: Call to builtin strnlen
-[eva] tests/builtins/strnlen.c:10: 
+[eva] strnlen.c:10: Call to builtin strnlen
+[eva] strnlen.c:10: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strnlen.c:11: Call to builtin strnlen
-[eva:alarm] tests/builtins/strnlen.c:11: Warning: 
+[eva] strnlen.c:11: Call to builtin strnlen
+[eva:alarm] strnlen.c:11: Warning: 
   function strnlen: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strnlen.c:13: Call to builtin strnlen
-[eva] tests/builtins/strnlen.c:13: 
+[eva] strnlen.c:13: Call to builtin strnlen
+[eva] strnlen.c:13: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strnlen.c:14: Call to builtin strnlen
-[eva] tests/builtins/strnlen.c:14: 
+[eva] strnlen.c:14: Call to builtin strnlen
+[eva] strnlen.c:14: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strnlen.c:15: Call to builtin strnlen
-[eva] tests/builtins/strnlen.c:15: 
+[eva] strnlen.c:15: Call to builtin strnlen
+[eva] strnlen.c:15: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strnlen.c:17: 
+[eva] strnlen.c:17: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]

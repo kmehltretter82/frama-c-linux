@@ -1,15 +1,15 @@
-[kernel] Parsing tests/value/library_precond.i (no preprocessing)
+[kernel] Parsing library_precond.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function mxml <- main.
-  Called from tests/value/library_precond.i:9.
+  Called from library_precond.i:9.
 [eva] using specification for function mxml
-[eva] tests/value/library_precond.i:5: Warning: 
+[eva] library_precond.i:5: Warning: 
   no 'assigns \result \from ...' clause specified for function mxml
-[eva:alarm] tests/value/library_precond.i:9: Warning: 
+[eva:alarm] library_precond.i:9: Warning: 
   function mxml: precondition got status invalid.
 [eva] Done for function mxml
 [eva] Recording results for main

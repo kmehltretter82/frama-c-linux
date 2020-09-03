@@ -1,5 +1,5 @@
-[kernel] Parsing tests/misc/pragma_pack_zero.c (with preprocessing)
-[kernel] tests/misc/pragma_pack_zero.c:35: Warning: 
+[kernel] Parsing pragma_pack_zero.c (with preprocessing)
+[kernel] pragma_pack_zero.c:35: Warning: 
   GCC accepts pack(0) but does not specify its behavior; considering it equivalent to pack()
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

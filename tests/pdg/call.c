@@ -1,6 +1,6 @@
 /* run.config
    GCC:
-   STDOPT: +"-lib-entry -main g -pdg -pdg-dot tests/pdg/call "
+   STDOPT: +"-lib-entry -main g -pdg -pdg-dot call "
 */
 
 /* Ne pas modifier : exemple utilisé dans le rapport. */

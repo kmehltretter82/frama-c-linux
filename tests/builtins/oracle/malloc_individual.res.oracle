@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/malloc_individual.c (with preprocessing)
+[kernel] Parsing malloc_individual.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -7,10 +7,10 @@
   A ∈ {0}
   B ∈ {0}
   C ∈ {0}
-[eva] tests/builtins/malloc_individual.c:12: Call to builtin malloc
-[eva] tests/builtins/malloc_individual.c:12: 
+[eva] malloc_individual.c:12: Call to builtin malloc
+[eva] malloc_individual.c:12: 
   allocating variable __malloc_main_l12
-[eva:alarm] tests/builtins/malloc_individual.c:15: Warning: 
+[eva:alarm] malloc_individual.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for main
 [eva] done for function main

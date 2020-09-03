@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/csmith.i (no preprocessing)
+[kernel] Parsing csmith.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,83 +8,83 @@
   G1b ∈ {0}
   G2 ∈ {0}
 [eva] computing for function f1 <- main.
-  Called from tests/slicing/csmith.i:234.
+  Called from csmith.i:234.
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f1b <- main.
-  Called from tests/slicing/csmith.i:235.
+  Called from csmith.i:235.
 [eva] Recording results for f1b
 [eva] Done for function f1b
 [eva] computing for function f2 <- main.
-  Called from tests/slicing/csmith.i:236.
+  Called from csmith.i:236.
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function bts181 <- main.
-  Called from tests/slicing/csmith.i:237.
+  Called from csmith.i:237.
 [eva] Recording results for bts181
 [eva] Done for function bts181
 [eva] computing for function bts181b <- main.
-  Called from tests/slicing/csmith.i:238.
+  Called from csmith.i:238.
 [eva] Recording results for bts181b
 [eva] Done for function bts181b
 [eva] computing for function bts807 <- main.
-  Called from tests/slicing/csmith.i:239.
+  Called from csmith.i:239.
 [eva] Recording results for bts807
 [eva] Done for function bts807
 [eva] computing for function bts809 <- main.
-  Called from tests/slicing/csmith.i:240.
+  Called from csmith.i:240.
 [eva] Recording results for bts809
 [eva] Done for function bts809
 [eva] computing for function bts879 <- main.
-  Called from tests/slicing/csmith.i:241.
+  Called from csmith.i:241.
 [eva] Recording results for bts879
 [eva] Done for function bts879
 [eva] computing for function bts879b <- main.
-  Called from tests/slicing/csmith.i:242.
+  Called from csmith.i:242.
 [eva] Recording results for bts879b
 [eva] Done for function bts879b
 [eva] computing for function bts899 <- main.
-  Called from tests/slicing/csmith.i:243.
-[eva] tests/slicing/csmith.i:135: starting to merge loop iterations
-[eva:alarm] tests/slicing/csmith.i:141: Warning: 
+  Called from csmith.i:243.
+[eva] csmith.i:135: starting to merge loop iterations
+[eva:alarm] csmith.i:141: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for bts899
 [eva] Done for function bts899
-[eva:alarm] tests/slicing/csmith.i:243: Warning: 
+[eva:alarm] csmith.i:243: Warning: 
   signed overflow. assert x + tmp_5 ≤ 2147483647;
                    (tmp_5 from bts899())
 [eva] computing for function bts906 <- main.
-  Called from tests/slicing/csmith.i:244.
-[eva] tests/slicing/csmith.i:149: starting to merge loop iterations
-[eva] tests/slicing/csmith.i:150: starting to merge loop iterations
+  Called from csmith.i:244.
+[eva] csmith.i:149: starting to merge loop iterations
+[eva] csmith.i:150: starting to merge loop iterations
 [eva] Recording results for bts906
 [eva] Done for function bts906
-[eva:alarm] tests/slicing/csmith.i:244: Warning: 
+[eva:alarm] csmith.i:244: Warning: 
   signed overflow. assert x + tmp_6 ≤ 2147483647;
                    (tmp_6 from bts906())
 [eva] computing for function bts906b <- main.
-  Called from tests/slicing/csmith.i:245.
-[eva] tests/slicing/csmith.i:168: starting to merge loop iterations
-[eva] tests/slicing/csmith.i:169: starting to merge loop iterations
+  Called from csmith.i:245.
+[eva] csmith.i:168: starting to merge loop iterations
+[eva] csmith.i:169: starting to merge loop iterations
 [eva] Recording results for bts906b
 [eva] Done for function bts906b
-[eva:alarm] tests/slicing/csmith.i:245: Warning: 
+[eva:alarm] csmith.i:245: Warning: 
   signed overflow. assert x + tmp_7 ≤ 2147483647;
                    (tmp_7 from bts906b())
 [eva] computing for function bts963 <- main.
-  Called from tests/slicing/csmith.i:247.
-[eva] tests/slicing/csmith.i:211: starting to merge loop iterations
+  Called from csmith.i:247.
+[eva] csmith.i:211: starting to merge loop iterations
 [eva] Recording results for bts963
 [eva] Done for function bts963
-[eva:alarm] tests/slicing/csmith.i:247: Warning: 
+[eva:alarm] csmith.i:247: Warning: 
   signed overflow. assert x + tmp_8 ≤ 2147483647;
                    (tmp_8 from bts963())
 [eva] computing for function bts963b <- main.
-  Called from tests/slicing/csmith.i:248.
-[eva] tests/slicing/csmith.i:223: starting to merge loop iterations
+  Called from csmith.i:248.
+[eva] csmith.i:223: starting to merge loop iterations
 [eva] Recording results for bts963b
 [eva] Done for function bts963b
-[eva:alarm] tests/slicing/csmith.i:248: Warning: 
+[eva:alarm] csmith.i:248: Warning: 
   signed overflow. assert x + tmp_9 ≤ 2147483647;
                    (tmp_9 from bts963b())
 [eva] Recording results for main
@@ -379,4 +379,4 @@ int main(int n)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_csmith.i (no preprocessing)
+[kernel] Parsing result/ocode_0_csmith.i (no preprocessing)

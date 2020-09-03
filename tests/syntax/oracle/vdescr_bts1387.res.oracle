@@ -1,4 +1,4 @@
-[kernel] Parsing tests/syntax/vdescr_bts1387.i (no preprocessing)
+[kernel] Parsing vdescr_bts1387.i (no preprocessing)
 [kernel] Variable f has vdescr ''
 [kernel] Variable  has vdescr ''
 [kernel] Variable g has vdescr ''

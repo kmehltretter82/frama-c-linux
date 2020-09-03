@@ -1,24 +1,24 @@
-[kernel] Parsing tests/value/unop.c (with preprocessing)
+[kernel] Parsing unop.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/unop.c:22.
-[eva] tests/value/unop.c:2: Frama_C_show_each_1: [-2147483648. .. 2147483648.]
-[eva] tests/value/unop.c:4: Frama_C_show_each_1_then: [-2147483648. .. -3.]
-[eva] tests/value/unop.c:6: 
+  Called from unop.c:22.
+[eva] unop.c:2: Frama_C_show_each_1: [-2147483648. .. 2147483648.]
+[eva] unop.c:4: Frama_C_show_each_1_then: [-2147483648. .. -3.]
+[eva] unop.c:6: 
   Frama_C_show_each_1_else: [-2.99999976158 .. 2147483648.]
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/unop.c:23.
-[eva] tests/value/unop.c:11: Frama_C_show_each_2: [-2147483648..2147483647]
-[eva:alarm] tests/value/unop.c:12: Warning: 
+  Called from unop.c:23.
+[eva] unop.c:11: Frama_C_show_each_2: [-2147483648..2147483647]
+[eva:alarm] unop.c:12: Warning: 
   signed overflow. assert -i ≤ 2147483647;
-[eva] tests/value/unop.c:13: Frama_C_show_each_2_then: [-2147483647..-3]
-[eva] tests/value/unop.c:15: Frama_C_show_each_2_else: [-2..2147483647]
+[eva] unop.c:13: Frama_C_show_each_2_then: [-2147483647..-3]
+[eva] unop.c:15: Frama_C_show_each_2_else: [-2..2147483647]
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main

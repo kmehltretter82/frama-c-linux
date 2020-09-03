@@ -1,21 +1,21 @@
-[kernel] Parsing tests/slicing/combine.i (no preprocessing)
+[kernel] Parsing combine.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/slicing/combine.i:24.
+  Called from combine.i:24.
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/combine.i:17.
+  Called from combine.i:17.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/slicing/combine.i:26.
+  Called from combine.i:26.
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/combine.i:17.
+  Called from combine.i:17.
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
@@ -120,19 +120,19 @@ int main(int x)
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/slicing/combine.i:24.
+  Called from combine.i:24.
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/combine.i:17.
-[kernel:annot:missing-spec] tests/slicing/combine.i:17: Warning: 
+  Called from combine.i:17.
+[kernel:annot:missing-spec] combine.i:17: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f_s_2 <- main.
-  Called from tests/slicing/combine.i:26.
+  Called from combine.i:26.
 [eva] computing for function g <- f_s_2 <- main.
-  Called from tests/slicing/combine.i:17.
+  Called from combine.i:17.
 [eva] Done for function g
 [eva] Recording results for f_s_2
 [eva] Done for function f_s_2
@@ -181,17 +181,17 @@ int main(int x)
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/slicing/combine.i:24.
+  Called from combine.i:24.
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/combine.i:17.
+  Called from combine.i:17.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f_s_2 <- main.
-  Called from tests/slicing/combine.i:26.
+  Called from combine.i:26.
 [eva] computing for function g <- f_s_2 <- main.
-  Called from tests/slicing/combine.i:17.
+  Called from combine.i:17.
 [eva] Done for function g
 [eva] Recording results for f_s_2
 [eva] Done for function f_s_2

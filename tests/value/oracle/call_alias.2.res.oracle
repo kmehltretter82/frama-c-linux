@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/call_alias.i (no preprocessing)
+[kernel] Parsing call_alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
 [eva] Initial state computed
@@ -12,7 +12,7 @@
   H ∈ {0}
   I ∈ {0}
 [eva] computing for function sum <- main2.
-  Called from tests/value/call_alias.i:33.
+  Called from call_alias.i:33.
 [eva] Recording results for sum
 [eva] Done for function sum
 [eva] Recording results for main2

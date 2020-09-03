@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/pointer_loop.i (no preprocessing)
+[kernel] Parsing pointer_loop.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -15,7 +15,7 @@
       [1] ∈ {0}
   ACtrl[0] ∈ {{ &Ctrl[0] }}
        [1] ∈ {{ &Ctrl[1] }}
-[eva] tests/value/pointer_loop.i:13: starting to merge loop iterations
+[eva] pointer_loop.i:13: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

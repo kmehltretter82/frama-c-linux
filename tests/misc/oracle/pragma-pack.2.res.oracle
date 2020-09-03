@@ -1,5 +1,5 @@
-[kernel] Parsing tests/misc/pragma-pack.c (with preprocessing)
-[kernel] tests/misc/pragma-pack.c:87: Warning: 
+[kernel] Parsing pragma-pack.c (with preprocessing)
+[kernel] pragma-pack.c:87: Warning: 
   ignoring #pragma pack(pop) with empty stack
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -7,11 +7,11 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function tests1 <- main.
-  Called from tests/misc/pragma-pack.c:38.
+  Called from pragma-pack.c:38.
 [eva] Recording results for tests1
 [eva] Done for function tests1
 [eva] computing for function tests2 <- main.
-  Called from tests/misc/pragma-pack.c:38.
+  Called from pragma-pack.c:38.
 [eva] Recording results for tests2
 [eva] Done for function tests2
 [eva] Recording results for main

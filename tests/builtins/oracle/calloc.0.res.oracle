@@ -1,45 +1,45 @@
-[kernel] Parsing tests/builtins/calloc.c (with preprocessing)
+[kernel] Parsing calloc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:14.
+  Called from calloc.c:14.
 [eva] using specification for function calloc
-[eva] tests/builtins/calloc.c:14: Warning: 
+[eva] calloc.c:14: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:17.
-[eva] tests/builtins/calloc.c:17: Warning: 
+  Called from calloc.c:17.
+[eva] calloc.c:17: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:20.
-[eva] tests/builtins/calloc.c:20: Warning: 
+  Called from calloc.c:20.
+[eva] calloc.c:20: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:23.
-[eva] tests/builtins/calloc.c:23: Warning: 
+  Called from calloc.c:23.
+[eva] calloc.c:23: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
-[eva:alarm] tests/builtins/calloc.c:26: Warning: 
+[eva:alarm] calloc.c:26: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:30.
-[eva] tests/builtins/calloc.c:30: Warning: 
+  Called from calloc.c:30.
+[eva] calloc.c:30: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
-[eva:alarm] tests/builtins/calloc.c:33: Warning: 
+[eva:alarm] calloc.c:33: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] computing for function calloc <- main.
-  Called from tests/builtins/calloc.c:38.
-[eva] tests/builtins/calloc.c:38: Warning: 
+  Called from calloc.c:38.
+[eva] calloc.c:38: Warning: 
   ignoring unsupported \allocates clause
 [eva] Done for function calloc
-[eva] tests/builtins/calloc.c:40: assertion got status valid.
+[eva] calloc.c:40: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

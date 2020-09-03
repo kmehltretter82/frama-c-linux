@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/summary.i (no preprocessing)
+[kernel] Parsing summary.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,64 +6,64 @@
   undet ∈ [--..--]
   volatile_d ∈ [--..--]
 [eva] computing for function alarms <- main.
-  Called from tests/value/summary.i:62.
-[eva:alarm] tests/value/summary.i:27: Warning: 
+  Called from summary.i:62.
+[eva:alarm] summary.i:27: Warning: 
   out of bounds read. assert \valid_read(p);
-[eva:alarm] tests/value/summary.i:29: Warning: 
+[eva:alarm] summary.i:29: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/value/summary.i:30: Warning: 
+[eva:alarm] summary.i:30: Warning: 
   accessing out of bounds index. assert 0 ≤ undet;
-[eva:alarm] tests/value/summary.i:30: Warning: 
+[eva:alarm] summary.i:30: Warning: 
   accessing out of bounds index. assert undet < 10;
-[eva:alarm] tests/value/summary.i:31: Warning: 
+[eva:alarm] summary.i:31: Warning: 
   division by zero. assert undet ≢ 0;
-[eva:alarm] tests/value/summary.i:32: Warning: 
+[eva:alarm] summary.i:32: Warning: 
   signed overflow. assert -2147483648 ≤ undet + undet;
-[eva:alarm] tests/value/summary.i:32: Warning: 
+[eva:alarm] summary.i:32: Warning: 
   signed overflow. assert undet + undet ≤ 2147483647;
-[eva:alarm] tests/value/summary.i:33: Warning: 
+[eva:alarm] summary.i:33: Warning: 
   invalid LHS operand for left shift. assert 0 ≤ undet;
-[eva:alarm] tests/value/summary.i:33: Warning: 
+[eva:alarm] summary.i:33: Warning: 
   invalid RHS operand for shift. assert 0 ≤ undet < 32;
-[eva:alarm] tests/value/summary.i:33: Warning: 
+[eva:alarm] summary.i:33: Warning: 
   signed overflow. assert undet << undet ≤ 2147483647;
-[eva:alarm] tests/value/summary.i:34: Warning: 
+[eva:alarm] summary.i:34: Warning: 
   non-finite double value. assert \is_finite(volatile_d);
-[eva:alarm] tests/value/summary.i:35: Warning: 
+[eva:alarm] summary.i:35: Warning: 
   non-finite double value. assert \is_finite(\sub_double(d, d));
-[eva:alarm] tests/value/summary.i:36: Warning: 
+[eva:alarm] summary.i:36: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < d;
-[eva:alarm] tests/value/summary.i:36: Warning: 
+[eva:alarm] summary.i:36: Warning: 
   overflow in conversion from floating-point to integer. assert d < 2147483648;
-[eva:alarm] tests/value/summary.i:39: Warning: 
+[eva:alarm] summary.i:39: Warning: 
   pointer subtraction. assert \base_addr(p) ≡ \base_addr(q);
-[eva:alarm] tests/value/summary.i:40: Warning: 
+[eva:alarm] summary.i:40: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)q);
-[eva:locals-escaping] tests/value/summary.i:43: Warning: 
+[eva:locals-escaping] summary.i:43: Warning: 
   locals {z} escaping the scope of a block of alarms through p
-[eva:alarm] tests/value/summary.i:45: Warning: 
+[eva:alarm] summary.i:45: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function logic <- main.
-  Called from tests/value/summary.i:63.
-[eva] tests/value/summary.i:53: assertion got status valid.
-[eva:alarm] tests/value/summary.i:54: Warning: assertion got status unknown.
-[eva:alarm] tests/value/summary.i:56: Warning: 
+  Called from summary.i:63.
+[eva] summary.i:53: assertion got status valid.
+[eva:alarm] summary.i:54: Warning: assertion got status unknown.
+[eva:alarm] summary.i:56: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for logic
 [eva] Done for function logic
 [eva] computing for function f <- main.
-  Called from tests/value/summary.i:64.
-[kernel:annot:missing-spec] tests/value/summary.i:64: Warning: 
+  Called from summary.i:64.
+[kernel:annot:missing-spec] summary.i:64: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [eva] using specification for function f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/value/summary.i:65.
-[kernel:annot:missing-spec] tests/value/summary.i:65: Warning: 
+  Called from summary.i:65.
+[kernel:annot:missing-spec] summary.i:65: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
 [eva] using specification for function g
 [eva] Done for function g

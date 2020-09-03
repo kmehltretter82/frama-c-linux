@@ -4,9 +4,9 @@
    OPT: -eva @EVA_CONFIG@ -main loop -journal-disable
 */
 /*
- * bin/viewer.byte -main f tests/scope/scope.c -eva
- * bin/viewer.byte -main f2 tests/scope/scope.c -eva
- * bin/viewer.byte -main loop tests/scope/scope.c -eva
+ * bin/viewer.byte -main f scope.c -eva
+ * bin/viewer.byte -main f2 scope.c -eva
+ * bin/viewer.byte -main loop scope.c -eva
  */
 
 #include "__fc_builtin.h"

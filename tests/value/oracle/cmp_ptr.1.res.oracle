@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/cmp_ptr.i (no preprocessing)
+[kernel] Parsing cmp_ptr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -33,66 +33,66 @@
   t ∈ {0}
   r ∈ {0}
   ff ∈ {0}
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   evaluating condition to {0; 1} instead of {0; 1} because of UPCPA
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   not reducing {{ &T + [-8589934588..8589934592],0%4 }} to {{ &T +
                                                               [20..8589934592],0%4 }} because of UPCPA
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva:alarm] tests/value/cmp_ptr.i:21: Warning: 
+[eva:alarm] cmp_ptr.i:21: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&T[5]));
-[eva:alarm] tests/value/cmp_ptr.i:21: Warning: 
+[eva:alarm] cmp_ptr.i:21: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/value/cmp_ptr.i:21: Warning: 
+[eva:alarm] cmp_ptr.i:21: Warning: 
   out of bounds write. assert \valid(q);
-[eva:pointer-comparison] tests/value/cmp_ptr.i:21: 
+[eva:pointer-comparison] cmp_ptr.i:21: 
   not reducing {{ &T + [-8589934588..8589934592],0%4 }} to {{ &T +
                                                               [-8589934588..16],0%4 }} because of UPCPA
-[eva:pointer-comparison] tests/value/cmp_ptr.i:22: 
+[eva:pointer-comparison] cmp_ptr.i:22: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/cmp_ptr.i:22: 
+[eva:pointer-comparison] cmp_ptr.i:22: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva:alarm] tests/value/cmp_ptr.i:22: Warning: 
+[eva:alarm] cmp_ptr.i:22: Warning: 
   pointer comparison. assert \pointer_comparable((void *)0, (void *)(&y + 2));
-[eva:alarm] tests/value/cmp_ptr.i:23: Warning: 
+[eva:alarm] cmp_ptr.i:23: Warning: 
   pointer downcast. assert (unsigned int)(&y + 2) ≤ 2147483647;
-[eva:pointer-comparison] tests/value/cmp_ptr.i:24: 
+[eva:pointer-comparison] cmp_ptr.i:24: 
   invalid pointer comparison: invalid pointer(s)
-[eva:alarm] tests/value/cmp_ptr.i:24: Warning: 
+[eva:alarm] cmp_ptr.i:24: Warning: 
   non-finite float value. assert \is_finite(ff);
-[eva:pointer-comparison] tests/value/cmp_ptr.i:28: 
+[eva:pointer-comparison] cmp_ptr.i:28: 
   invalid pointer comparison: invalid pointer(s)
-[eva:alarm] tests/value/cmp_ptr.i:28: Warning: 
+[eva:alarm] cmp_ptr.i:28: Warning: 
   pointer downcast.
   assert (unsigned int)tmp_0 ≤ 2147483647;
   (tmp_0 from u?& f:& g)
-[eva:alarm] tests/value/cmp_ptr.i:28: Warning: 
+[eva:alarm] cmp_ptr.i:28: Warning: 
   signed overflow.
   assert -2147483648 ≤ 1 + (int)tmp_0;
   (tmp_0 from u?& f:& g)
-[eva:alarm] tests/value/cmp_ptr.i:28: Warning: 
+[eva:alarm] cmp_ptr.i:28: Warning: 
   signed overflow. assert 1 + (int)tmp_0 ≤ 2147483647;
                    (tmp_0 from u?& f:& g)
-[eva:pointer-comparison] tests/value/cmp_ptr.i:30: 
+[eva:pointer-comparison] cmp_ptr.i:30: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/cmp_ptr.i:30: 
+[eva:pointer-comparison] cmp_ptr.i:30: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva:alarm] tests/value/cmp_ptr.i:30: Warning: 
+[eva:alarm] cmp_ptr.i:30: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)((int *)T - 1), (void *)0);
-[eva:pointer-comparison] tests/value/cmp_ptr.i:32: 
+[eva:pointer-comparison] cmp_ptr.i:32: 
   invalid pointer comparison: invalid pointer(s)
-[eva:pointer-comparison] tests/value/cmp_ptr.i:32: 
+[eva:pointer-comparison] cmp_ptr.i:32: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
-[eva:alarm] tests/value/cmp_ptr.i:32: Warning: 
+[eva:alarm] cmp_ptr.i:32: Warning: 
   pointer comparison.
   assert \pointer_comparable((void (*)())0, (void (*)())(&f + 3));
-[eva:pointer-comparison] tests/value/cmp_ptr.i:32: 
+[eva:pointer-comparison] cmp_ptr.i:32: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
 [eva] Recording results for main
 [eva] done for function main

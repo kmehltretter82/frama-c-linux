@@ -1,16 +1,16 @@
-[kernel] Parsing tests/builtins/free.c (with preprocessing)
+[kernel] Parsing free.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/builtins/free.c:44.
-[eva] tests/builtins/free.c:8: Call to builtin malloc
-[eva] tests/builtins/free.c:8: allocating variable __malloc_main1_l8
-[eva] tests/builtins/free.c:10: Call to builtin malloc
-[eva] tests/builtins/free.c:10: allocating variable __malloc_main1_l10
-[eva] tests/builtins/free.c:13: 
+  Called from free.c:44.
+[eva] free.c:8: Call to builtin malloc
+[eva] free.c:8: allocating variable __malloc_main1_l8
+[eva] free.c:10: Call to builtin malloc
+[eva] free.c:10: allocating variable __malloc_main1_l10
+[eva] free.c:13: 
   Frama_C_dump_each:
   # Cvalue domain:
   __fc_heap_status ∈ [--..--]
@@ -39,38 +39,38 @@
                     [2] ∈ {2}
                     [3..9] ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] tests/builtins/free.c:14: Call to builtin free
-[eva] tests/builtins/free.c:14: 
+[eva] free.c:14: Call to builtin free
+[eva] free.c:14: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/free.c:14: 
+[eva:malloc] free.c:14: 
   weak free on bases: {__malloc_main1_l8, __malloc_main1_l10}
-[eva] tests/builtins/free.c:16: Call to builtin malloc
-[eva] tests/builtins/free.c:16: allocating variable __malloc_main1_l16
-[eva] tests/builtins/free.c:18: Call to builtin free
-[eva] tests/builtins/free.c:18: 
+[eva] free.c:16: Call to builtin malloc
+[eva] free.c:16: allocating variable __malloc_main1_l16
+[eva] free.c:18: Call to builtin free
+[eva] free.c:18: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/free.c:18: 
+[eva:malloc] free.c:18: 
   strong free on bases: {__malloc_main1_l16}
-[eva] tests/builtins/free.c:21: Call to builtin free
-[eva] tests/builtins/free.c:21: 
+[eva] free.c:21: Call to builtin free
+[eva] free.c:21: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/free.c:21: strong free on bases: {}
-[eva] tests/builtins/free.c:23: Call to builtin malloc
-[eva] tests/builtins/free.c:23: allocating variable __malloc_main1_l23
-[eva] tests/builtins/free.c:26: Call to builtin free
-[eva] tests/builtins/free.c:26: 
+[eva:malloc] free.c:21: strong free on bases: {}
+[eva] free.c:23: Call to builtin malloc
+[eva] free.c:23: allocating variable __malloc_main1_l23
+[eva] free.c:26: Call to builtin free
+[eva] free.c:26: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/free.c:26: weak free on bases: {__malloc_main1_l23}
+[eva:malloc] free.c:26: weak free on bases: {__malloc_main1_l23}
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/builtins/free.c:45.
-[eva] tests/builtins/free.c:35: Call to builtin malloc
-[eva] tests/builtins/free.c:35: allocating variable __malloc_main2_l35
-[eva] tests/builtins/free.c:39: Call to builtin free
-[eva] tests/builtins/free.c:39: 
+  Called from free.c:45.
+[eva] free.c:35: Call to builtin malloc
+[eva] free.c:35: allocating variable __malloc_main2_l35
+[eva] free.c:39: Call to builtin free
+[eva] free.c:39: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] tests/builtins/free.c:39: 
+[eva:malloc] free.c:39: 
   strong free on bases: {__malloc_main2_l35}
 [eva] Recording results for main2
 [eva] Done for function main2

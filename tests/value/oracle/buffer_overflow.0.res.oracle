@@ -1,11 +1,11 @@
-[kernel] Parsing tests/value/buffer_overflow.i (no preprocessing)
+[kernel] Parsing buffer_overflow.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/value/buffer_overflow.i:15: starting to merge loop iterations
-[eva:alarm] tests/value/buffer_overflow.i:18: Warning: 
+[eva] buffer_overflow.i:15: starting to merge loop iterations
+[eva:alarm] buffer_overflow.i:18: Warning: 
   accessing out of bounds index. assert loop_counter < 10;
 [eva] Recording results for main
 [eva] done for function main

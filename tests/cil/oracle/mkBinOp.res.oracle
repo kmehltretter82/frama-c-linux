@@ -1,4 +1,4 @@
-[kernel] Parsing tests/cil/mkBinOp.i (no preprocessing)
+[kernel] Parsing mkBinOp.i (no preprocessing)
 TEST 1: (void *)0 == (void *)0
 TEST 1 (safe ptr cmp): (void *)0 == (void *)0
 TEST 2: (void *)0 == (void *)0

@@ -1,30 +1,30 @@
-[kernel] Parsing tests/spec/array_typedef.c (with preprocessing)
+[kernel] Parsing array_typedef.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function create_msg <- main.
-  Called from tests/spec/array_typedef.c:35.
+  Called from array_typedef.c:35.
 [eva] computing for function host_address <- create_msg <- main.
-  Called from tests/spec/array_typedef.c:25.
+  Called from array_typedef.c:25.
 [eva] Recording results for host_address
 [eva] Done for function host_address
 [eva] computing for function host_address <- create_msg <- main.
-  Called from tests/spec/array_typedef.c:26.
+  Called from array_typedef.c:26.
 [eva] Recording results for host_address
 [eva] Done for function host_address
-[eva] tests/spec/array_typedef.c:27: assertion got status valid.
-[eva] tests/spec/array_typedef.c:28: assertion got status valid.
-[eva] tests/spec/array_typedef.c:29: assertion got status valid.
+[eva] array_typedef.c:27: assertion got status valid.
+[eva] array_typedef.c:28: assertion got status valid.
+[eva] array_typedef.c:29: assertion got status valid.
 [eva] Recording results for create_msg
 [eva] Done for function create_msg
 [eva] computing for function send_msg <- main.
-  Called from tests/spec/array_typedef.c:36.
+  Called from array_typedef.c:36.
 [eva] computing for function send_addr <- send_msg <- main.
-  Called from tests/spec/array_typedef.c:15.
+  Called from array_typedef.c:15.
 [eva] using specification for function send_addr
-[eva] tests/spec/array_typedef.c:12: Warning: 
+[eva] array_typedef.c:12: Warning: 
   no \from part for clause 'assigns \empty;'
 [eva] Done for function send_addr
 [eva] Recording results for send_msg

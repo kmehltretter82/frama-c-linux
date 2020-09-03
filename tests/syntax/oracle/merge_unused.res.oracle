@@ -1,5 +1,5 @@
-[kernel] Parsing tests/syntax/merge_unused.c (with preprocessing)
-[kernel] Parsing tests/syntax/merge_unused_2.c (with preprocessing)
+[kernel] Parsing merge_unused.c (with preprocessing)
+[kernel] Parsing merge_unused_2.c (with preprocessing)
 [kernel:linker:drop-conflicting-unused] Warning: 
   Incompatible declaration for G1:
   Definitions of struct s are not isomorphic. Reason follows:
@@ -13,8 +13,8 @@
      int i ;
   };
   
-  First declaration was at tests/syntax/merge_unused.c:11
-  Current declaration is at tests/syntax/merge_unused.h:7
+  First declaration was at merge_unused.c:11
+  Current declaration is at merge_unused.h:7
   Current declaration is unused, silently removing it
 [kernel] User Error: Incompatible declaration for G3:
   Definitions of struct s are not isomorphic. Reason follows:
@@ -28,6 +28,6 @@
      int i ;
   };
   
-  First declaration was at tests/syntax/merge_unused.h:9
-  Current declaration is at tests/syntax/merge_unused.h:9
+  First declaration was at merge_unused.h:9
+  Current declaration is at merge_unused.h:9
 [kernel] Frama-C aborted: invalid user input.

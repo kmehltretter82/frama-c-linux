@@ -1,4 +1,4 @@
-[kernel] Parsing tests/builtins/strchr.c (with preprocessing)
+[kernel] Parsing strchr.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -19,667 +19,667 @@
   strchr_misc_static_str ∈ {0}
   strchr_misc_zero_str ∈ {0}
 [eva] computing for function strchr_small_sets <- main.
-  Called from tests/builtins/strchr.c:546.
-[eva] tests/builtins/strchr.c:88: Call to builtin strchr
-[eva] tests/builtins/strchr.c:88: 
+  Called from strchr.c:546.
+[eva] strchr.c:88: Call to builtin strchr
+[eva] strchr.c:88: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:88: Frama_C_show_each_mystrchr: {3}
-[eva] tests/builtins/strchr.c:89: assertion got status valid.
-[eva] tests/builtins/strchr.c:92: Call to builtin strchr
-[eva] tests/builtins/strchr.c:92: 
+[eva] strchr.c:88: Frama_C_show_each_mystrchr: {3}
+[eva] strchr.c:89: assertion got status valid.
+[eva] strchr.c:92: Call to builtin strchr
+[eva] strchr.c:92: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:92: Frama_C_show_each_mystrchr: {0; 3}
-[eva] tests/builtins/strchr.c:93: assertion got status valid.
-[eva] tests/builtins/strchr.c:95: Call to builtin strchr
-[eva] tests/builtins/strchr.c:95: 
+[eva] strchr.c:92: Frama_C_show_each_mystrchr: {0; 3}
+[eva] strchr.c:93: assertion got status valid.
+[eva] strchr.c:95: Call to builtin strchr
+[eva] strchr.c:95: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:95: Frama_C_show_each_mystrchr: {0}
-[eva] tests/builtins/strchr.c:96: assertion got status valid.
-[eva] tests/builtins/strchr.c:99: Call to builtin strchr
-[eva] tests/builtins/strchr.c:99: 
+[eva] strchr.c:95: Frama_C_show_each_mystrchr: {0}
+[eva] strchr.c:96: assertion got status valid.
+[eva] strchr.c:99: Call to builtin strchr
+[eva] strchr.c:99: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:99: Frama_C_show_each_mystrchr: {1; 3}
-[eva] tests/builtins/strchr.c:100: assertion got status valid.
-[eva] tests/builtins/strchr.c:104: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:104: Warning: 
+[eva] strchr.c:99: Frama_C_show_each_mystrchr: {1; 3}
+[eva] strchr.c:100: assertion got status valid.
+[eva] strchr.c:104: Call to builtin strchr
+[eva:alarm] strchr.c:104: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:104: Frama_C_show_each_mystrchr: {0; 1}
-[eva] tests/builtins/strchr.c:105: assertion got status valid.
+[eva] strchr.c:104: Frama_C_show_each_mystrchr: {0; 1}
+[eva] strchr.c:105: assertion got status valid.
 [eva] Recording results for strchr_small_sets
 [eva] Done for function strchr_small_sets
 [eva] computing for function strchr_zero_termination <- main.
-  Called from tests/builtins/strchr.c:547.
-[eva] tests/builtins/strchr.c:113: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:113: Warning: 
+  Called from strchr.c:547.
+[eva] strchr.c:113: Call to builtin strchr
+[eva:alarm] strchr.c:113: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:113: Frama_C_show_each_mystrchr: {0}
-[eva] tests/builtins/strchr.c:114: assertion got status valid.
-[eva] tests/builtins/strchr.c:118: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:118: Warning: 
+[eva] strchr.c:113: Frama_C_show_each_mystrchr: {0}
+[eva] strchr.c:114: assertion got status valid.
+[eva] strchr.c:118: Call to builtin strchr
+[eva:alarm] strchr.c:118: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strchr.c:124: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:124: Warning: 
+[eva] strchr.c:124: Call to builtin strchr
+[eva:alarm] strchr.c:124: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for strchr_zero_termination
 [eva] Done for function strchr_zero_termination
 [eva] computing for function strchr_initialization <- main.
-  Called from tests/builtins/strchr.c:548.
-[eva] tests/builtins/strchr.c:132: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:132: Warning: 
+  Called from strchr.c:548.
+[eva] strchr.c:132: Call to builtin strchr
+[eva:alarm] strchr.c:132: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:132: Frama_C_show_each_mystrchr: {0}
-[eva] tests/builtins/strchr.c:133: assertion got status valid.
-[eva] tests/builtins/strchr.c:136: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:136: Warning: 
+[eva] strchr.c:132: Frama_C_show_each_mystrchr: {0}
+[eva] strchr.c:133: assertion got status valid.
+[eva] strchr.c:136: Call to builtin strchr
+[eva:alarm] strchr.c:136: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strchr.c:141: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:141: Warning: 
+[eva] strchr.c:141: Call to builtin strchr
+[eva:alarm] strchr.c:141: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:141: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:142: assertion got status valid.
-[eva] tests/builtins/strchr.c:148: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:148: Warning: 
+[eva] strchr.c:141: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:142: assertion got status valid.
+[eva] strchr.c:148: Call to builtin strchr
+[eva:alarm] strchr.c:148: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:148: Frama_C_show_each_mystrchr: {3}
-[eva] tests/builtins/strchr.c:149: assertion got status valid.
+[eva] strchr.c:148: Frama_C_show_each_mystrchr: {3}
+[eva] strchr.c:149: assertion got status valid.
 [eva] Recording results for strchr_initialization
 [eva] Done for function strchr_initialization
 [eva] computing for function strchr_large <- main.
-  Called from tests/builtins/strchr.c:549.
+  Called from strchr.c:549.
 [eva] computing for function init_array_nondet <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:197.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
-[eva] tests/builtins/strchr.c:189: 
+  Called from strchr.c:197.
+[eva] strchr.c:189: Call to builtin memset
+[eva] strchr.c:189: 
   function memset: precondition 'valid_s' got status valid.
 [eva] share/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:200.
+  Called from strchr.c:200.
 [eva] using specification for function Frama_C_interval
-[eva] tests/builtins/strchr.c:200: 
+[eva] strchr.c:200: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:201: Call to builtin strchr
-[eva] tests/builtins/strchr.c:201: 
+[eva] strchr.c:201: Call to builtin strchr
+[eva] strchr.c:201: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:201: Frama_C_show_each_mystrchr: {20; 75}
-[eva] tests/builtins/strchr.c:202: assertion got status valid.
+[eva] strchr.c:201: Frama_C_show_each_mystrchr: {20; 75}
+[eva] strchr.c:202: assertion got status valid.
 [eva] computing for function Frama_C_interval <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:204.
-[eva] tests/builtins/strchr.c:204: 
+  Called from strchr.c:204.
+[eva] strchr.c:204: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:205: Call to builtin strchr
-[eva] tests/builtins/strchr.c:205: 
+[eva] strchr.c:205: Call to builtin strchr
+[eva] strchr.c:205: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:205: Frama_C_show_each_mystrchr: {20}
-[eva] tests/builtins/strchr.c:206: assertion got status valid.
-[eva] tests/builtins/strchr.c:207: assertion 'refined' got status valid.
+[eva] strchr.c:205: Frama_C_show_each_mystrchr: {20}
+[eva] strchr.c:206: assertion got status valid.
+[eva] strchr.c:207: assertion 'refined' got status valid.
 [eva] computing for function Frama_C_interval <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:209.
-[eva] tests/builtins/strchr.c:209: 
+  Called from strchr.c:209.
+[eva] strchr.c:209: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:210: Call to builtin strchr
-[eva] tests/builtins/strchr.c:210: 
+[eva] strchr.c:210: Call to builtin strchr
+[eva] strchr.c:210: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:210: Frama_C_show_each_mystrchr: {75}
-[eva] tests/builtins/strchr.c:211: assertion got status valid.
-[eva] tests/builtins/strchr.c:212: assertion 'refined' got status valid.
+[eva] strchr.c:210: Frama_C_show_each_mystrchr: {75}
+[eva] strchr.c:211: assertion got status valid.
+[eva] strchr.c:212: assertion 'refined' got status valid.
 [eva] computing for function Frama_C_interval <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:214.
-[eva] tests/builtins/strchr.c:214: 
+  Called from strchr.c:214.
+[eva] strchr.c:214: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:215: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:215: Warning: 
+[eva] strchr.c:215: Call to builtin strchr
+[eva:alarm] strchr.c:215: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:215: Frama_C_show_each_mystrchr: {75}
-[eva] tests/builtins/strchr.c:216: assertion got status valid.
-[eva] tests/builtins/strchr.c:217: assertion 'refined' got status valid.
+[eva] strchr.c:215: Frama_C_show_each_mystrchr: {75}
+[eva] strchr.c:216: assertion got status valid.
+[eva] strchr.c:217: assertion 'refined' got status valid.
 [eva] computing for function init_array_nondet <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:219.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:219.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strchr_large <- main.
-  Called from tests/builtins/strchr.c:220.
-[eva] tests/builtins/strchr.c:220: 
+  Called from strchr.c:220.
+[eva] strchr.c:220: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:221: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:221: Warning: 
+[eva] strchr.c:221: Call to builtin strchr
+[eva:alarm] strchr.c:221: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:221: Frama_C_show_each_mystrchr: [50..99]
-[eva] tests/builtins/strchr.c:222: assertion got status valid.
+[eva] strchr.c:221: Frama_C_show_each_mystrchr: [50..99]
+[eva] strchr.c:222: assertion got status valid.
 [eva] Recording results for strchr_large
 [eva] Done for function strchr_large
 [eva] computing for function strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:550.
+  Called from strchr.c:550.
 [eva] computing for function init_array_nondet <- strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:229.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:229.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function init_array_nondet <- strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:230.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:230.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:234.
-[eva] tests/builtins/strchr.c:234: 
+  Called from strchr.c:234.
+[eva] strchr.c:234: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:235: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:235: Warning: 
+[eva] strchr.c:235: Call to builtin strchr
+[eva:alarm] strchr.c:235: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:235: Frama_C_show_each_mystrchr: {20}
-[eva] tests/builtins/strchr.c:236: assertion got status valid.
-[eva] tests/builtins/strchr.c:237: assertion 'refined' got status valid.
+[eva] strchr.c:235: Frama_C_show_each_mystrchr: {20}
+[eva] strchr.c:236: assertion got status valid.
+[eva] strchr.c:237: assertion 'refined' got status valid.
 [eva] computing for function Frama_C_interval <- strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:240.
-[eva] tests/builtins/strchr.c:240: 
+  Called from strchr.c:240.
+[eva] strchr.c:240: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:241: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:241: Warning: 
+[eva] strchr.c:241: Call to builtin strchr
+[eva:alarm] strchr.c:241: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:241: Frama_C_show_each_mystrchr: {75}
-[eva] tests/builtins/strchr.c:242: assertion got status valid.
-[eva] tests/builtins/strchr.c:243: assertion 'refined' got status valid.
+[eva] strchr.c:241: Frama_C_show_each_mystrchr: {75}
+[eva] strchr.c:242: assertion got status valid.
+[eva] strchr.c:243: assertion 'refined' got status valid.
 [eva] computing for function Frama_C_interval <- strchr_large_uninit <- main.
-  Called from tests/builtins/strchr.c:245.
-[eva] tests/builtins/strchr.c:245: 
+  Called from strchr.c:245.
+[eva] strchr.c:245: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:246: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:246: Warning: 
+[eva] strchr.c:246: Call to builtin strchr
+[eva:alarm] strchr.c:246: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:246: Frama_C_show_each_mystrchr: {75}
-[eva] tests/builtins/strchr.c:247: assertion got status valid.
-[eva] tests/builtins/strchr.c:248: assertion 'refined' got status valid.
+[eva] strchr.c:246: Frama_C_show_each_mystrchr: {75}
+[eva] strchr.c:247: assertion got status valid.
+[eva] strchr.c:248: assertion 'refined' got status valid.
 [eva] Recording results for strchr_large_uninit
 [eva] Done for function strchr_large_uninit
 [eva] computing for function strchr_misc_array <- main.
-  Called from tests/builtins/strchr.c:551.
+  Called from strchr.c:551.
 [eva] computing for function Frama_C_interval <- strchr_misc_array <- main.
-  Called from tests/builtins/strchr.c:270.
-[eva] tests/builtins/strchr.c:270: 
+  Called from strchr.c:270.
+[eva] strchr.c:270: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/builtins/strchr.c:271: Call to builtin strchr
-[eva] tests/builtins/strchr.c:271: 
+[eva] strchr.c:271: Call to builtin strchr
+[eva] strchr.c:271: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:alarm] tests/builtins/strchr.c:271: Warning: 
+[eva:alarm] strchr.c:271: Warning: 
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(tab_str[i]);
-[eva] tests/builtins/strchr.c:271: Frama_C_show_each_mystrchr: [0..13]
-[eva] tests/builtins/strchr.c:272: assertion got status valid.
+[eva] strchr.c:271: Frama_C_show_each_mystrchr: [0..13]
+[eva] strchr.c:272: assertion got status valid.
 [eva] Recording results for strchr_misc_array
 [eva] Done for function strchr_misc_array
 [eva] computing for function strchr_misc <- main.
-  Called from tests/builtins/strchr.c:552.
-[eva] tests/builtins/strchr.c:301: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:301: Warning: 
+  Called from strchr.c:552.
+[eva] strchr.c:301: Call to builtin strchr
+[eva:alarm] strchr.c:301: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strchr.c:304: Call to builtin strchr
-[eva] tests/builtins/strchr.c:304: 
+[eva] strchr.c:304: Call to builtin strchr
+[eva] strchr.c:304: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:alarm] tests/builtins/strchr.c:304: Warning: 
+[eva:alarm] strchr.c:304: Warning: 
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(str);
-[eva] tests/builtins/strchr.c:304: Frama_C_show_each_mystrchr: {12; 14}
-[eva] tests/builtins/strchr.c:305: assertion got status valid.
-[eva] tests/builtins/strchr.c:307: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:307: Warning: 
+[eva] strchr.c:304: Frama_C_show_each_mystrchr: {12; 14}
+[eva] strchr.c:305: assertion got status valid.
+[eva] strchr.c:307: Call to builtin strchr
+[eva:alarm] strchr.c:307: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:307: Frama_C_show_each_mystrchr2: {0}
-[eva] tests/builtins/strchr.c:308: assertion got status valid.
-[eva] tests/builtins/strchr.c:310: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:310: Warning: 
+[eva] strchr.c:307: Frama_C_show_each_mystrchr2: {0}
+[eva] strchr.c:308: assertion got status valid.
+[eva] strchr.c:310: Call to builtin strchr
+[eva:alarm] strchr.c:310: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
-[eva] tests/builtins/strchr.c:311: Call to builtin strchr
-[eva] tests/builtins/strchr.c:311: 
+[eva] strchr.c:311: Call to builtin strchr
+[eva] strchr.c:311: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:311: Frama_C_show_each_mystrchr: {3}
-[eva] tests/builtins/strchr.c:312: assertion got status valid.
-[eva] tests/builtins/strchr.c:313: Call to builtin strchr
-[eva] tests/builtins/strchr.c:313: 
+[eva] strchr.c:311: Frama_C_show_each_mystrchr: {3}
+[eva] strchr.c:312: assertion got status valid.
+[eva] strchr.c:313: Call to builtin strchr
+[eva] strchr.c:313: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:313: Frama_C_show_each_mystrchr: {4}
-[eva] tests/builtins/strchr.c:314: assertion got status valid.
-[eva] tests/builtins/strchr.c:315: Call to builtin strchr
-[eva] tests/builtins/strchr.c:315: 
+[eva] strchr.c:313: Frama_C_show_each_mystrchr: {4}
+[eva] strchr.c:314: assertion got status valid.
+[eva] strchr.c:315: Call to builtin strchr
+[eva] strchr.c:315: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:315: Frama_C_show_each_mystrchr: {5}
-[eva] tests/builtins/strchr.c:316: assertion got status valid.
-[eva] tests/builtins/strchr.c:317: Call to builtin strchr
-[eva] tests/builtins/strchr.c:317: 
+[eva] strchr.c:315: Frama_C_show_each_mystrchr: {5}
+[eva] strchr.c:316: assertion got status valid.
+[eva] strchr.c:317: Call to builtin strchr
+[eva] strchr.c:317: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:317: Frama_C_show_each_mystrchr: {9}
-[eva] tests/builtins/strchr.c:318: assertion got status valid.
+[eva] strchr.c:317: Frama_C_show_each_mystrchr: {9}
+[eva] strchr.c:318: assertion got status valid.
 [eva] Recording results for strchr_misc
 [eva] Done for function strchr_misc
 [eva] computing for function strchr_misc2 <- main.
-  Called from tests/builtins/strchr.c:553.
-[eva] tests/builtins/strchr.c:326: Call to builtin strchr
-[eva] tests/builtins/strchr.c:326: 
+  Called from strchr.c:553.
+[eva] strchr.c:326: Call to builtin strchr
+[eva] strchr.c:326: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:alarm] tests/builtins/strchr.c:326: Warning: 
+[eva:alarm] strchr.c:326: Warning: 
   pointer subtraction. assert \base_addr(_s) ≡ \base_addr(s1);
-[eva] tests/builtins/strchr.c:326: Frama_C_show_each_mystrchr2: {3; 4}
-[eva] tests/builtins/strchr.c:327: assertion got status valid.
-[eva] tests/builtins/strchr.c:330: Call to builtin strchr
-[eva] tests/builtins/strchr.c:330: 
+[eva] strchr.c:326: Frama_C_show_each_mystrchr2: {3; 4}
+[eva] strchr.c:327: assertion got status valid.
+[eva] strchr.c:330: Call to builtin strchr
+[eva] strchr.c:330: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:alarm] tests/builtins/strchr.c:330: Warning: 
+[eva:alarm] strchr.c:330: Warning: 
   pointer subtraction. assert \base_addr(_s_0) ≡ \base_addr(s1);
-[eva] tests/builtins/strchr.c:330: Frama_C_show_each_mystrchr2: {3; 4}
-[eva] tests/builtins/strchr.c:331: assertion got status valid.
-[eva] tests/builtins/strchr.c:335: Call to builtin strchr
-[eva] tests/builtins/strchr.c:335: 
+[eva] strchr.c:330: Frama_C_show_each_mystrchr2: {3; 4}
+[eva] strchr.c:331: assertion got status valid.
+[eva] strchr.c:335: Call to builtin strchr
+[eva] strchr.c:335: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:alarm] tests/builtins/strchr.c:335: Warning: 
+[eva:alarm] strchr.c:335: Warning: 
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(s1);
-[eva] tests/builtins/strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
-[eva] tests/builtins/strchr.c:336: assertion got status valid.
-[eva] tests/builtins/strchr.c:334: starting to merge loop iterations
-[eva] tests/builtins/strchr.c:335: Call to builtin strchr
-[eva] tests/builtins/strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
-[eva] tests/builtins/strchr.c:335: Call to builtin strchr
-[eva] tests/builtins/strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
-[eva] tests/builtins/strchr.c:335: Call to builtin strchr
-[eva] tests/builtins/strchr.c:335: Frama_C_show_each_mystrchr: {3; 4; 7; 8}
-[eva] tests/builtins/strchr.c:342: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:342: Warning: 
+[eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
+[eva] strchr.c:336: assertion got status valid.
+[eva] strchr.c:334: starting to merge loop iterations
+[eva] strchr.c:335: Call to builtin strchr
+[eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
+[eva] strchr.c:335: Call to builtin strchr
+[eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
+[eva] strchr.c:335: Call to builtin strchr
+[eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4; 7; 8}
+[eva] strchr.c:342: Call to builtin strchr
+[eva:alarm] strchr.c:342: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:342: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:343: assertion got status valid.
+[eva] strchr.c:342: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:343: assertion got status valid.
 [eva] Recording results for strchr_misc2
 [eva] Done for function strchr_misc2
 [eva] computing for function strchr_bitfields <- main.
-  Called from tests/builtins/strchr.c:554.
-[eva] tests/builtins/strchr.c:166: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:166: Warning: 
+  Called from strchr.c:554.
+[eva] strchr.c:166: Call to builtin strchr
+[eva:alarm] strchr.c:166: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for strchr_bitfields
 [eva] Done for function strchr_bitfields
 [eva] computing for function strchr_bitfields2 <- main.
-  Called from tests/builtins/strchr.c:555.
-[eva] tests/builtins/strchr.c:183: Call to builtin strchr
-[eva] tests/builtins/strchr.c:183: 
+  Called from strchr.c:555.
+[eva] strchr.c:183: Call to builtin strchr
+[eva] strchr.c:183: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:183: Frama_C_show_each_mystrchr: {2}
-[eva] tests/builtins/strchr.c:184: assertion got status valid.
+[eva] strchr.c:183: Frama_C_show_each_mystrchr: {2}
+[eva] strchr.c:184: assertion got status valid.
 [eva] Recording results for strchr_bitfields2
 [eva] Done for function strchr_bitfields2
 [eva] computing for function strchr_escaping <- main.
-  Called from tests/builtins/strchr.c:556.
-[eva:alarm] tests/builtins/strchr.c:258: Warning: 
+  Called from strchr.c:556.
+[eva:alarm] strchr.c:258: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:locals-escaping] tests/builtins/strchr.c:258: Warning: 
+[eva:locals-escaping] strchr.c:258: Warning: 
   locals {x} escaping the scope of a block of strchr_escaping through s
-[eva] tests/builtins/strchr.c:261: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:261: Warning: 
+[eva] strchr.c:261: Call to builtin strchr
+[eva:alarm] strchr.c:261: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:261: Frama_C_show_each_mystrchr: {0}
-[eva] tests/builtins/strchr.c:262: assertion got status valid.
-[eva] tests/builtins/strchr.c:264: Call to builtin strchr
-[eva] tests/builtins/strchr.c:264: 
+[eva] strchr.c:261: Frama_C_show_each_mystrchr: {0}
+[eva] strchr.c:262: assertion got status valid.
+[eva] strchr.c:264: Call to builtin strchr
+[eva] strchr.c:264: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:264: Frama_C_show_each_mystrchr: {0}
-[eva] tests/builtins/strchr.c:265: assertion got status valid.
+[eva] strchr.c:264: Frama_C_show_each_mystrchr: {0}
+[eva] strchr.c:265: assertion got status valid.
 [eva] Recording results for strchr_escaping
 [eva] Done for function strchr_escaping
 [eva] computing for function strchr_big_array <- main.
-  Called from tests/builtins/strchr.c:557.
-[eva:alarm] tests/builtins/strchr.c:353: Warning: 
+  Called from strchr.c:557.
+[eva:alarm] strchr.c:353: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strchr.c:355: Warning: 
+[eva:alarm] strchr.c:355: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strchr.c:357: Warning: 
+[eva:alarm] strchr.c:357: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/builtins/strchr.c:366: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:366: Warning: 
+[eva] strchr.c:366: Call to builtin strchr
+[eva:alarm] strchr.c:366: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:366: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:367: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:367: Warning: 
+[eva] strchr.c:366: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:367: Call to builtin strchr
+[eva:alarm] strchr.c:367: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:367: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:368: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:368: Warning: 
+[eva] strchr.c:367: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:368: Call to builtin strchr
+[eva:alarm] strchr.c:368: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:368: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:369: Frama_C_show_each: {1}, {1}, {1}
-[eva] tests/builtins/strchr.c:370: assertion got status valid.
-[eva] tests/builtins/strchr.c:371: assertion got status valid.
-[eva] tests/builtins/strchr.c:372: assertion got status valid.
-[eva] tests/builtins/strchr.c:374: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:374: Warning: 
+[eva] strchr.c:368: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:369: Frama_C_show_each: {1}, {1}, {1}
+[eva] strchr.c:370: assertion got status valid.
+[eva] strchr.c:371: assertion got status valid.
+[eva] strchr.c:372: assertion got status valid.
+[eva] strchr.c:374: Call to builtin strchr
+[eva:alarm] strchr.c:374: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:374: Frama_C_show_each_mystrchr: [1..797],1%4
-[eva] tests/builtins/strchr.c:375: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:375: Warning: 
+[eva] strchr.c:374: Frama_C_show_each_mystrchr: [1..797],1%4
+[eva] strchr.c:375: Call to builtin strchr
+[eva:alarm] strchr.c:375: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:375: Frama_C_show_each_mystrchr: [1..801],1%4
-[eva] tests/builtins/strchr.c:376: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:376: Warning: 
+[eva] strchr.c:375: Frama_C_show_each_mystrchr: [1..801],1%4
+[eva] strchr.c:376: Call to builtin strchr
+[eva:alarm] strchr.c:376: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:376: Frama_C_show_each_mystrchr: [1..3999997],1%4
-[eva] tests/builtins/strchr.c:377: 
+[eva] strchr.c:376: Frama_C_show_each_mystrchr: [1..3999997],1%4
+[eva] strchr.c:377: 
   Frama_C_show_each: [1..797],1%4, [1..801],1%4, [1..3999997],1%4
-[eva] tests/builtins/strchr.c:378: assertion got status valid.
-[eva] tests/builtins/strchr.c:379: assertion got status valid.
-[eva] tests/builtins/strchr.c:380: assertion got status valid.
-[eva:alarm] tests/builtins/strchr.c:381: Warning: 
+[eva] strchr.c:378: assertion got status valid.
+[eva] strchr.c:379: assertion got status valid.
+[eva] strchr.c:380: assertion got status valid.
+[eva:alarm] strchr.c:381: Warning: 
   assertion 'refined' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:382: Warning: 
+[eva:alarm] strchr.c:382: Warning: 
   assertion 'refined' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:383: Warning: 
+[eva:alarm] strchr.c:383: Warning: 
   assertion 'refined' got status unknown.
 [eva] computing for function init_array_nondet <- strchr_big_array <- main.
-  Called from tests/builtins/strchr.c:385.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:385.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function init_array_nondet <- strchr_big_array <- main.
-  Called from tests/builtins/strchr.c:386.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:386.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function init_array_nondet <- strchr_big_array <- main.
-  Called from tests/builtins/strchr.c:387.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:387.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
-[eva:alarm] tests/builtins/strchr.c:389: Warning: 
+[eva:alarm] strchr.c:389: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strchr.c:391: Warning: 
+[eva:alarm] strchr.c:391: Warning: 
   out of bounds write. assert \valid(p);
-[eva:alarm] tests/builtins/strchr.c:393: Warning: 
+[eva:alarm] strchr.c:393: Warning: 
   out of bounds write. assert \valid(p);
-[eva] tests/builtins/strchr.c:394: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:394: Warning: 
+[eva] strchr.c:394: Call to builtin strchr
+[eva:alarm] strchr.c:394: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:394: Frama_C_show_each_mystrchr: [0..799]
-[eva] tests/builtins/strchr.c:395: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:395: Warning: 
+[eva] strchr.c:394: Frama_C_show_each_mystrchr: [0..799]
+[eva] strchr.c:395: Call to builtin strchr
+[eva:alarm] strchr.c:395: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:395: Frama_C_show_each_mystrchr: [0..803]
-[eva] tests/builtins/strchr.c:396: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:396: Warning: 
+[eva] strchr.c:395: Frama_C_show_each_mystrchr: [0..803]
+[eva] strchr.c:396: Call to builtin strchr
+[eva:alarm] strchr.c:396: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:396: Frama_C_show_each_mystrchr: [0..3999999]
-[eva] tests/builtins/strchr.c:397: 
+[eva] strchr.c:396: Frama_C_show_each_mystrchr: [0..3999999]
+[eva] strchr.c:397: 
   Frama_C_show_each: [0..799], [0..803], [0..3999999]
-[eva] tests/builtins/strchr.c:398: assertion got status valid.
-[eva] tests/builtins/strchr.c:399: assertion got status valid.
-[eva] tests/builtins/strchr.c:400: assertion got status valid.
-[eva] tests/builtins/strchr.c:402: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:402: Warning: 
+[eva] strchr.c:398: assertion got status valid.
+[eva] strchr.c:399: assertion got status valid.
+[eva] strchr.c:400: assertion got status valid.
+[eva] strchr.c:402: Call to builtin strchr
+[eva:alarm] strchr.c:402: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:402: Frama_C_show_each_mystrchr: [0..799]
-[eva] tests/builtins/strchr.c:403: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:403: Warning: 
+[eva] strchr.c:402: Frama_C_show_each_mystrchr: [0..799]
+[eva] strchr.c:403: Call to builtin strchr
+[eva:alarm] strchr.c:403: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:403: Frama_C_show_each_mystrchr: [0..803]
-[eva] tests/builtins/strchr.c:404: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:404: Warning: 
+[eva] strchr.c:403: Frama_C_show_each_mystrchr: [0..803]
+[eva] strchr.c:404: Call to builtin strchr
+[eva:alarm] strchr.c:404: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:404: Frama_C_show_each_mystrchr: [0..3999999]
-[eva] tests/builtins/strchr.c:405: 
+[eva] strchr.c:404: Frama_C_show_each_mystrchr: [0..3999999]
+[eva] strchr.c:405: 
   Frama_C_show_each: [0..799], [0..803], [0..3999999]
-[eva] tests/builtins/strchr.c:406: assertion got status valid.
-[eva] tests/builtins/strchr.c:407: assertion got status valid.
-[eva] tests/builtins/strchr.c:408: assertion got status valid.
-[eva] tests/builtins/strchr.c:409: assertion 'refined' got status valid.
-[eva] tests/builtins/strchr.c:410: assertion 'refined' got status valid.
-[eva] tests/builtins/strchr.c:411: assertion 'refined' got status valid.
+[eva] strchr.c:406: assertion got status valid.
+[eva] strchr.c:407: assertion got status valid.
+[eva] strchr.c:408: assertion got status valid.
+[eva] strchr.c:409: assertion 'refined' got status valid.
+[eva] strchr.c:410: assertion 'refined' got status valid.
+[eva] strchr.c:411: assertion 'refined' got status valid.
 [eva] Recording results for strchr_big_array
 [eva] Done for function strchr_big_array
 [eva] computing for function strchr_no_zero_but_ok <- main.
-  Called from tests/builtins/strchr.c:558.
-[eva] tests/builtins/strchr.c:422: Call to builtin strchr
-[eva] tests/builtins/strchr.c:422: 
+  Called from strchr.c:558.
+[eva] strchr.c:422: Call to builtin strchr
+[eva] strchr.c:422: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:422: Frama_C_show_each_mystrchr: {10}
-[eva] tests/builtins/strchr.c:423: assertion got status valid.
-[eva] tests/builtins/strchr.c:424: Call to builtin strchr
-[eva] tests/builtins/strchr.c:424: 
+[eva] strchr.c:422: Frama_C_show_each_mystrchr: {10}
+[eva] strchr.c:423: assertion got status valid.
+[eva] strchr.c:424: Call to builtin strchr
+[eva] strchr.c:424: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:424: Frama_C_show_each_mystrchr: {10}
-[eva] tests/builtins/strchr.c:425: assertion got status valid.
-[eva] tests/builtins/strchr.c:427: Call to builtin strchr
-[eva] tests/builtins/strchr.c:427: 
+[eva] strchr.c:424: Frama_C_show_each_mystrchr: {10}
+[eva] strchr.c:425: assertion got status valid.
+[eva] strchr.c:427: Call to builtin strchr
+[eva] strchr.c:427: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:427: Frama_C_show_each_mystrchr: {10}
-[eva] tests/builtins/strchr.c:428: assertion got status valid.
-[eva] tests/builtins/strchr.c:430: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:430: Warning: 
+[eva] strchr.c:427: Frama_C_show_each_mystrchr: {10}
+[eva] strchr.c:428: assertion got status valid.
+[eva] strchr.c:430: Call to builtin strchr
+[eva:alarm] strchr.c:430: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:430: 
+[eva] strchr.c:430: 
   Frama_C_show_each_mystrchr: {10; 14; 15; 16; 17; 18; 19}
-[eva] tests/builtins/strchr.c:431: assertion got status valid.
-[eva] tests/builtins/strchr.c:433: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:433: Warning: 
+[eva] strchr.c:431: assertion got status valid.
+[eva] strchr.c:433: Call to builtin strchr
+[eva:alarm] strchr.c:433: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva] tests/builtins/strchr.c:433: Frama_C_show_each_mystrchr: {10; 18; 19}
-[eva] tests/builtins/strchr.c:434: assertion got status valid.
+[eva] strchr.c:433: Frama_C_show_each_mystrchr: {10; 18; 19}
+[eva] strchr.c:434: assertion got status valid.
 [eva] Recording results for strchr_no_zero_but_ok
 [eva] Done for function strchr_no_zero_but_ok
 [eva] computing for function strchr_small_sets_chars <- main.
-  Called from tests/builtins/strchr.c:559.
-[eva] tests/builtins/strchr.c:463: Frama_C_show_each_c: {97}
-[eva] tests/builtins/strchr.c:464: Call to builtin strchr
-[eva] tests/builtins/strchr.c:464: 
+  Called from strchr.c:559.
+[eva] strchr.c:463: Frama_C_show_each_c: {97}
+[eva] strchr.c:464: Call to builtin strchr
+[eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:464: Frama_C_show_each_mystrchr: {-1; 0}
-[eva] tests/builtins/strchr.c:464: Call to builtin strchr
-[eva] tests/builtins/strchr.c:464: 
+[eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1; 0}
+[eva] strchr.c:464: Call to builtin strchr
+[eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:464: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:464: Call to builtin strchr
-[eva] tests/builtins/strchr.c:464: 
+[eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:464: Call to builtin strchr
+[eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:464: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:464: Call to builtin strchr
-[eva] tests/builtins/strchr.c:464: 
+[eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:464: Call to builtin strchr
+[eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:464: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:464: Call to builtin strchr
-[eva] tests/builtins/strchr.c:464: 
+[eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:464: Call to builtin strchr
+[eva] strchr.c:464: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:464: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] tests/builtins/strchr.c:465: 
+[eva] strchr.c:464: Frama_C_show_each_mystrchr: {-1; 0; 1}
+[eva] strchr.c:465: 
   Frama_C_show_each_res: {-1; 0}, {-1}, {-1}, {-1}, {-1; 0; 1}
-[eva] tests/builtins/strchr.c:466: assertion got status valid.
-[eva] tests/builtins/strchr.c:467: assertion got status valid.
-[eva] tests/builtins/strchr.c:468: assertion got status valid.
-[eva] tests/builtins/strchr.c:469: assertion got status valid.
-[eva] tests/builtins/strchr.c:470: assertion got status valid.
-[eva] tests/builtins/strchr.c:473: Call to builtin strchr
-[eva] tests/builtins/strchr.c:473: 
+[eva] strchr.c:466: assertion got status valid.
+[eva] strchr.c:467: assertion got status valid.
+[eva] strchr.c:468: assertion got status valid.
+[eva] strchr.c:469: assertion got status valid.
+[eva] strchr.c:470: assertion got status valid.
+[eva] strchr.c:473: Call to builtin strchr
+[eva] strchr.c:473: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:473: Frama_C_show_each_mystrchr: {1}
-[eva] tests/builtins/strchr.c:473: Call to builtin strchr
-[eva] tests/builtins/strchr.c:473: 
+[eva] strchr.c:473: Frama_C_show_each_mystrchr: {1}
+[eva] strchr.c:473: Call to builtin strchr
+[eva] strchr.c:473: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:473: Frama_C_show_each_mystrchr: {-1; 1}
-[eva] tests/builtins/strchr.c:473: Call to builtin strchr
-[eva] tests/builtins/strchr.c:473: 
+[eva] strchr.c:473: Frama_C_show_each_mystrchr: {-1; 1}
+[eva] strchr.c:473: Call to builtin strchr
+[eva] strchr.c:473: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:473: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:473: Call to builtin strchr
-[eva] tests/builtins/strchr.c:473: 
+[eva] strchr.c:473: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:473: Call to builtin strchr
+[eva] strchr.c:473: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:473: Frama_C_show_each_mystrchr: {-1; 0}
-[eva] tests/builtins/strchr.c:473: Call to builtin strchr
-[eva] tests/builtins/strchr.c:473: 
+[eva] strchr.c:473: Frama_C_show_each_mystrchr: {-1; 0}
+[eva] strchr.c:473: Call to builtin strchr
+[eva] strchr.c:473: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:473: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] tests/builtins/strchr.c:474: 
+[eva] strchr.c:473: Frama_C_show_each_mystrchr: {-1; 0; 1}
+[eva] strchr.c:474: 
   Frama_C_show_each_res: {1}, {-1; 1}, {-1}, {-1; 0}, {-1; 0; 1}
-[eva] tests/builtins/strchr.c:475: assertion got status valid.
-[eva] tests/builtins/strchr.c:476: assertion got status valid.
-[eva] tests/builtins/strchr.c:477: assertion got status valid.
-[eva] tests/builtins/strchr.c:478: assertion got status valid.
-[eva] tests/builtins/strchr.c:479: assertion got status valid.
-[eva] tests/builtins/strchr.c:482: Frama_C_show_each_c: {97; 98}
-[eva] tests/builtins/strchr.c:483: Call to builtin strchr
-[eva] tests/builtins/strchr.c:483: 
+[eva] strchr.c:475: assertion got status valid.
+[eva] strchr.c:476: assertion got status valid.
+[eva] strchr.c:477: assertion got status valid.
+[eva] strchr.c:478: assertion got status valid.
+[eva] strchr.c:479: assertion got status valid.
+[eva] strchr.c:482: Frama_C_show_each_c: {97; 98}
+[eva] strchr.c:483: Call to builtin strchr
+[eva] strchr.c:483: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] tests/builtins/strchr.c:483: Call to builtin strchr
-[eva] tests/builtins/strchr.c:483: 
+[eva] strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0; 1}
+[eva] strchr.c:483: Call to builtin strchr
+[eva] strchr.c:483: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:483: Frama_C_show_each_mystrchr: {-1; 1}
-[eva] tests/builtins/strchr.c:483: Call to builtin strchr
-[eva] tests/builtins/strchr.c:483: 
+[eva] strchr.c:483: Frama_C_show_each_mystrchr: {-1; 1}
+[eva] strchr.c:483: Call to builtin strchr
+[eva] strchr.c:483: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:483: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:483: Call to builtin strchr
-[eva] tests/builtins/strchr.c:483: 
+[eva] strchr.c:483: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:483: Call to builtin strchr
+[eva] strchr.c:483: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0}
-[eva] tests/builtins/strchr.c:483: Call to builtin strchr
-[eva] tests/builtins/strchr.c:483: 
+[eva] strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0}
+[eva] strchr.c:483: Call to builtin strchr
+[eva] strchr.c:483: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] tests/builtins/strchr.c:484: 
+[eva] strchr.c:483: Frama_C_show_each_mystrchr: {-1; 0; 1}
+[eva] strchr.c:484: 
   Frama_C_show_each_res: {-1; 0; 1}, {-1; 1}, {-1}, {-1; 0}, {-1; 0; 1}
-[eva] tests/builtins/strchr.c:486: assertion got status valid.
-[eva] tests/builtins/strchr.c:487: assertion got status valid.
-[eva] tests/builtins/strchr.c:488: assertion got status valid.
-[eva] tests/builtins/strchr.c:489: assertion got status valid.
-[eva] tests/builtins/strchr.c:490: assertion got status valid.
-[eva] tests/builtins/strchr.c:493: Frama_C_show_each_c: {98; 99}
-[eva] tests/builtins/strchr.c:494: Call to builtin strchr
-[eva] tests/builtins/strchr.c:494: 
+[eva] strchr.c:486: assertion got status valid.
+[eva] strchr.c:487: assertion got status valid.
+[eva] strchr.c:488: assertion got status valid.
+[eva] strchr.c:489: assertion got status valid.
+[eva] strchr.c:490: assertion got status valid.
+[eva] strchr.c:493: Frama_C_show_each_c: {98; 99}
+[eva] strchr.c:494: Call to builtin strchr
+[eva] strchr.c:494: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:494: Frama_C_show_each_mystrchr: {1; 2}
-[eva] tests/builtins/strchr.c:494: Call to builtin strchr
-[eva] tests/builtins/strchr.c:494: 
+[eva] strchr.c:494: Frama_C_show_each_mystrchr: {1; 2}
+[eva] strchr.c:494: Call to builtin strchr
+[eva] strchr.c:494: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:494: Frama_C_show_each_mystrchr: {-1; 1; 2}
-[eva] tests/builtins/strchr.c:494: Call to builtin strchr
-[eva] tests/builtins/strchr.c:494: 
+[eva] strchr.c:494: Frama_C_show_each_mystrchr: {-1; 1; 2}
+[eva] strchr.c:494: Call to builtin strchr
+[eva] strchr.c:494: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:494: Frama_C_show_each_mystrchr: {-1}
-[eva] tests/builtins/strchr.c:494: Call to builtin strchr
-[eva] tests/builtins/strchr.c:494: 
+[eva] strchr.c:494: Frama_C_show_each_mystrchr: {-1}
+[eva] strchr.c:494: Call to builtin strchr
+[eva] strchr.c:494: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:494: Frama_C_show_each_mystrchr: {-1; 0; 2}
-[eva] tests/builtins/strchr.c:494: Call to builtin strchr
-[eva] tests/builtins/strchr.c:494: 
+[eva] strchr.c:494: Frama_C_show_each_mystrchr: {-1; 0; 2}
+[eva] strchr.c:494: Call to builtin strchr
+[eva] strchr.c:494: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:494: Frama_C_show_each_mystrchr: {-1; 0; 1}
-[eva] tests/builtins/strchr.c:495: 
+[eva] strchr.c:494: Frama_C_show_each_mystrchr: {-1; 0; 1}
+[eva] strchr.c:495: 
   Frama_C_show_each_res: {1; 2}, {-1; 1; 2}, {-1}, {-1; 0; 2}, {-1; 0; 1}
-[eva] tests/builtins/strchr.c:496: assertion got status valid.
-[eva] tests/builtins/strchr.c:497: assertion 'refined' got status valid.
-[eva] tests/builtins/strchr.c:498: assertion got status valid.
-[eva] tests/builtins/strchr.c:499: assertion got status valid.
-[eva] tests/builtins/strchr.c:500: assertion got status valid.
-[eva] tests/builtins/strchr.c:501: assertion got status valid.
-[eva] tests/builtins/strchr.c:504: Frama_C_show_each_c: {0; 98; 99}
-[eva] tests/builtins/strchr.c:505: Call to builtin strchr
-[eva] tests/builtins/strchr.c:505: 
+[eva] strchr.c:496: assertion got status valid.
+[eva] strchr.c:497: assertion 'refined' got status valid.
+[eva] strchr.c:498: assertion got status valid.
+[eva] strchr.c:499: assertion got status valid.
+[eva] strchr.c:500: assertion got status valid.
+[eva] strchr.c:501: assertion got status valid.
+[eva] strchr.c:504: Frama_C_show_each_c: {0; 98; 99}
+[eva] strchr.c:505: Call to builtin strchr
+[eva] strchr.c:505: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:505: Frama_C_show_each_mystrchr: {-1; 1; 2; 3}
-[eva] tests/builtins/strchr.c:505: Call to builtin strchr
-[eva] tests/builtins/strchr.c:505: 
+[eva] strchr.c:505: Frama_C_show_each_mystrchr: {-1; 1; 2; 3}
+[eva] strchr.c:505: Call to builtin strchr
+[eva] strchr.c:505: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3}
-[eva] tests/builtins/strchr.c:505: Call to builtin strchr
-[eva] tests/builtins/strchr.c:505: 
+[eva] strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3}
+[eva] strchr.c:505: Call to builtin strchr
+[eva] strchr.c:505: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0}
-[eva] tests/builtins/strchr.c:505: Call to builtin strchr
-[eva] tests/builtins/strchr.c:505: 
+[eva] strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0}
+[eva] strchr.c:505: Call to builtin strchr
+[eva] strchr.c:505: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3}
-[eva] tests/builtins/strchr.c:505: Call to builtin strchr
-[eva] tests/builtins/strchr.c:505: 
+[eva] strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3}
+[eva] strchr.c:505: Call to builtin strchr
+[eva] strchr.c:505: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 3}
-[eva] tests/builtins/strchr.c:506: 
+[eva] strchr.c:505: Frama_C_show_each_mystrchr: {-1; 0; 1; 3}
+[eva] strchr.c:506: 
   Frama_C_show_each_res:
   {-1; 1; 2; 3}, {-1; 0; 1; 2; 3}, {-1; 0}, {-1; 0; 1; 2; 3}, {-1; 0; 1; 3}
-[eva] tests/builtins/strchr.c:507: assertion got status valid.
-[eva:alarm] tests/builtins/strchr.c:508: Warning: 
+[eva] strchr.c:507: assertion got status valid.
+[eva:alarm] strchr.c:508: Warning: 
   assertion 'refined' got status unknown.
-[eva] tests/builtins/strchr.c:509: assertion got status valid.
-[eva] tests/builtins/strchr.c:510: assertion got status valid.
-[eva] tests/builtins/strchr.c:511: assertion got status valid.
-[eva] tests/builtins/strchr.c:512: assertion got status valid.
+[eva] strchr.c:509: assertion got status valid.
+[eva] strchr.c:510: assertion got status valid.
+[eva] strchr.c:511: assertion got status valid.
+[eva] strchr.c:512: assertion got status valid.
 [eva] Recording results for strchr_small_sets_chars
 [eva] Done for function strchr_small_sets_chars
 [eva] computing for function strchr_unbounded <- main.
-  Called from tests/builtins/strchr.c:560.
-[eva] tests/builtins/strchr.c:519: Call to builtin strchr
-[eva] tests/builtins/strchr.c:519: 
+  Called from strchr.c:560.
+[eva] strchr.c:519: Call to builtin strchr
+[eva] strchr.c:519: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] tests/builtins/strchr.c:519: 
+[eva] strchr.c:519: 
   Frama_C_show_each_mystrchr: {-1; 0; 1; 2; 3; 4}
-[eva] tests/builtins/strchr.c:520: assertion got status valid.
-[eva] tests/builtins/strchr.c:524: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:524: Warning: 
+[eva] strchr.c:520: assertion got status valid.
+[eva] strchr.c:524: Call to builtin strchr
+[eva:alarm] strchr.c:524: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:524: Warning: 
+[eva:alarm] strchr.c:524: Warning: 
   pointer subtraction. assert \base_addr(_ss_0) ≡ \base_addr(s);
-[eva] tests/builtins/strchr.c:524: Frama_C_show_each_mystrchr: [-1..26]
-[eva] tests/builtins/strchr.c:525: assertion got status valid.
+[eva] strchr.c:524: Frama_C_show_each_mystrchr: [-1..26]
+[eva] strchr.c:525: assertion got status valid.
 [eva] computing for function init_array_nondet <- strchr_unbounded <- main.
-  Called from tests/builtins/strchr.c:526.
-[eva] tests/builtins/strchr.c:189: Call to builtin memset
+  Called from strchr.c:526.
+[eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
-[eva] tests/builtins/strchr.c:527: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:527: Warning: 
+[eva] strchr.c:527: Call to builtin strchr
+[eva:alarm] strchr.c:527: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:527: Warning: 
+[eva:alarm] strchr.c:527: Warning: 
   pointer subtraction. assert \base_addr(_ss_1) ≡ \base_addr(s);
-[eva] tests/builtins/strchr.c:527: Frama_C_show_each_mystrchr: [-1..29]
-[eva] tests/builtins/strchr.c:528: assertion got status valid.
-[eva] tests/builtins/strchr.c:529: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:529: Warning: 
+[eva] strchr.c:527: Frama_C_show_each_mystrchr: [-1..29]
+[eva] strchr.c:528: assertion got status valid.
+[eva] strchr.c:529: Call to builtin strchr
+[eva:alarm] strchr.c:529: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:529: Warning: 
+[eva:alarm] strchr.c:529: Warning: 
   pointer subtraction. assert \base_addr(_ss_2) ≡ \base_addr(s);
-[eva] tests/builtins/strchr.c:529: Frama_C_show_each_mystrchr: [-1..29]
-[eva] tests/builtins/strchr.c:530: assertion got status valid.
+[eva] strchr.c:529: Frama_C_show_each_mystrchr: [-1..29]
+[eva] strchr.c:530: assertion got status valid.
 [eva] Recording results for strchr_unbounded
 [eva] Done for function strchr_unbounded
 [eva] computing for function strchr_invalid <- main.
-  Called from tests/builtins/strchr.c:561.
-[eva] tests/builtins/strchr.c:536: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:536: Warning: 
+  Called from strchr.c:561.
+[eva] strchr.c:536: Call to builtin strchr
+[eva:alarm] strchr.c:536: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] tests/builtins/strchr.c:536: Warning: 
+[eva:alarm] strchr.c:536: Warning: 
   pointer comparison. assert \pointer_comparable((void *)_ss, (void *)0);
-[eva:alarm] tests/builtins/strchr.c:536: Warning: 
+[eva:alarm] strchr.c:536: Warning: 
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(s);
-[eva:alarm] tests/builtins/strchr.c:536: Warning: 
+[eva:alarm] strchr.c:536: Warning: 
   signed overflow. assert -2147483648 ≤ _ss - s;
-[eva:alarm] tests/builtins/strchr.c:536: Warning: 
+[eva:alarm] strchr.c:536: Warning: 
   signed overflow. assert _ss - s ≤ 2147483647;
-[eva] tests/builtins/strchr.c:536: 
+[eva] strchr.c:536: 
   Frama_C_show_each_mystrchr: [-2147483648..2147483647]
 [eva] Recording results for strchr_invalid
 [eva] Done for function strchr_invalid
 [eva] computing for function strchr_garbled_mix_in_char <- main.
-  Called from tests/builtins/strchr.c:562.
-[eva:alarm] tests/builtins/strchr.c:541: Warning: 
+  Called from strchr.c:562.
+[eva:alarm] strchr.c:541: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva] tests/builtins/strchr.c:541: 
+[eva] strchr.c:541: 
   Assigning imprecise value to garbled.
-  The imprecision originates from Arithmetic {tests/builtins/strchr.c:541}
-[eva:alarm] tests/builtins/strchr.c:542: Warning: 
+  The imprecision originates from Arithmetic {strchr.c:541}
+[eva:alarm] strchr.c:542: Warning: 
   pointer downcast. assert (unsigned int)garbled ≤ 2147483647;
-[eva] tests/builtins/strchr.c:542: Call to builtin strchr
-[eva:alarm] tests/builtins/strchr.c:542: Warning: 
+[eva] strchr.c:542: Call to builtin strchr
+[eva:alarm] strchr.c:542: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for strchr_garbled_mix_in_char
 [eva] Done for function strchr_garbled_mix_in_char
@@ -735,7 +735,7 @@
 [eva:final-states] Values at end of function strchr_garbled_mix_in_char:
   garbled ∈
          {{ garbled mix of &{x}
-          (origin: Arithmetic {tests/builtins/strchr.c:541}) }}
+          (origin: Arithmetic {strchr.c:541}) }}
 [eva:final-states] Values at end of function strchr_initialization:
   c ∈ {0}
   empty_or_uninitialized[0] ∈ {0} or UNINITIALIZED

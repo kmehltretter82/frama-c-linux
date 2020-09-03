@@ -1,4 +1,4 @@
-[kernel] Parsing tests/rte/tab.c (with preprocessing)
+[kernel] Parsing tab.c (with preprocessing)
 [rte] annotating function f4
 [rte] annotating function g4
 [rte] annotating function h4

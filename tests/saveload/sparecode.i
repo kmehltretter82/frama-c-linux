@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err ./bin/toplevel.opt -slicing-level 2 -slice-return main -eva-show-progress -save ./tests/saveload/result/sparecode.sav tests/saveload/sparecode.i -then-on 'Slicing export' -print > tests/saveload/result/sparecode_sav.res 2> tests/saveload/result/sparecode_sav.err
-   STDOPT: +"-load ./tests/saveload/result/sparecode.sav"
+   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err ./bin/toplevel.opt -slicing-level 2 -slice-return main -eva-show-progress -save ./result/sparecode.sav sparecode.i -then-on 'Slicing export' -print > result/sparecode_sav.res 2> result/sparecode_sav.err
+   STDOPT: +"-load ./result/sparecode.sav"
 */
 int G;
 

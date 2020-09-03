@@ -1,7 +1,7 @@
-[kernel] Parsing tests/metrics/reach.c (with preprocessing)
+[kernel] Parsing reach.c (with preprocessing)
 [metrics] Cil AST
   
-  Stats for function <tests/metrics/reach.c/baz>
+  Stats for function <reach.c/baz>
   ============================================== 
   Sloc = 1
   Decision point = 0
@@ -16,7 +16,7 @@
   Pointer dereferencing = 0
   Cyclomatic complexity = 1
   
-  Stats for function <tests/metrics/reach.c/foo>
+  Stats for function <reach.c/foo>
   ============================================== 
   Sloc = 2
   Decision point = 0
@@ -31,7 +31,7 @@
   Pointer dereferencing = 0
   Cyclomatic complexity = 1
   
-  Stats for function <tests/metrics/reach.c/main>
+  Stats for function <reach.c/main>
   =============================================== 
   Sloc = 12
   Decision point = 1
@@ -101,11 +101,11 @@
   Coverage estimation = 33.3% 
   
   Unreached functions (2) =
-    <tests/metrics/reach.c>: baz; foo;
+    <reach.c>: baz; foo;
 [metrics] References to non-analyzed functions
   ------------------------------------
-  Function main references foo (at tests/metrics/reach.c:26)
-  Initializer of t references baz (at tests/metrics/reach.c:10)
+  Function main references foo (at reach.c:26)
+  Initializer of t references baz (at reach.c:10)
 [metrics] Statements analyzed by Eva
   --------------------------
   12 stmts in analyzed functions, 7 stmts analyzed (58.3%)

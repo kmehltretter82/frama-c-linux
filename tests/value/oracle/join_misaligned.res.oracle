@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/join_misaligned.i (no preprocessing)
+[kernel] Parsing join_misaligned.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,16 +14,16 @@
   z[0..4] ∈ {255}
   a ∈ {0}
   va ∈ [--..--]
-[eva:alarm] tests/value/join_misaligned.i:23: Warning: 
+[eva:alarm] join_misaligned.i:23: Warning: 
   pointer downcast. assert (unsigned int)(&t) ≤ 2147483647;
-[eva:alarm] tests/value/join_misaligned.i:37: Warning: 
+[eva:alarm] join_misaligned.i:37: Warning: 
   pointer downcast. assert (unsigned int)(&u) ≤ 2147483647;
 [eva] Recording results for main
 [eva] done for function main
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
-  {{ garbled mix of &{t} (origin: Merge {tests/value/join_misaligned.i:42}) }}
-  {{ garbled mix of &{u} (origin: Merge {tests/value/join_misaligned.i:42}) }}
+  {{ garbled mix of &{t} (origin: Merge {join_misaligned.i:42}) }}
+  {{ garbled mix of &{u} (origin: Merge {join_misaligned.i:42}) }}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t{[0]; [1][bits 0 to 15]} ∈ {0}
@@ -50,13 +50,13 @@
   y{[0]; [1][bits 0 to 15]#} ∈ {0x22222222} repeated %32, bits 0 to 47 
    [1][bits 16 to 23] ∈
    {{ garbled mix of &{t}
-    (origin: Merge {tests/value/join_misaligned.i:42}) }}
+    (origin: Merge {join_misaligned.i:42}) }}
    {[1][bits 24 to 31]; [2][bits 0 to 15]} ∈
    {{ garbled mix of &{t; u}
-    (origin: Merge {tests/value/join_misaligned.i:42}) }}
+    (origin: Merge {join_misaligned.i:42}) }}
    [2][bits 16 to 23] ∈
    {{ garbled mix of &{u}
-    (origin: Merge {tests/value/join_misaligned.i:42}) }}
+    (origin: Merge {join_misaligned.i:42}) }}
    [2][bits 24 to 31]# ∈ {0x22222222}%32, bits 24 to 31 
    [3..6] ∈ {1}
   z[0..2] ∈ {255}

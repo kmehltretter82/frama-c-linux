@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts709.c (with preprocessing)
+[kernel] Parsing bts709.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,33 +8,33 @@
   var1 IN {0}
   var2 IN {0}
 [eva] computing for function inputsOf_testcase_func <- main.
-  Called from tests/slicing/bts709.c:47.
+  Called from bts709.c:47.
 [eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
-  Called from tests/slicing/bts709.c:55.
-[kernel:annot:missing-spec] tests/slicing/bts709.c:55: Warning: 
+  Called from bts709.c:55.
+[kernel:annot:missing-spec] bts709.c:55: Warning: 
   Neither code nor specification for function nondet_int, generating default assigns from the prototype
 [eva] using specification for function nondet_int
 [eva] Done for function nondet_int
 [eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
-  Called from tests/slicing/bts709.c:56.
+  Called from bts709.c:56.
 [eva] Done for function nondet_int
 [eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
-  Called from tests/slicing/bts709.c:57.
+  Called from bts709.c:57.
 [eva] Done for function nondet_int
 [eva] Recording results for inputsOf_testcase_func
 [eva] Done for function inputsOf_testcase_func
 [eva] computing for function func <- main.
-  Called from tests/slicing/bts709.c:48.
+  Called from bts709.c:48.
 [eva] computing for function __FC_assert <- func <- main.
-  Called from tests/slicing/bts709.c:38.
+  Called from bts709.c:38.
 [eva] using specification for function __FC_assert
-[eva:alarm] tests/slicing/bts709.c:38: Warning: 
+[eva:alarm] bts709.c:38: Warning: 
   function __FC_assert: precondition 'nonnull_c' got status unknown.
 [eva] Done for function __FC_assert
 [eva] Recording results for func
 [eva] Done for function func
-[eva] tests/slicing/bts709.c:46: starting to merge loop iterations
-[eva] tests/slicing/bts709.c:47: 
+[eva] bts709.c:46: starting to merge loop iterations
+[eva] bts709.c:47: 
   Reusing old results for call to inputsOf_testcase_func
 [eva] Recording results for main
 [eva] done for function main
@@ -88,7 +88,7 @@ void func_slice_1(void)
         var2 = 3;
       }
   /*@ slice pragma stmt; */
-  if (65 != var2) __FC_assert((5 != var1) != 0,"tests/slicing/bts709.c",38,
+  if (65 != var2) __FC_assert((5 != var1) != 0,"bts709.c",38,
                               "5 != var1");
   return;
 }
@@ -116,6 +116,6 @@ void inputsOf_testcase_func_slice_1(void)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts709.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] tests/slicing/result/ocode_0_bts709.i:25: Warning: 
+[kernel] Parsing result/ocode_0_bts709.i (no preprocessing)
+[kernel:typing:implicit-function-declaration] result/ocode_0_bts709.i:25: Warning: 
   Calling undeclared function __FC_assert. Old style K&R code?

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/logic.c (with preprocessing)
+[kernel] Parsing logic.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,503 +14,503 @@
   arr_ptr[0..2] ∈ {0}
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
-  Called from tests/value/logic.c:441.
-[eva] tests/value/logic.c:103: 
+  Called from logic.c:441.
+[eva] logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
-[eva:alarm] tests/value/logic.c:103: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:105: assertion got status valid.
-[eva:alarm] tests/value/logic.c:106: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:107: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:108: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:109: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:110: assertion got status valid.
-[eva:alarm] tests/value/logic.c:111: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:112: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:113: assertion got status valid.
-[eva] tests/value/logic.c:115: assertion got status valid.
-[eva] tests/value/logic.c:117: assertion got status valid.
-[eva] tests/value/logic.c:119: assertion got status valid.
-[eva:alarm] tests/value/logic.c:120: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:121: assertion got status valid.
-[eva:alarm] tests/value/logic.c:122: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:125: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:126: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:127: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:128: assertion got status valid.
-[eva] tests/value/logic.c:130: assertion got status valid.
-[eva:alarm] tests/value/logic.c:131: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:132: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:134: 
+[eva:alarm] logic.c:103: Warning: assertion got status unknown.
+[eva] logic.c:105: assertion got status valid.
+[eva:alarm] logic.c:106: Warning: assertion got status unknown.
+[eva:alarm] logic.c:107: Warning: assertion got status unknown.
+[eva:alarm] logic.c:108: Warning: assertion got status unknown.
+[eva:alarm] logic.c:109: Warning: assertion got status unknown.
+[eva] logic.c:110: assertion got status valid.
+[eva:alarm] logic.c:111: Warning: assertion got status unknown.
+[eva:alarm] logic.c:112: Warning: assertion got status unknown.
+[eva] logic.c:113: assertion got status valid.
+[eva] logic.c:115: assertion got status valid.
+[eva] logic.c:117: assertion got status valid.
+[eva] logic.c:119: assertion got status valid.
+[eva:alarm] logic.c:120: Warning: assertion got status unknown.
+[eva] logic.c:121: assertion got status valid.
+[eva:alarm] logic.c:122: Warning: assertion got status unknown.
+[eva:alarm] logic.c:125: Warning: assertion got status unknown.
+[eva:alarm] logic.c:126: Warning: assertion got status unknown.
+[eva:alarm] logic.c:127: Warning: assertion got status unknown.
+[eva] logic.c:128: assertion got status valid.
+[eva] logic.c:130: assertion got status valid.
+[eva:alarm] logic.c:131: Warning: assertion got status unknown.
+[eva:alarm] logic.c:132: Warning: assertion got status unknown.
+[eva] logic.c:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type struct ts
-[eva:alarm] tests/value/logic.c:134: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:135: 
+[eva:alarm] logic.c:134: Warning: assertion got status unknown.
+[eva] logic.c:135: 
   cannot evaluate ACSL term, unsupported ACSL construct: != operation on non-supported type int [10]
-[eva:alarm] tests/value/logic.c:135: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:137: assertion got status valid.
-[eva] tests/value/logic.c:138: assertion got status valid.
-[eva] tests/value/logic.c:139: assertion got status valid.
-[eva] tests/value/logic.c:141: assertion got status valid.
-[eva] tests/value/logic.c:143: 
+[eva:alarm] logic.c:135: Warning: assertion got status unknown.
+[eva] logic.c:137: assertion got status valid.
+[eva] logic.c:138: assertion got status valid.
+[eva] logic.c:139: assertion got status valid.
+[eva] logic.c:141: assertion got status valid.
+[eva] logic.c:143: 
   cannot evaluate ACSL term, unsupported ACSL construct: set intersection
-[eva:alarm] tests/value/logic.c:143: Warning: assertion got status unknown.
+[eva:alarm] logic.c:143: Warning: assertion got status unknown.
 [eva] Recording results for eq_tsets
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
-  Called from tests/value/logic.c:442.
-[eva] tests/value/logic.c:149: Frama_C_show_each: {-126}
-[eva] tests/value/logic.c:150: assertion got status valid.
-[eva] tests/value/logic.c:151: assertion got status valid.
+  Called from logic.c:442.
+[eva] logic.c:149: Frama_C_show_each: {-126}
+[eva] logic.c:150: assertion got status valid.
+[eva] logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
 [eva] Done for function eq_char
 [eva] computing for function casts <- main.
-  Called from tests/value/logic.c:443.
-[eva] tests/value/logic.c:155: assertion got status valid.
-[eva] tests/value/logic.c:156: assertion got status valid.
+  Called from logic.c:443.
+[eva] logic.c:155: assertion got status valid.
+[eva] logic.c:156: assertion got status valid.
 [eva] Recording results for casts
 [eva] Done for function casts
 [eva] computing for function empty_tset <- main.
-  Called from tests/value/logic.c:444.
+  Called from logic.c:444.
 [eva] computing for function f_empty_tset <- empty_tset <- main.
-  Called from tests/value/logic.c:166.
+  Called from logic.c:166.
 [eva] using specification for function f_empty_tset
-[eva] tests/value/logic.c:166: 
+[eva] logic.c:166: 
   function f_empty_tset: precondition 'r1' got status valid.
-[eva] tests/value/logic.c:166: 
+[eva] logic.c:166: 
   function f_empty_tset: precondition 'r2' got status valid.
 [eva] Done for function f_empty_tset
-[eva] tests/value/logic.c:167: assertion got status valid.
+[eva] logic.c:167: assertion got status valid.
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
-  Called from tests/value/logic.c:445.
-[eva:alarm] tests/value/logic.c:172: Warning: 
+  Called from logic.c:445.
+[eva:alarm] logic.c:172: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
-[eva:alarm] tests/value/logic.c:172: Warning: 
+[eva:alarm] logic.c:172: Warning: 
   accessing out of bounds index. assert v < 10;
-[eva:alarm] tests/value/logic.c:173: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:174: Warning: assertion got status unknown.
+[eva:alarm] logic.c:173: Warning: assertion got status unknown.
+[eva:alarm] logic.c:174: Warning: assertion got status unknown.
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
-  Called from tests/value/logic.c:446.
-[eva:alarm] tests/value/logic.c:182: Warning: 
+  Called from logic.c:446.
+[eva:alarm] logic.c:182: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva:alarm] tests/value/logic.c:184: Warning: 
+[eva:alarm] logic.c:184: Warning: 
   assertion 'UNK' got status unknown.
-[eva] tests/value/logic.c:185: Frama_C_show_each: {-1; 1}
-[eva:alarm] tests/value/logic.c:186: Warning: 
+[eva] logic.c:185: Frama_C_show_each: {-1; 1}
+[eva:alarm] logic.c:186: Warning: 
   assertion 'UNK' got status unknown.
-[eva] tests/value/logic.c:187: Frama_C_show_each: {-1; 1}
-[eva:alarm] tests/value/logic.c:189: Warning: 
+[eva] logic.c:187: Frama_C_show_each: {-1; 1}
+[eva:alarm] logic.c:189: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/logic.c:190: assertion 'OK' got status valid.
-[eva] tests/value/logic.c:191: Frama_C_show_each: {1}
-[eva] tests/value/logic.c:192: assertion 'OK' got status valid.
-[eva] tests/value/logic.c:193: Frama_C_show_each: {1}
-[eva:alarm] tests/value/logic.c:197: Warning: 
+[eva] logic.c:190: assertion 'OK' got status valid.
+[eva] logic.c:191: Frama_C_show_each: {1}
+[eva] logic.c:192: assertion 'OK' got status valid.
+[eva] logic.c:193: Frama_C_show_each: {1}
+[eva:alarm] logic.c:197: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva:alarm] tests/value/logic.c:198: Warning: 
+[eva:alarm] logic.c:198: Warning: 
   assertion 'UNK' got status unknown.
-[eva] tests/value/logic.c:199: Frama_C_show_each: {0; 1}
-[eva:alarm] tests/value/logic.c:200: Warning: 
+[eva] logic.c:199: Frama_C_show_each: {0; 1}
+[eva:alarm] logic.c:200: Warning: 
   assertion 'UNK' got status unknown.
-[eva] tests/value/logic.c:201: Frama_C_show_each: {0; 1}
-[eva:alarm] tests/value/logic.c:203: Warning: 
+[eva] logic.c:201: Frama_C_show_each: {0; 1}
+[eva:alarm] logic.c:203: Warning: 
   assertion 'ASSUME' got status unknown.
-[eva] tests/value/logic.c:204: assertion 'OK' got status valid.
-[eva] tests/value/logic.c:205: Frama_C_show_each: {1}
-[eva] tests/value/logic.c:206: assertion 'OK' got status valid.
-[eva] tests/value/logic.c:207: Frama_C_show_each: {1}
+[eva] logic.c:204: assertion 'OK' got status valid.
+[eva] logic.c:205: Frama_C_show_each: {1}
+[eva] logic.c:206: assertion 'OK' got status valid.
+[eva] logic.c:207: Frama_C_show_each: {1}
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
-  Called from tests/value/logic.c:447.
+  Called from logic.c:447.
 [eva] computing for function select_like <- cond_in_lval <- main.
-  Called from tests/value/logic.c:228.
+  Called from logic.c:228.
 [eva] using specification for function select_like
 [eva] Done for function select_like
-[eva] tests/value/logic.c:229: assertion got status valid.
+[eva] logic.c:229: assertion got status valid.
 [eva] computing for function select_like <- cond_in_lval <- main.
-  Called from tests/value/logic.c:230.
+  Called from logic.c:230.
 [eva] Done for function select_like
-[eva] tests/value/logic.c:231: assertion got status valid.
-[eva] tests/value/logic.c:232: assertion got status valid.
-[eva] tests/value/logic.c:233: assertion got status valid.
+[eva] logic.c:231: assertion got status valid.
+[eva] logic.c:232: assertion got status valid.
+[eva] logic.c:233: assertion got status valid.
 [eva] computing for function select_like <- cond_in_lval <- main.
-  Called from tests/value/logic.c:234.
+  Called from logic.c:234.
 [eva] Done for function select_like
-[eva] tests/value/logic.c:235: assertion got status valid.
-[eva] tests/value/logic.c:236: assertion got status valid.
+[eva] logic.c:235: assertion got status valid.
+[eva] logic.c:236: assertion got status valid.
 [eva] computing for function select_like <- cond_in_lval <- main.
-  Called from tests/value/logic.c:239.
+  Called from logic.c:239.
 [eva] Done for function select_like
-[eva] tests/value/logic.c:240: assertion got status valid.
-[eva] tests/value/logic.c:241: assertion got status valid.
-[eva] tests/value/logic.c:243: assertion got status valid.
-[eva] tests/value/logic.c:245: assertion got status valid.
-[eva:alarm] tests/value/logic.c:246: Warning: assertion got status unknown.
+[eva] logic.c:240: assertion got status valid.
+[eva] logic.c:241: assertion got status valid.
+[eva] logic.c:243: assertion got status valid.
+[eva] logic.c:245: assertion got status valid.
+[eva:alarm] logic.c:246: Warning: assertion got status unknown.
 [eva] Recording results for cond_in_lval
 [eva] Done for function cond_in_lval
 [eva] computing for function pred <- main.
-  Called from tests/value/logic.c:448.
-[eva] tests/value/logic.c:90: assertion got status valid.
-[eva] tests/value/logic.c:91: assertion got status valid.
-[eva] tests/value/logic.c:31: 
+  Called from logic.c:448.
+[eva] logic.c:90: assertion got status valid.
+[eva] logic.c:91: assertion got status valid.
+[eva] logic.c:31: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
-[eva:alarm] tests/value/logic.c:92: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:92: 
+[eva:alarm] logic.c:92: Warning: assertion got status unknown.
+[eva] logic.c:92: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
-[eva] tests/value/logic.c:93: assertion got status valid.
+[eva] logic.c:93: assertion got status valid.
 [eva] computing for function f <- pred <- main.
-  Called from tests/value/logic.c:94.
-[eva] tests/value/logic.c:46: assertion got status valid.
-[eva] tests/value/logic.c:47: assertion got status valid.
+  Called from logic.c:94.
+[eva] logic.c:46: assertion got status valid.
+[eva] logic.c:47: assertion got status valid.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- pred <- main.
-  Called from tests/value/logic.c:95.
-[eva] tests/value/logic.c:55: assertion got status valid.
-[eva] tests/value/logic.c:56: assertion got status valid.
-[eva] tests/value/logic.c:57: assertion got status valid.
-[eva] tests/value/logic.c:35: 
+  Called from logic.c:95.
+[eva] logic.c:55: assertion got status valid.
+[eva] logic.c:56: assertion got status valid.
+[eva] logic.c:57: assertion got status valid.
+[eva] logic.c:35: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
-[eva:alarm] tests/value/logic.c:58: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:58: 
+[eva:alarm] logic.c:58: Warning: assertion got status unknown.
+[eva] logic.c:58: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function unsup <- pred <- main.
-  Called from tests/value/logic.c:96.
-[eva:alarm] tests/value/logic.c:81: Warning: assertion got status unknown.
+  Called from logic.c:96.
+[eva:alarm] logic.c:81: Warning: assertion got status unknown.
 [eva] Recording results for unsup
 [eva] Done for function unsup
 [eva] computing for function h <- pred <- main.
-  Called from tests/value/logic.c:97.
-[eva] tests/value/logic.c:69: 
+  Called from logic.c:97.
+[eva] logic.c:69: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function h_acsl
-[eva:alarm] tests/value/logic.c:69: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:70: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:71: assertion got status valid.
-[eva:alarm] tests/value/logic.c:72: Warning: 
+[eva:alarm] logic.c:69: Warning: assertion got status unknown.
+[eva:alarm] logic.c:70: Warning: assertion got status unknown.
+[eva] logic.c:71: assertion got status valid.
+[eva:alarm] logic.c:72: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] tests/value/logic.c:73: assertion got status valid.
-[eva] tests/value/logic.c:75: assertion got status valid.
-[eva] tests/value/logic.c:76: assertion got status valid.
+[eva] logic.c:73: assertion got status valid.
+[eva] logic.c:75: assertion got status valid.
+[eva] logic.c:76: assertion got status valid.
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for pred
 [eva] Done for function pred
 [eva] computing for function float_sign <- main.
-  Called from tests/value/logic.c:449.
-[eva] tests/value/logic.c:251: assertion got status valid.
-[eva] tests/value/logic.c:252: assertion got status valid.
-[eva] tests/value/logic.c:253: assertion got status valid.
-[eva] tests/value/logic.c:254: assertion got status valid.
-[eva:alarm] tests/value/logic.c:256: Warning: assertion got status unknown.
+  Called from logic.c:449.
+[eva] logic.c:251: assertion got status valid.
+[eva] logic.c:252: assertion got status valid.
+[eva] logic.c:253: assertion got status valid.
+[eva] logic.c:254: assertion got status valid.
+[eva:alarm] logic.c:256: Warning: assertion got status unknown.
 [eva] Recording results for float_sign
 [eva] Done for function float_sign
 [eva] computing for function min_max <- main.
-  Called from tests/value/logic.c:450.
+  Called from logic.c:450.
 [eva] computing for function Frama_C_interval <- min_max <- main.
-  Called from tests/value/logic.c:274.
+  Called from logic.c:274.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/logic.c:274: 
+[eva] logic.c:274: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- min_max <- main.
-  Called from tests/value/logic.c:275.
-[eva] tests/value/logic.c:275: 
+  Called from logic.c:275.
+[eva] logic.c:275: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- min_max <- main.
-  Called from tests/value/logic.c:276.
-[eva] tests/value/logic.c:276: 
+  Called from logic.c:276.
+[eva] logic.c:276: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/logic.c:281: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:282: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:283: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:284: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:288: Warning: assertion got status unknown.
+[eva:alarm] logic.c:281: Warning: assertion got status unknown.
+[eva:alarm] logic.c:282: Warning: assertion got status unknown.
+[eva:alarm] logic.c:283: Warning: assertion got status unknown.
+[eva:alarm] logic.c:284: Warning: assertion got status unknown.
+[eva:alarm] logic.c:288: Warning: assertion got status unknown.
 [eva] Recording results for min_max
 [eva] Done for function min_max
 [eva] computing for function assign_tsets <- main.
-  Called from tests/value/logic.c:451.
+  Called from logic.c:451.
 [eva] computing for function assign_tsets_aux <- assign_tsets <- main.
-  Called from tests/value/logic.c:269.
+  Called from logic.c:269.
 [eva] using specification for function assign_tsets_aux
 [eva] Done for function assign_tsets_aux
 [eva] Recording results for assign_tsets
 [eva] Done for function assign_tsets
 [eva] computing for function check_and_assert <- main.
-  Called from tests/value/logic.c:452.
-[eva:alarm] tests/value/logic.c:295: Warning: assertion got status unknown.
-[eva] tests/value/logic.c:296: Frama_C_show_each_42: {42}
-[eva] tests/value/logic.c:297: check got status valid.
-[eva:alarm] tests/value/logic.c:299: Warning: check got status unknown.
-[eva] tests/value/logic.c:300: 
+  Called from logic.c:452.
+[eva:alarm] logic.c:295: Warning: assertion got status unknown.
+[eva] logic.c:296: Frama_C_show_each_42: {42}
+[eva] logic.c:297: check got status valid.
+[eva:alarm] logic.c:299: Warning: check got status unknown.
+[eva] logic.c:300: 
   Frama_C_show_each_imprecise: [-2147483648..2147483647]
-[eva:alarm] tests/value/logic.c:301: Warning: assertion got status unknown.
-[eva:alarm] tests/value/logic.c:303: Warning: 
+[eva:alarm] logic.c:301: Warning: assertion got status unknown.
+[eva:alarm] logic.c:303: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:alarm] tests/value/logic.c:306: Warning: check got status invalid.
-[eva] tests/value/logic.c:307: Frama_C_show_each_reachable: {42}
+[eva:alarm] logic.c:306: Warning: check got status invalid.
+[eva] logic.c:307: Frama_C_show_each_reachable: {42}
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
 [eva] computing for function min_max_quantifier <- main.
-  Called from tests/value/logic.c:453.
-[eva] tests/value/logic.c:321: check 'valid' got status valid.
-[eva] tests/value/logic.c:322: check 'valid' got status valid.
-[eva] tests/value/logic.c:323: check 'valid' got status valid.
-[eva] tests/value/logic.c:324: check 'valid' got status valid.
-[eva] tests/value/logic.c:325: check 'valid' got status valid.
-[eva] tests/value/logic.c:326: check 'valid' got status valid.
-[eva:alarm] tests/value/logic.c:327: Warning: check 'valid' got status unknown.
-[eva:alarm] tests/value/logic.c:328: Warning: check 'valid' got status unknown.
-[eva:alarm] tests/value/logic.c:329: Warning: 
+  Called from logic.c:453.
+[eva] logic.c:321: check 'valid' got status valid.
+[eva] logic.c:322: check 'valid' got status valid.
+[eva] logic.c:323: check 'valid' got status valid.
+[eva] logic.c:324: check 'valid' got status valid.
+[eva] logic.c:325: check 'valid' got status valid.
+[eva] logic.c:326: check 'valid' got status valid.
+[eva:alarm] logic.c:327: Warning: check 'valid' got status unknown.
+[eva:alarm] logic.c:328: Warning: check 'valid' got status unknown.
+[eva:alarm] logic.c:329: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:330: Warning: 
+[eva:alarm] logic.c:330: Warning: 
   check 'unknown' got status unknown.
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:331.
-[eva] tests/value/logic.c:331: 
+  Called from logic.c:331.
+[eva] logic.c:331: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:332.
-[eva] tests/value/logic.c:332: 
+  Called from logic.c:332.
+[eva] logic.c:332: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/logic.c:333: check 'valid' got status valid.
-[eva] tests/value/logic.c:334: check 'valid' got status valid.
-[eva] tests/value/logic.c:335: check 'valid' got status valid.
-[eva] tests/value/logic.c:336: check 'valid' got status valid.
-[eva:alarm] tests/value/logic.c:337: Warning: 
+[eva] logic.c:333: check 'valid' got status valid.
+[eva] logic.c:334: check 'valid' got status valid.
+[eva] logic.c:335: check 'valid' got status valid.
+[eva] logic.c:336: check 'valid' got status valid.
+[eva:alarm] logic.c:337: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:338: Warning: 
+[eva:alarm] logic.c:338: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:339: Warning: 
+[eva:alarm] logic.c:339: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:340: Warning: 
-  check 'unknown' got status unknown.
-[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:341.
-[eva] tests/value/logic.c:341: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:342.
-[eva] tests/value/logic.c:342: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] tests/value/logic.c:343: check 'valid' got status valid.
-[eva] tests/value/logic.c:344: check 'valid' got status valid.
-[eva] tests/value/logic.c:345: check 'valid' got status valid.
-[eva] tests/value/logic.c:346: check 'valid' got status valid.
-[eva:alarm] tests/value/logic.c:347: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:348: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:349: Warning: 
-  check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:350: Warning: 
+[eva:alarm] logic.c:340: Warning: 
   check 'unknown' got status unknown.
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:351.
-[eva] tests/value/logic.c:351: 
+  Called from logic.c:341.
+[eva] logic.c:341: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
-  Called from tests/value/logic.c:352.
-[eva] tests/value/logic.c:352: 
+  Called from logic.c:342.
+[eva] logic.c:342: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] tests/value/logic.c:353: Warning: 
+[eva] logic.c:343: check 'valid' got status valid.
+[eva] logic.c:344: check 'valid' got status valid.
+[eva] logic.c:345: check 'valid' got status valid.
+[eva] logic.c:346: check 'valid' got status valid.
+[eva:alarm] logic.c:347: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] tests/value/logic.c:354: Warning: 
+[eva:alarm] logic.c:348: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] logic.c:349: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] logic.c:350: Warning: 
+  check 'unknown' got status unknown.
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from logic.c:351.
+[eva] logic.c:351: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- min_max_quantifier <- main.
+  Called from logic.c:352.
+[eva] logic.c:352: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] logic.c:353: Warning: 
+  check 'unknown' got status unknown.
+[eva:alarm] logic.c:354: Warning: 
   check 'unknown' got status unknown.
 [eva] Recording results for min_max_quantifier
 [eva] Done for function min_max_quantifier
 [eva] computing for function int_abs <- main.
-  Called from tests/value/logic.c:454.
+  Called from logic.c:454.
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:365.
+  Called from logic.c:365.
 [eva] using specification for function abs
 [eva] Done for function abs
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:366.
+  Called from logic.c:366.
 [eva] Done for function abs
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:367.
+  Called from logic.c:367.
 [eva] Done for function abs
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:370.
-[eva] tests/value/logic.c:370: 
+  Called from logic.c:370.
+[eva] logic.c:370: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:371.
+  Called from logic.c:371.
 [eva] Done for function abs
-[eva] tests/value/logic.c:372: Frama_C_show_each_5_10: {5; 6; 7; 8; 9; 10}
+[eva] logic.c:372: Frama_C_show_each_5_10: {5; 6; 7; 8; 9; 10}
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:373.
-[eva] tests/value/logic.c:373: 
+  Called from logic.c:373.
+[eva] logic.c:373: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:374.
+  Called from logic.c:374.
 [eva] Done for function abs
-[eva] tests/value/logic.c:375: Frama_C_show_each_0_4: {0; 1; 2; 3; 4}
+[eva] logic.c:375: Frama_C_show_each_0_4: {0; 1; 2; 3; 4}
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:377.
-[eva] tests/value/logic.c:377: 
+  Called from logic.c:377.
+[eva] logic.c:377: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:378.
+  Called from logic.c:378.
 [eva] Done for function abs
-[eva] tests/value/logic.c:379: Frama_C_show_each_10_100: [10..100]
+[eva] logic.c:379: Frama_C_show_each_10_100: [10..100]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:380.
-[eva] tests/value/logic.c:380: 
+  Called from logic.c:380.
+[eva] logic.c:380: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:381.
+  Called from logic.c:381.
 [eva] Done for function abs
-[eva] tests/value/logic.c:382: Frama_C_show_each_0_100: [0..100]
+[eva] logic.c:382: Frama_C_show_each_0_100: [0..100]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:383.
-[eva] tests/value/logic.c:383: 
+  Called from logic.c:383.
+[eva] logic.c:383: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:384.
+  Called from logic.c:384.
 [eva] Done for function abs
-[eva] tests/value/logic.c:385: Frama_C_show_each_10_20: [10..20]
+[eva] logic.c:385: Frama_C_show_each_10_20: [10..20]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:386.
-[eva] tests/value/logic.c:386: 
+  Called from logic.c:386.
+[eva] logic.c:386: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:387.
+  Called from logic.c:387.
 [eva] Done for function abs
-[eva] tests/value/logic.c:388: Frama_C_show_each_0_12: [0..12]
+[eva] logic.c:388: Frama_C_show_each_0_12: [0..12]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:389.
-[eva] tests/value/logic.c:389: 
+  Called from logic.c:389.
+[eva] logic.c:389: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:390.
+  Called from logic.c:390.
 [eva] Done for function abs
-[eva] tests/value/logic.c:391: Frama_C_show_each_0_16: [0..16]
+[eva] logic.c:391: Frama_C_show_each_0_16: [0..16]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:393.
-[eva] tests/value/logic.c:393: 
+  Called from logic.c:393.
+[eva] logic.c:393: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:395.
+  Called from logic.c:395.
 [eva] Done for function abs
-[eva] tests/value/logic.c:396: Frama_C_show_each_2_mod_4: [2..82],2%4
+[eva] logic.c:396: Frama_C_show_each_2_mod_4: [2..82],2%4
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:397.
-[eva] tests/value/logic.c:397: 
+  Called from logic.c:397.
+[eva] logic.c:397: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:399.
+  Called from logic.c:399.
 [eva] Done for function abs
-[eva] tests/value/logic.c:400: Frama_C_show_each_1_mod_2: [1..83],1%2
+[eva] logic.c:400: Frama_C_show_each_1_mod_2: [1..83],1%2
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:401.
-[eva] tests/value/logic.c:401: 
+  Called from logic.c:401.
+[eva] logic.c:401: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:403.
+  Called from logic.c:403.
 [eva] Done for function abs
-[eva] tests/value/logic.c:404: Frama_C_show_each_no_mod: [0..35]
+[eva] logic.c:404: Frama_C_show_each_no_mod: [0..35]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
-  Called from tests/value/logic.c:406.
-[eva] tests/value/logic.c:406: 
+  Called from logic.c:406.
+[eva] logic.c:406: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:407.
+  Called from logic.c:407.
 [eva] Done for function abs
-[eva] tests/value/logic.c:408: Frama_C_show_each_set: {0; 1; 2; 3; 4; 5}
+[eva] logic.c:408: Frama_C_show_each_set: {0; 1; 2; 3; 4; 5}
 [eva] computing for function abs <- int_abs <- main.
-  Called from tests/value/logic.c:411.
+  Called from logic.c:411.
 [eva] Done for function abs
-[eva] tests/value/logic.c:411: 
+[eva] logic.c:411: 
   Assigning imprecise value to x_0.
-  The imprecision originates from Library function {tests/value/logic.c:411}
-[eva] tests/value/logic.c:412: 
+  The imprecision originates from Library function {logic.c:411}
+[eva] logic.c:412: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x_0}
-  (origin: Library function {tests/value/logic.c:411}) }}
+  (origin: Library function {logic.c:411}) }}
 [eva] Recording results for int_abs
 [eva] Done for function int_abs
 [eva] computing for function float_abs <- main.
-  Called from tests/value/logic.c:455.
+  Called from logic.c:455.
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:421.
+  Called from logic.c:421.
 [eva] using specification for function fabs
 [eva] Done for function fabs
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:422.
+  Called from logic.c:422.
 [eva] Done for function fabs
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:423.
+  Called from logic.c:423.
 [eva] Done for function fabs
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
-  Called from tests/value/logic.c:426.
+  Called from logic.c:426.
 [eva] using specification for function Frama_C_double_interval
-[eva] tests/value/logic.c:426: 
+[eva] logic.c:426: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/value/logic.c:426: 
+[eva] logic.c:426: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:427.
+  Called from logic.c:427.
 [eva] Done for function fabs
-[eva] tests/value/logic.c:428: Frama_C_show_each_zero: [-0. .. 0.]
+[eva] logic.c:428: Frama_C_show_each_zero: [-0. .. 0.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
-  Called from tests/value/logic.c:429.
-[eva] tests/value/logic.c:429: 
+  Called from logic.c:429.
+[eva] logic.c:429: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/value/logic.c:429: 
+[eva] logic.c:429: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:430.
+  Called from logic.c:430.
 [eva] Done for function fabs
-[eva] tests/value/logic.c:431: Frama_C_show_each_half_two: [0.5 .. 2.]
+[eva] logic.c:431: Frama_C_show_each_half_two: [0.5 .. 2.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
-  Called from tests/value/logic.c:432.
-[eva] tests/value/logic.c:432: 
+  Called from logic.c:432.
+[eva] logic.c:432: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/value/logic.c:432: 
+[eva] logic.c:432: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:433.
+  Called from logic.c:433.
 [eva] Done for function fabs
-[eva] tests/value/logic.c:434: Frama_C_show_each_0_10: [-0. .. 10.]
+[eva] logic.c:434: Frama_C_show_each_0_10: [-0. .. 10.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
-  Called from tests/value/logic.c:435.
-[eva] tests/value/logic.c:435: 
+  Called from logic.c:435.
+[eva] logic.c:435: 
   function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] tests/value/logic.c:435: 
+[eva] logic.c:435: 
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
-  Called from tests/value/logic.c:436.
+  Called from logic.c:436.
 [eva] Done for function fabs
-[eva] tests/value/logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
+[eva] logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
 [eva] Recording results for float_abs
 [eva] Done for function float_abs
 [eva] Recording results for main
@@ -567,7 +567,7 @@
   eleven ∈ {11}
   x_0 ∈
      {{ garbled mix of &{x_0}
-      (origin: Library function {tests/value/logic.c:411}) }}
+      (origin: Library function {logic.c:411}) }}
 [eva:final-states] Values at end of function min_max:
   Frama_C_entropy_source ∈ [--..--]
   x_0 ∈ [3..17]

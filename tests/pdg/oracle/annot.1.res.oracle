@@ -1,12 +1,12 @@
-[kernel] Parsing tests/pdg/annot.c (with preprocessing)
+[kernel] Parsing annot.c (with preprocessing)
 [eva] Analyzing a complete application starting at loop
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
-[eva:alarm] tests/pdg/annot.c:22: Warning: loop invariant got status unknown.
-[eva] tests/pdg/annot.c:25: starting to merge loop iterations
-[eva:alarm] tests/pdg/annot.c:26: Warning: 
+[eva:alarm] annot.c:22: Warning: loop invariant got status unknown.
+[eva] annot.c:25: starting to merge loop iterations
+[eva:alarm] annot.c:26: Warning: 
   signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] done for function loop

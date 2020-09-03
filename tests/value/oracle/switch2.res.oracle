@@ -1,16 +1,16 @@
-[kernel] Parsing tests/value/switch2.i (no preprocessing)
+[kernel] Parsing switch2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from tests/value/switch2.i:13.
+  Called from switch2.i:13.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/value/switch2.i:13.
-[kernel:annot:missing-spec] tests/value/switch2.i:13: Warning: 
+  Called from switch2.i:13.
+[kernel:annot:missing-spec] switch2.i:13: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
 [eva] using specification for function g
 [eva] Done for function g

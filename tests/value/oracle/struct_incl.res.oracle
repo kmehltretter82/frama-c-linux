@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/struct_incl.i (no preprocessing)
+[kernel] Parsing struct_incl.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -22,19 +22,19 @@
   z ∈ {0}
   t ∈ {0}
   v ∈ [--..--]
-[eva:alarm] tests/value/struct_incl.i:28: Warning: 
+[eva:alarm] struct_incl.i:28: Warning: 
   pointer downcast. assert (unsigned int)(&s1.d[9]) ≤ 2147483647;
-[eva:alarm] tests/value/struct_incl.i:29: Warning: 
+[eva:alarm] struct_incl.i:29: Warning: 
   pointer downcast. assert (unsigned int)(&s1.d[10]) ≤ 2147483647;
-[eva:alarm] tests/value/struct_incl.i:30: Warning: 
+[eva:alarm] struct_incl.i:30: Warning: 
   pointer downcast. assert (unsigned int)(&s1.b) ≤ 2147483647;
-[eva:alarm] tests/value/struct_incl.i:48: Warning: 
+[eva:alarm] struct_incl.i:48: Warning: 
   accessing out of bounds index. assert 10 < 10;
-[kernel] tests/value/struct_incl.i:48: Warning: 
+[kernel] struct_incl.i:48: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/struct_incl.i:48: 
+[eva] struct_incl.i:48: 
   assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/scope/scope.c (with preprocessing)
+[kernel] Parsing scope.c (with preprocessing)
 [eva] Analyzing a complete application starting at loop
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,18 +6,18 @@
   S1 ∈ {0}
   S2 ∈ {0}
   T[0..99] ∈ {0}
-[eva] tests/scope/scope.c:67: starting to merge loop iterations
-[eva:alarm] tests/scope/scope.c:68: Warning: 
+[eva] scope.c:67: starting to merge loop iterations
+[eva:alarm] scope.c:68: Warning: 
   signed overflow. assert a + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/scope.c:69: Warning: 
+[eva:alarm] scope.c:69: Warning: 
   signed overflow. assert b + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/scope.c:70: Warning: 
+[eva:alarm] scope.c:70: Warning: 
   signed overflow. assert s + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/scope.c:75: Warning: 
+[eva:alarm] scope.c:75: Warning: 
   signed overflow. assert a + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/scope.c:76: Warning: 
+[eva:alarm] scope.c:76: Warning: 
   signed overflow. assert b + 1 ≤ 2147483647;
-[eva:alarm] tests/scope/scope.c:77: Warning: 
+[eva:alarm] scope.c:77: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] done for function loop

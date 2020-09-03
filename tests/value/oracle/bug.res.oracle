@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/bug.i (no preprocessing)
+[kernel] Parsing bug.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed

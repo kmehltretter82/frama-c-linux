@@ -1,4 +1,4 @@
-[kernel] Parsing tests/metrics/libc.c (with preprocessing)
+[kernel] Parsing libc.c (with preprocessing)
 [metrics] Defined functions (5)
   =====================
    bar (0 call); f (0 call); foo (0 call); g (address taken) (0 call);

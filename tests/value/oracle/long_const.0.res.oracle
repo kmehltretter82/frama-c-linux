@@ -1,23 +1,23 @@
-[kernel] Parsing tests/value/long_const.i (no preprocessing)
+[kernel] Parsing long_const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] tests/value/long_const.i:35: 
+[eva] long_const.i:35: 
   Frama_C_show_each_f: {4}, {18446603611099103232}, {0}
 [eva] computing for function div64 <- main.
-  Called from tests/value/long_const.i:37.
-[eva:alarm] tests/value/long_const.i:37: Warning: 
+  Called from long_const.i:37.
+[eva:alarm] long_const.i:37: Warning: 
   function div64: precondition 'num' got status unknown.
-[eva:alarm] tests/value/long_const.i:37: Warning: 
+[eva:alarm] long_const.i:37: Warning: 
   function div64: precondition 'denom' got status unknown.
 [eva] computing for function LL_ABS <- div64 <- main.
-  Called from tests/value/long_const.i:24.
+  Called from long_const.i:24.
 [eva] Recording results for LL_ABS
 [eva] Done for function LL_ABS
-[eva] tests/value/long_const.i:25: Reusing old results for call to LL_ABS
-[eva] tests/value/long_const.i:26: 
+[eva] long_const.i:25: Reusing old results for call to LL_ABS
+[eva] long_const.i:26: 
   Frama_C_show_each:
   [-9223372036854775807..9223372036854775807],
   [0..9223372036854775807],

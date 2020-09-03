@@ -1,4 +1,4 @@
-[kernel] Parsing tests/misc/obfuscate.c (with preprocessing)
+[kernel] Parsing obfuscate.c (with preprocessing)
 [obfuscator] Warning: unobfuscated attribute name `fc_stdlib'
 [obfuscator] Warning: unobfuscated attribute parameter name `stdint.h'
 [obfuscator] Warning: unobfuscated attribute name `missingproto'

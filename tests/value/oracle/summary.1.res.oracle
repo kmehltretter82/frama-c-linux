@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/summary.i (no preprocessing)
+[kernel] Parsing summary.i (no preprocessing)
 [eva] Analyzing a complete application starting at minimal
 [eva] Computing initial state
 [eva] Initial state computed

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/sizeof.i (no preprocessing)
+[kernel] Parsing sizeof.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -10,35 +10,35 @@
   s1 ∈ {0}
   i ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from tests/value/sizeof.i:40.
-[eva] tests/value/sizeof.i:10: assertion got status valid.
-[eva] tests/value/sizeof.i:14: assertion got status valid.
-[eva] tests/value/sizeof.i:17: assertion got status valid.
+  Called from sizeof.i:40.
+[eva] sizeof.i:10: assertion got status valid.
+[eva] sizeof.i:14: assertion got status valid.
+[eva] sizeof.i:17: assertion got status valid.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from tests/value/sizeof.i:41.
-[eva:alarm] tests/value/sizeof.i:32: Warning: 
+  Called from sizeof.i:41.
+[eva:alarm] sizeof.i:32: Warning: 
   pointer downcast. assert (unsigned int)(&s1) ≤ 2147483647;
-[eva] tests/value/sizeof.i:32: 
+[eva] sizeof.i:32: 
   Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {tests/value/sizeof.i:32}
-[eva:alarm] tests/value/sizeof.i:33: Warning: 
+  The imprecision originates from Arithmetic {sizeof.i:32}
+[eva:alarm] sizeof.i:33: Warning: 
   accessing out of bounds index.
   assert (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
-[eva:alarm] tests/value/sizeof.i:33: Warning: 
+[eva:alarm] sizeof.i:33: Warning: 
   out of bounds write.
   assert \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
-[eva:alarm] tests/value/sizeof.i:34: Warning: 
+[eva:alarm] sizeof.i:34: Warning: 
   accessing out of bounds index.
   assert (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;
-[eva:alarm] tests/value/sizeof.i:34: Warning: 
+[eva:alarm] sizeof.i:34: Warning: 
   out of bounds write.
   assert \valid(&p->t[(unsigned int)(sizeof(int [10]) - (unsigned int)i)]);
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function f <- main.
-  Called from tests/value/sizeof.i:42.
+  Called from sizeof.i:42.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

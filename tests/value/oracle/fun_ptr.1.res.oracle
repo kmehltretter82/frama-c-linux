@@ -1,16 +1,16 @@
-[kernel] Parsing tests/value/fun_ptr.i (no preprocessing)
-[kernel:typing:incompatible-types-call] tests/value/fun_ptr.i:55: Warning: 
+[kernel] Parsing fun_ptr.i (no preprocessing)
+[kernel:typing:incompatible-types-call] fun_ptr.i:55: Warning: 
   implicit conversion between incompatible function types:
   void (*)(int j, void *p)
   and
   void (*)(long , short *)
-[kernel:typing:incompatible-types-call] tests/value/fun_ptr.i:56: Warning: 
+[kernel:typing:incompatible-types-call] fun_ptr.i:56: Warning: 
   expected 'short *' but got argument of type 'int *': & x
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
-[eva:alarm] tests/value/fun_ptr.i:21: Warning: 
+[eva:alarm] fun_ptr.i:21: Warning: 
   pointer downcast. assert (unsigned __int64)(&f) ≤ 9223372036854775807;
-[eva:alarm] tests/value/fun_ptr.i:21: Warning: 
+[eva:alarm] fun_ptr.i:21: Warning: 
   pointer downcast. assert (unsigned __int64)(&g) ≤ 9223372036854775807;
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
@@ -21,78 +21,78 @@
   R3 ∈ {0}
   v ∈ [--..--]
 [eva] computing for function test1 <- main.
-  Called from tests/value/fun_ptr.i:78.
-[eva:alarm] tests/value/fun_ptr.i:28: Warning: 
+  Called from fun_ptr.i:78.
+[eva:alarm] fun_ptr.i:28: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((int (*)(int ))t[nd]);
 [eva] computing for function f <- test1 <- main.
-  Called from tests/value/fun_ptr.i:28.
+  Called from fun_ptr.i:28.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] computing for function test2 <- main.
-  Called from tests/value/fun_ptr.i:79.
-[eva:alarm] tests/value/fun_ptr.i:33: Warning: 
+  Called from fun_ptr.i:79.
+[eva:alarm] fun_ptr.i:33: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((int (*)(int , int ))t[nd]);
 [eva] computing for function g <- test2 <- main.
-  Called from tests/value/fun_ptr.i:33.
+  Called from fun_ptr.i:33.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] tests/value/fun_ptr.i:33: Reusing old results for call to f
+[eva] fun_ptr.i:33: Reusing old results for call to f
 [eva] Recording results for test2
 [eva] Done for function test2
 [eva] computing for function test3 <- main.
-  Called from tests/value/fun_ptr.i:80.
-[eva:alarm] tests/value/fun_ptr.i:38: Warning: 
+  Called from fun_ptr.i:80.
+[eva:alarm] fun_ptr.i:38: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(int ))t[nd]);
 [eva] Recording results for test3
 [eva] Done for function test3
-[eva:alarm] tests/value/fun_ptr.i:83: Warning: 
+[eva:alarm] fun_ptr.i:83: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(double , double ))ph);
-[eva:alarm] tests/value/fun_ptr.i:85: Warning: 
+[eva:alarm] fun_ptr.i:85: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(void))ph);
 [eva] computing for function h <- main.
-  Called from tests/value/fun_ptr.i:87.
+  Called from fun_ptr.i:87.
 [eva] Recording results for h
 [eva] Done for function h
 [eva] computing for function test_benign <- main.
-  Called from tests/value/fun_ptr.i:89.
-[eva:alarm] tests/value/fun_ptr.i:56: Warning: 
+  Called from fun_ptr.i:89.
+[eva:alarm] fun_ptr.i:56: Warning: 
   pointer to function with incompatible type. assert \valid_function(p);
 [eva] computing for function benign <- test_benign <- main.
-  Called from tests/value/fun_ptr.i:56.
+  Called from fun_ptr.i:56.
 [eva] Recording results for benign
 [eva] Done for function benign
 [eva] Recording results for test_benign
 [eva] Done for function test_benign
 [eva] computing for function test_too_much_benign <- main.
-  Called from tests/value/fun_ptr.i:90.
-[eva:alarm] tests/value/fun_ptr.i:70: Warning: 
+  Called from fun_ptr.i:90.
+[eva:alarm] fun_ptr.i:70: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((void (*)(int , int ))p);
 [eva] computing for function too_much <- test_too_much_benign <- main.
-  Called from tests/value/fun_ptr.i:70.
+  Called from fun_ptr.i:70.
 [eva] Recording results for too_much
 [eva] Done for function too_much
-[eva:alarm] tests/value/fun_ptr.i:73: Warning: 
+[eva:alarm] fun_ptr.i:73: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((void (*)(int , int ))p);
 [eva] Recording results for test_too_much_benign
 [eva] Done for function test_too_much_benign
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/fun_ptr.i:38: 
+[eva] fun_ptr.i:38: 
   assertion 'Eva,function_pointer' got final status invalid.
-[eva] tests/value/fun_ptr.i:73: 
+[eva] fun_ptr.i:73: 
   assertion 'Eva,function_pointer' got final status invalid.
-[eva] tests/value/fun_ptr.i:83: 
+[eva] fun_ptr.i:83: 
   assertion 'Eva,function_pointer' got final status invalid.
-[eva] tests/value/fun_ptr.i:85: 
+[eva] fun_ptr.i:85: 
   assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function benign:
@@ -135,7 +135,7 @@
 [from] Computing for function test1
 [from] Done for function test1
 [from] Computing for function test2
-[from] tests/value/fun_ptr.i:33: Warning: 
+[from] fun_ptr.i:33: Warning: 
   variadic call detected. Using only 1 argument(s).
 [from] Done for function test2
 [from] Computing for function test3
@@ -146,14 +146,14 @@
 [from] Computing for function too_much
 [from] Done for function too_much
 [from] Computing for function test_too_much_benign
-[from] tests/value/fun_ptr.i:70: Warning: 
+[from] fun_ptr.i:70: Warning: 
   variadic call detected. Using only 1 argument(s).
 [from] Computing for function too_much2 <-test_too_much_benign
 [from] Non-terminating function too_much2 (no dependencies)
 [from] Done for function too_much2
 [from] Done for function test_too_much_benign
 [from] Computing for function main
-[from] tests/value/fun_ptr.i:85: Warning: 
+[from] fun_ptr.i:85: Warning: 
   variadic call detected. Using only 0 argument(s).
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

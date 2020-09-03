@@ -1,4 +1,4 @@
-[kernel] Parsing tests/syntax/forloophook.i (no preprocessing)
+[kernel] Parsing forloophook.i (no preprocessing)
 Found a for loop
 Local declaration
 Has a test

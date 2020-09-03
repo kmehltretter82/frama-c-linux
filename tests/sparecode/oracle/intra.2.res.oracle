@@ -1,4 +1,4 @@
-[kernel] Parsing tests/sparecode/intra.i (no preprocessing)
+[kernel] Parsing intra.i (no preprocessing)
 [sparecode] remove unused code...
 [eva] Analyzing a complete application starting at main2
 [eva] Computing initial state
@@ -8,8 +8,8 @@
   X10 ∈ {0}
   Y10 ∈ {0}
 [eva] computing for function f10 <- main2.
-  Called from tests/sparecode/intra.i:115.
-[eva] tests/sparecode/intra.i:109: assertion got status valid.
+  Called from intra.i:115.
+[eva] intra.i:109: assertion got status valid.
 [eva] Recording results for f10
 [eva] Done for function f10
 [eva] Recording results for main2
@@ -40,7 +40,7 @@
 [pdg] Bottom for function spare_called_fct
 [pdg] computing for function stop
 [from] Computing for function stop
-[kernel:annot:missing-spec] tests/sparecode/intra.i:110: Warning: 
+[kernel:annot:missing-spec] intra.i:110: Warning: 
   Neither code nor specification for function stop, generating default assigns from the prototype
 [from] Done for function stop
 [pdg] done for function stop

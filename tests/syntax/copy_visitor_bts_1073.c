@@ -2,7 +2,7 @@
 CMXS: @PTEST_NAME@
 CMXS: @PTEST_NAME@_bis
 OPT: -load-module %{dep:@PTEST_NAME@.cmxs}
-OPT: -load-module @PTEST_DIR@/@PTEST_NAME@_bis -test -then-on filtered -print
+OPT: -load-module @PTEST_NAME@_bis -test -then-on filtered -print
 */
 
 #include "stdio.h"

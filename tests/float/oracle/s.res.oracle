@@ -1,5 +1,5 @@
-[kernel] Parsing tests/float/s.i (no preprocessing)
-[kernel:parser:decimal-float] tests/float/s.i:18: Warning: 
+[kernel] Parsing s.i (no preprocessing)
+[kernel:parser:decimal-float] s.i:18: Warning: 
   Floating-point constant 1.882f is not represented exactly. Will use 0x1.e1cac00000000p0.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -243,43 +243,43 @@
   G18 ∈ {0}
   G19 ∈ {0}
 [eva] computing for function F4 <- main.
-  Called from tests/float/s.i:260.
+  Called from s.i:260.
 [eva] computing for function F1 <- F4 <- main.
-  Called from tests/float/s.i:230.
-[kernel:annot:missing-spec] tests/float/s.i:230: Warning: 
+  Called from s.i:230.
+[kernel:annot:missing-spec] s.i:230: Warning: 
   Neither code nor specification for function F1, generating default assigns from the prototype
 [eva] using specification for function F1
 [eva] Done for function F1
-[eva:alarm] tests/float/s.i:231: Warning: 
+[eva:alarm] s.i:231: Warning: 
   accessing out of bounds index. assert 0 ≤ V4;
-[eva:alarm] tests/float/s.i:231: Warning: 
+[eva:alarm] s.i:231: Warning: 
   accessing out of bounds index. assert V4 < 64;
 [eva] computing for function F2 <- F4 <- main.
-  Called from tests/float/s.i:233.
-[kernel:annot:missing-spec] tests/float/s.i:233: Warning: 
+  Called from s.i:233.
+[kernel:annot:missing-spec] s.i:233: Warning: 
   Neither code nor specification for function F2, generating default assigns from the prototype
 [eva] using specification for function F2
 [eva] Done for function F2
-[eva:alarm] tests/float/s.i:238: Warning: 
+[eva:alarm] s.i:238: Warning: 
   accessing out of bounds index. assert 0 ≤ V5;
-[eva:alarm] tests/float/s.i:238: Warning: 
+[eva:alarm] s.i:238: Warning: 
   accessing out of bounds index. assert V5 < 64;
 [eva] computing for function F2 <- F4 <- main.
-  Called from tests/float/s.i:241.
+  Called from s.i:241.
 [eva] Done for function F2
-[eva:alarm] tests/float/s.i:242: Warning: 
+[eva:alarm] s.i:242: Warning: 
   accessing out of bounds index. assert 0 ≤ V6;
-[eva:alarm] tests/float/s.i:242: Warning: 
+[eva:alarm] s.i:242: Warning: 
   accessing out of bounds index. assert V6 < 64;
 [eva] computing for function F3 <- F4 <- main.
-  Called from tests/float/s.i:244.
-[kernel:annot:missing-spec] tests/float/s.i:244: Warning: 
+  Called from s.i:244.
+[kernel:annot:missing-spec] s.i:244: Warning: 
   Neither code nor specification for function F3, generating default assigns from the prototype
 [eva] using specification for function F3
 [eva] Done for function F3
-[eva:alarm] tests/float/s.i:245: Warning: 
+[eva:alarm] s.i:245: Warning: 
   accessing out of bounds index. assert 0 ≤ V7;
-[eva:alarm] tests/float/s.i:245: Warning: 
+[eva:alarm] s.i:245: Warning: 
   accessing out of bounds index. assert V7 < 32;
 [eva] Recording results for F4
 [eva] Done for function F4

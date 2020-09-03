@@ -1,188 +1,188 @@
-[kernel] Parsing tests/libc/wchar_h.c (with preprocessing)
+[kernel] Parsing wchar_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] computing for function fopen <- main.
-  Called from tests/libc/wchar_h.c:5.
+  Called from wchar_h.c:5.
 [eva] using specification for function fopen
-[eva] tests/libc/wchar_h.c:5: 
+[eva] wchar_h.c:5: 
   function fopen: precondition 'valid_filename' got status valid.
-[eva] tests/libc/wchar_h.c:5: 
+[eva] wchar_h.c:5: 
   function fopen: precondition 'valid_mode' got status valid.
 [eva] Done for function fopen
 [eva] computing for function fgetws <- main.
-  Called from tests/libc/wchar_h.c:8.
+  Called from wchar_h.c:8.
 [eva] using specification for function fgetws
-[eva] tests/libc/wchar_h.c:8: 
+[eva] wchar_h.c:8: 
   function fgetws: precondition 'room_nwstring' got status valid.
-[eva] tests/libc/wchar_h.c:8: 
+[eva] wchar_h.c:8: 
   function fgetws: precondition 'valid_stream' got status valid.
 [eva] Done for function fgetws
-[eva] tests/libc/wchar_h.c:10: assertion got status valid.
-[eva] tests/libc/wchar_h.c:13: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:13: 
+[eva] wchar_h.c:10: assertion got status valid.
+[eva] wchar_h.c:13: Call to builtin wmemchr
+[eva] wchar_h.c:13: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] tests/libc/wchar_h.c:13: 
+[eva] wchar_h.c:13: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] tests/libc/wchar_h.c:13: 
+[eva] wchar_h.c:13: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:14: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:15: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:15: 
+[eva] wchar_h.c:14: check 'ok' got status valid.
+[eva] wchar_h.c:15: Call to builtin wmemchr
+[eva] wchar_h.c:15: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] tests/libc/wchar_h.c:15: 
+[eva] wchar_h.c:15: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] tests/libc/wchar_h.c:15: 
+[eva] wchar_h.c:15: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:16: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:18: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:18: 
+[eva] wchar_h.c:16: check 'ok' got status valid.
+[eva] wchar_h.c:18: Call to builtin wmemchr
+[eva] wchar_h.c:18: 
   function wmemchr: precondition 'valid' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:18: Warning: 
+[eva:alarm] wchar_h.c:18: Warning: 
   function wmemchr: precondition 'initialization' got status invalid.
-[eva] tests/libc/wchar_h.c:18: 
+[eva] wchar_h.c:18: 
   function wmemchr: no state left, precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:21: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:21: 
+[eva] wchar_h.c:21: Call to builtin wmemchr
+[eva] wchar_h.c:21: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] tests/libc/wchar_h.c:21: 
+[eva] wchar_h.c:21: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] tests/libc/wchar_h.c:21: 
+[eva] wchar_h.c:21: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:22: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:24: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:24: 
+[eva] wchar_h.c:22: check 'ok' got status valid.
+[eva] wchar_h.c:24: Call to builtin wmemchr
+[eva] wchar_h.c:24: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] tests/libc/wchar_h.c:24: 
+[eva] wchar_h.c:24: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] tests/libc/wchar_h.c:24: 
+[eva] wchar_h.c:24: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:25: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:26: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:26: 
+[eva] wchar_h.c:25: check 'ok' got status valid.
+[eva] wchar_h.c:26: Call to builtin wmemchr
+[eva] wchar_h.c:26: 
   function wmemchr: precondition 'valid' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:26: Warning: 
+[eva:alarm] wchar_h.c:26: Warning: 
   function wmemchr: precondition 'initialization' got status unknown.
-[eva] tests/libc/wchar_h.c:26: 
+[eva] wchar_h.c:26: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:27: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:29: Call to builtin wmemchr
-[eva] tests/libc/wchar_h.c:29: 
+[eva] wchar_h.c:27: check 'ok' got status valid.
+[eva] wchar_h.c:29: Call to builtin wmemchr
+[eva] wchar_h.c:29: 
   function wmemchr: precondition 'valid' got status valid.
-[eva] tests/libc/wchar_h.c:29: 
+[eva] wchar_h.c:29: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] tests/libc/wchar_h.c:29: 
+[eva] wchar_h.c:29: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] tests/libc/wchar_h.c:30: check 'ok' got status valid.
+[eva] wchar_h.c:30: check 'ok' got status valid.
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:33.
+  Called from wchar_h.c:33.
 [eva] using specification for function wcsncpy
-[eva] tests/libc/wchar_h.c:33: 
+[eva] wchar_h.c:33: 
   function wcsncpy: precondition 'valid_wstring_src' got status valid.
-[eva] tests/libc/wchar_h.c:33: 
+[eva] wchar_h.c:33: 
   function wcsncpy: precondition 'room_nwstring' got status valid.
-[eva] tests/libc/wchar_h.c:33: 
+[eva] wchar_h.c:33: 
   function wcsncpy: precondition 'separation,dest,src' got status valid.
 [eva] Done for function wcsncpy
-[eva] tests/libc/wchar_h.c:34: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:35: check 'ok' got status valid.
-[eva] tests/libc/wchar_h.c:37: Call to builtin wcslen
-[eva] tests/libc/wchar_h.c:37: 
+[eva] wchar_h.c:34: check 'ok' got status valid.
+[eva] wchar_h.c:35: check 'ok' got status valid.
+[eva] wchar_h.c:37: Call to builtin wcslen
+[eva] wchar_h.c:37: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:37.
-[eva] tests/libc/wchar_h.c:37: 
+  Called from wchar_h.c:37.
+[eva] wchar_h.c:37: 
   function wcsncpy: precondition 'valid_wstring_src' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:37: Warning: 
+[eva:alarm] wchar_h.c:37: Warning: 
   function wcsncpy: precondition 'room_nwstring' got status invalid.
-[eva] tests/libc/wchar_h.c:37: 
+[eva] wchar_h.c:37: 
   function wcsncpy: no state left, precondition 'separation,dest,src' got status valid.
 [eva] Done for function wcsncpy
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:41.
-[eva:alarm] tests/libc/wchar_h.c:41: Warning: 
+  Called from wchar_h.c:41.
+[eva:alarm] wchar_h.c:41: Warning: 
   function wcsncpy: precondition 'valid_wstring_src' got status unknown.
-[eva] tests/libc/wchar_h.c:41: 
+[eva] wchar_h.c:41: 
   function wcsncpy: precondition 'room_nwstring' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:41: Warning: 
+[eva:alarm] wchar_h.c:41: Warning: 
   function wcsncpy: precondition 'separation,dest,src' got status invalid.
 [eva] Done for function wcsncpy
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:45.
-[eva] tests/libc/wchar_h.c:45: 
+  Called from wchar_h.c:45.
+[eva] wchar_h.c:45: 
   function wcsncpy: precondition 'valid_wstring_src' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:45: Warning: 
+[eva:alarm] wchar_h.c:45: Warning: 
   function wcsncpy: precondition 'room_nwstring' got status invalid.
-[eva] tests/libc/wchar_h.c:45: 
+[eva] wchar_h.c:45: 
   function wcsncpy: no state left, precondition 'separation,dest,src' got status valid.
 [eva] Done for function wcsncpy
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:49.
-[eva:alarm] tests/libc/wchar_h.c:49: Warning: 
+  Called from wchar_h.c:49.
+[eva:alarm] wchar_h.c:49: Warning: 
   function wcsncpy: precondition 'valid_wstring_src' got status invalid.
-[eva] tests/libc/wchar_h.c:49: 
+[eva] wchar_h.c:49: 
   function wcsncpy: no state left, precondition 'room_nwstring' got status valid.
-[eva] tests/libc/wchar_h.c:49: 
+[eva] wchar_h.c:49: 
   function wcsncpy: no state left, precondition 'separation,dest,src' got status valid.
 [eva] Done for function wcsncpy
 [eva] computing for function wcsncpy <- main.
-  Called from tests/libc/wchar_h.c:53.
-[eva:alarm] tests/libc/wchar_h.c:53: Warning: 
+  Called from wchar_h.c:53.
+[eva:alarm] wchar_h.c:53: Warning: 
   function wcsncpy: precondition 'valid_wstring_src' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:53: Warning: 
+[eva:alarm] wchar_h.c:53: Warning: 
   function wcsncpy: precondition 'room_nwstring' got status invalid.
-[eva] tests/libc/wchar_h.c:53: 
+[eva] wchar_h.c:53: 
   function wcsncpy: no state left, precondition 'separation,dest,src' got status valid.
 [eva] Done for function wcsncpy
 [eva] computing for function wcsncmp <- main.
-  Called from tests/libc/wchar_h.c:56.
+  Called from wchar_h.c:56.
 [eva] using specification for function wcsncmp
-[eva] tests/libc/wchar_h.c:56: 
+[eva] wchar_h.c:56: 
   function wcsncmp: precondition 'valid_wstring_s1' got status valid.
-[eva] tests/libc/wchar_h.c:56: 
+[eva] wchar_h.c:56: 
   function wcsncmp: precondition 'valid_wstring_s2' got status valid.
 [eva] Done for function wcsncmp
 [eva] computing for function wcsncmp <- main.
-  Called from tests/libc/wchar_h.c:57.
-[eva] tests/libc/wchar_h.c:57: 
+  Called from wchar_h.c:57.
+[eva] wchar_h.c:57: 
   function wcsncmp: precondition 'valid_wstring_s1' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:57: Warning: 
+[eva:alarm] wchar_h.c:57: Warning: 
   function wcsncmp: precondition 'valid_wstring_s2' got status unknown.
 [eva] Done for function wcsncmp
 [eva] computing for function wcsncat <- main.
-  Called from tests/libc/wchar_h.c:59.
+  Called from wchar_h.c:59.
 [eva] using specification for function wcsncat
-[eva] tests/libc/wchar_h.c:59: 
+[eva] wchar_h.c:59: 
   function wcsncat: precondition 'valid_nwstring_src' got status valid.
-[eva] tests/libc/wchar_h.c:59: 
+[eva] wchar_h.c:59: 
   function wcsncat: precondition 'valid_wstring_dest' got status valid.
-[eva] tests/libc/wchar_h.c:59: 
+[eva] wchar_h.c:59: 
   function wcsncat: precondition 'room_for_concatenation' got status valid.
-[eva] tests/libc/wchar_h.c:59: 
+[eva] wchar_h.c:59: 
   function wcsncat: precondition 'separation' got status valid.
 [eva] Done for function wcsncat
 [eva] computing for function wcsncat <- main.
-  Called from tests/libc/wchar_h.c:60.
-[eva] tests/libc/wchar_h.c:60: 
+  Called from wchar_h.c:60.
+[eva] wchar_h.c:60: 
   function wcsncat: precondition 'valid_nwstring_src' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:60: Warning: 
+[eva:alarm] wchar_h.c:60: Warning: 
   function wcsncat: precondition 'valid_wstring_dest' got status unknown.
-[eva:alarm] tests/libc/wchar_h.c:60: Warning: 
+[eva:alarm] wchar_h.c:60: Warning: 
   function wcsncat: precondition 'room_for_concatenation' got status unknown.
-[eva] tests/libc/wchar_h.c:60: 
+[eva] wchar_h.c:60: 
   function wcsncat: precondition 'separation' got status valid.
 [eva] Done for function wcsncat
 [eva] computing for function wcsncat <- main.
-  Called from tests/libc/wchar_h.c:66.
-[eva] tests/libc/wchar_h.c:66: 
+  Called from wchar_h.c:66.
+[eva] wchar_h.c:66: 
   function wcsncat: precondition 'valid_nwstring_src' got status valid.
-[eva] tests/libc/wchar_h.c:66: 
+[eva] wchar_h.c:66: 
   function wcsncat: precondition 'valid_wstring_dest' got status valid.
-[eva:alarm] tests/libc/wchar_h.c:66: Warning: 
+[eva:alarm] wchar_h.c:66: Warning: 
   function wcsncat: precondition 'room_for_concatenation' got status invalid.
-[eva] tests/libc/wchar_h.c:66: 
+[eva] wchar_h.c:66: 
   function wcsncat: no state left, precondition 'separation' got status valid.
 [eva] Done for function wcsncat
 [eva] Recording results for main

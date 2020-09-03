@@ -1,4 +1,4 @@
-[kernel] Parsing tests/slicing/bts335b.i (no preprocessing)
+[kernel] Parsing bts335b.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -6,11 +6,11 @@
   X ∈ {0}
   Y ∈ {0}
 [eva] computing for function f <- main.
-  Called from tests/slicing/bts335b.i:20.
-[eva:alarm] tests/slicing/bts335b.i:16: Warning: 
+  Called from bts335b.i:20.
+[eva:alarm] bts335b.i:16: Warning: 
   signed overflow. assert z + 1 ≤ 2147483647;
 [eva] computing for function g <- f <- main.
-  Called from tests/slicing/bts335b.i:17.
+  Called from bts335b.i:17.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
@@ -19,18 +19,18 @@
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
-[eva:alarm] tests/slicing/bts335b.i:21: Warning: 
+[eva:alarm] bts335b.i:21: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
 [eva] computing for function g <- main.
-  Called from tests/slicing/bts335b.i:22.
+  Called from bts335b.i:22.
 [eva] Recording results for g
 [from] Computing for function g
 [from] Done for function g
 [eva] Done for function g
-[eva:alarm] tests/slicing/bts335b.i:22: Warning: 
+[eva:alarm] bts335b.i:22: Warning: 
   signed overflow. assert -2147483648 ≤ r + tmp_0;
                    (tmp_0 from g(2, w, b, j))
-[eva:alarm] tests/slicing/bts335b.i:22: Warning: 
+[eva:alarm] bts335b.i:22: Warning: 
   signed overflow. assert r + tmp_0 ≤ 2147483647;
                    (tmp_0 from g(2, w, b, j))
 [eva] Recording results for main
@@ -38,15 +38,15 @@
 [from] Done for function main
 [eva] done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to g at tests/slicing/bts335b.i:17 (by f):
+[from] call to g at bts335b.i:17 (by f):
   X FROM c; x
   Y FROM c; x
   \result FROM c; x
-[from] call to f at tests/slicing/bts335b.i:20 (by main):
+[from] call to f at bts335b.i:20 (by main):
   X FROM c; x
   Y FROM c; x
   \result FROM c; x
-[from] call to g at tests/slicing/bts335b.i:22 (by main):
+[from] call to g at bts335b.i:22 (by main):
   X FROM c; y
   Y FROM c; y
   \result FROM c; y
@@ -126,4 +126,4 @@ int main(int v, int w, int a, int b, int i, int j)
 }
 
 
-[kernel] Parsing tests/slicing/result/ocode_0_bts335b.i (no preprocessing)
+[kernel] Parsing result/ocode_0_bts335b.i (no preprocessing)

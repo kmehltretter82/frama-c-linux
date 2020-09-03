@@ -1,5 +1,5 @@
-[kernel] Parsing tests/value/undefined_sequence2.i (no preprocessing)
-[kernel] tests/value/undefined_sequence2.i:11: Warning: 
+[kernel] Parsing undefined_sequence2.i (no preprocessing)
+[kernel] undefined_sequence2.i:11: Warning: 
   Unspecified sequence with side effect:
   /* *x <- x */
   tmp = 0;
@@ -7,13 +7,13 @@
   /* *x <- x */
   tmp_0 = 0;
   *x = tmp_0;
-[kernel] tests/value/undefined_sequence2.i:18: Warning: 
+[kernel] undefined_sequence2.i:18: Warning: 
   Unspecified sequence with side effect:
   /* i <-  */
   i ++;
   /* i <-  */
   i ++;
-[kernel] tests/value/undefined_sequence2.i:26: Warning: 
+[kernel] undefined_sequence2.i:26: Warning: 
   Unspecified sequence with side effect:
   /*  <-  */
   tmp = i;
@@ -21,7 +21,7 @@
   i ++;
   /* a[tmp] <- tmp i */
   a[tmp] = i;
-[kernel] tests/value/undefined_sequence2.i:34: Warning: 
+[kernel] undefined_sequence2.i:34: Warning: 
   Unspecified sequence with side effect:
   /* *x <- x */
   tmp = 0;
@@ -29,7 +29,7 @@
   /* *y <- y */
   tmp_0 = 0;
   *y = tmp_0;
-[kernel] tests/value/undefined_sequence2.i:47: Warning: 
+[kernel] undefined_sequence2.i:47: Warning: 
   Unspecified sequence with side effect:
   /* *x <- x */
   tmp = 0;
@@ -44,51 +44,51 @@
   a[0..1] ∈ {0}
   foo ∈ [--..--]
 [eva] computing for function multiple_update_wrong_1 <- main.
-  Called from tests/value/undefined_sequence2.i:56.
-[eva:alarm] tests/value/undefined_sequence2.i:11: Warning: 
+  Called from undefined_sequence2.i:56.
+[eva:alarm] undefined_sequence2.i:11: Warning: 
   undefined multiple accesses in expression. assert \separated(x, x);
 [eva] Recording results for multiple_update_wrong_1
 [eva] Done for function multiple_update_wrong_1
 [eva] computing for function multiple_update_wrong_2 <- main.
-  Called from tests/value/undefined_sequence2.i:58.
-[eva:alarm] tests/value/undefined_sequence2.i:18: Warning: 
+  Called from undefined_sequence2.i:58.
+[eva:alarm] undefined_sequence2.i:18: Warning: 
   undefined multiple accesses in expression. assert \separated(&i, &i);
 [eva] Recording results for multiple_update_wrong_2
 [eva] Done for function multiple_update_wrong_2
 [eva] computing for function multiple_update_wrong_3 <- main.
-  Called from tests/value/undefined_sequence2.i:60.
-[eva:alarm] tests/value/undefined_sequence2.i:26: Warning: 
+  Called from undefined_sequence2.i:60.
+[eva:alarm] undefined_sequence2.i:26: Warning: 
   undefined multiple accesses in expression. assert \separated(&i, &i);
 [eva] Recording results for multiple_update_wrong_3
 [eva] Done for function multiple_update_wrong_3
 [eva] computing for function multiple_update_unsafe <- main.
-  Called from tests/value/undefined_sequence2.i:62.
+  Called from undefined_sequence2.i:62.
 [eva] Recording results for multiple_update_unsafe
 [eva] Done for function multiple_update_unsafe
-[eva] tests/value/undefined_sequence2.i:62: Frama_C_show_each_passed4:
+[eva] undefined_sequence2.i:62: Frama_C_show_each_passed4:
 [eva] computing for function multiple_update_unsafe <- main.
-  Called from tests/value/undefined_sequence2.i:64.
-[eva:alarm] tests/value/undefined_sequence2.i:34: Warning: 
+  Called from undefined_sequence2.i:64.
+[eva:alarm] undefined_sequence2.i:34: Warning: 
   undefined multiple accesses in expression. assert \separated(x, y);
 [eva] Recording results for multiple_update_unsafe
 [eva] Done for function multiple_update_unsafe
 [eva] computing for function multiple_update_safe <- main.
-  Called from tests/value/undefined_sequence2.i:66.
+  Called from undefined_sequence2.i:66.
 [eva] Recording results for multiple_update_safe
 [eva] Done for function multiple_update_safe
-[eva] tests/value/undefined_sequence2.i:66: Frama_C_show_each_passed6:
+[eva] undefined_sequence2.i:66: Frama_C_show_each_passed6:
 [eva] computing for function multiple_update_safe <- main.
-  Called from tests/value/undefined_sequence2.i:68.
+  Called from undefined_sequence2.i:68.
 [eva] Recording results for multiple_update_safe
 [eva] Done for function multiple_update_safe
-[eva] tests/value/undefined_sequence2.i:68: Frama_C_show_each_passed7:
+[eva] undefined_sequence2.i:68: Frama_C_show_each_passed7:
 [eva] Recording results for main
 [eva] done for function main
-[eva] tests/value/undefined_sequence2.i:11: 
+[eva] undefined_sequence2.i:11: 
   assertion 'Eva,separation' got final status invalid.
-[eva] tests/value/undefined_sequence2.i:18: 
+[eva] undefined_sequence2.i:18: 
   assertion 'Eva,separation' got final status invalid.
-[eva] tests/value/undefined_sequence2.i:26: 
+[eva] undefined_sequence2.i:26: 
   assertion 'Eva,separation' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function multiple_update_safe:

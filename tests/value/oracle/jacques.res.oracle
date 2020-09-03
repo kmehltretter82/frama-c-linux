@@ -1,4 +1,4 @@
-[kernel] Parsing tests/value/jacques.i (no preprocessing)
+[kernel] Parsing jacques.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,16 +9,16 @@
   A ∈ {0}
   B ∈ {0}
   C ∈ {0}
-[eva] tests/value/jacques.i:21: Frama_C_show_each_f: {{ NULL ; &S_pp }}
-[eva:alarm] tests/value/jacques.i:23: Warning: assertion got status unknown.
-[eva] tests/value/jacques.i:25: Frama_C_show_each_f: {{ &S_pp }}
-[eva] tests/value/jacques.i:29: assertion got status valid.
+[eva] jacques.i:21: Frama_C_show_each_f: {{ NULL ; &S_pp }}
+[eva:alarm] jacques.i:23: Warning: assertion got status unknown.
+[eva] jacques.i:25: Frama_C_show_each_f: {{ &S_pp }}
+[eva] jacques.i:29: assertion got status valid.
 [eva] computing for function f <- main.
-  Called from tests/value/jacques.i:36.
+  Called from jacques.i:36.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from tests/value/jacques.i:40.
+  Called from jacques.i:40.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
