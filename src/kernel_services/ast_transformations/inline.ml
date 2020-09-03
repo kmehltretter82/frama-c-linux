@@ -260,6 +260,9 @@ let inliner functions_to_inline = object (self)
               (Extlib.the self#current_kf)
               callee return_aux args
           in
+          let fun_name = Kernel_function.get_name callee in
+          let new_attribute = (Attr (Cil.frama_c_inlined,[AStr fun_name])) in
+          block.battrs <- Cil.addAttribute new_attribute block.battrs;
           let skind =
             if needs_assign then begin
               match return_aux, return with
