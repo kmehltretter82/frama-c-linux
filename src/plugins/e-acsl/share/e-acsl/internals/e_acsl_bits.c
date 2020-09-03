@@ -20,32 +20,13 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
+#include "e_acsl_bits.h"
+
+/* Check if we have little-endian and abort the execution otherwise. */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#  error "Big-endian byte order is unsupported"
+#elif __BYTE_ORDER__ == __ORDER_PDP_ENDIAN__
+#  error "PDP-endian byte order is unsupported"
+#elif __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+#  error "Unknown byte order"
 #endif
-
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
-
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
-
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
-
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
-
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"

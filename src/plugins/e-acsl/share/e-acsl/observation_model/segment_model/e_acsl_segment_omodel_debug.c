@@ -20,32 +20,34 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+#include "../../internals/e_acsl_rtl_io.h"
+#include "e_acsl_segment_tracking.h"
+#include "e_acsl_shadow_layout.h"
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#include "../internals/e_acsl_omodel_debug.h"
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#define E_ACSL_MMODEL_DESC "shadow memory"
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+void describe_observation_model() {
+  rtl_printf(" * Memory tracking: %s\n", E_ACSL_MMODEL_DESC);
+  rtl_printf(" *   Heap  %d MB\n", E_ACSL_HEAP_SIZE);
+  rtl_printf(" *   Stack %d MB\n", E_ACSL_STACK_SIZE);
+}
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+int allocated(uintptr_t addr, long size, uintptr_t base) {
+  TRY_SEGMENT_WEAK(addr,
+    return heap_allocated(addr, size, base),
+    return static_allocated(addr, size, base));
+  if (!IS_ON_VALID(addr))
+    return 0;
+  return 0;
+}
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+int readonly (void *ptr) {
+  uintptr_t addr = (uintptr_t)ptr;
+  return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
+}
+
+int writeable(uintptr_t addr, long size, uintptr_t base_ptr) {
+  return allocated(addr, size, base_ptr) && !readonly((void*)addr);
+}

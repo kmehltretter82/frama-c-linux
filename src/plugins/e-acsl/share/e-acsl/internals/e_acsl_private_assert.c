@@ -21,31 +21,61 @@
 /**************************************************************************/
 
 /* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
+// #ifndef _DEFAULT_SOURCE
+// # define _DEFAULT_SOURCE 1
+// #endif
+
+#include <limits.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stddef.h>
+
+#include "e_acsl_rtl_io.h"
+#include "e_acsl_trace.h"
+
+#include "e_acsl_private_assert.h"
+
+#define prepend_file_line(file, line, fmt) \
+  do { \
+    char * afmt = "%s:%d: %s\n"; \
+    char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11]; \
+    rtl_sprintf(buf, afmt, file, line, fmt); \
+    fmt = buf; \
+  } while (0)
+
+void raise_abort(const char *file, int line) {
+#ifdef E_ACSL_DEBUG
+#ifndef E_ACSL_NO_TRACE
+  trace();
 #endif
+#endif
+  raise(SIGABRT);
+}
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+void private_abort_fail(const char * file, int line, char *fmt, ...) {
+  va_list va;
+  sigset_t defer_abrt;
+  sigemptyset(&defer_abrt);
+  sigaddset(&defer_abrt,SIGABRT);
+  sigprocmask(SIG_BLOCK,&defer_abrt,NULL);
+  va_start(va,fmt);
+  rtl_veprintf(fmt, va);
+  va_end(va);
+  sigprocmask(SIG_UNBLOCK,&defer_abrt,NULL);
+  raise_abort(file, line);
+}
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+void private_assert_fail(int expr, const char *file, int line, char *fmt,  ...) {
+  if (!expr) {
+    char * afmt = "%s:%d: %s";
+    char buf[strlen(fmt) + strlen(afmt) + PATH_MAX + 11];
+    rtl_sprintf(buf, afmt, file, line, fmt);
+    fmt = buf;
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
-
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
-
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+    va_list va;
+    va_start(va,fmt);
+    rtl_veprintf(fmt, va);
+    va_end(va);
+    raise_abort(file, line);
+  }
+}

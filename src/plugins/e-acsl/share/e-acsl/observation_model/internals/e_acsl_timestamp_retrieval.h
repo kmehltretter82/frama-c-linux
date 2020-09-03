@@ -21,57 +21,33 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_malloc.h
- *
- * \brief E-ACSL memory allocation bindings.
+ * \file
+ * \brief Temporal timestamp retrieval
 ***************************************************************************/
 
-/* Declaration of memory locations considered safe before a program starts.
- * Most of these should be declared somewhere in start procedures of c
- * and gcc libraries. One example of a safe location is errno. */
+#ifndef E_ACSL_TIMESTAMP_RETRIEVAL_H
+#define E_ACSL_TIMESTAMP_RETRIEVAL_H
 
-#ifndef E_ACSL_SAFE_LOCATIONS_H
-#define E_ACSL_SAFE_LOCATIONS_H
+#ifdef E_ACSL_TEMPORAL
 
-#include <stdio.h>
 #include <stdint.h>
-#include <errno.h>
 
-/* Simple representation of a safe location */
-struct memory_location {
-  uintptr_t address; /* Address */
-  uintptr_t length; /* Byte-length */
-  int is_initialized; /* Notion of initialization */
-};
+/*! \brief Return origin time stamp associated with a memory block containing
+ * address given by `ptr`. `0` indicates an invalid timestamp, i.e., timestamp
+ * of a memory block which does not exist. */
+uint32_t origin_timestamp(void *ptr);
 
-typedef struct memory_location memory_location;
+/*! \brief Return address of referent shadow */
+uintptr_t temporal_referent_shadow(void *addr);
 
-/* An array storing safe locations up to `safe_location_counter` position.
- * This array should be initialized via a below function called
- * `collect_safe_locations`. */
-static memory_location safe_locations [16];
-static int safe_location_counter = 0;
+/*! \brief Return referent time stamp associated with a pointer which address
+ * is given by `ptr`. This function expects that `ptr` is allocated and at
+ * least `sizeof(uintptr_t)` bytes long */
+uint32_t referent_timestamp(void *ptr);
 
-#define add_safe_location(_addr,_len,_init) { \
-  safe_locations[safe_location_counter].address = _addr; \
-  safe_locations[safe_location_counter].length = _len; \
-  safe_location_counter++; \
-}
+/*! \brief Store a referent number `ref` in the shadow of `ptr` */
+void store_temporal_referent(void *ptr, uint32_t ref);
 
-#ifdef errno
-#undef errno
-extern __thread int errno;
-#endif
+#endif // E_ACSL_TEMPORAL
 
-extern FILE *stdin;		  /* Standard input stream.  */
-extern FILE *stdout;		/* Standard output stream.  */
-extern FILE *stderr;		/* Standard error output stream. */
-
-static void collect_safe_locations() {
-  /* Tracking of errno and standard streams */
-  add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
-  add_safe_location((uintptr_t)stdout, sizeof(FILE), "stdout");
-  add_safe_location((uintptr_t)stderr, sizeof(FILE), "stderr");
-  add_safe_location((uintptr_t)stdin, sizeof(FILE), "stdin");
-}
-#endif
+#endif // E_ACSL_TIMESTAMP_RETRIEVAL_H

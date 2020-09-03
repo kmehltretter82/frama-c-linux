@@ -20,32 +20,38 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+/*! ***********************************************************************
+ * \file
+ * \brief E-ACSL assertions and abort statements implementation.
+***************************************************************************/
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#ifndef E_ACSL_PRIVATE_ASSERT
+#define E_ACSL_PRIVATE_ASSERT
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+/*! \brief Assert with printf-like error message support */
+#define private_assert(expr, fmt_and_args...) \
+  private_assert_fail(expr, __FILE__, __LINE__, fmt_and_args)
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+/*! \brief Output a message to error stream using printf-like format string
+ * and abort the execution.
+ *
+ * This is a wrapper for \p eprintf combined with \p abort */
+#define private_abort(fmt_and_args...) \
+  private_abort_fail(__FILE__, __LINE__, fmt_and_args)
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+void private_assert_fail(int expr, const char *file, int line, char *fmt,  ...);
+void private_abort_fail(const char * file, int line, char *fmt, ...);
+void raise_abort(const char * file, int line);
+
+/* Instances of assertions shared accross different memory models */
+
+/*! \brief Abort the execution if the size of the pointer computed during
+ * instrumentation (\p _ptr_sz) does not match the size of the pointer used
+ * by a compiler (\p void*) */
+#define arch_assert(_ptr_sz) \
+  private_assert(_ptr_sz == sizeof(void*), \
+    "Mismatch of instrumentation- and compile-time pointer sizes: " \
+    "%lu vs %lu\n", _ptr_sz, sizeof(void*))
+
+#endif // E_ACSL_PRIVATE_ASSERT

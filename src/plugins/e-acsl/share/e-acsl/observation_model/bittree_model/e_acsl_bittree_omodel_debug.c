@@ -20,32 +20,31 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+#include "../../internals/e_acsl_private_assert.h"
+#include "e_acsl_bittree.h"
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#include "../internals/e_acsl_omodel_debug.h"
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#define E_ACSL_MMODEL_DESC "patricia trie"
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+void describe_observation_model() {
+  rtl_printf(" * Memory tracking: %s\n", E_ACSL_MMODEL_DESC);
+}
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+/** \brief same as ::lookup_allocated but return either `1` or `0` depending
+    on whether the memory block described by this function's arguments is
+    allocated or not.
+    NOTE: Should have same signature in all models. */
+int allocated(uintptr_t addr, long size, uintptr_t base) {
+  return lookup_allocated((void*)addr, size, (void*)base) == NULL ? 0 : 1;
+}
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+int readonly (void *ptr) {
+  bt_block * blk = bt_find(ptr);
+  private_assert(blk != NULL, "Readonly on unallocated memory", NULL);
+  return blk->is_readonly;
+}
+
+int writeable(uintptr_t addr, long size, uintptr_t base_ptr) {
+  return allocated(addr, size, base_ptr) && !readonly((void*)addr);
+}

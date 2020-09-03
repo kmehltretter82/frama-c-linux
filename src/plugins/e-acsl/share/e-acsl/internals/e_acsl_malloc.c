@@ -20,32 +20,38 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+#include "e_acsl_malloc.h"
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+struct memory_spaces mem_spaces = {
+  .rtl_mspace = NULL,
+  .heap_mspace = NULL,
+  .heap_start = 0,
+  .heap_end = 0,
+  .heap_mspace_least = 0,
+};
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+/* \brief Create two memory spaces, one for RTL and the other for application
+   memory. This function *SHOULD* be called before any allocations are made
+   otherwise execution fails */
+void make_memory_spaces(size_t rtl_size, size_t heap_size) {
+  mem_spaces.rtl_mspace = create_mspace(rtl_size, 0);
+  mem_spaces.heap_mspace = create_mspace(heap_size, 0);
+  /* Do not use `mspace_least_addr` here, as it returns the address of the
+     mspace header. */
+  mem_spaces.heap_start = (uintptr_t)mspace_malloc(mem_spaces.heap_mspace,1);
+  mem_spaces.heap_end = mem_spaces.heap_start + heap_size;
+  /* Save initial least address of heap memspace. This address is used later
+     to check whether memspace has been moved. */
+  mem_spaces.heap_mspace_least = (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace);
+}
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+void destroy_memory_spaces() {
+  destroy_mspace(mem_spaces.rtl_mspace);
+  destroy_mspace(mem_spaces.heap_mspace);
+}
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
-
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+int is_pow_of_2(size_t x) {
+  while (((x & 1) == 0) && x > 1) /* while x is even and > 1 */
+    x >>= 1;
+  return (x == 1);
+}

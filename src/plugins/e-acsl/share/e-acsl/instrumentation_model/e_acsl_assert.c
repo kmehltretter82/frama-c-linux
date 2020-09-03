@@ -20,32 +20,44 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
+/*! ***********************************************************************
+ * \file
+ * \brief E-ACSL assertions and abort statements implementation.
+***************************************************************************/
+
+#include <stdlib.h>
+
+#include "../internals/e_acsl_private_assert.h"
+#include "../internals/e_acsl_rtl_io.h"
+
+#include "e_acsl_assert.h"
+
+int runtime_sound_verdict = 1;
+
+#ifndef E_ACSL_EXTERNAL_ASSERT
+/*! \brief Default implementation of E-ACSL runtime assertions */
+void runtime_assert(int predicate, const char *kind, const char *fct,
+    const char *pred_txt, const char * file, int line) {
+  if (runtime_sound_verdict) {
+    if (! predicate) {
+      STDERR("%s: In function '%s'\n"
+             "%s:%d: Error: %s failed:\n"
+             "\tThe failing predicate is:\n"
+             "\t%s.\n",
+             file, fct, file, line, kind, pred_txt);
+#ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
+#ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
+      exit(E_ACSL_FAIL_EXITCODE);
+#else
+      raise_abort(file, line); /* Raise abort signal */
 #endif
-
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
-
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
-
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
-
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
-
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+#endif
+    }
+  } else
+    STDERR("%s: In function '%s'\n"
+           "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
+           "\tthe considered predicate is:\n"
+           "\t%s\n",
+           file, fct, file, line, kind, predicate ? "ok": "FAIL", pred_txt);
+}
+#endif

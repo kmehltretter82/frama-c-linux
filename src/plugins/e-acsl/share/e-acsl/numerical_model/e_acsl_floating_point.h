@@ -21,17 +21,19 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file   e_acsl_floating_point.h
+ * \file
  * \brief  Functionality related to processing of floating point values
 ***************************************************************************/
 
 #ifndef E_ACSL_FLOATING_POINT_H
 #define E_ACSL_FLOATING_POINT_H
 
-#include "e_acsl.h"
-#include <math.h>
-#include <float.h>
-#include <fenv.h>
+#include "../internals/e_acsl_alias.h"
+
+#define math_HUGE_VAL             export_alias(math_HUGE_VAL)
+#define math_HUGE_VALF            export_alias(math_HUGE_VALF)
+#define math_INFINITY             export_alias(math_INFINITY)
+#define floating_point_exception  export_alias(floating_point_exception)
 
 /* Below variables hold infinity values for floating points defined in math.h.
    Most of them are defined as macros that expand to built-in function calls.
@@ -48,11 +50,14 @@
 */
 
 /** \brief Positive infinity for doubles: same as HUGE_VAL */
-double math_HUGE_VAL = 0.0;
+extern double math_HUGE_VAL
+  __attribute__((FC_BUILTIN));
 /** \brief Positive infinity for floats: same as HUGE_VALF */
-float  math_HUGE_VALF = 0.0;
+extern float  math_HUGE_VALF
+  __attribute__((FC_BUILTIN));
 /** \brief Representation of infinity value for doubles: same as INFINITY */
-double math_INFINITY = 0.0;
+extern double math_INFINITY
+  __attribute__((FC_BUILTIN));
 
 /* FIXME: An additional variable that should be added to this list is
      long double math_HUGE_VALL;
@@ -60,35 +65,9 @@ double math_INFINITY = 0.0;
    are unsupported Value plug-in analysis who start throwing errors once
    test suite is ran. */
 
-static void init_infinity_values() {
-  /* Initialize E-ACSL infinity values */
-  math_HUGE_VAL  = HUGE_VAL;
-  math_HUGE_VALF = HUGE_VALF;
-  math_INFINITY  = INFINITY;
-  /* Clear exceptions buffers */
-  feclearexcept(FE_ALL_EXCEPT);
-}
+void init_infinity_values();
 
-void floating_point_exception(const char *exp) {
-  int except = fetestexcept(FE_ALL_EXCEPT);
-  char *resp = NULL;
-  if (except) {
-    if (fetestexcept(FE_DIVBYZERO))
-      resp = "Division by zero";
-    else if (fetestexcept(FE_INEXACT))
-      resp = "Rounded result of an operation is not equal to the infinite precision result";
-    else if (fetestexcept(FE_INVALID))
-      resp = "Result of a floating-point operation is not well-defined";
-    else if (fetestexcept(FE_OVERFLOW))
-      resp = "Floating-point overflow";
-    else if (fetestexcept(FE_UNDERFLOW))
-      resp = "Floating-point underflow";
-  }
-  if (resp) {
-    rtl_printf("Execution of the statement `%s` leads to a floating point exception\n", exp);
-    rtl_printf("Exception:  %s\n", resp);
-  }
-  feclearexcept(FE_ALL_EXCEPT);
-}
+void floating_point_exception(const char *exp)
+  __attribute__((FC_BUILTIN));
 
-#endif
+#endif // E_ACSL_FLOATING_POINT_H

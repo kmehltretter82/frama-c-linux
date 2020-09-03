@@ -20,32 +20,35 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+#include <stdio.h>
+#include <errno.h>
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#include "e_acsl_safe_locations.h"
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+/* An array storing safe locations up to `safe_location_counter` position.
+ * This array should be initialized via a below function called
+ * `collect_safe_locations`. */
+static memory_location safe_locations [16];
+static int safe_location_counter = 0;
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+#define add_safe_location(_addr,_len,_init) { \
+  safe_locations[safe_location_counter].address = _addr; \
+  safe_locations[safe_location_counter].length = _len; \
+  safe_location_counter++; \
+}
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+void collect_safe_locations() {
+  /* Tracking of errno and standard streams */
+  add_safe_location((uintptr_t)&errno, sizeof(int), "errno");
+  add_safe_location((uintptr_t)stdout, sizeof(FILE), "stdout");
+  add_safe_location((uintptr_t)stderr, sizeof(FILE), "stderr");
+  add_safe_location((uintptr_t)stdin, sizeof(FILE), "stdin");
+}
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+size_t get_safe_locations_count() {
+  return safe_location_counter;
+}
+
+memory_location * get_safe_location(size_t i) {
+  return &safe_locations[i];
+}

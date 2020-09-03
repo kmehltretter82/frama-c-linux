@@ -21,7 +21,7 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_gmp.h
+ * \file
  * \brief Prototypes of functions belonging to GNU Multiple
  * Precision Arithmetic Library (GMP) used within E-ACSL
 ***************************************************************************/
@@ -33,8 +33,8 @@
 #ifndef E_ACSL_GMP_API_H
 #define E_ACSL_GMP_API_H
 
-#include "stdlib.h"
-#include "e_acsl_alias.h"
+#include <stddef.h>
+#include "../internals/e_acsl_alias.h"
 
 #define mpz_struct  export_alias(mpz_struct)
 #define mpz_t       export_alias(mpz_t)

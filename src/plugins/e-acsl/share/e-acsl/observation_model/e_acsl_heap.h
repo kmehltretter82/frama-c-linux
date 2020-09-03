@@ -20,32 +20,33 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+/*! ***********************************************************************
+ * \file
+ * \brief  User API to query E-ACSL about the state of heap allocation.
+***************************************************************************/
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#ifndef E_ACSL_HEAP
+#define E_ACSL_HEAP
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#include <stddef.h>
+#include "../internals/e_acsl_alias.h"
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+#define heap_allocation_size      export_alias(heap_allocation_size)
+#define heap_allocated_blocks     export_alias(heap_allocated_blocks)
+#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
+#define get_heap_allocated_blocks export_alias(get_heap_allocated_blocks)
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+/*! \brief A variable holding the number of bytes in heap application allocation. */
+extern size_t heap_allocation_size;
+/*! \brief A variable holding the number of blocks in heap application allocation. */
+extern size_t heap_allocated_blocks;
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+/*! Return the number of bytes in heap application allocation. */
+size_t get_heap_allocation_size()
+  __attribute__((FC_BUILTIN));
+
+/*! Return the number of blocks in heap application allocation. */
+size_t get_heap_allocated_blocks()
+  __attribute__((FC_BUILTIN));
+
+#endif // E_ACSL_HEAP

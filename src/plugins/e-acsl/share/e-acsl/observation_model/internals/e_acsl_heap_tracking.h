@@ -20,32 +20,27 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+/*! ***********************************************************************
+ * \file
+ * \brief Functionality to report/track memory leaks. Shared between models
+***************************************************************************/
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#ifndef E_ACSL_HEAP_TRACKING
+#define E_ACSL_HEAP_TRACKING
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#include <stddef.h>
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+/* Return the number of bytes in heap application allocation */
+size_t get_heap_internal_allocation_size(void);
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+/* Return the number of blocks in heap application allocation */
+size_t get_heap_internal_allocated_blocks(void);
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+/* Update heap allocation stats */
+void update_heap_allocation(long size);
+
+/* If E_ACSL_VERBOSE or E_ACSL_DEBUG are set, print a message if there is still
+ * some allocated memory on the heap. */
+void report_heap_leacks();
+
+#endif // E_ACSL_HEAP_TRACKING

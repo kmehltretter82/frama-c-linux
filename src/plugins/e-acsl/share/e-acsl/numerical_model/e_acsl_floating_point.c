@@ -20,32 +20,46 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+#include <fenv.h>
+#include <math.h>
+#include <stddef.h>
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#include "../internals/e_acsl_rtl_io.h"
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#include "e_acsl_floating_point.h"
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+// Initialization
+double math_HUGE_VAL = 0.0;
+float  math_HUGE_VALF = 0.0;
+double math_INFINITY = 0.0;
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+void init_infinity_values() {
+  /* Initialize E-ACSL infinity values */
+  math_HUGE_VAL  = HUGE_VAL;
+  math_HUGE_VALF = HUGE_VALF;
+  math_INFINITY  = INFINITY;
+  /* Clear exceptions buffers */
+  feclearexcept(FE_ALL_EXCEPT);
+}
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+void floating_point_exception(const char *exp) {
+  int except = fetestexcept(FE_ALL_EXCEPT);
+  char *resp = NULL;
+  if (except) {
+    if (fetestexcept(FE_DIVBYZERO))
+      resp = "Division by zero";
+    else if (fetestexcept(FE_INEXACT))
+      resp = "Rounded result of an operation is not equal to the infinite precision result";
+    else if (fetestexcept(FE_INVALID))
+      resp = "Result of a floating-point operation is not well-defined";
+    else if (fetestexcept(FE_OVERFLOW))
+      resp = "Floating-point overflow";
+    else if (fetestexcept(FE_UNDERFLOW))
+      resp = "Floating-point underflow";
+  }
+  if (resp) {
+    rtl_printf("Execution of the statement `%s` leads to a floating point exception\n", exp);
+    rtl_printf("Exception:  %s\n", resp);
+  }
+  feclearexcept(FE_ALL_EXCEPT);
+}

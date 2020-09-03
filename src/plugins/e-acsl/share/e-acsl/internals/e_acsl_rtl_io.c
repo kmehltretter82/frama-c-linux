@@ -37,65 +37,15 @@
 /****************************************************************************/
 
 /*! ***********************************************************************
- * \file   e_acsl_printf.h
+ * \file
  * \brief Malloc and stdio free implementation printf.
- *
- * Supported format strings:
- * - Flag characters:
- *     - 0       - the following value will be is zero-padded.
- *
- * - Field width:
- *     - Optional positive decimal integer following flag characters.
- *
- * - Length modifier:
- *     - l       - the following integer conversion corresponds to a long int or
- *                  unsigned long int argument.
- *
- * - Standard conversion specifiers:
- *    - d       - signed integers.
- *    - u       - unsigned integers.
- *    - f       - floating point numbers. Floating point numbers do not support
- *    -             precision specification.
- *    - x,X     - hexadecimal numbers.
- *    - p       - void pointers.
- *
- * - Non-standard conversion specifiers:
- *     - a       - memory-address.
- *     - b, B    - print field width bits of a number left-to-right (b) or
- *      right-to-left (B). Unless specified field-width of 8 is used. Bits
- *      over a 64-bit boundary are ignored.
- *     - v, V    - print first field width bits of a memory region given by a
- *      void pointer left-to-right (v) or right-to-left (V). Unless specified
- *      field-width of 8 is used.
 ***************************************************************************/
 
-#ifndef E_ACSL_PRINTF_H
-#define E_ACSL_PRINTF_H
-
-#include <unistd.h>
-#include <stdint.h>
 #include <stdarg.h>
-#include "e_acsl_alias.h"
+#include <stdint.h>
+#include <unistd.h>
 
-/* ****************** */
-/* Public API         */
-/* ****************** */
-
-/* Replacement for printf with support for the above specifiers */
-static int rtl_printf(char *fmt, ...);
-
-/* Same as printf but write to a string buffer */
-static int rtl_sprintf(char* s, char *fmt, ...);
-
-/* Same as printf but write to the error stream. */
-static int rtl_eprintf(char *fmt, ...);
-
-/* Same as printf but write to a file descriptor. */
-static int rtl_dprintf(int fd, char *fmt, ...);
-
-/* ****************** */
-/* Implementation     */
-/* ****************** */
+#include "e_acsl_rtl_io.h"
 
 typedef void (*putcf) (void*,char);
 
@@ -402,41 +352,56 @@ static void _charc_literal  (void* p, char c) {
   }
 }
 
-static int rtl_printf(char *fmt, ...) {
+int rtl_printf(char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
-  _format(NULL,_charc_stdout,fmt,va);
+  int result = rtl_vprintf(fmt, va);
   va_end(va);
+  return result;
+}
+
+int rtl_vprintf(char *fmt, va_list vlist) {
+  _format(NULL, _charc_stdout, fmt, vlist);
   return 1;
 }
 
-static int rtl_eprintf(char *fmt, ...) {
+int rtl_eprintf(char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
-  _format(NULL,_charc_stderr,fmt,va);
+  int result = rtl_veprintf(fmt, va);
   va_end(va);
+  return result;
+}
+
+int rtl_veprintf(char *fmt, va_list vlist) {
+  _format(NULL, _charc_stderr, fmt, vlist);
   return 1;
 }
 
-static int rtl_dprintf(int fd, char *fmt, ...) {
+int rtl_dprintf(int fd, char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
+  int result = rtl_vdprintf(fd, fmt, va);
+  va_end(va);
+  return result;
+}
+
+int rtl_vdprintf(int fd, char *fmt, va_list vlist) {
   intptr_t fd_long = fd;
-  _format((void*)fd_long,_charc_file,fmt,va);
-  va_end(va);
+  _format((void*)fd_long, _charc_file, fmt, vlist);
   return 1;
 }
 
-static int rtl_sprintf(char* s, char *fmt, ...) {
+int rtl_sprintf(char* s, char *fmt, ...) {
   va_list va;
   va_start(va,fmt);
-  _format(&s,putcp,fmt,va);
-  putcp(&s,0);
+  int result = rtl_vsprintf(s, fmt, va);
   va_end(va);
-  return 1;
+  return result;
 }
 
-#define STDOUT(...) rtl_printf(__VA_ARGS__)
-#define STDERR(...) rtl_eprintf(__VA_ARGS__)
-
-#endif
+int rtl_vsprintf(char *s, char *fmt, va_list vlist) {
+  _format(&s, putcp, fmt, vlist);
+  putcp(&s,0);
+  return 1;
+}

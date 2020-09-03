@@ -21,17 +21,25 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file   e_acsl_segment_mmodel.c
+ * \file
  * \brief  Implementation of E-ACSL public API for a segment (shadow) memory
  *   model. See e_acsl.h for details.
 ***************************************************************************/
 
-#include <sys/time.h>
-#include <sys/resource.h>
-#include "e_acsl_shadow_layout.h"
-#include "e_acsl_segment_tracking.h"
+#include <stddef.h>
+#include <stdint.h>
 
-#define E_ACSL_MMODEL_DESC "shadow memory"
+#include "../../internals/e_acsl_debug.h"
+#include "../../internals/e_acsl_malloc.h"
+#include "../../internals/e_acsl_private_assert.h"
+#include "../../instrumentation_model/e_acsl_temporal.h"
+#include "../../numerical_model/e_acsl_floating_point.h"
+#include "../internals/e_acsl_safe_locations.h"
+#include "e_acsl_segment_tracking.h"
+#include "e_acsl_shadow_layout.h"
+
+#include "../internals/e_acsl_timestamp_retrieval.h"
+#include "../e_acsl_observation_model.h"
 
 void * store_block(void *ptr, size_t size) {
   /* Only stack-global memory blocks are recorded explicitly via this function.
@@ -236,11 +244,12 @@ void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
     /* Tracking safe locations */
     collect_safe_locations();
     int i;
-    for (i = 0; i < safe_location_counter; i++) {
-      void *addr = (void*)safe_locations[i].address;
-      uintptr_t len = safe_locations[i].length;
+    for (i = 0; i < get_safe_locations_count(); i++) {
+    memory_location * loc = get_safe_location(i);
+      void *addr = (void*)loc->address;
+      uintptr_t len = loc->length;
       shadow_alloca(addr, len);
-      if (safe_locations[i].is_initialized)
+      if (loc->is_initialized)
         initialize(addr, len);
     }
     init_infinity_values();
@@ -252,36 +261,4 @@ void memory_clean(void) {
   clean_shadow_layout();
   report_heap_leaks();
 }
-/* }}} */
-
-/* Local operations on temporal timestamps {{{ */
-/* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */
-#ifdef E_ACSL_TEMPORAL
-static uintptr_t temporal_referent_shadow(void *addr) {
-  TRY_SEGMENT(addr,
-    return TEMPORAL_HEAP_SHADOW(addr),
-    return TEMPORAL_SECONDARY_STATIC_SHADOW(addr));
-  return 0;
-}
-
-static uint32_t origin_timestamp(void *ptr) {
-  TRY_SEGMENT_WEAK(ptr,
-    return heap_origin_timestamp((uintptr_t)ptr),
-    return static_origin_timestamp((uintptr_t)ptr));
-  return INVALID_TEMPORAL_TIMESTAMP;
-}
-
-static uint32_t referent_timestamp(void *ptr) {
-  TRY_SEGMENT(ptr,
-    return heap_referent_timestamp((uintptr_t)ptr),
-    return static_referent_timestamp((uintptr_t)ptr));
-  return INVALID_TEMPORAL_TIMESTAMP;
-}
-
-static void store_temporal_referent(void *ptr, uint32_t ref) {
-  TRY_SEGMENT(ptr,
-    heap_store_temporal_referent((uintptr_t)ptr, ref),
-    static_store_temporal_referent((uintptr_t)ptr,ref));
-}
-#endif
 /* }}} */

@@ -20,32 +20,35 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
-#endif
+/*! ***********************************************************************
+ * \file
+ *
+ * Declaration of memory locations considered safe before a program starts.
+ * Most of these should be declared somewhere in start procedures of c
+ * and gcc libraries. One example of a safe location is errno.
+***************************************************************************/
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#ifndef E_ACSL_SAFE_LOCATIONS_H
+#define E_ACSL_SAFE_LOCATIONS_H
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+#include <stdint.h>
+#include <stddef.h>
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+/* Simple representation of a safe location */
+struct memory_location {
+  uintptr_t address; /* Address */
+  uintptr_t length; /* Byte-length */
+  int is_initialized; /* Notion of initialization */
+};
+typedef struct memory_location memory_location;
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+/*! Initialize the array of safe locations */
+void collect_safe_locations();
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+/*! \return the number of safe locations collected */
+size_t get_safe_locations_count();
+
+/*! \return The i-th safe location collected */
+memory_location * get_safe_location(size_t i);
+
+#endif // E_ACSL_SAFE_LOCATIONS_H

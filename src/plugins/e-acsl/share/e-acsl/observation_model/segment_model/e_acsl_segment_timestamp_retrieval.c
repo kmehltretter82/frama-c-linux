@@ -20,32 +20,41 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
+#include "e_acsl_segment_tracking.h"
+#ifdef E_ACSL_TEMPORAL
+# include "../../instrumentation_model/e_acsl_temporal_timestamp.h"
 #endif
 
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
+#include "../internals/e_acsl_timestamp_retrieval.h"
 
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
+/* Local operations on temporal timestamps {{{ */
+/* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */
+#ifdef E_ACSL_TEMPORAL
+uintptr_t temporal_referent_shadow(void *addr) {
+  TRY_SEGMENT(addr,
+    return TEMPORAL_HEAP_SHADOW(addr),
+    return TEMPORAL_SECONDARY_STATIC_SHADOW(addr));
+  return 0;
+}
 
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
+uint32_t origin_timestamp(void *ptr) {
+  TRY_SEGMENT_WEAK(ptr,
+    return heap_origin_timestamp((uintptr_t)ptr),
+    return static_origin_timestamp((uintptr_t)ptr));
+  return INVALID_TEMPORAL_TIMESTAMP;
+}
 
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
+uint32_t referent_timestamp(void *ptr) {
+  TRY_SEGMENT(ptr,
+    return heap_referent_timestamp((uintptr_t)ptr),
+    return static_referent_timestamp((uintptr_t)ptr));
+  return INVALID_TEMPORAL_TIMESTAMP;
+}
 
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+void store_temporal_referent(void *ptr, uint32_t ref) {
+  TRY_SEGMENT(ptr,
+    heap_store_temporal_referent((uintptr_t)ptr, ref),
+    static_store_temporal_referent((uintptr_t)ptr,ref));
+}
+#endif
+/* }}} */

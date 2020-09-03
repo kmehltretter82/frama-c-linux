@@ -21,16 +21,20 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file e_acsl_bittree_mmodel.c
+ * \file
  * \brief Implementation of E-ACSL public API using a memory model based
  * on Patricia Trie. See e_acsl.h for details.
 ***************************************************************************/
 
-# include "e_acsl_bittree_api.h"
-# include "e_acsl_bittree.h"
+#include "../../internals/e_acsl_debug.h"
+#include "../../internals/e_acsl_malloc.h"
+#include "../../internals/e_acsl_private_assert.h"
+#include "../../instrumentation_model/e_acsl_temporal.h"
+#include "../../numerical_model/e_acsl_floating_point.h"
+#include "../internals/e_acsl_safe_locations.h""
+#include "e_acsl_bittree.h"
 
-static inline int allocated(uintptr_t addr, long size, uintptr_t base_ptr);
-static inline int writeable(uintptr_t addr, long size, uintptr_t base_ptr);
+#include "../e_acsl_observation_model.h"
 
 /* Public API {{{ */
 /* Debug */
@@ -42,27 +46,6 @@ static inline int writeable(uintptr_t addr, long size, uintptr_t base_ptr);
 # define delete_block_debug export_alias(delete_block_debug)
 #endif
 /* }}} */
-
-#define E_ACSL_MMODEL_DESC "patricia trie"
-
-/* Assertions in debug mode */
-#ifdef E_ACSL_DEBUG
-/* Assert that memory block [_addr, _addr + _size] is allocated */
-# define DVALIDATE_ALLOCATED(_addr, _size, _base) \
-  vassert(allocated((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %a\n", \
-    _addr, _size, _base);
-
-/* Assert that memory block [_addr, _addr + _size] is allocated
- * and can be written to */
-# define DVALIDATE_WRITEABLE(_addr, _size, _base) \
-  vassert(writeable((uintptr_t)_addr, _size, (uintptr_t)_base), \
-    "Operation on unallocated block [%a + %lu] with base %a\n", \
-    _addr, _size, _base);
-#else
-#define DVALIDATE_ALLOCATED(_ptr, _size, _base)
-#define DVALIDATE_WRITEABLE(_ptr, _size, _base)
-#endif
 
 /**************************/
 /* SUPPORT            {{{ */
@@ -223,7 +206,7 @@ int initialized(void * ptr, size_t size) {
 size_t block_length(void* ptr) {
   bt_block * blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
-  vassert(blk != NULL, "\\block_length of unallocated memory", NULL);
+  private_assert(blk != NULL, "\\block_length of unallocated memory", NULL);
   return blk->size;
 }
 
@@ -241,27 +224,6 @@ static bt_block* lookup_allocated(void* ptr, size_t size, void *ptr_base) {
     return NULL;
 #endif
   return (blk->size - ((size_t)ptr - blk->ptr) >= size) ? blk : NULL;
-}
-
-/** \brief same as ::lookup_allocated but return either `1` or `0` depending
-    on whether the memory block described by this function's arguments is
-    allocated or not.
-    NOTE: Should have same signature in all models. */
-static inline int allocated(uintptr_t addr, long size, uintptr_t base) {
-  return lookup_allocated((void*)addr, size, (void*)base) == NULL ? 0 : 1;
-}
-
-/** \brief Return 1 if a given memory location is read-only and 0 otherwise */
-static int readonly (void *ptr) {
-  bt_block * blk = bt_find(ptr);
-  vassert(blk != NULL, "Readonly on unallocated memory", NULL);
-  return blk->is_readonly;
-}
-
-/** \brief same as ::allocated but returns `0` if the memory block described
-     by the arguments cannot be written to */
-static inline int writeable(uintptr_t addr, long size, uintptr_t base_ptr) {
-  return allocated(addr, size, base_ptr) && !readonly((void*)addr);
 }
 
 /* return whether the size bytes of ptr are readable/writable */
@@ -287,14 +249,14 @@ int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
 /* return the base address of the block containing ptr */
 void* base_addr(void* ptr) {
   bt_block * tmp = bt_find(ptr);
-  vassert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
+  private_assert(tmp != NULL, "\\base_addr of unallocated memory", NULL);
   return (void*)tmp->ptr;
 }
 
 /* return the offset of `ptr` within its block */
 size_t offset(void* ptr) {
   bt_block * tmp = bt_find(ptr);
-  vassert(tmp != NULL, "\\offset of unallocated memory", NULL);
+  private_assert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
 }
 /* }}} */
@@ -309,12 +271,12 @@ size_t offset(void* ptr) {
 void* store_block(void *ptr, size_t size) {
 #ifdef E_ACSL_DEBUG
   if (ptr == NULL)
-    vabort("Attempt to record NULL block");
+    private_abort("Attempt to record NULL block");
   else {
     char *check = (char*)ptr;
     bt_block *exitsing_block = bt_find(ptr);
     if (exitsing_block) {
-      vabort("\nRecording %a [%lu] at %s:%d failed."
+      private_abort("\nRecording %a [%lu] at %s:%d failed."
         " Overlapping block %a [%lu] found at %s:%d\n",
         ptr, size, cloc.file, cloc.line, base_addr(check),
         block_length(check), exitsing_block->file, exitsing_block->line);
@@ -322,7 +284,7 @@ void* store_block(void *ptr, size_t size) {
     check += size - 1;
     exitsing_block = bt_find(check);
     if (exitsing_block) {
-      vabort("\nRecording %a [%lu] at %d failed."
+      private_abort("\nRecording %a [%lu] at %d failed."
         " Overlapping block %a [%lu] found at %s:%d\n",
         ptr, size, cloc.file, cloc.line, base_addr(check),
         block_length(check), exitsing_block->file, exitsing_block->line);
@@ -372,14 +334,14 @@ void delete_block(void *ptr) {
 #ifdef E_ACSL_DEBUG
   /* Make sure the recorded block is not NULL */
   if (!ptr)
-    vabort("Attempt to delete NULL block");
+    private_abort("Attempt to delete NULL block");
 #endif
   if (ptr != NULL) {
     bt_block *tmp = bt_lookup(ptr);
 #ifdef E_ACSL_DEBUG
     /* Make sure the removed block exists in the tracked allocation */
     if (!tmp)
-      vabort("Attempt to delete untracked block");
+      private_abort("Attempt to delete untracked block");
 #endif
     if (tmp) {
       bt_clean_block_init(tmp);
@@ -400,7 +362,7 @@ void* store_block_duplicate(void* ptr, size_t size) {
 #ifdef E_ACSL_DEBUG
     /* Make sure that duplicate block, if so is of the same length */
     if (tmp->size != size)
-      vabort("Attempt to store duplicate block of different length");
+      private_abort("Attempt to store duplicate block of different length");
 #endif
       delete_block(ptr);
     }
@@ -440,7 +402,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
      - size and alignment are greater than zero
      - alignment is a power of 2
      - size is a multiple of alignment */
-  if (!size || !alignment || !powof2(alignment) || (size%alignment))
+  if (!size || !alignment || !is_pow_of_2(alignment) || (size%alignment))
     return NULL;
 
   void *res = public_aligned_alloc(alignment, size);
@@ -453,7 +415,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) {
  /* Check if:
    *  - size and alignment are greater than zero
    *  - alignment is a power of 2 and a multiple of sizeof(void*) */
-  if (!size || !alignment || !powof2(alignment) || alignment%sizeof(void*))
+  if (!size || !alignment || !is_pow_of_2(alignment) || alignment%sizeof(void*))
     return -1;
 
   /* Make sure that the first argument to posix memalign is indeed allocated */
@@ -538,13 +500,13 @@ void free(void *ptr) {
   if (ptr == NULL) {
 /* Fail if instructed to treat NULL input to free as invalid. */
 #ifdef E_ACSL_FREE_VALID_ADDRESS
-    vabort("NULL pointer in free\n");
+    private_abort("NULL pointer in free\n");
 #endif
     return;
   }
   bt_block *res = bt_lookup(ptr);
   if (!res) {
-    vabort("Not a start of block (%a) in free\n", ptr);
+    private_abort("Not a start of block (%a) in free\n", ptr);
   } else {
     update_heap_allocation(-res->size);
     public_free(ptr);
@@ -617,11 +579,12 @@ void memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   /* Tracking safe locations */
   collect_safe_locations();
   int i;
-  for (i = 0; i < safe_location_counter; i++) {
-    void *addr = (void*)safe_locations[i].address;
-    uintptr_t len = safe_locations[i].length;
+  for (i = 0; i < get_safe_location_count(); i++) {
+    memory_location * loc = get_safe_location(i);
+    void *addr = (void*)loc->address;
+    uintptr_t len = loc->length;
     store_block(addr, len);
-    if (safe_locations[i].is_initialized)
+    if (loc->is_initialized)
       initialize(addr, len);
   }
   init_infinity_values();
@@ -658,7 +621,8 @@ void delete_block_debug(char *file, int line, void* ptr) {
   update_cloc(file, line);
   bt_block * tmp = bt_lookup(ptr);
   if (!tmp) {
-    vabort("Block with base address %a not found in the memory model at %s:%d",
+    private_abort(
+        "Block with base address %a not found in the memory model at %s:%d",
         ptr, file, line);
   }
   delete_block(ptr);
@@ -673,38 +637,6 @@ void block_info(char *p) {
   } else {
     DLOG(" << %a >> not allocated\n", p);
   }
-}
-#endif
-/* }}} */
-
-/* Local operations on temporal timestamps {{{ */
-/* Remaining functionality (shared between all models) is located in e_acsl_temporal.h */
-#ifdef E_ACSL_TEMPORAL
-static uint32_t origin_timestamp(void *ptr) {
-  bt_block * blk = bt_find(ptr);
-  return blk != NULL ? blk->timestamp : INVALID_TEMPORAL_TIMESTAMP;
-}
-
-static uintptr_t temporal_referent_shadow(void *ptr) {
-  bt_block *blk = bt_find(ptr);
-  vassert(blk != NULL,
-    "referent timestamp on unallocated memory address %a", (uintptr_t)ptr);
-  vassert(blk->temporal_shadow != NULL,
-    "no temporal shadow of block with base address", (uintptr_t)blk->ptr);
-  return (uintptr_t)blk->temporal_shadow + offset(ptr);
-}
-
-static uint32_t referent_timestamp(void *ptr) {
-  bt_block * blk = bt_find(ptr);
-  if (blk != NULL)
-    return *((uint32_t*)temporal_referent_shadow(ptr));
-  else
-    return INVALID_TEMPORAL_TIMESTAMP;
-}
-
-static void store_temporal_referent(void *ptr, uint32_t ref) {
-  uint32_t *shadow = (uint32_t*)temporal_referent_shadow(ptr);
-  *shadow = ref;
 }
 #endif
 /* }}} */

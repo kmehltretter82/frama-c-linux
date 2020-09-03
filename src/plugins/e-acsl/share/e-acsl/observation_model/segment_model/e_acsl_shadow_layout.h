@@ -25,6 +25,13 @@
  * \brief Setup for memory tracking using shadowing
 ***************************************************************************/
 
+#ifndef E_ACSL_SHADOW_LAYOUT
+#define E_ACSL_SHADOW_LAYOUT
+
+#include <stddef.h>
+#include <stdint.h>
+#include "../../internals/e_acsl_malloc.h"
+
 /* Default size of a program's heap tracked via shadow memory */
 #ifndef E_ACSL_HEAP_SIZE
 #define E_ACSL_HEAP_SIZE 512
@@ -114,7 +121,7 @@ char *strerror(int errnum);
  */
 
 /*! \brief Return byte-size of the TLS segment */
-static size_t get_tls_size() {
+inline static size_t get_tls_size() {
   return PGM_TLS_SIZE;
 }
 
@@ -128,94 +135,42 @@ extern char ** environ;
 
 /*! \brief Set a new soft stack limit
  * \param size - new stack size in bytes */
-static size_t increase_stack_limit(const size_t size) {
-  rlim_t stacksz = (rlim_t)size;
-  struct rlimit rl;
-  int result = getrlimit(RLIMIT_STACK, &rl);
-  if (result == 0) {
-    if (rl.rlim_cur < stacksz) {
-      if (stacksz>rl.rlim_max) stacksz = rl.rlim_max;
-      rl.rlim_cur = stacksz;
-      result = setrlimit(RLIMIT_STACK, &rl);
-      if (result != 0) {
-        vabort("setrlimit: %s \n", strerror(errno));
-      }
-    }
-  } else {
-    vabort("getrlimit: %s \n", strerror(errno));
-  }
-  return (size_t)stacksz;
-}
+size_t increase_stack_limit(const size_t size);
 
 /*! \brief Return byte-size of a program's stack. The return value is the soft
  * stack limit, i.e., it can be programmatically increased at runtime. */
-static size_t get_default_stack_size() {
-  struct rlimit rlim;
-  vassert(!getrlimit(RLIMIT_STACK, &rlim),
-    "Cannot detect program's stack size", NULL);
-  return rlim.rlim_cur;
-}
+size_t get_default_stack_size();
 
-static size_t get_stack_size() {
-#ifndef E_ACSL_STACK_SIZE
-  return get_default_stack_size();
-#else
-  return increase_stack_limit(E_ACSL_STACK_SIZE*MB);
-#endif
-}
+size_t get_stack_size();
 
 /*! \brief Return greatest (known) address on a program's stack.
  * This function presently determines the address using the address of the
  * last string in `environ`. That is, it assumes that argc and argv are
  * stored below environ, which holds for GCC/Glibc but is not necessarily
  * true for some other compilers/libraries. */
-static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
-  char **env = environ;
-  while (env[1])
-    env++;
-  uintptr_t addr = (uintptr_t)*env + strlen(*env);
-
-  /* When returning the end stack address we need to make sure that
-   * ::ULONG_BITS past that address are actually writeable. This is
-   * to be able to set initialization and read-only bits ::ULONG_BITS
-   * at a time. If not respected, this may cause a segfault in
-   * ::argv_alloca. */
-  uintptr_t stack_end = addr + ULONG_BITS;
-  uintptr_t stack_start = stack_end - get_stack_size();
-  return stack_start;
-}
+uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref);
 /* }}} */
 
 /** Program heap information {{{ */
 /*! \brief Return the start address of a program's heap. */
-static uintptr_t get_heap_start() {
-  return mem_spaces.heap_start;
-}
+uintptr_t get_heap_start();
 
 /*! \brief Return the tracked size of a program's heap. */
-static size_t get_heap_size() {
-  return PGM_HEAP_SIZE;
-}
+size_t get_heap_size();
 
 /*! \brief Return the size of a secondary shadow region tracking
  * initialization (i.e., init shadow). */
-static size_t get_heap_init_size() {
-  return get_heap_size()/8;
-}
+size_t get_heap_init_size();
 
 /** }}} */
 
 /** Program global information {{{ */
 /*! \brief Return the start address of a segment holding globals (generally
  * BSS and Data segments). */
-static uintptr_t get_global_start() {
-  return (uintptr_t)&__executable_start;
-}
+uintptr_t get_global_start();
 
 /*! \brief Return byte-size of global segment */
-static size_t get_global_size() {
-  return ((uintptr_t)&end - get_global_start());
-}
+size_t get_global_size();
 /** }}} */
 
 /** Shadow Layout {{{ */
@@ -301,10 +256,10 @@ struct memory_layout {
 };
 
 /*! \brief Full program memory layout. */
-static struct memory_layout mem_layout;
+struct memory_layout mem_layout;
 
 /*! \brief Array of used partitions */
-static memory_partition *mem_partitions [] = {
+memory_partition *mem_partitions [] = {
   &mem_layout.heap,
   &mem_layout.stack,
   &mem_layout.global,
@@ -318,17 +273,8 @@ static memory_partition *mem_partitions [] = {
  * \param size - size in bytes
  * \param name - segment name
  * \param msp - mspace used for this segment (defined only for heap) */
-static void set_application_segment(memory_segment *seg, uintptr_t start,
-    size_t size, const char *name, mspace msp) {
-  seg->name = name;
-  seg->start = start;
-  seg->size = size;
-  seg->end = seg->start + seg->size;
-  seg->mspace = msp;
-  seg->parent = NULL;
-  seg->shadow_ratio = 0;
-  seg->shadow_offset = 0;
-}
+void set_application_segment(memory_segment *seg, uintptr_t start,
+    size_t size, const char *name, mspace msp);
 
 /*! \brief Set a shadow memory segment
  *
@@ -337,122 +283,26 @@ static void set_application_segment(memory_segment *seg, uintptr_t start,
  * \param ratio - ratio of shadow to application memory
  * \param name - symbolic name of the segment
  */
-static void set_shadow_segment(memory_segment *seg, memory_segment *parent,
-    size_t ratio, const char *name) {
-  seg->parent = parent;
-  seg->name = name;
-  seg->shadow_ratio = ratio;
-  seg->size = parent->size/seg->shadow_ratio;
-  seg->mspace = create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
-  seg->start = (uintptr_t)mspace_malloc(seg->mspace,1);
-  seg->end = seg->start + seg->size;
-  seg->shadow_offset = parent->start - seg->start;
-}
+void set_shadow_segment(memory_segment *seg, memory_segment *parent,
+    size_t ratio, const char *name);
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::memory_layout holding that information with data.
    Case of the stack. */
-static void init_shadow_layout_stack(int *argc_ref, char ***argv_ref) {
-  memory_partition *pstack = &mem_layout.stack;
-  set_application_segment(&pstack->application, get_stack_start(argc_ref, argv_ref),
-    get_stack_size(), "stack", NULL);
-  /* Changes of the ratio in the following will require changes in get_tls_start */
-  set_shadow_segment(&pstack->primary, &pstack->application, 1, "stack_primary");
-  set_shadow_segment(&pstack->secondary, &pstack->application, 1, "stack_secondary");
-#ifdef E_ACSL_TEMPORAL
-  set_shadow_segment(&pstack->temporal_primary, &pstack->application, 1, "temporal_stack_primary");
-  set_shadow_segment(&pstack->temporal_secondary, &pstack->application, 1, "temporal_stack_secondary");
-#endif
-
-  mem_layout.is_initialized = 1;
-}
+void init_shadow_layout_stack(int *argc_ref, char ***argv_ref);
 
 /*! \brief Return start address of a program's TLS */
-static uintptr_t get_tls_start() {
-  size_t tls_size = get_tls_size();
-  uintptr_t data = (uintptr_t)&id_tdata,
-            bss = (uintptr_t)&id_tbss;
-  /* It could happen that the shadow allocated before bss is too big.
-    Indeed allocating PGM_TLS_SIZE/2 could cause an overlap with the other
-    shadow segments AND heap.application (in case the latter is too big too).
-    In such cases, take the smallest available address (the max used +1). */
-  uintptr_t tls_start_half = (data > bss ? bss : data) - tls_size/2;
-  memory_partition pheap = mem_layout.heap,
-                   pglobal = mem_layout.global;
-  uintptr_t max_shadow = pheap.primary.end;
-  max_shadow = pheap.secondary.end > max_shadow ?
-    pheap.secondary.end : max_shadow;
-  max_shadow = pglobal.primary.end > max_shadow ?
-    pglobal.primary.end : max_shadow;
-  max_shadow = pglobal.secondary.end > max_shadow ?
-    pglobal.secondary.end : max_shadow;
-  max_shadow = pheap.application.end > max_shadow ?
-    pheap.application.end : max_shadow;
-  /* Shadow stacks are not yet allocated at his point since
-     init_shadow_layout_stack is called after
-     init_shadow_layout_heap_global_tls (for reasons related to memory
-     initialization in presence of things like GCC constructors).
-     We must leave sufficient space for them. */
-  max_shadow = max_shadow +
-    2*get_stack_size() + /* One for primary, one for secondary.
-                            If ratio is changed in init_shadow_layout_stack
-                            then update required here.
-                            TODO: if stack too big ==> problem */
-    1;
-  return tls_start_half > max_shadow ? tls_start_half : max_shadow;
-}
+uintptr_t get_tls_start();
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::memory_layout holding that information with data.
    Case of the heap, globals and tls. */
-static void init_shadow_layout_heap_global_tls() {
-  memory_partition *pheap = &mem_layout.heap;
-  set_application_segment(&pheap->application, get_heap_start(),
-    get_heap_size(), "heap", mem_spaces.heap_mspace);
-  set_shadow_segment(&pheap->primary, &pheap->application, 1, "heap_primary");
-  set_shadow_segment(&pheap->secondary, &pheap->application, 8, "heap_secondary");
-#ifdef E_ACSL_TEMPORAL
-  set_shadow_segment(&pheap->temporal_primary, &pheap->application, 1, "temporal_heap_primary");
-  set_shadow_segment(&pheap->temporal_secondary, &pheap->application, 1, "temporal_heap_secondary");
-#endif
-
-  memory_partition *pglobal = &mem_layout.global;
-  set_application_segment(&pglobal->application, get_global_start(),
-    get_global_size(), "global", NULL);
-  set_shadow_segment(&pglobal->primary, &pglobal->application, 1, "global_primary");
-  set_shadow_segment(&pglobal->secondary, &pglobal->application, 1, "global_secondary");
-#ifdef E_ACSL_TEMPORAL
-  set_shadow_segment(&pglobal->temporal_primary, &pglobal->application, 1, "temporal_global_primary");
-  set_shadow_segment(&pglobal->temporal_secondary, &pglobal->application, 1, "temporal_global_secondary");
-#endif
-
-  memory_partition *ptls = &mem_layout.tls;
-  set_application_segment(&ptls->application, get_tls_start(),
-    get_tls_size(), "tls", NULL);
-  set_shadow_segment(&ptls->primary, &ptls->application, 1, "tls_primary");
-  set_shadow_segment(&ptls->secondary, &ptls->application, 1, "tls_secondary");
-#ifdef E_ACSL_TEMPORAL
-  set_shadow_segment(&ptls->temporal_primary, &ptls->application, 1, "temporal_tls_primary");
-  set_shadow_segment(&ptls->temporal_secondary, &ptls->application, 1, "temporal_tls_secondary");
-#endif
-
-  mem_layout.is_initialized = 1;
-}
+void init_shadow_layout_heap_global_tls();
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
-static void clean_shadow_layout() {
-  if (mem_layout.is_initialized) {
-    int i;
-    for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
-      if (mem_partitions[i]->primary.mspace)
-        destroy_mspace(mem_partitions[i]->primary.mspace);
-      if (mem_partitions[i]->secondary.mspace)
-        destroy_mspace(mem_partitions[i]->secondary.mspace);
-    }
-  }
-}
+void clean_shadow_layout();
 /* }}} */
 
 /** Shadow access {{{
@@ -620,3 +470,5 @@ static void clean_shadow_layout() {
 #define TEMPORAL_SECONDARY_STATIC_SHADOW(_addr) \
   SHADOW_REGION_ADDRESS(_addr, TEMPORAL_SECONDARY)
 #endif /* }}} */
+
+#endif // E_ACSL_SHADOW_LAYOUT

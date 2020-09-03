@@ -20,72 +20,20 @@
 /*                                                                        */
 /**************************************************************************/
 
-/*! ***********************************************************************
- * \file  e_acsl_format.h
- * \brief Validating format strings with respect to arguments and their types
- *
- * Detection of format string vulnerabilities and other violations
- * related to improper use of formats in printf-like functions are addressed
- * as follows. Each call to a format function `f` (e.g. printf)
- * is replaced by a call to an analysis function `f'`. The signature of `f'` is
- * similar to that of `f'` except it has an additional argument. This argument
- * is a literal string where each character describes the type of a variadic
- * argument in the original call to `f`.
- *
- * For instance:
- *  `printf("Str=%s, Int=%d ", str, num);`
- * is replaced by
- *  `__e_acsl_builtin_printf("sd", "Str=%s, Int=%d", str, num);`
- * Note the first argument "sd". It indicates that `printf` was invoked
- * with two variadic arguments of types `char*` (specified via 's')
- * and `int` (`d`). Such single-character types are further called
- * |abbreviated| types. See ::abbr2str function for details.
- *
- * Execution of __e_acsl_builtin_printf checks that
- *  - format string is a NUL-terminated C string
- *  - all directives in the format string are well-formed (as per C99 standard)
- *  - each formatting directive has a corresponding variadic argument.
- *    Excessive arguments (for which there are no directives) are allowed
- *    but otherwise ignored.
- *  - the types of variadic arguments provided via a call match the types
- *    expected by the respective format directives. This check includes checking
- *    for signedness. For instance,
- *      __e_acsl_builtin_printf("d", "%u", n);
- *    will abort because the formatting directive expects its argument to be an
- *    unsigned integer, whereas `n` is a signed integer (indicated by "d") in
- *    the first argument to `__e_acsl_builtin_printf`. Bear in mind though that
- *    char, short, and float types are the subjects to default promotions. That
- *    is, `char` and `short` are promoted to `int` and `float` is promoted to
- *    double. Frama-C enforces such promotions by adding explicit casts.
- *  - variadic arguments corresponding to `%s` conversion specifiers describe
- *    valid C strings (NUL-terminated arrays of characters belonging to program
- *    allocation)
- *  - variadic arguments corresponding to `%n` conversion specifiers describe
- *    valid integer pointers
- * Execution of __e_acsl_builtin_dprintf additionally checks that
- *  - the file descriptor designated for writing is open
- * Execution of __e_acsl_builtin_fprintf additionally checks that
- *  - the stream designated for writing is valid
- * Execution of __e_acsl_builtin_sprintf and  __e_acsl_builtin_sprintf
- * additionally check that
- *  - memory buffers designated for writing are allocated, writable and provide
- *    sufficient space for storing the results
-***************************************************************************/
+#ifdef E_ACSL_VALIDATE_FORMAT_STRINGS
 
-#ifndef E_ACSL_FORMAT_H
-#define E_ACSL_FORMAT_H
-
-#ifndef E_ACSL_VALIDATE_FORMAT_STRINGS
-# define E_ACSL_FORMAT_VALIDITY_DESC "disabled"
-#else
-# define E_ACSL_FORMAT_VALIDITY_DESC "enabled"
-
-#include <stdlib.h>
-#include <features.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <wctype.h>
 #include <fcntl.h>
+#include <limits.h>
+#include <stdint.h>
+#include <wctype.h>
+
+#include "../internals/e_acsl_malloc.h"
+#include "../internals/e_acsl_private_assert.h"
+#include "../internals/e_acsl_rtl_io.h"
+#include "../internals/e_acsl_rtl_string.h"
+#include "e_acsl_string.h"
+
+#include "e_acsl_stdio.h"
 
 #define FMT_ERROR "Format error: "
 #define INT_ERROR "Internal error: "
@@ -179,7 +127,7 @@ static abbrev_t size2abbri(int size, int sign) {
     return sign ? ILong : IULong;
   else if (size == sizeof(long long int))
     return sign ? ILongLong : IULongLong;
-  vabort(INT_ERROR "integral type corresponding to size %d unknown\n", size);
+  private_abort(INT_ERROR "integral type corresponding to size %d unknown\n", size);
   return '\0';
 }
 
@@ -207,7 +155,7 @@ static char abbr2ptr(char c) {
     case ILongLong: return PLongLong;
     case IULongLong: return PULongLong;
     default:
-      vabort(INT_ERROR "Unexpected abbreviated type %c\n", c);
+      private_abort(INT_ERROR "Unexpected abbreviated type %c\n", c);
   }
   return '\0';
 }
@@ -355,7 +303,7 @@ static char *fetch_format_argno(char *fmt, format_directive *dir,
 
   /* make sure that numbered and non-numbered directives are not mixed */
   if (prev && prev->arg.expl != dir->arg.expl)
-    vabort(FMT_ERROR
+    private_abort(FMT_ERROR
       "\"%s\":  numbered and non-numbered directives cannot be mixed\n",
       dir->format);
 
@@ -370,7 +318,7 @@ static char *fetch_format_flags(char *fmt, format_directive *dir) {
   if (!dir->flags._f) \
     { dir->flags._f = 1; } \
   else  \
-    { vabort(FMT_ERROR "flag %s has already been set\n", #_f); }
+    { private_abort(FMT_ERROR "flag %s has already been set\n", #_f); }
 
   while (is_flag_char(*fmt)) {
     dir->flags.specified = 1;
@@ -413,7 +361,7 @@ static char *fetch_format_field_width(char *fmt, format_directive *dir) {
   } else { /* ... or a positive decimal integer */
     if (isdigit(*fmt)) {
       if (*fmt == '0') {
-        vabort(FMT_ERROR
+        private_abort(FMT_ERROR
           "field width in format cannot start with zero (%s)\n", dir->format);
       };
       while (isdigit(*fmt)) {
@@ -491,7 +439,7 @@ static char *fetch_format_length(char *fmt, format_directive *dir) {
 
   /* Make sure that the length modifier (if there is one) belongs
      to a right character class */
-  vassert(dir->length.mod == '\0' || is_length_char(dir->length.mod),
+  private_assert(dir->length.mod == '\0' || is_length_char(dir->length.mod),
     INT_ERROR "Bad length modifier: '%c'\n", dir->length.mod);
 
   if (dir->length.bytes) {
@@ -510,11 +458,11 @@ static char *fetch_format_length(char *fmt, format_directive *dir) {
   /* which has been fetched at the start matches the one we have arrived at */
   if (!is_specifier_char(dir->specifier)) {
     if (dir->specifier == '%')
-      vabort(FMT_ERROR "in directive '%s'."
+      private_abort(FMT_ERROR "in directive '%s'."
           "the complete conversion specification for '%%' is '%%%%'\n",
           dir->format);
     else
-      vabort(FMT_ERROR "illegal format specifier '%c'\n", dir->specifier);
+      private_abort(FMT_ERROR "illegal format specifier '%c'\n", dir->specifier);
   }
   return ++fmt;
 } /* }}} */
@@ -590,7 +538,7 @@ static void release_directives(const char *fmt, format_directive ** dirs) {
 /* Format string validation (well-formedness) {{{ */
 static inline void validate_application(format_directive *dir, char *allowed,
   char* kind, char *desc) {
-  vassert(strchr(allowed, dir->specifier) != NULL, FMT_ERROR
+  private_assert(strchr(allowed, dir->specifier) != NULL, FMT_ERROR
     "wrong application of %s [%s] to format specifier [%c]\n",
     desc, kind, dir->specifier);
 }
@@ -619,7 +567,7 @@ static void validate_applications(format_directive *dir) {
 
   /* No flags should be used if 'n' specifier is given */
   if (dir->flags.specified && dir->specifier == 'n')
-    vabort(FMT_ERROR "one of more flags with [n] specifier\n", NULL);
+    private_abort(FMT_ERROR "one of more flags with [n] specifier\n", NULL);
 
   /* ==== Precision ==== */
   desc = "precision";
@@ -637,7 +585,7 @@ static void validate_applications(format_directive *dir) {
   desc = "field width";
 
   if (dir->specifier == 'n' && dir->field_width != INT_MIN)
-    vabort(FMT_ERROR "field width used with [n] specifier\n", NULL);
+    private_abort(FMT_ERROR "field width used with [n] specifier\n", NULL);
 
   /* ==== Length modifiers ==== */
   desc = "length modifier";
@@ -646,7 +594,7 @@ static void validate_applications(format_directive *dir) {
      conversion specifiers. 'L' applies to a, A, e, E, f, F, g, or G. */
   if (dir->length.mod != '\0') {
     /* Make sure the length specifier is one of the allowed ones */
-    vassert(is_length_char(dir->length.mod),
+    private_assert(is_length_char(dir->length.mod),
       FMT_ERROR "bad length specifier [%c]\n", dir->length.mod);
 
     /* Conver length modifier to a string */
@@ -675,7 +623,7 @@ static void validate_applications(format_directive *dir) {
         validate_application(dir, "aAeEfFgG", lm_kind, desc);
         break;
       default:
-        vabort(INT_ERROR "unexpected length modifier %c\n", lm_kind);
+        private_abort(INT_ERROR "unexpected length modifier %c\n", lm_kind);
     }
   }
 }
@@ -704,7 +652,7 @@ static abbrev_t infer_integral_abbr(format_directive *dir, int sgn) {
     case '\0':
       return (sgn ? IInt : IUInt);
   }
-  vabort(INT_ERROR "unexpected length modifier: '%c'\n", dir->length.mod);
+  private_abort(INT_ERROR "unexpected length modifier: '%c'\n", dir->length.mod);
   return '\0';
 }
 
@@ -728,7 +676,7 @@ static abbrev_t infer_n_abbr(format_directive *dir) {
     case '\0':
       return PInt;
     default:
-      vabort(INT_ERROR "unexpected length modifier '%c'\n", dir->length.mod);
+      private_abort(INT_ERROR "unexpected length modifier '%c'\n", dir->length.mod);
   }
   return '\0';
 }
@@ -746,7 +694,7 @@ static void validate_format_type
 {
   abbrev_t actual_t = fmtdesc[dir->arg.index];
   if (actual_t != expected_t) {
-    vabort("%s: directive %d ('%s') expects argument of type '%s'"
+    private_abort("%s: directive %d ('%s') expects argument of type '%s'"
       " but the corresponding argument has type '%s'\n",
       func, dir->arg.index + 1, dir->directive,
       abbr2str(expected_t), abbr2str(actual_t));
@@ -769,19 +717,19 @@ static long validate_format_string_argument
     (wide) ? valid_nwstring((wchar_t*)s, limit, 0) : valid_nstring(s, limit, 0);
   switch(size) {
     case -1:
-      vabort
+      private_abort
         ("%s: attempt to access unallocated memory via directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
     case -2:
-      vabort(INT_ERROR
+      private_abort(INT_ERROR
         "%s: writeable check unexpectedly failed in directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
     case -3:
-      vabort("%s: attempt to access partially unallocated memory "
+      private_abort("%s: attempt to access partially unallocated memory "
         "via directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
     case -4:
-      vabort("%s: unterminated string in directive %d ('%s')\n",
+      private_abort("%s: unterminated string in directive %d ('%s')\n",
         func, dir->arg.index + 1, dir->directive);
   }
   return size;
@@ -793,7 +741,7 @@ static void validate_overlapping_buffer(char *buffer, size_t buf_sz, void *arg,
     size_t arg_sz, const char *func, format_directive *dir) {
   if (buffer) {
     if (!disjoint_spaces((uintptr_t)buffer, buf_sz, (uintptr_t)arg, arg_sz))
-      vabort("%s: output buffer overlaps with argument %d (%s)\n",
+      private_abort("%s: output buffer overlaps with argument %d (%s)\n",
           func, dir->arg.index + 1, dir->directive);
   }
 }
@@ -817,7 +765,7 @@ static void validate_format
 
   /* Check that format string is valid first */
   if (valid_string((char*)fmt, 0) < 0)
-    vabort("%s: invalid format string (unallocated or unterminated)\n", func);
+    private_abort("%s: invalid format string (unallocated or unterminated)\n", func);
 
   /* Parse format string and generate format directives */
   format_directive ** dirs = get_format_directives((char*)fmt);
@@ -841,7 +789,7 @@ static void validate_format
        format directive in the format string there should be a corresponding
        argument except for literal directive `%%` */
     if (argno >= arglen)
-      vabort("%s: directive %d (%s) in format \"%s\" has no argument\n",
+      private_abort("%s: directive %d (%s) in format \"%s\" has no argument\n",
         func, dir->arg.index + 1, dir->directive, dir->format);
 
 /* Shortcut for `validate_format_type` function */
@@ -906,7 +854,7 @@ static void validate_format
       case 'p':
         validate_type(PVoid);
         if (!allocated(addr, 1, addr))
-          vabort("%s: argument %d of directive %s not allocated\n", func,
+          private_abort("%s: argument %d of directive %s not allocated\n", func,
             argno + 1, dir->directive);
         validate_overlapping_buffer
           (buffer, buf_size, (void*)addr, 1, func, dir);
@@ -919,14 +867,14 @@ static void validate_format
            sure that the provided pointer corresponds to writeable memory. */
         int size = dir->length.bytes == 0 ?  sizeof(int) : dir->length.bytes;
         if (!writeable(addr, size, addr))
-          vabort("%s: argument %d of directive %s not allocated or writeable\n",
+          private_abort("%s: argument %d of directive %s not allocated or writeable\n",
             func, argno, dir->directive);
         validate_overlapping_buffer
           (buffer, buf_size, (void*)addr, size, func, dir);
         break;
       }
       default:
-        vabort(INT_ERROR "Unexpected format specifier '%c'\n", dir->specifier);
+        private_abort(INT_ERROR "Unexpected format specifier '%c'\n", dir->specifier);
     }
     dirs++;
 #undef validate_type
@@ -949,18 +897,18 @@ int builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...) {
   va_start(ap, fmt);
   /* First check that stream belongs to allocated space */
   if (!allocated((uintptr_t)stream, 1, (uintptr_t)stream))
-    vabort("fprintf: attempt to write to an invalid stream\n", NULL);
+    private_abort("fprintf: attempt to write to an invalid stream\n", NULL);
   /* Check if stream is a valid stream and that is open */
   int fd = fileno(stream);
   if (fd == -1)
-    vabort("fprintf: attempt to write to an invalid stream\n", NULL);
+    private_abort("fprintf: attempt to write to an invalid stream\n", NULL);
   /* Since we have a file descriptor check if it is open.
      This may not be really necessary since `fileno` should be able to tell us
      that. Does not hurt though. That's a fast check.
      It should be noted that `fileno` is a POSIX function and not in the C99
      standard. */
   if (fcntl(fd, F_GETFD) == -1)
-    vabort("fprintf: attempt to write to a closed stream\n", NULL);
+    private_abort("fprintf: attempt to write to a closed stream\n", NULL);
 
   validate_format(fmtdesc, fmt, ap, "fprintf", NULL, 0);
   va_start(ap, fmt);
@@ -972,7 +920,7 @@ int builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...) {
   va_start(ap, fmt);
   /* Make sure that the designated file descriptor is open */
   if (fcntl(fd, F_GETFD) == -1)
-    vabort("dprintf: attempt to write to a closed file descriptor %d\n", fd);
+    private_abort("dprintf: attempt to write to a closed file descriptor %d\n", fd);
   validate_format(fmtdesc, fmt, ap, "dprintf", NULL, 0);
   va_start(ap, fmt);
   return vdprintf(fd, fmt, ap);
@@ -989,7 +937,7 @@ int builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
   va_start(ap, fmt);
   int len = vsnprintf(NULL, 0, fmt, ap);
   if (!writeable((uintptr_t)buffer, len + 1, (uintptr_t)buffer))
-    vabort("sprintf: output buffer is unallocated or has insufficient length "
+    private_abort("sprintf: output buffer is unallocated or has insufficient length "
       "to store %d characters or not writeable\n", len + 1);
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "sprintf", buffer, len + 1);
@@ -1005,7 +953,7 @@ int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
   /* Check that the input buffer is large enough. However, if there are zero
      characters to write, it does not matter */
   if (size > 0 && !writeable((uintptr_t)buffer, size, (uintptr_t)buffer))
-    vabort("sprintf: output buffer is unallocated or has insufficient length "
+    private_abort("sprintf: output buffer is unallocated or has insufficient length "
       "to store %d characters and \\0 terminator or not writeable\n", size);
   va_start(ap, fmt);
   return vsnprintf(buffer, size, fmt, ap);
@@ -1020,5 +968,4 @@ int builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...) {
 }
 
 /* }}} */
-#endif /* E_ACSL_VALIDATE_FORMAT_STRINGS */
-#endif /* E_ACSL_FORMAT_H */
+#endif // E_ACSL_VALIDATE_FORMAT_STRINGS

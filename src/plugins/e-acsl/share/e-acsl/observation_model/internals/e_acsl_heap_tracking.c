@@ -20,32 +20,48 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-#ifndef _DEFAULT_SOURCE
-# define _DEFAULT_SOURCE 1
+#include "../../internals/e_acsl_rtl_io.h"
+#include "e_acsl_heap_tracking.h"
+
+/* Variable tracking byte-count of user-allocated heap memory. */
+static size_t heap_internal_allocation_size = 0;
+/* Read-only version of the variable above exposed to the user in
+ * `e_acsl_heap.h` */
+size_t __e_acsl_heap_allocation_size = 0;
+
+/* Variable tracking count of heap memory blocks */
+static size_t heap_internal_allocated_blocks = 0;
+/* Read-only version of the variable above exposed to the user in
+ * `e_acsl_heap.h` */
+size_t __e_acsl_heap_allocated_blocks = 0;
+
+size_t get_heap_internal_allocation_size(void) {
+  return heap_internal_allocation_size;
+}
+
+size_t get_heap_internal_allocated_blocks(void) {
+  return heap_internal_allocated_blocks;
+}
+
+void update_heap_allocation(long size) {
+  heap_internal_allocation_size += size;
+  if (size > 0)
+    ++heap_internal_allocated_blocks;
+  else if (size < 0)
+    --heap_internal_allocated_blocks;
+
+  // Update read-only versions of the variables
+  __e_acsl_heap_allocation_size = heap_internal_allocation_size;
+  __e_acsl_heap_allocated_blocks = heap_internal_allocated_blocks;
+}
+
+void report_heap_leaks() {
+#if defined(E_ACSL_VERBOSE) || defined(E_ACSL_DEBUG)
+  size_t size = get_heap_allocation_size();
+  size_t blocks = get_heap_allocated_blocks();
+  if (size) {
+    rtl_printf(" *** WARNING: Leaked %lu bytes of heap memory in %ld block%s\n",
+      size, blocks, (blocks == 1) ? "" : "s");
+  }
 #endif
-
-// Internals
-#include "internals/e_acsl_bits.c"
-#include "internals/e_acsl_debug.c"
-#include "internals/e_acsl_malloc.c"
-#include "internals/e_acsl_private_assert.c"
-#include "internals/e_acsl_rtl_io.c"
-#include "internals/e_acsl_rtl_string.c"
-#include "internals/e_acsl_shexec.c"
-#include "internals/e_acsl_trace.c"
-
-// Instrumentation model
-#include "instrumentation_model/e_acsl_assert.c"
-#include "instrumentation_model/e_acsl_temporal.c"
-
-// Observation model
-#include "observation_model/e_acsl_heap.c"
-#include "observation_model/e_acsl_observation_model.c"
-
-// Numerical model
-#include "numerical_model/e_acsl_floating_point.c"
-
-// Libc replacements
-#include "libc_replacements/e_acsl_stdio.c"
-#include "libc_replacements/e_acsl_string.c"
+}

@@ -21,124 +21,35 @@
 /**************************************************************************/
 
 /*! ***********************************************************************
- * \file  e_acsl_assert.h
+ * \file
  * \brief E-ACSL assertions and abort statements.
 ***************************************************************************/
 
 #ifndef E_ACSL_ASSERT_H
 #define E_ACSL_ASSERT_H
 
-#include <sys/types.h>
-#include <signal.h>
-#include <limits.h>
-#include "e_acsl_alias.h"
-#include "e_acsl_printf.h"
-#include "e_acsl_string.h"
-#include "e_acsl_trace.h"
+#include "../internals/e_acsl_alias.h"
 
-#define runtime_assert export_alias(assert)
 #define runtime_sound_verdict export_alias(sound_verdict)
-
-/*! \brief Drop-in replacement for abort function */
-#define runtime_abort() exec_abort(__LINE__, __FILE__)
-
-/*! \brief Output a message to error stream using printf-like format string
- * and abort the execution.
- *
- * This is a wrapper for \p eprintf combined with \p abort */
-static void vabort(char *fmt, ...);
-
-/*! \brief Assert with printf-like error message support */
-#define vassert(expr, fmt, ...) \
-  vassert_fail(expr, __LINE__, __FILE__, fmt, __VA_ARGS__)
-
-/* This ::exec_abort replaces `abort` via a macro at the top of this file */
-static void exec_abort(int line, const char *file) {
-#ifdef E_ACSL_DEBUG
-#ifndef E_ACSL_NO_TRACE
-  trace();
-#endif
-#endif
- raise(SIGABRT);
-}
-
-/*! \brief Print a message to stderr and abort the execution */
-static void vabort(char *fmt, ...) {
-  va_list va;
-  sigset_t defer_abrt;
-  sigemptyset(&defer_abrt);
-  sigaddset(&defer_abrt,SIGABRT);
-  sigprocmask(SIG_BLOCK,&defer_abrt,NULL);
-  va_start(va,fmt);
-  _format(NULL,_charc_stderr,fmt,va);
-  va_end(va);
-  sigprocmask(SIG_UNBLOCK,&defer_abrt,NULL);
-  runtime_abort();
-}
-
-static void vassert_fail(int expr, int line, char *file, char *fmt,  ...) {
-  if (!expr) {
-    char *afmt = "%s at %s:%d\n";
-    char buf [strlen(fmt) + strlen(afmt) + PATH_MAX +  11];
-    rtl_sprintf(buf, afmt, fmt, file, line);
-    fmt = buf;
-
-    va_list va;
-    va_start(va,fmt);
-    _format(NULL,_charc_stderr,fmt,va);
-    va_end(va);
-    runtime_abort();
-  }
-}
-
-#ifdef E_ACSL_NO_ASSERT_FAIL
-# define E_ACSL_ASSERT_NO_FAIL_DESC "pass through"
-#else
-# define E_ACSL_ASSERT_NO_FAIL_DESC "abort"
-#endif
+#define runtime_assert        export_alias(assert)
 
 /*! E-ACSL instrumentation automatically sets this global to 0 if its verdict
     becomes unsound.
     TODO: may only happen for annotations containing memory-related properties.
     For arithmetic properties, the verdict is always sound (?). */
-int runtime_sound_verdict = 1;
+extern int runtime_sound_verdict;
 
-#ifndef E_ACSL_EXTERNAL_ASSERT
-/*! \brief Default implementation of E-ACSL runtime assertions */
-void runtime_assert(int predicate, const char *kind, const char *fct,
-    const char *pred_txt, const char * file, int line) {
-  if (runtime_sound_verdict) {
-    if (! predicate) {
-      STDERR("%s: In function '%s'\n"
-             "%s:%d: Error: %s failed:\n"
-             "\tThe failing predicate is:\n"
-             "\t%s.\n",
-             file, fct, file, line, kind, pred_txt);
-#ifndef E_ACSL_NO_ASSERT_FAIL /* Do fail on assertions */
-#ifdef E_ACSL_FAIL_EXITCODE /* Fail by exit with a given code */
-      exit(E_ACSL_FAIL_EXITCODE);
-#else
-      runtime_abort(); /* Raise abort signal */
-#endif
-#endif
-    }
-  } else
-    STDERR("%s: In function '%s'\n"
-           "%s:%d: Warning: no sound verdict for %s (guess: %s).\n"
-           "\tthe considered predicate is:\n"
-           "\t%s\n",
-           file, fct, file, line, kind, predicate ? "ok": "FAIL", pred_txt);
-}
-#endif
+/*! \brief Runtime assertion verifying a given predicate
+ *  \param pred  integer code of a predicate
+ *  \param kind  C string representing a kind an annotation (e.g., "Assertion")
+ *  \param fct
+ *  \param pred_txt  stringified predicate
+ *  \param file un-instrumented file of predicate placement
+ *  \param line line of predicate placement in the un-instrumented file */
+/*@ requires pred != 0;
+  @ assigns \nothing; */
+void runtime_assert(int pred, const char *kind, const char *fct, const char *pred_txt,
+    const char * file, int line)
+  __attribute__((FC_BUILTIN));
 
-/* Instances of assertions shared accross different memory models */
-
-/*! \brief Abort the execution if the size of the pointer computed during
- * instrumentation (\p _ptr_sz) does not match the size of the pointer used
- * by a compiler (\p void*) */
-#define arch_assert(_ptr_sz) \
-  vassert(_ptr_sz == sizeof(void*), \
-    "Mismatch of instrumentation- and compile-time pointer sizes: " \
-    "%lu vs %lu\n", _ptr_sz, sizeof(void*))
-
-#endif
+#endif // E_ACSL_ASSERT_H
