@@ -1,5 +1,5 @@
 /* run.config
-   DEPS: ../../share/libc/string.c
+   DEPS: ../../../share/libc/string.c
    STDOPT: #"-cpp-extra-args=-include../../share/libc/string.c -slevel-function strstr:30 -eva-no-skip-stdlib-specs"
  */
 /* This file has been adapted from libc-test, which is licensed under the

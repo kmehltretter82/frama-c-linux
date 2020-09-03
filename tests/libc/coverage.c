@@ -1,5 +1,5 @@
 /* run.config*
-   DEPS: ../../share/libc/string.c
+   DEPS: ../../../share/libc/string.c
    OPT: -eva-no-builtins-auto @EVA_OPTIONS@ ../../share/libc/string.c -eva -slevel 6 -metrics-eva-cover -then -metrics-libc
 */
 

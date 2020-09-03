@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: rte_get_annot
-   OPT: -rte-select @@all -load-module %{dep:rte_get_annot} -journal-disable
+   MODULE: rte_get_annot.cmxs
+   OPT: -rte-select @@all -journal-disable
 */
 
 

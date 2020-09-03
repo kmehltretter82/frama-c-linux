@@ -6,30 +6,30 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function getchar <- main.
-  Called from value_rte.c:12.
+  Called from value_rte.c:13.
 [eva] using specification for function getchar
 [eva] Done for function getchar
-[eva] value_rte.c:13: assertion 'rte,index_bound' got status valid.
-[eva] value_rte.c:15: assertion 'rte,signed_overflow' got status valid.
-[eva] value_rte.c:11: starting to merge loop iterations
+[eva] value_rte.c:14: assertion 'rte,index_bound' got status valid.
+[eva] value_rte.c:16: assertion 'rte,signed_overflow' got status valid.
+[eva] value_rte.c:12: starting to merge loop iterations
 [eva] computing for function getchar <- main.
-  Called from value_rte.c:12.
+  Called from value_rte.c:13.
 [eva] Done for function getchar
 [eva] computing for function getchar <- main.
-  Called from value_rte.c:12.
+  Called from value_rte.c:13.
 [eva] Done for function getchar
 [eva] computing for function getchar <- main.
-  Called from value_rte.c:12.
+  Called from value_rte.c:13.
 [eva] Done for function getchar
 [eva] computing for function getchar <- main.
-  Called from value_rte.c:12.
+  Called from value_rte.c:13.
 [eva] Done for function getchar
-[eva:alarm] value_rte.c:13: Warning: 
+[eva:alarm] value_rte.c:14: Warning: 
   assertion 'rte,index_bound' got status unknown.
 [eva] Recording results for main
 [eva] done for function main
-[eva] value_rte.c:13: assertion 'rte,index_bound' got final status valid.
-[eva] value_rte.c:15: assertion 'rte,signed_overflow' got final status valid.
+[eva] value_rte.c:14: assertion 'rte,index_bound' got final status valid.
+[eva] value_rte.c:16: assertion 'rte,signed_overflow' got final status valid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {1}
@@ -882,11 +882,11 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'rte,index_bound' (file value_rte.c, line 13)
+[  Valid  ] Assertion 'rte,index_bound' (file value_rte.c, line 14)
             by Eva.
-[    -    ] Assertion 'rte,index_bound' (file value_rte.c, line 13)
+[    -    ] Assertion 'rte,index_bound' (file value_rte.c, line 14)
             tried with Eva.
-[  Valid  ] Assertion 'rte,signed_overflow' (file value_rte.c, line 15)
+[  Valid  ] Assertion 'rte,signed_overflow' (file value_rte.c, line 16)
             by Eva.
 
 --------------------------------------------------------------------------------
