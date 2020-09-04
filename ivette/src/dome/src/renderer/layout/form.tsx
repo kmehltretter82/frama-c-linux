@@ -153,6 +153,13 @@ export function useValidity() {
   return useIfMonitor(monitor) ?? true;
 }
 
+export function useLocalMonitor(P?: MonitorAll): [boolean, MonitorAll] {
+  const M = React.useMemo(() => new MonitorAll(), []);
+  const V = useMonitor(M);
+  useMonitoredItem(P, V);
+  return [V, M];
+}
+
 /* --------------------------------------------------------------------------*/
 /* --- Main Form Container                                                ---*/
 /* --------------------------------------------------------------------------*/
@@ -171,12 +178,15 @@ export interface FormProps extends FilterProps, Children {
  */
 export const Form = (props: FormProps) => {
   const { className, style, children, ...filter } = props;
+  const { hidden, disabled } = useContext(filter);
+  const [, monitor] = useLocalMonitor();
   const css = Utils.classes('dome-xForm-grid', className);
+  if (hidden) return null;
   return (
     <div className={css} style={style}>
-      <Filter {...filter}>
+      <CONTEXT.Provider value={{ hidden, disabled, monitor }}>
         {children}
-      </Filter>
+      </CONTEXT.Provider>
     </div>
   );
 };
@@ -219,6 +229,27 @@ export function Warning(props: WarningProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Block Container
+// --------------------------------------------------------------------------
+
+/**
+   Layout its contents inside a full-width block.
+   The children are _not_ supposed to contain `<Field/>` like elements,
+   only custom controls that fits a full-width containter.
+   @category Form Containers
+ */
+export function Block(props: FilterProps & Children) {
+  const { children, ...filter } = props;
+  return (
+    <Filter {...filter}>
+      <div className="dome-xForm-block">
+        {children}
+      </div>
+    </Filter>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Section Container
 // --------------------------------------------------------------------------
 
@@ -239,9 +270,7 @@ export interface SectionProps extends FilterProps, Children {
 export function Section(props: SectionProps) {
   const { label, title, children, onError, ...filter } = props;
   const { disabled, hidden, monitor } = useContext(filter);
-  const local = React.useMemo(() => new MonitorAll(), []);
-  const valid = useMonitor(local);
-  useMonitoredItem(monitor, valid);
+  const [valid, local] = useLocalMonitor(monitor);
   const [unfold, flip] = Dome.useFlipSettings(props.settings, props.unfold);
 
   if (hidden) return null;
@@ -275,7 +304,7 @@ export function Section(props: SectionProps) {
 /* --------------------------------------------------------------------------*/
 
 /** @category Form Fields */
-export interface FieldProps<A> {
+export interface ValueProps<A> {
   state: State<A>;
   checker?: Checker<A>;
   onError?: string;
@@ -284,7 +313,7 @@ export interface FieldProps<A> {
 }
 
 /** @category Form Fields */
-export function useField<A>(props: FieldProps<A>): FieldState<A> {
+export function useValue<A>(props: ValueProps<A>): FieldState<A> {
   const { checker, onError, latency = 0, onChange } = props;
   const [value, setValue] = props.state;
   const [current, setCurrent] = React.useState<A>(value);
@@ -310,6 +339,62 @@ export function useField<A>(props: FieldProps<A>): FieldState<A> {
     };
   }, [checker, onError, latency, onChange, setValue, setError]);
   return [current, update, error];
+}
+
+export interface FieldProps extends FilterProps, Children {
+  /** Field label. */
+  label: string;
+  /** Field tooltip text. */
+  title?: string;
+  /** Field offset. */
+  offset?: number;
+  /** Html tag `<input/>` element. */
+  htmlFor?: string;
+}
+
+let FIELDID = 0;
+
+export function useHtmlFor() {
+  return React.useMemo(() => `dome-field ${FIELDID++}`, []);
+}
+
+/**
+   Generic Field.
+   Layout its content in a top-left aligned box on the right of the label.
+ */
+export function Field(props: FieldProps) {
+  const { hidden, disabled } = useContext(props);
+
+  if (hidden) return null;
+
+  const { label, title, offset, htmlFor, children } = props;
+
+  const cssLabel = Utils.classes(
+    'dome-xForm-label dome-text-label',
+    disabled && 'dome-disabled',
+  );
+
+  const cssField = Utils.classes(
+    'dome-xForm-field dome-text-label',
+    disabled && 'dome-disabled',
+  );
+
+  return (
+    <>
+      <label
+        className={cssLabel}
+        style={{ top: offset }}
+        htmlFor={htmlFor}
+        title={title}
+      >
+        {label}
+      </label>
+      <div className={cssField}>
+        {children}
+      </div>
+    </>
+  );
+
 }
 
 // --------------------------------------------------------------------------
