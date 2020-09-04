@@ -8890,9 +8890,14 @@ and createLocal ghost ((_, sto, _, _) as specs)
                 Logic_const.prel ~loc:castloc (Rle, talloca_size, max_bound)
               in
               let alloca_bounds = Logic_const.pand ~loc:castloc (pos_size, max_size) in
-              let alloca_bounds = { alloca_bounds with pred_name = ["alloca_bounds"] } in
+              let alloca_bounds =
+                { alloca_bounds with pred_name = ["alloca_bounds"] }
+              in
+              let alloca_bounds =
+                Logic_const.toplevel_predicate alloca_bounds
+              in
               let annot =
-                Logic_const.new_code_annotation (AAssert ([], Assert, alloca_bounds))
+                Logic_const.new_code_annotation (AAssert ([], alloca_bounds))
               in
               (mkStmtOneInstr ~ghost ~valid_sid
                  (Code_annot (annot, castloc)),
@@ -9414,9 +9419,10 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
              [\assert \false]*)
           let pfalse = Logic_const.unamed ~loc Pfalse in
           let pfalse = { pfalse with pred_name = ["missing_return"] } in
+          let pfalse = Logic_const.toplevel_predicate pfalse in
           let assert_false () =
             let annot =
-              Logic_const.new_code_annotation (AAssert ([], Assert, pfalse))
+              Logic_const.new_code_annotation (AAssert ([], pfalse))
             in
             Cil.mkStmt ~ghost ~valid_sid (Instr(Code_annot(annot,loc)))
           in

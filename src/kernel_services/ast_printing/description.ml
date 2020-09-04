@@ -54,7 +54,7 @@ let pp_labels fmt stmt =
   | ls -> Format.fprintf fmt " '%s'" (String.concat "," ls)
 
 let pp_idpred kloc fmt idpred =
-  let np = idpred.ip_content in
+  let np = Logic_const.pred_of_id_pred idpred in
   if np.pred_name <> []
   then Format.fprintf fmt " '%s'" (String.concat "," np.pred_name)
   else pp_kloc kloc fmt np.pred_loc
@@ -110,14 +110,16 @@ let pp_named fmt nx =
   if nx.pred_name <> [] then
     Format.fprintf fmt " '%s'" (String.concat "," nx.pred_name)
 
+let pp_top fmt tp = pp_named fmt tp.tp_statement
+
 let pp_code_annot fmt ca =
   match ca.annot_content with
-  | AAssert(bs,Assert,np) ->
-    Format.fprintf fmt "assertion%a%a" pp_for bs pp_named np
-  | AAssert(bs,Check,np) ->
-    Format.fprintf fmt "check%a%a" pp_for bs pp_named np
-  | AInvariant(bs,_,np) ->
-    Format.fprintf fmt "invariant%a%a" pp_for bs pp_named np
+  | AAssert(bs,tp) when not tp.tp_only_check ->
+    Format.fprintf fmt "assertion%a%a" pp_for bs pp_top tp
+  | AAssert(bs,tp) ->
+    Format.fprintf fmt "check%a%a" pp_for bs pp_top tp
+  | AInvariant(bs,_,tp) ->
+    Format.fprintf fmt "invariant%a%a" pp_for bs pp_top tp
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
   | AAllocation(bs,_) -> Format.fprintf fmt "allocates_frees%a" pp_for bs
   | APragma _ -> Format.pp_print_string fmt "pragma"
@@ -253,21 +255,22 @@ let rec pp_prop kfopt kiopt kloc fmt = function
       pp_bhvs ic_bhvs
       (pp_opt kiopt (pp_kinstr kloc)) ic_kinstr
       (pp_opt kiopt pp_active) ic_active
-  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,Assert,np)}} ->
+  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,tp)}}
+    when not tp.tp_only_check ->
     Format.fprintf fmt "Assertion%a%a%a"
       pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,Check,np)}} ->
+      pp_top tp
+      (pp_kloc kloc) tp.tp_statement.pred_loc
+  | IPCodeAnnot {ica_ca={annot_content=AAssert(bs,tp)}} ->
     Format.fprintf fmt "Check%a%a%a"
       pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
-  | IPCodeAnnot {ica_ca={annot_content=AInvariant(bs,_,np)}} ->
+      pp_top tp
+      (pp_kloc kloc) tp.tp_statement.pred_loc
+  | IPCodeAnnot {ica_ca={annot_content=AInvariant(bs,_,tp)}} ->
     Format.fprintf fmt "Invariant%a%a%a"
       pp_for bs
-      pp_named np
-      (pp_kloc kloc) np.pred_loc
+      pp_top tp
+      (pp_kloc kloc) tp.tp_statement.pred_loc
   | IPCodeAnnot {ica_ca={annot_content=AExtended(bs,_,{ext_name})};ica_stmt} ->
     Format.fprintf fmt "%a%a %a"
       pp_capitalize ext_name pp_for bs (pp_stmt kloc) ica_stmt
@@ -360,18 +363,16 @@ let to_string pp elt =
   Buffer.contents b
 
 let code_annot_kind_and_node code_annot = match code_annot.annot_content with
-  | AAssert (_, kind, {pred_content; pred_name}) ->
+  | AAssert (_, {tp_only_check; tp_statement = {pred_content; pred_name}}) ->
     let kind = match Alarms.find code_annot with
       | Some alarm -> Alarms.get_name alarm
       | None ->
-        if List.exists ((=) "missing_return") pred_name
-        then "missing_return"
-        else match kind with
-          | Assert -> "user assertion"
-          | Check -> "user check"
+        if List.exists ((=) "missing_return") pred_name then "missing_return"
+        else if tp_only_check then "user check"
+        else "user assertion"
     in
     Some (kind, to_string Printer.pp_predicate_node pred_content)
-  | AInvariant (_, _, {pred_content}) ->
+  | AInvariant (_, _, {tp_statement = {pred_content}}) ->
     Some ("loop invariant", to_string Printer.pp_predicate_node pred_content)
   | _ -> None
 
@@ -471,12 +472,12 @@ let for_order k = function
   | [] -> [I k]
   | bs -> I (succ k) :: named_order bs
 let annot_order = function
-  | {annot_content=AAssert(bs,Check,np)} ->
-    for_order 0 bs @ named_order np.pred_name
-  | {annot_content=AAssert(bs,Assert,np)} ->
-    for_order 2 bs @ named_order np.pred_name
-  | {annot_content=AInvariant(bs,_,np)} ->
-    for_order 4 bs @ named_order np.pred_name
+  | {annot_content=AAssert(bs,tp)} when tp.tp_only_check ->
+    for_order 0 bs @ named_order tp.tp_statement.pred_name
+  | {annot_content=AAssert(bs,tp)} ->
+    for_order 2 bs @ named_order tp.tp_statement.pred_name
+  | {annot_content=AInvariant(bs,_,tp)} ->
+    for_order 4 bs @ named_order tp.tp_statement.pred_name
   | _ -> [I 6]
 let loop_order = function
   | Id_contract (active,b) -> [B b; A active]

@@ -66,6 +66,8 @@ struct
   let pp_term_offset fmt x = (printer ())#term_offset fmt x
   let pp_predicate_node fmt x = (printer ())#predicate_node fmt x
   let pp_predicate fmt x = (printer ())#predicate fmt x
+  let pp_toplevel_predicate fmt x =
+    (printer())#predicate fmt x.Cil_types.tp_statement
   let pp_identified_predicate fmt x = (printer ())#identified_predicate fmt x
   let pp_code_annotation fmt x = (printer ())#code_annotation fmt x
   let pp_funspec fmt x = (printer ())#funspec fmt x

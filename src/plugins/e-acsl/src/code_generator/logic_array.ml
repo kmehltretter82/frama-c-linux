@@ -202,7 +202,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       Alarms.get_name (Index_out_of_bound (iter_e, Some len1_exp))
     in
     match a.annot_content with
-    | AAssert (_, _, { pred_name = hd :: _ })
+    | AAssert (_, { tp_statement = { pred_name = hd :: _ }})
       when Datatype.String.equal hd index_bound -> false
     | _ -> true
   in

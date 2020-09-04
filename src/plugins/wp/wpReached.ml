@@ -84,8 +84,9 @@ let is_dead_annot ca =
   match ca.annot_content with
   | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
       false && is_unrolled_completely spec
-  | AAssert([],Assert,p) -> is_predicate false p
-  | AInvariant([],_,p) -> is_predicate false p
+  | AAssert([],p) ->
+      not p.tp_only_check && is_predicate false p.tp_statement
+  | AInvariant([],_,p) -> is_predicate false p.tp_statement
   | _ -> false
 
 let is_dead_code stmt =

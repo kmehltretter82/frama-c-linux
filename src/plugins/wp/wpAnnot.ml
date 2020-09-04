@@ -862,7 +862,7 @@ let get_loop_annots config vloop s =
   let do_annot _ a (assigns, loop_entry, loop_back , loop_core as acc) =
     match a.annot_content with
     | AInvariant (b_list, true, inv) ->
-        add_loop_invariant_annot config vloop s a b_list inv acc
+        add_loop_invariant_annot config vloop s a b_list inv.tp_statement acc
     | AVariant (var_exp, None) ->
         let loop_entry, loop_back =
           add_variant_annot config s a var_exp loop_entry loop_back
@@ -934,47 +934,51 @@ let get_stmt_annots config v s =
               Printer.pp_code_annotation a;
             acc
           end
-    | AAssert (b_list, kind, p) ->
+    | AAssert (b_list, p) ->
         let kf = config.kf in
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              if kind = Check then acc
+              if p.tp_only_check then acc
               else
                 let b_acc =
-                  WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
+                  WpStrategy.add_prop_assert
+                    b_acc WpStrategy.Ahyp kf s a p.tp_statement
                 in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
-              let check = kind = Check
-              and goal = goal_to_select config id in
-              if check && not goal then acc
+              let goal = goal_to_select config id in
+              if p.tp_only_check && not goal then acc
               else
-                let kind = WpStrategy.(if check then Agoal else Aboth goal) in
-                let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
+                let kind =
+                  WpStrategy.(if p.tp_only_check then Agoal else Aboth goal)
+                in
+                let b_acc =
+                  WpStrategy.add_prop_assert b_acc kind kf s a p.tp_statement
+                in
                 (b_acc, (a_acc, e_acc))
         in acc
-    | AAllocation (_b_list, _frees_allocates) ->
-        (* [PB] TODO *) acc
-    | AAssigns (_b_list, _assigns) ->
-        (* loop assigns: see get_loop_annots *) acc
-    | AVariant (_v, _rel) -> (* see get_loop_annots *) acc
-    | APragma _ -> acc
-    | AStmtSpec (b_list, spec) ->
-        if b_list <> [] then (* TODO ! *)
-          Wp_parameters.warning ~once:true
-            "Ignored specification 'for %a' (generalize to all behavior)"
-            (Pretty_utils.pp_list ~sep:", " Format.pp_print_string)
-            b_list;
-        add_stmt_spec_annots config v s b_list spec acc
-    | AExtended _ -> acc
-  in
-  let before_acc =
-    add_stmt_deadcode_smoke config WpStrategy.empty_acc s in
-  let after_acc = WpStrategy.empty_acc in
-  let exits_acc = WpStrategy.empty_acc in
-  let acc = before_acc, (after_acc, exits_acc) in
-  Annotations.fold_code_annot do_annot s acc
+   | AAllocation (_b_list, _frees_allocates) ->
+     (* [PB] TODO *) acc
+   | AAssigns (_b_list, _assigns) ->
+     (* loop assigns: see get_loop_annots *) acc
+   | AVariant (_v, _rel) -> (* see get_loop_annots *) acc
+   | APragma _ -> acc
+   | AStmtSpec (b_list, spec) ->
+     if b_list <> [] then (* TODO ! *)
+       Wp_parameters.warning ~once:true
+         "Ignored specification 'for %a' (generalize to all behavior)"
+         (Pretty_utils.pp_list ~sep:", " Format.pp_print_string)
+         b_list;
+  add_stmt_spec_annots config v s b_list spec acc
+| AExtended _ -> acc
+in
+let before_acc =
+  add_stmt_deadcode_smoke config WpStrategy.empty_acc s in
+let after_acc = WpStrategy.empty_acc in
+let exits_acc = WpStrategy.empty_acc in
+let acc = before_acc, (after_acc, exits_acc) in
+Annotations.fold_code_annot do_annot s acc
 
 let get_fct_pre_annots config spec =
   let acc = WpStrategy.empty_acc in
@@ -1425,7 +1429,7 @@ let get_id_prop_strategies ~model ?(assigns=WithAssigns) p =
   let open Property in match p with
   | IPCodeAnnot {ica_kf; ica_ca} ->
       let bhvs = match ica_ca.annot_content with
-        | AAssert (l, _, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
+        | AAssert (l, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
         | _ -> []
       in get_strategies assigns ica_kf model bhvs None (IdProp p)
   | IPAssigns {ias_kf = kf; ias_bhv = Id_loop _}

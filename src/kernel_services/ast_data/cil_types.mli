@@ -1590,7 +1590,17 @@ and predicate_node =
     create fresh predicates *)
 and identified_predicate = {
   ip_id: int; (** identifier *)
-  ip_content: predicate; (** the predicate itself*)
+  ip_content: toplevel_predicate; (** the predicate itself*)
+}
+
+(** main statement of an annotation. *)
+and toplevel_predicate = {
+  tp_only_check: bool;
+  (** whether the annotation is only used to check that [ip_content] holds, but
+      stays invisible for other verification tasks (see description of ACSL's
+      check keyword).
+  *)
+  tp_statement: predicate;
 }
 
 (** predicates with a location and an optional list of names *)
@@ -1745,17 +1755,11 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
-(** Kind of an assertion:
-    - an assert is both evaluated and used as hypothesis afterwards;
-    - a check is only evaluated, but is not used as an hypothesis: it does not
-      affect the analyses. *)
-and assertion_kind = Assert | Check
-
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with
     {!Logic_ptree.code_annot}. *)
 and code_annotation_node =
-  | AAssert of string list * assertion_kind * predicate
+  | AAssert of string list * toplevel_predicate
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 
@@ -1763,7 +1767,7 @@ and code_annotation_node =
   (** statement contract
       (potentially restricted to some enclosing behaviors). *)
 
-  | AInvariant of string list * bool * predicate
+  | AInvariant of string list * bool * toplevel_predicate
   (** loop/code invariant. The list of strings is the list of behaviors to which
       this invariant applies.  The boolean flag is true for normal loop
       invariants and false for invariant-as-assertions. *)
@@ -1814,7 +1818,7 @@ and global_annotation =
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
       string * bool * logic_label list * string list *
-      predicate * attributes * location
+      toplevel_predicate * attributes * location
   (** definition of a lemma. The boolean flag is [true] if the property should
       be taken as an axiom and [false] if it must be proved.  *)
   | Dinvariant of logic_info * location

@@ -3773,15 +3773,16 @@ struct
     append_loop_labels (append_here_label (append_pre_label (append_init_label
                                                                (Lenv.empty()))))
 
-  let assertion_kind =
-    function Assert -> Cil_types.Assert | Check -> Cil_types.Check
+  let only_check = function Assert -> false | Check -> true
 
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
       | AAssert (behav,k,p) ->
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AAssert(behav,assertion_kind k,predicate (code_annot_env()) p)
+        let p = predicate (code_annot_env()) p in
+        let p = Logic_const.toplevel_predicate ~only_check:(only_check k) p in
+        Cil_types.AAssert(behav,p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma
           (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
@@ -3810,7 +3811,8 @@ struct
       | AInvariant (behav,f,i) ->
         let env = if f then loop_annot_env () else code_annot_env () in
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AInvariant (behav,f,predicate env i)
+        let p = Logic_const.toplevel_predicate (predicate env i) in
+        Cil_types.AInvariant (behav,f,p)
       | AAllocation (behav,fa) ->
         check_behavior_names loc current_behaviors behav;
         Cil_types.AAllocation(behav,
@@ -4132,7 +4134,7 @@ struct
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
-      let p = predicate env e in
+      let p = Logic_const.toplevel_predicate (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
         | Some lab -> [lab]

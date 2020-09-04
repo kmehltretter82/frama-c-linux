@@ -3060,16 +3060,12 @@ class cil_printer () = object (self)
           (Pretty_utils.pp_list ~sep:",@ " pp_print_string) l
     in
     match ca.annot_content with
-    | AAssert (behav,Assert,p) ->
+    | AAssert (behav,p) ->
+      let kw = if p.tp_only_check then "check" else "assert" in
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_acsl_keyword "assert"
-        self#predicate p
-    | AAssert (behav,Check,p) ->
-      fprintf fmt "@[%a%a@ %a;@]"
-        pp_for_behavs behav
-        self#pp_acsl_keyword "check"
-        self#predicate p
+        self#pp_acsl_keyword kw
+        self#predicate p.tp_statement
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"
         self#pp_acsl_keyword "slice pragma"
@@ -3098,12 +3094,12 @@ class cil_printer () = object (self)
       fprintf fmt "@[<2>%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword "loop invariant"
-        self#predicate i
+        self#predicate i.tp_statement
     | AInvariant(behav,false,i) ->
       fprintf fmt "@[<2>%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword "invariant"
-        self#predicate i
+        self#predicate i.tp_statement
     | AVariant v ->
       self#variant fmt v
     | AExtended (behav, is_loop, e) ->
@@ -3204,7 +3200,7 @@ class cil_printer () = object (self)
            the pretty-printing of labels, and before pretty-printing predicate
         *)
         (fun _ -> (match labels with [l] -> current_label <- l | _ -> ()))
-        self#predicate pred;
+        self#predicate pred.tp_statement;
       current_label <- old_lab
     | Dtype (ti,_) ->
       fprintf fmt "@[<hv 2>@[%a %a%a%a;@]@\n"

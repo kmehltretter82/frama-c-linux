@@ -204,7 +204,7 @@ let lemma_of_global proof = function
       lem_types = types ;
       lem_labels = labels ;
       lem_axiom = axiom ;
-      lem_property = pred ;
+      lem_property = pred.tp_statement ;
       lem_depends = proof ;
     }
   | _ -> assert false
