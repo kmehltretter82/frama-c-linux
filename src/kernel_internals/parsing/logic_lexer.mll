@@ -297,6 +297,17 @@
 
   let accept_c_comments_into_acsl_spec = ref false
 
+  let hack_merge_tokens current next =
+    match (current,next) with
+    | CHECK, REQUIRES -> true, CHECK_REQUIRES
+    | CHECK, ENSURES -> true, CHECK_ENSURES
+    | CHECK, EXITS -> true, CHECK_EXITS
+    | CHECK, RETURNS -> true, CHECK_RETURNS
+    | CHECK, BREAKS -> true, CHECK_BREAKS
+    | CHECK, CONTINUES -> true, CHECK_CONTINUES
+    | CHECK, LOOP -> true, CHECK_LOOP
+    | CHECK, LEMMA -> true, CHECK_LEMMA
+    | _ -> false, current
 }
 
 let space = [' ' '\t' '\012' '\r' '@' ]
@@ -339,7 +350,15 @@ rule token = parse
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
       let s = lexeme lexbuf in
-      identifier s cabsloc
+      let curr_tok = identifier s cabsloc in
+      if curr_tok = CHECK then begin
+        let next_tok =
+          token { lexbuf with refill_buff = lexbuf.refill_buff }
+        in
+        let (eat_next, tok) = hack_merge_tokens curr_tok next_tok in
+        if eat_next then ignore (token lexbuf);
+        tok
+      end else curr_tok
     }
 
   | '0'['x''X'] rH+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
