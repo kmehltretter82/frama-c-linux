@@ -313,13 +313,18 @@ val add_aliases:
   string ->
   plugin:string ->
   group:Group.t ->
+  ?visible: bool ->
+  ?deprecated: bool ->
   stage ->
   string list ->
   unit
 (** [add_aliases orig plugin group aliases] adds a list of aliases to the given
     option name [orig].
+    If [visible] is set to false, the aliases do not appear in help messages.
+    If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
-    @since Carbon-20110201 *)
+    @since Carbon-20110201
+    @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
 
 val replace_option_setting: 
   string -> plugin:string -> group:Group.t -> option_setting -> unit

@@ -270,8 +270,9 @@ struct
 
   let option_name = X.option_name
 
-  let add_aliases = 
-    Cmdline.add_aliases option_name ~plugin:P.shortname ~group stage
+  let add_aliases ?visible ?deprecated =
+    Cmdline.add_aliases
+      option_name ~plugin:P.shortname ~group stage ?visible ?deprecated
 
   let print_help fmt =
     Cmdline.print_option_help fmt ~plugin:P.shortname ~group option_name
