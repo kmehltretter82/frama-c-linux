@@ -134,13 +134,20 @@ static __thread int id_tbss;
 extern char ** environ;
 
 /*! \brief Set a new soft stack limit
- * \param size - new stack size in bytes */
+ *
+ * If the new stack size is greater than the max stack size, then set to the max
+ * stack size. If the new stack size is less than the current stack size, don't
+ * do anything.
+ *
+ * Abort if an error occur when retrieving or setting the stack size.
+ *
+ * \param size - new stack size in bytes
+ * \return the new stack size in bytes.
+ */
 size_t increase_stack_limit(const size_t size);
 
 /*! \brief Return byte-size of a program's stack. The return value is the soft
  * stack limit, i.e., it can be programmatically increased at runtime. */
-size_t get_default_stack_size();
-
 size_t get_stack_size();
 
 /*! \brief Return greatest (known) address on a program's stack.

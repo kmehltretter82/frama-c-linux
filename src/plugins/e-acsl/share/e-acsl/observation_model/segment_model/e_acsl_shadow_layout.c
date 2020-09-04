@@ -43,6 +43,8 @@ size_t increase_stack_limit(const size_t size) {
       if (result != 0) {
         private_abort("setrlimit: %s \n", strerror(errno));
       }
+    } else {
+      stacksz = rl.rlim_cur;
     }
   } else {
     private_abort("getrlimit: %s \n", strerror(errno));
@@ -50,19 +52,11 @@ size_t increase_stack_limit(const size_t size) {
   return (size_t)stacksz;
 }
 
-size_t get_default_stack_size() {
+size_t get_stack_size() {
   struct rlimit rlim;
   private_assert(!getrlimit(RLIMIT_STACK, &rlim),
     "Cannot detect program's stack size", NULL);
   return rlim.rlim_cur;
-}
-
-size_t get_stack_size() {
-#ifndef E_ACSL_STACK_SIZE
-  return get_default_stack_size();
-#else
-  return increase_stack_limit(E_ACSL_STACK_SIZE*MB);
-#endif
 }
 
 uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
