@@ -8,7 +8,7 @@
 */
 
 import React from 'react' ;
-import { useBoolSettings } from 'dome';
+import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons' ;
 import { Label } from 'dome/controls/labels' ;
 
@@ -107,7 +107,7 @@ const disableAll = (children) =>
 export function Section(props) {
 
   const context = React.useContext( SideBarContext );
-  const [ state=true, setState ] = useBoolSettings(
+  const [ state, flipState ] = useFlipSettings(
     makeSettings(context.settings,props), props.defaultUnfold
   );
   const { enabled=true, disabled=false, unfold, children } = props ;
@@ -117,7 +117,7 @@ export function Section(props) {
   const dimmed = context.disabled || disabled || !enabled ;
   const foldable = unfold === undefined ;
   const visible = foldable ? state : unfold ;
-  const onClick = foldable ? (() => setState(!state)) : undefined ;
+  const onClick = foldable ? flipState : undefined ;
   const maxHeight = visible ? 'max-content' : 0 ;
   const subContext = Object.assign( {}, context, { disabled: dimmed } );
 

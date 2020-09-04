@@ -442,7 +442,7 @@ const RenderTable = () => {
     States.useSelection();
 
   const [showFilter, flipFilter] =
-    Dome.useBoolSettings('ivette.properties.showFilter');
+    Dome.useFlipSettings('ivette.properties.showFilter');
 
   // Updating the filter
   const selectedFunction = selection?.current?.function;

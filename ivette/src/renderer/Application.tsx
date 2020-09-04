@@ -58,9 +58,9 @@ const HistorySelectionControls = () => {
 
 export default (() => {
   const [sidebar, flipSidebar] =
-    Dome.useBoolSettings('frama-c.sidebar.unfold', true);
+    Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
-    Dome.useBoolSettings('frama-c.viewbar.unfold', true);
+    Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
   return (
     <Vfill>

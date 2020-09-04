@@ -589,31 +589,40 @@ export function useClock(period: number, initStart: boolean): Timer {
 // --- Settings Hookds
 // --------------------------------------------------------------------------
 
-export type FlipState = [boolean, (newState?: boolean) => void];
-
 /**
    Bool window settings helper. Default is `false` unless specified.
-   See also [[dome/data/settings]].
-   @returns `[state,flipState]` where flipState can be invoked with an
-   optional argument. By default, `flipState()` invert the state and
-    `flipState(s)` set the state to `s`.
 */
 export function useBoolSettings(
   key: string | undefined,
   defaultValue = false,
-): FlipState {
+) {
+  return Settings.useWindowSettings(
+    key, Json.jBoolean, defaultValue,
+  );
+}
+
+/**
+   Bool window settings helper with a flip callback.
+ */
+export function useFlipSettings(
+  key: string | undefined,
+  defaultValue = false,
+): [boolean, () => void] {
   const [state, setState] = Settings.useWindowSettings(
     key, Json.jBoolean, defaultValue,
   );
   const flipState = React.useCallback(
-    (v) => setState(v === undefined ? !state : v),
+    () => setState(!state),
     [state, setState],
   );
   return [state, flipState];
 }
 
 /** Number window settings helper. Default is `0` unless specified. */
-export function useNumberSettings(key: string | undefined, defaultValue = 0) {
+export function useNumberSettings(
+  key: string | undefined,
+  defaultValue = 0,
+) {
   return Settings.useWindowSettings(
     key, Json.jNumber, defaultValue,
   );

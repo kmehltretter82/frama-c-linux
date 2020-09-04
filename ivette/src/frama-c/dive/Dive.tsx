@@ -475,7 +475,7 @@ const GraphView = () => {
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
   const [lock, flipLock] =
-    Dome.useBoolSettings('dive.lock');
+    Dome.useFlipSettings('dive.lock');
   const [selectionMode, setSelectionMode] =
     Dome.useStringSettings('dive.selectionMode', 'follow');
 

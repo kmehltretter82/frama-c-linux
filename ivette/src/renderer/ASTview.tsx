@@ -92,7 +92,7 @@ const ASTview = () => {
   const multipleSelections = selection?.multiple.allSelections;
   const [theme, setTheme] = Settings.useGlobalSettings(Theme);
   const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
-  const [wrapText, flipWrapText] = Dome.useBoolSettings('ASTview.wrapText');
+  const [wrapText, flipWrapText] = Dome.useFlipSettings('ASTview.wrapText');
   const markersInfo = States.useSyncArray(markerInfo);
 
   const theFunction = selection?.current?.function;
