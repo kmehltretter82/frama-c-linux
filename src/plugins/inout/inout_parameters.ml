@@ -77,21 +77,6 @@ module ForceInout =
        let help = "Compute operational inputs, an over-approximation of the set of locations whose initial value is used; and the sure outputs, an under-approximation of the set of the certainly written locations"
      end)
 
-(* Remove in Frama-C Chlorine *)
-let () = Parameter_customize.is_invisible ()
-module ForceCallwiseInout =
-  True
-    (struct
-       let option_name = "-inout-callwise"
-       let help = "Compute callsite-wide operational inputs; this results in more precise results for -inout and -out options"
-    end)
-let () =
-  ForceCallwiseInout.add_update_hook
-    (fun _ new_ ->
-       if not new_ then
-         Kernel.abort "@[option -inout-callwise can no longer be unset.@]")
-
-
 module ForceInoutExternalWithFormals =
   False
     (struct

@@ -1016,19 +1016,10 @@ module MemExecAll =
     (struct
       let option_name = "-eva-memexec"
       let help = "Speed up analysis by not recomputing functions already \
-                  analyzed in the same context. Forces -inout-callwise. \
+                  analyzed in the same context. \
                   Callstacks for which the analysis has not been recomputed \
                   are incorrectly shown as dead in the GUI."
     end)
-let () =
-  MemExecAll.add_set_hook
-    (fun _bold bnew ->
-       if bnew then
-         try
-           Dynamic.Parameter.Bool.set "-inout-callwise" true
-         with Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ ->
-           abort "Cannot set option -eva-memexec. Is plugin Inout registered?"
-    )
 
 let () = Parameter_customize.set_group precision_tuning
 module ArrayPrecisionLevel =
