@@ -1,6 +1,6 @@
-// --------------------------------------------------------------------------
-// --- Forms Layout
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------*/
+/* --- Form Fields                                                        ---*/
+/* --------------------------------------------------------------------------*/
 
 /**
    @packageDocumentation
@@ -17,6 +17,7 @@ export type Setter<A> = (value: A) => void;
 export type Checker<A> = (value: A) => boolean | Error;
 export type State<A> = [A, Setter<A>]
 export type Callback<A> = (value: A, valid: boolean) => void;
+export type FieldState<A> = [A, Setter<A>, Error];
 
 /* --------------------------------------------------------------------------*/
 /* --- State Utilities                                                    ---*/
@@ -85,7 +86,7 @@ export function useIndex<A>(
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- Form Context                                                       ---*/
+/* --- Basics                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
 export interface FilterProps {
@@ -98,6 +99,12 @@ export interface FilterProps {
   /** default is false. */
   disabled?: boolean;
 }
+
+export interface Children { children: React.ReactNode; }
+
+/* --------------------------------------------------------------------------*/
+/* --- Form Context                                                       ---*/
+/* --------------------------------------------------------------------------*/
 
 interface FormContext {
   disabled: boolean;
@@ -120,8 +127,7 @@ function useContext(props: FilterProps): FormContext {
   }
 }
 
-export interface Children { children: React.ReactNode; }
-
+/** @category Form Containers */
 export function Filter(props: FilterProps & Children) {
   const context = useContext(props);
   if (context.hidden) return null;
@@ -133,51 +139,11 @@ export function Filter(props: FilterProps & Children) {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- Value Filter                                                      --- */
+/* --- Main Form Container                                                ---*/
 /* --------------------------------------------------------------------------*/
 
-export interface FieldProps<A> {
-  state: State<A>;
-  checker?: Checker<A>;
-  message?: string;
-  onChange?: Callback<A>;
-  latency?: number;
-}
 
-type FilterState<A> = [A, Setter<A>, Error];
-
-export function useField<A>(props: FieldProps<A>): FilterState<A> {
-  const { checker, message, latency = 0, onChange } = props;
-  const [value, setValue] = props.state;
-  const [current, setCurrent] = React.useState<A>(value);
-  const [error, setError] = React.useState<Error>(undefined);
-  const update = React.useMemo(() => {
-    if (!latency)
-      return (newValue: A) => {
-        const newError = validate(newValue, checker, message);
-        setCurrent(newValue);
-        setValue(newValue);
-        setError(newError);
-        if (onChange) onChange(newValue, isValid(newError));
-      };
-    const propagate = debounce((newValue) => {
-      const newError = validate(newValue, checker, message);
-      setValue(newValue);
-      setError(newError);
-      if (onChange) onChange(newValue, isValid(newError));
-    });
-    return (newValue: A) => {
-      setCurrent(newValue);
-      propagate(newValue);
-    }
-  }, [checker, message, latency, onChange, setValue, setError]);
-  return [current, update, error];
-};
-
-// --------------------------------------------------------------------------
-// --- Form Container
-// --------------------------------------------------------------------------
-
+/** @category Form Containers */
 export interface FormProps extends FilterProps, Children {
   /** Additional container class. */
   className?: string;
@@ -185,7 +151,10 @@ export interface FormProps extends FilterProps, Children {
   style?: React.CSSProperties;
 }
 
-/** Form Container. */
+/**
+   Main Form Container.
+   @category Form Containers
+ */
 export const Form = (props: FormProps) => {
   const { className, style, children, ...filter } = props;
   const css = Utils.classes('dome-xForm-grid', className);
@@ -197,6 +166,10 @@ export const Form = (props: FormProps) => {
     </div>
   );
 }
+
+// --------------------------------------------------------------------------
+// --- Warning Badge
+// --------------------------------------------------------------------------
 
 export interface WarningProps {
   /** Short warn message in case of error. */
@@ -227,6 +200,52 @@ export function Warning(props: WarningProps) {
       </span>
     </div>
   );
+};
+
+// --------------------------------------------------------------------------
+// --- Section Container
+// --------------------------------------------------------------------------
+
+/* --------------------------------------------------------------------------*/
+/* --- Value Filter                                                      --- */
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields */
+export interface FieldProps<A> {
+  state: State<A>;
+  checker?: Checker<A>;
+  message?: string;
+  onChange?: Callback<A>;
+  latency?: number;
+}
+
+/** @category Form Fields */
+export function useField<A>(props: FieldProps<A>): FieldState<A> {
+  const { checker, message, latency = 0, onChange } = props;
+  const [value, setValue] = props.state;
+  const [current, setCurrent] = React.useState<A>(value);
+  const [error, setError] = React.useState<Error>(undefined);
+  const update = React.useMemo(() => {
+    if (!latency)
+      return (newValue: A) => {
+        const newError = validate(newValue, checker, message);
+        setCurrent(newValue);
+        setValue(newValue);
+        setError(newError);
+        if (onChange) onChange(newValue, isValid(newError));
+      };
+    const propagate = debounce((newValue) => {
+      const newError = validate(newValue, checker, message);
+      setValue(newValue);
+      setError(newError);
+      if (onChange) onChange(newValue, isValid(newError));
+    });
+    return (newValue: A) => {
+      setCurrent(newValue);
+      propagate(newValue);
+    }
+  }, [checker, message, latency, onChange, setValue, setError]);
+  return [current, update, error];
 };
 
 // --------------------------------------------------------------------------
