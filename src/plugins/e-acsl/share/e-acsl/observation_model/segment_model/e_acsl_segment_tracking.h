@@ -367,8 +367,6 @@ void mark_readonly_region (uintptr_t addr, long size);
 /* }}} */
 
 /* Heap allocation {{{ (malloc/calloc) */
-extern int MSPACES_INIT;
-
 /** \brief Return shadowed copy of a memory chunk on a program's heap using.
  * If `init` parameter is set to a non-zero value the memory occupied by the
  * resulting block is set to be initialized and uninitialized otherwise. */
