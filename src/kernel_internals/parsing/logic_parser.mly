@@ -225,6 +225,7 @@
   let cv_const = Attr ("const", [])
   let cv_volatile = Attr ("volatile", [])
 
+  let toplevel_pred tp_only_check tp_statement = { tp_only_check; tp_statement }
 %}
 
 /*****************************************************************************/
@@ -250,6 +251,8 @@
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
 %token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK SEMICOLON NULL EMPTY
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
+%token CHECK_REQUIRES CHECK_LOOP CHECK_LEMMA
+%token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
@@ -1098,6 +1101,7 @@ contract:
 
 // use that to detect potentially missing ';' at end of clause
 clause_kw:
+| CHECK_REQUIRES { "check requires" }
 | REQUIRES { "requires" }
 | ASSUMES {"assumes"}
 | ASSIGNS { "assigns" }
@@ -1121,8 +1125,10 @@ requires:
 ;
 
 ne_requires:
-| REQUIRES full_lexpr SEMICOLON requires { $2::$4 }
-| REQUIRES full_lexpr clause_kw { missing 2 ";" $3}
+| REQUIRES full_lexpr SEMICOLON requires { toplevel_pred false $2::$4 }
+| CHECK_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred true $2 :: $4 }
+| REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
+| CHECK_REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
 ;
 
 terminates:
@@ -1161,7 +1167,10 @@ allocation:
 
 ne_simple_clauses:
 | post_cond_kind full_lexpr SEMICOLON simple_clauses
-    { let allocation,assigns,post_cond,extended = $4 in allocation,assigns,(($1,$2)::post_cond),extended }
+    { let only_check, kind = $1 in
+      let allocation,assigns,post_cond,extended = $4 in
+      allocation,assigns,
+      ((kind,toplevel_pred only_check $2)::post_cond),extended }
 | allocation SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $3 in
       let a = concat_allocation allocation $1 in
@@ -1388,7 +1397,8 @@ loop_allocation:
 ;
 
 loop_invariant:
-| LOOP INVARIANT full_lexpr SEMICOLON { $3 }
+| LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred false $3 }
+| CHECK_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred true $3 }
 ;
 
 loop_variant:
@@ -1450,10 +1460,11 @@ pragma_or_code_annotation:
 
 code_annotation:
 | ASSERT full_lexpr SEMICOLON
-      { fun bhvs -> AAssert (bhvs,Assert,$2) }
+  { fun bhvs -> AAssert (bhvs,toplevel_pred false $2) }
 | CHECK full_lexpr SEMICOLON
-      { fun bhvs -> AAssert (bhvs,Check,$2) }
-| INVARIANT full_lexpr SEMICOLON { fun bhvs -> AInvariant (bhvs,false,$2) }
+  { fun bhvs -> AAssert (bhvs,toplevel_pred true $2) }
+| INVARIANT full_lexpr SEMICOLON
+  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred false $2) }
 | EXT_CODE_ANNOT grammar_extension SEMICOLON
   { fun bhvs ->
     let open Cil_types in
@@ -1601,7 +1612,11 @@ logic_def:
 | LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, $4) }
+      LDlemma (id, false, labels, tvars, toplevel_pred false $4) }
+| CHECK_LEMMA poly_id COLON full_lexpr SEMICOLON
+    { let (id,labels,tvars) = $2 in
+      exit_type_variables_scope ();
+      LDlemma (id, false, labels, tvars, toplevel_pred true $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
@@ -1674,7 +1689,7 @@ logic_decl:
 | AXIOM poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, true, labels, tvars, $4) }
+      LDlemma (id, true, labels, tvars, toplevel_pred false $4) }
 ;
 
 logic_decl_loc:
@@ -1836,11 +1851,16 @@ acsl_c_keyword:
 ;
 
 post_cond:
-| ENSURES { Normal, "ensures" }
-| EXITS   { Exits, "exits" }
-| BREAKS  { Breaks, "breaks" }
-| CONTINUES { Continues, "continues" }
-| RETURNS { Returns, "returns" }
+| ENSURES { (false,Normal), "ensures" }
+| EXITS   { (false,Exits), "exits" }
+| BREAKS  { (false,Breaks), "breaks" }
+| CONTINUES { (false,Continues), "continues" }
+| RETURNS { (false,Returns), "returns" }
+| CHECK_ENSURES { (true,Normal), "check ensures" }
+| CHECK_EXITS   { (true,Exits), "check exits" }
+| CHECK_BREAKS  { (true,Breaks), "check breaks" }
+| CHECK_CONTINUES { (true,Continues), "check continues" }
+| CHECK_RETURNS { (true,Returns), "check returns" }
 ;
 
 is_acsl_spec:
@@ -1851,6 +1871,7 @@ is_acsl_spec:
 | FREES      { "frees" }
 | BEHAVIOR   { "behavior" }
 | REQUIRES   { "requires" }
+| CHECK_REQUIRES { "check requires" }
 | TERMINATES { "terminates" }
 | COMPLETE   { "complete" }
 | DECREASES  { "decreases" }
