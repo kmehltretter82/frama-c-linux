@@ -1769,9 +1769,14 @@ and visitCilPredicate vis p =
   doVisitCil vis
     id vis#vpredicate childrenPredicate p
 
+and visitCilToplevel_predicate vis p =
+  let s = p.tp_statement in
+  let s' = visitCilPredicate vis s in
+  if s != s' then { p with tp_statement = s' } else p
+
 and childrenIdentified_predicate vis ip =
   let p = ip.ip_content in
-  let p' = visitCilPredicate vis p in
+  let p' = visitCilToplevel_predicate vis p in
   if p != p' then { ip with ip_content = p' }
   else ip
 
@@ -2089,7 +2094,7 @@ and childrenAnnotation vis a =
         vis#get_filling_actions;
     if ti' != ti then Dtype (ti',loc) else a
   | Dlemma(s,is_axiom,labels,tvars,p,attr,loc) ->
-    let p' = visitCilPredicate vis p in
+    let p' = visitCilToplevel_predicate vis p in
     let attr' = visitCilAttributes vis attr in
     if p' != p || attr != attr' then
       Dlemma(s,is_axiom,labels,tvars,p',attr',loc)
@@ -2142,14 +2147,14 @@ and visitCilCodeAnnotation vis ca =
     vis (Visitor_behavior.ccode_annotation vis#behavior) vis#vcode_annot childrenCodeAnnot ca
 
 and childrenCodeAnnot vis ca =
-  let vPred p = visitCilPredicate vis p in
+  let vPred p = visitCilToplevel_predicate vis p in
   let vTerm t = visitCilTerm vis t in
   let vSpec s = visitCilFunspec vis s in
   let change_content annot = { ca with annot_content = annot } in
   match ca.annot_content with
-    AAssert (behav,kind,p) ->
+    AAssert (behav,p) ->
     let p' = vPred p in if p' != p then
-      change_content (AAssert (behav,kind,p'))
+      change_content (AAssert (behav,p'))
     else ca
   | APragma (Impact_pragma t) ->
     let t' = visitCilImpactPragma vis t in

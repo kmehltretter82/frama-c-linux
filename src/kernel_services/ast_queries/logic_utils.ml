@@ -129,7 +129,7 @@ let coerce_type typ =
   else if Cil.isFloatingType ty then Lreal
   else Ctype typ
 
-let predicate_of_identified_predicate ip = ip.ip_content
+let predicate_of_identified_predicate ip = ip.ip_content.tp_statement
 
 let translate_old_label s p =
   let get_label () =
@@ -1025,8 +1025,13 @@ and is_same_predicate pred1 pred2 =
   is_same_list Datatype.String.equal pred1.pred_name pred2.pred_name &&
   is_same_predicate_node pred1.pred_content pred2.pred_content
 
+
+and is_same_toplevel_predicate p1 p2 =
+  p1.tp_only_check = p2.tp_only_check &&
+  is_same_predicate p1.tp_statement p2.tp_statement
+
 and is_same_identified_predicate p1 p2 =
-  is_same_predicate p1.ip_content p2.ip_content
+  is_same_toplevel_predicate p1.ip_content p2.ip_content
 
 and is_same_identified_term l1 l2 =
   is_same_term l1.it_content l2.it_content
@@ -1130,12 +1135,12 @@ let is_same_extension x1 x2 =
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with
-  | AAssert(l1,k1,p1), AAssert(l2,k2,p2) ->
-    is_same_list (=) l1 l2 && k1 = k2 && is_same_predicate p1 p2
+  | AAssert(l1,p1), AAssert(l2,p2) ->
+    is_same_list (=) l1 l2 && is_same_toplevel_predicate p1 p2
   | AStmtSpec (l1,s1), AStmtSpec (l2,s2) ->
     is_same_list (=) l1 l2 && is_same_spec s1 s2
   | AInvariant(l1,b1,p1), AInvariant(l2,b2,p2) ->
-    is_same_list (=) l1 l2 && b1 = b2 && is_same_predicate p1 p2
+    is_same_list (=) l1 l2 && b1 = b2 && is_same_toplevel_predicate p1 p2
   | AVariant v1, AVariant v2 -> is_same_variant v1 v2
   | AAssigns(l1,a1), AAssigns(l2,a2) ->
     is_same_list (=) l1 l2 && is_same_assigns a1 a2
@@ -1165,7 +1170,7 @@ let rec is_same_global_annotation ga1 ga2 =
     Dlemma(n2,ax2,labs2,typs2,st2,attr2,_) ->
     is_same_string n1 n2 && ax1 = ax2 &&
     is_same_list is_same_logic_label labs1 labs2 &&
-    is_same_list (=) typs1 typs2 && is_same_predicate st1 st2 &&
+    is_same_list (=) typs1 typs2 && is_same_toplevel_predicate st1 st2 &&
     is_same_attributes attr1 attr2
   | Dinvariant (li1,_), Dinvariant (li2,_) -> is_same_logic_info li1 li2
   | Dtype_annot (li1,_), Dtype_annot (li2,_) -> is_same_logic_info li1 li2
@@ -2158,10 +2163,10 @@ let lhost_c_type thost =
   | TResult ty -> ty
 
 let is_assert ca =
-  match ca.annot_content with AAssert (_, Assert, _) -> true | _ -> false
+  match ca.annot_content with AAssert (_, p) -> not p.tp_only_check | _ -> false
 
 let is_check ca =
-  match ca.annot_content with AAssert (_, Check, _) -> true | _ -> false
+  match ca.annot_content with AAssert (_, p) -> p.tp_only_check | _ -> false
 
 let is_contract ca =
   match ca.annot_content with AStmtSpec _ -> true | _ -> false
@@ -2205,7 +2210,7 @@ let is_loop_annot s =
 
 let is_trivial_annotation a =
   match a.annot_content with
-  | AAssert (_,_,a) -> is_trivially_true a
+  | AAssert (_,a) -> is_trivially_true a.tp_statement
   | APragma _ | AStmtSpec _ | AInvariant _ | AVariant _
   | AAssigns _| AAllocation _ | AExtended _
     -> false

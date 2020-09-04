@@ -466,9 +466,11 @@ let ident_names names =
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, Check, named_pred)  -> "@check"::(ident_names named_pred.pred_name)
-  | AAssert (_, Assert, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
-  | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
+  | AAssert (_, pred)  ->
+      let cat = if pred.tp_only_check then "@check" else "@assert" in
+      cat::(ident_names pred.tp_statement.pred_name)
+  | AInvariant (_,_,named_pred) ->
+      "@invariant"::(ident_names named_pred.tp_statement.pred_name)
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,{ext_name}) -> [Printf.sprintf "@%s" ext_name]
   | _ -> [] (* TODO : add some more names ? *)
@@ -479,7 +481,7 @@ let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      ip_pred.ip_content.pred_name
+      ip_pred.ip_content.tp_statement.pred_name
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
@@ -641,8 +643,8 @@ let assigns_hints hs froms =
   List.iter (fun ({it_content=t},_) -> term_hints hs t) froms
 
 let annot_hints hs = function
-  | AAssert(bs,_,ipred) | AInvariant(bs,_,ipred) ->
-      List.iter (add_hint hs) (ident_names ipred.pred_name) ;
+  | AAssert(bs,ipred) | AInvariant(bs,_,ipred) ->
+      List.iter (add_hint hs) (ident_names ipred.tp_statement.pred_name) ;
       List.iter (add_hint hs) bs
   | AAssigns(bs,Writes froms) ->
       List.iter (add_hint hs) bs ;
@@ -659,7 +661,7 @@ let property_hints hs =
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
         List.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
-        List.iter (add_hint hs) ip_pred.ip_content.pred_name
+        List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]
     | IPCodeAnnot {ica_ca} -> annot_hints hs ica_ca.annot_content
     | IPAssigns {ias_froms} -> assigns_hints hs ias_froms

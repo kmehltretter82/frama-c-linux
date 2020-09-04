@@ -717,13 +717,16 @@ let extend_name e pred =
   if Emitter.equal e Emitter.end_user || Emitter.equal e Emitter.kernel
   then pred
   else
-    let names = pred.pred_name in
+    let names = pred.tp_statement.pred_name in
     let s = Emitter.get_name e in
     if (List.mem s names) ||
        let acsl_identifier_regexp =
          Str.regexp "^\\([\\][_a-zA-Z]\\|[_a-zA-Z]\\)[0-9_a-zA-Z]*$"
        in not (Str.string_match acsl_identifier_regexp s 0)
-    then pred else { pred with pred_name = s :: names }
+    then pred
+    else
+      { pred with
+        tp_statement = { pred.tp_statement with pred_name = s :: names }}
 
 (** {3 Adding subparts of a function contract} *)
 
@@ -1072,8 +1075,8 @@ let add_code_annot emitter ?kf stmt ca =
   let kf = find_englobing_kf ?kf stmt in
   let convert a =
     match a.annot_content with
-    | AAssert(l, kind, p) ->
-      let a = { a with annot_content=AAssert(l,kind,extend_name emitter p) } in
+    | AAssert(l, p) ->
+      let a = { a with annot_content=AAssert(l,extend_name emitter p) } in
       a, Property.ip_of_code_annot kf stmt a
     | AInvariant(l, b, p) ->
       let a={a with annot_content=AInvariant(l,b,extend_name emitter p)} in
@@ -1270,11 +1273,13 @@ let add_code_annot emitter ?kf stmt ca =
     Code_annots.add stmt tbl
 
 let add_assert e ?kf stmt a =
-  let a = Logic_const.new_code_annotation (AAssert ([],Assert,a)) in
+  let a = Logic_const.toplevel_predicate ~only_check:false a in
+  let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
 let add_check e ?kf stmt a =
-  let a = Logic_const.new_code_annotation (AAssert ([],Check,a)) in
+  let a = Logic_const.toplevel_predicate ~only_check:true a in
+  let a = Logic_const.new_code_annotation (AAssert ([],a)) in
   add_code_annot e ?kf stmt a
 
 (** {3 Adding globals} *)

@@ -29,8 +29,8 @@ let has_requires spec =
 
 let code_annotation_text ca =
   match ca.annot_content with
-  | AAssert (_, Assert, _) ->  "assertion"
-  | AAssert (_, Check, _) -> "check"
+  | AAssert (_, {tp_only_check=false}) ->  "assertion"
+  | AAssert (_, {tp_only_check=true}) -> "check"
   | AInvariant _ ->  "loop invariant"
   | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
   | AExtended _  ->
@@ -203,7 +203,8 @@ let mark_green_and_red () =
        currently skipped during evaluation. *)
     if contains_c_at ca || (Alarms.find ca <> None) then
       match ca.annot_content with
-      | AAssert (_, _, p) | AInvariant (_, true, p) ->
+      | AAssert (_, p) | AInvariant (_, true, p) ->
+        let p = p.tp_statement in
         let loc = code_annotation_loc ca stmt in
         Cil.CurrentLoc.set loc;
         let kf = Kernel_function.find_englobing_kf stmt in
@@ -246,7 +247,8 @@ let mark_invalid_initializers () =
     | None -> ()
     | Some _ ->
       match ca.annot_content with
-      | AAssert (_, _, p) ->
+      | AAssert (_, p) ->
+        let p = p.tp_statement in
         let ip = Property.ip_of_code_annot_single kf first_stmt ca in
         (* Evaluate in a fully empty state. Only predicates that do not
            depend on the memory will result in 'False' *)

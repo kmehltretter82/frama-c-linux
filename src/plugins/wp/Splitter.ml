@@ -50,7 +50,7 @@ let pretty fmt = function
 
 let loc = function
   | THEN s | ELSE s | CASE(s,_) | CALL(s,_) | DEFAULT s -> Stmt.loc s
-  | ASSERT(p,_,_) -> p.ip_content.pred_loc
+  | ASSERT(p,_,_) -> p.ip_content.tp_statement.pred_loc
 
 let compare p q =
   if p == q then 0 else
@@ -103,8 +103,7 @@ and unwrap p =
         (unwrap p)
   | _ -> raise Exit
 
-let predicate ip =
-  ip.ip_content
+let predicate ip = ip.ip_content.tp_statement
 
 let rec enumerate ip k n = function
   | [] -> []

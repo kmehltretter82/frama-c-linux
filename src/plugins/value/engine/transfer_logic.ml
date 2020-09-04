@@ -137,7 +137,7 @@ let emit_message_and_status kind kf behavior ~active ~empty property named_pred 
 let create_conjunction l=
   let loc = match l with
     | [] -> None
-    | p :: _ -> Some p.ip_content.pred_loc
+    | p :: _ -> Some (Logic_const.pred_of_id_pred p).pred_loc
   in
   Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
 
@@ -580,8 +580,8 @@ module Make
 
   let code_annotation_text ca =
     match ca.annot_content with
-    | AAssert (_, Assert, _) ->  "assertion"
-    | AAssert (_, Check, _) -> "check"
+    | AAssert (_,{tp_only_check = false}) ->  "assertion"
+    | AAssert (_,{tp_only_check = true}) -> "check"
     | AInvariant _ ->  "loop invariant"
     | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
     | AExtended _ ->
@@ -687,9 +687,10 @@ module Make
         aux_interp ~reduce code_annot behav p
     in
     match code_annot.annot_content with
-    | AAssert (behav, Check, p) -> aux ~reduce:false code_annot behav p
-    | AAssert (behav, Assert, p)
-    | AInvariant (behav, true, p) -> aux ~reduce:true code_annot behav p
+    | AAssert (behav, p) ->
+      aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
+    | AInvariant (behav, true, p) ->
+      aux ~reduce:true code_annot behav p.tp_statement
     | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _ | AExtended _

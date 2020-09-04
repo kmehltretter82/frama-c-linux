@@ -957,6 +957,7 @@ let mk_deterministic_lemma () =
     in
     let trans = Path_analysis.get_transitions_of_state state automaton in
     let prop = Extlib.product_fold disjoint_guards ptrue trans trans in
+    let prop = Logic_const.toplevel_predicate ~only_check:true prop in
     let name = state.Promelaast.name ^ "_deterministic_trans" in
     let lemma =
       Dlemma (name, false, [label],[],prop,[],Cil_datatype.Location.unknown)

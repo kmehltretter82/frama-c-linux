@@ -297,9 +297,9 @@ struct
       with Not_found -> Wp_parameters.fatal "Error during compilation"
 
   let assert_ env p prop_id =
-    let pos = pred env `Positive p.ip_content in
+    let pos = pred env `Positive p.ip_content.tp_statement in
     let env' = env @* [Clabels.here, env @: Clabels.next ] in
-    let neg = pred env' `Negative p.ip_content in
+    let neg = pred env' `Negative p.ip_content.tp_statement in
     let goal = {
       goal_pred = pos;
       goal_prop = prop_id;
@@ -430,7 +430,7 @@ struct
     in
     let post_cond termination_kind env (tk, ip) =
       if tk = termination_kind then
-        assume_ env `Positive ip.ip_content
+        assume_ env `Positive ip.ip_content.tp_statement
       else nop
     in
     let behavior env b =
@@ -540,7 +540,7 @@ struct
                  let node = get_node nodes vertex in
                  bind c_label node acc
               ) a.labels env in
-          assume (pred env `Negative a.predicate.ip_content) @^
+          assume (pred env `Negative a.predicate.ip_content.tp_statement) @^
           goto (env @: Clabels.here) (env @: Clabels.next)
       | Prop _ ->
           not_yet "[StmtSemantics] Annots other than 'assert'"
@@ -717,7 +717,7 @@ struct
       in
       assume,
       List.fold_left
-        (fun acc ip -> acc @^ pre_cond `Negative env ip.ip_content)
+        (fun acc ip -> acc @^ pre_cond `Negative env ip.ip_content.tp_statement)
         nop b.b_requires
       @^ goto (env @: Clabels.here) (env @: Clabels.next)
     in
