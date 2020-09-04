@@ -64,8 +64,8 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
-let () = Help.add_aliases [ "-value-h"; "-val-h" ]
-let () = add_plugin_output_aliases [ "value" ]
+let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
+let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
 
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"
@@ -109,7 +109,7 @@ module ForceValues =
       let help = "Compute values"
       let output_by_default = true
     end)
-let () = ForceValues.add_aliases ["-val"]
+let () = ForceValues.add_aliases ~deprecated:true ["-val"]
 
 let domains = add_group "Abstract Domains"
 let precision_tuning = add_group "Precision vs. time"
@@ -373,7 +373,6 @@ module NoResultsFunctions =
                   function f"
     end)
 let () = add_dep NoResultsFunctions.parameter
-let () = NoResultsFunctions.add_aliases ["-no-results-function"]
 
 let () = Parameter_customize.set_group performance
 module ResultsAll =
@@ -383,7 +382,6 @@ module ResultsAll =
       let help = "Record values for each of the statements of the program."
     end)
 let () = add_dep ResultsAll.parameter
-let () = ResultsAll.add_aliases ["-results"]
 
 let () = Parameter_customize.set_group performance
 module JoinResults =
@@ -393,7 +391,6 @@ module JoinResults =
       let help = "Precompute consolidated states once Eva is computed"
       let default = true
     end)
-let () = JoinResults.add_aliases ["-val-join-results"]
 
 let () = Parameter_customize.set_group performance
 module EqualityStorage =
@@ -463,7 +460,6 @@ module AllRoundingModesConstants =
                   or being converted to higher precision"
     end)
 let () = add_correctness_dep AllRoundingModesConstants.parameter
-let () = AllRoundingModesConstants.add_aliases ["-all-rounding-modes-constants"]
 
 let () = Parameter_customize.set_group alarms
 module UndefinedPointerComparisonPropagateAll =
@@ -475,9 +471,6 @@ module UndefinedPointerComparisonPropagateAll =
                   the emission of an alarm"
     end)
 let () = add_correctness_dep UndefinedPointerComparisonPropagateAll.parameter
-let () =
-  UndefinedPointerComparisonPropagateAll.add_aliases
-    ["-undefined-pointer-comparison-propagate-all"]
 
 let () = Parameter_customize.set_group alarms
 module WarnPointerComparison =
@@ -491,7 +484,6 @@ module WarnPointerComparison =
     end)
 let () = WarnPointerComparison.set_possible_values ["all"; "pointer"; "none"]
 let () = add_correctness_dep WarnPointerComparison.parameter
-let () = WarnPointerComparison.add_aliases ["-val-warn-undefined-pointer-comparison"]
 
 let () = Parameter_customize.set_group alarms
 module WarnSignedConvertedDowncast =
@@ -504,9 +496,6 @@ module WarnSignedConvertedDowncast =
                   destination range."
     end)
 let () = add_correctness_dep WarnSignedConvertedDowncast.parameter
-let () =
-  WarnSignedConvertedDowncast.add_aliases
-    ["-val-warn-signed-converted-downcast"]
 
 
 let () = Parameter_customize.set_group alarms
@@ -520,7 +509,6 @@ module WarnPointerSubstraction =
          offsets. When unset, do not warn but generate imprecise offsets."
     end)
 let () = add_correctness_dep WarnPointerSubstraction.parameter
-let () = WarnPointerSubstraction.add_aliases ["-val-warn-pointer-subtraction"]
 
 let () = Parameter_customize.set_group alarms
 module IgnoreRecursiveCalls =
@@ -531,7 +519,6 @@ module IgnoreRecursiveCalls =
         "Pretend function calls that would be recursive do not happen. Causes unsoundness"
     end)
 let () = add_correctness_dep IgnoreRecursiveCalls.parameter
-let () = IgnoreRecursiveCalls.add_aliases ["-val-ignore-recursive-calls"]
 
 let () = Parameter_customize.set_group alarms
 
@@ -546,7 +533,6 @@ module WarnCopyIndeterminate =
                   functions by '=-@all'."
     end)
 let () = add_correctness_dep WarnCopyIndeterminate.parameter
-let () = WarnCopyIndeterminate.add_aliases ["-val-warn-copy-indeterminate"]
 let () = WarnCopyIndeterminate.Category.(set_default (all ()))
 
 let () = Parameter_customize.set_group alarms
@@ -558,7 +544,6 @@ module ReduceOnLogicAlarms =
                   emitted while the predicate is evaluated (experimental)"
     end)
 let () = add_correctness_dep ReduceOnLogicAlarms.parameter
-let () = ReduceOnLogicAlarms.add_aliases ["-val-reduce-on-logic-alarms"]
 
 let () = Parameter_customize.set_group alarms
 module InitializedLocals =
@@ -570,7 +555,6 @@ module InitializedLocals =
                   initialization."
     end)
 let () = add_correctness_dep InitializedLocals.parameter
-let () = InitializedLocals.add_aliases ["-val-initialized-locals"]
 
 (* ------------------------------------------------------------------------- *)
 (* --- Initial context                                                   --- *)
@@ -586,7 +570,6 @@ module AutomaticContextMaxDepth =
       let help = "Use <n> as the depth of the default context for Eva. (defaults to 2)"
     end)
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
-let () = AutomaticContextMaxDepth.add_aliases ["-context-depth"]
 
 let () = Parameter_customize.set_group initial_context
 module AutomaticContextMaxWidth =
@@ -599,7 +582,6 @@ module AutomaticContextMaxWidth =
     end)
 let () = AutomaticContextMaxWidth.set_range ~min:1 ~max:max_int
 let () = add_correctness_dep AutomaticContextMaxWidth.parameter
-let () = AutomaticContextMaxWidth.add_aliases ["-context-width"]
 
 let () = Parameter_customize.set_group initial_context
 module AllocatedContextValid =
@@ -610,7 +592,6 @@ module AllocatedContextValid =
                   and then use NULL (defaults to false)"
     end)
 let () = add_correctness_dep AllocatedContextValid.parameter
-let () = AllocatedContextValid.add_aliases ["-context-valid-pointers"]
 
 let () = Parameter_customize.set_group initial_context
 module InitializationPaddingGlobals =
@@ -626,7 +607,6 @@ module InitializationPaddingGlobals =
     end)
 let () = InitializationPaddingGlobals.set_possible_values ["yes"; "no"; "maybe"]
 let () = add_correctness_dep InitializationPaddingGlobals.parameter
-let () = InitializationPaddingGlobals.add_aliases ["-val-initialization-padding-globals"]
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tuning                                                            --- *)
@@ -674,7 +654,6 @@ module WideningDelay =
         "Do not widen before the <n>-th iteration (defaults to 3)"
     end)
 let () = WideningDelay.set_range ~min:1 ~max:max_int
-let () = WideningDelay.add_aliases ["-wlevel"]
 let () = add_precision_dep WideningDelay.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -704,7 +683,6 @@ module SemanticUnrollingLevel =
          (defaults to 0)"
     end)
 let () = add_precision_dep SemanticUnrollingLevel.parameter
-let () = SemanticUnrollingLevel.add_aliases ["-slevel"]
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -729,7 +707,6 @@ module SlevelFunction =
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep SlevelFunction.parameter
-let () = SlevelFunction.add_aliases ["-slevel-function"]
 
 let () = Parameter_customize.set_group precision_tuning
 module SlevelMergeAfterLoop =
@@ -742,7 +719,6 @@ module SlevelMergeAfterLoop =
          of a loop are merged before entering the next excution."
     end)
 let () = add_precision_dep SlevelMergeAfterLoop.parameter
-let () = SlevelMergeAfterLoop.add_aliases ["-val-slevel-merge-after-loop"]
 
 let () = Parameter_customize.set_group precision_tuning
 module MinLoopUnroll =
@@ -848,7 +824,6 @@ module SplitReturnFunction =
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep SplitReturnFunction.parameter
-let () = SplitReturnFunction.add_aliases ["-val-split-return-function"]
 
 let () = Parameter_customize.set_group precision_tuning
 module SplitReturn =
@@ -876,7 +851,6 @@ let () =
            abort "@[@[incorrect argument for option %s@ (%s).@]"
              SplitReturn.name s))
 let () = add_precision_dep SplitReturn.parameter
-let () = SplitReturn.add_aliases ["-val-split-return"]
 
 (* --- Misc --- *)
 
@@ -893,7 +867,6 @@ module ILevel =
          (defaults to 8, must be between 4 and 128)"
     end)
 let () = add_precision_dep ILevel.parameter
-let () = ILevel.add_aliases ["-val-ilevel"]
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
 let () = ILevel.set_range 4 256
 
@@ -930,7 +903,6 @@ module BuiltinsOverrides =
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep BuiltinsOverrides.parameter
-let () = BuiltinsOverrides.add_aliases ["-val-builtin"]
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
@@ -947,7 +919,6 @@ module BuiltinsAuto =
                   known C functions"
     end)
 let () = add_correctness_dep BuiltinsAuto.parameter
-let () = BuiltinsAuto.add_aliases ["-val-builtins-auto"]
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.set_negative_option_name ""
@@ -958,7 +929,6 @@ module BuiltinsList =
       let help = "List existing builtins, and which functions they \
                   are automatically associated to (if any)"
     end)
-let () = BuiltinsList.add_aliases ["-val-builtins-list"]
 
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevel =
@@ -972,7 +942,6 @@ module LinearLevel =
          Defaults to 0."
     end)
 let () = add_precision_dep LinearLevel.parameter
-let () = LinearLevel.add_aliases ["-val-subdivide-non-linear"]
 
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevelFunction =
@@ -1009,7 +978,6 @@ module UsePrototype =
                   their definitions"
     end)
 let () = add_precision_dep UsePrototype.parameter
-let () = UsePrototype.add_aliases ["-val-use-spec"]
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
@@ -1020,7 +988,6 @@ module SkipLibcSpecs =
                   standard library of Frama-C, when their bodies are evaluated"
     end)
 let () = add_precision_dep SkipLibcSpecs.parameter
-let () = SkipLibcSpecs.add_aliases ["-val-skip-stdlib-specs"]
 
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1032,7 +999,6 @@ module RmAssert =
                   so that the user needs to inspect fewer of them"
     end)
 let () = add_precision_dep RmAssert.parameter
-let () = RmAssert.add_aliases ["-remove-redundant-alarms"]
 
 let () = Parameter_customize.set_group precision_tuning
 module MemExecAll =
@@ -1044,7 +1010,6 @@ module MemExecAll =
                   Callstacks for which the analysis has not been recomputed \
                   are incorrectly shown as dead in the GUI."
     end)
-let () = MemExecAll.add_aliases ["-memexec-all"]
 let () =
   MemExecAll.add_set_hook
     (fun _bold bnew ->
@@ -1067,7 +1032,6 @@ module ArrayPrecisionLevel =
                   less than n values. (defaults to 200)"
     end)
 let () = add_precision_dep ArrayPrecisionLevel.parameter
-let () = ArrayPrecisionLevel.add_aliases ["-plevel"]
 let () = ArrayPrecisionLevel.add_update_hook
     (fun _ v -> Offsetmap.set_plevel v)
 
@@ -1173,7 +1137,6 @@ module ValShowProgress =
       let option_name = "-eva-show-progress"
       let help = "Show progression messages during analysis"
     end)
-let () = ValShowProgress.add_aliases ["-val-show-progress"]
 
 let () = Parameter_customize.set_group messages
 module ValShowPerf =
@@ -1182,7 +1145,6 @@ module ValShowPerf =
       let option_name = "-eva-show-perf"
       let help = "Compute and show a summary of the time spent analyzing function calls"
     end)
-let () = ValShowPerf.add_aliases ["-val-show-perf"]
 
 let () = Parameter_customize.set_group messages
 module ValPerfFlamegraphs =
@@ -1195,7 +1157,6 @@ module ValPerfFlamegraphs =
       let arg_name = "file"
       let default = ""
     end)
-let () = ValPerfFlamegraphs.add_aliases ["-val-flamegraph"]
 
 
 let () = Parameter_customize.set_group messages
@@ -1207,7 +1168,6 @@ module ShowSlevel =
       let arg_name = "n"
       let help = "Period for showing consumption of the alloted slevel during analysis"
     end)
-let () = ShowSlevel.add_aliases ["-val-show-slevel"]
 let () = ShowSlevel.set_range ~min:1 ~max:max_int
 
 let () = Parameter_customize.set_group messages
@@ -1217,7 +1177,6 @@ module PrintCallstacks =
       let option_name = "-eva-print-callstacks"
       let help = "When printing a message, also show the current call stack"
     end)
-let () = PrintCallstacks.add_aliases ["-val-print-callstacks"]
 
 let () = Parameter_customize.set_group messages
 module ReportRedStatuses =
@@ -1255,7 +1214,6 @@ module InterpreterMode =
       let help = "Stop at first call to a library function, if main() has \
                   arguments, on undecided branches"
     end)
-let () = InterpreterMode.add_aliases ["-val-interpreter-mode"]
 
 let () = Parameter_customize.set_group interpreter
 module StopAtNthAlarm =
@@ -1265,7 +1223,6 @@ module StopAtNthAlarm =
     let arg_name = "n"
     let help = "Abort the analysis when the nth alarm is emitted."
   end)
-let () = StopAtNthAlarm.add_aliases ["-val-stop-at-nth-alarm"]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ugliness required for correctness                                  --- *)
@@ -1369,7 +1326,6 @@ module AllocFunctions =
                   By default, contains malloc, calloc and realloc."
       let default = Datatype.String.Set.of_list ["malloc"; "calloc"; "realloc"]
     end)
-let () = AllocFunctions.add_aliases ["-val-malloc-functions"]
 let () = AllocFunctions.add_aliases ["-eva-malloc-functions"]
 
 let () = Parameter_customize.set_group malloc
@@ -1380,7 +1336,6 @@ module AllocReturnsNull=
       let help = "Memory allocation built-ins (malloc, calloc, realloc) are \
                   modeled as nondeterministically returning a null pointer"
     end)
-let () = AllocReturnsNull.add_aliases ["-val-alloc-returns-null"]
 
 let () = Parameter_customize.set_group malloc
 module MallocLevel =
@@ -1392,7 +1347,61 @@ module MallocLevel =
       let help = "Set to [m] the number of precise dynamic allocations \
                   besides the initial one, for each callstack (defaults to 0)"
     end)
-let () = MallocLevel.add_aliases ["-val-mlevel"]
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated aliases                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let deprecated_aliases : ((module Parameter_sig.S) * string) list =
+  [ (module SemanticUnrollingLevel), "-slevel"
+  ; (module SlevelFunction), "-slevel-function"
+  ; (module NoResultsFunctions), "-no-results-function"
+  ; (module ResultsAll), "-results"
+  ; (module JoinResults), "-val-join-results"
+  ; (module AllRoundingModesConstants), "-all-rounding-modes-constants"
+  ; (module UndefinedPointerComparisonPropagateAll), "-undefined-pointer-comparison-propagate-all"
+  ; (module WarnPointerComparison), "-val-warn-undefined-pointer-comparison"
+  ; (module WarnSignedConvertedDowncast), "-val-warn-signed-converted-downcast"
+  ; (module WarnPointerSubstraction), "-val-warn-pointer-subtraction"
+  ; (module IgnoreRecursiveCalls), "-val-ignore-recursive-calls"
+  ; (module WarnCopyIndeterminate), "-val-warn-copy-indeterminate"
+  ; (module ReduceOnLogicAlarms), "-val-reduce-on-logic-alarms"
+  ; (module InitializedLocals), "-val-initialized-locals"
+  ; (module AutomaticContextMaxDepth), "-context-depth"
+  ; (module AutomaticContextMaxWidth), "-context-width"
+  ; (module AllocatedContextValid), "-context-valid-pointers"
+  ; (module InitializationPaddingGlobals), "-val-initialization-padding-globals"
+  ; (module WideningDelay), "-wlevel"
+  ; (module SlevelMergeAfterLoop), "-val-slevel-merge-after-loop"
+  ; (module SplitReturnFunction), "-val-split-return-function"
+  ; (module SplitReturn), "-val-split-return"
+  ; (module ILevel), "-val-ilevel"
+  ; (module BuiltinsOverrides), "-val-builtin"
+  ; (module BuiltinsAuto), "-val-builtins-auto"
+  ; (module BuiltinsList), "-val-builtins-list"
+  ; (module LinearLevel), "-val-subdivide-non-linear"
+  ; (module UsePrototype), "-val-use-spec"
+  ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
+  ; (module RmAssert), "-remove-redundant-alarms"
+  ; (module MemExecAll), "-memexec-all"
+  ; (module ArrayPrecisionLevel), "-plevel"
+  ; (module ValShowProgress), "-val-show-progress"
+  ; (module ValShowPerf), "-val-show-perf"
+  ; (module ValPerfFlamegraphs), "-val-flamegraph"
+  ; (module ShowSlevel), "-val-show-slevel"
+  ; (module PrintCallstacks), "-val-print-callstacks"
+  ; (module InterpreterMode), "-val-interpreter-mode"
+  ; (module StopAtNthAlarm), "-val-stop-at-nth-alarm"
+  ; (module AllocFunctions), "-val-malloc-functions"
+  ; (module AllocReturnsNull), "-val-alloc-returns-null"
+  ; (module MallocLevel), "-val-mlevel"
+  ]
+
+let add_deprecated_alias ((module P: Parameter_sig.S), name) =
+  P.add_aliases ~visible:false ~deprecated:true [name]
+
+let () = List.iter add_deprecated_alias deprecated_aliases
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Meta options                                                       --- *)
