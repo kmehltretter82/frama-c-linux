@@ -58,21 +58,21 @@ let () =
             if Cil.hasAttribute "fc_stdlib" fun_attrs then begin
               Annotations.iter_behaviors (fun _emitter bhv ->
                   List.iter (fun ip ->
-                      let pred = ip.ip_content in
+                      let pred = Logic_const.pred_of_id_pred ip in
                       warn_if_unnamed "requires" pred;
                       check_initialized pred;
                       check_dangling pred;
                       check_separated pred;
                     ) bhv.b_requires;
                   List.iter (fun ip ->
-                      let pred = ip.ip_content in
+                      let pred = Logic_const.pred_of_id_pred ip in
                       warn_if_unnamed "assumes" pred;
                       check_initialized pred;
                       check_dangling pred;
                       check_separated pred;
                     ) bhv.b_assumes;
                   List.iter (fun (_termination, ip) ->
-                      let pred = ip.ip_content in
+                      let pred = Logic_const.pred_of_id_pred ip in
                       warn_if_unnamed "ensures" pred;
                       check_initialized pred;
                       check_dangling pred;
