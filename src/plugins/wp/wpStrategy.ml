@@ -163,13 +163,13 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
 
 let add_prop_fct_pre acc kind kf bhv ~assumes pre =
   if pre.ip_content.tp_only_check then acc else begin
-  let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
-  let labels = NormAtLabels.labels_fct_pre in
-  let p = Logic_const.pred_of_id_pred pre in
-  let p = Logic_const.(pat (p,pre_label)) in
-  let p = normalize id ?assumes labels p in
-  add_prop acc kind id p
-end
+    let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
+    let labels = NormAtLabels.labels_fct_pre in
+    let p = Logic_const.pred_of_id_pred pre in
+    let p = Logic_const.(pat (p,pre_label)) in
+    let p = normalize id ?assumes labels p in
+    add_prop acc kind id p
+  end
 
 let add_prop_fct_post acc kind kf  bhv tkind post =
   let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
