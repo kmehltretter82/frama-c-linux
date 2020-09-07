@@ -119,7 +119,7 @@ let wp_warn_memory_context () =
 
 let wp_insert_memory_context model =
   begin
-    Globals.Functions.iter
+    Wp_parameters.iter_fct
       begin fun kf ->
         let hyp = WpContext.compute_hypotheses model kf in
         let model_id = WpContext.MODEL.id model in
@@ -813,7 +813,7 @@ let cmdline_run () =
           LogicBuiltins.dump ();
       end ;
     if Wp_parameters.CheckModelHypotheses.get () then
-      wp_insert_memory_context computer#model ;
+      wp_insert_memory_context computer#model fct ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   if Wp_parameters.CachePrint.get () then

@@ -1048,7 +1048,7 @@ module CheckModelHypotheses =
     (struct
       let option_name = "-wp-check-model-hypotheses"
       let help = "Insert memory model hypotheses in function contracts and \
-                  check them on call."
+                  check them on call. (experimental)"
     end)
 
 let wkey_imprecise_hypotheses_assigns =
