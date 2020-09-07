@@ -5,7 +5,7 @@
 [wp:strategy] take f_assigns  *x;
 [wp:strategy] [add_node_annots] on <stmt-1>
 [wp:strategy] [add_node_annots] on <stmt-2>
-[wp:strategy] [add_node_annots] on <stmt-10>
+[wp:strategy] [add_node_annots] on <stmt-30>
 [wp:strategy] 'main' is the main entry point
 [wp:strategy] [add_node_annots] on <stmt-5>
 [wp:strategy] [add_node_annots] on <callIn-6>
@@ -13,7 +13,7 @@
 [wp:strategy] [add_node_annots] on <callIn-6>
 [wp:strategy] [add_node_annots] on <stmt-7>
 [wp:strategy] [add_node_annots] on <stmt-8>
-[wp:strategy] [add_node_annots] on <stmt-12>
+[wp:strategy] [add_node_annots] on <stmt-32>
 [wp] Warning: Missing RTE guards
 [wp:strategy] 'f' is NOT the main entry point
 [wp:strategy] 'f' is NOT the main entry point
@@ -123,6 +123,22 @@ int main(void)
   /*@ check a ≡ 0; */ ;
   __retres = 0;
   return __retres;
+}
+
+void loop(void)
+{
+  {
+    int i = 0;
+    /*@ check loop invariant \true; */
+    while (i < 10) i ++;
+  }
+  int j = 0;
+  l: /*@ check invariant \true; */ ;
+  if (j >= 10) goto l1;
+  j ++;
+  goto l;
+  l1: ;
+  return;
 }
 
 

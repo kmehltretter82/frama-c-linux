@@ -251,7 +251,7 @@
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
 %token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK SEMICOLON NULL EMPTY
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
-%token CHECK_REQUIRES CHECK_LOOP CHECK_LEMMA
+%token CHECK_REQUIRES CHECK_LOOP CHECK_INVARIANT CHECK_LEMMA
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
@@ -1449,6 +1449,7 @@ beg_pragma_or_code_annotation:
 | ASSERT {}
 | CHECK {}
 | INVARIANT {}
+| CHECK_INVARIANT {}
 | EXT_CODE_ANNOT {}
 ;
 
@@ -1465,6 +1466,8 @@ code_annotation:
   { fun bhvs -> AAssert (bhvs,toplevel_pred true $2) }
 | INVARIANT full_lexpr SEMICOLON
   { fun bhvs -> AInvariant (bhvs,false,toplevel_pred false $2) }
+| CHECK_INVARIANT full_lexpr SEMICOLON
+  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred true $2) }
 | EXT_CODE_ANNOT grammar_extension SEMICOLON
   { fun bhvs ->
     let open Cil_types in
