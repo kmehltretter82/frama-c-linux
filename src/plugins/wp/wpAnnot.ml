@@ -373,6 +373,9 @@ let kind_to_select config kind id = match kind with
   | WpStrategy.AcallPre(goal,fct) ->
       let goal = goal && goal_to_select config id in
       Some (WpStrategy.AcallPre(goal,fct))
+  | WpStrategy.AcallCheck(fct) ->
+      if goal_to_select config id then Some (WpStrategy.AcallCheck fct)
+      else None
   | WpStrategy.AcallPost _ ->
       if goal_to_select config id then Some kind else None
   | WpStrategy.Ahyp | WpStrategy.AcallHyp _ -> Some kind

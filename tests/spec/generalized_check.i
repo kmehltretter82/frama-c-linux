@@ -3,19 +3,23 @@ OPT: -wp-fct f,main -wp -wp-prover qed -wp-msg-key strategy,no-time-info -print
 */
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
-/*@ check requires \valid(x);
+/*@ check requires f_valid_x: \valid(x);
     assigns *x;
-    check ensures *x == 0;
+    check ensures f_init_x: *x == 0;
 */
 void f(int* x) {
-  /*@ check \valid(x); */ // can't be proved by WP: we ignore the requires
+  /*@ check f_valid_ko: \valid(x); */
   *x = 0;
 }
 
 int main() {
   int a = 4;
-  f(&a);
-  /*@ check a == 0; */ // can't be proved by WP: we ignore the ensures
+  volatile int c;
+  int* p = (void*)0;
+  if (c) p = &a;
+  f(p);
+  /*@ check main_valid_ko: \valid(p); */
+  /*@ check main_p_content_ko: *p == 0; */
 }
 
 void loop () {
