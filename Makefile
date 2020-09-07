@@ -899,7 +899,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
 	domains/inout_domain \
-	utils/state_import \
 	legacy/eval_terms legacy/eval_annots \
 	domains/powerset engine/transfer_logic \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
