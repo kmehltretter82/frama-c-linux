@@ -453,6 +453,7 @@ module Make
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
+      let active = active && not pred.ip_content.tp_only_check in
       let ip = build_prop pred in
       if ignore_predicate pr then
         states
