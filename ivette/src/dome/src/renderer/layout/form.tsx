@@ -102,6 +102,23 @@ export function useDefault<A>(
   return [value ?? defaultValue, error, setState];
 }
 
+export function useRequired<A>(
+  state: FieldState<A>,
+): FieldState<A | undefined> {
+  const [value, error, setState] = state;
+  const cache = React.useRef(value);
+  const update = React.useCallback(
+    (newValue: A | undefined, newError: Error) => {
+      if (newValue === undefined) {
+        setState(cache.current, newError || 'Required field');
+      } else {
+        setState(newValue, newError);
+      }
+    }, [cache, setState],
+  );
+  return [value, error, update];
+}
+
 export function useChecker<A>(
   state: FieldState<A>,
   checker?: Checker<A>,
@@ -112,6 +129,37 @@ export function useChecker<A>(
     setState(newValue, localError);
   }, [checker, setState]);
   return [value, error, update];
+}
+
+export function useFilter<A, B>(
+  state: FieldState<A>,
+  input: (value: A) => B,
+  output: (value: B) => A,
+  defaultValue: B,
+): FieldState<B> {
+  const [value, error, setState] = state;
+  const cacheA = React.useRef<A>(value);
+  const cacheB = React.useRef<B>(defaultValue);
+  const update = React.useCallback(
+    (newValue: B, newError: Error) => {
+      try {
+        const outValue = output(newValue);
+        setState(outValue, newError);
+      } catch (outErr) {
+        const outError = newError || outErr.toString() || 'Invalid value';
+        setState(cacheA.current, outError);
+      }
+    }, [cacheA, output, setState],
+  );
+  cacheA.current = value;
+  try {
+    const inValue = input(value);
+    cacheB.current = inValue;
+    return [inValue, error, update];
+  } catch (inErr) {
+    const inError = error || inErr.toString() || 'Invalid value';
+    return [cacheB.current, inError, update];
+  }
 }
 
 export function useProperty<A, K extends keyof A>(
@@ -448,19 +496,24 @@ export interface FieldProps<A> extends FilterProps {
   onError?: string;
 }
 
-type InputEvent = { target: { value: string } };
-type InputState = [string, Error, (evt: InputEvent) => void];
+type InputEvent<A> = { target: { value: A } };
+type InputState<A> = [string, Error, (evt: InputEvent<A>) => void];
+
+function useChangeEvent<A>(setState: Callback<A>) {
+  return React.useCallback(
+    (evt: InputEvent<A>) => { setState(evt.target.value, undefined); },
+    [setState],
+  );
+}
 
 function useTextInputField(
   props: FieldTextProps,
   defaultLatency: number,
-): InputState {
+): InputState<string> {
   const checked = useChecker(props.state, props.checker);
   const period = props.latency ?? defaultLatency;
   const [value, error, setState] = useLatency(checked, period);
-  const onChange = (evt: InputEvent) => {
-    setState(evt.target.value, undefined);
-  };
+  const onChange = useChangeEvent(setState);
   return [value || '', error, onChange];
 }
 
@@ -625,6 +678,69 @@ export const FieldCodeArea = (props: FieldTextAreaProps) => {
         placeholder={props.placeholder}
         onChange={onChange}
       />
+    </Field>
+  );
+};
+
+/* --------------------------------------------------------------------------*/
+/* --- Number Field                                                       ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface FieldNumberProps extends FieldProps<number | undefined> {
+  units?: string;
+  placeholder?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  latency?: number;
+}
+
+function TEXT_OF_NUMBER(n: number | undefined): string {
+  if (n === undefined) return '';
+  if (Number.isNaN(n)) throw new Error('Invalid number');
+  return Number(n).toLocaleString('en');
+}
+
+function NUMBER_OF_TEXT(s: string): number | undefined {
+  if (s === '') return undefined;
+  const n = Number.parseFloat(s.replace(/[ ,]/g, ''));
+  if (Number.isNaN(n)) throw new Error('Invalid number');
+  return n;
+}
+
+/**
+   Text Field.
+   @category Form Fields
+ */
+export const FieldNumber = (props: FieldNumberProps) => {
+  const { units, latency = 600 } = props;
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const css = Utils.classes('dome-xForm-number-field', props.className);
+  const checked = useChecker(props.state, props.checker);
+  const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
+  const [value, error, setState] = useLatency(filtered, latency);
+  const onChange = useChangeEvent(setState);
+  const UNITS = units && (
+    <label className="dome-text-label dome-xForm-units">{units}</label>
+  );
+  return (
+    <Field
+      {...props}
+      offset={4}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="text"
+        value={value}
+        className={css}
+        style={props.style}
+        disabled={disabled}
+        placeholder={props.placeholder}
+        onChange={onChange}
+      />
+      {UNITS}
     </Field>
   );
 };
