@@ -21,5 +21,6 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'foo':
-  /*@ behavior typed: requires \separated(&GLOBAL,a); */
+  /*@ behavior typed:
+        requires \separated(a, &GLOBAL); */
   void foo(int *a);

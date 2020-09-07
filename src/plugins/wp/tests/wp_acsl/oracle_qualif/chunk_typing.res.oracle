@@ -53,9 +53,14 @@
 [wp] Warning: Memory model hypotheses for function 'function':
   /*@
      behavior typed:
-     requires \separated(x+(..),
-                \union(i8+(..),u8+(..),i16+(..),u16+(..),i32+(..),u32+(..),
-                  i64+(..),u64+(..)));
+       requires \separated(i16 + (..), (char const *)x + (..));
+       requires \separated(i32 + (..), (char const *)x + (..));
+       requires \separated(i64 + (..), (char const *)x + (..));
+       requires \separated(i8 + (..), (char const *)x + (..));
+       requires \separated(u16 + (..), (char const *)x + (..));
+       requires \separated(u32 + (..), (char const *)x + (..));
+       requires \separated(u64 + (..), (char const *)x + (..));
+       requires \separated(u8 + (..), (char const *)x + (..));
      */
   void function(signed char * /*[10]*/ i8, unsigned char * /*[10]*/ u8,
                 short * /*[10]*/ i16, unsigned short * /*[10]*/ u16,

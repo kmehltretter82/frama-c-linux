@@ -25,7 +25,7 @@
 type model
 type scope = Global | Kf of Kernel_function.t
 type rollback = unit -> unit
-type hypotheses = unit -> MemoryContext.clause list
+type hypotheses = MemoryContext.partition -> MemoryContext.partition
 
 val register :
   id:string ->
@@ -44,7 +44,7 @@ val register :
 val get_descr : model -> string
 val get_emitter : model -> Emitter.t
 
-val compute_hypotheses : model -> Kernel_function.t -> MemoryContext.clause list
+val compute_hypotheses : model -> Kernel_function.t -> MemoryContext.partition
 
 type context = model * scope
 type t = context

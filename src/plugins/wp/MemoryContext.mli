@@ -30,17 +30,6 @@ type partition
 
 val empty : partition
 val set : varinfo -> param -> partition -> partition
-val assigned : identified_term -> partition -> partition
 
-type zone
-
-type clause =
-  | Valid of zone
-  | Separated of zone list list
-
-(** Build the separation clause from a partition,
-    including the clauses related to the pointer validity *)
-val requires : partition -> clause list
-
-val pp_zone : Format.formatter -> zone -> unit
-val pp_clause : Format.formatter -> clause -> unit
+val add_behavior : kernel_function -> string -> partition -> unit
+val get_behavior : kernel_function -> string -> partition -> behavior option

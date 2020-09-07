@@ -30,8 +30,8 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'duplet':
   /*@
      behavior typed_ref:
-     requires \separated(pi,pj,a+(..));
-     requires \valid(pi);
-     requires \valid(pj);
+       requires \separated(pi, pj, a + (..));
+       requires \valid(pi);
+       requires \valid(pj);
      */
   void duplet(int *a, int *pi, int *pj);

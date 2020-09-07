@@ -19,5 +19,6 @@
   global_frame              3        -        5      60.0%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'global_frame':
-  /*@ behavior typed: requires \separated(&zero,one); */
+  /*@ behavior typed:
+        requires \separated(one, &zero); */
   void global_frame(int *one, int arg);

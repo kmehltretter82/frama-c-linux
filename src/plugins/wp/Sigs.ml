@@ -291,9 +291,10 @@ sig
   val datatype : string
   (** For projectification. Must be unique among models. *)
 
-  val hypotheses : unit -> MemoryContext.clause list
-  (** Computes the memory model hypotheses including separation and validity
-      clauses to be verified for this model. *)
+  val hypotheses : MemoryContext.partition -> MemoryContext.partition
+  (** Computes the memory model partitionning of the memory locations.
+      This function typically adds new elements to the partition received
+      in input (that can be empty). *)
 
   module Chunk : Chunk
   (** Memory model chunks. *)

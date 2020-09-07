@@ -42,7 +42,7 @@ module L = Qed.Logic
 (* -------------------------------------------------------------------------- *)
 
 let datatype = "MemTyped"
-let hypotheses () = []
+let hypotheses p = p
 let configure () =
   begin
     let orig_pointer = Context.push Lang.pointer (fun _ -> t_addr) in

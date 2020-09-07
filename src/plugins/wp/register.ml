@@ -89,13 +89,11 @@ let wp_iter_model ?ip ?index job =
     Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
   end
 
-let wp_print_memory_context kf m hyp fmt =
+let wp_print_memory_context kf bhv fmt =
   begin
     let printer = new Printer.extensible_printer () in
     let pp_vdecl = printer#without_annot printer#vdecl in
-    Format.fprintf fmt
-      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (WpContext.MODEL.id m) ;
-    List.iter (MemoryContext.pp_clause fmt) hyp ;
+    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
     let vkf = Kernel_function.get_vi kf in
     Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
       pp_vdecl vkf ;
@@ -105,13 +103,27 @@ let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let hyp = WpContext.compute_hypotheses m kf in
-        if hyp <> [] then
-          Wp_parameters.warning
-            ~current:false
-            "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-            (Kernel_function.get_name kf)
-            (wp_print_memory_context kf m hyp)
+        let partition = WpContext.compute_hypotheses m kf in
+        let model = WpContext.MODEL.id m in
+        let hyp = MemoryContext.get_behavior kf model partition in
+        match hyp with
+        | None -> ()
+        | Some bhv ->
+            Wp_parameters.warning
+              ~current:false
+              "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+              (Kernel_function.get_name kf)
+              (wp_print_memory_context kf bhv)
+      end
+  end
+
+let wp_insert_memory_context model =
+  begin
+    Wp_parameters.iter_fct
+      begin fun kf ->
+        let hyp = WpContext.compute_hypotheses model kf in
+        let model_id = WpContext.MODEL.id model in
+        MemoryContext.add_behavior kf model_id hyp
       end
   end
 
@@ -800,6 +812,8 @@ let cmdline_run () =
         WpContext.on_context (computer#model,WpContext.Global)
           LogicBuiltins.dump ();
       end ;
+    if Wp_parameters.CheckModelHypotheses.get () then
+      wp_insert_memory_context computer#model fct ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   if Wp_parameters.CachePrint.get () then

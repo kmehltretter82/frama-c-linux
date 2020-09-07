@@ -16,5 +16,6 @@
   f                         1        -        2      50.0%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f':
-  /*@ behavior typed_ref: requires \valid(written); */
+  /*@ behavior typed_ref:
+        requires \valid(written); */
   void f(unsigned int *written);

@@ -54,5 +54,6 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'f3':
-  /*@ behavior typed: requires \separated(&p->a,&p); */
+  /*@ behavior typed:
+        requires \separated(&p, &p->a); */
   void f3(void);

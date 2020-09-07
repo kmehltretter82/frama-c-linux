@@ -21,8 +21,8 @@
 [wp] Warning: Memory model hypotheses for function 'global_frame':
   /*@
      behavior typed_ref:
-     requires \separated(zero,one);
-     requires \valid(zero);
-     requires \valid(one);
+       requires \separated(zero, one);
+       requires \valid(one);
+       requires \valid(zero);
      */
   void global_frame(int *one, int arg);

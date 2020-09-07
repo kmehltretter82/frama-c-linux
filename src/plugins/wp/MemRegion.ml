@@ -441,7 +441,7 @@ let configure_ia =
   let no_binder = { bind = fun _ f v -> f v } in
   fun _vertex -> no_binder
 
-let hypotheses () = []
+let hypotheses p = p
 
 let error msg = Warning.error ~source:"Region Model" msg
 
