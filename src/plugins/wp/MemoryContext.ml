@@ -179,11 +179,8 @@ let separated_list ?loc = function
       let comp = Cil_datatype.Term.compare in
       pseparated ?loc (List.sort comp l)
 
-let separated_from_term loc assigned l =
+let term_separated_from_regions loc assigned l =
   separated_list ~loc (assigned :: List.map (region_to_term loc) l)
-
-let separated_from_addr loc assigned =
-  separated_from_term loc (addr_of_lval ~loc assigned.it_content)
 
 let valid_region loc r =
   let t = region_to_term loc r in
@@ -265,20 +262,20 @@ let assigned_via_pointers kf =
 
 let clauses_of_partition kf loc p =
   let globals = global_zones p in
-  let filter p = not (Logic_utils.is_trivially_true p) in
   let main_sep =
     main_separation loc globals (context_zones p) (heaps p)
   in
   let assigns_sep =
+    let addr_of t = addr_of_lval ~loc t.it_content in
     List.map
-      (fun t -> separated_from_addr loc t globals)
+      (fun t -> term_separated_from_regions loc (addr_of t) globals)
       (assigned_via_pointers kf)
   in
   let context_validity =
     List.map (valid_region loc) (context_zones p)
   in
   let reqs = main_sep @ assigns_sep @ context_validity in
-  let reqs = List.filter filter reqs in
+  let reqs = List.filter (fun p -> not(Logic_utils.is_trivially_true p)) reqs in
   let reqs = List.sort_uniq Logic_utils.compare_predicate reqs in
   reqs
 
