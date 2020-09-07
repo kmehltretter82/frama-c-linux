@@ -306,6 +306,7 @@
     | CHECK, BREAKS -> true, CHECK_BREAKS
     | CHECK, CONTINUES -> true, CHECK_CONTINUES
     | CHECK, LOOP -> true, CHECK_LOOP
+    | CHECK, INVARIANT -> true, CHECK_INVARIANT
     | CHECK, LEMMA -> true, CHECK_LEMMA
     | _ -> false, current
 }
