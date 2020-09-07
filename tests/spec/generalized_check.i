@@ -1,3 +1,6 @@
+/* run.config
+OPT: -wp -wp-prover qed -wp-msg-key no-time-info -print
+*/
 /*@ check lemma tauto: \true ==> \true; */
 
 /*@ check requires \valid(x);
