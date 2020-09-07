@@ -373,6 +373,7 @@
     visibility: hidden ;
     position: absolute ;
     top: 3px ;
+    width: max-content ;
     color: darkorange ;
     margin-left: 4px ;
     font-size: smaller ;

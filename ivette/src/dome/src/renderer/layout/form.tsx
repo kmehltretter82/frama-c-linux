@@ -12,22 +12,16 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
-import {
-  MonitorAll,
-  useMonitor,
-  useIfMonitor,
-  useMonitoredItem,
-} from 'dome/data/monitors';
 
-export type Error = undefined | string;
-export type Setter<A> = (value: A) => void;
+export type Error =
+  | undefined | boolean | string
+  | { [key: string]: Error } | Error[];
 export type Checker<A> = (value: A) => boolean | Error;
-export type State<A> = [A, Setter<A>];
-export type Callback<A> = (value: A, valid: boolean) => void;
-export type FieldState<A> = [A, Setter<A>, Error];
+export type Callback<A> = (value: A, error: Error) => void;
+export type FieldState<A> = [A, Error, Callback<A>];
 
 /* --------------------------------------------------------------------------*/
-/* --- State Utilities                                                    ---*/
+/* --- State Errors Utilities                                             ---*/
 /* --------------------------------------------------------------------------*/
 
 export function inRange(
@@ -40,15 +34,14 @@ export function inRange(
 export function validate<A>(
   value: A,
   checker: undefined | Checker<A>,
-  onError: undefined | string,
 ): Error {
   if (checker) {
     try {
       const r = checker(value);
       if (r === undefined || r === true) return undefined;
-      return onError || r || 'Invalid Field';
+      return r;
     } catch (err) {
-      return err.toString();
+      return err.toString() || false;
     }
   }
   return undefined;
@@ -56,40 +49,117 @@ export function validate<A>(
 
 export function isValid(err: Error): boolean { return !err; }
 
-export function useCallback<A>(
-  value: A,
-  error: Error,
+type ObjectError = { [key: string]: Error }
+
+function isObjectError(err: Error): err is ObjectError {
+  return typeof err === 'object' && !Array.isArray(err);
+}
+
+function isArrayError(err: Error): err is Error[] {
+  return Array.isArray(err);
+}
+
+function isValidObject(err: ObjectError): boolean {
+  const ks = Object.keys(err);
+  for (let k = 0; k < ks.length; k++) {
+    if (!isValid(err[ks[k]])) return false;
+  }
+  return true;
+}
+
+function isValidArray(err: Error[]): boolean {
+  for (let k = 0; k < err.length; k++) {
+    if (!isValid(err[k])) return false;
+  }
+  return true;
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- State Hooks                                                        ---*/
+/* --------------------------------------------------------------------------*/
+
+export function useState<A>(
+  defaultValue: A,
+  checker?: Checker<A>,
   onChange?: Callback<A>,
-) {
-  React.useEffect(
-    () => { if (onChange) onChange(value, isValid(error)); },
-    [value, error, onChange],
-  );
+): FieldState<A> {
+  const [value, setValue] = React.useState<A>(defaultValue);
+  const [error, setError] = React.useState<Error>(undefined);
+  const setState = React.useCallback((newValue: A, newError: Error) => {
+    const localError = validate(value, checker) || newError;
+    setValue(newValue);
+    setError(localError);
+    if (onChange) onChange(newValue, localError);
+  }, [setValue, setError, onChange]);
+  return [value, error, setState];
+}
+
+export function useChecker<A>(
+  state: FieldState<A>,
+  checker?: Checker<A>,
+): FieldState<A> {
+  const [value, error, setState] = state;
+  const update = React.useCallback((newValue: A, newError: Error) => {
+    const localError = validate(newValue, checker) || newError;
+    setState(newValue, localError);
+  }, [setState]);
+  return [value, error, update];
 }
 
 export function useProperty<A, K extends keyof A>(
-  state: State<A>,
+  state: FieldState<A>,
   property: K,
-): State<A[K]> {
-  const [value, setValue] = state;
-  const update = React.useCallback((newProp: A[K]) => {
+  checker?: Checker<A[K]>,
+  onError?: string,
+): FieldState<A[K]> {
+  const [value, error, setState] = state;
+  const update = React.useCallback((newProp: A[K], newError: Error) => {
     const newValue = { ...value, [property]: newProp };
+    const objError = isObjectError(error) ? error : {};
+    const propError = validate(newProp, checker) || newError;
+    const localError = { ...objError, [property]: propError };
+    setState(newValue, isValidObject(localError) ? undefined : localError);
+  }, [value, error, setState, property, checker, onError]);
+  return [value[property], error, update];
+}
+
+export function useLatency<A>(
+  state: FieldState<A>,
+  latency?: number,
+): FieldState<A> {
+  const [initValue, initError, setState] = state;
+  const period = Math.max(latency ?? 0, 0);
+  const [value, setValue] = React.useState(initValue);
+  const [error, setError] = React.useState(initError);
+  const propagate = React.useCallback(
+    debounce(setState, period),
+    [latency, setState],
+  );
+  const update = React.useCallback((newValue, newError) => {
     setValue(newValue);
-  }, [value, property, setValue]);
-  return [value[property], update];
+    setError(newError);
+    propagate(newValue, newError);
+  }, [setValue, setError, propagate]);
+  return [value, error, update];
 }
 
 export function useIndex<A>(
-  state: State<A[]>,
+  state: FieldState<A[]>,
   index: number,
-): State<A> {
-  const [array, setValue] = state;
-  const update = React.useCallback((newItem: A) => {
+  checker?: Checker<A>,
+  onError?: string,
+): FieldState<A> {
+  const [array, error, setState] = state;
+  const update = React.useCallback((newValue: A, newError: Error) => {
     const newArray = array.slice();
-    newArray[index] = newItem;
-    setValue(newArray);
-  }, [array, index, setValue]);
-  return [array[index], update];
+    newArray[index] = newValue;
+    const localError = isArrayError(error) ? error.slice() : [];
+    const valueError = validate(newValue, checker) || newError;
+    localError[index] = valueError;
+    setState(newArray, isValidArray(localError) ? undefined : localError);
+  }, [array, error, setState, index, checker, onError]);
+  const itemError = isArrayError(error) ? error[index] : undefined;
+  return [array[index], itemError, update];
 }
 
 /* --------------------------------------------------------------------------*/
@@ -116,7 +186,6 @@ export interface Children { children: React.ReactNode }
 interface FormContext {
   disabled: boolean;
   hidden: boolean;
-  monitor?: MonitorAll;
 }
 
 const CONTEXT = React.createContext<FormContext | undefined>(undefined);
@@ -132,7 +201,6 @@ function useContext(props?: FilterProps): FormContext {
   return {
     hidden: (props && HIDDEN(props)) || (Parent?.hidden ?? false),
     disabled: (props && DISABLED(props)) || (Parent?.disabled ?? false),
-    monitor: Parent?.monitor,
   };
 }
 
@@ -145,19 +213,6 @@ export function Filter(props: FilterProps & Children) {
       {props.children}
     </CONTEXT.Provider>
   );
-}
-
-/** @category Form Containers */
-export function useValidity() {
-  const { monitor } = useContext();
-  return useIfMonitor(monitor) ?? true;
-}
-
-export function useLocalMonitor(P?: MonitorAll): [boolean, MonitorAll] {
-  const M = React.useMemo(() => new MonitorAll(), []);
-  const V = useMonitor(M);
-  useMonitoredItem(P, V);
-  return [V, M];
 }
 
 /* --------------------------------------------------------------------------*/
@@ -179,12 +234,11 @@ export interface FormProps extends FilterProps, Children {
 export const Form = (props: FormProps) => {
   const { className, style, children, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
-  const [, monitor] = useLocalMonitor();
   const css = Utils.classes('dome-xForm-grid', className);
   if (hidden) return null;
   return (
     <div className={css} style={style}>
-      <CONTEXT.Provider value={{ hidden, disabled, monitor }}>
+      <CONTEXT.Provider value={{ hidden, disabled }}>
         {children}
       </CONTEXT.Provider>
     </div>
@@ -196,34 +250,31 @@ export const Form = (props: FormProps) => {
 // --------------------------------------------------------------------------
 
 export interface WarningProps {
-  /** Short warn message in case of error. */
-  warn?: string;
-  /** Error description (in tooltip if warn, on hover otherwized). */
+  /** Short warning message (displayed on hover). */
+  warning?: string;
+  /** Error details (if a string is provided, in tooltip). */
   error?: Error;
   /** Label offset. */
   offset?: number;
 }
 
-/** Warning badge */
+/** Warning Badge. */
 export function Warning(props: WarningProps) {
-  const { error, warn, offset = 0 } = props;
-  if (!error) return null;
-  const hovered = warn || error;
-  const tooltip = warn ? error : undefined;
-  const style = warn ? { width: 'max-content' } : undefined;
-
+  const { warning, error, offset = 0 } = props;
+  const DETAILS = typeof error === 'string' ? error : undefined;
+  const WARNING = warning && (
+    <span className="dome-xForm-warning">
+      {warning}
+    </span>
+  );
   return (
     <div
       className="dome-xIcon dome-xForm-error"
       style={{ top: offset - 2 }}
+      title={DETAILS}
     >
-      <SVG id="WARNING" size={11} title={tooltip} />
-      <span
-        className="dome-xForm-warning"
-        style={style}
-      >
-        {hovered}
-      </span>
+      <SVG id="WARNING" size={11} />
+      {WARNING}
     </div>
   );
 }
@@ -234,7 +285,7 @@ export function Warning(props: WarningProps) {
 
 /**
    Layout its contents inside a full-width block.
-   The children are _not_ supposed to contain `<Field/>` like elements,
+   The children are _not_ supposed to contain `<Field />` like elements,
    only custom controls that fits a full-width containter.
    @category Form Containers
  */
@@ -258,8 +309,10 @@ export interface SectionProps extends FilterProps, Children {
   label: string;
   /** Tooltip text. */
   title?: string;
-  /** Warning Error. */
-  onError?: string;
+  /** Warning Error (when unfolded). */
+  warning?: string;
+  /** Associated Error. */
+  error?: Error;
   /** Fold/Unfold settings. */
   settings?: string;
   /** Fold/Unfold state (defaults to false). */
@@ -268,14 +321,13 @@ export interface SectionProps extends FilterProps, Children {
 
 /** Form Section. */
 export function Section(props: SectionProps) {
-  const { label, title, children, onError, ...filter } = props;
-  const { disabled, hidden, monitor } = useContext(filter);
-  const [valid, local] = useLocalMonitor(monitor);
+  const { label, title, children, warning, error, ...filter } = props;
+  const { disabled, hidden } = useContext(filter);
   const [unfold, flip] = Dome.useFlipSettings(props.settings, props.unfold);
 
   if (hidden) return null;
 
-  const hasWarning = unfold && !disabled && !valid;
+  const hasWarning = unfold && !disabled && !error;
 
   const cssTitle = Utils.classes(
     'dome-text-title',
@@ -283,7 +335,7 @@ export function Section(props: SectionProps) {
   );
 
   return (
-    <CONTEXT.Provider value={{ hidden, disabled, monitor: local }}>
+    <CONTEXT.Provider value={{ hidden, disabled }}>
       <div className="dome-xForm-section">
         <div className="dome-xForm-fold" onClick={flip}>
           <SVG id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'} size={11} />
@@ -291,7 +343,7 @@ export function Section(props: SectionProps) {
         <label className={cssTitle} title={title}>
           {label}
         </label>
-        {hasWarning && <Warning warn={onError} />}
+        {hasWarning && <Warning warning={warning} />}
       </div>
       {unfold && children}
       {unfold && <div className="dome-xForm-hsep" />}
@@ -303,44 +355,6 @@ export function Section(props: SectionProps) {
 /* --- Value Filter                                                      --- */
 /* --------------------------------------------------------------------------*/
 
-/** @category Form Fields */
-export interface ValueProps<A> {
-  state: State<A>;
-  checker?: Checker<A>;
-  onError?: string;
-  onChange?: Callback<A>;
-  latency?: number;
-}
-
-/** @category Form Fields */
-export function useValue<A>(props: ValueProps<A>): FieldState<A> {
-  const { checker, onError, latency = 0, onChange } = props;
-  const [value, setValue] = props.state;
-  const [current, setCurrent] = React.useState<A>(value);
-  const [error, setError] = React.useState<Error>(undefined);
-  const update = React.useMemo(() => {
-    if (!latency)
-      return (newValue: A) => {
-        const newError = validate(newValue, checker, onError);
-        setCurrent(newValue);
-        setValue(newValue);
-        setError(newError);
-        if (onChange) onChange(newValue, isValid(newError));
-      };
-    const propagate = debounce((newValue) => {
-      const newError = validate(newValue, checker, onError);
-      setValue(newValue);
-      setError(newError);
-      if (onChange) onChange(newValue, isValid(newError));
-    });
-    return (newValue: A) => {
-      setCurrent(newValue);
-      propagate(newValue);
-    };
-  }, [checker, onError, latency, onChange, setValue, setError]);
-  return [current, update, error];
-}
-
 export interface FieldProps extends FilterProps, Children {
   /** Field label. */
   label: string;
@@ -348,7 +362,7 @@ export interface FieldProps extends FilterProps, Children {
   title?: string;
   /** Field offset. */
   offset?: number;
-  /** Html tag `<input/>` element. */
+  /** Html tag `<input />` element. */
   htmlFor?: string;
 }
 
