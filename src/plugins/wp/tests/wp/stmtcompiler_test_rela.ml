@@ -54,7 +54,8 @@ let run () =
         pred_content = Cil_types.Ptrue;
       }
     in
-    let annot = Logic_const.new_code_annotation (AAssert ([],Assert,pred)) in
+    let pred = Logic_const.toplevel_predicate pred in
+    let annot = Logic_const.new_code_annotation (AAssert ([],pred)) in
     let po = Wpo.{
         po_gid = "";
         po_leg = "";
