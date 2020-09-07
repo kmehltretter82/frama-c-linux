@@ -254,6 +254,7 @@ module EqualityCall =
       let default = "formals"
       let arg_name = "none|formals|all"
     end)
+let () = EqualityCall.set_possible_values ["none"; "formals"; "all"]
 let () = add_precision_dep EqualityCall.parameter
 
 let () = Parameter_customize.set_group domains
@@ -302,6 +303,7 @@ module Numerors_Real_Size =
         "Set <n> as the significand size of the MPFR representation \
          of reals used by the numerors domain (defaults to 128)"
     end)
+let () = Numerors_Real_Size.set_range 1 max_int
 let () = add_precision_dep Numerors_Real_Size.parameter
 
 let () = Parameter_customize.set_group domains
@@ -569,6 +571,7 @@ module AutomaticContextMaxDepth =
       let arg_name = "n"
       let help = "Use <n> as the depth of the default context for Eva. (defaults to 2)"
     end)
+let () = AutomaticContextMaxDepth.set_range 0 max_int
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
 
 let () = Parameter_customize.set_group initial_context
@@ -666,7 +669,7 @@ module WideningPeriod =
       let help =
         "After the first widening, widen each <n> iterations (defaults to 2)"
     end)
-let () = WideningDelay.set_range ~min:1 ~max:max_int
+let () = WideningPeriod.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
 
 (* --- Partitioning --- *)
@@ -682,6 +685,7 @@ module SemanticUnrollingLevel =
          The larger n, the more precise and expensive the analysis \
          (defaults to 0)"
     end)
+let () = SemanticUnrollingLevel.set_range 0 max_int
 let () = add_precision_dep SemanticUnrollingLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -941,6 +945,7 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
+let () = LinearLevel.set_range 0 max_int
 let () = add_precision_dep LinearLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1031,6 +1036,7 @@ module ArrayPrecisionLevel =
                   Array accesses are precise as long as the interval for the index contains \
                   less than n values. (defaults to 200)"
     end)
+let () = ArrayPrecisionLevel.set_range 0 max_int
 let () = add_precision_dep ArrayPrecisionLevel.parameter
 let () = ArrayPrecisionLevel.add_update_hook
     (fun _ v -> Offsetmap.set_plevel v)
@@ -1223,6 +1229,7 @@ module StopAtNthAlarm =
     let arg_name = "n"
     let help = "Abort the analysis when the nth alarm is emitted."
   end)
+let () = StopAtNthAlarm.set_range 0 max_int
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ugliness required for correctness                                  --- *)
@@ -1273,6 +1280,7 @@ module OracleDepth =
       let default = 2
       let arg_name = ""
     end)
+let () = OracleDepth.set_range 0 max_int
 let () = add_precision_dep OracleDepth.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1285,6 +1293,7 @@ module ReductionDepth =
       let default = 4
       let arg_name = ""
     end)
+let () = ReductionDepth.set_range 0 max_int
 let () = add_precision_dep ReductionDepth.parameter
 
 
@@ -1347,6 +1356,7 @@ module MallocLevel =
       let help = "Set to [m] the number of precise dynamic allocations \
                   besides the initial one, for each callstack (defaults to 0)"
     end)
+let () = MallocLevel.set_range 0 max_int
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated aliases                                                 --- *)
