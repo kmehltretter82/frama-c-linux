@@ -95,12 +95,17 @@ let pp_bhv fmt bhv =
   if not (Cil.is_default_behavior bhv) then
     Format.fprintf fmt " for '%s'" bhv.b_name
 
-let pp_bhvs fmt = function
-  | [] -> ()
-  | b::bs ->
-    Format.fprintf fmt " @[<hov 0>'%s'" b ;
-    List.iter (fun b -> Format.fprintf fmt ",@ '%s'" b) bs ;
-    Format.fprintf fmt "@]"
+let pp_bhvs fmt bhvs =
+  if Datatype.String.Set.is_empty bhvs then
+    ()
+  else
+    Pretty_utils.pp_iter
+      ~pre:" @[<hov 0>"
+      ~suf:"@]"
+      ~sep:",@ "
+      Datatype.String.Set.iter
+      (fun fmt s -> Format.fprintf fmt "'%s'" s)
+      fmt bhvs
 
 let pp_for fmt = function
   | [] -> ()
@@ -492,8 +497,10 @@ let rec ip_order = function
   | IPBehavior {ib_kf;ib_kinstr;ib_active;ib_bhv} ->
     [I 6;F ib_kf;K ib_kinstr;B ib_bhv; A ib_active]
   | IPComplete {ic_kf;ic_kinstr;ic_active;ic_bhvs} ->
+    let ic_bhvs = Datatype.String.Set.elements ic_bhvs in
     [I 7;F ic_kf;K ic_kinstr; A ic_active] @ for_order 0 ic_bhvs
   | IPDisjoint {ic_kf;ic_kinstr;ic_active;ic_bhvs} ->
+    let ic_bhvs = Datatype.String.Set.elements ic_bhvs in
     [I 8;F ic_kf;K ic_kinstr; A ic_active] @ for_order 0 ic_bhvs
   | IPPredicate {ip_kind;ip_kf;ip_kinstr} ->
     [I 9;F ip_kf;K ip_kinstr] @ kind_order ip_kind
