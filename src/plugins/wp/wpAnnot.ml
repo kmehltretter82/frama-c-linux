@@ -753,7 +753,7 @@ let add_called_post called_kf termination_kind acc =
     let kind = WpStrategy.AcallHyp called_kf in
     let assumes = (Ast_info.behavior_assumes b) in
     let add_post acc (tk, p) =
-      if tk = termination_kind
+      if tk = termination_kind && not p.ip_content.tp_only_check
       then WpStrategy.add_prop_call_post acc kind called_kf b tk ~assumes p
       else acc
     in List.fold_left add_post acc b.b_post_cond
