@@ -1,5 +1,6 @@
 /* run.config
 OPT: -wp-fct f,main -wp -wp-prover qed -wp-msg-key strategy,no-time-info -print
+OPT: -eva -eva-use-spec f
 */
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
