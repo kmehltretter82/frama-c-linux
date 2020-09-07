@@ -1,5 +1,5 @@
 /*run.config
-OPT: -no-autoload-plugins -load-module from,inout,loopanalysis,eva,scope -val -val-show-progress -then -loop
+OPT: -no-autoload-plugins -load-module from,inout,loopanalysis,eva,scope -eva -eva-show-progress -then -loop
 */
 
 void f1(int n) {

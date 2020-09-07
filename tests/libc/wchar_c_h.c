@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"-cpp-extra-args=-DTEST_IMPLEMENTATION=1" +"-slevel 1000"
-   STDOPT: +"-slevel 1000"
+   STDOPT: +"-cpp-extra-args=-DTEST_IMPLEMENTATION=1" +"-eva-slevel 1000"
+   STDOPT: +"-eva-slevel 1000"
    COMMENT: slevel is used to ensure all loops are unrolled (including in the
    COMMENT: implementation). 'goto exit' avoids recomputing split branches.
 */

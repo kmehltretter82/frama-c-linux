@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-impact-pragma f" +"-lib-entry" +"-main f" +"-remove-redundant-alarms"
+   STDOPT: +"-impact-pragma f" +"-lib-entry" +"-main f" +"-eva-remove-redundant-alarms"
    */
 
 int P,c;

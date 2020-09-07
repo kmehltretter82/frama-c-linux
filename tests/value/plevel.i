@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-plevel 40 -big-ints-hex 0x55"
+   STDOPT: #"-eva-plevel 40 -big-ints-hex 0x55"
 */
 
 int t[0xFFFF];

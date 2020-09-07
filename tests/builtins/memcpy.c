@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-calldeps -slevel-function init:2000 -eva-msg-key imprecision -plevel 150 -main main_all -inout -no-deps -absolute-valid-range 100000-100001 -then -load-module report -report"
+   STDOPT: +"-calldeps -eva-slevel-function init:2000 -eva-msg-key imprecision -eva-plevel 150 -main main_all -inout -no-deps -absolute-valid-range 100000-100001 -then -load-module report -report"
 */
 #include "string.h"
 

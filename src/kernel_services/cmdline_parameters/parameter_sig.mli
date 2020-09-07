@@ -179,10 +179,13 @@ module type S_no_parameter = sig
 
   val equal: t -> t -> bool
 
-  val add_aliases: string list -> unit
+  val add_aliases: ?visible: bool -> ?deprecated:bool -> string list -> unit
   (** Add some aliases for this option. That is other option names which have
       exactly the same semantics that the initial option.
-      @raise Invalid_argument if one of the strings is empty *)
+      If [visible] is set to false, the aliases do not appear in help messages.
+      If [deprecated] is set to true, the use of the aliases emits a warning.
+      @raise Invalid_argument if one of the strings is empty
+      @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
 
   (**/**)
   val is_set: unit -> bool

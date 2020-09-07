@@ -131,12 +131,10 @@ module SplitReturnFunction:
 module SplitGlobalStrategy: State_builder.Ref with type data = Split_strategy.t
 
 module ValShowProgress: Parameter_sig.Bool
-module ValShowInitialState: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
 module ValPerfFlamegraphs: Parameter_sig.String
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
-module AlarmsWarnings: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.String
 module NumerorsLogFile: Parameter_sig.String
 

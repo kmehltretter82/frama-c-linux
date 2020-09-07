@@ -223,14 +223,15 @@ struct
           ~plugin X.option_name Typed_parameter.ty ~journalize:false p
       else p
 
-    let add_aliases list =
-      add_aliases list;
+    let add_aliases ?visible ?deprecated list =
+      add_aliases ?visible ?deprecated list;
       match !negative_option_ref with
       | None -> ()
       | Some negative_option ->
         let negative_list = List.map negate_name list in
         let plugin = P.shortname in
-        Cmdline.add_aliases negative_option ~plugin ~group stage negative_list
+        Cmdline.add_aliases
+          negative_option ~plugin ~group ?visible ?deprecated stage negative_list
 
   end
 
@@ -1719,8 +1720,8 @@ struct
         f ();
       end
 
-    let add_aliases list =
-      add_aliases list;
+    let add_aliases ?visible ?deprecated list =
+      add_aliases ?visible ?deprecated list;
       Output.add_aliases (List.map (fun alias -> alias ^ "-print") list)
 
   end

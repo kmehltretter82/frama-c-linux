@@ -1,5 +1,5 @@
 /* run.config*
-  STDOPT: #"-no-results-function init -calldeps -slevel 10000" +"-inout"
+  STDOPT: #"-eva-no-results-function init -calldeps -eva-slevel 10000" +"-inout"
 */
 
 #define N 3000

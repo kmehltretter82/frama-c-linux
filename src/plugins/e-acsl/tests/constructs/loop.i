@@ -1,6 +1,6 @@
 /* run.config_ci
    COMMENT: loop invariants
-   STDOPT: +"-slevel 160"
+   STDOPT: +"-eva-slevel 160"
 */
 
 void simple_loop() {
