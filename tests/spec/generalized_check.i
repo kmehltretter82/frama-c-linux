@@ -1,7 +1,7 @@
 /* run.config
-OPT: -wp -wp-prover qed -wp-msg-key no-time-info -print
+OPT: -wp -wp-prover qed -wp-msg-key strategy,no-time-info -print
 */
-/*@ check lemma tauto: \true ==> \true; */
+/*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
 /*@ check requires \valid(x);
     assigns *x;

@@ -1122,8 +1122,9 @@ let add_global_annotations annots =
           "Global invariant not handled yet ('%s' ignored)"
           linfo.l_var_info.lv_name;
         ()
-    | Dlemma (name,_,_,_,_,_,_) ->
-        WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
+    | Dlemma (name,_,_,_,p,_,_) ->
+        if not (p.tp_only_check) then
+          WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
   and do_globals gs = List.iter do_global gs in
   (*[LC]: forcing order of iteration: hash is not the same on 32 and 64 bits *)
