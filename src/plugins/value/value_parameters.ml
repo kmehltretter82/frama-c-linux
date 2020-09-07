@@ -25,6 +25,7 @@ let kernel_parameters_correctness = [
   Kernel.MainFunction.parameter;
   Kernel.LibEntry.parameter;
   Kernel.AbsoluteValidRange.parameter;
+  Kernel.InitializedPaddingLocals.parameter;
   Kernel.SafeArrays.parameter;
   Kernel.UnspecifiedAccess.parameter;
   Kernel.SignedOverflow.parameter;
@@ -33,6 +34,10 @@ let kernel_parameters_correctness = [
   Kernel.RightShiftNegative.parameter;
   Kernel.SignedDowncast.parameter;
   Kernel.UnsignedDowncast.parameter;
+  Kernel.PointerDowncast.parameter;
+  Kernel.SpecialFloat.parameter;
+  Kernel.InvalidBool.parameter;
+  Kernel.InvalidPointer.parameter;
 ]
 
 let parameters_correctness = ref Typed_parameter.Set.empty
@@ -906,7 +911,7 @@ module BuiltinsOverrides =
                   Fall back to <f> if <ffc> cannot handle its arguments."
       let default = Kernel_function.Map.empty
     end)
-let () = add_precision_dep BuiltinsOverrides.parameter
+let () = add_correctness_dep BuiltinsOverrides.parameter
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
@@ -982,7 +987,7 @@ module UsePrototype =
       let help = "Use the ACSL specification of the functions instead of \
                   their definitions"
     end)
-let () = add_precision_dep UsePrototype.parameter
+let () = add_correctness_dep UsePrototype.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
@@ -1254,6 +1259,7 @@ module AllocReturnsNull=
       let help = "Memory allocation built-ins (malloc, calloc, realloc) are \
                   modeled as nondeterministically returning a null pointer"
     end)
+let () = add_correctness_dep AllocReturnsNull.parameter
 
 let () = Parameter_customize.set_group malloc
 module MallocLevel =
@@ -1266,6 +1272,7 @@ module MallocLevel =
                   besides the initial one, for each callstack (defaults to 0)"
     end)
 let () = MallocLevel.set_range 0 max_int
+let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated aliases                                                 --- *)
