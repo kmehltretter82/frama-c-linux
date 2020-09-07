@@ -958,27 +958,27 @@ let get_stmt_annots config v s =
                 in
                 (b_acc, (a_acc, e_acc))
         in acc
-   | AAllocation (_b_list, _frees_allocates) ->
-     (* [PB] TODO *) acc
-   | AAssigns (_b_list, _assigns) ->
-     (* loop assigns: see get_loop_annots *) acc
-   | AVariant (_v, _rel) -> (* see get_loop_annots *) acc
-   | APragma _ -> acc
-   | AStmtSpec (b_list, spec) ->
-     if b_list <> [] then (* TODO ! *)
-       Wp_parameters.warning ~once:true
-         "Ignored specification 'for %a' (generalize to all behavior)"
-         (Pretty_utils.pp_list ~sep:", " Format.pp_print_string)
-         b_list;
-  add_stmt_spec_annots config v s b_list spec acc
-| AExtended _ -> acc
-in
-let before_acc =
-  add_stmt_deadcode_smoke config WpStrategy.empty_acc s in
-let after_acc = WpStrategy.empty_acc in
-let exits_acc = WpStrategy.empty_acc in
-let acc = before_acc, (after_acc, exits_acc) in
-Annotations.fold_code_annot do_annot s acc
+    | AAllocation (_b_list, _frees_allocates) ->
+        (* [PB] TODO *) acc
+    | AAssigns (_b_list, _assigns) ->
+        (* loop assigns: see get_loop_annots *) acc
+    | AVariant (_v, _rel) -> (* see get_loop_annots *) acc
+    | APragma _ -> acc
+    | AStmtSpec (b_list, spec) ->
+        if b_list <> [] then (* TODO ! *)
+          Wp_parameters.warning ~once:true
+            "Ignored specification 'for %a' (generalize to all behavior)"
+            (Pretty_utils.pp_list ~sep:", " Format.pp_print_string)
+            b_list;
+        add_stmt_spec_annots config v s b_list spec acc
+    | AExtended _ -> acc
+  in
+  let before_acc =
+    add_stmt_deadcode_smoke config WpStrategy.empty_acc s in
+  let after_acc = WpStrategy.empty_acc in
+  let exits_acc = WpStrategy.empty_acc in
+  let acc = before_acc, (after_acc, exits_acc) in
+  Annotations.fold_code_annot do_annot s acc
 
 let get_fct_pre_annots config spec =
   let acc = WpStrategy.empty_acc in
