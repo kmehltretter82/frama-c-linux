@@ -31,6 +31,8 @@
      behavior typed_ref:
      requires \separated(error,
                 \union(&seq,&service_cpt,service_id+(..),service_result+(..)));
+     requires \separated(error,
+                \union(service_result+(..),service_id+(..),&service_cpt,&seq));
      requires \valid(error);
      */
   int job(int a, int b, int *error);

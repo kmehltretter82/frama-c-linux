@@ -35,5 +35,7 @@
      behavior typed:
      requires \separated(\union(&seq,&service_cpt,service_id+(..),
                            service_result+(..)),error);
+     requires \separated(error,
+                \union(service_result+(..),service_id+(..),&service_cpt,&seq));
      */
   int job(int a, int b, int *error);

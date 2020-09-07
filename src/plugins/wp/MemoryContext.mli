@@ -30,11 +30,9 @@ type partition
 
 val empty : partition
 val set : varinfo -> param -> partition -> partition
+val assigned : identified_term -> partition -> partition
 
-type zone =
-  | Var of varinfo   (** [&x] the cell x *)
-  | Ptr of varinfo   (** [p] the cell pointed by p *)
-  | Arr of varinfo   (** [p+(..)] the cell and its neighbors pointed by p *)
+type zone
 
 type clause =
   | Valid of zone
