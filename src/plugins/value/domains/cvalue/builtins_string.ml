@@ -339,7 +339,12 @@ let reduce_by_validity ~size cvalue =
   let loc_bits = Locations.loc_bytes_to_loc_bits cvalue in
   let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
   if Locations.(is_valid Read loc)
-  then loc.Locations.loc, true
+  then
+    let is_aligned _base ival =
+      Ival.is_zero (Ival.scale_rem ~pos:true size ival)
+    in
+    let valid = Locations.Location_Bits.for_all is_aligned loc_bits in
+    loc.Locations.loc, valid
   else
     let valid_loc = Locations.(valid_part Read ~bitfield:true loc) in
     valid_loc.Locations.loc, false
