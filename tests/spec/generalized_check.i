@@ -1,5 +1,5 @@
 /* run.config
-OPT: -wp-fct f,main -wp -wp-prover qed -wp-msg-key strategy,no-time-info -print
+OPT: -wp -wp-prover qed -wp-msg-key strategy,no-time-info -print
 OPT: -eva -eva-use-spec f
 */
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
@@ -13,6 +13,8 @@ void f(int* x) {
   *x = 0;
 }
 
+void loop(void);
+
 int main() {
   int a = 4;
   volatile int c;
@@ -21,12 +23,15 @@ int main() {
   f(p);
   /*@ check main_valid_ko: \valid(p); */
   /*@ check main_p_content_ko: *p == 0; */
+  loop();
 }
 
 void loop () {
-  /*@ check loop invariant \true; */
-  for (int i = 0; i< 10; i++);
   int j = 0;
+  /*@ check loop invariant j == 10;
+      loop assigns i;
+   */
+  for (int i = 0; i< 10; i++);
  l: /*@ check invariant \true; */ ;
   if (j >= 10) goto l1;
   j++;
