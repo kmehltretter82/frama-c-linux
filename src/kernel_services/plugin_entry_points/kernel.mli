@@ -394,6 +394,9 @@ module CppExtraArgsPerFile: Parameter_sig.Filepath_map with type value = string
 module CppGnuLike: Parameter_sig.Bool
 (** Behavior of option "-cpp-frama-c-compliant" *)
 
+module PrintCppCommands: Parameter_sig.Bool
+(** Behavior of option "-print-cpp-commands" *)
+
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)
 

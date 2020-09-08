@@ -1004,6 +1004,17 @@ module CppGnuLike =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+module PrintCppCommands =
+  False
+    (struct
+      let module_name = "PrintCppCommands"
+      let option_name = "-print-cpp-commands"
+      let help = "prints the preprocessing command(s) used by Frama-C \
+                  and exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
 module FramaCStdLib =
   True
     (struct
