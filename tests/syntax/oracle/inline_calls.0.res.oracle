@@ -23,7 +23,7 @@ int g(void)
   if (v) {
     int tmp;
     {
-      int __retres_5;
+       /* __blockattribute__(____fc_inlined__("f")) */int __retres_5;
       __retres_5 = 2;
       tmp = __retres_5;
     }
@@ -33,7 +33,7 @@ int g(void)
   else {
     int tmp_0;
     {
-      int __retres_6;
+       /* __blockattribute__(____fc_inlined__("in_f__fc_inline")) */int __retres_6;
       __retres_6 = 3;
       tmp_0 = __retres_6;
     }
@@ -47,11 +47,11 @@ int h(void)
 {
   int tmp;
   {
-    int __retres;
+     /* __blockattribute__(____fc_inlined__("g")) */int __retres;
     if (v) {
       int tmp_3;
       {
-        int __retres_5;
+         /* __blockattribute__(____fc_inlined__("f")) */int __retres_5;
         __retres_5 = 2;
         tmp_3 = __retres_5;
       }
@@ -61,6 +61,7 @@ int h(void)
     else {
       int tmp_0;
       {
+         /* __blockattribute__(____fc_inlined__("in_f__fc_inline")) */
         int __retres_6;
         __retres_6 = 3;
         tmp_0 = __retres_6;
@@ -90,8 +91,8 @@ int rec(int x_0)
     goto return_label;
   }
   {
-    int __retres_7;
-    int tmp_6;
+     /* __blockattribute__(____fc_inlined__("rec")) */int __retres_7;
+                                                      int tmp_6;
     int x_0_5 = x_0 - 1;
     if (x_0_5 < 0) {
       __retres_7 = x_0_5;
@@ -116,7 +117,7 @@ int f1(int a)
   if (nondet) {
     int __inline_tmp;
     {
-      int a_5 = 1;
+       /* __blockattribute__(____fc_inlined__("g1")) */int a_5 = 1;
       if (nondet) g1(4);
       __inline_tmp = a_5;
     }
@@ -125,12 +126,12 @@ int f1(int a)
     if (nondet) {
       int __inline_tmp_6;
       {
-        int __retres_9;
+         /* __blockattribute__(____fc_inlined__("f1")) */int __retres_9;
         int a_8 = 2;
         if (nondet) {
           int __inline_tmp_10;
           {
-            int a_5_11 = 1;
+             /* __blockattribute__(____fc_inlined__("g1")) */int a_5_11 = 1;
             if (nondet) g1(4);
             __inline_tmp_10 = a_5_11;
           }
@@ -155,7 +156,7 @@ int g1(int a)
   if (nondet) {
     int __inline_tmp;
     {
-      int a_4 = 4;
+       /* __blockattribute__(____fc_inlined__("g1")) */int a_4 = 4;
       if (nondet) {
         int __inline_tmp_5;
         g1(4);
@@ -173,23 +174,23 @@ int main(void)
   int __inline_tmp;
   int tmp_1;
   {
-    int __retres;
+     /* __blockattribute__(____fc_inlined__("i")) */int __retres;
     /*@ assert i: \true; */ ;
     __retres = 0;
     __inline_tmp = __retres;
   }
   int local_init = __inline_tmp;
   {
-    int __retres_10;
-    int tmp;
+     /* __blockattribute__(____fc_inlined__("rec")) */int __retres_10;
+                                                      int tmp;
     int x_0 = local_init;
     if (x_0 < 0) {
       __retres_10 = x_0;
       goto return_label;
     }
     {
-      int __retres_7;
-      int tmp_6;
+       /* __blockattribute__(____fc_inlined__("rec")) */int __retres_7;
+                                                        int tmp_6;
       int x_0_5 = x_0 - 1;
       if (x_0_5 < 0) {
         __retres_7 = x_0_5;
@@ -204,12 +205,12 @@ int main(void)
   }
   int t = __inline_tmp_8;
   {
-    int __retres_13;
+     /* __blockattribute__(____fc_inlined__("f1")) */int __retres_13;
     int a = 2;
     if (nondet) {
       int __inline_tmp_14;
       {
-        int a_5 = 1;
+         /* __blockattribute__(____fc_inlined__("g1")) */int a_5 = 1;
         if (nondet) g1(4);
         __inline_tmp_14 = a_5;
       }
@@ -218,12 +219,13 @@ int main(void)
       if (nondet) {
         int __inline_tmp_6;
         {
-          int __retres_9;
+           /* __blockattribute__(____fc_inlined__("f1")) */int __retres_9;
           int a_8 = 2;
           if (nondet) {
             int __inline_tmp_10;
             {
-              int a_5_11 = 1;
+               /* __blockattribute__(____fc_inlined__("g1")) */int a_5_11 =
+                                                                 1;
               if (nondet) g1(4);
               __inline_tmp_10 = a_5_11;
             }
@@ -243,13 +245,13 @@ int main(void)
     __inline_tmp_11 = __retres_13;
   }
   {
-    int tmp_15;
+     /* __blockattribute__(____fc_inlined__("h")) */int tmp_15;
     {
-      int __retres_16;
+       /* __blockattribute__(____fc_inlined__("g")) */int __retres_16;
       if (v) {
         int tmp_3;
         {
-          int __retres_5;
+           /* __blockattribute__(____fc_inlined__("f")) */int __retres_5;
           __retres_5 = 2;
           tmp_3 = __retres_5;
         }
@@ -259,6 +261,7 @@ int main(void)
       else {
         int tmp_0;
         {
+           /* __blockattribute__(____fc_inlined__("in_f__fc_inline")) */
           int __retres_6;
           __retres_6 = 3;
           tmp_0 = __retres_6;
@@ -285,8 +288,10 @@ int with_static(void)
 int call_with_static(void)
 {
   int tmp;
-  with_static_count ++;
-  tmp = with_static_count;
+  {
+     /* __blockattribute__(____fc_inlined__("with_static")) */with_static_count ++;
+    tmp = with_static_count;
+  }
   return tmp;
 }
 
@@ -300,7 +305,8 @@ void builtin_acsl(void)
 void call_builtin_acsl(void)
 {
   {
-    float g_0 = 0.f;
+     /* __blockattribute__(____fc_inlined__("builtin_acsl")) */float g_0 =
+                                                                 0.f;
     /*@ assert ¬\is_NaN(g_0); */ ;
     ;
   }
@@ -315,8 +321,10 @@ void f_slevel(void)
 
 void call_f_slevel(void)
 {
-  /*@ slevel 0; */ ;
-  ;
+  {
+     /* __blockattribute__(____fc_inlined__("f_slevel")) *//*@ slevel 0; */ ;
+    ;
+  }
   return;
 }
 
@@ -330,10 +338,12 @@ void post_decl(void);
 
 void middle_decl(void)
 {
-  x ++;
-  y ++;
-  post_decl();
-  ;
+  {
+     /* __blockattribute__(____fc_inlined__("pre_decl")) */x ++;
+    y ++;
+    post_decl();
+    ;
+  }
   return;
 }
 
