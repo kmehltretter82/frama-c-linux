@@ -28,10 +28,11 @@ int main() {
 
 void loop () {
   int j = 0;
-  /*@ check loop invariant j == 10;
+  /*@ check loop invariant false_but_preserved: j == 10;
       loop assigns i;
    */
   for (int i = 0; i< 10; i++);
+  /*@ check implied_by_false_invariant: j == 10; */
  l: /*@ check invariant \true; */ ;
   if (j >= 10) goto l1;
   j++;

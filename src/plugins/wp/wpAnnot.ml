@@ -833,6 +833,8 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
   in loop_entry, loop_back
 
 let add_loop_invariant_annot config vloop s ca b_list inv acc =
+  let only_check = inv.tp_only_check in
+  let inv = inv.tp_statement in
   let assigns, loop_entry, loop_back , loop_core = acc in
   (* we have to prove that inv is true for each edge that goes
    * in the loop, so we can assume that inv is true for each edge
@@ -846,15 +848,18 @@ let add_loop_invariant_annot config vloop s ca b_list inv acc =
             WpStrategy.Agoal s ca inv in
         let loop_back = add_prop_loop_inv ~established:false config loop_back
             WpStrategy.Agoal s ca inv in
-        let loop_core = add_prop_inv_fixpoint config loop_core
-            WpStrategy.Ahyp s ca inv in
+        let loop_core =
+          if only_check then loop_core
+          else
+            add_prop_inv_fixpoint config loop_core WpStrategy.Ahyp s ca inv
+        in
         assigns, loop_entry , loop_back , loop_core
       end
-  | TBRhyp ->
+  | TBRhyp when not only_check ->
       let kind = WpStrategy.Ahyp in
       let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
       in assigns, loop_entry , loop_back , loop_core
-  | TBRno -> acc
+  | TBRhyp | TBRno -> acc
 
 (** Returns the annotations for the three edges of the loop node:
  * - loop_entry : goals for the edge entering in the loop
@@ -865,7 +870,7 @@ let get_loop_annots config vloop s =
   let do_annot _ a (assigns, loop_entry, loop_back , loop_core as acc) =
     match a.annot_content with
     | AInvariant (b_list, true, inv) ->
-        add_loop_invariant_annot config vloop s a b_list inv.tp_statement acc
+        add_loop_invariant_annot config vloop s a b_list inv acc
     | AVariant (var_exp, None) ->
         let loop_entry, loop_back =
           add_variant_annot config s a var_exp loop_entry loop_back
