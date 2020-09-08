@@ -691,7 +691,7 @@ module Make
     | AAssert (behav, p) ->
       aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
     | AInvariant (behav, true, p) ->
-      aux ~reduce:true code_annot behav p.tp_statement
+      aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
     | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _ | AExtended _
