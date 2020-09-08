@@ -384,11 +384,11 @@ module Make
     else (* Not enough slevel to split, and reduction not required *)
       States.singleton state
 
-  let eval_split_and_reduce limit active pred build_env state =
+  let eval_split_and_reduce limit ~reduce pred build_env state =
     let env = build_env state in
     let status = Domain.evaluate_predicate env state pred in
     let  reduced_states =
-      if active then
+      if reduce then
         match status with
         | Alarmset.False   -> States.empty
         | Alarmset.True    ->
@@ -453,7 +453,7 @@ module Make
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
-      let active = active && not pred.ip_content.tp_only_check in
+      let reduce = active && not pred.ip_content.tp_only_check in
       let ip = build_prop pred in
       if ignore_predicate pr then
         states
@@ -466,7 +466,7 @@ module Make
           States.fold
             (fun state (acc_status, acc_states) ->
                let status, reduced_states =
-                 eval_split_and_reduce limit active pr build_env state
+                 eval_split_and_reduce limit ~reduce pr build_env state
                in
                (status :: acc_status,
                 fst (States.merge ~into:acc_states reduced_states)))
