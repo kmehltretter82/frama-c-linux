@@ -256,11 +256,11 @@ let get_file_type filename =
       | "html" | "htm" -> Html
       | "txt" | "text" -> Text
       | s ->
-        Metrics_parameters.fatal
+        Metrics_parameters.abort
           "Unknown file extension %s. Cannot produce output.@." s
   with
     | No_suffix ->
-       Metrics_parameters.fatal
+       Metrics_parameters.abort
          "File %s has no suffix. Cannot produce output.@." filename
 
 module VarinfoByName = struct

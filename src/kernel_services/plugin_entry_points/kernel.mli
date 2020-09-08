@@ -468,7 +468,7 @@ module ImplicitFunctionDeclaration: Parameter_sig.String
 module C11: Parameter_sig.Bool
 (** Behavior of option "-c11" *)
 
-module JsonCompilationDatabase: Parameter_sig.String
+module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 
 (* ************************************************************************* *)

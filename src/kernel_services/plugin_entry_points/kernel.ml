@@ -1121,12 +1121,12 @@ module C11 =
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module JsonCompilationDatabase =
-  String
+  P.Filepath
     (struct
-      let module_name = "JsonCompilationDatabase"
       let option_name = "-json-compilation-database"
-      let default = ""
       let arg_name = "path"
+      let file_kind = "directory or json"
+      let existence = Filepath.Must_exist
       let help =
         "when set, preprocessing of each file will include corresponding \
          flags (e.g. -I, -D) from the JSON compilation database \

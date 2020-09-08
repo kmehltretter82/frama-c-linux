@@ -31,36 +31,44 @@ include Plugin.Register
    end)
 
 module Ltl_File =
-  Empty_string
+  Filepath
     (struct
        let option_name = "-aorai-ltl"
        let arg_name = ""
+       let file_kind = "ltl"
+       let existence = Fc_Filepath.Must_exist
        let help = "specifies file name for LTL property"
      end)
 
 module To_Buchi =
-  Empty_string
+  Filepath
     (struct
        let option_name = "-aorai-to-buchi"
        let arg_name = "f"
+       let file_kind = "Promela"
+       let existence = Fc_Filepath.Indifferent
        let help =
          "only generates the buchi automata (in Promela language) in file <s>"
      end)
 
 module Buchi =
-  Empty_string
+  Filepath
     (struct
        let option_name = "-aorai-buchi"
        let arg_name = "f"
+       let file_kind = "Promela"
+       let existence = Fc_Filepath.Must_exist
        let help = "considers the property described by the buchi automata \
                    (in Promela language) from file <f>."
      end)
 
 module Ya =
-  Empty_string
+  Filepath
     (struct
        let option_name = "-aorai-automata"
        let arg_name = "f"
+       let file_kind = "Ya"
+       let existence = Fc_Filepath.Must_exist
        let help = "considers the property described by the ya automata \
                    (in Ya language) from file <f>."
      end)
@@ -74,10 +82,12 @@ module Output_Spec =
         end)
 
 module Output_C_File =
-  Empty_string
+  Filepath
     (struct
        let option_name = "-aorai-output-c-file"
        let arg_name = ""
+       let file_kind = "annotated C"
+       let existence = Fc_Filepath.Indifferent
        let help = "specifies generated file name for annotated C code"
      end)
 
@@ -155,7 +165,7 @@ let is_on () =
        Buchi.is_default ()    && Ya.is_default () )
 
 let promela_file () =
-  if Buchi.get () = "" then To_Buchi.get () else Buchi.get ()
+  if Fc_Filepath.Normalized.is_unknown (Buchi.get ()) then To_Buchi.get () else Buchi.get ()
 
 let advance_abstract_interpretation () =
   not (AbstractInterpretationOff.get ()) && not (AbstractInterpretation.get ())
