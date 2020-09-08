@@ -688,8 +688,7 @@ module Make
         aux_interp ~reduce code_annot behav p
     in
     match code_annot.annot_content with
-    | AAssert (behav, p) ->
-      aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
+    | AAssert (behav, p)
     | AInvariant (behav, true, p) ->
       aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
     | APragma _
