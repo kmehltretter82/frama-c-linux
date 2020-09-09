@@ -199,7 +199,7 @@ let ip_lemma l =
      il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
      il_pred = l.lem_property}
 
-let lemma_of_global proof = function
+let lemma_of_global ~context = function
   | Dlemma(name,axiom,labels,types,pred,_,loc) ->
       let kind = if axiom then `Axiom else
         if pred.tp_only_check then `Check else `Lemma in
@@ -210,14 +210,14 @@ let lemma_of_global proof = function
         lem_labels = labels ;
         lem_kind = kind ;
         lem_property = pred.tp_statement ;
-        lem_depends = proof ;
+        lem_depends = context ;
       }
   | _ -> assert false
 
-let populate a proof = function
+let populate a ~context = function
   | Dfun_or_pred(l,_) -> a.ax_logics <- l :: a.ax_logics
   | Dtype(t,_) -> a.ax_types <- t :: a.ax_types
-  | Dlemma _ as g -> a.ax_lemmas <- lemma_of_global proof g :: a.ax_lemmas
+  | Dlemma _ as g -> a.ax_lemmas <- lemma_of_global ~context g :: a.ax_lemmas
   | _ -> ()
 
 let ip_of_axiomatic g =
@@ -225,7 +225,7 @@ let ip_of_axiomatic g =
   | None -> assert false
   | Some ip -> ip
 
-let axiomatic_of_global proof = function
+let axiomatic_of_global ~context = function
   | Daxiomatic(name,globals,_,loc) as g ->
       let a = {
         ax_name = name ;
@@ -234,7 +234,7 @@ let axiomatic_of_global proof = function
         ax_reads = Varinfo.Set.empty ;
         ax_types = [] ; ax_lemmas = [] ; ax_logics = [] ;
       } in
-      List.iter (populate a proof) globals ;
+      List.iter (populate a ~context) globals ;
       a.ax_types <- List.rev a.ax_types ;
       a.ax_logics <- List.rev a.ax_logics ;
       a.ax_lemmas <- List.rev a.ax_lemmas ;
@@ -407,7 +407,8 @@ class visitor =
       | Dlemma _ ->
           let lem = lemma_of_global database.proofcontext global in
           register_lemma database self#section lem ;
-          database.proofcontext <- lem :: database.proofcontext ;
+          if lem.lem_kind <> `Check then
+            database.proofcontext <- lem :: database.proofcontext ;
           SkipChildren
 
       | Dtype(t,_) ->
