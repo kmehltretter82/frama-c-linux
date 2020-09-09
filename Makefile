@@ -2409,12 +2409,9 @@ else
 DISTRIB_HEADERS:=open-source
 # for checking that distributed files aren't under proprietary licence.
 DISTRIB_PROPRIETARY_HEADERS:=$(CEA_PROPRIETARY_HEADERS)
-# DISTRIB_TESTS contents files that can be distributed without header checking
+# DISTRIB_TESTS contains files that can be distributed without header checking
 DISTRIB_TESTS:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
                   $(DISTRIB_TESTS))
-# DISTRIB_FILES contents files that can be distributed with header checking
-DISTRIB_FILES:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
-                  $(DISTRIB_FILES))
 endif
 
 # Set some variables for `headers`target.
