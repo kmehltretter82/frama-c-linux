@@ -465,12 +465,13 @@ let ident_names names =
   List.filter (function "" -> true
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
+let pred_names p =
+  let p_names = ident_names p.tp_statement.pred_name in
+  if p.tp_only_check then "@check"::p_names else p_names
+
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, pred)  ->
-      let cat = if pred.tp_only_check then "@check" else "@assert" in
-      cat::(ident_names pred.tp_statement.pred_name)
-  | AInvariant (_,_,named_pred) ->
-      "@invariant"::(ident_names named_pred.tp_statement.pred_name)
+  | AAssert (_, pred)  -> "@assert" :: pred_names pred
+  | AInvariant (_,_,pred) -> "@invariant":: pred_names pred
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,{ext_name}) -> [Printf.sprintf "@%s" ext_name]
   | _ -> [] (* TODO : add some more names ? *)
@@ -481,7 +482,7 @@ let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      ip_pred.ip_content.tp_statement.pred_name
+      pred_names ip_pred.ip_content
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
