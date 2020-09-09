@@ -500,7 +500,8 @@ let user_prop_names p =
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let names = "@lemma"::a::(ident_names l.pred_name)
+      let cat = if l.tp_only_check then "@check" else "@lemma" in
+      let names = cat::a::(ident_names l.tp_statement.pred_name)
       in begin
         match LogicUsage.section_of_lemma a with
         | LogicUsage.Toplevel _ -> names
@@ -657,7 +658,7 @@ let property_hints hs =
   let open Property in function
     | IPAxiom  {il_name; il_pred}
     | IPLemma  {il_name; il_pred} ->
-        List.iter (add_required hs) (il_name::il_pred.pred_name)
+        List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
         List.iter (add_required hs) ic_bhvs

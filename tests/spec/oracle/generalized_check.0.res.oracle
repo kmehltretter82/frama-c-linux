@@ -10,13 +10,13 @@
 [wp] 11 goals scheduled
 [wp] [Qed] Goal typed_f_assigns : Valid
 [wp] [Failed] Goal typed_f_check_f_valid_ko
-[wp] [Qed] Goal typed_f_ensures_f_init_x : Valid
-[wp] [Failed] Goal typed_lemma_easy_proof
+[wp] [Qed] Goal typed_f_check_ensures_f_init_x : Valid
+[wp] [Failed] Goal typed_check_lemma_easy_proof
 [wp] [Qed] Goal typed_loop_loop_assigns : Valid
 [wp] [Failed] Goal typed_loop_check_implied_by_false_invariant
-[wp] [Failed] Goal typed_loop_loop_invariant_false_but_preserved_established
-[wp] [Failed] Goal typed_loop_loop_invariant_false_but_preserved_preserved
-[wp] [Failed] Goal typed_main_call_f_requires_f_valid_x
+[wp] [Failed] Goal typed_loop_check_loop_invariant_false_but_preserved_established
+[wp] [Failed] Goal typed_loop_check_loop_invariant_false_but_preserved_preserved
+[wp] [Failed] Goal typed_main_call_f_check_requires_f_valid_x
 [wp] [Failed] Goal typed_main_check_main_p_content_ko
 [wp] [Failed] Goal typed_main_check_main_valid_ko
 [wp] Proved goals:    3 / 11
