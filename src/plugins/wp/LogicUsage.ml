@@ -194,10 +194,16 @@ let pp_profile fmt l =
 
 let ip_lemma l =
   let open Property in
-  (if l.lem_kind = `Axiom then Property.ip_axiom else Property.ip_lemma)
+  let mk_prop, only_check =
+    match l.lem_kind with
+    | `Axiom -> Property.ip_axiom, false
+    | `Lemma -> Property.ip_lemma, false
+    | `Check -> Property.ip_lemma, true
+  in
+  mk_prop
     {il_name = l.lem_name; il_labels = l.lem_labels;
      il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
-     il_pred = l.lem_property}
+     il_pred = Logic_const.toplevel_predicate ~only_check l.lem_property}
 
 let lemma_of_global ~context = function
   | Dlemma(name,axiom,labels,types,pred,_,loc) ->

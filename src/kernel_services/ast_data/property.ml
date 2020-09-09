@@ -126,7 +126,7 @@ and identified_lemma = {
   il_name : string;
   il_labels : logic_label list;
   il_args : string list;
-  il_pred : predicate;
+  il_pred : toplevel_predicate;
   il_loc : location
 }
 
@@ -418,8 +418,13 @@ include Datatype.Make_with_collections
 
       type t = identified_property
       let name = "Property.t"
-      let reprs = [IPAxiom {il_name="";il_labels=[];il_args=[];
-                            il_pred=Logic_const.ptrue;il_loc=Location.unknown}]
+      let reprs = [
+        IPAxiom {
+          il_name="";il_labels=[];il_args=[];
+          il_pred=Logic_const.(toplevel_predicate ptrue);
+          il_loc=Location.unknown
+        }]
+
       let mem_project = Datatype.never_any_project
 
       let pp_active fmt active =
@@ -837,7 +842,7 @@ let rec pretty_debug fmt = function
       Cil_types_debug.pp_string il_name
       (Cil_types_debug.pp_list Cil_types_debug.pp_logic_label) il_labels
       (Cil_types_debug.pp_list Cil_types_debug.pp_string) il_args
-      Cil_types_debug.pp_predicate il_pred
+      Cil_types_debug.pp_toplevel_predicate il_pred
       Cil_types_debug.pp_location il_loc
   | IPAxiomatic {iax_name; iax_props} ->
     Format.fprintf fmt "IPAxiomatic(%a,%a)"
@@ -848,7 +853,7 @@ let rec pretty_debug fmt = function
       Cil_types_debug.pp_string il_name
       (Cil_types_debug.pp_list Cil_types_debug.pp_logic_label) il_labels
       (Cil_types_debug.pp_list Cil_types_debug.pp_string) il_args
-      Cil_types_debug.pp_predicate il_pred
+      Cil_types_debug.pp_toplevel_predicate il_pred
       Cil_types_debug.pp_location il_loc
   | IPTypeInvariant {iti_name; iti_type; iti_pred; iti_loc} ->
     Format.fprintf fmt "IPTypeInvariant(%a,%a,%a,%a)"
@@ -1028,10 +1033,10 @@ struct
     | IPDecrease {id_kf=kf; id_variant=variant} ->
       (kf_prefix kf) ^ "loop_term" ^ (variant_suffix variant)
     | IPAxiom {il_name=name; il_pred} ->
-      Format.asprintf "axiom_%s%a" name pp_names il_pred.pred_name
+      Format.asprintf "axiom_%s%a" name pp_names il_pred.tp_statement.pred_name
     | IPAxiomatic {iax_name} -> "axiomatic_" ^ iax_name
     | IPLemma {il_name=name; il_pred} ->
-      Format.asprintf "lemma_%s%a" name pp_names il_pred.pred_name
+      Format.asprintf "lemma_%s%a" name pp_names il_pred.tp_statement.pred_name
     | IPTypeInvariant {iti_name; iti_pred} ->
       Format.asprintf "type_invariant_%s%a"
         iti_name pp_names iti_pred.pred_name
@@ -1150,17 +1155,35 @@ struct
     | IPPredicate {ip_kind=PKAssumes bhv; ip_kf=kf; ip_pred=ip} ->
       [ K kf ; B bhv ; A "assumes" ; I ip ]
     | IPPredicate {ip_kind=PKRequires bhv; ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "requires" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_requires" else "requires"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Normal); ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "ensures" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_ensures" else "ensures"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Exits); ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "exits" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_exits" else "exits"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Breaks); ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "breaks" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_breaks" else "breaks"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Continues); ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "continues" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_continues" else "continues"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Returns); ip_kf=kf; ip_pred=ip} ->
-      [ K kf ; B bhv ; A "returns" ; I ip ]
+      let a =
+        if ip.ip_content.tp_only_check then "check_returns" else "returns"
+      in
+      [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKTerminates; ip_kf=kf; ip_pred=ip} ->
       [ K kf ; A "terminates" ; I ip ]
 
@@ -1195,9 +1218,15 @@ struct
       let a = if p.tp_only_check then "check" else "assert" in
       [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_, true, p)}} ->
-      [K kf ; A "loop_invariant" ; P p.tp_statement ]
-    | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_, false, p)}} ->
-      [K kf ; A "invariant" ; P p.tp_statement ]
+      let a =
+        if p.tp_only_check then "check_loop_invariant" else "loop_invariant"
+      in
+      [K kf ; A a ; P p.tp_statement ]
+    | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_,false, p)}} ->
+      let a =
+        if p.tp_only_check then "check_invariant" else "invariant"
+      in
+      [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AVariant (e, _)}} ->
       [K kf ; A "loop_variant" ; T e ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AAssigns _}} ->
@@ -1223,7 +1252,8 @@ struct
     | IPAxiomatic _
     | IPAxiom _ -> []
     | IPLemma {il_name=name; il_pred=p} ->
-      [ A "lemma" ; A name ; P p ]
+      let a = if p.tp_only_check then "check_lemma" else "lemma" in
+      [ A a ; A name ; P p.tp_statement ]
 
     | IPTypeInvariant {iti_name=name}
     | IPGlobalInvariant {igi_name=name} ->
@@ -1511,10 +1541,8 @@ let ip_of_global_annotation a =
       let iax_props = List.fold_left aux [] l in
       IPAxiomatic {iax_name; iax_props} :: (iax_props @ acc)
     | Dlemma(il_name, true, il_labels, il_args, il_pred, _, il_loc) ->
-      let il_pred = il_pred.tp_statement in
       ip_axiom {il_name; il_labels; il_args; il_pred; il_loc} :: acc
     | Dlemma(il_name, false, il_labels, il_args, il_pred, _, il_loc) ->
-      let il_pred = il_pred.tp_statement in
       ip_lemma {il_name; il_labels; il_args; il_pred; il_loc} :: acc
     | Dinvariant(l, igi_loc) ->
       let igi_pred = match l.l_body with
