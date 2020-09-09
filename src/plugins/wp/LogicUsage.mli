@@ -30,10 +30,12 @@ open Clabels
 
 val basename : varinfo -> string (** Trims the original name *)
 
+type lkind = [ `Axiom | `Check | `Lemma ]
+
 type logic_lemma = {
   lem_name : string ;
+  lem_kind : lkind ;
   lem_position : Filepath.position ;
-  lem_axiom : bool ;
   lem_types : string list ;
   lem_labels : logic_label list ;
   lem_property : predicate ;

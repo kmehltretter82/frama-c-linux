@@ -141,7 +141,7 @@ struct
                     prefix name Chunk.pretty chunk i in
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
-                  l_assumed = true ;
+                  l_kind = `Axiom ;
                   l_name ; l_types = 0 ;
                   l_triggers ;
                   l_forall = F.p_vars l_lemma ;
@@ -226,7 +226,7 @@ struct
           let lfun = Lang.generated_f ~result "Array%a%s_%s" pp_rid r
               (Matrix.id ds) (Matrix.natural_id obj_e) in
           let prefix = Lang.Fun.debug lfun in
-          let axiom = prefix ^ "_access" in
+          let name = prefix ^ "_access" in
           let xmem,chunks,sigma = signature domain in
           let denv = Matrix.denv ds in
           let phi = e_fun lfun (v :: denv.size_val @ List.map e_var xmem) in
@@ -242,8 +242,8 @@ struct
             d_cluster = cluster ;
           } ;
           Definitions.define_lemma {
-            l_assumed = true ;
-            l_name = axiom ; l_types = 0 ;
+            l_kind = `Axiom ;
+            l_name = name ; l_types = 0 ;
             l_forall = F.p_vars lemma ;
             l_triggers = [[Trigger.of_term va]] ;
             l_lemma = lemma ;
