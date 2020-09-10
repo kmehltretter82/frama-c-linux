@@ -84,7 +84,7 @@ module Behaviors =
     (struct
       let option_name = "-wp-bhv"
       let arg_name = "b,..."
-      let help = "Select properties of the given behaviors (defaults to all behaviors) of the selected functions."
+      let help = "Select only properties belonging to listed behaviors."
     end)
 let () = on_reset Behaviors.clear
 
@@ -96,10 +96,14 @@ module Properties =
     (struct
       let option_name = "-wp-prop"
       let arg_name = "p,..."
-      let help = "Select properties having the one of the given tagnames (defaults to all properties).\n\
-                  You may also replace the tagname by '@category' for the selection of all properties of the given category.\n\
-                  Accepted categories are: checks, lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors, assert, check, invariant, variant, breaks, continues, returns.\n\
-                  Starts by a minus character to remove properties from the selection."
+      let help =
+        "Select properties based names and category.\n\
+         Use +name or +category to select properties and -name or -category\n\
+         to remove them from the selection. The '+' sign can be omitted.\n\
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
+         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
+         @complete_behaviors, @disjoint_behaviors and\n\
+         @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
