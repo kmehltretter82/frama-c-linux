@@ -522,23 +522,6 @@ let () =
     (fun _ b -> assert b; GeneralVerbose.set 0; GeneralDebug.set 0)
 
 let () = Parameter_customize.set_group messages
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.do_not_journalize ()
-module Permissive =
-  Bool
-    (struct
-      let default = !Parameter_customize.is_permissive_ref
-      let option_name = "-permissive"
-      let module_name = "Permissive"
-      let help =
-        "performs less verification on validity of command-line options"
-    end)
-let () =
-  Permissive.add_set_hook
-    (fun _ b -> Parameter_customize.is_permissive_ref := b)
-
-let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.do_not_projectify ()
@@ -1650,11 +1633,45 @@ let () =
        Project.Datatype.Set.iter (fun project -> Project.remove ~project ()) s)
 
 (* ************************************************************************* *)
-(** {2 Others options} *)
+(** {2 Checks} *)
+(* ************************************************************************* *)
+
+let checks = add_group "Checks"
+
+let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_reset_on_copy ()
+module Check =
+  False(struct
+    let option_name = "-check"
+    let module_name = "Check"
+    let help = "performs consistency checks over the Abstract Syntax \
+                Tree"
+  end)
+
+let () = Parameter_customize.set_group checks
+module Copy =
+  False(struct
+    let option_name = "-copy"
+    let module_name = "Copy"
+    let help =
+      "always perform a copy of the original AST before analysis begin"
+  end)
+
+let () = Parameter_customize.set_group checks
+let () = Parameter_customize.set_negative_option_name ""
+module TypeCheck =
+  True(struct
+    let module_name = "TypeCheck"
+    let option_name = "-typecheck"
+    let help = "forces typechecking of the source files"
+  end)
+
+(* ************************************************************************* *)
+(** {2 Other options} *)
 (* ************************************************************************* *)
 
 [@@@warning "-60"]
-(* Warning this three options are parsed and used directly from Cmdline *)
+(* Warning: these options are parsed and used directly from Cmdline *)
 
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
@@ -1692,41 +1709,19 @@ module Deterministic =
       let help = ""
     end)
 
-[@@@warning "+60"]
-
-(* ************************************************************************* *)
-(** {2 Checks} *)
-(* ************************************************************************* *)
-
-let checks = add_group "Checks"
-
-let () = Parameter_customize.set_group checks
-let () = Parameter_customize.do_not_reset_on_copy ()
-module Check =
-  False(struct
-    let option_name = "-check"
-    let module_name = "Check"
-    let help = "performs consistency checks over the Abstract Syntax \
-                Tree"
-  end)
-
-let () = Parameter_customize.set_group checks
-module Copy =
-  False(struct
-    let option_name = "-copy"
-    let module_name = "Copy"
-    let help =
-      "always perform a copy of the original AST before analysis begin"
-  end)
-
 let () = Parameter_customize.set_group checks
 let () = Parameter_customize.set_negative_option_name ""
-module TypeCheck =
-  True(struct
-    let module_name = "TypeCheck"
-    let option_name = "-typecheck"
-    let help = "forces typechecking of the source files"
-  end)
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module Permissive =
+  False
+    (struct
+      let module_name = "Permissive"
+      let option_name = "-permissive"
+      let help =
+        "perform less verifications on validity of command-line options"
+    end)
+
+[@@@warning "+60"]
 
 (*
 Local Variables:

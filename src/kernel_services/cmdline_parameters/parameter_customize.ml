@@ -93,8 +93,6 @@ let is_invisible () =
 let use_category_ref = ref true
 let no_category () = use_category_ref := false
 
-let is_permissive_ref = ref false
-
 let find_kf_by_name: (string -> Cil_types.kernel_function) ref =
   Extlib.mk_fun "Parameter_customize.find_kf_by_name"
 

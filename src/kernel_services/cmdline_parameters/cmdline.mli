@@ -396,6 +396,13 @@ val deterministic: bool
       are acceptable, as reproducibility is more important.
       @since Aluminium-20160501 *)
 
+val permissive: bool
+  (** Downgrades some command-line errors to warnings, such as
+      unknown option names and invalid values for some options
+      (e.g. inexistent function names).
+
+      @since Frama-C+dev *)
+
 val last_project_created_by_copy: (unit -> string option) ref
 
 val load_all_plugins: (unit -> unit) ref

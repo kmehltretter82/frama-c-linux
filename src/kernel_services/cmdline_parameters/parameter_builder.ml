@@ -1031,7 +1031,7 @@ struct
       if must_exist then
         error s
       else
-      if !Parameter_customize.is_permissive_ref then begin
+      if Cmdline.permissive then begin
         P.L.warning "ignoring non-existing function%s '%s'."
           specific_msg s;
         set

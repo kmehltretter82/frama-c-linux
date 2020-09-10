@@ -76,6 +76,7 @@ let journal_isset_ref = ref false
 let use_obj_ref = ref true
 let use_type_ref = ref true
 let deterministic = ref false
+let permissive = ref false
 
 let last_project_created_by_copy = ref (fun () -> assert false)
 
@@ -268,6 +269,11 @@ let error name msg =
     "option `%s' %s.@\nuse `%s -help' for more information."
     name msg bin_name
 
+let warning name msg =
+  Kernel_log.warning
+    "option `%s' %s, ignoring. [-permissive]@\n"
+    name msg
+
 let all_options = match Array.to_list Sys.argv with
   | [] -> assert false
   | _binary :: l -> l
@@ -343,6 +349,9 @@ let parse known_options_list then_expected options_list =
         unknown_options, nb_used, Some (then_options, Replace)
     | "-then-on" :: project_name :: then_options when then_expected ->
         unknown_options, nb_used, Some (then_options, Name project_name)
+    | "-permissive" :: next_options ->
+      permissive := true;
+      go unknown_options nb_used next_options
     | option :: (arg :: next_options as arg_next) ->
         let unknown, use_arg, is_used =
           parse_one_option unknown_options option arg
@@ -386,6 +395,7 @@ let () =
         "-kernel-verbose", Int (fun n -> Kernel_verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
+        "-permissive", Unit (fun () -> permissive := true);
       ]
       false
       all_options
@@ -417,6 +427,7 @@ let journal_isset = !journal_isset_ref
 let use_obj = !use_obj_ref
 let use_type = !use_type_ref
 let deterministic = !deterministic
+let permissive = !permissive
 
 (* ************************************************************************* *)
 (** {2 Plugin} *)
@@ -762,11 +773,19 @@ let use_cmdline_files = On_Files.extend
 
 let set_files used_loading l =
   Kernel_log.feedback ~dkey "setting files from command lines.";
-  List.iter
-    (fun s ->
-       if s = "" then error "" "has no name. What do you exactly have in mind?";
-       if s.[0] = '-' then error s "is unknown")
-    l;
+  let l =
+    List.fold_right
+      (fun s acc ->
+         if s = "" then
+           if permissive then (warning "" "has no name"; acc)
+           else error "" "has no name. What do you exactly have in mind?"
+         else if s.[0] = '-' then
+           if permissive then (warning s "is unknown"; acc)
+           else error s "is unknown"
+         else
+           s :: acc
+      ) l []
+  in
   assert
     (Kernel_log.verify
        (not (On_Files.is_empty ()))
