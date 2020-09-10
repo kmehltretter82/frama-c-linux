@@ -500,9 +500,8 @@ let user_prop_names p =
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let cat = if l.tp_only_check then "@check" else "@lemma" in
-      let names = cat::a::(ident_names l.tp_statement.pred_name)
-      in begin
+      let names = "@lemma"::a::pred_names l in
+      begin
         match LogicUsage.section_of_lemma a with
         | LogicUsage.Toplevel _ -> names
         | LogicUsage.Axiomatic ax -> ax.LogicUsage.ax_name::names
