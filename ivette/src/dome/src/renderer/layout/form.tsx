@@ -12,7 +12,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
-import { Checkbox, Radio } from 'dome/controls/buttons';
+import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
 
 export type Error =
   | undefined | boolean | string
@@ -1050,6 +1050,7 @@ export interface RadioFieldProps<A> extends FieldProps<A> {
   value: A;
 }
 
+/** @category Form Fields */
 export function RadioField<A>(props: RadioFieldProps<A>) {
   const { hidden, disabled } = useContext(props);
 
@@ -1073,6 +1074,44 @@ export function RadioField<A>(props: RadioFieldProps<A>) {
       selection={selection}
       onSelection={onSelection}
     />
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Select Menu Field                                                  ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields */
+export interface SelectFieldProps extends FieldProps<string | undefined> {
+  placeholder?: string;
+  children: any;
+}
+
+/**
+   Children must be standard `<option>` or `<optgroup>` elements.
+
+   @category Form Fields
+*/
+export function SelectField(props: SelectFieldProps) {
+  const id = useHtmlFor();
+  const [value, error, setState] = useChecker(props.state, props.checker);
+  const onChange = (newValue?: string) => setState(newValue, undefined);
+  const { children, placeholder } = props;
+  return (
+    <Field
+      {...props}
+      error={error}
+      htmlFor={id}
+    >
+      <SelectMenu
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        onChange={onChange}
+      >
+        {children}
+      </SelectMenu>
+    </Field>
   );
 }
 

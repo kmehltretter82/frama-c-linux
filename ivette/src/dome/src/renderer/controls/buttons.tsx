@@ -522,7 +522,7 @@ export interface SelectProps {
   className?: string;
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
-  /** Shall be [[Item]] elements. */
+  /** Shall be standard `<option/>` and `<optgroup/>` elements. */
   children: any;
 }
 
