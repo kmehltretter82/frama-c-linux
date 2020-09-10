@@ -269,7 +269,7 @@ function useContext(props?: FilterProps): FormContext {
 }
 
 /** @category Form Containers */
-export function Filter(props: FilterProps & Children) {
+export function FormFilter(props: FilterProps & Children) {
   const context = useContext(props);
   if (context.hidden) return null;
   return (
@@ -295,7 +295,7 @@ export interface FormProps extends FilterProps, Children {
    Main Form Container.
    @category Form Containers
  */
-export const Form = (props: FormProps) => {
+export function FormPage(props: FormProps) {
   const { className, style, children, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
   const css = Utils.classes('dome-xForm-grid', className);
@@ -307,7 +307,7 @@ export const Form = (props: FormProps) => {
       </CONTEXT.Provider>
     </div>
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Warning Badge
@@ -351,14 +351,14 @@ export function Warning(props: WarningProps) {
    Layout its contents inside a full-width container.
    @category Form Containers
  */
-export function Block(props: FilterProps & Children) {
+export function FormBlock(props: FilterProps & Children) {
   const { children, ...filter } = props;
   return (
-    <Filter {...filter}>
+    <FormFilter {...filter}>
       <div className="dome-xForm-block">
         {children}
       </div>
-    </Filter>
+    </FormFilter>
   );
 }
 
@@ -573,7 +573,7 @@ export function TextField(props: TextFieldProps) {
    Monospaced Text Field.
    @category Text Fields
  */
-export function FieldCode(props: TextFieldProps) {
+export function TextCodeField(props: TextFieldProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 600);
@@ -657,7 +657,7 @@ export function TextFieldArea(props: TextFieldAreaProps) {
    Monospaced Text Field Area.
    @category Text Fields
  */
-export function FieldCodeArea(props: TextFieldAreaProps) {
+export function TextCodeFieldArea(props: TextFieldAreaProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
