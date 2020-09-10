@@ -12,6 +12,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
+import { Checkbox } from 'dome/controls/buttons';
 
 export type Error =
   | undefined | boolean | string
@@ -1002,6 +1003,41 @@ export function TimeField(props: TimeOrDateFieldProps) {
         onChange={onChange}
       />
     </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Check Box Field                                                    ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields */
+export interface CheckboxFieldProps extends FieldProps<boolean> {
+  /** Default is false */
+  inverted?: boolean;
+}
+
+/** @category Form Fields */
+export function CheckboxField(props: CheckboxFieldProps) {
+  const { hidden, disabled } = useContext(props);
+
+  if (hidden) return null;
+
+  const [value, , setState] = props.state;
+  const { label, title, inverted } = props;
+  const css = Utils.classes(
+    'dome-xForm-field dome-text-label',
+    disabled && 'dome-disabled',
+  );
+  const onChange = () => setState(!value, undefined);
+  return (
+    <Checkbox
+      className={css}
+      label={label}
+      title={title}
+      disabled={disabled}
+      value={inverted ? !value : value}
+      onChange={onChange}
+    />
   );
 }
 
