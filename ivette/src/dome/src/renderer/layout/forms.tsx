@@ -105,6 +105,23 @@ export function useState<A>(
   return [value, error, setState];
 }
 
+/** Introduces a local state and propagates only non-errors */
+export function useValid<A>(
+  state: [A, (newValue: A) => void],
+): FieldState<A> {
+  const [value, setValue] = state;
+  const [local, setLocal] = React.useState(value);
+  const [error, setError] = React.useState<Error>(undefined);
+  const update = React.useCallback(
+    (newValue: A, newError: Error) => {
+      setLocal(newValue);
+      setError(newError);
+      if (!newError) setValue(newValue);
+    }, [setValue],
+  );
+  return [error ? local : value, error, update];
+}
+
 /** Provides a new state with a default value. */
 export function useDefault<A>(
   state: FieldState<A | undefined>,
@@ -364,7 +381,7 @@ export function FormFilter(props: FilterProps & Children) {
 /* --------------------------------------------------------------------------*/
 
 /** @category Form Containers */
-export interface FormProps extends FilterProps, Children {
+export interface PageProps extends FilterProps, Children {
   /** Additional container class. */
   className?: string;
   /** Additional container style. */
@@ -375,7 +392,7 @@ export interface FormProps extends FilterProps, Children {
    Main Form Container.
    @category Form Containers
  */
-export function FormPage(props: FormProps) {
+export function Page(props: PageProps) {
   const { className, style, children, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
   const css = Utils.classes('dome-xForm-grid', className);

@@ -9,14 +9,14 @@ import * as Json from 'dome/data/json';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import { Label, Code } from 'dome/controls/labels';
-import { IconButton } from 'dome/controls/buttons';
+import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar, Component } from 'frama-c/LabViews';
-import { Vfill } from 'dome/layout/boxes';
+import { Vfill, Folder } from 'dome/layout/boxes';
+
 import { RSplit } from 'dome/layout/splitters';
-import { Form, Section, FieldCheckbox } from 'dome/layout/forms';
 
 import { source as SourceLoc } from 'api/kernel/services';
 import { statusData as Property } from 'api/kernel/properties';
@@ -276,70 +276,125 @@ class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
 // --- Property Filter Form
 // -------------------------------------------------------------------------
 
-const PropertyFilter =
-  (props: { model: PropertyModel }) => (
+type BoolFields = { [key: string]: boolean };
+
+interface SectionProps {
+  label: string;
+  path: string;
+  children: React.ReactNode;
+}
+
+function Section(props: SectionProps) {
+  const settings = `propfilter-${props.path}`;
+  return (
+    <Folder label={props.label} settings={settings}>
+      {props.children}
+    </Folder>
+  );
+}
+
+interface CheckFieldProps<A, K extends keyof A> {
+  filter: A;
+  onChange: () => void;
+  label: string;
+  path: K;
+}
+
+function CheckField<A extends BoolFields, K extends keyof A>(
+  props: CheckFieldProps<A, K>,
+) {
+  const forceUpdate = Dome.useForceUpdate();
+  const { label, filter, path, onChange } = props;
+  const update = (v: boolean) => {
+    (filter as any)[path] = v;
+    forceUpdate();
+    onChange();
+  };
+  return (
+    <Checkbox
+      style={{ display: 'block' }}
+      label={label}
+      value={filter[path]}
+      onChange={update}
+    />
+  );
+}
+
+/* eslint-disable max-len */
+
+function PropertyFilter(props: { model: PropertyModel }) {
+  const onChange = props.model.reload;
+  const filter = props.model.getFilterProps();
+  const setCurrentFunction = React.useCallback(
+    (v: boolean) => {
+      filter.currentFunction = v;
+      onChange();
+    }, [filter, onChange],
+  );
+  const status = { filter: filter.status, onChange };
+  const kind = { filter: filter.kind, onChange };
+  const alarms = { filter: filter.alarms, onChange };
+  return (
     <Vfill>
-      <Form
-        value={props.model.getFilterProps()}
-        onChange={props.model.reload}
-      >
-        <FieldCheckbox label="Current function" path="currentFunction" />
-        <Section label="Status" unfold path="status">
-          <FieldCheckbox label="Valid" path="valid" />
-          <FieldCheckbox label="Valid under hyp." path="valid_hyp" />
-          <FieldCheckbox label="Unknown" path="unknown" />
-          <FieldCheckbox label="Invalid" path="invalid" />
-          <FieldCheckbox label="Invalid under hyp." path="invalid_hyp" />
-          <FieldCheckbox label="Considered valid" path="considered_valid" />
-          <FieldCheckbox label="Untried" path="untried" />
-          <FieldCheckbox label="Dead" path="dead" />
-          <FieldCheckbox label="Inconsistent" path="inconsistent" />
-        </Section>
-        <Section label="Property kind" path="kind">
-          <FieldCheckbox label="Assertions" path="assert" />
-          <FieldCheckbox label="Invariants" path="invariant" />
-          <FieldCheckbox label="Variants" path="variant" />
-          <FieldCheckbox label="Preconditions" path="requires" />
-          <FieldCheckbox label="Postconditions" path="ensures" />
-          <FieldCheckbox label="Instance" path="instance" />
-          <FieldCheckbox label="Assigns clauses" path="assigns" />
-          <FieldCheckbox label="From clauses" path="from" />
-          <FieldCheckbox label="Allocates" path="allocates" />
-          <FieldCheckbox label="Behaviors" path="behavior" />
-          <FieldCheckbox label="Reachables" path="reachable" />
-          <FieldCheckbox label="Axiomatics" path="axiomatic" />
-          <FieldCheckbox label="Pragma" path="pragma" />
-          <FieldCheckbox label="Others" path="others" />
-        </Section>
-        <Section label="Alarms" path="alarms">
-          <FieldCheckbox label="Alarms" path="alarms" />
-          <FieldCheckbox label="Others" path="others" />
-        </Section>
-        <Section label="Alarms kind" path="alarms">
-          <FieldCheckbox label="Overflows" path="overflow" />
-          <FieldCheckbox label="Divisions by zero" path="division_by_zero" />
-          <FieldCheckbox label="Shifts" path="shift" />
-          <FieldCheckbox label="Special floats" path="special_float" />
-          <FieldCheckbox label="Float to int" path="float_to_int" />
-          <FieldCheckbox label="_Bool values" path="bool_value" />
-          <FieldCheckbox label="Memory accesses" path="mem_access" />
-          <FieldCheckbox label="Index bounds" path="index_bound" />
-          <FieldCheckbox label="Initializations" path="initialization" />
-          <FieldCheckbox label="Dangling pointers" path="dangling_pointer" />
-          <FieldCheckbox label="Pointer values" path="pointer_value" />
-          <FieldCheckbox label="Function pointers" path="function_pointer" />
-          <FieldCheckbox label="Pointer comparisons" path="ptr_comparison" />
-          <FieldCheckbox label="Differing blocks" path="differing_blocks" />
-          <FieldCheckbox label="Separations" path="separation" />
-          <FieldCheckbox label="Overlaps" path="overlap" />
-          <FieldCheckbox
-            label="Initialization of unions"
-            path="union_initialization"
-          />
-        </Section>
-      </Form>
+      <Checkbox
+        label="Current function"
+        value={filter.currentFunction}
+        onChange={setCurrentFunction}
+      />
+      <Section label="Status" path="status">
+        <CheckField {...status} label="Valid" path="valid" />
+        <CheckField {...status} label="Valid under hyp." path="valid_hyp" />
+        <CheckField {...status} label="Unknown" path="unknown" />
+        <CheckField {...status} label="Invalid" path="invalid" />
+        <CheckField {...status} label="Invalid under hyp." path="invalid_hyp" />
+        <CheckField {...status} label="Considered valid" path="considered_valid" />
+        <CheckField {...status} label="Untried" path="untried" />
+        <CheckField {...status} label="Inconsistent" path="inconsistent" />
+      </Section>
+      <Section label="Property kind" path="kind">
+        <CheckField {...kind} label="Assertions" path="assert" />
+        <CheckField {...kind} label="Invariants" path="invariant" />
+        <CheckField {...kind} label="Variants" path="variant" />
+        <CheckField {...kind} label="Preconditions" path="requires" />
+        <CheckField {...kind} label="Postconditions" path="ensures" />
+        <CheckField {...kind} label="Instance" path="instance" />
+        <CheckField {...kind} label="Assigns clauses" path="assigns" />
+        <CheckField {...kind} label="From clauses" path="from" />
+        <CheckField {...kind} label="Allocates" path="allocates" />
+        <CheckField {...kind} label="Behaviors" path="behavior" />
+        <CheckField {...kind} label="Reachables" path="reachable" />
+        <CheckField {...kind} label="Axiomatics" path="axiomatic" />
+        <CheckField {...kind} label="Pragma" path="pragma" />
+        <CheckField {...kind} label="Others" path="others" />
+      </Section>
+      <Section label="Alarms" path="alarms">
+        <CheckField {...alarms} label="Alarms" path="alarms" />
+        <CheckField {...alarms} label="Others" path="others" />
+      </Section>
+      <Section label="Alarms kind" path="alarms">
+        <CheckField {...alarms} label="Overflows" path="overflow" />
+        <CheckField {...alarms} label="Divisions by zero" path="division_by_zero" />
+        <CheckField {...alarms} label="Shifts" path="shift" />
+        <CheckField {...alarms} label="Special floats" path="special_float" />
+        <CheckField {...alarms} label="Float to int" path="float_to_int" />
+        <CheckField {...alarms} label="_Bool values" path="bool_value" />
+        <CheckField {...alarms} label="Memory accesses" path="mem_access" />
+        <CheckField {...alarms} label="Index bounds" path="index_bound" />
+        <CheckField {...alarms} label="Initializations" path="initialization" />
+        <CheckField {...alarms} label="Dangling pointers" path="dangling_pointer" />
+        <CheckField {...alarms} label="Pointer values" path="pointer_value" />
+        <CheckField {...alarms} label="Function pointers" path="function_pointer" />
+        <CheckField {...alarms} label="Pointer comparisons" path="ptr_comparison" />
+        <CheckField {...alarms} label="Differing blocks" path="differing_blocks" />
+        <CheckField {...alarms} label="Separations" path="separation" />
+        <CheckField {...alarms} label="Overlaps" path="overlap" />
+        <CheckField {...alarms} label="Initialization of unions" path="union_initialization" />
+      </Section>
     </Vfill>
   );
+}
+
+/* eslint-enable max-len */
 
 // -------------------------------------------------------------------------
 // --- Property Columns

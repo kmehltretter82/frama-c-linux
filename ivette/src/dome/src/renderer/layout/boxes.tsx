@@ -182,7 +182,7 @@ export const Folder = (props: FolderProps) => {
   } = props;
   const [unfold, flip] = Dome.useFlipSettings(settings, defaultUnfold);
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
-  const display = unfold ? 'none' : 'block';
+  const display = unfold ? 'block' : 'none';
   return (
     <Vpack>
       <Hpack onClick={flip}>
