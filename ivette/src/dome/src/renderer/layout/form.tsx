@@ -3,6 +3,15 @@
 /* --------------------------------------------------------------------------*/
 
 /**
+   Form Fields are made of states and fields, arranged into a form page.
+
+   Field states are typically build with [[useState]] and [[useProperty]]
+   hooks, also you can also build them manually. All the provided hooks
+   can be used and composed with each other to build full feature states.
+
+   Form fields shall be arranged into sections and form pages to obtain a
+   wellformed layout.
+
    @packageDocumentation
    @module dome/layout/form
  */
@@ -79,6 +88,7 @@ function isValidArray(err: Error[]): boolean {
 /* --- State Hooks                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
+/** Create a local field state, like `React.useState()` does. */
 export function useState<A>(
   defaultValue: A,
   checker?: Checker<A>,
@@ -95,6 +105,7 @@ export function useState<A>(
   return [value, error, setState];
 }
 
+/** Provides a new state with a default value. */
 export function useDefault<A>(
   state: FieldState<A | undefined>,
   defaultValue: A,
@@ -103,23 +114,50 @@ export function useDefault<A>(
   return [value ?? defaultValue, error, setState];
 }
 
+/**
+   Coerces a state with defined value
+   into some with possibly undefined one.
+ */
+export function useDefined<A>(
+  state: FieldState<A>,
+): FieldState<A | undefined> {
+  const [value, error, setState] = state;
+  const update = React.useCallback(
+    (newValue: A | undefined, newError: Error) => {
+      if (newValue !== undefined) {
+        setState(newValue, newError);
+      }
+    }, [setState],
+  );
+  return [value, error, update];
+}
+
+/**
+   Undefined value leads to an error.
+   @param onError - error message in case of undefined or invalid updates.
+ */
 export function useRequired<A>(
   state: FieldState<A>,
+  onError?: string,
 ): FieldState<A | undefined> {
   const [value, error, setState] = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
     (newValue: A | undefined, newError: Error) => {
       if (newValue === undefined) {
-        setState(cache.current, newError || 'Required field');
+        setState(cache.current, onError || 'Required field');
       } else {
         setState(newValue, newError);
       }
-    }, [cache, setState],
+    }, [cache, onError, setState],
   );
   return [value, error, update];
 }
 
+/**
+   Enrich the state with a local checker.
+   The local error, if any, has precedence over any error from updates.
+ */
 export function useChecker<A>(
   state: FieldState<A>,
   checker?: Checker<A>,
@@ -131,6 +169,23 @@ export function useChecker<A>(
   }, [checker, setState]);
   return [value, error, update];
 }
+
+/**
+   Transform a state `A` into a state `B` through converting functions.
+
+   Input and output functions shall be the inverse with each others.
+
+   In case an exception is raised during input conversion, state `B`
+   retains its previous value (or default value) but forwards
+   the translation error.
+
+   In case an exception is raised during output conversion, a local state
+   is maintained with the invalid `B` value until it is transformed into
+   a valid one.
+
+   @param input - converting function from `A` to `B`
+   @param output - converting function from `B` to `A`
+ */
 
 export function useFilter<A, B>(
   state: FieldState<A>,
@@ -173,6 +228,48 @@ export function useFilter<A, B>(
 
 }
 
+/**
+   Introduces a latency between local changes and propagated ones.
+   A transient local state is maintained during debounced updates, until
+   the last update is finally flushed.
+ */
+export function useLatency<A>(
+  state: FieldState<A>,
+  latency?: number,
+): FieldState<A> {
+  const [value, error, setState] = state;
+  const period = latency ?? 0;
+  const [localValue, setLocalValue] = React.useState(value);
+  const [localError, setLocalError] = React.useState(error);
+  const [dangling, setDangling] = React.useState(false);
+  const update = React.useMemo(() => {
+    if (period > 0) {
+      const propagate = debounce(
+        (lateValue: A, lateError: Error) => {
+          setState(lateValue, lateError);
+          setDangling(false);
+        }, period,
+      );
+      return (newValue: A, newError: Error) => {
+        setLocalValue(newValue);
+        setLocalError(newError);
+        setDangling(true);
+        propagate(newValue, newError);
+      };
+    }
+    setDangling(false);
+    return setState;
+  }, [period, setDangling, setState, setLocalValue, setLocalError]);
+  return [
+    dangling ? localValue : value,
+    dangling ? localError : error,
+    update,
+  ];
+}
+
+/**
+   Returns the state associated to a property of the input state.
+ */
 export function useProperty<A, K extends keyof A>(
   state: FieldState<A>,
   property: K,
@@ -189,26 +286,9 @@ export function useProperty<A, K extends keyof A>(
   return [value[property], error, update];
 }
 
-export function useLatency<A>(
-  state: FieldState<A>,
-  latency?: number,
-): FieldState<A> {
-  const [initValue, initError, setState] = state;
-  const period = latency ?? 0;
-  const [value, setValue] = React.useState(initValue);
-  const [error, setError] = React.useState(initError);
-  const propagate = React.useMemo(
-    () => (period > 0 ? debounce(setState, period) : setState),
-    [period, setState],
-  );
-  const update = React.useCallback((newValue, newError) => {
-    setValue(newValue);
-    setError(newError);
-    propagate(newValue, newError);
-  }, [setValue, setError, propagate]);
-  return [value, error, update];
-}
-
+/**
+   Returns the state associated to an index element of the input state.
+ */
 export function useIndex<A>(
   state: FieldState<A[]>,
   index: number,
@@ -228,7 +308,7 @@ export function useIndex<A>(
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- Basics                                                             ---*/
+/* --- Form Filter Context                                                ---*/
 /* --------------------------------------------------------------------------*/
 
 export interface FilterProps {
@@ -243,10 +323,6 @@ export interface FilterProps {
 }
 
 export interface Children { children: React.ReactNode }
-
-/* --------------------------------------------------------------------------*/
-/* --- Form Context                                                       ---*/
-/* --------------------------------------------------------------------------*/
 
 interface FormContext {
   disabled: boolean;
@@ -269,7 +345,10 @@ function useContext(props?: FilterProps): FormContext {
   };
 }
 
-/** @category Form Containers */
+/**
+   Allow to locally disable or hide all its children fields.
+   @category Form Containers
+*/
 export function FormFilter(props: FilterProps & Children) {
   const context = useContext(props);
   if (context.hidden) return null;
@@ -1007,6 +1086,36 @@ export function TimeField(props: TimeOrDateFieldProps) {
 }
 
 /* --------------------------------------------------------------------------*/
+/* --- Color Field                                                        ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields */
+export type ColorFieldProps = FieldProps<string | undefined>;
+
+/** @category Form Fields */
+export function ColorField(props: ColorFieldProps) {
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const [value, error, onChange] = useTextInputField(props, 600);
+  return (
+    <Field
+      {...props}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="color"
+        value={value || '#ffffff'}
+        className="dome-xForm-color-field"
+        disabled={disabled}
+        onChange={onChange}
+      />
+    </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
 /* --- Check Box Field                                                    ---*/
 /* --------------------------------------------------------------------------*/
 
@@ -1091,8 +1200,9 @@ export interface SelectFieldProps extends FieldProps<string | undefined> {
    Children must be standard `<option>` or `<optgroup>` elements.
 
    @category Form Fields
-*/
+ */
 export function SelectField(props: SelectFieldProps) {
+  const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, setState] = useChecker(props.state, props.checker);
   const onChange = (newValue?: string) => setState(newValue, undefined);
@@ -1106,6 +1216,7 @@ export function SelectField(props: SelectFieldProps) {
       <SelectMenu
         id={id}
         value={value}
+        disabled={disabled}
         placeholder={placeholder}
         onChange={onChange}
       >
