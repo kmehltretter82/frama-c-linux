@@ -461,13 +461,17 @@ module Select (Eval: Eval) = struct
       | PVDecl (Some kf, Kstmt stmt, vi) ->
         let lv = (Var vi, NoOffset) in
         select_lv main_ui (GL_Stmt (kf, stmt)) lv
-      | PIP (IPCodeAnnot {ica_kf = kf; ica_stmt = stmt;
-                          ica_ca = {annot_content =
-                                      AAssert (_, _, p)
-                                    | AInvariant (_, true, p)} as ca
-                         } as ip) ->
+      | PIP (
+          IPCodeAnnot {
+            ica_kf = kf; ica_stmt = stmt;
+            ica_ca = {
+              annot_content =
+                AAssert (_, p) | AInvariant (_, true, p)
+            } as ca
+          } as ip) ->
         begin
           let loc = GL_Stmt (kf, stmt) in
+          let p = p.tp_statement in
           let alarm_or_property =
             match Alarms.find ca with
             | None -> Red_statuses.Prop ip

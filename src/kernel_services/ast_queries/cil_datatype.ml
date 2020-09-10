@@ -2235,8 +2235,8 @@ module Code_annotation = struct
       end)
 
   let loc ca = match ca.annot_content with
-    | AAssert(_,_,{pred_loc=loc})
-    | AInvariant(_,_,{pred_loc=loc})
+    | AAssert(_,{ tp_statement = {pred_loc=loc}})
+    | AInvariant(_,_,{tp_statement = {pred_loc=loc}})
     | AVariant({term_loc=loc},_) -> Some loc
     | AAssigns _ | AAllocation _ | APragma _ | AExtended _
     | AStmtSpec _ -> None
@@ -2259,6 +2259,20 @@ module Predicate = struct
       end)
 end
 
+module Toplevel_predicate = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Make
+      (struct
+        type t = toplevel_predicate
+        let name = "Toplevel_predicate"
+        let reprs =
+          [ { tp_statement = List.hd Predicate.reprs; tp_only_check = false }]
+        let internal_pretty_code = Datatype.undefined
+        let pretty fmt x = !pretty_ref fmt x
+        let varname _ = "p"
+      end)
+end
+
 module Identified_predicate = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   include Make_with_collections
@@ -2266,7 +2280,7 @@ module Identified_predicate = struct
         type t = identified_predicate
         let name = "Identified_predicate"
         let reprs =
-          [ { ip_content = List.hd Predicate.reprs; ip_id = -1} ]
+          [ { ip_content = List.hd Toplevel_predicate.reprs; ip_id = -1} ]
         let compare x y = Extlib.compare_basic x.ip_id y.ip_id
         let equal x y = x.ip_id = y.ip_id
         let copy = Datatype.undefined

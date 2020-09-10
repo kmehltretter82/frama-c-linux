@@ -204,7 +204,7 @@ let variant_predicate stmt v =
   Logic_const.pand ~loc (pred1, pred2)
 
 let supported_annotation annot = match annot.annot_content with
-  | AAssert ([], _, _)
+  | AAssert ([], _)
   | AInvariant ([], _, _)
   | AVariant (_, None) -> true
   | _ -> false (* TODO *)
@@ -214,9 +214,9 @@ let code_annot = Annotations.code_annot ~filter:supported_annotation
 let make_annotation kf stmt annot labels =
   let kind, pred =
     match annot.annot_content with
-    | AAssert ([], Cil_types.Assert, pred) -> Assert, pred
-    | AAssert ([], Cil_types.Check, pred) -> Check, pred
-    | AInvariant ([], _, pred) -> Invariant, pred
+    | AAssert ([], {tp_only_check = false; tp_statement = pred}) -> Assert, pred
+    | AAssert ([], {tp_only_check = true; tp_statement = pred}) -> Check, pred
+    | AInvariant ([], _, pred) -> Invariant, pred.tp_statement
     | AVariant (v, None) -> Assert, variant_predicate stmt v
     | _ -> assert false
   in
@@ -552,7 +552,10 @@ let build_automaton ~annotations kf =
   let bind_labels (v1, edge, v2) =
     match edge.edge_transition with
     | Prop (annot, stmt) ->
-      let l = Cil.extract_labels_from_pred annot.predicate.ip_content in
+      let l =
+        Cil.extract_labels_from_pred
+          (Logic_const.pred_of_id_pred annot.predicate)
+      in
       let bind label map =
         try
           let vertex = match label with

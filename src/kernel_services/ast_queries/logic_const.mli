@@ -46,8 +46,19 @@ val refresh_code_annotation: code_annotation -> code_annotation
 *)
 val refresh_spec: funspec -> funspec
 
-(** creates a new identified predicate with a fresh id. *)
-val new_predicate: predicate -> identified_predicate
+(** creates a new toplevel predicate.
+    [only_check] is true if the corresponding predicate should only be used
+    to check a property, without adding it as hypothesis for the rest of the
+    verification. See {!Cil_types.toplevel_predicate} for more information.
+    Default is [false], i.e. use standard ACSL semantics.
+    @since Frama-C+dev
+*)
+val toplevel_predicate: ?only_check:bool -> predicate -> toplevel_predicate
+
+(** creates a new identified predicate with a fresh id.
+    @modify Frama-C+dev add [only_check] optional parameter
+ *)
+val new_predicate: ?only_check:bool -> predicate -> identified_predicate
 
 (** creates a new acsl_extension with a fresh id.
     @plugin development guide

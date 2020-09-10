@@ -911,7 +911,7 @@ class visitor (ctx:context) c =
       id, t
 
     method on_dlemma l =
-      let kind = Why3.Decl.(if l.l_assumed then Paxiom else Plemma) in
+      let kind = Why3.Decl.(if l.l_kind = `Axiom then Paxiom else Plemma) in
       let cnv = empty_cnv ctx in
       let id, t = self#make_lemma cnv l in
       let decl = Why3.Decl.create_prop_decl kind id t in

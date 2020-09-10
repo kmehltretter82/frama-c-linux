@@ -722,7 +722,8 @@ let set_doomed emitter pid =
             let pred_loc = Stmt.loc stmt in
             let pred_name = [ "Wp" ; "SmokeTest" ] in
             let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-            let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
+            let pf = Logic_const.toplevel_predicate pf in
+            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
             Annotations.add_code_annot emitter ~kf stmt ca ; ca
       in
       List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)

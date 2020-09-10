@@ -135,6 +135,7 @@ val pp_quantifiers : Format.formatter -> Cil_types.quantifiers -> unit
 val pp_relation : Format.formatter -> Cil_types.relation -> unit
 val pp_predicate_node : Format.formatter -> Cil_types.predicate_node -> unit
 val pp_identified_predicate : Format.formatter -> Cil_types.identified_predicate -> unit
+val pp_toplevel_predicate: Format.formatter -> Cil_types.toplevel_predicate -> unit
 val pp_predicate : Cil_types.predicate Pretty_utils.formatter
 val pp_spec : Format.formatter -> Cil_types.spec -> unit
 val pp_acsl_extension : Format.formatter -> Cil_types.acsl_extension -> unit

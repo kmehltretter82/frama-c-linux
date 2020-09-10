@@ -1,3 +1,9 @@
+# Running qualif tests
+
+- Be sure that you have installed the appropriate versions of
+  alt-ergo and coq _before_ having compiled Frama-C.
+- use `make wp-qualif` in the toplevel Frama-C directory
+
 # How to add a new test
 
 ```

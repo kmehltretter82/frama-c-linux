@@ -76,7 +76,7 @@ module LIT = WpContext.Generator(STR)
         define_lemma {
           l_name = prefix ^ "_literal" ;
           l_cluster = cluster () ;
-          l_assumed = true ;
+          l_kind = `Axiom ;
           l_types = 0 ;
           l_forall = [] ;
           l_triggers = [] ;

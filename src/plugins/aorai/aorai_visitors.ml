@@ -460,6 +460,7 @@ let get_unchanged_aux_var loc current_state =
 class visit_adding_pre_post_from_buch treatloops =
 
   let predicate_to_invariant kf stmt pred =
+    let pred = Logic_const.toplevel_predicate pred in
     Annotations.add_code_annot
       Aorai_option.emitter
       ~kf

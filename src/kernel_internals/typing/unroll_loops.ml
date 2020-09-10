@@ -684,7 +684,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
         | Some emitter ->
           let annot =
             Logic_const.new_code_annotation
-              (AInvariant ([],true,Logic_const.pfalse))
+              (AInvariant ([],true,Logic_const.(toplevel_predicate pfalse)))
           in
           Annotations.add_code_annot
 	    emitter ~kf:(Extlib.the self#current_kf) sloop annot;

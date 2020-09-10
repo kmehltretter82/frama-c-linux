@@ -19,7 +19,7 @@ int f(void);
 /*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
 /*@
-lemma I_deterministic_trans{L}:
+check lemma I_deterministic_trans{L}:
   (∀ int __retres_f;
      ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
         \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧

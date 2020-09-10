@@ -373,7 +373,7 @@ end) = struct
     Annotations.iter_code_annot
       (fun _ ca ->
          match ca.annot_content with
-         | AAssert (_, _, p)
+         | AAssert (_, p)
          | AInvariant (_, true, p) ->
            begin
              let env =
@@ -382,7 +382,7 @@ end) = struct
                  ~here:(X.stmt_state stmt)
                  ()
              in
-             match Eva.Eval_terms.predicate_deps env p with
+             match Eva.Eval_terms.predicate_deps env p.tp_statement with
              | None ->
                (* To be sound, we should perform a join with the top zone here.
                   We do nothing instead because the latter behavior would
