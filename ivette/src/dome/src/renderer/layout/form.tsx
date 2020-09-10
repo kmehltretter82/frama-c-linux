@@ -12,7 +12,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
-import { Checkbox } from 'dome/controls/buttons';
+import { Checkbox, Radio } from 'dome/controls/buttons';
 
 export type Error =
   | undefined | boolean | string
@@ -1037,6 +1037,41 @@ export function CheckboxField(props: CheckboxFieldProps) {
       disabled={disabled}
       value={inverted ? !value : value}
       onChange={onChange}
+    />
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Radio Box Field                                                    ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields */
+export interface RadioFieldProps<A> extends FieldProps<A> {
+  value: A;
+}
+
+export function RadioField<A>(props: RadioFieldProps<A>) {
+  const { hidden, disabled } = useContext(props);
+
+  if (hidden) return null;
+
+  const [selection, , setState] = props.state;
+  const onSelection = (value: A) => setState(value, undefined);
+  const { label, title, value } = props;
+  const css = Utils.classes(
+    'dome-xForm-field dome-text-label',
+    disabled && 'dome-disabled',
+  );
+
+  return (
+    <Radio
+      className={css}
+      label={label}
+      title={title}
+      value={value}
+      disabled={disabled}
+      selection={selection}
+      onSelection={onSelection}
     />
   );
 }
