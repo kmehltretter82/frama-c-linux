@@ -506,20 +506,20 @@ export interface FieldProps<A> extends FilterProps {
   onError?: string;
 }
 
-type InputEvent<A> = { target: { value: A } };
-type InputState<A> = [string, Error, (evt: InputEvent<A>) => void];
+type InputEvent = { target: { value: string } };
+type InputState = [string, Error, (evt: InputEvent) => void];
 
-function useChangeEvent<A>(setState: Callback<A>) {
+function useChangeEvent(setState: Callback<string>) {
   return React.useCallback(
-    (evt: InputEvent<A>) => { setState(evt.target.value, undefined); },
+    (evt: InputEvent) => { setState(evt.target.value, undefined); },
     [setState],
   );
 }
 
 function useTextInputField(
-  props: FieldTextProps,
+  props: TextFieldProps,
   defaultLatency: number,
-): InputState<string> {
+): InputState {
   const checked = useChecker(props.state, props.checker);
   const period = props.latency ?? defaultLatency;
   const [value, error, setState] = useLatency(checked, period);
@@ -531,8 +531,8 @@ function useTextInputField(
 /* --- Text Fields                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
-/** @category Form Fields */
-export interface FieldTextProps extends FieldProps<string | undefined> {
+/** @category Text Fields */
+export interface TextFieldProps extends FieldProps<string | undefined> {
   placeholder?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -541,9 +541,9 @@ export interface FieldTextProps extends FieldProps<string | undefined> {
 
 /**
    Text Field.
-   @category Form Fields
+   @category Text Fields
  */
-export const FieldText = (props: FieldTextProps) => {
+export const TextField = (props: TextFieldProps) => {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-text-field', props.className);
@@ -571,9 +571,9 @@ export const FieldText = (props: FieldTextProps) => {
 
 /**
    Monospaced Text Field.
-   @category Form Fields
+   @category Text Fields
  */
-export const FieldCode = (props: FieldTextProps) => {
+export const FieldCode = (props: TextFieldProps) => {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 600);
@@ -607,8 +607,8 @@ export const FieldCode = (props: FieldTextProps) => {
 /* --- Text Area Fields                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-/** @category Form Fields */
-export interface FieldTextAreaProps extends FieldTextProps {
+/** @category Text Fields */
+export interface TextFieldAreaProps extends TextFieldProps {
   /** Number of columns (default 35, min 5). */
   cols?: number;
   /** Number of rows (default 5, min 2). */
@@ -617,9 +617,9 @@ export interface FieldTextAreaProps extends FieldTextProps {
 
 /**
    Text Field Area.
-   @category Form Fields
+   @category Text Fields
  */
-export const FieldTextArea = (props: FieldTextAreaProps) => {
+export const TextFieldArea = (props: TextFieldAreaProps) => {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -655,9 +655,9 @@ export const FieldTextArea = (props: FieldTextAreaProps) => {
 
 /**
    Monospaced Text Field Area.
-   @category Form Fields
+   @category Text Fields
  */
-export const FieldCodeArea = (props: FieldTextAreaProps) => {
+export const FieldCodeArea = (props: TextFieldAreaProps) => {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -696,7 +696,8 @@ export const FieldCodeArea = (props: FieldTextAreaProps) => {
 /* --- Number Field                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
-export interface FieldNumberProps extends FieldProps<number | undefined> {
+/** @category Number Fields */
+export interface NumberFieldProps extends FieldProps<number | undefined> {
   units?: string;
   placeholder?: string;
   className?: string;
@@ -718,10 +719,10 @@ function NUMBER_OF_TEXT(s: string): number | undefined {
 }
 
 /**
-   Text Field.
-   @category Form Fields
+   Text Field for Numbers.
+   @category Number Fields
  */
-export function FieldNumber(props: FieldNumberProps) {
+export function NumberField(props: NumberFieldProps) {
   const { units, latency = 600 } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
@@ -736,7 +737,6 @@ export function FieldNumber(props: FieldNumberProps) {
   return (
     <Field
       {...props}
-      offset={4}
       htmlFor={id}
       error={error}
     >
@@ -759,7 +759,8 @@ export function FieldNumber(props: FieldNumberProps) {
 /* --- Spinner Field                                                      ---*/
 /* --------------------------------------------------------------------------*/
 
-export interface FieldSpinnerProps extends FieldNumberProps {
+/** @category Number Fields */
+export interface SpinnerFieldProps extends NumberFieldProps {
   units?: string;
   /** Minimum value (included). */
   min: number;
@@ -769,11 +770,15 @@ export interface FieldSpinnerProps extends FieldNumberProps {
   step?: number;
 }
 
-export function FieldSpinner(props: FieldSpinnerProps) {
+/**
+   Spinner Field
+   @category Number Fields
+ */
+export function SpinnerField(props: SpinnerFieldProps) {
   const { units, min, max, step = 1, latency = 600, checker } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
-  const css = Utils.classes('dome-xForm-number-field', props.className);
+  const css = Utils.classes('dome-xForm-spinner-field', props.className);
   const fullChecker = React.useCallback((v: number | undefined) => {
     if (v !== undefined && min <= v && v <= max) {
       return checker ? checker(v) : true;
@@ -791,7 +796,6 @@ export function FieldSpinner(props: FieldSpinnerProps) {
   return (
     <Field
       {...props}
-      offset={4}
       htmlFor={id}
       error={error}
     >
@@ -809,6 +813,110 @@ export function FieldSpinner(props: FieldSpinnerProps) {
         onChange={onChange}
       />
       {UNITS}
+    </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Slider Field                                                       ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Number Fields */
+export interface SliderFieldProps extends FieldProps<number> {
+  /** Minimal value (included). */
+  min: number;
+  /** Maximal value (included). */
+  max: number;
+  /** Default is 1. */
+  step?: number;
+  /** Reset value on double-click (if defined). */
+  onReset?: number;
+  /**
+     Show a label displaying the value (default is true).
+     In case a function is provided, it is used to reformat the value.
+   */
+  labelValue?: boolean | ((value: number) => string);
+  className?: string;
+  style?: React.CSSProperties;
+  latency?: number;
+}
+
+const FORMATVALUE = (
+  labelValue: boolean | ((v: number) => string),
+  v: number,
+): string | undefined => {
+  if (labelValue === false) return undefined;
+  if (labelValue === true) return v > 0 ? `+${v}` : `-${-v}`;
+  return labelValue(v);
+};
+
+const CSS_SLIDER = 'dome-text-label dome-xForm-units dome-xForm-slider-value';
+const SHOW_SLIDER = `${CSS_SLIDER} dome-xForm-slider-show`;
+const HIDE_SLIDER = `${CSS_SLIDER} dome-xForm-slider-hide`;
+
+/**
+   Slider Field
+   @category Number Fields
+ */
+export function SliderField(props: SliderFieldProps) {
+  const {
+    min, max, step = 1, latency = 600,
+    labelValue = true, onReset,
+  } = props;
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const css = Utils.classes('dome-xForm-slider-field', props.className);
+  const checked = useChecker(props.state, props.checker);
+  const delayed = useLatency(checked, latency);
+  const [label, setLabel] = React.useState<string | undefined>(undefined);
+  const [value, error, setState] = delayed;
+  const onChange = React.useMemo(
+    () => {
+      const fadeOut = debounce(() => setLabel(undefined), latency);
+      return (evt: InputEvent) => {
+        const v = Number.parseInt(evt.target.value, 10);
+        if (!Number.isNaN(v)) {
+          setState(v, undefined);
+          const vlabel = FORMATVALUE(labelValue, v);
+          setLabel(vlabel);
+          if (vlabel) fadeOut();
+        } else {
+          setLabel(undefined);
+        }
+      };
+    }, [labelValue, latency, setState, setLabel],
+  );
+  const onDoubleClick = React.useCallback(() => {
+    if (onReset) {
+      setState(onReset, undefined);
+      setLabel(undefined);
+    }
+  }, [onReset, setState, setLabel]);
+  const VALUELABEL = labelValue && (
+    <label className={label ? SHOW_SLIDER : HIDE_SLIDER}>
+      {label}
+    </label>
+  );
+  return (
+    <Field
+      {...props}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="range"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        className={css}
+        style={props.style}
+        disabled={disabled}
+        onDoubleClick={onDoubleClick}
+        onChange={onChange}
+      />
+      {VALUELABEL}
     </Field>
   );
 }
