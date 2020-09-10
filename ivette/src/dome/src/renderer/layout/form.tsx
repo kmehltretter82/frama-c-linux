@@ -137,29 +137,39 @@ export function useFilter<A, B>(
   output: (value: B) => A,
   defaultValue: B,
 ): FieldState<B> {
+
   const [value, error, setState] = state;
-  const cacheA = React.useRef<A>(value);
-  const cacheB = React.useRef<B>(defaultValue);
+  const [localValue, setLocalValue] = React.useState(defaultValue);
+  const [localError, setLocalError] = React.useState<Error>(undefined);
+  const [dangling, setDangling] = React.useState(false);
+
   const update = React.useCallback(
     (newValue: B, newError: Error) => {
       try {
         const outValue = output(newValue);
-        setState(outValue, newError);
-      } catch (outErr) {
-        const outError = newError || outErr.toString() || 'Invalid value';
-        setState(cacheA.current, outError);
+        setLocalValue(newValue);
+        setLocalError(newError);
+        if (isValid(newError)) {
+          setDangling(false);
+          setState(outValue, undefined);
+        }
+      } catch (err) {
+        setLocalValue(newValue);
+        setLocalError(newError || err.toString() || 'Invalid value');
+        setDangling(true);
       }
-    }, [cacheA, output, setState],
+    }, [output, setState, setLocalValue, setLocalError],
   );
-  cacheA.current = value;
-  try {
-    const inValue = input(value);
-    cacheB.current = inValue;
-    return [inValue, error, update];
-  } catch (inErr) {
-    const inError = error || inErr.toString() || 'Invalid value';
-    return [cacheB.current, inError, update];
+
+  if (dangling) {
+    return [localValue, localError, update];
   }
+  try {
+    return [input(value), error, update];
+  } catch (err) {
+    return [localValue, err.toString() || 'Invalid input', update];
+  }
+
 }
 
 export function useProperty<A, K extends keyof A>(
@@ -711,7 +721,7 @@ function NUMBER_OF_TEXT(s: string): number | undefined {
    Text Field.
    @category Form Fields
  */
-export const FieldNumber = (props: FieldNumberProps) => {
+export function FieldNumber(props: FieldNumberProps) {
   const { units, latency = 600 } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
@@ -743,6 +753,64 @@ export const FieldNumber = (props: FieldNumberProps) => {
       {UNITS}
     </Field>
   );
-};
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Spinner Field                                                      ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface FieldSpinnerProps extends FieldNumberProps {
+  units?: string;
+  /** Minimum value (included). */
+  min: number;
+  /** Maximum value (included). */
+  max: number;
+  /** Stepper increment (defaults 1). */
+  step?: number;
+}
+
+export function FieldSpinner(props: FieldSpinnerProps) {
+  const { units, min, max, step = 1, latency = 600, checker } = props;
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const css = Utils.classes('dome-xForm-number-field', props.className);
+  const fullChecker = React.useCallback((v: number | undefined) => {
+    if (v !== undefined && min <= v && v <= max) {
+      return checker ? checker(v) : true;
+    }
+    return `Range ${min}…${max}`;
+
+  }, [min, max, checker]);
+  const checked = useChecker(props.state, fullChecker);
+  const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
+  const [value, error, setState] = useLatency(filtered, latency);
+  const onChange = useChangeEvent(setState);
+  const UNITS = units && (
+    <label className="dome-text-label dome-xForm-units">{units}</label>
+  );
+  return (
+    <Field
+      {...props}
+      offset={4}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="number"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        className={css}
+        style={props.style}
+        disabled={disabled}
+        placeholder={props.placeholder}
+        onChange={onChange}
+      />
+      {UNITS}
+    </Field>
+  );
+}
 
 // --------------------------------------------------------------------------
