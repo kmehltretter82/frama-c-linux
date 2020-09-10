@@ -543,7 +543,7 @@ export interface TextFieldProps extends FieldProps<string | undefined> {
    Text Field.
    @category Text Fields
  */
-export const TextField = (props: TextFieldProps) => {
+export function TextField(props: TextFieldProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-text-field', props.className);
@@ -567,13 +567,13 @@ export const TextField = (props: TextFieldProps) => {
       />
     </Field>
   );
-};
+}
 
 /**
    Monospaced Text Field.
    @category Text Fields
  */
-export const FieldCode = (props: TextFieldProps) => {
+export function FieldCode(props: TextFieldProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 600);
@@ -601,7 +601,7 @@ export const FieldCode = (props: TextFieldProps) => {
       />
     </Field>
   );
-};
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- Text Area Fields                                                   ---*/
@@ -619,7 +619,7 @@ export interface TextFieldAreaProps extends TextFieldProps {
    Text Field Area.
    @category Text Fields
  */
-export const TextFieldArea = (props: TextFieldAreaProps) => {
+export function TextFieldArea(props: TextFieldAreaProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -651,13 +651,13 @@ export const TextFieldArea = (props: TextFieldAreaProps) => {
       />
     </Field>
   );
-};
+}
 
 /**
    Monospaced Text Field Area.
    @category Text Fields
  */
-export const FieldCodeArea = (props: TextFieldAreaProps) => {
+export function FieldCodeArea(props: TextFieldAreaProps) {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -690,7 +690,7 @@ export const FieldCodeArea = (props: TextFieldAreaProps) => {
       />
     </Field>
   );
-};
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- Number Field                                                       ---*/
@@ -917,6 +917,90 @@ export function SliderField(props: SliderFieldProps) {
         onChange={onChange}
       />
       {VALUELABEL}
+    </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Date Field                                                         ---*/
+/* --------------------------------------------------------------------------*/
+
+/** @category Time and Date Fields */
+export interface TimeOrDateFieldProps extends FieldProps<string | undefined> {
+  min?: string;
+  max?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  latency?: number;
+}
+
+/**
+   Field with a Date Input element.
+
+   The date is presented in english locale, with format `mm/dd/yyyy`,
+   but the state value is a string compatible with
+   javascript `Date('yyyy-dd-mm')` format.
+
+   @category Time and Date Fields
+ */
+export function DateField(props: TimeOrDateFieldProps) {
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const css = Utils.classes('dome-xForm-date-field', props.className);
+  const [value, error, onChange] = useTextInputField(props, 600);
+  return (
+    <Field
+      {...props}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="date"
+        value={value}
+        min={props.min}
+        max={props.max}
+        className={css}
+        style={props.style}
+        disabled={disabled}
+        onChange={onChange}
+      />
+    </Field>
+  );
+}
+
+/**
+   Field with a Time Input element.
+
+   The time is presented in english locale, but its internal
+   value is a string 'hh:mm' on 24h per day basis. This internal
+   format can be used to form a valid javascript
+   `Date('yyyy-mm-ddThh:mm')` object.
+
+   @category Time and Date Fields
+ */
+export function TimeField(props: TimeOrDateFieldProps) {
+  const { disabled } = useContext(props);
+  const id = useHtmlFor();
+  const css = Utils.classes('dome-xForm-date-field', props.className);
+  const [value, error, onChange] = useTextInputField(props, 600);
+  return (
+    <Field
+      {...props}
+      htmlFor={id}
+      error={error}
+    >
+      <input
+        id={id}
+        type="time"
+        value={value}
+        min={props.min}
+        max={props.max}
+        className={css}
+        style={props.style}
+        disabled={disabled}
+        onChange={onChange}
+      />
     </Field>
   );
 }
