@@ -323,7 +323,7 @@ struct
     let low = M.is_init_range sigma obj loc e_one in
     let lemma = p_equiv high low in
     {
-      l_assumed = true ;
+      l_kind = `Axiom ;
       l_name = name ^ "_low" ; l_types = 0 ;
       l_forall = F.p_vars lemma ;
       l_triggers = [] ;

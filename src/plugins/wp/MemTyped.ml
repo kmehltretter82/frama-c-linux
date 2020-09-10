@@ -546,7 +546,7 @@ module BASE = WpContext.Generator(Varinfo)
             let m_init = p_call p_cinits [m] in
             let init_prop = p_forall [a] (p_imply m_init init_access) in
             Definitions.define_lemma {
-              l_assumed = true ;
+              l_kind = `Axiom ;
               l_name = prefix ^ "_init" ; l_types = 0 ;
               l_triggers = [] ; l_forall = [] ;
               l_lemma = init_prop ;
