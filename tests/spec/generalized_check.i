@@ -1,5 +1,5 @@
 /* run.config
-OPT: -wp -wp-prover qed -wp-msg-key no-cache-info,no-time-info
+OPT: -wp -wp-prover qed -wp-msg-key shell
 OPT: -eva -eva-use-spec f
 OPT: -print
 */
