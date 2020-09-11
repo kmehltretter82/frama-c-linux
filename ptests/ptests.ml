@@ -1006,7 +1006,7 @@ let get_macros cmd =
 
 let basic_command_string =
   let contains_toplevel_or_frama_c =
-    Str.regexp "[^( ]*\\(\\(toplevel\\)\\|\\(viewer\\)\\|\\(frama-c\\)\\).*"
+    Str.regexp "[^( ]*\\(\\(toplevel\\)\\|\\(viewer\\)\\|\\(frama-c-gui\\)\\|\\(frama-c[^-]\\)\\).*"
   in
   fun command ->
     let macros = get_macros command in
