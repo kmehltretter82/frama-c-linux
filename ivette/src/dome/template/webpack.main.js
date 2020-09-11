@@ -31,7 +31,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'dome$':         path.resolve( DOME , 'src/main/dome.js' ),
+      'dome$':         path.resolve( DOME , 'src/main/dome.ts' ),
       'dome/system$':  path.resolve( DOME , 'src/misc/system.js' ),
       'dome/devtools': domeDevtools()
     }

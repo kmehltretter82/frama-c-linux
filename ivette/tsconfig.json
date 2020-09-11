@@ -45,8 +45,9 @@
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
       "api/*": [ "api/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
-      "dome": [ "src/dome/src/renderer/dome.js" ],
+      "dome": [ "src/dome/src/renderer/dome.tsx" ],
       "dome/system": [ "src/dome/src/misc/system.js" ],
+      "dome/devtools": [ "src/dome/src/misc/devtools.js" ],
       "dome/misc/*": [ "src/dome/src/misc/*"],
       "dome/*": [ "src/dome/src/renderer/*" ],
       "codemirror/lib/codemirror": ["node_modules/@types/codemirror/index.d.ts"],
