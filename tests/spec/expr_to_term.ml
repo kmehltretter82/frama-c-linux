@@ -11,7 +11,7 @@ let check_expr_term check fct s post =
   in
   let term =
     match post with
-      | (_, { ip_content = { pred_content = Papp(_,_,[l;_]) } }) -> l
+      | (_,{ip_content={tp_statement={pred_content = Papp(_,_,[l;_])}}}) -> l
       | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond post
   in
   let term' = Logic_utils.expr_to_term ~coerce:false exp in

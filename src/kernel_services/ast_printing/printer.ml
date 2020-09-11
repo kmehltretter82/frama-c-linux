@@ -288,6 +288,7 @@ let () = Cil_datatype.Logic_label.pretty_ref := pp_logic_label
 let () = Cil_datatype.Global_annotation.pretty_ref := pp_global_annotation
 let () = Cil_datatype.Global.pretty_ref := pp_global
 let () = Cil_datatype.Predicate.pretty_ref := pp_predicate
+let () = Cil_datatype.Toplevel_predicate.pretty_ref := pp_toplevel_predicate
 let () = Cil_datatype.Identified_predicate.pretty_ref := pp_identified_predicate
 let () = Cil_datatype.Fundec.pretty_ref := pp_fundec
 

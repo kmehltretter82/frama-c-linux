@@ -23,22 +23,22 @@ enum aorai_OpStatusList {
     aorai_Terminated = 1,
     aorai_Called = 0
 };
-/*@ lemma Si_deterministic_trans{L}: \true;
+/*@ check lemma Si_deterministic_trans{L}: \true;
  */
-/*@ lemma Sf_deterministic_trans{L}: \true;
+/*@ check lemma Sf_deterministic_trans{L}: \true;
  */
-/*@ lemma S5_deterministic_trans{L}: \true;
+/*@ check lemma S5_deterministic_trans{L}: \true;
  */
-/*@ lemma S4_deterministic_trans{L}: \true;
+/*@ check lemma S4_deterministic_trans{L}: \true;
  */
-/*@ lemma S2_deterministic_trans{L}: \true;
+/*@ check lemma S2_deterministic_trans{L}: \true;
  */
 int X;
 int Y;
 /*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
 /*@
-lemma S3_deterministic_trans{L}:
+check lemma S3_deterministic_trans{L}:
   ∀ int x;
     ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 5 ∧
@@ -46,7 +46,7 @@ lemma S3_deterministic_trans{L}:
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
  */
 /*@
-lemma S1_deterministic_trans{L}:
+check lemma S1_deterministic_trans{L}:
   ∀ int __retres_f, int x;
     ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0 ∧
@@ -54,7 +54,7 @@ lemma S1_deterministic_trans{L}:
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
  */
 /*@
-lemma S0_deterministic_trans{L}:
+check lemma S0_deterministic_trans{L}:
   ∀ int c;
     ¬(\at(aorai_CurOperation,L) ≡ op_real_main ∧
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ c ≢ 0 ∧

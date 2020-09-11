@@ -636,14 +636,12 @@ let make_panel (main_ui:main_window_extension_points) =
     | IPLemma _ -> lemmas.get ()
     | IPComplete _ -> complete_disjoint.get ()
     | IPDisjoint _ -> complete_disjoint.get ()
-    | IPCodeAnnot {ica_ca={annot_content = AAssert (_, kind, _)} as ca} ->
+    | IPCodeAnnot {ica_ca={annot_content=AAssert(_, {tp_only_check})} as ca} ->
       begin
         match Alarms.find ca with
         | Some a -> rte.get () && active_alarm a
         | None ->
-          match kind with
-          | Assert -> user_assertions.get ()
-          | Check -> user_checks.get ()
+          if tp_only_check then user_checks.get() else  user_assertions.get ()
       end
     | IPCodeAnnot {ica_ca={annot_content = AInvariant _}} ->
       invariant.get ()

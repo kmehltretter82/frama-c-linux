@@ -660,7 +660,7 @@ class erase_exn =
          we haven't seen an uncaught exception anyway. *)
       | Exits | Breaks | Continues -> orig
       | Returns | Normal ->
-        let loc = pred.ip_content.pred_loc in
+        let loc = (Logic_const.pred_of_id_pred pred).pred_loc in
         let p = self#pred_uncaught_flag loc false in
         let pred' = Logic_const.pred_of_id_pred pred in
         (kind,

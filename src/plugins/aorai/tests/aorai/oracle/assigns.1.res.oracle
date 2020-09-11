@@ -18,15 +18,15 @@ enum aorai_OpStatusList {
     aorai_Terminated = 1,
     aorai_Called = 0
 };
-/*@ lemma in_main_deterministic_trans{L}: \true;
+/*@ check lemma in_main_deterministic_trans{L}: \true;
  */
-/*@ lemma Sf_deterministic_trans{L}: \true;
+/*@ check lemma Sf_deterministic_trans{L}: \true;
  */
-/*@ lemma S_in_f_deterministic_trans{L}: \true;
+/*@ check lemma S_in_f_deterministic_trans{L}: \true;
  */
-/*@ lemma S2_deterministic_trans{L}: \true;
+/*@ check lemma S2_deterministic_trans{L}: \true;
  */
-/*@ lemma S1_deterministic_trans{L}: \true;
+/*@ check lemma S1_deterministic_trans{L}: \true;
  */
 int X;
 /*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */

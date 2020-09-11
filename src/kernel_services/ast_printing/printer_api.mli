@@ -452,6 +452,8 @@ module type S_pp = sig
   (** @since 21.0-Scandium *)
   val pp_predicate_node: Format.formatter -> predicate_node -> unit
   val pp_predicate: Format.formatter -> predicate -> unit
+  val pp_toplevel_predicate: Format.formatter -> toplevel_predicate -> unit
+  (** @since Frama-C+dev *)
   val pp_identified_predicate: Format.formatter -> identified_predicate -> unit
   val pp_code_annotation: Format.formatter -> code_annotation -> unit
   val pp_funspec: Format.formatter -> funspec -> unit

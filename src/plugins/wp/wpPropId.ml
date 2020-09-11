@@ -465,10 +465,13 @@ let ident_names names =
   List.filter (function "" -> true
                       | _ as n -> '\"' <> (String.get n 0) ) names
 
+let pred_names p =
+  let p_names = ident_names p.tp_statement.pred_name in
+  if p.tp_only_check then "@check"::p_names else p_names
+
 let code_annot_names ca = match ca.annot_content with
-  | AAssert (_, Check, named_pred)  -> "@check"::(ident_names named_pred.pred_name)
-  | AAssert (_, Assert, named_pred)  -> "@assert"::(ident_names named_pred.pred_name)
-  | AInvariant (_,_,named_pred) -> "@invariant"::(ident_names named_pred.pred_name)
+  | AAssert (_, pred)  -> "@assert" :: pred_names pred
+  | AInvariant (_,_,pred) -> "@invariant":: pred_names pred
   | AVariant (term, _) -> "@variant"::(ident_names term.term_name)
   | AExtended(_,_,{ext_name}) -> [Printf.sprintf "@%s" ext_name]
   | _ -> [] (* TODO : add some more names ? *)
@@ -479,7 +482,7 @@ let user_prop_names p =
   let open Property in match p with
   | IPPredicate {ip_kind; ip_pred} ->
       Format.asprintf  "@@%a" Property.pretty_predicate_kind ip_kind ::
-      ip_pred.ip_content.pred_name
+      pred_names ip_pred.ip_content
   | IPExtended {ie_ext={ext_name}} -> [ Printf.sprintf "@%s" ext_name ]
   | IPCodeAnnot {ica_ca} -> code_annot_names ica_ca
   | IPComplete {ic_bhvs} ->
@@ -497,8 +500,8 @@ let user_prop_names p =
   | IPDecrease {id_ca=Some ca} -> "@decreases"::code_annot_names ca
   | IPDecrease _ -> [ "@decreases" ]
   | IPLemma {il_name = a; il_pred = l} ->
-      let names = "@lemma"::a::(ident_names l.pred_name)
-      in begin
+      let names = "@lemma"::a::pred_names l in
+      begin
         match LogicUsage.section_of_lemma a with
         | LogicUsage.Toplevel _ -> names
         | LogicUsage.Axiomatic ax -> ax.LogicUsage.ax_name::names
@@ -641,8 +644,8 @@ let assigns_hints hs froms =
   List.iter (fun ({it_content=t},_) -> term_hints hs t) froms
 
 let annot_hints hs = function
-  | AAssert(bs,_,ipred) | AInvariant(bs,_,ipred) ->
-      List.iter (add_hint hs) (ident_names ipred.pred_name) ;
+  | AAssert(bs,ipred) | AInvariant(bs,_,ipred) ->
+      List.iter (add_hint hs) (ident_names ipred.tp_statement.pred_name) ;
       List.iter (add_hint hs) bs
   | AAssigns(bs,Writes froms) ->
       List.iter (add_hint hs) bs ;
@@ -654,12 +657,12 @@ let property_hints hs =
   let open Property in function
     | IPAxiom  {il_name; il_pred}
     | IPLemma  {il_name; il_pred} ->
-        List.iter (add_required hs) (il_name::il_pred.pred_name)
+        List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
         List.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
-        List.iter (add_hint hs) ip_pred.ip_content.pred_name
+        List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]
     | IPCodeAnnot {ica_ca} -> annot_hints hs ica_ca.annot_content
     | IPAssigns {ias_froms} -> assigns_hints hs ias_froms
