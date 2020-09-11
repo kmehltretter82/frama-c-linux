@@ -14,14 +14,18 @@
 const path = require('path');
 const DOME = process.env.DOME || path.resolve( __dirname , 'dome' );
 
+// --------------------------------------------------------------------------
+
 module.exports = {
   module: {
     rules: [
-      { test: /\.css$/, use: [ 'css-loader' ] }
+      { test: /\.css$/, use: [ 'css-loader' ] },
+      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
     ],
     strictExportPresence: true
   },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
       '@plugins':     path.resolve( __dirname , 'src/plugins' ),
       'dome/misc':    path.resolve( DOME , 'src/misc' ),

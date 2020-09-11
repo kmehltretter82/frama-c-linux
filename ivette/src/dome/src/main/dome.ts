@@ -32,7 +32,7 @@ import SYS, * as System from 'dome/system';
 // --------------------------------------------------------------------------
 
 import { URL } from 'url';
-import * as Menubar from './menubar.js';
+import * as Menubar from './menubar';
 
 // --------------------------------------------------------------------------
 // --- System Helpers
