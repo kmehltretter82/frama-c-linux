@@ -105,7 +105,7 @@ export function useState<A>(
   return [value, error, setState];
 }
 
-/** Introduces a local state and propagates only non-errors */
+/** Introduces a local state and propagates only non-errors. */
 export function useValid<A>(
   state: [A, (newValue: A) => void],
 ): FieldState<A> {
@@ -487,7 +487,7 @@ export function Section(props: SectionProps) {
 
   if (hidden) return null;
 
-  const hasWarning = unfold && !disabled && !error;
+  const hasWarning = unfold && !disabled && error;
 
   const cssTitle = Utils.classes(
     'dome-text-title',
@@ -938,14 +938,15 @@ export interface SliderFieldProps extends FieldProps<number> {
   latency?: number;
 }
 
-const FORMATVALUE = (
-  labelValue: boolean | ((v: number) => string),
-  v: number,
-): string | undefined => {
+const FORMAT_VALUE = (v: number) => Number(v).toString();
+const FORMAT_RANGE = (v: number) => v > 0 ? `+${v}` : `-${-v}`;
+const FORMATING = (props: SliderFieldProps) => {
+  const { labelValue = true, min } = props;
   if (labelValue === false) return undefined;
-  if (labelValue === true) return v > 0 ? `+${v}` : `-${-v}`;
-  return labelValue(v);
-};
+  if (labelValue === true) return min < 0 ? FORMAT_RANGE : FORMAT_VALUE;
+  return labelValue;
+}
+
 
 const CSS_SLIDER = 'dome-text-label dome-xForm-units dome-xForm-slider-value';
 const SHOW_SLIDER = `${CSS_SLIDER} dome-xForm-slider-show`;
@@ -956,10 +957,7 @@ const HIDE_SLIDER = `${CSS_SLIDER} dome-xForm-slider-hide`;
    @category Number Fields
  */
 export function SliderField(props: SliderFieldProps) {
-  const {
-    min, max, step = 1, latency = 600,
-    labelValue = true, onReset,
-  } = props;
+  const { min, max, step = 1, latency = 600, onReset } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-slider-field', props.className);
@@ -967,6 +965,7 @@ export function SliderField(props: SliderFieldProps) {
   const delayed = useLatency(checked, latency);
   const [label, setLabel] = React.useState<string | undefined>(undefined);
   const [value, error, setState] = delayed;
+  const labeling = FORMATING(props);
   const onChange = React.useMemo(
     () => {
       const fadeOut = debounce(() => setLabel(undefined), latency);
@@ -974,14 +973,14 @@ export function SliderField(props: SliderFieldProps) {
         const v = Number.parseInt(evt.target.value, 10);
         if (!Number.isNaN(v)) {
           setState(v, undefined);
-          const vlabel = FORMATVALUE(labelValue, v);
+          const vlabel = labeling && labeling(v);
           setLabel(vlabel);
           if (vlabel) fadeOut();
         } else {
           setLabel(undefined);
         }
       };
-    }, [labelValue, latency, setState, setLabel],
+    }, [labeling, latency, setState, setLabel],
   );
   const onDoubleClick = React.useCallback(() => {
     if (onReset) {
@@ -989,7 +988,7 @@ export function SliderField(props: SliderFieldProps) {
       setLabel(undefined);
     }
   }, [onReset, setState, setLabel]);
-  const VALUELABEL = labelValue && (
+  const VALUELABEL = labeling && (
     <label className={label ? SHOW_SLIDER : HIDE_SLIDER}>
       {label}
     </label>
