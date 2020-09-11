@@ -26,12 +26,12 @@ open Cil_types
     statement (if any) for runtime assertion checking. This C statements are
     part of the resulting environment. *)
 
-val translate_pre_spec: kernel_function -> Env.t -> funspec -> Env.t
-val translate_post_spec: kernel_function -> Env.t -> funspec -> Env.t
+val translate_pre_spec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
+val translate_post_spec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
 val translate_pre_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
+  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
 val translate_post_code_annotation:
-  kernel_function -> Env.t -> code_annotation -> Env.t
+  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
 val translate_named_predicate:
   kernel_function -> Env.t -> predicate -> Env.t
 
@@ -50,6 +50,6 @@ val predicate_to_exp: kernel_function -> predicate -> exp
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

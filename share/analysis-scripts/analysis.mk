@@ -118,7 +118,7 @@ EVAFLAGS   ?= \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix \
-  -memexec-all -calldeps -permissive -from-verbose 0 \
+  -calldeps -permissive -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 FCFLAGS    ?=

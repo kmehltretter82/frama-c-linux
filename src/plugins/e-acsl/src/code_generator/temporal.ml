@@ -51,9 +51,9 @@ type flow =
 
 module Mk: sig
   (* Generate either
-      - [store_nblock(lhs, rhs)], or
-      - [store_nreferent(lhs, rhs)]
-     function call based on the value of [flow] *)
+     - [store_nblock(lhs, rhs)], or
+     - [store_nreferent(lhs, rhs)]
+       function call based on the value of [flow] *)
   val store_reference: loc:location -> flow -> lval -> exp -> stmt
 
   (* Generate a [save_*_parameter] call *)
@@ -81,7 +81,7 @@ end = struct
       | Copy -> Options.fatal "Copy flow type in store_reference"
     in
     let fname = RTL.mk_temporal_name fname in
-    Constructor.mk_lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
+    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
 
   let save_param ~loc flow lhs pos =
     let infix = match flow with
@@ -91,13 +91,13 @@ end = struct
     in
     let fname = "save_" ^ infix ^ "_parameter" in
     let fname = RTL.mk_temporal_name fname in
-    Constructor.mk_lib_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
+    Smart_stmt.lib_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
 
   let pull_param ~loc vi pos =
     let exp = Cil.mkAddrOfVi vi in
     let fname = RTL.mk_temporal_name "pull_parameter" in
     let sz = Cil.kinteger ~loc IULong (Cil.bytesSizeOf vi.vtype) in
-    Constructor.mk_lib_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
+    Smart_stmt.lib_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
 
   let handle_return_referent ~save ~loc lhs =
     let fname = match save with
@@ -106,17 +106,17 @@ end = struct
     in
     (* TODO: Returning structs is unsupported so far *)
     (match (Cil.typeOf lhs) with
-      | TPtr _ -> ()
-      | _ -> Error.not_yet "Struct in return");
-    Constructor.mk_lib_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
+     | TPtr _ -> ()
+     | _ -> Error.not_yet "Struct in return");
+    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
 
   let reset_return_referent ~loc =
-    Constructor.mk_lib_call ~loc (RTL.mk_temporal_name "reset_return") []
+    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name "reset_return") []
 
   let temporal_memcpy_struct ~loc lhs rhs =
     let fname  = RTL.mk_temporal_name "memcpy" in
     let size = Cil.sizeOf ~loc (Cil.typeOfLval lhs) in
-    Constructor.mk_lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
+    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
 end
 (* }}} *)
 
@@ -125,10 +125,10 @@ end
 (* ************************************************************************** *)
 
 (* Given an lvalue [lhs] representing LHS of an assignment, and an expression
-  [rhs] representing its RHS compute triple (l,r,f), such that:
+   [rhs] representing its RHS compute triple (l,r,f), such that:
    - lval [l] and exp [r] are addresses of a pointer and a memory block, and
    - flow [f] indicates how to update the meta-data of [l] using information
-    stored by [r]. The values of [f] indicate the following
+     stored by [r]. The values of [f] indicate the following
      + Direct - referent number of [l] is assigned the referent number of [r]
      + Indirect - referent number of [l] is assigned the origin number of [r]
      + Copy - metadata of [r] is copied to metadata of [l] *)
@@ -145,51 +145,52 @@ let assign ?(ltype) lhs rhs loc =
     let base, _ = Misc.ptr_index rhs in
     let rhs, flow =
       (match base.enode with
-      | AddrOf _
-      | StartOf _ -> rhs, Direct
-      (* Unary operator describes !, ~ or -: treat it same as Const since
-         it implies integer or logical operations. This case is rare but
-         happens: for instance in Gap SPEC CPU benchmark the returned pointer
-         is assigned -1 (for whatever bizarre reason) *)
-      | Const _ | UnOp _ -> base, Direct
-      (* Special case for literal strings which E-ACSL rewrites into
-         global variables: take the origin number of a string *)
-      | Lval(Var vi, _) when RTL.is_generated_name vi.vname ->
-        base, Direct
-      (* Lvalue of a pointer type can be a cast of an integral type, for
-         instance for the case when address is taken by value (shown via the
-         following example).
-           uintptr_t addr = ...;
-           char *p = (char* )addr;
-         If this is the case then the analysis takes the value of a variable. *)
-      | Lval lv ->
-        if Cil.isPointerType (Cil.unrollType (Cil.typeOfLval lv)) then
-          Cil.mkAddrOf ~loc lv, Indirect
-        else
-          rhs, Direct
-      (* Binary operation which yields an integer (or FP) type.
-         Since LHS is of pointer type we assume that the whole integer
-         expression computes to an address for which there is no
-         outer container, so the only thing to do is to take origin number *)
-      | BinOp(op, _, _, _) ->
-        (* At this point [ptr_index] should have split pointer arithmetic into
-           base pointer and index so there should be no pointer arithmetic
-           operations there. The following bit is to make sure of it. *)
-        (match op with
+       | AddrOf _
+       | StartOf _ -> rhs, Direct
+       (* Unary operator describes !, ~ or -: treat it same as Const since
+          it implies integer or logical operations. This case is rare but
+          happens: for instance in Gap SPEC CPU benchmark the returned pointer
+          is assigned -1 (for whatever bizarre reason) *)
+       | Const _ | UnOp _ -> base, Direct
+       (* Special case for literal strings which E-ACSL rewrites into
+          global variables: take the origin number of a string *)
+       | Lval(Var vi, _) when RTL.is_generated_name vi.vname ->
+         base, Direct
+       (* Lvalue of a pointer type can be a cast of an integral type, for
+          instance for the case when address is taken by value (shown via the
+          following example).
+            uintptr_t addr = ...;
+            char *p = (char* )addr;
+          If this is the case then the analysis takes the value of a variable.
+       *)
+       | Lval lv ->
+         if Cil.isPointerType (Cil.unrollType (Cil.typeOfLval lv)) then
+           Cil.mkAddrOf ~loc lv, Indirect
+         else
+           rhs, Direct
+       (* Binary operation which yields an integer (or FP) type.
+          Since LHS is of pointer type we assume that the whole integer
+          expression computes to an address for which there is no
+          outer container, so the only thing to do is to take origin number *)
+       | BinOp(op, _, _, _) ->
+         (* At this point [ptr_index] should have split pointer arithmetic into
+            base pointer and index so there should be no pointer arithmetic
+            operations there. The following bit is to make sure of it. *)
+         (match op with
           | MinusPI | PlusPI | IndexPI -> assert false
           | _ -> ());
-        base, Direct
-      | _ -> assert false)
+         base, Direct
+       | _ -> assert false)
     in Some (lhs, rhs, flow)
   | TNamed _ -> assert false
   | TInt _ | TFloat _ | TEnum _ -> None
   | TComp _ ->
     let rhs = match rhs.enode with
-    | AddrOf _ -> rhs
-    | Lval lv -> Cil.mkAddrOf ~loc lv
-    | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
-    | UnOp _ | BinOp _ | CastE _ | StartOf _ | Info _ ->
-      Options.abort "unsupported RHS %a" Printer.pp_exp rhs
+      | AddrOf _ -> rhs
+      | Lval lv -> Cil.mkAddrOf ~loc lv
+      | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+      | UnOp _ | BinOp _ | CastE _ | StartOf _ | Info _ ->
+        Options.abort "unsupported RHS %a" Printer.pp_exp rhs
     in Some (lhs, rhs, Copy)
   (* va_list is a builtin type, we assume it has no pointers here and treat
      it as a "big" integer rather than a struct *)
@@ -240,29 +241,29 @@ end = struct
      structure so they can be retrieved once that function is called *)
   let save_params current_stmt loc args env kf =
     let (env, _) = List.fold_left
-      (fun (env, index) param ->
-        let lv = Mem(param), NoOffset in
-        let ltype = Cil.typeOf param in
-        let vals = assign ~ltype lv param loc in
-        Extlib.may_map
-          (fun (_, rhs, flow) ->
-            let env =
-              if Mmodel_analysis.must_model_exp ~kf param then
-                let stmt = Mk.save_param ~loc flow rhs index in
-                Env.add_stmt ~before:current_stmt ~post:false env kf stmt
-              else env
-            in
-            (env, index+1))
-          ~dft:(env, index+1)
-          vals)
-      (env, 0)
-      args
+        (fun (env, index) param ->
+           let lv = Mem(param), NoOffset in
+           let ltype = Cil.typeOf param in
+           let vals = assign ~ltype lv param loc in
+           Extlib.may_map
+             (fun (_, rhs, flow) ->
+                let env =
+                  if Mmodel_analysis.must_model_exp ~kf param then
+                    let stmt = Mk.save_param ~loc flow rhs index in
+                    Env.add_stmt ~before:current_stmt ~post:false env kf stmt
+                  else env
+                in
+                (env, index+1))
+             ~dft:(env, index+1)
+             vals)
+        (env, 0)
+        args
     in env
 
   (* Update local environment with a statement tracking temporal metadata
      associated with assignment [ret] = [func(args)]. *)
   let call_with_ret ?(alloc=false) current_stmt loc ret env kf =
-    let rhs = Cil.new_exp ~loc (Lval ret) in
+    let rhs = Smart_exp.lval ~loc ret in
     let vals = assign ret rhs loc in
     (* Track referent numbers of assignments via function calls.
        Library functions (i.e., with no source code available) that return
@@ -282,17 +283,17 @@ end = struct
        [pull_return] added via a call to [Mk.handle_return_referent] *)
     Extlib.may_map
       (fun (lhs, rhs, flow) ->
-        let flow, rhs = match flow with
-          | Indirect when alloc -> Direct, (Constructor.mk_deref ~loc rhs)
-          | _ -> flow, rhs
-        in
-        let stmt =
-          if alloc then
-            Mk.store_reference ~loc flow lhs rhs
-          else
-            Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
-        in
-        Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
+         let flow, rhs = match flow with
+           | Indirect when alloc -> Direct, (Smart_exp.deref ~loc rhs)
+           | _ -> flow, rhs
+         in
+         let stmt =
+           if alloc then
+             Mk.store_reference ~loc flow lhs rhs
+           else
+             Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
+         in
+         Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
       ~dft:env
       vals
 
@@ -305,7 +306,7 @@ end = struct
         | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
       in
       let stmt =
-        Constructor.mk_lib_call ~loc (RTL.mk_temporal_name name) args
+        Smart_stmt.lib_call ~loc (RTL.mk_temporal_name name) args
       in
       Env.add_stmt ~before:current_stmt ~post:false env kf stmt
     else
@@ -320,7 +321,7 @@ end = struct
        the implementation of the function should be empty and compiler should
        be able to optimize that code out. *)
     let name = (RTL.mk_temporal_name "reset_parameters") in
-    let stmt = Constructor.mk_lib_call ~loc name [] in
+    let stmt = Smart_stmt.lib_call ~loc name [] in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
     let stmt = Mk.reset_return_referent ~loc in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
@@ -340,9 +341,9 @@ end = struct
     let alloc = not has_def in
     Extlib.may_map
       (fun lhs ->
-        if Mmodel_analysis.must_model_lval ~kf lhs then
-          call_with_ret ~alloc current_stmt loc lhs env kf
-        else env)
+         if Mmodel_analysis.must_model_lval ~kf lhs then
+           call_with_ret ~alloc current_stmt loc lhs env kf
+         else env)
       ~dft:env
       ret
 end
@@ -465,15 +466,15 @@ let mk_global_init ~loc vi off init =
      corresponding variable which that literal string has been converted to *)
   let exp =
     try let rec get_string e = match e.enode with
-      | Const(CStr str) -> str
-      | CastE(_, exp) -> get_string exp
-      | _ -> raise Not_found
-    in
-    let str = get_string exp in
-    Cil.evar ~loc (Literal_strings.find str)
-  with
+        | Const(CStr str) -> str
+        | CastE(_, exp) -> get_string exp
+        | _ -> raise Not_found
+      in
+      let str = get_string exp in
+      Cil.evar ~loc (Literal_strings.find str)
+    with
     (* Not a literal string: just use the expression at hand *)
-    Not_found -> exp
+      Not_found -> exp
   in
   (* The input [vi] is from the old project, so get the corresponding variable
      from the new one, otherwise AST integrity is violated *)
@@ -488,15 +489,15 @@ let mk_global_init ~loc vi off init =
 let handle_function_parameters kf env =
   if is_enabled () then
     let env, _ = List.fold_left
-      (fun (env, index) param ->
-        let env =
-          if Mmodel_analysis.must_model_vi ~kf param
-          then track_argument param index env kf
-          else env
-        in
-        env, index + 1)
-      (env, 0)
-      (Kernel_function.get_formals kf)
+        (fun (env, index) param ->
+           let env =
+             if Mmodel_analysis.must_model_vi ~kf param
+             then track_argument param index env kf
+             else env
+           in
+           env, index + 1)
+        (env, 0)
+        (Kernel_function.get_formals kf)
     in env
   else
     env
@@ -505,8 +506,8 @@ let handle_stmt stmt env kf =
   if is_enabled () then begin
     match stmt.skind with
     | Instr instr -> handle_instruction stmt instr env kf
-    | Return(ret, loc) -> Extlib.may_map
-      (fun ret -> handle_return_stmt loc ret env kf) ~dft:env ret
+    | Return(ret, loc) ->
+      Extlib.may_map (fun ret -> handle_return_stmt loc ret env kf) ~dft:env ret
     | Goto _ | Break _ | Continue _ | If _ | Switch _ | Loop _ | Block _
     | UnspecifiedSequence _ | Throw _ | TryCatch _ | TryFinally _
     | TryExcept _ -> env

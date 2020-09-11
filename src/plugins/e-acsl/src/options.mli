@@ -22,10 +22,8 @@
 
 include Plugin.S (** implementation of Log.S for E-ACSL *)
 
-module Check: Parameter_sig.Bool
 module Run: Parameter_sig.Bool
 module Valid: Parameter_sig.Bool
-module Prepare: Parameter_sig.Bool
 module Gmp_only: Parameter_sig.Bool
 module Full_mmodel: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
@@ -38,6 +36,7 @@ module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
 
 val parameter_states: State.t list
+val emitter: Emitter.t
 
 val must_visit: unit -> bool
 
@@ -48,6 +47,6 @@ val dkey_typing: category
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../.."
 End:
 *)

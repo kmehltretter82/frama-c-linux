@@ -899,7 +899,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
 	domains/inout_domain \
-	utils/state_import \
 	legacy/eval_terms legacy/eval_annots \
 	domains/powerset engine/transfer_logic \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
@@ -1790,11 +1789,14 @@ lint: $(LINT_TARGET)
 
 check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
-		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
-		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
-		if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
-			echo "error: ocp-indent >=1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
+		else \
+			$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+			$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+			if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
+				echo "error: ocp-indent 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
 			exit 1; \
+			fi; \
 		fi; \
 	else \
 		exit 1; \
@@ -2407,12 +2409,9 @@ else
 DISTRIB_HEADERS:=open-source
 # for checking that distributed files aren't under proprietary licence.
 DISTRIB_PROPRIETARY_HEADERS:=$(CEA_PROPRIETARY_HEADERS)
-# DISTRIB_TESTS contents files that can be distributed without header checking
+# DISTRIB_TESTS contains files that can be distributed without header checking
 DISTRIB_TESTS:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
                   $(DISTRIB_TESTS))
-# DISTRIB_FILES contents files that can be distributed with header checking
-DISTRIB_FILES:=$(filter-out $(CEA_PROPRIETARY_FILES) ,\
-                  $(DISTRIB_FILES))
 endif
 
 # Set some variables for `headers`target.

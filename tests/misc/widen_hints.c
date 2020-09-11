@@ -1,7 +1,7 @@
 /* run.config
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DSYNTAX_ERRORS -kernel-warn-key=annot-error=active
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DNONCONST
-   OPT: -eva @EVA_CONFIG@ -slevel 1 -eva-msg-key widen-hints
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 1 -eva-msg-key widen-hints
    OPT: -eva @EVA_CONFIG@ -cpp-extra-args=-DALLGLOBAL -eva-msg-key widen-hints
 */
 #define N 2

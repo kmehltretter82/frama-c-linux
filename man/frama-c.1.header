@@ -25,4 +25,4 @@
 .\" using pandoc 2.0 or newer. To modify this file, edit the Markdown file
 .\" and run `make man/frama-c.1`.
 
-.TH FRAMA-C 1 2020-05-26
+.TH FRAMA-C 1 2020-09-01

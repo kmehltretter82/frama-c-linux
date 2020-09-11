@@ -39,8 +39,8 @@ let term_to_exp_ref
 (*****************************************************************************)
 
 (* Remove all the bindings for [kf]. [Cil_datatype.Kf.Hashtbl] does not
-  provide the [remove_all] function. Thus we need to keep calling [remove]
-  until all entries are removed. *)
+   provide the [remove_all] function. Thus we need to keep calling [remove]
+   until all entries are removed. *)
 let rec remove_all tbl kf =
   if Cil_datatype.Kf.Hashtbl.mem tbl kf then begin
     Cil_datatype.Kf.Hashtbl.remove tbl kf;
@@ -66,10 +66,10 @@ end
 (**************************************************************************)
 
 (* Builds the terms [t_size] and [t_shifted] from each
-  [Lvs_quantif(tmin, lv, tmax)] from [lscope]
-  where [t_size = tmax - tmin + (-1|0|1)] depending on whether the
+   [Lvs_quantif(tmin, lv, tmax)] from [lscope]
+   where [t_size = tmax - tmin + (-1|0|1)] depending on whether the
                                           inequalities are strict or large
-  and [t_shifted = lv - tmin + (-1|0)] (so that we start indexing at 0) *)
+   and [t_shifted = lv - tmin + (-1|0)] (so that we start indexing at 0) *)
 let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
   match lscope with
   | [] ->
@@ -97,29 +97,29 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
     in
     let iv = Interval.(extract_ival (infer t_size)) in
     (* The EXACT amount of memory that is needed can be known at runtime. This
-      is because the tightest bounds for the variables can be known at runtime.
-      Example: In the following predicate
+       is because the tightest bounds for the variables can be known at runtime.
+       Example: In the following predicate
         [\exists integer u; 9 <= u <= 13 &&
          \forall integer v; -5 < v <= (u <= 11 ? u + 6 : u - 9) ==>
            \at(u + v > 0, K)]
         the upper bound [M] for [v] depends on [u].
         In chronological order, [M] equals to 15, 16, 17, 3 and 4.
         Thus the tightest upper bound for [v] is [max(M)=17].
-      HOWEVER, computing that exact information requires extra nested loops,
-      prior to the [malloc] stmts, that will try all the possible values of the
-      variables involved in the bounds.
-      Instead of sacrificing time over memory (by performing these extra
-      computations), we consider that sacrificing memory over time is more
-      beneficial. In particular, though we may allocate more memory than
-      needed, the number of reads/writes into it is the same in both cases.
-      Conclusion: over-approximate [t_size] *)
+       HOWEVER, computing that exact information requires extra nested loops,
+       prior to the [malloc] stmts, that will try all the possible values of the
+       variables involved in the bounds.
+       Instead of sacrificing time over memory (by performing these extra
+       computations), we consider that sacrificing memory over time is more
+       beneficial. In particular, though we may allocate more memory than
+       needed, the number of reads/writes into it is the same in both cases.
+       Conclusion: over-approximate [t_size] *)
     let t_size = match Ival.min_and_max iv with
       | _, Some max ->
         Logic_const.tint ~loc max
       | _, None ->
         Error.not_yet
           "\\at on purely logic variables and with quantifier that uses \
-            too complex bound (E-ACSL cannot infer a finite upper bound to it)"
+           too complex bound (E-ACSL cannot infer a finite upper bound to it)"
     in
     (* Index *)
     let t_lv = Logic_const.tvar ~loc lv in
@@ -148,13 +148,13 @@ let rec sizes_and_shifts_from_quantifs ~loc kf lscope sizes_and_shifts =
 let size_from_sizes_and_shifts ~loc = function
   | [] ->
     (* No quantified variable. But still need to allocate [1*sizeof(_)] amount
-      of memory to store purely logic variables that are NOT quantified
-      (example: from \let). *)
+       of memory to store purely logic variables that are NOT quantified
+       (example: from \let). *)
     Cil.lone ~loc ()
   | (size, _) :: sizes_and_shifts ->
     List.fold_left
       (fun t_size (t_s, _) ->
-        Logic_const.term ~loc (TBinOp(Mult, t_size, t_s)) Linteger)
+         Logic_const.term ~loc (TBinOp(Mult, t_size, t_s)) Linteger)
       size
       sizes_and_shifts
 
@@ -171,35 +171,35 @@ let lval_at_index ~loc kf env (e_at, vi_at, t_index) =
   lval_at_index, env
 
 (* Associate to each possible tuple of quantifiers
-  a unique index from the set {n | 0 <= n < n_max}.
-  That index will serve to identify the memory location where the evaluation
-  of the term/predicate is stored for the given tuple of quantifier.
-  The following gives the smallest set of such indexes (hence we use the
-  smallest amount of memory in some respect):
-  To (t_shifted_n, t_shifted_n-1, ..., t_shifted_1)
-  where 0 <= t_shifted_i < beta_i
-  corresponds: \sum_{i=1}^n( t_shifted_i * \pi_{j=1}^{i-1}(beta_j) ) *)
+   a unique index from the set {n | 0 <= n < n_max}.
+   That index will serve to identify the memory location where the evaluation
+   of the term/predicate is stored for the given tuple of quantifier.
+   The following gives the smallest set of such indexes (hence we use the
+   smallest amount of memory in some respect):
+   To (t_shifted_n, t_shifted_n-1, ..., t_shifted_1)
+   where 0 <= t_shifted_i < beta_i
+   corresponds: \sum_{i=1}^n( t_shifted_i * \pi_{j=1}^{i-1}(beta_j) ) *)
 let index_from_sizes_and_shifts ~loc sizes_and_shifts =
   let product terms = List.fold_left
-    (fun product t ->
-      Logic_const.term ~loc (TBinOp(Mult, product, t)) Linteger)
-    (Cil.lone ~loc ())
-    terms
+      (fun product t ->
+         Logic_const.term ~loc (TBinOp(Mult, product, t)) Linteger)
+      (Cil.lone ~loc ())
+      terms
   in
   let sum, _ = List.fold_left
-    (fun (index, sizes) (t_size, t_shifted) ->
-      let pi_beta_j = product sizes in
-      let bi_mult_pi_beta_j =
-        Logic_const.term ~loc (TBinOp(Mult, t_shifted, pi_beta_j)) Linteger
-      in
-      let sum = Logic_const.term
-        ~loc
-        (TBinOp(PlusA, bi_mult_pi_beta_j, index))
-        Linteger
-      in
-      sum, t_size :: sizes)
-    (Cil.lzero ~loc (), [])
-    sizes_and_shifts
+      (fun (index, sizes) (t_size, t_shifted) ->
+         let pi_beta_j = product sizes in
+         let bi_mult_pi_beta_j =
+           Logic_const.term ~loc (TBinOp(Mult, t_shifted, pi_beta_j)) Linteger
+         in
+         let sum = Logic_const.term
+             ~loc
+             (TBinOp(PlusA, bi_mult_pi_beta_j, index))
+             Linteger
+         in
+         sum, t_size :: sizes)
+      (Cil.lzero ~loc (), [])
+      sizes_and_shifts
   in
   sum
 
@@ -225,62 +225,63 @@ let to_exp ~loc kf env pot label =
   in
   (* Creating the pointer *)
   let ty = match pot with
-  | Misc.PoT_pred _ ->
-    Cil.intType
-  | Misc.PoT_term t ->
-    begin match Typing.get_number_ty t with
-    | Typing.(C_integer _ | C_float _ | Nan) ->
-      Typing.get_typ t
-    | Typing.(Rational | Real) ->
-      Error.not_yet "\\at on purely logic variables and over real type"
-    | Typing.Gmpz ->
-      Error.not_yet "\\at on purely logic variables and over gmp type"
-    end
+    | Lscope.PoT_pred _ ->
+      Cil.intType
+    | Lscope.PoT_term t ->
+      begin match Typing.get_number_ty t with
+        | Typing.(C_integer _ | C_float _ | Nan) ->
+          Typing.get_typ t
+        | Typing.(Rational | Real) ->
+          Error.not_yet "\\at on purely logic variables and over real type"
+        | Typing.Gmpz ->
+          Error.not_yet "\\at on purely logic variables and over gmp type"
+      end
   in
   let ty_ptr = TPtr(ty, []) in
   let vi_at, e_at, env = Env.new_var
-    ~loc
-    ~name:"at"
-    ~scope:Varname.Function
-    env
-    kf
-    None
-    ty_ptr
-    (fun vi e ->
-      (* Handle [malloc] and [free] stmts *)
-      let lty_sizeof = Ctype Cil.(theMachine.typeOfSizeOf) in
-      let t_sizeof = Logic_const.term ~loc (TSizeOf ty) lty_sizeof in
-      let t_size = size_from_sizes_and_shifts ~loc sizes_and_shifts in
-      let t_size =
-        Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
-      in
-      Typing.type_term ~use_gmp_opt:false t_size;
-      let malloc_stmt = match Typing.get_number_ty t_size with
-      | Typing.C_integer IInt ->
-        let e_size, _ = term_to_exp kf env t_size in
-        let e_size = Cil.constFold false e_size in
-        let malloc_stmt =
-          Constructor.mk_lib_call ~loc
-            ~result:(Cil.var vi)
-            "malloc"
-            [ e_size ]
-        in
-        malloc_stmt
-      | Typing.(C_integer _ | C_float _ | Gmpz) ->
-        Error.not_yet
-          "\\at on purely logic variables that needs to allocate \
-           too much memory (bigger than int_max bytes)"
-      | Typing.(Rational | Real | Nan) ->
-        Error.not_yet "quantification over non-integer type"
-      in
-      let free_stmt = Constructor.mk_lib_call ~loc "free" [e] in
-      (* The list of stmts returned by the current closure are inserted
-        LOCALLY to the block where the new var is FIRST used, whatever scope
-        is indicated to [Env.new_var].
-        Thus we need to add [malloc] and [free] through dedicated functions. *)
-      Malloc.add kf malloc_stmt;
-      Free.add kf free_stmt;
-      [])
+      ~loc
+      ~name:"at"
+      ~scope:Varname.Function
+      env
+      kf
+      None
+      ty_ptr
+      (fun vi e ->
+         (* Handle [malloc] and [free] stmts *)
+         let lty_sizeof = Ctype Cil.(theMachine.typeOfSizeOf) in
+         let t_sizeof = Logic_const.term ~loc (TSizeOf ty) lty_sizeof in
+         let t_size = size_from_sizes_and_shifts ~loc sizes_and_shifts in
+         let t_size =
+           Logic_const.term ~loc (TBinOp(Mult, t_sizeof, t_size)) lty_sizeof
+         in
+         Typing.type_term ~use_gmp_opt:false t_size;
+         let malloc_stmt = match Typing.get_number_ty t_size with
+           | Typing.C_integer IInt ->
+             let e_size, _ = term_to_exp kf env t_size in
+             let e_size = Cil.constFold false e_size in
+             let malloc_stmt =
+               Smart_stmt.lib_call ~loc
+                 ~result:(Cil.var vi)
+                 "malloc"
+                 [ e_size ]
+             in
+             malloc_stmt
+           | Typing.(C_integer _ | C_float _ | Gmpz) ->
+             Error.not_yet
+               "\\at on purely logic variables that needs to allocate \
+                too much memory (bigger than int_max bytes)"
+           | Typing.(Rational | Real | Nan) ->
+             Error.not_yet "quantification over non-integer type"
+         in
+         let free_stmt = Smart_stmt.lib_call ~loc "free" [e] in
+         (* The list of stmts returned by the current closure are inserted
+            LOCALLY to the block where the new var is FIRST used, whatever scope
+            is indicated to [Env.new_var].
+            Thus we need to add [malloc] and [free] through dedicated functions.
+         *)
+         Malloc.add kf malloc_stmt;
+         Free.add kf free_stmt;
+         [])
   in
   (* Index *)
   let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
@@ -289,40 +290,40 @@ let to_exp ~loc kf env pot label =
     let term_to_exp = !term_to_exp_ref in
     let named_predicate_to_exp = !predicate_to_exp_ref in
     match pot with
-    | Misc.PoT_pred p ->
+    | Lscope.PoT_pred p ->
       let env = Env.push env in
       let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
       let e, env = named_predicate_to_exp kf env p in
       let e = Cil.constFold false e in
       let storing_stmt =
-        Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
+        Smart_stmt.assigns ~loc ~result:lval e
       in
       let block, env =
         Env.pop_and_get env storing_stmt ~global_clear:false Env.After
       in
       (* We CANNOT return [block.bstmts] because it does NOT contain
-        variable declarations. *)
-      [ Cil.mkStmt ~valid_sid:true (Block block) ], env
-    | Misc.PoT_term t ->
+         variable declarations. *)
+      [ Smart_stmt.block_stmt block ], env
+    | Lscope.PoT_term t ->
       begin match Typing.get_number_ty t with
-      | Typing.(C_integer _ | C_float _ | Nan) ->
-        let env = Env.push env in
-        let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-        let e, env = term_to_exp kf env t in
-        let e = Cil.constFold false e in
-        let storing_stmt =
-          Cil.mkStmtOneInstr ~valid_sid:true (Set(lval, e, loc))
-        in
-        let block, env =
-          Env.pop_and_get env storing_stmt ~global_clear:false Env.After
-        in
-        (* We CANNOT return [block.bstmts] because it does NOT contain
-          variable declarations. *)
-        [ Cil.mkStmt ~valid_sid:true (Block block) ], env
-      | Typing.(Rational | Real) ->
-        Error.not_yet "\\at on purely logic variables and over real type"
-      | Typing.Gmpz ->
-        Error.not_yet "\\at on purely logic variables and over gmp type"
+        | Typing.(C_integer _ | C_float _ | Nan) ->
+          let env = Env.push env in
+          let lval, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
+          let e, env = term_to_exp kf env t in
+          let e = Cil.constFold false e in
+          let storing_stmt =
+            Smart_stmt.assigns ~loc ~result:lval e
+          in
+          let block, env =
+            Env.pop_and_get env storing_stmt ~global_clear:false Env.After
+          in
+          (* We CANNOT return [block.bstmts] because it does NOT contain
+             variable declarations. *)
+          [ Smart_stmt.block_stmt block ], env
+        | Typing.(Rational | Real) ->
+          Error.not_yet "\\at on purely logic variables and over real type"
+        | Typing.Gmpz ->
+          Error.not_yet "\\at on purely logic variables and over gmp type"
       end
   in
   (* Storing loops *)
@@ -333,20 +334,20 @@ let to_exp ~loc kf env pot label =
   in
   let storing_loops_block = Cil.mkBlock storing_loops_stmts in
   let storing_loops_block, env = Env.pop_and_get
-    env
-    (Cil.mkStmt ~valid_sid:true (Block storing_loops_block))
-    ~global_clear:false
-    Env.After
+      env
+      (Smart_stmt.block_stmt storing_loops_block)
+      ~global_clear:false
+      Env.After
   in
   (* Put at label *)
   let env = put_block_at_label env kf storing_loops_block label in
   (* Returning *)
   let lval_at_index, env = lval_at_index ~loc kf env (e_at, vi_at, t_index) in
-  let e = Cil.new_exp ~loc (Lval lval_at_index) in
+  let e = Smart_exp.lval ~loc lval_at_index in
   e, env
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

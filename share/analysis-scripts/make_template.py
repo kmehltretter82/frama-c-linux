@@ -44,13 +44,13 @@ if len(sys.argv) > 2:
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")
     sys.exit(1)
 
-framac_in_path = True
-framac = shutil.which("frama-c")
-if not framac:
-    framac_in_path = False
-    if os.environ.get("FRAMAC"):
-        framac = os.environ["FRAMAC"]
-    else:
+framac_in_path = False
+if os.environ.get("FRAMAC"):
+    framac = os.environ["FRAMAC"]
+if not framac or not os.path.isfile(framac):
+    framac_in_path = True
+    framac = shutil.which("frama-c")
+    if not framac:
         sys.exit("error: frama-c must be in the PATH, "\
                  "or in environment variable FRAMAC")
 

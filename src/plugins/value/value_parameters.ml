@@ -25,6 +25,7 @@ let kernel_parameters_correctness = [
   Kernel.MainFunction.parameter;
   Kernel.LibEntry.parameter;
   Kernel.AbsoluteValidRange.parameter;
+  Kernel.InitializedPaddingLocals.parameter;
   Kernel.SafeArrays.parameter;
   Kernel.UnspecifiedAccess.parameter;
   Kernel.SignedOverflow.parameter;
@@ -33,6 +34,10 @@ let kernel_parameters_correctness = [
   Kernel.RightShiftNegative.parameter;
   Kernel.SignedDowncast.parameter;
   Kernel.UnsignedDowncast.parameter;
+  Kernel.PointerDowncast.parameter;
+  Kernel.SpecialFloat.parameter;
+  Kernel.InvalidBool.parameter;
+  Kernel.InvalidPointer.parameter;
 ]
 
 let parameters_correctness = ref Typed_parameter.Set.empty
@@ -64,8 +69,8 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
-let () = Help.add_aliases [ "-value-h"; "-val-h" ]
-let () = add_plugin_output_aliases [ "value" ]
+let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
+let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
 
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"
@@ -106,10 +111,10 @@ module ForceValues =
   WithOutput
     (struct
       let option_name = "-eva"
-      let help = "compute values"
+      let help = "Compute values"
       let output_by_default = true
     end)
-let () = ForceValues.add_aliases ["-val"]
+let () = ForceValues.add_aliases ~deprecated:true ["-val"]
 
 let domains = add_group "Abstract Domains"
 let precision_tuning = add_group "Precision vs. time"
@@ -225,7 +230,7 @@ module DomainsFunction =
     end)
     (struct
       let option_name = "-eva-domains-function"
-      let help = "Enables a domain only for the given functions. \
+      let help = "Enable a domain only for the given functions. \
                   <d:f+> enables the domain [d] from function [f] \
                   (the domain is enabled in all functions called from [f]). \
                   <d:f-> disables the domain [d] from function [f]."
@@ -248,12 +253,13 @@ module EqualityCall =
   String
     (struct
       let option_name = "-eva-equality-through-calls"
-      let help = "Equalities propagated through function calls (from the caller \
+      let help = "Propagate equalities through function calls (from the caller \
                   to the called function): none, only equalities between formal \
                   parameters and concrete arguments, or all. "
       let default = "formals"
       let arg_name = "none|formals|all"
     end)
+let () = EqualityCall.set_possible_values ["none"; "formals"; "all"]
 let () = add_precision_dep EqualityCall.parameter
 
 let () = Parameter_customize.set_group domains
@@ -269,7 +275,7 @@ module EqualityCallFunction =
     end)
     (struct
       let option_name = "-eva-equality-through-calls-function"
-      let help = "Equalities propagated through calls to specific functions. \
+      let help = "Propagate equalities through calls to specific functions. \
                   Overrides -eva-equality-call."
       let default = Kernel_function.Map.empty
       let arg_name = "f:none|formals|all"
@@ -281,8 +287,8 @@ module OctagonCall =
   Bool
     (struct
       let option_name = "-eva-octagon-through-calls"
-      let help = "Whether the relations inferred by the octagon domain are \
-                  propagated through function calls. Disabled by default: \
+      let help = "Propagate relations inferred by the octagon domain \
+                  through function calls. Disabled by default: \
                   the octagon analysis is intra-procedural, starting \
                   each function with an empty octagon state, \
                   and losing the octagons inferred at the end. \
@@ -299,9 +305,10 @@ module Numerors_Real_Size =
       let option_name = "-eva-numerors-real-size"
       let arg_name = "n"
       let help =
-        "set <n> as the significand size of the MPFR representation \
+        "Set <n> as the significand size of the MPFR representation \
          of reals used by the numerors domain (defaults to 128)"
     end)
+let () = Numerors_Real_Size.set_range 1 max_int
 let () = add_precision_dep Numerors_Real_Size.parameter
 
 let () = Parameter_customize.set_group domains
@@ -309,7 +316,7 @@ module Numerors_Mode =
   String
     (struct
       let option_name = "-eva-numerors-interaction"
-      let help = "defines how the numerors domain infers the absolute and the \
+      let help = "Define how the numerors domain infers the absolute and the \
                   relative errors:\n\
                   - relative: the relative is deduced from the absolute;\n\
                   - absolute: the absolute is deduced from the relative;\n\
@@ -369,38 +376,35 @@ module NoResultsFunctions =
     (struct
       let option_name = "-eva-no-results-function"
       let arg_name = "f"
-      let help = "do not record the values obtained for the statements of \
+      let help = "Do not record the values obtained for the statements of \
                   function f"
     end)
 let () = add_dep NoResultsFunctions.parameter
-let () = NoResultsFunctions.add_aliases ["-no-results-function"]
 
 let () = Parameter_customize.set_group performance
 module ResultsAll =
   True
     (struct
       let option_name = "-eva-results"
-      let help = "record values for any of the statements of the program."
+      let help = "Record values for each of the statements of the program."
     end)
 let () = add_dep ResultsAll.parameter
-let () = ResultsAll.add_aliases ["-results"]
 
 let () = Parameter_customize.set_group performance
 module JoinResults =
   Bool
     (struct
       let option_name = "-eva-join-results"
-      let help = "precompute consolidated states once value is computed"
+      let help = "Precompute consolidated states once Eva is computed"
       let default = true
     end)
-let () = JoinResults.add_aliases ["-val-join-results"]
 
 let () = Parameter_customize.set_group performance
 module EqualityStorage =
   Bool
     (struct
       let option_name = "-eva-equality-storage"
-      let help = "Stores the states of the equality domain during \
+      let help = "Store the states of the equality domain during \
                   the analysis."
       let default = true
     end)
@@ -411,7 +415,7 @@ module SymbolicLocsStorage =
   Bool
     (struct
       let option_name = "-eva-symbolic-locations-storage"
-      let help = "Stores the states of the symbolic locations domain during \
+      let help = "Store the states of the symbolic locations domain during \
                   the analysis."
       let default = true
     end)
@@ -422,7 +426,7 @@ module GaugesStorage =
   Bool
     (struct
       let option_name = "-eva-gauges-storage"
-      let help = "Stores the states of the gauges domain during the analysis."
+      let help = "Store the states of the gauges domain during the analysis."
       let default = true
     end)
 let () = add_precision_dep GaugesStorage.parameter
@@ -432,7 +436,7 @@ module ApronStorage =
   Bool
     (struct
       let option_name = "-eva-apron-storage"
-      let help = "Stores the states of the apron domains during the \
+      let help = "Store the states of the apron domains during the \
                   analysis."
       let default = false
     end)
@@ -443,7 +447,7 @@ module BitwiseOffsmStorage =
   Bool
     (struct
       let option_name = "-eva-bitwise-storage"
-      let help = "Stores the states of the bitwise domain during the \
+      let help = "Store the states of the bitwise domain during the \
                   analysis."
       let default = true
     end)
@@ -458,53 +462,35 @@ module AllRoundingModesConstants =
   False
     (struct
       let option_name = "-eva-all-rounding-modes-constants"
-      let help = "Take into account the possibility of constants not being converted to the nearest representable value, or being converted to higher precision"
+      let help = "Take into account the possibility of constants not being \
+                  converted to the nearest representable value, \
+                  or being converted to higher precision"
     end)
 let () = add_correctness_dep AllRoundingModesConstants.parameter
-let () = AllRoundingModesConstants.add_aliases ["-all-rounding-modes-constants"]
 
 let () = Parameter_customize.set_group alarms
 module UndefinedPointerComparisonPropagateAll =
   False
     (struct
       let option_name = "-eva-undefined-pointer-comparison-propagate-all"
-      let help = "if the target program appears to contain undefined pointer comparisons, propagate both outcomes {0; 1} in addition to the emission of an alarm"
+      let help = "If the target program appears to contain undefined pointer \
+                  comparisons, propagate both outcomes {0; 1} in addition to \
+                  the emission of an alarm"
     end)
 let () = add_correctness_dep UndefinedPointerComparisonPropagateAll.parameter
-let () =
-  UndefinedPointerComparisonPropagateAll.add_aliases
-    ["-undefined-pointer-comparison-propagate-all"]
 
 let () = Parameter_customize.set_group alarms
 module WarnPointerComparison =
   String
     (struct
       let option_name = "-eva-warn-undefined-pointer-comparison"
-      let help = "warn on all pointer comparisons, on comparisons where \
+      let help = "Warn on all pointer comparisons, on comparisons where \
                   the arguments have pointer type (default), or never warn"
       let default = "pointer"
       let arg_name = "all|pointer|none"
     end)
 let () = WarnPointerComparison.set_possible_values ["all"; "pointer"; "none"]
 let () = add_correctness_dep WarnPointerComparison.parameter
-let () = WarnPointerComparison.add_aliases ["-val-warn-undefined-pointer-comparison"]
-
-
-let () = Parameter_customize.set_group alarms
-let () = Parameter_customize.is_invisible ()
-module WarnLeftShiftNegative =
-  True
-    (struct
-      let option_name = "-val-warn-left-shift-negative"
-      let help =
-        "Emit alarms when left-shifting negative integers"
-    end)
-let () = add_correctness_dep WarnLeftShiftNegative.parameter
-let () = WarnLeftShiftNegative.add_update_hook
-    (fun _ v ->
-       warning "This option is deprecated. Use %s instead"
-         Kernel.LeftShiftNegative.name;
-       Kernel.LeftShiftNegative.set v)
 
 let () = Parameter_customize.set_group alarms
 module WarnSignedConvertedDowncast =
@@ -517,9 +503,6 @@ module WarnSignedConvertedDowncast =
                   destination range."
     end)
 let () = add_correctness_dep WarnSignedConvertedDowncast.parameter
-let () =
-  WarnSignedConvertedDowncast.add_aliases
-    ["-val-warn-signed-converted-downcast"]
 
 
 let () = Parameter_customize.set_group alarms
@@ -533,7 +516,6 @@ module WarnPointerSubstraction =
          offsets. When unset, do not warn but generate imprecise offsets."
     end)
 let () = add_correctness_dep WarnPointerSubstraction.parameter
-let () = WarnPointerSubstraction.add_aliases ["-val-warn-pointer-subtraction"]
 
 let () = Parameter_customize.set_group alarms
 module IgnoreRecursiveCalls =
@@ -544,7 +526,6 @@ module IgnoreRecursiveCalls =
         "Pretend function calls that would be recursive do not happen. Causes unsoundness"
     end)
 let () = add_correctness_dep IgnoreRecursiveCalls.parameter
-let () = IgnoreRecursiveCalls.add_aliases ["-val-ignore-recursive-calls"]
 
 let () = Parameter_customize.set_group alarms
 
@@ -553,13 +534,12 @@ module WarnCopyIndeterminate =
     (struct
       let option_name = "-eva-warn-copy-indeterminate"
       let arg_name = "f | @all"
-      let help = "warn when a statement of the specified functions copies a \
+      let help = "Warn when a statement of the specified functions copies a \
                   value that may be indeterminate (uninitialized or containing escaping address). \
                   Set by default; can be deactivated for function 'f' by '=-f', or for all \
                   functions by '=-@all'."
     end)
 let () = add_correctness_dep WarnCopyIndeterminate.parameter
-let () = WarnCopyIndeterminate.add_aliases ["-val-warn-copy-indeterminate"]
 let () = WarnCopyIndeterminate.Category.(set_default (all ()))
 
 let () = Parameter_customize.set_group alarms
@@ -568,10 +548,9 @@ module ReduceOnLogicAlarms =
     (struct
       let option_name = "-eva-reduce-on-logic-alarms"
       let help = "Force reductions by a predicate to ignore logic alarms \
-                  emitted while the predicated is evaluated (experimental)"
+                  emitted while the predicate is evaluated (experimental)"
     end)
 let () = add_correctness_dep ReduceOnLogicAlarms.parameter
-let () = ReduceOnLogicAlarms.add_aliases ["-val-reduce-on-logic-alarms"]
 
 let () = Parameter_customize.set_group alarms
 module InitializedLocals =
@@ -583,7 +562,6 @@ module InitializedLocals =
                   initialization."
     end)
 let () = add_correctness_dep InitializedLocals.parameter
-let () = InitializedLocals.add_aliases ["-val-initialized-locals"]
 
 (* ------------------------------------------------------------------------- *)
 (* --- Initial context                                                   --- *)
@@ -596,10 +574,10 @@ module AutomaticContextMaxDepth =
       let option_name = "-eva-context-depth"
       let default = 2
       let arg_name = "n"
-      let help = "use <n> as the depth of the default context for Eva. (defaults to 2)"
+      let help = "Use <n> as the depth of the default context for Eva. (defaults to 2)"
     end)
+let () = AutomaticContextMaxDepth.set_range 0 max_int
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
-let () = AutomaticContextMaxDepth.add_aliases ["-context-depth"]
 
 let () = Parameter_customize.set_group initial_context
 module AutomaticContextMaxWidth =
@@ -608,21 +586,20 @@ module AutomaticContextMaxWidth =
       let option_name = "-eva-context-width"
       let default = 2
       let arg_name = "n"
-      let help = "use <n> as the width of the default context for Eva. (defaults to 2)"
+      let help = "Use <n> as the width of the default context for Eva. (defaults to 2)"
     end)
 let () = AutomaticContextMaxWidth.set_range ~min:1 ~max:max_int
 let () = add_correctness_dep AutomaticContextMaxWidth.parameter
-let () = AutomaticContextMaxWidth.add_aliases ["-context-width"]
 
 let () = Parameter_customize.set_group initial_context
 module AllocatedContextValid =
   False
     (struct
       let option_name = "-eva-context-valid-pointers"
-      let help = "only allocate valid pointers until context-depth, and then use NULL (defaults to false)"
+      let help = "Only allocate valid pointers until context-depth, \
+                  and then use NULL (defaults to false)"
     end)
 let () = add_correctness_dep AllocatedContextValid.parameter
-let () = AllocatedContextValid.add_aliases ["-context-valid-pointers"]
 
 let () = Parameter_customize.set_group initial_context
 module InitializationPaddingGlobals =
@@ -638,7 +615,6 @@ module InitializationPaddingGlobals =
     end)
 let () = InitializationPaddingGlobals.set_possible_values ["yes"; "no"; "maybe"]
 let () = add_correctness_dep InitializationPaddingGlobals.parameter
-let () = InitializationPaddingGlobals.add_aliases ["-val-initialization-padding-globals"]
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tuning                                                            --- *)
@@ -669,7 +645,7 @@ module HierarchicalConvergence =
     (struct
       let option_name = "-eva-hierarchical-convergence"
       let help = "Experimental and unsound. Separate the convergence process \
-                  of each levels of nested  loops. This implies that the convergence of \
+                  of each level of nested loops. This implies that the convergence of \
                   inner loops will be completely recomputed when doing another iteration \
                   of the outer loops."
     end)
@@ -683,10 +659,9 @@ module WideningDelay =
       let option_name = "-eva-widening-delay"
       let arg_name = "n"
       let help =
-        "do not widen before the <n>-th iteration (defaults to 3)"
+        "Do not widen before the <n>-th iteration (defaults to 3)"
     end)
 let () = WideningDelay.set_range ~min:1 ~max:max_int
-let () = WideningDelay.add_aliases ["-wlevel"]
 let () = add_precision_dep WideningDelay.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -697,9 +672,9 @@ module WideningPeriod =
       let option_name = "-eva-widening-period"
       let arg_name = "n"
       let help =
-        "after the first widening, widen each <n> iterations (defaults to 2)"
+        "After the first widening, widen each <n> iterations (defaults to 2)"
     end)
-let () = WideningDelay.set_range ~min:1 ~max:max_int
+let () = WideningPeriod.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
 
 (* --- Partitioning --- *)
@@ -711,10 +686,12 @@ module SemanticUnrollingLevel =
       let option_name = "-eva-slevel"
       let arg_name = "n"
       let help =
-        "superpose up to <n> states when unrolling control flow. The larger n, the more precise and expensive the analysis (defaults to 0)"
+        "Superpose up to <n> states when unrolling control flow. \
+         The larger n, the more precise and expensive the analysis \
+         (defaults to 0)"
     end)
+let () = SemanticUnrollingLevel.set_range 0 max_int
 let () = add_precision_dep SemanticUnrollingLevel.parameter
-let () = SemanticUnrollingLevel.add_aliases ["-slevel"]
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -735,11 +712,10 @@ module SlevelFunction =
     (struct
       let option_name = "-eva-slevel-function"
       let arg_name = "f:n"
-      let help = "override slevel with <n> when analyzing <f>"
+      let help = "Override slevel with <n> when analyzing <f>"
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep SlevelFunction.parameter
-let () = SlevelFunction.add_aliases ["-slevel-function"]
 
 let () = Parameter_customize.set_group precision_tuning
 module SlevelMergeAfterLoop =
@@ -748,11 +724,10 @@ module SlevelMergeAfterLoop =
       let option_name = "-eva-slevel-merge-after-loop"
       let arg_name = "f | @all"
       let help =
-        "when set, the different execution paths that originate from the body \
+        "When set, the different execution paths that originate from the body \
          of a loop are merged before entering the next excution."
     end)
 let () = add_precision_dep SlevelMergeAfterLoop.parameter
-let () = SlevelMergeAfterLoop.add_aliases ["-val-slevel-merge-after-loop"]
 
 let () = Parameter_customize.set_group precision_tuning
 module MinLoopUnroll =
@@ -762,9 +737,9 @@ module MinLoopUnroll =
       let arg_name = "n"
       let default = 0
       let help =
-        "unroll <n> loop iterations for each loop, regardless of the slevel \
+        "Unroll <n> loop iterations for each loop, regardless of the slevel \
          settings and the number of states already propagated. \
-         Can be overwritten on a case by case basis by loop unroll annotations."
+         Can be overwritten on a case-by-case basis by loop unroll annotations."
     end)
 let () = add_precision_dep MinLoopUnroll.parameter
 let () = MinLoopUnroll.set_range 0 max_int
@@ -776,7 +751,7 @@ module AutoLoopUnroll =
       let option_name = "-eva-auto-loop-unroll"
       let arg_name = "n"
       let default = 0
-      let help = "limit of the automatic loop unrolling: all loops whose \
+      let help = "Limit of the automatic loop unrolling: all loops whose \
                   number of iterations can be easily bounded by <n> \
                   are completely unrolled."
     end)
@@ -791,8 +766,8 @@ module DefaultLoopUnroll =
       let arg_name = "n"
       let default = 100
       let help =
-        "defines the default limit for loop unroll annotations that do\
-         not explicitely provide a limit."
+        "Define the default limit for loop unroll annotations that do \
+         not explicitly provide a limit."
     end)
 let () = add_precision_dep DefaultLoopUnroll.parameter
 let () = DefaultLoopUnroll.set_range 0 max_int
@@ -805,7 +780,7 @@ module HistoryPartitioning =
       let arg_name = "n"
       let default = 0
       let help =
-        "keep states distincts as long as the <n> last branching in their\
+        "Keep states distinct as long as the <n> last branching in their \
          traces are also distinct. (A value of 0 deactivates this feature)"
     end)
 let () = add_precision_dep HistoryPartitioning.parameter
@@ -816,7 +791,7 @@ module ValuePartitioning =
   String_set
     (struct
       let option_name = "-eva-partition-value"
-      let help = "partition the space of reachable states according to the \
+      let help = "Partition the space of reachable states according to the \
                   possible values of the global(s) variable(s) V."
       let arg_name = "V"
     end)
@@ -829,8 +804,8 @@ module SplitLimit =
       let option_name = "-eva-split-limit"
       let arg_name = "N"
       let default = 100
-      let help = "prevents the split annotations or -eva-partition-value to \
-                  enumerate more than N cases"
+      let help = "Prevent split annotations or -eva-partition-value from \
+                  enumerating more than N cases"
     end)
 let () = add_precision_dep SplitLimit.parameter
 let () = SplitLimit.set_range 0 max_int
@@ -853,12 +828,11 @@ module SplitReturnFunction =
     (struct
       let option_name = "-eva-split-return-function"
       let arg_name = "f:n"
-      let help = "split return states of function <f> according to \
+      let help = "Split return states of function <f> according to \
                   \\result == n and \\result != n"
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep SplitReturnFunction.parameter
-let () = SplitReturnFunction.add_aliases ["-val-split-return-function"]
 
 let () = Parameter_customize.set_group precision_tuning
 module SplitReturn =
@@ -867,8 +841,8 @@ module SplitReturn =
       let option_name = "-eva-split-return"
       let arg_name = "mode"
       let default = ""
-      let help = "when 'mode' is a number, or 'full', this is equivalent \
-                  to -val-split-return-function f:mode for all functions f. \
+      let help = "When 'mode' is a number, or 'full', this is equivalent \
+                  to -eva-split-return-function f:mode for all functions f. \
                   When mode is 'auto', automatically split states at the end \
                   of all functions, according to the function return code"
     end)
@@ -886,7 +860,6 @@ let () =
            abort "@[@[incorrect argument for option %s@ (%s).@]"
              SplitReturn.name s))
 let () = add_precision_dep SplitReturn.parameter
-let () = SplitReturn.add_aliases ["-val-split-return"]
 
 (* --- Misc --- *)
 
@@ -903,7 +876,6 @@ module ILevel =
          (defaults to 8, must be between 4 and 128)"
     end)
 let () = add_precision_dep ILevel.parameter
-let () = ILevel.add_aliases ["-val-ilevel"]
 let () = ILevel.add_update_hook (fun _ i -> Int_set.set_small_cardinal i)
 let () = ILevel.set_range 4 256
 
@@ -934,13 +906,12 @@ module BuiltinsOverrides =
     (struct
       let option_name = "-eva-builtin"
       let arg_name = "f:ffc"
-      let help = "when analyzing function <f>, try to use Frama-C builtin \
+      let help = "When analyzing function <f>, try to use Frama-C builtin \
                   <ffc> instead. \
                   Fall back to <f> if <ffc> cannot handle its arguments."
       let default = Kernel_function.Map.empty
     end)
-let () = add_precision_dep BuiltinsOverrides.parameter
-let () = BuiltinsOverrides.add_aliases ["-val-builtin"]
+let () = add_correctness_dep BuiltinsOverrides.parameter
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
@@ -957,17 +928,16 @@ module BuiltinsAuto =
                   known C functions"
     end)
 let () = add_correctness_dep BuiltinsAuto.parameter
-let () = BuiltinsAuto.add_aliases ["-val-builtins-auto"]
 
 let () = Parameter_customize.set_group precision_tuning
+let () = Parameter_customize.set_negative_option_name ""
 module BuiltinsList =
   False
     (struct
       let option_name = "-eva-builtins-list"
-      let help = "Lists the existing builtins, and which functions they \
+      let help = "List existing builtins, and which functions they \
                   are automatically associated to (if any)"
     end)
-let () = BuiltinsList.add_aliases ["-val-builtins-list"]
 
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevel =
@@ -980,8 +950,8 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
+let () = LinearLevel.set_range 0 max_int
 let () = add_precision_dep LinearLevel.parameter
-let () = LinearLevel.add_aliases ["-val-subdivide-non-linear"]
 
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevelFunction =
@@ -1001,7 +971,7 @@ module LinearLevelFunction =
     (struct
       let option_name = "-eva-subdivide-non-linear-function"
       let arg_name = "f:n"
-      let help = "override the global option -eva-subdivide-non-linear with <n>\
+      let help = "Override the global option -eva-subdivide-non-linear with <n>\
                   when analyzing the function <f>."
       let default = Kernel_function.Map.empty
     end)
@@ -1014,21 +984,20 @@ module UsePrototype =
     (struct
       let option_name = "-eva-use-spec"
       let arg_name = "f1,..,fn"
-      let help = "use the ACSL specification of the functions instead of their definitions"
+      let help = "Use the ACSL specification of the functions instead of \
+                  their definitions"
     end)
-let () = add_precision_dep UsePrototype.parameter
-let () = UsePrototype.add_aliases ["-val-use-spec"]
+let () = add_correctness_dep UsePrototype.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
   True
     (struct
       let option_name = "-eva-skip-stdlib-specs"
-      let help = "skip ACSL specifications on functions originating from the \
+      let help = "Skip ACSL specifications on functions originating from the \
                   standard library of Frama-C, when their bodies are evaluated"
     end)
 let () = add_precision_dep SkipLibcSpecs.parameter
-let () = SkipLibcSpecs.add_aliases ["-val-skip-stdlib-specs"]
 
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1036,10 +1005,10 @@ module RmAssert =
   True
     (struct
       let option_name = "-eva-remove-redundant-alarms"
-      let help = "after the analysis, try to remove redundant alarms, so that the user needs inspect fewer of them"
+      let help = "After the analysis, try to remove redundant alarms, \
+                  so that the user needs to inspect fewer of them"
     end)
 let () = add_precision_dep RmAssert.parameter
-let () = RmAssert.add_aliases ["-remove-redundant-alarms"]
 
 let () = Parameter_customize.set_group precision_tuning
 module MemExecAll =
@@ -1047,20 +1016,10 @@ module MemExecAll =
     (struct
       let option_name = "-eva-memexec"
       let help = "Speed up analysis by not recomputing functions already \
-                  analyzed in the same context. Forces -inout-callwise. \
+                  analyzed in the same context. \
                   Callstacks for which the analysis has not been recomputed \
                   are incorrectly shown as dead in the GUI."
     end)
-let () = MemExecAll.add_aliases ["-memexec-all"]
-let () =
-  MemExecAll.add_set_hook
-    (fun _bold bnew ->
-       if bnew then
-         try
-           Dynamic.Parameter.Bool.set "-inout-callwise" true
-         with Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ ->
-           abort "Cannot set option -eva-memexec. Is plugin Inout registered?"
-    )
 
 let () = Parameter_customize.set_group precision_tuning
 module ArrayPrecisionLevel =
@@ -1069,105 +1028,14 @@ module ArrayPrecisionLevel =
       let default = 200
       let option_name = "-eva-plevel"
       let arg_name = "n"
-      let help = "use <n> as the precision level for arrays accesses. \
+      let help = "Use <n> as the precision level for arrays accesses. \
                   Array accesses are precise as long as the interval for the index contains \
                   less than n values. (defaults to 200)"
     end)
+let () = ArrayPrecisionLevel.set_range 0 max_int
 let () = add_precision_dep ArrayPrecisionLevel.parameter
-let () = ArrayPrecisionLevel.add_aliases ["-plevel"]
 let () = ArrayPrecisionLevel.add_update_hook
     (fun _ v -> Offsetmap.set_plevel v)
-
-(* Options SaveFunctionState and LoadFunctionState are related
-   and mutually dependent for sanity checking.
-   Also, they depend on BuiltinsOverrides, so they cannot be defined before it. *)
-let () = Parameter_customize.set_group initial_context
-module SaveFunctionState =
-  Kernel_function_map
-    (struct
-      include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ file = file
-      let to_string ~key:_ file = file
-    end)
-    (struct
-      let option_name = "-eva-save-fun-state"
-      let arg_name = "function:filename"
-      let help = "save state of function <function> in file <filename>"
-      let default = Kernel_function.Map.empty
-    end)
-let () = SaveFunctionState.add_aliases ["-val-save-fun-state"]
-let () = Parameter_customize.set_group initial_context
-module LoadFunctionState =
-  Kernel_function_map
-    (struct
-      include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ file = file
-      let to_string ~key:_ file = file
-    end)
-    (struct
-      let option_name = "-eva-load-fun-state"
-      let arg_name = "function:filename"
-      let help = "load state of function <function> from file <filename>"
-      let default = Kernel_function.Map.empty
-    end)
-let () = LoadFunctionState.add_aliases ["-val-load-fun-state"]
-let () = add_correctness_dep SaveFunctionState.parameter
-let () = add_correctness_dep LoadFunctionState.parameter
-(* checks that SaveFunctionState has a unique argument pair, and returns it. *)
-let get_SaveFunctionState () =
-  let is_first = ref true in
-  let (kf, filename) = SaveFunctionState.fold
-      (fun (kf, opt_filename) _acc ->
-         if !is_first then is_first := false
-         else abort "option `%s' requires a single function:filename pair"
-             SaveFunctionState.name;
-         let filename = Extlib.the opt_filename in
-         kf, filename
-      ) (Kernel_function.dummy (), "")
-  in
-  if filename = "" then abort "option `%s' requires a function:filename pair"
-      SaveFunctionState.name
-  else kf, filename
-(* checks that LoadFunctionState has a unique argument pair, and returns it. *)
-let get_LoadFunctionState () =
-  let is_first = ref true in
-  let (kf, filename) = LoadFunctionState.fold
-      (fun (kf, opt_filename) _acc ->
-         if !is_first then is_first := false
-         else abort "option `%s' requires a single function:filename pair"
-             LoadFunctionState.name;
-         let filename = Extlib.the opt_filename in
-         kf, filename
-      ) (Kernel_function.dummy (), "")
-  in
-  if filename = "" then abort "option `%s' requires a function:filename pair"
-      LoadFunctionState.name
-  else kf, filename
-(* perform early sanity checks to avoid aborting the analysis only at the end *)
-let () = Ast.apply_after_computed (fun _ ->
-    (* check the function to save returns 'void' *)
-    if SaveFunctionState.is_set () then begin
-      let (kf, _) = get_SaveFunctionState () in
-      if not (Kernel_function.returns_void kf) then
-        abort "option `%s': function `%a' must return void"
-          SaveFunctionState.name Kernel_function.pretty kf
-    end;
-    if SaveFunctionState.is_set () && LoadFunctionState.is_set () then begin
-      (* check that if both save and load are set, they do not specify the
-         same function name (note: cannot compare using function ids) *)
-      let (save_kf, _) = get_SaveFunctionState () in
-      let (load_kf, _) = get_LoadFunctionState () in
-      if Kernel_function.equal save_kf load_kf then
-        abort "options `%s' and `%s' cannot save/load the same function `%a'"
-          SaveFunctionState.name LoadFunctionState.name
-          Kernel_function.pretty save_kf
-    end;
-    if LoadFunctionState.is_set () then
-      let (kf, _) = get_LoadFunctionState () in
-      BuiltinsOverrides.add (kf, Some "Frama_C_load_state");
-  )
 
 (* ------------------------------------------------------------------------- *)
 (* --- Messages                                                          --- *)
@@ -1180,51 +1048,26 @@ module ValShowProgress =
       let option_name = "-eva-show-progress"
       let help = "Show progression messages during analysis"
     end)
-let () = ValShowProgress.add_aliases ["-val-show-progress"]
-
-let () = Parameter_customize.set_group messages
-let () = Parameter_customize.is_invisible ()
-module ValShowInitialState =
-  True
-    (struct
-      let option_name = "-val-show-initial-state"
-      (* deprecated in Silicon *)
-      let help = "[deprecated] Show initial state before analysis starts. \
-                  This option has been replaced by \
-                  -value-msg-key=[-]initial-state and has no effect anymore."
-    end)
-let () =
-  ValShowInitialState.add_set_hook
-    (fun _ new_ ->
-       if new_ then
-         Kernel.warning "@[Option -val-show-initial-state has no effect, \
-                         it has been replaced by -eva-msg-key=initial-state@]"
-       else
-         Kernel.warning "@[Option -no-val-show-initial-state has no effect, \
-                         it has been replaced by -eva-msg-key=-initial-state@]"
-    )
 
 let () = Parameter_customize.set_group messages
 module ValShowPerf =
   False
     (struct
       let option_name = "-eva-show-perf"
-      let help = "Compute and shows a summary of the time spent analyzing function calls"
+      let help = "Compute and show a summary of the time spent analyzing function calls"
     end)
-let () = ValShowPerf.add_aliases ["-val-show-perf"]
 
 let () = Parameter_customize.set_group messages
 module ValPerfFlamegraphs =
   String
     (struct
       let option_name = "-eva-flamegraph"
-      let help = "Dumps a summary of the time spent analyzing function calls \
+      let help = "Dump a summary of the time spent analyzing function calls \
                   in a format suitable for the Flamegraph tool \
                   (http://www.brendangregg.com/flamegraphs.html)"
       let arg_name = "file"
       let default = ""
     end)
-let () = ValPerfFlamegraphs.add_aliases ["-val-flamegraph"]
 
 
 let () = Parameter_customize.set_group messages
@@ -1236,7 +1079,6 @@ module ShowSlevel =
       let arg_name = "n"
       let help = "Period for showing consumption of the alloted slevel during analysis"
     end)
-let () = ShowSlevel.add_aliases ["-val-show-slevel"]
 let () = ShowSlevel.set_range ~min:1 ~max:max_int
 
 let () = Parameter_customize.set_group messages
@@ -1246,35 +1088,6 @@ module PrintCallstacks =
       let option_name = "-eva-print-callstacks"
       let help = "When printing a message, also show the current call stack"
     end)
-let () = PrintCallstacks.add_aliases ["-val-print-callstacks"]
-
-let () = Parameter_customize.set_group messages
-let () = Parameter_customize.is_invisible ()
-module AlarmsWarnings =
-  True
-    (struct
-      let option_name = "-val-warn-on-alarms"
-      let help = "[DEPRECATED: use warning key alarm to manage alarms] \
-                  if set (default), possible alarms are printed in \
-                  the analysis log as warnings, otherwise as plain feedback"
-    end)
-
-let () =
-  AlarmsWarnings.add_set_hook
-    (fun _ f ->
-       match get_warn_status wkey_alarm with
-       | Log.Wabort | Log.Werror | Log.Werror_once ->
-         warning "alarms already set to produce an error. \
-                  Ignoring -val-warn-on-alarms"
-       | Log.Winactive | Log.Wactive | Log.Wfeedback ->
-         set_warn_status wkey_alarm (if f then Log.Wactive else Log.Wfeedback)
-       | Log.Wonce | Log.Wfeedback_once ->
-         (* Keep the 'once' status. Note that this will only happen if user
-            is mixing old and new style of warning management, thus it becomes
-            difficult to interpret the desired action.
-         *)
-         set_warn_status wkey_alarm
-           (if f then Log.Wonce else Log.Wfeedback_once))
 
 let () = Parameter_customize.set_group messages
 module ReportRedStatuses =
@@ -1283,7 +1096,7 @@ module ReportRedStatuses =
       let option_name = "-eva-report-red-statuses"
       let arg_name = "filename"
       let default = ""
-      let help = "output the list of \"red properties\" in a csv file of the \
+      let help = "Output the list of \"red properties\" in a csv file of the \
                   given name. These are the properties which were invalid for \
                   some states. Their consolidated status may not be invalid, \
                   but they should often be investigated first."
@@ -1294,7 +1107,7 @@ module NumerorsLogFile =
   String
     (struct
       let option_name = "-eva-numerors-log-file"
-      let help = "The Numerors Domain will save each call to the DPRINT \
+      let help = "The Numerors domain will save each call to the DPRINT \
                   function in the given file"
       let arg_name = "file"
       let default = ""
@@ -1312,36 +1125,6 @@ module InterpreterMode =
       let help = "Stop at first call to a library function, if main() has \
                   arguments, on undecided branches"
     end)
-let () = InterpreterMode.add_aliases ["-val-interpreter-mode"]
-
-let () = Parameter_customize.set_group interpreter
-let () = Parameter_customize.is_invisible ()
-module ObviouslyTerminatesFunctions =
-  Fundec_set
-    (struct
-      let option_name = "-obviously-terminates-function"
-      let arg_name = "f"
-      let help = "deprecated"
-    end)
-let () = add_dep ObviouslyTerminatesFunctions.parameter
-let () = ObviouslyTerminatesFunctions.add_update_hook
-    (fun _ _ ->
-       warning "Option -obviously-terminates-function is no longer supported. \
-                Ignoring.")
-
-let () = Parameter_customize.set_group interpreter
-let () = Parameter_customize.is_invisible ()
-module ObviouslyTerminatesAll =
-  False
-    (struct
-      let option_name = "-obviously-terminates"
-      let help = "undocumented and deprecated"
-    end)
-let () = add_dep ObviouslyTerminatesAll.parameter
-let () = ObviouslyTerminatesAll.add_update_hook
-    (fun _ _ ->
-       warning "Option -obviously-terminates is no longer supported. \
-                Ignoring.")
 
 let () = Parameter_customize.set_group interpreter
 module StopAtNthAlarm =
@@ -1349,9 +1132,9 @@ module StopAtNthAlarm =
     let option_name = "-eva-stop-at-nth-alarm"
     let default = max_int
     let arg_name = "n"
-    let help = "Aborts the analysis when the nth alarm is emitted."
+    let help = "Abort the analysis when the nth alarm is emitted."
   end)
-let () = StopAtNthAlarm.add_aliases ["-val-stop-at-nth-alarm"]
+let () = StopAtNthAlarm.set_range 0 max_int
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ugliness required for correctness                                  --- *)
@@ -1402,6 +1185,7 @@ module OracleDepth =
       let default = 2
       let arg_name = ""
     end)
+let () = OracleDepth.set_range 0 max_int
 let () = add_precision_dep OracleDepth.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1414,6 +1198,7 @@ module ReductionDepth =
       let default = 4
       let arg_name = ""
     end)
+let () = ReductionDepth.set_range 0 max_int
 let () = add_precision_dep ReductionDepth.parameter
 
 
@@ -1446,7 +1231,7 @@ module AllocFunctions =
     (struct
       let option_name = "-eva-alloc-functions"
       let arg_name = "f1,...,fn"
-      let help = "Controls call site creation for dynamically allocated bases. \
+      let help = "Control call site creation for dynamically allocated bases. \
                   Dynamic allocation builtins use the call sites of \
                   malloc/calloc/realloc to know \
                   where to create new bases. This detection does not work for \
@@ -1455,7 +1240,6 @@ module AllocFunctions =
                   By default, contains malloc, calloc and realloc."
       let default = Datatype.String.Set.of_list ["malloc"; "calloc"; "realloc"]
     end)
-let () = AllocFunctions.add_aliases ["-val-malloc-functions"]
 let () = AllocFunctions.add_aliases ["-eva-malloc-functions"]
 
 let () = Parameter_customize.set_group malloc
@@ -1466,7 +1250,7 @@ module AllocReturnsNull=
       let help = "Memory allocation built-ins (malloc, calloc, realloc) are \
                   modeled as nondeterministically returning a null pointer"
     end)
-let () = AllocReturnsNull.add_aliases ["-val-alloc-returns-null"]
+let () = add_correctness_dep AllocReturnsNull.parameter
 
 let () = Parameter_customize.set_group malloc
 module MallocLevel =
@@ -1475,10 +1259,66 @@ module MallocLevel =
       let option_name = "-eva-mlevel"
       let default = 0
       let arg_name = "m"
-      let help = "sets to [m] the number of precise dynamic allocations \
+      let help = "Set to [m] the number of precise dynamic allocations \
                   besides the initial one, for each callstack (defaults to 0)"
     end)
-let () = MallocLevel.add_aliases ["-val-mlevel"]
+let () = MallocLevel.set_range 0 max_int
+let () = add_precision_dep MallocLevel.parameter
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated aliases                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let deprecated_aliases : ((module Parameter_sig.S) * string) list =
+  [ (module SemanticUnrollingLevel), "-slevel"
+  ; (module SlevelFunction), "-slevel-function"
+  ; (module NoResultsFunctions), "-no-results-function"
+  ; (module ResultsAll), "-results"
+  ; (module JoinResults), "-val-join-results"
+  ; (module AllRoundingModesConstants), "-all-rounding-modes-constants"
+  ; (module UndefinedPointerComparisonPropagateAll), "-undefined-pointer-comparison-propagate-all"
+  ; (module WarnPointerComparison), "-val-warn-undefined-pointer-comparison"
+  ; (module WarnSignedConvertedDowncast), "-val-warn-signed-converted-downcast"
+  ; (module WarnPointerSubstraction), "-val-warn-pointer-subtraction"
+  ; (module IgnoreRecursiveCalls), "-val-ignore-recursive-calls"
+  ; (module WarnCopyIndeterminate), "-val-warn-copy-indeterminate"
+  ; (module ReduceOnLogicAlarms), "-val-reduce-on-logic-alarms"
+  ; (module InitializedLocals), "-val-initialized-locals"
+  ; (module AutomaticContextMaxDepth), "-context-depth"
+  ; (module AutomaticContextMaxWidth), "-context-width"
+  ; (module AllocatedContextValid), "-context-valid-pointers"
+  ; (module InitializationPaddingGlobals), "-val-initialization-padding-globals"
+  ; (module WideningDelay), "-wlevel"
+  ; (module SlevelMergeAfterLoop), "-val-slevel-merge-after-loop"
+  ; (module SplitReturnFunction), "-val-split-return-function"
+  ; (module SplitReturn), "-val-split-return"
+  ; (module ILevel), "-val-ilevel"
+  ; (module BuiltinsOverrides), "-val-builtin"
+  ; (module BuiltinsAuto), "-val-builtins-auto"
+  ; (module BuiltinsList), "-val-builtins-list"
+  ; (module LinearLevel), "-val-subdivide-non-linear"
+  ; (module UsePrototype), "-val-use-spec"
+  ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
+  ; (module RmAssert), "-remove-redundant-alarms"
+  ; (module MemExecAll), "-memexec-all"
+  ; (module ArrayPrecisionLevel), "-plevel"
+  ; (module ValShowProgress), "-val-show-progress"
+  ; (module ValShowPerf), "-val-show-perf"
+  ; (module ValPerfFlamegraphs), "-val-flamegraph"
+  ; (module ShowSlevel), "-val-show-slevel"
+  ; (module PrintCallstacks), "-val-print-callstacks"
+  ; (module InterpreterMode), "-val-interpreter-mode"
+  ; (module StopAtNthAlarm), "-val-stop-at-nth-alarm"
+  ; (module AllocFunctions), "-val-malloc-functions"
+  ; (module AllocReturnsNull), "-val-alloc-returns-null"
+  ; (module MallocLevel), "-val-mlevel"
+  ]
+
+let add_deprecated_alias ((module P: Parameter_sig.S), name) =
+  P.add_aliases ~visible:false ~deprecated:true [name]
+
+let () = List.iter add_deprecated_alias deprecated_aliases
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Meta options                                                       --- *)

@@ -91,12 +91,9 @@ let post_analysis_cleanup ~aborted =
   if Value_parameters.JoinResults.get () then
     Db.Value.Table_By_Callstack.iter
       (fun s _ -> ignore (Db.Value.get_stmt_state s));
-  if not aborted then begin
+  if not aborted then
     (* Keep memexec results for users that want to resume the analysis *)
-    Mem_exec.cleanup_results ();
-    if not (Value_parameters.SaveFunctionState.is_empty ()) then
-      State_import.save_globals_state ();
-  end
+    Mem_exec.cleanup_results ()
 
 let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to

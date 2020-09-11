@@ -20,41 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Make the property statuses of the initial project accessible when
-    doing the main translation *)
+open Cil_types
 
-type kind =
-  | K_Assert
-  | K_Invariant
-  | K_Variant
-  | K_StmtSpec
-  | K_Allocation
-  | K_Assigns
-  | K_Decreases
-  | K_Terminates (* TODO: should be removed: not part of the E-ACSL subset *)
-  | K_Complete
-  | K_Disjoint
-  | K_Requires
-  | K_Ensures
+(* ********************************************************************** *)
+(* Helper functions to build expressions *)
+(* ********************************************************************** *)
 
-val clear: unit -> unit
-(** to be called before any program transformation *)
+val lval: loc:location -> lval -> exp
+(** Construct an lval expression from an lval. *)
 
-val push: Kernel_function.t -> kind -> Property.t -> unit
-(** store the given property of the given kind for the given function *)
+val deref: loc:location -> exp -> exp
+(** Construct a dereference of an expression. *)
 
-val before_translation: unit -> unit
-(** to be called just before injecting the code *)
-
-val must_translate: Kernel_function.t -> kind -> bool
-(** To be called just before transforming a property of the given kind for the
-    given function.
-    VERY IMPORTANT: the property of the n-th call to this function exactly
-    correspond to the n-th pushed property (see {!push}).
-    @return true if and only if the translation must occur. *)
+val subscript: loc:location -> exp -> exp -> exp
+(** [mk_subscript ~loc array idx] Create an expression to access the [idx]'th
+    element of the [array]. *)
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)

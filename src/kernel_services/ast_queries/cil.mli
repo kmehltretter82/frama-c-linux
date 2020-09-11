@@ -546,8 +546,15 @@ val isLogicRealType: logic_type -> bool
     floating point *)
 val isArithmeticType: typ -> bool
 
-(** True if the argument is an arithmetic or pointer type (i.e. integer, enum,
-    floating point or pointer *)
+(** True if the argument is a scalar type (i.e. integral, enum,
+    floating point or pointer
+    @since Frama-C+dev
+*)
+val isScalarType: typ -> bool
+
+(** alias of isScalarType.
+    @deprecated Frama-C+dev use isScalarType instead
+*)
 val isArithmeticOrPointerType: typ -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
@@ -1240,6 +1247,11 @@ val frama_c_init_obj: string
     @since 18.0-Argon
 *)
 val frama_c_mutable: string
+
+(** A block marked with this attribute is known to be inlined, i.e.
+    it replaces a call to an inline function.
+*)
+val frama_c_inlined: string
 
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.

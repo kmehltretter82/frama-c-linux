@@ -116,19 +116,15 @@ let call ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
   let e, env = !term_to_exp_ref kf (Env.rte env true) t in
-  let _, res, env =
-    Env.new_var
-      ~loc
-      ~name
-      env
-      kf
-      None
-      ctx
-      (fun v _ ->
-         let name = Functions.RTL.mk_api_name name in
-         [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) name [ e ] ])
-  in
-  res, env
+  Env.rtl_call_to_new_var
+    ~loc
+    ~name
+    env
+    kf
+    None
+    ctx
+    name
+    [ e ]
 
 (*****************************************************************************)
 (************************* Calls with Range Elimination **********************)
@@ -159,8 +155,8 @@ let gmp_to_sizet ~loc kf env size p =
       None
       sizet
       (fun vi _ ->
-         [ Constructor.mk_runtime_check Constructor.RTE kf guard p;
-           Constructor.mk_lib_call ~loc
+         [ Smart_stmt.runtime_check Smart_stmt.RTE kf guard p;
+           Smart_stmt.lib_call ~loc
              ~result:(Cil.var vi)
              "__gmpz_get_ui"
              [ size ] ])
@@ -234,24 +230,20 @@ let call_memory_block ~loc kf name ctx env ptr r p =
     | _ -> assert false
   in
   (* generating env *)
-  let _, e, env =
-    Env.new_var
-      ~loc
-      ~name
-      env
-      kf
-      None
-      ctx
-      (fun v _ ->
-         let fname = Functions.RTL.mk_api_name name in
-         let args = match name with
-           | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
-           | "initialized" -> [ ptr; size ]
-           | _ -> Error.not_yet ("builtin " ^ name)
-         in
-         [ Constructor.mk_lib_call ~loc ~result:(Cil.var v) fname args ])
+  let args = match name with
+    | "valid" | "valid_read" -> [ ptr; size; base; base_addr ]
+    | "initialized" -> [ ptr; size ]
+    | _ -> Error.not_yet ("builtin " ^ name)
   in
-  e, env
+  Env.rtl_call_to_new_var
+    ~loc
+    ~name
+    env
+    kf
+    None
+    ctx
+    name
+    args
 
 (* [call_with_ranges] handles ranges in [t] when calling builtin [name].
    It only supports the following cases for the time being:
@@ -342,23 +334,17 @@ let call_with_size ~loc kf name ctx env t p =
   let call_for_unsupported_constructs ~loc kf name ctx env t =
     let term_to_exp = !term_to_exp_ref in
     let e, env = term_to_exp kf (Env.rte env true) t in
-    let _, res, env =
-      Env.new_var
-        ~loc
-        ~name
-        env
-        kf
-        None
-        ctx
-        (fun v _ ->
-           let ty = Misc.cty t.term_type in
-           let sizeof = Misc.mk_ptr_sizeof ty loc in
-           [ Constructor.mk_rtl_call ~loc
-               ~result:(Cil.var v)
-               name
-               [ e; sizeof ] ])
-    in
-    res, env
+    let ty = Misc.cty t.term_type in
+    let sizeof = Misc.mk_ptr_sizeof ty loc in
+    Env.rtl_call_to_new_var
+      ~loc
+      ~name
+      env
+      kf
+      None
+      ctx
+      name
+      [ e; sizeof ]
   in
   call_with_ranges
     ~loc
@@ -382,21 +368,18 @@ let call_valid ~loc kf name ctx env t p =
       | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
       | _ -> assert false
     in
-    let _, res, env =
-      Env.new_var
-        ~loc
-        ~name
-        env
-        kf
-        None
-        ctx
-        (fun v _ ->
-           let ty = Misc.cty t.term_type in
-           let sizeof = Misc.mk_ptr_sizeof ty loc in
-           let args = [ e; sizeof; base; base_addr ] in
-           [ Constructor.mk_rtl_call ~loc ~result:(Cil.var v) name args ])
-    in
-    res, env
+    let ty = Misc.cty t.term_type in
+    let sizeof = Misc.mk_ptr_sizeof ty loc in
+    let args = [ e; sizeof; base; base_addr ] in
+    Env.rtl_call_to_new_var
+      ~loc
+      ~name
+      env
+      kf
+      None
+      ctx
+      name
+      args
   in
   call_with_ranges
     ~loc

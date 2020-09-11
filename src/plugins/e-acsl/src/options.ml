@@ -31,13 +31,6 @@ module P = Plugin.Register
 module PP = P (* [PP] required to avoid an ocamldoc error in OCaml 4.02 *)
 include PP
 
-module Check =
-  False
-    (struct
-      let option_name = "-e-acsl-check"
-      let help = "only type check E-ACSL annotated program"
-    end)
-
 module Run =
   False
     (struct
@@ -61,13 +54,6 @@ module Valid =
     (struct
       let option_name = "-e-acsl-valid"
       let help = "translate annotation which have been proven valid"
-    end)
-
-module Prepare =
-  False
-    (struct
-      let option_name = "-e-acsl-prepare"
-      let help = "prepare the AST to be directly usable by E-ACSL"
     end)
 
 module Gmp_only =
@@ -163,7 +149,9 @@ let parameter_states =
     Functions.self;
     Instrument.self ]
 
-let must_visit () = Run.get () || Check.get ()
+let emitter = Emitter.create "E-ACSL" [ Funspec ] ~correctness:[] ~tuning:[]
+
+let must_visit () = Run.get ()
 
 let dkey_analysis = register_category "analysis"
 let dkey_prepare = register_category "preparation"
@@ -172,6 +160,6 @@ let dkey_typing = register_category "typing"
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../.."
 End:
 *)

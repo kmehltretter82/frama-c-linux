@@ -47,6 +47,8 @@ let exists lv t =
   in
   List.exists is_lv t
 
+type pred_or_term = PoT_pred of predicate | PoT_term of term
+
 exception Lscope_used
 let is_used lscope pot =
   let o = object inherit Visitor.frama_c_inplace
@@ -57,8 +59,14 @@ let is_used lscope pot =
   in
   try
     (match pot with
-     | Misc.PoT_pred p -> ignore (Visitor.visitFramacPredicate o p)
-     | Misc.PoT_term t -> ignore (Visitor.visitFramacTerm o t));
+     | PoT_pred p -> ignore (Visitor.visitFramacPredicate o p)
+     | PoT_term t -> ignore (Visitor.visitFramacTerm o t));
     false
   with Lscope_used ->
     true
+
+(*
+Local Variables:
+compile-command: "make -C ../../../../.."
+End:
+*)

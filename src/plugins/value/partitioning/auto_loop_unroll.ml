@@ -415,7 +415,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     try
       let zero_delta = { current = `Value Val.zero; final = `Bottom; } in
       let delta = delta_block zero_delta loop in
-      final_delta delta >> fun d -> Some d
+      final_delta delta >> fun d ->
+      if is_true (Val.assume_non_zero d) then Some d else None
     with NoIncrement -> None
 
   (* If in the block [loop], [lval] is assigned once to the value of another

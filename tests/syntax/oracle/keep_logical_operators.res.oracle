@@ -11,4 +11,20 @@ int test(int a, int b, int c)
   return_label: return __retres;
 }
 
+int test_ptr(int *a, int *b, int *c)
+{
+  int __retres;
+  if (a && (b || c)) {
+    __retres = 1;
+    goto return_label;
+  }
+  if (a) 
+    if (b) {
+      __retres = 2;
+      goto return_label;
+    }
+  __retres = 3;
+  return_label: return __retres;
+}
+
 

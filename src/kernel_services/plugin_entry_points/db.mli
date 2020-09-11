@@ -1317,8 +1317,7 @@ module Operational_inputs : sig
   val get_internal_precise: (?stmt:stmt -> kernel_function -> Inout_type.t) ref
     (** More precise version of [get_internal] function. If [stmt] is
         specified, and is a possible call to the given kernel_function,
-        returns the operational inputs for this call (if option -inout-callwise
-        has been set). *)
+        returns the operational inputs for this call. *)
 
 (**/**)
     (* Internal use *)

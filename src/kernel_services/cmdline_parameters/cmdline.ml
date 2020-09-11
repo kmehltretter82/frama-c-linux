@@ -252,7 +252,11 @@ type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
   | String of (string -> unit)
-  | String_list of (string list -> unit)
+
+let option_setting_and_warn warn = function
+  | Unit f -> Unit (fun () -> warn (); f ())
+  | Int f -> Int (fun i -> warn (); f i)
+  | String f -> String (fun s -> warn (); f s)
 
 exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
@@ -309,10 +313,6 @@ let parse known_options_list then_expected options_list =
         | String f ->
             check_string_argname ();
             f arg;
-            true
-        | String_list f ->
-            check_string_argname ();
-            f (Str.split (Str.regexp "[ \t]*,[ \t]*") arg);
             true
       in
       unknown_options, use_arg && not explicit, true
@@ -441,7 +441,8 @@ module Plugin: sig
   val add_group: ?memo:bool -> plugin:string -> string -> string * bool
   val add_option: string -> group:string -> cmdline_option -> unit
   val add_aliases:
-    orig:string -> string -> group:string -> string list -> cmdline_option list
+    orig:string -> string -> group:string -> ?visible:bool -> ?deprecated:bool
+    -> string list -> cmdline_option list
   val replace_option_setting: 
     string -> plugin:string -> group:string -> option_setting -> unit
   val replace_option_help:
@@ -530,7 +531,7 @@ end = struct
   (* table name_of_the_original_option --> aliases *)
   let aliases_tbl = Hashtbl.create 7
 
-  let add_aliases ~orig shortname ~group names =
+  let add_aliases ~orig shortname ~group ?(visible=true) ?(deprecated=false) names =
     (* mostly inline [add_option] and perform additional actions *)
     let options_group = find_group shortname group in
     let option = List.find (fun o -> o.oname = orig) !options_group in
@@ -538,7 +539,19 @@ end = struct
       if name = "" then invalid_arg "empty alias name";
       Hashtbl.replace all_options name option;
       Option_names.add name true;
-      let alias = { option with oname = name } in
+      let setting =
+        if deprecated
+        then
+          let warn () =
+            Kernel_log.warning ~once:true
+              "@[%s is@ a deprecated alias@ for option %s.@ \
+               Please use %s instead.@]"
+              name option.oname option.oname
+          in
+          option_setting_and_warn warn option.setting
+        else option.setting
+      in
+      let alias = { option with oname = name; ovisible = visible; setting; } in
       options_group := alias :: !options_group;
       alias
     in
@@ -728,8 +741,8 @@ let add_option_without_action
       ohelp = help; ext_help = ext_help; ovisible = visible;
       setting = Unit (fun () -> assert false) }
 
-let add_aliases orig ~plugin ~group stage aliases =
-  let l = Plugin.add_aliases ~orig plugin ~group aliases in
+let add_aliases orig ~plugin ~group ?visible ?deprecated stage aliases =
+  let l = Plugin.add_aliases ~orig plugin ~group ?visible ?deprecated aliases in
   let add = match stage with
     | Early -> Early_Stage.add_for_parsing
     | Extending -> Extending_Stage.add_for_parsing
@@ -896,7 +909,6 @@ let low_print_option_help fmt print_invisible o =
         | Unit _ -> ""
         | Int _ -> " <n>"
         | String _ -> " <s>"
-        | String_list _ -> " <s1, ..., sn>"
       else
         " <" ^ s ^ ">"
     in
@@ -905,7 +917,8 @@ let low_print_option_help fmt print_invisible o =
       print_helpline fmt (name ^ ty) o.ohelp o.ext_help;
       List.iter
         (fun o ->
-           print_helpline fmt (o.oname ^ ty) ("alias for option " ^ name) "")
+           if print_invisible || o.ovisible then
+             print_helpline fmt (o.oname ^ ty) ("alias for option " ^ name) "")
         (Plugin.find_option_aliases o)
     end;
     true

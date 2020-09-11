@@ -83,6 +83,6 @@ let () = Cmdline.run_after_configuring_stage init
 
 (*
 Local Variables:
-compile-command: "make"
+compile-command: "make -C ../../../../.."
 End:
 *)

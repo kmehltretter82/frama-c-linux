@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -slevel-function main8_aux:2,main5_bis:4 -eva-msg-key d-gauges"
+   STDOPT: +" -eva-slevel-function main8_aux:2,main5_bis:4 -eva-msg-key d-gauges"
 */
 
 #include <stdlib.h>

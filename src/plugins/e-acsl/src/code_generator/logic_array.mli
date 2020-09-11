@@ -1,8 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of the Frama-C's E-ACSL plug-in.                    *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2012-2020                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,24 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Saving/loading of Value states, possibly among different ASTs.
-    Used by the command-line options defined by
-    [Value_parameters.SaveFunctionState] and
-    [Value_parameters.LoadFunctionState].
-    @since Aluminium-20160501 *)
+open Cil_types
 
-(** Loads the saved initial global state, and merges it with the given state
-    (locals plus new globals which were not present in the original AST).
-    The saved state may come from a different project.
-    Note that, to ensure soundness of the merge, some constraints must be
-    respected according to where the merge takes place.
-    The intended use is to replace costly function calls, in which case
-    the state of local variables should not be modified by the function. *)
-val load_and_merge_function_state: Cvalue.Model.t -> Cvalue.Model.t
+val is_array: typ -> bool
+(** @return true iff the type is an array *)
 
-(** Saves the final state of globals variables after the return statement of
-    the function defined via [Value_parameters.SaveFunctionState]. The result
-    is saved in the file defined by the same option.
-    The function must have been called exactly once during the value analysis,
-    otherwise the saved state is unspecified. *)
-val save_globals_state: unit -> unit
+val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
+  name:string -> binop -> exp -> exp -> exp * Env.t
+(** [comparison_to_exp ~loc kf env ~name bop e1 e2] generate the C code
+    equivalent to [e1 bop e2].
+    Requires that [bop] is either [Ne] or [Eq] and that [e1] and [e2] are
+    arrays. *)
+
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+
+val translate_rte_ref:
+  (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
+   Env.t) ref

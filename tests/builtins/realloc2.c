@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-mlevel 0 -inout-callwise -inout-no-print "
+   STDOPT: #"-eva-mlevel 0 -inout-no-print "
 */
 #include <stdlib.h>
 

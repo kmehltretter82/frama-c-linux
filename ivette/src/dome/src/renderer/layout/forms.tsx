@@ -939,14 +939,13 @@ export interface SliderFieldProps extends FieldProps<number> {
 }
 
 const FORMAT_VALUE = (v: number) => Number(v).toString();
-const FORMAT_RANGE = (v: number) => v > 0 ? `+${v}` : `-${-v}`;
+const FORMAT_RANGE = (v: number) => (v > 0 ? `+${v}` : `-${-v}`);
 const FORMATING = (props: SliderFieldProps) => {
   const { labelValue = true, min } = props;
   if (labelValue === false) return undefined;
   if (labelValue === true) return min < 0 ? FORMAT_RANGE : FORMAT_VALUE;
   return labelValue;
-}
-
+};
 
 const CSS_SLIDER = 'dome-text-label dome-xForm-units dome-xForm-slider-value';
 const SHOW_SLIDER = `${CSS_SLIDER} dome-xForm-slider-show`;

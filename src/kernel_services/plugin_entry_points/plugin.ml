@@ -44,7 +44,8 @@ module type S_no_log = sig
   module Config: Parameter_sig.Specific_dir
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
-  val add_plugin_output_aliases: string list -> unit
+  val add_plugin_output_aliases:
+    ?visible:bool -> ?deprecated:bool -> string list -> unit
 end
 
 module type S = sig
@@ -795,14 +796,14 @@ struct
     let is_kernel = is_kernel () in
     Warn_category.add_set_hook (parse_warn_directives is_kernel)
 
-  let add_plugin_output_aliases aliases =
+  let add_plugin_output_aliases ?visible ?deprecated aliases =
     let aliases = List.filter (fun alias -> alias <> "") aliases in
     let optname suffix = List.map (fun alias -> "-" ^ alias ^ suffix) aliases in
-    Help.add_aliases (optname "-help");
-    Verbose.add_aliases (optname "-verbose");
-    Debug_category.add_aliases (optname "-msg-key");
-    Warn_category.add_aliases (optname "-warn-key");
-    LogToFile.add_aliases (optname "-log")
+    Help.add_aliases ?visible ?deprecated (optname "-help");
+    Verbose.add_aliases ?visible ?deprecated (optname "-verbose");
+    Debug_category.add_aliases ?visible ?deprecated (optname "-msg-key");
+    Warn_category.add_aliases ?visible ?deprecated (optname "-warn-key");
+    LogToFile.add_aliases ?visible ?deprecated (optname "-log")
 
   let () = reset_plugin ()
 

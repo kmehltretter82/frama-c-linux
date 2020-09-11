@@ -214,7 +214,9 @@ rec {
         inherit src;
         buildInputs = (mk_buildInputs { opamPackages = [ "xml-light" ]; } ) ++
                     [ pkgs.getopt
-                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook stdenv.cc.cc.lib
+                      pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
+                      pkgs.swiProlog
+                      stdenv.cc.cc.lib
         ];
         counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
@@ -226,6 +228,7 @@ rec {
         volatile_src = plugins.volatile.src;
         security_src = plugins.security.src;
         context_from_precondition_src = plugins.context-from-precondition.src;
+        metacsl_src = plugins.meta.src;
         postPatch = ''
                patchShebangs .
         '';
@@ -234,8 +237,8 @@ rec {
            chmod -R u+w -- "$sourceRoot/src/plugins/counter-examples"
            cp -r --preserve=mode "$genassigns_src" "$sourceRoot/src/plugins/genassigns"
            chmod -R u+w -- "$sourceRoot/src/plugins/genassigns"
-           cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
-           chmod -R u+w -- "$sourceRoot/src/plugins/frama-clang"
+           # cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"
+           # chmod -R u+w -- "$sourceRoot/src/plugins/frama-clang"
            cp -r --preserve=mode "$pathcrawler_src" "$sourceRoot/src/plugins/pathcrawler"
            chmod -R u+w -- "$sourceRoot/src/plugins/pathcrawler"
            cp -r --preserve=mode "$mthread_src" "$sourceRoot/src/plugins/mthread"

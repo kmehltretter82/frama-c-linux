@@ -3,9 +3,535 @@
 #include "stdlib.h"
 int T1[3];
 int T2[4];
+void arrays(void)
+{
+  int a[3] = {1, 2, 3};
+  int b[3] = {4, 5, 6};
+  __e_acsl_store_block((void *)(b),(size_t)12);
+  __e_acsl_full_init((void *)(& b));
+  int c[3] = {1, 2, 3};
+  __e_acsl_store_block((void *)(c),(size_t)12);
+  __e_acsl_full_init((void *)(& c));
+  int d[6] = {1, 2, 3, 4, 5, 6};
+  {
+    int __gen_e_acsl_ne;
+    __gen_e_acsl_ne = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter;
+      __gen_e_acsl_iter = 0;
+      while (__gen_e_acsl_iter < 3) {
+        if (a[__gen_e_acsl_iter] != b[__gen_e_acsl_iter]) {
+          __gen_e_acsl_ne = 1;
+          break;
+        }
+        __gen_e_acsl_iter ++;
+      }
+    }
+    else __gen_e_acsl_ne = 1;
+    __e_acsl_assert(__gen_e_acsl_ne,"Assertion","arrays","a != b",
+                    "tests/arith/array.i",21);
+  }
+  /*@ assert a ≢ b; */ ;
+  {
+    int __gen_e_acsl_eq;
+    __gen_e_acsl_eq = 1;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_2;
+      __gen_e_acsl_iter_2 = 0;
+      while (__gen_e_acsl_iter_2 < 3) {
+        if (a[__gen_e_acsl_iter_2] != c[__gen_e_acsl_iter_2]) {
+          __gen_e_acsl_eq = 0;
+          break;
+        }
+        __gen_e_acsl_iter_2 ++;
+      }
+    }
+    else __gen_e_acsl_eq = 0;
+    __e_acsl_assert(__gen_e_acsl_eq,"Assertion","arrays","a == c",
+                    "tests/arith/array.i",22);
+  }
+  /*@ assert a ≡ c; */ ;
+  {
+    int __gen_e_acsl_ne_2;
+    __gen_e_acsl_ne_2 = 0;
+    if (0) {
+      unsigned long __gen_e_acsl_iter_3;
+      __gen_e_acsl_iter_3 = 0;
+      while (__gen_e_acsl_iter_3 < 3) {
+        if (a[__gen_e_acsl_iter_3] != d[__gen_e_acsl_iter_3]) {
+          __gen_e_acsl_ne_2 = 1;
+          break;
+        }
+        __gen_e_acsl_iter_3 ++;
+      }
+    }
+    else __gen_e_acsl_ne_2 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_2,"Assertion","arrays","a != d",
+                    "tests/arith/array.i",23);
+  }
+  /*@ assert a ≢ d; */ ;
+  int *e = a;
+  int *f = b;
+  __e_acsl_store_block((void *)(& f),(size_t)8);
+  __e_acsl_full_init((void *)(& f));
+  int *g = c;
+  __e_acsl_store_block((void *)(& g),(size_t)8);
+  __e_acsl_full_init((void *)(& g));
+  int *h = a;
+  __e_acsl_assert(e != f,"Assertion","arrays","e != f","tests/arith/array.i",
+                  30);
+  /*@ assert e ≢ f; */ ;
+  __e_acsl_assert(e != g,"Assertion","arrays","e != g","tests/arith/array.i",
+                  31);
+  /*@ assert e ≢ g; */ ;
+  __e_acsl_assert(e == h,"Assertion","arrays","e == h","tests/arith/array.i",
+                  32);
+  /*@ assert e ≡ h; */ ;
+  __e_acsl_assert(e == a,"Assertion","arrays","e == (int *)a",
+                  "tests/arith/array.i",36);
+  /*@ assert e ≡ (int *)a; */ ;
+  __e_acsl_assert(e != c,"Assertion","arrays","e != (int *)c",
+                  "tests/arith/array.i",37);
+  /*@ assert e ≢ (int *)c; */ ;
+  {
+    int __gen_e_acsl_eq_2;
+    __gen_e_acsl_eq_2 = 1;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_4;
+      __gen_e_acsl_iter_4 = 0;
+      while (__gen_e_acsl_iter_4 < 3) {
+        {
+          int __gen_e_acsl_valid_read;
+          __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& (*((int (*)[3])g))[__gen_e_acsl_iter_4]),
+                                                        sizeof(int),
+                                                        (void *)(& (*((int (*)[3])g))[__gen_e_acsl_iter_4]),
+                                                        (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])g))[__gen_e_acsl_iter_4])",
+                          "tests/arith/array.i",40);
+          if (a[__gen_e_acsl_iter_4] != (*((int (*)[3])g))[__gen_e_acsl_iter_4]) {
+            __gen_e_acsl_eq_2 = 0;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_4 ++;
+      }
+    }
+    else __gen_e_acsl_eq_2 = 0;
+    __e_acsl_assert(__gen_e_acsl_eq_2,"Assertion","arrays",
+                    "a == *((int (*)[3])g)","tests/arith/array.i",40);
+  }
+  /*@ assert a ≡ *((int (*)[3])g); */ ;
+  {
+    int __gen_e_acsl_eq_3;
+    int __gen_e_acsl_valid_read_2;
+    unsigned long __gen_e_acsl_;
+    unsigned long __gen_e_acsl__2;
+    unsigned long __gen_e_acsl_length2;
+    __gen_e_acsl_eq_3 = 1;
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*((int (*)[])g)),
+                                                    sizeof(int),
+                                                    (void *)(*((int (*)[])g)),
+                                                    (void *)(*((int (*)[])g)));
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,"RTE","arrays",
+                    "mem_access: \\valid_read((int *)*((int (*)[])g))",
+                    "tests/arith/array.i",41);
+    __gen_e_acsl_ = __e_acsl_block_length((void *)(*((int (*)[])g)));
+    __gen_e_acsl__2 = __e_acsl_offset((void *)(*((int (*)[])g)));
+    __gen_e_acsl_length2 = (__gen_e_acsl_ - __gen_e_acsl__2) / sizeof(int);
+    if (3UL == __gen_e_acsl_length2) {
+      unsigned long __gen_e_acsl_iter_5;
+      __gen_e_acsl_iter_5 = 0;
+      while (__gen_e_acsl_iter_5 < 3) {
+        {
+          int __gen_e_acsl_valid_read_3;
+          __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*((int (*)[])g))[__gen_e_acsl_iter_5]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[])g))[__gen_e_acsl_iter_5]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_3,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[])g))[__gen_e_acsl_iter_5])",
+                          "tests/arith/array.i",41);
+          if (a[__gen_e_acsl_iter_5] != (*((int (*)[])g))[__gen_e_acsl_iter_5]) {
+            __gen_e_acsl_eq_3 = 0;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_5 ++;
+      }
+    }
+    else __gen_e_acsl_eq_3 = 0;
+    __e_acsl_assert(__gen_e_acsl_eq_3,"Assertion","arrays",
+                    "a == *((int (*)[])g)","tests/arith/array.i",41);
+  }
+  /*@ assert a ≡ *((int (*)[])g); */ ;
+  {
+    int __gen_e_acsl_ne_3;
+    __gen_e_acsl_ne_3 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_6;
+      __gen_e_acsl_iter_6 = 0;
+      while (__gen_e_acsl_iter_6 < 3) {
+        {
+          int __gen_e_acsl_valid_read_4;
+          __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*((int (*)[3])f))[__gen_e_acsl_iter_6]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[3])f))[__gen_e_acsl_iter_6]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_4,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])f))[__gen_e_acsl_iter_6])",
+                          "tests/arith/array.i",42);
+          if (a[__gen_e_acsl_iter_6] != (*((int (*)[3])f))[__gen_e_acsl_iter_6]) {
+            __gen_e_acsl_ne_3 = 1;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_6 ++;
+      }
+    }
+    else __gen_e_acsl_ne_3 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_3,"Assertion","arrays",
+                    "a != *((int (*)[3])f)","tests/arith/array.i",42);
+  }
+  /*@ assert a ≢ *((int (*)[3])f); */ ;
+  {
+    int __gen_e_acsl_ne_4;
+    int __gen_e_acsl_valid_read_5;
+    unsigned long __gen_e_acsl__3;
+    unsigned long __gen_e_acsl__4;
+    unsigned long __gen_e_acsl_length2_2;
+    __gen_e_acsl_ne_4 = 0;
+    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(*((int (*)[])f)),
+                                                    sizeof(int),
+                                                    (void *)(*((int (*)[])f)),
+                                                    (void *)(*((int (*)[])f)));
+    __e_acsl_assert(__gen_e_acsl_valid_read_5,"RTE","arrays",
+                    "mem_access: \\valid_read((int *)*((int (*)[])f))",
+                    "tests/arith/array.i",43);
+    __gen_e_acsl__3 = __e_acsl_block_length((void *)(*((int (*)[])f)));
+    __gen_e_acsl__4 = __e_acsl_offset((void *)(*((int (*)[])f)));
+    __gen_e_acsl_length2_2 = (__gen_e_acsl__3 - __gen_e_acsl__4) / sizeof(int);
+    if (3UL == __gen_e_acsl_length2_2) {
+      unsigned long __gen_e_acsl_iter_7;
+      __gen_e_acsl_iter_7 = 0;
+      while (__gen_e_acsl_iter_7 < 3) {
+        {
+          int __gen_e_acsl_valid_read_6;
+          __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(& (*((int (*)[])f))[__gen_e_acsl_iter_7]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[])f))[__gen_e_acsl_iter_7]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_6,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[])f))[__gen_e_acsl_iter_7])",
+                          "tests/arith/array.i",43);
+          if (a[__gen_e_acsl_iter_7] != (*((int (*)[])f))[__gen_e_acsl_iter_7]) {
+            __gen_e_acsl_ne_4 = 1;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_7 ++;
+      }
+    }
+    else __gen_e_acsl_ne_4 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_4,"Assertion","arrays",
+                    "a != *((int (*)[])f)","tests/arith/array.i",43);
+  }
+  /*@ assert a ≢ *((int (*)[])f); */ ;
+  int i[6] = {1, 2, 3, 4, 5, 6};
+  __e_acsl_store_block((void *)(i),(size_t)24);
+  __e_acsl_full_init((void *)(& i));
+  int j[6] = {4, 5, 6, 1, 2, 3};
+  __e_acsl_store_block((void *)(j),(size_t)24);
+  __e_acsl_full_init((void *)(& j));
+  int k[6] = {4, 5, 6, 4, 5, 6};
+  __e_acsl_store_block((void *)(k),(size_t)24);
+  __e_acsl_full_init((void *)(& k));
+  {
+    int __gen_e_acsl_ne_5;
+    __gen_e_acsl_ne_5 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_8;
+      __gen_e_acsl_iter_8 = 0;
+      while (__gen_e_acsl_iter_8 < 6) {
+        if (i[__gen_e_acsl_iter_8] != j[__gen_e_acsl_iter_8]) {
+          __gen_e_acsl_ne_5 = 1;
+          break;
+        }
+        __gen_e_acsl_iter_8 ++;
+      }
+    }
+    else __gen_e_acsl_ne_5 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_5,"Assertion","arrays","i != j",
+                    "tests/arith/array.i",49);
+  }
+  /*@ assert i ≢ j; */ ;
+  {
+    int __gen_e_acsl_ne_6;
+    __gen_e_acsl_ne_6 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_9;
+      __gen_e_acsl_iter_9 = 0;
+      while (__gen_e_acsl_iter_9 < 6) {
+        if (i[__gen_e_acsl_iter_9] != k[__gen_e_acsl_iter_9]) {
+          __gen_e_acsl_ne_6 = 1;
+          break;
+        }
+        __gen_e_acsl_iter_9 ++;
+      }
+    }
+    else __gen_e_acsl_ne_6 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_6,"Assertion","arrays","i != k",
+                    "tests/arith/array.i",50);
+  }
+  /*@ assert i ≢ k; */ ;
+  {
+    int __gen_e_acsl_ne_7;
+    __gen_e_acsl_ne_7 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_10;
+      __gen_e_acsl_iter_10 = 0;
+      while (__gen_e_acsl_iter_10 < 6) {
+        if (j[__gen_e_acsl_iter_10] != k[__gen_e_acsl_iter_10]) {
+          __gen_e_acsl_ne_7 = 1;
+          break;
+        }
+        __gen_e_acsl_iter_10 ++;
+      }
+    }
+    else __gen_e_acsl_ne_7 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_7,"Assertion","arrays","j != k",
+                    "tests/arith/array.i",51);
+  }
+  /*@ assert j ≢ k; */ ;
+  int *l = & i[3];
+  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_full_init((void *)(& l));
+  int *m = & j[3];
+  __e_acsl_store_block((void *)(& m),(size_t)8);
+  __e_acsl_full_init((void *)(& m));
+  int *n = & k[3];
+  __e_acsl_store_block((void *)(& n),(size_t)8);
+  __e_acsl_full_init((void *)(& n));
+  {
+    int __gen_e_acsl_ne_8;
+    __gen_e_acsl_ne_8 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_11;
+      __gen_e_acsl_iter_11 = 0;
+      while (__gen_e_acsl_iter_11 < 3) {
+        {
+          int __gen_e_acsl_valid_read_7;
+          int __gen_e_acsl_valid_read_8;
+          __gen_e_acsl_valid_read_7 = __e_acsl_valid_read((void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_11]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_11]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_7,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_11])",
+                          "tests/arith/array.i",55);
+          __gen_e_acsl_valid_read_8 = __e_acsl_valid_read((void *)(& (*((int (*)[3])m))[__gen_e_acsl_iter_11]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[3])m))[__gen_e_acsl_iter_11]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_8,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])m))[__gen_e_acsl_iter_11])",
+                          "tests/arith/array.i",55);
+          if ((*((int (*)[3])l))[__gen_e_acsl_iter_11] != (*((int (*)[3])m))[__gen_e_acsl_iter_11]) {
+            __gen_e_acsl_ne_8 = 1;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_11 ++;
+      }
+    }
+    else __gen_e_acsl_ne_8 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_8,"Assertion","arrays",
+                    "*((int (*)[3])l) != *((int (*)[3])m)",
+                    "tests/arith/array.i",55);
+  }
+  /*@ assert *((int (*)[3])l) ≢ *((int (*)[3])m); */ ;
+  {
+    int __gen_e_acsl_eq_4;
+    __gen_e_acsl_eq_4 = 1;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_12;
+      __gen_e_acsl_iter_12 = 0;
+      while (__gen_e_acsl_iter_12 < 3) {
+        {
+          int __gen_e_acsl_valid_read_9;
+          int __gen_e_acsl_valid_read_10;
+          __gen_e_acsl_valid_read_9 = __e_acsl_valid_read((void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_12]),
+                                                          sizeof(int),
+                                                          (void *)(& (*((int (*)[3])l))[__gen_e_acsl_iter_12]),
+                                                          (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_9,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])l))[__gen_e_acsl_iter_12])",
+                          "tests/arith/array.i",56);
+          __gen_e_acsl_valid_read_10 = __e_acsl_valid_read((void *)(& (*((int (*)[3])n))[__gen_e_acsl_iter_12]),
+                                                           sizeof(int),
+                                                           (void *)(& (*((int (*)[3])n))[__gen_e_acsl_iter_12]),
+                                                           (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_10,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[3])n))[__gen_e_acsl_iter_12])",
+                          "tests/arith/array.i",56);
+          if ((*((int (*)[3])l))[__gen_e_acsl_iter_12] != (*((int (*)[3])n))[__gen_e_acsl_iter_12]) {
+            __gen_e_acsl_eq_4 = 0;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_12 ++;
+      }
+    }
+    else __gen_e_acsl_eq_4 = 0;
+    __e_acsl_assert(__gen_e_acsl_eq_4,"Assertion","arrays",
+                    "*((int (*)[3])l) == *((int (*)[3])n)",
+                    "tests/arith/array.i",56);
+  }
+  /*@ assert *((int (*)[3])l) ≡ *((int (*)[3])n); */ ;
+  {
+    int __gen_e_acsl_ne_9;
+    __gen_e_acsl_ne_9 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_13;
+      __e_acsl_assert(1,"RTE","arrays","array_coercion: (int)3 <= (int)6",
+                      "tests/arith/array.i",59);
+      __e_acsl_assert(1,"RTE","arrays","array_coercion: (int)3 <= (int)6",
+                      "tests/arith/array.i",59);
+      __gen_e_acsl_iter_13 = 0;
+      while (__gen_e_acsl_iter_13 < 3) {
+        if (i[__gen_e_acsl_iter_13] != k[__gen_e_acsl_iter_13]) {
+          __gen_e_acsl_ne_9 = 1;
+          break;
+        }
+        __gen_e_acsl_iter_13 ++;
+      }
+    }
+    else __gen_e_acsl_ne_9 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_9,"Assertion","arrays",
+                    "(int [3])i != (int [3])k","tests/arith/array.i",59);
+  }
+  /*@ assert (int [3])i ≢ (int [3])k; */ ;
+  {
+    int __gen_e_acsl_eq_5;
+    __gen_e_acsl_eq_5 = 1;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_14;
+      __e_acsl_assert(1,"RTE","arrays","array_coercion: (int)3 <= (int)6",
+                      "tests/arith/array.i",60);
+      __e_acsl_assert(1,"RTE","arrays","array_coercion: (int)3 <= (int)6",
+                      "tests/arith/array.i",60);
+      __gen_e_acsl_iter_14 = 0;
+      while (__gen_e_acsl_iter_14 < 3) {
+        if (j[__gen_e_acsl_iter_14] != k[__gen_e_acsl_iter_14]) {
+          __gen_e_acsl_eq_5 = 0;
+          break;
+        }
+        __gen_e_acsl_iter_14 ++;
+      }
+    }
+    else __gen_e_acsl_eq_5 = 0;
+    __e_acsl_assert(__gen_e_acsl_eq_5,"Assertion","arrays",
+                    "(int [3])j == (int [3])k","tests/arith/array.i",60);
+  }
+  /*@ assert (int [3])j ≡ (int [3])k; */ ;
+  {
+    int __gen_e_acsl_ne_10;
+    __gen_e_acsl_ne_10 = 0;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_15;
+      __gen_e_acsl_iter_15 = 0;
+      while (__gen_e_acsl_iter_15 < 2) {
+        {
+          int __gen_e_acsl_valid_read_11;
+          int __gen_e_acsl_valid_read_12;
+          __gen_e_acsl_valid_read_11 = __e_acsl_valid_read((void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_15]),
+                                                           sizeof(int),
+                                                           (void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_15]),
+                                                           (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_11,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_15])",
+                          "tests/arith/array.i",61);
+          __gen_e_acsl_valid_read_12 = __e_acsl_valid_read((void *)(& (*((int (*)[2])m))[__gen_e_acsl_iter_15]),
+                                                           sizeof(int),
+                                                           (void *)(& (*((int (*)[2])m))[__gen_e_acsl_iter_15]),
+                                                           (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_12,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[2])m))[__gen_e_acsl_iter_15])",
+                          "tests/arith/array.i",61);
+          if ((*((int (*)[2])l))[__gen_e_acsl_iter_15] != (*((int (*)[2])m))[__gen_e_acsl_iter_15]) {
+            __gen_e_acsl_ne_10 = 1;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_15 ++;
+      }
+    }
+    else __gen_e_acsl_ne_10 = 1;
+    __e_acsl_assert(__gen_e_acsl_ne_10,"Assertion","arrays",
+                    "*((int (*)[2])l) != *((int (*)[2])m)",
+                    "tests/arith/array.i",61);
+  }
+  /*@ assert *((int (*)[2])l) ≢ *((int (*)[2])m); */ ;
+  {
+    int __gen_e_acsl_eq_6;
+    __gen_e_acsl_eq_6 = 1;
+    if (1) {
+      unsigned long __gen_e_acsl_iter_16;
+      __gen_e_acsl_iter_16 = 0;
+      while (__gen_e_acsl_iter_16 < 2) {
+        {
+          int __gen_e_acsl_valid_read_13;
+          int __gen_e_acsl_valid_read_14;
+          __gen_e_acsl_valid_read_13 = __e_acsl_valid_read((void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_16]),
+                                                           sizeof(int),
+                                                           (void *)(& (*((int (*)[2])l))[__gen_e_acsl_iter_16]),
+                                                           (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_13,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[2])l))[__gen_e_acsl_iter_16])",
+                          "tests/arith/array.i",62);
+          __gen_e_acsl_valid_read_14 = __e_acsl_valid_read((void *)(& (*((int (*)[2])n))[__gen_e_acsl_iter_16]),
+                                                           sizeof(int),
+                                                           (void *)(& (*((int (*)[2])n))[__gen_e_acsl_iter_16]),
+                                                           (void *)0);
+          __e_acsl_assert(__gen_e_acsl_valid_read_14,"RTE","arrays",
+                          "mem_access: \\valid_read(&(*((int (*)[2])n))[__gen_e_acsl_iter_16])",
+                          "tests/arith/array.i",62);
+          if ((*((int (*)[2])l))[__gen_e_acsl_iter_16] != (*((int (*)[2])n))[__gen_e_acsl_iter_16]) {
+            __gen_e_acsl_eq_6 = 0;
+            break;
+          }
+        }
+        __gen_e_acsl_iter_16 ++;
+      }
+    }
+    else __gen_e_acsl_eq_6 = 0;
+    __e_acsl_assert(__gen_e_acsl_eq_6,"Assertion","arrays",
+                    "*((int (*)[2])l) == *((int (*)[2])n)",
+                    "tests/arith/array.i",62);
+  }
+  /*@ assert *((int (*)[2])l) ≡ *((int (*)[2])n); */ ;
+  __e_acsl_delete_block((void *)(& n));
+  __e_acsl_delete_block((void *)(& m));
+  __e_acsl_delete_block((void *)(& l));
+  __e_acsl_delete_block((void *)(k));
+  __e_acsl_delete_block((void *)(j));
+  __e_acsl_delete_block((void *)(i));
+  __e_acsl_delete_block((void *)(& g));
+  __e_acsl_delete_block((void *)(& f));
+  __e_acsl_delete_block((void *)(c));
+  __e_acsl_delete_block((void *)(b));
+  return;
+}
+
+void vlas(int n)
+{
+  return;
+}
+
 int main(void)
 {
   int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
   {
     int i = 0;
     while (i < 3) {
@@ -21,12 +547,15 @@ int main(void)
     }
   }
   __e_acsl_assert(T1[0] == T2[0],"Assertion","main","T1[0] == T2[0]",
-                  "tests/arith/array.i",13);
+                  "tests/arith/array.i",109);
   /*@ assert T1[0] ≡ T2[0]; */ ;
   __e_acsl_assert(T1[1] != T2[1],"Assertion","main","T1[1] != T2[1]",
-                  "tests/arith/array.i",14);
+                  "tests/arith/array.i",110);
   /*@ assert T1[1] ≢ T2[1]; */ ;
+  arrays();
+  vlas(3);
   __retres = 0;
+  __e_acsl_memory_clean();
   return __retres;
 }
 

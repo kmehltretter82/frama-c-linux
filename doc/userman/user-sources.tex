@@ -29,34 +29,38 @@ in the figure. Note that some plug-ins, such as \textsf{Variadic}
 (described in chapter~\ref{user-variadic}), perform further AST
 transformations before most analyses are run.
 
-\section{Pre-processing the Source Files}\label{sec:preprocessing}
+\section{Preprocessing the Source Files}\label{sec:preprocessing}
 
 The list of files to analyze must be provided on the command line, or
 chosen interactively in the GUI. Files with the suffix
-{\tt .i} are assumed to be already pre-processed \C files. \FramaC
-pre-processes the other files with the following command.
+{\tt .i} are assumed to be already preprocessed \C files. \FramaC
+preprocesses {\tt .c} and {\tt .h} files with the following basic command:
 \begin{shell}
 \$ gcc -C -E -I .
 \end{shell}
+Plus some architecture-dependent flags. The {\em exact} preprocessing command
+line can be obtained via options \texttt{-kernel-msg-key pp} and
+\optiondef{-}{print-cpp-commands} (the latter exits \FramaC after printing).
 
 Option \optiondef{-}{cpp-extra-args} can be used to add arguments to the
-default pre-processing command, typically via the inclusion of defines
+default preprocessing command, typically via the inclusion of defines
 (\texttt{-D} switches) and header directories (\texttt{-I} switches), as in
 \texttt{-cpp-extra-args="-DDEBUG -DARCH=ia32 -I./headers"}.
 You can also add arguments on a per-file basis, using option
 \optiondef{-}{cpp-extra-args-per-file}.
 
-If you need to, you can also {\em replace} the pre-processing command
+If you need to, you can also {\em replace} the preprocessing command
 entirely with option \optiondef{-}{cpp-command}. Placeholders (see below)
 can be used for advanced commands.
-If no placeholders are used, the pre-processor is invoked in the
+If no placeholders are used, the preprocessor is invoked in the
 following way.
 \begin{commands}
-\texttt{<cmd> <args> -o <output file> <input file>}
+\texttt{<cmd> <args> <input file> -o <output file>}
 \end{commands}
 
-In this command, \texttt{<output file>} is chosen by \FramaC while
-\texttt{<input file>} is one of the filenames provided by the user.
+In this command, \texttt{<output file>} is a temporary filename chosen by
+\FramaC while \texttt{<input file>} is one of the filenames provided by the
+user.
 
 For commands which do not follow this pattern, it is also possible to use
 the following placeholders:
@@ -103,29 +107,29 @@ are ignored. Also note that the use of the database simply adds flags
 be specified by the user.
 
 In all of the above cases,
-\acsl annotations are pre-processed by default (option \optiondef{-}{pp-annot}
-is set by default). Unless a custom pre-processor is specified
+\acsl annotations are preprocessed by default (option \optiondef{-}{pp-annot}
+is set by default). Unless a custom preprocessor is specified
 (via \optionuse{-}{cpp-frama-c-compliant}), \FramaC considers that \gcc is
-installed and uses it as pre-processor.
-If you do \emph{not} want annotations to be pre-processed, you need to pass
+installed and uses it as preprocessor.
+If you do \emph{not} want annotations to be preprocessed, you need to pass
 option \texttt{-no-pp-annot} to \FramaC. Note that some headers in the
 standard C library provided with \FramaC (described below) use such annotations,
 therefore it might be necessary to disable inclusion of such headers.
 
-Also note that ACSL annotations are pre-processed separately from the C
+Also note that ACSL annotations are preprocessed separately from the C
 code in a second pass, and that arguments given as \texttt{-cpp-extra-args} are
-\emph{not} given to the second pass of pre-processing. Instead,
+\emph{not} given to the second pass of preprocessing. Instead,
 \texttt{-pp-annot} relies on the ability of \gcc to output all
 macro definitions (including those given with \texttt{-D}) in the
-pre-processed file. In particular, \texttt{-cpp-extra-args} must be
+preprocessed file. In particular, \texttt{-cpp-extra-args} must be
 used if you are including header files who behave differently
 depending on the number of times they are included.
 
 In addition, files having the suffix \texttt{.ci} will be considered as needing
 preprocessing for ACSL annotations only. Those files may contain
-\texttt{\#define} directives and annotations are pre-processed as explained in
+\texttt{\#define} directives and annotations are preprocessed as explained in
 the previous paragraph. This allows to have macros in ACSL annotations while
-using a non-GNU-like pre-processor.
+using a non-GNU-like preprocessor.
 
 \begin{important}
   An experimental, incomplete, C standard library is bundled with \FramaC and installed
@@ -143,7 +147,7 @@ using a non-GNU-like pre-processor.
 
 \section{Merging the Source Code files}
 
-After pre-processing, \FramaC parses, type-checks and links the source
+After preprocessing, \FramaC parses, type-checks and links the source
 code.  It also performs these operations for the \acsl annotations
 optionally present in the program. Together, these steps form the
 \emph{merging} phase of the creation of an analysis project.
@@ -347,7 +351,7 @@ supported are typedefs redefinition.
 a certain number of C macros. They are summarized below.
 
 \begin{description}
-\item \textttdef{\_\_FRAMAC\_\_}: defined to 1 during pre-processing by \FramaC,
+\item \textttdef{\_\_FRAMAC\_\_}: defined to 1 during preprocessing by \FramaC,
 as if the user had added \texttt{-D\_\_FRAMAC\_\_} to the command line. Useful
 for conditional compilation and detection of an execution by \FramaC.
 
@@ -465,7 +469,7 @@ preparation itself succeeds, by running \FramaC without any option.
 \$ frama-c <input files>
 \end{shell}
 
-If you need to use other options for pre-processing or normalizing the source
+If you need to use other options for preprocessing or normalizing the source
 code, you can use the option \optiondef{-}{typecheck} for
 the same purpose. For instance:
 \begin{shell}

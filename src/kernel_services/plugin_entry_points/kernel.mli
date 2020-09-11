@@ -371,7 +371,7 @@ module UnrollingForce: Parameter_sig.Bool
     called for well preparing the AST. *)
 module Machdep: Parameter_sig.String
 
-(** Behavior of invisible option -keep-logical operator:
+(** Behavior of invisible option -keep-logical-operators:
     Tries to avoid converting && and || into conditional statements.
     Note that this option is incompatible with many (most) plug-ins of the
     platform and thus should only be enabled with great care and for very
@@ -393,6 +393,9 @@ module CppExtraArgsPerFile: Parameter_sig.Filepath_map with type value = string
 
 module CppGnuLike: Parameter_sig.Bool
 (** Behavior of option "-cpp-frama-c-compliant" *)
+
+module PrintCppCommands: Parameter_sig.Bool
+(** Behavior of option "-print-cpp-commands" *)
 
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)
@@ -465,7 +468,7 @@ module ImplicitFunctionDeclaration: Parameter_sig.String
 module C11: Parameter_sig.Bool
 (** Behavior of option "-c11" *)
 
-module JsonCompilationDatabase: Parameter_sig.String
+module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 
 (* ************************************************************************* *)

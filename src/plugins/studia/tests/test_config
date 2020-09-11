@@ -1,1 +1,1 @@
-OPT: -val -journal-disable -out -input -deps
+OPT: -eva -journal-disable -out -input -deps

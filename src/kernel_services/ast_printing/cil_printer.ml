@@ -93,6 +93,7 @@ let () = register_shallow_attribute Cil.frama_c_ghost_else
 let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
+let () = register_shallow_attribute Cil.frama_c_inlined
 
 let keep_attr = function
   | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)

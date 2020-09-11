@@ -27,6 +27,9 @@ open Cil_types
 val init: unit -> unit
 (** Must be called before any use of GMP *)
 
+val is_t: typ -> bool
+(** @return true iff the given type is equivalent to one of the GMP type. *)
+
 (**************************************************************************)
 (******************************** Types ***********************************)
 (**************************************************************************)

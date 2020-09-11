@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-no-results-function f"
+   STDOPT: #"-eva-no-results-function f"
    STDOPT: #"-main main3"
    STDOPT: #"-main main4 -absolute-valid-range 0-0xFF"
    STDOPT: #"-main main5"

@@ -16,7 +16,11 @@
 ##################################
 Open Source Release <next-release>
 ##################################
-
+-   Kernel    [2020-09-08] Add option -print-cpp-commands, to print the
+              preprocessing commands used by Frama-C.
+-   Eva       [2020-09-07] Deprecates legacy options aliases -val-* in favor
+              of option names -eva-*.
+-*  Slicing   [2020-09-07] Better handling of invalid command line options.
 -   Eva       [2020-07-27] Improved automatic loop unroll (-eva-auto-loop-unroll
               option) on loops with several exit conditions, conditions using
               equality operators, temporary variables introduced by the Frama-C

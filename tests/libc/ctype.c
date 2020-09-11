@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-slevel 4"
+   STDOPT: #"-eva-slevel 4"
 */
 #include <stdio.h>
 #include <ctype.h>

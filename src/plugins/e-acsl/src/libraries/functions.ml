@@ -92,12 +92,10 @@ module RTL = struct
   let is_generated_kf kf =
     is_generated_name (Kernel_function.get_name kf)
 
-  let is_rtl_name name = startswith e_acsl_api_prefix name
-
   let is_generated_literal_string_name name =
     startswith e_acsl_lit_string_prefix name
 
-  let get_rtl_replacement_name fn = e_acsl_builtin_prefix ^ fn
+  let libc_replacement_name fn = e_acsl_builtin_prefix ^ fn
 
   let has_rtl_replacement = function
     | "strcpy"  | "strncpy" | "strlen" | "strcat" | "strncat" | "strcmp"

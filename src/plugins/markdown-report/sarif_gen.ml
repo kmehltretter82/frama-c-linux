@@ -29,8 +29,7 @@ let frama_c_sarif =
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
   Tool.create
-    ~name ~version ~semanticVersion ~fullName ~downloadUri ()
-
+    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri ())
 
 let get_remarks () =
   let f = Mdr_params.Remarks.get () in
@@ -63,22 +62,32 @@ let gen_remark alarm =
   [ Block
       [ Text
           (plain
-             (Printf.sprintf "This alarms represents a potential %s."
+             (Printf.sprintf "This alarm represents a potential %s."
                 (Alarms.get_description alarm)
              )
           )
       ]
   ]
 
+let kind_of_status =
+  let open Property_status.Feedback in
+  let open Sarif.Result_kind in
+  function
+  | Never_tried -> notApplicable
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
+  | Unknown | Unknown_but_dead -> open_
+  | Invalid | Invalid_under_hyp | Invalid_but_dead -> fail
+  | Inconsistent -> review
+
 let level_of_status =
   let open Property_status.Feedback in
   let open Sarif.Result_level in
   function
-  | Never_tried -> notApplicable
-  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> pass
-  | Unknown | Unknown_but_dead -> warning
+  | Never_tried -> none
+  | Considered_valid | Valid | Valid_under_hyp | Valid_but_dead -> none
+  | Unknown | Unknown_but_dead -> none
   | Invalid | Invalid_under_hyp | Invalid_but_dead -> error
-  | Inconsistent -> note
+  | Inconsistent -> none
 
 let make_message alarm annot remark =
   let open Markdown in
@@ -92,11 +101,15 @@ let make_message alarm annot remark =
     | [] -> summary :: gen_remark alarm
     | _ -> summary :: remark
   in
-  let richText =
+  let markdown =
     String.trim
       (Format.asprintf "@[%a@]" (Markdown.pp_elements ~page:"") markdown)
   in
-  Message.create ~text ~richText ()
+  Message.create ~text ~markdown ()
+
+let opt_physical_location_of_loc loc =
+  if loc = Cil_datatype.Location.unknown then []
+  else [ Location.of_loc loc ]
 
 let gen_results remarks =
   let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
@@ -106,12 +119,13 @@ let gen_results remarks =
       Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
     in
     let label = "Alarm-" ^ string_of_int i in
+    let kind = kind_of_status (Property_status.Feedback.get prop) in
     let level = level_of_status (Property_status.Feedback.get prop) in
     let remark = get_remark remarks label in
     let message = make_message alarm annot remark in
-    let locations = [ Location.of_loc (Cil_datatype.Stmt.loc s) ] in
+    let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
     let res =
-      Sarif_result.create ~level ~ruleId ~message ~locations ()
+      Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
     in
     (i+1, rules, res :: content)
   in
@@ -128,12 +142,14 @@ let make_ip_message ip =
   let text = Format.asprintf "@[%a.@]" Property.short_pretty ip in
   Message.plain_text ~text ()
 
+let user_annot_id = "user-spec"
+
 let gen_status ip =
   let status = Property_status.Feedback.get ip in
   let level = level_of_status status in
-  let locations = [ Location.of_loc (Property.location ip) ] in
+  let locations = opt_physical_location_of_loc (Property.location ip) in
   let message = make_ip_message ip in
-  Sarif_result.create ~level ~locations ~message ()
+  Sarif_result.create ~ruleId:user_annot_id ~level ~locations ~message ()
 
 let gen_statuses () =
   let f ip content =
@@ -141,29 +157,27 @@ let gen_statuses () =
   in
   List.rev (Property_status.fold f [])
 
-let gen_files () =
+let gen_artifacts () =
   let add_src_file f =
-    let key =
-      let fname = Filepath.Normalized.to_pretty_string f in
-      Filename.chop_extension (Filename.basename fname)
-    in
-    let fileLocation = FileLocation.create ~uri:(f :> string) () in
+    let uri = (f:Filepath.Normalized.t :> string) in
+    let location = ArtifactLocation.create ~uri () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
-    key, File.create ~fileLocation ~roles ~mimeType ()
+    Artifact.create ~location ~roles ~mimeType ()
   in
   List.map add_src_file (Kernel.Files.get ())
 
 let add_rule id desc l =
   let text = desc ^ "." in
-  let shortDescription = Message.plain_text ~text () in
-  let rule = Rule.create ~id ~shortDescription () in
-  (id, rule) :: l
+  let shortDescription = MultiformatMessageString.create ~text () in
+  let rule = ReportingDescriptor.create ~id ~shortDescription () in
+  rule :: l
 
-let make_rule_dictionary rules = Datatype.String.Map.fold add_rule rules []
+let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 
 let gen_run remarks =
   let tool = frama_c_sarif in
+  let name = "frama-c" in
   let invocations = [gen_invocation ()] in
   let rules, results = gen_results remarks in
   let user_annot_results = gen_statuses () in
@@ -172,13 +186,13 @@ let gen_run remarks =
     | [] -> rules
     | _ ->
       Datatype.String.Map.add
-        "user-spec" "User written ACSL specification" rules
+        user_annot_id "User-written ACSL specification" rules
   in
-  let rules = make_rule_dictionary rules in
-  let resources = Resources.create ~rules () in
+  let rules = make_taxonomies rules in
+  let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
-  let files = gen_files () in
-  Run.create ~tool ~invocations ~results ~resources ~files ()
+  let artifacts = gen_artifacts () in
+  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts ()
 
 let generate () =
   let remarks = get_remarks () in

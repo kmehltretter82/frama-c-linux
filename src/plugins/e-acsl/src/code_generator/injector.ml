@@ -60,7 +60,7 @@ let inject_in_local_init loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
-    let store = Constructor.mk_store_stmt ~str_size:sz vi in
+    let store = Smart_stmt.store_stmt ~str_size:sz vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
@@ -68,9 +68,9 @@ let inject_in_local_init loc env kf vi = function
     when Options.Validate_format_strings.get ()
       && Functions.Libc.is_printf_name fvi.vname
     ->
-    (* rewrite format functions (e.g., [printf]). *)
-    let name = Functions.RTL.get_rtl_replacement_name fvi.vname in
-    let new_vi = Misc.get_lib_fun_vi name in
+    (* rewrite libc function names (e.g., [printf]). *)
+    let name = Functions.RTL.libc_replacement_name fvi.vname in
+    let new_vi = try Builtins.find name with Not_found -> assert false in
     let fmt = Functions.Libc.get_printf_argument_str ~loc fvi.vname args in
     ConsInit(new_vi, fmt :: args, kind), env
 
@@ -80,7 +80,7 @@ let inject_in_local_init loc env kf vi = function
     ->
     (* rewrite names of functions for which we have alternative definitions in
        the RTL. *)
-    fvi.vname <- Functions.RTL.get_rtl_replacement_name fvi.vname;
+    fvi.vname <- Functions.RTL.libc_replacement_name fvi.vname;
     init, env
 
   | AssignInit init ->
@@ -109,7 +109,7 @@ let rename_caller loc args exp = match exp.enode with
     when Options.Replace_libc_functions.get ()
       && Functions.RTL.has_rtl_replacement vi.vname
     ->
-    vi.vname <- Functions.RTL.get_rtl_replacement_name vi.vname;
+    vi.vname <- Functions.RTL.libc_replacement_name vi.vname;
     exp, args
 
   | Lval(Var vi, _)
@@ -120,12 +120,12 @@ let rename_caller loc args exp = match exp.enode with
        from the above because argument list of format functions is extended with
        an argument describing actual variadic arguments *)
     (* replacement name, e.g., [printf] -> [__e_acsl_builtin_printf] *)
-    let name = Functions.RTL.get_rtl_replacement_name vi.vname in
+    let name = Functions.RTL.libc_replacement_name vi.vname in
     (* variadic arguments descriptor *)
     let fmt = Functions.Libc.get_printf_argument_str ~loc vi.vname args in
-    (* get the name of the library function we need. Cannot just rewrite the
-       name as AST check will then fail *)
-    let vi = Misc.get_lib_fun_vi name in
+    (* get the library function we need. Cannot just rewrite the name as AST
+       check will then fail *)
+    let vi = try Rtl.Symbols.find_vi name with Not_found -> assert false in
     Cil.evar vi, fmt :: args
 
   | _ ->
@@ -145,13 +145,13 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)
         if Cil.isBitfield lv then Cil.mkEmptyStmt ()
-        else Constructor.mk_initialize ~loc lv
+        else Smart_stmt.initialize ~loc lv
       in
       let env = Env.add_stmt ~post ~before env kf new_stmt in
       let env = match vi with
         | None -> env
         | Some vi ->
-          let new_stmt = Constructor.mk_store_stmt vi in
+          let new_stmt = Smart_stmt.store_stmt vi in
           Env.add_stmt ~post ~before env kf new_stmt
       in
       env
@@ -189,7 +189,7 @@ let inject_in_instr env kf stmt = function
       if Functions.Libc.is_vla_free caller then
         match args with
         | [ { enode = CastE (_, { enode = Lval (Var vi, NoOffset) }) } ] ->
-          let delete_block = Constructor.mk_delete_stmt ~is_addr:true vi in
+          let delete_block = Smart_stmt.delete_stmt ~is_addr:true vi in
           Env.add_stmt env kf delete_block
         | _ -> Options.fatal "The normalization of __fc_vla_free() has changed"
       else
@@ -232,7 +232,7 @@ let add_new_block_in_stmt env kf stmt =
   in
   let mk_post_env env stmt =
     Annotations.fold_code_annot
-      (fun _ a env -> Translate.translate_post_code_annotation kf env a)
+      (fun _ a env -> Translate.translate_post_code_annotation kf stmt env a)
       stmt
       env
   in
@@ -252,7 +252,7 @@ let add_new_block_in_stmt env kf stmt =
           let env = mk_post_env env stmt in
           (* also handle the postcondition of the function and clear the
              env *)
-          Translate.translate_post_spec kf env (Annotations.funspec kf)
+          Translate.translate_post_spec kf Kglobal env (Annotations.funspec kf)
         else
           env
       in
@@ -263,7 +263,7 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      let new_stmt = Constructor.mk_block stmt b in
+      let new_stmt = Smart_stmt.block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to
            evaluate the postcondition when jumping to them. *)
@@ -293,7 +293,7 @@ let add_new_block_in_stmt env kf stmt =
       let post_block, env =
         Env.pop_and_get
           env
-          (Constructor.mk_block new_stmt pre_block)
+          (Smart_stmt.block new_stmt pre_block)
           ~global_clear:false
           Env.Before
       in
@@ -302,7 +302,7 @@ let add_new_block_in_stmt env kf stmt =
         then Cil.transient_block post_block
         else post_block
       in
-      let res = Constructor.mk_block new_stmt post_block in
+      let res = Smart_stmt.block new_stmt post_block in
       if not (Cil_datatype.Stmt.equal new_stmt res) then
         E_acsl_label.move kf new_stmt res;
       res, env
@@ -337,7 +337,7 @@ let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
     match return_stmt with
     | Some return_stmt ->
       let b = Cil.mkBlock new_stmts in
-      let new_stmt = Constructor.mk_block return_stmt b in
+      let new_stmt = Smart_stmt.block return_stmt b in
       E_acsl_label.move kf return_stmt new_stmt;
       [ new_stmt ]
     | None -> new_stmts
@@ -450,7 +450,7 @@ and inject_in_stmt env kf stmt =
       (* translate the precondition of the function *)
       if Functions.check kf then
         let funspec = Annotations.funspec kf in
-        Translate.translate_pre_spec kf env funspec
+        Translate.translate_pre_spec kf Kglobal env funspec
       else env
     else
       env
@@ -459,7 +459,7 @@ and inject_in_stmt env kf stmt =
   let env =
     if Functions.check kf then
       Annotations.fold_code_annot
-        (fun _ a env -> Translate.translate_pre_code_annotation kf env a)
+        (fun _ a env -> Translate.translate_pre_code_annotation kf stmt env a)
         stmt
         env
     else
@@ -516,7 +516,7 @@ and inject_in_block (env: Env.t) kf blk =
         List.fold_left
           (fun acc vi ->
              if Mmodel_analysis.must_model_vi ~kf vi
-             then Constructor.mk_delete_stmt vi :: acc
+             then Smart_stmt.delete_stmt vi :: acc
              else acc)
           stmts
           blk.blocals
@@ -531,7 +531,7 @@ and inject_in_block (env: Env.t) kf blk =
         List.fold_left
           (fun acc vi ->
              if Mmodel_analysis.must_model_vi vi && not vi.vdefined
-             then Constructor.mk_store_stmt vi :: acc
+             then Smart_stmt.store_stmt vi :: acc
              else acc)
           blk.bstmts
           blk.blocals;
@@ -589,6 +589,7 @@ let inject_in_fundec main fundec =
   in
   List.iter unghost_formal fundec.sformals;
   (* update environments *)
+  (* TODO: do it only for built-ins *)
   Builtins.update vi.vname vi;
   (* track function addresses but the main function that is tracked internally
      via RTL *)
@@ -628,17 +629,15 @@ let unghost_vi vi =
 let inject_in_global (env, main) = function
   (* library functions and built-ins *)
   | GVarDecl(vi, _) | GVar(vi, _, _)
-  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _)
-    when Misc.is_library_loc vi.vdecl || Builtins.mem vi.vname ->
-    Misc.register_library_function vi;
-    if Builtins.mem vi.vname then Builtins.update vi.vname vi;
+  | GFunDecl(_, vi, _) | GFun({ svar = vi }, _) when Builtins.mem vi.vname ->
+    Builtins.update vi.vname vi;
     env, main
 
   (* Cil built-ins and other library globals: nothing to do *)
   | GVarDecl(vi, _) | GVar(vi, _, _) | GFun({ svar = vi }, _)
     when Misc.is_fc_or_compiler_builtin vi ->
     env, main
-  | g when Misc.is_library_loc (Global.loc g) ->
+  | g when Rtl.Symbols.mem_global g ->
     env, main
 
   (* variable declarations *)
@@ -822,8 +821,8 @@ let inject_mmodel_handler main =
       in
       let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
       let args = args @ [ ptr_size ] in
-      let init = Constructor.mk_rtl_call loc "memory_init" args in
-      let clean = Constructor.mk_rtl_call loc "memory_clean" [] in
+      let init = Smart_stmt.rtl_call loc "memory_init" args in
+      let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
       surround_function_with main fundec init (Some clean)
     in
     Extlib.may handle_main main
@@ -845,7 +844,6 @@ let reset_all ast =
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
   Mmodel_analysis.reset ();
-  Misc.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
@@ -862,8 +860,6 @@ let inject () =
   Options.feedback ~level:2
     "injecting annotations as code in project %a"
     Project.pretty (Project.current ());
-  Keep_status.before_translation ();
-  Misc.reorder_ast ();
   Gmp_types.init ();
   let ast = Ast.get () in
   inject_in_file ast;

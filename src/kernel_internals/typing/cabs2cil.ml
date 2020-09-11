@@ -5995,7 +5995,8 @@ and doExp local_env
       let res =
         if Cil.isCompleteType typ then new_exp ~loc (SizeOf typ)
         else begin
-          Kernel.error ~once:true ~current:true "sizeof on incomplete type";
+          Kernel.error ~once:true ~current:true
+            "sizeof on incomplete type '%a'" Cil_printer.pp_typ typ;
           new_exp ~loc (Const (CStr ("booo sizeof(incomplete)")))
         end
       in
@@ -7784,11 +7785,7 @@ and doCondExp local_env asconst
              end else CEAnd (ce1, ce2))
         | CEExp(se1, e1'), CEExp (se2, e2') when
             theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
-          CEExp
-            (empty,
-             new_exp ~loc
-               (BinOp(LAnd,
-                      makeCast e1' intType, makeCast e2' intType, intType)))
+          CEExp (empty, new_exp ~loc (BinOp(LAnd, e1', e2', intType)))
         | _ -> CEAnd (ce1, ce2)
       end
 
@@ -7807,11 +7804,7 @@ and doCondExp local_env asconst
              end else CEOr (ce1, ce2))
         | CEExp (se1, e1'), CEExp (se2, e2') when
             theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
-          CEExp
-            (empty,
-             new_exp ~loc
-               (BinOp(LOr,
-                      makeCast e1' intType, makeCast e2' intType, intType)))
+          CEExp (empty, new_exp ~loc (BinOp(LOr, e1', e2', intType)))
         | _ -> CEOr (ce1, ce2)
       end
 

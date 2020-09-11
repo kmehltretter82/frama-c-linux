@@ -605,6 +605,11 @@ let () = registerAttribute frama_c_mutable (AttrName false)
 let () =
   registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
+let frama_c_inlined = "__fc_inlined"
+let () = registerAttribute frama_c_inlined (AttrName false)
+let () =
+  registerAttribute (Extlib.strip_underscore frama_c_inlined) (AttrName false)
+
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
     match t with
@@ -3583,10 +3588,12 @@ let isLongDoubleType t =
   | TFloat(FLongDouble,_) -> true
   | _ -> false
 
-let isArithmeticOrPointerType t=
+let isScalarType t=
   match unrollTypeSkel t with
   | TInt _ | TEnum _ | TFloat _ | TPtr _ -> true
   | _ -> false
+
+let isArithmeticOrPointerType = isScalarType
 
 let rec isLogicArithmeticType t =
   match t with
@@ -6186,9 +6193,18 @@ let mkBinOp ~loc op e1 e2 =
     in
     constFoldBinOp ~loc machdep op e1 e2 intType
   in
+  let check_scalar op e t =
+    if not (isScalarType t) then
+      Kernel.fatal ~current:true "operand of %s is not scalar: %a"
+        op !pp_exp_ref e
+  in
   match op with
     (Mult|Div) -> doArithmetic ()
-  | (Mod|BAnd|BOr|BXor|LAnd|LOr) -> doIntegralArithmetic ()
+  | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
+  | LAnd | LOr ->
+    check_scalar "logical operator" e1 t1;
+    check_scalar "logical operator" e2 t2;
+    constFoldBinOp ~loc machdep op e1 e2 intType
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if msvcMode () then

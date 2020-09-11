@@ -23,18 +23,20 @@
 open Cil_types
 
 (* ********************************************************************** *)
-(* Expressions *)
-(* ********************************************************************** *)
-
-let mk_deref ~loc lv = Cil.new_exp ~loc (Lval(Mem(lv), NoOffset))
-
-(* ********************************************************************** *)
 (* Statements *)
 (* ********************************************************************** *)
 
-let mk_stmt sk = Cil.mkStmt ~valid_sid:true sk
-let mk_instr i = mk_stmt (Instr i)
-let mk_call ~loc ?result e args = mk_instr (Call(result, e, args, loc))
+let stmt sk = Cil.mkStmt ~valid_sid:true sk
+let instr i = stmt (Instr i)
+let block_stmt blk = stmt (Block blk)
+let call ~loc ?result e args = instr (Call(result, e, args, loc))
+
+let assigns ~loc ~result e = instr (Set(result, e, loc))
+
+let if_stmt ~loc ~cond ?(else_blk=Cil.mkBlock []) then_blk =
+  stmt (If (cond, then_blk, else_blk, loc))
+
+let break ~loc = stmt (Break loc)
 
 type annotation_kind =
   | Assertion
@@ -53,20 +55,25 @@ let kind_to_string loc k =
      | Invariant -> "Invariant"
      | RTE -> "RTE")
 
-let mk_block stmt b = match b.bstmts with
+let block stmt b = match b.bstmts with
   | [] ->
     (match stmt.skind with
      | Instr(Skip _) -> stmt
      | _ -> assert false)
   | [ s ] -> s
-  |  _ :: _ -> mk_stmt (Block b)
+  |  _ :: _ -> block_stmt b
 
 (* ********************************************************************** *)
 (* E-ACSL specific code *)
 (* ********************************************************************** *)
 
-let mk_lib_call ~loc ?result fname args =
-  let vi = Misc.get_lib_fun_vi fname in
+let lib_call ~loc ?result fname args =
+  let vi =
+    try Rtl.Symbols.find_vi fname
+    with Rtl.Symbols.Unregistered _ as exn ->
+    try Builtins.find fname
+    with Not_found -> raise exn
+  in
   let f = Cil.evar ~loc vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =
@@ -96,32 +103,32 @@ let mk_lib_call ~loc ?result fname args =
     | TFun(_, None, _, _) -> []
     | _ -> assert false
   in
-  mk_call ~loc ?result f args
+  call ~loc ?result f args
 
-let mk_rtl_call ~loc ?result fname args =
-  mk_lib_call ~loc ?result (Functions.RTL.mk_api_name fname) args
+let rtl_call ~loc ?result fname args =
+  lib_call ~loc ?result (Functions.RTL.mk_api_name fname) args
 
 (* ************************************************************************** *)
 (** {2 Handling the E-ACSL's C-libraries, part II} *)
 (* ************************************************************************** *)
 
-let mk_full_init_stmt vi =
+let full_init_stmt vi =
   let loc = vi.vdecl in
-  mk_rtl_call ~loc "full_init" [ Cil.evar ~loc vi ]
+  rtl_call ~loc "full_init" [ Cil.evar ~loc vi ]
 
-let mk_initialize ~loc (host, offset as lv) = match host, offset with
+let initialize ~loc (host, offset as lv) = match host, offset with
   | Var _, NoOffset ->
-    mk_rtl_call ~loc "full_init" [ Cil.mkAddrOf ~loc lv ]
+    rtl_call ~loc "full_init" [ Cil.mkAddrOf ~loc lv ]
   | _ ->
     let typ = Cil.typeOfLval lv in
-    mk_rtl_call ~loc
+    rtl_call ~loc
       "initialize"
       [ Cil.mkAddrOf ~loc lv; Cil.new_exp loc (SizeOf typ) ]
 
-let mk_named_store_stmt name ?str_size vi =
+let named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
-  let store = mk_rtl_call ~loc name in
+  let store = rtl_call ~loc name in
   match ty, str_size with
   | TArray(_, Some _,_,_), None ->
     store [ Cil.evar ~loc vi; Cil.sizeOf ~loc ty ]
@@ -141,27 +148,27 @@ let mk_named_store_stmt name ?str_size vi =
       Printer.pp_typ ty
       Printer.pp_exp size
 
-let mk_store_stmt ?str_size vi =
-  mk_named_store_stmt "store_block" ?str_size vi
+let store_stmt ?str_size vi =
+  named_store_stmt "store_block" ?str_size vi
 
-let mk_duplicate_store_stmt ?str_size vi =
-  mk_named_store_stmt "store_block_duplicate" ?str_size vi
+let duplicate_store_stmt ?str_size vi =
+  named_store_stmt "store_block_duplicate" ?str_size vi
 
-let mk_delete_stmt ?(is_addr=false) vi =
+let delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
-  let mk = mk_rtl_call ~loc "delete_block" in
+  let mk = rtl_call ~loc "delete_block" in
   match is_addr, Cil.unrollType vi.vtype with
   | _, TArray(_, Some _, _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
-let mk_mark_readonly vi =
+let mark_readonly vi =
   let loc = vi.vdecl in
-  mk_rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
+  rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
 
-let mk_runtime_check_with_msg ~loc msg kind kf e =
+let runtime_check_with_msg ~loc msg kind kf e =
   let file = (fst loc).Filepath.pos_path in
   let line = (fst loc).Filepath.pos_lnum in
-  mk_rtl_call ~loc
+  rtl_call ~loc
     "assert"
     [ e;
       kind_to_string loc kind;
@@ -170,13 +177,13 @@ let mk_runtime_check_with_msg ~loc msg kind kf e =
       Cil.mkString ~loc (Filepath.Normalized.to_pretty_string file);
       Cil.integer loc line ]
 
-let mk_runtime_check kind kf e p =
+let runtime_check kind kf e p =
   let loc = p.pred_loc in
   let msg =
     Kernel.Unicode.without_unicode
       (Format.asprintf "%a@?" Printer.pp_predicate) p
   in
-  mk_runtime_check_with_msg ~loc msg kind kf e
+  runtime_check_with_msg ~loc msg kind kf e
 
 (*
 Local Variables:

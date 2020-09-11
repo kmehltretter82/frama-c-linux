@@ -25,14 +25,6 @@
 open Cil_types
 
 (* ************************************************************************** *)
-(** {2 Builders} *)
-(* ************************************************************************** *)
-
-exception Unregistered_library_function of string
-val get_lib_fun_vi: string -> varinfo
-(** @return varinfo corresponding to a name of a given library function *)
-
-(* ************************************************************************** *)
 (** {2 Handling \result} *)
 (* ************************************************************************** *)
 
@@ -43,26 +35,12 @@ val result_vi: kernel_function -> varinfo
 (** @return the varinfo corresponding to \result in the given function *)
 
 (* ************************************************************************** *)
-(** {2 Handling the E-ACSL's C-libraries} *)
-(* ************************************************************************** *)
-
-val library_files: unit -> Datatype.Filepath.t list
-val is_library_loc: location -> bool
-val register_library_function: varinfo -> unit
-val reset: unit -> unit
-
-val is_fc_or_compiler_builtin: varinfo -> bool
-
-(* ************************************************************************** *)
 (** {2 Other stuff} *)
 (* ************************************************************************** *)
 
-val term_addr_of: loc:location -> term_lval -> typ -> term
+val is_fc_or_compiler_builtin: varinfo -> bool
 
-val reorder_ast: unit -> unit
-(* Reorder current AST by bringing all global declarations belonging to the
- * E-ACSL runtime library and their dependencies (e.g., typedef size_t) to
- * the very top of the file. *)
+val term_addr_of: loc:location -> term_lval -> typ -> term
 
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)
@@ -90,8 +68,6 @@ val term_has_lv_from_vi: term -> bool
 (** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
 
-type pred_or_term = PoT_pred of predicate | PoT_term of term
-
 val mk_ptr_sizeof: typ -> location -> exp
 (** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points
     to a [typ] typ and returns [sizeof(typ)]. *)
@@ -104,6 +80,13 @@ val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 
 module Id_term: Datatype.S_with_collections with type t = term
 (** Datatype for terms that relies on physical equality. *)
+
+val extract_uncoerced_lval: exp -> exp option
+(** Unroll the [CastE] part of the expression until an [Lval] is found, and
+    return it.
+
+    If at some point the expression is neither a [CastE] nor an [Lval], then
+    return [None]. *)
 
 (*
 Local Variables:

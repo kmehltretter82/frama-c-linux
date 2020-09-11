@@ -44,6 +44,13 @@ SRC_LIBRARIES:= \
 	varname
 SRC_LIBRARIES:=$(addprefix src/libraries/, $(SRC_LIBRARIES))
 
+# project initializer
+SRC_PROJECT_INITIALIZER:= \
+	rtl \
+	prepare_ast
+SRC_PROJECT_INITIALIZER:=\
+  $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
+
 # analyses
 SRC_ANALYSES:= \
 	rte \
@@ -55,16 +62,10 @@ SRC_ANALYSES:= \
 	typing
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
-# project initializer
-SRC_PROJECT_INITIALIZER:= \
-	keep_status \
-	prepare_ast
-SRC_PROJECT_INITIALIZER:=\
-  $(addprefix src/project_initializer/, $(SRC_PROJECT_INITIALIZER))
-
 # code generator
 SRC_CODE_GENERATOR:= \
-	constructor \
+	smart_exp \
+	smart_stmt \
 	gmp \
 	label \
 	env \
@@ -74,6 +75,7 @@ SRC_CODE_GENERATOR:= \
 	at_with_lscope \
 	mmodel_translate \
 	logic_functions \
+	logic_array \
 	translate \
 	temporal \
 	memory_observer \
@@ -99,8 +101,8 @@ PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= src/local_config \
 	src/options \
 	$(SRC_LIBRARIES) \
-	$(SRC_ANALYSES) \
 	$(SRC_PROJECT_INITIALIZER) \
+	$(SRC_ANALYSES) \
 	$(SRC_CODE_GENERATOR) \
 	src/main
 
