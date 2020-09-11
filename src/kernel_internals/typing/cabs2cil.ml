@@ -288,7 +288,9 @@ let pop_stdheader () =
   | s::l ->
     Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Popping %s %s" fc_stdlib s;
     current_stdheader := l
-  | [] -> Kernel.warning "#pragma %s pop does not match a push" fc_stdlib
+  | [] ->
+    Kernel.warning ~current:true
+      "#pragma %s pop does not match a push" fc_stdlib
 
 let push_stdheader s =
   Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Pushing %s %s@." fc_stdlib s;
@@ -1057,7 +1059,7 @@ let newAlphaName
     with
     | Not_found -> () (* no clash of identifiers *)
     | Failure _ ->
-      Kernel.fatal
+      Kernel.fatal ~current:true
         "finding a fresh identifier in local scope with empty scopes stack"
   end;
   stripKind kind newname, oldloc
@@ -4242,7 +4244,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       match res with
       | Some s -> annot_chunk @@ ({current_chunk with stmts = [s]}, ghost)
       | None ->
-        Kernel.warning ~wkey:Kernel.wkey_annot_error
+        Kernel.warning ~wkey:Kernel.wkey_annot_error ~current:true
           "Statement contract and ACSL pragmas over a local definition \
            are not implemented. Ignoring annotation";
         current_chunk
@@ -4345,7 +4347,7 @@ let fixFormalsType formals =
           try
             ChangeTo (Hashtbl.find table v.vname)
           with Not_found ->
-            Kernel.fatal "Formal %a not tied to a varinfo"
+            Kernel.fatal ~current:true "Formal %a not tied to a varinfo"
               Cil_printer.pp_varinfo v;
         end else SkipChildren
     end
@@ -4683,7 +4685,8 @@ let rec doSpecList ghost (suggestedAnonName: string)
             else if fitsInInt ILongLong i then ILongLong
             else IULongLong
           | "int" -> IInt
-          | s -> Kernel.fatal "Unknown enums representations '%s'" s
+          | s ->
+            Kernel.fatal ~current:true "Unknown enums representations '%s'" s
         end
       in
       (* as each name,value pair is determined, this is called *)
@@ -4753,7 +4756,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
             else if unsigned then IUInt else IInt
           | "int" -> IInt
           | "gcc-short-enums" -> real_kind
-          | s -> Kernel.fatal "Unknown enum representation '%s'" s
+          | s -> Kernel.fatal ~current:true "Unknown enum representation '%s'" s
         in
         enum.ekind <- ekind;
       end;
@@ -5472,7 +5475,7 @@ and makeCompType ghost (isstruct: bool)
           if Cil_datatype.Compinfo.equal comp comp' then begin
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
-            Kernel.abort
+            Kernel.abort ~current:true
               "type %s %s is circular"
               (if comp.cstruct then "struct" else "union")
               comp.cname;
@@ -5740,7 +5743,7 @@ and doExp local_env
              of the same name, but in that case, it is not possible to
              take the address of the function (or do anything else than
              calling the function, which is matched later on). *)
-          Kernel.warning ~wkey:Kernel.wkey_cert_msc_38
+          Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
             "%s is a standard macro. Its definition cannot be suppressed, \
              see CERT C coding rules MSC38-C" n
         end;
@@ -6442,7 +6445,7 @@ and doExp local_env
       let action local_env asconst e _what =
         match e.expr_node with
         | A.COMMA _ | A.QUESTION _ | A.PAREN _ ->
-          Kernel.fatal "normalization of lval in compound assignment failed"
+          Kernel.fatal ~current:true "normalization of lval in compound assignment failed"
         | A.VARIABLE _ | A.UNARY (A.MEMOF, _) | (* Regular lvalues *)
           A.INDEX _ | A.MEMBEROF _ | A.MEMBEROFPTR _ |
           A.CAST _ (* GCC extension *) -> begin
@@ -8486,7 +8489,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
   Kernel.debug ~dkey:Kernel.dkey_typing_global "createGlobal: %s" n;
   (* If the global is a Frama-C builtin, set the generated flag *)
   if is_stdlib_macro n && get_current_stdheader () = "" then begin
-    Kernel.warning ~wkey:Kernel.wkey_cert_msc_38
+    Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
       "Attempt to declare %s as external identifier outside of the stdlib. \
        It is supposed to be a macro name and cannot be declared. See CERT C \
        coding rule MSC38-C" n
@@ -8564,7 +8567,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
           List.iter2
             (fun x y ->
                if x != y then
-                 Kernel.fatal
+                 Kernel.fatal ~current:true
                    "Function %s: formals are not shared between AST and \
                     FormalDecls table" vi.vname)
             l1 l2;
