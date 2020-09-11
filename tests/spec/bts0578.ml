@@ -16,12 +16,12 @@ let main () =
     in
     add s (AStmtSpec ([],contract))
   in
-  add s (AInvariant(["foo"], true, ptrue));
+  add s (AInvariant(["foo"], true, toplevel_predicate ptrue));
   add s (AVariant(tinteger 0, None));
-  add s (AInvariant([], true, ptrue));
-  add s (AInvariant(["foo"], true, ptrue));
+  add s (AInvariant([], true, toplevel_predicate ptrue));
+  add s (AInvariant(["foo"], true, toplevel_predicate ptrue));
   Filecheck.check_ast "after adding invariants";
-  let requires = [Logic_const.new_predicate Logic_const.ptrue] in
+  let requires = [new_predicate ptrue] in
   let bhv = [Cil.mk_behavior ~requires ()] in
   add_behavior !s1 bhv;
   Filecheck.check_ast "after adding contract";

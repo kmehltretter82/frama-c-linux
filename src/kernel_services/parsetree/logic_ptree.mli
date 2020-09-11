@@ -161,6 +161,7 @@ and lexpr_node =
   | PLrepeat of lexpr * lexpr
       (** repeat a list of elements a number of times. *)
 
+type toplevel_predicate = { tp_only_check: bool; tp_statement: lexpr }
 
 type extension = string * lexpr list
 
@@ -231,7 +232,7 @@ and decl_node =
         (** [LDinductive_def(name,labels,type_params, parameters, indcases)]
             represents an inductive definition of a new predicate.
          *)
-  | LDlemma of string * bool * string list * string list * lexpr
+  | LDlemma of string * bool * string list * string list * toplevel_predicate
       (** LDlemma(name,is_axiom,labels,type_params,property) represents
           a lemma or an axiom [name].
           [is_axiom] is true for an axiom and false for a lemma. [labels]
@@ -276,9 +277,11 @@ and variant = lexpr * string option
     with {!Cil_types.behavior}. *)
 type behavior = {
   mutable b_name : string; (** name of the behavior. *)
-  mutable b_requires : lexpr list; (** require clauses. *)
+  mutable b_requires : toplevel_predicate list; (** require clauses. *)
   mutable b_assumes : lexpr list; (** assume clauses. *)
-  mutable b_post_cond : (Cil_types.termination_kind * lexpr) list; (** post-condition. *)
+  mutable b_post_cond :
+    (Cil_types.termination_kind * toplevel_predicate) list;
+  (** post-condition. *)
   mutable b_assigns : assigns; (** assignments. *)
   mutable b_allocation : allocation; (** frees, allocates. *)
   mutable b_extended : extension list (** extensions *)
@@ -329,13 +332,10 @@ and pragma =
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 
-and assertion_kind = Assert | Check
-
-
 (** all annotations that can be found in the code. This type shares the name of
     its constructors with {!Cil_types.code_annotation_node}. *)
 type code_annot =
-  | AAssert of string list * assertion_kind * lexpr
+  | AAssert of string list * toplevel_predicate
   (** assertion to be checked. The list of strings is the list of
       behaviors to which this assertion applies. *)
 
@@ -343,7 +343,7 @@ type code_annot =
   (** statement contract
       (potentially restricted to some enclosing behaviors). *)
 
-  | AInvariant of string list * bool * lexpr
+  | AInvariant of string list * bool * toplevel_predicate
   (** loop/code invariant. The list of strings is the list of behaviors to which
       this invariant applies.  The boolean flag is true for normal loop
       invariants and false for invariant-as-assertions. *)

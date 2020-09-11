@@ -109,7 +109,7 @@ let check_funspec_abrupt_clauses fname spec =
 	(function
 	| (Cil_types.Normal | Cil_types.Exits),_ -> ()
 	| (Cil_types.Breaks | Cil_types.Continues | Cil_types.Returns),
-          {Logic_ptree.lexpr_loc = (loc,_)} ->
+          { Logic_ptree.tp_statement = { lexpr_loc = (loc,_)}} ->
           Errorloc.parse_error ~source:loc
             "Specification of function %s can only contain ensures or \
                  exits post-conditions" fname)

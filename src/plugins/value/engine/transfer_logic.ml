@@ -137,7 +137,7 @@ let emit_message_and_status kind kf behavior ~active ~empty property named_pred 
 let create_conjunction l=
   let loc = match l with
     | [] -> None
-    | p :: _ -> Some p.ip_content.pred_loc
+    | p :: _ -> Some (Logic_const.pred_of_id_pred p).pred_loc
   in
   Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
 
@@ -384,11 +384,11 @@ module Make
     else (* Not enough slevel to split, and reduction not required *)
       States.singleton state
 
-  let eval_split_and_reduce limit active pred build_env state =
+  let eval_split_and_reduce limit ~reduce pred build_env state =
     let env = build_env state in
     let status = Domain.evaluate_predicate env state pred in
     let  reduced_states =
-      if active then
+      if reduce then
         match status with
         | Alarmset.False   -> States.empty
         | Alarmset.True    ->
@@ -453,6 +453,7 @@ module Make
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
+      let reduce = active && not pred.ip_content.tp_only_check in
       let ip = build_prop pred in
       if ignore_predicate pr then
         states
@@ -465,7 +466,7 @@ module Make
           States.fold
             (fun state (acc_status, acc_states) ->
                let status, reduced_states =
-                 eval_split_and_reduce limit active pr build_env state
+                 eval_split_and_reduce limit ~reduce pr build_env state
                in
                (status :: acc_status,
                 fst (States.merge ~into:acc_states reduced_states)))
@@ -580,8 +581,8 @@ module Make
 
   let code_annotation_text ca =
     match ca.annot_content with
-    | AAssert (_, Assert, _) ->  "assertion"
-    | AAssert (_, Check, _) -> "check"
+    | AAssert (_,{tp_only_check = false}) ->  "assertion"
+    | AAssert (_,{tp_only_check = true}) -> "check"
     | AInvariant _ ->  "loop invariant"
     | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
     | AExtended _ ->
@@ -687,9 +688,9 @@ module Make
         aux_interp ~reduce code_annot behav p
     in
     match code_annot.annot_content with
-    | AAssert (behav, Check, p) -> aux ~reduce:false code_annot behav p
-    | AAssert (behav, Assert, p)
-    | AInvariant (behav, true, p) -> aux ~reduce:true code_annot behav p
+    | AAssert (behav, p)
+    | AInvariant (behav, true, p) ->
+      aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
     | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _ | AExtended _

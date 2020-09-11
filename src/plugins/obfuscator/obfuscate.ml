@@ -150,11 +150,14 @@ class visitor = object
       Cil.SkipChildren
     else begin
       Identified_predicate.Hashtbl.add id_pred_visited p ();
-      let names = p.ip_content.pred_name in
+      let { tp_only_check = only_check; tp_statement = pred } = p.ip_content in
+      let names = pred.pred_name in
       let names' =
         List.map (Dictionary.fresh Obfuscator_kind.Predicate) names
       in
-      let p' = { p with ip_content = { p.ip_content with pred_name = names'}} in
+      let pred' = { pred with pred_name = names' } in
+      let ip_content = Logic_const.toplevel_predicate ~only_check pred' in
+      let p' = { p with ip_content } in
       Cil.ChangeDoChildrenPost (p', Extlib.id)
     end
 

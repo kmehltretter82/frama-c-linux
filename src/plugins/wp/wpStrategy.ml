@@ -48,9 +48,14 @@ type annot_kind =
   | AcallPre of bool * kernel_function
   (* annotation is a called function precondition :
      to be considered as hyp, and goal if bool=true *)
+  | AcallCheck of kernel_function
+  (* annotation is a called function check-only precondition.
+     to be considered as goal only. *)
   | AcallPost of kernel_function
   (* annotation is a called function post check :
      to be considered as goal only *)
+
+type call_pre_kind = CPhyp | CPgoal | CPboth
 
 (* -------------------------------------------------------------------------- *)
 (* --- Annotations for one program point.                                 --- *)
@@ -68,7 +73,7 @@ type annots = {
   p_both : (bool * WpPropId.pred_info) list;
   p_cut : (bool * WpPropId.pred_info) list;
   call_hyp : WpPropId.pred_info list ForCall.t; (* post and pre *)
-  call_pre : (bool * WpPropId.pred_info) list ForCall.t; (* goal only *)
+  call_pre : (call_pre_kind * WpPropId.pred_info) list ForCall.t;
   call_post : WpPropId.pred_info list ForCall.t; (* post goals only (not hyp) *)
   call_asgn : WpPropId.assigns_full_info ForCall.t;
   a_goal : WpPropId.assigns_full_info;
@@ -112,10 +117,20 @@ let add_prop acc kind id p =
                          | Some p -> Some(WpPropId.mk_pred_info id p) in
   let add_hyp l = match get_p with None -> l | Some p -> p::l in
   let add_goal l = match get_p with None -> l | Some p -> p::l in
+  let add_both_std goal l =
+    match get_p with None -> l | Some p -> (goal,p) :: l
+  in
   let add_both goal l =
     match get_p with
     | None -> l
-    | Some p -> (goal, p)::l
+    | Some p ->
+        let kind = if goal then CPboth else CPhyp in
+        (kind, p)::l
+  in
+  let add_pre l =
+    match get_p with
+    | None -> l
+    | Some p -> (CPgoal, p) :: l
   in
   let add_for_call fct calls =
     let l = try ForCall.find fct calls with Not_found -> [] in
@@ -123,6 +138,10 @@ let add_prop acc kind id p =
   let add_both_call fct goal calls =
     let l = try ForCall.find fct calls with Not_found -> [] in
     ForCall.add fct (add_both goal l) calls in
+  let add_pre_call fct calls =
+    let l = try ForCall.find fct calls with Not_found -> [] in
+    ForCall.add fct (add_pre l) calls
+  in
   let info = acc.info in
   let goal, info = match kind with
     | Ahyp ->
@@ -130,13 +149,15 @@ let add_prop acc kind id p =
     | Agoal ->
         true, { info with p_goal = add_goal info.p_goal }
     | Aboth goal ->
-        goal, { info with p_both = add_both goal info.p_both }
+        goal, { info with p_both = add_both_std goal info.p_both }
     | AcutB goal ->
-        goal, { info with p_cut = add_both goal info.p_cut }
+        goal, { info with p_cut = add_both_std goal info.p_cut }
     | AcallHyp fct ->
         false, { info with call_hyp = add_for_call fct info.call_hyp }
     | AcallPre (goal,fct) ->
         goal, { info with call_pre = add_both_call fct goal info.call_pre }
+    | AcallCheck fct ->
+        true, { info with call_pre = add_pre_call fct info.call_pre }
     | AcallPost fct ->
         true, { info with call_post = add_for_call fct info.call_post }
   in let acc = { acc with info = info } in
@@ -149,7 +170,10 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
     let p = Logic_const.pred_of_id_pred pred in
     Logic_const.(pat (p,pre_label))
   in
-  let requires = Logic_const.pands (List.map norm_pred bhv.b_requires) in
+  let requires =
+    List.filter (fun x -> not x.ip_content.tp_only_check) bhv.b_requires
+  in
+  let requires = Logic_const.pands (List.map norm_pred requires) in
   let assumes = Logic_const.pands (List.map norm_pred bhv.b_assumes) in
   let precond = Logic_const.pimplies (assumes, requires) in
   let precond_id = Logic_const.new_predicate precond in
@@ -159,12 +183,14 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
   add_prop acc kind id p
 
 let add_prop_fct_pre acc kind kf bhv ~assumes pre =
-  let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
-  let labels = NormAtLabels.labels_fct_pre in
-  let p = Logic_const.pred_of_id_pred pre in
-  let p = Logic_const.(pat (p,pre_label)) in
-  let p = normalize id ?assumes labels p in
-  add_prop acc kind id p
+  if pre.ip_content.tp_only_check then acc else begin
+    let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
+    let labels = NormAtLabels.labels_fct_pre in
+    let p = Logic_const.pred_of_id_pred pre in
+    let p = Logic_const.(pat (p,pre_label)) in
+    let p = normalize id ?assumes labels p in
+    add_prop acc kind id p
+  end
 
 let add_prop_fct_post acc kind kf  bhv tkind post =
   let id = WpPropId.mk_fct_post_id kf bhv (tkind, post) in
@@ -207,13 +233,24 @@ let add_prop_stmt_post acc kind kf s bhv tkind l_post ~assumes post =
   let p = normalize id labels ?assumes p in
   add_prop acc kind id p
 
+let update_kind kind pre =
+  if pre.ip_content.tp_only_check then begin
+    match kind with
+    | AcallPre(false,_) -> None
+    | AcallPre(true, kf) -> Some (AcallCheck kf)
+    | _ -> Some kind
+  end else Some kind
+
 let add_prop_call_pre acc kind id ~assumes pre =
-  let labels = NormAtLabels.labels_fct_pre in
-  let p = Logic_const.pred_of_id_pred pre in
-  (* assumes can be normalized in the same time *)
-  let p = Logic_const.pimplies (assumes, p) in
-  let p = normalize id labels p in
-  add_prop acc kind id p
+  match update_kind kind pre with
+  | None -> acc
+  | Some kind ->
+      let labels = NormAtLabels.labels_fct_pre in
+      let p = Logic_const.pred_of_id_pred pre in
+      (* assumes can be normalized in the same time *)
+      let p = Logic_const.pimplies (assumes, p) in
+      let p = normalize id labels p in
+      add_prop acc kind id p
 
 let add_prop_call_post acc kind called_kf bhv tkind ~assumes post =
   let id = WpPropId.mk_fct_post_id called_kf bhv (tkind, post) in
@@ -439,6 +476,14 @@ let filter_both l =
     p::h_acc, if goal then p::g_acc else g_acc
   in List.fold_left add ([], []) l
 
+let filter_both_call l =
+  let add (h_acc, g_acc) (goal, p) =
+    match goal with
+    | CPboth -> p :: h_acc, p :: g_acc
+    | CPhyp -> p :: h_acc, g_acc
+    | CPgoal -> h_acc, p :: g_acc
+  in List.fold_left add ([], []) l
+
 let get_both_hyp_goals annots = filter_both annots.info.p_both
 
 let get_call_hyp annots fct =
@@ -446,7 +491,7 @@ let get_call_hyp annots fct =
   with Not_found -> []
 
 let get_call_pre annots fct =
-  try filter_both (ForCall.find fct annots.info.call_pre)
+  try filter_both_call (ForCall.find fct annots.info.call_pre)
   with Not_found -> [],[]
 
 let get_call_post annots fct =
@@ -473,8 +518,14 @@ let pp_annots fmt acc =
     Format.fprintf fmt "%s%s: %a@."
       k (if b then "" else " (h)") WpPropId.pp_pred_of_pred_info p
   in
+  let pp_pred_c k c p =
+    let kind = match c with CPboth -> "(h+g)" | CPgoal -> "g" | CPhyp -> "h" in
+    Format.fprintf fmt "%s%s: %a@."
+      k kind WpPropId.pp_pred_of_pred_info p
+  in
   let pp_pred_list k l = List.iter (fun p -> pp_pred k true p) l in
   let pp_pred_b_list k l = List.iter (fun (b, p) -> pp_pred k b p) l in
+  let pp_pred_c_list k l = List.iter (fun (c, p) -> pp_pred_c k c p) l in
   begin
     pp_pred_list "H" acc.p_hyp;
     pp_pred_list "G" acc.p_goal;
@@ -488,7 +539,7 @@ let pp_annots fmt acc =
     ForCall.iter
       (fun kf bhs ->
          let name = "CallPre:" ^ (Kernel_function.get_name kf) in
-         pp_pred_b_list name bhs)
+         pp_pred_c_list name bhs)
       acc.call_pre;
     ForCall.iter
       (fun kf asgn ->

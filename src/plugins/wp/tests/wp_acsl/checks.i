@@ -1,7 +1,7 @@
 /* run.config
    OPT: -eva -load-module scope,eva,report -then -report
    OPT: -wp-prop=@check
-   OPT: -wp-prop=@assert
+   OPT: -wp-prop=-@check
 */
 /* run.config_qualif
    OPT: -load-module report -wp-steps 5 -then -report
