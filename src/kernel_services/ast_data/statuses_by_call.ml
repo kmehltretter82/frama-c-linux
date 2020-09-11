@@ -166,15 +166,16 @@ let rec associate acc ~formals ~concretes =
     let term = Logic_utils.expr_to_term concrete in
     associate ((formal, term) :: acc) ~formals ~concretes
 
-let transpose_pred_at_callsite ~formals ~concretes pred =
-  let pred = Logic_const.pred_of_id_pred pred in
+let transpose_pred_at_callsite ~formals ~concretes id_pred =
+  let pred = Logic_const.pred_of_id_pred id_pred in
   try
     let arguments = associate [] ~formals ~concretes in
     let visitor :> Cil.cilVisitor = replacement_visitor arguments in
     let new_pred = Cil.visitCilPredicateNode visitor pred.pred_content in
     let p_unnamed = Logic_const.unamed ~loc:pred.pred_loc new_pred in
     let p_named = { p_unnamed with pred_name = pred.pred_name } in
-    Some (Logic_const.new_predicate p_named)
+    let only_check = id_pred.ip_content.tp_only_check in
+    Some (Logic_const.new_predicate ~only_check p_named)
   with Non_Transposable -> None
 
 
