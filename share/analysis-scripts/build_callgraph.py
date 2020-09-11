@@ -28,93 +28,126 @@
 import sys
 import os
 import re
-import glob
 import function_finder
 
-MIN_PYTHON = (3, 5) # for glob(recursive)
+MIN_PYTHON = (3, 5)
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
-debug = os.getenv("DEBUG")
-
 arg = ""
 if len(sys.argv) < 2:
-   print(f"usage: {sys.argv[0]} [file1 file2 ...]")
-   print("       builds a heuristic callgraph for the specified files.")
-   sys.exit(1)
+    print(f"usage: {sys.argv[0]} file...")
+    print("        builds a heuristic callgraph for the specified files.")
+    sys.exit(1)
 else:
-   files = sys.argv[1:]
+    files = sys.argv[1:]
 
+class Callgraph:
+    """
+    Heuristics-based callgraphs.
+    Nodes are function names. Edges (caller, callee, locations) contain the source
+    and target nodes, plus a list of locations (file, line) where calls from
+    [caller] to [callee] occur.
+    """
 
-'''
-re_fun = function_finder.prepare_definition_regex()
-for f in files:
-    (found, match) = function_finder.find_first_match(re_fun, f)
-    if match:
-       fname = match.group(1)
-    else:
-        print(f"No function declaration or definition found in {f} !")
-    if found:
-        if found == 1:
-            print(f"Found declarator for {fname.upper()}, ignoring !")
+    # maps each caller to the list of its callees
+    succs = {}
+
+    # maps (caller, callee) to the list of call locations
+    edges = {}
+
+    def add_edge(self, caller, callee, loc):
+        if (caller, callee) in self.edges:
+            # edge already exists
+            self.edges[(caller, callee)].append(loc)
         else:
-            print(f"Found definition for {fname.upper()} !")
-'''
+            # new edge: check if caller exists
+            if not caller in self.succs:
+                self.succs[caller] = []
+            # add callee as successor of caller
+            self.succs[caller].append(callee)
+            # add call location to edge information
+            self.edges[(caller, callee)] = [loc]
 
-re_function_def = function_finder.prepare_definition_regex()
-re_function_call = r"[a-zA-Z_][a-zA-Z0-9_]*\s*\("
-# here, get for each loop iteration a tuple (Match Object, int) of the name of the Match Object in file and it's line
-# find_definitions is a generator function so appending all iterations results is to be expected in order to get a data_structure to further process
-def function_definition_mapper(regex, File):
-    return [x for x in function_finder.find_definitions(regex, File, 0)]
+    def nodes(self):
+        return self.succs.keys()
 
-def function_calls_mapper(regex, File):
-    return [x for x in function_finder.find_calls(regex, File, 0)]
+    def __repr__(self):
+        return f"Callgraph({self.succs}, {self.edges})"
 
-# here starts the inspection of each of the files passed in command line
-for f in files:
-    if debug:
-        print(f"Entering file {os.path.relpath(f)}:")
-    function_defs = function_definition_mapper(re_function_def, f)
-    if not function_defs:
-        if debug:
-            print(f"No call or potential call found in file {f} !")
-        continue
-    # function_ranges is a list of [name_function_def, (int, int)]
-    # its size == len(function_defs)
-    # name_function_def is a string
-    # (int, int) is a tuple of that describe the range of name_function_def
-    function_ranges = []
-    [[function_ranges.append((element[0].group(1), (element[1], function_defs[i + 1][1] - 1)))\
-    for i, element in enumerate(function_defs) if i < len(function_defs) - 1]]
-    function_calls = function_calls_mapper(re_function_call,f)
-    if not function_calls:
-        print(f"No definition found in file {f} !")
-        continue
-    if debug:
-        for i in range(len(function_ranges)):
-            print(f"{function_ranges[i]}")
-        print("\n")
-        for i in range(len(function_calls)):
-            print(f"{function_calls[i][0].group(0)} appears at line {function_calls[i][1]}")
-        print("\n")
-    func_def_calls = []
-    # for each function call:
-    #   Go through function_def list
-    #       keep range of current function_def 
-    #       check if current function call is in that range
-    #       append a tuple (string, string, int) as (function_being_defined, function_being_called, line of function call) to the list
-    for i in range(len(function_calls)):
-        for index, e in enumerate(function_ranges):
-            min_range, max_range = e[1]
-            if min_range < function_calls[i][1] <= max_range:
-                func_def_calls.append((e[0], function_calls[i][0].group(0)[:-1], function_calls[i][1]))
-    for i in range(len(func_def_calls)):
-        print(f"{os.path.relpath(f)}:{func_def_calls[i][2]}: {func_def_calls[i][0]} -> {func_def_calls[i][1]}")
+def compute(files):
+    #print(f"Computing callgraph for {len(files)} file(s)...")
+    cg = Callgraph()
+    for f in files:
+        #print(f"Processing {os.path.relpath(f)}...")
+        newlines = function_finder.compute_newline_offsets(f)
+        defs = function_finder.find_definitions_and_declarations(True, False, f, newlines)
+        calls = function_finder.find_calls(f, newlines)
+        for call in calls:
+            caller = function_finder.find_caller(defs, call)
+            if caller:
+                called = call[0]
+                line = call[1]
+                loc = (f, line)
+                cg.add_edge(caller, called, loc)
+    #print(f"Callgraph computed ({len(cg.succs)} node(s), {len(cg.edges)} edge(s))")
+    return cg
 
+def print_edge(cg, caller, called, padding="", end="\n"):
+    locs = cg.edges[(caller, called)]
+    for (filename, line) in locs:
+        print(f"{padding}{os.path.relpath(filename)}:{line}: {caller} -> {called}", end=end)
 
+def print_cg(cg):
+    for (caller, called) in cg.edges:
+        print_edge(cg, caller, called)
 
+# succs: dict, input, not modified
+# visited: set, input-output, modified
+# just_visited: set, input-output, modified
+# n: input, not modified
+#
+# The difference between visited and just_visited is that the latter refers
+# to the current dfs; nodes visited in previous dfs already had their cycles
+# reported, so we do not report them multiple times.
+def cycle_dfs(cg, visited, just_visited, n):
+    just_visited.add(n)
+    if n not in cg.succs:
+        return []
+    for succ in cg.succs[n]:
+        if succ in just_visited:
+            return [(n, succ)]
+        elif succ in visited:
+            # already reported in a previous iteration
+            return []
+        else:
+            res = cycle_dfs(cg, visited, just_visited, succ)
+            if res:
+                caller = res[0][0]
+                return [(n, caller)] + res
+            else:
+                return []
+    return []
 
-
-
-
+def detect_recursion(cg):
+    #print(f"Detecting recursive calls...")
+    to_visit = set(cg.nodes())
+    #if len(to_visit) > 100:
+    #    print(f"Checking recursion ({len(to_visit)} nodes)...")
+    if not to_visit: # empty graph -> no recursion
+        return False
+    visited = set()
+    has_cycle = False
+    while to_visit:
+        just_visited = set()
+        n = sorted(list(to_visit))[0]
+        cycle = cycle_dfs(cg, visited, just_visited, n)
+        visited = visited.union(just_visited)
+        if cycle:
+            has_cycle = True
+            print(f"recursive cycle detected: ")
+            for (caller, called) in cycle:
+                print_edge(cg, caller, called, padding="  ")
+        to_visit -= visited
+    if not has_cycle:
+        print(f"no recursive calls detected")

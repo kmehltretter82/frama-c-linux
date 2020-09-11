@@ -70,6 +70,22 @@ usage() {
    echo "      and non-POSIX external libraries."
    echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
    echo ""
+   echo "  - heuristic-print-callgraph [--dot outfile] file..."
+   echo "      Prints a heuristic, syntactic-based, callgraph for the"
+   echo "      specified files. Use --dot outfile to print it in DOT"
+   echo "      (Graphviz) format, to [outfile]. If [outfile] is '-',"
+   echo "      prints to stdout."
+   echo ""
+   echo "  - heuristic-detect-recursion file..."
+   echo "      Uses a heuristic, syntactic-based, callgraph to detect recursive"
+   echo "      calls. Results are guaranteed neither correct nor complete."
+   echo ""
+   echo "  - heuristic-list-functions want_defs want_decls file..."
+   echo "      Uses heuristics to find possible function definitions and declarations."
+   echo "      If [want_defs] is true, lists definitions."
+   echo "      If [want_decls] is true, lists declarations."
+   echo "      Results are guaranteed neither correct nor complete."
+   echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
@@ -214,6 +230,18 @@ case "$command" in
     "configure")
         shift;
         configure_for_frama_c "$@";
+        ;;
+    "heuristic-print-callgraph")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/print_callgraph.py "$@";
+        ;;
+    "heuristic-detect-recursion")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/detect_recursion.py "$@";
+        ;;
+    "heuristic-list-functions")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/heuristic_list_functions.py "$@";
         ;;
     "make-wrapper")
         shift;
