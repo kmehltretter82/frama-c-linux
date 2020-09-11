@@ -107,6 +107,7 @@ function obtainGlobalSettings() {
      config: path;           // Path to config file
      frame: { x,y,w,h };     // Frame position
      settings: object;       // Current settings
+     storage: object;        // Local storage
      reload: boolean;        // Reloaded window
    }
  */
@@ -114,18 +115,20 @@ function obtainGlobalSettings() {
 const WindowHandles = {}; // Indexed by *webContents* id
 
 function saveWindowConfig(handle) {
-  const settings = {
+  const configData = {
     frame: handle.frame,
     settings: handle.settings,
+    storage: handle.storage,
     devtools: handle.devtools
   };
-  saveSettings( handle.config, settings );
+  saveSettings( handle.config, configData );
 }
 
 function windowSyncSettings(event) {
   const handle = WindowHandles[event.sender.id];
   event.returnValue = {
     globals: obtainGlobalSettings(),
+    storage: handle && handle.storage,
     settings: handle && handle.settings
   };
 }
@@ -154,6 +157,14 @@ function applyWindowSettings(event,args) {
   }
 }
 
+function applyStorageSettings(event,args) {
+  const handle = WindowHandles[event.sender.id];
+  if (handle) {
+    applyPatches( handle.storage, args );
+    if (DEVEL) saveWindowConfig( handle );
+  }
+}
+
 function applyGlobalSettings(event,args) {
   applyPatches( obtainGlobalSettings(), args );
   BrowserWindow.getAllWindows().forEach((w) => {
@@ -166,6 +177,7 @@ function applyGlobalSettings(event,args) {
 
 ipcMain.on('dome.ipc.settings.window', applyWindowSettings );
 ipcMain.on('dome.ipc.settings.global', applyGlobalSettings );
+ipcMain.on('dome.ipc.settings.storage', applyStorageSettings );
 
 // --------------------------------------------------------------------------
 // --- Renderer-Process Communication
@@ -294,7 +306,7 @@ function createBrowserWindow( config, argv, wdir )
   const configFile = isAppWindow ? lookupConfig( wdir ) : PATH_WINDOW_SETTINGS ;
   const configData = loadSettings( configFile );
 
-  const { frame, devtools, settings={} } = configData;
+  const { frame, devtools, settings={}, storage={} } = configData;
   if (frame) {
     const getInt = (v) => v && _.toSafeInteger(v);
     options.x = getInt(frame.x);
@@ -309,7 +321,7 @@ function createBrowserWindow( config, argv, wdir )
   const handle = {
     window: theWindow,
     config: configFile,
-    frame, settings, devtools,
+    frame, settings, storage, devtools,
     reload: false
   };
 

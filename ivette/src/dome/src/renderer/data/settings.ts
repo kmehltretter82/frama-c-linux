@@ -117,21 +117,24 @@ export class GObject<A extends JSON.json> extends GlobalSettings<A> {
 
 type store = { [key: string]: JSON.json };
 type patch = { key: string; value: JSON.json };
-type driver = { evt: string; ipc: string; broadcast: boolean };
+type driver = {
+  evt: string;
+  ipc: string;
+  globals: boolean; // Global Settings (all windows share the same)
+  defaults: boolean; // Restore defaults on demand
+};
 
 class Driver {
 
-  readonly evt: string; // broadcast event
-  readonly broadcast: boolean; // settings broadcast
+  readonly evt: string; // Global Update Event
   readonly store: Map<string, JSON.json> = new Map();
   readonly diffs: Map<string, JSON.json> = new Map();
-  readonly fire: (() => void) & { flush: () => void; cancel: () => void };
+  readonly commit: (() => void) & { flush: () => void; cancel: () => void };
 
-  constructor({ evt, ipc, broadcast }: driver) {
+  constructor({ evt, ipc, defaults, globals }: driver) {
     this.evt = evt;
-    this.broadcast = broadcast;
     // --- Update Events
-    this.fire = debounce(() => {
+    this.commit = debounce(() => {
       const m = this.diffs;
       if (m.size > 0) {
         const patches: patch[] = [];
@@ -143,14 +146,16 @@ class Driver {
       }
     }, 100);
     // --- Restore Defaults Events
-    ipcRenderer.on('dome.ipc.settings.defaults', () => {
-      this.fire.cancel();
-      this.store.clear();
-      this.diffs.clear();
-      SysEmitter.emit(this.evt);
-    });
+    if (defaults) {
+      ipcRenderer.on('dome.ipc.settings.defaults', () => {
+        this.commit.cancel();
+        this.store.clear();
+        this.diffs.clear();
+        SysEmitter.emit(this.evt);
+      });
+    }
     // --- Broadcast Events
-    if (this.broadcast) {
+    if (globals) {
       ipcRenderer.on(
         'dome.ipc.settings.broadcast',
         (_sender, updates: patch[]) => {
@@ -171,15 +176,15 @@ class Driver {
     }
     // --- Closing Events
     ipcRenderer.on('dome.ipc.closing', () => {
-      this.fire();
-      this.fire.flush();
+      this.commit();
+      this.commit.flush();
     });
   }
 
   // --- Initial Data
 
   sync(data: store) {
-    this.fire.cancel();
+    this.commit.cancel();
     this.store.clear();
     this.diffs.clear();
     const m = this.store;
@@ -204,8 +209,8 @@ class Driver {
       this.store.set(key, data);
       this.diffs.set(key, data);
     }
-    if (this.broadcast) SysEmitter.emit(this.evt);
-    this.fire();
+    SysEmitter.emit(this.evt);
+    this.commit();
   }
 
 }
@@ -225,7 +230,7 @@ function useSettings<A>(
   );
   // Local state
   const [value, setValue] = React.useState<A>(loader);
-  // Broadcast
+  // Emit update event
   React.useEffect(() => {
     const event = D.evt;
     const callback = () => setValue(loader());
@@ -249,7 +254,8 @@ function useSettings<A>(
 const WindowSettingsDriver = new Driver({
   evt: 'dome.settings.window',
   ipc: 'dome.ipc.settings.window',
-  broadcast: false,
+  globals: false,
+  defaults: true,
 });
 
 /**
@@ -331,13 +337,86 @@ export function offWindowSettings(callback: () => void) {
 }
 
 // --------------------------------------------------------------------------
+// --- Local Storage
+// --------------------------------------------------------------------------
+
+const LocalStorageDriver = new Driver({
+  evt: 'dome.settings.storage',
+  ipc: 'dome.ipc.settings.storage',
+  globals: false,
+  defaults: false,
+});
+
+/**
+   Returns the current value of the settings (default for undefined key).
+ */
+export function getLocalStorage<A>(
+  key: string | undefined,
+  decoder: JSON.Loose<A>,
+  defaultValue: A,
+): A {
+  return key ?
+    JSON.jCatch(decoder, defaultValue)(LocalStorageDriver.load(key))
+    : defaultValue;
+}
+
+/**
+   Updates the current value of the settings (on defined key).
+   Most settings are subtypes of `JSON` and do not require any specific
+   encoder. If you have some, simply use it before updating the settings.
+   See [[useLocalStorage]] and [[useWindowsettingsdata]].
+ */
+export function setLocalStorage(
+  key: string | undefined,
+  value: JSON.json,
+) {
+  if (key) LocalStorageDriver.save(key, value);
+}
+
+export function useLocalStorage<A extends JSON.json>(
+  key: string | undefined,
+  decoder: JSON.Loose<A>,
+  defaultValue: A,
+) {
+  return useSettings({
+    decoder,
+    encoder: JSON.identity,
+    defaultValue,
+  }, LocalStorageDriver, key);
+}
+
+/** Same as [[useLocalStorage]] with a specific encoder. */
+export function useLocalStorageData<A>(
+  key: string | undefined,
+  decoder: JSON.Loose<A>,
+  encoder: JSON.Encoder<A>,
+  defaultValue: A,
+) {
+  return useSettings({
+    decoder,
+    encoder,
+    defaultValue,
+  }, LocalStorageDriver, key);
+}
+
+/** Call the callback function on window settings events. */
+export function useLocalStorageEvent(callback: () => void) {
+  React.useEffect(() => {
+    const { evt } = LocalStorageDriver;
+    SysEmitter.on(evt, callback);
+    return () => { SysEmitter.off(evt, callback); };
+  });
+}
+
+// --------------------------------------------------------------------------
 // --- Global Settings
 // --------------------------------------------------------------------------
 
 const GlobalSettingsDriver = new Driver({
   evt: 'dome.settings.global',
   ipc: 'dome.ipc.settings.global',
-  broadcast: true,
+  globals: true,
+  defaults: true,
 });
 
 /**
@@ -371,9 +450,11 @@ export const global = GlobalSettingsDriver.evt;
 /* @ internal */
 export function synchronize() {
   const data = ipcRenderer.sendSync('dome.ipc.settings.sync');
-  const globals: store = data.store ?? {};
-  GlobalSettingsDriver.sync(globals);
+  const storage: store = data.storage ?? {};
+  const globals: store = data.globals ?? {};
   const settings: store = data.settings ?? {};
+  LocalStorageDriver.sync(storage);
+  GlobalSettingsDriver.sync(globals);
   WindowSettingsDriver.sync(settings);
 }
 

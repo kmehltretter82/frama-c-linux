@@ -98,15 +98,22 @@ your data flow.
   `Dome.useEvent()` hooks can be used to make your components being notified by
   events.
 
-- **Window Settings** are stored in the user's home directory but remain
-  generally unnoticed by most users, although they are responsible for a good user
-  experience.  They typically include the window's position and dimension,
-  resizable items position, fold/unfold states, presentation options, etc. Most
+- **Window Settings** are stored a local file at the root of user's project, and
+  remains generally unnoticed by most users. They typically include the window's
+  position and dimension, resizable items position, fold/unfold states,
+  presentation options, etc. Most
   **Dome** components with presentation options can be assigned a `settings` key
   to make their state persistent. Contrary to Global Settings, however, they are
   not shared across several windows. You may also access these data by using
   `Settings.setWindowSetting()` and `Settings.getWindowSetting()`, or the **React** hook
   `Settings.useWindowSetting()`. See also helpers `Dome.useXxxSettings()`.
+  It is possible, from the application main menu, to reset all the window settings to their
+  default values.
+
+- **Local Storage** are stored in the same file than window settings, although
+  they are not automatically reset to their initial values.
+  This is very convenient to store persistent user data on a per-project basis.
+  See `Settings.xxxLocalStorage()` functions for more details.
 
 - **Global Settings** are stored in the user's home directory and automatically
   saved and load with your application; they are typically modified _via_ the
