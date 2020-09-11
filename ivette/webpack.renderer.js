@@ -31,7 +31,7 @@ module.exports = {
       'frama-c':      path.resolve( __dirname , 'src/frama-c' ),
       '@plugins':     path.resolve( __dirname , 'src/plugins' ),
       'dome/misc':    path.resolve( DOME , 'src/misc' ),
-      'dome/system':  path.resolve( DOME , 'src/misc/system.js' ),
+      'dome/system':  path.resolve( DOME , 'src/misc/system.ts' ),
       'dome$':        path.resolve( DOME , 'src/renderer/dome.tsx' ),
       'dome':         path.resolve( DOME , 'src/renderer' ),
       'react-dom':    '@hot-loader/react-dom'

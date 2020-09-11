@@ -38,7 +38,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
       'dome$':         path.resolve( DOME , 'src/main/dome.ts' ),
-      'dome/system$':  path.resolve( DOME , 'src/misc/system.js' ),
+      'dome/system$':  path.resolve( DOME , 'src/misc/system.ts' ),
       'dome/devtools': domeDevtools()
     }
   }
