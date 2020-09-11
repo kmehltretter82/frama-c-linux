@@ -1016,13 +1016,11 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
-  /* eslint-disable no-param-reassign */
   state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
-  /* eslint-enable no-param-reassign */
 
   return (
     <div onKeyDown={state.onKeyDown}>
