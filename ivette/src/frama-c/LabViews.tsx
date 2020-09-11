@@ -352,10 +352,11 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
 
 function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   const [local, setLocal] = Settings.useWindowSettings(
-    settings, Json.jAny, {},
+    settings, Json.jObj, {},
   ) as any;
-  const [customs, setCustoms] =
-    Dome.useGlobalSettings<any>('frama-c.labview', Json.jAny, {});
+  const [customs, setCustoms] = Settings.useLocalStorage(
+    'frama-c.labview', Json.jObj, {},
+  );
   const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
@@ -374,7 +375,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
       { id, order, label, title, builtin: true, defaultView, origin };
   });
 
-  _.forEach(customs, (view) => {
+  _.forEach(customs as any, (view) => {
     const { id, order, label = '(Custom View)', title, origin } = view;
     if (id && !theViews[id]) {
       theViews[id] = { id, order, label, title, builtin: false, origin };
@@ -463,7 +464,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     if (edited === id) {
       const RENAMED = (newLabel: string) => {
         if (newLabel) {
-          const custom = customs[id];
+          const custom = Json.jObj(customs[id]) || {};
           if (custom) custom.label = newLabel;
           setCustoms(customs);
         }

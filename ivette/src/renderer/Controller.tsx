@@ -99,7 +99,7 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 let reloadCommand: string | undefined;
 
 Dome.reload.on(() => {
-  const [lastCmd] = Settings.getWindowSettings(
+  const [lastCmd] = Settings.getLocalStorage(
     'Controller.history', Json.jList(Json.jString), [],
   );
   reloadCommand = lastCmd;
@@ -175,7 +175,7 @@ const RenderConsole = () => {
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
-  const [history, setHistory] = Settings.useWindowSettings(
+  const [history, setHistory] = Settings.useLocalStorage(
     'Controller.history', Json.jList(Json.jString), [],
   );
 
