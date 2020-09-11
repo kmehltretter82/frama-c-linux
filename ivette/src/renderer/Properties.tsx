@@ -280,7 +280,7 @@ class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
 // --- Property Filter Form
 // -------------------------------------------------------------------------
 
-const MODEL = React.createContext(() => { });
+const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
@@ -303,9 +303,8 @@ interface CheckFieldProps {
 }
 
 function CheckField(props: CheckFieldProps) {
-  const reload = React.useContext(MODEL);
   const [value, setValue] = useFilter(props.path);
-  const onChange = () => { setValue(); reload(); };
+  const onChange = () => { setValue(); Reload.emit(); };
   return (
     <Checkbox
       style={{ display: 'block' }}
@@ -481,6 +480,7 @@ const RenderTable = () => {
     Dome.useFlipSettings('ivette.properties.showFilter');
 
   // Updating the filter
+  Dome.useEvent(Reload, model.reload);
   const selectedFunction = selection?.current?.function;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
@@ -521,9 +521,7 @@ const RenderTable = () => {
         >
           <PropertyColumns />
         </Table>
-        <MODEL.Provider value={model.reload}>
-          <PropertyFilter />
-        </MODEL.Provider>
+        <PropertyFilter />
       </RSplit>
     </>
   );
