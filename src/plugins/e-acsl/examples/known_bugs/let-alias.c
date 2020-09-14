@@ -2,7 +2,7 @@
    DONTRUN:
 */
 
-/* let binding on alias: only work with -e-acsl-full-mmodel;
+/* let binding on alias: only work with -e-acsl-full-mtracking;
    should not be the case. */
 
 int main(void) {
