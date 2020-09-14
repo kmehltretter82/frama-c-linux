@@ -28,18 +28,18 @@ open Cil_types
 val reset: unit -> unit
 (** Must be called to redo the analysis *)
 
-val use_model: unit -> bool
+val use_monitoring: unit -> bool
 (** Is one variable monitored (at least)? *)
 
-val must_model_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
+val must_monitor_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
 (** [must_model_vi ?kf ?stmt vi] returns [true] if the varinfo [vi] at the given
     [stmt] in the given function [kf] must be tracked by the memory model
     library. *)
 
-val must_model_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
+val must_monitor_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
 (** Same as {!must_model_vi}, for left-values *)
 
-val must_model_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
+val must_monitor_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
 (** Same as {!must_model_vi}, for expressions *)
 
 (*

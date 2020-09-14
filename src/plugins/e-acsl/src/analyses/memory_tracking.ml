@@ -692,7 +692,7 @@ end = struct
 
 end
 
-let consolidated_must_model_vi vi =
+let consolidated_must_monitor_vi vi =
   if Env.is_consolidated () then
     Env.consolidated_mem vi
   else begin
@@ -713,7 +713,7 @@ let consolidated_must_model_vi vi =
     Env.consolidated_mem vi
   end
 
-let must_model_vi ?kf ?stmt vi =
+let must_monitor_vi ?kf ?stmt vi =
   let _kf = match kf, stmt with
     | None, None | Some _, _ -> kf
     | None, Some stmt -> Some (Kernel_function.find_englobing_kf stmt)
@@ -721,14 +721,14 @@ let must_model_vi ?kf ?stmt vi =
   (* [JS 2013/05/07] that is unsound to take the env from the given stmt in
      presence of aliasing with an address (see tests address.i).
      TODO: could be optimized though *)
-  consolidated_must_model_vi vi
+  consolidated_must_monitor_vi vi
 (*  match stmt, kf with
-    | None, _ -> consolidated_must_model_vi vi
+    | None, _ -> consolidated_must_monitor_vi vi
     | Some _, None ->
     assert false
     | Some stmt, Some kf  ->
     if not (Env.is_consolidated ()) then
-      ignore (consolidated_must_model_vi vi);
+      ignore (consolidated_must_monitor_vi vi);
     try
       let tbl = Env.find kf in
       try
@@ -736,7 +736,7 @@ let must_model_vi ?kf ?stmt vi =
     Varinfo.Hptset.mem vi (Env.default_varinfos set)
       with Not_found ->
     (* new statement *)
-    consolidated_must_model_vi vi
+    consolidated_must_monitor_vi vi
     with Not_found ->
       (* [kf] is dead code *)
       false
@@ -761,8 +761,8 @@ and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
-let must_model_lval = apply_on_vi_base_from_lval must_model_vi
-let must_model_exp = apply_on_vi_base_from_exp must_model_vi
+let must_monitor_lval = apply_on_vi_base_from_lval must_monitor_vi
+let must_monitor_exp = apply_on_vi_base_from_exp must_monitor_vi
 
 let must_never_monitor_lval ?kf ?stmt lv =
   apply_on_vi_base_from_lval
@@ -782,27 +782,27 @@ let must_never_monitor_exp ?kf ?stmt lv  =
 (** {1 Public API} *)
 (* ************************************************************************** *)
 
-let must_model_vi ?kf ?stmt vi =
+let must_monitor_vi ?kf ?stmt vi =
   not (must_never_monitor vi)
   &&
-  (Options.Full_mmodel.get ()
-   || Error.generic_handle (must_model_vi ?kf ?stmt) false vi)
+  (Options.Full_mtracking.get ()
+   || Error.generic_handle (must_monitor_vi ?kf ?stmt) false vi)
 
-let must_model_lval ?kf ?stmt lv =
+let must_monitor_lval ?kf ?stmt lv =
   not (must_never_monitor_lval ?kf ?stmt lv)
   &&
-  (Options.Full_mmodel.get ()
-   || Error.generic_handle (must_model_lval ?kf ?stmt) false lv)
+  (Options.Full_mtracking.get ()
+   || Error.generic_handle (must_monitor_lval ?kf ?stmt) false lv)
 
-let must_model_exp ?kf ?stmt exp =
+let must_monitor_exp ?kf ?stmt exp =
   not (must_never_monitor_exp ?kf ?stmt exp)
   &&
-  (Options.Full_mmodel.get ()
-   || Error.generic_handle (must_model_exp ?kf ?stmt) false exp)
+  (Options.Full_mtracking.get ()
+   || Error.generic_handle (must_monitor_exp ?kf ?stmt) false exp)
 
-let use_model () =
+let use_monitoring () =
   not (Env.is_empty ())
-  || Options.Full_mmodel.get ()
+  || Options.Full_mtracking.get ()
   || Env.has_heap_allocations ()
 
 (*
