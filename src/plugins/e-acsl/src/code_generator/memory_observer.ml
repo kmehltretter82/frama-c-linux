@@ -26,7 +26,7 @@ let tracking_stmt ?before fold mk_stmt env kf vars =
   if Functions.instrument kf then
     fold
       (fun vi env ->
-         if Mmodel_analysis.must_model_vi ~kf vi then
+         if Memory_tracking.must_monitor_vi ~kf vi then
            Env.add_stmt ?before env kf (mk_stmt vi)
          else
            env)

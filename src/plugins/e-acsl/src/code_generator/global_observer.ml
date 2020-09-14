@@ -43,11 +43,11 @@ let is_empty () = Varinfo.Hashtbl.length tbl = 0
    Initializers (used to capture literal strings) are added through
    [add_initializer] below. *)
 let add vi =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     Varinfo.Hashtbl.replace tbl vi (ref [])
 
 let add_initializer vi offset init =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     try
       let l = Varinfo.Hashtbl.find tbl vi in
       l := (offset, init) :: !l

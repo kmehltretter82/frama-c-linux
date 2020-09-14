@@ -583,7 +583,8 @@ and context_insensitive_term_to_exp kf env t =
     if Misc.is_set_of_ptr_or_array t1.term_type ||
        Misc.is_set_of_ptr_or_array t2.term_type then
       (* case of arithmetic over set of pointers (due to use of ranges)
-         should have already been handled in [mmodel_call_with_ranges] *)
+         should have already been handled in [Memory_translate.call_with_ranges]
+      *)
       assert false;
     (* binary operation over pointers *)
     let ty = match t1.term_type with
@@ -696,19 +697,19 @@ and context_insensitive_term_to_exp kf env t =
       e, env, sty, ""
   | Tbase_addr(BuiltinLabel Here, t) ->
     let name = "base_addr" in
-    let e, env = Mmodel_translate.call ~loc kf name Cil.voidPtrType env t in
+    let e, env = Memory_translate.call ~loc kf name Cil.voidPtrType env t in
     e, env, C_number, name
   | Tbase_addr _ -> not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "offset" in
-    let e, env = Mmodel_translate.call ~loc kf name size_t env t in
+    let e, env = Memory_translate.call ~loc kf name size_t env t in
     e, env, C_number, name
   | Toffset _ -> not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "block_length" in
-    let e, env = Mmodel_translate.call ~loc kf name size_t env t in
+    let e, env = Memory_translate.call ~loc kf name size_t env t in
     e, env, C_number, name
   | Tblock_length _ -> not_yet env "labeled \\block_length"
   | Tnull ->
@@ -965,7 +966,7 @@ and named_predicate_content_to_exp ?name kf env p =
         | Pvalid_read _ -> "valid_read"
         | _ -> assert false
       in
-      Mmodel_translate.call_valid ~loc kf name Cil.intType env t
+      Memory_translate.call_valid ~loc kf name Cil.intType env t
     in
     if !is_visiting_valid then begin
       (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
@@ -996,7 +997,7 @@ and named_predicate_content_to_exp ?name kf env p =
          vi.vformal || vi.vglob || Functions.RTL.is_generated_name vi.vname ->
        Cil.one ~loc, env
      | _ ->
-       Mmodel_translate.call_with_size
+       Memory_translate.call_with_size
          ~loc
          kf
          "initialized"
@@ -1007,7 +1008,7 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pinitialized _ -> not_yet env "labeled \\initialized"
   | Pallocable _ -> not_yet env "\\allocate"
   | Pfreeable(BuiltinLabel Here, t) ->
-    Mmodel_translate.call ~loc kf "freeable" Cil.intType env t
+    Memory_translate.call ~loc kf "freeable" Cil.intType env t
   | Pfreeable _ -> not_yet env "labeled \\freeable"
   | Pfresh _ -> not_yet env "\\fresh"
 
@@ -1095,8 +1096,8 @@ let () =
   Quantif.predicate_to_exp_ref := named_predicate_to_exp;
   At_with_lscope.term_to_exp_ref := term_to_exp;
   At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp;
-  Mmodel_translate.term_to_exp_ref := term_to_exp;
-  Mmodel_translate.predicate_to_exp_ref := named_predicate_to_exp;
+  Memory_translate.term_to_exp_ref := term_to_exp;
+  Memory_translate.predicate_to_exp_ref := named_predicate_to_exp;
   Logic_functions.term_to_exp_ref := term_to_exp;
   Logic_functions.named_predicate_to_exp_ref := named_predicate_to_exp;
   Logic_array.translate_rte_ref := translate_rte
