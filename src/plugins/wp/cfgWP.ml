@@ -101,6 +101,10 @@ struct
   struct
     type t = effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
+    let pretty fmt e =
+      Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
+        P.pretty e.e_pid (Cvalues.pp_region M.pretty) e.e_region
+    [@@ warning "-32"]
   end
 
   module G = Qed.Collection.Make(TARGET)
@@ -140,9 +144,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a@ @[<hov 2>Prove %a@]"
-      Pcond.dump vc.hyps
-      F.pp_pred vc.goal
+    Format.fprintf fmt "%a"
+      (Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal) vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in

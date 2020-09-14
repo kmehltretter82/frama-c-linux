@@ -230,7 +230,7 @@ let compare_prop_id pid1 pid2 =
     else
       Stdlib.compare pid1.p_part pid2.p_part
 
-module PropId =
+module PropIdRaw =
   Datatype.Make_with_collections(
   struct
     type t = prop_id
@@ -356,7 +356,7 @@ end = struct
     in normalize_basename basename
 
 
-  module UniquifyPropId = NameUniquify(PropId)(struct
+  module UniquifyPropId = NameUniquify(PropIdRaw)(struct
       let name = "WpProperty"
       let basename = get_prop_id_basename
     end)
@@ -435,7 +435,7 @@ struct
         if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
           Printf.sprintf "%s_part%06d" basename (succ k)
 
-  module Uniquify2 = NameUniquify(PropId)(struct
+  module Uniquify2 = NameUniquify(PropIdRaw)(struct
       let name = "Wp.WpPropId.Names2."
       let basename = get_prop_id_basename
     end)
@@ -572,6 +572,16 @@ struct
 end
 
 let pretty_local = Pretty.pp_local
+
+(* -------------------------------------------------------------------------- *)
+(* --- Datatype                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+module PropId =
+struct
+  include PropIdRaw
+  let pretty = pp_propid
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Hints                                                              --- *)
