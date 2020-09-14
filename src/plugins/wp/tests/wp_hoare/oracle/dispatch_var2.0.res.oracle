@@ -208,7 +208,7 @@ Assume {
   Have: (ta_y_0=true).
   (* Pre-condition *)
   Have: (ta_y_0=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_1=true) /\ (ta_y_0=false).
   (* Block In *)
   Have: (Init_tmp_0=false) /\ (ta_tmp_0=false).
@@ -222,7 +222,7 @@ Assume {
   Have: ((Init_tmp_0=true) -> (Init_tmp_1=true)).
   (* Return *)
   Have: tmp_0 = call_param_0.
-  (* Function Exit *)
+  (* Frame Out *)
   Have: (ta_y_3=true).
 }
 Prove: call_param_0 = 0.
@@ -243,7 +243,7 @@ Assume {
   Have: (ta_y_1=true).
   (* Pre-condition *)
   Have: (ta_y_1=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_2=true) /\ (ta_y_1=false).
   (* Block In *)
   Have: (ta_tmp_0=false).
@@ -271,7 +271,7 @@ Assume {
   Have: (ta_y_1=true).
   (* Pre-condition *)
   Have: (ta_y_1=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_2=true) /\ (ta_y_1=false).
   (* Block In *)
   Have: (ta_tmp_0=false).
@@ -291,7 +291,7 @@ Assume {
   Have: (ta_y_0=true).
   (* Pre-condition *)
   Have: (ta_y_0=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_1=true) /\ (ta_y_0=false).
   (* Block In *)
   Have: (Init_tmp_0=false) /\ (ta_tmp_1=false).
@@ -314,7 +314,7 @@ Assume {
   Have: (ta_y_1=true).
   (* Pre-condition *)
   Have: (ta_y_1=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_0=true) /\ (ta_y_1=false).
   (* Block In *)
   Have: (ta_tmp_0=false).
@@ -331,7 +331,7 @@ Assume {
   Have: (ta_y_1=true).
   (* Pre-condition *)
   Have: (ta_y_1=true).
-  (* Function Frame *)
+  (* Frame In *)
   Have: (ta_y_2=true) /\ (ta_y_1=false).
   (* Block In *)
   Have: (ta_tmp_0=false).

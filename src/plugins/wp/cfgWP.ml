@@ -1203,11 +1203,10 @@ struct
             let hs = M.frame (L.current env) in
             let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
-        | Mcfg.SC_Function_in -> wp
-        | Mcfg.SC_Function_frame ->
-            wp_scope env wp ~descr:"Function Frame" Enter xs
-        | Mcfg.SC_Function_out ->
-            wp_scope env wp ~descr:"Function Exit" Leave xs
+        | Mcfg.SC_Frame_in ->
+            wp_scope env wp ~descr:"Frame In" Enter xs
+        | Mcfg.SC_Frame_out ->
+            wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
             wp_scope env wp ~descr:"Block In" Enter xs
         | Mcfg.SC_Block_out ->

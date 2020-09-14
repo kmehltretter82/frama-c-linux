@@ -234,9 +234,8 @@ struct
   let pp_scope sc fmt xs =
     let title = match sc with
       | Mcfg.SC_Global -> "Global"
-      | Mcfg.SC_Function_in -> "F-in"
-      | Mcfg.SC_Function_frame -> "F-frame"
-      | Mcfg.SC_Function_out -> "F-out"
+      | Mcfg.SC_Frame_in -> "F-in"
+      | Mcfg.SC_Frame_out -> "F-out"
       | Mcfg.SC_Block_in -> "B-in"
       | Mcfg.SC_Block_out -> "B-out"
     in begin

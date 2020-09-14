@@ -24,9 +24,8 @@ open Cil_types
 
 type scope =
   | SC_Global
-  | SC_Function_in    (* Just before the pre-state *)
-  | SC_Function_frame (* Just after the introduction of formals *)
-  | SC_Function_out   (* Post-state *)
+  | SC_Frame_in
+  | SC_Frame_out
   | SC_Block_in
   | SC_Block_out
 

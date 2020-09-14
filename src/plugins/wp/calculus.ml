@@ -495,9 +495,8 @@ module Cfg (W : Mcfg.S) = struct
        | Mcfg.SC_Global -> "global"
        | Mcfg.SC_Block_in -> "block in"
        | Mcfg.SC_Block_out -> "block out"
-       | Mcfg.SC_Function_in -> "function in"
-       | Mcfg.SC_Function_frame -> "function frame"
-       | Mcfg.SC_Function_out -> "function out" )
+       | Mcfg.SC_Frame_in -> "frame in"
+       | Mcfg.SC_Frame_out -> "frame out" )
       (Pretty_utils.pp_list  ~sep:", " Printer.pp_varinfo) vars;
     match scope with
     | Mcfg.(SC_Block_in | SC_Block_out) when vars = [] -> obj
@@ -564,13 +563,12 @@ module Cfg (W : Mcfg.S) = struct
           Wp_error.unsupported "strange CFGs."
       | Cil2cfg.VfctIn ->
           let obj = get_only_succ env cfg v in
-          let obj = wp_scope wenv formals Mcfg.SC_Function_in obj in
           let obj = wp_scope wenv [] Mcfg.SC_Global obj in
           obj
       | Cil2cfg.VblkIn (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
           let obj = wp_scope wenv b.blocals Mcfg.SC_Block_in obj in
-          let obj = wp_scope wenv formals Mcfg.SC_Function_frame obj in
+          let obj = wp_scope wenv formals Mcfg.SC_Frame_in obj in
           obj
       | Cil2cfg.VblkOut (Cil2cfg.Bfct, b) ->
           let obj = get_only_succ env cfg v in
@@ -604,7 +602,7 @@ module Cfg (W : Mcfg.S) = struct
       | Cil2cfg.VfctOut
       | Cil2cfg.Vexit ->
           let obj = get_only_succ env cfg v (* exitpost / postcondition *) in
-          wp_scope wenv formals Mcfg.SC_Function_out obj
+          wp_scope wenv formals Mcfg.SC_Frame_out obj
       | Cil2cfg.Vend ->
           W.empty
           (* LC : unused entry point...
