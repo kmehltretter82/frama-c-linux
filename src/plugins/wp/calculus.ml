@@ -599,8 +599,7 @@ module Cfg (W : Mcfg.S) = struct
       | Cil2cfg.Vloop _ | Cil2cfg.Vloop2 _ ->
           let get_loop_head = fun n -> get_only_succ env cfg n in
           wp_loop env v e get_loop_head
-      | Cil2cfg.VfctOut
-      | Cil2cfg.Vexit ->
+      | Cil2cfg.VfctOut | Cil2cfg.VfctErr ->
           let obj = get_only_succ env cfg v (* exitpost / postcondition *) in
           wp_scope wenv formals Mcfg.SC_Frame_out obj
       | Cil2cfg.Vend ->
