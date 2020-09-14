@@ -1369,8 +1369,6 @@ src/plugins/value/utils/library_functions.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/mark_noresults.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/unit_tests.ml: CEA_LGPL_OR_PROPRIETARY
