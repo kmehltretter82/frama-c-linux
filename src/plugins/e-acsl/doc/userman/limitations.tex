@@ -87,9 +87,9 @@ plug-in is running (see examples of Sections~\ref{sec:no-main} and
 
 The instrumentation in the generated program is partial for every program
 without main containing memory-related annotations, except if the option
-\optionuse{-}{e-acsl-full-mmodel} or the \eacsl plug-in (of \shortopt{M} option
-of \eacslgcc) is provided. In that case, violations of such annotations are
-undetected.
+\optionuse{-}{e-acsl-full-mtracking} or the \eacsl plug-in (of \shortopt{M}
+option of \eacslgcc) is provided. In that case, violations of such annotations
+are undetected.
 
 Consider the following example.
 
@@ -144,7 +144,7 @@ instrumented code (linked against this main) could print some warnings from the
 \index{Function!Undefined}
 
 The instrumentation in the generated program is partial for a program $p$ if $p$
-contains a memory-related annotation $a$ and an undefined function 
+contains a memory-related annotation $a$ and an undefined function
 $f$ such that:
 \begin{itemize}
 \item either $f$ has an (even indirect) effect on a left-value occurring in $a$;

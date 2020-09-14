@@ -25,7 +25,7 @@ include Plugin.S (** implementation of Log.S for E-ACSL *)
 module Run: Parameter_sig.Bool
 module Valid: Parameter_sig.Bool
 module Gmp_only: Parameter_sig.Bool
-module Full_mmodel: Parameter_sig.Bool
+module Full_mtracking: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
 module Builtins: Parameter_sig.String_set
 module Temporal_validity: Parameter_sig.Bool
