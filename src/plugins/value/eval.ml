@@ -248,6 +248,14 @@ type ('loc, 'value) call = {
   recursive: bool;
 }
 
+type recursion = {
+  depth: int;
+  substitution: (varinfo * varinfo) list;
+  base_substitution: Base.substitution;
+  withdrawal: varinfo list;
+  base_withdrawal: Base.Hptset.t;
+}
+
 type cacheable = Cacheable | NoCache | NoCacheCallers
 
 (*

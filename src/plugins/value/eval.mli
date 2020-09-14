@@ -215,7 +215,6 @@ type 'location logic_assign =
 (**                       {2 Interprocedural Analysis }                       *)
 (* -------------------------------------------------------------------------- *)
 
-
 (** Argument of a function call. *)
 type ('loc, 'value) argument = {
   formal: varinfo;          (** The formal argument of the called function. *)
@@ -235,7 +234,19 @@ type ('loc, 'value) call = {
   recursive: bool;
 }
 
-(* Can the results of a function call be cached with memexec? *)
+(** Information needed to interpret a recursive call.
+    The local variables and formal parameters of different recursive calls
+    should not be mixed up. Those of the current call must be temporary withdraw
+    or replaced from the domain states before starting the new recursive call. *)
+type recursion = {
+  depth: int;
+  substitution: (varinfo * varinfo) list;
+  base_substitution: Base.substitution;
+  withdrawal: varinfo list;
+  base_withdrawal: Base.Hptset.t;
+}
+
+(** Can the results of a function call be cached with memexec? *)
 type cacheable =
   | Cacheable      (** Functions whose result can be safely cached *)
   | NoCache        (** Functions whose result should not be cached, but for

@@ -556,7 +556,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         let arguments = List.rev arguments in
         arguments, rest
     in
-    {kf; arguments; rest; return; recursive}
+    {kf; arguments; rest; return; recursive; }
 
   let make_call ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)

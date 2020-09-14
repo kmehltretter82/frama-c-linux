@@ -32,7 +32,7 @@ open Cil_types
 let check_formals_non_referenced kf =
   let formals = Kernel_function.get_formals kf in
   if List.exists (fun vi -> vi.vaddrof) formals then
-    Value_parameters.error ~current:true ~once:true
+    Value_parameters.warning ~current:true ~once:true
       "function '%a' (involved in a recursive call) has a formal parameter \
        whose address is taken. Analysis may be unsound."
       Kernel_function.pretty kf
@@ -104,3 +104,73 @@ let empty_spec_for_recursive_call kf =
   let bhv = Cil.mk_behavior ~assigns ~name:Cil.default_behavior_name () in
   empty.spec_behavior <- [bhv];
   empty
+
+
+(* -------------------------------------------------------------------------- *)
+
+module CallDepth =
+  Datatype.Pair_with_collections (Kernel_function) (Datatype.Int)
+    (struct let module_name = "RecDepth" end)
+
+module VarCopies =
+  Datatype.List (Datatype.Pair (Cil_datatype.Varinfo) (Cil_datatype.Varinfo))
+
+module Vars = Datatype.Pair (VarCopies) (Datatype.List (Cil_datatype.Varinfo))
+
+module VarStack =
+  State_builder.Hashtbl
+    (CallDepth.Hashtbl)
+    (Vars)
+    (struct
+      let name = "Eva.Recursion.VarStack"
+      let dependencies = [ Ast.self ]
+      let size = 9
+    end)
+
+let copy_variable depth varinfo =
+  let name = Format.asprintf "\\copy<%s>[%i]" varinfo.vname depth
+  and typ = varinfo.vtype
+  and source = true
+  and temp = varinfo.vtemp
+  and referenced = varinfo.vreferenced
+  and ghost = varinfo.vghost
+  and loc = varinfo.vdecl in
+  Cil.makeVarinfo ~source ~temp ~referenced ~ghost ~loc false false name typ
+
+let copy_fresh_variable fundec depth varinfo =
+  let v = copy_variable depth varinfo in
+  Cil.refresh_local_name fundec v;
+  v
+
+let make_stack (kf, depth) =
+  let fundec =
+    try Kernel_function.get_definition kf
+    with Kernel_function.No_Definition -> assert false
+  in
+  let vars = Kernel_function.(get_formals kf @ get_locals kf) in
+  let reachable, withdrawal = List.partition (fun vi -> vi.vaddrof) vars in
+  let copy v = v, copy_fresh_variable fundec depth v in
+  let substitution = List.map copy reachable in
+  substitution, withdrawal
+
+let get_stack kf depth = VarStack.memo make_stack (kf, depth)
+
+let make_recursive_call kf =
+  let call_stack = Value_util.call_stack () in
+  let previous_calls = List.filter (fun (f, _) -> f == kf) call_stack in
+  let depth = List.length previous_calls in
+  let substitution, withdrawal = get_stack kf depth in
+  let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
+  let list_substitution = List.map base_of_varinfo substitution in
+  let base_substitution = Base.substitution_from_list list_substitution in
+  let list_withdrawal = List.map Base.of_varinfo withdrawal in
+  let base_withdrawal = Base.Hptset.of_list list_withdrawal in
+  Eval.{ depth; substitution; base_substitution; withdrawal; base_withdrawal; }
+
+let revert_recursion recursion =
+  let revert (v1, v2) = v2, v1 in
+  let substitution = List.map revert recursion.Eval.substitution in
+  let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
+  let list = List.map base_of_varinfo substitution in
+  let base_substitution = Base.substitution_from_list list in
+  Eval.{ recursion with substitution; base_substitution; }

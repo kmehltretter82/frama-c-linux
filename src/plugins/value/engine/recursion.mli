@@ -32,3 +32,8 @@ val empty_spec_for_recursive_call: kernel_function -> spec
 (** Generate an empty spec [assigns \nothing] or
     [assigns \result \from \nothing], to be used to "approximate" the
     results of a recursive call. *)
+
+(** TODO *)
+val make_recursive_call: kernel_function -> Eval.recursion
+
+val revert_recursion: Eval.recursion -> Eval.recursion
