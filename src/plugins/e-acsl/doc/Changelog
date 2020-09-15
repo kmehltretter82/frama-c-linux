@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* runtime      [2020-09-15] Fix wrong value returned for the stack size in the
+                segment memory model (frama-c/e-acsl#126).
 -  E-ACSL       [2020-09-15] Deprecate -e-acsl-full-mmodel in favor of
                 -e-acsl-full-mtracking.
 -  e-acsl-gcc   [2020-09-15] Deprecate --full-mmodel in favor of

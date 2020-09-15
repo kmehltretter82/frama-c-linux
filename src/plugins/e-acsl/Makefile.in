@@ -399,18 +399,25 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 
 EACSL_INSTALL_MANUAL_FILES=$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_MANUAL_FILES)))
 
+EACSL_INSTALL_C_DIRECTORIES := \
+	e-acsl \
+	e-acsl/internals \
+	e-acsl/instrumentation_model \
+	e-acsl/observation_model \
+	e-acsl/observation_model/internals \
+	e-acsl/observation_model/bittree_model \
+	e-acsl/observation_model/segment_model \
+	e-acsl/numerical_model \
+	e-acsl/libc_replacements
+
 install::
 	$(PRINT_INSTALL) E-ACSL share files
-	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_DATADIR)/e-acsl
-	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl/bittree_model \
-	         $(FRAMAC_DATADIR)/e-acsl/segment_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/bittree_model/* \
-	      $(FRAMAC_DATADIR)/e-acsl/bittree_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/segment_model/* \
-	      $(FRAMAC_DATADIR)/e-acsl/segment_model
-        # manuals are not present in standard distribution.
-        # Don't fail because of that.
+	for dir in $(EACSL_C_DIRECTORIES); do \
+		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
+		$(CP) $(E_ACSL_DIR)/share/$$dir/*.[ch] $(FRAMAC_DATADIR)/$$dir ; \
+	done
+	# manuals are not present in standard distribution.
+	# Don't fail because of that.
 ifneq ("$(EACSL_INSTALL_MANUAL_FILES)","")
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals
