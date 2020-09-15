@@ -253,10 +253,6 @@ struct
       (fun vc (warn,hyp) -> assume_vc ?descr ?filter ?init ~warn [hyp] vc)
       vc whs
 
-  let passify_vc pa vc =
-    let hs = Passive.conditions pa (occurs_vc vc) in
-    assume_vc hs vc
-
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
   (* -------------------------------------------------------------------------- *)
@@ -365,6 +361,14 @@ struct
       (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
       targets
 
+  let passify_vc pa vc =
+    let hs = Passive.conditions pa (occurs_vc vc) in
+    assume_vc hs vc
+
+  let passify_vcs pa vcs =
+    if Passive.is_empty pa then vcs
+    else gmap (passify_vc pa) vcs
+
   (* -------------------------------------------------------------------------- *)
   (* --- Merge for Calculus                                                 --- *)
   (* -------------------------------------------------------------------------- *)
@@ -386,8 +390,8 @@ struct
       (fun () ->
          let sigma,pa1,pa2 = merge_sigma wp1.sigma wp2.sigma in
          let effects = Eset.union wp1.effects wp2.effects in
-         let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-         let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+         let vcs1 = passify_vcs pa1 wp1.vcs in
+         let vcs2 = passify_vcs pa2 wp2.vcs in
          let vcs = gmerge vcs1 vcs2 in
          { sigma = sigma ; vcs = vcs ; effects = effects }
       ) ()
@@ -659,7 +663,7 @@ struct
            let pa = Sigma.join s_here s_labl in
            let stop,effects = Eset.partition (is_stopeffect label) wp.effects in
            let vcs = Gmap.filter (not_posteffect stop) wp.vcs in
-           let vcs = gmap (passify_vc pa) vcs in
+           let vcs = passify_vcs pa vcs in
            let vcs = check_nothing stop vcs in
            let vcs = state_vcs stmt s_here vcs in
            { sigma = Some s_here ; vcs=vcs ; effects=effects })
@@ -809,8 +813,8 @@ struct
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
-             let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-             let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+             let vcs1 = passify_vcs pa1 wp1.vcs in
+             let vcs2 = passify_vcs pa2 wp2.vcs in
              gbranch
                ~left:(assume_vc ~descr:"Then" ~stmt ~warn [cond])
                ~right:(assume_vc ~descr:"Else" ~stmt ~warn [p_not cond])
