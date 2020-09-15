@@ -12,12 +12,12 @@
   loop not completely unrolled
 [eva] tests/value/partitioning-annots.c:34: starting to merge loop iterations
 [eva] tests/value/partitioning-annots.c:36: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:47: 
+[eva:loop-unroll] tests/value/partitioning-annots.c:49: 
   loop not completely unrolled
-[eva] tests/value/partitioning-annots.c:47: starting to merge loop iterations
-[eva:loop-unroll] tests/value/partitioning-annots.c:52: 
+[eva] tests/value/partitioning-annots.c:49: starting to merge loop iterations
+[eva:loop-unroll] tests/value/partitioning-annots.c:54: 
   loop not completely unrolled
-[eva] tests/value/partitioning-annots.c:52: starting to merge loop iterations
+[eva] tests/value/partitioning-annots.c:54: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] done for function test_unroll
 [eva] ====== VALUES COMPUTED ======

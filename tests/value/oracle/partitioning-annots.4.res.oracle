@@ -6,13 +6,13 @@
   k ∈ {0}
   nondet ∈ [--..--]
 [eva] computing for function Frama_C_interval <- test_history.
-  Called from tests/value/partitioning-annots.c:127.
+  Called from tests/value/partitioning-annots.c:129.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:127: 
+[eva] tests/value/partitioning-annots.c:129: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:133: Frama_C_show_each: {0; 1}, {0; 1}
-[eva:alarm] tests/value/partitioning-annots.c:136: Warning: 
+[eva] tests/value/partitioning-annots.c:135: Frama_C_show_each: {0; 1}, {0; 1}
+[eva:alarm] tests/value/partitioning-annots.c:138: Warning: 
   division by zero. assert j ≢ 0;
 [eva] Recording results for test_history
 [eva] done for function test_history
