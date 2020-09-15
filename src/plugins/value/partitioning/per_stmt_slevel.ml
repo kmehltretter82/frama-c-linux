@@ -91,7 +91,7 @@ let compute kf =
         Cil_datatype.Stmt.Hashtbl.add h_local s i;
         Stack.push i local_slevel;
       | Some SlevelFull ->
-        let cap = Value_parameters.SlevelFullCap.get () in
+        let cap = max_int in
         if debug then Format.printf "Vising split %d, pushing %d@." s.sid cap;
         Cil_datatype.Stmt.Hashtbl.add h_local s cap;
         Stack.push cap local_slevel;

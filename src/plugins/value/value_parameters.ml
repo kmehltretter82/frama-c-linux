@@ -718,19 +718,6 @@ module SlevelFunction =
 let () = add_precision_dep SlevelFunction.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-module SlevelFullCap =
-  Int
-    (struct
-      let option_name = "-eva-slevel-full-cap"
-      let arg_name = "n"
-      let default = 10000
-      let help =
-        "defines the cap for slevel full annotations."
-    end)
-let () = add_precision_dep SlevelFullCap.parameter
-let () = SlevelFullCap.set_range 0 max_int
-
-let () = Parameter_customize.set_group precision_tuning
 module SlevelMergeAfterLoop =
   Kernel_function_set
     (struct
