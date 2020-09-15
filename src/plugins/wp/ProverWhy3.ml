@@ -1206,14 +1206,26 @@ let call_prover prover_config ~timeout ~steplimit drv prover task =
       Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
       Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
     } in
-  let command = Why3.Whyconf.get_complete_command prover_config
-      ~with_steps:(steps<>None) in
+  let with_steps = match steps, prover_config.Why3.Whyconf.command_steps with
+    | None, _ -> false
+    | Some _, Some _ -> true
+    | Some _, None ->
+        Wp_parameters.warning ~once:true ~current:false
+          "%a does not support steps limit (ignored option)"
+          Why3.Whyconf.print_prover prover ;
+        false
+  in
+  let command = Why3.Whyconf.get_complete_command prover_config ~with_steps in
   let call =
     Why3.Driver.prove_task_prepared ~command ~limit drv task in
-  Wp_parameters.debug ~dkey "Why3 run prover %a with %i timeout %i steps@."
+  let pp_steps fmt s =
+    if with_steps then Format.fprintf fmt "%i steps" (Why3.Opt.get_def (-1) s)
+    else Format.fprintf fmt ""
+  in
+  Wp_parameters.debug ~dkey "Why3 run prover %a with %i timeout %a@."
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
-    (Why3.Opt.get_def (-1) steps);
+    pp_steps steps ;
   let timeout = match timeout with None -> 0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
