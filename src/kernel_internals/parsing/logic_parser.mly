@@ -1189,12 +1189,21 @@ ne_simple_clauses:
 | post_cond_kind full_lexpr clause_kw { missing 2 ";" $3 }
 | allocation clause_kw { missing 1 ";" $2 }
 | ASSIGNS full_assigns clause_kw { missing 2 ";" $3 }
-| EXT_CONTRACT grammar_extension clause_kw { missing 1 ";" $3 }
+| EXT_CONTRACT ne_grammar_extension clause_kw { missing 1 ";" $3 }
 ;
 
-grammar_extension:
-/* Grammar Extensibility for plugins */
+ne_grammar_extension:
 | full_zones { $1 }
+;
+
+/* possibly empty list of terms, for ACSL extensions registered by plugins. */
+grammar_extension:
+| enter_kw_c_mode extension_content exit_kw_c_mode { $2 }
+;
+
+extension_content:
+| /* epsilon */ { [] }
+| zones { $1 }
 ;
 
 post_cond_kind:

@@ -48,6 +48,7 @@ void loop (void) {
   //@ for ca_foo: ca_foo \true;
   //@ ns_foo \true;
   //@ baz \true;
+  //@ empty_extension;
   /*@ loop invariant \true; */
   while (0) { }
 }
