@@ -87,12 +87,12 @@ let compute kf =
         Cil_datatype.Stmt.Hashtbl.add h_local s (Stack.top local_slevel);
         if d <> None then Cil_datatype.Stmt.Hashtbl.add h_merge s ();
       | Some (SlevelLocal i) ->
-        if debug then Format.printf "Vising split %d, pushing %d@." s.sid i;
+        if debug then Format.printf "Visiting split %d, pushing %d@." s.sid i;
         Cil_datatype.Stmt.Hashtbl.add h_local s i;
         Stack.push i local_slevel;
       | Some SlevelFull ->
         let cap = max_int in
-        if debug then Format.printf "Vising split %d, pushing %d@." s.sid cap;
+        if debug then Format.printf "Visiting split %d, pushing %d@." s.sid cap;
         Cil_datatype.Stmt.Hashtbl.add h_local s cap;
         Stack.push cap local_slevel;
       | Some SlevelDefault ->
