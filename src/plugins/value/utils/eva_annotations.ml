@@ -178,7 +178,7 @@ module Unroll = Register (struct
     let is_loop_annot = true
 
     let parse ~typing_context = function
-      | [{lexpr_node = PLvar "full"}] -> UnrollFull
+      | [] -> UnrollFull
       | [t] ->
         let open Logic_typing in
         UnrollAmount
@@ -186,16 +186,16 @@ module Unroll = Register (struct
       | _ -> raise Parse_error
 
     let export = function
-      | UnrollFull -> Ext_terms [Logic_const.tstring "full"]
+      | UnrollFull -> Ext_terms []
       | UnrollAmount t -> Ext_terms [t]
 
     let import = function
-      | Ext_terms [{term_node=TConst (LStr "full")}] -> UnrollFull
+      | Ext_terms [] -> UnrollFull
       | Ext_terms [t] -> UnrollAmount t
       | _ -> assert false
 
     let print fmt = function
-      | UnrollFull -> Format.pp_print_string fmt "full"
+      | UnrollFull -> ()
       | UnrollAmount t -> Printer.pp_term fmt t
   end)
 

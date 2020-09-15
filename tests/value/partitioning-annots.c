@@ -40,10 +40,12 @@ void test_unroll()
 
   // At the end, we must have both arrays a and b to be fully initialized at 42
 
-  // Small loops can be unrolled with the annotation "unroll full".
+  // Small loops can be unrolled without giving an unroll amount.
   // The actual limit of the number of iterations can be overriden with
   // the option -eva-default-loop-unroll
-  //@ loop unroll full;
+  // Here -eva-default-loop-unroll is set to a value not high enough to
+  // completely unroll the loop thus a warning should be emitted.
+  //@ loop unroll;
   for (int i = 0 ; i < 2*N ; i++)
     c[i] = i % 2;
 
