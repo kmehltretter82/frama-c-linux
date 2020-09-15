@@ -1,0 +1,46 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_plugin/post_assigns.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Loading driver 'share/wp.driver'
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function receive
+------------------------------------------------------------
+
+Goal Post-condition (file tests/wp_plugin/post_assigns.i, line 9) in 'receive':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/post_assigns.i, line 10) in 'receive' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/post_assigns.i, line 10) in 'receive' (2/2):
+Call Effect at line 14
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/post_assigns.i, line 10) in 'receive' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/post_assigns.i, line 10) in 'receive' (2/2):
+Call Effect at line 14
+Assume {
+  Have: 0 <= size_0.
+  Type: is_sint32(size_1) /\ is_sint32(size_0).
+  (* Heap *)
+  Type: (region(message_0.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint8(message_0, 0), 1 + size_0).
+}
+Prove: size_0 <= size_1.
+
+------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'receive':
+  /*@ behavior typed: requires \separated(&size,message+(..)); */
+  void receive(int n, char *message);
