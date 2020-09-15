@@ -8,14 +8,15 @@
 [wp] [CFG] Goal init_t2_v2_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v3_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
-[wp] 91 goals scheduled
+[wp] 92 goals scheduled
 [wp] [Alt-Ergo] Goal typed_init_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_init_loop_invariant_Partial_preserved : Valid
 [wp] [Qed] Goal typed_init_loop_invariant_Partial_established : Valid
 [wp] [Alt-Ergo] Goal typed_init_loop_invariant_Range_preserved : Valid
 [wp] [Qed] Goal typed_init_loop_invariant_Range_established : Valid
 [wp] [Qed] Goal typed_init_loop_assigns_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_init_loop_assigns_part3 : Valid
 [wp] [Qed] Goal typed_init_assigns : Valid
 [wp] [Qed] Goal typed_init_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_init_loop_variant_positive : Valid
@@ -100,12 +101,12 @@
 [wp] [Qed] Goal typed_init_t2_v3_loop_variant_positive : Valid
 [wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_variant_2_decrease : Valid
 [wp] [Qed] Goal typed_init_t2_v3_loop_variant_2_positive : Valid
-[wp] Proved goals:   91 / 91
-  Qed:            51 
+[wp] Proved goals:   92 / 92
+  Qed:            52 
   Alt-Ergo:       40
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  init                      6        4       10       100%
+  init                      7        4       11       100%
   init_t1                   6        4       10       100%
   init_t2_v1                9        8       17       100%
   init_t2_v2                9        8       17       100%

@@ -7,7 +7,7 @@ int size;
 
 /*@
   ensures size == n;
-  assigns size, message[ 0 .. \at(size,Post) ]; // FAILS
+  assigns size, message[ 0 .. \at(size,Post) ];
 */
 void receive(int n,char *message) {
   size = n ;

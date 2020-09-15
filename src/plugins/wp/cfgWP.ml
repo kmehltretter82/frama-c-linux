@@ -658,15 +658,20 @@ struct
     if Clabels.is_here label then wp else
       in_wenv wenv wp
         (fun env wp ->
+           let frame = L.get_frame () in
            let s_here = L.current env in
-           let s_labl = L.mem_frame label in
-           let pa = Sigma.join s_here s_labl in
+           let s_frame =
+             if L.has_at_frame frame label then
+               L.mem_at_frame frame label
+             else
+               (L.set_at_frame frame label s_here ; s_here) in
+           let pa = Sigma.join s_here s_frame in
            let stop,effects = Eset.partition (is_stopeffect label) wp.effects in
            let vcs = Gmap.filter (not_posteffect stop) wp.vcs in
            let vcs = passify_vcs pa vcs in
            let vcs = check_nothing stop vcs in
            let vcs = state_vcs stmt s_here vcs in
-           { sigma = Some s_here ; vcs=vcs ; effects=effects })
+           { sigma = Some s_frame ; vcs=vcs ; effects=effects })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : assignation                                              --- *)
@@ -1051,6 +1056,7 @@ struct
     let seq_post = cc_havoc dom_call seq_result.pre in
     let seq_exit = cc_havoc dom_call (sigma_at wexit) in
     (* Pre-State *)
+    (* Passive: joined later by call_proper *)
     let sigma_pre, _, _ = Sigma.merge seq_post.pre seq_exit.pre in
     let formals = List.map (C.exp sigma_pre) es in
     let call = L.call kf formals in

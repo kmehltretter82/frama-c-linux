@@ -30,15 +30,7 @@ Prove: true.
 
 Goal Assigns (file tests/wp_plugin/post_assigns.i, line 10) in 'receive' (2/2):
 Call Effect at line 14
-Assume {
-  Have: 0 <= size_0.
-  Type: is_sint32(size_1) /\ is_sint32(size_0).
-  (* Heap *)
-  Type: (region(message_0.base) <= 0) /\ linked(Malloc_0).
-  (* Goal *)
-  When: !invalid(Malloc_0, shift_sint8(message_0, 0), 1 + size_0).
-}
-Prove: size_0 <= size_1.
+Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'receive':

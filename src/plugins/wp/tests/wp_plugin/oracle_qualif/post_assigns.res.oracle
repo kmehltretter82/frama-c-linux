@@ -8,13 +8,12 @@
 [wp] [Qed] Goal typed_receive_assigns_exit_part1 : Valid
 [wp] [Qed] Goal typed_receive_assigns_exit_part2 : Valid
 [wp] [Qed] Goal typed_receive_assigns_normal_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_receive_assigns_normal_part2 : Unsuccess
-[wp] Proved goals:    4 / 5
-  Qed:             4 
-  Alt-Ergo:        0  (unsuccess: 1)
+[wp] [Qed] Goal typed_receive_assigns_normal_part2 : Valid
+[wp] Proved goals:    5 / 5
+  Qed:             5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  receive                   4        -        5      80.0%
+  receive                   5        -        5       100%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'receive':
   /*@ behavior typed: requires \separated(&size,message+(..)); */
