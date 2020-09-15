@@ -55,7 +55,7 @@ SRC_PROJECT_INITIALIZER:=\
 SRC_ANALYSES:= \
 	rte \
 	literal_strings \
-	mmodel_analysis \
+	memory_tracking \
 	exit_points \
 	lscope \
 	interval \
@@ -73,7 +73,7 @@ SRC_CODE_GENERATOR:= \
 	loops \
 	quantif \
 	at_with_lscope \
-	mmodel_translate \
+	memory_translate \
 	logic_functions \
 	logic_array \
 	translate \
@@ -114,9 +114,9 @@ PLUGIN_DEPENDENCIES:= RteGen
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
 
 # Suppress a spurious warning with OCaml >= 4.04.0
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmo \
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmo \
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmi: E_ACSL_BFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmx: E_ACSL_OFLAGS+= -w -60
 
 ###############
 # Local Flags #
@@ -160,7 +160,7 @@ PLUGIN_TESTS_DIRS := \
 	arith \
 	memory \
 	gmp-only \
-	full-mmodel \
+	full-mtracking \
 	format \
 	temporal \
 	special
@@ -291,8 +291,8 @@ EACSL_TEST_FILES = \
 	tests/test_config_ci.in \
 	tests/gmp-only/test_config_ci \
 	tests/gmp-only/test_config_dev \
-	tests/full-mmodel/test_config_ci \
-	tests/full-mmodel/test_config_dev \
+	tests/full-mtracking/test_config_ci \
+	tests/full-mtracking/test_config_dev \
 	tests/builtin/test_config_ci \
 	tests/builtin/test_config_dev \
 	tests/temporal/test_config_ci \

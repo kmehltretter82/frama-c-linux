@@ -32,6 +32,11 @@ error () {
   fi
 }
 
+# Print a warning message to STDERR.
+warning () {
+  echo "e-acsl-gcc: warning: $1" 1>&2
+}
+
 # Check if a given executable name can be found by in the PATH
 has_tool() {
   which "$@" >/dev/null 2>&1 && return 0 || return 1
@@ -264,8 +269,8 @@ check_getopt;
 
 # Getopt options
 LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
-  frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,gmp,quiet,logfile:,
-  ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
+  frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
+  quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
@@ -292,7 +297,7 @@ OPTION_OUTPUT_EXEC="a.out"               # Generated executable name
 OPTION_EACSL_OUTPUT_EXEC=""              # Name of E-ACSL executable
 OPTION_EACSL="-e-acsl"                   # Specifies E-ACSL run
 OPTION_FRAMA_STDLIB="-no-frama-c-stdlib" # Use Frama-C stdlib
-OPTION_FULL_MMODEL=                      # Instrument as much as possible
+OPTION_FULL_MTRACKING=                      # Instrument as much as possible
 OPTION_GMP=                              # Use GMP integers everywhere
 OPTION_EACSL_MMODELS="segment"           # Memory model used
 OPTION_EACSL_SHARE=                      # Custom E-ACSL share directory
@@ -489,9 +494,13 @@ do
       OPTION_FRAMA_STDLIB="-frama-c-stdlib"
     ;;
     # Use as much memory-related instrumentation as possible
-    -M|--full-mmodel)
+    -M|--full-mtracking|--full-mmodel)
+      if [ "$i" = "--full-mmodel" ]; then
+        warning "--full-mmodel is a deprecated alias for option --full-mtracking."
+        warning "Please use --full-mtracking instead."
+      fi
       shift;
-      OPTION_FULL_MMODEL="-e-acsl-full-mmodel"
+      OPTION_FULL_MTRACKING="-e-acsl-full-mtracking"
     ;;
     # Use GMP everywhere
     -g|--gmp)
@@ -780,7 +789,7 @@ if [ -n "$OPTION_EACSL" ]; then
     $OPTION_EACSL
     $OPTION_GMP
     $OPTION_LIBC_REPLACEMENTS
-    $OPTION_FULL_MMODEL
+    $OPTION_FULL_MTRACKING
     $OPTION_TEMPORAL
     $OPTION_VERBOSE
     $OPTION_DEBUG

@@ -216,7 +216,7 @@ let mk_stmt_from_assign loc lhs rhs =
 
 (* Top-level handler for Set instructions *)
 let set_instr ?(post=false) current_stmt loc lhs rhs env kf =
-  if Mmodel_analysis.must_model_lval ~kf lhs then
+  if Memory_tracking.must_monitor_lval ~kf lhs then
     Extlib.may_map
       (fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
       ~dft:env
@@ -248,7 +248,7 @@ end = struct
            Extlib.may_map
              (fun (_, rhs, flow) ->
                 let env =
-                  if Mmodel_analysis.must_model_exp ~kf param then
+                  if Memory_tracking.must_monitor_exp ~kf param then
                     let stmt = Mk.save_param ~loc flow rhs index in
                     Env.add_stmt ~before:current_stmt ~post:false env kf stmt
                   else env
@@ -341,7 +341,7 @@ end = struct
     let alloc = not has_def in
     Extlib.may_map
       (fun lhs ->
-         if Mmodel_analysis.must_model_lval ~kf lhs then
+         if Memory_tracking.must_monitor_lval ~kf lhs then
            call_with_ret ~alloc current_stmt loc lhs env kf
          else env)
       ~dft:env
@@ -371,7 +371,7 @@ end = struct
         inits
 
   let instr current_stmt vi li loc env kf =
-    if Mmodel_analysis.must_model_vi ~kf vi then
+    if Memory_tracking.must_monitor_vi ~kf vi then
       match li with
       | AssignInit init ->
         handle_init current_stmt NoOffset loc vi init env kf
@@ -421,7 +421,7 @@ let handle_return_stmt loc ret env kf =
   | _ -> Options.fatal "Something other than Lval in return"
 
 let handle_return_stmt loc ret env kf =
-  if Mmodel_analysis.must_model_exp ~kf ret then
+  if Memory_tracking.must_monitor_exp ~kf ret then
     handle_return_stmt loc ret env kf
   else
     env
@@ -491,7 +491,7 @@ let handle_function_parameters kf env =
     let env, _ = List.fold_left
         (fun (env, index) param ->
            let env =
-             if Mmodel_analysis.must_model_vi ~kf param
+             if Memory_tracking.must_monitor_vi ~kf param
              then track_argument param index env kf
              else env
            in

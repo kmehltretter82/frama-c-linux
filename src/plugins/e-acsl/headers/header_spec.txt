@@ -44,8 +44,8 @@ src/analyses/literal_strings.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/literal_strings.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/mmodel_analysis.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/analyses/mmodel_analysis.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/memory_tracking.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/analyses/memory_tracking.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/rte.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -72,8 +72,8 @@ src/code_generator/loops.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/loops.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/memory_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/memory_observer.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/mmodel_translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
-src/code_generator/mmodel_translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/memory_translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/memory_translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/quantif.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/quantif.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/rational.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -113,8 +113,8 @@ tests/builtin/test_config_ci: .ignore
 tests/builtin/test_config_dev: .ignore
 tests/format/test_config_ci: .ignore
 tests/format/test_config_dev: .ignore
-tests/full-mmodel/test_config_ci: .ignore
-tests/full-mmodel/test_config_dev: .ignore
+tests/full-mtracking/test_config_ci: .ignore
+tests/full-mtracking/test_config_dev: .ignore
 tests/gmp-only/test_config_ci: .ignore
 tests/gmp-only/test_config_dev: .ignore
 tests/temporal/test_config_ci: .ignore

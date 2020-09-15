@@ -27,7 +27,7 @@ open Cil_types
 open Cil_datatype
 
 val store: ?before:stmt -> Env.t -> kernel_function -> varinfo list -> Env.t
-(** For each variable of the given list, if necessary according to the mmodel
+(** For each variable of the given list, if necessary according to the mtracking
     analysis, add a call to [__e_acsl_store_block] in the given environment. *)
 
 val duplicate_store:

@@ -52,7 +52,7 @@ let subst_all_literals_in_exp env kf e =
       (* the guard below could be optimized: if no annotation depends on this
          string, then it is not required to monitor it.
          (currently, the guard says: "no annotation uses the memory model" *)
-      | Const (CStr s) when Mmodel_analysis.use_model () ->
+      | Const (CStr s) when Memory_tracking.use_monitoring () ->
         let e, env = literal e.eloc !env_ref kf s in
         env_ref := env;
         Cil.ChangeTo e

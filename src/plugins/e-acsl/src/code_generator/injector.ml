@@ -138,7 +138,7 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
       | Var vi, NoOffset -> vi.vglob || vi.vformal
       | _ -> false
     in
-    let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+    let must_model = Memory_tracking.must_monitor_lval ~stmt ~kf lv in
     if not (may_safely_ignore lv) && must_model then
       let before = Cil.mkStmt ~valid_sid:true stmt.skind in
       let new_stmt =
@@ -515,7 +515,7 @@ and inject_in_block (env: Env.t) kf blk =
       if Functions.instrument kf then
         List.fold_left
           (fun acc vi ->
-             if Mmodel_analysis.must_model_vi ~kf vi
+             if Memory_tracking.must_monitor_vi ~kf vi
              then Smart_stmt.delete_stmt vi :: acc
              else acc)
           stmts
@@ -530,7 +530,7 @@ and inject_in_block (env: Env.t) kf blk =
       blk.bstmts <-
         List.fold_left
           (fun acc vi ->
-             if Mmodel_analysis.must_model_vi vi && not vi.vdefined
+             if Memory_tracking.must_monitor_vi vi && not vi.vdefined
              then Smart_stmt.store_stmt vi :: acc
              else acc)
           blk.bstmts
@@ -702,7 +702,7 @@ let surround_function_with kf fundec stmt_begin stmt_end =
     These functions track the usage of globals if the program being analyzed. *)
 let inject_global_handler file main =
   Options.feedback ~dkey ~level:2 "building global handler.";
-  if Mmodel_analysis.use_model () then
+  if Memory_tracking.use_monitoring () then
     (* Create [__e_acsl_globals_init] function *)
     let vi_init, fundec_init = Global_observer.mk_init_function () in
     let cil_fct_init = GFun(fundec_init, Location.unknown) in
@@ -786,16 +786,16 @@ let inject_global_handler file main =
       file.globals <- file.globals @ globals_func
 
 (** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
-    memory model analysis is running.
+    memory tracking analysis is running.
     [__e_acsl_memory_init] initializes memory storage and potentially records
     program arguments. Parameters to [__e_acsl_memory_init] are addresses of
     program arguments or NULLs if [main] is declared without arguments.
     [__e_acsl_memory_clean] clean the memory allocated by
     [__e_acsl_memory_init]. *)
-let inject_mmodel_handler main =
+let inject_mtracking_handler main =
   (* Only inject memory init and memory clean if the memory model analysis is
      running *)
-  if Mmodel_analysis.use_model () then begin
+  if Memory_tracking.use_monitoring () then begin
     let loc = Location.unknown in
     let nulls = [ Cil.zero loc ; Cil.zero loc ] in
     let handle_main main =
@@ -837,13 +837,13 @@ let inject_in_file file =
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
     inject_global_handler file main;
   file.globals <- Logic_functions.add_generated_functions file.globals;
-  inject_mmodel_handler main
+  inject_mtracking_handler main
 
 let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
-  Mmodel_analysis.reset ();
+  Memory_tracking.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();
