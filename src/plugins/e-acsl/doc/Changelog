@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-09-15] Deprecate -e-acsl-full-mmodel in favor of
+                -e-acsl-full-mtracking.
+-  e-acsl-gcc   [2020-09-15] Deprecate --full-mmodel in favor of
+                --full-mtracking.
 -* E-ACSL       [2020-08-28] Fix crash that may occur when translating
                 properties that have been proved valid by another plug-in
                 (frama-c/e-acsl#106).
