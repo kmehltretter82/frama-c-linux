@@ -174,24 +174,29 @@ let run_list_all_plugin_options () =
                      generate 2 strings *)
                   let strings_of_typed_parameter tp =
                     let name = tp.Typed_parameter.name in
-                    match tp.Typed_parameter.accessor with
-                    | Typed_parameter.Bool (_, opt_neg) ->
-                      begin
-                        match opt_neg with
-                        | None -> [(name, "bool")]
-                        | Some neg -> [(name, "bool"); (neg, "bool")]
-                      end
-                    | Int (_, frange) ->
-                      let (min, max) = frange () in
-                      if min = min_int && max = max_int then [(name, "int")]
-                      else [(name, Format.asprintf "int (%d, %d)" min max)]
-                    | String (_, fvalues) ->
-                      let values = fvalues () in
-                      if values = [] then [(name, "string")]
-                      else
-                        [(name, Format.asprintf "string (%a)"
-                            (Pretty_utils.pp_list ~sep:", "
-                               Format.pp_print_string) values)]
+                    (* special case due to the "cmdline hack" related to
+                       the "Input C files" option: if it does not start
+                       with '-', ignore it *)
+                    if String.get name 0 <> '-' then []
+                    else
+                      match tp.Typed_parameter.accessor with
+                      | Typed_parameter.Bool (_, opt_neg) ->
+                        begin
+                          match opt_neg with
+                          | None -> [(name, "bool")]
+                          | Some neg -> [(name, "bool"); (neg, "bool")]
+                        end
+                      | Int (_, frange) ->
+                        let (min, max) = frange () in
+                        if min = min_int && max = max_int then [(name, "int")]
+                        else [(name, Format.asprintf "int (%d, %d)" min max)]
+                      | String (_, fvalues) ->
+                        let values = fvalues () in
+                        if values = [] then [(name, "string")]
+                        else
+                          [(name, Format.asprintf "string (%a)"
+                              (Pretty_utils.pp_list ~sep:", "
+                                 Format.pp_print_string) values)]
                   in
                   let group_options =
                     List.flatten
