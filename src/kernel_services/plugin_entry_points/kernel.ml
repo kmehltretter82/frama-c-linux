@@ -424,11 +424,10 @@ module AutocompleteHelp =
   P.String_set
     (struct
       let option_name = "-autocomplete"
-      let arg_name = "[+]p1,p2,..."
+      let arg_name = "p1,p2,..."
       let help = "displays all Frama-C options, used for shell autocompletion. \
                   Prints options for the specified plugin names (or '@all' for \
-                  all plugins). If the first character is '+', \
-                  only prints visible options."
+                  all plugins). Note: for the kernel, use an empty string."
     end)
 
 let _ =
@@ -471,7 +470,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralVerbose =
   Int
     (struct
@@ -493,7 +492,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralDebug =
   Zero
     (struct
@@ -517,7 +516,7 @@ let () =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 module Quiet =

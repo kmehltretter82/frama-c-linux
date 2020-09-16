@@ -89,9 +89,10 @@ type plugin = private
     p_shortname: string;
     p_help: string;
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
-(** Only iterable parameters (see {!do_iterate} and {!do_not_iterate}) are
-    registered in the field [p_parameters].
-    @since Beryllium-20090901 *)
+(** @since Beryllium-20090901
+    @modify Frama-C+dev previously only "iterable" parameters were included,
+                        now all parameters are.
+*)
 
 module type General_services = sig
   include S

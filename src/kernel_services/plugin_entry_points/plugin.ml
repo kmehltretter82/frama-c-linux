@@ -311,7 +311,7 @@ struct
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      if is_visible then Parameter_customize.do_iterate ()
+      if is_visible then Parameter_customize.is_reconfigurable ()
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
@@ -517,7 +517,7 @@ struct
     Parameter_customize.set_group messages;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.do_not_journalize ();
-    Parameter_customize.do_iterate ();
+    Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
       Parameter_customize.set_cmdline_stage Cmdline.Early;
       Parameter_customize.set_module_name modname;
