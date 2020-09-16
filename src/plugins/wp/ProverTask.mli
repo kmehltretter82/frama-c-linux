@@ -85,7 +85,7 @@ val schedule : 'a Task.task -> unit
 val spawn :
   ?monitor:('a option -> unit) ->
   ?pool:Task.pool ->
-  all:bool ->
+  all:bool -> smoke:bool ->
   ('a * bool Task.task) list -> unit
 
 (** Spawn all the tasks over the server and retain the first 'validated' one.
