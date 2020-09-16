@@ -412,7 +412,7 @@ EACSL_INSTALL_C_DIRECTORIES := \
 
 install::
 	$(PRINT_INSTALL) E-ACSL share files
-	for dir in $(EACSL_C_DIRECTORIES); do \
+	for dir in $(EACSL_INSTALL_C_DIRECTORIES); do \
 		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
 		$(CP) $(E_ACSL_DIR)/share/$$dir/*.[ch] $(FRAMAC_DATADIR)/$$dir ; \
 	done
