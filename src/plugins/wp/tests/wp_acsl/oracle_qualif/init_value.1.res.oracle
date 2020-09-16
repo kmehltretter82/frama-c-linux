@@ -4,15 +4,6 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 18 goals scheduled
-[wp] [Alt-Ergo] Goal typed_fa1_ensures_qed_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa1_ensures_qed_ko_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa2_ensures_qed_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa2_ensures_qed_ko_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko_3 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ko_2 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_Sc_eq_ko : Unsuccess
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_Sc_t : Unsuccess
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_Sc_c_2 : Unsuccess
@@ -22,6 +13,15 @@
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_T1_6 : Unsuccess
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_indirect_init_union_b : Unsuccess
 [wp] [Alt-Ergo] Goal typed_main_ko_requires_qed_ko_indirect_init_union_t : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa1_ensures_qed_ko : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa1_ensures_qed_ko_2 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa2_ensures_qed_ko : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa2_ensures_qed_ko_2 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko_2 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fa3_ensures_qed_ko_3 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ko : Unsuccess
+[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ko_2 : Unsuccess
 [wp] Proved goals:    0 / 18
   Alt-Ergo:        0  (unsuccess: 18)
 ------------------------------------------------------------

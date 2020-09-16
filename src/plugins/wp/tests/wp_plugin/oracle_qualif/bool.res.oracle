@@ -4,13 +4,13 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 7 goals scheduled
-[wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Valid
-[wp] [Qed] Goal typed_band_bool_true_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bor_bool_true_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Valid
-[wp] [Qed] Goal typed_bxor_bool_true_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_job_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_bor_bool_true_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Valid
+[wp] [Qed] Goal typed_band_bool_true_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Valid
+[wp] [Qed] Goal typed_bxor_bool_true_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Valid
 [wp] Proved goals:    7 / 7
   Qed:             2 
   Alt-Ergo:        5

@@ -4,10 +4,6 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 24 goals scheduled
-[wp] [Qed] Goal typed_fa1_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_fa2_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_fa3_ensures_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ok : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_Struct_Simple_a : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_Struct_Simple_b : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_Simple_Array_0 : Valid
@@ -28,6 +24,10 @@
 [wp] [Qed] Goal typed_main_requires_qed_ok_4 : Valid
 [wp] [Alt-Ergo] Goal typed_main_requires_qed_ok_5 : Valid
 [wp] [Qed] Goal typed_main_requires_qed_ok_direct_init_union : Valid
+[wp] [Qed] Goal typed_fa1_ensures_qed_ok : Valid
+[wp] [Qed] Goal typed_fa2_ensures_qed_ok : Valid
+[wp] [Qed] Goal typed_fa3_ensures_qed_ok : Valid
+[wp] [Alt-Ergo] Goal typed_fs1_ensures_qed_ok : Valid
 [wp] Proved goals:   24 / 24
   Qed:            19 
   Alt-Ergo:        5

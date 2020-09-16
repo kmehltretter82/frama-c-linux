@@ -20,9 +20,9 @@
 [wp] Goal typed_find_loop_assigns : trivial
 [wp] Goal typed_find_loop_variant_decrease : not tried
 [wp] Goal typed_find_loop_variant_positive : not tried
+[wp] Goal typed_find_not_found_ensures : not tried
 [wp] Goal typed_find_found_ensures : not tried
 [wp] Goal typed_find_found_ensures_2 : not tried
-[wp] Goal typed_find_not_found_ensures : not tried
 [wp] Goal typed_find_ptr_complete_found_not_found : trivial
 [wp] Goal typed_find_ptr_disjoint_found_not_found : trivial
 [wp] Goal typed_find_ptr_ensures_Range : not tried
@@ -38,9 +38,9 @@
 [wp] Goal typed_find_ptr_loop_assigns : trivial
 [wp] Goal typed_find_ptr_loop_variant_decrease : not tried
 [wp] Goal typed_find_ptr_loop_variant_positive : not tried
+[wp] Goal typed_find_ptr_not_found_ensures : not tried
 [wp] Goal typed_find_ptr_found_ensures : not tried
 [wp] Goal typed_find_ptr_found_ensures_2 : not tried
-[wp] Goal typed_find_ptr_not_found_ensures : not tried
 [wp] Goal typed_iter_ptr_ensures_Last : not tried
 [wp] Goal typed_iter_ptr_loop_invariant_Range_preserved : not tried
 [wp] Goal typed_iter_ptr_loop_invariant_Range_established : not tried

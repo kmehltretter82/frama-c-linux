@@ -15,27 +15,27 @@
 [wp] [Alt-Ergo] Goal hoare_bts0513_ensures_qed_ko_ko2 : Unsuccess
 [wp] [Alt-Ergo] Goal hoare_bts0513_bis_assert_qed_ko_ko1 : Unsuccess
 [wp] [Qed] Goal hoare_bts0513_bis_assert_qed_ok_ok : Valid
-[wp] [Qed] Goal hoare_default_behaviors_ensures_qed_ok : Valid
-[wp] [Qed] Goal hoare_default_behaviors_assert_qed_ok_2 : Valid
-[wp] [Qed] Goal hoare_default_behaviors_ensures_qed_ok_stmt_p : Valid
-[wp] [Qed] Goal hoare_default_behaviors_assert_qed_ok : Valid
-[wp] [Alt-Ergo] Goal hoare_default_behaviors_assert_rte_signed_overflow : Unsuccess
-[wp] [Qed] Goal hoare_default_behaviors_assigns : Valid
 [wp] [Qed] Goal hoare_dpd1_assert_qed_ok_A : Valid
 [wp] [Alt-Ergo] Goal hoare_dpd1_ensures_qed_ko_Eko : Unsuccess
 [wp] [Qed] Goal hoare_dpd1_assigns : Valid
-[wp] [Qed] Goal hoare_dpd2_assert_qed_ok_A : Valid
 [wp] [Alt-Ergo] Goal hoare_dpd2_ensures_qed_ko_Eko : Unsuccess
 [wp] [Qed] Goal hoare_dpd2_assigns : Valid
-[wp] [Qed] Goal hoare_spec_if_ensures_qed_ok_2 : Valid
+[wp] [Qed] Goal hoare_dpd2_assert_qed_ok_A : Valid
 [wp] [Qed] Goal hoare_spec_if_ensures_qed_ok : Valid
 [wp] [Qed] Goal hoare_spec_if_assigns : Valid
 [wp] [Alt-Ergo] Goal hoare_spec_if_assert_rte_signed_overflow : Unsuccess
 [wp] [Qed] Goal hoare_spec_if_assigns_2 : Valid
 [wp] [Alt-Ergo] Goal hoare_spec_if_assert_rte_signed_overflow_2 : Unsuccess
 [wp] [Qed] Goal hoare_spec_if_assigns_3 : Valid
+[wp] [Qed] Goal hoare_spec_if_ensures_qed_ok_2 : Valid
 [wp] [Qed] Goal hoare_spec_if_cond_ensures_qed_ok : Valid
 [wp] [Qed] Goal hoare_spec_if_not_cond_ensures_qed_ok : Valid
+[wp] [Qed] Goal hoare_default_behaviors_ensures_qed_ok_stmt_p : Valid
+[wp] [Qed] Goal hoare_default_behaviors_assert_qed_ok : Valid
+[wp] [Alt-Ergo] Goal hoare_default_behaviors_assert_rte_signed_overflow : Unsuccess
+[wp] [Qed] Goal hoare_default_behaviors_assigns : Valid
+[wp] [Qed] Goal hoare_default_behaviors_ensures_qed_ok : Valid
+[wp] [Qed] Goal hoare_default_behaviors_assert_qed_ok_2 : Valid
 [wp] Proved goals:   17 / 25
   Qed:            17 
   Alt-Ergo:        0  (unsuccess: 8)

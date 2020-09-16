@@ -4,6 +4,21 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 32 goals scheduled
+[wp] [Qed] Goal typed_job_ensures_K : Valid
+[wp] [Qed] Goal typed_job_ensures_P : Valid
+[wp] [Qed] Goal typed_job_assigns_part1 : Valid
+[wp] [Qed] Goal typed_job_assigns_part2 : Valid
+[wp] [Qed] Goal typed_job_assigns_part3 : Valid
+[wp] [Qed] Goal typed_job2_ensures_K : Valid
+[wp] [Qed] Goal typed_job2_ensures_Q : Valid
+[wp] [Qed] Goal typed_job2_assigns_part1 : Valid
+[wp] [Qed] Goal typed_job2_assigns_part2 : Valid
+[wp] [Qed] Goal typed_job2_assigns_part3 : Valid
+[wp] [Qed] Goal typed_job3_ensures_K : Valid
+[wp] [Alt-Ergo] Goal typed_job3_ensures_Q : Valid
+[wp] [Qed] Goal typed_job3_assigns_part1 : Valid
+[wp] [Qed] Goal typed_job3_assigns_part2 : Valid
+[wp] [Qed] Goal typed_job3_assigns_part3 : Valid
 [wp] [Qed] Goal typed_caller_ensures_K : Valid
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P1 : Valid
 [wp] [Alt-Ergo] Goal typed_caller_ensures_P2 : Valid
@@ -21,21 +36,6 @@
 [wp] [Alt-Ergo] Goal typed_caller3_ensures_R : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_call_job3_requires : Valid
 [wp] [Alt-Ergo] Goal typed_caller3_call_job3_2_requires : Valid
-[wp] [Qed] Goal typed_job_ensures_K : Valid
-[wp] [Qed] Goal typed_job_ensures_P : Valid
-[wp] [Qed] Goal typed_job_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job_assigns_part3 : Valid
-[wp] [Qed] Goal typed_job2_ensures_K : Valid
-[wp] [Qed] Goal typed_job2_ensures_Q : Valid
-[wp] [Qed] Goal typed_job2_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job2_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job2_assigns_part3 : Valid
-[wp] [Qed] Goal typed_job3_ensures_K : Valid
-[wp] [Alt-Ergo] Goal typed_job3_ensures_Q : Valid
-[wp] [Qed] Goal typed_job3_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job3_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job3_assigns_part3 : Valid
 [wp] Proved goals:   32 / 32
   Qed:            17 
   Alt-Ergo:       15

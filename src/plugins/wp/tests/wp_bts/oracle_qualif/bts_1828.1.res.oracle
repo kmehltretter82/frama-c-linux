@@ -4,12 +4,12 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
+[wp] [Alt-Ergo] Goal typed_ref_local_frame_assert_ok : Valid
 [wp] [Qed] Goal typed_ref_global_frame_ensures_sep_iff_ref : Valid
 [wp] [Qed] Goal typed_ref_global_frame_ensures_one_iff_ref : Valid
 [wp] [Qed] Goal typed_ref_global_frame_ensures_zero_always : Valid
 [wp] [Qed] Goal typed_ref_global_frame_assert_ok : Valid
 [wp] [Qed] Goal typed_ref_global_frame_assert_ok_2 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_local_frame_assert_ok : Valid
 [wp] Proved goals:    6 / 6
   Qed:             5 
   Alt-Ergo:        1

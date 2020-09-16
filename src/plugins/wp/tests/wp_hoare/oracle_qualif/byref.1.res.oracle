@@ -6,16 +6,16 @@
 [wp] 12 goals scheduled
 [wp] [Qed] Goal typed_ref_f_ensures : Valid
 [wp] [Qed] Goal typed_ref_f_assigns : Valid
+[wp] [Qed] Goal typed_ref_wrong_without_ref_ensures : Valid
+[wp] [Qed] Goal typed_ref_wrong_without_ref_call_f_requires : Valid
+[wp] [Qed] Goal typed_ref_pointer_ensures : Valid
+[wp] [Qed] Goal typed_ref_pointer_call_f_requires : Valid
+[wp] [Qed] Goal typed_ref_local_ensures : Valid
+[wp] [Qed] Goal typed_ref_local_call_f_requires : Valid
 [wp] [Qed] Goal typed_ref_formal_ensures : Valid
 [wp] [Qed] Goal typed_ref_formal_call_f_requires : Valid
 [wp] [Qed] Goal typed_ref_global_ensures : Valid
 [wp] [Qed] Goal typed_ref_global_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_local_ensures : Valid
-[wp] [Qed] Goal typed_ref_local_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_pointer_ensures : Valid
-[wp] [Qed] Goal typed_ref_pointer_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_wrong_without_ref_ensures : Valid
-[wp] [Qed] Goal typed_ref_wrong_without_ref_call_f_requires : Valid
 [wp] Proved goals:   12 / 12
   Qed:            12
 ------------------------------------------------------------

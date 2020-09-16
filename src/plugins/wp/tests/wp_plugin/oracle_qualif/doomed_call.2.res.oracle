@@ -28,12 +28,18 @@
 [wp] [Qed] Goal typed_f3_ko_ensures : Valid
 [wp] [Passed] Smoke-test typed_call_exit_ok_wp_smoke_dead_call_s18
 [wp] [Qed] Goal typed_f3_ok_ensures : Valid
+[wp] [Passed] Smoke-test typed_call_ko_global_wp_smoke_dead_call_s22
+[wp] [Qed] Goal typed_f4_ok_ensures : Valid
 [wp] [Failed] Smoke-test typed_call_ko_global_wp_smoke_dead_call_s26
        Qed: Valid
 [wp] tests/wp_plugin/doomed_call.i:89: Warning: Failed smoke-test
 [wp] [Qed] Goal typed_f4_ko_ensures : Valid
-[wp] [Passed] Smoke-test typed_call_ko_global_wp_smoke_dead_call_s22
-[wp] [Qed] Goal typed_f4_ok_ensures : Valid
+[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s29
+[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s30
+[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s31
+[wp] [Passed] Smoke-test typed_f5_ok_wp_smoke_dead_code_s30
+[wp] [Passed] Smoke-test typed_f5_ok_wp_smoke_dead_code_s31
+[wp] [Qed] Goal typed_f5_ok_ensures : Valid
 [wp] [Passed] Smoke-test typed_call_wrong_wp_smoke_dead_call_s35
 [wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s34
 [wp] [Failed] Smoke-test typed_call_effect_wp_smoke_dead_call_s36
@@ -44,12 +50,6 @@
        Qed: Valid
 [wp] tests/wp_plugin/doomed_call.i:121: Warning: Failed smoke-test
 [wp] [Qed] Goal typed_f5_ko_ensures : Valid
-[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s29
-[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s30
-[wp] [Passed] Smoke-test typed_call_effect_wp_smoke_dead_call_s31
-[wp] [Passed] Smoke-test typed_f5_ok_wp_smoke_dead_code_s30
-[wp] [Passed] Smoke-test typed_f5_ok_wp_smoke_dead_code_s31
-[wp] [Qed] Goal typed_f5_ok_ensures : Valid
 [wp] Proved goals:   31 / 36
   Qed:            13  (failed: 5)
   Alt-Ergo:       18

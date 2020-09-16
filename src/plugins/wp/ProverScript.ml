@@ -394,7 +394,8 @@ let task
   begin fun () ->
     Prover.simplify ~start ~result wpo >>= fun succeed ->
     if succeed
-    then Task.return ()
+    then
+      ( success wpo (Some VCS.Qed) ; Task.return ())
     else
       let json = ProofSession.load wpo in
       let script = Priority.sort (ProofScript.decode json) in

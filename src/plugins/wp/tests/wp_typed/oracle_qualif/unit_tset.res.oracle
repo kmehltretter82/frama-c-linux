@@ -4,8 +4,8 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Qed] Goal typed_complex_call_job_requires : Valid
 [wp] [Qed] Goal typed_complex_assigns : Valid
+[wp] [Qed] Goal typed_complex_call_job_requires : Valid
 [wp] Proved goals:    2 / 2
   Qed:             2
 ------------------------------------------------------------

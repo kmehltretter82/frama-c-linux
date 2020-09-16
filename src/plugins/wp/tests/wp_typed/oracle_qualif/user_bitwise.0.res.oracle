@@ -6,14 +6,14 @@
 [wp] 12 goals scheduled
 [wp] [Qed] Goal typed_ref_rl1_ensures_b0 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rl1_ensures_bk : Valid
-[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b1 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b2 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b1 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b2 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rr1_ensures_b0 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rr1_ensures_bk : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln32_ensures_b2 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rrn32_ensures_b1 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rrn32_ensures_b2 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b1 : Valid
+[wp] [Alt-Ergo] Goal typed_ref_rln64_ensures_b2 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rrn64_ensures_b1 : Valid
 [wp] [Alt-Ergo] Goal typed_ref_rrn64_ensures_b2 : Valid
 [wp] Proved goals:   12 / 12

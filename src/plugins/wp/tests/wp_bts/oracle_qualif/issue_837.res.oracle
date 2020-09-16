@@ -4,15 +4,15 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled
+[wp] [Qed] Goal typed_foo_assigns_part1 : Valid
+[wp] [Qed] Goal typed_foo_assigns_part2 : Valid
+[wp] [Qed] Goal typed_foo_assigns_part3 : Valid
+[wp] [Qed] Goal typed_foo_assigns_part4 : Valid
 [wp] [Qed] Goal typed_bar_assigns_part1 : Valid
 [wp] [Qed] Goal typed_bar_assigns_part2 : Valid
 [wp] [Qed] Goal typed_bar_assigns_part3 : Valid
 [wp] [Qed] Goal typed_bar_assigns_part4 : Valid
 [wp] [Qed] Goal typed_bar_assigns_part5 : Valid
-[wp] [Qed] Goal typed_foo_assigns_part1 : Valid
-[wp] [Qed] Goal typed_foo_assigns_part2 : Valid
-[wp] [Qed] Goal typed_foo_assigns_part3 : Valid
-[wp] [Qed] Goal typed_foo_assigns_part4 : Valid
 [wp] Proved goals:    9 / 9
   Qed:             9
 ------------------------------------------------------------

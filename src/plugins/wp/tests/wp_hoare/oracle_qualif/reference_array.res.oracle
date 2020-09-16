@@ -4,6 +4,14 @@
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 36 goals scheduled
+[wp] [Alt-Ergo] Goal typed_ref_reset_1_5_ensures : Valid
+[wp] [Qed] Goal typed_ref_reset_1_5_assigns_exit : Valid
+[wp] [Qed] Goal typed_ref_reset_1_5_assigns_normal : Valid
+[wp] [Qed] Goal typed_ref_reset_1_5_call_reset_5_requires : Valid
+[wp] [Alt-Ergo] Goal typed_ref_load_1_5_ensures : Valid
+[wp] [Qed] Goal typed_ref_load_1_5_assigns_exit : Valid
+[wp] [Qed] Goal typed_ref_load_1_5_assigns_normal : Valid
+[wp] [Qed] Goal typed_ref_load_1_5_call_load_5_requires : Valid
 [wp] [Alt-Ergo] Goal typed_ref_add_1_5_ensures : Valid
 [wp] [Qed] Goal typed_ref_add_1_5_assigns_exit : Valid
 [wp] [Qed] Goal typed_ref_add_1_5_assigns_normal : Valid
@@ -16,14 +24,6 @@
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_1_call_load_5_requires : Valid
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_1_call_reset_5_requires : Valid
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_1_call_add_5_requires : Valid
-[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Pload : Valid
-[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Preset : Valid
-[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Padd : Valid
-[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_assigns_exit : Valid
-[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_assigns_normal : Valid
-[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_load_1_5_requires : Valid
-[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_reset_1_5_requires : Valid
-[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_add_1_5_requires : Valid
 [wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_to_1_ensures_Pload : Valid
 [wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_to_1_ensures_Preset : Valid
 [wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_to_1_ensures_Padd : Valid
@@ -32,14 +32,14 @@
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_2_to_1_call_load_5_requires : Valid
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_2_to_1_call_reset_5_requires : Valid
 [wp] [Qed] Goal typed_ref_calls_on_array_dim_2_to_1_call_add_5_requires : Valid
-[wp] [Alt-Ergo] Goal typed_ref_load_1_5_ensures : Valid
-[wp] [Qed] Goal typed_ref_load_1_5_assigns_exit : Valid
-[wp] [Qed] Goal typed_ref_load_1_5_assigns_normal : Valid
-[wp] [Qed] Goal typed_ref_load_1_5_call_load_5_requires : Valid
-[wp] [Alt-Ergo] Goal typed_ref_reset_1_5_ensures : Valid
-[wp] [Qed] Goal typed_ref_reset_1_5_assigns_exit : Valid
-[wp] [Qed] Goal typed_ref_reset_1_5_assigns_normal : Valid
-[wp] [Qed] Goal typed_ref_reset_1_5_call_reset_5_requires : Valid
+[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Pload : Valid
+[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Preset : Valid
+[wp] [Alt-Ergo] Goal typed_ref_calls_on_array_dim_2_ensures_Padd : Valid
+[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_assigns_exit : Valid
+[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_assigns_normal : Valid
+[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_load_1_5_requires : Valid
+[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_reset_1_5_requires : Valid
+[wp] [Qed] Goal typed_ref_calls_on_array_dim_2_call_add_1_5_requires : Valid
 [wp] Proved goals:   36 / 36
   Qed:            24 
   Alt-Ergo:       12
