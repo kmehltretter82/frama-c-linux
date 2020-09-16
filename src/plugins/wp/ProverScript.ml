@@ -392,16 +392,19 @@ let task
     ~depth ~width ~backtrack ~auto
     ~start ~progress ~result ~success wpo =
   begin fun () ->
-    start wpo ;
-    let json = ProofSession.load wpo in
-    let script = Priority.sort (ProofScript.decode json) in
-    let tree = ProofEngine.proof ~main:wpo in
-    let env = Env.make tree
-        ~valid ~failed ~provers
-        ~depth ~width ~backtrack ~auto
-        ~progress ~result ~success in
-    crawl env (process env) None script >>?
-    (fun _ -> ProofEngine.forward tree) ;
+    Prover.simplify ~start ~result wpo >>= fun succeed ->
+    if succeed
+    then Task.return ()
+    else
+      let json = ProofSession.load wpo in
+      let script = Priority.sort (ProofScript.decode json) in
+      let tree = ProofEngine.proof ~main:wpo in
+      let env = Env.make tree
+          ~valid ~failed ~provers
+          ~depth ~width ~backtrack ~auto
+          ~progress ~result ~success in
+      crawl env (process env) None script >>?
+      (fun _ -> ProofEngine.forward tree) ;
   end
 
 (* -------------------------------------------------------------------------- *)

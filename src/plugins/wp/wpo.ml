@@ -814,8 +814,7 @@ let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ignore (set_result g VCS.Qed result) ;
-    true
+    ( set_result g VCS.Qed result ; true )
   else false
 
 let compute g =
