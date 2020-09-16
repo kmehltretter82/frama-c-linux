@@ -158,9 +158,10 @@ class printer_with_annot () = object (self)
       Pretty_utils.pp_list
         ~sep:"@\n" ~suf:"@\n"
         (fun fmt s ->
-           if not (String.contains s '\n') then
-             Format.fprintf fmt "// %s" s
-           else Format.fprintf fmt "/* %s */" s
+           if String.contains s '\n' || String.contains s '\r' then
+             Format.fprintf fmt "/*%s*/" s
+           else
+             Format.fprintf fmt "//%s" s
         ) fmt comments
     end;
     (* Out of tree global annotations are pretty printed before the first
@@ -205,10 +206,10 @@ class printer_with_annot () = object (self)
       if comments <> [] then
         Pretty_utils.pp_list ~sep:"@\n" ~suf:"@]@\n"
           (fun fmt s ->
-             if not (String.contains s '\n') then
-               Format.fprintf fmt "@[// %s@]" s
+             if String.contains s '\n' || String.contains s '\r' then
+               Format.fprintf fmt "@[/*%s*/@]" s
              else
-               Format.fprintf fmt "@[/* %s */@]" s
+               Format.fprintf fmt "@[//%s@]" s
           ) fmt comments
     end;
     if verbose || Kernel.is_debug_key_enabled Kernel.dkey_print_sid then
