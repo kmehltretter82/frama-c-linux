@@ -270,7 +270,7 @@
 [wp] [Qed] Goal typed_size_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_size_assert_rte_mem_access : Valid
 [wp] [Qed] Goal typed_size_assigns : Valid
-[wp] Proved goals:   74 / 143
+[wp] Proved goals:  143 / 143
   Qed:            16 
   Script:          1 
   Alt-Ergo:       57

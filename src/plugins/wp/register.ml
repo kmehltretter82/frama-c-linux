@@ -217,21 +217,19 @@ module GOALS = Wpo.S.Set
 
 let scheduled = ref 0
 let exercised = ref 0
-let spy = ref false
 let session = ref GOALS.empty
-let proved = ref GOALS.empty
 let provers = ref PM.empty
 
-let begin_session () = session := GOALS.empty ; spy := true
+let begin_session () = session := GOALS.empty
 let clear_session () = session := GOALS.empty
-let end_session   () = session := GOALS.empty ; spy := false
+let end_session   () = session := GOALS.empty
 let iter_session f  = GOALS.iter f !session
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
-    proved := GOALS.empty ;
+    session := GOALS.empty ;
     provers := PM.empty ;
   end
 
@@ -268,7 +266,7 @@ let do_list_scheduled iter_on_goals =
     (fun goal ->
        begin
          incr scheduled ;
-         if !spy then session := GOALS.add goal !session ;
+         session := GOALS.add goal !session ;
        end) ;
   match !scheduled with
   | 0 -> Wp_parameters.warning ~current:false "No goal generated"
@@ -353,8 +351,6 @@ let do_wpo_stat goal prover res =
   | Failed | Invalid ->
       s.failed <- succ s.failed
   | Valid ->
-      if not (Wpo.is_tactic goal) then
-        proved := GOALS.add goal !proved ;
       s.proved <- succ s.proved ;
       add_step s res.prover_steps ;
       add_time s res.prover_time ;
@@ -510,12 +506,15 @@ let do_report_scheduled () =
   else
   if !scheduled > 0 then
     begin
-      let proved = GOALS.cardinal !proved in
+      let passed = GOALS.fold
+          (fun g n ->
+             if Wpo.is_passed g then succ n else n
+          ) !session 0 in
       let mode = Cache.get_mode () in
       if mode <> Cache.NoCache then do_report_cache_usage mode ;
       Wp_parameters.result "%t"
         begin fun fmt ->
-          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+          Format.fprintf fmt "Proved goals: %4d / %d@\n" passed !scheduled ;
           Pretty_utils.pp_items
             ~min:12 ~align:`Left
             ~title:(fun (prover,_) -> VCS.title_of_prover prover)

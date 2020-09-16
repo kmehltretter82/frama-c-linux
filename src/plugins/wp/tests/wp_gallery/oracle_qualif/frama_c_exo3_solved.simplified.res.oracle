@@ -75,7 +75,7 @@
 [wp] [Qed] Goal typed_pair_loop_variant_2_positive : Valid
 [wp] [Alt-Ergo] Goal typed_pair_has_pair_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_pair_no_pair_ensures : Valid
-[wp] Proved goals:   19 / 35
+[wp] Proved goals:   35 / 35
   Qed:             4 
   Alt-Ergo:       15
 ------------------------------------------------------------

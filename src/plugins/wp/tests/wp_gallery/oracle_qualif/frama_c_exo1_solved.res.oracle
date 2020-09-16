@@ -39,7 +39,7 @@
 [wp] [Qed] Goal typed_exo1_assigns : Valid
 [wp] [Qed] Goal typed_exo1_loop_variant_decrease : Valid
 [wp] [Qed] Goal typed_exo1_loop_variant_positive : Valid
-[wp] Proved goals:    9 / 15
+[wp] Proved goals:   15 / 15
   Qed:             0 
   Alt-Ergo:        9
 ------------------------------------------------------------
