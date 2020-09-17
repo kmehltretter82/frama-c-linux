@@ -12,7 +12,8 @@ a custom git repository, do the following:
    `frama-c`.
 
 2. If needed, add Debian and opam prerequisites to the appropriate lines in the
-   Dockerfile, or change the opam version in the `ENV` lines.
+   Dockerfile (after `apt update` and before removing the `apt` cache).
+   If you need to change the opam version, also edit the `ENV` lines.
 
 3. For a "minimal" image (with installed Frama-C, but no source code), run:
 
