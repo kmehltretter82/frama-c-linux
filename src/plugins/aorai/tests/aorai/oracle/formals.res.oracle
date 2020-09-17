@@ -22,16 +22,16 @@ enum aorai_OpStatusList {
     aorai_Terminated = 1,
     aorai_Called = 0
 };
-/*@ lemma init_deterministic_trans{L}: \true;
+/*@ check lemma init_deterministic_trans{L}: \true;
  */
-/*@ lemma aorai_reject_deterministic_trans{L}: \true;
+/*@ check lemma aorai_reject_deterministic_trans{L}: \true;
  */
-/*@ lemma OK_deterministic_trans{L}: \true;
+/*@ check lemma OK_deterministic_trans{L}: \true;
  */
 /*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
 /*@
-lemma main_0_deterministic_trans{L}:
+check lemma main_0_deterministic_trans{L}:
   ∀ int x;
     ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 3 ∧
@@ -39,7 +39,7 @@ lemma main_0_deterministic_trans{L}:
        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 1);
  */
 /*@
-lemma aorai_intermediate_state_0_deterministic_trans{L}:
+check lemma aorai_intermediate_state_0_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
      ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
@@ -48,7 +48,7 @@ lemma aorai_intermediate_state_0_deterministic_trans{L}:
 /*@ ghost int aorai_CurStates = init; */
 /*@ ghost int aorai_x_0 = 0; */
 /*@
-lemma aorai_intermediate_state_2_deterministic_trans{L}:
+check lemma aorai_intermediate_state_2_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
      \at(aorai_x_0,L) ≡ 3 ∧
@@ -58,7 +58,7 @@ lemma aorai_intermediate_state_2_deterministic_trans{L}:
  */
 /*@ ghost int aorai_y = 0; */
 /*@
-lemma aorai_intermediate_state_1_deterministic_trans{L}:
+check lemma aorai_intermediate_state_1_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
      \at(aorai_y,L) ≡ 2 ∧
@@ -68,7 +68,7 @@ lemma aorai_intermediate_state_1_deterministic_trans{L}:
  */
 /*@ ghost int aorai_x = 0; */
 /*@
-lemma aorai_intermediate_state_deterministic_trans{L}:
+check lemma aorai_intermediate_state_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
      \at(aorai_x,L) ≡ 1 ∧

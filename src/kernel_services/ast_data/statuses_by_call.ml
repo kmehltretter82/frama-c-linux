@@ -111,23 +111,27 @@ let replacement_visitor ~arguments = object (self)
     | TVar { lv_origin = Some vinfo } when vinfo.vformal ->
       if under_label then raise Non_Transposable;
       begin
-        let new_term = replace_formal_by_concrete vinfo arguments in
-        let add_offset lv = TLval (Logic_const.addTermOffsetLval t_offset lv) in
-        match new_term.term_node with
-        | TLval lv -> Cil.ChangeDoChildrenPost (add_offset lv, fun x -> x)
-        | _ ->
-          if t_offset = TNoOffset
-          then Cil.ChangeTo new_term.term_node
-          else
-            let ltyp = new_term.term_type in
-            let tmp_lvar = Cil.make_temp_logic_var ltyp in
-            let tmp_linfo =
-              { l_var_info = tmp_lvar; l_body = LBterm new_term;
-                l_type = None; l_tparams = []; l_labels = []; l_profile = [];  }
-            in
-            let lval_node = TLval (TVar tmp_lvar, t_offset) in
-            let lval_term = Tlet (tmp_linfo, Logic_const.term lval_node ltyp) in
-            Cil.ChangeDoChildrenPost (lval_term, fun x -> x)
+        let post_replace _ =
+          let new_term = replace_formal_by_concrete vinfo arguments in
+          let add_offset lv =
+            TLval (Logic_const.addTermOffsetLval t_offset lv)
+          in
+          match new_term.term_node with
+          | TLval lv -> add_offset lv
+          | node ->
+            if t_offset = TNoOffset then node
+            else
+              let ltyp = new_term.term_type in
+              let tmp_lvar = Cil.make_temp_logic_var ltyp in
+              let tmp_linfo =
+                { l_var_info = tmp_lvar; l_body = LBterm new_term;
+                  l_type = None; l_tparams = []; l_labels = [];
+                  l_profile = []; }
+              in
+              let lval_node = TLval (TVar tmp_lvar, t_offset) in
+              Tlet (tmp_linfo, Logic_const.term lval_node ltyp)
+        in
+        Cil.DoChildrenPost post_replace
       end
     | _ -> Cil.DoChildren
 
@@ -149,8 +153,7 @@ let replacement_visitor ~arguments = object (self)
     | _ -> Cil.DoChildren
 
   method! vlogic_label = function
-    | BuiltinLabel Pre ->
-      Cil.ChangeDoChildrenPost (Logic_const.here_label, fun x -> x)
+    | BuiltinLabel Pre -> Cil.DoChildrenPost (fun _ -> Logic_const.here_label)
     | _ -> Cil.DoChildren
 end
 
@@ -163,15 +166,16 @@ let rec associate acc ~formals ~concretes =
     let term = Logic_utils.expr_to_term concrete in
     associate ((formal, term) :: acc) ~formals ~concretes
 
-let transpose_pred_at_callsite ~formals ~concretes pred =
-  let pred = Logic_const.pred_of_id_pred pred in
+let transpose_pred_at_callsite ~formals ~concretes id_pred =
+  let pred = Logic_const.pred_of_id_pred id_pred in
   try
     let arguments = associate [] ~formals ~concretes in
     let visitor :> Cil.cilVisitor = replacement_visitor arguments in
     let new_pred = Cil.visitCilPredicateNode visitor pred.pred_content in
     let p_unnamed = Logic_const.unamed ~loc:pred.pred_loc new_pred in
     let p_named = { p_unnamed with pred_name = pred.pred_name } in
-    Some (Logic_const.new_predicate p_named)
+    let only_check = id_pred.ip_content.tp_only_check in
+    Some (Logic_const.new_predicate ~only_check p_named)
   with Non_Transposable -> None
 
 

@@ -25,6 +25,7 @@ let kernel_parameters_correctness = [
   Kernel.MainFunction.parameter;
   Kernel.LibEntry.parameter;
   Kernel.AbsoluteValidRange.parameter;
+  Kernel.InitializedPaddingLocals.parameter;
   Kernel.SafeArrays.parameter;
   Kernel.UnspecifiedAccess.parameter;
   Kernel.SignedOverflow.parameter;
@@ -33,6 +34,10 @@ let kernel_parameters_correctness = [
   Kernel.RightShiftNegative.parameter;
   Kernel.SignedDowncast.parameter;
   Kernel.UnsignedDowncast.parameter;
+  Kernel.PointerDowncast.parameter;
+  Kernel.SpecialFloat.parameter;
+  Kernel.InvalidBool.parameter;
+  Kernel.InvalidPointer.parameter;
 ]
 
 let parameters_correctness = ref Typed_parameter.Set.empty
@@ -254,6 +259,7 @@ module EqualityCall =
       let default = "formals"
       let arg_name = "none|formals|all"
     end)
+let () = EqualityCall.set_possible_values ["none"; "formals"; "all"]
 let () = add_precision_dep EqualityCall.parameter
 
 let () = Parameter_customize.set_group domains
@@ -302,6 +308,7 @@ module Numerors_Real_Size =
         "Set <n> as the significand size of the MPFR representation \
          of reals used by the numerors domain (defaults to 128)"
     end)
+let () = Numerors_Real_Size.set_range 1 max_int
 let () = add_precision_dep Numerors_Real_Size.parameter
 
 let () = Parameter_customize.set_group domains
@@ -569,6 +576,7 @@ module AutomaticContextMaxDepth =
       let arg_name = "n"
       let help = "Use <n> as the depth of the default context for Eva. (defaults to 2)"
     end)
+let () = AutomaticContextMaxDepth.set_range 0 max_int
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
 
 let () = Parameter_customize.set_group initial_context
@@ -666,7 +674,7 @@ module WideningPeriod =
       let help =
         "After the first widening, widen each <n> iterations (defaults to 2)"
     end)
-let () = WideningDelay.set_range ~min:1 ~max:max_int
+let () = WideningPeriod.set_range ~min:1 ~max:max_int
 let () = add_precision_dep WideningPeriod.parameter
 
 (* --- Partitioning --- *)
@@ -682,6 +690,7 @@ module SemanticUnrollingLevel =
          The larger n, the more precise and expensive the analysis \
          (defaults to 0)"
     end)
+let () = SemanticUnrollingLevel.set_range 0 max_int
 let () = add_precision_dep SemanticUnrollingLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -902,7 +911,7 @@ module BuiltinsOverrides =
                   Fall back to <f> if <ffc> cannot handle its arguments."
       let default = Kernel_function.Map.empty
     end)
-let () = add_precision_dep BuiltinsOverrides.parameter
+let () = add_correctness_dep BuiltinsOverrides.parameter
 
 (* Exported in Eva.mli. *)
 let use_builtin key name =
@@ -941,6 +950,7 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
+let () = LinearLevel.set_range 0 max_int
 let () = add_precision_dep LinearLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -977,7 +987,7 @@ module UsePrototype =
       let help = "Use the ACSL specification of the functions instead of \
                   their definitions"
     end)
-let () = add_precision_dep UsePrototype.parameter
+let () = add_correctness_dep UsePrototype.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
@@ -1006,19 +1016,10 @@ module MemExecAll =
     (struct
       let option_name = "-eva-memexec"
       let help = "Speed up analysis by not recomputing functions already \
-                  analyzed in the same context. Forces -inout-callwise. \
+                  analyzed in the same context. \
                   Callstacks for which the analysis has not been recomputed \
                   are incorrectly shown as dead in the GUI."
     end)
-let () =
-  MemExecAll.add_set_hook
-    (fun _bold bnew ->
-       if bnew then
-         try
-           Dynamic.Parameter.Bool.set "-inout-callwise" true
-         with Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ ->
-           abort "Cannot set option -eva-memexec. Is plugin Inout registered?"
-    )
 
 let () = Parameter_customize.set_group precision_tuning
 module ArrayPrecisionLevel =
@@ -1031,100 +1032,10 @@ module ArrayPrecisionLevel =
                   Array accesses are precise as long as the interval for the index contains \
                   less than n values. (defaults to 200)"
     end)
+let () = ArrayPrecisionLevel.set_range 0 max_int
 let () = add_precision_dep ArrayPrecisionLevel.parameter
 let () = ArrayPrecisionLevel.add_update_hook
     (fun _ v -> Offsetmap.set_plevel v)
-
-(* Options SaveFunctionState and LoadFunctionState are related
-   and mutually dependent for sanity checking.
-   Also, they depend on BuiltinsOverrides, so they cannot be defined before it. *)
-let () = Parameter_customize.set_group initial_context
-module SaveFunctionState =
-  Kernel_function_map
-    (struct
-      include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ file = file
-      let to_string ~key:_ file = file
-    end)
-    (struct
-      let option_name = "-eva-save-fun-state"
-      let arg_name = "function:filename"
-      let help = "Experimental. Save state of function <function> in file <filename>"
-      let default = Kernel_function.Map.empty
-    end)
-let () = SaveFunctionState.add_aliases ["-val-save-fun-state"]
-let () = Parameter_customize.set_group initial_context
-module LoadFunctionState =
-  Kernel_function_map
-    (struct
-      include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ file = file
-      let to_string ~key:_ file = file
-    end)
-    (struct
-      let option_name = "-eva-load-fun-state"
-      let arg_name = "function:filename"
-      let help = "Experimental. Load state of function <function> from file <filename>"
-      let default = Kernel_function.Map.empty
-    end)
-let () = LoadFunctionState.add_aliases ["-val-load-fun-state"]
-let () = add_correctness_dep SaveFunctionState.parameter
-let () = add_correctness_dep LoadFunctionState.parameter
-(* checks that SaveFunctionState has a unique argument pair, and returns it. *)
-let get_SaveFunctionState () =
-  let is_first = ref true in
-  let (kf, filename) = SaveFunctionState.fold
-      (fun (kf, opt_filename) _acc ->
-         if !is_first then is_first := false
-         else abort "option `%s' requires a single function:filename pair"
-             SaveFunctionState.name;
-         let filename = Extlib.the opt_filename in
-         kf, filename
-      ) (Kernel_function.dummy (), "")
-  in
-  if filename = "" then abort "option `%s' requires a function:filename pair"
-      SaveFunctionState.name
-  else kf, filename
-(* checks that LoadFunctionState has a unique argument pair, and returns it. *)
-let get_LoadFunctionState () =
-  let is_first = ref true in
-  let (kf, filename) = LoadFunctionState.fold
-      (fun (kf, opt_filename) _acc ->
-         if !is_first then is_first := false
-         else abort "option `%s' requires a single function:filename pair"
-             LoadFunctionState.name;
-         let filename = Extlib.the opt_filename in
-         kf, filename
-      ) (Kernel_function.dummy (), "")
-  in
-  if filename = "" then abort "option `%s' requires a function:filename pair"
-      LoadFunctionState.name
-  else kf, filename
-(* perform early sanity checks to avoid aborting the analysis only at the end *)
-let () = Ast.apply_after_computed (fun _ ->
-    (* check the function to save returns 'void' *)
-    if SaveFunctionState.is_set () then begin
-      let (kf, _) = get_SaveFunctionState () in
-      if not (Kernel_function.returns_void kf) then
-        abort "option `%s': function `%a' must return void"
-          SaveFunctionState.name Kernel_function.pretty kf
-    end;
-    if SaveFunctionState.is_set () && LoadFunctionState.is_set () then begin
-      (* check that if both save and load are set, they do not specify the
-         same function name (note: cannot compare using function ids) *)
-      let (save_kf, _) = get_SaveFunctionState () in
-      let (load_kf, _) = get_LoadFunctionState () in
-      if Kernel_function.equal save_kf load_kf then
-        abort "options `%s' and `%s' cannot save/load the same function `%a'"
-          SaveFunctionState.name LoadFunctionState.name
-          Kernel_function.pretty save_kf
-    end;
-    if LoadFunctionState.is_set () then
-      let (kf, _) = get_LoadFunctionState () in
-      BuiltinsOverrides.add (kf, Some "Frama_C_load_state");
-  )
 
 (* ------------------------------------------------------------------------- *)
 (* --- Messages                                                          --- *)
@@ -1223,6 +1134,7 @@ module StopAtNthAlarm =
     let arg_name = "n"
     let help = "Abort the analysis when the nth alarm is emitted."
   end)
+let () = StopAtNthAlarm.set_range 0 max_int
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ugliness required for correctness                                  --- *)
@@ -1273,6 +1185,7 @@ module OracleDepth =
       let default = 2
       let arg_name = ""
     end)
+let () = OracleDepth.set_range 0 max_int
 let () = add_precision_dep OracleDepth.parameter
 
 let () = Parameter_customize.set_group precision_tuning
@@ -1285,6 +1198,7 @@ module ReductionDepth =
       let default = 4
       let arg_name = ""
     end)
+let () = ReductionDepth.set_range 0 max_int
 let () = add_precision_dep ReductionDepth.parameter
 
 
@@ -1336,6 +1250,7 @@ module AllocReturnsNull=
       let help = "Memory allocation built-ins (malloc, calloc, realloc) are \
                   modeled as nondeterministically returning a null pointer"
     end)
+let () = add_correctness_dep AllocReturnsNull.parameter
 
 let () = Parameter_customize.set_group malloc
 module MallocLevel =
@@ -1347,6 +1262,8 @@ module MallocLevel =
       let help = "Set to [m] the number of precise dynamic allocations \
                   besides the initial one, for each callstack (defaults to 0)"
     end)
+let () = MallocLevel.set_range 0 max_int
+let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated aliases                                                 --- *)

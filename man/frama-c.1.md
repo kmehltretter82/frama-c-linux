@@ -333,6 +333,9 @@ See also **-cpp-frama-c-compliant**.
 [-no]-print
 : pretty-prints the source code as normalized by CIL. Defaults to no.
 
+-print-cpp-commands
+: outputs the preprocessing commands for all input files.
+
 [-no]-print-libc
 : expands **#include** directives in the pretty-printed CIL code for files in
 the Frama-C standard library. Defaults to no.

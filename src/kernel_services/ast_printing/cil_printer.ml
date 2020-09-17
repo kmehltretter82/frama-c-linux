@@ -93,6 +93,7 @@ let () = register_shallow_attribute Cil.frama_c_ghost_else
 let () = register_shallow_attribute Cil.frama_c_ghost_formal
 let () = register_shallow_attribute Cil.frama_c_mutable
 let () = register_shallow_attribute Cil.frama_c_init_obj
+let () = register_shallow_attribute Cil.frama_c_inlined
 
 let keep_attr = function
   | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)
@@ -2834,13 +2835,17 @@ class cil_printer () = object (self)
   method decreases fmt v = self#decrement "decreases" fmt v
   method variant fmt v = self#decrement "loop variant" fmt v
 
+  method private pp_only_check fmt p =
+    if p.tp_only_check then fprintf fmt "%a " self#pp_acsl_keyword "check"
+
   method assumes fmt p =
     fprintf fmt "@[<hov 2>%a@ %a;@]"
       self#pp_acsl_keyword "assumes"
       self#identified_predicate p
 
   method requires fmt p =
-    fprintf fmt "@[<hov 2>%a@ %a;@]"
+    fprintf fmt "@[<hov 2>%a%a@ %a;@]"
+      self#pp_only_check p.ip_content
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
@@ -2852,7 +2857,8 @@ class cil_printer () = object (self)
 
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in
-    fprintf fmt "@[<hov 2>%a@ %a;@]"
+    fprintf fmt "@[<hov 2>%a%a@ %a;@]"
+      self#pp_only_check p.ip_content
       self#pp_acsl_keyword kw
       self#identified_predicate p
 
@@ -3059,16 +3065,12 @@ class cil_printer () = object (self)
           (Pretty_utils.pp_list ~sep:",@ " pp_print_string) l
     in
     match ca.annot_content with
-    | AAssert (behav,Assert,p) ->
+    | AAssert (behav,p) ->
+      let kw = if p.tp_only_check then "check" else "assert" in
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_acsl_keyword "assert"
-        self#predicate p
-    | AAssert (behav,Check,p) ->
-      fprintf fmt "@[%a%a@ %a;@]"
-        pp_for_behavs behav
-        self#pp_acsl_keyword "check"
-        self#predicate p
+        self#pp_acsl_keyword kw
+        self#predicate p.tp_statement
     | APragma (Slice_pragma sp) ->
       fprintf fmt "@[%a@ %a;@]"
         self#pp_acsl_keyword "slice pragma"
@@ -3094,15 +3096,17 @@ class cil_printer () = object (self)
         pp_for_behavs behav
         (self#allocation ~isloop:true) af
     | AInvariant(behav,true, i) ->
-      fprintf fmt "@[<2>%a%a@ %a;@]"
+      fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
+        self#pp_only_check i
         self#pp_acsl_keyword "loop invariant"
-        self#predicate i
+        self#predicate i.tp_statement
     | AInvariant(behav,false,i) ->
-      fprintf fmt "@[<2>%a%a@ %a;@]"
+      fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
+        self#pp_only_check i
         self#pp_acsl_keyword "invariant"
-        self#predicate i
+        self#predicate i.tp_statement
     | AVariant v ->
       self#variant fmt v
     | AExtended (behav, is_loop, e) ->
@@ -3192,7 +3196,8 @@ class cil_printer () = object (self)
     | Dlemma(name, is_axiom, labels, tvars, pred, _attr, _) ->
       (* attributes are meant to be purely internal for now. *)
       let old_lab = current_label in
-      fprintf fmt "@[<hv 2>@[<hov 1>%a %a%a%a:@]@ %t%a;@]@\n"
+      fprintf fmt "@[<hv 2>@[<hov 1>%a%a %a%a%a:@]@ %t%a;@]@\n"
+        self#pp_only_check pred
         self#pp_acsl_keyword (if is_axiom then "axiom" else "lemma")
         self#varname name
         self#labels labels
@@ -3203,7 +3208,7 @@ class cil_printer () = object (self)
            the pretty-printing of labels, and before pretty-printing predicate
         *)
         (fun _ -> (match labels with [l] -> current_label <- l | _ -> ()))
-        self#predicate pred;
+        self#predicate pred.tp_statement;
       current_label <- old_lab
     | Dtype (ti,_) ->
       fprintf fmt "@[<hv 2>@[%a %a%a%a;@]@\n"

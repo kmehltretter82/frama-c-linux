@@ -114,8 +114,8 @@ struct
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert (_, Assert, _) -> t_assert
-        | AAssert (_, Check, _) -> t_check
+        | AAssert (_, {tp_only_check = false}) -> t_assert
+        | AAssert (_, {tp_only_check = true }) -> t_check
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant

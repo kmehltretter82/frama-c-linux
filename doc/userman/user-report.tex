@@ -19,6 +19,13 @@ It provides the following features, which we detail in turn:
 \item Make Frama-C exit with a non-null status code on some classified warning or error.
 \end{itemize}
 
+\FramaC has recently earned the ability to output data in the SARIF%
+\footnote{Static Analysis Results Interchange Format,
+\url{https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif}} format.
+This is performed by the \textsf{Markdown Report} plug-in, described in
+section~\ref{sarif}.
+
+
 %% --------------------------------------------------------------------------
 %% ---  Textual Report
 %% --------------------------------------------------------------------------
@@ -245,3 +252,38 @@ each one following the format given in Figure~\ref{report-classified-event}.
   warnings (default is: \verb+'REVIEW'+)
 \end{description}
 
+\section{SARIF Output via the Markdown Report Plug-in}\label{sarif}
+
+SARIF is a JSON-based standard output format for static analysis results.
+It is currently supported by \FramaC in its version 2.1.0.
+Some IDEs, such as Visual Code, contain plug-ins which allow importing SARIF
+reports. A few Microsoft tools and libraries related to SARIF are available
+at \url{https://sarifweb.azurewebsites.net/}. Microsoft also publishes
+command-line tools for SARIF, made available via NPM packages and .Net Core
+applications.
+
+\subsection{Prerequisites}
+
+SARIF output is produced by the \textsf{Markdown Report} (MdR) plug-in.
+The plug-in is distributed with \FramaC, but it depends on optional
+features, namely the \texttt{opam} package \texttt{ppx\_deriving\_yojson},
+so it may not be available in every \FramaC installation.
+
+When installing \FramaC via opam, include the optional dependency
+\texttt{ppx\_deriving\_yojson} to ensure MdR will be available.
+Note that MdR has other features and output formats, which are not described
+here.
+
+\subsection{Generating a SARIF Report}
+
+To enable generation of a SARIF report, use option \texttt{-mdr-gen sarif}.
+It will produce a JSON file (by default, \texttt{report.sarif}) with an entry
+for each ACSL property.
+
+You can change the output file name with option \texttt{-mdr-out <f>}.
+
+Note that there are no filtering options in the SARIF output; it is up to the
+tools importing the file to decide which information to sort, filter, and
+display.
+
+For more details about \textsf{Markdown Report}, use option \texttt{-mdr-help.}

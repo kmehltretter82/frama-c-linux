@@ -1037,13 +1037,14 @@ and translate_rte_annots:
   let env =
     List.fold_left
       (fun env a -> match a.annot_content with
-         | AAssert(_, _, p) ->
+         | AAssert(_, p) ->
            handle_error
              (fun env ->
                 Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
                 (* The logic scope MUST NOT be reset here since we still might
                    be in the middle of the translation of the original
                    predicate. *)
+                let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
                 let env = translate_named_predicate kf (Env.rte env false) p in
@@ -1160,10 +1161,11 @@ let must_translate_opt = function
 let assumes_predicate bhv =
   List.fold_left
     (fun acc p ->
-       let loc = p.ip_content.pred_loc in
+       let pred = p.ip_content.tp_statement in
+       let loc = pred.pred_loc in
        Logic_const.pand ~loc
          (acc,
-          Logic_const.unamed ~loc p.ip_content.pred_content))
+          Logic_const.unamed ~loc pred.pred_content))
     Logic_const.ptrue
     bhv.b_assumes
 
@@ -1173,14 +1175,15 @@ let translate_preconditions kf kinstr env behaviors =
     let assumes_pred = assumes_predicate b in
     List.fold_left
       (fun env p ->
+         let pred = p.ip_content.tp_statement in
          let do_it env =
            if must_translate (Property.ip_of_requires kf kinstr b p) then
-             let loc = p.ip_content.pred_loc in
+             let loc = pred.pred_loc in
              let p =
                Logic_const.pimplies
                  ~loc
                  (assumes_pred,
-                  Logic_const.unamed ~loc p.ip_content.pred_content)
+                  Logic_const.unamed ~loc pred.pred_content)
              in
              translate_named_predicate kf env p
            else
@@ -1214,8 +1217,8 @@ let translate_postconditions kf kinstr env behaviors =
            let do_it env =
              match t with
              | Normal ->
-               let loc = p.ip_content.pred_loc in
-               let p = p.ip_content in
+               let p = p.ip_content.tp_statement in
+               let loc = p.pred_loc in
                let p =
                  Logic_const.pimplies
                    ~loc
@@ -1282,12 +1285,12 @@ let translate_post_spec kf kinstr env spec =
 
 let translate_pre_code_annotation kf stmt env annot =
   let convert env = match annot.annot_content with
-    | AAssert(l, _, p) ->
+    | AAssert(l, p) ->
       if must_translate (Property.ip_of_code_annot_single kf stmt annot) then
         let env = Env.set_annotation_kind env Smart_stmt.Assertion in
         if l <> [] then
           not_yet env "@[assertion applied only on some behaviors@]";
-        translate_named_predicate kf env p
+        translate_named_predicate kf env p.tp_statement
       else
         env
     | AStmtSpec(l, spec) ->
@@ -1299,8 +1302,10 @@ let translate_pre_code_annotation kf stmt env annot =
         let env = Env.set_annotation_kind env Smart_stmt.Invariant in
         if l <> [] then
           not_yet env "@[invariant applied only on some behaviors@]";
-        let env = translate_named_predicate kf env p in
-        if loop_invariant then Env.add_loop_invariant env p else env
+        let env = translate_named_predicate kf env p.tp_statement in
+        if loop_invariant then
+          Env.add_loop_invariant env p.tp_statement
+        else env
       else
         env
     | AVariant _ ->

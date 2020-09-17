@@ -46,7 +46,7 @@ struct
       let option_name = "-mdr-out"
       let arg_name = "f"
       let default = "report"
-      let help = "sets the name of the output file to <f>.@ \
+      let help = "sets the name of the output file to <f>. \
                   If <f> has no extension, it is chosen automatically based on \
                   the report kind"
     end)

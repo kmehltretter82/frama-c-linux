@@ -91,15 +91,6 @@ module ArrayPrecisionLevel: Parameter_sig.Int
 module AllocatedContextValid: Parameter_sig.Bool
 module InitializationPaddingGlobals: Parameter_sig.String
 
-module SaveFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-module LoadFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-val get_SaveFunctionState : unit -> Cil_types.kernel_function * string
-val get_LoadFunctionState : unit -> Cil_types.kernel_function * string
-
 module Numerors_Real_Size : Parameter_sig.Int
 module Numerors_Mode : Parameter_sig.String
 

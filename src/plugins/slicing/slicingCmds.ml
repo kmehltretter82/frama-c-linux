@@ -529,6 +529,7 @@ let select_stmt_annots set mark ~spare  ~threat ~user_assert ~slicing_pragma ~lo
 (** Registered as a slicing selection function:
     Add a selection of the annotations related to a function. *)
 let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var kf =
+  try
   let zones_decl_vars,pragmas =
     !Db.Properties.Interp.To_zone.from_func_annots Kinstr.iter_from_func
          (Some
@@ -538,6 +539,13 @@ let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loo
       kf
   in let set = select_ZoneAnnot_pragmas set ~spare pragmas kf
   in select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
+  with Kernel_function.No_Definition ->
+    SlicingParameters.warning ~wkey:SlicingParameters.wkey_cmdline
+      "No definition for function '%a'. \
+       Slicing requests from the command line are ignored."
+      Kernel_function.pretty kf;
+    Cil_datatype.Varinfo.Map.empty
+
 
 (** Registered as a slicing selection function:
     Add selection of function outputs.

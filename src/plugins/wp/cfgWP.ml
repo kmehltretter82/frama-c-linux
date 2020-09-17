@@ -1394,7 +1394,7 @@ struct
   let compile_lemma l = ignore (VCG.lemma l)
 
   let prove_lemma collection l =
-    if not l.lem_axiom then
+    if l.lem_kind <> `Axiom then
       begin
         let id = WpPropId.mk_lemma_id l in
         let def = VCG.lemma l in
