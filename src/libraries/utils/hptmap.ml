@@ -1131,6 +1131,47 @@ struct
   let inter_with_shape shape map = merge_with_shape ~inter:true shape map
   let diff_with_shape shape map = merge_with_shape ~inter:false shape map
 
+  (* Intersection and difference between a map and a shape. *)
+  let partition_with_shape =
+    let extract_leaf key map =
+      try wrap_Leaf key (find key map)
+      with Not_found -> Empty
+    in
+    let rec merge shape map =
+      match shape, map with
+      | Empty, _ -> Empty, map
+      | _, Empty -> Empty, Empty
+      | _, Leaf (key, _, _) -> if mem key shape then map, Empty else Empty, map
+      | Leaf (key, _, _), _ -> extract_leaf key map, remove key map
+      | Branch (p, m, s0, s1, _), Branch (q, n, t0, t1, _) ->
+        let rewrap p m u0 u1 =
+          if t0 == u0 && t1 == u1 then map
+          else if u0 == Empty then u1 else if u1 == Empty then u0
+          else wrap_Branch p m u0 u1
+        in
+        let rewrap_both p m (inter0, diff0) (inter1, diff1) =
+          rewrap p m inter0 inter1, rewrap p m diff0 diff1
+        in
+        if (p = q) && (m = n) then
+          (* The trees have the same prefix. Merge their sub-trees. *)
+          rewrap_both p m (merge s0 t0) (merge s1 t1)
+        else if (Big_Endian.shorter m n) && (match_prefix q p m) then
+          (* [q] contains [p]. Merge [map] with a sub-tree of [shape]. *)
+          if (q land m) = 0
+          then merge s0 map
+          else merge s1 map
+        else if (Big_Endian.shorter n m) && (match_prefix p q n) then
+          (* [p] contains [q]. Merge [shape] with a sub-tree of [map]. The other
+             sub-tree of [map] matches an empty shape. *)
+          if (p land n) = 0
+          then rewrap_both q n (merge shape t0) (Empty, t1)
+          else rewrap_both q n (Empty, t0) (merge shape t1)
+        else
+          (* The prefixes disagree: [map] matches an empty shape. *)
+          Empty, map
+    in
+    merge
+
   let fold2_join_heterogeneous (type arg) (type result) ~cache ~empty_left ~empty_right ~both ~join ~empty =
     let cache_merge = match cache with
       | Hptmap_sig.NoCache -> (fun f x y -> f x y)

@@ -76,6 +76,8 @@ module type S = sig
     val shape: t -> unit shape
     val from_shape: 'a shape -> t
 
+    val partition_with_shape: 'a shape -> t -> t * t
+
     val fold2_join_heterogeneous:
       cache:Hptmap_sig.cache_type ->
       empty_left:('a shape -> 'b) ->

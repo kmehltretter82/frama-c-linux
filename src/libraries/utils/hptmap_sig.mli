@@ -188,6 +188,11 @@ module type S = sig
       efficient than successive calls to {!remove} or {!add} to build the
       resulting map. *)
 
+  val partition_with_shape: 'a shape -> t -> t * t
+  (** [partition_with_shape s m] returns two maps [inter, diff] such that:
+      - [inter] contains the elements of [m] bound in the shape [s] ;
+      - [diff] contains the elements of [m] not bound in the shape [s]. *)
+
   (** {2 Binary predicates} *)
 
   type decide_fast = Done | Unknown

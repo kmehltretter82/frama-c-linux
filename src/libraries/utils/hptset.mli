@@ -88,6 +88,8 @@ module type S = sig
     val from_shape: 'a shape -> t
     (** Build a set from another [elt]-indexed map or set. *)
 
+    val partition_with_shape: 'a shape -> t -> t * t
+
     val fold2_join_heterogeneous:
       cache:Hptmap_sig.cache_type ->
       empty_left:('a shape -> 'b) ->
