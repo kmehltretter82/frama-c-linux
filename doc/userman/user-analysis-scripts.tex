@@ -333,6 +333,47 @@ quick iterations during parametrization of the analysis.
   \texttt{.eva} targets.
 \end{description}
 
+\subsection{Adding new analyses and stages}
+
+Besides the predefined \Value-oriented steps, you can easily add other stages
+and analyses, which may or may not depend on \Value.
+
+For instance, to add a SARIF report using the \tool{Markdown Report} plug-in,
+you can simply add, before the template epilogue, the following lines, where
+\texttt{target} is the name of your target:
+
+\begin{makefilecode}
+target.sarif: target.parse
+	$(FRAMAC) -load $^/framac.sav -mdr-gen sarif -mdr-out $@
+\end{makefilecode}
+
+This rule will create a file \texttt{target.sarif} inside the \texttt{.frama-c}
+directory. The rule will depend on the parsing of \texttt{target.parse} and
+use the saved session at \texttt{target.parse/framac.sav}.
+
+If you want the report to run after the analysis with \Value, instead, simply
+replace \texttt{.parse} with \texttt{.eva}.
+
+Then, running \texttt{fcmake target.sarif} will create or update the report,
+recomputing dependencies when needed.
+
+Adding a new stage, with a saved session that can be reused later for other
+stages and analyses, requires just a few more lines, as in the following
+example:
+
+\begin{makefilecode}
+target.wp: target.parse
+	mkdir -p $@
+	$(FRAMAC) -load $^/framac.sav -wp -save $@/framac.sav
+\end{makefilecode}
+
+In the example above, we define a new stage, \texttt{target.wp}, which depends
+on the parsing stage, runs the \tool{WP} plug-in, and saves the result in a
+session file. This session file can then be loaded by another stage,
+or in the GUI. For instance, the \texttt{.gui} predefined target works out of
+the box in this case: running \texttt{fcmake target.wp.gui} will load the saved
+session in the Frama-C GUI.
+
 \section{Script Descriptions}
 \label{sec:script-descriptions}
 
