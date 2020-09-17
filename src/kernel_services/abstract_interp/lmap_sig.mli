@@ -150,6 +150,8 @@ val filter_by_shape: 'a Hptmap.Shape(Base.Base).t -> t -> t
 (** Removes the base if it is present. Does nothing otherwise. *)
 val remove_base : Base.t -> t -> t
 
+val replace_base: Base.substitution -> t -> t
+
 
 (** {2 Iterators} *)
 

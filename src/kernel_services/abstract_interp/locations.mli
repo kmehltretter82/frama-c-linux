@@ -78,6 +78,10 @@ module Location_Bytes : sig
   (** [add b i loc] binds [b] to [i] in [loc] when [i] is not {!Ival.bottom},
       and returns {!bottom} otherwise. *)
 
+  val replace_base: Base.substitution -> t -> bool * t
+  (** [replace_base subst loc] changes the location [loc] by substituting the
+      pointed bases according to [subst]. *)
+
   val diff : t -> t -> t
     (** Over-approximation of difference. [arg2] needs to be exact or an
         under_approximation. *)

@@ -358,6 +358,19 @@ module Location_Bytes = struct
        | Map _ -> false);
        true
 
+ let replace_base substitution v =
+   let substitute replace make acc =
+     let modified, set' = replace substitution acc in
+     modified, if modified then make set' else v
+   in
+   match v with
+   | Top (Base.SetLattice.Top, _) -> false, v
+   | Top (Base.SetLattice.Set set, origin) ->
+     substitute Base.Hptset.replace (inject_top_origin_internal origin) set
+   | Map map ->
+     let decide _key  = Ival.join in
+     substitute (M.replace_key ~decide) (fun m -> Map m) map
+
  let overlaps ~partial ~size mm1 mm2 =
    match mm1, mm2 with
    | Top _, _ | _, Top _ -> intersects mm1 mm2

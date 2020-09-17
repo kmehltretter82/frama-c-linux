@@ -638,6 +638,14 @@ struct
     | Top -> Top
     | Map m -> Map (M.remove b m)
 
+  let replace_base shape = function
+    | Bottom -> Bottom
+    | Top -> Top
+    | Map map as t ->
+      let decide _key = Offsetmap.join in
+      let modified, map = M.replace_key ~decide shape map in
+      if modified then Map map else t
+
   let is_reachable = function
     | Bottom -> false
     | Top | Map _ -> true
