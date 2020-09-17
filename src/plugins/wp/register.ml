@@ -176,9 +176,9 @@ let do_wp_report () =
         end ;
         List.iter (WpReport.export stats) reports ;
       end ;
-      if Wp_parameters.MemoryContext.get () then
-        wp_warn_memory_context ()
-    end
+    if Wp_parameters.MemoryContext.get () then
+      wp_warn_memory_context ()
+  end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Wp Results                                                      --- *)
