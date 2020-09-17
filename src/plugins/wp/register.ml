@@ -99,13 +99,18 @@ let wp_print_memory_context kf bhv fmt =
       pp_vdecl vkf ;
   end
 
+let wp_compute_memory_context model =
+  let hypotheses_computer = WpContext.compute_hypotheses model in
+  let name = WpContext.MODEL.id model in
+  MemoryContext.compute name hypotheses_computer
+
 let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let partition = WpContext.compute_hypotheses m kf in
+        let hypotheses_computer = WpContext.compute_hypotheses m in
         let model = WpContext.MODEL.id m in
-        let hyp = MemoryContext.get_behavior kf model partition in
+        let hyp = MemoryContext.get_behavior kf model hypotheses_computer in
         match hyp with
         | None -> ()
         | Some bhv ->
@@ -121,9 +126,9 @@ let wp_insert_memory_context model =
   begin
     Wp_parameters.iter_fct
       begin fun kf ->
-        let hyp = WpContext.compute_hypotheses model kf in
+        let hyp_computer = WpContext.compute_hypotheses model in
         let model_id = WpContext.MODEL.id model in
-        MemoryContext.add_behavior kf model_id hyp
+        MemoryContext.add_behavior kf model_id hyp_computer
       end
   end
 
@@ -171,9 +176,9 @@ let do_wp_report () =
         end ;
         List.iter (WpReport.export stats) reports ;
       end ;
-    if Wp_parameters.MemoryContext.get () then
-      wp_warn_memory_context ()
-  end
+      if Wp_parameters.MemoryContext.get () then
+        wp_warn_memory_context ()
+    end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Wp Results                                                      --- *)
@@ -812,6 +817,7 @@ let cmdline_run () =
         WpContext.on_context (computer#model,WpContext.Global)
           LogicBuiltins.dump ();
       end ;
+    wp_compute_memory_context computer#model ;
     if Wp_parameters.CheckModelHypotheses.get () then
       wp_insert_memory_context computer#model fct ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()

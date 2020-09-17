@@ -279,10 +279,18 @@ let clauses_of_partition kf loc p =
   let reqs = List.sort_uniq Logic_utils.compare_predicate reqs in
   reqs
 
-let emitter =
-  Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
+module Table =
+  State_builder.Hashtbl
+    (Cil_datatype.Kf.Hashtbl)
+    (Datatype.Option(Cil_datatype.Funbehavior))
+    (struct
+      let name = "MemoryContext.Table"
+      let size = 17
+      let dependencies = [ Ast.self ]
+    end)
 
-let get_behavior kf name partition =
+let compute_behavior kf name hypotheses_computer =
+  let partition = hypotheses_computer kf in
   let loc = Kernel_function.get_location kf in
   let reqs = clauses_of_partition kf loc partition in
   let reqs = List.map Logic_const.new_predicate reqs in
@@ -299,7 +307,17 @@ let get_behavior kf name partition =
         b_extended = []
       }
 
-let add_behavior kf name partition =
-  match get_behavior kf name partition with
+let compute name hypotheses_computer =
+  Globals.Functions.iter
+    (fun kf -> ignore (compute_behavior kf name hypotheses_computer))
+
+let get_behavior kf name hypotheses_computer =
+  Table.memo (fun kf -> compute_behavior kf name hypotheses_computer) kf
+
+let emitter =
+  Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
+
+let add_behavior kf name hypotheses_computer =
+  match get_behavior kf name hypotheses_computer with
   | None -> ()
   | Some bhv -> Annotations.add_behaviors emitter kf [bhv]
