@@ -111,6 +111,14 @@ extern time_t time(time_t *timer);
 char __fc_ctime[26];
 char * const  __fc_p_ctime = __fc_ctime;
 
+/*@
+  requires valid_timeptr: \valid_read(timeptr);
+  requires initialization:init_timeptr: \initialized(timeptr);
+  assigns __fc_ctime[0..25] \from indirect:*timeptr, indirect:__fc_time;
+  assigns \result \from indirect:*timeptr, indirect:__fc_time, __fc_p_ctime;
+  ensures result_points_to_ctime: \result == __fc_p_ctime;
+  ensures result_valid_string: valid_read_string(__fc_p_ctime);
+ */
 extern char *asctime(const struct tm *timeptr);
 
 /*@
