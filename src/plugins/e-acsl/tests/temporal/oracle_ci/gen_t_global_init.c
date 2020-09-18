@@ -110,7 +110,7 @@ void __e_acsl_globals_init(void)
   return;
 }
 
-void __e_acsl_globals_delete(void)
+void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(descs2));
   __e_acsl_delete_block((void *)(& l_desc2));
@@ -204,7 +204,7 @@ int main(int argc, char const **argv)
   /*@ assert \valid_read(*p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
-  __e_acsl_globals_delete();
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

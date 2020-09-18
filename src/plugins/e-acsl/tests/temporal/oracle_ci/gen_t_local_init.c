@@ -106,7 +106,7 @@ void __e_acsl_globals_init(void)
   return;
 }
 
-void __e_acsl_globals_delete(void)
+void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(Str));
   __e_acsl_delete_block((void *)(Strings));
@@ -426,7 +426,7 @@ int main(int argc, char const **argv)
   __e_acsl_delete_block((void *)(str));
   __e_acsl_delete_block((void *)(& p));
   __e_acsl_delete_block((void *)(strings));
-  __e_acsl_globals_delete();
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

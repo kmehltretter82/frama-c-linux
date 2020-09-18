@@ -24,7 +24,7 @@ void __e_acsl_globals_init(void)
   return;
 }
 
-void __e_acsl_globals_delete(void)
+void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& t));
 }
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   t.j = (_Bool)1;
   /*@ assert \initialized(&t.j); */ ;
   tmp = test(& t);
-  __e_acsl_globals_delete();
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return tmp;
 }

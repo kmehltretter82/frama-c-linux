@@ -707,8 +707,8 @@ let inject_global_handler file main =
     let vi_init, fundec_init = Global_observer.mk_init_function () in
     let cil_fct_init = GFun(fundec_init, Location.unknown) in
     (* Create [__e_acsl_globals_delete] function *)
-    let vi_delete, fundec_delete = Global_observer.mk_delete_function () in
-    let cil_fct_delete = GFun(fundec_delete, Location.unknown) in
+    let vi_clean, fundec_clean = Global_observer.mk_clean_function () in
+    let cil_fct_clean = GFun(fundec_clean, Location.unknown) in
     match main with
     | Some main ->
       let mk_fct_call vi =
@@ -727,14 +727,14 @@ let inject_global_handler file main =
       (* Create [__e_acsl_globals_init();] call *)
       let stmt_init = mk_fct_call vi_init in
       (* Create [__e_acsl_globals_delete();] call *)
-      let stmt_delete =
-        match fundec_delete.sbody.bstmts with
+      let stmt_clean =
+        match fundec_clean.sbody.bstmts with
         | [] -> None
-        | _ -> Some (mk_fct_call vi_delete)
+        | _ -> Some (mk_fct_call vi_clean)
       in
       (* Surround the content of main with the calls to
          [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
-      surround_function_with main main_fundec stmt_init stmt_delete;
+      surround_function_with main main_fundec stmt_init stmt_clean;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -753,11 +753,11 @@ let inject_global_handler file main =
         in
         (* [main] at the end *)
         let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
-        (* Prepend [__e_acsl_globals_delete] if not empty *)
+        (* Prepend [__e_acsl_globals_clean] if not empty *)
         let globals_to_add =
-          match fundec_delete.sbody.bstmts with
+          match fundec_clean.sbody.bstmts with
           | [] -> globals_to_add
-          | _ -> cil_fct_delete :: globals_to_add
+          | _ -> cil_fct_clean :: globals_to_add
         in
         (* Prepend [__e_acsl_globals_init] *)
         let globals_to_add = cil_fct_init :: globals_to_add in
@@ -777,11 +777,11 @@ let inject_global_handler file main =
                       `__e_acsl_memory_init' and `__e_acsl_memory_clean' \
                       by yourself.@]"
         Global_observer.function_init_name
-        Global_observer.function_delete_name;
+        Global_observer.function_clean_name;
       let globals_func =
-        match fundec_delete.sbody.bstmts with
+        match fundec_clean.sbody.bstmts with
         | [] -> [ cil_fct_init ]
-        | _ -> [ cil_fct_init; cil_fct_delete ]
+        | _ -> [ cil_fct_init; cil_fct_clean ]
       in
       file.globals <- file.globals @ globals_func
 
