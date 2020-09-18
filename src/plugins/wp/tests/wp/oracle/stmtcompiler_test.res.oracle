@@ -3,7 +3,6 @@
 [kernel] tests/wp/stmtcompiler_test.i:136: Warning: 
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [kernel] tests/wp/stmtcompiler_test.i:145: Warning: 
   No code nor implicit assigns clause for function behavior1, generating default assigns from the prototype
 [wp] Warning: Missing RTE guards

@@ -23,7 +23,6 @@ Function call_two_ref: { r0 tmp tmp_0 __retres }
 Function g: { *pg tmp }
 Function array_in_struct_param: { sf }
 .................................................
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function array_in_struct_param
