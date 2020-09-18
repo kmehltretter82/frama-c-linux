@@ -7,14 +7,14 @@ RUN apt-get update && apt-get install -y \
     z3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN opam init --disable-sandboxing --compiler=ocaml-base-compiler.4.07.1 -y
+RUN opam init --disable-sandboxing --compiler=ocaml-base-compiler.4.08.1 -y
 
 # "RUN eval $(opam env)" does not work, so we manually set its variables
-ENV OPAM_SWITCH_PREFIX "/root/.opam/ocaml-base-compiler.4.07.1"
-ENV CAML_LD_LIBRARY_PATH "/root/.opam/ocaml-base-compiler.4.07.1/lib/stublibs:/root/.opam/ocaml-base-compiler.4.07.1/lib/ocaml/stublibs:/root/.opam/ocaml-base-compiler.4.07.1/lib/ocaml"
-ENV OCAML_TOPLEVEL_PATH "/root/.opam/ocaml-base-compiler.4.07.1/lib/toplevel"
-ENV MANPATH "$MANPATH:/root/.opam/ocaml-base-compiler.4.07.1/man"
-ENV PATH "/root/.opam/ocaml-base-compiler.4.07.1/bin:$PATH"
+ENV OPAM_SWITCH_PREFIX "/root/.opam/ocaml-base-compiler.4.08.1"
+ENV CAML_LD_LIBRARY_PATH "/root/.opam/ocaml-base-compiler.4.08.1/lib/stublibs:/root/.opam/ocaml-base-compiler.4.08.1/lib/ocaml/stublibs:/root/.opam/ocaml-base-compiler.4.08.1/lib/ocaml"
+ENV OCAML_TOPLEVEL_PATH "/root/.opam/ocaml-base-compiler.4.08.1/lib/toplevel"
+ENV MANPATH "$MANPATH:/root/.opam/ocaml-base-compiler.4.08.1/man"
+ENV PATH "/root/.opam/ocaml-base-compiler.4.08.1/bin:$PATH"
 
 RUN opam update -y && opam install depext -y
 
@@ -24,7 +24,7 @@ RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     apron.v0.9.12 \
     conf-graphviz.0.1 \
     mlgmpidl.1.2.12 \
-    ocamlfind.1.8.0 \
+    ocamlfind.1.8.1 \
     ocamlgraph.1.8.8 \
     ppx_deriving_yojson.3.5.2 \
     why3.1.3.1 \
@@ -38,16 +38,16 @@ RUN why3 config --full-config
 # with_source: keep Frama-C sources
 ARG with_source=no
 
+# copies a cloned, non-public Frama-C
+COPY frama-c /root/frama-c
+
 RUN cd /root && \
-    wget http://frama-c.com/download/frama-c-21.0-Scandium.tar.gz && \
-    tar xvf frama-c-*.tar.gz && \
-    (cd frama-c-* && \
-        ./configure --disable-gui && \
+    (cd frama-c && \
+        autoconf && ./configure --disable-gui && \
         make -j && \
         make install \
     ) && \
-    rm -f frama-c-*.tar.gz && \
-    [ "${with_source}" != "no" ] || rm -rf frama-c-*
+    [ "${with_source}" != "no" ] || rm -rf frama-c
 
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no
@@ -60,6 +60,6 @@ RUN if [ "${with_test}" != "no" ]; then \
            --verbose \
         && \
         rm -rf /var/lib/apt/lists/* && \
-        cd /root/frama-c-* && \
+        cd /root/frama-c && \
         make tests; \
     fi
