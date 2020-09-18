@@ -301,7 +301,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
-  let process_call stmt call valuation state =
+  let process_call stmt call recursion valuation state =
     Value_util.push_call_stack call.kf (Kstmt stmt);
     let cleanup () =
       Value_util.pop_call_stack ();
@@ -312,7 +312,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
         (* Process the call according to the domain decision. *)
-        match Domain.start_call stmt call domain_valuation state with
+        match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
           !compute_call_ref stmt call state
@@ -449,11 +449,11 @@ module Make (Abstract: Abstractions.Eva) = struct
     Kernel_function.get_formals kf @ locals
 
   (* Do the call to one function. *)
-  let do_one_call valuation stmt lv call state =
+  let do_one_call valuation stmt lv call recursion state =
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
-    let call_result = process_call stmt call valuation state in
+    let call_result = process_call stmt call recursion valuation state in
     call_result.cacheable,
     call_result.states >>- fun result ->
     let leaving_vars = leaving_vars kf_callee in
@@ -474,7 +474,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       let post = Domain.leave_scope kf_callee leaving_vars state in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      Domain.finalize_call stmt call ~pre ~post >>- fun state ->
+      Domain.finalize_call stmt call recursion ~pre ~post >>- fun state ->
       (* Backward propagates the [reductions] on the concrete arguments. *)
       reduce_arguments reductions state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
@@ -483,7 +483,7 @@ module Make (Abstract: Abstractions.Eva) = struct
          domains. Do not reduce them, and more importantly, do not remove
          them from the scope. (Because the instance from the initial,
          non-recursive, call are still present.) *)
-      Domain.finalize_call stmt call ~pre ~post:state >>- fun state ->
+      Domain.finalize_call stmt call recursion ~pre ~post:state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
     in
     let states =
@@ -745,10 +745,17 @@ module Make (Abstract: Abstractions.Eva) = struct
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
           eval >>- fun (call, valuation) ->
+          let recursion =
+            if call.recursive
+            then Some (Recursion.make_recursive_call call.kf)
+            else None
+          in
           (* Register the call. *)
           Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
           (* Do the call. *)
-          let c, states = do_one_call valuation stmt lval_option call state in
+          let c, states =
+            do_one_call valuation stmt lval_option call recursion state
+          in
           (* If needed, propagate that callers cannot be cached. *)
           if c = NoCacheCallers then
             cacheable := NoCacheCallers;

@@ -260,7 +260,7 @@ module type Transfer = sig
       - [valuation] is a cache for all values and locations computed during
         the evaluation of the function and its arguments. *)
   val start_call:
-    stmt -> (location, value) call ->
+    stmt -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
@@ -271,7 +271,8 @@ module type Transfer = sig
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:
-    stmt -> (location, value) call -> pre:state -> post:state -> state or_bottom
+    stmt -> (location, value) call -> recursion option ->
+    pre:state -> post:state -> state or_bottom
 
   (** Called on the Frama_C_show_each directives. Prints the internal properties
       inferred by the domain in the [state] about the expression [exp]. Can use

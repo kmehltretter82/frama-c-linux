@@ -63,8 +63,8 @@ module Make
   let update _ _ = `Value ()
   let assign _ _ _ _ _ _ = `Value ()
   let assume _ _ _ _ _ = `Value ()
-  let start_call _ _ _ _ = `Value ()
-  let finalize_call _ _ ~pre:_ ~post:_ = `Value ()
+  let start_call _ _ _ _ _ = `Value ()
+  let finalize_call _ _ _ ~pre:_ ~post:_ = `Value ()
   let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ _ = ()

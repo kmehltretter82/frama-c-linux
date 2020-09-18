@@ -473,16 +473,21 @@ module Make
       end
     | _ -> `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    unscope state vars
+
+  let start_call _stmt call recursion valuation state =
     let state =
       match call_init_state call.kf with
       | ISCaller  -> assign_formals valuation call state
       | ISFormals -> assign_formals valuation call empty
       | ISEmpty   -> empty
     in
+    let state = Extlib.opt_fold start_recursive_call recursion state in
     `Value state
 
-  let finalize_call _stmt call ~pre ~post =
+  let finalize_call _stmt call _recursion ~pre ~post =
     if call_init_state call.kf = ISCaller then
       `Value post (* [pre] was the state inferred in the caller, and it
                      has been updated during the analysis of [kf] into

@@ -204,14 +204,14 @@ let actualize_formals state arguments =
   in
   List.fold_left treat_one_formal state arguments
 
-let start_call _stmt call valuation state =
+let start_call _stmt call _recursion valuation state =
   let state = update valuation state in
   let with_formals = actualize_formals state call.arguments in
   let stack_with_call = Value_util.call_stack () in
   Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
   `Value with_formals
 
-let finalize_call stmt call ~pre:_ ~post:state =
+let finalize_call stmt call _recursion ~pre:_ ~post:state =
   (* Deallocate memory allocated via alloca().
      To minimize computations, only do it for function definitions. *)
   let state' =

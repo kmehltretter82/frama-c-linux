@@ -1208,7 +1208,7 @@ module D_Impl : Abstract_domain.S
     try `Value (G.assign to_loc to_val lv.lval e state)
     with Unassignable -> `Value (kill lv.lloc state)
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     let state =
       match function_calls_handling with
       | FullInterprocedural -> post
@@ -1217,10 +1217,16 @@ module D_Impl : Abstract_domain.S
     in
     `Value state
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    remove_variables vars state
+
+  let start_call _stmt call recursion valuation state =
     let state =
       match function_calls_handling with
-      | FullInterprocedural -> update valuation state
+      | FullInterprocedural ->
+        let state = Extlib.opt_fold start_recursive_call recursion state in
+        update valuation state
       | IntraproceduralAll
       | IntraproceduralNonReferenced -> `Value G.empty
     in

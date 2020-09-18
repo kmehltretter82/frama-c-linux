@@ -1216,17 +1216,22 @@ module Domain = struct
 
   let assume _stmt _exp _bool = update
 
-  let start_call _stmt call valuation state =
+  let start_recursive_call recursion state =
+    let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    List.fold_left State.remove state vars
+
+  let start_call _stmt call recursion valuation state =
     if intraprocedural ()
     then `Value (empty ())
     else
+      let state = Extlib.opt_fold start_recursive_call recursion state in
       let state = { state with modified = Locations.Zone.bottom } in
       let assign_formal state { formal; concrete; avalue } =
         state >>- assign_variable formal concrete avalue valuation
       in
       List.fold_left assign_formal (`Value state) call.arguments
 
-  let finalize_call _stmt _call ~pre ~post =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     if intraprocedural ()
     then `Value (kill post.modified pre)
     else

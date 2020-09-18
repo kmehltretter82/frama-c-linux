@@ -82,10 +82,16 @@ module Make_Minimal
   let assume stmt expr positive _valuation state =
     Domain.assume stmt expr positive state
 
-  let start_call stmt call _valuation state =
-    `Value (Domain.start_call stmt (simplify_call call) state)
+  let start_call stmt call recursion _valuation state =
+    match recursion with
+    | None -> `Value (Domain.start_call stmt (simplify_call call) state)
+    | Some _ ->
+      (* TODO *)
+      Value_parameters.abort
+        "The domain %s does not support recursive call." Domain.name
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
+    assert (recursion = None);
     Domain.finalize_call stmt (simplify_call call) ~pre ~post
 
   let show_expr _valuation = Domain.show_expr
@@ -218,9 +224,18 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.assign kinstr lv expr value (record valuation) state
     let assume stmt expr positive valuation state =
       Domain.assume stmt expr positive (record valuation) state
-    let start_call stmt call valuation state =
-      `Value (Domain.start_call stmt call (record valuation) state)
-    let finalize_call = Domain.finalize_call
+
+    let start_call stmt call recursion valuation state =
+      match recursion with
+      | None -> `Value (Domain.start_call stmt call (record valuation) state)
+      | Some _ ->
+        (* TODO *)
+        Value_parameters.abort
+          "The domain %s does not support recursive call." Domain.name
+
+    let finalize_call stmt call recursion =
+      assert (recursion = None);
+      Domain.finalize_call stmt call
 
     let show_expr _valuation = Domain.show_expr
 
@@ -436,7 +451,7 @@ module Restrict
      - otherwise, only propagate the state from the call site to kill the
        properties that depend on locations written in the called functions. *)
 
-  let start_call stmt call valuation state =
+  let start_call stmt call recursion valuation state =
     (* Starts the call with mode [new_mode]. [previous_mode] is the current mode
        of the caller. *)
     let start_call_with_mode ?previous_mode ~new_mode state =
@@ -444,7 +459,7 @@ module Restrict
       then
         match previous_mode with
         | Some mode when mode.current.write ->
-          Domain.start_call stmt call valuation state >>-: fun state ->
+          Domain.start_call stmt call recursion valuation state >>-: fun state ->
           Some (state, new_mode)
         | _ ->
           `Value (Some (start_analysis call state, new_mode))
@@ -465,13 +480,13 @@ module Restrict
     | None, None ->
       `Value None
 
-  let finalize_call stmt call ~pre ~post =
+  let finalize_call stmt call recursion ~pre ~post =
     match pre, post with
     | None, _ | _, None -> `Value None
     | Some (pre, pre_mode), Some (post, post_mode) ->
       if post_mode.current.write
       then
-        Domain.finalize_call stmt call ~pre ~post >>-: fun state ->
+        Domain.finalize_call stmt call recursion ~pre ~post >>-: fun state ->
         Some (state, pre_mode)
       else
         `Value (Some (post, pre_mode))

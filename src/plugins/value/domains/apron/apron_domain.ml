@@ -634,7 +634,11 @@ module Make (Man : Input) = struct
     with
     | Out_of_Scope _ -> `Value state
 
-  let start_call _stmt call valuation state =
+  let start_call _stmt call recursion valuation state =
+    if recursion <> None
+    then
+      Value_parameters.abort ~current:true
+        "The binding to APRON domains does not support recursive calls.";
     update valuation state >>- fun state ->
     let eval = make_eval state in
     let oracle = make_oracle valuation in
@@ -669,7 +673,7 @@ module Make (Man : Input) = struct
     then `Bottom
     else `Value state
 
-  let finalize_call _stmt _call ~pre:_ ~post = `Value post
+  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
   let show_expr _valuation _state _fmt _expr = ()
 
