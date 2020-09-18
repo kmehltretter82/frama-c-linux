@@ -70,6 +70,8 @@ val make_escaping_fundec:
     [fdec] is used to detect whether we are deallocating the outer scope of a
     function, in which case a different warning is emitted. *)
 
+val substitute:
+  Base.substitution -> clobbered_set -> Cvalue.Model.t -> Cvalue.Model.t
 
 (*
 Local Variables:
