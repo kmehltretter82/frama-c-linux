@@ -38,25 +38,10 @@ let check_formals_non_referenced kf =
       Kernel_function.pretty kf
 
 let warn_recursive_call kf call_stack =
-  if Value_parameters.IgnoreRecursiveCalls.get ()
-  then begin
-    Value_util.warning_once_current
-      "@[recursive call@ during@ value@ analysis@ of %a \
-       @[(%a <- %a)@].@ Assuming@ the call@ has@ no effect.@ \
-       The analysis@ will@ be@ unsound.@]"
-      Kernel_function.pretty kf Kernel_function.pretty kf
-      Value_types.Callstack.pretty call_stack ;
-    check_formals_non_referenced kf;
-    Db.Value.recursive_call_occurred kf;
-  end
-  else begin
-    Value_parameters.error ~once:true ~current:true
-      "@[@[detected@ recursive@ call@ (%a <- %a)@]@;@[Use %s@ to@ \
-       ignore@ (beware@ this@ will@ make@ the analysis@ unsound)@]@]"
-      Kernel_function.pretty kf Value_types.Callstack.pretty call_stack
-      Value_parameters.IgnoreRecursiveCalls.option_name;
-    raise Db.Value.Aborted
-  end
+  Value_parameters.feedback ~once:true ~current:true
+    "@[@[detected@ recursive@ call@ (%a <- %a)@]@;@]"
+    Kernel_function.pretty kf Value_types.Callstack.pretty call_stack;
+  check_formals_non_referenced kf
 
 (* Check whether the function at the top of the call-stack starts a
    recursive call. *)

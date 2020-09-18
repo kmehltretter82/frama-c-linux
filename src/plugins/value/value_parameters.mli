@@ -65,12 +65,12 @@ module WarnSignedConvertedDowncast: Parameter_sig.Bool
 module WarnPointerSubstraction: Parameter_sig.Bool
 module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set
 
-module IgnoreRecursiveCalls: Parameter_sig.Bool
-
 module DescendingIteration: Parameter_sig.String
 module HierarchicalConvergence: Parameter_sig.Bool
 module WideningDelay: Parameter_sig.Int
 module WideningPeriod: Parameter_sig.Int
+
+module RecursiveUnroll: Parameter_sig.Int
 
 module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
