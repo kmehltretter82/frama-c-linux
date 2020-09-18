@@ -275,7 +275,7 @@ let show ?height ?width ~(host:basic_main) () =
       `HORIZONTAL ~layout:`END ~packing:dialog#action_area#pack ()
   in
   let cancel =
-    GButton.button ~label:"Cancel" ~stock:`CANCEL ~packing:buttons#pack ()
+    GButton.button ~label:"Close" ~stock:`CANCEL ~packing:buttons#pack ()
   in
   ignore (cancel#connect#released dialog#destroy);
   let button_run =
