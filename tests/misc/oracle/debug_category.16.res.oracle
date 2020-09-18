@@ -8,7 +8,7 @@
   The full backtrace is:
   
   Plug-in test aborted: internal error.
-  Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues.
+  Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues
   Your Frama-C version is VERSION
   Note that a version and a backtrace alone often do not contain enough
   information to understand the bug. Guidelines for reporting bugs are at:

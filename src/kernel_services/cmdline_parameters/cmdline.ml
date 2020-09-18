@@ -106,7 +106,7 @@ let get_backtrace () =
 
 let request_crash_report =
   Format.sprintf
-    "Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues.\n\
+    "Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues\n\
      Your Frama-C version is %s.\n\
      Note that a version and a backtrace alone often do not contain enough\n\
      information to understand the bug. Guidelines for reporting bugs are at:\n\
