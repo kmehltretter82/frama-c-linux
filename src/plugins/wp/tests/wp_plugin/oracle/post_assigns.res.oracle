@@ -34,5 +34,9 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'receive':
-  /*@ behavior typed: requires \separated(&size,message+(..)); */
+  /*@
+     behavior typed:
+       requires \separated(message + (..), &size);
+       requires \separated(message + (0 .. \at(size,Post)), &size);
+     */
   void receive(int n, char *message);
