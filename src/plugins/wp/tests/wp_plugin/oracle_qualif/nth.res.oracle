@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/nth.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] 4 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_access_16_16_ok : Valid
 [wp] [Alt-Ergo] Goal typed_lemma_access_4_4_ok : Valid

@@ -1,7 +1,6 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing tests/wp_plugin/sequence.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 34 goals scheduled
 [wp] [Qed] Goal typed_caveat_loops_ensures_ok_first : Valid

@@ -391,19 +391,21 @@ let results g =
     (Wpo.get_results g)
 
 let do_wpo_failed goal =
+  let updating = Cache.is_updating () in
   match results goal with
   | [p,r] ->
-      Wp_parameters.result "[%a] Goal %s : %a%a"
+      Wp_parameters.result "[%a] Goal %s : %t%a"
         VCS.pp_prover p (Wpo.get_gid goal)
-        (VCS.pp_result_qualif p) r pp_warnings goal
+        (VCS.pp_result_qualif ~updating p r) pp_warnings goal
   | pres ->
       Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
         begin fun fmt ->
           pp_warnings fmt goal ;
           List.iter
             (fun (p,r) ->
-               Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
-                 (VCS.title_of_prover p) (VCS.pp_result_qualif p) r
+               Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
+                 (VCS.title_of_prover p)
+                 (VCS.pp_result_qualif ~updating p r)
             ) pres ;
         end
 
@@ -416,11 +418,12 @@ let do_wpo_smoke status goal =
     (Wpo.get_gid goal)
     begin fun fmt ->
       pp_warnings fmt goal ;
+      let updating = Cache.is_updating () in
       List.iter
         (fun (p,r) ->
-           Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
+           Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
              (VCS.title_of_prover p)
-             (VCS.pp_result_qualif p) r
+             (VCS.pp_result_qualif ~updating p r)
         ) (results goal) ;
     end
 
@@ -453,10 +456,11 @@ let do_wpo_success goal s =
             VCS.pp_prover script (Wpo.get_gid goal)
       | Some prover ->
           let result = Wpo.get_result goal prover in
+          let updating = Cache.is_updating () in
           Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : %a"
+            "[%a] Goal %s : %t"
             VCS.pp_prover prover (Wpo.get_gid goal)
-            (VCS.pp_result_qualif prover) result
+            (VCS.pp_result_qualif ~updating prover result)
     end
 
 let do_report_time fmt s =

@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/stmt.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] [CFG] Goal f_exits : Valid (Unreachable)
 [wp] [CFG] Goal g_exits : Valid (Unreachable)
 [wp] [CFG] Goal g_assigns : Valid (Unreachable)

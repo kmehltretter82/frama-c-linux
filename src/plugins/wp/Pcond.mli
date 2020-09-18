@@ -23,16 +23,18 @@
 open Qed.Plib
 open Conditions
 
+open Lang.F
+
 (** {2 All-in-one printers} *)
 
-val dump : bundle printer
-val bundle : ?clause:string -> bundle printer
-val sequence : ?clause:string -> sequence printer
 val pretty : sequent printer
+
+val dump : bundle printer
+val dump_bundle : ?clause:string -> ?goal:pred -> bundle printer
+val dump_sequence : ?clause:string -> ?goal:pred -> sequence printer
 
 (** {2 Low-level API} *)
 
-open Lang.F
 type env = Plang.Env.t
 
 val alloc_hyp : Plang.pool -> (var -> unit) -> sequence -> unit
@@ -103,7 +105,7 @@ class state :
     method pp_value : Format.formatter -> term -> unit
   end
 
-class sequence : #state ->
+class seqengine : #state ->
   object
     inherit engine
     method set_sequence : Conditions.sequence -> unit

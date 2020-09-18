@@ -3,7 +3,6 @@
 [kernel] Parsing tests/wp_manual/working_dir/swap.c (with preprocessing)
 [kernel] Parsing tests/wp_manual/working_dir/swap1.h (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp] [Alt-Ergo] Goal typed_swap_ensures_A : Valid

@@ -12,7 +12,6 @@
 [eva:final-states] Values at end of function main:
   __retres ∈ [-2147483647..2147483647]
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
 [wp] [Alt-Ergo] Goal typed_main_assert_Eva_signed_overflow : Unsuccess

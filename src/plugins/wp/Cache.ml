@@ -136,6 +136,11 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
 let get_mode = MODE.get
 let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
 
+let is_updating () =
+  match MODE.get () with
+  | NoCache | Replay | Offline -> false
+  | Update | Rebuild | Cleanup -> true
+
 let task_hash wpo drv prover task =
   lazy
     begin
