@@ -668,10 +668,32 @@ let cfun_spec env kf =
   let update_spec_env v = env.local.spec <- E.cup env.local.spec v ;
     Cil.SkipChildren
   in
+  let res_type = Kernel_function.get_return_type kf in
+  let is_from_result ({ it_content=t }, _) = Logic_utils.is_result t in
   let visitor = object
     inherit Cil.nopCilVisitor
     method !vpredicate p = update_spec_env (pred env p)
     method !vterm t = update_spec_env (vterm env t)
+
+    method! vassigns = function
+      | WritesAny -> Cil.SkipChildren
+      | Writes l
+        when Cil.isPointerType res_type && not (List.exists is_from_result l) ->
+          Wp_parameters.warning ~once:true
+            "No 'assigns \\result \\from ...' specification for function '%a', \
+             returning pointer type.@ Callers assumptions might be imprecise."
+            Kernel_function.pretty kf ;
+          Cil.DoChildren
+      | _ -> Cil.DoChildren
+
+    method! vfrom = function
+      | it, FromAny when Logic_typing.is_pointer_type it.it_content.term_type ->
+          Wp_parameters.warning ~once:true
+            "No \\from specification for assigned pointer '%a'.@ \
+             Callers assumptions might be imprecise."
+            Cil_printer.pp_identified_term it ;
+          Cil.DoChildren
+      | _ -> Cil.DoChildren
   end in
   let spec = Annotations.funspec kf in
   ignore (Cil.visitCilFunspec (visitor:>Cil.cilVisitor) spec) ;
