@@ -51,5 +51,12 @@
   call_array_in_struct_param   5     -        5       100%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'reset':
-  /*@ behavior typed_ref: requires \valid(p); */
+  /*@ behavior typed_ref:
+        requires \valid(p); */
   void reset(struct T *p);
+[wp] Warning: Memory model hypotheses for function 'call_reset_5_tps':
+  /*@
+     behavior typed_ref:
+       requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
+     */
+  void call_reset_5_tps(void);

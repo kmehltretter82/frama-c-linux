@@ -464,14 +464,18 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'reset':
-  /*@ behavior typed_ref: requires \valid(rp); */
+  /*@ behavior typed_ref:
+        requires \valid(rp); */
   void reset(int *rp);
 [wp] Warning: Memory model hypotheses for function 'incr':
-  /*@ behavior typed_ref: requires \valid(ip); */
+  /*@ behavior typed_ref:
+        requires \valid(ip); */
   void incr(int *ip);
 [wp] Warning: Memory model hypotheses for function 'load':
-  /*@ behavior typed_ref: requires \valid(lp); */
+  /*@ behavior typed_ref:
+        requires \valid(lp); */
   int load(int *lp);
 [wp] Warning: Memory model hypotheses for function 'call_param_ref':
-  /*@ behavior typed_ref: requires \valid(q); */
+  /*@ behavior typed_ref:
+        requires \valid(q); */
   int call_param_ref(int *q);

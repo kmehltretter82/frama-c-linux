@@ -156,5 +156,6 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'reset':
-  /*@ behavior typed_caveat: requires \valid(p+(..)); */
+  /*@ behavior typed_caveat:
+        requires \valid(p + (..)); */
   void reset(struct S *p);

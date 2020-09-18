@@ -119,7 +119,10 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'job':
   /*@
      behavior typed:
-     requires \separated(\union(&seq,&service_cpt,service_id+(..),
-                           service_result+(..)),error);
+       requires
+         \separated(
+           error, (int *)service_id + (..), (int *)service_result + (..), &seq,
+           &service_cpt
+           );
      */
   int job(int a, int b, int *error);

@@ -43,7 +43,7 @@ let configure () =
 let no_binder = { bind = fun _ f v -> f v }
 let configure_ia _ = no_binder
 
-let hypotheses () = []
+let hypotheses p = p
 
 module Chunk =
 struct

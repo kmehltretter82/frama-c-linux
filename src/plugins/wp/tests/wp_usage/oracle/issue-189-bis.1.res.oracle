@@ -171,8 +171,8 @@ Prove: true.
 [wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior typed:
-     requires \separated(src,dst);
-     requires \valid(src);
-     requires \valid(dst);
+       requires \separated(src, dst);
+       requires \valid(dst);
+       requires \valid(src);
      */
   void memcpy_context_vars(unsigned char *src, unsigned char *dst, int len);

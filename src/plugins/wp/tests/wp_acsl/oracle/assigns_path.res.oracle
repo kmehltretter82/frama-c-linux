@@ -99,5 +99,6 @@ Prove: true.
 
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'job':
-  /*@ behavior typed: requires \separated(&p,b+(..)); */
+  /*@ behavior typed:
+        requires \separated(b + (..), &p); */
   void job(int n, int *b);
