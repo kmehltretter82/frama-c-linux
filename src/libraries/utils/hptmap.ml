@@ -1343,6 +1343,23 @@ struct
       in
       aux 
 
+      let replace_key ~decide shape map =
+        let cache = Hptmap_sig.NoCache in
+        let inter, diff = partition_with_shape shape map in
+        if is_empty inter
+        then false, map
+        else
+          let join = join ~cache ~symmetric:true ~idempotent:true ~decide in
+          let both _key value new_key = singleton new_key value in
+          let new_inter =
+            fold2_join_heterogeneous
+              ~cache
+              ~empty_left:(fun _ -> empty)
+              ~empty_right:(fun _ -> assert false)
+              ~empty
+              ~both ~join inter shape
+          in
+          true, join new_inter diff
 
     let generic_predicate exn ~cache ~decide_fast ~decide_fst ~decide_snd ~decide_both =
       if debug_cache then Format.eprintf "CACHE generic_predicate %s@." (fst cache);

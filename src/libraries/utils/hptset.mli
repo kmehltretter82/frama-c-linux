@@ -100,6 +100,8 @@ module type S = sig
       t -> 'a shape ->
       'b
 
+    val replace: elt shape -> t -> bool * t
+
     (** Clear all the caches used internally by the functions of this module.
         Those caches are not project-aware, so this function must be called
         at least each a project switch occurs. *)
