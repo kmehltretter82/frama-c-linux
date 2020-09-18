@@ -1,6 +1,5 @@
 [kernel] Parsing tests/wp_usage/save_load.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f

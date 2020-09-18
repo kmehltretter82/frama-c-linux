@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/invertible.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [kernel] tests/wp_plugin/invertible.i:17: Warning: 
   No code nor implicit assigns clause for function main, generating default assigns from the prototype
 ------------------------------------------------------------
