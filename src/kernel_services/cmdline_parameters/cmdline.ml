@@ -106,11 +106,11 @@ let get_backtrace () =
 
 let request_crash_report =
   Format.sprintf
-    "Please report as 'crash' at http://bts.frama-c.com/.\n\
+    "Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues\n\
      Your Frama-C version is %s.\n\
      Note that a version and a backtrace alone often do not contain enough\n\
      information to understand the bug. Guidelines for reporting bugs are at:\n\
-     http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines\n"
+     https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs\n"
     Fc_config.version_and_codename
 
 let protect = function
@@ -139,7 +139,8 @@ let protect = function
       let name = long_plugin_name p in
       Printf.sprintf
         "%s aborted: unimplemented feature.%s\n\
-         You may send a feature request at http://bts.frama-c.com with:\n\
+         You may send a feature request at \
+         https://git.frama-c.com/pub/frama-c/issues with:\n\
          '[%s] %s'."
         name (additional_info ()) name m
   | e ->

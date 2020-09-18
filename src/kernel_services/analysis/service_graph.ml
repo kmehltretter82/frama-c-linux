@@ -125,10 +125,12 @@ struct
   let edge_invariant src dst = function
     | Inter_functions ->
       if not (Vertex.equal src.root dst.root || dst.is_root) then
-	Kernel.failure
+        Kernel.failure
           "Correctness bug when computing services.\n\
-PLEASE REPORT AS MAJOR BUG on http://bts.frama-c.com with the following info.\n\
-Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
+           PLEASE REPORT AS MAJOR BUG on \
+           https://git.frama-c.com/pub/frama-c/issues \
+           with the following info.\n\
+           Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
           (G.V.name src.node)
           (G.V.name src.root.node)
           src.is_root
@@ -137,10 +139,12 @@ Src:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b)"
           dst.is_root
     | Inter_services | Both ->
       if not (src.is_root && dst.is_root) then
-	Kernel.failure
+        Kernel.failure
           "Correctness bug when computing services.\n\
-PLEASE REPORT AS MAJOR BUG on http://bts.frama-c.com with the following info.\n\
-Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
+           PLEASE REPORT AS MAJOR BUG on \
+           https://git.frama-c.com/pub/frama-c/issues \
+           with the following info.\n\
+           Src root:%s in %s (is_root:%b) Dst:%s in %s (is_root:%b) [2d case]"
           (G.V.name src.node)
           (G.V.name src.root.node)
           src.is_root
