@@ -1,7 +1,6 @@
 # frama-c -wp -wp-rte -wp-no-let [...]
 [kernel] Parsing tests/wp_acsl/struct_fields.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function foo
 [wp] 2 goals scheduled
 ---------------------------------------------

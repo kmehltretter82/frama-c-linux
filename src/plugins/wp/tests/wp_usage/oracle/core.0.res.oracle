@@ -3,7 +3,6 @@
 [kernel] tests/wp_usage/core.i:11: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] tests/wp_usage/core.i:24: Warning: 
   Missing assigns clause (assigns 'everything' instead)

@@ -1,7 +1,6 @@
 # frama-c -wp -wp-rte -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo3_solved.old.v2.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function equal_elements
 [wp] Goal typed_ref_equal_elements_ensures_v1_good : not tried
 [wp] Goal typed_ref_equal_elements_ensures_v2_good : not tried
