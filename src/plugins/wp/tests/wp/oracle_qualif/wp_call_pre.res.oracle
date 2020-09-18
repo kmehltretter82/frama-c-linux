@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp/wp_call_pre.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [kernel] tests/wp/wp_call_pre.c:53: Warning: 
   No code nor implicit assigns clause for function f, generating default assigns from the prototype
 [kernel] tests/wp/wp_call_pre.c:53: Warning: 

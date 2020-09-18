@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_typed/unit_lemma.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] 6 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_P23_KO : Unsuccess
 [wp] [Alt-Ergo] Goal typed_lemma_P52 : Valid

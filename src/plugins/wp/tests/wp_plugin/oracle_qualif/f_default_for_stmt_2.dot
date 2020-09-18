@@ -35,6 +35,7 @@ digraph f {
   N100 [ color=green , label="Assume f_ensures_3" ] ;
  N100 -> N099 ;
   N101 [ color=red , label="Assigns f_assigns" ] ;
+  N101 -> N100 [ style=dotted ] ;
   N102 [ label="" , shape=circle ] ;
  N102 -> N101 ;
  N102 -> N100 ;
