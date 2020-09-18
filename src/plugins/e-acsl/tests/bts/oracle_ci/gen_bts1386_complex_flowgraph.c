@@ -272,7 +272,7 @@ void __e_acsl_globals_init(void)
   return;
 }
 
-void __e_acsl_globals_delete(void)
+void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(target));
   __e_acsl_delete_block((void *)(source));
@@ -286,7 +286,7 @@ int main(void)
   initialize(source,100);
   duffcopy(source,target,43);
   __retres = 0;
-  __e_acsl_globals_delete();
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }
