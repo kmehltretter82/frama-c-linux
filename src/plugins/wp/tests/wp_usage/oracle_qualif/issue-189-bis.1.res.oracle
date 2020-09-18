@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_usage/issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled
 [wp] [Alt-Ergo] Goal typed_memcpy_context_vars_ensures_memcpy_ok : Valid
@@ -24,8 +23,8 @@
 [wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior typed:
-     requires \separated(src,dst);
-     requires \valid(src);
-     requires \valid(dst);
+       requires \separated(src, dst);
+       requires \valid(dst);
+       requires \valid(src);
      */
   void memcpy_context_vars(unsigned char *src, unsigned char *dst, int len);

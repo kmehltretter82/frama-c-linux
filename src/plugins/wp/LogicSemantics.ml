@@ -63,6 +63,7 @@ struct
   let mk_frame = C.mk_frame
   let in_frame = C.in_frame
   let mem_frame = C.mem_frame
+  let has_at_frame = C.has_at_frame
   let mem_at_frame = C.mem_at_frame
   let set_at_frame = C.set_at_frame
   let mem_at = C.mem_at

@@ -48,8 +48,8 @@ let pp_call_type fmt = function
   | Static kf -> Kernel_function.pretty fmt kf
 
 type node_type =
-  | Vstart | Vend | Vexit
-  | VfctIn | VfctOut (* TODO : not useful anymore -> Bfct *)
+  | Vstart | Vend
+  | VfctIn | VfctOut | VfctErr
   | VblkIn of block_type * block
   | VblkOut of block_type * block
   | Vstmt of stmt
@@ -82,7 +82,7 @@ let node_type_id t : node_id = match t with
   | Vstart -> (0, 0)
   | VfctIn -> (0, 1)
   | VfctOut -> (0, 2)
-  | Vexit -> (0, 3)
+  | VfctErr -> (0, 3)
   | Vend -> (0, 4)
   | Vstmt s | Vtest (true, s, _) | Vswitch (s,_) | Vcall (s, _, _, _) ->
       (1, s.sid)
@@ -113,8 +113,8 @@ let pp_node_type fmt n = match n with
   | Vstart -> Format.fprintf fmt "<start>"
   | VfctIn -> Format.fprintf fmt "<fctIn>"
   | VfctOut -> Format.fprintf fmt "<fctOut>"
+  | VfctErr -> Format.fprintf fmt "<fctErr>"
   | Vend -> Format.fprintf fmt "<end>"
-  | Vexit -> Format.fprintf fmt "<exit>"
   | VblkIn (bk,_) -> Format.fprintf fmt "<blkIn-%a>" pp_bkind bk
   | VblkOut (bk,_) -> Format.fprintf fmt "<blkOut-%a>" pp_bkind bk
   | Vcall (s, _, _, _) -> Format.fprintf fmt "<callIn-%d>" s.sid
@@ -146,7 +146,7 @@ let pp_node fmt v = VL.pretty fmt v
 
 let start_stmt_of_node v = match node_type v with
   | Vstart | Vtest (false, _, _) | VblkOut _
-  | VfctIn | VfctOut | Vend | Vexit | Vloop2 _ -> None
+  | VfctIn | VfctOut | VfctErr | Vend | Vloop2 _ -> None
   | VblkIn (bk, _) -> bkind_stmt bk
   | Vstmt s | Vtest (true, s, _) | Vloop (_, s) | Vswitch (s,_)
   | Vcall (s, _, _, _)
@@ -154,7 +154,7 @@ let start_stmt_of_node v = match node_type v with
 
 let node_stmt_opt v = match node_type v with
   | Vstart | Vtest (false, _, _)
-  | VfctIn | VfctOut | Vend | Vexit | Vloop2 _ -> None
+  | VfctIn | VfctOut | VfctErr | Vend | Vloop2 _ -> None
   | VblkIn (bk, _) | VblkOut (bk, _) -> bkind_stmt bk
   | Vstmt s | Vtest (true, s, _) | Vloop (_, s) | Vswitch (s,_)
   | Vcall (s, _, _, _)
@@ -479,14 +479,14 @@ let get_call_out_edges cfg v =
   in
   let en, ee = match node_type (edge_dst e1) ,
                      node_type (edge_dst e2) with
-  | _,  Vexit -> e1, e2
-  | Vexit, _  -> e2, e1
+  | _,  VfctErr -> e1, e2
+  | VfctErr, _  -> e2, e1
   | _, _ -> assert false
   in en, ee
 
 let get_edge_stmt e =
   match node_type (edge_dst e) with
-  | Vstart | VfctIn | Vexit | VfctOut -> None
+  | Vstart | VfctIn | VfctOut | VfctErr -> None
   | VblkIn (Bstmt s, _) | Vstmt s
   | Vcall (s,_,_,_) | Vtest (true, s, _) | Vswitch (s,_) -> Some s
   | Vloop (_,s) -> if is_back_edge e then None else Some s
@@ -497,7 +497,7 @@ let get_edge_labels e =
   let l = match node_type v_after with
     | Vstart -> assert false
     | VfctIn -> []
-    | Vexit | VfctOut -> [Clabels.post]
+    | VfctErr | VfctOut -> [Clabels.post]
     | VblkIn (Bstmt s, _)
     | Vcall (s,_,_,_) | Vstmt s | Vtest (true, s, _) | Vswitch (s,_) ->
         [Clabels.stmt s]
@@ -556,7 +556,7 @@ let get_exit_edges cfg src =
     let add_exit e acc =
       let dst = edge_dst e in
       match node_type dst with
-      | Vexit ->
+      | VfctErr ->
           debug
             "[get_exit_edges] add %a@." pp_edge e;
           (* (succ_e cfg dst) @ acc *)
@@ -660,12 +660,12 @@ let block_scope_for_edge cfg e =
   | VblkIn(Bstmt _,b) -> { b_opened=[b] ; b_closed=[] }
   | Vcall _
   | VblkIn _ | VblkOut _ | Vtest(false,_,_)
-  | VfctIn | VfctOut | Vstart | Vend | Vexit | Vloop2 _ ->
+  | VfctIn | VfctOut | VfctErr | Vstart | Vend | Vloop2 _ ->
       no_scope
 
 let has_exit cfg =
   try
-    let node = Hashtbl.find cfg.stmt_node (node_type_id Vexit) in
+    let node = Hashtbl.find cfg.stmt_node (node_type_id VfctErr) in
     match pred_e cfg node with
     | [] -> false
     | _ -> true
@@ -758,10 +758,10 @@ let init_cfg spec_only kf =
   let fct_in =  add_node env (VfctIn) in
   let _ = add_edge env start Enone fct_in in
   let fct_out =  add_node env (VfctOut) in
-  let nexit =  add_node env (Vexit) in
+  let fct_err =  add_node env (VfctErr) in
   let nend =  add_node env (Vend) in
   let _ = add_edge env fct_out Enone nend in
-  let _ = add_edge env nexit Enone nend in
+  let _ = add_edge env fct_err Enone nend in
   env, fct_in, fct_out
 
 let get_node env t =
@@ -883,7 +883,7 @@ and cfg_stmt env s next =
       setup_preconditions_proxies f;
       let in_call = get_stmt_node env s in
       add_edge env in_call Enone next;
-      let exit_node = get_node env (Vexit) in
+      let exit_node = get_node env VfctErr in
       add_edge env in_call Enone exit_node;
       in_call
   | Instr (Local_init(_,ConsInit (f, _, _), _)) ->
@@ -891,7 +891,7 @@ and cfg_stmt env s next =
       Statuses_by_call.setup_all_preconditions_proxies kf;
       let in_call = get_stmt_node env s in
       add_edge env in_call Enone next;
-      let exit_node = get_node env Vexit in
+      let exit_node = get_node env VfctErr in
       add_edge env in_call Enone exit_node;
       in_call
   | Instr _  | Return _ ->

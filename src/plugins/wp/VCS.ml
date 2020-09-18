@@ -317,31 +317,35 @@ let pp_result fmt r =
   | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf r
   | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf r
 
-let pp_cache_miss fmt st prover r =
-  let qualified =
-    match prover with
-    | Qed | Tactical -> true
-    | NativeAltErgo | NativeCoq -> r.verdict <> Timeout
-    | Why3 _ -> r.cached || r.prover_time < Rformat.epsilon
-  in
-  if not qualified && Wp_parameters.has_dkey dkey_shell then
-    Format.fprintf fmt "%s%a (unqualified)" st pp_perf r
-  else
-    Format.pp_print_string fmt (if is_valid r then "Valid" else "Unsuccess")
+let is_qualified prover result =
+  match prover with
+  | Qed | Tactical -> true
+  | NativeAltErgo | NativeCoq -> result.verdict <> Timeout
+  | Why3 _ -> result.cached || result.prover_time < Rformat.epsilon
 
-let pp_result_qualif prover fmt r =
+let pp_cache_miss fmt st updating prover result =
+  if not updating
+  && not (is_qualified prover result)
+  && Wp_parameters.has_dkey dkey_shell
+  then
+    Format.fprintf fmt "%s%a (missing cache)" st pp_perf result
+  else
+    Format.pp_print_string fmt @@
+    if is_valid result then "Valid" else "Unsuccess"
+
+let pp_result_qualif ?(updating=true) prover result fmt =
   if Wp_parameters.has_dkey dkey_shell then
-    match r.verdict with
+    match result.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
     | Invalid -> Format.pp_print_string fmt "Invalid"
-    | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
-    | Valid -> pp_cache_miss fmt "Valid" prover r
-    | Unknown -> pp_cache_miss fmt "Unsuccess" prover r
-    | Timeout -> pp_cache_miss fmt "Timeout" prover r
-    | Stepout -> pp_cache_miss fmt "Stepout" prover r
+    | Failed -> Format.fprintf fmt "Failed@ %s" result.prover_errmsg
+    | Valid -> pp_cache_miss fmt "Valid" updating prover result
+    | Unknown -> pp_cache_miss fmt "Unsuccess" updating prover result
+    | Timeout -> pp_cache_miss fmt "Timeout" updating prover result
+    | Stepout -> pp_cache_miss fmt "Stepout" updating prover result
   else
-    pp_result fmt r
+    pp_result fmt result
 
 let compare p q =
   let rank = function

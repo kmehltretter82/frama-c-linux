@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2020-09-17] New experimental option: -wp-check-model-hypotheses
+                           Generates requires in contracts for model hypotheses
+- WP          [2020-09-17] Hypotheses: assigned memory locations
 - WP          [2020-09-11] Support for generalized @check ACSL annotations
 - WP          [2020-07-06] Removed debug keys "no-xxx-info" (subsumed by "shell")
 - WP          [2020-07-06] Option -wp-cache-env now defaults to false

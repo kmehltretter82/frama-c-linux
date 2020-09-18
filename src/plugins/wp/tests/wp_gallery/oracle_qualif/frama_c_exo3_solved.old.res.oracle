@@ -1,7 +1,6 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo3_solved.old.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 34 goals scheduled
 [wp] [Alt-Ergo] Goal typed_ref_equal_elements_ensures : Valid
@@ -48,9 +47,9 @@
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
      behavior typed_ref:
-     requires \separated(v1,v2,a+(..));
-     requires \valid(v1);
-     requires \valid(v2);
+       requires \separated(v1, v2, a + (..));
+       requires \valid(v1);
+       requires \valid(v2);
      */
   void equal_elements(int *a, int *v1, int *v2);
 [wp] Running WP plugin...
@@ -82,8 +81,8 @@
 [wp] Warning: Memory model hypotheses for function 'equal_elements':
   /*@
      behavior typed_ref:
-     requires \separated(v1,v2,a+(..));
-     requires \valid(v1);
-     requires \valid(v2);
+       requires \separated(v1, v2, a + (..));
+       requires \valid(v1);
+       requires \valid(v2);
      */
   void equal_elements(int *a, int *v1, int *v2);

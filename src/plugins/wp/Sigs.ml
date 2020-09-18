@@ -291,9 +291,10 @@ sig
   val datatype : string
   (** For projectification. Must be unique among models. *)
 
-  val hypotheses : unit -> MemoryContext.clause list
-  (** Computes the memory model hypotheses including separation and validity
-      clauses to be verified for this model. *)
+  val hypotheses : MemoryContext.partition -> MemoryContext.partition
+  (** Computes the memory model partitionning of the memory locations.
+      This function typically adds new elements to the partition received
+      in input (that can be empty). *)
 
   module Chunk : Chunk
   (** Memory model chunks. *)
@@ -656,6 +657,9 @@ sig
 
   (** Update a frame with a specific environment for the given label. *)
   val set_at_frame : frame -> Clabels.c_label -> sigma -> unit
+
+  (** Chek if a frame already has a specific envioronement for the given label. *)
+  val has_at_frame : frame -> Clabels.c_label -> bool
 
   (** Same as [mem_at_frame] but for the current frame. *)
   val mem_frame : Clabels.c_label -> sigma

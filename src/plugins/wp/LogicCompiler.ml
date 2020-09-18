@@ -258,6 +258,10 @@ struct
       types = [];
     }
 
+  let has_at_frame frame label =
+    assert (not (Clabels.is_here label));
+    LabelMap.mem label frame.labels
+
   let mem_at_frame frame label =
     assert (not (Clabels.is_here label));
     try LabelMap.find label frame.labels

@@ -34,11 +34,11 @@ type model = {
 
 and rollback = (unit -> unit)
 and scope = Global | Kf of Kernel_function.t
-and hypotheses = unit -> MemoryContext.clause list
+and hypotheses = MemoryContext.partition -> MemoryContext.partition
 and context = model * scope
 and t = context
 
-let nohyp (_kf) = []
+let nohyp (_kf) = MemoryContext.empty
 
 module MODEL =
 struct
@@ -149,7 +149,8 @@ let get_context () = Context.get context |> snd
 let get_model () = get_context () |> fst
 let get_scope () = get_context () |> snd
 
-let compute_hypotheses m f = on_context (m,Kf f) m.hypotheses ()
+let compute_hypotheses m f =
+  on_context (m,Kf f) m.hypotheses MemoryContext.empty
 
 let directory () = get_model () |> MODEL.id |> Wp_parameters.get_output_dir
 

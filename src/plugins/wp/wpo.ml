@@ -283,8 +283,8 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
-               pp_prover prover (pp_result_qualif prover) result
+             Format.fprintf fmt "Prover %a returns %t@\n"
+               pp_prover prover (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -347,9 +347,9 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
+             Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover) result
+               (pp_result_qualif prover result)
         ) results ;
     end
 

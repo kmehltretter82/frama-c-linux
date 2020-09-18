@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_bts/bts_1828.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Alt-Ergo] Goal typed_local_frame_assert_ok : Valid
@@ -19,5 +18,6 @@
   global_frame              3        -        5      60.0%
 ------------------------------------------------------------
 [wp] Warning: Memory model hypotheses for function 'global_frame':
-  /*@ behavior typed: requires \separated(&zero,one); */
+  /*@ behavior typed:
+        requires \separated(one, &zero); */
   void global_frame(int *one, int arg);

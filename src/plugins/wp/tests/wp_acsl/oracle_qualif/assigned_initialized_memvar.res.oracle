@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_acsl/assigned_initialized_memvar.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 22 goals scheduled
 [wp] [Alt-Ergo] Goal typed_initialize_loop_invariant_CHECK_preserved : Valid

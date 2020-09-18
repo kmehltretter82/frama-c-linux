@@ -70,8 +70,8 @@ val pp_call_type : Format.formatter -> call_type -> unit
 val get_call_type : exp -> call_type
 
 type node_type = private
-  | Vstart | Vend | Vexit
-  | VfctIn | VfctOut
+  | Vstart | Vend
+  | VfctIn | VfctOut | VfctErr
   | VblkIn of block_type * block
   | VblkOut of block_type * block
   | Vstmt of stmt

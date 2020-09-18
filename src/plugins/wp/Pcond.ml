@@ -333,7 +333,7 @@ class engine (lang : #Plang.engine) =
 
 let is_nop = function None -> true | Some(_,upd) -> Bag.is_empty upd
 
-class sequence (lang : #state) =
+class seqengine (lang : #state) =
   object(self)
     inherit engine lang as super
 
@@ -440,7 +440,7 @@ class sequence (lang : #state) =
 
 let engine () =
   if Wp_parameters.has_dkey dkey_state then
-    ( new sequence (new state) :> engine )
+    ( new seqengine (new state) :> engine )
   else
     new engine (new Plang.engine)
 
@@ -449,15 +449,18 @@ let pretty fmt seq =
 
 let () = Conditions.pretty := pretty
 
-let sequence ?(clause="Sequence") fmt seq =
+let dump_sequence ?(clause="Sequence") ?goal fmt seq =
   let plang = new Plang.engine in
   let pcond = new engine plang in
   plang#global
-    (fun () ->
-       Vars.iter (fun x -> ignore (plang#bind x)) (Conditions.vars_hyp seq) ;
-       pcond#pp_sequence ~clause fmt seq)
+    begin fun () ->
+      pcond#pp_block ~clause fmt seq ;
+      match goal with
+      | None -> ()
+      | Some g -> Format.fprintf fmt "@ @[<hov 2>Prove %a@]" plang#pp_pred g
+    end
 
-let bundle ?clause fmt bundle =
-  sequence ?clause fmt (Conditions.bundle bundle)
+let dump_bundle ?clause ?goal fmt bundle =
+  dump_sequence ?clause ?goal fmt (Conditions.bundle bundle)
 
-let dump = bundle ~clause:"Bundle"
+let dump = dump_bundle ?goal:None ~clause:"Bundle"

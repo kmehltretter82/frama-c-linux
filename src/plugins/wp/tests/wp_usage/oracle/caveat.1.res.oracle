@@ -11,7 +11,6 @@ Function implicit: { a *r p q }
 Function explicit: { a *r p q }
 Function observer: { a *r p q }
 .................................................
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function explicit
@@ -72,24 +71,24 @@ Prove: P_OBS(x_2, x_3, x_4).
 [wp] Warning: Memory model hypotheses for function 'implicit':
   /*@
      behavior typed_caveat:
-     requires \separated(a,r);
-     requires \valid(a);
-     requires \valid(r);
+       requires \separated(a, r);
+       requires \valid(a);
+       requires \valid(r);
      */
   void implicit(struct S *a, int *r);
 [wp] Warning: Memory model hypotheses for function 'explicit':
   /*@
      behavior typed_caveat:
-     requires \separated(a,r);
-     requires \valid(a);
-     requires \valid(r);
+       requires \separated(a, r);
+       requires \valid(a);
+       requires \valid(r);
      */
   void explicit(struct S *a, int *r);
 [wp] Warning: Memory model hypotheses for function 'observer':
   /*@
      behavior typed_caveat:
-     requires \separated(a,r);
-     requires \valid(a);
-     requires \valid(r);
+       requires \separated(a, r);
+       requires \valid(a);
+       requires \valid(r);
      */
   void observer(struct S *a, int *r);

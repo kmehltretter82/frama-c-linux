@@ -30,6 +30,8 @@ val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int
 
+val is_updating : unit -> bool
+
 val cleanup_cache : unit -> unit
 
 type runner =

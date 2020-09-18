@@ -89,29 +89,46 @@ let wp_iter_model ?ip ?index job =
     Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
   end
 
-let wp_print_memory_context kf m hyp fmt =
+let wp_print_memory_context kf bhv fmt =
   begin
     let printer = new Printer.extensible_printer () in
     let pp_vdecl = printer#without_annot printer#vdecl in
-    Format.fprintf fmt
-      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (WpContext.MODEL.id m) ;
-    List.iter (MemoryContext.pp_clause fmt) hyp ;
+    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
     let vkf = Kernel_function.get_vi kf in
     Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
       pp_vdecl vkf ;
   end
 
+let wp_compute_memory_context model =
+  let hypotheses_computer = WpContext.compute_hypotheses model in
+  let name = WpContext.MODEL.id model in
+  MemoryContext.compute name hypotheses_computer
+
 let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let hyp = WpContext.compute_hypotheses m kf in
-        if hyp <> [] then
-          Wp_parameters.warning
-            ~current:false
-            "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-            (Kernel_function.get_name kf)
-            (wp_print_memory_context kf m hyp)
+        let hypotheses_computer = WpContext.compute_hypotheses m in
+        let model = WpContext.MODEL.id m in
+        let hyp = MemoryContext.get_behavior kf model hypotheses_computer in
+        match hyp with
+        | None -> ()
+        | Some bhv ->
+            Wp_parameters.warning
+              ~current:false
+              "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+              (Kernel_function.get_name kf)
+              (wp_print_memory_context kf bhv)
+      end
+  end
+
+let wp_insert_memory_context model =
+  begin
+    Wp_parameters.iter_fct
+      begin fun kf ->
+        let hyp_computer = WpContext.compute_hypotheses model in
+        let model_id = WpContext.MODEL.id model in
+        MemoryContext.add_behavior kf model_id hyp_computer
       end
   end
 
@@ -366,19 +383,21 @@ let results g =
     (Wpo.get_results g)
 
 let do_wpo_failed goal =
+  let updating = Cache.is_updating () in
   match results goal with
   | [p,r] ->
-      Wp_parameters.result "[%a] Goal %s : %a%a"
+      Wp_parameters.result "[%a] Goal %s : %t%a"
         VCS.pp_prover p (Wpo.get_gid goal)
-        (VCS.pp_result_qualif p) r pp_warnings goal
+        (VCS.pp_result_qualif ~updating p r) pp_warnings goal
   | pres ->
       Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
         begin fun fmt ->
           pp_warnings fmt goal ;
           List.iter
             (fun (p,r) ->
-               Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
-                 (VCS.title_of_prover p) (VCS.pp_result_qualif p) r
+               Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
+                 (VCS.title_of_prover p)
+                 (VCS.pp_result_qualif ~updating p r)
             ) pres ;
         end
 
@@ -391,11 +410,12 @@ let do_wpo_smoke status goal =
     (Wpo.get_gid goal)
     begin fun fmt ->
       pp_warnings fmt goal ;
+      let updating = Cache.is_updating () in
       List.iter
         (fun (p,r) ->
-           Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
+           Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
              (VCS.title_of_prover p)
-             (VCS.pp_result_qualif p) r
+             (VCS.pp_result_qualif ~updating p r)
         ) (results goal) ;
     end
 
@@ -428,10 +448,11 @@ let do_wpo_success goal s =
             VCS.pp_prover script (Wpo.get_gid goal)
       | Some prover ->
           let result = Wpo.get_result goal prover in
+          let updating = Cache.is_updating () in
           Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : %a"
+            "[%a] Goal %s : %t"
             VCS.pp_prover prover (Wpo.get_gid goal)
-            (VCS.pp_result_qualif prover) result
+            (VCS.pp_result_qualif ~updating prover result)
     end
 
 let do_report_time fmt s =
@@ -759,6 +780,9 @@ let cmdline_run () =
         WpContext.on_context (computer#model,WpContext.Global)
           LogicBuiltins.dump ();
       end ;
+    wp_compute_memory_context computer#model ;
+    if Wp_parameters.CheckModelHypotheses.get () then
+      wp_insert_memory_context computer#model fct ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   if Wp_parameters.CachePrint.get () then

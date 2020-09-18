@@ -31,6 +31,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "e_acsl_shadow_layout.h"
+
 /* Segment settings and shadow values interpretation {{{ */
 
 /* This file implements segment-based and offset-based shadow memory models

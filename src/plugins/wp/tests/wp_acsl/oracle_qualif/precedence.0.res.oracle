@@ -37,7 +37,6 @@
 [kernel:annot-error] tests/wp_acsl/precedence.i:176: Warning: 
   P is not a logic variable. Ignoring code annotation
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 52 goals scheduled
 [wp] [Qed] Goal typed_predicate_ensures_r_precedence_and_xor : Valid

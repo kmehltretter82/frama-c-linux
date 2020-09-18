@@ -1,0 +1,2 @@
+# ignore an eventual frama-c subfolder in this directory
+frama-c

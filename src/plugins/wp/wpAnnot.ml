@@ -1049,7 +1049,7 @@ let get_behavior_annots config =
         let post = get_fct_post_annots config Normal spec in
         WpStrategy.add_on_edges annots post (Cil2cfg.succ_e cfg v)
 
-    | Cil2cfg.Vexit ->
+    | Cil2cfg.VfctErr ->
         let post = get_fct_post_annots config Exits spec in
         WpStrategy.add_on_edges annots post (Cil2cfg.succ_e cfg v)
 
@@ -1306,7 +1306,7 @@ let process_unreached_annots cfg =
     | Cil2cfg.Vstart -> Wp_parameters.fatal "Start must be reachable"
     | Cil2cfg.VfctIn -> Wp_parameters.fatal "FctIn must be reachable"
     | Cil2cfg.VfctOut  -> List.fold_left (do_bhv Normal) acc spec.spec_behavior
-    | Cil2cfg.Vexit  ->
+    | Cil2cfg.VfctErr  ->
         let acc = List.fold_left (do_bhv Exits) acc spec.spec_behavior in
         let visitor = new vexit kf acc in
         ignore Visitor.(visitFramacKf (visitor :> frama_c_visitor) kf) ;
