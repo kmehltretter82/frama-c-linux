@@ -158,6 +158,10 @@ void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
 
+#ifdef E_ACSL_DEBUG_VERBOSE
+  DEBUG_PRINT_LAYOUT;
+#endif
+
   /* Each segment has 3 partitions:
 	 - application memory
      - primary/secondary shadows */
