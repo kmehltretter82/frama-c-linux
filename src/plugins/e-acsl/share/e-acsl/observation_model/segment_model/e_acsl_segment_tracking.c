@@ -172,19 +172,25 @@ void validate_shadow_layout() {
 #endif
   int num_segments = num_partitions*num_seg_in_part;
   uintptr_t segments[num_segments][2];
+  const char * segment_names[num_segments];
 
   size_t i;
   for (i = 0; i < num_partitions; i++) {
     memory_partition *p = mem_partitions[i];
+    segment_names[num_seg_in_part*i] = p->application.name;
     segments[num_seg_in_part*i][0] = p->application.start;
     segments[num_seg_in_part*i][1] = p->application.end;
+    segment_names[num_seg_in_part*i+1] = p->primary.name;
     segments[num_seg_in_part*i+1][0] = p->primary.start;
     segments[num_seg_in_part*i+1][1] = p->primary.end;
+    segment_names[num_seg_in_part*i+2] = p->secondary.name;
     segments[num_seg_in_part*i+2][0] = p->secondary.start;
     segments[num_seg_in_part*i+2][1] = p->secondary.end;
 #ifdef E_ACSL_TEMPORAL
+    segment_names[num_seg_in_part*i+3] = p->temporal_primary.name;
     segments[num_seg_in_part*i+3][0] = p->temporal_primary.start;
     segments[num_seg_in_part*i+3][1] = p->temporal_primary.end;
+    segment_names[num_seg_in_part*i+4] = p->temporal_secondary.name;
     segments[num_seg_in_part*i+4][0] = p->temporal_secondary.start;
     segments[num_seg_in_part*i+4][1] = p->temporal_secondary.end;
 #endif
@@ -194,14 +200,17 @@ void validate_shadow_layout() {
   size_t j;
   for (int i = 0; i < num_segments; i++) {
     uintptr_t *src = segments[i];
+    const char *src_name = segment_names[i];
     DVASSERT(src[0] < src[1],
-      "Segment start is greater than segment end %lu < %lu\n", src[0], src[1]);
+      "Segment %s start is greater than segment end %lu < %lu\n",
+      src_name, src[0], src[1]);
     for (j = 0; j < num_segments; j++) {
       if (i != j) {
         uintptr_t *dest = segments[j];
+        const char *dest_name = segment_names[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
-          "Segment [%lu, %lu] overlaps with segment [%lu, %lu]",
-          src[0], src[1], dest[0], dest[1]);
+          "Segment %s [%lu, %lu] overlaps with segment %s [%lu, %lu]",
+          src_name, src[0], src[1], dest_name, dest[0], dest[1]);
       }
     }
   }
