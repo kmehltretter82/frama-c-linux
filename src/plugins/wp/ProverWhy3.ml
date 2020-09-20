@@ -1198,34 +1198,11 @@ let ping_prover_call p =
         VCS.pp_result r;
       Task.Return (Task.Result r)
 
-let call_prover prover_config ~timeout ~steplimit drv prover task =
-  let steps = match steplimit with Some 0 -> None | _ -> steplimit in
-  let limit =
-    let def = Why3.Call_provers.empty_limit in
-    { def with
-      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
-      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
-    } in
-  let with_steps = match steps, prover_config.Why3.Whyconf.command_steps with
-    | None, _ -> false
-    | Some _, Some _ -> true
-    | Some _, None ->
-        Wp_parameters.warning ~once:true ~current:false
-          "%a does not support steps limit (ignored option)"
-          Why3.Whyconf.print_prover prover ;
-        false
-  in
-  let command = Why3.Whyconf.get_complete_command prover_config ~with_steps in
-  let call =
-    Why3.Driver.prove_task_prepared ~command ~limit drv task in
-  let pp_steps fmt s =
-    if with_steps then Format.fprintf fmt "%i steps" (Why3.Opt.get_def (-1) s)
-    else Format.fprintf fmt ""
-  in
-  Wp_parameters.debug ~dkey "Why3 run prover %a with %i timeout %a@."
+let call_prover_task ~timeout ~steps prover call =
+  Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %d, steps %d@."
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
-    pp_steps steps ;
+    (Why3.Opt.get_def (-1) steps) ;
   let timeout = match timeout with None -> 0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
@@ -1242,13 +1219,47 @@ let call_prover prover_config ~timeout ~steplimit drv prover task =
   in
   Task.async ping
 
-let is_trivial (t : Why3.Task.task) =
-  let goal = Why3.Task.task_goal_fmla t in
-  Why3.Term.t_equal goal Why3.Term.t_true
+(* -------------------------------------------------------------------------- *)
+(* --- Batch Prover                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let digest wpo drv prover task =
+  let file = Wpo.DISK.file_goal
+      ~pid:wpo.Wpo.po_pid
+      ~model:wpo.Wpo.po_model
+      ~prover:(VCS.Why3 prover) in
+  let _ = Command.print_file file
+      begin fun fmt ->
+        Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
+          (Why3Provers.print_why3 prover) ;
+        Why3.Driver.print_task_prepared drv fmt task ;
+      end
+  in Digest.file file |> Digest.to_hex
+
+let batch pconf driver ~timeout ~steplimit prover task =
+  let steps = match steplimit with Some 0 -> None | _ -> steplimit in
+  let limit =
+    let def = Why3.Call_provers.empty_limit in
+    { def with
+      Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
+      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
+    } in
+  let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
+    | None, _ -> false
+    | Some _, Some _ -> true
+    | Some _, None -> false
+  in
+  let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
+  let call = Why3.Driver.prove_task_prepared ~command ~limit driver task in
+  call_prover_task ~timeout ~steps prover call
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
 (* -------------------------------------------------------------------------- *)
+
+let is_trivial (t : Why3.Task.task) =
+  let goal = Why3.Task.task_goal_fmla t in
+  Why3.Term.t_equal goal Why3.Term.t_true
 
 let build_proof_task ?timeout ?steplimit ~prover wpo () =
   try
@@ -1259,12 +1270,14 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
     then Task.return VCS.no_result (* Only generate *)
     else
       let env = WpContext.on_context context get_why3_env () in
-      let drv , config , task = prover_task env prover task in
+      let drv , pconf , task = prover_task env prover task in
       if is_trivial task then
         Task.return VCS.valid
       else
-        Cache.get_result wpo (call_prover config)
-          ~timeout ~steplimit drv prover task
+        Cache.get_result
+          ~digest:(digest wpo drv)
+          ~runner:(batch pconf drv)
+          ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"
