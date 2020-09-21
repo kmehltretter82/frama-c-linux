@@ -622,6 +622,20 @@ module Provers = String_list
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module Interactive = String
+    (struct
+      let option_name = "-wp-interactive"
+      let arg_name = "mode"
+      let default = "batch"
+      let help =
+        "WP mode for interactive provers:\n\
+         - 'batch': use scripts (default)\n\
+         - 'edit': run editor on every goal\n\
+         - 'fix': run editor on unproved goal\n\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module RunAllProvers =
   False(struct
     let option_name = "-wp-run-all-provers"

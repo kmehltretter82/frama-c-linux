@@ -1163,7 +1163,8 @@ let ping_prover_call p =
               let time = Unix.time () in
               if time > timeout then
                 begin
-                  Wp_parameters.debug ~dkey "Hard Kill (late why3server timeout)" ;
+                  Wp_parameters.debug ~dkey
+                    "Hard Kill (late why3server timeout)" ;
                   p.interrupted <- true ;
                   Why3.Call_provers.interrupt_call p.call ;
                 end
@@ -1271,7 +1272,7 @@ let editor pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  Format.sprintf "%s/%s.%s" (dir :> string) wpo.Wpo.po_sid ext
+  Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
 let call_editor ~script pconf =
   Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;

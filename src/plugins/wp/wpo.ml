@@ -954,7 +954,7 @@ let goals_of_property =
 let prover_of_name =
   Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name" ~journalize:false
     (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.prover_of_name
+    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)

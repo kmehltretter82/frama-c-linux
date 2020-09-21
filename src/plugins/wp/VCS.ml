@@ -38,7 +38,7 @@ type mode =
   | EditMode  (* Edit then check scripts *)
   | FixMode   (* Try check script, then edit script on non-success *)
 
-let prover_of_name = function
+let parse_prover = function
   | "" | "none" -> None
   | "qed" | "Qed" -> Some Qed
   | "native-alt-ergo" (* for wp-reports *)
@@ -70,13 +70,19 @@ let prover_of_name = function
             (String.concat ":" prv) (Why3Provers.print_wp p) ;
           Some (Why3 p)
       | NotFound ->
-          Wp_parameters.error "Prover '%s' not found in why3.conf" name ;
+          Wp_parameters.error ~once:true
+            "Prover '%s' not found in why3.conf" name ;
           None
 
-let mode_of_prover_name = function
-  | "native:coqedit" -> EditMode
-  | "native:coqide" | "native:altgr-ergo" -> FixMode
-  | _ -> BatchMode
+let parse_mode m =
+  match String.lowercase_ascii m with
+  | "fix" -> FixMode
+  | "edit" -> EditMode
+  | "batch" -> BatchMode
+  | _ ->
+      Wp_parameters.error ~once:true
+        "Unrecognized mode %S (use 'batch' instead)" m ;
+      BatchMode
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.print_wp s
@@ -126,12 +132,14 @@ let is_auto = function
   | Tactical | NativeCoq -> false
   | Why3 p ->
       match p.prover_name with
-      | "Alt-Ergo" | "CVC4" | "Z3" -> false
-      | "Coq" -> true
+      | "Alt-Ergo" | "CVC4" | "Z3" -> true
+      | "Coq" -> false
       | _ ->
           let config = Why3Provers.config () in
-          let prover_config = Why3.Whyconf.get_prover_config config p in
-          not prover_config.interactive
+          try
+            let prover_config = Why3.Whyconf.get_prover_config config p in
+            not prover_config.interactive
+          with Not_found -> true
 
 let cmp_prover p q =
   match p,q with

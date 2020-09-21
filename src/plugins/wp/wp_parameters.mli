@@ -108,6 +108,7 @@ module PrecondWeakening : Parameter_sig.Bool
 module Detect: Parameter_sig.Bool
 module Generate:Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
+module Interactive: Parameter_sig.String
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool

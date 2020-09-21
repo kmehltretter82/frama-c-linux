@@ -551,7 +551,7 @@ let do_list_scheduled_result () =
 (* ---  Proving                                                         --- *)
 (* ------------------------------------------------------------------------ *)
 
-type mode = {
+type script = {
   mutable tactical : bool ;
   mutable update : bool ;
   mutable depth : int ;
@@ -561,24 +561,24 @@ type mode = {
   mutable provers : (VCS.mode * VCS.prover) list ;
 }
 
-let spawn_wp_proofs ~mode goals =
-  if mode.tactical || mode.provers<>[] then
+let spawn_wp_proofs ~script goals =
+  if script.tactical || script.provers<>[] then
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
       Bag.iter
         (fun goal ->
-           if  mode.tactical
+           if  script.tactical
             && not (Wpo.is_trivial goal)
-            && (mode.auto <> [] || ProofSession.exists goal)
+            && (script.auto <> [] || ProofSession.exists goal)
            then
              ProverScript.spawn
                ~failed:false
-               ~auto:mode.auto
-               ~depth:mode.depth
-               ~width:mode.width
-               ~backtrack:mode.backtrack
-               ~provers:(List.map snd mode.provers)
+               ~auto:script.auto
+               ~depth:script.depth
+               ~width:script.width
+               ~backtrack:script.backtrack
+               ~provers:(List.map snd script.provers)
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
@@ -591,7 +591,7 @@ let spawn_wp_proofs ~mode goals =
                ~progress:do_progress
                ~result:do_wpo_result
                ~success:do_wpo_success
-               mode.provers
+               script.provers
         ) goals ;
       Task.on_server_wait server do_wpo_wait ;
       Task.launch server
@@ -604,19 +604,20 @@ let env_script_update () =
   try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
   with Not_found -> false
 
-let compute_provers ~mode =
-  mode.provers <- List.fold_right
-      (fun pname prvs ->
-         match VCS.prover_of_name pname with
-         | None -> prvs
-         | Some VCS.Tactical ->
-             mode.tactical <- true ;
-             if pname = "tip" || env_script_update () then
-               mode.update <- true ;
-             prvs
-         | Some prover ->
-             (VCS.mode_of_prover_name pname , prover) :: prvs)
-      (get_prover_names ()) []
+let compute_provers ~mode ~script =
+  script.provers <- List.fold_right
+      begin fun pname prvs ->
+        match VCS.parse_prover pname with
+        | None -> prvs
+        | Some VCS.Tactical ->
+            script.tactical <- true ;
+            if pname = "tip" || env_script_update () then
+              script.update <- true ;
+            prvs
+        | Some prover ->
+            let pmode = if VCS.is_auto prover then VCS.BatchMode else mode in
+            (pmode , prover) :: prvs
+      end (get_prover_names ()) []
 
 let dump_strategies =
   let once = ref true in
@@ -629,18 +630,18 @@ let dump_strategies =
                  Format.fprintf fmt "@\n  '%s': %s" h#id h#title
                )))
 
-let default_mode () = {
+let default_script_mode () = {
   tactical = false ; update=false ; provers = [] ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
-let compute_auto ~mode =
-  mode.auto <- [] ;
-  mode.width <- Wp_parameters.AutoWidth.get () ;
-  mode.depth <- Wp_parameters.AutoDepth.get () ;
-  mode.backtrack <- max 0 (Wp_parameters.BackTrack.get ()) ;
+let compute_auto ~script =
+  script.auto <- [] ;
+  script.width <- Wp_parameters.AutoWidth.get () ;
+  script.depth <- Wp_parameters.AutoDepth.get () ;
+  script.backtrack <- max 0 (Wp_parameters.BackTrack.get ()) ;
   let auto = Wp_parameters.Auto.get () in
-  if mode.depth <= 0 || mode.width <= 0 then
+  if script.depth <= 0 || script.width <= 0 then
     ( if auto <> [] then
         Wp_parameters.feedback
           "Auto-search deactivated because of 0-depth or 0-width" )
@@ -650,17 +651,17 @@ let compute_auto ~mode =
         (fun id ->
            if id = "?" then dump_strategies ()
            else
-             try mode.auto <- Strategy.lookup ~id :: mode.auto
+             try script.auto <- Strategy.lookup ~id :: script.auto
              with Not_found ->
                Wp_parameters.error ~current:false
                  "Strategy -wp-auto '%s' unknown (ignored)." id
         ) auto ;
-      mode.auto <- List.rev mode.auto ;
-      if mode.auto <> [] then mode.tactical <- true ;
+      script.auto <- List.rev script.auto ;
+      if script.auto <> [] then script.tactical <- true ;
     end
 
-let do_update_session mode goals =
-  if mode.update then
+let do_update_session ~script goals =
+  if script.update then
     begin
       let removed = ref 0 in
       let updated = ref 0 in
@@ -714,24 +715,25 @@ let do_update_session mode goals =
     end
 
 let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
-  let mode = default_mode () in
-  compute_provers ~mode ;
-  compute_auto ~mode ;
+  let script = default_script_mode () in
+  let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
+  compute_provers ~mode ~script ;
+  compute_auto ~script ;
   begin match provers with None -> () | Some prvs ->
-    mode.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
+    script.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
   end ;
   begin match tip with None -> () | Some tip ->
-    mode.tactical <- tip ;
-    mode.update <- tip ;
+    script.tactical <- tip ;
+    script.update <- tip ;
   end ;
-  let spawned = mode.tactical || mode.provers <> [] in
+  let spawned = script.tactical || script.provers <> [] in
   begin
     if spawned then do_list_scheduled goals ;
-    spawn_wp_proofs ~mode goals ;
+    spawn_wp_proofs ~script goals ;
     if spawned then
       begin
         do_list_scheduled_result () ;
-        do_update_session mode goals ;
+        do_update_session ~script goals ;
       end
     else if not (Wp_parameters.Print.get ()) then
       Bag.iter do_wpo_display goals
