@@ -143,11 +143,6 @@ val no_category: unit -> unit
     @since Sodium-20150201
  *)
 
-val is_permissive_ref: bool ref
-(** if [true], less checks are performed on value of arguments.
-    Set by {!Kernel.Permissive} option
- *)
-
 (* ************************************************************************* *)
 (** {2 Function names} *)
 (* ************************************************************************* *)

@@ -246,6 +246,9 @@ module GeneralDebug: Parameter_sig.Int
 module Quiet: Parameter_sig.Bool
 (** Behavior of option "-quiet" *)
 
+module Permissive: Parameter_sig.Bool
+(** Behavior of option "-permissive" *)
+
 (** @plugin development guide *)
 module Unicode: sig
   include Parameter_sig.Bool

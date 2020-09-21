@@ -16,6 +16,9 @@
 ##################################
 Open Source Release <next-release>
 ##################################
+
+-   Kernel    [2020-09-21] Option -permissive now allows non-existent option
+              names.
 -   Logic     [2020-09-11] Introduce check-only annotations for
               requires, ensures, loop invariant and lemmas
 -   Kernel    [2020-09-08] Add option -print-cpp-commands, to print the
