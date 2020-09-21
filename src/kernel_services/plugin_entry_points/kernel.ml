@@ -1639,6 +1639,7 @@ let () =
 let checks = add_group "Checks"
 
 let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_reset_on_copy ()
 module Check =
   False(struct
@@ -1649,6 +1650,7 @@ module Check =
   end)
 
 let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
 module Copy =
   False(struct
     let option_name = "-copy"
@@ -1658,6 +1660,7 @@ module Copy =
   end)
 
 let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_negative_option_name ""
 module TypeCheck =
   True(struct
@@ -1710,6 +1713,7 @@ module Deterministic =
     end)
 
 let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module Permissive =

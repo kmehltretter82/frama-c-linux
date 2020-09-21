@@ -399,7 +399,7 @@ val deterministic: bool
 val permissive: bool
   (** Downgrades some command-line errors to warnings, such as
       unknown option names and invalid values for some options
-      (e.g. inexistent function names).
+      (e.g. non-existent function names).
 
       @since Frama-C+dev *)
 
