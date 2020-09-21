@@ -2,7 +2,7 @@
   OPT: -wp-prop=CHECK
 */
 /* run.config_qualif
-  OPT: -wp-prop=CHECK
+  OPT: -wp-prop=CHECK -wp-timeout 20
 */
 
 struct S {
