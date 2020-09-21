@@ -1153,18 +1153,20 @@ let ping_prover_call p =
   match Why3.Call_provers.query_call p.call with
   | NoUpdates
   | ProverStarted ->
-      let () = match p.timeover with
-        | None ->
-            let started = Unix.time () in
-            p.timeover <- Some (started +. 2.0 +. float p.timeout)
-        | Some timeout ->
-            let time = Unix.time () in
-            if time > timeout then
-              begin
-                Wp_parameters.debug ~dkey "Hard Kill (late why3server timeout)" ;
-                p.interrupted <- true ;
-                Why3.Call_provers.interrupt_call p.call ;
-              end
+      let () =
+        if p.timeout > 0 then
+          match p.timeover with
+          | None ->
+              let started = Unix.time () in
+              p.timeover <- Some (started +. 2.0 +. float p.timeout)
+          | Some timeout ->
+              let time = Unix.time () in
+              if time > timeout then
+                begin
+                  Wp_parameters.debug ~dkey "Hard Kill (late why3server timeout)" ;
+                  p.interrupted <- true ;
+                  Why3.Call_provers.interrupt_call p.call ;
+                end
       in Task.Wait 100
   | InternalFailure exn ->
       let msg = Format.asprintf "@[<hov 2>%a@]"
@@ -1279,9 +1281,10 @@ let prepare ~file driver task =
 
 let editscript ~file pconf =
   let call = Why3.Call_provers.call_editor ~command:(editor pconf) file in
+  Wp_parameters.feedback ~ontty:`Transient "Editing %S..." file ;
   call_prover_task ~timeout:None ~steps:None pconf.prover call
 
-let interactive wpo pconf driver prover task =
+let interactive ~ide wpo pconf driver prover task =
   let file = script ~force:true wpo in
   if not (Sys.file_exists file) then prepare ~file driver task ;
   let time = Wp_parameters.CoqTimeout.get () in
@@ -1289,7 +1292,7 @@ let interactive wpo pconf driver prover task =
   let open Task in
   batch pconf driver ~script:file ~timeout ~steplimit:None prover task
   >>= fun result ->
-  if VCS.is_valid result then
+  if not ide || VCS.is_valid result then
     Task.return result
   else
     editscript ~file pconf >>= fun _ ->
@@ -1317,7 +1320,7 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
         Task.return VCS.valid
       else
       if prover.prover_name = "Coq" then
-        interactive wpo pconf drv prover task
+        interactive ~ide:true wpo pconf drv prover task
       else
         Cache.get_result
           ~digest:(digest wpo drv)
