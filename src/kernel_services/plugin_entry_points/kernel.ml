@@ -438,8 +438,11 @@ let _ =
         fun f acc ->
         FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
       method mem name =
-        FcPlugin.fold_on_plugins
-          (fun p found -> found || name = p.FcPlugin.p_shortname) false
+        try
+          FcPlugin.iter_on_plugins
+            (fun p -> if name = p.FcPlugin.p_shortname then raise Exit);
+          false
+        with Exit -> true
     end)
 
 let () = Parameter_customize.set_group help
