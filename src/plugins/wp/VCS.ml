@@ -289,22 +289,24 @@ let cached r = if is_verdict r then { r with cached=true } else r
 
 let kfailed ?pos msg = Pretty_utils.ksfprintf (failed ?pos) msg
 
-let perfo dkey = not (Wp_parameters.has_dkey dkey)
-
-let pp_perf fmt r =
+let pp_perf_forced fmt r =
   begin
     let t = r.solver_time in
-    if t > Rformat.epsilon && perfo dkey_shell
+    if t > Rformat.epsilon
     then Format.fprintf fmt " (Qed:%a)" Rformat.pp_time t ;
     let t = r.prover_time in
-    if t > Rformat.epsilon && perfo dkey_shell
+    if t > Rformat.epsilon
     then Format.fprintf fmt " (%a)" Rformat.pp_time t ;
     let s = r.prover_steps in
-    if s > 0 && perfo dkey_shell
+    if s > 0
     then Format.fprintf fmt " (%d)" s ;
-    if r.cached && perfo dkey_shell
+    if r.cached
     then Format.fprintf fmt " (cached)" ;
   end
+
+let pp_perf_shell fmt r =
+  if not (Wp_parameters.has_dkey dkey_shell) then
+    pp_perf_forced fmt r
 
 let pp_result fmt r =
   match r.verdict with
@@ -312,10 +314,10 @@ let pp_result fmt r =
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Invalid -> Format.pp_print_string fmt "Invalid"
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
-  | Valid -> Format.fprintf fmt "Valid%a" pp_perf r
-  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf r
-  | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf r
-  | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf r
+  | Valid -> Format.fprintf fmt "Valid%a" pp_perf_shell r
+  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf_shell r
+  | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf_shell r
+  | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf_shell r
 
 let is_qualified prover result =
   match prover with
@@ -328,7 +330,7 @@ let pp_cache_miss fmt st updating prover result =
   && not (is_qualified prover result)
   && Wp_parameters.has_dkey dkey_shell
   then
-    Format.fprintf fmt "%s%a (missing cache)" st pp_perf result
+    Format.fprintf fmt "%s%a (missing cache)" st pp_perf_forced result
   else
     Format.pp_print_string fmt @@
     if is_valid result then "Valid" else "Unsuccess"

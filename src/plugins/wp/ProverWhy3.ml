@@ -1216,8 +1216,8 @@ let call_prover prover_config ~timeout ~steplimit drv prover task =
         false
   in
   let command = Why3.Whyconf.get_complete_command prover_config ~with_steps in
-  let call =
-    Why3.Driver.prove_task_prepared ~command ~limit drv task in
+  let call = Why3.Driver.prove_task_prepared ~command ~limit drv task in
+  let steps = if with_steps then steps else None in
   let pp_steps fmt s =
     if with_steps then Format.fprintf fmt "%i steps" (Why3.Opt.get_def (-1) s)
     else Format.fprintf fmt ""
