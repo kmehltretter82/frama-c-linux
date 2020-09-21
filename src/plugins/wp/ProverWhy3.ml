@@ -1298,7 +1298,7 @@ let prepare ~mode wpo driver task =
   else None
 
 let interactive ~mode wpo pconf driver prover task =
-  let time = Wp_parameters.CoqTimeout.get () in
+  let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
   match prepare ~mode wpo driver task with
   | None -> Task.return VCS.unknown

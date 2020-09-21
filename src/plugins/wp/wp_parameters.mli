@@ -119,6 +119,7 @@ module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
 module SmokeTimeout: Parameter_sig.Int
+module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
 module CoqTimeout: Parameter_sig.Int

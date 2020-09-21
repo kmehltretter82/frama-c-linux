@@ -629,9 +629,9 @@ module Interactive = String
       let default = "batch"
       let help =
         "WP mode for interactive provers:\n\
-         - 'batch': use scripts (default)\n\
+         - 'batch': use script only (default)\n\
          - 'edit': run editor on every goal\n\
-         - 'fix': run editor on unproved goal\n\
+         - 'fix': run editor for unproved goal\n\
         "
     end)
 
@@ -744,6 +744,18 @@ module SmokeTimeout =
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module InteractiveTimeout =
+  Int(struct
+    let option_name = "-wp-interactive-timeout"
+    let default = 30
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for checking scripts\n\
+         of interactive provers (default: %d)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
