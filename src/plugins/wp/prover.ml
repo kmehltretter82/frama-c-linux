@@ -40,7 +40,7 @@ let dispatch ?(config=VCS.default) mode prover wpo =
         ProverWhy3.prove
           ~timeout:(VCS.get_timeout ~smoke config)
           ~steplimit:(VCS.get_stepout config)
-          ~prover wpo
+          ~mode ~prover wpo
   end
 
 let started ?start wpo =

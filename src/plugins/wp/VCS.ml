@@ -122,8 +122,16 @@ let filename_for_prover = function
   | Tactical -> "Tactical"
 
 let is_auto = function
-  | Qed | NativeAltErgo | Why3 _ -> true
+  | Qed | NativeAltErgo -> true
   | Tactical | NativeCoq -> false
+  | Why3 p ->
+      match p.prover_name with
+      | "Alt-Ergo" | "CVC4" | "Z3" -> false
+      | "Coq" -> true
+      | _ ->
+          let config = Why3Provers.config () in
+          let prover_config = Why3.Whyconf.get_prover_config config p in
+          not prover_config.interactive
 
 let cmp_prover p q =
   match p,q with

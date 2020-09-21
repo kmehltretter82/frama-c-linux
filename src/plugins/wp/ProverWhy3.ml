@@ -1268,35 +1268,53 @@ let editor pconf =
     String.concat " " (ed.editor_command :: ed.editor_options)
   with Not_found ->
     Why3.Whyconf.(default_editor (get_main config))
-[@@ warning "-32"]
 
-let script ~force wpo =
-  let dir = Wp_parameters.get_session_dir ~force "coq" in
-  Format.sprintf "%s/%s.v" (dir :> string) wpo.Wpo.po_sid
+let scriptfile ~force ~ext wpo =
+  let dir = Wp_parameters.get_session_dir ~force "interactive" in
+  Format.sprintf "%s/%s.%s" (dir :> string) wpo.Wpo.po_sid ext
 
-let prepare ~file driver task =
-  Command.pp_to_file file (fun fmt ->
-      ignore (Why3.Driver.print_task_prepared driver fmt task)
-    )
-
-let editscript ~file pconf =
-  let call = Why3.Call_provers.call_editor ~command:(editor pconf) file in
-  Wp_parameters.feedback ~ontty:`Transient "Editing %S..." file ;
+let call_editor ~script pconf =
+  Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
+  let call = Why3.Call_provers.call_editor ~command:(editor pconf) script in
   call_prover_task ~timeout:None ~steps:None pconf.prover call
 
-let interactive ~ide wpo pconf driver prover task =
-  let file = script ~force:true wpo in
-  if not (Sys.file_exists file) then prepare ~file driver task ;
+let compile ~script ~timeout pconf driver prover task =
+  let digest _prover _task = Digest.file script |> Digest.to_hex in
+  let runner = batch pconf driver ~script in
+  Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
+
+let prepare ~mode wpo driver task =
+  let force = match mode with VCS.BatchMode -> false | _ -> true in
+  let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
+  let script = scriptfile ~force wpo ~ext in
+  if Sys.file_exists script then Some script
+  else if force then
+    begin
+      Command.pp_to_file script (fun fmt ->
+          ignore (Why3.Driver.print_task_prepared driver fmt task)
+        ) ; Some script
+    end
+  else None
+
+let interactive ~mode wpo pconf driver prover task =
   let time = Wp_parameters.CoqTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
-  let open Task in
-  batch pconf driver ~script:file ~timeout ~steplimit:None prover task
-  >>= fun result ->
-  if not ide || VCS.is_valid result then
-    Task.return result
-  else
-    editscript ~file pconf >>= fun _ ->
-    batch pconf driver ~script:file ~timeout ~steplimit:None prover task
+  match prepare ~mode wpo driver task with
+  | None -> Task.return VCS.unknown
+  | Some script ->
+      match mode with
+      | VCS.BatchMode ->
+          compile ~script ~timeout pconf driver prover task
+      | VCS.EditMode ->
+          let open Task in
+          call_editor ~script pconf >>= fun _ ->
+          compile ~script ~timeout pconf driver prover task
+      | VCS.FixMode ->
+          let open Task in
+          compile ~script ~timeout pconf driver prover task >>= fun r ->
+          if VCS.is_valid r then return r else
+            call_editor ~script pconf >>= fun _ ->
+            compile ~script ~timeout pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1306,7 +1324,7 @@ let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
   Why3.Term.t_equal goal Why3.Term.t_true
 
-let build_proof_task ?timeout ?steplimit ~prover wpo () =
+let build_proof_task ?(mode=VCS.BatchMode) ?timeout ?steplimit ~prover wpo () =
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
@@ -1319,8 +1337,8 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
       if is_trivial task then
         Task.return VCS.valid
       else
-      if prover.prover_name = "Coq" then
-        interactive ~ide:true wpo pconf drv prover task
+      if pconf.interactive then
+        interactive ~mode wpo pconf drv prover task
       else
         Cache.get_result
           ~digest:(digest wpo drv)
@@ -1334,7 +1352,7 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
     else
       Task.failed "[Why3 Error] %a" Why3.Exn_printer.exn_printer exn
 
-let prove ?timeout ?steplimit ~prover wpo =
-  Task.later (build_proof_task ?timeout ?steplimit ~prover wpo) ()
+let prove ?mode ?timeout ?steplimit ~prover wpo =
+  Task.later (build_proof_task ?mode ?timeout ?steplimit ~prover wpo) ()
 
 (* -------------------------------------------------------------------------- *)
