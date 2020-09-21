@@ -1236,7 +1236,7 @@ let digest wpo drv prover task =
       end
   in Digest.file file |> Digest.to_hex
 
-let batch pconf driver ~timeout ~steplimit prover task =
+let batch pconf driver ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
     let def = Why3.Call_provers.empty_limit in
@@ -1250,8 +1250,50 @@ let batch pconf driver ~timeout ~steplimit prover task =
     | Some _, None -> false
   in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
-  let call = Why3.Driver.prove_task_prepared ~command ~limit driver task in
+  let inplace = if script <> None then Some true else None in
+  let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
+      ~command ~limit driver task in
   call_prover_task ~timeout ~steps prover call
+
+(* -------------------------------------------------------------------------- *)
+(* --- Interactive Prover (Coq)                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let editor pconf =
+  let config = Why3Provers.config () in
+  try
+    let ed = Why3.Whyconf.editor_by_id config pconf.Why3.Whyconf.editor in
+    String.concat " " (ed.editor_command :: ed.editor_options)
+  with Not_found ->
+    Why3.Whyconf.(default_editor (get_main config))
+[@@ warning "-32"]
+
+let script ~force wpo =
+  let dir = Wp_parameters.get_session_dir ~force "coq" in
+  Format.sprintf "%s/%s.v" (dir :> string) wpo.Wpo.po_sid
+
+let prepare ~file driver task =
+  Command.pp_to_file file (fun fmt ->
+      ignore (Why3.Driver.print_task_prepared driver fmt task)
+    )
+
+let editscript ~file pconf =
+  let call = Why3.Call_provers.call_editor ~command:(editor pconf) file in
+  call_prover_task ~timeout:None ~steps:None pconf.prover call
+
+let interactive wpo pconf driver prover task =
+  let file = script ~force:true wpo in
+  if not (Sys.file_exists file) then prepare ~file driver task ;
+  let time = Wp_parameters.CoqTimeout.get () in
+  let timeout = if time <= 0 then None else Some time in
+  let open Task in
+  batch pconf driver ~script:file ~timeout ~steplimit:None prover task
+  >>= fun result ->
+  if VCS.is_valid result then
+    Task.return result
+  else
+    editscript ~file pconf >>= fun _ ->
+    batch pconf driver ~script:file ~timeout ~steplimit:None prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1274,9 +1316,12 @@ let build_proof_task ?timeout ?steplimit ~prover wpo () =
       if is_trivial task then
         Task.return VCS.valid
       else
+      if prover.prover_name = "Coq" then
+        interactive wpo pconf drv prover task
+      else
         Cache.get_result
           ~digest:(digest wpo drv)
-          ~runner:(batch pconf drv)
+          ~runner:(batch pconf drv ?script:None)
           ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
