@@ -47,6 +47,9 @@ let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr ~category:L.Injection "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"
 
+let f_base_offset_table = Lang.extern_f ~library
+    ~category:Qed.Logic.Function ~result:L.Int "base_offset_table"
+
 let f_base_offset = Lang.extern_f ~library
     ~category:Qed.Logic.Injection ~result:L.Int "base_offset"
 
@@ -108,7 +111,9 @@ let a_offset p = e_fun f_offset [p]
 let a_global b = e_fun f_global [b]
 let a_shift l k = e_fun f_shift [l;k]
 let a_addr b k = a_shift (a_global b) k
-let a_base_offset k = e_fun f_base_offset [k]
+let a_base_offset b k =
+  let offset_index = e_fun f_base_offset_table [b] in
+  e_fun f_base_offset [offset_index ; k]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Qed Simplifiers                                                    --- *)

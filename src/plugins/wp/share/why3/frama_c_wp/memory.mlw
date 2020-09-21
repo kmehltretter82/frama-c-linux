@@ -182,8 +182,15 @@ theory Memory
 
   function int_of_addr addr : int
   function addr_of_int int : addr
-  function base_offset int : int
-  function base_index int : int
+  function base_offset int int : int
+  function base_offset_table int : int
+
+  axiom base_offset_zero:
+    forall table: int. base_offset table 0 = 0
+
+  axiom base_offset_monotonic:
+    forall table o1 o2: int.
+      o1 <= o2 <-> base_offset table o1 <= base_offset table o2
 
   axiom int_of_addr_bijection :
     forall a:int. int_of_addr (addr_of_int a) = a

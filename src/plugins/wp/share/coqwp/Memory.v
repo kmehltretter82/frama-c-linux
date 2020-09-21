@@ -348,11 +348,11 @@ Definition addr_of_int : Z -> addr.
 Admitted.
 
 (* Why3 goal *)
-Definition base_offset: Z -> Z.
+Definition base_offset: Z -> Z -> Z.
 Admitted.
 
 (* Why3 goal *)
-Definition base_index: Z -> Z.
+Definition base_offset_table: Z -> Z.
 Admitted.
 
 (* Why3 goal *)
@@ -370,15 +370,30 @@ Lemma addr_of_null : ((int_of_addr null) = 0%Z).
 Admitted.
 
 (* Why3 goal *)
-Lemma base_offset_zero : ((base_offset 0%Z) = 0%Z).
+Lemma base_offset_zero : forall (t: Z), ((base_offset t 0%Z) = 0%Z).
 Admitted.
 
 (* Why3 goal *)
-Lemma base_offset_inj : forall (i:Z), ((base_index (base_offset i)) = i).
+Lemma base_offset_monotonic : forall (t:Z) (i:Z) (j:Z), (i <= j)%Z ->
+  ((base_offset t i) <= (base_offset t j))%Z.
 Admitted.
 
-(* Why3 goal *)
-Lemma base_offset_monotonic : forall (i:Z) (j:Z), (i < j)%Z ->
-  ((base_offset i) < (base_offset j))%Z.
+Definition cinits (m: farray addr bool) : Prop.
 Admitted.
 
+Definition is_init_range(m: farray addr bool) (p: addr) (l: Z) :=
+  forall i : int, (0 <= i)%Z /\ (i < l)%Z -> m .[ shift p i ] = true.
+
+Definition set_init (m: farray addr bool) (p:addr) (a: Z) : farray addr bool.
+Admitted.
+
+Lemma set_init_access:
+  forall m: farray addr bool,
+  forall q p : addr,
+  forall a : int,
+    (~  separated q 1%Z p a -> (set_init m p a) .[ q ] = m .[ q ])
+    /\ (separated q 1%Z p a -> (set_init m p a) .[ q ] = true).
+Admitted.
+
+Definition monotonic_init(m1 m2 : farray addr bool) :=
+  forall p: addr, m1 .[ p ] = true -> m2 .[ p ] = true.
