@@ -29,6 +29,7 @@ open Cil_types
 let stmt sk = Cil.mkStmt ~valid_sid:true sk
 let instr i = stmt (Instr i)
 let block_stmt blk = stmt (Block blk)
+let block_from_stmts stmts = block_stmt (Cil.mkBlock stmts)
 let call ~loc ?result e args = instr (Call(result, e, args, loc))
 
 let assigns ~loc ~result e = instr (Set(result, e, loc))
