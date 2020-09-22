@@ -4,6 +4,10 @@
 [wp] Warning: Missing RTE guards
 [wp] 15 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_Lb : Valid
+[wp] [Qed] Goal typed_loop_statement_requires_Scond : Valid
+[wp] [Qed] Goal typed_loop_statement_ensures_Sbody : Valid
+[wp] [Qed] Goal typed_loop_statement_assigns : Valid
+[wp] [Alt-Ergo] Goal typed_loop_statement_requires_Rinv : Valid
 [wp] [Qed] Goal typed_loop_statement_ensures_Scond : Valid
 [wp] [Qed] Goal typed_loop_statement_ensures_Sloop : Valid
 [wp] [Alt-Ergo] Goal typed_loop_statement_loop_invariant_Iloop_preserved : Valid
@@ -14,10 +18,6 @@
 [wp] [Qed] Goal typed_loop_statement_assigns_2_exit_part2 : Valid
 [wp] [Qed] Goal typed_loop_statement_assigns_2_normal_part1 : Valid
 [wp] [Qed] Goal typed_loop_statement_assigns_2_normal_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_loop_statement_requires_Rinv : Valid
-[wp] [Qed] Goal typed_loop_statement_requires_Scond : Valid
-[wp] [Qed] Goal typed_loop_statement_ensures_Sbody : Valid
-[wp] [Qed] Goal typed_loop_statement_assigns : Valid
 [wp] Proved goals:   15 / 15
   Qed:            11 
   Alt-Ergo:        4

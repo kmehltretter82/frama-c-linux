@@ -5,11 +5,11 @@
 [wp] 7 goals scheduled
 [wp] [Alt-Ergo] Goal typed_f_ensures_qed_ok : Valid
 [wp] [Alt-Ergo] Goal typed_g_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_modifies_x_ensures_qed_ok_F_OK : Valid
-[wp] [Alt-Ergo] Goal typed_modifies_x_ensures_qed_ok_W_OK_todo : Unsuccess
 [wp] [Qed] Goal typed_modifies_y_ensures_qed_ok_F_OK : Valid
 [wp] [Qed] Goal typed_modifies_y_ensures_qed_ok_G_OK : Valid
 [wp] [Alt-Ergo] Goal typed_modifies_y_ensures_qed_ok_W_OK_todo : Unsuccess
+[wp] [Qed] Goal typed_modifies_x_ensures_qed_ok_F_OK : Valid
+[wp] [Alt-Ergo] Goal typed_modifies_x_ensures_qed_ok_W_OK_todo : Unsuccess
 [wp] Proved goals:    5 / 7
   Qed:             3 
   Alt-Ergo:        2  (unsuccess: 2)

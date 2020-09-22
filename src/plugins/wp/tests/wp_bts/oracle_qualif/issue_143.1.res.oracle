@@ -3,8 +3,8 @@
 [wp] Running WP plugin...
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 2 goals scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_ok_because_inconsistent : Valid
 [wp] [Alt-Ergo] Goal typed_lemma_ok_because_consistent : Valid
+[wp] [Alt-Ergo] Goal typed_lemma_ok_because_inconsistent : Valid
 [wp] Proved goals:    2 / 2
   Qed:             0 
   Alt-Ergo:        2

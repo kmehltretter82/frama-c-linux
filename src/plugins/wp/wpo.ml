@@ -805,7 +805,6 @@ let is_trivial g =
   | GoalLemma vc -> VC_Lemma.is_trivial vc
   | GoalAnnot vc -> VC_Annot.is_trivial vc
 
-
 let reduce g =
   match g.po_formula with
   | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
@@ -815,8 +814,7 @@ let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ignore (set_result g VCS.Qed result) ;
-    true
+    ( set_result g VCS.Qed result ; true )
   else false
 
 let compute g =
@@ -835,6 +833,12 @@ let is_proved g =
 let is_unknown g = List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
     ( get_results g )
+
+let is_passed g =
+  if is_smoke_test g then
+    not (is_proved g)
+  else
+    is_proved g
 
 let get_result =
   Dynamic.register ~plugin:"Wp" "Wpo.get_result" ~journalize:false

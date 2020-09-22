@@ -3,10 +3,37 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 42 goals scheduled
+[wp] [Alt-Ergo] Goal typed_initialize_loop_invariant_CHECK_preserved : Valid
+[wp] [Qed] Goal typed_initialize_loop_invariant_CHECK_established : Valid
+[wp] [Alt-Ergo] Goal typed_initialize_check_CHECK : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_initialize_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_range_check_CHECK : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_range_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_field_check_CHECK : Valid
+[wp] [Qed] Goal typed_field_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_field_loop_assigns_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_array_check_CHECK : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part1 : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part2 : Valid
 [wp] [Qed] Goal typed_array_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_index_check_CHECK : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_index_loop_assigns_part3 : Valid
+[wp] [Alt-Ergo] Goal typed_descr_check_CHECK : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part1 : Valid
+[wp] [Alt-Ergo] Goal typed_descr_loop_assigns_part2 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part3 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part4 : Valid
+[wp] [Qed] Goal typed_descr_loop_assigns_part5 : Valid
+[wp] [Alt-Ergo] Goal typed_comp_check_CHECK : Valid
+[wp] [Qed] Goal typed_comp_loop_assigns_part1 : Valid
+[wp] [Qed] Goal typed_comp_loop_assigns_part2 : Valid
+[wp] [Alt-Ergo] Goal typed_comp_loop_assigns_part3 : Valid
 [wp] [Alt-Ergo] Goal typed_assigned_glob_check_CHECK : Valid
 [wp] [Alt-Ergo] Goal typed_assigned_glob_loop_invariant_CHECK_preserved : Valid
 [wp] [Qed] Goal typed_assigned_glob_loop_invariant_CHECK_established : Valid
@@ -18,33 +45,6 @@
 [wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part1 : Valid
 [wp] [Qed] Goal typed_assigned_glob_loop_assigns_2_part2 : Valid
 [wp] [Alt-Ergo] Goal typed_assigned_glob_loop_assigns_2_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_comp_check_CHECK : Valid
-[wp] [Qed] Goal typed_comp_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_comp_loop_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_comp_loop_assigns_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_descr_check_CHECK : Valid
-[wp] [Qed] Goal typed_descr_loop_assigns_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_descr_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_descr_loop_assigns_part3 : Valid
-[wp] [Qed] Goal typed_descr_loop_assigns_part4 : Valid
-[wp] [Qed] Goal typed_descr_loop_assigns_part5 : Valid
-[wp] [Alt-Ergo] Goal typed_field_check_CHECK : Valid
-[wp] [Qed] Goal typed_field_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_field_loop_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_index_check_CHECK : Valid
-[wp] [Qed] Goal typed_index_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_index_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_index_loop_assigns_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_initialize_loop_invariant_CHECK_preserved : Valid
-[wp] [Qed] Goal typed_initialize_loop_invariant_CHECK_established : Valid
-[wp] [Alt-Ergo] Goal typed_initialize_check_CHECK : Valid
-[wp] [Qed] Goal typed_initialize_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_initialize_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_initialize_loop_assigns_part3 : Valid
-[wp] [Alt-Ergo] Goal typed_range_check_CHECK : Valid
-[wp] [Qed] Goal typed_range_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_range_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_range_loop_assigns_part3 : Valid
 [wp] Proved goals:   42 / 42
   Qed:            27 
   Alt-Ergo:       15

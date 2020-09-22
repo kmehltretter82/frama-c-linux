@@ -165,9 +165,10 @@ struct
     Prover.prove wpo ?config ~mode:VCS.BatchMode
       ~progress:env.progress prover
 
-  let pending env =
+  let backtracking env =
     match ProofEngine.status env.tree with
-    | `Main | `Invalid | `Proved -> 0 | `Pending n -> n
+    | `Unproved | `Invalid | `Proved | `Passed -> 0
+    | `Pending n | `StillResist n -> n
 
   let setup_backtrack env node depth =
     if env.backtrack > 0 then
@@ -181,11 +182,11 @@ struct
               bk_node = node ;
               bk_best = (-1) ;
               bk_depth = depth ;
-              bk_pending = pending env ;
+              bk_pending = backtracking env ;
             }
 
   let search env node ~depth =
-    if env.auto <> [] && depth < env.depth && pending env < env.width
+    if env.auto <> [] && depth < env.depth && backtracking env < env.width
     then
       match ProverSearch.search env.tree ~anchor:node env.auto with
       | None -> None
@@ -197,7 +198,7 @@ struct
       match env.backtracking with
       | None -> None
       | Some point ->
-          let n = pending env in
+          let n = backtracking env in
           let anchor = point.bk_node in
           if n < point.bk_pending then
             begin
@@ -300,7 +301,7 @@ and autosearch env ~depth node : bool Task.task =
 
 and autofork env ~depth fork =
   let _,children = ProofEngine.commit fork in
-  let pending = Env.pending env in
+  let pending = Env.backtracking env in
   if pending > 0 then
     begin
       Env.progress env (Printf.sprintf "Auto %d" pending) ;
@@ -391,16 +392,20 @@ let task
     ~depth ~width ~backtrack ~auto
     ~start ~progress ~result ~success wpo =
   begin fun () ->
-    start wpo ;
-    let json = ProofSession.load wpo in
-    let script = Priority.sort (ProofScript.decode json) in
-    let tree = ProofEngine.proof ~main:wpo in
-    let env = Env.make tree
-        ~valid ~failed ~provers
-        ~depth ~width ~backtrack ~auto
-        ~progress ~result ~success in
-    crawl env (process env) None script >>?
-    (fun _ -> ProofEngine.forward tree) ;
+    Prover.simplify ~start ~result wpo >>= fun succeed ->
+    if succeed
+    then
+      ( success wpo (Some VCS.Qed) ; Task.return ())
+    else
+      let json = ProofSession.load wpo in
+      let script = Priority.sort (ProofScript.decode json) in
+      let tree = ProofEngine.proof ~main:wpo in
+      let env = Env.make tree
+          ~valid ~failed ~provers
+          ~depth ~width ~backtrack ~auto
+          ~progress ~result ~success in
+      crawl env (process env) None script >>?
+      (fun _ -> ProofEngine.forward tree) ;
   end
 
 (* -------------------------------------------------------------------------- *)

@@ -92,7 +92,7 @@ Prove: P_P(x).
 
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[wp] 2 goals scheduled
+[wp] 1 goal scheduled
 ---------------------------------------------
 --- Context 'typed_ref_f' Cluster 'Compound' 
 ---------------------------------------------
@@ -164,36 +164,7 @@ end
        let x = get1 t (shift_sint321 a i) in
        region1 (base1 a) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
   end
-[wp:print-generated] 
-  theory WP2
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use frama_c_wp.memory.Memory *)
-    
-    (* use frama_c_wp.cint.Cint *)
-    
-    (* use Compound *)
-    
-    (* use Axiomatic *)
-    
-    goal wp_goal :
-      forall t:addr -> int, i:int, a:addr.
-       let x = get t (shift_sint32 a i) in
-       region (base a) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
-  end
-[wp] 2 goals generated
+[wp] 1 goal generated
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------

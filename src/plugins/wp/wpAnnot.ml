@@ -162,13 +162,6 @@ let is_proved pf =
 let is_invalid pf =
   pf.invalid && not (is_proved pf)
 
-let status pf =
-  try
-    Array.iter (function Complete -> raise Exit | _ -> ()) pf.proved ;
-    `Proved
-  with Exit ->
-    if pf.invalid then `Invalid else `Partial
-
 (* -------------------------------------------------------------------------- *)
 (* --- PID for Functions                                                  --- *)
 (* -------------------------------------------------------------------------- *)
