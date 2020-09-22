@@ -19,10 +19,10 @@ let run () =
 
   let provers =
     List.fold_right
-      (fun pname prvs -> match VCS.prover_of_name pname with
+      (fun pname prvs -> match VCS.parse_prover pname with
          | None -> prvs
          | Some VCS.Tactical -> prvs
-         | Some prv -> (VCS.mode_of_prover_name pname, prv) :: prvs)
+         | Some prv -> (VCS.BatchMode, prv) :: prvs)
       ["qed"] []
   in
 
