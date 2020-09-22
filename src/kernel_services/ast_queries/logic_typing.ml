@@ -2308,40 +2308,58 @@ struct
       accept_array: bool;
       accept_models: bool;
       accept_func_ptr: bool;
+      accept_addrs: bool;
     }
 
   let lval_addressable_mode =
     { accept_empty = false; accept_formal = true; accept_array = true;
-      accept_models = false; accept_func_ptr = true; }
+      accept_models = false; accept_func_ptr = true; accept_addrs = false;}
   let lval_assignable_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; }
+      accept_models = true; accept_func_ptr = false; accept_addrs = false;}
+  let lval_dependency_mode =
+    { accept_empty = true; accept_formal = true; accept_array = false;
+      accept_models = true; accept_func_ptr = false; accept_addrs = true;}
 
   let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
+
+  (* Beware that ONLY TLval is accepted *)
+  let check_term_lval_kind m t =
+    match t.term_node with
+    | TLval (lhost,loff) ->
+      (not (isLogicArrayType t.term_type) || m.accept_array) &&
+      (match lhost with
+       | TVar v -> begin
+           match v.lv_origin with
+           | None ->
+             (* specific case: \exit_status is a model of the
+                exit status of the program. *)
+             if Logic_const.is_exit_status t then m.accept_models
+             else
+               false (* pure logic variable, at least as long as
+                        model variables are not supported. *)
+           | Some v -> not v.vformal || m.accept_formal
+         end
+       | TResult _ -> m.accept_models
+       | _ -> true) &&
+      (match snd (Logic_utils.remove_term_offset loff) with
+       | TModel _ -> m.accept_models
+       | _ -> true)
+    | _ -> assert false
 
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
       | Tempty_set -> m.accept_empty
-      | TLval (lhost,loff) ->
-        (not (isLogicArrayType t.term_type) || m.accept_array) &&
-        (match lhost with
-         | TVar v -> begin
-             match v.lv_origin with
-             | None ->
-               (* specific case: \exit_status is a model of the
-                  exit status of the program. *)
-               if Logic_const.is_exit_status t then m.accept_models
-               else
-                 false (* pure logic variable, at least as long as
-                          model variables are not supported. *)
-             | Some v -> not v.vformal || m.accept_formal
-           end
-         | TResult _ -> m.accept_models
-         | _ -> true) &&
-        (match snd (Logic_utils.remove_term_offset loff) with
-         | TModel _ -> m.accept_models
-         | _ -> true)
-      | TAddrOf lv -> is_fct_ptr lv && m.accept_func_ptr
+      | TLval _  -> check_term_lval_kind m t
+      | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
+      | TAddrOf lv | TStartOf lv ->
+        m.accept_addrs &&
+        begin match lv with
+          | TVar { lv_origin = None }, _ -> false
+          | TVar { lv_origin = Some v }, _ -> not v.vformal
+          | TMem _, _ -> true
+          | _ -> false
+        end
       | Tif (_,t1,t2) -> aux t1 && aux t2
 
       | Tunion l | Tinter l -> List.for_all aux l
@@ -2351,7 +2369,7 @@ struct
 
       | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCastE (_,_)
-      | TStartOf _ | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
+      | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
       | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
         false
@@ -3109,6 +3127,27 @@ struct
     in
     lift_set check_lval t
 
+  and term_from f t =
+    let check_from t =
+      match t.term_node with
+      | TAddrOf lv when is_fun_ptr t.term_type ->
+        f lv
+          { t with
+            term_type = type_of_pointed t.term_type;
+            term_node = TLval lv }
+      | TLval lv
+      | TLogic_coerce(_,{term_node = TLval lv })
+      | Tat({term_node = TLval lv},_) -> f lv t
+      | TStartOf lv
+      | Tat ({term_node = TStartOf lv}, _)
+      | TAddrOf lv
+      | Tat ({term_node = TAddrOf lv}, _) ->
+        f lv t
+      | _ -> C.error t.term_loc "not a dependency value: %a"
+               Cil_printer.pp_term t
+    in
+    lift_set check_from t
+
   and type_logic_app env loc f labels ttl =
     (* support for overloading *)
     let infos =
@@ -3448,6 +3487,15 @@ struct
     | PLcomprehension _ | PLset _ | PLunion _ | PLinter _ | PLempty ->
       ctxt.error loc "expecting a predicate and not tsets"
 
+  let term_as_dependency ctxt env t =
+    let module [@warning "-60"] C = struct end in
+    let t = ctxt.type_term ctxt env t in
+
+    if not (check_lval_kind lval_dependency_mode t) then
+      ctxt.error t.term_loc "not a valid dependency: %a"
+        Cil_printer.pp_term t ;
+    lift_set (term_from (fun _ t -> t)) t
+
   let type_from ctxt ~accept_formal env (l,d) =
     let module [@warning "-60"] C = struct end in
     (* Yannick: [assigns *\at(\result,Post)] should be allowed *)
@@ -3459,7 +3507,7 @@ struct
       FromAny -> (tl,Cil_types.FromAny)
     | From f ->
       let tf =
-        List.map (term_lval_assignable ctxt ~accept_formal:true env) f
+        List.map (term_as_dependency ctxt env) f
       in
       let tf =
         List.map
