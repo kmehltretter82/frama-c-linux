@@ -508,7 +508,7 @@ and inject_in_block (env: Env.t) kf blk =
           (* The free statements are passed in the same order than the malloc
              ones. In order to free the variable in the reverse order, the list
              is reversed before appending the return statement. Moreover,
-             `rev_append` is tail recursive contrary to `append` *)
+             [List.rev_append] is tail recursive contrary to [List.append] *)
           List.rev_append free_stmts [ return_stmt ]
         | None -> []
       in

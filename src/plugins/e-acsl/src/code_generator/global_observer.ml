@@ -60,11 +60,11 @@ let rec literal_in_initializer env kf = function
   | CompoundInit (_, l) ->
     List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
-(* Create a global kernel function named `name`.
+(* Create a global kernel function named [name].
    Return a triple (varinfo * fundec * kernel_function) of the created
    global function. *)
 let mk_function name =
-  (* Create global function `name` *)
+  (* Create global function [name] *)
   let vi =
     Cil.makeGlobalVar ~source:true
       name

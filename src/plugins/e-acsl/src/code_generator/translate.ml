@@ -24,9 +24,11 @@ module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
 
+(** *)
+
 let dkey = Options.dkey_translation
 
-(* internal to [named_predicate_to_exp] but put it outside in order to not add
+(* internal to [predicate_to_exp] but put it outside in order to not add
    extra tedious parameter.
    It is [true] iff we are currently visiting \valid. *)
 let is_visiting_valid = ref false

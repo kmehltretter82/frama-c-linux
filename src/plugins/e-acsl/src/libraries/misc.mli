@@ -47,7 +47,7 @@ val cty: logic_type -> typ
 
 val ptr_index: ?loc:location -> ?index:exp -> exp
   -> Cil_types.exp * Cil_types.exp
-(** Split pointer-arithmetic expression of the type `p + i` into its
+(** Split pointer-arithmetic expression of the type [p + i] into its
     pointer and integer parts. *)
 
 val term_of_li: logic_info -> term
