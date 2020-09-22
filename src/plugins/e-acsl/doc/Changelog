@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-09-22] Support of complete and disjoint behavior
+                (frama-c/e-acsl#92 and frama-c/e-acsl#27).
 -* runtime      [2020-09-15] Fix wrong value returned for the stack size in the
                 segment memory model (frama-c/e-acsl#126).
 -  E-ACSL       [2020-09-15] Deprecate -e-acsl-full-mmodel in favor of
