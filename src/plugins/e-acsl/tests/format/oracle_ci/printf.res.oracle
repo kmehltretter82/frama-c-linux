@@ -25,10 +25,13 @@
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:351: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:92: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:79: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:854: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:351: Warning: 
@@ -40,18 +43,12 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:354: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:354: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:351: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:357: Warning: 
   E-ACSL construct `logic functions performing read accesses'
   is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:171: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:160: Warning: 
   E-ACSL construct `user-defined logic type' is not yet supported.
@@ -59,6 +56,27 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:167: Warning: 
   E-ACSL construct `user-defined logic type' is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
+  Some assumes clauses couldn't be translated.
+  Ignoring complete and disjoint behaviors annotations.
+[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:163: Warning: 
+  E-ACSL construct `logic functions performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:164: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:165: Warning: 
+  invalid E-ACSL construct
+  `non integer variable p in quantification
+  found: ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c)'.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
   E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
@@ -69,17 +87,17 @@
   E-ACSL construct `logic functions performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:127: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:470: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:127: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:472: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:473: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:457: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:473: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:459: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -90,565 +108,3 @@
   function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
 [kernel:annot:missing-spec] tests/format/printf.c:180: Warning: 
   Neither code nor specification for function __e_acsl_builtin_printf, generating default assigns from the prototype
-[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/sys/wait.h:86: Warning: 
-  function __gen_e_acsl_waitpid: postcondition 'initialization,stat_loc_init_on_success' got status unknown.
-[eva:alarm] tests/format/printf.c:180: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status);
-[kernel:annot:missing-spec] tests/format/signalled.h:17: Warning: 
-  Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype
-[eva:alarm] tests/format/printf.c:183: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_0);
-[eva:alarm] tests/format/printf.c:186: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_1);
-[eva:alarm] tests/format/printf.c:189: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_2);
-[eva:alarm] tests/format/printf.c:194: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_3);
-[eva:alarm] tests/format/printf.c:197: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_4);
-[eva:alarm] tests/format/printf.c:199: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_5);
-[eva:alarm] tests/format/printf.c:201: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_6);
-[eva:alarm] tests/format/printf.c:204: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_7);
-[eva:alarm] tests/format/printf.c:206: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_8);
-[eva:alarm] tests/format/printf.c:51: Warning: 
-  function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:357: Warning: 
-  function __gen_e_acsl_strcpy: postcondition 'equal_contents' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:165: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_first_occur' got status unknown.
-[eva:alarm] tests/format/printf.c:59: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status);
-[eva:alarm] FRAMAC_SHARE/libc/string.h:161: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_char' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:161: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_char' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:162: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_same_base' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:163: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_in_length' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:164: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_valid_string' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:165: Warning: 
-  function __gen_e_acsl_strchr, behavior found: postcondition 'result_first_occur' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] FRAMAC_SHARE/libc/string.h:168: Warning: 
-  function __gen_e_acsl_strchr, behavior not_found: postcondition 'result_null' got status unknown. (Behavior may be inactive, no reduction performed.)
-[eva:alarm] tests/format/printf.c:62: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_0);
-[eva:alarm] tests/format/signalled.h:17: Warning: 
-  signed overflow. assert testno + 1 ≤ 2147483647;
-[eva:alarm] tests/format/printf.c:224: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_9);
-[eva:alarm] tests/format/printf.c:225: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_10);
-[eva:alarm] tests/format/printf.c:226: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_11);
-[eva:alarm] tests/format/printf.c:233: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_12);
-[eva:alarm] tests/format/printf.c:233: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_13);
-[eva:alarm] tests/format/printf.c:234: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_14);
-[eva:alarm] tests/format/printf.c:234: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_15);
-[eva:alarm] tests/format/printf.c:235: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_16);
-[eva:alarm] tests/format/printf.c:235: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_17);
-[eva:alarm] tests/format/printf.c:235: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_18);
-[eva:alarm] tests/format/printf.c:239: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_19);
-[eva:alarm] tests/format/printf.c:239: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_20);
-[eva:alarm] tests/format/printf.c:240: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_21);
-[eva:alarm] tests/format/printf.c:240: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_22);
-[eva:alarm] tests/format/printf.c:241: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_23);
-[eva:alarm] tests/format/printf.c:241: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_24);
-[eva:alarm] tests/format/printf.c:241: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_25);
-[eva:alarm] tests/format/printf.c:245: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_26);
-[eva:alarm] tests/format/printf.c:245: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_27);
-[eva:alarm] tests/format/printf.c:246: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_28);
-[eva:alarm] tests/format/printf.c:246: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_29);
-[eva:alarm] tests/format/printf.c:247: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_30);
-[eva:alarm] tests/format/printf.c:247: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_31);
-[eva:alarm] tests/format/printf.c:249: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_32);
-[eva:alarm] tests/format/printf.c:249: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_33);
-[eva:alarm] tests/format/printf.c:250: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_34);
-[eva:alarm] tests/format/printf.c:250: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_35);
-[eva:alarm] tests/format/printf.c:251: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_36);
-[eva:alarm] tests/format/printf.c:251: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_37);
-[eva:alarm] tests/format/printf.c:252: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_38);
-[eva:alarm] tests/format/printf.c:252: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_39);
-[eva:alarm] tests/format/printf.c:254: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_40);
-[eva:alarm] tests/format/printf.c:257: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_41);
-[eva:alarm] tests/format/printf.c:261: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_42);
-[eva:alarm] tests/format/printf.c:261: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_43);
-[eva:alarm] tests/format/printf.c:262: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_44);
-[eva:alarm] tests/format/printf.c:262: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_45);
-[eva:alarm] tests/format/printf.c:263: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_46);
-[eva:alarm] tests/format/printf.c:263: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_47);
-[eva:alarm] tests/format/printf.c:263: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_48);
-[eva:alarm] tests/format/printf.c:267: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_49);
-[eva:alarm] tests/format/printf.c:267: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_50);
-[eva:alarm] tests/format/printf.c:268: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_51);
-[eva:alarm] tests/format/printf.c:268: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_52);
-[eva:alarm] tests/format/printf.c:269: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_53);
-[eva:alarm] tests/format/printf.c:269: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_54);
-[eva:alarm] tests/format/printf.c:269: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_55);
-[eva:alarm] tests/format/printf.c:277: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_56);
-[eva:alarm] tests/format/printf.c:277: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_57);
-[eva:alarm] tests/format/printf.c:281: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_58);
-[eva:alarm] tests/format/printf.c:281: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_59);
-[eva:alarm] tests/format/printf.c:282: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_60);
-[eva:alarm] tests/format/printf.c:282: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_61);
-[eva:alarm] tests/format/printf.c:282: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_62);
-[eva:alarm] tests/format/printf.c:289: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_63);
-[eva:alarm] tests/format/printf.c:289: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_64);
-[eva:alarm] tests/format/printf.c:290: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_65);
-[eva:alarm] tests/format/printf.c:290: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_66);
-[eva:alarm] tests/format/printf.c:295: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_67);
-[eva:alarm] tests/format/printf.c:295: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_68);
-[eva:alarm] tests/format/printf.c:296: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_69);
-[eva:alarm] tests/format/printf.c:300: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_70);
-[eva:alarm] tests/format/printf.c:300: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_71);
-[eva:alarm] tests/format/printf.c:301: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_72);
-[eva:alarm] tests/format/printf.c:301: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_73);
-[eva:alarm] tests/format/printf.c:302: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_74);
-[eva:alarm] tests/format/printf.c:302: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_75);
-[eva:alarm] tests/format/printf.c:303: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_76);
-[eva:alarm] tests/format/printf.c:303: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_77);
-[eva:alarm] tests/format/printf.c:307: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_78);
-[eva:alarm] tests/format/printf.c:308: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_79);
-[eva:alarm] tests/format/printf.c:309: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_80);
-[eva:alarm] tests/format/printf.c:312: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_81);
-[eva:alarm] tests/format/printf.c:312: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_82);
-[eva:alarm] tests/format/printf.c:313: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_83);
-[eva:alarm] tests/format/printf.c:313: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_84);
-[eva:alarm] tests/format/printf.c:314: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_85);
-[eva:alarm] tests/format/printf.c:314: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_86);
-[eva:alarm] tests/format/printf.c:315: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_87);
-[eva:alarm] tests/format/printf.c:315: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_88);
-[eva:alarm] tests/format/printf.c:316: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_89);
-[eva:alarm] tests/format/printf.c:316: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_90);
-[eva:alarm] tests/format/printf.c:317: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_91);
-[eva:alarm] tests/format/printf.c:317: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_92);
-[eva:alarm] tests/format/printf.c:318: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_93);
-[eva:alarm] tests/format/printf.c:318: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_94);
-[eva:alarm] tests/format/printf.c:321: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_95);
-[eva:alarm] tests/format/printf.c:321: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_96);
-[eva:alarm] tests/format/printf.c:322: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_97);
-[eva:alarm] tests/format/printf.c:322: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_98);
-[eva:alarm] tests/format/printf.c:323: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_99);
-[eva:alarm] tests/format/printf.c:323: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_100);
-[eva:alarm] tests/format/printf.c:324: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_101);
-[eva:alarm] tests/format/printf.c:324: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_102);
-[eva:alarm] tests/format/printf.c:326: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_103);
-[eva:alarm] tests/format/printf.c:326: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_104);
-[eva:alarm] tests/format/printf.c:330: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_105);
-[eva:alarm] tests/format/printf.c:330: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_106);
-[eva:alarm] tests/format/printf.c:333: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_107);
-[eva:alarm] tests/format/printf.c:333: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_108);
-[eva:alarm] tests/format/printf.c:333: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_109);
-[eva:alarm] tests/format/printf.c:333: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_110);
-[eva:alarm] tests/format/printf.c:334: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_111);
-[eva:alarm] tests/format/printf.c:334: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_112);
-[eva:alarm] tests/format/printf.c:334: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_113);
-[eva:alarm] tests/format/printf.c:334: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_114);
-[eva:alarm] tests/format/printf.c:335: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_115);
-[eva:alarm] tests/format/printf.c:335: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_116);
-[eva:alarm] tests/format/printf.c:335: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_117);
-[eva:alarm] tests/format/printf.c:335: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_118);
-[eva:alarm] tests/format/printf.c:336: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_119);
-[eva:alarm] tests/format/printf.c:336: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_120);
-[eva:alarm] tests/format/printf.c:336: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_121);
-[eva:alarm] tests/format/printf.c:336: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_122);
-[eva:alarm] tests/format/printf.c:337: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_123);
-[eva:alarm] tests/format/printf.c:337: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_124);
-[eva:alarm] tests/format/printf.c:337: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_125);
-[eva:alarm] tests/format/printf.c:337: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_126);
-[eva:alarm] tests/format/printf.c:338: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_127);
-[eva:alarm] tests/format/printf.c:338: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_128);
-[eva:alarm] tests/format/printf.c:338: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_129);
-[eva:alarm] tests/format/printf.c:338: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_130);
-[eva:alarm] tests/format/printf.c:341: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_131);
-[eva:alarm] tests/format/printf.c:341: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_132);
-[eva:alarm] tests/format/printf.c:341: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_133);
-[eva:alarm] tests/format/printf.c:341: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_134);
-[eva:alarm] tests/format/printf.c:342: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_135);
-[eva:alarm] tests/format/printf.c:342: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_136);
-[eva:alarm] tests/format/printf.c:342: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_137);
-[eva:alarm] tests/format/printf.c:342: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_138);
-[eva:alarm] tests/format/printf.c:344: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_139);
-[eva:alarm] tests/format/printf.c:344: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_140);
-[eva:alarm] tests/format/printf.c:344: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_141);
-[eva:alarm] tests/format/printf.c:344: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_142);
-[eva:alarm] tests/format/printf.c:346: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_143);
-[eva:alarm] tests/format/printf.c:346: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_144);
-[eva:alarm] tests/format/printf.c:346: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_145);
-[eva:alarm] tests/format/printf.c:346: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_146);
-[eva:alarm] tests/format/printf.c:347: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_147);
-[eva:alarm] tests/format/printf.c:347: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_148);
-[eva:alarm] tests/format/printf.c:347: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_149);
-[eva:alarm] tests/format/printf.c:347: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_150);
-[eva:alarm] tests/format/printf.c:348: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_151);
-[eva:alarm] tests/format/printf.c:348: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_152);
-[eva:alarm] tests/format/printf.c:348: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_153);
-[eva:alarm] tests/format/printf.c:348: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_154);
-[eva:alarm] tests/format/printf.c:350: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_155);
-[eva:alarm] tests/format/printf.c:350: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_156);
-[eva:alarm] tests/format/printf.c:350: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_157);
-[eva:alarm] tests/format/printf.c:350: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_158);
-[eva:alarm] tests/format/printf.c:354: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_159);
-[eva:alarm] tests/format/printf.c:354: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_160);
-[eva:alarm] tests/format/printf.c:355: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_161);
-[eva:alarm] tests/format/printf.c:355: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_162);
-[eva:alarm] tests/format/printf.c:356: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_163);
-[eva:alarm] tests/format/printf.c:356: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_164);
-[eva:alarm] tests/format/printf.c:357: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_165);
-[eva:alarm] tests/format/printf.c:357: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_166);
-[eva:alarm] tests/format/printf.c:358: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_167);
-[eva:alarm] tests/format/printf.c:358: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_168);
-[eva:alarm] tests/format/printf.c:359: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_169);
-[eva:alarm] tests/format/printf.c:359: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_170);
-[eva:alarm] tests/format/printf.c:360: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_171);
-[eva:alarm] tests/format/printf.c:360: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_172);
-[eva:alarm] tests/format/printf.c:361: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_173);
-[eva:alarm] tests/format/printf.c:361: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_174);
-[eva:alarm] tests/format/printf.c:362: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_175);
-[eva:alarm] tests/format/printf.c:362: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_176);
-[eva:alarm] tests/format/printf.c:363: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_177);
-[eva:alarm] tests/format/printf.c:363: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_178);
-[eva:alarm] tests/format/printf.c:364: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_179);
-[eva:alarm] tests/format/printf.c:364: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_180);
-[eva:alarm] tests/format/printf.c:365: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_181);
-[eva:alarm] tests/format/printf.c:365: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_182);
-[eva:alarm] tests/format/printf.c:366: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_183);
-[eva:alarm] tests/format/printf.c:366: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_184);
-[eva:alarm] tests/format/printf.c:367: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_185);
-[eva:alarm] tests/format/printf.c:367: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_186);
-[eva:alarm] tests/format/printf.c:368: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_187);
-[eva:alarm] tests/format/printf.c:368: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_188);
-[eva:alarm] tests/format/printf.c:369: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_189);
-[eva:alarm] tests/format/printf.c:369: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_190);
-[eva:alarm] tests/format/printf.c:372: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_191);
-[eva:alarm] tests/format/printf.c:372: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_192);
-[eva:alarm] tests/format/printf.c:373: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_193);
-[eva:alarm] tests/format/printf.c:373: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_194);
-[eva:alarm] tests/format/printf.c:374: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_195);
-[eva:alarm] tests/format/printf.c:374: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_196);
-[eva:alarm] tests/format/printf.c:375: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_197);
-[eva:alarm] tests/format/printf.c:375: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_198);
-[eva:alarm] tests/format/printf.c:376: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_199);
-[eva:alarm] tests/format/printf.c:376: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_200);
-[eva:alarm] tests/format/printf.c:377: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_201);
-[eva:alarm] tests/format/printf.c:377: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_202);
-[eva:alarm] tests/format/printf.c:378: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_203);
-[eva:alarm] tests/format/printf.c:378: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_204);
-[eva:alarm] tests/format/printf.c:379: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_205);
-[eva:alarm] tests/format/printf.c:379: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_206);
-[eva:alarm] tests/format/printf.c:380: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_207);
-[eva:alarm] tests/format/printf.c:380: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_208);
-[eva:alarm] tests/format/printf.c:381: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_209);
-[eva:alarm] tests/format/printf.c:381: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_210);
-[eva:alarm] tests/format/printf.c:382: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_211);
-[eva:alarm] tests/format/printf.c:382: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_212);
-[eva:alarm] tests/format/printf.c:383: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_213);
-[eva:alarm] tests/format/printf.c:383: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_214);
-[eva:alarm] tests/format/printf.c:384: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_215);
-[eva:alarm] tests/format/printf.c:384: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_216);
-[eva:alarm] tests/format/printf.c:385: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_217);
-[eva:alarm] tests/format/printf.c:385: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_218);
-[eva:alarm] tests/format/printf.c:386: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_219);
-[eva:alarm] tests/format/printf.c:386: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_220);
-[eva:alarm] tests/format/printf.c:387: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_221);
-[eva:alarm] tests/format/printf.c:387: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_222);
-[eva:alarm] tests/format/printf.c:390: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_223);
-[eva:alarm] tests/format/printf.c:391: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_224);
-[eva:alarm] tests/format/printf.c:392: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_225);
-[eva:alarm] tests/format/printf.c:393: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_226);
-[eva:alarm] tests/format/printf.c:394: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_227);
-[eva:alarm] tests/format/printf.c:395: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_228);
-[eva:alarm] tests/format/printf.c:396: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_229);
-[eva:alarm] tests/format/printf.c:399: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_230);
-[eva:alarm] tests/format/printf.c:400: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_231);
-[eva:alarm] tests/format/printf.c:407: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_232);
-[eva:alarm] tests/format/printf.c:408: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_233);
-[eva:alarm] tests/format/printf.c:409: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_234);
-[eva:alarm] tests/format/printf.c:410: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_235);
-[eva:alarm] tests/format/printf.c:415: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_236);
-[eva:alarm] tests/format/printf.c:416: Warning: 
-  accessing uninitialized left-value. assert \initialized(&s2);
-[eva:alarm] tests/format/printf.c:416: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_237);
-[eva:alarm] tests/format/printf.c:419: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_238);
-[eva:alarm] tests/format/printf.c:421: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_239);
-[eva:alarm] tests/format/printf.c:424: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_240);
-[eva:alarm] tests/format/printf.c:425: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_241);
-[eva:alarm] tests/format/printf.c:426: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_242);
-[eva:alarm] tests/format/printf.c:427: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_243);
-[eva:alarm] tests/format/printf.c:428: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_244);
-[eva:alarm] tests/format/printf.c:453: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_245);
-[eva:alarm] tests/format/printf.c:454: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_246);
-[eva:alarm] tests/format/printf.c:455: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_247);
-[eva:alarm] tests/format/printf.c:458: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_248);
-[eva:alarm] tests/format/printf.c:459: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_249);
-[eva:alarm] tests/format/printf.c:460: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_250);
-[eva:alarm] tests/format/printf.c:461: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_251);
-[eva:alarm] tests/format/printf.c:464: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_252);
-[eva:alarm] tests/format/printf.c:465: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_253);
-[eva:alarm] tests/format/printf.c:466: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_254);
-[eva:alarm] tests/format/printf.c:467: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_255);
-[eva:alarm] tests/format/printf.c:468: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_256);
-[eva:alarm] tests/format/printf.c:469: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_257);
-[eva:alarm] tests/format/printf.c:470: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_258);
-[eva:alarm] tests/format/printf.c:471: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_259);
-[eva:alarm] tests/format/printf.c:472: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_260);
-[eva:alarm] tests/format/printf.c:473: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_261);
-[eva:alarm] tests/format/printf.c:476: Warning: 
-  accessing uninitialized left-value. assert \initialized(&process_status_262);

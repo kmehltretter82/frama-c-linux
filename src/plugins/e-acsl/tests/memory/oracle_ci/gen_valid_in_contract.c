@@ -63,17 +63,18 @@ int main(void)
  */
 struct list *__gen_e_acsl_f(struct list *l)
 {
-  struct list *__gen_e_acsl_at_4;
-  int __gen_e_acsl_at_3;
   struct list *__gen_e_acsl_at_2;
-  int __gen_e_acsl_at;
+  struct list *__gen_e_acsl_at;
+  __e_acsl_contract_t *__gen_e_acsl_contract;
   struct list *__retres;
   __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& l),(size_t)8);
-  __gen_e_acsl_at_4 = l;
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_or;
+    __e_acsl_store_block((void *)(& l),(size_t)8);
+    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+                                           l == (struct list *)0);
     __gen_e_acsl_valid = __e_acsl_valid((void *)l,sizeof(struct list),
                                         (void *)l,(void *)(& l));
     if (! __gen_e_acsl_valid) __gen_e_acsl_or = 1;
@@ -101,24 +102,29 @@ struct list *__gen_e_acsl_f(struct list *l)
       else __gen_e_acsl_and = 0;
       __gen_e_acsl_or = ! __gen_e_acsl_and;
     }
-    __gen_e_acsl_at_3 = __gen_e_acsl_or;
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+                                           __gen_e_acsl_or);
   }
   __gen_e_acsl_at_2 = l;
-  __gen_e_acsl_at = l == (struct list *)0;
+  __gen_e_acsl_at = l;
   __retres = f(l);
   {
-    int __gen_e_acsl_implies;
-    int __gen_e_acsl_implies_2;
-    if (! __gen_e_acsl_at) __gen_e_acsl_implies = 1;
-    else __gen_e_acsl_implies = __retres == __gen_e_acsl_at_2;
-    __e_acsl_assert(__gen_e_acsl_implies,"Postcondition","f",
-                    "\\old(l == \\null) ==> \\result == \\old(l)",
-                    "tests/memory/valid_in_contract.c",15);
-    if (! __gen_e_acsl_at_3) __gen_e_acsl_implies_2 = 1;
-    else __gen_e_acsl_implies_2 = __retres == __gen_e_acsl_at_4;
-    __e_acsl_assert(__gen_e_acsl_implies_2,"Postcondition","f",
-                    "\\old(!\\valid{Here}(l) || !\\valid{Here}(l->next)) ==> \\result == \\old(l)",
-                    "tests/memory/valid_in_contract.c",18);
+    int __gen_e_acsl_assumes_value;
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == __gen_e_acsl_at,
+                                                    "Postcondition","f",
+                                                    "B1: \\result == \\old(l)",
+                                                    "tests/memory/valid_in_contract.c",
+                                                    15);
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    if (__gen_e_acsl_assumes_value) __e_acsl_assert(__retres == __gen_e_acsl_at_2,
+                                                    "Postcondition","f",
+                                                    "B2: \\result == \\old(l)",
+                                                    "tests/memory/valid_in_contract.c",
+                                                    18);
+    __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& l));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
