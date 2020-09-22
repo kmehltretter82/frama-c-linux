@@ -29,3 +29,16 @@ Assume {
 Prove: base_offset(x_1, 1 + i + x_2) <= base_offset(x_1, 1 + i_1 + x_2).
 
 ------------------------------------------------------------
+------------------------------------------------------------
+  Function g
+------------------------------------------------------------
+
+Goal Check 'KO' (file tests/wp_acsl/base_offset.i, line 29):
+Prove: base_offset_table(G_z_33) = base_offset_table(G_x_31).
+
+------------------------------------------------------------
+
+Goal Check 'KO' (file tests/wp_acsl/base_offset.i, line 30):
+Prove: base_offset_table(G_y_32) != base_offset_table(G_x_31).
+
+------------------------------------------------------------
