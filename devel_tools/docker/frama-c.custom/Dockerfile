@@ -47,7 +47,7 @@ RUN cd /root && \
         make -j && \
         make install \
     ) && \
-    [ "${with_source}" != "no" ] || rm -rf frama-c
+    ([ "${with_source}" != "no" ] || rm -rf frama-c)
 
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no

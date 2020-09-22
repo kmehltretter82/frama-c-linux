@@ -127,6 +127,7 @@ share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/make_template.py: .ignore
 share/analysis-scripts/make_wrapper.py: .ignore
+share/analysis-scripts/normalize_jcdb.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore

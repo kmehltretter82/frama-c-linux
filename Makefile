@@ -270,6 +270,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
+      share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
       share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
@@ -1955,6 +1956,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
+	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/prologue.mk \
 	  share/analysis-scripts/README.md \

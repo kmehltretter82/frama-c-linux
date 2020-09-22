@@ -141,22 +141,6 @@ let is_updating () =
   | NoCache | Replay | Offline -> false
   | Update | Rebuild | Cleanup -> true
 
-let task_hash wpo drv prover task =
-  lazy
-    begin
-      let file = Wpo.DISK.file_goal
-          ~pid:wpo.Wpo.po_pid
-          ~model:wpo.Wpo.po_model
-          ~prover:(VCS.Why3 prover) in
-      let _ = Command.print_file file
-          begin fun fmt ->
-            Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-              (Why3Provers.print_why3 prover) ;
-            Why3.Driver.print_task_prepared drv fmt task ;
-          end
-      in Digest.file file |> Digest.to_hex
-    end
-
 let time_fits time = function
   | None | Some 0 -> true
   | Some limit -> time <= float limit
@@ -256,23 +240,24 @@ let cleanup_cache () =
         Wp_parameters.warning ~current:false
           "Cannot cleanup cache"
 
-type runner =
-  timeout:int option -> steplimit:int option ->
-  Why3.Driver.driver -> Why3Provers.t -> Why3.Task.task ->
+type 'a digest =
+  Why3Provers.t -> 'a -> string
+
+type 'a runner =
+  timeout:int option -> steplimit:int option -> Why3Provers.t -> 'a ->
   VCS.result Task.task
 
-let get_result wpo runner ~timeout ~steplimit drv prover task =
+let get_result ~digest ~runner ~timeout ~steplimit prover goal =
   let mode = get_mode () in
   match mode with
-  | NoCache ->
-      runner ~timeout ~steplimit drv prover task
+  | NoCache -> runner ~timeout ~steplimit prover goal
   | Offline ->
-      let hash = task_hash wpo drv prover task in
+      let hash = lazy (digest prover goal) in
       let result = get_cache_result ~mode hash |> VCS.cached in
       if VCS.is_verdict result then incr hits else incr miss ;
       Task.return result
   | Update | Replay | Rebuild | Cleanup ->
-      let hash = task_hash wpo drv prover task in
+      let hash = lazy (digest prover goal) in
       let result =
         get_cache_result ~mode hash
         |> promote ~timeout ~steplimit |> VCS.cached in
@@ -284,10 +269,12 @@ let get_result wpo runner ~timeout ~steplimit drv prover task =
         end
       else
         Task.finally
-          (runner ~timeout ~steplimit drv prover task)
+          (runner ~timeout ~steplimit prover goal)
           begin function
             | Task.Result result when VCS.is_verdict result ->
                 incr miss ;
                 set_cache_result ~mode hash prover result
             | _ -> ()
           end
+
+(* -------------------------------------------------------------------------- *)

@@ -208,38 +208,6 @@ configure_for_frama_c() {
     CPP="gcc -E -nostdinc -fno-builtin -I${FRAMAC_SHARE}/libc -D__FC_MACHDEP_${MACHDEP}" ./configure "$@"
 }
 
-normalize_jcdb() {
-    path=""
-    if [ "$#" -eq 0 ]; then
-        path="./compile_commands.json"
-    else
-        path="$1"
-    fi
-    if [ ! -e "$path" ]; then
-        echo "error: cannot find file: $path";
-        exit 1
-    fi
-    sed "s|$PWD/||g" "$path" > "${path}.tmp"
-    cmp -s "$path" "${path}.tmp"
-    if [ $? -eq 0 ]; then
-        echo "No changes to be applied to $path"
-        rm "${path}.tmp"
-    else
-        echo "Differences to be applied to $path:"
-        diff -u0 "$path" "${path}.tmp"
-        read -p "Normalize $path? [y/N] " yn
-        case $yn in
-            [Yy])
-                mv "${path}.tmp" "$path"
-                echo "Normalization applied to $path"
-            ;;
-            *)
-                echo "Exiting without overwriting."
-                exit 0;;
-        esac
-    fi
-}
-
 case "$command" in
     "help" | "-help" | "--help" | "-h")
         usage 0;
@@ -279,7 +247,7 @@ case "$command" in
         ;;
     "normalize-jcdb")
         shift;
-        normalize_jcdb "$@";
+        ${FRAMAC_SHARE}/analysis-scripts/normalize_jcdb.py "$@";
         ;;
     *)
         echo "error: unrecognized command: $command";

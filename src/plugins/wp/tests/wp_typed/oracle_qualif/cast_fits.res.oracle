@@ -13,11 +13,11 @@
      (target: __anonunion_L8_8*)
 [wp] 8 goals scheduled
 [wp] [Alt-Ergo] Goal typed_fits1_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_mismatch1_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_fits2_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits3_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits4_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits5_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_mismatch1_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_mismatch2_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_mismatch3_ensures : Unsuccess (Stronger)
 [wp] Proved goals:    5 / 8

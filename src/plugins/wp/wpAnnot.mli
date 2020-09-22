@@ -49,8 +49,6 @@ val is_proved : proof -> bool
 val is_invalid : proof -> bool
 (** whether an invalid proof result has been registered or not *)
 
-val status : proof -> [ `Proved | `Invalid | `Partial ]
-
 val target : proof -> Property.t
 val dependencies : proof -> Property.t list
 

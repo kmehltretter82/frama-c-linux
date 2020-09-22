@@ -44,9 +44,10 @@ module Pmap : Map.S with type key = prover
 val name_of_prover : prover -> string
 val title_of_prover : prover -> string
 val filename_for_prover : prover -> string
-val prover_of_name : string -> prover option
-val mode_of_prover_name : string -> mode
 val title_of_mode : mode -> string
+
+val parse_mode : string -> mode
+val parse_prover : string -> prover option
 
 val pp_prover : Format.formatter -> prover -> unit
 val pp_mode : Format.formatter -> mode -> unit

@@ -5,16 +5,16 @@
 [wp] 12 goals scheduled
 [wp] [Qed] Goal typed_f_ensures : Valid
 [wp] [Qed] Goal typed_f_assigns : Valid
+[wp] [Qed] Goal typed_wrong_without_ref_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_wrong_without_ref_call_f_requires : Unsuccess
+[wp] [Qed] Goal typed_pointer_ensures : Valid
+[wp] [Qed] Goal typed_pointer_call_f_requires : Valid
+[wp] [Qed] Goal typed_local_ensures : Valid
+[wp] [Qed] Goal typed_local_call_f_requires : Valid
 [wp] [Qed] Goal typed_formal_ensures : Valid
 [wp] [Qed] Goal typed_formal_call_f_requires : Valid
 [wp] [Qed] Goal typed_global_ensures : Valid
 [wp] [Qed] Goal typed_global_call_f_requires : Valid
-[wp] [Qed] Goal typed_local_ensures : Valid
-[wp] [Qed] Goal typed_local_call_f_requires : Valid
-[wp] [Qed] Goal typed_pointer_ensures : Valid
-[wp] [Qed] Goal typed_pointer_call_f_requires : Valid
-[wp] [Qed] Goal typed_wrong_without_ref_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_wrong_without_ref_call_f_requires : Unsuccess
 [wp] Proved goals:   11 / 12
   Qed:            11 
   Alt-Ergo:        0  (unsuccess: 1)

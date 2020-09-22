@@ -111,3 +111,5 @@ let has_shortcut p s =
           (Why3.Whyconf.get_prover_shortcuts (config ())) with
   | None -> false
   | Some p' -> Why3.Whyconf.Prover.equal p p'
+
+(* -------------------------------------------------------------------------- *)

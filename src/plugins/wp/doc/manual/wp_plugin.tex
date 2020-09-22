@@ -10,51 +10,13 @@ This plug-in computes proof obligations of programs annotated with
 \textsf{ACSL} annotations by \emph{weakest precondition calculus},
 using a parametrized memory model to represent pointers and heap
 values. The proof obligations may then be discharged by external
-decision procedures, which range over automated theorem provers such
-as \textsf{Alt-Ergo}~\cite{AltErgo2006}, interactive proof assistants
-like \textsf{Coq}~\cite{Coq84} and the interactive proof manager
-\textsf{Why3}~\cite{Why3}.
-
-This chapter describes how to use the plug-in, from the
-\textsf{Frama-C} graphical user interface (section~\ref{wp-gui}), from
-the command line (section~\ref{wp-cmdline}), or from another plug-in
-(section~\ref{wp-api}).  Additionally, the combination of the \textsf{WP}
-plug-in with the load and save commands of \textsf{Frama-C} and/or the
-\texttt{-then} command-line option is explained in section~\ref{wp-persistent}.
-
-\clearpage
-%-----------------------------------------------------------------------------
-\section{Installing Provers}
-\label{wp-install-provers}
-%-----------------------------------------------------------------------------
-
-The \textsf{WP} plug-in requires external provers to work.
-The recommended versions for external provers are:
-\begin{center}
-  \begin{tabular}{crlc}
-    Prover & Versions & Download &\\
-    \hline
-    \textsf{Why3} & \verb|1.3.1| &
-    \url{http://why3.lri.fr} & \cite{Why3}\\
-    \textsf{Alt-Ergo} & \verb|2.0.0|  &
-    \url{http://alt-ergo.ocamlpro.com} & \cite{AltErgo2006}\\
-    % \textsf{Coq} & \verb|8.9.0| &
-    % \url{http://coq.inria.fr} & \cite{Coq84}\\
-  \end{tabular}
-\end{center}
-
-Recent \textsf{OPAM}-provided versions should work smoothly.
-Other versions might be supported as well, typically, as far as we know:
-\begin{itemize}
-\item \textsf{Alt-Ergo} \verb+2.2.0+ and \verb+2.3.0+, although distributed under a non-commercial licence.
-% \item \textsf{Coq} \verb+8.7.2+ and \verb+8.8.2+, although proof scripts compatibility can be an issue.
-\item \textsf{Why3} \verb+1.3.1+.
-\end{itemize}
-
-Other provers, like \textsf{Coq}, \textsf{Gappa}, \textsf{Z3}, \textsf{CVC3},
-\textsf{CVC4}, \textsf{PVS}, and many others, are accessible from
-\textsf{WP} through \textsf{Why3}. We refer the user to the manual of
-\textsf{Why3} to handle specific configuration tasks.
+automated theorem provers such as
+\textsf{Alt-Ergo}~\cite{AltErgo2006},
+\textsf{CVC4}~\cite{CVC4} and
+\textsf{Z3}~\cite{Z3}
+or by interactive proof assistants
+like \textsf{Coq}~\cite{Coq84} and more generally, any automated or interactive
+prover supported by \textsf{Why3}~\cite{Why3}.
 
 \clearpage
 %-----------------------------------------------------------------------------
@@ -1018,6 +980,10 @@ all unproved proof obligations are sent to external decision procedures.
 
 Support for \textsf{Why-3 IDE} is no longer provided.
 
+Since \textsf{Frama-C 22.0} (Titanium) support for Coq interactive prover has
+been added and might also work with other interactive provers.
+See \texttt{-wp-interactive <mode>} option for details.
+
 \begin{description}
 \item[\tt -wp-prover <dp,...>] selects the decision procedures used to
   discharge proof obligations. See below for supported provers.  By
@@ -1028,6 +994,13 @@ Support for \textsf{Why-3 IDE} is no longer provided.
   It is possible to ask for several decision procedures to be tried.
   For each goal, the first decision procedure that succeeds cancels the
   other attempts.
+\item[\tt -wp-interactive <mode>] selects the interaction mode with
+  interactive provers such as Coq. Three modes are available:
+  \texttt{"batch"} mode only check existing scripts (the default);
+  \texttt{"edit"} mode opens the default prover editor on each generated goal;
+  \texttt{"fix"} mode only opens
+  editor for non-proved goals. New scripts are created in the \texttt{interactive}
+  directory of \textsf{WP} session (see option \texttt{-wp-session <dir>}).
 \item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
   This command can only work if \textsf{why3} API was installed before building and
   installing \textsf{Frama-C}.
@@ -1053,6 +1026,8 @@ Support for \textsf{Why-3 IDE} is no longer provided.
   to the decision prover (defaults to 10 seconds).
 \item[\tt -wp-smoke-timeout <n>] sets the timeout (in seconds) for smoke tests
   (see \verb+-wp-smoke-tests+, defaults to 5 seconds).
+\item[\tt -wp-interactive-timeout <n>] sets the timeout (in seconds) for checking
+  edited scripts with interactive provers (defaults to 30 seconds).
 \item[\tt -wp-time-extra <n>] additional time allocated to provers when
   replaying a script. This is used to cope with variable machine load.
   Default is \verb+5s+.
@@ -1455,7 +1430,7 @@ several categories of formatters (PO stands for \emph{Proof Obligations}):
 can be written \verb+"%.."+ or \verb+"%{..}"+. When \verb+range+ is used
 instead of \verb+steps+, the maximal number $n$ of steps is printed as a range $a..b$ that
 contains $n$.
-When option \verb+-report-json+ is used, the previous rank $a$ and $b$ are kept when
+When option \verb+-wp-report-json+ is used, the previous rank $a$ and $b$ are kept when
 available and still fits with the new maximal step number. Otherwise, $a$ and $b$ are re-adjusted
 following an heurisitics designed to increase the stability for non-regression testing.
 

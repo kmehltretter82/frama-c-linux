@@ -159,7 +159,8 @@ val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
 val get_target : t -> Property.t
 val is_trivial : t -> bool (** do not tries simplification, do not check prover results *)
 val is_proved : t -> bool (** do not tries simplification, check prover results *)
-val is_unknown : t -> bool
+val is_unknown : t -> bool (** at least one prover returns « Unknown » *)
+val is_passed : t -> bool (** proved, or unknown for smoke tests *)
 val warnings : t -> Warning.t list
 
 (** [true] if the result is valid. Dynamically exported.

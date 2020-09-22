@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2020-09-21] Added support for Why3 Coq interactive prover
+- WP          [2020-09-21] New option -wp-interactive <mode>
+- WP          [2020-09-21] New option -wp-interactive-timeout <seconds>
 - WP          [2020-09-17] New experimental option: -wp-check-model-hypotheses
                            Generates requires in contracts for model hypotheses
 - WP          [2020-09-17] Hypotheses: assigned memory locations

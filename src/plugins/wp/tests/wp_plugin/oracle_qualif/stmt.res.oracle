@@ -12,11 +12,11 @@
 [wp] [CFG] Goal h_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled
+[wp] [Qed] Goal typed_f_ensures : Valid
+[wp] [Qed] Goal typed_f_assigns : Valid
 [wp] [Qed] Goal typed_f_ensures_2 : Valid
 [wp] [Qed] Goal typed_f_ensures_3 : Valid
 [wp] [Qed] Goal typed_f_assert : Valid
-[wp] [Qed] Goal typed_f_ensures : Valid
-[wp] [Qed] Goal typed_f_assigns : Valid
 [wp] [Qed] Goal typed_g_ensures_2 : Valid
 [wp] [Qed] Goal typed_g_assert : Valid
 [wp] [Qed] Goal typed_h_ensures_2 : Valid

@@ -35,5 +35,5 @@
 [wp] Goal typed_pair_loop_variant_positive : not tried
 [wp] Goal typed_pair_loop_variant_2_decrease : not tried
 [wp] Goal typed_pair_loop_variant_2_positive : not tried
-[wp] Goal typed_pair_has_pair_ensures : not tried
 [wp] Goal typed_pair_no_pair_ensures : not tried
+[wp] Goal typed_pair_has_pair_ensures : not tried

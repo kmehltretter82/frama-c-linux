@@ -34,33 +34,11 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte] annotating function max_subarray
-[wp] 23 goals scheduled
-[wp] [Alt-Ergo] Goal typed_max_subarray_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_ensures_2 : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_invariant_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_2_preserved : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_invariant_2_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_3_preserved : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_invariant_3_established : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_invariant_4_preserved : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_invariant_4_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_5_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_5_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_6_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_6_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_7_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_7_established : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_8_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_max_subarray_loop_invariant_8_established : Valid
+[wp] 1 goal scheduled
 [wp] [Alt-Ergo] Goal typed_max_subarray_assert_rte_mem_access : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_assigns : Valid
-[wp] [Qed] Goal typed_max_subarray_assigns : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_max_subarray_loop_variant_positive : Valid
-[wp] Proved goals:   14 / 23
+[wp] Proved goals:    1 / 1
   Qed:             0 
-  Alt-Ergo:       14
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   max_subarray              9       14       23       100%
