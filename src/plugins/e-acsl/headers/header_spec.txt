@@ -13,6 +13,8 @@ man/e-acsl-gcc.sh.1: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 scripts/e-acsl-gcc.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_assert.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_assert.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/instrumentation_model/e_acsl_contract.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/instrumentation_model/e_acsl_contract.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal_timestamp.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
