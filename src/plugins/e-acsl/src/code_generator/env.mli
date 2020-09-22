@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Contract_types
 
 (** Environments.
 
@@ -191,6 +192,19 @@ val not_yet: t -> string -> 'a
 
 val untypable: t -> string -> 'a
 (** Save the current context and raise [Error.Typing_error] exception. *)
+
+(* ************************************************************************** *)
+(** {2 Contracts} *)
+(* ************************************************************************** *)
+
+val push_contract: t -> contract -> t
+(** Push a contract to the environment's stack *)
+val top_contract: t -> contract * contract list
+(** Return the top contract of the environment's stack *)
+val pop_and_get_contract: t -> contract * t
+(** Pop and return the top contract of the environment's stack *)
+val pop_contract: t -> t
+(** Pop the top contract of the environment's stack *)
 
 val pretty: Format.formatter -> t -> unit
 

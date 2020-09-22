@@ -82,6 +82,9 @@ src/analyses/typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/typing.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/global_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
