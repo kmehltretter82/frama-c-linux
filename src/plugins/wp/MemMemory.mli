@@ -40,7 +40,7 @@ val a_addr : term -> term -> term (** Constructor for [{ base ; offset }] *)
 val a_shift : term -> term -> term (** Shift: [a_shift a k] adds [k] to [a.offset] *)
 val a_base : term -> term (** Returns the base *)
 val a_offset : term -> term (** Returns the offset *)
-val a_base_offset : term -> term
+val a_base_offset : term -> term -> term
 (** Returns the offset in {i bytes} from the {i logic} offset
     (which is a memory cell index, actually) *)
 
