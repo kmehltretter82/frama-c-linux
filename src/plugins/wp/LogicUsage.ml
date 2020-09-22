@@ -501,6 +501,11 @@ let iter_lemmas f =
   let d = Database.get () in
   SMap.iter (fun _name (lem,_) -> f lem) d.lemmas
 
+let fold_lemmas f =
+  compute () ;
+  let d = Database.get () in
+  SMap.fold (fun _name (lem,_) -> f lem) d.lemmas
+
 let logic_lemma l = fst (get_lemma l)
 
 let section_of_lemma l = snd (get_lemma l)
