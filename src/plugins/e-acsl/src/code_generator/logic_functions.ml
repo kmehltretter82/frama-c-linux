@@ -27,9 +27,9 @@ open Cil_datatype
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let named_predicate_to_exp_ref
+let predicate_to_exp_ref
   : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "named_predicate_to_exp_ref"
+  = Extlib.mk_fun "predicate_to_exp_ref"
 
 let term_to_exp_ref
   : (kernel_function -> Env.t -> term -> exp * Env.t) ref
@@ -81,7 +81,7 @@ let generate_return_block ~loc env ret_vi e = match e.enode with
 (* Generate the function's body for predicates. *)
 let pred_to_block ~loc kf env ret_vi p =
   Typing.type_named_predicate ~must_clear:false p;
-  let e, env = !named_predicate_to_exp_ref kf env p in
+  let e, env = !predicate_to_exp_ref kf env p in
   (* for predicate, since the result is either 0 or 1, return it directly (it
      cannot be provided as extra argument *)
   generate_return_block ~loc env ret_vi e

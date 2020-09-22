@@ -27,13 +27,13 @@ open Cil_types
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let translate_named_predicate_ref
+let translate_predicate_ref
   : (kernel_function -> Env.t -> predicate -> Env.t) ref
-  = Extlib.mk_fun "translate_named_predicate_ref"
+  = Extlib.mk_fun "translate_predicate_ref"
 
-let named_predicate_ref
+let predicate_to_exp_ref
   : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "named_predicate_ref"
+  = Extlib.mk_fun "predicate_to_exp_ref"
 
 let term_to_exp_ref
   : (kernel_function -> Env.t -> term -> exp * Env.t) ref
@@ -53,7 +53,7 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let invariants, env = Env.pop_loop env in
         let env = Env.push env in
         let env =
-          let translate_named_predicate = !translate_named_predicate_ref in
+          let translate_named_predicate = !translate_predicate_ref in
           List.fold_left (translate_named_predicate kf) env invariants
         in
         let blk, env =
@@ -249,7 +249,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | None ->
         guard :: body @ [ next ], env
       | Some p ->
-        let e, env = !named_predicate_ref kf (Env.push env) p in
+        let e, env = !predicate_to_exp_ref kf (Env.push env) p in
         let stmt, env =
           Smart_stmt.runtime_check Smart_stmt.RTE kf e p, env
         in

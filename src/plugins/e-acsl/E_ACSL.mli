@@ -30,13 +30,21 @@ module Error: sig
 end
 
 module Translate: sig
-  exception No_simple_translation of term
-  val term_to_exp: typ option -> term -> exp
-  (** @raise New_typing_error when the given term cannot be typed (something wrong
+  exception No_simple_term_translation of term
+  val untyped_term_to_exp: typ option -> term -> exp
+  (** @raise Typing_error when the given term cannot be typed (something wrong
       happened with this term)
       @raise Not_yet when the given term contains an unsupported construct.
-      @raise No_simple_translation when the given term cannot be translated into
-      a single expression. *)
+      @raise No_simple_term_translation when the given term cannot be translated
+      into a single expression. *)
+
+  exception No_simple_predicate_translation of predicate
+  val untyped_predicate_to_exp: predicate -> exp
+  (** @raise Typing_error when the given predicate cannot be typed
+      (something wrong happened with this predicate).
+      @raise Not_yet when the given predicate contains an unsupported construct.
+      @raise No_simple_predicate_translation when the given predicate cannot be
+      translated into a single expression. *)
 end
 
 module Functions: sig

@@ -860,10 +860,10 @@ and env_of_li li kf env loc =
   in
   Env.add_stmt env kf stmt
 
-(* Convert an ACSL named predicate into a corresponding C expression (if
-   any) in the given environment. Also extend this environment which includes
-   the generating constructs. *)
-and named_predicate_content_to_exp ?name kf env p =
+(* Convert an ACSL predicate into a corresponding C expression (if any) in the
+   given environment. Also extend this environment which includes the generating
+   constructs. *)
+and predicate_content_to_exp ?name kf env p =
   let loc = p.pred_loc in
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, env
@@ -891,30 +891,30 @@ and named_predicate_content_to_exp ?name kf env p =
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
+    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
     let _, env2 as res2 =
-      named_predicate_to_exp kf (Env.push env1) p2 in
+      predicate_to_exp kf (Env.push env1) p2 in
     let env3 = Env.push env2 in
     let name = match name with None -> "and" | Some n -> n in
     conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = named_predicate_to_exp kf (Env.rte env true) p1 in
+    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
     let env' = Env.push env1 in
-    let res2 = named_predicate_to_exp kf (Env.push env') p2 in
+    let res2 = predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
     conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
-    named_predicate_to_exp
+    predicate_to_exp
       ~name:"implies"
       kf
       env
       (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
   | Piff(p1, p2) ->
     (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
-    named_predicate_to_exp
+    predicate_to_exp
       ~name:"equiv"
       kf
       env
@@ -922,24 +922,24 @@ and named_predicate_content_to_exp ?name kf env p =
          (Logic_const.pimplies ~loc (p1, p2),
           Logic_const.pimplies ~loc (p2, p1)))
   | Pnot p ->
-    let e, env = named_predicate_to_exp kf env p in
+    let e, env = predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
     let e1, env1 = term_to_exp kf (Env.rte env true) t in
     let (_, env2 as res2) =
-      named_predicate_to_exp kf (Env.push env1) p2 in
-    let res3 = named_predicate_to_exp kf (Env.push env2) p3 in
+      predicate_to_exp kf (Env.push env1) p2 in
+    let res3 = predicate_to_exp kf (Env.push env2) p3 in
     conditional_to_exp loc kf None e1 res2 res3
   | Plet(li, p) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     let env = env_of_li li kf env loc in
-    let e, env = named_predicate_to_exp kf env p in
+    let e, env = predicate_to_exp kf env p in
     Interval.Env.remove li.l_var_info;
     e, env
   | Pforall _ | Pexists _ -> Quantif.quantif_to_exp kf env p
   | Pat(p, BuiltinLabel Here) ->
-    named_predicate_to_exp kf env p
+    predicate_to_exp kf env p
   | Pat(p', label) ->
     let lscope = Env.Logic_scope.get env in
     let pot = Lscope.PoT_pred p' in
@@ -947,7 +947,7 @@ and named_predicate_content_to_exp ?name kf env p =
       At_with_lscope.to_exp ~loc kf env pot label
     else begin
       (* convert [t'] to [e] in a separated local env *)
-      let e, env = named_predicate_to_exp kf (Env.push env) p' in
+      let e, env = predicate_to_exp kf (Env.push env) p' in
       let e, env, sty = at_to_exp_no_lscope env kf None label e in
       assert (sty = C_number);
       e, env
@@ -976,7 +976,7 @@ and named_predicate_content_to_exp ?name kf env p =
         Typing.type_named_predicate ~must_clear:false init;
         let p = Logic_const.pand ~loc (init, p) in
         is_visiting_valid := true;
-        named_predicate_to_exp kf env p
+        predicate_to_exp kf env p
       | _ ->
         call_valid t p
     end
@@ -1006,10 +1006,10 @@ and named_predicate_content_to_exp ?name kf env p =
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
-and named_predicate_to_exp ?name kf ?rte env p =
+and predicate_to_exp ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let env = Env.rte env false in
-  let e, env = named_predicate_content_to_exp ?name kf env p in
+  let e, env = predicate_content_to_exp ?name kf env p in
   let env = if rte then translate_rte kf env e else env in
   let cast = Typing.get_cast_of_predicate p in
   add_cast
@@ -1021,6 +1021,15 @@ and named_predicate_to_exp ?name kf ?rte env p =
     C_number
     None
     e
+
+and generalized_untyped_predicate_to_exp ?name kf ?rte ?must_clear_typing env p =
+  let rte = match rte with None -> Env.generate_rte env | Some b -> b in
+  let must_clear = match must_clear_typing with None -> rte | Some b -> b in
+  Typing.type_named_predicate ~must_clear p;
+  let e, env = predicate_to_exp ?name kf ~rte env p in
+  assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  let env = Env.Logic_scope.reset env in
+  e, env
 
 and translate_rte_annots:
   'a. (Format.formatter -> 'a -> unit) -> 'a ->
@@ -1042,7 +1051,7 @@ and translate_rte_annots:
                 let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
-                let env = translate_named_predicate kf (Env.rte env false) p in
+                let env = translate_predicate kf (Env.rte env false) p in
                 let env = Env.Logic_scope.set_reset env lscope_reset_old in
                 env)
              env
@@ -1063,14 +1072,18 @@ and translate_rte ?filter kf env e =
   in
   translate_rte_annots Printer.pp_exp e kf env l
 
-and translate_named_predicate kf env p =
+and translate_predicate ?pred_to_print kf env p =
   Options.feedback ~dkey ~level:3 "translating predicate %a"
     Printer.pp_predicate p;
-  let rte = Env.generate_rte env in
-  Typing.type_named_predicate ~must_clear:rte p;
-  let e, env = named_predicate_to_exp kf ~rte env p in
-  assert (Typ.equal (Cil.typeOf e) Cil.intType);
-  let env = Env.Logic_scope.reset env in
+  let pred_to_print =
+    match pred_to_print with
+    | Some pred ->
+      Options.feedback ~dkey ~level:3 "(predicate to print %a)"
+        Printer.pp_predicate pred;
+      pred
+    | None -> p
+  in
+  let e, env = generalized_untyped_predicate_to_exp kf env p in
   Env.add_stmt
     env
     kf
@@ -1078,36 +1091,41 @@ and translate_named_predicate kf env p =
        (Env.annotation_kind env)
        kf
        e
-       p)
+       pred_to_print)
 
-let named_predicate_to_exp ?name kf env p =
-  named_predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
+let predicate_to_exp_without_rte ?name kf env p =
+  predicate_to_exp ?name kf env p (* forget optional argument ?rte *)
 
 let () =
   Loops.term_to_exp_ref := term_to_exp;
-  Loops.translate_named_predicate_ref := translate_named_predicate;
-  Loops.named_predicate_ref := named_predicate_to_exp;
-  Quantif.predicate_to_exp_ref := named_predicate_to_exp;
+  Loops.translate_predicate_ref := translate_predicate;
+  Loops.predicate_to_exp_ref := predicate_to_exp_without_rte;
+  Quantif.predicate_to_exp_ref := predicate_to_exp_without_rte;
   At_with_lscope.term_to_exp_ref := term_to_exp;
-  At_with_lscope.predicate_to_exp_ref := named_predicate_to_exp;
+  At_with_lscope.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Memory_translate.term_to_exp_ref := term_to_exp;
-  Memory_translate.predicate_to_exp_ref := named_predicate_to_exp;
+  Memory_translate.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Logic_functions.term_to_exp_ref := term_to_exp;
-  Logic_functions.named_predicate_to_exp_ref := named_predicate_to_exp;
+  Logic_functions.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Logic_array.translate_rte_ref := translate_rte
+
+exception No_simple_term_translation of term
+exception No_simple_predicate_translation of predicate
 
 (* This function is used by Guillaume.
    However, it is correct to use it only in specific contexts. *)
-let predicate_to_exp kf p =
-  Typing.type_named_predicate ~must_clear:true p;
-  let e, _ = named_predicate_to_exp kf Env.empty p in
-  assert (Typ.equal (Cil.typeOf e) Cil.intType);
+let untyped_predicate_to_exp p =
+  let env = Env.push Env.empty in
+  let env = Env.rte env false in
+  let e, env =
+    try generalized_untyped_predicate_to_exp ~must_clear_typing:false (Kernel_function.dummy ()) env p
+    with Rtl.Symbols.Unregistered _ -> raise (No_simple_predicate_translation p)
+  in
+  if not (Env.has_no_new_stmt env) then raise (No_simple_predicate_translation p);
   e
 
-exception No_simple_translation of term
-
 (* This function is used by plug-in [Cfp]. *)
-let term_to_exp typ t =
+let untyped_term_to_exp typ t =
   (* infer a context from the given [typ] whenever possible *)
   let ctx_of_typ ty =
     if Gmp_types.Z.is_t ty then Typing.gmpz
@@ -1124,9 +1142,9 @@ let term_to_exp typ t =
   let env = Env.rte env false in
   let e, env =
     try term_to_exp (Kernel_function.dummy ()) env t
-    with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)
+    with Rtl.Symbols.Unregistered _ -> raise (No_simple_term_translation t)
   in
-  if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
+  if not (Env.has_no_new_stmt env) then raise (No_simple_term_translation t);
   e
 
 (* ************************************************************************** *)
