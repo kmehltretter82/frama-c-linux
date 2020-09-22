@@ -347,12 +347,15 @@ Admitted.
 Definition addr_of_int : Z -> addr.
 Admitted.
 
-(* Why3 goal *)
-Definition base_offset: Z -> Z -> Z.
+Definition table : Type.
 Admitted.
 
 (* Why3 goal *)
-Definition base_offset_table: Z -> Z.
+Definition table_to_offset: table -> Z -> Z.
+Admitted.
+
+(* Why3 goal *)
+Definition table_of_base: Z -> table.
 Admitted.
 
 (* Why3 goal *)
@@ -370,12 +373,12 @@ Lemma addr_of_null : ((int_of_addr null) = 0%Z).
 Admitted.
 
 (* Why3 goal *)
-Lemma base_offset_zero : forall (t: Z), ((base_offset t 0%Z) = 0%Z).
+Lemma table_to_offset_zero : forall (t: table), ((table_to_offset t 0%Z) = 0%Z).
 Admitted.
 
 (* Why3 goal *)
-Lemma base_offset_monotonic : forall (t:Z) (i:Z) (j:Z), (i <= j)%Z ->
-  ((base_offset t i) <= (base_offset t j))%Z.
+Lemma table_to_offset_monotonic : forall (t:table) (i:Z) (j:Z), (i <= j)%Z ->
+  ((table_to_offset t i) <= (table_to_offset t j))%Z.
 Admitted.
 
 Definition cinits (m: farray addr bool) : Prop.
