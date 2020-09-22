@@ -491,6 +491,23 @@ module Context = struct
 
 end
 
+let handle_error f env =
+  let env = Error.handle f env in
+  Context.restore env
+
+let handle_error_with_args f (env, args) =
+  let env, args = Error.handle f (env, args) in
+  let env = Context.restore env in
+  env, args
+
+let not_yet env s =
+  Context.save env;
+  Error.not_yet s
+
+let untypable env s =
+  Context.save env;
+  Error.untypable s
+
 (* debugging purpose *)
 let pretty fmt env =
   let local_env, _ = top env in

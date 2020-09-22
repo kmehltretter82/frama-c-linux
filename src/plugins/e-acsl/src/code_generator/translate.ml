@@ -26,14 +26,6 @@ open Cil_datatype
 
 let dkey = Options.dkey_translation
 
-let not_yet env s =
-  Env.Context.save env;
-  Error.not_yet s
-
-let handle_error f env =
-  let env = Error.handle f env in
-  Env.Context.restore env
-
 (* internal to [named_predicate_to_exp] but put it outside in order to not add
    extra tedious parameter.
    It is [true] iff we are currently visiting \valid. *)
@@ -257,7 +249,7 @@ and toffset_to_offset ?loc kf env = function
     let e, env = term_to_exp kf env t in
     let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
-  | TModel _ -> not_yet env "model"
+  | TModel _ -> Env.not_yet env "model"
 
 and tlval_to_lval kf env (host, offset) =
   let host, env, name = thost_to_host kf env host in
@@ -307,7 +299,7 @@ and context_insensitive_term_to_exp kf env t =
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
-      not_yet env "reals: Neg | BNot"
+      Env.not_yet env "reals: Neg | BNot"
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), env, C_number, ""
   | TUnOp(LNot, t) ->
@@ -602,7 +594,7 @@ and context_insensitive_term_to_exp kf env t =
         let ty = Typing.get_typ t in
         Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)), env, C_number, ""
       | Typing.Gmpz ->
-        not_yet env "pointer subtraction resulting in gmp"
+        Env.not_yet env "pointer subtraction resulting in gmp"
       | Typing.(C_float _ | Rational | Real | Nan) ->
         assert false
     end
@@ -673,9 +665,9 @@ and context_insensitive_term_to_exp kf env t =
     in
     e, env, C_number, "app"
   | Tapp(_, _ :: _, _) ->
-    not_yet env "logic functions with labels"
-  | Tlambda _ -> not_yet env "functional"
-  | TDataCons _ -> not_yet env "constructor"
+    Env.not_yet env "logic functions with labels"
+  | Tlambda _ -> Env.not_yet env "functional"
+  | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
     let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
     let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
@@ -699,29 +691,29 @@ and context_insensitive_term_to_exp kf env t =
     let name = "base_addr" in
     let e, env = Memory_translate.call ~loc kf name Cil.voidPtrType env t in
     e, env, C_number, name
-  | Tbase_addr _ -> not_yet env "labeled \\base_addr"
+  | Tbase_addr _ -> Env.not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "offset" in
     let e, env = Memory_translate.call ~loc kf name size_t env t in
     e, env, C_number, name
-  | Toffset _ -> not_yet env "labeled \\offset"
+  | Toffset _ -> Env.not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t) ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
     let name = "block_length" in
     let e, env = Memory_translate.call ~loc kf name size_t env t in
     e, env, C_number, name
-  | Tblock_length _ -> not_yet env "labeled \\block_length"
+  | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->
     Cil.mkCast (Cil.zero ~loc) (TPtr(TVoid [], [])), env, C_number, "null"
-  | TUpdate _ -> not_yet env "functional update"
-  | Ttypeof _ -> not_yet env "typeof"
-  | Ttype _ -> not_yet env "C type"
-  | Tempty_set -> not_yet env "empty tset"
-  | Tunion _ -> not_yet env "union of tsets"
-  | Tinter _ -> not_yet env "intersection of tsets"
-  | Tcomprehension _ -> not_yet env "tset comprehension"
-  | Trange _ -> not_yet env "range"
+  | TUpdate _ -> Env.not_yet env "functional update"
+  | Ttypeof _ -> Env.not_yet env "typeof"
+  | Ttype _ -> Env.not_yet env "C type"
+  | Tempty_set -> Env.not_yet env "empty tset"
+  | Tunion _ -> Env.not_yet env "union of tsets"
+  | Tinter _ -> Env.not_yet env "intersection of tsets"
+  | Tcomprehension _ -> Env.not_yet env "tset comprehension"
+  | Trange _ -> Env.not_yet env "range"
   | Tlet(li, t) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
@@ -888,10 +880,10 @@ and named_predicate_content_to_exp ?name kf env p =
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
     let e, env = term_to_exp kf env tapp in
     e, env
-  | Pseparated _ -> not_yet env "\\separated"
-  | Pdangling _ -> not_yet env "\\dangling"
-  | Pobject_pointer _ -> not_yet env "\\object_pointer"
-  | Pvalid_function _ -> not_yet env "\\valid_function"
+  | Pseparated _ -> Env.not_yet env "\\separated"
+  | Pdangling _ -> Env.not_yet env "\\dangling"
+  | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
+  | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
     let ity = Typing.get_integer_op_of_predicate p in
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
@@ -910,7 +902,7 @@ and named_predicate_content_to_exp ?name kf env p =
     let res2 = named_predicate_to_exp kf (Env.push env') p2 in
     let name = match name with None -> "or" | Some n -> n in
     conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
-  | Pxor _ -> not_yet env "xor"
+  | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
     named_predicate_to_exp
@@ -986,8 +978,8 @@ and named_predicate_content_to_exp ?name kf env p =
       | _ ->
         call_valid t p
     end
-  | Pvalid _ -> not_yet env "labeled \\valid"
-  | Pvalid_read _ -> not_yet env "labeled \\valid_read"
+  | Pvalid _ -> Env.not_yet env "labeled \\valid"
+  | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pinitialized(BuiltinLabel Here, t) ->
     (match t.term_node with
      (* optimisation when we know that the initialisation is ok *)
@@ -1005,12 +997,12 @@ and named_predicate_content_to_exp ?name kf env p =
          env
          t
          p)
-  | Pinitialized _ -> not_yet env "labeled \\initialized"
-  | Pallocable _ -> not_yet env "\\allocate"
+  | Pinitialized _ -> Env.not_yet env "labeled \\initialized"
+  | Pallocable _ -> Env.not_yet env "\\allocate"
   | Pfreeable(BuiltinLabel Here, t) ->
     Memory_translate.call ~loc kf "freeable" Cil.intType env t
-  | Pfreeable _ -> not_yet env "labeled \\freeable"
-  | Pfresh _ -> not_yet env "\\fresh"
+  | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
+  | Pfresh _ -> Env.not_yet env "\\fresh"
 
 and named_predicate_to_exp ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
@@ -1039,7 +1031,7 @@ and translate_rte_annots:
     List.fold_left
       (fun env a -> match a.annot_content with
          | AAssert(_, p) ->
-           handle_error
+           Env.handle_error
              (fun env ->
                 Options.feedback ~dkey ~level:4 "prevent RTE from %a" pp elt;
                 (* The logic scope MUST NOT be reset here since we still might

@@ -175,6 +175,23 @@ module Context: sig
   val restore: t -> t
 end
 
+val handle_error: (t -> t) -> t -> t
+(** Run the closure with the given environment and handle potential errors.
+    Restore the globals of the environment to the last time [Env.Context.save]
+    was called and return it in case of errors. *)
+
+val handle_error_with_args: (t * 'a -> t * 'a) -> t * 'a -> t * 'a
+(** Run the closure with the given environment and arguments  and handle
+    potential errors.
+    Restore the globals of the environment to the last time [Env.Context.save]
+    was called and return it in case of errors. *)
+
+val not_yet: t -> string -> 'a
+(** Save the current context and raise [Error.Not_yet] exception. *)
+
+val untypable: t -> string -> 'a
+(** Save the current context and raise [Error.Typing_error] exception. *)
+
 val pretty: Format.formatter -> t -> unit
 
 (*
