@@ -166,7 +166,12 @@ let normalize ?(existence=Indifferent) ?base_name path_name =
 (* --- Symboling Names                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_symbolic_dir name dir = (insert cwd dir).symbolic_name <- Some name
+(* Note: Symbolic directories are not currently projectified *)
+let symbolic_dirs = Hashtbl.create 3
+
+let add_symbolic_dir name dir =
+  Hashtbl.replace symbolic_dirs name dir;
+  (insert cwd dir).symbolic_name <- Some name
 
 let rec add_path buffer path =
   let open Buffer in
@@ -186,6 +191,9 @@ let rec skip_dot file_name =
   if Extlib.string_prefix "./" file_name then
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
+
+let all_symbolic_dirs () =
+  Hashtbl.fold (fun name dir acc -> (name, dir) :: acc) symbolic_dirs []
 
 let pretty file_name =
   if Filename.is_relative file_name then
@@ -256,6 +264,25 @@ module Normalized = struct
     try
       (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
     with _ -> false
+
+  let to_base_uri p =
+    let pretty = to_pretty_string p in
+    if Filename.is_relative pretty then begin
+      if String.contains pretty '/' then
+        match Str.bounded_split (Str.regexp "/") pretty 2 with
+        | [prefix; postprefix] ->
+          begin
+            try
+              Hashtbl.find symbolic_dirs prefix, postprefix
+            with Not_found ->
+              "PWD", pretty
+          end
+        | _ -> failwith "to_base_uri: error in bounded_split"
+      else
+        "PWD", pretty
+    end else
+      (* absolute path *)
+      "", pretty
 end
 
 type position =
