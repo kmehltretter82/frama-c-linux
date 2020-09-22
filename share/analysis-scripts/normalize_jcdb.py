@@ -22,10 +22,9 @@
 #                                                                        #
 ##########################################################################
 
-# This script parses a compile_commands.json[1] file and lists the C files
-# in it.
+# This script removes absolute path references in a JSON Compilation Database.
 #
-# [1] See: http://clang.llvm.org/docs/JSONCompilationDatabase.html
+# See: http://clang.llvm.org/docs/JSONCompilationDatabase.html
 
 import sys
 import os
@@ -33,7 +32,7 @@ import json
 import re
 from pathlib import Path
 
-MIN_PYTHON = (3, 6) # for glob(recursive) and automatic Path conversions
+MIN_PYTHON = (3, 6) # for automatic Path conversions
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
@@ -47,53 +46,34 @@ if not arg.exists():
    print(f"error: file '{arg}' not found")
    sys.exit(f"usage: {sys.argv[0]} [compile_commands.json]")
 
-# check if arg has a known extension
-def is_known_c_extension(ext):
-   return ext == ".c" or ext == ".i" or ext == ".h"
-
-pwd = os.getcwd()
-fcmake_pwd = pwd / Path(".frama-c") # pwd as seen by the Frama-C makefile
-json = json.loads(open(arg).read())
+jcdb_json = json.loads(open(arg).read())
 jcdb_dir = arg.parent
-includes = set()
-defines = set()
-files = set() # set of pairs of (file, file_for_fcmake)
-for entry in json:
-   arg_includes = [] # before normalization
-   if not "file" in entry:
-       # ignore entries without a filename
-       continue
-   file = Path(entry["file"])
-   dir = Path(entry["directory"]) if "directory" in entry else None
-   if file.is_absolute():
-      filepath = file
-   elif dir and dir.is_absolute():
-      filepath = dir / file
-   elif dir:
-      filepath = jcdb_dir / dir / file
+out_json = {}
+
+nb_diffs = 0
+for entry in jcdb_json:
+   if "file" in entry and os.path.isabs(entry["file"]):
+      old_entry = entry["file"]
+      entry["file"] = os.path.relpath(entry["file"], jcdb_dir)
+      if old_entry != entry["file"]:
+         nb_diffs += 1
+      else:
+         print(f"warning: absolute path could not be normalized: {entry['file']}")
+   elif "directory" in entry and os.path.isabs(entry["directory"]):
+      old_entry = entry["directory"]
+      entry["directory"] = os.path.relpath(entry["directory"], jcdb_dir)
+      if old_entry != entry["directory"]:
+         nb_diffs += 1
+      else:
+         print(f"warning: absolute path could not be normalized: {entry['directory']}")
+
+if nb_diffs == 0:
+   print(f"No changes to be applied to {arg}")
+else:
+   yn = input(f"{nb_diffs} replacements to be applied. Normalize {arg}? [y/N] ")
+   if yn.lower() == "y":
+      with open(arg, 'w', encoding='utf-8') as outfile:
+         json.dump(jcdb_json, outfile, ensure_ascii=False, indent=4)
+         print(f"Normalization applied to {arg}")
    else:
-      filepath = jcdb_dir / file
-   if not is_known_c_extension(filepath.suffix):
-      print(f"warning: ignoring file of unknown type: {filepath}")
-   else:
-      files.add((os.path.relpath(filepath, pwd), os.path.relpath(filepath, fcmake_pwd)))
-
-files_for_fcmake = map (lambda x:(x[1]), files)
-print("# Paths as seen by a makefile inside subdirectory '.frama-c':")
-print("SRCS=\\\n" + " \\\n".join(sorted(files_for_fcmake)) + " \\")
-print("")
-
-files_defining_main = set()
-re_main = re.compile("(int|void)\s+main\s*\([^)]*\)\s*\{")
-for (file, file_for_fcmake) in files:
-   assert os.path.exists(file), "file does not exist: %s" % file
-   with open(file, 'r') as content_file:
-      content = content_file.read()
-      res = re.search(re_main, content)
-      if res is not None:
-         files_defining_main.add(file_for_fcmake)
-
-if files_defining_main != []:
-   print("")
-   print("# Possible definition of main function in the following file(s), as seen from '.frama-c':")
-   print("\n".join(sorted(files_defining_main)))
+      print("Exiting without overwriting.")

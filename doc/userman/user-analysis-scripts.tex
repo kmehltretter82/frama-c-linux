@@ -64,11 +64,12 @@ The intended usage is as follows:
   the analysis, with the list of source files and required parameters
   (architecture, preprocessing flags, main function);
 \item The user edits and runs the generated Makefile, adjusting the
-  analysis as needed and re-running \texttt{make}.
+  analysis as needed and re-running \texttt{fcmake}\footnote{\texttt{fcmake}
+  is described in Section~\ref{sec:using-generated-makefile}.}.
 \end{enumerate}
 
 Ideally, after modifying the source code or re-parametrizing the analysis,
-re-running \texttt{make} should be enough to obtain a new result.
+re-running \texttt{fcmake} should be enough to obtain a new result.
 
 Section~\ref{sec:using-generated-makefile} details usage of the Makefile
 and presents an illustrative diagram.
@@ -81,9 +82,9 @@ Makefile from a template. The user must fill in the following information,
 required for running an \Value analysis:
 
 \begin{description}
-\item[machdep]: architectural information about system where the code will run:
-  integer type sizes, compiler, OS, etc. See section~\ref{sec:normalize} for
-  more details.
+\item[machdep]: architectural information about the system where the code will
+  run: integer type sizes, compiler, OS, etc.
+  See section~\ref{sec:normalize} for more details.
 \item[preprocessing flags]: options given to the C preprocessor, mainly
   macros (\texttt{-D}) and include directories (\texttt{-I}).
 \item[list of sources]: the actual list of source files that make a logical
@@ -151,10 +152,16 @@ They allow the production of a JSON Compilation Database
 in section~\ref{sec:preprocessing}). This leads to a different workflow:
 
 \begin{enumerate}
-\item Run CMake with the flag \texttt{-DCMAKE\_EXPORT\_COMPILE\_COMMANDS=1},
-  or install Build EAR (\url{https://github.com/rizsotto/Bear}) and run
-  \texttt{bear make <targets>} instead of \texttt{make <targets>}. This will
-  create a \texttt{compile\_commands.json} file.
+\item For CMake:
+  \begin{itemize}
+  \item Run \texttt{cmake -DCMAKE\_EXPORT\_COMPILE\_COMMANDS=1 <targets>}.
+  \end{itemize}
+  For Makefile:
+  \begin{itemize}
+  \item Install Build EAR (\url{https://github.com/rizsotto/Bear});
+  \item Run \texttt{bear~make~<targets>} (instead of \texttt{make <targets>}).
+  \end{itemize}
+  In both cases, you will obtain a \texttt{compile\_commands.json} file.
 \item Run \texttt{frama-c-script list-files}. A list of the compiled files,
   along with files defining a \texttt{main} function, will be presented.
 \item Run \texttt{frama-c-script make-template} to create a template for
@@ -168,12 +175,64 @@ however, the compilation database may include extraneous sources
 (e.g. when compiling the same source for different binary targets or test
 cases). Manual intervention may be necessary.
 
-\section{Using the generated Makefile}
+\section{Using the generated Makefile, via \texttt{fcmake}}
 \label{sec:using-generated-makefile}
 
 The generated Makefile can be used to run one or several analyses.
-The diagram in Fig.~\ref{fig:analysis-scripts} summarizes its usage.
-Makefile targets and outputs are detailed in this section.
+Its basic usage involving the \texttt{fcmake} alias (equivalent to
+\texttt{make -C .frama-c}) is the following:
+
+\begin{itemize}
+\item \texttt{fcmake <target>.parse}: parse the sources
+\item \texttt{fcmake <target>.eva}: run Eva
+\item \texttt{fcmake <target>.eva.gui}: open the results in the GUI
+\end{itemize}
+
+This section details how to produce the Makefile, how to define the
+\texttt{fcmake} alias, and lists other useful targets and settings.
+
+\subsection*{Storing Frama-C files and results in \texttt{.frama-c}}
+
+By default, the generated \texttt{GNUmakefile} is created in the (hidden)
+directory \texttt{.frama-c}, which should contain all files specific to Frama-C.
+This arrangement provides several benefits:
+
+\begin{itemize}
+\item Frama-C-related files do not pollute the original code; everything
+  is stored in a separate directory, easily identifiable by its name;
+\item Existing makefiles are not overridden by Frama-C's;
+\item Having a standardized structure helps with CI integration.
+\end{itemize}
+
+However, special attention is needed due to a few consequences of this
+structure:
+
+\begin{itemize}
+\item The \texttt{make} process will be run from a subdirectory of the
+  current one; therefore, source and include paths must be either absolute
+  or prefixed with \texttt{..};
+\item In some cases, it may be necessary to add flags such as \texttt{-I ..},
+  so that the preprocessor will find the required files.
+\end{itemize}
+
+\subsection*{Defining and using \texttt{fcmake}}
+
+We recommend defining the following {\em alias} in your shell:
+
+\begin{verbatim}
+alias fcmake='make -C .frama-c'
+\end{verbatim}
+
+Running \texttt{fcmake} will have the same effect as running \texttt{make}
+inside the \texttt{.frama-c} directory.
+
+The commands in this section assume usage of the \texttt{fcmake} alias
+defined above.
+
+\subsection*{Frama-C makefile targets and variables}
+
+The diagram in Fig.~\ref{fig:analysis-scripts} summarizes the usage of
+the generated Makefile. Its targets and outputs are detailed in this section.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -193,8 +252,14 @@ That is, the target name (chosen by the user), suffixed with \texttt{.parse},
 is defined as depending on each of its source files. Changes to any of these
 sources will trigger a recomputation of the AST.
 
-{\em Note:} the target name itself {\em cannot} contain slashes or dots.
+Note that, since the generated makefile is inside \texttt{.frama-c}, relative
+paths to source files will always begin with \texttt{../}, except for
+sources located within \texttt{.frama-c}, e.g. \texttt{fc\_stubs.c}.
+
+\begin{important}
+Target names can contain hyphens and underscores, but neither slashes nor dots.
 See also the {\em Technical Notes} section about some current limitations.
+\end{important}
 
 Then, for each \texttt{.parse} target, a corresponding \texttt{.eva} target
 needs to be added to the \texttt{TARGETS} variable in the Makefile.
@@ -234,6 +299,12 @@ t2.parse: FCFLAGS += -main test2
 t2.parse: CPPFLAGS += -DTEST2
 \end{lstlisting}
 
+\begin{important}
+\texttt{-I} flags referencing relative paths must take into account the
+fact that \FramaC will be run from the \texttt{.frama-c} directory, and
+therefore must include an initial ``\texttt{../}''.
+\end{important}
+
 \subsection{Predefined targets}
 
 The predefined targets below are the {\em raison d'être} of the generated
@@ -253,9 +324,6 @@ quick iterations during parametrization of the analysis.
   and runs the \Value plug-in, with the options given in \texttt{EVAFLAGS}.
   If the analysis succeeds, produces a directory \texttt{<target>.eva} with the
   analysis results and a saved session file.
-  Also creates a timestamped version of \texttt{<target>.eva}, to enable
-  future comparisons between different parametrizations. The non-timestamped
-  version corresponds to the latest (successful) analysis.
   If the analysis fails, tries to save a partial result in
   \texttt{<target>.eva.error} (when possible).
 \item[<target>.eva.gui]: loads the result of the corresponding
@@ -266,6 +334,47 @@ quick iterations during parametrization of the analysis.
   \texttt{.eva} targets.
 \end{description}
 
+\subsection{Adding new analyses and stages}
+
+Besides the predefined \Value-oriented steps, you can easily add other stages
+and analyses, which may or may not depend on \Value.
+
+For instance, to add a SARIF report using the \tool{Markdown Report} plug-in,
+you can simply add, before the template epilogue, the following lines, where
+\texttt{target} is the name of your target:
+
+\begin{makefilecode}
+target.sarif: target.parse
+	$(FRAMAC) -load $^/framac.sav -mdr-gen sarif -mdr-out $@
+\end{makefilecode}
+
+This rule will create a file \texttt{target.sarif} inside the \texttt{.frama-c}
+directory. The rule will depend on the parsing of \texttt{target.parse} and
+use the saved session at \texttt{target.parse/framac.sav}.
+
+If you want the report to run after the analysis with \Value, instead, simply
+replace \texttt{.parse} with \texttt{.eva}.
+
+Then, running \texttt{fcmake target.sarif} will create or update the report,
+recomputing dependencies when needed.
+
+Adding a new stage, with a saved session that can be reused later for other
+stages and analyses, requires just a few more lines, as in the following
+example:
+
+\begin{makefilecode}
+target.wp: target.parse
+	mkdir -p $@
+	$(FRAMAC) -load $^/framac.sav -wp -save $@/framac.sav
+\end{makefilecode}
+
+In the example above, we define a new stage, \texttt{target.wp}, which depends
+on the parsing stage, runs the \tool{WP} plug-in, and saves the result in a
+session file. This session file can then be loaded by another stage,
+or in the GUI. For instance, the \texttt{.gui} predefined target works out of
+the box in this case: running \texttt{fcmake target.wp.gui} will load the saved
+session in the Frama-C GUI.
+
 \section{Script Descriptions}
 \label{sec:script-descriptions}
 
@@ -274,17 +383,17 @@ Run \texttt{frama-c-script help} for more details and optional arguments.
 
 \begin{description}
 \item[make-template]: creates the initial Makefile, based on a template.
-  This command creates a file named \texttt{GNUmakefile} with some hardcoded
-  sections, some filled in interactively by the user, and comments indicating
-  which parts may need change. Once created, it enables the general workflow
-  mentioned earlier.
+  This command creates a file named \texttt{.frama-c/GNUmakefile} with some
+  hardcoded sections, some sections filled in interactively by the user,
+  and comments indicating which parts may need change.
+  Once created, it enables the general workflow mentioned earlier.
 \item[make-wrapper <target> <args>]: calls \texttt{make <target> <args>} with
   a special wrapper: when running \Value, upon encountering one of a few known
   error messages, suggests some actions on how to proceed.
   For instance, if a missing function definition is encountered when analyzing
   the code with \Value, the wrapper will look for its definition and, if found,
   suggest that its source code be added to the analysis. This script is meant
-  to be used with the {\em one at a time} workflow describe in
+  to be used with the {\em one at a time} workflow described in
   section~\ref{alternative-workflows}.
 \item[find-fun <fun>]: looks for possible declarations and definitions
   of function \texttt{<fun>}. Uses a heuristic that does not depend on \FramaC
@@ -298,11 +407,11 @@ Other commands, only useful in a few cases, are described below.
 \item[configure <machdep>]: runs a \texttt{configure}
   script (based on Autoconf) with some settings to emulate a more portable
   system, removing optional code features that could prevent \FramaC from
-  parsing the sources. Currently still depends partially on the host system,
+  parsing the sources. Currently, it still depends partially on the host system,
   so many features are not disabled.
 \item[make-path] (for \FramaC developers): to be used when Frama-C is not
-  installed in the PATH; adds a \texttt{frama-c-path.mk} file that is used
-  by the Makefile generated by \texttt{make-template}.
+  installed in the PATH; adds a \texttt{path.mk} file that is used
+  by the Makefile generated via \texttt{make-template}.
 \item[flamegraph]: opens a {\em flamegraph}\footnote{%
   See \url{https://github.com/brendangregg/FlameGraph} for details about
   flamegraphs.} to visualize which functions take most of the time
@@ -349,7 +458,7 @@ The {\em open-source-case-studies} Git repository (OSCS for short),
 available at \url{https://git.frama-c.com/pub/open-source-case-studies},
 contains several open-source C code bases parametrized with the help of
 analysis scripts. Each case study has its own directory, with a
-\texttt{GNUmakefile} defining one or more analysis targets.
+\texttt{.frama-c/GNUmakefile} defining one or more analysis targets.
 
 Due to the variety of test cases, OSCS provide practical usage
 examples of the \texttt{GNUmakefile} described in this chapter.
@@ -366,16 +475,9 @@ understand some unintuitive behaviors.
 
 \paragraph{\em Changes to header files do not trigger a new parsing/analysis.}
 Currently, changes to included files (e.g. headers) are {\em not}
-tracked by the generated Makefile and may require running \texttt{make}
+tracked by the generated Makefile and may require running \texttt{fcmake}
 with \texttt{-B} (to force recomputation of dependencies), or running
-\texttt{make clean} before re-running \texttt{make}.
-
-\paragraph{\em Why is the generated Makefile called \texttt{GNUmakefile}?}
-GNU Make, by default, searches for a file named \texttt{GNUmakefile} before
-searching for a \texttt{Makefile}. Thus, running \texttt{make} without
-arguments results in running the Makefile generated by \texttt{make-template}.
-You can rename it to \texttt{framac.mk} or something else, and then run it
-via \texttt{make -f framac.mk <targets>}.
+\texttt{fcmake clean} before re-running \texttt{fcmake}.
 
 \paragraph{\em Most scripts are heuristics-based and offer no
   correctness/completeness guarantees.} In order to handle files {\em before}
