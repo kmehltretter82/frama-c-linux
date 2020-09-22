@@ -119,6 +119,8 @@ src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_annots.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_annots.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/dependencies/dep_eva.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/dependencies/dep_eva.enabled.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/dependencies/dep_eva.disabled.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

@@ -87,6 +87,7 @@ SRC_CODE_GENERATOR:= \
 	logic_array \
 	translate \
 	contract \
+	translate_annots \
 	temporal \
 	memory_observer \
 	literal_observer \
