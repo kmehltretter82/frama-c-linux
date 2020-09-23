@@ -356,7 +356,7 @@ let reset_perf () =
 (* --- Flamegraphs                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Set to [Some _] if option [-val-dump-flamegraph] is set and [main] is
+(* Set to [Some _] if option [-eva-flamegraph] is set and [main] is
    currently being analyzed and the file is ok. Otherwise, set to [None]. *)
 let oc_flamegraph = ref None
 

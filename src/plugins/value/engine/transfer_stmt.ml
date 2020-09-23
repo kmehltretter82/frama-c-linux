@@ -239,7 +239,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     | `Value (valuation, lloc, ltyp) ->
       (* Tries to interpret the assignment as a copy for the returned value
          of a function call, on struct and union types, and when
-         -val-warn-copy-indeterminate is disabled. *)
+         -eva-warn-copy-indeterminate is disabled. *)
       let lval_copy =
         if is_ret || Cil.isStructOrUnionType ltyp || do_copy_at kinstr
         then find_lval expr
