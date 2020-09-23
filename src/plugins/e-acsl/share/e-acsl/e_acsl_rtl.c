@@ -37,6 +37,7 @@
 
 // Instrumentation model
 #include "instrumentation_model/e_acsl_assert.c"
+#include "instrumentation_model/e_acsl_contract.c"
 #include "instrumentation_model/e_acsl_temporal.c"
 
 // Observation model

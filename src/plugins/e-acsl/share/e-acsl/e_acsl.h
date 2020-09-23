@@ -90,6 +90,7 @@
 /************************************************************************/
 
 #include "observation_model/e_acsl_observation_model.h"
+#include "instrumentation_model/e_acsl_contract.h"
 #include "instrumentation_model/e_acsl_temporal.h"
 #include "numerical_model/e_acsl_floating_point.h"
 #include "numerical_model/e_acsl_gmp_api.h"

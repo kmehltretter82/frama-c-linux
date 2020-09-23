@@ -48,21 +48,28 @@ module Nb_not_yet =
 
 let nb_not_yet = Nb_not_yet.get
 
-let generic_handle f res x =
-  try
-    f x
-  with
+let process_error = function
   | Typing_error s ->
     let msg = Format.sprintf "@[invalid E-ACSL construct@ `%s'.@]" s in
     Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_typing.set (Nb_typing.get () + 1);
-    res
+    Nb_typing.set (Nb_typing.get () + 1)
   | Not_yet s ->
     let msg =
       Format.sprintf "@[E-ACSL construct@ `%s'@ is not yet supported.@]" s
     in
     Options.warning ~once:true ~current:true "@[%s@ Ignoring annotation.@]" msg;
-    Nb_not_yet.set (Nb_not_yet.get () + 1);
+    Nb_not_yet.set (Nb_not_yet.get () + 1)
+  | exn ->
+    Options.fatal
+      "Unexpected error in `Error.process_error`: %s"
+      (Printexc.to_string exn)
+
+let generic_handle f res x =
+  try
+    f x
+  with
+  | exn ->
+    process_error exn;
     res
 
 let handle f x = generic_handle f x x

@@ -22,42 +22,30 @@
 
 open Cil_types
 
-(** Generate C implementations of user-defined logic functions.
-    A logic function can have multiple C implementations depending on
-    the types computed for its arguments.
-    Eg: Consider the following definition: [integer g(integer x) = x]
-      with the following calls: [g(5)] and [g(10*INT_MAX)]
-      They will respectively generate the C prototypes [int g_1(int)]
-      and [long g_2(long)] *)
+(** Represent a function or statement contract. *)
+type contract = {
+  location: location;
+  (** Location of the function or statement attached to the contract. *)
 
-(**************************************************************************)
-(************** Logic functions without labels ****************************)
-(**************************************************************************)
+  named_behaviors_count: int;
+  (** Number of named behaviors in the contract
+      (excluding the default behavior) *)
 
-val reset: unit -> unit
+  name_to_idx_tbl: (string, int) Hashtbl.t;
+  (** Hashtable associating the name of a behavior with its index in the C API
+      structure used to store behaviors information at runtime. *)
 
-val tapp_to_exp:
-  loc:location ->
-  string -> Env.t -> kernel_function ->
-  term -> logic_info -> Typing.number_ty list -> exp list ->
-  varinfo * exp * Env.t
+  mutable var: (varinfo * exp) option;
+  (** Elements to access the C API structure used to store contracts
+      information at runtime. *)
 
-val add_generated_functions: global list -> global list
-(* @return the input list of globals in which the generated functions have been
-   inserted at the right places (both their declaration and their definition) *)
+  mutable all_assumes_translated: bool;
+  (** True if all the assumes clauses of the contract could be translated, false
+      otherwise.
 
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
+      If even one assume clause can't be translated, then the complete and
+      disjoint clauses can't be computed. *)
 
-val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)
+  spec: spec
+  (** Specification for the contract *)
+}

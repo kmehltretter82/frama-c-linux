@@ -25,8 +25,8 @@
     - a call to [__e_acsl_delete_block] at the end of the scope.
       This is not always sufficient to track variables because execution
       may exit a scope early (for instance via a goto or a break statement).
-      This module computes program points at which extra `delete_block` statements
-      need to be added to handle such early scope exits. *)
+      This module computes program points at which extra [delete_block]
+      statements need to be added to handle such early scope exits. *)
 
 open Cil_types
 open Cil_datatype

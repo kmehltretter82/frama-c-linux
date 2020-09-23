@@ -30,7 +30,7 @@ Prove: true.
   Function bhv
 ------------------------------------------------------------
 
-Goal Complete behaviors 'pos', 'neg':
+Goal Complete behaviors 'neg', 'pos':
 Assume { Type: is_sint32(n). (* Pre-condition *) Have: n != 0. }
 Prove: (0 < n) \/ (n < 0).
 

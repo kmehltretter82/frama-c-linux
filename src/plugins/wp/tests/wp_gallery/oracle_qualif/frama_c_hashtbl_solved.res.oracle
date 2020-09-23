@@ -3,8 +3,8 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 102 goals scheduled
-[wp] [Qed] Goal typed_eq_string_complete_not_eq_eq : Valid
-[wp] [Qed] Goal typed_eq_string_disjoint_not_eq_eq : Valid
+[wp] [Qed] Goal typed_eq_string_complete_eq_not_eq : Valid
+[wp] [Qed] Goal typed_eq_string_disjoint_eq_not_eq : Valid
 [wp] [Alt-Ergo] Goal typed_eq_string_loop_invariant_preserved : Valid
 [wp] [Qed] Goal typed_eq_string_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_eq_string_loop_invariant_2_preserved : Valid
@@ -79,8 +79,8 @@
 [wp] [Alt-Ergo] Goal typed_add_full_assigns_normal_part7 : Valid
 [wp] [Alt-Ergo] Goal typed_add_full_assigns_normal_part8 : Valid
 [wp] [Qed] Goal typed_add_full_assigns_normal_part9 : Valid
-[wp] [Alt-Ergo] Goal typed_mem_binding_complete_not_found_found : Valid
-[wp] [Alt-Ergo] Goal typed_mem_binding_disjoint_not_found_found : Valid
+[wp] [Alt-Ergo] Goal typed_mem_binding_complete_found_not_found : Valid
+[wp] [Alt-Ergo] Goal typed_mem_binding_disjoint_found_not_found : Valid
 [wp] [Alt-Ergo] Goal typed_mem_binding_loop_invariant_preserved : Valid
 [wp] [Alt-Ergo] Goal typed_mem_binding_loop_invariant_established : Valid
 [wp] [Alt-Ergo] Goal typed_mem_binding_loop_invariant_2_preserved : Valid

@@ -13,6 +13,8 @@ man/e-acsl-gcc.sh.1: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 scripts/e-acsl-gcc.sh: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_assert.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_assert.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/instrumentation_model/e_acsl_contract.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+share/e-acsl/instrumentation_model/e_acsl_contract.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal.c: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 share/e-acsl/instrumentation_model/e_acsl_temporal_timestamp.h: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -80,6 +82,9 @@ src/analyses/typing.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/analyses/typing.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/at_with_lscope.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/contract_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/env.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/global_observer.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -114,6 +119,11 @@ src/code_generator/temporal.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/temporal.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/code_generator/translate.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_annots.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/code_generator/translate_annots.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/dependencies/dep_eva.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/dependencies/dep_eva.enabled.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/dependencies/dep_eva.disabled.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/builtins.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/error.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL

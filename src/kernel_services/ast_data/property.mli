@@ -100,7 +100,7 @@ type identified_complete = {
   ic_kf : kernel_function;
   ic_kinstr : kinstr;
   ic_active : Datatype.String.Set.t;
-  ic_bhvs : string list
+  ic_bhvs : Datatype.String.Set.t
 }
 (** Same as for {!identified_behavior}. *)
 

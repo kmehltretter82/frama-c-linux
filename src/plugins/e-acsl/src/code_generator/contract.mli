@@ -20,48 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Loop specific actions. *)
-
 open Cil_types
+open Contract_types
 
-(**************************************************************************)
-(************************* Loop invariants ********************************)
-(**************************************************************************)
+(** Translate a given ACSL contract (function or statement) into the
+    corresponding C statement for runtime assertion checking. *)
 
-val preserve_invariant:
-  Env.t -> Kernel_function.t -> stmt -> stmt * Env.t
-(** Modify the given stmt loop to insert the code which preserves its loop
-    invariants. Also return the modified environment. *)
+type t = contract
 
-(**************************************************************************)
-(**************************** Nested loops ********************************)
-(**************************************************************************)
+val create: loc:location -> spec -> t
+(** Create a contract from a [spec] object (either function spec or statement
+    spec) *)
 
-val mk_nested_loops:
-  loc:location -> (Env.t -> stmt list * Env.t) -> kernel_function -> Env.t ->
-  Lscope.lscope_var list -> stmt list * Env.t
-(** [mk_nested_loops ~loc mk_innermost_block kf env lvars] creates nested
-    loops (with the proper statements for initializing the loop counters)
-    from the list of logic variables [lvars]. Quantified variables create
-    loops while let-bindings simply create new variables.
-    The [mk_innermost_block] closure creates the statements of the innermost
-    block. *)
+val translate_preconditions: kernel_function -> kinstr -> Env.t -> t -> Env.t
+(** Translate the preconditions of the given contract into the environement *)
+
+val translate_postconditions: kernel_function -> kinstr -> Env.t -> Env.t
+(** Translate the postconditions of the given contract into the environment *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val translate_predicate_ref:
-  (kernel_function -> Env.t -> predicate -> Env.t) ref
+val must_translate_ppt_ref: (Property.t -> bool) ref
 
-val predicate_to_exp_ref:
-  (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-
-val term_to_exp_ref:
-  (kernel_function -> Env.t -> term -> exp * Env.t) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)
+val must_translate_ppt_opt_ref: (Property.t option -> bool) ref
