@@ -112,3 +112,10 @@ module Stubs = String_list(
     let arg_name = "f1,...,fn"
     let help = "list of C files containing stub functions"
   end)
+
+module PrintLibc = True(
+  struct
+    let option_name = "-mdr-print-libc"
+    let help =
+      "when set (default), reports include information about libc elements."
+  end)

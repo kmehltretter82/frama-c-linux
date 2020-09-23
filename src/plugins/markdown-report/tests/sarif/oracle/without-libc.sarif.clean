@@ -1,0 +1,89 @@
+{
+  "$schema":
+    "https://github.com/oasis-tcs/sarif-spec/blob/master/Documents/CommitteeSpecificationDrafts/v2.1.0-CSD.1/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "frama-c",
+          "fullName": "frama-c-21.1+dev (Scandium)",
+          "version": "21.1+dev (Scandium)",
+          "semanticVersion": "21.1+dev",
+          "downloadUri": "https://frama-c.com/download.html"
+        }
+      },
+      "invocations": [
+        {
+          "commandLine":
+            "frama-c -check tests/sarif/libc.c -no-autoload-plugins -load-module eva,from,scope,markdown_report -eva -mdr-gen sarif -mdr-out tests/sarif/oracle/without-libc.sarif -mdr-no-print-libc",
+          "arguments": [
+            "-check", "tests/sarif/libc.c", "-no-autoload-plugins",
+            "-load-module", "eva,from,scope,markdown_report", "-eva",
+            "-mdr-gen", "sarif", "-mdr-out",
+            "tests/sarif/oracle/without-libc.sarif", "-mdr-no-print-libc"
+          ],
+          "exitCode": 0,
+          "executionSuccessful": true
+        }
+      ],
+      "originalUriBaseIds": {
+        "FRAMAC_SHARE": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_SHARE" },
+        "FRAMAC_LIB": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_LIB" },
+        "FRAMAC_PLUGIN": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_PLUGIN" },
+        "PWD": {
+          "uri": "REPLACED_FOR_PTESTS_PWD"
+        }
+      },
+      "artifacts": [
+        {
+          "location": { "uri": "tests/sarif/libc.c" },
+          "roles": [ "analysisTarget" ],
+          "mimeType": "text/x-csrc"
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "specialization of valid_string_s at stmt 2."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri":
+                    "REPLACED_FOR_PTESTS_PWD/tests/sarif/libc.c"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 10,
+                  "endLine": 11,
+                  "endColumn": 19,
+                  "byteLength": 9
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "defaultSourceLanguage": "C",
+      "taxonomies": [
+        {
+          "name": "frama-c",
+          "rules": [
+            {
+              "id": "user-spec",
+              "shortDescription": {
+                "text": "User-written ACSL specification."
+              }
+            }
+          ],
+          "contents": [ "nonLocalizedData" ]
+        }
+      ]
+    }
+  ]
+}

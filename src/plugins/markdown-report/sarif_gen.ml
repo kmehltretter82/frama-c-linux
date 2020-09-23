@@ -53,6 +53,9 @@ module Analysis_cmdline =
 
 let gen_invocation () =
   let cl = Analysis_cmdline.get () in
+  (* The first argument is _always_ the binary name, but to avoid printing it
+     as an absolute path to binlevel.opt, we replace it with 'frama-c' *)
+  let cl = "frama-c" :: List.tl cl in
   let commandLine = String.concat " " cl in
   let arguments = List.tl cl in
   Invocation.create ~commandLine ~arguments ()
@@ -107,27 +110,51 @@ let make_message alarm annot remark =
   in
   Message.create ~text ~markdown ()
 
+let kf_is_in_libc kf =
+  let g = Kernel_function.get_global kf in
+  Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g)
+
+let ip_is_in_libc ip =
+  match Property.get_kf ip with
+  | None ->
+    (* possibly an identified lemma; check its attributes *)
+    begin
+      match ip with
+      | IPAxiomatic {iax_attrs=attrs}
+      | IPLemma {il_attrs=attrs}
+      | IPAxiom {il_attrs=attrs} ->
+        Cil.hasAttribute "fc_stdlib" attrs
+      | _ ->
+        false
+    end
+  | Some kf ->
+    kf_is_in_libc kf
+
 let opt_physical_location_of_loc loc =
   if loc = Cil_datatype.Location.unknown then []
   else [ Location.of_loc loc ]
-
+(* Cil_types *)
 let gen_results remarks =
   let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
-    let prop = Property.ip_of_code_annot_single kf s annot in
-    let ruleId = Alarms.get_name alarm in
-    let rules =
-      Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
-    in
-    let label = "Alarm-" ^ string_of_int i in
-    let kind = kind_of_status (Property_status.Feedback.get prop) in
-    let level = level_of_status (Property_status.Feedback.get prop) in
-    let remark = get_remark remarks label in
-    let message = make_message alarm annot remark in
-    let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
-    let res =
-      Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
-    in
-    (i+1, rules, res :: content)
+    if not (Mdr_params.PrintLibc.get ()) && kf_is_in_libc kf then
+      (* skip alarm in libc *)
+      (i, rules, content)
+    else
+      let prop = Property.ip_of_code_annot_single kf s annot in
+      let ruleId = Alarms.get_name alarm in
+      let rules =
+        Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
+      in
+      let label = "Alarm-" ^ string_of_int i in
+      let kind = kind_of_status (Property_status.Feedback.get prop) in
+      let level = level_of_status (Property_status.Feedback.get prop) in
+      let remark = get_remark remarks label in
+      let message = make_message alarm annot remark in
+      let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
+      let res =
+        Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
+      in
+      (i+1, rules, res :: content)
   in
   let _, rules, content =
     Alarms.fold treat_alarm (0, Datatype.String.Map.empty,[])
@@ -153,7 +180,11 @@ let gen_status ip =
 
 let gen_statuses () =
   let f ip content =
-    if is_alarm ip then content else (gen_status ip) :: content
+    let exclude =
+      is_alarm ip ||
+      (not (Mdr_params.PrintLibc.get ()) && ip_is_in_libc ip)
+    in
+    if exclude then content else (gen_status ip) :: content
   in
   List.rev (Property_status.fold f [])
 
