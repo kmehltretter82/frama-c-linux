@@ -20,11 +20,13 @@ module TestNumber =
      end)
 
 module InternalWpShare =
-  P.Empty_string(
+  P.Filepath(
     struct
       let option_name = "-aorai-test-wp-share"
       let help = "use custom wp share dir (when in internal plugin mode)"
       let arg_name = "dir"
+      let existence = Filepath.Must_exist
+      let file_kind = "wp share directory"
     end)
 
 module ProveAuxSpec =
@@ -50,17 +52,13 @@ let extend () =
     let run = !Db.Toplevel.run in
     fun f ->
       let my_project = Project.create "Reparsing" in
-      let wp_compute_kf =
-        Dynamic.get ~plugin:"Wp" "wp_compute_kf"
-          Datatype.(
-            func3 (option Kernel_function.ty) (list string) (list string) unit)
-      in
+      let wp_compute_kf kf = Wp.VC.command (Wp.VC.generate_kf kf) in
       let check_auto_func kf =
         let name = Kernel_function.get_name kf in
         if Kernel_function.is_definition kf &&
            (is_suffix "_pre_func" name || is_suffix "_post_func" name)
         then
-          wp_compute_kf (Some kf) [] []
+          wp_compute_kf kf
       in
       run f;
       let tmpfile =
@@ -89,10 +87,9 @@ let extend () =
       Constfold.off ();
       Ast.compute();
       if ProveAuxSpec.get () then begin
-        let wp_share = InternalWpShare.get() in
-        if wp_share <> "" then
-          Dynamic.Parameter.String.set "-wp-share" wp_share;
-        Dynamic.Parameter.Int.set "-wp-verbose" 0;
+        if InternalWpShare.is_set() then
+          Wp.Wp_parameters.Share.set (InternalWpShare.get());
+        Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;
       end;
       File.pretty_ast ();
@@ -101,5 +98,3 @@ let extend () =
   Db.Toplevel.run := myrun
 
 let () = extend ()
-
-
