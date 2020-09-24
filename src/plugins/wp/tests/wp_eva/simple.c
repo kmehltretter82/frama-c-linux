@@ -1,3 +1,13 @@
+/* run.config
+  OPT:  -wp-model eva1
+  OPT:  -wp-model eva2
+*/
+
+/* run.config_qualif
+  OPT:  -wp-model eva1
+  OPT:  -wp-model eva2
+*/
+
 #include "__fc_builtin.h"
 
 /*@
@@ -10,8 +20,10 @@
 int z;
 
 void f (int *x, int *y){
+  if(z==41) return;
   *x = *x+1;
   /*@ assert P(*x) && P(*y) && P(z); @*/
+  int r = 1/(*x-42);
 }
 
 void g (int *x, int *y){

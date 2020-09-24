@@ -1,0 +1,23 @@
+[kernel] Parsing tests/wp_eva/simple.c (with preprocessing)
+[eva:alarm] tests/wp_eva/simple.c:25: Warning: assertion got status unknown.
+[eva:alarm] tests/wp_eva/simple.c:26: Warning: 
+  division by zero. assert (int)(*x - 42) ≢ 0;
+[eva:alarm] tests/wp_eva/simple.c:31: Warning: assertion got status unknown.
+# frama-c -wp -wp-model 'Eva2' [...]
+[wp] Running WP plugin...
+[wp] tests/wp_eva/simple.c:34: Warning: 
+  Ignored 'terminates' specification:
+   \false
+[wp] Warning: Missing RTE guards
+[wp] 3 goals scheduled
+[wp] [Alt-Ergo] Goal eva2_f_assert : Timeout (missing cache)
+[wp] [Alt-Ergo] Goal eva2_f_assert_Eva_division_by_zero : Valid (missing cache)
+[wp] [Alt-Ergo] Goal eva2_g_assert : Timeout (missing cache)
+[wp] Proved goals:    1 / 3
+  Qed:             0 
+  Alt-Ergo:        1  (unsuccess: 2)
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  f                         -        1        2      50.0%
+  g                         -        -        1       0.0%
+------------------------------------------------------------

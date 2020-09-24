@@ -945,7 +945,7 @@ PLUGIN_NAME:=Reduc
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/reduc
 PLUGIN_CMO:=reduc_options misc value2acsl collect hyp register
-PLUGIN_DEPENDENCIES:=Value
+PLUGIN_DEPENDENCIES:=Eva
 
 $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 

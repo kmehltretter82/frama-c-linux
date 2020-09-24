@@ -1,0 +1,2 @@
+CMD: @frama-c@ -no-autoload-plugins -load-module eva,scope,reduc,wp -eva -eva-no-print -eva-verbose 0 @PTEST_FILE@ -then -reduc -reduc-gen-annot all -then -no-reduc -then -wp -wp-par 1 -wp-share ./share -wp-msg-key shell -wp-report tests/qualif.report -wp-session @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay @PTEST_FILE@ -wp-coq-timeout 120
+OPT:
