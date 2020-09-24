@@ -62,7 +62,7 @@ val print_file : string -> (Format.formatter -> 'a) -> 'a
 (* ************************************************************************* *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of exn
+type 'a result = Result of 'a | Error of Printexc.raw_backtrace * exn
 val catch : ('a -> 'b) -> 'a -> 'b result
 val return : 'a result -> 'a
 val time : ?rmax:timer -> ?radd:timer -> ('a -> 'b) -> 'a -> 'b

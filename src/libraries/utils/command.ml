@@ -111,11 +111,13 @@ let print_file file job =
 (* -------------------------------------------------------------------------- *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of exn
+type 'a result = Result of 'a | Error of Printexc.raw_backtrace * exn
 let dt_max tm dt = match tm with Some r when dt > !r -> r := dt | _ -> ()
 let dt_add tm dt = match tm with Some r -> r := !r +. dt | _ -> ()
-let return = function Result x -> x | Error e -> raise e
-let catch f x = try Result(f x) with e -> Error e
+let return = function Result x -> x | Error (bt,e) -> Printexc.raise_with_backtrace e bt
+let catch f x = try Result(f x) with e ->
+  let bt = Printexc.get_raw_backtrace () in
+  Error (bt,e)
 let time ?rmax ?radd job data =
   begin
     let t0 = Sys.time () in
