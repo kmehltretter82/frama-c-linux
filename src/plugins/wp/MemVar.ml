@@ -1533,7 +1533,12 @@ struct
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty
 
   let is_well_formed sigma =
-    M.is_well_formed sigma.mem
+    let values = SIGMA.domain sigma.vars in
+    let constrain v =
+      Cvalues.has_ctype v.vtype (e_var (Sigma.get sigma (Var v)))
+    in
+    let cstrs = SIGMA.Chunk.Set.fold (fun e l -> constrain e :: l) values [] in
+    p_and (p_conj cstrs) (M.is_well_formed sigma.mem)
 
   (* -------------------------------------------------------------------------- *)
 
