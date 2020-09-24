@@ -404,9 +404,14 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
                 ~steps verdict
             with Not_found ->
               begin
+                let message std =
+                  Format.asprintf
+                    "Alt-Ergo (%s) for goal %a"
+                    std WpPropId.pretty pid
+                in
                 if Wp_parameters.verbose_atleast 1 then begin
-                  ProverTask.pp_file ~message:"Alt-Ergo (stdout)" ~file:logout ;
-                  ProverTask.pp_file ~message:"Alt-Ergo (stderr)" ~file:logerr ;
+                  ProverTask.pp_file ~message:(message "stdout") ~file:logout ;
+                  ProverTask.pp_file ~message:(message "stderr") ~file:logerr ;
                 end;
                 if r = 0 then VCS.failed "Unexpected Alt-Ergo output"
                 else VCS.kfailed "Alt-Ergo exits with status [%d]." r
