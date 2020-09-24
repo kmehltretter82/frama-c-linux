@@ -1,7 +1,7 @@
 ( library
   (name metrics)
   (public_name frama-c-metrics.core)
-  (modules metrics_parameters css_html metrics_base metrics_acsl
+  (modules metrics metrics_parameters css_html metrics_base metrics_acsl
     metrics_cabs metrics_cilast metrics_coverage
     register)
   (flags -open Frama_c_kernel)

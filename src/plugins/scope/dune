@@ -1,13 +1,13 @@
 (library
-  (name Scope)
+  (name scope)
   (public_name frama-c-scope.core)
-  (modules datascope zones defs)
+  (modules scope datascope zones defs)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel)
 )
 
 (library
-  (name Scope_gui)
+  (name scope_gui)
   (public_name frama-c-scope.gui)
   (optional)
   (modules dpds_gui)

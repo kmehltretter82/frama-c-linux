@@ -40,8 +40,8 @@ let mk_bi_label (parent:GPack.box) l1 =
 
 module HalsteadMetricsGUI = struct
 
-  let compute = Metrics_cabs.compute_on_cabs 
-  let name = "Halstead" 
+  let compute = Metrics__Metrics_cabs.compute_on_cabs
+  let name = "Halstead"
 
   let display_result (main_ui:Design.main_window_extension_points) (parent_win:GPack.box) =
     try
@@ -52,8 +52,8 @@ module HalsteadMetricsGUI = struct
       ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" name)
                ~justify:`LEFT ~packing:box#pack ());
       ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
-      let metrics = Metrics_cabs.Halstead.get_metrics () in
-      let table_contents = Metrics_cabs.Halstead.to_list metrics in
+      let metrics = Metrics__Metrics_cabs.Halstead.get_metrics () in
+      let table_contents = Metrics__Metrics_cabs.Halstead.to_list metrics in
       Metrics_gui_panels.display_as_table table_contents box
     with
     | Ast.NoUntypedAst ->
@@ -77,7 +77,7 @@ module CyclomaticMetricsGUI = struct
     val mutable checked_fun = Kernel_function.dummy ()
 
     method get_data =
-      let checker = (new Metrics_cilast.slocVisitor ~libc) in
+      let checker = (new Metrics__Metrics_cilast.slocVisitor ~libc) in
       ignore (visitFramacGlobal (checker :> frama_c_visitor)
                 (Kernel_function.get_global checked_fun));
       checker#get_global_metrics
@@ -144,7 +144,7 @@ module CyclomaticMetricsGUI = struct
       ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" fname)
                ~justify:`LEFT ~packing:vbox#pack ());
       ignore(GMisc.separator `HORIZONTAL ~packing:vbox#pack ());
-      let metrics_data  = BasicMetrics.to_list self#get_data in
+      let metrics_data  = Metrics__Metrics_base.BasicMetrics.to_list self#get_data in
       Metrics_gui_panels.display_as_table metrics_data vbox;
       let close_button = GButton.button ~stock:`OK ~packing:vbox#pack () in
       close_button#set_border_width 10;
@@ -167,16 +167,16 @@ module CyclomaticMetricsGUI = struct
         match localizable with
           | PVDecl (Some kf, _,_) ->
             let callback1 () =
-              Metrics_parameters.debug "cyclo_selector - callback";
+              Metrics__Metrics_parameters.debug "cyclo_selector - callback";
               self#display_localizable localizable  ()
             in
 	    let callback2 () =
 	      (* function selected is kf *)
-	       Metrics_coverage.compute_coverage_by_fun ();
+	       Metrics__Metrics_coverage.compute_coverage_by_fun ();
 	       (* Got a list of (kf,value,total,percent).
 		  Now let's scan this list *)
 	       try 
-		 let valeur,total,percent = Metrics_coverage.get_coverage kf in
+		 let valeur,total,percent = Metrics__Metrics_coverage.get_coverage kf in
 		 self#do_value main_ui localizable valeur total percent
 	       with Not_found -> ()
 	    in
@@ -192,7 +192,7 @@ module CyclomaticMetricsGUI = struct
       main_ui#register_source_selector self#cyclo_selector
   end
 
-  let compute ~libc () = Metrics_cilast.compute_on_cilast ~libc
+  let compute ~libc () = Metrics__Metrics_cilast.compute_on_cilast ~libc
 
   let display_result ~libc (parent_win:GPack.box) =
     let padder = GBin.alignment
@@ -202,8 +202,8 @@ module CyclomaticMetricsGUI = struct
     ignore(GMisc.label ~markup:(Printf.sprintf "<b>%s</b>" name)
              ~justify:`LEFT ~packing:box#pack ());
     ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
-    let metrics = Metrics_cilast.get_global_metrics ~libc in
-    let table_contents = BasicMetrics.to_list metrics in
+    let metrics = Metrics__Metrics_cilast.get_global_metrics ~libc in
+    let table_contents = Metrics__Metrics_base.BasicMetrics.to_list metrics in
     Metrics_gui_panels.display_as_table table_contents box
 
   let register ~libc main_ui =
@@ -226,7 +226,7 @@ module ValueCoverageGUI = struct
   let filetree_enabled = ref true
 
   let filetree_visible () =
-    !filetree_enabled && Metrics_coverage.is_computed_by_fun ()
+    !filetree_enabled && Metrics__Metrics_coverage.is_computed_by_fun ()
 
   (* TODO : Metrics data structure must be projectified ? *)
   let compute ~libc =
@@ -234,10 +234,10 @@ module ValueCoverageGUI = struct
       match !result with
         | None ->
           !Db.Value.compute ();
-          result := Some (Metrics_coverage.compute ~libc)
+          result := Some (Metrics__Metrics_coverage.compute ~libc)
         | Some _ -> ()
     end;
-    Metrics_coverage.compute_coverage_by_fun ();
+    Metrics__Metrics_coverage.compute_coverage_by_fun ();
     !update_filetree `Contents;
     Extlib.the !result
 
@@ -247,7 +247,7 @@ module ValueCoverageGUI = struct
         begin
           try
             let kf = Globals.Functions.get v in
-            get (Metrics_coverage.get_coverage kf)
+            get (Metrics__Metrics_coverage.get_coverage kf)
           with Not_found -> -1
         end
       | _ -> -1
@@ -293,7 +293,7 @@ module ValueCoverageGUI = struct
   let () =
     Db.Value.Table_By_Callstack.add_hook_on_update
       (fun _ ->
-         Metrics_coverage.clear_coverage_by_fun ();
+         Metrics__Metrics_coverage.clear_coverage_by_fun ();
         !update_filetree `Visibility)
 
   (* Functions are highlighted using different colors according to the
@@ -340,12 +340,12 @@ module ValueCoverageGUI = struct
              ~justify:`LEFT ~packing:box#pack ());
     ignore(GMisc.separator `HORIZONTAL ~packing:box#pack ());
     let metrics = compute ~libc in
-    let pcent = Metrics_coverage.percent_coverage ~libc metrics in
+    let pcent = Metrics__Metrics_coverage.percent_coverage ~libc metrics in
     let progress_bar = GRange.progress_bar ~packing:box#pack () in
     progress_bar#set_fraction (pcent /. 100.0);
     ignore(GMisc.label
              ~markup:(Format.sprintf "%s%% functions reached"
-                        (Metrics_base.float_to_string pcent))
+                        (Metrics__Metrics_base.float_to_string pcent))
              ~justify:`LEFT ~packing:box#pack ());
     let _ignore = Gtk_helper.on_bool box "Highlight results"
         (fun () -> !highlight)
@@ -361,11 +361,11 @@ module ValueCoverageGUI = struct
   let register ~libc main_ui =
     Design.register_reset_extension (fun _ -> result := None);
     main_ui#register_source_highlighter highlighter;
-    let apply = Metrics_parameters.ValueCoverage.get () in
+    let apply = Metrics__Metrics_parameters.ValueCoverage.get () in
     Metrics_gui_panels.register_metrics ~apply name (display_result ~libc main_ui);
 end
 
-let register_final ?(libc=Metrics_parameters.Libc.get ()) main_ui =
+let register_final ?(libc=Metrics__Metrics_parameters.Libc.get ()) main_ui =
   let box = Metrics_gui_panels.init_panel main_ui in
   Design.register_reset_extension Metrics_gui_panels.reset_panel;
   HalsteadMetricsGUI.register main_ui;

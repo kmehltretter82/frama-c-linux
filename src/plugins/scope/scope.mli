@@ -45,7 +45,12 @@ module Defs : sig
         a call.
         Also returns the zone that is possibly not defined.
         Can return [None] when the information is not available (Pdg missing).
- *)
+*)
+
+  val compute_with_def_type_zone:
+    Cil_types.kernel_function -> Cil_types.stmt -> Locations.Zone.t ->
+    ((bool * bool) Cil_datatype.Stmt.Map.t * Locations.Zone.t option) option
+    (** internal use *)
 end
 
 module Datascope : sig
@@ -72,6 +77,15 @@ module Datascope : sig
 
   val rm_asserts : unit -> unit
   (** Same analysis than [check_asserts] but mark the assertions as proven. *)
+
+  (** for internal use *)
+  module R: Plugin.General_services
+
+  val get_lval_zones:
+    for_writing:bool ->
+    Cil_types.stmt ->
+    Cil_types.lval ->
+    Locations.Zone.t * bool * Locations.Zone.t
 end
 
 (** {3 Zones} *)
