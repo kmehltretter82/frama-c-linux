@@ -1,2 +1,2 @@
 [kernel] Parsing cpp-command.c (with preprocessing)
-%1 = cpp-command.c %2 = /tmp/cpp-command.c95395d.i %args =  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32
+%1 = cpp-command.c %2 = /tmp/cpp-command.c125b21.i %args =  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32

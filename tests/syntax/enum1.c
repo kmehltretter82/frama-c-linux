@@ -1,4 +1,5 @@
 /* run.config
+   DEPS: enum.h
    STDOPT: +"enum2.c"
 */
 

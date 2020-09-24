@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: report
 OPT: -report
 OPT: -ulevel -1 -report
 */

@@ -1,5 +1,5 @@
 /* run.config
-OPT: @PTEST_DIR@/@PTEST_NAME@_aux.i -print
+OPT: %{dep:@PTEST_NAME@_aux.i} -print
 */
 int open (const char* file, int flags, int mode) {
   return -1;

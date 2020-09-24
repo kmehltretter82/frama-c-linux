@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: sparecode
    CMXS: @PTEST_NAME@
    STDOPT: +"-load-module %{dep:@PTEST_NAME@.cmxs}"
 */

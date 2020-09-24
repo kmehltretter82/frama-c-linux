@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"@PTEST_DIR@/inline_def_2.i"
+STDOPT: +"%{dep:inline_def_2.i}"
 */
 
 // inline definition can be used in this translation unit, but does not

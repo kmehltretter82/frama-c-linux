@@ -1,3 +1,3 @@
-[kernel] User Error: Missing source file 'ghost_cv_var_decl.ml'
+[kernel] User Error: Missing source file 'tests/syntax/ghost_cv_var_decl.ml'
 [kernel] User Error: Deferred error message was emitted during execution. See above messages for more information.
 [kernel] Frama-C aborted: invalid user input.

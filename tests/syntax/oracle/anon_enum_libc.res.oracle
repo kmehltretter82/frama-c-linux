@@ -1,5 +1,5 @@
 [kernel] Parsing anon_enum_libc.c (with preprocessing)
-[kernel] User Error: failed to run: gcc -E -C -I.  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -I tmp/anon_enum_libc.c7cac46.i' '/home/bobot/Sources/frama-c/_build/default/result/anon_enum_libc.c'
+[kernel] User Error: failed to run: gcc -E -C -I.  -I/home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -I tests/syntax -dD -nostdinc -m32 -o '/tmp/anon_enum_libc.c98bd8a.i' '/home/bobot/Sources/frama-c/_build/default/tests/syntax/result/anon_enum_libc.c'
   See chapter "Preparing the Sources" in the Frama-C user manual for more details.
 [kernel] User Error: stopping on file "anon_enum_libc.c" that has errors. Add '-kernel-msg-key pp'
   for preprocessing command.
