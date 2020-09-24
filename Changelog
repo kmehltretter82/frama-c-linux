@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2020-09-22] New option -autocomplete p1, ..., pn that list the
+              options of plug-ins p1, ..., pn in a format suitable for
+              autocompletion scripts.
 -   Kernel    [2020-09-21] Option -permissive now allows non-existent option
               names.
 -   Logic     [2020-09-11] Introduce check-only annotations for
