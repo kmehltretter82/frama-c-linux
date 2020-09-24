@@ -260,7 +260,7 @@ struct
     | M_float -> L.Array (t_addr, L.Real)
     | M_base _ -> L.Array (L.Int, t_addr)
   let basename_of_chunk c = match c with
-    | M_int -> "Mint00"
+    | M_int -> "Mint"
     | M_char -> "Mchar"
     | M_float -> "Mfloat"
     | M_base b -> match b with

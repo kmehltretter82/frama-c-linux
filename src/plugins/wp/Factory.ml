@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Value
+type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Eva1 | Eva2
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -68,7 +68,8 @@ let descr_mheap d = function
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
-  | Value -> main d "value"
+  | Eva1 -> main d "eva1"
+  | Eva2 -> main d "eva2"
 
 let descr_mvar d = function
   | Var -> ()
@@ -233,6 +234,8 @@ module Model_Typed_Var = Register(Var)(MemTyped)
 module Model_Typed_Ref = Register(Ref)(MemTyped)
 module Model_Caveat = Register(Caveat)(MemTyped)
 
+module MemVal = MemVal.Make(MemVal.Eva)
+
 module MakeCompiler(M:Sigs.Model) = struct
   module M = M
   module C = CodeSemantics.Make(M)
@@ -249,6 +252,7 @@ module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
 module Comp_Caveat = MakeCompiler(Model_Caveat)
 module Comp_MemValue = MakeCompiler(MemValue)
+module Comp_MemVal = MakeCompiler(MemVal)
 
 
 let compiler mheap mvar : (module Sigs.Compiler) =
@@ -261,7 +265,8 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Raw     -> (module Comp_MemTyped)
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
-  | Value, _          -> (module Comp_MemValue)
+  | Eva1, _           -> (module Comp_MemVal)
+  | Eva2, _           -> (module Comp_MemValue)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -271,6 +276,8 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Region -> MemRegion.configure ()
+  | Eva1 -> MemVal.configure ()
+  | Eva2 -> MemValue.configure ()
   | Typed p ->
       let rollback_memtyped = MemTyped.configure () in
       let orig_memtyped_pointer = Context.push MemTyped.pointer p in
@@ -279,7 +286,6 @@ let configure_mheap = function
         Context.pop MemTyped.pointer orig_memtyped_pointer
       in
       rollback
-  | Value -> MemValue.configure ()
 
 let configure_driver setup driver () =
   let rollback_mheap = configure_mheap setup.mheap in
@@ -341,6 +347,7 @@ let split ~warning (m:string) : string list =
     (fun c ->
        match c with
        | 'A' .. 'Z' -> Buffer.add_char buffer c
+       | '0' .. '9' -> Buffer.add_char buffer c
        | '_' | ',' | '@' | '+' | ' ' | '\t' | '\n' | '(' | ')' -> flush ()
        | _ -> warning (Printf.sprintf
                          "In model spec %S : unexpected character '%c'" m c)
@@ -355,8 +362,9 @@ let update_config ~warning m s = function
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
-  | "VALUE" -> { s with mheap = Value }
+  | "EVA1" -> { s with mheap = Eva1 }
   | "CAVEAT" -> { s with mvar = Caveat }
+  | "EVA2" -> { s with mheap = Eva2 }
   | "RAW" -> { s with mvar = Raw }
   | "REF" -> { s with mvar = Ref }
   | "VAR" -> { s with mvar = Var }
