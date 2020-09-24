@@ -111,7 +111,7 @@ module VState =
 struct
   module M = Cvalue.Model
   let current : M.t ref = ref M.bottom
-  let _update () =
+  let update () =
     try
       match WpContext.get_scope () with
       | Global -> assert false
@@ -260,7 +260,7 @@ struct
     | M_float -> L.Array (t_addr, L.Real)
     | M_base _ -> L.Array (L.Int, t_addr)
   let basename_of_chunk c = match c with
-    | M_int -> "Mint"
+    | M_int -> "Mint00"
     | M_char -> "Mchar"
     | M_float -> "Mfloat"
     | M_base b -> match b with
@@ -361,7 +361,10 @@ let imval c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
 
 let lookup_lv _c _e = assert false (* TODO *)
 
-let lookup s e = imval (Tmap.find e s)
+let lookup s e =
+  match Tmap.find e s with
+  | exception Not_found -> Mterm
+  | v -> imval v
 
 let apply f s =
   let m = ref Tmap.empty in
@@ -670,6 +673,7 @@ let scope : sigma sequence -> scope -> varinfo list -> pred list = fun seq scope
   | Enter ->
       alloc_pred seq xs ALLOC
   | Leave ->
+      VState.update ();
       alloc_pred seq xs FREE
 
 let global : sigma -> term (*addr*) -> pred = fun _sigma p ->

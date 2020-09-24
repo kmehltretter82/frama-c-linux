@@ -355,6 +355,7 @@ let update_config ~warning m s = function
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
+  | "VALUE" -> { s with mheap = Value }
   | "CAVEAT" -> { s with mvar = Caveat }
   | "RAW" -> { s with mvar = Raw }
   | "REF" -> { s with mvar = Ref }
