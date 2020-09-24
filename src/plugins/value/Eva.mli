@@ -67,21 +67,26 @@ module Unit_tests: sig
   val run: unit -> unit
 end
 
-
+(** Register special annotations to locally guide the partitioning of states
+    performed by an Eva analysis. *)
 module Eva_annotations: sig
+
+  (** Annotations tweaking the behavior of the -eva-slevel paramter. *)
   type slevel_annotation =
-    | SlevelMerge
-    | SlevelDefault
-    | SlevelLocal of int
-    | SlevelFull
+    | SlevelMerge        (** Join all states separated by slevel. *)
+    | SlevelDefault      (** Use the limit defined by -eva-slevel. *)
+    | SlevelLocal of int (** Use the given limit instead of -eva-slevel. *)
+    | SlevelFull         (** Remove the limit of number of separated states. *)
 
+  (** Loop unroll annotations. *)
   type unroll_annotation =
-    | UnrollAmount of Cil_types.term
-    | UnrollFull
+    | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
+    | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
 
+  (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
-    | FlowSplit of Cil_types.term
-    | FlowMerge of Cil_types.term
+    | FlowSplit of Cil_types.term (** Split states according to a term. *)
+    | FlowMerge of Cil_types.term (** Merge states separated by a previous split. *)
 
   val add_slevel_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> slevel_annotation -> unit
