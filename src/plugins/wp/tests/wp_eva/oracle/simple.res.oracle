@@ -1,0 +1,34 @@
+[kernel] Parsing tests/wp_eva/simple.c (with preprocessing)
+[eva:alarm] tests/wp_eva/simple.c:14: Warning: assertion got status unknown.
+[eva:alarm] tests/wp_eva/simple.c:19: Warning: assertion got status unknown.
+[wp] Running WP plugin...
+[wp] tests/wp_eva/simple.c:28: Warning: 
+  Ignored 'terminates' specification:
+   \false
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function f
+------------------------------------------------------------
+
+Goal Assertion (file tests/wp_eva/simple.c, line 14):
+Let x = read_sint32(MVar_z_0, 0).
+Let x_1 = 1 + x.
+Assume { Type: is_sint32(x) /\ is_sint32(x_1). }
+Prove: P_P(x_1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function g
+------------------------------------------------------------
+
+Goal Assertion (file tests/wp_eva/simple.c, line 19):
+Let x = read_sint32(MVar_x_0, 0).
+Let x_1 = read_sint32(MVar_y_0, 0).
+Let x_2 = read_sint32(MVar_z_0, 0).
+Let x_3 = 1 + x.
+Assume {
+  Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3).
+}
+Prove: P_P(x_1) /\ P_P(x_2) /\ P_P(x_3).
+
+------------------------------------------------------------

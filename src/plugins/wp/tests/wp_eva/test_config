@@ -1,0 +1,2 @@
+CMD: @frama-c@ -no-autoload-plugins -load-module eva,scope -eva -load-module wp -eva-no-print -eva-verbose 0
+OPT: -then -wp -wp-print -wp-prover none -wp-share ./share -wp-msg-key shell -wp-model value
