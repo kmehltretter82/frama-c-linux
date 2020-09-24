@@ -34,7 +34,7 @@
         dgraph_helper
 )
   (flags -open Frama_c_kernel -linkall)
-  (libraries frama-c.init.gui frama-c.kernel ocamlgraph.dgraph
+  (libraries frama-c.init.gui frama-c.kernel
    (select gtk_compat.ml from
       (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> gtk_compat.2.ml)
       (lablgtk3 lablgtk3-sourceview3 -> gtk_compat.3.ml)
@@ -48,7 +48,7 @@
       (lablgtk3 lablgtk3-sourceview3 -> GSourceView.3.mli)
    )
    (select dgraph_helper.ml from
-      (dgraph -> dgraph_helper.yes.ml)
+      (ocamlgraph.dgraph -> dgraph_helper.yes.ml)
       ( -> dgraph_helper.no.ml)
    )
 )
