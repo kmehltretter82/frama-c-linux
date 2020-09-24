@@ -116,16 +116,18 @@ type plugin =
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
 
 let plugins: plugin list ref = ref []
+let cmp_plugins p1 p2 =
+  (* the kernel is the smallest plug-in *)
+  match p1.p_name, p2.p_name with
+  | s1, s2 when s1 = kernel_name && s2 = kernel_name -> 0
+  | s1, _ when s1 = kernel_name -> -1
+  | _, s2 when s2 = kernel_name -> 1
+  | s1, s2 -> String.compare s1 s2
 let iter_on_plugins f =
-  let cmp p1 p2 =
-    (* the kernel is the smaller plug-in *)
-    match p1.p_name, p2.p_name with
-    | s1, s2 when s1 = kernel_name && s2 = kernel_name -> 0
-    | s1, _ when s1 = kernel_name -> -1
-    | _, s2 when s2 = kernel_name -> 1
-    | s1, s2 -> String.compare s1 s2
-  in
-  List.iter f (List.sort cmp !plugins)
+  List.iter f (List.sort cmp_plugins !plugins)
+
+let fold_on_plugins (f : (plugin -> 'a -> 'a)) (acc : 'a) : 'a =
+  List.fold_left (fun acc e -> f e acc) acc (List.sort cmp_plugins !plugins)
 
 let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
@@ -309,7 +311,7 @@ struct
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      if is_visible then Parameter_customize.do_iterate ()
+      if is_visible then Parameter_customize.is_reconfigurable ()
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
@@ -515,7 +517,7 @@ struct
     Parameter_customize.set_group messages;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.do_not_journalize ();
-    Parameter_customize.do_iterate ();
+    Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
       Parameter_customize.set_cmdline_stage Cmdline.Early;
       Parameter_customize.set_module_name modname;

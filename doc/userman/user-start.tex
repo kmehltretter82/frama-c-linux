@@ -264,6 +264,11 @@ source $(frama-c-config -share)/autocomplete_frama-c || true
 There is also an autocompletion script for zsh, \texttt{\_frama-c}, also
 in the shared resources directory. Look inside for installation instructions.
 
+The kernel option \optiondef{-}{autocomplete} provides a text output listing
+all \FramaC options, so that autocompletion scripts may use it to provide
+completion. The \FramaC team welcomes improved and additional autocompletion
+scripts.
+
 \subsection{Splitting a \FramaC Execution into Several Steps}\label{sec:then}
 
 By default, \FramaC parses its command line in an \emph{unspecified} order and

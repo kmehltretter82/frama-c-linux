@@ -1075,42 +1075,6 @@ let list_plugins () =
     end ;
   raise Exit
 
-let list_all_plugin_options ~print_invisible =
-  Log.print_on_output
-    begin fun fmt ->
-      let of_name s =
-        if s = "" then (if Unix.isatty Unix.stdout then
-                          "\x1b[31mNO NAME\x1b[0m" else "NO NAME")
-        else s
-      in
-      let print_cmdline_option fmt (c:cmdline_option) =
-        if print_invisible || c.ovisible then
-          Format.fprintf fmt "@[<v>Name: %s@]" c.oname
-        else
-          Format.ifprintf fmt "@[<v>Name: %s@]" c.oname
-      in
-      let print_cmdline_option_list fmt cs =
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@;"
-           print_cmdline_option) fmt (sort_cmdline_options cs)
-      in
-      let print_groups fmt gs =
-        let sorted_gs = sort_groups gs in
-        (Pretty_utils.pp_list
-           ~pre:"@[<v>" ~sep:"@;" ~suf:"@]"
-           (Pretty_utils.pp_pair ~pre:"@[<v 2>" ~suf:"@]" ~sep:"@;"
-              (fun fmt name -> Format.pp_print_string fmt (of_name name))
-              (fun fmt p -> print_cmdline_option_list fmt !p))) fmt sorted_gs
-      in
-      let print_plugin fmt p =
-        Format.fprintf fmt "@[<v 2>Name: %s@;%a@]"
-          p.Plugin.name print_groups p.Plugin.groups
-      in
-      Format.fprintf fmt "%a@."
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@;" print_plugin)
-        (Plugin.all_plugins ())
-    end;
-  raise Exit
-
 (* ************************************************************************* *)
 (** {3 Explain}
 

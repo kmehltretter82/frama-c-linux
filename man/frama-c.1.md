@@ -97,6 +97,10 @@ with non-trivial control flow are never duplicated. Defaults to yes.
 : reads ACSL annotations. This is the default. Annotations are pre-processed
 by default. Use -no-pp-annot if you don't want to expand macros in annotations.
 
+-autocomplete *p1,...,pn*
+: lists the options of plugins *p1,...,pn* in a format suitable for
+autocompletion scripts.
+
 -big-ints-hex *max*
 : integers larger than *max* are displayed in hexadecimal
 (by default, all integers are displayed in decimal).

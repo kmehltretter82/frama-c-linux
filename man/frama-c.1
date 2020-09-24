@@ -25,7 +25,7 @@
 .\" using pandoc 2.0 or newer. To modify this file, edit the Markdown file
 .\" and run `make man/frama-c.1`.
 
-.TH FRAMA-C 1 2020-09-01
+.TH FRAMA-C 1 2020-09-21
 .SH NAME
 .PP
 frama-c[.byte] - a static analyzer for C programs
@@ -140,6 +140,10 @@ reads ACSL annotations.
 This is the default.
 Annotations are pre-processed by default.
 Use -no-pp-annot if you don\[cq]t want to expand macros in annotations.
+.TP
+.B -autocomplete \f[I]p1,\&...,pn\f[R]
+lists the options of plugins \f[I]p1,\&...,pn\f[R] in a format suitable
+for autocompletion scripts.
 .TP
 .B -big-ints-hex \f[I]max\f[R]
 integers larger than \f[I]max\f[R] are displayed in hexadecimal (by

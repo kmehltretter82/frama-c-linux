@@ -233,6 +233,9 @@ module PrintLib: Parameter_sig.Bool
 module PrintPluginPath: Parameter_sig.Bool
 (** Behavior of option "-print-plugin-path" *)
 
+module AutocompleteHelp: Parameter_sig.String_set
+(** Behavior of option "-autocomplete" *)
+
 (* ************************************************************************* *)
 (** {2 Output Messages} *)
 (* ************************************************************************* *)
