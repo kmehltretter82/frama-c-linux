@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -aorai-automata tests/aorai/test_recursion4.ya -aorai-test 1 -aorai-acceptance -load-module tests/aorai/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-automata tests/aorai/test_recursion4.ya -aorai-test 1 -aorai-acceptance -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
 */
 
 # pragma JessieIntegerModel(math)

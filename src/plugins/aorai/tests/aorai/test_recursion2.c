@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -aorai-buchi tests/aorai/test_recursion2.promela -aorai-test 1 -aorai-acceptance -load-module tests/aorai/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
-   OPT: -aorai-buchi tests/aorai/test_recursion3.promela -aorai-test 1 -aorai-acceptance -load-module tests/aorai/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-buchi tests/aorai/test_recursion2.promela -aorai-test 1 -aorai-acceptance -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-buchi tests/aorai/test_recursion3.promela -aorai-test 1 -aorai-acceptance -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
 */
 
 /* Calcul de la longueur cumulee des chaines de caracteres prises en parametre */

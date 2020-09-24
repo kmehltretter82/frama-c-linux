@@ -80,7 +80,7 @@ PLUGIN_NO_DEFAULT_TEST:=yes
 endif
 
 PLUGIN_TESTS_DIRS:=aorai
-PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/aorai/Aorai_test.ml $(PLUGIN_DIR)/tests/aorai/name_projects.ml
+PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/Aorai_test.ml $(PLUGIN_DIR)/tests/aorai/name_projects.ml
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
@@ -101,7 +101,7 @@ $(Aorai_DIR)/tests/test_config_prove: \
 	$(SED) -e 's!@AORAI_WP_SHARE@!$(AORAI_WP_SHARE)!' $< > $@
 	$(CHMOD_RO) $@
 
-Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/aorai/Aorai_test.cmxs $(Aorai_DIR)/tests/aorai/Aorai_test.cmo $(Aorai_DIR)/tests/aorai/name_projects.cmxs $(Aorai_DIR)/tests/aorai/name_projects.cmo
+Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/Aorai_test.cmxs $(Aorai_DIR)/tests/Aorai_test.cmo $(Aorai_DIR)/tests/aorai/name_projects.cmxs $(Aorai_DIR)/tests/aorai/name_projects.cmo
 
 # Regenerating the Makefile on need
 

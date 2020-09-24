@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -aorai-ltl tests/aorai/test_switch2.ltl -aorai-test 1 -aorai-acceptance -load-module tests/aorai/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-ltl tests/aorai/test_switch2.ltl -aorai-test 1 -aorai-acceptance -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
 */
 
 int status=0;

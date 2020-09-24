@@ -1,5 +1,5 @@
 /* run.config*
-OPT: -aorai-automata tests/aorai/hoare_seq.ya -aorai-test 1 -aorai-acceptance -load-module tests/aorai/Aorai_test -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+OPT: -aorai-automata tests/aorai/hoare_seq.ya -aorai-test 1 -aorai-acceptance -load-module tests/Aorai_test -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
 */
 
 void f(void) { }
