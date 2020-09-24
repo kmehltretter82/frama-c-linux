@@ -343,16 +343,9 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       in
       if vinfo.vdefined
       then update_call_map fundef_calls
-      else
-        let has_spec =
-          try
-            let spec = Annotations.funspec ~populate:false (Globals.Functions.get vinfo) in
-            spec <> Cil.empty_funspec ()
-          with Annotations.No_funspec _ ->
-            false
-        in
-        if has_spec then update_call_map funspec_calls
-        else update_call_map fundecl_calls
+      else if Annotations.has_funspec (Globals.Functions.get vinfo)
+      then update_call_map funspec_calls
+      else update_call_map fundecl_calls
 
   method! vinst i =
     begin match i with
