@@ -28,7 +28,7 @@
         history
         gui_printers
         design
-        analyses_manager file_manager project_manager debug_manager
+        analyses_manager file_manager project_manager
         help_manager
         property_navigator GSourceView gtk_compat
         dgraph_helper
@@ -50,6 +50,10 @@
    (select dgraph_helper.ml from
       (ocamlgraph.dgraph -> dgraph_helper.yes.ml)
       ( -> dgraph_helper.no.ml)
+   )
+   (select debug_manager.ml from
+      (ocamlgraph.dgraph -> debug_manager.ok.ml)
+      ( -> debug_manager.ko.ml)
    )
 )
 )

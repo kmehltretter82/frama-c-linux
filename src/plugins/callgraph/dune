@@ -16,7 +16,7 @@
   (modules Cg_viewer)
 ;  (private_modules Cg_viewer)
   (flags -open Frama_c_kernel -open Frama_c_gui -open Callgraph)
-  (libraries callgraph frama-c.kernel frama-c.gui)
+  (libraries callgraph frama-c.kernel frama-c.gui ocamlgraph.dgraph)
 )
 
 (plugin (optional) (name callgraph) (libraries frama-c-callgraph.gui) (site (frama-c plugins_gui)))
