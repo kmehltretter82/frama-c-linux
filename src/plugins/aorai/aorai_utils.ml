@@ -1851,13 +1851,16 @@ let auto_func_block loc f st status res =
     if Aorai_option.Deterministic.get () then begin
       let orig = Data_for_aorai.get_varinfo curState in
       let copy = Cil.copyVarinfo orig (orig.vname ^ "_tmp") in
+      copy.vglob <- false;
       List.map (fun st -> (st, copy)) states, [copy]
     end else begin
       let bindings =
         List.map
           (fun st ->
              let state_var = Data_for_aorai.get_state_var st in
-             (st,Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") ))
+             let copy = Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") in
+             copy.vglob <- false;
+             (st,copy))
           states
       in bindings, snd (List.split bindings)
     end
