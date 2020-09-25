@@ -8,52 +8,52 @@
 --- Properties of Function 'g_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 80)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 82)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 81)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 83)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 85)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 88)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 91)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 94)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_in' (file /tmp/aorai_deterministic_0.i, line 98)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 87)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 102)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_in' (file /tmp/aorai_deterministic_0.i, line 106)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 90)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 110)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 113)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 116)
-            tried with Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 82)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 93)
             by Wp.typed.
-[    -    ] Behavior 'buch_state_S0_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S1_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S2_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S3_out'
-            tried with Frama-C kernel.
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 96)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S4_in' (file /tmp/aorai_deterministic_0.i, line 100)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 104)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S5_in' (file /tmp/aorai_deterministic_0.i, line 108)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 112)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 115)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 118)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 84)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S3_out'
+            by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_S4_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S4_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S4_out'
+            by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_S5_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S5_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Sf_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Si_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S5_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Si_out'
+            by Frama-C kernel.
 [  Valid  ] Default behavior
             by Frama-C kernel.
 
@@ -61,31 +61,31 @@
 --- Properties of Function 'g_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 134)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 136)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 135)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 137)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 139)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 141)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_deterministic_0.i, line 143)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_deterministic_0.i, line 145)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 147)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 149)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 150)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 152)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_deterministic_0.i, line 154)
+[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_deterministic_0.i, line 156)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 158)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 160)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 161)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 163)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 164)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 166)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 167)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 169)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 170)
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 172)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 136)
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 138)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -121,48 +121,48 @@
 --- Properties of Function 'f_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 206)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 210)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 207)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 211)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 211)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 214)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 217)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_deterministic_0.i, line 221)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 215)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 225)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 228)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 231)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 234)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 237)
-            tried with Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 208)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 218)
             by Wp.typed.
-[    -    ] Behavior 'buch_state_S0_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S1_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S2_out'
-            tried with Frama-C kernel.
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 221)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_deterministic_0.i, line 225)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 229)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 232)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 235)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 238)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 241)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 212)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S2_out'
+            by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_S3_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S3_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S4_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S5_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Sf_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Si_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S4_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S5_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Si_out'
+            by Frama-C kernel.
 [  Valid  ] Default behavior
             by Frama-C kernel.
 
@@ -170,29 +170,29 @@
 --- Properties of Function 'f_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 255)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 259)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 256)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 260)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 260)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 264)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 263)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 267)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_deterministic_0.i, line 267)
+[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_deterministic_0.i, line 271)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 271)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 275)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 274)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 278)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 277)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 281)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 280)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 284)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 283)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 287)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 286)
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 290)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 257)
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 261)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -226,52 +226,52 @@
 --- Properties of Function 'real_main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 322)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 328)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 323)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 329)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 327)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 333)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_deterministic_0.i, line 331)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_deterministic_0.i, line 337)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 335)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_deterministic_0.i, line 339)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 341)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 343)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 346)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 349)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 352)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 355)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 358)
-            tried with Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 324)
+[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_deterministic_0.i, line 345)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 349)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 352)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 355)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 358)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 361)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 364)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 330)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_S1_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S1_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S1_out'
+            by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_S2_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S2_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S3_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S4_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S5_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Sf_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Si_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S4_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S5_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Si_out'
+            by Frama-C kernel.
 [  Valid  ] Default behavior
             by Frama-C kernel.
 
@@ -279,29 +279,29 @@
 --- Properties of Function 'real_main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 376)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 382)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 377)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 383)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 381)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 387)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 384)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 390)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 387)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 393)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 390)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 396)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 393)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 399)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 396)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 402)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_deterministic_0.i, line 400)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_deterministic_0.i, line 406)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 404)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 410)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 407)
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 413)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 378)
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 384)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -335,46 +335,46 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 439)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 446)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 440)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 447)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_in' (file /tmp/aorai_deterministic_0.i, line 445)
+[  Valid  ] Post-condition for 'buch_state_S0_in' (file /tmp/aorai_deterministic_0.i, line 452)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 449)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 452)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 455)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 458)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 461)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 464)
-            tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 467)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 470)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 456)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 441)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 459)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 462)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 465)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 468)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 471)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 474)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 477)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 448)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_in'
             by Frama-C kernel.
-[    -    ] Behavior 'buch_state_S0_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S1_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S2_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S3_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S4_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_S5_out'
-            tried with Frama-C kernel.
-[    -    ] Behavior 'buch_state_Sf_out'
-            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S4_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_S5_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
 [  Valid  ] Behavior 'buch_state_Si_out'
             by Frama-C kernel.
 [  Valid  ] Default behavior
@@ -384,29 +384,29 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 487)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 494)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 488)
+[  Valid  ] Post-condition (file /tmp/aorai_deterministic_0.i, line 495)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 492)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_deterministic_0.i, line 499)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 495)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_deterministic_0.i, line 502)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 498)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_deterministic_0.i, line 505)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 501)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_deterministic_0.i, line 508)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 504)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_deterministic_0.i, line 511)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 507)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_deterministic_0.i, line 514)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_deterministic_0.i, line 511)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_deterministic_0.i, line 518)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 515)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_deterministic_0.i, line 522)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 518)
+[  Valid  ] Post-condition for 'buch_state_Si_out' (file /tmp/aorai_deterministic_0.i, line 525)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 489)
+[  Valid  ] Assigns (file /tmp/aorai_deterministic_0.i, line 496)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -439,7 +439,6 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   126 Completely validated
-    60 To be validated
+   186 Completely validated
    186 Total
 --------------------------------------------------------------------------------

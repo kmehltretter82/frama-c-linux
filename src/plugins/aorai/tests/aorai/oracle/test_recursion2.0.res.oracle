@@ -67,7 +67,9 @@ int global_argc = 0;
 /*@ ghost int T1 = 0; */
 /*@ ghost int accept_T2 = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires (1 ≡ S1 ∨ 1 ≡ T1) ∧ 0 ≡ T0_init ∧ 0 ≡ accept_T2;
+     requires 1 ≡ T1 ⇒ global_argc > 0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_count;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, T0_init, T1,
              accept_T2;
@@ -196,7 +198,8 @@ int count(char *argv)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ S1 ∧ 0 ≡ T0_init ∧ 0 ≡ T1 ∧ 0 ≡ accept_T2;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_sumOne;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, T0_init, T1,
              accept_T2;
@@ -327,7 +330,8 @@ int sumOne(char *t, int length)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ T0_init ∧ 0 ≡ S1 ∧ 0 ≡ T1 ∧ 0 ≡ accept_T2;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, T0_init, T1,
              accept_T2;

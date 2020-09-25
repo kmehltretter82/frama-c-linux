@@ -17,7 +17,8 @@ enum aorai_OpStatusList {
 /*@ ghost int S2 = 0; */
 /*@ ghost int main_0 = 1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ main_0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_decode_int;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, main_0;
      
@@ -184,7 +185,9 @@ int decode_int(char *s)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires (1 ≡ S1 ∨ 1 ≡ S2) ∧ 0 ≡ main_0;
+     requires 1 ≡ S1 ⇒ 1 ≢ 0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_factorial;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, main_0;
      
@@ -304,7 +307,8 @@ int factorial(int value)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ main_0 ∧ 0 ≡ S1 ∧ 0 ≡ S2;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, main_0;
      

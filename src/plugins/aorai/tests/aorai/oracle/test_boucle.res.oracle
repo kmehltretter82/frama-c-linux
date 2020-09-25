@@ -22,7 +22,8 @@ extern int call_to_an_undefined_function(void);
 /*@ ghost int T0_init = 1; */
 /*@ ghost int accept_S1 = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires (1 ≡ T0_S2 ∨ 1 ≡ accept_S1) ∧ 0 ≡ T0_init;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_a;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S2, T0_init,
              accept_S1;
@@ -126,7 +127,8 @@ int a(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires (1 ≡ T0_S2 ∨ 1 ≡ accept_S1) ∧ 0 ≡ T0_init;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_b;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S2, T0_init,
              accept_S1;
@@ -231,7 +233,8 @@ int b(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ T0_init ∧ 0 ≡ T0_S2 ∧ 0 ≡ accept_S1;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S2, T0_init,
              accept_S1;

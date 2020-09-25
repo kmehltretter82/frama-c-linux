@@ -23,7 +23,10 @@ int rr = 1;
 /*@ ghost int accept_S3 = 0; */
 /*@ ghost int accept_all = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       (1 ≡ T0_S4 ∨ 1 ≡ T1_S2) ∧ 0 ≡ T0_init ∧
+       0 ≡ accept_S3 ∧ 0 ≡ accept_all;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opa;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S4, T0_init, T1_S2,
              accept_S3, accept_all;
@@ -189,7 +192,11 @@ void opa(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ T1_S2 ∧ 0 ≡ T0_S4 ∧ 0 ≡ T0_init ∧ 0 ≡ accept_S3 ∧
+       0 ≡ accept_all;
+     requires 1 ≡ T1_S2 ⇒ rr ≡ 51;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opb;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S4, T0_init, T1_S2,
              accept_S3, accept_all;
@@ -323,7 +330,10 @@ void opb(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ T0_init ∧ 0 ≡ T0_S4 ∧ 0 ≡ T1_S2 ∧ 0 ≡ accept_S3 ∧
+       0 ≡ accept_all;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, T0_S4, T0_init, T1_S2,
              accept_S3, accept_all;

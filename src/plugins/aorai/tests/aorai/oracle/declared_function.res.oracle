@@ -46,7 +46,8 @@ check lemma I_deterministic_trans{L}:
  */
 /*@ ghost int aorai_CurStates = I; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ I;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      

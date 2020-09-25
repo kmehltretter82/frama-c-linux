@@ -21,7 +21,9 @@ int myAge = 0;
 /*@ ghost int S1 = 0; */
 /*@ ghost int main_0 = 1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ S1 ∧ 0 ≡ main_0;
+     requires 1 ≡ S1 ⇒ nobody.Age ≡ 1;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_increment;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
      
@@ -110,7 +112,9 @@ void increment(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ main_0 ∧ 0 ≡ S1;
+     requires 1 ≡ main_0 ⇒ nobody.Age ≡ 0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
      

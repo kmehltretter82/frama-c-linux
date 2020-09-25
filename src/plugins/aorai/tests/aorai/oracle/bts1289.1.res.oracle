@@ -18,7 +18,10 @@ enum aorai_OpStatusList {
 /*@ ghost int aorai_intermediate_state_0 = 0; */
 /*@ ghost int init = 1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       (1 ≡ S ∨ 1 ≡ T) ∧ 0 ≡ aorai_intermediate_state ∧
+       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ init;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_a;
      assigns aorai_CurOpStatus, aorai_CurOperation, S, T,
              aorai_intermediate_state, aorai_intermediate_state_0, init;
@@ -181,7 +184,10 @@ void a(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ init ∧ 0 ≡ S ∧ 0 ≡ T ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S, T,
              aorai_intermediate_state, aorai_intermediate_state_0, init;

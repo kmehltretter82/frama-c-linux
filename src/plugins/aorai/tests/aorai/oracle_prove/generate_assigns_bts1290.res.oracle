@@ -8,15 +8,15 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 29)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 30)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 35)
+[  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 31)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_out' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 39)
+[  Valid  ] Post-condition for 'buch_state_S_in' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 36)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_generate_assigns_bts1290_0.i, line 31)
+[  Valid  ] Post-condition for 'buch_state_S_out' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 40)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_generate_assigns_bts1290_0.i, line 32)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S_in'
             by Frama-C kernel.
@@ -29,15 +29,15 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 56)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 57)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 62)
+[  Valid  ] Post-condition (file /tmp/aorai_generate_assigns_bts1290_0.i, line 58)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_out' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 66)
+[  Valid  ] Post-condition for 'buch_state_S_in' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 63)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_generate_assigns_bts1290_0.i, line 58)
+[  Valid  ] Post-condition for 'buch_state_S_out' (file /tmp/aorai_generate_assigns_bts1290_0.i, line 67)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_generate_assigns_bts1290_0.i, line 59)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S_in'
             by Frama-C kernel.

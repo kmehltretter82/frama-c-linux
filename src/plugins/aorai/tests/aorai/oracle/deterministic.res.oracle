@@ -63,7 +63,9 @@ check lemma S0_deterministic_trans{L}:
  */
 /*@ ghost int aorai_CurStates = Si; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ S3;
+     requires aorai_CurStates ≡ S3 ⇒ x ≡ 5 ∨ x ≡ 4;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_g;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
@@ -191,7 +193,9 @@ void g(int x)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ S1;
+     requires aorai_CurStates ≡ S1 ⇒ x ≡ 4;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
@@ -310,7 +314,9 @@ int f(int x)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ S0;
+     requires aorai_CurStates ≡ S0 ⇒ c ≡ 0 ∨ c ≢ 0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_real_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
@@ -429,7 +435,8 @@ int real_main(int c)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ Si;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      

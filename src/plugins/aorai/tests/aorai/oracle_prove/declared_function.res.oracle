@@ -21,15 +21,15 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 63)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 64)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_I_in' (file /tmp/aorai_declared_function_0.i, line 69)
+[  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 65)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_I_out' (file /tmp/aorai_declared_function_0.i, line 73)
+[  Valid  ] Post-condition for 'buch_state_I_in' (file /tmp/aorai_declared_function_0.i, line 70)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_declared_function_0.i, line 65)
+[  Valid  ] Post-condition for 'buch_state_I_out' (file /tmp/aorai_declared_function_0.i, line 74)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_declared_function_0.i, line 66)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_I_in'
             by Frama-C kernel.
@@ -42,15 +42,15 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 94)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 95)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_I_in' (file /tmp/aorai_declared_function_0.i, line 100)
+[  Valid  ] Post-condition (file /tmp/aorai_declared_function_0.i, line 96)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_I_out' (file /tmp/aorai_declared_function_0.i, line 104)
+[  Valid  ] Post-condition for 'buch_state_I_in' (file /tmp/aorai_declared_function_0.i, line 101)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_declared_function_0.i, line 96)
+[  Valid  ] Post-condition for 'buch_state_I_out' (file /tmp/aorai_declared_function_0.i, line 105)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_declared_function_0.i, line 97)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_I_in'
             by Frama-C kernel.

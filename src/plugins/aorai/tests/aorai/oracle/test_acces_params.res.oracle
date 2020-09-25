@@ -24,7 +24,11 @@ int rr = 1;
 /*@ ghost int SF = 0; */
 /*@ ghost int mainst = 1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ SF ∧
+       0 ≡ mainst;
+     requires 1 ≡ S1 ⇒ i ≥ 0;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opa;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, SF,
              mainst;
@@ -175,7 +179,10 @@ void opa(int i, int j)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ S3 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S4 ∧ 0 ≡ SF ∧
+       0 ≡ mainst;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opb;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, SF,
              mainst;
@@ -325,7 +332,10 @@ int opb(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ mainst ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧
+       0 ≡ SF;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, SF,
              mainst;

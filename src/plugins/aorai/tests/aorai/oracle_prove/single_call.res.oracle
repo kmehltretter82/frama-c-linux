@@ -8,19 +8,19 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 31)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 32)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_single_call_0.i, line 37)
+[  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 33)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_single_call_0.i, line 40)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_single_call_0.i, line 38)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_single_call_0.i, line 44)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_single_call_0.i, line 41)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_single_call_0.i, line 48)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_single_call_0.i, line 45)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_single_call_0.i, line 33)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_single_call_0.i, line 49)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_single_call_0.i, line 34)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -37,19 +37,19 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 74)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 75)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_single_call_0.i, line 80)
+[  Valid  ] Post-condition (file /tmp/aorai_single_call_0.i, line 76)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_single_call_0.i, line 84)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_single_call_0.i, line 81)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_single_call_0.i, line 88)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_single_call_0.i, line 85)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_single_call_0.i, line 91)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_single_call_0.i, line 89)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_single_call_0.i, line 76)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_single_call_0.i, line 92)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_single_call_0.i, line 77)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.

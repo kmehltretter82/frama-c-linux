@@ -33,7 +33,8 @@ int X;
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
 /*@ ghost int aorai_CurStates = S1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ Sf;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
@@ -123,7 +124,8 @@ void f(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires aorai_CurStates ≡ S1;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      

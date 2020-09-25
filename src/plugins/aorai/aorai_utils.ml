@@ -1704,10 +1704,7 @@ let auto_func_behaviors loc f st state =
   Aorai_option.debug
     "func behavior for %a (%s)" Kernel_function.pretty f call_or_ret;
   let (states, _) as auto = Data_for_aorai.getAutomata() in
-  (* requires is not needed for pre_func, as it is enforced by the
-     requires of the original C function itself (and the call to pre_func
-     by definition the first instruction of the function).
-  *)
+  let requires = auto_func_preconditions loc f st state in
   let post_cond =
     let called_pre =
       Logic_const.new_predicate
@@ -1734,9 +1731,6 @@ let auto_func_behaviors loc f st state =
     in
     (* let old_pred = Aorai_utils.mk_old_state_pred loc in *)
     [(Normal, called_pre); (Normal, called_pre_2)]
-  in
-  let requires =
-    if st = Promelaast.Call then [] else auto_func_preconditions loc f st state
   in
   let mk_behavior (assigns, behaviors) status =
     let new_assigns, new_behaviors =

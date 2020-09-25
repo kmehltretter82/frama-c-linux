@@ -31,19 +31,19 @@
 --- Properties of Function 'countOne_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 61)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 62)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 68)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 63)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 72)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 69)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 75)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 73)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 78)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 76)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 63)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 79)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 64)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -60,19 +60,19 @@
 --- Properties of Function 'countOne_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 103)
-            by Wp.typed.
 [  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 104)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 110)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 105)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 114)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 111)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 117)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 115)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 120)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 118)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 105)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 121)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 106)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -89,19 +89,19 @@
 --- Properties of Function 'count_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 173)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 175)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 174)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 176)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 180)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 182)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 184)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 186)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 187)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 189)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 190)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 192)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 175)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 177)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -118,19 +118,19 @@
 --- Properties of Function 'count_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 215)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 217)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 216)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 218)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 221)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 223)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 224)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 226)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 228)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 230)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 232)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 234)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 217)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 219)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_out'
             by Frama-C kernel.
@@ -147,19 +147,19 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 279)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 282)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 280)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 283)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 285)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 288)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 288)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 291)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 292)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 295)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 296)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 299)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 281)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 284)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_out'
             by Frama-C kernel.
@@ -176,21 +176,21 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 321)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 324)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 322)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion1_0.i, line 325)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 328)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_recursion1_0.i, line 331)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 332)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_recursion1_0.i, line 335)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 335)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_recursion1_0.i, line 338)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 339)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_in' (file /tmp/aorai_test_recursion1_0.i, line 342)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 343)
+[  Valid  ] Post-condition for 'buch_state_accept_S1_out' (file /tmp/aorai_test_recursion1_0.i, line 346)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 323)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion1_0.i, line 326)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.

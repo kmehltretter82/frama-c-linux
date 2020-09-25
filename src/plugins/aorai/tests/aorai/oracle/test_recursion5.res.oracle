@@ -23,7 +23,9 @@ enum aorai_OpStatusList {
 /*@ ghost int IgnoreFoo = 0; */
 /*@ ghost int WillDoFoo = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_isPresentRec;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
@@ -197,7 +199,9 @@ int isPresentRec(int *t, int i, int max, int val)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_isPresent;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
@@ -335,7 +339,9 @@ int isPresent(int *t, int max, int val)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ WillDoFoo ∧ 0 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_foo;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
@@ -447,7 +453,9 @@ void foo(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;

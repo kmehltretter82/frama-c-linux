@@ -8,23 +8,23 @@
 --- Properties of Function 'f_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 35)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 37)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 36)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 38)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 41)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 43)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 44)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 46)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in_f_in' (file /tmp/aorai_assigns_0.i, line 48)
+[  Valid  ] Post-condition for 'buch_state_S_in_f_in' (file /tmp/aorai_assigns_0.i, line 50)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 52)
+[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 54)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 55)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 57)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 58)
+[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 60)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 37)
+[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 39)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -45,23 +45,23 @@
 --- Properties of Function 'f_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 92)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 94)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 93)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 95)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 98)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 100)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 101)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 103)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 104)
+[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 106)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 107)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 109)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_in_main_in' (file /tmp/aorai_assigns_0.i, line 111)
+[  Valid  ] Post-condition for 'buch_state_in_main_in' (file /tmp/aorai_assigns_0.i, line 113)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 115)
+[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 117)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 94)
+[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 96)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -89,23 +89,23 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 162)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 166)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 163)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 167)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 168)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 172)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 171)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 175)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 174)
+[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 178)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_assigns_0.i, line 178)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_assigns_0.i, line 182)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 182)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 186)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 185)
+[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 189)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 164)
+[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 168)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -126,23 +126,23 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 219)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 223)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 220)
+[  Valid  ] Post-condition (file /tmp/aorai_assigns_0.i, line 224)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 225)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_assigns_0.i, line 229)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_assigns_0.i, line 229)
+[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_assigns_0.i, line 233)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 233)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_assigns_0.i, line 237)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 236)
+[  Valid  ] Post-condition for 'buch_state_S_in_f_out' (file /tmp/aorai_assigns_0.i, line 240)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 239)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_assigns_0.i, line 243)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 242)
+[  Valid  ] Post-condition for 'buch_state_in_main_out' (file /tmp/aorai_assigns_0.i, line 246)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 221)
+[  Valid  ] Assigns (file /tmp/aorai_assigns_0.i, line 225)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.

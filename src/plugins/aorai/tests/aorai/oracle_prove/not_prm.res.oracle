@@ -8,17 +8,17 @@
 --- Properties of Function 'f_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 30)
+[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 32)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 31)
+[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 33)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_not_prm_0.i, line 35)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_not_prm_0.i, line 37)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_not_prm_0.i, line 39)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_not_prm_0.i, line 41)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_not_prm_0.i, line 43)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_not_prm_0.i, line 45)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_not_prm_0.i, line 32)
+[  Valid  ] Assigns (file /tmp/aorai_not_prm_0.i, line 34)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -33,17 +33,17 @@
 --- Properties of Function 'f_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 64)
+[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 66)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 65)
+[  Valid  ] Post-condition (file /tmp/aorai_not_prm_0.i, line 67)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_not_prm_0.i, line 69)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_not_prm_0.i, line 71)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_not_prm_0.i, line 73)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_not_prm_0.i, line 75)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_not_prm_0.i, line 77)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_not_prm_0.i, line 79)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_not_prm_0.i, line 66)
+[  Valid  ] Assigns (file /tmp/aorai_not_prm_0.i, line 68)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.

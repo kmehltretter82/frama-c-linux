@@ -39,7 +39,8 @@ check lemma Init_deterministic_trans{L}:
  */
 /*@ ghost int aorai_CurStates = Init; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires \false;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
@@ -128,7 +129,8 @@ void f(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires \false;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      

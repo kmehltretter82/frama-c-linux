@@ -18,7 +18,9 @@ int x = 0;
 /*@ ghost int last = 0; */
 /*@ ghost int step1 = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ init ∨ 1 ≡ last ∨ 1 ≡ step1;
+     requires 1 ≡ last ⇒ x ≡ 3 ∨ (x ≢ 4 ∧ x ≢ 3) ∨ x ≡ 4;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, init, last, step1;
      
@@ -264,7 +266,9 @@ void f(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ init ∨ 1 ≡ last ∨ 1 ≡ step1;
+     requires 1 ≡ last ⇒ x ≡ 3 ∨ (x ≢ 4 ∧ x ≢ 3) ∨ x ≡ 4;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_g;
      assigns aorai_CurOpStatus, aorai_CurOperation, init, last, step1;
      
@@ -510,7 +514,8 @@ void g(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires 1 ≡ init ∧ 0 ≡ last ∧ 0 ≡ step1;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, init, last, step1;
      

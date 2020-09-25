@@ -19,7 +19,9 @@ int X;
 /*@ ghost int Sf = 0; */
 /*@ ghost int in_main = 0; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ Sf ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S_in_f ∧ 0 ≡ in_main;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S_in_f, Sf,
              in_main;
@@ -146,7 +148,9 @@ void f(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S_in_f ∧ 0 ≡ Sf ∧ 0 ≡ in_main;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S_in_f, Sf,
              in_main;

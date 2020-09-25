@@ -12,21 +12,21 @@
 --- Properties of Function 'isPresentRec_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 35)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 37)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 36)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 38)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 41)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 43)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 45)
+[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 47)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 49)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 51)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 52)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 54)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 55)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 57)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 37)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 39)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_out'
             by Frama-C kernel.
@@ -45,23 +45,23 @@
 --- Properties of Function 'isPresentRec_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 88)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 90)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 89)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 91)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 94)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 96)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 97)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 99)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 102)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 104)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 108)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 110)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 113)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 115)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 119)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 121)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 90)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 92)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_out'
             by Frama-C kernel.
@@ -82,21 +82,21 @@
 --- Properties of Function 'isPresent_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 195)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 199)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 196)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 200)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 201)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 205)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 205)
+[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 209)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 209)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 213)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 212)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 216)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 215)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 219)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 197)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 201)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_out'
             by Frama-C kernel.
@@ -115,23 +115,23 @@
 --- Properties of Function 'isPresent_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 247)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 251)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 248)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 252)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 254)
+[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 258)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 258)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 262)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 261)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 265)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 264)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 268)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 268)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_in' (file /tmp/aorai_test_recursion5_0.i, line 272)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 272)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 276)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 249)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 253)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_in'
             by Frama-C kernel.
@@ -152,21 +152,21 @@
 --- Properties of Function 'foo_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 330)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 336)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 331)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 337)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 337)
+[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 343)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 341)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 347)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 344)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 350)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 347)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 353)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 350)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 356)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 332)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 338)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_in'
             by Frama-C kernel.
@@ -185,21 +185,21 @@
 --- Properties of Function 'foo_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 380)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 386)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 381)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 387)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 387)
+[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 393)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 391)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 397)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 394)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 400)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 397)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 403)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 400)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 406)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 382)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 388)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_in'
             by Frama-C kernel.
@@ -225,21 +225,21 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 442)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 450)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 443)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 451)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 448)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 456)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 452)
+[  Valid  ] Post-condition for 'buch_state_Idle_in' (file /tmp/aorai_test_recursion5_0.i, line 460)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 456)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 464)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 459)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 467)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 462)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 470)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 444)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 452)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_out'
             by Frama-C kernel.
@@ -258,21 +258,21 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 492)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 500)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 493)
+[  Valid  ] Post-condition (file /tmp/aorai_test_recursion5_0.i, line 501)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 499)
+[  Valid  ] Post-condition for 'buch_state_End_in' (file /tmp/aorai_test_recursion5_0.i, line 507)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 503)
+[  Valid  ] Post-condition for 'buch_state_End_out' (file /tmp/aorai_test_recursion5_0.i, line 511)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 506)
+[  Valid  ] Post-condition for 'buch_state_Idle_out' (file /tmp/aorai_test_recursion5_0.i, line 514)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 509)
+[  Valid  ] Post-condition for 'buch_state_IgnoreFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 517)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 512)
+[  Valid  ] Post-condition for 'buch_state_WillDoFoo_out' (file /tmp/aorai_test_recursion5_0.i, line 520)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 494)
+[  Valid  ] Assigns (file /tmp/aorai_test_recursion5_0.i, line 502)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_End_in'
             by Frama-C kernel.

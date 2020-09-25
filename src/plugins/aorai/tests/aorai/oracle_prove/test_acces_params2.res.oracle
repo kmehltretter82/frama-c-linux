@@ -10,27 +10,27 @@
 --- Properties of Function 'opa_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 41)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 46)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 42)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 47)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 47)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 52)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 50)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 55)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_test_acces_params2_0.i, line 54)
+[  Valid  ] Post-condition for 'buch_state_S3_in' (file /tmp/aorai_test_acces_params2_0.i, line 59)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 58)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 63)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 61)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 66)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 64)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 69)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 67)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 72)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 70)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 75)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 43)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 48)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -55,27 +55,27 @@
 --- Properties of Function 'opa_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 115)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 120)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 116)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 121)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 121)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 126)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 124)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 129)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 127)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 132)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_in' (file /tmp/aorai_test_acces_params2_0.i, line 131)
+[  Valid  ] Post-condition for 'buch_state_S4_in' (file /tmp/aorai_test_acces_params2_0.i, line 136)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 135)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 140)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 138)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 143)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 141)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 146)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 144)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 149)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 117)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 122)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -107,27 +107,27 @@
 --- Properties of Function 'opb_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 210)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 219)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 211)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 220)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 216)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 225)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 219)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 228)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 222)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 231)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 225)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 234)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_in' (file /tmp/aorai_test_acces_params2_0.i, line 229)
+[  Valid  ] Post-condition for 'buch_state_S5_in' (file /tmp/aorai_test_acces_params2_0.i, line 238)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 233)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 242)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 236)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 245)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 239)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 248)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 212)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 221)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -152,27 +152,27 @@
 --- Properties of Function 'opb_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 283)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 292)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 284)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 293)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 289)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 298)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 292)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 301)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 295)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 304)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 298)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 307)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 301)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 310)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_in' (file /tmp/aorai_test_acces_params2_0.i, line 305)
+[  Valid  ] Post-condition for 'buch_state_S6_in' (file /tmp/aorai_test_acces_params2_0.i, line 314)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 309)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 318)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 312)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 321)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 285)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 294)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -204,25 +204,25 @@
 --- Properties of Function 'opc_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 375)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 385)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 376)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 386)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 381)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 391)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 384)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 394)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 387)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 397)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 390)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 400)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 393)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 403)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 396)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 406)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 399)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 409)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 377)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 387)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -245,25 +245,25 @@
 --- Properties of Function 'opc_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 440)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 450)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 441)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 451)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 446)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 456)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 449)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 459)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 452)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 462)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 455)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 465)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 458)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 468)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 461)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 471)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 464)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 474)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 442)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 452)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -293,27 +293,27 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 538)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 552)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 539)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 553)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 544)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 558)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_test_acces_params2_0.i, line 548)
+[  Valid  ] Post-condition for 'buch_state_S2_in' (file /tmp/aorai_test_acces_params2_0.i, line 562)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 552)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 566)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 555)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 569)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 558)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 572)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 561)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 575)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 564)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 578)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 567)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 581)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 540)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 554)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.
@@ -338,27 +338,27 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 611)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 625)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 612)
+[  Valid  ] Post-condition (file /tmp/aorai_test_acces_params2_0.i, line 626)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 617)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_acces_params2_0.i, line 631)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 620)
+[  Valid  ] Post-condition for 'buch_state_S2_out' (file /tmp/aorai_test_acces_params2_0.i, line 634)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 623)
+[  Valid  ] Post-condition for 'buch_state_S3_out' (file /tmp/aorai_test_acces_params2_0.i, line 637)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 626)
+[  Valid  ] Post-condition for 'buch_state_S4_out' (file /tmp/aorai_test_acces_params2_0.i, line 640)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 629)
+[  Valid  ] Post-condition for 'buch_state_S5_out' (file /tmp/aorai_test_acces_params2_0.i, line 643)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 632)
+[  Valid  ] Post-condition for 'buch_state_S6_out' (file /tmp/aorai_test_acces_params2_0.i, line 646)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_in' (file /tmp/aorai_test_acces_params2_0.i, line 636)
+[  Valid  ] Post-condition for 'buch_state_S7_in' (file /tmp/aorai_test_acces_params2_0.i, line 650)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 640)
+[  Valid  ] Post-condition for 'buch_state_S7_out' (file /tmp/aorai_test_acces_params2_0.i, line 654)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 613)
+[  Valid  ] Assigns (file /tmp/aorai_test_acces_params2_0.i, line 627)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_out'
             by Frama-C kernel.

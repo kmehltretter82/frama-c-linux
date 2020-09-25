@@ -25,7 +25,10 @@ int status = 0;
 /*@ ghost int accept_S4 = 0; */
 /*@ ghost int accept_init = 1; */
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ accept_S4 ∧ 0 ≡ accept_S1 ∧ 0 ≡ accept_S2 ∧
+       0 ≡ accept_S3 ∧ 0 ≡ accept_init;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_commit_trans;
      assigns aorai_CurOpStatus, aorai_CurOperation, accept_S1, accept_S2,
              accept_S3, accept_S4, accept_init;
@@ -161,7 +164,10 @@ int commit_trans(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ accept_S2 ∧ 0 ≡ accept_S1 ∧ 0 ≡ accept_S3 ∧
+       0 ≡ accept_S4 ∧ 0 ≡ accept_init;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_init_trans;
      assigns aorai_CurOpStatus, aorai_CurOperation, accept_S1, accept_S2,
              accept_S3, accept_S4, accept_init;
@@ -310,7 +316,10 @@ int init_trans(void)
 }
 
 /*@ ghost
-  /@ ensures aorai_CurOpStatus ≡ aorai_Called;
+  /@ requires
+       1 ≡ accept_init ∧ 0 ≡ accept_S1 ∧ 0 ≡ accept_S2 ∧
+       0 ≡ accept_S3 ∧ 0 ≡ accept_S4;
+     ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, accept_S1, accept_S2,
              accept_S3, accept_S4, accept_init;

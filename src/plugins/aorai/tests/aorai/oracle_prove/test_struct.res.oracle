@@ -8,17 +8,17 @@
 --- Properties of Function 'increment_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 37)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 39)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 38)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 40)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 43)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 45)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 47)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 49)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 50)
+[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 52)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 39)
+[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 41)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_in'
             by Frama-C kernel.
@@ -33,17 +33,17 @@
 --- Properties of Function 'increment_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 72)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 74)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 73)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 75)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 78)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 80)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 82)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 84)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 85)
+[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 87)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 74)
+[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 76)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_in'
             by Frama-C kernel.
@@ -65,17 +65,17 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 122)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 126)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 123)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 127)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 128)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 132)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 132)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 136)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 135)
+[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 139)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 124)
+[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 128)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_in'
             by Frama-C kernel.
@@ -90,17 +90,17 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 157)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 161)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 158)
+[  Valid  ] Post-condition (file /tmp/aorai_test_struct_0.i, line 162)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 163)
+[  Valid  ] Post-condition for 'buch_state_S1_in' (file /tmp/aorai_test_struct_0.i, line 167)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 167)
+[  Valid  ] Post-condition for 'buch_state_S1_out' (file /tmp/aorai_test_struct_0.i, line 171)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 170)
+[  Valid  ] Post-condition for 'buch_state_main_0_out' (file /tmp/aorai_test_struct_0.i, line 174)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 159)
+[  Valid  ] Assigns (file /tmp/aorai_test_struct_0.i, line 163)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S1_in'
             by Frama-C kernel.

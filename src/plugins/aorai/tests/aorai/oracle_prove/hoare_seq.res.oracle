@@ -8,29 +8,29 @@
 --- Properties of Function 'f_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 36)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 40)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 37)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 41)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 44)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 48)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 47)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 51)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 50)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 54)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 53)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 57)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in' (file /tmp/aorai_hoare_seq_0.i, line 57)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in' (file /tmp/aorai_hoare_seq_0.i, line 61)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 61)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 65)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 64)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 68)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 68)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 72)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 72)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 76)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 38)
+[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 42)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -57,29 +57,29 @@
 --- Properties of Function 'f_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 118)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 122)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 119)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 123)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 126)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 130)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 129)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 133)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 132)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 136)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 135)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 139)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 138)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 142)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_in' (file /tmp/aorai_hoare_seq_0.i, line 142)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_in' (file /tmp/aorai_hoare_seq_0.i, line 146)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 146)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 150)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 150)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 154)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 154)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 158)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 120)
+[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 124)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -106,29 +106,29 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 243)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 254)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 244)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 255)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 251)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 262)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 254)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 265)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_hoare_seq_0.i, line 258)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_hoare_seq_0.i, line 269)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 262)
+[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 273)
             tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_in' (file /tmp/aorai_hoare_seq_0.i, line 266)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_in' (file /tmp/aorai_hoare_seq_0.i, line 277)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 270)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 281)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 273)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 284)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 276)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 287)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 279)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 290)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 245)
+[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 256)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -155,29 +155,29 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 326)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 337)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 327)
+[  Valid  ] Post-condition (file /tmp/aorai_hoare_seq_0.i, line 338)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 334)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_hoare_seq_0.i, line 345)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_hoare_seq_0.i, line 340)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_hoare_seq_0.i, line 351)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 346)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_hoare_seq_0.i, line 357)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 349)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_hoare_seq_0.i, line 360)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 352)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_hoare_seq_0.i, line 363)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 355)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_hoare_seq_0.i, line 366)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 358)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_hoare_seq_0.i, line 369)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 365)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_in' (file /tmp/aorai_hoare_seq_0.i, line 376)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 372)
+[  Valid  ] Post-condition for 'buch_state_aorai_reject_out' (file /tmp/aorai_hoare_seq_0.i, line 383)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 328)
+[  Valid  ] Assigns (file /tmp/aorai_hoare_seq_0.i, line 339)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.

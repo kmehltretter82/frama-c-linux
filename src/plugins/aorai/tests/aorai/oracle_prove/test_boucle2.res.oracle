@@ -10,25 +10,25 @@
 --- Properties of Function 'opa_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 40)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 44)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 41)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 45)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 47)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 51)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 51)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 55)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 54)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 58)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 57)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 61)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 60)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 64)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 63)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 67)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 66)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 70)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 42)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 46)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -51,27 +51,27 @@
 --- Properties of Function 'opa_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 106)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 110)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 107)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 111)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 113)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 117)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 117)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 121)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 120)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 124)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_in' (file /tmp/aorai_test_boucle2_0.i, line 124)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_in' (file /tmp/aorai_test_boucle2_0.i, line 128)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 128)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 132)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 131)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 135)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 134)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 138)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 137)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 141)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 108)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 112)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -103,25 +103,25 @@
 --- Properties of Function 'opb_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 199)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 207)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 200)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 208)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 205)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 213)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 208)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 216)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 211)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 219)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_in' (file /tmp/aorai_test_boucle2_0.i, line 215)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_in' (file /tmp/aorai_test_boucle2_0.i, line 223)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 219)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 227)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 222)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 230)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 225)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 233)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 201)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 209)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_out'
             by Frama-C kernel.
@@ -144,25 +144,25 @@
 --- Properties of Function 'opb_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 265)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 273)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 266)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 274)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 271)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 279)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 274)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 282)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 277)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 285)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 280)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 288)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_in' (file /tmp/aorai_test_boucle2_0.i, line 284)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_in' (file /tmp/aorai_test_boucle2_0.i, line 292)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 288)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 296)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 291)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 299)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 267)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 275)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_out'
             by Frama-C kernel.
@@ -192,25 +192,25 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 346)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 358)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 347)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 359)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 353)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_in' (file /tmp/aorai_test_boucle2_0.i, line 365)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 357)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 369)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 360)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 372)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 363)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 375)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 366)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 378)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 369)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 381)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 372)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 384)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 348)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 360)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_in'
             by Frama-C kernel.
@@ -233,25 +233,25 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 412)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 424)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 413)
+[  Valid  ] Post-condition (file /tmp/aorai_test_boucle2_0.i, line 425)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 418)
+[  Valid  ] Post-condition for 'buch_state_T0_S2_out' (file /tmp/aorai_test_boucle2_0.i, line 430)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 421)
+[  Valid  ] Post-condition for 'buch_state_T0_init_out' (file /tmp/aorai_test_boucle2_0.i, line 433)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 424)
+[  Valid  ] Post-condition for 'buch_state_accept_S3_out' (file /tmp/aorai_test_boucle2_0.i, line 436)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 427)
+[  Valid  ] Post-condition for 'buch_state_accept_S4_out' (file /tmp/aorai_test_boucle2_0.i, line 439)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 430)
+[  Valid  ] Post-condition for 'buch_state_accept_S5_out' (file /tmp/aorai_test_boucle2_0.i, line 442)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_in' (file /tmp/aorai_test_boucle2_0.i, line 434)
+[  Valid  ] Post-condition for 'buch_state_accept_all_in' (file /tmp/aorai_test_boucle2_0.i, line 446)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 438)
+[  Valid  ] Post-condition for 'buch_state_accept_all_out' (file /tmp/aorai_test_boucle2_0.i, line 450)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 414)
+[  Valid  ] Assigns (file /tmp/aorai_test_boucle2_0.i, line 426)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_T0_S2_out'
             by Frama-C kernel.

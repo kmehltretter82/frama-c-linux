@@ -8,35 +8,35 @@
 --- Properties of Function 'f_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 38)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 45)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 39)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 46)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 46)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 53)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 49)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 56)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 52)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 59)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 55)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 62)
             by Wp.typed.
-[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 59)
+[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 66)
             tried with Wp.typed.
-[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 60)
-            tried with Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 64)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 67)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 65)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 71)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 71)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 72)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 72)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 78)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 75)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 79)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 78)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 82)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 40)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 85)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 47)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -63,27 +63,27 @@
 --- Properties of Function 'f_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 127)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 134)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 128)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 135)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 135)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 142)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 138)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 145)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 141)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 148)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 144)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 151)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 147)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 154)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_in' (file /tmp/aorai_loop_bts1050_0.i, line 151)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_in' (file /tmp/aorai_loop_bts1050_0.i, line 158)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 155)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 162)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 158)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 165)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 129)
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 136)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -115,27 +115,27 @@
 --- Properties of Function 'g_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 232)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 244)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 233)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 245)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 240)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 252)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 243)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 255)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 246)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 258)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 249)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 261)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 252)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 264)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 255)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 267)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_in' (file /tmp/aorai_loop_bts1050_0.i, line 259)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_in' (file /tmp/aorai_loop_bts1050_0.i, line 271)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 263)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 275)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 234)
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 246)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -160,27 +160,27 @@
 --- Properties of Function 'g_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 309)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 321)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 310)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 322)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 317)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 329)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 320)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 332)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 323)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 335)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_in' (file /tmp/aorai_loop_bts1050_0.i, line 327)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_in' (file /tmp/aorai_loop_bts1050_0.i, line 339)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 331)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 343)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 334)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 346)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 337)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 349)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 340)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 352)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 311)
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 323)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -212,27 +212,27 @@
 --- Properties of Function 'main_pre_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 401)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 419)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 402)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 420)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 409)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 427)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 412)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 430)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_loop_bts1050_0.i, line 416)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_loop_bts1050_0.i, line 434)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 420)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 438)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 423)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 441)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 426)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 444)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 429)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 447)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 432)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 450)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 403)
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 421)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -257,27 +257,27 @@
 --- Properties of Function 'main_post_func'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 477)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 495)
             by Wp.typed.
-[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 478)
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 496)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 485)
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 503)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_loop_bts1050_0.i, line 490)
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_loop_bts1050_0.i, line 508)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 495)
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 513)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 498)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 516)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 501)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 519)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 504)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 522)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 507)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 525)
             by Wp.typed.
-[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 510)
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 528)
             by Wp.typed.
-[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 479)
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 497)
             by Wp.typed.
 [  Valid  ] Behavior 'buch_state_S0_out'
             by Frama-C kernel.
@@ -308,7 +308,7 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   125 Completely validated
-     3 To be validated
+   126 Completely validated
+     2 To be validated
    128 Total
 --------------------------------------------------------------------------------
