@@ -52,7 +52,17 @@ let extend () =
     let run = !Db.Toplevel.run in
     fun f ->
       let my_project = Project.create "Reparsing" in
-      let wp_compute_kf kf = Wp.VC.command (Wp.VC.generate_kf kf) in
+      let wp_compute_kf kf =
+        let vcs = Wp.VC.generate_kf kf in
+        Wp.VC.command vcs;
+        Bag.iter
+          (fun vc ->
+             if not (Wp.VC.is_proved vc) then
+               P.warning "Could not prove %a in automaton function %a"
+                 Property.pretty (Wp.VC.get_property vc)
+                 Kernel_function.pretty kf)
+          vcs
+      in
       let check_auto_func kf =
         let name = Kernel_function.get_name kf in
         if Kernel_function.is_definition kf &&
@@ -91,7 +101,6 @@ let extend () =
           Wp.Wp_parameters.Share.set (InternalWpShare.get());
         Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;
-        Report.Register.print ();
       end else begin
         File.pretty_ast ();
       end;
