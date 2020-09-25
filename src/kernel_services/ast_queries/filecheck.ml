@@ -509,15 +509,19 @@ module Base_checker = struct
          | _ -> Cil.ChangeDoChildrenPost (s,post_action));
 
       method private check_local_var v =
+        let prefix fmt =
+          Format.fprintf fmt "Local variable %a(%d) in function %a"
+            Printer.pp_varinfo v v.vid
+            Printer.pp_varinfo (Extlib.the self#current_func).svar
+        in
+        if v.vglob then check_abort "%t is marked as global" prefix;
+        if v.vformal then check_abort "%t is marked as formal" prefix;
         if Varinfo.Set.mem v local_vars then begin
           local_vars <- Varinfo.Set.remove v local_vars;
         end else begin
           check_abort
-            "In function %a, variable %a(%d) is supposed to be local to a block \
-             but not mentioned in the function's locals."
-            Printer.pp_varinfo
-            (Extlib.the self#current_func).svar
-            Printer.pp_varinfo v v.vid
+            "%t is present in a block's blocals but in the function's slocals"
+            prefix
         end
 
       method private check_local_static v =
