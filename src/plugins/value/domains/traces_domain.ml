@@ -1093,6 +1093,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         (** all our variables are assigned, not defined *)
         let var_map = List.fold_left fresh_varinfo var_map vs in
         let vs = List.map (subst_in_varinfo var_map) vs in
+        List.iter (fun v -> v.vformal <- false) vs;
         locals := vs @ !locals;
         let block = { Cil_types.battrs = [];
                       bscoping = true;
