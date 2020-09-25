@@ -182,12 +182,15 @@ module type S = sig
     dst_val: t ->
     t option or_bottom
 
+  (** {3 Misc } *)
+
   val resolve_functions : t -> Kernel_function.t list or_top * bool
   (** [resolve_functions v] returns the list of functions that may be pointed to
       by the abstract value [v] (representing a function pointer). The returned
       boolean must be [true] if some of the values represented by [v] do not
       correspond to functions. It is always safe to return [`Top, true]. *)
 
+  val replace_base: Base.substitution -> t -> t
 end
 
 type 'v key = 'v Structure.Key_Value.key

@@ -107,6 +107,8 @@ let constant _ = function
    precisely *)
 let resolve_functions _ = `Top, true
 
+let replace_base _substitution t = t
+
 (** {2 Alarms} *)
 
 let assume_non_zero v =

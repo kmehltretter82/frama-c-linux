@@ -132,6 +132,8 @@ module CVal = struct
       let kfs, alarm = Locations.Location_Bytes.fold_topset_ok aux v init in
       `Value kfs, alarm
     with Abstract_interp.Error_Top -> `Top, true
+
+  let replace_base substitution t = snd (Cvalue.V.replace_base substitution t)
 end
 
 module Interval = struct
@@ -175,6 +177,7 @@ module Interval = struct
   let forward_cast ~src_type:_ ~dst_type:_ _ = `Value top
 
   let resolve_functions _ = `Top, true
+  let replace_base _substitution t = t
 
   let rewrap_integer range value =
     match value with
