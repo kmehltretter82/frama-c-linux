@@ -175,6 +175,8 @@ ifeq ($(FRAMAC_INSTALLDIR),"")
 	dune install
 else
 	dune install --prefix ${FRAMAC_INSTALLDIR}
+	echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
+	echo '  export OCAMLPATH="${FRAMAC_INSTALLDIR}:$$OCAMLPATH"'
 endif
 
 uninstall:
