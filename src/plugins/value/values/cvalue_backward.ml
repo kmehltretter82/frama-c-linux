@@ -339,7 +339,7 @@ let downcast_enabled ~ik_src ~ik_dst =
   if Cil.isSigned ik_dst
   then
     Kernel.SignedDowncast.get () ||
-    (* In this case, -val-warn-signed-converted-downcast behaves exactly
+    (* In this case, -eva-warn-signed-converted-downcast behaves exactly
        as -warn-signed-downcast *)
     (Cil.isSigned ik_src && Value_parameters.WarnSignedConvertedDowncast.get ())
   else Kernel.UnsignedDowncast.get ()

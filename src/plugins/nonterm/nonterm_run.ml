@@ -239,7 +239,7 @@ let check_unreachable_statements kf ~to_ignore ~dead_code ~warned_kfs =
    are ignored if:
    1. the function is in the list of functions to be ignored;
    2. or the function has a body AND its specification is not being used
-      via -val-use-spec.
+      via -eva-use-spec.
    In case 2, the call is ignored because non-terminating statements inside
    it will already be reported. *)
 let ignore_kf name =
