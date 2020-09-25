@@ -165,6 +165,25 @@ force-reconfigure:
 	expr `$(CAT) .force-reconfigure` + 1 > .force-reconfigure
 
 
+##############################################################################
+.phony: install uninstall
+
+FRAMAC_INSTALLDIR?=""
+
+install:
+ifeq ($(FRAMAC_INSTALLDIR),"")
+	dune install
+else
+	dune install --prefix ${FRAMAC_INSTALLDIR}
+endif
+
+uninstall:
+ifeq ($(FRAMAC_INSTALLDIR),"")
+	dune uninstall
+else
+	dune uninstall --prefix ${FRAMAC_INSTALLDIR}
+endif
+
 ###############################################################################
 # Local Variables:
 # compile-command: "make"
