@@ -1822,14 +1822,17 @@ let mk_stmt loc (states, tr) f fst status ((st,_) as state) res =
         (List.rev exp_from_trans)
         (List.rev stmt_from_action)
     else
-      List.fold_left2
-        (fun acc cond stmt_act ->
-           if stmt_act = [] then acc
-           else
-             (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
-        [mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt)]
-        (List.rev exp_from_trans)
-        (List.rev stmt_from_action)
+      let actions =
+        List.fold_left2
+          (fun acc cond stmt_act ->
+             if stmt_act = [] then acc
+             else
+               (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
+          []
+          (List.rev exp_from_trans)
+          (List.rev stmt_from_action)
+      in
+      mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
   end else
   if Aorai_option.Deterministic.get () then []
   else [is_out_of_state_stmt state loc]

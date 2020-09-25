@@ -2,5 +2,3 @@
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_seq_loop_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards
-[aorai-test] Warning: Could not prove ensures
-  1 ≡ aorai_intermediate_state_1 in automaton function f_pre_func
