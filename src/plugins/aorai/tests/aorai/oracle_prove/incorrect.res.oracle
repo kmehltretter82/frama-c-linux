@@ -1,0 +1,68 @@
+[kernel] Parsing tests/aorai/incorrect.i (no preprocessing)
+[aorai] Welcome to the Aorai plugin
+[aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
+[kernel] Parsing /tmp/aorai_incorrect_0.i (no preprocessing)
+[wp] Warning: Missing RTE guards
+[kernel:annot:missing-spec] /tmp/aorai_incorrect_0.i:60: Warning: 
+  Neither code nor specification for function f, generating default assigns from the prototype
+[report] Computing properties status...
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'f'
+--------------------------------------------------------------------------------
+
+[    -    ] Assigns nothing
+            tried with Inferred annotations.
+[    -    ] Froms (file /tmp/aorai_incorrect_0.i, line 4)
+            tried with Inferred annotations.
+[    -    ] Default behavior
+            tried with Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main_pre_func'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Post-condition (file /tmp/aorai_incorrect_0.i, line 38)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_incorrect_0.i, line 39)
+            by Wp.typed.
+[    -    ] Post-condition for 'buch_state_s0_out' (file /tmp/aorai_incorrect_0.i, line 43)
+            tried with Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_incorrect_0.i, line 40)
+            by Wp.typed.
+[    -    ] Behavior 'buch_state_s0_out'
+            tried with Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main_post_func'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Post-condition (file /tmp/aorai_incorrect_0.i, line 59)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_incorrect_0.i, line 60)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_s0_out' (file /tmp/aorai_incorrect_0.i, line 64)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_incorrect_0.i, line 61)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_s0_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Status Report Summary
+--------------------------------------------------------------------------------
+    11 Completely validated
+     5 To be validated
+    16 Total
+--------------------------------------------------------------------------------

@@ -1,753 +1,314 @@
 [kernel] Parsing tests/aorai/loop_bts1050.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
-[kernel] Parsing /tmp/aorai_loop_bts10500.i (no preprocessing)
-[wp] Collecting axiomatic usage
-[wp] warning: Missing RTE guards
-[wp] [Qed] Goal typed_f_post_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_f_post_func_post_2 : Valid
-[wp] [Qed] Goal typed_f_post_func_post : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part16 : Valid
-[wp] [Qed] Goal typed_f_post_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_2_in_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_1_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_0_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_3_out_post : Valid
-[wp] [Qed] Goal typed_f_post_func_buch_state_aorai_intermediate_state_2_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_f_pre_func_post_2 : Valid
-[wp] [Qed] Goal typed_f_pre_func_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part18 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part17 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part16 : Valid
-[wp] [Qed] Goal typed_f_pre_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_0_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_1_in_1_post_2 : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_1_in_1_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_1_out_post_2 : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_1_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_3_out_post : Valid
-[wp] [Qed] Goal typed_f_pre_func_buch_state_aorai_intermediate_state_2_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_g_post_func_post_2 : Valid
-[wp] [Qed] Goal typed_g_post_func_post : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part16 : Valid
-[wp] [Qed] Goal typed_g_post_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_1_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_0_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_0_in_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_3_out_post : Valid
-[wp] [Qed] Goal typed_g_post_func_buch_state_aorai_intermediate_state_2_out_post : Valid
-[wp] Computing [100 goals...]
-[wp] [Qed] Goal typed_g_pre_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_g_pre_func_post_2 : Valid
-[wp] [Qed] Goal typed_g_pre_func_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_3_in_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_2_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_1_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_0_out_post : Valid
-[wp] [Qed] Goal typed_g_pre_func_buch_state_aorai_intermediate_state_3_out_post : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_main_post_func_post_2 : Valid
-[wp] [Qed] Goal typed_main_post_func_post : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part17 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part16 : Valid
-[wp] [Qed] Goal typed_main_post_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_aorai_intermediate_state_0_out____ : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_Sf_in_post : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_aorai_intermediate_state_3_out____ : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_aorai_intermediate_state_2_out____ : Valid
-[wp] [Qed] Goal typed_main_post_func_buch_state_aorai_intermediate_state_1_out____ : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part02 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part01 : Valid
-[wp] [Qed] Goal typed_main_pre_func_post_2 : Valid
-[wp] [Qed] Goal typed_main_pre_func_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part06 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part05 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part04 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part03 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part10 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part09 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part08 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part07 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part14 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part13 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part12 : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part11 : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_in_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_Sf_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_S0_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_assign_part15 : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_2_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_1_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_0_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_out_post : Valid
-[wp] [Qed] Goal typed_main_pre_func_buch_state_aorai_intermediate_state_3_out_post : Valid
-/* Generated by Frama-C */
-enum aorai_ListOper {
-    op_f = 2,
-    op_g = 1,
-    op_main = 0
-};
-enum aorai_OpStatusList {
-    aorai_Terminated = 1,
-    aorai_Called = 0
-};
-/*@ ghost enum aorai_ListOper aorai_CurOperation = op_main; */
-/*@ ghost enum aorai_OpStatusList aorai_CurOpStatus = aorai_Called; */
-/*@ ghost int S0 = 1; */
-/*@ ghost int Sf = 0; */
-/*@ ghost int aorai_intermediate_state = 0; */
-/*@ ghost int aorai_intermediate_state_0 = 0; */
-/*@ ghost int aorai_intermediate_state_1 = 0; */
-/*@ ghost int aorai_intermediate_state_2 = 0; */
-/*@ ghost int aorai_intermediate_state_3 = 0; */
-/*@ ghost int aorai_counter = 0; */
-/*@ ensures aorai_CurOpStatus ≡ aorai_Called;
-    ensures aorai_CurOperation ≡ op_f;
-    assigns aorai_counter, aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_out:
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_in_0:
-      assumes 1 ≡ aorai_intermediate_state_0 ∧ aorai_counter < 5;
-      ensures 1 ≡ aorai_intermediate_state_1;
-      ensures aorai_counter ≡ \old(aorai_counter)+1;
-    
-    behavior buch_state_aorai_intermediate_state_1_in_1:
-      assumes 1 ≡ aorai_intermediate_state;
-      ensures 1 ≡ aorai_intermediate_state_1;
-      ensures aorai_counter ≡ 1;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      assumes
-        (0 ≡ aorai_intermediate_state_0 ∨ ¬(aorai_counter < 5)) ∧
-        0 ≡ aorai_intermediate_state;
-      ensures 0 ≡ aorai_intermediate_state_1;
-      ensures aorai_counter ≡ \old(aorai_counter);
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void f_pre_func(void)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Called;
-  aorai_CurOperation = op_f;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  aorai_intermediate_state_3_tmp = 0;
-  aorai_intermediate_state_2_tmp = 0;
-  if (aorai_intermediate_state_0 == 1) 
-    if (aorai_counter < 5) aorai_counter ++;
-  if (aorai_intermediate_state == 1) aorai_counter = 1;
-  if (aorai_intermediate_state == 1) aorai_intermediate_state_1_tmp = 1;
-  else 
-    if (aorai_intermediate_state_0 == 1) 
-      if (aorai_counter < 5) aorai_intermediate_state_1_tmp = 1;
-      else aorai_intermediate_state_1_tmp = 0;
-    else aorai_intermediate_state_1_tmp = 0;
-  aorai_intermediate_state_0_tmp = 0;
-  aorai_intermediate_state_tmp = 0;
-  Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+[kernel] Parsing /tmp/aorai_loop_bts1050_0.i (no preprocessing)
+[wp] Warning: Missing RTE guards
+[report] Computing properties status...
 
-/*@ requires
-      1 ≡ aorai_intermediate_state_1 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-      0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-    ensures aorai_CurOpStatus ≡ aorai_Terminated;
-    ensures aorai_CurOperation ≡ op_f;
-    assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_out:
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      ensures 0 ≡ aorai_intermediate_state_1;
-    
-    behavior buch_state_aorai_intermediate_state_2_in:
-      assumes 1 ≡ aorai_intermediate_state_1;
-      ensures 1 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      assumes 0 ≡ aorai_intermediate_state_1;
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void f_post_func(void)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Terminated;
-  aorai_CurOperation = op_f;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  aorai_intermediate_state_3_tmp = 0;
-  if (aorai_intermediate_state_1 == 1) aorai_intermediate_state_2_tmp = 1;
-  else aorai_intermediate_state_2_tmp = 0;
-  aorai_intermediate_state_1_tmp = 0;
-  aorai_intermediate_state_0_tmp = 0;
-  aorai_intermediate_state_tmp = 0;
-  Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+--------------------------------------------------------------------------------
+--- Properties of Function 'f_pre_func'
+--------------------------------------------------------------------------------
 
-/*@ requires
-      (1 ≡ aorai_intermediate_state ∨ 1 ≡ aorai_intermediate_state_0) ∧
-      0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
-      0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-    requires 1 ≡ aorai_intermediate_state_0 ⇒ aorai_counter < 5;
-    requires
-      0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
-    
-    behavior Buchi_property_behavior:
-      ensures
-        0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
-      ensures 1 ≡ aorai_intermediate_state_2;
-      ensures
-        \at(1 ≡ aorai_intermediate_state_0,Pre) ∧
-        1 ≡ aorai_intermediate_state_2 ⇒
-        aorai_counter ≡ \at(aorai_counter,Pre)+1;
-      ensures
-        \at(1 ≡ aorai_intermediate_state,Pre) ∧
-        1 ≡ aorai_intermediate_state_2 ⇒ aorai_counter ≡ 1;
- */
-void f(void)
-{
-  f_pre_func();
-  f_post_func();
-  return;
-}
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 38)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 39)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 46)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 49)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 52)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 55)
+            by Wp.typed.
+[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 59)
+            tried with Wp.typed.
+[    -    ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_0' (file /tmp/aorai_loop_bts1050_0.i, line 60)
+            tried with Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 64)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_in_1' (file /tmp/aorai_loop_bts1050_0.i, line 65)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 71)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 72)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 75)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 78)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 40)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[    -    ] Behavior 'buch_state_aorai_intermediate_state_1_in_0'
+            tried with Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_in_1'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
 
-/*@ ensures aorai_CurOpStatus ≡ aorai_Called;
-    ensures aorai_CurOperation ≡ op_g;
-    assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_out:
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      ensures 0 ≡ aorai_intermediate_state_1;
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_in:
-      assumes 1 ≡ aorai_intermediate_state_2;
-      ensures 1 ≡ aorai_intermediate_state_3;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      assumes 0 ≡ aorai_intermediate_state_2;
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void g_pre_func(void)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Called;
-  aorai_CurOperation = op_g;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  if (aorai_intermediate_state_2 == 1) aorai_intermediate_state_3_tmp = 1;
-  else aorai_intermediate_state_3_tmp = 0;
-  aorai_intermediate_state_2_tmp = 0;
-  aorai_intermediate_state_1_tmp = 0;
-  aorai_intermediate_state_0_tmp = 0;
-  aorai_intermediate_state_tmp = 0;
-  Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+--------------------------------------------------------------------------------
+--- Properties of Function 'f_post_func'
+--------------------------------------------------------------------------------
 
-/*@ requires
-      1 ≡ aorai_intermediate_state_3 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-      0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2;
-    ensures aorai_CurOpStatus ≡ aorai_Terminated;
-    ensures aorai_CurOperation ≡ op_g;
-    assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_out:
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_in:
-      assumes 1 ≡ aorai_intermediate_state_3;
-      ensures 1 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      assumes 0 ≡ aorai_intermediate_state_3;
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      ensures 0 ≡ aorai_intermediate_state_1;
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void g_post_func(void)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Terminated;
-  aorai_CurOperation = op_g;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  aorai_intermediate_state_3_tmp = 0;
-  aorai_intermediate_state_2_tmp = 0;
-  aorai_intermediate_state_1_tmp = 0;
-  if (aorai_intermediate_state_3 == 1) aorai_intermediate_state_0_tmp = 1;
-  else aorai_intermediate_state_0_tmp = 0;
-  aorai_intermediate_state_tmp = 0;
-  Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 127)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 128)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 135)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 138)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 141)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 144)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 147)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_in' (file /tmp/aorai_loop_bts1050_0.i, line 151)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 155)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 158)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 129)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_in'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
 
-/*@ requires
-      1 ≡ aorai_intermediate_state_2 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-      0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
-    
-    behavior Buchi_property_behavior:
-      ensures
-        0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_1 ∧
-        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-      ensures 1 ≡ aorai_intermediate_state_0;
- */
-void g(void)
-{
-  g_pre_func();
-  g_post_func();
-  return;
-}
+--------------------------------------------------------------------------------
+--- Properties of Function 'f'
+--------------------------------------------------------------------------------
 
-/*@ ensures aorai_CurOpStatus ≡ aorai_Called;
-    ensures aorai_CurOperation ≡ op_main;
-    assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_out:
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_in:
-      assumes 1 ≡ S0;
-      ensures 1 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      assumes 0 ≡ S0;
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      ensures 0 ≡ aorai_intermediate_state_1;
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void main_pre_func(int c)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Called;
-  aorai_CurOperation = op_main;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  aorai_intermediate_state_3_tmp = 0;
-  aorai_intermediate_state_2_tmp = 0;
-  aorai_intermediate_state_1_tmp = 0;
-  aorai_intermediate_state_0_tmp = 0;
-  if (S0 == 1) aorai_intermediate_state_tmp = 1;
-  else aorai_intermediate_state_tmp = 0;
-  Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+[  Valid  ] Default behavior
+            by Frama-C kernel.
 
-/*@ requires
-      (1 ≡ aorai_intermediate_state ∨ 1 ≡ aorai_intermediate_state_0) ∧
-      0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
-      0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-    ensures aorai_CurOpStatus ≡ aorai_Terminated;
-    ensures aorai_CurOperation ≡ op_main;
-    assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
-            aorai_intermediate_state, aorai_intermediate_state_0,
-            aorai_intermediate_state_1, aorai_intermediate_state_2,
-            aorai_intermediate_state_3;
-    
-    behavior buch_state_S0_out:
-      ensures 0 ≡ S0;
-    
-    behavior buch_state_Sf_in:
-      assumes
-        1 ≡ aorai_intermediate_state_0 ∨ 1 ≡ aorai_intermediate_state;
-      ensures 1 ≡ Sf;
-    
-    behavior buch_state_Sf_out:
-      assumes
-        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state;
-      ensures 0 ≡ Sf;
-    
-    behavior buch_state_aorai_intermediate_state_out:
-      ensures 0 ≡ aorai_intermediate_state;
-    
-    behavior buch_state_aorai_intermediate_state_0_out:
-      ensures 0 ≡ aorai_intermediate_state_0;
-    
-    behavior buch_state_aorai_intermediate_state_1_out:
-      ensures 0 ≡ aorai_intermediate_state_1;
-    
-    behavior buch_state_aorai_intermediate_state_2_out:
-      ensures 0 ≡ aorai_intermediate_state_2;
-    
-    behavior buch_state_aorai_intermediate_state_3_out:
-      ensures 0 ≡ aorai_intermediate_state_3;
- */
-void main_post_func(int res)
-{
-  /*@ ghost int S0_tmp; */
-  /*@ ghost int Sf_tmp; */
-  /*@ ghost int aorai_intermediate_state_tmp; */
-  /*@ ghost int aorai_intermediate_state_0_tmp; */
-  /*@ ghost int aorai_intermediate_state_1_tmp; */
-  /*@ ghost int aorai_intermediate_state_2_tmp; */
-  /*@ ghost int aorai_intermediate_state_3_tmp; */
-  aorai_CurOpStatus = aorai_Terminated;
-  aorai_CurOperation = op_main;
-  S0_tmp = S0;
-  Sf_tmp = Sf;
-  aorai_intermediate_state_tmp = aorai_intermediate_state;
-  aorai_intermediate_state_0_tmp = aorai_intermediate_state_0;
-  aorai_intermediate_state_1_tmp = aorai_intermediate_state_1;
-  aorai_intermediate_state_2_tmp = aorai_intermediate_state_2;
-  aorai_intermediate_state_3_tmp = aorai_intermediate_state_3;
-  aorai_intermediate_state_3_tmp = 0;
-  aorai_intermediate_state_2_tmp = 0;
-  aorai_intermediate_state_1_tmp = 0;
-  aorai_intermediate_state_0_tmp = 0;
-  aorai_intermediate_state_tmp = 0;
-  if (aorai_intermediate_state == 1) Sf_tmp = 1;
-  else 
-    if (aorai_intermediate_state_0 == 1) Sf_tmp = 1; else Sf_tmp = 0;
-  S0_tmp = 0;
-  S0 = S0_tmp;
-  Sf = Sf_tmp;
-  aorai_intermediate_state = aorai_intermediate_state_tmp;
-  aorai_intermediate_state_0 = aorai_intermediate_state_0_tmp;
-  aorai_intermediate_state_1 = aorai_intermediate_state_1_tmp;
-  aorai_intermediate_state_2 = aorai_intermediate_state_2_tmp;
-  aorai_intermediate_state_3 = aorai_intermediate_state_3_tmp;
-  return;
-}
+--------------------------------------------------------------------------------
+--- Properties of Function 'g_pre_func'
+--------------------------------------------------------------------------------
 
-/*@ requires
-      1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-      0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧
-      0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-    
-    behavior aorai_acceptance:
-      ensures 1 ≡ Sf;
-    
-    behavior Buchi_property_behavior:
-      ensures
-        0 ≡ S0 ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧
-        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
-      ensures 1 ≡ Sf;
-      ensures
-        \at(1 ≡ S0,Pre) ∧ 1 ≡ Sf ⇒
-        (1 ≤ aorai_counter ≤ 5) ∨
-        aorai_counter ≡ \at(aorai_counter,Pre)+0;
- */
-int main(int c)
-{
-  int aorai_Loop_Init_37;
-  int __retres;
-  main_pre_func(c);
-  if (c < 0) c = 0;
-  if (c > 0) c = 5;
-  /*@ ghost aorai_Loop_Init_37 = 1; */
-  aorai_loop_37:
-    /*@ loop invariant Aorai: 0 ≡ S0;
-        loop invariant Aorai: 0 ≡ Sf;
-        loop invariant
-          Aorai:
-            1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
-        loop invariant
-          Aorai:
-            1 ≡ aorai_intermediate_state_0 ∨
-            0 ≡ aorai_intermediate_state_0;
-        loop invariant Aorai: 0 ≡ aorai_intermediate_state_1;
-        loop invariant Aorai: 0 ≡ aorai_intermediate_state_2;
-        loop invariant Aorai: 0 ≡ aorai_intermediate_state_3;
-        loop invariant
-          Aorai:
-            1 ≡ aorai_intermediate_state ∨
-            1 ≡ aorai_intermediate_state_0;
-        loop invariant
-          Aorai:
-            aorai_Loop_Init_37 ≢ 0 ⇒
-            \at(1 ≡ S0,Pre) ⇒ 0 ≡ aorai_intermediate_state_0;
-        loop invariant
-          Aorai: aorai_Loop_Init_37 ≡ 0 ⇒ 0 ≡ aorai_intermediate_state;
-        loop invariant
-          Aorai:
-            \at(1 ≡ aorai_intermediate_state,aorai_loop_37) ∧
-            1 ≡ aorai_intermediate_state_0 ⇒ 1 ≤ aorai_counter ≤ 5;
-    */
-    while (1) {
-      if (! c) goto while_0_break;
-      /*@ ghost aorai_Loop_Init_37 = 0; */
-      f();
-      g();
-      c --;
-    }
-  while_0_break: ;
-  __retres = 0;
-  main_post_func(__retres);
-  return __retres;
-}
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 232)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 233)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 240)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 243)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 246)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 249)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 252)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 255)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_in' (file /tmp/aorai_loop_bts1050_0.i, line 259)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 263)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 234)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_in'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
 
+--------------------------------------------------------------------------------
+--- Properties of Function 'g_post_func'
+--------------------------------------------------------------------------------
 
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 309)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 310)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 317)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 320)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 323)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_in' (file /tmp/aorai_loop_bts1050_0.i, line 327)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 331)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 334)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 337)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 340)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 311)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_in'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'g'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main_pre_func'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 401)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 402)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 409)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 412)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_in' (file /tmp/aorai_loop_bts1050_0.i, line 416)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 420)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 423)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 426)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 429)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 432)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 403)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_in'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main_post_func'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 477)
+            by Wp.typed.
+[  Valid  ] Post-condition (file /tmp/aorai_loop_bts1050_0.i, line 478)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_S0_out' (file /tmp/aorai_loop_bts1050_0.i, line 485)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_in' (file /tmp/aorai_loop_bts1050_0.i, line 490)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_Sf_out' (file /tmp/aorai_loop_bts1050_0.i, line 495)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_out' (file /tmp/aorai_loop_bts1050_0.i, line 498)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_0_out' (file /tmp/aorai_loop_bts1050_0.i, line 501)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_1_out' (file /tmp/aorai_loop_bts1050_0.i, line 504)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_2_out' (file /tmp/aorai_loop_bts1050_0.i, line 507)
+            by Wp.typed.
+[  Valid  ] Post-condition for 'buch_state_aorai_intermediate_state_3_out' (file /tmp/aorai_loop_bts1050_0.i, line 510)
+            by Wp.typed.
+[  Valid  ] Assigns (file /tmp/aorai_loop_bts1050_0.i, line 479)
+            by Wp.typed.
+[  Valid  ] Behavior 'buch_state_S0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_in'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_Sf_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_0_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_1_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_2_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_3_out'
+            by Frama-C kernel.
+[  Valid  ] Behavior 'buch_state_aorai_intermediate_state_out'
+            by Frama-C kernel.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'main'
+--------------------------------------------------------------------------------
+
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
+--- Status Report Summary
+--------------------------------------------------------------------------------
+   125 Completely validated
+     3 To be validated
+   128 Total
+--------------------------------------------------------------------------------

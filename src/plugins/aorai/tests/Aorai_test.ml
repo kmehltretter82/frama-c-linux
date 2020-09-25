@@ -91,8 +91,10 @@ let extend () =
           Wp.Wp_parameters.Share.set (InternalWpShare.get());
         Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;
+        Report.Register.print ();
+      end else begin
+        File.pretty_ast ();
       end;
-      File.pretty_ast ();
       ok:=true (* no error, we can erase the file *)
   in
   Db.Toplevel.run := myrun
