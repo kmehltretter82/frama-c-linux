@@ -665,9 +665,10 @@ class pane (gprovers : GuiConfig.provers) =
                 self#search proof fork
               else
                 begin
+                  let provers = List.map (fun e -> e#prover) provers in
                   ProverScript.search
                     ~depth ~width ~auto
-                    ~provers:[ VCS.NativeAltErgo ]
+                    ~provers
                     ~result:
                       (fun wpo prv res ->
                          text#printf "[%a] %a : %a@."

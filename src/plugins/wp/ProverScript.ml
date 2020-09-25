@@ -324,7 +324,8 @@ let rec crawl env on_child node = function
       Task.return ()
 
   | Error(msg,json) :: alternative ->
-      Wp_parameters.warning "@[<hov 2>Script Error %S: %a@]@."
+      Wp_parameters.warning "@[<hov 2>Script Error: on goal %a@\n%S: %a@]@."
+        WpPropId.pretty (Env.goal env node).po_pid
         msg Json.pp json ;
       crawl env on_child node alternative
 
@@ -349,9 +350,11 @@ let rec crawl env on_child node = function
         match jfork (Env.tree env) ?node jtactic with
         | None ->
             Wp_parameters.warning
-              "Script Error: can not apply '%s'@\n\
+              "Script Error: on goal %a@\n\
+               can not apply '%s'@\n\
                @[<hov 2>Params: %a@]@\n\
                @[<hov 2>Select: %a@]@."
+              WpPropId.pretty (Env.goal env node).po_pid
               jtactic.tactic
               Json.pp jtactic.params
               Json.pp jtactic.select ;
