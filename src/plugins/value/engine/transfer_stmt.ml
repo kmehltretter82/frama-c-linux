@@ -543,14 +543,39 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     {kf; arguments; rest; return; recursive; }
 
+  let substitute_assigned_value substitution = function
+    | Assign value -> Assign (Value.replace_base substitution value)
+    | Copy (loc, flagged) ->
+      let v = flagged.v >>-: Value.replace_base substitution in
+      let flagged = { flagged with v } in
+      (* TODO: replace base in [loc] *)
+      Copy (loc, flagged)
+
+  let substitute_argument substitution argument =
+    let avalue = substitute_assigned_value substitution argument.avalue in
+    { argument with avalue }
+
+  let substitute_call substitution call =
+    let arguments = List.map (substitute_argument substitution) call.arguments in
+    { call with arguments }
+
   let make_call ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
     let determinate = is_determinate kf in
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
-    call, valuation
-
+    let recursion =
+      if call.recursive
+      then Some (Recursion.make_recursive_call call.kf)
+      else None
+    in
+    let call =
+      match recursion with
+      | None -> call
+      | Some recursion -> substitute_call recursion.base_substitution call
+    in
+    call, recursion, valuation
 
   (* ----------------- show_each and dump_each directives ------------------- *)
 
@@ -729,12 +754,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           (* Create the call. *)
           let eval, alarms = make_call ~subdivnb kf args valuation state in
           Alarmset.emit ki_call alarms;
-          eval >>- fun (call, valuation) ->
-          let recursion =
-            if call.recursive
-            then Some (Recursion.make_recursive_call call.kf)
-            else None
-          in
+          eval >>- fun (call, recursion, valuation) ->
           (* Register the call. *)
           Value_results.add_kf_caller call.kf ~caller:(current_kf, stmt);
           (* Do the call. *)
