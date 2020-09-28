@@ -453,14 +453,113 @@ and tlval_to_lval (tlhost, toffset) res =
         should not see \result. *)
      | None -> Aorai_option.fatal "Unexpected \\result")
 
-(* Translate the cross condition of an automaton edge to an expression.
-   Used in mk_stmt. *)
-let crosscond_to_exp curr_f curr_status loc (cond,_) res =
+module Kf_bhv_cache =
+  Datatype.Pair_with_collections(Cil_datatype.Kf)(Datatype.String)
+    (struct let module_name = "Aorai_utils.Kf_bhv_cache" end)
 
+let bhv_aux_functions_table = Kf_bhv_cache.Hashtbl.create 7
+
+let get_bhv_aux_fct kf bhv =
+  match
+    Kf_bhv_cache.Hashtbl.find_opt bhv_aux_functions_table (kf,bhv.b_name)
+  with
+  | Some vi -> vi, false
+  | None ->
+    let loc = Cil_datatype.Location.unknown in
+    let ovi = Kernel_function.get_vi kf in
+    let vi = Cil_const.copy_with_new_vid ovi in
+    vi.vname <- Data_for_aorai.get_fresh (ovi.vname ^ "_bhv_" ^ bhv.b_name);
+    vi.vdefined <- false;
+    vi.vghost <- true;
+    let (_,args,varargs,_) = Cil.splitFunctionTypeVI ovi in
+    let typ = TFun(Cil.intType, args, varargs,[]) in
+    Cil.update_var_type vi typ;
+    Cil.setFormalsDecl vi typ;
+    vi.vattr <- [];
+    let assoc =
+      List.combine (Kernel_function.get_formals kf) (Cil.getFormalsDecl vi)
+    in
+    let vis = object
+      inherit Visitor.frama_c_copy (Project.current())
+      method! vlogic_var_use lv =
+        match lv.lv_origin with
+        | None -> JustCopy
+        | Some vi ->
+          (match
+             List.find_opt (fun (x,_) -> Cil_datatype.Varinfo.equal vi x) assoc
+           with
+           | None -> JustCopy
+           | Some (_,nvi) -> ChangeTo (Cil.cvar_to_lvar nvi))
+    end
+    in
+    let assumes = Visitor.visitFramacPredicates vis bhv.b_assumes in
+    let assumes = List.map Logic_const.refresh_predicate assumes in
+    let assigns = Writes [] in
+    let post_cond =
+      [Normal,
+       Logic_const.(
+         new_predicate
+           (prel (Req,tlogic_coerce (tresult Cil.intType) Linteger,lone())))]
+    in
+    let bhv_in =
+      Cil.mk_behavior ~name:bhv.b_name ~assumes ~assigns ~post_cond ()
+    in
+    let name = bhv.b_name ^ "_out" in
+    let assumes =
+      [ Logic_const.(
+            new_predicate (pnot (pands (List.map pred_of_id_pred assumes))))]
+    in
+    let assigns = Writes [] in
+    let post_cond =
+      [ Normal,
+        Logic_const.(
+          new_predicate
+            (prel
+               (Req, tlogic_coerce (tresult Cil.intType) Linteger, lzero())))]
+    in
+    let bhv_out = Cil.mk_behavior ~name ~assumes ~assigns ~post_cond () in
+    Globals.Functions.replace_by_declaration (Cil.empty_funspec()) vi loc;
+    let my_kf = Globals.Functions.get vi in
+    Annotations.add_behaviors
+      ~register_children:true Aorai_option.emitter my_kf [bhv_in; bhv_out];
+    Annotations.add_assigns
+      ~keep_empty:false Aorai_option.emitter my_kf (Writes []);
+    Annotations.add_complete Aorai_option.emitter my_kf
+      [bhv_in.b_name; bhv_out.b_name];
+    Annotations.add_disjoint Aorai_option.emitter my_kf
+      [bhv_in.b_name; bhv_out.b_name];
+    vi, true
+
+(** create a new abstract function call to decide whether we are in the
+    corresponding behavior or not. *)
+let mk_behavior_call generated_kf kf bhv =
+  let aux,generated = get_bhv_aux_fct kf bhv in
+  let res =
+    Cil.makeLocalVar
+      (Kernel_function.get_definition generated_kf)
+      ~ghost:true ~referenced:true ~insert:false
+      (get_fresh "bhv_aux") Cil.intType
+  in
+  let stmt =
+    Cil.mkStmtOneInstr
+      ~ghost:true
+      ~valid_sid:true
+      (Cil_types.Call (
+          Some (Var res, NoOffset),
+          Cil.evar aux,
+          List.map (fun x -> Cil.evar x) (Kernel_function.get_formals kf),
+          Cil_datatype.Location.unknown))
+  in
+  (res, stmt,
+   if generated then Cil_datatype.Varinfo.Set.singleton aux
+   else Cil_datatype.Varinfo.Set.empty)
+
+(* Translate the cross condition of an automaton edge to an expression.
+   Used in mk_stmt. This might generate calls to auxiliary functions, to
+   take into account a guard that uses a function behavior. *)
+let crosscond_to_exp generated_kf curr_f curr_status loc (cond,_) res =
   let check_current_event f status =
-    if Kernel_function.equal curr_f f && curr_status = status then
-      Cil.one loc
-    else Cil.zero loc
+    Kernel_function.equal curr_f f && curr_status = status
   in
   let rel_convert = function
     | Rlt -> Lt
@@ -473,28 +572,54 @@ let crosscond_to_exp curr_f curr_status loc (cond,_) res =
   let rec expnode_convert =
     function
     | TOr  (c1, c2) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.mkBinOp loc LOr e1 (expnode_convert c2)
+       | None ->
+         let stmts2, vars2, defs2, e2 = expnode_convert c2 in
+         stmts1 @ stmts2, vars1 @ vars2,
+         Cil_datatype.Varinfo.Set.union defs1 defs2,
+         Cil.mkBinOp loc LOr e1 e2
        | Some i when Integer.is_zero i -> expnode_convert c2
-       | Some _ -> e1)
+       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty,e1)
     | TAnd (c1, c2) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.mkBinOp loc LAnd e1 (expnode_convert c2)
-       | Some i when Integer.is_zero i -> e1
+       | None ->
+         let stmts2, vars2, defs2, e2 = expnode_convert c2 in
+         stmts1 @ stmts2, vars1 @vars2,
+         Cil_datatype.Varinfo.Set.union defs1 defs2,
+         Cil.mkBinOp loc LAnd e1 e2
+       | Some i when Integer.is_zero i ->
+         [], [], Cil_datatype.Varinfo.Set.empty, e1
        | Some _ -> expnode_convert c2)
     | TNot (c1) ->
-      let e1 = expnode_convert c1 in
+      let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
-       | None -> Cil.new_exp loc (UnOp(LNot, e1,Cil.intType))
-       | Some i when Integer.is_zero i -> Cil.one loc
-       | Some _ -> Cil.zero loc)
-    | TCall (f,_) -> check_current_event f Promelaast.Call
-    | TReturn f -> check_current_event f Promelaast.Return
-    | TTrue -> (Cil.one loc)
-    | TFalse -> (Cil.zero loc)
+       | None ->
+         stmts1, vars1, defs1, Cil.new_exp loc (UnOp(LNot, e1,Cil.intType))
+       | Some i when Integer.is_zero i ->
+         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+       | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc)
+    | TCall (f,None) ->
+      if check_current_event f Promelaast.Call then
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+      else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TCall (f, Some bhv) ->
+      if check_current_event f Promelaast.Call then begin
+        let res, stmt, new_kf = mk_behavior_call generated_kf f bhv in
+        [ stmt ], [res], new_kf, Cil.evar res
+      end else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TReturn f ->
+      if check_current_event f Promelaast.Return then
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+      else
+        [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
+    | TTrue -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.one loc
+    | TFalse -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero loc
     | TRel(rel,t1,t2) ->
+      [], [], Cil_datatype.Varinfo.Set.empty,
       Cil.mkBinOp
         loc (rel_convert rel) (term_to_exp t1 res) (term_to_exp t2 res)
   in
@@ -1782,22 +1907,24 @@ let copy_stmt s =
    If state is reachable, generates a "If then else" statement, else it is
    just an assignment.
    Used in auto_func_block. *)
-let mk_stmt loc (states, tr) f fst status ((st,_) as state) res =
+let mk_stmt generated_kf loc (states, tr) f fst status ((st,_) as state) res =
   if is_reachable st status then begin
     let useful_trans =  get_accessible_transitions (states,tr) st status in
-    let exp_from_trans,stmt_from_action =
-      List.split
-        (List.map
-           (function trans ->
-              (Cil.mkBinOp
-                 loc
-                 LAnd
-                 (is_state_exp trans.start loc)
-                 (crosscond_to_exp f fst loc trans.cross res)),
-              (act_convert loc trans.cross res)
-           )
-           useful_trans
-        )
+    let aux_stmts, new_vars, new_funcs, exp_from_trans,stmt_from_action =
+      List.fold_right
+        (fun trans
+          (aux_stmts, aux_vars, new_funcs, exp_from_trans, stmt_from_action) ->
+           let (tr_stmts, tr_vars, tr_funcs, exp) =
+             crosscond_to_exp generated_kf f fst loc trans.cross res
+           in
+           (tr_stmts @ aux_stmts,
+            tr_vars @ aux_vars,
+            Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
+            Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp
+            ::exp_from_trans,
+            act_convert loc trans.cross res :: stmt_from_action))
+        useful_trans
+        ([],[],Cil_datatype.Varinfo.Set.empty, [], [])
     in
     let mkIfStmt exp1 block1 block2 =
       Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
@@ -1813,31 +1940,35 @@ let mk_stmt loc (states, tr) f fst status ((st,_) as state) res =
       if Aorai_option.Deterministic.get () then []
       else [is_out_of_state_stmt state loc]
     in
-    if Aorai_option.Deterministic.get () then
-      List.fold_left2
-        (fun acc cond stmt_act ->
-           [mkIfStmt cond
-              (mkBlock (copy_stmt then_stmt :: stmt_act)) (mkBlock acc)])
-        else_stmt
-        (List.rev exp_from_trans)
-        (List.rev stmt_from_action)
-    else
-      let actions =
+    let trans_stmts =
+      if Aorai_option.Deterministic.get () then
         List.fold_left2
           (fun acc cond stmt_act ->
-             if stmt_act = [] then acc
-             else
-               (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
-          []
+             [mkIfStmt cond
+                (mkBlock (copy_stmt then_stmt :: stmt_act)) (mkBlock acc)])
+          else_stmt
           (List.rev exp_from_trans)
           (List.rev stmt_from_action)
-      in
-      mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
+      else
+        let actions =
+          List.fold_left2
+            (fun acc cond stmt_act ->
+               if stmt_act = [] then acc
+               else
+                 (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
+            []
+            (List.rev exp_from_trans)
+            (List.rev stmt_from_action)
+        in
+        mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
+    in
+    new_funcs, new_vars, aux_stmts @ trans_stmts
   end else
-  if Aorai_option.Deterministic.get () then []
-  else [is_out_of_state_stmt state loc]
+  if Aorai_option.Deterministic.get () then
+    Cil_datatype.Varinfo.Set.empty, [], []
+  else Cil_datatype.Varinfo.Set.empty, [], [is_out_of_state_stmt state loc]
 
-let auto_func_block loc f st status res =
+let auto_func_block generated_kf loc f st status res =
   let dkey = func_body_dkey in
   let call_or_ret =
     match st with
@@ -1901,15 +2032,21 @@ let auto_func_block loc f st status res =
         copies
   in
   (* For each state, we have to generate the statement that will update its copy. *)
-  let main_stmt =
+  let new_funcs, local_var, main_stmt =
 
     List.fold_left
-      (fun acc state -> (mk_stmt loc auto f st status state res)@acc )
-      []
+      (fun (new_funcs, aux_vars, stmts) state ->
+         let my_funcs, my_vars, my_stmts =
+           mk_stmt generated_kf loc auto f st status state res
+         in
+         Cil_datatype.Varinfo.Set.union my_funcs new_funcs,
+         my_vars @ aux_vars,
+         my_stmts@stmts )
+      (Cil_datatype.Varinfo.Set.empty, local_var, [])
       copies
 
   in
-
+  
   (* Finally, we replace the state var values by the ones computed in copies. *)
   let stvar_update =
     if Aorai_option.Deterministic.get () then
@@ -1931,7 +2068,7 @@ let auto_func_block loc f st status res =
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"
     Printer.pp_block res_block;
-  res_block,local_var
+  new_funcs,res_block,local_var
 
 let get_preds_wrt_params_reachable_states state f status =
   let auto = Data_for_aorai.getAutomata () in

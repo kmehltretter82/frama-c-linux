@@ -231,6 +231,24 @@ void f(void)
 }
 
 /*@ ghost
+/@ assigns \nothing;
+   
+   behavior bhv:
+     assumes c > 0;
+     ensures \result ≡ 1;
+     assigns \nothing;
+   
+   behavior bhv_out:
+     assumes ¬(c > 0);
+     ensures \result ≡ 0;
+     assigns \nothing;
+   
+   complete behaviors bhv, bhv_out;
+   disjoint behaviors bhv, bhv_out;
+ @/
+int main_bhv_bhv(int c); */
+
+/*@ ghost
   /@ requires
        1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
        0 ≡ aorai_intermediate_state_0 ∧
@@ -277,6 +295,7 @@ void f(void)
    @/
   void main_pre_func(int c)
   {
+    int bhv_aux;
     int S0_tmp;
     int Sf_tmp;
     int aorai_intermediate_state_tmp;
@@ -300,7 +319,10 @@ void f(void)
       if (c <= 0) aorai_intermediate_state_0_tmp = 1;
       else aorai_intermediate_state_0_tmp = 0;
     else aorai_intermediate_state_0_tmp = 0;
-    if (S0 == 1) aorai_intermediate_state_tmp = 1;
+    bhv_aux = main_bhv_bhv(c);
+    if (S0 == 1) 
+      if (bhv_aux) aorai_intermediate_state_tmp = 1;
+      else aorai_intermediate_state_tmp = 0;
     else aorai_intermediate_state_tmp = 0;
     Sf_tmp = 0;
     S0_tmp = 0;
