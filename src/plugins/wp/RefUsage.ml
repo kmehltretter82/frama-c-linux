@@ -573,6 +573,101 @@ and v_body (env:ctx) = (* locals of the logical function are removed *)
   | LBinductive(inds) -> E.fcup (fun (_,_,_,p) -> vglob (pred env p)) inds
 
 (* ---------------------------------------------------------------------- *)
+(* --- Assigns checking                                               --- *)
+(* ---------------------------------------------------------------------- *)
+
+module AssignsCompleteness : sig
+  val check: kernel_function -> unit
+end = struct
+  exception Incomplete_assigns of (string list * string)
+
+  let dkey_verbose = Wp_parameters.register_category "verbose-assigns-warning"
+
+  (* Warn on any function without assigns *)
+  let wkey_pedantic = Wp_parameters.register_warn_category "pedantic-assigns"
+  let () = Wp_parameters.set_warn_status wkey_pedantic Log.Winactive
+
+  let collect_assigns kf =
+    let opt_try f p = function None -> f p | Some x -> Some x in
+    let fold_assigns bhv =
+      let folder _ a acc = match a, acc with
+        | WritesAny, _ -> None
+        | _, None      -> Some a
+        | _, Some acc  -> Some (Logic_utils.concat_assigns acc a)
+      in
+      Annotations.fold_assigns folder kf bhv None
+    in
+    let find_default () =
+      match fold_assigns Cil.default_behavior_name with
+      | None ->
+          if Wp_parameters.has_dkey dkey_verbose then
+            Wp_parameters.warning
+              "No default assigns for '%a'.@ Trying complete behaviors if any."
+              Kernel_function.pretty kf ;
+          None
+      | Some x -> Some [x]
+    in
+    let find_complete () =
+      let fold_behaviors names =
+        let folder l name = match (fold_assigns name) with
+          | None -> raise (Incomplete_assigns(names, name))
+          | Some a -> a :: l
+        in
+        try Some (List.fold_left folder [] names)
+        with Incomplete_assigns(bhv_l,b) ->
+          if Wp_parameters.has_dkey dkey_verbose then
+            Wp_parameters.warning "Complete behaviors: %a.@ No assigns for %s"
+              (Pretty_utils.pp_list ~pre:"{" ~last:"}" ~sep:", "
+                 Format.pp_print_string)
+              bhv_l b ;
+          None
+      in
+      Annotations.fold_complete (fun _ -> opt_try fold_behaviors) kf None
+    in
+    (* First:
+       - try to find default behavior assigns, if we cannot get it
+       - try to find a "complete behaviors" set where each behavior has assigns
+         As assigns and froms are over-approximations, the result (if it exists)
+         must cover all assigned memory locations and all data dependencies.
+    *)
+    opt_try find_complete () (opt_try find_default () None)
+
+  let check_assigns kf assigns =
+    let vassigns a =
+      let res_t = Kernel_function.get_return_type kf in
+      let assigns_result ({ it_content=t }, _) = Logic_utils.is_result t in
+      let froms = match a with WritesAny -> [] | Writes l -> l in
+      if Cil.isPointerType res_t && not (List.exists assigns_result froms) then
+        Wp_parameters.warning
+          ~once:true ~source:(fst (Kernel_function.get_location kf))
+          "No 'assigns \\result \\from ...' specification for function '%a', \
+           returning pointer type.@ Callers assumptions might be imprecise."
+          Kernel_function.pretty kf ;
+      let vfrom = function
+        | t, FromAny when Logic_typing.is_pointer_type t.it_content.term_type ->
+            Wp_parameters.warning
+              ~once:true ~source:(fst t.it_content.term_loc)
+              "No \\from specification for assigned pointer '%a'.@ \
+               Callers assumptions might be imprecise."
+              Cil_printer.pp_identified_term t
+        | _ -> ()
+      in List.iter vfrom froms
+    in
+    match assigns with
+    | None ->
+        Wp_parameters.warning ~wkey:wkey_pedantic
+          ~once:true ~source:(fst (Kernel_function.get_location kf))
+          "No 'assigns' specification for function '%a'.@ \
+           Callers assumptions might be imprecise."
+          Kernel_function.pretty kf
+    | Some l -> List.iter vassigns l
+
+  let check kf =
+    check_assigns kf (collect_assigns kf)
+end
+
+
+(* ---------------------------------------------------------------------- *)
 (* --- Compilation of C Function                                      --- *)
 (* ---------------------------------------------------------------------- *)
 
@@ -668,33 +763,12 @@ let cfun_spec env kf =
   let update_spec_env v = env.local.spec <- E.cup env.local.spec v ;
     Cil.SkipChildren
   in
-  let res_type = Kernel_function.get_return_type kf in
-  let is_from_result ({ it_content=t }, _) = Logic_utils.is_result t in
   let visitor = object
     inherit Cil.nopCilVisitor
     method !vpredicate p = update_spec_env (pred env p)
     method !vterm t = update_spec_env (vterm env t)
-
-    method! vassigns = function
-      | WritesAny -> Cil.SkipChildren
-      | Writes l
-        when Cil.isPointerType res_type && not (List.exists is_from_result l) ->
-          Wp_parameters.warning ~once:true
-            "No 'assigns \\result \\from ...' specification for function '%a', \
-             returning pointer type.@ Callers assumptions might be imprecise."
-            Kernel_function.pretty kf ;
-          Cil.DoChildren
-      | _ -> Cil.DoChildren
-
-    method! vfrom = function
-      | it, FromAny when Logic_typing.is_pointer_type it.it_content.term_type ->
-          Wp_parameters.warning ~once:true
-            "No \\from specification for assigned pointer '%a'.@ \
-             Callers assumptions might be imprecise."
-            Cil_printer.pp_identified_term it ;
-          Cil.DoChildren
-      | _ -> Cil.DoChildren
   end in
+  AssignsCompleteness.check kf ;
   let spec = Annotations.funspec kf in
   ignore (Cil.visitCilFunspec (visitor:>Cil.cilVisitor) spec) ;
   (* Partitioning the accesses of the spec for formals vs globals *)
