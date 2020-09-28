@@ -1033,9 +1033,14 @@ let find_in_path s =
   with Exit ->
     Some !found
 
-let print_list cout l = List.iter (Printf.fprintf cout " %S") l
+let print_list fmt l = List.iter (Format.fprintf fmt " %S") l
+module Fmt = struct
+  let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
+  let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
+  let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
+end
 
-let command_string ~result_cout ~oracle_cout command =
+let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
   let errlog = log_prefix ^ ".err.log" in
   (* let stderr = match command.filter with
@@ -1085,7 +1090,7 @@ let command_string ~result_cout ~oracle_cout command =
    *   match command.timeout with
    *   | "" -> command_string
    *   | s ->
-   *     Printf.sprintf
+   *     Format.sprintf
    *       "%s; if test $? -gt 127; then \
    *        echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
    *        fi"
@@ -1094,7 +1099,7 @@ let command_string ~result_cout ~oracle_cout command =
   (* let command_string = match filter with
    *   | None -> command_string
    *   | Some filter ->
-   *     Printf.sprintf "%s && %s < %s >%s && rm -f %s"
+   *     Format.sprintf "%s && %s < %s >%s && rm -f %s"
    *       command_string
    *       filter
    *       (Filename.sanitize stderr)
@@ -1103,10 +1108,11 @@ let command_string ~result_cout ~oracle_cout command =
    * in *)
   let macros = get_macros command in
   let deps = List.map (Macros.expand macros) command.deps in
-  Printf.fprintf result_cout
+  let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s in
+  Format.fprintf result_fmt
     "(rule\n  \
      (targets %S %S %a)\n  \
-     (deps   %a %S (package frama-c)%t (universe))\n  \
+     (deps   %a %S (package frama-c)%a (universe))\n  \
      (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1) (system %S)))))\n\
      )\n"
     errlog
@@ -1114,14 +1120,11 @@ let command_string ~result_cout ~oracle_cout command =
     print_list command.log_files
     print_list deps
     (get_ptest_file command)
-    (fun cout ->
-       List.iter
-         (fun d -> Printf.fprintf cout " (package %S)" ("frama-c-"^d))
-         command.plugins)
+    Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     errlog
     res
     command_string;
-    Printf.fprintf result_cout
+    Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (deps  %a %S (package frama-c)%t (universe))\n  \
@@ -1130,15 +1133,15 @@ let command_string ~result_cout ~oracle_cout command =
     command.file
     print_list deps
     (get_ptest_file command)
-    (fun cout ->
+    (fun fmt ->
        List.iter
-         (fun d -> Printf.fprintf cout " (package %S)" ("frama-c-"^d))
+         (fun d -> Format.fprintf fmt " (package %S)" ("frama-c-"^d))
          command.plugins)
     command_string;
 
   let oracle_prefix = oracle_prefix command in
   (* Update oracle *)
-  Printf.fprintf result_cout
+  Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (action (diff %S %S))\n\
@@ -1146,7 +1149,7 @@ let command_string ~result_cout ~oracle_cout command =
     ("diff-"^log_prefix)
     (Filename.concat ".." (oracle_prefix ^ ".res.oracle"))
     (log_prefix ^ ".res.log");
-  Printf.fprintf result_cout
+  Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (action (diff %S %S))\n\
@@ -1154,14 +1157,14 @@ let command_string ~result_cout ~oracle_cout command =
     ("diff-"^log_prefix)
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
     (log_prefix ^ ".err.log");
-  Printf.fprintf result_cout
+  Format.fprintf result_fmt
     "(alias (deps (alias %S)) (name ptests))\n"
     ("diff-"^log_prefix);
-  Printf.fprintf oracle_cout
+  Format.fprintf oracle_fmt
     "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
     (Filename.basename (oracle_prefix ^ ".err.oracle"))
     (Filename.basename (oracle_prefix ^ ".err.oracle"));
-  Printf.fprintf oracle_cout
+  Format.fprintf oracle_fmt
     "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
     (Filename.basename (oracle_prefix ^ ".res.oracle"))
     (Filename.basename (oracle_prefix ^ ".res.oracle"));
@@ -1628,7 +1631,7 @@ let update_dir_ref dir config =
   let dc_execnow = List.map update_execnow config.dc_execnow in
   { config with dc_execnow }
 
-let dispatcher ~result_cout ~oracle_cout file directory config =
+let dispatcher ~result_fmt ~oracle_fmt file directory config =
   let config =
     scan_test_file config directory file in
   if not config.dc_dont_run then
@@ -1676,7 +1679,7 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
           ex_timeout = execnow.ex_timeout;
         }
       in
-      Printf.fprintf result_cout "\
+      Format.fprintf result_fmt "\
       (rule
        (targets %a %a)
 (action (system %S))
@@ -1690,12 +1693,12 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
     in
     let treat_option option =
       let toplevel = make_toplevel_cmd option in
-      command_string ~result_cout ~oracle_cout toplevel;
+      command_string ~result_fmt ~oracle_fmt toplevel;
       incr i
     in
     List.iter (fun cmxs ->
         let file = Macros.expand macros cmxs in
-        Printf.fprintf result_cout "\
+        Format.fprintf result_fmt "\
       (executable \
       (name %s) \
       (modules %s) \
@@ -1704,7 +1707,7 @@ let dispatcher ~result_cout ~oracle_cout file directory config =
       (flags -open Frama_c_kernel))\n \
       "
           file file
-          print_list (List.map (Printf.sprintf "frama-c-%s.core") config.dc_plugins)
+          print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
       ) config.dc_cmxs;
     List.iter treat_option config.dc_toplevels;
     List.iter make_execnow_cmd config.dc_execnow
@@ -1734,10 +1737,12 @@ let () =
        (* the "suite" may be a directory or a single file *)
        let directory = SubDir.create suite in
        let result_dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
-       let result_cout = open_out result_dune_file in
-       Printf.fprintf result_cout "(copy_files ../*.*)\n";
+       let result_cout = (open_out result_dune_file) in
+       let result_fmt = Format.formatter_of_out_channel result_cout  in
+       Format.fprintf result_fmt "(copy_files ../*.*)@.";
        let oracle_dune_file = Filename.concat (SubDir.make_file directory SubDir.oracle_dirname) "dune" in
-       let oracle_cout = open_out oracle_dune_file in
+       let oracle_cout = (open_out oracle_dune_file) in
+       let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
        let config = SubDir.make_file directory dir_config_file in
        let default = default_config () in
        let default = update_dir_ref directory default in
@@ -1755,9 +1760,11 @@ let () =
          assert (Filename.is_relative file);
          if test_pattern dir_config file
          then begin
-           dispatcher ~result_cout ~oracle_cout file directory dir_config;
+           dispatcher ~result_fmt ~oracle_fmt file directory dir_config;
          end;
        done;
+       Format.fprintf result_fmt "@.";
+       Format.fprintf oracle_fmt "@.";
        close_out result_cout;
        close_out oracle_cout;
     )
