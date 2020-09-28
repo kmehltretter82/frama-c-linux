@@ -130,12 +130,12 @@ val auto_func_behaviors:
     generates the body of pre & post functions.
     - [current_kf] is the auxiliary function currently being defined.
     - [res] must be [None] for a pre-function and [Some v] for a post-func where
-    [v] is the formal corresponding to the value returned by the original
-    function. If the original function returns [Void], [res] must be [None].
+      [v] is the formal corresponding to the value returned by the original
+      function. If the original function returns [Void], [res] must be [None].
 
     @returns [funcs, block, locals], where
     - funcs is the set of auxiliary functions that are used to determine
-    whether a particular behavior of original callee is taken
+      whether a particular behavior of original callee is taken
     - block is the sequence of instructions that perform the transition
     - locals is the list of local variables.
 *)

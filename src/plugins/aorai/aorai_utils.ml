@@ -1914,15 +1914,15 @@ let mk_stmt generated_kf loc (states, tr) f fst status ((st,_) as state) res =
       List.fold_right
         (fun trans
           (aux_stmts, aux_vars, new_funcs, exp_from_trans, stmt_from_action) ->
-           let (tr_stmts, tr_vars, tr_funcs, exp) =
-             crosscond_to_exp generated_kf f fst loc trans.cross res
-           in
-           (tr_stmts @ aux_stmts,
-            tr_vars @ aux_vars,
-            Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
-            Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp
-            ::exp_from_trans,
-            act_convert loc trans.cross res :: stmt_from_action))
+          let (tr_stmts, tr_vars, tr_funcs, exp) =
+            crosscond_to_exp generated_kf f fst loc trans.cross res
+          in
+          (tr_stmts @ aux_stmts,
+           tr_vars @ aux_vars,
+           Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
+           Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp
+           ::exp_from_trans,
+           act_convert loc trans.cross res :: stmt_from_action))
         useful_trans
         ([],[],Cil_datatype.Varinfo.Set.empty, [], [])
     in
@@ -2046,7 +2046,7 @@ let auto_func_block generated_kf loc f st status res =
       copies
 
   in
-  
+
   (* Finally, we replace the state var values by the ones computed in copies. *)
   let stvar_update =
     if Aorai_option.Deterministic.get () then

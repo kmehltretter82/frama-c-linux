@@ -195,7 +195,7 @@ class visit_adding_code_for_synchronisation =
                     (Kernel_function.get_formals kf),
                   loc))
           :: fundec.sbody.bstmts;
-         (* Finally, we update the CFG for the new fundec *)
+        (* Finally, we update the CFG for the new fundec *)
         let keepSwitch = Kernel.KeepSwitch.get() in
         Cfg.prepareCFG ~keepSwitch fun_dec_pre;
         Cfg.cfgFun fun_dec_pre;
