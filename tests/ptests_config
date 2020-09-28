@@ -1,0 +1,1 @@
+DEFAULT_SUITES= dynamic dynamic_plugin journal saveload spec misc syntax cil pretty_printing builtins libc value fc_script jcdb metrics callgraph  value/traces occurrence rte rte_manual idct test float  constant_propagation   impact pdg scope sparecode slicing

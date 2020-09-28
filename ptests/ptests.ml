@@ -217,22 +217,6 @@ let make_test_suite s =
 
 (* Those variables are read from a ptests_config file *)
 let default_suites = ref []
-let toplevel_path = ref ""
-
-let change_toplevel_to_gui () =
-  let s = !toplevel_path in
-  match string_del_suffix "toplevel.opt" s with
-  | Some s -> toplevel_path := s ^ "viewer.opt"
-  | None ->
-    match string_del_suffix "toplevel.byte" s with
-    | Some s -> toplevel_path := s ^ "viewer.byte"
-    | None ->
-      match string_del_suffix "frama-c" s with
-      | Some s -> toplevel_path := s ^ "frama-c-gui"
-      | None ->
-        match string_del_suffix "frama-c.byte" s with
-        | Some s -> toplevel_path := s ^ "frama-c-gui.byte"
-        | None -> ()
 
 
 let () =
@@ -389,8 +373,6 @@ let parse_config_line =
     | "DEFAULT_SUITES" ->
       let l = Str.split regexp_blank value in
       default_suites := List.map (Filename.concat test_path) l
-    | "TOPLEVEL_PATH" ->
-      toplevel_path := value
     | _ -> default_env key value (* Environnement variable that Frama-C reads*)
 
 
@@ -414,20 +396,13 @@ let () =
         end
       done
     with
-    | End_of_file ->
-      if !toplevel_path = "" then begin
-        Format.eprintf "Missing TOPLEVEL_PATH variable. Aborting.@.";
-        exit 1
-      end
+    | End_of_file -> ()
   end
   else begin
     Format.eprintf
       "Cannot find configuration file %s. Aborting.@." config;
     exit 1
   end
-
-(** Must be done after reading config *)
-let () = if !behavior = Gui then change_toplevel_to_gui ()
 
 (* redefine name if special configuration expected *)
 let redefine_name name =
@@ -595,7 +570,7 @@ type config =
 
 let default_macros () =
   let l = [
-    "frama-c", !toplevel_path;
+    "frama-c", "frama-c";
   ] in
   Macros.add_list l Macros.empty
 
@@ -607,8 +582,8 @@ let default_config () =
     dc_deps = [];
     dc_plugins = [];
     dc_filter = None ;
-    dc_default_toplevel = !toplevel_path;
-    dc_toplevels = [ !toplevel_path, default_options, [], Macros.empty, "" ];
+    dc_default_toplevel = "frama-c";
+    dc_toplevels = [ "frama-c", default_options, [], Macros.empty, "" ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -649,10 +624,10 @@ let scan_execnow ~once dir ex_timeout (s:string) =
     }
 
 (* the default toplevel for the current level of options. *)
-let current_default_toplevel = ref !toplevel_path
+let current_default_toplevel = ref "frama-c"
 let current_default_log = ref []
 let current_default_cmds =
-  ref [!toplevel_path,default_options,[], Macros.empty, ""]
+  ref ["frama-c",default_options,[], Macros.empty, ""]
 
 let make_custom_opts =
   let space = Str.regexp " " in

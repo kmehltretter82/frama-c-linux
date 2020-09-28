@@ -40,7 +40,6 @@ autom4te.cache
 
 #tests
 
-/tests/ptests_config
 /tests/**/result/
 /tests/**/result_*/
 
