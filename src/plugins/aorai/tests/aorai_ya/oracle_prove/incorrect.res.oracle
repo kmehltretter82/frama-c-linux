@@ -1,7 +1,7 @@
 [kernel] Parsing tests/aorai_ya/incorrect.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
 [aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
-[kernel] Parsing /tmp/aorai_incorrect_0.i (no preprocessing)
+[kernel] Parsing TMPDIR/aorai_incorrect_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards
-[kernel:annot:missing-spec] /tmp/aorai_incorrect_0.i:61: Warning: 
+[kernel:annot:missing-spec] TMPDIR/aorai_incorrect_0.i:61: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype

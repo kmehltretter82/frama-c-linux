@@ -1,4 +1,4 @@
 [kernel] Parsing tests/aorai_ltl/test_switch3_return.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
-[kernel] Parsing /tmp/aorai_test_switch3_return_0.i (no preprocessing)
+[kernel] Parsing TMPDIR/aorai_test_switch3_return_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards

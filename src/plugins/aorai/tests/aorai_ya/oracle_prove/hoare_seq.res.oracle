@@ -1,4 +1,4 @@
 [kernel] Parsing tests/aorai_ya/hoare_seq.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
-[kernel] Parsing /tmp/aorai_hoare_seq_0.i (no preprocessing)
+[kernel] Parsing TMPDIR/aorai_hoare_seq_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards
