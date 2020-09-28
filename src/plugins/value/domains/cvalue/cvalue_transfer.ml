@@ -224,13 +224,13 @@ let finalize_call stmt call ~pre:_ ~post:state =
 
 let show_expr valuation state fmt expr =
   match expr.enode with
-  | Lval lval ->
+  | Lval lval | StartOf lval ->
     let record = match valuation.Abstract_domain.find_loc lval with
       | `Value record -> record
       | `Top -> assert false
     in
     let offsm = Cvalue_offsetmap.offsetmap_of_lval state lval record.loc in
-    let typ = Cil.typeOf expr in
+    let typ = Cil.typeOfLval lval in
     Eval_op.pretty_offsetmap typ fmt offsm
   | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
 
