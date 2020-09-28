@@ -147,24 +147,6 @@ let load_script base =
 (* --- Command-Line Entry Points                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* See https://github.com/ocaml/dune/pull/636 about why the path separator for
-   ocamlfind is ';' on Cygwin. *)
-let ocamlfind_path_separator = if Sys.cygwin || Sys.win32 then ";" else ":"
-
-let set_module_load_path path =
-  let check_dir ~user d =
-    if is_dir d then true else
-      ( if user then Klog.warning "cannot load '%s' (not a directory)" d
-      ; false ) in
-  let paths =
-    [List.filter (check_dir ~user:true) path;
-     (if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.paths else []);
-     Config_data.Plugins.Plugins.paths] in
-  let ocamlpath = (String.concat ":" (List.flatten paths)) in
-  (* Unix.putenv "OCAMLPATH" ocamlpath; (\* for script *\) *)
-  Klog.debug ~dkey "setting findlib path to %s" ocamlpath
-  (* Config_data.Plugins.Plugins. .init paths () *)
-
 let load_plugin_path () =
   if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
   Config_data.Plugins.Plugins.load_all ()
