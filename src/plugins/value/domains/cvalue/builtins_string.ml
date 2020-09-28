@@ -59,6 +59,9 @@ let pos_min_int ival =
   | None -> Integer.zero
   | Some i -> Integer.(max zero i)
 
+let make_interval ~min ~max =
+  Ival.inject_interval ~min:(Some min) ~max:(Some max)
+
 (* Backward reduction of an ival against an integer.*)
 let backward_comp_left comp ival integer =
   Ival.backward_comp_int_left comp ival (Ival.inject_singleton integer)
@@ -145,95 +148,80 @@ let read_char kind offset cvalue acc =
   let new_acc = read_one_char kind ~offset ~from:acc.from cvalue in
   { new_acc with read = join acc.read new_acc.read }
 
-(* Reads the [offsetmap] character by character, starting from [index], with a
-   period of [kind.size], until reaching [max]. Precise but inefficient. *)
-let rec search_each_index kind ~validity ~index ~max offsetmap acc =
-  let offsets = Ival.inject_singleton index in
+(* Searches the range [min..max] of the [offsetmap], that contains a repeated
+   value of size [v_size]. *)
+let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   let size = kind.size in
-  let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
-  let acc = read_char kind offsets cvalue acc in
-  let index = Integer.add index size in
-  if acc.stop || Integer.gt index max
-  then acc
-  else search_each_index kind ~validity ~index ~max offsetmap acc
-
-(* Reads at once the characters of size [kind.size] in the range [min..max] in
-   the [offsetmap], that contains the repeated value [v] of size [v_size].
-   Assumes that [min] and [max] match the start and the end of the values. *)
-let search_range kind ~min ~max (v, v_size, _v_shift) acc =
-  let make_interval ~min ~max =
-    Ival.inject_interval ~min:(Some min) ~max:(Some max)
-  in
-  (* Case where only one read is needed. *)
-  if Cvalue.V_Or_Uninitialized.is_isotropic v || Integer.equal kind.size v_size
-  then
-    let offset = make_interval ~min ~max ~rem:Integer.zero ~modu:kind.size in
-    read_char kind offset v acc
-  else
-    (* The value [v] contains [nb_chars] characters: need [nb_chars] reads. *)
-    let nb_chars = Integer.e_div v_size kind.size in
-    (* Reads the [count]-nth character in [v]. *)
-    let rec do_one_char count ~max res =
-      let start = Integer.mul kind.size count in
-      let min = Integer.add min start in
-      if Integer.ge count nb_chars || Integer.gt min max
+  (* Reads will repeat themselves every [modu] bits. *)
+  let modu = Integer.ppcm v_size size in
+  let max_reads = Integer.(to_int (e_div modu size)) in
+  (* Performs [max_reads] consecutive reads from offsets {[min] + k[modu]},
+     bound by [max]. *)
+  let search_until ~max acc =
+    let rec read_index count ~min res =
+      let rem = Integer.e_rem min modu in
+      let offsets = make_interval ~min ~max ~rem ~modu in
+      let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
+      (* Be careful to not use this result [t] for the reads of the next
+         characters, as the reduction of [acc.from] assumes that the reads at
+         [offset] are consecutive, which is not the case here. Thus, we always
+         read with the initial [acc], and accumulate the result in [res]. *)
+      let t = read_char kind offsets cvalue acc in
+      let read = join res.read t.read in
+      (* At the end, all the reads are indeed consecutive, and we can
+         use the narrow of the [from] for the next ranges of the offsetmap. *)
+      let from = Ival.narrow res.from t.from in
+      let res = { read; from; stop = res.stop || t.stop; } in
+      let min = Integer.add min kind.size in
+      if (Ival.is_singleton_int offsets && res.stop)
+      || Integer.gt min max || count >= max_reads
       then res
-      else
-        let stop = Integer.(add start (pred kind.size)) in
-        let _, cvalue =
-          Cvalue.V_Or_Uninitialized.extract_bits
-            ~topify:Origin.K_Misalign_read ~start ~stop ~size:v_size v
-        in
-        let rem = Integer.mul count kind.size in
-        let offset = make_interval ~min ~max ~rem ~modu:v_size in
-        (* Be careful to not use this result [t] for the reads of the next
-           characters, as the reduction of [acc.from] assumes that the reads at
-           [offset] are consecutive, which is not the case here. Thus, we always
-           read with the initial [acc], and accumulate the result in [res]. *)
-        let t = read_char kind offset cvalue acc in
-        let read = join res.read t.read in
-        (* At the end, the [nb_chars] reads are indeed consecutive, and we can
-           use the narrow of the [from] for the next ranges of the offsetmap. *)
-        let from = Ival.narrow res.from t.from in
-        let res = { read; from; stop = res.stop || t.stop; } in
-        do_one_char (Integer.succ count) ~max res
+      else read_index (count + 1) ~min res
     in
-    (* The maximal offset we are sure to read. *)
-    let sure_offset = Integer.max (the_max_int acc.from) min in
-    let sure_max = Integer.add sure_offset v_size in
-    (* If one of the read characters stops the search, the other characters will
-       lead to imprecise results — as they are all periodic until [max]. Thus we
-       perform a first read until the maximal sure read offset. *)
-    let acc =
-      if Integer.lt sure_max max
-      then do_one_char Integer.zero ~max:sure_max acc
-      else acc
-    in
-    if acc.stop then acc else do_one_char Integer.zero ~max acc
+    read_index 1 ~min acc
+  in
+  (* The maximal offset we are sure to read from. *)
+  let sure_offset = Integer.max min (the_max_int acc.from) in
+  let sure_max = Integer.pred (Integer.add sure_offset modu) in
+  (* If one of the read characters stops the search, the other characters will
+     lead to imprecise results — as they are all periodic until [max]. Thus we
+     perform a first read of the range until the maximal sure read offset. *)
+  let acc =
+    if Integer.lt sure_max max
+    then search_until ~max:sure_max acc
+    else acc
+  in
+  if acc.stop then acc else search_until ~max acc
 
 (* Folds the [offsetmap] from [start] to [max]. *)
-let fold_offsm kind ~validity ~start ~max offsetmap acc =
+let fold_offsm kind ~validity ~start ~max ~rem offsetmap acc =
   let modu = kind.size in
   let process_range (start, max) (v, v_size, v_shift) acc =
     if acc.stop then acc else
-      let index = Integer.round_up_to_r ~min:start ~r:Integer.zero ~modu in
-      let v_start = Abstract_interp.Rel.add_abs start v_shift in
-      (* Process the whole range at once when:
-         - the ending cut is aligned with the reads, meaning that no read
-           overlaps between two ranges of the offsetmap.
-         - and either the value is isotropic, or the reads are aligned with the
-           repeated values. *)
-      if Integer.is_zero (Integer.e_rem (Integer.succ max) modu) &&
-         (Cvalue.V_Or_Uninitialized.is_isotropic v ||
-          Integer.(equal index v_start && is_zero (e_rem v_size kind.size)))
-      then search_range kind ~min:index ~max (v, v_size, v_shift) acc
-      else search_each_index kind ~validity ~index ~max offsetmap acc
+      let min = Integer.round_up_to_r ~min:start ~r:rem ~modu in
+      if Integer.gt min max then acc else
+        let v_start = Abstract_interp.Rel.add_abs start v_shift in
+        (* Only one read of the value is needed when:
+           - the ending cut is aligned with the reads, meaning that no read
+             overlaps between two ranges of the offsetmap.
+           - and either the value is isotropic, or the repeated value has the
+             same size than the reads. *)
+        if Integer.equal rem (Integer.e_rem (Integer.succ max) modu) &&
+           (Cvalue.V_Or_Uninitialized.is_isotropic v ||
+            Integer.equal min v_start && Integer.equal v_size kind.size)
+        then
+          let offset = make_interval ~min ~max ~rem ~modu in
+          read_char kind offset v acc
+        else
+          (* Otherwise, search the range by reading the offsetmap for each
+             required offset. Less efficient, but equally precise. *)
+          search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc
   in
   Cvalue.V_Offsetmap.fold_between
     ~entire:false (start, max) process_range offsetmap acc
 
 (* Performs the search in the [offsetmap]. *)
-let search_offsm kind ~validity ~offset offsetmap =
+let search_offsm kind ~validity ~offset ~rem offsetmap =
   let start = pos_min_int offset in
   (* Compute the maximal bit that can be read in the offsetmap. *)
   let base_max = match Base.valid_range validity with
@@ -251,7 +239,7 @@ let search_offsm kind ~validity ~offset offsetmap =
   in
   (* Starts the search with an empty accumulator. *)
   let acc = { read = empty; from = offset; stop = false } in
-  let acc = fold_offsm kind ~validity ~start ~max offsetmap acc in
+  let acc = fold_offsm kind ~validity ~start ~max ~rem offsetmap acc in
   (* Alarm if the search does not stop before the end of the offsetmap. *)
   if not acc.stop && Integer.gt (Integer.add max kind.size) base_max
   then { acc.read with alarm = true }
@@ -273,9 +261,14 @@ let search_base kind ~offset base state =
   | `Top -> assert false
   | `Value offsetmap ->
     let validity = Base.validity base in
-    let search_one_char offset char =
+    let search_one_rem ~offset ~char ~rem acc =
       let kind = { kind with search = char } in
-      search_offsm kind ~validity ~offset offsetmap
+      let res = search_offsm kind ~validity ~offset ~rem offsetmap in
+      join acc res
+    in
+    let search_one_char offset char =
+      let rems = Ival.scale_rem ~pos:true kind.size offset in
+      Ival.fold_int (fun rem -> search_one_rem ~offset ~char ~rem) rems empty
     in
     let search_one_offset offset =
       search_by_folding kind.search (search_one_char offset)
@@ -346,7 +339,12 @@ let reduce_by_validity ~size cvalue =
   let loc_bits = Locations.loc_bytes_to_loc_bits cvalue in
   let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
   if Locations.(is_valid Read loc)
-  then loc.Locations.loc, true
+  then
+    let is_aligned _base ival =
+      Ival.is_zero (Ival.scale_rem ~pos:true size ival)
+    in
+    let valid = Locations.Location_Bits.for_all is_aligned loc_bits in
+    loc.Locations.loc, valid
   else
     let valid_loc = Locations.(valid_part Read ~bitfield:true loc) in
     valid_loc.Locations.loc, false
