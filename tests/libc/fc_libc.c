@@ -4,11 +4,13 @@
    CMXS: check_parsing_individual_headers
    CMXS: check_libc_anonymous_tags
    CMXS: check_compliance
-   OPT: -load-module check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
+   PLUGIN: metrics
+   OPT: -load-module %{dep:check_libc_naming_conventions.cmxs} -print -cpp-extra-args='-nostdinc' -metrics -metrics-libc -load-module %{dep:check_const.cmxs} -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
    OPT: -print -print-libc
-   OPT: -load-module check_parsing_individual_headers
-   OPT: -load-module check_libc_anonymous_tags
-   OPT: -load-module check_compliance -kernel-msg-key printer:attrs
+   OPT: -load-module %{dep:check_parsing_individual_headers.cmxs}
+   OPT: -load-module %{dep:check_libc_anonymous_tags.cmxs}
+   OPT: -load-module %{dep:check_compliance.cmxs} -kernel-msg-key printer:attrs
+   DEPS: ./check_full_libc.sh
    CMD: ./check_full_libc.sh
    OPT:
 **/

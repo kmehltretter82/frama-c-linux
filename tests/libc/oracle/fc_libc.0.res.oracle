@@ -4,10 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fc_libc.c:155: assertion got status valid.
-[eva] fc_libc.c:156: assertion got status valid.
 [eva] fc_libc.c:157: assertion got status valid.
 [eva] fc_libc.c:158: assertion got status valid.
+[eva] fc_libc.c:159: assertion got status valid.
+[eva] fc_libc.c:160: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -41,11 +41,12 @@
    wcscpy (0 call); wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call);
    wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (412)
+  Undefined functions (415)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
-   Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
-   Frama_C_long_long_interval (0 call);
+   Frama_C_abstract_cardinal (0 call); Frama_C_abstract_max (0 call);
+   Frama_C_abstract_min (0 call); Frama_C_int_interval (0 call);
+   Frama_C_long_interval (0 call); Frama_C_long_long_interval (0 call);
    Frama_C_real_interval_as_double (0 call); Frama_C_short_interval (0 call);
    Frama_C_size_t_interval (0 call); Frama_C_unsigned_char_interval (0 call);
    Frama_C_unsigned_int_interval (0 call);
@@ -187,7 +188,7 @@
   Goto = 97
   Assignment = 459
   Exit point = 83
-  Function = 495
+  Function = 498
   Function call = 93
   Pointer dereferencing = 159
   Cyclomatic complexity = 296

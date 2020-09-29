@@ -8,7 +8,7 @@ let is_header f = Str.string_match header_re f 0
 
 (* Files which are *not* supposed to be parsed *)
 let blacklist () =
-  let libc = (Filename.concat (Sys.getenv "FRAMAC_SHARE") "libc") in
+  let libc = (Filename.concat Fc_config.datadir "libc") in
   List.map (fun f ->
       Datatype.Filepath.of_string (Filename.concat libc f))
     ["tgmath.h"; "complex.h"; "__fc_machdep_linux_shared.h"]
@@ -42,4 +42,4 @@ let collect_headers libc_dir =
     ) all_headers
 
 let () =
-  Db.Main.apply (collect_headers (Filename.concat (Sys.getenv "FRAMAC_SHARE") "libc"))
+  Db.Main.apply (collect_headers (Filename.concat Fc_config.datadir "libc"))
