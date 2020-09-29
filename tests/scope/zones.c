@@ -1,8 +1,8 @@
 /* run.config
-#   CMXS: @PTEST_NAME@
-   OPT: -load-module @PTEST_NAME@ -eva @EVA_OPTIONS@ -journal-disable
+   PLUGIN: pdg
+   CMXS: @PTEST_NAME@
+   OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -eva @EVA_OPTIONS@ -journal-disable
 */
-
 
 /* bin/viewer.opt -eva @PTEST_DIR@/@PTEST_NAME@.c */
 

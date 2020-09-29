@@ -1,11 +1,11 @@
 /* run.config
+   PLUGIN: pdg
    CMXS: @PTEST_NAME@
    OPT: -journal-disable -load-module %{dep:@PTEST_NAME@.cmxs} -then -main main2
 */
 /* bug 971: */
 volatile foo;
 int v;
-
 void f1 () {
   v += 1;
 }
