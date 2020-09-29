@@ -32,8 +32,7 @@
   Called from behavior_assert.c:52.
 [eva] Recording results for abs
 [eva] Done for function abs
-[eva:alarm] behavior_assert.c:55: Warning: 
-  assertion got status unknown.
+[eva:alarm] behavior_assert.c:55: Warning: assertion got status unknown.
 [eva] behavior_assert.c:45: 
   function h1, behavior not_null: postcondition got status valid.
 [eva] Recording results for h1

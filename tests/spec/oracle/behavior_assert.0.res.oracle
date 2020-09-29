@@ -8,8 +8,7 @@
   c ∈ [--..--]
 [eva] computing for function f <- main.
   Called from behavior_assert.c:90.
-[eva:alarm] behavior_assert.c:14: Warning: 
-  assertion got status invalid.
+[eva:alarm] behavior_assert.c:14: Warning: assertion got status invalid.
 [eva] behavior_assert.c:16: assertion got status valid.
 [eva] Recording results for f
 [eva] Done for function f
@@ -33,8 +32,7 @@
   Called from behavior_assert.c:52.
 [eva] Recording results for abs
 [eva] Done for function abs
-[eva:alarm] behavior_assert.c:55: Warning: 
-  assertion got status unknown.
+[eva:alarm] behavior_assert.c:55: Warning: assertion got status unknown.
 [eva] behavior_assert.c:45: 
   function h1, behavior not_null: postcondition got status valid.
 [eva] Recording results for h1
@@ -45,8 +43,7 @@
 [eva] computing for function k <- main.
   Called from behavior_assert.c:93.
 [eva] behavior_assert.c:85: assertion got status valid.
-[eva:alarm] behavior_assert.c:86: Warning: 
-  assertion got status invalid.
+[eva:alarm] behavior_assert.c:86: Warning: assertion got status invalid.
 [eva] Recording results for k
 [eva] Done for function k
 [eva] Recording results for main
