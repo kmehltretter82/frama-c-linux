@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Eva       [2020-09-28] Improved string builtins on wide strings: crash fixed,
+              better performance, misaligned pointers now considered invalid.
 -   Kernel    [2020-09-22] New option -autocomplete p1, ..., pn that list the
               options of plug-ins p1, ..., pn in a format suitable for
               autocompletion scripts.
