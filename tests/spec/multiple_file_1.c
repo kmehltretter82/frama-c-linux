@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print multiple_file_2.c -journal-disable
+   OPT: -print %{dep:multiple_file_2.c} -journal-disable
 */
 
 /* see bug #43 */

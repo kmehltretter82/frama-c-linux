@@ -1,7 +1,7 @@
 /* run.config
-STDOPT: +"model2.c"
+DEPS: model1.h
+STDOPT: +"%{dep:model2.c}"
 */
-
 #include "model1.h"
 
 void main () {
