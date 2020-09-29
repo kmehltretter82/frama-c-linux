@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"abstract_struct_2.c -lib-entry -eva-msg-key initial-state"
+   STDOPT: #"%{dep:abstract_struct_2.c} -lib-entry -eva-msg-key initial-state"
 */
 #include "stdlib.h"
 
