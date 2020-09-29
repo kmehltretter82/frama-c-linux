@@ -1038,6 +1038,7 @@ module Fmt = struct
   let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
+  let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
 end
 
 let command_string ~result_fmt ~oracle_fmt command =
@@ -1114,7 +1115,7 @@ let command_string ~result_fmt ~oracle_fmt command =
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a (universe))\n  \
      (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1) (system %S)))))\n\
-     )\n"
+     )@."
     errlog
     res
     print_list command.log_files
@@ -1123,7 +1124,8 @@ let command_string ~result_fmt ~oracle_fmt command =
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     errlog
     res
-    command_string;
+    command_string
+  ;
     Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
@@ -1158,8 +1160,12 @@ let command_string ~result_fmt ~oracle_fmt command =
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
     (log_prefix ^ ".err.log");
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name ptests))\n"
-    ("diff-"^log_prefix);
+    "(alias (deps (alias %S)) (name ptests)\
+;     (enabled_if (and true %a))
+ )@."
+    ("diff-"^log_prefix)
+    Fmt.(list (var_libavailable plugin_as_package )) command.plugins
+  ;
   Format.fprintf oracle_fmt
     "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n"
     (Filename.basename (oracle_prefix ^ ".err.oracle"))
