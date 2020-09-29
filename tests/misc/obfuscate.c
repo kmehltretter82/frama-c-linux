@@ -1,7 +1,7 @@
 /* run.config
+   PLUGIN: obfuscator
    OPT: -obfuscate
 */
-
 int my_var = 0;
 
 /*@ global invariant I: my_var >= 0; */

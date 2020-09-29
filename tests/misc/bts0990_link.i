@@ -1,5 +1,5 @@
 /* run.config
-   OPT: bts0990_link_1.i
+   OPT: %{dep:bts0990_link_1.i}
 */
 
 // NB: This test is meant to return an error, as s is declared as an array in

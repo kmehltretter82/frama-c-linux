@@ -1,6 +1,6 @@
 /* run.config
    CMXS: @PTEST_NAME@
-   OPT: -load-script @PTEST_DIR@/@PTEST_NAME@ -then-on test -print
+   OPT: -load-script %{dep:@PTEST_NAME@.cmxs} -then-on test -print
 */
 
 int a = 10;
