@@ -12,6 +12,6 @@ void main (void) {
  buf[0] = 42;
  TcpOption * option = buf + 10;
  option->length = 5;
- Frama_C_show_each(option->value);
+ Frama_C_show_each(&(option->value));
  memcpy(option->value, value, 2);
 }
