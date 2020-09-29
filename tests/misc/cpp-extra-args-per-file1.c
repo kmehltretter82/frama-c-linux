@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -no-autoload-plugins -cpp-extra-args="-DGLOBAL" -cpp-extra-args-per-file @PTEST_DIR@/cpp-extra-args-per-file1.c:'-DFILE1 -DMACRO_WITH_QUOTES="\"hello world"\"',@PTEST_DIR@/cpp-extra-args-per-file2.c:"-DFILE2" -print -then @PTEST_DIR@/cpp-extra-args-per-file2.c -no-print
+   OPT: -cpp-extra-args="-DGLOBAL" -cpp-extra-args-per-file @PTEST_DIR@/cpp-extra-args-per-file1.c:'-DFILE1 -DMACRO_WITH_QUOTES="\"hello world"\"',@PTEST_DIR@/cpp-extra-args-per-file2.c:"-DFILE2" -print -then %{dep:cpp-extra-args-per-file2.c} -no-print
  */
 
 #ifndef GLOBAL

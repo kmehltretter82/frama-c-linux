@@ -1,4 +1,5 @@
 /* run.config
+   DEPS: prec_i.h
    DONTRUN: static local variables & specifications
  */
 typedef int INTEGER;

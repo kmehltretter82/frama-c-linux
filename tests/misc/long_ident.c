@@ -1,7 +1,7 @@
 /* run.config
+   PLUGIN: obfuscator
    OPT: -obfuscate -journal-disable
 */
-
 /*@ ensures \valid(q);  // <-- obfuscation error [bts#404]
  */
 int f(int *q) ;

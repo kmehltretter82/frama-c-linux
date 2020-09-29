@@ -1,7 +1,7 @@
 /* run.config
-   OPT: volatile_aux.c -print -copy
+   DEPS: volatile.h
+   OPT: %{dep:volatile_aux.c} -print -copy
 */
-
 #include "volatile.h"
 
 //@volatile x,y writes w ;

@@ -1,5 +1,6 @@
 /* run.config
-OPT: -print @PTEST_DIR@/merge_logic_globals_2.c -cpp-extra-args="-I@PTEST_DIR@"
+DEPS: merge_logic_globals.h
+OPT: -print %{dep:merge_logic_globals_2.c} -cpp-extra-args="-I@PTEST_DIR@"
 */
 #include "merge_logic_globals.h"
 

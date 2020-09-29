@@ -567,6 +567,7 @@ type config =
     dc_cmxs    : string list; (** cmxs to compile *)
     dc_deps    : string list; (** deps *)
     dc_plugins : string list; (** only plugins to load *)
+    dc_load_module : string list; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
@@ -594,6 +595,7 @@ let default_config () =
     dc_cmxs = [];
     dc_deps = [];
     dc_plugins = [];
+    dc_load_module = [];
     dc_filter = None ;
     dc_default_toplevel = "frama-c";
     dc_toplevels = [ "frama-c", default_options, [], Macros.empty, "" ];
@@ -707,11 +709,10 @@ let config_macro _dir s current =
   end
 
 let config_module _dir s current =
-  let k = "PTEST_LOAD_MODULES" and v = " -load-module " ^ s in
   { current with
     dc_cmxs = (Filename.chop_suffix s ".cmxs") :: current.dc_cmxs;
     dc_deps = s :: current.dc_deps;
-    dc_macros = Macros.append_expand k v current.dc_macros;
+    dc_load_module = s :: current.dc_load_module;
   }
 
 let config_options =
@@ -874,6 +875,7 @@ type toplevel_command =
     timeout: string;
     deps: string list;
     plugins: string list;
+    load_module: string list;
   }
 
 type command =
@@ -976,7 +978,7 @@ let get_macros cmd =
   Macros.add_list macros cmd.macros
 
 let contains_frama_c_binary_name =
-  Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
+  Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\).*"
 
 let frama_c_binary_name =
   Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
@@ -998,8 +1000,9 @@ let basic_command_string =
   let options =
     if contains_frama_c_binary
     then begin
-      let opt_modules = Macros.expand macros
-          (Macros.get "PTEST_LOAD_MODULES" macros) in
+      let opt_modules = String.concat " "
+          (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
+             command.load_module) in
       let opt_pre = Macros.expand macros !additional_options_pre in
       let opt_post = Macros.expand macros !additional_options in
       let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
@@ -1678,6 +1681,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
        execnow=false; timeout;
        deps = config.dc_deps;
        plugins = config.dc_plugins;
+       load_module = config.dc_load_module;
       }
     in
     let mk_cmd (s, timeout) =
@@ -1695,6 +1699,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         timeout;
         deps = config.dc_deps;
         plugins = config.dc_plugins;
+        load_module = config.dc_load_module;
       }
     in
     let process_macros_cmd s = basic_command_string (mk_cmd s) in

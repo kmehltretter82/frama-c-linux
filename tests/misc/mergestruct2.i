@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -journal-disable mergestruct3.i mergestruct1.i
+   OPT: -print -journal-disable %{dep:mergestruct3.i} %{dep:mergestruct1.i}
 */
 struct s *p;
 

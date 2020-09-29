@@ -1,4 +1,4 @@
 /* run.config
-   OPT: merge.c -print
+   OPT: %{dep:merge.c} -print
  */
 int x =2;

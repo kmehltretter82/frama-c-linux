@@ -1,9 +1,9 @@
 /*run.config
+  DEPS: pragma-pack-utils.h
   STDOPT: #"-machdep gcc_x86_64 -kernel-msg-key typing:pragma"
   STDOPT: #"-cpp-command=\"gcc -E -C -I. -m32\" -cpp-frama-c-compliant"
   STDOPT: #"-machdep msvc_x86_64"
  */
-
 #include "pragma-pack-utils.h"
 
 #include <stdint.h>

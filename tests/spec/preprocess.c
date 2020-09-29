@@ -1,7 +1,7 @@
 /* run.config
+   DEPS: preprocess.h
    OPT: -eva @EVA_CONFIG@ -journal-disable -print
 */
-
 // see bts 1357
 #define assert(x) (x)?1:0
 

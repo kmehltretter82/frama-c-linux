@@ -1,8 +1,8 @@
 /* run.config
-CMXS: Change_formals
-OPT: -load-module %{dep:Change_formals.cmxs} -cpp-extra-args="-DNO_PROTO" -then-on test -print
-OPT: -load-module %{dep:Change_formals.cmxs} -cpp-extra-args="-DNO_IMPLEM" -then-on test -print
-OPT: -load-module %{dep:Change_formals.cmxs} -then-on test -print
+MODULE: Change_formals.cmxs
+OPT: -cpp-extra-args="-DNO_PROTO" -then-on test -print
+OPT: -cpp-extra-args="-DNO_IMPLEM" -then-on test -print
+OPT: -then-on test -print
 */
 
 #ifndef NO_PROTO

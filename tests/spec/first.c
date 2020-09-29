@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print third.c second.c -journal-disable
+   OPT: -print %{dep:third.c} %{dep:second.c} -journal-disable
 */
 /*@ behavior b:
   requires \valid(first);

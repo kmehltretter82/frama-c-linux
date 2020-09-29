@@ -168,9 +168,10 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests
 
-TESTS=rte slicing scope value syntax
+TESTS=cil float idct rte slicing scope value syntax
 tests:
-	dune exec -- ptests
+	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
+	dune exec -- ptests/ptests.exe
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
 
 ##############################################################################
