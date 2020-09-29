@@ -581,11 +581,10 @@ module AssignsCompleteness : sig
 end = struct
   exception Incomplete_assigns of (string list * string)
 
-  let dkey_verbose = Wp_parameters.register_category "verbose-assigns-warning"
-
   (* Warn on any function without assigns *)
   let wkey_pedantic = Wp_parameters.register_warn_category "pedantic-assigns"
-  let () = Wp_parameters.set_warn_status wkey_pedantic Log.Winactive
+
+  type ('a, 'b) result = Ok of 'a | Error of 'b
 
   let collect_assigns kf =
     let opt_try f p = function None -> f p | Some x -> Some x in
@@ -599,14 +598,10 @@ end = struct
     in
     let find_default () =
       match fold_assigns Cil.default_behavior_name with
-      | None ->
-          if Wp_parameters.has_dkey dkey_verbose then
-            Wp_parameters.warning
-              "No default assigns for '%a'.@ Trying complete behaviors if any."
-              Kernel_function.pretty kf ;
-          None
+      | None -> None
       | Some x -> Some [x]
     in
+    let incompletes = ref [] in
     let find_complete () =
       let fold_behaviors names =
         let folder l name = match (fold_assigns name) with
@@ -615,11 +610,7 @@ end = struct
         in
         try Some (List.fold_left folder [] names)
         with Incomplete_assigns(bhv_l,b) ->
-          if Wp_parameters.has_dkey dkey_verbose then
-            Wp_parameters.warning "Complete behaviors: %a.@ No assigns for %s"
-              (Pretty_utils.pp_list ~pre:"{" ~last:"}" ~sep:", "
-                 Format.pp_print_string)
-              bhv_l b ;
+          incompletes := (bhv_l, b) :: !incompletes ;
           None
       in
       Annotations.fold_complete (fun _ -> opt_try fold_behaviors) kf None
@@ -630,7 +621,23 @@ end = struct
          As assigns and froms are over-approximations, the result (if it exists)
          must cover all assigned memory locations and all data dependencies.
     *)
-    opt_try find_complete () (opt_try find_default () None)
+    match opt_try find_complete () (opt_try find_default () None) with
+    | None -> Error !incompletes
+    | Some r -> Ok r
+
+  let pretty_behaviors_errors fmt l =
+    let pp_complete =
+      Pretty_utils.pp_list ~pre:"{" ~suf:"}" ~sep:", " Format.pp_print_string
+    in
+    let pp_bhv_error fmt (bhv_l, name) =
+      Format.fprintf fmt
+        "- in complete behaviors: %a@\n  No assigns for (at least) '%s'@\n"
+        pp_complete bhv_l name
+    in
+    match l with
+    | [] -> Format.fprintf fmt ""
+    | l -> Format.fprintf fmt "%a" (Pretty_utils.pp_list pp_bhv_error) l
+
 
   let check_assigns kf assigns =
     let vassigns a =
@@ -638,14 +645,14 @@ end = struct
       let assigns_result ({ it_content=t }, _) = Logic_utils.is_result t in
       let froms = match a with WritesAny -> [] | Writes l -> l in
       if Cil.isPointerType res_t && not (List.exists assigns_result froms) then
-        Wp_parameters.warning
+        Wp_parameters.warning ~wkey:wkey_pedantic
           ~once:true ~source:(fst (Kernel_function.get_location kf))
           "No 'assigns \\result \\from ...' specification for function '%a', \
            returning pointer type.@ Callers assumptions might be imprecise."
           Kernel_function.pretty kf ;
       let vfrom = function
         | t, FromAny when Logic_typing.is_pointer_type t.it_content.term_type ->
-            Wp_parameters.warning
+            Wp_parameters.warning ~wkey:wkey_pedantic
               ~once:true ~source:(fst t.it_content.term_loc)
               "No \\from specification for assigned pointer '%a'.@ \
                Callers assumptions might be imprecise."
@@ -654,13 +661,14 @@ end = struct
       in List.iter vfrom froms
     in
     match assigns with
-    | None ->
+    | Error l ->
         Wp_parameters.warning ~wkey:wkey_pedantic
           ~once:true ~source:(fst (Kernel_function.get_location kf))
-          "No 'assigns' specification for function '%a'.@ \
+          "No 'assigns' specification for function '%a'.@\n%a\
            Callers assumptions might be imprecise."
           Kernel_function.pretty kf
-    | Some l -> List.iter vassigns l
+          pretty_behaviors_errors l
+    | Ok l -> List.iter vassigns l
 
   let check kf =
     check_assigns kf (collect_assigns kf)
