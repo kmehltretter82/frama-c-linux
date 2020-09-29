@@ -14,18 +14,14 @@
   Yg ∈ {0}
 [eva] computing for function simple <- main.
   Called from zones.c:73.
-[eva:alarm] zones.c:15: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
-[eva:alarm] zones.c:16: Warning: 
-  signed overflow. assert y + z ≤ 2147483647;
+[eva:alarm] zones.c:15: Warning: signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] zones.c:16: Warning: signed overflow. assert y + z ≤ 2147483647;
 [eva] Recording results for simple
 [eva] Done for function simple
 [eva] computing for function array1 <- main.
   Called from zones.c:74.
-[eva:alarm] zones.c:21: Warning: 
-  accessing out of bounds index. assert 0 ≤ x;
-[eva:alarm] zones.c:21: Warning: 
-  accessing out of bounds index. assert x < 10;
+[eva:alarm] zones.c:21: Warning: accessing out of bounds index. assert 0 ≤ x;
+[eva:alarm] zones.c:21: Warning: accessing out of bounds index. assert x < 10;
 [eva:alarm] zones.c:22: Warning: 
   signed overflow. assert T[0] + y ≤ 2147483647;
 [eva] Recording results for array1
@@ -50,14 +46,12 @@
 [eva] Done for function g
 [eva] computing for function g <- caller <- main.
   Called from zones.c:68.
-[eva:alarm] zones.c:60: Warning: 
-  signed overflow. assert a + b ≤ 2147483647;
+[eva:alarm] zones.c:60: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function f <- caller <- main.
   Called from zones.c:68.
-[eva:alarm] zones.c:54: Warning: 
-  signed overflow. assert x + y ≤ 2147483647;
+[eva:alarm] zones.c:54: Warning: signed overflow. assert x + y ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for caller
