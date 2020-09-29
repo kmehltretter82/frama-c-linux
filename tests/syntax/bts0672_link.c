@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"bts0672_link_2.c"
-   STDOPT: +"bts0672_link_2.c" +"-cpp-extra-args='-DPROTO'"
+   STDOPT: +"%{dep:bts0672_link_2.c}"
+   STDOPT: +"%{dep:bts0672_link_2.c}" +"-cpp-extra-args='-DPROTO'"
 */
 
 int Frama_C_entropy_source;

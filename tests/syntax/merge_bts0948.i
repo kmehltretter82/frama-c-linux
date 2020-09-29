@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"merge_bts0948_1.i" +"merge_bts0948_2.i"
+   STDOPT: +"%{dep:merge_bts0948_1.i}" +"%{dep:merge_bts0948_2.i}"
 */
 
 /*@ requires \valid((char*)dest);

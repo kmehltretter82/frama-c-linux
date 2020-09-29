@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"vdefined_bts1241_1.i"
+STDOPT: +"%{dep:vdefined_bts1241_1.i}"
  */
 
 int f();

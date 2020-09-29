@@ -1,10 +1,10 @@
 /*run.config
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align1.c" +"merge_attrs_align2.c"
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align1.c" +"merge_attrs_align3.c"
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align1.c" +"merge_attrs_align4.c"
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align2.c" +"merge_attrs_align3.c"
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align2.c" +"merge_attrs_align4.c"
-  STDOPT: +"-machdep x86_64" +"merge_attrs_align3.c" +"merge_attrs_align4.c"
+  STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align1.c}" +"%{dep:merge_attrs_align2.c}"
+  STDOPT: +"-machdep x86_64" +"%{merge_attrs_align1.c}" +"%{merge_attrs_align3.c}"
+  STDOPT: +"-machdep x86_64" +"%{merge_attrs_align1.c}" +"%{merge_attrs_align4.c}"
+  STDOPT: +"-machdep x86_64" +"%{merge_attrs_align2.c}" +"%{merge_attrs_align3.c}"
+  STDOPT: +"-machdep x86_64" +"%{merge_attrs_align2.c}" +"%{merge_attrs_align4.c}"
+  STDOPT: +"-machdep x86_64" +"%{dep:merge_attrs_align3.c}" +"%{dep:merge_attrs_align4.c}"
  */
 
 // for testing with GCC/Clang
