@@ -15,7 +15,7 @@ enum aorai_OpStatusList {
     aorai_Terminated = 1,
     aorai_Called = 0
 };
-/*@ lemma s0_deterministic_trans{L}: \true;
+/*@ check lemma s0_deterministic_trans{L}: \true;
  */
 int f(void);
 

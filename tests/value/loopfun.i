@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-slevel 50 -no-results"
+   STDOPT: +"-eva-slevel 50 -eva-no-results"
    STDOPT: +"-eva-warn-key=missing-loop-unroll=feedback -eva-warn-key=missing-loop-unroll:for=active -main main2"
 */
 static int a = 7;

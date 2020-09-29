@@ -1,5 +1,5 @@
 /*run.config
-  STDOPT: #"-eva-split-return auto -slevel 2"
+  STDOPT: #"-eva-split-return auto -eva-slevel 2"
 */
 // Extract based on Linux Programmer's Manual, GETADDRINFO(3) man page
 #include <sys/types.h>

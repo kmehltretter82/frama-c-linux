@@ -25,12 +25,12 @@
 
 include Plugin.S
 
-module Ltl_File: Parameter_sig.String
-module To_Buchi: Parameter_sig.String
-module Buchi: Parameter_sig.String
-module Ya: Parameter_sig.String
+module Ltl_File: Parameter_sig.Filepath
+module To_Buchi: Parameter_sig.Filepath
+module Buchi: Parameter_sig.Filepath
+module Ya: Parameter_sig.Filepath
 module Output_Spec: Parameter_sig.Bool
-module Output_C_File: Parameter_sig.String
+module Output_C_File: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
 module AbstractInterpretation: Parameter_sig.Bool
@@ -44,7 +44,7 @@ module AddingOperationNameAndStatusInSpecification: Parameter_sig.Bool
 module Deterministic: State_builder.Ref with type data = bool
 
 val is_on : unit -> bool
-val promela_file: unit -> string
+val promela_file: unit -> Filepath.Normalized.t
 val advance_abstract_interpretation: unit -> bool
 
 val emitter: Emitter.t

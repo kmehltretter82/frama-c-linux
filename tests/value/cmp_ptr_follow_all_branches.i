@@ -1,6 +1,6 @@
 /* run.config*
    STDOPT: #"-eva-msg-key pointer-comparison"
-   STDOPT: #"-undefined-pointer-comparison-propagate-all -eva-msg-key pointer-comparison"
+   STDOPT: #"-eva-undefined-pointer-comparison-propagate-all -eva-msg-key pointer-comparison"
 */
 
 int a;

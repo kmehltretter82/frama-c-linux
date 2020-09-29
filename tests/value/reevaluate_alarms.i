@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-load-module report -report -then -slevel 10"
+   STDOPT: +"-load-module report -report -then -eva-slevel 10"
 */
 
 

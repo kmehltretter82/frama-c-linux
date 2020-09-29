@@ -233,6 +233,9 @@ module PrintLib: Parameter_sig.Bool
 module PrintPluginPath: Parameter_sig.Bool
 (** Behavior of option "-print-plugin-path" *)
 
+module AutocompleteHelp: Parameter_sig.String_set
+(** Behavior of option "-autocomplete" *)
+
 (* ************************************************************************* *)
 (** {2 Output Messages} *)
 (* ************************************************************************* *)
@@ -245,6 +248,9 @@ module GeneralDebug: Parameter_sig.Int
 
 module Quiet: Parameter_sig.Bool
 (** Behavior of option "-quiet" *)
+
+module Permissive: Parameter_sig.Bool
+(** Behavior of option "-permissive" *)
 
 (** @plugin development guide *)
 module Unicode: sig
@@ -394,6 +400,9 @@ module CppExtraArgsPerFile: Parameter_sig.Filepath_map with type value = string
 module CppGnuLike: Parameter_sig.Bool
 (** Behavior of option "-cpp-frama-c-compliant" *)
 
+module PrintCppCommands: Parameter_sig.Bool
+(** Behavior of option "-print-cpp-commands" *)
+
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)
 
@@ -465,7 +474,7 @@ module ImplicitFunctionDeclaration: Parameter_sig.String
 module C11: Parameter_sig.Bool
 (** Behavior of option "-c11" *)
 
-module JsonCompilationDatabase: Parameter_sig.String
+module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 
 (* ************************************************************************* *)

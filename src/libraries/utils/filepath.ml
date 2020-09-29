@@ -252,6 +252,10 @@ module Normalized = struct
   let pp_abs fmt p = Format.fprintf fmt "%s" p
   let unknown = normalize ""
   let is_unknown fp = equal fp unknown
+  let is_file fp =
+    try
+      (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
+    with _ -> false
 end
 
 type position =

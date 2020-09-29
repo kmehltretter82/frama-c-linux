@@ -127,6 +127,7 @@ share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/make_template.py: .ignore
 share/analysis-scripts/make_wrapper.py: .ignore
+share/analysis-scripts/normalize_jcdb.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore
@@ -1369,8 +1370,6 @@ src/plugins/value/utils/library_functions.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/mark_noresults.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/unit_tests.ml: CEA_LGPL_OR_PROPRIETARY

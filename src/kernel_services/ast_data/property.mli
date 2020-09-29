@@ -100,7 +100,7 @@ type identified_complete = {
   ic_kf : kernel_function;
   ic_kinstr : kinstr;
   ic_active : Datatype.String.Set.t;
-  ic_bhvs : string list
+  ic_bhvs : Datatype.String.Set.t
 }
 (** Same as for {!identified_behavior}. *)
 
@@ -156,7 +156,7 @@ and identified_lemma = {
   il_name : string;
   il_labels : logic_label list;
   il_args : string list;
-  il_pred : predicate;
+  il_pred : toplevel_predicate;
   il_loc : location
 }
 

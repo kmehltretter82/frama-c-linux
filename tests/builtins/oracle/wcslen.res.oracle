@@ -1,4 +1,4 @@
-[kernel] Parsing wcslen.c (with preprocessing)
+[kernel] Parsing tests/builtins/wcslen.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -31,335 +31,365 @@
                      [11] ∈ {100}
   nondet ∈ [--..--]
 [eva] computing for function small_sets <- main.
-  Called from wcslen.c:339.
-[eva] wcslen.c:60: Call to builtin wcslen
-[eva] wcslen.c:60: 
+  Called from tests/builtins/wcslen.c:370.
+[eva] tests/builtins/wcslen.c:60: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:60: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:61: assertion got status valid.
-[eva] wcslen.c:65: Call to builtin wcslen
-[eva] wcslen.c:65: 
+[eva] tests/builtins/wcslen.c:61: assertion got status valid.
+[eva] tests/builtins/wcslen.c:65: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:65: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:66: assertion got status valid.
-[eva] wcslen.c:70: Call to builtin wcslen
-[eva] wcslen.c:70: 
+[eva] tests/builtins/wcslen.c:66: assertion got status valid.
+[eva] tests/builtins/wcslen.c:70: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:70: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:71: assertion got status valid.
-[eva] wcslen.c:75: Call to builtin wcslen
-[eva] wcslen.c:75: 
+[eva] tests/builtins/wcslen.c:71: assertion got status valid.
+[eva] tests/builtins/wcslen.c:75: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:75: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:76: assertion got status valid.
-[eva] wcslen.c:81: Call to builtin wcslen
-[eva:alarm] wcslen.c:81: Warning: 
+[eva] tests/builtins/wcslen.c:76: assertion got status valid.
+[eva] tests/builtins/wcslen.c:81: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:81: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:82: assertion got status valid.
+[eva] tests/builtins/wcslen.c:82: assertion got status valid.
 [eva] Recording results for small_sets
 [eva] Done for function small_sets
 [eva] computing for function zero_termination <- main.
-  Called from wcslen.c:340.
-[eva] wcslen.c:89: Call to builtin wcslen
-[eva:alarm] wcslen.c:89: Warning: 
+  Called from tests/builtins/wcslen.c:371.
+[eva] tests/builtins/wcslen.c:89: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:89: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:90: assertion got status valid.
-[eva] wcslen.c:93: Call to builtin wcslen
-[eva:alarm] wcslen.c:93: Warning: 
+[eva] tests/builtins/wcslen.c:90: assertion got status valid.
+[eva] tests/builtins/wcslen.c:93: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:93: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
-[eva] wcslen.c:97: Call to builtin wcslen
-[eva:alarm] wcslen.c:97: Warning: 
+[eva] tests/builtins/wcslen.c:97: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:97: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for zero_termination
 [eva] Done for function zero_termination
 [eva] computing for function wcslen_initialization <- main.
-  Called from wcslen.c:341.
-[eva] wcslen.c:105: Call to builtin wcslen
-[eva:alarm] wcslen.c:105: Warning: 
+  Called from tests/builtins/wcslen.c:372.
+[eva] tests/builtins/wcslen.c:105: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:105: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:106: assertion got status valid.
-[eva] wcslen.c:109: Call to builtin wcslen
-[eva:alarm] wcslen.c:109: Warning: 
+[eva] tests/builtins/wcslen.c:106: assertion got status valid.
+[eva] tests/builtins/wcslen.c:109: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:109: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
-[eva] wcslen.c:116: Call to builtin wcslen
-[eva:alarm] wcslen.c:116: Warning: 
+[eva] tests/builtins/wcslen.c:116: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:116: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:117: assertion got status valid.
-[eva] wcslen.c:124: Call to builtin wcslen
-[eva:alarm] wcslen.c:124: Warning: 
+[eva] tests/builtins/wcslen.c:117: assertion got status valid.
+[eva] tests/builtins/wcslen.c:124: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:124: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:125: assertion got status valid.
+[eva] tests/builtins/wcslen.c:125: assertion got status valid.
 [eva] Recording results for wcslen_initialization
 [eva] Done for function wcslen_initialization
 [eva] computing for function wcslen_large <- main.
-  Called from wcslen.c:342.
+  Called from tests/builtins/wcslen.c:373.
 [eva] computing for function init_array_nondet <- wcslen_large <- main.
-  Called from wcslen.c:168.
-[eva] wcslen.c:161: Call to builtin memset
-[eva] wcslen.c:161: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+  Called from tests/builtins/wcslen.c:168.
+[eva] tests/builtins/wcslen.c:161: Call to builtin memset
+[eva] tests/builtins/wcslen.c:161: 
+  function memset: precondition 'valid_s' got status valid.
+[eva] share/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- wcslen_large <- main.
-  Called from wcslen.c:171.
+  Called from tests/builtins/wcslen.c:171.
 [eva] using specification for function Frama_C_interval
-[eva] wcslen.c:171: 
+[eva] tests/builtins/wcslen.c:171: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:172: Call to builtin wcslen
-[eva] wcslen.c:172: 
+[eva] tests/builtins/wcslen.c:172: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:172: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:173: assertion got status valid.
+[eva] tests/builtins/wcslen.c:173: assertion got status valid.
 [eva] computing for function Frama_C_interval <- wcslen_large <- main.
-  Called from wcslen.c:175.
-[eva] wcslen.c:175: 
+  Called from tests/builtins/wcslen.c:175.
+[eva] tests/builtins/wcslen.c:175: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:176: Call to builtin wcslen
-[eva] wcslen.c:176: 
+[eva] tests/builtins/wcslen.c:176: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:176: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:177: assertion got status valid.
+[eva] tests/builtins/wcslen.c:177: assertion got status valid.
 [eva] computing for function Frama_C_interval <- wcslen_large <- main.
-  Called from wcslen.c:179.
-[eva] wcslen.c:179: 
+  Called from tests/builtins/wcslen.c:179.
+[eva] tests/builtins/wcslen.c:179: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:180: Call to builtin wcslen
-[eva] wcslen.c:180: 
+[eva] tests/builtins/wcslen.c:180: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:180: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:181: assertion got status valid.
+[eva] tests/builtins/wcslen.c:181: assertion got status valid.
 [eva] computing for function Frama_C_interval <- wcslen_large <- main.
-  Called from wcslen.c:183.
-[eva] wcslen.c:183: 
+  Called from tests/builtins/wcslen.c:183.
+[eva] tests/builtins/wcslen.c:183: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:184: Call to builtin wcslen
-[eva:alarm] wcslen.c:184: Warning: 
+[eva] tests/builtins/wcslen.c:184: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:184: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:185: assertion got status valid.
+[eva] tests/builtins/wcslen.c:185: assertion got status valid.
 [eva] computing for function init_array_nondet <- wcslen_large <- main.
-  Called from wcslen.c:187.
-[eva] wcslen.c:161: Call to builtin memset
+  Called from tests/builtins/wcslen.c:187.
+[eva] tests/builtins/wcslen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- wcslen_large <- main.
-  Called from wcslen.c:188.
-[eva] wcslen.c:188: 
+  Called from tests/builtins/wcslen.c:188.
+[eva] tests/builtins/wcslen.c:188: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:189: Call to builtin wcslen
-[eva:alarm] wcslen.c:189: Warning: 
+[eva] tests/builtins/wcslen.c:189: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:189: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:190: assertion got status valid.
+[eva] tests/builtins/wcslen.c:190: assertion got status valid.
 [eva] Recording results for wcslen_large
 [eva] Done for function wcslen_large
 [eva] computing for function wcslen_large_uninit <- main.
-  Called from wcslen.c:343.
+  Called from tests/builtins/wcslen.c:374.
 [eva] computing for function init_array_nondet <- wcslen_large_uninit <- main.
-  Called from wcslen.c:197.
-[eva] wcslen.c:161: Call to builtin memset
+  Called from tests/builtins/wcslen.c:197.
+[eva] tests/builtins/wcslen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function init_array_nondet <- wcslen_large_uninit <- main.
-  Called from wcslen.c:198.
-[eva] wcslen.c:161: Call to builtin memset
+  Called from tests/builtins/wcslen.c:198.
+[eva] tests/builtins/wcslen.c:161: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
 [eva] computing for function Frama_C_interval <- wcslen_large_uninit <- main.
-  Called from wcslen.c:202.
-[eva] wcslen.c:202: 
+  Called from tests/builtins/wcslen.c:202.
+[eva] tests/builtins/wcslen.c:202: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:203: Call to builtin wcslen
-[eva:alarm] wcslen.c:203: Warning: 
+[eva] tests/builtins/wcslen.c:203: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:203: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:204: assertion got status valid.
+[eva] tests/builtins/wcslen.c:204: assertion got status valid.
 [eva] computing for function Frama_C_interval <- wcslen_large_uninit <- main.
-  Called from wcslen.c:207.
-[eva] wcslen.c:207: 
+  Called from tests/builtins/wcslen.c:207.
+[eva] tests/builtins/wcslen.c:207: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:208: Call to builtin wcslen
-[eva:alarm] wcslen.c:208: Warning: 
+[eva] tests/builtins/wcslen.c:208: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:208: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:209: assertion got status valid.
+[eva] tests/builtins/wcslen.c:209: assertion got status valid.
 [eva] computing for function Frama_C_interval <- wcslen_large_uninit <- main.
-  Called from wcslen.c:211.
-[eva] wcslen.c:211: 
+  Called from tests/builtins/wcslen.c:211.
+[eva] tests/builtins/wcslen.c:211: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:212: Call to builtin wcslen
-[eva:alarm] wcslen.c:212: Warning: 
+[eva] tests/builtins/wcslen.c:212: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:212: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:213: assertion got status valid.
+[eva] tests/builtins/wcslen.c:213: assertion got status valid.
 [eva] Recording results for wcslen_large_uninit
 [eva] Done for function wcslen_large_uninit
 [eva] computing for function misc <- main.
-  Called from wcslen.c:344.
-[eva] wcslen.c:241: Call to builtin wcslen
-[eva:alarm] wcslen.c:241: Warning: 
+  Called from tests/builtins/wcslen.c:375.
+[eva] tests/builtins/wcslen.c:241: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:241: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
-[eva] wcslen.c:244: Call to builtin wcslen
-[eva] wcslen.c:244: 
+[eva] tests/builtins/wcslen.c:244: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:244: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:245: assertion got status valid.
-[eva] wcslen.c:248: Call to builtin wcslen
-[eva:alarm] wcslen.c:248: Warning: 
+[eva] tests/builtins/wcslen.c:245: assertion got status valid.
+[eva] tests/builtins/wcslen.c:248: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:248: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:249: assertion got status valid.
+[eva] tests/builtins/wcslen.c:249: assertion got status valid.
 [eva] computing for function Frama_C_interval <- misc <- main.
-  Called from wcslen.c:250.
-[eva] wcslen.c:250: 
+  Called from tests/builtins/wcslen.c:250.
+[eva] tests/builtins/wcslen.c:250: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:252: Call to builtin wcslen
-[eva] wcslen.c:252: 
+[eva] tests/builtins/wcslen.c:252: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:252: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:253: assertion got status valid.
-[eva] wcslen.c:255: Call to builtin wcslen
-[eva:alarm] wcslen.c:255: Warning: 
+[eva] tests/builtins/wcslen.c:253: assertion got status valid.
+[eva] tests/builtins/wcslen.c:255: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:255: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
-[eva] wcslen.c:256: Call to builtin wcslen
-[eva] wcslen.c:256: 
+[eva] tests/builtins/wcslen.c:256: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:256: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:257: assertion got status valid.
-[eva] wcslen.c:260: Call to builtin wcslen
-[eva] wcslen.c:260: 
+[eva] tests/builtins/wcslen.c:257: assertion got status valid.
+[eva] tests/builtins/wcslen.c:260: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:260: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:261: assertion got status valid.
-[eva] wcslen.c:265: Call to builtin wcslen
-[eva] wcslen.c:265: 
+[eva] tests/builtins/wcslen.c:261: assertion got status valid.
+[eva] tests/builtins/wcslen.c:265: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:265: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:266: assertion got status valid.
-[eva] wcslen.c:270: Call to builtin wcslen
-[eva] wcslen.c:270: 
+[eva] tests/builtins/wcslen.c:266: assertion got status valid.
+[eva] tests/builtins/wcslen.c:270: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:270: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:271: assertion got status valid.
-[eva] wcslen.c:269: starting to merge loop iterations
-[eva] wcslen.c:270: Call to builtin wcslen
-[eva] wcslen.c:270: Call to builtin wcslen
-[eva] wcslen.c:270: Call to builtin wcslen
-[eva] wcslen.c:270: Call to builtin wcslen
-[eva] wcslen.c:277: Call to builtin wcslen
-[eva:alarm] wcslen.c:277: Warning: 
+[eva] tests/builtins/wcslen.c:271: assertion got status valid.
+[eva] tests/builtins/wcslen.c:269: starting to merge loop iterations
+[eva] tests/builtins/wcslen.c:270: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:270: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:270: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:270: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:277: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:277: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:278: assertion got status valid.
+[eva] tests/builtins/wcslen.c:278: assertion got status valid.
 [eva] Recording results for misc
 [eva] Done for function misc
 [eva] computing for function bitfields <- main.
-  Called from wcslen.c:345.
-[eva] wcslen.c:140: Call to builtin wcslen
-[eva:alarm] wcslen.c:140: Warning: 
+  Called from tests/builtins/wcslen.c:376.
+[eva] tests/builtins/wcslen.c:140: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:140: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for bitfields
 [eva] Done for function bitfields
 [eva] computing for function bitfields2 <- main.
-  Called from wcslen.c:346.
-[eva] wcslen.c:155: Call to builtin wcslen
-[eva] wcslen.c:155: 
+  Called from tests/builtins/wcslen.c:377.
+[eva] tests/builtins/wcslen.c:155: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:155: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:156: assertion got status valid.
+[eva] tests/builtins/wcslen.c:156: assertion got status valid.
 [eva] Recording results for bitfields2
 [eva] Done for function bitfields2
 [eva] computing for function escaping <- main.
-  Called from wcslen.c:347.
-[eva:alarm] wcslen.c:222: Warning: 
+  Called from tests/builtins/wcslen.c:378.
+[eva:alarm] tests/builtins/wcslen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:alarm] wcslen.c:222: Warning: 
+[eva:alarm] tests/builtins/wcslen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:alarm] wcslen.c:222: Warning: 
+[eva:alarm] tests/builtins/wcslen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:alarm] wcslen.c:222: Warning: 
+[eva:alarm] tests/builtins/wcslen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:locals-escaping] wcslen.c:222: Warning: 
+[eva:locals-escaping] tests/builtins/wcslen.c:222: Warning: 
   locals {x} escaping the scope of a block of escaping through s
-[eva] wcslen.c:225: Call to builtin wcslen
-[eva:alarm] wcslen.c:225: Warning: 
+[eva] tests/builtins/wcslen.c:225: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:225: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:226: assertion got status valid.
-[eva] wcslen.c:228: Call to builtin wcslen
-[eva] wcslen.c:228: 
+[eva] tests/builtins/wcslen.c:226: assertion got status valid.
+[eva] tests/builtins/wcslen.c:228: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:228: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] wcslen.c:229: assertion got status valid.
+[eva] tests/builtins/wcslen.c:229: assertion got status valid.
 [eva] Recording results for escaping
 [eva] Done for function escaping
 [eva] computing for function big_array <- main.
-  Called from wcslen.c:348.
-[eva:alarm] wcslen.c:287: Warning: out of bounds write. assert \valid(p);
-[eva:alarm] wcslen.c:291: Warning: out of bounds write. assert \valid(p);
-[eva:alarm] wcslen.c:294: Warning: out of bounds write. assert \valid(p);
-[eva] wcslen.c:301: Call to builtin wcslen
-[eva:alarm] wcslen.c:301: Warning: 
+  Called from tests/builtins/wcslen.c:379.
+[eva:alarm] tests/builtins/wcslen.c:287: Warning: 
+  out of bounds write. assert \valid(p);
+[eva:alarm] tests/builtins/wcslen.c:291: Warning: 
+  out of bounds write. assert \valid(p);
+[eva:alarm] tests/builtins/wcslen.c:294: Warning: 
+  out of bounds write. assert \valid(p);
+[eva] tests/builtins/wcslen.c:301: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:301: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:302: Call to builtin wcslen
-[eva:alarm] wcslen.c:302: Warning: 
+[eva] tests/builtins/wcslen.c:302: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:302: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:303: Call to builtin wcslen
-[eva:alarm] wcslen.c:303: Warning: 
+[eva] tests/builtins/wcslen.c:303: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:303: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:304: Frama_C_show_each: {0}, {0}, {0}
-[eva] wcslen.c:306: Call to builtin wcslen
-[eva:alarm] wcslen.c:306: Warning: 
+[eva] tests/builtins/wcslen.c:304: Frama_C_show_each: {0}, {0}, {0}
+[eva] tests/builtins/wcslen.c:306: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:306: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:307: Call to builtin wcslen
-[eva:alarm] wcslen.c:307: Warning: 
+[eva] tests/builtins/wcslen.c:307: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:307: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:308: Call to builtin wcslen
-[eva:alarm] wcslen.c:308: Warning: 
+[eva] tests/builtins/wcslen.c:308: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:308: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:309: Frama_C_show_each: {0}, {0}, {0}
+[eva] tests/builtins/wcslen.c:309: Frama_C_show_each: {0}, {0}, {0}
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.
-  Called from wcslen.c:349.
-[eva] wcslen.c:314: starting to merge loop iterations
+  Called from tests/builtins/wcslen.c:380.
+[eva] tests/builtins/wcslen.c:314: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:318.
-[eva] wcslen.c:318: 
+  Called from tests/builtins/wcslen.c:318.
+[eva] tests/builtins/wcslen.c:318: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:319: Call to builtin wcslen
-[eva:alarm] wcslen.c:319: Warning: 
+[eva] tests/builtins/wcslen.c:319: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:319: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:322.
-[eva] wcslen.c:322: 
+  Called from tests/builtins/wcslen.c:322.
+[eva] tests/builtins/wcslen.c:322: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:323: Call to builtin wcslen
-[eva:alarm] wcslen.c:323: Warning: 
+[eva] tests/builtins/wcslen.c:323: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:323: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:325.
-[eva] wcslen.c:325: 
+  Called from tests/builtins/wcslen.c:325.
+[eva] tests/builtins/wcslen.c:325: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:326: Call to builtin wcslen
-[eva:alarm] wcslen.c:326: Warning: 
+[eva] tests/builtins/wcslen.c:326: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:326: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:327.
-[eva] wcslen.c:327: 
+  Called from tests/builtins/wcslen.c:327.
+[eva] tests/builtins/wcslen.c:327: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:328: Call to builtin wcslen
-[eva:alarm] wcslen.c:328: Warning: 
+[eva] tests/builtins/wcslen.c:328: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:328: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:329.
-[eva] wcslen.c:329: 
+  Called from tests/builtins/wcslen.c:329.
+[eva] tests/builtins/wcslen.c:329: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:330: Call to builtin wcslen
-[eva:alarm] wcslen.c:330: Warning: 
+[eva] tests/builtins/wcslen.c:330: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:330: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
-  Called from wcslen.c:331.
-[eva] wcslen.c:331: 
+  Called from tests/builtins/wcslen.c:331.
+[eva] tests/builtins/wcslen.c:331: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] wcslen.c:333: Call to builtin wcslen
-[eva:alarm] wcslen.c:333: Warning: 
+[eva] tests/builtins/wcslen.c:333: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:333: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
 [eva] Recording results for negative_offsets
 [eva] Done for function negative_offsets
+[eva] computing for function misaligned_string <- main.
+  Called from tests/builtins/wcslen.c:381.
+[eva] tests/builtins/wcslen.c:345: assertion got status valid.
+[eva] tests/builtins/wcslen.c:346: Call to builtin wcslen
+[eva] tests/builtins/wcslen.c:346: 
+  function wcslen: precondition 'valid_string_s' got status valid.
+[eva] computing for function Frama_C_interval <- misaligned_string <- main.
+  Called from tests/builtins/wcslen.c:350.
+[eva] tests/builtins/wcslen.c:350: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] tests/builtins/wcslen.c:351: Warning: 
+  out of bounds write. assert \valid((char *)((wchar_t *)b) + i);
+[eva:alarm] tests/builtins/wcslen.c:352: Warning: assertion got status unknown.
+[eva] tests/builtins/wcslen.c:353: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:353: Warning: 
+  function wcslen: precondition 'valid_string_s' got status unknown.
+[eva:alarm] tests/builtins/wcslen.c:361: Warning: assertion got status unknown.
+[eva] tests/builtins/wcslen.c:362: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:362: Warning: 
+  function wcslen: precondition 'valid_string_s' got status unknown.
+[eva] tests/builtins/wcslen.c:365: Call to builtin wcslen
+[eva:alarm] tests/builtins/wcslen.c:365: Warning: 
+  function wcslen: precondition 'valid_string_s' got status invalid.
+[eva] Recording results for misaligned_string
+[eva] Done for function misaligned_string
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 3 assertion(s)
@@ -401,6 +431,24 @@
    [1..3] ∈ ESCAPINGADDR
   z1 ∈ {0}
   z2 ∈ {0}
+[eva:final-states] Values at end of function misaligned_string:
+  Frama_C_entropy_source ∈ [--..--]
+  a[0][bits 0 to 7] ∈ {1}
+   [0][bits 8 to 31] ∈ {0}
+   [1] ∈ {1}
+   [2] ∈ {0}
+  a_length ∈ {2}
+  b[0..9999999]# ∈ {0; 17} repeated %8 
+  i ∈ [0..39999999]
+  b_length ∈ [0..9999999]
+  c[0][bits 0 to 7] ∈ {0}
+   {[0][bits 8 to 31]#; [1][bits 0 to 7]#} ∈ {1}
+   {[1][bits 8 to 31]#; [2][bits 0 to 7]#} ∈ {2}
+   {[2][bits 8 to 31]; [3][bits 0 to 7]} ∈ {0}
+   {[3][bits 8 to 31]#; [4][bits 0 to 7]#} ∈ {4}
+   [4][bits 8 to 31] ∈ {0}
+  p ∈ {{ &c + {1} }}
+  c_length ∈ {2}
 [eva:final-states] Values at end of function misc:
   Frama_C_entropy_source ∈ [--..--]
   loc_str ∈ {{ L"Bonjour Monde\n" }}
@@ -520,9 +568,11 @@
 [from] Done for function bitfields2
 [from] Computing for function escaping
 [from] Done for function escaping
-[from] Computing for function misc
-[from] Computing for function Frama_C_interval <-misc
+[from] Computing for function misaligned_string
+[from] Computing for function Frama_C_interval <-misaligned_string
 [from] Done for function Frama_C_interval
+[from] Done for function misaligned_string
+[from] Computing for function misc
 [from] Done for function misc
 [from] Computing for function negative_offsets
 [from] Done for function negative_offsets
@@ -556,7 +606,8 @@
                non_terminated2[2..3]; empty_or_uninitialized[0];
                uninitialized[0]; s[0..1]; t[0..3]; s; s; a[3..99]; a[3..99];
                s[0..3]; loc_char_array[0..4]; x[0..3]; maybe_init[0..1];
-               t[0..999999]; u[0..199]; r[0..200]; buf[0..99];
+               t[0..999999]; u[0..199]; r[0..200]; buf[0..99]; a[0..2];
+               b[0..9999999]; c{[0][bits 8 to 31]; [1..3]; [4][bits 0 to 7]};
                L"Hello World\n"[bits 0 to 415];
                L"abc\000\000\000abc"[bits 0 to 319]; L""; L"a"[bits 0 to 63];
                L"aa"[bits 0 to 95]; L"aaa"[bits 0 to 127];
@@ -578,6 +629,8 @@
   NO EFFECTS
 [from] Function escaping:
   NO EFFECTS
+[from] Function misaligned_string:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function misc:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function negative_offsets:
@@ -616,6 +669,11 @@
     s[0..3]; z1; tmp; z2; tmp_0
 [inout] Inputs for function escaping:
     nondet
+[inout] Out (internal) for function misaligned_string:
+    Frama_C_entropy_source; a[0..2]; a_length; b[0..9999999]; i; b_length;
+    c[0..4]; p; c_length
+[inout] Inputs for function misaligned_string:
+    Frama_C_entropy_source; nondet
 [inout] Out (internal) for function misc:
     Frama_C_entropy_source; loc_str; loc_char_array[3]; sz1; sz2; sz3; 
     sz4; sz5; sz6; sz7; sz8; x[0..3]; z[0..3]; i; str; s1; tmp; s2; tmp_0; 

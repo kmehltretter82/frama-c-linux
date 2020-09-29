@@ -215,16 +215,14 @@ module Internals =
 module CallsiteHash = Value_types.Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
-   This table is filled by the [-inout-callwise] option, or for functions for
-   which only the specification is used. *)
+*)
 module CallwiseResults =
   State_builder.Hashtbl
   (Value_types.Callsite.Hashtbl)
   (Inout_type)
   (struct
     let size = 17
-    let dependencies = [Internals.self;
-                        Inout_parameters.ForceCallwiseInout.self]
+    let dependencies = [Internals.self]
     let name = "Inout.Operational_inputs.CallwiseResults"
    end)
 
@@ -373,7 +371,7 @@ end) = struct
     Annotations.iter_code_annot
       (fun _ ca ->
          match ca.annot_content with
-         | AAssert (_, _, p)
+         | AAssert (_, p)
          | AInvariant (_, true, p) ->
            begin
              let env =
@@ -382,7 +380,7 @@ end) = struct
                  ~here:(X.stmt_state stmt)
                  ()
              in
-             match Eva.Eval_terms.predicate_deps env p with
+             match Eva.Eval_terms.predicate_deps env p.tp_statement with
              | None ->
                (* To be sound, we should perform a join with the top zone here.
                   We do nothing instead because the latter behavior would
@@ -565,10 +563,6 @@ let extract_inout_from_froms froms =
 
 module Callwise = struct
 
-  let compute_callwise () =
-    Inout_parameters.ForceCallwiseInout.get () ||
-      Dynamic.Parameter.Bool.get "-memexec-all" ()
-
   let merge_call_in_local_table call local_table v =
     let prev =
       try CallsiteHash.find local_table call
@@ -600,41 +594,39 @@ module Callwise = struct
   let call_inout_stack = ref []
 
   let call_for_callwise_inout (call_type, state, call_stack) =
-    if compute_callwise () then begin
-      let (current_function, ki as call_site) = List.hd call_stack in
-      let merge_inout inout =
-        if ki = Kglobal 
-        then merge_call_in_global_tables call_site inout
-        else
-          let _above_function, table =
-            try List.hd !call_inout_stack
-            with Failure _ -> assert false
-          in
-          merge_call_in_local_table call_site table inout
-      in
-      match call_type with
-      | `Builtin {Value_types.c_from = Some (froms,sure_out) } ->
-         let in_, out_ = extract_inout_from_froms froms in
-         let inout = {
-           over_inputs_if_termination = in_;
-           over_inputs = in_;
-           over_logic_inputs = Zone.bottom;
-           over_outputs_if_termination = out_ ;
-           over_outputs = out_;
-           under_outputs_if_termination = sure_out;
-         } in
-         merge_inout inout
-      | `Def | `Memexec ->
-        let table_current_function = CallsiteHash.create 7 in
-        call_inout_stack :=
-          (current_function, table_current_function) :: !call_inout_stack
-      | `Spec spec ->
-        let inout =compute_using_given_spec_state state spec current_function in
-        merge_inout inout
-      | `Builtin { Value_types.c_from = None } ->
-        let inout = compute_using_prototype_state state current_function in
-        merge_inout inout
-    end;;
+    let (current_function, ki as call_site) = List.hd call_stack in
+    let merge_inout inout =
+      if ki = Kglobal 
+      then merge_call_in_global_tables call_site inout
+      else
+        let _above_function, table =
+          try List.hd !call_inout_stack
+          with Failure _ -> assert false
+        in
+        merge_call_in_local_table call_site table inout
+    in
+    match call_type with
+    | `Builtin {Value_types.c_from = Some (froms,sure_out) } ->
+      let in_, out_ = extract_inout_from_froms froms in
+      let inout = {
+        over_inputs_if_termination = in_;
+        over_inputs = in_;
+        over_logic_inputs = Zone.bottom;
+        over_outputs_if_termination = out_ ;
+        over_outputs = out_;
+        under_outputs_if_termination = sure_out;
+      } in
+      merge_inout inout
+    | `Def | `Memexec ->
+      let table_current_function = CallsiteHash.create 7 in
+      call_inout_stack :=
+        (current_function, table_current_function) :: !call_inout_stack
+    | `Spec spec ->
+      let inout =compute_using_given_spec_state state spec current_function in
+      merge_inout inout
+    | `Builtin { Value_types.c_from = None } ->
+      let inout = compute_using_prototype_state state current_function in
+      merge_inout inout
 
 
   module MemExec =
@@ -711,31 +703,30 @@ module Callwise = struct
     Computer.end_dataflow ()
 
   let record_for_callwise_inout ((call_stack: Db.Value.callstack), value_res) =
-    if compute_callwise () then
-      let inout = match value_res with
-        | Value_types.Normal (states, _after_states)
-        | Value_types.NormalStore ((states, _after_states), _) ->
-            let kf, _ = List.hd call_stack in
-            let inout =
-              try
-                if !Db.Value.no_results (Kernel_function.get_definition kf) then
-                  top
-              else
-                compute_call_from_value_states kf call_stack (Lazy.force states)
-              with Kernel_function.No_Definition -> top
-            in
-            (match value_res with
-               | Value_types.NormalStore (_, memexec_counter) ->
-                   MemExec.replace memexec_counter inout
-               | _ -> ());
-            inout
+    let inout = match value_res with
+      | Value_types.Normal (states, _after_states)
+      | Value_types.NormalStore ((states, _after_states), _) ->
+        let kf, _ = List.hd call_stack in
+        let inout =
+          try
+            if !Db.Value.no_results (Kernel_function.get_definition kf) then
+              top
+            else
+              compute_call_from_value_states kf call_stack (Lazy.force states)
+          with Kernel_function.No_Definition -> top
+        in
+        (match value_res with
+         | Value_types.NormalStore (_, memexec_counter) ->
+           MemExec.replace memexec_counter inout
+         | _ -> ());
+        inout
 
-        | Value_types.Reuse counter ->
-            MemExec.find counter
-      in
-      Db.Operational_inputs.Record_Inout_Callbacks.apply
-        (call_stack, inout);
-      end_record call_stack inout
+      | Value_types.Reuse counter ->
+        MemExec.find counter
+    in
+    Db.Operational_inputs.Record_Inout_Callbacks.apply
+      (call_stack, inout);
+    end_record call_stack inout
 
 
   (* Register our callbacks inside the value analysis *)
@@ -816,8 +807,8 @@ let get_internal =
   Internals.memo
     (fun kf ->
        !Db.Value.compute ();
-       try Internals.find kf (* If [-inout-callwise] is set, the results may
-                              have been computed by the call to Value.compute *)
+       try Internals.find kf (* The results may have been computed by the call
+                                to Value.compute *)
        with
          | Not_found ->
              if!Db.Value.use_spec_instead_of_definition kf then

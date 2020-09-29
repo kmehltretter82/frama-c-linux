@@ -3,7 +3,7 @@
 */
 
 int main(void) {
-  int x = 0, y = 2;
+  int x = 0, y = 2, z;
   // one ensures
   /*@ ensures x == 1; */
   x = 1;
@@ -21,9 +21,9 @@ int main(void) {
     @ requires y == 2; */
   x = x + y;
   // several behaviors
-  /*@ behavior b1: 
+  /*@ behavior b1:
     @   requires x == 5;
-    @   ensures x == 3; 
+    @   ensures x == 3;
     @ behavior b2:
     @   requires x == 3+y;
     @   requires y == 2;
@@ -32,7 +32,7 @@ int main(void) {
   // mix requires and assumes
   /*@ behavior b1:
     @   assumes x == 1;
-    @   requires x == 0; 
+    @   requires x == 0;
     @ behavior b2:
     @   assumes x == 3;
     @   assumes y == 2;
@@ -44,7 +44,30 @@ int main(void) {
   /*@ requires y == 2; */
   x = x + y;
 
-  /*@ requires x == 7; 
+  // complete and disjoint behaviors
+  /*@
+    requires x > -1000;
+    assigns x;
+    ensures z >= 0;
+
+    behavior pos:
+      assumes x >= 0;
+      ensures z == x;
+
+    behavior neg:
+      assumes x < 0;
+      ensures z == -x;
+
+    complete behaviors;
+    disjoint behaviors;
+  */
+  if (x < 0) {
+    z = -x;
+  } else {
+    z = x;
+  }
+
+  /*@ requires x == 7;
     @ ensures x == 7; */
   return 0;
 }

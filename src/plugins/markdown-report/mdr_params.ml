@@ -20,19 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Pervasives_string = String
+
 include Plugin.Register(
   struct
     let name = "Markdown report"
     let shortname = "mdr"
     let help = "generates a report in markdown format"
-  end)
-
-module Output = String(
-  struct
-    let option_name = "-mdr-out"
-    let arg_name = "f"
-    let default = "report.md"
-    let help = "sets the name of the output file to <f>"
   end)
 
 module Generate = String(
@@ -44,6 +38,26 @@ module Generate = String(
       "select the <kind> of report to generate among: \
        none (default), md, draft and sarif"
   end)
+
+module Output : Parameter_sig.String =
+struct
+  include String(
+    struct
+      let option_name = "-mdr-out"
+      let arg_name = "f"
+      let default = "report"
+      let help = "sets the name of the output file to <f>. \
+                  If <f> has no extension, it is chosen automatically based on \
+                  the report kind"
+    end)
+  let get () =
+    let s = get () in
+    if Pervasives_string.contains (Filename.basename s) '.' then s
+    else
+      let kind = Generate.get () in
+      let ext = if kind = "sarif" then ".sarif" else ".md" in
+      s ^ ext
+end
 
 let () =
   Generate.set_possible_values [ "none"; "md"; "draft"; "sarif" ]

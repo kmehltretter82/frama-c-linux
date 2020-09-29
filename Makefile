@@ -168,7 +168,7 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests
 
-TESTS=rte slicing scope value
+TESTS=rte slicing scope value syntax
 tests:
 	dune exec -- ptests
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))

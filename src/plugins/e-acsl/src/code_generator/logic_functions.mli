@@ -50,7 +50,7 @@ val add_generated_functions: global list -> global list
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val named_predicate_to_exp_ref:
+val predicate_to_exp_ref:
   (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
 
 val term_to_exp_ref:

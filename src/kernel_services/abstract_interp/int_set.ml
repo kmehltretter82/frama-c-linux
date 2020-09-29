@@ -318,7 +318,7 @@ let apply_bin_1_strict_decr f x (s : Integer.t array) =
   in
   c 0
 
-let apply2_n f (s1 : Integer.t array) (s2 : Integer.t array) =
+let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
   let ps = ref empty_ps in
   let l1 = Array.length s1 in
   let l2 = Array.length s2 in
@@ -588,7 +588,7 @@ let add_singleton = apply_bin_1_strict_incr Int.add
 let add s1 s2 =
   match s1, s2 with
   | [| x |], s | s, [| x |] -> `Set (apply_bin_1_strict_incr Int.add x s)
-  | _, _ -> apply2_n Int.add s1 s2
+  | _, _ -> apply2 Int.add s1 s2
 
 let add_under s1 s2 =
   match s1, s2 with
@@ -619,7 +619,7 @@ let scale f s =
 let mul s1 s2 =
   match s1, s2 with
   | s, [| x |] | [| x |], s -> `Set (scale x s)
-  | _, _ -> apply2_n Int.mul s1 s2
+  | _, _ -> apply2 Int.mul s1 s2
 
 let scale_div ~pos f s =
   assert (not (Int.is_zero f));

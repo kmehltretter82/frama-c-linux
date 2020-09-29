@@ -76,6 +76,7 @@ sig
 
   val guards : frame -> pred list
   val mem_frame : c_label -> sigma
+  val has_at_frame : frame -> c_label -> bool
   val mem_at_frame : frame -> c_label -> sigma
   val set_at_frame : frame -> c_label -> sigma -> unit
 

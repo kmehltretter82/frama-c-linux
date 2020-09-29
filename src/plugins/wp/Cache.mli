@@ -30,11 +30,16 @@ val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int
 
+val is_updating : unit -> bool
+
 val cleanup_cache : unit -> unit
 
-type runner =
-  timeout:int option -> steplimit:int option ->
-  Why3.Driver.driver -> Why3Provers.t -> Why3.Task.task ->
+type 'a digest = Why3Provers.t -> 'a -> string
+
+type 'a runner =
+  timeout:int option -> steplimit:int option -> Why3Provers.t -> 'a ->
   VCS.result Task.task
 
-val get_result: Wpo.t -> runner -> runner
+val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
+
+(**************************************************************************)

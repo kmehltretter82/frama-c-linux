@@ -1,7 +1,6 @@
 # frama-c -wp -wp-rte -no-warn-signed-overflow [...]
 [kernel] Parsing tests/wp_gallery/frama_c_exo2_solved.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [rte] annotating function max_subarray
 [wp] Goal typed_max_subarray_ensures : not tried
 [wp] Goal typed_max_subarray_ensures_2 : not tried

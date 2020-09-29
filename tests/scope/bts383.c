@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva @EVA_CONFIG@ -print -journal-disable -scope-verbose 1 -remove-redundant-alarms -context-width 3
+   OPT: -eva @EVA_CONFIG@ -print -journal-disable -scope-verbose 1 -eva-remove-redundant-alarms -eva-context-width 3
 */
 /* 
    echo '!Db.Scope.check_asserts();;' \

@@ -23,11 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let rtl_files () =
-  List.map
-    (fun d -> Options.Share.get_file ~mode:`Must_exist d)
-    [ "e_acsl_gmp_api.h";
-      "e_acsl.h" ]
+let rtl_file () = Options.Share.get_file ~mode:`Must_exist "e_acsl.h"
 
 (* create the RTL AST in a fresh project *)
 let create_rtl_ast prj =
@@ -40,7 +36,7 @@ let create_rtl_ast prj =
        Kernel.Keep_unused_specified_functions.off ();
        Kernel.CppExtraArgs.add
          (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
-       Kernel.Files.set (rtl_files ());
+       Kernel.Files.set [ rtl_file () ];
        Ast.get ())
     ()
 

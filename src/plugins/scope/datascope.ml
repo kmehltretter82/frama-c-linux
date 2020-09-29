@@ -488,15 +488,17 @@ let add_proven_annot (ca, stmt_ca) (ca_because, stmt_because) acc =
 let check_stmt_annots (ca, stmt_ca) stmt acc =
   let check _ annot acc =
     match ca.annot_content, annot.annot_content with
-    | AAssert (_, Assert, p'), AAssert (_, _, p) ->
-        if Logic_utils.is_same_predicate_node p.pred_content p'.pred_content then
-          let acc, added = add_proven_annot (annot, stmt) (ca, stmt_ca) acc in
-          if added then
-            R.debug "annot at stmt %d could be removed: %a"
-              stmt.sid Printer.pp_code_annotation annot;
-          acc
-        else
-          acc
+    | AAssert (_, p'), AAssert (_, p) when not p'.tp_only_check ->
+      let p = p.tp_statement.pred_content in
+      let p' = p'.tp_statement.pred_content in
+      if Logic_utils.is_same_predicate_node p p' then
+        let acc, added = add_proven_annot (annot, stmt) (ca, stmt_ca) acc in
+        if added then
+          R.debug "annot at stmt %d could be removed: %a"
+            stmt.sid Printer.pp_code_annotation annot;
+        acc
+      else
+        acc
     | _ -> acc
   in
   Annotations.fold_code_annot check stmt acc

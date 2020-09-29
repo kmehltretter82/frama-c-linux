@@ -881,7 +881,13 @@ and pp_predicate_node fmt = function
 
 and pp_identified_predicate fmt identified_predicate =
   Format.fprintf fmt "{ip_id=%d;ip_content=%a}"
-    identified_predicate.ip_id pp_predicate identified_predicate.ip_content
+    identified_predicate.ip_id
+    pp_toplevel_predicate identified_predicate.ip_content
+
+and pp_toplevel_predicate fmt toplevel_predicate =
+  Format.fprintf fmt "{tp_only_check=%B;tp_statement=%a}"
+    toplevel_predicate.tp_only_check
+    pp_predicate toplevel_predicate.tp_statement
 
 and pp_predicate fmt predicate = Format.fprintf fmt "{%a%apred_content=%a}"
     (pp_if_list_not_empty "pred_name=" ";" (pp_list pp_string)) predicate.pred_name
@@ -960,17 +966,16 @@ and pp_pragma fmt = function
   | Impact_pragma(term) ->
     Format.fprintf fmt "Impact_pragma(%a)" pp_impact_pragma term
 
-and pp_assertion_kind fmt = function
-  | Assert -> Format.pp_print_string fmt "Assert"
-  | Check -> Format.pp_print_string fmt "Check"
-
 and pp_code_annotation_node fmt = function
-  | AAssert(string_list,kind,predicate) ->
-    Format.fprintf fmt "AAssert(%a,%a,%a)"  (pp_list pp_string) string_list pp_assertion_kind kind pp_predicate predicate
+  | AAssert(string_list,p) ->
+    Format.fprintf fmt "AAssert(%a,%a)"
+      (pp_list pp_string) string_list
+      pp_toplevel_predicate p
   | AStmtSpec(string_list,spec) ->
     Format.fprintf fmt "AStmtSpec(%a,%a)"  (pp_list pp_string) string_list  pp_spec spec
-  | AInvariant(string_list,bool,predicate) ->
-    Format.fprintf fmt "AInvariant(%a,%a,%a)"  (pp_list pp_string) string_list  pp_bool bool  pp_predicate predicate
+  | AInvariant(string_list,bool,p) ->
+    Format.fprintf fmt "AInvariant(%a,%a,%a)"
+      (pp_list pp_string) string_list  pp_bool bool  pp_toplevel_predicate p
   | AVariant(term_variant) ->
     Format.fprintf fmt "AVariant(%a)" pp_variant term_variant
   | AAssigns(string_list,assigns) ->
@@ -1010,7 +1015,8 @@ and pp_global_annotation fmt = function
   | Dlemma(string,bool,logic_label_list,string_list,predicate,attributes,location) ->
     Format.fprintf fmt "Dlemma(%a,%a,%a,%a,%a,%a,%a)"  pp_string string  pp_bool bool
       (pp_list pp_logic_label) logic_label_list (pp_list pp_string) string_list
-      pp_predicate predicate  pp_attributes attributes  pp_location location
+      pp_toplevel_predicate predicate
+      pp_attributes attributes  pp_location location
   | Dinvariant(logic_info,location) ->
     Format.fprintf fmt "Dinvariant(%a,%a)"  pp_logic_info logic_info  pp_location location
   | Dtype_annot(logic_info,location) ->

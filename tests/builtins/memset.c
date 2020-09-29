@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-calldeps -eva-msg-key imprecision -plevel 500" +"-inout -no-deps"
+   STDOPT: #"-calldeps -eva-msg-key imprecision -eva-plevel 500" +"-inout -no-deps"
 */
 
 #include "string.h"

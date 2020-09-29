@@ -17,6 +17,20 @@
 Open Source Release <next-release>
 ##################################
 
+-*  Eva       [2020-09-28] Improved string builtins on wide strings: crash fixed,
+              better performance, misaligned pointers now considered invalid.
+-   Kernel    [2020-09-22] New option -autocomplete p1, ..., pn that list the
+              options of plug-ins p1, ..., pn in a format suitable for
+              autocompletion scripts.
+-   Kernel    [2020-09-21] Option -permissive now allows non-existent option
+              names.
+-   Logic     [2020-09-11] Introduce check-only annotations for
+              requires, ensures, loop invariant and lemmas
+-   Kernel    [2020-09-08] Add option -print-cpp-commands, to print the
+              preprocessing commands used by Frama-C.
+-   Eva       [2020-09-07] Deprecates legacy options aliases -val-* in favor
+              of option names -eva-*.
+-*  Slicing   [2020-09-07] Better handling of invalid command line options.
 -   Eva       [2020-07-27] Improved automatic loop unroll (-eva-auto-loop-unroll
               option) on loops with several exit conditions, conditions using
               equality operators, temporary variables introduced by the Frama-C
@@ -331,7 +345,7 @@ o!  Constant Propagation [2018-09-12] Removing Db API for Constant Propagation
 o!  Kernel    [2018-07-23] Remove completely outdated module Dataflow.
               Deprecated since 3+ years. Use Dataflow2 instead.
 -*  RTE       [2018-07-23] Stop generating spurious \initialized alarms.
-              Fixes #@429  
+              Fixes #@429
 -*  Kernel    [2018-07-06] Respect relative order of labels and ACSL annots.
               Fixes #@524
 o*  Ptests    [2018-07-02] Do not keep oracles for empty stderr. Fixes #@402
@@ -832,7 +846,7 @@ o! Kernel     [2016-06-14] Remove class Filecheck.check from API.
               translated as 'tmp = e;' instead of 'if (e) {}' (which was
               incorrect when e did not have a scalar type)
 -  Eva        [2016-05-27] Improvements to option -val-subdivide-non-linear for
-              high number of subdivisions 
+              high number of subdivisions
 -* Value      [2016-05-23] Option -val-show-initial-state has been removed.
               Instead, -value-msg-key=-initial-state can be used
 -  Value      [2016-05-23] New message key final-states, that can be used

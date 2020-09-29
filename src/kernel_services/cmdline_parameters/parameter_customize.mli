@@ -90,7 +90,8 @@ val set_group: Cmdline.Group.t -> unit
       @since Beryllium-20090901 *)
 
 val is_invisible: unit -> unit
-(** Prevent the help to list the parameter. Also imply {!do_not_iterate}.
+(** Prevent -help from listing the parameter.
+    Also imply {!is_not_reconfigurable}.
     @since Carbon-20101201
     @modify Nitrogen-20111001 does not appear in the help *)
 
@@ -123,17 +124,21 @@ val argument_must_be_existing_fun: unit -> unit
     unset, names of defined-only functions will raise an error as well.
     @since Sodium-20150201 *)
 
-val do_iterate: unit -> unit
-(** Ensure that {!iter_on_plugins} is applied to this parameter. By default
+val is_reconfigurable: unit -> unit
+(** Ensure that the GUI will show this parameter. By default
     only parameters corresponding to options registered at the
-    {!Cmdline.Configuring} stage are iterable.
-    @since Nitrogen-20111001 *)
+    {!Cmdline.Configuring} stage are reconfigurable.
+    @since Nitrogen-20111001
+    @modify Frama-C+dev [do_iterate] renamed to [is_reconfigurable]
+*)
 
-val do_not_iterate: unit -> unit
-(** Prevent {!iter_on_plugins} to be applied on the parameter. By default, only
+val is_not_reconfigurable: unit -> unit
+(** Prevent the GUI from showing this parameter. By default, only
     parameters corresponding to options registered at the
-    {!Cmdline.Configuring} stage are iterable.
-    @since Nitrogen-20111001 *)
+    {!Cmdline.Configuring} stage are reconfigurable.
+    @since Nitrogen-20111001
+    @modify Frama-C+dev [do_iterate] renamed to [is_reconfigurable]
+ *)
 
 val no_category: unit -> unit
 (** Prevent a collection parameter to use categories and the extension '+', and
@@ -141,11 +146,6 @@ val no_category: unit -> unit
     the parameter is a list of '-' prefixed options to an external tool, unless
     you are willing to let users escape the initial '-' everytime.
     @since Sodium-20150201
- *)
-
-val is_permissive_ref: bool ref
-(** if [true], less checks are performed on value of arguments.
-    Set by {!Kernel.Permissive} option
  *)
 
 (* ************************************************************************* *)
@@ -211,7 +211,7 @@ val argument_may_be_fundecl_ref: bool ref
 val argument_must_be_fundecl_ref: bool ref
 val argument_must_be_existing_fun_ref: bool ref
 val group_ref: Cmdline.Group.t ref
-val do_iterate_ref: bool option ref
+val is_reconfigurable_ref: bool option ref
 val is_visible_ref: bool ref
 val module_name_ref: string ref
 val use_category_ref: bool ref

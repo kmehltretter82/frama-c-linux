@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-msg-key malloc"
-   STDOPT: #"-eva-no-builtins-auto -slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-no-alloc-returns-null -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto -eva-slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-msg-key malloc"
+   STDOPT: #"-eva-no-builtins-auto -eva-slevel 10 -eva-builtin calloc:Frama_C_calloc -eva-alloc-builtin by_stack -eva-no-alloc-returns-null -eva-msg-key malloc"
    STDOPT: #"-eva-no-builtins-auto"
 */ // slevel is used to unroll loops
 

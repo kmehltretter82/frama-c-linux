@@ -283,8 +283,8 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
-               pp_prover prover (pp_result_qualif prover) result
+             Format.fprintf fmt "Prover %a returns %t@\n"
+               pp_prover prover (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -347,9 +347,9 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
+             Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover) result
+               (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -723,7 +723,8 @@ let set_doomed emitter pid =
             let pred_loc = Stmt.loc stmt in
             let pred_name = [ "Wp" ; "SmokeTest" ] in
             let pf = { Logic_const.pfalse with pred_loc ; pred_name } in
-            let ca = Logic_const.new_code_annotation (AAssert ([],Assert,pf)) in
+            let pf = Logic_const.toplevel_predicate pf in
+            let ca = Logic_const.new_code_annotation (AAssert ([],pf)) in
             Annotations.add_code_annot emitter ~kf stmt ca ; ca
       in
       List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
@@ -804,7 +805,6 @@ let is_trivial g =
   | GoalLemma vc -> VC_Lemma.is_trivial vc
   | GoalAnnot vc -> VC_Annot.is_trivial vc
 
-
 let reduce g =
   match g.po_formula with
   | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
@@ -814,8 +814,7 @@ let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ignore (set_result g VCS.Qed result) ;
-    true
+    ( set_result g VCS.Qed result ; true )
   else false
 
 let compute g =
@@ -834,6 +833,12 @@ let is_proved g =
 let is_unknown g = List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
     ( get_results g )
+
+let is_passed g =
+  if is_smoke_test g then
+    not (is_proved g)
+  else
+    is_proved g
 
 let get_result =
   Dynamic.register ~plugin:"Wp" "Wpo.get_result" ~journalize:false
@@ -949,7 +954,7 @@ let goals_of_property =
 let prover_of_name =
   Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name" ~journalize:false
     (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.prover_of_name
+    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)

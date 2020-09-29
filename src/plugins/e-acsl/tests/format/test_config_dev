@@ -1,2 +1,2 @@
-MACRO: ROOT_EACSL_GCC_OPTS_EXT --validate-format-strings --full-mmodel
+MACRO: ROOT_EACSL_GCC_OPTS_EXT --validate-format-strings --full-mtracking
 MACRO: ROOT_EACSL_EXEC_FILTER @SEDCMD@ -e "s|/.*/share/e-acsl|FRAMAC_SHARE/e-acsl|"

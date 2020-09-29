@@ -30,10 +30,12 @@ open Clabels
 
 val basename : varinfo -> string (** Trims the original name *)
 
+type lkind = [ `Axiom | `Check | `Lemma ]
+
 type logic_lemma = {
   lem_name : string ;
+  lem_kind : lkind ;
   lem_position : Filepath.position ;
-  lem_axiom : bool ;
   lem_types : string list ;
   lem_labels : logic_label list ;
   lem_property : predicate ;
@@ -58,6 +60,7 @@ val compute : unit -> unit (** To force computation *)
 
 val ip_lemma : logic_lemma -> Property.t
 val iter_lemmas : (logic_lemma -> unit) -> unit
+val fold_lemmas : (logic_lemma -> 'a -> 'a) -> 'a -> 'a
 val logic_lemma : string -> logic_lemma
 val axiomatic : string -> axiomatic
 val section_of_lemma : string -> logic_section

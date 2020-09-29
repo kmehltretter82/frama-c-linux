@@ -157,7 +157,12 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_global glob in
       Pretty_utils.pp_list
         ~sep:"@\n" ~suf:"@\n"
-        (fun fmt s -> Format.fprintf fmt "/* %s */" s) fmt comments
+        (fun fmt s ->
+           if String.contains s '\n' || String.contains s '\r' then
+             Format.fprintf fmt "/*%s*/" s
+           else
+             Format.fprintf fmt "//%s" s
+        ) fmt comments
     end;
     (* Out of tree global annotations are pretty printed before the first
        variable declaration of the first function definition. *)
@@ -200,8 +205,12 @@ class printer_with_annot () = object (self)
       let comments = Globals.get_comments_stmt s in
       if comments <> [] then
         Pretty_utils.pp_list ~sep:"@\n" ~suf:"@]@\n"
-          (fun fmt s -> Format.fprintf fmt "@[/* %s */@]" s)
-          fmt comments
+          (fun fmt s ->
+             if String.contains s '\n' || String.contains s '\r' then
+               Format.fprintf fmt "@[/*%s*/@]" s
+             else
+               Format.fprintf fmt "@[//%s@]" s
+          ) fmt comments
     end;
     if verbose || Kernel.is_debug_key_enabled Kernel.dkey_print_sid then
       Format.fprintf fmt "@[/* sid:%d */@]@\n" s.sid ;
@@ -288,6 +297,7 @@ let () = Cil_datatype.Logic_label.pretty_ref := pp_logic_label
 let () = Cil_datatype.Global_annotation.pretty_ref := pp_global_annotation
 let () = Cil_datatype.Global.pretty_ref := pp_global
 let () = Cil_datatype.Predicate.pretty_ref := pp_predicate
+let () = Cil_datatype.Toplevel_predicate.pretty_ref := pp_toplevel_predicate
 let () = Cil_datatype.Identified_predicate.pretty_ref := pp_identified_predicate
 let () = Cil_datatype.Fundec.pretty_ref := pp_fundec
 

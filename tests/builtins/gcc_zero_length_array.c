@@ -1,5 +1,5 @@
 /* run.config*
-  STDOPT: +"-machdep gcc_x86_32 -eva-alloc-builtin fresh -slevel 11"
+  STDOPT: +"-machdep gcc_x86_32 -eva-alloc-builtin fresh -eva-slevel 11"
  */
 #include <stdlib.h>
 

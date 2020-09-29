@@ -1,6 +1,6 @@
 /* run.config
    DEPS: ../../../share/libc/string.c
-   STDOPT: #"-cpp-extra-args=-include../../share/libc/string.c -slevel-function strchr:256,main:256 -eva-slevel-merge-after-loop main -eva-no-builtins-auto -eva-no-skip-stdlib-specs"
+   STDOPT: #"-cpp-extra-args=-include../../share/libc/string.c -eva-slevel-function strchr:256,main:256 -eva-slevel-merge-after-loop main -eva-no-builtins-auto -eva-no-skip-stdlib-specs"
  */
 /* This file has been adapted from libc-test, which is licensed under the
    following standard MIT license:

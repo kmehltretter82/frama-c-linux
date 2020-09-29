@@ -76,7 +76,6 @@ module SemanticUnrollingLevel: Parameter_sig.Int
 module SlevelFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = int
-
 module SlevelMergeAfterLoop: Parameter_sig.Kernel_function_set
 
 module MinLoopUnroll : Parameter_sig.Int
@@ -90,15 +89,6 @@ module ArrayPrecisionLevel: Parameter_sig.Int
 
 module AllocatedContextValid: Parameter_sig.Bool
 module InitializationPaddingGlobals: Parameter_sig.String
-
-module SaveFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-module LoadFunctionState:
-  Parameter_sig.Map with type key = Cil_types.kernel_function
-                     and type value = string
-val get_SaveFunctionState : unit -> Cil_types.kernel_function * string
-val get_LoadFunctionState : unit -> Cil_types.kernel_function * string
 
 module Numerors_Real_Size : Parameter_sig.Int
 module Numerors_Mode : Parameter_sig.String
@@ -131,12 +121,10 @@ module SplitReturnFunction:
 module SplitGlobalStrategy: State_builder.Ref with type data = Split_strategy.t
 
 module ValShowProgress: Parameter_sig.Bool
-module ValShowInitialState: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
 module ValPerfFlamegraphs: Parameter_sig.String
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
-module AlarmsWarnings: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.String
 module NumerorsLogFile: Parameter_sig.String
 

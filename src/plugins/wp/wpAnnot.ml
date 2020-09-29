@@ -162,13 +162,6 @@ let is_proved pf =
 let is_invalid pf =
   pf.invalid && not (is_proved pf)
 
-let status pf =
-  try
-    Array.iter (function Complete -> raise Exit | _ -> ()) pf.proved ;
-    `Proved
-  with Exit ->
-    if pf.invalid then `Invalid else `Partial
-
 (* -------------------------------------------------------------------------- *)
 (* --- PID for Functions                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -373,6 +366,9 @@ let kind_to_select config kind id = match kind with
   | WpStrategy.AcallPre(goal,fct) ->
       let goal = goal && goal_to_select config id in
       Some (WpStrategy.AcallPre(goal,fct))
+  | WpStrategy.AcallCheck(fct) ->
+      if goal_to_select config id then Some (WpStrategy.AcallCheck fct)
+      else None
   | WpStrategy.AcallPost _ ->
       if goal_to_select config id then Some kind else None
   | WpStrategy.Ahyp | WpStrategy.AcallHyp _ -> Some kind
@@ -753,7 +749,7 @@ let add_called_post called_kf termination_kind acc =
     let kind = WpStrategy.AcallHyp called_kf in
     let assumes = (Ast_info.behavior_assumes b) in
     let add_post acc (tk, p) =
-      if tk = termination_kind
+      if tk = termination_kind && not p.ip_content.tp_only_check
       then WpStrategy.add_prop_call_post acc kind called_kf b tk ~assumes p
       else acc
     in List.fold_left add_post acc b.b_post_cond
@@ -830,6 +826,8 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
   in loop_entry, loop_back
 
 let add_loop_invariant_annot config vloop s ca b_list inv acc =
+  let only_check = inv.tp_only_check in
+  let inv = inv.tp_statement in
   let assigns, loop_entry, loop_back , loop_core = acc in
   (* we have to prove that inv is true for each edge that goes
    * in the loop, so we can assume that inv is true for each edge
@@ -843,15 +841,18 @@ let add_loop_invariant_annot config vloop s ca b_list inv acc =
             WpStrategy.Agoal s ca inv in
         let loop_back = add_prop_loop_inv ~established:false config loop_back
             WpStrategy.Agoal s ca inv in
-        let loop_core = add_prop_inv_fixpoint config loop_core
-            WpStrategy.Ahyp s ca inv in
+        let loop_core =
+          if only_check then loop_core
+          else
+            add_prop_inv_fixpoint config loop_core WpStrategy.Ahyp s ca inv
+        in
         assigns, loop_entry , loop_back , loop_core
       end
-  | TBRhyp ->
+  | TBRhyp when not only_check ->
       let kind = WpStrategy.Ahyp in
       let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
       in assigns, loop_entry , loop_back , loop_core
-  | TBRno -> acc
+  | TBRhyp | TBRno -> acc
 
 (** Returns the annotations for the three edges of the loop node:
  * - loop_entry : goals for the edge entering in the loop
@@ -934,24 +935,28 @@ let get_stmt_annots config v s =
               Printer.pp_code_annotation a;
             acc
           end
-    | AAssert (b_list, kind, p) ->
+    | AAssert (b_list, p) ->
         let kf = config.kf in
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              if kind = Check then acc
+              if p.tp_only_check then acc
               else
                 let b_acc =
-                  WpStrategy.add_prop_assert b_acc WpStrategy.Ahyp kf s a p
+                  WpStrategy.add_prop_assert
+                    b_acc WpStrategy.Ahyp kf s a p.tp_statement
                 in (b_acc, (a_acc, e_acc))
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
-              let check = kind = Check
-              and goal = goal_to_select config id in
-              if check && not goal then acc
+              let goal = goal_to_select config id in
+              if p.tp_only_check && not goal then acc
               else
-                let kind = WpStrategy.(if check then Agoal else Aboth goal) in
-                let b_acc = WpStrategy.add_prop_assert b_acc kind kf s a p in
+                let kind =
+                  WpStrategy.(if p.tp_only_check then Agoal else Aboth goal)
+                in
+                let b_acc =
+                  WpStrategy.add_prop_assert b_acc kind kf s a p.tp_statement
+                in
                 (b_acc, (a_acc, e_acc))
         in acc
     | AAllocation (_b_list, _frees_allocates) ->
@@ -1044,7 +1049,7 @@ let get_behavior_annots config =
         let post = get_fct_post_annots config Normal spec in
         WpStrategy.add_on_edges annots post (Cil2cfg.succ_e cfg v)
 
-    | Cil2cfg.Vexit ->
+    | Cil2cfg.VfctErr ->
         let post = get_fct_post_annots config Exits spec in
         WpStrategy.add_on_edges annots post (Cil2cfg.succ_e cfg v)
 
@@ -1118,8 +1123,9 @@ let add_global_annotations annots =
           "Global invariant not handled yet ('%s' ignored)"
           linfo.l_var_info.lv_name;
         ()
-    | Dlemma (name,_,_,_,_,_,_) ->
-        WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
+    | Dlemma (name,_,_,_,p,_,_) ->
+        if not (p.tp_only_check) then
+          WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
   and do_globals gs = List.iter do_global gs in
   (*[LC]: forcing order of iteration: hash is not the same on 32 and 64 bits *)
@@ -1300,7 +1306,7 @@ let process_unreached_annots cfg =
     | Cil2cfg.Vstart -> Wp_parameters.fatal "Start must be reachable"
     | Cil2cfg.VfctIn -> Wp_parameters.fatal "FctIn must be reachable"
     | Cil2cfg.VfctOut  -> List.fold_left (do_bhv Normal) acc spec.spec_behavior
-    | Cil2cfg.Vexit  ->
+    | Cil2cfg.VfctErr  ->
         let acc = List.fold_left (do_bhv Exits) acc spec.spec_behavior in
         let visitor = new vexit kf acc in
         ignore Visitor.(visitFramacKf (visitor :> frama_c_visitor) kf) ;
@@ -1425,7 +1431,7 @@ let get_id_prop_strategies ~model ?(assigns=WithAssigns) p =
   let open Property in match p with
   | IPCodeAnnot {ica_kf; ica_ca} ->
       let bhvs = match ica_ca.annot_content with
-        | AAssert (l, _, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
+        | AAssert (l, _) | AInvariant (l, _, _) | AAssigns (l, _) -> l
         | _ -> []
       in get_strategies assigns ica_kf model bhvs None (IdProp p)
   | IPAssigns {ias_kf = kf; ias_bhv = Id_loop _}

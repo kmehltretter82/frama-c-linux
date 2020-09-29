@@ -187,7 +187,9 @@ class split =
             let open Qed.Logic in
             match Lang.F.repr e with
             | Leq(x,y) -> split_cmp "Split (comp.)" x y
-            | Lt(x,y)  -> split_cmp "Split (comp.)" x y
+            | Lt(x,y) ->
+                let x = if F.is_int x then F.(e_add x e_one) else x in
+                split_cmp "Split (comp.)" x y
             | Eq(x,y)  when not (is_prop x || is_prop y) ->
                 split_cmp "Split (eq.)" x y
             | Neq(x,y) when not (is_prop x || is_prop y) ->

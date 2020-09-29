@@ -26,6 +26,11 @@ open VCS
 (* --- Prover Implementation against Task API                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+val simplify :
+  ?start:(Wpo.t -> unit) ->
+  ?result:(Wpo.t -> prover -> result -> unit) ->
+  Wpo.t -> bool Task.task
+
 val prove : Wpo.t ->
   ?config:config ->
   ?mode:mode ->

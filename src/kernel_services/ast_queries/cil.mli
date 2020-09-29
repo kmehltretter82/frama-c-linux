@@ -1248,6 +1248,11 @@ val frama_c_init_obj: string
 *)
 val frama_c_mutable: string
 
+(** A block marked with this attribute is known to be inlined, i.e.
+    it replaces a call to an inline function.
+*)
+val frama_c_inlined: string
+
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
 *)

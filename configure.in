@@ -255,6 +255,31 @@ dnl   AC_MSG_RESULT(Landmarks profiling disabled);
 dnl   HAS_LANDMARKS="no"
 dnl fi
 
+# Python 3 (for analysis-scripts)
+########
+
+AC_MSG_CHECKING(for python3)
+
+PYTHON3_VERSION=$(python3 --version 2>/dev/null || echo "")
+if test -z "$PYTHON3_VERSION" ; then
+  AC_MSG_RESULT(not found. Some non-regression tests will be disabled.)
+  HAS_PYTHON36="no"
+else
+  AC_MSG_RESULT(found)
+  AC_MSG_CHECKING(for python3 >= 3.6)
+  PYTHON3_VERSION=$(echo "$PYTHON3_VERSION" | cut -d' ' -f2-)
+  case $PYTHON3_VERSION in
+  2.*|3.[[0-5]].*)
+     AC_MSG_RESULT(found $PYTHON3_VERSION (too old); some non-regression tests will be disabled)
+     HAS_PYTHON36="no"
+     ;;
+   *)
+     AC_MSG_RESULT(ok)
+     HAS_PYTHON36="yes"
+     ;;
+  esac
+fi
+
 ############
 # Platform #
 ############
@@ -514,6 +539,7 @@ AC_SUBST(DEVELOPMENT)
 AC_SUBST(HAS_APRON)
 AC_SUBST(HAS_MPFR)
 AC_SUBST(HAS_LANDMARKS)
+AC_SUBST(HAS_PYTHON36)
 AC_SUBST(LABLGTK_VERSION)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)

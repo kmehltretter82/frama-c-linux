@@ -448,9 +448,12 @@ end = struct
           Printer.pp_code_annotation v;
         ChangeTo
           (Logic_const.new_code_annotation
-             (AAssert ([], Assert,
-                       { pred_name = []; pred_loc = Cil_datatype.Location.unknown;
-                         pred_content = Ptrue})))
+             (AAssert
+                ([],
+                 Logic_const.toplevel_predicate
+                   { pred_name = [];
+                     pred_loc = Cil_datatype.Location.unknown;
+                     pred_content = Ptrue})))
       end
 
     method private process_call is_init_call call_stmt lval _f args loc =
@@ -714,7 +717,8 @@ end = struct
 
     method private visit_pred p =
       Logic_const.new_predicate
-        (visitCilPredicate (self:>Cil.cilVisitor) p.ip_content)
+        (visitCilPredicate (self:>Cil.cilVisitor)
+           (Logic_const.pred_of_id_pred p))
 
     method private visit_identified_term t =
       let t' = visitCilTerm (self:>Cil.cilVisitor) t.it_content in
@@ -733,11 +737,15 @@ end = struct
     method! vbehavior b =
       let finfo = self#get_finfo () in
 
-      let pre_visible p =  Info.fun_precond_visible finfo p.ip_content in
+      let pre_visible p =
+        Info.fun_precond_visible finfo (Logic_const.pred_of_id_pred p)
+      in
       b.b_assumes <- filter_list pre_visible self#visit_pred b.b_assumes;
       b.b_requires <- filter_list pre_visible self#visit_pred b.b_requires;
 
-      let ensure_visible (_,p) = Info.fun_postcond_visible finfo p.ip_content in
+      let ensure_visible (_,p) =
+        Info.fun_postcond_visible finfo (Logic_const.pred_of_id_pred p)
+      in
       b.b_post_cond <-
         filter_list ensure_visible (fun (k,p) -> k,self#visit_pred p)
           b.b_post_cond;
@@ -785,7 +793,7 @@ end = struct
       let new_term = match spec.spec_terminates with
         | None -> None
         | Some p ->
-          if Info.fun_precond_visible finfo p.ip_content
+          if Info.fun_precond_visible finfo (Logic_const.pred_of_id_pred p)
           then Some (self#visit_pred p)
           else None
       in

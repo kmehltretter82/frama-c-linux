@@ -128,6 +128,9 @@ HAS_MPFR ?=@HAS_MPFR@
 # landmarks
 HAS_LANDMARKS	?=@HAS_LANDMARKS@
 
+# python 3.6
+HAS_PYTHON36 ?=@HAS_PYTHON36@
+
 ##########################
 # Miscellaneous commands #
 ##########################
@@ -157,8 +160,12 @@ HAVE_BUILTIN_VA_LIST ?=@HAVE_BUILTIN_VA_LIST@
 # Non-plugin test directories containing some ML files to compile
 TEST_DIRS_AS_PLUGIN:=\
   dynamic dynamic_plugin journal saveload spec misc syntax cil \
-  pretty_printing builtins libc value fc_script
-TEST_DIRS_AS_PLUGIN+=jcdb
+  pretty_printing builtins libc value
+
+ifeq ($(HAS_PYTHON36),yes)
+TEST_DIRS_AS_PLUGIN+= fc_script jcdb
+endif
+
 PLUGIN_TESTS_LIST+=$(TEST_DIRS_AS_PLUGIN)
 
 ##########################

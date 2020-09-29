@@ -41,7 +41,7 @@
    wcscpy (0 call); wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call);
    wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (411)
+  Undefined functions (412)
   =========================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_int_interval (0 call); Frama_C_long_interval (0 call);
@@ -73,17 +73,17 @@
    __va_openat_void (0 call); _exit (0 call); abort (0 call); accept (0 call);
    access (0 call); acos (0 call); acosf (0 call); acosh (0 call);
    acoshf (0 call); acoshl (0 call); acosl (0 call); alloca (0 call);
-   asin (0 call); asinf (0 call); asinl (0 call); at_quick_exit (0 call);
-   atan (0 call); atan2 (0 call); atan2f (0 call); atanf (0 call);
-   atanl (0 call); atexit (0 call); atof (0 call); atol (0 call);
-   atoll (0 call); basename (0 call); bind (0 call); bsearch (0 call);
-   bzero (0 call); ceil (0 call); ceilf (0 call); ceill (0 call);
-   cfgetispeed (0 call); cfgetospeed (0 call); cfsetispeed (0 call);
-   cfsetospeed (0 call); chdir (0 call); chown (0 call); chroot (0 call);
-   clearerr (0 call); clearerr_unlocked (0 call); clock (0 call);
-   clock_gettime (0 call); clock_nanosleep (0 call); close (0 call);
-   closedir (0 call); closelog (0 call); connect (0 call); cos (0 call);
-   cosf (0 call); cosl (0 call); creat (0 call); ctime (0 call);
+   asctime (0 call); asin (0 call); asinf (0 call); asinl (0 call);
+   at_quick_exit (0 call); atan (0 call); atan2 (0 call); atan2f (0 call);
+   atanf (0 call); atanl (0 call); atexit (0 call); atof (0 call);
+   atol (0 call); atoll (0 call); basename (0 call); bind (0 call);
+   bsearch (0 call); bzero (0 call); ceil (0 call); ceilf (0 call);
+   ceill (0 call); cfgetispeed (0 call); cfgetospeed (0 call);
+   cfsetispeed (0 call); cfsetospeed (0 call); chdir (0 call); chown (0 call);
+   chroot (0 call); clearerr (0 call); clearerr_unlocked (0 call);
+   clock (0 call); clock_gettime (0 call); clock_nanosleep (0 call);
+   close (0 call); closedir (0 call); closelog (0 call); connect (0 call);
+   cos (0 call); cosf (0 call); cosl (0 call); creat (0 call); ctime (0 call);
    difftime (0 call); dirname (0 call); div (0 call); drand48 (0 call);
    dup (0 call); dup2 (0 call); erand48 (0 call); execl (0 call);
    execle (0 call); execlp (0 call); execv (0 call); execve (0 call);
@@ -187,7 +187,7 @@
   Goto = 97
   Assignment = 459
   Exit point = 83
-  Function = 494
+  Function = 495
   Function call = 93
   Pointer dereferencing = 159
   Cyclomatic complexity = 296

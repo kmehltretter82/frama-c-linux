@@ -25,6 +25,7 @@
 (* ************************************************************************* *)
 
 module CamlString = String
+module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
 
@@ -420,17 +421,29 @@ let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module AutocompleteHelp =
-  False
+  P.String_set
     (struct
       let option_name = "-autocomplete"
-      let help = "displays all plugin options. Used for zsh autocompletion"
-      let module_name = "AutocompleteHelp"
+      let arg_name = "p1,p2,..."
+      let help = "displays all Frama-C options, used for shell autocompletion. \
+                  Prints options for the specified plugin names (or '@all' for \
+                  all plugins). Note: for the kernel, use an empty string."
     end)
-let run_list_all_plugin_options () =
-  if AutocompleteHelp.get () then
-    Cmdline.list_all_plugin_options ~print_invisible:true
-  else Cmdline.nop
-let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
+
+let _ =
+  AutocompleteHelp.Category.enable_all
+    []
+    (object
+      method fold: 'a. (string -> 'a -> 'a) -> 'a -> 'a =
+        fun f acc ->
+        FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
+      method mem name =
+        try
+          FcPlugin.iter_on_plugins
+            (fun p -> if name = p.FcPlugin.p_shortname then raise Exit);
+          false
+        with Exit -> true
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
@@ -460,7 +473,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralVerbose =
   Int
     (struct
@@ -482,7 +495,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralDebug =
   Zero
     (struct
@@ -506,7 +519,7 @@ let () =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 module Quiet =
@@ -520,23 +533,6 @@ module Quiet =
 let () =
   Quiet.add_set_hook
     (fun _ b -> assert b; GeneralVerbose.set 0; GeneralDebug.set 0)
-
-let () = Parameter_customize.set_group messages
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.do_not_journalize ()
-module Permissive =
-  Bool
-    (struct
-      let default = !Parameter_customize.is_permissive_ref
-      let option_name = "-permissive"
-      let module_name = "Permissive"
-      let help =
-        "performs less verification on validity of command-line options"
-    end)
-let () =
-  Permissive.add_set_hook
-    (fun _ b -> Parameter_customize.is_permissive_ref := b)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
@@ -1018,6 +1014,17 @@ module CppGnuLike =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+module PrintCppCommands =
+  False
+    (struct
+      let module_name = "PrintCppCommands"
+      let option_name = "-print-cpp-commands"
+      let help = "prints the preprocessing command(s) used by Frama-C \
+                  and exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
 module FramaCStdLib =
   True
     (struct
@@ -1124,12 +1131,12 @@ module C11 =
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module JsonCompilationDatabase =
-  String
+  P.Filepath
     (struct
-      let module_name = "JsonCompilationDatabase"
       let option_name = "-json-compilation-database"
-      let default = ""
       let arg_name = "path"
+      let file_kind = "directory or json"
+      let existence = Filepath.Must_exist
       let help =
         "when set, preprocessing of each file will include corresponding \
          flags (e.g. -I, -D) from the JSON compilation database \
@@ -1653,11 +1660,48 @@ let () =
        Project.Datatype.Set.iter (fun project -> Project.remove ~project ()) s)
 
 (* ************************************************************************* *)
-(** {2 Others options} *)
+(** {2 Checks} *)
+(* ************************************************************************* *)
+
+let checks = add_group "Checks"
+
+let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.do_not_reset_on_copy ()
+module Check =
+  False(struct
+    let option_name = "-check"
+    let module_name = "Check"
+    let help = "performs consistency checks over the Abstract Syntax \
+                Tree"
+  end)
+
+let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
+module Copy =
+  False(struct
+    let option_name = "-copy"
+    let module_name = "Copy"
+    let help =
+      "always perform a copy of the original AST before analysis begin"
+  end)
+
+let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_negative_option_name ""
+module TypeCheck =
+  True(struct
+    let module_name = "TypeCheck"
+    let option_name = "-typecheck"
+    let help = "forces typechecking of the source files"
+  end)
+
+(* ************************************************************************* *)
+(** {2 Other options} *)
 (* ************************************************************************* *)
 
 [@@@warning "-60"]
-(* Warning this three options are parsed and used directly from Cmdline *)
+(* Warning: these options are parsed and used directly from Cmdline *)
 
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
@@ -1695,41 +1739,20 @@ module Deterministic =
       let help = ""
     end)
 
-[@@@warning "+60"]
-
-(* ************************************************************************* *)
-(** {2 Checks} *)
-(* ************************************************************************* *)
-
-let checks = add_group "Checks"
-
 let () = Parameter_customize.set_group checks
-let () = Parameter_customize.do_not_reset_on_copy ()
-module Check =
-  False(struct
-    let option_name = "-check"
-    let module_name = "Check"
-    let help = "performs consistency checks over the Abstract Syntax \
-                Tree"
-  end)
-
-let () = Parameter_customize.set_group checks
-module Copy =
-  False(struct
-    let option_name = "-copy"
-    let module_name = "Copy"
-    let help =
-      "always perform a copy of the original AST before analysis begin"
-  end)
-
-let () = Parameter_customize.set_group checks
+let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_negative_option_name ""
-module TypeCheck =
-  True(struct
-    let module_name = "TypeCheck"
-    let option_name = "-typecheck"
-    let help = "forces typechecking of the source files"
-  end)
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module Permissive =
+  False
+    (struct
+      let module_name = "Permissive"
+      let option_name = "-permissive"
+      let help =
+        "perform less verifications on validity of command-line options"
+    end)
+
+[@@@warning "+60"]
 
 (*
 Local Variables:

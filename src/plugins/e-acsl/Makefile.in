@@ -44,6 +44,11 @@ SRC_LIBRARIES:= \
 	varname
 SRC_LIBRARIES:=$(addprefix src/libraries/, $(SRC_LIBRARIES))
 
+# source files that depend on optional dependencies
+SRC_DYN_DEPENDENCIES:= \
+	dep_eva
+SRC_DYN_DEPENDENCIES:=$(addprefix src/dependencies/, $(SRC_DYN_DEPENDENCIES))
+
 # project initializer
 SRC_PROJECT_INITIALIZER:= \
 	rtl \
@@ -55,7 +60,7 @@ SRC_PROJECT_INITIALIZER:=\
 SRC_ANALYSES:= \
 	rte \
 	literal_strings \
-	mmodel_analysis \
+	memory_tracking \
 	exit_points \
 	lscope \
 	interval \
@@ -63,8 +68,13 @@ SRC_ANALYSES:= \
 SRC_ANALYSES:=$(addprefix src/analyses/, $(SRC_ANALYSES))
 
 # code generator
+CODE_GENERATOR_CMI:= \
+	contract_types
+CODE_GENERATOR_CMI:=$(addprefix src/code_generator/, $(CODE_GENERATOR_CMI))
+
 SRC_CODE_GENERATOR:= \
-	constructor \
+	smart_exp \
+	smart_stmt \
 	gmp \
 	label \
 	env \
@@ -72,10 +82,12 @@ SRC_CODE_GENERATOR:= \
 	loops \
 	quantif \
 	at_with_lscope \
-	mmodel_translate \
+	memory_translate \
 	logic_functions \
 	logic_array \
 	translate \
+	contract \
+	translate_annots \
 	temporal \
 	memory_observer \
 	literal_observer \
@@ -91,6 +103,7 @@ PLUGIN_DIR ?=.
 PLUGIN_EXTRA_DIRS:=\
 	src \
 	src/libraries \
+	src/dependencies \
 	src/analyses \
 	src/project_initializer \
 	src/code_generator
@@ -100,22 +113,65 @@ PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= src/local_config \
 	src/options \
 	$(SRC_LIBRARIES) \
+	$(SRC_DYN_DEPENDENCIES) \
 	$(SRC_PROJECT_INITIALIZER) \
 	$(SRC_ANALYSES) \
 	$(SRC_CODE_GENERATOR) \
 	src/main
-
+PLUGIN_CMI:= \
+	$(CODE_GENERATOR_CMI)
 PLUGIN_HAS_MLI:=yes
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DEPENDENCIES:= RteGen
+PLUGIN_GENERATED:=
 
 # We "save" this variable so that it can be used once PLUGIN_DIR has been reset
 EACSL_PLUGIN_DIR:=$(PLUGIN_DIR)
 
 # Suppress a spurious warning with OCaml >= 4.04.0
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmo \
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmi: E_ACSL_BFLAGS+= -w -60
-$(EACSL_PLUGIN_DIR)/src/analyses/mmodel_analysis.cmx: E_ACSL_OFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmo \
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmi: E_ACSL_BFLAGS+= -w -60
+$(EACSL_PLUGIN_DIR)/src/analyses/memory_tracking.cmx: E_ACSL_OFLAGS+= -w -60
+
+########################
+# Dynamic dependencies #
+########################
+
+# Distributed files for the dynamic dependencies
+EACSL_DISTRIB_DYNDEP:=
+
+# Eva
+DEP_EVA :=src/dependencies/dep_eva
+DEP_EVA_ENABLED :=$(DEP_EVA).enabled.ml
+DEP_EVA_DISABLED :=$(DEP_EVA).disabled.ml
+PLUGIN_GENERATED += $(EACSL_PLUGIN_DIR)/$(DEP_EVA).ml
+
+## Add enabled and disabled files to the list of distributed files
+## (relative to e-acsl directory)
+EACSL_DISTRIB_DYNDEP += $(DEP_EVA_ENABLED) $(DEP_EVA_DISABLED)
+
+## Update enabled and disabled files path to be relative to the root directory
+DEP_EVA_ENABLED:=$(addprefix $(EACSL_PLUGIN_DIR)/, $(DEP_EVA_ENABLED))
+DEP_EVA_DISABLED:=$(addprefix $(EACSL_PLUGIN_DIR)/, $(DEP_EVA_DISABLED))
+
+## Add Eva to the plugin dependencies if enabled
+ifneq "$(ENABLE_EVA)" "no"
+	PLUGIN_DEPENDENCIES+= Eva
+endif
+
+## Copy enabled or disabled file to the source file that will be used for the
+## compilation
+$(EACSL_PLUGIN_DIR)/src/dependencies/dep_eva.ml: \
+		$(DEP_EVA_ENABLED) $(DEP_EVA_DISABLED) \
+		$(EACSL_PLUGIN_DIR)/Makefile share/Makefile.config
+	$(PRINT_MAKING) $@
+	$(RM) $@
+ifneq "$(ENABLE_EVA)" "no"
+	$(CP) $(DEP_EVA_ENABLED) $@
+else
+	$(CP) $(DEP_EVA_DISABLED) $@
+endif
+	$(CHMOD_RO) $@
 
 ###############
 # Local Flags #
@@ -127,7 +183,7 @@ IS_DISTRIBUTED:=no
 # Local configuration #
 #######################
 
-PLUGIN_GENERATED:= $(EACSL_PLUGIN_DIR)/src/local_config.ml
+PLUGIN_GENERATED += $(EACSL_PLUGIN_DIR)/src/local_config.ml
 
 VERSION_FILE=$(FRAMAC_ROOT_SRCDIR)/VERSION
 
@@ -159,7 +215,7 @@ PLUGIN_TESTS_DIRS := \
 	arith \
 	memory \
 	gmp-only \
-	full-mmodel \
+	full-mtracking \
 	format \
 	temporal \
 	special
@@ -290,8 +346,8 @@ EACSL_TEST_FILES = \
 	tests/test_config_ci.in \
 	tests/gmp-only/test_config_ci \
 	tests/gmp-only/test_config_dev \
-	tests/full-mmodel/test_config_ci \
-	tests/full-mmodel/test_config_dev \
+	tests/full-mtracking/test_config_ci \
+	tests/full-mtracking/test_config_dev \
 	tests/builtin/test_config_ci \
 	tests/builtin/test_config_dev \
 	tests/temporal/test_config_ci \
@@ -323,6 +379,7 @@ EACSL_MISC_FILES = \
 EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
 
 EACSL_DISTRIB_EXTERNAL =\
+  $(EACSL_DISTRIB_DYNDEP) \
   $(EACSL_SHARE_FILES) \
   $(EACSL_MISC_FILES) \
   $(EACSL_DOC_FILES) \
@@ -398,18 +455,25 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 
 EACSL_INSTALL_MANUAL_FILES=$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_MANUAL_FILES)))
 
+EACSL_INSTALL_C_DIRECTORIES := \
+	e-acsl \
+	e-acsl/internals \
+	e-acsl/instrumentation_model \
+	e-acsl/observation_model \
+	e-acsl/observation_model/internals \
+	e-acsl/observation_model/bittree_model \
+	e-acsl/observation_model/segment_model \
+	e-acsl/numerical_model \
+	e-acsl/libc_replacements
+
 install::
 	$(PRINT_INSTALL) E-ACSL share files
-	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/*.[ch] $(FRAMAC_DATADIR)/e-acsl
-	$(MKDIR) $(FRAMAC_DATADIR)/e-acsl/bittree_model \
-	         $(FRAMAC_DATADIR)/e-acsl/segment_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/bittree_model/* \
-	      $(FRAMAC_DATADIR)/e-acsl/bittree_model
-	$(CP) $(E_ACSL_DIR)/share/e-acsl/segment_model/* \
-	      $(FRAMAC_DATADIR)/e-acsl/segment_model
-        # manuals are not present in standard distribution.
-        # Don't fail because of that.
+	for dir in $(EACSL_INSTALL_C_DIRECTORIES); do \
+		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
+		$(CP) $(E_ACSL_DIR)/share/$$dir/*.[ch] $(FRAMAC_DATADIR)/$$dir ; \
+	done
+	# manuals are not present in standard distribution.
+	# Don't fail because of that.
 ifneq ("$(EACSL_INSTALL_MANUAL_FILES)","")
 	$(PRINT_INSTALL) E-ACSL manuals
 	$(MKDIR) $(FRAMAC_DATADIR)/manuals

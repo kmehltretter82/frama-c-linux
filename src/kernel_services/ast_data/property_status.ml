@@ -507,13 +507,12 @@ and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
          let old_s = Emitter_with_properties.Hashtbl.find by_emitter emitter in
          try
            let first =
-             (if distinct then merge_distinct_emitted
-              else check_strongest_emitted)
-               s
-               old_s
-           in
-           if first then emit s else old_s
-         with Unmergeable -> emit Dont_know
+             if distinct then merge_distinct_emitted s old_s
+             else check_strongest_emitted s old_s
+           in if first then emit s else old_s
+         with
+         | Unmergeable -> emit Dont_know
+         | Inconsistent_emitted_status _ -> emit False_if_reachable
      with Not_found ->
        emit s)
   with Not_found ->

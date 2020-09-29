@@ -193,14 +193,14 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
       } ;
       Definitions.define_lemma {
         l_cluster = cluster ;
-        l_assumed = true ;
+        l_kind = `Axiom ;
         l_name = Printf.sprintf "addrof_%s_%d" basename id ;
         l_forall = params ; l_types = 0 ; l_triggers = [] ;
         l_lemma = p_addrof ;
       } ;
       Definitions.define_lemma {
         l_cluster = cluster ;
-        l_assumed = true ;
+        l_kind = `Axiom ;
         l_name = Printf.sprintf "consistent_%s_%d" basename id ;
         l_forall = params ; l_types = 0 ; l_triggers = [] ;
         l_lemma = p_consistent ;
@@ -208,7 +208,7 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
       if p_index != F.p_true then
         Definitions.define_lemma {
           l_cluster = cluster ;
-          l_assumed = true ;
+          l_kind = `Axiom ;
           l_name = Printf.sprintf "index_%s_%d" basename id ;
           l_forall = params @ [k] ; l_types = 0 ; l_triggers = [] ;
           l_lemma = p_index ;
@@ -441,7 +441,7 @@ let configure_ia =
   let no_binder = { bind = fun _ f v -> f v } in
   fun _vertex -> no_binder
 
-let hypotheses () = []
+let hypotheses p = p
 
 let error msg = Warning.error ~source:"Region Model" msg
 

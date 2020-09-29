@@ -22,18 +22,32 @@
 
 open Cil_types
 
-(** [translate_*] translates a given ACSL annotation into the corresponding C
-    statement (if any) for runtime assertion checking. This C statements are
-    part of the resulting environment. *)
+(** Generate C implementations of expressions. *)
 
-val translate_pre_spec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
-val translate_post_spec: kernel_function -> kinstr -> Env.t -> funspec -> Env.t
-val translate_pre_code_annotation:
-  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
-val translate_post_code_annotation:
-  kernel_function -> stmt -> Env.t -> code_annotation -> Env.t
-val translate_named_predicate:
-  kernel_function -> Env.t -> predicate -> Env.t
+val predicate_to_exp:
+  ?name:string ->
+  kernel_function ->
+  ?rte:bool ->
+  Env.t ->
+  predicate ->
+  exp * Env.t
+(** Convert an ACSL predicate into a corresponding C expression. *)
+
+val generalized_untyped_predicate_to_exp:
+  ?name:string ->
+  kernel_function ->
+  ?rte:bool ->
+  ?must_clear_typing:bool ->
+  Env.t ->
+  predicate ->
+  exp * Env.t
+(** Convert an untyped ACSL predicate into a corresponding C expression. *)
+
+val translate_predicate:
+  ?pred_to_print:predicate -> kernel_function -> Env.t -> predicate -> Env.t
+(** Translate the given predicate to a runtime check in the given environment.
+    If [pred_to_print] is set, then the runtime check will use this predicate as
+    message. *)
 
 val translate_rte_annots:
   (Format.formatter -> 'a -> unit) ->
@@ -42,11 +56,23 @@ val translate_rte_annots:
   Env.t ->
   code_annotation list ->
   Env.t
+(** Translate the given RTE annotations into runtime checks in the given
+    environment. *)
 
-exception No_simple_translation of term
-val term_to_exp: typ option -> term -> exp
+exception No_simple_term_translation of term
+(** Exceptin raised if [untyped_term_to_exp] would generate new statements in
+    the environment *)
 
-val predicate_to_exp: kernel_function -> predicate -> exp
+exception No_simple_predicate_translation of predicate
+(** Exceptin raised if [untyped_predicate_to_exp] would generate new statements
+    in the environment *)
+
+val untyped_term_to_exp: typ option -> term -> exp
+(** Convert an untyped ACSL term into a corresponding C expression. *)
+
+val untyped_predicate_to_exp: predicate -> exp
+(** Convert an untyped ACSL predicate into a corresponding C expression. This
+    expression is valid only in certain contexts and shouldn't be used. *)
 
 (*
 Local Variables:

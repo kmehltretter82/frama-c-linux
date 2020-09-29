@@ -84,7 +84,7 @@ module Behaviors =
     (struct
       let option_name = "-wp-bhv"
       let arg_name = "b,..."
-      let help = "Select properties of the given behaviors (defaults to all behaviors) of the selected functions."
+      let help = "Select only properties belonging to listed behaviors."
     end)
 let () = on_reset Behaviors.clear
 
@@ -96,10 +96,14 @@ module Properties =
     (struct
       let option_name = "-wp-prop"
       let arg_name = "p,..."
-      let help = "Select properties having the one of the given tagnames (defaults to all properties).\n\
-                  You may also replace the tagname by '@category' for the selection of all properties of the given category.\n\
-                  Accepted categories are: lemmas, requires, assigns, ensures, exits, complete_behaviors, disjoint_behaviors, assert, check, invariant, variant, breaks, continues, returns.\n\
-                  Starts by a minus character to remove properties from the selection."
+      let help =
+        "Select properties based names and category.\n\
+         Use +name or +category to select properties and -name or -category\n\
+         to remove them from the selection. The '+' sign can be omitted.\n\
+         Categories are: @lemma, @requires, @assigns, @ensures, @exits,\n\
+         @assert, @invariant, @variant, @breaks, @continues, @returns,\n\
+         @complete_behaviors, @disjoint_behaviors and\n\
+         @check (which includes all check clauses)."
     end)
 let () = on_reset Properties.clear
 
@@ -618,6 +622,20 @@ module Provers = String_list
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module Interactive = String
+    (struct
+      let option_name = "-wp-interactive"
+      let arg_name = "mode"
+      let default = "batch"
+      let help =
+        "WP mode for interactive provers:\n\
+         - 'batch': use script only (default)\n\
+         - 'edit': run editor on every goal\n\
+         - 'fix': run editor for unproved goal\n\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module RunAllProvers =
   False(struct
     let option_name = "-wp-run-all-provers"
@@ -726,6 +744,18 @@ module SmokeTimeout =
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module InteractiveTimeout =
+  Int(struct
+    let option_name = "-wp-interactive-timeout"
+    let default = 30
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for checking scripts\n\
+         of interactive provers (default: %d)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1039,6 +1069,25 @@ module MemoryContext =
       let option_name = "-wp-warn-memory-model"
       let help = "Warn Against Memory Model Hypotheses"
     end)
+
+let wkey_imprecise_hypotheses_assigns =
+  register_warn_category "hypotheses:assigns"
+let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
+
+let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
+
+module CheckModelHypotheses =
+  False
+    (struct
+      let option_name = "-wp-check-model-hypotheses"
+      let help = "Insert memory model hypotheses in function contracts and \
+                  check them on call. (experimental)"
+    end)
+
+let wkey_imprecise_hypotheses_assigns =
+  register_warn_category "hypotheses:assigns"
+let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
 
 let () = Parameter_customize.set_group wp_po
 module OutputDir =

@@ -108,6 +108,7 @@ module PrecondWeakening : Parameter_sig.Bool
 module Detect: Parameter_sig.Bool
 module Generate:Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
+module Interactive: Parameter_sig.String
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
@@ -118,6 +119,7 @@ module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
 module SmokeTimeout: Parameter_sig.Int
+module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
 module CoqTimeout: Parameter_sig.Int
@@ -150,10 +152,13 @@ module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
+module CheckModelHypotheses: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
+
+val wkey_imprecise_hypotheses_assigns: warn_category
 
 (** {2 Getters} *)
 

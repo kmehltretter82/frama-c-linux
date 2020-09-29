@@ -3,7 +3,7 @@
 #  This file is part of the Frama-C's E-ACSL plug-in.                    #
 #                                                                        #
 #  Copyright (C) 2012-2018                                               #
-#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#    CEA (Commissariat ï¿½ l'ï¿½nergie atomique et aux ï¿½nergies              #
 #         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
@@ -39,7 +39,7 @@ _eacsl_gcc() {
     --frama-c-extra= --frama-c= --gcc= --e-acsl-share= --memory-model=
     --e-acsl-extra=
     --compile --compile-only --print-mmodels --frama-c-only --instrumented-only
-    --gmp --full-mmodel --rte= --rte-select= --no-int-overflow
+    --gmp --full-mtracking --rte= --rte-select= --no-int-overflow
     --no-stdlib --frama-c-stdlib --libc-replacements
     --temporal --free-valid-address --weak-validity --validate-format-strings
     --heap-size --stack-size"

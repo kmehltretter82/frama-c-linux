@@ -6,14 +6,14 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function g <- f.
-  Called from keep_annot.i:26.
-[eva] keep_annot.i:15: starting to merge loop iterations
+  Called from keep_annot.i:25.
+[eva] keep_annot.i:14: starting to merge loop iterations
+[eva:alarm] keep_annot.i:19: Warning: assertion got status unknown.
 [eva:alarm] keep_annot.i:20: Warning: assertion got status unknown.
-[eva:alarm] keep_annot.i:21: Warning: assertion got status unknown.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] keep_annot.i:27: assertion got status valid.
-[eva:alarm] keep_annot.i:28: Warning: assertion got status unknown.
+[eva] keep_annot.i:26: assertion got status valid.
+[eva:alarm] keep_annot.i:27: Warning: assertion got status unknown.
 [eva] Recording results for f
 [eva] done for function f
 [slicing] initializing slicing ...

@@ -239,11 +239,6 @@ val list_plugins: unit -> exit
   (** Display the list of installed plug-ins 
       @since Magnesium-20151001 *)
 
-(** Display the list of all installed plug-ins and their options, in
-    a condensed format. Used for zsh autocompletion.
-    @since Phosphorus-20170501-beta1 *)
-val list_all_plugin_options : print_invisible:bool -> exit
-
 val explain_cmdline : unit -> exit
 
 val plugin_help: string -> exit
@@ -270,7 +265,6 @@ type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
   | String of (string -> unit)
-  | String_list of (string list -> unit)
 
 val add_option:
   string ->
@@ -314,13 +308,18 @@ val add_aliases:
   string ->
   plugin:string ->
   group:Group.t ->
+  ?visible: bool ->
+  ?deprecated: bool ->
   stage ->
   string list ->
   unit
 (** [add_aliases orig plugin group aliases] adds a list of aliases to the given
     option name [orig].
+    If [visible] is set to false, the aliases do not appear in help messages.
+    If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
-    @since Carbon-20110201 *)
+    @since Carbon-20110201
+    @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
 
 val replace_option_setting: 
   string -> plugin:string -> group:Group.t -> option_setting -> unit
@@ -391,6 +390,13 @@ val deterministic: bool
       possible in their outputs. Higher memory consumption or analysis time
       are acceptable, as reproducibility is more important.
       @since Aluminium-20160501 *)
+
+val permissive: bool
+  (** Downgrades some command-line errors to warnings, such as
+      unknown option names and invalid values for some options
+      (e.g. non-existent function names).
+
+      @since Frama-C+dev *)
 
 val last_project_created_by_copy: (unit -> string option) ref
 

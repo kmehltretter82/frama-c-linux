@@ -79,7 +79,7 @@ sig
   val cup : t -> t -> t
   val cup_differ : t -> t -> t * bool
   (* val leq : t -> t -> bool *) (* unused for now *)
-  (* val lcup : t list -> t *) (* unused for now *)
+  val lcup : t list -> t
   val fcup : ('a -> t) -> 'a list -> t
   val get : varinfo -> t -> access
   val access : varinfo -> access -> t -> t
@@ -120,7 +120,7 @@ struct
   (* let leq = Xmap.subset (fun _ -> Access.leq) *)
 
   (* unused for now *)
-  (* let rec lcup = function [] -> bot |[x] -> x |x::xs -> cup x (lcup xs)*)
+  let rec lcup = function [] -> bot |[x] -> x |x::xs -> cup x (lcup xs)
   let rec fcup f = function
       [] -> bot | [x] -> f x | x::xs -> cup (f x) (fcup f xs)
 
@@ -731,6 +731,11 @@ let compute_usage () =
   Wp_parameters.feedback ~ontty:`Transient "Collecting variable usage" ;
   (* initial state from variable initializers *)
   let u_init = Globals.Vars.fold cvarinit E.bot in
+  (* Usage in lemmas *)
+  let u_lemmas =
+    LogicUsage.fold_lemmas
+      (fun l -> E.cup (pred (mk_ctx()) l.lem_property)) E.bot
+  in
   (* initial state by kf *)
   let usage = Globals.Functions.fold (fun kf env ->
       KFmap.insert (fun _ _u _old -> assert false) kf (cfun kf) env)
@@ -790,10 +795,12 @@ let compute_usage () =
       ignore (KFmap.interf (kf_fp state_fp) callers todo);
       fixpoint state_fp.todo
   in fixpoint todo ;
+  let u_init = E.cup u_init u_lemmas in
   (* TODO[LC]: prendre en compte la compilation des fonctions logiques et predicats ; Cf. add_lphi *)
   let usage =
     KFmap.map
-      (fun ctx -> E.cup (E.cup ctx.code ctx.spec_globals) ctx.spec_formals)
+      (fun ctx ->
+         E.lcup [ u_lemmas ; ctx.code ; ctx.spec_globals ; ctx.spec_formals])
       usage
   in u_init, usage
 

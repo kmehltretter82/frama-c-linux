@@ -47,7 +47,7 @@ val cty: logic_type -> typ
 
 val ptr_index: ?loc:location -> ?index:exp -> exp
   -> Cil_types.exp * Cil_types.exp
-(** Split pointer-arithmetic expression of the type `p + i` into its
+(** Split pointer-arithmetic expression of the type [p + i] into its
     pointer and integer parts. *)
 
 val term_of_li: logic_info -> term
@@ -80,6 +80,13 @@ val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 
 module Id_term: Datatype.S_with_collections with type t = term
 (** Datatype for terms that relies on physical equality. *)
+
+val extract_uncoerced_lval: exp -> exp option
+(** Unroll the [CastE] part of the expression until an [Lval] is found, and
+    return it.
+
+    If at some point the expression is neither a [CastE] nor an [Lval], then
+    return [None]. *)
 
 (*
 Local Variables:

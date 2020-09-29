@@ -89,29 +89,46 @@ let wp_iter_model ?ip ?index job =
     Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
   end
 
-let wp_print_memory_context kf m hyp fmt =
+let wp_print_memory_context kf bhv fmt =
   begin
     let printer = new Printer.extensible_printer () in
     let pp_vdecl = printer#without_annot printer#vdecl in
-    Format.fprintf fmt
-      "@[<hv 0>@[<hv 3>/*@@@ behavior %s:" (WpContext.MODEL.id m) ;
-    List.iter (MemoryContext.pp_clause fmt) hyp ;
+    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
     let vkf = Kernel_function.get_vi kf in
     Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
       pp_vdecl vkf ;
   end
 
+let wp_compute_memory_context model =
+  let hypotheses_computer = WpContext.compute_hypotheses model in
+  let name = WpContext.MODEL.id model in
+  MemoryContext.compute name hypotheses_computer
+
 let wp_warn_memory_context () =
   begin
     wp_iter_model
       begin fun kf m ->
-        let hyp = WpContext.compute_hypotheses m kf in
-        if hyp <> [] then
-          Wp_parameters.warning
-            ~current:false
-            "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-            (Kernel_function.get_name kf)
-            (wp_print_memory_context kf m hyp)
+        let hypotheses_computer = WpContext.compute_hypotheses m in
+        let model = WpContext.MODEL.id m in
+        let hyp = MemoryContext.get_behavior kf model hypotheses_computer in
+        match hyp with
+        | None -> ()
+        | Some bhv ->
+            Wp_parameters.warning
+              ~current:false
+              "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+              (Kernel_function.get_name kf)
+              (wp_print_memory_context kf bhv)
+      end
+  end
+
+let wp_insert_memory_context model =
+  begin
+    Wp_parameters.iter_fct
+      begin fun kf ->
+        let hyp_computer = WpContext.compute_hypotheses model in
+        let model_id = WpContext.MODEL.id model in
+        MemoryContext.add_behavior kf model_id hyp_computer
       end
   end
 
@@ -217,21 +234,14 @@ module GOALS = Wpo.S.Set
 
 let scheduled = ref 0
 let exercised = ref 0
-let spy = ref false
 let session = ref GOALS.empty
-let proved = ref GOALS.empty
 let provers = ref PM.empty
-
-let begin_session () = session := GOALS.empty ; spy := true
-let clear_session () = session := GOALS.empty
-let end_session   () = session := GOALS.empty ; spy := false
-let iter_session f  = GOALS.iter f !session
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
-    proved := GOALS.empty ;
+    session := GOALS.empty ;
     provers := PM.empty ;
   end
 
@@ -262,14 +272,15 @@ let add_time s t =
       if t > s.u_time then s.u_time <- t ;
     end
 
-let do_list_scheduled iter_on_goals =
+let do_list_scheduled goals =
   clear_scheduled () ;
-  iter_on_goals
+  Bag.iter
     (fun goal ->
        begin
          incr scheduled ;
-         if !spy then session := GOALS.add goal !session ;
-       end) ;
+         session := GOALS.add goal !session ;
+       end)
+    goals ;
   match !scheduled with
   | 0 -> Wp_parameters.warning ~current:false "No goal generated"
   | 1 -> Wp_parameters.feedback "1 goal scheduled"
@@ -353,8 +364,6 @@ let do_wpo_stat goal prover res =
   | Failed | Invalid ->
       s.failed <- succ s.failed
   | Valid ->
-      if not (Wpo.is_tactic goal) then
-        proved := GOALS.add goal !proved ;
       s.proved <- succ s.proved ;
       add_step s res.prover_steps ;
       add_time s res.prover_time ;
@@ -374,19 +383,21 @@ let results g =
     (Wpo.get_results g)
 
 let do_wpo_failed goal =
+  let updating = Cache.is_updating () in
   match results goal with
   | [p,r] ->
-      Wp_parameters.result "[%a] Goal %s : %a%a"
+      Wp_parameters.result "[%a] Goal %s : %t%a"
         VCS.pp_prover p (Wpo.get_gid goal)
-        (VCS.pp_result_qualif p) r pp_warnings goal
+        (VCS.pp_result_qualif ~updating p r) pp_warnings goal
   | pres ->
       Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
         begin fun fmt ->
           pp_warnings fmt goal ;
           List.iter
             (fun (p,r) ->
-               Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
-                 (VCS.title_of_prover p) (VCS.pp_result_qualif p) r
+               Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
+                 (VCS.title_of_prover p)
+                 (VCS.pp_result_qualif ~updating p r)
             ) pres ;
         end
 
@@ -399,11 +410,12 @@ let do_wpo_smoke status goal =
     (Wpo.get_gid goal)
     begin fun fmt ->
       pp_warnings fmt goal ;
+      let updating = Cache.is_updating () in
       List.iter
         (fun (p,r) ->
-           Format.fprintf fmt "@\n%8s: @[<hv>%a@]"
+           Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
              (VCS.title_of_prover p)
-             (VCS.pp_result_qualif p) r
+             (VCS.pp_result_qualif ~updating p r)
         ) (results goal) ;
     end
 
@@ -436,10 +448,11 @@ let do_wpo_success goal s =
             VCS.pp_prover script (Wpo.get_gid goal)
       | Some prover ->
           let result = Wpo.get_result goal prover in
+          let updating = Cache.is_updating () in
           Wp_parameters.feedback ~ontty:`Silent
-            "[%a] Goal %s : %a"
+            "[%a] Goal %s : %t"
             VCS.pp_prover prover (Wpo.get_gid goal)
-            (VCS.pp_result_qualif prover) result
+            (VCS.pp_result_qualif ~updating prover result)
     end
 
 let do_report_time fmt s =
@@ -510,12 +523,15 @@ let do_report_scheduled () =
   else
   if !scheduled > 0 then
     begin
-      let proved = GOALS.cardinal !proved in
+      let passed = GOALS.fold
+          (fun g n ->
+             if Wpo.is_passed g then succ n else n
+          ) !session 0 in
       let mode = Cache.get_mode () in
       if mode <> Cache.NoCache then do_report_cache_usage mode ;
       Wp_parameters.result "%t"
         begin fun fmt ->
-          Format.fprintf fmt "Proved goals: %4d / %d@\n" proved !scheduled ;
+          Format.fprintf fmt "Proved goals: %4d / %d@\n" passed !scheduled ;
           Pretty_utils.pp_items
             ~min:12 ~align:`Left
             ~title:(fun (prover,_) -> VCS.title_of_prover prover)
@@ -535,7 +551,7 @@ let do_list_scheduled_result () =
 (* ---  Proving                                                         --- *)
 (* ------------------------------------------------------------------------ *)
 
-type mode = {
+type script = {
   mutable tactical : bool ;
   mutable update : bool ;
   mutable depth : int ;
@@ -545,24 +561,24 @@ type mode = {
   mutable provers : (VCS.mode * VCS.prover) list ;
 }
 
-let spawn_wp_proofs_iter ~mode iter_on_goals =
-  if mode.tactical || mode.provers<>[] then
+let spawn_wp_proofs ~script goals =
+  if script.tactical || script.provers<>[] then
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
-      iter_on_goals
+      Bag.iter
         (fun goal ->
-           if  mode.tactical
+           if  script.tactical
             && not (Wpo.is_trivial goal)
-            && (mode.auto <> [] || ProofSession.exists goal)
+            && (script.auto <> [] || ProofSession.exists goal)
            then
              ProverScript.spawn
                ~failed:false
-               ~auto:mode.auto
-               ~depth:mode.depth
-               ~width:mode.width
-               ~backtrack:mode.backtrack
-               ~provers:(List.map snd mode.provers)
+               ~auto:script.auto
+               ~depth:script.depth
+               ~width:script.width
+               ~backtrack:script.backtrack
+               ~provers:(List.map snd script.provers)
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
@@ -575,8 +591,8 @@ let spawn_wp_proofs_iter ~mode iter_on_goals =
                ~progress:do_progress
                ~result:do_wpo_result
                ~success:do_wpo_success
-               mode.provers
-        ) ;
+               script.provers
+        ) goals ;
       Task.on_server_wait server do_wpo_wait ;
       Task.launch server
     end
@@ -588,19 +604,20 @@ let env_script_update () =
   try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
   with Not_found -> false
 
-let compute_provers ~mode =
-  mode.provers <- List.fold_right
-      (fun pname prvs ->
-         match VCS.prover_of_name pname with
-         | None -> prvs
-         | Some VCS.Tactical ->
-             mode.tactical <- true ;
-             if pname = "tip" || env_script_update () then
-               mode.update <- true ;
-             prvs
-         | Some prover ->
-             (VCS.mode_of_prover_name pname , prover) :: prvs)
-      (get_prover_names ()) []
+let compute_provers ~mode ~script =
+  script.provers <- List.fold_right
+      begin fun pname prvs ->
+        match VCS.parse_prover pname with
+        | None -> prvs
+        | Some VCS.Tactical ->
+            script.tactical <- true ;
+            if pname = "tip" || env_script_update () then
+              script.update <- true ;
+            prvs
+        | Some prover ->
+            let pmode = if VCS.is_auto prover then VCS.BatchMode else mode in
+            (pmode , prover) :: prvs
+      end (get_prover_names ()) []
 
 let dump_strategies =
   let once = ref true in
@@ -613,18 +630,18 @@ let dump_strategies =
                  Format.fprintf fmt "@\n  '%s': %s" h#id h#title
                )))
 
-let default_mode () = {
+let default_script_mode () = {
   tactical = false ; update=false ; provers = [] ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
-let compute_auto ~mode =
-  mode.auto <- [] ;
-  mode.width <- Wp_parameters.AutoWidth.get () ;
-  mode.depth <- Wp_parameters.AutoDepth.get () ;
-  mode.backtrack <- max 0 (Wp_parameters.BackTrack.get ()) ;
+let compute_auto ~script =
+  script.auto <- [] ;
+  script.width <- Wp_parameters.AutoWidth.get () ;
+  script.depth <- Wp_parameters.AutoDepth.get () ;
+  script.backtrack <- max 0 (Wp_parameters.BackTrack.get ()) ;
   let auto = Wp_parameters.Auto.get () in
-  if mode.depth <= 0 || mode.width <= 0 then
+  if script.depth <= 0 || script.width <= 0 then
     ( if auto <> [] then
         Wp_parameters.feedback
           "Auto-search deactivated because of 0-depth or 0-width" )
@@ -634,22 +651,22 @@ let compute_auto ~mode =
         (fun id ->
            if id = "?" then dump_strategies ()
            else
-             try mode.auto <- Strategy.lookup ~id :: mode.auto
+             try script.auto <- Strategy.lookup ~id :: script.auto
              with Not_found ->
                Wp_parameters.error ~current:false
                  "Strategy -wp-auto '%s' unknown (ignored)." id
         ) auto ;
-      mode.auto <- List.rev mode.auto ;
-      if mode.auto <> [] then mode.tactical <- true ;
+      script.auto <- List.rev script.auto ;
+      if script.auto <> [] then script.tactical <- true ;
     end
 
-let do_update_session mode iter =
-  if mode.update then
+let do_update_session ~script goals =
+  if script.update then
     begin
       let removed = ref 0 in
       let updated = ref 0 in
       let invalid = ref 0 in
-      iter
+      Bag.iter
         begin fun goal ->
           let results = Wpo.get_results goal in
           let autoproof (p,r) =
@@ -680,7 +697,7 @@ let do_update_session mode iter =
                     ProofSession.save goal (ProofScript.encode scripts)
                   end
               end
-        end ;
+        end goals ;
       let r = !removed in
       let u = !updated in
       let f = !invalid in
@@ -697,33 +714,30 @@ let do_update_session mode iter =
           Wp_parameters.result "Updated session with %d new script%s to complete." f s );
     end
 
-let do_wp_proofs_iter ?provers ?tip iter =
-  let mode = default_mode () in
-  compute_provers ~mode ;
-  compute_auto ~mode ;
+let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
+  let script = default_script_mode () in
+  let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
+  compute_provers ~mode ~script ;
+  compute_auto ~script ;
   begin match provers with None -> () | Some prvs ->
-    mode.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
+    script.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
   end ;
   begin match tip with None -> () | Some tip ->
-    mode.tactical <- tip ;
-    mode.update <- tip ;
+    script.tactical <- tip ;
+    script.update <- tip ;
   end ;
-  let spawned = mode.tactical || mode.provers <> [] in
+  let spawned = script.tactical || script.provers <> [] in
   begin
-    if spawned then do_list_scheduled iter ;
-    spawn_wp_proofs_iter ~mode iter ;
+    if spawned then do_list_scheduled goals ;
+    spawn_wp_proofs ~script goals ;
     if spawned then
       begin
         do_list_scheduled_result () ;
-        do_update_session mode iter ;
+        do_update_session ~script goals ;
       end
     else if not (Wp_parameters.Print.get ()) then
-      iter do_wpo_display
+      Bag.iter do_wpo_display goals
   end
-
-let do_wp_proofs () = do_wp_proofs_iter (fun f -> Wpo.iter ~on_goal:f ())
-
-let do_wp_proofs_for goals = do_wp_proofs_iter (fun f -> Bag.iter f goals)
 
 (* registered at frama-c (normal) exit *)
 let do_cache_cleanup () =
@@ -735,38 +749,6 @@ let do_cache_cleanup () =
     then
       Wp_parameters.result "[Cache] removed:%d" removed
   end
-
-(* ------------------------------------------------------------------------ *)
-(* ---  Secondary Entry Points                                          --- *)
-(* ------------------------------------------------------------------------ *)
-
-(* Deprecated entry point in Dynamic. *)
-
-let deprecated_wp_compute kf bhv ipopt =
-  let model = computer () in
-  let goals =
-    match ipopt with
-    | None -> Generator.compute_kf model ?kf ~bhv ()
-    | Some ip -> Generator.compute_ip model ip
-  in do_wp_proofs_for goals
-
-let deprecated_wp_compute_kf kf bhv prop =
-  let model = computer () in
-  do_wp_proofs_for (Generator.compute_kf model ?kf ~bhv ~prop ())
-
-
-let deprecated_wp_compute_ip ip =
-  Wp_parameters.warning ~once:true "Dynamic 'wp_compute_ip' is now deprecated." ;
-  let model = computer () in
-  do_wp_proofs_for (Generator.compute_ip model ip)
-
-let deprecated_wp_compute_call stmt =
-  Wp_parameters.warning ~once:true "Dynamic 'wp_compute_ip' is now deprecated." ;
-  do_wp_proofs_for (Generator.compute_call (computer ()) stmt)
-
-let deprecated_wp_clear () =
-  Wp_parameters.warning ~once:true "Dynamic 'wp_compute_ip' is now deprecated." ;
-  Wpo.clear ()
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Command-line Entry Points                                       --- *)
@@ -800,27 +782,26 @@ let cmdline_run () =
         WpContext.on_context (computer#model,WpContext.Global)
           LogicBuiltins.dump ();
       end ;
+    wp_compute_memory_context computer#model ;
+    if Wp_parameters.CheckModelHypotheses.get () then
+      wp_insert_memory_context computer#model fct ;
     Generator.compute_selection computer ~fct ~bhv ~prop ()
   in
   if Wp_parameters.CachePrint.get () then
     Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
   let fct = Wp_parameters.get_wp () in
-  match fct with
-  | Wp_parameters.Fct_none -> ()
-  | Wp_parameters.Fct_all ->
+  if fct <> Wp_parameters.Fct_none then
+    begin
+      let goals = wp_main fct in
+      do_wp_proofs goals ;
       begin
-        ignore (wp_main fct);
-        do_wp_proofs ();
-        do_wp_print ();
-        do_wp_report ();
-      end
-  | _ ->
-      begin
-        let goals = wp_main fct in
-        do_wp_proofs_for goals ;
-        do_wp_print_for goals ;
-        do_wp_report () ;
-      end
+        if fct <> Wp_parameters.Fct_all then
+          do_wp_print_for goals
+        else
+          do_wp_print () ;
+      end ;
+      do_wp_report () ;
+    end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Register external functions                                     --- *)
@@ -836,56 +817,6 @@ let register name ty code =
       ~journalize:false (*LC: Because of Property is not journalizable. *)
       (fun x -> deprecated name ; code x)
   in ()
-
-(* DEPRECATED *)
-let () =
-  let module OLS = Datatype.List(Datatype.String) in
-  let module OKF = Datatype.Option(Kernel_function) in
-  let module OP = Datatype.Option(Property) in
-  register "wp_compute"
-    (Datatype.func3 OKF.ty OLS.ty OP.ty Datatype.unit)
-    deprecated_wp_compute
-
-let () =
-  let module OKF = Datatype.Option(Kernel_function) in
-  let module OLS = Datatype.List(Datatype.String) in
-  register "wp_compute_kf"
-    (Datatype.func3 OKF.ty OLS.ty OLS.ty Datatype.unit)
-    deprecated_wp_compute_kf
-
-let () =
-  register "wp_compute_ip"
-    (Datatype.func Property.ty Datatype.unit)
-    deprecated_wp_compute_ip
-
-let () =
-  register "wp_compute_call"
-    (Datatype.func Cil_datatype.Stmt.ty Datatype.unit)
-    deprecated_wp_compute_call
-
-let () =
-  register "wp_clear"
-    (Datatype.func Datatype.unit Datatype.unit)
-    deprecated_wp_clear
-
-let run = Dynamic.register ~plugin:"Wp" "run"
-    (Datatype.func Datatype.unit Datatype.unit)
-    ~journalize:true
-    cmdline_run
-
-let () =
-  let open Datatype in
-  begin
-    let t_job = func Unit.ty Unit.ty in
-    let t_iter = func (func Wpo.S.ty Unit.ty) Unit.ty in
-    let register name ty f =
-      ignore (Dynamic.register name ty ~plugin:"Wp" ~journalize:false f)
-    in
-    register "wp_begin_session" t_job  begin_session ;
-    register "wp_end_session"   t_job  end_session   ;
-    register "wp_clear_session" t_job  clear_session ;
-    register "wp_iter_session"  t_iter iter_session  ;
-  end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Tracing WP Invocation                                           --- *)

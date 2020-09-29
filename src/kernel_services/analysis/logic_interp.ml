@@ -947,17 +947,17 @@ to function contracts."
         (* to preserve the effect of the statement *)
         pragmas :=
           { !pragmas with stmt = Stmt.Set.add ki !pragmas.stmt}
-      | AAssert (_behav,_,pred) ->
+      | AAssert (_behav,pred) ->
         (* to preserve the interpretation of the assertion *)
-        get_zone_from_pred ki pred;
+        get_zone_from_pred ki pred.tp_statement;
       | AInvariant (_behav,true,pred) -> (* loop invariant *)
         (* WARNING this is obsolete *)
         (* [JS 2010/09/02] TODO: so what is the right way to do? *)
         (* to preserve the interpretation of the loop invariant *)
-        get_zone_from_pred (Extlib.the loop_body_opt) pred;
+        get_zone_from_pred (Extlib.the loop_body_opt) pred.tp_statement;
       | AInvariant (_behav,false,pred) -> (* code invariant *)
         (* to preserve the interpretation of the code invariant *)
-        get_zone_from_pred ki pred;
+        get_zone_from_pred ki pred.tp_statement;
       | AVariant (term,_) ->
         (* to preserve the interpretation of the variant *)
         get_zone_from_term (Extlib.the loop_body_opt) term;

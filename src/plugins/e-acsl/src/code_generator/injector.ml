@@ -60,7 +60,7 @@ let inject_in_local_init loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
     when Functions.Libc.is_vla_alloc_name fvi.vname ->
     (* add a store statement when creating a variable length array *)
-    let store = Constructor.mk_store_stmt ~str_size:sz vi in
+    let store = Smart_stmt.store_stmt ~str_size:sz vi in
     let env = Env.add_stmt ~post:true env kf store in
     init, env
 
@@ -138,20 +138,20 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
       | Var vi, NoOffset -> vi.vglob || vi.vformal
       | _ -> false
     in
-    let must_model = Mmodel_analysis.must_model_lval ~stmt ~kf lv in
+    let must_model = Memory_tracking.must_monitor_lval ~stmt ~kf lv in
     if not (may_safely_ignore lv) && must_model then
       let before = Cil.mkStmt ~valid_sid:true stmt.skind in
       let new_stmt =
         (* bitfields are not yet supported ==> no initializer.
            a [not_yet] will be raised in [Translate]. *)
         if Cil.isBitfield lv then Cil.mkEmptyStmt ()
-        else Constructor.mk_initialize ~loc lv
+        else Smart_stmt.initialize ~loc lv
       in
       let env = Env.add_stmt ~post ~before env kf new_stmt in
       let env = match vi with
         | None -> env
         | Some vi ->
-          let new_stmt = Constructor.mk_store_stmt vi in
+          let new_stmt = Smart_stmt.store_stmt vi in
           Env.add_stmt ~post ~before env kf new_stmt
       in
       env
@@ -189,7 +189,7 @@ let inject_in_instr env kf stmt = function
       if Functions.Libc.is_vla_free caller then
         match args with
         | [ { enode = CastE (_, { enode = Lval (Var vi, NoOffset) }) } ] ->
-          let delete_block = Constructor.mk_delete_stmt ~is_addr:true vi in
+          let delete_block = Smart_stmt.delete_stmt ~is_addr:true vi in
           Env.add_stmt env kf delete_block
         | _ -> Options.fatal "The normalization of __fc_vla_free() has changed"
       else
@@ -232,7 +232,7 @@ let add_new_block_in_stmt env kf stmt =
   in
   let mk_post_env env stmt =
     Annotations.fold_code_annot
-      (fun _ a env -> Translate.translate_post_code_annotation kf stmt env a)
+      (fun _ a env -> Translate_annots.post_code_annotation kf stmt env a)
       stmt
       env
   in
@@ -252,7 +252,7 @@ let add_new_block_in_stmt env kf stmt =
           let env = mk_post_env env stmt in
           (* also handle the postcondition of the function and clear the
              env *)
-          Translate.translate_post_spec kf Kglobal env (Annotations.funspec kf)
+          Translate_annots.post_funspec kf Kglobal env
         else
           env
       in
@@ -263,7 +263,7 @@ let add_new_block_in_stmt env kf stmt =
       let b, env =
         Env.pop_and_get env new_stmt ~global_clear:true Env.After
       in
-      let new_stmt = Constructor.mk_block stmt b in
+      let new_stmt = Smart_stmt.block stmt b in
       if not (Cil_datatype.Stmt.equal stmt new_stmt) then begin
         (* move the labels of the return to the new block in order to
            evaluate the postcondition when jumping to them. *)
@@ -293,7 +293,7 @@ let add_new_block_in_stmt env kf stmt =
       let post_block, env =
         Env.pop_and_get
           env
-          (Constructor.mk_block new_stmt pre_block)
+          (Smart_stmt.block new_stmt pre_block)
           ~global_clear:false
           Env.Before
       in
@@ -302,7 +302,7 @@ let add_new_block_in_stmt env kf stmt =
         then Cil.transient_block post_block
         else post_block
       in
-      let res = Constructor.mk_block new_stmt post_block in
+      let res = Smart_stmt.block new_stmt post_block in
       if not (Cil_datatype.Stmt.equal new_stmt res) then
         E_acsl_label.move kf new_stmt res;
       res, env
@@ -337,7 +337,7 @@ let insert_as_last_stmts_in_innermost_block ~last_stmts kf outer_block =
     match return_stmt with
     | Some return_stmt ->
       let b = Cil.mkBlock new_stmts in
-      let new_stmt = Constructor.mk_block return_stmt b in
+      let new_stmt = Smart_stmt.block return_stmt b in
       E_acsl_label.move kf return_stmt new_stmt;
       [ new_stmt ]
     | None -> new_stmts
@@ -450,7 +450,7 @@ and inject_in_stmt env kf stmt =
       (* translate the precondition of the function *)
       if Functions.check kf then
         let funspec = Annotations.funspec kf in
-        Translate.translate_pre_spec kf Kglobal env funspec
+        Translate_annots.pre_funspec kf Kglobal env funspec
       else env
     else
       env
@@ -459,7 +459,7 @@ and inject_in_stmt env kf stmt =
   let env =
     if Functions.check kf then
       Annotations.fold_code_annot
-        (fun _ a env -> Translate.translate_pre_code_annotation kf stmt env a)
+        (fun _ a env -> Translate_annots.pre_code_annotation kf stmt env a)
         stmt
         env
     else
@@ -508,15 +508,15 @@ and inject_in_block (env: Env.t) kf blk =
           (* The free statements are passed in the same order than the malloc
              ones. In order to free the variable in the reverse order, the list
              is reversed before appending the return statement. Moreover,
-             `rev_append` is tail recursive contrary to `append` *)
+             [List.rev_append] is tail recursive contrary to [List.append] *)
           List.rev_append free_stmts [ return_stmt ]
         | None -> []
       in
       if Functions.instrument kf then
         List.fold_left
           (fun acc vi ->
-             if Mmodel_analysis.must_model_vi ~kf vi
-             then Constructor.mk_delete_stmt vi :: acc
+             if Memory_tracking.must_monitor_vi ~kf vi
+             then Smart_stmt.delete_stmt vi :: acc
              else acc)
           stmts
           blk.blocals
@@ -530,8 +530,8 @@ and inject_in_block (env: Env.t) kf blk =
       blk.bstmts <-
         List.fold_left
           (fun acc vi ->
-             if Mmodel_analysis.must_model_vi vi && not vi.vdefined
-             then Constructor.mk_store_stmt vi :: acc
+             if Memory_tracking.must_monitor_vi vi && not vi.vdefined
+             then Smart_stmt.store_stmt vi :: acc
              else acc)
           blk.bstmts
           blk.blocals;
@@ -702,13 +702,13 @@ let surround_function_with kf fundec stmt_begin stmt_end =
     These functions track the usage of globals if the program being analyzed. *)
 let inject_global_handler file main =
   Options.feedback ~dkey ~level:2 "building global handler.";
-  if Mmodel_analysis.use_model () then
+  if Memory_tracking.use_monitoring () then
     (* Create [__e_acsl_globals_init] function *)
     let vi_init, fundec_init = Global_observer.mk_init_function () in
     let cil_fct_init = GFun(fundec_init, Location.unknown) in
     (* Create [__e_acsl_globals_delete] function *)
-    let vi_delete, fundec_delete = Global_observer.mk_delete_function () in
-    let cil_fct_delete = GFun(fundec_delete, Location.unknown) in
+    let vi_clean, fundec_clean = Global_observer.mk_clean_function () in
+    let cil_fct_clean = GFun(fundec_clean, Location.unknown) in
     match main with
     | Some main ->
       let mk_fct_call vi =
@@ -727,14 +727,14 @@ let inject_global_handler file main =
       (* Create [__e_acsl_globals_init();] call *)
       let stmt_init = mk_fct_call vi_init in
       (* Create [__e_acsl_globals_delete();] call *)
-      let stmt_delete =
-        match fundec_delete.sbody.bstmts with
+      let stmt_clean =
+        match fundec_clean.sbody.bstmts with
         | [] -> None
-        | _ -> Some (mk_fct_call vi_delete)
+        | _ -> Some (mk_fct_call vi_clean)
       in
       (* Surround the content of main with the calls to
          [__e_acsl_globals_init();] and [__e_acsl_globals_delete();] *)
-      surround_function_with main main_fundec stmt_init stmt_delete;
+      surround_function_with main main_fundec stmt_init stmt_clean;
       (* Retrieve all globals except main *)
       let main_vi = Globals.Functions.get_vi main in
       let new_globals =
@@ -753,11 +753,11 @@ let inject_global_handler file main =
         in
         (* [main] at the end *)
         let globals_to_add = [ GFun(main_fundec, Location.unknown) ] in
-        (* Prepend [__e_acsl_globals_delete] if not empty *)
+        (* Prepend [__e_acsl_globals_clean] if not empty *)
         let globals_to_add =
-          match fundec_delete.sbody.bstmts with
+          match fundec_clean.sbody.bstmts with
           | [] -> globals_to_add
-          | _ -> cil_fct_delete :: globals_to_add
+          | _ -> cil_fct_clean :: globals_to_add
         in
         (* Prepend [__e_acsl_globals_init] *)
         let globals_to_add = cil_fct_init :: globals_to_add in
@@ -777,25 +777,25 @@ let inject_global_handler file main =
                       `__e_acsl_memory_init' and `__e_acsl_memory_clean' \
                       by yourself.@]"
         Global_observer.function_init_name
-        Global_observer.function_delete_name;
+        Global_observer.function_clean_name;
       let globals_func =
-        match fundec_delete.sbody.bstmts with
+        match fundec_clean.sbody.bstmts with
         | [] -> [ cil_fct_init ]
-        | _ -> [ cil_fct_init; cil_fct_delete ]
+        | _ -> [ cil_fct_init; cil_fct_clean ]
       in
       file.globals <- file.globals @ globals_func
 
 (** Add a call to [__e_acsl_memory_init] and [__e_acsl_memory_clean] if the
-    memory model analysis is running.
+    memory tracking analysis is running.
     [__e_acsl_memory_init] initializes memory storage and potentially records
     program arguments. Parameters to [__e_acsl_memory_init] are addresses of
     program arguments or NULLs if [main] is declared without arguments.
     [__e_acsl_memory_clean] clean the memory allocated by
     [__e_acsl_memory_init]. *)
-let inject_mmodel_handler main =
+let inject_mtracking_handler main =
   (* Only inject memory init and memory clean if the memory model analysis is
      running *)
-  if Mmodel_analysis.use_model () then begin
+  if Memory_tracking.use_monitoring () then begin
     let loc = Location.unknown in
     let nulls = [ Cil.zero loc ; Cil.zero loc ] in
     let handle_main main =
@@ -821,8 +821,8 @@ let inject_mmodel_handler main =
       in
       let ptr_size = Cil.sizeOf loc Cil.voidPtrType in
       let args = args @ [ ptr_size ] in
-      let init = Constructor.mk_rtl_call loc "memory_init" args in
-      let clean = Constructor.mk_rtl_call loc "memory_clean" [] in
+      let init = Smart_stmt.rtl_call loc "memory_init" args in
+      let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
       surround_function_with main fundec init (Some clean)
     in
     Extlib.may handle_main main
@@ -837,13 +837,13 @@ let inject_in_file file =
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
     inject_global_handler file main;
   file.globals <- Logic_functions.add_generated_functions file.globals;
-  inject_mmodel_handler main
+  inject_mtracking_handler main
 
 let reset_all ast =
   (* by default, do not run E-ACSL on the generated code *)
   Options.Run.off ();
   (* reset all the E-ACSL environments to their original states *)
-  Mmodel_analysis.reset ();
+  Memory_tracking.reset ();
   Logic_functions.reset ();
   Literal_strings.reset ();
   Global_observer.reset ();

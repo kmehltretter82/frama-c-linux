@@ -37,7 +37,7 @@ module type VarUsage =
 sig
   val datatype : string
   val param : varinfo -> MemoryContext.param
-  val hypotheses : unit -> MemoryContext.clause list
+  val iter: ?kf:kernel_function -> init:bool -> (varinfo -> unit) -> unit
 end
 
 module Make(V : VarUsage)(M : Sigs.Model) =
@@ -52,7 +52,13 @@ struct
   let no_binder = { bind = fun _ f v -> f v }
   let configure_ia _ = no_binder
 
-  let hypotheses () = V.hypotheses () @ M.hypotheses ()
+  let hypotheses p =
+    let kf,init = match WpContext.get_scope () with
+      | WpContext.Global -> None,false
+      | WpContext.Kf f -> Some f, WpStrategy.is_main_init f in
+    let w = ref p in
+    V.iter ?kf ~init (fun vi -> w := MemoryContext.set vi (V.param vi) !w) ;
+    M.hypotheses !w
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Chunk                                                             --- *)
@@ -1527,7 +1533,11 @@ struct
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty
 
   let is_well_formed sigma =
-    M.is_well_formed sigma.mem
+    let cstrs = ref [] in
+    SIGMA.iter
+      (fun v c -> cstrs := Cvalues.has_ctype v.vtype (e_var c) :: !cstrs)
+      sigma.vars ;
+    p_conj ((M.is_well_formed sigma.mem) :: !cstrs)
 
   (* -------------------------------------------------------------------------- *)
 

@@ -129,13 +129,7 @@ struct
     if S.mem x.vname (get_vars ()) then ByValue else
       V.param x
 
-  let hypotheses () =
-    let kf,init = match WpContext.get_scope () with
-      | WpContext.Global -> None,false
-      | WpContext.Kf f -> Some f, WpStrategy.is_main_init f in
-    let w = ref MemoryContext.empty in
-    V.iter ?kf ~init (fun vi -> w := MemoryContext.set vi (param vi) !w) ;
-    MemoryContext.requires !w
+  let iter = V.iter
 
 end
 

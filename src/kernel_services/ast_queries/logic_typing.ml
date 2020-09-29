@@ -3513,6 +3513,10 @@ struct
 
   let id_predicate env pred = Logic_const.new_predicate (predicate env pred)
 
+  let id_predicate_top env pred =
+    let { tp_only_check = only_check; tp_statement = pred } = pred in
+    Logic_const.new_predicate ~only_check (predicate env pred)
+
   let id_term_ptr env t =
     let loc = t.lexpr_loc in
     let t = term env t in
@@ -3675,11 +3679,12 @@ struct
               ~type_assigns:type_assign
           in
           let b_assumes = List.map (id_predicate env) bas in
-          let b_requires= List.map (id_predicate env) br in
+          let b_requires= List.map (id_predicate_top env) br in
           let b_post_cond =
             List.map
               (fun (k,p)->
-                 let p' = id_predicate (post_state_env k) p in (k,p')) be
+                 let p' = id_predicate_top (post_state_env k) p in (k,p'))
+              be
           in
           let b_assigns =
             type_assign typing_context ~accept_formal:is_stmt_contract assigns_env ba
@@ -3773,15 +3778,14 @@ struct
     append_loop_labels (append_here_label (append_pre_label (append_init_label
                                                                (Lenv.empty()))))
 
-  let assertion_kind =
-    function Assert -> Cil_types.Assert | Check -> Cil_types.Check
-
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
     let annot = match ca with
-      | AAssert (behav,k,p) ->
+      | AAssert (behav,{tp_only_check=only_check; tp_statement = p}) ->
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AAssert(behav,assertion_kind k,predicate (code_annot_env()) p)
+        let p = predicate (code_annot_env()) p in
+        let p = Logic_const.toplevel_predicate ~only_check p in
+        Cil_types.AAssert(behav,p)
       | APragma (Impact_pragma sp) ->
         Cil_types.APragma
           (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
@@ -3807,10 +3811,11 @@ struct
         Cil_types.AStmtSpec (behav,my_spec)
       | AVariant v ->
         Cil_types.AVariant (type_variant (loop_annot_env ()) v)
-      | AInvariant (behav,f,i) ->
+      | AInvariant (behav,f,{ tp_only_check = only_check; tp_statement = i}) ->
         let env = if f then loop_annot_env () else code_annot_env () in
         check_behavior_names loc current_behaviors behav;
-        Cil_types.AInvariant (behav,f,predicate env i)
+        let p = Logic_const.toplevel_predicate ~only_check (predicate env i) in
+        Cil_types.AInvariant (behav,f,p)
       | AAllocation (behav,fa) ->
         check_behavior_names loc current_behaviors behav;
         Cil_types.AAllocation(behav,
@@ -4116,7 +4121,8 @@ struct
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Dtype (my_info,loc)
-    | LDlemma (x,is_axiom, labels, poly, e) ->
+    | LDlemma (x,is_axiom, labels, poly,
+               { tp_only_check = only_check; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
@@ -4132,7 +4138,7 @@ struct
           Cil_datatype.Location.pretty old_loc
       end;
       let labels,env = annot_env loc labels poly in
-      let p = predicate env e in
+      let p = Logic_const.toplevel_predicate ~only_check (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
         | Some lab -> [lab]

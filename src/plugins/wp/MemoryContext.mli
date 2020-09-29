@@ -24,25 +24,16 @@ open Cil_types
 
 type param = NotUsed | ByAddr | ByValue | ByShift | ByRef | InContext | InArray
 
-val pp_param : Format.formatter -> param -> unit
+val pp_param: Format.formatter -> param -> unit
 
 type partition
 
-val empty : partition
-val set : varinfo -> param -> partition -> partition
+val empty: partition
+val set: varinfo -> param -> partition -> partition
 
-type zone =
-  | Var of varinfo   (** [&x] the cell x *)
-  | Ptr of varinfo   (** [p] the cell pointed by p *)
-  | Arr of varinfo   (** [p+(..)] the cell and its neighbors pointed by p *)
+val compute: string -> (kernel_function -> partition) -> unit
 
-type clause =
-  | Valid of zone
-  | Separated of zone list list
-
-(** Build the separation clause from a partition,
-    including the clauses related to the pointer validity *)
-val requires : partition -> clause list
-
-val pp_zone : Format.formatter -> zone -> unit
-val pp_clause : Format.formatter -> clause -> unit
+val add_behavior:
+  kernel_function -> string -> (kernel_function -> partition) -> unit
+val get_behavior:
+  kernel_function -> string -> (kernel_function -> partition) -> behavior option

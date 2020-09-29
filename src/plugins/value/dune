@@ -18,7 +18,7 @@
   (name eva)
   (optional)
   (public_name frama-c-eva.core)
-  (modules unit_tests
+  (modules eva unit_tests
    split_strategy value_parameters
         value_perf value_util
         mark_noresults
@@ -35,7 +35,6 @@
         builtins_memory
         builtins_print_c
         builtins_watchpoint
-        state_import
         function_args split_return
         per_stmt_slevel
         eval structure
@@ -80,7 +79,7 @@
 ( library
   (name numerors)
   (public_name frama-c-eva.numerors)
-  (flags -open Frama_c_kernel -open Eva)
+  (flags -open Frama_c_kernel -open Eva.Private)
   (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
   (libraries frama-c.kernel frama-c-eva.core gmp)
   (optional)
@@ -91,7 +90,7 @@
 ( library
   (name apron_domain)
   (public_name frama-c-eva.apron)
-  (flags -open Frama_c_kernel -open Eva)
+  (flags -open Frama_c_kernel -open Eva.Private)
   (modules apron_domain)
   (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
   (optional)
@@ -105,7 +104,7 @@
   (optional)
   (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
 ;  (public_interfaces ())
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva.Private)
   (libraries eva frama-c.kernel frama-c.gui)
 )
 

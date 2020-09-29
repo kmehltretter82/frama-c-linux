@@ -1,7 +1,7 @@
 \begin{syntax}
   [ function-contract ] ::= requires-clause*
                             { decreases-clause? } simple-clause*
-                            named-behavior* { completeness-clause* }
+                            named-behavior* completeness-clause*
   \
   requires-clause ::= "requires" pred ";"
   \
@@ -24,6 +24,6 @@
   \
   assumes-clause ::= "assumes" pred ";"
   \
-  { completeness-clause } ::= { "complete" "behaviors" (id (","id)*)? ";" } ;
-     | { "disjoint" "behaviors" (id (","id)*)? ";" }
+  completeness-clause ::= "complete" "behaviors" (id (","id)*)? ";"
+                        | "disjoint" "behaviors" (id (","id)*)? ";"
 \end{syntax}

@@ -40,7 +40,7 @@ let dispatch ?(config=VCS.default) mode prover wpo =
         ProverWhy3.prove
           ~timeout:(VCS.get_timeout ~smoke config)
           ~steplimit:(VCS.get_stepout config)
-          ~prover wpo
+          ~mode ~prover wpo
   end
 
 let started ?start wpo =
@@ -112,7 +112,8 @@ let spawn wpo ~delayed
     let process (mode,prover) =
       prove wpo ?config ~mode ?start ?progress ?result prover in
     let all = Wp_parameters.RunAllProvers.get() in
-    ProverTask.spawn ?monitor ?pool ~all
+    let smoke = Wpo.is_smoke_test wpo in
+    ProverTask.spawn ?monitor ?pool ~all ~smoke
       (List.map
          (fun mp ->
             let prover = snd mp in
@@ -124,3 +125,5 @@ let spawn wpo ~delayed
     let thread = Task.thread process in
     let server = ProverTask.server () in
     Task.spawn server ?pool thread
+
+(* -------------------------------------------------------------------------- *)

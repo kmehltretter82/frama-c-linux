@@ -258,6 +258,10 @@ struct
       types = [];
     }
 
+  let has_at_frame frame label =
+    assert (not (Clabels.is_here label));
+    LabelMap.mem label frame.labels
+
   let mem_at_frame frame label =
     assert (not (Clabels.is_here label));
     try LabelMap.find label frame.labels
@@ -498,7 +502,7 @@ struct
     | Pforall(qs,q) -> strip_forall (xs @ qs) q
     | _ -> xs , p
 
-  let compile_lemma cluster name ~assumed types labels lemma =
+  let compile_lemma cluster name ~kind types labels lemma =
     let qs,prop = strip_forall [] lemma in
     let xs,tgs,domain,prop,_ =
       let cc_pred = pred `Positive in
@@ -508,7 +512,7 @@ struct
     {
       l_name = name ;
       l_types = List.length types ;
-      l_assumed = assumed ;
+      l_kind = kind ;
       l_triggers = [tgs] ;
       l_forall = xs ;
       l_cluster = cluster ;
@@ -539,7 +543,7 @@ struct
             let trigger = Trigger.of_term result in
             Definitions.define_lemma {
               l_name = name ;
-              l_assumed = true ;
+              l_kind = `Axiom ;
               l_types = ldef.d_types ;
               l_forall = ldef.d_params ;
               l_triggers = [[trigger]] ;
@@ -721,7 +725,7 @@ struct
     (* Re-compile final cases *)
     let cases = List.map
         (fun (case,labels,types,lemma) ->
-           compile_lemma cluster ~assumed:true case types labels lemma)
+           compile_lemma cluster ~kind:`Axiom case types labels lemma)
         cases in
     Definitions.update_symbol { ldef with d_definition = Inductive cases } ;
     type_for_signature l ldef sigp (* sufficient *) ; SIG sigm
@@ -770,7 +774,7 @@ struct
                     {
                       l_name ;
                       l_types = 0 ;
-                      l_assumed = true ;
+                      l_kind = `Axiom ;
                       l_triggers = [frame.triggers] ;
                       l_forall = vs ;
                       l_cluster = cluster ;
@@ -802,7 +806,7 @@ struct
         "Lemma '%s' has labels, consider using global invariant instead."
         l.lem_name ;
     Definitions.define_lemma
-      (compile_lemma c ~assumed:l.lem_axiom
+      (compile_lemma c ~kind:l.lem_kind
          l.lem_name l.lem_types l.lem_labels l.lem_property)
 
   let define_axiomatic cluster ax =

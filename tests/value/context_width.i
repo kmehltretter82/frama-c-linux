@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-context-width 3 -then -print -then -context-width 1"
+   STDOPT: +"-eva-context-width 3 -then -print -then -eva-context-width 1"
 */
 
 int a;

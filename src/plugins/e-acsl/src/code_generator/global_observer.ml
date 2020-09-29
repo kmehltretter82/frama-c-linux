@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 
 let function_init_name = Functions.RTL.mk_api_name "globals_init"
-let function_delete_name = Functions.RTL.mk_api_name "globals_delete"
+let function_clean_name = Functions.RTL.mk_api_name "globals_clean"
 
 (* Hashtable mapping global variables (as Cil_type.varinfo) to their
    initializers (if any).
@@ -43,11 +43,11 @@ let is_empty () = Varinfo.Hashtbl.length tbl = 0
    Initializers (used to capture literal strings) are added through
    [add_initializer] below. *)
 let add vi =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     Varinfo.Hashtbl.replace tbl vi (ref [])
 
 let add_initializer vi offset init =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     try
       let l = Varinfo.Hashtbl.find tbl vi in
       l := (offset, init) :: !l
@@ -60,11 +60,11 @@ let rec literal_in_initializer env kf = function
   | CompoundInit (_, l) ->
     List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
-(* Create a global kernel function named `name`.
+(* Create a global kernel function named [name].
    Return a triple (varinfo * fundec * kernel_function) of the created
    global function. *)
 let mk_function name =
-  (* Create global function `name` *)
+  (* Create global function [name] *)
   let vi =
     Cil.makeGlobalVar ~source:true
       name
@@ -123,8 +123,8 @@ let mk_init_function () =
          if Misc.is_fc_or_compiler_builtin vi then stmts
          else
            (* a global is both allocated and initialized *)
-           Constructor.mk_store_stmt vi
-           :: Constructor.mk_initialize ~loc:Location.unknown (Cil.var vi)
+           Smart_stmt.store_stmt vi
+           :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
            :: stmts)
       tbl
       stmts
@@ -136,10 +136,10 @@ let mk_init_function () =
          let loc = Location.unknown in
          let e = Cil.new_exp ~loc:loc (Const (CStr s)) in
          let str_size = Cil.new_exp loc (SizeOfStr s) in
-         Constructor.mk_assigns ~loc ~result:(Cil.var vi) e
-         :: Constructor.mk_store_stmt ~str_size vi
-         :: Constructor.mk_full_init_stmt vi
-         :: Constructor.mk_mark_readonly vi
+         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
+         :: Smart_stmt.store_stmt ~str_size vi
+         :: Smart_stmt.full_init_stmt vi
+         :: Smart_stmt.mark_readonly vi
          :: stmts)
       stmts
   in
@@ -150,7 +150,7 @@ let mk_init_function () =
       let b, _env = Env.pop_and_get env stmt ~global_clear:true Env.Before in
       b, stmts
   in
-  let stmts = Constructor.mk_block_stmt b :: stmts in
+  let stmts = Smart_stmt.block_stmt b :: stmts in
   (* prevent multiple calls to [__e_acsl_globals_init] *)
   let loc = Location.unknown in
   let vi_already_run =
@@ -168,14 +168,14 @@ let mk_init_function () =
       (Local_init (vi_already_run, init, loc))
   in
   let already_run =
-    Constructor.mk_assigns
+    Smart_stmt.assigns
       ~loc
       ~result:(Cil.var vi_already_run)
       (Cil.one ~loc)
   in
   let stmts = already_run :: stmts in
   let guard =
-    Constructor.mk_if
+    Smart_stmt.if_stmt
       ~loc
       ~cond:(Cil.evar vi_already_run)
       (Cil.mkBlock [])
@@ -186,16 +186,16 @@ let mk_init_function () =
   fundec.sbody.bstmts <- stmts;
   vi, fundec
 
-let mk_delete_function () =
-  (* Create and register [__e_acsl_globals_delete] function with definition
+let mk_clean_function () =
+  (* Create and register [__e_acsl_globals_clean] function with definition
      for de-allocation of global variables *)
-  let vi, fundec, _kf = mk_function function_delete_name in
+  let vi, fundec, _kf = mk_function function_clean_name in
   (* Generate delete statements and add them to the function body *)
   let stmts =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _l acc ->
          if Misc.is_fc_or_compiler_builtin vi then acc
-         else Constructor.mk_delete_stmt vi :: acc)
+         else Smart_stmt.delete_stmt vi :: acc)
       tbl
       []
   in

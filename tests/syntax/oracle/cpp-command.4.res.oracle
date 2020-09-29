@@ -1,0 +1,2 @@
+[kernel] Preprocessing command:
+  gcc -E -C -I LIBC -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32 '/home/bobot/Sources/frama-c/_build/default/tests/syntax/result/cpp-command.c' -o '/tmp/FILE.i'

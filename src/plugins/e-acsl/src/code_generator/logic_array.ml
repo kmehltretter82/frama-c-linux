@@ -95,7 +95,7 @@ let length_exp ~loc kf env ~name array =
         ~name
         Cil.theMachine.typeOfSizeOf
         (fun v _ -> [
-             Constructor.mk_assigns
+             Smart_stmt.assigns
                ~loc
                ~result:(Cil.var v)
                (Cil.mkBinOp
@@ -168,7 +168,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       None
       ~name
       Cil.intType
-      (fun v _ -> [ Constructor.mk_assigns ~loc ~result:(Cil.var v) (res_value ()) ])
+      (fun v _ -> [ Smart_stmt.assigns ~loc ~result:(Cil.var v) (res_value ()) ])
   in
 
   (* Retrieve the length of the arrays *)
@@ -193,8 +193,8 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
      arrays. This env will enable us to also check RTEs *)
   let env = Env.push env in
   (* Create the access to the arrays *)
-  let array1_iter_e = Constructor.mk_subscript ~loc array1 iter_e in
-  let array2_iter_e = Constructor.mk_subscript ~loc array2 iter_e in
+  let array1_iter_e = Smart_exp.subscript ~loc array1 iter_e in
+  let array2_iter_e = Smart_exp.subscript ~loc array2 iter_e in
   (* Check RTE on the arrays, filtering out bounding checks since the accesses
      are built already in bounds *)
   let filter a =
@@ -202,7 +202,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       Alarms.get_name (Index_out_of_bound (iter_e, Some len1_exp))
     in
     match a.annot_content with
-    | AAssert (_, _, { pred_name = hd :: _ })
+    | AAssert (_, { tp_statement = { pred_name = hd :: _ }})
       when Datatype.String.equal hd index_bound -> false
     | _ -> true
   in
@@ -212,12 +212,12 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   let cond = Cil.mkBinOp ~loc Ne array1_iter_e array2_iter_e in
   (* Create the statement representing the body of the for loop *)
   let body =
-    Constructor.mk_if
+    Smart_stmt.if_stmt
       ~loc
       ~cond
       (Cil.mkBlock [
-          Constructor.mk_assigns ~loc ~result:(Cil.var comparison_vi) (res_value ~flip:true ());
-          Constructor.mk_break ~loc
+          Smart_stmt.assigns ~loc ~result:(Cil.var comparison_vi) (res_value ~flip:true ());
+          Smart_stmt.break ~loc
         ])
   in
   (* Pop the env to build the body of the for loop *)
@@ -225,14 +225,14 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
 
   (* Create the statement representing the full for loop *)
   let for_loop =
-    (Constructor.mk_block_stmt
+    (Smart_stmt.block_stmt
        (Cil.mkBlock
           (Cil.mkForIncr
              ~iter
              ~first:(Cil.zero ~loc)
              ~stopat:len1_exp
              ~incr:(Cil.one ~loc)
-             ~body:[ Constructor.mk_block_stmt body_blk ]
+             ~body:[ Smart_stmt.block_stmt body_blk ]
           )
        )
     )
@@ -244,7 +244,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
 
   (* Add the check for the length before the for loop *)
   let prepend_coercion_check ~name env stmts array len =
-    let array_orig = Option.get (Constructor.extract_uncoerced_lval array) in
+    let array_orig = Option.get (Misc.extract_uncoerced_lval array) in
     if array_orig == array then
       stmts, env
     else
@@ -259,7 +259,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       in
       let p = { p with pred_name = "array_coercion" :: p.pred_name } in
       let stmt =
-        Constructor.mk_runtime_check Constructor.RTE kf e p
+        Smart_stmt.runtime_check Smart_stmt.RTE kf e p
       in
       stmt :: stmts, env
   in
@@ -272,17 +272,17 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
 
   (* Pop the env to build the full then block *)
   let then_blk, env =
-    pop_and_get_env env (Constructor.mk_block_stmt (Cil.mkBlock then_stmts))
+    pop_and_get_env env (Smart_stmt.block_stmt (Cil.mkBlock then_stmts))
   in
 
   (* Create the statement representing the whole generated code *)
   let stmt =
-    Constructor.mk_if
+    Smart_stmt.if_stmt
       ~loc
       ~cond:(Cil.mkBinOp ~loc Eq len1_exp len2_exp)
       then_blk
       ~else_blk:(Cil.mkBlock
-                   [ Constructor.mk_assigns
+                   [ Smart_stmt.assigns
                        ~loc
                        ~result:(Cil.var comparison_vi)
                        (res_value ~flip:true ()) ])

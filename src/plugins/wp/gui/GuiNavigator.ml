@@ -263,7 +263,7 @@ class behavior
                 | Some m , _ -> m
                 | None , VCS.NativeCoq -> VCS.EditMode
                 | None , VCS.NativeAltErgo -> VCS.FixMode
-                | _ -> VCS.BatchMode in
+                | _ -> if VCS.is_auto prover then VCS.BatchMode else VCS.FixMode in
               schedule (Prover.prove w ~mode ~result prover) ;
               refresh w
       end
@@ -291,7 +291,8 @@ class behavior
     val popup_tip  = new Widget.popup ()
     val popup_ergo = new Widget.popup ()
     val popup_coq  = new Widget.popup ()
-    val popup_why3 = new Widget.popup ()
+    val popup_why3_auto = new Widget.popup ()
+    val popup_why3_inter = new Widget.popup ()
     val mutable popup_target = None
 
     method private popup_delete () =
@@ -327,8 +328,10 @@ class behavior
         popup_tip#add_item ~label:"Run Script" ~callback:(self#popup_run BatchMode) ;
         popup_tip#add_item ~label:"Edit Proof" ~callback:(self#popup_run EditMode) ;
         popup_tip#add_item ~label:"Delete Script" ~callback:(self#popup_delete_script) ;
-        self#add_popup_proofmodes popup_why3
-          [ "Run",BatchMode ] ;
+        popup_why3_auto#add_item ~label:"Run Prover" ~callback:(self#popup_run VCS.BatchMode) ;
+        popup_why3_inter#add_item ~label:"Check Script" ~callback:(self#popup_run VCS.BatchMode) ;
+        popup_why3_inter#add_item ~label:"Edit Script" ~callback:(self#popup_run VCS.EditMode) ;
+        popup_why3_inter#add_item ~label:"Fixup Script" ~callback:(self#popup_run VCS.FixMode) ;
         self#add_popup_proofmodes popup_ergo
           [ "Run",BatchMode ; "Open Altgr-Ergo on Fail",EditMode ; "Open Altgr-Ergo",EditMode ] ;
         self#add_popup_proofmodes popup_coq
@@ -344,7 +347,10 @@ class behavior
         | Some Qed -> popup_qed#run ()
         | Some NativeCoq -> popup_coq#run ()
         | Some NativeAltErgo -> popup_ergo#run ()
-        | Some (Why3 _) -> popup_why3#run ()
+        | Some (Why3 _ as p) ->
+            if VCS.is_auto p
+            then popup_why3_auto#run ()
+            else popup_why3_inter#run ()
       end
 
     method private action w p =

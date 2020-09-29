@@ -85,12 +85,13 @@ module Replace_libc_functions =
                   RTL alternatives"
     end)
 
-module Full_mmodel =
+module Full_mtracking =
   False
     (struct
-      let option_name = "-e-acsl-full-mmodel"
+      let option_name = "-e-acsl-full-mtracking"
       let help = "maximal memory-related instrumentation"
     end)
+let () = Full_mtracking.add_aliases ~deprecated:true [ "-e-acsl-full-mmodel" ]
 
 module Builtins =
   String_set
@@ -142,7 +143,7 @@ let () = Cmdline.run_after_configuring_stage version
 let parameter_states =
   [ Valid.self;
     Gmp_only.self;
-    Full_mmodel.self;
+    Full_mtracking.self;
     Builtins.self;
     Temporal_validity.self;
     Validate_format_strings.self;

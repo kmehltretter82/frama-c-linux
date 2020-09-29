@@ -314,18 +314,25 @@ let schedule task =
   Task.spawn server (Task.thread task)
 
 let silent _ = ()
-let spawn ?(monitor=silent) ?pool ~all
+let spawn ?(monitor=silent) ?pool ~all ~smoke
     (jobs : ('a * bool Task.task) list) =
   if jobs <> [] then
     begin
       let step = ref 0 in
       let monitored = ref [] in
-      let canceled = ref false in
+      let finalized = ref false in
       let callback a r =
         if r then
-          begin if not all && not !canceled then
+          begin
+            if smoke then
               begin
-                canceled := true ;
+                finalized := true ;
+                monitor (Some a) ;
+              end
+            else
+            if not all && not !finalized then
+              begin
+                finalized := true ;
                 monitor (Some a) ;
                 List.iter Task.cancel !monitored ;
               end
@@ -333,7 +340,7 @@ let spawn ?(monitor=silent) ?pool ~all
         else
           begin
             decr step ;
-            if not !canceled && !step = 0 then
+            if not !finalized && !step = 0 then
               monitor None ;
           end in
       let pack (a,t) = Task.thread (t >>= Task.call (callback a)) in

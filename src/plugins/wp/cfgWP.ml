@@ -101,6 +101,10 @@ struct
   struct
     type t = effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
+    let pretty fmt e =
+      Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
+        P.pretty e.e_pid (Cvalues.pp_region M.pretty) e.e_region
+    [@@ warning "-32"]
   end
 
   module G = Qed.Collection.Make(TARGET)
@@ -140,9 +144,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a@ @[<hov 2>Prove %a@]"
-      Pcond.dump vc.hyps
-      F.pp_pred vc.goal
+    Format.fprintf fmt "%a"
+      (Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal) vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in
@@ -249,10 +252,6 @@ struct
     List.fold_left
       (fun vc (warn,hyp) -> assume_vc ?descr ?filter ?init ~warn [hyp] vc)
       vc whs
-
-  let passify_vc pa vc =
-    let hs = Passive.conditions pa (occurs_vc vc) in
-    assume_vc hs vc
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -362,6 +361,14 @@ struct
       (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
       targets
 
+  let passify_vc pa vc =
+    let hs = Passive.conditions pa (occurs_vc vc) in
+    assume_vc hs vc
+
+  let passify_vcs pa vcs =
+    if Passive.is_empty pa then vcs
+    else gmap (passify_vc pa) vcs
+
   (* -------------------------------------------------------------------------- *)
   (* --- Merge for Calculus                                                 --- *)
   (* -------------------------------------------------------------------------- *)
@@ -383,8 +390,8 @@ struct
       (fun () ->
          let sigma,pa1,pa2 = merge_sigma wp1.sigma wp2.sigma in
          let effects = Eset.union wp1.effects wp2.effects in
-         let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-         let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+         let vcs1 = passify_vcs pa1 wp1.vcs in
+         let vcs2 = passify_vcs pa2 wp2.vcs in
          let vcs = gmerge vcs1 vcs2 in
          { sigma = sigma ; vcs = vcs ; effects = effects }
       ) ()
@@ -651,15 +658,20 @@ struct
     if Clabels.is_here label then wp else
       in_wenv wenv wp
         (fun env wp ->
+           let frame = L.get_frame () in
            let s_here = L.current env in
-           let s_labl = L.mem_frame label in
-           let pa = Sigma.join s_here s_labl in
+           let s_frame =
+             if L.has_at_frame frame label then
+               L.mem_at_frame frame label
+             else
+               (L.set_at_frame frame label s_here ; s_here) in
+           let pa = Sigma.join s_here s_frame in
            let stop,effects = Eset.partition (is_stopeffect label) wp.effects in
            let vcs = Gmap.filter (not_posteffect stop) wp.vcs in
-           let vcs = gmap (passify_vc pa) vcs in
+           let vcs = passify_vcs pa vcs in
            let vcs = check_nothing stop vcs in
            let vcs = state_vcs stmt s_here vcs in
-           { sigma = Some s_here ; vcs=vcs ; effects=effects })
+           { sigma = Some s_frame ; vcs=vcs ; effects=effects })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : assignation                                              --- *)
@@ -806,8 +818,8 @@ struct
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
-             let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-             let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+             let vcs1 = passify_vcs pa1 wp1.vcs in
+             let vcs2 = passify_vcs pa2 wp2.vcs in
              gbranch
                ~left:(assume_vc ~descr:"Then" ~stmt ~warn [cond])
                ~right:(assume_vc ~descr:"Else" ~stmt ~warn [p_not cond])
@@ -1044,6 +1056,7 @@ struct
     let seq_post = cc_havoc dom_call seq_result.pre in
     let seq_exit = cc_havoc dom_call (sigma_at wexit) in
     (* Pre-State *)
+    (* Passive: joined later by call_proper *)
     let sigma_pre, _, _ = Sigma.merge seq_post.pre seq_exit.pre in
     let formals = List.map (C.exp sigma_pre) es in
     let call = L.call kf formals in
@@ -1200,11 +1213,10 @@ struct
             let hs = M.frame (L.current env) in
             let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
-        | Mcfg.SC_Function_in -> wp
-        | Mcfg.SC_Function_frame ->
-            wp_scope env wp ~descr:"Function Frame" Enter xs
-        | Mcfg.SC_Function_out ->
-            wp_scope env wp ~descr:"Function Exit" Leave xs
+        | Mcfg.SC_Frame_in ->
+            wp_scope env wp ~descr:"Frame In" Enter xs
+        | Mcfg.SC_Frame_out ->
+            wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
             wp_scope env wp ~descr:"Block In" Enter xs
         | Mcfg.SC_Block_out ->
@@ -1394,7 +1406,7 @@ struct
   let compile_lemma l = ignore (VCG.lemma l)
 
   let prove_lemma collection l =
-    if not l.lem_axiom then
+    if l.lem_kind <> `Axiom then
       begin
         let id = WpPropId.mk_lemma_id l in
         let def = VCG.lemma l in

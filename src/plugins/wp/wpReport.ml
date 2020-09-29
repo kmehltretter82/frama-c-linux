@@ -609,7 +609,7 @@ let pstats ~config fmt s cmd arg =
   | "wp" | "qed" -> stat ~config fmt (get_prover s VCS.Qed) arg
   | cmd when is_stat_name cmd -> stat ~config fmt s.main cmd
   | prover ->
-      match (VCS.prover_of_name prover) with
+      match (VCS.parse_prover prover) with
       | None -> Wp_parameters.error ~once:true "Unknown prover name %s" prover
       | Some prover -> stat ~config fmt (get_prover s prover) arg
 

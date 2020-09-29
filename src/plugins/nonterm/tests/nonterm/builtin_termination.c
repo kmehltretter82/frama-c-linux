@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-val-builtin strlen:Frama_C_strlen"
+   STDOPT: #"-eva-builtin strlen:Frama_C_strlen"
  */
 
 #include <string.h>

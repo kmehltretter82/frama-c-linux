@@ -1,8 +1,12 @@
 ( library
-  (name eacsl)
+  (name E_ACSL)
   (public_name frama-c-e-acsl.core)
   (flags -open Frama_c_kernel)
-  (libraries frama-c.kernel)
+ (libraries frama-c.kernel
+  (select dep_eva.ml from
+        (frama-c-eva.core -> dep_eva.enabled.ml)
+        ( -> dep_eva.disabled.ml)
+ ))
 )
 
 (plugin (optional) (name e-acsl) (libraries frama-c-e-acsl.core) (site (frama-c plugins)))
@@ -11,4 +15,5 @@
 (copy_files# src/analyses/*.ml*)
 (copy_files# src/code_generator/*.ml*)
 (copy_files# src/libraries/*.ml*)
+(copy_files# src/dependencies/*.ml*)
 (copy_files# src/project_initializer/*.ml*)

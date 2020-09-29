@@ -57,10 +57,12 @@ let trim name =
 (* --- Definition Blocks                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+type lkind = [ `Axiom | `Check | `Lemma ]
+
 type logic_lemma = {
   lem_name : string ;
+  lem_kind : lkind ;
   lem_position : Filepath.position ;
-  lem_axiom : bool ;
   lem_types : string list ;
   lem_labels : logic_label list ;
   lem_property : predicate ;
@@ -192,27 +194,36 @@ let pp_profile fmt l =
 
 let ip_lemma l =
   let open Property in
-  (if l.lem_axiom then Property.ip_axiom else Property.ip_lemma)
+  let mk_prop, only_check =
+    match l.lem_kind with
+    | `Axiom -> Property.ip_axiom, false
+    | `Lemma -> Property.ip_lemma, false
+    | `Check -> Property.ip_lemma, true
+  in
+  mk_prop
     {il_name = l.lem_name; il_labels = l.lem_labels;
      il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
-     il_pred = l.lem_property}
+     il_pred = Logic_const.toplevel_predicate ~only_check l.lem_property}
 
-let lemma_of_global proof = function
-  | Dlemma(name,axiom,labels,types,pred,_,loc) -> {
-      lem_name = name ;
-      lem_position = fst loc ;
-      lem_types = types ;
-      lem_labels = labels ;
-      lem_axiom = axiom ;
-      lem_property = pred ;
-      lem_depends = proof ;
-    }
+let lemma_of_global ~context = function
+  | Dlemma(name,axiom,labels,types,pred,_,loc) ->
+      let kind = if axiom then `Axiom else
+        if pred.tp_only_check then `Check else `Lemma in
+      {
+        lem_name = name ;
+        lem_position = fst loc ;
+        lem_types = types ;
+        lem_labels = labels ;
+        lem_kind = kind ;
+        lem_property = pred.tp_statement ;
+        lem_depends = context ;
+      }
   | _ -> assert false
 
-let populate a proof = function
+let populate a ~context = function
   | Dfun_or_pred(l,_) -> a.ax_logics <- l :: a.ax_logics
   | Dtype(t,_) -> a.ax_types <- t :: a.ax_types
-  | Dlemma _ as g -> a.ax_lemmas <- lemma_of_global proof g :: a.ax_lemmas
+  | Dlemma _ as g -> a.ax_lemmas <- lemma_of_global ~context g :: a.ax_lemmas
   | _ -> ()
 
 let ip_of_axiomatic g =
@@ -220,7 +231,7 @@ let ip_of_axiomatic g =
   | None -> assert false
   | Some ip -> ip
 
-let axiomatic_of_global proof = function
+let axiomatic_of_global ~context = function
   | Daxiomatic(name,globals,_,loc) as g ->
       let a = {
         ax_name = name ;
@@ -229,7 +240,7 @@ let axiomatic_of_global proof = function
         ax_reads = Varinfo.Set.empty ;
         ax_types = [] ; ax_lemmas = [] ; ax_logics = [] ;
       } in
-      List.iter (populate a proof) globals ;
+      List.iter (populate a ~context) globals ;
       a.ax_types <- List.rev a.ax_types ;
       a.ax_logics <- List.rev a.ax_logics ;
       a.ax_lemmas <- List.rev a.ax_lemmas ;
@@ -402,7 +413,8 @@ class visitor =
       | Dlemma _ ->
           let lem = lemma_of_global database.proofcontext global in
           register_lemma database self#section lem ;
-          database.proofcontext <- lem :: database.proofcontext ;
+          if lem.lem_kind <> `Check then
+            database.proofcontext <- lem :: database.proofcontext ;
           SkipChildren
 
       | Dtype(t,_) ->
@@ -489,6 +501,11 @@ let iter_lemmas f =
   let d = Database.get () in
   SMap.iter (fun _name (lem,_) -> f lem) d.lemmas
 
+let fold_lemmas f =
+  compute () ;
+  let d = Database.get () in
+  SMap.fold (fun _name (lem,_) -> f lem) d.lemmas
+
 let logic_lemma l = fst (get_lemma l)
 
 let section_of_lemma l = snd (get_lemma l)
@@ -502,9 +519,9 @@ let proof_context () =
 (* --- Dump API                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let dump_type fmt t = Format.fprintf fmt " * type '%s'@\n" t.lt_name
+let pp_type fmt t = Format.fprintf fmt " * type '%s'@\n" t.lt_name
 
-let dump_profile fmt kind l =
+let pp_sig fmt kind l =
   begin
     Format.fprintf fmt " * %s '%s'@\n" kind (compute_logicname l) ;
     if is_overloaded l then
@@ -513,11 +530,11 @@ let dump_profile fmt kind l =
       Format.fprintf fmt "   recursive@\n" ;
   end
 
-let dump_logic fmt d l =
+let pp_decl fmt d l =
   begin
     try
       let cases = LMap.find l d.cases in
-      dump_profile fmt "inductive" l ;
+      pp_sig fmt "inductive" l ;
       List.iter
         (fun ind ->
            Format.fprintf fmt "   @[case %s:" ind.ind_case ;
@@ -532,14 +549,16 @@ let dump_logic fmt d l =
         ) cases ;
     with Not_found ->
       let kind = if l.l_type = None then "predicate" else "function" in
-      dump_profile fmt kind l ;
+      pp_sig fmt kind l ;
   end
 
-let dump_lemma fmt l =
-  if l.lem_axiom then
-    Format.fprintf fmt " * axiom '%s'@\n" l.lem_name
-  else
-    Format.fprintf fmt " * lemma '%s'@\n" l.lem_name
+let pp_kind fmt = function
+  | `Axiom -> Format.pp_print_string fmt "axiom"
+  | `Lemma -> Format.pp_print_string fmt "lemma"
+  | `Check -> Format.pp_print_string fmt "check lemma"
+
+let pp_lemma fmt l =
+  Format.fprintf fmt " * %a '%s'@\n" pp_kind l.lem_kind l.lem_name
 
 let get_name l = compute () ; compute_logicname l
 
@@ -556,9 +575,9 @@ let dump () =
       SMap.iter
         (fun _ a ->
            Format.fprintf fmt "Axiomatic %s {@\n" a.ax_name ;
-           List.iter (dump_type fmt) a.ax_types ;
-           List.iter (dump_logic fmt d) a.ax_logics ;
-           List.iter (dump_lemma fmt) a.ax_lemmas ;
+           List.iter (pp_type fmt) a.ax_types ;
+           List.iter (pp_decl fmt d) a.ax_logics ;
+           List.iter (pp_lemma fmt) a.ax_lemmas ;
            Format.fprintf fmt "}@\n"
         ) d.axiomatics ;
       TMap.iter
@@ -573,8 +592,8 @@ let dump () =
         d.logics ;
       SMap.iter
         (fun l (lem,s) ->
-           Format.fprintf fmt " * %s '%s' in %a@\n"
-             (if lem.lem_axiom then "axiom" else "lemma")
+           Format.fprintf fmt " * %a '%s' in %a@\n"
+             pp_kind lem.lem_kind
              l pp_section s)
         d.lemmas ;
       Format.fprintf fmt "-------------------------------------------------@." ;

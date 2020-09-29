@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_typed/cast_fits.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] tests/wp_typed/cast_fits.i:13: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_L2_2*)
@@ -14,11 +13,11 @@
      (target: __anonunion_L8_8*)
 [wp] 8 goals scheduled
 [wp] [Alt-Ergo] Goal typed_fits1_ensures : Valid
+[wp] [Alt-Ergo] Goal typed_mismatch1_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_fits2_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits3_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits4_ensures : Valid
 [wp] [Alt-Ergo] Goal typed_fits5_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_mismatch1_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_mismatch2_ensures : Unsuccess (Stronger)
 [wp] [Alt-Ergo] Goal typed_mismatch3_ensures : Unsuccess (Stronger)
 [wp] Proved goals:    5 / 8

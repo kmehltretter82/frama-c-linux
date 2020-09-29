@@ -138,8 +138,7 @@ let use_spec_instead_of_definition kf =
   not (Kernel_function.is_definition kf) ||
   Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
   Builtins.is_builtin_overridden kf ||
-  Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ()) ||
-  Value_parameters.LoadFunctionState.mem kf
+  Kernel_function.Set.mem kf (Value_parameters.UsePrototype.get ())
 
 let eval_predicate ~pre ~here p =
   let open Eval_terms in

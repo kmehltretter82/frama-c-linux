@@ -121,6 +121,7 @@ struct
   let add_assigns env (pid,_) k =
     let u = node () in
     Format.fprintf !out "  %a [ color=red , label=\"Assigns %a\" ] ;@." pretty u WpPropId.pp_propid pid ;
+    Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
     merge env u k
 
   let use_assigns _env _stmt region d k =
@@ -215,7 +216,9 @@ struct
             (fun (_,p) -> Format.fprintf fmt "\n@[<hov 2>Requires %a ;@]"
                 Printer.pp_predicate p) pre
       end ;
-    ignore pre ; merge env u k
+    ignore pre ;
+    Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
+    merge env u k
 
   let call env stmt _r kf _es ~pre ~post ~pexit ~assigns ~p_post ~p_exit =
     let u_post = List.fold_right (add_hyp env) post p_post in
@@ -231,9 +234,8 @@ struct
   let pp_scope sc fmt xs =
     let title = match sc with
       | Mcfg.SC_Global -> "Global"
-      | Mcfg.SC_Function_in -> "F-in"
-      | Mcfg.SC_Function_frame -> "F-frame"
-      | Mcfg.SC_Function_out -> "F-out"
+      | Mcfg.SC_Frame_in -> "F-in"
+      | Mcfg.SC_Frame_out -> "F-out"
       | Mcfg.SC_Block_in -> "B-in"
       | Mcfg.SC_Block_out -> "B-out"
     in begin

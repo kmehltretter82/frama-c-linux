@@ -1,3 +1,5 @@
+[kernel] Warning: -slevel is a deprecated alias for option -eva-slevel.
+  Please use -eva-slevel instead.
 [kernel] Parsing summary.i (no preprocessing)
 [rte] annotating function alarms
 [rte] annotating function bottom

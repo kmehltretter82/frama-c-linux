@@ -27,13 +27,13 @@ open Cil_types
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let translate_named_predicate_ref
+let translate_predicate_ref
   : (kernel_function -> Env.t -> predicate -> Env.t) ref
-  = Extlib.mk_fun "translate_named_predicate_ref"
+  = Extlib.mk_fun "translate_predicate_ref"
 
-let named_predicate_ref
+let predicate_to_exp_ref
   : (kernel_function -> Env.t -> predicate -> exp * Env.t) ref
-  = Extlib.mk_fun "named_predicate_ref"
+  = Extlib.mk_fun "predicate_to_exp_ref"
 
 let term_to_exp_ref
   : (kernel_function -> Env.t -> term -> exp * Env.t) ref
@@ -53,17 +53,17 @@ let preserve_invariant env kf stmt = match stmt.skind with
         let invariants, env = Env.pop_loop env in
         let env = Env.push env in
         let env =
-          let translate_named_predicate = !translate_named_predicate_ref in
+          let translate_named_predicate = !translate_predicate_ref in
           List.fold_left (translate_named_predicate kf) env invariants
         in
         let blk, env =
           Env.pop_and_get env last ~global_clear:false Env.Before
         in
-        Constructor.mk_block last blk :: stmts, env
+        Smart_stmt.block last blk :: stmts, env
       | s :: tl ->
         handle_invariants (s :: stmts, env) tl
     in
-    let env = Env.set_annotation_kind env Constructor.Invariant in
+    let env = Env.set_annotation_kind env Smart_stmt.Invariant in
     let stmts, env = handle_invariants ([], env) stmts in
     let new_blk = { blk with bstmts = List.rev stmts } in
     { stmt with skind = Loop([], new_blk, loc, cont, break) },
@@ -212,7 +212,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         Env.Middle
     in
     (* generate the guard [x bop t2] *)
-    let block_to_stmt b = Constructor.mk_block_stmt b in
+    let block_to_stmt b = Smart_stmt.block_stmt b in
     let tlv = Logic_const.tvar ~loc logic_x in
     let guard =
       (* must copy [t2] to force being typed again *)
@@ -221,10 +221,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int guard;
     let guard_exp, env = term_to_exp kf (Env.push env) guard in
-    let break_stmt = Constructor.mk_break ~loc:guard_exp.eloc in
+    let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
         env
-        (Constructor.mk_if
+        (Smart_stmt.if_stmt
            ~loc:guard_exp.eloc
            ~cond:guard_exp
            (mkBlock [ mkEmptyStmt ~loc () ])
@@ -249,12 +249,12 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       | None ->
         guard :: body @ [ next ], env
       | Some p ->
-        let e, env = !named_predicate_ref kf (Env.push env) p in
+        let e, env = !predicate_to_exp_ref kf (Env.push env) p in
         let stmt, env =
-          Constructor.mk_runtime_check Constructor.RTE kf e p, env
+          Smart_stmt.runtime_check Smart_stmt.RTE kf e p, env
         in
         let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
-        let guard_for_small_type = Constructor.mk_block_stmt b in
+        let guard_for_small_type = Smart_stmt.block_stmt b in
         guard_for_small_type :: guard :: body @ [ next ], env
     in
     let start = block_to_stmt init_blk in

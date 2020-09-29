@@ -297,7 +297,7 @@ let add_zeroes = add_v (V_Or_Uninitialized.initialized Cvalue.V.singleton_zero)
    [orig_state]: state before any allocation, returned in case of failure;
    [state_after_alloc]: state in case the allocation is successful;
    [returns_null]: if given, forces the result to consider/ignore the
-   possibility of failure, despite -val-alloc-returns-null. *)
+   possibility of failure, despite -eva-alloc-returns-null. *)
 let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
   let default_returns_null = Value_parameters.AllocReturnsNull.get () in
   let returns_null = Extlib.opt_conv default_returns_null returns_null in

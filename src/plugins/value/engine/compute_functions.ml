@@ -55,7 +55,7 @@ let options_ok () =
   Value_parameters.UsePrototype.iter (fun kf -> check_assigns kf)
 
 (* Do something tasteless in case the user did not put a spec on functions
-   for which he set [-val-use-spec]:  generate an incorrect one ourselves *)
+   for which he set [-eva-use-spec]:  generate an incorrect one ourselves *)
 let generate_specs () =
   let aux kf =
     if need_assigns kf then begin
@@ -91,12 +91,9 @@ let post_analysis_cleanup ~aborted =
   if Value_parameters.JoinResults.get () then
     Db.Value.Table_By_Callstack.iter
       (fun s _ -> ignore (Db.Value.get_stmt_state s));
-  if not aborted then begin
+  if not aborted then
     (* Keep memexec results for users that want to resume the analysis *)
-    Mem_exec.cleanup_results ();
-    if not (Value_parameters.SaveFunctionState.is_empty ()) then
-      State_import.save_globals_state ();
-  end
+    Mem_exec.cleanup_results ()
 
 let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
@@ -159,7 +156,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Compute a call to [kf] in the state [state]. The evaluation will
      be done either using the body of [kf] or its specification, depending
-     on whether the body exists and on option [-val-use-spec]. [call_kinstr]
+     on whether the body exists and on option [-eva-use-spec]. [call_kinstr]
      is the instruction at which the call takes place, and is used to update
      the statuses of the preconditions of [kf]. If [show_progress] is true,
      the callstack and additional information are printed. *)
