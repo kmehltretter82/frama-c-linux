@@ -24,14 +24,11 @@
 
 open Cil_types
 
+val recursive_spec: kernel_function -> funspec
+
 val is_recursive_call: kernel_function -> bool
 (** Given  the current state of the call stack, detect whether the
     given given function would start a recursive cycle. *)
-
-val empty_spec_for_recursive_call: kernel_function -> spec
-(** Generate an empty spec [assigns \nothing] or
-    [assigns \result \from \nothing], to be used to "approximate" the
-    results of a recursive call. *)
 
 (** TODO *)
 val make_recursive_call: kernel_function -> Eval.recursion

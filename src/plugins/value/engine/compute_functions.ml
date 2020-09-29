@@ -154,6 +154,14 @@ module Make (Abstract: Abstractions.Eva) = struct
     | None -> fun _ -> assert false
     | Some get -> fun location -> get location
 
+  let unroll_recursive_call kf =
+    let call_stack = Value_util.call_stack () in
+    let previous_calls = List.filter (fun (f, _) -> f == kf) call_stack in
+    let depth = List.length previous_calls in
+    assert (depth > 0);
+    let limit = Value_parameters.RecursiveUnroll.get () in
+    depth <= limit
+
   (* Compute a call to [kf] in the state [state]. The evaluation will
      be done either using the body of [kf] or its specification, depending
      on whether the body exists and on option [-eva-use-spec]. [call_kinstr]
@@ -172,8 +180,8 @@ module Make (Abstract: Abstractions.Eva) = struct
         Value_types.Callstack.pretty_short call_stack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc call_kinstr);
     let use_spec =
-      if call.recursive then
-        `Spec (Recursion.empty_spec_for_recursive_call kf)
+      if call.recursive && not (unroll_recursive_call kf) then
+        `Spec (Recursion.recursive_spec kf)
       else
         match kf.fundec with
         | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)

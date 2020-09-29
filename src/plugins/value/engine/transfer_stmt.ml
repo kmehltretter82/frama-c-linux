@@ -472,22 +472,15 @@ module Make (Abstract: Abstractions.Eva) = struct
       >>- fun reductions ->
       (* The formals (and the locals) of the called function leave scope. *)
       let post = Domain.leave_scope kf_callee leaving_vars state in
+      let recursion = Option.map Recursion.revert_recursion recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
       Domain.finalize_call stmt call recursion ~pre ~post >>- fun state ->
       (* Backward propagates the [reductions] on the concrete arguments. *)
       reduce_arguments reductions state >>- fun state ->
       treat_return ~kf_callee lv call.return stmt state
-    and process_recursive state =
-      (* When the call is recursive, formals have not been added to the
-         domains. Do not reduce them, and more importantly, do not remove
-         them from the scope. (Because the instance from the initial,
-         non-recursive, call are still present.) *)
-      Domain.finalize_call stmt call recursion ~pre ~post:state >>- fun state ->
-      treat_return ~kf_callee lv call.return stmt state
     in
     let states =
-      let process = if call.recursive then process_recursive else process in
       List.fold_left
         (fun acc return -> Bottom.add_to_list (process return) acc)
         [] result
@@ -536,25 +529,17 @@ module Make (Abstract: Abstractions.Eva) = struct
     let recursive = Recursion.is_recursive_call kf in
     let return = Library_functions.get_retres_vi kf in
     let arguments, rest =
-      if recursive then
-        (* For recursive calls, we evaluate 'assigns \result \from \nothing'
-           using a specification. We generate a dummy [call] object in which
-           formals are not present. This way, domains will not overwrite
-           the formals of the recursive function (which would be present
-           in scope twice). *)
-        [], []
-      else
-        let formals = Kernel_function.get_formals kf in
-        let rec format_arguments acc args formals = match args, formals with
-          | _, [] -> acc, args
-          | [], _ -> assert false
-          | (concrete, avalue) :: args, formal :: formals ->
-            let argument = { formal ; concrete; avalue } in
-            format_arguments (argument :: acc)  args formals
-        in
-        let arguments, rest = format_arguments [] args formals in
-        let arguments = List.rev arguments in
-        arguments, rest
+      let formals = Kernel_function.get_formals kf in
+      let rec format_arguments acc args formals = match args, formals with
+        | _, [] -> acc, args
+        | [], _ -> assert false
+        | (concrete, avalue) :: args, formal :: formals ->
+          let argument = { formal ; concrete; avalue } in
+          format_arguments (argument :: acc)  args formals
+      in
+      let arguments, rest = format_arguments [] args formals in
+      let arguments = List.rev arguments in
+      arguments, rest
     in
     {kf; arguments; rest; return; recursive; }
 

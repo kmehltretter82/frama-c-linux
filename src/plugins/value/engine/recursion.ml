@@ -37,18 +37,29 @@ let check_formals_non_referenced kf =
        whose address is taken. Analysis may be unsound."
       Kernel_function.pretty kf
 
-let warn_recursive_call kf call_stack =
+let warn_recursive_call kf =
   Value_parameters.feedback ~once:true ~current:true
-    "@[@[detected@ recursive@ call@ (%a <- %a)@]@;@]"
-    Kernel_function.pretty kf Value_types.Callstack.pretty call_stack;
+    "@[detected recursive call@ of function %a.@]"
+    Kernel_function.pretty kf;
   check_formals_non_referenced kf
+
+let recursive_spec kf =
+  let funspec = Annotations.funspec ~populate:false kf in
+  if Cil.is_empty_funspec funspec then
+    Value_parameters.abort ~current:true
+      "@[Recursive call to %a@ without a specification.@ Try to increase@ \
+       the %s parameter@ or write a specification@ for function %a.@]"
+      Kernel_function.pretty kf
+      Value_parameters.RecursiveUnroll.name
+      Kernel_function.pretty kf
+  else funspec
 
 (* Check whether the function at the top of the call-stack starts a
    recursive call. *)
 let is_recursive_call kf =
   let call_stack = Value_util.call_stack () in
   if List.exists (fun (f, _) -> f == kf) call_stack
-  then (warn_recursive_call kf call_stack; true)
+  then (warn_recursive_call kf; true)
   else false
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]
@@ -74,7 +85,7 @@ let _spec_for_recursive_call kf =
       ~silent_about_merging_behav:true spec initial_spec;
     spec
 
-let empty_spec_for_recursive_call kf =
+let _empty_spec_for_recursive_call kf =
   let typ_res = Kernel_function.get_return_type kf in
   let empty = Cil.empty_funspec () in
   let assigns =
