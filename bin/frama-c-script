@@ -85,6 +85,9 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
+# All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
+# directory containing frama-c, frama-c-config and frama-c-script.
+export FRAMAC_BIN="$DIR"
 FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
@@ -137,12 +140,12 @@ make_path() {
         esac
     fi
     cat <<EOF > "${dir}/path.mk"
-FRAMAC_DIR=${DIR}
-ifeq (\$(wildcard \$(FRAMAC_DIR)),)
+FRAMAC_BIN=${DIR}
+ifeq (\$(wildcard \$(FRAMAC_BIN)),)
 # Frama-C not installed locally; using the version in the PATH
 else
-FRAMAC=\$(FRAMAC_DIR)/frama-c
-FRAMAC_GUI=\$(FRAMAC_DIR)/frama-c-gui
+FRAMAC=\$(FRAMAC_BIN)/frama-c
+FRAMAC_GUI=\$(FRAMAC_BIN)/frama-c-gui
 endif
 EOF
     echo "Wrote to: ${dir}/path.mk"
