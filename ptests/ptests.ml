@@ -1081,6 +1081,12 @@ let command_string ~result_fmt ~oracle_fmt command =
    *     in
    *     Some (exec_name ^ params)
    * in *)
+    let filter_stdout_begin,filter_stdout_end = match command.filter with
+    | None -> "",""
+    | Some filter ->
+      "(pipe-stdout ",
+      Format.sprintf "(system %S))" filter
+  in
   let command_string = basic_command_string command in
   (* let command_string = match filter with
    *   | None -> command_string
@@ -1114,7 +1120,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a (universe))\n  \
-     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1 125) (system %S)))))\n\
+     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 125) (system %S))%s)))\n\
      )@."
     errlog
     res
@@ -1124,7 +1130,9 @@ let command_string ~result_fmt ~oracle_fmt command =
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     errlog
     res
+    filter_stdout_begin
     command_string
+    filter_stdout_end
   ;
     Format.fprintf result_fmt
     "(rule\n  \

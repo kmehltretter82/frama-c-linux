@@ -1,6 +1,6 @@
 /* run.config
    CMXS: machdep_char_unsigned
-   OPT:-print -load-module machdep_char_unsigned -machdep unsigned_char -then -constfold -rte
+   OPT:-print -load-module %{dep:machdep_char_unsigned.cmxs} -machdep unsigned_char -then -constfold -rte
 */
 char t[10];
 
