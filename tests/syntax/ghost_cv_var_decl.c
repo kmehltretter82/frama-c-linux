@@ -1,6 +1,6 @@
 /* run.config
    OPT:-cpp-extra-args="-DFAIL_DECL_TYPE"
-   OPT:-load-script @PTEST_DIR@/@PTEST_NAME@.ml
+   OPT:-load-script %{dep:@PTEST_NAME@.ml}
 */
 
 

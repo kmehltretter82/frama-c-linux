@@ -1,3 +1,287 @@
-[kernel] User Error: Missing source file 'tests/syntax/ghost_cv_var_decl.ml'
-[kernel] User Error: Deferred error message was emitted during execution. See above messages for more information.
-[kernel] Frama-C aborted: invalid user input.
+[kernel] Parsing ghost_cv_var_decl.c (with preprocessing)
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:12: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:22: 'g1' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:23: 'g2' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:32: 
+  'g0' elements are already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:45: 'g0' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:175: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:184: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:191: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:200: 'b' is already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:207: 
+  'b' elements are already ghost
+[kernel:ghost:already-ghost] ghost_cv_var_decl.c:216: 
+  'b' elements are already ghost
+[kernel] ghost_cv_var_decl.c:8
+   f_ints: normal
+[kernel] ghost_cv_var_decl.c:9
+   ng: normal
+[kernel] ghost_cv_var_decl.c:11
+   g0: ghost
+[kernel] ghost_cv_var_decl.c:12
+   g1: ghost
+[kernel] ghost_cv_var_decl.c:15
+   f_ptrs: normal
+[kernel] ghost_cv_var_decl.c:16
+   ng: normal -> normal
+[kernel] ghost_cv_var_decl.c:19
+   g: ghost -> normal
+[kernel] ghost_cv_var_decl.c:20
+   g0: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:22
+   g1: ghost -> normal
+[kernel] ghost_cv_var_decl.c:23
+   g2: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:27
+   f_arrays: normal
+[kernel] ghost_cv_var_decl.c:28
+   ng: normal -> normal
+[kernel] ghost_cv_var_decl.c:31
+   g: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:32
+   g0: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:40
+   f_structs: normal
+[kernel] ghost_cv_var_decl.c:41
+   ng: normal -> { field: normal }
+[kernel] ghost_cv_var_decl.c:44
+   g: ghost -> { field: ghost }
+[kernel] ghost_cv_var_decl.c:45
+   g0: ghost -> { field: ghost }
+[kernel] ghost_cv_var_decl.c:52
+   named: normal
+[kernel] ghost_cv_var_decl.c:53
+   a: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:54
+   ptr: ghost -> normal
+[kernel] ghost_cv_var_decl.c:73
+   nesting_non_ghost: normal
+[kernel] ghost_cv_var_decl.c:74
+   a: normal
+[kernel] ghost_cv_var_decl.c:75
+   ptr: normal -> normal
+[kernel] ghost_cv_var_decl.c:76
+   array: normal -> normal
+[kernel] ghost_cv_var_decl.c:78
+   pptr: normal -> normal -> normal
+[kernel] ghost_cv_var_decl.c:79
+   parray: normal -> normal -> normal
+[kernel] ghost_cv_var_decl.c:80
+   aptr: normal -> normal -> normal
+[kernel] ghost_cv_var_decl.c:81
+   aarray: normal -> normal -> normal
+[kernel] ghost_cv_var_decl.c:83
+   sp: normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:84
+   sa: normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:85
+   spa: normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:86
+   sap: normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:88
+   psp: normal -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:89
+   psa: normal -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:90
+   pspa: normal -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:91
+   psap: normal -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:93
+   asp: normal -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:94
+   asa: normal -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:95
+   aspa: normal -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:96
+   asap: normal -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:101
+   nesting_ghost: normal
+[kernel] ghost_cv_var_decl.c:103
+   a: ghost
+[kernel] ghost_cv_var_decl.c:104
+   ptr: ghost -> normal
+[kernel] ghost_cv_var_decl.c:105
+   ptrg: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:107
+   array: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:109
+   pptr: ghost -> normal -> normal
+[kernel] ghost_cv_var_decl.c:110
+   pptrg: ghost -> ghost -> normal
+[kernel] ghost_cv_var_decl.c:111
+   pptrgg: ghost -> ghost -> ghost
+[kernel] ghost_cv_var_decl.c:113
+   parray: ghost -> normal -> normal
+[kernel] ghost_cv_var_decl.c:114
+   parrayg: ghost -> ghost -> ghost
+[kernel] ghost_cv_var_decl.c:116
+   aptr: ghost -> ghost -> normal
+[kernel] ghost_cv_var_decl.c:117
+   aptrg: ghost -> ghost -> ghost
+[kernel] ghost_cv_var_decl.c:119
+   aarray: ghost -> ghost -> ghost
+[kernel] ghost_cv_var_decl.c:121
+   sp: ghost -> { field: ghost -> normal }
+[kernel] ghost_cv_var_decl.c:122
+   sa: ghost -> { field: ghost -> ghost }
+[kernel] ghost_cv_var_decl.c:123
+   spa: ghost -> { field: ghost -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:124
+   sap: ghost -> { field: ghost -> ghost -> normal }
+[kernel] ghost_cv_var_decl.c:126
+   psp: ghost -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:127
+   pspg: ghost -> ghost -> { field: ghost -> normal }
+[kernel] ghost_cv_var_decl.c:129
+   psa: ghost -> normal -> { field: normal -> normal }
+[kernel] ghost_cv_var_decl.c:130
+   psag: ghost -> ghost -> { field: ghost -> ghost }
+[kernel] ghost_cv_var_decl.c:132
+   pspa: ghost -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:133
+   pspag: ghost -> ghost -> { field: ghost -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:135
+   psap: ghost -> normal -> { field: normal -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:136
+   psapg: ghost -> ghost -> { field: ghost -> ghost -> normal }
+[kernel] ghost_cv_var_decl.c:138
+   asp: ghost -> ghost -> { field: ghost -> normal }
+[kernel] ghost_cv_var_decl.c:139
+   asa: ghost -> ghost -> { field: ghost -> ghost }
+[kernel] ghost_cv_var_decl.c:140
+   aspa: ghost -> ghost -> { field: ghost -> normal -> normal }
+[kernel] ghost_cv_var_decl.c:141
+   asap: ghost -> ghost -> { field: ghost -> ghost -> normal }
+[kernel] ghost_cv_var_decl.c:171
+   foo_1: normal
+[kernel] ghost_cv_var_decl.c:171
+   a: normal
+[kernel] ghost_cv_var_decl.c:175
+   foo_2: normal
+[kernel] ghost_cv_var_decl.c:175
+   a: normal
+[kernel] ghost_cv_var_decl.c:175
+   b: ghost
+[kernel] ghost_cv_var_decl.c:179
+   foo_3: normal
+[kernel] ghost_cv_var_decl.c:179
+   a: normal
+[kernel] ghost_cv_var_decl.c:179
+   b: ghost
+[kernel] ghost_cv_var_decl.c:179
+   c: ghost
+[kernel] ghost_cv_var_decl.c:183
+   bar_1: normal
+[kernel] :0
+   a: normal
+[kernel] ghost_cv_var_decl.c:184
+   bar_2: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost
+[kernel] ghost_cv_var_decl.c:185
+   bar_3: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost
+[kernel] :0
+   c: ghost
+[kernel] ghost_cv_var_decl.c:187
+   pfoo_1: normal
+[kernel] ghost_cv_var_decl.c:187
+   a: normal -> normal
+[kernel] ghost_cv_var_decl.c:191
+   pfoo_2: normal
+[kernel] ghost_cv_var_decl.c:191
+   a: normal
+[kernel] ghost_cv_var_decl.c:191
+   b: ghost -> normal
+[kernel] ghost_cv_var_decl.c:195
+   pfoo_3: normal
+[kernel] ghost_cv_var_decl.c:195
+   a: normal
+[kernel] ghost_cv_var_decl.c:195
+   b: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:195
+   c: ghost -> normal
+[kernel] ghost_cv_var_decl.c:199
+   pbar_1: normal
+[kernel] :0
+   a: normal -> normal
+[kernel] ghost_cv_var_decl.c:200
+   pbar_2: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost -> normal
+[kernel] ghost_cv_var_decl.c:201
+   pbar_3: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost -> ghost
+[kernel] :0
+   c: ghost -> normal
+[kernel] ghost_cv_var_decl.c:203
+   afoo_1: normal
+[kernel] ghost_cv_var_decl.c:203
+   a: normal -> normal
+[kernel] ghost_cv_var_decl.c:207
+   afoo_2: normal
+[kernel] ghost_cv_var_decl.c:207
+   a: normal
+[kernel] ghost_cv_var_decl.c:207
+   b: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:211
+   afoo_3: normal
+[kernel] ghost_cv_var_decl.c:211
+   a: normal
+[kernel] ghost_cv_var_decl.c:211
+   b: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:215
+   abar_1: normal
+[kernel] :0
+   a: normal -> normal
+[kernel] ghost_cv_var_decl.c:216
+   abar_2: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:217
+   abar_3: normal
+[kernel] :0
+   a: normal
+[kernel] :0
+   b: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:220
+   reference_functions: normal
+[kernel] ghost_cv_var_decl.c:225
+   v: normal
+[kernel] ghost_cv_var_decl.c:226
+   gp: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:231
+   ng: normal -> normal
+[kernel] ghost_cv_var_decl.c:232
+   ga: ghost -> ghost
+[kernel] ghost_cv_var_decl.c:245
+   x: ghost
+[kernel] ghost_cv_var_decl.c:239
+   i: normal
+[kernel] ghost_cv_var_decl.c:240
+   p: normal -> normal
+[kernel] ghost_cv_var_decl.c:242
+   gp1: ghost -> normal
+[kernel] ghost_cv_var_decl.c:243
+   gp2: ghost -> normal
+[kernel] ghost_cv_var_decl.c:245
+   x: ghost
+[kernel] ghost_cv_var_decl.c:247
+   main: normal
+[kernel] ghost_cv_var_decl.c:248
+   value: ghost
+[kernel] ghost_cv_var_decl.c:249
+   __retres: normal
