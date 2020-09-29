@@ -2,7 +2,7 @@
    PLUGIN: report
    CMXS: big_local_array_script
    OPT: @EVA_OPTIONS@ -print -journal-disable -eva -report
-   OPT: @EVA_OPTIONS@ -load-module big_local_array_script -then-on prj -print -report
+   OPT: @EVA_OPTIONS@ -load-module %{dep:big_local_array_script.cmxs} -then-on prj -print -report
    OPT: @EVA_OPTIONS@ -print -journal-disable -no-initialized-padding-locals -eva
 */
 
