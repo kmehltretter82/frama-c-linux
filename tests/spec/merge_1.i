@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"merge_2.i"
+   STDOPT: +"%{dep:merge_2.i}"
  */
 /*@ requires \valid(s);
   @ assigns \nothing;

@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -print -load-module ./@PTEST_DIR@/@PTEST_NAME@
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -print
 */
 
 /*@ behavior foo: ensures \true; */

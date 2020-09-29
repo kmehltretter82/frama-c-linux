@@ -1142,7 +1142,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4 125) (system %S))%s)))\n\
+     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4 125 127) (system %S))%s)))\n\
      )@."
     errlog
     res
@@ -1159,16 +1159,13 @@ let command_string ~result_fmt ~oracle_fmt command =
     Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (deps  %a %S (package frama-c)%t)\n  \
+     (deps  %a %S (package frama-c)%a (universe))\n  \
      (action (system %S))\n\
      )\n"
     command.file
     print_list deps
     (get_ptest_file command)
-    (fun fmt ->
-       List.iter
-         (fun d -> Format.fprintf fmt " (package %S)" ("frama-c-"^d))
-         command.plugins)
+    Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     command_string;
 
   let oracle_prefix = oracle_prefix command in

@@ -1,5 +1,6 @@
 [kernel] Parsing assignable_location.i (no preprocessing)
-[kernel:annot-error] assignable_location.i:36: Warning: unexpected token ';'
+[kernel:annot-error] assignable_location.i:36: Warning: 
+  unexpected token ';'
 [kernel:annot-error] assignable_location.i:28: Warning: 
   not an addressable left value: \result. Ignoring logic specification of function annotations_to_reject
 [kernel:annot-error] assignable_location.i:30: Warning: 

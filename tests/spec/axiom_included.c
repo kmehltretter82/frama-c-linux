@@ -1,5 +1,6 @@
 /* run.config
-   STDOPT: +"axiom_included_1.c"
+   DEPS: axiom_included.h
+   STDOPT: +"%{dep:axiom_included_1.c}"
 */
 
 #include "axiom_included.h"

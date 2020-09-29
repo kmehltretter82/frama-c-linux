@@ -24,7 +24,8 @@
 [eva] computing for function send_addr <- send_msg <- main.
   Called from array_typedef.c:15.
 [eva] using specification for function send_addr
-[eva] array_typedef.c:12: Warning: no \from part for clause 'assigns \empty;'
+[eva] array_typedef.c:12: Warning: 
+  no \from part for clause 'assigns \empty;'
 [eva] Done for function send_addr
 [eva] Recording results for send_msg
 [eva] Done for function send_msg

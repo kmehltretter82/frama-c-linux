@@ -1,5 +1,5 @@
 /* run.config
-OPT: @PTEST_DIR@/multi_axiomatic_2.i -print
+OPT: %{dep:multi_axiomatic_2.i} -print
 */
 
 /*@

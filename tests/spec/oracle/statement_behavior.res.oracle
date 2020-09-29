@@ -8,7 +8,8 @@
   Called from statement_behavior.c:23.
 [eva] statement_behavior.c:10: Warning: 
   no \from part for clause 'assigns five_times;'
-[eva:alarm] statement_behavior.c:17: Warning: assertion got status unknown.
+[eva:alarm] statement_behavior.c:17: Warning: 
+  assertion got status unknown.
 [eva:alarm] statement_behavior.c:4: Warning: 
   function pfsqopfc: postcondition got status unknown.
 [eva:alarm] statement_behavior.c:18: Warning: 
