@@ -1138,7 +1138,7 @@ let command_string ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(rule\n  \
      (targets %S %S %a)\n  \
-     (deps   %a %S (package frama-c)%a (universe))\n  \
+     (deps   %a %S (package frama-c)%a)\n  \
      (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 125) (system %S))%s)))\n\
      )@."
     errlog
@@ -1156,7 +1156,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (deps  %a %S (package frama-c)%t (universe))\n  \
+     (deps  %a %S (package frama-c)%t)\n  \
      (action (system %S))\n\
      )\n"
     command.file
