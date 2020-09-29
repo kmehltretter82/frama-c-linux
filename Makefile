@@ -174,7 +174,7 @@ tests:
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
 
 ##############################################################################
-.phony: install uninstall
+.PHONY: install uninstall
 
 FRAMAC_INSTALLDIR?=""
 
