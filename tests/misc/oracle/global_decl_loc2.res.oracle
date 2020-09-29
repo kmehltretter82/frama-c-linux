@@ -1,2 +1,2 @@
-[kernel] User Error: source file 'global_decl_loc.i' does not exist
+[kernel] User Error: source file 'tests/misc/global_decl_loc.i' does not exist
 [kernel] Frama-C aborted: invalid user input.

@@ -1,6 +1,7 @@
 /* run.config*
-CMXS: @PTEST_NAME@
-OPT: -cpp-extra-args="-D__FC_MACHDEP_CUSTOM" -load-module %{dep:@PTEST_NAME@.cmxs} -machdep custom -print -then -print
+DEPS: __fc_machdep_custom.h
+MODULE: @PTEST_NAME@.cmxs
+OPT: -cpp-extra-args="-D__FC_MACHDEP_CUSTOM" -machdep custom -print -then -print
 COMMENT: we need a -then to test double registering of a machdep
 */
 

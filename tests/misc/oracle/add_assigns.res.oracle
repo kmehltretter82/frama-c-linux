@@ -5,7 +5,7 @@
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assigns (file add_assigns.i, line 6)
+[  Valid  ] Assigns (file add_assigns.i, line 7)
             by assigns.
 [  Valid  ] Default behavior
             by Frama-C kernel.
