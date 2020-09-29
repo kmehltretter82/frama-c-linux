@@ -166,6 +166,14 @@ force-reconfigure:
 
 
 ##############################################################################
+.phony: dune-tests
+
+TESTS=rte slicing scope value
+dune-tests:
+	dune exec -- ptests
+	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
+
+##############################################################################
 .phony: install uninstall
 
 FRAMAC_INSTALLDIR?=""
