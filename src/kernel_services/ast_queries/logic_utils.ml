@@ -512,9 +512,9 @@ and expr_to_boolean e =
   let open Cil_types in
   let tbool n = Logic_const.term n Logic_const.boolean_type in
   match e.enode with
-  | UnOp(BNot, a,_) ->
-    tbool @@ TUnOp(BNot, expr_to_boolean a)
-  | BinOp((BAnd|BOr) as op,a,b,_) ->
+  | UnOp(LNot, a,_) ->
+    tbool @@ TUnOp(LNot, expr_to_boolean a)
+  | BinOp((LAnd|LOr) as op,a,b,_) ->
     let va = expr_to_boolean a in
     let vb = expr_to_boolean b in
     tbool @@ TBinOp(op,va,vb)
@@ -545,11 +545,11 @@ and expr_to_predicate e =
   | BinOp(Ge, a, b, _) -> prel Rge a b
   | BinOp(Eq, a, b, _) -> prel Req a b
   | BinOp(Ne, a, b, _) -> prel Rneq a b
-  | BinOp(BAnd, a, b, _) ->
+  | BinOp(LAnd, a, b, _) ->
     unamed @@ Pand(expr_to_predicate a,expr_to_predicate b)
-  | BinOp(BOr, a, b, _) ->
+  | BinOp(LOr, a, b, _) ->
     unamed @@ Por(expr_to_predicate a,expr_to_predicate b)
-  | UnOp(BNot, a, _) ->
+  | UnOp(LNot, a, _) ->
     unamed @@ Pnot(expr_to_predicate a)
   | _ ->
     let t = expr_to_term ~coerce:true e in
