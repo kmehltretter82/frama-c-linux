@@ -156,8 +156,10 @@ let lookup_rtl_globals rtl_ast =
     | GAnnot _ :: l ->
       (* ignoring annotations from the AST *)
       do_globals acc l
-    | GAsm _ | GPragma _ | GText _ as g :: _l  ->
-      Kernel.fatal "unexpected global %a" Printer.pp_global g
+    | GPragma _ as g :: l ->
+      do_it Symbols.mem_global acc l g
+    | GAsm _ | GText _ as g :: _l  ->
+      Options.fatal "unexpected global %a" Printer.pp_global g
   in
   do_globals [] rtl_ast.globals
 
@@ -245,8 +247,10 @@ let insert_rtl_globals rtl_prj rtl_globals ast =
           acc
       in
       add acc l
-    | GAnnot _ | GAsm _ | GPragma _ | GText _ as g :: _l  ->
-      Kernel.fatal "unexpected global %a" Printer.pp_global g
+    | GPragma _ as g :: l ->
+      add (g :: acc) l
+    | GAnnot _ | GAsm _ | GText _ as g :: _l  ->
+      Options.fatal "unexpected global %a" Printer.pp_global g
   in
   ast.globals <- add ast.globals rtl_globals
 
