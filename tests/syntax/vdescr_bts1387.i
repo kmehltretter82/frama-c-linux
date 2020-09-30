@@ -1,7 +1,8 @@
 /* run.config
-CMXS: @PTEST_NAME@
-OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs}
+MODULE: @PTEST_NAME@.cmxs
+OPT: #"-no-print"
 */
+
 int f(int);
 int g(int);
 

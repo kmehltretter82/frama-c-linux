@@ -1,6 +1,6 @@
 /* run.config
-CMXS: @PTEST_NAME@
-OPT: -load-module %{dep:@PTEST_NAME@.cmxs} @EVA_OPTIONS@
+MODULE: @PTEST_NAME@.cmxs
+OPT: @EVA_OPTIONS@
 */
 
 struct S { int i; };

@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -print
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -print
 */
 
 int f(void) {

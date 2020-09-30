@@ -166,13 +166,16 @@ force-reconfigure:
 
 
 ##############################################################################
-.PHONY: tests
+.PHONY: tests clean-tests
 
 TESTS=cil float idct rte slicing scope value syntax misc builtins libc
 tests: config.sed
 	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 	dune exec -- ptests/ptests.exe
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
+
+clean-tests:
+	rm -rf _build/default/tests
 
 ##############################################################################
 .PHONY: install uninstall

@@ -1,6 +1,6 @@
 /* run.config
-  CMXS: @PTEST_NAME@
-  OPT: -load-module %{dep:@PTEST_NAME@.cmxs}
+  MODULE: @PTEST_NAME@.cmxs
+  OPT: -no-autoload-plugins
 */
 
 void declaration_void(void) /*@ ghost (int x, int y) */ ;

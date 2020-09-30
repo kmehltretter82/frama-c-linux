@@ -1,6 +1,6 @@
 /* run.config
-CMXS: logic_env_script
-OPT: -load-module %{dep:logic_env_script.cmxs}
+MODULE: logic_env_script.cmxs
+OPT: -no-autoload-plugins
 */
 
 //@ predicate foo(integer x) = x == 0;

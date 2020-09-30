@@ -1,8 +1,8 @@
 /* run.config
-CMXS: Enum_repr
-OPT: -load-module %{dep:Enum_repr.cmxs} -enums int -print
-OPT: -load-module %{dep:Enum_repr.cmxs} -enums gcc-short-enums -print
-OPT: -load-module %{dep:Enum_repr.cmxs} -enums gcc-enums -print
+MODULE: Enum_repr.cmxs
+OPT: -enums int -print
+OPT: -enums gcc-short-enums -print
+OPT: -enums gcc-enums -print
 */
 
 // is represented by | int | gcc-enums          | gcc-short-enums 

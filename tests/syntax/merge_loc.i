@@ -1,7 +1,7 @@
 /* run.config
-   CMXS: pp_lines
-   STDOPT: #"-load-module %{dep:pp_lines.cmxs}"
+   MODULE: pp_lines.cmxs
 */
+
 
 // Test locations when cabs2cil merges declarations and tentative definitions
 // together. We should always favor the tentative definition.

@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -kernel-warn-key transient-block=active
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -kernel-warn-key transient-block=active
 */
 
 void f(void) { }
