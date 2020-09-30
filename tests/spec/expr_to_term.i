@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -print
+OPT: -keep-logical-operators -print
 */
 
 
@@ -42,4 +42,18 @@ int g() {
 /*@ ensures int_eq((int)(t<5 ? 1 : 0),(int)6); */
 int h() {
   if (t<5) return 2; else return 3;
+}
+
+void expr_to_predicate(int x) { }
+
+
+int z,t;
+/*@ ensures z!=0 && t!=0;
+    ensures !(z<5);
+    ensures (int)(t|5) != 0;
+*/
+void i() {
+  expr_to_predicate(z&&t);
+  expr_to_predicate(!(z<5));
+  expr_to_predicate(t|5);
 }
