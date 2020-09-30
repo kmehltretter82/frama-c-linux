@@ -1,7 +1,7 @@
 /* run.config
 DEPS: anon_enum_libc.h
 FILTER: sed -e 's|#include *"\([^/]*[/]\)*\([^/]*\)"|#include "PTESTS_DIR/\2"|'
-OPT: -cpp-extra-args="-I ." -ocode @PTEST_NAME@.tmp.c -print -then -ocode="" @PTEST_NAME@.tmp.c -print
+OPT: -cpp-extra-args="-I ." -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then -ocode="" ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print
 */
 struct { int x; float y; } s1;
 
