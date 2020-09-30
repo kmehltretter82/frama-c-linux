@@ -26,8 +26,7 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_define_wint_t.h"
-
+#include <wchar.h>
 __BEGIN_DECLS
 
 extern int iswalnum(wint_t wc);
