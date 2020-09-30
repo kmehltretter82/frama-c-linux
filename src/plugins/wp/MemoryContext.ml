@@ -50,6 +50,7 @@ type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
   to_heap : zone list ; (* [ p, ... ] *)
   context : zone list ; (* [ p+(..), ... ] *)
+  by_addr : zone list ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -60,12 +61,13 @@ let empty = {
   globals = [] ;
   context = [] ;
   to_heap = [] ;
+  by_addr = [] ;
 }
 
 let set x p w =
   match p with
   | NotUsed -> w
-  | ByAddr -> w
+  | ByAddr -> { w with by_addr = Var x :: w.by_addr }
   | ByRef | InContext ->
       if Cil.isFunctionType x.vtype then w else
         { w with context = Ptr x :: w.context }
@@ -192,6 +194,10 @@ let global_zones partition =
 let context_zones partition =
   List.map (fun z -> [z]) partition.context
 
+let addr_of_zones partition =
+  let comp a b = Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
+  List.sort comp partition.by_addr
+
 let heap_zones partition =
   let comp a b = Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
   List.sort comp partition.to_heap
@@ -199,7 +205,7 @@ let heap_zones partition =
 (* Note that this function does not return separated zone lists, but well-typed
    zone lists.
 *)
-let heaps partition =
+let well_type_zones zone_function partition =
   let rec partition_by_type t acc l =
     match l, acc with
     | [], _ ->
@@ -211,7 +217,9 @@ let heaps partition =
     | x :: l, acc ->
         partition_by_type (type_of_zone x) ([x] :: acc) l
   in
-  partition_by_type Cil.voidType [] (heap_zones partition)
+  partition_by_type Cil.voidType [] (zone_function partition)
+
+let heaps = well_type_zones heap_zones
 
 let main_separation loc globals context heaps =
   match heaps, context with
@@ -232,16 +240,11 @@ let assigned_locations kf filter =
   let add_from l (e, _ds) =
     if filter e.it_content then e :: l else l
   in
-  let add_assign kf _emitter assigns l = match assigns with
-    | WritesAny ->
-        Wp_parameters.warning
-          ~wkey:Wp_parameters.wkey_imprecise_hypotheses_assigns ~once:true
-          "No assigns for function '%a', model hypotheses will be imprecise"
-          Kernel_function.pretty kf ;
-        l
+  let add_assign _emitter assigns l = match assigns with
+    | WritesAny -> l
     | Writes froms -> List.fold_left add_from l froms
   in
-  Annotations.fold_assigns (add_assign kf) kf Cil.default_behavior_name []
+  Annotations.fold_assigns add_assign kf Cil.default_behavior_name []
 
 let assigned_via_pointers kf =
   let rec assigned_via_pointer t =
@@ -260,24 +263,67 @@ let assigned_via_pointers kf =
   in
   assigned_locations kf assigned_via_pointer
 
+let post_term t =
+  let exception Post_value in
+  let v = object
+    inherit Cil.nopCilVisitor
+    method! vlogic_label = function
+      | BuiltinLabel(Post) -> raise Post_value
+      | _ -> Cil.SkipChildren
+    method! vterm_lval = function
+      | TResult _, _ -> raise Post_value
+      | _ -> Cil.DoChildren
+  end in
+  try ignore (Cil.visitCilTerm v t) ; false
+  with Post_value -> true
+
+let simpl_pred_list l =
+  List.sort_uniq Logic_utils.compare_predicate
+    (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) l)
+
 let clauses_of_partition kf loc p =
   let globals = global_zones p in
   let main_sep =
     main_separation loc globals (context_zones p) (heaps p)
   in
-  let assigns_sep =
+  let assigns_sep_req, assigns_sep_ens =
     let addr_of t = addr_of_lval ~loc t.it_content in
-    List.map
-      (fun t -> term_separated_from_regions loc (addr_of t) globals)
-      (assigned_via_pointers kf)
+    let folder (req, ens) t =
+      let sep = term_separated_from_regions loc (addr_of t) globals in
+      if post_term t.it_content then (req, sep :: ens) else (sep :: req, ens)
+    in
+    List.fold_left folder ([],[]) (assigned_via_pointers kf)
   in
-  let context_validity =
-    List.map (valid_region loc) (context_zones p)
+  let context_validity = List.map (valid_region loc) (context_zones p) in
+  let reqs = main_sep @ assigns_sep_req @ context_validity in
+  let reqs = simpl_pred_list reqs in
+  let ens = simpl_pred_list assigns_sep_ens in
+  reqs, ens
+
+let addr_of_vars = well_type_zones addr_of_zones
+
+let ptr_or_ptr_set { term_type = t } =
+  let open Logic_typing in
+  is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
+
+let escaping_formals kf loc p =
+  let ret_t = Kernel_function.get_return_type kf in
+  let addr_of t = addr_of_lval ~loc t.it_content in
+  let asgnd_ptrs =
+    Extlib.filter_map
+      (* Search assigned pointers via a pointer,
+         e.g. 'assigns *p ;' with '*p' of type pointer or set of pointers *)
+      (fun t -> ptr_or_ptr_set t.it_content) addr_of (assigned_via_pointers kf)
   in
-  let reqs = main_sep @ assigns_sep @ context_validity in
-  let reqs = List.filter (fun p -> not(Logic_utils.is_trivially_true p)) reqs in
-  let reqs = List.sort_uniq Logic_utils.compare_predicate reqs in
-  reqs
+  let asgnd_ptrs =
+    if Cil.isPointerType ret_t then tresult ~loc ret_t :: asgnd_ptrs
+    else asgnd_ptrs
+  in
+  let local_zone = function Var v -> v.vformal | _ -> false in
+  let local_partition = { p with by_addr = List.filter local_zone p.by_addr } in
+  let locals = addr_of_vars local_partition in
+  simpl_pred_list
+    (List.map (fun t -> term_separated_from_regions loc t locals) asgnd_ptrs)
 
 module Table =
   State_builder.Hashtbl
@@ -292,16 +338,18 @@ module Table =
 let compute_behavior kf name hypotheses_computer =
   let partition = hypotheses_computer kf in
   let loc = Kernel_function.get_location kf in
-  let reqs = clauses_of_partition kf loc partition in
-  let reqs = List.map Logic_const.new_predicate reqs in
-  match reqs with
-  | [] -> None
-  | l1 ->
+  let reqs, ens = clauses_of_partition kf loc partition in
+  let ens = escaping_formals kf loc partition @ ens in
+  let reqs = List.map new_predicate reqs in
+  let ens = List.map (fun p -> Normal, new_predicate p) ens in
+  match reqs, ens with
+  | [], [] -> None
+  | reqs, ens ->
       Some {
         b_name = name ;
-        b_requires = l1 ;
+        b_requires = reqs ;
         b_assumes = [] ;
-        b_post_cond = [] ;
+        b_post_cond = ens ;
         b_assigns = WritesAny ;
         b_allocation = FreeAllocAny ;
         b_extended = []
