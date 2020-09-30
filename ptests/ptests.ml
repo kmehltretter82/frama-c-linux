@@ -1716,6 +1716,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
       in
       Format.fprintf result_fmt "\
       (rule
+       (alias ptests)
        (targets %a %a)
 (action (system %S))
 )
@@ -1724,6 +1725,15 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         print_list res.ex_bin
         res.ex_cmd
       ;
+      List.iter (fun log ->
+          Format.fprintf result_fmt
+            "(rule\n  \
+             (alias ptests)\n  \
+             (action (diff %S %S))\n\
+             )\n"
+            (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
+            log
+        ) res.ex_log;
       incr e
     in
     let treat_option option =
