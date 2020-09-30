@@ -36,6 +36,6 @@ Prove: true.
   /*@
      behavior typed:
        requires \separated(message + (..), &size);
-       requires \separated(message + (0 .. \at(size,Post)), &size);
+       ensures \separated(message + (0 .. \at(size,Post)), &size);
      */
   void receive(int n, char *message);
