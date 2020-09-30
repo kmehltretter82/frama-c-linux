@@ -20,3 +20,7 @@
   g                         1        -        1       100%
   h                         -        1        1       100%
 ------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'h':
+  /*@ behavior typed:
+        ensures \separated(\result, &x); */
+  int *h(int x);
