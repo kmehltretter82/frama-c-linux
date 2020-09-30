@@ -413,6 +413,13 @@ let is_boolean_binop op =
   | PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP
   | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr -> false
 
+let is_comparison_binop op =
+  let open Cil_types in
+  match op with
+  | Lt | Gt | Le | Ge | Eq | Ne -> true
+  | PlusA | PlusPI | IndexPI | MinusA | MinusPI | MinusPP
+  | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr | LAnd | LOr -> false
+
 let float_builtin prefix fkind =
   let name = match fkind with
     | FFloat -> Printf.sprintf "\\%s_float" prefix
@@ -518,7 +525,7 @@ and expr_to_boolean e =
     let va = expr_to_boolean a in
     let vb = expr_to_boolean b in
     tbool @@ TBinOp(op,va,vb)
-  | BinOp(op, a, b, _) when is_boolean_binop op ->
+  | BinOp(op, a, b, _) when is_comparison_binop op ->
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
     tbool @@ TBinOp(op,va,vb)
