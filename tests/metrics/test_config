@@ -1,2 +1,2 @@
 PLUGIN: metrics
-OPT: -load-module scope -metrics
+OPT: -metrics

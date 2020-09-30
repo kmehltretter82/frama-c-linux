@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-load-module scope -metrics-eva-cover -then -main foo"
+   STDOPT: +"-metrics-eva-cover -then -main foo"
 **/
 void foo () {
   int i = 0;
