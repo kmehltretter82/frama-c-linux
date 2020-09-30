@@ -1189,12 +1189,12 @@ let get_output () =
   let name = Project.get_unique_name project in
   if name = "default" then base
   else
-    let dir = Datatype.Filepath.concat base ("/" ^ name) in
+    let dir = Datatype.Filepath.concat base name in
     make_output_dir (dir :> string) ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1218,7 +1218,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   if force then make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)

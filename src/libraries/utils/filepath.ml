@@ -237,7 +237,7 @@ module Normalized = struct
   type t = string
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
-  let concat ?existence t s = normalize ?existence (t ^ s)
+  let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
   let to_pretty_string s = pretty s
   let equal : t -> t -> bool = (=)
   let compare = String.compare
