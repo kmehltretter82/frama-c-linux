@@ -245,7 +245,6 @@ type ('loc, 'value) call = {
   arguments: ('loc, 'value) argument list;
   rest: (exp * ('loc, 'value) assigned) list;
   return: varinfo option;
-  recursive: bool;
 }
 
 type recursion = {

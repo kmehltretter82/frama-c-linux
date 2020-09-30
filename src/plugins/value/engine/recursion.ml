@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Eval
 
 (** Recursion *)
 
@@ -53,14 +54,6 @@ let recursive_spec kf =
       Value_parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
   else funspec
-
-(* Check whether the function at the top of the call-stack starts a
-   recursive call. *)
-let is_recursive_call kf =
-  let call_stack = Value_util.call_stack () in
-  if List.exists (fun (f, _) -> f == kf) call_stack
-  then (warn_recursive_call kf; true)
-  else false
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]
    has no existing specification, generate (an incorrect) one, and warn
@@ -106,7 +99,7 @@ let _empty_spec_for_recursive_call kf =
 
 module CallDepth =
   Datatype.Pair_with_collections (Kernel_function) (Datatype.Int)
-    (struct let module_name = "RecDepth" end)
+    (struct let module_name = "CallDepth" end)
 
 module VarCopies =
   Datatype.List (Datatype.Pair (Cil_datatype.Varinfo) (Cil_datatype.Varinfo))
@@ -151,22 +144,28 @@ let make_stack (kf, depth) =
 
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
-let make_recursive_call kf =
-  let call_stack = Value_util.call_stack () in
-  let previous_calls = List.filter (fun (f, _) -> f == kf) call_stack in
-  let depth = List.length previous_calls in
+let make_recursion kf depth =
+  warn_recursive_call kf;
   let substitution, withdrawal = get_stack kf depth in
   let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
   let list_substitution = List.map base_of_varinfo substitution in
   let base_substitution = Base.substitution_from_list list_substitution in
   let list_withdrawal = List.map Base.of_varinfo withdrawal in
   let base_withdrawal = Base.Hptset.of_list list_withdrawal in
-  Eval.{ depth; substitution; base_substitution; withdrawal; base_withdrawal; }
+  { depth; substitution; base_substitution; withdrawal; base_withdrawal; }
+
+let get_recursion kf =
+  let call_stack = Value_util.call_stack () in
+  let previous_calls = List.filter (fun (f, _) -> f == kf) call_stack in
+  let depth = List.length previous_calls in
+  if depth > 0
+  then Some (make_recursion kf depth)
+  else None
 
 let revert_recursion recursion =
   let revert (v1, v2) = v2, v1 in
-  let substitution = List.map revert recursion.Eval.substitution in
+  let substitution = List.map revert recursion.substitution in
   let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
   let list = List.map base_of_varinfo substitution in
   let base_substitution = Base.substitution_from_list list in
-  Eval.{ recursion with substitution; base_substitution; }
+  { recursion with substitution; base_substitution; }

@@ -48,8 +48,7 @@ let simplify_call call =
   { kf = call.Eval.kf;
     arguments = List.map simplify_argument call.Eval.arguments;
     rest = List.map fst call.Eval.rest;
-    return = call.Eval.return;
-    recursive = call.Eval.recursive }
+    return = call.Eval.return; }
 
 module Make_Minimal
     (Value: Abstract_value.S)

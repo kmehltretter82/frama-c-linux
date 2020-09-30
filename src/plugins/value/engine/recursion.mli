@@ -23,14 +23,11 @@
 (** Handling of recursion cycles in the callgraph *)
 
 open Cil_types
+open Eval
 
 val recursive_spec: kernel_function -> funspec
 
-val is_recursive_call: kernel_function -> bool
-(** Given  the current state of the call stack, detect whether the
-    given given function would start a recursive cycle. *)
-
 (** TODO *)
-val make_recursive_call: kernel_function -> Eval.recursion
+val get_recursion: kernel_function -> recursion option
 
-val revert_recursion: Eval.recursion -> Eval.recursion
+val revert_recursion: recursion -> recursion

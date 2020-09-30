@@ -27,7 +27,7 @@ open Eval
 module type S = sig
   type state
   type value
-  type location
+  type loc
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
@@ -44,7 +44,7 @@ module type S = sig
     builtin: bool;
   }
   val compute_call_ref:
-    (stmt -> (location, value) call -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option ->state -> call_result) ref
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -105,6 +105,17 @@ module DumpFileCounters =
       let name = "Transfer_stmt.DumpFileCounters"
     end)
 
+module VarHashtbl = Cil_datatype.Varinfo.Hashtbl
+
+let substitution_visitor table = object
+  inherit Visitor.frama_c_copy (Project.current ())
+
+  method! vvrbl varinfo =
+    match VarHashtbl.find_opt table varinfo with
+    | None -> Cil.JustCopy
+    | Some lval -> Cil.ChangeTo lval
+end
+
 module Make (Abstract: Abstractions.Eva) = struct
 
   module Value = Abstract.Val
@@ -114,7 +125,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   type state = Domain.t
   type value = Value.t
-  type location = Location.location
+  type loc = Location.location
 
   (* When using a product of domains, a product of states may have no
      concretization (if the domains have inferred incompatible properties)
@@ -295,8 +306,8 @@ module Make (Abstract: Abstractions.Eva) = struct
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
-  let compute_call_ref
-    : (stmt -> (location, value) call -> Domain.state -> call_result) ref
+  let compute_call_ref :
+    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
     = ref (fun _ -> assert false)
 
   (* Returns the result of a call, and a boolean that indicates whether a
@@ -315,7 +326,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
           Domain.Store.register_initial_state (Value_util.call_stack ()) state;
-          !compute_call_ref stmt call state
+          !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = `Bottom; cacheable = Cacheable; builtin=false }
       in
@@ -526,7 +537,6 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Create an Eval.call *)
   let create_call kf args =
-    let recursive = Recursion.is_recursive_call kf in
     let return = Library_functions.get_retres_vi kf in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
@@ -541,9 +551,9 @@ module Make (Abstract: Abstractions.Eva) = struct
       let arguments = List.rev arguments in
       arguments, rest
     in
-    {kf; arguments; rest; return; recursive; }
+    {kf; arguments; rest; return; }
 
-  let substitute_assigned_value substitution = function
+  let replace_value substitution = function
     | Assign value -> Assign (Value.replace_base substitution value)
     | Copy (loc, flagged) ->
       let v = flagged.v >>-: Value.replace_base substitution in
@@ -551,13 +561,17 @@ module Make (Abstract: Abstractions.Eva) = struct
       (* TODO: replace base in [loc] *)
       Copy (loc, flagged)
 
-  let substitute_argument substitution argument =
-    let avalue = substitute_assigned_value substitution argument.avalue in
-    { argument with avalue }
-
-  let substitute_call substitution call =
-    let arguments = List.map (substitute_argument substitution) call.arguments in
-    { call with arguments }
+  let replace_recursive_call recursion call =
+    let tbl = VarHashtbl.create 9 in
+    List.iter (fun (v1, v2) -> VarHashtbl.add tbl v1 v2) recursion.substitution;
+    let visitor = substitution_visitor tbl in
+    let replace_arg argument =
+      let concrete = Visitor.visitFramacExpr visitor argument.concrete in
+      let avalue = replace_value recursion.base_substitution argument.avalue in
+      { argument with concrete; avalue }
+    in
+    let arguments = List.map replace_arg call.arguments in
+    { call with arguments; }
 
   let make_call ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
@@ -565,16 +579,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
-    let recursion =
-      if call.recursive
-      then Some (Recursion.make_recursive_call call.kf)
-      else None
-    in
-    let call =
-      match recursion with
-      | None -> call
-      | Some recursion -> substitute_call recursion.base_substitution call
-    in
+    let recursion = Recursion.get_recursion kf in
+    let call = Extlib.opt_fold replace_recursive_call recursion call in
     call, recursion, valuation
 
   (* ----------------- show_each and dump_each directives ------------------- *)

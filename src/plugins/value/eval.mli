@@ -231,7 +231,6 @@ type ('loc, 'value) call = {
                                                   return value of the call.
                                                   Same varinfo for every
                                                   call to a given function. *)
-  recursive: bool;
 }
 
 (** Information needed to interpret a recursive call.
