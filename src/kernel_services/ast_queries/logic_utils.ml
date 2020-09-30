@@ -442,6 +442,12 @@ let get_float_unop op typ =
   | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
   | _ -> None
 
+let is_boolean_exp e =
+  match e.enode with
+  | BinOp(op,_,_,_) -> is_boolean_binop op
+  | UnOp(LNot,_,_) -> true
+  | _ -> false
+
 let rec expr_to_term ?(coerce=false) e =
   let loc = e.eloc in
   let typ = Cil.typeOf e in
@@ -550,6 +556,10 @@ and expr_to_predicate e =
   | BinOp(Le, a, b, _) -> prel Rle a b
   | BinOp(Gt, a, b, _) -> prel Rgt a b
   | BinOp(Ge, a, b, _) -> prel Rge a b
+  | BinOp(Eq, a, b, _) when Cil.isZero b && is_boolean_exp a ->
+    pnot @@ expr_to_predicate a
+  | BinOp(Ne, a, b, _) when Cil.isZero b && is_boolean_exp a ->
+    expr_to_predicate a
   | BinOp(Eq, a, b, _) -> prel Req a b
   | BinOp(Ne, a, b, _) -> prel Rneq a b
   | BinOp(LAnd, a, b, _) ->
