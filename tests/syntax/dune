@@ -1,0 +1,3 @@
+(rule
+ (action (with-stdout-to framac_share_path (pipe-stdout (run frama-c -print-share-path) (run tr -d '\n'))))
+)

@@ -1,8 +1,7 @@
 /* run.config
-DEPS: ../../../share/libc/string.h
-OPT: -add-symbolic-path SHARE:../../../share ../../../share/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
-OPT: -add-symbolic-path SHARE:../../../share @PTEST_FILE@ ../../../share/libc/string.h @PTEST_FILE@ -print
-OPT: -add-symbolic-path SHARE:../../../share @PTEST_FILE@ @PTEST_FILE@ ../../../share/libc/string.h -print
+OPT:%{read:../framac_share_path}/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
+OPT: @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h @PTEST_FILE@ -print
+OPT: @PTEST_FILE@ @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h -print
 */
 
 #include "string.h"
