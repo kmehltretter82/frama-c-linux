@@ -1061,6 +1061,7 @@ module Fmt = struct
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
+  let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
 
 let command_string ~result_fmt ~oracle_fmt command =
@@ -1137,7 +1138,6 @@ let command_string ~result_fmt ~oracle_fmt command =
    * in *)
   let macros = get_macros command in
   let deps = List.map (Macros.expand macros) command.deps in
-  let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s in
   Format.fprintf result_fmt
     "(rule\n  \
      (targets %S %S %a)\n  \
@@ -1717,10 +1717,13 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
       Format.fprintf result_fmt "\
       (rule
        (alias ptests)
+       (deps %a (package frama-c)%a)
        (targets %a %a)
 (action (system %S))
 )
 "
+        print_list config.dc_deps
+        Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
         print_list res.ex_log
         print_list res.ex_bin
         res.ex_cmd

@@ -8,8 +8,7 @@
   c ∈ {0}
   d ∈ {0}
 [eva] control.i:18: starting to merge loop iterations
-[eva:alarm] control.i:21: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] control.i:21: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [eva] done for function f
 [eva] ====== VALUES COMPUTED ======
@@ -44,8 +43,7 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva:alarm] control.i:21: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] control.i:21: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [from] Computing for function f
 [from] Done for function f

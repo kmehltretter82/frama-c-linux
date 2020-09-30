@@ -22,6 +22,33 @@
 
 (** Analysis for values and pointers *)
 
+
+(** For internal use *)
+
+module Private: sig
+  module Abstractions = Abstractions
+  module Analysis = Analysis
+  module Alarmset = Alarmset
+  module Main_values = Main_values
+  module Value_parameters =Value_parameters
+  module Eval = Eval
+  module Eval_terms = Eval_terms
+  module Red_statuses = Red_statuses
+  module Abstract_value = Abstract_value
+  module Abstract_domain = Abstract_domain
+  module Mark_noresults = Mark_noresults
+  module Simple_memory = Simple_memory
+  module Structure = Structure
+  module Eval_typ = Eval_typ
+  module Eval_op = Eval_op
+  module Value_util = Value_util
+  module Value_results = Value_results
+  module Domain_builder = Domain_builder
+  module Main_locations = Main_locations
+  module Eval_annots = Eval_annots
+end
+
+
 module Value_results: sig
   type results
 
@@ -96,29 +123,4 @@ module Eva_annotations: sig
     Cil_types.stmt -> flow_annotation -> unit
   val add_subdivision_annot : emitter:Emitter.t -> loc:Cil_types.location ->
     Cil_types.stmt -> int -> unit
-end
-
-(** For internal use *)
-
-module Private: sig
-  module Abstractions = Eva__Abstractions
-  module Analysis = Eva__Analysis
-  module Alarmset = Eva__Alarmset
-  module Main_values = Eva__Main_values
-  module Value_parameters =Eva__Value_parameters
-  module Eval = Eva__Eval
-  module Eval_terms = Eva__Eval_terms
-  module Red_statuses = Eva__Red_statuses
-  module Abstract_value = Eva__Abstract_value
-  module Abstract_domain = Eva__Abstract_domain
-  module Mark_noresults = Eva__Mark_noresults
-  module Simple_memory = Eva__Simple_memory
-  module Structure = Eva__Structure
-  module Eval_typ = Eva__Eval_typ
-  module Eval_op = Eva__Eval_op
-  module Value_util = Eva__Value_util
-  module Value_results = Eva__Value_results
-  module Domain_builder = Eva__Domain_builder
-  module Main_locations = Eva__Main_locations
-  module Eval_annots = Eva__Eval_annots
 end

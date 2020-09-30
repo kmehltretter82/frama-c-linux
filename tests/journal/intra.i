@@ -1,9 +1,9 @@
 /* run.config
    PLUGIN: sparecode
    CMXS: @PTEST_NAME@
-   EXECNOW: BIN intra_journal.ml @frama-c@ -eva-show-progress -load-module %{dep:@PTEST_NAME@.cmxs} -journal-enable -journal-name result/intra_journal.ml @PTEST_DIR@/@PTEST_NAME@.i > /dev/null 2> /dev/null
+   EXECNOW: BIN intra_journal.ml PTESTS_IT_IS_NOT_FRAMAC=yes @frama-c@ -eva-show-progress -no-autoload-plugins -load-plugin from,inout,eva,scope,variadic,sparecode -load-module %{dep:@PTEST_NAME@.cmxs} -journal-enable -journal-name intra_journal.ml @PTEST_NAME@.i > /dev/null 2> /dev/null
    CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
-   OPT: -load-script result/intra_journal -journal-disable
+   OPT: -load-script %{dep:intra_journal.ml} -journal-disable
 */
 
 /* Waiting for results such as:
