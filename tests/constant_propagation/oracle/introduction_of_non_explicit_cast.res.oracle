@@ -42,12 +42,10 @@
   Called from introduction_of_non_explicit_cast.c:76.
 [eva] Recording results for test_ptr
 [eva] Done for function test_ptr
-[eva] introduction_of_non_explicit_cast.c:77: 
-  assertion got status valid.
+[eva] introduction_of_non_explicit_cast.c:77: assertion got status valid.
 [eva:alarm] introduction_of_non_explicit_cast.c:80: Warning: 
   assertion got status unknown.
-[eva] introduction_of_non_explicit_cast.c:81: 
-  assertion got status valid.
+[eva] introduction_of_non_explicit_cast.c:81: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
