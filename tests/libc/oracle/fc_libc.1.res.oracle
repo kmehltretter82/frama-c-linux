@@ -4713,10 +4713,10 @@ extern size_t fwrite(void const * __restrict ptr, size_t size, size_t nmemb,
 
 /*@ requires valid_stream: \valid(stream);
     requires valid_pos: \valid(pos);
-    requires initialization: pos: \initialized(pos);
-    assigns *pos, \result;
-    assigns *pos \from (indirect: *stream);
+    ensures initialization: pos: \initialized(\old(pos));
+    assigns \result, *pos;
     assigns \result \from (indirect: *stream);
+    assigns *pos \from (indirect: *stream);
  */
 extern int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
 
@@ -4745,8 +4745,9 @@ extern int fseeko(FILE *stream, off_t offset, int whence);
 /*@ requires valid_stream: \valid(stream);
     requires valid_pos: \valid_read(pos);
     requires initialization: pos: \initialized(pos);
-    assigns *stream;
+    assigns *stream, \result;
     assigns *stream \from *pos;
+    assigns \result \from (indirect: *stream), (indirect: *pos);
  */
 extern int fsetpos(FILE *stream, fpos_t const *pos);
 
