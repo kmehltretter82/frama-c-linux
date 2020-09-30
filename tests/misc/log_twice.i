@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: @EVA_CONFIG@ -load-module %{dep:@PTEST_NAME@.cmxs}
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: @EVA_CONFIG@
 */
 
 int* f() {

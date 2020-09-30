@@ -1,5 +1,5 @@
 /* run.config
-   CMXS: global_decl_loc
-   OPT: %{dep:global_decl_loc2.i} -load-module %{dep:@PTEST_NAME@.cmxs}
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: %{dep:global_decl_loc2.i}
  */
 int g;

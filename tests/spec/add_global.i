@@ -1,6 +1,6 @@
 /* run.config
-CMXS: @PTEST_NAME@
-OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -print
+MODULE: @PTEST_NAME@.cmxs
+OPT: -print
 */
 
 int main () { return 0; }

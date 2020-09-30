@@ -1,7 +1,7 @@
 /* run.config
 PLUGIN: report
-CMXS: @PTEST_NAME@
-OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -then -report -then -print
+MODULE: @PTEST_NAME@.cmxs
+OPT: -then -report -then -print
 */
 
 /*@ assigns *x; */

@@ -1,7 +1,7 @@
 /* run.config
    PLUGIN: sparecode
-   CMXS: @PTEST_NAME@
-   STDOPT: +"-load-module %{dep:@PTEST_NAME@.cmxs}"
+   MODULE: @PTEST_NAME@.cmxs
+   STDOPT:
 */
 int G;
 

@@ -1,6 +1,6 @@
 /* run.config*
-CMXS: @PTEST_NAME@
-OPT: -eva -main f -load-module %{dep:@PTEST_NAME@.cmxs} -then-on change_main -main g -eva
+MODULE: @PTEST_NAME@.cmxs
+OPT: -eva -main f -then-on change_main -main g -eva
 */
 
 int f(int x) { return x; }

@@ -1,6 +1,6 @@
 /* run.config
-CMXS: @PTEST_NAME@
-OPT: -main f -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -print
+MODULE: @PTEST_NAME@.cmxs
+OPT: -main f -print
 */
 
 static int f(void);

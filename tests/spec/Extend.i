@@ -1,6 +1,6 @@
 /* run.config
-CMXS: @PTEST_NAME@
-OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -copy -kernel-warn-key=annot-error=active
+MODULE: @PTEST_NAME@.cmxs
+OPT: -copy -kernel-warn-key=annot-error=active
 */
 
 /*@ foo x == 0;

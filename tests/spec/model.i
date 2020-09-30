@@ -1,6 +1,6 @@
 /* run.config
-CMXS: @PTEST_NAME@
-STDOPT: +"-no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs}"
+MODULE: @PTEST_NAME@.cmxs
+STDOPT:
 */
 struct S { int x; int y; };
 typedef struct S T;

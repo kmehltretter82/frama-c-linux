@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: Type_of_term
-   OPT: -load-module %{dep:Type_of_term.cmxs} -print
+   MODULE: @TEST_NAME@.cmxs
+   OPT: -print
 */
 
 int t [42];

@@ -1,6 +1,6 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -typecheck -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs}
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -typecheck
 */
 /* must emit falls-through warning. */
 int f (int foo, char** args) {

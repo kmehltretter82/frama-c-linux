@@ -1,7 +1,7 @@
 /* run.config
-   CMXS: @PTEST_NAME@
-   OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -print
-   OPT: -no-autoload-plugins -load-module %{dep:@PTEST_NAME@.cmxs} -remove-exn -print
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -print
+   OPT: -remove-exn -print
  */
 struct my_exn { int e; };
 
