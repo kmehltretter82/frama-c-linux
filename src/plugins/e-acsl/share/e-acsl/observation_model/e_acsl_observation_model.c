@@ -56,7 +56,7 @@ int separated2(void * ptr1, size_t size1, void * ptr2, size_t size2) {
   return sep;
 }
 
-int separated(size_t count, ...) {
+int eacsl_separated(size_t count, ...) {
   void * ptrs[count];
   size_t sizes[count];
 

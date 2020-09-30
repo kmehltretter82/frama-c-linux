@@ -364,7 +364,8 @@ void initialize_static_region(uintptr_t addr, long size);
 /*! \brief Mark n bytes starting from the address given by `ptr` as initialized.
  * NOTE: This function has many similarities with ::initialize_static_region
  * The functionality, however is preferred to be kept separate
- * because the ::mark_readonly should operate only on the global shadow. */
+ * because the ::eacsl_mark_readonly should operate only on the global shadow.
+ */
 void mark_readonly_region (uintptr_t addr, long size);
 /* }}} */
 
@@ -400,7 +401,7 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr);
  * As some of the other functions, \b \\freeable can be expressed using
  * ::IS_ON_HEAP, ::heap_allocated and ::_base_addr. Here direct
  * implementation is preferred for performance reasons. */
-int freeable(void *ptr);
+int eacsl_freeable(void *ptr);
 
 /*! \brief Querying information about a specific heap memory address.
  * This function is similar to ::static_info except it returns data

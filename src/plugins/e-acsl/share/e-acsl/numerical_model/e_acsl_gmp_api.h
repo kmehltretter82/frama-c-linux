@@ -36,36 +36,36 @@
 #include <stddef.h>
 #include "../internals/e_acsl_alias.h"
 
-#define mpz_struct  export_alias(mpz_struct)
-#define mpz_t       export_alias(mpz_t)
-#define mpq_struct  export_alias(mpq_struct)
-#define mpq_t       export_alias(mpq_t)
-#define mp_bitcnt_t export_alias(mp_bitcnt_t)
+#define eacsl_mpz_struct  export_alias(mpz_struct)
+#define eacsl_mpz_t       export_alias(mpz_t)
+#define eacsl_mpq_struct  export_alias(mpq_struct)
+#define eacsl_mpq_t       export_alias(mpq_t)
+#define eacsl_mp_bitcnt_t export_alias(mp_bitcnt_t)
 
-struct mpz_struct {
+struct eacsl_mpz_struct {
   int _mp_alloc;
   int _mp_size;
   unsigned long *_mp_d;
 };
 
-typedef struct mpz_struct mpz_struct;
-typedef mpz_struct (__attribute__((__FC_BUILTIN__)) mpz_t)[1];
+typedef struct eacsl_mpz_struct eacsl_mpz_struct;
+typedef eacsl_mpz_struct (__attribute__((__FC_BUILTIN__)) eacsl_mpz_t)[1];
 
-struct mpq_struct {
-  mpz_struct _mp_num;
-  mpz_struct _mp_den;
+struct eacsl_mpq_struct {
+  eacsl_mpz_struct _mp_num;
+  eacsl_mpz_struct _mp_den;
 };
 
-typedef struct mpq_struct mpq_struct;
-typedef mpq_struct (__attribute__((__FC_BUILTIN__)) mpq_t)[1];
+typedef struct eacsl_mpq_struct eacsl_mpq_struct;
+typedef eacsl_mpq_struct (__attribute__((__FC_BUILTIN__)) eacsl_mpq_t)[1];
 
 /**
  * Counts of bits of a multi-precision number are represented in the C type
- * mp_bitcnt_t. Currently this is always an unsigned long, but on some systems
- * it will be an unsigned long long in the future.
+ * eacsl_mp_bitcnt_t. Currently this is always an unsigned long, but on some
+ * systems it will be an unsigned long long in the future.
  * @see https://gmplib.org/manual/Nomenclature-and-Types#Nomenclature-and-Types
  */
-typedef unsigned long int mp_bitcnt_t;
+typedef unsigned long int eacsl_mp_bitcnt_t;
 
 /****************/
 /* Initializers */
@@ -77,14 +77,14 @@ typedef unsigned long int mp_bitcnt_t;
   @ ensures \valid(z);
   @ allocates z;
   @ assigns *z \from __e_acsl_init; */
-extern void __gmpz_init(mpz_t z)
+extern void __gmpz_init(eacsl_mpz_t z)
   __attribute__((FC_BUILTIN));
 
 /*@ requires ! \initialized(q);
   @ ensures \valid(q);
   @ allocates q;
   @ assigns *q \from __e_acsl_init; */
-extern void __gmpq_init(mpq_t q)
+extern void __gmpq_init(eacsl_mpq_t q)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(z_orig);
@@ -93,7 +93,7 @@ extern void __gmpq_init(mpq_t q)
   @ ensures \valid(z);
 //  @ ensures z->n == z_orig->n;
   @ assigns *z \from *z_orig; */
-extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig)
+extern void __gmpz_init_set(eacsl_mpz_t z, const eacsl_mpz_t z_orig)
   __attribute__((FC_BUILTIN));
 
 /*@ requires ! \initialized(z);
@@ -102,7 +102,7 @@ extern void __gmpz_init_set(mpz_t z, const mpz_t z_orig)
   @ ensures \initialized(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n)
+extern void __gmpz_init_set_ui(eacsl_mpz_t z, unsigned long int n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires ! \initialized(z);
@@ -111,7 +111,7 @@ extern void __gmpz_init_set_ui(mpz_t z, unsigned long int n)
   @ ensures \initialized(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_init_set_si(mpz_t z, signed long int n)
+extern void __gmpz_init_set_si(eacsl_mpz_t z, signed long int n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires ! \initialized(z);
@@ -120,7 +120,7 @@ extern void __gmpz_init_set_si(mpz_t z, signed long int n)
   @ ensures \initialized(z);
   @ assigns *z \from str[0..],base;
   @ assigns \result \from str[0..],base; */
-extern int __gmpz_init_set_str(mpz_t z, const char *str, int base)
+extern int __gmpz_init_set_str(eacsl_mpz_t z, const char *str, int base)
   __attribute__((FC_BUILTIN));
 
 /*@ requires ! \initialized(z);
@@ -128,7 +128,7 @@ extern int __gmpz_init_set_str(mpz_t z, const char *str, int base)
   @ ensures \valid(z);
   @ ensures \initialized(z);
   @ assigns *z \from base; */
-extern void __gmpz_import (mpz_t z, size_t, int, size_t, int, size_t, const void *base)
+extern void __gmpz_import (eacsl_mpz_t z, size_t, int, size_t, int, size_t, const void *base)
   __attribute__((FC_BUILTIN));
 
 /***************/
@@ -139,34 +139,34 @@ extern void __gmpz_import (mpz_t z, size_t, int, size_t, int, size_t, const void
   @ requires \valid(z);
 //  @ ensures z->n == z_orig->n;
   @ assigns *z \from *z_orig; */
-extern void __gmpz_set(mpz_t z, const mpz_t z_orig)
+extern void __gmpz_set(eacsl_mpz_t z, const eacsl_mpz_t z_orig)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(q_orig);
   @ requires \valid(q);
   @ assigns *q \from *q_orig; */
-extern void __gmpq_set(mpq_t q, const mpq_t q_orig)
+extern void __gmpq_set(eacsl_mpq_t q, const eacsl_mpq_t q_orig)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q);
   @ assigns *q \from d; */
-extern void __gmpq_set_d(mpq_t q, double d)
+extern void __gmpq_set_d(eacsl_mpq_t q, double d)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q);
   @ assigns *q \from n,d; */
-extern void __gmpq_set_ui(mpq_t q, unsigned long int n, unsigned long int d)
+extern void __gmpq_set_ui(eacsl_mpq_t q, unsigned long int n, unsigned long int d)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q);
   @ assigns *q \from n,d; */
-extern void __gmpq_set_si(mpq_t q, signed long int n, unsigned long int d)
+extern void __gmpq_set_si(eacsl_mpq_t q, signed long int n, unsigned long int d)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(z_orig);
   @ requires \valid(q);
   @ assigns *q \from *z_orig; */
-extern void __gmpq_set_z(mpq_t q, const mpz_t z_orig)
+extern void __gmpq_set_z(eacsl_mpq_t q, const eacsl_mpz_t z_orig)
   __attribute__((FC_BUILTIN));
 
 /*@ allocates q;
@@ -174,24 +174,24 @@ extern void __gmpq_set_z(mpq_t q, const mpz_t z_orig)
   @ ensures \initialized(q);
   @ assigns *q \from str[0..],base;
   @ assigns \result \from str[0..],base; */
-extern int __gmpq_set_str(mpq_t q, const char *str, int base)
+extern int __gmpq_set_str(eacsl_mpq_t q, const char *str, int base)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z);
   @ assigns *z \from n; */
-extern void __gmpz_set_ui(mpz_t z, unsigned long int n)
+extern void __gmpz_set_ui(eacsl_mpz_t z, unsigned long int n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z);
 //  @ ensures z->n == n;
   @ assigns *z \from n; */
-extern void __gmpz_set_si(mpz_t z, signed long int n)
+extern void __gmpz_set_si(eacsl_mpz_t z, signed long int n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(q_orig);
   @ requires \valid(z);
   @ assigns *z \from *q_orig; */
-extern void __gmpz_set_q(mpz_t z, const mpq_t q_orig)
+extern void __gmpz_set_q(eacsl_mpz_t z, const eacsl_mpq_t q_orig)
   __attribute__((FC_BUILTIN));
 
 /*************/
@@ -201,13 +201,13 @@ extern void __gmpz_set_q(mpz_t z, const mpq_t q_orig)
 /*@ requires \valid(x);
 //  @ frees x;
   @ assigns *x \from *x; */
-extern void __gmpz_clear(mpz_t x)
+extern void __gmpz_clear(eacsl_mpz_t x)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(x);
 //  @ frees x;
   @ assigns *x \from *x; */
-extern void __gmpq_clear(mpq_t x)
+extern void __gmpq_clear(eacsl_mpq_t x)
   __attribute__((FC_BUILTIN));
 
 /********************/
@@ -217,13 +217,13 @@ extern void __gmpq_clear(mpq_t x)
 /*@ requires \valid_read(z1);
   @ requires \valid_read(z2);
   @ assigns \result \from *z1, *z2; */
-extern int __gmpz_cmp(const mpz_t z1, const mpz_t z2)
+extern int __gmpz_cmp(const eacsl_mpz_t z1, const eacsl_mpz_t z2)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(q1);
   @ requires \valid_read(q2);
   @ assigns \result \from *q1, *q2; */
-extern int __gmpq_cmp(const mpq_t q1, const mpq_t q2)
+extern int __gmpq_cmp(const eacsl_mpq_t q1, const eacsl_mpq_t q2)
   __attribute__((FC_BUILTIN));
 
 /************************/
@@ -233,82 +233,82 @@ extern int __gmpq_cmp(const mpq_t q1, const mpq_t q2)
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ assigns *z1 \from *z2; */
-extern void __gmpz_neg(mpz_t z1, const mpz_t z2)
+extern void __gmpz_neg(eacsl_mpz_t z1, const eacsl_mpz_t z2)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_add(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_add(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
   @ assigns *q1 \from *q2, *q3; */
-extern void __gmpq_add(mpq_t q1, const mpq_t q2, const mpq_t q3)
+extern void __gmpq_add(eacsl_mpq_t q1, const eacsl_mpq_t q2, const eacsl_mpq_t q3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_sub(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_sub(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
   @ assigns *q1 \from *q2, *q3; */
-extern void __gmpq_sub(mpq_t q1, const mpq_t q2, const mpq_t q3)
+extern void __gmpq_sub(eacsl_mpq_t q1, const eacsl_mpq_t q2, const eacsl_mpq_t q3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_mul(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_mul(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ assigns *z1 \from *z2, n; */
-extern void __gmpz_mul_2exp(mpz_t z1, const mpz_t z2, mp_bitcnt_t n)
+extern void __gmpz_mul_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2, eacsl_mp_bitcnt_t n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
   @ assigns *q1 \from *q2, *q3; */
-extern void __gmpq_mul(mpq_t q1, const mpq_t q2, const mpq_t q3)
+extern void __gmpq_mul(eacsl_mpq_t q1, const eacsl_mpq_t q2, const eacsl_mpq_t q3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_tdiv_q(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_tdiv_q(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_tdiv_r(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_tdiv_r(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ assigns *z1 \from *z2, n; */
-extern void __gmpz_tdiv_q_2exp(mpz_t z1, const mpz_t z2, mp_bitcnt_t n)
+extern void __gmpz_tdiv_q_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2, eacsl_mp_bitcnt_t n)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
   @ assigns *q1 \from *q2, *q3; */
-extern void __gmpq_div(mpq_t q1, const mpq_t q2, const mpq_t q3)
+extern void __gmpq_div(eacsl_mpq_t q1, const eacsl_mpq_t q2, const eacsl_mpq_t q3)
   __attribute__((FC_BUILTIN));
 
 /*********************/
@@ -319,28 +319,28 @@ extern void __gmpq_div(mpq_t q1, const mpq_t q2, const mpq_t q3)
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_and(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_and(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_ior(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_ior(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
   @ assigns *z1 \from *z2, *z3; */
-extern void __gmpz_xor(mpz_t z1, const mpz_t z2, const mpz_t z3)
+extern void __gmpz_xor(eacsl_mpz_t z1, const eacsl_mpz_t z2, const eacsl_mpz_t z3)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ assigns *z1 \from *z2;
   @ assigns \result \from *z1,*z2; */
-extern int __gmpz_com(mpz_t z1, const mpz_t z2)
+extern int __gmpz_com(eacsl_mpz_t z1, const eacsl_mpz_t z2)
   __attribute__((FC_BUILTIN));
 
 /************************/
@@ -350,28 +350,28 @@ extern int __gmpz_com(mpz_t z1, const mpz_t z2)
 /** Return non-zero iff the value of z fits in an unsigned long */
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
-extern int __gmpz_fits_ulong_p(const mpz_t z)
+extern int __gmpz_fits_ulong_p(const eacsl_mpz_t z)
   __attribute__((FC_BUILTIN));
 
 /** Return non-zero iff the value of z fits in a signed long */
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
-extern int __gmpz_fits_slong_p(const mpz_t z)
+extern int __gmpz_fits_slong_p(const eacsl_mpz_t z)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
-extern long __gmpz_get_si(const mpz_t z)
+extern long __gmpz_get_si(const eacsl_mpz_t z)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(q);
   @ assigns \result \from *q; */
-extern double __gmpq_get_d(const mpq_t q)
+extern double __gmpq_get_d(const eacsl_mpq_t q)
   __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(z);
   @ assigns \result \from *z; */
-extern unsigned long __gmpz_get_ui(const mpz_t z)
+extern unsigned long __gmpz_get_ui(const eacsl_mpz_t z)
   __attribute__((FC_BUILTIN));
 
 #endif

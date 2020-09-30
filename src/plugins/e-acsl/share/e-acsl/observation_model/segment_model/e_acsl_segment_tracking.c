@@ -534,7 +534,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   /* Make sure that heap memspace has not been moved. This is likely if
      a really large chunk has been requested to be allocated. */
   private_assert(mem_spaces.heap_mspace_least ==
-    (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace),
+    (uintptr_t)eacsl_mspace_least_addr(mem_spaces.heap_mspace),
     "Exceeded heap allocation limit of %luMB -- heap memory space moved. \n",
     E_ACSL_HEAP_SIZE);
 
@@ -643,7 +643,7 @@ void *shadow_copy(const void *ptr, size_t size, int init) {
  * block.
  *
  * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
- * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true.
+ * allocated heap memory block, i.e., `eacsl_freeable(ptr)` evaluates to true.
  *
  * \param ptr - base address of the memory block to be removed from tracking
  * \param init - if evaluated to a non-zero value then initialization shadow
@@ -684,7 +684,7 @@ void free(void *ptr) {
   }
 
   if (ptr != NULL) { /* NULL is a valid behaviour */
-    if (freeable(ptr)) {
+    if (eacsl_freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
       public_free(ptr);
     } else {
@@ -705,7 +705,7 @@ void* realloc(void *ptr, size_t size) {
   else if (ptr != NULL && size == 0) {
     free(ptr);
   } else {
-    if (freeable(ptr)) { /* ... and can be used as an input to `free` */
+    if (eacsl_freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = public_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
@@ -823,7 +823,7 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
   return 0;
 }
 
-int freeable(void *ptr) { /* + */
+int eacsl_freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
