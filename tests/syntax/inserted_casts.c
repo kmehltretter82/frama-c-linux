@@ -1,7 +1,7 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   STDOPT: +"-no-autoload-plugins"
-   STDOPT: +"-no-autoload-plugins" +"-machdep x86_64"
+   STDOPT:
+   STDOPT: +"-machdep x86_64"
 */
 #include "stddef.h"
 int f(int b)

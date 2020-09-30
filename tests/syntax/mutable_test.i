@@ -1,7 +1,7 @@
 /* run.config
 MODULE: @PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -print
 */
+
 
 struct R_1 {
    int r ;

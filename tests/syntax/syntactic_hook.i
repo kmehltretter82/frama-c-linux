@@ -1,7 +1,7 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   STDOPT: +"-no-autoload-plugins"
 */
+
 int f(void);
 
 int k(int *);

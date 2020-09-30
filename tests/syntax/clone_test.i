@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@.cmxs
-OPT: #"-no-print"
+STDOPT: +"-no-print"
 */
 
 /*@

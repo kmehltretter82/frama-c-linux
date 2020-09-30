@@ -1,7 +1,7 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   OPT: -print
 */
+
 
 int f(void) {
     return 1;

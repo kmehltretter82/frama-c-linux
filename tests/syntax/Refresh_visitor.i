@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@.cmxs
-OPT: @EVA_OPTIONS@
+STDOPT: +"-no-print" +"@EVA_OPTIONS@"
 */
 
 struct S { int i; };

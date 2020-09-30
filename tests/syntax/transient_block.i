@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   OPT: -kernel-warn-key transient-block=active
+   STDOPT: +"-no-print" +"-kernel-warn-key transient-block=active"
 */
 
 void f(void) { }
