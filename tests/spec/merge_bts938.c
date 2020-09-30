@@ -1,8 +1,8 @@
 /* run.config
-   STDOPT: +"%{deps:merge_bts938_1.c}"
+   DEPS: @PTEST_NAME@.h
+   STDOPT: +"%{dep:@PTEST_NAME@_1.c}"
 */
 
 #include "merge_bts938.h"
-
 //@ ensures test:\true;
 int main(void) { }
