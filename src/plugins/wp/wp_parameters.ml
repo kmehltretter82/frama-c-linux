@@ -1065,10 +1065,6 @@ module MemoryContext =
       let help = "Warn Against Memory Model Hypotheses"
     end)
 
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
-
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 
@@ -1079,10 +1075,6 @@ module CheckModelHypotheses =
       let help = "Insert memory model hypotheses in function contracts and \
                   check them on call. (experimental)"
     end)
-
-let wkey_imprecise_hypotheses_assigns =
-  register_warn_category "hypotheses:assigns"
-let () = set_warn_status wkey_imprecise_hypotheses_assigns Log.Winactive
 
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
