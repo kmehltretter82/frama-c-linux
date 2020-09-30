@@ -155,12 +155,6 @@ val load_module: string -> unit
 
 val load_plugin: string -> unit
 
-(** Sets the load path for modules in FRAMAC_PLUGIN, prepending it with [path].
-    Does not load any plugins.
-    Must be invoked only once from boot during extending stage.
-    @since Phosphorus-20170501-beta1. *)
-val set_module_load_path : string list -> unit
-
 (**/**)
 val load_plugin_path: unit -> unit
 (** Load all plugins in the path set with [set_module_load_path].

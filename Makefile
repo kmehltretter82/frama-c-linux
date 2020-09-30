@@ -87,7 +87,7 @@ MAJOR_VERSION=$(shell $(SED) -E 's/^([0-9]+)\..*/\1/' VERSION)
 MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 VERSION_CODENAME=$(shell $(CAT) VERSION_CODENAME)
 
-config.sed: VERSION share/Makefile.config Makefile configure.in
+config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configure.in
 	@echo "# generated file" > $@
 	@echo "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" >> $@
 	@echo "s|@VERSION@|$(VERSION)|" >> $@

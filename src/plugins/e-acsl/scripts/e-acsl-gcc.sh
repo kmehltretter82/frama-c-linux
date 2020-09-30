@@ -672,15 +672,6 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
     `test -f "$DEVELOPMENT/META.frama-c-e_acsl" -o \
           -f "$FRAMAC_PLUGIN/META.frama-c-e_acsl"; echo $?`
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
-  # Add the project directory to FRAMAC_PLUGINS,
-  # otherwise Frama-C uses an installed version
-  if test -f "$DEVELOPMENT/META.frama-c-e_acsl"; then
-    FRAMAC_FLAGS="-add-path=$DEVELOPMENT/top -add-path=$DEVELOPMENT $FRAMAC_FLAGS";
-  fi
-else
-  # Installed version. FRAMAC_SHARE should not be used here as Frama-C
-  # and E-ACSL may not be installed to the same location
-  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit

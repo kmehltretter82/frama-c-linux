@@ -81,10 +81,6 @@ This option has the same per-plugin (and kernel) specializations as
 Bounds are parsed as OCaml integer constants.
 By default, all numerical addresses are considered invalid.
 
--add-path *p1[,p2[...,pn]]*
-: adds directories *p1* through *pn* to the list of directories in which
-plugins are searched.
-
 [-no]-aggressive-merging
 : merges function definitions modulo renaming. Defaults to no.
 
@@ -529,10 +525,6 @@ the following variables.
 
 FRAMAC_LIB
 : The directory where kernel's compiled interfaces are installed.
-
-FRAMAC_PLUGIN
-: The directory where Frama-C can find standard plugins.
-If you wish to have plugins in several places, use **-add-path** instead.
 
 FRAMAC_SHARE
 : The directory where Frama-C data (e.g. its version of the standard library)

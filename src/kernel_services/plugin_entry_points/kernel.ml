@@ -790,18 +790,6 @@ module LoadState =
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_projectify ()
-module AddPath =
-  String_list
-    (struct
-      let option_name = "-add-path"
-      let module_name = "AddPath"
-      let arg_name = "DIR,..."
-      let help = "Prepend directories to FRAMAC_PLUGIN for loading dynamic plug-ins"
-    end)
-
-let () = Parameter_customize.set_group saveload
-let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
-let () = Parameter_customize.do_not_projectify ()
 module LoadModule =
   String_list
     (struct
@@ -842,7 +830,6 @@ module AutoLoadPlugins =
 
 let bootstrap_loader () =
   begin
-    Dynamic.set_module_load_path (AddPath.get ());
     if AutoLoadPlugins.get () then Dynamic.load_plugin_path () ;
     List.iter Dynamic.load_plugin (LoadPlugin.get()) ;
     List.iter Dynamic.load_module (LoadModule.get()) ;
