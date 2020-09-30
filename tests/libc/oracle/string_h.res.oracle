@@ -245,7 +245,7 @@
 [eva] using specification for function strdup
 [eva:libc:unsupported-spec] string_h.c:146: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
-  Consider adding /home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc/string.c
+  Consider adding FRAMA-C-INSTALL/share/frama-c/share/libc/string.c
   to the analyzed source files.
 [eva] string_h.c:146: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:146: 
@@ -256,7 +256,7 @@
 [eva] using specification for function strndup
 [eva:libc:unsupported-spec] string_h.c:147: Warning: 
   The specification of function 'strndup' is currently not supported by Eva.
-  Consider adding /home/bobot/Sources/frama-c/_build/install/default/share/frama-c/share/libc/string.c
+  Consider adding FRAMA-C-INSTALL/share/frama-c/share/libc/string.c
   to the analyzed source files.
 [eva] string_h.c:147: Warning: ignoring unsupported \allocates clause
 [eva] string_h.c:147: 

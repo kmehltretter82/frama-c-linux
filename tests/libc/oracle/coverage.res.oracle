@@ -1,5 +1,5 @@
 [kernel] Parsing coverage.c (with preprocessing)
-[kernel] Parsing /home/bobot/Sources/frama-c/_build/default/share/libc/string.c (with preprocessing)
+[kernel] Parsing FRAMA-C/share/libc/string.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
