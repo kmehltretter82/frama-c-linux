@@ -168,7 +168,7 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests clean-tests
 
-TESTS=cil constant_propagation float idct rte slicing scope value syntax misc builtins libc
+TESTS=cil constant_propagation float idct metrics rte slicing scope value syntax misc builtins libc
 tests: config.sed
 	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 	dune exec -- ptests/ptests.exe

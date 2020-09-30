@@ -1,1 +1,2 @@
-OPT: -no-autoload-plugins -load-module metrics,scope -metrics
+PLUGIN: metrics
+OPT: -load-module scope -metrics
