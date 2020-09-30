@@ -61,7 +61,7 @@ let print_config get value () =
 
 let print_configl get value () =
   if get () then begin
-    Log.print_on_output (fun fmt -> List.iter (Format.fprintf fmt "%s\n%!") value) ;
+    Log.print_on_output (fun fmt -> (Format.fprintf fmt "%s%!" (String.concat "\n" value))) ;
     raise Cmdline.Exit
   end
 
