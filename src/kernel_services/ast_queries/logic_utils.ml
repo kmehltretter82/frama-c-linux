@@ -451,12 +451,12 @@ let rec expr_to_term ?(coerce=false) e =
     | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
+    | BinOp (op, _, _, _) when is_boolean_binop op ->
+      let tc = expr_to_boolean e in
+      Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
+      Linteger
     | BinOp (op, a, b, _) ->
-      if is_boolean_binop op then
-        let tc = expr_to_boolean e in
-        Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
-        Linteger
-      else begin match get_float_binop op typ with
+      begin match get_float_binop op typ with
         | Some phi ->
           let va = expr_to_term a in
           let vb = expr_to_term b in
