@@ -96,11 +96,13 @@ let unsupported_specs_tbl =
 let warn_unsupported_spec name =
   try
     let header = Hashtbl.find unsupported_specs_tbl name in
+    let path = Filename.(concat (concat Fc_config.datadir "libc") header) in
+    let path = Filepath.Normalized.of_string path in
     Value_parameters.warning ~once:true ~current:true
       ~wkey:Value_parameters.wkey_libc_unsupported_spec
       "@[The specification of function '%s' is currently not supported by Eva.@ \
-       Consider adding %s@ to the analyzed source files.@]"
-      name (Fc_config.datadir ^ "/libc/" ^ header)
+       Consider adding %a@ to the analyzed source files.@]"
+      name  Filepath.Normalized.pretty path
   with Not_found -> ()
 
 
