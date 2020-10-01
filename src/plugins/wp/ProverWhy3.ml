@@ -1274,9 +1274,20 @@ let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
   Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
-let call_editor ~script wpo pconf driver prover task =
+let editor ~script ~merge wpo pconf driver prover task =
   Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
   Cache.clear_result ~digest:(digest wpo driver) prover task ;
+  if merge then
+    begin
+      let backup = script ^ ".bak" in
+      Sys.rename script backup ;
+      let old = open_in backup in
+      Command.pp_to_file script
+        (fun fmt ->
+           ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
+        );
+      close_in old ;
+    end ;
   let call = Why3.Call_provers.call_editor ~command:(editor pconf) script in
   call_prover_task ~timeout:None ~steps:None pconf.prover call
 
@@ -1286,15 +1297,17 @@ let compile ~script ~timeout wpo pconf driver prover task =
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
 let prepare ~mode wpo driver task =
-  let force = match mode with VCS.BatchMode -> false | _ -> true in
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
+  let force = mode <> VCS.BatchMode in
   let script = scriptfile ~force wpo ~ext in
-  if Sys.file_exists script then Some script
-  else if force then
+  if Sys.file_exists script then Some (script, true) else
+  if force then
     begin
-      Command.pp_to_file script (fun fmt ->
-          ignore (Why3.Driver.print_task_prepared driver fmt task)
-        ) ; Some script
+      Command.pp_to_file script
+        (fun fmt ->
+           ignore @@ Why3.Driver.print_task_prepared driver fmt task
+        );
+      Some (script, false)
     end
   else None
 
@@ -1303,19 +1316,19 @@ let interactive ~mode wpo pconf driver prover task =
   let timeout = if time <= 0 then None else Some time in
   match prepare ~mode wpo driver task with
   | None -> Task.return VCS.unknown
-  | Some script ->
+  | Some (script, merge) ->
       match mode with
       | VCS.BatchMode ->
           compile ~script ~timeout wpo pconf driver prover task
       | VCS.EditMode ->
           let open Task in
-          call_editor ~script wpo pconf driver prover task >>= fun _ ->
+          editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
           compile ~script ~timeout wpo pconf driver prover task
       | VCS.FixMode ->
           let open Task in
           compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
           if VCS.is_valid r then return r else
-            call_editor ~script wpo pconf driver prover task >>= fun _ ->
+            editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
             compile ~script ~timeout wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
