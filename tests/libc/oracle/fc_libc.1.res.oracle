@@ -2767,7 +2767,8 @@ char *setlocale(int category, char const *locale)
 }
 
 /*@ ensures result_current_locale: \result ≡ __fc_locale;
-    assigns \nothing;
+    assigns \result;
+    assigns \result \from __fc_locale;
  */
 struct lconv *localeconv(void)
 {
