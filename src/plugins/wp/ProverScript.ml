@@ -162,7 +162,7 @@ struct
     | None -> ProofEngine.main env.tree
 
   let prove env wpo ?config prover =
-    Prover.prove wpo ?config ~mode:VCS.BatchMode
+    Prover.prove wpo ?config ~mode:VCS.Batch
       ~progress:env.progress prover
 
   let backtracking env =

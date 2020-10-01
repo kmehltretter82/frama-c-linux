@@ -59,7 +59,7 @@ let update ?result wpo prover res =
   | None -> ()
   | Some f -> f wpo prover res
 
-let run_prover wpo ?config ?(mode=BatchMode) ?progress ?result prover =
+let run_prover wpo ?config ?(mode=Batch) ?progress ?result prover =
   signal ?progress wpo (VCS.name_of_prover prover) ;
   dispatch ?config mode prover wpo >>>
   fun status ->

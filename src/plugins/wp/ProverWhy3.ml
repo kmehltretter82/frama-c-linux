@@ -1276,22 +1276,25 @@ let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
   Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
+let updatescript ~script driver task =
+  let backup = script ^ ".bak" in
+  Sys.rename script backup ;
+  let old = open_in backup in
+  Command.pp_to_file script
+    (fun fmt ->
+       ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
+    );
+  close_in old ;
+  let d_old = Digest.file backup in
+  let d_new = Digest.file script in
+  if String.equal d_new d_old then Extlib.safe_remove backup
+
 let editor ~script ~merge wpo pconf driver prover task =
   Task.sync editor_mutex
     begin fun () ->
       Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
       Cache.clear_result ~digest:(digest wpo driver) prover task ;
-      if merge then
-        begin
-          let backup = script ^ ".bak" in
-          Sys.rename script backup ;
-          let old = open_in backup in
-          Command.pp_to_file script
-            (fun fmt ->
-               ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
-            );
-          close_in old ;
-        end ;
+      if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       let call = Why3.Call_provers.call_editor ~command script in
       call_prover_task ~timeout:None ~steps:None pconf.prover call
@@ -1304,7 +1307,7 @@ let compile ~script ~timeout wpo pconf driver prover task =
 
 let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
-  let force = mode <> VCS.BatchMode in
+  let force = mode <> VCS.Batch in
   let script = scriptfile ~force wpo ~ext in
   if Sys.file_exists script then Some (script, true) else
   if force then
@@ -1324,16 +1327,27 @@ let interactive ~mode wpo pconf driver prover task =
   | None -> Task.return VCS.unknown
   | Some (script, merge) ->
       match mode with
-      | VCS.BatchMode ->
+      | VCS.Batch ->
           compile ~script ~timeout wpo pconf driver prover task
-      | VCS.EditMode ->
+      | VCS.Update ->
+          if merge then updatescript ~script driver task ;
+          compile ~script ~timeout wpo pconf driver prover task
+      | VCS.Edit ->
           let open Task in
           editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
           compile ~script ~timeout wpo pconf driver prover task
-      | VCS.FixMode ->
+      | VCS.Fix ->
           let open Task in
           compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
           if VCS.is_valid r then return r else
+            editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
+            compile ~script ~timeout wpo pconf driver prover task
+      | VCS.FixUpdate ->
+          let open Task in
+          if merge then updatescript ~script driver task ;
+          compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
+          if VCS.is_valid r then return r else
+            let merge = false in
             editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
             compile ~script ~timeout wpo pconf driver prover task
 
@@ -1345,7 +1359,7 @@ let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
   Why3.Term.t_equal goal Why3.Term.t_true
 
-let build_proof_task ?(mode=VCS.BatchMode) ?timeout ?steplimit ~prover wpo () =
+let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
