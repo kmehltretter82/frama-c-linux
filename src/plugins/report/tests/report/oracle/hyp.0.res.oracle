@@ -1,9 +1,9 @@
-[kernel] Parsing tests/report/hyp.i (no preprocessing)
+[kernel] Parsing hyp.i (no preprocessing)
 [report] Computing properties status...
 --------------------------------------------------------------------------------
 --- No status to report
 --------------------------------------------------------------------------------
-[kernel:annot:missing-spec] tests/report/hyp.i:25: Warning: 
+[kernel:annot:missing-spec] hyp.i:24: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [kernel] SETTING STATUS OF assert \false; TO unknown
 [report] Computing properties status...
@@ -21,7 +21,7 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -46,9 +46,9 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 14)
+[ Partial ] Assertion (file hyp.i, line 13)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -74,7 +74,7 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -102,7 +102,7 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -129,7 +129,7 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 14)
+[  Valid  ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -156,7 +156,7 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -185,14 +185,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 26)
+[  Valid  ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -219,14 +219,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 14)
+[  Valid  ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 26)
+[  Valid  ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -254,14 +254,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 26)
+[  Valid  ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -291,23 +291,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 26)
+[ Partial ] Assertion (file hyp.i, line 25)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -334,24 +334,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 14)
+[ Partial ] Assertion (file hyp.i, line 13)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 26)
+[ Partial ] Assertion (file hyp.i, line 25)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -381,23 +381,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 26)
+[ Partial ] Assertion (file hyp.i, line 25)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -427,14 +427,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 26)
+[    -    ] Assertion (file hyp.i, line 25)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -461,15 +461,15 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 14)
+[ Partial ] Assertion (file hyp.i, line 13)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 26)
+[    -    ] Assertion (file hyp.i, line 25)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -499,14 +499,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 26)
+[    -    ] Assertion (file hyp.i, line 25)
             tried with Test.
 
 --------------------------------------------------------------------------------
@@ -536,16 +536,16 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -573,16 +573,16 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -612,14 +612,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -649,23 +649,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -694,23 +694,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -742,21 +742,21 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 10)
+[    -    ] Assertion (file hyp.i, line 9)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -787,23 +787,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -831,23 +831,23 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 14)
+[  Dead   ] Assertion (file hyp.i, line 13)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -878,21 +878,21 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 26)
+[   Bug   ] Assertion (file hyp.i, line 25)
             by Test.
 
 --------------------------------------------------------------------------------
@@ -922,24 +922,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -967,24 +967,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 14)
+[  Valid  ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -1014,24 +1014,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally valid, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -1061,24 +1061,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -1106,24 +1106,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file tests/report/hyp.i, line 14)
+[  Valid  ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -1153,24 +1153,24 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 10)
+[   Bug   ] Assertion (file hyp.i, line 9)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file tests/report/hyp.i, line 26)
+[  Dead   ] Assertion (file hyp.i, line 25)
             Locally unknown, but unreachable.
             By Test because:
-             - Assertion (file tests/report/hyp.i, line 10)
+             - Assertion (file hyp.i, line 9)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -1200,14 +1200,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file tests/report/hyp.i, line 14)
+[    -    ] Assertion (file hyp.i, line 13)
             tried with Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Unsound ] Assertion (file tests/report/hyp.i, line 26)
+[ Unsound ] Assertion (file hyp.i, line 25)
             inconsistent status:
               VALID according to Test
               but **NOT** VALID according to Test2
@@ -1237,15 +1237,15 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[ Partial ] Assertion (file tests/report/hyp.i, line 14)
+[ Partial ] Assertion (file hyp.i, line 13)
             By Test, with pending:
-             - Assertion (file tests/report/hyp.i, line 26)
+             - Assertion (file hyp.i, line 25)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Unsound ] Assertion (file tests/report/hyp.i, line 26)
+[ Unsound ] Assertion (file hyp.i, line 25)
             inconsistent status:
               VALID according to Test
               but **NOT** VALID according to Test2
@@ -1278,14 +1278,14 @@
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion (file tests/report/hyp.i, line 14)
+[   Bug   ] Assertion (file hyp.i, line 13)
             by Test.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[ Unsound ] Assertion (file tests/report/hyp.i, line 26)
+[ Unsound ] Assertion (file hyp.i, line 25)
             inconsistent status:
               VALID according to Test
               but **NOT** VALID according to Test2
