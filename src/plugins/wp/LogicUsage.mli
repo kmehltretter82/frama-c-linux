@@ -40,6 +40,7 @@ type logic_lemma = {
   lem_labels : logic_label list ;
   lem_property : predicate ;
   lem_depends : logic_lemma list ; (** in reverse order *)
+  lem_attrs : attributes ;
 }
 
 type axiomatic = {

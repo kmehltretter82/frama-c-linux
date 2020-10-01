@@ -157,6 +157,7 @@ and identified_lemma = {
   il_labels : logic_label list;
   il_args : string list;
   il_pred : toplevel_predicate;
+  il_attrs : attributes;
   il_loc : location
 }
 

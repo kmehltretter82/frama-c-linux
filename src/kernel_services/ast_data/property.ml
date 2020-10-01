@@ -127,6 +127,7 @@ and identified_lemma = {
   il_labels : logic_label list;
   il_args : string list;
   il_pred : toplevel_predicate;
+  il_attrs : attributes;
   il_loc : location
 }
 
@@ -422,6 +423,7 @@ include Datatype.Make_with_collections
         IPAxiom {
           il_name="";il_labels=[];il_args=[];
           il_pred=Logic_const.(toplevel_predicate ptrue);
+          il_attrs=[];
           il_loc=Location.unknown
         }]
 
@@ -839,23 +841,25 @@ let rec pretty_debug fmt = function
       Cil_types_debug.pp_kinstr id_kinstr
       (Cil_types_debug.pp_option Cil_types_debug.pp_code_annotation) id_ca
       Cil_types_debug.pp_variant id_variant
-  | IPAxiom {il_name; il_labels; il_args; il_pred; il_loc} ->
-    Format.fprintf fmt "IPAxiom(%a,%a,%a,%a,%a)"
+  | IPAxiom {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} ->
+    Format.fprintf fmt "IPAxiom(%a,%a,%a,%a,%a,%a)"
       Cil_types_debug.pp_string il_name
       (Cil_types_debug.pp_list Cil_types_debug.pp_logic_label) il_labels
       (Cil_types_debug.pp_list Cil_types_debug.pp_string) il_args
       Cil_types_debug.pp_toplevel_predicate il_pred
+      Cil_types_debug.pp_attributes il_attrs
       Cil_types_debug.pp_location il_loc
   | IPAxiomatic {iax_name; iax_props} ->
     Format.fprintf fmt "IPAxiomatic(%a,%a)"
       Cil_types_debug.pp_string iax_name
       (Cil_types_debug.pp_list pretty_debug) iax_props
-  | IPLemma {il_name; il_labels; il_args; il_pred; il_loc} ->
-    Format.fprintf fmt "IPLemma(%a,%a,%a,%a,%a)"
+  | IPLemma {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} ->
+    Format.fprintf fmt "IPLemma(%a,%a,%a,%a,%a,%a)"
       Cil_types_debug.pp_string il_name
       (Cil_types_debug.pp_list Cil_types_debug.pp_logic_label) il_labels
       (Cil_types_debug.pp_list Cil_types_debug.pp_string) il_args
       Cil_types_debug.pp_toplevel_predicate il_pred
+      Cil_types_debug.pp_attributes il_attrs
       Cil_types_debug.pp_location il_loc
   | IPTypeInvariant {iti_name; iti_type; iti_pred; iti_loc} ->
     Format.fprintf fmt "IPTypeInvariant(%a,%a,%a,%a)"
@@ -1548,10 +1552,10 @@ let ip_of_global_annotation a =
     | Daxiomatic(iax_name, l, _, _) ->
       let iax_props = List.fold_left aux [] l in
       IPAxiomatic {iax_name; iax_props} :: (iax_props @ acc)
-    | Dlemma(il_name, true, il_labels, il_args, il_pred, _, il_loc) ->
-      ip_axiom {il_name; il_labels; il_args; il_pred; il_loc} :: acc
-    | Dlemma(il_name, false, il_labels, il_args, il_pred, _, il_loc) ->
-      ip_lemma {il_name; il_labels; il_args; il_pred; il_loc} :: acc
+    | Dlemma(il_name, true, il_labels, il_args, il_pred, il_attrs, il_loc) ->
+      ip_axiom {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} :: acc
+    | Dlemma(il_name, false, il_labels, il_args, il_pred, il_attrs, il_loc) ->
+      ip_lemma {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} :: acc
     | Dinvariant(l, igi_loc) ->
       let igi_pred = match l.l_body with
         | LBpred p -> p
