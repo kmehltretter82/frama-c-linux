@@ -41,5 +41,6 @@ type 'a runner =
   VCS.result Task.task
 
 val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
+val clean_entry_for: digest:('a digest) -> Why3Provers.t -> 'a -> unit
 
 (**************************************************************************)

@@ -1274,13 +1274,15 @@ let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
   Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
-let call_editor ~script pconf =
+let call_editor ~script wpo pconf driver prover task =
+  let digest = digest wpo driver in
   Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
+  Cache.clean_entry_for digest prover task ;
   let call = Why3.Call_provers.call_editor ~command:(editor pconf) script in
   call_prover_task ~timeout:None ~steps:None pconf.prover call
 
-let compile ~script ~timeout pconf driver prover task =
-  let digest _prover _task = Digest.file script |> Digest.to_hex in
+let compile ~script ~timeout wpo pconf driver prover task =
+  let digest = digest wpo driver in
   let runner = batch pconf driver ~script in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
@@ -1305,17 +1307,17 @@ let interactive ~mode wpo pconf driver prover task =
   | Some script ->
       match mode with
       | VCS.BatchMode ->
-          compile ~script ~timeout pconf driver prover task
+          compile ~script ~timeout wpo pconf driver prover task
       | VCS.EditMode ->
           let open Task in
-          call_editor ~script pconf >>= fun _ ->
-          compile ~script ~timeout pconf driver prover task
+          call_editor ~script wpo pconf driver prover task >>= fun _ ->
+          compile ~script ~timeout wpo pconf driver prover task
       | VCS.FixMode ->
           let open Task in
-          compile ~script ~timeout pconf driver prover task >>= fun r ->
+          compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
           if VCS.is_valid r then return r else
-            call_editor ~script pconf >>= fun _ ->
-            compile ~script ~timeout pconf driver prover task
+            call_editor ~script wpo pconf driver prover task >>= fun _ ->
+            compile ~script ~timeout wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
