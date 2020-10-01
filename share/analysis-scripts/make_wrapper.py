@@ -54,7 +54,8 @@ if not framac_bin:
 framac_script = f"{framac_bin}/frama-c-script"
 
 _logfd, logname = tempfile.mkstemp(prefix="make_wrapper_tmp_")
-with subprocess.Popen(['make', "-C", make_dir] + args,
+cmd_list = ['make', "-C", make_dir] + args
+with subprocess.Popen(cmd_list,
                       stdout=subprocess.PIPE,
                       stderr=subprocess.STDOUT) as proc, \
      open (logname, "bw") as logfile:
