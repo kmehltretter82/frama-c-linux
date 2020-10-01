@@ -8,6 +8,6 @@ top/
 .merlin
 *~
 /Makefile
-/tests/ptests_config
+/tests/**/dune
 /tests/*/result
 /tests/*/result_*

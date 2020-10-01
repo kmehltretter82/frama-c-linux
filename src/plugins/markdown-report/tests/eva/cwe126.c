@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -mdr-remarks tests/eva/cwe126.remarks.md
+   STDOPT: +"-mdr-remarks %{dep:@PTEST_NAME@.remarks.md}"
  */
 
 /* extracted from Juliet test suite v1.3 for C
