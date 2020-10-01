@@ -44,15 +44,15 @@ if len(sys.argv) > 2:
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")
     sys.exit(1)
 
-framac_in_path = False
-if os.environ.get("FRAMAC"):
-    framac = os.environ["FRAMAC"]
-if not framac or not os.path.isfile(framac):
-    framac_in_path = True
-    framac = shutil.which("frama-c")
-    if not framac:
-        sys.exit("error: frama-c must be in the PATH, "\
-                 "or in environment variable FRAMAC")
+# Note: if Frama-C is in the path, ignore the one in FRAMAC_BIN
+framac = shutil.which("frama-c")
+if framac:
+    framac_bin = Path(os.path.dirname(os.path.abspath(framac)))
+else:
+    framac_bin = os.getenv('FRAMAC_BIN')
+    if not framac_bin:
+        sys.exit("error: FRAMAC_BIN not in environment")
+    framac_bin = Path(framac_bin)
 
 jcdb = Path("compile_commands.json")
 
@@ -72,8 +72,7 @@ if "PTESTS_TESTING" in os.environ:
     fc_stubs_c.touch()
     gnumakefile.touch()
 
-bindir = Path(os.path.dirname(os.path.abspath(framac)))
-frama_c_config = bindir / "frama-c-config"
+frama_c_config = framac_bin / "frama-c-config"
 process = Popen([frama_c_config, "-share"], stdout=PIPE)
 (output, err) = process.communicate()
 output = output.decode('utf-8')
@@ -83,7 +82,7 @@ if exit_code != 0:
 sharedir = Path(output)
 
 def get_known_machdeps():
-    process = Popen([bindir / "frama-c", "-machdep", "help"], stdout=PIPE)
+    process = Popen([framac_bin / "frama-c", "-machdep", "help"], stdout=PIPE)
     (output, err) = process.communicate()
     output = output.decode('utf-8')
     exit_code = process.wait()
@@ -250,9 +249,9 @@ gnumakefile.write_text("".join(lines))
 
 print(f"Template created: {gnumakefile}")
 
-if not "PTESTS_TESTING" in os.environ and not framac_in_path:
+if not "PTESTS_TESTING" in os.environ and not framac:
     print(f"Frama-C not in path, adding path.mk to {dir}")
-    frama_c_script = bindir / "frama-c-script"
+    frama_c_script = framac_bin / "frama-c-script"
     os.system(f"{frama_c_script} make-path {dir}")
 
 if "PTESTS_TESTING" in os.environ:
