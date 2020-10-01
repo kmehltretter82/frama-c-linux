@@ -1,4 +1,4 @@
-[kernel] Parsing tests/loop_analysis/slevel_overflow.c (with preprocessing)
+[kernel] Parsing slevel_overflow.c (with preprocessing)
 [loop] Functions with loops whose estimated bounds were larger than -loop-max-slevel
   (we recommend setting their slevel to 0 to avoid wasting time):
   f2 (estimated bounds: 16777216000000000000000)

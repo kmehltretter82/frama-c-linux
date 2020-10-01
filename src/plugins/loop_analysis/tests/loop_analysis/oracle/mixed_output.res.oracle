@@ -1,4 +1,4 @@
-[kernel] Parsing tests/loop_analysis/mixed_output.i (no preprocessing)
+[kernel] Parsing mixed_output.i (no preprocessing)
 [loop] Functions with loops whose bounds we could not find:
   loop_inf
   loop_inf2

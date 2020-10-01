@@ -1,4 +1,4 @@
-[kernel] Parsing tests/loop_analysis/test.i (no preprocessing)
+[kernel] Parsing test.i (no preprocessing)
 [loop] Functions with loops whose bounds we could not find:
   g
   h6

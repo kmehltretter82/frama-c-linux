@@ -1,6 +1,5 @@
-[kernel] Parsing tests/loop_analysis/non_natural_loop2.i (no preprocessing)
-[kernel] tests/loop_analysis/non_natural_loop2.i:4: Warning: 
-  Non-natural loop detected.
+[kernel] Parsing non_natural_loop2.i (no preprocessing)
+[kernel] non_natural_loop2.i:4: Warning: Non-natural loop detected.
 [loop] Warning: Could not analyze function main;
   it contains a non-natural loop
 [loop] Add this to your command line:

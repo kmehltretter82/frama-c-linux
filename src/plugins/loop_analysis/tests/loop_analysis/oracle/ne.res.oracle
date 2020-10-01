@@ -1,38 +1,38 @@
-[kernel] Parsing tests/loop_analysis/ne.i (no preprocessing)
-[loop] tests/loop_analysis/ne.i:38: Warning: 
+[kernel] Parsing ne.i (no preprocessing)
+[loop] ne.i:38: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 7; i += 2)
-[loop] tests/loop_analysis/ne.i:46: Warning: 
+[loop] ne.i:46: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -9; i -= 2)
-[loop] tests/loop_analysis/ne.i:54: Warning: 
+[loop] ne.i:54: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 18; i += 15)
-[loop] tests/loop_analysis/ne.i:62: Warning: 
+[loop] ne.i:62: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -5; i -= 15)
-[loop] tests/loop_analysis/ne.i:70: Warning: 
+[loop] ne.i:70: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 3; i += 2)
-[loop] tests/loop_analysis/ne.i:78: Warning: 
+[loop] ne.i:78: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -11; i -= 2)
-[loop] tests/loop_analysis/ne.i:86: Warning: 
+[loop] ne.i:86: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 25; i += 15)
-[loop] tests/loop_analysis/ne.i:94: Warning: 
+[loop] ne.i:94: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -35; i -= 15)
-[loop] tests/loop_analysis/ne.i:103: Warning: 
+[loop] ne.i:103: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 7; i -= 2)
-[loop] tests/loop_analysis/ne.i:111: Warning: 
+[loop] ne.i:111: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -9; i += 2)
-[loop] tests/loop_analysis/ne.i:119: Warning: 
+[loop] ne.i:119: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != 18; i -= 15)
-[loop] tests/loop_analysis/ne.i:127: Warning: 
+[loop] ne.i:127: Warning: 
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -5; i += 15)
 [loop] Functions with loops whose bounds we could not find:

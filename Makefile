@@ -170,12 +170,14 @@ force-reconfigure:
 
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value
 
-PLUGIN_TESTS= dive
+PLUGIN_TESTS= dive loop_analysis
 
 tests: config.sed
 	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 	dune exec -- ptests/ptests.exe
-	dune exec -- ptests/ptests.exe $(addprefix src/plugins/,$(addsuffix /tests/,$(PLUGIN_TESTS)))
+	for plugin in $(PLUGIN_TESTS); do \
+		dune exec -- ptests/ptests.exe src/plugins/$$plugin/tests; \
+	done
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
 	dune build $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
 
