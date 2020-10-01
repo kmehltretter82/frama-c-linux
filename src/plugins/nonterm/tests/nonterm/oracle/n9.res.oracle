@@ -1,19 +1,19 @@
-[kernel] Parsing tests/nonterm/n9.i (no preprocessing)
+[kernel] Parsing n9.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function f <- main.
-  Called from tests/nonterm/n9.i:41.
+  Called from n9.i:41.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function g <- main.
-  Called from tests/nonterm/n9.i:42.
+  Called from n9.i:42.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function f_explicit_break <- main.
-  Called from tests/nonterm/n9.i:43.
+  Called from n9.i:43.
 [eva] Recording results for f_explicit_break
 [eva] Done for function f_explicit_break
 [eva] Recording results for main
@@ -28,13 +28,13 @@
 [eva:final-states] Values at end of function main:
   res ∈ {0}
   __retres ∈ {0}
-[nonterm] tests/nonterm/n9.i:7: Warning: 
+[nonterm] n9.i:7: Warning: 
   non-terminating loop
-  stack: f :: tests/nonterm/n9.i:41 <- main
-[nonterm] tests/nonterm/n9.i:19: Warning: 
+  stack: f :: n9.i:41 <- main
+[nonterm] n9.i:19: Warning: 
   non-terminating loop
-  stack: g :: tests/nonterm/n9.i:42 <- main
-[nonterm] tests/nonterm/n9.i:29: Warning: 
+  stack: g :: n9.i:42 <- main
+[nonterm] n9.i:29: Warning: 
   non-terminating loop
-  stack: f_explicit_break :: tests/nonterm/n9.i:43 <- main
+  stack: f_explicit_break :: n9.i:43 <- main
 [nonterm] Analysis done.

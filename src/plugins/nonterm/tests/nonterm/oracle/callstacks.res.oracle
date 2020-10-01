@@ -1,29 +1,29 @@
-[kernel] Parsing tests/nonterm/callstacks.i (no preprocessing)
+[kernel] Parsing callstacks.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function h <- main.
-  Called from tests/nonterm/callstacks.i:23.
+  Called from callstacks.i:23.
 [eva] computing for function g <- h <- main.
-  Called from tests/nonterm/callstacks.i:18.
+  Called from callstacks.i:18.
 [eva] computing for function f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:13.
+  Called from callstacks.i:13.
 [eva] computing for function nt <- f <- g <- h <- main.
-  Called from tests/nonterm/callstacks.i:8.
+  Called from callstacks.i:8.
 [eva] Recording results for nt
 [eva] Done for function nt
-[eva] tests/nonterm/callstacks.i:9: Reusing old results for call to nt
+[eva] callstacks.i:9: Reusing old results for call to nt
 [eva] Recording results for f
 [eva] Done for function f
-[eva] tests/nonterm/callstacks.i:14: Reusing old results for call to f
+[eva] callstacks.i:14: Reusing old results for call to f
 [eva] Recording results for g
 [eva] Done for function g
-[eva] tests/nonterm/callstacks.i:19: Reusing old results for call to g
+[eva] callstacks.i:19: Reusing old results for call to g
 [eva] Recording results for h
 [eva] Done for function h
-[eva] tests/nonterm/callstacks.i:24: Reusing old results for call to g
+[eva] callstacks.i:24: Reusing old results for call to g
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -37,15 +37,15 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
-[nonterm] tests/nonterm/callstacks.i:4: Warning: 
+[nonterm] callstacks.i:4: Warning: 
   non-terminating loop
-  stack: nt :: tests/nonterm/callstacks.i:8 <-
-         f :: tests/nonterm/callstacks.i:13 <-
-         g :: tests/nonterm/callstacks.i:18 <-
-         h :: tests/nonterm/callstacks.i:23 <-
+  stack: nt :: callstacks.i:8 <-
+         f :: callstacks.i:13 <-
+         g :: callstacks.i:18 <-
+         h :: callstacks.i:23 <-
          main
-[nonterm] tests/nonterm/callstacks.i:8: Warning: unreachable return
-[nonterm] tests/nonterm/callstacks.i:13: Warning: unreachable return
-[nonterm] tests/nonterm/callstacks.i:18: Warning: unreachable return
-[nonterm] tests/nonterm/callstacks.i:23: Warning: unreachable return
+[nonterm] callstacks.i:8: Warning: unreachable return
+[nonterm] callstacks.i:13: Warning: unreachable return
+[nonterm] callstacks.i:18: Warning: unreachable return
+[nonterm] callstacks.i:23: Warning: unreachable return
 [nonterm] Analysis done.
