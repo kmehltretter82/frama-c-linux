@@ -47,24 +47,30 @@ let get_remark remarks label =
   | None -> []
   | Some l -> l
 
-let command_line () = Array.to_list Sys.argv
-
 module Analysis_cmdline =
-  State_builder.Ref(Datatype.List(Datatype.String))
+  State_builder.List_ref(Datatype.List(Datatype.String))
     (struct
       let name = "Sarif_gen.Analysis_cmdline"
       let dependencies = []
-      let default = command_line
     end)
 
+let command_line () = Array.to_list Sys.argv
+
+let update_cmdline () = Analysis_cmdline.add (command_line())
+
+let () = Cmdline.run_after_loading_stage update_cmdline
+
 let gen_invocation () =
-  let cl = Analysis_cmdline.get () in
-  (* The first argument is _always_ the binary name, but to avoid printing it
-     as an absolute path to binlevel.opt, we replace it with 'frama-c' *)
-  let cl = "frama-c" :: List.tl cl in
-  let commandLine = String.concat " " cl in
-  let arguments = List.tl cl in
-  Invocation.create ~commandLine ~arguments ()
+  let cls = Analysis_cmdline.get () in
+  let gen_one cl =
+    (* The first argument is _always_ the binary name, but to avoid printing it
+       as an absolute path to binlevel.opt, we replace it with 'frama-c' *)
+    let cl = "frama-c" :: List.tl cl in
+    let commandLine = String.concat " " cl in
+    let arguments = List.tl cl in
+    Invocation.create ~commandLine ~arguments ()
+  in
+  List.map gen_one cls
 
 let gen_remark alarm =
   let open Markdown in
@@ -215,7 +221,7 @@ let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 let gen_run remarks =
   let tool = frama_c_sarif () in
   let name = "frama-c" in
-  let invocations = [gen_invocation ()] in
+  let invocations = gen_invocation () in
   let rules, results = gen_results remarks in
   let user_annot_results = gen_statuses () in
   let rules =
