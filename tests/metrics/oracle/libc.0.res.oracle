@@ -4,8 +4,12 @@
    bar (0 call); f (0 call); foo (0 call); g (address taken) (0 call);
    main (0 call); 
   
-  Undefined functions (0)
-  =======================
+  Specified-only functions (0)
+  ============================
+   
+  
+  Undefined and unspecified functions (0)
+  =======================================
    
   
   'Extern' global variables (0)

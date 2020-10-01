@@ -67,6 +67,10 @@ val funspec:
     generated. 
     @raise No_funspec whenever the given function has no specification *) 
 
+val has_funspec: kernel_function -> bool
+(** @return [true] iff the function has a non-empty specification.
+    @since Frama-C+dev *)
+
 val behaviors:
   ?emitter:Emitter.t -> ?populate:bool -> kernel_function -> funbehavior list
 (** Get the behaviors clause of the contract associated to the given function.
