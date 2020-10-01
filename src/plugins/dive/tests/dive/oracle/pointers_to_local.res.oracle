@@ -1,4 +1,4 @@
-[kernel] Parsing tests/dive/pointers_to_local.i (no preprocessing)
+[kernel] Parsing pointers_to_local.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,4 +14,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/pointers_to_local.dot
+[dive] output to pointers_to_local.dot

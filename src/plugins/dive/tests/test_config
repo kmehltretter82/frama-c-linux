@@ -1,3 +1,5 @@
+# Just one test by C file since @PTEST_NUMBER@ is not used into the LOG name.
 LOG: @PTEST_NAME@.dot
-OPT: -no-autoload-plugins -load-module from,inout,eva,variadic,scope,dive -check -eva-msg-key=-initial-state -eva-no-show-progress -dive-output-dot @PTEST_RESULT@/@PTEST_NAME@
+PLUGIN: from inout eva variadic scope dive
+OPT: -check -eva-msg-key=-initial-state -eva-no-show-progress -dive-output-dot @PTEST_NAME@
 FILTER: perl -0777 -pe 's/\[server[^[]*//g'

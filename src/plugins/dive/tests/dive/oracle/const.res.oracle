@@ -1,17 +1,12 @@
-[kernel] Parsing tests/dive/const.i (no preprocessing)
+[kernel] Parsing const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/dive/const.i:14: Warning: 
-  signed overflow. assert -2147483648 ≤ 2 * i;
-[eva:alarm] tests/dive/const.i:14: Warning: 
-  signed overflow. assert 2 * i ≤ 2147483647;
-[eva:alarm] tests/dive/const.i:7: Warning: 
-  signed overflow. assert x + 1 ≤ 2147483647;
-[eva:alarm] tests/dive/const.i:9: Warning: 
-  signed overflow. assert -2147483648 ≤ c + w;
-[eva:alarm] tests/dive/const.i:9: Warning: 
-  signed overflow. assert c + w ≤ 2147483647;
+[eva:alarm] const.i:14: Warning: signed overflow. assert -2147483648 ≤ 2 * i;
+[eva:alarm] const.i:14: Warning: signed overflow. assert 2 * i ≤ 2147483647;
+[eva:alarm] const.i:7: Warning: signed overflow. assert x + 1 ≤ 2147483647;
+[eva:alarm] const.i:9: Warning: signed overflow. assert -2147483648 ≤ c + w;
+[eva:alarm] const.i:9: Warning: signed overflow. assert c + w ≤ 2147483647;
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
@@ -25,4 +20,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/const.dot
+[dive] output to const.dot

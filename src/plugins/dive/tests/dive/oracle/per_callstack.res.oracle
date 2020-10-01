@@ -1,10 +1,10 @@
-[kernel] Parsing tests/dive/per_callstack.i (no preprocessing)
+[kernel] Parsing per_callstack.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/dive/per_callstack.i:15: Warning: 
+[eva:alarm] per_callstack.i:15: Warning: 
   non-finite float value. assert \is_finite(\add_float(x, y));
-[eva:alarm] tests/dive/per_callstack.i:15: Warning: 
+[eva:alarm] per_callstack.i:15: Warning: 
   non-finite float value. assert \is_finite(\add_float(\add_float(x, y), z));
 [eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
@@ -19,4 +19,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[dive] output to tests/dive/result/per_callstack.dot
+[dive] output to per_callstack.dot
