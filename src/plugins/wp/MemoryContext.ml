@@ -362,6 +362,26 @@ let compute name hypotheses_computer =
 let get_behavior kf name hypotheses_computer =
   Table.memo (fun kf -> compute_behavior kf name hypotheses_computer) kf
 
+let print_memory_context kf bhv fmt =
+  begin
+    let printer = new Printer.extensible_printer () in
+    let pp_vdecl = printer#without_annot printer#vdecl in
+    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
+    let vkf = Kernel_function.get_vi kf in
+    Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
+      pp_vdecl vkf ;
+  end
+
+let warn kf name hyp_computer =
+  match get_behavior kf name hyp_computer with
+  | None -> ()
+  | Some bhv ->
+      Wp_parameters.warning
+        ~current:false ~once:true
+        "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
+        (Kernel_function.get_name kf)
+        (print_memory_context kf bhv)
+
 let emitter =
   Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
 

@@ -20,20 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
-type param = NotUsed | ByAddr | ByValue | ByShift | ByRef | InContext | InArray
-
-val pp_param: Format.formatter -> param -> unit
-
-type partition
-
-val empty: partition
-val set: varinfo -> param -> partition -> partition
-
-val compute: string -> (kernel_function -> partition) -> unit
-
-val add_behavior:
-  kernel_function -> string -> (kernel_function -> partition) -> unit
-val warn:
-  kernel_function -> string -> (kernel_function -> partition) -> unit
+val compute: WpContext.model -> unit
+val iter: (Kernel_function.t -> unit) -> unit

@@ -1658,6 +1658,8 @@ src/plugins/wp/Why3Provers.mli: CEA_WP
 src/plugins/wp/Wp.mli: .ignore
 src/plugins/wp/WpTac.ml: CEA_WP
 src/plugins/wp/WpTac.mli: CEA_WP
+src/plugins/wp/WpTarget.ml: CEA_WP
+src/plugins/wp/WpTarget.mli: CEA_WP
 src/plugins/wp/calculus.ml: CEA_WP
 src/plugins/wp/calculus.mli: CEA_WP
 src/plugins/wp/cfgDump.ml: CEA_WP

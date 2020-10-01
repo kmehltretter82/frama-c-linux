@@ -772,8 +772,7 @@ let select_default pid =
   let names = user_prop_pid pid in
   not (List.mem "no_wp" names)
 
-let select_by_name asked_names pid =
-  let names = user_prop_pid pid in
+let are_selected_names asked names =
   if List.mem "no_wp" names then false
   else
     let is_minus s = try s.[0] = '-' with _ -> false in
@@ -791,9 +790,15 @@ let select_by_name asked_names pid =
                then a && (not (eval ()))
                else a || (eval ()))
     in
-    match List.fold_left eval None asked_names with
+    match List.fold_left eval None asked with
     | Some false -> false
     | _ -> true
+
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  are_selected_names asked_names names
+
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
