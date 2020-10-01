@@ -607,17 +607,11 @@ module Provers = String_list
       let option_name = "-wp-prover"
       let arg_name = "dp,..."
       let help =
-        "Submit proof obligations to external prover(s):\n\
-         - 'none' to skip provers\n\
-         - 'script' (session scripts only)\n\
-         - 'tip' (failed scripts only)\n\
-         - 'alt-ergo' (default)\n\
-         - 'altgr-ergo' (gui)\n\
-         - 'coq', 'coqide' (see also -wp-coq-script)\n\
-         - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
-         - 'native:alt-ergo'\n\
-         - 'native:coq'\n\
-         - 'native:coqide'\
+        "Submit proof obligations to prover(s):\n\
+         - 'none' (no prover run)\n\
+         - 'script' (replay all session scripts)\n\
+         - 'tip' (replay or init scripts for failed goals)\n\
+         - '<why3-prover>' (any Why-3 prover, see -wp-detect)\n\
         "
     end)
 
@@ -628,10 +622,12 @@ module Interactive = String
       let arg_name = "mode"
       let default = "batch"
       let help =
-        "WP mode for interactive provers:\n\
-         - 'batch': use script only (default)\n\
-         - 'edit': run editor on every goal\n\
-         - 'fix': run editor for unproved goal\n\
+        "WP mode for interactive Why-3 provers (eg: Coq):\n\
+         - 'batch': check current proof (default)\n\
+         - 'update': update and check proof\n\
+         - 'edit': edit proof before check\n\
+         - 'fix': check and edit proof if necessary\n\
+         - 'fixup': update proof and fix\n\
         "
     end)
 
