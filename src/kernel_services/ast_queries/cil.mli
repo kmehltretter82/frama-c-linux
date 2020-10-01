@@ -2316,14 +2316,7 @@ val separate_if_succs: stmt -> stmt * stmt
 
 (**/**)
 
-val dependency_on_ast: State.t -> unit
-(** indicates that the given state depends on the AST. *)
-
-val set_dependencies_of_ast : State.t -> unit
-(** Makes all states that have been marked as depending on the AST by
-    {!dependency_on_ast} depend on the given state. Should only be used
-    once when creating the AST state.
-*)
+val switch_case_state_self: State.t
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref
 val pp_global_ref: (Format.formatter -> global -> unit) ref

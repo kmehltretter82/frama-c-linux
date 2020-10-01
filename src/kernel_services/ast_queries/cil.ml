@@ -70,11 +70,6 @@ let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
 
 let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
 
-let set_dependencies_of_ast, dependency_on_ast  =
-  let list_self = ref [] in
-  (fun ast -> State_dependency_graph.add_dependencies ~from:ast !list_self),
-  (fun state -> list_self := state :: !list_self)
-
 let voidType = Cil_const.voidType
 let intType = TInt(IInt,[])
 let uintType = TInt(IUInt,[])
@@ -698,7 +693,6 @@ module FormalsDecl =
     end)
 
 let selfFormalsDecl = FormalsDecl.self
-let () = dependency_on_ast selfFormalsDecl
 
 let makeFormalsVarDecl ?ghost (n,t,a) =
   let vi = makeVarinfo ?ghost ~temp:false false true n t in
@@ -4871,8 +4865,6 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let () = dependency_on_ast Frama_c_builtins.self
-
 let is_builtin v = hasAttribute "FC_BUILTIN" v.vattr
 
 let is_unused_builtin v = is_builtin v && not v.vreferenced
@@ -7165,7 +7157,8 @@ module Switch_cases =
       let dependencies = []
       let size = 49
     end)
-let () = dependency_on_ast Switch_cases.self
+
+let switch_case_state_self = Switch_cases.self
 let separate_switch_succs = Switch_cases.memo separate_switch_succs
 
 class dropAttributes ?select () = object

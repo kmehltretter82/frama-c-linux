@@ -71,7 +71,6 @@ module Comments =
           let default () = MyTable.empty
          end)
     let self = MyState.self
-    let () = Cil.dependency_on_ast self
 
     (* What matters is the beginning of the comment. *)
     let add (first,last) comment =

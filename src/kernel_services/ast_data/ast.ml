@@ -87,7 +87,9 @@ let () =
                  Cil_datatype.Varinfo.Hptset.self ];
   add_monotonic_state Cil_datatype.Stmt.Hptset.self;
   add_monotonic_state Cil_datatype.Varinfo.Hptset.self;
-  Cil.set_dependencies_of_ast self;
+  State_dependency_graph.add_dependencies ~from:self
+    [Cabshelper.Comments.self;Cil.selfFormalsDecl;
+     Cil.Frama_c_builtins.self;Cil.switch_case_state_self];
   Logic_env.init_dependencies self;
 
 exception Bad_Initialization of string
