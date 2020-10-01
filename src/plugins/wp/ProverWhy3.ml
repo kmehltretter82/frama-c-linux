@@ -1275,9 +1275,8 @@ let scriptfile ~force ~ext wpo =
   Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
 let call_editor ~script wpo pconf driver prover task =
-  let digest = digest wpo driver in
   Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
-  Cache.clean_entry_for digest prover task ;
+  Cache.clear_result ~digest:(digest wpo driver) prover task ;
   let call = Why3.Call_provers.call_editor ~command:(editor pconf) script in
   call_prover_task ~timeout:None ~steps:None pconf.prover call
 
