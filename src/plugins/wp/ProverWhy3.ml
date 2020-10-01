@@ -1262,7 +1262,9 @@ let batch pconf driver ?script ~timeout ~steplimit prover task =
 (* --- Interactive Prover (Coq)                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let editor pconf =
+let editor_mutex = Task.mutex ()
+
+let editor_command pconf =
   let config = Why3Provers.config () in
   try
     let ed = Why3.Whyconf.editor_by_id config pconf.Why3.Whyconf.editor in
@@ -1275,21 +1277,25 @@ let scriptfile ~force ~ext wpo =
   Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
 
 let editor ~script ~merge wpo pconf driver prover task =
-  Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
-  Cache.clear_result ~digest:(digest wpo driver) prover task ;
-  if merge then
-    begin
-      let backup = script ^ ".bak" in
-      Sys.rename script backup ;
-      let old = open_in backup in
-      Command.pp_to_file script
-        (fun fmt ->
-           ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
-        );
-      close_in old ;
-    end ;
-  let call = Why3.Call_provers.call_editor ~command:(editor pconf) script in
-  call_prover_task ~timeout:None ~steps:None pconf.prover call
+  Task.sync editor_mutex
+    begin fun () ->
+      Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
+      Cache.clear_result ~digest:(digest wpo driver) prover task ;
+      if merge then
+        begin
+          let backup = script ^ ".bak" in
+          Sys.rename script backup ;
+          let old = open_in backup in
+          Command.pp_to_file script
+            (fun fmt ->
+               ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
+            );
+          close_in old ;
+        end ;
+      let command = editor_command pconf in
+      let call = Why3.Call_provers.call_editor ~command script in
+      call_prover_task ~timeout:None ~steps:None pconf.prover call
+    end
 
 let compile ~script ~timeout wpo pconf driver prover task =
   let digest = digest wpo driver in
