@@ -143,7 +143,7 @@ clean-backups:
 
 HR_TIMESTAMP := $(shell date +"%H:%M:%S %d/%m/%Y")# Human readable
 DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
-SHELL        := /bin/bash
+SHELL        := $(shell which bash)
 .SHELLFLAGS  := -eu -o pipefail -c
 
 .ONESHELL:
