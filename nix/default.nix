@@ -5,11 +5,11 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
            specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
                 { name = "coq"; constraint = "=8.12.0";  }
+                { name = "alt-ergo" ; constraint = "=2.3.1"; }
                 { name = "why3" ; constraint = "=1.3.3"; }
                 { name = "why3-coq" ; constraint = "=1.3.3"; }
                 { name = "menhir"; constraint = "=20200624"; }
                 { name = "dune"; constraint = "=2.7.1"; }
-                { name = "camlzip"; constraint = "=1.10"; }  #so that why3 is always compiled with it
                 ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
@@ -159,9 +159,7 @@ rec {
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.3.1"; }
-               ]; };
+        buildInputs = mk_buildInputs { opamPackages = []; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
