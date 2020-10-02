@@ -168,8 +168,23 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests clean-tests
 
+# todo: adds bugs?
+# todo: adds crowbar?
+# todo: adds dynamic?
+# todo: adds dynamic_plugin?
+# todo: adds fc_script
+# todo: adds make_run_script
+# todo: adds more_wp
+# todo: adds pretty_printing: fixes tests/pretty_printing/ghost_parameters.c
+# todo: adds saveload
+# todo: adds verisec
+# todo: what about test_config_apron, test_config_...
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value
 
+# todo: adds aorai (2 configs + Aorai_test library)
+# todo: adds report: fixes src/plugins/report/tests/report/classify.c
+# todo: no test found for studia ?
+# todo: adds wp (at least 2 configs)
 PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm server variadic
 
 tests: config.sed
