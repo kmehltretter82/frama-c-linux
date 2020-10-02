@@ -170,7 +170,7 @@ force-reconfigure:
 
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value
 
-PLUGIN_TESTS= dive loop_analysis markdown-report nonterm server
+PLUGIN_TESTS= dive loop_analysis markdown-report nonterm server variadic
 
 tests: config.sed
 	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
