@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [rte] annotating function BinaryMultiplication
 [wp] 16 goals scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_half : Unsuccess
+[wp] [Alt-Ergo] Goal typed_lemma_half : Valid
 [wp] [Qed] Goal typed_lemma_size : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
@@ -19,12 +19,12 @@
 [wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
 [wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
-[wp] Proved goals:   15 / 16
+[wp] Proved goals:   16 / 16
   Qed:             3 
-  Alt-Ergo:       12  (unsuccess: 1)
+  Alt-Ergo:       13
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Axiomatic mult            1        -        2      50.0%
+  Axiomatic mult            1        1        2       100%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   BinaryMultiplication      2       12       14       100%
