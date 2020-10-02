@@ -139,7 +139,6 @@ ML_LINT_KO+=src/libraries/utils/cilconfig.ml
 ML_LINT_KO+=src/libraries/utils/command.ml
 ML_LINT_KO+=src/libraries/utils/command.mli
 ML_LINT_KO+=src/libraries/utils/escape.mli
-ML_LINT_KO+=src/libraries/utils/filepath.ml
 ML_LINT_KO+=src/libraries/utils/hook.ml
 ML_LINT_KO+=src/libraries/utils/hook.mli
 ML_LINT_KO+=src/libraries/utils/hptmap.ml

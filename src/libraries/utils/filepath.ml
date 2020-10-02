@@ -83,7 +83,7 @@ let make dir base_name =
 
 let getdir path =
   match path.dir with
-  | None -> dummy (* the parent of the root directory is itself *) 
+  | None -> dummy (* the parent of the root directory is itself *)
   | Some d -> d
 
 let rec norm path = function
@@ -93,9 +93,9 @@ let rec norm path = function
   | p::ps -> norm (make path p) ps
 
 let insert base path_name =
-  let full_path_name = 
-    (* if a <base> is provided while a <file> which is already absolute 
-       (and thus matches [re_root]) then the <base> is not taken 
+  let full_path_name =
+    (* if a <base> is provided while a <file> which is already absolute
+       (and thus matches [re_root]) then the <base> is not taken
        into account *)
     if Str.string_match re_root path_name 0
     then path_name
@@ -108,8 +108,8 @@ let insert base path_name =
     try HPath.find hcons p
     with Not_found ->
       let base =
-        (* if a <base> is provided while a <file> is already absolute 
-           (and thus matches [re_root]) then the <base> is not taken 
+        (* if a <base> is provided while a <file> is already absolute
+           (and thus matches [re_root]) then the <base> is not taken
            into account *)
         if Str.string_match re_root path_name 0
         then root (String.sub path_name 0 (Str.group_end 0 - 1))
@@ -176,16 +176,16 @@ let add_symbolic_dir name dir =
 let rec add_path buffer path =
   let open Buffer in
   match path.symbolic_name with
-    | None ->
-        begin
-          match path.dir with
-            | None -> add_string buffer path.path_name
-            | Some d ->
-              if d != cwd (* hconsed *) then
-                ( add_path buffer d ; add_char buffer '/' ) ;
-              add_string buffer path.base_name
-        end
-    | Some sn -> add_string buffer sn
+  | None ->
+    begin
+      match path.dir with
+      | None -> add_string buffer path.path_name
+      | Some d ->
+        if d != cwd (* hconsed *) then
+          ( add_path buffer d ; add_char buffer '/' ) ;
+        add_string buffer path.base_name
+    end
+  | Some sn -> add_string buffer sn
 
 let rec skip_dot file_name =
   if Extlib.string_prefix "./" file_name then
