@@ -336,7 +336,7 @@ let () =
 
 
 let fail s =
-  Format.printf "Error: %s@." s;
+  Format.printf "Error: %s@.Aborting (CWD=%s).@." s (Sys.getcwd());
   exit 2
 
 (** split the filename into before including "tests" dir and after including "tests" dir
@@ -359,7 +359,7 @@ let rec get_test_path = function
   | [] ->
     if Sys.file_exists "tests" && Sys.is_directory "tests" then "tests", []
     else begin
-      Format.eprintf "No test path found. Aborting@.";
+      Format.eprintf "No test path found. Aborting (CWD=%s).@." (Sys.getcwd());
       exit 1
     end
   | [f] -> let tests, suffix = get_upper_test_dir f f in
@@ -404,7 +404,7 @@ let () =
           let value = Str.matched_group 2 line in
           parse_config_line (key, value)
         else begin
-          Format.eprintf "Cannot interpret line '%s' in ptests_config@." line;
+          Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
           exit 1
         end
       done
@@ -413,7 +413,7 @@ let () =
   end
   else begin
     Format.eprintf
-      "Cannot find configuration file %s. Aborting.@." config;
+      "Cannot find configuration file %s. Aborting (CWD=%s).@." config (Sys.getcwd()) ;
     exit 1
   end
 
@@ -1444,7 +1444,7 @@ let launch_and_check_compare_file diff ~cmp_string ~log_file ~oracle_file =
       lock_printf
         "%% Comparison function exited with code %d for files %s and %s. \
          Allowed exit codes are 0 (no diff), 1 (diff found) and \
-         2 (system error). This is a fatal error.@." n log_file oracle_file;
+         2 (system error). Aborting (CWD=%s).@." n log_file oracle_file (Sys.getcwd());
       exit 2
   end;
   res
