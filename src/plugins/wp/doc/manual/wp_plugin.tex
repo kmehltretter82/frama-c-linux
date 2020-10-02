@@ -995,12 +995,17 @@ See \texttt{-wp-interactive <mode>} option for details.
   For each goal, the first decision procedure that succeeds cancels the
   other attempts.
 \item[\tt -wp-interactive <mode>] selects the interaction mode with
-  interactive provers such as Coq. Three modes are available:
-  \texttt{"batch"} mode only check existing scripts (the default);
-  \texttt{"edit"} mode opens the default prover editor on each generated goal;
-  \texttt{"fix"} mode only opens
-  editor for non-proved goals. New scripts are created in the \texttt{interactive}
-  directory of \textsf{WP} session (see option \texttt{-wp-session <dir>}).
+  interactive provers such as Coq (while it could work for other interactive
+  provers, it has not been tested so far). Five modes are available:
+  \begin{itemize}
+  \item \texttt{"batch"} mode only check existing scripts (the default);
+  \item \texttt{"update"} mode update the script and then checks it;
+  \item \texttt{"edit"} mode opens the default prover editor on each generated goal;
+  \item \texttt{"fix"} mode only opens editor for non-proved goals;
+  \item \texttt{"fixup"} combines \texttt{"update"} and \texttt{"fix"} (if necessary).
+  \end{itemize}
+  New scripts are created in the \texttt{interactive} directory of \textsf{WP}
+  session (see option \texttt{-wp-session <dir>}).
 \item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
   This command can only work if \textsf{why3} API was installed before building and
   installing \textsf{Frama-C}.
