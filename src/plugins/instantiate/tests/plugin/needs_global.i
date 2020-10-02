@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -load-script tests/plugin/needs_globals.ml -instantiate -check -print
+   MODULE: needs_globals.cmxs
+   OPT: -instantiate -check -print
 */
 
 int i ; // needed for already_one specifciation
