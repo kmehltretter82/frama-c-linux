@@ -160,7 +160,7 @@ rec {
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
         buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.0.0"; }
+                    { name = "alt-ergo"; constraint = "=2.3.3"; }
                ]; };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
