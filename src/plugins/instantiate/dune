@@ -6,3 +6,6 @@
 )
 
 (plugin (optional) (name instantiate) (libraries frama-c-instantiate.core) (site (frama-c plugins)))
+
+(copy_files# stdlib/*)
+(copy_files# string/*)
