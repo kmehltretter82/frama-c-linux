@@ -47,6 +47,10 @@ let get_remark remarks label =
   | None -> []
   | Some l -> l
 
+(* keep track of command line arguments for all invocations of Frama-C during
+   a save/load sequence. Note that the list is in reverse order
+   (newest invocation first).
+*)
 module Analysis_cmdline =
   State_builder.List_ref(Datatype.List(Datatype.String))
     (struct
@@ -70,7 +74,7 @@ let gen_invocation () =
     let arguments = List.tl cl in
     Invocation.create ~commandLine ~arguments ()
   in
-  List.map gen_one cls
+  List.rev_map gen_one cls
 
 let gen_remark alarm =
   let open Markdown in
