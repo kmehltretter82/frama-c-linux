@@ -404,9 +404,14 @@ class altergo ~config ~pid ~gui ~file ~lines ~logout ~logerr =
                 ~steps verdict
             with Not_found ->
               begin
+                let message std =
+                  Format.asprintf
+                    "Alt-Ergo (%s) for goal %a"
+                    std WpPropId.pretty pid
+                in
                 if Wp_parameters.verbose_atleast 1 then begin
-                  ProverTask.pp_file ~message:"Alt-Ergo (stdout)" ~file:logout ;
-                  ProverTask.pp_file ~message:"Alt-Ergo (stderr)" ~file:logerr ;
+                  ProverTask.pp_file ~message:(message "stdout") ~file:logout ;
+                  ProverTask.pp_file ~message:(message "stderr") ~file:logerr ;
                 end;
                 if r = 0 then VCS.failed "Unexpected Alt-Ergo output"
                 else VCS.kfailed "Alt-Ergo exits with status [%d]." r
@@ -450,11 +455,11 @@ let try_prove ~config ~pid ~gui ~file ~lines ~logout ~logerr =
 
 let prove_file ~config ~pid ~mode ~file ~lines ~logout ~logerr =
   let gui = match mode with
-    | EditMode -> Lazy.force altergo_gui
-    | BatchMode | FixMode -> false in
+    | Edit -> Lazy.force altergo_gui
+    | Batch | Update | Fix | FixUpdate -> false in
   try_prove ~config ~pid ~gui ~file ~lines ~logout ~logerr >>= function
   | { verdict=(VCS.Unknown|VCS.Timeout|VCS.Stepout) }
-    when mode = FixMode && Lazy.force altergo_gui ->
+    when (mode = Fix || mode = FixUpdate) && Lazy.force altergo_gui ->
       try_prove ~config ~pid ~gui:true ~file ~lines ~logout ~logerr
   | r -> Task.return r
 

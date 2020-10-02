@@ -103,8 +103,12 @@ module Normalized: sig
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
-  (** @return the normalized path resulting from the concatenation of the given
-      path and string. *)
+  (** [concat ~existence dir file] returns the normalized path
+      resulting from the concatenation of [dir] ^ "/" ^ [file].
+      The resulting path must respect [existence].
+
+      @since Frama-C+dev
+  *)
   val concat: ?existence:existence -> t -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,

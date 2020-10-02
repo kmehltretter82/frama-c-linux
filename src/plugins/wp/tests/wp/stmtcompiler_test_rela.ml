@@ -21,7 +21,7 @@ let run () =
       (fun pname prvs -> match VCS.parse_prover pname with
          | None -> prvs
          | Some VCS.Tactical -> prvs
-         | Some prv -> (VCS.BatchMode, prv) :: prvs)
+         | Some prv -> (VCS.Batch, prv) :: prvs)
       ["alt-ergo"] []
   in
 

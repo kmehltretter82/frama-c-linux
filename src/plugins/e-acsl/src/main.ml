@@ -106,15 +106,6 @@ let generate_code =
     (Datatype.func Datatype.string Project.ty)
     generate_code
 
-let predicate_to_exp =
-  Dynamic.register
-    ~plugin:"E_ACSL"
-    ~journalize:false
-    "predicate_to_exp"
-    (Datatype.func2
-       Kernel_function.ty Cil_datatype.Predicate.ty Cil_datatype.Exp.ty)
-    Translate.predicate_to_exp
-
 (* The Frama-C standard library contains specific built-in variables prefixed by
    "__fc_" and declared as extern: they prevent the generated code to be
    linked. This modification of the default printer replaces them by their

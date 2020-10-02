@@ -41,8 +41,8 @@ val init_set: loc:location -> lval -> exp -> exp -> stmt
 val normalize_str: string -> string
 (** Normalize the string so that it fits the representation used by the
     underlying real library. For example, "0.1" is a real number in ACSL
-    whereas it is considered as a double by `libgmp` because it is written in
-    decimal expansion. In order to make `libgmp` consider it to be a rational,
+    whereas it is considered as a double by [libgmp] because it is written in
+    decimal expansion. In order to make [libgmp] consider it to be a rational,
     it must be converted into "1/10". *)
 
 (* TODO: change the call convention *)

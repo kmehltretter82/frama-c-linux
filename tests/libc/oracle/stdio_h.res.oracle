@@ -114,6 +114,29 @@
 [eva:alarm] tests/libc/stdio_h.c:41: Warning: 
   function fgets: precondition 'room_s' got status invalid.
 [eva] Done for function fgets
+[eva] computing for function fgetpos <- main.
+  Called from tests/libc/stdio_h.c:46.
+[eva] using specification for function fgetpos
+[eva] tests/libc/stdio_h.c:46: 
+  function fgetpos: precondition 'valid_stream' got status valid.
+[eva] tests/libc/stdio_h.c:46: 
+  function fgetpos: precondition 'valid_pos' got status valid.
+[eva] Done for function fgetpos
+[eva] computing for function fsetpos <- main.
+  Called from tests/libc/stdio_h.c:47.
+[eva] using specification for function fsetpos
+[eva] tests/libc/stdio_h.c:47: 
+  function fsetpos: precondition 'valid_stream' got status valid.
+[eva] tests/libc/stdio_h.c:47: 
+  function fsetpos: precondition 'valid_pos' got status valid.
+[eva] tests/libc/stdio_h.c:47: 
+  function fsetpos: precondition 'initialization,pos' got status valid.
+[eva] Done for function fsetpos
+[eva] computing for function fclose <- main.
+  Called from tests/libc/stdio_h.c:49.
+[eva] tests/libc/stdio_h.c:49: 
+  function fclose: precondition 'valid_stream' got status valid.
+[eva] Done for function fclose
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -129,5 +152,7 @@
   redirected ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
   fgets_buf0[0] ∈ [--..--] or UNINITIALIZED
   fgets_res ∈ {{ NULL ; &fgets_buf0[0] }}
+  pos ∈ [--..--] or UNINITIALIZED
+  res_fclose ∈ {-1; 0}
   __retres ∈ {0; 1; 2; 3}
   S___fc_stdout[0..1] ∈ [--..--]

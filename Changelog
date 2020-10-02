@@ -17,6 +17,13 @@
 Open Source Release <next-release>
 ##################################
 
+-   Metrics   [2020-10-01] Distinguish between undefined but specified functions
+              and functions with neither definition nor specification.
+-*  Eva       [2020-09-28] Improved string builtins on wide strings: crash fixed,
+              better performance, misaligned pointers now considered invalid.
+-   Kernel    [2020-09-22] New option -autocomplete p1, ..., pn that list the
+              options of plug-ins p1, ..., pn in a format suitable for
+              autocompletion scripts.
 -   Kernel    [2020-09-21] Option -permissive now allows non-existent option
               names.
 -   Logic     [2020-09-11] Introduce check-only annotations for

@@ -17,13 +17,28 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file tests/wp_acsl/base_offset.i, line 15) in 'f':
-Let x = p.offset.
+Let x = p.base.
+Let a = table_of_base(x).
+Let x_1 = p.offset.
 Assume {
   (* Heap *)
-  Type: region(p.base) <= 0.
+  Type: region(x) <= 0.
   (* Goal *)
   When: (0 <= i) /\ (i <= i_1) /\ (i_1 <= 3).
 }
-Prove: base_offset(1 + i + x) <= base_offset(1 + i_1 + x).
+Prove: table_to_offset(a, 1 + i + x_1) <= table_to_offset(a, 1 + i_1 + x_1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function g
+------------------------------------------------------------
+
+Goal Check 'KO' (file tests/wp_acsl/base_offset.i, line 29):
+Prove: table_of_base(G_z_33) = table_of_base(G_x_31).
+
+------------------------------------------------------------
+
+Goal Check 'KO' (file tests/wp_acsl/base_offset.i, line 30):
+Prove: table_of_base(G_y_32) != table_of_base(G_x_31).
 
 ------------------------------------------------------------

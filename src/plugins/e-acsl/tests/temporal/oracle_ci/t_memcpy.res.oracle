@@ -24,7 +24,7 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:95: Warning: 
   E-ACSL construct `\separated' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:95: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:92: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:98: Warning: 

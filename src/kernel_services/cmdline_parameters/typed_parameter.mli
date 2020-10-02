@@ -45,6 +45,8 @@ type parameter = private
       help: string; (** Help message *)
       accessor: typed_accessor; (** How to get and set the value of the
 				    parameter *)
+      visible: bool; (** Is visible to the user, e.g. in the command-line help *)
+      reconfigurable: bool; (** Can be reconfigured, e.g. in the GUI *)
       is_set: unit -> bool (** Is this option really set? *) }
 
 include Datatype.S_with_collections with type t = parameter
@@ -61,6 +63,8 @@ val create:
   name:string -> 
   help:string -> 
   accessor:typed_accessor ->
+  visible:bool ->
+  reconfigurable:bool ->
   is_set: (unit -> bool) ->
   t
 (**/**)

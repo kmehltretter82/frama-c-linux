@@ -22,7 +22,7 @@
 [wp] [Qed] Goal typed_min_disjoint_bx_by : Valid
 [wp] [Qed] Goal typed_min_bx_ensures_qed_ok : Valid
 [wp] [Qed] Goal typed_min_by_ensures_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_bhv_complete_pos_neg : Valid
+[wp] [Alt-Ergo] Goal typed_bhv_complete_neg_pos : Valid
 [wp] [Qed] Goal typed_bhv_pos_ensures_qed_ok : Valid
 [wp] [Qed] Goal typed_bhv_neg_ensures_qed_ok : Valid
 [wp] [Qed] Goal typed_stmt_contract_requires_qed_ok : Valid

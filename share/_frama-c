@@ -127,7 +127,7 @@ function _frama_c () {
         local autocomp
         # call frama-c with all the -load-module ; if it fails, test without the load-modules ;
         # if it fails again, abort
-        autocomp=$($the_args -autocomplete 2>/dev/null) || autocomp=$($my_words[1] -autocomplete 2>/dev/null) || unset autocomp
+        autocomp=$($the_args -autocomplete @all 2>/dev/null) || autocomp=$($my_words[1] -autocomplete @all 2>/dev/null) || unset autocomp
         (( $+autocomp )) && autocompletion=($(grep -o "\-[^ ]*" <<< $autocomp | sort))
         (( $#autocompletion )) || _message "$my_words[1] exists, but no option was detected"
         _store_cache frama-c_autocompletion autocompletion

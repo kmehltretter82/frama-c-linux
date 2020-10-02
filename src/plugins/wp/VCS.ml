@@ -34,9 +34,11 @@ type prover =
   | Tactical      (* Interactive Prover *)
 
 type mode =
-  | BatchMode (* Only check scripts *)
-  | EditMode  (* Edit then check scripts *)
-  | FixMode   (* Try check script, then edit script on non-success *)
+  | Batch (* Only check scripts *)
+  | Update (* Check and update scripts *)
+  | Edit  (* Edit then check scripts *)
+  | Fix   (* Try to check script, then edit script on non-success *)
+  | FixUpdate (* Update and fix *)
 
 let parse_prover = function
   | "" | "none" -> None
@@ -76,13 +78,15 @@ let parse_prover = function
 
 let parse_mode m =
   match String.lowercase_ascii m with
-  | "fix" -> FixMode
-  | "edit" -> EditMode
-  | "batch" -> BatchMode
+  | "fix" -> Fix
+  | "edit" -> Edit
+  | "batch" -> Batch
+  | "update" -> Update
+  | "fixup" -> FixUpdate
   | _ ->
       Wp_parameters.error ~once:true
         "Unrecognized mode %S (use 'batch' instead)" m ;
-      BatchMode
+      Batch
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.print_wp s
@@ -102,9 +106,11 @@ let title_of_prover = function
   | Tactical -> "Script"
 
 let title_of_mode = function
-  | FixMode -> "Fix"
-  | EditMode -> "Edit"
-  | BatchMode -> "Batch"
+  | Fix -> "Fix"
+  | Edit -> "Edit"
+  | Batch -> "Batch"
+  | Update -> "Update"
+  | FixUpdate -> "Fix Update"
 
 let sanitize_why3 s =
   let buffer = Buffer.create 80 in

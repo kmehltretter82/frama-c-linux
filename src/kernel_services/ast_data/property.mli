@@ -100,7 +100,7 @@ type identified_complete = {
   ic_kf : kernel_function;
   ic_kinstr : kinstr;
   ic_active : Datatype.String.Set.t;
-  ic_bhvs : string list
+  ic_bhvs : Datatype.String.Set.t
 }
 (** Same as for {!identified_behavior}. *)
 
@@ -149,7 +149,8 @@ type identified_extended = {
 
 and identified_axiomatic = {
   iax_name : string;
-  iax_props : identified_property list
+  iax_props : identified_property list;
+  iax_attrs : attributes;
 }
 
 and identified_lemma = {
@@ -157,6 +158,7 @@ and identified_lemma = {
   il_labels : logic_label list;
   il_args : string list;
   il_pred : toplevel_predicate;
+  il_attrs : attributes;
   il_loc : location
 }
 

@@ -251,7 +251,7 @@ class behavior
           | VCS.Tactical ->
               begin
                 match mode , ProverScript.get w with
-                | (None | Some VCS.BatchMode) , `Script ->
+                | (None | Some VCS.Batch) , `Script ->
                     schedule (ProverScript.prove ~success w)
                 | _ ->
                     card#set `Goal ;
@@ -261,9 +261,9 @@ class behavior
           | _ ->
               let mode = match mode , prover with
                 | Some m , _ -> m
-                | None , VCS.NativeCoq -> VCS.EditMode
-                | None , VCS.NativeAltErgo -> VCS.FixMode
-                | _ -> if VCS.is_auto prover then VCS.BatchMode else VCS.FixMode in
+                | None , VCS.NativeCoq -> VCS.Edit
+                | None , VCS.NativeAltErgo -> VCS.Fix
+                | _ -> if VCS.is_auto prover then VCS.Batch else VCS.Fix in
               schedule (Prover.prove w ~mode ~result prover) ;
               refresh w
       end
@@ -325,17 +325,17 @@ class behavior
     initializer
       let open VCS in
       begin
-        popup_tip#add_item ~label:"Run Script" ~callback:(self#popup_run BatchMode) ;
-        popup_tip#add_item ~label:"Edit Proof" ~callback:(self#popup_run EditMode) ;
+        popup_tip#add_item ~label:"Run Script" ~callback:(self#popup_run Batch) ;
+        popup_tip#add_item ~label:"Edit Proof" ~callback:(self#popup_run Edit) ;
         popup_tip#add_item ~label:"Delete Script" ~callback:(self#popup_delete_script) ;
-        popup_why3_auto#add_item ~label:"Run Prover" ~callback:(self#popup_run VCS.BatchMode) ;
-        popup_why3_inter#add_item ~label:"Check Script" ~callback:(self#popup_run VCS.BatchMode) ;
-        popup_why3_inter#add_item ~label:"Edit Script" ~callback:(self#popup_run VCS.EditMode) ;
-        popup_why3_inter#add_item ~label:"Fixup Script" ~callback:(self#popup_run VCS.FixMode) ;
+        popup_why3_auto#add_item ~label:"Run Prover" ~callback:(self#popup_run VCS.Batch) ;
+        popup_why3_inter#add_item ~label:"Check Script" ~callback:(self#popup_run VCS.Batch) ;
+        popup_why3_inter#add_item ~label:"Edit Script" ~callback:(self#popup_run VCS.Edit) ;
+        popup_why3_inter#add_item ~label:"Fixup Script" ~callback:(self#popup_run VCS.FixUpdate) ;
         self#add_popup_proofmodes popup_ergo
-          [ "Run",BatchMode ; "Open Altgr-Ergo on Fail",EditMode ; "Open Altgr-Ergo",EditMode ] ;
+          [ "Run",Batch ; "Open Altgr-Ergo on Fail",Edit ; "Open Altgr-Ergo",Edit ] ;
         self#add_popup_proofmodes popup_coq
-          [ "Check Proof",BatchMode ; "Edit on Fail",EditMode ; "Edit Proof",EditMode ] ;
+          [ "Check Proof",Batch ; "Edit on Fail",Edit ; "Edit Proof",Edit ] ;
       end
 
     method private popup w p =

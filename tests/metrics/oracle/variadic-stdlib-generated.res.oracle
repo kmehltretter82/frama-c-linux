@@ -3,8 +3,12 @@
   =====================
    main (0 call); my_printf (1 call); 
   
-  Undefined functions (1)
-  =======================
+  Specified-only functions (0)
+  ============================
+   
+  
+  Undefined and unspecified functions (1)
+  =======================================
    rand (1 call); 
   
   'Extern' global variables (0)

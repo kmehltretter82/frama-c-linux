@@ -23,6 +23,7 @@
 module E_acsl_label = Label
 open Cil_types
 open Cil_datatype
+open Contract_types
 
 type localized_scope =
   | LGlobal
@@ -62,6 +63,8 @@ type t = {
      should be added. *)
   global_mp_tbl: mp_tbl;
   env_stack: local_env list;
+  contract_stack: contract list;
+  (* Stack of contracts for active functions and statements *)
   var_mapping: Varinfo.t Stack.t Logic_var.Map.t;
   (* records of C bindings for logic vars *)
   loop_invariants: predicate list list;
@@ -92,6 +95,7 @@ let empty =
     new_global_vars = [];
     global_mp_tbl = empty_mp_tbl;
     env_stack = [];
+    contract_stack = [];
     var_mapping = Logic_var.Map.empty;
     loop_invariants = [];
     cpt = 0 }
@@ -490,6 +494,40 @@ module Context = struct
       env
 
 end
+
+let handle_error f env =
+  let env = Error.handle f env in
+  Context.restore env
+
+let handle_error_with_args f (env, args) =
+  let env, args = Error.handle f (env, args) in
+  let env = Context.restore env in
+  env, args
+
+let not_yet env s =
+  Context.save env;
+  Error.not_yet s
+
+let untypable env s =
+  Context.save env;
+  Error.untypable s
+
+let push_contract env contract =
+  { env with contract_stack = contract :: env.contract_stack }
+
+let top_contract env =
+  match env.contract_stack with
+  | [] -> Options.fatal "Contract list is empty in env. That is unexpected"
+  | hd :: tl -> hd, tl
+
+let pop_and_get_contract env =
+  let hd, tl = top_contract env in
+  hd, { env with contract_stack = tl }
+
+let pop_contract env =
+  let _, env = pop_and_get_contract env in
+  env
+
 
 (* debugging purpose *)
 let pretty fmt env =

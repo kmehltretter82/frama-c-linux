@@ -598,7 +598,7 @@ let pointer_val t = t
 let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (a_base l)
 
 let base_addr l = a_addr (a_base l) e_zero
-let base_offset l = a_base_offset (a_offset l)
+let base_offset l = a_base_offset (a_base l) (a_offset l)
 let block_length sigma obj l =
   e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
 

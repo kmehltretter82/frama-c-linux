@@ -616,7 +616,7 @@ class pane (gprovers : GuiConfig.provers) =
               VCS.pp_prover prv Wpo.pp_title wpo VCS.pp_result res
           end
         ~success:(fun _ _ -> Wutil.later self#commit)
-        ~pool (List.map (fun dp -> VCS.BatchMode , dp) provers)
+        ~pool (List.map (fun dp -> VCS.Batch , dp) provers)
 
     method private fork proof fork =
       Wutil.later
@@ -665,9 +665,10 @@ class pane (gprovers : GuiConfig.provers) =
                 self#search proof fork
               else
                 begin
+                  let provers = List.map (fun e -> e#prover) provers in
                   ProverScript.search
                     ~depth ~width ~auto
-                    ~provers:[ VCS.NativeAltErgo ]
+                    ~provers
                     ~result:
                       (fun wpo prv res ->
                          text#printf "[%a] %a : %a@."

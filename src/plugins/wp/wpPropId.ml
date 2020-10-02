@@ -458,8 +458,11 @@ let get_propid = Names.get_prop_id_name
 let pp_propid fmt pid =
   Format.pp_print_string fmt (get_propid pid)
 
-let pp_names fmt l =  match l with [] -> () | _ ->
-  Format.fprintf fmt "_%a" (Wp_error.pp_string_list ~empty:"" ~sep:"_") l
+let pp_names fmt l =
+  let l = Datatype.String.Set.elements l in
+  match l with
+  | [] -> ()
+  | _ -> Format.fprintf fmt "_%a" (Wp_error.pp_string_list ~empty:"" ~sep:"_") l
 
 let ident_names names =
   List.filter (function "" -> true
@@ -670,7 +673,7 @@ let property_hints hs =
         List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
-        List.iter (add_required hs) ic_bhvs
+        Datatype.String.Set.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
         List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]

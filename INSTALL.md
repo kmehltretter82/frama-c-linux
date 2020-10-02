@@ -85,9 +85,9 @@ Actually, you can use any prover supported by Why3 in combination with Frama-C/W
 Most provers are available on all platforms. After their installation,
 Why3 must be configured to make them available for Frama-C/WP:
 
-    ```shell
-    why3 config --detect
-    ```
+```shell
+why3 config --detect
+```
 
 ### Reference configuration
 

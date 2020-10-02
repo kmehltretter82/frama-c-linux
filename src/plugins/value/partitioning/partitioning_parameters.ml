@@ -83,8 +83,8 @@ struct
     in
     match get_unroll_annot stmt with
     | [] -> warn_no_loop_unroll stmt; default
-    | [None] -> Partition.IntLimit default_loop_unroll
-    | [(Some t)] -> begin
+    | [UnrollFull] -> Partition.IntLimit default_loop_unroll
+    | [UnrollAmount t] -> begin
         (* Inlines the value of const variables in [t]. *)
         let global_init vi =
           try (Globals.Vars.find vi).init with Not_found -> None

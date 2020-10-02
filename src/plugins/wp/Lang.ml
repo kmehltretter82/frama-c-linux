@@ -726,6 +726,14 @@ struct
   end
   include QED
 
+  (* Hide force parameter. *)
+  let set_builtin f = QZERO.set_builtin f
+  let set_builtin' f = QZERO.set_builtin' f
+  let set_builtin_eq f = QZERO.set_builtin_eq f
+  let set_builtin_leq f = QZERO.set_builtin_leq f
+  let set_builtin_get f = QZERO.set_builtin_get f
+
+
   (* -------------------------------------------------------------------------- *)
   (* --- Term Extensions                                                    --- *)
   (* -------------------------------------------------------------------------- *)
@@ -1042,14 +1050,14 @@ module For_export = struct
   let rebuild ?cache t = QZERO.rebuild_in_state (get_state ()) ?cache t
 
   let set_builtin f c =
-    add_init (fun () -> QZERO.set_builtin f c)
+    add_init (fun () -> QZERO.set_builtin ~force:true f c)
 
   let set_builtin' f c =
-    add_init (fun () -> QZERO.set_builtin' f c)
+    add_init (fun () -> QZERO.set_builtin' ~force:true f c)
   let set_builtin_eq f c =
-    add_init (fun () -> QZERO.set_builtin_eq f c)
+    add_init (fun () -> QZERO.set_builtin_eq ~force:true f c)
   let set_builtin_leq f c =
-    add_init (fun () -> QZERO.set_builtin_leq f c)
+    add_init (fun () -> QZERO.set_builtin_leq ~force:true f c)
 
   let in_state f v = QZERO.in_state (get_state ()) f v
 
