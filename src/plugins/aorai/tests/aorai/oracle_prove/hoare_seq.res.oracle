@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai/hoare_seq.i (no preprocessing)
+[kernel] Parsing hoare_seq.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_hoare_seq0.i (no preprocessing)
 [wp] Collecting axiomatic usage

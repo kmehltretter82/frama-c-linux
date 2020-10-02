@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai/test_switch3.c (with preprocessing)
+[kernel] Parsing test_switch3.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_test_switch30.i (no preprocessing)
 [wp] Collecting axiomatic usage

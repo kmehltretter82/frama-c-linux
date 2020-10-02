@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai/test_recursion4.c (with preprocessing)
+[kernel] Parsing test_recursion4.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_test_recursion40.i (no preprocessing)
 [wp] Collecting axiomatic usage

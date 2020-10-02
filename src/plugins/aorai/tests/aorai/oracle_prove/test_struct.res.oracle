@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai/test_struct.c (with preprocessing)
+[kernel] Parsing test_struct.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_test_struct0.i (no preprocessing)
 [wp] Collecting axiomatic usage

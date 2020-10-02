@@ -178,8 +178,8 @@ tests: config.sed
 	for plugin in $(PLUGIN_TESTS); do \
 		dune exec -- ptests/ptests.exe src/plugins/$$plugin/tests; \
 	done
-	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS)))
-	dune build $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
+	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS))) \
+	           $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
 
 clean-tests:
 	rm -rf _build/default/tests

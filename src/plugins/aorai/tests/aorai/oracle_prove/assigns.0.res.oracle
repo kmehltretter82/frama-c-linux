@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai/assigns.c (with preprocessing)
+[kernel] Parsing assigns.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing /tmp/aorai_assigns0.i (no preprocessing)
 [wp] Collecting axiomatic usage
