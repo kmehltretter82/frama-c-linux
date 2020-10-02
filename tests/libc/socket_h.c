@@ -19,5 +19,21 @@ int main() {
   struct sockaddr_in addr2;
   socklen_t socklen = sizeof(addr2);
   rc = getsockname(sockfd, (struct sockaddr *)&addr2, &socklen);
+
+  char buf[40] = {'a', 'b', 'c'};
+  ssize_t sent = sendto(sockfd, buf, 3, 0, (struct sockaddr *)&addr,
+                        sizeof(addr));
+
+  ssize_t sent2 = sendto(sockfd, buf, 3, 0, 0, 0);
+
+  struct sockaddr_in recvfrom_addr;
+  socklen_t recvfrom_addr_len = sizeof(recvfrom_addr);
+  ssize_t received = recvfrom(sockfd, buf, sizeof(buf), 0,
+                              (struct sockaddr *)&recvfrom_addr,
+                              &recvfrom_addr_len);
+  if (received != -1) {
+    //@ assert \initialized(&recvfrom_addr);
+  }
+  ssize_t received2 = recvfrom(sockfd, buf, sizeof(buf), 0, 0, 0);
   return rc;
 }
