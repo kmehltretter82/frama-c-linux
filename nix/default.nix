@@ -8,8 +8,8 @@ let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
                 { name = "why3" ; constraint = "=1.3.3"; }
                 { name = "why3-coq" ; constraint = "=1.3.3"; }
                 { name = "menhir"; constraint = "=20200624"; }
-                { name = "dune"; constraint = "=1.11.4"; }
-                { name = "camlzip"; constraint = "=1.07"; }  #so that why3 is always compiled with it
+                { name = "dune"; constraint = "=2.7.1"; }
+                { name = "camlzip"; constraint = "=1.10"; }  #so that why3 is always compiled with it
                 ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
