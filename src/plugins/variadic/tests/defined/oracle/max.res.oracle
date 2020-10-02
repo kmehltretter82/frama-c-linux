@@ -1,6 +1,5 @@
-[variadic] tests/defined/max.c:3: Declaration of variadic function max.
-[variadic] tests/defined/max.c:20: 
-  Generic translation of call to variadic function.
+[variadic] max.c:3: Declaration of variadic function max.
+[variadic] max.c:20: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

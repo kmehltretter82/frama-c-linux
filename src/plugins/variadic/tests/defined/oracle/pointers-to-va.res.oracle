@@ -1,13 +1,12 @@
-[variadic] tests/defined/pointers-to-va.c:6: Declaration of variadic function f.
-[variadic] tests/defined/pointers-to-va.c:17: 
-  Declaration of variadic function g.
-[variadic] tests/defined/pointers-to-va.c:31: 
+[variadic] pointers-to-va.c:6: Declaration of variadic function f.
+[variadic] pointers-to-va.c:17: Declaration of variadic function g.
+[variadic] pointers-to-va.c:31: 
   Generic translation of call to variadic function.
-[variadic] tests/defined/pointers-to-va.c:32: 
+[variadic] pointers-to-va.c:32: 
   Generic translation of call to variadic function.
-[variadic] tests/defined/pointers-to-va.c:33: 
+[variadic] pointers-to-va.c:33: 
   Generic translation of call to variadic function.
-[variadic] tests/defined/pointers-to-va.c:34: 
+[variadic] pointers-to-va.c:34: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

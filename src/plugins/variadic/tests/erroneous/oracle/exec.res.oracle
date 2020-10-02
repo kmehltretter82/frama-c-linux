@@ -4,19 +4,14 @@
   Declaration of variadic function execle.
 [variadic] FRAMAC_SHARE/libc/unistd.h:823: 
   Declaration of variadic function execlp.
-[variadic] tests/erroneous/exec.c:5: Warning: 
+[variadic] exec.c:5: Warning: 
   Incorrect type for argument 3. The argument will be cast from int to char *.
-[variadic] tests/erroneous/exec.c:5: 
-  Translating call to execl to a call to execv.
-[variadic] tests/erroneous/exec.c:7: Warning: 
+[variadic] exec.c:5: Translating call to execl to a call to execv.
+[variadic] exec.c:7: Warning: 
   Failed to find a sentinel (NULL pointer) in the argument list.
-[variadic] tests/erroneous/exec.c:7: 
-  Generic translation of call to variadic function.
-[variadic] tests/erroneous/exec.c:9: Warning: 
-  Not enough arguments: expected 5, given 4.
-[variadic] tests/erroneous/exec.c:9: 
-  Generic translation of call to variadic function.
-[variadic] tests/erroneous/exec.c:11: Warning: 
+[variadic] exec.c:7: Generic translation of call to variadic function.
+[variadic] exec.c:9: Warning: Not enough arguments: expected 5, given 4.
+[variadic] exec.c:9: Generic translation of call to variadic function.
+[variadic] exec.c:11: Warning: 
   Incorrect type for argument 5. The argument will be cast from int to char * const *.
-[variadic] tests/erroneous/exec.c:11: 
-  Translating call to execle to a call to execve.
+[variadic] exec.c:11: Translating call to execle to a call to execve.

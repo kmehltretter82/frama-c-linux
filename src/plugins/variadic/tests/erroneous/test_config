@@ -1,1 +1,1 @@
-OPT: -no-autoload-plugins -load-module variadic -check -kernel-verbose 0 -variadic-verbose 2
+OPT: -check -kernel-verbose 0 -variadic-verbose 2

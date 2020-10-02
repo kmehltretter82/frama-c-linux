@@ -14,35 +14,31 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/stdio_scan.c:10: Warning: 
+[variadic] stdio_scan.c:10: Warning: 
   Call to function fscanf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_scan.c:10: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_scan.c:11: Warning: 
+[variadic] stdio_scan.c:10: Generic translation of call to variadic function.
+[variadic] stdio_scan.c:11: Warning: 
   Call to function scanf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_scan.c:11: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_scan.c:12: Warning: 
+[variadic] stdio_scan.c:11: Generic translation of call to variadic function.
+[variadic] stdio_scan.c:12: Warning: 
   Call to function sscanf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_scan.c:12: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_scan.c:14: 
+[variadic] stdio_scan.c:12: Generic translation of call to variadic function.
+[variadic] stdio_scan.c:14: 
   Translating call to fscanf to a call to the specialized version fscanf_va_1.
-[variadic] tests/known/stdio_scan.c:15: 
+[variadic] stdio_scan.c:15: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
-[variadic] tests/known/stdio_scan.c:16: 
+[variadic] stdio_scan.c:16: 
   Translating call to sscanf to a call to the specialized version sscanf_va_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/known/stdio_scan.c:10: Warning: 
+[eva:alarm] stdio_scan.c:10: Warning: 
   accessing uninitialized left-value. assert \initialized(&s);
 [eva] done for function main
-[eva] tests/known/stdio_scan.c:10: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] stdio_scan.c:10: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

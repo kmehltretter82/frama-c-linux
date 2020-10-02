@@ -14,18 +14,17 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/scanf_wrong.c:8: 
+[variadic] scanf_wrong.c:8: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
-[variadic] tests/known/scanf_wrong.c:8: Warning: 
+[variadic] scanf_wrong.c:8: Warning: 
   Incorrect type for argument 2. The argument will be cast from double to char *.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/known/scanf_wrong.c:8: Warning: 
+[eva:alarm] scanf_wrong.c:8: Warning: 
   accessing uninitialized left-value. assert \initialized(&d);
 [eva] done for function main
-[eva] tests/known/scanf_wrong.c:8: 
-  assertion 'Eva,initialization' got final status invalid.
+[eva] scanf_wrong.c:8: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

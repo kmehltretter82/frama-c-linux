@@ -14,21 +14,21 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf_wrong_arity.c:8: 
+[variadic] printf_wrong_arity.c:8: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/printf_wrong_arity.c:8: Warning: 
+[variadic] printf_wrong_arity.c:8: Warning: 
   Too many arguments: expected 2, given 3. Superfluous arguments will be removed.
-[variadic] tests/known/printf_wrong_arity.c:9: 
+[variadic] printf_wrong_arity.c:9: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] tests/known/printf_wrong_arity.c:9: Warning: 
+[variadic] printf_wrong_arity.c:9: Warning: 
   Not enough arguments: expected 3, given 2.
-[variadic] tests/known/printf_wrong_arity.c:9: 
+[variadic] printf_wrong_arity.c:9: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function printf_va_1
-[kernel:annot:missing-spec] tests/known/printf_wrong_arity.c:9: Warning: 
+[kernel:annot:missing-spec] printf_wrong_arity.c:9: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
 [eva] using specification for function printf
 [eva] done for function main

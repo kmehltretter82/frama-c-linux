@@ -14,9 +14,9 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/snprintf.c:12: 
+[variadic] snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
-[variadic] tests/known/snprintf.c:15: 
+[variadic] snprintf.c:15: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -24,14 +24,14 @@
 [eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf_va_1
-[eva] tests/known/snprintf.c:12: 
+[eva] snprintf.c:12: 
   Cannot evaluate range bound format_length(format) - 1
   (unsupported ACSL construct: logic function format_length). Approximating
-[eva:alarm] tests/known/snprintf.c:12: Warning: 
+[eva:alarm] snprintf.c:12: Warning: 
   function snprintf_va_1: precondition \valid(s + (0 .. n - 1)) ∨
                                        \valid(s +
                                               (0 .. format_length(format) - 1)) got status unknown.
-[eva:alarm] tests/known/snprintf.c:13: Warning: 
+[eva:alarm] snprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] using specification for function snprintf_va_2
 [eva] done for function main

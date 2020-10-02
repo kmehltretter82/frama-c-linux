@@ -1,15 +1,12 @@
-[variadic] tests/defined/recursive.i:4: Declaration of variadic function f.
-[variadic] tests/defined/recursive.i:8: 
-  Generic translation of call to variadic function.
-[variadic] tests/defined/recursive.i:12: 
-  Generic translation of call to variadic function.
+[variadic] recursive.i:4: Declaration of variadic function f.
+[variadic] recursive.i:8: Generic translation of call to variadic function.
+[variadic] recursive.i:12: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] tests/defined/recursive.i:8: Warning: 
-  recursive call during value analysis
-  of f (f <- f :: tests/defined/recursive.i:12 <- main). Assuming the call has
-  no effect. The analysis will be unsound.
+[eva] recursive.i:8: Warning: 
+  recursive call during value analysis of f (f <- f :: recursive.i:12 <- main).
+  Assuming the call has no effect. The analysis will be unsound.
 [eva] using specification for function f
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

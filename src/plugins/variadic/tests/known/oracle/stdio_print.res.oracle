@@ -14,50 +14,44 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/stdio_print.c:9: Warning: 
+[variadic] stdio_print.c:9: Warning: 
   Call to function fprintf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_print.c:9: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_print.c:10: Warning: 
+[variadic] stdio_print.c:9: Generic translation of call to variadic function.
+[variadic] stdio_print.c:10: Warning: 
   Call to function printf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_print.c:10: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_print.c:11: Warning: 
+[variadic] stdio_print.c:10: Generic translation of call to variadic function.
+[variadic] stdio_print.c:11: Warning: 
   Call to function snprintf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_print.c:11: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_print.c:12: Warning: 
+[variadic] stdio_print.c:11: Generic translation of call to variadic function.
+[variadic] stdio_print.c:12: Warning: 
   Call to function sprintf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_print.c:12: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_print.c:13: Warning: 
+[variadic] stdio_print.c:12: Generic translation of call to variadic function.
+[variadic] stdio_print.c:13: Warning: 
   Call to function dprintf with non-static format argument:
   no specification will be generated.
-[variadic] tests/known/stdio_print.c:13: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/stdio_print.c:15: 
+[variadic] stdio_print.c:13: Generic translation of call to variadic function.
+[variadic] stdio_print.c:15: 
   Translating call to fprintf to a call to the specialized version fprintf_va_1.
-[variadic] tests/known/stdio_print.c:16: 
+[variadic] stdio_print.c:16: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/stdio_print.c:17: 
+[variadic] stdio_print.c:17: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
-[variadic] tests/known/stdio_print.c:18: 
+[variadic] stdio_print.c:18: 
   Translating call to sprintf to a call to the specialized version sprintf_va_1.
-[variadic] tests/known/stdio_print.c:19: 
+[variadic] stdio_print.c:19: 
   Translating call to dprintf to a call to the specialized version dprintf_va_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva:alarm] tests/known/stdio_print.c:9: Warning: 
+[eva:alarm] stdio_print.c:9: Warning: 
   accessing uninitialized left-value. assert \initialized(&format);
 [eva] done for function main
-[eva] tests/known/stdio_print.c:9: 
-  assertion 'Eva,initialization' got final status invalid.
-[kernel:annot:missing-spec] tests/known/stdio_print.c:9: Warning: 
+[eva] stdio_print.c:9: assertion 'Eva,initialization' got final status invalid.
+[kernel:annot:missing-spec] stdio_print.c:9: Warning: 
   Neither code nor specification for function fprintf, generating default assigns from the prototype
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

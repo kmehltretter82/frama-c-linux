@@ -14,29 +14,29 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf_wrong_pointers.c:14: 
+[variadic] printf_wrong_pointers.c:14: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/printf_wrong_pointers.c:15: 
+[variadic] printf_wrong_pointers.c:15: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] tests/known/printf_wrong_pointers.c:16: 
+[variadic] printf_wrong_pointers.c:16: 
   Translating call to printf to a call to the specialized version printf_va_3.
-[variadic] tests/known/printf_wrong_pointers.c:17: 
+[variadic] printf_wrong_pointers.c:17: 
   Translating call to printf to a call to the specialized version printf_va_4.
-[variadic] tests/known/printf_wrong_pointers.c:18: 
+[variadic] printf_wrong_pointers.c:18: 
   Translating call to printf to a call to the specialized version printf_va_5.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function printf_va_1
-[eva:alarm] tests/known/printf_wrong_pointers.c:14: Warning: 
+[eva:alarm] printf_wrong_pointers.c:14: Warning: 
   function printf_va_1: precondition \valid(param0) got status invalid.
 [eva] using specification for function printf_va_2
 [eva] using specification for function printf_va_3
-[eva:alarm] tests/known/printf_wrong_pointers.c:16: Warning: 
+[eva:alarm] printf_wrong_pointers.c:16: Warning: 
   function printf_va_3: precondition \valid(param0) got status invalid.
 [eva] using specification for function printf_va_4
 [eva] using specification for function printf_va_5
-[eva:alarm] tests/known/printf_wrong_pointers.c:18: Warning: 
+[eva:alarm] printf_wrong_pointers.c:18: Warning: 
   function printf_va_5: precondition valid_read_wstring(param0) got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

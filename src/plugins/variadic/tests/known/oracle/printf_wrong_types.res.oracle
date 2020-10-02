@@ -14,65 +14,65 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf_wrong_types.c:18: 
+[variadic] printf_wrong_types.c:18: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/printf_wrong_types.c:19: 
+[variadic] printf_wrong_types.c:19: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] tests/known/printf_wrong_types.c:19: Warning: 
+[variadic] printf_wrong_types.c:19: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned int to int.
-[variadic] tests/known/printf_wrong_types.c:20: 
+[variadic] printf_wrong_types.c:20: 
   Translating call to printf to a call to the specialized version printf_va_3.
-[variadic] tests/known/printf_wrong_types.c:20: Warning: 
+[variadic] printf_wrong_types.c:20: Warning: 
   Incorrect type for argument 2. The argument will be cast from int to unsigned int.
-[variadic] tests/known/printf_wrong_types.c:21: 
+[variadic] printf_wrong_types.c:21: 
   Translating call to printf to a call to the specialized version printf_va_4.
-[variadic] tests/known/printf_wrong_types.c:21: Warning: 
+[variadic] printf_wrong_types.c:21: Warning: 
   Incorrect type for argument 2. The argument will be cast from int to long.
-[variadic] tests/known/printf_wrong_types.c:22: 
+[variadic] printf_wrong_types.c:22: 
   Translating call to printf to a call to the specialized version printf_va_5.
-[variadic] tests/known/printf_wrong_types.c:22: Warning: 
+[variadic] printf_wrong_types.c:22: Warning: 
   Incorrect type for argument 2. The argument will be cast from long to int.
-[variadic] tests/known/printf_wrong_types.c:23: 
+[variadic] printf_wrong_types.c:23: 
   Translating call to printf to a call to the specialized version printf_va_6.
-[variadic] tests/known/printf_wrong_types.c:23: Warning: 
+[variadic] printf_wrong_types.c:23: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned int to unsigned long.
-[variadic] tests/known/printf_wrong_types.c:24: 
+[variadic] printf_wrong_types.c:24: 
   Translating call to printf to a call to the specialized version printf_va_7.
-[variadic] tests/known/printf_wrong_types.c:24: Warning: 
+[variadic] printf_wrong_types.c:24: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
-[variadic] tests/known/printf_wrong_types.c:25: 
+[variadic] printf_wrong_types.c:25: 
   Translating call to printf to a call to the specialized version printf_va_8.
-[variadic] tests/known/printf_wrong_types.c:25: Warning: 
+[variadic] printf_wrong_types.c:25: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned int to void *.
-[variadic] tests/known/printf_wrong_types.c:26: 
+[variadic] printf_wrong_types.c:26: 
   Translating call to printf to a call to the specialized version printf_va_9.
-[variadic] tests/known/printf_wrong_types.c:27: 
+[variadic] printf_wrong_types.c:27: 
   Translating call to printf to a call to the specialized version printf_va_10.
-[variadic] tests/known/printf_wrong_types.c:27: Warning: 
+[variadic] printf_wrong_types.c:27: Warning: 
   Incorrect type for argument 2. The argument will be cast from long double to double.
-[variadic] tests/known/printf_wrong_types.c:28: 
+[variadic] printf_wrong_types.c:28: 
   Translating call to printf to a call to the specialized version printf_va_11.
-[variadic] tests/known/printf_wrong_types.c:28: Warning: 
+[variadic] printf_wrong_types.c:28: Warning: 
   Incorrect type for argument 2. The argument will be cast from long double to double.
-[variadic] tests/known/printf_wrong_types.c:29: 
+[variadic] printf_wrong_types.c:29: 
   Translating call to printf to a call to the specialized version printf_va_12.
-[variadic] tests/known/printf_wrong_types.c:29: Warning: 
+[variadic] printf_wrong_types.c:29: Warning: 
   Incorrect type for argument 2. The argument will be cast from double to long double.
-[variadic] tests/known/printf_wrong_types.c:30: 
+[variadic] printf_wrong_types.c:30: 
   Translating call to printf to a call to the specialized version printf_va_13.
-[variadic] tests/known/printf_wrong_types.c:30: Warning: 
+[variadic] printf_wrong_types.c:30: Warning: 
   Incorrect type for argument 2. The argument will be cast from int to char *.
-[variadic] tests/known/printf_wrong_types.c:31: 
+[variadic] printf_wrong_types.c:31: 
   Translating call to printf to a call to the specialized version printf_va_14.
-[variadic] tests/known/printf_wrong_types.c:31: Warning: 
+[variadic] printf_wrong_types.c:31: Warning: 
   Incorrect type for argument 2. The argument will be cast from char * to int.
-[variadic] tests/known/printf_wrong_types.c:35: 
+[variadic] printf_wrong_types.c:35: 
   Translating call to printf to a call to the specialized version printf_va_15.
-[variadic] tests/known/printf_wrong_types.c:35: Warning: 
+[variadic] printf_wrong_types.c:35: Warning: 
   Possible portability issues with enum type for argument 2 (use -variadic-no-strict to avoid this warning).
-[variadic] tests/known/printf_wrong_types.c:36: 
+[variadic] printf_wrong_types.c:36: 
   Translating call to printf to a call to the specialized version printf_va_16.
-[variadic] tests/known/printf_wrong_types.c:36: Warning: 
+[variadic] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -90,7 +90,7 @@
 [eva] using specification for function printf_va_11
 [eva] using specification for function printf_va_12
 [eva] using specification for function printf_va_13
-[eva:alarm] tests/known/printf_wrong_types.c:30: Warning: 
+[eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -351,7 +351,7 @@ int main(void)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[kernel:annot:missing-spec] tests/known/printf_wrong_types.c:18: Warning: 
+[kernel:annot:missing-spec] printf_wrong_types.c:18: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
 [eva] using specification for function printf
 [eva] done for function main
@@ -426,55 +426,55 @@ int main(void)
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf_wrong_types.c:18: 
+[variadic] printf_wrong_types.c:18: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/printf_wrong_types.c:19: 
+[variadic] printf_wrong_types.c:19: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] tests/known/printf_wrong_types.c:19: Warning: 
+[variadic] printf_wrong_types.c:19: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned int to int.
-[variadic] tests/known/printf_wrong_types.c:20: 
+[variadic] printf_wrong_types.c:20: 
   Translating call to printf to a call to the specialized version printf_va_3.
-[variadic] tests/known/printf_wrong_types.c:20: Warning: 
+[variadic] printf_wrong_types.c:20: Warning: 
   Incorrect type for argument 2. The argument will be cast from int to unsigned int.
-[variadic] tests/known/printf_wrong_types.c:21: 
+[variadic] printf_wrong_types.c:21: 
   Translating call to printf to a call to the specialized version printf_va_4.
-[variadic] tests/known/printf_wrong_types.c:22: 
+[variadic] printf_wrong_types.c:22: 
   Translating call to printf to a call to the specialized version printf_va_5.
-[variadic] tests/known/printf_wrong_types.c:23: 
+[variadic] printf_wrong_types.c:23: 
   Translating call to printf to a call to the specialized version printf_va_6.
-[variadic] tests/known/printf_wrong_types.c:24: 
+[variadic] printf_wrong_types.c:24: 
   Translating call to printf to a call to the specialized version printf_va_7.
-[variadic] tests/known/printf_wrong_types.c:25: 
+[variadic] printf_wrong_types.c:25: 
   Translating call to printf to a call to the specialized version printf_va_8.
-[variadic] tests/known/printf_wrong_types.c:25: Warning: 
+[variadic] printf_wrong_types.c:25: Warning: 
   Incorrect type for argument 2. The argument will be cast from unsigned int to void *.
-[variadic] tests/known/printf_wrong_types.c:26: 
+[variadic] printf_wrong_types.c:26: 
   Translating call to printf to a call to the specialized version printf_va_9.
-[variadic] tests/known/printf_wrong_types.c:27: 
+[variadic] printf_wrong_types.c:27: 
   Translating call to printf to a call to the specialized version printf_va_10.
-[variadic] tests/known/printf_wrong_types.c:27: Warning: 
+[variadic] printf_wrong_types.c:27: Warning: 
   Incorrect type for argument 2. The argument will be cast from long double to double.
-[variadic] tests/known/printf_wrong_types.c:28: 
+[variadic] printf_wrong_types.c:28: 
   Translating call to printf to a call to the specialized version printf_va_11.
-[variadic] tests/known/printf_wrong_types.c:28: Warning: 
+[variadic] printf_wrong_types.c:28: Warning: 
   Incorrect type for argument 2. The argument will be cast from long double to double.
-[variadic] tests/known/printf_wrong_types.c:29: 
+[variadic] printf_wrong_types.c:29: 
   Translating call to printf to a call to the specialized version printf_va_12.
-[variadic] tests/known/printf_wrong_types.c:29: Warning: 
+[variadic] printf_wrong_types.c:29: Warning: 
   Incorrect type for argument 2. The argument will be cast from double to long double.
-[variadic] tests/known/printf_wrong_types.c:30: 
+[variadic] printf_wrong_types.c:30: 
   Translating call to printf to a call to the specialized version printf_va_13.
-[variadic] tests/known/printf_wrong_types.c:30: Warning: 
+[variadic] printf_wrong_types.c:30: Warning: 
   Incorrect type for argument 2. The argument will be cast from int to char *.
-[variadic] tests/known/printf_wrong_types.c:31: 
+[variadic] printf_wrong_types.c:31: 
   Translating call to printf to a call to the specialized version printf_va_14.
-[variadic] tests/known/printf_wrong_types.c:31: Warning: 
+[variadic] printf_wrong_types.c:31: Warning: 
   Incorrect type for argument 2. The argument will be cast from char * to int.
-[variadic] tests/known/printf_wrong_types.c:35: 
+[variadic] printf_wrong_types.c:35: 
   Translating call to printf to a call to the specialized version printf_va_15.
-[variadic] tests/known/printf_wrong_types.c:36: 
+[variadic] printf_wrong_types.c:36: 
   Translating call to printf to a call to the specialized version printf_va_16.
-[variadic] tests/known/printf_wrong_types.c:36: Warning: 
+[variadic] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -492,7 +492,7 @@ int main(void)
 [eva] using specification for function printf_va_11
 [eva] using specification for function printf_va_12
 [eva] using specification for function printf_va_13
-[eva:alarm] tests/known/printf_wrong_types.c:30: Warning: 
+[eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

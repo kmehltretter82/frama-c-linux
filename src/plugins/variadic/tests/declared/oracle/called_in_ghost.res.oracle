@@ -1,4 +1,4 @@
-[kernel] Parsing tests/declared/called_in_ghost.i (no preprocessing)
+[kernel] Parsing called_in_ghost.i (no preprocessing)
 [kernel] function is not ghost
 [kernel] function is a non ghost global
 [kernel] e is a non ghost formal

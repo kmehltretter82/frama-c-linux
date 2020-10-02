@@ -3,13 +3,13 @@
 [variadic] FRAMAC_SHARE/libc/fcntl.h:116: Declaration of variadic function open.
 [variadic] FRAMAC_SHARE/libc/fcntl.h:122: 
   Declaration of variadic function openat.
-[variadic] tests/known/fcntl.c:8: 
+[variadic] fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).
-[variadic] tests/known/fcntl.c:9: 
+[variadic] fcntl.c:9: 
   Translating call to the specialized version fcntl(int, int, int).
-[variadic] tests/known/fcntl.c:10: 
+[variadic] fcntl.c:10: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] tests/known/fcntl.c:16: Warning: 
+[variadic] fcntl.c:16: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -17,13 +17,12 @@
          fcntl(int, int, struct flock *)
   Given arguments:
          fcntl(int, int, int, int)
-[variadic] tests/known/fcntl.c:16: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/fcntl.c:20: 
+[variadic] fcntl.c:16: Generic translation of call to variadic function.
+[variadic] fcntl.c:20: 
   Translating call to the specialized version fcntl(int, int).
-[variadic] tests/known/fcntl.c:24: 
+[variadic] fcntl.c:24: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic] tests/known/fcntl.c:28: Warning: 
+[variadic] fcntl.c:28: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -31,8 +30,7 @@
          fcntl(int, int, struct flock *)
   Given arguments:
          fcntl(int, int, double)
-[variadic] tests/known/fcntl.c:28: 
-  Generic translation of call to variadic function.
+[variadic] fcntl.c:28: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -40,9 +38,9 @@
 [eva] using specification for function __va_fcntl_int
 [eva] using specification for function __va_fcntl_flock
 [eva] using specification for function fcntl
-[eva:alarm] tests/known/fcntl.c:20: Warning: 
+[eva:alarm] fcntl.c:20: Warning: 
   function __va_fcntl_void: precondition 'cmd_has_void_arg' got status invalid.
-[eva:alarm] tests/known/fcntl.c:24: Warning: 
+[eva:alarm] fcntl.c:24: Warning: 
   function __va_fcntl_flock: precondition 'cmd_as_flock_arg' got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

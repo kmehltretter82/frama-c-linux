@@ -1,11 +1,10 @@
-[variadic] tests/declared/rvalues-with-ghost.i:1: 
-  Declaration of variadic function f.
-[variadic] tests/declared/rvalues-with-ghost.i:5: 
+[variadic] rvalues-with-ghost.i:1: Declaration of variadic function f.
+[variadic] rvalues-with-ghost.i:5: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[kernel:annot:missing-spec] tests/declared/rvalues-with-ghost.i:5: Warning: 
+[kernel:annot:missing-spec] rvalues-with-ghost.i:5: Warning: 
   Neither code nor specification for function f, generating default assigns from the prototype
 [eva] using specification for function f
 [eva] done for function main

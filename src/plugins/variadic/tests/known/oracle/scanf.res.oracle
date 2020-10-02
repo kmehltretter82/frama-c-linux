@@ -14,7 +14,7 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/scanf.c:7: 
+[variadic] scanf.c:7: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

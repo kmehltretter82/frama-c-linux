@@ -26,23 +26,23 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/swprintf.c:12: 
+[variadic] swprintf.c:12: 
   Translating call to swprintf to a call to the specialized version swprintf_va_1.
-[variadic] tests/known/swprintf.c:15: 
+[variadic] swprintf.c:15: 
   Translating call to swprintf to a call to the specialized version swprintf_va_2.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf_va_1
-[eva] tests/known/swprintf.c:12: 
+[eva] swprintf.c:12: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
-[eva:alarm] tests/known/swprintf.c:12: Warning: 
+[eva:alarm] swprintf.c:12: Warning: 
   function swprintf_va_1: precondition \valid(ws + (0 .. n - 1)) ∨
                                        \valid(ws +
                                               (0 .. wformat_length(format) - 1)) got status unknown.
-[eva:alarm] tests/known/swprintf.c:13: Warning: 
+[eva:alarm] swprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] using specification for function swprintf_va_2
 [eva] done for function main

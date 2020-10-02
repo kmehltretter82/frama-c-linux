@@ -4,13 +4,13 @@
   Declaration of variadic function execle.
 [variadic] FRAMAC_SHARE/libc/unistd.h:823: 
   Declaration of variadic function execlp.
-[variadic] tests/known/exec_failed_requirement.c:7: 
+[variadic] exec_failed_requirement.c:7: 
   Translating call to execl to a call to execv.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function execv
-[eva:alarm] tests/known/exec_failed_requirement.c:7: Warning: 
+[eva:alarm] exec_failed_requirement.c:7: Warning: 
   function execv: precondition 'valid_string_argv0' got status invalid.
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

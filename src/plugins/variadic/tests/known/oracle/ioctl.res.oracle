@@ -1,19 +1,19 @@
 [variadic] FRAMAC_SHARE/libc/stropts.h:164: 
   Declaration of variadic function ioctl.
-[variadic] tests/known/ioctl.c:13: 
+[variadic] ioctl.c:13: 
   Translating call to the specialized version ioctl(int, int).
-[variadic] tests/known/ioctl.c:15: 
+[variadic] ioctl.c:15: 
   Translating call to the specialized version ioctl(int, int, void *).
-[variadic] tests/known/ioctl.c:17: 
+[variadic] ioctl.c:17: 
   Translating call to the specialized version ioctl(int, int, void *).
-[variadic] tests/known/ioctl.c:18: 
+[variadic] ioctl.c:18: 
   Translating call to the specialized version ioctl(int, int, int).
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function __va_ioctl_void
 [eva] using specification for function __va_ioctl_ptr
-[eva:invalid-assigns] tests/known/ioctl.c:17: 
+[eva:invalid-assigns] ioctl.c:17: 
   Completely invalid destination for assigns clause *((char *)argp + (0 ..)).
   Ignoring.
 [eva] using specification for function __va_ioctl_int

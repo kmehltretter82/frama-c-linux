@@ -4,22 +4,19 @@
   Declaration of variadic function execle.
 [variadic] FRAMAC_SHARE/libc/unistd.h:823: 
   Declaration of variadic function execlp.
-[variadic] tests/known/exec.c:9: Translating call to execle to a call to execve.
-[variadic] tests/known/exec.c:11: Warning: 
+[variadic] exec.c:9: Translating call to execle to a call to execve.
+[variadic] exec.c:11: Warning: 
   Too many arguments: expected 5, given 6. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:11: Translating call to execl to a call to execv.
-[variadic] tests/known/exec.c:12: Warning: 
+[variadic] exec.c:11: Translating call to execl to a call to execv.
+[variadic] exec.c:12: Warning: 
   Too many arguments: expected 4, given 5. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:12: 
-  Translating call to execlp to a call to execvp.
-[variadic] tests/known/exec.c:13: Warning: 
+[variadic] exec.c:12: Translating call to execlp to a call to execvp.
+[variadic] exec.c:13: Warning: 
   Too many arguments: expected 4, given 6. Superfluous arguments will be removed.
-[variadic] tests/known/exec.c:13: 
-  Translating call to execle to a call to execve.
-[variadic] tests/known/exec.c:15: Warning: 
+[variadic] exec.c:13: Translating call to execle to a call to execve.
+[variadic] exec.c:15: Warning: 
   Failed to find a sentinel (NULL pointer) in the argument list.
-[variadic] tests/known/exec.c:15: 
-  Generic translation of call to variadic function.
+[variadic] exec.c:15: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

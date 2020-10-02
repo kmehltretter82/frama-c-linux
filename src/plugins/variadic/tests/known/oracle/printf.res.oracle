@@ -26,65 +26,64 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf.c:37: 
+[variadic] printf.c:37: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] tests/known/printf.c:38: 
+[variadic] printf.c:38: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] tests/known/printf.c:39: 
+[variadic] printf.c:39: 
   Translating call to printf to a call to the specialized version printf_va_3.
-[variadic] tests/known/printf.c:41: 
+[variadic] printf.c:41: 
   Translating call to printf to a call to the specialized version printf_va_4.
-[variadic] tests/known/printf.c:42: 
+[variadic] printf.c:42: 
   Translating call to printf to a call to the specialized version printf_va_5.
-[variadic] tests/known/printf.c:43: 
+[variadic] printf.c:43: 
   Translating call to printf to a call to the specialized version printf_va_6.
-[variadic] tests/known/printf.c:44: 
+[variadic] printf.c:44: 
   Translating call to printf to a call to the specialized version printf_va_7.
-[variadic] tests/known/printf.c:45: 
+[variadic] printf.c:45: 
   Translating call to printf to a call to the specialized version printf_va_8.
-[variadic] tests/known/printf.c:46: 
+[variadic] printf.c:46: 
   Translating call to printf to a call to the specialized version printf_va_9.
-[variadic] tests/known/printf.c:47: 
+[variadic] printf.c:47: 
   Translating call to printf to a call to the specialized version printf_va_10.
-[variadic] tests/known/printf.c:48: 
+[variadic] printf.c:48: 
   Translating call to printf to a call to the specialized version printf_va_11.
-[variadic] tests/known/printf.c:50: 
+[variadic] printf.c:50: 
   Translating call to printf to a call to the specialized version printf_va_12.
-[variadic] tests/known/printf.c:51: 
+[variadic] printf.c:51: 
   Translating call to printf to a call to the specialized version printf_va_13.
-[variadic] tests/known/printf.c:52: 
+[variadic] printf.c:52: 
   Translating call to printf to a call to the specialized version printf_va_14.
-[variadic] tests/known/printf.c:53: 
+[variadic] printf.c:53: 
   Translating call to printf to a call to the specialized version printf_va_15.
-[variadic] tests/known/printf.c:54: 
+[variadic] printf.c:54: 
   Translating call to printf to a call to the specialized version printf_va_16.
-[variadic] tests/known/printf.c:55: 
+[variadic] printf.c:55: 
   Translating call to printf to a call to the specialized version printf_va_17.
-[variadic] tests/known/printf.c:56: 
+[variadic] printf.c:56: 
   Translating call to printf to a call to the specialized version printf_va_18.
-[variadic] tests/known/printf.c:58: 
+[variadic] printf.c:58: 
   Translating call to printf to a call to the specialized version printf_va_19.
-[variadic] tests/known/printf.c:59: 
+[variadic] printf.c:59: 
   Translating call to printf to a call to the specialized version printf_va_20.
-[variadic] tests/known/printf.c:60: 
+[variadic] printf.c:60: 
   Translating call to printf to a call to the specialized version printf_va_21.
-[variadic] tests/known/printf.c:61: 
+[variadic] printf.c:61: 
   Translating call to printf to a call to the specialized version printf_va_22.
-[variadic] tests/known/printf.c:63: 
+[variadic] printf.c:63: 
   Translating call to printf to a call to the specialized version printf_va_23.
-[variadic] tests/known/printf.c:65: 
+[variadic] printf.c:65: 
   Translating call to printf to a call to the specialized version printf_va_24.
-[variadic] tests/known/printf.c:68: 
+[variadic] printf.c:68: 
   Translating call to printf to a call to the specialized version printf_va_25.
-[variadic] tests/known/printf.c:69: 
+[variadic] printf.c:69: 
   Translating call to printf to a call to the specialized version printf_va_26.
-[variadic] tests/known/printf.c:71: Warning: 
+[variadic] printf.c:71: Warning: 
   Flag ' ' and conversion specififer x are not compatibles.
-[variadic] tests/known/printf.c:71: 
-  Generic translation of call to variadic function.
-[variadic] tests/known/printf.c:74: 
+[variadic] printf.c:71: Generic translation of call to variadic function.
+[variadic] printf.c:74: 
   Translating call to printf to a call to the specialized version printf_va_27.
-[variadic] tests/known/printf.c:75: 
+[variadic] printf.c:75: 
   Translating call to printf to a call to the specialized version printf_va_28.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -115,7 +114,7 @@
 [eva] using specification for function printf_va_24
 [eva] using specification for function printf_va_25
 [eva] using specification for function printf_va_26
-[kernel:annot:missing-spec] tests/known/printf.c:71: Warning: 
+[kernel:annot:missing-spec] printf.c:71: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
 [eva] using specification for function printf
 [eva] using specification for function printf_va_27

@@ -3,15 +3,14 @@
 [variadic] FRAMAC_SHARE/libc/fcntl.h:116: Declaration of variadic function open.
 [variadic] FRAMAC_SHARE/libc/fcntl.h:122: 
   Declaration of variadic function openat.
-[variadic] tests/known/open_wrong.c:13: Warning: 
+[variadic] open_wrong.c:13: Warning: 
   No matching prototype found for this call to open.
   Expected candidates:
          open(char const *, int)
          open(char const *, int, mode_t)
   Given arguments:
          open(char const *, int, char const *)
-[variadic] tests/known/open_wrong.c:13: 
-  Generic translation of call to variadic function.
+[variadic] open_wrong.c:13: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

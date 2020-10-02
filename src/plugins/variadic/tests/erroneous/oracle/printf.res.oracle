@@ -14,8 +14,7 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:538: 
   Declaration of variadic function dprintf.
-[variadic] tests/erroneous/printf.c:8: Warning: Multiple usage of flag '-'.
-[variadic] tests/erroneous/printf.c:8: Warning: 
+[variadic] printf.c:8: Warning: Multiple usage of flag '-'.
+[variadic] printf.c:8: Warning: 
   Flag ' ' and conversion specififer e are not compatibles.
-[variadic] tests/erroneous/printf.c:8: 
-  Generic translation of call to variadic function.
+[variadic] printf.c:8: Generic translation of call to variadic function.

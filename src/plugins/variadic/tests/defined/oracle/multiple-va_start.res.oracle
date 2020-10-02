@@ -1,12 +1,10 @@
-[variadic] tests/defined/multiple-va_start.c:9: 
-  Declaration of variadic function pack.
-[variadic] tests/defined/multiple-va_start.c:32: 
+[variadic] multiple-va_start.c:9: Declaration of variadic function pack.
+[variadic] multiple-va_start.c:32: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] tests/defined/multiple-va_start.c:20: 
-  allocating variable __malloc_pack_l20
+[eva] multiple-va_start.c:20: allocating variable __malloc_pack_l20
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function pack:
