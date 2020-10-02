@@ -111,7 +111,7 @@ def check_path_exists(path):
 
 check_path_exists(gnumakefile)
 main = input("Main target name: ")
-if not re.match("^[a-zA-Z_0-9]+$", main):
+if not re.match("^[a-zA-Z_0-9-]+$", main):
     sys.exit("error: invalid main target name (can only contain letters, digits, dash or underscore)")
 
 main_fun_finder_re = function_finder.prepare("main")
