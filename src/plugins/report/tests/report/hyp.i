@@ -1,6 +1,7 @@
 /* run.config
-   OPT: -load-script %{dep:one_hyp.ml}
-   OPT: -load-script %{dep:several_hyps.ml}
+   CMXS: one_hyp several_hyps
+   OPT: -load-module one_hyp.cmxs
+   OPT: -load-module several_hyps.cmxs
 */
 void f(void);
 void f2(void);

@@ -1,7 +1,8 @@
 /* run.config
-   OPT: -load-script %{dep:projectified_status.ml}
-   OPT: -load-script %{dep:no_hyp.ml}
-   OPT: -load-script %{dep:multi_emitters.ml}
+   CMXS: projectified_status no_hyp multi_emitters
+   OPT: -load-module projectified_status.cmxs
+   OPT: -load-module no_hyp.cmxs
+   OPT: -load-module multi_emitters.cmxs
 */
 
 void main() {
