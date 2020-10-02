@@ -1,4 +1,4 @@
 /configure
 /Makefile
-/tests/ptests_config
+/tests/**/dune
 /tests/*/result

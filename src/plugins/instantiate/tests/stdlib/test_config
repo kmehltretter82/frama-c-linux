@@ -1,1 +1,1 @@
-OPT: @PTEST_FILE@ -instantiate -print -check -then -ocode @PTEST_DIR@/result/@PTEST_NAME@.c -print -then -no-instantiate @PTEST_DIR@/result/@PTEST_NAME@.c -ocode="" -print
+OPT: @PTEST_FILE@ -instantiate -print -check -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then -no-instantiate ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -ocode="" -print

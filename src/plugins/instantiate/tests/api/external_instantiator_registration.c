@@ -1,5 +1,6 @@
 /* run.config
-   OPT: -load-script tests/api/external_instantiator_registration.ml -instantiate -check -print
+   MODULE: @PTEST_NAME@.cmxs
+   OPT: -instantiate -check -print
 */
 
 void mine(void* parameter) ;
