@@ -1142,7 +1142,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4 125 127) (system %S))%s)))\n\
+     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 3 4 125 127) (system %S))%s)))\n\
      )@."
     errlog
     res
