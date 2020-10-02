@@ -94,7 +94,7 @@ let rec norm path = function
 
 let insert base path_name =
   let full_path_name = 
-    (* if a <base> is provided while a <file> is already absolute 
+    (* if a <base> is provided while a <file> which is already absolute 
        (and thus matches [re_root]) then the <base> is not taken 
        into account *)
     if Str.string_match re_root path_name 0
