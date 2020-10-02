@@ -174,7 +174,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config --full-config
+               why3 config --detect
                make src/plugins/wp/tests/test_config_qualif
                export FRAMAC_WP_CACHE=replay
                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
