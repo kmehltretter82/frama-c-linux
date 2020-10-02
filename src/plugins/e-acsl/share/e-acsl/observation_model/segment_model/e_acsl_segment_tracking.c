@@ -202,14 +202,14 @@ void validate_shadow_layout() {
     uintptr_t *src = segments[i];
     const char *src_name = segment_names[i];
     DVASSERT(src[0] < src[1],
-      "Segment %s start is greater than segment end %lu < %lu\n",
+      "Segment %s start is greater than segment end %a < %a\n",
       src_name, src[0], src[1]);
     for (j = 0; j < num_segments; j++) {
       if (i != j) {
         uintptr_t *dest = segments[j];
         const char *dest_name = segment_names[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
-          "Segment %s [%lu, %lu] overlaps with segment %s [%lu, %lu]",
+          "Segment %s [%a, %a] overlaps with segment %s [%a, %a]",
           src_name, src[0], src[1], dest_name, dest[0], dest[1]);
       }
     }
@@ -1043,7 +1043,7 @@ void print_shadows(uintptr_t addr, size_t size) {
 }
 
 void print_memory_segment(struct memory_segment *p, char *lab, int off) {
-  DLOG("   %s: %lu MB [%lu, %lu]", lab, MB_SZ(p->size), p->start, p->end);
+  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
   if (off)
     DLOG("{ Offset: %ld }", p->shadow_offset);
   DLOG("\n");
