@@ -177,16 +177,15 @@ force-reconfigure:
 # todo: adds more_wp
 # todo: adds pretty_printing: fixes tests/pretty_printing/ghost_parameters.c
 # todo: adds saveload
-# todo: adds value/numerors?
+# todo: adds value/numerors? (requires opam package mlgmpidl and system libraries for MPFR)
 # todo: adds verisec
-# todo: what about test_config_apron, test_config_...
+# todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value value/traces
 
 # todo: adds aorai (2 configs + Aorai_test library)
-# todo: adds report: fixes src/plugins/report/tests/report/classify.c
 # todo: no test found for studia ?
 # todo: adds wp (at least 2 configs)
-PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm server variadic
+PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic
 
 info:
 	echo $(sort $(dir $(SUB_TESTS)))
