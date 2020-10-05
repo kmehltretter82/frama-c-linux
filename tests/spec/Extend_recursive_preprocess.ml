@@ -59,7 +59,7 @@ let ext_foo_visitor vis ext =
 let ext_fooo_printer prt fmt ext =
   match ext with
   | Ext_preds ps ->
-    Pretty_utils.pp_list ~pre:"data:" ~sep:",@ " prt#predicate fmt ps
+    Pretty_utils.pp_list ~pre:"@[data:" ~sep:",@ " prt#predicate fmt ps
   | _ -> assert false
 
 let () =  Acsl_extension.register_global
