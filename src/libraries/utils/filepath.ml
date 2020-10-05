@@ -173,19 +173,32 @@ let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs name dir;
   (insert cwd dir).symbolic_name <- Some name
 
-let rec add_path buffer path =
+let rec add_uri_path buffer path =
   let open Buffer in
   match path.symbolic_name with
   | None ->
     begin
       match path.dir with
-      | None -> add_string buffer path.path_name
+      | None -> add_string buffer path.path_name; None
       | Some d ->
-        if d != cwd (* hconsed *) then
-          ( add_path buffer d ; add_char buffer '/' ) ;
-        add_string buffer path.base_name
+        if d != cwd (* hconsed *) then begin
+          let symb_base = add_uri_path buffer d in
+          add_char buffer '/';
+          add_string buffer path.base_name;
+          symb_base
+        end else begin
+          add_string buffer path.base_name;
+          Some "PWD"
+        end
     end
-  | Some sn -> add_string buffer sn
+  | Some sn -> Some sn
+
+let add_path path =
+  let buf = Buffer.create 80 in
+  match add_uri_path buf path with
+  | None -> Buffer.contents buf
+  | Some "PWD" -> Buffer.contents buf
+  | Some symb -> symb ^ Buffer.contents buf
 
 let rec skip_dot file_name =
   if Extlib.string_prefix "./" file_name then
@@ -206,9 +219,7 @@ let pretty file_name =
       let n = 1 + String.length cwd_name in
       String.sub file_name n (String.length file_name - n)
     else
-      let buffer = Buffer.create 80 in
-      add_path buffer path ;
-      skip_dot (Buffer.contents buffer)
+      skip_dot (add_path path)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
@@ -265,24 +276,14 @@ module Normalized = struct
       (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
     with _ -> false
 
-  let to_base_uri p =
-    let pretty = to_pretty_string p in
-    if Filename.is_relative pretty then begin
-      if String.contains pretty '/' then
-        match Str.bounded_split (Str.regexp "/") pretty 2 with
-        | [prefix; postprefix] ->
-          begin
-            try
-              Hashtbl.find symbolic_dirs prefix, postprefix
-            with Not_found ->
-              "PWD", pretty
-          end
-        | _ -> failwith "to_base_uri: error in bounded_split"
-      else
-        "PWD", pretty
-    end else
-      (* absolute path *)
-      "", pretty
+  let to_base_uri name =
+    if is_relative name then None, skip_dot name
+    else begin
+      let p = insert cwd name in
+      let buf = Buffer.create 80 in
+      let res = add_uri_path buf p in
+      res, Buffer.contents buf
+    end
 end
 
 type position =

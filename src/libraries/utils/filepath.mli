@@ -164,16 +164,16 @@ module Normalized: sig
 
   (** [to_base_uri path] returns a pair [prefix, rest], according to the
       prettified value of [path]:
-      - if it starts with symbolic path SYMB, prefix is "SYMB";
-      - if it is a relative path, prefix is "PWD";
-      - else (an absolute path), prefix is "".
+      - if it starts with symbolic path SYMB, prefix is Some "SYMB";
+      - if it is a relative path, prefix is Some "PWD";
+      - else (an absolute path), prefix is None.
         [rest] contains everything after the '/' following the prefix.
         E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
         ("FRAMAC_SHARE", "libc/string.h").
 
       @since Frama-C+dev
   *)
-  val to_base_uri: t -> string * string
+  val to_base_uri: t -> string option * string
 end
 
 (** Describes a position in a source file.
