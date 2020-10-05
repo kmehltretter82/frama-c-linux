@@ -130,7 +130,8 @@ struct
 
   let tree env = env.tree
 
-  let play env res =
+  let play env prv res =
+    List.mem prv env.provers &&
     if VCS.is_valid res then env.valid else env.failed
 
   let progress env msg = env.progress (ProofEngine.main env.tree) msg
@@ -332,7 +333,7 @@ let rec crawl env on_child node = function
   | Prover( prv , res ) :: alternative ->
       begin
         let task =
-          if Env.play env res then
+          if Env.play env prv res then
             let wpo = Env.goal env node in
             let config = VCS.configure res in
             Env.prove env wpo ~config prv
