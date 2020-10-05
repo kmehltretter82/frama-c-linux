@@ -4,7 +4,6 @@
    OPT: -load-module no_hyp.cmxs
    OPT: -load-module multi_emitters.cmxs
 */
-
 void main() {
   int x = 1;
   /*@ assert \true; */

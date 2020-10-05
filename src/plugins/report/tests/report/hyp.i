@@ -5,7 +5,6 @@
 */
 void f(void);
 void f2(void);
-
 void g() {
   /*@ assert \true; */
 }
