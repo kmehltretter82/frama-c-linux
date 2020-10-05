@@ -1,8 +1,8 @@
 ( library
   (name report)
   (public_name frama-c-report.core)
-  (modules report_parameters scan dump csv register Report)
-  (private_modules report_parameters scan dump csv)
+  (modules report_parameters scan dump csv register classify Report)
+  (private_modules report_parameters scan dump csv register classify)
   (flags -open Frama_c_kernel)
   (libraries frama-c.kernel)
 )
