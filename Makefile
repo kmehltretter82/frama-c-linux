@@ -180,16 +180,13 @@ force-reconfigure:
 # todo: adds value/numerors? (requires opam package mlgmpidl and system libraries for MPFR)
 # todo: adds verisec
 # todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
+# NOTE: the elements of this list shoud be part of the DEFAULT_SUITES contained into `tests/ptest_config` 
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value value/traces
 
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: no test found for studia ?
 # todo: adds wp (at least 2 configs)
 PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic
-
-info:
-	echo $(sort $(dir $(SUB_TESTS)))
-
 
 tests: config.sed
 	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
