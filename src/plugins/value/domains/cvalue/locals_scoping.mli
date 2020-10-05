@@ -71,7 +71,8 @@ val make_escaping_fundec:
     function, in which case a different warning is emitted. *)
 
 val substitute:
-  Base.substitution -> clobbered_set -> Cvalue.Model.t -> Cvalue.Model.t
+  Base.substitution -> clobbered_set -> Cvalue.Model.t ->
+  Cvalue.Model.t * Base.Hptset.t
 
 (*
 Local Variables:
