@@ -74,13 +74,13 @@ PLUGIN_HAS_EXT_DOC:=no # [JS 2010/07/28] was 'yes'
                        # but prevent 'make src-distrib to work
 
 # aorai_ya can always be run
-PLUGIN_TESTS_DIRS:=aorai_ya
+PLUGIN_TESTS_DIRS:=ya
 
 ifeq (@HAS_LTLTOBA@,yes)
-PLUGIN_TESTS_DIRS+=aorai_ltl
+PLUGIN_TESTS_DIRS+=ltl
 endif
 
-PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/Aorai_test.ml $(PLUGIN_DIR)/tests/aorai_ya/name_projects.ml
+PLUGIN_TESTS_LIB:=$(PLUGIN_DIR)/tests/Aorai_test.ml $(PLUGIN_DIR)/tests/ya/name_projects.ml
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
@@ -101,7 +101,7 @@ $(Aorai_DIR)/tests/test_config_prove: \
 	$(SED) -e 's!@AORAI_WP_SHARE@!$(AORAI_WP_SHARE)!' $< > $@
 	$(CHMOD_RO) $@
 
-Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/Aorai_test.cmxs $(Aorai_DIR)/tests/Aorai_test.cmo $(Aorai_DIR)/tests/aorai_ya/name_projects.cmxs $(Aorai_DIR)/tests/aorai_ya/name_projects.cmo
+Aorai_DEFAULT_TESTS: $(Aorai_DIR)/tests/Aorai_test.cmxs $(Aorai_DIR)/tests/Aorai_test.cmo $(Aorai_DIR)/tests/ya/name_projects.cmxs $(Aorai_DIR)/tests/ya/name_projects.cmo
 
 # Regenerating the Makefile on need
 
