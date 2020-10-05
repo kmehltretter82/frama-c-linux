@@ -181,19 +181,28 @@ force-reconfigure:
 # todo: what about test_config_apron, test_config_...
 TESTS=builtins callgraph cil constant_propagation float idct impact jcdb journal libc metrics misc occurrence pdg rte rte_manual scope slicing sparecode spec syntax test value
 
+SUB_TESTS=value/traces
+
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: adds report: fixes src/plugins/report/tests/report/classify.c
 # todo: no test found for studia ?
 # todo: adds wp (at least 2 configs)
 PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm server variadic
 
+info:
+	echo $(sort $(dir $(SUB_TESTS)))
+
+
 tests: config.sed
 	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 	dune exec -- ptests/ptests.exe
+	for dir_with_subtest in $(sort $(dir $(SUB_TESTS))); do \
+		dune exec -- ptests/ptests.exe tests/$$dir_with_subtest; \
+	done
 	for plugin in $(PLUGIN_TESTS); do \
 		dune exec -- ptests/ptests.exe src/plugins/$$plugin/tests; \
 	done
-	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS))) \
+	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS) $(SUB_TESTS))) \
 	           $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
 
 clean-tests:
