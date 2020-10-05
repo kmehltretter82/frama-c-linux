@@ -70,10 +70,7 @@ let default_printer printer fmt = function
   | Ext_annot (_,an) -> Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
                           printer#extended fmt an
 
-let default_short_printer name printer fmt = function
-  | Ext_id _ | Ext_terms _ | Ext_preds _ -> Format.fprintf fmt "%s" name
-  | Ext_annot (id,an) ->
-    Format.fprintf fmt "%s@ {@\n%a@]@\n}" id (Pretty_utils.pp_list ~sep:"@\n" printer#extended) an
+let default_short_printer name _printer fmt _ext_kind = Format.fprintf fmt "%s" name
 
 let make
     name category
@@ -96,17 +93,17 @@ let make_block
   { preprocessor; typer; status},{ category; visitor; printer; short_printer }
 
 module Extensions = struct
-  (*hash table for  category, visitor, printer and short_priner of extensions*)
+  (*hash table for  category, visitor, printer and short_printer of extensions*)
   let ext_tbl = Hashtbl.create 5
 
   (*hash table for status, preprocessor and typer of single extensions*)
-  let ext_sta_tbl = Hashtbl.create 5
+  let ext_single_tbl = Hashtbl.create 5
 
-  (*hash table for status, preprocessor and visitor of block extensions*)
+  (*hash table for status, preprocessor and typer of block extensions*)
   let ext_block_tbl = Hashtbl.create 5
 
   let find_single name :extension_single =
-    try Hashtbl.find ext_sta_tbl name with Not_found ->
+    try Hashtbl.find ext_single_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
 
   let find_common name :extension_common =
@@ -136,7 +133,7 @@ module Extensions = struct
         name
     else
       begin
-        Hashtbl.add ext_sta_tbl name info1;
+        Hashtbl.add ext_single_tbl name info1;
         Hashtbl.add ext_tbl name info2
       end
 
@@ -258,7 +255,7 @@ let deprecated_replace name ext =
     short_printer = ext.printer ;
   }
   in
-  Hashtbl.add Extensions.ext_sta_tbl name info1;
+  Hashtbl.add Extensions.ext_single_tbl name info1;
   Hashtbl.add Extensions.ext_tbl name info2
 
 let strong_cat = Hashtbl.create 5
@@ -275,7 +272,7 @@ let merge ((info1:extension_single),(info2:extension_common)) :extension =
    short_printer = info2.printer}
 
 let deprecated_find ?(strong=true) name cat op_name =
-  match Hashtbl.find_opt Extensions.ext_sta_tbl name with
+  match Hashtbl.find_opt Extensions.ext_single_tbl name with
   | None ->
     if strong then Hashtbl.add strong_cat name cat ;
     merge (make name cat default_typer false)
