@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai_ya/generate_assigns_bts1290.i (no preprocessing)
+[kernel] Parsing tests/ya/generate_assigns_bts1290.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing TMPDIR/aorai_generate_assigns_bts1290_0.i (no preprocessing)
 [wp] Warning: Missing RTE guards

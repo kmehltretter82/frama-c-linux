@@ -1,8 +1,8 @@
-[kernel] Parsing tests/aorai_ltl/test_switch2.c (with preprocessing)
+[kernel] Parsing tests/ltl/test_switch2.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
-[aorai] tests/aorai_ltl/test_switch2.c:34: Warning: 
+[aorai] tests/ltl/test_switch2.c:34: Warning: 
   Call to opc not conforming to automaton (post-cond). Assuming it is on a dead path
-[aorai] tests/aorai_ltl/test_switch2.c:23: Warning: 
+[aorai] tests/ltl/test_switch2.c:23: Warning: 
   Call to opc not conforming to automaton (pre-cond). Assuming it is on a dead path
 [kernel] Parsing TMPDIR/aorai_test_switch2_0.i (no preprocessing)
 [wp] TMPDIR/aorai_test_switch2_0.i:4: Warning: 

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai_ya/bts1289.i (no preprocessing)
+[kernel] Parsing tests/ya/bts1289.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
 [aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
 [kernel] Parsing TMPDIR/aorai_bts1289_0.i (no preprocessing)

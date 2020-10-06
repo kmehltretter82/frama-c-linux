@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai_ya/declared_function.i (no preprocessing)
+[kernel] Parsing tests/ya/declared_function.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing TMPDIR/aorai_declared_function_0.i (no preprocessing)
 [kernel:annot:missing-spec] TMPDIR/aorai_declared_function_0.i:48: Warning: 

@@ -1,4 +1,4 @@
-[kernel] Parsing tests/aorai_ya/test_acces_params2.c (with preprocessing)
+[kernel] Parsing tests/ya/test_acces_params2.c (with preprocessing)
 [aorai] Welcome to the Aorai plugin
 [kernel] Parsing TMPDIR/aorai_test_acces_params2_0.i (no preprocessing)
 [wp] TMPDIR/aorai_test_acces_params2_0.i:3: Warning: 
