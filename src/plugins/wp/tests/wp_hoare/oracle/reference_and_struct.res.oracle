@@ -261,3 +261,9 @@ Prove: true.
        requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
      */
   void call_reset_5_tps(void);
+[wp] Warning: Memory model hypotheses for function 'load_5':
+  /*@
+     behavior typed_ref:
+       requires \separated(hp + (..), (int *)reg_load + (..));
+     */
+  void load_5(int *hp);

@@ -42,3 +42,9 @@ Assume {
 Prove: valid_rw(Malloc_0, p, 2).
 
 ------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'fopen':
+  /*@
+     behavior typed:
+       requires \separated(&_p__fc_fopen, {filename + (..), mode + (..)});
+     */
+  FILE *fopen(char const * __restrict filename, char const * __restrict mode);

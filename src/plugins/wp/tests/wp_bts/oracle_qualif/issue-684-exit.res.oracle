@@ -13,3 +13,75 @@
  Functions                 WP     Alt-Ergo  Total   Success
   inconditional_exit        4        -        4       100%
 ------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'seed48':
+  /*@
+     behavior typed:
+       requires
+         \separated(
+           seed16v + (..), (unsigned short *)__fc_random48_counter + (..),
+           &__fc_random48_init, &__fc_p_random48_counter
+           );
+     */
+  extern unsigned short *seed48(unsigned short * /*[3]*/ seed16v);
+[wp] Warning: Memory model hypotheses for function 'lcong48':
+  /*@
+     behavior typed:
+       requires
+         \separated(
+           param + (..), (unsigned short *)__fc_random48_counter + (..),
+           &__fc_random48_init
+           );
+     */
+  extern void lcong48(unsigned short * /*[7]*/ param);
+[wp] Warning: Memory model hypotheses for function 'erand48':
+  /*@
+     behavior typed:
+       requires
+         \separated(
+           xsubi + (..), (unsigned short *)__fc_random48_counter + (..)
+           );
+     */
+  extern double erand48(unsigned short * /*[3]*/ xsubi);
+[wp] Warning: Memory model hypotheses for function 'nrand48':
+  /*@
+     behavior typed:
+       requires
+         \separated(
+           xsubi + (..), (unsigned short *)__fc_random48_counter + (..)
+           );
+     */
+  extern long nrand48(unsigned short * /*[3]*/ xsubi);
+[wp] Warning: Memory model hypotheses for function 'jrand48':
+  /*@
+     behavior typed:
+       requires
+         \separated(
+           xsubi + (..), (unsigned short *)__fc_random48_counter + (..)
+           );
+     */
+  extern long jrand48(unsigned short * /*[3]*/ xsubi);
+[wp] Warning: Memory model hypotheses for function 'getenv':
+  /*@
+     behavior typed:
+       requires \separated(name + (..), (char **)__fc_env + (..));
+     */
+  extern char *getenv(char const *name);
+[wp] Warning: Memory model hypotheses for function 'putenv':
+  /*@
+     behavior typed:
+       requires \separated(string + (..), (char **)__fc_env + (..));
+     */
+  extern int putenv(char *string);
+[wp] Warning: Memory model hypotheses for function 'setenv':
+  /*@
+     behavior typed:
+       requires
+         \separated((char **)__fc_env + (..), {name + (..), value + (..)});
+     */
+  extern int setenv(char const *name, char const *value, int overwrite);
+[wp] Warning: Memory model hypotheses for function 'unsetenv':
+  /*@
+     behavior typed:
+       requires \separated(name + (..), (char **)__fc_env + (..));
+     */
+  extern int unsetenv(char const *name);

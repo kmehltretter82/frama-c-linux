@@ -18,3 +18,10 @@ Assume {
 Prove: P_equal(1, 1).
 
 ------------------------------------------------------------
+[wp] Warning: Memory model hypotheses for function 'Write':
+  /*@
+     behavior typed:
+       requires \separated(p + (..), (char *)A + (..));
+       requires \separated(p + (0 ..), (char *)A + (..));
+     */
+  extern void Write(char *p, int n);
