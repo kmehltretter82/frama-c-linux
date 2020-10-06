@@ -978,10 +978,10 @@ let get_macros cmd =
   Macros.add_list macros cmd.macros
 
 let contains_frama_c_binary_name =
-  Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\).*"
+  Str.regexp "\\([^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\($\\|[ \t]\\)\\)"
 
 let frama_c_binary_name =
-  Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
+  Str.regexp "\\([^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
 
 let basic_command_string =
   fun command ->
