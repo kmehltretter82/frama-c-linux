@@ -390,7 +390,20 @@ let warn kf name hyp_computer =
 let emitter =
   Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
 
+module RegisteredHypotheses =
+  State_builder.Set_ref
+    (Cil_datatype.Kf.Set)
+    (struct
+      let name = "Wp.MemoryContext.RegisteredHypotheses"
+      let dependencies = [Ast.self]
+    end)
+
 let add_behavior kf name hypotheses_computer =
-  match get_behavior kf name hypotheses_computer with
-  | None -> ()
-  | Some bhv -> Annotations.add_behaviors emitter kf [bhv]
+  if RegisteredHypotheses.mem kf then ()
+  else begin
+    begin match get_behavior kf name hypotheses_computer with
+      | None -> ()
+      | Some bhv -> Annotations.add_behaviors emitter kf [bhv]
+    end ;
+    RegisteredHypotheses.add kf
+  end
