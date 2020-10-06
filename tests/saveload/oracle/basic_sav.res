@@ -6,8 +6,7 @@
   
 [eva] basic.i:19: assertion got status valid.
 [eva] basic.i:20: starting to merge loop iterations
-[eva:alarm] basic.i:20: Warning: 
-  signed overflow. assert -2147483648 ≤ i - 1;
+[eva:alarm] basic.i:20: Warning: signed overflow. assert -2147483648 ≤ i - 1;
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -1,7 +1,7 @@
 /* run.config
-   EXECNOW: BIN multi_project.sav LOG multi_project_sav.res LOG multi_project_sav.err ./bin/toplevel.opt -save ./result/multi_project.sav @EVA_OPTIONS@ -semantic-const-folding @PTEST_DIR@/@PTEST_NAME@.i > result/multi_project_sav.res 2> result/multi_project_sav.err
+   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err (@frama-c@ -save @PTEST_NAME@.sav @EVA_OPTIONS@ -semantic-const-folding @PTEST_NAME@.i) > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
    CMXS: @PTEST_NAME@
-   STDOPT: +"-load ./result/multi_project.sav -journal-disable"
+   STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -journal-disable"
    CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: -eva @EVA_OPTIONS@
 */
