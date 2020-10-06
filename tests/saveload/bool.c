@@ -1,7 +1,7 @@
 /* run.config
    EXECNOW: BIN bool.sav LOG bool_sav.res LOG bool_sav.err ./bin/toplevel.opt -save bool.sav -eva @EVA_OPTIONS@ ./bool.c > bool_sav.res 2> bool_sav.err
-   STDOPT: +"-load bool.sav -out -input -deps"
-   STDOPT: +"-load bool.sav -eva @EVA_OPTIONS@"
+   STDOPT: +"-load %{dep:bool.sav} -out -input -deps"
+   STDOPT: +"-load %{dep:bool.sav} -eva @EVA_OPTIONS@"
  */
 
 #include "stdbool.h"
