@@ -1,2 +1,1 @@
-[kernel] User Error: Frama-C state file 'result/isset.sav' does not exist
-[kernel] Frama-C aborted: invalid user input.
+[kernel] Warning: ignoring source files specified on the command line while loading a global initial context.

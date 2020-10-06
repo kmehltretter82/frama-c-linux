@@ -1,12 +1,12 @@
-[kernel] Parsing basic.i (no preprocessing)
+[kernel] Parsing tests/saveload/basic.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] basic.i:19: assertion got status valid.
-[eva] basic.i:20: starting to merge loop iterations
-[eva:alarm] basic.i:20: Warning: 
+[eva] tests/saveload/basic.i:19: assertion got status valid.
+[eva] tests/saveload/basic.i:20: starting to merge loop iterations
+[eva:alarm] tests/saveload/basic.i:20: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
 [eva] Recording results for main
 [eva] done for function main

@@ -1,4 +1,4 @@
-[kernel] Parsing sparecode.i (no preprocessing)
+[kernel] Parsing tests/saveload/sparecode.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -6,15 +6,15 @@
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
 [eva] computing for function f <- main.
-  Called from sparecode.i:16.
+  Called from tests/saveload/sparecode.i:16.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from sparecode.i:17.
+  Called from tests/saveload/sparecode.i:17.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.
-  Called from sparecode.i:18.
+  Called from tests/saveload/sparecode.i:18.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

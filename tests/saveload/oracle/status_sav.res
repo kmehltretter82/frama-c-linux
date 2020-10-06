@@ -1,2 +1,2 @@
-[kernel] Parsing basic.i (no preprocessing)
+[kernel] Parsing tests/saveload/basic.i (no preprocessing)
 unknown (tried by Test)
