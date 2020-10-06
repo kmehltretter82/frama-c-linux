@@ -89,7 +89,7 @@ static void bt_clean_block(bt_block *b);
 
 #ifdef E_ACSL_DEBUG
 /*! \brief Print information about a given block */
-static void bt_print_block(bt_block *b);
+static void eacsl_bt_print_block(bt_block *b);
 
 /*! \brief Recursively print the contents of the bittree starting from a
  * given node */

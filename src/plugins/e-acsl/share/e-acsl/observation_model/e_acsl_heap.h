@@ -31,22 +31,22 @@
 #include <stddef.h>
 #include "../internals/e_acsl_alias.h"
 
-#define heap_allocation_size      export_alias(heap_allocation_size)
-#define heap_allocated_blocks     export_alias(heap_allocated_blocks)
-#define get_heap_allocation_size  export_alias(get_heap_allocation_size)
-#define get_heap_allocated_blocks export_alias(get_heap_allocated_blocks)
+#define eacsl_heap_allocation_size      export_alias(heap_allocation_size)
+#define eacsl_heap_allocated_blocks     export_alias(heap_allocated_blocks)
+#define eacsl_get_heap_allocation_size  export_alias(get_heap_allocation_size)
+#define eacsl_get_heap_allocated_blocks export_alias(get_heap_allocated_blocks)
 
 /*! \brief A variable holding the number of bytes in heap application allocation. */
-extern size_t heap_allocation_size;
+extern size_t eacsl_heap_allocation_size;
 /*! \brief A variable holding the number of blocks in heap application allocation. */
-extern size_t heap_allocated_blocks;
+extern size_t eacsl_heap_allocated_blocks;
 
 /*! Return the number of bytes in heap application allocation. */
-size_t get_heap_allocation_size()
+size_t eacsl_get_heap_allocation_size()
   __attribute__((FC_BUILTIN));
 
 /*! Return the number of blocks in heap application allocation. */
-size_t get_heap_allocated_blocks()
+size_t eacsl_get_heap_allocated_blocks()
   __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_HEAP

@@ -32,13 +32,13 @@
 
 #include "e_acsl_assert.h"
 
-int runtime_sound_verdict = 1;
+int eacsl_runtime_sound_verdict = 1;
 
 #ifndef E_ACSL_EXTERNAL_ASSERT
 /*! \brief Default implementation of E-ACSL runtime assertions */
-void runtime_assert(int predicate, const char *kind, const char *fct,
+void eacsl_runtime_assert(int predicate, const char *kind, const char *fct,
     const char *pred_txt, const char * file, int line) {
-  if (runtime_sound_verdict) {
+  if (eacsl_runtime_sound_verdict) {
     if (! predicate) {
       STDERR("%s: In function '%s'\n"
              "%s:%d: Error: %s failed:\n"

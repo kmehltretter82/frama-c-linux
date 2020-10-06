@@ -33,21 +33,21 @@ struct memory_spaces mem_spaces = {
 /* \brief Create two memory spaces, one for RTL and the other for application
    memory. This function *SHOULD* be called before any allocations are made
    otherwise execution fails */
-void make_memory_spaces(size_t rtl_size, size_t heap_size) {
-  mem_spaces.rtl_mspace = create_mspace(rtl_size, 0);
-  mem_spaces.heap_mspace = create_mspace(heap_size, 0);
-  /* Do not use `mspace_least_addr` here, as it returns the address of the
+void eacsl_make_memory_spaces(size_t rtl_size, size_t heap_size) {
+  mem_spaces.rtl_mspace = eacsl_create_mspace(rtl_size, 0);
+  mem_spaces.heap_mspace = eacsl_create_mspace(heap_size, 0);
+  /* Do not use `eacsl_mspace_least_addr` here, as it returns the address of the
      mspace header. */
-  mem_spaces.heap_start = (uintptr_t)mspace_malloc(mem_spaces.heap_mspace,1);
+  mem_spaces.heap_start = (uintptr_t)eacsl_mspace_malloc(mem_spaces.heap_mspace,1);
   mem_spaces.heap_end = mem_spaces.heap_start + heap_size;
   /* Save initial least address of heap memspace. This address is used later
      to check whether memspace has been moved. */
-  mem_spaces.heap_mspace_least = (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace);
+  mem_spaces.heap_mspace_least = (uintptr_t)eacsl_mspace_least_addr(mem_spaces.heap_mspace);
 }
 
-void destroy_memory_spaces() {
-  destroy_mspace(mem_spaces.rtl_mspace);
-  destroy_mspace(mem_spaces.heap_mspace);
+void eacsl_destroy_memory_spaces() {
+  eacsl_destroy_mspace(mem_spaces.rtl_mspace);
+  eacsl_destroy_mspace(mem_spaces.heap_mspace);
 }
 
 int is_pow_of_2(size_t x) {
