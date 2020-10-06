@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err ../../bin/toplevel.opt -slicing-level 2 -slice-return main -eva-show-progress -save sparecode.sav sparecode.i -then-on 'Slicing export' -print > sparecode_sav.res 2> sparecode_sav.err
+   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save sparecode.sav sparecode.i -then-on 'Slicing export' -print > sparecode_sav.res 2> sparecode_sav.err
    STDOPT: +"-load %{dep:sparecode.sav}"
 */
 int G;
