@@ -441,8 +441,7 @@ let make (main : main_window_extension_points) =
     (* --- Provers                                                            --- *)
     (* -------------------------------------------------------------------------- *)
 
-    let provers = new GuiConfig.provers "wp.provers" in
-
+    let provers = new GuiConfig.provers in
     let dp_chooser = new GuiConfig.dp_chooser ~main ~provers in
 
     (* -------------------------------------------------------------------------- *)
