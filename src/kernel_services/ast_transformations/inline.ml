@@ -109,6 +109,7 @@ let inline_call loc caller callee return args =
       self#set_current_kf caller;
       Cil.DoChildrenPost
         (fun fd ->
+           List.iter (fun v -> v.vformal <- false) fd.sformals;
            caller_fd.slocals <-
              caller_fd.slocals @ fd.sformals @ fd.slocals;
            let add_init vi arg =
