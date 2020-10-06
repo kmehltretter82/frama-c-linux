@@ -254,7 +254,7 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
 let term_to_ptr_and_size ~loc kf env t =
   let e, env = !term_to_exp_ref kf (Env.rte env true) t in
   let ty = Misc.cty t.term_type in
-  let sizeof = Misc.mk_ptr_sizeof ty loc in
+  let sizeof = Smart_exp.ptr_sizeof ~loc ty in
   e, sizeof, env
 
 (* Take an expression [e] and return a tuple [(base, base_addr)] where [base]

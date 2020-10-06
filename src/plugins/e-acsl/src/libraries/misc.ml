@@ -146,11 +146,6 @@ let term_has_lv_from_vi t =
   with Lv_from_vi_found ->
     true
 
-let mk_ptr_sizeof typ loc =
-  match Cil.unrollType typ with
-  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
-  | _ -> assert false
-
 let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
