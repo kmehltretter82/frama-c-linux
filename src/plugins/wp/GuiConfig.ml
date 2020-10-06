@@ -34,13 +34,17 @@ class provers =
     initializer
       begin
         (** select automatically the provers set on the command line *)
-        let cmdline = Wp_parameters.Provers.get () in
+        let cmdline =
+          match Wp_parameters.Provers.get () with
+          | [] -> [ "alt-ergo" ]
+          | prvs -> prvs
+        in
         let selection = List.fold_left
             (fun acc e ->
                match Why3Provers.find_opt e with
                | None -> acc
                | Some p -> S.add p acc)
-             S.empty cmdline
+            S.empty cmdline
         in
         self#set selection ;
       end
@@ -62,13 +66,14 @@ class dp_chooser
   let array = new Wpane.warray () in
   object(self)
 
+    val mutable mainstream = true
     val mutable selected = M.empty
 
     method private enable dp e =
       selected <- M.add dp e selected
 
     method private lookup dp =
-      M.find dp selected
+      try M.find dp selected with Not_found -> false
 
     method private entry dp =
       let text = Why3Provers.title dp in
@@ -91,9 +96,15 @@ class dp_chooser
         array#update () ;
       end
 
-    method private detect () =
+    method private provers =
+      let filter p =
+        self#lookup p || not mainstream || Why3Provers.is_mainstream p
+      in S.filter filter (Why3Provers.provers_set ())
+
+    method private filter () =
       begin
-        self#configure (Why3Provers.provers_set ());
+        mainstream <- not mainstream ;
+        self#configure self#provers ;
       end
 
     method private apply () =
@@ -105,7 +116,8 @@ class dp_chooser
            selected)
 
     method run () =
-      let dps = Why3Provers.provers_set () in
+      selected <- M.empty ;
+      let dps = self#provers in
       let sel = provers#get in
       selected <- M.merge
           (fun _ avail enab ->
@@ -119,7 +131,8 @@ class dp_chooser
 
     initializer
       begin
-        dialog#button ~action:(`ACTION self#detect) ~label:"Detect Provers" () ;
+        dialog#button ~action:(`ACTION self#filter) ~label:"Filter"
+          ~tooltip:"Switch to main stream / alternative solvers" () ;
         dialog#button ~action:(`CANCEL) ~label:"Cancel" () ;
         dialog#button ~action:(`APPLY) ~label:"Apply" () ;
         array#set_entry self#entry ;
