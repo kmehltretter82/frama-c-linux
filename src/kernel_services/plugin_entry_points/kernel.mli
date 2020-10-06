@@ -238,7 +238,7 @@ module PrintPluginPath: Parameter_sig.Bool
 module AutocompleteHelp: Parameter_sig.String_set
 (** Behavior of option "-autocomplete" *)
 
-module DumpConfig: Parameter_sig.Bool
+module PrintConfigJson: Parameter_sig.Bool
 (** Behavior of option "-dump-config"
     @since Frama-C+dev *)
 

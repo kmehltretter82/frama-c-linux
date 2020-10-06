@@ -420,12 +420,12 @@ let () =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
-module DumpConfig =
+module PrintConfigJson =
   False
     (struct
-      let module_name = "DumpConfig"
-      let option_name = "-dump-config"
-      let help = "dump several information about frama-configuration inside \
+      let module_name = "PrintConfigJson"
+      let option_name = "-print-config-json"
+      let help = "print several information about frama-configuration inside a \
                   JSON object"
     end)
 

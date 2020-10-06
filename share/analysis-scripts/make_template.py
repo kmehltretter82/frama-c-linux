@@ -73,7 +73,7 @@ if "PTESTS_TESTING" in os.environ:
     fc_stubs_c.touch()
     gnumakefile.touch()
 
-process = Popen([framac_bin / "frama-c", "-dump-config"], stdout=PIPE)
+process = Popen([framac_bin / "frama-c", "-print-config-json"], stdout=PIPE)
 (output, err) = process.communicate()
 exit_code = process.wait()
 if exit_code != 0:

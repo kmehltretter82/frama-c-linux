@@ -81,7 +81,7 @@ let dump_to_stdout () =
 
 let () =
   let action () =
-    if Kernel.DumpConfig.get () then begin
+    if Kernel.PrintConfigJson.get () then begin
       dump_to_stdout ();
       raise Cmdline.Exit
     end else
