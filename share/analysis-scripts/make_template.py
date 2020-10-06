@@ -72,13 +72,12 @@ if "PTESTS_TESTING" in os.environ:
     fc_stubs_c.touch()
     gnumakefile.touch()
 
-frama_c_config = framac_bin / "frama-c-config"
-process = Popen([frama_c_config, "-share"], stdout=PIPE)
+process = Popen([framac_bin / "frama-c", "-no-autoload-plugins", "-print-share-path"], stdout=PIPE)
 (output, err) = process.communicate()
 output = output.decode('utf-8')
 exit_code = process.wait()
 if exit_code != 0:
-    sys.exit("error running frama-c-config")
+    sys.exit(f"error running frama-c -print-share-path")
 sharedir = Path(output)
 
 def get_known_machdeps():
@@ -96,18 +95,18 @@ def get_known_machdeps():
     return (default_machdep, machdeps)
 
 def check_path_exists(path):
-    if os.path.exists(path):
+    if path.exists():
         yn = input(f"warning: {path} already exists. Overwrite? [y/N] ")
         if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
             print("Exiting without overwriting.")
             sys.exit(0)
-    pathdir = os.path.dirname(path)
-    if not os.path.exists(pathdir):
+    pathdir = path.parent
+    if not pathdir.exists():
         yn = input(f"warning: directory '{pathdir}' does not exit. Create it? [y/N] ")
         if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
             print("Exiting without creating.")
             sys.exit(0)
-        Path(pathdir).mkdir(parents=True, exist_ok=False)
+        pathdir.mkdir(parents=True, exist_ok=False)
 
 check_path_exists(gnumakefile)
 main = input("Main target name: ")
