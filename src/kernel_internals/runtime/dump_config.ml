@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let list_plugins_names () =
+let list_plugin_names () =
   Plugin.fold_on_plugins (fun p acc -> p.Plugin.p_name :: acc) []
 
 let dump_parameter tp =
@@ -71,7 +71,7 @@ let dump_to_json () =
     "dot", (match Fc_config.dot with Some cmd -> `String cmd | None -> `Null) ;
     "current_machdep", `String (Kernel.Machdep.get ()) ;
     "machdeps", list string (File.list_available_machdeps ()) ;
-    "plugins", list string (list_plugins_names ()) ;
+    "plugins", list string (list_plugin_names ()) ;
     "parameters", `Assoc (dump_all_parameters ()) ;
   ]
 
