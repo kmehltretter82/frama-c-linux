@@ -77,7 +77,7 @@ let dump_to_json () =
 
 let dump_to_stdout () =
   let json = dump_to_json () in
-  Yojson.Basic.pretty_to_channel stdout json
+  Yojson.Basic.(pretty_to_channel stdout (sort json))
 
 let () =
   let action () =
