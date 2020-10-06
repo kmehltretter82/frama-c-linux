@@ -55,7 +55,7 @@ let term_to_exp_ref
     Hence [Range_elimination_exception] must be raised. *)
 exception Range_elimination_exception
 
-(* Takes a [toffset] and checks whether it contains an index that is a set *)
+(* Take a [toffset] and check whether it contains an index that is a set *)
 let rec has_set_as_index = function
   | TNoOffset ->
     false
@@ -64,8 +64,8 @@ let rec has_set_as_index = function
   | TModel(_, toffset) | TField(_, toffset) ->
     has_set_as_index toffset
 
-(* Performs Range Elimination on index [TIndex(term, offset)]. Term part.
-   Raises [Range_elimination_exception] whether either the operation is unsound
+(* Perform Range Elimination on index [TIndex(term, offset)]. Term part.
+   Raise [Range_elimination_exception] whether either the operation is unsound
    or we don't support the construction yet. *)
 let eliminate_ranges_from_index_of_term ~loc t =
   match t.term_node with
@@ -77,8 +77,8 @@ let eliminate_ranges_from_index_of_term ~loc t =
   | _ ->
     raise Range_elimination_exception
 
-(* Performs Range Elimination on index [TIndex(term, offset)]. Offset part.
-   Raises [Range_elimination_exception], through [eliminate_ranges_from_
+(* Perform Range Elimination on index [TIndex(term, offset)]. Offset part.
+   Raise [Range_elimination_exception], through [eliminate_ranges_from_
    index_of_term], whether either the operation is unsound or we don't support
    the construction yet. *)
 let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =

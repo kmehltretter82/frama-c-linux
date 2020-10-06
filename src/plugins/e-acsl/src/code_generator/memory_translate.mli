@@ -22,15 +22,15 @@
 
 open Cil_types
 
-(* Create calls to a few memory builtins.
+(* Create calls to a few memory built-ins.
    Partial support for ranges is provided. *)
 
 val call:
   loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
   exp * Env.t
-(* [call ~loc kf name ctx env t] creates a call to the E-ACSL memory builtin
+(* [call ~loc kf name ctx env t] creates a call to the E-ACSL memory built-in
    identified by [name] which only requires a single argument, namely the
-   pointer under study. The supported builtins are:
+   pointer under study. The supported built-ins are:
    [base_addr], [block_length], [offset] and [freeable]. *)
 
 val call_with_size:
@@ -47,7 +47,7 @@ val call_valid:
   loc:location -> kernel_function -> string -> typ -> Env.t -> term ->
   predicate -> exp * Env.t
 (* [call_valid ~loc kf name ctx env t p] creates a call to the E-ACSL memory
-   builtin [valid] or [valid_read] according to [name].
+   built-in [valid] or [valid_read] according to [name].
    [t] can denote ranges of memory locations.
    [p] is the predicate under testing. *)
 
