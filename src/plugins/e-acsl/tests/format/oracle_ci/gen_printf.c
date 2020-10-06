@@ -171,6 +171,7 @@ char *__gen_e_acsl_literal_string_12;
 char *__gen_e_acsl_literal_string_35;
 char *__gen_e_acsl_literal_string_9;
 char *__gen_e_acsl_literal_string_6;
+char *__gen_e_acsl_literal_string_338;
 char *__gen_e_acsl_literal_string_70;
 char *__gen_e_acsl_literal_string_47;
 char *__gen_e_acsl_literal_string_32;
@@ -491,6 +492,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
   size_t tmp;
   unsigned long __lengthof_format;
   int i;
+  __e_acsl_store_block((void *)(& fmt),(size_t)8);
   __e_acsl_store_block((void *)(& allowed),(size_t)8);
   tmp = __gen_e_acsl_strlen(fmt);
   int len = (int)tmp;
@@ -581,6 +583,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
   }
   __e_acsl_delete_block((void *)format);
   /* __fc_vla_free((void *)format); */
+  __e_acsl_delete_block((void *)(& fmt));
   __e_acsl_delete_block((void *)(& allowed));
   __e_acsl_delete_block((void *)(& format));
   return;
@@ -700,11 +703,13 @@ char *__gen_e_acsl_strcpy(char * __restrict dest, char const * __restrict src)
 {
   char *__gen_e_acsl_at;
   char *__retres;
+  __e_acsl_store_block((void *)(& src),(size_t)8);
   __e_acsl_store_block((void *)(& dest),(size_t)8);
   __gen_e_acsl_at = dest;
   __retres = strcpy(dest,src);
   __e_acsl_assert(__retres == __gen_e_acsl_at,"Postcondition","strcpy",
                   "\\result == \\old(dest)","FRAMAC_SHARE/libc/string.h",358);
+  __e_acsl_delete_block((void *)(& src));
   __e_acsl_delete_block((void *)(& dest));
   return __retres;
 }
@@ -821,7 +826,9 @@ char *__gen_e_acsl_strchr(char const *s, int c)
 size_t __gen_e_acsl_strlen(char const *s)
 {
   size_t __retres;
+  __e_acsl_store_block((void *)(& s),(size_t)8);
   __retres = strlen(s);
+  __e_acsl_delete_block((void *)(& s));
   return __retres;
 }
 
@@ -1655,6 +1662,11 @@ void __e_acsl_globals_init(void)
                          sizeof("fFeEgGaA"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_6);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_6);
+    __gen_e_acsl_literal_string_338 = "diouxfFeEgGaAcspn";
+    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_338,
+                         sizeof("diouxfFeEgGaAcspn"));
+    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_338);
+    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_338);
     __gen_e_acsl_literal_string_70 = "diouxXncsaAeEfFgG";
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_70,
                          sizeof("diouxXncsaAeEfFgG"));
@@ -2531,6 +2543,8 @@ void __e_acsl_globals_init(void)
                          sizeof("% n"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_323);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_323);
+    __e_acsl_store_block((void *)(& valid_specifiers),(size_t)8);
+    __e_acsl_full_init((void *)(& valid_specifiers));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),(size_t)8);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
     __e_acsl_store_block((void *)(& __fc_time_tm),(size_t)36);
@@ -2541,6 +2555,7 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)(& valid_specifiers));
   __e_acsl_delete_block((void *)(& __fc_p_time_tm));
   __e_acsl_delete_block((void *)(& __fc_time_tm));
 }

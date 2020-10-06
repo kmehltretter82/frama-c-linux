@@ -14,17 +14,47 @@
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:25: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/memory/separated.c:34: Warning: 
+[eva:alarm] tests/memory/separated.c:26: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/memory/separated.c:35: Warning: 
+[eva:alarm] tests/memory/separated.c:27: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/memory/separated.c:44: Warning: 
+[eva:alarm] tests/memory/separated.c:36: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/memory/separated.c:45: Warning: 
+[eva:alarm] tests/memory/separated.c:37: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:46: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:47: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/separated.c:48: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:49: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:50: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:51: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:52: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:60: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:60: Warning: 
+  assertion 'E_ACSL,separated_guard' got status unknown.
+[eva:alarm] tests/memory/separated.c:61: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:61: Warning: 
+  assertion 'E_ACSL,separated_guard' got status unknown.
+[eva:alarm] tests/memory/separated.c:62: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:62: Warning: 
+  assertion 'E_ACSL,separated_guard' got status unknown.
+[eva:alarm] tests/memory/separated.c:62: Warning: assertion got status unknown.
+[eva:alarm] tests/memory/separated.c:63: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:63: Warning: 
+  assertion 'E_ACSL,separated_guard' got status unknown.
+[eva:alarm] tests/memory/separated.c:63: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/separated.c:63: Warning: assertion got status unknown.
+[eva:alarm] tests/memory/separated.c:64: Warning: 
   function __e_acsl_assert: precondition got status unknown.
