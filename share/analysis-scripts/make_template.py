@@ -31,6 +31,7 @@ import re
 import shutil
 import shlex
 import glob
+import json
 from subprocess import Popen, PIPE
 from pathlib import Path
 import function_finder
@@ -72,27 +73,16 @@ if "PTESTS_TESTING" in os.environ:
     fc_stubs_c.touch()
     gnumakefile.touch()
 
-process = Popen([framac_bin / "frama-c", "-no-autoload-plugins", "-print-share-path"], stdout=PIPE)
+process = Popen([framac_bin / "frama-c", "-dump-config"], stdout=PIPE)
 (output, err) = process.communicate()
-output = output.decode('utf-8')
 exit_code = process.wait()
 if exit_code != 0:
     sys.exit(f"error running frama-c -print-share-path")
-sharedir = Path(output)
 
-def get_known_machdeps():
-    process = Popen([framac_bin / "frama-c", "-machdep", "help"], stdout=PIPE)
-    (output, err) = process.communicate()
-    output = output.decode('utf-8')
-    exit_code = process.wait()
-    if exit_code != 0:
-        sys.exit("error getting machdeps: " + output)
-    match = re.match("\[kernel\] supported machines are (.*) \(default is (.*)\).", output, re.DOTALL)
-    if not match:
-        sys.exit("error getting known machdeps: " + output)
-    machdeps = match.group(1).split()
-    default_machdep = match.group(2)
-    return (default_machdep, machdeps)
+fc_config = json.loads(output.decode('utf-8'))
+sharedir = Path(fc_config['datadir'])
+default_machdep = fc_config['current_machdep']
+machdeps = fc_config['machdeps']
 
 def check_path_exists(path):
     if path.exists():
@@ -172,7 +162,6 @@ if yn != "" and (yn[0] == "Y" or yn[0] == "y"):
     add_main_stub = True
 
 print("Please define the architectural model (machdep) of the target machine.")
-(default_machdep, machdeps) = get_known_machdeps()
 print("Known machdeps: " + " ".join(machdeps))
 machdep_chosen = False
 while not machdep_chosen:
