@@ -52,6 +52,16 @@ let calls_visitor callees = object(self)
     | _ -> Cil.SkipChildren
 end
 
+module Callees =
+  State_builder.Hashtbl
+    (Cil_datatype.Kf.Hashtbl)
+    (Fct)
+    (struct
+      let dependencies = [Ast.self]
+      let name = "WpTarget.Callees"
+      let size = 17
+    end)
+
 (** Note: we add the kf received in parameter in the set only if it has a
     definition (and thus if it does not have one, we add nothing as it has
     no visible callee).
@@ -60,16 +70,18 @@ end
     the function is used, it will be added to the set via its caller(s) if they
     are under verification.
 *)
+let with_callees kf =
+  if Kernel_function.has_definition kf then begin
+    let set = ref (Fct.singleton kf) in
+    ignore (Visitor.visitFramacKf (calls_visitor set) kf) ;
+    !set
+  end else
+    Fct.empty
+
+let with_callees = Callees.memo with_callees
+
 let add_with_callees kf =
-  let component kf =
-    if Kernel_function.has_definition kf then begin
-      let set = ref (Fct.singleton kf) in
-      ignore (Visitor.visitFramacKf (calls_visitor set) kf) ;
-      !set
-    end else
-      Fct.empty
-  in
-  Fct.iter TargetKfs.add (component kf)
+  Fct.iter TargetKfs.add (with_callees kf)
 
 exception Found
 

@@ -63,9 +63,30 @@ let wp_rte_generated s =
         not mem
       else false
 
+let merge_scopes vcs =
+  Bag.fold_left
+    begin fun s vc ->
+       match VC.get_scope vc with
+       | WpContext.Global -> s
+       | WpContext.Kf kf ->
+          Kernel_function.Set.union (WpTarget.with_callees kf) s
+    end
+    Kernel_function.Set.empty vcs
+
+let warn_memory_context vcs =
+  let setup = Factory.parse (Wp_parameters.Model.get ()) in
+  let driver = Driver.load_driver () in
+  let model = Factory.instance setup driver in
+  let hypotheses_computer = WpContext.compute_hypotheses model in
+  let name = WpContext.MODEL.id model in
+  Kernel_function.Set.iter
+    (fun kf -> MemoryContext.warn kf name hypotheses_computer)
+    (merge_scopes vcs)
+
 let spawn provers vcs =
   if not (Bag.is_empty vcs) then
     let provers = Why3.Whyconf.Sprover.elements provers#get in
+    warn_memory_context vcs ;
     VC.command ~provers ~tip:true vcs
 
 let run_and_prove
