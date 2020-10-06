@@ -32,11 +32,9 @@ type functions =
   | Fct_skip of Cil_datatype.Kf.Set.t
   | Fct_list of Cil_datatype.Kf.Set.t
 
-val get_kf : unit -> functions
-val get_wp : unit -> functions
+val get_fct : unit -> functions
 val iter_fct : (Kernel_function.t -> unit) -> functions -> unit
 val iter_kf : (Kernel_function.t -> unit) -> unit
-val iter_wp : (Kernel_function.t -> unit) -> unit
 
 (** {2 Goal Selection} *)
 
