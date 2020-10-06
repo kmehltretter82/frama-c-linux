@@ -87,6 +87,15 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
 
+let ptr_base ~loc e =
+  let base, _ = ptr_index ~loc e in
+  let base_addr  = match base.enode with
+    | AddrOf _ | Const _ -> Cil.zero ~loc
+    | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
+    | _ -> assert false
+  in
+  base, base_addr
+
 (* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
   | LBterm t -> t
