@@ -360,7 +360,12 @@ let compute name hypotheses_computer =
     (fun kf -> ignore (compute_behavior kf name hypotheses_computer))
 
 let get_behavior kf name hypotheses_computer =
-  Table.memo (fun kf -> compute_behavior kf name hypotheses_computer) kf
+  Table.memo
+    begin fun kf ->
+      AssignsCompleteness.warn kf ;
+      compute_behavior kf name hypotheses_computer
+    end
+    kf
 
 let print_memory_context kf bhv fmt =
   begin

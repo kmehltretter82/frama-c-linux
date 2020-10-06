@@ -63,7 +63,7 @@ PLUGIN_CMO:= \
 	wp_parameters wp_error \
 	dyncall ctypes clabels \
 	Why3Provers \
-	Context Warning MemoryContext wpContext \
+	Context Warning AssignsCompleteness MemoryContext wpContext \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
