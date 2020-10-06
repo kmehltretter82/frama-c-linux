@@ -52,11 +52,22 @@ let calls_visitor callees = object(self)
     | _ -> Cil.SkipChildren
 end
 
-let add_with_dependencies kf =
+(** Note: we add the kf received in parameter in the set only if it has a
+    definition (and thus if it does not have one, we add nothing as it has
+    no visible callee).
+
+    This prevent to warn on prototypes that have a contract but are unused. If
+    the function is used, it will be added to the set via its caller(s) if they
+    are under verification.
+*)
+let add_with_callees kf =
   let component kf =
-    let set = ref (Fct.singleton kf) in
-    ignore (Visitor.visitFramacKf (calls_visitor set) kf) ;
-    !set
+    if Kernel_function.has_definition kf then begin
+      let set = ref (Fct.singleton kf) in
+      ignore (Visitor.visitFramacKf (calls_visitor set) kf) ;
+      !set
+    end else
+      Fct.empty
   in
   Fct.iter TargetKfs.add (component kf)
 
@@ -147,10 +158,10 @@ let check_properties behaviors props kf =
 
 let add_with_behaviors behaviors props kf =
   if behaviors = [] && props = [] then
-    add_with_dependencies kf
+    add_with_callees kf
   else begin
     try check_properties behaviors props kf
-    with Found -> add_with_dependencies kf
+    with Found -> add_with_callees kf
   end
 
 let compute model =
