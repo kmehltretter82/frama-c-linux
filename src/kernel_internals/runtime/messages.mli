@@ -44,8 +44,8 @@ val nb_messages: unit -> int
 (** Number of stored warning messages, error messages, or all
     messages.*)
 
-val add_update_hook: (unit -> unit) -> unit
-(** Register a hook on message addition *)
+val add_global_hook: (unit -> unit) -> unit
+(** Register a global hook (not projectified) on message addition. *)
 
 (*
 Local Variables:

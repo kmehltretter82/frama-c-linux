@@ -1718,12 +1718,12 @@ class main_window () : main_window_extension_points =
         GtkMisc.Label.set_text label text
       in
       register_reset_extension (fun _ -> display_warnings ());
-      Messages.add_update_hook (fun () ->
-        if not !outdated_warnings then
-          begin
-            outdated_warnings := true ;
-            Wutil.later display_warnings
-          end
+      Messages.add_global_hook (fun () ->
+          if not !outdated_warnings then
+            begin
+              outdated_warnings := true ;
+              Wutil.later display_warnings
+            end
         );
       Messages.reset_once_flag ();
       display_warnings ();

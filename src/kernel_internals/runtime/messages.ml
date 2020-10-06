@@ -48,7 +48,12 @@ module Messages =
     end)
 let () = Ast.add_monotonic_state Messages.self
 
-let add_message m = Messages.set (m :: Messages.get ())
+let demons = ref []
+let add_message m =
+  begin
+    Messages.set (m :: Messages.get ()) ;
+    List.iter (fun fn -> fn()) !demons ;
+  end
 
 let nb_errors () =
   Messages.fold_left
@@ -95,7 +100,7 @@ let () = Log.check_not_yet := check_not_yet
 
 let reset_once_flag () = OnceTable.clear ()
 
-let add_update_hook fn = Messages.add_hook_on_update (fun _ -> fn ())
+let add_global_hook fn = demons := !demons @ [fn]
 
 (*
 Local Variables:
