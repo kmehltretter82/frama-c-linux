@@ -20,38 +20,41 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let dump_to_stdout () =
+
+let dump_to_json () =
   let string s = `String s in
   let list f l = `List (List.map f l) in
-  let json = `Assoc [
-      "version", `String Fc_config.version ;
-      "codename", `String Fc_config.codename ;
-      "version_and_codename", `String Fc_config.version_and_codename ;
-      "major_version", `Int Fc_config.major_version ;
-      "minor_version", `Int Fc_config.minor_version ;
-      "is_gui", `Bool !Fc_config.is_gui ;
-      "ocamlc", `String Fc_config.ocamlc ;
-      "ocamlopt", `String Fc_config.ocamlopt ;
-      "ocaml_wflags", `String Fc_config.ocaml_wflags ;
-      "datadir", `String Fc_config.datadir ;
-      "datadirs", list string Fc_config.datadirs ;
-      "framac_libc", `String Fc_config.framac_libc ;
-      "libdir", `String Fc_config.libdir ;
-      "plugin_dir", list string Fc_config.plugin_dir ;
-      "plugin_path", `String Fc_config.plugin_path ;
-      "compilation_unit_names", list string Fc_config.compilation_unit_names ;
-      "library_names", list string Fc_config.library_names ;
-      "preprocessor", `String Fc_config.preprocessor ;
-      "using_default_cpp", `Bool Fc_config.using_default_cpp ;
-      "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;
-      "preprocessor_supported_arch_options",
-      list string Fc_config.preprocessor_supported_arch_options ;
-      "preprocessor_keep_comments", `Bool Fc_config.preprocessor_keep_comments ;
-      "dot", (match Fc_config.dot with Some cmd -> `String cmd | None -> `Null) ;
-      "current_machdep", `String (Kernel.Machdep.get ()) ;
-      "machdeps", list string (File.list_available_machdeps ())
-    ]
-  in
+  `Assoc [
+    "version", `String Fc_config.version ;
+    "codename", `String Fc_config.codename ;
+    "version_and_codename", `String Fc_config.version_and_codename ;
+    "major_version", `Int Fc_config.major_version ;
+    "minor_version", `Int Fc_config.minor_version ;
+    "is_gui", `Bool !Fc_config.is_gui ;
+    "ocamlc", `String Fc_config.ocamlc ;
+    "ocamlopt", `String Fc_config.ocamlopt ;
+    "ocaml_wflags", `String Fc_config.ocaml_wflags ;
+    "datadir", `String Fc_config.datadir ;
+    "datadirs", list string Fc_config.datadirs ;
+    "framac_libc", `String Fc_config.framac_libc ;
+    "libdir", `String Fc_config.libdir ;
+    "plugin_dir", list string Fc_config.plugin_dir ;
+    "plugin_path", `String Fc_config.plugin_path ;
+    "compilation_unit_names", list string Fc_config.compilation_unit_names ;
+    "library_names", list string Fc_config.library_names ;
+    "preprocessor", `String Fc_config.preprocessor ;
+    "using_default_cpp", `Bool Fc_config.using_default_cpp ;
+    "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;
+    "preprocessor_supported_arch_options",
+    list string Fc_config.preprocessor_supported_arch_options ;
+    "preprocessor_keep_comments", `Bool Fc_config.preprocessor_keep_comments ;
+    "dot", (match Fc_config.dot with Some cmd -> `String cmd | None -> `Null) ;
+    "current_machdep", `String (Kernel.Machdep.get ()) ;
+    "machdeps", list string (File.list_available_machdeps ())
+  ]
+
+let dump_to_stdout () =
+  let json = dump_to_json () in
   Yojson.Basic.pretty_to_channel stdout json
 
 let () =
@@ -63,4 +66,3 @@ let () =
       Cmdline.nop
   in
   Cmdline.run_after_exiting_stage action
-
