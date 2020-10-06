@@ -86,6 +86,8 @@ void mark_readonly(void *ptr) {
 
 int valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
+    size == 0
+    ||
     allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
     && !readonly(ptr)
 #ifdef E_ACSL_TEMPORAL
@@ -95,7 +97,10 @@ int valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
 }
 
 int valid_read(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
-  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+  return
+    size == 0
+    ||
+    allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif

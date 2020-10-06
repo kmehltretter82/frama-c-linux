@@ -229,7 +229,10 @@ static bt_block* lookup_allocated(void* ptr, size_t size, void *ptr_base) {
 /* return whether the size bytes of ptr are readable/writable */
 int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = lookup_allocated(ptr, size, ptr_base);
-  return blk != NULL && !blk->is_readonly
+  return
+    size == 0
+    ||
+    blk != NULL && !blk->is_readonly
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
@@ -239,7 +242,10 @@ int valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
 /* return whether the size bytes of ptr are readable */
 int valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = lookup_allocated(ptr, size, ptr_base);
-  return blk != NULL
+  return
+    size == 0
+    ||
+    blk != NULL
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif

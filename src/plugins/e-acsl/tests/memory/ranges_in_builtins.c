@@ -48,6 +48,9 @@ int main(void) {
   /*@ assert !\valid_read(&t3[6][1][0] + (2..10)); */
   /*@ assert \valid_read(&t3[(n-1)..(n+2)][1]); */
 
+  int t4[10][10][10];
+  /*@ assert \let x = 5; \valid(&t4[4][0..x][2]); */
+
   struct S s;
   s.a[0] = 7; s.a[1] = 8;
   /*@ assert \initialized(&s.a[0] + (1..1)); */ ;
