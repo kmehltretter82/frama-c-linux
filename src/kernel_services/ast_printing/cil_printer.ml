@@ -1830,7 +1830,14 @@ class cil_printer () = object (self)
       (match fi.fbitfield with
        | None -> ""
        | Some i -> ": " ^ string_of_int i ^ " ")
-      self#attributes fi.fattr
+      self#attributes fi.fattr;
+    if Kernel.(is_debug_key_enabled dkey_print_field_offsets) then
+      try
+        let (offset, size) = Cil.bitsOffset fi.ftype (Field (fi, NoOffset)) in
+        let first = offset in
+        let last = offset + size - 1 in
+        fprintf fmt " /* bits %d .. %d */" first last
+      with Cil.SizeOfError _ -> ()
 
   method private opt_funspec fmt funspec =
     if logic_printer_enabled && not (Cil.is_empty_funspec funspec) then

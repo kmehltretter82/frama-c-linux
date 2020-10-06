@@ -105,6 +105,8 @@ let dkey_print_unspecified = register_category "printer:unspecified"
 
 let dkey_print_vid = register_category "printer:vid"
 
+let dkey_print_field_offsets = register_category "printer:field-offsets"
+
 let dkey_prop_status = register_category "prop-status"
 
 let dkey_prop_status_emit = register_category "prop-status:emit"
