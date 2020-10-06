@@ -170,12 +170,10 @@ force-reconfigure:
 
 # todo: adds bugs?
 # todo: adds crowbar?
-# todo: adds dynamic?
 # todo: adds dynamic_plugin?
 # todo: adds fc_script
 # todo: adds make_run_script
 # todo: adds more_wp
-# todo: adds pretty_printing: fixes tests/pretty_printing/ghost_parameters.c
 # todo: adds saveload
 # todo: adds value/numerors? (requires opam package mlgmpidl and system libraries for MPFR)
 # todo: adds verisec
