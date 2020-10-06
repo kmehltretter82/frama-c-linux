@@ -19,7 +19,8 @@ Goal Instance of 'Pre-condition (file tests/wp_usage/global.c, line 14) in 'foo'
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'foo':
+[wp] tests/wp_usage/global.c:16: Warning: 
+  Memory model hypotheses for function 'foo':
   /*@ behavior typed:
         requires \separated(a, &GLOBAL); */
   void foo(int *a);

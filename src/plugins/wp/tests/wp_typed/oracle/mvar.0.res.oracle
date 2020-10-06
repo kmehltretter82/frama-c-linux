@@ -18,7 +18,8 @@ Assume {
 Prove: P_equal(1, 1).
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'Write':
+[wp] tests/wp_typed/mvar.i:8: Warning: 
+  Memory model hypotheses for function 'Write':
   /*@
      behavior typed:
        requires \separated(p + (..), (char *)A + (..));

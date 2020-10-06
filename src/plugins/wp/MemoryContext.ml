@@ -382,7 +382,7 @@ let warn kf name hyp_computer =
   | None -> ()
   | Some bhv ->
       Wp_parameters.warning
-        ~current:false ~once:true (* ~source:(fst(Kernel_function.get_location kf)) *)
+        ~current:false ~once:true ~source:(fst(Kernel_function.get_location kf))
         "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
         (Kernel_function.get_name kf)
         (print_memory_context kf bhv)

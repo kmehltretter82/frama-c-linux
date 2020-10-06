@@ -59,7 +59,8 @@ Assume {
 Prove: !valid_rw(Malloc_0[L_y_25 <- 0], a, 1).
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'h':
+[wp] tests/wp_typed/unit_alloc.i:34: Warning: 
+  Memory model hypotheses for function 'h':
   /*@ behavior typed:
         ensures \separated(\result, &x); */
   int *h(int x);

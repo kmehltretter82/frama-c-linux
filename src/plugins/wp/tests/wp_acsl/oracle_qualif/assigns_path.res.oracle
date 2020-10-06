@@ -19,7 +19,8 @@
  Functions                 WP     Alt-Ergo  Total   Success
   job                       6        3        9       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'job':
+[wp] tests/wp_acsl/assigns_path.i:12: Warning: 
+  Memory model hypotheses for function 'job':
   /*@ behavior typed:
         requires \separated(b + (..), &p); */
   void job(int n, int *b);

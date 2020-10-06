@@ -22,7 +22,8 @@ Effect at line 17
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'f':
+[wp] tests/wp_usage/issue-189.i:16: Warning: 
+  Memory model hypotheses for function 'f':
   /*@
      behavior typed_caveat:
        requires \separated(ptr, src);

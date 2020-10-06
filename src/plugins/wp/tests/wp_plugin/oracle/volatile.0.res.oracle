@@ -35,7 +35,8 @@ Goal Assertion 'KO_WHEN_VOLATILE' (file tests/wp_plugin/volatile.i, line 35):
 Prove: EqS1_st_v(w, w_1).
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'job_struct_assigns':
+[wp] tests/wp_plugin/volatile.i:32: Warning: 
+  Memory model hypotheses for function 'job_struct_assigns':
   /*@ behavior typed:
         requires \separated(p, &sv); */
   void job_struct_assigns(struct st_v *p);

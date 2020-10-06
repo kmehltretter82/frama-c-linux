@@ -36,11 +36,13 @@
   call_global               5        -        5       100%
   write                     2        -        2       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'f':
+[wp] tests/wp_hoare/reference.i:14: Warning: 
+  Memory model hypotheses for function 'f':
   /*@ behavior typed_ref:
         requires \valid(p); */
   int f(int *p);
-[wp] Warning: Memory model hypotheses for function 'f2':
+[wp] tests/wp_hoare/reference.i:30: Warning: 
+  Memory model hypotheses for function 'f2':
   /*@
      behavior typed_ref:
        requires \separated(p2, q);
@@ -48,15 +50,18 @@
        requires \valid(q);
      */
   int f2(int *p2, int *q);
-[wp] Warning: Memory model hypotheses for function 'call_f2':
+[wp] tests/wp_hoare/reference.i:37: Warning: 
+  Memory model hypotheses for function 'call_f2':
   /*@ behavior typed_ref:
         requires \valid(ptr); */
   int call_f2(int *ptr, int y);
-[wp] Warning: Memory model hypotheses for function 'call_global':
+[wp] tests/wp_hoare/reference.i:48: Warning: 
+  Memory model hypotheses for function 'call_global':
   /*@ behavior typed_ref:
         requires \valid(gl); */
   int call_global(void);
-[wp] Warning: Memory model hypotheses for function 'write':
+[wp] tests/wp_hoare/reference.i:60: Warning: 
+  Memory model hypotheses for function 'write':
   /*@ behavior typed_ref:
         requires \valid(pa); */
   void write(int kb, int *pa);

@@ -154,7 +154,8 @@ Effect at line 24
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'reset':
+[wp] tests/wp_usage/caveat_range.i:16: Warning: 
+  Memory model hypotheses for function 'reset':
   /*@ behavior typed_caveat:
         requires \valid(p + (..)); */
   void reset(struct S *p);

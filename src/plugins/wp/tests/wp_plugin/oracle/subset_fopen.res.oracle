@@ -42,7 +42,8 @@ Assume {
 Prove: valid_rw(Malloc_0, p, 2).
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'fopen':
+[wp] tests/wp_plugin/subset_fopen.c:13: Warning: 
+  Memory model hypotheses for function 'fopen':
   /*@
      behavior typed:
        requires \separated(&_p__fc_fopen, {filename + (..), mode + (..)});

@@ -167,7 +167,8 @@ Effect at line 59
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
+[wp] tests/wp_usage/issue-189-bis.i:48: Warning: 
+  Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior typed:
        requires \separated(src, dst);

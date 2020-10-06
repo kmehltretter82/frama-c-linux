@@ -25,7 +25,8 @@
  Functions                 WP     Alt-Ergo  Total   Success
   job                      16        -       16       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'job':
+[wp] tests/wp_typed/user_injector.i:58: Warning: 
+  Memory model hypotheses for function 'job':
   /*@
      behavior typed_ref:
        requires

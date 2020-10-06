@@ -14,7 +14,8 @@
  Functions                 WP     Alt-Ergo  Total   Success
   receive                   5        -        5       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'receive':
+[wp] tests/wp_plugin/post_assigns.i:12: Warning: 
+  Memory model hypotheses for function 'receive':
   /*@
      behavior typed:
        requires \separated(message + (..), &size);

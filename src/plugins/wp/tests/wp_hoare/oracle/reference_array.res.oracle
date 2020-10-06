@@ -401,26 +401,30 @@ Goal Instance of 'Pre-condition (file tests/wp_hoare/reference_array.i, line 9) 
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'load_5':
+[wp] tests/wp_hoare/reference_array.i:24: Warning: 
+  Memory model hypotheses for function 'load_5':
   /*@
      behavior typed_ref:
        requires \separated(hp + (..), (int *)reg_load + (..));
      */
   void load_5(int *hp);
-[wp] Warning: Memory model hypotheses for function 'add_5':
+[wp] tests/wp_hoare/reference_array.i:31: Warning: 
+  Memory model hypotheses for function 'add_5':
   /*@
      behavior typed_ref:
        requires
          \separated(gp + (..), (int *)reg_load + (..), (int *)reg_add + (..));
      */
   void add_5(int *gp);
-[wp] Warning: Memory model hypotheses for function 'load_1_5':
+[wp] tests/wp_hoare/reference_array.i:45: Warning: 
+  Memory model hypotheses for function 'load_1_5':
   /*@
      behavior typed_ref:
        requires \separated(lp + (..), (int *)reg_load + (..));
      */
   void load_1_5(int (*lp)[5]);
-[wp] Warning: Memory model hypotheses for function 'add_1_5':
+[wp] tests/wp_hoare/reference_array.i:52: Warning: 
+  Memory model hypotheses for function 'add_1_5':
   /*@
      behavior typed_ref:
        requires
