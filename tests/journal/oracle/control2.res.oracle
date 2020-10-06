@@ -7,8 +7,8 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva] control2.c:13: starting to merge loop iterations
-[eva:alarm] control2.c:16: Warning: 
+[eva] control2.c:14: starting to merge loop iterations
+[eva:alarm] control2.c:17: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] done for function f
 [eva] ====== VALUES COMPUTED ======
@@ -37,11 +37,11 @@
   y ∈ [--..--]
   c ∈ [--..--]
   d ∈ [--..--]
-[eva:alarm] control2.c:14: Warning: 
+[eva:alarm] control2.c:15: Warning: 
   signed overflow. assert y + 1 ≤ 2147483647;
-[eva:alarm] control2.c:14: Warning: 
+[eva:alarm] control2.c:15: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
-[eva:alarm] control2.c:16: Warning: 
+[eva:alarm] control2.c:17: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] done for function f
 [eva] ====== VALUES COMPUTED ======

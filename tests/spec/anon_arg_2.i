@@ -1,5 +1,6 @@
 /* run.config*
-STDOPT: #"%{dep:anon_arg_1.i} @PTEST_FILE@"
+CMD: frama-c @FRAMA_C_PLUGINS_OPTIONS@ @OPTIONS@ %{dep:anon_arg_1.i} @PTEST_FILE@
+OPT: -pp-annot -print -journal-disable -kernel-warn-key=annot-error=active -check
 */
 
 /*@ requires \valid(p);

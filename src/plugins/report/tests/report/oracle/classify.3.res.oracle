@@ -1,6 +1,5 @@
 [report] Monitoring events
 [report] Loading 'classify.json'
-# frama-c -wp [...]
 [kernel] Parsing classify.c (with preprocessing)
 [kernel:annot-error] classify.c:27: Warning: 
   unbound logic variable ignored. Ignoring code annotation

@@ -1,5 +1,5 @@
 COMMENT: this directory is meant to test the parser and pretty-printer
 COMMENT: the default option checks that pretty-printed code can be merged
 COMMENT: with the original one
-CMD: FRAMAC_PLUGIN=tests/.empty @frama-c@ -no-autoload-plugins
+CMD: frama-c -no-autoload-plugins @OPTIONS@
 OPT: @PTEST_FILE@ -print -journal-disable -check -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.c @PTEST_FILE@ -ocode="" -print

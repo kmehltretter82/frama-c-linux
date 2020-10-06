@@ -124,28 +124,6 @@ let end_comment = Str.regexp ".*\\*/"
 
 let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)")
 
-let opt_to_byte toplevel =
-  match string_del_suffix "frama-c" toplevel with
-  | Some path -> path ^ "frama-c.byte"
-  | None ->
-    match string_del_suffix "toplevel.opt" toplevel with
-    | Some path -> path ^ "toplevel.byte"
-    | None ->
-      match string_del_suffix "frama-c-gui" toplevel with
-      | Some path -> path ^ "frama-c-gui.byte"
-      | None ->
-        match string_del_suffix "viewer.opt" toplevel with
-        | Some path -> path ^ "viewer.byte"
-        | None -> toplevel
-
-let opt_to_byte_options options =
-  str_global_replace regex_cmxs "\\1.cmo\\2" options
-
-let execnow_opt_to_byte cmd =
-  let cmd = opt_to_byte cmd in
-  opt_to_byte_options cmd
-
-
 let output_unix_error (exn : exn) =
   match exn with
   | Unix.Unix_error (error, _function, arg) ->
@@ -203,12 +181,6 @@ let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
 let do_make = ref "make"
 let n = ref 4    (* the level of parallelism *)
 let suites = ref []
-
-(** options appended to toplevel for all tests *)
-let additional_options = ref ""
-
-(** options prepended to toplevel for all tests *)
-let additional_options_pre = ref ""
 
 (** special configuration, with associated oracles *)
 let special_config = ref ""
@@ -308,14 +280,6 @@ let rec argspec =
     " Use native toplevel (default)";
     "-config", Arg.Set_string special_config,
     " <name> Use special configuration and oracles";
-    "-add-options", Arg.Set_string additional_options,
-    "<options> Add additional options to be passed to the toplevels \
-     that will be launched. <options> are added after standard test options";
-    "-add-options-pre", Arg.Set_string additional_options_pre,
-    "<options> Add additional options to be passed to the toplevels \
-     that will be launched. <options> are added before standard test options.";
-    "-add-options-post", Arg.Set_string additional_options,
-    "Synonym of -add-options";
     "-xunit", Arg.Set xunit,
     " Create a xUnit file named xunit.xml collecting results";
     "-error-code", Arg.Set do_error_code,
@@ -582,11 +546,7 @@ type config =
     dc_timeout: string
   }
 
-let default_macros () =
-  let l = [
-    "frama-c", "frama-c";
-  ] in
-  Macros.add_list l Macros.empty
+let default_macros () = Macros.empty
 
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
@@ -597,7 +557,7 @@ let default_config () =
     dc_plugins = [];
     dc_load_module = [];
     dc_filter = None ;
-    dc_default_toplevel = "frama-c";
+    dc_default_toplevel = "@frama-c@";
     dc_toplevels = [ "frama-c", default_options, [], Macros.empty, "" ];
     dc_dont_run = false;
     dc_framac = true;
@@ -986,38 +946,32 @@ let frama_c_binary_name =
 let basic_command_string =
   fun command ->
   let macros = get_macros command in
+  let plugins_options =
+    let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
+    let opt_modules = String.concat " "
+        (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
+           command.load_module) in
+    String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules]
+  in
+  let options = Macros.expand macros command.options in
+  let macros =
+    Macros.add_list [ "OPTIONS", options;
+                      "FRAMA_C_PLUGINS_OPTIONS", plugins_options;
+                    ] macros in
+  let file = Filename.sanitize @@ get_ptest_file command in
+  let options =
+    String.concat " " [file;plugins_options;options]
+  in
+  let macros = Macros.add_list [
+      "FRAMA_C_DEFAULT_OPTIONS",options;
+      "frama-c", "frama-c "^options;
+    ] macros in
   let logfiles = List.map (Macros.expand macros) command.log_files in
   command.log_files <- logfiles;
-  let has_ptest_file_t, toplevel =
-    Macros.does_expand macros command.toplevel
+  let toplevel =
+    Macros.expand macros command.toplevel
   in
-  let has_ptest_file_o, options = Macros.does_expand macros command.options in
-  let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
-  let toplevel, contains_frama_c_binary =
-    str_string_match_and_replace contains_frama_c_binary_name
-      frama_c_binary_name ~suffix:" -check" toplevel
-  in
-  let options =
-    if contains_frama_c_binary
-    then begin
-      let opt_modules = String.concat " "
-          (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
-             command.load_module) in
-      let opt_pre = Macros.expand macros !additional_options_pre in
-      let opt_post = Macros.expand macros !additional_options in
-      let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
-      String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules;opt_pre;options;opt_post]
-    end else options
-  in
-  let options = if !use_byte then opt_to_byte_options options else options in
-  let raw_command =
-    if has_ptest_file_t || has_ptest_file_o || command.execnow then
-      toplevel ^ " " ^ options
-    else begin
-      let file = Filename.sanitize @@ get_ptest_file command in
-      toplevel ^ " " ^ file ^ " " ^ options
-    end
-  in
+  let raw_command = toplevel in
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
