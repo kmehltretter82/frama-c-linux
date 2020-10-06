@@ -707,7 +707,7 @@ let type_term ~use_gmp_opt ?ctx t =
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx t)
 
-let type_named_predicate ?(must_clear=true) p =
+let type_named_predicate ~must_clear p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   if must_clear then begin

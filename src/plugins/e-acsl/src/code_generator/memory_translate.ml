@@ -420,7 +420,7 @@ let call_with_tset ~loc ~arg_from_range ~arg_from_term ?(prepend_n_args=false) k
     in
     (* There's no more quantifiers in the arguments now, we can call back
        [prediate_to_exp] to translate the predicate as usual *)
-    Typing.type_named_predicate ~must_clear:true p_quantified;
+    Typing.type_named_predicate ~must_clear:false p_quantified;
     !predicate_to_exp_ref kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the
