@@ -174,25 +174,38 @@ void validate_shadow_layout() {
   uintptr_t segments[num_segments][2];
   const char * segment_names[num_segments];
 
-  size_t i;
+  size_t i, app_idx, primary_idx, secondary_idx;
+#ifdef E_ACSL_TEMPORAL
+  size_t primary_temporal_idx, secondary_temporal_idx;
+#endif
   for (i = 0; i < num_partitions; i++) {
     memory_partition *p = mem_partitions[i];
-    segment_names[num_seg_in_part*i] = p->application.name;
-    segments[num_seg_in_part*i][0] = p->application.start;
-    segments[num_seg_in_part*i][1] = p->application.end;
-    segment_names[num_seg_in_part*i+1] = p->primary.name;
-    segments[num_seg_in_part*i+1][0] = p->primary.start;
-    segments[num_seg_in_part*i+1][1] = p->primary.end;
-    segment_names[num_seg_in_part*i+2] = p->secondary.name;
-    segments[num_seg_in_part*i+2][0] = p->secondary.start;
-    segments[num_seg_in_part*i+2][1] = p->secondary.end;
+
+    app_idx = num_seg_in_part*i;
+    segment_names[app_idx] = p->application.name;
+    segments[app_idx][0] = p->application.start;
+    segments[app_idx][1] = p->application.end;
+
+    primary_idx = num_seg_in_part*i+1;
+    segment_names[primary_idx] = p->primary.name;
+    segments[primary_idx][0] = p->primary.start;
+    segments[primary_idx][1] = p->primary.end;
+
+    secondary_idx = num_seg_in_part*i+2;
+    segment_names[secondary_idx] = p->secondary.name;
+    segments[secondary_idx][0] = p->secondary.start;
+    segments[secondary_idx][1] = p->secondary.end;
+
 #ifdef E_ACSL_TEMPORAL
-    segment_names[num_seg_in_part*i+3] = p->temporal_primary.name;
-    segments[num_seg_in_part*i+3][0] = p->temporal_primary.start;
-    segments[num_seg_in_part*i+3][1] = p->temporal_primary.end;
-    segment_names[num_seg_in_part*i+4] = p->temporal_secondary.name;
-    segments[num_seg_in_part*i+4][0] = p->temporal_secondary.start;
-    segments[num_seg_in_part*i+4][1] = p->temporal_secondary.end;
+    primary_temporal_idx = num_seg_in_part*i+3;
+    segment_names[primary_temporal_idx] = p->temporal_primary.name;
+    segments[primary_temporal_idx][0] = p->temporal_primary.start;
+    segments[primary_temporal_idx][1] = p->temporal_primary.end;
+
+    secondary_temporal_idx = num_seg_in_part*i+4;
+    segment_names[secondary_temporal_idx] = p->temporal_secondary.name;
+    segments[secondary_temporal_idx][0] = p->temporal_secondary.start;
+    segments[secondary_temporal_idx][1] = p->temporal_secondary.end;
 #endif
   }
 
