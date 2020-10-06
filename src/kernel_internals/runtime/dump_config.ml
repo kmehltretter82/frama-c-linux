@@ -20,6 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let list_plugins_names () =
+  Plugin.fold_on_plugins (fun p acc -> p.Plugin.p_name :: acc) []
+
+let dump_parameter tp =
+  let open Typed_parameter in
+  let json_value = match tp.accessor with
+    | Bool (accessor,_) -> `Bool (accessor.get ())
+    | Int (accessor,_) -> `Int (accessor.get ())
+    | String (accessor,_) -> `String (accessor.get ())
+  in
+  tp.name, json_value
+
+let dump_all_parameters () =
+  let add_category _ l acc =
+    List.fold_left (fun acc tp -> dump_parameter tp :: acc) acc l
+  in
+  let add_plugin plugin acc =
+    Hashtbl.fold add_category plugin.Plugin.p_parameters acc
+  in
+  Plugin.fold_on_plugins add_plugin []
 
 let dump_to_json () =
   let string s = `String s in
@@ -50,7 +70,9 @@ let dump_to_json () =
     "preprocessor_keep_comments", `Bool Fc_config.preprocessor_keep_comments ;
     "dot", (match Fc_config.dot with Some cmd -> `String cmd | None -> `Null) ;
     "current_machdep", `String (Kernel.Machdep.get ()) ;
-    "machdeps", list string (File.list_available_machdeps ())
+    "machdeps", list string (File.list_available_machdeps ()) ;
+    "plugins", list string (list_plugins_names ()) ;
+    "parameters", `Assoc (dump_all_parameters ()) ;
   ]
 
 let dump_to_stdout () =
