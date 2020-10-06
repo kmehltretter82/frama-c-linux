@@ -455,11 +455,11 @@ let try_prove ~config ~pid ~gui ~file ~lines ~logout ~logerr =
 
 let prove_file ~config ~pid ~mode ~file ~lines ~logout ~logerr =
   let gui = match mode with
-    | EditMode -> Lazy.force altergo_gui
-    | BatchMode | FixMode -> false in
+    | Edit -> Lazy.force altergo_gui
+    | Batch | Update | Fix | FixUpdate -> false in
   try_prove ~config ~pid ~gui ~file ~lines ~logout ~logerr >>= function
   | { verdict=(VCS.Unknown|VCS.Timeout|VCS.Stepout) }
-    when mode = FixMode && Lazy.force altergo_gui ->
+    when (mode = Fix || mode = FixUpdate) && Lazy.force altergo_gui ->
       try_prove ~config ~pid ~gui:true ~file ~lines ~logout ~logerr
   | r -> Task.return r
 

@@ -41,8 +41,8 @@
    wcscpy (0 call); wcslen (2 calls); wcsncat (0 call); wcsncpy (0 call);
    wmemcpy (0 call); wmemset (0 call); 
   
-  Undefined functions (415)
-  =========================
+  Specified-only functions (414)
+  ==============================
    FD_CLR (0 call); FD_ISSET (0 call); FD_SET (0 call); FD_ZERO (0 call);
    Frama_C_abstract_cardinal (0 call); Frama_C_abstract_max (0 call);
    Frama_C_abstract_min (0 call); Frama_C_int_interval (0 call);
@@ -53,21 +53,21 @@
    Frama_C_unsigned_long_interval (0 call);
    Frama_C_unsigned_long_long_interval (0 call);
    Frama_C_unsigned_short_interval (0 call); _Exit (0 call);
-   __builtin_abort (1 call); __builtin_clz (0 call); __builtin_clzl (0 call);
-   __builtin_clzll (0 call); __builtin_ctz (0 call); __builtin_ctzl (0 call);
-   __builtin_ctzll (0 call); __builtin_popcount (0 call);
-   __builtin_popcountl (0 call); __builtin_popcountll (0 call);
-   __builtin_sadd_overflow (0 call); __builtin_saddl_overflow (0 call);
-   __builtin_saddll_overflow (0 call); __builtin_smul_overflow (0 call);
-   __builtin_smull_overflow (0 call); __builtin_smulll_overflow (0 call);
-   __builtin_ssub_overflow (0 call); __builtin_ssubl_overflow (0 call);
-   __builtin_ssubll_overflow (0 call); __builtin_uadd_overflow (0 call);
-   __builtin_uaddl_overflow (0 call); __builtin_uaddll_overflow (0 call);
-   __builtin_umul_overflow (0 call); __builtin_umull_overflow (0 call);
-   __builtin_umulll_overflow (0 call); __builtin_usub_overflow (0 call);
-   __builtin_usubl_overflow (0 call); __builtin_usubll_overflow (0 call);
-   __fc_fpclassify (0 call); __fc_fpclassifyf (0 call); __fc_infinity (0 call);
-   __fc_nan (0 call); __va_fcntl_flock (0 call); __va_fcntl_int (0 call);
+   __builtin_clz (0 call); __builtin_clzl (0 call); __builtin_clzll (0 call);
+   __builtin_ctz (0 call); __builtin_ctzl (0 call); __builtin_ctzll (0 call);
+   __builtin_popcount (0 call); __builtin_popcountl (0 call);
+   __builtin_popcountll (0 call); __builtin_sadd_overflow (0 call);
+   __builtin_saddl_overflow (0 call); __builtin_saddll_overflow (0 call);
+   __builtin_smul_overflow (0 call); __builtin_smull_overflow (0 call);
+   __builtin_smulll_overflow (0 call); __builtin_ssub_overflow (0 call);
+   __builtin_ssubl_overflow (0 call); __builtin_ssubll_overflow (0 call);
+   __builtin_uadd_overflow (0 call); __builtin_uaddl_overflow (0 call);
+   __builtin_uaddll_overflow (0 call); __builtin_umul_overflow (0 call);
+   __builtin_umull_overflow (0 call); __builtin_umulll_overflow (0 call);
+   __builtin_usub_overflow (0 call); __builtin_usubl_overflow (0 call);
+   __builtin_usubll_overflow (0 call); __fc_fpclassify (0 call);
+   __fc_fpclassifyf (0 call); __fc_infinity (0 call); __fc_nan (0 call);
+   __va_fcntl_flock (0 call); __va_fcntl_int (0 call);
    __va_fcntl_void (0 call); __va_ioctl_int (0 call); __va_ioctl_ptr (0 call);
    __va_ioctl_void (0 call); __va_open_mode_t (0 call);
    __va_open_void (0 call); __va_openat_mode_t (0 call);
@@ -166,6 +166,10 @@
    wcsncmp (0 call); wcspbrk (0 call); wcsrchr (0 call); wcsspn (0 call);
    wcsstr (0 call); wcstombs (0 call); wctomb (0 call); wmemchr (0 call);
    wmemcmp (0 call); wmemmove (0 call); write (0 call); 
+  
+  Undefined and unspecified functions (1)
+  =======================================
+   __builtin_abort (1 call); 
   
   'Extern' global variables (16)
   ==============================
@@ -281,8 +285,12 @@ void main(void)
   =====================
    main (0 call); 
   
-  Undefined functions (0)
-  =======================
+  Specified-only functions (0)
+  ============================
+   
+  
+  Undefined and unspecified functions (0)
+  =======================================
    
   
   'Extern' global variables (0)

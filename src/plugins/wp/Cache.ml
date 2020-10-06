@@ -213,6 +213,16 @@ let set_cache_result ~mode hash prover result =
         Wp_parameters.warning ~current:false ~once:true
           "can not update cache (%s)" (Printexc.to_string err)
 
+let clear_result ~digest prover goal =
+  try
+    let hash = digest prover goal in
+    let dir = get_usable_dir ~make:true () in
+    let file = Printf.sprintf "%s/%s.json" dir hash in
+    Extlib.safe_remove file
+  with err ->
+    Wp_parameters.warning ~current:false ~once:true
+      "can not clean cache entry (%s)" (Printexc.to_string err)
+
 let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then

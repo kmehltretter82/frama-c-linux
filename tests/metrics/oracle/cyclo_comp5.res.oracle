@@ -3,8 +3,12 @@
   =====================
    complexity5 (1 call); main (0 call); 
   
-  Undefined functions (1)
-  =======================
+  Specified-only functions (0)
+  ============================
+   
+  
+  Undefined and unspecified functions (1)
+  =======================================
    printf (4 calls); 
   
   'Extern' global variables (0)

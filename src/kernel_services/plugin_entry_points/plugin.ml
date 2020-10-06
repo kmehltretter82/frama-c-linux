@@ -370,7 +370,7 @@ struct
             try
               List.fold_left
                 (fun dummy d ->
-                   let name = Datatype.Filepath.concat d ("/" ^ s) in
+                   let name = Datatype.Filepath.concat d s in
                    if Sys.file_exists (name :> string)
                    then raise (Found name)
                    else dummy)
@@ -391,7 +391,7 @@ struct
           let filepath =
             match base_dirs () with
             | [] -> assert false
-            | d :: _ -> Datatype.Filepath.concat d ("/" ^ s)
+            | d :: _ -> Datatype.Filepath.concat d s
           in
           match mode with
           | `Must_exist ->
@@ -419,7 +419,7 @@ struct
       let s_dirname = Filename.dirname s in
       let base_dir = get_dir ~mode s_dirname in
       let s_basename = Filename.basename s in
-      let filepath = Datatype.Filepath.concat base_dir ("/" ^ s_basename) in
+      let filepath = Datatype.Filepath.concat base_dir s_basename in
       match mode with
       | `Must_exist ->
         if Sys.file_exists (filepath :> string)

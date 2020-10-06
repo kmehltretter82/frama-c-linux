@@ -31,9 +31,10 @@ class type sloc_visitor = object
   inherit Visitor.generic_frama_c_visitor
 
   (* Get the number of times a function has been called if it has been
-     defined (fundef) or not (fundecl).
+     defined (fundef), specified (funspec), or just declared (fundecl).
   *)
   method fundecl_calls: int Metrics_base.VInfoMap.t
+  method funspec_calls: int Metrics_base.VInfoMap.t
   method fundef_calls: int Metrics_base.VInfoMap.t
   method extern_global_vars: Metrics_base.VInfoSet.t
 
@@ -64,6 +65,7 @@ val get_global_metrics : libc:bool -> Metrics_base.BasicMetrics.t ;;
 
 type cilast_metrics = {
   fundecl_calls: int Metrics_base.VInfoMap.t;
+  funspec_calls: int Metrics_base.VInfoMap.t;
   fundef_calls: int Metrics_base.VInfoMap.t;
   extern_global_vars: Metrics_base.VInfoSet.t;
   basic_global_metrics: Metrics_base.BasicMetrics.t

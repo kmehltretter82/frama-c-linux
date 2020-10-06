@@ -6,8 +6,12 @@
    baz (address taken) (0 call); foo (address taken) (0 call); foobar (0 call);
    main (0 call); 
   
-  Undefined functions (1)
-  =======================
+  Specified-only functions (0)
+  ============================
+   
+  
+  Undefined and unspecified functions (1)
+  =======================================
    exit (1 call); 
   
   'Extern' global variables (1)

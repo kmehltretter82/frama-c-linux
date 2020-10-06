@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] stdio_print.c:9: Warning: 
   Call to function fprintf with non-static format argument:

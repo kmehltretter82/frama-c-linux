@@ -621,22 +621,17 @@ module Make (Abstract: Abstractions.Eva) = struct
     | None, _ | _, None ->
       fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cvalue, Some get_ploc ->
-      fun fmt subdivnb expr state ->
-        match expr.enode with
-        | Lval lval ->
-          begin
-            try
-              let offsm =
-                fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval)
-                >>- fun (_, loc, _) ->
-                Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
-              in
-              let typ = Cil.typeOf expr in
-              (Bottom.pretty (Eval_op.pretty_offsetmap typ)) fmt offsm
-            with Abstract_interp.Error_Top ->
-              Format.fprintf fmt "%s" (Unicode.top_string ())
-          end
-        | _ -> assert false
+      fun fmt subdivnb lval state ->
+        try
+          let offsm =
+            fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval)
+            >>- fun (_, loc, _) ->
+            Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
+          in
+          let typ = Cil.typeOfLval lval in
+          (Bottom.pretty (Eval_op.pretty_offsetmap typ)) fmt offsm
+        with Abstract_interp.Error_Top ->
+          Format.fprintf fmt "%s" (Unicode.top_string ())
 
   (* For scalar expressions, prints the cvalue component of their values. *)
   let show_value =
@@ -650,10 +645,12 @@ module Make (Abstract: Abstractions.Eva) = struct
         (Bottom.pretty Cvalue.V.pretty) fmt value
 
   let pretty_arguments ~subdivnb state arguments =
+    let is_scalar lval = Cil.isArithmeticOrPointerType (Cil.typeOfLval lval) in
     let pretty fmt expr =
-      if Cil.isArithmeticOrPointerType (Cil.typeOf expr)
-      then show_value fmt subdivnb expr state
-      else show_offsm fmt subdivnb expr state
+      match expr.enode with
+      | Lval lval | StartOf lval when not (is_scalar lval) ->
+        show_offsm fmt subdivnb lval state
+      | _ -> show_value fmt subdivnb expr state
     in
     Pretty_utils.pp_list ~pre:"@[<hv>" ~sep:",@ " ~suf:"@]" pretty arguments
 

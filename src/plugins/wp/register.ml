@@ -615,7 +615,7 @@ let compute_provers ~mode ~script =
               script.update <- true ;
             prvs
         | Some prover ->
-            let pmode = if VCS.is_auto prover then VCS.BatchMode else mode in
+            let pmode = if VCS.is_auto prover then VCS.Batch else mode in
             (pmode , prover) :: prvs
       end (get_prover_names ()) []
 
@@ -720,7 +720,7 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   compute_provers ~mode ~script ;
   compute_auto ~script ;
   begin match provers with None -> () | Some prvs ->
-    script.provers <- List.map (fun dp -> VCS.BatchMode , VCS.Why3 dp) prvs
+    script.provers <- List.map (fun dp -> VCS.Batch , VCS.Why3 dp) prvs
   end ;
   begin match tip with None -> () | Some tip ->
     script.tactical <- tip ;

@@ -1,6 +1,7 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,users,eva -calldeps -eva @EVA_CONFIG@ -journal-disable -users -then -input
    OPT: -no-autoload-plugins -load-module from,eva @EVA_CONFIG@ -deps -show-indirect-deps -journal-disable
+   PLUGIN: users
+   OPT: -calldeps -eva @EVA_CONFIG@ -journal-disable -users -then -input
 */
 int a,b,c,d;
 int x,y,z,t;

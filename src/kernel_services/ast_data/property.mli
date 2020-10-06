@@ -149,7 +149,8 @@ type identified_extended = {
 
 and identified_axiomatic = {
   iax_name : string;
-  iax_props : identified_property list
+  iax_props : identified_property list;
+  iax_attrs : attributes;
 }
 
 and identified_lemma = {
@@ -157,6 +158,7 @@ and identified_lemma = {
   il_labels : logic_label list;
   il_args : string list;
   il_pred : toplevel_predicate;
+  il_attrs : attributes;
   il_loc : location
 }
 
