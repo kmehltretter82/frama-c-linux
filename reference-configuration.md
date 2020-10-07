@@ -2,7 +2,7 @@ The following set of packages is known to be a working configuration for
 compiling Frama-C+dev, on a machine with gcc <= 9[^gcc-10]
 
 - OCaml 4.08.1
-- alt-ergo.2.3.3 (for wp, optional)
+- alt-ergo.2.2.0 (for wp, optional)
 - apron.v0.9.12 (for eva, optional)
 - lablgtk.2.18.11 | lablgtk3.3.1.1 + lablgtk3-sourceview3.3.1.1
 - mlgmpidl.1.2.12 (for eva, optional)
