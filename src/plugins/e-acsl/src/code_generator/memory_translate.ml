@@ -254,21 +254,8 @@ let range_to_ptr_and_size ~loc kf env ptr r p =
 let term_to_ptr_and_size ~loc kf env t =
   let e, env = !term_to_exp_ref kf (Env.rte env true) t in
   let ty = Misc.cty t.term_type in
-  let sizeof = Misc.mk_ptr_sizeof ty loc in
+  let sizeof = Smart_exp.ptr_sizeof ~loc ty in
   e, sizeof, env
-
-(* Take an expression [e] and return a tuple [(base, base_addr)] where [base]
-   is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
-   [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
-   otherwise. *)
-let exp_to_base_and_baseaddr ~loc e =
-  let base, _ = Misc.ptr_index ~loc e in
-  let base_addr  = match base.enode with
-    | AddrOf _ | Const _ -> Cil.zero ~loc
-    | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
-    | _ -> assert false
-  in
-  base, base_addr
 
 (* [fname_to_pred name args] returns the memory predicate corresponding to
    [name] with the given [args]. *)
@@ -510,12 +497,12 @@ let call_valid ~loc kf name ctx env t p =
   assert (name = "valid" || name = "valid_read");
   let arg_from_term ~loc kf env rev_args t _p =
     let ptr, size, env = term_to_ptr_and_size ~loc kf env t in
-    let base, base_addr = exp_to_base_and_baseaddr ~loc ptr in
+    let base, base_addr = Misc.ptr_base ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, env
   in
   let arg_from_range ~loc kf env rev_args ptr r p =
     let ptr, size, env = range_to_ptr_and_size ~loc kf env ptr r p in
-    let base, base_addr = exp_to_base_and_baseaddr ~loc ptr in
+    let base, base_addr = Misc.ptr_base ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, env
   in
   let prepend_n_args = false in
