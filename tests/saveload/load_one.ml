@@ -1,4 +1,4 @@
-let () = at_exit (fun _ -> Sys.remove "result/load_one.sav")
+let () = at_exit (fun _ -> Sys.remove "load_one.sav")
 
 let main () =
   let sparecode () =
