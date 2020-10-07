@@ -19,3 +19,10 @@ void h (int i) {
 
 int c;
 int g() { return 1 || (-1L || g(), c); }
+
+int nop(void) {
+  { int loc_var; }
+  { int loc_var (void);
+    return loc_var();
+  }
+}
