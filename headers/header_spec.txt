@@ -1605,6 +1605,8 @@ src/plugins/wp/TacBitwised.ml: CEA_WP
 src/plugins/wp/TacBitwised.mli: CEA_WP
 src/plugins/wp/TacBitrange.ml: CEA_WP
 src/plugins/wp/TacBitrange.mli: CEA_WP
+src/plugins/wp/TacBittest.ml: CEA_WP
+src/plugins/wp/TacBittest.mli: CEA_WP
 src/plugins/wp/TacChoice.ml: CEA_WP
 src/plugins/wp/TacChoice.mli: CEA_WP
 src/plugins/wp/TacCongruence.ml: CEA_WP
