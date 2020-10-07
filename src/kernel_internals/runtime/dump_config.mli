@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 val dump_to_json : unit -> Yojson.Basic.t
-(** Builds a Json object describing the Frama-C configuration *)
+(** Builds a Json object describing the Frama-C configuration. *)
 
 val dump_to_stdout : unit -> unit
-(** Dumps a Json object to describing the Frama-C configuration to stdout *)
+(** Dumps a Json object describing the Frama-C configuration to stdout. *)
