@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] tests/memory/ranges_in_builtins.c:64: Warning: 
+[e-acsl] tests/memory/ranges_in_builtins.c:67: Warning: 
   E-ACSL construct `arithmetic over set of pointers or arrays'
   is not yet supported.
   Ignoring annotation.
@@ -9,12 +9,14 @@
 [eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
   function __gmpz_init_set: precondition ¬\initialized(z) got status unknown.
 [eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
-  function __gmpz_init_set: precondition ¬\initialized(z) got status unknown.
-[eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/ranges_in_builtins.c:8: Warning: 
   function __e_acsl_assert: precondition got status unknown.
 [eva:alarm] tests/memory/ranges_in_builtins.c:49: Warning: 
   function __e_acsl_assert: precondition got status unknown.
-[eva:alarm] tests/memory/ranges_in_builtins.c:54: Warning: 
+[eva:alarm] tests/memory/ranges_in_builtins.c:52: Warning: 
+  function __e_acsl_assert: precondition got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:52: Warning: 
+  assertion got status unknown.
+[eva:alarm] tests/memory/ranges_in_builtins.c:57: Warning: 
   accessing uninitialized left-value. assert \initialized(&s.b);

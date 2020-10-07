@@ -185,6 +185,36 @@ rec {
         '';
   };
 
+  aorai-prove = mk_deriv {
+        name = "frama-c-aorai-prove";
+        buildInputs = mk_buildInputs { opamPackages = [
+                    { name = "alt-ergo"; constraint = "=2.0.0"; }
+               ]; };
+        build_dir = main.build_dir;
+        src = main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "test_config*" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+           true
+        '';
+
+        buildPhase = ''
+          make clean_share_link
+          make create_share_link
+          mkdir home
+          HOME=$(pwd)/home
+          why3 config --full-config
+          make src/plugins/aorai/tests/ptests_config
+          make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
+        '';
+
+        installPhase = ''
+          true
+        '';
+  };
+
   e-acsl-tests-dev = mk_deriv {
         name = "frama-c-e-acsl-tests-dev";
         buildInputs = mk_buildInputs { nixPackages = [ pkgs.gmp pkgs.getopt ]; };

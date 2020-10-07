@@ -217,7 +217,6 @@ case "$command" in
         ;;
     "make-template")
         shift;
-        export FRAMAC="${DIR}/frama-c"
         ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$@";
         ;;
     "make-path")

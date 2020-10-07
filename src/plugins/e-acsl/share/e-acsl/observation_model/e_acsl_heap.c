@@ -24,10 +24,10 @@
 
 #include "e_acsl_heap.h"
 
-size_t get_heap_allocation_size(void) {
+size_t eacsl_get_heap_allocation_size(void) {
   return get_heap_internal_allocation_size();
 }
 
-size_t get_heap_allocated_blocks(void) {
+size_t eacsl_get_heap_allocated_blocks(void) {
   return get_heap_internal_allocated_blocks();
 }

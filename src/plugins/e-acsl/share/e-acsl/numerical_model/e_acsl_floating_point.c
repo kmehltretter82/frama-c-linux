@@ -29,20 +29,20 @@
 #include "e_acsl_floating_point.h"
 
 // Initialization
-double math_HUGE_VAL = 0.0;
-float  math_HUGE_VALF = 0.0;
-double math_INFINITY = 0.0;
+double eacsl_math_HUGE_VAL = 0.0;
+float  eacsl_math_HUGE_VALF = 0.0;
+double eacsl_math_INFINITY = 0.0;
 
 void init_infinity_values() {
   /* Initialize E-ACSL infinity values */
-  math_HUGE_VAL  = HUGE_VAL;
-  math_HUGE_VALF = HUGE_VALF;
-  math_INFINITY  = INFINITY;
+  eacsl_math_HUGE_VAL  = HUGE_VAL;
+  eacsl_math_HUGE_VALF = HUGE_VALF;
+  eacsl_math_INFINITY  = INFINITY;
   /* Clear exceptions buffers */
   feclearexcept(FE_ALL_EXCEPT);
 }
 
-void floating_point_exception(const char *exp) {
+void eacsl_floating_point_exception(const char *exp) {
   int except = fetestexcept(FE_ALL_EXCEPT);
   char *resp = NULL;
   if (except) {

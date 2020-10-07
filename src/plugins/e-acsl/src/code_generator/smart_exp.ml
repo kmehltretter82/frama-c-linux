@@ -39,6 +39,11 @@ let subscript ~loc array idx =
       Cil_types_debug.pp_exp
       array
 
+let ptr_sizeof ~loc typ =
+  match Cil.unrollType typ with
+  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
+  | _ -> assert false
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

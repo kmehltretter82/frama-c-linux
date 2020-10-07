@@ -126,16 +126,24 @@ val auto_func_behaviors:
   Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
   Data_for_aorai.state -> Cil_types.funbehavior list
 
-(** [auto_func_block loc f status st res]
+(** [auto_func_block current_kf loc f status st res]
     generates the body of pre & post functions.
-    res must be [None] for a pre-function and [Some v] for a post-func where
-    [v] is the formal corresponding to the value returned by the original
-    function. If the original function returns [Void], [res] must be [None].
-    It also returns the local variables list declared in the body. *)
+    - [current_kf] is the auxiliary function currently being defined.
+    - [res] must be [None] for a pre-function and [Some v] for a post-func where
+      [v] is the formal corresponding to the value returned by the original
+      function. If the original function returns [Void], [res] must be [None].
+
+    @returns [funcs, block, locals], where
+    - funcs is the set of auxiliary functions that are used to determine
+      whether a particular behavior of original callee is taken
+    - block is the sequence of instructions that perform the transition
+    - locals is the list of local variables.
+*)
 val auto_func_block:
+  Kernel_function.t ->
   Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
   Data_for_aorai.state -> Cil_types.varinfo option ->
-  Cil_types.block * Cil_types.varinfo list
+  Cil_datatype.Varinfo.Set.t * Cil_types.block * Cil_types.varinfo list
 
 val get_preds_pre_wrt_params :  kernel_function -> predicate
 

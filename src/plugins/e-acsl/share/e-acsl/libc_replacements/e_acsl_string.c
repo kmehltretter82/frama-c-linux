@@ -36,7 +36,7 @@ long valid_nstring(char *s, long n, int wrtbl) {
   if (alc) {
     if (wrtbl && readonly(s))
       return -2; /* Not writeable */
-    long size = block_length(s) - offset(s);
+    long size = eacsl_block_length(s) - eacsl_offset(s);
     long i;
     for (i = 0; i < size; i++) {
       if (s[i] == '\0' || n == i)
@@ -59,7 +59,7 @@ long valid_nwstring(wchar_t *s, long n, int wrtbl) {
   if (alc) {
     if (wrtbl && readonly(s))
       return -2; /* Not writeable */
-    long size = (block_length(s) - offset(s))/sizeof(wchar_t);
+    long size = (eacsl_block_length(s) - eacsl_offset(s))/sizeof(wchar_t);
     long i;
     for (i = 0; i < size; i++) {
       if (s[i] == L'\0' || n == i)
@@ -146,11 +146,11 @@ static inline void validate_overlapping_spaces
 /*** strlen/strcpy/strcat/strcmp {{{ ***/
 /************************************************************************/
 
-size_t builtin_strlen(const char *s) {
+size_t eacsl_builtin_strlen(const char *s) {
   return validate_allocated_string((char*)s, -1, "strlen", "input ");
 }
 
-char *builtin_strcpy(char *dest, const char *src) {
+char *eacsl_builtin_strcpy(char *dest, const char *src) {
   // `src` string should be a valid NUL-terminated C string
   size_t size =
     validate_allocated_string((char*)src, -1, "strlen", "source string ");
@@ -163,7 +163,7 @@ char *builtin_strcpy(char *dest, const char *src) {
   return strcpy(dest, src);
 }
 
-char *builtin_strncpy(char *dest, const char *src, size_t n) {
+char *eacsl_builtin_strncpy(char *dest, const char *src, size_t n) {
   /* `src` should be a valid string up to `nth` character */
   validate_allocated_string((char*)src, n, "strncpy", "source string ");
   /* `dest` should be allocated and writeable up to `nth` character */
@@ -173,26 +173,26 @@ char *builtin_strncpy(char *dest, const char *src, size_t n) {
   return strncpy(dest, src, n);
 }
 
-int builtin_strcmp(const char *s1, const char *s2) {
+int eacsl_builtin_strcmp(const char *s1, const char *s2) {
   /* both strings should be valid NUL-terminated strings */
   validate_allocated_string((char*)s1, -1, "strcmp", "string 1 ");
   validate_allocated_string((char*)s2, -1, "strcmp", "string 2 ");
   return strcmp(s1, s2);
 }
 
-int builtin_strncmp(const char *s1, const char *s2, size_t n) {
+int eacsl_builtin_strncmp(const char *s1, const char *s2, size_t n) {
   /* both strings should be valid up to nth character */
   validate_allocated_string((char*)s1, n, "strncmp", "string 1 ");
   validate_allocated_string((char*)s2, n, "strncmp", "string 2 ");
   return strncmp(s1, s2, n);
 }
 
-char *builtin_strcat(char *dest, const char *src) {
+char *eacsl_builtin_strcat(char *dest, const char *src) {
   long src_sz =
     validate_allocated_string((char*)src, -1, "strcat", "source string ");
   long dest_sz =
     validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
-  size_t avail_sz = block_length(dest) - offset(dest);
+  size_t avail_sz = eacsl_block_length(dest) - eacsl_offset(dest);
   if (!(avail_sz >= src_sz + dest_sz + 1)) {
     private_abort("strcat: insufficient space in destination string, "
       "available: %lu bytes, requires at least %lu bytes\n",
@@ -203,11 +203,11 @@ char *builtin_strcat(char *dest, const char *src) {
   return strcat(dest, src);
 }
 
-char *builtin_strncat(char *dest, const char *src, size_t n) {
+char *eacsl_builtin_strncat(char *dest, const char *src, size_t n) {
   validate_allocated_string((char*)src, n, "strncat", "source string ");
   long dest_sz =
     validate_writeable_string((char*)dest, -1, "strcat", "destination string ");
-  size_t avail_sz = block_length(dest) - offset(dest);
+  size_t avail_sz = eacsl_block_length(dest) - eacsl_offset(dest);
   if (!(avail_sz >= n + dest_sz + 1)) {
     private_abort("strncat: insufficient space in destination string, "
       "available: %lu bytes, requires at least %lu bytes\n",
@@ -223,26 +223,26 @@ char *builtin_strncat(char *dest, const char *src, size_t n) {
 /*** memcpy/memcmp/memset/memmove {{{ ***/
 /************************************************************************/
 
-void *builtin_memcpy(void *dest, const void *src, size_t n) {
+void *eacsl_builtin_memcpy(void *dest, const void *src, size_t n) {
   validate_allocated_space((void*)src, n, "memcpy", "source space ");
   validate_writeable_space((void*)dest, n, "memcpy", "destination space ");
   validate_overlapping_spaces((uintptr_t)src, n, (uintptr_t)dest, n, "memcpy");
   return memcpy(dest, src, n);
 }
 
-void *builtin_memset(void *s, int c, size_t n) {
+void *eacsl_builtin_memset(void *s, int c, size_t n) {
   validate_writeable_space((void*)s, n, "memset", "space ");
   return memset(s, c, n);
 }
 
-int builtin_memcmp(const void *s1, const void *s2, size_t n) {
+int eacsl_builtin_memcmp(const void *s1, const void *s2, size_t n) {
   validate_allocated_space((void*)s1, n, "memcmp", "space 1 ");
   validate_allocated_space((void*)s2, n, "memcmp", "space 1 ");
   validate_overlapping_spaces((uintptr_t)s1, n, (uintptr_t)s2, n, "memcpy");
   return memcmp(s1, s2, n);
 }
 
-void *builtin_memmove(void *dest, const void *src, size_t n) {
+void *eacsl_builtin_memmove(void *dest, const void *src, size_t n) {
   validate_allocated_space((void*)src, n, "memcmp", "source space ");
   validate_writeable_space((void*)dest, n, "memcmp", "destination space ");
   return memmove(dest, src, n);

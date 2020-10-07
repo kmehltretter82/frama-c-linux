@@ -57,6 +57,14 @@ wp-qualif:
    - nix
   allow_failure: true
 
+aorai-prove:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A frama-c.aorai-prove
+  tags:
+   - nix
+  allow_failure: true
+
 genassigns:
   stage: tests
   script:

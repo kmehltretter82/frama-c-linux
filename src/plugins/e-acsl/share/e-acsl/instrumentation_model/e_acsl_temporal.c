@@ -32,17 +32,17 @@
 #include "e_acsl_temporal.h"
 
 /* Temporal store {{{ */
-void temporal_store_nblock(void *lhs, void *rhs) {
+void eacsl_temporal_store_nblock(void *lhs, void *rhs) {
   store_temporal_referent(lhs, origin_timestamp(rhs));
 }
 
-void temporal_store_nreferent(void *lhs, void *rhs) {
+void eacsl_temporal_store_nreferent(void *lhs, void *rhs) {
   store_temporal_referent(lhs, referent_timestamp(rhs));
 }
 /* }}} */
 
 /* Memcpy/memset {{{ */
-void temporal_memcpy(void *dest, void *src, size_t size) {
+void eacsl_temporal_memcpy(void *dest, void *src, size_t size) {
   /* Memcpy is only relevant for pointers here, so if there is a
    * copy under a pointer's size then there no point in copying memory*/
   if (size >= sizeof(void*)) {
@@ -54,7 +54,7 @@ void temporal_memcpy(void *dest, void *src, size_t size) {
   }
 }
 
-void temporal_memset(void *dest, int c, size_t size) {
+void eacsl_temporal_memset(void *dest, int c, size_t size) {
   DVALIDATE_WRITEABLE(dest, size, dest);
   void *dest_shadow = (void *)temporal_referent_shadow(dest);
   memset(dest_shadow, 0, size);
@@ -62,22 +62,22 @@ void temporal_memset(void *dest, int c, size_t size) {
 /* }}} */
 
 /* Function parameters {{{ */
-void temporal_save_nblock_parameter(void *ptr, unsigned int param) {
+void eacsl_temporal_save_nblock_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TBlockN;
 }
 
-void temporal_save_nreferent_parameter(void *ptr, unsigned int param) {
+void eacsl_temporal_save_nreferent_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TReferentN;
 }
 
-void temporal_save_copy_parameter(void *ptr, unsigned int param) {
+void eacsl_temporal_save_copy_parameter(void *ptr, unsigned int param) {
   parameter_referents[param].ptr = ptr;
   parameter_referents[param].temporal_flow = TCopy;
 }
 
-void temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
+void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
   struct temporal_parameter *tpar = &parameter_referents[param];
   switch(tpar->temporal_flow) {
     case TBlockN:
@@ -87,36 +87,36 @@ void temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
       store_temporal_referent(ptr, referent_timestamp(tpar->ptr));
       break;
     case TCopy:
-      temporal_memcpy(ptr, tpar->ptr, size);
+      eacsl_temporal_memcpy(ptr, tpar->ptr, size);
       break;
     default:
       private_assert(0, "Unreachable", NULL);
   }
 }
 
-void temporal_reset_parameters() {
+void eacsl_temporal_reset_parameters() {
   reset_parameter_referents();
 }
 /* }}} */
 
 /* Return values {{{ */
-void temporal_save_return(void *ptr) {
+void eacsl_temporal_save_return(void *ptr) {
   return_referent = (ptr, sizeof(void*)) ? referent_timestamp(ptr) : 0;
 }
 
-void temporal_pull_return(void *ptr) {
+void eacsl_temporal_pull_return(void *ptr) {
   store_temporal_referent(ptr, return_referent);
 }
 
-void temporal_reset_return() {
+void eacsl_temporal_reset_return() {
   return_referent = 0;
 }
 /* }}} */
 
 /* Temporal valid {{{ */
 int temporal_valid(void *ptr, void *addr_of_ptr) {
-  /* Could check for NULL, but since temporal_valid if ran by `valid`, this
-   * has been already checked.
+  /* Could check for NULL, but since temporal_valid if ran by `eacsl_valid`,
+   * this has been already checked.
    * FIXME: If the address of pointer and the pointer itself reference the same
    * address the access is deemed temporally valid by default.
    * One issue associated  with such checking is the case when a pointer points
