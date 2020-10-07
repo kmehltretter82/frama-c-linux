@@ -14,3 +14,8 @@
   call_f2                   1        -        1       100%
   call_f3                   1        -        1       100%
 ------------------------------------------------------------
+[wp] tests/wp_hoare/reference_array_simple.i:40: Warning: 
+  Memory model hypotheses for function 'call_f3':
+  /*@ behavior typed_ref:
+        ensures \separated(\result, (int **)tp + (..)); */
+  int *call_f3(void);

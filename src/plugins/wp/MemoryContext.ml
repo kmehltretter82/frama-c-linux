@@ -277,6 +277,15 @@ let post_term t =
   try ignore (Cil.visitCilTerm v t) ; false
   with Post_value -> true
 
+let assigned_separation kf loc globals =
+  let addr_of t = addr_of_lval ~loc t.it_content in
+  let asgnd_ptrs = List.map addr_of (assigned_via_pointers kf) in
+  let folder (req, ens) t =
+    let sep = term_separated_from_regions loc t globals in
+    if post_term t then (req, sep :: ens) else (sep :: req, ens)
+  in
+  List.fold_left folder ([],[]) asgnd_ptrs
+
 let simpl_pred_list l =
   List.sort_uniq Logic_utils.compare_predicate
     (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) l)
@@ -286,14 +295,7 @@ let clauses_of_partition kf loc p =
   let main_sep =
     main_separation loc globals (context_zones p) (heaps p)
   in
-  let assigns_sep_req, assigns_sep_ens =
-    let addr_of t = addr_of_lval ~loc t.it_content in
-    let folder (req, ens) t =
-      let sep = term_separated_from_regions loc (addr_of t) globals in
-      if post_term t.it_content then (req, sep :: ens) else (sep :: req, ens)
-    in
-    List.fold_left folder ([],[]) (assigned_via_pointers kf)
-  in
+  let assigns_sep_req, assigns_sep_ens = assigned_separation kf loc globals in
   let context_validity = List.map (valid_region loc) (context_zones p) in
   let reqs = main_sep @ assigns_sep_req @ context_validity in
   let reqs = simpl_pred_list reqs in
@@ -306,7 +308,7 @@ let ptr_or_ptr_set { term_type = t } =
   let open Logic_typing in
   is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
 
-let escaping_formals kf loc p =
+let out_pointers_separation kf loc p =
   let ret_t = Kernel_function.get_return_type kf in
   let addr_of t = addr_of_lval ~loc t.it_content in
   let asgnd_ptrs =
@@ -319,11 +321,20 @@ let escaping_formals kf loc p =
     if Cil.isPointerType ret_t then tresult ~loc ret_t :: asgnd_ptrs
     else asgnd_ptrs
   in
-  let local_zone = function Var v -> v.vformal | _ -> false in
-  let local_partition = { p with by_addr = List.filter local_zone p.by_addr } in
-  let locals = addr_of_vars local_partition in
-  simpl_pred_list
-    (List.map (fun t -> term_separated_from_regions loc t locals) asgnd_ptrs)
+  let formals_separation =
+    let formal_zone = function Var v -> v.vformal | _ -> false in
+    let formal_partition =
+      { p with by_addr = List.filter formal_zone p.by_addr }
+    in
+    let formals = addr_of_vars formal_partition in
+    List.map (fun t -> term_separated_from_regions loc t formals) asgnd_ptrs
+  in
+  let globals_separation =
+    let globals = global_zones p in
+    List.map (fun t -> term_separated_from_regions loc t globals) asgnd_ptrs
+  in
+  simpl_pred_list (formals_separation @ globals_separation)
+
 
 module Table =
   State_builder.Hashtbl
@@ -339,7 +350,7 @@ let compute_behavior kf name hypotheses_computer =
   let partition = hypotheses_computer kf in
   let loc = Kernel_function.get_location kf in
   let reqs, ens = clauses_of_partition kf loc partition in
-  let ens = escaping_formals kf loc partition @ ens in
+  let ens = out_pointers_separation kf loc partition @ ens in
   let reqs = List.map new_predicate reqs in
   let ens = List.map (fun p -> Normal, new_predicate p) ens in
   match reqs, ens with
