@@ -937,14 +937,7 @@ let get_macros cmd =
   in
   Macros.add_list macros cmd.macros
 
-let contains_frama_c_binary_name =
-  Str.regexp "\\([^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\($\\|[ \t]\\)\\)"
-
-let frama_c_binary_name =
-  Str.regexp "\\([^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
-
-let basic_command_string =
-  fun command ->
+let basic_command_string command =
   let macros = get_macros command in
   let plugins_options =
     let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
