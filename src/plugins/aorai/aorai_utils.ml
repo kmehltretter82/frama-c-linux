@@ -835,12 +835,14 @@ let is_state_pred state =
       (Req,one_term(),
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
-let is_state_stmt (state,copy) loc =
-  if Aorai_option.Deterministic.get ()
-  then
-    mkStmtOneInstr
-      ~ghost:true (Set (Cil.var copy, int2enumstate_exp loc state.nums, loc))
-  else mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one loc, loc))
+let is_state_non_det_stmt (_,copy) loc =
+  mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one loc, loc))
+
+let is_state_det_stmt state loc =
+  let var = Data_for_aorai.get_varinfo curState in
+  mkStmtOneInstr
+    ~ghost:true (Set (Cil.var var, int2enumstate_exp loc state.nums, loc))
+
 
 let is_state_exp state loc =
   if Aorai_option.Deterministic.get ()
@@ -1901,76 +1903,137 @@ let act_convert loc act res =
   in
   List.map treat_one_act act
 
-let copy_stmt s =
-  let vis = new Visitor.frama_c_refresh (Project.current()) in
-  Visitor.visitFramacStmt vis s
+let mk_transitions_stmt generated_kf loc f st res trans =
+  List.fold_right
+    (fun trans
+      (aux_stmts, aux_vars, new_funcs, exp_from_trans, stmt_from_action) ->
+      let (tr_stmts, tr_vars, tr_funcs, exp) =
+        crosscond_to_exp generated_kf f st loc trans.cross res
+      in
+      let cond = Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp in
+      (tr_stmts @ aux_stmts,
+       tr_vars @ aux_vars,
+       Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
+       Cil.mkBinOp loc LOr exp_from_trans cond,
+       (Cil.copy_exp cond, act_convert loc trans.actions res)
+       :: stmt_from_action))
+    trans
+    ([],[],Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc, [])
 
-(* mk_stmt loc (states, tr) f fst status state
+let mkIfStmt loc exp1 block1 block2 =
+  Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+
+let mk_deterministic_stmt
+    generated_kf loc auto f fst status ret state
+    (other_stmts, other_funcs, other_vars, trans_stmts as res) =
+  if is_reachable state status then begin
+    let trans = get_accessible_transitions auto state status in
+    let aux_stmts, aux_vars, aux_funcs, _, stmt_from_action =
+      mk_transitions_stmt generated_kf loc f fst ret trans
+    in
+    let stmts =
+      List.fold_left
+        (fun acc (cond, stmt_act) ->
+           [mkIfStmt loc cond
+              (mkBlock (is_state_det_stmt state loc :: stmt_act))
+              (mkBlock acc)])
+        trans_stmts
+        (List.rev stmt_from_action)
+    in
+    aux_stmts @ other_stmts,
+    Cil_datatype.Varinfo.Set.union aux_funcs other_funcs,
+    aux_vars @ other_vars,
+    stmts
+  end else res
+
+(* mk_non_deterministic_stmt loc (states, tr) f fst status state
    Generates the statement updating the variable representing
    the state argument.
    If state is reachable, generates a "If then else" statement, else it is
    just an assignment.
    Used in auto_func_block. *)
-let mk_stmt generated_kf loc (states, tr) f fst status ((st,_) as state) res =
+let mk_non_deterministic_stmt
+    generated_kf loc (states, tr) f fst status ((st,_) as state) res =
   if is_reachable st status then begin
     let useful_trans =  get_accessible_transitions (states,tr) st status in
-    let aux_stmts, new_vars, new_funcs, exp_from_trans,stmt_from_action =
-      List.fold_right
-        (fun trans
-          (aux_stmts, aux_vars, new_funcs, exp_from_trans, stmt_from_action) ->
-          let (tr_stmts, tr_vars, tr_funcs, exp) =
-            crosscond_to_exp generated_kf f fst loc trans.cross res
-          in
-          (tr_stmts @ aux_stmts,
-           tr_vars @ aux_vars,
-           Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
-           Cil.mkBinOp loc LAnd (is_state_exp trans.start loc) exp
-           ::exp_from_trans,
-           act_convert loc trans.actions res :: stmt_from_action))
-        useful_trans
-        ([],[],Cil_datatype.Varinfo.Set.empty, [], [])
+    let aux_stmts, new_vars, new_funcs, cond,stmt_from_action =
+     mk_transitions_stmt generated_kf loc f fst res useful_trans
     in
-    let mkIfStmt exp1 block1 block2 =
-      Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
-    in
-    let if_cond =
-      List.fold_left
-        (fun acc exp -> Cil.mkBinOp loc LOr exp acc)
-        (List.hd exp_from_trans)
-        (List.tl exp_from_trans)
-    in
-    let then_stmt = is_state_stmt state loc in
-    let else_stmt =
-      if Aorai_option.Deterministic.get () then []
-      else [is_out_of_state_stmt state loc]
-    in
+    let then_stmt = is_state_non_det_stmt state loc in
+    let else_stmt = [is_out_of_state_stmt state loc] in
     let trans_stmts =
-      if Aorai_option.Deterministic.get () then
-        List.fold_left2
-          (fun acc cond stmt_act ->
-             [mkIfStmt cond
-                (mkBlock (copy_stmt then_stmt :: stmt_act)) (mkBlock acc)])
-          else_stmt
-          (List.rev exp_from_trans)
+      let actions =
+        List.fold_left
+          (fun acc (cond, stmt_act) ->
+             if stmt_act = [] then acc
+             else
+               (mkIfStmt loc cond (mkBlock stmt_act) (mkBlock []))::acc)
+          []
           (List.rev stmt_from_action)
-      else
-        let actions =
-          List.fold_left2
-            (fun acc cond stmt_act ->
-               if stmt_act = [] then acc
-               else
-                 (mkIfStmt cond (mkBlock stmt_act) (mkBlock []))::acc)
-            []
-            (List.rev exp_from_trans)
-            (List.rev stmt_from_action)
-        in
-        mkIfStmt if_cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
+      in
+      mkIfStmt loc cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
     in
     new_funcs, new_vars, aux_stmts @ trans_stmts
   end else
-  if Aorai_option.Deterministic.get () then
-    Cil_datatype.Varinfo.Set.empty, [], []
-  else Cil_datatype.Varinfo.Set.empty, [], [is_out_of_state_stmt state loc]
+    Cil_datatype.Varinfo.Set.empty, [], [is_out_of_state_stmt state loc]
+
+let equalsStmt lval exp loc = (* assignment *)
+  Cil.mkStmtOneInstr ~ghost:true (Set (lval, exp, loc))
+
+let mk_deterministic_body generated_kf loc f st status res =
+  let (states, _ as auto) = Data_for_aorai.getGraph() in
+  let aux_stmts, aux_funcs, aux_vars, trans_stmts =
+  List.fold_right
+    (mk_deterministic_stmt generated_kf loc auto f st status res)
+    states
+    ([], Cil_datatype.Varinfo.Set.empty, [],[])
+  in
+  aux_funcs, aux_vars, aux_stmts @ trans_stmts
+
+let mk_non_deterministic_body generated_kf loc f st status res =
+  (* For the following tests, we need a copy of every state. *)
+  let (states, _) as auto = Data_for_aorai.getGraph() in
+  let copies, local_var =
+    let bindings =
+      List.map
+        (fun st ->
+           let state_var = Data_for_aorai.get_state_var st in
+           let copy = Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") in
+           copy.vglob <- false;
+           (st,copy))
+        states
+    in bindings, snd (List.split bindings)
+  in
+  let copies_update =
+    List.map
+      (fun (st,copy) ->
+         equalsStmt (Cil.var copy)
+           (Cil.evar ~loc (Data_for_aorai.get_state_var st)) loc)
+      copies
+  in
+  let new_funcs, local_var, main_stmt =
+    List.fold_left
+      (fun (new_funcs, aux_vars, stmts) state ->
+         let my_funcs, my_vars, my_stmts =
+           mk_non_deterministic_stmt generated_kf loc auto f st status state res
+         in
+         Cil_datatype.Varinfo.Set.union my_funcs new_funcs,
+         my_vars @ aux_vars,
+         my_stmts@stmts )
+      (Cil_datatype.Varinfo.Set.empty, local_var, [])
+      copies
+  in
+
+  (* Finally, we replace the state var values by the ones computed in copies. *)
+  let stvar_update =
+    List.map
+      (fun (state,copy) ->
+         equalsStmt
+           (Cil.var (Data_for_aorai.get_state_var state))
+           (Cil.evar ~loc copy) loc)
+      copies
+  in
+  new_funcs, local_var, copies_update @ main_stmt @ stvar_update
 
 let auto_func_block generated_kf loc f st status res =
   let dkey = func_body_dkey in
@@ -1981,93 +2044,32 @@ let auto_func_block generated_kf loc f st status res =
   in
   Aorai_option.debug
     ~dkey "func code for %a (%s)" Kernel_function.pretty f call_or_ret;
-  let (states, _) as auto = Data_for_aorai.getGraph() in
 
-  (* For the following tests, we need a copy of every state. *)
-
-  let copies, local_var =
-    if Aorai_option.Deterministic.get () then begin
-      let orig = Data_for_aorai.get_varinfo curState in
-      let copy = Cil.copyVarinfo orig (orig.vname ^ "_tmp") in
-      copy.vglob <- false;
-      List.map (fun st -> (st, copy)) states, [copy]
-    end else begin
-      let bindings =
-        List.map
-          (fun st ->
-             let state_var = Data_for_aorai.get_state_var st in
-             let copy = Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") in
-             copy.vglob <- false;
-             (st,copy))
-          states
-      in bindings, snd (List.split bindings)
-    end
-  in
-  let equalsStmt lval exp = (* assignment *)
-    Cil.mkStmtOneInstr ~ghost:true (Set (lval, exp, loc))
-  in
   let stmt_begin_list =
-
     [
       (* First statement : what is the current status : called or return ? *)
       equalsStmt
-        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOpStatus)) (* current status... *)
-        (Cil.new_exp loc (Const (Data_for_aorai.op_status_to_cenum st))); (* ... equals to what it is *)
-
-      (* Second statement : what is the current operation, i.e. which function ?  *)
+        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOpStatus))
+        (Cil.new_exp loc (Const (Data_for_aorai.op_status_to_cenum st))) loc;
+      (* Second statement : what is the current operation,
+         i.e. which function ?  *)
       equalsStmt
-        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOp)) (* current operation ... *)
-        (Cil.new_exp loc (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f)))) (* ...equals to what it is  *)
+        (Cil.var (Data_for_aorai.get_varinfo Data_for_aorai.curOp))
+        (Cil.new_exp loc
+           (Const (Data_for_aorai.func_to_cenum (Kernel_function.get_name f))))
+        loc
     ]
-
   in
-
-  (* As we work on copies, they need to be set to their actual values *)
-
-  let copies_update =
-    if Aorai_option.Deterministic.get () then
-      let orig = Data_for_aorai.get_varinfo curState in
-      [ equalsStmt (Cil.var (List.hd local_var)) (Cil.evar ~loc orig) ]
-    else
-      List.map
-        (fun (st,copy) ->
-           equalsStmt (Cil.var copy)
-             (Cil.evar ~loc (Data_for_aorai.get_state_var st)))
-        copies
-  in
-  (* For each state, we have to generate the statement that will update its copy. *)
   let new_funcs, local_var, main_stmt =
-
-    List.fold_left
-      (fun (new_funcs, aux_vars, stmts) state ->
-         let my_funcs, my_vars, my_stmts =
-           mk_stmt generated_kf loc auto f st status state res
-         in
-         Cil_datatype.Varinfo.Set.union my_funcs new_funcs,
-         my_vars @ aux_vars,
-         my_stmts@stmts )
-      (Cil_datatype.Varinfo.Set.empty, local_var, [])
-      copies
-
-  in
-
-  (* Finally, we replace the state var values by the ones computed in copies. *)
-  let stvar_update =
-    if Aorai_option.Deterministic.get () then
-      let orig = Data_for_aorai.get_varinfo curState in
-      [ equalsStmt (Cil.var orig) (Cil.evar (List.hd local_var))]
+    if Aorai_option.Deterministic.get() then
+      mk_deterministic_body generated_kf loc f st status res
     else
-      List.map
-        (fun (state,copy) ->
-           equalsStmt
-             (Cil.var (Data_for_aorai.get_state_var state))
-             (Cil.evar ~loc copy))
-        copies
+      mk_non_deterministic_body generated_kf loc f st status res
   in
   let ret = [ Cil.mkStmt ~ghost:true (Cil_types.Return(None,loc)) ] in
   let res_block =
     (Cil.mkBlock
-       ( stmt_begin_list @ copies_update @ main_stmt @ stvar_update @ ret))
+       ( stmt_begin_list @ main_stmt @ ret))
   in
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"

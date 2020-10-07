@@ -86,14 +86,11 @@ check lemma emptying_stack_deterministic_trans{L}:
    @/
   void push_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_push;
-    aorai_CurStates_tmp = aorai_CurStates;
-    if (3 == aorai_CurStates) aorai_CurStates_tmp = filling_stack;
+    if (3 == aorai_CurStates) aorai_CurStates = filling_stack;
     else 
-      if (1 == aorai_CurStates) aorai_CurStates_tmp = filling_stack;
-    aorai_CurStates = aorai_CurStates_tmp;
+      if (1 == aorai_CurStates) aorai_CurStates = filling_stack;
     return;
   }
 
@@ -132,15 +129,12 @@ check lemma emptying_stack_deterministic_trans{L}:
    @/
   void push_post_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_push;
-    aorai_CurStates_tmp = aorai_CurStates;
     if (4 == aorai_CurStates) {
-      aorai_CurStates_tmp = filled_stack;
+      aorai_CurStates = filled_stack;
       aorai_n ++;
     }
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 
@@ -204,13 +198,10 @@ void push(void)
    @/
   void pop_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
-    aorai_CurStates_tmp = aorai_CurStates;
     if (3 == aorai_CurStates) 
-      if (aorai_n > 0) aorai_CurStates_tmp = emptying_stack;
-    aorai_CurStates = aorai_CurStates_tmp;
+      if (aorai_n > 0) aorai_CurStates = emptying_stack;
     return;
   }
 
@@ -258,21 +249,23 @@ void push(void)
    @/
   void pop_post_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
-    aorai_CurStates_tmp = aorai_CurStates;
-    if (2 == aorai_CurStates) 
-      if (aorai_n > 1) {
-        aorai_CurStates_tmp = filled_stack;
-        aorai_n --;
-      }
-    if (2 == aorai_CurStates) 
+    if (2 == aorai_CurStates) {
       if (aorai_n == 1) {
-        aorai_CurStates_tmp = empty_stack;
+        aorai_CurStates = empty_stack;
         aorai_n --;
       }
-    aorai_CurStates = aorai_CurStates_tmp;
+      else goto _LAND;
+    }
+    else {
+      _LAND: ;
+      if (2 == aorai_CurStates) 
+        if (aorai_n > 1) {
+          aorai_CurStates = filled_stack;
+          aorai_n --;
+        }
+    }
     return;
   }
 
@@ -338,15 +331,12 @@ void pop(void)
    @/
   void main_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
     if (5 == aorai_CurStates) {
-      aorai_CurStates_tmp = empty_stack;
+      aorai_CurStates = empty_stack;
       aorai_n = 0;
     }
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 
@@ -383,12 +373,9 @@ void pop(void)
    @/
   void main_post_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
-    if (1 == aorai_CurStates) aorai_CurStates_tmp = accept;
-    aorai_CurStates = aorai_CurStates_tmp;
+    if (1 == aorai_CurStates) aorai_CurStates = accept;
     return;
   }
 

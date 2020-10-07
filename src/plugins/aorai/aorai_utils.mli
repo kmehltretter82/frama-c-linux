@@ -71,9 +71,6 @@ val host_state_term: unit -> Cil_types.term_lval
     corresponding state. *)
 val is_state_pred: state -> predicate
 
-(** Returns the statement saying the state is affected *)
-val is_state_stmt: state * Cil_types.varinfo -> location -> Cil_types.stmt
-
 (** Returns the boolean expression saying the state is affected *)
 val is_state_exp: state -> location -> Cil_types.exp
 
