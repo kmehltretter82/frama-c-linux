@@ -234,7 +234,7 @@ WP_API_BASE= \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
 	wpPropId.mli mcfg.ml \
-	Context.mli Warning.mli wpContext.mli \
+	Context.mli Warning.mli AssignsCompleteness.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \

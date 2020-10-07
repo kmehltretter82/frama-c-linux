@@ -34,3 +34,5 @@ val is_complete: Kernel_function.t -> bool
 val warn: Kernel_function.t -> unit
 (** Displays a warning if the given kernel function has incomplete assigns.
     Note that the warning is configured with [~once] set to [true]. *)
+
+val wkey_pedantic: Wp_parameters.warn_category
