@@ -1,10 +1,9 @@
 /* run.config
    PLUGIN: sparecode
    MODULE: @PTEST_NAME@.cmxs
-   STDOPT:
+   STDOPT: 
 */
 int G;
-
 int f (int x, int y) {
   G = y;
   return x;
