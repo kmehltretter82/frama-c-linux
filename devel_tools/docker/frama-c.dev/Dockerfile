@@ -33,7 +33,7 @@ RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     zmq.5.1.3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN why3 config --full-config
+RUN why3 config --detect
 
 # with_source: keep Frama-C sources
 ARG with_source=no

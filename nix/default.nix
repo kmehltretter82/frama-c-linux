@@ -159,7 +159,7 @@ rec {
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { opamPackages = []; };
+        buildInputs = mk_buildInputs { };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
@@ -187,9 +187,7 @@ rec {
 
   aorai-prove = mk_deriv {
         name = "frama-c-aorai-prove";
-        buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.0.0"; }
-               ]; };
+        buildInputs = mk_buildInputs { };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
@@ -205,7 +203,7 @@ rec {
           make create_share_link
           mkdir home
           HOME=$(pwd)/home
-          why3 config --full-config
+          why3 config --detect
           make src/plugins/aorai/tests/ptests_config
           make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
         '';
