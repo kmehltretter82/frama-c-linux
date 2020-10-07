@@ -89,8 +89,10 @@ let search tree ?anchor ?sequent heuristics =
   let anchor = ProofEngine.anchor tree ?node:anchor () in
   let sequent =
     match sequent with
-    | Some s -> s | None -> snd (Wpo.compute (ProofEngine.goal anchor)) in
+    | Some s -> s
+    | None -> snd (Wpo.compute (ProofEngine.goal anchor)) in
   let lookup h = try h#search pool#add sequent with Not_found -> () in
+  Conditions.index sequent ;
   WpContext.on_context
     (ProofEngine.node_context anchor)
     (List.iter lookup) heuristics ;
