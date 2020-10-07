@@ -1,7 +1,7 @@
 /* run.config
    CMXS: segfault_datatypes_A segfault_datatypes_B
-   EXECNOW: LOG segfault_datatypes_sav.res LOG segfault_datatypes_sav.err BIN segfault_datatypes.sav @frama-c@ -load-module %{dep:segfault_datatypes_A.cmxs} -eva @EVA_OPTIONS@ -out -input -deps %{dep:segfault_datatypes.i} -save segfault_datatypes.sav > segfault_datatypes_sav.res 2> segfault_datatypes_sav.err
-   CMD: @frama-c@ -load-module %{dep:segfault_datatypes_B.cmxs}
+   EXECNOW: LOG segfault_datatypes_sav.res LOG segfault_datatypes_sav.err BIN segfault_datatypes.sav @frama-c@ -load-module %{dep:segfault_datatypes_A.cmxs} -eva @EVA_OPTIONS@ -out -input -deps -save segfault_datatypes.sav > segfault_datatypes_sav.res 2> segfault_datatypes_sav.err
+   CMD: frama-c -no-autoload-plugin -load-module %{dep:segfault_datatypes_B.cmxs}
    STDOPT: +"-load %{dep:segfault_datatypes.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
 */
 

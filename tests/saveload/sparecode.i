@@ -1,9 +1,9 @@
 /* run.config
-   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err (@frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save sparecode.sav sparecode.i -then-on 'Slicing export' -print) > sparecode_sav.res 2> sparecode_sav.err
+   PLUGIN: slicing
+   EXECNOW: BIN sparecode.sav LOG sparecode_sav.res LOG sparecode_sav.err @frama-c@ -slicing-level 2 -slice-return main -eva-show-progress -save sparecode.sav -then-on 'Slicing export' -print > sparecode_sav.res 2> sparecode_sav.err
    STDOPT: +"-load %{dep:sparecode.sav}"
 */
 int G;
-
 int f (int x, int y) {
   G = y;
   return x;

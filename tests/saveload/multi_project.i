@@ -1,5 +1,6 @@
 /* run.config
-   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err (@frama-c@ -save @PTEST_NAME@.sav @EVA_OPTIONS@ -semantic-const-folding @PTEST_NAME@.i) > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
+   PLUGIN: constant_propagation
+   EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -save @PTEST_NAME@.sav @EVA_OPTIONS@ -semantic-const-folding > @PTEST_NAME@_sav.res 2> @PTEST_NAME@_sav.err
    CMXS: @PTEST_NAME@
    STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -journal-disable"
    CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
@@ -8,7 +9,6 @@
 int f(int x) {
   return x + x;
 }
-
 int main() {
   int x = 2;
   int y = f(x);

@@ -1,5 +1,5 @@
 /* run.config
-   EXECNOW: LOG @PTEST_NAME@_initial.res LOG @PTEST_NAME@_initial.err BIN @PTEST_NAME@.sav (@frama-c@ @PTEST_NAME@.i -out -calldeps -eva-show-progress -main main1 -save @PTEST_NAME@.sav) > @PTEST_NAME@_initial.res 2> @PTEST_NAME@_initial.err
+   EXECNOW: LOG @PTEST_NAME@_initial.res LOG @PTEST_NAME@_initial.err BIN @PTEST_NAME@.sav @frama-c@ -out -calldeps -eva-show-progress -main main1 -save @PTEST_NAME@.sav > @PTEST_NAME@_initial.res 2> @PTEST_NAME@_initial.err
    STDOPT: +"-load %{dep:@PTEST_NAME@.sav} -main main2 -then -main main3"
 */
 
