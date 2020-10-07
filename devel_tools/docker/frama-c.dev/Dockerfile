@@ -20,14 +20,14 @@ RUN opam update -y && opam install depext -y
 
 # Install packages from reference configuration
 RUN apt-get update && opam update -y && opam depext --install -y --verbose \
-    alt-ergo.2.0.0 \
+    alt-ergo.2.2.0 \
     apron.v0.9.12 \
     conf-graphviz.0.1 \
     mlgmpidl.1.2.12 \
     ocamlfind.1.8.1 \
     ocamlgraph.1.8.8 \
     ppx_deriving_yojson.3.5.2 \
-    why3.1.3.1 \
+    why3.1.3.3 \
     yojson.1.7.0 \
     zarith.1.9.1 \
     zmq.5.1.3 \
