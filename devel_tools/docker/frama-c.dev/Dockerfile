@@ -50,6 +50,7 @@ RUN cd /root && \
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no
 
+# run general tests, then test that WP can see external provers
 RUN if [ "${with_test}" != "no" ]; then \
        apt-get update && \
        opam update -y && opam depext --install -y \
@@ -59,5 +60,8 @@ RUN if [ "${with_test}" != "no" ]; then \
         && \
         rm -rf /var/lib/apt/lists/* && \
         cd /root/frama-c && \
-        make tests; \
+        make tests && \
+        (cd src/plugins/wp/tests/ && \
+         frama-c -wp wp_gallery/binary-multiplication-without-overflow.c \
+         -wp-prover alt-ergo,cvc4); \
     fi
