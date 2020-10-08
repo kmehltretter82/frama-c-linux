@@ -455,16 +455,18 @@ struct
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
-  let init_range ~sigma lv typ a b value =
+  let init_range ~sigma lv typ low excl_up value =
     let obj = Ctypes.object_of typ in
     let outcome = Warning.catch
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
            let e = Extlib.opt_map (exp sigma) value in
-           let a = e_bigint a and b = e_bigint b in
-           (is_exp_range sigma l obj a b e),
-           (M.initialized sigma (Rrange(l, obj, Some a, Some b)))
+           let low = e_bigint low in
+           let excl_up = e_bigint excl_up in
+           let incl_up = e_sub excl_up e_one in
+           (is_exp_range sigma l obj low excl_up e),
+           (M.initialized sigma (Rrange(l, obj, Some low, Some incl_up)))
         ) () in
     match outcome with
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)
