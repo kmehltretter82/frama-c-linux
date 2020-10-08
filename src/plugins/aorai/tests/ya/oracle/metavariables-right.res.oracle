@@ -75,7 +75,7 @@ check lemma e_deterministic_trans{L}:
        assumes aorai_CurStates ≡ b;
        ensures aorai_CurStates ≡ c;
        ensures aorai_x ≡ \old(x);
-       ensures aorai_y ≡ \old(aorai_x);
+       ensures aorai_y ≡ aorai_x;
      
      behavior buch_state_c_out:
        assumes aorai_CurStates ≢ b;
@@ -476,8 +476,8 @@ void h(int x)
      behavior buch_state_e_in_0:
        assumes aorai_CurStates ≡ h_0;
        ensures aorai_CurStates ≡ e;
-       ensures aorai_y ≡ \old(0);
-       ensures aorai_x ≡ \old(1);
+       ensures aorai_y ≡ 0;
+       ensures aorai_x ≡ 1;
      
      behavior buch_state_e_out:
        assumes aorai_CurStates ≢ h_0;

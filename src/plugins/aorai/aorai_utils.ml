@@ -1570,14 +1570,50 @@ let add_behavior_pebble_actions ~loc f st behaviors state trans =
     in
     Cil.mk_behavior ~name ~assumes ~post_cond () :: behaviors
 
-let mk_action ~loc a =
+(* NB: we assume that the terms coming from YA automata keep quite simple.
+   Notably that they do not introduce themselves any \at. *)
+let make_old loc init t =
+  let vis =
+    object(self)
+      inherit Visitor.frama_c_inplace
+      val is_old = Stack.create ()
+      method private is_old =
+        if Stack.is_empty is_old then false else Stack.top is_old
+      method! vterm t =
+        match t.term_node with
+        | TLval lv ->
+          if Cil_datatype.Term_lval.Set.mem lv init then begin
+            if self#is_old then begin
+              Stack.push false is_old;
+              DoChildrenPost
+                (fun t ->
+                   ignore (Stack.pop is_old);
+                   Logic_const.(tat ~loc (t,here_label)))
+            end else DoChildren
+          end
+          else begin
+            if not self#is_old then begin
+              Stack.push true is_old;
+              DoChildrenPost
+                (fun t ->
+                   ignore (Stack.pop is_old);
+                   Logic_const.told ~loc t)
+            end else DoChildren
+          end
+        | _ -> DoChildren
+    end
+  in Visitor.visitFramacTerm vis t
+
+let mk_action ~loc init a =
   let term_lval lv =
     Logic_const.term ~loc (TLval lv) (Cil.typeOfTermLval lv)
   in
+  let add_lv lv = Cil_datatype.Term_lval.Set.add lv init in
   match a with
   | Counter_init lv ->
     [Logic_const.prel ~loc
-       (Req, term_lval lv, Logic_const.tinteger ~loc 1)]
+       (Req, term_lval lv, Logic_const.tinteger ~loc 1)],
+    add_lv lv
   | Counter_incr lv ->
     [Logic_const.prel ~loc
        (Req, term_lval lv,
@@ -1585,11 +1621,13 @@ let mk_action ~loc a =
           (TBinOp (PlusA,
                    Logic_const.told ~loc (term_lval lv),
                    Logic_const.tinteger ~loc 1))
-          (Cil.typeOfTermLval lv))]
-  | Pebble_init _ | Pebble_move _ -> [] (* Treated elsewhere *)
+          (Cil.typeOfTermLval lv))],
+    add_lv lv
+  | Pebble_init _ | Pebble_move _ -> [],init (* Treated elsewhere *)
   | Copy_value (lv,t) ->
     [Logic_const.prel ~loc
-       (Req, term_lval lv, Logic_const.told t)]
+       (Req, term_lval lv, make_old loc init t)],
+    add_lv lv
 
 let is_reachable state status =
   let treat_one_state _ map = Data_for_aorai.Aorai_state.Map.mem state map in
@@ -1629,7 +1667,7 @@ let get_accessible_transitions auto state status =
   Data_for_aorai.Aorai_state.Set.fold
     (fun s acc -> Path_analysis.get_edges s state auto @ acc) previous_set []
 
-let rec get_aux_var_bhv_name = function
+let get_aux_var_bhv_name = function
   | TVar v, _ ->
     Data_for_aorai.get_fresh (v.lv_name ^ "_unchanged")
   | lv ->
@@ -1740,30 +1778,34 @@ let mk_behavior ~loc auto kf e status state =
                      Normal,
                      Logic_const.new_predicate (is_state_pred state)
                    in
-                   let treat_one_action acc a =
-                     let posts = mk_action ~loc a in
+                   let treat_one_action (other_posts, init) a =
+                     let posts, init = mk_action ~loc init a in
                      match state.multi_state  with
                      | None ->
-                       acc @
+                       other_posts @
                        List.map
                          (fun x ->
                             (Normal, Logic_const.new_predicate x))
-                         posts
+                         posts,
+                       init
                      | Some (_,aux) ->
                        let set =
                          find_pebble_origin
                            Logic_const.pre_label trans.actions
                        in
-                       acc @
+                       other_posts @
                        List.map
                          (fun x ->
                             (Normal,
                              Logic_const.new_predicate
                                (pebble_post ~loc set aux x)))
-                         posts
+                         posts,
+                       init
                    in
-                   let post_cond =
-                     List.fold_left treat_one_action [post_cond] trans.actions
+                   let post_cond,_ =
+                     List.fold_left treat_one_action
+                       ([post_cond], Cil_datatype.Term_lval.Set.empty)
+                       trans.actions
                    in
                    let assigns = action_assigns trans in
                    let all_assigns = concat_assigns assigns all_assigns in
