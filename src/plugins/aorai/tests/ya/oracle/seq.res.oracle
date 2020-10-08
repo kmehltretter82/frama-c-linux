@@ -253,6 +253,11 @@ void f(void)
          (0 ≡ aorai_intermediate_state_2 ∨ ¬(aorai_counter < 2)) ∧
          0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state;
        ensures 0 ≡ aorai_intermediate_state_3;
+     
+     behavior aorai_counter_unchanged:
+       assumes 0 ≡ aorai_intermediate_state;
+       assumes 0 ≡ aorai_intermediate_state_0;
+       assumes 0 ≡ aorai_intermediate_state_2 ∨ ¬(aorai_counter < 2);
        ensures aorai_counter ≡ \old(aorai_counter);
    @/
   void g_pre_func(void)

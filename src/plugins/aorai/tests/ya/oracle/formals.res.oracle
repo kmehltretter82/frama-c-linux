@@ -95,7 +95,6 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      behavior buch_state_aorai_intermediate_state_out:
        assumes aorai_CurStates ≢ main_0 ∨ ¬(x ≡ 1);
        ensures aorai_CurStates ≢ aorai_intermediate_state;
-       ensures aorai_x ≡ \old(aorai_x);
      
      behavior buch_state_aorai_intermediate_state_0_out:
        ensures aorai_CurStates ≢ aorai_intermediate_state_0;
@@ -111,7 +110,6 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      behavior buch_state_aorai_intermediate_state_2_out:
        assumes aorai_CurStates ≢ main_0 ∨ ¬(x ≡ 3);
        ensures aorai_CurStates ≢ aorai_intermediate_state_2;
-       ensures aorai_x_0 ≡ \old(aorai_x_0);
      
      behavior buch_state_aorai_reject_out:
        ensures aorai_CurStates ≢ aorai_reject;
@@ -121,6 +119,14 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      
      behavior buch_state_main_0_out:
        ensures aorai_CurStates ≢ main_0;
+     
+     behavior aorai_x_0_unchanged:
+       assumes aorai_CurStates ≢ main_0 ∨ ¬(x ≡ 3);
+       ensures aorai_x_0 ≡ \old(aorai_x_0);
+     
+     behavior aorai_x_unchanged:
+       assumes aorai_CurStates ≢ main_0 ∨ ¬(x ≡ 1);
+       ensures aorai_x ≡ \old(aorai_x);
    @/
   void f_pre_func(int x)
   {
@@ -334,7 +340,6 @@ int f(int x)
      behavior buch_state_aorai_intermediate_state_1_out:
        assumes aorai_CurStates ≢ aorai_intermediate_state_0;
        ensures aorai_CurStates ≢ aorai_intermediate_state_1;
-       ensures aorai_y ≡ \old(aorai_y);
      
      behavior buch_state_aorai_intermediate_state_2_out:
        ensures aorai_CurStates ≢ aorai_intermediate_state_2;
@@ -352,6 +357,10 @@ int f(int x)
      
      behavior buch_state_main_0_out:
        ensures aorai_CurStates ≢ main_0;
+     
+     behavior aorai_y_unchanged:
+       assumes aorai_CurStates ≢ aorai_intermediate_state_0;
+       ensures aorai_y ≡ \old(aorai_y);
    @/
   void g_pre_func(int y)
   {

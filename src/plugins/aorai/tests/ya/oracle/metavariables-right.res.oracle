@@ -80,8 +80,6 @@ check lemma e_deterministic_trans{L}:
      behavior buch_state_c_out:
        assumes aorai_CurStates ≢ b;
        ensures aorai_CurStates ≢ c;
-       ensures aorai_y ≡ \old(aorai_y);
-       ensures aorai_x ≡ \old(aorai_x);
      
      behavior buch_state_d_out:
        ensures aorai_CurStates ≢ d;
@@ -100,6 +98,14 @@ check lemma e_deterministic_trans{L}:
      
      behavior buch_state_i_0_out:
        ensures aorai_CurStates ≢ i_0;
+     
+     behavior aorai_y_unchanged:
+       assumes aorai_CurStates ≢ b;
+       ensures aorai_y ≡ \old(aorai_y);
+     
+     behavior aorai_x_unchanged:
+       assumes aorai_CurStates ≢ b;
+       ensures aorai_x ≡ \old(aorai_x);
    @/
   void f_pre_func(int x)
   {
@@ -476,8 +482,6 @@ void h(int x)
      behavior buch_state_e_out:
        assumes aorai_CurStates ≢ h_0;
        ensures aorai_CurStates ≢ e;
-       ensures aorai_y ≡ \old(aorai_y);
-       ensures aorai_x ≡ \old(aorai_x);
      
      behavior buch_state_f_0_out:
        ensures aorai_CurStates ≢ f_0;
@@ -490,6 +494,14 @@ void h(int x)
      
      behavior buch_state_i_0_out:
        ensures aorai_CurStates ≢ i_0;
+     
+     behavior aorai_y_unchanged_0:
+       assumes aorai_CurStates ≢ h_0;
+       ensures aorai_y ≡ \old(aorai_y);
+     
+     behavior aorai_x_unchanged_0:
+       assumes aorai_CurStates ≢ h_0;
+       ensures aorai_x ≡ \old(aorai_x);
    @/
   void i_post_func(void)
   {

@@ -1629,27 +1629,59 @@ let get_accessible_transitions auto state status =
   Data_for_aorai.Aorai_state.Set.fold
     (fun s acc -> Path_analysis.get_edges s state auto @ acc) previous_set []
 
+let rec get_aux_var_bhv_name = function
+  | TVar v, _ ->
+    Data_for_aorai.get_fresh (v.lv_name ^ "_unchanged")
+  | lv ->
+    Aorai_option.fatal "unexpected lval for action variable: %a"
+      Printer.pp_term_lval lv
+
 (* Assumes that we don't have a multi-state here.
    pebbles are handled elsewhere
 *)
-let mk_unchanged_aux_vars trans =
-  let my_aux_vars = Cil_datatype.Term_lval.Set.empty in
-  let add_one_action acc = function
+let mk_unchanged_aux_vars_bhvs loc f st status =
+  let (states,_ as auto) = Data_for_aorai.getGraph() in
+  let add_state_trans acc state =
+    let trans = get_reachable_trans state st auto status in
+    List.rev_append trans acc
+  in
+  let crossable_trans =
+    List.fold_left add_state_trans [] states
+  in
+  let add_trans_aux_var trans map = function
     | Counter_init lv | Counter_incr lv | Copy_value (lv,_) ->
-      Cil_datatype.Term_lval.Set.add lv acc
-    | Pebble_init _ | Pebble_move _ -> acc
+      let other_trans =
+        match Cil_datatype.Term_lval.Map.find_opt lv map with
+        | Some l -> l
+        | None -> []
+      in
+      Cil_datatype.Term_lval.Map.add lv (trans :: other_trans) map
+    | Pebble_init _ | Pebble_move _ -> map
   in
-  let add_one_trans acc tr =
-    List.fold_left add_one_action acc tr.actions
+  let add_trans_aux_vars map trans =
+    List.fold_left (add_trans_aux_var trans) map trans.actions
   in
-  let my_aux_vars = List.fold_left add_one_trans my_aux_vars trans in
-  let treat_lval lv acc =
+  let possible_actions =
+    List.fold_left add_trans_aux_vars
+      Cil_datatype.Term_lval.Map.empty
+      crossable_trans
+  in
+  let out_trans trans =
+    Logic_const.new_predicate
+      (Logic_const.por ~loc
+         (is_out_of_state_pred trans.start,
+          Logic_const.pnot (crosscond_to_pred trans.cross f st)))
+  in
+  let mk_behavior lv trans acc =
+    let name = get_aux_var_bhv_name lv in
+    let assumes = List.map out_trans trans in
     let t = Data_for_aorai.tlval lv in
     let ot = Logic_const.told t in
     let p = Logic_const.prel (Req,t,ot) in
-    (Normal, Logic_const.new_predicate p) :: acc
+    let post_cond = [Normal, Logic_const.new_predicate p] in
+    Cil.mk_behavior ~name ~assumes ~post_cond () :: acc
   in
-  Cil_datatype.Term_lval.Set.fold treat_lval my_aux_vars []
+  Cil_datatype.Term_lval.Map.fold mk_behavior possible_actions []
 
 let mk_behavior ~loc auto kf e status state =
   Aorai_option.debug "analysis of state %s (%d)"
@@ -1779,7 +1811,7 @@ let mk_behavior ~loc auto kf e status state =
       else begin
         let post_cond =
           match state.multi_state with
-          | None -> mk_unchanged_aux_vars my_trans
+          | None -> [] (* Done elsewhere *)
           | Some (set,_) ->
             let set =
               Data_for_aorai.pebble_set_at set Logic_const.here_label
@@ -1874,8 +1906,11 @@ let auto_func_behaviors loc f st state =
   let global_behavior =
     Cil.mk_behavior ~requires ~post_cond ~assigns ()
   in
+  let non_action_behaviors =
+    mk_unchanged_aux_vars_bhvs loc f st state
+  in
   (* Keep behaviors ordered according to the states they describe *)
-  global_behavior :: (List.rev behaviors)
+  global_behavior :: (List.rev_append behaviors non_action_behaviors)
 
 
 let act_convert loc act res =

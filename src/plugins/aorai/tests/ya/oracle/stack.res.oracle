@@ -119,13 +119,17 @@ check lemma emptying_stack_deterministic_trans{L}:
      behavior buch_state_filled_stack_out:
        assumes aorai_CurStates ≢ filling_stack;
        ensures aorai_CurStates ≢ filled_stack;
-       ensures aorai_n ≡ \old(aorai_n);
      
      behavior buch_state_filling_stack_out:
        ensures aorai_CurStates ≢ filling_stack;
      
      behavior buch_state_init_out:
        ensures aorai_CurStates ≢ init;
+     
+     behavior aorai_n_unchanged:
+       assumes aorai_CurStates ≢ filling_stack;
+       assumes aorai_CurStates ≢ filling_stack;
+       ensures aorai_n ≡ \old(aorai_n);
    @/
   void push_post_func(void)
   {
@@ -226,7 +230,6 @@ void push(void)
      behavior buch_state_empty_stack_out:
        assumes aorai_CurStates ≢ emptying_stack ∨ ¬(aorai_n ≡ 1);
        ensures aorai_CurStates ≢ empty_stack;
-       ensures aorai_n ≡ \old(aorai_n);
      
      behavior buch_state_emptying_stack_out:
        ensures aorai_CurStates ≢ emptying_stack;
@@ -239,13 +242,17 @@ void push(void)
      behavior buch_state_filled_stack_out:
        assumes aorai_CurStates ≢ emptying_stack ∨ ¬(aorai_n > 1);
        ensures aorai_CurStates ≢ filled_stack;
-       ensures aorai_n ≡ \old(aorai_n);
      
      behavior buch_state_filling_stack_out:
        ensures aorai_CurStates ≢ filling_stack;
      
      behavior buch_state_init_out:
        ensures aorai_CurStates ≢ init;
+     
+     behavior aorai_n_unchanged_0:
+       assumes aorai_CurStates ≢ emptying_stack ∨ ¬(aorai_n > 1);
+       assumes aorai_CurStates ≢ emptying_stack ∨ ¬(aorai_n ≡ 1);
+       ensures aorai_n ≡ \old(aorai_n);
    @/
   void pop_post_func(void)
   {
@@ -315,7 +322,6 @@ void pop(void)
      behavior buch_state_empty_stack_out:
        assumes aorai_CurStates ≢ init;
        ensures aorai_CurStates ≢ empty_stack;
-       ensures aorai_n ≡ \old(aorai_n);
      
      behavior buch_state_emptying_stack_out:
        ensures aorai_CurStates ≢ emptying_stack;
@@ -328,6 +334,10 @@ void pop(void)
      
      behavior buch_state_init_out:
        ensures aorai_CurStates ≢ init;
+     
+     behavior aorai_n_unchanged_1:
+       assumes aorai_CurStates ≢ init;
+       ensures aorai_n ≡ \old(aorai_n);
    @/
   void main_pre_func(void)
   {
