@@ -250,7 +250,9 @@ struct
 
   let assume_vcs ?descr ?filter ?init whs vc =
     List.fold_left
-      (fun vc (warn,hyp) -> assume_vc ?descr ?filter ?init ~warn [hyp] vc)
+      (fun vc (warn, (hvalue, hinit)) ->
+         let vc = assume_vc ?descr ?filter ?init ~warn [hvalue] vc in
+         assume_vc ?descr ?filter ?init ~warn [hinit] vc)
       vc whs
 
   (* -------------------------------------------------------------------------- *)

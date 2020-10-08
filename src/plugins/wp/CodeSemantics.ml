@@ -443,14 +443,16 @@ struct
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
-           match init with
-           | Some e ->
-               let v = M.load sigma obj l in
-               p_equal (val_of_exp sigma e) (cval v)
-           | None -> is_zero sigma obj l
+           let value_hyp = match init with
+             | Some e ->
+                 let v = M.load sigma obj l in
+                 p_equal (val_of_exp sigma e) (cval v)
+             | None -> is_zero sigma obj l
+           in
+           value_hyp, (M.initialized sigma (Rloc(obj, l)))
         ) () in
     match outcome with
-    | Warning.Failed warn -> warn , F.p_true
+    | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
   let init_range ~sigma lv typ a b value =
@@ -460,14 +462,16 @@ struct
         (fun () ->
            let l = lval sigma lv in
            let e = Extlib.opt_map (exp sigma) value in
-           is_exp_range sigma l obj (e_bigint a) (e_bigint b) e
+           let a = e_bigint a and b = e_bigint b in
+           (is_exp_range sigma l obj a b e),
+           (M.initialized sigma (Rrange(l, obj, Some a, Some b)))
         ) () in
     match outcome with
-    | Warning.Failed warn -> warn , F.p_true
+    | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
 
-  type warned_hyp = Warning.Set.t * Lang.F.pred
+  type warned_hyp = Warning.Set.t * (Lang.F.pred * Lang.F.pred)
 
   (* Hypothesis for initialization of one variable *)
   let rec init_variable ~sigma lv init acc =

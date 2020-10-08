@@ -598,17 +598,23 @@ sig
   val unchanged : M.sigma -> M.sigma -> varinfo -> pred
   (** Express that a given variable has the same value in two memory states. *)
 
-  type warned_hyp = Warning.Set.t * pred
+  type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init : sigma:M.sigma -> varinfo -> init option -> warned_hyp list
-  (** Express that some variable has some initial value at the
-      given memory state.
+  val init :
+    sigma:M.sigma -> varinfo -> init option -> warned_hyp list
+    (** Express that some variable has some initial value at the
+        given memory state. The first predicate states the value,
+        the second, the initialization status.
 
-      Remark: [None] initializer are interpreted as zeroes. This is consistent
-      with the [init option] associated with global variables in CIL,
-      for which the default initializer are zeroes. There is no
-      [init option] value associated with local initializers.
-  *)
+        Note: we DO NOT merge values and initialization status
+        hypotheses as the factorization performed by Qed can make
+        predicates too hard to simplify later.
+
+        Remark: [None] initializer are interpreted as zeroes. This is consistent
+        with the [init option] associated with global variables in CIL,
+        for which the default initializer are zeroes. There is no
+        [init option] value associated with local initializers.
+    *)
 
 end
 

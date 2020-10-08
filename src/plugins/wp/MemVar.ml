@@ -1190,7 +1190,9 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-        let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
+        let xs = List.filter
+            (fun v -> not v.vformal && not v.vglob && not v.vdefined) xs
+        in
         let uninitialized v =
           let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
           Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
