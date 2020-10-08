@@ -98,8 +98,10 @@ autom4te.cache
 /doc/aorai/frama-c-aorai-example.tgz
 /doc/aorai/frama-c-aorai-example
 /doc/aorai/main.pdf
+/doc/aorai/ya_file.tex
 /doc/aorai/basic_ya.tex
 /doc/aorai/extended_ya.tex
+/doc/aorai/ya_variables.tex
 
 /doc/code/print_api/*.html
 /doc/code/print_api/*.dot
