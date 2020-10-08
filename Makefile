@@ -1708,7 +1708,10 @@ check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
 ALL_ML_FILES+=ptests/ptests.ml
+
+ifeq ($(origin MANUAL_ML_FILES),undefined)
 MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
+endif
 
 # Allow control of files to be linted/fixed by external sources
 # (e.g. pre-commit hook that will concentrate on files which have changed)
