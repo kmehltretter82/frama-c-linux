@@ -1957,7 +1957,7 @@ let mk_non_deterministic_stmt
   if is_reachable st status then begin
     let useful_trans =  get_accessible_transitions (states,tr) st status in
     let aux_stmts, new_vars, new_funcs, cond,stmt_from_action =
-     mk_transitions_stmt generated_kf loc f fst res useful_trans
+      mk_transitions_stmt generated_kf loc f fst res useful_trans
     in
     let then_stmt = is_state_non_det_stmt state loc in
     let else_stmt = [is_out_of_state_stmt state loc] in
@@ -1983,10 +1983,10 @@ let equalsStmt lval exp loc = (* assignment *)
 let mk_deterministic_body generated_kf loc f st status res =
   let (states, _ as auto) = Data_for_aorai.getGraph() in
   let aux_stmts, aux_funcs, aux_vars, trans_stmts =
-  List.fold_right
-    (mk_deterministic_stmt generated_kf loc auto f st status res)
-    states
-    ([], Cil_datatype.Varinfo.Set.empty, [],[])
+    List.fold_right
+      (mk_deterministic_stmt generated_kf loc auto f st status res)
+      states
+      ([], Cil_datatype.Varinfo.Set.empty, [],[])
   in
   aux_funcs, aux_vars, aux_stmts @ trans_stmts
 
