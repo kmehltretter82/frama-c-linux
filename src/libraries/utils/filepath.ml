@@ -282,7 +282,14 @@ module Normalized = struct
       let p = insert cwd name in
       let buf = Buffer.create 80 in
       let res = add_uri_path buf p in
-      res, Buffer.contents buf
+      let uri =
+        Buffer.contents buf in
+      let uri =
+        try
+          String.sub uri 1 (String.length uri - 1)
+        with Invalid_argument _ -> uri
+      in
+      res, uri
     end
 end
 
