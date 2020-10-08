@@ -1,0 +1,5 @@
+(install
+ (package frama-c)
+ (section bin)
+ (files frama-c-script)
+)
