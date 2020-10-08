@@ -159,7 +159,7 @@ let gen_statuses () =
 
 let gen_artifacts () =
   let add_src_file f =
-    let uri = (f:Filepath.Normalized.t :> string) in
+    let uri = Filepath.Normalized.to_pretty_string f in
     let location = ArtifactLocation.create ~uri () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
@@ -192,7 +192,19 @@ let gen_run remarks =
   let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
-  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts ()
+  let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
+  let uriBasesJson =
+    List.fold_left (fun acc (name, dir) ->
+        (name, `Assoc [("uri", `String dir)]) :: acc
+      ) [] uriBases
+  in
+  let originalUriBaseIds =
+    match ArtifactLocationDictionary.of_yojson (`Assoc uriBasesJson) with
+    | Ok x -> x
+    | Error s -> failwith s
+  in
+  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts
+    ~originalUriBaseIds ()
 
 let generate () =
   let remarks = get_remarks () in

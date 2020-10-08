@@ -98,10 +98,8 @@ module ArtifactLocation = struct
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let open Filepath in
-    (* by construction, we have an absolute path here, no need for uriBase *)
-    let uri = ((fst loc).pos_path :> string) in
-    create ~uri ()
+    let uriBaseId, uri = Filepath.(Normalized.to_base_uri (fst loc).pos_path) in
+    create ~uri ?uriBaseId ()
 end
 
 module ArtifactLocationDictionary = Json_dictionary(ArtifactLocation)
