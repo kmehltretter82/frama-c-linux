@@ -88,7 +88,7 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
 # directory containing frama-c, frama-c-config and frama-c-script.
 export FRAMAC_BIN="$DIR"
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
+FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
