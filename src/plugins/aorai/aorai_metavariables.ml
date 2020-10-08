@@ -27,6 +27,7 @@ open Cil_types
 open Promelaast
 
 
+
 let dkey_metavar_init = Aorai_option.register_category "metavar-init"
 
 module type InitAnalysisParam =
@@ -63,29 +64,6 @@ struct
     | InitializedSet s1, InitializedSet s2 ->
       InitializedSet (Set.inter s1 s2)
 
-  let used_metavariables cond =
-    let result = ref Set.empty in
-    let visit_term =
-      let v = object
-        inherit Visitor.frama_c_inplace
-        method!vlogic_var_use lv =
-          match lv.lv_origin with
-          | Some vi when Env.is_metavariable vi ->
-            result := Set.add vi !result;
-            Cil.SkipChildren
-          | _ -> Cil.SkipChildren
-      end in
-      fun t -> ignore (Visitor.visitFramacTerm v t)
-    in
-    let rec visit_cond = function
-      | TAnd (c1,c2) | TOr (c1,c2) -> visit_cond c1; visit_cond c2
-      | TNot (c) -> visit_cond c
-      | TRel (_,t1,t2) -> visit_term t1; visit_term t2
-      | TCall _ | TReturn _ | TTrue | TFalse -> ()
-    in
-    visit_cond cond;
-    !result
-
   let pretty_state fmt st =
     Format.pp_print_string fmt st.Promelaast.name
 
@@ -101,28 +79,49 @@ struct
   let _pretty_data fmt = function
     | Bottom -> Format.printf "Bottom"
     | InitializedSet set -> pretty_set fmt set
+  
+  let check (src,tr,dst) used initialized =
+    let diff = Set.diff used initialized in
+    if not (Set.is_empty diff) then
+      Aorai_option.abort
+        "The metavariables %a may not be initialized before the transition \
+         from %a to %a:@\n%a"
+        pretty_set diff
+        pretty_state src
+        pretty_state dst
+        pretty_trans tr
 
-  let alarm (src,tr,dst) vars =
-    Aorai_option.abort
-      "The metavariables %a may not be initialized before the transition \
-       from %a to %a:@\n%a"
-      pretty_set vars
-      pretty_state src
-      pretty_state dst
-      pretty_trans tr
+  let term_mvars t =
+    let result = ref Set.empty in
+    let v = object
+      inherit Visitor.frama_c_inplace
+      method!vlogic_var_use lv =
+        match lv.lv_origin with
+        | Some vi when Env.is_metavariable vi ->
+          result := Set.add vi !result;
+          Cil.SkipChildren
+        | _ -> Cil.SkipChildren
+    end in
+    ignore (Visitor.visitFramacTerm v t);
+    !result
+
+  let rec cond_mvars = function
+    | TAnd (c1,c2) | TOr (c1,c2) -> Set.union (cond_mvars c1) (cond_mvars c2)
+    | TNot (c) -> cond_mvars c
+    | TRel (_,t1,t2) -> Set.union (term_mvars t1) (term_mvars t2)
+    | TCall _ | TReturn _ | TTrue | TFalse -> Set.empty
 
   let analyze ((src,tr,dst) as edge) = function
     | Bottom -> Bottom
     | InitializedSet initialized ->
       (* Check that the condition uses only initialized variables *)
-      let used = used_metavariables tr.cross in
-      let diff = Set.diff used initialized in
-      if not (Set.is_empty diff) then
-        alarm edge diff;
-      (* Add variables initialized by the condition *)
-      let add set = function
-        | Copy_value ((TVar({lv_origin = Some vi}),_),_) -> Set.add vi set
-        | _ -> set
+      check edge (cond_mvars tr.cross) (initialized);
+      (* Add initialized variables and check the right hand side *)
+      let add initialized = function
+        | Copy_value ((TVar({lv_origin = Some vi}),_),t) ->
+          check edge (term_mvars t) initialized;
+          Set.add vi initialized
+        | _ -> initialized
       in
       let initialized' = List.fold_left add initialized tr.actions in
       Aorai_option.debug ~dkey "%a {%a} -> %a {%a}"

@@ -62,7 +62,7 @@ check lemma e_deterministic_trans{L}:
   /@ requires aorai_CurStates ≡ b;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
-     assigns aorai_y, aorai_x, aorai_CurOpStatus, aorai_CurOperation,
+     assigns aorai_x, aorai_y, aorai_CurOpStatus, aorai_CurOperation,
              aorai_CurStates;
      
      behavior buch_state_a_out:
@@ -74,8 +74,8 @@ check lemma e_deterministic_trans{L}:
      behavior buch_state_c_in_0:
        assumes aorai_CurStates ≡ b;
        ensures aorai_CurStates ≡ c;
-       ensures aorai_y ≡ \old(aorai_x);
        ensures aorai_x ≡ \old(x);
+       ensures aorai_y ≡ \old(aorai_x);
      
      behavior buch_state_c_out:
        assumes aorai_CurStates ≢ b;
@@ -113,8 +113,8 @@ check lemma e_deterministic_trans{L}:
     aorai_CurOperation = op_f;
     if (1 == aorai_CurStates) {
       aorai_CurStates = c;
-      aorai_y = aorai_x;
       aorai_x = x;
+      aorai_y = aorai_x;
     }
     return;
   }
