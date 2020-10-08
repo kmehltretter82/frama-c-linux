@@ -6,8 +6,8 @@
 [wp] [Qed] Goal typed_l_int_assert_SUCCS : Valid
 [wp] [Qed] Goal typed_l_int_assert_SUCCS_2 : Valid
 [wp] [Alt-Ergo] Goal typed_l_int_check_FAILS : Unsuccess
-[wp] [Alt-Ergo] Goal typed_l_array_assert_SUCCS : Valid (missing cache)
-[wp] [Alt-Ergo] Goal typed_l_array_assert_SUCCS_2 : Valid (missing cache)
+[wp] [Alt-Ergo] Goal typed_l_array_assert_SUCCS : Valid
+[wp] [Alt-Ergo] Goal typed_l_array_assert_SUCCS_2 : Valid
 [wp] [Alt-Ergo] Goal typed_l_array_check_FAILS : Unsuccess
 [wp] [Qed] Goal typed_l_struct_assert_SUCCS : Valid
 [wp] [Qed] Goal typed_l_struct_assert_SUCCS_2 : Valid

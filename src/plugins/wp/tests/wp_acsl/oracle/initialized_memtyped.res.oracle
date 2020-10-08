@@ -52,6 +52,26 @@ Prove: (Init_0[px_0]=true).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function ptr_on_local
+------------------------------------------------------------
+
+Goal Assertion 'provable' (file tests/wp_acsl/initialized_memtyped.i, line 89):
+Let a = global(L_x_63).
+Assume {
+  (* Heap *)
+  Type: cinits(Init_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 2).
+  (* Initializer *)
+  Init: (Init_0[shift_sint32(a, 0)]=true).
+  (* Initializer *)
+  Init: forall i_1 : Z. ((0 < i_1) -> ((i_1 <= 2) ->
+      (Init_0[shift_sint32(a, i_1)]=true))).
+}
+Prove: (Init_0[shift_sint32(a, i)]=true).
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function test
 ------------------------------------------------------------
 
