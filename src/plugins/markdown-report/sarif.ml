@@ -460,6 +460,7 @@ module Driver = struct
     semanticVersion: (string [@default ""]);
     fileVersion: (string [@default ""]);
     downloadUri: (string [@default ""]);
+    informationUri: (string [@default ""]);
     sarifLoggerVersion: (string [@default ""]);
     language: (string [@default "en-US"]);
     properties: (Properties.t [@default Properties.default]);
@@ -472,13 +473,14 @@ module Driver = struct
       ?(semanticVersion="")
       ?(fileVersion="")
       ?(downloadUri="")
+      ?(informationUri="")
       ?(sarifLoggerVersion="")
       ?(language="en-US")
       ?(properties=Properties.default)
       ()
     =
     { name; fullName; version; semanticVersion; fileVersion;
-      downloadUri; sarifLoggerVersion; language; properties }
+      downloadUri; informationUri; sarifLoggerVersion; language; properties }
 
   let default = create ~name:"" ()
 end

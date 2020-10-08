@@ -28,8 +28,10 @@ let frama_c_sarif =
   let semanticVersion = Fc_config.version in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
+  let informationUri = "https://frama-c.com" in
   Tool.create
-    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri ())
+    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri
+       ~informationUri ())
 
 let get_remarks () =
   let f = Mdr_params.Remarks.get () in
@@ -226,7 +228,7 @@ let gen_run remarks =
   let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
-        (name, `Assoc [("uri", `String dir)]) :: acc
+        (name, `Assoc [("uri", `String ("file://" ^ dir ^ "/"))]) :: acc
       ) [] uriBases
   in
   let originalUriBaseIds =

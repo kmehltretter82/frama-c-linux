@@ -10,7 +10,8 @@
           "fullName": "frama-c-21.1+dev (Scandium)",
           "version": "21.1+dev (Scandium)",
           "semanticVersion": "21.1+dev",
-          "downloadUri": "https://frama-c.com/download.html"
+          "downloadUri": "https://frama-c.com/download.html",
+          "informationUri": "https://frama-c.com"
         }
       },
       "invocations": [
@@ -28,11 +29,14 @@
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_SHARE" },
-        "FRAMAC_LIB": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_LIB" },
-        "FRAMAC_PLUGIN": { "uri": "REPLACED_FOR_PTESTS_FRAMAC_PLUGIN" },
+        "FRAMAC_SHARE": { "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_SHARE/" },
+        "FRAMAC_LIB": { "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_LIB/" },
+        "FRAMAC_PLUGIN": {
+          "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_PLUGIN/"
+        },
         "PWD": {
-          "uri": "REPLACED_FOR_PTESTS_PWD"
+          "uri":
+            "file://REPLACED_FOR_PTESTS_PWD/"
         }
       },
       "artifacts": [
