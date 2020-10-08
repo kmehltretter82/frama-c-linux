@@ -79,7 +79,7 @@ struct
   let _pretty_data fmt = function
     | Bottom -> Format.printf "Bottom"
     | InitializedSet set -> pretty_set fmt set
-  
+
   let check (src,tr,dst) used initialized =
     let diff = Set.diff used initialized in
     if not (Set.is_empty diff) then
