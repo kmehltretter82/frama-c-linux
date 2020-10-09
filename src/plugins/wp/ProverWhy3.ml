@@ -1252,6 +1252,7 @@ let batch pconf driver ?script ~timeout ~steplimit prover task =
     | Some _, Some _ -> true
     | Some _, None -> false
   in
+  let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
   let inplace = if script <> None then Some true else None in
   let call = Why3.Driver.prove_task_prepared ?old:script ?inplace

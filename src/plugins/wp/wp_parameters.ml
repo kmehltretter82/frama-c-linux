@@ -155,21 +155,20 @@ let iter_fct phi = function
         (fun kf -> if not (Fct.mem kf fs) then phi kf)
   | Fct_list fs -> Fct.iter phi fs
 
-let get_kf () =
+let get_kfs () =
   if Functions.is_empty() then
     if SkipFunctions.is_empty () then Fct_all
     else Fct_skip (SkipFunctions.get())
   else
     Fct_list (Fct.diff (Functions.get()) (SkipFunctions.get()))
 
-let get_wp () =
+let get_fct () =
   if WP.get () || not (Functions.is_empty()) ||
      not (Behaviors.is_empty()) || not (Properties.is_empty())
-  then get_kf ()
+  then get_kfs ()
   else Fct_none
 
-let iter_wp f = iter_fct f (get_wp ())
-let iter_kf f = iter_fct f (get_kf ())
+let iter_kf f = iter_fct f (get_fct ())
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Memory Models                                                   --- *)
