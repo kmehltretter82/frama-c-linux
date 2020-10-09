@@ -175,3 +175,5 @@ val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 val cat_print_generated: category
+
+val protect : exn -> bool
