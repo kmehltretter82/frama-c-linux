@@ -1208,6 +1208,7 @@ let get_temp_name ghost () =
 (* Create a new temporary variable *)
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
+  let t' = Cil.typeRemoveAttributes ["const"] t' in
   let name = get_temp_name ghost () in
   let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
