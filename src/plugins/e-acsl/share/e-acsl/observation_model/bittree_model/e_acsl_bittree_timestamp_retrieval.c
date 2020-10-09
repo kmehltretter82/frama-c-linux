@@ -42,7 +42,7 @@ uintptr_t temporal_referent_shadow(void *ptr) {
     "referent timestamp on unallocated memory address %a", (uintptr_t)ptr);
   private_assert(blk->temporal_shadow != NULL,
     "no temporal shadow of block with base address", (uintptr_t)blk->ptr);
-  return (uintptr_t)blk->temporal_shadow + offset(ptr);
+  return (uintptr_t)blk->temporal_shadow + eacsl_offset(ptr);
 }
 
 uint32_t referent_timestamp(void *ptr) {

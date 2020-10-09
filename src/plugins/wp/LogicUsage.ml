@@ -68,6 +68,7 @@ type logic_lemma = {
   lem_property : predicate ;
   lem_depends : logic_lemma list ;
   (* global lemmas declared before in AST order (in reverse order) *)
+  lem_attrs : attributes ;
 }
 
 type axiomatic = {
@@ -203,10 +204,11 @@ let ip_lemma l =
   mk_prop
     {il_name = l.lem_name; il_labels = l.lem_labels;
      il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
+     il_attrs = l.lem_attrs;
      il_pred = Logic_const.toplevel_predicate ~only_check l.lem_property}
 
 let lemma_of_global ~context = function
-  | Dlemma(name,axiom,labels,types,pred,_,loc) ->
+  | Dlemma(name,axiom,labels,types,pred,attrs,loc) ->
       let kind = if axiom then `Axiom else
         if pred.tp_only_check then `Check else `Lemma in
       {
@@ -217,6 +219,7 @@ let lemma_of_global ~context = function
         lem_kind = kind ;
         lem_property = pred.tp_statement ;
         lem_depends = context ;
+        lem_attrs = attrs ;
       }
   | _ -> assert false
 

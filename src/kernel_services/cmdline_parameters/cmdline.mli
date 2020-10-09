@@ -239,11 +239,6 @@ val list_plugins: unit -> exit
   (** Display the list of installed plug-ins 
       @since Magnesium-20151001 *)
 
-(** Display the list of all installed plug-ins and their options, in
-    a condensed format. Used for zsh autocompletion.
-    @since Phosphorus-20170501-beta1 *)
-val list_all_plugin_options : print_invisible:bool -> exit
-
 val explain_cmdline : unit -> exit
 
 val plugin_help: string -> exit

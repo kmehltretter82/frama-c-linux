@@ -1533,7 +1533,11 @@ struct
           (M.domain obj (mloc_of_loc l)) Heap.Set.empty
 
   let is_well_formed sigma =
-    M.is_well_formed sigma.mem
+    let cstrs = ref [] in
+    SIGMA.iter
+      (fun v c -> cstrs := Cvalues.has_ctype v.vtype (e_var c) :: !cstrs)
+      sigma.vars ;
+    p_conj ((M.is_well_formed sigma.mem) :: !cstrs)
 
   (* -------------------------------------------------------------------------- *)
 

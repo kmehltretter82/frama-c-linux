@@ -41,6 +41,7 @@ val compare : t -> t -> int
 val provers : unit -> t list
 val provers_set : unit -> Why3.Whyconf.Sprover.t
 val is_available : t -> bool
+val is_mainstream : t -> bool
 val has_shortcut : t -> string -> bool
 
 (**************************************************************************)

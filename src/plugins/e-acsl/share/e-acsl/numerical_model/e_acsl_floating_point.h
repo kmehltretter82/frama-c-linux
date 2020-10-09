@@ -30,10 +30,10 @@
 
 #include "../internals/e_acsl_alias.h"
 
-#define math_HUGE_VAL             export_alias(math_HUGE_VAL)
-#define math_HUGE_VALF            export_alias(math_HUGE_VALF)
-#define math_INFINITY             export_alias(math_INFINITY)
-#define floating_point_exception  export_alias(floating_point_exception)
+#define eacsl_math_HUGE_VAL             export_alias(math_HUGE_VAL)
+#define eacsl_math_HUGE_VALF            export_alias(math_HUGE_VALF)
+#define eacsl_math_INFINITY             export_alias(math_INFINITY)
+#define eacsl_floating_point_exception  export_alias(floating_point_exception)
 
 /* Below variables hold infinity values for floating points defined in math.h.
    Most of them are defined as macros that expand to built-in function calls.
@@ -50,13 +50,13 @@
 */
 
 /** \brief Positive infinity for doubles: same as HUGE_VAL */
-extern double math_HUGE_VAL
+extern double eacsl_math_HUGE_VAL
   __attribute__((FC_BUILTIN));
 /** \brief Positive infinity for floats: same as HUGE_VALF */
-extern float  math_HUGE_VALF
+extern float  eacsl_math_HUGE_VALF
   __attribute__((FC_BUILTIN));
 /** \brief Representation of infinity value for doubles: same as INFINITY */
-extern double math_INFINITY
+extern double eacsl_math_INFINITY
   __attribute__((FC_BUILTIN));
 
 /* FIXME: An additional variable that should be added to this list is
@@ -67,7 +67,7 @@ extern double math_INFINITY
 
 void init_infinity_values();
 
-void floating_point_exception(const char *exp)
+void eacsl_floating_point_exception(const char *exp)
   __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_FLOATING_POINT_H

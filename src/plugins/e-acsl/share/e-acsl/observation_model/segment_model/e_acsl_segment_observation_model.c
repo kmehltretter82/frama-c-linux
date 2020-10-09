@@ -41,7 +41,7 @@
 #include "../internals/e_acsl_timestamp_retrieval.h"
 #include "../e_acsl_observation_model.h"
 
-void * store_block(void *ptr, size_t size) {
+void * eacsl_store_block(void *ptr, size_t size) {
   /* Only stack-global memory blocks are recorded explicitly via this function.
      Heap blocks should be tracked internally using memory allocation functions
      such as malloc or calloc. */
@@ -49,22 +49,22 @@ void * store_block(void *ptr, size_t size) {
   return ptr;
 }
 
-void delete_block(void *ptr) {
+void eacsl_delete_block(void *ptr) {
   /* Block deletion should be performed on stack/global addresses only,
    * heap blocks should be deallocated manually via free/cfree/realloc. */
   shadow_freea(ptr);
 }
 
-void * store_block_duplicate(void *ptr, size_t size) {
+void * eacsl_store_block_duplicate(void *ptr, size_t size) {
   if (allocated((uintptr_t)ptr, size, (uintptr_t)ptr))
-    delete_block(ptr);
+    eacsl_delete_block(ptr);
   shadow_alloca(ptr, size);
   return ptr;
 }
 
 /*! \brief Initialize a chunk of memory given by its start address (`addr`)
  * and byte length (`n`). */
-void initialize(void *ptr, size_t n) {
+void eacsl_initialize(void *ptr, size_t n) {
   TRY_SEGMENT(
     (uintptr_t)ptr,
     initialize_heap_region((uintptr_t)ptr, n),
@@ -72,11 +72,11 @@ void initialize(void *ptr, size_t n) {
   )
 }
 
-void full_init(void *ptr) {
-  initialize(ptr, _block_length(ptr));
+void eacsl_full_init(void *ptr) {
+  eacsl_initialize(ptr, _block_length(ptr));
 }
 
-void mark_readonly(void *ptr) {
+void eacsl_mark_readonly(void *ptr) {
   mark_readonly_region((uintptr_t)ptr, _block_length(ptr));
 }
 
@@ -84,8 +84,10 @@ void mark_readonly(void *ptr) {
 /* E-ACSL annotations {{{ */
 /* ********************** */
 
-int valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
+int eacsl_valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
+    size == 0
+    ||
     allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
     && !readonly(ptr)
 #ifdef E_ACSL_TEMPORAL
@@ -94,8 +96,11 @@ int valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
   ;
 }
 
-int valid_read(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
-  return allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+int eacsl_valid_read(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
+  return
+    size == 0
+    ||
+    allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
@@ -105,7 +110,7 @@ int valid_read(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
 /*! NB: The implementation for this function can also be specified via
    \p _base_addr macro that will eventually call ::TRY_SEGMENT. The following
    implementation is preferred for performance reasons. */
-void * base_addr(void *ptr) {
+void * eacsl_base_addr(void *ptr) {
   TRY_SEGMENT(ptr,
     return (void*)heap_info((uintptr_t)ptr, 'B'),
     return (void*)static_info((uintptr_t)ptr, 'B'));
@@ -115,21 +120,21 @@ void * base_addr(void *ptr) {
 /*! NB: Implementation of the following function can also be specified
    via \p _block_length macro. A more direct approach via ::TRY_SEGMENT
    is preferred for performance reasons. */
-size_t block_length(void *ptr) {
+size_t eacsl_block_length(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'L'),
     return static_info((uintptr_t)ptr, 'L'))
   return 0;
 }
 
-size_t offset(void *ptr) {
+size_t eacsl_offset(void *ptr) {
   TRY_SEGMENT(ptr,
     return heap_info((uintptr_t)ptr, 'O'),
     return static_info((uintptr_t)ptr, 'O'));
   return 0;
 }
 
-int initialized(void *ptr, size_t size) {
+int eacsl_initialized(void *ptr, size_t size) {
   uintptr_t addr = (uintptr_t)ptr;
   TRY_SEGMENT_WEAK(addr,
     return heap_initialized(addr, size),
@@ -180,9 +185,9 @@ static void argv_alloca(int *argc_ref,  char *** argv_ref) {
   /* Fill temporal shadow */
   int i;
   argv = *argv_ref;
-  temporal_store_nblock(argv_ref, *argv_ref);
+  eacsl_temporal_store_nblock(argv_ref, *argv_ref);
   for (i = 0; i < argc; i++)
-    temporal_store_nblock(argv + i, *(argv+i));
+    eacsl_temporal_store_nblock(argv + i, *(argv+i));
 #endif
 
   while (*environ) {
@@ -208,7 +213,7 @@ void mspaces_init() {
   static char already_run = 0;
   if (! already_run) {
     describe_run();
-    make_memory_spaces(64*MB, get_heap_size());
+    eacsl_make_memory_spaces(64*MB, get_heap_size());
     /* Allocate and log shadow memory layout of the execution.
        Case of the heap, globals and tls. */
     init_shadow_layout_heap_global_tls();
@@ -216,7 +221,7 @@ void mspaces_init() {
   }
 }
 
-void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
+void eacsl_memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
   /* [already_run] avoids reentrancy issue (see Gitlab issue #83),
      e.g. in presence of a recursive call to 'main' */
   static char already_run = 0;
@@ -250,14 +255,14 @@ void memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
       uintptr_t len = loc->length;
       shadow_alloca(addr, len);
       if (loc->is_initialized)
-        initialize(addr, len);
+        eacsl_initialize(addr, len);
     }
     init_infinity_values();
     already_run = 1;
   }
 }
 
-void memory_clean(void) {
+void eacsl_memory_clean(void) {
   clean_shadow_layout();
   report_heap_leaks();
 }

@@ -50,6 +50,12 @@ val ptr_index: ?loc:location -> ?index:exp -> exp
 (** Split pointer-arithmetic expression of the type [p + i] into its
     pointer and integer parts. *)
 
+val ptr_base: loc:location -> exp -> exp * exp
+(* Takes an expression [e] and return a tuple [(base, base_addr)] where [base]
+   is the address [p] if [e] is of the form [p + i] and [e] otherwise, and
+   [base_addr] is the address [&p] if [e] is of the form [p + i] and 0
+   otherwise. *)
+
 val term_of_li: logic_info -> term
 (** [term_of_li li] assumes that [li.l_body] matches [LBterm t]
     and returns [t]. *)
@@ -67,10 +73,6 @@ val is_bitfield_pointers: logic_type -> bool
 val term_has_lv_from_vi: term -> bool
 (** @return true iff the given term contains a variables that originates from
     a C varinfo, that is a non-purely logic variable. *)
-
-val mk_ptr_sizeof: typ -> location -> exp
-(** [mk_ptr_sizeof ptr_typ loc] takes the pointer typ [ptr_typ] that points
-    to a [typ] typ and returns [sizeof(typ)]. *)
 
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)

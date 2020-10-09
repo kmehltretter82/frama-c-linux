@@ -94,6 +94,7 @@ let print_wp s =
 let title p = Pretty_utils.sfprintf "%a" Why3.Whyconf.print_prover p
 let name p = p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
+let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))

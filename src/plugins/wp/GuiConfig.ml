@@ -24,51 +24,29 @@
 (* ---  Prover List in Configuration                                    --- *)
 (* ------------------------------------------------------------------------ *)
 
-class provers key =
+module S = Why3.Whyconf.Sprover
+module M = Why3.Whyconf.Mprover
+
+class provers =
   object(self)
-    inherit [Why3.Whyconf.Sprover.t] Wutil.selector Why3.Whyconf.Sprover.empty
-
-    method private load () =
-      let open Gtk_helper.Configuration in
-      let prover_of_conf acc = function
-        | ConfList [ConfString prover_name;
-                    ConfString prover_version;
-                    ConfString prover_altern] ->
-            Why3.Whyconf.Sprover.add
-              Why3.Whyconf.{ prover_name; prover_version; prover_altern }
-              acc
-        | _ -> acc in
-      try
-        let data = Gtk_helper.Configuration.find key in
-        match data with
-        | ConfList data ->
-            (List.fold_left prover_of_conf Why3.Whyconf.Sprover.empty data)
-        | _ -> Why3.Whyconf.Sprover.empty
-      with Not_found -> Why3.Whyconf.Sprover.empty
-
-    method private save () =
-      let open Gtk_helper.Configuration in
-      let conf_of_prover dp = ConfList Why3.Whyconf.[ConfString dp.prover_name;
-                                                     ConfString dp.prover_version;
-                                                     ConfString dp.prover_altern] in
-      Gtk_helper.Configuration.set key
-        (ConfList (List.map conf_of_prover
-                     (Why3.Whyconf.Sprover.elements self#get)))
+    inherit [S.t] Wutil.selector S.empty
 
     initializer
       begin
-        let settings = self#load () in
         (** select automatically the provers set on the command line *)
-        let cmdline = Wp_parameters.Provers.get () in
+        let cmdline =
+          match Wp_parameters.Provers.get () with
+          | [] -> [ "alt-ergo" ]
+          | prvs -> prvs
+        in
         let selection = List.fold_left
             (fun acc e ->
                match Why3Provers.find_opt e with
                | None -> acc
-               | Some p -> Why3.Whyconf.Sprover.add p acc)
-            settings cmdline
+               | Some p -> S.add p acc)
+            S.empty cmdline
         in
         self#set selection ;
-        self#on_event self#save ;
       end
 
   end
@@ -88,13 +66,14 @@ class dp_chooser
   let array = new Wpane.warray () in
   object(self)
 
-    val mutable selected = Why3.Whyconf.Mprover.empty
+    val mutable mainstream = true
+    val mutable selected = M.empty
 
     method private enable dp e =
-      selected <- Why3.Whyconf.Mprover.add dp e selected
+      selected <- M.add dp e selected
 
     method private lookup dp =
-      Why3.Whyconf.Mprover.find dp selected
+      try M.find dp selected with Not_found -> false
 
     method private entry dp =
       let text = Why3Provers.title dp in
@@ -117,23 +96,30 @@ class dp_chooser
         array#update () ;
       end
 
-    method private detect () =
+    method private provers =
+      let filter p =
+        self#lookup p || not mainstream || Why3Provers.is_mainstream p
+      in S.filter filter (Why3Provers.provers_set ())
+
+    method private filter () =
       begin
-        self#configure (Why3Provers.provers_set ());
+        mainstream <- not mainstream ;
+        self#configure self#provers ;
       end
 
     method private apply () =
       provers#set
-        (Why3.Whyconf.Mprover.map_filter
+        (M.map_filter
            (function
              | true -> Some ()
              | false -> None)
            selected)
 
     method run () =
-      let dps = Why3Provers.provers_set () in
+      selected <- M.empty ;
+      let dps = self#provers in
       let sel = provers#get in
-      selected <- Why3.Whyconf.Mprover.merge
+      selected <- M.merge
           (fun _ avail enab ->
              match avail, enab with
              | None, _ -> None
@@ -145,7 +131,8 @@ class dp_chooser
 
     initializer
       begin
-        dialog#button ~action:(`ACTION self#detect) ~label:"Detect Provers" () ;
+        dialog#button ~action:(`ACTION self#filter) ~label:"Filter"
+          ~tooltip:"Switch to main stream / alternative solvers" () ;
         dialog#button ~action:(`CANCEL) ~label:"Cancel" () ;
         dialog#button ~action:(`APPLY) ~label:"Apply" () ;
         array#set_entry self#entry ;

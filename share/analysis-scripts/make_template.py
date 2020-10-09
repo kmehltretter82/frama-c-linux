@@ -31,6 +31,7 @@ import re
 import shutil
 import shlex
 import glob
+import json
 from subprocess import Popen, PIPE
 from pathlib import Path
 import function_finder
@@ -44,15 +45,15 @@ if len(sys.argv) > 2:
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")
     sys.exit(1)
 
-framac_in_path = False
-if os.environ.get("FRAMAC"):
-    framac = os.environ["FRAMAC"]
-if not framac or not os.path.isfile(framac):
-    framac_in_path = True
-    framac = shutil.which("frama-c")
-    if not framac:
-        sys.exit("error: frama-c must be in the PATH, "\
-                 "or in environment variable FRAMAC")
+# Note: if Frama-C is in the path, ignore the one in FRAMAC_BIN
+framac = shutil.which("frama-c")
+if framac:
+    framac_bin = Path(os.path.dirname(os.path.abspath(framac)))
+else:
+    framac_bin = os.getenv('FRAMAC_BIN')
+    if not framac_bin:
+        sys.exit("error: FRAMAC_BIN not in environment")
+    framac_bin = Path(framac_bin)
 
 jcdb = Path("compile_commands.json")
 
@@ -72,47 +73,34 @@ if "PTESTS_TESTING" in os.environ:
     fc_stubs_c.touch()
     gnumakefile.touch()
 
-bindir = Path(os.path.dirname(os.path.abspath(framac)))
-frama_c_config = bindir / "frama-c-config"
-process = Popen([frama_c_config, "-share"], stdout=PIPE)
+process = Popen([framac_bin / "frama-c", "-print-config-json"], stdout=PIPE)
 (output, err) = process.communicate()
-output = output.decode('utf-8')
 exit_code = process.wait()
 if exit_code != 0:
-    sys.exit("error running frama-c-config")
-sharedir = Path(output)
+    sys.exit(f"error running frama-c -print-share-path")
 
-def get_known_machdeps():
-    process = Popen([bindir / "frama-c", "-machdep", "help"], stdout=PIPE)
-    (output, err) = process.communicate()
-    output = output.decode('utf-8')
-    exit_code = process.wait()
-    if exit_code != 0:
-        sys.exit("error getting machdeps: " + output)
-    match = re.match("\[kernel\] supported machines are (.*) \(default is (.*)\).", output, re.DOTALL)
-    if not match:
-        sys.exit("error getting known machdeps: " + output)
-    machdeps = match.group(1).split()
-    default_machdep = match.group(2)
-    return (default_machdep, machdeps)
+fc_config = json.loads(output.decode('utf-8'))
+sharedir = Path(fc_config['datadir'])
+default_machdep = fc_config['current_machdep']
+machdeps = fc_config['machdeps']
 
 def check_path_exists(path):
-    if os.path.exists(path):
+    if path.exists():
         yn = input(f"warning: {path} already exists. Overwrite? [y/N] ")
         if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
             print("Exiting without overwriting.")
             sys.exit(0)
-    pathdir = os.path.dirname(path)
-    if not os.path.exists(pathdir):
+    pathdir = path.parent
+    if not pathdir.exists():
         yn = input(f"warning: directory '{pathdir}' does not exit. Create it? [y/N] ")
         if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
             print("Exiting without creating.")
             sys.exit(0)
-        Path(pathdir).mkdir(parents=True, exist_ok=False)
+        pathdir.mkdir(parents=True, exist_ok=False)
 
 check_path_exists(gnumakefile)
 main = input("Main target name: ")
-if not re.match("^[a-zA-Z_0-9]+$", main):
+if not re.match("^[a-zA-Z_0-9-]+$", main):
     sys.exit("error: invalid main target name (can only contain letters, digits, dash or underscore)")
 
 main_fun_finder_re = function_finder.prepare("main")
@@ -174,7 +162,6 @@ if yn != "" and (yn[0] == "Y" or yn[0] == "y"):
     add_main_stub = True
 
 print("Please define the architectural model (machdep) of the target machine.")
-(default_machdep, machdeps) = get_known_machdeps()
 print("Known machdeps: " + " ".join(machdeps))
 machdep_chosen = False
 while not machdep_chosen:
@@ -250,9 +237,9 @@ gnumakefile.write_text("".join(lines))
 
 print(f"Template created: {gnumakefile}")
 
-if not "PTESTS_TESTING" in os.environ and not framac_in_path:
+if not "PTESTS_TESTING" in os.environ and not framac:
     print(f"Frama-C not in path, adding path.mk to {dir}")
-    frama_c_script = bindir / "frama-c-script"
+    frama_c_script = framac_bin / "frama-c-script"
     os.system(f"{frama_c_script} make-path {dir}")
 
 if "PTESTS_TESTING" in os.environ:

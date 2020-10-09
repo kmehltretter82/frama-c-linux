@@ -25,6 +25,7 @@
 (* ************************************************************************* *)
 
 module CamlString = String
+module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
 
@@ -103,6 +104,8 @@ let dkey_print_sid = register_category "printer:sid"
 let dkey_print_unspecified = register_category "printer:unspecified"
 
 let dkey_print_vid = register_category "printer:vid"
+
+let dkey_print_field_offsets = register_category "printer:field-offsets"
 
 let dkey_prop_status = register_category "prop-status"
 
@@ -417,20 +420,44 @@ let () =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
+module PrintConfigJson =
+  False
+    (struct
+      let module_name = "PrintConfigJson"
+      let option_name = "-print-config-json"
+      let help = "prints extensive data about Frama-C's configuration, in \
+                  JSON format, and exits (experimental: the output format \
+                  is very likely to change in future versions)."
+    end)
+
+let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module AutocompleteHelp =
-  False
+  P.String_set
     (struct
       let option_name = "-autocomplete"
-      let help = "displays all plugin options. Used for zsh autocompletion"
-      let module_name = "AutocompleteHelp"
+      let arg_name = "p1,p2,..."
+      let help = "displays all Frama-C options, used for shell autocompletion. \
+                  Prints options for the specified plugin names (or '@all' for \
+                  all plugins). Note: for the kernel, use an empty string."
     end)
-let run_list_all_plugin_options () =
-  if AutocompleteHelp.get () then
-    Cmdline.list_all_plugin_options ~print_invisible:true
-  else Cmdline.nop
-let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
+
+let _ =
+  AutocompleteHelp.Category.enable_all
+    []
+    (object
+      method fold: 'a. (string -> 'a -> 'a) -> 'a -> 'a =
+        fun f acc ->
+        FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
+      method mem name =
+        try
+          FcPlugin.iter_on_plugins
+            (fun p -> if name = p.FcPlugin.p_shortname then raise Exit);
+          false
+        with Exit -> true
+    end)
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
@@ -460,7 +487,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralVerbose =
   Int
     (struct
@@ -482,7 +509,7 @@ let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 module GeneralDebug =
   Zero
     (struct
@@ -506,7 +533,7 @@ let () =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.do_iterate ()
+let () = Parameter_customize.is_reconfigurable ()
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_journalize ()
 module Quiet =

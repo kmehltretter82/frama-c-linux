@@ -62,14 +62,20 @@ let get_call_name exp = match exp.enode with
 
 (* the various kinds of auxiliary functions. *)
 type func_auto_mode =
-    Not_auto_func (* original C function. *)
-  | Pre_func of kernel_function (* Pre_func f denotes a function updating
-                                   the automaton when f is called. *)
-  | Post_func of kernel_function (* Post_func f denotes a function updating
-                                    the automaton when returning from f. *)
+  | Not_auto_func (* original C function. *)
+  | Aux_func of kernel_function
+  (* Checks whether we are in the corresponding behavior of the function. *)
+  | Pre_func of kernel_function
+  (* Pre_func f denotes a function updating the automaton when f is called. *)
+  | Post_func of kernel_function
+  (* Post_func f denotes a function updating the automaton
+     when returning from f. *)
 
 (* table from auxiliary functions to the corresponding original one. *)
 let func_orig_table = Cil_datatype.Varinfo.Hashtbl.create 17
+
+let add_aux_bhv orig_kf vi =
+  Cil_datatype.Varinfo.Hashtbl.add func_orig_table vi (Aux_func orig_kf)
 
 let kind_of_func vi =
   try Cil_datatype.Varinfo.Hashtbl.find func_orig_table vi
@@ -78,19 +84,21 @@ let kind_of_func vi =
 (* The following functions will be used to generate C code for pre & post
    functions. *)
 
-let mk_auto_fct_block kf status auto_state res =
+let mk_auto_fct_block kf_aux kf status auto_state res =
   let loc = Kernel_function.get_location kf in
-  Aorai_utils.auto_func_block loc kf status auto_state res
+  Aorai_utils.auto_func_block kf_aux loc kf status auto_state res
 
-let mk_pre_fct_block kf =
+let mk_pre_fct_block kf_pre kf =
   mk_auto_fct_block
+    kf_pre
     kf
     Promelaast.Call
     (Data_for_aorai.get_kf_init_state kf)
     None
 
-let mk_post_fct_block kf res =
+let mk_post_fct_block kf_post kf res =
   mk_auto_fct_block
+    kf_post
     kf
     Promelaast.Return
     (Data_for_aorai.get_kf_return_state kf)
@@ -153,9 +161,16 @@ class visit_adding_code_for_synchronisation =
           fun_dec_post (TFun(voidType,Some arg,false,[]));
         (* We will now fill the function with the result
            of the automaton's analysis. *)
-        let pre_block,pre_locals = mk_pre_fct_block kf in
-        let post_block,post_locals =
-          mk_post_fct_block kf (Extlib.opt_of_list fun_dec_post.sformals)
+        Globals.Functions.replace_by_definition
+          (Cil.empty_funspec()) fun_dec_pre loc;
+        Globals.Functions.replace_by_definition
+          (Cil.empty_funspec()) fun_dec_post loc;
+        let kf_pre = Globals.Functions.get vi_pre in
+        let kf_post = Globals.Functions.get vi_post in
+        let aux_func_pre, pre_block,pre_locals = mk_pre_fct_block kf_pre kf in
+        let aux_func_post, post_block,post_locals =
+          mk_post_fct_block
+            kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
         in
         fun_dec_pre.slocals <- pre_locals;
         fun_dec_pre.sbody <- pre_block;
@@ -163,7 +178,16 @@ class visit_adding_code_for_synchronisation =
         fun_dec_post.slocals <- post_locals;
         fun_dec_post.sbody <- post_block;
         fun_dec_post.svar.vdefined <- true;
-        let globs = [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc);] in
+        let aux_funcs =
+          Cil_datatype.Varinfo.Set.union aux_func_pre aux_func_post
+        in
+        let globs =
+          Cil_datatype.Varinfo.Set.fold
+            (fun x acc ->
+               GFunDecl(Cil.empty_funspec(),x,loc) :: acc) aux_funcs
+            [ GFun(fun_dec_pre,loc); GFun(fun_dec_post,loc)]
+        in
+        Cil_datatype.Varinfo.Set.iter (add_aux_bhv kf) aux_funcs;
         fundec.sbody.bstmts <-
           Cil.mkStmtOneInstr ~ghost:true
             (Call(None,Cil.evar ~loc vi_pre,
@@ -171,10 +195,6 @@ class visit_adding_code_for_synchronisation =
                     (Kernel_function.get_formals kf),
                   loc))
           :: fundec.sbody.bstmts;
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_pre loc;
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) fun_dec_post loc;
         (* Finally, we update the CFG for the new fundec *)
         let keepSwitch = Kernel.KeepSwitch.get() in
         Cfg.prepareCFG ~keepSwitch fun_dec_pre;
@@ -891,7 +911,7 @@ class visit_adding_pre_post_from_buch treatloops =
       let spec = Annotations.funspec my_kf in
       let loc = Kernel_function.get_location my_kf in
       (match kind_of_func vi with
-       | Pre_func _ | Post_func _ -> ()
+       | Pre_func _ | Post_func _ | Aux_func _ -> ()
        | Not_auto_func -> (* Normal C function *)
          let bhvs = mk_post my_kf in
          let my_state = Data_for_aorai.get_kf_init_state my_kf in
@@ -954,7 +974,8 @@ class visit_adding_pre_post_from_buch treatloops =
            in
            Annotations.add_behaviors Aorai_option.emitter my_kf bhvs;
            SkipChildren
-         | Not_auto_func -> DoChildren (* they are not considered here. *))
+         | Aux_func _ | Not_auto_func ->
+           DoChildren (* they are not considered here. *))
 
       | _ -> DoChildren;
 

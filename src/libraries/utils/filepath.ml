@@ -83,7 +83,7 @@ let make dir base_name =
 
 let getdir path =
   match path.dir with
-  | None -> dummy (* the parent of the root directory is itself *) 
+  | None -> dummy (* the parent of the root directory is itself *)
   | Some d -> d
 
 let rec norm path = function
@@ -93,9 +93,9 @@ let rec norm path = function
   | p::ps -> norm (make path p) ps
 
 let insert base path_name =
-  let full_path_name = 
-    (* if a <base> is provided while a <file> is already absolute 
-       (and thus matches [re_root]) then the <base> is not taken 
+  let full_path_name =
+    (* if a <base> is provided while a <file> which is already absolute
+       (and thus matches [re_root]) then the <base> is not taken
        into account *)
     if Str.string_match re_root path_name 0
     then path_name
@@ -108,8 +108,8 @@ let insert base path_name =
     try HPath.find hcons p
     with Not_found ->
       let base =
-        (* if a <base> is provided while a <file> is already absolute 
-           (and thus matches [re_root]) then the <base> is not taken 
+        (* if a <base> is provided while a <file> is already absolute
+           (and thus matches [re_root]) then the <base> is not taken
            into account *)
         if Str.string_match re_root path_name 0
         then root (String.sub path_name 0 (Str.group_end 0 - 1))
@@ -166,26 +166,47 @@ let normalize ?(existence=Indifferent) ?base_name path_name =
 (* --- Symboling Names                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_symbolic_dir name dir = (insert cwd dir).symbolic_name <- Some name
+(* Note: Symbolic directories are not currently projectified *)
+let symbolic_dirs = Hashtbl.create 3
 
-let rec add_path buffer path =
+let add_symbolic_dir name dir =
+  Hashtbl.replace symbolic_dirs name dir;
+  (insert cwd dir).symbolic_name <- Some name
+
+let rec add_uri_path buffer path =
   let open Buffer in
   match path.symbolic_name with
-    | None ->
-        begin
-          match path.dir with
-            | None -> add_string buffer path.path_name
-            | Some d ->
-              if d != cwd (* hconsed *) then
-                ( add_path buffer d ; add_char buffer '/' ) ;
-              add_string buffer path.base_name
+  | None ->
+    begin
+      match path.dir with
+      | None -> add_string buffer path.path_name; None
+      | Some d ->
+        if d != cwd (* hconsed *) then begin
+          let symb_base = add_uri_path buffer d in
+          add_char buffer '/';
+          add_string buffer path.base_name;
+          symb_base
+        end else begin
+          add_string buffer path.base_name;
+          Some "PWD"
         end
-    | Some sn -> add_string buffer sn
+    end
+  | Some sn -> Some sn
+
+let add_path path =
+  let buf = Buffer.create 80 in
+  match add_uri_path buf path with
+  | None -> Buffer.contents buf
+  | Some "PWD" -> Buffer.contents buf
+  | Some symb -> symb ^ Buffer.contents buf
 
 let rec skip_dot file_name =
   if Extlib.string_prefix "./" file_name then
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
+
+let all_symbolic_dirs () =
+  Hashtbl.fold (fun name dir acc -> (name, dir) :: acc) symbolic_dirs []
 
 let pretty file_name =
   if Filename.is_relative file_name then
@@ -198,9 +219,7 @@ let pretty file_name =
       let n = 1 + String.length cwd_name in
       String.sub file_name n (String.length file_name - n)
     else
-      let buffer = Buffer.create 80 in
-      add_path buffer path ;
-      skip_dot (Buffer.contents buffer)
+      skip_dot (add_path path)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
@@ -237,7 +256,7 @@ module Normalized = struct
   type t = string
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
-  let concat ?existence t s = normalize ?existence (t ^ s)
+  let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
   let to_pretty_string s = pretty s
   let equal : t -> t -> bool = (=)
   let compare = String.compare
@@ -256,6 +275,15 @@ module Normalized = struct
     try
       (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
     with _ -> false
+
+  let to_base_uri name =
+    if is_relative name then None, skip_dot name
+    else begin
+      let p = insert cwd name in
+      let buf = Buffer.create 80 in
+      let res = add_uri_path buf p in
+      res, Buffer.contents buf
+    end
 end
 
 type position =

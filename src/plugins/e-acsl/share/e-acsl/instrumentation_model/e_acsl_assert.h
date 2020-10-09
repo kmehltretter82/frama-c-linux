@@ -30,14 +30,14 @@
 
 #include "../internals/e_acsl_alias.h"
 
-#define runtime_sound_verdict export_alias(sound_verdict)
-#define runtime_assert        export_alias(assert)
+#define eacsl_runtime_sound_verdict export_alias(sound_verdict)
+#define eacsl_runtime_assert        export_alias(assert)
 
 /*! E-ACSL instrumentation automatically sets this global to 0 if its verdict
     becomes unsound.
     TODO: may only happen for annotations containing memory-related properties.
     For arithmetic properties, the verdict is always sound (?). */
-extern int runtime_sound_verdict;
+extern int eacsl_runtime_sound_verdict;
 
 /*! \brief Runtime assertion verifying a given predicate
  *  \param pred  integer code of a predicate
@@ -48,8 +48,8 @@ extern int runtime_sound_verdict;
  *  \param line line of predicate placement in the un-instrumented file */
 /*@ requires pred != 0;
   @ assigns \nothing; */
-void runtime_assert(int pred, const char *kind, const char *fct, const char *pred_txt,
-    const char * file, int line)
+void eacsl_runtime_assert(int pred, const char *kind, const char *fct,
+    const char *pred_txt, const char * file, int line)
   __attribute__((FC_BUILTIN));
 
 #endif // E_ACSL_ASSERT_H

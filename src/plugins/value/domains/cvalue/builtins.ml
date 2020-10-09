@@ -27,7 +27,7 @@ exception Invalid_nb_of_args of int
 
 (* 'Always' means the builtin will always be used to replace a function
    with its name. 'OnAuto' means that the function will be replaced only
-   if -val-builtins-auto is set. *)
+   if -eva-builtins-auto is set. *)
 type use_builtin = Always | OnAuto
 
 (* Table of all registered builtins; filled by [register_builtin] calls.  *)
@@ -83,7 +83,7 @@ let () =
          Log.print_on_output
            (fun fmt ->
               Format.fprintf fmt "@[*** LIST OF EVA BUILTINS@\n@\n\
-                                  ** Replacements set by -val-builtins-auto:\
+                                  ** Replacements set -eva-builtins-auto:\
                                   @\n   unless otherwise specified, \
                                   function <f> is replaced by builtin \
                                   Frama_C_<f>:@\n@\n   @[%a@]@]@\n"
@@ -97,7 +97,7 @@ let () =
          Log.print_on_output
            (fun fmt ->
               Format.fprintf fmt "@\n@[** Full list of builtins \
-                                  (configurable via -val-builtin):@\n\
+                                  (configurable via -eva-builtin):@\n\
                                   @\n   @[%a@]@]@\n"
                 (Pretty_utils.pp_list ~sep:",@ "
                    Format.pp_print_string) stand_alone);

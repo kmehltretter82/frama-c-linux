@@ -335,6 +335,37 @@ void negative_offsets() {
   wchar_t dest[100 * 2];
 }
 
+#define MAX 10000000
+
+void misaligned_string () {
+  // Read an offsetmap with a value range smaller than the read characters.
+  wchar_t a[3] = {0};
+  *(char *)a = 1;
+  a[1] = 1;
+  //@ assert valid_read_wstring(&a[0]);
+  unsigned int a_length = wcslen(&a[0]);
+  /* Read an offsetmap with repeated values smaller than the searched
+     characters: test a performance issue. */
+  wchar_t b[MAX] = {0};
+  int i = Frama_C_interval(0, MAX * 4);
+  *((char *)b + i) = (char)17;
+  //@ assert valid_read_wstring(&b[0]);
+  unsigned int b_length = wcslen(&b[0]);
+  /* Read an offsetmap through a misaligned pointer. */
+  wchar_t c[5] = {0};
+  wchar_t *p = (wchar_t *)( (char *)c + 1);
+  *p = 1;
+  *(p+1) = 2;
+  *(p+2) = 0; // If we accept the string pointed by p, its length should be 2.
+  *(p+3) = 4;
+  //@ assert valid_read_wstring(p);
+  unsigned int c_length = wcslen(p);
+  if (nondet) {
+    *(p+2) = 3; // The string pointed by p cannot be valid here.
+    c_length = wcslen(p);
+  }
+}
+
 int main (int c) {
   small_sets();
   zero_termination();
@@ -347,5 +378,6 @@ int main (int c) {
   escaping();
   big_array();
   negative_offsets();
+  misaligned_string();
   return 0;
 }

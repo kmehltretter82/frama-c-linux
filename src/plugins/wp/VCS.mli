@@ -27,16 +27,18 @@
 (** {2 Prover} *)
 
 type prover =
-  | Why3 of Why3Provers.t (* Prover via WHY *)
-  | NativeAltErgo (* Direct Alt-Ergo *)
-  | NativeCoq     (* Direct Coq and Coqide *)
-  | Qed           (* Qed Solver *)
-  | Tactical      (* Interactive Prover *)
+  | Why3 of Why3Provers.t (** Prover via WHY *)
+  | NativeAltErgo (** Direct Alt-Ergo *)
+  | NativeCoq     (** Direct Coq and Coqide *)
+  | Qed           (** Qed Solver *)
+  | Tactical      (** Interactive Prover *)
 
 type mode =
-  | BatchMode (* Only check scripts *)
-  | EditMode  (* Edit then check scripts *)
-  | FixMode   (* Try check script, then edit script on non-success *)
+  | Batch  (** Only check scripts *)
+  | Update (** Check and update scripts *)
+  | Edit   (** Edit then check scripts *)
+  | Fix    (** Try check script, then edit script on non-success *)
+  | FixUpdate (** Update & Fix *)
 
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover

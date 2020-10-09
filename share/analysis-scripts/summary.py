@@ -45,7 +45,7 @@ def build_make_environment(framac):
     else:
         env = { **os.environ,  'PATH' : f"{framac}/bin:{os.environ['PATH']}" }
         args = [
-            f"FRAMAC_DIR={framac}/bin",
+            f"FRAMAC_BIN={framac}/bin",
             f"FRAMAC={framac}/bin/frama-c"
         ]
     return env, args

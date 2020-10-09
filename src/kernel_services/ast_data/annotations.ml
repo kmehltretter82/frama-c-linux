@@ -480,6 +480,11 @@ let generic_funspec merge get ?emitter ?(populate=true) kf =
 let funspec ?emitter ?populate kf =
   generic_funspec merge_funspec ?emitter ?populate (fun x -> x) kf
 
+let has_funspec kf =
+  try
+    not (Cil.is_empty_funspec (funspec ~populate:false kf))
+  with No_funspec _ -> false
+
 (* Do not share behaviors with outside world if there's a single emitter. *)
 let behaviors =
   generic_funspec merge_behaviors

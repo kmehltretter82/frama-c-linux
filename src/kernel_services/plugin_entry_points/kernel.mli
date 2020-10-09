@@ -99,6 +99,8 @@ val dkey_print_unspecified: category
 
 val dkey_print_vid: category
 
+val dkey_print_field_offsets: category
+
 val dkey_prop_status: category
 
 val dkey_prop_status_emit: category
@@ -232,6 +234,13 @@ module PrintLib: Parameter_sig.Bool
 
 module PrintPluginPath: Parameter_sig.Bool
 (** Behavior of option "-print-plugin-path" *)
+
+module AutocompleteHelp: Parameter_sig.String_set
+(** Behavior of option "-autocomplete" *)
+
+module PrintConfigJson: Parameter_sig.Bool
+(** Behavior of option "-print-config-json"
+    @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Output Messages} *)

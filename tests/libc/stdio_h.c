@@ -42,5 +42,10 @@ int main() {
     //@ assert unreachable: \false;
   }
 
+  fpos_t pos;
+  fgetpos(f, &pos);
+  fsetpos(f, &pos);
+
+  int res_fclose = fclose(f);
   return 0;
 }

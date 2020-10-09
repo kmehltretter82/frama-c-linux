@@ -28,8 +28,8 @@
  * is split into two mspaces (memory spaces). Memory allocation itself is
  * delegated to a slightly customised version of dlmalloc shipped with the
  * RTL. The overall pattern is as follows:
- *    mspace space = create_mspace(capacity, locks);
- *    char *p = mspace_malloc(space, size);
+ *    mspace space = eacsl_create_mspace(capacity, locks);
+ *    char *p = eacsl_mspace_malloc(space, size);
 ***************************************************************************/
 
 #ifndef E_ACSL_MALLOC_H
@@ -52,16 +52,17 @@
 /*** Mspace initialization {{{ ***/
 /************************************************************************/
 
-#define make_memory_spaces    export_alias(make_memory_spaces)
-#define destroy_memory_spaces export_alias(destroy_memory_spaces)
+#define eacsl_make_memory_spaces    export_alias(make_memory_spaces)
+#define eacsl_destroy_memory_spaces export_alias(destroy_memory_spaces)
 
 /*! \brief Create two memory spaces, one for RTL and the other for application
     memory. This function *SHOULD* be called before any allocations are made
     otherwise execution fails */
-void make_memory_spaces(size_t rtl_size, size_t heap_size);
+void eacsl_make_memory_spaces(size_t rtl_size, size_t heap_size);
 
-/*! \brief Destroy the memory spaces created with `make_memory_spaces()`. */
-void destroy_memory_spaces();
+/*! \brief Destroy the memory spaces created with
+    `eacsl_make_memory_spaces()`. */
+void eacsl_destroy_memory_spaces();
 
 /* }}} */
 
@@ -70,15 +71,15 @@ void destroy_memory_spaces();
 /*** Mspace allocators (from dlmalloc) {{{ ***/
 /************************************************************************/
 
-#define create_mspace         export_alias(create_mspace)
-#define destroy_mspace        export_alias(destroy_mspace)
-#define mspace_least_addr     export_alias(mspace_least_addr)
-#define mspace_malloc         export_alias(mspace_malloc)
-#define mspace_free           export_alias(mspace_free)
-#define mspace_calloc         export_alias(mspace_calloc)
-#define mspace_realloc        export_alias(mspace_realloc)
-#define mspace_posix_memalign export_alias(mspace_posix_memalign)
-#define mspace_aligned_alloc  export_alias(mspace_aligned_alloc)
+#define eacsl_create_mspace         export_alias(create_mspace)
+#define eacsl_destroy_mspace        export_alias(destroy_mspace)
+#define eacsl_mspace_least_addr     export_alias(mspace_least_addr)
+#define eacsl_mspace_malloc         export_alias(mspace_malloc)
+#define eacsl_mspace_free           export_alias(mspace_free)
+#define eacsl_mspace_calloc         export_alias(mspace_calloc)
+#define eacsl_mspace_realloc        export_alias(mspace_realloc)
+#define eacsl_mspace_posix_memalign export_alias(mspace_posix_memalign)
+#define eacsl_mspace_aligned_alloc  export_alias(mspace_aligned_alloc)
 
 typedef void* mspace;
 
@@ -91,15 +92,15 @@ struct memory_spaces {
 };
 extern struct memory_spaces mem_spaces;
 
-extern mspace create_mspace(size_t, int);
-extern size_t destroy_mspace(mspace);
-extern void*  mspace_malloc(mspace, size_t);
-extern void   mspace_free(mspace, void*);
-extern void*  mspace_calloc(mspace msp, size_t, size_t);
-extern void*  mspace_realloc(mspace msp, void*, size_t);
-extern void*  mspace_aligned_alloc(mspace, size_t, size_t);
-extern int    mspace_posix_memalign(mspace, void **, size_t, size_t);
-extern void*  mspace_least_addr(mspace);
+extern mspace eacsl_create_mspace(size_t, int);
+extern size_t eacsl_destroy_mspace(mspace);
+extern void*  eacsl_mspace_malloc(mspace, size_t);
+extern void   eacsl_mspace_free(mspace, void*);
+extern void*  eacsl_mspace_calloc(mspace msp, size_t, size_t);
+extern void*  eacsl_mspace_realloc(mspace msp, void*, size_t);
+extern void*  eacsl_mspace_aligned_alloc(mspace, size_t, size_t);
+extern int    eacsl_mspace_posix_memalign(mspace, void **, size_t, size_t);
+extern void*  eacsl_mspace_least_addr(mspace);
 
 /* }}} */
 
@@ -110,12 +111,12 @@ extern void*  mspace_least_addr(mspace);
 /* Used within RTL to override standard allocation */
 /* Shortcuts for public allocation functions */
 
-#define public_malloc(...)         mspace_malloc(mem_spaces.heap_mspace, __VA_ARGS__)
-#define public_realloc(...)        mspace_realloc(mem_spaces.heap_mspace, __VA_ARGS__)
-#define public_calloc(...)         mspace_calloc(mem_spaces.heap_mspace, __VA_ARGS__)
-#define public_free(...)           mspace_free(mem_spaces.heap_mspace, __VA_ARGS__)
-#define public_aligned_alloc(...)  mspace_aligned_alloc(mem_spaces.heap_mspace, __VA_ARGS__)
-#define public_posix_memalign(...) mspace_posix_memalign(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_malloc(...)         eacsl_mspace_malloc(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_realloc(...)        eacsl_mspace_realloc(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_calloc(...)         eacsl_mspace_calloc(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_free(...)           eacsl_mspace_free(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_aligned_alloc(...)  eacsl_mspace_aligned_alloc(mem_spaces.heap_mspace, __VA_ARGS__)
+#define public_posix_memalign(...) eacsl_mspace_posix_memalign(mem_spaces.heap_mspace, __VA_ARGS__)
 
 /* }}} */
 
@@ -123,10 +124,10 @@ extern void*  mspace_least_addr(mspace);
 /*** Private allocators usable within RTL and GMP {{{ ***/
 /************************************************************************/
 
-#define private_malloc(...)  mspace_malloc(mem_spaces.rtl_mspace, __VA_ARGS__)
-#define private_calloc(...)  mspace_calloc(mem_spaces.rtl_mspace, __VA_ARGS__)
-#define private_realloc(...) mspace_realloc(mem_spaces.rtl_mspace, __VA_ARGS__)
-#define private_free(...)    mspace_free(mem_spaces.rtl_mspace, __VA_ARGS__)
+#define private_malloc(...)  eacsl_mspace_malloc(mem_spaces.rtl_mspace, __VA_ARGS__)
+#define private_calloc(...)  eacsl_mspace_calloc(mem_spaces.rtl_mspace, __VA_ARGS__)
+#define private_realloc(...) eacsl_mspace_realloc(mem_spaces.rtl_mspace, __VA_ARGS__)
+#define private_free(...)    eacsl_mspace_free(mem_spaces.rtl_mspace, __VA_ARGS__)
 
 /* }}} */
 

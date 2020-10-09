@@ -57,8 +57,8 @@ void update_heap_allocation(long size) {
 
 void report_heap_leaks() {
 #if defined(E_ACSL_VERBOSE) || defined(E_ACSL_DEBUG)
-  size_t size = get_heap_allocation_size();
-  size_t blocks = get_heap_allocated_blocks();
+  size_t size = eacsl_get_heap_allocation_size();
+  size_t blocks = eacsl_get_heap_allocated_blocks();
   if (size) {
     rtl_printf(" *** WARNING: Leaked %lu bytes of heap memory in %ld block%s\n",
       size, blocks, (blocks == 1) ? "" : "s");

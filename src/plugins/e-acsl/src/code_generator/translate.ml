@@ -882,7 +882,6 @@ and predicate_content_to_exp ?name kf env p =
     Typing.type_term ~use_gmp_opt:false ~ctx:Typing.c_int tapp;
     let e, env = term_to_exp kf env tapp in
     e, env
-  | Pseparated _ -> Env.not_yet env "\\separated"
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
@@ -982,6 +981,34 @@ and predicate_content_to_exp ?name kf env p =
     end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
+  | Pseparated tlist ->
+    let env =
+      List.fold_left
+        (fun env t ->
+           let name = "separated_guard" in
+           let p = Logic_const.pvalid_read ~loc (BuiltinLabel Here, t) in
+           let p = { p with pred_name = name :: p.pred_name } in
+           let e, env =
+             predicate_content_to_exp
+               ~name
+               kf
+               env
+               p
+           in
+           let stmt =
+             Smart_stmt.runtime_check
+               Smart_stmt.RTE
+               kf
+               e
+               p
+           in
+           Env.add_assert kf stmt p;
+           Env.add_stmt env kf stmt
+        )
+        env
+        tlist
+    in
+    Memory_translate.call_with_size ~loc kf "separated" Cil.intType env tlist p
   | Pinitialized(BuiltinLabel Here, t) ->
     (match t.term_node with
      (* optimisation when we know that the initialisation is ok *)
@@ -997,7 +1024,7 @@ and predicate_content_to_exp ?name kf env p =
          "initialized"
          Cil.intType
          env
-         t
+         [ t ]
          p)
   | Pinitialized _ -> Env.not_yet env "labeled \\initialized"
   | Pallocable _ -> Env.not_yet env "\\allocate"
@@ -1023,6 +1050,11 @@ and predicate_to_exp ?name kf ?rte env p =
     e
 
 and generalized_untyped_predicate_to_exp ?name kf ?rte ?must_clear_typing env p =
+  (* If [rte] is true, it means we're translating the root predicate of an
+     assertion and we need to generate the RTE for it. The typing environment
+     must be cleared. Otherwise, if [rte] is false, it means we're already
+     translating RTE predicates as part of the translation of another root
+     predicate, and the typing environment must be kept. *)
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let must_clear = match must_clear_typing with None -> rte | Some b -> b in
   Typing.type_named_predicate ~must_clear p;
