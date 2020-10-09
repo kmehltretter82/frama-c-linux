@@ -44,7 +44,26 @@ let warn_recursive_call kf =
     Kernel_function.pretty kf;
   check_formals_non_referenced kf
 
-let recursive_spec kf =
+let mark_unknown_requires kinstr kf funspec =
+  let stmt =
+    match kinstr with
+    | Kglobal -> assert false
+    | Kstmt stmt -> stmt
+  in
+  let emitter = Value_util.emitter in
+  let status = Property_status.Dont_know in
+  let emit_behavior behavior =
+    let emit_predicate predicate =
+      let ip = Property.ip_of_requires kf kinstr behavior predicate in
+      Statuses_by_call.setup_precondition_proxy kf ip;
+      let property = Statuses_by_call.precondition_at_call kf ip stmt in
+      Property_status.emit ~distinct:true emitter ~hyps:[] property status
+    in
+    List.iter emit_predicate behavior.b_requires
+  in
+  List.iter emit_behavior funspec.spec_behavior
+
+let recursive_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
   if Cil.is_empty_funspec funspec then
     Value_parameters.abort ~current:true
@@ -64,6 +83,7 @@ let recursive_spec kf =
         (if depth > 0 then Format.asprintf " of depth %i" depth else "")
         Kernel_function.pretty kf
     in
+    mark_unknown_requires kinstr kf funspec;
     funspec
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]

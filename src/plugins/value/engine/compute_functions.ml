@@ -174,7 +174,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     let use_spec =
       match recursion with
       | Some { depth } when depth >= Value_parameters.RecursiveUnroll.get () ->
-        `Spec (Recursion.recursive_spec kf)
+        `Spec (Recursion.recursive_spec call_kinstr kf)
       | _ ->
         match kf.fundec with
         | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)

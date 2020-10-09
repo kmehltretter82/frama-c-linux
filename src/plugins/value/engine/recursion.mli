@@ -25,7 +25,7 @@
 open Cil_types
 open Eval
 
-val recursive_spec: kernel_function -> funspec
+val recursive_spec: kinstr -> kernel_function -> funspec
 
 (** TODO *)
 val get_recursion: kernel_function -> recursion option
