@@ -340,6 +340,9 @@ See also **-cpp-frama-c-compliant**.
 -print-cpp-commands
 : outputs the preprocessing commands for all input files.
 
+-print-config-json
+: outputs extensive Frama-C configuration data in JSON format.
+
 [-no]-print-libc
 : expands **#include** directives in the pretty-printed CIL code for files in
 the Frama-C standard library. Defaults to no.

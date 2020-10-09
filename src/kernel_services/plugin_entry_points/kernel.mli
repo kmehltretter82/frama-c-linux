@@ -238,6 +238,10 @@ module PrintPluginPath: Parameter_sig.Bool
 module AutocompleteHelp: Parameter_sig.String_set
 (** Behavior of option "-autocomplete" *)
 
+module PrintConfigJson: Parameter_sig.Bool
+(** Behavior of option "-print-config-json"
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 Output Messages} *)
 (* ************************************************************************* *)
