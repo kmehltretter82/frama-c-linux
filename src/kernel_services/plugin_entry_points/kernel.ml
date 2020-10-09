@@ -426,7 +426,8 @@ module PrintConfigJson =
       let module_name = "PrintConfigJson"
       let option_name = "-print-config-json"
       let help = "prints extensive data about Frama-C's configuration, in \
-                  JSON format, and exits."
+                  JSON format, and exits (experimental: the output format \
+                  is very likely to change in future versions)."
     end)
 
 let () = Parameter_customize.set_group help
