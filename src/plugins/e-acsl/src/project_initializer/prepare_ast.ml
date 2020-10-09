@@ -392,6 +392,8 @@ let must_duplicate kf vi =
   not (is_variadic_function vi)
   && (* it is not a built-in *)
   not (Misc.is_fc_or_compiler_builtin vi)
+  && (* it is not a generated function *)
+  not (Misc.is_fc_stdlib_generated vi)
   &&
   ((* either explicitely listed as to be not instrumented *)
     not (Functions.instrument kf)

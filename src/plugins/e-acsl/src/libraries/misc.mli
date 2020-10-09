@@ -40,6 +40,10 @@ val result_vi: kernel_function -> varinfo
 
 val is_fc_or_compiler_builtin: varinfo -> bool
 
+val is_fc_stdlib_generated: varinfo -> bool
+(** Returns true if the [varinfo] is a generated stdlib function. (For instance
+    generated function by the Variadic plug-in. *)
+
 val term_addr_of: loc:location -> term_lval -> typ -> term
 
 val cty: logic_type -> typ
