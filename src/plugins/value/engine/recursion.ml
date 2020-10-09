@@ -53,7 +53,18 @@ let recursive_spec kf =
       Kernel_function.pretty kf
       Value_parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
-  else funspec
+  else
+    let depth = Value_parameters.RecursiveUnroll.get () in
+    let () =
+      Value_parameters.warning ~once:true ~current:true
+        "@[Using specification of function %a@ for recursive calls%s.@ \
+         Analysis of function %a@ is thus incomplete@ and its soundness@ \
+         relies on the written specification.@]"
+        Kernel_function.pretty kf
+        (if depth > 0 then Format.asprintf " of depth %i" depth else "")
+        Kernel_function.pretty kf
+    in
+    funspec
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]
    has no existing specification, generate (an incorrect) one, and warn
