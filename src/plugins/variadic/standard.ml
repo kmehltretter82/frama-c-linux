@@ -292,6 +292,9 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
         raise Translate_call_exn;
   in
 
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
+
   (* Rebuild the call *)
   Self.result ~current:true ~level:2
     "Translating call to the specialized version %a."
@@ -634,6 +637,9 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   in
   new_callee.vname <- new_name;
   new_globals := glob :: !new_globals;
+
+  (* Store the translation *)
+  Replacements.add new_callee vf.vf_decl;
 
   (* Translate the call *)
   Self.result ~current:true ~level:2
