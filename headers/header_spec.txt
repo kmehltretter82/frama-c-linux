@@ -367,6 +367,8 @@ src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
 src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL

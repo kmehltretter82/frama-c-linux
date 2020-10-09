@@ -1125,31 +1125,39 @@ let alphaConvertVarAndAddToEnv addtoenv vi =
       vi
     else begin
       if vi.vglob then begin
-        (* Perhaps this is because we have seen a static local which happened
-         * to get the name that we later want to use for a global. *)
-        try
-          let static_local_vi = H.find staticLocals vi.vname in
-          H.remove staticLocals vi.vname;
-          (* Use the new name for the static local *)
-          static_local_vi.vname <- newname;
-          (* And continue using the last one *)
-          vi
-        with Not_found -> begin
-            (* Or perhaps we have seen a typedef which stole our name. This is
-               possible because typedefs use the same name space *)
-            try
-              let typedef_ti = H.find typedefs vi.vname in
-              H.remove typedefs vi.vname;
-              (* Use the new name for the typedef instead *)
-              typedef_ti.tname <- newname;
-              (* And continue using the last name *)
-              vi
-            with Not_found ->
-              abort_context
-                "It seems that we would need to rename global %s (to %s) \
-                 because of previous occurrence at %a"
-                vi.vname newname Cil_printer.pp_location oldloc;
-          end
+        (* if a purely local variable stole our name, force it to be renamed.*)
+        let local =
+          List.find_opt
+            (fun x -> x.vname = vi.vname) !currentFunctionFDEC.slocals
+        in
+        match local with
+        | Some local -> local.vname <- newname; vi
+        | None ->
+          (* Perhaps this is because we have seen a static local which happened
+           * to get the name that we later want to use for a global. *)
+          try
+            let static_local_vi = H.find staticLocals vi.vname in
+            H.remove staticLocals vi.vname;
+            (* Use the new name for the static local *)
+            static_local_vi.vname <- newname;
+            (* And continue using the last one *)
+            vi
+          with Not_found -> begin
+              (* Or perhaps we have seen a typedef which stole our name. This is
+                 possible because typedefs use the same name space *)
+              try
+                let typedef_ti = H.find typedefs vi.vname in
+                H.remove typedefs vi.vname;
+                (* Use the new name for the typedef instead *)
+                typedef_ti.tname <- newname;
+                (* And continue using the last name *)
+                vi
+              with Not_found ->
+                abort_context
+                  "It seems that we would need to rename global %s (to %s) \
+                   because of previous occurrence at %a"
+                  vi.vname newname Cil_printer.pp_location oldloc;
+            end
       end else copyVarinfo vi newname
     end
   in
