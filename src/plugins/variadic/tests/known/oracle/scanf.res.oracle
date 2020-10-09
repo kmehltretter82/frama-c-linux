@@ -65,7 +65,7 @@ int main(void)
   int __retres;
   char c[10];
   int i;
-  scanf_va_1("Hello %*10le %% %10s %[^]world] %d !",c,c,& i);
+  scanf("Hello %*10le %% %10s %[^]world] %d !",c,c,& i); /* scanf_va_1 */
   __retres = 0;
   return __retres;
 }

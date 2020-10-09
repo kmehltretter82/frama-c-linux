@@ -185,11 +185,11 @@ int main(void)
     void *__va_args_40[3] = {& __va_arg0_34, & __va_arg1_36, & __va_arg2_38};
     dprintf(1,(char const *)format,(void * const *)(__va_args_40));
   }
-  fprintf_va_1(stream,"%d %s %d",1,(char *)"2",3);
-  printf_va_1("%d %s %d",1,(char *)"2",3);
-  snprintf_va_1(str,size,"%d %s %d",1,(char *)"2",3);
-  sprintf_va_1(str,"%d %s %d",1,(char *)"2",3);
-  dprintf_va_1(1,"%d %s %s",1,(char *)"3",(char *)"4");
+  fprintf(stream,"%d %s %d",1,(char *)"2",3); /* fprintf_va_1 */
+  printf("%d %s %d",1,(char *)"2",3); /* printf_va_1 */
+  snprintf(str,size,"%d %s %d",1,(char *)"2",3); /* snprintf_va_1 */
+  sprintf(str,"%d %s %d",1,(char *)"2",3); /* sprintf_va_1 */
+  dprintf(1,"%d %s %s",1,(char *)"3",(char *)"4"); /* dprintf_va_1 */
   __retres = 0;
   return __retres;
 }

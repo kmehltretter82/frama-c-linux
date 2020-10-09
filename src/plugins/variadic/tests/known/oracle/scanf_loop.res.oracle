@@ -53,7 +53,7 @@ int main(void)
   int n;
   while (1) {
     int tmp;
-    tmp = scanf_va_1("%d",& n);
+    tmp = scanf("%d",& n); /* scanf_va_1 */
     if (! (tmp > 0)) break;
     if (nondet) break;
   }

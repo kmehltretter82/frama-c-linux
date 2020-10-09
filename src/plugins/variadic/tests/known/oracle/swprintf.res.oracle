@@ -103,11 +103,11 @@ int main(void)
   if (nondet) {
     size_t tmp;
     tmp = wcslen((wchar_t const *)(data));
-    swprintf_va_1(dest,tmp,(wchar_t const *)L"%" "l" "s" ,data);
+    swprintf(dest,tmp,(wchar_t const *)L"%" "l" "s" ,data); /* swprintf_va_1 */
     /*@ assert \false; */ ;
   }
   tmp_0 = wcslen((wchar_t const *)(data));
-  swprintf_va_2(dest,tmp_0 / (size_t)2,(wchar_t const *)L"%" "l" "s" ,data);
+  swprintf(dest,tmp_0 / (size_t)2,(wchar_t const *)L"%" "l" "s" ,data); /* swprintf_va_2 */
   __retres = 0;
   return __retres;
 }

@@ -41,8 +41,8 @@ int main(void)
   char arg = (char)42;
   int r2 = __va_ioctl_ptr(fd1,request1,(void *)(& arg));
   struct st *p = (struct st *)0;
-  __va_ioctl_ptr(fd1,request1,(void *)p);
-  __va_ioctl_int(fd1,request1,42);
+  ioctl(fd1,request1,(void *)p); /* __va_ioctl_ptr */
+  ioctl(fd1,request1,42); /* __va_ioctl_int */
   __retres = 0;
   return __retres;
 }

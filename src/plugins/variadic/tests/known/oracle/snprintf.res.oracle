@@ -90,11 +90,11 @@ int main(void)
   if (nondet) {
     size_t tmp;
     tmp = strlen((char const *)(data));
-    snprintf_va_1(dest,tmp,"%s",data);
+    snprintf(dest,tmp,"%s",data); /* snprintf_va_1 */
     /*@ assert \false; */ ;
   }
   tmp_0 = strlen((char const *)(data));
-  snprintf_va_2(dest,tmp_0 / (size_t)2,"%s",data);
+  snprintf(dest,tmp_0 / (size_t)2,"%s",data); /* snprintf_va_2 */
   __retres = 0;
   return __retres;
 }

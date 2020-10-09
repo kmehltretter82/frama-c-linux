@@ -40,8 +40,8 @@ int main(void)
   mode_t mode1 = (unsigned int)0;
   int mode2 = 0;
   char *file = (char *)"file";
-  __va_openat_mode_t(0,(char const *)file,flag,mode1);
-  __va_openat_mode_t(0,(char const *)file,flag,(mode_t)mode2);
+  openat(0,(char const *)file,flag,mode1); /* __va_openat_mode_t */
+  openat(0,(char const *)file,flag,(mode_t)mode2); /* __va_openat_mode_t */
   {
     double __va_arg0 = 3.0;
     void *__va_args[1] = {& __va_arg0};
