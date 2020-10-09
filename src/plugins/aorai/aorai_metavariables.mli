@@ -24,3 +24,5 @@
 (**************************************************************************)
 
 val checkInitialization : Promelaast.typed_automaton -> unit
+
+val checkSingleAssignment : Promelaast.typed_automaton -> unit

@@ -26,9 +26,25 @@
 open Cil_types
 open Promelaast
 
+let dkey = Aorai_option.register_category "check-metavar"
 
 
-let dkey_metavar_init = Aorai_option.register_category "metavar-init"
+module VarSet = Cil_datatype.Varinfo.Set
+
+let pretty_set fmt set =
+  let l = VarSet.elements set in
+  Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
+
+let pretty_state fmt st =
+  Format.pp_print_string fmt st.Promelaast.name
+
+let pretty_trans fmt tr =
+  Format.fprintf fmt "from %a to %a:@\n{ @[%a@] } %a"
+    pretty_state tr.start
+    pretty_state tr.stop
+    Promelaoutput.Typed.print_condition tr.cross
+    Promelaoutput.Typed.print_actionl tr.actions
+
 
 module type InitAnalysisParam =
 sig
@@ -41,12 +57,9 @@ struct
   type edge = Aorai_graph.E.t
   type g = Aorai_graph.t
 
-  module Set = Cil_datatype.Varinfo.Set
-  type data = Bottom | InitializedSet of Set.t
+  type data = Bottom | InitializedSet of VarSet.t
 
-  let dkey = dkey_metavar_init
-
-  let top = InitializedSet Set.empty
+  let top = InitializedSet VarSet.empty
 
   let init v =
     if v.Promelaast.init = Bool3.True then top else Bottom
@@ -56,49 +69,34 @@ struct
   let equal d1 d2 =
     match d1, d2 with
     | Bottom, d | d, Bottom -> d = Bottom
-    | InitializedSet s1, InitializedSet s2 -> Set.equal s1 s2
+    | InitializedSet s1, InitializedSet s2 -> VarSet.equal s1 s2
 
   let join d1 d2 =
     match d1, d2 with
     | Bottom, d | d, Bottom -> d
     | InitializedSet s1, InitializedSet s2 ->
-      InitializedSet (Set.inter s1 s2)
-
-  let pretty_state fmt st =
-    Format.pp_print_string fmt st.Promelaast.name
-
-  let pretty_trans fmt tr =
-    Promelaoutput.Typed.print_condition fmt tr.cross;
-    if tr.actions <> [] then
-      Format.fprintf fmt "{@[%a@]}" Promelaoutput.Typed.print_actionl tr.actions
-
-  let pretty_set fmt set =
-    let l = Set.elements set in
-    Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
+      InitializedSet (VarSet.inter s1 s2)
 
   let _pretty_data fmt = function
     | Bottom -> Format.printf "Bottom"
     | InitializedSet set -> pretty_set fmt set
 
-  let check (src,tr,dst) used initialized =
-    let diff = Set.diff used initialized in
-    if not (Set.is_empty diff) then
+  let check tr used initialized =
+    let diff = VarSet.diff used initialized in
+    if not (VarSet.is_empty diff) then
       Aorai_option.abort
-        "The metavariables %a may not be initialized before the transition \
-         from %a to %a:@\n%a"
+        "The metavariables %a may not be initialized before the transition %a"
         pretty_set diff
-        pretty_state src
-        pretty_state dst
         pretty_trans tr
 
   let term_mvars t =
-    let result = ref Set.empty in
+    let result = ref VarSet.empty in
     let v = object
       inherit Visitor.frama_c_inplace
       method!vlogic_var_use lv =
         match lv.lv_origin with
         | Some vi when Env.is_metavariable vi ->
-          result := Set.add vi !result;
+          result := VarSet.add vi !result;
           Cil.SkipChildren
         | _ -> Cil.SkipChildren
     end in
@@ -106,27 +104,27 @@ struct
     !result
 
   let rec cond_mvars = function
-    | TAnd (c1,c2) | TOr (c1,c2) -> Set.union (cond_mvars c1) (cond_mvars c2)
+    | TAnd (c1,c2) | TOr (c1,c2) -> VarSet.union (cond_mvars c1) (cond_mvars c2)
     | TNot (c) -> cond_mvars c
-    | TRel (_,t1,t2) -> Set.union (term_mvars t1) (term_mvars t2)
-    | TCall _ | TReturn _ | TTrue | TFalse -> Set.empty
+    | TRel (_,t1,t2) -> VarSet.union (term_mvars t1) (term_mvars t2)
+    | TCall _ | TReturn _ | TTrue | TFalse -> VarSet.empty
 
-  let analyze ((src,tr,dst) as edge) = function
+  let analyze (_,tr,_) = function
     | Bottom -> Bottom
     | InitializedSet initialized ->
       (* Check that the condition uses only initialized variables *)
-      check edge (cond_mvars tr.cross) (initialized);
+      check tr (cond_mvars tr.cross) (initialized);
       (* Add initialized variables and check the right hand side *)
       let add initialized = function
         | Copy_value ((TVar({lv_origin = Some vi}),_),t) ->
-          check edge (term_mvars t) initialized;
-          Set.add vi initialized
+          check tr (term_mvars t) initialized;
+          VarSet.add vi initialized
         | _ -> initialized
       in
       let initialized' = List.fold_left add initialized tr.actions in
       Aorai_option.debug ~dkey "%a {%a} -> %a {%a}"
-        pretty_state src pretty_set initialized
-        pretty_state dst pretty_set initialized';
+        pretty_state tr.start pretty_set initialized
+        pretty_state tr.stop pretty_set initialized';
       InitializedSet initialized'
 end
 
@@ -144,3 +142,20 @@ let checkInitialization auto =
   let g = Aorai_graph.of_automaton auto in
   let _result = Fixpoint.analyze A.init g in
   ()
+
+let checkSingleAssignment auto =
+  let check_action tr assigned = function
+    | Copy_value ((TVar({lv_origin = Some vi}),_),_) ->
+      if VarSet.mem vi assigned then
+        Aorai_option.abort
+          "The metavariable %a may not be assigned several times during the \
+           transition %a"
+          Cil_printer.pp_varinfo vi
+          pretty_trans tr;
+      VarSet.add vi assigned
+    | _ -> assigned
+  in
+  let check_trans tr =
+    ignore (List.fold_left (check_action tr) VarSet.empty tr.actions)
+  in
+  List.iter check_trans auto.trans

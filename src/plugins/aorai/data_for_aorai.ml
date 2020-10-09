@@ -1561,7 +1561,8 @@ let setAutomata auto =
     (* all transitions have a true parameterized guard, i.e. [[]] *)
     cond_of_parametrizedTransitions :=
       Array.make (getNumberOfTransitions  ()) [[]] ;
-  Aorai_metavariables.checkInitialization auto
+  Aorai_metavariables.checkInitialization auto ;
+  Aorai_metavariables.checkSingleAssignment auto
 
 let getState num =
   List.find (fun st -> st.nums = num) (getAutomata ()).states
