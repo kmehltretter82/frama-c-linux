@@ -116,7 +116,7 @@ let a_addr b k = a_shift (a_global b) k   (* b k -> { base = b; offset = k } *)
 (* -------------------------------------------------------------------------- *)
 (* ---  Cmath Wrapper                                                     --- *)
 (* -------------------------------------------------------------------------- *)
-let a_iabs i = e_fun Cmath.f_iabs [i]    (* x -> |x| *)
+let a_iabs i = e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  MemValue Types                                                     --- *)
@@ -267,7 +267,7 @@ struct
             assert false (* by context. *)
   end
 
-  let cluster () = Definitions.cluster ~id:"Default" ()
+  let cluster () = Definitions.cluster ~id:"MemVal"  ()
 
   module Heap = Qed.Collection.Make(Chunk)
   module Sigma = Sigma.Make(Chunk)(Heap)
@@ -331,7 +331,7 @@ struct
         | _ -> compare a b
   end
 
-  module Access = WpContext.StaticGenerator(Obj)
+  module Access = WpContext.Generator(Obj)
       (struct
         let name = "MemVal.Access"
         type key = c_object
@@ -368,7 +368,7 @@ struct
           };
           lfun
 
-        let axiomatize ~obj suffix t_mem t_data f_rd f_wr =
+        let axiomatize ~obj:_ suffix t_mem t_data f_rd f_wr =
           let name = "axiom_" ^ suffix in
           let xw = Lang.freshvar ~basename:"w" t_mem in
           let w = e_var xw in
@@ -376,13 +376,13 @@ struct
           let o = e_var xo in
           let xv = Lang.freshvar ~basename:"v" t_data in
           let v = e_var xv in
-          let p_write = p_call f_wr [w; o; v] in
-          let p_read = p_call f_rd [e_prop p_write; o] in
-          let lemma = p_equal (e_prop p_read) v in
+          let p_write = e_fun f_wr [w; o; v] ~result:t_mem in
+          let p_read = e_fun f_rd [p_write; o] ~result:t_data in
+          let lemma = p_equal p_read v in
           let cluster = cluster () in
-          if not (Wp_parameters.debug_atleast 1) then begin
-            F.set_builtin_2 f_rd (phi_read ~obj ~read:f_rd ~write:f_wr)
-          end;
+          (* if not (Wp_parameters.debug_atleast 1) then begin
+           *   F.set_builtin_2 f_rd (phi_read ~obj ~read:f_rd ~write:f_wr)
+           * end; *)
           Definitions.define_lemma {
             l_kind = `Axiom;
             l_name = name; l_types = 0;
@@ -402,14 +402,14 @@ struct
           let ro = e_var xro in
           let xv = Lang.freshvar ~basename:"v" t_data in
           let v = e_var xv in
-          let p_write = p_call f_wr [w; wo; v] in
-          let p_read = p_call f_rd [e_prop p_write; ro] in
+          let p_write = e_fun f_wr [w; wo; v] ~result:t_mem in
+          let p_read = e_fun f_rd [p_write; ro] ~result:t_data in
           let sizeof = (F.e_int (Ctypes.sizeof_object obj)) in
           let offset = a_iabs (F.e_sub ro wo) in
           let lemma =
             F.p_imply
               (F.p_leq sizeof offset)
-              (F.p_equal (e_prop p_read) (e_prop (p_call f_rd [w; ro])))
+              (F.p_equal p_read (e_fun f_rd [w; ro] ~result:t_data))
           in
           let cluster = cluster () in
           Definitions.define_lemma {
@@ -435,9 +435,9 @@ struct
       end)
 
   let read obj ~mem ~offset =
-    F.e_fun (fst (Access.get obj)) [mem; offset]
+    F.e_fun (fst (Access.get obj)) [mem; offset] ~result:(Lang.tau_of_object obj)
   let write obj ~mem ~offset ~value =
-    F.e_fun (snd (Access.get obj)) [mem; offset; value]
+    F.e_fun (snd (Access.get obj)) [mem; offset; value] ~result:t_words
 
   let fold_ite f l =
     let rec aux = function
@@ -832,7 +832,7 @@ struct
       v []
 
   let logic_ival ival = fun x ->
-    (* assert (not (Ival.is_float ival)); (\* by integer offsets *\) *)
+    (* assert (not (Ival.is_float ival)); (* by integer offsets *) *)
     match Ival.project_small_set ival with
     | Some is ->
       F.p_any

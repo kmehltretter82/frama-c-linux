@@ -35,6 +35,14 @@ theory Cmath [@ W:non_conservative_extension:N]
 
 end
 
+theory IAbs
+  use export int.Abs
+end
+
+theory RAbs
+  use export real.Abs
+end
+
 theory Square [@ W:non_conservative_extension:N]
 
   use real.RealInfix

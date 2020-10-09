@@ -3,24 +3,27 @@
 [eva:alarm] tests/wp_eva/simple.c:26: Warning: 
   division by zero. assert (int)(*x - 42) ≢ 0;
 [eva:alarm] tests/wp_eva/simple.c:31: Warning: assertion got status unknown.
+[eva:alarm] tests/wp_eva/simple.c:35: Warning: assertion got status unknown.
+[eva:alarm] tests/wp_eva/simple.c:41: Warning: assertion got status unknown.
 # frama-c -wp -wp-model 'Eva1' [...]
 [wp] Running WP plugin...
-[wp] tests/wp_eva/simple.c:34: Warning: 
+[wp] tests/wp_eva/simple.c:44: Warning: 
   Ignored 'terminates' specification:
    \false
 [wp] Warning: Missing RTE guards
-[wp] 3 goals scheduled
-[wp] [Alt-Ergo] Goal eva1_f_assert : Failed
-  [Why3 Error] Not a predicate symbol: write_sint32
-[wp] [Alt-Ergo] Goal eva1_f_assert_Eva_division_by_zero : Failed
-  [Why3 Error] Not a predicate symbol: write_sint321
-[wp] Failure: Undefined symbol 'read_sint32'
-[wp] [Alt-Ergo] Goal eva1_g_assert : Failed
-  [Why3 Error] anomaly: Log.AbortFatal("wp")
-[wp] Proved goals:    0 / 3
-  Alt-Ergo:        0  (failed: 3)
+[wp] 5 goals scheduled
+[wp] [Alt-Ergo] Goal eva1_f_assert : Timeout (missing cache)
+[wp] [Alt-Ergo] Goal eva1_f_assert_Eva_division_by_zero : Valid (missing cache)
+[wp] [Alt-Ergo] Goal eva1_g_assert : Timeout (missing cache)
+[wp] [Qed] Goal eva1_h_assert : Valid
+[wp] [Alt-Ergo] Goal eva1_h2_assert : Valid (missing cache)
+[wp] Proved goals:    3 / 5
+  Qed:             1 
+  Alt-Ergo:        2  (unsuccess: 2)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f                         -        -        2       0.0%
+  f                         -        1        2      50.0%
   g                         -        -        1       0.0%
+  h                         1        -        1       100%
+  h2                        -        1        1       100%
 ------------------------------------------------------------

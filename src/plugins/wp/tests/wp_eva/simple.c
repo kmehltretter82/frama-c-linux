@@ -31,10 +31,22 @@ void g (int *x, int *y){
   /*@ assert P(*x) && P(*y) && P(z); @*/
 }
 
+void h (int *x, int *y){
+  /*@ assert *x == *y; */
+}
+
+void h2 (int *x, int *y, int *z){
+  *x = *z;
+  *y = 1;
+  /*@ assert *x == *z; */
+}
+
 void main(){
   int x = Frama_C_interval(2,1000);
   int y = Frama_C_interval(2,1000);
   z = Frama_C_interval(2,1000);
   f(&z,&z);
   g(&x,&y);
+  h(&x,&x);
+  h2(&x,&y,&z);
 }
