@@ -87,24 +87,24 @@ void eacsl_mark_readonly(void *ptr) {
 int eacsl_valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
     size == 0
-    ||
+    || (
     allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
     && !readonly(ptr)
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
-  ;
+    );
 }
 
 int eacsl_valid_read(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
   return
     size == 0
-    ||
+    || (
     allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
-  ;
+    );
 }
 
 /*! NB: The implementation for this function can also be specified via
