@@ -313,6 +313,20 @@ and autofork env ~depth fork =
     ( Env.validate env ; Task.return true )
 
 (* -------------------------------------------------------------------------- *)
+(* --- Apply Script Tactic                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let apply env node jtactic subscripts =
+  match jfork (Env.tree env) ?node jtactic with
+  | None -> failwith "Selector not found"
+  | Some fork ->
+      let _,children = ProofEngine.commit fork in
+      reconcile children subscripts ; (*TODO: saveback forgiven script ? *)
+      List.filter
+        (fun (_,node) -> not (ProofEngine.proved node))
+        children
+
+(* -------------------------------------------------------------------------- *)
 (* --- Script Crawling                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -348,30 +362,26 @@ let rec crawl env on_child node = function
 
   | Tactic( _ , jtactic , subscripts ) :: alternative ->
       begin
-        match jfork (Env.tree env) ?node jtactic with
-        | None ->
-            Wp_parameters.warning
-              "Script Error: on goal %a@\n\
-               can not apply '%s'@\n\
-               @[<hov 2>Params: %a@]@\n\
-               @[<hov 2>Select: %a@]@."
-              WpPropId.pretty (Env.goal env node).po_pid
-              jtactic.tactic
-              Json.pp jtactic.params
-              Json.pp jtactic.select ;
-            crawl env on_child node alternative
-        | Some fork ->
-            (*TODO: saveback forgiven script *)
-            let _,children = ProofEngine.commit fork in
-            reconcile children subscripts ;
-            let residual = List.filter
-                (fun (_,node) -> not (ProofEngine.proved node))
-                children in
-            if residual = [] then
-              Env.validate env
-            else
-              List.iter (fun (_,n) -> on_child n) children ;
-            Task.return ()
+        try
+          let residual = apply env node jtactic subscripts in
+          if residual = [] then
+            Env.validate env
+          else
+            List.iter (fun (_,n) -> on_child n) residual ;
+          Task.return ()
+        with exn when Wp_parameters.protect exn ->
+          Wp_parameters.warning
+            "Script Error: on goal %a@\n\
+             can not apply '%s'@\n\
+             exception %S@\n\
+             @[<hov 2>Params: %a@]@\n\
+             @[<hov 2>Select: %a@]@."
+            WpPropId.pretty (Env.goal env node).po_pid
+            jtactic.tactic
+            (Printexc.to_string exn)
+            Json.pp jtactic.params
+            Json.pp jtactic.select ;
+          crawl env on_child node alternative
       end
 
 (* -------------------------------------------------------------------------- *)
