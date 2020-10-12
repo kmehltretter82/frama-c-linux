@@ -58,18 +58,20 @@
     }
   },
   {
+    "selector": ".multiple-selection",
+    "style": {
+      "overlay-color": "#aaa",
+      "overlay-padding": "10px",
+      "overlay-opacity": 0.4
+    }
+  },
+  {
     "selector": "edge:selected",
     "style": {
       "color": "#48f",
       "overlay-color": "#8bf",
       "overlay-padding": "10px",
       "overlay-opacity": 0.4
-    }
-  },
-  {
-    "selector": "edge[?is_root]",
-    "style": {
-      "width": 4
     }
   },
   {

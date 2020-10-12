@@ -297,9 +297,8 @@ class Dive {
     for (const dep of data.deps) {
       const src = this.cy.$id(dep.src);
       const dst = this.cy.$id(dep.dst);
-      const isRoot = dst?.data('is_root');
       this.cy.add({
-        data: { ...dep, source: dep.src, target: dep.dst, is_root: isRoot },
+        data: { ...dep, source: dep.src, target: dep.dst },
         group: 'edges',
         classes: src?.hasClass('new') || dst?.hasClass('new') ? 'new' : '',
       });
@@ -486,8 +485,10 @@ class Dive {
       _.some(ele.data().origins, this.selectedLocation)
     );
     this.cy.$(':selected').forEach(unselect);
+    this.cy.$('.multiple-selection').removeClass('multiple-selection');
     select(node);
     const edges = node.incomers('edge');
+    edges.addClass('multiple-selection');
     edges.unselect();
     const relevantEdges = edges.filter(hasOrigin);
     if (relevantEdges.empty())
