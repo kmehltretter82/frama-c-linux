@@ -27,7 +27,9 @@
 let cfg = lazy
   begin
     try
-      Why3.Whyconf.read_config None
+      let config = Why3.Whyconf.read_config None in
+      let config = Why3.Whyconf.load_default_config_if_needed config in
+      config
     with exn ->
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
@@ -94,6 +96,7 @@ let print_wp s =
 let title p = Pretty_utils.sfprintf "%a" Why3.Whyconf.print_prover p
 let name p = p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
+let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))

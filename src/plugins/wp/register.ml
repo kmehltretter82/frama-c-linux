@@ -759,49 +759,48 @@ let dkey_refusage = Wp_parameters.register_category "refusage"
 let dkey_builtins = Wp_parameters.register_category "builtins"
 
 let cmdline_run () =
-  let wp_main fct =
-    Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
-    Ast.compute ();
-    Dyncall.compute ();
-    if Wp_parameters.has_dkey dkey_logicusage then
+  begin
+    if Wp_parameters.CachePrint.get () then
+      Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
+    let fct = Wp_parameters.get_fct () in
+    if fct <> Wp_parameters.Fct_none then
       begin
-        LogicUsage.compute ();
-        LogicUsage.dump ();
-      end ;
-    if Wp_parameters.has_dkey dkey_refusage then
-      begin
-        RefUsage.compute ();
-        RefUsage.dump ();
-      end ;
-    let bhv = Wp_parameters.Behaviors.get () in
-    let prop = Wp_parameters.Properties.get () in
-    (** TODO entry point *)
-    let computer = computer () in
-    if Wp_parameters.has_dkey dkey_builtins then
-      begin
-        WpContext.on_context (computer#model,WpContext.Global)
-          LogicBuiltins.dump ();
-      end ;
-    wp_compute_memory_context computer#model ;
-    if Wp_parameters.CheckModelHypotheses.get () then
-      wp_insert_memory_context computer#model fct ;
-    Generator.compute_selection computer ~fct ~bhv ~prop ()
-  in
-  if Wp_parameters.CachePrint.get () then
-    Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
-  let fct = Wp_parameters.get_wp () in
-  if fct <> Wp_parameters.Fct_none then
-    begin
-      let goals = wp_main fct in
-      do_wp_proofs goals ;
-      begin
-        if fct <> Wp_parameters.Fct_all then
-          do_wp_print_for goals
-        else
-          do_wp_print () ;
-      end ;
-      do_wp_report () ;
-    end
+        Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
+        Ast.compute ();
+        Dyncall.compute ();
+        if Wp_parameters.has_dkey dkey_logicusage then
+          begin
+            LogicUsage.compute ();
+            LogicUsage.dump ();
+          end ;
+        if Wp_parameters.has_dkey dkey_refusage then
+          begin
+            RefUsage.compute ();
+            RefUsage.dump ();
+          end ;
+        let bhv = Wp_parameters.Behaviors.get () in
+        let prop = Wp_parameters.Properties.get () in
+        (** TODO entry point *)
+        let computer = computer () in
+        if Wp_parameters.has_dkey dkey_builtins then
+          begin
+            WpContext.on_context (computer#model,WpContext.Global)
+              LogicBuiltins.dump ();
+          end ;
+        wp_compute_memory_context computer#model ;
+        if Wp_parameters.CheckModelHypotheses.get () then
+          wp_insert_memory_context computer#model fct ;
+        let goals = Generator.compute_selection computer ~fct ~bhv ~prop () in
+        do_wp_proofs goals ;
+        begin
+          if fct <> Wp_parameters.Fct_all then
+            do_wp_print_for goals
+          else
+            do_wp_print () ;
+        end ;
+        do_wp_report () ;
+      end
+  end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Register external functions                                     --- *)

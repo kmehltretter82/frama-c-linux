@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2020                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,28 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val version : string
-val config : unit -> Why3.Whyconf.config
-val configure : unit -> unit
-val set_procs : int -> unit
+val dump_to_json : unit -> Yojson.Basic.t
+(** Builds a Json object describing the Frama-C configuration. *)
 
-type t = Why3.Whyconf.prover
-
-val find_opt : string -> t option
-
-type fallback = Exact of t | Fallback of t | NotFound
-val find_fallback : string -> fallback
-
-val print_why3 : t -> string
-val print_wp : t -> string
-val title : t -> string
-val name : t -> string
-val compare : t -> t -> int
-
-val provers : unit -> t list
-val provers_set : unit -> Why3.Whyconf.Sprover.t
-val is_available : t -> bool
-val is_mainstream : t -> bool
-val has_shortcut : t -> string -> bool
-
-(**************************************************************************)
+val dump_to_stdout : unit -> unit
+(** Dumps a Json object describing the Frama-C configuration to stdout. *)

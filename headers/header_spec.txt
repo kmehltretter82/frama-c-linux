@@ -367,6 +367,8 @@ src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
 src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL
@@ -1738,12 +1740,12 @@ src/plugins/wp/share/coqwp/Zbits.v: CEA_WP
 src/plugins/wp/share/coqwp/bool/Bool.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Abs.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/ComputerDivision.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/EuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/EuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Exponentiation.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Int.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/MinMax.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Power.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Map.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Const.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/real/Abs.v: UNMODIFIED_WHY3

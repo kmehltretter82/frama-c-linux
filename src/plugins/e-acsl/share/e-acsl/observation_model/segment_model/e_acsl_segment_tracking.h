@@ -36,7 +36,7 @@
 /* Segment settings and shadow values interpretation {{{ */
 
 /* This file implements segment-based and offset-based shadow memory models
- * (shadow encodings) (see draft of the PLDI'17 paper).
+ * (shadow encodings) (see draft of the ISMM'17 paper).
  *
  * IMPORTANT: While the implementation of the offset-based encoding mostly
  * follows the description given by the paper, there are differences in the

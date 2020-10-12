@@ -420,6 +420,18 @@ let () =
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
+module PrintConfigJson =
+  False
+    (struct
+      let module_name = "PrintConfigJson"
+      let option_name = "-print-config-json"
+      let help = "prints extensive data about Frama-C's configuration, in \
+                  JSON format, and exits (experimental: the output format \
+                  is very likely to change in future versions)."
+    end)
+
+let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
 let () = Parameter_customize.do_not_journalize ()
 let () = Parameter_customize.set_negative_option_name ""
 module AutocompleteHelp =
