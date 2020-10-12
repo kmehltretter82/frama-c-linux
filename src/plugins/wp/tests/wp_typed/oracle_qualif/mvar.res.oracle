@@ -16,7 +16,7 @@
 [wp] tests/wp_typed/mvar.i:8: Warning: 
   Memory model hypotheses for function 'Write':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(p + (..), (char *)A + (..));
        requires \separated(p + (0 ..), (char *)A + (..));
      */

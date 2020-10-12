@@ -102,11 +102,11 @@ Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), -5), 10).
 ------------------------------------------------------------
 [wp] tests/wp_plugin/overassign.i:14: Warning: 
   Memory model hypotheses for function 'f1_ok':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p + (0 .. 9), &p); */
   void f1_ok(void);
 [wp] tests/wp_plugin/overassign.i:17: Warning: 
   Memory model hypotheses for function 'f2_ok':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p + (10 .. 19), &p); */
   void f2_ok(void);

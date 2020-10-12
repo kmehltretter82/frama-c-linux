@@ -25,7 +25,7 @@
 [wp] tests/wp_hoare/refguards.i:10: Warning: 
   Memory model hypotheses for function 'f':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(c, d, {a + (..), b + (..)});
        requires \valid(c);
        requires \valid(d);
@@ -34,7 +34,7 @@
 [wp] tests/wp_hoare/refguards.i:25: Warning: 
   Memory model hypotheses for function 'h':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(c, d);
        requires \valid(c);
        requires \valid(d);
@@ -43,7 +43,7 @@
 [wp] tests/wp_hoare/refguards.i:39: Warning: 
   Memory model hypotheses for function 's':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(c, d);
        requires \valid(c);
        requires \valid(d);

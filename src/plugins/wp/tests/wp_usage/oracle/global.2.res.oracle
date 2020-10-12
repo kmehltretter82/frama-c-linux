@@ -21,7 +21,9 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_usage/global.c:16: Warning: 
   Memory model hypotheses for function 'foo':
-  /*@ behavior typed_ref:
-        requires \separated(a, &GLOBAL);
-        requires \valid(a); */
+  /*@
+     behavior wp_typed_ref:
+       requires \separated(a, &GLOBAL);
+       requires \valid(a);
+     */
   void foo(int *a);

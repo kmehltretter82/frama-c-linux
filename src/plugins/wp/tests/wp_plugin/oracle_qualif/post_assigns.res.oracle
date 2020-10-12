@@ -17,7 +17,7 @@
 [wp] tests/wp_plugin/post_assigns.i:12: Warning: 
   Memory model hypotheses for function 'receive':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(message + (..), &size);
        ensures \separated(message + (0 .. \at(size,Post)), &size);
      */

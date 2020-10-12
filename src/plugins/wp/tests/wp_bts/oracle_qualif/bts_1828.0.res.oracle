@@ -19,6 +19,6 @@
 ------------------------------------------------------------
 [wp] tests/wp_bts/bts_1828.i:56: Warning: 
   Memory model hypotheses for function 'global_frame':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(one, &zero); */
   void global_frame(int *one, int arg);

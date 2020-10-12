@@ -68,20 +68,22 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_plugin/sep.i:18: Warning: 
   Memory model hypotheses for function 'f2_p_a':
-  /*@ behavior typed_caveat:
+  /*@ behavior wp_typed_caveat:
         requires \separated(p, &a);
         requires \valid(p); */
   void f2_p_a(int *p);
 [wp] tests/wp_plugin/sep.i:22: Warning: 
   Memory model hypotheses for function 'f3_p_ab':
-  /*@ behavior typed_caveat:
-        requires \separated(p, &a, &b);
-        requires \valid(p); */
+  /*@
+     behavior wp_typed_caveat:
+       requires \separated(p, &a, &b);
+       requires \valid(p);
+     */
   void f3_p_ab(int *p);
 [wp] tests/wp_plugin/sep.i:26: Warning: 
   Memory model hypotheses for function 'f4_pq_ab':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p, q, &a, &b);
        requires \valid(p);
        requires \valid(q);
@@ -90,7 +92,7 @@ Prove: true.
 [wp] tests/wp_plugin/sep.i:30: Warning: 
   Memory model hypotheses for function 'f5_pq':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p, q);
        requires \valid(p);
        requires \valid(q);
@@ -99,7 +101,7 @@ Prove: true.
 [wp] tests/wp_plugin/sep.i:34: Warning: 
   Memory model hypotheses for function 'f6_Pa':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p + (..), &a);
        requires \valid(p + (..));
      */
@@ -107,7 +109,7 @@ Prove: true.
 [wp] tests/wp_plugin/sep.i:43: Warning: 
   Memory model hypotheses for function 'f7_pq_ad':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p, q, &a, &d);
        requires \valid(p);
        requires \valid(q);
@@ -116,7 +118,7 @@ Prove: true.
 [wp] tests/wp_plugin/sep.i:49: Warning: 
   Memory model hypotheses for function 'f8_pq_a':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p, q, &a);
        requires \valid(p);
        requires \valid(q);

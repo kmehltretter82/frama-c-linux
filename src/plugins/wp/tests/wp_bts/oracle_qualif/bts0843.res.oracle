@@ -17,6 +17,6 @@
 ------------------------------------------------------------
 [wp] tests/wp_bts/bts0843.i:13: Warning: 
   Memory model hypotheses for function 'f3':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(&p, &p->a); */
   void f3(void);

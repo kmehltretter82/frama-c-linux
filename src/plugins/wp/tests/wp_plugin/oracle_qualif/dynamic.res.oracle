@@ -69,21 +69,21 @@
 ------------------------------------------------------------
 [wp] tests/wp_plugin/dynamic.i:41: Warning: 
   Memory model hypotheses for function 'guarded_call':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p, &X); */
   void guarded_call(struct S *p);
 [wp] tests/wp_plugin/dynamic.i:63: Warning: 
   Memory model hypotheses for function 'behavior':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int behavior(int (*p)(void));
 [wp] tests/wp_plugin/dynamic.i:76: Warning: 
   Memory model hypotheses for function 'some_behaviors':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int some_behaviors(int (*p)(void));
 [wp] tests/wp_plugin/dynamic.i:85: Warning: 
   Memory model hypotheses for function 'missing_context':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p, &X1); */
   int missing_context(int (*p)(void));

@@ -29,7 +29,7 @@ Prove: true.
 [wp] tests/wp_typed/unit_labels.i:7: Warning: 
   Memory model hypotheses for function 'duplet':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(pi, pj, a + (..));
        requires \valid(pi);
        requires \valid(pj);

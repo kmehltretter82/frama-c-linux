@@ -99,6 +99,6 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_acsl/assigns_path.i:12: Warning: 
   Memory model hypotheses for function 'job':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(b + (..), &p); */
   void job(int n, int *b);

@@ -498,23 +498,23 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_hoare/dispatch_var.i:12: Warning: 
   Memory model hypotheses for function 'ref_ctr':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(p); */
   int ref_ctr(int *p);
 [wp] tests/wp_hoare/dispatch_var.i:44: Warning: 
   Memory model hypotheses for function 'ref_bd':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int ref_bd(int *q);
 [wp] tests/wp_hoare/dispatch_var.i:83: Warning: 
   Memory model hypotheses for function 'ref_valid':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(p1); */
   int ref_valid(int *p1);
 [wp] tests/wp_hoare/dispatch_var.i:133: Warning: 
   Memory model hypotheses for function 'ref_ctr_nr':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(ref, ref1, ref2);
        requires \valid(ref);
        requires \valid(ref1);
@@ -523,11 +523,11 @@ Prove: true.
   int ref_ctr_nr(int *ref, int *ref1, int *ref2);
 [wp] tests/wp_hoare/dispatch_var.i:158: Warning: 
   Memory model hypotheses for function 'ref_ctr_nstars':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(pp); */
   int ref_ctr_nstars(int **pp);
 [wp] tests/wp_hoare/dispatch_var.i:194: Warning: 
   Memory model hypotheses for function 'g':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(pg); */
   int g(int *pg);

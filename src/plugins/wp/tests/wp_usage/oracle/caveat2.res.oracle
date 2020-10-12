@@ -100,7 +100,7 @@ Prove: true.
 [wp] tests/wp_usage/caveat2.i:17: Warning: 
   Memory model hypotheses for function 'job':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(p, b + (..));
        requires \valid(b + (..));
        requires \valid(p);

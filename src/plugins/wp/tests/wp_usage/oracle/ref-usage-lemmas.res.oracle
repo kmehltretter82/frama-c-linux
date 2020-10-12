@@ -19,6 +19,6 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_usage/ref-usage-lemmas.i:26: Warning: 
   Memory model hypotheses for function 'foo':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(x, &b); */
   void foo(int *x);

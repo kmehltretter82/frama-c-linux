@@ -357,7 +357,7 @@ let compute_behavior kf name hypotheses_computer =
   | [], [] -> None
   | reqs, ens ->
       Some {
-        b_name = name ;
+        b_name = Annotations.fresh_behavior_name kf ("wp_" ^  name) ;
         b_requires = reqs ;
         b_assumes = [] ;
         b_post_cond = ens ;

@@ -28,6 +28,6 @@
 ------------------------------------------------------------
 [wp] tests/wp_acsl/pointer.i:73: Warning: 
   Memory model hypotheses for function 'absurd':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(q + (..), &p); */
   void absurd(int *q);

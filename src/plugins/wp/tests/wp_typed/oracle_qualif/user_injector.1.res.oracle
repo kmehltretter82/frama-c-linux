@@ -28,7 +28,7 @@
 [wp] tests/wp_typed/user_injector.i:58: Warning: 
   Memory model hypotheses for function 'job':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires
          \separated(
            error, (int *)service_id + (..), (int *)service_result + (..), &seq,

@@ -25,7 +25,7 @@ Prove: true.
 [wp] tests/wp_usage/issue-189.i:16: Warning: 
   Memory model hypotheses for function 'f':
   /*@
-     behavior typed_caveat:
+     behavior wp_typed_caveat:
        requires \separated(ptr, src);
        requires \valid(ptr);
      */

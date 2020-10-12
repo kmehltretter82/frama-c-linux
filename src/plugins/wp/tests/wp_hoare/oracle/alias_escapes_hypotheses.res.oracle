@@ -70,22 +70,22 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_hoare/alias_escapes_hypotheses.i:8: Warning: 
   Memory model hypotheses for function 'f1':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         ensures \separated(\result, &a); */
   int *f1(void);
 [wp] tests/wp_hoare/alias_escapes_hypotheses.i:19: Warning: 
   Memory model hypotheses for function 'f3':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         ensures \separated(\result, &x); */
   int *f3(int x);
 [wp] tests/wp_hoare/alias_escapes_hypotheses.i:24: Warning: 
   Memory model hypotheses for function 'fp1':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p, &a);
         ensures \separated(p, &a); */
   void fp1(int **p);
 [wp] tests/wp_hoare/alias_escapes_hypotheses.i:35: Warning: 
   Memory model hypotheses for function 'fp3':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         ensures \separated(p, &x); */
   void fp3(int **p, int x);

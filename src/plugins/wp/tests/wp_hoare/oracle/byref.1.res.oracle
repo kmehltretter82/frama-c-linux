@@ -87,16 +87,16 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_hoare/byref.i:14: Warning: 
   Memory model hypotheses for function 'f':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(r); */
   void f(int *r);
 [wp] tests/wp_hoare/byref.i:20: Warning: 
   Memory model hypotheses for function 'wrong_without_ref':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int wrong_without_ref(int *q);
 [wp] tests/wp_hoare/byref.i:31: Warning: 
   Memory model hypotheses for function 'pointer':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int pointer(int *q);

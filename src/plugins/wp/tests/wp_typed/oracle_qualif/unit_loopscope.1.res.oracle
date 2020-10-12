@@ -16,6 +16,6 @@
 ------------------------------------------------------------
 [wp] tests/wp_typed/unit_loopscope.i:9: Warning: 
   Memory model hypotheses for function 'f':
-  /*@ behavior typed_ref:
+  /*@ behavior wp_typed_ref:
         requires \valid(written); */
   void f(unsigned int *written);

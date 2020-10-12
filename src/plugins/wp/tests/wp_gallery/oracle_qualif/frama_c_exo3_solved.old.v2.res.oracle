@@ -48,7 +48,7 @@
 [wp] tests/wp_gallery/frama_c_exo3_solved.old.v2.c:56: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(v1, v2, a + (..));
        requires \valid(v1);
        requires \valid(v2);

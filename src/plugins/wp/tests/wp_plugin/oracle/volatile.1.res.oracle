@@ -71,6 +71,6 @@ Prove: true.
 ------------------------------------------------------------
 [wp] tests/wp_plugin/volatile.i:32: Warning: 
   Memory model hypotheses for function 'job_struct_assigns':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(p, &sv); */
   void job_struct_assigns(struct st_v *p);

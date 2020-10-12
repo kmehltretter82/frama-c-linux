@@ -196,24 +196,24 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:17: Warning: 
   Memory model hypotheses for function 'global_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(g_alias, (int *)global + (..), &g_alias);
      */
   void global_alias(void);
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:24: Warning: 
   Memory model hypotheses for function 'global_no_alias':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(g_alias, &g_alias); */
   void global_no_alias(void);
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:32: Warning: 
   Memory model hypotheses for function 'formal_alias':
-  /*@ behavior typed:
+  /*@ behavior wp_typed:
         requires \separated(f_alias, (int *)global + (..)); */
   void formal_alias(int *f_alias);
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:48: Warning: 
   Memory model hypotheses for function 'formal_alias_array':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated((int *)global + (..), &(*alias_array)[0 .. 1]);
        requires \separated(alias_array + (..), (int *)global + (..));
      */
@@ -221,7 +221,7 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:61: Warning: 
   Memory model hypotheses for function 'field_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated((int *)global + (..), &x->x);
        requires \separated(x, (int *)global + (..));
      */
@@ -229,7 +229,7 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:73: Warning: 
   Memory model hypotheses for function 'field_range_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated((int *)global + (..), &(x + (0 .. 3))->x);
        requires \separated(x + (..), (int *)global + (..));
      */
@@ -237,7 +237,7 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:81: Warning: 
   Memory model hypotheses for function 'set_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
        requires \separated(f_alias, (int *)global + (..), &g_alias);
      */
@@ -245,7 +245,7 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:92: Warning: 
   Memory model hypotheses for function 'comprehension_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires
          \separated(
            (int *)global + (..), &g_alias,
@@ -256,7 +256,7 @@ Prove: true.
 [wp] tests/wp_hoare/alias_assigns_hypotheses.i:102: Warning: 
   Memory model hypotheses for function 'union_alias':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
        requires \separated(f_alias, (int *)global + (..), &g_alias);
      */

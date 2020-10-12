@@ -18,7 +18,7 @@
 [wp] tests/wp_plugin/subset_fopen.c:13: Warning: 
   Memory model hypotheses for function 'fopen':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(&_p__fc_fopen, {filename + (..), mode + (..)});
        ensures \separated(\result, &_p__fc_fopen);
      */
