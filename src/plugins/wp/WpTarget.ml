@@ -32,25 +32,15 @@ module TargetKfs =
       let name = "WpTarget.TargetKfs"
     end)
 
-let calls_visitor callees = object(self)
-  inherit Visitor.frama_c_inplace
-  method private add kf =
-    callees := Fct.add kf !callees
-
-  method! vinst = function
-    | Call(_, { enode = Lval(Var vi, NoOffset) }, _, _)
-    | Local_init (_,ConsInit(vi,_,_),_) ->
-        let kf = Globals.Functions.get vi in
-        self#add kf ;
-        Cil.SkipChildren
-    | Call _ ->
-        begin match Extlib.opt_map Dyncall.get self#current_stmt with
-          | Some (Some (_, l)) -> List.iter self#add l
-          | _ -> ()
-        end ;
-        Cil.SkipChildren
-    | _ -> Cil.SkipChildren
-end
+let get_called_stmt stmt =
+  match stmt.skind with
+  | Instr (Call(_, fct, _, _)) ->
+      begin match Kernel_function.get_called fct with
+        | Some kf -> [kf]
+        | None -> Extlib.(opt_conv [] (opt_map snd (Dyncall.get stmt)))
+      end
+  | Instr (Local_init (_,ConsInit(vi,_,_),_)) -> [ Globals.Functions.get vi ]
+  | _ -> []
 
 module Callees =
   State_builder.Hashtbl
@@ -71,12 +61,13 @@ module Callees =
     are under verification.
 *)
 let with_callees kf =
-  if Kernel_function.has_definition kf then begin
-    let set = ref (Fct.singleton kf) in
-    ignore (Visitor.visitFramacKf (calls_visitor set) kf) ;
-    !set
-  end else
-    Fct.empty
+  try
+    let stmts = (Kernel_function.get_definition kf).sallstmts in
+    let fold s stmt =
+      List.fold_left (fun s kf -> Fct.add kf s) s (get_called_stmt stmt)
+    in
+    List.fold_left fold (Fct.singleton kf) stmts
+  with Kernel_function.No_Definition -> Fct.empty
 
 let with_callees = Callees.memo with_callees
 
@@ -147,16 +138,7 @@ let check_properties behaviors props kf =
           end
           kf_behaviors
       in
-      match stmt.skind with
-      | Instr (Call(_, { enode = Lval(Var vi, NoOffset) }, _, _))
-      | Instr (Local_init (_,ConsInit(vi,_,_),_)) ->
-          check_callee (Globals.Functions.get vi)
-      | Instr (Call _) ->
-          begin match Dyncall.get stmt with
-            | None -> ()
-            | Some (_, l) -> List.iter check_callee l
-          end
-      | _ -> ()
+      List.iter check_callee (get_called_stmt stmt)
     in
     let check_stmt stmt =
       check_call stmt ;
