@@ -187,13 +187,7 @@ let compute model =
     insert_rte kf ;
     add_with_behaviors behaviors props kf
   in
-  let functions = Wp_parameters.Functions.get () in
-  let skipped   = Wp_parameters.SkipFunctions.get () in
-  let open Globals.Functions in
-  if Fct.is_empty functions then
-    if Fct.is_empty skipped then iter add_kf
-    else iter (fun kf -> if Fct.mem kf skipped then () else add_kf kf)
-  else Fct.iter add_kf (Fct.diff functions skipped)
+  Wp_parameters.iter_kf add_kf
 
 let compute model =
   if not (TargetKfs.is_computed ()) then begin

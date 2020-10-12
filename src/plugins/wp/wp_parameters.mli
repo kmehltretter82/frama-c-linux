@@ -41,8 +41,6 @@ val iter_kf : (Kernel_function.t -> unit) -> unit
 module WP          : Parameter_sig.Bool
 module Behaviors   : Parameter_sig.String_list
 module Properties  : Parameter_sig.String_list
-module Functions   : Parameter_sig.Kernel_function_set
-module SkipFunctions   : Parameter_sig.Kernel_function_set
 module StatusAll   : Parameter_sig.Bool
 module StatusTrue  : Parameter_sig.Bool
 module StatusFalse : Parameter_sig.Bool
