@@ -78,7 +78,7 @@ let warn_memory_context kfs =
   end
 
 let populate_memory_context kfs =
-  if Wp_parameters.CheckModelHypotheses.get () then begin
+  if Wp_parameters.CheckMemoryContext.get () then begin
     Kernel_function.Set.iter
       (fun kf -> with_model MemoryContext.add_behavior kf) kfs
   end

@@ -1,9 +1,9 @@
 /* run.config
-   OPT:-wp-model +ref -wp-no-warn-memory-model -wp-check-model-hypotheses -then -print
+   OPT:-wp-model +ref -wp-no-warn-memory-model -wp-check-memory-model -then -print
 */
 
 /* run.config_qualif
-   OPT:-wp-model +ref -wp-no-warn-memory-model -wp-check-model-hypotheses
+   OPT:-wp-model +ref -wp-no-warn-memory-model -wp-check-memory-model
 */
 
 int g ;

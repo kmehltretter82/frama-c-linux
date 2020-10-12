@@ -773,7 +773,7 @@ let cmdline_run () =
           end ;
         WpTarget.compute computer#model ;
         wp_compute_memory_context computer#model ;
-        if Wp_parameters.CheckModelHypotheses.get () then
+        if Wp_parameters.CheckMemoryContext.get () then
           wp_insert_memory_context computer#model ;
         let goals = Generator.compute_selection computer ~fct ~bhv ~prop () in
         do_wp_proofs goals ;
