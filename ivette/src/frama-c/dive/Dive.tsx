@@ -10,6 +10,7 @@ import * as API from 'api/plugins/dive';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 import './cytoscape_libs';
+import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 
 import tippy, * as Tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
@@ -34,6 +35,7 @@ interface Cxtcommand {
 
 interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: any): void;
+  panzoom(options: any): void;
 }
 
 function callstackToString(callstack: API.callstack): string {
@@ -49,6 +51,19 @@ function buildCxtMenu(
     content: content ? renderToString(content) : '',
     select: action || (() => { }),
     enabled: !!action,
+  });
+}
+
+/* double click events for Cytoscape */
+
+function enableDoubleClickEvents(cy: Cytoscape.Core, delay = 350) {
+  let last: Cytoscape.EventObject | undefined;
+  cy.on('click', (e) => {
+    if (last && last.target === e.target &&
+      e.timeStamp - last.timeStamp < delay) {
+      e.target.trigger('double-click', e);
+    }
+    last = e;
   });
 }
 
@@ -83,8 +98,17 @@ class Dive {
     this.cy = cy || Cytoscape();
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
-    this.cy.off('click'); // Remove previous listeners
+
+    // Remove previous listeners
+    this.cy.off('click');
+    this.cy.off('double-click');
+
+    // Add new listeners
+    enableDoubleClickEvents(this.cy);
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
+    this.cy.on('double-click', '$node > node', // compound nodes
+      (event) => this.doubleClickNode(event.target));
+    (this.cy as CytoscapeExtended).panzoom({});
 
     this.layout = 'cose-bilkent';
 
@@ -434,6 +458,10 @@ class Dive {
        nodes and edges. As we want some incoming edges to remain selected, we
        make the node unselectable, preventing cytoscape to select it. */
     node.unselectify();
+  }
+
+  doubleClickNode(node: Cytoscape.NodeSingular) {
+    this.cy.animate({ fit: { eles: node, padding: 10 } });
   }
 
   selectLocation(location: States.Location | undefined, doExplore: boolean) {
