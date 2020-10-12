@@ -78,12 +78,11 @@ exception Found
 
 let check_properties behaviors props kf =
   let open Property in
-  let selected_behavior b =
-    behaviors = [] ||
-    Extlib.may_map ~dft:false (fun b -> List.mem b.b_name behaviors) b
+  let exists_selected_behavior l =
+    behaviors = [] || List.exists (fun b -> List.mem b behaviors) l
   in
   let check_ip ip =
-    if selected_behavior (get_behavior ip) then
+    if exists_selected_behavior (WpPropId.user_bhv_names ip) then
       let names = WpPropId.user_prop_names ip in
       if props = [] || WpPropId.are_selected_names props names then raise Found
   in
