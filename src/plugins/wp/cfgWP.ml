@@ -754,11 +754,23 @@ struct
     | Some exp ->
         in_wenv wenv wp
           begin fun env wp ->
-            let vr = L.result () in
-            let tr = L.return () in
-            let sigma = L.current env in
-            let returned = p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
-            let vcs = gmap (assume_vc ~descr:"Return" ~stmt [returned]) wp.vcs in
+            let compile () =
+              let sigma = L.current env in
+              let vr = L.result () in
+              let tr = L.return () in
+              p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
+            let outcome = Warning.catch
+                ~severe:false ~effect:"Result value discarded (unknown)"
+                compile () in
+            let warn, condition =
+              match outcome with
+              | Warning.Failed warn ->
+                  warn , p_true
+              | Warning.Result(warn,condition) ->
+                  warn , condition in
+            let vcs = gmap (
+                assume_vc ~descr:"Return" ~stmt ~warn [condition]
+              ) wp.vcs in
             { wp with vcs = vcs }
           end
 
