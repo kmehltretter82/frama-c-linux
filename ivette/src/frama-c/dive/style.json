@@ -16,14 +16,6 @@
     }
   },
   {
-    "selector": "node:selected",
-    "style": {
-      "overlay-color": "#8bf",
-      "overlay-padding": "10px",
-      "overlay-opacity": 0.4
-    }
-  },
-  {
     "selector": "node[label]",
     "style": {
       "label": "data(label)"
@@ -58,7 +50,7 @@
     }
   },
   {
-    "selector": ".multiple-selection",
+    "selector": "edge.multiple-selection",
     "style": {
       "overlay-color": "#aaa",
       "overlay-padding": "10px",
@@ -66,9 +58,8 @@
     }
   },
   {
-    "selector": "edge:selected",
+    "selector": "edge.selection, :selected",
     "style": {
-      "color": "#48f",
       "overlay-color": "#8bf",
       "overlay-padding": "10px",
       "overlay-opacity": 0.4

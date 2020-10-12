@@ -486,15 +486,12 @@ class Dive {
     );
     this.cy.$(':selected').forEach(unselect);
     this.cy.$('.multiple-selection').removeClass('multiple-selection');
+    this.cy.$('.selection').removeClass('selection');
     select(node);
     const edges = node.incomers('edge');
-    edges.addClass('multiple-selection');
-    edges.unselect();
     const relevantEdges = edges.filter(hasOrigin);
-    if (relevantEdges.empty())
-      edges.select();
-    else
-      relevantEdges.select();
+    edges.addClass('multiple-selection');
+    relevantEdges.addClass('selection');
   }
 }
 
