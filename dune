@@ -1,1 +1,1 @@
-(dirs src ptests tests share)
+(dirs src ptests tests share bin)

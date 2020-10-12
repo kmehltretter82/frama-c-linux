@@ -1,0 +1,9 @@
+(install
+ (package frama-c)
+ (section bin)
+ (files
+  (frama-c-script as frama-c-script)
+  (frama-c-config as frama-c-config)
+  (local_export.sh as local_export.sh)
+ )
+)
