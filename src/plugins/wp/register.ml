@@ -748,8 +748,11 @@ let cmdline_run () =
     if fct <> Wp_parameters.Fct_none then
       begin
         Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
+        let computer = computer () in
         Ast.compute ();
         Dyncall.compute ();
+        if Wp_parameters.RTE.get () then
+          WpRTE.generate_all computer#model ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -763,7 +766,6 @@ let cmdline_run () =
         let bhv = Wp_parameters.Behaviors.get () in
         let prop = Wp_parameters.Properties.get () in
         (** TODO entry point *)
-        let computer = computer () in
         if Wp_parameters.has_dkey dkey_builtins then
           begin
             WpContext.on_context (computer#model,WpContext.Global)
