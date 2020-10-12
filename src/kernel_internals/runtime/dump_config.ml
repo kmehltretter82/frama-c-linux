@@ -50,19 +50,19 @@ let dump_to_json () =
     "version_and_codename", `String Fc_config.version_and_codename ;
     "major_version", `Int Fc_config.major_version ;
     "minor_version", `Int Fc_config.minor_version ;
-    "is_gui", `Bool !Fc_config.is_gui ;
+    "is_gui", `Bool Fc_config.is_gui ;
     "lablgtk", `String Fc_config.lablgtk ;
-    "ocamlc", `String Fc_config.ocamlc ;
-    "ocamlopt", `String Fc_config.ocamlopt ;
+    (* "ocamlc", `String Fc_config.ocamlc ;
+     * "ocamlopt", `String Fc_config.ocamlopt ; *)
     "ocaml_wflags", `String Fc_config.ocaml_wflags ;
     "datadir", `String Fc_config.datadir ;
     "datadirs", list string Fc_config.datadirs ;
     "framac_libc", `String Fc_config.framac_libc ;
-    "libdir", `String Fc_config.libdir ;
+    (* "libdir", `String Fc_config.libdir ; *)
     "plugin_dir", list string Fc_config.plugin_dir ;
-    "plugin_path", `String Fc_config.plugin_path ;
-    "compilation_unit_names", list string Fc_config.compilation_unit_names ;
-    "library_names", list string Fc_config.library_names ;
+    (* "plugin_path", `String Fc_config.plugin_path ;
+     * "compilation_unit_names", list string Fc_config.compilation_unit_names ;
+     * "library_names", list string Fc_config.library_names ; *)
     "preprocessor", `String Fc_config.preprocessor ;
     "using_default_cpp", `Bool Fc_config.using_default_cpp ;
     "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;
