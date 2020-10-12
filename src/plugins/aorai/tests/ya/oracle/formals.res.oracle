@@ -132,21 +132,15 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
   {
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (7 == aorai_CurStates) {
-      if (x == 1) {
-        aorai_CurStates = aorai_intermediate_state;
-        aorai_x = x;
+    if (7 == aorai_CurStates && x == 1) {
+      aorai_CurStates = aorai_intermediate_state;
+      aorai_x = x;
+    }
+    else 
+      if (7 == aorai_CurStates && x == 3) {
+        aorai_CurStates = aorai_intermediate_state_2;
+        aorai_x_0 = x;
       }
-      else goto _LAND;
-    }
-    else {
-      _LAND: ;
-      if (7 == aorai_CurStates) 
-        if (x == 3) {
-          aorai_CurStates = aorai_intermediate_state_2;
-          aorai_x_0 = x;
-        }
-    }
     return;
   }
 
@@ -219,28 +213,13 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
   {
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (4 == aorai_CurStates) {
-      if (aorai_x_0 == 3) aorai_CurStates = OK; else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (1 == aorai_CurStates) {
-        if (aorai_x == 1) aorai_CurStates = aorai_intermediate_state_0;
-        else goto _LAND_0;
-      }
-      else {
-        _LAND_0: ;
-        if (4 == aorai_CurStates) {
-          if (aorai_x_0 != 3) aorai_CurStates = aorai_reject;
-          else goto _LAND;
-        }
-        else {
-          _LAND: ;
-          if (1 == aorai_CurStates) 
-            if (aorai_x != 1) aorai_CurStates = aorai_reject;
-        }
-      }
-    }
+    if (4 == aorai_CurStates && aorai_x_0 == 3) aorai_CurStates = OK;
+    else 
+      if (1 == aorai_CurStates && aorai_x == 1) aorai_CurStates = aorai_intermediate_state_0;
+      else 
+        if (4 == aorai_CurStates && aorai_x_0 != 3) aorai_CurStates = aorai_reject;
+        else 
+          if (1 == aorai_CurStates && aorai_x != 1) aorai_CurStates = aorai_reject;
     return;
   }
 
@@ -438,18 +417,13 @@ int f(int x)
   {
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
-    if (3 == aorai_CurStates) {
-      if (aorai_y == 2) aorai_CurStates = OK; else goto _LAND;
-    }
-    else {
-      _LAND: ;
+    if (3 == aorai_CurStates && aorai_y == 2) aorai_CurStates = OK;
+    else 
       if (0 == aorai_CurStates) aorai_CurStates = OK;
       else 
         if (5 == aorai_CurStates) aorai_CurStates = aorai_reject;
         else 
-          if (3 == aorai_CurStates) 
-            if (aorai_y != 2) aorai_CurStates = aorai_reject;
-    }
+          if (3 == aorai_CurStates && aorai_y != 2) aorai_CurStates = aorai_reject;
     return;
   }
 

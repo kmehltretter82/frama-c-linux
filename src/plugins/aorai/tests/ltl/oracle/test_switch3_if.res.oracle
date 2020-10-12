@@ -58,9 +58,7 @@ enum aorai_OpStatusList {
     accept_S2_tmp = 0;
     accept_S1_tmp = 0;
     T0_init_tmp = 0;
-    if (T0_S2 == 1) T0_S2_tmp = 1;
-    else 
-      if (accept_S2 == 1) T0_S2_tmp = 1; else T0_S2_tmp = 0;
+    if (T0_S2 == 1 || accept_S2 == 1) T0_S2_tmp = 1; else T0_S2_tmp = 0;
     T0_S2 = T0_S2_tmp;
     T0_init = T0_init_tmp;
     accept_S1 = accept_S1_tmp;
@@ -247,14 +245,10 @@ int countOne(char *argv)
     T0_init_tmp = T0_init;
     accept_S1_tmp = accept_S1;
     accept_S2_tmp = accept_S2;
-    if (T0_S2 == 1) accept_S2_tmp = 1;
-    else 
-      if (accept_S2 == 1) accept_S2_tmp = 1; else accept_S2_tmp = 0;
-    if (T0_S2 == 1) accept_S1_tmp = 1;
-    else 
-      if (accept_S1 == 1) accept_S1_tmp = 1;
-      else 
-        if (accept_S2 == 1) accept_S1_tmp = 1; else accept_S1_tmp = 0;
+    if (T0_S2 == 1 || accept_S2 == 1) accept_S2_tmp = 1;
+    else accept_S2_tmp = 0;
+    if ((T0_S2 == 1 || accept_S1 == 1) || accept_S2 == 1) accept_S1_tmp = 1;
+    else accept_S1_tmp = 0;
     T0_init_tmp = 0;
     if (accept_S1 == 1) T0_S2_tmp = 1; else T0_S2_tmp = 0;
     T0_S2 = T0_S2_tmp;

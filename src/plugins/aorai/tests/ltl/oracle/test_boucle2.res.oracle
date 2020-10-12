@@ -144,9 +144,7 @@ int rr = 1;
     accept_all_tmp = 0;
     accept_S5_tmp = 0;
     accept_S4_tmp = 0;
-    if (T0_S2 == 1) 
-      if (rr == 51) accept_S3_tmp = 1; else accept_S3_tmp = 0;
-    else accept_S3_tmp = 0;
+    if (T0_S2 == 1 && rr == 51) accept_S3_tmp = 1; else accept_S3_tmp = 0;
     T0_init_tmp = 0;
     if (T0_S2 == 1) T0_S2_tmp = 1; else T0_S2_tmp = 0;
     T0_S2 = T0_S2_tmp;

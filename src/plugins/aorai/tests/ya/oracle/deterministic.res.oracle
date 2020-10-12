@@ -107,14 +107,9 @@ check lemma S0_deterministic_trans{L}:
   {
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
-    if (3 == aorai_CurStates) {
-      if (x == 4) aorai_CurStates = S4; else goto _LAND;
-    }
-    else {
-      _LAND: ;
-      if (3 == aorai_CurStates) 
-        if (x == 5) aorai_CurStates = S5;
-    }
+    if (3 == aorai_CurStates && x == 4) aorai_CurStates = S4;
+    else 
+      if (3 == aorai_CurStates && x == 5) aorai_CurStates = S5;
     return;
   }
 
@@ -231,8 +226,7 @@ void g(int x)
   {
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (1 == aorai_CurStates) 
-      if (x == 4) aorai_CurStates = S3;
+    if (1 == aorai_CurStates && x == 4) aorai_CurStates = S3;
     return;
   }
 
@@ -278,9 +272,7 @@ void g(int x)
   {
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (1 == aorai_CurStates) 
-      if (res == 0) 
-        if (X == 5) aorai_CurStates = S2;
+    if (1 == aorai_CurStates && (res == 0 && X == 5)) aorai_CurStates = S2;
     return;
   }
 
@@ -351,14 +343,9 @@ int f(int x)
   {
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_real_main;
-    if (0 == aorai_CurStates) {
-      if (c != 0) aorai_CurStates = S1; else goto _LAND;
-    }
-    else {
-      _LAND: ;
-      if (0 == aorai_CurStates) 
-        if (c == 0) aorai_CurStates = S2;
-    }
+    if (0 == aorai_CurStates && c != 0) aorai_CurStates = S1;
+    else 
+      if (0 == aorai_CurStates && c == 0) aorai_CurStates = S2;
     return;
   }
 

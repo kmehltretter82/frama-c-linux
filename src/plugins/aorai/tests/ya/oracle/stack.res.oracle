@@ -204,8 +204,7 @@ void push(void)
   {
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
-    if (3 == aorai_CurStates) 
-      if (aorai_n > 0) aorai_CurStates = emptying_stack;
+    if (3 == aorai_CurStates && aorai_n > 0) aorai_CurStates = emptying_stack;
     return;
   }
 
@@ -258,21 +257,15 @@ void push(void)
   {
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
-    if (2 == aorai_CurStates) {
-      if (aorai_n == 1) {
-        aorai_CurStates = empty_stack;
+    if (2 == aorai_CurStates && aorai_n == 1) {
+      aorai_CurStates = empty_stack;
+      aorai_n --;
+    }
+    else 
+      if (2 == aorai_CurStates && aorai_n > 1) {
+        aorai_CurStates = filled_stack;
         aorai_n --;
       }
-      else goto _LAND;
-    }
-    else {
-      _LAND: ;
-      if (2 == aorai_CurStates) 
-        if (aorai_n > 1) {
-          aorai_CurStates = filled_stack;
-          aorai_n --;
-        }
-    }
     return;
   }
 
