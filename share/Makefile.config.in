@@ -166,7 +166,7 @@ TEST_DIRS_AS_PLUGIN:=\
   pretty_printing builtins libc value
 
 ifeq ($(HAS_PYTHON36),yes)
-TEST_DIRS_AS_PLUGIN+= fc_script jcdb
+TEST_DIRS_AS_PLUGIN+= compliance fc_script jcdb
 endif
 
 PLUGIN_TESTS_LIST+=$(TEST_DIRS_AS_PLUGIN)
