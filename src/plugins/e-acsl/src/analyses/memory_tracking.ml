@@ -365,9 +365,15 @@ module rec Transfer
         (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
+      | Pseparated tlist ->
+        state_ref :=
+          List.fold_left
+            (register_term kf)
+            !state_ref
+            tlist;
+        Cil.DoChildren
       | Pallocable _ -> Error.not_yet "\\allocable"
       | Pfresh _ -> Error.not_yet "\\fresh"
-      | Pseparated _ -> Error.not_yet "\\separated"
       | Pdangling _ -> Error.not_yet "\\dangling"
       | Ptrue | Pfalse | Papp _ | Prel _
       | Pand _ | Por _ | Pxor _ | Pimplies _ | Piff _ | Pnot _ | Pif _

@@ -99,6 +99,8 @@ val dkey_print_unspecified: category
 
 val dkey_print_vid: category
 
+val dkey_print_field_offsets: category
+
 val dkey_prop_status: category
 
 val dkey_prop_status_emit: category

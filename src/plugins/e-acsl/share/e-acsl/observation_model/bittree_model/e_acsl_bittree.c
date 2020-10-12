@@ -432,7 +432,7 @@ static void bt_clean () {
 /* DEBUG             */
 /*********************/
 #ifdef E_ACSL_DEBUG
-static void bt_print_block(bt_block * ptr) {
+static void eacsl_bt_print_block(bt_block * ptr) {
   if (ptr != NULL) {
     DLOG("%a; %lu Bytes; %slitteral; [init] : %d ",
       (char*)ptr->ptr, ptr->size,
@@ -453,7 +453,7 @@ static void bt_print_node(bt_node * ptr, int depth) {
   for(i = 0; i < depth; i++)
     DLOG("  ");
   if(ptr->is_leaf)
-    bt_print_block(ptr->leaf);
+    eacsl_bt_print_block(ptr->leaf);
   else {
     DLOG("%p -- %p\n", (void*)ptr->mask, (void*)ptr->addr);
     bt_print_node(ptr->left, depth+1);
@@ -461,7 +461,7 @@ static void bt_print_node(bt_node * ptr, int depth) {
   }
 }
 
-static void bt_print_tree() {
+static void eacsl_bt_print_tree() {
   DLOG("------------DEBUG\n");
   bt_print_node(bt_root, 0);
   DLOG("-----------------\n");

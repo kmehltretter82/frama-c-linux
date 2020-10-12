@@ -158,6 +158,10 @@ void validate_shadow_layout() {
   /* Check that the struct holding memory layout is marked as initialized. */
   DVALIDATE_MEMORY_INIT;
 
+#ifdef E_ACSL_DEBUG_VERBOSE
+  DEBUG_PRINT_LAYOUT;
+#endif
+
   /* Each segment has 3 partitions:
 	 - application memory
      - primary/secondary shadows */
@@ -168,21 +172,40 @@ void validate_shadow_layout() {
 #endif
   int num_segments = num_partitions*num_seg_in_part;
   uintptr_t segments[num_segments][2];
+  const char * segment_names[num_segments];
 
-  size_t i;
+  size_t i, app_idx, primary_idx, secondary_idx;
+#ifdef E_ACSL_TEMPORAL
+  size_t primary_temporal_idx, secondary_temporal_idx;
+#endif
   for (i = 0; i < num_partitions; i++) {
     memory_partition *p = mem_partitions[i];
-    segments[num_seg_in_part*i][0] = p->application.start;
-    segments[num_seg_in_part*i][1] = p->application.end;
-    segments[num_seg_in_part*i+1][0] = p->primary.start;
-    segments[num_seg_in_part*i+1][1] = p->primary.end;
-    segments[num_seg_in_part*i+2][0] = p->secondary.start;
-    segments[num_seg_in_part*i+2][1] = p->secondary.end;
+
+    app_idx = num_seg_in_part*i;
+    segment_names[app_idx] = p->application.name;
+    segments[app_idx][0] = p->application.start;
+    segments[app_idx][1] = p->application.end;
+
+    primary_idx = num_seg_in_part*i+1;
+    segment_names[primary_idx] = p->primary.name;
+    segments[primary_idx][0] = p->primary.start;
+    segments[primary_idx][1] = p->primary.end;
+
+    secondary_idx = num_seg_in_part*i+2;
+    segment_names[secondary_idx] = p->secondary.name;
+    segments[secondary_idx][0] = p->secondary.start;
+    segments[secondary_idx][1] = p->secondary.end;
+
 #ifdef E_ACSL_TEMPORAL
-    segments[num_seg_in_part*i+3][0] = p->temporal_primary.start;
-    segments[num_seg_in_part*i+3][1] = p->temporal_primary.end;
-    segments[num_seg_in_part*i+4][0] = p->temporal_secondary.start;
-    segments[num_seg_in_part*i+4][1] = p->temporal_secondary.end;
+    primary_temporal_idx = num_seg_in_part*i+3;
+    segment_names[primary_temporal_idx] = p->temporal_primary.name;
+    segments[primary_temporal_idx][0] = p->temporal_primary.start;
+    segments[primary_temporal_idx][1] = p->temporal_primary.end;
+
+    secondary_temporal_idx = num_seg_in_part*i+4;
+    segment_names[secondary_temporal_idx] = p->temporal_secondary.name;
+    segments[secondary_temporal_idx][0] = p->temporal_secondary.start;
+    segments[secondary_temporal_idx][1] = p->temporal_secondary.end;
 #endif
   }
 
@@ -190,14 +213,17 @@ void validate_shadow_layout() {
   size_t j;
   for (int i = 0; i < num_segments; i++) {
     uintptr_t *src = segments[i];
+    const char *src_name = segment_names[i];
     DVASSERT(src[0] < src[1],
-      "Segment start is greater than segment end %lu < %lu\n", src[0], src[1]);
+      "Segment %s start is greater than segment end %a < %a\n",
+      src_name, src[0], src[1]);
     for (j = 0; j < num_segments; j++) {
       if (i != j) {
         uintptr_t *dest = segments[j];
+        const char *dest_name = segment_names[j];
         DVASSERT(src[1] < dest[0] || src[0] > dest[1],
-          "Segment [%lu, %lu] overlaps with segment [%lu, %lu]",
-          src[0], src[1], dest[0], dest[1]);
+          "Segment %s [%a, %a] overlaps with segment %s [%a, %a]",
+          src_name, src[0], src[1], dest_name, dest[0], dest[1]);
       }
     }
   }
@@ -521,7 +547,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   /* Make sure that heap memspace has not been moved. This is likely if
      a really large chunk has been requested to be allocated. */
   private_assert(mem_spaces.heap_mspace_least ==
-    (uintptr_t)mspace_least_addr(mem_spaces.heap_mspace),
+    (uintptr_t)eacsl_mspace_least_addr(mem_spaces.heap_mspace),
     "Exceeded heap allocation limit of %luMB -- heap memory space moved. \n",
     E_ACSL_HEAP_SIZE);
 
@@ -630,7 +656,7 @@ void *shadow_copy(const void *ptr, size_t size, int init) {
  * block.
  *
  * NOTE: ::unset_heap_segment assumes that `ptr` is a base address of an
- * allocated heap memory block, i.e., `freeable(ptr)` evaluates to true.
+ * allocated heap memory block, i.e., `eacsl_freeable(ptr)` evaluates to true.
  *
  * \param ptr - base address of the memory block to be removed from tracking
  * \param init - if evaluated to a non-zero value then initialization shadow
@@ -671,7 +697,7 @@ void free(void *ptr) {
   }
 
   if (ptr != NULL) { /* NULL is a valid behaviour */
-    if (freeable(ptr)) {
+    if (eacsl_freeable(ptr)) {
       unset_heap_segment(ptr, 1, "free");
       public_free(ptr);
     } else {
@@ -692,7 +718,7 @@ void* realloc(void *ptr, size_t size) {
   else if (ptr != NULL && size == 0) {
     free(ptr);
   } else {
-    if (freeable(ptr)) { /* ... and can be used as an input to `free` */
+    if (eacsl_freeable(ptr)) { /* ... and can be used as an input to `free` */
       size_t alloc_size = ALLOC_SIZE(size);
       res = public_realloc(ptr, alloc_size);
       DVALIDATE_ALIGNMENT(res);
@@ -810,7 +836,7 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
   return 0;
 }
 
-int freeable(void *ptr) { /* + */
+int eacsl_freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
@@ -1030,7 +1056,7 @@ void print_shadows(uintptr_t addr, size_t size) {
 }
 
 void print_memory_segment(struct memory_segment *p, char *lab, int off) {
-  DLOG("   %s: %lu MB [%lu, %lu]", lab, MB_SZ(p->size), p->start, p->end);
+  DLOG("   %s: %lu MB [%a, %a]", lab, MB_SZ(p->size), p->start, p->end);
   if (off)
     DLOG("{ Offset: %ld }", p->shadow_offset);
   DLOG("\n");

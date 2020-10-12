@@ -884,7 +884,7 @@ static void validate_format
 /* }}} */
 
 /* Printf and friends {{{ */
-int builtin_printf(const char *fmtdesc, const char *fmt, ...) {
+int eacsl_builtin_printf(const char *fmtdesc, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "printf", NULL, 0);
@@ -892,7 +892,7 @@ int builtin_printf(const char *fmtdesc, const char *fmt, ...) {
   return vprintf(fmt, ap);
 }
 
-int builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...) {
+int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   /* First check that stream belongs to allocated space */
@@ -915,7 +915,7 @@ int builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...) {
   return vfprintf(stream, fmt, ap);
 }
 
-int builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...) {
+int eacsl_builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   /* Make sure that the designated file descriptor is open */
@@ -926,7 +926,7 @@ int builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...) {
   return vdprintf(fd, fmt, ap);
 }
 
-int builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
+int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
   va_list ap;
   /* Make sure that the buffer has sufficient space to store the result of the
      function. Luckily this can be accomplished via `snprintf(buf, n, mfmt,...)`
@@ -945,7 +945,7 @@ int builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...) {
   return vsprintf(buffer, fmt, ap);
 }
 
-int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
+int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
     const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
@@ -959,7 +959,7 @@ int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
   return vsnprintf(buffer, size, fmt, ap);
 }
 
-int builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...) {
+int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   validate_format(fmtdesc, fmt, ap, "syslog", NULL, 0);

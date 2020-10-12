@@ -82,38 +82,38 @@
 
 /* No need to encapsulate via ifdef: using these extra definitions does
    not hurt, otherwise need to pass additional parameters to frama-c */
-#define builtin_printf   export_alias(builtin_printf)
-#define builtin_fprintf  export_alias(builtin_fprintf)
-#define builtin_dprintf  export_alias(builtin_dprintf)
-#define builtin_sprintf  export_alias(builtin_sprintf)
-#define builtin_snprintf export_alias(builtin_snprintf)
-#define builtin_syslog   export_alias(builtin_syslog)
+#define eacsl_builtin_printf   export_alias(builtin_printf)
+#define eacsl_builtin_fprintf  export_alias(builtin_fprintf)
+#define eacsl_builtin_dprintf  export_alias(builtin_dprintf)
+#define eacsl_builtin_sprintf  export_alias(builtin_sprintf)
+#define eacsl_builtin_snprintf export_alias(builtin_snprintf)
+#define eacsl_builtin_syslog   export_alias(builtin_syslog)
 
 /* Printf and friends {{{ */
 
 /** \brief `printf` with error checking. */
-int builtin_printf(const char *fmtdesc, const char *fmt, ...)
+int eacsl_builtin_printf(const char *fmtdesc, const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /** \brief `fprintf` with error checking. */
-int builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...)
+int eacsl_builtin_fprintf(const char *fmtdesc, FILE *stream, const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /** \brief `dprintf` with error checking. */
-int builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...)
+int eacsl_builtin_dprintf(const char *fmtdesc, int fd, const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /** \brief `sprintf` with error checking. */
-int builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...)
+int eacsl_builtin_sprintf(const char *fmtdesc, char *buffer, const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /** \brief `snprintf` with error checking. */
-int builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
+int eacsl_builtin_snprintf(const char *fmtdesc, char *buffer, size_t size,
     const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /** \brief `syslog` with error checking. */
-int builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...)
+int eacsl_builtin_syslog(const char *fmtdesc, int priority, const char *fmt, ...)
   __attribute__((FC_BUILTIN));
 
 /* }}} */

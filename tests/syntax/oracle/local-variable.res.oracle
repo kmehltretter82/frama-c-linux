@@ -33,4 +33,19 @@ int g(void)
   return __retres;
 }
 
+int loc_var(void);
+
+int nop(void)
+{
+  {
+    int loc_var_0;
+    
+  }
+  {
+    int tmp;
+    tmp = loc_var();
+    return tmp;
+  }
+}
+
 

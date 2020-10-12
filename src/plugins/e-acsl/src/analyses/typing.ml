@@ -593,7 +593,6 @@ let rec type_predicate p =
           Options.fatal "unexpected logic definition"
             Printer.pp_predicate p
       end
-    | Pseparated _ -> Error.not_yet "\\separated"
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
       let i1 = Interval.infer t1 in
@@ -681,6 +680,11 @@ let rec type_predicate p =
         guards;
       (type_predicate goal).ty
 
+    | Pseparated tlist ->
+      List.iter
+        (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan t))
+        tlist;
+      c_int
     | Pinitialized(_, t)
     | Pfreeable(_, t)
     | Pallocable(_, t)
@@ -703,7 +707,7 @@ let type_term ~use_gmp_opt ?ctx t =
     Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx t)
 
-let type_named_predicate ?(must_clear=true) p =
+let type_named_predicate ~must_clear p =
   Options.feedback ~dkey ~level:3 "typing predicate '%a'."
     Printer.pp_predicate p;
   if must_clear then begin

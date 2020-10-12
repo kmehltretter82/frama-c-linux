@@ -118,8 +118,8 @@ void set_shadow_segment(memory_segment *seg, memory_segment *parent,
   seg->name = name;
   seg->shadow_ratio = ratio;
   seg->size = parent->size/seg->shadow_ratio;
-  seg->mspace = create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
-  seg->start = (uintptr_t)mspace_malloc(seg->mspace,1);
+  seg->mspace = eacsl_create_mspace(seg->size + SHADOW_SEGMENT_PADDING, 0);
+  seg->start = (uintptr_t)eacsl_mspace_malloc(seg->mspace,1);
   seg->end = seg->start + seg->size;
   seg->shadow_offset = parent->start - seg->start;
 }
@@ -212,9 +212,9 @@ void clean_shadow_layout() {
     int i;
     for (i = 0; i < sizeof(mem_partitions)/sizeof(memory_partition*); i++) {
       if (mem_partitions[i]->primary.mspace)
-        destroy_mspace(mem_partitions[i]->primary.mspace);
+        eacsl_destroy_mspace(mem_partitions[i]->primary.mspace);
       if (mem_partitions[i]->secondary.mspace)
-        destroy_mspace(mem_partitions[i]->secondary.mspace);
+        eacsl_destroy_mspace(mem_partitions[i]->secondary.mspace);
     }
   }
 }
