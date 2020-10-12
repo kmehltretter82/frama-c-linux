@@ -148,7 +148,7 @@ let checkSingleAssignment auto =
     | Copy_value ((TVar({lv_origin = Some vi}),_),_) ->
       if VarSet.mem vi assigned then
         Aorai_option.abort
-          "The metavariable %a may not be assigned several times during the \
+          "The metavariable %a is assigned several times during the \
            transition %a"
           Cil_printer.pp_varinfo vi
           pretty_trans tr;
