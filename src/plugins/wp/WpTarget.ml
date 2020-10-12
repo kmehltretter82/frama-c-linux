@@ -77,66 +77,56 @@ let add_with_callees kf =
 exception Found
 
 let check_properties behaviors props kf =
+  let open Property in
+  let selected_behavior b =
+    behaviors = [] ||
+    Extlib.may_map ~dft:false (fun b -> List.mem b.b_name behaviors) b
+  in
   let check_ip ip =
-    let names = WpPropId.user_prop_names ip in
-    if props = [] || WpPropId.are_selected_names props names then raise Found
+    if selected_behavior (get_behavior ip) then
+      let names = WpPropId.user_prop_names ip in
+      if props = [] || WpPropId.are_selected_names props names then raise Found
   in
-  let check_with f bhv p = check_ip (f kf Kglobal bhv p) in
-  let check_bhv_requires bhv =
-    List.iter (check_with Property.ip_of_requires bhv) bhv.b_requires
+  let check_bhv_requires kf kinstr bv =
+    List.iter (fun p -> check_ip (ip_of_requires kf kinstr bv p)) bv.b_requires
   in
-  let check_bhv_ensures bhv =
-    List.iter (check_with Property.ip_of_ensures bhv) bhv.b_post_cond
+  let check_bhv_ensures kf kinstr bv =
+    List.iter (fun p -> check_ip (ip_of_ensures kf kinstr bv p)) bv.b_post_cond
   in
   let opt_check = function None -> () | Some p -> check_ip p in
-  let check_bhv_assigns kf kinstr bhv =
-    opt_check (Property.ip_assigns_of_behavior kf kinstr ~active:[] bhv)
+  let check_bhv_assigns kf kinstr bv =
+    opt_check (ip_assigns_of_behavior kf kinstr ~active:[] bv)
   in
-  let check_bhv_allocation kf kinstr bhv =
-    opt_check (Property.ip_allocation_of_behavior kf kinstr ~active:[] bhv)
+  let check_bhv_allocation kf kinstr bv =
+    opt_check (ip_allocation_of_behavior kf kinstr ~active:[] bv)
   in
-  let check_bhv reqs behaviors kf kinstr bv =
-    if behaviors = [] || List.mem bv.b_name behaviors then begin
-      if reqs then check_bhv_requires bv ;
-      check_bhv_assigns kf kinstr bv ;
-      check_bhv_allocation kf kinstr bv ;
-      check_bhv_ensures bv
-    end
+  let check_complete_disjoint kf kinstr =
+    try
+      let spec = Annotations.funspec kf in
+      let comp = ip_complete_of_spec kf kinstr ~active:[] spec in
+      let disj = ip_disjoint_of_spec kf kinstr ~active:[] spec in
+      List.iter check_ip comp ;
+      List.iter check_ip disj ;
+    with Annotations.No_funspec _ -> ()
   in
-  let check_code behaviors =
+  let check_bhv kf kinstr bv =
+    check_bhv_assigns kf kinstr bv ;
+    check_bhv_allocation kf kinstr bv ;
+    check_bhv_ensures kf kinstr bv ;
+    check_complete_disjoint kf kinstr
+  in
+  let check_code () =
     let stmts =
       try (Kernel_function.get_definition kf).sallstmts
       with Kernel_function.No_Definition -> []
     in
-    let for_a_bhv l = match behaviors with
-      | [] -> true
-      | bhvs -> List.exists (fun e -> List.mem e bhvs) l
-    in
     let check stmt _ ca =
-      match ca.annot_content with
-      | AAssert(fors, _) | AInvariant(fors, _, _) when for_a_bhv fors ->
-          check_ip (Property.ip_of_code_annot_single kf stmt ca)
-      | AVariant _v ->
-          check_ip (Property.ip_of_code_annot_single kf stmt ca)
-      | AAssigns(fors, _) when for_a_bhv fors ->
-          opt_check (Property.ip_assigns_of_code_annot kf (Kstmt stmt) ca)
-      | AAllocation(fors, a) when for_a_bhv fors ->
-          let kind = Property.Id_loop ca in
-          opt_check (Property.ip_of_allocation kf (Kstmt stmt) kind a)
-      | AStmtSpec(fors, s) ->
-          if for_a_bhv fors then raise Found ;
-          List.iter (check_bhv true behaviors kf (Kstmt stmt)) s.spec_behavior
-      | _ -> ()
+      List.iter check_ip (ip_of_code_annot kf stmt ca)
     in
     let check_call stmt =
       let check_callee kf =
         let kf_behaviors = Annotations.behaviors kf in
-        List.iter
-          begin fun b ->
-            if behaviors = [] || List.mem b.b_name behaviors then
-              List.iter (check_with Property.ip_of_requires b) b.b_requires
-          end
-          kf_behaviors
+        List.iter (check_bhv_requires kf Kglobal) kf_behaviors
       in
       List.iter check_callee (get_called_stmt stmt)
     in
@@ -146,9 +136,9 @@ let check_properties behaviors props kf =
     in
     List.iter check_stmt stmts
   in
-  let check_funbhv _ bv = check_bhv false behaviors kf Kglobal bv in
+  let check_funbhv _ bv = check_bhv kf Kglobal bv in
   Annotations.iter_behaviors check_funbhv kf ;
-  check_code behaviors
+  check_code ()
 
 let add_with_behaviors behaviors props kf =
   if behaviors = [] && props = [] then

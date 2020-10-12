@@ -43,19 +43,3 @@ Function cup:
 [wp] [CFG] Goal by_reference_in_code_annotation_no_exit_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
 [wp] No proof obligations
-[wp] tests/wp_usage/code_spec.i:56: Warning: 
-  Memory model hypotheses for function 'by_value_in_code_annotation':
-  /*@
-     behavior typed:
-       requires
-         \separated(
-           (int *)tab + (..), &x1, &x2, &x3, &x4, &x5, &x6, &x7, &x8, &x9,
-           {p + (..), q + (..)}
-           );
-     */
-  void by_value_in_code_annotation(int v, int *p, int *q);
-[wp] tests/wp_usage/code_spec.i:71: Warning: 
-  Memory model hypotheses for function 'by_reference_in_code_annotation':
-  /*@ behavior typed:
-        requires \separated(p, &p1, &p2, &p3, &p4, &p5, &p6); */
-  void by_reference_in_code_annotation(int *p);
