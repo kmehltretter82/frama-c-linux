@@ -29,6 +29,9 @@
 ifndef FRAMAC_SHARE
 FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
 endif
+ifndef FRAMAC_LIBDIR
+FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
+endif
 
 ###################
 # Plug-in sources #
@@ -485,7 +488,9 @@ EACSL_INSTALL_SCRIPTS=$(addprefix $(E_ACSL_DIR)/,$(EACSL_SCRIPTS))
 
 EACSL_INSTALL_MANPAGES=$(addprefix $(E_ACSL_DIR)/,$(EACSL_MANPAGES))
 
-install::
+EACSL_INSTALL_LIB_DIR :=$(FRAMAC_LIBDIR)/e-acsl
+
+install:: clean-install
 	$(PRINT_INSTALL) E-ACSL share files
 	for dir in $(EACSL_C_DIRECTORIES); do \
 		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
@@ -499,8 +504,8 @@ ifneq ("$(EACSL_INSTALL_MANUAL_FILES)","")
 	$(CP) $(EACSL_INSTALL_MANUAL_FILES) $(FRAMAC_DATADIR)/manuals;
 endif
 	$(PRINT_INSTALL) E-ACSL libraries
-	$(MKDIR) $(LIBDIR)
-	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
+	$(MKDIR) $(EACSL_INSTALL_LIB_DIR)
+	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(EACSL_INSTALL_LIB_DIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
 	$(CP) $(EACSL_INSTALL_SCRIPTS) $(BINDIR)/
@@ -519,7 +524,7 @@ uninstall::
 	$(PRINT_RM) E-ACSL manuals
 	$(RM) $(FRAMAC_DATADIR)/manuals/*.pdf
 	$(PRINT_RM) E-ACSL libraries
-	$(RM) $(LIBDIR)/libeacsl-*.a
+	$(RM) -r $(EACSL_INSTALL_LIB_DIR)
 	$(PRINT_RM) E-ACSL scripts
 	$(RM) $(EACSL_INSTALLED_SCRIPTS)
 	$(PRINT_RM) E-ACSL man pages

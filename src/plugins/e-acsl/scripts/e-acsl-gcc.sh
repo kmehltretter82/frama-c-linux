@@ -352,8 +352,6 @@ Notes:
 
 # Base dir of this script
 BASEDIR="$(realpath `dirname $0`)"
-# Directory with contrib libraries of E-ACSL
-LIBDIR="$BASEDIR/../lib"
 
 # Run getopt
 ARGS=`getopt -n "$ERROR" -l "$LONGOPTIONS" -o "$SHORTOPTIONS" -- "$@"`
@@ -672,6 +670,7 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
     `test -f "$DEVELOPMENT/META.frama-c-e_acsl" -o \
           -f "$FRAMAC_PLUGIN/META.frama-c-e_acsl"; echo $?`
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
+  EACSL_LIB="$DEVELOPMENT/lib"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
   if test -f "$DEVELOPMENT/META.frama-c-e_acsl"; then
@@ -680,7 +679,8 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
-  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
+  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl"
+  EACSL_LIB="$BASEDIR/../lib/frama-c/e-acsl"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -768,7 +768,7 @@ FRAMAC_FLAGS="$FRAMAC_FLAGS \
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
-EACSL_LDFLAGS="$LIBDIR/libeacsl-dlmalloc.a -lgmp -lm"
+EACSL_LDFLAGS="$EACSL_LIB/libeacsl-dlmalloc.a -lgmp -lm"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
