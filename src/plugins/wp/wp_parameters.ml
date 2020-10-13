@@ -1239,3 +1239,13 @@ let print_generated ?header file =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let protect e =
+  if debug_atleast 1 then false else
+    match e with
+    | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | _ -> true
+
+(* -------------------------------------------------------------------------- *)

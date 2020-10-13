@@ -62,9 +62,7 @@ val print_file : string -> (Format.formatter -> 'a) -> 'a
 (* ************************************************************************* *)
 
 type timer = float ref
-type 'a result = Result of 'a | Error of exn
-val catch : ('a -> 'b) -> 'a -> 'b result
-val return : 'a result -> 'a
+
 val time : ?rmax:timer -> ?radd:timer -> ('a -> 'b) -> 'a -> 'b
   (** Compute the elapsed time with [Sys.time].
       The [rmax] timer is maximized and the [radd] timer is cumulated.

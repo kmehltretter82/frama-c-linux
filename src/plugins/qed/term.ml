@@ -2239,8 +2239,10 @@ struct
     let fresh sigma t = fresh sigma.pool t
 
     let call f e =
-      let v = f e in
-      validate "Qed.Subst.add_fun" v ; v
+      if lc_closed e then
+        let v = f e in
+        validate "Qed.Subst.add_fun" v ; v
+      else raise Not_found
 
     let rec compute e = function
       | EMPTY -> raise Not_found

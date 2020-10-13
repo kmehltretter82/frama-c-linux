@@ -121,7 +121,15 @@ let spawn wpo ~delayed
             prover , task
          ) provers)
   else
-    let process = simplify ?start ?result wpo in
+    let process = simplify ?start ?result wpo >>= fun ok ->
+      begin
+        match success with
+        | None -> ()
+        | Some on_success ->
+            on_success wpo (if ok then Some VCS.Qed else None) ;
+      end ;
+      Task.return ()
+    in
     let thread = Task.thread process in
     let server = ProverTask.server () in
     Task.spawn server ?pool thread
