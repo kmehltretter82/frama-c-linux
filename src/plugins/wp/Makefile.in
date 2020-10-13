@@ -89,7 +89,7 @@ PLUGIN_CMO:= \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
-	TacRewrite TacBitwised TacBitrange TacShift \
+	TacRewrite TacBitwised TacBitrange TacBittest TacShift \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
 	ProverTask ProverErgo ProverCoq \
