@@ -286,7 +286,9 @@ module Normalized = struct
         Buffer.contents buf in
       let uri =
         try
-          String.sub uri 1 (String.length uri - 1)
+          if String.get uri 0 = '/' then
+            String.sub uri 1 (String.length uri - 1)
+          else uri
         with Invalid_argument _ -> uri
       in
       res, uri
