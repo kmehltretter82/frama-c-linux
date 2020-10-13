@@ -86,6 +86,10 @@ usage() {
    echo "      If [want_decls] is true, lists declarations."
    echo "      Results are guaranteed neither correct nor complete."
    echo ""
+   echo "  - estimate-difficulty file..."
+   echo "      Applies several heuristics to try and estimate the difficulty"
+   echo "      of analyzing the specified files with Frama-C."
+   echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
@@ -242,6 +246,10 @@ case "$command" in
     "heuristic-list-functions")
         shift;
         ${FRAMAC_SHARE}/analysis-scripts/heuristic_list_functions.py "$@";
+        ;;
+    "estimate-difficulty")
+        shift;
+        ${FRAMAC_SHARE}/analysis-scripts/estimate_difficulty.py "$@";
         ;;
     "make-wrapper")
         shift;

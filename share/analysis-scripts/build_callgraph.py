@@ -136,6 +136,22 @@ def cycle_dfs(cg, visited, just_visited, n):
                 return []
     return []
 
+def compute_recursive_cycles(cg, acc):
+    to_visit = set(cg.nodes())
+    if not to_visit: # empty graph -> no recursion
+        return
+    visited = set()
+    while to_visit:
+        just_visited = set()
+        n = sorted(list(to_visit))[0]
+        cycle = cycle_dfs(cg, visited, just_visited, n)
+        visited = visited.union(just_visited)
+        if cycle:
+            (fst, snd) = cycle[0]
+            cycle_start_loc = cg.edges[(fst, snd)][0]
+            acc.append((cycle_start_loc, cycle))
+        to_visit -= visited
+
 def detect_recursion(cg):
     #print(f"Detecting recursive calls...")
     to_visit = set(cg.nodes())
