@@ -108,6 +108,10 @@ val pretty_set : Format.formatter -> int VInfoMap.t -> unit
 
 val pretty_extern_vars: Format.formatter -> VInfoSet.t -> unit
 
+(** Build a JSON list with the varinfos in [m], each as a JSON object with
+    the varinfo name as key and additional attributes as values. *)
+val json_of_varinfo_map : int VInfoMap.t -> Yojson.t
+
 (** Handling entry points informations *)
 val number_entry_points : int VInfoMap.t -> int
 ;;
@@ -115,6 +119,8 @@ val number_entry_points : int VInfoMap.t -> int
 val pretty_entry_points :
   Format.formatter -> int VInfoMap.t -> unit
 ;;
+
+val json_of_entry_points : int VInfoMap.t -> Yojson.t
 
 (** Get the filename where the definition of a varinfo occurs *)
 val file_of_vinfodef: Cil_types.varinfo -> Datatype.Filepath.t;;
@@ -133,6 +139,7 @@ val get_filename: Cabs.definition -> Datatype.Filepath.t;;
 type output_type =
   | Html
   | Text
+  | Json
 ;;
 
 (** get_file_type [extension] sets the output type according to [extension].

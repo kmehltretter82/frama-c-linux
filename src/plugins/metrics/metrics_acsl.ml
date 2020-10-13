@@ -315,7 +315,10 @@ let dump () =
       let fmt = Format.formatter_of_out_channel chan in
       (match Metrics_base.get_file_type out with
             | Metrics_base.Html -> dump_acsl_stats_html fmt
-            | Metrics_base.Text -> dump_acsl_stats fmt);
+            | Metrics_base.Text -> dump_acsl_stats fmt
+            | Metrics_base.Json ->
+              raise (Log.FeatureRequest ("Metrics", "JSON format for ACSL metrics"))
+      );
       close_out chan
     with Sys_error s ->
       Metrics_parameters.abort "Cannot open file %s (%s)" out s
