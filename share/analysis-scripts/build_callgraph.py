@@ -102,6 +102,13 @@ def print_cg(cg):
     for (caller, called) in cg.edges:
         print_edge(cg, caller, called)
 
+# note: out _must_ exist (the caller must create it if needed)
+def print_cg_dot(cg, out=sys.stdout):
+    print("digraph callgraph {", file=out)
+    for (caller, called) in cg.edges:
+        print(f"  {caller} -> {called};", file=out)
+    print("}", file=out)
+
 # succs: dict, input, not modified
 # visited: set, input-output, modified
 # just_visited: set, input-output, modified
