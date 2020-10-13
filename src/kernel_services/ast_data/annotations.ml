@@ -635,11 +635,35 @@ let iter_bhv_gen get iter f kf b =
   in
   iter_spec_gen get iter f kf
 
+(* Filter out generic specification. If nothing is
+ * found, call f on generic spec once *)
+let iter_filter_generic to_filter iterator f kf b =
+  let something = ref false in
+  let filter_generic e a =
+    if a <> to_filter then begin something := true; f e a end
+  in iterator filter_generic kf b;
+  if not !something then f Emitter.dummy to_filter
+
+(* Fold version *)
+let fold_filter_generic to_filter iterator f kf b init =
+  let something = ref false in
+  let filter_generic e a acc =
+    if a <> to_filter then (something := true; f e a acc) else acc
+  in let res = iterator filter_generic kf b init in
+  if not !something then f Emitter.dummy to_filter res else res
+
 let iter_requires f = iter_bhv_gen (fun b -> b.b_requires) List.iter f
 let iter_assumes f = iter_bhv_gen (fun b -> b.b_assumes) List.iter f
 let iter_ensures f = iter_bhv_gen (fun b -> b.b_post_cond) List.iter f
-let iter_assigns f = iter_bhv_gen (fun b -> b.b_assigns) (fun f a -> f a) f
-let iter_allocates f = iter_bhv_gen (fun b -> b.b_allocation) (fun f a -> f a) f
+
+let iter_assigns f =
+  iter_filter_generic WritesAny
+    (iter_bhv_gen (fun b -> b.b_assigns) (fun f a -> f a)) f
+
+let iter_allocates f =
+  iter_filter_generic FreeAllocAny
+    (iter_bhv_gen (fun b -> b.b_allocation) (fun f a -> f a)) f
+
 let iter_extended f = iter_bhv_gen (fun b -> b.b_extended) List.iter f
 
 let fold_spec_gen get fold f kf acc =
@@ -703,10 +727,12 @@ let fold_ensures f =
     (fun f l acc -> List.fold_left (Extlib.swap f) acc l) f
 
 let fold_assigns f =
-  fold_bhv_gen (fun b -> b.b_assigns) (fun f a acc -> f a acc) f
+  fold_filter_generic WritesAny
+    (fold_bhv_gen (fun b -> b.b_assigns) (fun f a -> f a)) f
 
 let fold_allocates f =
-  fold_bhv_gen (fun b -> b.b_allocation) (fun f a acc -> f a acc) f
+  fold_filter_generic FreeAllocAny
+    (fold_bhv_gen (fun b -> b.b_allocation) (fun f a -> f a)) f
 
 let fold_extended f =
   fold_bhv_gen (fun b -> b.b_extended)
