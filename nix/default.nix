@@ -295,6 +295,14 @@ rec {
                 autoPatchelf src/plugins/pathcrawler
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
+                # Setup Why3
+                mkdir home
+                HOME=$(pwd)/home
+                why3 config --detect
+                # Setup WP related
+                export CAVEAT_IMPORTER_NIX_MODE=yes
+                export FRAMAC_WP_CACHE=replay
+                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''
