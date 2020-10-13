@@ -17,9 +17,10 @@
 
   let make_keyword () =
     let keyword = Buffer.contents full_kw in
+    let sep = if String.contains keyword '$' then '|' else '$' in
     print_string "\\addspace";
     Printf.printf
-      "\\lstinline$%s$" keyword;
+      "\\lstinline%c%s%c" sep keyword sep;
     print_string "\\spacetrue";
     Buffer.clear full_kw
 }

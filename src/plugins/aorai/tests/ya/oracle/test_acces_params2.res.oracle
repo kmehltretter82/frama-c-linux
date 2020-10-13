@@ -82,9 +82,7 @@ int rr = 1;
     S6_tmp = 0;
     S5_tmp = 0;
     S4_tmp = 0;
-    if (S2 == 1) 
-      if (r >= 0) S3_tmp = 1; else S3_tmp = 0;
-    else S3_tmp = 0;
+    if (S2 == 1 && r >= 0) S3_tmp = 1; else S3_tmp = 0;
     S2_tmp = 0;
     S1_tmp = 0;
     S1 = S1_tmp;
@@ -156,9 +154,7 @@ int rr = 1;
     S7_tmp = 0;
     S6_tmp = 0;
     S5_tmp = 0;
-    if (S3 == 1) 
-      if (res <= 5000) S4_tmp = 1; else S4_tmp = 0;
-    else S4_tmp = 0;
+    if (S3 == 1 && res <= 5000) S4_tmp = 1; else S4_tmp = 0;
     S3_tmp = 0;
     S2_tmp = 0;
     S1_tmp = 0;

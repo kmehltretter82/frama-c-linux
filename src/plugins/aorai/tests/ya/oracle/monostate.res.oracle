@@ -64,14 +64,11 @@ check lemma Init_deterministic_trans{L}:
    @/
   void f_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    aorai_CurStates_tmp = aorai_CurStates;
-    if (2 == aorai_CurStates) aorai_CurStates_tmp = aorai_reject;
+    if (2 == aorai_CurStates) aorai_CurStates = aorai_reject;
     else 
-      if (1 == aorai_CurStates) aorai_CurStates_tmp = aorai_reject;
-    aorai_CurStates = aorai_CurStates_tmp;
+      if (1 == aorai_CurStates) aorai_CurStates = aorai_reject;
     return;
   }
 
@@ -99,12 +96,9 @@ check lemma Init_deterministic_trans{L}:
    @/
   void f_post_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    aorai_CurStates_tmp = aorai_CurStates;
-    if (2 == aorai_CurStates) aorai_CurStates_tmp = aorai_reject;
-    aorai_CurStates = aorai_CurStates_tmp;
+    if (2 == aorai_CurStates) aorai_CurStates = aorai_reject;
     return;
   }
 
@@ -145,11 +139,8 @@ void f(void)
    @/
   void main_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 
@@ -172,11 +163,8 @@ void f(void)
    @/
   void main_post_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 

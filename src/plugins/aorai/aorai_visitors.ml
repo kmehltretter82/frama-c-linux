@@ -33,7 +33,7 @@ open Cil
 let dkey = Aorai_option.register_category "action"
 
 let get_acceptance_pred () =
-  let (st,_) = Data_for_aorai.getAutomata () in
+  let (st,_) = Data_for_aorai.getGraph () in
   List.fold_left
     (fun acc s ->
        match s.acceptation with
@@ -371,24 +371,24 @@ let pred_reachable reachable_states =
       (nb, reachable,
        Logic_const.pand (unreachable, Aorai_utils.is_out_of_state_pred state))
   in
-  let (states,_) = Data_for_aorai.getAutomata () in
+  let (states,_) = Data_for_aorai.getGraph () in
   let (nb, reachable, unreachable) =
     List.fold_left treat_one_state (0,pfalse,ptrue) states
   in
   (nb > 1, reachable, unreachable)
 
 let possible_start kf (start,int) =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let trans = Path_analysis.get_edges start int auto in
   let treat_one_trans cond tr =
     Logic_const.por
-      (cond, Aorai_utils.crosscond_to_pred (fst tr.cross) kf Promelaast.Call)
+      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
   in
   let cond = List.fold_left treat_one_trans Logic_const.pfalse trans in
   Logic_const.pand (Aorai_utils.is_state_pred start, cond)
 
 let neg_trans kf trans =
-  let auto = Data_for_aorai.getAutomata () in
+  let auto = Data_for_aorai.getGraph () in
   let rec aux l acc =
     match l with
     | [] -> acc
@@ -409,7 +409,7 @@ let neg_trans kf trans =
              List.fold_left
                (fun cond tr ->
                   Logic_simplification.tand
-                    cond (Logic_simplification.tnot (fst tr.cross)))
+                    cond (Logic_simplification.tnot tr.cross))
                cond trans)
           TTrue same_start
       in
@@ -527,7 +527,7 @@ class visit_adding_pre_post_from_buch treatloops =
         predicate_to_invariant kf stmt pred
       end
     in
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     List.iter treat_one_state states;
     if has_multiple_choice then begin
       let add_possible_state state _ acc =
@@ -584,7 +584,7 @@ class visit_adding_pre_post_from_buch treatloops =
     Data_for_aorai.Aorai_state.Map.fold treat_one_state possible_states []
   in
   let partition_pre_state map =
-    let (states,_) = Data_for_aorai.getAutomata () in
+    let (states,_) = Data_for_aorai.getGraph () in
     let is_equiv st1 st2 =
       let check_one _ o1 o2 =
         match o1, o2 with
@@ -840,7 +840,7 @@ class visit_adding_pre_post_from_buch treatloops =
               in
               (i+1,bhv :: bhvs)
           in
-          let (states,_) = Data_for_aorai.getAutomata () in
+          let (states,_) = Data_for_aorai.getGraph () in
           List.rev (snd (List.fold_left aux (0,bhvs) states))
         end
     in

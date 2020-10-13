@@ -32,12 +32,12 @@ open Promelaast
 *)
 
 val isCrossable:
-  (typed_condition * action) trans -> kernel_function -> funcStatus -> bool
+  typed_trans -> kernel_function -> funcStatus -> bool
 
 (** Given a transition and the main entry point it returns if
     the cross condition can be satisfied at the beginning of the program. *)
 val isCrossableAtInit:
-  (typed_condition * action) trans -> kernel_function -> bool
+  typed_trans -> kernel_function -> bool
 
 (** This function rewrites a cross condition into an ACSL expression.
     Moreover, by giving current operation name and its status (call or
@@ -70,9 +70,6 @@ val host_state_term: unit -> Cil_types.term_lval
 (** Returns the predicate saying that automaton is in
     corresponding state. *)
 val is_state_pred: state -> predicate
-
-(** Returns the statement saying the state is affected *)
-val is_state_stmt: state * Cil_types.varinfo -> location -> Cil_types.stmt
 
 (** Returns the boolean expression saying the state is affected *)
 val is_state_exp: state -> location -> Cil_types.exp

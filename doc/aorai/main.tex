@@ -14,7 +14,7 @@
 \definecolor{gris}{rgb}{0.95,0.95,0.95}
 \definecolor{GrisClair}{rgb}{0.98,0.98,0.98}
 \usepackage[leftbars]{changebar}
-
+\usepackage{courier}
 \input{macros}
 
 %\setboolean{extension}{true}
@@ -36,12 +36,16 @@
 }
 
 \lstdefinelanguage{ya}{
-  alsoletter={\\,\%},
-  morekeywords={CALL,RETURN,COR,return,true,false,transitions,\\result},
+  alsoletter={\\,\%,\$},
+  morekeywords={CALL,RETURN,COR,return,true,false,transitions,\\result,other},
   keywordsprefix={\%},
 }
 
-\lstloadlanguages{[ANSI]C,[Objective]Caml,csh,ACSL}
+\lstloadlanguages{[ANSI]C,[Objective]Caml,csh,ACSL,ya}
+\lstset{
+basicstyle=\ttfamily,
+keywordstyle=\bfseries,
+}
 
 \title{\aorai\ Plugin Tutorial\\\textit{\normalsize (A.k.a. LTL to ACSL)}}
 \author{Nicolas Stouls and Virgile Prevosto\\
@@ -332,35 +336,27 @@ For compatibility reasons, other syntaxes, like LTL or PROMELA, are supported.
 
 \section{YA}
 \label{sec:ya}
+\lstset{language=ya}
 \subsection{YA file}\label{sec:ya-file}
-The description of the automaton can be done in more than one way, but we
-recommend to follow the guidelines explained below:
-\begin{itemize}
-\item Initial states of automaton are specified using the
-\emph{\%init} keyword followed by a comma-separated list
-containing the states' name:
-\begin{lstlisting}[language=ya]
-%init: S1, S2, ..., Sn;
-\end{lstlisting}
-\item Acceptance states are specified using the \emph{\%accept} keyword 
-followed by a comma separated list containing the states' name
-\begin{lstlisting}[language=ya]
-%accept: S1, S2, ..., Sn;
-\end{lstlisting}
+A YA file follows the grammar described in Fig.~\ref{ya-file}.
+\begin{figure}[htb]
+\input{ya_file.tex}
+\caption{Structure of a YA file}\label{ya-file}
+\end{figure}
+The directives specify the initial and accepting state(s). There must be at
+least one initial state (exactly one if the automaton is supposed to be
+deterministic. All initial and accepting state must appear in the list of
+states afterwards.
+
+A state is simply described by its name and the list of transitions
+starting from this state with their guard. The specific \lstinline|other|
+guard indicates that this transition is taken if none of the other ones
+can be taken. If it appears, it must be last in the list of transitions.
+
+Conditions that can occur in guards are described in the next section.
+
 \begin{new}
-\item Reject states are specified using the \emph{\%reject} keyword,
-followed by a comma separated list containing the states' name
-\begin{lstlisting}[language=ya]
-%reject: S1, S2, ..., Sn;
-\end{lstlisting}
-\end{new}
-\item If the automaton is supposed to be deterministic, this can be 
-      specified using the following directive:
-\begin{lstlisting}[language=ya]
-%deterministic;
-\end{lstlisting}
-\begin{new}
-\item By default, \aorai considers that all functions calls and returns trigger
+By default, \aorai considers that all functions calls and returns trigger
 a transition of the automaton. In order to have transitions only for the 
 functions that explicitly appear in the description of the automaton, the
 following directive must be used:
@@ -368,26 +364,6 @@ following directive must be used:
 %explicit transitions;
 \end{lstlisting}
 \end{new}
-\item States and transitions are described by sets of the following form
-\begin{lstlisting}[language=ya]
-  state: { condition_1 } -> new_state_1
-       | { condition_2 } -> new_state_2
-       | { condition_n } -> new_state_n
-       ;
-\end{lstlisting}
-A condition which is always true can be omitted along with its surrounding
-braces:
-\begin{lstlisting}
- state: -> new_state;
-\end{lstlisting}
-In addition, the last transition can have the following form:
-\begin{lstlisting}
- state: ...
-      other -> new_state
-\end{lstlisting}
-indicating that this transition is crossed if and only if none of the
-preceding transitions is activated.
-\end{itemize}
 
 \subsection{Basic YA guards}\label{sec:basic-ya-guards}
 The syntax for basic YA conditions is described in
@@ -491,7 +467,7 @@ most common patterns:
 \item \lstinline|{,e}| is equivalent to \lstinline|{0,e}|
 \end{itemize}
 
-Note that a repetition modifier that allows to have a non-fixed number of
+Note that a repetition modifier that allows a non-fixed number of
 repetitions prevents the automaton to be \lstinline|%deterministic|.
 
 \lstinline|id(seq)| indicates that we have a \lstinline|CALL(id)| event,
@@ -531,36 +507,72 @@ S0: { main::bhv() } -> Sf
 Sf: -> Sf;
 \end{lstlisting}
 
-\begin{new}
-\subsubsection{Sharing values}
+\subsubsection{YA variables}
 Extended guards do not allow to specify relations between the parameters of
-distinct, non-nested calls. For instance, we cannot specify that a call to
-\texttt{fopen(f)} must be followed by a call to \texttt{fclose(f)} with the same
-\texttt{f} in both cases. In order to do that, it is possible to parameterize
-the description of the automaton by directives of the following form:
-\begin{lstlisting}[language=ya]
-%parameter: decl;
-\end{lstlisting}
-where \texttt{decl} is an ACSL declaration. The parameter declared that way will
-be treated as an existentially-quantified variable across the automaton.
-For instance, in order to check whether a call to \texttt{fopen} is always
-matched by a call to \texttt{fclose}, we can use the following automaton:
+distinct, non-nested calls. In order to be more flexible, it is possible to declare
+variables in a Ya file, to assign them values when crossing a transition, and to use
+them in guards. The syntax for that is described in Fig.~\ref{fig:ya-variables}.
+\begin{figure}[htb]
+\input{ya_variables.tex}
+\caption{Syntax for declaring and using YA variables}
+\label{fig:ya-variables}
+\end{figure}
+
+Only \lstinline|char|, \lstinline|int|, \lstinline|long| variables are currently
+supported. Furthermore, variables can only be introduced in deterministic automata,
+which do not use extended guards.
+
+A variable \lstinline|$x| %$
+must have been declared in the directives of the file to be used in a guard. Furthermore
+if it is used in a transition starting from state \lstinline|S|, then all possible paths
+from the initial state to \lstinline|S| must contain at least one assignment to \lstinline|$x|.
+Note that assignments are performed sequentially, so that if
+\lstinline|$x| has already been assigned in a given sequence of actions, it can automatically
+be used in subsequent assignments (on the other hand, since conditions are evaluated
+before actions, it must have been initialized elsewhere if it were to be used in the
+condition part of the guard.
+
+in the right hand side of an action, it is possible to refer to the value of a formal
+parameter of \lstinline|f| when the transition is triggered over a \lstinline|CALL|
+to \lstinline|f| and to its return value when hangling a \lstinline|RETURN| event,
+as described in section~\ref{sec:basic-ya-guards} for conditions.
+
+An example of YA automaton with variables is given below. It uses variables \lstinline|$x| and
+\lstinline|$y| that are updated when calling \lstinline|f| and returning from \lstinline|i|,
+while \lstinline|$x| is used when calling \lstinline|h|.%$
 
 \begin{lstlisting}[language=ya]
-%init: S0;
-%accept: Sf;
-%reject: S1;
-%parameter: FILE* f;
-%explicit transitions;
+%init:		a;
+%accept:	i;
+%deterministic;
 
-S0: { fopen(){\result==f}; } -> S1;
-  | -> S0;
+$x : int;
+$y : int;
 
-S1: { fclose{stream==f}(); } -> Sf
+a : { CALL(main) } -> b;
 
-Sf: -> Sf
+b :
+  { CALL(f) } $x:=f().x; $y := $x; -> c
+| { CALL(g) } -> d
+;
+
+c : { RETURN(f) } -> e;
+
+d : { RETURN(g) } -> g;
+
+e :
+  { CALL(h) && $x > 0 } -> f
+| { RETURN(main) } -> i
+;
+
+f : { RETURN(h) } -> g;
+
+g : { CALL(i) } -> h;
+
+h : { RETURN(i) } $y := 0; $x := 1; -> e;
+
+i : -> i;
 \end{lstlisting}
-\end{new}
 
 \section{LTL}
 \label{sec:ltl}
@@ -1225,6 +1237,11 @@ The plug-in is composed of three parts:
 
 
 \section{Recent updates}
+\subsection{Frama-C Titanium}
+\begin{itemize}
+\item Various bug fixes
+\item Introduction of YA variables
+\end{itemize}
 \subsection{Frama-C Aluminium}
 \begin{itemize}
 \item Generated functions now have a body in addition to a specification

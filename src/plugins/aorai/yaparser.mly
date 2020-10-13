@@ -27,9 +27,12 @@
 
 /* Originated from http://www.ltl2dstar.de/down/ltl2dstar-0.4.2.zip  */
 %{
+open Cil_types
 open Logic_ptree
 open Promelaast
 open Bool3
+
+type options = Deterministic | Init of string list | Accept of string list
 
 let to_seq c =
   [{ condition = Some c;
@@ -50,37 +53,99 @@ let fetch_and_create_state name =
   try
     Hashtbl.find observed_states name
   with
-    Not_found -> 
+    Not_found ->
       let s = Data_for_aorai.new_state name in
       Hashtbl.add observed_states name s; s
 ;;
 
 let prefetch_and_create_state name =
-    if (Hashtbl.mem prefetched_states name) || 
-      not (Hashtbl.mem observed_states name) 
+    if (Hashtbl.mem prefetched_states name) ||
+      not (Hashtbl.mem observed_states name)
     then
       begin
-        let s= fetch_and_create_state name in 
+        let s= fetch_and_create_state name in
         Hashtbl.add prefetched_states name name;
         s
-      end 
+      end
     else
       (fetch_and_create_state name)
 ;;
 
+let set_init_state id =
+  try
+    let state = Hashtbl.find observed_states id in
+    state.init <- True
+  with Not_found ->
+    Aorai_option.abort "no state '%s'" id
+
+let set_accept_state id =
+  try
+    let state = Hashtbl.find observed_states id in
+    state.acceptation <- True
+  with Not_found ->
+    Aorai_option.abort "no state '%s'" id
+
+let add_metavariable map (name,typename) =
+  let ty = match typename with
+    | "int" -> TInt(IInt, [])
+    | "char" -> TInt(IChar, [])
+    | "long" -> TInt(ILong, [])
+    | _ ->
+      Aorai_option.abort "Unrecognized type %s for metavariable %s"
+        typename name
+  in
+  if Datatype.String.Map.mem name map then
+    Aorai_option.abort "The metavariable %s is declared twice" name;
+  let vi = Cil.makeGlobalVar (Data_for_aorai.get_fresh ("aorai_" ^ name)) ty in
+  Datatype.String.Map.add name vi map
+
+let check_state st =
+  if st.acceptation=Undefined || st.init=Undefined then
+   Aorai_option.abort
+    "Error: the state '%s' is used but never defined." st.name
+
+let interpret_option = function
+  | Init states ->
+    List.iter set_init_state states
+  | Accept states ->
+    List.iter set_accept_state states
+  | Deterministic ->
+    Aorai_option.Deterministic.set true
+
+let build_automaton options metavariables trans =
+  let htable_to_list table = Hashtbl.fold (fun _ st l -> st :: l) table [] in
+  let states = htable_to_list observed_states
+  and undefined_states = htable_to_list prefetched_states
+  and metavariables =
+    List.fold_left add_metavariable Datatype.String.Map.empty metavariables
+  in
+  List.iter interpret_option options;
+  List.iter check_state states;
+  if not (List.exists (fun st -> st.init=True) states) then
+    Aorai_option.abort "Automaton does not declare an initial state";
+  if undefined_states <> [] then
+    Aorai_option.abort "Error: the state(s) %a are used but never defined."
+      (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) undefined_states;
+  { states; trans; metavariables }
+
+
 type pre_cond = Behavior of string | Pre of Promelaast.condition
+
 
 %}
 
 %token CALL_OF  RETURN_OF  CALLORRETURN_OF
 %token <string> IDENTIFIER
+%token <string> METAVAR
 %token <string> INT
+%token AFF
 %token LCURLY RCURLY LPAREN RPAREN LSQUARE RSQUARE LBRACELBRACE RBRACERBRACE
 %token RARROW
 %token TRUE FALSE
 %token NOT DOT AMP
-%token COLON SEMI_COLON COMMA PIPE CARET QUESTION COMMA COLUMNCOLUMN
+%token COLON SEMI_COLON COMMA PIPE CARET QUESTION COLUMNCOLUMN
 %token EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
+%token INIT ACCEPT DETERMINISTIC METAVAR
 %token OTHERWISE
 %token EOF
 
@@ -93,75 +158,28 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %left DOT
 %nonassoc NOT TRUE FALSE
 %nonassoc QUESTION
-%right SEMICOLON
+%right SEMI_COLON
 %nonassoc lowest
 
 %type <Promelaast.parsed_automaton> main
 %start main
 %%
 
-main
-  : options states {
-  List.iter
-    (fun(key, ids) ->
-       match key with
-           "init"   ->
-             List.iter
-               (fun id -> 
-                 try
-                   (Hashtbl.find observed_states id).init <- True
-                 with
-                     Not_found ->
-                       Aorai_option.abort "Error: no state '%s'\n" id)
-               ids
-         | "accept" ->
-             List.iter
-               (fun id -> try
-                  (Hashtbl.find observed_states id).acceptation <- True
-                with Not_found ->
-                  Aorai_option.abort "no state '%s'\n" id) ids
-         | "deterministic" -> Aorai_option.Deterministic.set true;
-         | oth      -> Aorai_option.abort "unknown option '%s'\n" oth
-    ) $1;
-    let states=
-      Hashtbl.fold
-        (fun _ st l ->
-           if st.acceptation=Undefined || st.init=Undefined then
-             begin
-               Aorai_option.abort
-                 "Error: the state '%s' is used but never defined.\n" st.name
-             end;
-           st::l)
-        observed_states []
-    in
-    (try
-       Hashtbl.iter 
-         (fun _ st -> if st.init=True then raise Exit) observed_states;
-       Aorai_option.abort "Automaton does not declare an initial state"
-     with Exit -> ());
-    if Hashtbl.length prefetched_states >0 then 
-      begin
-        let r = Hashtbl.fold
-          (fun s n _ -> 
-            s^"Error: the state '"^n^"' is used but never defined.\n")
-          prefetched_states 
-          ""
-        in
-        Aorai_option.abort "%s" r
-      end;
-    (states, $2)
-  }
-  ;
-
+main : options metavars states { build_automaton $1 $2 $3 }
 
 options
-  : options option { $1@[$2] }
+  : options option { $1 @ [$2] }
   | option         { [$1] }
   ;
 
 option
-  : PERCENT IDENTIFIER opt_identifiers SEMI_COLON { ($2, $3) }
-  ;
+  : PERCENT IDENTIFIER opt_identifiers SEMI_COLON { 
+    match $2 with
+    | "init" -> Init $3
+    | "accept" -> Accept $3
+    | "deterministic" -> Deterministic
+    | _ ->  Aorai_option.abort "unknown option: '%s'" $2
+  }
 
 opt_identifiers
   : /* empty */ { [] }
@@ -169,8 +187,21 @@ opt_identifiers
   ;
 
 id_list
-  : id_list COMMA IDENTIFIER { $1@[$3] }
+  : id_list COMMA IDENTIFIER { $1 @ [$3] }
   | IDENTIFIER               { [$1] }
+  ;
+
+metavars
+  : /* epsilon */      { [] }
+  | non_empty_metavars { $1 }
+
+non_empty_metavars
+  : non_empty_metavars metavar { $1 @ [$2] }
+  | metavar                    { [$1] }
+  ;
+
+metavar
+  : METAVAR COLON IDENTIFIER SEMI_COLON { $1,$3 }
   ;
 
 states
@@ -183,7 +214,7 @@ state
       let start_state = fetch_and_create_state $1 in
       let (_, transitions) =
         List.fold_left
-          (fun (otherwise, transitions) (cross,stop_state) ->
+          (fun (otherwise, transitions) (cross,actions,stop_state) ->
             if otherwise then
               Aorai_option.abort
                 "'other' directive in definition of %s \
@@ -191,11 +222,11 @@ state
             else begin
               let trans =
                 { start=start_state; stop=stop_state;
-                  cross=cross;       numt=(-1) }::transitions
+                  cross; actions; numt=(-1) }::transitions
               in
-              let otherwise = 
-                match cross with 
-                  | Otherwise -> true 
+              let otherwise =
+                match cross with
+                  | Otherwise -> true
                   | Seq _ -> false
               in otherwise, trans
             end)
@@ -211,10 +242,12 @@ transitions  /*=>  [transition; ...] */
 
 
 transition:  /*=>  (guard, state) */
-  | LCURLY seq_elt RCURLY RARROW IDENTIFIER 
-      { (Seq $2, prefetch_and_create_state $5) }
-  | OTHERWISE RARROW IDENTIFIER {(Otherwise, prefetch_and_create_state $3) }
-  | RARROW IDENTIFIER { (Seq (to_seq PTrue), prefetch_and_create_state $2) }
+  | LCURLY seq_elt RCURLY actions RARROW IDENTIFIER
+      { (Seq $2, $4, prefetch_and_create_state $6) }
+  | OTHERWISE actions RARROW IDENTIFIER
+      { (Otherwise, $2, prefetch_and_create_state $4) }
+  | actions RARROW IDENTIFIER
+      { (Seq (to_seq PTrue), $1, prefetch_and_create_state $3) }
   ;
 
 non_empty_seq:
@@ -231,28 +264,28 @@ guard:
   | single_cond { to_seq $1 }
   | LSQUARE non_empty_seq RSQUARE { $2 }
   | IDENTIFIER pre_cond LPAREN seq RPAREN post_cond
-      { let pre_cond = 
+      { let pre_cond =
           match $2 with
             | Behavior b -> PCall($1,Some b)
             | Pre c -> PAnd (PCall($1,None), c)
         in
-        let post_cond = 
+        let post_cond =
           match $6 with
             | None -> PReturn $1
             | Some c -> PAnd (PReturn $1,c)
         in
-        (to_seq pre_cond) @ $4 @ to_seq post_cond 
+        (to_seq pre_cond) @ $4 @ to_seq post_cond
       }
   | IDENTIFIER LPAREN non_empty_seq RPAREN post_cond
-      { let post_cond = 
+      { let post_cond =
           match $5 with
             | None -> PReturn $1
             | Some c -> PAnd (PReturn $1,c)
         in
-        (to_seq (PCall ($1, None))) @ $3 @ to_seq post_cond 
+        (to_seq (PCall ($1, None))) @ $3 @ to_seq post_cond
       }
   | IDENTIFIER LPAREN RPAREN post_cond
-      { let post_cond = 
+      { let post_cond =
           match $4 with
             | None -> PReturn $1
             | Some c -> PAnd (PReturn $1,c)
@@ -280,7 +313,7 @@ seq_elt:
       | l ->
         if is_no_repet (min,max) then
           l (* [ a; [b;c]; d] is equivalent to [a;b;c;d] *)
-        else [ { condition = None; nested = l; min_rep = min; max_rep = max } ] 
+        else [ { condition = None; nested = l; min_rep = min; max_rep = max } ]
   }
 ;
 
@@ -358,4 +391,24 @@ access_leaf
   | IDENTIFIER LPAREN RPAREN DOT IDENTIFIER { PPrm($1,$5) }
   | IDENTIFIER { PVar $1 }
   | LPAREN access RPAREN { $2 }
+  | METAVAR { PMetavar $1 }
+  ;
+
+actions
+  : /* epsilon */                   { [] }
+  | non_empty_actions opt_semicolon { $1 }
+  ;
+
+non_empty_actions
+  : non_empty_actions SEMI_COLON action { $1 @ [$3] }
+  | action                              { [$1] }
+  ;
+
+action
+  : METAVAR AFF arith_relation { Metavar_assign ($1, $3) }
+  ;
+
+opt_semicolon
+  : /* empty */ {}
+  | SEMI_COLON  {}
   ;

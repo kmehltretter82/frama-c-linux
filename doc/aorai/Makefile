@@ -8,7 +8,7 @@ EXAMPLES=example.c example.ltl example.ya \
          example_loop2.c example_loop2.ya \
          README
 
-BNF=basic_ya.bnf extended_ya.bnf
+BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
 
 all: main.pdf $(ARCHIVENAME).tgz
 

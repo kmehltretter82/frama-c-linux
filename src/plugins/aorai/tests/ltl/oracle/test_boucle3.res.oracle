@@ -236,9 +236,7 @@ void opa(void)
     accept_S3_tmp = accept_S3;
     accept_all_tmp = accept_all;
     accept_all_tmp = 0;
-    if (T1_S2 == 1) 
-      if (rr == 51) accept_S3_tmp = 1; else accept_S3_tmp = 0;
-    else accept_S3_tmp = 0;
+    if (T1_S2 == 1 && rr == 51) accept_S3_tmp = 1; else accept_S3_tmp = 0;
     T1_S2_tmp = 0;
     T0_init_tmp = 0;
     T0_S4_tmp = 0;

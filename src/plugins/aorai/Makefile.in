@@ -51,6 +51,8 @@ PLUGIN_CMO:= bool3 \
 	path_analysis \
 	promelaoutput \
 	logic_simplification \
+	aorai_graph \
+	aorai_metavariables \
 	data_for_aorai \
 	aorai_utils \
 	ltl_output \

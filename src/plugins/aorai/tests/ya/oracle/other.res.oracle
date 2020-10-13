@@ -65,42 +65,13 @@ int x = 0;
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) {
-      if (x == 3) step1_tmp = 1; else goto _LAND_0;
-    }
-    else {
-      _LAND_0: ;
-      if (last == 1) {
-        if (x == 3) step1_tmp = 1; else goto _LAND;
-      }
-      else {
-        _LAND: ;
-        if (step1 == 1) 
-          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
-        else step1_tmp = 0;
-      }
-    }
-    if (last == 1) {
-      if (x != 4) {
-        if (x != 3) last_tmp = 1; else goto _LAND_1;
-      }
-      else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (step1 == 1) 
-        if (x == 4) last_tmp = 1; else last_tmp = 0;
-      else last_tmp = 0;
-    }
-    if (init == 1) {
-      if (x != 3) init_tmp = 1; else goto _LAND_2;
-    }
-    else {
-      _LAND_2: ;
-      if (last == 1) 
-        if (x == 4) init_tmp = 1; else init_tmp = 0;
-      else init_tmp = 0;
-    }
+    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
+      step1_tmp = 1;
+    else step1_tmp = 0;
+    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
+    else last_tmp = 0;
+    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -157,42 +128,13 @@ int x = 0;
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) {
-      if (x == 3) step1_tmp = 1; else goto _LAND_0;
-    }
-    else {
-      _LAND_0: ;
-      if (last == 1) {
-        if (x == 3) step1_tmp = 1; else goto _LAND;
-      }
-      else {
-        _LAND: ;
-        if (step1 == 1) 
-          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
-        else step1_tmp = 0;
-      }
-    }
-    if (last == 1) {
-      if (x != 4) {
-        if (x != 3) last_tmp = 1; else goto _LAND_1;
-      }
-      else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (step1 == 1) 
-        if (x == 4) last_tmp = 1; else last_tmp = 0;
-      else last_tmp = 0;
-    }
-    if (init == 1) {
-      if (x != 3) init_tmp = 1; else goto _LAND_2;
-    }
-    else {
-      _LAND_2: ;
-      if (last == 1) 
-        if (x == 4) init_tmp = 1; else init_tmp = 0;
-      else init_tmp = 0;
-    }
+    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
+      step1_tmp = 1;
+    else step1_tmp = 0;
+    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
+    else last_tmp = 0;
+    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -313,42 +255,13 @@ void f(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) {
-      if (x == 3) step1_tmp = 1; else goto _LAND_0;
-    }
-    else {
-      _LAND_0: ;
-      if (last == 1) {
-        if (x == 3) step1_tmp = 1; else goto _LAND;
-      }
-      else {
-        _LAND: ;
-        if (step1 == 1) 
-          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
-        else step1_tmp = 0;
-      }
-    }
-    if (last == 1) {
-      if (x != 4) {
-        if (x != 3) last_tmp = 1; else goto _LAND_1;
-      }
-      else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (step1 == 1) 
-        if (x == 4) last_tmp = 1; else last_tmp = 0;
-      else last_tmp = 0;
-    }
-    if (init == 1) {
-      if (x != 3) init_tmp = 1; else goto _LAND_2;
-    }
-    else {
-      _LAND_2: ;
-      if (last == 1) 
-        if (x == 4) init_tmp = 1; else init_tmp = 0;
-      else init_tmp = 0;
-    }
+    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
+      step1_tmp = 1;
+    else step1_tmp = 0;
+    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
+    else last_tmp = 0;
+    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -405,42 +318,13 @@ void f(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) {
-      if (x == 3) step1_tmp = 1; else goto _LAND_0;
-    }
-    else {
-      _LAND_0: ;
-      if (last == 1) {
-        if (x == 3) step1_tmp = 1; else goto _LAND;
-      }
-      else {
-        _LAND: ;
-        if (step1 == 1) 
-          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
-        else step1_tmp = 0;
-      }
-    }
-    if (last == 1) {
-      if (x != 4) {
-        if (x != 3) last_tmp = 1; else goto _LAND_1;
-      }
-      else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (step1 == 1) 
-        if (x == 4) last_tmp = 1; else last_tmp = 0;
-      else last_tmp = 0;
-    }
-    if (init == 1) {
-      if (x != 3) init_tmp = 1; else goto _LAND_2;
-    }
-    else {
-      _LAND_2: ;
-      if (last == 1) 
-        if (x == 4) init_tmp = 1; else init_tmp = 0;
-      else init_tmp = 0;
-    }
+    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
+      step1_tmp = 1;
+    else step1_tmp = 0;
+    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
+    else last_tmp = 0;
+    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -548,13 +432,9 @@ void g(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) 
-      if (x == 3) step1_tmp = 1; else step1_tmp = 0;
-    else step1_tmp = 0;
+    if (init == 1 && x == 3) step1_tmp = 1; else step1_tmp = 0;
     last_tmp = 0;
-    if (init == 1) 
-      if (x != 3) init_tmp = 1; else init_tmp = 0;
-    else init_tmp = 0;
+    if (init == 1 && x != 3) init_tmp = 1; else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
@@ -611,42 +491,13 @@ void g(void)
     init_tmp = init;
     last_tmp = last;
     step1_tmp = step1;
-    if (init == 1) {
-      if (x == 3) step1_tmp = 1; else goto _LAND_0;
-    }
-    else {
-      _LAND_0: ;
-      if (last == 1) {
-        if (x == 3) step1_tmp = 1; else goto _LAND;
-      }
-      else {
-        _LAND: ;
-        if (step1 == 1) 
-          if (x != 4) step1_tmp = 1; else step1_tmp = 0;
-        else step1_tmp = 0;
-      }
-    }
-    if (last == 1) {
-      if (x != 4) {
-        if (x != 3) last_tmp = 1; else goto _LAND_1;
-      }
-      else goto _LAND_1;
-    }
-    else {
-      _LAND_1: ;
-      if (step1 == 1) 
-        if (x == 4) last_tmp = 1; else last_tmp = 0;
-      else last_tmp = 0;
-    }
-    if (init == 1) {
-      if (x != 3) init_tmp = 1; else goto _LAND_2;
-    }
-    else {
-      _LAND_2: ;
-      if (last == 1) 
-        if (x == 4) init_tmp = 1; else init_tmp = 0;
-      else init_tmp = 0;
-    }
+    if ((init == 1 && x == 3 || last == 1 && x == 3) || step1 == 1 && x != 4) 
+      step1_tmp = 1;
+    else step1_tmp = 0;
+    if (last == 1 && (x != 4 && x != 3) || step1 == 1 && x == 4) last_tmp = 1;
+    else last_tmp = 0;
+    if (init == 1 && x != 3 || last == 1 && x == 4) init_tmp = 1;
+    else init_tmp = 0;
     init = init_tmp;
     last = last_tmp;
     step1 = step1_tmp;
