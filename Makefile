@@ -2039,7 +2039,7 @@ uninstall::
 HEADER_SPEC := $(DEFAULT_HEADER_SPEC)
 # The list can be extended by external plugins using PLUGIN_HEADER_SPEC variable
 HEADER_SPEC += $(PLUGIN_HEADER_SPEC_LIST)
-HEADER_SPEC += ivette/headers/header_spec.txt
+HEADER_SPEC += ivette/./headers/header_spec.txt
 # Default list of header specification files can be overloaded.
 HEADER_SPEC_FILE?=$(HEADER_SPEC)
 
@@ -2047,7 +2047,6 @@ HEADER_SPEC_FILE?=$(HEADER_SPEC)
 HEADER_DIRS := $(DEFAULT_HEADER_DIRS)
 # The list can be extended by external plugins using PLUGIN_HEADER_DIRS variable
 HEADER_DIRS += $(PLUGIN_HEADER_DIRS_LIST)
-HEADER_DIRS += ivette/headers
 # Takes into account the kind of distribution (open-souce/close-source)
 DISTRIB_HEADER_DIRS?=$(addsuffix /$(DISTRIB_HEADERS),$(HEADER_DIRS))
 
@@ -2387,7 +2386,7 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-sinclude ivette/.Makefile.distrib
+include ivette/Makefile.distrib
 
 DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
