@@ -54,7 +54,7 @@ let mark_unknown_requires kinstr kf funspec =
   let status = Property_status.Dont_know in
   let emit_behavior behavior =
     let emit_predicate predicate =
-      let ip = Property.ip_of_requires kf kinstr behavior predicate in
+      let ip = Property.ip_of_requires kf Kglobal behavior predicate in
       Statuses_by_call.setup_precondition_proxy kf ip;
       let property = Statuses_by_call.precondition_at_call kf ip stmt in
       Property_status.emit ~distinct:true emitter ~hyps:[] property status
