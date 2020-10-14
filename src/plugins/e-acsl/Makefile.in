@@ -292,6 +292,7 @@ EACSL_DLMALLOC_LIBNAME = libeacsl-dlmalloc.a
 EACSL_DLMALLOC_LIB = $(EACSL_LIBDIR)/$(EACSL_DLMALLOC_LIBNAME)
 EACSL_DLMALLOC_SRC = $(EACSL_DLMALLOC_DIR)/dlmalloc.c
 EACSL_DLMALLOC_OBJ  = dlmalloc.o
+# Don't forget to update "e-acsl-gcc.sh" if the flags are updated
 EACSL_DLMALLOC_FLAGS = \
   -DHAVE_MORECORE=0 \
   -DHAVE_MMAP=1  \
