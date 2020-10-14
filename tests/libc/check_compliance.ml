@@ -45,14 +45,24 @@ let run_once = ref false
 
 module StringSet = Set.Make(String)
 
-let get_idents dir f =
+let get_idents_from_list dir f =
   let file = Filename.concat dir f in
   let open Yojson.Basic.Util in
   Kernel.feedback "parsing %s" f;
   let json = Yojson.Basic.from_file file in
   let elements = json |> member "data" |> to_list in
   List.fold_left (fun acc e ->
-      let ident = e |> member "ident" |> to_string in
+      StringSet.add (e |> to_string) acc
+    ) StringSet.empty elements
+
+
+let get_idents_from_assoc dir f =
+  let file = Filename.concat dir f in
+  let open Yojson.Basic.Util in
+  Kernel.feedback "parsing %s" f;
+  let json = Yojson.Basic.from_file file in
+  let elements = json |> member "data" |> to_assoc in
+  List.fold_left (fun acc (ident, _) ->
       StringSet.add ident acc
     ) StringSet.empty elements
 
@@ -62,10 +72,9 @@ let get_ident_headers dir f =
   let open Yojson.Basic.Util in
   Kernel.feedback "parsing %s" f;
   let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_list in
-  List.iter (fun e ->
-      let ident = e |> member "ident" |> to_string in
-      let header = e |> member "header" |> to_string in
+  let elements = json |> member "data" |> to_assoc in
+  List.iter (fun (ident, values) ->
+      let header = values |> member "header" |> to_string in
       Hashtbl.replace idents ident header
     ) elements;
   idents
@@ -76,11 +85,10 @@ let get_ident_headers_and_extensions dir f =
   let open Yojson.Basic.Util in
   Kernel.feedback "parsing %s" f;
   let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_list in
-  List.iter (fun e ->
-      let ident = e |> member "ident" |> to_string in
-      let header = e |> member "header" |> to_string in
-      let extensions = e |> member "extensions" |> to_list in
+  let elements = json |> member "data" |> to_assoc in
+  List.iter (fun (ident, values) ->
+      let header = values |> member "header" |> to_string in
+      let extensions = values |> member "extensions" |> to_list in
       Hashtbl.replace idents ident (header, extensions)
     ) elements;
   idents
@@ -94,9 +102,9 @@ let () =
         let fc_stdlib_idents = vis#get_idents in
         let dir = Filename.concat Fc_config.datadir "compliance" in
         let c11_idents = get_ident_headers dir "c11_functions.json" in
-        let glibc_idents = get_idents dir "glibc_functions.json" in
+        let glibc_idents = get_idents_from_list dir "glibc_functions.json" in
         let posix_idents = get_ident_headers_and_extensions dir "posix_identifiers.json" in
-        let nonstandard_idents = get_idents dir "nonstandard_identifiers.json" in
+        let nonstandard_idents = get_idents_from_assoc dir "nonstandard_identifiers.json" in
         Hashtbl.iter (fun id headers ->
             if not (Extlib.string_prefix "__" id) &&
                not (Extlib.string_prefix "Frama_C" id) &&
