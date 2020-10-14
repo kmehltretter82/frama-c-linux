@@ -39,7 +39,7 @@ PLUGIN_CMO:=\
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure share/acsl.xml
-PLUGIN_TESTS_DIRS:= eva
+PLUGIN_TESTS_DIRS:= eva sarif
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 

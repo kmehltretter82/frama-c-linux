@@ -22,10 +22,14 @@
 
 open Sarif
 
-let frama_c_sarif =
+let frama_c_sarif () =
   let name = "frama-c" in
-  let version = Fc_config.version_and_codename in
-  let semanticVersion = Fc_config.version in
+  let version, semanticVersion =
+    if Mdr_params.SarifDeterministic.get () then
+      "omitted-for-deterministic-output", ""
+    else
+      Fc_config.version_and_codename, Fc_config.version
+  in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
   let informationUri = "https://frama-c.com" in
@@ -209,7 +213,7 @@ let add_rule id desc l =
 let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 
 let gen_run remarks =
-  let tool = frama_c_sarif in
+  let tool = frama_c_sarif () in
   let name = "frama-c" in
   let invocations = [gen_invocation ()] in
   let rules, results = gen_results remarks in
@@ -228,7 +232,12 @@ let gen_run remarks =
   let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
-        (name, `Assoc [("uri", `String ("file://" ^ dir ^ "/"))]) :: acc
+        let baseUri =
+          if Mdr_params.SarifDeterministic.get () then
+            "omitted-for-deterministic-output/"
+          else  "file://" ^ dir ^ "/"
+        in
+        (name, `Assoc [("uri", `String baseUri)]) :: acc
       ) [] uriBases
   in
   let originalUriBaseIds =

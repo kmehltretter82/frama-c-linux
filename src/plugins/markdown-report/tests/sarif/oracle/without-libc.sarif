@@ -7,9 +7,8 @@
       "tool": {
         "driver": {
           "name": "frama-c",
-          "fullName": "frama-c-21.1+dev (Scandium)",
-          "version": "21.1+dev (Scandium)",
-          "semanticVersion": "21.1+dev",
+          "fullName": "frama-c-omitted-for-deterministic-output",
+          "version": "omitted-for-deterministic-output",
           "downloadUri": "https://frama-c.com/download.html",
           "informationUri": "https://frama-c.com"
         }
@@ -17,27 +16,23 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check tests/sarif/libc.c -no-autoload-plugins -load-module eva,from,scope,markdown_report -eva -mdr-gen sarif -mdr-out tests/sarif/oracle/without-libc.sarif -mdr-no-print-libc",
+            "frama-c -check tests/sarif/libc.c -no-autoload-plugins -load-module eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic -mdr-no-print-libc -mdr-out tests/sarif/result/without-libc.sarif",
           "arguments": [
             "-check", "tests/sarif/libc.c", "-no-autoload-plugins",
             "-load-module", "eva,from,scope,markdown_report", "-eva",
-            "-mdr-gen", "sarif", "-mdr-out",
-            "tests/sarif/oracle/without-libc.sarif", "-mdr-no-print-libc"
+            "-eva-no-results", "-mdr-gen", "sarif",
+            "-mdr-sarif-deterministic", "-mdr-no-print-libc", "-mdr-out",
+            "tests/sarif/result/without-libc.sarif"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": { "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_SHARE/" },
-        "FRAMAC_LIB": { "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_LIB/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file://REPLACED_FOR_PTESTS_FRAMAC_PLUGIN/"
-        },
-        "PWD": {
-          "uri":
-            "file://REPLACED_FOR_PTESTS_PWD/"
-        }
+        "FRAMAC_SHARE": { "uri": "omitted-for-deterministic-output/" },
+        "FRAMAC_LIB": { "uri": "omitted-for-deterministic-output/" },
+        "FRAMAC_PLUGIN": { "uri": "omitted-for-deterministic-output/" },
+        "PWD": { "uri": "omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
@@ -59,12 +54,12 @@
               "physicalLocation": {
                 "artifactLocation": {
                   "uri":
-                    "REPLACED_FOR_PTESTS_PWD/tests/sarif/libc.c"
+                    "/home/andr/git/frama-c-2/src/plugins/markdown-report/tests/sarif/libc.c"
                 },
                 "region": {
-                  "startLine": 11,
+                  "startLine": 13,
                   "startColumn": 10,
-                  "endLine": 11,
+                  "endLine": 13,
                   "endColumn": 19,
                   "byteLength": 9
                 }
