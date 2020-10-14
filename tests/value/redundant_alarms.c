@@ -1,5 +1,5 @@
 /* run.config*
-   PLUGIN: slicing sparecode
+   PLUGIN: @EVA_PLUGINS@ slicing sparecode
    OPT: @EVA_CONFIG@ -eva-warn-copy-indeterminate=-@all,main3 -scope-msg-key rm_asserts -scope-verbose 2 -eva-remove-redundant-alarms -print -slice-threat main1 -then-on 'Slicing export' -print
  **/
 

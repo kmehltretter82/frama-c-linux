@@ -1,5 +1,5 @@
 /* run.config
-  PLUGIN: slicing
+  PLUGIN: slicing @EVA_PLUGINS@ 
   STDOPT: +"-eva -inout -pdg -calldeps -deps -then -slice-return main -then-last -print @EVA_OPTIONS@"
 */
 

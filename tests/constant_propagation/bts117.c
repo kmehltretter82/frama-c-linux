@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: sparecode
+PLUGIN: sparecode @PLUGIN@
 OPT: -journal-disable -print
 OPT: -journal-disable -semantic-const-folding @EVA_OPTIONS@
 OPT: -journal-disable -sparecode-analysis @EVA_OPTIONS@

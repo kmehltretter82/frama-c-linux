@@ -1,2 +1,2 @@
-PLUGIN: occurrence
+PLUGIN: occurrence @EVA_PLUGINS@
 STDOPT: -"-eva" -"-out" -"-input" -"-deps" +"-occurrence-verbose 1"

@@ -1,8 +1,8 @@
 /* run.config
+  PLUGIN:
   STDOPT: +"-kernel-warn-key ghost:bad-use=inactive"
 */
 // Note: we deactivate ghost:bad-use to check that pretty-printing ghost well
-
 void decl_function_void_no_ghost(void);
 void def_function_void_no_ghost(void) {}
 void decl_function_void_ghost(void) /*@ ghost (int y) */;

@@ -1,2 +1,2 @@
-PLUGIN: slicing
+PLUGIN: slicing @EVA_PLUGINS@
 OPT: @EVA_OPTIONS@

@@ -343,12 +343,12 @@ let test_path =
   Sys.chdir (Filename.dirname tests);
   "tests"
 
+let split_blank s = Str.split (Str.regexp "[ ]+") s
 let parse_config_line =
-  let regexp_blank = Str.regexp "[ ]+" in
   fun (key, value) ->
     match key with
     | "DEFAULT_SUITES" ->
-      let l = Str.split regexp_blank value in
+      let l = split_blank value in
       default_suites := List.map (Filename.concat test_path) l
     | _ -> default_env key value (* Environnement variable that Frama-C reads*)
 
@@ -546,7 +546,7 @@ type config =
     dc_timeout: string
   }
 
-let default_macros () = Macros.empty
+let default_macros () = Macros.add_list [ "PLUGIN", "" ] Macros.empty
 
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
@@ -641,14 +641,16 @@ let config_exec ~once dir s current =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
 let config_cmxs _dir s current =
-  let l = (String.split_on_char ' ' s) in
+  let l = split_blank s in
   { current with dc_cmxs = l @ current.dc_cmxs }
 
 let config_deps _dir s current =
-  { current with dc_deps = (String.split_on_char ' ' s) @ current.dc_deps }
+  { current with dc_deps = (split_blank s) @ current.dc_deps }
 
 let config_plugin _dir s current =
-  { current with dc_plugins = (String.split_on_char ' ' s) @ current.dc_plugins }
+  let s = Macros.expand current.dc_macros s in
+  { current with dc_plugins = split_blank s ;
+                 dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
 
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -772,7 +774,7 @@ let scan_options dir scan_buffer default =
      | [] when !r.dc_framac -> { !r with dc_toplevels = default.dc_toplevels }
      | l -> { !r with dc_toplevels = List.rev l })
 
-let split_config = Str.regexp ",[ ]*"
+let split_config s = Str.split (Str.regexp ",[ ]*") s
 
 let is_config name =
   let prefix = "run.config" in
@@ -797,7 +799,7 @@ let scan_test_file default dir f =
              name = "run.config" && !special_config = ""  ||
              name = "run.config_" ^ !special_config
            in
-           let configs = Str.split split_config (String.trim names) in
+           let configs = split_config (String.trim names) in
            if List.exists is_current_config configs then
              (* Found options for current config! *)
              scan_options dir scan_buffer default

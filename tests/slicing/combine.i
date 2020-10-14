@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: constant_propagation
+   PLUGIN: constant_propagation @PLUGIN@
    CMD: @frama-c@ -load-plugin slicing -load-plugin constant_propagation -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */
