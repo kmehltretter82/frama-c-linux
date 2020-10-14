@@ -26,7 +26,7 @@ int main(void)
   int i = 1;
   t[0] = 1;
   t[1] = 2;
-  printf(__gen_e_acsl_literal_string,x,t[0],t[i]);
+  printf(__gen_e_acsl_literal_string,x,t[0],t[i]); /* printf_va_1 */
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

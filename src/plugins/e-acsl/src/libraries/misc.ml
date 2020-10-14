@@ -36,6 +36,9 @@ let is_fc_or_compiler_builtin vi =
    let prefix = String.sub vi.vname 0 prefix_length in
    Datatype.String.equal prefix "__builtin_")
 
+let is_fc_stdlib_generated vi =
+  Cil.hasAttribute "fc_stdlib_generated" vi.vattr
+
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
 (* ************************************************************************** *)

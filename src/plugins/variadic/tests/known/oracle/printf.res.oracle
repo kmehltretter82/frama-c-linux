@@ -621,32 +621,32 @@ int main(void)
   int8_t i8 = (signed char)42;
   uint_least64_t uleast64 = (unsigned long long)42u;
   int_fast32_t ifast32 = 42;
-  printf_va_1("Hello world !\n");
-  printf_va_2("%s%n",string,& i);
-  printf_va_3("%ls",wstring);
-  printf_va_4("%d %hhn",i,& hh);
-  printf_va_5("%hhi %hn",(int)hh,& h);
-  printf_va_6("%hd %ln",(int)h,& l);
-  printf_va_7("%li %lln",l,& ll);
-  printf_va_8("%lld %jn",ll,& j);
-  printf_va_9("%jd %zn",j,& z);
-  printf_va_10("%zd %tn",z,& t);
-  printf_va_11("%td\n",t);
-  printf_va_12("%u ",ui);
-  printf_va_13("%hho ",(int)uhh);
-  printf_va_14("%hx ",(int)uh);
-  printf_va_15("%lX ",ul);
-  printf_va_16("%llu ",ull);
-  printf_va_17("%jo ",uj);
-  printf_va_18("%zx %tX\n",z,t);
-  printf_va_19("%llu",u64);
-  printf_va_20("%hhi",(int)i8);
-  printf_va_21("%llx",uleast64);
-  printf_va_22("%d",ifast32);
-  printf_va_23("%f %Le\n",f,L);
-  printf_va_24("%c\n",(int)c);
-  printf_va_25("%p ",(void *)string);
-  printf_va_26("%d %*.*u\n",1,- (-1),2,ui);
+  printf("Hello world !\n"); /* printf_va_1 */
+  printf("%s%n",string,& i); /* printf_va_2 */
+  printf("%ls",wstring); /* printf_va_3 */
+  printf("%d %hhn",i,& hh); /* printf_va_4 */
+  printf("%hhi %hn",(int)hh,& h); /* printf_va_5 */
+  printf("%hd %ln",(int)h,& l); /* printf_va_6 */
+  printf("%li %lln",l,& ll); /* printf_va_7 */
+  printf("%lld %jn",ll,& j); /* printf_va_8 */
+  printf("%jd %zn",j,& z); /* printf_va_9 */
+  printf("%zd %tn",z,& t); /* printf_va_10 */
+  printf("%td\n",t); /* printf_va_11 */
+  printf("%u ",ui); /* printf_va_12 */
+  printf("%hho ",(int)uhh); /* printf_va_13 */
+  printf("%hx ",(int)uh); /* printf_va_14 */
+  printf("%lX ",ul); /* printf_va_15 */
+  printf("%llu ",ull); /* printf_va_16 */
+  printf("%jo ",uj); /* printf_va_17 */
+  printf("%zx %tX\n",z,t); /* printf_va_18 */
+  printf("%llu",u64); /* printf_va_19 */
+  printf("%hhi",(int)i8); /* printf_va_20 */
+  printf("%llx",uleast64); /* printf_va_21 */
+  printf("%d",ifast32); /* printf_va_22 */
+  printf("%f %Le\n",f,L); /* printf_va_23 */
+  printf("%c\n",(int)c); /* printf_va_24 */
+  printf("%p ",(void *)string); /* printf_va_25 */
+  printf("%d %*.*u\n",1,- (-1),2,ui); /* printf_va_26 */
   {
     unsigned int __va_arg0 = ui;
     char *__va_arg1 = string;
@@ -656,8 +656,8 @@ int main(void)
            (void * const *)(__va_args));
   }
   char hashes[4] = {(char)'#', (char)'#', (char)'#', (char)'#'};
-  printf_va_27("%.*s",4,hashes);
-  printf_va_28("%.4s",hashes);
+  printf("%.*s",4,hashes); /* printf_va_27 */
+  printf("%.4s",hashes); /* printf_va_28 */
   __retres = 0;
   return __retres;
 }

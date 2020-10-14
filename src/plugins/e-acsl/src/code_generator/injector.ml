@@ -639,6 +639,9 @@ let inject_in_global (env, main) = function
     env, main
   | g when Rtl.Symbols.mem_global g ->
     env, main
+  (* generated function declaration: nothing to do *)
+  | GFunDecl(_, vi, _) when Misc.is_fc_stdlib_generated vi ->
+    env, main
 
   (* variable declarations *)
   | GVarDecl(vi, _) | GFunDecl(_, vi, _) ->

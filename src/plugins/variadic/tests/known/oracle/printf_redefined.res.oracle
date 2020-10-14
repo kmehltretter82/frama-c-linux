@@ -25,7 +25,7 @@ int printf_va_1(char const * __restrict __format, size_t param0);
 void main(void)
 {
   long x = (long)0;
-  printf_va_1("%zd\n",(size_t)x);
+  printf("%zd\n",(size_t)x); /* printf_va_1 */
   return;
 }
 

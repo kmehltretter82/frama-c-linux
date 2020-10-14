@@ -1,4 +1,2 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[kernel:annot:missing-spec] tests/bts/bts1398.c:12: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype

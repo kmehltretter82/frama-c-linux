@@ -1454,6 +1454,8 @@ src/plugins/variadic/generic.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/standard.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/translate.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_build.ml: CEA_LGPL_OR_PROPRIETARY

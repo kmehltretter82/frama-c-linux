@@ -20,16 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format_types
+open Cil_types
 
-exception Invalid_format
+val add: varinfo -> varinfo -> unit
+(** [add replaced original] stores the association of the original and the
+    replaced functions in a project state. *)
 
-val check_f_specification : f_conversion_specification -> f_conversion_specification
-val check_s_specification : s_conversion_specification -> s_conversion_specification
-val check_f_format : f_format -> f_format
-val check_s_format : s_format -> s_format
-val check_format : format -> format
+val find: varinfo -> varinfo
+(* [find fct] returns the original function for [fct] from the project state if
+   it has been replaced. Raise [Not_found] if no original function exists. *)
 
-val parse_f_format : Format_string.t -> f_format
-val parse_s_format : Format_string.t -> s_format
-val parse_format : format_kind -> Format_string.t -> format
+val mem: varinfo -> bool
+(* [mem fct] returns true if an original function exists for [fct], false
+   otherwise. *)

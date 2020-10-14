@@ -254,21 +254,21 @@ int main(void)
   int j;
   wchar_t input[0x100] =
     {102, 111, 114, 116, 121, 45, 116, 119, 111, 32, 105, 115, 0};
-  wprintf_va_1((wchar_t const *)L"%" "d" " " "%" "l" "d" "\\n" ,42,42L);
-  wprintf_va_2((wchar_t const *)L"%" "1" "0" "d" " " "%" "0" "1" "0" "d"
-               "\\n" ,42,42);
-  wprintf_va_3((wchar_t const *)L"%" "d" " " "%" "x" " " "%" "o" " " "%" "#"
-               "x" " " "%" "#" "o" "\\n" ,42,42u,42u,42u,42u);
-  wprintf_va_4((wchar_t const *)L"%" "2" "." "1" "f" " " "%" "+" "." "0" "e"
-               " " "%" "E" "\\n" ,42.0,42.0,42.0);
-  wprintf_va_5((wchar_t const *)L"%" "*" "d" " " "\\n" ,4,2);
-  wprintf_va_6((wchar_t const *)L"%" "l" "s" " " "\\n" ,(wchar_t *)L"4" "2" );
-  swprintf_va_1(wstring,(unsigned int)0x100,(wchar_t const *)L"%" "s" " " "="
-                " " "%" "d" ,(char *)L"4" "2" " " "+" " " "4" "2" ,42 + 42);
-  wscanf_va_1((wchar_t const *)L"%" "l" "s" ,wstring);
-  wscanf_va_2((wchar_t const *)L"%" "d" " " "%" "d" ,& i,& j);
-  swscanf_va_1((wchar_t const *)(input),(wchar_t const *)L"%" "l" "s" " " "%"
-               "*" "s" " " "%" "d" ,wstring,& i);
+  wprintf((wchar_t const *)L"%" "d" " " "%" "l" "d" "\\n" ,42,42L); /* wprintf_va_1 */
+  wprintf((wchar_t const *)L"%" "1" "0" "d" " " "%" "0" "1" "0" "d" "\\n" ,
+          42,42); /* wprintf_va_2 */
+  wprintf((wchar_t const *)L"%" "d" " " "%" "x" " " "%" "o" " " "%" "#" "x"
+          " " "%" "#" "o" "\\n" ,42,42u,42u,42u,42u); /* wprintf_va_3 */
+  wprintf((wchar_t const *)L"%" "2" "." "1" "f" " " "%" "+" "." "0" "e" " "
+          "%" "E" "\\n" ,42.0,42.0,42.0); /* wprintf_va_4 */
+  wprintf((wchar_t const *)L"%" "*" "d" " " "\\n" ,4,2); /* wprintf_va_5 */
+  wprintf((wchar_t const *)L"%" "l" "s" " " "\\n" ,(wchar_t *)L"4" "2" ); /* wprintf_va_6 */
+  swprintf(wstring,(unsigned int)0x100,(wchar_t const *)L"%" "s" " " "=" " "
+           "%" "d" ,(char *)L"4" "2" " " "+" " " "4" "2" ,42 + 42); /* swprintf_va_1 */
+  wscanf((wchar_t const *)L"%" "l" "s" ,wstring); /* wscanf_va_1 */
+  wscanf((wchar_t const *)L"%" "d" " " "%" "d" ,& i,& j); /* wscanf_va_2 */
+  swscanf((wchar_t const *)(input),(wchar_t const *)L"%" "l" "s" " " "%" "*"
+          "s" " " "%" "d" ,wstring,& i); /* swscanf_va_1 */
   __retres = 0;
   return __retres;
 }

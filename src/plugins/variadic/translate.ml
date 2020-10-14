@@ -45,7 +45,7 @@ let translate_variadics (file : file) =
   (* Environment filled with global symbols. *)
   let env = Environment.from_file file in
 
-  (* Table associating varinfo of variadic functions to a variadic_function 
+  (* Table associating varinfo of variadic functions to a variadic_function
      description *)
   let module Table = Cil_datatype.Varinfo.Hashtbl in
   let classification : variadic_function Table.t = Table.create 17 in
@@ -54,14 +54,14 @@ let translate_variadics (file : file) =
 
     method! vglob glob =
       begin match glob with
-      | GFunDecl(_, vi, _) | GFun ({svar = vi}, _)
-            when not (is_framac_builtin vi) ->
+        | GFunDecl(_, vi, _) | GFun ({svar = vi}, _)
+          when not (is_framac_builtin vi) ->
           if not (Table.mem classification vi) then begin
             let vf = Classify.classify env vi in
             may (Table.add classification vi) vf
           end;
           Cil.SkipChildren
-      | _ ->
+        | _ ->
           Cil.SkipChildren
       end
   end
@@ -88,26 +88,26 @@ let translate_variadics (file : file) =
     (* Translate types and signatures *)
     method! vglob glob =
       begin match glob with
-      | GFunDecl(_, vi, _) when is_framac_builtin vi ->
+        | GFunDecl(_, vi, _) when is_framac_builtin vi ->
           Self.result ~level:2 ~current:true
             "Variadic builtin %s left untransformed." vi.vname;
           Cil.SkipChildren
 
-      | GFunDecl(_, vi, _) ->
+        | GFunDecl(_, vi, _) ->
           if Table.mem classification vi then
             Generic.add_vpar vi;
           Cil.DoChildren
 
-      | GFun ({svar = vi} as fundec, _) ->
+        | GFun ({svar = vi} as fundec, _) ->
           if Table.mem classification vi then begin
             Generic.add_vpar vi;
             fundec.sformals <- Cil.getFormalsDecl vi;
           end;
           Standard.new_globals := [];
           Cil.DoChildrenPost (fun globs ->
-            List.rev (globs @ !Standard.new_globals))
+              List.rev (globs @ !Standard.new_globals))
 
-      | _ ->
+        | _ ->
           Cil.DoChildren
       end
 
@@ -156,83 +156,90 @@ let translate_variadics (file : file) =
             ~fundec ~ghost block loc mk_call (Cil.evar ~loc f) args
       in
       begin match i with
-      | Call(_, {enode = Lval(Var vi, _)}, _, _)
-            when List.mem vi.vname va_builtins ->
+        | Call(_, {enode = Lval(Var vi, _)}, _, _)
+          when List.mem vi.vname va_builtins ->
           File.must_recompute_cfg fundec;
           Cil.ChangeTo (Generic.translate_va_builtin fundec i)
-      | Call(lv, {enode = Lval(Var vi, NoOffset)}, args, loc) ->
-        begin
-          try
+        | Call(lv, {enode = Lval(Var vi, NoOffset)}, args, loc) ->
+          begin
+            try
+              let mk_call f args = Call (lv, f, args, loc) in
+              let res = make_new_args mk_call vi args in
+              File.must_recompute_cfg fundec;
+              Cil.ChangeTo res
+            with Not_found ->
+              Cil.DoChildren
+          end
+
+        | Call(lv, callee, args, loc) ->
+          let is_variadic =
+            try
+              let args, _ = Typ.ghost_partitioned_params (Cil.typeOf callee) in
+              let last = Extends.List.last args in
+              last = Generic.vpar
+            with Extends.List.EmptyList -> false
+          in
+          if is_variadic then begin
             let mk_call f args = Call (lv, f, args, loc) in
-            let res = make_new_args mk_call vi args in
+            let res =
+              Generic.translate_call
+                ~fundec
+                ~ghost
+                block
+                loc
+                mk_call
+                callee
+                args
+            in
             File.must_recompute_cfg fundec;
             Cil.ChangeTo res
-          with Not_found ->
+          end else
             Cil.DoChildren
-        end
-
-      | Call(lv, callee, args, loc) ->
-        let is_variadic =
-          try
-            let args, _ = Typ.ghost_partitioned_params (Cil.typeOf callee) in
-            let last = Extends.List.last args in
-            last = Generic.vpar
-          with Extends.List.EmptyList -> false
-        in
-        if is_variadic then begin
-          let mk_call f args = Call (lv, f, args, loc) in
-          let res =
-            Generic.translate_call ~fundec ~ghost block loc mk_call callee args
-          in
-          File.must_recompute_cfg fundec;
-          Cil.ChangeTo res
-        end else
-          Cil.DoChildren
-      | Local_init(v, ConsInit(c, args, kind), loc) ->
-        begin
-          try
-            let mk_call f args =
+        | Local_init(v, ConsInit(c, args, kind), loc) ->
+          begin
+            try
+              let mk_call f args =
+                let args =
+                  match kind, args with
+                  | Constructor, [] ->
+                    Options.Self.fatal
+                      "Constructor %a is expected to have at least one argument"
+                      Cil_printer.pp_varinfo c
+                  | Constructor, _::tl -> tl
+                  | Plain_func, args -> args
+                in
+                let f =
+                  match f.enode with
+                  | Lval (Var f, NoOffset) -> f
+                  | _ ->
+                    Options.Self.fatal
+                      "Constructor cannot be translated as indirect call"
+                in
+                Local_init(v,ConsInit(f,args,kind),loc)
+              in
               let args =
-                match kind, args with
-                | Constructor, [] ->
-                  Options.Self.fatal
-                    "Constructor %a is expected to have at least one argument"
-                    Cil_printer.pp_varinfo c
-                | Constructor, _::tl -> tl
-                | Plain_func, args -> args
-              in
-              let f =
-                match f.enode with
-                | Lval (Var f, NoOffset) -> f
-                | _ ->
-                  Options.Self.fatal
-                    "Constructor cannot be translated as indirect call"
-              in
-              Local_init(v,ConsInit(f,args,kind),loc)
-            in
-            let args =
-              match kind with
+                match kind with
                 | Plain_func -> args
                 | Constructor -> Cil.mkAddrOfVi v :: args
-            in
-            let res = make_new_args mk_call c args in
-            File.must_recompute_cfg fundec;
-            Cil.ChangeTo res
-          with Not_found ->
-            Cil.DoChildren
-        end
-      | _-> Cil.DoChildren
+              in
+              let res = make_new_args mk_call c args in
+              File.must_recompute_cfg fundec;
+              Cil.ChangeTo res
+            with Not_found ->
+              Cil.DoChildren
+          end
+        | _-> Cil.DoChildren
       end
 
     method! vexpr exp =
       begin match exp.enode with
-      | AddrOf (Var vi, NoOffset)
-        when Extends.Cil.is_variadic_function vi && is_framac_builtin vi ->
+        | AddrOf (Var vi, NoOffset)
+          when Extends.Cil.is_variadic_function vi && is_framac_builtin vi ->
           Self.not_yet_implemented
             "The variadic plugin doesn't handle calls to a pointer to the \
              variadic builtin %s."
             vi.vname
-      | _ -> Cil.DoChildren
+        | _ -> Cil.DoChildren
       end
   end
   in

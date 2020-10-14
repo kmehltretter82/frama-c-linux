@@ -68,7 +68,7 @@ int main(void)
   char c[10];
   int i;
   /*@ assert Eva: initialization: \initialized(&d); */
-  scanf_va_1("Hello %*10le %% %10s %[^]world] %d !",(char *)d,c,& i);
+  scanf("Hello %*10le %% %10s %[^]world] %d !",(char *)d,c,& i); /* scanf_va_1 */
   __retres = 0;
   return __retres;
 }

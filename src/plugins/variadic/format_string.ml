@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 type t =
-| String of string
-| WString of int64 list
+  | String of string
+  | WString of int64 list
 
 exception OutOfBounds
 exception NotAscii of int64
@@ -30,13 +30,13 @@ exception NotAscii of int64
 let get_char (s : t) (i : int) : char =
   match s with
   | String s ->
-      begin try
+    begin try
         String.get s i
       with
         Invalid_argument _ -> raise OutOfBounds
-      end
+    end
   | WString s ->
-      begin try 
+    begin try
         let c = List.nth s i in
         if (c >= Int64.zero && c<= (Int64.of_int 255)) then
           Char.chr (Int64.to_int c)
@@ -44,22 +44,22 @@ let get_char (s : t) (i : int) : char =
           raise (NotAscii c)
       with
         Failure _ -> raise OutOfBounds
-      end
+    end
 
 let get_wchar (s : t) (i : int) : int64 =
   match s with
   | String s ->
-      begin try
+    begin try
         Int64.of_int (Char.code (String.get s i))
       with
         Invalid_argument _ -> raise OutOfBounds
-      end
+    end
   | WString s ->
-      begin try 
+    begin try
         List.nth s i
       with
         Failure _ -> raise OutOfBounds
-      end
+    end
 
 let sub_string (s : t) (start : int) (len : int) : string =
   let init_char i =

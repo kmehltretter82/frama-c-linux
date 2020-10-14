@@ -20,16 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format_types
+(* State to store the association between a replaced function and the original
+   function. *)
+module Replacements =
+  Cil_state_builder.Varinfo_hashtbl
+    (Cil_datatype.Varinfo)
+    (struct
+      let size = 17
+      let name = "replacements"
+      let dependencies = [ Options.Enabled.self; Options.Strict.self ]
+    end)
 
-exception Invalid_format
+let add new_vi old_vi =
+  Replacements.add new_vi old_vi
 
-val check_f_specification : f_conversion_specification -> f_conversion_specification
-val check_s_specification : s_conversion_specification -> s_conversion_specification
-val check_f_format : f_format -> f_format
-val check_s_format : s_format -> s_format
-val check_format : format -> format
+let find new_vi =
+  Replacements.find new_vi
 
-val parse_f_format : Format_string.t -> f_format
-val parse_s_format : Format_string.t -> s_format
-val parse_format : format_kind -> Format_string.t -> format
+let mem new_vi =
+  Replacements.mem new_vi
