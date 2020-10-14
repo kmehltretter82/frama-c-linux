@@ -50,7 +50,7 @@ type partition = {
   globals : zone list ; (* [ &G , G[...], ... ] *)
   to_heap : zone list ; (* [ p, ... ] *)
   context : zone list ; (* [ p+(..), ... ] *)
-  by_addr : zone list ;
+  by_addr : zone list ; (* [ &(x + ..), ... ] *)
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -87,11 +87,10 @@ let set x p w =
       else w
 
 (* -------------------------------------------------------------------------- *)
-(* ANNOTS                                                                     *)
+(* --- Building Annotations                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 open Logic_const
-
 
 let rec ptr_of = function
   | Ctype t -> Ctype (TPtr(t, []))
@@ -188,24 +187,19 @@ let valid_region loc r =
   let t = region_to_term loc r in
   pvalid ~loc (here_label, t)
 
-let global_zones partition =
-  List.map (fun z -> [z]) partition.globals
+let simplify ps =
+  List.sort_uniq Logic_utils.compare_predicate
+    (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps)
 
-let context_zones partition =
-  List.map (fun z -> [z]) partition.context
+let ptrset { term_type = t } =
+  let open Logic_typing in
+  is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
 
-let addr_of_zones partition =
-  let comp a b = Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
-  List.sort comp partition.by_addr
+(* -------------------------------------------------------------------------- *)
+(* --- Partition Helpers                                                  --- *)
+(* -------------------------------------------------------------------------- *)
 
-let heap_zones partition =
-  let comp a b = Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
-  List.sort comp partition.to_heap
-
-(* Note that this function does not return separated zone lists, but well-typed
-   zone lists.
-*)
-let well_type_zones zone_function partition =
+let welltyped zones =
   let rec partition_by_type t acc l =
     match l, acc with
     | [], _ ->
@@ -217,10 +211,24 @@ let well_type_zones zone_function partition =
     | x :: l, acc ->
         partition_by_type (type_of_zone x) ([x] :: acc) l
   in
-  partition_by_type Cil.voidType [] (zone_function partition)
+  let compare_zone a b =
+    Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
+  partition_by_type Cil.voidType [] (List.sort compare_zone zones)
 
-let heaps = well_type_zones heap_zones
+let global_zones partition =
+  List.map (fun z -> [z]) partition.globals
 
+let context_zones partition =
+  List.map (fun z -> [z]) partition.context
+
+let heaps partition = welltyped partition.to_heap
+let addr_of_vars partition = welltyped partition.by_addr
+
+(* -------------------------------------------------------------------------- *)
+(* --- Computing Separation                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Memory regions shall be separated with each others *)
 let main_separation loc globals context heaps =
   match heaps, context with
   | [], [] ->
@@ -236,6 +244,7 @@ let main_separation loc globals context heaps =
       in
       List.map for_typed_heap heaps
 
+(* Filter assigns *)
 let assigned_locations kf filter =
   let add_from l (e, _ds) =
     if filter e.it_content then e :: l else l
@@ -246,6 +255,7 @@ let assigned_locations kf filter =
   in
   Annotations.fold_assigns add_assign kf Cil.default_behavior_name []
 
+(* Locations assigned by pointer from a call *)
 let assigned_via_pointers kf =
   let rec assigned_via_pointer t =
     match t.term_node with
@@ -263,12 +273,13 @@ let assigned_via_pointers kf =
   in
   assigned_locations kf assigned_via_pointer
 
+(* Checks whether a term refers to Post *)
 let post_term t =
   let exception Post_value in
   let v = object
     inherit Cil.nopCilVisitor
     method! vlogic_label = function
-      | BuiltinLabel(Post) -> raise Post_value
+      | BuiltinLabel Post -> raise Post_value
       | _ -> Cil.SkipChildren
     method! vterm_lval = function
       | TResult _, _ -> raise Post_value
@@ -277,6 +288,7 @@ let post_term t =
   try ignore (Cil.visitCilTerm v t) ; false
   with Post_value -> true
 
+(* Computes conditions from call assigns *)
 let assigned_separation kf loc globals =
   let addr_of t = addr_of_lval ~loc t.it_content in
   let asgnd_ptrs = List.map addr_of (assigned_via_pointers kf) in
@@ -286,28 +298,18 @@ let assigned_separation kf loc globals =
   in
   List.fold_left folder ([],[]) asgnd_ptrs
 
-let simpl_pred_list l =
-  List.sort_uniq Logic_utils.compare_predicate
-    (List.filter (fun p -> not(Logic_utils.is_trivially_true p)) l)
-
+(* Computes conditions from partition *)
 let clauses_of_partition kf loc p =
   let globals = global_zones p in
-  let main_sep =
-    main_separation loc globals (context_zones p) (heaps p)
-  in
+  let main_sep = main_separation loc globals (context_zones p) (heaps p) in
   let assigns_sep_req, assigns_sep_ens = assigned_separation kf loc globals in
   let context_validity = List.map (valid_region loc) (context_zones p) in
   let reqs = main_sep @ assigns_sep_req @ context_validity in
-  let reqs = simpl_pred_list reqs in
-  let ens = simpl_pred_list assigns_sep_ens in
+  let reqs = simplify reqs in
+  let ens = simplify assigns_sep_ens in
   reqs, ens
 
-let addr_of_vars = well_type_zones addr_of_zones
-
-let ptr_or_ptr_set { term_type = t } =
-  let open Logic_typing in
-  is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
-
+(* Computes conditions from return *)
 let out_pointers_separation kf loc p =
   let ret_t = Kernel_function.get_return_type kf in
   let addr_of t = addr_of_lval ~loc t.it_content in
@@ -315,7 +317,7 @@ let out_pointers_separation kf loc p =
     Extlib.filter_map
       (* Search assigned pointers via a pointer,
          e.g. 'assigns *p ;' with '*p' of type pointer or set of pointers *)
-      (fun t -> ptr_or_ptr_set t.it_content) addr_of (assigned_via_pointers kf)
+      (fun t -> ptrset t.it_content) addr_of (assigned_via_pointers kf)
   in
   let asgnd_ptrs =
     if Cil.isPointerType ret_t then tresult ~loc ret_t :: asgnd_ptrs
@@ -333,19 +335,9 @@ let out_pointers_separation kf loc p =
     let globals = global_zones p in
     List.map (fun t -> term_separated_from_regions loc t globals) asgnd_ptrs
   in
-  simpl_pred_list (formals_separation @ globals_separation)
+  simplify (formals_separation @ globals_separation)
 
-
-module Table =
-  State_builder.Hashtbl
-    (Cil_datatype.Kf.Hashtbl)
-    (Datatype.Option(Cil_datatype.Funbehavior))
-    (struct
-      let name = "MemoryContext.Table"
-      let size = 17
-      let dependencies = [ Ast.self ]
-    end)
-
+(* Computes all conditions from behavior *)
 let compute_behavior kf name hypotheses_computer =
   let partition = hypotheses_computer kf in
   let loc = Kernel_function.get_location kf in
@@ -366,6 +358,28 @@ let compute_behavior kf name hypotheses_computer =
         b_extended = []
       }
 
+(* -------------------------------------------------------------------------- *)
+(* --- Memoization                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Table =
+  State_builder.Hashtbl
+    (Cil_datatype.Kf.Hashtbl)
+    (Datatype.Option(Cil_datatype.Funbehavior))
+    (struct
+      let name = "MemoryContext.Table"
+      let size = 17
+      let dependencies = [ Ast.self ]
+    end)
+
+module RegisteredHypotheses =
+  State_builder.Set_ref
+    (Cil_datatype.Kf.Set)
+    (struct
+      let name = "Wp.MemoryContext.RegisteredHypotheses"
+      let dependencies = [Ast.self]
+    end)
+
 let compute name hypotheses_computer =
   Globals.Functions.iter
     (fun kf -> ignore (compute_behavior kf name hypotheses_computer))
@@ -377,6 +391,10 @@ let get_behavior kf name hypotheses_computer =
       compute_behavior kf name hypotheses_computer
     end
     kf
+
+(* -------------------------------------------------------------------------- *)
+(* --- External API                                                       --- *)
+(* -------------------------------------------------------------------------- *)
 
 let print_memory_context kf bhv fmt =
   begin
@@ -401,14 +419,6 @@ let warn kf name hyp_computer =
 let emitter =
   Emitter.(create "Wp.Hypotheses" [Funspec] ~correctness:[] ~tuning:[])
 
-module RegisteredHypotheses =
-  State_builder.Set_ref
-    (Cil_datatype.Kf.Set)
-    (struct
-      let name = "Wp.MemoryContext.RegisteredHypotheses"
-      let dependencies = [Ast.self]
-    end)
-
 let add_behavior kf name hypotheses_computer =
   if RegisteredHypotheses.mem kf then ()
   else begin
@@ -418,3 +428,5 @@ let add_behavior kf name hypotheses_computer =
     end ;
     RegisteredHypotheses.add kf
   end
+
+(* -------------------------------------------------------------------------- *)
