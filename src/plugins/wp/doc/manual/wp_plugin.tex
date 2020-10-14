@@ -823,13 +823,17 @@ The available \textsf{WP} command-line options related to model selection are:
   makes the \textsf{WP} emitting a warning on each volatile access.
 \item[\tt -wp-(no)-warn-memory-model] this option (de)activate the
   warnings about memory model hypotheses
-  for the generated proof obligations. For each model supporting this feature, and each concerned function,
+  for the generated proof obligations, as described in Section~\ref{wp-model-hypotheses}.
+  For each model supporting this feature, and each concerned function,
   an \textsf{ACSL} specification is printed on output.
   Currently, only the \texttt{Caveat}, \texttt{Typed} and \texttt{Ref} memory models support
-  this feature.
+  this feature. See also experimental option below.
 \item[\tt -wp-(no)-check-memory-model] this \emph{experimental} option generates
-  the hypotheses listed by the option \texttt{-wp-warn-memory-model} as ACSL contracts and
-  asks WP to verify them. Disabled by default.
+  ACSL contracts for the selected memory model hypotheses, as described
+  in Section~\ref{wp-model-hypotheses} and listed by option
+  \texttt{-wp-warn-memory-model}.
+  Hence, the memory model hypothes are exposed to \textsf{WP} and other plugins.
+  Disabled by default.
 \end{description}
 
 \subsection{Computation Strategy}
