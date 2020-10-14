@@ -1,0 +1,16 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp/bad_cast_call.i (no preprocessing)
+[wp] Running WP plugin...
+[kernel:annot:missing-spec] tests/wp/bad_cast_call.i:3: Warning: 
+  Neither code nor specification for function m, generating default assigns from the prototype
+[wp] Warning: Missing RTE guards
+[wp] tests/wp/bad_cast_call.i:5: Warning: 
+  Cast with incompatible pointers types (source: sint8*) (target: char**)
+------------------------------------------------------------
+  Function foo
+------------------------------------------------------------
+
+Goal Assertion 'MUST_FAIL' (file tests/wp/bad_cast_call.i, line 6):
+Prove: null = pages_0.
+
+------------------------------------------------------------

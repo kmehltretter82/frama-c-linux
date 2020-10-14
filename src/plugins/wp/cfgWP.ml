@@ -1187,7 +1187,7 @@ struct
          match outcome with
          | Warning.Result(warn , wp) -> { wp with vcs = add_warnings warn wp.vcs }
          | Warning.Failed warn ->
-             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_exit.vcs in
+             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_post.vcs in
              let v_exit = do_assigns_everything ~stmt ~warn p_exit.effects p_exit.vcs in
              let effects = Eset.union p_post.effects p_exit.effects in
              let vcs = gmerge v_post v_exit in
