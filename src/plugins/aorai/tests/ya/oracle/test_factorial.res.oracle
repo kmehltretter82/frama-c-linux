@@ -216,9 +216,7 @@ int decode_int(char *s)
     S2_tmp = S2;
     main_0_tmp = main_0;
     main_0_tmp = 0;
-    if (S1 == 1) S2_tmp = 1;
-    else 
-      if (S2 == 1) S2_tmp = 1; else S2_tmp = 0;
+    if (S1 == 1 || S2 == 1) S2_tmp = 1; else S2_tmp = 0;
     S1_tmp = 0;
     S1 = S1_tmp;
     S2 = S2_tmp;
@@ -264,12 +262,8 @@ int decode_int(char *s)
     S2_tmp = S2;
     main_0_tmp = main_0;
     main_0_tmp = 0;
-    if (S1 == 1) S2_tmp = 1;
-    else 
-      if (S2 == 1) S2_tmp = 1; else S2_tmp = 0;
-    if (S1 == 1) S1_tmp = 1;
-    else 
-      if (S2 == 1) S1_tmp = 1; else S1_tmp = 0;
+    if (S1 == 1 || S2 == 1) S2_tmp = 1; else S2_tmp = 0;
+    if (S1 == 1 || S2 == 1) S1_tmp = 1; else S1_tmp = 0;
     S1 = S1_tmp;
     S2 = S2_tmp;
     main_0 = main_0_tmp;

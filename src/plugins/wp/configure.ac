@@ -63,15 +63,15 @@ case $WHY3VERSION in
         AC_MSG_RESULT([not found!])
         plugin_disable(wp,[why3 not found])
         ;;
-      0.* | 1.[[012]].* | 1.3.0)
-        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.1+])
+      0.* | 1.[[012]].* | 1.3.0 | 1.3.1 | 1.3.2)
+        AC_MSG_RESULT([found $WHY3VERSION: requires 1.3.3+])
         plugin_disable(wp,[non-supported why3 $WHY3VERSION])
         ;;
       1.3.*)
         AC_MSG_RESULT([found $WHY3VERSION: ok])
         ;;
       *)
-        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.1+)])
+        AC_MSG_RESULT([found $WHY3VERSION: might work (should be 1.3.3+)])
         ;;
 esac
 fi
@@ -85,7 +85,7 @@ if test "$ENABLE_WP" != "no"; then
     if test "$COQC" = "yes" ; then
       COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
       case $COQVERSION in
-        8.7*|8.8*|8.9*|8.10*|8.11.*|trunk)
+        8.7*|8.8*|8.9*|8.10*|8.11.*|8.12.*|trunk)
           AC_MSG_RESULT(coqc version $COQVERSION found)
           ;;
         *)

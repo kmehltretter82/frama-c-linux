@@ -33,11 +33,8 @@ int f(void);
    @/
   void main_pre_func(void)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 
@@ -54,11 +51,8 @@ int f(void);
    @/
   void main_post_func(int res)
   {
-    int aorai_CurStates_tmp;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    aorai_CurStates_tmp = aorai_CurStates;
-    aorai_CurStates = aorai_CurStates_tmp;
     return;
   }
 

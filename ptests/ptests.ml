@@ -1376,7 +1376,7 @@ let do_command command =
             else
               execnow.ex_cmd
           in
-          if !verbosity >= 1 then begin
+          if !verbosity >= 1 || !behavior = Show then begin
             lock_printf "%% launch %s@." cmd;
           end;
           shared.summary_run <- succ shared.summary_run;

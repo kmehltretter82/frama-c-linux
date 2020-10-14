@@ -714,6 +714,10 @@ src/plugins/aorai/VERSIONS.txt: .ignore
 src/plugins/aorai/YA.README: .ignore
 src/plugins/aorai/aorai_dataflow.ml: AORAI_LGPL
 src/plugins/aorai/aorai_dataflow.mli: AORAI_LGPL
+src/plugins/aorai/aorai_graph.ml: AORAI_LGPL
+src/plugins/aorai/aorai_graph.mli: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.ml: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.mli: AORAI_LGPL
 src/plugins/aorai/aorai_option.ml: AORAI_LGPL
 src/plugins/aorai/aorai_option.mli: AORAI_LGPL
 src/plugins/aorai/aorai_register.ml: AORAI_LGPL
@@ -1607,6 +1611,8 @@ src/plugins/wp/TacBitwised.ml: CEA_WP
 src/plugins/wp/TacBitwised.mli: CEA_WP
 src/plugins/wp/TacBitrange.ml: CEA_WP
 src/plugins/wp/TacBitrange.mli: CEA_WP
+src/plugins/wp/TacBittest.ml: CEA_WP
+src/plugins/wp/TacBittest.mli: CEA_WP
 src/plugins/wp/TacChoice.ml: CEA_WP
 src/plugins/wp/TacChoice.mli: CEA_WP
 src/plugins/wp/TacCongruence.ml: CEA_WP
@@ -1740,12 +1746,12 @@ src/plugins/wp/share/coqwp/Zbits.v: CEA_WP
 src/plugins/wp/share/coqwp/bool/Bool.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Abs.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/ComputerDivision.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/EuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/EuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Exponentiation.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Int.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/MinMax.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Power.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Map.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Const.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/real/Abs.v: UNMODIFIED_WHY3

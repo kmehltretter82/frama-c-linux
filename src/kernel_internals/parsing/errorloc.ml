@@ -191,12 +191,12 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
     with _ -> close_in_noerr in_ch
   with _ -> ()
 
-let pretty_pos fmt pos =
+let pp_pos fmt pos =
   if pos = Cil_datatype.Position.unknown then Format.fprintf fmt "<unknown>"
   else Format.fprintf fmt "%d:%d" pos.Filepath.pos_lnum
       (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
 
-let pretty_pos_between fmt (pos_start, pos_end) =
+let pp_location fmt (pos_start, pos_end) =
   if pos_start.Filepath.pos_path = pos_end.Filepath.pos_path then
     if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then
       (* single file, single line *)
@@ -210,7 +210,7 @@ let pretty_pos_between fmt (pos_start, pos_end) =
         pos_start.Filepath.pos_lnum pos_end.Filepath.pos_lnum
   else (* multiple files (very rare) *)
     Format.fprintf fmt "Location: between %a and %a"
-      pretty_pos pos_start pretty_pos pos_end
+      pp_pos pos_start pp_pos pos_end
 
 let parse_error ?(source=Cil_datatype.Position.of_lexing_pos (Lexing.lexeme_start_p !current.lexbuf)) msg =
   let start_pos = try Some (Parsing.symbol_start_pos ()) with | _ -> None in
@@ -239,7 +239,7 @@ let parse_error ?(source=Cil_datatype.Position.of_lexing_pos (Lexing.lexeme_star
         Kernel.feedback ~source:start_pos "%s:@." str
           ~append:(fun fmt ->
             Format.fprintf fmt "%a%a\n"
-              pretty_pos_between (start_pos, source)
+              pp_location (start_pos, source)
               pretty_token (Lexing.lexeme !current.lexbuf);
             Format.fprintf fmt "%a@."
               (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) source);

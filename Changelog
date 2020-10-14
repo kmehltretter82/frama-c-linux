@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Aorai     [2020-10-13] Ya automata can set auxiliary variables during a
+              transition, and use such variables in subsequent guards.
 -   Kernel    [2020-10-09] Add option -print-config-json, to output Frama-C
               configuration data in JSON format.
 -   Metrics   [2020-10-01] Distinguish between undefined but specified functions

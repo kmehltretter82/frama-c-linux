@@ -27,18 +27,13 @@
 {
     open Yaparser
     open Lexing
-    exception Eof
+    exception Lexing_error of string
 
     let new_line lexbuf =
       let lcp = lexbuf.lex_curr_p in
       lexbuf.lex_curr_p <- { lcp with pos_lnum = lcp.pos_lnum + 1;
                                       pos_bol  = lcp.pos_cnum; }
     ;;
-
-  exception Error of (Lexing.position * Lexing.position) * string
-  let loc lexbuf = (lexeme_start_p lexbuf, lexeme_end_p lexbuf)
-  let raise_located loc e = raise (Error (loc, e))
-
 }
 
 let num    = ['0'-'9']
@@ -59,6 +54,7 @@ rule token = parse
   | "false"           { FALSE }
   | "\\result" as lxm { IDENTIFIER(lxm) }
   | ident as lxm      { IDENTIFIER(lxm) }
+  | '$' (ident as lxm){ METAVAR(lxm) }
   | ','               { COMMA }
   | '+'               { PLUS }
   | '-'               { MINUS }
@@ -92,30 +88,7 @@ rule token = parse
   | '^'               { CARET }
   | '?'               { QUESTION }
   | eof               { EOF }
-  | _                 { raise_located (loc lexbuf) "Unknown token" }
-
-{
-  let parse c =
-    let lb = from_channel c in
-    try
-      Yaparser.main token lb
-    with
-        Parsing.Parse_error
-      | Invalid_argument _ ->
-          (* [VP]: Does not contain more information than
-             what is in the exn. *)
-          (*let (a,b)=(loc lb) in
-            Format.print_string "Syntax error (" ;
-            Format.print_string "l" ;
-            Format.print_int a.pos_lnum ;
-            Format.print_string "c" ;
-            Format.print_int (a.pos_cnum-a.pos_bol) ;
-            Format.print_string " -> l" ;
-            Format.print_int b.pos_lnum ;
-            Format.print_string "c" ;
-            Format.print_int (b.pos_cnum-b.pos_bol) ;
-            Format.print_string ")\n" ;
-           *)
-            raise_located (loc lb) "Syntax error"
-
-}
+  | ":="              { AFF }
+  | _                 {
+    raise (Lexing_error ("unexpected character '" ^ Lexing.lexeme lexbuf ^ "'"))
+  }
