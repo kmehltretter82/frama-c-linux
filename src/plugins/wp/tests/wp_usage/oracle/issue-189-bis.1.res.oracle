@@ -167,9 +167,10 @@ Effect at line 59
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'memcpy_context_vars':
+[wp] tests/wp_usage/issue-189-bis.i:48: Warning: 
+  Memory model hypotheses for function 'memcpy_context_vars':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(src, dst);
        requires \valid(dst);
        requires \valid(src);

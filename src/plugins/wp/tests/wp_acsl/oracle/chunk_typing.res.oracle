@@ -1876,9 +1876,10 @@ Goal Positivity of Loop variant at loop (file tests/wp_acsl/chunk_typing.i, line
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'function':
+[wp] tests/wp_acsl/chunk_typing.i:21: Warning: 
+  Memory model hypotheses for function 'function':
   /*@
-     behavior typed:
+     behavior wp_typed:
        requires \separated(i16 + (..), (char const *)x + (..));
        requires \separated(i32 + (..), (char const *)x + (..));
        requires \separated(i64 + (..), (char const *)x + (..));

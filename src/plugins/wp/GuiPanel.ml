@@ -63,10 +63,44 @@ let wp_rte_generated s =
         not mem
       else false
 
+let with_model action kf =
+  let setup = Factory.parse (Wp_parameters.Model.get ()) in
+  let driver = Driver.load_driver () in
+  let model = Factory.instance setup driver in
+  let hypotheses_computer = WpContext.compute_hypotheses model in
+  let name = WpContext.MODEL.id model in
+  action kf name hypotheses_computer
+
+let warn_memory_context kfs =
+  if Wp_parameters.MemoryContext.get () then begin
+    Kernel_function.Set.iter
+      (fun kf -> with_model MemoryContext.warn kf) kfs
+  end
+
+let populate_memory_context kfs =
+  if Wp_parameters.CheckMemoryContext.get () then begin
+    Kernel_function.Set.iter
+      (fun kf -> with_model MemoryContext.add_behavior kf) kfs
+  end
+
 let spawn provers vcs =
   if not (Bag.is_empty vcs) then
     let provers = Why3.Whyconf.Sprover.elements provers#get in
     VC.command ~provers ~tip:true vcs
+
+let treat_hypotheses selection =
+  let kf = match selection with
+    | S_none -> None
+    | S_fun kf -> Some kf
+    | S_prop ip -> Property.get_kf ip
+    | S_call s -> Some (Kernel_function.find_englobing_kf s.s_stmt)
+  in
+  let kfs = match kf with
+    | Some kf -> WpTarget.with_callees kf
+    | None -> Kernel_function.Set.empty
+  in
+  warn_memory_context kfs ;
+  populate_memory_context kfs
 
 let run_and_prove
     (main:Design.main_window_extension_points)
@@ -76,6 +110,7 @@ let run_and_prove
   begin
     try
       begin
+        treat_hypotheses selection ;
         match selection with
         | S_none -> raise Stop
         | S_fun kf -> spawn provers (VC.generate_kf kf)

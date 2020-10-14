@@ -24,12 +24,18 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2020-10-14] New warning "pedantic-assigns". WP needs precise
+                           'assigns ... \from ...' specification about out
+                           pointers (\result and assigned pointers) to generate
+                           precise proof hypotheses.
+- WP          [2020-10-14] Hypotheses: out pointers (\result + written pointers)
 - WP          [2020-10-07] New tactic Bit-Test range
 - WP          [2020-09-21] Added support for Why3 interactive prover (Coq)
+- WP          [2020-09-21] Added support for Why3 Coq interactive prover
 - WP          [2020-09-21] New option -wp-interactive <mode>
 - WP          [2020-09-21] New option -wp-interactive-timeout <seconds>
-- WP          [2020-09-17] New experimental option: -wp-check-model-hypotheses
-                           Generates requires in contracts for model hypotheses
+- WP          [2020-09-17] New experimental option: -wp-check-memory-model
+                           Insert function contracts for model hypotheses
 - WP          [2020-09-17] Hypotheses: assigned memory locations
 - WP          [2020-09-11] Support for generalized @check ACSL annotations
 - WP          [2020-07-06] Removed debug keys "no-xxx-info" (subsumed by "shell")

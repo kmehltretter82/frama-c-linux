@@ -1708,14 +1708,24 @@ class main_window () : main_window_extension_points =
         in
         Warning_manager.make ~packing ~callback
       in
+      let outdated_warnings = ref false in
       let display_warnings () =
-        Messages.reset_once_flag ();
+        outdated_warnings := false ;
         Warning_manager.clear warning_manager;
         Messages.iter (fun event -> Warning_manager.append warning_manager event);
         let text = Format.sprintf "Messages (%d)" (Messages.nb_messages ()) in
         let label = GtkMisc.Label.cast warnings_tab_label#as_widget in
         GtkMisc.Label.set_text label text
       in
+      register_reset_extension (fun _ -> display_warnings ());
+      Messages.add_global_hook (fun () ->
+          if not !outdated_warnings then
+            begin
+              outdated_warnings := true ;
+              Wutil.later display_warnings
+            end
+        );
+      Messages.reset_once_flag ();
       display_warnings ();
 
       (* Management of navigation history *)
@@ -1728,7 +1738,6 @@ class main_window () : main_window_extension_points =
             self#scroll l
         );
 
-      register_reset_extension (fun _ -> display_warnings ());
       self#default_screen ();
       menu_manager#refresh ();
       Project.register_after_set_current_hook

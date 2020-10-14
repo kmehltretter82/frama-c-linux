@@ -150,13 +150,11 @@ module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
-module CheckModelHypotheses: Parameter_sig.Bool
+module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
-
-val wkey_imprecise_hypotheses_assigns: warn_category
 
 (** {2 Getters} *)
 

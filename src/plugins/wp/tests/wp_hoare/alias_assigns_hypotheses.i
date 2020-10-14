@@ -1,6 +1,6 @@
 /* run.config
    OPT:
-   OPT:-wp-no-warn-memory-model -wp-check-model-hypotheses -then -print
+   OPT:-wp-no-warn-memory-model -wp-check-memory-model -then -print
 */
 
 /* run.config_qualif

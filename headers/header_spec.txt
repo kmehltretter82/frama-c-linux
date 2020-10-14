@@ -1462,6 +1462,8 @@ src/plugins/variadic/va_build.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/wp/.gitignore: .ignore
 src/plugins/wp/.ocp-indent: .ignore
+src/plugins/wp/AssignsCompleteness.ml: CEA_WP
+src/plugins/wp/AssignsCompleteness.mli: CEA_WP
 src/plugins/wp/Auto.ml: CEA_WP
 src/plugins/wp/Auto.mli: CEA_WP
 src/plugins/wp/Cache.ml: CEA_WP
@@ -1820,6 +1822,8 @@ src/plugins/wp/wpRTE.ml: CEA_WP
 src/plugins/wp/wpRTE.mli: CEA_WP
 src/plugins/wp/wpStrategy.ml: CEA_WP
 src/plugins/wp/wpStrategy.mli: CEA_WP
+src/plugins/wp/wpTarget.ml: CEA_WP
+src/plugins/wp/wpTarget.mli: CEA_WP
 src/plugins/wp/wp_error.ml: CEA_WP
 src/plugins/wp/wp_error.mli: CEA_WP
 src/plugins/wp/wp_parameters.ml: CEA_WP

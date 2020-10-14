@@ -89,42 +89,24 @@ let wp_iter_model ?ip ?index job =
     Fmap.iter (fun kf ms -> Models.iter (fun m -> job kf m) ms) !pool
   end
 
-let wp_print_memory_context kf bhv fmt =
-  begin
-    let printer = new Printer.extensible_printer () in
-    let pp_vdecl = printer#without_annot printer#vdecl in
-    Format.fprintf fmt "@[<hv 0>@[<hv 3>/*@@@ %a" Cil_printer.pp_behavior bhv ;
-    let vkf = Kernel_function.get_vi kf in
-    Format.fprintf fmt "@ @]*/@]@\n@[<hov 2>%a;@]@\n"
-      pp_vdecl vkf ;
-  end
-
 let wp_compute_memory_context model =
   let hypotheses_computer = WpContext.compute_hypotheses model in
   let name = WpContext.MODEL.id model in
   MemoryContext.compute name hypotheses_computer
 
-let wp_warn_memory_context () =
+let wp_warn_memory_context model =
   begin
-    wp_iter_model
-      begin fun kf m ->
-        let hypotheses_computer = WpContext.compute_hypotheses m in
-        let model = WpContext.MODEL.id m in
-        let hyp = MemoryContext.get_behavior kf model hypotheses_computer in
-        match hyp with
-        | None -> ()
-        | Some bhv ->
-            Wp_parameters.warning
-              ~current:false
-              "@[<hv 0>Memory model hypotheses for function '%s':@ %t@]"
-              (Kernel_function.get_name kf)
-              (wp_print_memory_context kf bhv)
+    WpTarget.iter
+      begin fun kf ->
+        let hypotheses_computer = WpContext.compute_hypotheses model in
+        let model = WpContext.MODEL.id model in
+        MemoryContext.warn kf model hypotheses_computer
       end
   end
 
 let wp_insert_memory_context model =
   begin
-    Wp_parameters.iter_fct
+    WpTarget.iter
       begin fun kf ->
         let hyp_computer = WpContext.compute_hypotheses model in
         let model_id = WpContext.MODEL.id model in
@@ -157,7 +139,7 @@ let do_wp_print_for goals =
     else Log.print_on_output
         (fun fmt -> Bag.iter (Wpo.pp_goal_flow fmt) goals)
 
-let do_wp_report () =
+let do_wp_report model =
   begin
     let reports = Wp_parameters.Report.get () in
     let jreport = Wp_parameters.ReportJson.get () in
@@ -177,7 +159,7 @@ let do_wp_report () =
         List.iter (WpReport.export stats) reports ;
       end ;
     if Wp_parameters.MemoryContext.get () then
-      wp_warn_memory_context ()
+      wp_warn_memory_context model
   end
 
 (* ------------------------------------------------------------------------ *)
@@ -766,8 +748,11 @@ let cmdline_run () =
     if fct <> Wp_parameters.Fct_none then
       begin
         Wp_parameters.feedback ~ontty:`Feedback "Running WP plugin...";
+        let computer = computer () in
         Ast.compute ();
         Dyncall.compute ();
+        if Wp_parameters.RTE.get () then
+          WpRTE.generate_all computer#model ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -781,15 +766,15 @@ let cmdline_run () =
         let bhv = Wp_parameters.Behaviors.get () in
         let prop = Wp_parameters.Properties.get () in
         (** TODO entry point *)
-        let computer = computer () in
         if Wp_parameters.has_dkey dkey_builtins then
           begin
             WpContext.on_context (computer#model,WpContext.Global)
               LogicBuiltins.dump ();
           end ;
+        WpTarget.compute computer#model ;
         wp_compute_memory_context computer#model ;
-        if Wp_parameters.CheckModelHypotheses.get () then
-          wp_insert_memory_context computer#model fct ;
+        if Wp_parameters.CheckMemoryContext.get () then
+          wp_insert_memory_context computer#model ;
         let goals = Generator.compute_selection computer ~fct ~bhv ~prop () in
         do_wp_proofs goals ;
         begin
@@ -798,7 +783,7 @@ let cmdline_run () =
           else
             do_wp_print () ;
         end ;
-        do_wp_report () ;
+        do_wp_report computer#model ;
       end
   end
 

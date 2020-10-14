@@ -521,6 +521,22 @@ let user_prop_names p =
   | IPGlobalInvariant _
   | IPOther _ -> []
 
+let user_bhv_names p =
+  let open Property in
+  let fors = match p with
+    | Property.IPCodeAnnot { ica_ca } ->
+        let fors = match ica_ca.annot_content with
+          | Cil_types.AAssert (fors, _)
+          | Cil_types.AStmtSpec (fors, _)
+          | Cil_types.AInvariant (fors, _, _)
+          | Cil_types.AAssigns (fors, _)
+          | Cil_types.AAllocation (fors, _)
+          | Cil_types.AExtended (fors, _, _) -> fors
+          | _ -> []
+        in fors
+    | _ -> []
+  in Extlib.may_map ~dft:fors (fun b -> b.b_name :: fors) (get_behavior p)
+
 let string_of_termination_kind = function
     Normal -> "post"
   | Exits -> "exits"
@@ -772,8 +788,7 @@ let select_default pid =
   let names = user_prop_pid pid in
   not (List.mem "no_wp" names)
 
-let select_by_name asked_names pid =
-  let names = user_prop_pid pid in
+let are_selected_names asked names =
   if List.mem "no_wp" names then false
   else
     let is_minus s = try s.[0] = '-' with _ -> false in
@@ -791,9 +806,15 @@ let select_by_name asked_names pid =
                then a && (not (eval ()))
                else a || (eval ()))
     in
-    match List.fold_left eval None asked_names with
+    match List.fold_left eval None asked with
     | Some false -> false
     | _ -> true
+
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  are_selected_names asked_names names
+
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with

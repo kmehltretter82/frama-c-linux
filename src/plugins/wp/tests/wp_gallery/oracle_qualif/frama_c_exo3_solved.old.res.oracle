@@ -44,9 +44,10 @@
  Functions                 WP     Alt-Ergo  Total   Success
   equal_elements           18       16       34       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'equal_elements':
+[wp] tests/wp_gallery/frama_c_exo3_solved.old.c:73: Warning: 
+  Memory model hypotheses for function 'equal_elements':
   /*@
-     behavior typed_ref:
+     behavior wp_typed_ref:
        requires \separated(v1, v2, a + (..));
        requires \valid(v1);
        requires \valid(v2);
@@ -78,11 +79,3 @@
  Functions                 WP     Alt-Ergo  Total   Success
   equal_elements           29       21       50       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'equal_elements':
-  /*@
-     behavior typed_ref:
-       requires \separated(v1, v2, a + (..));
-       requires \valid(v1);
-       requires \valid(v2);
-     */
-  void equal_elements(int *a, int *v1, int *v2);
