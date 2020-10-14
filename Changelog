@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+-   Variadic  [2020-10-14] Don't print generated function name but print
+              original name and a comment with the generated name so that the
+              printed code is compilable.
 -   Aorai     [2020-10-13] Ya automata can set auxiliary variables during a
               transition, and use such variables in subsequent guards.
 -   Kernel    [2020-10-09] Add option -print-config-json, to output Frama-C
