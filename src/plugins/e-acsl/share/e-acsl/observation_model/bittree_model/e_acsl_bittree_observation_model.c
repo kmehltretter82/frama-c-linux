@@ -31,7 +31,7 @@
 #include "../../internals/e_acsl_private_assert.h"
 #include "../../instrumentation_model/e_acsl_temporal.h"
 #include "../../numerical_model/e_acsl_floating_point.h"
-#include "../internals/e_acsl_safe_locations.h""
+#include "../internals/e_acsl_safe_locations.h"
 #include "e_acsl_bittree.h"
 
 #include "../e_acsl_observation_model.h"
@@ -231,12 +231,12 @@ int eacsl_valid(void* ptr, size_t size, void *ptr_base, void *addrof_base) {
   bt_block * blk = lookup_allocated(ptr, size, ptr_base);
   return
     size == 0
-    ||
+    || (
     blk != NULL && !blk->is_readonly
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
-  ;
+    );
 }
 
 /* return whether the size bytes of ptr are readable */
@@ -244,12 +244,12 @@ int eacsl_valid_read(void* ptr, size_t size, void *ptr_base, void *addrof_base) 
   bt_block * blk = lookup_allocated(ptr, size, ptr_base);
   return
     size == 0
-    ||
+    || (
     blk != NULL
 #ifdef E_ACSL_TEMPORAL
     && temporal_valid(ptr_base, addrof_base)
 #endif
-  ;
+    );
 }
 
 /* return the base address of the block containing ptr */
@@ -260,7 +260,7 @@ void* eacsl_base_addr(void* ptr) {
 }
 
 /* return the offset of `ptr` within its block */
-size_t offset(void* ptr) {
+size_t eacsl_offset(void* ptr) {
   bt_block * tmp = bt_find(ptr);
   private_assert(tmp != NULL, "\\offset of unallocated memory", NULL);
   return ((uintptr_t)ptr - tmp->ptr);
@@ -585,7 +585,7 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   /* Tracking safe locations */
   collect_safe_locations();
   int i;
-  for (i = 0; i < get_safe_location_count(); i++) {
+  for (i = 0; i < get_safe_locations_count(); i++) {
     memory_location * loc = get_safe_location(i);
     void *addr = (void*)loc->address;
     uintptr_t len = loc->length;

@@ -26,6 +26,7 @@
 ***************************************************************************/
 
 #include "../../internals/e_acsl_malloc.h"
+#include "../../internals/e_acsl_private_assert.h"
 
 #include "e_acsl_bittree.h"
 
@@ -160,7 +161,7 @@ static bt_node * bt_get_leaf_from_block (bt_block * ptr) {
 	    == (ptr->ptr & curr->left->mask))
       curr = curr->left;
     else
-      vassert(0, "Unreachable", NULL);
+      private_assert(0, "Unreachable", NULL);
   }
   DASSERT(curr->is_leaf);
   DASSERT(curr->leaf == ptr);
