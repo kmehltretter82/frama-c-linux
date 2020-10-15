@@ -714,10 +714,7 @@ module V_Or_Uninitialized = struct
   let mask_init = 2
   let mask_noesc = 1
 
-  (* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-  [@@@ warning "-3"]
-  external get_flags : t -> int = "caml_obj_tag" "noalloc"
-  [@@@ warning "+3"]
+  external get_flags : t -> int = "caml_obj_tag" [@@noalloc]
 
   let is_initialized v = (get_flags v land mask_init) <> 0
   let is_noesc v = (get_flags v land mask_noesc) <> 0
