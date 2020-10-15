@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: @EVA_CONFIG@
    STDOPT: +"-copy" +"-eva"
  */
 
@@ -6,7 +7,6 @@
 /*@ predicate q(int x) = x == 42; */
 /*@ logic int f (int y); */
 /*@ logic integer g (int x) = x + 42; */
-
 
 /*@ frees x; */
 void f(int *x);

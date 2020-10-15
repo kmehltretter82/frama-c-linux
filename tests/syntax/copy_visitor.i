@@ -1,4 +1,5 @@
 /* run.config
+   PLUGIN: @EVA_CONFIG@
    STDOPT: +"-copy -eva @EVA_OPTIONS@"
  */
 struct S {
@@ -6,7 +7,6 @@ struct S {
   int b;
 };
 struct S s = {.a = 1, .b=2};
-
 /*@
   requires \valid(s);
   assigns s->a;

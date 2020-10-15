@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] unroll_visit.i:8: assertion got status valid.
-[eva] unroll_visit.i:6: starting to merge loop iterations
+[eva] unroll_visit.i:10: assertion got status valid.
+[eva] unroll_visit.i:8: starting to merge loop iterations
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

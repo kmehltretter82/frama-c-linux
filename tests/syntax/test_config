@@ -1,4 +1,5 @@
 COMMENT: this directory is meant to test exclusively the front-end
 COMMENT: (parser, type-checker, linker, syntactic transformations)
+PLUGIN: variadic
 OPT: -print -journal-disable -check
 FILEREG:.*\.\(c\|i\|ci\)$

@@ -1,10 +1,10 @@
 /* run.config
+PLUGIN: @EVA_CONFIG@
 MODULE: @PTEST_NAME@.cmxs
 STDOPT: +"-no-print" +"@EVA_OPTIONS@"
 */
 
 struct S { int i; };
-
 /*@ lemma foo: \forall struct S x; x.i >= 0 || x.i < 0; */
 
 struct matrix {

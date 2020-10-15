@@ -1,8 +1,8 @@
 /* run.config*
 TIMEOUT: 600
+PLUGIN: @EVA_CONFIG@
 OPT: -eva
 */
-
 #include <wchar.h>
 #include <stdio.h>
 
