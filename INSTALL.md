@@ -180,7 +180,7 @@ sudo apt install make m4 gcc opam
 Then opam can be set up using these commands:
 
 ```
-opam init --disable-sandboxing -c 4.05.0 --shell-setup
+opam init --disable-sandboxing --shell-setup
 eval $(opam env)
 opam install -y depext
 ```
