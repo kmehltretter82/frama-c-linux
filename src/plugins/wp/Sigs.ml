@@ -612,8 +612,10 @@ sig
 
         Remark: [None] initializer are interpreted as zeroes. This is consistent
         with the [init option] associated with global variables in CIL,
-        for which the default initializer are zeroes. There is no
-        [init option] value associated with local initializers.
+        for which the default initializer are zeroes. This function is called
+        for global initializers and local initializers ([Cil.Local_init]).
+        It is not called for local variables without initializers as they do not
+        have a [Cil.init option].
     *)
 
 end
