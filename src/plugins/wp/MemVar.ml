@@ -1085,11 +1085,11 @@ struct
           | Ref _ -> p_true
           | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
           | Val(m,x,p) ->
-              if (x.vformal || x.vglob) then
+              if is_heap_allocated m then
+                M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+              else if (x.vformal || x.vglob) then
                 try valid_offset RW (vobject m x) p
                 with ShiftMismatch -> shift_mismatch l
-              else if is_heap_allocated m then
-                M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
               else
                 initialized_loc sigma obj x p
         end
@@ -1099,17 +1099,26 @@ struct
           | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
           | Val(m,x,p) ->
               try
-                let in_array = valid_range RW (vobject m x) p (elt, a, b) in
-                let initialized =
-                  if x.vformal || x.vglob then p_true
-                  else initialized_range sigma (vobject m x) x p a b
-                in
-                F.p_imply (F.p_leq a b) (p_and in_array initialized)
-              with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
                   M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
-                else shift_mismatch l
+                else
+                  let rec normalize obj = function
+                    | [] -> [], a, b
+                    | [Shift(elt, i)] when Ctypes.equal obj elt ->
+                        [], F.e_add a i, F.e_add b i
+                    | f :: ofs ->
+                        let l, a, b = normalize obj ofs in f :: l, a, b
+                  in
+                  let p, a, b = normalize elt p in
+                  let in_array = valid_range RW (vobject m x) p (elt, a, b) in
+                  let initialized =
+                    if x.vformal || x.vglob then p_true
+                    else initialized_range sigma (vobject m x) x p a b
+                  in
+                  F.p_imply (F.p_leq a b) (p_and in_array initialized)
+              with ShiftMismatch ->
+                shift_mismatch l
         end
     | Rrange(l, _,a,b) ->
         Warning.error
@@ -1190,7 +1199,10 @@ struct
     match scope with
     | Leave -> []
     | Enter ->
-        let xs = List.filter (fun v -> not v.vformal && not v.vglob) xs in
+        let xs = List.filter
+            (fun v -> is_mvar_alloc v && not v.vformal &&
+                      not v.vglob && not v.vdefined) xs
+        in
         let uninitialized v =
           let value = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
           Lang.F.p_equal (access_init (get_init_term seq.post v) []) value
