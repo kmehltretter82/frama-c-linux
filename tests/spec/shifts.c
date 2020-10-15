@@ -1,7 +1,7 @@
 /* run.config
+   PLUGIN: @EVA_PLUGINS@
    OPT: -eva @EVA_CONFIG@ -deps -journal-disable
 */
-
 int e;
 
 /*@

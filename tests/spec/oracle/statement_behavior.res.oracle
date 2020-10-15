@@ -5,13 +5,13 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function pfsqopfc <- main.
-  Called from statement_behavior.c:23.
-[eva] statement_behavior.c:10: Warning: 
+  Called from statement_behavior.c:25.
+[eva] statement_behavior.c:12: Warning: 
   no \from part for clause 'assigns five_times;'
-[eva:alarm] statement_behavior.c:17: Warning: assertion got status unknown.
-[eva:alarm] statement_behavior.c:4: Warning: 
+[eva:alarm] statement_behavior.c:19: Warning: assertion got status unknown.
+[eva:alarm] statement_behavior.c:6: Warning: 
   function pfsqopfc: postcondition got status unknown.
-[eva:alarm] statement_behavior.c:18: Warning: 
+[eva:alarm] statement_behavior.c:20: Warning: 
   accessing uninitialized left-value. assert \initialized(&five_times);
 [eva] Recording results for pfsqopfc
 [eva] Done for function pfsqopfc

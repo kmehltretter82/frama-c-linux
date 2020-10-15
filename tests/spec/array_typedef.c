@@ -1,9 +1,9 @@
 /*run.config
- OPT: -print -eva @EVA_CONFIG@ -journal-disable
+ PLUGIN: @EVA_PLUGINS@
+ OPT: -print -eva @EVA_OPTIONS@ -journal-disable
  */
 #define IP_FIELD 4
 typedef int ip_address[IP_FIELD];
-
 typedef struct {
   ip_address src;
   int dst[IP_FIELD];

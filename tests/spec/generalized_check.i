@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: wp @PLUGIN@
+PLUGIN: wp @EVA_PLUGINS@
 OPT: -wp -wp-prover qed -wp-msg-key shell
 OPT: -eva -eva-use-spec f
 OPT: -print

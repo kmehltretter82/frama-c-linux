@@ -1,11 +1,13 @@
 /* run.config
-   OPT: -eva @EVA_CONFIG@ -inout -journal-disable
+   PLUGIN: @EVA_PLUGINS@
+   OPT: -eva @EVA_OPTIONS@ -inout -journal-disable
 */
+
 /*@ ensures \result == (int)(5 * x);
 */
 int pfsqopfc(int x) {
-int five_times;
 
+int five_times;
 /*@
   assigns five_times;
   ensures five_times == (int)(5 * x);

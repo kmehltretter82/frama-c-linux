@@ -1,3 +1,6 @@
+/* run.config
+   PLUGIN: eva
+*/
 typedef int assert;
 
 assert behavior = 0;
