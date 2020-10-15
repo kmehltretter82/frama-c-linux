@@ -248,13 +248,6 @@ struct
         path = path ;
       }
 
-  let assume_vcs ?descr ?filter ?init whs vc =
-    List.fold_left
-      (fun vc (warn, (hvalue, hinit)) ->
-         let vc = assume_vc ?descr ?filter ?init ~warn [hvalue] vc in
-         assume_vc ?descr ?filter ?init ~warn [hinit] vc)
-      vc whs
-
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
   (* -------------------------------------------------------------------------- *)
@@ -908,13 +901,14 @@ struct
              [C.unchanged shere sinit v]
          in { wp with vcs = gmap const_vc wp.vcs })
 
-  let init wenv var init wp = in_wenv wenv wp
+  let init wenv var opt_init wp = in_wenv wenv wp
       (fun env wp ->
+         let assume = assume_vc ~descr:"Initializer" ~filter:true ~init:true in
          let sigma = L.current env in
-         let init_vc = assume_vcs
-             ~init:true ~filter:true
-             ~descr:"Initializer"
-             (C.init ~sigma var init)
+         let init_vc vc =
+           List.fold_left
+             (fun vc (warn,(hv,hi)) -> assume ~warn [hi] (assume ~warn [hv] vc))
+             vc (C.init ~sigma var opt_init)
          in { wp with vcs = gmap init_vc wp.vcs })
 
   (* -------------------------------------------------------------------------- *)
