@@ -587,7 +587,7 @@ sig
      Express that all objects in a range of locations have a given value.
 
      More precisely, [is_exp_range sigma loc ty a b v] express that
-     value at [( ty* )loc + k] equals [v], forall [a <= k < b].
+     value at [( ty* )loc + k] equals [v], forall [a <= k <= b].
      Value [v=None] stands for zero.
   *)
   val is_exp_range :

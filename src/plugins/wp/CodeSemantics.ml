@@ -113,7 +113,7 @@ struct
   let is_exp_range sigma l obj a b v =
     let x = Lang.freshvar ~basename:"k" Logic.Int in
     let k = e_var x in
-    let range = [ p_leq a k ; p_lt k b ] in
+    let range = [ p_leq a k ; p_leq k b ] in
     let init =
       match v with
       | None -> is_zero sigma obj (M.shift l obj k)
@@ -455,18 +455,16 @@ struct
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)
     | Warning.Result(warn , hyp) -> warn , hyp
 
-  let init_range ~sigma lv typ low excl_up value =
+  let init_range ~sigma lv typ low up value =
     let obj = Ctypes.object_of typ in
     let outcome = Warning.catch
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
            let e = Extlib.opt_map (exp sigma) value in
-           let low = e_bigint low in
-           let excl_up = e_bigint excl_up in
-           let incl_up = e_sub excl_up e_one in
-           (is_exp_range sigma l obj low excl_up e),
-           (M.initialized sigma (Rrange(l, obj, Some low, Some incl_up)))
+           let low = e_bigint low and up = e_bigint up in
+           (is_exp_range sigma l obj low up e),
+           (M.initialized sigma (Rrange(l, obj, Some low, Some up)))
         ) () in
     match outcome with
     | Warning.Failed warn -> warn , (F.p_true, F.p_true)
@@ -523,8 +521,7 @@ struct
               | (_,None) -> acc (* nothing was delayed *)
               | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
                   (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
-                  let i2 = Integer.succ i0 in
-                  init_range ~sigma lv ty il i2 (Some exp) :: acc
+                  init_range ~sigma lv ty il i0 (Some exp) :: acc
               | (_il,Some (_i0,off,exp)) ->
                   (* case [_il=_i0], so uses [off] corresponding to [_i0]
                      Added pred: t[i]==exp*)
@@ -537,7 +534,7 @@ struct
                   if Integer.ge i0 i1 then (* no hole *) acc
                   else (* defaults values
                           Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
-                    init_range ~sigma lv ty i0 i1 None :: acc
+                    init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc
             in
             let acc, delayed =
               List.fold_left
