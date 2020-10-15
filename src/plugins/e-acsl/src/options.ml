@@ -28,8 +28,7 @@ module P = Plugin.Register
       let help = "Executable ANSI/ISO C Specification Language --- runtime \
                   assertion checker generator"
     end)
-module PP = P (* [PP] required to avoid an ocamldoc error in OCaml 4.02 *)
-include PP
+include P
 
 module Run =
   False
