@@ -39,7 +39,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((3 <= i) -> ((i <= 19) -> (A_1[i] = 0))).
   (* Pre-condition *)
-  Have: EqArray1_int(20, A, A_1).
+  Have: EqArray_int(20, A, A_1).
 }
 Prove: x = 12.
 

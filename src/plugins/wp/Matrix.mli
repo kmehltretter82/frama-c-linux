@@ -24,22 +24,19 @@
 (* --- Array Dimensions                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Ctypes
+type t (** Matrix dimensions.
+           Encodes the number of dimensions and their kind *)
+
+val of_dims : int option list -> t
+val compare : t -> t -> int
+val pretty : Format.formatter -> t -> unit
+val pp_suffix_id : Format.formatter -> t -> unit
+
+val merge : int option list -> int option list -> int option list option
+
 open Lang.F
 
-type dim = int option
-type matrix = c_object * dim list
-
-module MACHINE : WpContext.Key with type t = matrix
-module NATURAL : WpContext.Key with type t = matrix
-
-val of_array : arrayinfo -> matrix
-val id : dim list -> string (** unique w.r.t [equal] *)
-val natural_id : c_object -> string (** name for elements in NATURAL *)
-
-val merge : dim list -> dim list -> dim list option
-
-type denv = {
+type env = {
   size_var : var list ; (** size variables *)
   size_val : term list ; (** size values *)
   index_var : var list ; (** index variables *)
@@ -49,7 +46,8 @@ type denv = {
   monotonic : bool ; (** all dimensions are defined *)
 }
 
-val denv : dim list -> denv
-val size : matrix -> term list
-val tau : c_object -> dim list -> tau
-val init : c_object -> dim list -> tau
+val cc_tau : tau -> t -> tau (** Type of matrix *)
+val cc_env : t -> env (** Dimension environment *)
+val cc_dims : int option list -> term list (** Value of size variables *)
+
+(* -------------------------------------------------------------------------- *)

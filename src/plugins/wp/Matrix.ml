@@ -24,83 +24,49 @@
 (* --- Array Dimensions                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Ctypes
+(* private *)
+type t = [ `Fix | `Ext ] list
+
+let of_dims = List.map (function None -> `Ext | Some _ -> `Fix)
+
+let compare (ps : t) (qs : t) = Stdlib.compare ps qs
+
+let rec pp_hdims fmt = function
+  | [] -> ()
+  | `Fix :: ps -> pp_ndims `Fix 1 fmt ps
+  | `Ext :: ps -> pp_ndims `Ext 1 fmt ps
+
+and pp_ndims p k fmt = function
+  | q :: qs when p = q -> pp_ndims p (succ k) fmt qs
+  | ps -> pp_kdim p k fmt ; pp_hdims fmt ps
+
+and pp_kdim p k fmt =
+  begin
+    if p = `Fix then Format.pp_print_char fmt 'd' ;
+    if p = `Ext then Format.pp_print_char fmt 'w' ;
+    if k > 1 then Format.pp_print_int fmt k ;
+  end
+
+let pp_suffix_id fmt = function
+  | [] | [`Fix] -> ()
+  | ps -> Format.pp_print_char fmt '_' ; pp_hdims fmt ps
+
+let pretty fmt ps = pp_hdims fmt ps
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compilation Environment                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
 open Lang.F
 
-type dim = int option
-type matrix = c_object * dim list
-
-let of_array = Ctypes.array_dimensions
-
-module KEY(E : sig val compare : c_object -> c_object -> int end) =
-struct
-  type t = matrix
-
-  let compare_dim d1 d2 = match d1 , d2 with
-    | None,None -> 0
-    | Some _,None -> (-1)
-    | None,Some _ -> 1
-    | Some _,Some _ -> 0
-
-  let compare (e1,ds1) (e2,ds2) =
-    let cmp = E.compare e1 e2 in
-    if cmp = 0 then Qed.Hcons.compare_list compare_dim ds1 ds2 else cmp
-
-  let pretty fmt (obj,ds) =
-    Ctypes.pretty fmt obj ;
-    List.iter
-      (function
-        | None -> Format.pp_print_string fmt "[]"
-        | Some d -> Format.fprintf fmt "[%d]" d
-      ) ds
-end
-
-module COBJ =
-struct
-  let compare e1 e2 = match e1 , e2 with
-    | C_int _ , C_int _ -> 0
-    | C_int _ , _ -> (-1)
-    | _ , C_int _ -> 1
-    | C_float _ , C_float _ -> 0
-    | C_float _ , _ -> (-1)
-    | _ , C_float _ -> 1
-    | C_pointer _ , C_pointer _ -> 0
-    | C_pointer _ , _ -> (-1)
-    | _ , C_pointer _ -> 1
-    | C_comp a , C_comp b -> Cil_datatype.Compinfo.compare a b
-    | C_comp _ , _ -> (-1)
-    | _ , C_comp _ -> 1
-    | C_array _ , C_array _ -> assert false
-end
-
-module MACHINE = KEY(Ctypes)
-module NATURAL = KEY(COBJ)
-
-let natural_id = function
-  | C_int _ -> "int"
-  | C_float _ -> "float"
-  | C_pointer _ -> "pointer"
-  | C_array _ -> "array"
-  | C_comp c -> Lang.comp_id c
-
-let add_rank buffer k = if k > 0 then Buffer.add_string buffer (string_of_int k)
-let add_dim buffer rank = function
-  | None -> add_rank buffer rank ; Buffer.add_string buffer "w" ; 0
-  | Some _ -> succ rank
-
-let id ds =
-  let buffer = Buffer.create 8 in
-  add_rank buffer (List.fold_left (add_dim buffer) 0 ds) ;
-  Buffer.contents buffer
-
-type denv = {
+type env = {
   size_var : var list ; (* size variables *)
   size_val : term list ; (* size values *)
   index_var : var list ; (* index variables *)
   index_val : term list ; (* index values *)
   index_range : pred list ; (* indices are in range of size variables *)
-  index_offset : term list ; (* polynomial of indices *)
-  monotonic : bool ;
+  index_offset : term list ; (* polynomial of indices multiplied by previous sizes *)
+  monotonic : bool ; (* all dimensions are fixed *)
 }
 
 let rec collect rank = function
@@ -121,14 +87,14 @@ let rec collect rank = function
       let k_val = e_var k_var in
       let k_ofs = e_prod (k_val :: denv.size_val) in
       match d with
-      | None ->
+      | `Ext ->
           { denv with
             index_var = k_var :: denv.index_var ;
             index_val = k_val :: denv.index_val ;
             index_offset = k_ofs :: denv.index_offset ;
             monotonic = false ;
           }
-      | Some _ ->
+      | `Fix ->
           let n_base = match rank with 0 -> "n" | 1 -> "m" | _ -> "d" in
           let n_var = Lang.freshvar ~basename:n_base Qed.Logic.Int in
           let n_val = e_var n_var in
@@ -144,20 +110,19 @@ let rec collect rank = function
             monotonic = denv.monotonic ;
           }
 
-let denv = collect 0
+let cc_env = collect 0
 
-let rec dval = function
+let rec cc_dims ns =
+  match ns with
   | [] -> []
-  | None :: ds -> dval ds
-  | Some n :: ds -> e_int n :: dval ds
-let size (_,ds) = dval ds
+  | Some n :: ns -> e_int n :: cc_dims ns
+  | None :: ns -> cc_dims ns
 
-let rec kind on_leaf obj = function
-  | [] -> on_leaf obj
-  | _ :: ds -> Qed.Logic.Array( Qed.Logic.Int , kind on_leaf obj ds )
+let cc_tau te ds = Lang.t_matrix te (List.length ds)
 
-let tau = kind Lang.tau_of_object
-let init = kind Lang.init_of_object
+(* -------------------------------------------------------------------------- *)
+(* --- Dimension Merging                                                  --- *)
+(* -------------------------------------------------------------------------- *)
 
 let rec do_merge ds1 ds2 =
   match ds1 , ds2 with
@@ -172,3 +137,5 @@ let rec do_merge ds1 ds2 =
 let merge ds1 ds2 =
   try Some(do_merge ds1 ds2)
   with Exit -> None
+
+(* -------------------------------------------------------------------------- *)

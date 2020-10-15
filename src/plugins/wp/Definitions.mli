@@ -22,7 +22,6 @@
 
 open LogicUsage
 open Cil_types
-open Ctypes
 open Lang
 open Lang.F
 
@@ -33,7 +32,7 @@ val cluster : id:string -> ?title:string -> ?position:Filepath.position -> unit 
 val axiomatic : axiomatic -> cluster
 val section : logic_section -> cluster
 val compinfo : compinfo -> cluster
-val matrix : c_object -> cluster
+val matrix : unit -> cluster
 
 val cluster_id : cluster -> string (** Unique *)
 val cluster_title : cluster -> string

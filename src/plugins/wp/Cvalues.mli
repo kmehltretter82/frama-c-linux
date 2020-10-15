@@ -83,9 +83,11 @@ val volatile : ?warn:string -> unit -> bool
 
 (** {2 ACSL Equality} *)
 
+type matrixinfo = c_object * int option list
+
 val equal_object : c_object -> term -> term -> pred
 val equal_comp : compinfo -> term -> term -> pred
-val equal_array : Matrix.matrix -> term -> term -> pred
+val equal_array : matrixinfo -> term -> term -> pred
 
 (** {2 C and ACSL Constants} *)
 
