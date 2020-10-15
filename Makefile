@@ -596,6 +596,8 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/locations.cmo               \
 	src/kernel_services/abstract_interp/lmap.cmo                    \
 	src/kernel_services/abstract_interp/lmap_bitwise.cmo            \
+	src/kernel_services/abstract_interp/multidim.cmo                \
+	src/kernel_services/abstract_interp/memory_map.cmo              \
 	src/kernel_services/visitors/visitor.cmo                        \
 	src/kernel_services/ast_data/statuses_by_call.cmo               \
 	src/kernel_services/ast_printing/printer_tag.cmo                \
@@ -874,6 +876,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
+	domains/multidim_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \

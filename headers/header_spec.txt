@@ -475,6 +475,10 @@ src/kernel_services/abstract_interp/locations.ml: CEA_LGPL
 src/kernel_services/abstract_interp/locations.mli: CEA_LGPL
 src/kernel_services/abstract_interp/map_lattice.ml: CEA_LGPL
 src/kernel_services/abstract_interp/map_lattice.mli: CEA_LGPL
+src/kernel_services/abstract_interp/memory_map.ml: CEA_LGPL
+src/kernel_services/abstract_interp/memory_map.mli: CEA_LGPL
+src/kernel_services/abstract_interp/multidim.ml: CEA_LGPL
+src/kernel_services/abstract_interp/multidim.mli: CEA_LGPL
 src/kernel_services/abstract_interp/offsetmap.ml: CEA_LGPL
 src/kernel_services/abstract_interp/offsetmap.mli: CEA_LGPL
 src/kernel_services/abstract_interp/offsetmap_bitwise_sig.mli: CEA_LGPL
@@ -1309,6 +1313,8 @@ src/plugins/value/domains/hcexprs.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/hcexprs.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/inout_domain.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/inout_domain.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/multidim_domain.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/domains/multidim_domain.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/octagons.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/octagons.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/domains/offsm_domain.ml: CEA_LGPL_OR_PROPRIETARY

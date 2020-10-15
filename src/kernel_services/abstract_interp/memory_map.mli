@@ -1,0 +1,114 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2021                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+type size = Integer.t
+
+type default =
+  | Top (* Unknown everywhere *)
+  | Numerical (* Unknown but only numbers, no pointers at all *)
+  | Zero (* Zero everywhere *)
+
+(* Values the memory is mapped to *)
+module type Value =
+sig
+  type t
+
+  val name : string
+
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+
+  val pretty : Format.formatter -> t -> unit
+  val zero : t
+  val misaligned : t -> t
+  val top : t
+  val top_numerical : t
+  val is_included : t -> t -> bool
+end
+
+module type Config =
+sig
+  val deps : State.t list
+end
+
+module type T =
+sig
+  type location
+  type value
+  type t
+
+  (* Datatype *)
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+
+  (* Infinite unknown memory *)
+  val top : t
+
+  (* Infinite zero memory *)
+  val zero : t
+
+  (* Is the memory map completely unknown ? *)
+  val is_top : t -> bool
+
+  (* Get a unique value from a set of locations *)
+  val reduce : (value -> value -> value) -> t -> location -> value
+
+  (* Extract a sub map from a set of locations *)
+  val extract : (value -> value -> value) -> t -> location -> t
+
+  (* Set a default value on a set of locations *)
+  val initialize : t -> location -> default -> t
+
+  (* Set a unique value on a set of locations *)
+  val set : t -> location -> value -> t
+
+  (* Update values on a set of locations *)
+  val update : weak:bool -> (weak:bool -> value -> value) ->  t -> location -> t
+
+  (* Set top on a set of locations *)
+  val erase : t -> location -> t
+
+  (* Copy a whole map over another *)
+  val overwrite : weak:bool -> (weak:bool -> value -> value -> value) -> t -> location -> t -> t
+
+  (* Test inclusion of one memory map into another *)
+  val is_included : t -> t -> bool
+
+  (* Finest partition that is coarcer than both *)
+  val join : (size:size -> value -> value -> value) -> t -> t -> t
+
+  (* Partition widening *)
+  val widen : (size:size -> value -> value -> value) -> t -> t -> t
+
+  val pretty : Format.formatter -> t -> unit
+end
+
+type typed_offset =
+  | NoOffset of Cil_types.typ
+  | Index of Ival.t * Cil_types.typ * typed_offset
+  | Field of Cil_types.fieldinfo * typed_offset
+
+module MakeTyped (Config : Config) (Value : Value) : T
+  with type value = Value.t
+   and type location = typed_offset

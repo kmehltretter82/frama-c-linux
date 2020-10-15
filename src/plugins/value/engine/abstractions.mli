@@ -158,6 +158,7 @@ module Config : sig
   val taint: flag
   val sign: flag
   val traces: flag
+  val multidim: flag
   val printer: flag
 
   val default: t (** The default configuration of Eva. *)
