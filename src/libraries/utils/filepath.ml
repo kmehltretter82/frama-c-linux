@@ -277,22 +277,19 @@ module Normalized = struct
     with _ -> false
 
   let to_base_uri name =
-    if is_relative name then None, skip_dot name
-    else begin
-      let p = insert cwd name in
-      let buf = Buffer.create 80 in
-      let res = add_uri_path buf p in
-      let uri =
-        Buffer.contents buf in
-      let uri =
-        try
-          if String.get uri 0 = '/' then
-            String.sub uri 1 (String.length uri - 1)
-          else uri
-        with Invalid_argument _ -> uri
-      in
-      res, uri
-    end
+    let p = insert cwd name in
+    let buf = Buffer.create 80 in
+    let res = add_uri_path buf p in
+    let uri =
+      Buffer.contents buf in
+    let uri =
+      try
+        if String.get uri 0 = '/' then
+          String.sub uri 1 (String.length uri - 1)
+        else uri
+      with Invalid_argument _ -> uri
+    in
+    res, uri
 end
 
 type position =

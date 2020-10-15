@@ -36,7 +36,7 @@
       },
       "artifacts": [
         {
-          "location": { "uri": "tests/sarif/libc.c" },
+          "location": { "uri": "tests/sarif/libc.c", "uriBaseId": "PWD" },
           "roles": [ "analysisTarget" ],
           "mimeType": "text/x-csrc"
         }
@@ -53,8 +53,8 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri":
-                    "/home/andr/git/frama-c-2/src/plugins/markdown-report/tests/sarif/libc.c"
+                  "uri": "tests/sarif/libc.c",
+                  "uriBaseId": "PWD"
                 },
                 "region": {
                   "startLine": 13,
