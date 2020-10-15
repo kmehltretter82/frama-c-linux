@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -eva-slevel 10 -eva-mlevel 0 -eva-alloc-builtin by_stack
+   OPT: -eva @EVA_OPTIONS@ -eva-slevel 10 -eva-mlevel 0 -eva-alloc-builtin by_stack
 */
 #include <stdlib.h>
 

@@ -1,6 +1,6 @@
 /* run.config
-OPT: %{dep:@PTEST_NAME@_1.i} %{dep:@PTEST_NAME@_2.i} -eva @EVA_CONFIG@
-OPT: %{dep:@PTEST_NAME@_2.i} %{dep:@PTEST_NAME@_1.i} -eva @EVA_CONFIG@
+OPT: %{dep:@PTEST_NAME@_1.i} %{dep:@PTEST_NAME@_2.i} -eva @EVA_OPTIONS@
+OPT: %{dep:@PTEST_NAME@_2.i} %{dep:@PTEST_NAME@_1.i} -eva @EVA_OPTIONS@
 */
 extern int a[] ;
 

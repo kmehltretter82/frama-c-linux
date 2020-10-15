@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -warn-special-float none
+   OPT: -eva @EVA_OPTIONS@ -warn-special-float none
 */
 
 /* Tests on special float values NaN and infinites. */

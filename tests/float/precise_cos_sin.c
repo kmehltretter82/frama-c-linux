@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -eva-slevel 1000 -journal-disable -float-normal
+   OPT: -eva @EVA_OPTIONS@ -eva-slevel 1000 -journal-disable -float-normal
 */
 
 #include <__fc_builtin.h>

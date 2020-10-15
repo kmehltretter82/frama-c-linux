@@ -1,2 +1,2 @@
-PLUGIN: pdg @EVA_PLUGINS@ 
+PLUGIN: pdg @EVA_CONFIG@ 
 OPT: -journal-disable @EVA_OPTIONS@ -pdg-print -pdg-verbose 2

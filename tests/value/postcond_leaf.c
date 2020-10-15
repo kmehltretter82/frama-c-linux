@@ -1,5 +1,5 @@
 /* run.config* 
-OPT: -no-autoload-plugins @EVA_CONFIG@ -load-module eva,inout,report -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
+OPT: -no-autoload-plugins @EVA_OPTIONS@ -load-module eva,inout,report -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
 */
 
 /* Test what is printed when Value evaluates a post-condition:

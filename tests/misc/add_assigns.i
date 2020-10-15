@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: report @EVA_PLUGINS@
+PLUGIN: report @EVA_CONFIG@
 MODULE: @PTEST_NAME@.cmxs
 OPT: -then -report -then -print
 */

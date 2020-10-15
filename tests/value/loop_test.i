@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_CONFIG@ -main test_onzes -journal-disable
-   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_CONFIG@ -main test_cent_onzes -journal-disable
+   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -main test_onzes -journal-disable
+   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -main test_cent_onzes -journal-disable
 */
 
 

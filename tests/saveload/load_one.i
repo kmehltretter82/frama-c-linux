@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: sparecode @EVA_PLUGINS@
+   PLUGIN: sparecode @EVA_CONFIG@
    MODULE: @PTEST_NAME@.cmxs
    STDOPT: 
 */

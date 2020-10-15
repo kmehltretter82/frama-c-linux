@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_PLUGINS@
+   PLUGIN: @EVA_CONFIG@
    OPT: -eva @EVA_OPTIONS@ -inout -journal-disable
 */
 

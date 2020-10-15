@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: do not compare generated journals since they depend on current time
-   EXECNOW: BIN control_journal.ml BIN control_journal_bis.ml (frama-c @FRAMA_C_PLUGINS_OPTIONS@ -journal-enable -check -eva -deps -out @EVA_CONFIG@ -main f -journal-name control_journal.ml control.i && cp control_journal.ml control_journal_bis.ml) > /dev/null 2> /dev/null
+   EXECNOW: BIN control_journal.ml BIN control_journal_bis.ml (frama-c @FRAMA_C_PLUGINS_OPTIONS@ -journal-enable -check -eva -deps -out @EVA_OPTIONS@ -main f -journal-name control_journal.ml control.i && cp control_journal.ml control_journal_bis.ml) > /dev/null 2> /dev/null
   CMD: @frama-c@
   OPT: -load-script %{dep:control_journal.ml} -journal-disable
   CMD: @frama-c@

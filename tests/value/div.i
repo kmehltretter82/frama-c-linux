@@ -1,6 +1,6 @@
 /* run.config*
    STDOPT: #"-load-module scope -eva-remove-redundant-alarms"
-   OPT: -no-autoload-plugins -load-module eva,inout -rte -then -eva @EVA_CONFIG@
+   OPT: -no-autoload-plugins -load-module eva,inout -rte -then -eva @EVA_OPTIONS@
 */
 int X,Y,Z1,Z2,T,U1,U2,V,W1,W2;
 int a,b,d1,d2,d0,e;

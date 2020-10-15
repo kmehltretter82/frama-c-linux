@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,eva,report,rtegen -rte -then -eva @EVA_CONFIG@ -then -report -report-print-properties
-   OPT: -no-autoload-plugins -load-module from,inout,eva,report,rtegen -eva @EVA_CONFIG@ -then -rte -then -report -report-print-properties
+   OPT: -no-autoload-plugins -load-module from,inout,eva,report,rtegen -rte -then -eva @EVA_OPTIONS@ -then -report -report-print-properties
+   OPT: -no-autoload-plugins -load-module from,inout,eva,report,rtegen -eva @EVA_OPTIONS@ -then -rte -then -report -report-print-properties
 */
 
 // Fuse with precond.c when bts #1208 is solved

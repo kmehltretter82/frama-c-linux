@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_CONFIG@ -journal-disable -machdep x86_64
-   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_CONFIG@ -journal-disable
+   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_OPTIONS@ -journal-disable -machdep x86_64
+   OPT: -no-autoload-plugins -load-module eva,inout -eva @EVA_OPTIONS@ -journal-disable
 */
 
 int x;

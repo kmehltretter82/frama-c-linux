@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -eva-memexec -deps -inout -eva-mlevel 0
+   OPT: -eva @EVA_OPTIONS@ -eva-memexec -deps -inout -eva-mlevel 0
 */
 #include <stdlib.h>
 

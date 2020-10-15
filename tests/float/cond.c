@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -journal-disable -float-hex
+   OPT: -eva @EVA_OPTIONS@ -journal-disable -float-hex
 */
 
 #include "__fc_builtin.h"

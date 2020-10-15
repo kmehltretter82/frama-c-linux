@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@
+   OPT: -eva @EVA_OPTIONS@
 */
 
 #include <stdlib.h>

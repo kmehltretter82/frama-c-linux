@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-copy -eva @EVA_CONFIG@"
+   STDOPT: +"-copy -eva @EVA_OPTIONS@"
  */
 struct S {
   int a;

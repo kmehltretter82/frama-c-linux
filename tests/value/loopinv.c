@@ -1,5 +1,5 @@
 /* run.config* 
-OPT: @EVA_CONFIG@ -no-autoload-plugins -load-module from,inout,eva,report -eva-slevel-function main2:20 -pp-annot -eva -then -report
+OPT: @EVA_OPTIONS@ -no-autoload-plugins -load-module from,inout,eva,report -eva-slevel-function main2:20 -pp-annot -eva -then -report
 */
 
 /*@ requires valid: \valid(&t[0..s-1]);

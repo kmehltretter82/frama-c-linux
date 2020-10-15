@@ -1,5 +1,5 @@
 /* run.config
-    PLUGIN: @EVA_PLUGINS@
+    PLUGIN: @EVA_CONFIG@
     STDOPT: +"-eva -eva-verbose 2"
 */
 //@ logic integer foo(int x) = x + 2 ;

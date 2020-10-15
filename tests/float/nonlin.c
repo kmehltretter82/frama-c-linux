@@ -1,10 +1,10 @@
 /* run.config*
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 0
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 0
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10
-   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_CONFIG@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 0
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=double" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 0
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10
+   OPT: -eva-msg-key nonlin -eva-slevel 30 -eva @EVA_OPTIONS@ -cpp-extra-args="-DFLOAT=float" -float-hex -journal-disable -eva-subdivide-non-linear 10 -warn-special-float none
 */
 
 #include "__fc_builtin.h"

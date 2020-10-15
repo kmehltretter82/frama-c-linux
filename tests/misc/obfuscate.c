@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: obfuscator @EVA_PLUGINS@
+   PLUGIN: obfuscator @EVA_CONFIG@
    OPT: -obfuscate
 */
 int my_var = 0;

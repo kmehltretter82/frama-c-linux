@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -deps -calldeps -inout -eva-slevel 5 -eva-msg-key malloc
+   OPT: -eva @EVA_OPTIONS@ -deps -calldeps -inout -eva-slevel 5 -eva-msg-key malloc
 */
 #include <stdlib.h>
 

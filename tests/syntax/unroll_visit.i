@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva @EVA_CONFIG@ -deps -out -input -deps"
+   STDOPT: +"-eva @EVA_OPTIONS@ -deps -out -input -deps"
  */
 void main() {
    /*@ loop pragma UNROLL 2; */

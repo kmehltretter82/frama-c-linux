@@ -1,5 +1,5 @@
 /* run.config*
-   OPT:  @EVA_CONFIG@ -eva-alloc-builtin fresh -deps -journal-disable
+   OPT:  @EVA_OPTIONS@ -eva-alloc-builtin fresh -deps -journal-disable
 */
 
 #include "stdlib.c"

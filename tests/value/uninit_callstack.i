@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_CONFIG@ -eva-no-show-progress -eva-print-callstacks -journal-disable -eva-no-results
+   OPT: -no-autoload-plugins -load-module eva -eva @EVA_OPTIONS@ -eva-no-show-progress -eva-print-callstacks -journal-disable -eva-no-results
 */
 int *p, x;
 

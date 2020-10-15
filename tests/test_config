@@ -1,5 +1,4 @@
-MACRO: EVA_PLUGINS from inout eva scope variadic
+MACRO: EVA_CONFIG from inout eva scope variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0
-MACRO: EVA_CONFIG @EVA_OPTIONS@
-PLUGIN: @EVA_PLUGINS@
+PLUGIN: @EVA_CONFIG@
 OPT: -eva @EVA_OPTIONS@ -journal-disable -out -input -deps

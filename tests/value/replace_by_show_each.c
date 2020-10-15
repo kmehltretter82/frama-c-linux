@@ -1,5 +1,5 @@
 /* run.config*
- OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_CONFIG@ -inout -calldeps
+ OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -inout -calldeps
 */
 
 #define show_each_1 Frama_C_show_each_1

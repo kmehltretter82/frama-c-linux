@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   OPT: -eva @EVA_CONFIG@ -eva-slevel-function main:10
+   OPT: -eva @EVA_OPTIONS@ -eva-slevel-function main:10
 */
 void main() {
   int i, j = 0;

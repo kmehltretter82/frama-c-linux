@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -eva-slevel 50 -eva-mlevel 5
+   OPT: -eva @EVA_OPTIONS@ -eva-slevel 50 -eva-mlevel 5
 */
 #include<stdlib.h>
 #define MAX 10

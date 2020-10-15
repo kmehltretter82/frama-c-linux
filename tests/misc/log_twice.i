@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@.cmxs
-   OPT: @EVA_CONFIG@
+   OPT: @EVA_OPTIONS@
 */
 
 int* f() {
