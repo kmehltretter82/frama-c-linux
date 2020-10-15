@@ -510,14 +510,9 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
        | Node (max, _, _, _, _, r, m, v, _) ->
          let abs_max = max +~ o in
          let now = f (o, abs_max) (v, m, r) pre in
-         let no, nt, nz =
-           match move_right o t z with
-           | t -> t
-           | exception End_reached ->
-             abs_max, Empty, z (* End the recursion at next iteration *)
-         in
-         aux_fold no nt nz now
-
+         match move_right o t z with
+         | no, nt, nz -> aux_fold no nt nz now
+         | exception End_reached -> now
      in
      aux_fold o n z acc
  ;;
