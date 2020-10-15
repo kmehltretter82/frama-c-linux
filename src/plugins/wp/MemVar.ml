@@ -1104,12 +1104,13 @@ struct
                   M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
                 else
                   let rec normalize obj = function
-                    | [] -> [], Extlib.id
-                    | [Shift(elt, i)] when Ctypes.equal obj elt -> [], F.e_add i
-                    | f :: ofs -> let l, fn = normalize obj ofs in f :: l, fn
+                    | [] -> [], a, b
+                    | [Shift(elt, i)] when Ctypes.equal obj elt ->
+                        [], F.e_add a i, F.e_add b i
+                    | f :: ofs ->
+                        let l, a, b = normalize obj ofs in f :: l, a, b
                   in
-                  let p, shift = normalize elt p in
-                  let a = shift a and b = shift b in
+                  let p, a, b = normalize elt p in
                   let in_array = valid_range RW (vobject m x) p (elt, a, b) in
                   let initialized =
                     if x.vformal || x.vglob then p_true
