@@ -1056,6 +1056,7 @@ struct
           initialized_loc sigma obj x ofs
         in
         Lang.F.p_conj (List.map mk_pred ci.cfields)
+
   and initialized_range sigma obj x ofs low up =
     match obj with
     | C_array { arr_element=t } ->

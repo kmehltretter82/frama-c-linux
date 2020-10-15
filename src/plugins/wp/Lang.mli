@@ -177,12 +177,12 @@ val t_int : tau
 val t_real : tau
 val t_bool : tau
 val t_prop : tau
-val t_addr : unit -> tau (** pointer on Void *)
+val t_addr : unit -> tau
 val t_array : tau -> tau
 val t_farray : tau -> tau -> tau
 val t_datatype : adt -> tau list -> tau
 
-val pointer : (typ -> tau) Context.value (** type of pointers *)
+val pointer : tau Context.value (** type of pointers *)
 val floats : (c_float -> tau) Context.value (** type of floats *)
 val poly : string list Context.value (** polymorphism *)
 val builtin_types: (string -> t_builtin) Context.value (* builtin types *)

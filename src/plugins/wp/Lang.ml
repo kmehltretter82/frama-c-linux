@@ -186,7 +186,7 @@ let t_int = Logic.Int
 let t_bool = Logic.Bool
 let t_real = Logic.Real
 let t_prop = Logic.Prop
-let t_addr () = Context.get pointer Cil.voidType
+let t_addr () = Context.get pointer
 let t_array a = Logic.Array(Logic.Int,a)
 let t_farray a b = Logic.Array(a,b)
 let t_datatype adt ts = Logic.Data(adt,ts)
@@ -194,8 +194,8 @@ let t_datatype adt ts = Logic.Data(adt,ts)
 let rec tau_of_object = function
   | C_int _ -> Logic.Int
   | C_float f -> Context.get floats f
-  | C_pointer t -> Context.get pointer t
   | C_comp c -> tau_of_comp c
+  | C_pointer _ -> Context.get pointer
   | C_array { arr_element = typ } -> t_array (tau_of_ctype typ)
 
 and tau_of_ctype typ = tau_of_object (Ctypes.object_of typ)
