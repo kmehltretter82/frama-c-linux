@@ -43,7 +43,7 @@ type env = {
   index_val : term list ; (** index values *)
   index_range : pred list ; (** indices are in range of size variables *)
   index_offset : term list ; (** polynomial of indices *)
-  monotonic : bool ; (** all dimensions are defined *)
+  length : term option ; (** number of cells (None is infinite) *)
 }
 
 val cc_tau : tau -> t -> tau (** Type of matrix *)

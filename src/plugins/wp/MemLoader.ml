@@ -294,7 +294,7 @@ struct
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
-          if env.monotonic then
+          if env.length <> None then
             begin
               let ns = List.map F.e_var env.size_var in
               frame_lemmas lfun obj loc (v::ns) chunks
@@ -345,19 +345,6 @@ struct
 
   let isinitrec = ref (fun _ _ _ -> assert false)
 
-  let initialization_lemma cluster name (sigma, obj, loc) (lfun, params) =
-    let high = p_call lfun (List.map F.e_var params) in
-    let low = M.is_init_range sigma obj loc e_one in
-    let lemma = p_equiv high low in
-    {
-      l_kind = `Axiom ;
-      l_name = name ^ "_low" ; l_types = 0 ;
-      l_forall = F.p_vars lemma ;
-      l_triggers = [] ;
-      l_lemma = lemma ;
-      l_cluster = cluster ;
-    }
-
   module IS_INIT_COMP = WpContext.Generator(COMP_KEY)
       (struct
         let name = M.name ^ ".IS_INIT_COMP"
@@ -366,30 +353,39 @@ struct
 
         let generate (r,c) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
-          let v = e_var x in
           let obj = C_comp c in
-          let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
+          let loc = M.of_region_pointer r obj (e_var x) in
           let domain = M.init_footprint obj loc in
           let cluster = cluster () in
-          (* Function Is_init *)
+          (* Is_init: structural definition *)
           let name =
             Format.asprintf "Is%s%a" (Lang.comp_init_id c) pp_rid r
           in
           let lfun = Lang.generated_p name in
           let xms,chunks,sigma = signature domain in
+          let params = x :: xms in
           let def = p_all
               (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
               c.cfields
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: xms ;
+            d_params = params ;
             d_definition = Predicate(Def , def) ;
             d_cluster = cluster ;
           } ;
-          (* Lemma for low-level view of the memory *)
-          Definitions.define_lemma
-            (initialization_lemma cluster name (sigma,obj,loc) (lfun,x::xms)) ;
+          (* Is_init: full-range definition *)
+          let is_init_p = p_call lfun (List.map e_var (x :: xms)) in
+          let is_init_r = M.is_init_range sigma obj loc e_one in
+          let lemma = p_equiv is_init_p is_init_r in
+          Definitions.define_lemma {
+            l_kind = `Axiom ;
+            l_name = name ^ "_range" ; l_types = 0 ;
+            l_forall = params ;
+            l_triggers = [] ;
+            l_lemma = lemma ;
+            l_cluster = cluster ;
+          } ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -413,21 +409,32 @@ struct
           let lfun = Lang.generated_p name in
           let xmem,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
+          let params = x :: env.size_var @ xmem in
           let ofs = e_sum env.index_offset in
           let vm = !isinitrec sigma obj (M.shift loc obj ofs) in
           let def = p_forall env.index_var (p_hyps env.index_range vm) in
           let cluster = cluster () in
+          (* Is_init: structural definition *)
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: env.size_var @ xmem ;
+            d_params = params ;
             d_definition = Predicate (Def, def) ;
             d_cluster = cluster ;
           } ;
-          (* Lemma for low-level view of the memory *)
-          Definitions.define_lemma
-            (initialization_lemma cluster name
-               (sigma, obj, loc)
-               (lfun, x :: env.size_var @ xmem)) ;
+          (* Is_init: range definition *)
+          begin match env.length with None -> () | Some len ->
+            let is_init_p = p_call lfun (List.map e_var params) in
+            let is_init_r = M.is_init_range sigma obj loc len in
+            let lemma = p_equiv is_init_p is_init_r in
+            Definitions.define_lemma {
+              l_kind = `Axiom ;
+              l_name = name ^ "_range" ; l_types = 0 ;
+              l_forall = params ;
+              l_triggers = [] ;
+              l_lemma = lemma ;
+              l_cluster = cluster ;
+            }
+          end ;
           lfun , chunks
 
         let compile = Lang.local generate

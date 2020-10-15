@@ -66,7 +66,7 @@ type env = {
   index_val : term list ; (* index values *)
   index_range : pred list ; (* indices are in range of size variables *)
   index_offset : term list ; (* polynomial of indices multiplied by previous sizes *)
-  monotonic : bool ; (* all dimensions are fixed *)
+  length : term option ; (* number of array cells ; None is infinite *)
 }
 
 let rec collect rank = function
@@ -78,7 +78,7 @@ let rec collect rank = function
         index_val = [] ;
         index_range = [] ;
         index_offset = [] ;
-        monotonic = true ;
+        length = Some e_one ;
       }
   | d::ds ->
       let denv = collect (succ rank) ds in
@@ -92,7 +92,7 @@ let rec collect rank = function
             index_var = k_var :: denv.index_var ;
             index_val = k_val :: denv.index_val ;
             index_offset = k_ofs :: denv.index_offset ;
-            monotonic = false ;
+            length = None ;
           }
       | `Fix ->
           let n_base = match rank with 0 -> "n" | 1 -> "m" | _ -> "d" in
@@ -100,14 +100,17 @@ let rec collect rank = function
           let n_val = e_var n_var in
           let k_inf = p_leq e_zero k_val in
           let k_sup = p_lt k_val n_val in
-          {
+          let length = match denv.length with
+            | None -> None
+            | Some len -> Some (e_mul n_val len)
+          in {
             size_var = n_var :: denv.size_var ;
             size_val = n_val :: denv.size_val ;
             index_var = k_var :: denv.index_var ;
             index_val = k_val :: denv.index_val ;
             index_offset = k_ofs :: denv.index_offset ;
             index_range = k_inf :: k_sup :: denv.index_range ;
-            monotonic = denv.monotonic ;
+            length ;
           }
 
 let cc_env = collect 0
