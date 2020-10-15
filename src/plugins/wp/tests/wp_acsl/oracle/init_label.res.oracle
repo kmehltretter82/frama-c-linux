@@ -10,7 +10,7 @@
 
 Goal Post-condition 'KO' in 'extra':
 Let x = A[2].
-Assume { Type: is_sint32(x). (* Heap *) Type: IsArray1_sint32(A). }
+Assume { Type: is_sint32(x). (* Heap *) Type: IsArray_sint32(A). }
 Prove: x = 12.
 
 ------------------------------------------------------------
@@ -29,7 +29,7 @@ Prove: true.
 Goal Post-condition 'OK' in 'job':
 Let x = A[2].
 Assume {
-  Type: IsArray1_sint32(A) /\ IsArray1_sint32(A_1) /\ is_sint32(x).
+  Type: IsArray_sint32(A) /\ IsArray_sint32(A_1) /\ is_sint32(x).
   (* Initializer *)
   Init: A_1[0] = 10.
   (* Initializer *)

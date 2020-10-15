@@ -16,7 +16,7 @@ Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(x_3) /\
       is_sint32(x_4).
   (* Heap *)
-  Type: IsArray1_sint32(A).
+  Type: IsArray_sint32(A).
 }
 Prove: x_4 = 6.
 
@@ -35,7 +35,7 @@ Prove: true.
 
 Goal Post-condition 'KO' in 'fC':
 Let x = A[3].
-Assume { Type: is_sint32(x). (* Heap *) Type: IsArray1_sint32(A). }
+Assume { Type: is_sint32(x). (* Heap *) Type: IsArray_sint32(A). }
 Prove: x = 0.
 
 ------------------------------------------------------------

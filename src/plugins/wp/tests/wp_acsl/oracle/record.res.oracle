@@ -50,7 +50,7 @@ Prove: true.
 
 Goal Post-condition 'P2,qed_ok' in 'f':
 Assume {
-  Type: IsArray1_sint32(t1_0) /\ IsArray1_sint32(t2_0).
+  Type: IsArray_sint32(t1_0) /\ IsArray_sint32(t2_0).
   (* Goal *)
   When: forall i : Z. ((0 <= i) -> ((i <= 9) -> (t2_0[i] = t1_0[i]))).
 }

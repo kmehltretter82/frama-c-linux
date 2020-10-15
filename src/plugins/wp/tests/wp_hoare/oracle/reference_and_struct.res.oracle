@@ -133,7 +133,7 @@ Prove: true.
 Goal Post-condition 'Preset_5' in 'call_reset_5':
 Assume {
   (* Heap *)
-  Type: IsArray1S1_T(ts_1).
+  Type: IsArray_S1_T(ts_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)
@@ -170,7 +170,7 @@ Goal Post-condition 'Presset_mat' in 'call_reset_5_dim2':
 Let m = smatrix_0[1].
 Assume {
   (* Heap *)
-  Type: IsArray2S1_T(smatrix_1).
+  Type: IsArray_d2_S1_T(smatrix_1).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
   (* Call 'reset_5' *)

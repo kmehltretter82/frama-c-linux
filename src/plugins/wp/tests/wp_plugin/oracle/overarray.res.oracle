@@ -62,7 +62,7 @@ Goal Assigns nothing in 'f5_ko':
 Call Effect at line 25
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(A).
+  Type: IsArray_sint32(A).
   (* Exit Effects *)
   Have: forall i : Z. let x = 15 + i in (((-15) <= i) -> ((i <= 4) ->
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
@@ -75,7 +75,7 @@ Goal Assigns nothing in 'f5_ko':
 Call Effect at line 25
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(A).
+  Type: IsArray_sint32(A).
   (* Call Effects *)
   Have: forall i : Z. let x = 15 + i in (((-15) <= i) -> ((i <= 4) ->
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
@@ -91,7 +91,7 @@ Goal Assigns nothing in 'f6_ko':
 Call Effect at line 28
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(A).
+  Type: IsArray_sint32(A).
   (* Exit Effects *)
   Have: forall i : Z. let x = i - 5 in ((5 <= i) -> ((i <= 24) ->
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
@@ -104,7 +104,7 @@ Goal Assigns nothing in 'f6_ko':
 Call Effect at line 28
 Assume {
   (* Heap *)
-  Type: IsArray1_sint32(A).
+  Type: IsArray_sint32(A).
   (* Call Effects *)
   Have: forall i : Z. let x = i - 5 in ((5 <= i) -> ((i <= 24) ->
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).

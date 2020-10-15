@@ -16,9 +16,9 @@ Let x = k - 1.
 Let m = p[x <- v].
 Let m_1 = m[k <- v_1].
 Assume {
-  Type: IsArray1_sint32(p) /\ is_sint32(k) /\ is_sint32(v_1) /\
+  Type: IsArray_sint32(p) /\ is_sint32(k) /\ is_sint32(v_1) /\
       is_sint32(v) /\ is_sint32(x1_0) /\ is_sint32(x2_0) /\ is_sint32(x) /\
-      is_sint32(1 + k) /\ IsArray1_sint32(m) /\ IsArray1_sint32(m_1).
+      is_sint32(1 + k) /\ IsArray_sint32(m) /\ IsArray_sint32(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job' *)
@@ -35,9 +35,9 @@ Let x = k - 1.
 Let m = p[x <- v_1].
 Let m_1 = m[k <- v].
 Assume {
-  Type: IsArray1_sint32(p) /\ is_sint32(k) /\ is_sint32(v) /\
+  Type: IsArray_sint32(p) /\ is_sint32(k) /\ is_sint32(v) /\
       is_sint32(v_1) /\ is_sint32(x1_0) /\ is_sint32(x2_0) /\ is_sint32(x) /\
-      is_sint32(1 + k) /\ IsArray1_sint32(m) /\ IsArray1_sint32(m_1).
+      is_sint32(1 + k) /\ IsArray_sint32(m) /\ IsArray_sint32(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job' *)
@@ -61,8 +61,8 @@ Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 15) in
 :
 Let m = p[k <- v].
 Assume {
-  Type: IsArray1_sint32(p) /\ is_sint32(k) /\ is_sint32(x1_0) /\
-      IsArray1_sint32(m) /\ is_sint32(1 + k).
+  Type: IsArray_sint32(p) /\ is_sint32(k) /\ is_sint32(x1_0) /\
+      IsArray_sint32(m) /\ is_sint32(1 + k).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 8).
   (* Call 'job' *)
@@ -85,9 +85,9 @@ Let x = k - 1.
 Let m = q[x <- v].
 Let m_1 = m[k <- v_1].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
       IsS1_S(v) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job2' *)
@@ -104,9 +104,9 @@ Let x = k - 1.
 Let m = q[x <- v_1].
 Let m_1 = m[k <- v].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v) /\
       IsS1_S(v_1) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job2' *)
@@ -124,9 +124,9 @@ Let m = q[x <- v].
 Let m_1 = m[k <- v_1].
 Let m_2 = q[x <- s1_0].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
       IsS1_S(v) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job2' *)
@@ -150,7 +150,7 @@ Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 26) in
 :
 Let m = q[k <- v].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ is_sint32(k) /\ IsArray1S1_S(m) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ is_sint32(k) /\ IsArray_S1_S(m) /\
       is_sint32(1 + k).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 8).
@@ -174,9 +174,9 @@ Let x = k - 1.
 Let m = q[x <- v].
 Let m_1 = m[k <- v_1].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
       IsS1_S(v) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job3' *)
@@ -193,9 +193,9 @@ Let x = k - 1.
 Let m = q[x <- v_1].
 Let m_1 = m[k <- v].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v) /\
       IsS1_S(v_1) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job3' *)
@@ -213,9 +213,9 @@ Let m = q[x <- v].
 Let m_1 = m[k <- v_1].
 Let m_2 = q[x <- s1_0].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ IsS1_S(s2_0) /\ IsS1_S(v_1) /\
       IsS1_S(v) /\ is_sint32(k) /\ is_sint32(x) /\ is_sint32(1 + k) /\
-      IsArray1S1_S(m) /\ IsArray1S1_S(m_1).
+      IsArray_S1_S(m) /\ IsArray_S1_S(m_1).
   (* Pre-condition *)
   Have: (0 < k) /\ (k <= 9).
   (* Call 'job3' *)
@@ -239,7 +239,7 @@ Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 37) in
 :
 Let m = q[k <- v].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s1_0) /\ is_sint32(k) /\ IsArray1S1_S(m) /\
+  Type: IsArray_S1_S(q) /\ IsS1_S(s1_0) /\ is_sint32(k) /\ IsArray_S1_S(m) /\
       is_sint32(1 + k).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 8).
@@ -322,7 +322,7 @@ Goal Post-condition 'Q' in 'job3':
 Let a = s.F1_S_f.
 Let m = q[k <- { F1_S_f = (q[k].F1_S_f)[0 <- a[0]][1 <- a[1]] }].
 Assume {
-  Type: IsArray1S1_S(q) /\ IsS1_S(s) /\ is_sint32(k) /\ IsArray1S1_S(m).
+  Type: IsArray_S1_S(q) /\ IsS1_S(s) /\ is_sint32(k) /\ IsArray_S1_S(m).
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 9).
 }

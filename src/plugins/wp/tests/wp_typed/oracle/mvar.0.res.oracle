@@ -11,7 +11,7 @@
 Goal Post-condition (file tests/wp_typed/mvar.i, line 12) in 'Job':
 Assume {
   (* Heap *)
-  Type: IsArray1_sint8(A).
+  Type: IsArray_sint8(A).
   (* Call 'Write' *)
   Have: A[0] = 1.
 }

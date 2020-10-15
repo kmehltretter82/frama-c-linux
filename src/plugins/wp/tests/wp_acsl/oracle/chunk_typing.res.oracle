@@ -31,7 +31,7 @@ Let a_20 = a_9[shift_sint32(i32_0, i)].
 Let a_21 = a_11[shift_uint32(u32_0, i)].
 Let a_22 = a_13[shift_sint64(i64_0, i)].
 Assume {
-  Type: IsArray1_sint8(x) /\ is_sint16_chunk(Mint_1) /\
+  Type: IsArray_sint8(x) /\ is_sint16_chunk(Mint_1) /\
       is_sint32_chunk(Mint_3) /\ is_sint64_chunk(Mint_5) /\
       is_sint8_chunk(Mchar_0) /\ is_uint16_chunk(Mint_2) /\
       is_uint32_chunk(Mint_4) /\ is_uint64_chunk(Mint_6) /\

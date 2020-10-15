@@ -126,17 +126,14 @@ struct
 
   let array_name te ds =
     let dim = List.length ds in
+    let pp_dim fmt d = if d > 1 then Format.fprintf fmt "_d%d" d in
     match te with
     | C_int i ->
-        Format.asprintf "%sArray%d_%a" C.prefix dim model_int i
-    | C_float _ ->
-        Format.asprintf "%sArray%d_float" C.prefix dim
-    | C_pointer _ ->
-        Format.asprintf "%sArray%d_pointer" C.prefix dim
+        Format.asprintf "%sArray%a_%a" C.prefix pp_dim dim model_int i
     | C_comp c ->
-        Format.asprintf "%sArray%d%s" C.prefix dim (Lang.comp_id c)
-    | C_array _ ->
-        Wp_parameters.fatal "Unflatten array (%s %a)" C.prefix Ctypes.pretty te
+        Format.asprintf "%sArray%a_%s" C.prefix pp_dim dim (Lang.comp_id c)
+    | C_float _ | C_pointer _ | C_array _ ->
+        assert false
 
   let rec is_obj obj t =
     match obj with
