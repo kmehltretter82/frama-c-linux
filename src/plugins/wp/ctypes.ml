@@ -226,6 +226,9 @@ let pp_object fmt = function
   | C_comp _ -> Format.pp_print_string fmt "obj-struct/union"
   | C_array _ -> Format.pp_print_string fmt "obj-array"
 
+let i_name = i_memo (Pretty_utils.to_string pp_int)
+let f_name = f_memo (Pretty_utils.to_string pp_float)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Array Info                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -525,8 +528,8 @@ let promote a1 a2 =
            "promotion between arithmetics and pointer types"
 
 let rec basename = function
-  | C_int i -> Format.asprintf "%a" pp_int i
-  | C_float f -> Format.asprintf "%a" pp_float f
+  | C_int i -> i_name i
+  | C_float f -> f_name f
   | C_pointer _ -> "pointer"
   | C_comp c -> c.cname
   | C_array a ->
