@@ -180,37 +180,36 @@ let sort_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Linteger -> Logic.Sint
   | Lreal -> Logic.Sreal
 
-let tau_of_comp c = Logic.Data(Comp (c, KValue),[])
-
 let t_int = Logic.Int
 let t_bool = Logic.Bool
 let t_real = Logic.Real
 let t_prop = Logic.Prop
 let t_addr () = Context.get pointer
+let t_float f = Context.get floats f
+let t_comp c = Logic.Data(Comp (c, KValue),[])
+let t_init c = Logic.Data(Comp (c, KInit), [])
 let t_array a = Logic.Array(Logic.Int,a)
 let t_farray a b = Logic.Array(a,b)
 let t_datatype adt ts = Logic.Data(adt,ts)
+let rec t_matrix a n = if n > 0 then t_matrix (t_array a) (pred n) else a
 
 let rec tau_of_object = function
   | C_int _ -> Logic.Int
-  | C_float f -> Context.get floats f
-  | C_comp c -> tau_of_comp c
+  | C_float f -> t_float f
   | C_pointer _ -> Context.get pointer
+  | C_comp c -> t_comp c
   | C_array { arr_element = typ } -> t_array (tau_of_ctype typ)
 
 and tau_of_ctype typ = tau_of_object (Ctypes.object_of typ)
-
-let init_of_comp c = Logic.Data(Comp (c, KInit), [])
 
 let poly = Context.create "Wp.Lang.poly"
 
 let rec init_of_object = function
   | C_int _ | C_float _ | C_pointer _ -> Logic.Bool
-  | C_comp c -> init_of_comp c
+  | C_comp c -> t_init c
   | C_array { arr_element = typ } -> t_array (init_of_ctype typ)
 
 and init_of_ctype typ = init_of_object (Ctypes.object_of typ)
-
 
 let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
@@ -370,8 +369,8 @@ let tau_of_field = function
 
 let tau_of_record = function
   | Mfield(mdt,fs,_,_) -> Logic.Data(Mrecord(mdt,fs),[])
-  | Cfield(f, KValue) -> tau_of_comp f.fcomp
-  | Cfield(f, KInit) -> init_of_comp f.fcomp
+  | Cfield(f, KValue) -> t_comp f.fcomp
+  | Cfield(f, KInit) -> t_init f.fcomp
 
 module Field =
 struct

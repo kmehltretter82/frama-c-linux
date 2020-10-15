@@ -189,7 +189,7 @@ struct
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = M.value_footprint obj loc in
-          let result = Lang.tau_of_comp c in
+          let result = Lang.t_comp c in
           let lfun =
             Lang.generated_f ~result "Load%a_%s" pp_rid r (Lang.comp_id c)
           in

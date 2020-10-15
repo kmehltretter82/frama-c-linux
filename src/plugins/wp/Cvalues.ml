@@ -159,7 +159,7 @@ struct
       (Lang.generated_p (C.prefix ^ Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
-         let s = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+         let s = Lang.freshvar ~basename (Lang.t_comp c) in
          let def = p_all
              (fun f ->
                 is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
@@ -303,8 +303,9 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
         let basename = if c.cstruct then "S" else "U" in
-        let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-        let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+        let tc = Lang.t_comp c in
+        let xa = Lang.freshvar ~basename tc in
+        let xb = Lang.freshvar ~basename tc in
         let ra = e_var xa in
         let rb = e_var xb in
         let def = p_all

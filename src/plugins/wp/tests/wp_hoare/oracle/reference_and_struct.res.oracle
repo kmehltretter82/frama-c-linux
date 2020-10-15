@@ -204,7 +204,7 @@ Prove: true.
 
 Goal Post-condition 'Preset_5_tps' in 'call_reset_5_tps':
 Let a = tps_0[9].
-Let a_1 = shift_T(a, 0).
+Let a_1 = shift_S1_T(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, 10).
 Assume {
   (* Heap *)
@@ -215,9 +215,9 @@ Assume {
   Have: valid_rw(Malloc_0, a_1, 10).
   (* Call 'reset_5' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 4) ->
-      (a_2[shiftfield_F1_T_a(shift_T(a, i_1))] = 0))).
+      (a_2[shiftfield_F1_T_a(shift_S1_T(a, i_1))] = 0))).
 }
-Prove: a_2[shiftfield_F1_T_a(shift_T(a, i))] = 0.
+Prove: a_2[shiftfield_F1_T_a(shift_S1_T(a, i))] = 0.
 
 ------------------------------------------------------------
 

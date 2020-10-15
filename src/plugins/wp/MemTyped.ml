@@ -338,7 +338,7 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         | C_int i -> pp_int fmt i
         | C_float f -> pp_float fmt f
         | C_pointer _ -> Format.fprintf fmt "PTR"
-        | C_comp c -> Format.pp_print_string fmt c.cname
+        | C_comp c -> Format.pp_print_string fmt (Lang.comp_id c)
         | C_array a ->
             let te = object_of a.arr_element in
             match a.arr_flat with
