@@ -2303,7 +2303,7 @@ PLUGIN_DEP_LIST:=$(PLUGIN_LIST)
 
 # in case .depend is absent, we will make it. Otherwise, it will be left
 # untouched. Only make depend will force a recomputation of dependencies
-.depend: $(GENERATED) share/Makefile.dynamic_config
+.depend:
 	$(MAKE) depend
 
 depend:: $(GENERATED) share/Makefile.dynamic_config
