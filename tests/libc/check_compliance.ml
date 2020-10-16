@@ -45,7 +45,7 @@ let run_once = ref false
 
 module StringSet = Set.Make(String)
 
-let get_idents_from_list dir f =
+let set_of_data_from_list dir f =
   let file = Filename.concat dir f in
   let open Yojson.Basic.Util in
   Kernel.feedback "parsing %s" f;
@@ -56,7 +56,7 @@ let get_idents_from_list dir f =
     ) StringSet.empty elements
 
 
-let get_idents_from_assoc dir f =
+let set_of_data_from_assoc dir f =
   let file = Filename.concat dir f in
   let open Yojson.Basic.Util in
   Kernel.feedback "parsing %s" f;
@@ -66,7 +66,7 @@ let get_idents_from_assoc dir f =
       StringSet.add ident acc
     ) StringSet.empty elements
 
-let get_ident_headers dir f =
+let hashtable_of_ident_headers dir f =
   let file = Filename.concat dir f in
   let idents = Hashtbl.create 500 in
   let open Yojson.Basic.Util in
@@ -79,7 +79,7 @@ let get_ident_headers dir f =
     ) elements;
   idents
 
-let get_ident_headers_and_extensions dir f =
+let hashtable_of_ident_headers_and_extensions dir f =
   let file = Filename.concat dir f in
   let idents = Hashtbl.create 500 in
   let open Yojson.Basic.Util in
@@ -101,10 +101,11 @@ let () =
         ignore (Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) (Ast.get ()));
         let fc_stdlib_idents = vis#get_idents in
         let dir = Filename.concat Fc_config.datadir "compliance" in
-        let c11_idents = get_ident_headers dir "c11_functions.json" in
-        let glibc_idents = get_idents_from_list dir "glibc_functions.json" in
-        let posix_idents = get_ident_headers_and_extensions dir "posix_identifiers.json" in
-        let nonstandard_idents = get_idents_from_assoc dir "nonstandard_identifiers.json" in
+        let c11_idents = hashtable_of_ident_headers dir "c11_functions.json" in
+        let c11_headers = set_of_data_from_list dir "c11_headers.json" in
+        let glibc_idents = set_of_data_from_list dir "glibc_functions.json" in
+        let posix_idents = hashtable_of_ident_headers_and_extensions dir "posix_identifiers.json" in
+        let nonstandard_idents = set_of_data_from_assoc dir "nonstandard_identifiers.json" in
         Hashtbl.iter (fun id headers ->
             if not (Extlib.string_prefix "__" id) &&
                not (Extlib.string_prefix "Frama_C" id) &&
@@ -115,13 +116,14 @@ let () =
               let id_in_posix = Hashtbl.mem posix_idents id in
               let id_in_glibc = StringSet.mem id glibc_idents in
               let id_in_nonstd = StringSet.mem id nonstandard_idents in
+              let header_in_c11 h = StringSet.mem h c11_headers in
               if id_in_c11 then begin
                 (* Check that the header is the expected one.
                    Note that some symbols may appear in more than one header,
                    possibly due to collisions
                    (e.g. 'flock' as type and function). *)
                 let h = Hashtbl.find c11_idents id in
-                if not (List.mem h headers) then
+                if not (header_in_c11 h) then
                   Kernel.warning "<%a>:%s : C11 says %s"
                     (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) headers
                     id h
