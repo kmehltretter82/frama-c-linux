@@ -722,12 +722,24 @@ GENERATED+=src/plugins/gui/gtk_compat.ml
 
 ifeq ($(HAS_DGRAPH),yes)
   DGRAPHFILES:=debug_manager
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
-	$(CP) $< $@
+  GENERATED+=src/plugins/gui/debug_manager.ml
+  ifeq ($(HAS_OCAMLGRAPH_2), yes)
+	DGRAPH_MODULE=Graph_gtk
+	DGRAPH_ERROR=Graph_gtk.DGraphMake.DotError
+  else
+	DGRAPH_MODULE=Dgraph
+	DGRAPH_ERROR=Dgraph.DGraphModel.DotError
+  endif
+  src/plugins/gui/debug_manager.ml \
+  src/plugins/gui/dgraph_helper.ml \
+  src/plugins/callgraph/cg_viewer.ml: %.ml: %.yes.ml Makefile
+	$(RM) $@
+	$(SED) -e 's/DGRAPH_MODULE/$(DGRAPH_MODULE)/g' \
+               -e 's/DGRAPH_ERROR/$(DGRAPH_ERROR)/g' $< > $@
 	$(CHMOD_RO) $@
 else
   DGRAPHFILES:=
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml Makefile
 	$(CP) $< $@
 	$(CHMOD_RO) $@
 endif
@@ -794,6 +806,7 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
 PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
