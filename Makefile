@@ -1704,8 +1704,11 @@ ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -p
 ALL_ML_FILES+=ptests/ptests.ml
 
 ifeq ($(origin MANUAL_ML_FILES),undefined)
-MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
+MANUAL_ML_FILES:=$(ALL_ML_FILES)
 endif
+
+MANUAL_ML_FILES:=\
+  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
 # (e.g. pre-commit hook that will concentrate on files which have changed)
