@@ -413,25 +413,6 @@ clean_share_link:
 
 clean:: clean_share_link
 
-##############
-# Ocamlgraph #
-##############
-
-# dgraph (included in ocamlgraph)
-#[LC] Cf https://github.com/backtracking/ocamlgraph/pull/32
-ifeq ($(HAS_GNOMECANVAS),yes)
-ifneq ($(ENABLE_GUI),no)
-GRAPH_GUICMO= dgraph.cmo
-GRAPH_GUICMX= dgraph.cmx
-GRAPH_GUIO= dgraph.o
-HAS_DGRAPH=yes
-else # enable_gui is no: disable dgraph
-HAS_DGRAPH=no
-endif
-else # gnome_canvas is not yes: disable dgraph
-HAS_DGRAPH=no
-endif
-
 ##################
 # Frama-C Kernel #
 ##################
