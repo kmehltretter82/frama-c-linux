@@ -546,7 +546,11 @@ type config =
     dc_timeout: string
   }
 
-let default_macros () = Macros.add_list [ "PLUGIN", "" ] Macros.empty
+let default_macros () = Macros.add_list 
+  [ "PLUGIN", "" ;
+    "DEFAULT_OPTIONS", default_options;
+    "OPTIONS", "";
+  ] Macros.empty
 
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
@@ -940,27 +944,24 @@ let get_macros cmd =
   Macros.add_list macros cmd.macros
 
 let basic_command_string command =
+  let file = Filename.sanitize @@ get_ptest_file command in
   let macros = get_macros command in
-  let plugins_options =
-    let opt_plugin = String.concat " " (List.map (Printf.sprintf "-load-plugin %s") command.plugins) in
+  let expanded_plugins_options =
+    let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
     let opt_modules = String.concat " "
         (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
            command.load_module) in
     String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules]
+  and expanded_options = Macros.expand macros command.options
+  and expanded_default_options = Macros.expand macros "@DEFAULT_OPTIONS@" in
+  let expanded_cmd_options =
+    String.concat " " [file;expanded_default_options;expanded_plugins_options;expanded_options]
   in
-  let macros = Macros.add_list [ "OPTIONS", "" ] macros in
-  let options = Macros.expand macros command.options in
-  let macros =
-    Macros.add_list [ "OPTIONS", options;
-                      "FRAMA_C_PLUGINS_OPTIONS", plugins_options;
-                    ] macros in
-  let file = Filename.sanitize @@ get_ptest_file command in
-  let options =
-    String.concat " " [default_options;file;plugins_options;options]
-  in
-  let macros = Macros.add_list [
-      "FRAMA_C_DEFAULT_OPTIONS",options;
-      "frama-c", "frama-c "^options;
+  let macros = (* set expanded macros that can be used into CMD directives *)
+    Macros.add_list [
+      "OPTIONS", expanded_options;
+      "PLUGIN_OPTIONS", expanded_plugins_options;
+      "frama-c", "frama-c "^expanded_cmd_options;
     ] macros in
   let logfiles = List.map (Macros.expand macros) command.log_files in
   command.log_files <- logfiles;

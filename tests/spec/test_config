@@ -7,4 +7,4 @@ COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
 COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
 
 PLUGIN:
-OPT: -pp-annot -print -journal-disable -kernel-warn-key=annot-error=active -check
+OPT: -pp-annot -print -kernel-warn-key=annot-error=active

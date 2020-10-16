@@ -1,6 +1,6 @@
 /* run.config
-   OPT:-no-autoload-plugins -cpp-extra-args="-DCAN_CHECK"
-   OPT:-no-autoload-plugins -cpp-extra-args="-DCANT_CHECK"
+   OPT: -cpp-extra-args="-DCAN_CHECK"
+   OPT: -cpp-extra-args="-DCANT_CHECK"
 */
 
 #ifdef CAN_CHECK

@@ -7,4 +7,4 @@ COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
 COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
 
 PLUGIN:
-OPT: -print -journal-disable -check -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.c @PTEST_FILE@ -ocode="" -print
+OPT: -print -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.c @PTEST_FILE@ -ocode="" -print

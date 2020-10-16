@@ -7,4 +7,4 @@ COMMENT: of used plug'ins.
 MACRO: EVA_CONFIG from inout eva scope variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0
 PLUGIN: @EVA_CONFIG@
-OPT: -eva @EVA_OPTIONS@ -journal-disable -out -input -deps
+OPT: -eva @EVA_OPTIONS@ -out -input -deps

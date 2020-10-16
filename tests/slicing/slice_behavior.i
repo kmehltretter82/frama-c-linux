@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-eva -slice-assert f -slicing-level 0 -journal-disable -then-on 'Slicing export' -set-project-as-default -print -check -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-eva"
+   STDOPT: +"-eva -slice-assert f -slicing-level 0 -journal-disable -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -no-eva"
 */
 /*@ requires a > 0; */
 int f(int a) {

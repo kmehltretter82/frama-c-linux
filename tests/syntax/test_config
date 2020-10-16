@@ -6,5 +6,5 @@ COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
 COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
 
 PLUGIN: variadic
-OPT: -print -journal-disable -check
+OPT: -print
 FILEREG:.*\.\(c\|i\|ci\)$

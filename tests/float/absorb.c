@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: run.config is intentionally not-*
    EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err frama-c -no-autoload-plugins -journal-disable -save absorb.sav @PTEST_FILE@ > absorb_sav.res 2> absorb_sav.err
-   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err frama-c @FRAMA_C_PLUGINS_OPTIONS@ -load %{dep:absorb.sav} -eva @EVA_OPTIONS@ -journal-disable -float-hex -save absorb.sav2 > absorb_sav2.res 2> absorb_sav2.err
+   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err frama-c @PLUGIN_OPTIONS@ -load %{dep:absorb.sav} -eva @EVA_OPTIONS@ -journal-disable -float-hex -save absorb.sav2 > absorb_sav2.res 2> absorb_sav2.err
    OPT: -load %{dep:absorb.sav2} -deps -out -input
 */
 /* run.config*

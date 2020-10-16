@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print -check
+   OPT: -print
 */
 
 extern int t[3U];

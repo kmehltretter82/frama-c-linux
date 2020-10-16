@@ -1,4 +1,4 @@
 /* run.config
-   OPT: %{dep:merge2.c} -print
+   STDOPT: +"%{dep:merge2.c}"
 */
 int x;
