@@ -528,17 +528,22 @@ module Extensions = struct
   let initialized = ref false
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
+  let ref_typer_block = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer =
+  let set_handler ~is_extension ~typer ~typer_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
+    ref_typer_block := typer_block;
     initialized := true
 
   let is_extension name = !ref_is_extension name
 
   let typer name ~typing_context:typing_context ~loc =
     !ref_typer name typing_context loc
+
+  let typer_block name ~typing_context:typing_context ~loc =
+    !ref_typer_block name typing_context loc
 
   (* For deprecated functions *)
   let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
@@ -551,6 +556,8 @@ module Extensions = struct
     !ref_deprecated_handler name category status typer
 end
 let set_extension_handler = Extensions.set_handler
+let get_typer = Extensions.typer
+let get_typer_block = Extensions.typer_block
 
 (* Deprecated ACSL extensions functions *)
 let set_deprecated_extension_handler =
@@ -4281,9 +4288,16 @@ struct
       let rvi_opt = get_volatile_fct checks_reads_fct rd_opt in
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
-    | LDextended (kind, content) ->
+    | LDextended (Ext_lexpr(kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      Dextended (textended, [], loc)
+    | LDextended (Ext_extension (kind, name, content)) ->
+      let typing_context = base_ctxt (Lenv.empty ()) in
+      let status,tcontent =
+        Extensions.typer_block kind ~typing_context ~loc (name,content)
+      in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
       Dextended (textended, [], loc)
 

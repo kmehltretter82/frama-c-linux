@@ -311,6 +311,15 @@ let print_model_annot fmt ty =
     (print_logic_type None) ty.model_type
     ty.model_name
 
+let rec print_extended_decl fmt d =
+  let aux fmt d = print_extended_decl fmt d.extended_node in
+  match d with
+  | Ext_lexpr(name,d) ->
+    fprintf fmt "@[<2>%s@ %a@]" name (pp_list ~sep:",@ " print_lexpr) d
+  | Ext_extension(name,id,d) ->
+    fprintf fmt "@[<2>%s@ %s@ {@\n%a@]@\n}" name id
+      (pp_list ~sep:"@\n" aux) d
+
 let rec print_decl fmt d =
   match d.decl_node with
   | LDlogic_def(name,labels,tvar,rt,prms,body) ->
@@ -374,8 +383,7 @@ let rec print_decl fmt d =
       (pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" print_lexpr) tsets
       (pp_opt ~pre:"@ reads@ " pp_print_string) read
       (pp_opt ~pre:"@ writes@ " pp_print_string) write
-  | LDextended (s,l) ->
-    fprintf fmt "@[<2>%s@ %a@]" s (pp_list ~sep:",@ " print_lexpr) l
+  | LDextended d -> print_extended_decl fmt d
 
 let print_deps fmt deps =
   match deps with

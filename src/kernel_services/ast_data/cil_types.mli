@@ -1693,6 +1693,7 @@ and acsl_extension_kind =
   | Ext_terms of term list
   | Ext_preds of predicate list
   (** a list of predicates, the most common case of for extensions *)
+  | Ext_annot of string * acsl_extension list
 
 (** Where are we expected to find corresponding extension keyword.
     @plugin development guide
