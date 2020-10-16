@@ -83,7 +83,7 @@ Prove: (Init_0[x]=true).
 
 Goal Check 'unknown' (file tests/wp_acsl/initialized_memtyped.i, line 13):
 Assume { (* Heap *) Type: (region(a.base) <= 0) /\ cinits(Init_0). }
-Prove: IsInitArray1_int(a, 2, Init_0).
+Prove: IsInitArray_sint32(a, 2, Init_0).
 
 ------------------------------------------------------------
 
@@ -117,7 +117,8 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
 }
-Prove: IsInitArray1_int(a, 2, Init_0[x <- true][shift_sint32(a, 0) <- true]).
+Prove: IsInitArray_sint32(a, 2,
+         Init_0[x <- true][shift_sint32(a, 0) <- true]).
 
 ------------------------------------------------------------
 
@@ -136,7 +137,7 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
 }
-Prove: IsInitArray1_int(a, 2,
+Prove: IsInitArray_sint32(a, 2,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
            <- true]).
 
@@ -165,7 +166,7 @@ Assume {
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
       (region(x.base) <= 0) /\ cinits(Init_0).
 }
-Prove: IsInitArray1_int(shiftfield_F2_C_a(c), 10,
+Prove: IsInitArray_sint32(shiftfield_F2_C_a(c), 10,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
            <- true][shiftfield_F2_C_x(c) <- true]).
 

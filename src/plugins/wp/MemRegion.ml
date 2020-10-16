@@ -428,7 +428,7 @@ let datatype = "MemRegion"
 
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _ -> t_index) in
+    let orig_pointer = Context.push Lang.pointer t_index in
     let orig_null = Context.push Cvalues.null p_inull in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;

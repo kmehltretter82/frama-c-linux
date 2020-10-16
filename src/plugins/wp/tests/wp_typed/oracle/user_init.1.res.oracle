@@ -795,7 +795,7 @@ Prove: true.
 Goal Post-condition (file tests/wp_typed/user_init.i, line 39) in 'init_t2_v1':
 Assume {
   (* Heap *)
-  Type: IsArray2_sint32(t2_1).
+  Type: IsArray_d2_sint32(t2_1).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
   (* Loop assigns 'lack,Zone_i' *)
@@ -816,7 +816,7 @@ Let m = t2_0[i].
 Assume {
   Type: is_uint32(i).
   (* Heap *)
-  Type: IsArray2_sint32(t2_1).
+  Type: IsArray_d2_sint32(t2_1).
   (* Goal *)
   When: (0 <= i_1) /\ (0 <= i_2) /\ (i_1 < to_uint32(1 + i)) /\ (i_2 <= 19).
   (* Loop assigns 'lack,Zone_i' *)
@@ -855,7 +855,7 @@ Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 
 Assume {
   Type: is_uint32(i).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Loop assigns 'lack,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((0 <= i_1) -> ((i_2 <= 9) ->
       ((i_1 <= 19) ->
@@ -893,7 +893,7 @@ Let m = t2_0[i].
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_1).
+  Type: IsArray_d2_sint32(t2_1).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < to_uint32(1 + j)).
   (* Loop assigns 'lack,Zone_i' *)
@@ -937,7 +937,7 @@ Let m = t2_0[i].
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_2).
+  Type: IsArray_d2_sint32(t2_2).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < i) /\ (0 <= i_2) /\ (i_2 <= 19).
   (* Loop assigns 'lack,Zone_i' *)
@@ -980,7 +980,7 @@ Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Loop assigns 'lack,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((0 <= i_1) -> ((i_2 <= 9) ->
       ((i_1 <= 19) ->
@@ -1037,7 +1037,7 @@ Effect at line 51
 Assume {
   Type: is_uint32(i_2).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (0 <= i_5) /\ (0 <= i_6) /\ (0 <= i) /\
       (0 <= i_1) /\ (i_3 <= 9) /\ (i_5 <= 9) /\ (i <= 9) /\ (i_4 <= 19) /\
@@ -1076,7 +1076,7 @@ Effect at line 58
 Assume {
   Type: is_uint32(i_2).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (0 <= i_5) /\ (0 <= i_6) /\ (0 <= i) /\
       (0 <= i_1) /\ (i_3 <= 9) /\ (i_5 <= 9) /\ (i <= 9) /\ (i_4 <= 19) /\
@@ -1120,7 +1120,7 @@ Effect at line 58
 Assume {
   Type: is_uint32(i_2) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (0 <= i_5) /\ (0 <= i_6) /\ (0 <= i) /\
       (0 <= i_1) /\ (i_3 <= 9) /\ (i_5 <= 9) /\ (i <= 9) /\ (i_4 <= 19) /\
@@ -1162,7 +1162,7 @@ Effect at line 59
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Goal *)
   When: (0 <= i) /\ (0 <= j) /\ (i <= 9) /\ (j <= 19).
   (* Loop assigns 'lack,Zone_i' *)
@@ -1211,7 +1211,7 @@ Assume {
   Have: i <= 9.
   Have: i_1 <= 19.
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Loop assigns 'lack,Zone_i' *)
   Have: forall i_5,i_4 : Z. ((0 <= i_5) -> ((0 <= i_4) -> ((i_5 <= 9) ->
       ((i_4 <= 19) ->
@@ -1227,7 +1227,7 @@ Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 5
 Assume {
   Type: is_uint32(i).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Loop assigns 'lack,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((0 <= i_1) -> ((i_2 <= 9) ->
       ((i_1 <= 19) ->
@@ -1264,7 +1264,7 @@ Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 5
 Assume {
   Type: is_uint32(i) /\ is_uint32(j).
   (* Heap *)
-  Type: IsArray2_sint32(t2_0).
+  Type: IsArray_d2_sint32(t2_0).
   (* Loop assigns 'lack,Zone_i' *)
   Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((0 <= i_1) -> ((i_2 <= 9) ->
       ((i_1 <= 19) ->
@@ -1680,8 +1680,8 @@ Prove: P_MemSet20(t2_0[i], 20, v).
 
 Goal Preservation of Invariant 'Partial_i' (file tests/wp_typed/user_init.i, line 108):
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
-      IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray_sint32(t2_0[i]).
   (* Goal *)
   When: (0 <= i_1) /\ (i_1 < to_uint32(1 + i)).
   (* Invariant 'Partial_i' *)
@@ -1705,8 +1705,8 @@ Prove: true.
 
 Goal Preservation of Invariant 'Range_i' (file tests/wp_typed/user_init.i, line 107):
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
-      IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray_sint32(t2_0[i]).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v_1))).
@@ -1729,8 +1729,8 @@ Prove: true.
 Goal Preservation of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
 Let m = v[j <- v_1].
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
-      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]) /\ IsArray1_sint32(m).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray_sint32(t2_0[i]) /\ IsArray_sint32(m).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v_1))).
@@ -1752,7 +1752,7 @@ Prove: P_MemSet20(m, to_uint32(1 + j), v_1).
 Goal Establishment of Invariant 'Partial_j' (file tests/wp_typed/user_init.i, line 114):
 Let m = t2_0[i].
 Assume {
-  Type: is_uint32(i) /\ is_sint32(v) /\ IsArray1_sint32(m).
+  Type: is_uint32(i) /\ is_sint32(v) /\ IsArray_sint32(m).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v))).
@@ -1767,8 +1767,8 @@ Prove: P_MemSet20(m, 0, v).
 
 Goal Preservation of Invariant 'Range_j' (file tests/wp_typed/user_init.i, line 113):
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
-      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray_sint32(t2_0[i]).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v_1))).
@@ -1810,8 +1810,8 @@ Prove: true.
 Goal Loop assigns 'tactic,Zone_i' (2/3):
 Effect at line 111
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i_2) /\ is_sint32(v_1) /\
-      IsArray1_sint32(t2_0[i_2]).
+  Type: IsArray_sint32(v) /\ is_uint32(i_2) /\ is_sint32(v_1) /\
+      IsArray_sint32(t2_0[i_2]).
   (* Goal *)
   When: (0 <= i_3) /\ (0 <= i_4) /\ (0 <= i_5) /\ (0 <= i) /\ (i_3 <= 9) /\
       (i_5 <= 9) /\ (i <= 9) /\ (i_4 <= 19).
@@ -1833,8 +1833,8 @@ Prove: exists i_7,i_6 : Z. (i_7 <= i) /\ (i_6 <= i_1) /\ (0 <= i_7) /\
 Goal Loop assigns 'tactic,Zone_i' (3/3):
 Effect at line 117
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
-      IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray_sint32(t2_0[i]).
   (* Goal *)
   When: (0 <= i) /\ (0 <= i_1) /\ (i <= 9) /\ (i_1 <= 19).
   (* Invariant 'Partial_i' *)
@@ -1884,8 +1884,8 @@ Prove: exists i_5,i_4 : Z. (i_5 <= i) /\ (i_4 <= i_1) /\ (0 <= i_5) /\
 
 Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 111):
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
-      IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_sint32(v_1) /\
+      IsArray_sint32(t2_0[i]).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v_1))).
@@ -1907,8 +1907,8 @@ Prove: true.
 
 Goal Decreasing of Loop variant at loop (file tests/wp_typed/user_init.i, line 117):
 Assume {
-  Type: IsArray1_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
-      is_sint32(v_1) /\ IsArray1_sint32(t2_0[i]).
+  Type: IsArray_sint32(v) /\ is_uint32(i) /\ is_uint32(j) /\
+      is_sint32(v_1) /\ IsArray_sint32(t2_0[i]).
   (* Invariant 'Partial_i' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       P_MemSet20(t2_0[i_1], 20, v_1))).

@@ -189,7 +189,7 @@ struct
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = M.value_footprint obj loc in
-          let result = Lang.tau_of_comp c in
+          let result = Lang.t_comp c in
           let lfun =
             Lang.generated_f ~result "Load%a_%s" pp_rid r (Lang.comp_id c)
           in
@@ -217,46 +217,72 @@ struct
   (* ---  Array Loader                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module ARRAY_KEY =
+  module AKEY =
   struct
-    type t = int * arrayinfo * Matrix.matrix
-    let pretty fmt (r,_,m) =
-      Format.fprintf fmt "%d:%a" r Matrix.NATURAL.pretty m
-    let compare (r1,_,m1) (r2,_,m2) =
-      if r1 = r2 then Matrix.NATURAL.compare m1 m2 else r1-r2
+    type t = int * base * Matrix.t
+    and base = I of c_int | F of c_float | P | C of compinfo
+    let make r elt ds =
+      let base = match elt with
+        | C_int i -> I i
+        | C_float f -> F f
+        | C_pointer _ -> P
+        | C_comp c -> C c
+        | C_array _ -> raise (Invalid_argument "Wp.EqArray")
+      in r, base , ds
+    let key = function
+      | I i -> Ctypes.i_name i
+      | F f -> Ctypes.f_name f
+      | P -> "ptr"
+      | C c -> Lang.comp_id c
+    let obj = function
+      | I i -> C_int i
+      | F f -> C_float f
+      | P -> C_pointer Cil.voidPtrType
+      | C c -> C_comp c
+    let tau = function
+      | I _ -> Lang.t_int
+      | F f -> Lang.t_float f
+      | P -> Lang.t_addr ()
+      | C c -> Lang.t_comp c
+    let compare (r,a,p) (s,b,q) =
+      if r = s then
+        let cmp = String.compare (key a) (key b) in
+        if cmp <> 0 then cmp else Matrix.compare p q
+      else r - s
+    let pretty fmt (r,a,ds) =
+      Format.fprintf fmt "%s%a%a" (key a) pp_rid r Matrix.pp_suffix_id ds
   end
 
-  module ARRAY = WpContext.Generator(ARRAY_KEY)
+  module ARRAY = WpContext.Generator(AKEY)
       (struct
         open Matrix
         let name = M.name ^ ".ARRAY"
-        type key = int * arrayinfo * Matrix.matrix
+        type key = AKEY.t
         type data = lfun * chunk list
 
-        let generate (r,ainfo,(obj_e,ds)) =
+        let generate (r,a,ds) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
           let v = e_var x in
-          let obj_a = C_array ainfo in
-          let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
-          let domain = M.value_footprint obj_a loc in
-          let result = Matrix.tau obj_e ds in
+          let obj = AKEY.obj a in
+          let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
+          let domain = M.value_footprint obj loc in
+          let result = Matrix.cc_tau (AKEY.tau a) ds in
           let lfun =
-            Lang.generated_f ~result "Array%a%s_%s"
-              pp_rid r (Matrix.id ds) (Matrix.natural_id obj_e)
-          in
+            Lang.generated_f ~result "Array%a_%s%a"
+              pp_rid r (AKEY.key a) Matrix.pp_suffix_id ds in
           let prefix = Lang.Fun.debug lfun in
           let name = prefix ^ "_access" in
           let xmem,chunks,sigma = signature domain in
-          let denv = Matrix.denv ds in
-          let phi = e_fun lfun (v :: denv.size_val @ List.map e_var xmem) in
-          let va = List.fold_left e_get phi denv.index_val in
-          let ofs = e_sum denv.index_offset in
-          let vm = !loadrec sigma obj_e (M.shift loc obj_e ofs) in
-          let lemma = p_hyps denv.index_range (p_equal va vm) in
+          let env = Matrix.cc_env ds in
+          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xmem) in
+          let va = List.fold_left e_get phi env.index_val in
+          let ofs = e_sum env.index_offset in
+          let vm = !loadrec sigma obj (M.shift loc obj ofs) in
+          let lemma = p_hyps env.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: denv.size_var @ xmem ;
+            d_params = x :: env.size_var @ xmem ;
             d_definition = Logic result ;
             d_cluster = cluster ;
           } ;
@@ -268,10 +294,10 @@ struct
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
-          if denv.monotonic then
+          if env.length <> None then
             begin
-              let ns = List.map F.e_var denv.size_var in
-              frame_lemmas lfun obj_a loc (v::ns) chunks
+              let ns = List.map F.e_var env.size_var in
+              frame_lemmas lfun obj loc (v::ns) chunks
             end ;
           lfun , chunks
 
@@ -288,10 +314,11 @@ struct
     F.e_fun f (p :: memories sigma m)
 
   let load_array sigma a loc =
-    let d = Matrix.of_array a in
     let r , p = M.to_region_pointer loc in
-    let f , m = ARRAY.get (r,a,d) in
-    F.e_fun f (p :: Matrix.size d @ memories sigma m)
+    let e , ns = Ctypes.array_dimensions a in
+    let ds = Matrix.of_dims ns in
+    let f , m = ARRAY.get @@ AKEY.make r e ds in
+    F.e_fun f (p :: Matrix.cc_dims ns @ memories sigma m)
 
   let loadvalue sigma obj loc =
     match obj with
@@ -318,19 +345,6 @@ struct
 
   let isinitrec = ref (fun _ _ _ -> assert false)
 
-  let initialization_lemma cluster name (sigma, obj, loc) (lfun, params) =
-    let high = p_call lfun (List.map F.e_var params) in
-    let low = M.is_init_range sigma obj loc e_one in
-    let lemma = p_equiv high low in
-    {
-      l_kind = `Axiom ;
-      l_name = name ^ "_low" ; l_types = 0 ;
-      l_forall = F.p_vars lemma ;
-      l_triggers = [] ;
-      l_lemma = lemma ;
-      l_cluster = cluster ;
-    }
-
   module IS_INIT_COMP = WpContext.Generator(COMP_KEY)
       (struct
         let name = M.name ^ ".IS_INIT_COMP"
@@ -339,69 +353,88 @@ struct
 
         let generate (r,c) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
-          let v = e_var x in
           let obj = C_comp c in
-          let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
+          let loc = M.of_region_pointer r obj (e_var x) in
           let domain = M.init_footprint obj loc in
           let cluster = cluster () in
-          (* Function Is_init *)
+          (* Is_init: structural definition *)
           let name =
             Format.asprintf "Is%s%a" (Lang.comp_init_id c) pp_rid r
           in
           let lfun = Lang.generated_p name in
           let xms,chunks,sigma = signature domain in
+          let params = x :: xms in
           let def = p_all
               (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
               c.cfields
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: xms ;
+            d_params = params ;
             d_definition = Predicate(Def , def) ;
             d_cluster = cluster ;
           } ;
-          (* Lemma for low-level view of the memory *)
-          Definitions.define_lemma
-            (initialization_lemma cluster name (sigma,obj,loc) (lfun,x::xms)) ;
+          (* Is_init: full-range definition *)
+          let is_init_p = p_call lfun (List.map e_var (x :: xms)) in
+          let is_init_r = M.is_init_range sigma obj loc e_one in
+          let lemma = p_equiv is_init_p is_init_r in
+          Definitions.define_lemma {
+            l_kind = `Axiom ;
+            l_name = name ^ "_range" ; l_types = 0 ;
+            l_forall = params ;
+            l_triggers = [] ;
+            l_lemma = lemma ;
+            l_cluster = cluster ;
+          } ;
           lfun , chunks
 
         let compile = Lang.local generate
       end)
 
-  module ARRAYINIT = WpContext.Generator(ARRAY_KEY)
+  module IS_ARRAY_INIT = WpContext.Generator(AKEY)
       (struct
         open Matrix
-        let name = M.name ^ ".ARRAYINIT"
-        type key = int * arrayinfo * Matrix.matrix
+        let name = M.name ^ ".IS_ARRAY_INIT"
+        type key = AKEY.t
         type data = lfun * chunk list
 
-        let generate (r,ainfo,(obj_e,ds)) =
+        let generate (r,a,ds) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
           let v = e_var x in
-          let obj_a = C_array ainfo in
-          let loc = M.of_region_pointer r obj_a v in (* t_pointer -> loc *)
-          let domain = M.init_footprint obj_a loc in
-          let name = Format.asprintf "IsInitArray%a%s_%s"
-              pp_rid r (Matrix.id ds) (Matrix.natural_id obj_e)
-          in
+          let obj = AKEY.obj a in
+          let loc = M.of_region_pointer r obj v in
+          let domain = M.init_footprint obj loc in
+          let name = Format.asprintf "IsInitArray%a_%s%a"
+              pp_rid r (AKEY.key a) Matrix.pp_suffix_id ds in
           let lfun = Lang.generated_p name in
           let xmem,chunks,sigma = signature domain in
-          let denv = Matrix.denv ds in
-          let ofs = e_sum denv.index_offset in
-          let vm = !isinitrec sigma obj_e (M.shift loc obj_e ofs) in
-          let def = p_forall denv.index_var (p_hyps denv.index_range vm) in
+          let env = Matrix.cc_env ds in
+          let params = x :: env.size_var @ xmem in
+          let ofs = e_sum env.index_offset in
+          let vm = !isinitrec sigma obj (M.shift loc obj ofs) in
+          let def = p_forall env.index_var (p_hyps env.index_range vm) in
           let cluster = cluster () in
+          (* Is_init: structural definition *)
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: denv.size_var @ xmem ;
+            d_params = params ;
             d_definition = Predicate (Def, def) ;
             d_cluster = cluster ;
           } ;
-          (* Lemma for low-level view of the memory *)
-          Definitions.define_lemma
-            (initialization_lemma cluster name
-               (sigma, obj_a, loc)
-               (lfun, x :: denv.size_var @ xmem)) ;
+          (* Is_init: range definition *)
+          begin match env.length with None -> () | Some len ->
+            let is_init_p = p_call lfun (List.map e_var params) in
+            let is_init_r = M.is_init_range sigma obj loc len in
+            let lemma = p_equiv is_init_p is_init_r in
+            Definitions.define_lemma {
+              l_kind = `Axiom ;
+              l_name = name ^ "_range" ; l_types = 0 ;
+              l_forall = params ;
+              l_triggers = [] ;
+              l_lemma = lemma ;
+              l_cluster = cluster ;
+            }
+          end ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -412,11 +445,12 @@ struct
     let f , m = IS_INIT_COMP.get (r,comp) in
     F.p_call f (p :: memories sigma m)
 
-  let initialized_array sigma a loc =
-    let d = Matrix.of_array a in
+  let initialized_array sigma ainfo loc =
     let r , p = M.to_region_pointer loc in
-    let f , m = ARRAYINIT.get (r,a,d) in
-    F.p_call f (p :: Matrix.size d @ memories sigma m)
+    let e , ns = Ctypes.array_dimensions ainfo in
+    let ds = Matrix.of_dims ns in
+    let f , m = IS_ARRAY_INIT.get @@ AKEY.make r e ds in
+    F.p_call f (p :: Matrix.cc_dims ns @ memories sigma m)
 
   let initialized_loc sigma obj loc =
     match obj with

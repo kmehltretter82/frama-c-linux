@@ -27,7 +27,6 @@
 open LogicUsage
 open Cil_types
 open Cil_datatype
-open Ctypes
 open Qed.Logic
 open Lang
 open Lang.F
@@ -255,11 +254,7 @@ let icompinfo c =
        in cluster.c_irecords <- [c] ; cluster)
     (Lang.comp_init_id c)
 
-let matrix = function
-  | C_array _ -> assert false
-  | C_comp c -> compinfo c
-  | C_int _ | C_float _ | C_pointer _ ->
-      cluster ~id:"Matrix" ~title:"Basic Arrays" ()
+let matrix () = cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
 let call_fun ~result lfun cc es =
   Symbol.compile (Lang.local cc) lfun ;
