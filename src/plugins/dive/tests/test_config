@@ -1,5 +1,6 @@
-# Just one test by C file since @PTEST_NUMBER@ is not used into the LOG name.
+COMMENT: Just one test by C file since @PTEST_NUMBER@ is not used into the LOG name.
+
 LOG: @PTEST_NAME@.dot
 PLUGIN: from inout eva variadic scope dive
-OPT: -check -eva-msg-key=-initial-state -eva-no-show-progress -dive-output-dot @PTEST_NAME@
+OPT: -journal-disable -eva-msg-key=-initial-state -eva-no-show-progress -dive-output-dot @PTEST_NAME@
 FILTER: perl -0777 -pe 's/\[server[^[]*//g'

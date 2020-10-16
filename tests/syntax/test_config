@@ -1,5 +1,10 @@
 COMMENT: this directory is meant to test exclusively the front-end
-COMMENT: (parser, type-checker, linker, syntactic transformations)
+COMMENT: (parser, type-checker, linker, syntactic transformations).
+COMMENT: by default, no analysis is performed since only the varadic plugin is
+COMMENT: used.
+COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
+COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
+
 PLUGIN: variadic
 OPT: -print -journal-disable -check
 FILEREG:.*\.\(c\|i\|ci\)$

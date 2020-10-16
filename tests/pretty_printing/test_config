@@ -1,5 +1,10 @@
-COMMENT: this directory is meant to test the parser and pretty-printer
+COMMENT: this directory is meant to test the parser and pretty-printer.
 COMMENT: the default option checks that pretty-printed code can be merged
-COMMENT: with the original one
+COMMENT: with the original one.
+COMMENT: by default, no analysis is performed (since the PLUGIN directive
+COMMENT: is empty).
+COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
+COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
+
 PLUGIN:
 OPT: -print -journal-disable -check -then -ocode ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then ocode_@PTEST_NUMBER@_@PTEST_NAME@.c @PTEST_FILE@ -ocode="" -print

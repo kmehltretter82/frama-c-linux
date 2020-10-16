@@ -1,2 +1,2 @@
 PLUGIN: slicing @EVA_CONFIG@
-OPT: @EVA_OPTIONS@
+OPT: @EVA_OPTIONS@ -journal-disable

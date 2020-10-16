@@ -1,2 +1,2 @@
 PLUGIN: loop-analysis
-OPT: -loop
+OPT: -loop -journal-disable 

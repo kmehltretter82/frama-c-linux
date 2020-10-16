@@ -1,2 +1,2 @@
 PLUGIN: from inout eva variadic scope
-OPT: -check -print -kernel-verbose 0 -variadic-verbose 2 -eva -eva-slevel 10 -eva-msg-key=-initial-state,-summary -eva-no-show-progress -eva-print
+OPT: -journal-disable -print -kernel-verbose 0 -variadic-verbose 2 -eva -eva-slevel 10 -eva-msg-key=-initial-state,-summary -eva-no-show-progress -eva-print

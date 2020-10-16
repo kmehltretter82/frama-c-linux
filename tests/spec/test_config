@@ -1,6 +1,10 @@
-COMMENT: for now, this directory mainly tests the annotations syntax,
-COMMENT: no analysis is performed.
+COMMENT: for now, this directory mainly tests the annotations syntax.
 COMMENT: we continue on annotation errors, as this allows to put
 COMMENT: various variations of the same test in one file.
+COMMENT: by default, no analysis is performed (since the PLUGIN directive
+COMMENT: is empty).
+COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
+COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
+
 PLUGIN:
 OPT: -pp-annot -print -journal-disable -kernel-warn-key=annot-error=active -check

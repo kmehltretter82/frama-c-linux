@@ -170,10 +170,10 @@ force-reconfigure:
 
 # todo: adds bugs?
 # todo: adds crowbar?
-# todo: adds dynamic_plugin?
-# todo: adds fc_script
+# todo: adds dynamic_plugin? No, will be removed from master branch.
+# todo: adds fc_script (waiting for a fix in scripts of share/analysis-scripts/)
 # todo: adds make_run_script
-# todo: adds more_wp
+# todo: adds more_wp?
 # todo: adds value/numerors? (requires opam package mlgmpidl and system libraries for MPFR)
 # todo: adds verisec
 # todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
