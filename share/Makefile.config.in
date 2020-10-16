@@ -159,7 +159,7 @@ HAVE_BUILTIN_VA_LIST ?=@HAVE_BUILTIN_VA_LIST@
 # test directories for ptests configuration
 # Non-plugin test directories containing some ML files to compile
 TEST_DIRS_AS_PLUGIN:=\
-  dynamic dynamic_plugin journal saveload spec misc syntax cil \
+  dynamic journal saveload spec misc syntax cil \
   pretty_printing builtins libc value
 
 ifeq ($(HAS_PYTHON36),yes)
