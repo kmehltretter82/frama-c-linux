@@ -322,9 +322,10 @@ let apply env node jtactic subscripts =
   | Some fork ->
       let _,children = ProofEngine.commit fork in
       reconcile children subscripts ; (*TODO: saveback forgiven script ? *)
-      List.filter
-        (fun (_,node) -> not (ProofEngine.proved node))
-        children
+      let ok = List.for_all
+          (fun (_,node) -> ProofEngine.proved node)
+          children in
+      if ok then [] else children
 
 (* -------------------------------------------------------------------------- *)
 (* --- Script Crawling                                                    --- *)
