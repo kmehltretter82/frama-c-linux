@@ -1,0 +1,13 @@
+[ { "prover": "script", "verdict": "valid", "time": 0.0549, "steps": 117 },
+  { "header": "Induction", "tactic": "Wp.induction",
+    "params": { "base": 0, "hsup": true, "hinf": true },
+    "select": { "select": "inside-goal", "occur": 0, "target": "(L_f x_0)",
+                "pattern": "L_f$x" },
+    "children": { "Base": [ { "prover": "Alt-Ergo:2.2.0", "verdict": "valid",
+                              "time": 0.0083, "steps": 6 } ],
+                  "Induction (sup)": [ { "prover": "Alt-Ergo:2.2.0",
+                                         "verdict": "valid", "time": 0.0549,
+                                         "steps": 117 } ],
+                  "Induction (inf)": [ { "prover": "Alt-Ergo:2.2.0",
+                                         "verdict": "valid", "time": 0.0274,
+                                         "steps": 86 } ] } } ]
