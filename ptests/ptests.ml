@@ -558,7 +558,7 @@ let default_config () =
     dc_load_module = [];
     dc_filter = None ;
     dc_default_toplevel = "@frama-c@";
-    dc_toplevels = [ "frama-c", default_options, [], Macros.empty, "" ];
+    dc_toplevels = [ "@frama-c@", "", [], Macros.empty, "" ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -948,6 +948,7 @@ let basic_command_string command =
            command.load_module) in
     String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules]
   in
+  let macros = Macros.add_list [ "OPTIONS", "" ] macros in
   let options = Macros.expand macros command.options in
   let macros =
     Macros.add_list [ "OPTIONS", options;
@@ -955,7 +956,7 @@ let basic_command_string command =
                     ] macros in
   let file = Filename.sanitize @@ get_ptest_file command in
   let options =
-    String.concat " " [file;plugins_options;options]
+    String.concat " " [default_options;file;plugins_options;options]
   in
   let macros = Macros.add_list [
       "FRAMA_C_DEFAULT_OPTIONS",options;

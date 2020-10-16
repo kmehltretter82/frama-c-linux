@@ -46,7 +46,7 @@
 [sparecode] look for annotations in function print
 [pdg] computing for function print
 [from] Computing for function print
-[kernel:annot:missing-spec] top.i:11: Warning: 
+[kernel:annot:missing-spec] top.i:22: Warning: 
   Neither code nor specification for function print, generating default assigns from the prototype
 [from] Done for function print
 [pdg] done for function print
