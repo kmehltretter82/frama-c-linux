@@ -26,7 +26,7 @@ let frama_c_sarif () =
   let name = "frama-c" in
   let version, semanticVersion =
     if Mdr_params.SarifDeterministic.get () then
-      "omitted-for-deterministic-output", ""
+      "0+omitted-for-deterministic-output", ""
     else
       Fc_config.version_and_codename, Fc_config.version
   in
@@ -234,7 +234,7 @@ let gen_run remarks =
     List.fold_left (fun acc (name, dir) ->
         let baseUri =
           if Mdr_params.SarifDeterministic.get () then
-            "omitted-for-deterministic-output/"
+            "file:///omitted-for-deterministic-output/"
           else  "file://" ^ dir ^ "/"
         in
         (name, `Assoc [("uri", `String baseUri)]) :: acc

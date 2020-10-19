@@ -7,8 +7,8 @@
       "tool": {
         "driver": {
           "name": "frama-c",
-          "fullName": "frama-c-omitted-for-deterministic-output",
-          "version": "omitted-for-deterministic-output",
+          "fullName": "frama-c-0+omitted-for-deterministic-output",
+          "version": "0+omitted-for-deterministic-output",
           "downloadUri": "https://frama-c.com/download.html",
           "informationUri": "https://frama-c.com"
         }
@@ -29,10 +29,14 @@
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": { "uri": "omitted-for-deterministic-output/" },
-        "FRAMAC_LIB": { "uri": "omitted-for-deterministic-output/" },
-        "FRAMAC_PLUGIN": { "uri": "omitted-for-deterministic-output/" },
-        "PWD": { "uri": "omitted-for-deterministic-output/" }
+        "FRAMAC_SHARE": {
+          "uri": "file:///omitted-for-deterministic-output/"
+        },
+        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
+        "FRAMAC_PLUGIN": {
+          "uri": "file:///omitted-for-deterministic-output/"
+        },
+        "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {
