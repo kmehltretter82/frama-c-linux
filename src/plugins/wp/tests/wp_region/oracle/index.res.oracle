@@ -1,4 +1,4 @@
 [kernel] Parsing index.i (no preprocessing)
-[wp] Region Graph: result/index/region/job.dot
+[wp] Region Graph: index/region/job.dot
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
