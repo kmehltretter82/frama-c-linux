@@ -219,3 +219,27 @@ for header in chevron_includes:
             non_posix_headers.append(header)
             print(f"- warning: included non-POSIX header <{header}>")
 print(f"Header-related warnings: {len(non_posix_headers)}")
+
+
+# dynamic allocation
+
+dynalloc_functions = set(["malloc", "calloc", "free", "realloc", "alloca", "mmap"])
+dyncallees = dynalloc_functions.intersection(callees)
+if dyncallees:
+    print(f"- note: calls to dynamic allocation functions: {', '.join(sorted(dyncallees))}")
+
+
+# unsupported C11-specific features
+
+c11_unsupported = ["_Alignas", "_Alignof", "_Generic", "_Static_assert"]
+
+for keyword in c11_unsupported:
+    out = subprocess.Popen(["grep", "-n", '\\b' + keyword + '\\b'] + files + ["/dev/null"],
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    lines = out.communicate()[0].decode('utf-8').splitlines()
+    if lines:
+        n = len(lines)
+        print(f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of unsupported C11 construct '{keyword}'")
+
+# TODO:
+# - detect absence of 'main' function (library)
