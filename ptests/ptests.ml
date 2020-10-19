@@ -20,10 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** the options to launch the toplevel with if the test file is not
-     annotated with test options *)
-let default_options = "-journal-disable -check"
-
 module Filename = struct
   include Filename
   let concat =
@@ -548,7 +544,7 @@ type config =
 
 let default_macros () = Macros.add_list 
   [ "PLUGIN", "" ;
-    "DEFAULT_OPTIONS", default_options;
+    "DEFAULT_OPTIONS", "-journal-disable -check"; (* the options automatically added by the use of @frama-c@ in CMD and EXECNOW command.  *)
     "OPTIONS", "";
   ] Macros.empty
 
@@ -609,7 +605,7 @@ let scan_execnow ~once dir ex_timeout (s:string) =
 let current_default_toplevel = ref "frama-c"
 let current_default_log = ref []
 let current_default_cmds =
-  ref ["frama-c",default_options,[], Macros.empty, ""]
+  ref ["frama-c", "@DEFAULT_OPTIONS@", [], Macros.empty, ""]
 
 let make_custom_opts =
   let space = Str.regexp " " in
@@ -964,6 +960,7 @@ let basic_command_string command =
     ] macros in
 
   let toplevel, macros= if contains_framac_macro command.toplevel then
+     (* in such a case, OPTIONS are automatically added at the end of the current CMD *)
      let toplevel = String.concat " " [command.toplevel ; "@OPTIONS@"]
      and macros =
        Macros.add_list [
@@ -974,10 +971,7 @@ let basic_command_string command =
     command.toplevel, macros
   in
 
-  let toplevel =
-    Macros.expand macros toplevel
-  in
-  let raw_command = toplevel in
+  let raw_command = Macros.expand macros toplevel in
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
