@@ -7,9 +7,8 @@
       "tool": {
         "driver": {
           "name": "frama-c",
-          "fullName": "frama-c-21.1+dev (Scandium)",
-          "version": "21.1+dev (Scandium)",
-          "semanticVersion": "21.1+dev",
+          "fullName": "frama-c-0+omitted-for-deterministic-output",
+          "version": "0+omitted-for-deterministic-output",
           "downloadUri": "https://frama-c.com/download.html",
           "informationUri": "https://frama-c.com"
         }
@@ -37,26 +36,36 @@
         },
         {
           "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc",
+            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_eva.sav",
+            "-check", "-load", "tests/sarif/result/cwe125_eva.sav", "-then",
             "-mdr-out", "tests/sarif/result/cwe125.sarif", "-mdr-gen",
-            "sarif", "-mdr-no-print-libc"
+            "sarif", "-mdr-no-print-libc", "-mdr-sarif-deterministic"
+          ],
+          "exitCode": 0,
+          "executionSuccessful": true
+        },
+        {
+          "commandLine":
+            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+          "arguments": [
+            "-check", "-load", "tests/sarif/result/cwe125_eva.sav", "-then",
+            "-mdr-out", "tests/sarif/result/cwe125.sarif", "-mdr-gen",
+            "sarif", "-mdr-no-print-libc", "-mdr-sarif-deterministic"
           ],
           "exitCode": 0,
           "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {
-        "FRAMAC_SHARE": { "uri": "file:///home/andr/git/frama-c-2/share/" },
-        "FRAMAC_LIB": { "uri": "file:///home/andr/git/frama-c-2/lib/fc/" },
-        "FRAMAC_PLUGIN": {
-          "uri": "file:///home/andr/git/frama-c-2/lib/plugins/"
+        "FRAMAC_SHARE": {
+          "uri": "file:///omitted-for-deterministic-output/"
         },
-        "PWD": {
-          "uri":
-            "file:///home/andr/git/frama-c-2/src/plugins/markdown-report/"
-        }
+        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
+        "FRAMAC_PLUGIN": {
+          "uri": "file:///omitted-for-deterministic-output/"
+        },
+        "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [
         {

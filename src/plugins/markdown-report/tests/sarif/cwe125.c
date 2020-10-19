@@ -2,7 +2,7 @@
 NOFRAMAC: use execnow for proper sequencing of executions
 EXECNOW: @frama-c@ @PTEST_FILE@ -save @PTEST_DIR@/result/@PTEST_NAME@_parse.sav
 EXECNOW: @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_parse.sav -eva -save @PTEST_DIR@/result/@PTEST_NAME@_eva.sav
-EXECNOW: LOG @PTEST_NAME@.sarif @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_eva.sav -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc
+EXECNOW: LOG @PTEST_NAME@.sarif @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_eva.sav -then -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic
 */
 #include "__fc_builtin.h"
 
