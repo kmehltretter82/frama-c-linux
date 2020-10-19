@@ -810,7 +810,7 @@ src/plugins/gui/analyses_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/analyses_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/debug_manager.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/debug_manager.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/debug_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.mli: CEA_LGPL_OR_PROPRIETARY
