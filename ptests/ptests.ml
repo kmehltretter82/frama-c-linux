@@ -552,6 +552,9 @@ let default_macros () = Macros.add_list
     "OPTIONS", "";
   ] Macros.empty
 
+let framac_macro = "@frama-c@"
+let contains_framac_macro s = Str.string_match (Str.regexp (Str.quote "@frama-c@")) s 0
+
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
     dc_macros = default_macros ();
@@ -561,8 +564,8 @@ let default_config () =
     dc_plugins = [];
     dc_load_module = [];
     dc_filter = None ;
-    dc_default_toplevel = "@frama-c@";
-    dc_toplevels = [ "@frama-c@", "", [], Macros.empty, "" ];
+    dc_default_toplevel = framac_macro;
+    dc_toplevels = [ framac_macro, "", [], Macros.empty, "" ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -946,27 +949,33 @@ let get_macros cmd =
 let basic_command_string command =
   let file = Filename.sanitize @@ get_ptest_file command in
   let macros = get_macros command in
+  command.log_files <- List.map (Macros.expand macros) command.log_files;
   let expanded_plugins_options =
     let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
     let opt_modules = String.concat " "
         (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
            command.load_module) in
     String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules]
-  and expanded_options = Macros.expand macros command.options
-  and expanded_default_options = Macros.expand macros "@DEFAULT_OPTIONS@" in
-  let expanded_cmd_options =
-    String.concat " " [file;expanded_default_options;expanded_plugins_options;expanded_options]
-  in
+  and expanded_options = Macros.expand macros command.options in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
       "OPTIONS", expanded_options;
       "PLUGIN_OPTIONS", expanded_plugins_options;
-      "frama-c", "frama-c "^expanded_cmd_options;
     ] macros in
-  let logfiles = List.map (Macros.expand macros) command.log_files in
-  command.log_files <- logfiles;
+
+  let toplevel, macros= if contains_framac_macro command.toplevel then
+     let toplevel = String.concat " " [command.toplevel ; "@OPTIONS@"]
+     and macros =
+       Macros.add_list [
+      "frama-c", (String.concat " " [ "frama-c" ; "@DEFAULT_OPTIONS@" ; expanded_plugins_options ; file ])
+    ] macros in
+    toplevel, macros
+  else
+    command.toplevel, macros
+  in
+
   let toplevel =
-    Macros.expand macros command.toplevel
+    Macros.expand macros toplevel
   in
   let raw_command = toplevel in
   if command.timeout = "" then raw_command
