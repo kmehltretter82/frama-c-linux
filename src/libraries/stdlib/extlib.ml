@@ -330,10 +330,7 @@ let xor x y = if x then not y else y
 (** {2 Performance} *)
 (* ************************************************************************* *)
 
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external address_of_value: 'a -> int = "address_of_value" "noalloc"
-[@@@ warning "+3"]
+external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 
 (* ************************************************************************* *)
 (** {2 Exception catcher} *)

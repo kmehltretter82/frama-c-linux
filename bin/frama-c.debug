@@ -33,7 +33,6 @@ fi
 
 OCAML_VERSION=$(ocamlc -version)
 case $OCAML_VERSION in
-4.05*|4.06*|4.07*) DYNLINK='load_printer "dynlink.cma"';;
 4.08*)
     echo "impossible to load dynlink in ocamldebug for version $OCAML_VERSION";
     echo "pretty-printers will not be loaded";
