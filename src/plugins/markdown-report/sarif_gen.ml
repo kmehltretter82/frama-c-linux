@@ -22,14 +22,20 @@
 
 open Sarif
 
-let frama_c_sarif =
+let frama_c_sarif () =
   let name = "frama-c" in
-  let version = Fc_config.version_and_codename in
-  let semanticVersion = Fc_config.version in
+  let version, semanticVersion =
+    if Mdr_params.SarifDeterministic.get () then
+      "0+omitted-for-deterministic-output", ""
+    else
+      Fc_config.version_and_codename, Fc_config.version
+  in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
+  let informationUri = "https://frama-c.com" in
   Tool.create
-    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri ())
+    (Driver.create ~name ~version ~semanticVersion ~fullName ~downloadUri
+       ~informationUri ())
 
 let get_remarks () =
   let f = Mdr_params.Remarks.get () in
@@ -53,6 +59,9 @@ module Analysis_cmdline =
 
 let gen_invocation () =
   let cl = Analysis_cmdline.get () in
+  (* The first argument is _always_ the binary name, but to avoid printing it
+     as an absolute path to binlevel.opt, we replace it with 'frama-c' *)
+  let cl = "frama-c" :: List.tl cl in
   let commandLine = String.concat " " cl in
   let arguments = List.tl cl in
   Invocation.create ~commandLine ~arguments ()
@@ -107,27 +116,51 @@ let make_message alarm annot remark =
   in
   Message.create ~text ~markdown ()
 
+let kf_is_in_libc kf =
+  let g = Kernel_function.get_global kf in
+  Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g)
+
+let ip_is_in_libc ip =
+  match Property.get_kf ip with
+  | None ->
+    (* possibly an identified lemma; check its attributes *)
+    begin
+      match ip with
+      | IPAxiomatic {iax_attrs=attrs}
+      | IPLemma {il_attrs=attrs}
+      | IPAxiom {il_attrs=attrs} ->
+        Cil.hasAttribute "fc_stdlib" attrs
+      | _ ->
+        false
+    end
+  | Some kf ->
+    kf_is_in_libc kf
+
 let opt_physical_location_of_loc loc =
   if loc = Cil_datatype.Location.unknown then []
   else [ Location.of_loc loc ]
-
+(* Cil_types *)
 let gen_results remarks =
   let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
-    let prop = Property.ip_of_code_annot_single kf s annot in
-    let ruleId = Alarms.get_name alarm in
-    let rules =
-      Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
-    in
-    let label = "Alarm-" ^ string_of_int i in
-    let kind = kind_of_status (Property_status.Feedback.get prop) in
-    let level = level_of_status (Property_status.Feedback.get prop) in
-    let remark = get_remark remarks label in
-    let message = make_message alarm annot remark in
-    let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
-    let res =
-      Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
-    in
-    (i+1, rules, res :: content)
+    if not (Mdr_params.PrintLibc.get ()) && kf_is_in_libc kf then
+      (* skip alarm in libc *)
+      (i, rules, content)
+    else
+      let prop = Property.ip_of_code_annot_single kf s annot in
+      let ruleId = Alarms.get_name alarm in
+      let rules =
+        Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
+      in
+      let label = "Alarm-" ^ string_of_int i in
+      let kind = kind_of_status (Property_status.Feedback.get prop) in
+      let level = level_of_status (Property_status.Feedback.get prop) in
+      let remark = get_remark remarks label in
+      let message = make_message alarm annot remark in
+      let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
+      let res =
+        Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
+      in
+      (i+1, rules, res :: content)
   in
   let _, rules, content =
     Alarms.fold treat_alarm (0, Datatype.String.Map.empty,[])
@@ -153,14 +186,18 @@ let gen_status ip =
 
 let gen_statuses () =
   let f ip content =
-    if is_alarm ip then content else (gen_status ip) :: content
+    let exclude =
+      is_alarm ip ||
+      (not (Mdr_params.PrintLibc.get ()) && ip_is_in_libc ip)
+    in
+    if exclude then content else (gen_status ip) :: content
   in
   List.rev (Property_status.fold f [])
 
 let gen_artifacts () =
   let add_src_file f =
-    let uri = (f:Filepath.Normalized.t :> string) in
-    let location = ArtifactLocation.create ~uri () in
+    let uriBaseId, uri = Filepath.Normalized.to_base_uri f in
+    let location = ArtifactLocation.create ~uri ?uriBaseId () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
     Artifact.create ~location ~roles ~mimeType ()
@@ -176,7 +213,7 @@ let add_rule id desc l =
 let make_taxonomies rules = Datatype.String.Map.fold add_rule rules []
 
 let gen_run remarks =
-  let tool = frama_c_sarif in
+  let tool = frama_c_sarif () in
   let name = "frama-c" in
   let invocations = [gen_invocation ()] in
   let rules, results = gen_results remarks in
@@ -192,7 +229,24 @@ let gen_run remarks =
   let taxonomies = [ToolComponent.create ~name ~rules ()] in
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
-  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts ()
+  let uriBases = ("PWD", Sys.getcwd ()) :: Filepath.all_symbolic_dirs () in
+  let uriBasesJson =
+    List.fold_left (fun acc (name, dir) ->
+        let baseUri =
+          if Mdr_params.SarifDeterministic.get () then
+            "file:///omitted-for-deterministic-output/"
+          else  "file://" ^ dir ^ "/"
+        in
+        (name, `Assoc [("uri", `String baseUri)]) :: acc
+      ) [] uriBases
+  in
+  let originalUriBaseIds =
+    match ArtifactLocationDictionary.of_yojson (`Assoc uriBasesJson) with
+    | Ok x -> x
+    | Error s -> failwith s
+  in
+  Run.create ~tool ~invocations ~results ~taxonomies ~artifacts
+    ~originalUriBaseIds ()
 
 let generate () =
   let remarks = get_remarks () in
