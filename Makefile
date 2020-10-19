@@ -2280,9 +2280,13 @@ PLUGIN_DEP_LIST:=$(PLUGIN_LIST)
 
 .PHONY: depend
 
+# tell make not to remove generated files even if they are only a byproduct
+# of making .depend.
+.PRECIOUS: $(GENERATED) share/Makefile.dynamic_config
+
 # in case .depend is absent, we will make it. Otherwise, it will be left
 # untouched. Only make depend will force a recomputation of dependencies
-.depend:
+.depend: $(GENERATED) share/Makefile.dynamic_config
 	$(MAKE) depend
 
 depend:: $(GENERATED) share/Makefile.dynamic_config
