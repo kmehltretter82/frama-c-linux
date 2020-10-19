@@ -1,7 +1,7 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_manual/manual.i (no preprocessing)
-[kernel] Parsing tests/wp_manual/working_dir/swap.c (with preprocessing)
-[kernel] Parsing tests/wp_manual/working_dir/swap2.h (with preprocessing)
+[kernel] Parsing manual.i (no preprocessing)
+[kernel] Parsing working_dir/swap.c (with preprocessing)
+[kernel] Parsing working_dir/swap2.h (with preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function swap
 [wp] 8 goals scheduled

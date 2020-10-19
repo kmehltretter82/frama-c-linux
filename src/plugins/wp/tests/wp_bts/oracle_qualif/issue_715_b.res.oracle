@@ -1,7 +1,7 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/issue_715_b.i (no preprocessing)
+[kernel] Parsing issue_715_b.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel] tests/wp_bts/issue_715_b.i:9: Warning: 
+[kernel] issue_715_b.i:9: Warning: 
   No code nor implicit assigns clause for function dummy, generating default assigns from the prototype
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled

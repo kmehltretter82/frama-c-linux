@@ -14,15 +14,15 @@
             by Wp.typed.
 [  Valid  ] Post-condition 'B'
             by Wp.typed.
-[  Valid  ] Assigns (file tests/wp_manual/working_dir/swap2.h, line 4)
+[  Valid  ] Assigns (file working_dir/swap2.h, line 4)
             by Wp.typed.
-[  Valid  ] Assertion 'rte,mem_access' (file tests/wp_manual/working_dir/swap.c, line 3)
+[  Valid  ] Assertion 'rte,mem_access' (file working_dir/swap.c, line 3)
             by Wp.typed.
-[  Valid  ] Assertion 'rte,mem_access' (file tests/wp_manual/working_dir/swap.c, line 4)
+[  Valid  ] Assertion 'rte,mem_access' (file working_dir/swap.c, line 4)
             by Wp.typed.
-[  Valid  ] Assertion 'rte,mem_access' (file tests/wp_manual/working_dir/swap.c, line 4)
+[  Valid  ] Assertion 'rte,mem_access' (file working_dir/swap.c, line 4)
             by Wp.typed.
-[  Valid  ] Assertion 'rte,mem_access' (file tests/wp_manual/working_dir/swap.c, line 5)
+[  Valid  ] Assertion 'rte,mem_access' (file working_dir/swap.c, line 5)
             by Wp.typed.
 [  Valid  ] Default behavior
             by Frama-C kernel.

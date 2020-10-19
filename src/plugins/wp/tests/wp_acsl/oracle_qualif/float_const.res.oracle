@@ -1,6 +1,6 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/float_const.i (no preprocessing)
-[kernel:parser:decimal-float] tests/wp_acsl/float_const.i:10: Warning: 
+[kernel] Parsing float_const.i (no preprocessing)
+[kernel:parser:decimal-float] float_const.i:10: Warning: 
   Floating-point constant 0.1f is not represented exactly. Will use 0x1.99999a0000000p-4.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [wp] Running WP plugin...

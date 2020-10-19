@@ -1,7 +1,7 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/dynamic.i (no preprocessing)
+[kernel] Parsing dynamic.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] tests/wp_plugin/dynamic.i:78: Warning: Missing 'calls' for default behavior
+[wp] dynamic.i:78: Warning: Missing 'calls' for default behavior
 [wp] Warning: Missing RTE guards
 [wp] 51 goals scheduled
 [wp] [Alt-Ergo] Goal typed_call_call_point_f1_f2_s3 : Valid

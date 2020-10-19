@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/initialized_memvar.i (no preprocessing)
+[kernel] Parsing initialized_memvar.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 54 goals scheduled

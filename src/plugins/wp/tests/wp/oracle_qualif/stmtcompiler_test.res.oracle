@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp/stmtcompiler_test.i (no preprocessing)
-[kernel] tests/wp/stmtcompiler_test.i:136: Warning: 
+[kernel] Parsing stmtcompiler_test.i (no preprocessing)
+[kernel] stmtcompiler_test.i:136: Warning: 
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
-[kernel] tests/wp/stmtcompiler_test.i:145: Warning: 
+[kernel] stmtcompiler_test.i:145: Warning: 
   No code nor implicit assigns clause for function behavior1, generating default assigns from the prototype
 [wp] Warning: Missing RTE guards
-[wp] tests/wp/stmtcompiler_test.i:81: Warning: 
+[wp] stmtcompiler_test.i:81: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 27 goals scheduled
 [wp] [Qed] Goal typed_empty_assert : Valid

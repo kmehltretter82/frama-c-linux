@@ -1,5 +1,5 @@
 # frama-c -wp -wp-no-let -wp-timeout 45 -wp-steps 1500 [...]
-[kernel] Parsing tests/wp_plugin/bool.i (no preprocessing)
+[kernel] Parsing bool.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
@@ -14,8 +14,8 @@
 [wp] Proved goals:    3 / 7
   Qed:               2 
   Alt-Ergo 2.0.0:    1  (unsuccess: 4)
-[wp] Report in:  'tests/wp_plugin/oracle_qualif/bool.0.report.json'
-[wp] Report out: 'tests/wp_plugin/result_qualif/bool.0.report.json'
+[wp] Report in:  'oracle_qualif/bool.0.report.json'
+[wp] Report out: 'result_qualif/bool.0.report.json'
 -------------------------------------------------------------
 Functions           WP     Alt-Ergo        Total   Success
 job                 -      -                 1       0.0%

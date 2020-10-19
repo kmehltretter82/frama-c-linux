@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/convert.i (no preprocessing)
+[kernel] Parsing convert.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: native support for alt-ergo is deprecated, use why3 instead
 [wp] 2 goals scheduled

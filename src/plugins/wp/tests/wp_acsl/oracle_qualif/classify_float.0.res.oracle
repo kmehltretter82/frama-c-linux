@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/classify_float.c (with preprocessing)
+[kernel] Parsing classify_float.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] 3 goals scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_InfN_not_finite : Valid

@@ -1,10 +1,10 @@
 # frama-c -wp -wp-steps 50 [...]
-[kernel] Parsing tests/wp/wp_behav.c (with preprocessing)
+[kernel] Parsing wp_behav.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] tests/wp/wp_behav.c:172: Warning: 
+[wp] wp_behav.c:172: Warning: 
   Ignored specification 'for b1' (generalize to all behavior)
 [wp] Warning: Missing RTE guards
-[wp] tests/wp/wp_behav.c:69: Warning: 
+[wp] wp_behav.c:69: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 8 goals scheduled
 [wp] [Alt-Ergo] Goal typed_f_ensures_qed_ko : Unsuccess

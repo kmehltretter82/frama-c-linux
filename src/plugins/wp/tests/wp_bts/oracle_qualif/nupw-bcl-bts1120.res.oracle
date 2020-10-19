@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/nupw-bcl-bts1120.i (no preprocessing)
+[kernel] Parsing nupw-bcl-bts1120.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal unreachable_smt_with_contract_assigns : Valid (Unreachable)
 [wp] [CFG] Goal unreachable_smt_with_contract_exits_ok : Valid (Unreachable)

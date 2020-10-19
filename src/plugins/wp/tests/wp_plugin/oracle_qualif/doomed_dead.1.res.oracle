@@ -1,5 +1,5 @@
 # frama-c -wp -wp-split [...]
-[kernel] Parsing tests/wp_plugin/doomed_dead.i (no preprocessing)
+[kernel] Parsing doomed_dead.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 48 goals scheduled
@@ -20,7 +20,7 @@
 [wp] [Passed] Smoke-test typed_f2_ko_wp_smoke_dead_code_s22
 [wp] [Failed] Smoke-test typed_f2_ko_wp_smoke_dead_code_s23
        Qed: Valid
-[wp] tests/wp_plugin/doomed_dead.i:44: Warning: Failed smoke-test
+[wp] doomed_dead.i:44: Warning: Failed smoke-test
 [wp] [Passed] Smoke-test typed_f2_ko_wp_smoke_dead_code_s26
 [wp] [Qed] Goal typed_f2_ko_assigns_exit : Valid
 [wp] [Qed] Goal typed_f2_ko_assigns_normal_part1 : Valid
@@ -48,7 +48,7 @@
 [wp] [Passed] Smoke-test typed_f5_ko_wp_smoke_dead_code_s56
 [wp] [Failed] Smoke-test typed_f5_ko_wp_smoke_dead_code_s61
        Qed: Valid
-[wp] tests/wp_plugin/doomed_dead.i:90: Warning: Failed smoke-test
+[wp] doomed_dead.i:90: Warning: Failed smoke-test
 [wp] [Passed] Smoke-test typed_f5_ko_wp_smoke_dead_code_s63
 [wp] [Passed] Smoke-test typed_f5_ko_wp_smoke_dead_code_s65
 [wp] [Qed] Goal typed_f5_ko_assigns_part1 : Valid
