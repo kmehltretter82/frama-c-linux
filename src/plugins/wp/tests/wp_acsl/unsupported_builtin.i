@@ -1,5 +1,5 @@
 /* run.config
-  OPT: -load-module @PTEST_DIR@/@PTEST_NAME@.ml
+  MODULE: @PTEST_NAME@.cmxs
 */
 /* run.config_qualif
   DONTRUN:

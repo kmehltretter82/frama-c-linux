@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/boolean.i (no preprocessing)
+[kernel] Parsing boolean.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
@@ -11,7 +11,7 @@
   Function u8_is_continue
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/boolean.i, line 12) in 'u8_is_continue':
+Goal Post-condition (file boolean.i, line 12) in 'u8_is_continue':
 Assume {
   Type: is_uint8(b) /\ is_sint32(u8_is_continue_0).
   If 128 <= b

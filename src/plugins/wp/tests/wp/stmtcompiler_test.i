@@ -1,7 +1,7 @@
 /* run.config
-   OPT: -load-script tests/wp/stmtcompiler_test.ml -wp-msg-key shell
+   MODULE: stmtcompiler_test.cmxs
+   OPT: -wp-msg-key shell
 */
-
 int empty (int c){
   /*@ assert \true; */
   return c;

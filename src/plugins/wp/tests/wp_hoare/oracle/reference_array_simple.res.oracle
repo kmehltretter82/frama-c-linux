@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/reference_array_simple.i (no preprocessing)
+[kernel] Parsing reference_array_simple.i (no preprocessing)
 [wp] Running WP plugin...
 .................................................
 ... Ref Usage
@@ -17,7 +17,7 @@ Function call_f3: { tp tmp }
   Function call_f1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/reference_array_simple.i, line 14) in 'call_f1':
+Goal Post-condition (file reference_array_simple.i, line 14) in 'call_f1':
 Prove: true.
 
 ------------------------------------------------------------
@@ -25,7 +25,7 @@ Prove: true.
   Function call_f2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/reference_array_simple.i, line 25) in 'call_f2':
+Goal Post-condition (file reference_array_simple.i, line 25) in 'call_f2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -33,7 +33,7 @@ Prove: true.
   Function call_f3
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/reference_array_simple.i, line 39) in 'call_f3':
+Goal Post-condition (file reference_array_simple.i, line 39) in 'call_f3':
 Prove: true.
 
 ------------------------------------------------------------

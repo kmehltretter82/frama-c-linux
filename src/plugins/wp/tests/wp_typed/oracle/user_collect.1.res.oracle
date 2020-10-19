@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_typed/user_collect.i (no preprocessing)
+[kernel] Parsing user_collect.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -49,7 +49,7 @@ Prove: x2_0 = v.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file tests/wp_typed/user_collect.i, line 57)
+Goal Instance of 'Pre-condition (file user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file user_collect.i, line 57)
 :
 Assume { Type: is_sint32(k). (* Pre-condition *) Have: (0 <= k) /\ (k <= 8).
 }
@@ -57,7 +57,7 @@ Prove: k <= 9.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file tests/wp_typed/user_collect.i, line 58)
+Goal Instance of 'Pre-condition (file user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file user_collect.i, line 58)
 :
 Let m = p[k <- v].
 Assume {
@@ -138,7 +138,7 @@ Prove: EqArray1_S1_S(10, m_1, m_2[k <- s2_0]).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file tests/wp_typed/user_collect.i, line 70)
+Goal Instance of 'Pre-condition (file user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file user_collect.i, line 70)
 :
 Assume { Type: is_sint32(k). (* Pre-condition *) Have: (0 <= k) /\ (k <= 8).
 }
@@ -146,7 +146,7 @@ Prove: k <= 9.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file tests/wp_typed/user_collect.i, line 71)
+Goal Instance of 'Pre-condition (file user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file user_collect.i, line 71)
 :
 Let m = q[k <- v].
 Assume {
@@ -227,7 +227,7 @@ Prove: EqArray1_S1_S(10, m_1, m_2[k <- s2_0]).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file tests/wp_typed/user_collect.i, line 83)
+Goal Instance of 'Pre-condition (file user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file user_collect.i, line 83)
 :
 Assume { Type: is_sint32(k). (* Pre-condition *) Have: (0 <= k) /\ (k <= 8).
 }
@@ -235,7 +235,7 @@ Prove: k <= 9.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_typed/user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file tests/wp_typed/user_collect.i, line 84)
+Goal Instance of 'Pre-condition (file user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file user_collect.i, line 84)
 :
 Let m = q[k <- v].
 Assume {
@@ -263,18 +263,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 18) in 'job' (1/3):
+Goal Assigns (file user_collect.i, line 18) in 'job' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 18) in 'job' (2/3):
+Goal Assigns (file user_collect.i, line 18) in 'job' (2/3):
 Effect at line 22
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 18) in 'job' (3/3):
+Goal Assigns (file user_collect.i, line 18) in 'job' (3/3):
 Effect at line 22
 Prove: true.
 
@@ -293,18 +293,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 29) in 'job2' (1/3):
+Goal Assigns (file user_collect.i, line 29) in 'job2' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 29) in 'job2' (2/3):
+Goal Assigns (file user_collect.i, line 29) in 'job2' (2/3):
 Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 29) in 'job2' (3/3):
+Goal Assigns (file user_collect.i, line 29) in 'job2' (3/3):
 Effect at line 33
 Prove: true.
 
@@ -330,18 +330,18 @@ Prove: EqArray1_S1_S(10, m, q[k <- s]).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 40) in 'job3' (1/3):
+Goal Assigns (file user_collect.i, line 40) in 'job3' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 40) in 'job3' (2/3):
+Goal Assigns (file user_collect.i, line 40) in 'job3' (2/3):
 Effect at line 44
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_typed/user_collect.i, line 40) in 'job3' (3/3):
+Goal Assigns (file user_collect.i, line 40) in 'job3' (3/3):
 Effect at line 45
 Prove: true.
 

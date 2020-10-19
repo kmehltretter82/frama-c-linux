@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/doomed_axioms.i (no preprocessing)
+[kernel] Parsing doomed_axioms.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function foo
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_loop in 'foo' at loop (file tests/wp_plugin/doomed_axioms.i, line 29):
+Goal Wp_smoke_dead_loop in 'foo' at loop (file doomed_axioms.i, line 29):
 Assume {
   Type: is_sint32(n).
   (* Invariant 'C' *)
@@ -20,7 +20,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file tests/wp_plugin/doomed_axioms.i, line 30):
+Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_axioms.i, line 30):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
   (* Invariant 'C' *)
@@ -36,7 +36,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at return (file tests/wp_plugin/doomed_axioms.i, line 32):
+Goal Wp_smoke_dead_code in 'foo' at return (file doomed_axioms.i, line 32):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
   (* Invariant 'C' *)
@@ -52,7 +52,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file tests/wp_plugin/doomed_axioms.i, line 24):
+Goal Preservation of Invariant 'A' (file doomed_axioms.i, line 24):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -69,12 +69,12 @@ Prove: P_P(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file tests/wp_plugin/doomed_axioms.i, line 24):
+Goal Establishment of Invariant 'A' (file doomed_axioms.i, line 24):
 Prove: P_P(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'B' (file tests/wp_plugin/doomed_axioms.i, line 25):
+Goal Preservation of Invariant 'B' (file doomed_axioms.i, line 25):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -91,12 +91,12 @@ Prove: P_Q(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'B' (file tests/wp_plugin/doomed_axioms.i, line 25):
+Goal Establishment of Invariant 'B' (file doomed_axioms.i, line 25):
 Prove: P_Q(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'C' (file tests/wp_plugin/doomed_axioms.i, line 26):
+Goal Preservation of Invariant 'C' (file doomed_axioms.i, line 26):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -113,12 +113,12 @@ Prove: P_R(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'C' (file tests/wp_plugin/doomed_axioms.i, line 26):
+Goal Establishment of Invariant 'C' (file doomed_axioms.i, line 26):
 Prove: P_R(0).
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_plugin/doomed_axioms.i, line 27):
+Goal Loop assigns (file doomed_axioms.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------

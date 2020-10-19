@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_typed/frame.i (no preprocessing)
+[kernel] Parsing frame.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function compound
 ------------------------------------------------------------
 
-Goal Assertion 'SEP' (file tests/wp_typed/frame.i, line 10):
+Goal Assertion 'SEP' (file frame.i, line 10):
 Assume {
   Type: is_sint32(k).
   (* Heap *)
@@ -19,7 +19,7 @@ Prove: (comp_0[k].F1_ptr) != global(L_m_28).
 
 ------------------------------------------------------------
 
-Goal Assertion 'RES' (file tests/wp_typed/frame.i, line 11):
+Goal Assertion 'RES' (file frame.i, line 11):
 Let a = comp_0[k].F1_ptr.
 Let a_1 = global(L_m_28).
 Let x = Mint_0[a <- 4][a_1].

@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_typed/unit_alloc.i (no preprocessing)
+[kernel] Parsing unit_alloc.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -23,7 +23,7 @@ Prove: true.
   Function h
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/unit_alloc.i, line 33) in 'h':
+Goal Post-condition (file unit_alloc.i, line 33) in 'h':
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_rw(Malloc_0[P_x_40 <- 0], global(P_x_40), 1).
 
@@ -32,23 +32,23 @@ Prove: !valid_rw(Malloc_0[P_x_40 <- 0], global(P_x_40), 1).
   Function job
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/unit_alloc.i, line 15):
+Goal Assertion (file unit_alloc.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/unit_alloc.i, line 21):
+Goal Assertion (file unit_alloc.i, line 21):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rw(Malloc_0[L_y_25 <- 1], global(L_y_25), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/unit_alloc.i, line 22):
+Goal Assertion (file unit_alloc.i, line 22):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/unit_alloc.i, line 24):
+Goal Assertion (file unit_alloc.i, line 24):
 Let a = global(L_y_25).
 Assume {
   (* Heap *)

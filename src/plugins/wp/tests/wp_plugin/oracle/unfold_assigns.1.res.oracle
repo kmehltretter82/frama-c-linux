@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/unfold_assigns.i (no preprocessing)
+[kernel] Parsing unfold_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function ASSIGN_NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 62) in 'ASSIGN_NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 62) in 'ASSIGN_NO_UNFOLD_KO':
 Effect at line 65
 Prove: true.
 
@@ -15,7 +15,7 @@ Prove: true.
   Function ASSIGN_NO_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 56) in 'ASSIGN_NO_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 56) in 'ASSIGN_NO_UNFOLD_OK':
 Effect at line 59
 Prove: true.
 
@@ -24,13 +24,13 @@ Prove: true.
   Function NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
 Call Effect at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 33) in 'NO_UNFOLD_KO':
 Call Effect at line 35
 Prove: true.
 
@@ -39,13 +39,13 @@ Prove: true.
   Function NO_UNFOLD_OK_1
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
+Goal Assigns (file unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
 Call Effect at line 20
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
+Goal Assigns (file unfold_assigns.i, line 18) in 'NO_UNFOLD_OK_1':
 Call Effect at line 20
 Prove: true.
 
@@ -54,13 +54,13 @@ Prove: true.
   Function NO_UNFOLD_OK_2
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
+Goal Assigns (file unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
 Call Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
+Goal Assigns (file unfold_assigns.i, line 23) in 'NO_UNFOLD_OK_2':
 Call Effect at line 25
 Prove: true.
 
@@ -69,13 +69,13 @@ Prove: true.
   Function NO_UNFOLD_OK_3
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
+Goal Assigns (file unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
 Call Effect at line 30
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
+Goal Assigns (file unfold_assigns.i, line 28) in 'NO_UNFOLD_OK_3':
 Call Effect at line 30
 Prove: true.
 
@@ -84,7 +84,7 @@ Prove: true.
   Function USE_ASSIGN_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/unfold_assigns.i, line 48) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Post-condition (file unfold_assigns.i, line 48) in 'USE_ASSIGN_UNFOLD_KO':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -98,13 +98,13 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
 Call Effect at line 53
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 49) in 'USE_ASSIGN_UNFOLD_KO':
 Call Effect at line 53
 Prove: true.
 
@@ -113,7 +113,7 @@ Prove: true.
   Function USE_ASSIGN_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/unfold_assigns.i, line 39) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Post-condition (file unfold_assigns.i, line 39) in 'USE_ASSIGN_UNFOLD_OK':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -127,13 +127,13 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
 Call Effect at line 44
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 40) in 'USE_ASSIGN_UNFOLD_OK':
 Call Effect at line 44
 Prove: true.
 

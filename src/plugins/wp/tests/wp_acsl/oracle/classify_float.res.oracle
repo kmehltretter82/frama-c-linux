@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/classify_float.c (with preprocessing)
+[kernel] Parsing classify_float.c (with preprocessing)
 [wp] Running WP plugin...
 ------------------------------------------------------------
   Global

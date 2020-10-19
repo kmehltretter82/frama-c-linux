@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_gallery/frama_c_exo3_solved.old.c (with preprocessing)
+[kernel] Parsing frama_c_exo3_solved.old.c (with preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function equal_elements
 [wp] Goal typed_ref_equal_elements_ensures : not tried

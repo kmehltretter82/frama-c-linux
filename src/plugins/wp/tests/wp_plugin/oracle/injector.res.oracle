@@ -1,18 +1,18 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/injector.c (with preprocessing)
+[kernel] Parsing injector.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_plugin/injector.c, line 13) in 'g'' in 'f' at call 'g' (file tests/wp_plugin/injector.c, line 54)
+Goal Instance of 'Pre-condition (file injector.c, line 13) in 'g'' in 'f' at call 'g' (file injector.c, line 54)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_plugin/injector.c, line 13) in 'g'' in 'f' at call 'g' (file tests/wp_plugin/injector.c, line 56)
+Goal Instance of 'Pre-condition (file injector.c, line 13) in 'g'' in 'f' at call 'g' (file injector.c, line 56)
 :
 Prove: true.
 

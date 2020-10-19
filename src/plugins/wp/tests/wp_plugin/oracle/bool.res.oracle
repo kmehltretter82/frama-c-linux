@@ -1,12 +1,12 @@
 # frama-c -wp -wp-no-let [...]
-[kernel] Parsing tests/wp_plugin/bool.i (no preprocessing)
+[kernel] Parsing bool.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function band_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 28) in 'band_bool':
+Goal Post-condition for 'false' (file bool.i, line 28) in 'band_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(band_bool_0) /\ is_bool(retres_0).
@@ -24,7 +24,7 @@ Prove: band_bool_0 = 0.
   Function band_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 25) in 'band_bool':
+Goal Post-condition for 'true' (file bool.i, line 25) in 'band_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(band_bool_0) /\ is_bool(retres_0).
@@ -42,7 +42,7 @@ Prove: band_bool_0 = 1.
   Function bor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 18) in 'bor_bool':
+Goal Post-condition for 'false' (file bool.i, line 18) in 'bor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(bor_bool_0) /\ is_bool(retres_0).
@@ -60,7 +60,7 @@ Prove: bor_bool_0 = 0.
   Function bor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 15) in 'bor_bool':
+Goal Post-condition for 'true' (file bool.i, line 15) in 'bor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(bor_bool_0) /\ is_bool(retres_0).
@@ -78,7 +78,7 @@ Prove: bor_bool_0 = 1.
   Function bxor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_plugin/bool.i, line 37) in 'bxor_bool':
+Goal Post-condition for 'false' (file bool.i, line 37) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(bxor_bool_0) /\ is_bool(retres_0).
@@ -96,7 +96,7 @@ Prove: bxor_bool_0 = 0.
   Function bxor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_plugin/bool.i, line 34) in 'bxor_bool':
+Goal Post-condition for 'true' (file bool.i, line 34) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(a_1) /\ is_bool(b) /\ is_bool(b_1) /\
       is_bool(bxor_bool_0) /\ is_bool(retres_0).
@@ -114,7 +114,7 @@ Prove: bxor_bool_0 = 1.
   Function job
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/bool.i, line 10) in 'job':
+Goal Post-condition (file bool.i, line 10) in 'job':
 Assume {
   Type: is_bool(a) /\ is_bool(b) /\ is_sint32(job_0) /\ is_sint32(retres_0).
   Have: (a + b) = retres_0.

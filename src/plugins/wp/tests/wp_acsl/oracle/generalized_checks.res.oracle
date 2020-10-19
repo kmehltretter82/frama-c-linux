@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/generalized_checks.i (no preprocessing)
+[kernel] Parsing generalized_checks.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -66,19 +66,19 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'A' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'A' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'CA1' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'CA1' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'CA2,ko' in 'job'' in 'caller' at call 'job' (file tests/wp_acsl/generalized_checks.i, line 65)
+Goal Instance of 'Pre-condition 'CA2,ko' in 'job'' in 'caller' at call 'job' (file generalized_checks.i, line 65)
 :
 Assume { Type: is_sint32(x). (* Pre-condition *) Have: P_A(x) /\ P_CA1(x). }
 Prove: P_CA2(x).

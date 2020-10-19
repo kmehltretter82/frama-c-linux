@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/looplabels.i (no preprocessing)
+[kernel] Parsing looplabels.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function copy
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/looplabels.i, line 13) in 'copy':
+Goal Post-condition (file looplabels.i, line 13) in 'copy':
 Let a_1 = shift_sint32(b, 0).
 Let a_2 = shift_sint32(a, 0).
 Assume {
@@ -27,7 +27,7 @@ Prove: P_IsEqual(havoc(Mint_undef_0, Mint_0, a_1, i), a, b, i).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/looplabels.i, line 18):
+Goal Preservation of Invariant (file looplabels.i, line 18):
 Let a_1 = shift_sint32(b, 0).
 Let a_2 = shift_sint32(a, 0).
 Assume {
@@ -48,12 +48,12 @@ Prove: (-1) <= i.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/looplabels.i, line 18):
+Goal Establishment of Invariant (file looplabels.i, line 18):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/looplabels.i, line 19):
+Goal Preservation of Invariant (file looplabels.i, line 19):
 Let a_1 = shift_sint32(b, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = shift_sint32(a, 0).
@@ -76,7 +76,7 @@ Prove: P_IsEqual(a_2[shift_sint32(b, i) <- a_2[shift_sint32(a, i)]], a, b, x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/looplabels.i, line 19):
+Goal Establishment of Invariant (file looplabels.i, line 19):
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = shift_sint32(b, 0).
 Assume {
@@ -91,12 +91,12 @@ Prove: P_IsEqual(Mint_0, a, b, 0).
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/looplabels.i, line 20) (1/2):
+Goal Loop assigns (file looplabels.i, line 20) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/looplabels.i, line 20) (2/2):
+Goal Loop assigns (file looplabels.i, line 20) (2/2):
 Effect at line 23
 Let a_1 = shift_sint32(b, 0).
 Let a_2 = shift_sint32(a, 0).
@@ -121,7 +121,7 @@ Prove: included(a_3, 1, a_1, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/looplabels.i, line 14) in 'copy':
+Goal Assigns (file looplabels.i, line 14) in 'copy':
 Effect at line 22
 Prove: true.
 

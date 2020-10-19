@@ -1,19 +1,19 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_typed/unit_loopscope.i (no preprocessing)
+[kernel] Parsing unit_loopscope.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_typed/unit_loopscope.i:14: Warning: 
+[wp] unit_loopscope.i:14: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_typed/unit_loopscope.i, line 13):
+Goal Preservation of Invariant (file unit_loopscope.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_typed/unit_loopscope.i, line 13):
+Goal Establishment of Invariant (file unit_loopscope.i, line 13):
 Prove: false.
 
 ------------------------------------------------------------

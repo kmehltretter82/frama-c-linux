@@ -1,4 +1,4 @@
-[kernel] Parsing tests/wp_region/swap.i (no preprocessing)
-[wp] Region Graph: tests/wp_region/result/swap/region/job.dot
+[kernel] Parsing swap.i (no preprocessing)
+[wp] Region Graph: result/swap/region/job.dot
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards

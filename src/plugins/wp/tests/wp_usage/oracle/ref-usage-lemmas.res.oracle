@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_usage/ref-usage-lemmas.i (no preprocessing)
+[kernel] Parsing ref-usage-lemmas.i (no preprocessing)
 [wp] Running WP plugin...
 .................................................
 ... Ref Usage
@@ -13,7 +13,7 @@ Function main: { &a b __retres }
   Function main
 ------------------------------------------------------------
 
-Goal Pre-condition (file tests/wp_usage/ref-usage-lemmas.i, line 30) in 'main':
+Goal Pre-condition (file ref-usage-lemmas.i, line 30) in 'main':
 Prove: true.
 
 ------------------------------------------------------------

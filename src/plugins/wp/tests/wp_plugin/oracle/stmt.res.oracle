@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/stmt.c (with preprocessing)
+[kernel] Parsing stmt.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal f_exits : Valid (Unreachable)
 [wp] [CFG] Goal g_exits : Valid (Unreachable)
@@ -15,17 +15,17 @@
   Function f
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/stmt.c, line 10) in 'f':
+Goal Post-condition (file stmt.c, line 10) in 'f':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/stmt.c, line 11) in 'f':
+Goal Post-condition (file stmt.c, line 11) in 'f':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_plugin/stmt.c, line 16):
+Goal Assertion (file stmt.c, line 16):
 Prove: true.
 
 ------------------------------------------------------------
@@ -33,12 +33,12 @@ Prove: true.
   Function f with behavior default_for_stmt_2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/stmt.c, line 17) at block:
+Goal Post-condition (file stmt.c, line 17) at block:
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/stmt.c, line 21) at block:
+Goal Assigns (file stmt.c, line 21) at block:
 Prove: true.
 
 ------------------------------------------------------------
@@ -46,12 +46,12 @@ Prove: true.
   Function g
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/stmt.c, line 27) in 'g':
+Goal Post-condition (file stmt.c, line 27) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_plugin/stmt.c, line 32):
+Goal Assertion (file stmt.c, line 32):
 Prove: true.
 
 ------------------------------------------------------------
@@ -59,7 +59,7 @@ Prove: true.
   Function h
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/stmt.c, line 40) in 'h':
+Goal Post-condition (file stmt.c, line 40) in 'h':
 Prove: true.
 
 ------------------------------------------------------------
@@ -79,11 +79,11 @@ Prove: true.
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Exit-condition (file tests/wp_plugin/stmt.c, line 15) at block
+[  Valid  ] Exit-condition (file stmt.c, line 15) at block
             by Unreachable Annotations.
-[ Partial ] Return-condition (file tests/wp_plugin/stmt.c, line 16) at block
+[ Partial ] Return-condition (file stmt.c, line 16) at block
             By Frama-C kernel, with pending:
-             - Assertion (file tests/wp_plugin/stmt.c, line 16)
+             - Assertion (file stmt.c, line 16)
 [    -    ] Default behavior at block
             tried with Frama-C kernel.
 
@@ -91,13 +91,13 @@ Prove: true.
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Exit-condition (file tests/wp_plugin/stmt.c, line 31) at block
+[  Valid  ] Exit-condition (file stmt.c, line 31) at block
             by Unreachable Annotations.
-[  Valid  ] Return-condition (file tests/wp_plugin/stmt.c, line 32) at block
+[  Valid  ] Return-condition (file stmt.c, line 32) at block
             by Unreachable Annotations.
-[  Valid  ] Post-condition (file tests/wp_plugin/stmt.c, line 33) at block
+[  Valid  ] Post-condition (file stmt.c, line 33) at block
             by Unreachable Annotations.
-[  Valid  ] Assigns (file tests/wp_plugin/stmt.c, line 36) at block
+[  Valid  ] Assigns (file stmt.c, line 36) at block
             by Unreachable Annotations.
 [  Valid  ] Default behavior at block
             by Frama-C kernel.
@@ -106,19 +106,19 @@ Prove: true.
 --- Properties of Function 'h'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Exit-condition (file tests/wp_plugin/stmt.c, line 43) at block
+[  Valid  ] Exit-condition (file stmt.c, line 43) at block
             by Unreachable Annotations.
-[  Valid  ] Post-condition (file tests/wp_plugin/stmt.c, line 44) at block
+[  Valid  ] Post-condition (file stmt.c, line 44) at block
             by Unreachable Annotations.
-[ Partial ] Return-condition for 'POS' (file tests/wp_plugin/stmt.c, line 48) at block
+[ Partial ] Return-condition for 'POS' (file stmt.c, line 48) at block
             By Frama-C kernel, with pending:
              - Assertion (generated)
              - Assertion (generated)
-[ Partial ] Return-condition for 'NEG' (file tests/wp_plugin/stmt.c, line 51) at block
+[ Partial ] Return-condition for 'NEG' (file stmt.c, line 51) at block
             By Frama-C kernel, with pending:
              - Assertion (generated)
              - Assertion (generated)
-[  Valid  ] Assigns (file tests/wp_plugin/stmt.c, line 53) at block
+[  Valid  ] Assigns (file stmt.c, line 53) at block
             by Unreachable Annotations.
 [ Partial ] Behavior 'NEG' at block
             By Frama-C kernel, with pending:

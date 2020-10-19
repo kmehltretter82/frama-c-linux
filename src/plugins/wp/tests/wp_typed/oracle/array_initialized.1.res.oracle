@@ -1,14 +1,13 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_typed/array_initialized.c (with preprocessing)
-[kernel] tests/wp_typed/array_initialized.c:13: Warning: 
-  Too many initializers for array g
+[kernel] Parsing array_initialized.c (with preprocessing)
+[kernel] array_initialized.c:13: Warning: Too many initializers for array g
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function main1
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/array_initialized.c, line 71):
+Goal Assertion (file array_initialized.c, line 71):
 Let a = global(K_g_20).
 Assume {
   (* Goal *)
@@ -24,7 +23,7 @@ Prove: Mint_0[shift_sint32(a, i)] = 0.
   Function main2
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/array_initialized.c, line 185):
+Goal Assertion (file array_initialized.c, line 185):
 Let a = global(K_h1_26).
 Let a_1 = global(K_h2_27).
 Assume {
@@ -244,7 +243,7 @@ Prove: Mint_0[shift_sint32(a_1, i)] = Mint_0[shift_sint32(a, i)].
   Function main3
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/array_initialized.c, line 194):
+Goal Assertion (file array_initialized.c, line 194):
 Prove: true.
 
 ------------------------------------------------------------
@@ -252,7 +251,7 @@ Prove: true.
   Function main_pointer
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_typed/array_initialized.c, line 283):
+Goal Assertion (file array_initialized.c, line 283):
 Let a = global(K_p_34).
 Assume {
   (* Heap *)
@@ -270,7 +269,7 @@ Prove: valid_rw(Malloc_0, Mptr_0[shift_PTR(a, i)], 1).
   Function simpl
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_typed/array_initialized.c, line 288) in 'simpl':
+Goal Post-condition (file array_initialized.c, line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
   Type: is_sint32(x).

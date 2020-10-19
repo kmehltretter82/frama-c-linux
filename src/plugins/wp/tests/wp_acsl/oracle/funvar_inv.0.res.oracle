@@ -1,25 +1,19 @@
 # frama-c -wp -wp-model 'Hoare' [...]
-[kernel] Parsing tests/wp_acsl/funvar_inv.i (no preprocessing)
+[kernel] Parsing funvar_inv.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/funvar_inv.i:24: Warning: 
-  Can not compare pointers in Empty model
-[wp] tests/wp_acsl/funvar_inv.i:23: Warning: 
-  Can not compare pointers in Empty model
-[wp] tests/wp_acsl/funvar_inv.i:38: Warning: 
-  Can not compare pointers in Empty model
-[wp] tests/wp_acsl/funvar_inv.i:37: Warning: 
-  Can not compare pointers in Empty model
-[wp] tests/wp_acsl/funvar_inv.i:53: Warning: 
-  Can not compare pointers in Empty model
-[wp] tests/wp_acsl/funvar_inv.i:52: Warning: 
-  Can not compare pointers in Empty model
+[wp] funvar_inv.i:24: Warning: Can not compare pointers in Empty model
+[wp] funvar_inv.i:23: Warning: Can not compare pointers in Empty model
+[wp] funvar_inv.i:38: Warning: Can not compare pointers in Empty model
+[wp] funvar_inv.i:37: Warning: Can not compare pointers in Empty model
+[wp] funvar_inv.i:53: Warning: Can not compare pointers in Empty model
+[wp] funvar_inv.i:52: Warning: Can not compare pointers in Empty model
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
 Goal Post-condition 'P_startof' in 'f':
-tests/wp_acsl/funvar_inv.i:23: warning from Empty Model:
+funvar_inv.i:23: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].
@@ -35,7 +29,7 @@ Prove: x != 0.
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr' in 'f':
-tests/wp_acsl/funvar_inv.i:24: warning from Empty Model:
+funvar_inv.i:24: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].
@@ -61,7 +55,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'P_startof_shift' in 'f2':
-tests/wp_acsl/funvar_inv.i:37: warning from Empty Model:
+funvar_inv.i:37: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].
@@ -77,7 +71,7 @@ Prove: x != 0.
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr_shift' in 'f2':
-tests/wp_acsl/funvar_inv.i:38: warning from Empty Model:
+funvar_inv.i:38: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].
@@ -103,7 +97,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr_startof_shift' in 'g':
-tests/wp_acsl/funvar_inv.i:52: warning from Empty Model:
+funvar_inv.i:52: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].
@@ -119,7 +113,7 @@ Prove: x != 0.
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr_addr_shift' in 'g':
-tests/wp_acsl/funvar_inv.i:53: warning from Empty Model:
+funvar_inv.i:53: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
    Reason: Can not compare pointers in Empty model
 Let x = G[0].

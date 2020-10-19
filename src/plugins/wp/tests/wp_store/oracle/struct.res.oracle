@@ -1,17 +1,17 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_store/struct.i (no preprocessing)
+[kernel] Parsing struct.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file tests/wp_store/struct.i, line 21):
+Goal Assertion 'qed_ok' (file struct.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_store/struct.i, line 10) in 'g'' in 'f' at call 'g' (file tests/wp_store/struct.i, line 20)
+Goal Instance of 'Pre-condition (file struct.i, line 10) in 'g'' in 'f' at call 'g' (file struct.i, line 20)
 :
 Let a_1 = shift_sint32(shiftfield_F1_t_tab(a), 0).
 Assume {
@@ -27,12 +27,12 @@ Prove: valid_rw(Malloc_0, a_1, 1).
   Function g
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_store/struct.i, line 11) in 'g':
+Goal Post-condition (file struct.i, line 11) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_store/struct.i, line 12) in 'g':
+Goal Assigns (file struct.i, line 12) in 'g':
 Effect at line 15
 Prove: true.
 

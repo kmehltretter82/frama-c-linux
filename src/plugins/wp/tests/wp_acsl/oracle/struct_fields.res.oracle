@@ -1,5 +1,5 @@
 # frama-c -wp -wp-rte -wp-no-let [...]
-[kernel] Parsing tests/wp_acsl/struct_fields.i (no preprocessing)
+[kernel] Parsing struct_fields.i (no preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function foo
 [wp] 2 goals scheduled
@@ -239,7 +239,7 @@ end
   Function foo
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/struct_fields.i, line 15):
+Goal Assertion 'rte,mem_access' (file struct_fields.i, line 15):
 Assume {
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0) /\
@@ -259,7 +259,7 @@ Prove: valid_rd(Malloc_0, p, 3).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/struct_fields.i, line 16):
+Goal Assertion 'rte,mem_access' (file struct_fields.i, line 16):
 Let a = Load_S1_X(p, Mchar_0, Mint_0, Mint_1).
 Assume {
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\

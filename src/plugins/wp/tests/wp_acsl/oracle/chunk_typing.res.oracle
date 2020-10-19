@@ -1,12 +1,12 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_acsl/chunk_typing.i (no preprocessing)
+[kernel] Parsing chunk_typing.i (no preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function function
 ------------------------------------------------------------
   Function function
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/chunk_typing.i, line 15) in 'function':
+Goal Post-condition (file chunk_typing.i, line 15) in 'function':
 Let a = shift_sint8(i8_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
 Let a_2 = shift_uint8(u8_0, 0).
@@ -89,7 +89,7 @@ Prove: (a_16 = (1 + x[i])) /\ (a_17 = (1 + a_16)) /\ (a_18 = (1 + a_17)) /\
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 31):
+Goal Preservation of Invariant (file chunk_typing.i, line 31):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -189,12 +189,12 @@ Prove: (-1) <= i.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 31):
+Goal Establishment of Invariant (file chunk_typing.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 32):
+Goal Preservation of Invariant (file chunk_typing.i, line 32):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -297,12 +297,12 @@ Prove: a_24[shift_sint8(i8_0, i_1)] = 1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 32):
+Goal Establishment of Invariant (file chunk_typing.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 33):
+Goal Preservation of Invariant (file chunk_typing.i, line 33):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -405,12 +405,12 @@ Prove: a_24[shift_uint8(u8_0, i_1)] = 2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 33):
+Goal Establishment of Invariant (file chunk_typing.i, line 33):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 34):
+Goal Preservation of Invariant (file chunk_typing.i, line 34):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -513,12 +513,12 @@ Prove: a_24[shift_sint16(i16_0, i_1)] = 3.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 34):
+Goal Establishment of Invariant (file chunk_typing.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 35):
+Goal Preservation of Invariant (file chunk_typing.i, line 35):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -621,12 +621,12 @@ Prove: a_24[shift_uint16(u16_0, i_1)] = 4.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 35):
+Goal Establishment of Invariant (file chunk_typing.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 36):
+Goal Preservation of Invariant (file chunk_typing.i, line 36):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -729,12 +729,12 @@ Prove: a_24[shift_sint32(i32_0, i_1)] = 5.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 36):
+Goal Establishment of Invariant (file chunk_typing.i, line 36):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 37):
+Goal Preservation of Invariant (file chunk_typing.i, line 37):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -837,12 +837,12 @@ Prove: a_24[shift_uint32(u32_0, i_1)] = 6.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 37):
+Goal Establishment of Invariant (file chunk_typing.i, line 37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 38):
+Goal Preservation of Invariant (file chunk_typing.i, line 38):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -945,12 +945,12 @@ Prove: a_24[shift_sint64(i64_0, i_1)] = 7.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 38):
+Goal Establishment of Invariant (file chunk_typing.i, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/chunk_typing.i, line 39):
+Goal Preservation of Invariant (file chunk_typing.i, line 39):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -1053,12 +1053,12 @@ Prove: a_24[shift_uint64(u64_0, i_1)] = 8.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/chunk_typing.i, line 39):
+Goal Establishment of Invariant (file chunk_typing.i, line 39):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 45):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 45):
 Let a = shift_sint8(i8_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, 10).
 Let a_2 = shift_uint8(u8_0, 0).
@@ -1127,7 +1127,7 @@ Prove: valid_rw(Malloc_0, shift_sint8(i8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 46):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 46):
 Let a = shift_sint8(i8_0, i).
 Let a_1 = shift_sint8(i8_0, 0).
 Let a_2 = havoc(Mchar_undef_0, Mchar_0, a_1, 10).
@@ -1200,7 +1200,7 @@ Prove: valid_rw(Malloc_0, shift_uint8(u8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 47):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 47):
 Let a = shift_uint8(u8_0, i).
 Let a_1 = shift_sint8(i8_0, i).
 Let a_2 = shift_sint8(i8_0, 0).
@@ -1277,7 +1277,7 @@ Prove: valid_rw(Malloc_0, shift_sint16(i16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 48):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 48):
 Let a = shift_sint16(i16_0, i).
 Let a_1 = shift_uint8(u8_0, i).
 Let a_2 = shift_sint8(i8_0, i).
@@ -1358,7 +1358,7 @@ Prove: valid_rw(Malloc_0, shift_uint16(u16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 49):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 49):
 Let a = shift_uint16(u16_0, i).
 Let a_1 = shift_sint16(i16_0, i).
 Let a_2 = shift_uint8(u8_0, i).
@@ -1442,7 +1442,7 @@ Prove: valid_rw(Malloc_0, shift_sint32(i32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 50):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 50):
 Let a = shift_sint32(i32_0, i).
 Let a_1 = shift_uint16(u16_0, i).
 Let a_2 = shift_sint16(i16_0, i).
@@ -1530,7 +1530,7 @@ Prove: valid_rw(Malloc_0, shift_uint32(u32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 51):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 51):
 Let a = shift_uint32(u32_0, i).
 Let a_1 = shift_sint32(i32_0, i).
 Let a_2 = shift_uint16(u16_0, i).
@@ -1621,7 +1621,7 @@ Prove: valid_rw(Malloc_0, shift_sint64(i64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file tests/wp_acsl/chunk_typing.i, line 52):
+Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 52):
 Let a = shift_sint64(i64_0, i).
 Let a_1 = shift_uint32(u32_0, i).
 Let a_2 = shift_sint32(i32_0, i).
@@ -1716,7 +1716,7 @@ Prove: valid_rw(Malloc_0, shift_uint64(u64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,signed_overflow' (file tests/wp_acsl/chunk_typing.i, line 44):
+Goal Assertion 'rte,signed_overflow' (file chunk_typing.i, line 44):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -1814,65 +1814,65 @@ Prove: i <= 2147483646.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (1/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (1/9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (2/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (2/9):
 Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (3/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (3/9):
 Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (4/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (4/9):
 Effect at line 47
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (5/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (5/9):
 Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (6/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (6/9):
 Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (7/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (7/9):
 Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (8/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (8/9):
 Effect at line 51
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/chunk_typing.i, line 40) (9/9):
+Goal Loop assigns (file chunk_typing.i, line 40) (9/9):
 Effect at line 52
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file tests/wp_acsl/chunk_typing.i, line 44):
+Goal Decreasing of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file tests/wp_acsl/chunk_typing.i, line 44):
+Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------

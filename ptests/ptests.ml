@@ -357,13 +357,14 @@ let () =
       (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
       let ch = open_in config in
       let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
+      let regexp_comment = Str.regexp " *#" in
       while true do
         let line = input_line ch in
         if Str.string_match regexp line 0 then
           let key = Str.matched_group 1 line in
           let value = Str.matched_group 2 line in
           parse_config_line (key, value)
-        else begin
+        else if not (Str.string_match regexp_comment line 0) then begin
           Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
           exit 1
         end
@@ -643,16 +644,17 @@ let config_exec ~once dir s current =
     dc_execnow =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
+let split_list s = Str.split (Str.regexp "[ ,]+") s
 let config_cmxs _dir s current =
-  let l = split_blank s in
+  let l = split_list s in
   { current with dc_cmxs = l @ current.dc_cmxs }
 
 let config_deps _dir s current =
-  { current with dc_deps = (split_blank s) @ current.dc_deps }
+  { current with dc_deps = (split_list s) @ current.dc_deps }
 
 let config_plugin _dir s current =
   let s = Macros.expand current.dc_macros s in
-  { current with dc_plugins = split_blank s ;
+  { current with dc_plugins = split_list s ;
                  dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
 
 let config_macro _dir s current =

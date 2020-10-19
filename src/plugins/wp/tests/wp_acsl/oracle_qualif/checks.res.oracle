@@ -26,16 +26,16 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Check 'c1' (file tests/wp_acsl/checks.i, line 14)
+[    -    ] Check 'c1' (file checks.i, line 14)
             tried with Wp.typed.
-[    -    ] Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
+[    -    ] Assertion 'a1' (file checks.i, line 15)
             tried with Wp.typed.
-[ Partial ] Check 'c2' (file tests/wp_acsl/checks.i, line 16)
+[ Partial ] Check 'c2' (file checks.i, line 16)
             By Wp.typed, with pending:
-             - Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
-[ Partial ] Assertion 'a2' (file tests/wp_acsl/checks.i, line 17)
+             - Assertion 'a1' (file checks.i, line 15)
+[ Partial ] Assertion 'a2' (file checks.i, line 17)
             By Wp.typed, with pending:
-             - Assertion 'a1' (file tests/wp_acsl/checks.i, line 15)
+             - Assertion 'a1' (file checks.i, line 15)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary

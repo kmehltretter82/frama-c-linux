@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_bts/bts_1828.i (no preprocessing)
+[kernel] Parsing bts_1828.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -21,12 +21,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file tests/wp_bts/bts_1828.i, line 60):
+Goal Assertion 'ok' (file bts_1828.i, line 60):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file tests/wp_bts/bts_1828.i, line 61):
+Goal Assertion 'ok' (file bts_1828.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------
@@ -34,7 +34,7 @@ Prove: true.
   Function local_frame
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file tests/wp_bts/bts_1828.i, line 23):
+Goal Assertion 'ok' (file bts_1828.i, line 23):
 Assume {
   (* Heap *)
   Type: (region(one_0.base) <= 0) /\ linked(Malloc_0).

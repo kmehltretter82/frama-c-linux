@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/loop.i (no preprocessing)
+[kernel] Parsing loop.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -30,7 +30,7 @@ Prove: a_2[shift_sint32(t, i_1)] = e.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'qed_ok' (file tests/wp_plugin/loop.i, line 12):
+Goal Preservation of Invariant 'qed_ok' (file loop.i, line 12):
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
 Let x_1 = 1 + i.
@@ -52,7 +52,7 @@ Prove: a <= x_1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'qed_ok' (file tests/wp_plugin/loop.i, line 12):
+Goal Establishment of Invariant 'qed_ok' (file loop.i, line 12):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b).
   (* Heap *)
@@ -64,7 +64,7 @@ Prove: a <= (1 + b).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'qed_ok' (file tests/wp_plugin/loop.i, line 13):
+Goal Preservation of Invariant 'qed_ok' (file loop.i, line 13):
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
@@ -88,7 +88,7 @@ Prove: a_2[shift_sint32(t, i) <- e][shift_sint32(t, i_1)] = e.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'qed_ok' (file tests/wp_plugin/loop.i, line 13):
+Goal Establishment of Invariant 'qed_ok' (file loop.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------

@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/inductive.c (with preprocessing)
+[kernel] Parsing inductive.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: native support for coq is deprecated, use tip instead
 [wp] 2 goals scheduled

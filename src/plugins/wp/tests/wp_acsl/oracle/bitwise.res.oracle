@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/bitwise.i (no preprocessing)
+[kernel] Parsing bitwise.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function band
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 5) in 'band':
+Goal Post-condition (file bitwise.i, line 5) in 'band':
 Prove: true.
 
 ------------------------------------------------------------
@@ -73,7 +73,7 @@ Prove: land(65535, a) != 21845.
   Function band_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_acsl/bitwise.i, line 91) in 'band_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 91) in 'band_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -86,7 +86,7 @@ Prove: land(a, b) = 0.
   Function band_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_acsl/bitwise.i, line 88) in 'band_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 88) in 'band_bool':
 Prove: true.
 
 ------------------------------------------------------------
@@ -94,7 +94,7 @@ Prove: true.
   Function bnot
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 55) in 'bnot':
+Goal Post-condition (file bitwise.i, line 55) in 'bnot':
 Prove: true.
 
 ------------------------------------------------------------
@@ -102,7 +102,7 @@ Prove: true.
   Function bor
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 28) in 'bor':
+Goal Post-condition (file bitwise.i, line 28) in 'bor':
 Prove: true.
 
 ------------------------------------------------------------
@@ -139,7 +139,7 @@ Prove: true.
   Function bor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_acsl/bitwise.i, line 81) in 'bor_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 81) in 'bor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -152,7 +152,7 @@ Prove: (a = 0) /\ (b = 0).
   Function bor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_acsl/bitwise.i, line 78) in 'bor_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 78) in 'bor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'true' *)
@@ -165,7 +165,7 @@ Prove: (a != 0) \/ (b != 0).
   Function bxor
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 42) in 'bxor':
+Goal Post-condition (file bitwise.i, line 42) in 'bxor':
 Prove: true.
 
 ------------------------------------------------------------
@@ -173,7 +173,7 @@ Prove: true.
   Function bxor with behavior bit1
 ------------------------------------------------------------
 
-Goal Post-condition for 'bit1' (file tests/wp_acsl/bitwise.i, line 45) in 'bxor':
+Goal Post-condition for 'bit1' (file bitwise.i, line 45) in 'bxor':
 Prove: true.
 
 ------------------------------------------------------------
@@ -181,7 +181,7 @@ Prove: true.
   Function bxor with behavior bit2
 ------------------------------------------------------------
 
-Goal Post-condition for 'bit2' (file tests/wp_acsl/bitwise.i, line 48) in 'bxor':
+Goal Post-condition for 'bit2' (file bitwise.i, line 48) in 'bxor':
 Prove: true.
 
 ------------------------------------------------------------
@@ -199,7 +199,7 @@ Prove: lnot(x) = b.
   Function bxor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file tests/wp_acsl/bitwise.i, line 100) in 'bxor_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 100) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -212,7 +212,7 @@ Prove: b = a.
   Function bxor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file tests/wp_acsl/bitwise.i, line 97) in 'bxor_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 97) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'true' *)
@@ -225,7 +225,7 @@ Prove: b != a.
   Function lshift
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 58) in 'lshift':
+Goal Post-condition (file bitwise.i, line 58) in 'lshift':
 Prove: true.
 
 ------------------------------------------------------------
@@ -254,7 +254,7 @@ Prove: true.
   Function rshift
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/bitwise.i, line 69) in 'rshift':
+Goal Post-condition (file bitwise.i, line 69) in 'rshift':
 Prove: true.
 
 ------------------------------------------------------------

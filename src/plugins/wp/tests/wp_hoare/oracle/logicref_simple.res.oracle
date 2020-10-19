@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/logicref_simple.i (no preprocessing)
+[kernel] Parsing logicref_simple.i (no preprocessing)
 [wp] Running WP plugin...
 .................................................
 ... Ref Usage
@@ -15,7 +15,7 @@ Function fvpositive: { b }
   Function fsimple
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/logicref_simple.i, line 14) in 'fsimple':
+Goal Post-condition (file logicref_simple.i, line 14) in 'fsimple':
 Let x = Mint_0[c].
 Assume {
   Type: is_sint32(x) /\ is_sint32(1 + x).
@@ -37,7 +37,7 @@ Prove: true.
   Function fsimple_array
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/logicref_simple.i, line 19) in 'fsimple_array':
+Goal Post-condition (file logicref_simple.i, line 19) in 'fsimple_array':
 Let a = global(G_t_35).
 Let x = Mint_0[shift_sint32(a, 3)].
 Assume {
@@ -58,7 +58,7 @@ Prove: true.
   Function ftwo_star
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/logicref_simple.i, line 22) in 'ftwo_star':
+Goal Post-condition (file logicref_simple.i, line 22) in 'ftwo_star':
 Let x = Mint_0[Mptr_0[d]].
 Assume {
   Type: is_sint32(x) /\ is_sint32(1 + x).
@@ -80,12 +80,12 @@ Prove: true.
   Function fvpositive
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/logicref_simple.i, line 26) in 'fvpositive':
+Goal Post-condition (file logicref_simple.i, line 26) in 'fvpositive':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'OK' (file tests/wp_hoare/logicref_simple.i, line 30):
+Goal Assertion 'OK' (file logicref_simple.i, line 30):
 Assume {
   (* Heap *)
   Type: (region(b.base) <= 0) /\ linked(Malloc_0).
@@ -96,7 +96,7 @@ Prove: valid_rw(Malloc_0, b, 1).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/logicref_simple.i, line 26) in 'fvpositive':
+Goal Assigns (file logicref_simple.i, line 26) in 'fvpositive':
 Effect at line 31
 Prove: true.
 

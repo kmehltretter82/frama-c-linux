@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/trig.i (no preprocessing)
+[kernel] Parsing trig.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function foo
 ------------------------------------------------------------
 
-Goal Assertion 'ok,S' (file tests/wp_plugin/trig.i, line 35):
+Goal Assertion 'ok,S' (file trig.i, line 35):
 Let a_1 = L_concat(a, b).
 Let x = a_1.F1_MSG_size.
 Let a_2 = a_1.F1_MSG_text.
@@ -21,7 +21,7 @@ Prove: x = 10.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok,A' (file tests/wp_plugin/trig.i, line 36):
+Goal Assertion 'ok,A' (file trig.i, line 36):
 Let a_1 = L_concat(a, b).
 Let a_2 = (a.F1_MSG_text)[2].
 Let a_3 = a_1.F1_MSG_text.
@@ -39,7 +39,7 @@ Prove: a_4 = a_2.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok,B' (file tests/wp_plugin/trig.i, line 37):
+Goal Assertion 'ok,B' (file trig.i, line 37):
 Let a_1 = L_concat(a, b).
 Let a_2 = a_1.F1_MSG_text.
 Let a_3 = a_2[2].
@@ -60,7 +60,7 @@ Prove: a_6 = a_5.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'qed_ok' in 'fconcat'' in 'foo' at initialization of 'c' (file tests/wp_plugin/trig.i, line 34)
+Goal Instance of 'Pre-condition 'qed_ok' in 'fconcat'' in 'foo' at initialization of 'c' (file trig.i, line 34)
 :
 Prove: true.
 

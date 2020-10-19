@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
-[kernel] Parsing tests/wp_usage/issue-189.i (no preprocessing)
+[kernel] Parsing issue-189.i (no preprocessing)
 [wp] Running WP plugin...
 .................................................
 ... Ref Usage
@@ -12,12 +12,12 @@ Function f: { *ptr src idx }
   Function f
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_usage/issue-189.i, line 14) in 'f' (1/2):
+Goal Assigns (file issue-189.i, line 14) in 'f' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_usage/issue-189.i, line 14) in 'f' (2/2):
+Goal Assigns (file issue-189.i, line 14) in 'f' (2/2):
 Effect at line 17
 Prove: true.
 

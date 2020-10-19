@@ -8,7 +8,7 @@
 
 
 
-/tests/ptests_config
+/tests/*/oracle/dune
 /tests/*/result
 /tests/*/result_*
 /tests/*/*.sav

@@ -1,11 +1,11 @@
 /* run.config
-   OPT: -wp-driver tests/wp_plugin/abs.driver
+   OPT: -wp-driver %{dep:abs.driver}
  */
 
 /* run.config_qualif
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover alt-ergo
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover native:coq -wp-coq-script tests/wp_plugin/abs.script
-   OPT: -wp -wp-driver tests/wp_plugin/abs.driver -wp-prover native:alt-ergo
+   OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover alt-ergo
+   OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover native:coq -wp-coq-script %{dep:abs.script}
+   OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover native:alt-ergo
 */
 
 /*@ axiomatic Absolute { logic integer ABS(integer x) ; } */

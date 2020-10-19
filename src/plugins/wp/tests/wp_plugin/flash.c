@@ -1,15 +1,15 @@
 /* run.config
+   CMXS: flash
    OPT:
-   OPT: -wp-driver tests/wp_plugin/flash.driver,tests/wp_plugin/flash-ergo.driver
-   OPT: -wp-driver tests/wp_plugin/flash.driver -load-module tests/wp_plugin/flash.ml
+   OPT: -wp-driver %{dep:flash.driver},%{dep:flash-ergo.driver}
+   OPT: -wp-driver %{dep:flash.driver} -load-module %{dep:flash.cmxs}
 */
-
 /* run.config_qualif
+   CMXS: flash
    OPT: -wp-timeout 1
-   OPT: -wp-driver tests/wp_plugin/flash.driver,tests/wp_plugin/flash-ergo.driver
-   OPT: -wp-driver tests/wp_plugin/flash.driver -load-module tests/wp_plugin/flash.ml
+   OPT: -wp-driver %{dep:flash.driver},%{dep:flash-ergo.driver}
+   OPT: -wp-driver %{dep:flash.driver} -load-module %{dep:flash.cmxs}
 */
-
 /* -------------------------------------------------------------------------- */
 /* --- Observation of Sequence of Reads and Writes                        --- */
 /* -------------------------------------------------------------------------- */

@@ -1,8 +1,8 @@
 # frama-c -wp -wp-model 'Typed (Real)' [...]
-[kernel] Parsing tests/wp_plugin/float_model.i (no preprocessing)
-[kernel] tests/wp_plugin/float_model.i:10: Warning: 
+[kernel] Parsing float_model.i (no preprocessing)
+[kernel] float_model.i:10: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
-[kernel:parser:decimal-float] tests/wp_plugin/float_model.i:28: Warning: 
+[kernel:parser:decimal-float] float_model.i:28: Warning: 
   Floating-point constant 2.1 is not represented exactly. Will use 0x1.0cccccccccccdp1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [wp] Running WP plugin...

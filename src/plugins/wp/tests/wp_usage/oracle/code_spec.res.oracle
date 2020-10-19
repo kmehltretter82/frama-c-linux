@@ -1,9 +1,9 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_usage/code_spec.i (no preprocessing)
+[kernel] Parsing code_spec.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel] tests/wp_usage/code_spec.i:154: Warning: 
+[kernel] code_spec.i:154: Warning: 
   No code nor implicit assigns clause for function by_addr_in_spec, generating default assigns from the prototype
-[kernel] tests/wp_usage/code_spec.i:154: Warning: 
+[kernel] code_spec.i:154: Warning: 
   No code nor implicit assigns clause for function by_array_in_spec, generating default assigns from the prototype
 .................................................
 ... Ref Usage

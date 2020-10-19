@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Hoare' [...]
-[kernel] Parsing tests/wp/wp_strategy.c (with preprocessing)
+[kernel] Parsing wp_strategy.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -19,13 +19,13 @@ Prove: false.
   Function bts0513_bis
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ko,ko1' (file tests/wp/wp_strategy.c, line 27):
+Goal Assertion 'qed_ko,ko1' (file wp_strategy.c, line 27):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,ok' (file tests/wp/wp_strategy.c, line 28):
+Goal Assertion 'qed_ok,ok' (file wp_strategy.c, line 28):
 Prove: true.
 
 ------------------------------------------------------------
@@ -38,7 +38,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file tests/wp/wp_strategy.c, line 98):
+Goal Assertion 'qed_ok' (file wp_strategy.c, line 98):
 Prove: true.
 
 ------------------------------------------------------------
@@ -51,7 +51,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file tests/wp/wp_strategy.c, line 94):
+Goal Assertion 'qed_ok' (file wp_strategy.c, line 94):
 Prove: true.
 
 ------------------------------------------------------------
@@ -64,7 +64,7 @@ Prove: true.
   Function dpd1
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,A' (file tests/wp/wp_strategy.c, line 38):
+Goal Assertion 'qed_ok,A' (file wp_strategy.c, line 38):
 Prove: true.
 
 ------------------------------------------------------------
@@ -72,13 +72,13 @@ Prove: true.
   Function dpd1 with behavior default_for_stmt_10
 ------------------------------------------------------------
 
-Goal Post-condition 'qed_ko,Eko' at program point (file tests/wp/wp_strategy.c, line 37):
+Goal Post-condition 'qed_ko,Eko' at program point (file wp_strategy.c, line 37):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
 
 ------------------------------------------------------------
 
-Goal Assigns 'qed_ok' at program point (file tests/wp/wp_strategy.c, line 37):
+Goal Assigns 'qed_ok' at program point (file wp_strategy.c, line 37):
 Prove: true.
 
 ------------------------------------------------------------
@@ -86,7 +86,7 @@ Prove: true.
   Function dpd2 with behavior P
 ------------------------------------------------------------
 
-Goal Assertion for 'P' 'qed_ok,A' (file tests/wp/wp_strategy.c, line 46):
+Goal Assertion for 'P' 'qed_ok,A' (file wp_strategy.c, line 46):
 Prove: true.
 
 ------------------------------------------------------------
@@ -94,13 +94,13 @@ Prove: true.
   Function dpd2 with behavior default_for_stmt_15
 ------------------------------------------------------------
 
-Goal Post-condition 'qed_ko,Eko' at program point (file tests/wp/wp_strategy.c, line 45):
+Goal Post-condition 'qed_ko,Eko' at program point (file wp_strategy.c, line 45):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
 
 ------------------------------------------------------------
 
-Goal Assigns 'qed_ok' at program point (file tests/wp/wp_strategy.c, line 45):
+Goal Assigns 'qed_ok' at program point (file wp_strategy.c, line 45):
 Prove: true.
 
 ------------------------------------------------------------
@@ -153,7 +153,7 @@ Prove: true.
   Function spec_if_not_cond with behavior default_for_stmt_48
 ------------------------------------------------------------
 
-Goal Post-condition 'qed_ok' at if-then-else (file tests/wp/wp_strategy.c, line 80):
+Goal Post-condition 'qed_ok' at if-then-else (file wp_strategy.c, line 80):
 Prove: true.
 
 ------------------------------------------------------------

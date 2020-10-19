@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp/sharing.c (with preprocessing)
+[kernel] Parsing sharing.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
@@ -71,7 +71,7 @@ end
   Function f
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp/sharing.c, line 8) in 'f':
+Goal Post-condition (file sharing.c, line 8) in 'f':
 Let a = shift_sint32(t, 0).
 Let a_1 = shift_sint32(t, x).
 Let m = Mint_0[a <- Mint_0[a_1]].

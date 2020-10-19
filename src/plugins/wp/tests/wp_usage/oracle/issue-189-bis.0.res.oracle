@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_usage/issue-189-bis.i (no preprocessing)
+[kernel] Parsing issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -69,7 +69,7 @@ Prove: a_3[a_5] = Mint_0[a_5].
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'cpy' (file tests/wp_usage/issue-189-bis.i, line 27):
+Goal Preservation of Invariant 'cpy' (file issue-189-bis.i, line 27):
 Let a = Mptr_0[global(P_src_24)].
 Let a_1 = Mptr_0[global(P_dst_25)].
 Let a_2 = shift_uint8(a_1, 0).
@@ -101,22 +101,22 @@ Prove: a_5[shift_uint8(a, i)] = a_5[shift_uint8(a_1, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'cpy' (file tests/wp_usage/issue-189-bis.i, line 27):
+Goal Establishment of Invariant 'cpy' (file issue-189-bis.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'dst' (file tests/wp_usage/issue-189-bis.i, line 25):
+Goal Preservation of Invariant 'dst' (file issue-189-bis.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'dst' (file tests/wp_usage/issue-189-bis.i, line 25):
+Goal Establishment of Invariant 'dst' (file issue-189-bis.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'len' (file tests/wp_usage/issue-189-bis.i, line 23):
+Goal Preservation of Invariant 'len' (file issue-189-bis.i, line 23):
 Let a = Mptr_0[global(P_src_24)].
 Let a_1 = Mptr_0[global(P_dst_25)].
 Let a_2 = shift_uint8(a_1, 0).
@@ -145,39 +145,39 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'len' (file tests/wp_usage/issue-189-bis.i, line 23):
+Goal Establishment of Invariant 'len' (file issue-189-bis.i, line 23):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'src' (file tests/wp_usage/issue-189-bis.i, line 24):
+Goal Preservation of Invariant 'src' (file issue-189-bis.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'src' (file tests/wp_usage/issue-189-bis.i, line 24):
+Goal Establishment of Invariant 'src' (file issue-189-bis.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 26) (1/4):
+Goal Loop assigns (file issue-189-bis.i, line 26) (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 26) (2/4):
+Goal Loop assigns (file issue-189-bis.i, line 26) (2/4):
 Effect at line 32
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 26) (3/4):
+Goal Loop assigns (file issue-189-bis.i, line 26) (3/4):
 Effect at line 32
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 26) (4/4):
+Goal Loop assigns (file issue-189-bis.i, line 26) (4/4):
 Effect at line 32
 Let a = global(P_src_24).
 Let a_1 = Mptr_0[a].
@@ -211,7 +211,7 @@ Prove: (a_2 = v) \/ (a = v) \/ included(v, 1, a_4, len_0).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_usage/issue-189-bis.i, line 18) in 'memcpy_alias_vars':
+Goal Assigns (file issue-189-bis.i, line 18) in 'memcpy_alias_vars':
 Effect at line 31
 Prove: true.
 
@@ -283,7 +283,7 @@ Prove: a_3[a_5] = Mint_0[a_5].
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,cpy' (file tests/wp_usage/issue-189-bis.i, line 55):
+Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 55):
 Let a = Mptr_0[global(P_src_47)].
 Let a_1 = Mptr_0[global(P_dst_48)].
 Let a_2 = shift_uint8(a_1, 0).
@@ -315,22 +315,22 @@ Prove: a_5[shift_uint8(a, i)] = a_5[shift_uint8(a_1, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,cpy' (file tests/wp_usage/issue-189-bis.i, line 55):
+Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 55):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,dst' (file tests/wp_usage/issue-189-bis.i, line 53):
+Goal Preservation of Invariant 'ok,dst' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,dst' (file tests/wp_usage/issue-189-bis.i, line 53):
+Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,len' (file tests/wp_usage/issue-189-bis.i, line 51):
+Goal Preservation of Invariant 'ok,len' (file issue-189-bis.i, line 51):
 Let a = Mptr_0[global(P_src_47)].
 Let a_1 = Mptr_0[global(P_dst_48)].
 Let a_2 = shift_uint8(a_1, 0).
@@ -359,39 +359,39 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,len' (file tests/wp_usage/issue-189-bis.i, line 51):
+Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 51):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,src' (file tests/wp_usage/issue-189-bis.i, line 52):
+Goal Preservation of Invariant 'ok,src' (file issue-189-bis.i, line 52):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,src' (file tests/wp_usage/issue-189-bis.i, line 52):
+Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 52):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 54) (1/4):
+Goal Loop assigns (file issue-189-bis.i, line 54) (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 54) (2/4):
+Goal Loop assigns (file issue-189-bis.i, line 54) (2/4):
 Effect at line 60
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 54) (3/4):
+Goal Loop assigns (file issue-189-bis.i, line 54) (3/4):
 Effect at line 60
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_usage/issue-189-bis.i, line 54) (4/4):
+Goal Loop assigns (file issue-189-bis.i, line 54) (4/4):
 Effect at line 60
 Let a = Mptr_0[global(P_src_47)].
 Let a_1 = Mptr_0[global(P_dst_48)].
@@ -423,7 +423,7 @@ Prove: included(tmp_0, 1, a_2, len_0).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_usage/issue-189-bis.i, line 44) in 'memcpy_context_vars':
+Goal Assigns (file issue-189-bis.i, line 44) in 'memcpy_context_vars':
 Effect at line 59
 Prove: true.
 

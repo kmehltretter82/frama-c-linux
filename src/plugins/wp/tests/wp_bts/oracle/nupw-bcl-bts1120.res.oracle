@@ -1,9 +1,9 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_bts/nupw-bcl-bts1120.i (no preprocessing)
+[kernel] Parsing nupw-bcl-bts1120.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] tests/wp_bts/nupw-bcl-bts1120.i:54: Warning: 
+[wp] nupw-bcl-bts1120.i:54: Warning: 
   [cfg] Forget exits clause of node <blkIn-stmt:26>
-[wp] tests/wp_bts/nupw-bcl-bts1120.i:54: Warning: 
+[wp] nupw-bcl-bts1120.i:54: Warning: 
   [cfg] Forget exits clause of node <blkIn-stmt:26>
 [wp] [CFG] Goal unreachable_smt_with_contract_assigns : Valid (Unreachable)
 [wp] [CFG] Goal unreachable_smt_with_contract_exits_ok : Valid (Unreachable)
@@ -25,7 +25,7 @@ Prove: P_ExitP(0).
   Function cfg_domination_problem with behavior default_for_stmt_26
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_bts/nupw-bcl-bts1120.i, line 60) at block:
+Goal Assigns (file nupw-bcl-bts1120.i, line 60) at block:
 Prove: true.
 
 ------------------------------------------------------------
@@ -73,7 +73,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'ok' in 'f_with_precond'' in 'unreachable_smt_with_contract' at initialization of 'tmp' (file tests/wp_bts/nupw-bcl-bts1120.i, line 40)
+Goal Instance of 'Pre-condition 'ok' in 'f_with_precond'' in 'unreachable_smt_with_contract' at initialization of 'tmp' (file nupw-bcl-bts1120.i, line 40)
 :
 Prove: true.
 

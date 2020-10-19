@@ -1,12 +1,12 @@
 # frama-c -wp -wp-rte [...]
-[kernel] Parsing tests/wp_tip/chunk_printing.i (no preprocessing)
+[kernel] Parsing chunk_printing.i (no preprocessing)
 [wp] Running WP plugin...
 [rte] annotating function main
 ------------------------------------------------------------
   Function main
 ------------------------------------------------------------
 
-Goal Assertion (file tests/wp_tip/chunk_printing.i, line 32):
+Goal Assertion (file chunk_printing.i, line 32):
 Let x_1 = « *`v_1 »@L1.
 Let x_2 = « *`v »@L1.
 Assume {

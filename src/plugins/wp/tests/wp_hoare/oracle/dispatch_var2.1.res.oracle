@@ -1,39 +1,39 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
-[kernel] Parsing tests/wp_hoare/dispatch_var2.i (no preprocessing)
+[kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function call_global
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 37) in 'call_global':
+Goal Post-condition (file dispatch_var2.i, line 37) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global':
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global' (1/2):
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global' (2/2):
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (2/2):
 Call Result at line 42
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_global' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 41)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_global' at call 'reset' (file dispatch_var2.i, line 41)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_global' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 42)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_global' at call 'load' (file dispatch_var2.i, line 42)
 :
 Prove: true.
 
@@ -42,7 +42,7 @@ Prove: true.
   Function call_local
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 56) in 'call_local':
+Goal Post-condition (file dispatch_var2.i, line 56) in 'call_local':
 Prove: true.
 
 ------------------------------------------------------------
@@ -75,13 +75,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_local' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 61)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_local' at call 'reset' (file dispatch_var2.i, line 61)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_local' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 62)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_local' at call 'load' (file dispatch_var2.i, line 62)
 :
 Prove: true.
 
@@ -90,7 +90,7 @@ Prove: true.
   Function call_param
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 47) in 'call_param':
+Goal Post-condition (file dispatch_var2.i, line 47) in 'call_param':
 Prove: true.
 
 ------------------------------------------------------------
@@ -123,13 +123,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_param' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 51)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param' at call 'reset' (file dispatch_var2.i, line 51)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_param' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 52)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param' at call 'load' (file dispatch_var2.i, line 52)
 :
 Prove: true.
 
@@ -138,34 +138,34 @@ Prove: true.
   Function call_param_ref
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 68) in 'call_param_ref':
+Goal Post-condition (file dispatch_var2.i, line 68) in 'call_param_ref':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref':
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref' (1/2):
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref' (2/2):
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (2/2):
 Call Result at line 73
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_param_ref' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 72)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param_ref' at call 'reset' (file dispatch_var2.i, line 72)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_param_ref' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 73)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param_ref' at call 'load' (file dispatch_var2.i, line 73)
 :
 Prove: true.
 
@@ -174,12 +174,12 @@ Prove: true.
   Function incr
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 21) in 'incr':
+Goal Post-condition (file dispatch_var2.i, line 21) in 'incr':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 20) in 'incr':
+Goal Assigns (file dispatch_var2.i, line 20) in 'incr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -187,7 +187,7 @@ Prove: true.
   Function load
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 29) in 'load':
+Goal Post-condition (file dispatch_var2.i, line 29) in 'load':
 Prove: true.
 
 ------------------------------------------------------------
@@ -201,12 +201,12 @@ Prove: true.
   Function reset
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 14) in 'reset':
+Goal Post-condition (file dispatch_var2.i, line 14) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 13) in 'reset':
+Goal Assigns (file dispatch_var2.i, line 13) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------

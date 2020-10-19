@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/assigned_initialized_memvar.i (no preprocessing)
+[kernel] Parsing assigned_initialized_memvar.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function array
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 73):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 73):
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
@@ -37,7 +37,7 @@ Prove: true.
   Function comp
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 125):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 125):
 Let a = Init_s_0.Init_F1_S_a.
 Assume {
   Have: 0 <= i.
@@ -70,7 +70,7 @@ Prove: true.
   Function descr
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 105):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 105):
 Let a = Init_s_0.Init_F1_S_a.
 Assume {
   Have: 0 <= i.
@@ -149,7 +149,7 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 54):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 54):
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
@@ -175,7 +175,7 @@ Prove: true.
   Function index
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 89):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 89):
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
@@ -209,7 +209,7 @@ Prove: true.
   Function initialize
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 17):
+Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memvar.i, line 17):
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Invariant 'CHECK' *)
@@ -225,12 +225,12 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 17):
+Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memvar.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 22):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 22):
 Assume {
   Have: 0 <= i.
   Have: i <= 9.
@@ -254,7 +254,7 @@ Prove: true.
   Function range
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file tests/wp_acsl/assigned_initialized_memvar.i, line 38):
+Goal Check 'CHECK' (file assigned_initialized_memvar.i, line 38):
 Let a = Init_s_0.Init_F1_S_a.
 Assume {
   Have: 0 <= i.

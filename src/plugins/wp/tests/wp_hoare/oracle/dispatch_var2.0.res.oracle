@@ -1,12 +1,12 @@
 # frama-c -wp -wp-model 'Typed (Ref)' -wp-no-let [...]
-[kernel] Parsing tests/wp_hoare/dispatch_var2.i (no preprocessing)
+[kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function call_global
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 37) in 'call_global':
+Goal Post-condition (file dispatch_var2.i, line 37) in 'call_global':
 Assume {
   Type: is_sint32(call_global_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(x).
@@ -32,17 +32,17 @@ Prove: call_global_0 = 0.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global':
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global' (1/2):
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 36) in 'call_global' (2/2):
+Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (2/2):
 Call Result at line 42
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(tmp_0) /\ is_sint32(x).
@@ -63,13 +63,13 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_global' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 41)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_global' at call 'reset' (file dispatch_var2.i, line 41)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_global' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 42)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_global' at call 'load' (file dispatch_var2.i, line 42)
 :
 Prove: true.
 
@@ -78,7 +78,7 @@ Prove: true.
   Function call_local
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 56) in 'call_local':
+Goal Post-condition (file dispatch_var2.i, line 56) in 'call_local':
 Assume {
   Type: is_sint32(call_local_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(z).
@@ -188,7 +188,7 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_local' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 61)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_local' at call 'reset' (file dispatch_var2.i, line 61)
 :
 Assume {
   (* Block In *)
@@ -198,7 +198,7 @@ Prove: (ta_z_0=true).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_local' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 62)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_local' at call 'load' (file dispatch_var2.i, line 62)
 :
 Assume {
   Type: is_sint32(z).
@@ -219,7 +219,7 @@ Prove: (ta_z_0=true).
   Function call_param
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 47) in 'call_param':
+Goal Post-condition (file dispatch_var2.i, line 47) in 'call_param':
 Assume {
   Type: is_sint32(call_param_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(y).
@@ -324,7 +324,7 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_param' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 51)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param' at call 'reset' (file dispatch_var2.i, line 51)
 :
 Assume {
   (* Pre-condition *)
@@ -340,7 +340,7 @@ Prove: (ta_y_0=true).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_param' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 52)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param' at call 'load' (file dispatch_var2.i, line 52)
 :
 Assume {
   Type: is_sint32(y).
@@ -362,7 +362,7 @@ Prove: (ta_y_0=true).
   Function call_param_ref
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 68) in 'call_param_ref':
+Goal Post-condition (file dispatch_var2.i, line 68) in 'call_param_ref':
 Assume {
   Type: is_sint32(call_param_ref_0) /\ is_sint32(load_0) /\ is_sint32(q) /\
       is_sint32(tmp_0).
@@ -386,17 +386,17 @@ Prove: call_param_ref_0 = 0.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref':
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref' (1/2):
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 67) in 'call_param_ref' (2/2):
+Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (2/2):
 Call Result at line 73
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(q) /\ is_sint32(tmp_0).
@@ -415,13 +415,13 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 12) in 'reset'' in 'call_param_ref' at call 'reset' (file tests/wp_hoare/dispatch_var2.i, line 72)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param_ref' at call 'reset' (file dispatch_var2.i, line 72)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file tests/wp_hoare/dispatch_var2.i, line 27) in 'load'' in 'call_param_ref' at call 'load' (file tests/wp_hoare/dispatch_var2.i, line 73)
+Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param_ref' at call 'load' (file dispatch_var2.i, line 73)
 :
 Prove: true.
 
@@ -430,7 +430,7 @@ Prove: true.
   Function incr
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 21) in 'incr':
+Goal Post-condition (file dispatch_var2.i, line 21) in 'incr':
 Assume {
   Type: is_sint32(ip_0) /\ is_sint32(ip_1) /\ is_sint32(ip_2).
   Have: ip_2 = ip_0.
@@ -440,7 +440,7 @@ Prove: (1 + ip_0) = ip_1.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 20) in 'incr':
+Goal Assigns (file dispatch_var2.i, line 20) in 'incr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -448,7 +448,7 @@ Prove: true.
   Function load
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 29) in 'load':
+Goal Post-condition (file dispatch_var2.i, line 29) in 'load':
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(lp_0) /\ is_sint32(retres_0).
   (* Block In *)
@@ -475,13 +475,13 @@ Prove: (ta_retres_0=false).
   Function reset
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_hoare/dispatch_var2.i, line 14) in 'reset':
+Goal Post-condition (file dispatch_var2.i, line 14) in 'reset':
 Assume { Type: is_sint32(rp_0). Have: rp_0 = 0. }
 Prove: rp_0 = 0.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_hoare/dispatch_var2.i, line 13) in 'reset':
+Goal Assigns (file dispatch_var2.i, line 13) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------
