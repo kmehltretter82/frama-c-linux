@@ -1,6 +1,7 @@
 /*  run.config
-
-   CMD: @frama-c@ -load-plugin slicing -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
+   LIBS: libSelect
+   CMXS: @PTEST_NAME@
+   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */
 int main (char choix) {

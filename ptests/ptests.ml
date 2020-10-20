@@ -525,6 +525,7 @@ type config =
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
                                   *)
+    dc_libs    : string list; (** libraries to compile *)
     dc_cmxs    : string list; (** cmxs to compile *)
     dc_deps    : string list; (** deps *)
     dc_plugins : string list; (** only plugins to load *)
@@ -547,6 +548,7 @@ let default_macros () = Macros.add_list
   [ "PLUGIN", "" ;
     "DEFAULT_OPTIONS", "-journal-disable -check"; (* the options automatically added by the use of @frama-c@ in CMD and EXECNOW command.  *)
     "OPTIONS", "";
+    "LIBRARY", "";
   ] Macros.empty
 
 let framac_macro = "@frama-c@"
@@ -556,6 +558,7 @@ let default_config () =
   { dc_test_regexp = test_file_regexp ;
     dc_macros = default_macros ();
     dc_execnow = [];
+    dc_libs = [];
     dc_cmxs = [];
     dc_deps = [];
     dc_plugins = [];
@@ -645,6 +648,10 @@ let config_exec ~once dir s current =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
 let split_list s = Str.split (Str.regexp "[ ,]+") s
+let config_libs _dir s current =
+  let l = split_list s in
+  { current with dc_libs = l @ current.dc_libs }
+
 let config_cmxs _dir s current =
   let l = split_list s in
   { current with dc_cmxs = l @ current.dc_cmxs }
@@ -679,7 +686,7 @@ let config_module _dir s current =
   { current with
     dc_cmxs = (Filename.chop_suffix s ".cmxs") :: current.dc_cmxs;
     dc_deps = s :: current.dc_deps;
-    dc_load_module = s :: current.dc_load_module;
+    dc_load_module = ((Filename.chop_suffix s ".cmxs")^".cmxs") :: current.dc_load_module;
   }
 
 let config_options =
@@ -732,6 +739,7 @@ let config_options =
     "EXECNOW", config_exec ~once:true;
     "EXEC", config_exec ~once:false;
     "CMXS", config_cmxs;
+    "LIBS", config_libs;
     "DEPS", config_deps;
     "MACRO", config_macro;
     "MODULE", config_module;
@@ -1634,7 +1642,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
        execnow=false; timeout;
        deps = config.dc_deps;
        plugins = config.dc_plugins;
-       load_module = config.dc_load_module;
+       load_module = config.dc_libs @ config.dc_load_module ;
       }
     in
     let mk_cmd (s, timeout) =
@@ -1652,7 +1660,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         timeout;
         deps = config.dc_deps;
         plugins = config.dc_plugins;
-        load_module = config.dc_load_module;
+        load_module = config.dc_libs @ config.dc_load_module;
       }
     in
     let process_macros_cmd s = basic_command_string (mk_cmd s) in
@@ -1702,16 +1710,18 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     in
     List.iter (fun cmxs ->
         let file = Macros.expand macros cmxs in
+        let libraries = Macros.expand macros (String.concat " " config.dc_libs) in
         Format.fprintf result_fmt "\
       (executable \
       (name %s) \
       (modules %s) \
       (modes plugin) \
-      (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a) \
+      (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s) \
       (flags -open Frama_c_kernel))\n \
       "
           file file
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
+          libraries
       ) config.dc_cmxs;
     List.iter treat_option config.dc_toplevels;
     List.iter make_execnow_cmd config.dc_execnow

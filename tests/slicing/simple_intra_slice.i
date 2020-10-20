@@ -1,11 +1,11 @@
 /* run.config
-
-   CMD: @frama-c@ -load-plugin slicing -load-module %{dep:libSelect.cmxs} -load-module %{dep:@PTEST_NAME@.cmxs}
+   LIBS: libSelect
+   CMXS: @PTEST_NAME@
+   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
    OPT: @EVA_OPTIONS@ -deps -no-slice-callers -journal-disable
 */
 int Unknown;
 int G;
-
 
 /* on sélectionne le return.
    on doit garder juste a (pas G et b) */
