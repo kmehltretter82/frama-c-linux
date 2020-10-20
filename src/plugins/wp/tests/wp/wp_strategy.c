@@ -1,10 +1,10 @@
 /* run.config
-OPT: -journal-disable -wp-model Hoare -wp-verbose 2
-OPT: -journal-disable -wp-model Typed -wp-verbose 2 -wp-prop @assigns
+OPT: -wp-model Hoare -wp-verbose 2
+OPT: -wp-model Typed -wp-verbose 2 -wp-prop @assigns
 */
 
 /* run.config_qualif
-OPT: -journal-disable -rte -wp -wp-model Hoare -wp-par 1 -wp-msg-key shell
+OPT: -rte -wp -wp-model Hoare -wp-par 1 -wp-msg-key shell
 */
 /*----------------------------------------------------------------------------*/
 

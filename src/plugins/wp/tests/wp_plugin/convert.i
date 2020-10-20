@@ -4,7 +4,7 @@
 
 /* run.config_qualif
    OPT:
-   OPT: -wp-prover native:alt-ergo -wp-report=tests/native.report
+   OPT: -wp-prover native:alt-ergo -wp-report=%{dep:../../native.report}
 */
 
 // --------------------------------------------------------------------------

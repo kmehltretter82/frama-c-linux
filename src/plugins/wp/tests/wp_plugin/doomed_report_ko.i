@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-smoke-tests -wp-report tests/wp_plugin/doomed.report
+   OPT: -wp-smoke-tests -wp-report %{dep:doomed.report}
 */
 
 /*@ axiomatic CFG {

@@ -1,8 +1,8 @@
 /* run.config
    DONTRUN:
 */
-
 /* run.config_qualif
-   CMD: tests/wp_plugin/config.sh
+   DEPS: config.sh
+   CMD: config.sh
    OPT:
 */

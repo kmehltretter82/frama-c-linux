@@ -3,10 +3,10 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover alt-ergo                                            -wp-prop=-ko  -wp-timeout 100 -wp-steps 1500
-   OPT: -wp-prover native:alt-ergo -wp-report=tests/native.report      -wp-prop=-ko  -wp-timeout 100 -wp-steps 1500
-   OPT: -wp-prover alt-ergo                                            -wp-prop=ko   -wp-timeout 100 -wp-steps 10
-   OPT: -wp-prover native:alt-ergo -wp-report=tests/native.report      -wp-prop=ko   -wp-timeout 100 -wp-steps 10
+   OPT: -wp-prover alt-ergo                                              -wp-prop=-ko  -wp-timeout 100 -wp-steps 1500
+   OPT: -wp-prover native:alt-ergo -wp-report=%{dep:../../native.report} -wp-prop=-ko  -wp-timeout 100 -wp-steps 1500
+   OPT: -wp-prover alt-ergo                                              -wp-prop=ko   -wp-timeout 100 -wp-steps 10
+   OPT: -wp-prover native:alt-ergo -wp-report=%{dep:../../native.report} -wp-prop=ko   -wp-timeout 100 -wp-steps 10
 */
 
 // --------------------------------------------------------------------------

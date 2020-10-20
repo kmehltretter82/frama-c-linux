@@ -1,5 +1,6 @@
 /* run.config_qualif
-   OPT: -load-module eva,scope -no-wp -eva -eva-msg-key=-summary -then -wp -then -no-eva -warn-unsigned-overflow -wp
+   PLUGIN: @PLUGIN@ from,inout,eva,scope
+   OPT: -no-wp -eva -eva-msg-key=-summary -then -wp -then -no-eva -warn-unsigned-overflow -wp
  */
 
 /* run.config

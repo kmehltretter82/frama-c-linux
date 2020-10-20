@@ -1,7 +1,7 @@
 /* run.config_qualif
-   OPT: -load-script tests/wp/stmtcompiler_test_rela.ml -wp-msg-key shell
+   MODULE: stmtcompiler_test_rela.cmxs
+   OPT: -wp-msg-key shell
 */
-
 int empty (int c){
   c = c < 0 ? c + 10 : c+100;
   int tmp;

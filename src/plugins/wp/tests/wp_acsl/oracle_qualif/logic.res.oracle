@@ -5,32 +5,23 @@
 [wp] logic.i:65: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_Buint_4*)
      (target: uint32*)
-[wp] logic.i:49: Warning: 
-  Logic cast from struct (Tint2) not implemented yet
-[wp] logic.i:50: Warning: 
-  Logic cast from struct (Point) not implemented yet
+[wp] logic.i:49: Warning: Logic cast from struct (Tint2) not implemented yet
+[wp] logic.i:50: Warning: Logic cast from struct (Point) not implemented yet
 [wp] logic.i:51: Warning: 
   Logic cast to struct (Point) from (int [2]) not implemented yet
-[wp] logic.i:52: Warning: 
-  Logic cast from struct (Point) not implemented yet
-[wp] logic.i:53: Warning: 
-  Logic cast from struct (Tint2) not implemented yet
-[wp] logic.i:54: Warning: 
-  Logic cast from struct (Buint) not implemented yet
+[wp] logic.i:52: Warning: Logic cast from struct (Point) not implemented yet
+[wp] logic.i:53: Warning: Logic cast from struct (Tint2) not implemented yet
+[wp] logic.i:54: Warning: Logic cast from struct (Buint) not implemented yet
 [wp] logic.i:55: Warning: 
   Logic cast to struct (Buint) from (unsigned int) not implemented yet
-[wp] logic.i:56: Warning: 
-  Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:56: Warning: Logic cast from struct (Tint6) not implemented yet
 [wp] logic.i:57: Warning: 
   Logic cast to sized array (Triangle) from (int [6]) not implemented yet
-[wp] logic.i:58: Warning: 
-  Logic cast from struct (Tint6) not implemented yet
-[wp] logic.i:59: Warning: 
-  Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:58: Warning: Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:59: Warning: Logic cast from struct (Tint6) not implemented yet
 [wp] logic.i:60: Warning: 
   Logic cast to sized array (int [2]) from (int [6]) not implemented yet
-[wp] logic.i:61: Warning: 
-  Logic cast from struct (Tint6) not implemented yet
+[wp] logic.i:61: Warning: Logic cast from struct (Tint6) not implemented yet
 [wp] logic.i:62: Warning: 
   Logic cast to struct (Tint2) from (int [6]) not implemented yet
 [wp] 21 goals scheduled

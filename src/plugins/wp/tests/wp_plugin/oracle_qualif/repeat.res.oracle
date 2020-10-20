@@ -2,8 +2,7 @@
 [kernel] Parsing repeat.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] repeat.c:47: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
+[wp] repeat.c:47: Warning: Missing assigns clause (assigns 'everything' instead)
 [wp] 47 goals scheduled
 [wp] [Qed] Goal typed_master_ensures : Valid
 [wp] [Qed] Goal typed_master_assigns_exit : Valid

@@ -9,6 +9,7 @@
 
 
 /tests/*/oracle/dune
+/tests/*/oracle_*/dune
 /tests/*/result
 /tests/*/result_*
 /tests/*/*.sav

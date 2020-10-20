@@ -1,3 +1,4 @@
-PLUGIN: wp,rtegen
-CMD: @frama-c@ -wp -wp-par 1 -wp-share ../../../share -wp-msg-key shell -wp-report  %{dep:../../qualif.report} -wp-session @PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay -wp-coq-timeout 120
+PLUGIN: rtegen,wp
+MACRO: WP_OPTIONS -wp -wp-par 1 -wp-share ../../../share -wp-msg-key shell -wp-report  %{dep:../../qualif.report} -wp-session @PTEST_NAME@.@PTEST_NUMBER@.session -wp-cache-env -wp-cache replay -wp-coq-timeout 120
+CMD: @frama-c@ @WP_OPTIONS@
 OPT:

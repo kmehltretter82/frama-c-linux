@@ -1,5 +1,5 @@
 # frama-c -wp -wp-model 'Dump' [...]
-[kernel] Parsing tests/wp_plugin/stmt.c (with preprocessing)
+[kernel] Parsing stmt.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal f_exits : Valid (Unreachable)
 [wp] [CFG] Goal g_exits : Valid (Unreachable)
