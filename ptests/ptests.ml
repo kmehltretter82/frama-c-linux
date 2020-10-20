@@ -550,7 +550,7 @@ let default_macros () = Macros.add_list
   ] Macros.empty
 
 let framac_macro = "@frama-c@"
-let contains_framac_macro s = Str.string_match (Str.regexp (Str.quote "@frama-c@")) s 0
+let contains_framac_macro s = Str.string_match (Str.regexp ".*@frama-c@") s 0
 
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
