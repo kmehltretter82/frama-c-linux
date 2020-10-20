@@ -2,7 +2,7 @@
    OPT: -wp-driver %{dep:abs.driver}
  */
 /* run.config_qualif
-   DEPS: abs.why abs.mlw abs.script
+   DEPS: abs.why abs.mlw abs.script Abs.v
    OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover alt-ergo
    OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover native:coq -wp-coq-script %{dep:abs.script}
    OPT: -wp -wp-driver %{dep:abs.driver} -wp-prover native:alt-ergo

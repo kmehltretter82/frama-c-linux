@@ -1,3 +1,3 @@
 PLUGIN: rtegen,wp
-CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-share ../../../share -wp-msg-key shell
+CMD: @frama-c@ -wp -wp-prover none -wp-print -wp-msg-key shell
 OPT:
