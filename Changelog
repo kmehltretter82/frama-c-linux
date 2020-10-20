@@ -17,6 +17,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Dev       [2020-10-20] Support for OCamlGraph 2.0.0
 -   ACSL      [2020-10-16] Allows for axiomatic blocks-like extensions
 -   Variadic  [2020-10-14] Don't print generated function name but print
               original name and a comment with the generated name so that the
