@@ -150,8 +150,12 @@ for callee in sorted(callees):
         used_headers.add(posix_identifiers[callee]["header"])
     if callee in c11_functions:
         # check that the callee is not a macro or type (e.g. va_arg)
-        if posix_identifiers[callee]["id_type"] != "function":
+        if callee not in posix_identifiers:
+            # a few functions, such as strcpy_s, are in C11 but not in POSIX
             continue
+        else:
+            if posix_identifiers[callee]["id_type"] != "function":
+                continue
         #print(f"C11 function: {callee}")
         if callee in libc_specified_functions:
             if verbose or debug:
@@ -240,6 +244,11 @@ for keyword in c11_unsupported:
     if lines:
         n = len(lines)
         print(f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of unsupported C11 construct '{keyword}'")
+
+# assembly code
+
+if "asm" in callees or "__asm" in callees or "__asm__" in callees:
+    print(f"- warning: code seems to contain inline assembly ('asm(...)')")
 
 # TODO:
 # - detect absence of 'main' function (library)
