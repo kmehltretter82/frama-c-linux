@@ -98,6 +98,10 @@ DEVELOPMENT	?=@DEVELOPMENT@
 # Libraries #
 #############
 
+# ocamlgraph
+HAS_OCAMLGRAPH_2 ?= @HAS_OCAMLGRAPH_2@
+HAS_DGRAPH ?= @HAS_DGRAPH@
+
 # lablgtk
 HAS_LABLGTK	?=@HAS_LABLGTK@
 HAS_LABLGTK_CUSTOM_MODEL ?=@HAS_LABLGTK@
@@ -105,6 +109,8 @@ LABLGTK_PATH ?=@LABLGTK_PATH@
 LABLGTK ?= lablgtk@LABLGTK_VERSION@
 # lablgtksourceview
 HAS_GTKSOURCEVIEW ?=@HAS_GTKSOURCEVIEW@
+#gnomecanvas
+HAS_GNOMECANVAS ?=@HAS_GNOMECANVAS@
 
 LABLGTK_VERSION ?=@LABLGTK_VERSION@
 ifeq ("$(LABLGTK_VERSION)","3")
@@ -115,9 +121,6 @@ else
     $(patsubst lablgtk%,$(LABLGTK).%,$(basename $(notdir @GTKSOURCEVIEW@)))
   THREAD:=
 endif
-
-# lablgnomecanvas
-HAS_GNOMECANVAS	?=@HAS_GNOMECANVAS@
 
 # apron
 HAS_APRON	?=@HAS_APRON@
@@ -202,8 +205,17 @@ endif
 
 ifneq ($(ENABLE_GUI),no)
   LIBRARY_NAMES_GUI = $(LABLGTK) $(GTKSOURCEVIEW)
-  ifeq ($(HAS_GNOMECANVAS),yes)
-    LIBRARY_NAMES_GUI+=lablgtk2.gnomecanvas
+  ifeq ($(HAS_OCAMLGRAPH_2),yes)
+    ifeq ($(HAS_DGRAPH),yes)
+      LIBRARY_NAMES_GUI+=ocamlgraph_gtk
+    endif
+  else
+    ifeq ($(HAS_GNOMECANVAS),yes)
+      LIBRARY_NAMES_GUI+=lablgtk2.gnomecanvas
+      GRAPH_GUICMO= dgraph.cmo
+      GRAPH_GUICMX= dgraph.cmx
+      GRAPH_GUIO= dgraph.o
+    endif
   endif
 else
 LIBRARY_NAMES_GUI =

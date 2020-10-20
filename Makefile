@@ -413,25 +413,6 @@ clean_share_link:
 
 clean:: clean_share_link
 
-##############
-# Ocamlgraph #
-##############
-
-# dgraph (included in ocamlgraph)
-#[LC] Cf https://github.com/backtracking/ocamlgraph/pull/32
-ifeq ($(HAS_GNOMECANVAS),yes)
-ifneq ($(ENABLE_GUI),no)
-GRAPH_GUICMO= dgraph.cmo
-GRAPH_GUICMX= dgraph.cmx
-GRAPH_GUIO= dgraph.o
-HAS_DGRAPH=yes
-else # enable_gui is no: disable dgraph
-HAS_DGRAPH=no
-endif
-else # gnome_canvas is not yes: disable dgraph
-HAS_DGRAPH=no
-endif
-
 ##################
 # Frama-C Kernel #
 ##################
@@ -739,18 +720,6 @@ src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
-ifeq ($(HAS_DGRAPH),yes)
-  DGRAPHFILES:=debug_manager
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-else
-  DGRAPHFILES:=
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-endif
-
 SINGLE_GUI_CMO:= \
 	wutil_once \
 	gtk_compat \
@@ -813,6 +782,7 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
 PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
@@ -1710,8 +1680,11 @@ ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -p
 ALL_ML_FILES+=ptests/ptests.ml
 
 ifeq ($(origin MANUAL_ML_FILES),undefined)
-MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
+MANUAL_ML_FILES:=$(ALL_ML_FILES)
 endif
+
+MANUAL_ML_FILES:=\
+  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
 # (e.g. pre-commit hook that will concentrate on files which have changed)
@@ -2306,6 +2279,10 @@ GENERATED+=share/frama-c.rc
 PLUGIN_DEP_LIST:=$(PLUGIN_LIST)
 
 .PHONY: depend
+
+# tell make not to remove generated files even if they are only a byproduct
+# of making .depend.
+.PRECIOUS: $(GENERATED) share/Makefile.dynamic_config
 
 # in case .depend is absent, we will make it. Otherwise, it will be left
 # untouched. Only make depend will force a recomputation of dependencies

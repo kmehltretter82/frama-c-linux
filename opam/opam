@@ -103,11 +103,12 @@ run-test: [
 
 depends: [
   "ocaml" { >= "4.08.1" }
-  "ocamlgraph" { >= "1.8.8" & < "1.9~" }
+  "ocamlgraph" { >= "1.8.8" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "zarith"
   "conf-autoconf" { build }
-  ( ( "lablgtk" { >= "2.18.8" } & "conf-gnomecanvas" & "conf-gtksourceview" )
+  ( ( "lablgtk" { >= "2.18.8" } & "conf-gnomecanvas" & "conf-gtksourceview"
+      & ("ocamlgraph" { < "2.0" } | "ocamlgraph_gtk" ))
     | ( "lablgtk3" { >= "3.1.0" & os!="macos" }
         & "lablgtk3-sourceview3" & "conf-gtksourceview3" ) )
   ( "alt-ergo-free" | "alt-ergo" )
