@@ -3,6 +3,6 @@
 */
 /* run.config_qualif
    DEPS: config.sh
-   CMD: config.sh
+   CMD: ./config.sh
    OPT:
 */

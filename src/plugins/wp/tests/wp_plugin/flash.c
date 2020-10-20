@@ -6,6 +6,7 @@
 */
 /* run.config_qualif
    CMXS: flash
+   DEPS: flash.mlw
    OPT: -wp-timeout 1
    OPT: -wp-driver %{dep:flash.driver},%{dep:flash-ergo.driver}
    OPT: -wp-driver %{dep:flash.driver} -load-module %{dep:flash.cmxs}
