@@ -338,6 +338,19 @@ let merge_distinct_emitted x y = match x, y with
   | False_if_reachable, True | True, False_if_reachable ->
     raise Unmergeable
 
+let is_admitted_code_annot = function
+  | Cil_types.AAssert (_, tp)
+  | Cil_types.AInvariant (_, _, tp) -> tp.tp_kind = Admit
+  | _ -> false
+
+let rec is_admitted = function
+  | Property.IPPredicate ip -> ip.ip_pred.ip_content.tp_kind = Admit
+  | IPAxiom _  -> true
+  | IPLemma lemma -> lemma.il_pred.tp_kind = Admit
+  | IPCodeAnnot ca -> is_admitted_code_annot ca.ica_ca.annot_content
+  | IPPropertyInstance instance -> is_admitted instance.ii_ip
+  | _ -> false
+
 module Register_hook = Hook.Build (struct type t = Property.t end)
 
 let register_property_add_hook = Register_hook.extend
@@ -557,7 +570,9 @@ let emit_and_get e ~hyps ppt ?distinct s =
     | IPExtended _
     | IPTypeInvariant _ | IPGlobalInvariant _ -> ()
   end;
-  unsafe_emit_and_get e ~hyps ~auto:false ppt ?distinct s
+  if is_admitted ppt
+  then True (* TODO: fail here? *)
+  else unsafe_emit_and_get e ~hyps ~auto:false ppt ?distinct s
 
 let emit e ~hyps ppt ?distinct s = ignore (emit_and_get e ~hyps ppt ?distinct s)
 
@@ -644,7 +659,9 @@ let conjunction s1 s2 = match s1, s2 with
   | Dont_know, _ | _, Dont_know -> Dont_know
   | True, True -> True
 
-let is_not_verifiable_but_valid ppt status = match status with
+let is_not_verifiable_but_valid ppt status =
+  is_admitted ppt ||
+  match status with
   | Never_tried ->
     (match ppt with
      | Property.IPOther _ ->
