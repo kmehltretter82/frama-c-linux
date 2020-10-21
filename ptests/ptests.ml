@@ -650,7 +650,8 @@ let config_exec ~once dir s current =
 let split_list s = Str.split (Str.regexp "[ ,]+") s
 let config_libs _dir s current =
   let l = split_list s in
-  { current with dc_libs = l @ current.dc_libs }
+  { current with dc_libs = l @ current.dc_libs ;
+    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
 
 let config_cmxs _dir s current =
   let l = split_list s in
