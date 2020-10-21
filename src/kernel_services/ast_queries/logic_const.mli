@@ -47,18 +47,21 @@ val refresh_code_annotation: code_annotation -> code_annotation
 val refresh_spec: funspec -> funspec
 
 (** creates a new toplevel predicate.
-    [only_check] is true if the corresponding predicate should only be used
-    to check a property, without adding it as hypothesis for the rest of the
-    verification. See {!Cil_types.toplevel_predicate} for more information.
-    Default is [false], i.e. use standard ACSL semantics.
+    [predicate_kind] is [Assert] by default. It can be set to:
+    - [Check] for a predicate that should only be used to check a property,
+      without adding it as hypothesis for the rest of the verification.
+    - [Admit] for a predicate that is an hypothesis for the rest of the
+      verification and should not be checked by Frama-C.
+
+    See {!Cil_types.toplevel_predicate} for more information.
     @since 22.0-Titanium
 *)
-val toplevel_predicate: ?only_check:bool -> predicate -> toplevel_predicate
+val toplevel_predicate: ?kind:predicate_kind -> predicate -> toplevel_predicate
 
 (** creates a new identified predicate with a fresh id.
     @modify 22.0-Titanium add [only_check] optional parameter
  *)
-val new_predicate: ?only_check:bool -> predicate -> identified_predicate
+val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
 
 (** creates a new acsl_extension with a fresh id.
     @plugin development guide

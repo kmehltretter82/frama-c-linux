@@ -92,7 +92,7 @@ let is_dead_annot ca =
       is_unrolled_completely spec
   | AAssert([],p)
   | AInvariant([],_,p) ->
-      not p.tp_only_check && is_predicate false p.tp_statement
+      p.tp_kind <> Check && is_predicate false p.tp_statement
   | _ -> false
 
 let is_dead_code stmt =

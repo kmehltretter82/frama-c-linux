@@ -450,6 +450,7 @@ val clear_funspec: funspec -> unit
 
 val is_assert : code_annotation -> bool
 val is_check : code_annotation -> bool
+val is_admit : code_annotation -> bool
 val is_contract : code_annotation -> bool
 val is_stmt_invariant : code_annotation -> bool
 val is_loop_invariant : code_annotation -> bool

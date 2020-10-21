@@ -1019,8 +1019,9 @@ struct
       Format.asprintf  "%sextended%a" (extended_loc_prefix le) pp_names [ext_name]
     | IPCodeAnnot {ica_kf=kf; ica_ca=ca} ->
       let name = match ca.annot_content with
-        | AAssert (_, {tp_only_check = false }) -> "assert"
-        | AAssert (_, {tp_only_check = true }) -> "check"
+        | AAssert (_, {tp_kind = Assert }) -> "assert"
+        | AAssert (_, {tp_kind = Check }) -> "check"
+        | AAssert (_, {tp_kind = Admit }) -> "admit"
         | AInvariant (_,true,_) -> "loop_inv"
         | AInvariant _ -> "inv"
         | APragma _ -> "pragma"
@@ -1155,6 +1156,12 @@ struct
       let open Sanitizer in
       add_part buffer p ; add_sep buffer ; add_parts buffer ps
 
+  let prefix_with_kind tp name =
+    match tp.tp_kind with
+    | Assert -> name
+    | Check -> "check_" ^ name
+    | Admit -> "admit_" ^ name
+
   let rec parts_of_property ip : part list =
     match ip with
     | IPBehavior {ib_kf; ib_kinstr=Kglobal; ib_bhv} ->
@@ -1165,34 +1172,22 @@ struct
     | IPPredicate {ip_kind=PKAssumes bhv; ip_kf=kf; ip_pred=ip} ->
       [ K kf ; B bhv ; A "assumes" ; I ip ]
     | IPPredicate {ip_kind=PKRequires bhv; ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_requires" else "requires"
-      in
+      let a = prefix_with_kind ip.ip_content "requires" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Normal); ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_ensures" else "ensures"
-      in
+      let a = prefix_with_kind ip.ip_content "ensures" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Exits); ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_exits" else "exits"
-      in
+      let a = prefix_with_kind ip.ip_content "exits" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Breaks); ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_breaks" else "breaks"
-      in
+      let a = prefix_with_kind ip.ip_content "breaks" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Continues); ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_continues" else "continues"
-      in
+      let a = prefix_with_kind ip.ip_content "continues" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKEnsures (bhv, Returns); ip_kf=kf; ip_pred=ip} ->
-      let a =
-        if ip.ip_content.tp_only_check then "check_returns" else "returns"
-      in
+      let a = prefix_with_kind ip.ip_content "returns" in
       [ K kf ; B bhv ; A a ; I ip ]
     | IPPredicate {ip_kind=PKTerminates; ip_kf=kf; ip_pred=ip} ->
       [ K kf ; A "terminates" ; I ip ]
@@ -1225,17 +1220,17 @@ struct
                    ica_ca={annot_content=AExtended (_, _, {ext_name})}} ->
       [ K kf ; A ext_name ; S stmt ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AAssert (_,p)}} ->
-      let a = if p.tp_only_check then "check" else "assert" in
+      let a = match p.tp_kind with
+        | Assert -> "assert"
+        | Check -> "check"
+        | Admit -> "admit"
+      in
       [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_, true, p)}} ->
-      let a =
-        if p.tp_only_check then "check_loop_invariant" else "loop_invariant"
-      in
+      let a = prefix_with_kind p "loop_invariant" in
       [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AInvariant (_,false, p)}} ->
-      let a =
-        if p.tp_only_check then "check_invariant" else "invariant"
-      in
+      let a = prefix_with_kind p "invariant" in
       [K kf ; A a ; P p.tp_statement ]
     | IPCodeAnnot {ica_kf=kf; ica_ca={annot_content=AVariant (e, _)}} ->
       [K kf ; A "loop_variant" ; T e ]
@@ -1264,7 +1259,7 @@ struct
     | IPAxiomatic _
     | IPAxiom _ -> []
     | IPLemma {il_name=name; il_pred=p} ->
-      let a = if p.tp_only_check then "check_lemma" else "lemma" in
+      let a = prefix_with_kind p "lemma" in
       [ A a ; A name ; P p.tp_statement ]
 
     | IPTypeInvariant {iti_name=name}

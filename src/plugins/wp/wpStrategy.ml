@@ -171,7 +171,7 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
     Logic_const.(pat (p,pre_label))
   in
   let requires =
-    List.filter (fun x -> not x.ip_content.tp_only_check) bhv.b_requires
+    List.filter (fun x -> x.ip_content.tp_kind <> Check) bhv.b_requires
   in
   let requires = Logic_const.pands (List.map norm_pred requires) in
   let assumes = Logic_const.pands (List.map norm_pred bhv.b_assumes) in
@@ -183,7 +183,7 @@ let add_prop_fct_pre_bhv acc kind kf bhv =
   add_prop acc kind id p
 
 let add_prop_fct_pre acc kind kf bhv ~assumes pre =
-  if pre.ip_content.tp_only_check then acc else begin
+  if pre.ip_content.tp_kind = Check then acc else begin
     let id = WpPropId.mk_pre_id kf Kglobal bhv pre in
     let labels = NormAtLabels.labels_fct_pre in
     let p = Logic_const.pred_of_id_pred pre in
@@ -234,7 +234,7 @@ let add_prop_stmt_post acc kind kf s bhv tkind l_post ~assumes post =
   add_prop acc kind id p
 
 let update_kind kind pre =
-  if pre.ip_content.tp_only_check then begin
+  if pre.ip_content.tp_kind = Check then begin
     match kind with
     | AcallPre(false,_) -> None
     | AcallPre(true, kf) -> Some (AcallCheck kf)

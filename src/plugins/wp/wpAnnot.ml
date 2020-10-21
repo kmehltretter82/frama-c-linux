@@ -761,7 +761,7 @@ let add_called_post called_kf termination_kind acc =
     let kind = WpStrategy.AcallHyp called_kf in
     let assumes = (Ast_info.behavior_assumes b) in
     let add_post acc (tk, p) =
-      if tk = termination_kind && not p.ip_content.tp_only_check
+      if tk = termination_kind && p.ip_content.tp_kind <> Check
       then WpStrategy.add_prop_call_post acc kind called_kf b tk ~assumes p
       else acc
     in List.fold_left add_post acc b.b_post_cond
@@ -838,7 +838,7 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
   in loop_entry, loop_back
 
 let add_loop_invariant_annot config vloop s ca b_list inv acc =
-  let only_check = inv.tp_only_check in
+  let only_check = inv.tp_kind = Check in
   let inv = inv.tp_statement in
   let assigns, loop_entry, loop_back , loop_core = acc in
   (* we have to prove that inv is true for each edge that goes
@@ -952,7 +952,7 @@ let get_stmt_annots config v s =
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              if p.tp_only_check then acc
+              if p.tp_kind = Check then acc
               else
                 let b_acc =
                   WpStrategy.add_prop_assert
@@ -961,10 +961,10 @@ let get_stmt_annots config v s =
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
               let goal = goal_to_select config id in
-              if p.tp_only_check && not goal then acc
+              if p.tp_kind = Check && not goal then acc
               else
                 let kind =
-                  WpStrategy.(if p.tp_only_check then Agoal else Aboth goal)
+                  WpStrategy.(if p.tp_kind = Check then Agoal else Aboth goal)
                 in
                 let b_acc =
                   WpStrategy.add_prop_assert b_acc kind kf s a p.tp_statement
@@ -1136,7 +1136,7 @@ let add_global_annotations annots =
           linfo.l_var_info.lv_name;
         ()
     | Dlemma (name,_,_,_,p,_,_) ->
-        if not (p.tp_only_check) then
+        if p.tp_kind <> Check then
           WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
   and do_globals gs = List.iter do_global gs in

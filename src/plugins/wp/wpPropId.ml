@@ -470,7 +470,7 @@ let ident_names names =
 
 let pred_names p =
   let p_names = ident_names p.tp_statement.pred_name in
-  if p.tp_only_check then "@check"::p_names else p_names
+  if p.tp_kind = Check then "@check"::p_names else p_names
 
 let code_annot_names ca = match ca.annot_content with
   | AAssert (_, pred)  -> "@assert" :: pred_names pred

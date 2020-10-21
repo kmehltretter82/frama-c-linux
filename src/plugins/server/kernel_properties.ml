@@ -66,6 +66,7 @@ struct
 
   let t_assert = t_kind "assert" "Assertion"
   let t_check = t_kind "check" "Check"
+  let t_admit = t_kind "admit" "Hypothesis"
   let t_loop_invariant = t_loop "invariant"
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
@@ -114,8 +115,9 @@ struct
     | IPDisjoint _ -> t_disjoint
     | IPCodeAnnot { ica_ca={ annot_content } } ->
       begin match annot_content with
-        | AAssert (_, {tp_only_check = false}) -> t_assert
-        | AAssert (_, {tp_only_check = true }) -> t_check
+        | AAssert (_, {tp_kind = Assert}) -> t_assert
+        | AAssert (_, {tp_kind = Check }) -> t_check
+        | AAssert (_, {tp_kind = Admit }) -> t_admit
         | AStmtSpec _ -> t_code_contract
         | AInvariant(_,false,_) -> t_code_invariant
         | AInvariant(_,true,_) -> t_loop_invariant

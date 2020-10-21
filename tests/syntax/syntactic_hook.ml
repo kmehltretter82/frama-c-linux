@@ -15,7 +15,7 @@ class visit = object
            CODE_ANNOT(
              AAssert(
                [],
-               { tp_only_check = false;
+               { tp_kind = Assert;
                  tp_statement =
                    { lexpr_node =
                        PLat ({ lexpr_node = PLtrue; lexpr_loc = loc},"Pre");

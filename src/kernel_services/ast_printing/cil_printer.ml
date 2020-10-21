@@ -2847,8 +2847,11 @@ class cil_printer () = object (self)
   method decreases fmt v = self#decrement "decreases" fmt v
   method variant fmt v = self#decrement "loop variant" fmt v
 
-  method private pp_only_check fmt p =
-    if p.tp_only_check then fprintf fmt "%a " self#pp_acsl_keyword "check"
+  method private pp_predicate_kind fmt p =
+    match p.tp_kind with
+    | Assert -> ()
+    | Check -> fprintf fmt "%a " self#pp_acsl_keyword "check"
+    | Admit -> fprintf fmt "%a " self#pp_acsl_keyword "admit"
 
   method assumes fmt p =
     fprintf fmt "@[<hov 2>%a@ %a;@]"
@@ -2857,7 +2860,7 @@ class cil_printer () = object (self)
 
   method requires fmt p =
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_only_check p.ip_content
+      self#pp_predicate_kind p.ip_content
       self#pp_acsl_keyword "requires"
       self#identified_predicate p
 
@@ -2870,7 +2873,7 @@ class cil_printer () = object (self)
   method post_cond fmt (k,p) =
     let kw = get_termination_kind_name k in
     fprintf fmt "@[<hov 2>%a%a@ %a;@]"
-      self#pp_only_check p.ip_content
+      self#pp_predicate_kind p.ip_content
       self#pp_acsl_keyword kw
       self#identified_predicate p
 
@@ -3083,7 +3086,11 @@ class cil_printer () = object (self)
     in
     match ca.annot_content with
     | AAssert (behav,p) ->
-      let kw = if p.tp_only_check then "check" else "assert" in
+      let kw = match p.tp_kind with
+        | Assert -> "assert"
+        | Check ->  "check"
+        | Admit ->  "admit"
+      in
       fprintf fmt "@[%a%a@ %a;@]"
         pp_for_behavs behav
         self#pp_acsl_keyword kw
@@ -3115,13 +3122,13 @@ class cil_printer () = object (self)
     | AInvariant(behav,true, i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_only_check i
+        self#pp_predicate_kind i
         self#pp_acsl_keyword "loop invariant"
         self#predicate i.tp_statement
     | AInvariant(behav,false,i) ->
       fprintf fmt "@[<2>%a%a%a@ %a;@]"
         pp_for_behavs behav
-        self#pp_only_check i
+        self#pp_predicate_kind i
         self#pp_acsl_keyword "invariant"
         self#predicate i.tp_statement
     | AVariant v ->
@@ -3214,7 +3221,7 @@ class cil_printer () = object (self)
       (* attributes are meant to be purely internal for now. *)
       let old_lab = current_label in
       fprintf fmt "@[<hv 2>@[<hov 1>%a%a %a%a%a:@]@ %t%a;@]@\n"
-        self#pp_only_check pred
+        self#pp_predicate_kind pred
         self#pp_acsl_keyword (if is_axiom then "axiom" else "lemma")
         self#varname name
         self#labels labels

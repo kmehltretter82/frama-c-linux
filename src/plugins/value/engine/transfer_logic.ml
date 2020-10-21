@@ -453,7 +453,7 @@ module Make
     let emit = emit_message_and_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
-      let reduce = active && not pred.ip_content.tp_only_check in
+      let reduce = active && pred.ip_content.tp_kind <> Check in
       let ip = build_prop pred in
       if ignore_predicate pr then
         states
@@ -581,8 +581,9 @@ module Make
 
   let code_annotation_text ca =
     match ca.annot_content with
-    | AAssert (_,{tp_only_check = false}) ->  "assertion"
-    | AAssert (_,{tp_only_check = true}) -> "check"
+    | AAssert (_,{tp_kind = Assert}) ->  "assertion"
+    | AAssert (_,{tp_kind = Check}) -> "check"
+    | AAssert (_,{tp_kind = Admit}) -> "admit"
     | AInvariant _ ->  "loop invariant"
     | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
     | AExtended _ ->
@@ -690,7 +691,7 @@ module Make
     match code_annot.annot_content with
     | AAssert (behav, p)
     | AInvariant (behav, true, p) ->
-      aux ~reduce:(not p.tp_only_check) code_annot behav p.tp_statement
+      aux ~reduce:(p.tp_kind <> Check) code_annot behav p.tp_statement
     | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _ | AExtended _

@@ -1597,9 +1597,14 @@ and identified_predicate = {
   ip_content: toplevel_predicate; (** the predicate itself*)
 }
 
+and predicate_kind =
+  | Assert
+  | Check
+  | Admit
+
 (** main statement of an annotation. *)
 and toplevel_predicate = {
-  tp_only_check: bool;
+  tp_kind: predicate_kind;
   (** whether the annotation is only used to check that [ip_content] holds, but
       stays invisible for other verification tasks (see description of ACSL's
       check keyword).

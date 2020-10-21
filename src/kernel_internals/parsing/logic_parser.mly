@@ -251,7 +251,7 @@
   let cv_const = Attr ("const", [])
   let cv_volatile = Attr ("volatile", [])
 
-  let toplevel_pred tp_only_check tp_statement = { tp_only_check; tp_statement }
+  let toplevel_pred tp_kind tp_statement = { tp_kind; tp_statement }
 %}
 
 /*****************************************************************************/
@@ -277,10 +277,12 @@
 %token ALLOCATION STATIC REGISTER AUTOMATIC DYNAMIC UNALLOCATED
 %token ALLOCABLE FREEABLE FRESH
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
-%token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK SEMICOLON NULL EMPTY
+%token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK ADMIT SEMICOLON NULL EMPTY
 %token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
 %token CHECK_REQUIRES CHECK_LOOP CHECK_INVARIANT CHECK_LEMMA
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
+%token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
+%token ADMIT_ENSURES ADMIT_EXITS ADMIT_CONTINUES ADMIT_BREAKS ADMIT_RETURNS
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
@@ -1143,6 +1145,7 @@ contract:
 
 // use that to detect potentially missing ';' at end of clause
 clause_kw:
+| ADMIT_REQUIRES { "admit requires" }
 | CHECK_REQUIRES { "check requires" }
 | REQUIRES { "requires" }
 | ASSUMES {"assumes"}
@@ -1167,10 +1170,12 @@ requires:
 ;
 
 ne_requires:
-| REQUIRES full_lexpr SEMICOLON requires { toplevel_pred false $2::$4 }
-| CHECK_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred true $2 :: $4 }
+| REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Assert $2::$4 }
+| CHECK_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Check $2 :: $4 }
+| ADMIT_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Admit $2 :: $4 }
 | REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
 | CHECK_REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
+| ADMIT_REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
 ;
 
 terminates:
@@ -1209,10 +1214,10 @@ allocation:
 
 ne_simple_clauses:
 | post_cond_kind full_lexpr SEMICOLON simple_clauses
-    { let only_check, kind = $1 in
+    { let tp_kind, kind = $1 in
       let allocation,assigns,post_cond,extended = $4 in
       allocation,assigns,
-      ((kind,toplevel_pred only_check $2)::post_cond),extended }
+      ((kind,toplevel_pred tp_kind $2)::post_cond),extended }
 | allocation SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $3 in
       let a = concat_allocation allocation $1 in
@@ -1448,8 +1453,9 @@ loop_allocation:
 ;
 
 loop_invariant:
-| LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred false $3 }
-| CHECK_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred true $3 }
+| LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Assert $3 }
+| CHECK_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Check $3 }
+| ADMIT_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Admit $3 }
 ;
 
 loop_variant:
@@ -1499,8 +1505,10 @@ beg_pragma_or_code_annotation:
 | FOR {}
 | ASSERT {}
 | CHECK {}
+| ADMIT {}
 | INVARIANT {}
 | CHECK_INVARIANT {}
+| ADMIT_INVARIANT {}
 | EXT_CODE_ANNOT {}
 ;
 
@@ -1512,13 +1520,17 @@ pragma_or_code_annotation:
 
 code_annotation:
 | ASSERT full_lexpr SEMICOLON
-  { fun bhvs -> AAssert (bhvs,toplevel_pred false $2) }
+  { fun bhvs -> AAssert (bhvs,toplevel_pred Assert $2) }
 | CHECK full_lexpr SEMICOLON
-  { fun bhvs -> AAssert (bhvs,toplevel_pred true $2) }
+  { fun bhvs -> AAssert (bhvs,toplevel_pred Check $2) }
+| ADMIT full_lexpr SEMICOLON
+  { fun bhvs -> AAssert (bhvs,toplevel_pred Admit $2) }
 | INVARIANT full_lexpr SEMICOLON
-  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred false $2) }
+  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Assert $2) }
 | CHECK_INVARIANT full_lexpr SEMICOLON
-  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred true $2) }
+  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Check $2) }
+| ADMIT_INVARIANT full_lexpr SEMICOLON
+  { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Admit $2) }
 | EXT_CODE_ANNOT grammar_extension SEMICOLON
   { fun bhvs ->
     let open Cil_types in
@@ -1687,11 +1699,15 @@ logic_def:
 | LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, toplevel_pred false $4) }
+      LDlemma (id, false, labels, tvars, toplevel_pred Assert $4) }
 | CHECK_LEMMA poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, false, labels, tvars, toplevel_pred true $4) }
+      LDlemma (id, false, labels, tvars, toplevel_pred Check $4) }
+| ADMIT_LEMMA poly_id COLON full_lexpr SEMICOLON
+    { let (id,labels,tvars) = $2 in
+      exit_type_variables_scope ();
+      LDlemma (id, false, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
@@ -1764,7 +1780,7 @@ logic_decl:
 | AXIOM poly_id COLON full_lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      LDlemma (id, true, labels, tvars, toplevel_pred false $4) }
+      LDlemma (id, true, labels, tvars, toplevel_pred Assert $4) }
 ;
 
 logic_decl_loc:
@@ -1926,16 +1942,21 @@ acsl_c_keyword:
 ;
 
 post_cond:
-| ENSURES { (false,Normal), "ensures" }
-| EXITS   { (false,Exits), "exits" }
-| BREAKS  { (false,Breaks), "breaks" }
-| CONTINUES { (false,Continues), "continues" }
-| RETURNS { (false,Returns), "returns" }
-| CHECK_ENSURES { (true,Normal), "check ensures" }
-| CHECK_EXITS   { (true,Exits), "check exits" }
-| CHECK_BREAKS  { (true,Breaks), "check breaks" }
-| CHECK_CONTINUES { (true,Continues), "check continues" }
-| CHECK_RETURNS { (true,Returns), "check returns" }
+| ENSURES { (Assert,Normal), "ensures" }
+| EXITS   { (Assert,Exits), "exits" }
+| BREAKS  { (Assert,Breaks), "breaks" }
+| CONTINUES { (Assert,Continues), "continues" }
+| RETURNS { (Assert,Returns), "returns" }
+| CHECK_ENSURES { (Check,Normal), "check ensures" }
+| CHECK_EXITS   { (Check,Exits), "check exits" }
+| CHECK_BREAKS  { (Check,Breaks), "check breaks" }
+| CHECK_CONTINUES { (Check,Continues), "check continues" }
+| CHECK_RETURNS { (Check,Returns), "check returns" }
+| ADMIT_ENSURES { (Admit,Normal), "admit ensures" }
+| ADMIT_EXITS   { (Admit,Exits), "admit exits" }
+| ADMIT_BREAKS  { (Admit,Breaks), "admit breaks" }
+| ADMIT_CONTINUES { (Admit,Continues), "admit continues" }
+| ADMIT_RETURNS { (Admit,Returns), "admit returns" }
 ;
 
 is_acsl_spec:
@@ -1947,6 +1968,7 @@ is_acsl_spec:
 | BEHAVIOR   { "behavior" }
 | REQUIRES   { "requires" }
 | CHECK_REQUIRES { "check requires" }
+| ADMIT_REQUIRES { "admit requires" }
 | TERMINATES { "terminates" }
 | COMPLETE   { "complete" }
 | DECREASES  { "decreases" }
@@ -1960,6 +1982,7 @@ is_acsl_decl_or_code_annot:
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }
+| ADMIT     { "admit" }
 | GLOBAL    { "global" }
 | IMPACT    { "impact" }
 | INDUCTIVE { "inductive" }
