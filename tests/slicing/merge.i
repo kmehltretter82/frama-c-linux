@@ -1,7 +1,7 @@
 /* run.config
    LIBS: libSelect libAnim
    CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
+   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 3 -journal-disable
 */
 int G1, G2, G3;

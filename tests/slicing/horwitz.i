@@ -1,7 +1,7 @@
 /* run.config
    LIBS: libSelect
    CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
+   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
    OPT: @EVA_OPTIONS@ -deps -slicing-level 0 -journal-disable
 */
 /* bin/toplevel.opt -deps -eva @PTEST_DIR@/@PTEST_NAME@.c */

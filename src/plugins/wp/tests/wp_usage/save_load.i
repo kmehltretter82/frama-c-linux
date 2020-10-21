@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp-share ../../../share -wp -wp-print -wp-prover none -save @PTEST_NAME@.sav > @PTEST_NAME@.sav.res 2> @PTEST_NAME@.sav.err
-   CMD: @frama-c@ -load %{dep:@PTEST_NAME@.sav}
+   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp -wp-print -wp-prover none -save @PTEST_NAME@.sav > @PTEST_NAME@.sav.res 2> @PTEST_NAME@.sav.err
+   CMD: @frama-c@ -load %{dep:@PTEST_NAME@.sav} @OPTIONS@
    OPT: -print
    OPT: -wp -wp-prover none -wp-print
 */

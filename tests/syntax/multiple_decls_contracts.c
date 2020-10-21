@@ -1,5 +1,5 @@
 /* run.config
-CMD: frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @OPTIONS@
+CMD: @frama-c-cmd@ @OPTIONS@
 OPT: %{read:../framac_share_path}/libc/string.h @PTEST_FILE@ @PTEST_FILE@ -print
 OPT: @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h @PTEST_FILE@ -print
 OPT: @PTEST_FILE@ @PTEST_FILE@ %{read:../framac_share_path}/libc/string.h -print

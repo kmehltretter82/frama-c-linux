@@ -516,9 +516,20 @@ struct
 
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
+
+  let default_macros () = add_list
+    [ "PLUGIN", "" ;
+      "DEFAULT_OPTIONS", "-journal-disable -check";
+      "OPTIONS", "";
+      "frama-c-only","frama-c @DEFAULT_OPTIONS@ -no-autoload-plugins";
+      "frama-c-cmd", "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@";
+      "frama-c",     "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@";
+    ] empty
+
 end
 
 (** configuration of a directory/test. *)
+type cmd = { toplevel:string ; opts:string ; macros: Macros.t ; logs:string list ; timeout:string }
 type config =
   {
     dc_test_regexp: string; (** regexp of test files. *)
@@ -535,7 +546,7 @@ type config =
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
                                        standard output *)
-    dc_toplevels    : (string * string * string list * Macros.t * string) list;
+    dc_commands    : cmd list;
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
@@ -544,19 +555,11 @@ type config =
     dc_timeout: string
   }
 
-let default_macros () = Macros.add_list 
-  [ "PLUGIN", "" ;
-    "DEFAULT_OPTIONS", "-journal-disable -check"; (* the options automatically added by the use of @frama-c@ in CMD and EXECNOW command.  *)
-    "OPTIONS", "";
-    "LIBRARY", "";
-  ] Macros.empty
-
-let framac_macro = "@frama-c@"
-let contains_framac_macro s = Str.string_match (Str.regexp ".*@frama-c@") s 0
-
+let default_toplevel = "@frama-c@ @OPTIONS@"
+let default_command = {toplevel=default_toplevel; opts=""; logs=[]; macros=Macros.empty; timeout=""}
 let default_config () =
   { dc_test_regexp = test_file_regexp ;
-    dc_macros = default_macros ();
+    dc_macros = Macros.default_macros ();
     dc_execnow = [];
     dc_libs = [];
     dc_cmxs = [];
@@ -564,8 +567,8 @@ let default_config () =
     dc_plugins = [];
     dc_load_module = [];
     dc_filter = None ;
-    dc_default_toplevel = framac_macro;
-    dc_toplevels = [ framac_macro, "", [], Macros.empty, "" ];
+    dc_default_toplevel = default_toplevel;
+    dc_commands = [ default_command ];
     dc_dont_run = false;
     dc_framac = true;
     dc_default_log = [];
@@ -606,10 +609,9 @@ let scan_execnow ~once dir ex_timeout (s:string) =
     }
 
 (* the default toplevel for the current level of options. *)
-let current_default_toplevel = ref "frama-c"
+let current_default_toplevel = ref default_toplevel
 let current_default_log = ref []
-let current_default_cmds =
-  ref ["frama-c", "@DEFAULT_OPTIONS@", [], Macros.empty, ""]
+let current_default_cmds = ref [ default_command ]
 
 let make_custom_opts =
   let space = Str.regexp " " in
@@ -648,22 +650,31 @@ let config_exec ~once dir s current =
       scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
 let split_list s = Str.split (Str.regexp "[ ,]+") s
-let config_libs _dir s current =
-  let l = split_list s in
-  { current with dc_libs = l @ current.dc_libs ;
-    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
-
-let config_cmxs _dir s current =
-  let l = split_list s in
-  { current with dc_cmxs = l @ current.dc_cmxs }
-
 let config_deps _dir s current =
   { current with dc_deps = (split_list s) @ current.dc_deps }
+
+let config_cmxs _dir s current =
+  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+  { current with dc_cmxs = l @ current.dc_cmxs }
+
+let config_libs _dir s current =
+  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+  { current with dc_libs = l @ current.dc_libs ;
+    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
 
 let config_plugin _dir s current =
   let s = Macros.expand current.dc_macros s in
   { current with dc_plugins = split_list s ;
                  dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
+
+let config_module _dir s current =
+  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+  let deps = List.map (fun s -> s ^ ".cmxs") l in
+  { current with
+    dc_cmxs = l @ current.dc_cmxs;
+    dc_deps = deps @ current.dc_deps;
+    dc_load_module = deps @ current.dc_load_module;
+  }
 
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
@@ -683,13 +694,6 @@ let config_macro _dir s current =
     current
   end
 
-let config_module _dir s current =
-  { current with
-    dc_cmxs = (Filename.chop_suffix s ".cmxs") :: current.dc_cmxs;
-    dc_deps = s :: current.dc_deps;
-    dc_load_module = ((Filename.chop_suffix s ".cmxs")^".cmxs") :: current.dc_load_module;
-  }
-
 let config_options =
   [ "CMD",
     (fun _ s current ->
@@ -698,27 +702,28 @@ let config_options =
     "OPT",
     (fun _ s current ->
        let t =
-         current.dc_default_toplevel,
-         s,
-         current.dc_default_log,
-         current.dc_macros,
-         current.dc_timeout
+         { toplevel = current.dc_default_toplevel;
+           opts = s;
+           logs = current.dc_default_log;
+           macros = current.dc_macros;
+           timeout = current.dc_timeout }
        in
        { current with
          (*           dc_default_toplevel = !current_default_toplevel;*)
          dc_default_log = !current_default_log;
-         dc_toplevels = t :: current.dc_toplevels });
+         dc_commands = t :: current.dc_commands });
 
     "STDOPT",
     (fun _ s current ->
        let new_top =
          List.map
-           (fun (cmd,opts, log, _,_) ->
-              cmd, make_custom_opts opts s, log,
-              current.dc_macros, current.dc_timeout)
+           (fun command ->
+              { command with opts= make_custom_opts command.opts s ;
+                             macros = current.dc_macros;
+                             timeout= current.dc_timeout})
            !current_default_cmds
        in
-       { current with dc_toplevels = new_top @ current.dc_toplevels;
+       { current with dc_commands = new_top @ current.dc_commands;
                       dc_default_log = !current_default_log @
                                        current.dc_default_log });
 
@@ -751,16 +756,16 @@ let config_options =
     "TIMEOUT",
     (fun _ s current -> { current with dc_timeout = s });
     "NOFRAMAC",
-    (fun _ _ current -> { current with dc_toplevels = []; dc_framac = false; });
+    (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
   ]
 
 let scan_options dir scan_buffer default =
   let r =
-    ref { default with dc_toplevels = [] }
+    ref { default with dc_commands = [] }
   in
   current_default_toplevel := default.dc_default_toplevel;
   current_default_log := default.dc_default_log;
-  current_default_cmds := List.rev default.dc_toplevels;
+  current_default_cmds := List.rev default.dc_commands;
   let treat_line s =
     try
       Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
@@ -784,9 +789,9 @@ let scan_options dir scan_buffer default =
     assert false
   with
     End_of_file ->
-    (match !r.dc_toplevels with
-     | [] when !r.dc_framac -> { !r with dc_toplevels = default.dc_toplevels }
-     | l -> { !r with dc_toplevels = List.rev l })
+    (match !r.dc_commands with
+     | [] when !r.dc_framac -> { !r with dc_commands = default.dc_commands }
+     | l -> { !r with dc_commands = List.rev l })
 
 let split_config s = Str.split (Str.regexp ",[ ]*") s
 
@@ -954,7 +959,6 @@ let get_macros cmd =
   Macros.add_list macros cmd.macros
 
 let basic_command_string command =
-  let file = Filename.sanitize @@ get_ptest_file command in
   let macros = get_macros command in
   command.log_files <- List.map (Macros.expand macros) command.log_files;
   let expanded_plugins_options =
@@ -970,19 +974,7 @@ let basic_command_string command =
       "PLUGIN_OPTIONS", expanded_plugins_options;
     ] macros in
 
-  let toplevel, macros= if contains_framac_macro command.toplevel then
-     (* in such a case, OPTIONS are automatically added at the end of the current CMD *)
-     let toplevel = String.concat " " [command.toplevel ; "@OPTIONS@"]
-     and macros =
-       Macros.add_list [
-      "frama-c", (String.concat " " [ "frama-c" ; "@DEFAULT_OPTIONS@" ; expanded_plugins_options ; file ])
-    ] macros in
-    toplevel, macros
-  else
-    command.toplevel, macros
-  in
-
-  let raw_command = Macros.expand macros toplevel in
+  let raw_command = Macros.expand macros command.toplevel in
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
@@ -1635,8 +1627,8 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
   if not config.dc_dont_run then
     let i = ref 0 in
     let e = ref 0 in
-    let nb_files = List.length config.dc_toplevels in
-    let make_toplevel_cmd (toplevel, options, log_files, macros, timeout) =
+    let nb_files = List.length config.dc_commands in
+    let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; timeout} =
       let n = !i in
       {file; options; toplevel; nb_files; directory; n; log_files;
        filter = config.dc_filter; macros;
@@ -1666,8 +1658,8 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     in
     let process_macros_cmd s = basic_command_string (mk_cmd s) in
     let macros = get_macros (mk_cmd ("/bin/true","")) in
-    let process_macros s = Macros.expand macros s in
     let make_execnow_cmd execnow =
+      let process_macros s = Macros.expand macros s in
       let res =
         {
           ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
@@ -1724,7 +1716,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
       ) config.dc_cmxs;
-    List.iter treat_option config.dc_toplevels;
+    List.iter treat_option config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow
 
 let () =

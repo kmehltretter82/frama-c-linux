@@ -2,7 +2,7 @@
    DONTRUN:
 */
 /* run.config_qualif
-   CMD: chmod a-x %{dep:../../inexistant-prover} && @frama-c@ @WP_OPTIONS@
+   CMD: chmod a-x %{dep:../../inexistant-prover} && @frama-c@ @WP_OPTIONS@ @OPTIONS@
    OPT: -wp
    OPT: -wp -wp-prover "alt-ergo,native:coq" -wp-alt-ergo %{dep:../../inexistant-prover} -wp-coqc %{dep:../../inexistant-prover}
    OPT: -wp -wp-prover "alt-ergo" -wp-alt-ergo %{dep:../../inexistant-prover}

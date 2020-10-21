@@ -2,7 +2,7 @@
    PLUGIN: constant_propagation @PLUGIN@
    LIBS: libSelect
    CMXS: @PTEST_NAME@
-   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs}
+   CMD: @frama-c@ -load-module %{dep:@PTEST_NAME@.cmxs} @OPTIONS@
    OPT: @EVA_OPTIONS@ -deps -journal-disable
 */
 //@ assigns \result \from x;
