@@ -166,7 +166,7 @@ force-reconfigure:
 
 
 ##############################################################################
-.PHONY: tests clean-tests
+.PHONY: tests clean-tests run-tests purge-tests
 
 # todo: adds bugs?
 # todo: adds crowbar?
@@ -183,19 +183,36 @@ TESTS=builtins callgraph cil constant_propagation dynamic float idct impact jcdb
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: no test found for studia ?
 # todo: adds wp (config qualif)
-PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
+PLUGIN_TEST_CONFIGS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
 
-tests: config.sed
+ifneq ($(FRAMAC_WP_CACHEDIR),)
+PLUGIN_TEST_CONFIGS+= wp:qualif
+endif
+
+PLUGIN_TESTS= $(sort $(filter-out :%, $(subst :, :,$(PLUGIN_TEST_CONFIGS))))
+
+.PHONY: run-tests clean-tests purge-tests tests
+purge-tests: config.sed
 	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
+
+clean-tests: purge-tests
+	rm -rf _build/default/tests
+
+run-tests: FRAMAC_WP_CACHE=replay
+run-tests: config.sed purge-tests
 	dune exec -- ptests/ptests.exe
-	for plugin in $(PLUGIN_TESTS); do \
-		dune exec -- ptests/ptests.exe src/plugins/$$plugin/tests; \
+	for plugin in $(PLUGIN_TEST_CONFIGS); do \
+		dune exec -- ptests/ptests.exe src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests $$(echo $$plugin | sed -e "s/^[^:]*//" | sed -e "s/:/-config /"); \
 	done
 	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS))) \
 	           $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
 
-clean-tests:
-	rm -rf _build/default/tests
+ifneq ($(FRAMAC_WP_CACHEDIR),)
+tests: run-tests
+else
+tests: run-tests
+	@echo "WARNING: cannot run -config qualif tests of WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
+endif
 
 ##############################################################################
 .PHONY: install uninstall
