@@ -41,8 +41,7 @@ module Filename = struct
 
   let temp_file =
     if Sys.os_type = "Win32" then
-      fun a b -> let r = temp_file a b in
-        cygpath r
+      fun a b -> cygpath (temp_file a b)
     else
       fun a b -> temp_file a b
 
@@ -56,35 +55,16 @@ let string_del_suffix suffix s =
     Some (String.sub s 0 (ls - lsuffix))
   else None
 
-let str_mutex = Mutex.create()
-
-let str_global_replace regex repl s =
-  Mutex.lock str_mutex;
-  let res = Str.global_replace regex repl s in
-  Mutex.unlock str_mutex; res
-
-let str_string_match regex s n =
-  Mutex.lock str_mutex;
-  let res = Str.string_match regex s n in
-  Mutex.unlock str_mutex; res
-
 (* If regex1 matches inside s, adds suffix to the first occurrence of regex2.
    If matched, returns (replaced string, true), otherwise returns (s, false).
 *)
 let str_string_match_and_replace regex1 regex2 ~suffix s =
-  Mutex.lock str_mutex;
   let replaced_str, matched =
     if Str.string_match regex1 s 0 then
       Str.replace_first regex2 ("\\1" ^ suffix) s, true
     else s, false
   in
-  Mutex.unlock str_mutex;
   (replaced_str, matched)
-
-let str_split regex s =
-  Mutex.lock str_mutex;
-  let res = Str.split regex s in
-  Mutex.unlock str_mutex; res
 
 let default_env = ref []
 
@@ -96,7 +76,7 @@ let add_env var value =
 
 let print_default_env fmt =
   match !default_env with
-    [] -> ()
+  | [] -> ()
   | l ->
     Format.fprintf fmt "@[Env:@\n";
     List.iter (fun (x,y) -> Format.fprintf fmt "%s = \"%s\"@\n"  x y) l;
@@ -175,7 +155,6 @@ let do_diffs = ref (if Sys.os_type = "Win32" then "diff --strip-trailing-cr -u"
 let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
                   else "cmp -s")
 let do_make = ref "make"
-let n = ref 4    (* the level of parallelism *)
 let suites = ref []
 
 (** special configuration, with associated oracles *)
@@ -184,11 +163,8 @@ let do_error_code = ref false
 
 let xunit = ref false
 
-let io_mutex = Mutex.create ()
-
 let lock_fprintf f =
-  Mutex.lock io_mutex;
-  Format.kfprintf (fun _ -> Mutex.unlock io_mutex) f
+  Format.kfprintf (fun _ -> ()) f
 
 let lock_printf s = lock_fprintf Format.std_formatter s
 let lock_eprintf s = lock_fprintf Format.err_formatter s
@@ -242,7 +218,6 @@ let rec argspec =
   [
     "-gui", Arg.Unit (fun () ->
         behavior := Gui;
-        n := 1; (* Disable parallelism to see which GUI is launched *)
       ) ,
     " Start the tests in Frama-C's gui.";
     "-show", Arg.Unit (fun () -> behavior := Show) ,
@@ -264,12 +239,6 @@ let rec argspec =
     "-use-diff-as-cmp",
     Arg.Unit (fun () -> use_diff_as_cmp:=true; do_cmp:=!do_diffs),
     " Use the diff command for performing comparisons";
-    "-j", Arg.Int
-      (fun i -> if i>=0
-        then n := i
-        else ( lock_printf "Option -j requires nonnegative argument@.";
-               exit (-1))),
-    "<n>  Use nonnegative integer n for level of parallelism" ;
     "-byte", Arg.Set use_byte,
     " Use bytecode toplevel";
     "-opt", Arg.Clear use_byte,
@@ -493,13 +462,10 @@ struct
         if n <= String.length new_s then aux n new_acc else new_acc
       end else acc
     in
-    Mutex.lock str_mutex;
     try
-      let res = aux 0 (false,s) in
-      Mutex.unlock str_mutex; res
+      aux 0 (false,s)
     with e ->
       lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
-      Mutex.unlock str_mutex;
       raise e
 
   let expand macros s =
@@ -637,7 +603,7 @@ let make_custom_opts =
     *)
     (* revert the initial list, as it will be reverted back in the end. *)
     let opts =
-      aux (List.rev (str_split space stdopts)) s
+      aux (List.rev (Str.split space stdopts)) s
     in
     (* preserve options ordering *)
     List.fold_right (fun x s -> s ^ " " ^ x) opts ""
@@ -678,18 +644,15 @@ let config_module _dir s current =
 
 let config_macro _dir s current =
   let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-  Mutex.lock str_mutex;
   if Str.string_match regex s 0 then begin
     let name = Str.matched_group 1 s in
     let def =
       try Str.matched_group 3 s with Not_found -> (* empty text *) ""
     in
-    Mutex.unlock str_mutex;
     if !verbosity >= 1 then
       lock_printf "new macro %s with definition %s\n%!" name def;
     { current with dc_macros = Macros.add_expand name def current.dc_macros }
   end else begin
-    Mutex.unlock str_mutex;
     lock_eprintf "cannot understand MACRO definition: %s\n%!" s;
     current
   end
@@ -776,7 +739,7 @@ let scan_options dir scan_buffer default =
              lock_eprintf "@[unknown configuration option: %s@\n%!@]" name)
     with
     | Scanf.Scan_failure _ ->
-      if str_string_match end_comment s 0
+      if Str.string_match end_comment s 0
       then raise End_of_file
       else ()
     | End_of_file -> (* ignore blank lines. *) ()
@@ -827,7 +790,7 @@ let scan_test_file default dir f =
                    the line and we are indeed reading a config
                 *)
              (if List.exists is_config configs &&
-                 not (str_string_match end_comment names 0) then
+                 not (Str.string_match end_comment names 0) then
                 ignore (scan_options dir scan_buffer default);
               scan_config ()))
     in
@@ -875,8 +838,7 @@ type cmps =
   | Cmp_Log of SubDir.t (* directory *) * string (* file *)
 
 type shared =
-  { lock : Mutex.t ;
-    mutable building_target : bool ;
+  { mutable building_target : bool ;
     target_queue : command Queue.t ;
     commands_empty : Condition.t ;
     work_available : Condition.t ;
@@ -895,8 +857,7 @@ type shared =
   }
 
 let shared =
-  { lock = Mutex.create () ;
-    building_target = false ;
+  { building_target = false ;
     target_queue = Queue.create () ;
     commands_empty = Condition.create () ;
     work_available = Condition.create () ;
@@ -910,10 +871,6 @@ let shared =
     summary_run = 0 ;
     summary_ok = 0 ;
     summary_log = 0 }
-
-let unlock () = Mutex.unlock shared.lock
-
-let lock () = Mutex.lock shared.lock
 
 let catenate_number nb_files prefix n =
   if nb_files > 1
@@ -1206,17 +1163,11 @@ module Make_Report(M:sig type t end)=struct
       let hash c = Hashtbl.hash (project c)
      end)
   let tbl = H.create 774
-  let m = Mutex.create ()
   let record cmd (v:M.t) =
     if !xunit then begin
-      Mutex.lock m;
       H.add tbl cmd v;
-      Mutex.unlock m
     end
-  let iter f =
-    Mutex.lock m;
-    H.iter f tbl;
-    Mutex.unlock m
+  let iter f = H.iter f tbl
   let find k = H.find tbl k
   let remove k = H.remove tbl k
 
@@ -1378,21 +1329,15 @@ let xunit_report () =
 let log_ext = function Res -> ".res" | Err -> ".err"
 
 let launch_and_check_compare_file diff ~cmp_string ~log_file ~oracle_file =
-  lock();
   shared.summary_log <- shared.summary_log + 1;
-  unlock();
   let res = launch cmp_string in
   begin
     match res with
       0 ->
-      lock();
       shared.summary_ok <- shared.summary_ok + 1;
-      unlock()
     | 1 ->
-      lock();
       Queue.push diff shared.diffs;
       Condition.signal shared.diff_available;
-      unlock()
     | 2 ->
       lock_printf
         "%% System error while comparing. Maybe one of the files is missing...@\n%s or %s@."
@@ -1410,22 +1355,18 @@ let check_file_is_empty_or_nonexisting diff ~log_file =
   if is_file_empty_or_nonexisting log_file then
     0
   else begin
-    lock();
     (* signal that there's a problem. *)
     shared.summary_log <- shared.summary_log + 1;
     Queue.push diff shared.diffs;
     Condition.signal shared.diff_available;
-    unlock();
     1
   end
 
 let compare_one_file cmp log_prefix oracle_prefix log_kind =
   if !behavior = Show
   then begin
-    lock();
     Queue.push (Command_error(cmp,log_kind)) shared.diffs;
     Condition.signal shared.diff_available;
-    unlock();
     -1
   end else
     let ext = log_ext log_kind in
@@ -1448,10 +1389,8 @@ let compare_one_file cmp log_prefix oracle_prefix log_kind =
 let compare_one_log_file dir file =
   if !behavior = Show
   then begin
-    lock();
     Queue.push (Log_error(dir,file)) shared.diffs;
     Condition.signal shared.diff_available;
-    unlock()
   end else
     let log_file = Filename.sanitize (SubDir.make_result_file dir file) in
     let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir file) in
@@ -1599,7 +1538,7 @@ let diff_check_exist old_file new_file =
 
 let test_pattern config =
   let regexp = Str.regexp config.dc_test_regexp in
-  fun file -> str_string_match regexp file 0
+  fun file -> Str.string_match regexp file 0
 
 (* test for a possible toplevel configuration. *)
 let default_config () =
