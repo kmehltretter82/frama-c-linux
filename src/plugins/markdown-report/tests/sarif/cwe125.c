@@ -1,7 +1,7 @@
 /* run.config
 NOFRAMAC: use execnow for proper sequencing of executions
-EXECNOW: @frama-c@ @PTEST_FILE@ -save @PTEST_DIR@/result/@PTEST_NAME@_parse.sav
-EXECNOW: @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_parse.sav -eva -save @PTEST_DIR@/result/@PTEST_NAME@_eva.sav
+EXECNOW: LOG @PTEST_NAME@.parse.log @frama-c@ @PTEST_FILE@ -save @PTEST_DIR@/result/@PTEST_NAME@_parse.sav > @PTEST_DIR@/result/@PTEST_NAME@.parse.log
+EXECNOW: LOG @PTEST_NAME@.eva.log @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_parse.sav -eva -save @PTEST_DIR@/result/@PTEST_NAME@_eva.sav > @PTEST_DIR@/result/@PTEST_NAME@.eva.log
 EXECNOW: LOG @PTEST_NAME@.sarif @frama-c@ -load @PTEST_DIR@/result/@PTEST_NAME@_eva.sav -then -mdr-out @PTEST_DIR@/result/@PTEST_NAME@.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic
 */
 #include "__fc_builtin.h"

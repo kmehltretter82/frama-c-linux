@@ -44,17 +44,6 @@
           ],
           "exitCode": 0,
           "executionSuccessful": true
-        },
-        {
-          "commandLine":
-            "frama-c -check -load tests/sarif/result/cwe125_eva.sav -then -mdr-out tests/sarif/result/cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
-          "arguments": [
-            "-check", "-load", "tests/sarif/result/cwe125_eva.sav", "-then",
-            "-mdr-out", "tests/sarif/result/cwe125.sarif", "-mdr-gen",
-            "sarif", "-mdr-no-print-libc", "-mdr-sarif-deterministic"
-          ],
-          "exitCode": 0,
-          "executionSuccessful": true
         }
       ],
       "originalUriBaseIds": {

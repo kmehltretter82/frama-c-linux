@@ -60,7 +60,19 @@ module Analysis_cmdline =
 
 let command_line () = Array.to_list Sys.argv
 
-let update_cmdline () = Analysis_cmdline.add (command_line())
+let update_cmdline =
+  let already_updated = ref false in
+  fun () ->
+    if not (!already_updated) then begin
+      (* This function must be run after the loading stage, so that
+         the Analysis_cmdline state contains the list of previous launches
+         if any. However, `-then` restart the boot sequence from the loading
+         included, meaning that the hook will be replayed _also_ after each
+         `-then`. Using a _non-projectified_ boolean ref ensures that we add
+         the command line only once per run. *)
+      already_updated := true;
+      Analysis_cmdline.add (command_line())
+    end
 
 let () = Cmdline.run_after_loading_stage update_cmdline
 
