@@ -23,10 +23,7 @@
 module Filename = struct
   include Filename
   let concat =
-    if Sys.os_type = "Win32" then
-      fun a b -> a ^ "/" ^ b
-    else
-      concat
+    if Sys.os_type = "Win32" then fun a b -> a ^ "/" ^ b else concat
 
   let cygpath r =
     let cmd =
@@ -47,24 +44,6 @@ module Filename = struct
 
   let sanitize f = String.escaped f
 end
-
-let string_del_suffix suffix s =
-  let lsuffix = String.length suffix in
-  let ls = String.length s in
-  if ls >= lsuffix && String.sub s (ls - lsuffix) lsuffix = suffix then
-    Some (String.sub s 0 (ls - lsuffix))
-  else None
-
-(* If regex1 matches inside s, adds suffix to the first occurrence of regex2.
-   If matched, returns (replaced string, true), otherwise returns (s, false).
-*)
-let str_string_match_and_replace regex1 regex2 ~suffix s =
-  let replaced_str, matched =
-    if Str.string_match regex1 s 0 then
-      Str.replace_first regex2 ("\\1" ^ suffix) s, true
-    else s, false
-  in
-  (replaced_str, matched)
 
 let default_env = ref []
 
@@ -137,10 +116,6 @@ let is_file_empty_or_nonexisting filename =
     raise e
 
 let base_path = Filename.current_dir_name
-(*    (Filename.concat
-        (Filename.dirname Sys.executable_name)
-        Filename.parent_dir_name)
-*)
 
 (** Command-line flags *)
 
@@ -163,18 +138,14 @@ let do_error_code = ref false
 
 let xunit = ref false
 
-let lock_fprintf f =
-  Format.kfprintf (fun _ -> ()) f
-
+let lock_fprintf f = Format.kfprintf (fun _ -> ()) f
 let lock_printf s = lock_fprintf Format.std_formatter s
 let lock_eprintf s = lock_fprintf Format.err_formatter s
 
-let make_test_suite s =
-  suites := s :: !suites
+let add_test_suite s = suites := s :: !suites
 
 (* Those variables are read from a ptests_config file *)
 let default_suites = ref []
-
 
 let () =
   Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
@@ -210,9 +181,8 @@ let example_msg =
      ptests -v -j 1                           \
      # to check the time taken by each test\
      @]@ @]"
-;;
 
-let umsg = "Usage: ptests [options] [names of test suites]";;
+let umsg = "Usage: ptests [options] [names of test suites]"
 
 let rec argspec =
   [
@@ -250,7 +220,7 @@ let rec argspec =
     "-error-code", Arg.Set do_error_code,
     " Exit with error code 1 if tests failed (useful for scripts)";
   ]
-and help_msg () = Arg.usage (Arg.align argspec) umsg;;
+and help_msg () = Arg.usage (Arg.align argspec) umsg
 
 let () =
   Arg.parse
@@ -260,8 +230,8 @@ let () =
               compare optname1 optname2
            ) argspec)
      ) @ ["", Arg.Unit (fun () -> ()), example_msg;])
-    make_test_suite umsg
-;;
+    add_test_suite
+    umsg
 
 
 let fail s =
@@ -311,12 +281,11 @@ let test_path =
 let split_blank s = Str.split (Str.regexp "[ ]+") s
 let parse_config_line =
   fun (key, value) ->
-    match key with
-    | "DEFAULT_SUITES" ->
-      let l = split_blank value in
-      default_suites := List.map (Filename.concat test_path) l
-    | _ -> default_env key value (* Environnement variable that Frama-C reads*)
-
+  match key with
+  | "DEFAULT_SUITES" ->
+    let l = split_blank value in
+    default_suites := List.map (Filename.concat test_path) l
+  | _ -> default_env key value (* Environnement variable that Frama-C reads*)
 
 (** parse config files *)
 let () =
@@ -348,14 +317,12 @@ let () =
   end
 
 (* redefine name if special configuration expected *)
-let redefine_name name =
-  if !special_config = "" then name else
-    name ^ "_" ^ !special_config
+let config_name name =
+  if !special_config = "" then name else name ^ "_" ^ !special_config
 
-let dir_config_file = redefine_name dir_config_file
+let dir_config_file = config_name dir_config_file
 
-let gen_make_file s _dir file =
-  Filename.concat s file
+let gen_make_file s _dir file = Filename.concat s file
 
 module SubDir: sig
   type t
@@ -382,8 +349,8 @@ end = struct
     else if not (Sys.is_directory dir)
     then fail (Printf.sprintf "the file %s exists but is not a directory" dir)
 
-  let oracle_dirname = redefine_name "oracle"
-  let result_dirname = redefine_name "result"
+  let oracle_dirname = config_name "oracle"
+  let result_dirname = config_name "result"
 
   let make_result_file _ x = x
   let make_oracle_file = gen_make_file oracle_dirname
@@ -401,8 +368,7 @@ end = struct
 end
 
 type execnow =
-  {
-    ex_cmd: string;      (** command to launch *)
+  { ex_cmd: string;      (** command to launch *)
     ex_log: string list; (** log files *)
     ex_bin: string list; (** bin files *)
     ex_dir: SubDir.t;    (** directory of test suite *)
@@ -541,9 +507,6 @@ let default_config () =
     dc_timeout = "";
   }
 
-let launch _command_string =
-  assert false
-
 let scan_execnow ~once dir ex_timeout (s:string) =
   let rec aux (s:execnow) =
     try
@@ -602,9 +565,7 @@ let make_custom_opts =
        option (e.g. -verbose 2).
     *)
     (* revert the initial list, as it will be reverted back in the end. *)
-    let opts =
-      aux (List.rev (Str.split space stdopts)) s
-    in
+    let opts = aux (List.rev (Str.split space stdopts)) s in
     (* preserve options ordering *)
     List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
@@ -723,12 +684,10 @@ let config_options =
   ]
 
 let scan_options dir scan_buffer default =
-  let r =
-    ref { default with dc_commands = [] }
-  in
   current_default_toplevel := default.dc_default_toplevel;
   current_default_log := default.dc_default_log;
   current_default_cmds := List.rev default.dc_commands;
+  let r = ref { default with dc_commands = [] } in
   let treat_line s =
     try
       Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
@@ -751,7 +710,7 @@ let scan_options dir scan_buffer default =
     done;
     assert false
   with
-    End_of_file ->
+  | End_of_file ->
     (match !r.dc_commands with
      | [] when !r.dc_framac -> { !r with dc_commands = default.dc_commands }
      | l -> { !r with dc_commands = List.rev l })
@@ -768,7 +727,7 @@ let scan_test_file default dir f =
   let exists_as_file =
     try
       (Unix.lstat f).Unix.st_kind = Unix.S_REG
-    with Unix.Unix_error _ | Sys_error _ -> false
+    with | Unix.Unix_error _ | Sys_error _ -> false
   in
   if exists_as_file then begin
     let scan_buffer = Scanf.Scanning.open_in f in
@@ -879,7 +838,7 @@ let catenate_number nb_files prefix n =
 
 let name_without_extension command =
   try
-    (Filename.chop_extension command.file)
+    Filename.chop_extension command.file
   with
     Invalid_argument _ ->
     fail ("this test file does not have any extension: " ^
@@ -892,23 +851,16 @@ let gen_prefix gen_file cmd =
 let log_prefix = gen_prefix SubDir.make_result_file
 let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
-let get_ptest_file cmd = cmd.file
-
 let get_macros cmd =
-  let ptest_config =
-    if !special_config = "" then "" else "_" ^ !special_config
-  in
-  let ptest_file = get_ptest_file cmd in
-  let ptest_name =
-    try Filename.chop_extension cmd.file
-    with Invalid_argument _ -> cmd.file
-  in
+  let ptest_config = config_name "" in
+  let ptest_file = Filename.sanitize cmd.file in
+  let ptest_name = Filename.remove_extension cmd.file in
   let macros =
     [ "PTEST_CONFIG", ptest_config;
       "PTEST_DIR", SubDir.get cmd.directory;
       "PTEST_RESULT",
-      SubDir.get cmd.directory ^ "/" ^ redefine_name "result";
-      "PTEST_FILE", Filename.sanitize ptest_file;
+      Filename.concat (SubDir.get cmd.directory) (config_name "result");
+      "PTEST_FILE", ptest_file;
       "PTEST_NAME", ptest_name;
       "PTEST_NUMBER", string_of_int cmd.n;
     ]
@@ -930,7 +882,6 @@ let basic_command_string command =
       "OPTIONS", expanded_options;
       "PLUGIN_OPTIONS", expanded_plugins_options;
     ] macros in
-
   let raw_command = Macros.expand macros command.toplevel in
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
@@ -938,7 +889,8 @@ let basic_command_string command =
 (* Searches for executable [s] in the directories contained in the PATH
    environment variable. Returns [None] if not found, or
    [Some <fullpath>] otherwise. *)
-let find_in_path s =
+(*
+  let find_in_path s =
   let trim_right s =
     let n = ref (String.length s - 1) in
     let last_char_to_keep =
@@ -968,6 +920,7 @@ let find_in_path s =
     None
   with Exit ->
     Some !found
+*)
 
 let print_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
@@ -1062,7 +1015,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     res
     print_list command.log_files
     print_list deps
-    (get_ptest_file command)
+    command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     errlog
     res
@@ -1075,36 +1028,36 @@ let command_string ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (deps  %a %S (package frama-c)%a (universe))\n  \
      (action (system %S))\n\
-     )\n"
+     )@."
     command.file
     print_list deps
-    (get_ptest_file command)
+    command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     command_string;
 
   let oracle_prefix = oracle_prefix command in
-  (* Update oracle *)
+  let diff_alias = log_prefix ^ ".diff" in
+  (* diff with oracles *)
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (action (diff %S %S))\n\
-     )\n"
-    ("diff-"^log_prefix)
+     )@."
+    diff_alias
     (Filename.concat ".." (oracle_prefix ^ ".res.oracle"))
     (log_prefix ^ ".res.log");
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (action (diff %S %S))\n\
-     )\n"
-    ("diff-"^log_prefix)
+     )@."
+    diff_alias
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
     (log_prefix ^ ".err.log");
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name ptests)\
-;     (enabled_if (and true %a))
- )@."
-    ("diff-"^log_prefix)
+    "(alias (deps (alias %S)) (name ptests); (enabled_if (and true %a))\n\
+     )@."
+    diff_alias
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
   Format.fprintf oracle_fmt
@@ -1224,6 +1177,9 @@ let xunit_report () =
     close_out out;
   end
 
+
+let launch _command_string =
+  assert false
 
 (* let do_command command =
  *   match command with
@@ -1561,25 +1517,23 @@ let update_dir_ref dir config =
   { config with dc_execnow }
 
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
-  let config =
-    scan_test_file config directory file in
+  let config = scan_test_file config directory file in
   if not config.dc_dont_run then
     let i = ref 0 in
     let e = ref 0 in
     let nb_files = List.length config.dc_commands in
     let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; timeout} =
       let n = !i in
-      {file; options; toplevel; nb_files; directory; n; log_files;
-       filter = config.dc_filter; macros;
-       execnow=false; timeout;
-       deps = config.dc_deps;
-       plugins = config.dc_plugins;
-       load_module = config.dc_libs @ config.dc_load_module ;
+      { file; options; toplevel; nb_files; directory; n; log_files;
+        filter = config.dc_filter; macros;
+        execnow=false; timeout;
+        deps = config.dc_deps;
+        plugins = config.dc_plugins;
+        load_module = config.dc_libs @ config.dc_load_module ;
       }
     in
     let mk_cmd (s, timeout) =
-      {
-        file = file;
+      { file = file;
         nb_files = nb_files;
         log_files = [];
         options = "";
@@ -1595,34 +1549,30 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         load_module = config.dc_libs @ config.dc_load_module;
       }
     in
-    let process_macros_cmd s = basic_command_string (mk_cmd s) in
     let macros = get_macros (mk_cmd ("/bin/true","")) in
     let make_execnow_cmd execnow =
-      let process_macros s = Macros.expand macros s in
       let res =
-        {
-          ex_cmd = process_macros_cmd (execnow.ex_cmd, execnow.ex_timeout);
-          ex_log = List.map process_macros execnow.ex_log;
-          ex_bin = List.map process_macros execnow.ex_bin;
+        { ex_cmd = basic_command_string (mk_cmd  (execnow.ex_cmd, execnow.ex_timeout));
+          ex_log = List.map (Macros.expand macros) execnow.ex_log;
+          ex_bin = List.map (Macros.expand macros) execnow.ex_bin;
           ex_dir = execnow.ex_dir;
           ex_once = execnow.ex_once;
           ex_done = execnow.ex_done;
           ex_timeout = execnow.ex_timeout;
         }
       in
-      Format.fprintf result_fmt "\
-      (rule
-       (alias ptests)
-       (deps %a (package frama-c)%a)
-       (targets %a %a)
-(action (system %S))
-)
-"
-        print_list config.dc_deps
-        Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-        print_list res.ex_log
-        print_list res.ex_bin
-        res.ex_cmd
+      Format.fprintf result_fmt
+       "(rule\n  \
+        (alias ptests)\n  \
+        (deps %a (package frama-c)%a)\n  \
+        (targets %a %a)\n  \
+        (action (system %S))\n\
+        )\n"
+       print_list config.dc_deps
+       Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
+       print_list res.ex_log
+       print_list res.ex_bin
+       res.ex_cmd
       ;
       List.iter (fun log ->
           Format.fprintf result_fmt
@@ -1643,14 +1593,14 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     List.iter (fun cmxs ->
         let file = Macros.expand macros cmxs in
         let libraries = Macros.expand macros (String.concat " " config.dc_libs) in
-        Format.fprintf result_fmt "\
-      (executable \
-      (name %s) \
-      (modules %s) \
-      (modes plugin) \
-      (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s) \
-      (flags -open Frama_c_kernel))\n \
-      "
+        Format.fprintf result_fmt
+          "(executable\n  \
+           (name %s)\n  \
+           (modules %s)\n  \
+           (modes plugin)\n  \
+           (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
+           (flags -open Frama_c_kernel)\n\
+           )"
           file file
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
