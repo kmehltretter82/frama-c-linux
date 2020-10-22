@@ -92,7 +92,7 @@ why3 config --detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 21 (Scandium).
+for a set of packages that is known to work with Frama-C 22 (Titanium).
 
 ### Installing Custom Versions of Frama-C
 
