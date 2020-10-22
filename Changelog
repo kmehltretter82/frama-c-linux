@@ -17,6 +17,10 @@
 Open Source Release <next-release>
 ##################################
 
+###################################
+Open Source Release 22.0 (Titanium)
+###################################
+
 -   MdR       [2020-10-19] Update Sarif output to 2.1.0 + prettier URI
 -   Dev       [2020-10-20] Support for OCamlGraph 2.0.0
 -   ACSL      [2020-10-16] Allows for axiomatic blocks-like extensions

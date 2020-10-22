@@ -24,6 +24,10 @@
 Plugin WP <next-release>
 #########################
 
+#########################
+Plugin WP 22.0 (Titanium)
+#########################
+
 - WP          [2020-10-14] New warning "pedantic-assigns". WP needs precise
                            'assigns ... \from ...' specification about out
                            pointers (\result and assigned pointers) to generate
