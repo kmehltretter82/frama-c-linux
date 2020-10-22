@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ############################
 
+#############################
+Plugin E-ACSL 22.0 (Titanium)
+#############################
+
 -  E-ACSL       [2020-10-14] Add Support for Variadic generated functions in
                 the AST (frama-c/e-acsl#128).
 -  E-ACSL       [2020-10-06] Add support for the `\separated` predicate.
