@@ -131,8 +131,8 @@ let () =
   Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
                               locale *)
 
-let macro_default_options = "-journal-disable -check"
-let macro_frama_c_only = "frama-c @DEFAULT_OPTIONS@ -no-autoload-plugins"
+let macro_default_options = "-journal-disable -check -no-autoload-plugins"
+let macro_frama_c_only = "frama-c @DEFAULT_OPTIONS@"
 let macro_frama_c_cmd = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
 let macro_frama_c = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
 
@@ -812,7 +812,7 @@ let basic_command_string command =
     let opt_modules = String.concat " "
         (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
            command.load_module) in
-    String.concat " " ["-no-autoload-plugins";opt_plugin;opt_modules]
+    String.concat " " [opt_plugin;opt_modules]
   and expanded_options = Macros.expand macros command.options in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
