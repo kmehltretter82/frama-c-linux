@@ -1007,30 +1007,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     (Filename.basename (oracle_prefix ^ ".res.oracle"));
   ()
 
-let test_pattern config =
-  let regexp = Str.regexp config.dc_test_regexp in
-  fun file -> Str.string_match regexp file 0
-
-(* test for a possible toplevel configuration. *)
-let default_config () =
-  let general_config_file = Filename.concat PtestsConfig.test_path dir_config_file in
-  if Sys.file_exists general_config_file
-  then begin
-    let scan_buffer = Scanf.Scanning.from_file general_config_file in
-    scan_options
-      (SubDir.create ~with_subdir:false Filename.current_dir_name)
-      scan_buffer
-      (default_config ())
-  end
-  else default_config ()
-
-(* if we have some references to directories in the default config, they
-   need to be adapted to the actual test directory. *)
-let update_dir_ref dir config =
-  let update_execnow e = { e with ex_dir = dir } in
-  let dc_execnow = List.map update_execnow config.dc_execnow in
-  { config with dc_execnow }
-
+(** process a test file *)
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
   let config = scan_test_file config directory file in
   if not config.dc_dont_run then
@@ -1123,6 +1100,30 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     List.iter treat_option config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow
 
+let test_pattern config =
+  let regexp = Str.regexp config.dc_test_regexp in
+  fun file -> Str.string_match regexp file 0
+
+(* test for a possible toplevel configuration. *)
+let default_config () =
+  let general_config_file = Filename.concat PtestsConfig.test_path dir_config_file in
+  if Sys.file_exists general_config_file
+  then begin
+    let scan_buffer = Scanf.Scanning.from_file general_config_file in
+    scan_options
+      (SubDir.create ~with_subdir:false Filename.current_dir_name)
+      scan_buffer
+      (default_config ())
+  end
+  else default_config ()
+
+(* if we have some references to directories in the default config, they
+   need to be adapted to the actual test directory. *)
+let update_dir_ref dir config =
+  let update_execnow e = { e with ex_dir = dir } in
+  let dc_execnow = List.map update_execnow config.dc_execnow in
+  { config with dc_execnow }
+
 let () =
   (* enqueue the test files *)
   let suites =
@@ -1146,10 +1147,10 @@ let () =
        let oracle_dune_file = Filename.concat (SubDir.make_file directory SubDir.oracle_dirname) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
-       let config = SubDir.make_file directory dir_config_file in
-       let default = default_config () in
-       let default = update_dir_ref directory default in
        let dir_config =
+         let config = SubDir.make_file directory dir_config_file in
+         let default = default_config () in
+         let default = update_dir_ref directory default in
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
