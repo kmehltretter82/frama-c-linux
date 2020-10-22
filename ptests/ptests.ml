@@ -45,30 +45,30 @@ module Filename = struct
   let sanitize f = String.escaped f
 end
 
-let default_env = ref []
+module Env = struct
+  let default_env = ref []
 
-let add_default_env x y = default_env:=(x,y)::!default_env
+  let add_default_env x y = default_env:=(x,y)::!default_env
 
-let add_env var value =
-  add_default_env var value;
-  Unix.putenv var value
+  let add_env var value =
+    add_default_env var value;
+    Unix.putenv var value
 
-let print_default_env fmt =
-  match !default_env with
-  | [] -> ()
-  | l ->
-    Format.fprintf fmt "@[Env:@\n";
-    List.iter (fun (x,y) -> Format.fprintf fmt "%s = \"%s\"@\n"  x y) l;
-    Format.fprintf fmt "@]"
+  let print_default_env fmt =
+    match !default_env with
+    | [] -> ()
+    | l ->
+      Format.fprintf fmt "@[Env:@\n";
+      List.iter (fun (x,y) -> Format.fprintf fmt "%s = \"%s\"@\n"  x y) l;
+      Format.fprintf fmt "@]"
 
-let default_env var value =
-  try
-    let v = Unix.getenv var in
-    add_default_env (var ^ " (set from outside)") v
-  with Not_found -> add_env var value
+  let default_env var value =
+    try
+      let v = Unix.getenv var in
+      add_default_env (var ^ " (set from outside)") v
+    with Not_found -> add_env var value
 
-(** the name of the directory-wide configuration file*)
-let dir_config_file = "test_config"
+end
 
 (** the files in [suites] whose name matches
     the pattern [test_file_regexp] will be considered as test files *)
@@ -119,106 +119,71 @@ let base_path = Filename.current_dir_name
 
 (** Command-line flags *)
 
-type behavior = Run | Show | Gui
-let behavior = ref Run
 let verbosity = ref 0
-let dry_run = ref false
-let use_byte = ref false
-let use_diff_as_cmp = ref (Sys.os_type = "Win32")
-let do_diffs = ref (if Sys.os_type = "Win32" then "diff --strip-trailing-cr -u"
-                    else "diff -u")
-let do_cmp = ref (if Sys.os_type="Win32" then !do_diffs
-                  else "cmp -s")
 let do_make = ref "make"
 let suites = ref []
+let add_test_suite s = suites := s :: !suites
 
 (** special configuration, with associated oracles *)
 let special_config = ref ""
-let do_error_code = ref false
-
-let xunit = ref false
-
-let lock_fprintf f = Format.kfprintf (fun _ -> ()) f
-let lock_printf s = lock_fprintf Format.std_formatter s
-let lock_eprintf s = lock_fprintf Format.err_formatter s
-
-let add_test_suite s = suites := s :: !suites
-
-(* Those variables are read from a ptests_config file *)
-let default_suites = ref []
 
 let () =
   Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
                               locale *)
+
+let macro_default_options = "-journal-disable -check"
+let macro_frama_c_only = "frama-c @DEFAULT_OPTIONS@ -no-autoload-plugins"
+let macro_frama_c_cmd = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
+let macro_frama_c = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
+
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
-     A test suite can be the name of a directory in ./tests or \
-     the path to a file.@ @ \
+     Build the dune files allowing running the test suite contained into a directory (defaults to ./tests).@ @ \
      @[<v 1>\
-     Some variables can be used in test command:@ \
+     Some variables can be used in test directives:@  \
      @@PTEST_CONFIG@@    \
-     # test configuration suffix@ \
-     @@PTEST_FILE@@   \
-     # substituted by the test filename@ \
-     @@PTEST_DIR@@    \
-     # dirname of the test file@ \
-     @@PTEST_NAME@@   \
-     # basename of the test file@ \
-     @@PTEST_NUMBER@@ \
-     # test command number@] @ \
+     # test configuration suffix@  \
+     @@PTEST_FILE@@      \
+     # substituted by the test filename@  \
+     @@PTEST_DIR@@       \
+     # dirname of the test file@  \
+     @@PTEST_NAME@@      \
+     # basename of the test file@  \
+     @@PTEST_NUMBER@@    \
+     # test command number@  \
+     @@DEFAULT_OPTIONS@@ \
+     # the default option list: %s@  \
+     @@PLUGIN@@          \
+     # the current list of plugins set by the PLUGIN directive@]@.@.\
      @[<v 1>\
-     Examples:@ \
-     ptests@ \
-     ptests -diff \"echo diff\" -examine        \
-     # see again the list of tests that failed@ \
-     ptests misc                              \
-     # for a single test suite@ \
-     ptests tests/misc/alias.c                \
-     # for a single test@ \
-     ptests -examine tests/misc/alias.c       \
-     # to see the differences again@ \
-     ptests -v -j 1                           \
-     # to check the time taken by each test\
+     Other variables can only be used in test commands (CMD and EXECNOW directives):@  \
+     @@PLUGIN_OPTIONS@@          \
+     # the current list of options related to PLUGIN, MODULE and LIBS to load@  \
+     @@OPTIONS@@      \
+     # the current list of options related to OPT and STDOPT directives (for CMD directives)@  \
+     @@frama-c-only@@ \
+     # shortcut defined as follow: %s@  \
+     @@frama-c@@      \
+     # shortcut defined as follow: %s@  \
+     @@frama-c-cmd@@  \
+     # shortcut defined as follow: %s@  \
      @]@ @]"
+    macro_default_options
+    macro_frama_c_only
+    macro_frama_c
+    macro_frama_c_cmd
 
 let umsg = "Usage: ptests [options] [names of test suites]"
 
 let rec argspec =
   [
-    "-gui", Arg.Unit (fun () ->
-        behavior := Gui;
-      ) ,
-    " Start the tests in Frama-C's gui.";
-    "-show", Arg.Unit (fun () -> behavior := Show) ,
-    " Show the results of the tests.";
-    "-run", Arg.Unit (fun () -> behavior := Run) ,
-    " (default) Delete logs, run tests, then examine logs different from \
-     oracles.";
     "-v", Arg.Unit (fun () -> incr verbosity),
     " Increase verbosity (up to  twice)" ;
-    "-dry-run", Arg.Unit (fun () -> dry_run := true),
-    " Do not run commands (use with -v to print all commands which would be run)" ;
-    "-diff", Arg.String (fun s -> do_diffs := s;
-                          if !use_diff_as_cmp then do_cmp := s),
-    "<command>  Use command for diffs" ;
-    "-cmp", Arg.String (fun s -> do_cmp:=s),
-    "<command>  Use command for comparison";
     "-make", Arg.String (fun s -> do_make := s;),
     "<command> Use command instead of make";
-    "-use-diff-as-cmp",
-    Arg.Unit (fun () -> use_diff_as_cmp:=true; do_cmp:=!do_diffs),
-    " Use the diff command for performing comparisons";
-    "-byte", Arg.Set use_byte,
-    " Use bytecode toplevel";
-    "-opt", Arg.Clear use_byte,
-    " Use native toplevel (default)";
     "-config", Arg.Set_string special_config,
     " <name> Use special configuration and oracles";
-    "-xunit", Arg.Set xunit,
-    " Create a xUnit file named xunit.xml collecting results";
-    "-error-code", Arg.Set do_error_code,
-    " Exit with error code 1 if tests failed (useful for scripts)";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg
 
@@ -238,88 +203,96 @@ let fail s =
   Format.printf "Error: %s@.Aborting (CWD=%s).@." s (Sys.getcwd());
   exit 2
 
-(** split the filename into before including "tests" dir and after including "tests" dir
+module PtestsConfig = struct
+  (** split the filename into before including "tests" dir and after including "tests" dir
     NOTA: both part contains "tests" (one as suffix the other as prefix).
 *)
-let rec get_upper_test_dir initial dir =
-  let tests = Filename.dirname dir in
-  if tests = dir then
-    (* root directory *)
-    (fail (Printf.sprintf "Can't find a tests directory below %s" initial))
-  else
-    let base = Filename.basename dir in
-    if base = "tests" then
-      dir, "tests"
+  let rec get_upper_test_dir initial dir =
+    let tests = Filename.dirname dir in
+    if tests = dir then
+      (* root directory *)
+      (fail (Printf.sprintf "Can't find a tests directory below %s" initial))
     else
-      let tests, suffix = get_upper_test_dir initial tests in
-      tests, Filename.concat suffix base
+      let base = Filename.basename dir in
+      if base = "tests" then
+        dir, "tests"
+      else
+        let tests, suffix = get_upper_test_dir initial tests in
+        tests, Filename.concat suffix base
 
-let rec get_test_path = function
-  | [] ->
-    if Sys.file_exists "tests" && Sys.is_directory "tests" then "tests", []
+  let rec get_test_path = function
+    | [] ->
+      if Sys.file_exists "tests" && Sys.is_directory "tests" then "tests", []
+      else begin
+        Format.eprintf "No test path found. Aborting (CWD=%s).@." (Sys.getcwd());
+        exit 1
+      end
+    | [f] -> let tests, suffix = get_upper_test_dir f f in
+      tests, [suffix]
+    | a::l ->
+      let tests, l = get_test_path l in
+      let a_tests, a = get_upper_test_dir a a in
+      if a_tests <> tests
+      then fail (Printf.sprintf "All the tests should be inside the same tests directory")
+      else tests, a::l
+
+  let test_path =
+    let files, names = List.partition Sys.file_exists !suites in
+    let tests, l = get_test_path files in
+    let names = List.map (Filename.concat tests) names in
+    suites := names@l;
+    Sys.chdir (Filename.dirname tests);
+    "tests"
+
+  (* Those variables are read from a ptests_config file *)
+  let default_suites = ref []
+
+  let parse_config_line =
+    let split_blank s = Str.split (Str.regexp "[ ]+") s in
+    fun (key, value) ->
+    match key with
+    | "DEFAULT_SUITES" ->
+      let l = split_blank value in
+      default_suites := List.map (Filename.concat test_path) l
+    | _ -> Env.default_env key value (* Environnement variable that Frama-C reads*)
+
+  (** parse config files *)
+  let () =
+    let config = "tests/ptests_config" in
+    if Sys.file_exists config then begin
+      try
+        (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
+        let ch = open_in config in
+        let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
+        let regexp_comment = Str.regexp " *#" in
+        while true do
+          let line = input_line ch in
+          if Str.string_match regexp line 0 then
+            let key = Str.matched_group 1 line in
+            let value = Str.matched_group 2 line in
+            parse_config_line (key, value)
+          else if not (Str.string_match regexp_comment line 0) then begin
+            Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
+            exit 1
+          end
+        done
+      with
+      | End_of_file -> ()
+    end
     else begin
-      Format.eprintf "No test path found. Aborting (CWD=%s).@." (Sys.getcwd());
+      Format.eprintf
+        "Cannot find configuration file %s. Aborting (CWD=%s).@." config (Sys.getcwd()) ;
       exit 1
     end
-  | [f] -> let tests, suffix = get_upper_test_dir f f in
-    tests, [suffix]
-  | a::l ->
-    let tests, l = get_test_path l in
-    let a_tests, a = get_upper_test_dir a a in
-    if a_tests <> tests
-    then fail (Printf.sprintf "All the tests should be inside the same tests directory")
-    else tests, a::l
 
-let test_path =
-  let files, names = List.partition Sys.file_exists !suites in
-  let tests, l = get_test_path files in
-  let names = List.map (Filename.concat tests) names in
-  suites := names@l;
-  Sys.chdir (Filename.dirname tests);
-  "tests"
-
-let split_blank s = Str.split (Str.regexp "[ ]+") s
-let parse_config_line =
-  fun (key, value) ->
-  match key with
-  | "DEFAULT_SUITES" ->
-    let l = split_blank value in
-    default_suites := List.map (Filename.concat test_path) l
-  | _ -> default_env key value (* Environnement variable that Frama-C reads*)
-
-(** parse config files *)
-let () =
-  let config = "tests/ptests_config" in
-  if Sys.file_exists config then begin
-    try
-      (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
-      let ch = open_in config in
-      let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
-      let regexp_comment = Str.regexp " *#" in
-      while true do
-        let line = input_line ch in
-        if Str.string_match regexp line 0 then
-          let key = Str.matched_group 1 line in
-          let value = Str.matched_group 2 line in
-          parse_config_line (key, value)
-        else if not (Str.string_match regexp_comment line 0) then begin
-          Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
-          exit 1
-        end
-      done
-    with
-    | End_of_file -> ()
-  end
-  else begin
-    Format.eprintf
-      "Cannot find configuration file %s. Aborting (CWD=%s).@." config (Sys.getcwd()) ;
-    exit 1
-  end
+end
 
 (* redefine name if special configuration expected *)
 let config_name name =
   if !special_config = "" then name else name ^ "_" ^ !special_config
 
+(** the name of the directory-wide configuration file*)
+let dir_config_file = "test_config"
 let dir_config_file = config_name dir_config_file
 
 let gen_make_file s _dir file = Filename.concat s file
@@ -383,8 +356,7 @@ type execnow =
   }
 
 
-module Macros =
-struct
+module Macros = struct
   module StringMap = Map.Make (String)
   open StringMap
 
@@ -395,11 +367,11 @@ struct
   let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
 
   let does_expand macros s =
-    if !verbosity >=2 then begin
-      lock_printf "looking for macros in string %s\n%!" s;
-      lock_printf "Existing macros:\n%!";
-      iter (fun s1 s2 -> lock_printf "%s => %s\n%!" s1 s2) macros;
-      lock_printf "End macros\n%!";
+    if !verbosity >=3 then begin
+      Format.printf "looking for macros in string %s\n%!" s;
+      Format.printf "Existing macros:\n%!";
+      iter (fun s1 s2 -> Format.printf "%s => %s\n%!" s1 s2) macros;
+      Format.printf "End macros\n%!";
     end;
     let rec aux n (ptest_file_matched,s as acc) =
       if Str.string_match macro_regex s n then begin
@@ -413,17 +385,17 @@ struct
             new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
           end else begin
             try
-              if !verbosity >= 2 then lock_printf "macro is %s\n%!" macro;
+              if !verbosity >= 3 then Format.printf "macro is %s\n%!" macro;
               let replacement =  find macro macros in
-              if !verbosity >= 1 then
-                lock_printf "replacement for %s is %s\n%!" macro replacement;
+              if !verbosity >= 2 then
+                Format.printf "replacement for %s is %s\n%!" macro replacement;
               new_n,
               String.sub s 0 n ^ start ^ replacement ^ rest
             with
             | Not_found -> Str.group_end 2 + 1, s
           end
         in
-        if !verbosity >= 2 then lock_printf "new string is %s\n%!" new_s;
+        if !verbosity >= 3 then Format.printf "new string is %s\n%!" new_s;
         let new_acc = ptest_file_matched, new_s in
         if n <= String.length new_s then aux n new_acc else new_acc
       end else acc
@@ -431,7 +403,7 @@ struct
     try
       aux 0 (false,s)
     with e ->
-      lock_eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+      Format.eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
       raise e
 
   let expand macros s =
@@ -451,11 +423,11 @@ struct
 
   let default_macros () = add_list
     [ "PLUGIN", "" ;
-      "DEFAULT_OPTIONS", "-journal-disable -check";
+      "DEFAULT_OPTIONS", macro_default_options;
       "OPTIONS", "";
-      "frama-c-only","frama-c @DEFAULT_OPTIONS@ -no-autoload-plugins";
-      "frama-c-cmd", "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@";
-      "frama-c",     "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@";
+      "frama-c-only", macro_frama_c_only;
+      "frama-c-cmd", macro_frama_c_cmd;
+      "frama-c",     macro_frama_c;
     ] empty
 
 end
@@ -557,7 +529,7 @@ let make_custom_opts =
       with
       | Scanf.Scan_failure _ ->
         if s <> "" then
-          lock_eprintf "unknown STDOPT configuration string: %s\n%!" s;
+          Format.eprintf "unknown STDOPT configuration string: %s\n%!" s;
         opts
       | End_of_file -> opts
     in
@@ -610,11 +582,11 @@ let config_macro _dir s current =
     let def =
       try Str.matched_group 3 s with Not_found -> (* empty text *) ""
     in
-    if !verbosity >= 1 then
-      lock_printf "new macro %s with definition %s\n%!" name def;
+    if !verbosity >= 2 then
+      Format.printf "new macro %s with definition %s\n%!" name def;
     { current with dc_macros = Macros.add_expand name def current.dc_macros }
   end else begin
-    lock_eprintf "cannot understand MACRO definition: %s\n%!" s;
+    Format.eprintf "cannot understand MACRO definition: %s\n%!" s;
     current
   end
 
@@ -695,7 +667,7 @@ let scan_options dir scan_buffer default =
            try
              r := (List.assoc name config_options) dir opt !r
            with Not_found ->
-             lock_eprintf "@[unknown configuration option: %s@\n%!@]" name)
+             Format.eprintf "@[unknown configuration option: %s@\n%!@]" name)
     with
     | Scanf.Scan_failure _ ->
       if Str.string_match end_comment s 0
@@ -795,41 +767,6 @@ type diff =
 type cmps =
   | Cmp_Toplevel of toplevel_command
   | Cmp_Log of SubDir.t (* directory *) * string (* file *)
-
-type shared =
-  { mutable building_target : bool ;
-    target_queue : command Queue.t ;
-    commands_empty : Condition.t ;
-    work_available : Condition.t ;
-    diff_available : Condition.t ;
-    mutable commands : command Queue.t ; (* file, options, number *)
-    cmps : cmps Queue.t ;
-    (* command that has finished its execution *)
-    diffs : diff Queue.t ;
-    (* cmp that showed some difference *)
-    mutable commands_finished : bool ;
-    mutable cmp_finished : bool ;
-    mutable summary_time : float ;
-    mutable summary_run : int ;
-    mutable summary_ok : int ;
-    mutable summary_log : int;
-  }
-
-let shared =
-  { building_target = false ;
-    target_queue = Queue.create () ;
-    commands_empty = Condition.create () ;
-    work_available = Condition.create () ;
-    diff_available = Condition.create () ;
-    commands = Queue.create () ;
-    cmps = Queue.create () ;
-    diffs = Queue.create () ;
-    commands_finished = false ;
-    cmp_finished = false ;
-    summary_time = (Unix.times()).Unix.tms_cutime ;
-    summary_run = 0 ;
-    summary_ok = 0 ;
-    summary_log = 0 }
 
 let catenate_number nb_files prefix n =
   if nb_files > 1
@@ -1070,435 +1007,13 @@ let command_string ~result_fmt ~oracle_fmt command =
     (Filename.basename (oracle_prefix ^ ".res.oracle"));
   ()
 
-
-
-
-
-let update_log_files dir file =
-  mv (SubDir.make_result_file dir file) (SubDir.make_oracle_file dir file)
-
-let update_toplevel_command command =
-
-  let log_prefix = log_prefix command in
-  let oracle_prefix = oracle_prefix command in
-  (* Update oracle *)
-  mv (log_prefix ^ ".res.log") (oracle_prefix ^ ".res.oracle");
-  (* Is there an error log ? *)
-  begin try
-      let log = log_prefix ^ ".err.log"
-      and oracle = oracle_prefix ^ ".err.oracle"
-      in
-      if is_file_empty_or_nonexisting log then
-        (* No, remove the error oracle *)
-        unlink ~silent:false oracle
-      else
-        (* Yes, update the error oracle*)
-        mv log oracle
-    with (* Possible error in [is_file_empty] *)
-      Unix.Unix_error _ -> ()
-  end;
-  let macros = get_macros command in
-  let log_files = List.map (Macros.expand macros) command.log_files
-  in
-  List.iter (update_log_files command.directory) log_files
-
-let remove_execnow_results execnow =
-  List.iter
-    (fun f -> unlink (SubDir.make_result_file execnow.ex_dir f))
-    (execnow.ex_bin @ execnow.ex_log)
-
-module Make_Report(M:sig type t end)=struct
-  module H=Hashtbl.Make
-    (struct
-      type t = toplevel_command
-      let project cmd = (cmd.directory,cmd.file,cmd.n)
-      let equal c1 c2 =  (project c1)=(project c2)
-      let hash c = Hashtbl.hash (project c)
-     end)
-  let tbl = H.create 774
-  let record cmd (v:M.t) =
-    if !xunit then begin
-      H.add tbl cmd v;
-    end
-  let iter f = H.iter f tbl
-  let find k = H.find tbl k
-  let remove k = H.remove tbl k
-
-end
-module Report_run=Make_Report(struct type t=int*float
-(* At some point will contain the running time*)
-  end)
-
-let report_run cmp r = Report_run.record cmp r
-module Report_cmp=Make_Report(struct type t=int*int end)
-let report_cmp = Report_cmp.record
-let pretty_report fmt =
-  Report_run.iter
-    (fun test (_run_result,time_result) ->
-       Format.fprintf fmt
-         "<testcase classname=%S name=%S time=\"%f\">%s</testcase>@."
-         (Filename.basename (SubDir.get test.directory)) test.file time_result
-         (let res,err = Report_cmp.find test in
-          Report_cmp.remove test;
-          (if res=0 && err=0 then "" else
-             Format.sprintf "<failure type=\"Regression\">%s</failure>"
-               (if res=1 then "Stdout oracle difference"
-                else if res=2 then "Stdout System Error (missing oracle?)"
-                else if err=1 then "Stderr oracle difference"
-                else if err=2 then "Stderr System Error (missing oracle?)"
-                else "Unexpected errror"))));
-  (* Test that were compared but not runned *)
-  Report_cmp.iter
-    (fun test (res,err) ->
-       Format.fprintf fmt
-         "<testcase classname=%S name=%S>%s</testcase>@."
-         (Filename.basename (SubDir.get test.directory)) test.file
-         (if res=0 && err=0 then "" else
-            Format.sprintf "<failure type=\"Regression\">%s</failure>"
-              (if res=1 then "Stdout oracle difference"
-               else if res=2 then "Stdout System Error (missing oracle?)"
-               else if err=1 then "Stderr oracle difference"
-               else if err=2 then "Stderr System Error (missing oracle?)"
-               else "Unexpected errror")))
-let xunit_report () =
-  if !xunit then begin
-    let out = open_out_bin "xunit.xml" in
-    let fmt = Format.formatter_of_out_channel out in
-    Format.fprintf fmt
-      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\
-       @\n<testsuite errors=\"0\" failures=\"%d\" name=\"%s\" tests=\"%d\" time=\"%f\" timestamp=\"%f\">\
-       @\n%t</testsuite>@."
-      (shared.summary_log-shared.summary_ok)
-      "Frama-C"
-      shared.summary_log
-      ((Unix.times()).Unix.tms_cutime -. shared.summary_time)
-      (Unix.gettimeofday ())
-      pretty_report;
-    close_out out;
-  end
-
-
-let launch _command_string =
-  assert false
-
-(* let do_command command =
- *   match command with
- *   | Toplevel command ->
- *     (\* Update : copy the logs. Do not enqueue any cmp
- *        Run | Show: launch the command, then enqueue the cmp
- *        Gui: launch the command in the gui
- *        Examine : just enqueue the cmp *\)
- *     begin
- *       (\* Run, Show, Gui or Examine *\)
- *       if !behavior = Gui then begin
- *         (\* basic_command_string does not redirect the outputs, and does
- *            not overwrite the result files *\)
- *         let basic_command_string = basic_command_string command in
- *         lock_printf "%% launch %s@." basic_command_string ;
- *         ignore (launch basic_command_string)
- *       end
- *       else begin
- *         (\* command string also replaces macros in logfiles names, which
- *            is useful for Examine as well. *\)
- *         let command_string,_,_ = command_string command in
- *         begin
- *           if !verbosity >= 1
- *           then lock_printf "%% launch %s@." command_string ;
- *           let launch_result = launch command_string in
- *           let time = 0. (\* Individual time is difficult to compute correctly
- *                            for now, and currently unused *\) in
- *           report_run command (launch_result, time)
- *         end;
- *         lock ();
- *         shared.summary_run <- succ shared.summary_run ;
- *         Queue.push (Cmp_Toplevel command) shared.cmps;
- *         List.iter
- *           (fun f -> Queue.push (Cmp_Log (command.directory, f)) shared.cmps)
- *           command.log_files;
- *         unlock ()
- *       end
- *     end
- *   | Target (execnow, cmds) ->
- *     let continue res =
- *       lock();
- *       shared.summary_log <- succ shared.summary_log;
- *       if res = 0
- *       then begin
- *         shared.summary_ok <- succ shared.summary_ok;
- *         Queue.transfer shared.commands cmds;
- *         shared.commands <- cmds;
- *         shared.building_target <- false;
- *         Condition.broadcast shared.work_available;
- *         if !behavior = Run
- *         then begin
- *           List.iter
- *             (fun f -> Queue.push (Cmp_Log(execnow.ex_dir, f)) shared.cmps)
- *             execnow.ex_log
- *         end
- *       end
- *       else begin
- *         let rec treat_cmd = function
- *             Toplevel cmd ->
- *             shared.summary_run <- shared.summary_run + 1;
- *             let log_prefix = log_prefix cmd in
- *             unlink (log_prefix ^ ".res.log ")
- *           | Target (execnow,cmds) ->
- *             shared.summary_run <- succ shared.summary_run;
- *             remove_execnow_results execnow;
- *             Queue.iter treat_cmd cmds
- *         in
- *         Queue.iter treat_cmd cmds;
- *         Queue.push (Target_error execnow) shared.diffs;
- *         shared.building_target <- false;
- *         Condition.signal shared.diff_available
- *       end;
- *       unlock()
- *     in
- * 
- *     begin
- *         if not (!(execnow.ex_done) && execnow.ex_once)
- *         then begin
- *           remove_execnow_results execnow;
- *           let cmd =
- *             if !use_byte then
- *               execnow_opt_to_byte execnow.ex_cmd
- *             else
- *               execnow.ex_cmd
- *           in
- *           if !verbosity >= 1 then begin
- *             lock_printf "%% launch %s@." cmd;
- *           end;
- *           shared.summary_run <- succ shared.summary_run;
- *           let r = launch cmd in
- *           (\* mark as already executed. For EXECNOW in test_config files,
- *              other instances (for example another test of the same
- *              directory), won't relaunch the command. For EXECNOW in
- *              stand-alone tests, there is only one copy of the EXECNOW
- *              anyway *\)
- *           execnow.ex_done := true;
- *           continue r
- *         end
- *         else
- *           continue 0
- *       end *)
-
-let log_ext = function Res -> ".res" | Err -> ".err"
-
-let launch_and_check_compare_file diff ~cmp_string ~log_file ~oracle_file =
-  shared.summary_log <- shared.summary_log + 1;
-  let res = launch cmp_string in
-  begin
-    match res with
-      0 ->
-      shared.summary_ok <- shared.summary_ok + 1;
-    | 1 ->
-      Queue.push diff shared.diffs;
-      Condition.signal shared.diff_available;
-    | 2 ->
-      lock_printf
-        "%% System error while comparing. Maybe one of the files is missing...@\n%s or %s@."
-        log_file oracle_file
-    | n ->
-      lock_printf
-        "%% Comparison function exited with code %d for files %s and %s. \
-         Allowed exit codes are 0 (no diff), 1 (diff found) and \
-         2 (system error). Aborting (CWD=%s).@." n log_file oracle_file (Sys.getcwd());
-      exit 2
-  end;
-  res
-
-let check_file_is_empty_or_nonexisting diff ~log_file =
-  if is_file_empty_or_nonexisting log_file then
-    0
-  else begin
-    (* signal that there's a problem. *)
-    shared.summary_log <- shared.summary_log + 1;
-    Queue.push diff shared.diffs;
-    Condition.signal shared.diff_available;
-    1
-  end
-
-let compare_one_file cmp log_prefix oracle_prefix log_kind =
-  if !behavior = Show
-  then begin
-    Queue.push (Command_error(cmp,log_kind)) shared.diffs;
-    Condition.signal shared.diff_available;
-    -1
-  end else
-    let ext = log_ext log_kind in
-    let log_file = Filename.sanitize (log_prefix ^ ext ^ ".log") in
-    let oracle_file = Filename.sanitize (oracle_prefix ^ ext ^ ".oracle") in
-    if log_kind = Err && not (Sys.file_exists oracle_file) then
-      check_file_is_empty_or_nonexisting (Command_error (cmp,log_kind)) ~log_file
-    else begin
-      let cmp_string =
-        !do_cmp ^ " " ^ log_file ^ " " ^ oracle_file ^ " > /dev/null 2> /dev/null"
-      in
-      if !verbosity >= 2 then lock_printf "%% cmp%s (%d) :%s@."
-          ext
-          cmp.n
-          cmp_string;
-      launch_and_check_compare_file (Command_error (cmp,log_kind))
-        ~cmp_string ~log_file ~oracle_file
-    end
-
-let compare_one_log_file dir file =
-  if !behavior = Show
-  then begin
-    Queue.push (Log_error(dir,file)) shared.diffs;
-    Condition.signal shared.diff_available;
-  end else
-    let log_file = Filename.sanitize (SubDir.make_result_file dir file) in
-    let oracle_file = Filename.sanitize (SubDir.make_oracle_file dir file) in
-    let cmp_string = !do_cmp ^ " " ^ log_file ^ " " ^ oracle_file ^ " > /dev/null 2> /dev/null" in
-    if !verbosity >= 2 then lock_printf "%% cmplog: %s / %s@." (SubDir.get dir) file;
-    ignore (launch_and_check_compare_file (Log_error (dir,file))
-              ~cmp_string ~log_file ~oracle_file)
-
-let do_cmp = function
-  | Cmp_Toplevel cmp ->
-    let log_prefix = log_prefix cmp in
-    let oracle_prefix = oracle_prefix cmp in
-    let res = compare_one_file cmp log_prefix oracle_prefix Res in
-    let err = compare_one_file cmp log_prefix oracle_prefix Err in
-    report_cmp cmp (res,err)
-  | Cmp_Log(dir, f) ->
-    ignore (compare_one_log_file dir f)
-
-(* let worker_thread () =
- *   while true do
- *     lock () ;
- *     if (Queue.length shared.commands) + (Queue.length shared.cmps) < !n
- *     then Condition.signal shared.commands_empty;
- *     try
- *       let cmp = Queue.pop shared.cmps in
- *       unlock () ;
- *       do_cmp cmp
- *     with Queue.Empty ->
- *     try
- *       let rec real_command () =
- *         let command =
- *           try
- *             if shared.building_target then raise Queue.Empty;
- *             Queue.pop shared.target_queue
- *           with Queue.Empty ->
- *             Queue.pop shared.commands
- *         in
- *         match command with
- *           Target _ ->
- *           if shared.building_target
- *           then begin
- *             Queue.push command shared.target_queue;
- *             real_command()
- *           end
- *           else begin
- *             shared.building_target <- true;
- *             command
- *           end
- *         | _ -> command
- *       in
- *       let command = real_command() in
- *       unlock () ;
- *       do_command command
- *     with Queue.Empty ->
- *       if shared.commands_finished
- *       && Queue.is_empty shared.target_queue
- *       && not shared.building_target
- *       (\* a target being built would mean work can still appear *\)
- * 
- *       then (unlock () ; Thread.exit ());
- * 
- *       Condition.signal shared.commands_empty;
- *       (\* we still have the lock at this point *\)
- * 
- *       Condition.wait shared.work_available shared.lock;
- *       (\* this atomically releases the lock and suspends
- *          the thread on the condition work_available *\)
- * 
- *       unlock ();
- *   done *)
-
-let diff_check_exist old_file new_file =
-  if Sys.file_exists old_file then begin
-    if Sys.file_exists new_file then begin
-      !do_diffs ^ " " ^ old_file ^ " " ^ new_file
-    end else begin
-      "echo \"+++ " ^ new_file ^ " does not exist. Showing " ^
-      old_file ^ "\";" ^ " cat " ^ old_file
-    end
-  end else begin
-    "echo \"--- " ^ old_file ^ " does not exist. Showing " ^
-    new_file ^ "\";" ^ " cat " ^ new_file
-  end
-
-(* let do_diff = function
- *   | Command_error (diff, kind) ->
- *     let log_prefix = log_prefix diff in
- *     let log_ext = log_ext kind in
- *     let log_file = Filename.sanitize (log_prefix ^ log_ext ^ ".log") in
- *     let command_string,_,_ = command_string diff in
- *     lock_printf "%tCommand:@\n%s@." print_default_env command_string;
- *     if !behavior = Show
- *     then ignore (launch ("cat " ^ log_file))
- *     else
- *       let oracle_prefix = oracle_prefix diff in
- *       let oracle_file =
- *         Filename.sanitize (oracle_prefix ^ log_ext ^ ".oracle")
- *       in
- *       let diff_string = diff_check_exist oracle_file log_file in
- *       ignore (launch diff_string)
- *   | Target_error execnow ->
- *     lock_printf "Custom command failed: %s@\n" execnow.ex_cmd;
- *     let print_redirected out redir_str =
- *       try
- *         ignore (Str.search_forward (Str.regexp redir_str) execnow.ex_cmd 0);
- *         let file = Str.matched_group 1 execnow.ex_cmd in
- *         lock_printf "%s redirected to %s:@\n" out file;
- *         if not (Sys.file_exists file) then
- *           lock_printf "error: file does not exist: %s:@\n" file
- *         else
- *           ignore (launch ("cat " ^ file));
- *       with Not_found -> ()
- *     in
- *     print_redirected "stdout" "[^2]> ?\\([-a-zA-Z0-9_/.]+\\)";
- *     print_redirected "stderr" "2> ?\\([-a-zA-Z0-9_/.]+\\)";
- *   | Log_error(dir, file) ->
- *     let result_file =
- *       Filename.sanitize (SubDir.make_result_file dir file)
- *     in
- *     lock_printf "Log of %s:@." result_file;
- *     if !behavior = Show
- *     then ignore (launch ("cat " ^ result_file))
- *     else
- *       let oracle_file =
- *         Filename.sanitize (SubDir.make_oracle_file dir file)
- *       in
- *       let diff_string = diff_check_exist oracle_file result_file in
- *       ignore (launch diff_string) *)
-
-(* let diff_thread () =
- *   lock () ;
- *   while true do
- *     try
- *       let diff = Queue.pop shared.diffs in
- *       unlock ();
- *       do_diff diff;
- *       lock ()
- *     with Queue.Empty ->
- *       if shared.cmp_finished then (unlock () ; Thread.exit ());
- * 
- *       Condition.wait shared.diff_available shared.lock
- *       (\* this atomically releases the lock and suspends
- *          the thread on the condition cmp_available *\)
- *   done *)
-
 let test_pattern config =
   let regexp = Str.regexp config.dc_test_regexp in
   fun file -> Str.string_match regexp file 0
 
 (* test for a possible toplevel configuration. *)
 let default_config () =
-  let general_config_file = Filename.concat test_path dir_config_file in
+  let general_config_file = Filename.concat PtestsConfig.test_path dir_config_file in
   if Sys.file_exists general_config_file
   then begin
     let scan_buffer = Scanf.Scanning.from_file general_config_file in
@@ -1610,27 +1125,19 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
 
 let () =
   (* enqueue the test files *)
-  let default_suites () =
-    let priority = "tests/idct" in
-    let default = !default_suites in
-    if List.mem priority default
-    then priority :: (List.filter (fun name -> name <> priority) default)
-    else default
-  in
   let suites =
     match !suites with
-    | [] -> default_suites ()
+    | [] -> !PtestsConfig.default_suites
     | l ->
       List.fold_left (fun acc x ->
           if x = "tests"
-          then (default_suites ()) @ acc
+          then !PtestsConfig.default_suites @ acc
           else x::acc
         ) [] l
   in
   List.iter
     (fun suite ->
-       if !verbosity >= 2 then lock_printf "%% producer now treating test %s\n%!" suite;
-       (* the "suite" may be a directory or a single file *)
+       if !verbosity >= 1 then Format.printf "%% Test suite %s\n%!" suite;
        let directory = SubDir.create suite in
        let result_dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
        let result_cout = (open_out result_dune_file) in
