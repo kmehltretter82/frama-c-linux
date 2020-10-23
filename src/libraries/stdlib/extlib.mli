@@ -323,7 +323,7 @@ val html_escape: string -> string
 (** [format_string_of_stag stag] returns the string corresponding to [stag],
     or raises an exception if the tag extension is unsupported.
 
-    @since Frama-C+dev
+    @since 22.0-Titanium
  *)
 val format_string_of_stag: Format.stag -> string
 

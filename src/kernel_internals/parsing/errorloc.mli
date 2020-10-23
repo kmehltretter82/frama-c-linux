@@ -74,7 +74,7 @@ val pp_context_from_file:
   ?ctx:int -> ?start_line:int -> Format.formatter -> Filepath.position -> unit
 
 (** prints a readable description of a location
-    @since Frama-C+dev *)
+    @since 22.0-Titanium *)
 val pp_location: Format.formatter -> Cil_types.location -> unit
 
 (** Parse errors are usually fatal, but their reporting is sometimes

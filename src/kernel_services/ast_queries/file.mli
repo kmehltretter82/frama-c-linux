@@ -73,7 +73,7 @@ val list_available_machdeps: unit -> string list
 (** [list_available_machdeps ()] gives the list of the names of available
     machdeps, starting with the ones added with new_machdep and ending with
     the list of default machdeps.
-    @since Frama-C+dev *)
+    @since 22.0-Titanium *)
   
 type code_transformation_category
 (** type of registered code transformations

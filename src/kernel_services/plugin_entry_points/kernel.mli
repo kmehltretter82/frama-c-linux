@@ -240,7 +240,7 @@ module AutocompleteHelp: Parameter_sig.String_set
 
 module PrintConfigJson: Parameter_sig.Bool
 (** Behavior of option "-print-config-json"
-    @since Frama-C+dev *)
+    @since 22.0-Titanium *)
 
 (* ************************************************************************* *)
 (** {2 Output Messages} *)

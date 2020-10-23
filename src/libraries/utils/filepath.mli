@@ -92,7 +92,7 @@ val add_symbolic_dir: string -> string -> unit
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
 
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val all_symbolic_dirs: unit -> (string * string) list
 
@@ -114,7 +114,7 @@ module Normalized: sig
       resulting from the concatenation of [dir] ^ "/" ^ [file].
       The resulting path must respect [existence].
 
-      @since Frama-C+dev
+      @since 22.0-Titanium
   *)
   val concat: ?existence:existence -> t -> string -> t
 
@@ -159,7 +159,7 @@ module Normalized: sig
   (** [is_file f] returns [true] iff [f] points to a regular file
       (or a symbolic link pointing to a file).
       Returns [false] if any errors happen when [stat]'ing the file.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
   val is_file: t -> bool
 
   (** [to_base_uri path] returns a pair [prefix, rest], according to the
@@ -171,7 +171,7 @@ module Normalized: sig
         E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
         ("FRAMAC_SHARE", "libc/string.h").
 
-      @since Frama-C+dev
+      @since 22.0-Titanium
   *)
   val to_base_uri: t -> string option * string
 end
