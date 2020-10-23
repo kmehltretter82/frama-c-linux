@@ -129,7 +129,7 @@ val is_reconfigurable: unit -> unit
     only parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify Frama-C+dev [do_iterate] renamed to [is_reconfigurable]
+    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
 *)
 
 val is_not_reconfigurable: unit -> unit
@@ -137,7 +137,7 @@ val is_not_reconfigurable: unit -> unit
     parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify Frama-C+dev [do_iterate] renamed to [is_reconfigurable]
+    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
  *)
 
 val no_category: unit -> unit

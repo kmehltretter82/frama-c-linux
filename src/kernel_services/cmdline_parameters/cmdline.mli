@@ -319,7 +319,7 @@ val add_aliases:
     If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
     @since Carbon-20110201
-    @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
+    @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 
 val replace_option_setting: 
   string -> plugin:string -> group:Group.t -> option_setting -> unit
@@ -396,7 +396,7 @@ val permissive: bool
       unknown option names and invalid values for some options
       (e.g. non-existent function names).
 
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
 
 val last_project_created_by_copy: (unit -> string option) ref
 
