@@ -204,6 +204,7 @@ share/libc/__fc_define_wint_t.h: CEA_LGPL
 share/libc/__fc_gcc_builtins.h: CEA_LGPL
 share/libc/__fc_inet.h: CEA_LGPL
 share/libc/__fc_integer.h: CEA_LGPL
+share/libc/__fc_libc.h: CEA_LGPL
 share/libc/__fc_machdep.h: CEA_LGPL
 share/libc/__fc_machdep_linux_shared.h: CEA_LGPL
 share/libc/__fc_runtime.c: CEA_LGPL
