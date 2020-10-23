@@ -70,10 +70,6 @@ module Env = struct
 
 end
 
-(** the files in [suites] whose name matches
-    the pattern [test_file_regexp] will be considered as test files *)
-let test_file_regexp = ".*\\.\\(c\\|i\\)$"
-
 (** the pattern that ends the parsing of options in a test file *)
 let end_comment = Str.regexp ".*\\*/"
 
@@ -126,6 +122,8 @@ let add_test_suite s = suites := s :: !suites
 
 (** special configuration, with associated oracles *)
 let special_config = ref ""
+let config_name name =
+  if !special_config = "" then name else name ^ "_" ^ !special_config
 
 let () =
   Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
@@ -203,10 +201,16 @@ let fail s =
   Format.printf "Error: %s@.Aborting (CWD=%s).@." s (Sys.getcwd());
   exit 2
 
-module PtestsConfig = struct
+(* parses the [tests/ptests_config] file (prefers the one related to the expected configuration name*)
+module Ptests_config: sig
+
+  val test_path: string
+  val suites: unit -> string list
+
+end = struct
+
   (** split the filename into before including "tests" dir and after including "tests" dir
-    NOTA: both part contains "tests" (one as suffix the other as prefix).
-*)
+      NOTA: both part contains "tests" (one as suffix the other as prefix). *)
   let rec get_upper_test_dir initial dir =
     let tests = Filename.dirname dir in
     if tests = dir then
@@ -256,13 +260,17 @@ module PtestsConfig = struct
       default_suites := List.map (Filename.concat test_path) l
     | _ -> Env.default_env key value (* Environnement variable that Frama-C reads*)
 
-  (** parse config files *)
+  (** parses the [tests/ptests_config] file  *)
   let () =
-    let config = "tests/ptests_config" in
+    let config =
+      let filename = "tests/ptests_config" in
+      let expected_filename = config_name filename in
+      if Sys.file_exists expected_filename then expected_filename else filename
+    in
     if Sys.file_exists config then begin
+      let ch = open_in config in
       try
         (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
-        let ch = open_in config in
         let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
         let regexp_comment = Str.regexp " *#" in
         while true do
@@ -272,12 +280,13 @@ module PtestsConfig = struct
             let value = Str.matched_group 2 line in
             parse_config_line (key, value)
           else if not (Str.string_match regexp_comment line 0) then begin
+            close_in ch;
             Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
             exit 1
           end
         done
       with
-      | End_of_file -> ()
+      | End_of_file -> close_in ch
     end
     else begin
       Format.eprintf
@@ -285,15 +294,17 @@ module PtestsConfig = struct
       exit 1
     end
 
+  let suites () =
+    match !suites with
+    | [] -> !default_suites
+    | l ->
+      List.fold_left (fun acc x ->
+          if x = "tests"
+          then !default_suites @ acc
+          else x::acc
+        ) [] l
+
 end
-
-(* redefine name if special configuration expected *)
-let config_name name =
-  if !special_config = "" then name else name ^ "_" ^ !special_config
-
-(** the name of the directory-wide configuration file*)
-let dir_config_file = "test_config"
-let dir_config_file = config_name dir_config_file
 
 let gen_make_file s _dir file = Filename.concat s file
 
@@ -424,7 +435,6 @@ module Macros = struct
   let default_macros () = add_list
     [ "PLUGIN", "" ;
       "DEFAULT_OPTIONS", macro_default_options;
-      "OPTIONS", "";
       "frama-c-only", macro_frama_c_only;
       "frama-c-cmd", macro_frama_c_cmd;
       "frama-c",     macro_frama_c;
@@ -459,282 +469,330 @@ type config =
     dc_timeout: string
   }
 
-let default_toplevel = "@frama-c@ @OPTIONS@"
-let default_command = {toplevel=default_toplevel; opts=""; logs=[]; macros=Macros.empty; timeout=""}
-let default_config () =
-  { dc_test_regexp = test_file_regexp ;
-    dc_macros = Macros.default_macros ();
-    dc_execnow = [];
-    dc_libs = [];
-    dc_cmxs = [];
-    dc_deps = [];
-    dc_plugins = [];
-    dc_load_module = [];
-    dc_filter = None ;
-    dc_default_toplevel = default_toplevel;
-    dc_commands = [ default_command ];
-    dc_dont_run = false;
-    dc_framac = true;
-    dc_default_log = [];
-    dc_timeout = "";
-  }
+(* Scans the test directives (from test_config or test files) and expands macros as soon as possible *)
+module Test_config: sig
 
-let scan_execnow ~once dir ex_timeout (s:string) =
-  let rec aux (s:execnow) =
-    try
-      Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
-        (fun name cmd ->
-           aux { s with ex_cmd = cmd; ex_log = name :: s.ex_log })
-    with Scanf.Scan_failure _ ->
-    try
-      Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\-@@]%_[ ]%s@\n"
-        (fun name cmd ->
-           aux { s with ex_cmd = cmd; ex_bin = name :: s.ex_bin })
-    with Scanf.Scan_failure _ ->
-    try
-      Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
-        (fun cmd ->
-           let s = aux ({ s with ex_cmd = cmd; }) in
-           { s with ex_cmd = !do_make^" "^cmd; } )
-    with Scanf.Scan_failure _ ->
-      s
-  in
-  aux
-    { ex_cmd = s;
-      ex_log = [];
-      ex_bin = [];
-      ex_dir = dir;
-      ex_once = once;
-      ex_done = ref false;
-      ex_timeout;
+  (** The [test_config] filename related to the expected configuration name *)
+  val filename: string
+  val current_config: unit -> config
+
+  val scan_directives: SubDir.t -> Scanf.Scanning.in_channel -> config -> config
+  val scan_test_file:  SubDir.t -> file:string -> config -> config
+end  = struct
+
+  (** the name of the directory-wide configuration file*)
+  let filename = "test_config"
+  let filename = config_name filename
+
+  (** the files in [suites] whose name matches
+      the pattern [test_file_regexp] will be considered as test files *)
+  let test_file_regexp = ".*\\.\\(c\\|i\\)$"
+
+  let default_toplevel = "@frama-c@ @OPTIONS@"
+  let default_command = {toplevel=default_toplevel; opts=""; logs=[]; macros=Macros.empty; timeout=""}
+  let default_config () =
+    { dc_test_regexp = test_file_regexp ;
+      dc_macros = Macros.default_macros ();
+      dc_execnow = [];
+      dc_libs = [];
+      dc_cmxs = [];
+      dc_deps = [];
+      dc_plugins = [];
+      dc_load_module = [];
+      dc_filter = None ;
+      dc_default_toplevel = default_toplevel;
+      dc_commands = [ default_command ];
+      dc_dont_run = false;
+      dc_framac = true;
+      dc_default_log = [];
+      dc_timeout = "";
     }
 
-(* the default toplevel for the current level of options. *)
-let current_default_toplevel = ref default_toplevel
-let current_default_log = ref []
-let current_default_cmds = ref [ default_command ]
-
-let make_custom_opts =
-  let space = Str.regexp " " in
-  fun stdopts s ->
-    let rec aux opts s =
+  let scan_execnow ~once dir ex_timeout (s:string) =
+    let rec aux (s:execnow) =
       try
-        Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
-          (fun c opt rem ->
-             match c with
-             | "+" -> aux (opt :: opts) rem
-             | "#" -> aux (opts @ [ opt ]) rem
-             | "-" -> aux (List.filter (fun x -> x <> opt) opts) rem
-             | _ -> assert false (* format of scanned string disallow it *))
+        Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
+          (fun name cmd ->
+             aux { s with ex_cmd = cmd; ex_log = name :: s.ex_log })
+      with Scanf.Scan_failure _ ->
+      try
+        Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\-@@]%_[ ]%s@\n"
+          (fun name cmd ->
+             aux { s with ex_cmd = cmd; ex_bin = name :: s.ex_bin })
+      with Scanf.Scan_failure _ ->
+      try
+        Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
+          (fun cmd ->
+             let s = aux ({ s with ex_cmd = cmd; }) in
+             { s with ex_cmd = !do_make^" "^cmd; } )
+      with Scanf.Scan_failure _ ->
+        s
+    in
+    aux
+      { ex_cmd = s;
+        ex_log = [];
+        ex_bin = [];
+        ex_dir = dir;
+        ex_once = once;
+        ex_done = ref false;
+        ex_timeout;
+      }
+
+  let make_custom_opts =
+    let space = Str.regexp " " in
+    fun stdopts s ->
+      let rec aux opts s =
+        try
+          Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
+            (fun c opt rem ->
+               match c with
+               | "+" -> aux (opt :: opts) rem
+               | "#" -> aux (opts @ [ opt ]) rem
+               | "-" -> aux (List.filter (fun x -> x <> opt) opts) rem
+               | _ -> assert false (* format of scanned string disallow it *))
+        with
+        | Scanf.Scan_failure _ ->
+          if s <> "" then
+            Format.eprintf "unknown STDOPT configuration string: %s\n%!" s;
+          opts
+        | End_of_file -> opts
+      in
+      (* NB: current settings does not allow to remove a multiple-argument
+         option (e.g. -verbose 2).
+      *)
+      (* revert the initial list, as it will be reverted back in the end. *)
+      let opts = aux (List.rev (Str.split space stdopts)) s in
+      (* preserve options ordering *)
+      List.fold_right (fun x s -> s ^ " " ^ x) opts ""
+
+
+  let config_exec ~once dir s current =
+    let s = Macros.expand current.dc_macros s in
+    { current with
+      dc_execnow =
+        scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
+
+  let split_list s = Str.split (Str.regexp "[ ,]+") s
+  let config_deps _dir s current =
+    let s = Macros.expand current.dc_macros s in
+    { current with dc_deps = (split_list s) @ current.dc_deps }
+
+  let config_cmxs _dir s current =
+    let s = Macros.expand current.dc_macros s in
+    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+    { current with dc_cmxs = l @ current.dc_cmxs }
+
+  let config_libs _dir s current =
+    let s = Macros.expand current.dc_macros s in
+    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+    { current with dc_libs = l @ current.dc_libs ;
+                   dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
+
+  let config_plugin _dir s current =
+    let s = Macros.expand current.dc_macros s in
+    { current with dc_plugins = split_list s ;
+                   dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
+
+  let config_module _dir s current =
+    let s = Macros.expand current.dc_macros s in
+    let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
+    let deps = List.map (fun s -> s ^ ".cmxs") l in
+    { current with
+      dc_cmxs = l @ current.dc_cmxs;
+      dc_deps = deps @ current.dc_deps;
+      dc_load_module = deps @ current.dc_load_module;
+    }
+
+  let config_macro _dir s current =
+    (* note: the expansion is donly done into the definition *)
+    let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
+    if Str.string_match regex s 0 then begin
+      let name = Str.matched_group 1 s in
+      let def =
+        try Str.matched_group 3 s with Not_found -> (* empty text *) ""
+      in
+      if !verbosity >= 2 then
+        Format.printf "new macro %s with definition %s\n%!" name def;
+      { current with dc_macros = Macros.add_expand name def current.dc_macros }
+    end else begin
+      Format.eprintf "cannot understand MACRO definition: %s\n%!" s;
+      current
+    end
+
+  (* the default toplevel for the current level of options. *)
+  let current_default_toplevel = ref default_toplevel
+  let current_default_log = ref []
+  let current_default_cmds = ref [ default_command ]
+
+  let config_options =
+    [ "CMD",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_default_toplevel = s});
+
+      "OPT",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         let t =
+           { toplevel = current.dc_default_toplevel;
+             opts = s;
+             logs = current.dc_default_log;
+             macros = current.dc_macros;
+             timeout = current.dc_timeout }
+         in
+         { current with
+           (*           dc_default_toplevel = !current_default_toplevel;*)
+           dc_default_log = !current_default_log;
+           dc_commands = t :: current.dc_commands });
+
+      "STDOPT",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         let new_top =
+           List.map
+             (fun command ->
+                { command with opts= make_custom_opts command.opts s ;
+                               macros = current.dc_macros;
+                               timeout= current.dc_timeout})
+             !current_default_cmds
+         in
+         { current with dc_commands = new_top @ current.dc_commands;
+                        dc_default_log = !current_default_log @
+                                         current.dc_default_log });
+      "FILEREG",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_test_regexp = s });
+
+      "FILTER",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_filter = Some s });
+
+      "GCC",
+      (fun _ _ acc -> acc);
+
+      "COMMENT",
+      (fun _ _ acc -> acc);
+
+      "DONTRUN",
+      (fun _ _ current -> { current with dc_dont_run = true });
+
+      "EXECNOW", config_exec ~once:true;
+      "EXEC", config_exec ~once:false;
+      "CMXS", config_cmxs;
+      "LIBS", config_libs;
+      "DEPS", config_deps;
+      "MACRO", config_macro;
+      "MODULE", config_module;
+      "PLUGIN", config_plugin;
+      "LOG",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_default_log = s :: current.dc_default_log });
+      "TIMEOUT",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_timeout = s });
+      "NOFRAMAC",
+      (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
+    ]
+
+  let scan_directives dir scan_buffer default =
+    current_default_toplevel := default.dc_default_toplevel;
+    current_default_log := default.dc_default_log;
+    current_default_cmds := List.rev default.dc_commands;
+    let r = ref { default with dc_commands = [] } in
+    let treat_line s =
+      try
+        Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
+          (fun _ name opt ->
+             try
+               r := (List.assoc name config_options) dir opt !r
+             with Not_found ->
+               Format.eprintf "@[unknown configuration option: %s@\n%!@]" name)
       with
       | Scanf.Scan_failure _ ->
-        if s <> "" then
-          Format.eprintf "unknown STDOPT configuration string: %s\n%!" s;
-        opts
-      | End_of_file -> opts
+        if Str.string_match end_comment s 0
+        then raise End_of_file
+        else ()
+      | End_of_file -> (* ignore blank lines. *) ()
     in
-    (* NB: current settings does not allow to remove a multiple-argument
-       option (e.g. -verbose 2).
-    *)
-    (* revert the initial list, as it will be reverted back in the end. *)
-    let opts = aux (List.rev (Str.split space stdopts)) s in
-    (* preserve options ordering *)
-    List.fold_right (fun x s -> s ^ " " ^ x) opts ""
-
-
-(* how to process options *)
-let config_exec ~once dir s current =
-  { current with
-    dc_execnow =
-      scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
-
-let split_list s = Str.split (Str.regexp "[ ,]+") s
-let config_deps _dir s current =
-  { current with dc_deps = (split_list s) @ current.dc_deps }
-
-let config_cmxs _dir s current =
-  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-  { current with dc_cmxs = l @ current.dc_cmxs }
-
-let config_libs _dir s current =
-  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-  { current with dc_libs = l @ current.dc_libs ;
-    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
-
-let config_plugin _dir s current =
-  let s = Macros.expand current.dc_macros s in
-  { current with dc_plugins = split_list s ;
-                 dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
-
-let config_module _dir s current =
-  let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
-  let deps = List.map (fun s -> s ^ ".cmxs") l in
-  { current with
-    dc_cmxs = l @ current.dc_cmxs;
-    dc_deps = deps @ current.dc_deps;
-    dc_load_module = deps @ current.dc_load_module;
-  }
-
-let config_macro _dir s current =
-  let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-  if Str.string_match regex s 0 then begin
-    let name = Str.matched_group 1 s in
-    let def =
-      try Str.matched_group 3 s with Not_found -> (* empty text *) ""
-    in
-    if !verbosity >= 2 then
-      Format.printf "new macro %s with definition %s\n%!" name def;
-    { current with dc_macros = Macros.add_expand name def current.dc_macros }
-  end else begin
-    Format.eprintf "cannot understand MACRO definition: %s\n%!" s;
-    current
-  end
-
-let config_options =
-  [ "CMD",
-    (fun _ s current ->
-       { current with dc_default_toplevel = s});
-
-    "OPT",
-    (fun _ s current ->
-       let t =
-         { toplevel = current.dc_default_toplevel;
-           opts = s;
-           logs = current.dc_default_log;
-           macros = current.dc_macros;
-           timeout = current.dc_timeout }
-       in
-       { current with
-         (*           dc_default_toplevel = !current_default_toplevel;*)
-         dc_default_log = !current_default_log;
-         dc_commands = t :: current.dc_commands });
-
-    "STDOPT",
-    (fun _ s current ->
-       let new_top =
-         List.map
-           (fun command ->
-              { command with opts= make_custom_opts command.opts s ;
-                             macros = current.dc_macros;
-                             timeout= current.dc_timeout})
-           !current_default_cmds
-       in
-       { current with dc_commands = new_top @ current.dc_commands;
-                      dc_default_log = !current_default_log @
-                                       current.dc_default_log });
-
-    "FILEREG",
-    (fun _ s current -> { current with dc_test_regexp = s });
-
-    "FILTER",
-    (fun _ s current -> { current with dc_filter = Some s });
-
-    "GCC",
-    (fun _ _ acc -> acc);
-
-    "COMMENT",
-    (fun _ _ acc -> acc);
-
-    "DONTRUN",
-    (fun _ _ current -> { current with dc_dont_run = true });
-
-    "EXECNOW", config_exec ~once:true;
-    "EXEC", config_exec ~once:false;
-    "CMXS", config_cmxs;
-    "LIBS", config_libs;
-    "DEPS", config_deps;
-    "MACRO", config_macro;
-    "MODULE", config_module;
-    "PLUGIN", config_plugin;
-    "LOG",
-    (fun _ s current ->
-       { current with dc_default_log = s :: current.dc_default_log });
-    "TIMEOUT",
-    (fun _ s current -> { current with dc_timeout = s });
-    "NOFRAMAC",
-    (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
-  ]
-
-let scan_options dir scan_buffer default =
-  current_default_toplevel := default.dc_default_toplevel;
-  current_default_log := default.dc_default_log;
-  current_default_cmds := List.rev default.dc_commands;
-  let r = ref { default with dc_commands = [] } in
-  let treat_line s =
     try
-      Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
-        (fun _ name opt ->
-           try
-             r := (List.assoc name config_options) dir opt !r
-           with Not_found ->
-             Format.eprintf "@[unknown configuration option: %s@\n%!@]" name)
+      while true do
+        if Scanf.Scanning.end_of_input scan_buffer then raise End_of_file;
+        Scanf.bscanf scan_buffer "%s@\n" treat_line
+      done;
+      assert false
     with
-    | Scanf.Scan_failure _ ->
-      if Str.string_match end_comment s 0
-      then raise End_of_file
-      else ()
-    | End_of_file -> (* ignore blank lines. *) ()
-  in
-  try
-    while true do
-      if Scanf.Scanning.end_of_input scan_buffer then raise End_of_file;
-      Scanf.bscanf scan_buffer "%s@\n" treat_line
-    done;
-    assert false
-  with
-  | End_of_file ->
-    (match !r.dc_commands with
-     | [] when !r.dc_framac -> { !r with dc_commands = default.dc_commands }
-     | l -> { !r with dc_commands = List.rev l })
+    | End_of_file ->
+      (match !r.dc_commands with
+       | [] when !r.dc_framac -> { !r with dc_commands = default.dc_commands }
+       | l -> { !r with dc_commands = List.rev l })
 
-let split_config s = Str.split (Str.regexp ",[ ]*") s
+  (* test for a possible toplevel configuration. *)
+  let current_config () =
+    let general_config_file = Filename.concat Ptests_config.test_path filename in
+    if Sys.file_exists general_config_file
+    then begin
+      let scan_buffer = Scanf.Scanning.from_file general_config_file in
+      scan_directives
+        (SubDir.create ~with_subdir:false Filename.current_dir_name)
+        scan_buffer
+        (default_config ())
+    end
+    else default_config ()
 
-let is_config name =
-  let prefix = "run.config" in
-  let len = String.length prefix in
-  String.length name >= len && String.sub name 0 len = prefix
+  let split_config s = Str.split (Str.regexp ",[ ]*") s
 
-let scan_test_file default dir f =
-  let f = SubDir.make_file dir f in
-  let exists_as_file =
-    try
-      (Unix.lstat f).Unix.st_kind = Unix.S_REG
-    with | Unix.Unix_error _ | Sys_error _ -> false
-  in
-  if exists_as_file then begin
-    let scan_buffer = Scanf.Scanning.open_in f in
-    let rec scan_config () =
-      (* space in format string matches any number of whitespace *)
-      Scanf.bscanf scan_buffer " /* %s@\n"
-        (fun names ->
-           let is_current_config name =
-             name = "run.config*" ||
-             name = "run.config" && !special_config = ""  ||
-             name = "run.config_" ^ !special_config
-           in
-           let configs = split_config (String.trim names) in
-           if List.exists is_current_config configs then
-             (* Found options for current config! *)
-             scan_options dir scan_buffer default
-           else (* config name does not match: eat config and continue.
-                   But only if the comment is still opened by the end of
-                   the line and we are indeed reading a config
-                *)
-             (if List.exists is_config configs &&
-                 not (Str.string_match end_comment names 0) then
-                ignore (scan_options dir scan_buffer default);
-              scan_config ()))
+  let is_config name =
+    let prefix = "run.config" in
+    let len = String.length prefix in
+    String.length name >= len && String.sub name 0 len = prefix
+
+  let scan_test_file dir ~file default =
+    let f = SubDir.make_file dir file in
+    let exists_as_file =
+      try
+        (Unix.lstat f).Unix.st_kind = Unix.S_REG
+      with | Unix.Unix_error _ | Sys_error _ -> false
     in
-    try
-      let options =  scan_config () in
-      Scanf.Scanning.close_in scan_buffer;
-      options
-    with End_of_file | Scanf.Scan_failure _ ->
-      Scanf.Scanning.close_in scan_buffer;
-      default
-  end else
-    (* if the file has disappeared, don't try to run it... *)
-    { default with dc_dont_run = true }
+    if exists_as_file then begin
+      let scan_buffer = Scanf.Scanning.open_in f in
+      let rec scan_config () =
+        (* space in format string matches any number of whitespace *)
+        Scanf.bscanf scan_buffer " /* %s@\n"
+          (fun names ->
+             let is_current_config name =
+               name = "run.config*" ||
+               name = "run.config" && !special_config = ""  ||
+               name = "run.config_" ^ !special_config
+             in
+             let configs = split_config (String.trim names) in
+             if List.exists is_current_config configs then
+               (* Found options for current config! *)
+               scan_directives dir scan_buffer default
+             else (* config name does not match: eat config and continue.
+                     But only if the comment is still opened by the end of
+                     the line and we are indeed reading a config
+                  *)
+               (if List.exists is_config configs &&
+                   not (Str.string_match end_comment names 0) then
+                  ignore (scan_directives dir scan_buffer default);
+                scan_config ()))
+      in
+      try
+        let options =  scan_config () in
+        Scanf.Scanning.close_in scan_buffer;
+        options
+      with End_of_file | Scanf.Scan_failure _ ->
+        Scanf.Scanning.close_in scan_buffer;
+        default
+    end else
+      (* if the file has disappeared, don't try to run it... *)
+      { default with dc_dont_run = true }
+
+end
 
 type toplevel_command =
   { macros: Macros.t;
@@ -1009,7 +1067,7 @@ let command_string ~result_fmt ~oracle_fmt command =
 
 (** process a test file *)
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
-  let config = scan_test_file config directory file in
+  let config = Test_config.scan_test_file directory ~file config in
   if not config.dc_dont_run then
     let i = ref 0 in
     let e = ref 0 in
@@ -1104,19 +1162,6 @@ let test_pattern config =
   let regexp = Str.regexp config.dc_test_regexp in
   fun file -> Str.string_match regexp file 0
 
-(* test for a possible toplevel configuration. *)
-let default_config () =
-  let general_config_file = Filename.concat PtestsConfig.test_path dir_config_file in
-  if Sys.file_exists general_config_file
-  then begin
-    let scan_buffer = Scanf.Scanning.from_file general_config_file in
-    scan_options
-      (SubDir.create ~with_subdir:false Filename.current_dir_name)
-      scan_buffer
-      (default_config ())
-  end
-  else default_config ()
-
 (* if we have some references to directories in the default config, they
    need to be adapted to the actual test directory. *)
 let update_dir_ref dir config =
@@ -1126,16 +1171,7 @@ let update_dir_ref dir config =
 
 let () =
   (* enqueue the test files *)
-  let suites =
-    match !suites with
-    | [] -> !PtestsConfig.default_suites
-    | l ->
-      List.fold_left (fun acc x ->
-          if x = "tests"
-          then !PtestsConfig.default_suites @ acc
-          else x::acc
-        ) [] l
-  in
+  let suites = Ptests_config.suites () in
   List.iter
     (fun suite ->
        if !verbosity >= 1 then Format.printf "%% Test suite %s\n%!" suite;
@@ -1148,13 +1184,13 @@ let () =
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
        let dir_config =
-         let config = SubDir.make_file directory dir_config_file in
-         let default = default_config () in
+         let config = SubDir.make_file directory Test_config.filename in
+         let default = Test_config.current_config () in
          let default = update_dir_ref directory default in
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           scan_options directory scan_buffer default
+           Test_config.scan_directives directory scan_buffer default
          end
          else default
        in
