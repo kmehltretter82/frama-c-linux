@@ -65,7 +65,7 @@ authors: [
 homepage: "http://frama-c.com/"
 license: "GNU Lesser General Public License version 2.1"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-21.1-Scandium.pdf"
+doc: "http://frama-c.com/download/user-manual-22.0-beta-Titanium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
