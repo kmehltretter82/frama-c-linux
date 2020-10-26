@@ -351,22 +351,6 @@ end = struct
 
 end
 
-type execnow =
-  { ex_cmd: string;      (** command to launch *)
-    ex_log: string list; (** log files *)
-    ex_bin: string list; (** bin files *)
-    ex_dir: SubDir.t;    (** directory of test suite *)
-    ex_once: bool;       (** true iff the command has to be executed only once
-                             per config file (otherwise it is executed for
-                             every file of the test suite) *)
-    ex_done: bool ref;   (** has the command been already fully executed.
-                             Shared between all copies of this EXECNOW. Do
-                             NOT use a mutable field here, as execnows
-                             are duplicated using OCaml 'with' syntax. *)
-    ex_timeout: string;
-  }
-
-
 module Macros = struct
   module StringMap = Map.Make (String)
   open StringMap
@@ -442,8 +426,24 @@ module Macros = struct
 
 end
 
+type execnow =
+  { ex_cmd: string;      (** command to launch *)
+    ex_log: string list; (** log files *)
+    ex_bin: string list; (** bin files *)
+    ex_dir: SubDir.t;    (** directory of test suite *)
+    ex_once: bool;       (** true iff the command has to be executed only once
+                             per config file (otherwise it is executed for
+                             every file of the test suite) *)
+    ex_done: bool ref;   (** has the command been already fully executed.
+                             Shared between all copies of this EXECNOW. Do
+                             NOT use a mutable field here, as execnows
+                             are duplicated using OCaml 'with' syntax. *)
+    ex_timeout: string;
+  }
+
+
 (** configuration of a directory/test. *)
-type cmd = { toplevel:string ; opts:string ; logs:string list ; timeout:string }
+type cmd = { toplevel:string; opts:string; macros: Macros.t ; logs:string list ; timeout:string }
 type config =
   {
     dc_test_regexp: string; (** regexp of test files. *)
@@ -481,7 +481,7 @@ module Test_config: sig
 
   (* updates the configuration directives that do not depend of the test number and
      returns a getter of the PTEST_xxx variables including the one depending on the test number *)
-  val ptest_vars: SubDir.t -> file:string -> config -> config * (nth:int -> Macros.t)
+  val ptest_vars: SubDir.t -> file:string -> config -> config * (nth:int -> Macros.t -> Macros.t)
 
 end  = struct
 
@@ -490,17 +490,14 @@ end  = struct
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
     let ptest_vars =
-      Macros.add_list
         [ "PTEST_CONFIG", ptest_config;
           "PTEST_DIR", SubDir.get directory;
           "PTEST_RESULT",
           Filename.concat (SubDir.get directory) SubDir.result_dirname;
           "PTEST_FILE", ptest_file;
           "PTEST_NAME", ptest_name;
-        ]
-        Macros.empty
-    in
-    let subst = Macros.expand ptest_vars in
+        ] in
+    let subst = Macros.expand (Macros.add_list ptest_vars Macros.empty) in
     { config with
       dc_cmxs = List.map subst config.dc_cmxs;
       dc_deps = List.map subst config.dc_deps;
@@ -508,8 +505,8 @@ end  = struct
       dc_load_module = List.map subst config.dc_load_module;
       dc_libs = List.map subst config.dc_libs
     },
-    fun ~nth ->
-      Macros.add_list [ "PTEST_NUMBER", string_of_int nth ] ptest_vars
+    fun ~nth macros ->
+      Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
 
   (** the name of the directory-wide configuration file*)
   let filename = "test_config"
@@ -519,8 +516,8 @@ end  = struct
       the pattern [test_file_regexp] will be considered as test files *)
   let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
-  let default_toplevel = Macros.expand (Macros.default_macros ()) "@frama-c@ @OPTIONS@"
-  let default_command = {toplevel=default_toplevel; opts=""; logs=[]; timeout=""}
+  let default_toplevel = "@frama-c@ @OPTIONS@"
+  let default_command = {toplevel=default_toplevel; opts=""; macros=Macros.default_macros (); logs=[]; timeout=""}
   let default_config () =
     { dc_test_regexp = test_file_regexp ;
       dc_macros = Macros.default_macros ();
@@ -667,8 +664,9 @@ end  = struct
          let t =
            { toplevel = current.dc_default_toplevel;
              opts = s;
+             macros = current.dc_macros ;
              logs = current.dc_default_log;
-              timeout = current.dc_timeout }
+             timeout = current.dc_timeout }
          in
          { current with
            (*           dc_default_toplevel = !current_default_toplevel;*)
@@ -824,7 +822,7 @@ end  = struct
 end
 
 type toplevel_command =
-  { ptest_vars: Macros.t;
+  { macros: Macros.t;
     mutable log_files: string list;
     file : string ;
     nb_files : int ;
@@ -876,7 +874,7 @@ let log_prefix = gen_prefix SubDir.make_result_file
 let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
 let basic_command_string command =
-  let macros = command.ptest_vars in
+  let macros = command.macros in
   command.log_files <- List.map (Macros.expand macros) command.log_files;
   let expanded_plugins_options =
     let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
@@ -1085,12 +1083,12 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     let config,ptest_vars = Test_config.ptest_vars directory ~file config  in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; logs=log_files; timeout } ->
+      fun { toplevel; opts=options; macros; logs=log_files; timeout } ->
         let nth = !i in
         incr i ;
         command_string ~result_fmt ~oracle_fmt
           { file; options; toplevel; nb_files; directory; nth; timeout; log_files;
-            ptest_vars = ptest_vars ~nth;
+            macros = ptest_vars ~nth macros;
             filter = config.dc_filter;
             execnow=false;
             deps = config.dc_deps;
@@ -1100,15 +1098,16 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     in
     let make_execnow_cmd =
       let e = ref 0 in
-      fun execnow ->
+      fun execnow->
        let nth = !e in
        incr e ;
-       let mk_cmd (s, timeout) =
-         { file; nb_files; directory; nth; timeout;
+       let cmd =
+         { file; nb_files; directory; nth;
            log_files = [];
            options = "";
-           toplevel = s;
-           ptest_vars = ptest_vars ~nth;
+           toplevel = execnow.ex_cmd;
+           timeout=execnow.ex_timeout;
+           macros = ptest_vars ~nth Macros.empty;
            filter = config.dc_filter;
            execnow = true;
            deps = config.dc_deps;
@@ -1116,12 +1115,11 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
            load_module = config.dc_libs @ config.dc_load_module;
          }
        in
-       let cmd = mk_cmd (execnow.ex_cmd, execnow.ex_timeout) in
        let res =
          { execnow with
            ex_cmd = basic_command_string cmd;
-           ex_log = List.map (Macros.expand cmd.ptest_vars) execnow.ex_log;
-           ex_bin = List.map (Macros.expand cmd.ptest_vars) execnow.ex_bin;
+           ex_log = List.map (Macros.expand cmd.macros) execnow.ex_log;
+           ex_bin = List.map (Macros.expand cmd.macros) execnow.ex_bin;
          }
        in
        Format.fprintf result_fmt
