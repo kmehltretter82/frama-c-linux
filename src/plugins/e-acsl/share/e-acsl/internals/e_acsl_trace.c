@@ -28,6 +28,7 @@
 #include <limits.h>
 #include <stddef.h>
 
+#include "e_acsl_config.h"
 #include "e_acsl_malloc.h"
 #include "e_acsl_rtl_io.h"
 #include "e_acsl_rtl_string.h"
@@ -71,7 +72,7 @@ static int native_backtrace (void **array, int size) {
 }
 
 void trace() {
-# ifdef __linux__
+# if E_ACSL_OS_IS_LINUX
 
   int size = 24;
   void **bb = private_malloc(sizeof(void*)*size);
@@ -107,5 +108,5 @@ void trace() {
     counter++;
   }
   STDOUT("/***************************************/\n");
-# endif /* __linux__ */
+# endif /* E_ACSL_OS_IS_LINUX */
 }
