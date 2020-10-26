@@ -417,7 +417,7 @@ module Macros = struct
       Format.eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
       raise e
 
-  let expand macros s =
+  let expand (macros:t) s =
     snd (does_expand macros s)
 
   let get ?(default="") name macros =
@@ -443,7 +443,7 @@ module Macros = struct
 end
 
 (** configuration of a directory/test. *)
-type cmd = { toplevel:string ; opts:string ; macros: Macros.t ; logs:string list ; timeout:string }
+type cmd = { toplevel:string ; opts:string ; logs:string list ; timeout:string }
 type config =
   {
     dc_test_regexp: string; (** regexp of test files. *)
@@ -478,7 +478,38 @@ module Test_config: sig
 
   val scan_directives: SubDir.t -> Scanf.Scanning.in_channel -> config -> config
   val scan_test_file:  SubDir.t -> file:string -> config -> config
+
+  (* updates the configuration directives that do not depend of the test number and
+     returns a getter of the PTEST_xxx variables including the one depending on the test number *)
+  val ptest_vars: SubDir.t -> file:string -> config -> config * (nth:int -> Macros.t)
+
 end  = struct
+
+  let ptest_vars directory ~file config =
+    let ptest_config = config_name "" in
+    let ptest_file = Filename.sanitize file in
+    let ptest_name = Filename.remove_extension file in
+    let ptest_vars =
+      Macros.add_list
+        [ "PTEST_CONFIG", ptest_config;
+          "PTEST_DIR", SubDir.get directory;
+          "PTEST_RESULT",
+          Filename.concat (SubDir.get directory) SubDir.result_dirname;
+          "PTEST_FILE", ptest_file;
+          "PTEST_NAME", ptest_name;
+        ]
+        Macros.empty
+    in
+    let subst = Macros.expand ptest_vars in
+    { config with
+      dc_cmxs = List.map subst config.dc_cmxs;
+      dc_deps = List.map subst config.dc_deps;
+      dc_plugins = List.map subst config.dc_plugins;
+      dc_load_module = List.map subst config.dc_load_module;
+      dc_libs = List.map subst config.dc_libs
+    },
+    fun ~nth ->
+      Macros.add_list [ "PTEST_NUMBER", string_of_int nth ] ptest_vars
 
   (** the name of the directory-wide configuration file*)
   let filename = "test_config"
@@ -488,8 +519,8 @@ end  = struct
       the pattern [test_file_regexp] will be considered as test files *)
   let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
-  let default_toplevel = "@frama-c@ @OPTIONS@"
-  let default_command = {toplevel=default_toplevel; opts=""; logs=[]; macros=Macros.empty; timeout=""}
+  let default_toplevel = Macros.expand (Macros.default_macros ()) "@frama-c@ @OPTIONS@"
+  let default_command = {toplevel=default_toplevel; opts=""; logs=[]; timeout=""}
   let default_config () =
     { dc_test_regexp = test_file_regexp ;
       dc_macros = Macros.default_macros ();
@@ -637,8 +668,7 @@ end  = struct
            { toplevel = current.dc_default_toplevel;
              opts = s;
              logs = current.dc_default_log;
-             macros = current.dc_macros;
-             timeout = current.dc_timeout }
+              timeout = current.dc_timeout }
          in
          { current with
            (*           dc_default_toplevel = !current_default_toplevel;*)
@@ -652,7 +682,6 @@ end  = struct
            List.map
              (fun command ->
                 { command with opts= make_custom_opts command.opts s ;
-                               macros = current.dc_macros;
                                timeout= current.dc_timeout})
              !current_default_cmds
          in
@@ -795,7 +824,7 @@ end  = struct
 end
 
 type toplevel_command =
-  { macros: Macros.t;
+  { ptest_vars: Macros.t;
     mutable log_files: string list;
     file : string ;
     nb_files : int ;
@@ -803,7 +832,7 @@ type toplevel_command =
     toplevel: string ;
     filter : string option ;
     directory : SubDir.t ;
-    n : int;
+    nth : int;
     execnow:bool;
     timeout: string;
     deps: string list;
@@ -841,34 +870,18 @@ let name_without_extension command =
 
 let gen_prefix gen_file cmd =
   let prefix = gen_file cmd.directory (name_without_extension cmd) in
-  catenate_number cmd.nb_files prefix cmd.n
+  catenate_number cmd.nb_files prefix cmd.nth
 
 let log_prefix = gen_prefix SubDir.make_result_file
 let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
-let get_macros cmd =
-  let ptest_config = config_name "" in
-  let ptest_file = Filename.sanitize cmd.file in
-  let ptest_name = Filename.remove_extension cmd.file in
-  let macros =
-    [ "PTEST_CONFIG", ptest_config;
-      "PTEST_DIR", SubDir.get cmd.directory;
-      "PTEST_RESULT",
-      Filename.concat (SubDir.get cmd.directory) (config_name "result");
-      "PTEST_FILE", ptest_file;
-      "PTEST_NAME", ptest_name;
-      "PTEST_NUMBER", string_of_int cmd.n;
-    ]
-  in
-  Macros.add_list macros cmd.macros
-
 let basic_command_string command =
-  let macros = get_macros command in
+  let macros = command.ptest_vars in
   command.log_files <- List.map (Macros.expand macros) command.log_files;
   let expanded_plugins_options =
     let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
     let opt_modules = String.concat " "
-        (List.map (fun s -> Printf.sprintf " -load-module %S" (Macros.expand macros s))
+        (List.map (fun s -> Printf.sprintf " -load-module %S" s)
            command.load_module) in
     String.concat " " [opt_plugin;opt_modules]
   and expanded_options = Macros.expand macros command.options in
@@ -998,8 +1011,7 @@ let command_string ~result_fmt ~oracle_fmt command =
    *       (Filename.sanitize errlog)
    *       (Filename.sanitize stderr)
    * in *)
-  let macros = get_macros command in
-  let deps = List.map (Macros.expand macros) command.deps in
+  let deps = command.deps in
   Format.fprintf result_fmt
     "(rule\n  \
      (targets %S %S %a)\n  \
@@ -1018,7 +1030,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     command_string
     filter_stdout_end
   ;
-    Format.fprintf result_fmt
+  Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
      (deps  %a %S (package frama-c)%a (universe))\n  \
@@ -1069,80 +1081,74 @@ let command_string ~result_fmt ~oracle_fmt command =
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
   let config = Test_config.scan_test_file directory ~file config in
   if not config.dc_dont_run then
-    let e = ref 0 in
     let nb_files = List.length config.dc_commands in
+    let config,ptest_vars = Test_config.ptest_vars directory ~file config  in
     let make_cmd =
       let i = ref 0 in
-      fun cmd ->
-        let make_toplevel_cmd n {toplevel; opts=options; logs=log_files; macros; timeout} =
-          { file; options; toplevel; nb_files; directory; n; log_files;
-            filter = config.dc_filter; macros;
-            execnow=false; timeout;
+      fun { toplevel; opts=options; logs=log_files; timeout } ->
+        let nth = !i in
+        incr i ;
+        command_string ~result_fmt ~oracle_fmt
+          { file; options; toplevel; nb_files; directory; nth; timeout; log_files;
+            ptest_vars = ptest_vars ~nth;
+            filter = config.dc_filter;
+            execnow=false;
             deps = config.dc_deps;
             plugins = config.dc_plugins;
             load_module = config.dc_libs @ config.dc_load_module ;
           }
-        in
-        let toplevel = make_toplevel_cmd !i cmd in
-        command_string ~result_fmt ~oracle_fmt toplevel;
-        incr i
     in
-    let mk_cmd (s, timeout) =
-      { file = file;
-        nb_files = nb_files;
-        log_files = [];
-        options = "";
-        toplevel = s;
-        n = !e;
-        directory = directory;
-        filter = config.dc_filter;
-        macros = config.dc_macros;
-        execnow = true;
-        timeout;
-        deps = config.dc_deps;
-        plugins = config.dc_plugins;
-        load_module = config.dc_libs @ config.dc_load_module;
-      }
-    in
-    let macros = get_macros (mk_cmd ("/bin/true","")) in
-    let make_execnow_cmd execnow =
-      let res =
-        { ex_cmd = basic_command_string (mk_cmd  (execnow.ex_cmd, execnow.ex_timeout));
-          ex_log = List.map (Macros.expand macros) execnow.ex_log;
-          ex_bin = List.map (Macros.expand macros) execnow.ex_bin;
-          ex_dir = execnow.ex_dir;
-          ex_once = execnow.ex_once;
-          ex_done = execnow.ex_done;
-          ex_timeout = execnow.ex_timeout;
-        }
-      in
-      Format.fprintf result_fmt
-       "(rule\n  \
-        (alias ptests)\n  \
-        (deps %a (package frama-c)%a)\n  \
-        (targets %a %a)\n  \
-        (action (system %S))\n\
-        )\n"
-       print_list config.dc_deps
-       Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
-       print_list res.ex_log
-       print_list res.ex_bin
-       res.ex_cmd
-      ;
-      List.iter (fun log ->
-          Format.fprintf result_fmt
-            "(rule\n  \
-             (alias ptests)\n  \
-             (action (diff %S %S))\n\
-             )\n"
-            (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
-            log
-        ) res.ex_log;
-      incr e
+    let make_execnow_cmd =
+      let e = ref 0 in
+      fun execnow ->
+       let nth = !e in
+       incr e ;
+       let mk_cmd (s, timeout) =
+         { file; nb_files; directory; nth; timeout;
+           log_files = [];
+           options = "";
+           toplevel = s;
+           ptest_vars = ptest_vars ~nth;
+           filter = config.dc_filter;
+           execnow = true;
+           deps = config.dc_deps;
+           plugins = config.dc_plugins;
+           load_module = config.dc_libs @ config.dc_load_module;
+         }
+       in
+       let cmd = mk_cmd (execnow.ex_cmd, execnow.ex_timeout) in
+       let res =
+         { execnow with
+           ex_cmd = basic_command_string cmd;
+           ex_log = List.map (Macros.expand cmd.ptest_vars) execnow.ex_log;
+           ex_bin = List.map (Macros.expand cmd.ptest_vars) execnow.ex_bin;
+         }
+       in
+       Format.fprintf result_fmt
+         "(rule\n  \
+          (alias ptests)\n  \
+          (deps %a (package frama-c)%a)\n  \
+          (targets %a %a)\n  \
+          (action (system %S))\n\
+          )\n"
+         print_list config.dc_deps
+         Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
+         print_list res.ex_log
+         print_list res.ex_bin
+         res.ex_cmd
+       ;
+       List.iter (fun log ->
+           Format.fprintf result_fmt
+             "(rule\n  \
+              (alias ptests)\n  \
+              (action (diff %S %S))\n\
+              )\n"
+             (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
+             log
+         ) res.ex_log
     in
     List.iter (fun cmxs ->
-        let file = Macros.expand macros cmxs in
-        let libraries = Macros.expand macros (String.concat " " config.dc_libs) in
+        let libraries = String.concat " " config.dc_libs in
         Format.fprintf result_fmt
           "(executable\n  \
            (name %s)\n  \
@@ -1151,7 +1157,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
            (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
            (flags -open Frama_c_kernel)\n\
            )"
-          file file
+          cmxs cmxs
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
       ) config.dc_cmxs;
