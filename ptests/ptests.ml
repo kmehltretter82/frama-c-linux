@@ -1069,18 +1069,23 @@ let command_string ~result_fmt ~oracle_fmt command =
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
   let config = Test_config.scan_test_file directory ~file config in
   if not config.dc_dont_run then
-    let i = ref 0 in
     let e = ref 0 in
     let nb_files = List.length config.dc_commands in
-    let make_toplevel_cmd {toplevel; opts=options; logs=log_files; macros; timeout} =
-      let n = !i in
-      { file; options; toplevel; nb_files; directory; n; log_files;
-        filter = config.dc_filter; macros;
-        execnow=false; timeout;
-        deps = config.dc_deps;
-        plugins = config.dc_plugins;
-        load_module = config.dc_libs @ config.dc_load_module ;
-      }
+    let make_cmd =
+      let i = ref 0 in
+      fun cmd ->
+        let make_toplevel_cmd n {toplevel; opts=options; logs=log_files; macros; timeout} =
+          { file; options; toplevel; nb_files; directory; n; log_files;
+            filter = config.dc_filter; macros;
+            execnow=false; timeout;
+            deps = config.dc_deps;
+            plugins = config.dc_plugins;
+            load_module = config.dc_libs @ config.dc_load_module ;
+          }
+        in
+        let toplevel = make_toplevel_cmd !i cmd in
+        command_string ~result_fmt ~oracle_fmt toplevel;
+        incr i
     in
     let mk_cmd (s, timeout) =
       { file = file;
@@ -1135,11 +1140,6 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         ) res.ex_log;
       incr e
     in
-    let treat_option option =
-      let toplevel = make_toplevel_cmd option in
-      command_string ~result_fmt ~oracle_fmt toplevel;
-      incr i
-    in
     List.iter (fun cmxs ->
         let file = Macros.expand macros cmxs in
         let libraries = Macros.expand macros (String.concat " " config.dc_libs) in
@@ -1155,7 +1155,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
       ) config.dc_cmxs;
-    List.iter treat_option config.dc_commands;
+    List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow
 
 let test_pattern config =
