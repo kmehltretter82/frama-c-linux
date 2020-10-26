@@ -45,15 +45,10 @@ if len(sys.argv) > 2:
     print("       creates a Frama-C makefile in [dir] (default: .frama-c)")
     sys.exit(1)
 
-# Note: if Frama-C is in the path, ignore the one in FRAMAC_BIN
-framac = shutil.which("frama-c")
-if framac:
-    framac_bin = Path(os.path.dirname(os.path.abspath(framac)))
-else:
-    framac_bin = os.getenv('FRAMAC_BIN')
-    if not framac_bin:
-        sys.exit("error: FRAMAC_BIN not in environment")
-    framac_bin = Path(framac_bin)
+framac_bin = os.getenv('FRAMAC_BIN')
+if not framac_bin:
+    sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
+framac_bin = Path(framac_bin)
 
 jcdb = Path("compile_commands.json")
 
@@ -77,7 +72,7 @@ process = Popen([framac_bin / "frama-c", "-print-config-json"], stdout=PIPE)
 (output, err) = process.communicate()
 exit_code = process.wait()
 if exit_code != 0:
-    sys.exit(f"error running frama-c -print-share-path")
+    sys.exit(f"error running frama-c -print-config-json")
 
 fc_config = json.loads(output.decode('utf-8'))
 sharedir = Path(fc_config['datadir'])
@@ -237,13 +232,24 @@ gnumakefile.write_text("".join(lines))
 
 print(f"Template created: {gnumakefile}")
 
-if not "PTESTS_TESTING" in os.environ and not framac:
-    print(f"Frama-C not in path, adding path.mk to {dir}")
-    frama_c_script = framac_bin / "frama-c-script"
-    os.system(f"{frama_c_script} make-path {dir}")
+# write path.mk
+path_mk = dir / "path.mk"
+
+with open(path_mk, "w") as f:
+    f.write(f"""FRAMAC_BIN={framac_bin}
+ifeq ($(wildcard $(FRAMAC_BIN)),)
+# Frama-C not installed locally; using the version in the PATH
+else
+FRAMAC=$(FRAMAC_BIN)/frama-c
+FRAMAC_GUI=$(FRAMAC_BIN)/frama-c-gui
+endif
+""")
+
+print(f"Path to Frama-C binaries written to: {path_mk}")
 
 if "PTESTS_TESTING" in os.environ:
     print("Running ptests: cleaning up after tests...")
     jcdb.unlink()
     fc_stubs_c.unlink()
+    path_mk.unlink()
     # gnumakefile is not erased because we want it as an oracle
