@@ -1,6 +1,6 @@
 /* run.config*
 DEPS: __fc_machdep_custom.h
-MODULE: @PTEST_NAME@.cmxs
+MODULE: @PTEST_NAME@
 OPT: -cpp-extra-args="-D__FC_MACHDEP_CUSTOM" -machdep custom -print -then -print
 COMMENT: we need a -then to test double registering of a machdep
 */

@@ -1,5 +1,5 @@
 /* run.config
-MODULE: logic_env_script.cmxs
+MODULE: logic_env_script
 STDOPT: +"-no-print"
 */
 

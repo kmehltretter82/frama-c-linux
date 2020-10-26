@@ -1,5 +1,5 @@
 /* run.config_qualif
-   MODULE: stmtcompiler_test_rela.cmxs
+   MODULE: stmtcompiler_test_rela
    OPT: -wp-msg-key shell
 */
 int empty (int c){

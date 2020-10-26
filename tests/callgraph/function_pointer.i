@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: Test option -cg-function-pointers
-   MODULE: @PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    OPT: -cg-function-pointers
    OPT: -cg-no-services -cg-function-pointers
    OPT: -cg-no-function-pointers

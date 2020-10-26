@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: plugin_log.cmxs
+   MODULE: plugin_log
    LOG: log-file-kernel-warnings.txt
    LOG: log-file-kernel-results.txt
    LOG: log-file-feedback.txt

@@ -2,7 +2,7 @@
    OPT: -wp -wp-prover none
 */
 /* run.config_qualif
-   MODULE: TacNOP.cmxs
+   MODULE: TacNOP
    OPT: -wp -wp-par 1 -wp-prover script
 */
 

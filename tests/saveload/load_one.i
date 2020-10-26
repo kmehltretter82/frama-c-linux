@@ -1,6 +1,6 @@
 /* run.config
    PLUGIN: sparecode @EVA_CONFIG@
-   MODULE: @PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    STDOPT: 
 */
 int G;

@@ -1,5 +1,5 @@
 /* run.config
-MODULE: Enum_repr.cmxs
+MODULE: Enum_repr
 STDOPT: #"-enums int"
 STDOPT: #"-enums gcc-short-enums"
 STDOPT: #"-enums gcc-enums"

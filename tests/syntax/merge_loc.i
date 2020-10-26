@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: pp_lines.cmxs
+   MODULE: pp_lines
 */
 
 

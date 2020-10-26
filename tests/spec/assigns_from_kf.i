@@ -1,5 +1,5 @@
 /* run.config
-  MODULE: @PTEST_NAME@.cmxs
+  MODULE: @PTEST_NAME@
   OPT: -kernel-warn-key ghost:bad-use=inactive -print
 */
 // Note: we deactivate "ghost:bad-use" because the typing phase checks on call

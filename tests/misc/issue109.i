@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: @PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    OPT: -eva @EVA_OPTIONS@ -eva-slevel-function main:10
 */
 void main() {

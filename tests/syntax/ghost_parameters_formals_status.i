@@ -1,5 +1,5 @@
 /* run.config
-  MODULE: @PTEST_NAME@.cmxs
+  MODULE: @PTEST_NAME@
   STDOPT: +"-no-print"
 */
 

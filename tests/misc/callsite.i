@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: @PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    OPT:
  */
 // Don't use -debug 1 option in the test command.

@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: rte_get_annot.cmxs
+   MODULE: rte_get_annot
    OPT: -rte-select @@all -journal-disable
 */
 

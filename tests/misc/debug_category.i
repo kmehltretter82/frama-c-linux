@@ -1,5 +1,5 @@
 /* run.config
-MODULE: Debug_category.cmxs
+MODULE: Debug_category
 OPT: -test-msg-key help -test-warn-key="a=inactive"
 OPT: -test-msg-key a -test-warn-key="a=inactive"
 OPT: -test-msg-key a -test-msg-key="-a:b" -test-warn-key="a=inactive"

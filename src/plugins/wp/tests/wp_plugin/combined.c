@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   MODULE: @PTEST_NAME@.cmxs
+   MODULE: @PTEST_NAME@
    OPT: -wp-par 1
 */
 

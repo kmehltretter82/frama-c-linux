@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: needs_globals.cmxs
+   MODULE: needs_globals
    OPT: -instantiate -check -print
 */
 

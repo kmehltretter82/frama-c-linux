@@ -1,5 +1,5 @@
 /* run.config
-   MODULE: stmtcompiler_test.cmxs
+   MODULE: stmtcompiler_test
    OPT: -wp-msg-key shell
 */
 int empty (int c){
