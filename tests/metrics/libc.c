@@ -1,8 +1,9 @@
 /* run.config
    STDOPT: #"-metrics-no-libc -metrics-eva-cover"
    STDOPT: #"-metrics-libc -metrics-eva-cover"
-   STDOPT: #"-metrics-libc -metrics-output @PTEST_DIR@/oracle/libc.json"
-   LOG: @PTEST_DIR@/oracle/libc.json
+   STDOPT: #"-metrics-libc -metrics-output @PTEST_DIR@/result/libc.json"
+   LOG: libc.json
+   OPT:
 */
 #include <ctype.h>
 #include <stdio.h> // defines external variables
