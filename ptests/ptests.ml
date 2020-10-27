@@ -876,19 +876,18 @@ let log_prefix = gen_prefix SubDir.make_result_file
 let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
 let basic_command_string command =
-  let macros = command.macros in
-  let expanded_plugins_options =
+  let plugins_options =
     let opt_plugin = if command.plugins = [] then ""
       else Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
     let opt_modules = if command.load_module = [] then ""
       else Printf.sprintf "-load-module=%s" (String.concat "," command.load_module) in
     String.concat " " [opt_plugin;opt_modules]
-  and expanded_options = Macros.expand macros command.options in
+  in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
-      "OPTIONS", expanded_options;
-      "PLUGIN_OPTIONS", expanded_plugins_options;
-    ] macros in
+      "OPTIONS", Macros.expand command.macros command.options;
+      "PLUGIN_OPTIONS", plugins_options;
+    ] command.macros in
   let raw_command = Macros.expand macros command.toplevel in
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
@@ -941,7 +940,7 @@ end
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
   let subst = Str.global_replace regexp "\\1" in
-  fun ~cmd ~res ~errlog -> "echo (" ^ subst cmd ^ ") > " ^ res ^ " 2> " ^ errlog
+  fun ~cmd ~res ~errlog -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res errlog
 
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
