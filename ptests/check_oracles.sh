@@ -1,5 +1,8 @@
 #!/bin/bash -eu
 
+echo "Obsolete script since 'ptests.opt' cannot be used for that..."
+exit 1
+
 # Checks for extraneous, leftover oracle files that are no longer necessary.
 # Only reports files in plugins with a ptests_config file, and in directories
 # tested according to that ptests' DEFAULT_SUITES.
