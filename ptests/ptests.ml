@@ -785,13 +785,12 @@ let config_options =
        let new_top =
          List.map
            (fun (cmd,opts, log, macros,_) ->
-              cmd, make_custom_opts opts s, log,
+              cmd, make_custom_opts opts s, log @ current.dc_default_log,
               current.dc_macros, current.dc_timeout)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
-                      dc_default_log = !current_default_log @
-                                       current.dc_default_log });
+                      dc_default_log = !current_default_log });
 
     "FILEREG",
     (fun _ s current -> { current with dc_test_regexp = s });
