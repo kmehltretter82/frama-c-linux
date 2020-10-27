@@ -416,7 +416,7 @@ module Macros = struct
   let append_expand name def macros =
     add name (get name macros ^ expand macros def) macros
 
-  let default_macros () = add_list
+  let default_macros = add_list
     [ "PLUGIN", "" ;
       "DEFAULT_OPTIONS", macro_default_options;
       "frama-c-only", macro_frama_c_only;
@@ -434,10 +434,6 @@ type execnow =
     ex_once: bool;       (** true iff the command has to be executed only once
                              per config file (otherwise it is executed for
                              every file of the test suite) *)
-    ex_done: bool ref;   (** has the command been already fully executed.
-                             Shared between all copies of this EXECNOW. Do
-                             NOT use a mutable field here, as execnows
-                             are duplicated using OCaml 'with' syntax. *)
     ex_timeout: string;
   }
 
@@ -518,9 +514,9 @@ end  = struct
 
   let default_toplevel = "@frama-c@ @OPTIONS@"
   let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; macros=config.dc_macros; logs=[]; timeout=""} ]
-  let default_config () =
-    { dc_test_regexp = test_file_regexp ;
-      dc_macros = Macros.default_macros ();
+  let default_config =
+    { dc_test_regexp = test_file_regexp;
+      dc_macros = Macros.default_macros;
       dc_execnow = [];
       dc_libs = [];
       dc_cmxs = [];
@@ -529,7 +525,7 @@ end  = struct
       dc_load_module = [];
       dc_filter = None ;
       dc_default_toplevel = default_toplevel;
-      dc_commands = [ ];
+      dc_commands = [];
       dc_dont_run = false;
       dc_framac = true;
       dc_default_log = [];
@@ -562,7 +558,6 @@ end  = struct
         ex_bin = [];
         ex_dir = dir;
         ex_once = once;
-        ex_done = ref false;
         ex_timeout;
       }
 
@@ -650,7 +645,7 @@ end  = struct
   (* the default toplevel for the current level of options. *)
   let current_default_toplevel = ref default_toplevel
   let current_default_log = ref []
-  let current_default_cmds = ref [ ]
+  let current_default_cmds = ref []
 
   let config_options =
     [ "CMD",
@@ -768,9 +763,9 @@ end  = struct
       scan_directives
         (SubDir.create ~with_subdir:false Filename.current_dir_name)
         scan_buffer
-        (default_config ())
+        default_config
     end
-    else default_config ()
+    else default_config
 
   let split_config s = Str.split (Str.regexp ",[ ]*") s
 
@@ -830,7 +825,7 @@ end
 
 type toplevel_command =
   { macros: Macros.t;
-    mutable log_files: string list;
+    log_files: string list;
     file : string ;
     nb_files : int ;
     options : string ;
@@ -882,7 +877,6 @@ let oracle_prefix = gen_prefix SubDir.make_oracle_file
 
 let basic_command_string command =
   let macros = command.macros in
-  command.log_files <- List.map (Macros.expand macros) command.log_files;
   let expanded_plugins_options =
     let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
     let opt_modules = String.concat " "
@@ -1090,12 +1084,14 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     let config,ptest_vars = Test_config.ptest_vars directory ~file config  in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; logs=log_files; timeout } ->
+      fun { toplevel; opts=options; macros; logs; timeout } ->
         let nth = !i in
         incr i ;
+        let macros = ptest_vars ~nth macros in
+        let log_files = List.map (Macros.expand macros) logs in
         command_string ~result_fmt ~oracle_fmt
-          { file; options; toplevel; nb_files; directory; nth; timeout; log_files;
-            macros = ptest_vars ~nth macros;
+          { file; options; toplevel; nb_files; directory; nth; timeout;
+            macros; log_files;
             filter = config.dc_filter;
             execnow=false;
             deps = config.dc_deps;
