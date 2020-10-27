@@ -248,6 +248,7 @@ let get_suffix filename =
 type output_type =
   | Html
   | Text
+  | Json
 ;;
 
 let get_file_type filename =
@@ -255,6 +256,7 @@ let get_file_type filename =
     match get_suffix filename with
       | "html" | "htm" -> Html
       | "txt" | "text" -> Text
+      | "json" -> Json
       | s ->
         Metrics_parameters.abort
           "Unknown file extension %s. Cannot produce output.@." s
@@ -285,6 +287,16 @@ let pretty_set fmt s =
     s;
   Format.fprintf fmt "@]"
 
+let json_of_varinfo_map m =
+  let elems = VInfoMap.fold (fun f n acc ->
+      let calls = ("calls", `Int n) in
+      let address_taken = ("address_taken", `Bool f.vaddrof) in
+      let elem = `Assoc [(f.vname, `Assoc ([calls; address_taken]))] in
+      elem :: acc
+    ) m []
+  in
+  `List (List.rev elems)
+
 let pretty_extern_vars fmt s =
   Pretty_utils.pp_iter ~pre:"@[" ~suf:"@]" ~sep:";@ "
     VInfoSet.iter Printer.pp_varinfo fmt s
@@ -311,6 +323,16 @@ let pretty_entry_points  fmt fs =
   in
   Format.fprintf fmt "@[<hov 1>%a@]" print fs;
 ;;
+
+let json_of_entry_points m =
+  `List
+    (List.rev
+       (VInfoMap.fold
+          (fun vi n acc ->
+             if is_entry_point vi n then `String vi.vname :: acc
+             else acc)
+          m [])
+    )
 
 (* Utilities for CIL ASTs *)
 
