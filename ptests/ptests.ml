@@ -878,10 +878,10 @@ let oracle_prefix = gen_prefix SubDir.make_oracle_file
 let basic_command_string command =
   let macros = command.macros in
   let expanded_plugins_options =
-    let opt_plugin =  Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
-    let opt_modules = String.concat " "
-        (List.map (fun s -> Printf.sprintf " -load-module %S" s)
-           command.load_module) in
+    let opt_plugin = if command.plugins = [] then ""
+      else Printf.sprintf "-load-plugin=%s" (String.concat "," command.plugins) in
+    let opt_modules = if command.load_module = [] then ""
+      else Printf.sprintf "-load-module=%s" (String.concat "," command.load_module) in
     String.concat " " [opt_plugin;opt_modules]
   and expanded_options = Macros.expand macros command.options in
   let macros = (* set expanded macros that can be used into CMD directives *)
@@ -937,6 +937,11 @@ module Fmt = struct
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
+
+let show_cmd =
+  let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
+  let subst = Str.global_replace regexp "\\1" in
+  fun ~cmd ~res ~errlog -> "echo (" ^ subst cmd ^ ") > " ^ res ^ " 2> " ^ errlog
 
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
@@ -1039,7 +1044,19 @@ let command_string ~result_fmt ~oracle_fmt command =
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    command_string;
+    command_string
+  ;
+  Format.fprintf result_fmt
+    "(rule\n  \
+     (alias %S)\n  \
+     (deps  %a %S (package frama-c)%a (universe))\n  \
+     (action (system %S))\n\
+     )@."
+    (log_prefix ^ ".show")
+    print_list deps
+    command.file
+    Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
+    (show_cmd ~cmd:command_string ~res ~errlog );
 
   let oracle_prefix = oracle_prefix command in
   let diff_alias = log_prefix ^ ".diff" in
