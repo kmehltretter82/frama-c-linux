@@ -96,7 +96,7 @@ via the GUI:
 ## Further reference
 
 - Links to user and developer manuals, Frama-C archives,
-  and plug-in manuals are available at <br> http://frama-c.com/download.html
+  and plug-in manuals are available at <br> http://beta.frama-c.com/html/get-frama-c.html
 
 - [StackOverflow](http://stackoverflow.com/questions/tagged/frama-c) has several
   questions with the `frama-c` tag, which is monitored by several members of the
@@ -110,9 +110,10 @@ via the GUI:
   the [issues tracking system](https://git.frama-c.com/pub/frama-c/issues),
   for reporting bugs.
 
-- The [Frama-C wiki](https://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:start)
-  has some useful information, although it is not entirely up-to-date.
+- The [Frama-C documentation page](https://beta.frama-c.com/html/documentation.html)
+  contains links to all manuals and plugins description, as well as tutorials, courses
+	and more.
 
-- The [Frama-C blog](http://pub.frama-c.com/blog) has several posts about
+- The [Frama-C blog](http://beta.frama-c.com/blog) has several posts about
   new developments of Frama-C, as well as general discussions about the C
   language, undefined behavior, floating-point computations, etc.

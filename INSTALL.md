@@ -7,7 +7,7 @@
         - [Installing Frama-C from opam repository](#installing-frama-c-from-opam-repository)
         - [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)
         - [Installing Frama-C on Windows via WSL](#installing-frama-c-on-windows-via-wsl)
-        - [Installing Frama-C on macOS](#installing-frama-c-on-mac-os)
+        - [Installing Frama-C on macOS](#installing-frama-c-on-macos)
     - [Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)](#installing-frama-c-via-your-linux-distribution-debianubuntufedora)
     - [Compiling from source](#compiling-from-source)
         - [Quick Start](#quick-start)
