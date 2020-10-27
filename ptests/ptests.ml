@@ -517,7 +517,7 @@ end  = struct
   let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
   let default_toplevel = "@frama-c@ @OPTIONS@"
-  let default_command = {toplevel=default_toplevel; opts=""; macros=Macros.default_macros (); logs=[]; timeout=""}
+  let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; macros=config.dc_macros; logs=[]; timeout=""} ]
   let default_config () =
     { dc_test_regexp = test_file_regexp ;
       dc_macros = Macros.default_macros ();
@@ -529,7 +529,7 @@ end  = struct
       dc_load_module = [];
       dc_filter = None ;
       dc_default_toplevel = default_toplevel;
-      dc_commands = [ default_command ];
+      dc_commands = [ ];
       dc_dont_run = false;
       dc_framac = true;
       dc_default_log = [];
@@ -650,7 +650,7 @@ end  = struct
   (* the default toplevel for the current level of options. *)
   let current_default_toplevel = ref default_toplevel
   let current_default_log = ref []
-  let current_default_cmds = ref [ default_command ]
+  let current_default_cmds = ref [ ]
 
   let config_options =
     [ "CMD",
@@ -681,7 +681,9 @@ end  = struct
              (fun command ->
                 { command with opts= make_custom_opts command.opts s ;
                                timeout= current.dc_timeout})
-             !current_default_cmds
+             (if !current_default_cmds = [] then
+               default_commands current
+             else !current_default_cmds)
          in
          { current with dc_commands = new_top @ current.dc_commands;
                         dc_default_log = !current_default_log @
@@ -808,13 +810,18 @@ end  = struct
                   ignore (scan_directives dir scan_buffer default);
                 scan_config ()))
       in
-      try
-        let options =  scan_config () in
-        Scanf.Scanning.close_in scan_buffer;
-        options
-      with End_of_file | Scanf.Scan_failure _ ->
-        Scanf.Scanning.close_in scan_buffer;
-        default
+      let config =
+        try
+          let options =  scan_config () in
+          Scanf.Scanning.close_in scan_buffer;
+          options
+        with End_of_file | Scanf.Scan_failure _ ->
+          Scanf.Scanning.close_in scan_buffer;
+          default
+      in
+      if config.dc_commands = [] && config.dc_framac
+      then { config with dc_commands = default_commands config }
+      else config
     end else
       (* if the file has disappeared, don't try to run it... *)
       { default with dc_dont_run = true }
