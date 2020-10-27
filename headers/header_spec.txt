@@ -751,7 +751,7 @@ src/plugins/callgraph/Callgraph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/callgraph_api.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/callgraph/cg_viewer.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/callgraph/cg_viewer.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.ml: CEA_LGPL_OR_PROPRIETARY
