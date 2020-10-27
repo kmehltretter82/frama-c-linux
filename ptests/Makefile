@@ -6,8 +6,13 @@ purge-tests:
 clean-tests: purge-tests
 	rm -rf _build/default/ptests/tests
 
+TESTS= nothing cmd
+# opts
+
 run-tests: purge-tests
-	dune exec -- ../ptests/ptests.exe ./tests
-	dune build @tests/ptests
+	for dir in $(TESTS) ; do \
+	  dune exec -- ../ptests/ptests.exe ./tests/$$dir/tests ; \
+	done
+	dune build $(addprefix @tests/,$(addsuffix /tests/ptests,$(TESTS)))
 
 tests: run-tests

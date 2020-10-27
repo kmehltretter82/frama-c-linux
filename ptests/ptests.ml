@@ -130,9 +130,10 @@ let () =
                               locale *)
 
 let macro_default_options = "-journal-disable -check -no-autoload-plugins"
-let macro_frama_c_only = "frama-c @DEFAULT_OPTIONS@"
-let macro_frama_c_cmd = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
-let macro_frama_c = "frama-c @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
+let macro_frama_c_exe = "frama-c"
+let macro_frama_c_only = "@frama-c-exe@ @DEFAULT_OPTIONS@"
+let macro_frama_c_cmd = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
+let macro_frama_c = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
 
 let example_msg =
   Format.sprintf
@@ -160,6 +161,8 @@ let example_msg =
      # the current list of options related to PLUGIN, MODULE and LIBS to load@  \
      @@OPTIONS@@      \
      # the current list of options related to OPT and STDOPT directives (for CMD directives)@  \
+     @@frama-c-exe@@ \
+     # shortcut defined as follow: %s@  \
      @@frama-c-only@@ \
      # shortcut defined as follow: %s@  \
      @@frama-c@@      \
@@ -168,6 +171,7 @@ let example_msg =
      # shortcut defined as follow: %s@  \
      @]@ @]"
     macro_default_options
+    macro_frama_c_exe
     macro_frama_c_only
     macro_frama_c
     macro_frama_c_cmd
@@ -419,6 +423,7 @@ module Macros = struct
   let default_macros = add_list
     [ "PLUGIN", "" ;
       "DEFAULT_OPTIONS", macro_default_options;
+      "frama-c-exe", macro_frama_c_exe;
       "frama-c-only", macro_frama_c_only;
       "frama-c-cmd", macro_frama_c_cmd;
       "frama-c",     macro_frama_c;
