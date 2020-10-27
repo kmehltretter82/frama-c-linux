@@ -5,6 +5,7 @@
     { "foo": { "calls": 1, "address_taken": false } },
     { "g": { "calls": 0, "address_taken": true } },
     { "getopt": { "calls": 1, "address_taken": false } },
+    { "h": { "calls": 1, "address_taken": false } },
     { "main": { "calls": 0, "address_taken": false } }
   ],
   "specified-only-functions": [

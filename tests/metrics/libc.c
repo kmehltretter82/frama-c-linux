@@ -1,9 +1,8 @@
 /* run.config
    STDOPT: #"-metrics-no-libc -metrics-eva-cover"
    STDOPT: #"-metrics-libc -metrics-eva-cover"
-   STDOPT: #"-metrics-libc -metrics-output @PTEST_DIR@/result/libc.json"
    LOG: libc.json
-   OPT:
+   STDOPT: #"-metrics-libc -metrics-output @PTEST_DIR@/result/libc.json"
 */
 #include <ctype.h>
 #include <stdio.h> // defines external variables
@@ -24,6 +23,8 @@ int g() { // called via fp
   return isalpha(42);
 }
 
+int h() { return 0; }
+
 int (*fp)() = g;
 
 int getopt(int argc, char * const argv[],
@@ -34,5 +35,6 @@ int getopt(int argc, char * const argv[],
 int main() {
   fp();
   getopt(0, 0, 0);
+  h();
   return isblank(0);
 }
