@@ -1250,7 +1250,7 @@ and eval_toffset ~alarm_mode env typ toffset =
 
   | TField (fi, remaining) ->
     let size_current default =
-      try Ival.of_int (fst (Cil.bitsOffset typ (Field(fi, NoOffset))))
+      try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
     let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in

@@ -1833,10 +1833,11 @@ class cil_printer () = object (self)
       self#attributes fi.fattr;
     if Kernel.(is_debug_key_enabled dkey_print_field_offsets) then
       try
-        let (offset, size) = Cil.bitsOffset fi.ftype (Field (fi, NoOffset)) in
+        let (offset, size) = Cil.fieldBitsOffset fi in
         let first = offset in
-        let last = offset + size - 1 in
-        fprintf fmt " /* bits %d .. %d */" first last
+        let last = if size > 0 then Some (offset + size - 1) else None in
+        let pp_opt fmt = Pretty_utils.pp_opt ~none:"" Format.pp_print_int fmt in
+        fprintf fmt " /* bits %d .. %a */" first pp_opt last
       with Cil.SizeOfError _ -> ()
 
   method private opt_funspec fmt funspec =

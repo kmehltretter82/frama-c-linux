@@ -470,10 +470,9 @@ let memset_typ_offsm_int full_typ i =
           (* Do not produce NaN or infinites here (unless they are accepted
              by the engine). *)
           if Fval.is_finite f = True then update size v' else update size v
-        | TComp ({ cstruct = true ; cfields = l}, _, _) as tcomp -> (* struct *)
+        | TComp ({ cstruct = true ; cfields = l}, _, _) -> (* struct *)
           let aux_field offsm fi =
-            let field = Field (fi, NoOffset) in
-            let offset_fi = Int.of_int (fst (Cil.bitsOffset tcomp field)) in
+            let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
             aux fi.ftype (Int.add offset offset_fi) offsm
           in
           List.fold_left aux_field offsm l

@@ -2185,6 +2185,13 @@ val intOfAttrparam: attrparam -> int option
  * this after you call {!Cil.initCIL}. *)
 val bitsOffset: typ -> offset -> int * int
 
+(** Give a field, returns the number of bits from the structure or union
+ * containing the field and the width (also expressed in bits) for the subobject
+ * denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
+ * the size. This function is architecture dependent, so you should only call
+ * this after you call {!Cil.initCIL}. *)
+val fieldBitsOffset: fieldinfo -> int * int
+
 (** Like map but try not to make a copy of the list *)
 val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list
 
