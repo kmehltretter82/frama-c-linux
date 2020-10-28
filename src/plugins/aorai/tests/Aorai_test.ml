@@ -72,10 +72,11 @@ let extend () =
       in
       run f;
       let tmpfile =
-        Filename.get_temp_dir_name () ^ "/aorai_" ^
-        (Filename.chop_extension
-           (Filename.basename (List.hd (Kernel.Files.get()):>string))) ^ "_" ^
-        (string_of_int (TestNumber.get ())) ^ ".i"
+        Filename.(concat (get_temp_dir_name ())
+                    ("aorai_" ^
+                     (chop_extension
+                        (basename (List.hd (Kernel.Files.get()):>string))) ^
+                     "_" ^ (string_of_int (TestNumber.get ())) ^ ".i"))
       in
       let () =
         Extlib.safe_at_exit
