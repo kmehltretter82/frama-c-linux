@@ -782,6 +782,7 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=

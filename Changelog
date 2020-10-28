@@ -33,7 +33,7 @@ Open Source Release 22.0 (Titanium)
               transition, and use such variables in subsequent guards.
 -   Kernel    [2020-10-09] Add option -print-config-json, to output Frama-C
               configuration data in JSON format.
--   Logic     [2020-10-XX] '\from' now accepts '&v' expressions
+-   Logic     [2020-10-14] '\from' now accepts '&v' expressions
 -   Metrics   [2020-10-01] Distinguish between undefined but specified functions
               and functions with neither definition nor specification.
 -*  Eva       [2020-09-28] Improved string builtins on wide strings: crash fixed,

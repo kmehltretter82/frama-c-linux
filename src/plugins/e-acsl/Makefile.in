@@ -327,6 +327,27 @@ e-acsl-distclean: clean
 	$(PRINT_RM) generated project files
 	$(RM) $(wildcard $(addprefix $(E_ACSL_DIR)/, $(EACSL_CLEANFILES)))
 
+#################################################################
+# Common variables between source distribution and installation #
+#################################################################
+
+EACSL_C_DIRECTORIES := \
+	e-acsl \
+	e-acsl/internals \
+	e-acsl/instrumentation_model \
+	e-acsl/observation_model \
+	e-acsl/observation_model/internals \
+	e-acsl/observation_model/bittree_model \
+	e-acsl/observation_model/segment_model \
+	e-acsl/numerical_model \
+	e-acsl/libc_replacements
+
+EACSL_SCRIPTS := \
+	scripts/e-acsl-gcc.sh
+
+EACSL_MANPAGES := \
+	man/e-acsl-gcc.sh.1
+
 ################################
 # Building source distribution #
 ################################
@@ -339,7 +360,7 @@ EACSL_MANUAL_FILES = doc/manuals/*.pdf
 EACSL_DOC_FILES = \
 	doc/doxygen/doxygen.cfg.in \
 	doc/Changelog \
-	man/e-acsl-gcc.sh.1
+	$(EACSL_MANPAGES)
 
 EACSL_TEST_FILES = \
 	tests/test_config_dev.in \
@@ -360,23 +381,25 @@ EACSL_TEST_FILES = \
 EACSL_DISTRIB_TESTS = \
   $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
       $(dir)/*.[ich] \
-      $(dir)/test_config \
-      $(dir)/oracle_ci/*.c \
-      $(dir)/oracle_ci/*.oracle \
+      $(dir)/test_config_ci \
+      $(dir)/test_config_dev \
+      $(dir)/oracle_ci/* \
+      $(dir)/oracle_dev/* \
   )
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 
-EACSL_SCRIPT_FILES = scripts/e-acsl-gcc.sh
+EACSL_SCRIPT_FILES = $(EACSL_SCRIPTS)
 
 EACSL_LICENSE_FILES = \
   license/CEA_LGPL license/SPARETIMELABS \
   license/headache_config.txt license/LGPLv2.1
 
 EACSL_MISC_FILES = \
-  configure.ac Makefile.in INSTALL README
+  configure.ac Makefile.in README
 
-EACSL_SHARE_FILES = share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+EACSL_SHARE_FILES = \
+	$(addprefix share/,$(addsuffix /*.[ch],$(EACSL_C_DIRECTORIES)))
 
 EACSL_DISTRIB_EXTERNAL =\
   $(EACSL_DISTRIB_DYNDEP) \
@@ -412,9 +435,12 @@ wc:
 
 ifneq ("$(FRAMAC_INTERNAL)","yes")
 
-EACSL_SPARETIMELABS=$(EACSL_PLUGIN_DIR)/share/e-acsl/e_acsl_printf.h
+EACSL_SPARETIMELABS= \
+	$(EACSL_PLUGIN_DIR)/share/e-acsl/internals/e_acsl_rtl_io.h \
+	$(EACSL_PLUGIN_DIR)/share/e-acsl/internals/e_acsl_rtl_io.c
 
-EACSL_SHARE_BARE= share/e-acsl/*.[ch] share/e-acsl/*/*.[ch]
+EACSL_SHARE_BARE= \
+	$(addprefix share/,$(addsuffix /*.[ch],$(EACSL_C_DIRECTORIES)))
 EACSL_SHARE=$(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_SHARE_BARE))
 EACSL_CEA_SHARE=$(filter-out $(EACSL_SPARETIMELABS), $(wildcard $(EACSL_SHARE)))
 
@@ -455,20 +481,13 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 
 EACSL_INSTALL_MANUAL_FILES=$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_MANUAL_FILES)))
 
-EACSL_INSTALL_C_DIRECTORIES := \
-	e-acsl \
-	e-acsl/internals \
-	e-acsl/instrumentation_model \
-	e-acsl/observation_model \
-	e-acsl/observation_model/internals \
-	e-acsl/observation_model/bittree_model \
-	e-acsl/observation_model/segment_model \
-	e-acsl/numerical_model \
-	e-acsl/libc_replacements
+EACSL_INSTALL_SCRIPTS=$(addprefix $(E_ACSL_DIR)/,$(EACSL_SCRIPTS))
+
+EACSL_INSTALL_MANPAGES=$(addprefix $(E_ACSL_DIR)/,$(EACSL_MANPAGES))
 
 install::
 	$(PRINT_INSTALL) E-ACSL share files
-	for dir in $(EACSL_INSTALL_C_DIRECTORIES); do \
+	for dir in $(EACSL_C_DIRECTORIES); do \
 		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
 		$(CP) $(E_ACSL_DIR)/share/$$dir/*.[ch] $(FRAMAC_DATADIR)/$$dir ; \
 	done
@@ -484,10 +503,15 @@ endif
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
 	$(PRINT_INSTALL) E-ACSL scripts
 	$(MKDIR) $(BINDIR)
-	$(CP) $(E_ACSL_DIR)/scripts/e-acsl-gcc.sh $(BINDIR)/
+	$(CP) $(EACSL_INSTALL_SCRIPTS) $(BINDIR)/
 	$(PRINT_INSTALL) E-ACSL man pages
 	$(MKDIR) $(MANDIR)/man1
-	$(CP) $(E_ACSL_DIR)/man/e-acsl-gcc.sh.1 $(MANDIR)/man1/
+	$(CP) $(EACSL_INSTALL_MANPAGES) $(MANDIR)/man1/
+
+
+EACSL_INSTALLED_SCRIPTS=$(addprefix $(BINDIR)/,$(notdir $(EACSL_SCRIPTS)))
+
+EACSL_INSTALLED_MANPAGES=$(addprefix $(MANDIR)/man1/,$(notdir $(EACSL_MANPAGES)))
 
 uninstall::
 	$(PRINT_RM) E-ACSL share files
@@ -497,9 +521,9 @@ uninstall::
 	$(PRINT_RM) E-ACSL libraries
 	$(RM) $(LIBDIR)/libeacsl-*.a
 	$(PRINT_RM) E-ACSL scripts
-	$(RM) $(BINDIR)/e-acsl-gcc.sh
+	$(RM) $(EACSL_INSTALLED_SCRIPTS)
 	$(PRINT_RM) E-ACSL man pages
-	$(RM) $(MANDIR)/man1/e-acsl-gcc.sh.1
+	$(RM) $(EACSL_INSTALLED_MANPAGES)
 
 #####################################
 # Regenerating the Makefile on need #
