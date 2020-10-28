@@ -71,12 +71,17 @@ let extend () =
           wp_compute_kf kf
       in
       run f;
+      let tmpdir = Filename.get_temp_dir_name () in
+      let tmpdir =
+        match Filename.chop_suffix_opt ~suffix:"/" tmpdir with
+        | None -> tmpdir
+        | Some dir -> dir
+      in
       let tmpfile =
-        Filename.(concat (get_temp_dir_name ())
-                    ("aorai_" ^
-                     (chop_extension
-                        (basename (List.hd (Kernel.Files.get()):>string))) ^
-                     "_" ^ (string_of_int (TestNumber.get ())) ^ ".i"))
+        tmpdir ^ "/aorai_" ^
+        Filename.(
+          chop_extension (basename (List.hd (Kernel.Files.get()):>string))) ^
+        "_" ^ (string_of_int (TestNumber.get ())) ^ ".i"
       in
       let () =
         Extlib.safe_at_exit
