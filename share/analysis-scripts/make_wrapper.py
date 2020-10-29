@@ -49,7 +49,7 @@ args = args[1:]
 
 framac_bin = os.getenv('FRAMAC_BIN')
 if not framac_bin:
-   sys.exit("error: FRAMAC_BIN not in environment")
+   sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
 framac_script = f"{framac_bin}/frama-c-script"
 
 out = subprocess.Popen(['make', "-C", make_dir] + args,
