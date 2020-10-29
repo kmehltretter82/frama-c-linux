@@ -5385,8 +5385,14 @@ and makeCompType ghost (isstruct: bool)
   (* Create the self cell for use in fields and forward references. Or maybe
    * one exists already from a forward reference  *)
   let comp, _ = createCompInfo isstruct n' norig in
-  let doFieldGroup ~is_first_group ~is_last_group ((s: A.spec_elem list),
-                                                   (nl: (A.name * A.expression option) list)) =
+  let rec fold f acc = function
+    | [] -> acc
+    | [x] -> f ~last:true acc x
+    | x :: l -> fold f (f ~last:false acc x) l
+  in
+
+  let addFieldGroup ~last:last_group (flds : fieldinfo list)
+      ((s: A.spec_elem list), (nl: (A.name * A.expression option) list)) =
     (* Do the specifiers exactly once *)
     let sugg = match nl with
       | [] -> ""
@@ -5394,13 +5400,13 @@ and makeCompType ghost (isstruct: bool)
     in
     let bt, sto, inl, attrs = doSpecList ghost sugg s in
     (* Do the fields *)
-    let makeFieldInfo ~is_first_field ~is_last_field
+    let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : A.name), (widtho : A.expression option))
-      : fieldinfo =
+      : fieldinfo list =
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~current:true "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = true in
-      let ftype, nattr =
+      let ftype, fattr =
         doType
           ~allowZeroSizeArrays ghost false (AttrName false) bt
           (A.PARENTYPE(attrs, ndt, a))
@@ -5420,11 +5426,11 @@ and makeCompType ghost (isstruct: bool)
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
         match Cil.unrollType ftype with
-        | TArray(_,None,_,_) when is_last_field ->
+        | TArray(_,None,_,_) when last_group && last_field ->
           begin
             (* possible flexible array member; check if struct contains at least
                one other field *)
-            if is_first_field then (* struct is empty *)
+            if flds = [] then (* struct is empty *)
               Kernel.error ~current:true
                 "flexible array member '%s' (type %a) \
                  not allowed in otherwise empty struct"
@@ -5436,7 +5442,7 @@ and makeCompType ghost (isstruct: bool)
             "field `%s' is declared with incomplete type %a"
             n Cil_printer.pp_typ ftype
       end;
-      let width, ftype =
+      let fbitfield, ftype =
         match widtho with
         | None -> None, ftype
         | Some w -> begin
@@ -5459,9 +5465,14 @@ and makeCompType ghost (isstruct: bool)
               w, ftype
           end
       in
+      (* Compute the order of the field in the structure *)
+      let forder = match flds with
+        | [] -> 0
+        | { forder=previous_order } :: _ -> previous_order + 1
+      in
       (* If the field is unnamed and its type is a structure of union type
        * then give it a distinguished name  *)
-      let n' =
+      let fname =
         if n = missingFieldName then begin
           match unrollType ftype with
           | TComp _ -> begin
@@ -5493,47 +5504,29 @@ and makeCompType ghost (isstruct: bool)
         | _ -> ()
       in
       is_circular ftype;
-      { fcomp     =  comp;
+      { fcomp =  comp;
+        forder;
         forig_name = n;
-        fname     =  n';
-        ftype     =  ftype;
-        fbitfield =  width;
-        fattr     =  nattr;
-        floc      =  convLoc cloc;
-        faddrof   = false;
+        fname;
+        ftype;
+        fbitfield;
+        fattr;
+        floc =  convLoc cloc;
+        faddrof = false;
         fsize_in_bits = None;
         foffset_in_bits = None;
         fpadding_in_bits = None;
-      }
+      } :: flds
     in
-    let rec map_but_last l =
-      match l with
-      | [] -> []
-      | [f] ->
-        [makeFieldInfo ~is_first_field:false ~is_last_field:is_last_group f]
-      | f::l ->
-        let fi = makeFieldInfo ~is_first_field:false ~is_last_field:false f in
-        [fi] @ map_but_last l
-    in
-    match nl with
-    | [] -> []
-    | [f] ->
-      [makeFieldInfo ~is_first_field:is_first_group ~is_last_field:is_last_group f]
-    | f::l ->
-      let fi =
-        makeFieldInfo ~is_first_field:is_first_group ~is_last_field:false f
-      in
-      [fi] @ map_but_last l
+    fold addFieldInfo flds nl
   in
 
   (* Do regular fields first. *)
-  let flds =
-    List.filter (function FIELD _ -> true | TYPE_ANNOT _ -> false) nglist in
-  let flds =
-    List.map (function FIELD (f,g) -> (f,g) | _ -> assert false) flds in
-  let last = List.length flds -  1 in
-  let doField i = doFieldGroup ~is_first_group:(i=0) ~is_last_group:(i=last) in
-  let flds = List.concat (List.mapi doField flds) in
+  let to_field = function
+    | TYPE_ANNOT _ -> None
+    | FIELD (f,g) -> Some (f,g) in
+  let flds = Extlib.filter_map_opt to_field nglist in
+  let flds = List.rev (fold addFieldGroup [] flds) in
 
   let fld_table = Cil_datatype.Fieldinfo.Hashtbl.create 17 in
   let check f =

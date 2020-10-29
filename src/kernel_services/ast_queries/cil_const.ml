@@ -117,8 +117,9 @@ let mkCompInfo
       cdefined = false; }
   in
   let flds =
-    List.map (fun (fn, ft, fb, fa, fl) ->
+    List.mapi (fun forder (fn, ft, fb, fa, fl) ->
 	{ fcomp = comp;
+    forder;
 	  ftype = ft;
 	  forig_name = fn;
 	  fname = fn;

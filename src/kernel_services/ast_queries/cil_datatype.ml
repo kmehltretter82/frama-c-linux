@@ -804,6 +804,7 @@ module Fieldinfo = struct
                     List.fold_left
                       (fun acc loc ->
                          { fcomp = ci;
+                           forder = 0;
                            forig_name = "";
                            fname = "";
                            ftype = typ;
