@@ -132,6 +132,6 @@ depopts: [
 messages: [
   "The Frama-C/Wp now uses Why-3 for all provers (Cf. deprecated -wp-prover native:alt-ergo)"
   {alt-ergo:installed}
-  "The Frama-C/Wp native support for Coq is now deprecated (use TIP or Why-3 instead)."
+  "The Frama-C/Wp native support for Coq is deprecated and only activated with Coq.8.12.x (use TIP or Why-3 instead)."
   {coq:installed}
 ]
