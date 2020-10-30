@@ -874,13 +874,36 @@ weakest precondition calculus.
   and it can generates a large number of verifications for structures
   with many (nested) fields (defaults to \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation.
-  For each call to a function pointer \texttt{fp}
-  in the instruction or block under the annotation,
-  \texttt{fp} is required to belongs to the set \texttt{f1,\ldots,fn} and
-  a case analysis is performed with the contract of each provided function
-  (default is: \texttt{yes}).
+  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
 \end{description}
+
+\subsubsection{ACSL extension \texttt{@calls}}
+
+The handling of functions pointers is done via the ACSL code annotation
+extension \verb+@calls+. For each call to a function pointer \verb+fp+
+in the instruction or block under the annotation \verb+calls f1,\ldots,fn+,
+\verb+fp+ is required to belongs to the set \verb+f1,\ldots,fn+ and
+a case analysis is performed with the contract of each provided function.
+
+For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ ensures \result == x ; */
+int f1(int x);
+/*@ ensures \result == x+1 ; */
+int f2(int x);
+
+/*@ requires fp == &f1 || fp == &f2 ;
+    ensures POST: \result == 4 || \result == 5; */
+int caller(int (*fp)(int)){
+  //@ calls f1, f2 ;
+  return (*fp)(4);
+}
+\end{lstlisting}
+
+generates two goals for \verb+POST+, one for call to \verb+f1+ and
+a second for the call to \verb+f2+. A last goal is generated at the call
+site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
 \subsection{Smoke Tests}
 
