@@ -135,3 +135,7 @@ messages: [
   "The Frama-C/Wp native support for Coq is now deprecated (use TIP or Why-3 instead)."
   {coq:installed}
 ]
+
+post-messages: [
+  "Why3 provers setup: rm -r ~/.why3.conf ; why3 config --detect"
+]
