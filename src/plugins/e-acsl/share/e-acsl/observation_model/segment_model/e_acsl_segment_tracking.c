@@ -345,14 +345,6 @@ void shadow_freea(void *ptr) {
 
 /* Static querying {{{ */
 
-/*! \brief Checking whether a globally allocated memory block containing an
- * address _addr has read-only access. Note, this is light checking that
- * relies on the fact that a single block cannot contain read/write and
- * read-only parts, that is to check whether the block has read-only access it
- * is sufficient to check any of its bytes. */
-#define global_readonly(_addr) \
-  checkbit(READONLY_BIT, (*(char*)PRIMARY_GLOBAL_SHADOW(addr)))
-
 int static_allocated(uintptr_t addr, long size, uintptr_t base_ptr) {
   unsigned char *prim_shadow = (unsigned char*)PRIMARY_SHADOW(addr);
   /* Unless the address belongs to tracked allocation 0 is returned */
@@ -557,7 +549,7 @@ static void set_heap_segment(void *ptr, size_t size, size_t alloc_size,
   private_assert(mem_spaces.heap_end > max_addr,
     "Exceeded heap allocation limit of %luMB\n", E_ACSL_HEAP_SIZE);
 
-  DVALIDATE_MEMORY_INIT;
+  DVALIDATE_MEMORY_PRE_MAIN_INIT;
   /* Ensure the shadowed block in on the tracked heap portion */
   DVALIDATE_IS_ON_HEAP(((uintptr_t)ptr) - HEAP_SEGMENT, size);
   DVALIDATE_ALIGNMENT(ptr); /* Make sure alignment is right */
@@ -664,7 +656,7 @@ void *shadow_copy(const void *ptr, size_t size, int init) {
  * \param function - name of the de-allocation function (e.g., `free` or `cfree`)
 */
 static void unset_heap_segment(void *ptr, int init, const char *function) {
-  DVALIDATE_MEMORY_INIT;
+  DVALIDATE_MEMORY_PRE_MAIN_INIT;
   DVALIDATE_FREEABLE(((uintptr_t)ptr));
   /* Base address of shadow block */
   uintptr_t *base_shadow = (uintptr_t*)HEAP_SHADOW(ptr);
@@ -1134,10 +1126,23 @@ void print_shadow_layout() {
   print_memory_partition(&mem_layout.heap);
   DLOG(">>> STACK --------------------\n");
   print_memory_partition(&mem_layout.stack);
+#if E_ACSL_OS_IS_LINUX
   DLOG(">>> GLOBAL -------------------\n");
   print_memory_partition(&mem_layout.global);
   DLOG(">>> TLS ----------------------\n");
   print_memory_partition(&mem_layout.tls);
+#elif E_ACSL_OS_IS_WINDOWS
+  DLOG(">>> TEXT ---------------------\n");
+  print_memory_partition(&mem_layout.text);
+  DLOG(">>> BSS ----------------------\n");
+  print_memory_partition(&mem_layout.bss);
+  DLOG(">>> DATA --------------------\n");
+  print_memory_partition(&mem_layout.data);
+  DLOG(">>> IDATA --------------------\n");
+  print_memory_partition(&mem_layout.idata);
+  DLOG(">>> RDATA --------------------\n");
+  print_memory_partition(&mem_layout.rdata);
+#endif
   DLOG(">>> --------------------------\n");
 }
 
@@ -1147,10 +1152,23 @@ const char* which_segment(uintptr_t addr) {
     loc = "stack";
   else if (IS_ON_HEAP(addr))
     loc = "heap";
+#if E_ACSL_OS_IS_LINUX
   else if (IS_ON_GLOBAL(addr))
     loc = "global";
   else if (IS_ON_TLS(addr))
     loc = "TLS";
+#elif E_ACSL_OS_IS_WINDOWS
+  else if (IS_ON_TEXT(addr))
+    loc = "text";
+  else if (IS_ON_BSS(addr))
+    loc = "bss";
+  else if (IS_ON_DATA(addr))
+    loc = "data";
+  else if (IS_ON_IDATA(addr))
+    loc = "idata";
+  else if (IS_ON_RDATA(addr))
+    loc = "rdata";
+#endif
   else
     loc = "untracked";
   return loc;

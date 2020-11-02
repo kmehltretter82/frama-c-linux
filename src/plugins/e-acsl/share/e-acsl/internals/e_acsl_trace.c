@@ -36,6 +36,7 @@
 
 #include "e_acsl_trace.h"
 
+#if E_ACSL_OS_IS_LINUX
 extern void  *__libc_stack_end;
 
 struct frame_layout {
@@ -70,6 +71,7 @@ static int native_backtrace (void **array, int size) {
   }
   return cnt;
 }
+#endif
 
 void trace() {
 # if E_ACSL_OS_IS_LINUX

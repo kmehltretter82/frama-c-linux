@@ -30,6 +30,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "../../internals/e_acsl_config.h"
 #include "../../internals/e_acsl_malloc.h"
 
 /* Default size of a program's heap tracked via shadow memory */
@@ -41,21 +42,6 @@
 #ifndef E_ACSL_STACK_SIZE
 #define E_ACSL_STACK_SIZE 64
 #endif
-
-/* Symbols exported by the linker script */
-
-/*!\brief The first address past the end of the text segment. */
-extern char etext;
-/*!\brief The first address past the end of the initialized data segment. */
-extern char edata;
-/*!\brief The first address past the end of the uninitialized data segment. */
-extern char end;
-/*!\brief The first address of a program. */
-extern char __executable_start;
-
-/* \cond */
-void *sbrk(intptr_t increment);
-char *strerror(int errnum);
 
 /* MAP_ANONYMOUS is a mmap flag indicating that the contents of allocated blocks
  * should be nullified. Set value from <bits/mman-linux.h>, if MAP_ANONYMOUS is
@@ -95,43 +81,7 @@ char *strerror(int errnum);
 #define SHADOW_SEGMENT_PADDING (512*KB)
 /* }}} */
 
-/** Thread-local storage information {{{ */
-
-/*! Thread-local storage (TLS) keeps track of copies of per-thread variables.
- * Even though at the present stage RTL of E-ACSL is not thread-safe, some
- * of the variables (for instance ::errno) are allocated there. In X86 TLS
- * is typically located somewhere below the program's stack but above mmap
- * areas. TLS is typically separated into two sections: .tdata and .tbss.
- * Similar to globals using .data and .bss, .tdata keeps track of initialized
- * thread-local variables, while .tbss holds uninitialized ones.
- *
- * Start and end addresses of TLS are obtained by taking addresses of
- * initialized and uninitialized variables in TLS (::id_tdata and ::id_tss)
- * and adding fixed amount of shadow space around them. Visually it looks
- * as follows:
- *
- *   end TLS address (&id_tdata + TLS_SHADOW_SIZE/2)
- *   id_tdata address
- *   ...
- *   id_tbss address
- *   start TLS address (&id_bss - TLS_SHADOW_SIZE/2)
- *
- * HOWEVER problems can occur if PGM_TLS_SIZE is too big:
- * see get_tls_start for details.
- */
-
-/*! \brief Return byte-size of the TLS segment */
-inline static size_t get_tls_size() {
-  return PGM_TLS_SIZE;
-}
-
-static __thread int id_tdata = 1;
-static __thread int id_tbss;
-
-/* }}} */
-
 /** Program stack information {{{ */
-extern char ** environ;
 
 /*! \brief Set a new soft stack limit
  *
@@ -149,35 +99,11 @@ size_t increase_stack_limit(const size_t size);
 /*! \brief Return byte-size of a program's stack. The return value is the soft
  * stack limit, i.e., it can be programmatically increased at runtime. */
 size_t get_stack_size();
-
-/*! \brief Return greatest (known) address on a program's stack.
- * This function presently determines the address using the address of the
- * last string in `environ`. That is, it assumes that argc and argv are
- * stored below environ, which holds for GCC/Glibc but is not necessarily
- * true for some other compilers/libraries. */
-uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref);
 /* }}} */
 
 /** Program heap information {{{ */
-/*! \brief Return the start address of a program's heap. */
-uintptr_t get_heap_start();
-
 /*! \brief Return the tracked size of a program's heap. */
 size_t get_heap_size();
-
-/*! \brief Return the size of a secondary shadow region tracking
- * initialization (i.e., init shadow). */
-size_t get_heap_init_size();
-
-/** }}} */
-
-/** Program global information {{{ */
-/*! \brief Return the start address of a segment holding globals (generally
- * BSS and Data segments). */
-uintptr_t get_global_start();
-
-/*! \brief Return byte-size of global segment */
-size_t get_global_size();
 /** }}} */
 
 /** Shadow Layout {{{ */
@@ -257,20 +183,48 @@ typedef struct memory_partition memory_partition;
 struct memory_layout {
   memory_partition heap;
   memory_partition stack;
+#if E_ACSL_OS_IS_LINUX
+  // On linux
+  // The text, bss and data segments are contiguous and regrouped here in a
+  // global memory partition
   memory_partition global;
+  // The TLS is in a specific section and identifiable
   memory_partition tls;
-  int is_initialized;
+#elif E_ACSL_OS_IS_WINDOWS
+  // On windows
+  // The text, bss and data segments are not necessarily contiguous so each one
+  // is in its own memory partition
+  memory_partition text;
+  memory_partition bss;
+  memory_partition data;
+  memory_partition idata;
+  memory_partition rdata;
+  // The TLS is stored on the heap and is indistiguishable from it
+#endif
+  int is_initialized_pre_main;
+  int is_initialized_main;
 };
 
 /*! \brief Full program memory layout. */
-struct memory_layout mem_layout;
+struct memory_layout mem_layout = {
+  .is_initialized_pre_main = 0,
+  .is_initialized_main = 0,
+};
 
 /*! \brief Array of used partitions */
 memory_partition *mem_partitions [] = {
   &mem_layout.heap,
   &mem_layout.stack,
+#if E_ACSL_OS_IS_LINUX
   &mem_layout.global,
-  &mem_layout.tls
+  &mem_layout.tls,
+#elif E_ACSL_OS_IS_WINDOWS
+  &mem_layout.text,
+  &mem_layout.bss,
+  &mem_layout.data,
+  &mem_layout.idata,
+  &mem_layout.rdata,
+#endif
 };
 
 /*! \brief Initialize an application memory segment.
@@ -296,17 +250,18 @@ void set_shadow_segment(memory_segment *seg, memory_segment *parent,
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::memory_layout holding that information with data.
-   Case of the stack. */
-void init_shadow_layout_stack(int *argc_ref, char ***argv_ref);
-
-/*! \brief Return start address of a program's TLS */
-uintptr_t get_tls_start();
+ *
+ * Case of segments available before main (for instance from a function marked
+ * as `__constructor__`). */
+void init_shadow_layout_pre_main();
 
 /*! \brief Initialize memory layout, i.e., determine bounds of program segments,
  * allocate shadow memory spaces and compute offsets. This function populates
  * global struct ::memory_layout holding that information with data.
-   Case of the heap, globals and tls. */
-void init_shadow_layout_heap_global_tls();
+ *
+ * Case of segments only available once inside of main (for instance the stack
+ * of the program). */
+void init_shadow_layout_main(int *argc_ref, char ***argv_ref);
 
 /*! \brief Deallocate shadow regions used by runtime analysis */
 void clean_shadow_layout();
@@ -333,10 +288,23 @@ void clean_shadow_layout();
 #define heap_secondary_offset   mem_layout.heap.secondary.shadow_offset
 #define stack_primary_offset    mem_layout.stack.primary.shadow_offset
 #define stack_secondary_offset  mem_layout.stack.secondary.shadow_offset
-#define global_primary_offset   mem_layout.global.primary.shadow_offset
-#define global_secondary_offset mem_layout.global.secondary.shadow_offset
-#define tls_primary_offset      mem_layout.tls.primary.shadow_offset
-#define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
+#if E_ACSL_OS_IS_LINUX
+# define global_primary_offset   mem_layout.global.primary.shadow_offset
+# define global_secondary_offset mem_layout.global.secondary.shadow_offset
+# define tls_primary_offset      mem_layout.tls.primary.shadow_offset
+# define tls_secondary_offset    mem_layout.tls.secondary.shadow_offset
+#elif E_ACSL_OS_IS_WINDOWS
+# define text_primary_offset mem_layout.text.primary.shadow_offset
+# define text_secondary_offset mem_layout.text.secondary.shadow_offset
+# define bss_primary_offset mem_layout.bss.primary.shadow_offset
+# define bss_secondary_offset mem_layout.bss.secondary.shadow_offset
+# define data_primary_offset mem_layout.data.primary.shadow_offset
+# define data_secondary_offset mem_layout.data.secondary.shadow_offset
+# define idata_primary_offset mem_layout.idata.primary.shadow_offset
+# define idata_secondary_offset mem_layout.idata.secondary.shadow_offset
+# define rdata_primary_offset mem_layout.rdata.primary.shadow_offset
+# define rdata_secondary_offset mem_layout.rdata.secondary.shadow_offset
+#endif
 
 /*! \brief Compute a shadow address using displacement offset
  * @param _addr - an application space address
@@ -374,29 +342,97 @@ void clean_shadow_layout();
 #define SECONDARY_STACK_SHADOW(_addr) \
   SHADOW_ACCESS(_addr, stack_secondary_offset)
 
+#if E_ACSL_OS_IS_LINUX
 /*! \brief Convert a global address into its primary shadow counterpart */
-#define PRIMARY_GLOBAL_SHADOW(_addr)  \
+# define PRIMARY_GLOBAL_SHADOW(_addr)  \
   SHADOW_ACCESS(_addr, global_primary_offset)
 
 /*! \brief Convert a global address into its secondary shadow counterpart */
-#define SECONDARY_GLOBAL_SHADOW(_addr) \
+# define SECONDARY_GLOBAL_SHADOW(_addr) \
   SHADOW_ACCESS(_addr, global_secondary_offset)
 
 /*! \brief Convert a TLS address into its primary shadow counterpart */
-#define PRIMARY_TLS_SHADOW(_addr)  \
+# define PRIMARY_TLS_SHADOW(_addr)  \
   SHADOW_ACCESS(_addr, tls_primary_offset)
 
 /*! \brief Convert a TLS address into its secondary shadow counterpart */
-#define SECONDARY_TLS_SHADOW(_addr) \
+# define SECONDARY_TLS_SHADOW(_addr) \
   SHADOW_ACCESS(_addr, tls_secondary_offset)
+#elif E_ACSL_OS_IS_WINDOWS
+/*! \brief Convert a text address into its primary shadow counterpart */
+# define PRIMARY_TEXT_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, text_primary_offset)
+
+/*! \brief Convert a text address into its secondary shadow counterpart */
+# define SECONDARY_TEXT_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, text_secondary_offset)
+
+/*! \brief Convert a bss address into its primary shadow counterpart */
+# define PRIMARY_BSS_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, bss_primary_offset)
+
+/*! \brief Convert a bss address into its secondary shadow counterpart */
+# define SECONDARY_BSS_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, bss_secondary_offset)
+
+/*! \brief Convert an data address into its primary shadow counterpart */
+# define PRIMARY_DATA_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, data_primary_offset)
+
+/*! \brief Convert an data address into its secondary shadow counterpart */
+# define SECONDARY_DATA_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, data_secondary_offset)
+
+/*! \brief Convert an idata address into its primary shadow counterpart */
+# define PRIMARY_IDATA_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, idata_primary_offset)
+
+/*! \brief Convert an idata address into its secondary shadow counterpart */
+# define SECONDARY_IDATA_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, idata_secondary_offset)
+
+/*! \brief Convert an rdata address into its primary shadow counterpart */
+# define PRIMARY_RDATA_SHADOW(_addr)  \
+  SHADOW_ACCESS(_addr, rdata_primary_offset)
+
+/*! \brief Convert an rdata address into its secondary shadow counterpart */
+# define SECONDARY_RDATA_SHADOW(_addr) \
+  SHADOW_ACCESS(_addr, rdata_secondary_offset)
+
+/*! \brief Convert a global address into its primary shadow counterpart */
+# define PRIMARY_GLOBAL_SHADOW(_addr) \
+    (IS_ON_TEXT(_addr) ? PRIMARY_TEXT_SHADOW(_addr) : \
+     IS_ON_BSS(_addr) ? PRIMARY_BSS_SHADOW(_addr) : \
+     IS_ON_DATA(_addr) ? PRIMARY_DATA_SHADOW(_addr) : \
+     IS_ON_IDATA(_addr) ? PRIMARY_IDATA_SHADOW(_addr) : \
+     IS_ON_RDATA(_addr) ? PRIMARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+
+/*! \brief Convert a global address into its secondary shadow counterpart */
+# define SECONDARY_GLOBAL_SHADOW(_addr) \
+    (IS_ON_TEXT(_addr) ? SECONDARY_TEXT_SHADOW(_addr) : \
+     IS_ON_BSS(_addr) ? SECONDARY_BSS_SHADOW(_addr) : \
+     IS_ON_DATA(_addr) ? SECONDARY_DATA_SHADOW(_addr) : \
+     IS_ON_IDATA(_addr) ? SECONDARY_IDATA_SHADOW(_addr) : \
+     IS_ON_RDATA(_addr) ? SECONDARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+#endif
 
 /* \brief Compute a primary or a secondary shadow address (based on the value of
  * parameter `_region`) of an address tracked via an offset-based encoding.
  * For an untracked address `0` is returned. */
-#define SHADOW_REGION_ADDRESS(_addr, _region) \
-  (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
-    IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr) : \
-      IS_ON_TLS(_addr) ? _region##_TLS_SHADOW(_addr) : 0)
+#if E_ACSL_OS_IS_LINUX
+# define SHADOW_REGION_ADDRESS(_addr, _region) \
+    (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
+     IS_ON_GLOBAL(_addr) ? _region##_GLOBAL_SHADOW(_addr) : \
+     IS_ON_TLS(_addr) ? _region##_TLS_SHADOW(_addr) : (intptr_t)0)
+#elif E_ACSL_OS_IS_WINDOWS
+# define SHADOW_REGION_ADDRESS(_addr, _region) \
+    (IS_ON_STACK(_addr) ? _region##_STACK_SHADOW(_addr) : \
+     IS_ON_TEXT(_addr) ? _region##_TEXT_SHADOW(_addr) : \
+     IS_ON_BSS(_addr) ? _region##_BSS_SHADOW(_addr) : \
+     IS_ON_DATA(_addr) ? _region##_DATA_SHADOW(_addr) : \
+     IS_ON_IDATA(_addr) ? _region##_IDATA_SHADOW(_addr) : \
+     IS_ON_RDATA(_addr) ? _region##_RDATA_SHADOW(_addr) : (intptr_t)0)
+#endif
 
 /*! \brief Primary shadow address of a non-dynamic region */
 #define PRIMARY_SHADOW(_addr) SHADOW_REGION_ADDRESS(_addr, PRIMARY)
@@ -422,22 +458,50 @@ void clean_shadow_layout();
 /*! \brief Evaluate to true if `_addr` is a stack address */
 #define IS_ON_STACK(_addr) IS_ON(_addr, mem_layout.stack.application)
 
+#if E_ACSL_OS_IS_LINUX
 /*! \brief Evaluate to true if `_addr` is a global address */
-#define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global.application)
+# define IS_ON_GLOBAL(_addr) IS_ON(_addr, mem_layout.global.application)
 
 /*! \brief Evaluate to true if _addr is a TLS address */
-#define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
+# define IS_ON_TLS(_addr) IS_ON(_addr, mem_layout.tls.application)
 
 /*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
  * ::IS_ON_GLOBAL or ::IS_ON_TLS  */
-#define IS_ON_STATIC(_addr) \
-  (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
+# define IS_ON_STATIC(_addr) \
+    (IS_ON_STACK(_addr) || IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
+#elif E_ACSL_OS_IS_WINDOWS
+/*! \brief Evaluate to true if `_addr` is a text address */
+# define IS_ON_TEXT(_addr) IS_ON(_addr, mem_layout.text.application)
+
+/*! \brief Evaluate to true if `_addr` is a bss address */
+# define IS_ON_BSS(_addr) IS_ON(_addr, mem_layout.bss.application)
+
+/*! \brief Evaluate to true if `_addr` is an idata address */
+# define IS_ON_DATA(_addr) IS_ON(_addr, mem_layout.data.application)
+
+/*! \brief Evaluate to true if `_addr` is an idata address */
+# define IS_ON_IDATA(_addr) IS_ON(_addr, mem_layout.idata.application)
+
+/*! \brief Evaluate to true if `_addr` is an rdata address */
+# define IS_ON_RDATA(_addr) IS_ON(_addr, mem_layout.rdata.application)
+
+/*! \brief Evaluate to true if `_addr` is a global address */
+# define IS_ON_GLOBAL(_addr) \
+    (IS_ON_TEXT(_addr) || IS_ON_BSS(_addr) || IS_ON_DATA(_addr) || \
+     IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
+
+/*! \brief Shortcut for evaluating an address via ::IS_ON_STACK,
+ * ::IS_ON_TEXT, :: IS_ON_BSS, ::IS_ON_IDATA, or ::IS_ON_RDATA  */
+# define IS_ON_STATIC(_addr) \
+    (IS_ON_STACK(_addr) || IS_ON_TEXT(_addr) || IS_ON_BSS(_addr) || \
+     IS_ON_DATA(_addr) || IS_ON_IDATA(_addr) || IS_ON_RDATA(_addr))
+#endif
 
 /*! \brief Evaluate to a true value if a given address belongs to tracked
- * allocation (i.e., found within tls, stack, heap or globally) */
+ * allocation (i.e., found within static or dynamic allocation) */
 #define IS_ON_VALID(_addr) \
-  (IS_ON_STACK(_addr) || IS_ON_HEAP(_addr) || \
-   IS_ON_GLOBAL(_addr) || IS_ON_TLS(_addr))
+  (IS_ON_STATIC(_addr) || IS_ON_HEAP(_addr))
+
 /* }}} */
 
 #ifdef E_ACSL_TEMPORAL /* {{{ */
@@ -453,21 +517,79 @@ void clean_shadow_layout();
 #define TEMPORAL_SECONDARY_STACK_SHADOW(_addr) \
   SHADOW_ACCESS(_addr, mem_layout.stack.temporal_secondary.shadow_offset)
 
+#if E_ACSL_OS_IS_LINUX
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-#define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, mem_layout.global.temporal_primary.shadow_offset)
+# define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.global.temporal_primary.shadow_offset)
 
 /*! \brief Convert a global address into its primary temporal shadow counterpart */
-#define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, mem_layout.global.temporal_secondary.shadow_offset)
+# define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.global.temporal_secondary.shadow_offset)
 
 /*! \brief Convert a TLS address into its primary temporal shadow counterpart */
-#define TEMPORAL_PRIMARY_TLS_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, mem_layout.tls.temporal_primary.shadow_offset)
+# define TEMPORAL_PRIMARY_TLS_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.tls.temporal_primary.shadow_offset)
 
 /*! \brief Convert a TLS address into its secondary temporal shadow counterpart */
-#define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)  \
-  SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
+# define TEMPORAL_SECONDARY_TLS_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.tls.temporal_secondary.shadow_offset)
+#elif E_ACSL_OS_IS_WINDOWS
+/*! \brief Convert a text address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_TEXT_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.text.temporal_primary.shadow_offset)
+
+/*! \brief Convert a text address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_TEXT_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.text.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a bss address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_BSS_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.bss.temporal_primary.shadow_offset)
+
+/*! \brief Convert a bss address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_BSS_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.bss.temporal_secondary.shadow_offset)
+
+/*! \brief Convert an data address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_DATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.data.temporal_primary.shadow_offset)
+
+/*! \brief Convert an data address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_DATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.data.temporal_secondary.shadow_offset)
+
+/*! \brief Convert an idata address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_IDATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.idata.temporal_primary.shadow_offset)
+
+/*! \brief Convert an idata address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_IDATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.idata.temporal_secondary.shadow_offset)
+
+/*! \brief Convert an rdata address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_RDATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_primary.shadow_offset)
+
+/*! \brief Convert an rdata address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_RDATA_SHADOW(_addr)  \
+    SHADOW_ACCESS(_addr, mem_layout.rdata.temporal_secondary.shadow_offset)
+
+/*! \brief Convert a global address into its primary temporal shadow counterpart */
+# define TEMPORAL_PRIMARY_GLOBAL_SHADOW(_addr) \
+    (IS_ON_TEXT(_addr) ? TEMPORAL_PRIMARY_TEXT_SHADOW(_addr) : \
+     IS_ON_BSS(_addr) ? TEMPORAL_PRIMARY_BSS_SHADOW(_addr) : \
+     IS_ON_DATA(_addr) ? TEMPORAL_PRIMARY_DATA_SHADOW(_addr) : \
+     IS_ON_IDATA(_addr) ? TEMPORAL_PRIMARY_IDATA_SHADOW(_addr) : \
+     IS_ON_RDATA(_addr) ? TEMPORAL_PRIMARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+
+/*! \brief Convert a global address into its primary temporal shadow counterpart */
+# define TEMPORAL_SECONDARY_GLOBAL_SHADOW(_addr) \
+    (IS_ON_TEXT(_addr) ? TEMPORAL_SECONDARY_TEXT_SHADOW(_addr) : \
+     IS_ON_BSS(_addr) ? TEMPORAL_SECONDARY_BSS_SHADOW(_addr) : \
+     IS_ON_DATA(_addr) ? TEMPORAL_SECONDARY_DATA_SHADOW(_addr) : \
+     IS_ON_IDATA(_addr) ? TEMPORAL_SECONDARY_IDATA_SHADOW(_addr) : \
+     IS_ON_RDATA(_addr) ? TEMPORAL_SECONDARY_RDATA_SHADOW(_addr) : (intptr_t)0)
+#endif
 
 /*! \brief Temporal primary shadow address of a non-dynamic region */
 #define TEMPORAL_PRIMARY_STATIC_SHADOW(_addr) \

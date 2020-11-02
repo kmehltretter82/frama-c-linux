@@ -215,8 +215,8 @@ void mspaces_init() {
     describe_run();
     eacsl_make_memory_spaces(64*MB, get_heap_size());
     /* Allocate and log shadow memory layout of the execution.
-       Case of the heap, globals and tls. */
-    init_shadow_layout_heap_global_tls();
+       Case of the segments available before main. */
+    init_shadow_layout_pre_main();
     already_run = 1;
   }
 }
@@ -235,8 +235,9 @@ void eacsl_memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
     initialize_report_file(argc_ref, argv_ref);
     /* Lift stack limit to account for extra stack memory overhead.  */
     increase_stack_limit(get_stack_size()*2);
-    /* Allocate and log shadow memory layout of the execution. Case of stack. */
-    init_shadow_layout_stack(argc_ref, argv_ref);
+    /* Allocate and log shadow memory layout of the execution. Case of the
+       segments available after main. */
+    init_shadow_layout_main(argc_ref, argv_ref);
     //DEBUG_PRINT_LAYOUT;
     /* Make sure the layout holds */
     DVALIDATE_SHADOW_LAYOUT;
@@ -250,12 +251,14 @@ void eacsl_memory_init(int *argc_ref, char *** argv_ref, size_t ptr_size) {
     collect_safe_locations();
     int i;
     for (i = 0; i < get_safe_locations_count(); i++) {
-    memory_location * loc = get_safe_location(i);
-      void *addr = (void*)loc->address;
-      uintptr_t len = loc->length;
-      shadow_alloca(addr, len);
-      if (loc->is_initialized)
-        eacsl_initialize(addr, len);
+      memory_location * loc = get_safe_location(i);
+      if (loc->is_on_static) {
+        void *addr = (void*)loc->address;
+        uintptr_t len = loc->length;
+        shadow_alloca(addr, len);
+        if (loc->is_initialized)
+          eacsl_initialize(addr, len);
+      }
     }
     init_infinity_values();
     already_run = 1;
