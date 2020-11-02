@@ -43,8 +43,15 @@ if len(sys.argv) < 4:
    print("       in the specified files.")
    sys.exit(1)
 
-want_defs = sys.argv[1]
-want_decls = sys.argv[2]
+def boolish_string(s):
+    if s.lower() == "true" or s == "1":
+        return True
+    if s.lower() == "false" or s == "0":
+        return False
+    sys.exit(f"error: expected 'true', 'false', 0 or 1; got: {s}")
+
+want_defs = boolish_string(sys.argv[1])
+want_decls = boolish_string(sys.argv[2])
 files = sys.argv[3:]
 
 for f in files:

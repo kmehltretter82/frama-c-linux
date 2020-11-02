@@ -42,6 +42,8 @@ if len(sys.argv) < 2:
 else:
     files = sys.argv[1:]
 
+debug = os.getenv("DEBUG")
+
 class Callgraph:
     """
     Heuristics-based callgraphs.
@@ -89,6 +91,8 @@ def compute(files):
                 called = call[0]
                 line = call[1]
                 loc = (f, line)
+                if debug:
+                    print(f"build_callgraph: {f}:{line}: {caller} -> {called}")
                 cg.add_edge(caller, called, loc)
     #print(f"Callgraph computed ({len(cg.succs)} node(s), {len(cg.edges)} edge(s))")
     return cg
@@ -115,25 +119,30 @@ def print_cg_dot(cg, out=sys.stdout):
 # n: input, not modified
 #
 # The difference between visited and just_visited is that the latter refers
-# to the current dfs; nodes visited in previous dfs already had their cycles
+# to the current bfs; nodes visited in previous bfs already had their cycles
 # reported, so we do not report them multiple times.
-def cycle_dfs(cg, visited, just_visited, n):
+def cycle_bfs(cg, visited, just_visited, n):
+    if debug:
+        print(f"cycle_bfs: visited = {visited}, just_visited = {just_visited}, n = {n}")
     just_visited.add(n)
     if n not in cg.succs:
         return []
+    fifo = []
     for succ in cg.succs[n]:
         if succ in just_visited:
             return [(n, succ)]
         elif succ in visited:
             # already reported in a previous iteration
-            return []
-        else:
-            res = cycle_dfs(cg, visited, just_visited, succ)
-            if res:
-                caller = res[0][0]
-                return [(n, caller)] + res
-            else:
-                return []
+            continue
+        fifo.append(succ)
+    # no cycle found with direct successors, go to next level
+    for succ in fifo:
+        my_just_visited = just_visited.copy()
+        res = cycle_bfs(cg, visited, my_just_visited, succ)
+        if res:
+            # note that other cycles may not be reported
+            caller = res[0][0]
+            return [(n, caller)] + res
     return []
 
 def compute_recursive_cycles(cg, acc):
@@ -144,7 +153,7 @@ def compute_recursive_cycles(cg, acc):
     while to_visit:
         just_visited = set()
         n = sorted(list(to_visit))[0]
-        cycle = cycle_dfs(cg, visited, just_visited, n)
+        cycle = cycle_bfs(cg, visited, just_visited, n)
         visited = visited.union(just_visited)
         if cycle:
             (fst, snd) = cycle[0]
@@ -153,10 +162,7 @@ def compute_recursive_cycles(cg, acc):
         to_visit -= visited
 
 def detect_recursion(cg):
-    #print(f"Detecting recursive calls...")
     to_visit = set(cg.nodes())
-    #if len(to_visit) > 100:
-    #    print(f"Checking recursion ({len(to_visit)} nodes)...")
     if not to_visit: # empty graph -> no recursion
         return False
     visited = set()
@@ -164,7 +170,7 @@ def detect_recursion(cg):
     while to_visit:
         just_visited = set()
         n = sorted(list(to_visit))[0]
-        cycle = cycle_dfs(cg, visited, just_visited, n)
+        cycle = cycle_bfs(cg, visited, just_visited, n)
         visited = visited.union(just_visited)
         if cycle:
             has_cycle = True

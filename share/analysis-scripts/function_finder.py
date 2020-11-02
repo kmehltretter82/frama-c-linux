@@ -151,23 +151,29 @@ def find_definitions_and_declarations(want_defs, want_decls, filename, newlines)
         else:
             if not want_defs:
                 continue
-            end = get_first_line_after(braces, start)
-            if not end:
-                # no closing braces found; use "single-line function heuristic":
-                # assume the function is defined as 'type f(...) { code; }',
-                # in a single line
-                def_start_newline_offset = newlines[start-1]
-                line_of_opening_brace = line_of_offset(newlines, match.start(2))
-                definition = content[match.start(1):newlines[start-1]]
-                if start == line_of_opening_brace and definition.rstrip().endswith("}"):
-                    # assume the '}' is closing the '{' from the same line
-                    end = line_of_opening_brace
-                else:
-                    # no opening brace; assume a false positive and skip definition
-                    print(f"{os.path.relpath(filename)}:{start}:closing brace not found, " +
-                          f"skipping potential definition of '{funcname}'")
-                    continue
+            definition = content[match.start(1):newlines[start-1]]
+            # try "single-line function heuristic":
+            # assume the function is defined as 'type f(...) { code; }',
+            # in a single line
+            if definition.strip().endswith("}"):
+                end = line_of_offset(newlines, match.start(2))
+            else:
+                end = get_first_line_after(braces, start)
+                if not end:
+                    # no closing braces found; try again the "single-line function heuristic"
+                    def_start_newline_offset = newlines[start-1]
+                    line_of_opening_brace = line_of_offset(newlines, match.start(2))
+                    if start == line_of_opening_brace and definition.rstrip().endswith("}"):
+                        # assume the '}' is closing the '{' from the same line
+                        end = line_of_opening_brace
+                    else:
+                        # no opening brace; assume a false positive and skip definition
+                        print(f"{os.path.relpath(filename)}:{start}:closing brace not found, " +
+                              f"skipping potential definition of '{funcname}'")
+                        continue
         terminator_offset = match.start(2)
+        if debug:
+            print(f"function_finder: {'def' if is_def else 'decl'} of {funcname} between {start} and {end}")
         res.append((funcname, is_def, start, end, terminator_offset))
     return res
 

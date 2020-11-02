@@ -36,6 +36,11 @@ import subprocess
 import sys
 import tempfile
 
+#TODO : avoid relativizing paths when introducing too many ".." ;
+#TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
+#TODO : try to check the presence of compiler builtins
+#TODO : try to check for pragmas
+
 MIN_PYTHON = (3, 5)
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)

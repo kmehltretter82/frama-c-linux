@@ -44,3 +44,33 @@ void m() {
 
 void norec() {
 }
+
+int direct_rec() {
+  return direct_rec();
+}
+
+void indirect_rec1();
+
+void indirect_rec2() {
+  indirect_rec1();
+}
+
+void indirect_rec1() {
+  indirect_rec2();
+}
+
+void decl_only();
+
+void one_liner_function() { decl_only(); }
+
+void multiple_indirect1();
+
+void multiple_indirect2() {
+  multiple_indirect1();
+  multiple_indirect1();
+}
+
+void multiple_indirect1() {
+  multiple_indirect2();
+  multiple_indirect2();
+}
