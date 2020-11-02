@@ -63,7 +63,7 @@ type t = Why3.Whyconf.prover
 let find_opt s =
   try
     let config = Lazy.force cfg in
-    let filter = Why3.Whyconf.parse_filter_prover (String.lowercase_ascii s) in
+    let filter = Why3.Whyconf.parse_filter_prover s in
     Some ((Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover)
   with
   | Why3.Whyconf.ProverNotFound _
@@ -77,14 +77,18 @@ let find_fallback name =
   match find_opt name with
   | Some prv -> Exact prv
   | None ->
-      match String.split_on_char ',' name with
-      | shortname :: _ :: _ ->
-          begin
-            match find_opt (String.lowercase_ascii shortname) with
-            | Some prv -> Fallback prv
-            | None -> NotFound
-          end
-      | _ -> NotFound
+      (* Why3 should deal with this intermediate case *)
+      match find_opt (String.lowercase_ascii name) with
+      | Some prv -> Exact prv
+      | None ->
+          match String.split_on_char ',' name with
+          | shortname :: _ :: _ ->
+              begin
+                match find_opt (String.lowercase_ascii shortname) with
+                | Some prv -> Fallback prv
+                | None -> NotFound
+              end
+          | _ -> NotFound
 
 let print_why3 = Why3.Whyconf.prover_parseable_format
 let print_wp s =
