@@ -63,8 +63,7 @@ type t = Why3.Whyconf.prover
 let find_opt s =
   try
     let config = Lazy.force cfg in
-    let filter = Why3.Whyconf.parse_filter_prover s in
-    let filter = Why3.Whyconf.filter_prover_with_shortcut config filter in
+    let filter = Why3.Whyconf.parse_filter_prover (String.lowercase_ascii s) in
     Some ((Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover)
   with
   | Why3.Whyconf.ProverNotFound _
