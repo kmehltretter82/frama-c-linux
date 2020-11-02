@@ -901,7 +901,7 @@ int caller(int (*fp)(int)){
 }
 \end{lstlisting}
 
-generates two goals for \verb+POST+, one for call to \verb+f1+ and
+These annotations split post-conditions to the dynamic call into two sub-goals: one for call to \verb+f1+ and
 a second for the call to \verb+f2+. A last goal is generated at the call
 site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
