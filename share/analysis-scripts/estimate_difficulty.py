@@ -135,8 +135,17 @@ with open(framac_share / "compliance" / "posix_identifiers.json") as f:
     posix_headers = all_data["headers"]
 
 recursive_cycles = []
+reported_recursive_pairs = set()
 build_callgraph.compute_recursive_cycles(cg, recursive_cycles)
 for (cycle_start_loc, cycle) in recursive_cycles:
+    # Note: in larger code bases, many cycles are reported for the same final
+    # function (e.g. for the calls 'g -> g', we may have 'f -> g -> g',
+    # 'h -> g -> g', etc; to minimize this, we print just the first one.
+    # This does not prevent 3-cycle repetitions, such as 'f -> g -> f',
+    # but these are less common.
+    if cycle[-1] in reported_recursive_pairs:
+        continue
+    reported_recursive_pairs.add(cycle[-1])
     (filename, line) = cycle_start_loc
     (x, y) = cycle[0]
     pretty_cycle = f"{x} -> {y}"
