@@ -74,6 +74,11 @@ let of_logic = function
   | BuiltinLabel LoopEntry -> loopentry
   | StmtLabel s -> stmt !s
 
+let is_post = function
+  | BuiltinLabel Post -> true
+  | FormalLabel a -> a = post
+  | _ -> false
+
 let name = function FormalLabel a -> a | _ -> ""
 
 let lookup labels a =
