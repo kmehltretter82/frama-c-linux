@@ -183,20 +183,6 @@ int __gen_e_acsl_f2(int n)
     __e_acsl_assert(__gen_e_acsl_f2_13 != 0,1,"RTE","f2",
                     "division_by_zero: __gen_e_acsl_f2_13 != 0",
                     "tests/arith/functions_rec.c",10);
-    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_13 ≢ 0; */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_f2_9 * __gen_e_acsl_f2_11 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13
-          ≤ 2147483647;
-    */
     __gen_e_acsl_if_4 = (__gen_e_acsl_f2_9 * __gen_e_acsl_f2_11) / __gen_e_acsl_f2_13;
   }
   return __gen_e_acsl_if_4;
@@ -216,20 +202,6 @@ int __gen_e_acsl_f2_2(long n)
     __e_acsl_assert(__gen_e_acsl_f2_8 != 0,1,"RTE","f2_2",
                     "division_by_zero: __gen_e_acsl_f2_8 != 0",
                     "tests/arith/functions_rec.c",10);
-    /*@ assert Eva: division_by_zero: __gen_e_acsl_f2_8 ≢ 0; */
-    /*@ assert
-        Eva: signed_overflow:
-          -2147483648 ≤ __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          __gen_e_acsl_f2_4 * __gen_e_acsl_f2_6 ≤ 2147483647;
-    */
-    /*@ assert
-        Eva: signed_overflow:
-          (int)(__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8
-          ≤ 2147483647;
-    */
     __gen_e_acsl_if_3 = (__gen_e_acsl_f2_4 * __gen_e_acsl_f2_6) / __gen_e_acsl_f2_8;
   }
   return __gen_e_acsl_if_3;

@@ -16,8 +16,6 @@ int fact(int n)
   }
   tmp = __gen_e_acsl_fact(n - 1);
   ;
-  /*@ assert Eva: signed_overflow: -2147483648 ≤ n * tmp; */
-  /*@ assert Eva: signed_overflow: n * tmp ≤ 2147483647; */
   __retres = n * tmp;
   return_label: return __retres;
 }
