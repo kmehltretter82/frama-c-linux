@@ -4421,6 +4421,7 @@ and sizeOf ~loc t =
 
 and fieldBitsOffset (f : fieldinfo) : int * int =
   if  not f.fcomp.cstruct (* union *) then
+    (* All union fields start at offset 0 *)
     0, bitsSizeOf f.ftype
   else begin
     if f.foffset_in_bits = None then begin
@@ -4461,7 +4462,6 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
          | TComp (ci, _, _) -> assert (ci == f.fcomp)
          | _ -> assert false);
       let offsbits, size = fieldBitsOffset f in
-      (* All union fields start at offset 0 *)
       loopOff f.ftype size (start + offsbits) off
   in
   loopOff baset (bitsSizeOf baset) 0 off
