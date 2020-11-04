@@ -405,6 +405,30 @@ to apply the theorems. Such a strategy is \emph{not} complete in general.
 Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
 in other cases.
 
+\paragraph{Bit-Test Range} Tighten Bounds with respect to bits \\
+The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
+to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
+\textsf{Qed} engine has many simplification rules that applies to
+such patterns.
+
+The user selects an expression $\mathtt{bit\_test}(n,k)$ with $k$
+a \emph{constant} integer value greater or equal to 0 and lower than
+128. The tactic uses this test to thighten the bounds of $n$.
+
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,T &\models G \\
+\Delta,F &\models G
+\end{array}} $$
+
+with
+$$\begin{array}[t]{rlcll}
+  T \equiv & \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n & \Rightarrow 2^{k} \leq n) \\
+  F \equiv & \neg \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n < 2^{k+1} & \Rightarrow n < 2^{k})
+  \end{array}
+$$
+      
+
 \paragraph{Bitwise} Decompose equalities over $N$-bits\\
 The use selects an integer equality and a number of bits.
 Providing the two members of the equality are in range $0..2^N-1$,
@@ -421,11 +445,6 @@ where $\sigma$ is the following subsitution:
 \bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
 \right]
 \]
-
-The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
-to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
-\textsf{Qed} engine has many simplification rules that applies to
-such patterns, and the a tactic is good way to reason over bits.
 
 \paragraph{Congruence} Simplify Divisions and Products \\
 This tactic rewrites integer comparisons involving products and divisions.
