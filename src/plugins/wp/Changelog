@@ -24,6 +24,8 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2020-XX-XX] Removed option -wp-bits (now always enabled)
+
 #########################
 Plugin WP 22.0 (Titanium)
 #########################

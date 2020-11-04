@@ -544,13 +544,6 @@ module Prenex =
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
-module Bits =
-  True(struct
-    let option_name = "-wp-bits"
-    let help = "Use bit-test simplifications."
-  end)
-
-let () = Parameter_customize.set_group wp_simplifier
 module SimplifyIsCint =
   True(struct
     let option_name = "-wp-simplify-is-cint"
