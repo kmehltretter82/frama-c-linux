@@ -123,6 +123,13 @@ alternatives that include internal runtime error checking.
 always use GMP integers instead of C integral types.
 By default the GMP integers are used on as-needed basis.
 .TP
+.B --mbits=\fI<BITS>
+architecture to compile to. Valid arguments are \fI16\fP, \fI32\fP or \fI64\fP.
+Default to the architecture of the current environment.
+This option is used to select the \fBmachdep\fP when calling \fBFrama-C\fP, and
+to pass the corresponding \fB-m16\fP, \fB-m32\fP or \fB-m64\fP flag to the
+compiler.
+.TP
 .B -l, --ld-flags=\fI<FLAGS>
 pass the specified flags to the linker.
 .TP
