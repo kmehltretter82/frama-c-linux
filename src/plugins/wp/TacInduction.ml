@@ -37,14 +37,13 @@ let rec strip env p =
         ( env.hind <- p :: env.hind ; F.p_true )
       else p
 
-let process value n0 ~inf ~sup seq =
+let process value n0 seq =
 
   (* Transfrom seq into: hyps => (forall n, goal) *)
   let n = Lang.freshvar ~basename:"n" Qed.Logic.Int in
   let i = Lang.freshvar ~basename:"i" Qed.Logic.Int in
   let vn = F.e_var n in
   let vi = F.e_var i in
-  let v0 = n0 in
   let sigma = Lang.sigma () in
   F.Subst.add sigma value vn ;
   let env = { n ; sigma ; hind = [] } in
@@ -53,25 +52,19 @@ let process value n0 ~inf ~sup seq =
   let goal_i = F.p_subst_var n vi goal_n in
 
   (* Base: n = n0 *)
-  let goal_base = F.p_imply (F.p_equal vn v0) goal_n in
+  let goal_base = F.p_imply (F.p_equal vn n0) goal_n in
 
   (* Hind: n0 <= i < n *)
   let goal_sup =
-    if sup
-    then
-      let hsup = [ F.p_leq v0 vi ; F.p_lt vi vn ] in
-      let hind = F.p_forall [i] (F.p_hyps hsup goal_i) in
-      F.p_hyps [F.p_lt v0 vn; hind] goal_n
-    else F.p_leq value v0 in
+    let hsup = [ F.p_leq n0 vi ; F.p_lt vi vn ] in
+    let hind = F.p_forall [i] (F.p_hyps hsup goal_i) in
+    F.p_hyps [F.p_lt n0 vn; hind] goal_n in
 
   (* Hind: n < i <= n0 *)
   let goal_inf =
-    if inf
-    then
-      let hinf = [ F.p_lt vn vi ; F.p_leq vi v0 ] in
-      let hind = F.p_forall [i] (F.p_hyps hinf goal_i) in
-      F.p_hyps [F.p_lt vn v0; hind] goal_n
-    else F.p_leq v0 value in
+    let hinf = [ F.p_lt vn vi ; F.p_leq vi n0 ] in
+    let hind = F.p_forall [i] (F.p_hyps hinf goal_i) in
+    F.p_hyps [F.p_lt vn n0; hind] goal_n in
 
   (* All Cases *)
   List.map (fun (name,goal) -> name , (hyps,goal)) [
@@ -86,10 +79,6 @@ let process value n0 ~inf ~sup seq =
 
 let vbase,pbase = Tactical.composer ~id:"base"
     ~title:"Base" ~descr:"Value of base case" ()
-let vsup,psup = Tactical.checkbox ~id:"hsup"
-    ~title:"Sup" ~descr:"Induction over base <= n" ~default:true ()
-let vinf,pinf = Tactical.checkbox ~id:"hinf"
-    ~title:"Inf" ~descr:"Induction over n <= base" ~default:true ()
 
 class induction =
   object(self)
@@ -97,7 +86,7 @@ class induction =
         ~id:"Wp.induction"
         ~title:"Induction"
         ~descr:"Proof by integer induction"
-        ~params:[pbase;psup;pinf]
+        ~params:[pbase]
 
     method private get_base () =
       match self#get_field vbase with
@@ -113,10 +102,7 @@ class induction =
       let value = Tactical.selected s in
       if F.is_int value then
         match self#get_base () with
-        | Some base ->
-            let inf = self#get_field vinf in
-            let sup = self#get_field vsup in
-            Applicable(process value base ~inf ~sup)
+        | Some base -> Applicable(process value base)
         | None -> Not_configured
       else Not_applicable
 
