@@ -98,7 +98,13 @@ class induction =
       | _ ->
           None
 
-    method select _feedback (s : Tactical.selection) =
+    method select feedback (s : Tactical.selection) =
+      begin match self#get_field vbase with
+        | Empty ->
+            self#set_field vbase (Tactical.int 0) ;
+            feedback#update_field vbase
+        | _ -> ()
+      end ;
       let value = Tactical.selected s in
       if F.is_int value then
         match self#get_base () with
