@@ -90,7 +90,7 @@ struct
   (* Authorized written region from an assigns specification *)
   type effect = {
     e_pid : P.t ; (* Assign Property *)
-    e_kind : a_kind ; (* Requires post effects (in case of loop-assigns) *)
+    e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
     e_valid : L.sigma ; (* sigma where locations are filtered for validity *)
     e_region : L.region ; (* expected from spec *)
@@ -444,21 +444,23 @@ struct
         ainfo.a_assigns
     in match authorized_region with
     | None -> None
-    | Some region -> Some {
-        e_pid = pid ;
-        e_kind = ainfo.a_kind ;
-        e_label = from ;
-        e_valid = sigma ;
-        e_region = region ;
-        e_warn = Warning.Set.empty ;
-      }
+    | Some region ->
+        let post = match ainfo.a_kind with
+          | LoopAssigns -> true
+          | StmtAssigns -> NormAtLabels.has_postassigns ainfo.a_assigns
+        in Some {
+          e_pid = pid ;
+          e_post = post ;
+          e_label = from ;
+          e_valid = sigma ;
+          e_region = region ;
+          e_warn = Warning.Set.empty ;
+        }
 
   let cc_posteffect e vcs =
-    match e.e_kind with
-    | StmtAssigns -> vcs
-    | LoopAssigns ->
-        let vc = { empty_vc with vars = L.vars e.e_region } in
-        Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
+    if not e.e_post then vcs else
+      let vc = { empty_vc with vars = L.vars e.e_region } in
+      Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULES : adding axioms, hypotheses and goals                     --- *)
@@ -549,14 +551,13 @@ struct
              vars = xs }
          in
          let group =
-           match e.e_kind with
-           | StmtAssigns ->
-               Splitter.singleton (setup empty_vc)
-           | LoopAssigns ->
-               try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
-               with Not_found ->
-                 Wp_parameters.fatal "Missing post-effect for %a"
-                   WpPropId.pretty e.e_pid
+           if not e.e_post then
+             Splitter.singleton (setup empty_vc)
+           else
+             try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
+             with Not_found ->
+               Wp_parameters.fatal "Missing post-effect for %a"
+                 WpPropId.pretty e.e_pid
          in
          let target = match sloc with
            | None -> Gprop e.e_pid

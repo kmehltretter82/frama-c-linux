@@ -42,5 +42,5 @@ val labels_predicate : (logic_label * logic_label) list -> label_mapping
 val labels_axiom : label_mapping
 
 val preproc_annot : label_mapping -> predicate -> predicate
-
 val preproc_assigns : label_mapping -> from list -> from list
+val has_postassigns : assigns -> bool
