@@ -44,7 +44,7 @@ let process value n0 ~inf ~sup seq =
   let i = Lang.freshvar ~basename:"i" Qed.Logic.Int in
   let vn = F.e_var n in
   let vi = F.e_var i in
-  let v0 = F.e_int n0 in
+  let v0 = n0 in
   let sigma = Lang.sigma () in
   F.Subst.add sigma value vn ;
   let env = { n ; sigma ; hind = [] } in
@@ -84,7 +84,7 @@ let process value n0 ~inf ~sup seq =
 (* --- Induction Tactical                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let vbase,pbase = Tactical.spinner ~id:"base"
+let vbase,pbase = Tactical.composer ~id:"base"
     ~title:"Base" ~descr:"Value of base case" ()
 let vsup,psup = Tactical.checkbox ~id:"hsup"
     ~title:"Sup" ~descr:"Induction over base <= n" ~default:true ()
@@ -99,13 +99,25 @@ class induction =
         ~descr:"Proof by integer induction"
         ~params:[pbase;psup;pinf]
 
+    method private get_base () =
+      match self#get_field vbase with
+      | Tactical.Compose(Code(t, _, _))
+      | Inside(_, t) when Lang.F.typeof t = Lang.t_int ->
+          Some t
+      | Compose(Cint i) ->
+          Some (Lang.F.e_bigint i)
+      | _ ->
+          None
+
     method select _feedback (s : Tactical.selection) =
       let value = Tactical.selected s in
       if F.is_int value then
-        let base = self#get_field vbase in
-        let inf = self#get_field vinf in
-        let sup = self#get_field vsup in
-        Applicable(process value base ~inf ~sup)
+        match self#get_base () with
+        | Some base ->
+            let inf = self#get_field vinf in
+            let sup = self#get_field vsup in
+            Applicable(process value base ~inf ~sup)
+        | None -> Not_configured
       else Not_applicable
 
   end
