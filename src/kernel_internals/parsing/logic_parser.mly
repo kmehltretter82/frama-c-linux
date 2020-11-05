@@ -142,8 +142,7 @@
                  link the original contract with its pretty-printed version. *)
               Extlib.replace compare_pair (filter_from f2) acc
           | From ds1, From ds2 ->
-            (* we keep the two functional dependencies,
-               as they have to be proved separately. *)
+            (* we merge the two functional dependencies. *)
               Extlib.replace compare_pair (l, From (concat_deps ds1 ds2)) acc
       with Not_found -> acc @ [filter_from f2]
     in List.fold_left concat_one a1 a2
