@@ -4908,6 +4908,9 @@ module Builtin_functions =
       let size = 49
     end)
 
+(* [add_builtin ?prefix s t l b] adds the function [prefix ^ s] to the list of
+   built-ins. [t] is the return type and [l] is the list of parameter types.
+   [b] is true if the built-in is variadic, false otherwise. *)
 let add_builtin ?(prefix="__builtin_") s t l b =
   Builtin_functions.add (prefix ^ s) (t, l, b)
 
@@ -4915,6 +4918,43 @@ let () = registerAttribute "FC_BUILTIN" (AttrName true)
 
 (* Initialize the builtin functions after the machine has been initialized. *)
 let initGccBuiltins () : unit =
+  (* Complex types are unsupported so the following built-ins can't be added :
+     - cabs, cabsf, cabsh
+     - cacos, cacosf, cacosl, cacosh, cacoshf, cacoshl
+     - carg, cargf, cargl
+     - casin, casinf, casinl, casinh, casinhf, casinhl
+     - catan, catanf, catanl, catanh, catanhf, catanhl
+     - ccos, ccosf, ccosl, ccosh, ccoshf, ccoshl
+     - cexp, cexpf, cexpl
+     - cimag, cimagf, cimagl
+     - clog, clogf, clogl
+     - conj, conjf, conjl
+     - cpow, cpowf, cpowl
+     - cproj, cprojf, cprojl
+     - creal, crealf, creall
+     - csin, csinf, csinl, csinh, csinhf, csinhl
+     - csqrt, csqrtf, csqrtl
+     - ctan, ctanf, ctanl, ctanh, ctanhf, ctanhl
+  *)
+
+  (* [wint_t] isn't specified in [theMachine] so the following built-ins that
+     use this type can't be added :
+     - iswalnum
+     - iswalpha
+     - iswblank
+     - iswcntrl
+     - iswdigit
+     - iswgraph
+     - iswlower
+     - iswprint
+     - iswpunct
+     - iswspace
+     - iswupper
+     - iswxdigit
+     - towlower
+     - towupper
+  *)
+
   let sizeType = theMachine.upointType in
   let add = add_builtin in
   add "__fprintf_chk"
@@ -4967,19 +5007,41 @@ let initGccBuiltins () : unit =
     [ charPtrType; intType; sizeType; charConstPtrType; TBuiltin_va_list [] ]
     false;
 
+  add "_Exit" voidType [ intType ] false;
+  add "exit" voidType [ intType ] false;
+
   add "alloca" voidPtrType [ sizeType ] false;
+
+  add "malloc" voidPtrType [ sizeType ] false;
+  add "calloc" voidPtrType [ sizeType; sizeType ] false;
+  add "realloc" voidPtrType [ voidPtrType; sizeType ] false;
+  add "free" voidType [ voidPtrType ] false;
+
+  add "abs" intType [ intType ] false;
+  add "labs" longType [ longType ] false;
+  add "llabs" longLongType [ longLongType] false;
+  (* Can't add imaxabs because it takes intmax_t as parameter *)
 
   add "acos" doubleType [ doubleType ] false;
   add "acosf" floatType [ floatType ] false;
   add "acosl" longDoubleType [ longDoubleType ] false;
+  add "acosh" doubleType [ doubleType ] false;
+  add "acoshf" floatType [ floatType ] false;
+  add "acoshl" longDoubleType [ longDoubleType ] false;
 
   add "asin" doubleType [ doubleType ] false;
   add "asinf" floatType [ floatType ] false;
   add "asinl" longDoubleType [ longDoubleType ] false;
+  add "asinh" doubleType [ doubleType ] false;
+  add "asinhf" floatType [ floatType ] false;
+  add "asinhl" longDoubleType [ longDoubleType ] false;
 
   add "atan" doubleType [ doubleType ] false;
   add "atanf" floatType [ floatType ] false;
   add "atanl" longDoubleType [ longDoubleType ] false;
+  add "atanh" doubleType [ doubleType ] false;
+  add "atanhf" floatType [ floatType ] false;
+  add "atanhl" longDoubleType [ longDoubleType ] false;
 
   add "atan2" doubleType [ doubleType; doubleType ] false;
   add "atan2f" floatType [ floatType; floatType ] false;
@@ -4995,6 +5057,10 @@ let initGccBuiltins () : unit =
   let uint64t = uint64_t () in
   add "bswap64" uint64t [uint64t] false;
 
+  add "cbrt" doubleType [ doubleType ] false;
+  add "cbrtf" floatType [ floatType ] false;
+  add "cbrtl" longDoubleType [ longDoubleType ] false;
+
   add "ceil" doubleType [ doubleType ] false;
   add "ceilf" floatType [ floatType ] false;
   add "ceill" longDoubleType [ longDoubleType ] false;
@@ -5009,15 +5075,39 @@ let initGccBuiltins () : unit =
 
   add "constant_p" intType [ intType ] false;
 
+  add "copysign" doubleType [ doubleType; doubleType ] false;
+  add "copysignf" floatType [ floatType; floatType ] false;
+  add "copysignl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
+  add "erfc" doubleType [ doubleType ] false;
+  add "erfcf" floatType [ floatType ] false;
+  add "erfcl" longDoubleType [ longDoubleType ] false;
+
+  add "erf" doubleType [ doubleType ] false;
+  add "erff" floatType [ floatType ] false;
+  add "erfl" longDoubleType [ longDoubleType ] false;
+
   add "exp" doubleType [ doubleType ] false;
   add "expf" floatType [ floatType ] false;
   add "expl" longDoubleType [ longDoubleType ] false;
+
+  add "exp2" doubleType [ doubleType ] false;
+  add "exp2f" floatType [ floatType ] false;
+  add "exp2l" longDoubleType [ longDoubleType ] false;
+
+  add "expm1" doubleType [ doubleType ] false;
+  add "expm1f" floatType [ floatType ] false;
+  add "expm1l" longDoubleType [ longDoubleType ] false;
 
   add "expect" longType [ longType; longType ] false;
 
   add "fabs" doubleType [ doubleType ] false;
   add "fabsf" floatType [ floatType ] false;
   add "fabsl" longDoubleType [ longDoubleType ] false;
+
+  add "fdim" doubleType [ doubleType; doubleType ] false;
+  add "fdimf" floatType [ floatType; floatType ] false;
+  add "fdiml" longDoubleType [ longDoubleType; longDoubleType ] false;
 
   add "ffs" intType [ uintType ] false;
   add "ffsl" intType [ ulongType ] false;
@@ -5028,19 +5118,51 @@ let initGccBuiltins () : unit =
   add "floorf" floatType [ floatType ] false;
   add "floorl" longDoubleType [ longDoubleType ] false;
 
+  add "fma" doubleType [ doubleType; doubleType; doubleType ] false;
+  add "fmaf" floatType [ floatType; floatType; floatType ] false;
+  add "fmal"
+    longDoubleType [ longDoubleType; longDoubleType; longDoubleType ] false;
+
+  add "fmax" doubleType [ doubleType; doubleType ] false;
+  add "fmaxf" floatType [ floatType; floatType ] false;
+  add "fmaxl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
+  add "fmin" doubleType [ doubleType; doubleType ] false;
+  add "fminf" floatType [ floatType; floatType ] false;
+  add "fminl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
   add "huge_val" doubleType [] false;
   add "huge_valf" floatType [] false;
   add "huge_vall" longDoubleType [] false;
+
+  add "hypot" doubleType [ doubleType; doubleType ] false;
+  add "hypotf" floatType [ floatType; floatType ] false;
+  add "hypotl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
   add "ia32_lfence" voidType [] false;
   add "ia32_mfence" voidType [] false;
   add "ia32_sfence" voidType [] false;
 
+  add "ilogb" doubleType [ doubleType ] false;
+  add "ilogbf" floatType [ floatType ] false;
+  add "ilogbl" longDoubleType [ longDoubleType ] false;
+
   add "inf" doubleType [] false;
   add "inff" floatType [] false;
   add "infl" longDoubleType [] false;
-  add "memcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "mempcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
-  add "memset" voidPtrType [ voidPtrType; intType; intType ] false;
+
+  add "isblank" intType [ intType ] false;
+  add "isalnum" intType [ intType ] false;
+  add "isalpha" intType [ intType ] false;
+  add "iscntrl" intType [ intType ] false;
+  add "isdigit" intType [ intType ] false;
+  add "isgraph" intType [ intType ] false;
+  add "islower" intType [ intType ] false;
+  add "isprint" intType [ intType ] false;
+  add "ispunct" intType [ intType ] false;
+  add "isspace" intType [ intType ] false;
+  add "isupper" intType [ intType ] false;
+  add "isxdigit" intType [ intType ] false;
 
   add "fmod" doubleType [ doubleType ] false;
   add "fmodf" floatType [ floatType ] false;
@@ -5054,6 +5176,18 @@ let initGccBuiltins () : unit =
   add "ldexpf" floatType [ floatType; intType  ] false;
   add "ldexpl" longDoubleType [ longDoubleType; intType  ] false;
 
+  add "lgamma" doubleType [ doubleType ] false;
+  add "lgammaf" floatType [ floatType ] false;
+  add "lgammal" longDoubleType [ longDoubleType ] false;
+
+  add "llrint" longLongType [ doubleType ] false;
+  add "llrintf" longLongType [ floatType ] false;
+  add "llrintl" longLongType [ longDoubleType ] false;
+
+  add "llround" longLongType [ doubleType ] false;
+  add "llroundf" longLongType [ floatType ] false;
+  add "llroundl" longLongType [ longDoubleType ] false;
+
   add "log" doubleType [ doubleType ] false;
   add "logf" floatType [ floatType ] false;
   add "logl" longDoubleType [ longDoubleType ] false;
@@ -5062,6 +5196,33 @@ let initGccBuiltins () : unit =
   add "log10f" floatType [ floatType ] false;
   add "log10l" longDoubleType [ longDoubleType ] false;
 
+  add "log1p" doubleType [ doubleType ] false;
+  add "log1pf" floatType [ floatType ] false;
+  add "log1pl" longDoubleType [ longDoubleType ] false;
+
+  add "log2" doubleType [ doubleType ] false;
+  add "log2f" floatType [ floatType ] false;
+  add "log2l" longDoubleType [ longDoubleType ] false;
+
+  add "logb" doubleType [ doubleType ] false;
+  add "logbf" floatType [ floatType ] false;
+  add "logbl" longDoubleType [ longDoubleType ] false;
+
+  add "lrint" longType [ doubleType ] false;
+  add "lrintf" longType [ floatType ] false;
+  add "lrintl" longType [ longDoubleType ] false;
+
+  add "lround" longType [ doubleType ] false;
+  add "lroundf" longType [ floatType ] false;
+  add "lroundl" longType [ longDoubleType ] false;
+
+  add "memchr" voidPtrType [ voidConstPtrType; intType; sizeType ] false;
+  add "memcmp" intType [ voidConstPtrType; voidConstPtrType; sizeType ] false;
+  add "memcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
+  add "mempcpy" voidPtrType [ voidPtrType; voidConstPtrType; sizeType ] false;
+  add "memset" voidPtrType [ voidPtrType; intType; sizeType ] false;
+
+  add "modf" doubleType [ doubleType; TPtr(doubleType,[]) ] false;
   add "modff" floatType [ floatType; TPtr(floatType,[]) ] false;
   add "modfl"
     longDoubleType [ longDoubleType; TPtr(longDoubleType, []) ] false;
@@ -5072,18 +5233,96 @@ let initGccBuiltins () : unit =
   add "nans" doubleType [ charConstPtrType ] false;
   add "nansf" floatType [ charConstPtrType ] false;
   add "nansl" longDoubleType [ charConstPtrType ] false;
+
+  add "nearbyint" doubleType [ doubleType ] false;
+  add "nearbyintf" floatType [ floatType ] false;
+  add "nearbyintl" longDoubleType [ longDoubleType ] false;
+
+  add "nextafter" doubleType [ doubleType; doubleType ] false;
+  add "nextafterf" floatType [ floatType; floatType ] false;
+  add "nextafterl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
+  add "nexttoward" doubleType [ doubleType; longDoubleType ] false;
+  add "nexttowardf" floatType [ floatType; longDoubleType ] false;
+  add "nexttowardl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
   add "object_size" sizeType [ voidPtrType; intType ] false;
 
   add "parity" intType [ uintType ] false;
   add "parityl" intType [ ulongType ] false;
   add "parityll" intType [ ulongLongType ] false;
 
+  add "pow" doubleType [ doubleType; doubleType ] false;
+  add "powf" floatType [ floatType; floatType ] false;
+  add "powl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
   add "powi" doubleType [ doubleType; intType ] false;
   add "powif" floatType [ floatType; intType ] false;
   add "powil" longDoubleType [ longDoubleType; intType ] false;
+
   add "prefetch" voidType [ voidConstPtrType ] true;
+
+  add "printf" intType [ charConstPtrType ] true;
+  add "vprintf" intType [ charConstPtrType; TBuiltin_va_list [] ] false;
+  (* For [fprintf] and [vfprintf] the first argument is really FILE*, not void*,
+     but we don't want to build in the definition for FILE. *)
+  add "fprintf" intType [ voidPtrType; charConstPtrType ] true;
+  add "vfprintf"
+    intType [ voidPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
+  add "sprintf" intType [ charPtrType; charConstPtrType ] true;
+  add "vsprintf"
+    intType [ charPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
+  add "snprintf" intType [ charPtrType; sizeType; charConstPtrType ] true;
+  add "vsnprintf"
+    intType
+    [ charPtrType; sizeType; charConstPtrType; TBuiltin_va_list [] ]
+    false;
+
+  add "putchar" intType [ intType ] false;
+
+  add "puts" intType [ charConstPtrType ] false;
+  (* The second argument of [fputs] is really FILE*, not void*, but we
+     don't want to build in the definition for FILE. *)
+  add "fputs" intType [ charConstPtrType; voidPtrType ] false;
+
+  add "remainder" doubleType [ doubleType; doubleType ] false;
+  add "remainderf" floatType [ floatType; floatType ] false;
+  add "remainderl" longDoubleType [ longDoubleType; longDoubleType ] false;
+
+  add "remquo" doubleType [ doubleType; doubleType; intPtrType ] false;
+  add "remquof" floatType [ floatType; floatType; intPtrType ] false;
+  add "remquol"
+    longDoubleType [ longDoubleType; longDoubleType; intPtrType ] false;
+
   add "return" voidType [ voidConstPtrType ] false;
   add "return_address" voidPtrType [ uintType ] false;
+
+  add "rint" doubleType [ doubleType ] false;
+  add "rintf" floatType [ floatType ] false;
+  add "rintl" longDoubleType [ longDoubleType ] false;
+
+  add "round" doubleType [ doubleType ] false;
+  add "roundf" floatType [ floatType ] false;
+  add "roundl" longDoubleType [ longDoubleType ] false;
+
+  add "scalbln" doubleType [ doubleType; longType ] false;
+  add "scalblnf" floatType [ floatType; longType ] false;
+  add "scalblnl" longDoubleType [ longDoubleType; longType ] false;
+
+  add "scalbn" doubleType [ doubleType; intType ] false;
+  add "scalbnf" floatType [ floatType; intType ] false;
+  add "scalbnl" longDoubleType [ longDoubleType; intType ] false;
+
+  add "scanf" intType [ charConstPtrType ] true;
+  add "vscanf" intType [ charConstPtrType; TBuiltin_va_list [] ] false;
+  (* For [fscanf] and [vfscanf] the first argument is really FILE*, not void*,
+     but we don't want to build in the definition for FILE. *)
+  add "fscanf" intType [ voidPtrType; charConstPtrType ] true;
+  add "vfscanf"
+    intType [ voidPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
+  add "sscanf" intType [ charConstPtrType; charConstPtrType ] true;
+  add "vsscanf"
+    intType [ charConstPtrType; charConstPtrType; TBuiltin_va_list [] ] false;
 
   add "sin" doubleType [ doubleType ] false;
   add "sinf" floatType [ floatType ] false;
@@ -5098,15 +5337,19 @@ let initGccBuiltins () : unit =
   add "sqrtl" longDoubleType [ longDoubleType ] false;
 
   add "stpcpy" charPtrType [ charPtrType; charConstPtrType ] false;
+  add "strcat" charPtrType [ charPtrType; charConstPtrType ] false;
   add "strchr" charPtrType [ charPtrType; intType ] false;
   add "strcmp" intType [ charConstPtrType; charConstPtrType ] false;
   add "strcpy" charPtrType [ charPtrType; charConstPtrType ] false;
   add "strcspn" sizeType [ charConstPtrType; charConstPtrType ] false;
+  add "strlen" sizeType [ charConstPtrType ] false;
   add "strncat" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
   add "strncmp" intType [ charConstPtrType; charConstPtrType; sizeType ] false;
   add "strncpy" charPtrType [ charPtrType; charConstPtrType; sizeType ] false;
   add "strspn" sizeType [ charConstPtrType; charConstPtrType ] false;
   add "strpbrk" charPtrType [ charConstPtrType; charConstPtrType ] false;
+  add "strrchr" charPtrType [ charConstPtrType; intType ] false;
+  add "strstr" charPtrType [ charConstPtrType; charConstPtrType ] false;
   (* When we parse builtin_types_compatible_p, we change its interface *)
   add "types_compatible_p"
     intType
@@ -5120,6 +5363,17 @@ let initGccBuiltins () : unit =
   add "tanh" doubleType [ doubleType ] false;
   add "tanhf" floatType [ floatType ] false;
   add "tanhl" longDoubleType [ longDoubleType ] false;
+
+  add "tgamma" doubleType [ doubleType ] false;
+  add "tgammaf" floatType [ floatType ] false;
+  add "tgammal" longDoubleType [ longDoubleType ] false;
+
+  add "tolower" intType [ intType ] false;
+  add "toupper" intType [ intType ] false;
+
+  add "trunc" doubleType [ doubleType ] false;
+  add "truncf" floatType [ floatType ] false;
+  add "truncl" longDoubleType [ longDoubleType ] false;
 
   add "unreachable" voidType [ ] false;
 
