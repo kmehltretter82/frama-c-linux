@@ -411,7 +411,7 @@ to apply the theorems. Such a strategy is \emph{not} complete in general.
 Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
 in other cases.
 
-\paragraph{Bit-Test Range} Tighten Bounds with respect to bits \\
+\paragraph{Bit-Test Range} Tighten bounds with respect to bits \\
 The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
 to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
 \textsf{Qed} engine has many simplification rules that applies to
