@@ -124,7 +124,8 @@
     let compare_pair (l1,_) (l2,_) = is_same_lexpr l1 l2 in
     (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
-    let concat_one acc (l,d2 as f2)  =
+    let concat_one acc (_,d2 as f2)  =
+      let f2 = filter_from f2 in
       try
         let (_,d1) = List.find (compare_pair f2) acc
         in
@@ -140,11 +141,12 @@
                  the location at its old place in the list. This ensures
                  that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
-              Extlib.replace compare_pair (filter_from f2) acc
-          | From ds1, From ds2 ->
-            (* we merge the two functional dependencies. *)
-              Extlib.replace compare_pair (l, From (concat_deps ds1 ds2)) acc
-      with Not_found -> acc @ [filter_from f2]
+              Extlib.replace compare_pair f2 acc
+          | From _, From _ ->
+            (* we keep the two functional dependencies,
+               as they have to be proved separately. *)
+            acc @ [f2]
+      with Not_found -> acc @ [f2]
     in List.fold_left concat_one a1 a2
 
   let concat_allocation fa1 fa2 =
