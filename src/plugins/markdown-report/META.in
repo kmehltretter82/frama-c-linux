@@ -1,0 +1,7 @@
+description = "Frama-C Markdown_report plug-in"
+version = "@VERSION@"
+requires = "frama-c.kernel ppx_deriving ppx_deriving_yojson yojson"
+archive(byte) = "top/Markdown_report.cmo"
+archive(native) = "top/Markdown_report.cmx"
+plugin(native) = "top/Markdown_report.cmxs"
+plugin(byte) = "top/Markdown_report.cmo"

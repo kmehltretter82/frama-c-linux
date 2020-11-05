@@ -32,6 +32,7 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_MDR@
 PLUGIN_NAME:=Markdown_report
+PLUGIN_HAS_META:=yes
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Markdown_report.mli
 PLUGIN_CMO:=\
   sarif mdr_params parse_remarks \
@@ -53,6 +54,14 @@ $(Markdown_report_DIR)/Markdown_report.mli: \
 	echo "module Md_gen: sig" >> $@
 	cat $(Markdown_report_DIR)/md_gen.mli >> $@
 	echo "end" >> $@
+
+VERSION:=$(shell $(CAT) $(FRAMAC_SRC)/VERSION)
+
+$(Markdown_report_DIR)/META: $(Markdown_report_DIR)/META.in $(FRAMAC_SRC)/VERSION
+	$(PRINT_MAKING) $@
+	$(RM) $@
+	$(SED) -e 's|@VERSION@|$(VERSION)|' $< > $@
+	$(CHMOD_RO) $@
 
 ifeq ("$(FRAMAC_INTERNAL)","yes")
 CONFIG_STATUS_DIR=$(FRAMAC_SRC)
