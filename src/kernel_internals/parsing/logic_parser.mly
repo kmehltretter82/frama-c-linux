@@ -151,7 +151,7 @@
       | Writes [], _  | Writes _, [] ->
         raise (
           Not_well_formed (loc(),"Mixing \\nothing and a real location"))
-      | Writes a1, a2 -> Writes (concat_froms a2 a1)
+      | Writes a1, a2 -> Writes (concat_froms (concat_froms [] a2) a1)
 
   let concat_loop_assigns_allocation annots bhvs2 a2 fa2=
     (* NB: this is supposed to merge assigns related to named behaviors, in
