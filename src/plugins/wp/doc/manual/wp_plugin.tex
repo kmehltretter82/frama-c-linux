@@ -256,6 +256,8 @@ This mode replays the automated proofs and the interactive ones, re-running Alt-
 
 \newcommand{\TACTIC}[2]{#1\quad\quad\triangleright\quad\quad#2}
 
+\subsubsection{General}
+
 \paragraph{Absurd} Contradict a Hypothesis\\
 The user can select a hypothesis $H$, and change the goal to $\neg H$:
 
@@ -303,6 +305,9 @@ $$\TACTIC{\Delta\models\,G}{%
 \Delta,\neg C \models G
 \end{array}} $$
 
+\paragraph{Definition} Unfold predicate and logic function definition\\
+The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced with its definition, when available.
+
 \paragraph{Filter} Erase Hypotheses \\
 The tactic is always applicable. It removes hypotheses from the goal on a variable used basis. When variables are compounds (record and arrays) a finer heuristics is used to detect which parts of the variable is relevant. A transitive closure of dependencies is also used. However, it is always possible that too many hypotheses are removed.
 
@@ -323,22 +328,11 @@ $$\TACTIC{\Delta,\,\forall x\, P(x)\models G}{\Delta,P(n)\ldots P(m)\models G}$$
 When instantiating a goal with an expression $e$:
 $$\TACTIC{\Delta\models \exists x\,G(x)}{\Delta\models G(e)}$$
 
-\paragraph{Lemma} Search \& Instantiate Lemma\\
-The user start by selecting a term in the goal. Then, the search button in the tactic panel will display a list of lemma related to the term. Then, he can instantiate the parameters of the lemma, like with the Instance tactic.
-
 \paragraph{Intuition} Decompose with Conjunctive/Disjunctive Normal Form\\
 The user can select a hypothesis or a goal with nested conjunctions and disjunctions. The tactics then computes the conjunctive or disjunctive normal form of the selection and split the goal accordingly.
 
-\paragraph{Range} Enumerate a range of values for an integer term\\
-The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
-$$\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,e<a &\models G \\
-\Delta,e=a &\models G \\
-&\vdots \\
-\Delta,e=b &\models G \\
-\Delta,e>b &\models G
-\end{array}} $$
+\paragraph{Lemma} Search \& Instantiate Lemma\\
+The user start by selecting a term in the goal. Then, the search button in the tactic panel will display a list of lemma related to the term. Then, he can instantiate the parameters of the lemma, like with the Instance tactic.
 
 \paragraph{Rewrite} Replace Terms\\
 This tactic uses an equality in a hypothesis to replace each occurrence of term by another one.
@@ -384,49 +378,13 @@ Finally, when the user select a arithmetic comparison over $a$ and $b$, the tact
 \Delta,a>b&\models G
 \end{array}} \]
 
-\paragraph{Definition} Unfold predicate and logic function definition\\
-The user simply select a term $f(e_1,\ldots,e_n)$ or a predicate $P(e_1,\ldots,e_n)$ which is replaced by its definition, when available.
+\paragraph{Validity} Unfold validity and range definitions\\
+The user selects a validity expression (\lstinline{valid_rd},
+\lstinline{valid_rw}, \lstinline{invalid} or \lstinline{included}).
+The expression is unfolded to a \textsf{Qed} term.
 
-\paragraph{Bitwise} Decompose equalities over $N$-bits\\
-The use selects an integer equality and a number of bits.
-Providing the two members of the equality are in range $0..2^N-1$,
-the equality is decomposed into $N$ bit-tests equalities:
-\[\TACTIC{\Delta\models G}{%
-\begin{array}[t]{rcl}
-\Delta\phantom{)} &\models & 0 \leq a,b < 2^N \\
-\sigma(\Delta) & \models & \sigma(G)
-\end{array}
-}\]
-where $\sigma$ is the following subsitution:
-\[ \sigma \equiv
-\left[ a=b \quad \leftarrow
-\bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
-\right]
-\]
 
-The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
-to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
-\textsf{Qed} engine has many simplification rules that applies to
-such patterns, and the a tactic is good way to reason over bits.
-
-\paragraph{Shift} Transform logical shifts into arithmetics\\
-For positive integers, logical shifts such as \lstinline{a << k}
-and \lstinline{a >> k} where \lstinline$k$ is a constant can be interpreted into a multiplication or a division by $2^k$.
-
-When selecting a logical-shift, the tactic performs:
-\[\TACTIC{\Delta\models G}{%
-\begin{array}[t]{rcl}
-\Delta\phantom{)} &\models& 0 \leq a \\
-\sigma(\Delta) &\models& \sigma(G)
-\end{array}
-}\]
-where:
-\begin{tabular}[t]{ll}
-$\sigma = [ \mathtt{lsl}(a,k) \leftarrow a * 2^k ]$ &
-for left-shift, \\
-$\sigma = [ \mathtt{lsr}(a,k) \leftarrow a / 2^k ]$ &
-for right-shifts.
-\end{tabular}
+\subsubsection{Over integers}
 
 \paragraph{BitRange} Range of logical bitwise operators \\
 This tactical applies the two following lemmas to the current goal.
@@ -453,6 +411,47 @@ to apply the theorems. Such a strategy is \emph{not} complete in general.
 Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
 in other cases.
 
+\paragraph{Bit-Test Range} Tighten bounds with respect to bits \\
+The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
+to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
+\textsf{Qed} engine has many simplification rules that applies to
+such patterns.
+
+The user selects an expression $\mathtt{bit\_test}(n,k)$ with $k$
+a \emph{constant} integer value greater or equal to 0 and lower than
+128. The tactic uses this test to thighten the bounds of $n$.
+
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,T &\models G \\
+\Delta,F &\models G
+\end{array}} $$
+
+with
+$$\begin{array}[t]{rlcll}
+  T \equiv & \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n & \Rightarrow 2^{k} \leq n) \\
+  F \equiv & \neg \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n < 2^{k+1} & \Rightarrow n < 2^{k})
+  \end{array}
+$$
+      
+
+\paragraph{Bitwise} Decompose equalities over $N$-bits\\
+The use selects an integer equality and a number of bits.
+Providing the two members of the equality are in range $0..2^N-1$,
+the equality is decomposed into $N$ bit-tests equalities:
+\[\TACTIC{\Delta\models G}{%
+\begin{array}[t]{rcl}
+\Delta\phantom{)} &\models & 0 \leq a,b < 2^N \\
+\sigma(\Delta) & \models & \sigma(G)
+\end{array}
+}\]
+where $\sigma$ is the following subsitution:
+\[ \sigma \equiv
+\left[ a=b \quad \leftarrow
+\bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
+\right]
+\]
+
 \paragraph{Congruence} Simplify Divisions and Products \\
 This tactic rewrites integer comparisons involving products and divisions.
 The tactic applies one of the following theorems to the current goal.
@@ -471,7 +470,7 @@ n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
 \]
 
 \paragraph{Overflow} Integer Conversions \\
-This tactic rewrites machine integer conversions by identify,
+This tactic rewrites machine integer conversions by identity,
 providing the converted value is in available range. The tactic applies on expression
 with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer name,
 \emph{eg.} \texttt{to\_uint32}.
@@ -484,6 +483,36 @@ with pattern $\mathtt{to\_iota(e)}$ where \texttt{iota} is a a machine-integer n
 }\]
 where $\sigma = [ \mathtt{to\_iota}(e) \mapsto e ]$ and $[a..b]$ is the range
 of the \texttt{iota} integer domain.
+
+\paragraph{Range} Enumerate a range of values for an integer term\\
+The user select any integer expression $e$ in the proof, and a range of numerical values $a\ldots b$. The proof goes by case for each $e=a\ldots e=b$, plus the side cases $e<a$ and $e>b$:
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,e<a &\models G \\
+\Delta,e=a &\models G \\
+&\vdots \\
+\Delta,e=b &\models G \\
+\Delta,e>b &\models G
+\end{array}} $$
+
+\paragraph{Shift} Transform logical shifts into arithmetics\\
+For positive integers, logical shifts such as \lstinline{a << k}
+and \lstinline{a >> k} where \lstinline$k$ is a constant can be interpreted into a multiplication or a division by $2^k$.
+
+When selecting a logical-shift, the tactic performs:
+\[\TACTIC{\Delta\models G}{%
+\begin{array}[t]{rcl}
+\Delta\phantom{)} &\models& 0 \leq a \\
+\sigma(\Delta) &\models& \sigma(G)
+\end{array}
+}\]
+where:
+\begin{tabular}[t]{ll}
+$\sigma = [ \mathtt{lsl}(a,k) \leftarrow a * 2^k ]$ &
+for left-shift, \\
+$\sigma = [ \mathtt{lsr}(a,k) \leftarrow a / 2^k ]$ &
+for right-shifts.
+\end{tabular}
 
 \subsection{Strategies}
 
