@@ -188,8 +188,9 @@ the separation and validity hypotheses associated to the choice that
 it make of dispatching each pointer and variable either to the
 \lstinline{Hoare} or to the model $\cal{M}$ used for the heap.
 
-Thus, in addition to user-defined function \lstinline{requires}, WP
-also states as \lstinline{requires} that:
+Consequently, in addition to user-defined function \lstinline{requires},
+WP also assumes, and thus states as \lstinline{requires} for the function
+caller, that:
 
 \begin{itemize}
 \item \lstinline{Hoare} variables are separated from each other,
@@ -203,10 +204,10 @@ also states as \lstinline{requires} that:
 Furthermore, the function must ensure that:
 
 \begin{itemize}
-\item locations assigned via a pointer (including returned value when
+\item locations assigned via a pointer (including the returned value when
   it is a pointer) are separated from \lstinline{Hoare} variables whose address
   is not taken by the function (including via its contract),
-\item pointers assigned by the function (including returned value when
+\item pointers assigned by the function (including the returned value when
   it is a pointer) are separated from function parameters and \lstinline{Hoare}
   variables whose address is not taken by the function (including via
   its contract).
@@ -216,9 +217,9 @@ In order to precisely generate these hypotheses, WP needs precise
 \lstinline{assigns} specification. In particular each function under
 verification and all its callees needs an \lstinline{assigns} specification.
 Furthermore, if the function assigns or returns a pointer, WP needs
-a correct \lstinline{\from} specification. If the specification is
-incomplete, a warning \lstinline{wp:pedantic-assigns} is triggered.
-Note that WP does not verify that the \lstinline{\from} is correct.
+a correct \lstinline{\from} specification for those pointers. If the
+specification is incomplete, a warning \lstinline{wp:pedantic-assigns} is
+triggered. Note that WP does not verify that the \lstinline{\from} is correct.
 
 The hypotheses are displayed when the option
 \lstinline{-wp-warn-memory-model} is enable (it is enabled by default).
