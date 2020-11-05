@@ -446,14 +446,17 @@ n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
 
 \paragraph{Induction} Start a proof by integer induction \\
 The user select any integer expression $e$ in the proof and a base value $b$ (which defaults to
-0). The tactic generates a proof by strong (integer) induction on $e$, that is, the base case
-$e = b$ and then the cases $e < b$ and $b < e$. Formally:
+0). The tactic generates a proof by induction on $e$, that is, the base case
+$e = b$ and then the cases $e < b$ and $b < e$. Formally, the goal
+$\Delta\models\,G$ is first generalized into $\Delta',P(e)\models\,Q(e)$. Then
+we proceed by strong (integer) induction over $n$ for
+$G(n) \equiv P(n)\models\,Q(n)$:
 
-\[\TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{llll}
-\Delta, & G[e \leftarrow n], & n = b & \models G[e \leftarrow n] \\
-\Delta, & G[e \leftarrow i], & b \leq i < n & \models G[e \leftarrow n] \\
-\Delta, & G[e \leftarrow i], & n < i \leq b & \models G[e \leftarrow n]
+\[\TACTIC{\Delta\models\,G(n)}{%
+\begin{array}[t]{lll}
+\Delta', & n = b & \models G(n) \\
+\Delta', G(k), & b \leq i < n & \models G(n) \\
+\Delta', G(k), & n < i \leq b & \models G(n)
 \end{array}} \]
 
 \paragraph{Overflow} Integer Conversions \\
