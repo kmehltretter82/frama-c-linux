@@ -12,9 +12,9 @@
   signed overflow. assert -2147483648 ≤ uninit - 1;
 [eva] tests/pdg/simple_intra_slice.c:98: starting to merge loop iterations
 [eva:alarm] tests/pdg/simple_intra_slice.c:99: Warning: 
-  signed overflow. assert Unknown + 1 ≤ 2147483647;
-[eva:alarm] tests/pdg/simple_intra_slice.c:99: Warning: 
   signed overflow. assert -2147483648 ≤ Unknown - 1;
+[eva:alarm] tests/pdg/simple_intra_slice.c:99: Warning: 
+  signed overflow. assert Unknown + 1 ≤ 2147483647;
 [eva:alarm] tests/pdg/simple_intra_slice.c:101: Warning: 
   signed overflow. assert -2147483648 ≤ uninit2 - 1;
 [eva] tests/pdg/simple_intra_slice.c:100: starting to merge loop iterations
