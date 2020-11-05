@@ -455,7 +455,7 @@ $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 \[\TACTIC{\Delta\models\,G(n)}{%
 \begin{array}[t]{lll}
 \Delta', & n = b & \models G(n) \\
-\Delta', G(k), & b \leq i < n & \models G(n) \\
+\Delta',\; \forall i,\, b \leq i < n \Longrightarrow G(i) \;& \models G(n) \\
 \Delta', G(k), & n < i \leq b & \models G(n)
 \end{array}} \]
 
