@@ -251,27 +251,42 @@ c. Consolidating the Bench.
 
 This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every \textsf{WP} goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
 
-\clearpage
-\subsection{Available Tactics}
+\subsection{Strategies}
+
+Strategies are heuristics that generate a prioritized bunch of tactics to be tried on the current goal.
+Few built-in strategies are provided by the \textsf{WP} plug-in ; however, the user can extends the proof editor with
+custom ones, as explained in section~\ref{wp-custom-tactics} below.
+
+To run strategies, the interactive proof editor provide a single button \texttt{Strategies} in the tactic panel.
+Configure the heuristics you want to include in your try, then click the button. The generated with highest priority is immediately applied. The proof summary now display \texttt{backtrack} buttons revealing proof nodes where alternative tactics are available. You can use those backtracking button to cycle over the generated tactics.
+
+Of course, strategies are meant to be used multiple times, in sequence. Recall that strategies apply highest priority tactic first, on the current goal. When using strategies several times, you shall see several \texttt{backtrack}ing buttons in your proof script. You backtrack from any point at any time.
+
+You shall also alternate strategies \emph{and} manually triggered tactics. Though, strategies are only used to
+\emph{infer} or \emph{suggest} interesting tactics to the user. Once your are finished with your proved, only the tactics are saved in the script, not the strategies used to find them. Hence, replaying a script generated with strategies would not involve backtracking any more. The script will directly replay your chosen alternatives.
+
+It is also possible to call strategies from the command line, with option \texttt{-wp-auto}. The strategies are tried up to some depth, and while a limited number of pending goals
+remains unproved by \textsf{Qed} or the selected provers. More precisely:
+\begin{description}
+\item[\tt -wp-auto s,...] applies strategies \texttt{s,...} recursively to unproved goals.
+\item[\tt -wp-auto-depth <$n$>] limit recursive application of strategies to depth $n$ (default is 5).
+\item[\tt -wp-auto-width <$n$>] limit application of strategies when there is less than $n$ pending goals (default is 10).
+\item[\tt -wp-auto-backtrack <$n$>] when the first tried strategies do not close a branch, allows for backtracking
+  on $n$ alternative strategies. Backtracking is performed on goals which are closed to the root proof obligation, hence
+  performing a kind of width-first search strategy, which tends to be more efficient in practice.
+  Backtracking is deactivated by default ($n=0$) and only used when \verb+-wp-auto+ is set.
+\end{description}
+
+The name of registered strategies is printed on console by using \texttt{-wp-auto '?'}. Custom strategies can be loaded by plug-ins, see below.
 
 \newcommand{\TACTIC}[2]{#1\quad\quad\triangleright\quad\quad#2}
 
-\subsubsection{General}
+\subsection{General Tactics}
 
 \paragraph{Absurd} Contradict a Hypothesis\\
 The user can select a hypothesis $H$, and change the goal to $\neg H$:
 
 $$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
-
-
-\paragraph{Array} Decompose array access-update patterns\\
-The use select an expression $e\equiv a[k_1\mapsto v][k_2]$. Then:
-
-$$ \TACTIC{\Delta\models\,G}{%
-\begin{array}[t]{ll}
-\Delta,\,k_1=k_2,\,e = v &\models G \\
-\Delta,\,k_1\neq k_2,\,e = a[k_2] &\models G
-\end{array}} $$
 
 \paragraph{Choice} Select a Goal Alternative\\
 When the goal is a disjunction, the user select one alternative and discard the others:
@@ -281,7 +296,6 @@ $$ \TACTIC{\Delta\models\,\Gamma,G}{\Delta\models\,G} $$
 When the user select an equality between two records, it is decomposed field by field.
 
 $$ \TACTIC{ a = b }{ \bigwedge a.f_i = b.f_i } $$
-
 
 \paragraph{Contrapose} Swap and Negate Hypothesis with Conclusion\\
 The user select a hypothesis (typically, a negation) and swap it with the goal.
@@ -313,9 +327,6 @@ The tactic is always applicable. It removes hypotheses from the goal on a variab
 
 The tactic also have a variant where only hypotheses \emph{not relevant} to the goal are retained. This is useful to find absurd hypotheses that are completely disjoint from the goal.
 
-\paragraph{Havoc} Go Through Assigns \\
-This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predicate generate by complex assigns clause. The user select an address, and if the address is not assigned by the \texttt{Havoc} clause, the memory at this address is unchanged.
-
 \paragraph{Instance} Instantiate properties\\
 The user selects a hypothesis with one or several $\forall$ quantifiers, or an $\exists$ quantified goal. Then, with the composer, the use choose to instantiate one or several of the quantified parameters. In case of $\forall$ quantifier over integer, a range of values can be instantiated instead.
 
@@ -342,9 +353,6 @@ The original equality hypothesis is removed from the goal.
 
 $$\TACTIC{\Delta,a=b\models\,G}{\Delta[a\leftarrow b]\models\,G[a\leftarrow b]}$$
 
-\paragraph{Separated} Expand Separation Cases\\
-This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.
-
 \paragraph{Split} Decompose Logical Connectives and Conditionals\\
 This is the most versatile available tactic. It decompose merely any logical operator following the sequent calculus rules. Typically:
 
@@ -370,7 +378,8 @@ When the user selects a arbitrary boolean expression $e$, the tactic is similar 
 \Delta,\neg e\models G
 \end{array}} \]
 
-Finally, when the user select a arithmetic comparison over $a$ and $b$, the tactics makes a split over $a=b$, $a<b$ and $a>b$:
+Finally, when the user select a arithmetic comparison over $a$ and $b$,
+the tactics makes a split over $a=b$, $a<b$ and $a>b$:
 \[\TACTIC{\Delta\models\,G}{%
 \begin{array}[t]{ll}
 \Delta,a<b&\models G \\
@@ -378,7 +387,7 @@ Finally, when the user select a arithmetic comparison over $a$ and $b$, the tact
 \Delta,a>b&\models G
 \end{array}} \]
 
-\subsubsection{Over integers}
+\subsection{Integers \& Bit-wised Tactics}
 
 \paragraph{BitRange} Range of logical bitwise operators \\
 This tactical applies the two following lemmas to the current goal.
@@ -447,16 +456,16 @@ n|k, n|k', & (k/n).a = (k'/n).b &\Longleftrightarrow& k.a = k'.b
 \paragraph{Induction} Start a proof by integer induction \\
 The user select any integer expression $e$ in the proof and a base value $b$ (which defaults to
 0). The tactic generates a proof by induction on $e$, that is, the base case
-$e = b$ and then the cases $e < b$ and $b < e$. Formally, the goal
-$\Delta\models\,G$ is first generalized into $\Delta',P(e)\models\,Q(e)$. Then
-we proceed by strong (integer) induction over $n$ for
+$e = b$ and then the cases $e < b$ and $b < e$. Formally, the initial goal
+$\Delta_0\models\,G_0$ is first generalized into $\Delta,P(e)\models\,Q(e)$. The tactic
+then proceed by (strong) induction over $n$ for
 $G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 
 \[\TACTIC{\Delta\models\,G(n)}{%
 \begin{array}[t]{lll}
-\Delta', & n = b & \models G(n) \\
-\Delta',\; \forall i,\, b \leq i < n \Longrightarrow G(i) \;& \models G(n) \\
-\Delta',\; \forall i,\, n < i \leq b \Longrightarrow G(i) \; &  & \models G(n)
+\Delta,\; \quad n = b & \models G(n) \\
+\Delta,\; \forall i,\, b \leq i < n \Longrightarrow G(i) \; & \models G(n) \\
+\Delta,\; \forall i,\, n < i \leq b \Longrightarrow G(i) \; & \models G(n)
 \end{array}} \]
 
 \paragraph{Overflow} Integer Conversions \\
@@ -504,33 +513,24 @@ $\sigma = [ \mathtt{lsr}(a,k) \leftarrow a / 2^k ]$ &
 for right-shifts.
 \end{tabular}
 
-\subsection{Strategies}
+\subsection{Domain Specific Tactics}
 
-Strategies are heuristics that generate a prioritized bunch of tactics to be tried on the current goal.
-Few built-in strategies are provided by the \textsf{WP} plug-in ; however, the user can extends the proof editor with
-custom ones, as explained in section~\ref{wp-custom-tactics} below.
+\paragraph{Array} Decompose array access-update patterns\\
+The use select an expression $e\equiv a[k_1\mapsto v][k_2]$. Then:
 
-To run strategies, the interactive proof editor provide a single button \texttt{Strategies} in the tactic panel.
-Configure the heuristics you want to include in your try, then click the button. The generated with highest priority is immediately applied. The proof summary now display \texttt{backtrack} buttons revealing proof nodes where alternative tactics are available. You can use those backtracking button to cycle over the generated tactics.
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,\,k_1=k_2,\,e = v &\models G \\
+\Delta,\,k_1\neq k_2,\,e = a[k_2] &\models G
+\end{array}
+}\]
 
-Of course, strategies are meant to be used multiple times, in sequence. Recall that strategies apply highest priority tactic first, on the current goal. When using strategies several times, you shall see several \texttt{backtrack}ing buttons in your proof script. You backtrack from any point at any time.
+\paragraph{Havoc} Go Through Assigns \\
+This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predicate generate by complex assigns clause. The user select an address, and if the address is not assigned by the \texttt{Havoc} clause, the memory at this address is unchanged.
 
-You shall also alternate strategies \emph{and} manually triggered tactics. Though, strategies are only used to
-\emph{infer} or \emph{suggest} interesting tactics to the user. Once your are finished with your proved, only the tactics are saved in the script, not the strategies used to find them. Hence, replaying a script generated with strategies would not involve backtracking any more. The script will directly replay your chosen alternatives.
-
-It is also possible to call strategies from the command line, with option \texttt{-wp-auto}. The strategies are tried up to some depth, and while a limited number of pending goals
-remains unproved by \textsf{Qed} or the selected provers. More precisely:
-\begin{description}
-\item[\tt -wp-auto s,...] applies strategies \texttt{s,...} recursively to unproved goals.
-\item[\tt -wp-auto-depth <$n$>] limit recursive application of strategies to depth $n$ (default is 5).
-\item[\tt -wp-auto-width <$n$>] limit application of strategies when there is less than $n$ pending goals (default is 10).
-\item[\tt -wp-auto-backtrack <$n$>] when the first tried strategies do not close a branch, allows for backtracking
-  on $n$ alternative strategies. Backtracking is performed on goals which are closed to the root proof obligation, hence
-  performing a kind of width-first search strategy, which tends to be more efficient in practice.
-  Backtracking is deactivated by default ($n=0$) and only used when \verb+-wp-auto+ is set.
-\end{description}
-
-The name of registered strategies is printed on console by using \texttt{-wp-auto '?'}. Custom strategies can be loaded by plug-ins, see below.
+\paragraph{Separated} Expand Separation Cases\\
+This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.
 
 \subsection{Custom Tactics and Strategies}
 \label{wp-custom-tactics}
