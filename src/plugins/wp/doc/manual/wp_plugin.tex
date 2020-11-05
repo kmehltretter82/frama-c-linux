@@ -450,7 +450,7 @@ The user select any integer expression $e$ in the proof and a base value $b$ (wh
 $e = b$ and then the cases $e < b$ and $b < e$. Formally, the goal
 $\Delta\models\,G$ is first generalized into $\Delta',P(e)\models\,Q(e)$. Then
 we proceed by strong (integer) induction over $n$ for
-$G(n) \equiv P(n)\models\,Q(n)$:
+$G(n) \equiv P(n)\Longrightarrow\,Q(n)$:
 
 \[\TACTIC{\Delta\models\,G(n)}{%
 \begin{array}[t]{lll}
