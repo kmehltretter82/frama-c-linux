@@ -200,7 +200,7 @@ let is_safe_instruction lval = function
   | Asm _ -> false
 
 (* Returns true if the statement [stmt] of function [kf] does not modify [lval].
-   [lval] is a candidate for the automatic loop unrolling of [loop] [loop]. *)
+   [lval] is a candidate for the automatic loop unrolling of [loop]. *)
 let is_constant kf ~loop lval stmt =
   let rec is_safe_stmt ~goto stmt =
     match stmt.skind with
@@ -224,12 +224,19 @@ let is_constant kf ~loop lval stmt =
          that contains the current loop, which we don't want to unroll. *)
       let dest_blocks = Kernel_function.find_all_enclosing_blocks !dest in
       List.exists (Cil_datatype.Block.equal loop) dest_blocks &&
-      (* Otherwise, the goto stays within the loop: check that the block
-         englobing both the source and the destination is safe. *)
-      let block = Kernel_function.common_block !dest stmt in
-      (* If this block is the loop itself, then it is not safe,
-         as [lval] is modified within the loop. *)
-      not (block == loop) && is_safe_block ~goto:true block
+      (* Otherwise, the goto stays within the loop. *)
+      begin
+        (* If the successors all exits the loop block, then the goto is safe.
+           This is the case for gotos coming from "continue" statement.  *)
+        let all_stmts = Stmts_graph.get_block_stmts loop in
+        let is_outside_loop s = not (Cil_datatype.Stmt.Set.mem s all_stmts) in
+        List.for_all is_outside_loop !dest.succs ||
+        (* Otherwise, check that the block englobing both the source and the
+           destination is safe. If this block is the loop itself, then it is
+           not safe, as [lval] is modified within the loop. *)
+        let block = Kernel_function.common_block !dest stmt in
+        not (block == loop) && is_safe_block ~goto:true block
+      end
     | _ -> false
   (* A block is safe if all its statements are safe. *)
   and is_safe_block ~goto b = List.for_all (is_safe_stmt ~goto) b.bstmts in
