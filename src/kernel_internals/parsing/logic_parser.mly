@@ -109,44 +109,40 @@
 
   let loc_ext d = { extended_node = d; extended_loc = loc () }
 
-  let concat_deps ds1 ds2 =
-    let fold ds d = if List.exists (is_same_lexpr d) ds then ds else d :: ds in
-    let ds = List.fold_left fold [] ds1 in
-    let ds = List.fold_left fold ds ds2 in
-    List.rev ds
-
-  let filter_from (l, d) =
-    match d with
-    | From ds -> l, From (concat_deps [] ds)
-    | _ -> l, d
+  let filter_from l = function
+    | FromAny ->
+      l, FromAny
+    | From ds ->
+      let f ds d = if List.exists (is_same_lexpr d) ds then ds else d :: ds in
+      l, From(List.(rev (fold_left f [] ds)))
 
   let concat_froms a1 a2 =
-    let compare_pair (l1,_) (l2,_) = is_same_lexpr l1 l2 in
+    let compare_pair (b1,_) (b2,_) = is_same_lexpr b1 b2 in
     (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
-    let concat_one acc (_,d2 as f2)  =
-      let f2 = filter_from f2 in
+    let concat_one acc (l, f2)  =
+      let (_, f2) as p = filter_from l f2 in
       try
-        let (_,d1) = List.find (compare_pair f2) acc
+        let (_,f1) = List.find (compare_pair p) acc
         in
-        match (d1, d2) with
+        match (f1, f2) with
           | _,FromAny ->
             (* the new fundeps does not give more information than the one
                which is already present. Just ignore it.
              *)
            acc
-          | FromAny, From _ ->
+          | FromAny, _ ->
               (* the new fundeps is strictly more precise than the old one.
                  We replace the old dependency by the new one, but keep
                  the location at its old place in the list. This ensures
                  that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
-              Extlib.replace compare_pair f2 acc
+              Extlib.replace compare_pair p acc
           | From _, From _ ->
             (* we keep the two functional dependencies,
                as they have to be proved separately. *)
-            acc @ [f2]
-      with Not_found -> acc @ [f2]
+            acc @ [p]
+      with Not_found -> acc @ [p]
     in List.fold_left concat_one a1 a2
 
   let concat_allocation fa1 fa2 =
