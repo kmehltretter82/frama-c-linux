@@ -1629,6 +1629,8 @@ src/plugins/wp/TacFilter.ml: CEA_WP
 src/plugins/wp/TacFilter.mli: CEA_WP
 src/plugins/wp/TacHavoc.ml: CEA_WP
 src/plugins/wp/TacHavoc.mli: CEA_WP
+src/plugins/wp/TacInduction.ml: CEA_WP
+src/plugins/wp/TacInduction.mli: CEA_WP
 src/plugins/wp/TacInstance.ml: CEA_WP
 src/plugins/wp/TacInstance.mli: CEA_WP
 src/plugins/wp/TacLemma.ml: CEA_WP

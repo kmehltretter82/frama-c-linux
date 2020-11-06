@@ -85,7 +85,7 @@ PLUGIN_CMO:= \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
-	TacSplit TacChoice TacRange \
+	TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \

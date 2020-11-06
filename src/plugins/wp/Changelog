@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 #########################
 
+- WP          [2020-11-05] New tactic: Induction
+- WP          [2020-11-04] Removed option -wp-bits (now always enabled)
+
 #########################
 Plugin WP 22.0 (Titanium)
 #########################

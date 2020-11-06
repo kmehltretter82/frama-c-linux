@@ -210,9 +210,27 @@ let preproc_assigns labels asgns =
   let visitor = new norm_at labels in
   List.map (Visitor.visitFramacFrom visitor) asgns
 
+let has_postassigns = function
+  | WritesAny -> false
+  | Writes froms ->
+      let exception HAS_POST in
+      let visitor = new norm_at (fun l ->
+          if Clabels.is_post l then raise HAS_POST
+          else Clabels.of_logic l
+        ) in
+      try
+        List.iter
+          (fun fr -> ignore @@ Visitor.visitFramacFrom visitor fr)
+          froms ;
+        false
+      with HAS_POST ->
+        true
+
 let catch_label_error ex txt1 txt2 = match ex with
   | LabelError lab ->
       Wp_parameters.warning
         "Unexpected label %a in %s : ignored %s"
         Wp_error.pp_logic_label lab txt1 txt2
   | _ -> raise ex
+
+(* -------------------------------------------------------------------------- *)
