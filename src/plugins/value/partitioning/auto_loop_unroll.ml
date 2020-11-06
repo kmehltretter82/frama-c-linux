@@ -93,6 +93,7 @@ let is_frama_c_builtin exp =
      modified in the loop. *)
 type loop_effect =
   { written_vars: Cil_datatype.Varinfo.Set.t;
+    pointer_writes: bool;
     call: bool; }
 
 (* Visitor to compute the effects of a loop. *)
@@ -100,22 +101,27 @@ let loop_effect_visitor = object (self)
   inherit Visitor.frama_c_inplace
 
   val mutable written_vars = Cil_datatype.Varinfo.Set.empty
+  val mutable pointer_writes = false
   val mutable call = false
   val mutable assembly = false
 
   (* Returns None if the loop contains assembly code. *)
   method compute_effect block =
     written_vars <- Cil_datatype.Varinfo.Set.empty;
+    pointer_writes <- false;
     call <- false;
     assembly <- false;
     ignore Visitor.(visitFramacBlock (self :> frama_c_inplace) block);
-    if assembly then None else Some { written_vars; call; }
+    if assembly then None else Some { written_vars; pointer_writes; call; }
 
   method !vinst instr =
     let () = match instr with
       | Set ((Var varinfo, _), _, _)
       | Call (Some (Var varinfo, _), _, _, _) ->
         written_vars <- Cil_datatype.Varinfo.Set.add varinfo written_vars;
+      | Set ((Mem _, _), _, _)
+      | Call (Some (Mem _, _), _, _, _) ->
+        pointer_writes <- true;
       | _ -> ()
     in
     let () = match instr with
@@ -139,7 +145,10 @@ let is_integer lval = Cil.isIntegralType (Cil.typeOfLval lval)
 
 (* Computes the status of a lvalue for the heuristic, according to the
    loop effects. *)
-let classify loop_effect lval =
+let classify eval_ptr loop_effect lval =
+  let is_written varinfo =
+    Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
+  in
   let rec is_const_expr expr =
     match expr.enode with
     | Lval lval -> classify_lval lval = Constant
@@ -152,7 +161,7 @@ let classify loop_effect lval =
       if (varinfo.vglob && loop_effect.call)
       || not (is_const_offset offset)
       then Unsuitable
-      else if Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
+      else if is_written varinfo
       then
         if is_integer lval && not varinfo.vaddrof then Candidate else Unsuitable
       else
@@ -160,7 +169,14 @@ let classify loop_effect lval =
            the loop. We suppose here that this is not the case, but this could
            lead to some untimely loop unrolling. *)
         Constant
-    | Mem _, _ -> Unsuitable (* Pointers are not supported by the heuristic. *)
+    | Mem expr, offset ->
+      if not (loop_effect.pointer_writes || loop_effect.call)
+      && is_const_expr expr && is_const_offset offset
+      then
+        match eval_ptr expr with
+        | Some pointed when not (List.exists is_written pointed) -> Constant
+        | _ -> Unsuitable
+      else Unsuitable
   and is_const_offset = function
     | NoOffset -> true
     | Field (_, offset) -> is_const_offset offset
@@ -179,13 +195,13 @@ let rec get_lvalues expr =
 
 (* Finds the unique candidate lvalue for the automatic loop unrolling
    heuristic in the expression [expr], if it exists. Returns None otherwise.  *)
-let find_lonely_candidate loop_effect expr =
+let find_lonely_candidate eval_ptr loop_effect expr =
   let lvalues = get_lvalues expr in
   let rec aux acc list =
     match list with
     | [] -> acc
     | lval :: tl ->
-      match classify loop_effect lval with
+      match classify eval_ptr loop_effect lval with
       | Unsuitable -> None
       | Constant   -> aux acc tl
       | Candidate  -> if acc = None then aux (Some lval) tl else None
@@ -485,6 +501,21 @@ module Make (Abstract: Abstractions.Eva) = struct
     then None
     else flagged_value.v >> fun v -> Some v
 
+  (* TODO *)
+  let evaluate_pointer state expr =
+    Val.get Main_values.CVal.key >>= fun get_cvalue ->
+    fst (Eval.evaluate state expr) >> fun (_valuation, v) ->
+    let cvalue = get_cvalue v in
+    match Cvalue.V.get_bases cvalue with
+    | Base.SetLattice.Top -> None
+    | Base.SetLattice.Set bases ->
+      try
+        let varinfo_list =
+          Base.Hptset.fold (fun base acc -> Base.to_varinfo base :: acc) bases []
+        in
+        Some varinfo_list
+      with Base.Not_a_C_variable -> assert false
+
   let (>>:) v f = match v with Some v -> f v | None -> false
 
   (* Is the number of iterations of a loop bounded by [limit]?
@@ -497,9 +528,10 @@ module Make (Abstract: Abstractions.Eva) = struct
     (* Does the condition [condition = positive] limits the number of iterations
        of the loop by [limit]? *)
     let is_bounded_by_condition (condition, positive) =
+      let eval_ptr = evaluate_pointer state in
       (* Finds the unique integer lvalue modified within the loop in [condition].
          Stops if it does not exist is not a good candidate for the heuristic. *)
-      find_lonely_candidate loop_effect condition >>: fun lval ->
+      find_lonely_candidate eval_ptr loop_effect condition >>: fun lval ->
       (* If [lval] is not in scope at [stmt], introduces it into [state] so that
          [lval] can be properly evaluated in [state]. *)
       let state = enter_scope state kf stmt lval in

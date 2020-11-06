@@ -355,10 +355,8 @@
 [eva] tests/value/auto_loop_unroll.c:221: 
   Trace partitioning superposing up to 100 states
 [eva] tests/value/auto_loop_unroll.c:226: Frama_C_show_each_11_111: [11..111]
-[eva] tests/value/auto_loop_unroll.c:231: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:232: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:234: Frama_C_show_each_16: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:231: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:234: Frama_C_show_each_16: {16}
 [eva] Recording results for various_conditions
 [eva] Done for function various_conditions
 [eva] computing for function temporary_variables <- main.
