@@ -120,10 +120,10 @@
     let compare_pair (curb,_) (newb,_) = is_same_lexpr curb newb in
     (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
-    let concat_one acc (l, newf)  =
-      let (_, newf) as p = filter_from l newf in
+    let concat_one acc (newloc, newf)  =
+      let (newloc, newf) as p = filter_from newloc newf in
       try
-        let (_,curf) = List.find (compare_pair p) acc
+        let (curloc,curf) = List.find (compare_pair p) acc
         in
         match (curf, newf) with
           | _,FromAny ->
@@ -142,8 +142,21 @@
             let incl l lin =
               List.(for_all (fun e -> exists (is_same_lexpr e) lin) l)
             in
-            if      incl curl newl then acc
-            else if incl newl curl then Extlib.replace compare_pair p acc
+            let drop d k =
+              Kernel.warning ~current:false
+                "Drop '%a' \\from at %a for more precise one at %a"
+                Logic_print.print_lexpr curloc
+                Cil_datatype.Location.pretty d.lexpr_loc
+                Cil_datatype.Location.pretty k.lexpr_loc
+            in
+            if incl curl newl then begin
+              if not (incl newl curl) then drop newloc curloc;
+              acc
+            end
+            else if incl newl curl then begin
+              drop curloc newloc;
+              Extlib.replace compare_pair p acc
+            end
             else acc @ [p]
       with Not_found -> acc @ [p]
     in List.fold_left concat_one cura newa
