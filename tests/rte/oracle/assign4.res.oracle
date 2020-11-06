@@ -6,9 +6,7 @@
 int choose1(int min, int max);
 
 /*@ assigns \result;
-    assigns \result \from min, max;
-    assigns \result \from min, max;
- */
+    assigns \result \from min, max; */
 int choose2(int min, int max);
 
 int main(void)
