@@ -1643,6 +1643,8 @@ src/plugins/wp/TacRange.ml: CEA_WP
 src/plugins/wp/TacRange.mli: CEA_WP
 src/plugins/wp/TacRewrite.ml: CEA_WP
 src/plugins/wp/TacRewrite.mli: CEA_WP
+src/plugins/wp/TacSequence.ml: CEA_WP
+src/plugins/wp/TacSequence.mli: CEA_WP
 src/plugins/wp/TacShift.ml: CEA_WP
 src/plugins/wp/TacShift.mli: CEA_WP
 src/plugins/wp/TacSplit.ml: CEA_WP

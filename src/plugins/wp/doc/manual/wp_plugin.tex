@@ -532,6 +532,53 @@ This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predi
 \paragraph{Separated} Expand Separation Cases\\
 This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.
 
+
+\paragraph{Sequence} Unroll repeat-sequence operator\\
+In this section, let us use $A^n$ for the ACSL notation \lstinline{A *^ n},
+the repeat list operation, and $A \oplus l$ for the list concatenation.
+
+This tactics is used to transform $A^n$ sequences. Threes behaviors
+can be selected:
+unroll left that rewrites the list  $A^n$ into $A \oplus A^{n-1}$,
+unroll right that rewrites the list $A^n$ into $A^{n-1} \oplus A$
+and unroll sum that rewrites the list $A ^{n_1 + ... + n_k}$
+into $A^{n_1} \oplus ... \oplus A^{n_k}$. For unroll left and right,
+a negative value leads to an empty list. For unroll sum, one must prove that all
+$nI$ are positive.
+
+Rule for unroll left:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{lll}
+  \Delta[A^n\leftarrow A \oplus A^{n-1}],& n > 0 & \models G[A^n\leftarrow A \oplus A^{n-1}]\\
+  \Delta[A^n\leftarrow []],& n \leq 0 & \models G[A^n\leftarrow []]
+\end{array}
+}\]
+
+Rule for unroll right:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{lll}
+  \Delta[A^n\leftarrow A^{n-1} \oplus A],& n > 0 & \models G[A^n\leftarrow A^{n-1} \oplus A]\\
+  \Delta[A^n\leftarrow []],& n \leq 0 & \models G[A^n\leftarrow []]
+\end{array}
+}\]
+
+Rule for unroll sum:
+
+\[
+\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+  \Delta & \models\bigwedge_{i=1}^{k} 0 \leq n_i\\
+  &\\
+  \Delta[A^{\sum_{i=1}^{k}n_i}\leftarrow \bigoplus_{i=1}^{k} A^{n_i}] &
+  \models G[A^{\sum_{i=1}^{k}n_i}\leftarrow \bigoplus_{i=1}^{k} A^{n_i}]
+\end{array}
+}\]
+
+
 \subsection{Custom Tactics and Strategies}
 \label{wp-custom-tactics}
 
