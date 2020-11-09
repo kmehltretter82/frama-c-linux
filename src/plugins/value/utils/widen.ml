@@ -517,7 +517,7 @@ module Dynamic_Hints =
       let name = "Widen.Dynamic_Hints"
       let default = Widen_type.default
     end)
-let () = Ast.add_monotonic_state Global_Static_Hints.self
+let () = Ast.add_monotonic_state Dynamic_Hints.self
 
 (* The contents of this table should always be the join Dynamic_hints
    and Per_Function_Static_Hints, for the functions that have been computed.
