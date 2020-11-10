@@ -371,18 +371,17 @@
   Called from tests/value/auto_loop_unroll.c:352.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:257: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:262: Frama_C_show_each_30: {30}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:266: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:266: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:267: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:271: Frama_C_show_each_top: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:266: 
+  Trace partitioning superposing up to 100 states
+[eva] tests/value/auto_loop_unroll.c:271: 
+  Frama_C_show_each_top: [31..2147483647]
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:274: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:280: Frama_C_show_each_32: {32}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:283: Automatic loop unrolling.
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:284: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:284: 
-  Trace partitioning superposing up to 100 states
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:286: 
-  loop not completely unrolled
 [eva:alarm] tests/value/auto_loop_unroll.c:284: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] tests/value/auto_loop_unroll.c:288: 
@@ -403,15 +402,10 @@
 [eva] Done for function loops_with_goto
 [eva] computing for function non_natural_loops <- main.
   Called from tests/value/auto_loop_unroll.c:353.
-[eva:alarm] tests/value/auto_loop_unroll.c:330: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:334: Frama_C_show_each_50: [1..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:338: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:339: Warning: 
-  signed overflow. assert -2147483648 ≤ i - 1;
-[eva] tests/value/auto_loop_unroll.c:342: 
-  Frama_C_show_each_1_51: [1..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:329: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:334: Frama_C_show_each_50: {50}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:338: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:342: Frama_C_show_each_1_51: [1..51]
 [eva] Recording results for non_natural_loops
 [eva] Done for function non_natural_loops
 [eva] Recording results for main
@@ -441,7 +435,7 @@
   i ∈ {37}
   res ∈ {0}
 [eva:final-states] Values at end of function non_natural_loops:
-  i ∈ [-2147483648..50]
+  i ∈ [-1..50]
   res ∈ {0}
 [eva:final-states] Values at end of function simple_loops:
   res ∈ {100}
