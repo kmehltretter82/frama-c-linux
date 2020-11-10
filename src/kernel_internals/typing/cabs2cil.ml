@@ -5528,10 +5528,10 @@ and makeCompType ghost (isstruct: bool)
   let flds = Extlib.filter_map_opt to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in
 
-  let fld_table = Cil_datatype.Fieldinfo.Hashtbl.create 17 in
+  let fld_table = Hashtbl.create 17 in
   let check f =
     try
-      let oldf = Cil_datatype.Fieldinfo.Hashtbl.find fld_table f in
+      let oldf = Hashtbl.find fld_table f.fname in
       let source = fst f.floc in
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
@@ -5540,7 +5540,7 @@ and makeCompType ghost (isstruct: bool)
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
-      if f.fname <> "" then Cil_datatype.Fieldinfo.Hashtbl.add fld_table f f
+      if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
   List.iter check flds;
   if comp.cfields <> [] then begin

@@ -822,7 +822,7 @@ module Fieldinfo = struct
                  Typ.reprs)
             []
             Compinfo.reprs
-        let fid fi = fi.fcomp.ckey, fi.fname
+        let fid fi = fi.fcomp.ckey, fi.forder
         let compare f1 f2 = Extlib.compare_basic (fid f1) (fid f2)
         let hash f1 = Hashtbl.hash (fid f1)
         let equal f1 f2 = (fid f1) = (fid f2)

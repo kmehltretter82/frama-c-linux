@@ -49,7 +49,7 @@ theory S1_S
   (* use map.Map *)
   
   type S1_S =
-    | S1_S1 (F1_S_a:int -> int) (F1_S_b:int -> int) (F1_S_f:int)
+    | S1_S1 (F1_S_f:int) (F1_S_a:int -> int) (F1_S_b:int -> int)
   
   (* use Matrix *)
   
@@ -98,9 +98,9 @@ theory Compound
   (* use S1_S *)
   
   function Load_S1_S (p:addr) (mint:addr -> int) (mint1:addr -> int) : S1_S =
-    S1_S1 (Array_uint32 (shiftfield_F1_S_a p) 5 mint)
+    S1_S1 (get mint1 (shiftfield_F1_S_f p))
+    (Array_uint32 (shiftfield_F1_S_a p) 5 mint)
     (Array_sint32 (shiftfield_F1_S_b p) 5 mint1)
-    (get mint1 (shiftfield_F1_S_f p))
   
   Q_Array_uint32_access :
     forall mint:addr -> int, i:int, n:int, p:addr
