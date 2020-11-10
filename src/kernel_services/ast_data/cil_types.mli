@@ -400,6 +400,9 @@ and fieldinfo = {
   (** The host structure that contains this field. There can be only one
       [compinfo] that contains the field. *)
 
+  mutable forder: int;
+  (** The position in the host structure. *)
+
   forig_name: string;
   (** original name as found in C file. *)
 
