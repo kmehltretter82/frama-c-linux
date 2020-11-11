@@ -225,6 +225,14 @@ void various_conditions () {
   }
   Frama_C_show_each_11_111(res);
   res = 0;
+  /* Exit conditions using pointers. */
+  int x = 16;
+  int *p = &x;
+  for (int i = 0 ; i < *p ; ++i) {
+    res++;
+  }
+  Frama_C_show_each_16(res);
+  res = 0;
 }
 
 /* Examples of loops where temporary variables are introduced by Frama-C.
@@ -243,7 +251,7 @@ void temporary_variables () {
   Frama_C_show_each_21(res);
 }
 
-/* Examples of loops with goto statements. */
+/* Examples of natural loops with goto or continue statements. */
 void loops_with_goto () {
   int i, res = 0;
   for (i = 0; i < 30; i++) {
@@ -254,7 +262,7 @@ void loops_with_goto () {
   Frama_C_show_each_30(res);
   res = 0;
  middle: ;
-  /* Should never be unrolled. */
+  /* Can be unrolled, but [res] should still be imprecise. */
   for (i = 0; i < 31; i++) {
     res++;
     if (undet)
@@ -287,6 +295,52 @@ void loops_with_goto () {
   }
   Frama_C_show_each_top(res);
   res = 0;
+  /* Should be unrolled, and [res] should be precise. */
+  for (i = 0; i < 35; i++) {
+    if (undet)
+      continue;
+    res++;
+  }
+  Frama_C_show_each_0_35(res);
+  res = 0;
+  /* Should be unrolled, and [res] should be precise. */
+  for (i = 36; i--; res++) {
+    if (undet)
+      continue;
+  }
+  Frama_C_show_each_36(res);
+  res = 0;
+  /* Should be unrolled, and [res] should be precise. */
+  for (i = 0; i < 37; i++) {
+    if (i < 10)
+      continue;
+    res++;
+  }
+  Frama_C_show_each_27(res);
+  res = 0;
+}
+
+/* Examples of loops formed by goto statements. */
+void non_natural_loops () {
+  int i, res;
+  res = 0;
+  i = 0;
+ loop1:
+  i++;
+  res++;
+  if (i < 50) {
+    goto loop1;
+  }
+  Frama_C_show_each_50(res);
+  res = 0;
+  i = 50;
+ loop2:
+  res++;
+  if (undet && i--) {
+    goto loop2;
+  }
+  Frama_C_show_each_1_51(res);
+  res = 0;
 }
 
 void main () {
@@ -296,4 +350,5 @@ void main () {
   various_conditions ();
   temporary_variables ();
   loops_with_goto ();
+  non_natural_loops ();
 }
