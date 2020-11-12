@@ -494,12 +494,10 @@ Section~\ref{tut2:hello}). Each variable set in this example has to be set
 by any plug-in.
 \codeidx{Makefile.dynamic}
 \codeidx{FRAMAC\_SHARE}
-\codeidx{FRAMAC\_LIBDIR}
 \codeidx{PLUGIN\_CMO}
 \codeidx{PLUGIN\_NAME}
 \makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-\texttt{FRAMAC\_SHARE} must be set to the \framac share directory while
-\texttt{FRAMAC\_LIBDIR} must be set to the \framac lib directory.
+\texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
 \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
 \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
 sources.
@@ -596,18 +594,19 @@ otherwise.
 
 \codeidx{clean-install}
 \codeidx{install}
-In addition, if a plug-in wishes to install custom files to
-\texttt{FRAMAC\_LIBDIR} through the \texttt{install::} target,
-this target must depend on \texttt{clean-install}. 
-Indeed, \framac's main \texttt{Makefile} removes
-all existing files in this directory before performing a fresh installation,
-in order to avoid potential interference with an obsolete (and usually
-incompatible) module from a previous installation. Adding the dependency thus
-ensures that the removal will take place before any new file has been installed
-in the directory.
+In addition, if a plug-in wishes to install custom files through the
+\texttt{install::} target, this target must depend on \texttt{clean-install}.
+Indeed, \framac's main \texttt{Makefile} removes all existing files in this
+directory before performing a fresh installation, in order to avoid potential
+interference with an obsolete (and usually incompatible) module from a previous
+installation. Adding the dependency thus ensures that the removal will take
+place before any new file has been installed in the directory.
 
-\begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*}
-in addition to the normal plugin files, it should use the following code:
+\begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*} in
+  addition to the normal plugin files, it should use the following code:
+  \footnote{Note that the variable \texttt{FRAMAC\_LIBDIR} is automatically set
+    by the \framac build system to the value provided by the command
+    \texttt{frama-c-config -print-libpath}.\codeidx{FRAMAC\_LIBDIR}}
 \begin{makefilecode}
 install:: clean-install
         $(PRINT_INSTALL) "My beautiful library"
