@@ -109,15 +109,23 @@
 
   let loc_ext d = { extended_node = d; extended_loc = loc () }
 
-  let concat_froms a1 a2 =
-    let compare_pair (b1,_) (b2,_) = is_same_lexpr b1 b2 in
+  let filter_from l = function
+    | FromAny ->
+      l, FromAny
+    | From ds ->
+      let f ds d = if List.exists (is_same_lexpr d) ds then ds else d :: ds in
+      l, From(List.(rev (fold_left f [] ds)))
+
+  let concat_froms cura newa =
+    let compare_pair (curb,_) (newb,_) = is_same_lexpr curb newb in
     (* NB: the following has an horrible complexity, but the order of
        clauses in the input is preserved. *)
-    let concat_one acc (_,f2 as p)  =
+    let concat_one acc (newloc, newf)  =
+      let (newloc, newf) as p = filter_from newloc newf in
       try
-        let (_,f1) = List.find (compare_pair p) acc
+        let (curloc,curf) = List.find (compare_pair p) acc
         in
-        match (f1, f2) with
+        match (curf, newf) with
           | _,FromAny ->
             (* the new fundeps does not give more information than the one
                which is already present. Just ignore it.
@@ -130,12 +138,28 @@
                  that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
               Extlib.replace compare_pair p acc
-          | From _, From _ ->
-            (* we keep the two functional dependencies,
-               as they have to be proved separately. *)
-            acc @ [p]
+          | From curl, From newl ->
+            let incl l lin =
+              List.(for_all (fun e -> exists (is_same_lexpr e) lin) l)
+            in
+            let drop d k =
+              Kernel.warning ~current:false ~wkey:Kernel.wkey_multi_from
+                "Drop '%a' \\from at %a for more precise one at %a"
+                Logic_print.print_lexpr curloc
+                Cil_datatype.Location.pretty d.lexpr_loc
+                Cil_datatype.Location.pretty k.lexpr_loc
+            in
+            if incl curl newl then begin
+              if not (incl newl curl) then drop newloc curloc;
+              acc
+            end
+            else if incl newl curl then begin
+              drop curloc newloc;
+              Extlib.replace compare_pair p acc
+            end
+            else acc @ [p]
       with Not_found -> acc @ [p]
-    in List.fold_left concat_one a1 a2
+    in List.fold_left concat_one cura newa
 
   let concat_allocation fa1 fa2 =
     match fa1,fa2 with
@@ -151,7 +175,7 @@
       | Writes [], _  | Writes _, [] ->
         raise (
           Not_well_formed (loc(),"Mixing \\nothing and a real location"))
-      | Writes a1, a2 -> Writes (concat_froms a2 a1)
+      | Writes a1, a2 -> Writes (concat_froms (concat_froms [] a2) a1)
 
   let concat_loop_assigns_allocation annots bhvs2 a2 fa2=
     (* NB: this is supposed to merge assigns related to named behaviors, in
