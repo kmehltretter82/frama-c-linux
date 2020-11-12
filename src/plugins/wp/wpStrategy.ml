@@ -342,8 +342,8 @@ let add_assigns acc kind id a_desc =
   if goal && assigns_has_deps a_desc.a_assigns then
     Wp_parameters.warning
       ~once: true ~current:false ~wkey:AssignsCompleteness.wkey_pedantic
-      "WP uses \\from to compute precise hypotheses but their proof is not yet \
-       supported" ;
+      "WP uses \\from to generate precise hypotheses, however their proof is \
+       not supported yet" ;
   if goal then { acc with has_asgn_goal = true} else acc
 
 let add_assigns_any acc kind asgn =
