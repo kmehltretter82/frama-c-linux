@@ -39,10 +39,13 @@
    The heuristic is syntactic and limited to the current function: it does not
    handle assignment through pointers or function calls.
    Thus, the condition [cond] should only contains direct accesses to variables
-   whose address is never taken (they cannot be modified through pointers). If
-   the loop contains a function call, the condition [cond] should not contain
+   whose address is never taken (they cannot be modified through pointers).
+   If the loop contains a function call, the condition [cond] should not contain
    global variables (as they may be modified in the function called).
-   A first analysis of the loop gathers all such variables modified within the
+   If the loop contains no pointer writes and no function calls, the condition
+   can also contains pointers to variables that are not modified within the loop.
+
+   A first analysis of the loop gathers all variables modified within the
    loop; all others are constant, and can be evaluated in the loop entry state.
 
    When computing the increment [v_delta] of a lvalue [v] in the loop, the
@@ -105,9 +108,16 @@ module Graph = struct
     let wto = if backward then List.rev wto else wto in
     List.fold_left (fun acc vertex -> compute_vertex vertex acc) acc wto
 
-  (* Results for the dataflow analysis performed by the two functions below. *)
+  (* Results for the simple dataflow analysis performed by [compute] below. *)
   module Results = Vertex.Hashtbl
 
+  (* Simple dataflow analysis on [loop], with no fixpoint on inner nested loops.
+     Starts with the value [init_value] at the head of the loop [loop.head],
+     applies [transfer] to compute values through transitions in the loop body,
+     and use [join] to merge values coming from different paths.
+     [transfer] has an argument [~inner_loop], which is true in inner loops.
+     Returns the value computed for the loop head after one iteration of the
+     loop. Paths outside the loop body are ignored. *)
   let compute loop transfer join init_value =
     let results = Results.create (G.nb_vertex loop.graph) in
     Results.add results loop.head init_value;
@@ -156,14 +166,14 @@ end
 (* Effects of a loop:
    - set of varinfos that are directly modified within the loop. Pointer
      accesses are ignored.
-   - does the loop contain a call? If so, any global variable may also be
-     modified in the loop. *)
+   - does the loop contain a pointer write, a call or assemly code? *)
 type loop_effect =
   { written_vars: Cil_datatype.Varinfo.Set.t;
     pointer_writes: bool;
     call: bool;
     assembly: bool; }
 
+(* Adds a written variable to a loop_effect. *)
 let add_written_var vi effect =
   let written_vars = Cil_datatype.Varinfo.Set.add vi effect.written_vars in
   { effect with written_vars }
@@ -186,6 +196,8 @@ let compute_instr_effect effect = function
     { effect with assembly = true }
   | _ -> effect
 
+(* Computes the [loop_effect] of a [loop], by scanning all instructions of the
+   loop body. *)
 let compute_loop_effect loop =
   let acc =
     { written_vars = Cil_datatype.Varinfo.Set.empty;
@@ -208,7 +220,8 @@ type var_status =
 let is_integer lval = Cil.isIntegralType (Cil.typeOfLval lval)
 
 (* Computes the status of a lvalue for the heuristic, according to the
-   loop effects. *)
+   loop effects. Uses [eval_ptr] to compute the bases pointed by pointer
+   expressions. *)
 let classify eval_ptr loop_effect lval =
   let is_written varinfo =
     Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
@@ -272,7 +285,7 @@ let find_lonely_candidate eval_ptr loop_effect expr =
   in
   aux None lvalues
 
-(* If in the block [loop], [lval] is assigned once to the value of another
+(* If in the [loop], [lval] is assigned once to the value of another
    lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
 let cross_equality loop lval =
   (* If no such single equality can be found, return [lval] unchanged. *)
@@ -354,8 +367,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> delta
     | Asm _ -> raise NoIncrement
 
-  (* Computes an over-approximation of the increment of [lval] in the block
-     [loop]. Only syntactic assignments of [lval] are considered, so [lval]
+  (* Computes an over-approximation of the increment of [lval] in the [loop].
+     Only syntactic assignments of [lval] are considered, so [lval]
      should be a direct access to a variable whose address is not taken,
      and which should not be global if the loop contains function calls.
      Returns None if no increment can be computed. *)
@@ -469,7 +482,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     then None
     else flagged_value.v >> fun v -> Some v
 
-  (* TODO *)
+  (* Computes the bases pointed by a pointer expression [expr] in [state].  *)
   let evaluate_pointer state expr =
     Val.get Main_values.CVal.key >>= fun get_cvalue ->
     fst (Eval.evaluate state expr) >> fun (_valuation, v) ->
