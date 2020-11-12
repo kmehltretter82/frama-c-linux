@@ -185,6 +185,8 @@ let wkey_no_proto = register_warn_category "typing:no-proto"
 
 let wkey_missing_spec = register_warn_category "annot:missing-spec"
 
+let wkey_multi_from = register_warn_category "annot:multi-from"
+
 let wkey_decimal_float = register_warn_category "parser:decimal-float"
 let () = set_warn_status wkey_decimal_float Log.Wonce
 
