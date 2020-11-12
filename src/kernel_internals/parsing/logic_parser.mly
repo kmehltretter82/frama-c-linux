@@ -143,7 +143,7 @@
               List.(for_all (fun e -> exists (is_same_lexpr e) lin) l)
             in
             let drop d k =
-              Kernel.warning ~current:false
+              Kernel.warning ~current:false ~wkey:Kernel.wkey_multi_from
                 "Drop '%a' \\from at %a for more precise one at %a"
                 Logic_print.print_lexpr curloc
                 Cil_datatype.Location.pretty d.lexpr_loc

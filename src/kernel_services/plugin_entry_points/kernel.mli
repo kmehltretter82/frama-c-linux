@@ -175,6 +175,8 @@ val wkey_no_proto: warn_category
 
 val wkey_missing_spec: warn_category
 
+val wkey_multi_from: warn_category
+
 val wkey_decimal_float: warn_category
 
 val wkey_acsl_extension: warn_category
