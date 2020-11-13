@@ -596,16 +596,16 @@ otherwise.
 \codeidx{install}
 In addition, if a plug-in wishes to install custom files through the
 \texttt{install::} target, this target must depend on \texttt{clean-install}.
-Indeed, \framac's main \texttt{Makefile} removes all existing files in this
-directory before performing a fresh installation, in order to avoid potential
-interference with an obsolete (and usually incompatible) module from a previous
-installation. Adding the dependency thus ensures that the removal will take
-place before any new file has been installed in the directory.
+Indeed, \framac's main \texttt{Makefile} needs to remove all existing files
+before performing a fresh installation, in order to avoid potential interference
+with an obsolete (and usually incompatible) module from a previous installation.
+Adding the dependency thus ensures that the removal will take place before any
+new file has been installed.
 
 \begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*} in
   addition to the normal plugin files, it should use the following code:
   \footnote{Note that the variable \texttt{FRAMAC\_LIBDIR} is automatically set
-    by the \framac build system to the value provided by the command
+    in the \framac \texttt{Makefile} to the value provided by the command
     \texttt{frama-c-config -print-libpath}.\codeidx{FRAMAC\_LIBDIR}}
 \begin{makefilecode}
 install:: clean-install
