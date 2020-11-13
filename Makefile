@@ -179,33 +179,59 @@ force-reconfigure:
 # todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
 # NOTE: the elements of this list shoud be part of the DEFAULT_SUITES contained into `tests/ptest_config`
 TESTS=builtins callgraph cil constant_propagation dynamic float idct impact jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual saveload scope slicing sparecode spec syntax test value value/traces
+# todo: adds value:apron value:bitwise value:equalities value:gauges values:octagons values:symbols
+CONFIGS=
 
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: no test found for studia ?
 # todo: adds wp (config qualif)
-PLUGIN_TEST_CONFIGS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
+PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
+PLUGIN_CONFIGS=
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)
-PLUGIN_TEST_CONFIGS+= wp:qualif
+PLUGIN_CONFIGS+= wp:qualif
 endif
 
-PLUGIN_TESTS= $(sort $(filter-out :%, $(subst :, :,$(PLUGIN_TEST_CONFIGS))))
+TEST_CONFIGS=$(sort $(filter-out %:, $(subst :,: ,$(CONFIGS))))
+
+TEST_DIRS=tests
+TEST_ALIAS=$(addprefix @tests/, ptests_config $(subst :,/ptests_config_,$(CONFIGS)))
+
+PLUGIN_TEST_DIRS=$(patsubst %,src/plugins/%/tests,$(sort $(filter-out :%,$(subst :, :,$(PLUGIN_TESTS) $(PLUGIN_CONFIGS)))))
+PLUGIN_TEST_ALIAS= $(addprefix @src/plugins/,$(addsuffix /tests/ptests_config,$(PLUGIN_TESTS)) $(subst :,/tests/ptests_config_,$(PLUGIN_CONFIGS)))
+TEST_DIRS+=$(PLUGIN_TEST_DIRS)
+TEST_ALIAS+=$(PLUGIN_TEST_ALIAS)
+
+.PHONY: info-tests
+info-tests:
+	@echo "test directories: $(TEST_DIRS)"
+	@echo "dune alias: $(TEST_ALIAS)"
 
 .PHONY: run-tests clean-tests purge-tests tests
 purge-tests: config.sed
-	find tests $(addprefix src/plugins/,$(addsuffix /tests,$(PLUGIN_TESTS))) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
+	find $(TEST_DIRS) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 
 clean-tests: purge-tests
 	rm -rf _build/default/tests
 
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: config.sed purge-tests
-	dune exec -- ptests/ptests.exe
-	for plugin in $(PLUGIN_TEST_CONFIGS); do \
-		dune exec -- ptests/ptests.exe src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests $$(echo $$plugin | sed -e "s/^[^:]*//" | sed -e "s/:/-config /"); \
+	dune exec -- ptests/ptests.exe tests
+	for config in $(TEST_CONFIGS); do \
+		test -f tests/ptests_$$config || echo "Warning: use default ptests_config (no file: tests/ptests_config_$$config)"; \
+		dune exec -- ptests/ptests.exe tests -config $$config; \
 	done
-	dune build $(addprefix @tests/,$(addsuffix /ptests,$(TESTS))) \
-	           $(addprefix @src/plugins/,$(addsuffix /tests/ptests,$(PLUGIN_TESTS)))
+	for plugin in $(PLUGIN_TEST_DIRS); do \
+		dune exec -- ptests/ptests.exe $$plugin; \
+	done
+	for plugin in $(PLUGIN_CONFIGS); do \
+		plugin_dir=src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests; \
+		config_name=$$(echo $$plugin | sed -e "s/^[^:]*://"); \
+		config_file=$$plugin_dir/ptests_config_$$config_name; \
+		test -f $$config_file || echo "Warning: use default ptests_config (no file: $$(config_file))"; \
+		dune exec -- ptests/ptests.exe $$plugin_dir -config $$config_name; \
+	done
+	dune build $(TEST_ALIAS)
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests

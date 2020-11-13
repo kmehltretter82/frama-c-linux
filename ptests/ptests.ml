@@ -947,6 +947,8 @@ let show_cmd =
   let subst = Str.global_replace regexp "\\1" in
   fun ~cmd ~res ~errlog -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res errlog
 
+let ptests_alias = config_name "ptests_config"
+
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
   let errlog = log_prefix ^ ".err.log" in
@@ -1082,9 +1084,10 @@ let command_string ~result_fmt ~oracle_fmt command =
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
     (log_prefix ^ ".err.log");
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name ptests); (enabled_if (and true %a))\n\
+    "(alias (deps (alias %S)) (name %s); (enabled_if (and true %a))\n\
      )@."
     diff_alias
+    ptests_alias
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
   Format.fprintf oracle_fmt
@@ -1148,11 +1151,12 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
        in
        Format.fprintf result_fmt
          "(rule\n  \
-          (alias ptests)\n  \
+          (alias %s)\n  \
           (deps %a (package frama-c)%a)\n  \
           (targets %a %a)\n  \
           (action (system %S))\n\
           )\n"
+         ptests_alias
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
          print_list res.ex_log
@@ -1162,9 +1166,10 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
        List.iter (fun log ->
            Format.fprintf result_fmt
              "(rule\n  \
-              (alias ptests)\n  \
+              (alias %s)\n  \
               (action (diff %S %S))\n\
               )\n"
+             ptests_alias
              (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
              log
          ) res.ex_log
@@ -1208,6 +1213,7 @@ let () =
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
+       Format.fprintf result_fmt "(alias (deps (alias %s)) (name ptests))@." ptests_alias ;
        let oracle_dune_file = Filename.concat (SubDir.make_file directory SubDir.oracle_dirname) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
