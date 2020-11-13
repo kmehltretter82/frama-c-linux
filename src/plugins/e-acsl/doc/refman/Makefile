@@ -27,13 +27,13 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 e-acsl: e-acsl-implementation.pdf e-acsl.pdf
 all: e-acsl
 
-e-acsl-implementation.pdf: $(DEPS_MODERN)
+e-acsl-implementation.pdf: $(DEPS_MODERN) $(FRAMAC_MODERN)
 e-acsl-implementation.tex: $(MAIN).tex Makefile
 	rm -f $@
 	sed -e '/PrintRemarks/s/%--//' $^ > $@
 	chmod a-w $@
 
-e-acsl.pdf: $(DEPS_MODERN)
+e-acsl.pdf: $(DEPS_MODERN) $(FRAMAC_MODERN)
 e-acsl.tex: e-acsl-implementation.tex Makefile
 	rm -f $@
 	sed -e '/PrintImplementationRq/s/%--//' \
