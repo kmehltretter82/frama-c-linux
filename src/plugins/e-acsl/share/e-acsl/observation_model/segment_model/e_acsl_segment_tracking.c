@@ -895,7 +895,7 @@ int heap_initialized(uintptr_t addr, long len) {
     unsigned char mask = 0;
     setbits64_skip(set,mask,skip);
 
-    if (*shadow != mask)
+    if ((*shadow & mask) != mask)
       return 0;
   }
   if (len > 0)
