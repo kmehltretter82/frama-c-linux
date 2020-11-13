@@ -172,20 +172,24 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
         List.iter aux_loop enclosing_loops;
         Cil.DoChildren
       end
-    | Instr (Set ((Var vi, _), exp, _) ) -> begin
-        match exp.enode with
-        | BinOp (Mod, _, modu, _typ)
-        | CastE (_typ, {enode = BinOp (Mod, _, modu, _)}) ->
-          begin
-            match Cil.constFoldToInt modu with
-            | None -> ()
-            | Some i ->
-              let base = Base.of_varinfo vi in
-              let threshold = Ival.Widen_Hints.singleton (Integer.pred i) in
-              self#add_int_thresholds ~base threshold;
-          end
-        | _ -> ()
-      end;
+    | Instr (Set ((Var vi, _), exp, _) ) ->
+      let rec find_candidates expr =
+        match expr.enode with
+        | BinOp (Mod, _, modu, _typ) -> [modu]
+        | BinOp (LAnd, e1, e2, _typ) -> [e1; e2]
+        | CastE (_, expr)
+        | Info (expr, _) -> find_candidates expr
+        | _ -> []
+      in
+      let process expr =
+        match Cil.constFoldToInt expr with
+        | None -> ()
+        | Some i ->
+          let base = Base.of_varinfo vi in
+          let threshold = Ival.Widen_Hints.singleton (Integer.pred i) in
+          self#add_int_thresholds ~base threshold
+      in
+      List.iter process (find_candidates exp);
       Cil.DoChildren
     | _ -> Cil.DoChildren
 
