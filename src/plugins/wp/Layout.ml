@@ -99,15 +99,12 @@ struct
       let typ = TComp(comp,Cil.empty_size_cache (),[]) in
       H.add cache comp typ ; typ
 
-  let field_offset cache fd =
-    let typ = typ_of_comp cache fd.fcomp in
-    let offset = Cil_types.(Field(fd,NoOffset)) in
-    Cil.bitsOffset typ offset
+  let field_offset _cache fd =
+    Cil.fieldBitsOffset fd
 
   let range_field cache fd =
     let typ = typ_of_comp cache fd.fcomp in
-    let offset = Cil_types.(Field(fd,NoOffset)) in
-    Cil.bitsOffset typ offset , Cil.bitsSizeOf typ
+    Cil.fieldBitsOffset fd, Cil.bitsSizeOf typ
 
   let range_index typ n =
     let len = Cil.bitsSizeOf typ * n in (0 , len) , len

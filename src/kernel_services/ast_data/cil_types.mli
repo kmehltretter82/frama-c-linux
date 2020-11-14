@@ -436,13 +436,14 @@ and fieldinfo = {
       expression. *)
 
   mutable fsize_in_bits: int option;
-  (** (Deprecated. Use {!Cil.bitsOffset} instead.) Similar to [fbitfield] for
-      all types of fields.
-      @deprecated only Jessie uses this *)
+  (** Similar to [fbitfield] for all types of fields.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable foffset_in_bits: int option;
-  (** Offset at which the field starts in the structure. Do not read directly,
-      but use {!Cil.bitsOffset} instead. *)
+  (** Offset at which the field starts in the structure.
+      Do not read this field directly. Use {!Cil.fieldBitsOffset} or
+      {!Cil.bitsOffset} instead. *)
 
   mutable fpadding_in_bits: int option;
   (** (Deprecated.) Store the size of the padding that follows the field, if any.

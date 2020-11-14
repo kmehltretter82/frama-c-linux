@@ -489,12 +489,7 @@ let bits_sizeof_object = function
   | C_array ainfo -> bits_sizeof_array ainfo
 
 let field_offset fd =
-  if fd.fcomp.cstruct then (* C struct *)
-    let ctype = TComp(fd.fcomp,Cil.empty_size_cache(),[]) in
-    let offset = Field(fd,NoOffset) in
-    fst (Cil.bitsOffset ctype offset) / 8
-  else (* CIL invariant: all C union fields start at offset 0 *)
-    0
+  fst (Cil.fieldBitsOffset fd) / 8
 
 (* Conforms to C-ISO 6.3.1.8        *)
 (* If same sign => greater rank.    *)

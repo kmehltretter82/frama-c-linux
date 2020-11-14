@@ -1151,7 +1151,7 @@ and equalModuloPackedAlign attrs1 attrs2 =
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
-and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
+and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
@@ -1160,11 +1160,8 @@ and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
        in which case the difference may be safely ignored *)
     begin
       try
-        let offs1, width1 =
-          Cil.bitsOffset typ_ci1 (Field (f1, NoOffset))
-        in
-        let offs2, width2 =
-          Cil.bitsOffset typ_ci2 (Field (f2, NoOffset))
+        let offs1, width1 = Cil.fieldBitsOffset f1
+        and offs2, width2 = Cil.fieldBitsOffset f2
         in
         if not (equalModuloPackedAlign f1.fattr f2.fattr)
         || offs1 <> offs2 || width1 <> width2 then
@@ -1252,12 +1249,9 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
                      [%a] vs [%a]"
                     pp_attrs attrs pp_attrs oldattrs))
         in
-        let typ_ci = TComp(ci, {scache = Not_Computed}, []) in
-        let typ_oldci = TComp(oldci, {scache = Not_Computed}, []) in
         List.iter2
           (fun oldf f ->
-             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets
-               typ_ci typ_oldci f oldf;
+             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
              (* Make sure the types are compatible *)
              (* Note: 6.2.7 §1 states that the names of the fields should be the
                 same. We do not force this for now, but could do it. *)

@@ -248,8 +248,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
         try
           let full_fields_to_print = List.fold_left
             (fun acc field ->
-               let current_offset = Field (field,NoOffset) in
-               let start_o,width_o = bitsOffset typ current_offset in
+               let start_o,width_o = fieldBitsOffset field in
                let start_o,width_o =
                  Integer.of_int start_o, Integer.of_int width_o
                in
