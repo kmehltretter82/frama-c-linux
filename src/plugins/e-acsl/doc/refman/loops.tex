@@ -16,13 +16,13 @@
   loop-clause ::= loop-invariant ;
                 | { loop-assigns }
   \
-  [ loop-invariant ] ::= [ "loop" "invariant" pred ";" ] ;
+  [ loop-invariant ] ::= { clause-kind? } [ "loop" "invariant" pred ";" ] ;
   \
   { loop-assigns } ::= { "loop" "assigns" locations ";" } ;
   \
   { loop-behavior } ::= { "for" id ("," id)* ":" } ;
-  { loop-clause* } ; \hspace{-30mm} annotation for behavior $id$
+  { loop-clause* } ; \hspace{-35mm} annotation for behavior $id$
   \
   { loop-variant } ::= { "loop" "variant" term ";" } ;
-  | { "loop" "variant" term "for" id ";" } ;  \hspace{-30mm} variant for relation $id$
+  | { "loop" "variant" term "for" id ";" } ;  \hspace{-35mm} variant for relation $id$
 \end{syntax}
