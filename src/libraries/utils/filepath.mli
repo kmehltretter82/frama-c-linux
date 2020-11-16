@@ -156,6 +156,11 @@ module Normalized: sig
   (** @since 20.0-Calcium *)
   val is_unknown: t -> bool
 
+  (** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
+      which is a special notation for 'stdout'.
+      @since Frama-C+dev *)
+  val is_special_stdout: t -> bool
+
   (** [is_file f] returns [true] iff [f] points to a regular file
       (or a symbolic link pointing to a file).
       Returns [false] if any errors happen when [stat]'ing the file.
