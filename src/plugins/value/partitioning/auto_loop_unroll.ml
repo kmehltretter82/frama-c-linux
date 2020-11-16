@@ -495,7 +495,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           Base.Hptset.fold (fun base acc -> Base.to_varinfo base :: acc) bases []
         in
         Some varinfo_list
-      with Base.Not_a_C_variable -> assert false
+      with Base.Not_a_C_variable -> None
 
   let (>>:) v f = match v with Some v -> f v | None -> false
 
