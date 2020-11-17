@@ -278,11 +278,8 @@
 [eva] tests/value/auto_loop_unroll.c:112: Frama_C_show_each_120: {120}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:115: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:122: Frama_C_show_each_32_64: [32..64]
-[eva] tests/value/auto_loop_unroll.c:125: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:130: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:132: 
-  Frama_C_show_each_1_28: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:125: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:132: Frama_C_show_each_1_28: [1..28]
 [eva] tests/value/auto_loop_unroll.c:134: starting to merge loop iterations
 [eva:alarm] tests/value/auto_loop_unroll.c:139: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;

@@ -319,24 +319,32 @@ module Make (Abstract: Abstractions.Eva) = struct
   let (>>) v f = match v with `Value v -> f v | _ -> None
   let (>>=) v f = match v with Some v -> f v | None -> None
 
+  (* Over-approximation of the change of a value in one iteration of a loop. *)
+  type increment =
+    { value: Val.t or_bottom; (* Possible values at the end of an iteration. *)
+      delta: Val.t or_bottom; (* Possible increments in one iteration. *)
+    }
+
   (* Raised when no increment can be computed for the given lvalue in one
      loop iteration. *)
   exception NoIncrement
 
-  (* Adds or subtracts the integer value of [expr] to the current [delta],
-     according to [binop] which can be PlusA or MinusA.
+  (* Adds or subtracts the integer value of [expr] to the current increment
+     [acc.delta], according to [binop] which can be PlusA or MinusA.
      Raises NoIncrement if [expr] is not a constant integer expression. *)
-  let add_to_delta binop delta expr =
+  let add_to_delta binop acc expr =
     let typ = Cil.typeOf expr in
     match Cil.constFoldToInt expr with
     | None -> raise NoIncrement
     | Some i ->
-      let value = Val.inject_int typ i in
-      Bottom.non_bottom (Val.forward_binop typ binop delta value)
+      let add_to v =
+        v >>- fun v -> Val.forward_binop typ binop v (Val.inject_int typ i)
+      in
+      { value = add_to acc.value; delta = add_to acc.delta; }
 
-  (* Adds to [delta] the increment from the assignement of [lval] to the value
+  (* Adds to [acc] the increment from the assignement of [lval] to the value
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
-  let rec delta_assign lval delta expr =
+  let rec delta_assign lval acc expr =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
     let rec is_lval e = match e.enode with
       | Lval lv -> Cil_datatype.LvalStructEq.equal lval lv
@@ -344,27 +352,32 @@ module Make (Abstract: Abstractions.Eva) = struct
       | Info (e, _) -> is_lval e
       | _ -> false
     in
-    match expr.enode with
-    | BinOp ((PlusA | MinusA) as binop, e1, e2, _) ->
-      if is_lval e1
-      then add_to_delta binop delta e2
-      else if is_lval e2 && binop = PlusA
-      then add_to_delta binop delta e1
-      else raise NoIncrement
-    | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval delta e
-    | Info (e, _) -> delta_assign lval delta e
-    | _ -> raise NoIncrement
+    match Cil.constFoldToInt expr with
+    | Some i ->
+      let v = Val.inject_int (Cil.typeOf expr) i in
+      { value = `Value v; delta = `Bottom; }
+    | None ->
+      match expr.enode with
+      | BinOp ((PlusA | MinusA) as binop, e1, e2, _) ->
+        if is_lval e1
+        then add_to_delta binop acc e2
+        else if is_lval e2 && binop = PlusA
+        then add_to_delta binop acc e1
+        else raise NoIncrement
+      | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval acc e
+      | Info (e, _) -> delta_assign lval acc e
+      | _ -> raise NoIncrement
 
-  let delta_instruction ~inner_loop lval delta = function
+  let delta_instruction ~inner_loop lval acc = function
     | Set (lv, expr, _loc) ->
       if Cil_datatype.LvalStructEq.equal lval lv
-      then if inner_loop then raise NoIncrement else delta_assign lval delta expr
-      else delta
+      then if inner_loop then raise NoIncrement else delta_assign lval acc expr
+      else acc
     | Call (Some lv, _, _, _) ->
       if Cil_datatype.LvalStructEq.equal lval lv
       then raise NoIncrement (* No increment can be computed for a call. *)
-      else delta
-    | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> delta
+      else acc
+    | Call (None, _, _, _) | Local_init _ | Skip _ | Code_annot _ -> acc
     | Asm _ -> raise NoIncrement
 
   (* Computes an over-approximation of the increment of [lval] in the [loop].
@@ -378,9 +391,13 @@ module Make (Abstract: Abstractions.Eva) = struct
         delta_instruction ~inner_loop lval value instr
       | _ -> value
     in
-    match Graph.compute loop transfer Val.join Val.zero with
-    | Some d -> if is_true (Val.assume_non_zero d) then Some d else None
-    | None | exception NoIncrement -> None
+    let join t1 t2 =
+      { value = Bottom.join Val.join t1.value t2.value;
+        delta = Bottom.join Val.join t1.delta t2.delta; }
+    in
+    let init = { value = `Bottom; delta = `Value Val.zero } in
+    try Graph.compute loop transfer join init
+    with NoIncrement -> None
 
   let cvalue_complement typ cvalue =
     let open Eval_typ in
@@ -522,24 +539,38 @@ module Make (Abstract: Abstractions.Eva) = struct
       let lval = cross_equality loop lval in
       (* Evaluates the initial value [v_init] of [lval] in the loop entry state. *)
       evaluate_lvalue state lval >>: fun v_init ->
-      (* Computes an over-approximation [v_delta] of the increment of [lval]
+      (* Computes an over-approximation [v_incr] of the value update of [lval]
          in one iteration of the loop. *)
-      compute_delta lval loop >>: fun v_delta ->
+      compute_delta lval loop >>: fun v_incr ->
       let typ = Cil.typeOfLval lval in
       let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
-      (* Possible iterations numbers to exit the loop. *)
-      let iter_nb = binop Div (binop MinusA v_exit v_init) v_delta in
-      let bound = Abstract_value.Int (Integer.of_int limit) in
-      (* Use the iteration number if it is always smaller than the [limit].
-         Otherwise use [limit]. *)
-      let limit =
-        if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
-        then iter_nb
-        else Val.inject_int typ (Integer.of_int limit)
+      (* Computes the possible values of [lval] after n loop iterations. *)
+      let value =
+        (* [delta] is the possible increments of [lval] in one iteration. *)
+        v_incr.delta >>-: fun delta ->
+        (* If [delta] can be zero, then [lval] can be unchanged in an iteration,
+           and the loop may never terminate: we abort the heuristic. *)
+        if not (is_true (Val.assume_non_zero delta)) then raise Not_found;
+        (* Possible iterations numbers to exit the loop. *)
+        let iter_nb = binop Div (binop MinusA v_exit v_init) delta in
+        let bound = Abstract_value.Int (Integer.of_int limit) in
+        (* Use the iteration number if it is always smaller than the [limit].
+           Otherwise use [limit]. *)
+        let limit =
+          if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
+          then iter_nb
+          else Val.inject_int typ (Integer.of_int limit)
+        in
+        (* Computes the possible values of [lval] as the end of the loop, as
+           [v_init] + [limit] × [v_delta]. *)
+        binop PlusA v_init (binop Mult limit delta)
       in
-      (* Checks whether [v_init] + [limit] × [v_delta] ⊂ [v_exit]. *)
-      let value = binop PlusA v_init (binop Mult limit v_delta) in
-      Val.is_included value v_exit
+      (* [v_incr.value] are possible values for [lval] at the end of an
+         iteration, without increment/decrement. *)
+      let final_value = Bottom.join Val.join value v_incr.value in
+      (* Checks whether [final_value] ⊂ [v_exit], a sufficient condition
+         to exit the loop. *)
+      Bottom.is_included Val.is_included final_value (`Value v_exit)
     in
     (* Tests whether at least one of the exit conditions limits the number of
        iteration by [limit]. *)
