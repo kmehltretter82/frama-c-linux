@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
+                can be compiled and used from sources.
+
 #############################
 Plugin E-ACSL 22.0 (Titanium)
 #############################
