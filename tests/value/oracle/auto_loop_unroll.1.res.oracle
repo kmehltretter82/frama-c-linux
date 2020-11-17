@@ -6,7 +6,7 @@
   undet ∈ [--..--]
   g ∈ {0}
 [eva] computing for function simple_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:347.
+  Called from tests/value/auto_loop_unroll.c:366.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:24: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:24: 
   Trace partitioning superposing up to 100 states
@@ -25,7 +25,7 @@
 [eva] Recording results for simple_loops
 [eva] Done for function simple_loops
 [eva] computing for function various_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:348.
+  Called from tests/value/auto_loop_unroll.c:367.
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:57: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:59: Frama_C_show_each_64: {64}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:62: Automatic loop unrolling.
@@ -278,134 +278,143 @@
 [eva] tests/value/auto_loop_unroll.c:112: Frama_C_show_each_120: {120}
 [eva:loop-unroll] tests/value/auto_loop_unroll.c:115: Automatic loop unrolling.
 [eva] tests/value/auto_loop_unroll.c:122: Frama_C_show_each_32_64: [32..64]
+[eva] tests/value/auto_loop_unroll.c:125: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:130: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:132: 
+  Frama_C_show_each_1_28: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:134: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:139: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:141: Frama_C_show_each_top: [0..2147483647]
 [eva] Recording results for various_loops
 [eva] Done for function various_loops
 [eva] computing for function complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:349.
-[eva] tests/value/auto_loop_unroll.c:133: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:135: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:137: 
-  Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:141: starting to merge loop iterations
-[eva] tests/value/auto_loop_unroll.c:142: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:143: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:146: Warning: 
-  signed overflow. assert i + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:145: Warning: 
-  signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:148: 
-  Frama_C_show_each_imprecise: [0..2147483647]
+  Called from tests/value/auto_loop_unroll.c:368.
 [eva] tests/value/auto_loop_unroll.c:152: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:155: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:154: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:157: 
+[eva] tests/value/auto_loop_unroll.c:156: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:162.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
+[eva] tests/value/auto_loop_unroll.c:160: starting to merge loop iterations
 [eva] tests/value/auto_loop_unroll.c:161: starting to merge loop iterations
-[eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:162.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:162.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr_g <- complex_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:162.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
-[eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+[eva:alarm] tests/value/auto_loop_unroll.c:162: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:165: Warning: 
+  signed overflow. assert i + 1 ≤ 2147483647;
 [eva:alarm] tests/value/auto_loop_unroll.c:164: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:166: 
+[eva] tests/value/auto_loop_unroll.c:167: 
   Frama_C_show_each_imprecise: [0..2147483647]
 [eva] tests/value/auto_loop_unroll.c:171: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:174: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:175: 
+[eva] tests/value/auto_loop_unroll.c:176: 
   Frama_C_show_each_imprecise: [0..2147483647]
-[eva] tests/value/auto_loop_unroll.c:179: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
+[eva] computing for function incr_g <- complex_loops <- main.
+  Called from tests/value/auto_loop_unroll.c:181.
+[eva] Recording results for incr_g
+[eva] Done for function incr_g
+[eva] tests/value/auto_loop_unroll.c:180: starting to merge loop iterations
+[eva] computing for function incr_g <- complex_loops <- main.
+  Called from tests/value/auto_loop_unroll.c:181.
+[eva] Recording results for incr_g
+[eva] Done for function incr_g
+[eva] computing for function incr_g <- complex_loops <- main.
+  Called from tests/value/auto_loop_unroll.c:181.
+[eva] Recording results for incr_g
+[eva] Done for function incr_g
+[eva] computing for function incr_g <- complex_loops <- main.
+  Called from tests/value/auto_loop_unroll.c:181.
+[eva] Recording results for incr_g
+[eva] Done for function incr_g
+[eva] tests/value/auto_loop_unroll.c:181: Reusing old results for call to incr_g
+[eva] tests/value/auto_loop_unroll.c:181: Reusing old results for call to incr_g
+[eva:alarm] tests/value/auto_loop_unroll.c:183: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva:alarm] tests/value/auto_loop_unroll.c:180: Warning: 
+[eva] tests/value/auto_loop_unroll.c:185: 
+  Frama_C_show_each_imprecise: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:190: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:192: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva] tests/value/auto_loop_unroll.c:194: 
+  Frama_C_show_each_imprecise: [0..2147483647]
+[eva] tests/value/auto_loop_unroll.c:198: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:200: Warning: 
+  signed overflow. assert res + 1 ≤ 2147483647;
+[eva:alarm] tests/value/auto_loop_unroll.c:199: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:183: 
+[eva] tests/value/auto_loop_unroll.c:202: 
   Frama_C_show_each_imprecise: [0..2147483647]
 [eva] Recording results for complex_loops
 [eva] Done for function complex_loops
 [eva] computing for function various_conditions <- main.
-  Called from tests/value/auto_loop_unroll.c:350.
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:192: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:197: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:203: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:206: Frama_C_show_each_0_13: [0..13]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:208: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:211: Frama_C_show_each_0_14: [0..14]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:214: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:219: Frama_C_show_each_0_15: [0..15]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:221: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:221: 
+  Called from tests/value/auto_loop_unroll.c:369.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:211: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:214: Frama_C_show_each_11: {11}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:216: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:219: Frama_C_show_each_12: {12}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:222: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:225: Frama_C_show_each_0_13: [0..13]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:227: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:230: Frama_C_show_each_0_14: [0..14]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:233: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_0_15: [0..15]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:240: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:240: 
   Trace partitioning superposing up to 100 states
-[eva] tests/value/auto_loop_unroll.c:226: Frama_C_show_each_11_111: [11..111]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:231: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:234: Frama_C_show_each_16: {16}
+[eva] tests/value/auto_loop_unroll.c:245: Frama_C_show_each_11_111: [11..111]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:250: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:253: Frama_C_show_each_16: {16}
 [eva] Recording results for various_conditions
 [eva] Done for function various_conditions
 [eva] computing for function temporary_variables <- main.
-  Called from tests/value/auto_loop_unroll.c:351.
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:243: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:246: Frama_C_show_each_20: {20}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:248: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:251: Frama_C_show_each_21: {21}
+  Called from tests/value/auto_loop_unroll.c:370.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:262: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:265: Frama_C_show_each_20: {20}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:267: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:270: Frama_C_show_each_21: {21}
 [eva] Recording results for temporary_variables
 [eva] Done for function temporary_variables
 [eva] computing for function loops_with_goto <- main.
-  Called from tests/value/auto_loop_unroll.c:352.
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:257: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:262: Frama_C_show_each_30: {30}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:266: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:266: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:267: Warning: 
+  Called from tests/value/auto_loop_unroll.c:371.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:276: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:281: Frama_C_show_each_30: {30}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:285: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:285: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:286: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:266: 
+[eva] tests/value/auto_loop_unroll.c:285: 
   Trace partitioning superposing up to 100 states
-[eva] tests/value/auto_loop_unroll.c:271: 
+[eva] tests/value/auto_loop_unroll.c:290: 
   Frama_C_show_each_top: [31..2147483647]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:274: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:280: Frama_C_show_each_32: {32}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:283: Automatic loop unrolling.
-[eva:alarm] tests/value/auto_loop_unroll.c:284: Warning: 
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:293: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:299: Frama_C_show_each_32: {32}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:302: Automatic loop unrolling.
+[eva:alarm] tests/value/auto_loop_unroll.c:303: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:288: 
+[eva] tests/value/auto_loop_unroll.c:307: 
   Frama_C_show_each_33_inf: [33..2147483647]
-[eva:alarm] tests/value/auto_loop_unroll.c:292: Warning: 
+[eva:alarm] tests/value/auto_loop_unroll.c:311: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:291: starting to merge loop iterations
-[eva:alarm] tests/value/auto_loop_unroll.c:291: Warning: 
+[eva] tests/value/auto_loop_unroll.c:310: starting to merge loop iterations
+[eva:alarm] tests/value/auto_loop_unroll.c:310: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] tests/value/auto_loop_unroll.c:296: Frama_C_show_each_top: [0..2147483647]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:299: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:304: Frama_C_show_each_0_35: [0..35]
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:307: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:311: Frama_C_show_each_36: {36}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:314: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:319: Frama_C_show_each_27: {27}
+[eva] tests/value/auto_loop_unroll.c:315: Frama_C_show_each_top: [0..2147483647]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:318: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:323: Frama_C_show_each_0_35: [0..35]
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:326: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:330: Frama_C_show_each_36: {36}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:333: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:338: Frama_C_show_each_27: {27}
 [eva] Recording results for loops_with_goto
 [eva] Done for function loops_with_goto
 [eva] computing for function non_natural_loops <- main.
-  Called from tests/value/auto_loop_unroll.c:353.
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:329: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:334: Frama_C_show_each_50: {50}
-[eva:loop-unroll] tests/value/auto_loop_unroll.c:338: Automatic loop unrolling.
-[eva] tests/value/auto_loop_unroll.c:342: Frama_C_show_each_1_51: [1..51]
+  Called from tests/value/auto_loop_unroll.c:372.
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:348: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:353: Frama_C_show_each_50: {50}
+[eva:loop-unroll] tests/value/auto_loop_unroll.c:357: Automatic loop unrolling.
+[eva] tests/value/auto_loop_unroll.c:361: Frama_C_show_each_1_51: [1..51]
 [eva] Recording results for non_natural_loops
 [eva] Done for function non_natural_loops
 [eva] Recording results for main
@@ -540,7 +549,7 @@
     undet
 [inout] Out (internal) for function various_loops:
     Frama_C_entropy_source; g; res; i; i_0; i_1; i_2; x; k; i_3; i_4; t; 
-    i_5; j; i_6
+    i_5; j; i_6; i_7; i_8
 [inout] Inputs for function various_loops:
     Frama_C_entropy_source; undet; g
 [inout] Out (internal) for function main:

@@ -121,6 +121,25 @@ void various_loops () {
   }
   Frama_C_show_each_32_64(res);
   res = 0;
+  /* Loop counter decremented or directly assigned. */
+  for (int i = 28; i > 0;) {
+    if (undet)
+      i = -1; // exits the loop
+    else
+      i--;
+    res++;
+  }
+  Frama_C_show_each_1_28(res);
+  res = 0;
+  for (int i = 28; i > 0;) {
+    if (undet)
+      i = 2; // stay in the loop
+    else
+      i--;
+    res++;
+  }
+  Frama_C_show_each_top(res);
+  res = 0;
 }
 
 /* Loops that cannot be unrolled. */
