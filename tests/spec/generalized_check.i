@@ -1,8 +1,8 @@
 /* run.config
-OPT: -wp -wp-prover qed -wp-msg-key shell -wp-warn-key pedantic-assigns=inactive
 OPT: -eva -eva-use-spec f
 OPT: -print
 */
+
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 
 /*@ check requires f_valid_x: \valid(x);
