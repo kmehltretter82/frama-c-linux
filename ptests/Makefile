@@ -1,5 +1,14 @@
+all: run-tests
+
+ptests.exe: purge-tests ptests.ml
+	dune build --root . ptests.exe
+
+clean: purge-tests
+	dune clean --root .
+
 .PHONY: run-tests clean-tests purge-tests tests
 
+# removes also eventual broken dune files
 purge-tests:
 	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 
@@ -11,7 +20,7 @@ TESTS= nothing cmd
 
 run-tests: purge-tests
 	for dir in $(TESTS) ; do \
-	  dune exec -- ../ptests/ptests.exe ./tests/$$dir/tests ; \
+	  dune exec --root . ./ptests.exe ./tests/$$dir/tests ; \
 	done
 	dune build $(addprefix @tests/,$(addsuffix /tests/ptests,$(TESTS)))
 

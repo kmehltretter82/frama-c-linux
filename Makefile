@@ -122,8 +122,9 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 	@echo "s/@FLOAT_MAX_FLOAT@/$(FLOAT_MAX_FLOAT)/g" >> $@
 	@echo "s/@FORMAT_PP_OPT@/$(FORMAT_PP_OPT)/g" >> $@
 
-clean:
+clean: purge-tests
 	dune clean
+	dune clean --root ptests
 	rm -rf _build .merlin config.sed
 
 ########################################################################
@@ -202,13 +203,11 @@ PLUGIN_TEST_ALIAS= $(addprefix @src/plugins/,$(addsuffix /tests/ptests_config,$(
 TEST_DIRS+=$(PLUGIN_TEST_DIRS)
 TEST_ALIAS+=$(PLUGIN_TEST_ALIAS)
 
-.PHONY: info-tests
-info-tests:
-	@echo "test directories: $(TEST_DIRS)"
-	@echo "dune alias: $(TEST_ALIAS)"
+ptests/ptests.exe: ptests/ptests.ml
+	dune build --root ptests ptests.exe
 
 .PHONY: run-tests clean-tests purge-tests tests
-purge-tests: config.sed
+purge-tests:
 	find $(TEST_DIRS) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 
 clean-tests: purge-tests
@@ -216,20 +215,20 @@ clean-tests: purge-tests
 
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: config.sed purge-tests
-	dune exec -- ptests/ptests.exe tests
+	dune exec --root ptests -- ./ptests.exe tests
 	for config in $(TEST_CONFIGS); do \
 		test -f tests/ptests_$$config || echo "Warning: use default ptests_config (no file: tests/ptests_config_$$config)"; \
-		dune exec -- ptests/ptests.exe tests -config $$config; \
+		dune exec --root ptests -- ./ptests.exe tests -config $$config; \
 	done
 	for plugin in $(PLUGIN_TEST_DIRS); do \
-		dune exec -- ptests/ptests.exe $$plugin; \
+		dune exec --root ptests -- ./ptests.exe $$plugin; \
 	done
 	for plugin in $(PLUGIN_CONFIGS); do \
 		plugin_dir=src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests; \
 		config_name=$$(echo $$plugin | sed -e "s/^[^:]*://"); \
 		config_file=$$plugin_dir/ptests_config_$$config_name; \
 		test -f $$config_file || echo "Warning: use default ptests_config (no file: $$(config_file))"; \
-		dune exec -- ptests/ptests.exe $$plugin_dir -config $$config_name; \
+		dune exec --root ptests -- ./ptests.exe $$plugin_dir -config $$config_name; \
 	done
 	dune build $(TEST_ALIAS)
 

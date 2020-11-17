@@ -1,5 +1,5 @@
 (executable
  (name ptests)
  (modules ptests)
- (libraries unix threads str)
+ (libraries unix str)
 )
