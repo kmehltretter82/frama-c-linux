@@ -1,0 +1,29 @@
+[kernel:audit] Warning: 
+  different hashes for tests/value/audit.c: got d91c35d6c3eb02ede2ca2bdf92fda63d, expected 4574f9d5090319c57dab0c9cb81fda32
+[kernel] Audit: sources list written to: tests/value/result/audit-out.json
+[kernel] Parsing tests/value/audit.c (with preprocessing)
+[kernel:parser:decimal-float] tests/value/audit.c:9: Warning: 
+  Floating-point constant 2.1 is not represented exactly. Will use 0x1.0cccccccccccdp1.
+  (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] Recording results for main
+[eva] done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  f ∈ {2.09999990463}
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+    f
+[inout] Inputs for function main:
+    \nothing
+[kernel] Wrote: tests/value/result/audit-out.json
