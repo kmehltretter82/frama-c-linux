@@ -355,8 +355,6 @@ EACSL_MANPAGES := \
 EACSL_CONTRIB_FILES = \
   $(EACSL_DLMALLOC_REL_DIR)/dlmalloc.c
 
-EACSL_MANUAL_FILES = doc/manuals/*.pdf
-
 EACSL_DOC_FILES = \
 	doc/doxygen/doxygen.cfg.in \
 	doc/Changelog \
@@ -479,8 +477,6 @@ include $(FRAMAC_SHARE)/Makefile.dynamic
 # Install #
 ###########
 
-EACSL_INSTALL_MANUAL_FILES=$(wildcard $(addprefix $(EACSL_PLUGIN_DIR)/, $(EACSL_MANUAL_FILES)))
-
 EACSL_INSTALL_SCRIPTS=$(addprefix $(E_ACSL_DIR)/,$(EACSL_SCRIPTS))
 
 EACSL_INSTALL_MANPAGES=$(addprefix $(E_ACSL_DIR)/,$(EACSL_MANPAGES))
@@ -491,13 +487,6 @@ install::
 		$(MKDIR) $(FRAMAC_DATADIR)/$$dir && \
 		$(CP) $(E_ACSL_DIR)/share/$$dir/*.[ch] $(FRAMAC_DATADIR)/$$dir ; \
 	done
-	# manuals are not present in standard distribution.
-	# Don't fail because of that.
-ifneq ("$(EACSL_INSTALL_MANUAL_FILES)","")
-	$(PRINT_INSTALL) E-ACSL manuals
-	$(MKDIR) $(FRAMAC_DATADIR)/manuals
-	$(CP) $(EACSL_INSTALL_MANUAL_FILES) $(FRAMAC_DATADIR)/manuals;
-endif
 	$(PRINT_INSTALL) E-ACSL libraries
 	$(MKDIR) $(LIBDIR)
 	$(CP) $(EACSL_LIBDIR)/libeacsl-*.a $(LIBDIR)
@@ -516,8 +505,6 @@ EACSL_INSTALLED_MANPAGES=$(addprefix $(MANDIR)/man1/,$(notdir $(EACSL_MANPAGES))
 uninstall::
 	$(PRINT_RM) E-ACSL share files
 	$(RM) -r $(FRAMAC_DATADIR)/e-acsl
-	$(PRINT_RM) E-ACSL manuals
-	$(RM) $(FRAMAC_DATADIR)/manuals/*.pdf
 	$(PRINT_RM) E-ACSL libraries
 	$(RM) $(LIBDIR)/libeacsl-*.a
 	$(PRINT_RM) E-ACSL scripts

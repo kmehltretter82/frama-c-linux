@@ -1,5 +1,8 @@
 \begin{syntax}
 
+  C-type-qualifier ::= C-type-qualifier ;
+  | { "\ghost" } ; only in ghost
+  \
   ghost-type-specifier ::= C-type-specifier ;
   | { logic-type } \
   declaration ::= C-declaration ;
@@ -16,7 +19,8 @@
      "(" C-argument-expression-list? ")";
      {"/*@" "ghost"} ;
      {  "(" ghost-argument-expression-list ")"};
-     {  "*/"} ; call with ghosts
+     {  "*/"} ; call
+              ; with ghosts
     \
   statement ::= C-statement ;
              | statements-ghost \
