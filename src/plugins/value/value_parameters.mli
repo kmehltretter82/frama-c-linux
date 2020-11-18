@@ -228,6 +228,10 @@ val enabled_domains: unit -> (string * string) list
     builtin `b`. *)
 val use_builtin: Cil_types.kernel_function -> string -> unit
 
+(** [use_global_value_partitioning vi] enable value partitioning on the global
+    variable `vi`. *)
+val use_global_value_partitioning: Cil_types.varinfo -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
