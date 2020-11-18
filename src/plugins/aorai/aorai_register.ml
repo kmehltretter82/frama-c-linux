@@ -356,6 +356,7 @@ let work () =
             if Aorai_option.GenerateAnnotations.get () then
               Aorai_visitors.add_pre_post_from_buch file
                 (Aorai_option.advance_abstract_interpretation ());
+            Aorai_eva_analysis.setup ();
             printverb "Annotation of Cil      : done\n";
           end
         end

@@ -718,6 +718,9 @@ src/plugins/aorai/VERSIONS.txt: .ignore
 src/plugins/aorai/YA.README: .ignore
 src/plugins/aorai/aorai_dataflow.ml: AORAI_LGPL
 src/plugins/aorai/aorai_dataflow.mli: AORAI_LGPL
+src/plugins/aorai/aorai_eva_analysis.disabled.ml: AORAI_LGPL
+src/plugins/aorai/aorai_eva_analysis.enabled.ml: AORAI_LGPL
+src/plugins/aorai/aorai_eva_analysis.mli: AORAI_LGPL
 src/plugins/aorai/aorai_graph.ml: AORAI_LGPL
 src/plugins/aorai/aorai_graph.mli: AORAI_LGPL
 src/plugins/aorai/aorai_metavariables.ml: AORAI_LGPL
