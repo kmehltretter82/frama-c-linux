@@ -274,7 +274,9 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,
   print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
-  external-assert:,validate-format-strings,no-trace,libc-replacements"
+  external-assert:,validate-format-strings,no-trace,libc-replacements,
+  with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
+  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -285,6 +287,8 @@ OPTION_CPPFLAGS=                         # Preprocessor flags
 OPTION_LDFLAGS=                          # Linker flags
 OPTION_FRAMAC="frama-c"                  # Frama-C executable name
 OPTION_CC="gcc"                          # GCC executable name
+OPTION_AR="ar"                           # AR executable name
+OPTION_RANLIB="ranlib"                   # RANLIB executable name
 OPTION_ECHO="set -x"                     # Echo executed commands to STDOUT
 OPTION_INSTRUMENT=1                      # Perform E-ACSL instrumentation
 OPTION_DEBUG=                            # Set Frama-C debug flag
@@ -318,6 +322,11 @@ OPTION_STACK_SIZE=32      # Size of a heap shadow space (in MB)
 OPTION_HEAP_SIZE=128      # Size of a stack shadow space (in MB)
 OPTION_KEEP_GOING=        # Report failing assertions but do not abort execution
 OPTION_EXTERNAL_ASSERT="" # Use custom definition of assert function
+OPTION_WITH_DLMALLOC=""                  # Use provided dlmalloc library
+OPTION_DLMALLOC_FROM_SOURCES=            # Compile dlmalloc from sources
+OPTION_DLMALLOC_COMPILE_ONLY=            # Only compile dlmalloc
+OPTION_DLMALLOC_COMPILE_FLAGS="-O2 -g3"  # Dlmalloc compilation flags
+OPTION_OUTPUT_DLMALLOC=""                # Name of the compiled dlmalloc
 
 SUPPORTED_MMODELS="bittree,segment" # Supported memory model names
 MIN_STACK=16 # Minimal size of a tracked program stack
@@ -352,8 +361,6 @@ Notes:
 
 # Base dir of this script
 BASEDIR="$(realpath `dirname $0`)"
-# Directory with contrib libraries of E-ACSL
-LIBDIR="$BASEDIR/../lib"
 
 # Run getopt
 ARGS=`getopt -n "$ERROR" -l "$LONGOPTIONS" -o "$SHORTOPTIONS" -- "$@"`
@@ -643,12 +650,47 @@ do
       shift
       OPTION_NO_TRACE=1
     ;;
+    --ar)
+      shift;
+      OPTION_AR="$(which $1)"
+      shift;
+    ;;
+    --ranlib)
+      shift;
+      OPTION_RANLIB="$(which $1)"
+      shift;
+    ;;
+    --with-dlmalloc)
+      shift;
+      OPTION_WITH_DLMALLOC="$1"
+      shift;
+    ;;
+    --dlmalloc-from-sources)
+      shift;
+      OPTION_DLMALLOC_FROM_SOURCES=1
+    ;;
+    --dlmalloc-compile-only)
+      shift;
+      OPTION_INSTRUMENT=
+      OPTION_DLMALLOC_COMPILE_ONLY=1
+    ;;
+    --dlmalloc-compile-flags)
+      shift;
+      OPTION_DLMALLOC_COMPILE_FLAGS="$1"
+      shift;
+    ;;
+    --odlmalloc)
+      shift;
+      OPTION_OUTPUT_DLMALLOC="$1"
+      shift;
+    ;;
   esac
 done
 shift;
 
-# Bail if no files to translate are given
-if [ -z "$1" ]; then
+# Bail if no files to translate are given and we're not trying to only compile
+# dlmalloc
+if [ -z "$1" -a "$OPTION_DLMALLOC_COMPILE_ONLY" != "1" ]; then
   error "no input files";
 fi
 
@@ -672,6 +714,8 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
     `test -f "$DEVELOPMENT/META.frama-c-e_acsl" -o \
           -f "$FRAMAC_PLUGIN/META.frama-c-e_acsl"; echo $?`
   EACSL_SHARE="$DEVELOPMENT/share/e-acsl"
+  EACSL_LIB="$DEVELOPMENT/lib"
+  EACSL_CONTRIB="$DEVELOPMENT/contrib"
   # Add the project directory to FRAMAC_PLUGINS,
   # otherwise Frama-C uses an installed version
   if test -f "$DEVELOPMENT/META.frama-c-e_acsl"; then
@@ -680,7 +724,9 @@ if [ -f "$BASEDIR/../E_ACSL.mli" ]; then
 else
   # Installed version. FRAMAC_SHARE should not be used here as Frama-C
   # and E-ACSL may not be installed to the same location
-  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl/"
+  EACSL_SHARE="$BASEDIR/../share/frama-c/e-acsl"
+  EACSL_LIB="$BASEDIR/../lib/frama-c/e-acsl"
+  EACSL_CONTRIB="$BASEDIR/../share/frama-c/e-acsl/contrib"
 fi
 
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
@@ -761,6 +807,81 @@ fi
 CPPFLAGS="$OPTION_CPPFLAGS"
 LDFLAGS="$OPTION_LDFLAGS"
 
+# Dlmalloc
+if [ -n "$OPTION_WITH_DLMALLOC" ]; then
+  if [ "$OPTION_DLMALLOC_FROM_SOURCES" = "1" ]; then
+    error "use either --with-dlmalloc FILE or --dlmalloc-from-sources"
+  fi
+  if [ "$OPTION_DLMALLOC_COMPILE_ONLY" = "1" ]; then
+    error "use either --with-dlmalloc FILE or --dlmalloc-compile-only"
+  fi
+
+  # Use provided dlmalloc library
+  DLMALLOC_LIB_PATH="$OPTION_WITH_DLMALLOC"
+else
+  # Use distributed dlmalloc library
+  DLMALLOC_LIB_PATH="$EACSL_LIB/libeacsl-dlmalloc.a"
+fi
+
+if [ "$OPTION_DLMALLOC_FROM_SOURCES" = "1" -o \
+     "$OPTION_DLMALLOC_COMPILE_ONLY" = "1" ]; then
+  # Check ar and ranlib tools
+  check_tool "$OPTION_AR"
+  check_tool "$OPTION_RANLIB"
+  AR="$OPTION_AR"
+  RANLIB="$OPTION_RANLIB"
+
+  # Create a temporary directory to build dlmalloc. That directory will be
+  # removed when exiting the script
+  DLMALLOC_TMP_DIR=$(mktemp -d) || error "unable to create temp directory."
+  trap 'rm -rf "$DLMALLOC_TMP_DIR"' EXIT
+
+  DLMALLOC_SRC="$EACSL_CONTRIB/libdlmalloc/dlmalloc.c"
+  DLMALLOC_OBJ="$DLMALLOC_TMP_DIR/dlmalloc.o"
+
+  if [ -n "$OPTION_OUTPUT_DLMALLOC" ]; then
+    DLMALLOC_LIB_PATH="$OPTION_OUTPUT_DLMALLOC"
+  else
+    DLMALLOC_LIB_PATH="$DLMALLOC_TMP_DIR/libeacsl-dlmalloc.a"
+  fi
+
+  DLMALLOC_FLAGS="\
+    -DHAVE_MORECORE=0 \
+    -DHAVE_MMAP=1  \
+    -DNO_MALLINFO=1 \
+    -DNO_MALLOC_STATS=1 \
+    -DMSPACES=1 \
+    -DONLY_MSPACES \
+    -DMALLOC_ALIGNMENT=32 \
+    -DMSPACE_PREFIX=__e_acsl_ \
+    $OPTION_DLMALLOC_COMPILE_FLAGS
+  "
+
+  # Compile dlmalloc from sources
+  ($OPTION_ECHO; \
+   $CC -c $DLMALLOC_SRC $DLMALLOC_FLAGS -o$DLMALLOC_OBJ)
+  error "fail to compile dlmalloc." $?
+  ($OPTION_ECHO; \
+   $AR crus $DLMALLOC_LIB_PATH $DLMALLOC_OBJ)
+  error "fail to create dlmalloc archive library." $?
+  ($OPTION_ECHO; \
+   $RANLIB $DLMALLOC_LIB_PATH)
+  error "fail to generate dlmalloc archive index." $?
+
+  # Exit if dlmalloc-compile-only has been used
+  if [ "$OPTION_DLMALLOC_COMPILE_ONLY" = "1" ]; then
+    # If dlmalloc-compile-only is used with instrumented-only or compile,
+    # display a warning message
+    if [ -n "$OPTION_COMPILE" -o -n "$OPTION_INSTRUMENT" -o \
+         -n "$OPTION_INSTRUMENTED_ONLY" ]; then
+      warning "--dlmalloc-compile-only was used, the instrumentation and \
+compilation of the source code won't be run."
+    fi
+
+    exit 0;
+  fi
+fi
+
 # Extra Frama-C Flags E-ACSL needs
 FRAMAC_FLAGS="$FRAMAC_FLAGS \
   -remove-unused-specified-functions"
@@ -768,7 +889,7 @@ FRAMAC_FLAGS="$FRAMAC_FLAGS \
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
 EACSL_CFLAGS="$OPTION_EXTERNAL_ASSERT"
 EACSL_CPPFLAGS="-I$EACSL_SHARE"
-EACSL_LDFLAGS="$LIBDIR/libeacsl-dlmalloc.a -lgmp -lm"
+EACSL_LDFLAGS="$DLMALLOC_LIB_PATH -lgmp -lm"
 
 # Output file names
 OUTPUT_CODE="$OPTION_OUTPUT_CODE" # E-ACSL instrumented source
