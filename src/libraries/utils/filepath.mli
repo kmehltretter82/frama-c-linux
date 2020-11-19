@@ -89,6 +89,13 @@ val pretty: string -> string
     printed identically in different machines. *)
 val add_symbolic_dir: string -> string -> unit
 
+(** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
+    preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
+
+    @since 22.0-Titanium
+*)
+val all_symbolic_dirs: unit -> (string * string) list
+
 (** The [Normalized] module is simply a wrapper that ensures that paths are
     always normalized. Used by [Datatype.Filepath].
     @since 18.0-Argon *)
@@ -103,8 +110,12 @@ module Normalized: sig
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
-  (** @return the normalized path resulting from the concatenation of the given
-      path and string. *)
+  (** [concat ~existence dir file] returns the normalized path
+      resulting from the concatenation of [dir] ^ "/" ^ [file].
+      The resulting path must respect [existence].
+
+      @since 22.0-Titanium
+  *)
   val concat: ?existence:existence -> t -> string -> t
 
   (** [to_pretty_string p] returns [p] prettified,
@@ -148,8 +159,21 @@ module Normalized: sig
   (** [is_file f] returns [true] iff [f] points to a regular file
       (or a symbolic link pointing to a file).
       Returns [false] if any errors happen when [stat]'ing the file.
-      @since Frama-C+dev *)
+      @since 22.0-Titanium *)
   val is_file: t -> bool
+
+  (** [to_base_uri path] returns a pair [prefix, rest], according to the
+      prettified value of [path]:
+      - if it starts with symbolic path SYMB, prefix is Some "SYMB";
+      - if it is a relative path, prefix is Some "PWD";
+      - else (an absolute path), prefix is None.
+        [rest] contains everything after the '/' following the prefix.
+        E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
+        ("FRAMAC_SHARE", "libc/string.h").
+
+      @since 22.0-Titanium
+  *)
+  val to_base_uri: t -> string option * string
 end
 
 (** Describes a position in a source file.

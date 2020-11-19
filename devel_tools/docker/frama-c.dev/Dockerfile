@@ -1,5 +1,6 @@
 FROM debian:sid as base
 
+# Install non-OCaml dependencies + opam
 RUN apt-get update && apt-get install -y \
     cvc4 \
     opam \
@@ -19,23 +20,20 @@ RUN opam update -y && opam install depext -y
 
 # Install packages from reference configuration
 RUN apt-get update && opam update -y && opam depext --install -y --verbose \
-    alt-ergo.2.0.0 \
+    alt-ergo.2.2.0 \
     apron.v0.9.12 \
     conf-graphviz.0.1 \
     mlgmpidl.1.2.12 \
     ocamlfind.1.8.1 \
     ocamlgraph.1.8.8 \
     ppx_deriving_yojson.3.5.2 \
-    why3.1.3.1 \
+    why3.1.3.3 \
     yojson.1.7.0 \
     zarith.1.9.1 \
     zmq.5.1.3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install non-OCaml solvers
-RUN apt install z3 cvc4 -y
-
-RUN why3 config --full-config
+RUN why3 config --detect
 
 # with_source: keep Frama-C sources
 ARG with_source=no
@@ -52,6 +50,7 @@ RUN cd /root && \
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no
 
+# run general tests, then test that WP can see external provers
 RUN if [ "${with_test}" != "no" ]; then \
        apt-get update && \
        opam update -y && opam depext --install -y \
@@ -61,5 +60,8 @@ RUN if [ "${with_test}" != "no" ]; then \
         && \
         rm -rf /var/lib/apt/lists/* && \
         cd /root/frama-c && \
-        make tests; \
+        make tests && \
+        (cd src/plugins/wp/tests/ && \
+         frama-c -wp wp_gallery/binary-multiplication-without-overflow.c \
+         -wp-prover alt-ergo,cvc4); \
     fi

@@ -42,12 +42,14 @@ let generate_code =
        Temporal.enable (Options.Temporal_validity.get ());
        if Plugin.is_present "variadic" then begin
          let opt_name = "-variadic-translation" in
-         if Dynamic.Parameter.Bool.get opt_name () then begin
+         if Dynamic.Parameter.Bool.get opt_name () &&
+            Options.Validate_format_strings.get () then begin
            if Ast.is_computed () then
              Options.abort
-               "The variadic translation must be turned off for E-ACSL. \
-                Please use option '-variadic-no-translation'";
-           Options.warning "deactivating variadic translation";
+               "The variadic translation is incompatible with E-ACSL option \
+                '%s'.@ Please use option '-variadic-no-translation'."
+               Options.Validate_format_strings.option_name
+               Options.warning "deactivating variadic translation";
            Dynamic.Parameter.Bool.off opt_name ();
          end
        end;
@@ -105,15 +107,6 @@ let generate_code =
     "generate_code"
     (Datatype.func Datatype.string Project.ty)
     generate_code
-
-let predicate_to_exp =
-  Dynamic.register
-    ~plugin:"E_ACSL"
-    ~journalize:false
-    "predicate_to_exp"
-    (Datatype.func2
-       Kernel_function.ty Cil_datatype.Predicate.ty Cil_datatype.Exp.ty)
-    Translate.predicate_to_exp
 
 (* The Frama-C standard library contains specific built-in variables prefixed by
    "__fc_" and declared as extern: they prevent the generated code to be

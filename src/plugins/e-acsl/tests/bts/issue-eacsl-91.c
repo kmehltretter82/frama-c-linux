@@ -1,7 +1,7 @@
 /* run.config_ci
    COMMENT: frama-c/e-acsl#91, test for misplaced delete_block of local variable
    in switch.
-   STDOPT: #"-e-acsl-full-mmodel"
+   STDOPT: #"-e-acsl-full-mtracking"
 */
 short a;
 char b()

@@ -396,6 +396,9 @@ let get_machdep () =
   with Not_found -> (* Should not happen given the checks above *)
     Kernel.fatal "Machdep %s not registered" m
 
+let list_available_machdeps () =
+  Machdeps.fold (fun m _ acc -> m :: acc) (List.map fst default_machdeps)
+
 let pretty_machdep ?fmt ?machdep () =
   let machine = match machdep with None -> get_machdep () | Some m -> m in
   match fmt with

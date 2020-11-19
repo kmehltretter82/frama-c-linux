@@ -27,8 +27,11 @@ type slevel_annotation =
   | SlevelMerge
   | SlevelDefault
   | SlevelLocal of int
+  | SlevelFull
 
-type unroll_annotation = term option
+type unroll_annotation =
+  | UnrollAmount of Cil_types.term
+  | UnrollFull
 
 type flow_annotation =
   | FlowSplit of term
@@ -112,6 +115,7 @@ module Slevel = Register (struct
     let parse ~typing_context:_ = function
       | [{lexpr_node = PLvar "default"}] -> SlevelDefault
       | [{lexpr_node = PLvar "merge"}] -> SlevelMerge
+      | [{lexpr_node = PLvar "full"}] -> SlevelFull
       | [{lexpr_node = PLconstant (IntConstant i)}] ->
         let i =
           try int_of_string i
@@ -125,12 +129,14 @@ module Slevel = Register (struct
       | SlevelDefault -> Ext_terms [Logic_const.tstring "default"]
       | SlevelMerge -> Ext_terms [Logic_const.tstring "merge"]
       | SlevelLocal i -> Ext_terms [Logic_const.tinteger i]
+      | SlevelFull -> Ext_terms [Logic_const.tstring "full"]
 
     let import = function
       | Ext_terms [{term_node}] ->
         begin match term_node with
           | TConst (LStr "default") -> SlevelDefault
           | TConst (LStr "merge") -> SlevelMerge
+          | TConst (LStr "full") -> SlevelFull
           | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int i)
           | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor
                                   that will simplify our term into something
@@ -142,6 +148,7 @@ module Slevel = Register (struct
       | SlevelDefault -> Format.pp_print_string fmt "default"
       | SlevelMerge -> Format.pp_print_string fmt "merge"
       | SlevelLocal i -> Format.pp_print_int fmt i
+      | SlevelFull -> Format.pp_print_string fmt "full"
   end)
 
 module SimpleTermAnnotation =
@@ -164,31 +171,32 @@ struct
   let print = Printer.pp_term
 end
 
-module OptionalTermAnnotation =
-struct
-  type t = term option
-
-  let parse ~typing_context = function
-    | [] -> None
-    | [t] ->
-      let open Logic_typing in
-      Some (typing_context.type_term typing_context typing_context.pre_state t)
-    | _ -> raise Parse_error
-
-  let export t =
-    Ext_terms (Extlib.list_of_opt t)
-
-  let import = function
-    | Ext_terms l -> Extlib.opt_of_list l
-    | _ -> assert false
-
-  let print = Pretty_utils.pp_opt Printer.pp_term
-end
-
 module Unroll = Register (struct
-    include OptionalTermAnnotation
+    type t = unroll_annotation
+
     let name = "unroll"
     let is_loop_annot = true
+
+    let parse ~typing_context = function
+      | [] -> UnrollFull
+      | [t] ->
+        let open Logic_typing in
+        UnrollAmount
+          (typing_context.type_term typing_context typing_context.pre_state t)
+      | _ -> raise Parse_error
+
+    let export = function
+      | UnrollFull -> Ext_terms []
+      | UnrollAmount t -> Ext_terms [t]
+
+    let import = function
+      | Ext_terms [] -> UnrollFull
+      | Ext_terms [t] -> UnrollAmount t
+      | _ -> assert false
+
+    let print fmt = function
+      | UnrollFull -> ()
+      | UnrollAmount t -> Printer.pp_term fmt t
   end)
 
 module Split = Register (struct

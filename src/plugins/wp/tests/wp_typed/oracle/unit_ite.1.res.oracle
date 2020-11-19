@@ -1,7 +1,6 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_typed/unit_ite.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function check
@@ -11,6 +10,8 @@ Goal Post-condition (file tests/wp_typed/unit_ite.i, line 2) in 'check':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'check':
-  /*@ behavior typed_ref: requires \valid(p); */
+[wp] tests/wp_typed/unit_ite.i:3: Warning: 
+  Memory model hypotheses for function 'check':
+  /*@ behavior wp_typed_ref:
+        requires \valid(p); */
   void check(int x, int *p);

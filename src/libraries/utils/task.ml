@@ -469,7 +469,7 @@ let schedule server q =
     done
   with Queue.Empty -> ()
 
-let rec run_server server () =
+let server_progress server () =
   begin
     server.running <- List.filter
         (fun task ->
@@ -479,30 +479,29 @@ let rec run_server server () =
                server.terminated <- succ server.terminated ; false )
         ) server.running ;
     Array.iter (schedule server) server.queue ;
-    try
-      Db.yield ();
-      fire server.activity ;
-      if server.running <> [] then
-        begin
-          if not server.waiting && is_empty server then
-            begin
-              fire server.wait ;
-              server.waiting <- true ;
-            end ;
-          true
-        end
-      else
-        begin
-          fire server.stop ;
-          server.scheduled <- 0 ;
-          server.terminated <- 0 ;
-          false
-        end
-    with _ -> (* Db.Cancel ... *)
-      cancel_all server ;
-      run_server server ()
+    let () =
+      try Db.yield ()
+      with Db.Cancel -> cancel_all server
+    in
+    fire server.activity ;
+    if server.running <> [] then
+      begin
+        if not server.waiting && is_empty server then
+          begin
+            fire server.wait ;
+            server.waiting <- true ;
+          end ;
+        true
+      end
+    else
+      begin
+        fire server.stop ;
+        server.scheduled <- 0 ;
+        server.terminated <- 0 ;
+        false
+      end
   end
 
 let launch server =
   if server.scheduled > server.terminated
-  then ( fire server.start ; !on_idle (run_server server) )
+  then ( fire server.start ; !on_idle (server_progress server) )

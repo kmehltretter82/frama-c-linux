@@ -323,7 +323,7 @@ val html_escape: string -> string
 (** [format_string_of_stag stag] returns the string corresponding to [stag],
     or raises an exception if the tag extension is unsupported.
 
-    @since Frama-C+dev
+    @since 22.0-Titanium
  *)
 val format_string_of_stag: Format.stag -> string
 
@@ -331,10 +331,7 @@ val format_string_of_stag: Format.stag -> string
 (** {2 Performance} *)
 (* ************************************************************************* *)
 
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external address_of_value: 'a -> int = "address_of_value" "noalloc"
-[@@@ warning "+3"]
+external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 
 (* ************************************************************************* *)
 (** {2 Exception catcher} *)

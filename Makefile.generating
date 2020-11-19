@@ -134,6 +134,30 @@ src/libraries/stdlib/transitioning.ml: \
 	cat $< > $@
 	$(CHMOD_RO) $@
 
+ifeq ($(HAS_DGRAPH),yes)
+  DGRAPHFILES:=debug_manager
+  GENERATED+=src/plugins/gui/debug_manager.ml
+  ifeq ($(HAS_OCAMLGRAPH_2), yes)
+	DGRAPH_MODULE=Graph_gtk
+	DGRAPH_ERROR=Graph_gtk.DGraphMake.DotError
+  else
+	DGRAPH_MODULE=Dgraph
+	DGRAPH_ERROR=Dgraph.DGraphModel.DotError
+  endif
+  src/plugins/gui/debug_manager.ml \
+  src/plugins/gui/dgraph_helper.ml \
+  src/plugins/callgraph/cg_viewer.ml: %.ml: %.yes.ml Makefile.generating share/Makefile.config
+	$(RM) $@
+	$(SED) -e 's/DGRAPH_MODULE/$(DGRAPH_MODULE)/g' \
+               -e 's/DGRAPH_ERROR/$(DGRAPH_ERROR)/g' $< > $@
+	$(CHMOD_RO) $@
+else
+  DGRAPHFILES:=
+  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml Makefile.generating share/Makefile.config
+	$(CP) $< $@
+	$(CHMOD_RO) $@
+endif
+
 ##################
 # Frama-C-config #
 ##################

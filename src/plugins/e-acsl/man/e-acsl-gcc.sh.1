@@ -99,7 +99,7 @@ pass additional arguments to the \fBFrama-C\fP pre-processor.
 .B -L, --frama-c-stdlib
 use the \fBFrama-C\fP standard library instead of a system-wide one.
 .TP
-.B -M, --full-mmodel
+.B -M, --full-mtracking
 maximize memory-related instrumentation.
 .TP
 .B --temporal
@@ -153,7 +153,7 @@ Valid arguments are:
   \fIfloat-to-int\fP      \- casts from floating-point to integer.
   \fIdiv\fP               \- division by zero.
   \fIshift\fP             \- left and right shifts by a value out of bounds.
-  \fpointer-call\fP       \- annotate functions calls through pointers.
+  \fIpointer-call\fP      \- annotate functions calls through pointers.
   \fIall\fP               \- all of the above.
 .TP
 .B -A, --rte-select=\fI<OPTSTRING>
@@ -212,7 +212,39 @@ launch of the \fBE-ACSL\fP plugin.
 add \fI<OPTS>\fP to the list of options that will be given to the \fBE-ACSL\fP
 analysis. Only useful when \fB--then\fP is in use, in which case \fI<OPTS>\fP
 will be placed after the \fB-then\fP on \fBFrama-C\fP's command-line. Otherwise,
-equivalent to \fB--frama-c-extra\fP
+equivalent to \fB--frama-c-extra\fP.
+.TP
+.B --ar=\fI<FILE>
+the name of the \fBAR\fP executable. Only relevant with
+\fB--dlmalloc-from-sources\fP. By default the first \fIar\fP executable found in
+the system path is used.
+.TP
+.B --ranlib=\fI<FILE>
+the name of the \fBRANLIB\fP executable. Only relevant with
+\fB--dlmalloc-from-sources\fP. By default the first \fIranlib\fP executable
+found in the system path is used.
+.TP
+.B --with-dlmalloc=\fI<FILE>
+use \fI<FILE>\fP instead of distributed dlmalloc library.
+.TP
+.B --dlmalloc-from-sources
+compile and use dlmalloc library from sources instead of using the distributed
+library. Incompatible with \fB--with-dlmalloc\fP.
+.TP
+.B --dlmalloc-compile-only
+do not instrument or compile code, only compile dlmalloc library from sources.
+Implies \fB--dlmalloc-from-sources\fP and incompatible with
+\fB--with-dlmalloc\fP.
+.TP
+.B --dlmalloc-compile-flags=\fI<FLAGS>
+compile dlmalloc library with \fI<FLAGS>\fP compile flags. Default to
+\fI-O2 -g3\fP. Unused if \fB--dlmalloc-from-sources\fP or
+\fB--dlmalloc-compile-only\fP isn't used.
+.TP
+.B --odlmalloc=\fI<FILE>
+output compiled dlmalloc library to \fI<FILE>\fP. Unused if
+\fB--dlmalloc-from-sources\fP or \fB--dlmalloc-compile-only\fP isn't used.
+
 .SH EXIT STATUS
 .TP
 .B 0

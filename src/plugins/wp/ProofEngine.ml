@@ -205,18 +205,28 @@ let children n =
 (* --- State & Status                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type status = [ `Main | `Proved | `Invalid | `Pending of int ]
+type status = [
+  | `Unproved (* proof obligation not proved *)
+  | `Proved   (* proof obligation is proved *)
+  | `Pending of int (* proof is pending *)
+  | `Passed   (* smoke test is passed (PO is not proved) *)
+  | `Invalid  (* smoke test has failed (PO is proved) *)
+  | `StillResist of int (* proof is pending *)
+]
 
 let status t : status =
   match t.root with
   | None ->
       if Wpo.is_proved t.main
       then if Wpo.is_smoke_test t.main then `Invalid else `Proved
-      else `Main
+      else if Wpo.is_smoke_test t.main then `Passed else `Unproved
   | Some root ->
       match root.script with
-      | Opened | Script _ -> `Main
-      | Tactic _ -> `Pending (pending root)
+      | Opened | Script _ ->
+          if Wpo.is_smoke_test t.main then `Passed else `Unproved
+      | Tactic _ ->
+          let n = pending root in
+          if Wpo.is_smoke_test t.main then `StillResist n else `Pending n
 
 (* -------------------------------------------------------------------------- *)
 (* --- Navigation                                                         --- *)

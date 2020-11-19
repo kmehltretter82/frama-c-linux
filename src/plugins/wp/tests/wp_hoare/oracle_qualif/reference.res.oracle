@@ -1,9 +1,15 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_hoare/reference.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 23 goals scheduled
+[wp] [Qed] Goal typed_ref_g_ensures : Valid
+[wp] [Qed] Goal typed_ref_g_assigns_exit_part1 : Valid
+[wp] [Qed] Goal typed_ref_g_assigns_exit_part2 : Valid
+[wp] [Qed] Goal typed_ref_g_assigns_normal_part1 : Valid
+[wp] [Qed] Goal typed_ref_g_assigns_normal_part2 : Valid
+[wp] [Qed] Goal typed_ref_g_assigns_normal_part3 : Valid
+[wp] [Qed] Goal typed_ref_g_call_f_requires : Valid
 [wp] [Qed] Goal typed_ref_call_f2_ensures : Valid
 [wp] [Qed] Goal typed_ref_call_f2_assigns_exit_part1 : Valid
 [wp] [Qed] Goal typed_ref_call_f2_assigns_exit_part2 : Valid
@@ -18,13 +24,6 @@
 [wp] [Qed] Goal typed_ref_call_global_assigns_normal_part1 : Valid
 [wp] [Qed] Goal typed_ref_call_global_assigns_normal_part2 : Valid
 [wp] [Qed] Goal typed_ref_call_global_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_g_ensures : Valid
-[wp] [Qed] Goal typed_ref_g_assigns_exit_part1 : Valid
-[wp] [Qed] Goal typed_ref_g_assigns_exit_part2 : Valid
-[wp] [Qed] Goal typed_ref_g_assigns_normal_part1 : Valid
-[wp] [Qed] Goal typed_ref_g_assigns_normal_part2 : Valid
-[wp] [Qed] Goal typed_ref_g_assigns_normal_part3 : Valid
-[wp] [Qed] Goal typed_ref_g_call_f_requires : Valid
 [wp] [Qed] Goal typed_ref_write_ensures : Valid
 [wp] [Qed] Goal typed_ref_write_assigns : Valid
 [wp] Proved goals:   21 / 23
@@ -37,12 +36,32 @@
   call_global               5        -        5       100%
   write                     2        -        2       100%
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'call_f2':
-  /*@ behavior typed_ref: requires \valid(ptr); */
+[wp] tests/wp_hoare/reference.i:14: Warning: 
+  Memory model hypotheses for function 'f':
+  /*@ behavior wp_typed_ref:
+        requires \valid(p); */
+  int f(int *p);
+[wp] tests/wp_hoare/reference.i:30: Warning: 
+  Memory model hypotheses for function 'f2':
+  /*@
+     behavior wp_typed_ref:
+       requires \separated(p2, q);
+       requires \valid(p2);
+       requires \valid(q);
+     */
+  int f2(int *p2, int *q);
+[wp] tests/wp_hoare/reference.i:37: Warning: 
+  Memory model hypotheses for function 'call_f2':
+  /*@ behavior wp_typed_ref:
+        requires \valid(ptr); */
   int call_f2(int *ptr, int y);
-[wp] Warning: Memory model hypotheses for function 'call_global':
-  /*@ behavior typed_ref: requires \valid(gl); */
+[wp] tests/wp_hoare/reference.i:48: Warning: 
+  Memory model hypotheses for function 'call_global':
+  /*@ behavior wp_typed_ref:
+        requires \valid(gl); */
   int call_global(void);
-[wp] Warning: Memory model hypotheses for function 'write':
-  /*@ behavior typed_ref: requires \valid(pa); */
+[wp] tests/wp_hoare/reference.i:60: Warning: 
+  Memory model hypotheses for function 'write':
+  /*@ behavior wp_typed_ref:
+        requires \valid(pa); */
   void write(int kb, int *pa);

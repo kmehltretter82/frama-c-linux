@@ -416,7 +416,10 @@ struct
         let here = Sigma.create () in
         let next = Sigma.create () in
         (*TODO: make something of warnings *)
-        let hyp = Lang.F.p_all snd (C.init ~sigma:next vi (Some init)) in
+        let init = C.init ~sigma:next vi (Some init) in
+        let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
+        let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
+        let hyp = Lang.F.p_and hyp_init hyp_value in
         effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
     | Skip _ | Code_annot _ -> goto (env @: Clabels.here) (env @: Clabels.next)
 
@@ -669,7 +672,10 @@ struct
     let cfg_init = Globals.Vars.fold_in_file_order
         (fun var initinfo cfg ->
            if var.vstorage = Extern then cfg else
-             let h = Lang.F.p_all snd (C.init ~sigma:sinit var initinfo.init) in
+             let init = C.init ~sigma:sinit var initinfo.init in
+             let hvalue = Lang.F.p_all (fun (_, h) -> fst h) init in
+             let hinit =  Lang.F.p_all (fun (_, h) -> snd h) init in
+             let h = Lang.F.p_and hvalue hinit in
              let h = Cfg.P.create
                  (Cfg.Node.Map.add ninit sinit Cfg.Node.Map.empty)
                  h

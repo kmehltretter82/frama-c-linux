@@ -39,7 +39,7 @@ let vpar =
 (* Translation of variadic types (not deeply) *)
 
 let translate_type = function
-| TFun (ret_typ, args, is_variadic, attributes) ->
+  | TFun (ret_typ, args, is_variadic, attributes) ->
     let new_args =
       if is_variadic
       then
@@ -47,11 +47,11 @@ let translate_type = function
         Some (ng_args @ [vpar] @ g_args)
       else args
     in
-    TFun (ret_typ, new_args, false, attributes)      
+    TFun (ret_typ, new_args, false, attributes)
 
-| TBuiltin_va_list attr -> vpar_typ attr
+  | TBuiltin_va_list attr -> vpar_typ attr
 
-| typ -> typ
+  | typ -> typ
 
 
 (* Adding the vpar parameter to variadic functions *)
@@ -60,49 +60,49 @@ let add_vpar vi =
   let formals = Cil.getFormalsDecl vi in
   (* Add the vpar formal once *)
   if not (List.exists (fun vi -> vi.vname = vpar_name) formals) then
-  begin
-    (* Register the new formal *)
-    let new_formal = Cil.makeFormalsVarDecl vpar in
-    let new_formals = formals @ [new_formal] in
-    Cil.unsafeSetFormalsDecl vi new_formals
-  end
+    begin
+      (* Register the new formal *)
+      let new_formal = Cil.makeFormalsVarDecl vpar in
+      let new_formals = formals @ [new_formal] in
+      Cil.unsafeSetFormalsDecl vi new_formals
+    end
 
 
 (* Translation of va_* builtins  *)
 
 let translate_va_builtin caller inst =
   let vi, args, loc = match inst with
-  | Call(_, {enode = Lval(Var vi, _)}, args, loc) ->
+    | Call(_, {enode = Lval(Var vi, _)}, args, loc) ->
       vi, args, loc
-  | _ -> assert false
+    | _ -> assert false
   in
 
   let translate_va_start () =
     let va_list = match args with
-    | [{enode=Lval va_list}] -> va_list
-    | _ -> Self.fatal "Unexpected arguments to va_start"
+      | [{enode=Lval va_list}] -> va_list
+      | _ -> Self.fatal "Unexpected arguments to va_start"
     and varg =
       try Extlib.last (Cil.getFormalsDecl caller.svar)
-      with Invalid_argument _ -> Self.abort
-        "Using va_start macro in a function which is not variadic."
+      with Invalid_argument _ ->
+        Self.abort "Using va_start macro in a function which is not variadic."
     in
     [ Set (va_list, Cil.evar ~loc varg, loc) ]
   in
 
   let translate_va_copy () =
     let dest, src = match args with
-    | [{enode=Lval dest}; src] -> dest, src
-    | _ -> Self.fatal "Unexpected arguments to va_copy"
+      | [{enode=Lval dest}; src] -> dest, src
+      | _ -> Self.fatal "Unexpected arguments to va_copy"
     in
     [ Set (dest, src, loc) ]
   in
 
   let translate_va_arg () =
     let va_list, typ, lval = match args with
-    | [{enode=Lval va_list};
-       {enode=SizeOf typ};
-       {enode=CastE(_, {enode=AddrOf lval})}] -> va_list, typ, lval
-    | _ -> Self.fatal "Unexpected arguments to va_arg"
+      | [{enode=Lval va_list};
+         {enode=SizeOf typ};
+         {enode=CastE(_, {enode=AddrOf lval})}] -> va_list, typ, lval
+      | _ -> Self.fatal "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
     if Cil.isIntegralType typ then begin
@@ -119,7 +119,7 @@ let translate_va_builtin caller inst =
     (* Build the replacing instruction *)
     let mk_lval_exp lval = Cil.new_exp ~loc (Lval lval)  in
     let mk_mem exp = mk_lval_exp (Cil.mkMem ~addr:exp ~off:NoOffset) in
-    let mk_cast exp typ = Cil.mkCast ~force:false ~e:exp ~newt:typ in 
+    let mk_cast exp typ = Cil.mkCast ~force:false ~e:exp ~newt:typ in
     let src = mk_mem (mk_cast (mk_mem (mk_lval_exp va_list)) (TPtr (typ,[])))
     in
     [ Set (lval, src, loc);
@@ -127,11 +127,11 @@ let translate_va_builtin caller inst =
   in
 
   begin match vi.vname with
-  | "__builtin_va_start" -> translate_va_start ()
-  | "__builtin_va_copy" -> translate_va_copy ()
-  | "__builtin_va_arg" -> translate_va_arg ()
-  | "__builtin_va_end" -> [] (* No need to do anything for va_end *)
-  | _ -> assert false
+    | "__builtin_va_start" -> translate_va_start ()
+    | "__builtin_va_copy" -> translate_va_copy ()
+    | "__builtin_va_arg" -> translate_va_arg ()
+    | "__builtin_va_end" -> [] (* No need to do anything for va_end *)
+    | _ -> assert false
   end
 
 
@@ -166,7 +166,7 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
   (* Build an array to store addresses *)
   let addrs = List.map Cil.mkAddrOfVi vis in
   let vargs, assigns = Build.array_init ~loc fundec ~ghost block
-    "__va_args" Cil.voidPtrType addrs
+      "__va_args" Cil.voidPtrType addrs
   in
   let instrs = instrs @ [assigns] in
 

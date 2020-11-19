@@ -63,6 +63,7 @@ struct
   let mk_frame = C.mk_frame
   let in_frame = C.in_frame
   let mem_frame = C.mem_frame
+  let has_at_frame = C.has_at_frame
   let mem_at_frame = C.mem_at_frame
   let set_at_frame = C.set_at_frame
   let mem_at = C.mem_at
@@ -273,9 +274,11 @@ struct
     | EQ_loc
     | EQ_plain
     | EQ_float of c_float
-    | EQ_array of Matrix.matrix
+    | EQ_array of matrixinfo
     | EQ_comp of compinfo
     | EQ_incomparable
+
+  and matrixinfo = c_object * int option list
 
   let eqsort_of_type t =
     match Logic_utils.unroll_type ~unroll_typedef:false t with
@@ -287,7 +290,7 @@ struct
         | C_int _ -> EQ_plain
         | C_float f -> EQ_float f
         | C_comp c -> EQ_comp c
-        | C_array a -> EQ_array (Matrix.of_array a)
+        | C_array a -> EQ_array (Ctypes.array_dimensions a)
 
   let eqsort_of_comparison a b =
     match eqsort_of_type a.term_type , eqsort_of_type b.term_type with
@@ -295,7 +298,7 @@ struct
     | EQ_loc , EQ_loc -> EQ_loc
     | EQ_comp c1 , EQ_comp c2 ->
         if Compinfo.equal c1 c2 then EQ_comp c1 else EQ_incomparable
-    | EQ_array (t1,d1) , EQ_array (t2,d2) ->
+    | EQ_array(t1,d1) , EQ_array(t2,d2) ->
         if Ctypes.equal t1 t2 then
           match Matrix.merge d1 d2 with
           | Some d -> EQ_array(t1,d)

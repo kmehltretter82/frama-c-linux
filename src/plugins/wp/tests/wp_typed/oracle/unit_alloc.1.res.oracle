@@ -1,7 +1,6 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_typed/unit_alloc.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f
@@ -60,3 +59,8 @@ Assume {
 Prove: !valid_rw(Malloc_0[L_y_25 <- 0], a, 1).
 
 ------------------------------------------------------------
+[wp] tests/wp_typed/unit_alloc.i:34: Warning: 
+  Memory model hypotheses for function 'h':
+  /*@ behavior wp_typed_ref:
+        ensures \separated(\result, &x); */
+  int *h(int x);

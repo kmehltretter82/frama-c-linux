@@ -36,6 +36,9 @@ val block: stmt -> block -> stmt
 val block_stmt: block -> stmt
 (** Create a block statement from a block *)
 
+val block_from_stmts: stmt list -> stmt
+(** Create a block statement from a statement list. *)
+
 val assigns: loc:location -> result:lval -> exp -> stmt
 (** [assigns ~loc ~result value] create a statement to assign the [value]
     expression to the [result] lval. *)

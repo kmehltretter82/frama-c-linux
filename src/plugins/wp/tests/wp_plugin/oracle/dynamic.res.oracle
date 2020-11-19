@@ -10,7 +10,6 @@
 [wp] tests/wp_plugin/dynamic.i:87: Calls h1
 [wp] tests/wp_plugin/dynamic.i:100: Calls unreachable_g
 [wp:calls] Dynamic call(s): 6.
-[wp] Loading driver 'share/wp.driver'
 [wp] tests/wp_plugin/dynamic.i:78: Warning: Missing 'calls' for default behavior
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -373,15 +372,23 @@ Tags: Call h1.
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'guarded_call':
-  /*@ behavior typed: requires \separated(&X,p); */
+[wp] tests/wp_plugin/dynamic.i:41: Warning: 
+  Memory model hypotheses for function 'guarded_call':
+  /*@ behavior wp_typed:
+        requires \separated(p, &X); */
   void guarded_call(struct S *p);
-[wp] Warning: Memory model hypotheses for function 'behavior':
-  /*@ behavior typed: requires \separated(&X1,p+(..)); */
+[wp] tests/wp_plugin/dynamic.i:63: Warning: 
+  Memory model hypotheses for function 'behavior':
+  /*@ behavior wp_typed:
+        requires \separated(p + (..), &X1); */
   int behavior(int (*p)(void));
-[wp] Warning: Memory model hypotheses for function 'some_behaviors':
-  /*@ behavior typed: requires \separated(&X1,p+(..)); */
+[wp] tests/wp_plugin/dynamic.i:76: Warning: 
+  Memory model hypotheses for function 'some_behaviors':
+  /*@ behavior wp_typed:
+        requires \separated(p + (..), &X1); */
   int some_behaviors(int (*p)(void));
-[wp] Warning: Memory model hypotheses for function 'missing_context':
-  /*@ behavior typed: requires \separated(&X1,p); */
+[wp] tests/wp_plugin/dynamic.i:85: Warning: 
+  Memory model hypotheses for function 'missing_context':
+  /*@ behavior wp_typed:
+        requires \separated(p, &X1); */
   int missing_context(int (*p)(void));

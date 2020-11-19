@@ -12,4 +12,5 @@ Is this ok? [Y/n] compile_commands.json exists, add option -json-compilation-dat
 Known machdeps: x86_16 x86_32 x86_64 gcc_x86_16 gcc_x86_32 gcc_x86_64 ppc_32 msvc_x86_64
 Please enter the machdep [x86_32]: 'invalid_machdep' is not a standard machdep. Proceed anyway? [y/N]Please enter the machdep [x86_32]: warning: result/fc_stubs.c already exists. Overwrite? [y/N] Created stub for main function: result/fc_stubs.c
 Template created: result/GNUmakefile
+Path to Frama-C binaries written to: result/path.mk
 Running ptests: cleaning up after tests...

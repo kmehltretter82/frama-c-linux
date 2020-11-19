@@ -1,13 +1,12 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp/wp_behavior.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function behaviors
 ------------------------------------------------------------
 
-Goal Complete behaviors 'Y', 'X':
+Goal Complete behaviors 'X', 'Y':
 Assume {
   (* Pre-condition *)
   Have: P_R.
@@ -20,7 +19,7 @@ Prove: P_CX \/ P_CY.
 
 ------------------------------------------------------------
 
-Goal Disjoint behaviors 'Y', 'X':
+Goal Disjoint behaviors 'X', 'Y':
 Assume {
   (* Pre-condition *)
   Have: P_R.

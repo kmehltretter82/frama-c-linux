@@ -1,12 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/trig.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
-[wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_S : Valid
-[wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_A : Valid
-[wp] [Alt-Ergo] Goal typed_foo_assert_qed_ok_B : Unsuccess
+[wp] [Alt-Ergo] Goal typed_foo_assert_ok_S : Valid
+[wp] [Alt-Ergo] Goal typed_foo_assert_ok_A : Valid
+[wp] [Alt-Ergo] Goal typed_foo_assert_ok_B : Unsuccess
 [wp] [Qed] Goal typed_foo_call_fconcat_requires_qed_ok : Valid
 [wp] Proved goals:    3 / 4
   Qed:             1 

@@ -36,6 +36,9 @@ let is_fc_or_compiler_builtin vi =
    let prefix = String.sub vi.vname 0 prefix_length in
    Datatype.String.equal prefix "__builtin_")
 
+let is_fc_stdlib_generated vi =
+  Cil.hasAttribute "fc_stdlib_generated" vi.vattr
+
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
 (* ************************************************************************** *)
@@ -86,6 +89,15 @@ let rec ptr_index ?(loc=Location.unknown) ?(index=(Cil.zero loc)) exp =
   | Const _ | StartOf _ | AddrOf _ | Lval _ | UnOp _ -> (exp, index)
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     -> assert false
+
+let ptr_base ~loc e =
+  let base, _ = ptr_index ~loc e in
+  let base_addr  = match base.enode with
+    | AddrOf _ | Const _ -> Cil.zero ~loc
+    | Lval lv | StartOf lv -> Cil.mkAddrOrStartOf ~loc lv
+    | _ -> assert false
+  in
+  base, base_addr
 
 (* TODO: should not be in this file *)
 let term_of_li li =  match li.l_body with
@@ -145,11 +157,6 @@ let term_has_lv_from_vi t =
     false
   with Lv_from_vi_found ->
     true
-
-let mk_ptr_sizeof typ loc =
-  match Cil.unrollType typ with
-  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
-  | _ -> assert false
 
 let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max

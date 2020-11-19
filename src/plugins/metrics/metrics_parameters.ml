@@ -49,7 +49,8 @@ module OutputFile =
       let option_name = "-metrics-output"
       let arg_name = "filename"
       let help = "print some metrics into the specified file; \
-                  the output format is recognized through the extension."
+                  the output format is recognized through the extension: \
+                  .text/.txt for text, .html/.htm for HTML, or .json for JSON."
      end)
 
 module ValueCoverage =

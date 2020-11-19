@@ -548,12 +548,12 @@ val isArithmeticType: typ -> bool
 
 (** True if the argument is a scalar type (i.e. integral, enum,
     floating point or pointer
-    @since Frama-C+dev
+    @since 22.0-Titanium
 *)
 val isScalarType: typ -> bool
 
 (** alias of isScalarType.
-    @deprecated Frama-C+dev use isScalarType instead
+    @deprecated 22.0-Titanium use isScalarType instead
 *)
 val isArithmeticOrPointerType: typ -> bool
 
@@ -2184,6 +2184,13 @@ val intOfAttrparam: attrparam -> int option
  * the size. This function is architecture dependent, so you should only call
  * this after you call {!Cil.initCIL}. *)
 val bitsOffset: typ -> offset -> int * int
+
+(** Give a field, returns the number of bits from the structure or union
+ * containing the field and the width (also expressed in bits) for the subobject
+ * denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
+ * the size. This function is architecture dependent, so you should only call
+ * this after you call {!Cil.initCIL}. *)
+val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list *)
 val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list

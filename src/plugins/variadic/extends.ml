@@ -70,13 +70,13 @@ module Cil = struct
   let doublePtrType = ptrType doubleType
 
   let signedIntegerTypes = [Cil.charType; shortType; Cil.intType;
-			    Cil.longType; longLongType]
+                            Cil.longType; longLongType]
   let unsignedIntegerTypes = [ucharType; ushortType; Cil.uintType;
-			      Cil.ulongType; Cil.ulongLongType]
+                              Cil.ulongType; Cil.ulongLongType]
   let signedIntegerPtrTypes = [Cil.charPtrType; shortPtrType; Cil.intPtrType;
-			       longPtrType; longlongPtrType]
+                               longPtrType; longlongPtrType]
   let unsignedIntegerPtrTypes = [ucharPtrType; ushortPtrType; Cil.uintPtrType;
-				 ulongPtrType; ulonglongPtrType]
+                                 ulongPtrType; ulonglongPtrType]
 
   let signed_integers_ranking =
     Extlib.mapi (fun i t -> (t, i)) signedIntegerTypes
@@ -95,13 +95,13 @@ module Cil = struct
   let integer_ranking_comp t1 t2 =
     let rt1, rt2 =
       if is_signed_integer_type t1 && is_signed_integer_type t2 then
-	List.assoc t1 signed_integers_ranking,
-	List.assoc t2 signed_integers_ranking
+        List.assoc t1 signed_integers_ranking,
+        List.assoc t2 signed_integers_ranking
       else if is_unsigned_integer_type t1 && is_unsigned_integer_type t2 then
-	List.assoc t1 unsigned_integers_ranking,
-	List.assoc t2 unsigned_integers_ranking
+        List.assoc t1 unsigned_integers_ranking,
+        List.assoc t2 unsigned_integers_ranking
       else
-	raise (Invalid_argument "rank_comp") in
+        raise (Invalid_argument "rank_comp") in
     rt1 - rt2
 
   let integer_promotion t1 t2 =
@@ -140,54 +140,54 @@ module List = struct
     else a :: make (n - 1) a
 
   let to_scalar = function
-  | [a] -> a
-  | _ -> failwith "to_scalar"
+    | [a] -> a
+    | _ -> failwith "to_scalar"
 
   let of_opt = function
-  | None -> []
-  | Some x -> [x]
+    | None -> []
+    | Some x -> [x]
 
   let to_opt = function
-  | [] -> None
-  | [a] -> Some a
-  | _ -> failwith "to_opt"
+    | [] -> None
+    | [a] -> Some a
+    | _ -> failwith "to_opt"
 
   let first = function
-  | [] -> failwith "first"
-  | a :: _ -> a
+    | [] -> failwith "first"
+    | a :: _ -> a
 
   exception EmptyList
 
   let rec last = function
-  | [] -> raise EmptyList
-  | [a] -> a
-  | _ :: l -> last l
+    | [] -> raise EmptyList
+    | [a] -> a
+    | _ :: l -> last l
 
   let rec take n l =
     if n <= 0 then []
     else match l with
-    | [] -> []
-    | a :: l -> a :: take (n - 1) l
+      | [] -> []
+      | a :: l -> a :: take (n - 1) l
 
   let rec drop n l =
     if n <= 0 then l
     else match l with
-    | [] -> []
-    | _ :: l -> drop (n - 1) l
+      | [] -> []
+      | _ :: l -> drop (n - 1) l
 
   let rec break n l =
     if n <= 0 then ([], l)
     else match l with
-    | [] -> ([], [])
-    | a :: l ->
+      | [] -> ([], [])
+      | a :: l ->
         let l1, l2 = break (n - 1) l in
         (a :: l1, l2)
 
   let rec filter_map f = function
-  | [] -> []
-  | a :: l -> match f a with
-    | Some r -> r :: filter_map f l
-    | None -> filter_map f l
+    | [] -> []
+    | a :: l -> match f a with
+      | Some r -> r :: filter_map f l
+      | None -> filter_map f l
 
   let iteri f l =
     let i = ref 0 in
@@ -200,45 +200,45 @@ module List = struct
   let rev_mapi f l =
     let i = ref 0 in
     let rec aux acc = function
-    | [] -> acc
-    | a :: l -> let a' = f !i a in incr i; aux (a' :: acc) l
+      | [] -> acc
+      | a :: l -> let a' = f !i a in incr i; aux (a' :: acc) l
     in aux [] l
 
   let iteri2 f l1 l2 =
     let i = ref 0 in
     let rec aux l1 l2 = match l1, l2 with
-    | [], [] -> ()
-    | a1 :: l1, a2 :: l2 -> f !i a1 a2; incr i; aux l1 l2
-    | _, _ -> invalid_arg "List.iteri2"
+      | [], [] -> ()
+      | a1 :: l1, a2 :: l2 -> f !i a1 a2; incr i; aux l1 l2
+      | _, _ -> invalid_arg "List.iteri2"
     in
     aux l1 l2
 
   let mapi2 f l1 l2 =
     let i = ref 0 in
     let rec aux l1 l2 = match l1, l2 with
-    | [], [] -> []
-    | a1 :: l1, a2 :: l2 -> let r = f !i a1 a2 in incr i; r :: aux l1 l2
-    | _, _ -> invalid_arg "List.mapi2"
+      | [], [] -> []
+      | a1 :: l1, a2 :: l2 -> let r = f !i a1 a2 in incr i; r :: aux l1 l2
+      | _, _ -> invalid_arg "List.mapi2"
     in
     aux l1 l2
 
   let reduce_left f l =
     let rec aux acc = function
-    | [] -> acc
-    | a :: l -> aux (f acc a) l
+      | [] -> acc
+      | a :: l -> aux (f acc a) l
     in match l with
     | [] -> failwith "reduce"
     | a :: l -> aux a l
 
   let rec reduce_right f = function
-  | [] -> failwith "reduce"
-  | [a] -> a
-  | a :: l -> f a (reduce_right f l)
+    | [] -> failwith "reduce"
+    | [a] -> a
+    | a :: l -> f a (reduce_right f l)
 
   let map_fold_left f acc l =
     let rec aux acc r = function
-    | [] -> List.rev r, acc
-    | a :: l ->
+      | [] -> List.rev r, acc
+      | a :: l ->
         let a, acc = f acc a in
         aux acc (a :: r) l
     in
@@ -254,9 +254,9 @@ module List = struct
 
 
   let rec unique_sorted cmp = function
-  | a1 :: a2 :: l when cmp a1 a2 = 0 -> unique_sorted cmp (a2 :: l)
-  | [] -> []
-  | a :: l -> a :: unique_sorted cmp l
+    | a1 :: a2 :: l when cmp a1 a2 = 0 -> unique_sorted cmp (a2 :: l)
+    | [] -> []
+    | a :: l -> a :: unique_sorted cmp l
 
   let sort_unique cmp l =
     unique_sorted cmp (sort cmp l)

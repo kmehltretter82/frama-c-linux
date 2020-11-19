@@ -126,17 +126,14 @@ struct
 
   let array_name te ds =
     let dim = List.length ds in
+    let pp_dim fmt d = if d > 1 then Format.fprintf fmt "_d%d" d in
     match te with
     | C_int i ->
-        Format.asprintf "%sArray%d_%a" C.prefix dim model_int i
-    | C_float _ ->
-        Format.asprintf "%sArray%d_float" C.prefix dim
-    | C_pointer _ ->
-        Format.asprintf "%sArray%d_pointer" C.prefix dim
+        Format.asprintf "%sArray%a_%a" C.prefix pp_dim dim model_int i
     | C_comp c ->
-        Format.asprintf "%sArray%d%s" C.prefix dim (Lang.comp_id c)
-    | C_array _ ->
-        Wp_parameters.fatal "Unflatten array (%s %a)" C.prefix Ctypes.pretty te
+        Format.asprintf "%sArray%a_%s" C.prefix pp_dim dim (Lang.comp_id c)
+    | C_float _ | C_pointer _ | C_array _ ->
+        assert false
 
   let rec is_obj obj t =
     match obj with
@@ -159,7 +156,7 @@ struct
       (Lang.generated_p (C.prefix ^ Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
-         let s = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+         let s = Lang.freshvar ~basename (Lang.t_comp c) in
          let def = p_all
              (fun f ->
                 is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
@@ -171,17 +168,24 @@ struct
          })
       [s]
 
-  and is_array te ds t =
+  and is_array elt ds t =
     Definitions.call_pred
-      (Lang.generated_p (array_name te ds))
+      (Lang.generated_p (array_name elt ds))
       (fun lfun ->
-         let x = Lang.freshvar ~basename:"T" (Matrix.tau te ds) in
-         let ks = List.map (fun _d -> Lang.freshvar ~basename:"k" Logic.Int) ds in
+         let cluster =
+           match elt with
+           | C_comp c -> Definitions.compinfo c
+           | _ -> Definitions.matrix () in
+         let te = Lang.tau_of_object elt in
+         let d = List.length ds in
+         let x = Lang.freshvar ~basename:"T" (Lang.t_matrix te d) in
+         let fk _d = Lang.freshvar ~basename:"k" Logic.Int in
+         let ks = List.map fk ds in
          let e = List.fold_left (fun a k -> e_get a (e_var k)) (e_var x) ks in
-         let def = p_forall ks (is_obj te e) in
+         let def = p_forall ks (is_obj elt e) in
          {
            d_lfun = lfun ; d_types = 0 ; d_params = [x] ;
-           d_cluster = Definitions.matrix te ;
+           d_cluster = cluster ;
            d_definition = Predicate(Def,def) ;
          }
       ) [t]
@@ -253,34 +257,68 @@ let rec reduce_eqcomp = function
 (* --- ACSL Array Equality                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module EQARRAY = WpContext.Generator(Matrix.NATURAL)
+module AKEY =
+struct
+  type t = base * Matrix.t
+  and base = I | F of c_float | P | C of compinfo
+  let make elt ds =
+    let base = match elt with
+      | C_int _ -> I
+      | C_float f -> F f
+      | C_pointer _ -> P
+      | C_comp c -> C c
+      | C_array _ -> assert false
+    in base , ds
+  let key = function
+    | I -> "int"
+    | P -> "ptr"
+    | F f -> Ctypes.f_name f
+    | C c -> Lang.comp_id c
+  let cluster = function
+    | I | P | F _ -> Definitions.matrix ()
+    | C c -> Definitions.compinfo c
+  let tau = function
+    | I -> Lang.t_int
+    | F f -> Lang.t_float f
+    | P -> Lang.t_addr ()
+    | C c -> Lang.t_comp c
+  let equal = function
+    | I | F _ | P -> F.p_equal
+    | C c -> !equal_rec (C_comp c)
+  let compare (a,p) (b,q) =
+    let cmp = String.compare (key a) (key b) in
+    if cmp <> 0 then cmp else Matrix.compare p q
+  let pretty fmt (a,ds) =
+    Format.fprintf fmt "%s%a" (key a) Matrix.pp_suffix_id ds
+end
+
+module EQARRAY = WpContext.Generator(AKEY)
     (struct
-      open Matrix
       let name = "Cvalues.EqArray"
-      type key = matrix
+      type key = AKEY.t
       type data = lfun
-      let compile (te,ds) =
+      let compile (a,ds) =
         (* Contextual Symbol *)
         let lfun = Lang.generated_f
             ~context:true
             ~sort:Logic.Sprop
-            "EqArray%s_%s" (Matrix.id ds) (Matrix.natural_id te) in
+            "EqArray_%s%a" (AKEY.key a) Matrix.pp_suffix_id ds in
         (* Simplification of the symbol *)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
-        let denv = Matrix.denv ds in
-        let tau = Matrix.tau te ds in
+        let denv = Matrix.cc_env ds in
+        let tau = Matrix.cc_tau (AKEY.tau a) ds in
         let xa = Lang.freshvar ~basename:"T" tau in
         let xb = Lang.freshvar ~basename:"T" tau in
         let ta = e_var xa in
         let tb = e_var xb in
         let ta_xs = List.fold_left e_get ta denv.index_val in
         let tb_xs = List.fold_left e_get tb denv.index_val in
-        let property = p_hyps (denv.index_range) (!equal_rec te ta_xs tb_xs) in
+        let property = p_hyps (denv.index_range) (AKEY.equal a ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
         (* Registration *)
         Definitions.define_symbol {
-          d_cluster = Definitions.matrix te ;
+          d_cluster = AKEY.cluster a ;
           d_lfun = lfun ; d_types = 0 ;
           d_params = denv.size_var @ [xa ; xb ] ;
           d_definition = Predicate(Def,definition) ;
@@ -303,8 +341,9 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
         let basename = if c.cstruct then "S" else "U" in
-        let xa = Lang.freshvar ~basename (Lang.tau_of_comp c) in
-        let xb = Lang.freshvar ~basename (Lang.tau_of_comp c) in
+        let tc = Lang.t_comp c in
+        let xa = Lang.freshvar ~basename tc in
+        let xb = Lang.freshvar ~basename tc in
         let ra = e_var xa in
         let rb = e_var xb in
         let def = p_all
@@ -326,17 +365,20 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
 (* --- ACSL Equality                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+type matrixinfo = c_object * int option list
+
 let equal_comp c a b = p_call (EQCOMP.get c) [a;b]
 let equal_array m a b =
-  match m with
-  | _obj , [None] -> p_equal a b
-  | m -> p_call (EQARRAY.get m) (Matrix.size m @ [a;b])
+  let elt,ns = m in
+  let ds = Matrix.of_dims ns in
+  let ms = Matrix.cc_dims ns in
+  p_call (EQARRAY.get @@ AKEY.make elt ds) (ms @ [a;b])
 
 let equal_object obj a b =
   match obj with
   | C_int _ | C_float _ | C_pointer _ -> p_equal a b
   | C_comp c -> equal_comp c a b
-  | C_array t -> equal_array (Matrix.of_array t) a b
+  | C_array m -> equal_array (Ctypes.array_dimensions m) a b
 
 let () = equal_rec := equal_object
 

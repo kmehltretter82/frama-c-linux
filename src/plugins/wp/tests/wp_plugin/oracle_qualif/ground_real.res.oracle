@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing tests/wp_plugin/ground_real.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] 1 goal scheduled
 [wp] [Alt-Ergo] Goal typed_lemma_R : Valid
 [wp] Proved goals:    1 / 1

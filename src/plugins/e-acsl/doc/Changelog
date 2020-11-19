@@ -25,6 +25,27 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
+                can be compiled and used from sources.
+
+#############################
+Plugin E-ACSL 22.0 (Titanium)
+#############################
+
+-  E-ACSL       [2020-10-14] Add Support for Variadic generated functions in
+                the AST (frama-c/e-acsl#128).
+-  E-ACSL       [2020-10-06] Add support for the `\separated` predicate.
+                (frama-c/e-acsl#31)
+-* E-ACSL       [2020-10-06] Fix a soundness bug when translating a range with a
+                logic variable.
+-  E-ACSL       [2020-09-22] Support of complete and disjoint behavior
+                (frama-c/e-acsl#92 and frama-c/e-acsl#27).
+-* runtime      [2020-09-15] Fix wrong value returned for the stack size in the
+                segment memory model (frama-c/e-acsl#126).
+-  E-ACSL       [2020-09-15] Deprecate -e-acsl-full-mmodel in favor of
+                -e-acsl-full-mtracking.
+-  e-acsl-gcc   [2020-09-15] Deprecate --full-mmodel in favor of
+                --full-mtracking.
 -* E-ACSL       [2020-08-28] Fix crash that may occur when translating
                 properties that have been proved valid by another plug-in
                 (frama-c/e-acsl#106).

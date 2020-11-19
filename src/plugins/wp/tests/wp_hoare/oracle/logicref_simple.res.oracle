@@ -10,7 +10,6 @@ Function fsimple_array: { &t __retres }
 Function ftwo_star: { d __retres }
 Function fvpositive: { b }
 .................................................
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function fsimple

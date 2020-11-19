@@ -1,7 +1,6 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing tests/wp_usage/global.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] Loading driver 'share/wp.driver'
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function foo
@@ -20,6 +19,11 @@ Goal Instance of 'Pre-condition (file tests/wp_usage/global.c, line 14) in 'foo'
 Prove: true.
 
 ------------------------------------------------------------
-[wp] Warning: Memory model hypotheses for function 'foo':
-  /*@ behavior typed_ref: requires \separated(a,&GLOBAL); requires \valid(a); */
+[wp] tests/wp_usage/global.c:16: Warning: 
+  Memory model hypotheses for function 'foo':
+  /*@
+     behavior wp_typed_ref:
+       requires \separated(a, &GLOBAL);
+       requires \valid(a);
+     */
   void foo(int *a);

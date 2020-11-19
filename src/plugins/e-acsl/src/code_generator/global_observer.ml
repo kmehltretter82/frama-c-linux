@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 
 let function_init_name = Functions.RTL.mk_api_name "globals_init"
-let function_delete_name = Functions.RTL.mk_api_name "globals_delete"
+let function_clean_name = Functions.RTL.mk_api_name "globals_clean"
 
 (* Hashtable mapping global variables (as Cil_type.varinfo) to their
    initializers (if any).
@@ -43,11 +43,11 @@ let is_empty () = Varinfo.Hashtbl.length tbl = 0
    Initializers (used to capture literal strings) are added through
    [add_initializer] below. *)
 let add vi =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     Varinfo.Hashtbl.replace tbl vi (ref [])
 
 let add_initializer vi offset init =
-  if Mmodel_analysis.must_model_vi vi then
+  if Memory_tracking.must_monitor_vi vi then
     try
       let l = Varinfo.Hashtbl.find tbl vi in
       l := (offset, init) :: !l
@@ -60,11 +60,11 @@ let rec literal_in_initializer env kf = function
   | CompoundInit (_, l) ->
     List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
 
-(* Create a global kernel function named `name`.
+(* Create a global kernel function named [name].
    Return a triple (varinfo * fundec * kernel_function) of the created
    global function. *)
 let mk_function name =
-  (* Create global function `name` *)
+  (* Create global function [name] *)
   let vi =
     Cil.makeGlobalVar ~source:true
       name
@@ -186,10 +186,10 @@ let mk_init_function () =
   fundec.sbody.bstmts <- stmts;
   vi, fundec
 
-let mk_delete_function () =
-  (* Create and register [__e_acsl_globals_delete] function with definition
+let mk_clean_function () =
+  (* Create and register [__e_acsl_globals_clean] function with definition
      for de-allocation of global variables *)
-  let vi, fundec, _kf = mk_function function_delete_name in
+  let vi, fundec, _kf = mk_function function_clean_name in
   (* Generate delete statements and add them to the function body *)
   let stmts =
     Varinfo.Hashtbl.fold_sorted

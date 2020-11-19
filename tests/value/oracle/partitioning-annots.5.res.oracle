@@ -4,14 +4,15 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   k ∈ {0}
+  nondet ∈ [--..--]
 [eva] computing for function Frama_C_interval <- test_history.
-  Called from tests/value/partitioning-annots.c:125.
+  Called from tests/value/partitioning-annots.c:129.
 [eva] using specification for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:125: 
+[eva] tests/value/partitioning-annots.c:129: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {0}, {0}
-[eva] tests/value/partitioning-annots.c:131: Frama_C_show_each: {1}, {1}
+[eva] tests/value/partitioning-annots.c:135: Frama_C_show_each: {0}, {0}
+[eva] tests/value/partitioning-annots.c:135: Frama_C_show_each: {1}, {1}
 [eva] Recording results for test_history
 [eva] done for function test_history
 [eva] ====== VALUES COMPUTED ======

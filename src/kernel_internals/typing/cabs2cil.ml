@@ -288,7 +288,9 @@ let pop_stdheader () =
   | s::l ->
     Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Popping %s %s" fc_stdlib s;
     current_stdheader := l
-  | [] -> Kernel.warning "#pragma %s pop does not match a push" fc_stdlib
+  | [] ->
+    Kernel.warning ~current:true
+      "#pragma %s pop does not match a push" fc_stdlib
 
 let push_stdheader s =
   Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Pushing %s %s@." fc_stdlib s;
@@ -1057,7 +1059,7 @@ let newAlphaName
     with
     | Not_found -> () (* no clash of identifiers *)
     | Failure _ ->
-      Kernel.fatal
+      Kernel.fatal ~current:true
         "finding a fresh identifier in local scope with empty scopes stack"
   end;
   stripKind kind newname, oldloc
@@ -1123,31 +1125,39 @@ let alphaConvertVarAndAddToEnv addtoenv vi =
       vi
     else begin
       if vi.vglob then begin
-        (* Perhaps this is because we have seen a static local which happened
-         * to get the name that we later want to use for a global. *)
-        try
-          let static_local_vi = H.find staticLocals vi.vname in
-          H.remove staticLocals vi.vname;
-          (* Use the new name for the static local *)
-          static_local_vi.vname <- newname;
-          (* And continue using the last one *)
-          vi
-        with Not_found -> begin
-            (* Or perhaps we have seen a typedef which stole our name. This is
-               possible because typedefs use the same name space *)
-            try
-              let typedef_ti = H.find typedefs vi.vname in
-              H.remove typedefs vi.vname;
-              (* Use the new name for the typedef instead *)
-              typedef_ti.tname <- newname;
-              (* And continue using the last name *)
-              vi
-            with Not_found ->
-              abort_context
-                "It seems that we would need to rename global %s (to %s) \
-                 because of previous occurrence at %a"
-                vi.vname newname Cil_printer.pp_location oldloc;
-          end
+        (* if a purely local variable stole our name, force it to be renamed.*)
+        let local =
+          List.find_opt
+            (fun x -> x.vname = vi.vname) !currentFunctionFDEC.slocals
+        in
+        match local with
+        | Some local -> local.vname <- newname; vi
+        | None ->
+          (* Perhaps this is because we have seen a static local which happened
+           * to get the name that we later want to use for a global. *)
+          try
+            let static_local_vi = H.find staticLocals vi.vname in
+            H.remove staticLocals vi.vname;
+            (* Use the new name for the static local *)
+            static_local_vi.vname <- newname;
+            (* And continue using the last one *)
+            vi
+          with Not_found -> begin
+              (* Or perhaps we have seen a typedef which stole our name. This is
+                 possible because typedefs use the same name space *)
+              try
+                let typedef_ti = H.find typedefs vi.vname in
+                H.remove typedefs vi.vname;
+                (* Use the new name for the typedef instead *)
+                typedef_ti.tname <- newname;
+                (* And continue using the last name *)
+                vi
+              with Not_found ->
+                abort_context
+                  "It seems that we would need to rename global %s (to %s) \
+                   because of previous occurrence at %a"
+                  vi.vname newname Cil_printer.pp_location oldloc;
+            end
       end else copyVarinfo vi newname
     end
   in
@@ -1198,6 +1208,7 @@ let get_temp_name ghost () =
 (* Create a new temporary variable *)
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
+  let t' = Cil.typeRemoveAttributes ["const"] t' in
   let name = get_temp_name ghost () in
   let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
@@ -4242,7 +4253,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       match res with
       | Some s -> annot_chunk @@ ({current_chunk with stmts = [s]}, ghost)
       | None ->
-        Kernel.warning ~wkey:Kernel.wkey_annot_error
+        Kernel.warning ~wkey:Kernel.wkey_annot_error ~current:true
           "Statement contract and ACSL pragmas over a local definition \
            are not implemented. Ignoring annotation";
         current_chunk
@@ -4345,7 +4356,7 @@ let fixFormalsType formals =
           try
             ChangeTo (Hashtbl.find table v.vname)
           with Not_found ->
-            Kernel.fatal "Formal %a not tied to a varinfo"
+            Kernel.fatal ~current:true "Formal %a not tied to a varinfo"
               Cil_printer.pp_varinfo v;
         end else SkipChildren
     end
@@ -4683,7 +4694,8 @@ let rec doSpecList ghost (suggestedAnonName: string)
             else if fitsInInt ILongLong i then ILongLong
             else IULongLong
           | "int" -> IInt
-          | s -> Kernel.fatal "Unknown enums representations '%s'" s
+          | s ->
+            Kernel.fatal ~current:true "Unknown enums representations '%s'" s
         end
       in
       (* as each name,value pair is determined, this is called *)
@@ -4753,7 +4765,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
             else if unsigned then IUInt else IInt
           | "int" -> IInt
           | "gcc-short-enums" -> real_kind
-          | s -> Kernel.fatal "Unknown enum representation '%s'" s
+          | s -> Kernel.fatal ~current:true "Unknown enum representation '%s'" s
         in
         enum.ekind <- ekind;
       end;
@@ -5373,8 +5385,14 @@ and makeCompType ghost (isstruct: bool)
   (* Create the self cell for use in fields and forward references. Or maybe
    * one exists already from a forward reference  *)
   let comp, _ = createCompInfo isstruct n' norig in
-  let doFieldGroup ~is_first_group ~is_last_group ((s: A.spec_elem list),
-                                                   (nl: (A.name * A.expression option) list)) =
+  let rec fold f acc = function
+    | [] -> acc
+    | [x] -> f ~last:true acc x
+    | x :: l -> fold f (f ~last:false acc x) l
+  in
+
+  let addFieldGroup ~last:last_group (flds : fieldinfo list)
+      ((s: A.spec_elem list), (nl: (A.name * A.expression option) list)) =
     (* Do the specifiers exactly once *)
     let sugg = match nl with
       | [] -> ""
@@ -5382,13 +5400,13 @@ and makeCompType ghost (isstruct: bool)
     in
     let bt, sto, inl, attrs = doSpecList ghost sugg s in
     (* Do the fields *)
-    let makeFieldInfo ~is_first_field ~is_last_field
+    let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : A.name), (widtho : A.expression option))
-      : fieldinfo =
+      : fieldinfo list =
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~current:true "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = true in
-      let ftype, nattr =
+      let ftype, fattr =
         doType
           ~allowZeroSizeArrays ghost false (AttrName false) bt
           (A.PARENTYPE(attrs, ndt, a))
@@ -5408,11 +5426,11 @@ and makeCompType ghost (isstruct: bool)
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
         match Cil.unrollType ftype with
-        | TArray(_,None,_,_) when is_last_field ->
+        | TArray(_,None,_,_) when last_group && last_field ->
           begin
             (* possible flexible array member; check if struct contains at least
                one other field *)
-            if is_first_field then (* struct is empty *)
+            if flds = [] then (* struct is empty *)
               Kernel.error ~current:true
                 "flexible array member '%s' (type %a) \
                  not allowed in otherwise empty struct"
@@ -5424,7 +5442,7 @@ and makeCompType ghost (isstruct: bool)
             "field `%s' is declared with incomplete type %a"
             n Cil_printer.pp_typ ftype
       end;
-      let width, ftype =
+      let fbitfield, ftype =
         match widtho with
         | None -> None, ftype
         | Some w -> begin
@@ -5447,9 +5465,14 @@ and makeCompType ghost (isstruct: bool)
               w, ftype
           end
       in
+      (* Compute the order of the field in the structure *)
+      let forder = match flds with
+        | [] -> 0
+        | { forder=previous_order } :: _ -> previous_order + 1
+      in
       (* If the field is unnamed and its type is a structure of union type
        * then give it a distinguished name  *)
-      let n' =
+      let fname =
         if n = missingFieldName then begin
           match unrollType ftype with
           | TComp _ -> begin
@@ -5472,7 +5495,7 @@ and makeCompType ghost (isstruct: bool)
           if Cil_datatype.Compinfo.equal comp comp' then begin
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
-            Kernel.abort
+            Kernel.abort ~current:true
               "type %s %s is circular"
               (if comp.cstruct then "struct" else "union")
               comp.cname;
@@ -5481,52 +5504,34 @@ and makeCompType ghost (isstruct: bool)
         | _ -> ()
       in
       is_circular ftype;
-      { fcomp     =  comp;
+      { fcomp =  comp;
+        forder;
         forig_name = n;
-        fname     =  n';
-        ftype     =  ftype;
-        fbitfield =  width;
-        fattr     =  nattr;
-        floc      =  convLoc cloc;
-        faddrof   = false;
+        fname;
+        ftype;
+        fbitfield;
+        fattr;
+        floc =  convLoc cloc;
+        faddrof = false;
         fsize_in_bits = None;
         foffset_in_bits = None;
         fpadding_in_bits = None;
-      }
+      } :: flds
     in
-    let rec map_but_last l =
-      match l with
-      | [] -> []
-      | [f] ->
-        [makeFieldInfo ~is_first_field:false ~is_last_field:is_last_group f]
-      | f::l ->
-        let fi = makeFieldInfo ~is_first_field:false ~is_last_field:false f in
-        [fi] @ map_but_last l
-    in
-    match nl with
-    | [] -> []
-    | [f] ->
-      [makeFieldInfo ~is_first_field:is_first_group ~is_last_field:is_last_group f]
-    | f::l ->
-      let fi =
-        makeFieldInfo ~is_first_field:is_first_group ~is_last_field:false f
-      in
-      [fi] @ map_but_last l
+    fold addFieldInfo flds nl
   in
 
   (* Do regular fields first. *)
-  let flds =
-    List.filter (function FIELD _ -> true | TYPE_ANNOT _ -> false) nglist in
-  let flds =
-    List.map (function FIELD (f,g) -> (f,g) | _ -> assert false) flds in
-  let last = List.length flds -  1 in
-  let doField i = doFieldGroup ~is_first_group:(i=0) ~is_last_group:(i=last) in
-  let flds = List.concat (List.mapi doField flds) in
+  let to_field = function
+    | TYPE_ANNOT _ -> None
+    | FIELD (f,g) -> Some (f,g) in
+  let flds = Extlib.filter_map_opt to_field nglist in
+  let flds = List.rev (fold addFieldGroup [] flds) in
 
-  let fld_table = Cil_datatype.Fieldinfo.Hashtbl.create 17 in
+  let fld_table = Hashtbl.create 17 in
   let check f =
     try
-      let oldf = Cil_datatype.Fieldinfo.Hashtbl.find fld_table f in
+      let oldf = Hashtbl.find fld_table f.fname in
       let source = fst f.floc in
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
@@ -5535,7 +5540,7 @@ and makeCompType ghost (isstruct: bool)
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
-      if f.fname <> "" then Cil_datatype.Fieldinfo.Hashtbl.add fld_table f f
+      if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
   List.iter check flds;
   if comp.cfields <> [] then begin
@@ -5740,7 +5745,7 @@ and doExp local_env
              of the same name, but in that case, it is not possible to
              take the address of the function (or do anything else than
              calling the function, which is matched later on). *)
-          Kernel.warning ~wkey:Kernel.wkey_cert_msc_38
+          Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
             "%s is a standard macro. Its definition cannot be suppressed, \
              see CERT C coding rules MSC38-C" n
         end;
@@ -6442,7 +6447,7 @@ and doExp local_env
       let action local_env asconst e _what =
         match e.expr_node with
         | A.COMMA _ | A.QUESTION _ | A.PAREN _ ->
-          Kernel.fatal "normalization of lval in compound assignment failed"
+          Kernel.fatal ~current:true "normalization of lval in compound assignment failed"
         | A.VARIABLE _ | A.UNARY (A.MEMOF, _) | (* Regular lvalues *)
           A.INDEX _ | A.MEMBEROF _ | A.MEMBEROFPTR _ |
           A.CAST _ (* GCC extension *) -> begin
@@ -8486,7 +8491,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
   Kernel.debug ~dkey:Kernel.dkey_typing_global "createGlobal: %s" n;
   (* If the global is a Frama-C builtin, set the generated flag *)
   if is_stdlib_macro n && get_current_stdheader () = "" then begin
-    Kernel.warning ~wkey:Kernel.wkey_cert_msc_38
+    Kernel.warning ~wkey:Kernel.wkey_cert_msc_38 ~current:true
       "Attempt to declare %s as external identifier outside of the stdlib. \
        It is supposed to be a macro name and cannot be declared. See CERT C \
        coding rule MSC38-C" n
@@ -8564,7 +8569,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
           List.iter2
             (fun x y ->
                if x != y then
-                 Kernel.fatal
+                 Kernel.fatal ~current:true
                    "Function %s: formals are not shared between AST and \
                     FormalDecls table" vi.vname)
             l1 l2;

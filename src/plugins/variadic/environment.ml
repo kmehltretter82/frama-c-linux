@@ -25,24 +25,24 @@ open Cil_types
 module Table = Datatype.String.Hashtbl
 
 type env =
-{
-  globals: varinfo Table.t;
-  functions: varinfo Table.t;
-  typedefs: typeinfo Table.t;
-  structs: compinfo Table.t;
-  unions: compinfo Table.t;
-  enums: enuminfo Table.t;
-}
+  {
+    globals: varinfo Table.t;
+    functions: varinfo Table.t;
+    typedefs: typeinfo Table.t;
+    structs: compinfo Table.t;
+    unions: compinfo Table.t;
+    enums: enuminfo Table.t;
+  }
 
 let empty () : env =
-{
-  globals = Table.create 17;
-  functions = Table.create 17;
-  typedefs = Table.create 17;
-  structs = Table.create 17;
-  unions = Table.create 17;
-  enums = Table.create 17;
-}
+  {
+    globals = Table.create 17;
+    functions = Table.create 17;
+    typedefs = Table.create 17;
+    structs = Table.create 17;
+    unions = Table.create 17;
+    enums = Table.create 17;
+  }
 
 let add_global (env : env) (vi : varinfo) : unit  =
   Table.add env.globals vi.vname vi
@@ -95,19 +95,19 @@ let from_file (file : file) : env =
   let v = object inherit Cil.nopCilVisitor
     method! vglob glob =
       begin match glob with
-      | GFunDecl(_,vi,_) | GFun ({svar = vi}, _) ->
-        add_function env vi
-      | GVarDecl (vi,_) | GVar (vi, _, _) ->
-        add_global env vi
-      | GType (typeinfo,_) ->
-        add_typeinfo env typeinfo
-      | GCompTag (compinfo,_) ->
-        add_compinfo env compinfo
-      | GEnumTag (enuminfo,_) ->
-        add_enuminfo env enuminfo
-      | _ -> ()
+        | GFunDecl(_,vi,_) | GFun ({svar = vi}, _) ->
+          add_function env vi
+        | GVarDecl (vi,_) | GVar (vi, _, _) ->
+          add_global env vi
+        | GType (typeinfo,_) ->
+          add_typeinfo env typeinfo
+        | GCompTag (compinfo,_) ->
+          add_compinfo env compinfo
+        | GEnumTag (enuminfo,_) ->
+          add_enuminfo env enuminfo
+        | _ -> ()
       end;
-      Cil.SkipChildren         
+      Cil.SkipChildren
   end in
   Cil.visitCilFile v file;
   env

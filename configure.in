@@ -279,6 +279,10 @@ if test -z "$OCAMLGRAPH" ; then
   AC_MSG_ERROR(Cannot find ocamlgraph via ocamlfind \
 (requires ocamlgraph 1.8.5 or higher).)
 fi
+
+AC_SUBST(HAS_OCAMLGRAPH_2)
+HAS_OCAMLGRAPH_2=no
+
 case $OCAMLGRAPH in
       0.* | 1.[[01234567]].* \
       | 1.8.0 | 1.8.0+dev \
@@ -287,10 +291,14 @@ case $OCAMLGRAPH in
       | 1.8.3 | 1.8.3+dev \
       | 1.8.4 | 1.8.4+dev)
         AC_MSG_ERROR(found $OCAMLGRAPH: requires 1.8.5 or higher.);;
-      1.8.5 | 1.8.6 | 1.8.7)
+      1.8.5 | 1.8.6 | 1.8.7|1.8.8)
+        AC_MSG_RESULT(found);;
+      2.0.*)
+        HAS_OCAMLGRAPH_2=yes
         AC_MSG_RESULT(found);;
       *)
-        AC_MSG_RESULT(found $OCAMLGRAPH: should work);;
+        HAS_OCAMLGRAPH_2=yes
+        AC_MSG_RESULT(found $OCAMLGRAPH: should work, but is not tested);;
 esac
 
 # zarith
@@ -733,7 +741,13 @@ plugin_require(from_analysis,callgraph)
 check_plugin(gui,src/plugins/gui,[support for gui],yes)
 
 plugin_require_external(gui,lablgtk)
-plugin_use_external(gui,gnomecanvas)
+# in ocamlgraph 2, the gtk part is separated. Hence if we found it,
+# there's no need to check specifically for gnomecanvas
+if test "$HAS_OCAMLGRAPH_2" = "yes"; then
+  plugin_use_external(gui,ocaml_ocamlgraph_gtk)
+else
+  plugin_use_external(gui,gnomecanvas)
+fi
 plugin_require_external(gui,gtksourceview)
 plugin_use_external(gui,dot)
 
@@ -973,13 +987,17 @@ configure_library([LABLGTK],
                   [$LABLGTKPATH_FOR_CONFIGURE/lablgtk.$LIB_SUFFIX not found.],
                   no)
 
+if test "$HAS_OCAMLGRAPH_2" = yes; then
+  configure_pkg([ocamlgraph_gtk],[package ocamlgraph_gtk not found])
+fi
+
 # dot and xdot tools
 ####################
 
 configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
 
 configure_tool([UNIX2DOS],[unix2dos],
-               [unix2dos not found: you should install tofrodos],no)
+               [unix2dos not found: you should install dos2unix],no)
 
 plugin_use_external(tests,unix2dos)
 
@@ -990,6 +1008,13 @@ plugin_use_external(tests,unix2dos)
 new_section "checking for plug-in dependencies"
 
 check_frama_c_dependencies
+
+AC_SUBST(HAS_DGRAPH)
+if test "$HAS_OCAMLGRAPH_2" = "yes"; then
+  HAS_DGRAPH=$HAS_OCAML_OCAMLGRAPH_GTK;
+else
+  HAS_DGRAPH=$HAS_GNOMECANVAS
+fi
 
 ############################
 # Substitutions to perform #

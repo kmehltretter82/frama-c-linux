@@ -24,6 +24,21 @@ let check_expr_term check fct s post =
   let post = Logic_const.new_predicate app in
   Annotations.add_ensures emitter fct [Normal,post]
 
+let check_expr_pred fct s post =
+  let exp =
+    match s.skind with
+    | Instr (Call(_,_,[x],_)) -> x
+    | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
+  in
+  let pred = (snd post).ip_content.tp_statement in
+  let pred' = Logic_utils.expr_to_predicate exp in
+  if not (Logic_utils.is_same_predicate pred pred') then
+    Kernel.fatal
+      "translation of C expression %a is %a, inconsistent with predicate %a"
+      Printer.pp_exp exp Printer.pp_predicate pred' Printer.pp_predicate pred;
+  let post = Logic_const.new_predicate pred' in
+  Annotations.add_ensures emitter fct [Normal,post]
+
 let treat_fct check fct =
   let stmts = (Kernel_function.get_definition fct).sbody.bstmts in
   let stmts =
@@ -47,16 +62,31 @@ let treat_fct check fct =
   List.iter2 (check_expr_term check fct) stmts ensures;
   Filecheck.check_ast "check_expr_to_term"
 
+let treat_fct_pred fct =
+  let stmts = (Kernel_function.get_definition fct).sbody.bstmts in
+  let stmts =
+    List.filter
+      (fun x -> match x.skind with Instr(Call _) -> true | _ -> false)
+      stmts
+  in
+  let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond in
+  if List.length stmts <> List.length ensures then
+    Kernel.fatal "ill-formed test in function %a" Kernel_function.pretty fct;
+  List.iter2 (check_expr_pred fct) stmts ensures;
+  Filecheck.check_ast "check_expr_to_predicate"
+
 let compute () =
   let main = Globals.Functions.find_by_name "main" in
   let f = Globals.Functions.find_by_name "f" in
   let g = Globals.Functions.find_by_name "g" in
   let h = Globals.Functions.find_by_name "h" in
+  let i = Globals.Functions.find_by_name "i" in
   begin
     treat_fct true main;
     treat_fct false f;
     treat_fct true g;
     treat_fct true h;
+    treat_fct_pred i;
   end
 
 let () = Db.Main.extend compute

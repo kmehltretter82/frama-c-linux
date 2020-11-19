@@ -40,6 +40,7 @@ type logic_lemma = {
   lem_labels : logic_label list ;
   lem_property : predicate ;
   lem_depends : logic_lemma list ; (** in reverse order *)
+  lem_attrs : attributes ;
 }
 
 type axiomatic = {
@@ -60,6 +61,7 @@ val compute : unit -> unit (** To force computation *)
 
 val ip_lemma : logic_lemma -> Property.t
 val iter_lemmas : (logic_lemma -> unit) -> unit
+val fold_lemmas : (logic_lemma -> 'a -> 'a) -> 'a -> 'a
 val logic_lemma : string -> logic_lemma
 val axiomatic : string -> axiomatic
 val section_of_lemma : string -> logic_section

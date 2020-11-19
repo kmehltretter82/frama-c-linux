@@ -291,9 +291,10 @@ sig
   val datatype : string
   (** For projectification. Must be unique among models. *)
 
-  val hypotheses : unit -> MemoryContext.clause list
-  (** Computes the memory model hypotheses including separation and validity
-      clauses to be verified for this model. *)
+  val hypotheses : MemoryContext.partition -> MemoryContext.partition
+  (** Computes the memory model partitionning of the memory locations.
+      This function typically adds new elements to the partition received
+      in input (that can be empty). *)
 
   module Chunk : Chunk
   (** Memory model chunks. *)
@@ -586,7 +587,7 @@ sig
      Express that all objects in a range of locations have a given value.
 
      More precisely, [is_exp_range sigma loc ty a b v] express that
-     value at [( ty* )loc + k] equals [v], forall [a <= k < b].
+     value at [( ty* )loc + k] equals [v], forall [a <= k <= b].
      Value [v=None] stands for zero.
   *)
   val is_exp_range :
@@ -597,17 +598,25 @@ sig
   val unchanged : M.sigma -> M.sigma -> varinfo -> pred
   (** Express that a given variable has the same value in two memory states. *)
 
-  type warned_hyp = Warning.Set.t * pred
+  type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init : sigma:M.sigma -> varinfo -> init option -> warned_hyp list
-  (** Express that some variable has some initial value at the
-      given memory state.
+  val init :
+    sigma:M.sigma -> varinfo -> init option -> warned_hyp list
+    (** Express that some variable has some initial value at the
+        given memory state. The first predicate states the value,
+        the second, the initialization status.
 
-      Remark: [None] initializer are interpreted as zeroes. This is consistent
-      with the [init option] associated with global variables in CIL,
-      for which the default initializer are zeroes. There is no
-      [init option] value associated with local initializers.
-  *)
+        Note: we DO NOT merge values and initialization status
+        hypotheses as the factorization performed by Qed can make
+        predicates too hard to simplify later.
+
+        Remark: [None] initializer are interpreted as zeroes. This is consistent
+        with the [init option] associated with global variables in CIL,
+        for which the default initializer are zeroes. This function is called
+        for global initializers and local initializers ([Cil.Local_init]).
+        It is not called for local variables without initializers as they do not
+        have a [Cil.init option].
+    *)
 
 end
 
@@ -656,6 +665,9 @@ sig
 
   (** Update a frame with a specific environment for the given label. *)
   val set_at_frame : frame -> Clabels.c_label -> sigma -> unit
+
+  (** Chek if a frame already has a specific envioronement for the given label. *)
+  val has_at_frame : frame -> Clabels.c_label -> bool
 
   (** Same as [mem_at_frame] but for the current frame. *)
   val mem_frame : Clabels.c_label -> sigma

@@ -90,7 +90,7 @@ struct
   (* Authorized written region from an assigns specification *)
   type effect = {
     e_pid : P.t ; (* Assign Property *)
-    e_kind : a_kind ; (* Requires post effects (in case of loop-assigns) *)
+    e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
     e_valid : L.sigma ; (* sigma where locations are filtered for validity *)
     e_region : L.region ; (* expected from spec *)
@@ -101,6 +101,10 @@ struct
   struct
     type t = effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
+    let pretty fmt e =
+      Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
+        P.pretty e.e_pid (Cvalues.pp_region M.pretty) e.e_region
+    [@@ warning "-32"]
   end
 
   module G = Qed.Collection.Make(TARGET)
@@ -140,9 +144,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let pp_vc fmt vc =
-    Format.fprintf fmt "%a@ @[<hov 2>Prove %a@]"
-      Pcond.dump vc.hyps
-      F.pp_pred vc.goal
+    Format.fprintf fmt "%a"
+      (Pcond.dump_bundle ~clause:"Context" ~goal:vc.goal) vc.hyps
 
   let pp_vcs fmt vcs =
     let k = ref 0 in
@@ -244,15 +247,6 @@ struct
         deps = dset ;
         path = path ;
       }
-
-  let assume_vcs ?descr ?filter ?init whs vc =
-    List.fold_left
-      (fun vc (warn,hyp) -> assume_vc ?descr ?filter ?init ~warn [hyp] vc)
-      vc whs
-
-  let passify_vc pa vc =
-    let hs = Passive.conditions pa (occurs_vc vc) in
-    assume_vc hs vc
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -362,6 +356,14 @@ struct
       (fun g -> Splitter.merge_all merge_vcs (List.map (goal g) cases))
       targets
 
+  let passify_vc pa vc =
+    let hs = Passive.conditions pa (occurs_vc vc) in
+    assume_vc hs vc
+
+  let passify_vcs pa vcs =
+    if Passive.is_empty pa then vcs
+    else gmap (passify_vc pa) vcs
+
   (* -------------------------------------------------------------------------- *)
   (* --- Merge for Calculus                                                 --- *)
   (* -------------------------------------------------------------------------- *)
@@ -383,8 +385,8 @@ struct
       (fun () ->
          let sigma,pa1,pa2 = merge_sigma wp1.sigma wp2.sigma in
          let effects = Eset.union wp1.effects wp2.effects in
-         let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-         let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+         let vcs1 = passify_vcs pa1 wp1.vcs in
+         let vcs2 = passify_vcs pa2 wp2.vcs in
          let vcs = gmerge vcs1 vcs2 in
          { sigma = sigma ; vcs = vcs ; effects = effects }
       ) ()
@@ -442,21 +444,23 @@ struct
         ainfo.a_assigns
     in match authorized_region with
     | None -> None
-    | Some region -> Some {
-        e_pid = pid ;
-        e_kind = ainfo.a_kind ;
-        e_label = from ;
-        e_valid = sigma ;
-        e_region = region ;
-        e_warn = Warning.Set.empty ;
-      }
+    | Some region ->
+        let post = match ainfo.a_kind with
+          | LoopAssigns -> true
+          | StmtAssigns -> NormAtLabels.has_postassigns ainfo.a_assigns
+        in Some {
+          e_pid = pid ;
+          e_post = post ;
+          e_label = from ;
+          e_valid = sigma ;
+          e_region = region ;
+          e_warn = Warning.Set.empty ;
+        }
 
   let cc_posteffect e vcs =
-    match e.e_kind with
-    | StmtAssigns -> vcs
-    | LoopAssigns ->
-        let vc = { empty_vc with vars = L.vars e.e_region } in
-        Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
+    if not e.e_post then vcs else
+      let vc = { empty_vc with vars = L.vars e.e_region } in
+      Gmap.add (Gposteffect e.e_pid) (Splitter.singleton vc) vcs
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULES : adding axioms, hypotheses and goals                     --- *)
@@ -547,14 +551,13 @@ struct
              vars = xs }
          in
          let group =
-           match e.e_kind with
-           | StmtAssigns ->
-               Splitter.singleton (setup empty_vc)
-           | LoopAssigns ->
-               try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
-               with Not_found ->
-                 Wp_parameters.fatal "Missing post-effect for %a"
-                   WpPropId.pretty e.e_pid
+           if not e.e_post then
+             Splitter.singleton (setup empty_vc)
+           else
+             try Splitter.map setup (Gmap.find (Gposteffect e.e_pid) vcs)
+             with Not_found ->
+               Wp_parameters.fatal "Missing post-effect for %a"
+                 WpPropId.pretty e.e_pid
          in
          let target = match sloc with
            | None -> Gprop e.e_pid
@@ -651,15 +654,20 @@ struct
     if Clabels.is_here label then wp else
       in_wenv wenv wp
         (fun env wp ->
+           let frame = L.get_frame () in
            let s_here = L.current env in
-           let s_labl = L.mem_frame label in
-           let pa = Sigma.join s_here s_labl in
+           let s_frame =
+             if L.has_at_frame frame label then
+               L.mem_at_frame frame label
+             else
+               (L.set_at_frame frame label s_here ; s_here) in
+           let pa = Sigma.join s_here s_frame in
            let stop,effects = Eset.partition (is_stopeffect label) wp.effects in
            let vcs = Gmap.filter (not_posteffect stop) wp.vcs in
-           let vcs = gmap (passify_vc pa) vcs in
+           let vcs = passify_vcs pa vcs in
            let vcs = check_nothing stop vcs in
            let vcs = state_vcs stmt s_here vcs in
-           { sigma = Some s_here ; vcs=vcs ; effects=effects })
+           { sigma = Some s_frame ; vcs=vcs ; effects=effects })
 
   (* -------------------------------------------------------------------------- *)
   (* --- WP RULE : assignation                                              --- *)
@@ -806,8 +814,8 @@ struct
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
-             let vcs1 = gmap (passify_vc pa1) wp1.vcs in
-             let vcs2 = gmap (passify_vc pa2) wp2.vcs in
+             let vcs1 = passify_vcs pa1 wp1.vcs in
+             let vcs2 = passify_vcs pa2 wp2.vcs in
              gbranch
                ~left:(assume_vc ~descr:"Then" ~stmt ~warn [cond])
                ~right:(assume_vc ~descr:"Else" ~stmt ~warn [p_not cond])
@@ -894,13 +902,14 @@ struct
              [C.unchanged shere sinit v]
          in { wp with vcs = gmap const_vc wp.vcs })
 
-  let init wenv var init wp = in_wenv wenv wp
+  let init wenv var opt_init wp = in_wenv wenv wp
       (fun env wp ->
+         let assume = assume_vc ~descr:"Initializer" ~filter:true ~init:true in
          let sigma = L.current env in
-         let init_vc = assume_vcs
-             ~init:true ~filter:true
-             ~descr:"Initializer"
-             (C.init ~sigma var init)
+         let init_vc vc =
+           List.fold_left
+             (fun vc (warn,(hv,hi)) -> assume ~warn [hi] (assume ~warn [hv] vc))
+             vc (C.init ~sigma var opt_init)
          in { wp with vcs = gmap init_vc wp.vcs })
 
   (* -------------------------------------------------------------------------- *)
@@ -1044,6 +1053,7 @@ struct
     let seq_post = cc_havoc dom_call seq_result.pre in
     let seq_exit = cc_havoc dom_call (sigma_at wexit) in
     (* Pre-State *)
+    (* Passive: joined later by call_proper *)
     let sigma_pre, _, _ = Sigma.merge seq_post.pre seq_exit.pre in
     let formals = List.map (C.exp sigma_pre) es in
     let call = L.call kf formals in
@@ -1174,7 +1184,7 @@ struct
          match outcome with
          | Warning.Result(warn , wp) -> { wp with vcs = add_warnings warn wp.vcs }
          | Warning.Failed warn ->
-             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_exit.vcs in
+             let v_post = do_assigns_everything ~stmt ~warn p_post.effects p_post.vcs in
              let v_exit = do_assigns_everything ~stmt ~warn p_exit.effects p_exit.vcs in
              let effects = Eset.union p_post.effects p_exit.effects in
              let vcs = gmerge v_post v_exit in
@@ -1200,11 +1210,10 @@ struct
             let hs = M.frame (L.current env) in
             let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
             { wp with vcs }
-        | Mcfg.SC_Function_in -> wp
-        | Mcfg.SC_Function_frame ->
-            wp_scope env wp ~descr:"Function Frame" Enter xs
-        | Mcfg.SC_Function_out ->
-            wp_scope env wp ~descr:"Function Exit" Leave xs
+        | Mcfg.SC_Frame_in ->
+            wp_scope env wp ~descr:"Frame In" Enter xs
+        | Mcfg.SC_Frame_out ->
+            wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
             wp_scope env wp ~descr:"Block In" Enter xs
         | Mcfg.SC_Block_out ->
@@ -1312,8 +1321,7 @@ struct
   (* --- WPO Grouper                                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  (* NOTE: bug in ocamldoc in OCaml 4.02 prevents usage of 'P' here *)
-  module PMAP = Map.Make(WpPropId.PropId)
+  module PMAP = Map.Make(P)
 
   type group = {
     mutable verifs : VC_Annot.t Bag.t ;

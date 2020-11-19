@@ -442,28 +442,35 @@ let hash_list f l =
     | _ -> acc
   in aux 47 3 l
 
-let hash_ext_kind = function
-  | Ext_id i -> Datatype.Int.hash i
-  | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
-  | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
-
-let compare_ext_kind k1 k2 =
-  match k1, k2 with
-  | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
-  | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
-  | Ext_terms terms1, Ext_terms terms2 ->
-    Extlib.list_compare Logic_utils.compare_term terms1 terms2
-  | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
-  | Ext_preds p1, Ext_preds p2 ->
-    Extlib.list_compare Logic_utils.compare_predicate p1 p2
 
 module ExtMerging =
   Merging
     (struct
       type t = acsl_extension
-      let hash (e : acsl_extension) =
+      let rec hash (e : acsl_extension) =
+        let hash_ext_kind = function
+          | Ext_id i -> Datatype.Int.hash i
+          | Ext_terms terms -> 29 * (hash_list Logic_utils.hash_term terms)
+          | Ext_preds preds -> 47 * (hash_list Logic_utils.hash_predicate preds)
+          | Ext_annot (id, annots) -> Datatype.String.hash id + 5 * (hash_list hash annots)
+        in
         Datatype.String.hash e.ext_name + 5 * hash_ext_kind e.ext_kind
-      let compare (e1 : acsl_extension) (e2 : acsl_extension) =
+      let rec compare (e1 : acsl_extension) (e2 : acsl_extension) =
+        let compare_ext_kind k1 k2 =
+          match k1, k2 with
+          | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
+          | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
+          | Ext_terms terms1, Ext_terms terms2 ->
+            Extlib.list_compare Logic_utils.compare_term terms1 terms2
+          | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
+          | Ext_preds p1, Ext_preds p2 ->
+            Extlib.list_compare Logic_utils.compare_predicate p1 p2
+          | Ext_preds _, _ -> 1 | _, Ext_preds _ -> -1
+          | Ext_annot (id1, a1) , Ext_annot (id2, a2)  ->
+            match String.compare id1 id2 with
+            | 0 -> Extlib.list_compare compare a1 a2
+            | n -> n
+        in
         let res = Datatype.String.compare e1.ext_name e2.ext_name in
         if res <> 0 then res
         else
@@ -1144,7 +1151,7 @@ and equalModuloPackedAlign attrs1 attrs2 =
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
-and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
+and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
@@ -1153,11 +1160,8 @@ and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets typ_ci1 typ_ci2 f1 f2 =
        in which case the difference may be safely ignored *)
     begin
       try
-        let offs1, width1 =
-          Cil.bitsOffset typ_ci1 (Field (f1, NoOffset))
-        in
-        let offs2, width2 =
-          Cil.bitsOffset typ_ci2 (Field (f2, NoOffset))
+        let offs1, width1 = Cil.fieldBitsOffset f1
+        and offs2, width2 = Cil.fieldBitsOffset f2
         in
         if not (equalModuloPackedAlign f1.fattr f2.fattr)
         || offs1 <> offs2 || width1 <> width2 then
@@ -1245,12 +1249,9 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
                      [%a] vs [%a]"
                     pp_attrs attrs pp_attrs oldattrs))
         in
-        let typ_ci = TComp(ci, {scache = Not_Computed}, []) in
-        let typ_oldci = TComp(oldci, {scache = Not_Computed}, []) in
         List.iter2
           (fun oldf f ->
-             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets
-               typ_ci typ_oldci f oldf;
+             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
              (* Make sure the types are compatible *)
              (* Note: 6.2.7 §1 states that the names of the fields should be the
                 same. We do not force this for now, but could do it. *)

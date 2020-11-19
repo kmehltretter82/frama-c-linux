@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/printf_wrong_arity.c:8: 
   Translating call to printf to a call to the specialized version printf_va_1.
@@ -77,7 +77,7 @@ int main(void)
   int __retres;
   {
     int tmp = 2;
-    printf_va_1("%d",1);
+    printf("%d",1); /* printf_va_1 */
   }
   {
     int __va_arg0 = 1;

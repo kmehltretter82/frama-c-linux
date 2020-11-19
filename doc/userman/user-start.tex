@@ -6,9 +6,8 @@ This chapter describes \emph{how} to install \FramaC and
 
 \section{Installation}\label{sec:install}\index{Installation}
 
-The \FramaC platform is distributed as source code. Binaries
-are also available for popular architectures. All distributions
-include the \FramaC kernel and a base set of open-source plug-ins.
+The \FramaC platform is distributed as source code, including the \FramaC kernel
+and a base set of open-source plug-ins.
 
 The recommended way to install \FramaC is by using the
 \opam\index{opam}\footnote{\url{http://opam.ocaml.org}} package manager to
@@ -22,45 +21,37 @@ there is a delay between each new \FramaC release and the availability of a
 binary package for the considered platform.
 
 Finally, \FramaC can be compiled and installed from the source distribution,
-as long as its dependencies have already been installed.
+as long as its dependencies have already been installed. The exact set of
+dependencies varies from release to release. They are listed as constraints
+in the \texttt{opam/opam} file of the source distribution.
 
-The dependencies of the \FramaC kernel are as follows. Each plug-in may
-define its own set of additional dependencies.
-Instructions for installing \FramaC from source
-may be found in the file \texttt{INSTALL.md} of the source distribution.
+A {\em reference configuration}, guaranteed to be a working set of dependencies
+for \FramaC kernel and the open-source plug-ins included in the source
+distribution, is available in the \texttt{reference-configuration.md} file of
+the source distribution.
+
+For more installation instructions, consider reading the \texttt{INSTALL.md}
+file of the source distribution. The main components necessary for compiling
+and running \FramaC are described below.
+
 \begin{description}
 \item[A \C pre-processor]\index{C pre-processor} is required for \emph{using}
-  \FramaC on \C files. By default, \FramaC tries to use \texttt{gcc -C -E -I.}
-  as pre-processing command, but this command can be customized (see
-  Section~\ref{sec:preprocessing}). If you do not have any \C pre-processor,
+  \FramaC on \C files. If you do not have any \C pre-processor,
   you can only run \FramaC on already pre-processed \texttt{.i} files.
-\item[A \C compiler]\index{C compiler} is required to compile the \FramaC kernel.
-\item[A \tool{Unix}-like compilation environment] is mandatory and shall
-  have at least the tool \texttt{GNU
-    make}\footnote{\url{http://www.gnu.org/software/make}} version 3.81 or
-  higher, as well as various POSIX commands, libraries and header files.
+\item[A \C compiler]\index{C compiler} is required to compile the \FramaC
+  kernel.
+\item[A \tool{Unix}-like compilation environment] with at least the tool
+  \texttt{GNU make}\footnote{\url{http://www.gnu.org/software/make}},
+  as well as various POSIX commands, libraries and header files, is necessary
+  for compiling \FramaC and its plug-ins.
 \item[The \caml compiler]\index{OCaml compiler}\footnote{\url{http://ocaml.org}}
-  is required both for compiling \FramaC from source \emph{and} for compiling additional
-  plug-ins. Version greater or equal than 4.05.0 of the compiler must be used.
-
-%  Support for some plug-ins in native compilation mode (see
-%  Section~\ref{sec:modes})\index{Native-compiled} requires the so-called
-%  \emph{native dynamic linking} feature of \caml.
-\item[\tool{Gtk}-related
-  packages:]\codeidx{GTK+}\codeidx{Lablgtk}\codeidx{GtkSourceView} \tool{\sc
-  gtk+}\footnote{\url{http://www.gtk.org}} version 2.4 or higher,
-  \tool{GtkSourceView}\footnote{\url{http://projects.gnome.org/gtksourceview}}
-  version 2.x, \tool{GnomeCanvas}\footnote{\url{http://library.gnome.org/devel/libgnomecanvas}} version 2.x as well as
-  \tool{LablGtk}\footnote{\url{http://lablgtk.forge.ocamlcore.org}}
-  version 2.18.2 or higher are required for building the Graphical User Interface
-  (GUI) of \FramaC.
-\item[\tool{OcamlGraph} package:]\codeidx{OcamlGraph} \FramaC needs the
-  \tool{OcamlGraph}\footnote{\url{http://ocamlgraph.lri.fr}} package, version
-  $1.8.8$.
-\item[\tool{Zarith} package:]\codeidx{Zarith} \FramaC requires the
-  \tool{Zarith}\footnote{\url{http://forge.ocamlcore.org/projects/zarith}}
-  package, used for large integer computations.
+  is required both for compiling \FramaC from source \emph{and} for compiling
+  additional plug-ins. Compatible OCaml versions are listed as constraints in
+  the \texttt{opam/opam} file.
 \end{description}
+
+Other components, such as OcamlGraph, Zarith, Gtk-related packages for the GUI,
+etc., are listed in the \texttt{INSTALL.md} and \texttt{opam/opam} files.
 
 \section{One Framework, Several Executables}\label{sec:modes}
 
@@ -154,6 +145,10 @@ all documented with \texttt{-kernel-h}:
 
 There are many aliases for these options, but for backward compatibility purposes only.
 Those listed above should be used for scripting.
+
+For a more thorough display of configuration-related data, in JSON format,
+use option \optiondef{-}{print-config-json}. Note that the data output by this
+option is likely to change in future releases.
 
 \subsection{Options Outline}
 
@@ -266,12 +261,17 @@ content of the file to \texttt{\~{}/.bash\_completion}
 \item You can \texttt{source} the file, e.g. from your \texttt{.bashrc} with
 the following command:
 \begin{verbatim}
-source $(frama-c-config -share)/autocomplete_frama-c || true
+source $(frama-c-config -print-share-path)/autocomplete_frama-c || true
 \end{verbatim}
 \end{itemize}
 
 There is also an autocompletion script for zsh, \texttt{\_frama-c}, also
 in the shared resources directory. Look inside for installation instructions.
+
+The kernel option \optiondef{-}{autocomplete} provides a text output listing
+all \FramaC options, so that autocompletion scripts may use it to provide
+completion. The \FramaC team welcomes improved and additional autocompletion
+scripts.
 
 \subsection{Splitting a \FramaC Execution into Several Steps}\label{sec:then}
 

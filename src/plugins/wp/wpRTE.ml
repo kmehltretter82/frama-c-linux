@@ -102,6 +102,9 @@ let generate model kf =
   List.iter (configure ~update ~generate:true kf cint) generator ;
   if !update then !Db.RteGen.annotate_kf kf
 
+let generate_all model =
+  Wp_parameters.iter_kf (generate model)
+
 let missing_guards model kf =
   let update = ref false in
   let cint = WpContext.on_context (model,WpContext.Kf kf) Cint.current () in

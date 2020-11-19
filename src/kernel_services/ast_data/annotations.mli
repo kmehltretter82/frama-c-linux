@@ -67,6 +67,10 @@ val funspec:
     generated. 
     @raise No_funspec whenever the given function has no specification *) 
 
+val has_funspec: kernel_function -> bool
+(** @return [true] iff the function has a non-empty specification.
+    @since 22.0-Titanium *)
+
 val behaviors:
   ?emitter:Emitter.t -> ?populate:bool -> kernel_function -> funbehavior list
 (** Get the behaviors clause of the contract associated to the given function.
@@ -280,7 +284,7 @@ val add_code_annot:
     There can be at most one loop variant registered per statement.
     Attempting to register a second one will result in a fatal error.
 
-    @modify Frama-C+dev: add keep_empty argument
+    @modify 22.0-Titanium: add keep_empty argument
  *)
 
 val add_assert:
@@ -407,7 +411,7 @@ val add_allocates:
   keep_empty:bool -> allocation behavior_component_addition
 (** Add new allocates into the given behavior.
     See {!Annotations.add_assigns} for the signification of [keep_empty]
-    @modify Frama-C+dev add keep_empty argument
+    @modify 22.0-Titanium add keep_empty argument
  *)
 
 val add_extended: acsl_extension behavior_component_addition

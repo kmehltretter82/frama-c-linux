@@ -24,7 +24,7 @@
 (* ---  WP Provers Configuration Panel                                  --- *)
 (* ------------------------------------------------------------------------ *)
 
-class provers : string -> [Why3.Whyconf.Sprover.t] Widget.selector
+class provers : [Why3.Whyconf.Sprover.t] Widget.selector
 
 class dp_chooser :
   main:Design.main_window_extension_points ->

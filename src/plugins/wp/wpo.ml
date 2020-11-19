@@ -190,7 +190,14 @@ struct
 
   let is_trivial g = Conditions.is_trivial g.sequent
 
-  let apply phi g = g.sequent <- phi g.sequent
+  let apply option phi g =
+    try g.sequent <- phi g.sequent
+    with exn when Wp_parameters.protect exn ->
+      Wp_parameters.warning ~current:false ~once:true
+        "Goal simplification aborted (%s):@\n\
+         Exception %S@\n\
+         Re-run with debug level 1+ for details."
+        option (Printexc.to_string exn)
 
   let default_simplifiers = [
     Wp_parameters.SimplifyIsCint.get, Cint.is_cint_simplifier ;
@@ -200,23 +207,23 @@ struct
   let preprocess g =
     if Wp_parameters.Let.get () then
       begin
-        apply Conditions.introduction_eq g ;
+        apply "introcution" Conditions.introduction_eq g ;
         let fold acc (get,solver) = if get () then solver::acc else acc in
         let solvers = List.fold_left fold [] default_simplifiers in
-        apply (Conditions.simplify ~solvers) g ;
+        apply "-wp-simplify-*" (Conditions.simplify ~solvers) g ;
         if Wp_parameters.FilterInit.get ()
-        then apply Conditions.init_filter g ;
+        then apply "-wp-filter-init" Conditions.init_filter g ;
         if Wp_parameters.Prune.get ()
-        then apply (Conditions.pruning ~solvers) g ;
+        then apply "-wp-pruning" (Conditions.pruning ~solvers) g ;
         if Wp_parameters.Filter.get ()
-        then apply Conditions.filter g ;
+        then apply "-wp-filter" Conditions.filter g ;
         if Wp_parameters.Parasite.get ()
-        then apply Conditions.parasite g ;
+        then apply "-wp-parasite" Conditions.parasite g ;
       end
     else
       begin
         if Wp_parameters.Clean.get ()
-        then apply Conditions.clean g ;
+        then apply "-wp-clean" Conditions.clean g ;
       end ;
     if Conditions.is_trivial g.sequent then
       g.sequent <- Conditions.trivial ;
@@ -283,8 +290,8 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
-               pp_prover prover (pp_result_qualif prover) result
+             Format.fprintf fmt "Prover %a returns %t@\n"
+               pp_prover prover (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -347,9 +354,9 @@ struct
       List.iter
         (fun (prover,result) ->
            if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %a@\n"
+             Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover) result
+               (pp_result_qualif prover result)
         ) results ;
     end
 
@@ -805,7 +812,6 @@ let is_trivial g =
   | GoalLemma vc -> VC_Lemma.is_trivial vc
   | GoalAnnot vc -> VC_Annot.is_trivial vc
 
-
 let reduce g =
   match g.po_formula with
   | GoalLemma vc -> WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
@@ -815,8 +821,7 @@ let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ignore (set_result g VCS.Qed result) ;
-    true
+    ( set_result g VCS.Qed result ; true )
   else false
 
 let compute g =
@@ -835,6 +840,12 @@ let is_proved g =
 let is_unknown g = List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
     ( get_results g )
+
+let is_passed g =
+  if is_smoke_test g then
+    not (is_proved g)
+  else
+    is_proved g
 
 let get_result =
   Dynamic.register ~plugin:"Wp" "Wpo.get_result" ~journalize:false
@@ -950,7 +961,7 @@ let goals_of_property =
 let prover_of_name =
   Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name" ~journalize:false
     (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.prover_of_name
+    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)

@@ -270,6 +270,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/list_files.py                              \
       share/analysis-scripts/make_template.py                           \
       share/analysis-scripts/make_wrapper.py                            \
+      share/analysis-scripts/normalize_jcdb.py                          \
       share/analysis-scripts/parse-coverage.sh                          \
       share/analysis-scripts/prologue.mk                                \
       share/analysis-scripts/README.md                                  \
@@ -411,25 +412,6 @@ clean_share_link:
 	fi
 
 clean:: clean_share_link
-
-##############
-# Ocamlgraph #
-##############
-
-# dgraph (included in ocamlgraph)
-#[LC] Cf https://github.com/backtracking/ocamlgraph/pull/32
-ifeq ($(HAS_GNOMECANVAS),yes)
-ifneq ($(ENABLE_GUI),no)
-GRAPH_GUICMO= dgraph.cmo
-GRAPH_GUICMX= dgraph.cmx
-GRAPH_GUIO= dgraph.o
-HAS_DGRAPH=yes
-else # enable_gui is no: disable dgraph
-HAS_DGRAPH=no
-endif
-else # gnome_canvas is not yes: disable dgraph
-HAS_DGRAPH=no
-endif
 
 ##################
 # Frama-C Kernel #
@@ -626,6 +608,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_transformations/clone.cmo                           \
 	src/kernel_services/ast_transformations/filter.cmo                          \
 	src/kernel_services/ast_transformations/inline.cmo              \
+	src/kernel_internals/runtime/dump_config.cmo                    \
 	src/kernel_internals/runtime/special_hooks.cmo                  \
 	src/kernel_internals/runtime/messages.cmo
 
@@ -737,18 +720,6 @@ src/plugins/gui/gtk_compat.ml: src/plugins/gui/gtk_compat.2.ml
 endif
 GENERATED+=src/plugins/gui/gtk_compat.ml
 
-ifeq ($(HAS_DGRAPH),yes)
-  DGRAPHFILES:=debug_manager
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.yes.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-else
-  DGRAPHFILES:=
-  src/plugins/gui/dgraph_helper.ml: src/plugins/gui/dgraph_helper.no.ml
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-endif
-
 SINGLE_GUI_CMO:= \
 	wutil_once \
 	gtk_compat \
@@ -811,6 +782,8 @@ PLUGIN_DIR:=src/plugins/callgraph
 PLUGIN_CMO:= options journalize subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
+PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.yes.ml
+PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml
 else
 PLUGIN_GUI_CMO:=
 PLUGIN_DISTRIB_EXTERNAL:=cg_viewer.ml
@@ -1706,7 +1679,13 @@ check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
 ALL_ML_FILES+=ptests/ptests.ml
-MANUAL_ML_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(ALL_ML_FILES))
+
+ifeq ($(origin MANUAL_ML_FILES),undefined)
+MANUAL_ML_FILES:=$(ALL_ML_FILES)
+endif
+
+MANUAL_ML_FILES:=\
+  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
 
 # Allow control of files to be linted/fixed by external sources
 # (e.g. pre-commit hook that will concentrate on files which have changed)
@@ -1955,6 +1934,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/list_files.py \
 	  share/analysis-scripts/make_template.py \
 	  share/analysis-scripts/make_wrapper.py \
+	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/prologue.mk \
 	  share/analysis-scripts/README.md \
@@ -2300,6 +2280,10 @@ GENERATED+=share/frama-c.rc
 PLUGIN_DEP_LIST:=$(PLUGIN_LIST)
 
 .PHONY: depend
+
+# tell make not to remove generated files even if they are only a byproduct
+# of making .depend.
+.PRECIOUS: $(GENERATED) share/Makefile.dynamic_config
 
 # in case .depend is absent, we will make it. Otherwise, it will be left
 # untouched. Only make depend will force a recomputation of dependencies

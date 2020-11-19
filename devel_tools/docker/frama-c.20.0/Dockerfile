@@ -1,5 +1,6 @@
-FROM debian:sid as base
+FROM debian:buster as base
 
+# Install non-OCaml dependencies + opam
 RUN apt-get update && apt-get install -y \
     cvc4 \
     opam \
@@ -57,7 +58,6 @@ RUN if [ "${with_test}" != "no" ]; then \
            conf-time.1 \
            --verbose \
         && \
-        apt-get install python -y && \
         rm -rf /var/lib/apt/lists/* && \
         cd /root/frama-c-* && \
         make tests; \

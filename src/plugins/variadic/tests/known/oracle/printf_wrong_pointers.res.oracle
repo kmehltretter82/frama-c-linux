@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/printf_wrong_pointers.c:14: 
   Translating call to printf to a call to the specialized version printf_va_1.
@@ -140,11 +140,11 @@ int main(void)
   wchar_t *wstring = (wchar_t *)L"b" "a" "r" ;
   int volatile nondet = 0;
   switch (nondet) {
-    case 0: printf_va_1("%n",(int *)(& tt));
-    case 1: printf_va_2("%n",(int *)(& ui));
-    case 2: printf_va_3("%hhn",(signed char *)string);
-    case 3: printf_va_4("%s",(char *)wstring);
-    case 4: printf_va_5("%ls",(wchar_t *)string);
+    case 0: printf("%n",(int *)(& tt)); /* printf_va_1 */
+    case 1: printf("%n",(int *)(& ui)); /* printf_va_2 */
+    case 2: printf("%hhn",(signed char *)string); /* printf_va_3 */
+    case 3: printf("%s",(char *)wstring); /* printf_va_4 */
+    case 4: printf("%ls",(wchar_t *)string); /* printf_va_5 */
   }
   __retres = 0;
   return __retres;

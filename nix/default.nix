@@ -3,13 +3,13 @@
 
 let mk_buildInputs = { opamPackages ? [], nixPackages ? [] } :
     [ pkgs.gnugrep pkgs.gnused  pkgs.autoconf pkgs.gnumake pkgs.gcc pkgs.ncurses pkgs.time pkgs.python3 pkgs.perl pkgs.file pkgs.which pkgs.dos2unix] ++ nixPackages ++ opam2nix.build {
-           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson"
-                { name = "coq"; constraint = "=8.11.1";  }
-                { name = "why3" ; constraint = "=1.3.1"; }
-                { name = "why3-coq" ; constraint = "=1.3.1"; }
-                { name = "menhir"; constraint = "=20190924"; }
-                { name = "dune"; constraint = "=1.11.4"; }
-                { name = "camlzip"; constraint = "=1.07"; }  #so that why3 is always compiled with it
+           specs = opam2nix.toSpecs ([ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+                { name = "coq"; constraint = "=8.12.0";  }
+                { name = "alt-ergo" ; constraint = "=2.2.0"; }
+                { name = "why3" ; constraint = "=1.3.3"; }
+                { name = "why3-coq" ; constraint = "=1.3.3"; }
+                { name = "menhir"; constraint = "=20200624"; }
+                { name = "dune"; constraint = "=2.7.1"; }
                 ] ++ opamPackages
               );
            ocamlAttr = ocaml_version;
@@ -159,9 +159,7 @@ rec {
 
   wp-qualif = mk_deriv {
         name = "frama-c-wp-qualif";
-        buildInputs = mk_buildInputs { opamPackages = [
-                    { name = "alt-ergo"; constraint = "=2.0.0"; }
-               ]; };
+        buildInputs = mk_buildInputs { };
         build_dir = main.build_dir;
         src = main.build_dir + "/dir.tar";
         sourceRoot = ".";
@@ -176,7 +174,7 @@ rec {
                make create_share_link
                mkdir home
                HOME=$(pwd)/home
-               why3 config --full-config
+               why3 config --detect
                make src/plugins/wp/tests/test_config_qualif
                export FRAMAC_WP_CACHE=replay
                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
@@ -184,6 +182,34 @@ rec {
         '';
         installPhase = ''
                true
+        '';
+  };
+
+  aorai-prove = mk_deriv {
+        name = "frama-c-aorai-prove";
+        buildInputs = mk_buildInputs { };
+        build_dir = main.build_dir;
+        src = main.build_dir + "/dir.tar";
+        sourceRoot = ".";
+        postUnpack = ''
+               find . \( -name "Makefile*" -or -name ".depend" -o -name "ptests_config" -o -name "test_config*" -o -name "config.status" \) -exec bash -c "t=\$(stat -c %y \"\$0\"); sed -i -e \"s&$(cat $build_dir/old_pwd)&$(pwd)&g\" \"\$0\"; touch -d \"\$t\" \"\$0\"" {} \;
+        '';
+        configurePhase = ''
+           true
+        '';
+
+        buildPhase = ''
+          make clean_share_link
+          make create_share_link
+          mkdir home
+          HOME=$(pwd)/home
+          why3 config --detect
+          make src/plugins/aorai/tests/ptests_config
+          make PTESTS_OPTS="-config prove -error-code" Aorai_TESTS
+        '';
+
+        installPhase = ''
+          true
         '';
   };
 
@@ -269,6 +295,14 @@ rec {
                 autoPatchelf src/plugins/pathcrawler
                 make -j 4
                 ln -sr src/plugins/pathcrawler/share share/pc
+                # Setup Why3
+                mkdir home
+                HOME=$(pwd)/home
+                why3 config --detect
+                # Setup WP related
+                export CAVEAT_IMPORTER_NIX_MODE=yes
+                export FRAMAC_WP_CACHE=replay
+                export FRAMAC_WP_CACHEDIR=${plugins.wp-cache.src}
                 make tests -j4 PTESTS_OPTS="-error-code -j 4"
         '';
         installPhase = ''

@@ -32,11 +32,9 @@ type functions =
   | Fct_skip of Cil_datatype.Kf.Set.t
   | Fct_list of Cil_datatype.Kf.Set.t
 
-val get_kf : unit -> functions
-val get_wp : unit -> functions
+val get_fct : unit -> functions
 val iter_fct : (Kernel_function.t -> unit) -> functions -> unit
 val iter_kf : (Kernel_function.t -> unit) -> unit
-val iter_wp : (Kernel_function.t -> unit) -> unit
 
 (** {2 Goal Selection} *)
 
@@ -87,7 +85,6 @@ module Clean: Parameter_sig.Bool
 module Filter: Parameter_sig.Bool
 module Parasite: Parameter_sig.Bool
 module Prenex: Parameter_sig.Bool
-module Bits: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
@@ -108,6 +105,7 @@ module PrecondWeakening : Parameter_sig.Bool
 module Detect: Parameter_sig.Bool
 module Generate:Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
+module Interactive: Parameter_sig.String
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
@@ -118,6 +116,7 @@ module Script: Parameter_sig.String
 module UpdateScript: Parameter_sig.Bool
 module Timeout: Parameter_sig.Int
 module SmokeTimeout: Parameter_sig.Int
+module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
 module TimeMargin: Parameter_sig.Int
 module CoqTimeout: Parameter_sig.Int
@@ -150,6 +149,7 @@ module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
+module CheckMemoryContext: Parameter_sig.Bool
 module SmokeTests: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module SmokeDeadcode: Parameter_sig.Bool
@@ -172,3 +172,5 @@ val print_generated: ?header:string -> string -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 val cat_print_generated: category
+
+val protect : exn -> bool

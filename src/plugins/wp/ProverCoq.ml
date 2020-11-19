@@ -599,9 +599,9 @@ let prove_session ~mode w =
     compile_headers w.cw_includes false w.cw_headers >>=
     begin fun () ->
       match mode with
-      | BatchMode -> try_prove w
-      | EditMode -> try_coqide w
-      | FixMode ->
+      | Batch | Update -> try_prove w
+      | Edit -> try_coqide w
+      | Fix | FixUpdate ->
           begin
             try_prove w >>> function
             | Task.Result true -> Task.return true

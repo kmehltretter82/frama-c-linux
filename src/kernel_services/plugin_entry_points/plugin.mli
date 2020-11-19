@@ -71,7 +71,7 @@ module type S_no_log = sig
         [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
         -alias-verbose, etc.
         @since 18.0-Argon
-        @modify Frama-c+dev add [visible] and [deprecated] arguments. *)
+        @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
 end
 
 (** Provided plug-general services for plug-ins.
@@ -89,9 +89,10 @@ type plugin = private
     p_shortname: string;
     p_help: string;
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
-(** Only iterable parameters (see {!do_iterate} and {!do_not_iterate}) are
-    registered in the field [p_parameters].
-    @since Beryllium-20090901 *)
+(** @since Beryllium-20090901
+    @modify 22.0-Titanium previously only "iterable" parameters were included,
+                        now all parameters are.
+*)
 
 module type General_services = sig
   include S
@@ -169,8 +170,12 @@ val get: string -> plugin
     @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
-(** Iterate on each registered plug-ins.
+(** Iterate on each registered plug-in.
     @since Beryllium-20090901 *)
+
+val fold_on_plugins: (plugin -> 'a -> 'a) -> 'a -> 'a
+(** Fold [f] on each registered plug-in.
+    @since 22.0-Titanium *)
 
 (**/**)
 (* ************************************************************************* *)

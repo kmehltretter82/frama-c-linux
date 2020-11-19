@@ -82,3 +82,9 @@ void formal(int x)
 	int * p = &x ;
 	//@ assert provable: \initialized(p);
 }
+
+void ptr_on_local(void){
+  int x[3] = {0} ;
+  int *p = x ;
+  //@ assert provable: \initialized(p + (0..2));
+}

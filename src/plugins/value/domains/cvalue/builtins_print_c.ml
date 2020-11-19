@@ -140,7 +140,7 @@ let pretty_pointer_assignment fmt typname lv v =
     Kernel.abort ~current:true
       "pretty_pointer_assignment expected cardinal zero or one@ \
        for value %a (lv %s);@ \
-       (did you forget -val-no-alloc-returns-null?)" Cvalue.V.pretty v lv
+       (did you forget -eva-no-alloc-returns-null?)" Cvalue.V.pretty v lv
 
 let types = Hashtbl.create 7;;
 

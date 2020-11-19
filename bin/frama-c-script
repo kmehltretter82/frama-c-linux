@@ -38,10 +38,6 @@ usage() {
    echo "      Interactively prepares a template for analyses,"
    echo "      writing it to dir/GNUmakefile [default: .frama-c]."
    echo ""
-   echo "  - make-path [dir]"
-   echo "      [for Frama-C developers and advanced users without Frama-C in the path]"
-   echo "      Creates a path.mk file in dir [default: .frama-c]."
-   echo ""
    echo "  - list-files [path/to/compile_commands.json]"
    echo "      Lists all sources in the given compile_commands.json"
    echo "      [default: ./compile_commands.json]."
@@ -85,7 +81,10 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -share)
+# All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
+# directory containing frama-c, frama-c-config and frama-c-script.
+export FRAMAC_BIN="$DIR"
+FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
@@ -118,34 +117,6 @@ open_file() {
             open "$1"
             ;;
     esac
-}
-
-make_path() {
-    dir=".frama-c"
-    if [ "$#" -gt 0 ]; then
-        dir="$1"
-    fi
-    if [ ! -d "$dir" ]; then
-        read -p "Directory '$dir' does not exist. Create it? [y/N] " yn
-        case $yn in
-            [Yy])
-                mkdir -p "$dir"
-            ;;
-            *)
-                echo "Exiting without creating."
-                exit 0;;
-        esac
-    fi
-    cat <<EOF > "${dir}/path.mk"
-FRAMAC_DIR=${DIR}
-ifeq (\$(wildcard \$(FRAMAC_DIR)),)
-# Frama-C not installed locally; using the version in the PATH
-else
-FRAMAC=\$(FRAMAC_DIR)/frama-c
-FRAMAC_GUI=\$(FRAMAC_DIR)/frama-c-gui
-endif
-EOF
-    echo "Wrote to: ${dir}/path.mk"
 }
 
 flamegraph() {
@@ -208,50 +179,13 @@ configure_for_frama_c() {
     CPP="gcc -E -nostdinc -fno-builtin -I${FRAMAC_SHARE}/libc -D__FC_MACHDEP_${MACHDEP}" ./configure "$@"
 }
 
-normalize_jcdb() {
-    path=""
-    if [ "$#" -eq 0 ]; then
-        path="./compile_commands.json"
-    else
-        path="$1"
-    fi
-    if [ ! -e "$path" ]; then
-        echo "error: cannot find file: $path";
-        exit 1
-    fi
-    sed "s|$PWD/||g" "$path" > "${path}.tmp"
-    cmp -s "$path" "${path}.tmp"
-    if [ $? -eq 0 ]; then
-        echo "No changes to be applied to $path"
-        rm "${path}.tmp"
-    else
-        echo "Differences to be applied to $path:"
-        diff -u0 "$path" "${path}.tmp"
-        read -p "Normalize $path? [y/N] " yn
-        case $yn in
-            [Yy])
-                mv "${path}.tmp" "$path"
-                echo "Normalization applied to $path"
-            ;;
-            *)
-                echo "Exiting without overwriting."
-                exit 0;;
-        esac
-    fi
-}
-
 case "$command" in
     "help" | "-help" | "--help" | "-h")
         usage 0;
         ;;
     "make-template")
         shift;
-        export FRAMAC="${DIR}/frama-c"
         ${FRAMAC_SHARE}/analysis-scripts/make_template.py "$@";
-        ;;
-    "make-path")
-        shift;
-        make_path "$@";
         ;;
     "list-files")
         shift;
@@ -279,7 +213,7 @@ case "$command" in
         ;;
     "normalize-jcdb")
         shift;
-        normalize_jcdb "$@";
+        ${FRAMAC_SHARE}/analysis-scripts/normalize_jcdb.py "$@";
         ;;
     *)
         echo "error: unrecognized command: $command";

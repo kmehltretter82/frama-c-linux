@@ -1,5 +1,5 @@
 /* run.config
-OPT: -wp -wp-prover qed -wp-msg-key shell
+OPT: -wp -wp-prover qed -wp-msg-key shell -wp-warn-key pedantic-assigns=inactive
 OPT: -eva -eva-use-spec f
 OPT: -print
 */

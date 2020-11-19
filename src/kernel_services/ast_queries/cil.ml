@@ -1994,6 +1994,9 @@ and childrenCilExtended vis p =
   | Ext_preds preds ->
     let preds' = mapNoCopy (visitCilPredicate vis) preds in
     if preds == preds' then p else Ext_preds preds'
+  | Ext_annot (id,annots) ->
+    let annots' = mapNoCopy (visitCilExtended vis) annots in
+    if annots == annots' then p else Ext_annot (id,annots')
 
 and visitCilPredicates vis ps = mapNoCopy (visitCilIdPredicate vis) ps
 
@@ -4416,6 +4419,30 @@ and sizeOf ~loc t =
     integer ~loc ((bitsSizeOf t) lsr 3)
   with SizeOfError _ -> new_exp ~loc (SizeOf(t))
 
+and fieldBitsOffset (f : fieldinfo) : int * int =
+  if  not f.fcomp.cstruct (* union *) then
+    (* All union fields start at offset 0 *)
+    0, bitsSizeOf f.ftype
+  else begin
+    if f.foffset_in_bits = None then begin
+      let aux ~last acc fi =
+        let acc' = offsetOfFieldAcc ~last ~fi ~sofar:acc in
+        fi.fsize_in_bits <- Some acc'.oaLastFieldWidth;
+        fi.foffset_in_bits <- Some acc'.oaLastFieldStart;
+        acc'
+      in
+      ignore (
+        fold_struct_fields aux
+          { oaFirstFree      = 0;
+            oaLastFieldStart = 0;
+            oaLastFieldWidth = 0;
+            oaPrevBitPack    = None }
+          f.fcomp.cfields
+      );
+    end;
+    Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
+  end
+
 and bitsOffset (baset: typ) (off: offset) : int * int =
   let rec loopOff (baset: typ) (width: int) (start: int) = function
       NoOffset -> start, width
@@ -4429,38 +4456,12 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end
-    | Field(f, off) when not f.fcomp.cstruct (* union *) ->
+    | Field(f, off) ->
       if check_invariants then
-        assert (match unrollType baset with
-            | TComp (ci, _, _) -> ci == f.fcomp
-            | _ -> false);
-      (* All union fields start at offset 0 *)
-      loopOff f.ftype (bitsSizeOf f.ftype) start off
-
-    | Field(f, off) (* struct *) ->
-      if check_invariants then
-        assert (match unrollType baset with
-            | TComp (ci, _, _) -> ci == f.fcomp
-            | _ -> false);
-      if f.foffset_in_bits = None then begin
-        let aux ~last acc fi =
-          let acc' = offsetOfFieldAcc ~last ~fi ~sofar:acc in
-          fi.fsize_in_bits <- Some acc'.oaLastFieldWidth;
-          fi.foffset_in_bits <- Some acc'.oaLastFieldStart;
-          acc'
-        in
-        ignore (
-          fold_struct_fields aux
-            { oaFirstFree      = 0;
-              oaLastFieldStart = 0;
-              oaLastFieldWidth = 0;
-              oaPrevBitPack    = None }
-            f.fcomp.cfields
-        );
-      end;
-      let offsbits, size =
-        Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
-      in
+        (match unrollType baset with
+         | TComp (ci, _, _) -> assert (ci == f.fcomp)
+         | _ -> assert false);
+      let offsbits, size = fieldBitsOffset f in
       loopOff f.ftype size (start + offsbits) off
   in
   loopOff baset (bitsSizeOf baset) 0 off

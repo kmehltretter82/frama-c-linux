@@ -528,17 +528,22 @@ module Extensions = struct
   let initialized = ref false
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
+  let ref_typer_block = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer =
+  let set_handler ~is_extension ~typer ~typer_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
+    ref_typer_block := typer_block;
     initialized := true
 
   let is_extension name = !ref_is_extension name
 
   let typer name ~typing_context:typing_context ~loc =
     !ref_typer name typing_context loc
+
+  let typer_block name ~typing_context:typing_context ~loc =
+    !ref_typer_block name typing_context loc
 
   (* For deprecated functions *)
   let ref_deprecated_handler = ref (fun _ _ _ _  -> assert false)
@@ -551,6 +556,8 @@ module Extensions = struct
     !ref_deprecated_handler name category status typer
 end
 let set_extension_handler = Extensions.set_handler
+let get_typer = Extensions.typer
+let get_typer_block = Extensions.typer_block
 
 (* Deprecated ACSL extensions functions *)
 let set_deprecated_extension_handler =
@@ -2308,14 +2315,18 @@ struct
       accept_array: bool;
       accept_models: bool;
       accept_func_ptr: bool;
+      accept_addrs: bool;
     }
 
   let lval_addressable_mode =
     { accept_empty = false; accept_formal = true; accept_array = true;
-      accept_models = false; accept_func_ptr = true; }
+      accept_models = false; accept_func_ptr = true; accept_addrs = false;}
   let lval_assignable_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; }
+      accept_models = true; accept_func_ptr = false; accept_addrs = false;}
+  let lval_assigns_dependency_mode =
+    { accept_empty = true; accept_formal = true; accept_array = false;
+      accept_models = true; accept_func_ptr = false; accept_addrs = true;}
 
   let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
 
@@ -2341,7 +2352,15 @@ struct
         (match snd (Logic_utils.remove_term_offset loff) with
          | TModel _ -> m.accept_models
          | _ -> true)
-      | TAddrOf lv -> is_fct_ptr lv && m.accept_func_ptr
+      | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
+      | TAddrOf lv | TStartOf lv ->
+        m.accept_addrs &&
+        (* note that we assume that 'lv' is adressable. *)
+        begin match lv with
+          | TVar { lv_origin = Some _ }, _ | TMem _, _ -> true
+          | TVar { lv_origin = None }, _ -> false
+          | _ -> false
+        end
       | Tif (_,t1,t2) -> aux t1 && aux t2
 
       | Tunion l | Tinter l -> List.for_all aux l
@@ -2351,7 +2370,7 @@ struct
 
       | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCastE (_,_)
-      | TStartOf _ | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
+      | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
       | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
         false
@@ -3109,6 +3128,27 @@ struct
     in
     lift_set check_lval t
 
+  and term_from f t =
+    let check_from t =
+      match t.term_node with
+      | TAddrOf lv when is_fun_ptr t.term_type ->
+        f lv
+          { t with
+            term_type = type_of_pointed t.term_type;
+            term_node = TLval lv }
+      | TLval lv
+      | TLogic_coerce(_,{term_node = TLval lv })
+      | Tat({term_node = TLval lv},_) -> f lv t
+      | TStartOf lv
+      | Tat ({term_node = TStartOf lv}, _)
+      | TAddrOf lv
+      | Tat ({term_node = TAddrOf lv}, _) ->
+        f lv t
+      | _ -> C.error t.term_loc "not a dependency value: %a"
+               Cil_printer.pp_term t
+    in
+    lift_set check_from t
+
   and type_logic_app env loc f labels ttl =
     (* support for overloading *)
     let infos =
@@ -3448,6 +3488,14 @@ struct
     | PLcomprehension _ | PLset _ | PLunion _ | PLinter _ | PLempty ->
       ctxt.error loc "expecting a predicate and not tsets"
 
+  let term_as_dependency ctxt env t =
+    let module [@warning "-60"] C = struct end in
+    let t = ctxt.type_term ctxt env t in
+    if not (check_lval_kind lval_assigns_dependency_mode t) then
+      ctxt.error t.term_loc "not a valid dependency: %a"
+        Cil_printer.pp_term t ;
+    lift_set (term_from (fun _ t -> t)) t
+
   let type_from ctxt ~accept_formal env (l,d) =
     let module [@warning "-60"] C = struct end in
     (* Yannick: [assigns *\at(\result,Post)] should be allowed *)
@@ -3459,7 +3507,7 @@ struct
       FromAny -> (tl,Cil_types.FromAny)
     | From f ->
       let tf =
-        List.map (term_lval_assignable ctxt ~accept_formal:true env) f
+        List.map (term_as_dependency ctxt env) f
       in
       let tf =
         List.map
@@ -4240,9 +4288,16 @@ struct
       let rvi_opt = get_volatile_fct checks_reads_fct rd_opt in
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
-    | LDextended (kind, content) ->
+    | LDextended (Ext_lexpr(kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      Dextended (textended, [], loc)
+    | LDextended (Ext_extension (kind, name, content)) ->
+      let typing_context = base_ctxt (Lenv.empty ()) in
+      let status,tcontent =
+        Extensions.typer_block kind ~typing_context ~loc (name,content)
+      in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
       Dextended (textended, [], loc)
 

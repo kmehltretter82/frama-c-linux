@@ -27,8 +27,9 @@ open Metrics_base
 ;;
 
 type cilast_metrics = {
-  fundecl_calls: int Metrics_base.VInfoMap.t;
-  fundef_calls: int Metrics_base.VInfoMap.t;
+  fundecl_calls: int Metrics_base.VInfoMap.t; (* undefined and unspecified *)
+  funspec_calls: int Metrics_base.VInfoMap.t; (* undefined, but with spec *)
+  fundef_calls: int Metrics_base.VInfoMap.t; (* defined *)
   extern_global_vars: Metrics_base.VInfoSet.t;
   basic_global_metrics: BasicMetrics.t
 }
@@ -43,9 +44,10 @@ class type sloc_visitor = object
   inherit Visitor.generic_frama_c_visitor
 
   (* Get the number of times a function has been called if it has been
-     defined (fundef) or not (fundecl).
+     defined (fundef), specified (funspec), or just declared (fundecl).
   *)
   method fundecl_calls: int Metrics_base.VInfoMap.t
+  method funspec_calls: int Metrics_base.VInfoMap.t
   method fundef_calls: int Metrics_base.VInfoMap.t
   (* Global variables with 'Extern' storage *)
   method extern_global_vars: Metrics_base.VInfoSet.t
@@ -92,11 +94,13 @@ class slocVisitor ~libc : sloc_visitor = object(self)
   val mutable seen_vars = Varinfo.Set.empty;
 
   val fundecl_calls: int VInfoMap.t ref = ref VInfoMap.empty;
+  val funspec_calls: int VInfoMap.t ref = ref VInfoMap.empty;
   val fundef_calls: int VInfoMap.t ref = ref VInfoMap.empty;
   val extern_global_vars = ref VInfoSet.empty
 
   (* Getters/setters *)
   method fundecl_calls = !fundecl_calls
+  method funspec_calls = !funspec_calls
   method fundef_calls = !fundef_calls
   method extern_global_vars = !extern_global_vars
   method get_global_metrics = !global_metrics
@@ -339,8 +343,9 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       in
       if vinfo.vdefined
       then update_call_map fundef_calls
+      else if Annotations.has_funspec (Globals.Functions.get vinfo)
+      then update_call_map funspec_calls
       else update_call_map fundecl_calls
-
 
   method! vinst i =
     begin match i with
@@ -575,7 +580,9 @@ let dump_html fmt cil_visitor =
                         @{<h2>Synthetic results@}@ <br/>@ \
                         @{<span>Defined function(s)@} (%d): <br/>@ \
                         @[&nbsp; %a@]@ <br/>@ <br/>@ \
-                        @{<span>Undefined function(s)@} (%d):@ <br/>@ \
+                        @{<span>Specified-only function(s)@} (%d):@ <br/>@ \
+                        @[&nbsp; %a@]@ <br>@ <br/>@ \
+                        @{<span>Undefined and unspecified function(s)@} (%d):@ <br/>@ \
                         @[&nbsp; %a@]@ <br>@ <br/>@ \
                         @{<span>'Extern' global variable(s)@} (%d):@ <br/>@ \
                         @[&nbsp; %a@]@ <br>@ <br/>@ \
@@ -584,6 +591,8 @@ let dump_html fmt cil_visitor =
                         @}@]"
       (VInfoMap.cardinal cil_visitor#fundef_calls)
       Metrics_base.pretty_set cil_visitor#fundef_calls
+      (VInfoMap.cardinal cil_visitor#funspec_calls)
+      Metrics_base.pretty_set cil_visitor#funspec_calls
       (VInfoMap.cardinal cil_visitor#fundecl_calls)
       Metrics_base.pretty_set cil_visitor#fundecl_calls
       (VInfoSet.cardinal cil_visitor#extern_global_vars)
@@ -625,10 +634,12 @@ let dump_html fmt cil_visitor =
 
 let pp_funinfo fmt vis =
   let nfundef = VInfoMap.cardinal vis#fundef_calls in
+  let nfunspec = VInfoMap.cardinal vis#funspec_calls in
   let nfundecl = VInfoMap.cardinal vis#fundecl_calls in
   let nextern = VInfoSet.cardinal vis#extern_global_vars in
   let fundef_hdr = Format.sprintf "Defined functions (%d)" nfundef
-  and fundecl_hdr = Format.sprintf "Undefined functions (%d)" nfundecl
+  and funspec_hdr = Format.sprintf "Specified-only functions (%d)" nfunspec
+  and fundecl_hdr = Format.sprintf "Undefined and unspecified functions (%d)" nfundecl
   and extern_hdr = Format.sprintf "'Extern' global variables (%d)" nextern
   and entry_pts_hdr = Format.sprintf "Potential entry points (%d)"
       (Metrics_base.number_entry_points vis#fundef_calls) in
@@ -636,10 +647,13 @@ let pp_funinfo fmt vis =
     "@[<v 0>@[<v 1>%a@ @[%a@]@]@ @ \
      @[<v 1>%a@ @[%a@]@]@ @ \
      @[<v 1>%a@ @[%a@]@]@ @ \
+     @[<v 1>%a@ @[%a@]@]@ @ \
      @[<v 1>%a@ @[%a@]@]@ \
      @]"
     (Metrics_base.mk_hdr 1) fundef_hdr
     Metrics_base.pretty_set vis#fundef_calls
+    (Metrics_base.mk_hdr 1) funspec_hdr
+    Metrics_base.pretty_set vis#funspec_calls
     (Metrics_base.mk_hdr 1) fundecl_hdr
     Metrics_base.pretty_set vis#fundecl_calls
     (Metrics_base.mk_hdr 1) extern_hdr
@@ -647,6 +661,28 @@ let pp_funinfo fmt vis =
     (Metrics_base.mk_hdr 1) entry_pts_hdr
     Metrics_base.pretty_entry_points vis#fundef_calls
 ;;
+
+let json_of_funinfo vis =
+  let fundef =
+    ("defined-functions", json_of_varinfo_map vis#fundef_calls)
+  in
+  let funspec =
+    ("specified-only-functions", json_of_varinfo_map vis#funspec_calls)
+  in
+  let fundecl =
+    ("undefined-functions", json_of_varinfo_map vis#fundecl_calls)
+  in
+  let extern_vars =
+    VInfoSet.fold (fun vi acc -> `String vi.vname :: acc)
+      vis#extern_global_vars []
+  in
+  let extern =
+    ("extern-global-vars", `List (List.rev extern_vars))
+  in
+  let entry_points =
+    ("entry-points", json_of_entry_points vis#fundef_calls)
+  in
+  `Assoc [fundef; funspec; fundecl; extern; entry_points]
 
 let pp_with_funinfo fmt cil_visitor =
   Format.fprintf fmt "@[<v 0>%a@ %a@]"
@@ -680,6 +716,7 @@ let get_cilast_metrics ~libc =
     (cil_visitor:>Visitor.frama_c_visitor) file;
   {
     fundecl_calls = cil_visitor#fundecl_calls;
+    funspec_calls = cil_visitor#funspec_calls;
     fundef_calls = cil_visitor#fundef_calls;
     extern_global_vars = cil_visitor#extern_global_vars;
     basic_global_metrics = cil_visitor#get_global_metrics;
@@ -706,6 +743,9 @@ let compute_on_cilast ~libc =
         (match Metrics_base.get_file_type out_fname with
          | Html -> dump_html fmt cil_visitor
          | Text -> pp_with_funinfo fmt cil_visitor
+         | Json ->
+           let json = json_of_funinfo cil_visitor in
+           Yojson.pretty_print fmt json
         );
         close_out oc;
       with Sys_error _ ->

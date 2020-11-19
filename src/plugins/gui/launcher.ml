@@ -137,7 +137,10 @@ let add_group (box:GPack.box) label options =
   in
   let highlight =
     List.fold_right
-      (fun p b -> let is_set = add_parameter box p in b || is_set)
+      (fun p b ->
+         if p.Typed_parameter.reconfigurable then
+           let is_set = add_parameter box p in b || is_set
+         else b)
       options
       false
   in
@@ -275,7 +278,7 @@ let show ?height ?width ~(host:basic_main) () =
       `HORIZONTAL ~layout:`END ~packing:dialog#action_area#pack ()
   in
   let cancel =
-    GButton.button ~label:"Cancel" ~stock:`CANCEL ~packing:buttons#pack ()
+    GButton.button ~label:"Close" ~stock:`CANCEL ~packing:buttons#pack ()
   in
   ignore (cancel#connect#released dialog#destroy);
   let button_run =

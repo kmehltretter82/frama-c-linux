@@ -435,6 +435,20 @@ let get_float_unop op typ =
   | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
   | _ -> None
 
+let is_boolean_exp e =
+  match e.enode with
+  | BinOp(op,_,_,_) -> is_boolean_binop op
+  | UnOp(LNot,_,_) -> true
+  | _ -> false
+
+let get_bool_kind e =
+  match Cil.isInteger e with
+  | Some i ->
+    if Integer.(equal i zero) then `False else
+    if Integer.(equal i one) then `True else
+      `Term
+  | None -> if is_boolean_exp e then `Bool else `Term
+
 let rec expr_to_term ?(coerce=false) e =
   let loc = e.eloc in
   let typ = Cil.typeOf e in
@@ -444,12 +458,12 @@ let rec expr_to_term ?(coerce=false) e =
     | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
+    | BinOp (op, _, _, _) when is_boolean_binop op ->
+      let tc = expr_to_boolean e in
+      Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
+      Linteger
     | BinOp (op, a, b, _) ->
-      if is_boolean_binop op then
-        let tc = expr_to_boolean e in
-        Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
-        Linteger
-      else begin match get_float_binop op typ with
+      begin match get_float_binop op typ with
         | Some phi ->
           let va = expr_to_term a in
           let vb = expr_to_term b in
@@ -511,17 +525,38 @@ and offset_to_term_offset = function
 and expr_to_boolean e =
   let open Cil_types in
   let tbool n = Logic_const.term n Logic_const.boolean_type in
-  match e.enode with
-  | UnOp(BNot, a,_) ->
-    tbool @@ TUnOp(BNot, expr_to_boolean a)
-  | BinOp((BAnd|BOr) as op,a,b,_) ->
-    let va = expr_to_boolean a in
-    let vb = expr_to_boolean b in
-    tbool @@ TBinOp(op,va,vb)
-  | BinOp(op, a, b, _) when is_boolean_binop op ->
+  let tnot t = tbool @@ TUnOp(LNot, t) in
+  let tcompare op a b =
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
     tbool @@ TBinOp(op,va,vb)
+  in
+  match e.enode with
+  | UnOp(LNot, a,_) -> tnot (expr_to_boolean a)
+  | BinOp((LAnd|LOr) as op,a,b,_) ->
+    let va = expr_to_boolean a in
+    let vb = expr_to_boolean b in
+    tbool @@ TBinOp(op,va,vb)
+  | BinOp(Eq, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `True , `Bool -> expr_to_boolean b
+      | `Bool , `True -> expr_to_boolean a
+      | `False , `Bool -> tnot @@ expr_to_boolean b
+      | `Bool , `False -> tnot @@ expr_to_boolean a
+      | _ -> tcompare Eq a b
+    end
+  | BinOp(Ne, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `False , `Bool -> expr_to_boolean b
+      | `Bool , `False -> expr_to_boolean a
+      | `True , `Bool -> tnot @@ expr_to_boolean b
+      | `Bool , `True -> tnot @@ expr_to_boolean a
+      | _ -> tcompare Ne a b
+    end
+  | BinOp((Lt | Gt | Le | Ge) as op, a, b, _) ->
+    tcompare op a b
   | _ ->
     let t = expr_to_term ~coerce:true e in
     if is_zero_comparable t then
@@ -534,6 +569,7 @@ and expr_to_boolean e =
 and expr_to_predicate e =
   let open Cil_types in
   let unamed = Logic_const.unamed ~loc:e.eloc in
+  let pnot p = unamed @@ Pnot p in
   let prel r a b =
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
@@ -543,14 +579,30 @@ and expr_to_predicate e =
   | BinOp(Le, a, b, _) -> prel Rle a b
   | BinOp(Gt, a, b, _) -> prel Rgt a b
   | BinOp(Ge, a, b, _) -> prel Rge a b
-  | BinOp(Eq, a, b, _) -> prel Req a b
-  | BinOp(Ne, a, b, _) -> prel Rneq a b
-  | BinOp(BAnd, a, b, _) ->
+  | BinOp(Eq, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `True , `Bool -> expr_to_predicate b
+      | `Bool , `True -> expr_to_predicate a
+      | `False , `Bool -> pnot @@ expr_to_predicate b
+      | `Bool , `False -> pnot @@ expr_to_predicate a
+      | _ -> prel Req a b
+    end
+  | BinOp(Ne, a, b, _) ->
+    begin
+      match get_bool_kind a , get_bool_kind b with
+      | `False , `Bool -> expr_to_predicate b
+      | `Bool , `False -> expr_to_predicate a
+      | `True , `Bool -> pnot @@ expr_to_predicate b
+      | `Bool , `True -> pnot @@ expr_to_predicate a
+      | _ -> prel Rneq a b
+    end
+  | BinOp(LAnd, a, b, _) ->
     unamed @@ Pand(expr_to_predicate a,expr_to_predicate b)
-  | BinOp(BOr, a, b, _) ->
+  | BinOp(LOr, a, b, _) ->
     unamed @@ Por(expr_to_predicate a,expr_to_predicate b)
-  | UnOp(BNot, a, _) ->
-    unamed @@ Pnot(expr_to_predicate a)
+  | UnOp(LNot, a, _) ->
+    pnot @@ expr_to_predicate a
   | _ ->
     let t = expr_to_term ~coerce:true e in
     if is_zero_comparable t then
@@ -1134,7 +1186,7 @@ let is_same_pragma p1 p2 =
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
   | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
 
-let is_same_extension x1 x2 =
+let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
   (x1.ext_has_status = x2.ext_has_status) &&
   match x1.ext_kind, x2.ext_kind with
@@ -1143,7 +1195,9 @@ let is_same_extension x1 x2 =
     is_same_list is_same_term t1 t2
   | Ext_preds p1, Ext_preds p2 ->
     is_same_list is_same_predicate p1 p2
-  | (Ext_id _ | Ext_preds _ | Ext_terms _), _ -> false
+  | Ext_annot (id1, a1), Ext_annot (id2, a2) ->
+    is_same_string id1 id2 && is_same_list is_same_extension a1 a2
+  | (Ext_id _ | Ext_preds _ | Ext_terms _ | Ext_annot _ ), _ -> false
 
 let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
   match ca1.annot_content, ca2.annot_content with

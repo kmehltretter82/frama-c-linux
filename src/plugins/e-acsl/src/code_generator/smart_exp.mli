@@ -36,6 +36,10 @@ val subscript: loc:location -> exp -> exp -> exp
 (** [mk_subscript ~loc array idx] Create an expression to access the [idx]'th
     element of the [array]. *)
 
+val ptr_sizeof: loc:location -> typ -> exp
+(** [ptr_sizeof ~loc ptr_typ] takes the pointer typ [ptr_typ] that points
+    to a [typ] typ and returns [sizeof(typ)]. *)
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

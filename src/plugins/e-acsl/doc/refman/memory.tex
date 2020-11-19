@@ -10,7 +10,7 @@
        | { "\fresh" two-labels? "(" term, term ")" };
        | "\valid" { one-label? } "(" location-address ")" ;
        | "\valid_read" { one-label? } "(" location-address ")";
-       | { "\separated" "(" location-address "," location-addresses ")" };
+       | "\separated" "(" location-address "," location-addresses ")";
        \
   { one-label } ::= { "{" id "}" } ;
        \

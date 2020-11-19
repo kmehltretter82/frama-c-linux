@@ -36,7 +36,7 @@ let datatype = "MemZeroAlias"
 
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _typ -> Logic.Int) in
+    let orig_pointer = Context.push Lang.pointer Logic.Int in
     let orig_null    = Context.push Cvalues.null (p_equal e_zero) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
@@ -48,7 +48,7 @@ let no_binder = { bind = fun _ f v -> f v }
 let configure_ia _ = no_binder
 
 (* TODO: compute actual separation hypotheses *)
-let hypotheses () = []
+let hypotheses p = p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunks                                                             --- *)

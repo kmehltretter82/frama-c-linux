@@ -28,7 +28,7 @@ open Promelaast
 
 let pretty_clause fmt l =
   Format.fprintf fmt "@[<2>[%a@]]@\n"
-    (Pretty_utils.pp_list ~sep:",@ " Promelaoutput.print_condition) l
+    (Pretty_utils.pp_list ~sep:",@ " Promelaoutput.Typed.print_condition) l
 
 let pretty_dnf fmt l =
   Format.fprintf fmt "@[<2>[%a@]]@\n"
@@ -360,7 +360,7 @@ let simplClause clause dnf =
 *)
 let simplifyCond condition =
   Aorai_option.debug 
-    "initial condition: %a" Promelaoutput.print_condition condition;
+    "initial condition: %a" Promelaoutput.Typed.print_condition condition;
   (* Step 1 : Condition is translate into Disjunctive Normal Form *)
   let res1 = condToDNF condition in 
   Aorai_option.debug "initial dnf: %a" pretty_dnf res1;
@@ -394,14 +394,9 @@ let simplifyTrans transl =
       let (crossCond , pcond ) = simplifyCond (tr.cross) in
        (* pcond stands for parametrized condition : 
           disjunction of conjunctions of parametrized call/return *)
-      let tr'={ start = tr.start ;
-                stop  = tr.stop  ;
-                cross = crossCond ;
-                numt  = tr.numt
-              }
-      in
+      let tr'= { tr with cross = crossCond } in
       Aorai_option.debug "condition is %a, dnf is %a" 
-        Promelaoutput.print_condition crossCond pretty_dnf pcond;
+        Promelaoutput.Typed.print_condition crossCond pretty_dnf pcond;
       if tr'.cross <> TFalse then (tr'::ltr,pcond::lpcond) else (ltr,lpcond)
     ) 
     ([],[]) 
@@ -437,7 +432,7 @@ let simplifyDNFwrtCtx dnf kf1 status =
   in
   let res = tors (List.map simplCNFwrtCtx dnf) in
   Aorai_option.debug 
-    "After simplification: %a" Promelaoutput.print_condition res; res
+    "After simplification: %a" Promelaoutput.Typed.print_condition res; res
 
 (*
 Tests : 

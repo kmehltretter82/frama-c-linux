@@ -230,7 +230,7 @@ let compare_prop_id pid1 pid2 =
     else
       Stdlib.compare pid1.p_part pid2.p_part
 
-module PropId =
+module PropIdRaw =
   Datatype.Make_with_collections(
   struct
     type t = prop_id
@@ -356,7 +356,7 @@ end = struct
     in normalize_basename basename
 
 
-  module UniquifyPropId = NameUniquify(PropId)(struct
+  module UniquifyPropId = NameUniquify(PropIdRaw)(struct
       let name = "WpProperty"
       let basename = get_prop_id_basename
     end)
@@ -435,7 +435,7 @@ struct
         if n < 1000 then Printf.sprintf "%s_part%03d" basename (succ k) else
           Printf.sprintf "%s_part%06d" basename (succ k)
 
-  module Uniquify2 = NameUniquify(PropId)(struct
+  module Uniquify2 = NameUniquify(PropIdRaw)(struct
       let name = "Wp.WpPropId.Names2."
       let basename = get_prop_id_basename
     end)
@@ -458,8 +458,11 @@ let get_propid = Names.get_prop_id_name
 let pp_propid fmt pid =
   Format.pp_print_string fmt (get_propid pid)
 
-let pp_names fmt l =  match l with [] -> () | _ ->
-  Format.fprintf fmt "_%a" (Wp_error.pp_string_list ~empty:"" ~sep:"_") l
+let pp_names fmt l =
+  let l = Datatype.String.Set.elements l in
+  match l with
+  | [] -> ()
+  | _ -> Format.fprintf fmt "_%a" (Wp_error.pp_string_list ~empty:"" ~sep:"_") l
 
 let ident_names names =
   List.filter (function "" -> true
@@ -518,6 +521,22 @@ let user_prop_names p =
   | IPGlobalInvariant _
   | IPOther _ -> []
 
+let user_bhv_names p =
+  let open Property in
+  let fors = match p with
+    | Property.IPCodeAnnot { ica_ca } ->
+        let fors = match ica_ca.annot_content with
+          | Cil_types.AAssert (fors, _)
+          | Cil_types.AStmtSpec (fors, _)
+          | Cil_types.AInvariant (fors, _, _)
+          | Cil_types.AAssigns (fors, _)
+          | Cil_types.AAllocation (fors, _)
+          | Cil_types.AExtended (fors, _, _) -> fors
+          | _ -> []
+        in fors
+    | _ -> []
+  in Extlib.may_map ~dft:fors (fun b -> b.b_name :: fors) (get_behavior p)
+
 let string_of_termination_kind = function
     Normal -> "post"
   | Exits -> "exits"
@@ -572,6 +591,16 @@ struct
 end
 
 let pretty_local = Pretty.pp_local
+
+(* -------------------------------------------------------------------------- *)
+(* --- Datatype                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+module PropId =
+struct
+  include PropIdRaw
+  let pretty = pp_propid
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Hints                                                              --- *)
@@ -660,7 +689,7 @@ let property_hints hs =
         List.iter (add_required hs) (il_name::il_pred.tp_statement.pred_name)
     | IPBehavior _ -> ()
     | IPComplete {ic_bhvs} | IPDisjoint {ic_bhvs} ->
-        List.iter (add_required hs) ic_bhvs
+        Datatype.String.Set.iter (add_required hs) ic_bhvs
     | IPPredicate {ip_pred} ->
         List.iter (add_hint hs) ip_pred.ip_content.tp_statement.pred_name
     | IPExtended {ie_ext={ext_name}} -> List.iter (add_hint hs) [ext_name]
@@ -759,8 +788,7 @@ let select_default pid =
   let names = user_prop_pid pid in
   not (List.mem "no_wp" names)
 
-let select_by_name asked_names pid =
-  let names = user_prop_pid pid in
+let are_selected_names asked names =
   if List.mem "no_wp" names then false
   else
     let is_minus s = try s.[0] = '-' with _ -> false in
@@ -778,9 +806,15 @@ let select_by_name asked_names pid =
                then a && (not (eval ()))
                else a || (eval ()))
     in
-    match List.fold_left eval None asked_names with
+    match List.fold_left eval None asked with
     | Some false -> false
     | _ -> true
+
+
+let select_by_name asked_names pid =
+  let names = user_prop_pid pid in
+  are_selected_names asked_names names
+
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with

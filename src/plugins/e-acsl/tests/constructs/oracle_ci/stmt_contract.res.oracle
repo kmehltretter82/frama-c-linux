@@ -1,2 +1,5 @@
 [e-acsl] beginning translation.
+[e-acsl] tests/constructs/stmt_contract.i:64: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

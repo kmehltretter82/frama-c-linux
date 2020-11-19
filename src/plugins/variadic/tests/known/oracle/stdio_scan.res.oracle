@@ -12,7 +12,7 @@
   Declaration of variadic function sprintf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:217: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:538: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
 [variadic] tests/known/stdio_scan.c:10: Warning: 
   Call to function fscanf with non-static format argument:
@@ -156,9 +156,9 @@ int main(void)
     sscanf((char const *)str,(char const *)format,
            (void * const *)(__va_args_26));
   }
-  fscanf_va_1(stream,"%d %s %d",& i,s,& j);
-  scanf_va_1("%d %s %d",& i,s,& j);
-  sscanf_va_1((char const *)str,"%d %s %d",& i,s,& j);
+  fscanf(stream,"%d %s %d",& i,s,& j); /* fscanf_va_1 */
+  scanf("%d %s %d",& i,s,& j); /* scanf_va_1 */
+  sscanf((char const *)str,"%d %s %d",& i,s,& j); /* sscanf_va_1 */
   __retres = 0;
   return __retres;
 }

@@ -63,11 +63,11 @@ PLUGIN_CMO:= \
 	wp_parameters wp_error \
 	dyncall ctypes clabels \
 	Why3Provers \
-	Context Warning MemoryContext wpContext \
+	Context Warning AssignsCompleteness MemoryContext wpContext \
 	LogicUsage RefUsage \
 	Layout Region \
 	RegionAnnot RegionAccess RegionDump RegionAnalysis \
-	cil2cfg normAtLabels wpPropId mcfg \
+	cil2cfg normAtLabels wpPropId wpStrategy mcfg \
 	Lang Repr Matrix Passive Splitter \
 	LogicBuiltins Definitions \
 	Cmath Cint Cfloat Vset Vlist Cstring Cvalues \
@@ -81,15 +81,16 @@ PLUGIN_CMO:= \
 	Sigma MemLoader \
 	MemEmpty MemZeroAlias MemVar \
 	MemMemory MemTyped MemRegion \
-	wpReached wpStrategy wpRTE wpAnnot \
+	wpReached wpRTE wpAnnot wpTarget \
 	CfgCompiler StmtSemantics \
 	VCS script proof wpo wpReport \
 	Footprint Tactical Strategy \
-	TacSplit TacChoice TacRange \
+	TacSplit TacChoice TacRange TacInduction \
 	TacArray TacCompound TacUnfold \
 	TacHavoc TacInstance TacLemma \
 	TacFilter TacCut WpTac TacNormalForm \
-	TacRewrite TacBitwised TacBitrange TacShift \
+	TacRewrite TacBitwised TacBitrange TacBittest TacShift \
+	TacSequence \
 	TacCongruence TacOverflow Auto \
 	ProofSession ProofScript ProofEngine \
 	ProverTask ProverErgo ProverCoq \
@@ -234,7 +235,7 @@ WP_API_BASE= \
 	LogicUsage.mli RefUsage.mli \
 	normAtLabels.mli \
 	wpPropId.mli mcfg.ml \
-	Context.mli Warning.mli wpContext.mli \
+	Context.mli Warning.mli AssignsCompleteness.mli wpContext.mli \
 	Lang.mli Repr.mli Passive.mli Splitter.mli \
 	LogicBuiltins.mli Definitions.mli \
 	Cint.mli Cfloat.mli Vset.mli Cstring.mli \

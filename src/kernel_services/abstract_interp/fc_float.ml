@@ -58,11 +58,8 @@ let cmp_ieee = (compare: float -> float -> int)
     are also considered, e.g. "if x < 0.0" is equivalent to "if x < -0.0",
     which is also equivalent to "F.compare x (-0.0) < 0".
     This 'compare' operator distinguishes -0. and 0. *)
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external compare : float -> float -> int = "float_compare_total" "noalloc"
+external compare : float -> float -> int = "float_compare_total" [@@noalloc]
 let total_compare = compare
-[@@@ warning "+3"]
 
 let of_float round prec f = round >>% fun () -> round_to_precision prec f
 
@@ -74,10 +71,7 @@ let is_finite f = match classify_float f with
   | FP_nan | FP_infinite -> false
   | FP_normal | FP_subnormal | FP_zero -> true
 
-(* replace "noalloc" with [@@noalloc] for OCaml version >= 4.03.0 *)
-[@@@ warning "-3"]
-external is_negative : float -> bool = "float_is_negative" "noalloc"
-[@@@ warning "+3"]
+external is_negative : float -> bool = "float_is_negative" [@@noalloc]
 
 let round_to_precision round prec t =
   if is_single prec

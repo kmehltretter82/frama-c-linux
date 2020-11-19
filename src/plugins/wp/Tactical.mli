@@ -184,6 +184,9 @@ val rewrite : ?at:int -> (string * pred * term * term) list -> process
 (** For each pattern [(descr,guard,src,tgt)] replace [src] with [tgt]
     under condition [guard], inserted in position [at]. *)
 
+val condition : string -> pred -> process -> process
+(** Apply process, but only after proving some condition *)
+
 (** {2 Tactical Plug-in} *)
 
 class type tactical =

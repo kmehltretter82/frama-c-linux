@@ -61,5 +61,8 @@ int main() {
   struct tm mytime2;
   res_time = gmtime_r(&t, &mytime2);
 
+  time_str = asctime(&mytime);
+  //@ assert valid_string(time_str);
+
   return 0;
 }

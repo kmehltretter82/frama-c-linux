@@ -26,25 +26,33 @@
 # GNUmakefile template): it parses the output and suggests useful commands
 # whenever it can, by calling frama-c-script itself.
 
-import subprocess
-import sys
+import argparse
 import os
 import re
+import subprocess
+import sys
 from functools import partial
 
-if len(sys.argv) < 3:
-   print("usage: %s path-to-frama-c-script target" % sys.argv[0])
-   print("       Builds the specified target, parsing the output to")
-   print("       identify and recommend actions in case of failure.")
-   print("       The first argument must be the path to the frama-c-script")
-   print("       binary.")
-   sys.exit(1)
+MIN_PYTHON = (3, 6) # for automatic Path conversions
+if sys.version_info < MIN_PYTHON:
+    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
-framac_script = sys.argv[1]
-target = sys.argv[2]
-args = sys.argv[3:]
+parser = argparse.ArgumentParser(description="""
+Builds the specified target, parsing the output to identify and recommend
+actions in case of failure.""")
+parser.add_argument('--make-dir', metavar='DIR', default=".frama-c", nargs=1,
+                    help='directory containing the makefile (default: .frama-c)')
 
-out = subprocess.Popen(['make', target] + args,
+(make_dir_arg, args) = parser.parse_known_args()
+make_dir = vars(make_dir_arg)["make_dir"]
+args = args[1:]
+
+framac_bin = os.getenv('FRAMAC_BIN')
+if not framac_bin:
+   sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
+framac_script = f"{framac_bin}/frama-c-script"
+
+out = subprocess.Popen(['make', "-C", make_dir] + args,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 output = out.communicate()[0].decode('utf-8')
@@ -62,7 +70,7 @@ for line in lines:
     if match:
        fname = match.group(1)
        def action(fname):
-           out = subprocess.Popen([framac_script, "find-fun", fname],
+           out = subprocess.Popen([framac_script, "find-fun", "-C", make_dir, fname],
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
            output = out.communicate()[0].decode('utf-8')
            re_possible_definers = re.compile("Possible definitions for function")

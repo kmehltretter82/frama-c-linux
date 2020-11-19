@@ -143,9 +143,10 @@ extern char*__fc_locale_names[512];
 */
 extern char *setlocale(int category, const char *locale);
 
-/*@ assigns \nothing;
+/*@
+  assigns \result \from __fc_locale;
   ensures result_current_locale: \result == __fc_locale;
- */
+*/
 extern struct lconv *localeconv(void);
 
 __END_DECLS

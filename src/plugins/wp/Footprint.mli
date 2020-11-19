@@ -49,3 +49,5 @@ val locate : select:term -> inside:term -> occurrence
 
 (** Retrieve back the [k]-th occurrence of a footprint inside a term. *)
 val lookup : occur:occurrence -> inside:term -> term
+
+(* -------------------------------------------------------------------------- *)

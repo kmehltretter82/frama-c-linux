@@ -341,7 +341,7 @@ class pcond
     (focus : step_selection)
     (plang : Pcond.state) =
   object(self)
-    inherit Pcond.sequence plang as super
+    inherit Pcond.seqengine plang as super
 
     (* All displayed entries *)
     val mutable domain = Vars.empty

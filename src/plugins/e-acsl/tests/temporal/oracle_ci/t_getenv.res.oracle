@@ -5,7 +5,7 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:486: Warning: 
   E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:486: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:485: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

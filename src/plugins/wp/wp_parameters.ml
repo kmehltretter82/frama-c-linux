@@ -155,21 +155,20 @@ let iter_fct phi = function
         (fun kf -> if not (Fct.mem kf fs) then phi kf)
   | Fct_list fs -> Fct.iter phi fs
 
-let get_kf () =
+let get_kfs () =
   if Functions.is_empty() then
     if SkipFunctions.is_empty () then Fct_all
     else Fct_skip (SkipFunctions.get())
   else
     Fct_list (Fct.diff (Functions.get()) (SkipFunctions.get()))
 
-let get_wp () =
+let get_fct () =
   if WP.get () || not (Functions.is_empty()) ||
      not (Behaviors.is_empty()) || not (Properties.is_empty())
-  then get_kf ()
+  then get_kfs ()
   else Fct_none
 
-let iter_wp f = iter_fct f (get_wp ())
-let iter_kf f = iter_fct f (get_kf ())
+let iter_kf f = iter_fct f (get_fct ())
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Memory Models                                                   --- *)
@@ -545,13 +544,6 @@ module Prenex =
   end)
 
 let () = Parameter_customize.set_group wp_simplifier
-module Bits =
-  True(struct
-    let option_name = "-wp-bits"
-    let help = "Use bit-test simplifications."
-  end)
-
-let () = Parameter_customize.set_group wp_simplifier
 module SimplifyIsCint =
   True(struct
     let option_name = "-wp-simplify-is-cint"
@@ -607,17 +599,27 @@ module Provers = String_list
       let option_name = "-wp-prover"
       let arg_name = "dp,..."
       let help =
-        "Submit proof obligations to external prover(s):\n\
-         - 'none' to skip provers\n\
-         - 'script' (session scripts only)\n\
-         - 'tip' (failed scripts only)\n\
-         - 'alt-ergo' (default)\n\
-         - 'altgr-ergo' (gui)\n\
-         - 'coq', 'coqide' (see also -wp-coq-script)\n\
-         - 'why3:<dp>' or '<dp>' (why3 prover, see -wp-detect)\n\
-         - 'native:alt-ergo'\n\
-         - 'native:coq'\n\
-         - 'native:coqide'\
+        "Submit proof obligations to prover(s):\n\
+         - 'none' (no prover run)\n\
+         - 'script' (replay all session scripts)\n\
+         - 'tip' (replay or init scripts for failed goals)\n\
+         - '<why3-prover>' (any Why-3 prover, see -wp-detect)\n\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module Interactive = String
+    (struct
+      let option_name = "-wp-interactive"
+      let arg_name = "mode"
+      let default = "batch"
+      let help =
+        "WP mode for interactive Why-3 provers (eg: Coq):\n\
+         - 'batch': check current proof (default)\n\
+         - 'update': update and check proof\n\
+         - 'edit': edit proof before check\n\
+         - 'fix': check and edit proof if necessary\n\
+         - 'fixup': update proof and fix\n\
         "
     end)
 
@@ -730,6 +732,18 @@ module SmokeTimeout =
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module InteractiveTimeout =
+  Int(struct
+    let option_name = "-wp-interactive-timeout"
+    let default = 30
+    let arg_name = "n"
+    let help =
+      Printf.sprintf
+        "Set the timeout (in seconds) for checking scripts\n\
+         of interactive provers (default: %d)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1045,6 +1059,17 @@ module MemoryContext =
     end)
 
 let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
+
+module CheckMemoryContext =
+  False
+    (struct
+      let option_name = "-wp-check-memory-model"
+      let help = "Insert memory model hypotheses in function contracts and \
+                  check them on call. (experimental)"
+    end)
+
+let () = Parameter_customize.set_group wp_po
 module OutputDir =
   String(struct
     let option_name = "-wp-out"
@@ -1144,12 +1169,12 @@ let get_output () =
   let name = Project.get_unique_name project in
   if name = "default" then base
   else
-    let dir = Datatype.Filepath.concat base ("/" ^ name) in
+    let dir = Datatype.Filepath.concat base name in
     make_output_dir (dir :> string) ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1173,7 +1198,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Datatype.Filepath.concat base ("/" ^ d) in
+  let path = Datatype.Filepath.concat base d in
   if force then make_output_dir (path :> string) ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1197,5 +1222,15 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let protect e =
+  if debug_atleast 1 then false else
+    match e with
+    | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | _ -> true
 
 (* -------------------------------------------------------------------------- *)

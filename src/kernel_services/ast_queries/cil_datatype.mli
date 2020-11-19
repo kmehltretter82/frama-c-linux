@@ -73,7 +73,7 @@ module Location: sig
   (** Pretty-print both location start and end, including file, line and
       character offset.
 
-      @since Frama-C+dev
+      @since 22.0-Titanium
    *)
   val pretty_debug: t Pretty_utils.formatter
 
@@ -85,7 +85,7 @@ module Location: sig
       starting position. Compares normalized filenames, lines and columns,
       but no absolute character offsets.
 
-      @since Frama-C+dev
+      @since 22.0-Titanium
    *)
   val equal_start_semantic : location -> location -> bool
 

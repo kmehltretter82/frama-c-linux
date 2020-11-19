@@ -76,6 +76,7 @@ let journal_isset_ref = ref false
 let use_obj_ref = ref true
 let use_type_ref = ref true
 let deterministic = ref false
+let permissive = ref false
 
 let last_project_created_by_copy = ref (fun () -> assert false)
 
@@ -106,11 +107,11 @@ let get_backtrace () =
 
 let request_crash_report =
   Format.sprintf
-    "Please report as 'crash' at http://bts.frama-c.com/.\n\
+    "Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues\n\
      Your Frama-C version is %s.\n\
      Note that a version and a backtrace alone often do not contain enough\n\
      information to understand the bug. Guidelines for reporting bugs are at:\n\
-     http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:bug_reporting_guidelines\n"
+     https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs\n"
     Fc_config.version_and_codename
 
 let protect = function
@@ -139,7 +140,8 @@ let protect = function
       let name = long_plugin_name p in
       Printf.sprintf
         "%s aborted: unimplemented feature.%s\n\
-         You may send a feature request at http://bts.frama-c.com with:\n\
+         You may send a feature request at \
+         https://git.frama-c.com/pub/frama-c/issues with:\n\
          '[%s] %s'."
         name (additional_info ()) name m
   | e ->
@@ -267,6 +269,11 @@ let error name msg =
     "option `%s' %s.@\nuse `%s -help' for more information."
     name msg bin_name
 
+let warning name msg =
+  Kernel_log.warning
+    "option `%s' %s, ignoring. [-permissive]@\n"
+    name msg
+
 let all_options = match Array.to_list Sys.argv with
   | [] -> assert false
   | _binary :: l -> l
@@ -342,6 +349,9 @@ let parse known_options_list then_expected options_list =
         unknown_options, nb_used, Some (then_options, Replace)
     | "-then-on" :: project_name :: then_options when then_expected ->
         unknown_options, nb_used, Some (then_options, Name project_name)
+    | "-permissive" :: next_options ->
+      permissive := true;
+      go unknown_options nb_used next_options
     | option :: (arg :: next_options as arg_next) ->
         let unknown, use_arg, is_used =
           parse_one_option unknown_options option arg
@@ -385,6 +395,7 @@ let () =
         "-kernel-verbose", Int (fun n -> Kernel_verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
+        "-permissive", Unit (fun () -> permissive := true);
       ]
       false
       all_options
@@ -416,6 +427,7 @@ let journal_isset = !journal_isset_ref
 let use_obj = !use_obj_ref
 let use_type = !use_type_ref
 let deterministic = !deterministic
+let permissive = !permissive
 
 (* ************************************************************************* *)
 (** {2 Plugin} *)
@@ -761,11 +773,19 @@ let use_cmdline_files = On_Files.extend
 
 let set_files used_loading l =
   Kernel_log.feedback ~dkey "setting files from command lines.";
-  List.iter
-    (fun s ->
-       if s = "" then error "" "has no name. What do you exactly have in mind?";
-       if s.[0] = '-' then error s "is unknown")
-    l;
+  let l =
+    List.fold_right
+      (fun s acc ->
+         if s = "" then
+           if permissive then (warning "" "has no name"; acc)
+           else error "" "has no name. What do you exactly have in mind?"
+         else if s.[0] = '-' then
+           if permissive then (warning s "is unknown"; acc)
+           else error s "is unknown"
+         else
+           s :: acc
+      ) l []
+  in
   assert
     (Kernel_log.verify
        (not (On_Files.is_empty ()))
@@ -1053,42 +1073,6 @@ let list_plugins () =
           loading_failures;
       end;
     end ;
-  raise Exit
-
-let list_all_plugin_options ~print_invisible =
-  Log.print_on_output
-    begin fun fmt ->
-      let of_name s =
-        if s = "" then (if Unix.isatty Unix.stdout then
-                          "\x1b[31mNO NAME\x1b[0m" else "NO NAME")
-        else s
-      in
-      let print_cmdline_option fmt (c:cmdline_option) =
-        if print_invisible || c.ovisible then
-          Format.fprintf fmt "@[<v>Name: %s@]" c.oname
-        else
-          Format.ifprintf fmt "@[<v>Name: %s@]" c.oname
-      in
-      let print_cmdline_option_list fmt cs =
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@;"
-           print_cmdline_option) fmt (sort_cmdline_options cs)
-      in
-      let print_groups fmt gs =
-        let sorted_gs = sort_groups gs in
-        (Pretty_utils.pp_list
-           ~pre:"@[<v>" ~sep:"@;" ~suf:"@]"
-           (Pretty_utils.pp_pair ~pre:"@[<v 2>" ~suf:"@]" ~sep:"@;"
-              (fun fmt name -> Format.pp_print_string fmt (of_name name))
-              (fun fmt p -> print_cmdline_option_list fmt !p))) fmt sorted_gs
-      in
-      let print_plugin fmt p =
-        Format.fprintf fmt "@[<v 2>Name: %s@;%a@]"
-          p.Plugin.name print_groups p.Plugin.groups
-      in
-      Format.fprintf fmt "%a@."
-        (Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@;" print_plugin)
-        (Plugin.all_plugins ())
-    end;
   raise Exit
 
 (* ************************************************************************* *)

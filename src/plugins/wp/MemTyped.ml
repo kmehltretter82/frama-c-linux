@@ -42,10 +42,10 @@ module L = Qed.Logic
 (* -------------------------------------------------------------------------- *)
 
 let datatype = "MemTyped"
-let hypotheses () = []
+let hypotheses p = p
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer (fun _ -> t_addr) in
+    let orig_pointer = Context.push Lang.pointer t_addr in
     let orig_null    = Context.push Cvalues.null (p_equal a_null) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
@@ -338,7 +338,7 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         | C_int i -> pp_int fmt i
         | C_float f -> pp_float fmt f
         | C_pointer _ -> Format.fprintf fmt "PTR"
-        | C_comp c -> Format.pp_print_string fmt c.cname
+        | C_comp c -> Format.pp_print_string fmt (Lang.comp_id c)
         | C_array a ->
             let te = object_of a.arr_element in
             match a.arr_flat with
@@ -598,7 +598,7 @@ let pointer_val t = t
 let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (a_base l)
 
 let base_addr l = a_addr (a_base l) e_zero
-let base_offset l = a_base_offset (a_offset l)
+let base_offset l = a_base_offset (a_base l) (a_offset l)
 let block_length sigma obj l =
   e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
 

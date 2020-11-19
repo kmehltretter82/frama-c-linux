@@ -80,6 +80,19 @@ let str_string_match regex s n =
   let res = Str.string_match regex s n in
   Mutex.unlock str_mutex; res
 
+(* If regex1 matches inside s, adds suffix to the first occurrence of regex2.
+   If matched, returns (replaced string, true), otherwise returns (s, false).
+*)
+let str_string_match_and_replace regex1 regex2 ~suffix s =
+  Mutex.lock str_mutex;
+  let replaced_str, matched =
+    if Str.string_match regex1 s 0 then
+      Str.replace_first regex2 ("\\1" ^ suffix) s, true
+    else s, false
+  in
+  Mutex.unlock str_mutex;
+  (replaced_str, matched)
+
 let str_split regex s =
   Mutex.lock str_mutex;
   let res = Str.split regex s in
@@ -772,13 +785,12 @@ let config_options =
        let new_top =
          List.map
            (fun (cmd,opts, log, macros,_) ->
-              cmd, make_custom_opts opts s, log,
+              cmd, make_custom_opts opts s, log @ current.dc_default_log,
               current.dc_macros, current.dc_timeout)
            !current_default_cmds
        in
        { current with dc_toplevels = new_top @ current.dc_toplevels;
-                      dc_default_log = !current_default_log @
-                                       current.dc_default_log });
+                      dc_default_log = !current_default_log });
 
     "FILEREG",
     (fun _ s current -> { current with dc_test_regexp = s });
@@ -1004,40 +1016,47 @@ let get_macros cmd =
   in
   Macros.add_list macros cmd.macros
 
+let contains_frama_c_binary_name =
+  Str.regexp "[^( ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c[^-]\\).*"
+
+let frama_c_binary_name =
+  Str.regexp "\\([^ ]*\\(toplevel\\|viewer\\|frama-c-gui\\|frama-c\\)\\(\\.opt\\|\\.byte\\|\\.exe\\)?\\)"
+
 let basic_command_string =
-  let contains_toplevel_or_frama_c =
-    Str.regexp "[^( ]*\\(\\(toplevel\\)\\|\\(viewer\\)\\|\\(frama-c\\)\\).*"
-  in
   fun command ->
-    let macros = get_macros command in
-    let logfiles = List.map (Macros.expand macros) command.log_files in
-    command.log_files <- logfiles;
-    let has_ptest_file_t, toplevel =
-      Macros.does_expand macros command.toplevel
-    in
-    let has_ptest_file_o, options = Macros.does_expand macros command.options in
-    let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
-    let options =
-      if str_string_match contains_toplevel_or_frama_c command.toplevel 0
-      then begin
-        let opt_modules = Macros.expand macros
-            (Macros.get "PTEST_LOAD_MODULES" macros) in
-        let opt_pre = Macros.expand macros !additional_options_pre in
-        let opt_post = Macros.expand macros !additional_options in
-        "-check " ^ opt_modules ^ " " ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
-      end else options
-    in
-    let options = if !use_byte then opt_to_byte_options options else options in
-    let raw_command =
-      if has_ptest_file_t || has_ptest_file_o || command.execnow then
-        toplevel ^ " " ^ options
-      else begin
-        let file = Filename.sanitize @@ get_ptest_file command in
-        toplevel ^ " " ^ file ^ " " ^ options
-      end
-    in
-    if command.timeout = "" then raw_command
-    else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
+  let macros = get_macros command in
+  let logfiles = List.map (Macros.expand macros) command.log_files in
+  command.log_files <- logfiles;
+  let has_ptest_file_t, toplevel =
+    Macros.does_expand macros command.toplevel
+  in
+  let has_ptest_file_o, options = Macros.does_expand macros command.options in
+  let toplevel = if !use_byte then opt_to_byte toplevel else toplevel in
+  let toplevel, contains_frama_c_binary =
+    str_string_match_and_replace contains_frama_c_binary_name
+      frama_c_binary_name ~suffix:" -check" toplevel
+  in
+  let options =
+    if contains_frama_c_binary
+    then begin
+      let opt_modules = Macros.expand macros
+          (Macros.get "PTEST_LOAD_MODULES" macros) in
+      let opt_pre = Macros.expand macros !additional_options_pre in
+      let opt_post = Macros.expand macros !additional_options in
+      opt_modules ^ " " ^ opt_pre ^ " " ^ options ^ " " ^ opt_post
+    end else options
+  in
+  let options = if !use_byte then opt_to_byte_options options else options in
+  let raw_command =
+    if has_ptest_file_t || has_ptest_file_o || command.execnow then
+      toplevel ^ " " ^ options
+    else begin
+      let file = Filename.sanitize @@ get_ptest_file command in
+      toplevel ^ " " ^ file ^ " " ^ options
+    end
+  in
+  if command.timeout = "" then raw_command
+  else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
 (* Searches for executable [s] in the directories contained in the PATH
    environment variable. Returns [None] if not found, or
@@ -1356,7 +1375,7 @@ let do_command command =
             else
               execnow.ex_cmd
           in
-          if !verbosity >= 1 then begin
+          if !verbosity >= 1 || !behavior = Show then begin
             lock_printf "%% launch %s@." cmd;
           end;
           shared.summary_run <- succ shared.summary_run;

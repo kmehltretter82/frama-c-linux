@@ -127,6 +127,7 @@ share/analysis-scripts/git_utils.py: .ignore
 share/analysis-scripts/list_files.py: .ignore
 share/analysis-scripts/make_template.py: .ignore
 share/analysis-scripts/make_wrapper.py: .ignore
+share/analysis-scripts/normalize_jcdb.py: .ignore
 share/analysis-scripts/parse-coverage.sh: .ignore
 share/analysis-scripts/prologue.mk: CEA_LGPL
 share/analysis-scripts/README.md: .ignore
@@ -366,6 +367,8 @@ src/kernel_internals/parsing/logic_preprocess.mli: CEA_INRIA_LGPL
 src/kernel_internals/parsing/logic_preprocess.mll: CEA_INRIA_LGPL
 src/kernel_internals/runtime/README.md: .ignore
 src/kernel_internals/runtime/boot.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
+src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
 src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL
@@ -711,6 +714,10 @@ src/plugins/aorai/VERSIONS.txt: .ignore
 src/plugins/aorai/YA.README: .ignore
 src/plugins/aorai/aorai_dataflow.ml: AORAI_LGPL
 src/plugins/aorai/aorai_dataflow.mli: AORAI_LGPL
+src/plugins/aorai/aorai_graph.ml: AORAI_LGPL
+src/plugins/aorai/aorai_graph.mli: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.ml: AORAI_LGPL
+src/plugins/aorai/aorai_metavariables.mli: AORAI_LGPL
 src/plugins/aorai/aorai_option.ml: AORAI_LGPL
 src/plugins/aorai/aorai_option.mli: AORAI_LGPL
 src/plugins/aorai/aorai_register.ml: AORAI_LGPL
@@ -744,7 +751,7 @@ src/plugins/callgraph/Callgraph.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/callgraph_api.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/callgraph/cg_viewer.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/callgraph/cg_viewer.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.ml: CEA_LGPL_OR_PROPRIETARY
@@ -803,7 +810,7 @@ src/plugins/gui/analyses_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/analyses_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/book_manager.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/gui/debug_manager.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/gui/debug_manager.yes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/debug_manager.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/gui/design.mli: CEA_LGPL_OR_PROPRIETARY
@@ -1369,8 +1376,6 @@ src/plugins/value/utils/library_functions.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/mark_noresults.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/value/utils/state_import.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/structure.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/unit_tests.ml: CEA_LGPL_OR_PROPRIETARY
@@ -1449,12 +1454,16 @@ src/plugins/variadic/generic.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/register.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/variadic/replacements.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/standard.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/translate.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_build.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/variadic/va_types.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/wp/.gitignore: .ignore
 src/plugins/wp/.ocp-indent: .ignore
+src/plugins/wp/AssignsCompleteness.ml: CEA_WP
+src/plugins/wp/AssignsCompleteness.mli: CEA_WP
 src/plugins/wp/Auto.ml: CEA_WP
 src/plugins/wp/Auto.mli: CEA_WP
 src/plugins/wp/Cache.ml: CEA_WP
@@ -1606,6 +1615,8 @@ src/plugins/wp/TacBitwised.ml: CEA_WP
 src/plugins/wp/TacBitwised.mli: CEA_WP
 src/plugins/wp/TacBitrange.ml: CEA_WP
 src/plugins/wp/TacBitrange.mli: CEA_WP
+src/plugins/wp/TacBittest.ml: CEA_WP
+src/plugins/wp/TacBittest.mli: CEA_WP
 src/plugins/wp/TacChoice.ml: CEA_WP
 src/plugins/wp/TacChoice.mli: CEA_WP
 src/plugins/wp/TacCongruence.ml: CEA_WP
@@ -1618,6 +1629,8 @@ src/plugins/wp/TacFilter.ml: CEA_WP
 src/plugins/wp/TacFilter.mli: CEA_WP
 src/plugins/wp/TacHavoc.ml: CEA_WP
 src/plugins/wp/TacHavoc.mli: CEA_WP
+src/plugins/wp/TacInduction.ml: CEA_WP
+src/plugins/wp/TacInduction.mli: CEA_WP
 src/plugins/wp/TacInstance.ml: CEA_WP
 src/plugins/wp/TacInstance.mli: CEA_WP
 src/plugins/wp/TacLemma.ml: CEA_WP
@@ -1630,6 +1643,8 @@ src/plugins/wp/TacRange.ml: CEA_WP
 src/plugins/wp/TacRange.mli: CEA_WP
 src/plugins/wp/TacRewrite.ml: CEA_WP
 src/plugins/wp/TacRewrite.mli: CEA_WP
+src/plugins/wp/TacSequence.ml: CEA_WP
+src/plugins/wp/TacSequence.mli: CEA_WP
 src/plugins/wp/TacShift.ml: CEA_WP
 src/plugins/wp/TacShift.mli: CEA_WP
 src/plugins/wp/TacSplit.ml: CEA_WP
@@ -1739,12 +1754,12 @@ src/plugins/wp/share/coqwp/Zbits.v: CEA_WP
 src/plugins/wp/share/coqwp/bool/Bool.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Abs.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/ComputerDivision.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/EuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/EuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Exponentiation.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Int.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/MinMax.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/int/Power.v: UNMODIFIED_WHY3
-src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: UNMODIFIED_WHY3
+src/plugins/wp/share/coqwp/int/ComputerOfEuclideanDivision.v: MODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Map.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/map/Const.v: UNMODIFIED_WHY3
 src/plugins/wp/share/coqwp/real/Abs.v: UNMODIFIED_WHY3
@@ -1811,6 +1826,8 @@ src/plugins/wp/wpRTE.ml: CEA_WP
 src/plugins/wp/wpRTE.mli: CEA_WP
 src/plugins/wp/wpStrategy.ml: CEA_WP
 src/plugins/wp/wpStrategy.mli: CEA_WP
+src/plugins/wp/wpTarget.ml: CEA_WP
+src/plugins/wp/wpTarget.mli: CEA_WP
 src/plugins/wp/wp_error.ml: CEA_WP
 src/plugins/wp/wp_error.mli: CEA_WP
 src/plugins/wp/wp_parameters.ml: CEA_WP

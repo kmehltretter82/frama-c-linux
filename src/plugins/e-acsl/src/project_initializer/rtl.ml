@@ -23,11 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let rtl_files () =
-  List.map
-    (fun d -> Options.Share.get_file ~mode:`Must_exist d)
-    [ "e_acsl_gmp_api.h";
-      "e_acsl.h" ]
+let rtl_file () = Options.Share.get_file ~mode:`Must_exist "e_acsl.h"
 
 (* create the RTL AST in a fresh project *)
 let create_rtl_ast prj =
@@ -40,7 +36,7 @@ let create_rtl_ast prj =
        Kernel.Keep_unused_specified_functions.off ();
        Kernel.CppExtraArgs.add
          (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
-       Kernel.Files.set (rtl_files ());
+       Kernel.Files.set [ rtl_file () ];
        Ast.get ())
     ()
 
@@ -160,8 +156,10 @@ let lookup_rtl_globals rtl_ast =
     | GAnnot _ :: l ->
       (* ignoring annotations from the AST *)
       do_globals acc l
-    | GAsm _ | GPragma _ | GText _ as g :: _l  ->
-      Kernel.fatal "unexpected global %a" Printer.pp_global g
+    | GPragma _ as g :: l ->
+      do_it Symbols.mem_global acc l g
+    | GAsm _ | GText _ as g :: _l  ->
+      Options.fatal "unexpected global %a" Printer.pp_global g
   in
   do_globals [] rtl_ast.globals
 
@@ -249,8 +247,10 @@ let insert_rtl_globals rtl_prj rtl_globals ast =
           acc
       in
       add acc l
-    | GAnnot _ | GAsm _ | GPragma _ | GText _ as g :: _l  ->
-      Kernel.fatal "unexpected global %a" Printer.pp_global g
+    | GPragma _ as g :: l ->
+      add (g :: acc) l
+    | GAnnot _ | GAsm _ | GText _ as g :: _l  ->
+      Options.fatal "unexpected global %a" Printer.pp_global g
   in
   ast.globals <- add ast.globals rtl_globals
 

@@ -26,8 +26,8 @@ val add_specific_equality:
   unit
 (** Equality used in the goal, simpler to prove than polymorphic equality *)
 
-val prove : ?timeout:int -> ?steplimit:int -> prover:Why3Provers.t ->
-  Wpo.t -> VCS.result Task.task
+val prove : ?mode:VCS.mode -> ?timeout:int -> ?steplimit:int ->
+  prover:Why3Provers.t -> Wpo.t -> VCS.result Task.task
 (** Return NoResult if it is already proved by Qed *)
 
 (**************************************************************************)
