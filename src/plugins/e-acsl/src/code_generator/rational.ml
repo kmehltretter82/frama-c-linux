@@ -148,8 +148,9 @@ let add_cast ~loc ?name e env kf ty =
         None
         Cil.doubleType
         (fun v _ ->
-           [ Smart_stmt.lib_call ~loc
+           [ Smart_stmt.rtl_call ~loc
                ~result:(Cil.var v)
+               ~prefix:""
                "__gmpq_get_d"
                [ e ] ])
     in
@@ -197,7 +198,11 @@ let cmp ~loc bop e1 e2 env kf t_opt =
       ~name
       Cil.intType
       (fun v _ ->
-         [ Smart_stmt.lib_call ~loc ~result:(Cil.var v) fname [ e1; e2 ] ])
+         [ Smart_stmt.rtl_call ~loc
+             ~result:(Cil.var v)
+             ~prefix:""
+             fname
+             [ e1; e2 ] ])
   in
   Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
 
@@ -226,7 +231,10 @@ let binop ~loc bop e1 e2 env kf t_opt =
      [e2] *)
   let e1, env = create ~loc e1 env kf None in
   let e2, env = create ~loc e2 env kf None in
-  let mk_stmts _ e = [ Smart_stmt.lib_call ~loc name [ e; e1; e2 ] ] in
+  let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
+                         ~prefix:""
+                         name
+                         [ e; e1; e2 ] ] in
   let name = Misc.name_of_binop bop in
   let _, e, env = new_var_and_init ~loc ~name env kf t_opt mk_stmts in
   e, env
