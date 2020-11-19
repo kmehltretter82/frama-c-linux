@@ -9,7 +9,7 @@
   EXECNOW: BIN control_journal_bis.ml cp %{dep:control_journal.ml} control_journal_bis.ml > /dev/null 2> /dev/null
   OPT: -load-script %{dep:control_journal_bis.ml} -calldeps
 
-  EXECNOW: BIN abstract_cpt_journal.ml @frama-c-exe@ -load-module %{dep:abstract_cpt.cmxs} -load-module %{dep:use_cpt.cmxs} -journal-name abstract_cpt_journal.ml > /dev/null 2> /dev/null
+  EXECNOW: BIN abstract_cpt_journal.ml @frama-c-cmd@ -journal-enable -load-module %{dep:abstract_cpt.cmxs} -load-module %{dep:use_cpt.cmxs} -journal-name abstract_cpt_journal.ml > /dev/null 2> /dev/null
   OPT: -load-script %{dep:abstract_cpt_journal.ml} -load-module %{dep:abstract_cpt.cmxs} -load-module %{dep:use_cpt.cmxs}
 */
 int x,y,c,d;
