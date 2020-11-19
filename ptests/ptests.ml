@@ -947,7 +947,12 @@ end
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
   let subst = Str.global_replace regexp "\\1" in
-  fun ~cmd ~res ~errlog -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res errlog
+  fun ?res ?errlog cmd ->
+    match res, errlog with
+    | None, None         -> Format.sprintf "echo '%s'" (subst cmd)
+    | None, Some err     -> Format.sprintf "echo '%s 2> %s'" (subst cmd) err
+    | Some res, None     -> Format.sprintf "echo '%s > %s'" (subst cmd) res
+    | Some res, Some err -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res err
 
 let ptests_alias = config_name "ptests_config"
 
@@ -1064,11 +1069,11 @@ let command_string ~result_fmt ~oracle_fmt command =
      (action (system %S))\n\
      )@."
     (command.nth+1) command.file
-    (mk_alias command "show")
+    (mk_alias command "exec.show")
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    (show_cmd ~cmd:command_string ~res ~errlog );
+    (show_cmd ~res ~errlog command_string);
 
   let oracle_prefix = oracle_prefix command in
   let diff_alias = log_prefix ^ ".diff" in
@@ -1182,6 +1187,18 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
          res.ex_cmd
        ;
+       Format.fprintf result_fmt
+         "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
+          (alias %s)\n  \
+          (deps %a (package frama-c)%a (universe))\n  \
+          (action (system %S))\n\
+          )@."
+         (nth+1) file
+         (mk_alias cmd "execnow.show")
+         print_list config.dc_deps
+         Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
+         (show_cmd res.ex_cmd)
+       ;
        List.iteri (fun n log ->
            Format.fprintf result_fmt
              "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
@@ -1210,11 +1227,11 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           libraries
       ) config.dc_cmxs;
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
-      let print_list_str fmt l = List.iter (Format.fprintf fmt " %s") l in
+      let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
-          ";(alias (deps%a%a) (name %S))@."
-          print_list_str (List.mapi (fun i _ -> Format.sprintf "(alias %s.%d.exec)" test_name i) config.dc_commands)
-          print_list_str (List.mapi (fun i _ -> Format.sprintf "(alias %s.%d.execnow)" test_name i) config.dc_execnow)
+          "(alias (deps%a%a) (name %S))@."
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name (i+1)) config.dc_commands)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow" test_name (i+1)) config.dc_execnow)
           file
     end ;
     List.iter make_cmd config.dc_commands;
