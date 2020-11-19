@@ -179,7 +179,7 @@ force-reconfigure:
 # todo: adds verisec
 # todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
 # NOTE: the elements of this list shoud be part of the DEFAULT_SUITES contained into `tests/ptest_config`
-TESTS=builtins callgraph cil constant_propagation dynamic float idct impact jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual saveload scope slicing sparecode spec syntax test value value/traces
+TESTS=builtins callgraph cil constant_propagation dynamic fc_script float idct impact jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual saveload scope slicing sparecode spec syntax test value value/traces
 # todo: adds value:apron value:bitwise value:equalities value:gauges values:octagons values:symbols
 CONFIGS=
 
