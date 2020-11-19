@@ -3,10 +3,6 @@
 // --------------------------------------------------------------------------
 
 /**
-   @packageDocumentation
-   @module dome/text/pages
-   @description
-
    A collection of text area and elements do render textual content.
 
    Inside such areas, all elements are styled like a classical web page.
@@ -16,58 +12,66 @@
    All the textual parts are selectable inside the page, contrarily to
    most other widget components.
 
-   The behaviour of `<a href=...>` elements differs for local links and external URLs.
-   Local links trigger a `'dome.href'` event, that
-   you can listen to from the originating renderer process, _eg. by using `Dome.useUpdate()`
-   custom hook.
+   The behaviour of `<a href=...>` elements differs for local links and
+   external URLs. Local links trigger a `'dome.href'` event, that
+   you can listen to from the originating renderer process, _eg. by
+   using `Dome.useUpdate()` custom hook.
 
    External links launch the user's default browser.
-*/
 
-import React from 'react' ;
+   @packageDocumentation
+   @module dome/text/pages
+ */
 
-import './style.css' ;
+import React from 'react';
+import { classes } from 'dome/misc/utils';
+import './style.css';
+
+export interface TextProps {
+  /** Additional classe(s). */
+  className?: string;
+  /** Additional style properties. */
+  style?: React.CSSProperties;
+  /** Inner Components. */
+  children?: React.ReactNode;
+}
 
 // --------------------------------------------------------------------------
 // --- Page
 // --------------------------------------------------------------------------
 
 /**
-   @summary Blank HTML page.
-   @property {object} [style] - additional style elements
-   @property {Elements} [children] - page content
-   @description
+   Blank HTML page.
 
    The page has insets and shadows and fills the entire available area.
    Large content is crolled inside in both directions.
-*/
-
-export const Page = ({style,children}) => {
-  return (
-    <div className='dome-xPages-page'>
-      <div className='dome-xPages-sheet dome-pages'>
-        {children}
-      </div>
+ */
+export const Page = (props: TextProps) => (
+  <div className="dome-xPages-page">
+    <div
+      className={classes('dome-xPages-sheet dome-pages', props.className)}
+      style={props.style}
+    >
+      {props.children}
     </div>
-  );
-};
+  </div>
+);
 
 // --------------------------------------------------------------------------
-// --- Page
+// --- Note
 // --------------------------------------------------------------------------
 
 /**
-   @summary Blank HTML textarea.
-   @property {object} [style] - additional style elements
-   @property {Elements} [children] - page content
-   @description
+   Blank HTML textarea.
 
    The area has small padding and no margin, and does not scroll its content.
-*/
-
-export const Note = ({style,children}) => (
-  <div className=' dome-xPages-note dome-pages' style={style}>
-    {children}
+ */
+export const Note = (props: TextProps) => (
+  <div
+    className={classes('dome-xPages-note', 'dome-pages', props.className)}
+    style={props.style}
+  >
+    {props.children}
   </div>
 );
 
