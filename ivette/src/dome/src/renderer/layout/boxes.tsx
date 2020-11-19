@@ -166,7 +166,7 @@ export interface FolderProps {
   /** Contents left margin (in pixels, defaults to 18). */
   indent?: number;
   /** Children JSX elements. */
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**

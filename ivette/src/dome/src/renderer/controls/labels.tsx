@@ -30,7 +30,7 @@ export interface LabelProps {
   /** If `false`, do not display the label. Default to `true`. */
   display?: boolean;
   /** Additional content of the `<label/>` element. */
-  children?: any;
+  children?: React.ReactNode;
 }
 
 const makeLabel = (className: string, props: LabelProps) => {

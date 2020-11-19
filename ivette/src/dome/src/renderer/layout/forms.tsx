@@ -339,7 +339,7 @@ export interface FilterProps {
   disabled?: boolean;
 }
 
-export interface Children { children: React.ReactNode }
+export interface Children { children?: React.ReactNode }
 
 interface FormContext {
   disabled: boolean;
@@ -1208,7 +1208,7 @@ export function RadioField<A>(props: RadioFieldProps<A>) {
 /** @category Form Fields */
 export interface SelectFieldProps extends FieldProps<string | undefined> {
   placeholder?: string;
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**

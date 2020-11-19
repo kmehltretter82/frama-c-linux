@@ -155,7 +155,7 @@ export interface TableProps<Key, Row> {
   /** Fallback for rendering an empty table. */
   renderEmpty?: () => null | JSX.Element;
   /** Shall only contains `<Column<Row> … />` elements. */
-  children?: any;
+  children?: React.ReactElement | React.ReactElement[];
 }
 
 // --------------------------------------------------------------------------
@@ -705,7 +705,7 @@ export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
 function spawnIndex(
   state: TableState<any, any>,
   path: number[],
-  children: any,
+  children: React.ReactElement | React.ReactElement[],
 ) {
   const indexChild = (elt: React.ReactElement, k: number) => (
     <ColumnContext.Provider value={{ state, path, index: k }}>
@@ -713,6 +713,11 @@ function spawnIndex(
     </ColumnContext.Provider>
   );
   return <>{React.Children.map(children, indexChild)}</>;
+}
+
+export interface ColumnGroupProps {
+  index?: index;
+  children?: React.ReactElement | React.ReactElement[];
 }
 
 /** Column Groups.
@@ -758,12 +763,13 @@ function spawnIndex(
    this implicit root column group, just pack your columns inside a classical
    React fragment: `<Table … ><>{children}</></Table>`.
  */
-export function ColumnGroup(props: { index?: index; children: any }) {
+export function ColumnGroup(props: ColumnGroupProps) {
   const context = React.useContext(ColumnContext);
   if (!context) return null;
   const { state, path, index: defaultIndex } = context;
   const newPath = path.concat(props.index ?? defaultIndex);
-  return spawnIndex(state, newPath, props.children);
+  const { children } = props;
+  return children ? spawnIndex(state, newPath, children) : null;
 }
 
 // --------------------------------------------------------------------------
@@ -1103,10 +1109,11 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     return state.unwind;
   });
   Settings.useGlobalSettingsEvent(state.importSettings);
+  const columns = props.children ?? [];
   return (
     <div className="dome-xTable">
       <React.Fragment key="columns">
-        {spawnIndex(state, [], props.children)}
+        {spawnIndex(state, [], columns)}
       </React.Fragment>
       <AutoSizer key="table">
         {(size: Size) => makeTable(props, state, size)}

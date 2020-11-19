@@ -60,7 +60,7 @@ export interface ElementProps {
   /** Element identifier. */
   id: string;
   /** Element contents. */
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 /**

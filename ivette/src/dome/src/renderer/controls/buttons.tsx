@@ -451,7 +451,7 @@ export interface RadioGroupProps<A> {
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
   /** [[Radio]] Buttons. */
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**
@@ -523,7 +523,7 @@ export interface SelectProps {
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
   /** Shall be standard `<option/>` and `<optgroup/>` elements. */
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**
