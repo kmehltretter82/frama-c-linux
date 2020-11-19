@@ -1026,7 +1026,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 3 4 125 127) (system %S))%s)))\n\
+     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 3 4) (system %S))%s)))\n\
      )@."
     errlog
     res
@@ -1155,7 +1155,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           (deps %a (package frama-c)%a)\n  \
           (targets %a %a)\n  \
           (action (system %S))\n\
-          )\n"
+          )@."
          ptests_alias
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
@@ -1168,7 +1168,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
              "(rule\n  \
               (alias %s)\n  \
               (action (diff %S %S))\n\
-              )\n"
+              )@."
              ptests_alias
              (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
              log
@@ -1183,7 +1183,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
            (modes plugin)\n  \
            (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
            (flags -open Frama_c_kernel)\n\
-           )"
+           )@."
           cmxs cmxs
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
