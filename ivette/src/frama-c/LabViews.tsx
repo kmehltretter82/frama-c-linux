@@ -476,11 +476,14 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
           placeholder="View Name"
           autoFocus
           value={label}
+          title={title}
           onChange={RENAMED}
         />
       );
       return (
-        <Item key={id} id={id} icon="DISPLAY" title={title} label={FIELD} />
+        <Item key={id} icon="DISPLAY">
+          {FIELD}
+        </Item>
       );
     }
     const FLAGS = [];
@@ -488,13 +491,12 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     return (
       <Item
         key={id}
-        id={id}
         icon="DISPLAY"
         label={label}
         title={title}
         selected={id && current === id}
-        onSelection={SELECT}
-        onContextMenu={POPUP}
+        onSelection={() => SELECT(id)}
+        onContextMenu={() => POPUP(id)}
       >
         {FLAGS.map((icn) => (
           <Icon
@@ -529,6 +531,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
 const DRAGOVERLAY = { className: 'labview-stock' };
 
 function CustomGroup({
+  settings,
   dnd, shape, setDragging,
   id: sectionId,
   title: sectionTitle,
@@ -557,7 +560,8 @@ function CustomGroup({
   };
   return (
     <Section
-      id={sectionId}
+      key={sectionId}
+      settings={settings && `${settings}.${sectionId}`}
       label={sectionLabel}
       title={sectionTitle}
       defaultUnfold={sectionId === 'groups.frama-c'}
@@ -594,7 +598,7 @@ function CustomizePanel(
   });
 
   return (
-    <SideBar settings={settingFolds}>
+    <SideBar>
       <CustomViews
         key="views"
         settings={settingViews}
@@ -604,6 +608,7 @@ function CustomizePanel(
       />
       {groups.map((g) => (
         <CustomGroup
+          settings={settingFolds}
           key={g.id}
           id={g.id}
           label={g.label}
