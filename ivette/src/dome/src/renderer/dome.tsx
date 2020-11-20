@@ -176,7 +176,7 @@ ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
   focus.emit(value);
 });
 
-/** Return the current window focus. See [[isfocused]]. */
+/** Return the current window focus. See [[isFocused]]. */
 export function useWindowFocus(): boolean {
   useUpdate(focus);
   return windowFocus;

@@ -100,9 +100,13 @@
     "readme": "./README.md",
     "inputFiles": [
       "doc/pages",
-      "src/frama-c", "api",
+      "src/frama-c/server.ts",
+      "src/frama-c/states.ts",
+      "src/frama-c/utils.ts",
+      "api",
       "src/dome/src/renderer",
-      "src/dome/src/misc",
+      "src/dome/src/misc/utils.ts",
+      "src/dome/src/misc/system.ts",
     ]
   }
 }

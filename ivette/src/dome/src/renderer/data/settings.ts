@@ -275,7 +275,7 @@ export function getWindowSettings<A>(
    Updates the current value of the settings (on defined key).
    Most settings are subtypes of `JSON` and do not require any specific
    encoder. If you have some, simply use it before updating the settings.
-   See [[useWindowSettings]] and [[useWindowsettingsdata]].
+   See [[useWindowSettings]] and [[useWindowSettingsData]].
  */
 export function setWindowSettings(
   key: string | undefined,
@@ -364,7 +364,7 @@ export function getLocalStorage<A>(
    Updates the current value of the settings (on defined key).
    Most settings are subtypes of `JSON` and do not require any specific
    encoder. If you have some, simply use it before updating the settings.
-   See [[useLocalStorage]] and [[useWindowsettingsdata]].
+   See [[useLocalStorage]] and [[useWindowSettingsData]].
  */
 export function setLocalStorage(
   key: string | undefined,

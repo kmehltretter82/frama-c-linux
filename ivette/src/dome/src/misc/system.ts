@@ -131,7 +131,7 @@ export function getDownloads() { return appProxy.getPath('downloads'); }
    The function returns `undefined` until the `dome.command` event has
    been emitted from the `Main` process.
 
-   See also [[Dome.onCommand]]
+   See also [[dome.onCommand]]
 */
 export function getWorkingDir() { return COMMAND_WDIR; }
 
@@ -148,7 +148,7 @@ export function getPID() { return process.pid; }
    The function returns `undefined` until the `dome.command`
    event has been emitted from the `Main` process.
 
-   See also [[Dome.onCommand]]
+   See also [[dome.onCommand]]
 */
 export function getArguments() { return COMMAND_ARGV; }
 
