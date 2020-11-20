@@ -9,7 +9,7 @@
 
 import * as Dome from 'dome';
 import * as DomeBuffers from 'dome/text/buffers';
-import * as KernelData from 'api/kernel/data';
+import * as KernelData from 'frama-c/api/kernel/data';
 
 const D = new Dome.Debug('Utils');
 

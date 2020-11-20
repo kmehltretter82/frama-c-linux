@@ -3,7 +3,7 @@
 /**
    Informations
    @packageDocumentation
-   @module api/kernel/data
+   @module frama-c/api/kernel/data
 */
 
 //@ts-ignore

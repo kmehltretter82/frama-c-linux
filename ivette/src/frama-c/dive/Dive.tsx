@@ -5,7 +5,7 @@ import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import * as API from 'api/plugins/dive';
+import * as API from 'frama-c/api/plugins/dive';
 
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';

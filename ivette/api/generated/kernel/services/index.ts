@@ -3,7 +3,7 @@
 /**
    Kernel Services
    @packageDocumentation
-   @module api/kernel/services
+   @module frama-c/api/kernel/services
 */
 
 //@ts-ignore
@@ -16,13 +16,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byTag } from 'api/kernel/data';
+import { byTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { jTag } from 'api/kernel/data';
+import { jTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { jTagSafe } from 'api/kernel/data';
+import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { tag } from 'api/kernel/data';
+import { tag } from 'frama-c/api/kernel/data';
 
 const getConfig_internal: Server.GetRequest<
   null,

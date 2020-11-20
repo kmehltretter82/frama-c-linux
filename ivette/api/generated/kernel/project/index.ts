@@ -3,7 +3,7 @@
 /**
    Project Management
    @packageDocumentation
-   @module api/kernel/project
+   @module frama-c/api/kernel/project
 */
 
 //@ts-ignore

@@ -3,7 +3,7 @@
 /**
    Eva General Services
    @packageDocumentation
-   @module api/plugins/eva/general
+   @module frama-c/api/plugins/eva/general
 */
 
 //@ts-ignore
@@ -16,13 +16,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byMarker } from 'api/kernel/ast';
+import { byMarker } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jMarker } from 'api/kernel/ast';
+import { jMarker } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'api/kernel/ast';
+import { jMarkerSafe } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { marker } from 'api/kernel/ast';
+import { marker } from 'frama-c/api/kernel/ast';
 
 const getCallers_internal: Server.GetRequest<
   Json.key<'#fct'>,

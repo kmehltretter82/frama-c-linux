@@ -479,7 +479,7 @@ export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
 
 /** A selection of multiple locations. */
 export interface MultipleSelection {
-  /** The index of the current selected location in [[possibleSelections]]. */
+  /** The index of the current selected location in [[allSelections]]. */
   index: number;
   /** All locations forming a multiple selection. */
   allSelections: Location[];

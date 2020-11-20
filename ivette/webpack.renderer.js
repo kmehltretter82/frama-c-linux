@@ -27,7 +27,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      'api':          path.resolve( __dirname , 'api' ),
+      'frama-c/api':  path.resolve( __dirname , 'api/generated' ),
       'frama-c':      path.resolve( __dirname , 'src/frama-c' ),
       '@plugins':     path.resolve( __dirname , 'src/plugins' ),
       'dome/misc':    path.resolve( DOME , 'src/misc' ),

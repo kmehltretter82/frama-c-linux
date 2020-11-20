@@ -15,8 +15,8 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers, getDeadCode } from 'api/plugins/eva/general';
+import { printFunction, markerInfo } from 'frama-c/api/kernel/ast';
+import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';

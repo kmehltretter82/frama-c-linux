@@ -19,9 +19,9 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
 
-import { source as SourceLoc } from 'api/kernel/services';
-import { statusData as Property } from 'api/kernel/properties';
-import * as Properties from 'api/kernel/properties';
+import { source as SourceLoc } from 'frama-c/api/kernel/services';
+import { statusData as Property } from 'frama-c/api/kernel/properties';
+import * as Properties from 'frama-c/api/kernel/properties';
 
 // --------------------------------------------------------------------------
 // --- Filters

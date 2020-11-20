@@ -3,7 +3,7 @@
 /**
    Dive Services
    @packageDocumentation
-   @module api/plugins/dive
+   @module frama-c/api/plugins/dive
 */
 
 //@ts-ignore
@@ -16,21 +16,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byLocation } from 'api/kernel/ast';
+import { byLocation } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { byMarker } from 'api/kernel/ast';
+import { byMarker } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jLocation } from 'api/kernel/ast';
+import { jLocation } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jLocationSafe } from 'api/kernel/ast';
+import { jLocationSafe } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jMarker } from 'api/kernel/ast';
+import { jMarker } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'api/kernel/ast';
+import { jMarkerSafe } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { location } from 'api/kernel/ast';
+import { location } from 'frama-c/api/kernel/ast';
 //@ts-ignore
-import { marker } from 'api/kernel/ast';
+import { marker } from 'frama-c/api/kernel/ast';
 
 /** Parametrization of the exploration range. */
 export interface range {

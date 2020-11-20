@@ -3,7 +3,7 @@
 /**
    Property Services
    @packageDocumentation
-   @module api/kernel/properties
+   @module frama-c/api/kernel/properties
 */
 
 //@ts-ignore
@@ -16,21 +16,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byTag } from 'api/kernel/data';
+import { byTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { jTag } from 'api/kernel/data';
+import { jTag } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { jTagSafe } from 'api/kernel/data';
+import { jTagSafe } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { tag } from 'api/kernel/data';
+import { tag } from 'frama-c/api/kernel/data';
 //@ts-ignore
-import { bySource } from 'api/kernel/services';
+import { bySource } from 'frama-c/api/kernel/services';
 //@ts-ignore
-import { jSource } from 'api/kernel/services';
+import { jSource } from 'frama-c/api/kernel/services';
 //@ts-ignore
-import { jSourceSafe } from 'api/kernel/services';
+import { jSourceSafe } from 'frama-c/api/kernel/services';
 //@ts-ignore
-import { source } from 'api/kernel/services';
+import { source } from 'frama-c/api/kernel/services';
 
 /** Property Kinds */
 export enum propKind {

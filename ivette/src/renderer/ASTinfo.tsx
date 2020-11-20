@@ -10,8 +10,7 @@ import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component } from 'frama-c/LabViews';
-
-import { getInfo } from 'api/kernel/ast';
+import { getInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Information Panel
