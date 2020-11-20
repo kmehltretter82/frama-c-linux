@@ -1,0 +1,2 @@
+MACRO: frama-c-exe echo frama-c
+MACRO: DEFAULT_OPTIONS default-options:=@DEFAULT_OPTIONS@:=

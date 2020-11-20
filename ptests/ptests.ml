@@ -501,6 +501,7 @@ end  = struct
     let subst = Macros.expand (Macros.add_list ptest_vars Macros.empty) in
     ptest_name,
     { config with
+      dc_execnow = List.rev config.dc_execnow;
       dc_cmxs = List.map subst config.dc_cmxs;
       dc_deps = List.map subst config.dc_deps;
       dc_plugins = List.map subst config.dc_plugins;
@@ -956,7 +957,7 @@ let show_cmd =
 
 let ptests_alias = config_name "ptests_config"
 
-let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name (cmd.nth+1) suffix
+let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
   let errlog = log_prefix ^ ".err.log" in
@@ -1034,9 +1035,9 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule ; TEST #%d OF TEST FILE %S\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4) (system %S))%s)))\n\
+     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4 125) (system %S))%s)))\n\
      )@."
-    (command.nth+1) command.file
+    command.nth command.file
     errlog
     res
     print_list command.log_files
@@ -1055,7 +1056,7 @@ let command_string ~result_fmt ~oracle_fmt command =
      (deps  %a %S (package frama-c)%a (universe))\n  \
      (action (system %S))\n\
      )@."
-    (command.nth+1) command.file
+    command.nth command.file
     (mk_alias command "exec")
     print_list deps
     command.file
@@ -1068,7 +1069,7 @@ let command_string ~result_fmt ~oracle_fmt command =
      (deps  %a %S (package frama-c)%a (universe))\n  \
      (action (system %S))\n\
      )@."
-    (command.nth+1) command.file
+    command.nth command.file
     (mk_alias command "exec.show")
     print_list deps
     command.file
@@ -1115,8 +1116,8 @@ let command_string ~result_fmt ~oracle_fmt command =
 let dispatcher ~result_fmt ~oracle_fmt file directory config =
   let config = Test_config.scan_test_file directory ~file config in
   if not config.dc_dont_run then
-    let nb_files = List.length config.dc_commands in
     let test_name,config,ptest_vars = Test_config.ptest_vars directory ~file config  in
+    let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
       fun { toplevel; opts=options; macros; logs; timeout } ->
@@ -1134,13 +1135,14 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
             load_module = config.dc_libs @ config.dc_load_module ;
           }
     in
+    let nb_files_execnow = List.length config.dc_execnow in
     let make_execnow_cmd =
       let e = ref 0 in
       fun execnow->
        let nth = !e in
        incr e ;
        let cmd =
-         { test_name; file; nb_files; directory; nth;
+         { test_name; file; nb_files = nb_files_execnow; directory; nth;
            log_files = [];
            options = "";
            toplevel = execnow.ex_cmd;
@@ -1167,7 +1169,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           (targets %a %a)\n  \
           (action (system %S))\n\
           )@."
-         (nth+1) file
+         nth file
          ptests_alias
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
@@ -1181,7 +1183,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           (deps %a (package frama-c)%a (universe))\n  \
           (action (system %S))\n\
           )@."
-         (nth+1) file
+         nth file
          (mk_alias cmd "execnow")
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
@@ -1193,7 +1195,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           (deps %a (package frama-c)%a (universe))\n  \
           (action (system %S))\n\
           )@."
-         (nth+1) file
+         nth file
          (mk_alias cmd "execnow.show")
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
@@ -1205,7 +1207,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
               (alias %s)\n  \
               (action (diff %S %S))\n\
               )@."
-             (n+1) (nth+1) file
+             n nth file
              ptests_alias
              (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
              log
@@ -1221,7 +1223,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
            (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
            (flags -open Frama_c_kernel)\n\
            )@."
-          (n+1) file
+          n file
           cmxs cmxs
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
@@ -1230,8 +1232,8 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
       let print_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
           "(alias (deps%a%a) (name %S))@."
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name (i+1)) config.dc_commands)
-          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow" test_name (i+1)) config.dc_execnow)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
+          print_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow" test_name i) config.dc_execnow)
           file
     end ;
     List.iter make_cmd config.dc_commands;

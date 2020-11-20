@@ -1,0 +1,1 @@
+frama-c default-options:=-journal-disable -check -no-autoload-plugins:= opt.i -- OPT No0: number=0 name=opt file=opt.i
