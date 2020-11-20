@@ -185,8 +185,9 @@ CONFIGS=
 
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: no test found for studia ?
+# todo: adds wp, report, variadic
 # todo: adds wp (config qualif)
-PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
+PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm server
 PLUGIN_CONFIGS=
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)
@@ -208,7 +209,7 @@ ptests/ptests.exe: ptests/ptests.ml
 
 .PHONY: run-tests clean-tests purge-tests tests
 purge-tests:
-	find $(TEST_DIRS) -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
+	find tests src/plugins/*/tests -name dune | grep -e "oracle.*/dune\|result.*/dune" | xargs --no-run-if-empty rm
 
 clean-tests: purge-tests
 	rm -rf _build/default/tests
@@ -223,6 +224,7 @@ run-tests: config.sed purge-tests
 	for plugin in $(PLUGIN_TEST_DIRS); do \
 		dune exec --root ptests -- ./ptests.exe $$plugin; \
 	done
+	rm tests/spec/result/dune # HACK while WP problem is not solved
 	for plugin in $(PLUGIN_CONFIGS); do \
 		plugin_dir=src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests; \
 		config_name=$$(echo $$plugin | sed -e "s/^[^:]*://"); \
