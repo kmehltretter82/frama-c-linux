@@ -249,7 +249,7 @@ print(f"Path to Frama-C binaries written to: {path_mk}")
 
 if "PTESTS_TESTING" in os.environ:
     print("Running ptests: cleaning up after tests...")
-    jcdb.unlink()
-    fc_stubs_c.unlink()
-    path_mk.unlink()
+    jcdb.unlink(missing_ok=True)
+    fc_stubs_c.unlink(missing_ok=True)
+    path_mk.unlink(missing_ok=True)
     # gnumakefile is not erased because we want it as an oracle
