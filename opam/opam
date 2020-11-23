@@ -98,7 +98,10 @@ install: [
 ]
 
 run-test: [
-  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"]
+  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"] { arch != "ppc64" }
+  # tests are disabled on PPC64 due to floating-point oracle differences
+  # (some ULPs in libc trigonometric functions) and due to the lack of
+  # available hardware to test them locally
 ]
 
 depends: [
@@ -115,6 +118,7 @@ depends: [
   "conf-graphviz" { post }
   "yojson"
   "why3" { >= "1.3.3" }
+  "conf-time" { with-test }
 ]
 
 depopts: [
