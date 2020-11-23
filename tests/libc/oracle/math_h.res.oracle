@@ -1,5 +1,5 @@
 [kernel] Parsing tests/libc/math_h.c (with preprocessing)
-[kernel:parser:decimal-float] tests/libc/math_h.c:5: Warning: 
+[kernel:parser:decimal-float] tests/libc/math_h.c:6: Warning: 
   Floating-point constant 3.14159265358979323846264338327950288 is not represented exactly. Will use 0x1.921fb54442d18p1.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
@@ -280,15 +280,15 @@
   atan_minus_one ∈ {-0.785398163397}
   atan_large ∈ {1.57079632679}
   atan_top ∈ [-1.57079632679 .. 1.57079632679] ∪ {NaN}
-  atanf_f_pi ∈ {1.262627244}
-  atanf_f_half_pi ∈ {1.00388479233}
-  atanf_f_e ∈ {1.218282938}
+  atanf_f_pi ∈ {1.262627}
+  atanf_f_half_pi ∈ {1.003884}
+  atanf_f_e ∈ {1.218282}
   atanf_zero ∈ {0}
   atanf_minus_zero ∈ {-0.}
-  atanf_one ∈ {0.785398185253}
-  atanf_minus_one ∈ {-0.785398185253}
-  atanf_large ∈ {1.57079637051}
-  atanf_f_top ∈ [-1.57079637051 .. 1.57079637051] ∪ {NaN}
+  atanf_one ∈ {0.785398}
+  atanf_minus_one ∈ {-0.785398}
+  atanf_large ∈ {1.570796}
+  atanf_f_top ∈ [-1.570796 .. 1.570796] ∪ {NaN}
   atanl_ld_pi ∈ [-inf .. inf]
   atanl_ld_half_pi ∈ [-inf .. inf]
   atanl_ld_e ∈ [-inf .. inf]

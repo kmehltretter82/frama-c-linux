@@ -744,19 +744,76 @@ void* realloc(void *ptr, size_t size) {
          * shadow block to the size of the new allocation */
         if (old_size > size) {
           clearbits_right(
-              old_alloc_size - size,
-              old_init_shadow + old_alloc_size/8);
+              old_alloc_size - size,               // size in bits
+              old_init_shadow + old_alloc_size/8); // end of the old init shadow
         }
 
-        /* Now init shadow can be moved (if needed), keep in mind that
-         * segment base addresses are aligned at a boundary of something
-         * divisible by 8, so instead of moving actual bits here the
-         * segments are moved to avoid dealing with bit-level operations
-         * on incomplete bytes. */
+        /* Keep in mind that there is a ratio of 8 between the actual heap
+         * memory and the init shadow memory. So a byte in the actual memory
+         * corresponds to a bit in the shadow memory.
+         */
+
+        /* We need to keep the status of the init shadow up to `old_size` bits
+         * (or `size` if `size < old_size`), and we need to make sure that the
+         * bits of the init shadow correspondings to the bytes between
+         * `old_size` and `size` are set to zero if `size > old_size`. */
+
+        /* First of all, determine the number of bits in the init shadow that
+         * must be kept */
+        size_t keep_bits = (size < old_size) ? size : old_size;
+
+        /* To avoid doing too much bitwise operations, separate this size in
+         * the amount of bytes of init shadow that must be kept including any
+         * incomplete byte, and the number of bits that must be kept in the last
+         * byte if it is incomplete */
+        size_t rem_keep_bits = keep_bits%8;
+        size_t keep_bytes = keep_bits/8 + (rem_keep_bits > 0 ? 1 : 0);
+
+        /* If the pointer has been moved, then we need to copy `keep_bytes`
+         * from the old shadow to the new shadow to carry over all the needed
+         * information. Then the old init shadow can be reset. */
         if (res != ptr) {
-          size_t copy_size = (old_size > size) ? alloc_size : old_alloc_size;
-          memcpy(new_init_shadow, old_init_shadow, copy_size);
-          memset(old_init_shadow, 0, copy_size);
+          DVASSERT(keep_bytes <= alloc_size/8 && keep_bytes < old_alloc_size/8,
+            "Attempt to access out of bound init shadow. Accessing %lu bytes, \
+            old init shadow size: %lu bytes, new init shadow size: %lu bytes.",
+            keep_bytes, old_alloc_size/8, alloc_size/8);
+          memcpy(new_init_shadow, old_init_shadow, keep_bytes);
+          memset(old_init_shadow, 0, old_alloc_size/8);
+        }
+
+        if (size > old_size) {
+          // Last kept byte index
+          size_t idx = keep_bytes - 1; // idx < init_shadow_size by construction
+
+          /* If the new size is greater than the old size and the last kept byte
+           * is incomplete (`rem_keep_bits > 0`), then reset the unkept bits of
+           * the last byte in the new init shadow */
+          if (rem_keep_bits > 0) {
+            DVASSERT(idx < alloc_size/8,
+              "Attempt to access out of bound init shadow. Accessing index %lu \
+              with init shadow of size %lu bytes.", idx, alloc_size/8);
+            unsigned char mask = 0;
+            setbits64(rem_keep_bits, mask);
+            *(new_init_shadow + idx) &= mask;
+          }
+
+          /* Finally, if the new size is greater than the old size and the
+           * pointer hasn't been moved, then we need to make sure that the
+           * remaining bits of the init shadow corresponding to the memory
+           * between `old_size` and `size` are set to zero. */
+          if (res == ptr) {
+            // Index of the byte after the last kept byte
+            ++idx;
+            // Number of bytes between the index and the end of the init
+            // shadow corresponding to the new allocated memory
+            size_t count = size/8 - idx;
+
+            DVASSERT((idx+count) <= alloc_size/8,
+              "Attempt to access out of bound init shadow. Accessing %lu bytes \
+              from index %lu with init shadow of size %lu bytes.",
+              count, idx, alloc_size/8);
+            memset(new_init_shadow+idx, 0, count);
+          }
         }
       }
     } else {
@@ -895,7 +952,7 @@ int heap_initialized(uintptr_t addr, long len) {
     unsigned char mask = 0;
     setbits64_skip(set,mask,skip);
 
-    if (*shadow != mask)
+    if ((*shadow & mask) != mask)
       return 0;
   }
   if (len > 0)

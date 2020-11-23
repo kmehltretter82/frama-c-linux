@@ -1,4 +1,5 @@
 /* run.config
+   FILTER: sed -E -e '/atanf_/ s/([0-9][.][0-9]{6})[0-9]+/\1/g'
    STDOPT: #"-warn-special-float none" #"-cpp-extra-args=\"-DNONFINITE\""
 */
 #include <math.h>
@@ -29,7 +30,6 @@ const double fp_ilogb0 = FP_ILOGB0;
 const double fp_ilogbnan = FP_ILOGBNAN;
 
 #define TEST_VAL(type,f,c) type f##_##c = f(c)
-
 #define TEST_FUN(type,f,prefix)                 \
   TEST_VAL(type,f,prefix##pi);                  \
   TEST_VAL(type,f,prefix##half_pi);             \

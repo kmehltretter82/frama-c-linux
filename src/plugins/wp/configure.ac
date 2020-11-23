@@ -85,16 +85,14 @@ if test "$ENABLE_WP" != "no"; then
     if test "$COQC" = "yes" ; then
       COQVERSION=`coqc -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
       case $COQVERSION in
-        8.7*|8.8*|8.9*|8.10*|8.11.*|8.12.*|trunk)
+        8.12.*|trunk)
           AC_MSG_RESULT(coqc version $COQVERSION found)
           ;;
         *)
-          AC_MSG_RESULT(unsupported coqc version $COQVERSION)
+          AC_MSG_RESULT(unsupported coqc version $COQVERSION for - deprecated - native backend)
           COQC="no"
           ;;
       esac
-    else
-      AC_MSG_NOTICE(rerun configure to make wp using coq 8.7.2 or higher)
     fi
   else
     COQC="no"

@@ -2913,12 +2913,17 @@ class cil_printer () = object (self)
           (function (a,_) -> not (Logic_const.is_exit_status a.it_content))
           l
       in
+      let unique_assigned_locs =
+        let same t1 t2 = Cil_datatype.Term.equal t1.it_content t2.it_content in
+        let f l (a,_) = if List.exists (same a) l then l else a :: l in
+        List.rev (List.fold_left f [] without_result)
+      in
       fprintf fmt "@[<h>%t%a@]"
         (fun fmt -> if without_result <> [] then
             Format.fprintf fmt "%a " self#pp_acsl_keyword kw)
         (Pretty_utils.pp_list ~sep:",@ " ~suf:";@]"
-           (fun fmt (t, _) -> self#identified_term fmt t))
-        without_result
+           (fun fmt t -> self#identified_term fmt t))
+        unique_assigned_locs
 
   method private assigns_deps kw fmt = function
     | WritesAny -> ()

@@ -62,9 +62,30 @@
 
   let backslash = "__ANNOT_BACKSLASH__"
   let annot_content = "__ANNOT_CONTENT__"
+  let utf8_prefix = "__FC_UTF8_"
+
+  let encode_utf8 c = utf8_prefix  ^ (string_of_int (Char.code c))
 
   let re_backslash = Str.regexp_string backslash
   let re_annot_content = Str.regexp_string annot_content
+  let re_utf8 = Str.regexp (utf8_prefix ^ "\\([0-9]+\\)")
+
+  let decode_utf8 s =
+    let res = ref s in
+    let start = ref 0 in
+    try
+      while true do
+        let b = Str.search_forward re_utf8 !res !start in
+        let e = Str.match_end () in
+        let chr = Char.chr (int_of_string (Str.matched_group 1 !res)) in
+        let buf = Bytes.of_string !res in
+        Bytes.set buf b chr;
+        Bytes.blit buf e buf (b+1) (String.length !res - e);
+        res:= Bytes.sub_string buf 0 (String.length !res + 1 + b - e);
+        start := b+1;
+      done;
+      assert false;
+    with Not_found -> !res
 
   (* Delimiters for the various annotations in the preprocessing buffer.
      We have one delimiter for the beginning of an annotation (to discard
@@ -115,7 +136,7 @@
       ignore_content ();
       ignore (input_line file); (* ignore the #line directive *)
       let with_nl, content = get_annot true in
-      with_nl, replace_backslash content
+      with_nl, decode_utf8 @@ replace_backslash content
     with End_of_file ->
       Kernel.fatal
         "too few annotations in result file while pre-processing annotations"
@@ -183,6 +204,8 @@
     Buffer.add_char preprocess_buffer '\n';
     add_preprocess_line_info()
 }
+
+let utf8 = ['\128'-'\255']
 
 rule main = parse
   | ("#define"|"#undef") [' ''\t']* ((['a'-'z''A'-'Z''0'-'9''_'])* as m)
@@ -388,6 +411,10 @@ and annot = parse
         is_newline:=CHAR;
         Buffer.add_char preprocess_buffer '"';
         string annot lexbuf }
+  | utf8 as c {
+     Buffer.add_string preprocess_buffer (encode_utf8 c);
+     annot lexbuf
+    }
   | _ as c { is_newline := CHAR;
              Buffer.add_char preprocess_buffer c;
              annot lexbuf }
