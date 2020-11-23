@@ -280,7 +280,8 @@ class vis flag = object(self)
 end
 
 let treat_one_function flag kf =
-  if not (Cil.is_special_builtin (Kernel_function.get_name kf)) then begin
+  if not (Cil_builtins.is_special_builtin (Kernel_function.get_name kf))
+  then begin
     let my_flag = ref false in
     let vis = new vis my_flag in
     ignore (Visitor.visitFramacKf vis kf);

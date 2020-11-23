@@ -370,7 +370,7 @@ let get_filename fdef =
 let consider_function ~libc vinfo =
   not (!Db.Value.mem_builtin vinfo.vname
        || Ast_info.is_frama_c_builtin vinfo.vname
-       || Cil.is_unused_builtin vinfo
+       || Cil_builtins.is_unused_builtin vinfo
       ) && (libc || not (is_in_libc vinfo.vattr))
 
 let consider_variable ~libc vinfo =

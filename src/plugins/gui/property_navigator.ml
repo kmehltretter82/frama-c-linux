@@ -688,7 +688,7 @@ let make_panel (main_ui:main_window_extension_points) =
 
     (* Will the results for this kf be ultimately displayed *)
     let display kf =
-      not (Cil.is_unused_builtin (Kernel_function.get_vi kf)) &&
+      not (Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf)) &&
       not (onlyCurrent.get ()) ||
       (let kfvi = Kernel_function.get_vi kf in
        List.exists

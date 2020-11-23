@@ -314,7 +314,7 @@ let is_relevant ip =
   | None -> true
   | Some kf ->
     not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
-         || Cil.is_unused_builtin (Kernel_function.get_vi kf))
+         || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
 let add_update_hook f =

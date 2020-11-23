@@ -457,7 +457,7 @@ module State = struct
       let is_unused = function
         | GFun ({svar = vi},_) | GFunDecl (_, vi, _)
         | GVar (vi, _, _) | GVarDecl (vi, _) ->
-          Cil.is_unused_builtin vi
+          Cil_builtins.is_unused_builtin vi
         | _ -> false
       in
       f, Extlib.filter_out is_unused all

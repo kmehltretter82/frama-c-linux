@@ -464,7 +464,7 @@ let is_frama_c_builtin n =
    is_cea_domain_function n ||
    is_cea_dump_file_function n)
 
-let () = Cil.add_special_builtin_family is_frama_c_builtin
+let () = Cil_builtins.add_special_builtin_family is_frama_c_builtin
 
 (*
 Local Variables:

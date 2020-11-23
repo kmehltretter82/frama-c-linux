@@ -120,7 +120,7 @@ let print_global g =
     not (Cil.hasAttribute "fc_stdlib" attrs) || Kernel.PrintLibc.get()
   in
   let print_var v =
-    not (Cil.is_unused_builtin v) ||
+    not (Cil_builtins.is_unused_builtin v) ||
     Kernel.is_debug_key_enabled Kernel.dkey_print_builtins
   in
   match g with
@@ -1755,7 +1755,8 @@ class cil_printer () = object (self)
       | GFunDecl (funspec, vi, l) ->
         self#in_current_function vi;
         self#opt_funspec fmt funspec;
-        if not state.print_cil_as_is && Cil.Builtin_functions.mem vi.vname
+        if not state.print_cil_as_is &&
+           Cil_builtins.Builtin_functions.mem vi.vname
         then begin
           (* Compiler builtins need no prototypes. Just print them in
              comments. *)

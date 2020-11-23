@@ -697,7 +697,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                Queue.add
                  (fun () ->
                     if Cil.hasAttribute "FC_BUILTIN" v.vattr then
-                      Cil.Frama_c_builtins.add v.vname v;
+                      Cil_builtins.Frama_c_builtins.add v.vname v;
                     if Cil_datatype.Varinfo.equal v
                         (Kernel_function.get_vi new_kf)
                     then begin
@@ -756,7 +756,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                      (Project.get_name (Project.current()))
                      Printer.pp_block f.sbody;
                    if cond && Cil.hasAttribute "FC_BUILTIN" f.svar.vattr then
-                     Cil.Frama_c_builtins.add f.svar.vname f.svar;
+                     Cil_builtins.Frama_c_builtins.add f.svar.vname f.svar;
                    if  Cil_datatype.Varinfo.equal f.svar
                        (Kernel_function.get_vi new_kf)
                    then begin
