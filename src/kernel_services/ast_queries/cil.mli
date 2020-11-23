@@ -51,46 +51,6 @@
 open Cil_types
 open Cil_datatype
 
-(* ************************************************************************* *)
-(** {2 Builtins management} *)
-(* ************************************************************************* *)
-
-(** This module associates the name of a built-in function that might be used
-    during elaboration with the corresponding varinfo.  This is done when
-    parsing ${FRAMAC_SHARE}/libc/__fc_builtins.h, which is always performed
-    before processing the actual list of files provided on the command line (see
-    {!File.init_from_c_files}).  Actual list of such built-ins is managed in
-    {!Cabs2cil}. *)
-module Frama_c_builtins:
-  State_builder.Hashtbl with type key = string and type data = Cil_types.varinfo
-
-val is_builtin: Cil_types.varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin.
-    @since Fluorine-20130401 *)
-
-val is_unused_builtin: Cil_types.varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin that
-    is not used in the current program. Plugins may (and in fact should)
-    hide this builtin from their outputs *)
-
-val is_special_builtin: string -> bool
-(** @return [true] if the given name refers to a special built-in function.
-    A special built-in function can have any number of arguments. It is up to
-    the plug-ins to know what to do with it.
-    @since Carbon-20101201 *)
-
-(** register a new special built-in function *)
-val add_special_builtin: string -> unit
-
-(** register a new family of special built-in functions.
-    @since Carbon-20101201
-*)
-val add_special_builtin_family: (string -> bool) -> unit
-
-(** initialize the C built-ins. Should be called once per project, after the
-    machine has been set. *)
-val init_builtins: unit -> unit
-
 (** Call this function to perform some initialization, and only after you have
     set [Cil.msvcMode]. [initLogicBuiltins] is the function to call to init
     logic builtins. The [Machdeps] argument is a description of the hardware
@@ -266,20 +226,6 @@ val pushGlobal: global -> types: global list ref
 (** An empty statement. Used in pretty printing *)
 val invalidStmt: stmt
 
-(** A list of the built-in functions for the current compiler (GCC or
-  * MSVC, depending on [!msvcMode]).  Maps the name to the
-  * result and argument types, and whether it is vararg.
-  * Initialized by {!Cil.initCIL}
-  *
-  * This map replaces [gccBuiltins] and [msvcBuiltins] in previous
-  * versions of CIL.*)
-module Builtin_functions :
-  State_builder.Hashtbl with type key = string
-                         and type data = typ * typ list * bool
-
-(** This is used as the location of the prototypes of builtin functions. *)
-val builtinLoc: location
-
 (** Returns a location that ranges over the two locations in arguments. *)
 val range_loc: location -> location -> location
 
@@ -351,10 +297,34 @@ val ulongType: typ
 (** unsigned long long *)
 val ulongLongType: typ
 
+(** Any signed integer type of size 16 bits.
+    It is equivalent to the ISO C int16_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since Frama-C+dev
+*)
+val int16_t: unit -> typ
+
+(** Any signed integer type of size 32 bits.
+    It is equivalent to the ISO C int32_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since Frama-C+dev
+*)
+val int32_t: unit -> typ
+
+(** Any signed integer type of size 64 bits.
+    It is equivalent to the ISO C int64_t type but without using the
+    corresponding header.
+    Must only be called if such type exists in the current architecture.
+    @since Frama-C+dev
+*)
+val int64_t: unit -> typ
+
 (** Any unsigned integer type of size 16 bits.
     It is equivalent to the ISO C uint16_t type but without using the
     corresponding header.
-    Shall not be called if not such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint16_t: unit -> typ
@@ -362,7 +332,7 @@ val uint16_t: unit -> typ
 (** Any unsigned integer type of size 32 bits.
     It is equivalent to the ISO C uint32_t type but without using the
     corresponding header.
-    Shall not be called if not such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint32_t: unit -> typ
@@ -370,7 +340,7 @@ val uint32_t: unit -> typ
 (** Any unsigned integer type of size 64 bits.
     It is equivalent to the ISO C uint64_t type but without using the
     corresponding header.
-    Shall not be called if no such type exists in the current architecture.
+    Must only be called if such type exists in the current architecture.
     @since Nitrogen-20111001
 *)
 val uint64_t: unit -> typ
@@ -2353,6 +2323,12 @@ val set_deprecated_extension_handler:
   handler:(string -> ext_category ->
            (cilVisitor -> acsl_extension_kind -> acsl_extension_kind visitAction) ->
            unit) -> unit
+
+(* ***********************************************************************)
+(** {2 Forward references} *)
+(* ***********************************************************************)
+
+val init_builtins_ref: (unit -> unit) ref
 
 (*
 Local Variables:

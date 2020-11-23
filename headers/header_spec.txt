@@ -541,6 +541,8 @@ src/kernel_services/ast_queries/ast_info.ml: CEA_LGPL
 src/kernel_services/ast_queries/ast_info.mli: CEA_LGPL
 src/kernel_services/ast_queries/cil.ml: CIL
 src/kernel_services/ast_queries/cil.mli: CIL
+src/kernel_services/ast_queries/cil_builtins.ml: CIL
+src/kernel_services/ast_queries/cil_builtins.mli: CIL
 src/kernel_services/ast_queries/cil_const.ml: CIL
 src/kernel_services/ast_queries/cil_const.mli: CIL
 src/kernel_services/ast_queries/cil_datatype.ml: CEA_LGPL
