@@ -3597,18 +3597,6 @@ struct
       let accept t = accept_int t || accept_var t in
       Cil_types.Widen_hints (List.map (term_accept accept) l)
 
-  let type_annot loc ti =
-    let env = append_here_label (append_init_label (Lenv.empty())) in
-    let this_type = plain_logic_type loc env ti.this_type in
-    let v = Cil_const.make_logic_var_formal ti.this_name this_type in
-    let env = Lenv.add_var ti.this_name v env in
-    let body = predicate env ti.inv in
-    let infos = Cil_const.make_logic_info ti.inv_name in
-    infos.l_profile <- [v];
-    infos.l_labels <- [Logic_const.here_label];
-    infos.l_body <- LBpred body;
-    add_logic_function loc infos; infos
-
   let model_annot loc ti =
     let env = Lenv.empty() in
     let model_for_type =
@@ -4033,6 +4021,15 @@ struct
     add_logic_function loc info;
     env,info
 
+  let type_annot loc ti =
+    let p = ti.this_type, ti.this_name in
+    (* Note: Logic_decl registers the logic function *)
+    let env, info = logic_decl loc ti.inv_name [] [] [p] in
+    let body = predicate env ti.inv in
+    info.l_body <- LBpred body;
+    update_info_wrt_default_label info;
+    info
+
   let type_datacons loc env type_info (name,params) =
     (try
        let info = C.find_logic_ctor name in
@@ -4195,12 +4192,17 @@ struct
       Logic_env.Lemmas.add x def;
       def
     | LDinvariant (s, e) ->
-      let env = append_here_label (append_init_label (Lenv.empty())) in
-      let p = predicate env e in
+      let labels,env = annot_env loc [] [] in
       let li = Cil_const.make_logic_info s in
-      li.l_labels <- [Logic_const.here_label];
+      let p = predicate env e in
+      let labels = match !Lenv.default_label with
+        | None -> labels
+        | Some lab -> [lab]
+      in
+      li.l_labels <- labels;
       li.l_body <- LBpred p;
       add_logic_function loc li;
+      update_info_wrt_default_label li;
       Dinvariant (li,loc)
     | LDtype_annot l ->
       Dtype_annot (type_annot loc l,loc)
