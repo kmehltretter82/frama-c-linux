@@ -116,8 +116,7 @@ const LABEL = ({ disabled, label }: LABELprops) => (
 );
 
 export type ButtonKind =
-  undefined | 'default' |
-  'active' | 'primary' | 'warning' | 'positive' | 'negative';
+  'default' | 'active' | 'primary' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps {
   /** Text of the label. Prepend to other children elements. */
