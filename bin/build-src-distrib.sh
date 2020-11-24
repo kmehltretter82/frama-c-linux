@@ -2,6 +2,12 @@
 
 set -u
 
+# Search "BEGIN SCRIPT" to skip function
+
+# Set it to "no" in order to really execute the commands.
+# Otherwise, they are only printed.
+DEBUG=no
+
 # Executing this script requires bash 4.0 or higher
 # (special use of the 'case' construct)
 if test `echo $BASH_VERSION | sed "s/\([0-9]\).*/\1/" ` -lt 4; then
@@ -15,9 +21,314 @@ if ! command -v git-lfs >/dev/null 2>/dev/null; then
     exit 99
 fi
 
-# Set it to "no" in order to really execute the commands.
-# Otherwise, they are only printed.
-DEBUG=no
+function run {
+    cmd=$1
+    echo "$cmd"
+    if test "$DEBUG" == "no"; then
+        sh -c "$cmd" || { echo "Aborting step ${STEP}."; exit "${STEP}"; }
+    fi
+}
+
+function step {
+    STEP=$1
+    echo
+    echo "Step $1: $2"
+}
+
+# find_REMOTE create name url
+# - create: yes/no -> create if not found
+# - name: default name of the remote
+# - url: url of the repository
+# Sets:
+# REMOTE, the name of the found or created remote
+function find_REMOTE {
+    create=$1
+    name=$2
+    url=$3
+    REMOTE=$(git remote -v | grep $url | head -n 1 | cut -d"	" -f1)
+    if [ "$REMOTE" != "" ]; then
+        return
+    fi
+    echo "WARNING: can't find a remote for $name git repository";
+
+    if [ "$create" != "yes" ]; then
+        exit 1
+    fi
+
+    echo "Do you want to create one? (y/n)"
+    read CHOICE
+    case "${CHOICE}" in
+        "Y"|"y")
+            NAME=$name
+            git remote get-url $NAME &> /dev/null
+            while [ "$?" == "0" ]; do
+                echo -n "Give an available remote name for the public Frama-C remote: "
+                read NAME
+                git remote get-url $NAME &> /dev/null
+            done
+            run "git remote add $NAME $url"
+            REMOTE=$NAME
+            return ;;
+        *)
+            echo "No remote for public Frama-C repository"
+            exit 1
+    esac
+}
+
+# find_repository path url
+# - path: path to the directory
+# - url: URL of the repository
+# Checks:
+# - master branch
+# Sets:
+# DIRECTORY: path to the directory
+function find_repository_DIRECTORY_BRANCH {
+    name=$1
+    url=$2
+    if test \! -d $name/.git ; then
+        echo "ERROR: $name/.git directory not found; do you want to clone it? (y/n)"
+        read CHOICE
+        case "${CHOICE}" in
+            "Y"|"y")
+                run "git clone $url $name"
+                ;;
+            *)
+                echo "The Github Website repository must be linked at $name (clone or symbolic link)"
+                exit 1
+                ;&
+        esac
+    fi
+    DIRECTORY=$name
+    BRANCH=`git --git-dir=$name/.git rev-parse --abbrev-ref HEAD`
+    if [ "$BRANCH" != "master" ]; then
+        echo "### WARNING: $name repository is on branch $BRANCH"
+        proceed_anyway "Reset the branch to 'master', then run the script again."
+    fi
+}
+
+# proceed_anyway message
+# - message: text to display if we have to stop
+# Ask if the user want to continue and display the message if not (then exit)
+function proceed_anyway {
+    message=$1
+    echo "Proceed anyway? [y/N]"
+    read CHOICE
+    case "${CHOICE}" in
+        "Y"|"y")
+            ;;
+        *)
+            echo "$message"
+            exit 1
+    esac
+}
+
+function look_for_uncommited_changes {
+    run "git update-index --refresh"
+    if ! git diff-index HEAD --; then
+        echo ""
+        echo "### WARNING: uncommitted git changes will be discarded when creating archive!"
+        proceed_anyway "Stash or commit local changes, then run the script again."
+    fi
+}
+
+function look_for_frama_c_dev {
+    rgrep -i "frama-c+dev" src &> /dev/null
+    if [ "$?" == "0" ]; then
+        echo "### WARNING: Remaing frama-c+dev occurrences in 'src'"
+        proceed_anyway "Update API, then run the script again"
+    fi
+}
+
+function assert_build_dir {
+    if test \! -d "$BUILD_DIR" ; then
+        echo "ERROR: $BUILD_DIR does not exist, possibly removed by another step"
+        exit 1
+    fi
+}
+
+# diff_validation repository file
+# - repository: target repository
+# - file: target file
+# Ask for user validation before staging changes in [file] on the [repository].
+# Stops the script if the user refuses the changes
+function diff_validation {
+    repo=$1
+    file=$2
+    run "git -C $repo diff $file"
+    echo
+    echo "Is the above diff correct for $file? [y/N]"
+    read CHOICE
+    case "${CHOICE}" in
+        "Y"|"y")
+            ;;
+        *)
+            echo "Something went wrong, you may want to clean $repo"
+            exit 1
+    esac
+    run "git -C $repo add $file"
+}
+
+# WIKI generation
+
+function fill_wiki {
+    PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
+    WIKI_PAGE=$WIKI_DIR/$PAGE_NAME
+    run "mkdir -p $WIKI_DIR/manuals"
+    run "sed -i -e '/<!-- LAST RELEASE -->/a \
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/Home.md"
+    if test "$FINAL_RELEASE" = "yes"; then
+        release_type="FINAL"
+    else
+        release_type="BETA"
+    fi
+    run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
+- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $WIKI_DIR/_sidebar.md"
+    echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
+    echo "## Sources" >> $WIKI_PAGE
+    run "cp $OUT_DIR/$TARGZ_FILENAME $WIKI_DIR/downloads"
+    run "git -C $WIKI_DIR add downloads/$TARGZ_FILENAME"
+    echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
+    echo "" >> $WIKI_PAGE
+    echo "## Manuals" >> $WIKI_PAGE
+    for fpath in $OUT_DIR/manuals/* ; do
+        f=$(basename $fpath)
+        f_no_ext=${f%.*}
+        f_no_pdf_ext="${f%.pdf}"
+        echo "- [${f_no_pdf_ext%-${FRAMAC_VERSION_AND_CODENAME}}](manuals/$f)" >> $WIKI_PAGE
+        run "cp $fpath $WIKI_DIR/manuals/"
+        run "git -C $WIKI_DIR add manuals/$f"
+    done
+    echo "" >> $WIKI_PAGE
+    echo "## Main changes" >> $WIKI_PAGE
+    sed 's/\(\#.*\)/##\1/' changes.md >> $WIKI_PAGE
+    run "git -C $WIKI_DIR add $PAGE_NAME"
+    diff_validation $WIKI_DIR "Home.md"
+    diff_validation $WIKI_DIR "_sidebar.md"
+}
+
+# WEBSITE pages generation
+
+function add_install_page {
+    INSTALL_WEBPAGE=html/installations/$FRAMAC_VERSION_CODENAME_LOWER.md
+    INSTALL_WEBPAGE_PATH=$WEBSITE_DIR/$INSTALL_WEBPAGE
+    echo "---" > $INSTALL_WEBPAGE_PATH
+    echo "layout: doc_page" >> $INSTALL_WEBPAGE_PATH
+    echo "title: Installation instructions for $FRAMAC_VERSION_CODENAME" >> $INSTALL_WEBPAGE_PATH
+    echo "---" >> $INSTALL_WEBPAGE_PATH
+    echo >> $INSTALL_WEBPAGE_PATH
+    cat ./INSTALL.md >> $INSTALL_WEBPAGE_PATH
+
+    run "git -C $WEBSITE_DIR add $INSTALL_WEBPAGE"
+}
+
+function add_event_page {
+    EVENT_WEBPAGE=_events/framac-$FRAMAC_VERSION.md
+    EVENT_WEBPAGE_PATH=$WEBSITE_DIR/$EVENT_WEBPAGE
+
+    if [ "$VERSION_MINOR" != 0 ]; then
+        PREVIOUS=$VERSION_MAJOR
+    else
+        PREVIOUS=$(( $VERSION_MAJOR-1 ))
+    fi
+    PREVIOUS_NAME=$(git show $PREVIOUS.0:VERSION_CODENAME)
+
+    TEXTUAL_VERSION="Frama-C $FRAMAC_VERSION ($FRAMAC_VERSION_CODENAME)"
+    TEXTUAL_PREVIOUS="Frama-C $PREVIOUS ($PREVIOUS_NAME)"
+
+    echo "---" > $EVENT_WEBPAGE_PATH
+    echo "layout: default" >> $EVENT_WEBPAGE_PATH
+    echo "date: $(date +\"%d-%m-%Y\")" >> $EVENT_WEBPAGE_PATH
+    echo "event: $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
+    echo -n "title: " >> $EVENT_WEBPAGE_PATH
+    if [ "$FINAL_RELEASE" = "no" ]; then
+        echo -n "Beta release " >> $EVENT_WEBPAGE_PATH
+    else
+        echo -n "Release " >> $EVENT_WEBPAGE_PATH
+    fi
+    echo "of $TEXTUAL_VERSION" >> $EVENT_WEBPAGE_PATH
+    VERSION_PAGE="/fc-versions/$FRAMAC_VERSION_CODENAME_LOWER.html"
+    echo "link: $VERSION_PAGE" >> $EVENT_WEBPAGE_PATH
+    echo "---" >> $EVENT_WEBPAGE_PATH
+    echo >> $EVENT_WEBPAGE_PATH
+    echo "$TEXTUAL_VERSION is out. Download it [here]($VERSION_PAGE)." >> $EVENT_WEBPAGE_PATH
+    echo >> $EVENT_WEBPAGE_PATH
+    echo "Main changes with respect to $TEXTUAL_PREVIOUS include:" >> $EVENT_WEBPAGE_PATH
+    echo >> $EVENT_WEBPAGE_PATH
+    sed 's/\(\#.*\)/###\1/' changes.md >> $EVENT_WEBPAGE_PATH
+
+    run "git -C $WEBSITE_DIR add $EVENT_WEBPAGE"
+}
+
+function add_version_page {
+    VERSION_WEBPAGE="_fc-versions/$FRAMAC_VERSION_CODENAME_LOWER.md"
+    VERSION_WEBPAGE_PATH=$WEBSITE_DIR/$VERSION_WEBPAGE
+    if [ "$FINAL_RELEASE" = "no" ]; then
+        REMOVE="^acsl\| acsl\|/acsl"
+        ACSL_VERSION=0
+    else
+        REMOVE="beta"
+        ACSL_VERSION=$(ls $OUT_DIR/manuals | sed -n 's/^acsl-1.\([0-9][0-9]\).pdf/\1/p')
+    fi
+    sed -e "s/ACSL_VERSION/$ACSL_VERSION/" \
+        -e "s/MAJOR_VERSION/$VERSION_MAJOR/" \
+        -e "s/MINOR_VERSION/$VERSION_MINOR/" \
+        -e "s/VERSION_CODENAME/$FRAMAC_VERSION_CODENAME/" \
+        -e "s/LOWER_CODENAME/$FRAMAC_VERSION_CODENAME_LOWER/" \
+        -e "s/COMP_VERSION/$FRAMAC_VERSION/" \
+        ./bin/version_template.md \
+        | grep -vi "$REMOVE" > $VERSION_WEBPAGE_PATH
+    run "git -C $WEBSITE_DIR add $VERSION_WEBPAGE"
+}
+
+function add_downloads {
+    DOWNLOAD_DIR="$WEBSITE_DIR/download"
+    DOWNLOAD_PATH="download"
+    for fpath in $OUT_DIR/manuals/* ; do
+        f=$(basename $fpath)
+        f_no_ext=${f%.*}
+
+        if [[ $f_no_ext =~ ^e-acsl.*$ ]]; then
+            BASE="e-acsl/$f"
+        else
+            BASE="$f"
+        fi
+
+        if   [[ $f_no_ext =~ ^(e-)?acsl-[0-9].[0-9][0-9]$ ]]; then
+            REPL=$(echo $BASE | sed -e "s/-[0-9].[0-9][0-9]//")
+        elif [[ $f_no_ext =~ ^e-acsl-* ]]; then
+            REPL=$(echo $BASE | sed -e "s/-$FRAMAC_VERSION_AND_CODENAME//")
+        else
+            REPL=$(echo $BASE | sed -e "s/\(.*\)\/\(.*\)-$FRAMAC_VERSION_AND_CODENAME/\1\/frama-c-\2/")
+        fi
+
+        run "cp $fpath $DOWNLOAD_DIR/$BASE"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$BASE"
+        run "cp $fpath $DOWNLOAD_DIR/$REPL"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$REPL"
+    done
+    # Particular case for the value analysis manual:
+    EVA_FILE="$OUT_DIR/manuals/eva-manual-$FRAMAC_VERSION_AND_CODENAME.pdf"
+    VALUE_PATH="$DOWNLOAD_DIR/frama-c-value-analysis.pdf"
+    VALUE_GIT_PATH="$DOWNLOAD_PATH/frama-c-value-analysis.pdf"
+    run "cp $EVA_FILE $VALUE_PATH"
+    run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
+}
+
+function fill_website {
+    add_install_page
+    add_event_page
+    add_version_page
+    add_downloads
+}
+
+# BEGIN SCRIPT
+
+GITLAB_FRAMA_C_PRIVATE="git@git.frama-c.com:frama-c/frama-c.git"
+GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub/frama-c.git"
+GITLAB_WIKI="git@git.frama-c.com:pub/frama-c.wiki"
+GITLAB_WEBSITE="git@git.frama-c.com:pub/pub.frama-c.com.git"
+GITLAB_ACSL="git@github.com:acsl-language/acsl.git"
+
 if test \! -e .git ; then
     echo "ERROR: .git directory not found"
     echo "This script must be run at the root of a Frama-C repository"
@@ -30,9 +341,11 @@ if test \! -f VERSION ; then
     echo "This script must be run at the root of a Frama-C repository"
     exit 1
 fi
+
 FRAMAC_VERSION=$(cat VERSION)
 FRAMAC_TAG=$(git describe --tag)
 FRAMAC_VERSION_CODENAME=$(cat VERSION_CODENAME)
+FRAMAC_VERSION_CODENAME_LOWER=$(echo "$FRAMAC_VERSION_CODENAME" | tr '[:upper:]' '[:lower:]')
 FRAMAC_VERSION_AND_CODENAME="${FRAMAC_VERSION}-${FRAMAC_VERSION_CODENAME}"
 TARGZ_FILENAME=frama-c-${FRAMAC_VERSION_AND_CODENAME}.tar.gz
 
@@ -41,6 +354,10 @@ VERSION_MAJOR=$(cat VERSION | sed -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
 VERSION_MINOR=$(cat VERSION | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 
 if test -n "$VERSION_MODIFIER"; then FINAL_RELEASE=no; else FINAL_RELEASE=yes; fi
+if [ "$VERSION_MODIFIER" == "+dev" ]; then
+    echo "WARNING: The VERSION is a development version"
+    proceed_anyway "Update VERSION and run the script again"
+fi
 
 if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
     echo "WARNING: The current commit is not tagged with the current version:"
@@ -48,137 +365,70 @@ if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
     echo "Frama-C Tag    : $FRAMAC_TAG"
 fi
 
-run () {
-    cmd=$1
-    echo "$cmd"
-    if test "$DEBUG" == "no"; then
-        sh -c "$cmd" || { echo "Aborting step ${STEP}."; exit "${STEP}"; }
-    fi
-}
+# Find remotes
 
-# GITLAB_DIR=./pub-frama-c
-# GITLAB_GIT="git@git.frama-c.com:pub/frama-c.git"
+find_REMOTE "no" "origin" $GITLAB_FRAMA_C_PRIVATE
+ORIGIN_REMOTE=$REMOTE
+find_REMOTE "yes" "public" $GITLAB_FRAMA_C_PUBLIC
+PUBLIC_REMOTE=$REMOTE
 
-# if test ! -d $GITLAB_DIR/.git; then
-#     echo "WARNING: $GITLAB_DIR/.git directory not found; do you want to clone it? (y/n)"
-#     read CHOICE
-#     case "${CHOICE}" in
-#         "Y"|"y")
-#             run "git clone $GITLAB_GIT $GITLAB_DIR"
-#             ;;
-#         *)
-#             echo "gitlab's public Frama-C project must be linked at $GITLAB_DIR \
-    #                  (clone or symbolic link)"
-#             exit 1
-#             ;&
-#     esac
-# fi
-# GITLAB_BRANCH=$(git --git-dir=$GITLAB_DIR/.git rev-parse --abbrev-ref HEAD)
-# if test "$FRAMAC_BRANCH" != "$GITLAB_BRANCH"; then
-#     echo "WARNING: switching pub-frama-c to current branch $FRAMAC_BRANCH"
-#     run "git -C $GITLAB_DIR checkout -b $FRAMAC_BRANCH"
-# fi
+# Find specific repositories
 
-GITLAB_WIKI_GIT="git@git.frama-c.com:pub/frama-c.wiki"
-GITLAB_WIKI=./frama-c.wiki
-if test ! -d $GITLAB_WIKI/.git; then
-    echo "WARNING: $GITLAB_WIKI/.git directory not found; do you want to clone it? (y/n)"
+find_repository_DIRECTORY_BRANCH "./website" $GITLAB_WEBSITE
+WEBSITE_DIR=$DIRECTORY
+
+find_repository_DIRECTORY_BRANCH "./doc/acsl" $GITLAB_ACSL
+ACSL_DIR=$DIRECTORY
+
+find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $GITLAB_WIKI
+WIKI_DIR=$DIRECTORY
+
+CHANGES="./main_changes.md"
+if test \! -f $CHANGES ; then
+    echo "WARNING: The $CHANGES file is missing"
+    echo "Do you want to create an empty one? [y/N]"
     read CHOICE
     case "${CHOICE}" in
         "Y"|"y")
-            run "git clone $GITLAB_WIKI_GIT"
-            ;;
+            touch $CHANGES;;
         *)
-            echo "pub/frama-c wiki must be linked at $GITLAB_WIKI \
-                 (clone or symbolic link)"
+            echo "Create a changes file and run the script again"
             exit 1
-            ;&
     esac
 fi
-GITLAB_WIKI_BRANCH=$(git --git-dir=$GITLAB_WIKI/.git rev-parse --abbrev-ref HEAD)
-
-if test "$GITLAB_WIKI_BRANCH" != "master"; then
-    echo "WARNING: pub/frama-c's wiki is not on the master branch";
-fi
-
-ACSL_GIT="git@gitlab.com:acsl-language/acsl.git"
-ACSL_DIR="./doc/acsl"
-if test \! -d $ACSL_DIR/.git ; then
-    echo "WARNING: $ACSL_DIR/.git directory not found; do you want to clone it? (y/n)"
-    read CHOICE
-    case "${CHOICE}" in
-        "Y"|"y")
-            pushd "./doc"
-            run "git clone $ACSL_GIT"
-            popd
-            ;;
-        *)
-            echo "The Github ACSL repository must be linked at $ACSL_DIR (clone or symbolic link)"
-            exit 1
-            ;&
-    esac
-fi
-
-
 
 MANUALS_DIR="./doc/manuals"
-
-# push on frama-c.com only for final releases
-WEBSITE_GIT="git@git.frama-c.com:pub/pub.frama-c.com.git"
-if test "$FINAL_RELEASE" = "yes"; then
-    WEBSITE_DIR="./website"
-    if test \! -d $WEBSITE_DIR/.git ; then
-        echo "ERROR: $WEBSITE_DIR/.git directory not found; do you want to clone it? (y/n)"
-        read CHOICE
-        case "${CHOICE}" in
-            "Y"|"y")
-                run "git clone $WEBSITE_GIT website"
-                ;;
-            *)
-                echo "The Github Website repository must be linked at $WEBSITE_DIR (clone or symbolic link)"
-                exit 1
-                ;&
-        esac
-    fi
-    WEBSITE_BRANCH=`git --git-dir=$WEBSITE_DIR/.git rev-parse --abbrev-ref HEAD`
-fi # FINAL_RELEASE == yes
 
 BUILD_DIR_ROOT="/tmp/release"
 BUILD_DIR="$BUILD_DIR_ROOT/frama-c"
 
-echo "Frama-C Version         : $FRAMAC_VERSION"
-echo "Frama-C Branch          : $FRAMAC_BRANCH"
-echo "Final release           : $FINAL_RELEASE"
-# echo "pub/frama-c dir         : $GITLAB_DIR"
-# echo "pub/frama-c branch      : $GITLAB_BRANCH"
-echo "pub/frama-c wiki        : $GITLAB_WIKI"
-echo "Manuals Dir             : $MANUALS_DIR"
-if test "$FINAL_RELEASE" = "yes"; then
-    echo "Website Dir             : $WEBSITE_DIR"
-    echo "Website Branch          : $WEBSITE_BRANCH"
-else
-    echo "Intermediate release: website not updated"
-fi
-echo "Build Dir      : $BUILD_DIR"
+OUT_DIR="./distributed"
 
-DOWNLOAD_DIR="download"
-
-step () {
-    STEP=$1
-    echo
-    echo "Step $1: $2"
-}
+echo "Frama-C Version      : $FRAMAC_VERSION"
+echo "Final release        : $FINAL_RELEASE"
+echo "Frama-C Branch       : $FRAMAC_BRANCH"
+echo "Origin remote        : $ORIGIN_REMOTE"
+echo "Public remote        : $PUBLIC_REMOTE"
+echo "Manuals Dir          : $MANUALS_DIR"
+echo "ACSL Dir             : $ACSL_DIR"
+echo "Frama-C Wiki Dir     : $WIKI_DIR"
+echo "Website Dir          : $WEBSITE_DIR"
+echo "Changes file         : $CHANGES"
+echo "Build Dir            : $BUILD_DIR"
+echo "Output Dir           : $OUT_DIR"
 
 export LC_CTYPE=en_US.UTF-8
 
 echo -n "Steps are:
   N) previous information is wrong, STOP the script
-  0) compile PDF manuals (will ERASE $MANUALS_DIR!)
-  1) reset local copy of target repositories
+  0) ERASE $OUT_DIR
+  1) compile PDF manuals (will ERASE $MANUALS_DIR!)
   2) build the source distribution
   3) build API bundle
   4) build documentation companions
-  5) copy and stage locally the distributed manuals
+  5) clean $BUILD_DIR
+  6) prepare wiki (will RESET HARD $WIKI_DIR branch)
+  7) prepare website (will RESET HARD $WEBSITE_DIR branch)
 Start at which step? (default is N, which cancels everything)
 - If this is the first time running this script, start at 0
 - Otherwise, start at the latest step before failure
@@ -191,36 +441,24 @@ case "${STEP}" in
         exit 0;
         ;&
     0)
-        step 0 "COMPILING PDF MANUALS"
+        step 0 "PREPARE DISTRIBUTION DIRECTORY"
+        run "rm -rf $OUT_DIR"
+        run "mkdir -p $OUT_DIR"
+        ;&
+
+    1)
+        step 1 "COMPILING PDF MANUALS"
         run "rm -rf $MANUALS_DIR"
         run "mkdir -p $MANUALS_DIR"
         run "doc/build-manuals.sh"
-        ;&
-    1)
-        # run "git -C $GITLAB_DIR reset --hard"
-        run "git -C $GITLAB_WIKI reset --hard"
-        if test "$FINAL_RELEASE" = "yes"; then
-            run "git -C $WEBSITE_DIR reset --hard"
-        fi
+        run "rm -rf $OUT_DIR/manuals"
+        run "mkdir -p $OUT_DIR/manuals"
+        run "cp $MANUALS_DIR/* $OUT_DIR/manuals"
         ;&
     2)
         step 2 "BUILDING THE SOURCE DISTRIBUTION"
-        # WARNING! MUST RUN git update-index BEFORE git diff-index!
-        # See: https://stackoverflow.com/questions/36367190/git-diff-files-output-changes-after-git-status
-        run "git update-index --refresh"
-        if ! git diff-index HEAD --; then
-            echo ""
-            echo "### WARNING: uncommitted git changes will be discarded when creating archive!"
-            echo "Proceed anyway? [y/N]"
-            read CHOICE
-            case "${CHOICE}" in
-                "Y"|"y")
-                ;;
-                *)
-                    echo "Stash or commit local changes, then run the script again."
-                    exit 1
-            esac
-        fi
+        look_for_uncommited_changes
+        look_for_frama_c_dev
         run "mkdir -p $BUILD_DIR_ROOT"
         run "rm -rf $BUILD_DIR"
         run "git worktree add -f --detach $BUILD_DIR $FRAMAC_BRANCH"
@@ -229,112 +467,34 @@ case "${STEP}" in
         run "cd $BUILD_DIR; make -j OPEN_SOURCE=yes src-distrib"
         # sanity check: markdown-report must be distributed
         run "tar tf $BUILD_DIR/$TARGZ_FILENAME | grep -q src/plugins/markdown-report"
-        # populate release assets in wiki
-        run "mkdir -p $GITLAB_WIKI/downloads"
-        run "cp $BUILD_DIR/$TARGZ_FILENAME $GITLAB_WIKI/downloads/"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/$TARGZ_FILENAME"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE"
-            run "cp $BUILD_DIR/$TARGZ_FILENAME $WEBSITE_DIR/$SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-        fi
+        run "cp $BUILD_DIR/$TARGZ_FILENAME $OUT_DIR"
         ;&
     3)
-        #note: this step may fail if step 4 was performed,
-        #      because it will erase BUILD_DIR
         step 3 "BUILDING THE API BUNDLE"
-        if test \! -d "$BUILD_DIR" ; then
-            echo "ERROR: $BUILD_DIR does not exist, possibly removed by another step"
-            exit 1
-        fi
+        assert_build_dir
         run "cd $BUILD_DIR; make -j doc-distrib"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/frama-c-${FRAMAC_VERSION_AND_CODENAME}-api.tar.gz"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE"
-            run "cp $BUILD_DIR/frama-c-api.tar.gz $WEBSITE_DIR/$SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-        fi
+        run "cp $BUILD_DIR/frama-c-api.tar.gz $OUT_DIR"
         ;&
     4)
         step 4 "BUILDING THE DOCUMENTATION COMPANIONS"
-        if test \! -d "$BUILD_DIR" ; then
-            echo "ERROR: $BUILD_DIR does not exist, possibly removed by another step"
-            exit 1
-        fi
+        assert_build_dir
         run "cd $BUILD_DIR; make -j doc-companions"
-        if test "$FINAL_RELEASE" = "yes"; then
-            SPEC_FILE="$DOWNLOAD_DIR/hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz"
-            RELE_FILE="$DOWNLOAD_DIR/hello.tar.gz"
-            run "rm -f $WEBSITE_DIR/$SPEC_FILE $WEBSITE_DIR/$RELE_FILE"
-            run "cp $BUILD_DIR/hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz $WEBSITE_DIR/$SPEC_FILE"
-            run "git -C $WEBSITE_DIR add $SPEC_FILE"
-            run "ln -s hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz $WEBSITE_DIR/$RELE_FILE";
-            run "git -C $WEBSITE_DIR add $RELE_FILE"
-            run "rm -rf $BUILD_DIR"
-            run "git worktree prune"
-        fi
+        run "cp $BUILD_DIR/hello-${FRAMAC_VERSION_AND_CODENAME}.tar.gz $OUT_DIR"
         ;&
     5)
-        step 5 "COPYING AND STAGING THE DISTRIBUTED MANUALS"
-        PAGE_NAME=Frama-C-${FRAMAC_VERSION_AND_CODENAME}.md
-        WIKI_PAGE=$GITLAB_WIKI/$PAGE_NAME
-        run "mkdir -p $GITLAB_WIKI/manuals"
-        run "sed -i -e '/<!-- LAST RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/Home.md"
-        if test "$FINAL_RELEASE" = "yes"; then
-            release_type="FINAL"
-        else
-            release_type="BETA"
-        fi
-        run "sed -i -e '/<!-- LAST ${release_type} RELEASE -->/a \
-- [${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})](Frama-C-${FRAMAC_VERSION_AND_CODENAME})' $GITLAB_WIKI/_sidebar.md"
-        echo "# Frama-C release ${FRAMAC_VERSION} (${FRAMAC_VERSION_CODENAME})" > $WIKI_PAGE
-        echo "## Sources" >> $WIKI_PAGE
-        echo " - [$TARGZ_FILENAME](downloads/$TARGZ_FILENAME)" >> $WIKI_PAGE
-        echo "" >> $WIKI_PAGE
-        echo "## Manuals" >> $WIKI_PAGE
-        for fpath in $MANUALS_DIR/*; do
-            f=$(basename $fpath)
-            f_no_ext=${f%.*}
-            # E-ACSL-related files are stored in subdirectory e-acsl
-            if [[ $f_no_ext =~ ^e-acsl.*$ ]]; then
-                destdir="$WEBSITE_DIR/$DOWNLOAD_DIR/e-acsl"
-            else
-                destdir="$WEBSITE_DIR/$DOWNLOAD_DIR"
-            fi
-            if [[ -L $fpath ]]; then
-                # symbolic links are copied to the website and prepended with 'frama-c-'
-                # (except for acsl.pdf, which is copied as is)
-                if [[ $f_no_ext =~ ^(e-)?acsl$ ]]; then
-                    ln="$f"
-                else
-                    ln="frama-c-$f"
-                fi
-                run "rm -f $destdir/$ln"
-                run "cp -P $fpath $destdir/$ln"
-                run "git -C $destdir add $ln"
-            else
-                # non-symbolic links are copied as-is to the website, and also to
-                # the Gitlab wiki, where they are also added as links
-                f_no_pdf_ext="${f%.pdf}"
-                echo "- [${f_no_pdf_ext%-${FRAMAC_VERSION_AND_CODENAME}}](manuals/$f)" >> $WIKI_PAGE
-                run "cp $fpath $GITLAB_WIKI/manuals/"
-                run "git -C $GITLAB_WIKI add manuals/$f"
-                run "cp $fpath $destdir/$f"
-                run "git -C $destdir add $f"
-            fi
-        done
-
-        INSTALL_WEBPAGE=html/installations/$(echo "$FRAMAC_VERSION_CODENAME" | tr '[:upper:]' '[:lower:]').md
-        INSTALL_WEBPAGE_PATH=$WEBSITE_DIR/$INSTALL_WEBPAGE
-        echo "----" > $INSTALL_WEBPAGE_PATH
-        echo "layout: doc_page" >> $INSTALL_WEBPAGE_PATH
-        echo "title: Installation instructions for $FRAMAC_VERSION_CODENAME" >> $INSTALL_WEBPAGE_PATH
-        echo "----" >> $INSTALL_WEBPAGE_PATH
-        cat ./INSTALL.md >> $INSTALL_WEBPAGE_PATH
-        run "git -C $WEBSITE_DIR add $INSTALL_WEBPAGE"
-
-        run "git -C $GITLAB_WIKI add $PAGE_NAME"
+        step 5 "CLEAN $BUILD_DIR"
+        run "rm -rf $BUILD_DIR"
+        run "git worktree prune"
+        ;&
+    6)
+        step 6 "PREPARE WIKI"
+        run "git -C $WIKI_DIR reset --hard"
+        fill_wiki
+        ;&
+    7)
+        step 7 "PREPARE WEBSITE"
+        run "git -C $WEBSITE_DIR reset --hard"
+        fill_website
         ;;
     *)
         echo "Bad entry: ${STEP}"

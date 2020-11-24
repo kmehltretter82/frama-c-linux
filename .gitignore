@@ -34,6 +34,7 @@ autom4te.cache
 /config.log
 /config.status
 /frama-c-*.tar.gz
+/distributed
 /.log.autoconf
 /.Makefile.user
 /ocamlgraph/
