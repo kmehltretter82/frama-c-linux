@@ -9,16 +9,20 @@ import * as States from 'frama-c/states';
 import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { printFunction, markerInfo } from 'api/kernel/ast';
-import { getCallers, getDeadCode } from 'api/plugins/eva/general';
+import { printFunction, markerInfo } from 'frama-c/api/kernel/ast';
+import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
+
+import { Theme, FontSize } from './Preferences';
 
 const THEMES = [
   { id: 'default', label: 'Default' },
@@ -31,7 +35,7 @@ const THEMES = [
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('AST View');
+const D = new Dome.Debug('AST View');
 
 // --------------------------------------------------------------------------
 // --- Rich Text Printer
@@ -54,8 +58,9 @@ async function loadAST(
         if (theMarker)
           buffer.scroll(theMarker);
       } catch (err) {
-        PP.error(
-          'Fail to obtain AST', theFunction, theMarker, err,
+        D.error(
+          `Fail to retrieve the AST of function '${theFunction}' ` +
+          `and marker '${theMarker}':`, err,
         );
       }
     })();
@@ -69,7 +74,7 @@ async function functionCallers(functionName: string) {
     const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
     return locations;
   } catch (err) {
-    PP.error(`Fail to retrieve callers of function '${functionName}':`, err);
+    D.error(`Fail to retrieve callers of function '${functionName}':`, err);
     return [];
   }
 }
@@ -85,10 +90,10 @@ const ASTview = () => {
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const multipleSelections = selection?.multiple.allSelections;
-  const [theme, setTheme] = Dome.useGlobalSetting('ASTview.theme', 'default');
-  const [fontSize, setFontSize] = Dome.useGlobalSetting('ASTview.fontSize', 12);
-  const [wrapText, setWrapText] = Dome.useSwitch('ASTview.wrapText', false);
-  const markersInfo = States.useSyncArray(markerInfo).getArray();
+  const [theme, setTheme] = Settings.useGlobalSettings(Theme);
+  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
+  const [wrapText, flipWrapText] = Dome.useFlipSettings('ASTview.wrapText');
+  const markersInfo = States.useSyncArray(markerInfo);
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
@@ -134,7 +139,8 @@ const ASTview = () => {
 
   async function onContextMenu(id: string) {
     const items = [];
-    const selectedMarkerInfo = markersInfo.find((e) => e.key === id);
+    const markerId = (id as Json.key<'#markerInfo'>);
+    const selectedMarkerInfo = markersInfo.getData(markerId);
     if (selectedMarkerInfo?.var === 'function') {
       if (selectedMarkerInfo.kind === 'declaration') {
         if (selectedMarkerInfo?.name) {
@@ -170,10 +176,10 @@ const ASTview = () => {
 
   // Theme Popup
   const selectTheme = (id?: string) => id && setTheme(id);
-  const checkTheme =
-    (th: { id: string }) => ({ checked: th.id === theme, ...th });
-  const themePopup =
-    () => Dome.popupMenu(THEMES.map(checkTheme), selectTheme);
+  const themeItem = (th: { id: string; label: string }) => (
+    { checked: th.id === theme, ...th }
+  );
+  const themePopup = () => Dome.popupMenu(THEMES.map(themeItem), selectTheme);
 
   // Component
   return (
@@ -199,7 +205,7 @@ const ASTview = () => {
         <IconButton
           icon="WRAPTEXT"
           selected={wrapText}
-          onClick={setWrapText}
+          onClick={flipWrapText}
           title="Wrap text"
         />
       </TitleBar>

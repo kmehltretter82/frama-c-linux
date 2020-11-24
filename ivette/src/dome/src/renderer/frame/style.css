@@ -104,11 +104,12 @@
     height: 100% ;
     overflow-x: hidden ;
     overflow-y: auto ;
-    padding-top: 6px ;
-    padding-bottom: 6px ;
+    padding: 0px ;
 }
 
-.dome-window-active .dome-xSideBar.dome-color-frame {
+.dome-window-active .dome-xSideBar.dome-color-frame,
+.dome-window-active .dome-xSideBarSection-title.dome-color-frame
+{
     background: #e3e8ec ;
 }
 
@@ -118,11 +119,14 @@
 
 .dome-xSideBarSection {
     display: block ;
-    margin-top: 10px ;
-    margin-bottom: 10px ;
+    padding: 0px ;
 }
 
 .dome-xSideBarSection-title {
+    position: sticky ;
+    top: 0px ;
+    padding-top: 3px ;
+    padding-bottom: 0px ;
     padding-left: 3px ;
     padding-right: 2px ;
     display: flex ;

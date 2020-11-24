@@ -25,11 +25,20 @@ function domeDevtools() {
   }
 }
 
+// --------------------------------------------------------------------------
+
 module.exports = {
+  module: {
+    rules: [
+      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
+    ],
+    strictExportPresence: true
+  },
   resolve: {
+    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      'dome$':         path.resolve( DOME , 'src/main/dome.js' ),
-      'dome/system$':  path.resolve( DOME , 'src/misc/system.js' ),
+      'dome$':         path.resolve( DOME , 'src/main/dome.ts' ),
+      'dome/system$':  path.resolve( DOME , 'src/misc/system.ts' ),
       'dome/devtools': domeDevtools()
     }
   }

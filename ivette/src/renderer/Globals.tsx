@@ -6,7 +6,7 @@ import React from 'react';
 import { Section, Item } from 'dome/frame/sidebars';
 import * as States from 'frama-c/states';
 import { alpha } from 'dome/data/compare';
-import { functions, functionsData } from 'api/kernel/ast';
+import { functions, functionsData } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Globals Section
@@ -36,7 +36,7 @@ export default () => {
   };
 
   return (
-    <Section label="Functions">
+    <Section label="Functions" defaultUnfold>
       {fcts.map(makeFctItem)}
     </Section>
   );

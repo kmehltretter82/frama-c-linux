@@ -43,10 +43,11 @@
     "resolveJsonModule": true,                /* Allow to load JSON files as module. */
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "api/*": [ "api/*" ],
+      "frama-c/api/*": [ "api/generated/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
-      "dome": [ "src/dome/src/renderer/dome.js" ],
+      "dome": [ "src/dome/src/renderer/dome.tsx" ],
       "dome/system": [ "src/dome/src/misc/system.js" ],
+      "dome/devtools": [ "src/dome/src/misc/devtools.js" ],
       "dome/misc/*": [ "src/dome/src/misc/*"],
       "dome/*": [ "src/dome/src/renderer/*" ],
       "codemirror/lib/codemirror": ["node_modules/@types/codemirror/index.d.ts"],
@@ -99,9 +100,13 @@
     "readme": "./README.md",
     "inputFiles": [
       "doc/pages",
-      "src/frama-c", "api",
+      "src/frama-c/server.ts",
+      "src/frama-c/states.ts",
+      "src/frama-c/utils.ts",
+      "api/generated",
       "src/dome/src/renderer",
-      "src/dome/src/misc",
+      "src/dome/src/misc/utils.ts",
+      "src/dome/src/misc/system.ts",
     ]
   }
 }

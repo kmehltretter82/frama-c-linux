@@ -15,12 +15,20 @@ module TSC = Self.Action
       let help = "Generate TypeScript API"
     end)
 
+module API = Self.String
+    (struct
+      let option_name = "-server-tsc-pkg"
+      let arg_name = "dir"
+      let default = "frama-c/api"
+      let help = Printf.sprintf "Output package (default is '%s')" default
+     end)
+
 module OUT = Self.String
     (struct
       let option_name = "-server-tsc-out"
       let arg_name = "dir"
-      let default = "api"
-      let help = "Output directory (default is './api')"
+      let default = "api/generated"
+      let help = Printf.sprintf "Output directory (default is '%s')" default
     end)
 
 module Md = Markdown
@@ -474,12 +482,13 @@ let makeIgnore fmt msg =
 let makePackage pkg name fmt =
   begin
     let open Pkg in
+    let framac = API.get () in
     Format.fprintf fmt "/* --- Generated Frama-C Server API --- */@\n@\n" ;
     Format.fprintf fmt "/**@\n   %s@\n" pkg.p_title ;
     if pkg.p_descr <> [] then
       Format.fprintf fmt "@\n   @[<hov 0>%a@]@\n@\n" pp_descr pkg.p_descr ;
     Format.fprintf fmt "   @@packageDocumentation@\n" ;
-    Format.fprintf fmt "   @@module api/%s@\n" name ;
+    Format.fprintf fmt "   @@module %s/%s@\n" framac name ;
     Format.fprintf fmt "*/@\n@." ;
     let names = Pkg.resolve ~keywords pkg in
     makeIgnore fmt "import * as Json from 'dome/data/json';@\n" ;
@@ -494,11 +503,11 @@ let makePackage pkg name fmt =
          then
            let pkg = Pkg.name_of_pkg ~sep:"/" id.plugin id.package in
            if id.name = name then
-             makeIgnore fmt "import { %s } from 'api/%s';@\n"
-               name pkg
+             makeIgnore fmt "import { %s } from '%s/%s';@\n"
+               name framac pkg
            else
-             makeIgnore fmt "import { %s: %s } from 'api/%s';@\n"
-               id.name name pkg
+             makeIgnore fmt "import { %s: %s } from '%s/%s';@\n"
+               id.name name framac pkg
       ) names ;
     List.iter
       (makeDeclaration fmt names)

@@ -116,8 +116,7 @@ const LABEL = ({ disabled, label }: LABELprops) => (
 );
 
 export type ButtonKind =
-  undefined | 'default' |
-  'active' | 'primary' | 'warning' | 'positive' | 'negative';
+  'default' | 'active' | 'primary' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps {
   /** Text of the label. Prepend to other children elements. */
@@ -451,7 +450,7 @@ export interface RadioGroupProps<A> {
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
   /** [[Radio]] Buttons. */
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**
@@ -522,8 +521,8 @@ export interface SelectProps {
   className?: string;
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
-  /** Shall be [[Item]] elements. */
-  children: any;
+  /** Shall be standard `<option/>` and `<optgroup/>` elements. */
+  children?: React.ReactNode;
 }
 
 /**

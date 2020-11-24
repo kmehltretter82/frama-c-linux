@@ -6,7 +6,7 @@
   "author": "Loïc Correnson <loic.correnson@cea.fr>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint --ext .ts,.tsx --format=stylish ./src",
+    "lint": "eslint --ext .ts,.tsx --format=compact ./src",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "yarn run typecheck -- --watch",
     "build": "tsc"

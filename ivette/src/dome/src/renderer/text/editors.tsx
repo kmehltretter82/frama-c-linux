@@ -146,7 +146,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
       // Binding events to view
       this.codeMirror.on('update', this.handleUpdate);
       this.codeMirror.on('keyHandled', this.handleKey);
-      Dome.on('dome.update', this.refresh);
+      Dome.update.on(this.refresh);
       // Auto refresh
       this.refreshPolling = setInterval(this.autoRefresh, 250);
       this.handleUpdate();
@@ -156,7 +156,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
         clearInterval(this.refreshPolling);
         this.refreshPolling = undefined;
       }
-      Dome.off('dome.update', this.refresh);
+      Dome.update.off(this.refresh);
       const { buffer } = this.props;
       if (this.codeMirror && buffer) {
         buffer.unlink(this.codeMirror);

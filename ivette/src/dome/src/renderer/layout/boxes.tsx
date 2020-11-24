@@ -166,7 +166,7 @@ export interface FolderProps {
   /** Contents left margin (in pixels, defaults to 18). */
   indent?: number;
   /** Children JSX elements. */
-  children: any;
+  children?: React.ReactNode;
 }
 
 /**
@@ -180,12 +180,12 @@ export const Folder = (props: FolderProps) => {
     indent = 18,
     label, title, children,
   } = props;
-  const [unfold, onClick] = Dome.useSwitch(settings, defaultUnfold);
+  const [unfold, flip] = Dome.useFlipSettings(settings, defaultUnfold);
   const icon = unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
-  const display = unfold ? 'none' : 'block';
+  const display = unfold ? 'block' : 'none';
   return (
     <Vpack>
-      <Hpack onClick={onClick}>
+      <Hpack onClick={flip}>
         <Title icon={icon} label={label} title={title} />
       </Hpack>
       <Vpack style={{ display, marginLeft: indent }}>

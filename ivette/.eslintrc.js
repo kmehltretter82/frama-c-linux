@@ -17,7 +17,7 @@ module.exports = {
   },
   settings: {
     // Electron is in devDependencies because of its special build system
-    "import/core-modules": [ "electron" ]
+    "import/core-modules": [ 'electron', 'react-hot-loader' ]
   },
   rules: {
     // Do not enforce a displayName
@@ -102,7 +102,7 @@ module.exports = {
     "default-case": "off",
     "consistent-return": "off",
     // Allow modify properties of object passed in parameter
-    "no-param-reassign": "error", //[ "error", { "props": false } ],
+    "no-param-reassign": [ "error", { "props": false } ],
     // Disallow the use of var in favor of let and const
     "no-var": "error",
     // Do not favor default import

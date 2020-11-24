@@ -21,17 +21,18 @@ module.exports = {
     rules: [
       { test: /\.css$/, use: [ 'css-loader' ] },
       { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
-    ]
+    ],
+    strictExportPresence: true
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      'api':          path.resolve( __dirname , 'api' ),
+      'frama-c/api':  path.resolve( __dirname , 'api/generated' ),
       'frama-c':      path.resolve( __dirname , 'src/frama-c' ),
       '@plugins':     path.resolve( __dirname , 'src/plugins' ),
       'dome/misc':    path.resolve( DOME , 'src/misc' ),
-      'dome/system':  path.resolve( DOME , 'src/misc/system.js' ),
-      'dome$':        path.resolve( DOME , 'src/renderer/dome.js' ),
+      'dome/system':  path.resolve( DOME , 'src/misc/system.ts' ),
+      'dome$':        path.resolve( DOME , 'src/renderer/dome.tsx' ),
       'dome':         path.resolve( DOME , 'src/renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }

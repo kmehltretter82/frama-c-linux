@@ -6,7 +6,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
-import { Splitter } from 'dome/layout/splitters';
+import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
 
@@ -57,14 +57,10 @@ const HistorySelectionControls = () => {
 // --------------------------------------------------------------------------
 
 export default (() => {
-  const [sidebar, flipSidebar] = Dome.useSwitch(
-    'frama-c.sidebar.unfold',
-    true,
-  );
-  const [viewbar, flipViewbar] = Dome.useSwitch(
-    'frama-c.viewbar.unfold',
-    true,
-  );
+  const [sidebar, flipSidebar] =
+    Dome.useFlipSettings('frama-c.sidebar.unfold', true);
+  const [viewbar, flipViewbar] =
+    Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
   return (
     <Vfill>
@@ -85,7 +81,7 @@ export default (() => {
           onClick={flipViewbar}
         />
       </Toolbar.ToolBar>
-      <Splitter dir="LEFT" settings="frame-c.sidebar.position" unfold={sidebar}>
+      <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
           <Globals key="globals" />
@@ -125,7 +121,7 @@ export default (() => {
             <Values />
           </Group>
         </LabView>
-      </Splitter>
+      </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
         <Toolbar.Filler />

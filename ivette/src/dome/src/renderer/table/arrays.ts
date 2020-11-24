@@ -109,7 +109,6 @@ export class ArrayModel<Key, Row>
   }
 
   // Lazily compute table ; modifies packed entries in place
-  /* eslint-disable no-param-reassign */
   protected rebuild(): PACK<Key, Row>[] {
     const current = this.table;
     let filtered = 0;
@@ -133,7 +132,6 @@ export class ArrayModel<Key, Row>
     this.filtered = filtered;
     return table;
   }
-  /* eslint-enable no-param-reassign */
 
   // --------------------------------------------------------------------------
   // --- Proxy

@@ -5,7 +5,7 @@ import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import * as API from 'api/plugins/dive';
+import * as API from 'frama-c/api/plugins/dive';
 
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
@@ -500,9 +500,10 @@ const GraphView = () => {
   // Hooks
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
-  const [lock, flipLock] = Dome.useSwitch('dive.lock', false);
-  const [selectionMode, flipSelectionMode] =
-    Dome.useGlobalSetting('dive.selectionMode', 'follow');
+  const [lock, flipLock] =
+    Dome.useFlipSettings('dive.lock');
+  const [selectionMode, setSelectionMode] =
+    Dome.useStringSettings('dive.selectionMode', 'follow');
 
   function setCy(cy: Cytoscape.Core) {
     if (cy !== dive.cy)
@@ -548,13 +549,13 @@ const GraphView = () => {
   };
 
   // Selection mode
-  const selectMode = (id?: boolean) => id && flipSelectionMode(id);
+  const selectMode = (id?: string) => id && setSelectionMode(id);
   const modes = [
     { id: 'follow', label: 'Follow selection' },
     { id: 'add', label: 'Add selection to the graph' },
   ];
   const checkMode =
-    (item: { id: string }) => (
+    (item: { id: string; label: string }) => (
       { checked: item.id === selectionMode, ...item }
     );
   const modeMenu = () => {

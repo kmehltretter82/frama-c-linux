@@ -191,11 +191,11 @@ src/main/index.js: $(DOME)/template/update.sh $(DOME)/template/main.js
 
 ifndef DOME_CUSTOM_ENTRIES
 
-# dome-templ: src/renderer/Application.js
-# src/renderer/Application.js:
-# 	@echo "[Dome] creating $@ from template"
-# 	@mkdir -p src/renderer
-# 	@cp -f $(DOME)/template/Application.js $@
+dome-templ: src/renderer/Application.js
+src/renderer/Application.js:
+	@echo "[Dome] creating $@ from template"
+	@mkdir -p src/renderer
+	@cp -f $(DOME)/template/Application.js $@
 
 dome-templ: src/renderer/Preferences.js
 src/renderer/Preferences.js:

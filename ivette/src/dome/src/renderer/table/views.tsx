@@ -11,6 +11,8 @@ import React, { ReactNode } from 'react';
 import { forEach, debounce, throttle } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
 import {
   AutoSizer, Size,
@@ -153,7 +155,7 @@ export interface TableProps<Key, Row> {
   /** Fallback for rendering an empty table. */
   renderEmpty?: () => null | JSX.Element;
   /** Shall only contains `<Column<Row> … />` elements. */
-  children?: any;
+  children?: React.ReactElement | React.ReactElement[];
 }
 
 // --------------------------------------------------------------------------
@@ -265,12 +267,15 @@ function makeDataRenderer(
 // --- Table Settings
 // --------------------------------------------------------------------------
 
-type ColSettings<A> = { [id: string]: undefined | null | A };
-
 type TableSettings = {
-  resize?: ColSettings<number>;
-  visible?: ColSettings<boolean>;
+  resize?: Json.dict<number>;
+  visible?: Json.dict<boolean>;
 };
+
+const jTableSettings = Json.jObject({
+  resize: Json.jDict(Json.jNumber),
+  visible: Json.jDict(Json.jBoolean),
+});
 
 // --------------------------------------------------------------------------
 // --- Table State
@@ -316,7 +321,6 @@ class TableState<Key, Row> {
     this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
-    this.clearSettings = this.clearSettings.bind(this);
     this.rebuild = debounce(this.rebuild.bind(this), 5);
     this.rowGetter = makeRowGetter();
   }
@@ -394,27 +398,21 @@ class TableState<Key, Row> {
 
   // --- Table settings
 
-  clearSettings() {
-    this.resize.clear();
-    this.visible.clear();
-    this.forceUpdate();
-  }
-
   updateSettings() {
     const userSettings = this.settings;
     if (userSettings) {
-      const cws: ColSettings<number> = {};
-      const cvs: ColSettings<boolean> = {};
+      const cws: Json.dict<number> = {};
+      const cvs: Json.dict<boolean> = {};
       const { resize } = this;
       const { visible } = this;
       this.columns.forEach(({ id }) => {
         const cw = resize.get(id);
         const cv = visible.get(id);
-        cws[id] = cw === undefined ? null : cw;
-        cvs[id] = cv === undefined ? null : cv;
+        if (cw) cws[id] = cw;
+        if (cv) cvs[id] = cv;
       });
       const theSettings: TableSettings = { resize: cws, visible: cvs };
-      Dome.setWindowSetting(userSettings, theSettings);
+      Settings.setWindowSettings(userSettings, theSettings);
     }
     this.forceUpdate();
   }
@@ -427,7 +425,7 @@ class TableState<Key, Row> {
       resize.clear();
       visible.clear();
       const theSettings: undefined | TableSettings =
-        Dome.getWindowSetting(settings);
+        Settings.getWindowSettings(settings, jTableSettings, undefined);
       if (theSettings) {
         forEach(theSettings.resize, (cw, cid) => {
           if (typeof cw === 'number') this.resize.set(cid, cw);
@@ -707,7 +705,7 @@ export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
 function spawnIndex(
   state: TableState<any, any>,
   path: number[],
-  children: any,
+  children: React.ReactElement | React.ReactElement[],
 ) {
   const indexChild = (elt: React.ReactElement, k: number) => (
     <ColumnContext.Provider value={{ state, path, index: k }}>
@@ -715,6 +713,11 @@ function spawnIndex(
     </ColumnContext.Provider>
   );
   return <>{React.Children.map(children, indexChild)}</>;
+}
+
+export interface ColumnGroupProps {
+  index?: index;
+  children?: React.ReactElement | React.ReactElement[];
 }
 
 /** Column Groups.
@@ -760,12 +763,13 @@ function spawnIndex(
    this implicit root column group, just pack your columns inside a classical
    React fragment: `<Table … ><>{children}</></Table>`.
  */
-export function ColumnGroup(props: { index?: index; children: any }) {
+export function ColumnGroup(props: ColumnGroupProps) {
   const context = React.useContext(ColumnContext);
   if (!context) return null;
   const { state, path, index: defaultIndex } = context;
   const newPath = path.concat(props.index ?? defaultIndex);
-  return spawnIndex(state, newPath, props.children);
+  const { children } = props;
+  return children ? spawnIndex(state, newPath, children) : null;
 }
 
 // --------------------------------------------------------------------------
@@ -1018,13 +1022,11 @@ function makeTable<Key, Row>(
   const columns = makeColumns(state, cprops);
   const resizers = makeResizers(state, cprops);
 
-  /* eslint-disable no-param-reassign */
   state.rowCount = rowCount;
   if (state.width !== width) {
     state.width = width;
     setImmediate(state.forceUpdate);
   }
-  /* eslint-enable no-param-reassign */
 
   return (
     <div onKeyDown={state.onKeyDown}>
@@ -1106,11 +1108,12 @@ export function Table<Key, Row>(props: TableProps<Key, Row>) {
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
-  Dome.useEvent('dome.defaults', state.clearSettings);
+  Settings.useGlobalSettingsEvent(state.importSettings);
+  const columns = props.children ?? [];
   return (
     <div className="dome-xTable">
       <React.Fragment key="columns">
-        {spawnIndex(state, [], props.children)}
+        {spawnIndex(state, [], columns)}
       </React.Fragment>
       <AutoSizer key="table">
         {(size: Size) => makeTable(props, state, size)}

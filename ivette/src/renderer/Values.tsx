@@ -5,8 +5,8 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 import * as Json from 'dome/data/json';
-import * as Eva from 'api/plugins/eva/values';
-import * as Ast from 'api/kernel/ast';
+import * as Eva from 'frama-c/api/plugins/eva/values';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Compare from 'dome/data/compare';
 
 import { Table, Column } from 'dome/table/views';

@@ -12,19 +12,23 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { Order } from 'dome/data/compare';
-import * as GlobalStates from 'dome/data/states';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import { useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Server from './server';
 
-const PROJECT = 'frama-c.project';
-const STATE_PREFIX = 'frama-c.state.';
+const PROJECT = new Dome.Event('frama-c.project');
+class STATE extends Dome.Event {
+  constructor(id: string) {
+    super(`frama-c.state.${id}`);
+  }
+}
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
 // --------------------------------------------------------------------------
 
-const PP = new Dome.PP('States');
+const D = new Dome.Debug('States');
 
 // --------------------------------------------------------------------------
 // --- Synchronized Current Project
@@ -42,15 +46,15 @@ Server.onReady(async () => {
     };
     const current: { id?: string } = await Server.send(sr, null);
     currentProject = current.id;
-    Dome.emit(PROJECT);
+    PROJECT.emit();
   } catch (error) {
-    PP.error(`Fail to retrieve the current project. ${error.toString()}`);
+    D.error(`Fail to retrieve the current project. ${error.toString()}`);
   }
 });
 
 Server.onShutdown(() => {
   currentProject = '';
-  Dome.emit(PROJECT);
+  PROJECT.emit();
 });
 
 // --------------------------------------------------------------------------
@@ -85,9 +89,9 @@ export async function setProject(project: string) {
       };
       await Server.send(sr, project);
       currentProject = project;
-      Dome.emit(PROJECT);
+      PROJECT.emit();
     } catch (error) {
-      PP.error(`Fail to set the current project. ${error.toString()}`);
+      D.error(`Fail to set the current project. ${error.toString()}`);
     }
   }
 }
@@ -133,7 +137,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         update(r);
       } catch (error) {
-        PP.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
+        D.error(`Fail in useRequest '${rq.name}'. ${error.toString()}`);
         update(options.onError);
       }
     } else {
@@ -221,20 +225,20 @@ interface Handler<A> {
 
 // shared for all projects
 class SyncState<A> {
-  UPDATE: string;
+  UPDATE: Dome.Event;
   handler: Handler<A>;
   upToDate: boolean;
   value?: A;
 
   constructor(h: Handler<A>) {
     this.handler = h;
-    this.UPDATE = STATE_PREFIX + h.name;
+    this.UPDATE = new STATE(h.name);
     this.upToDate = false;
     this.value = undefined;
     this.update = this.update.bind(this);
     this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
-    Dome.on(PROJECT, this.update);
+    PROJECT.on(this.update);
   }
 
   getValue() {
@@ -250,9 +254,9 @@ class SyncState<A> {
       this.value = v;
       const setter = this.handler.getter;
       if (setter) await Server.send(setter, v);
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -264,9 +268,9 @@ class SyncState<A> {
       this.upToDate = true;
       const v = await Server.send(this.handler.getter, null);
       this.value = v;
-      Dome.emit(this.UPDATE);
+      this.UPDATE.emit();
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -309,7 +313,7 @@ export function useSyncState<A>(
 /** Synchronization with a (projectified) server value. */
 export function useSyncValue<A>(va: Value<A>): A | undefined {
   const s = getSyncState(va);
-  Dome.useUpdate(s.update);
+  Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
   return s.getValue();
 }
@@ -359,7 +363,7 @@ class SyncArray<K, A> {
       } while (pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to retrieve the value of syncArray '${this.handler.name}.`,
         `${error.toString()}`,
       );
@@ -378,7 +382,7 @@ class SyncArray<K, A> {
         this.fetch();
       }
     } catch (error) {
-      PP.error(
+      D.error(
         `Fail to set reload of syncArray '${this.handler.name}'.`,
         `${error.toString()}`,
       );
@@ -475,7 +479,7 @@ export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
 
 /** A selection of multiple locations. */
 export interface MultipleSelection {
-  /** The index of the current selected location in [[possibleSelections]]. */
+  /** The index of the current selected location in [[allSelections]]. */
   index: number;
   /** All locations forming a multiple selection. */
   allSelections: Location[];
@@ -685,12 +689,12 @@ const emptySelection = {
   },
 };
 
-const GlobalSelection = new GlobalStates.State<Selection>(emptySelection);
+const GlobalSelection = new GlobalState<Selection>(emptySelection);
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = GlobalStates.useState(GlobalSelection);
+  const [selection, setSelection] = useGlobalState(GlobalSelection);
 
   function update(action: SelectionActions) {
     const nextSelection = reducer(selection, action);

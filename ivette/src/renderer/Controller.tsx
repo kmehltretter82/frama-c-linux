@@ -4,6 +4,8 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 
 import { Button as ToolButton, ButtonGroup, Space } from 'dome/frame/toolbars';
 import { LED, LEDstatus, IconButton } from 'dome/controls/buttons';
@@ -96,9 +98,11 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 
 let reloadCommand: string | undefined;
 
-Dome.onReload(() => {
-  const hst = Dome.getWindowSetting('Controller.history');
-  reloadCommand = Array.isArray(hst) && hst[0];
+Dome.reload.on(() => {
+  const [lastCmd] = Settings.getLocalStorage(
+    'Controller.history', Json.jList(Json.jString), [],
+  );
+  reloadCommand = lastCmd;
 });
 
 Dome.onCommand((argv: string[], cwd: string) => {
@@ -169,14 +173,20 @@ const editor = new RichTextBuffer();
 const RenderConsole = () => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
-  const [history, setHistory] = Dome.useState('Controller.history', []);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
+  const [history, setHistory] = Settings.useLocalStorage(
+    'Controller.history', Json.jList(Json.jString), [],
+  );
 
-  Dome.useEmitter(editor, 'change', () => {
-    const cmd = editor.getValue().trim();
-    setEmpty(cmd === '');
-    setNoTrash(cursor === 0 && history.length === 1 && cmd === history[0]);
+  React.useEffect(() => {
+    const callback = () => {
+      const cmd = editor.getValue().trim();
+      setEmpty(cmd === '');
+      setNoTrash(noTrash && cmd === history[0]);
+    };
+    editor.on('change', callback);
+    return () => { editor.off('change', callback); };
   });
 
   const doReload = () => {

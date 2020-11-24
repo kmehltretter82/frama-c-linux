@@ -11,7 +11,10 @@
 import { DEVEL } from 'dome/system';
 
 export type json =
-  undefined | null | number | string | json[] | { [key: string]: json };
+  undefined | null | boolean | number | string |
+  json[] | { [key: string]: json };
+
+export type jobject = { [key: string]: json };
 
 /**
    Parse without _revivals_.
@@ -82,6 +85,11 @@ export const jNull: Safe<undefined> = () => undefined;
 
 /** Identity. */
 export const jAny: Safe<json> = (js: json) => js;
+
+/** JSON Object. */
+export const jObj: Loose<jobject> = (js: json) => (
+  typeof js === 'object' && !Array.isArray(js) && js !== null ? js : undefined
+);
 
 /** Primitive JSON number or `undefined`. */
 export const jNumber: Loose<number> = (js: json) => (

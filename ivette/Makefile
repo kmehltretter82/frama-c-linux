@@ -5,6 +5,7 @@ DOME_ARGS=--command $$(dirname $$0)/../../bin/frama-c
 DOME_DEV=-server-debug 1
 DOME_CLI=./bin/frama-c-gui
 DOME_API=./src/frama-c
+DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
@@ -21,10 +22,10 @@ lint: dome-pkg dome-templ
 	yarn run typecheck
 	yarn run lint
 
-fixlint: dome-pkg dome-templ
-	@echo "[Ivette] running typechecker & linter (fix mode)"
+tsc: dome-pkg dome-templ
+	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
 	yarn run typecheck
-	yarn run lint --fix
+	yarn run lint --fix --cache --cache-location .eslint-cache
 
 # --------------------------------------------------------------------------
 # --- Frama-C API

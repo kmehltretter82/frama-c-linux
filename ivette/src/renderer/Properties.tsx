@@ -5,162 +5,173 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import * as Dome from 'dome';
-import { key } from 'dome/data/json';
+import * as Json from 'dome/data/json';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
+import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
-import { IconButton } from 'dome/controls/buttons';
+import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar, Component } from 'frama-c/LabViews';
-import { Vfill } from 'dome/layout/boxes';
-import { Splitter } from 'dome/layout/splitters';
-import { Form, Section, FieldCheckbox } from 'dome/layout/forms';
+import { Scroll, Folder } from 'dome/layout/boxes';
 
-import { source as SourceLoc } from 'api/kernel/services';
-import { statusData as Property } from 'api/kernel/properties';
-import * as Properties from 'api/kernel/properties';
+import { RSplit } from 'dome/layout/splitters';
+
+import { source as SourceLoc } from 'frama-c/api/kernel/services';
+import { statusData as Property } from 'frama-c/api/kernel/properties';
+import * as Properties from 'frama-c/api/kernel/properties';
 
 // --------------------------------------------------------------------------
 // --- Filters
 // --------------------------------------------------------------------------
 
-const defaultStatusFilter =
-{
-  valid: true,
-  valid_hyp: true,
-  unknown: true,
-  invalid: true,
-  invalid_hyp: true,
-  considered_valid: false,
-  untried: false,
-  inconsistent: true,
-};
-
-const defaultKindFilter =
-{
-  assert: true,
-  invariant: true,
-  variant: true,
-  requires: true,
-  ensures: true,
-  instance: true,
-  assumes: true,
-  assigns: true,
-  from: true,
-  allocates: true,
-  behavior: false,
-  reachable: false,
-  axiomatic: true,
-  pragma: true,
-  others: true,
-};
-
-const defaultAlarmsFilter =
-{
-  alarms: true, // show properties that are alarms
-  others: true, // show properties that are not alarms
-  overflow: true,
-  division_by_zero: true,
-  mem_access: true,
-  index_bound: true,
-  pointer_value: true,
-  shift: true,
-  ptr_comparison: true,
-  differing_blocks: true,
-  separation: true,
-  overlap: true,
-  initialization: true,
-  dangling_pointer: true,
-  special_float: true,
-  float_to_int: true,
-  function_pointer: true,
-  union_initialization: true,
-  bool_value: true,
-};
-
-const defaultFilter =
-{
+const DEFAULTS: { [key: string]: boolean } = {
   currentFunction: false,
-  status: defaultStatusFilter,
-  kind: defaultKindFilter,
-  alarms: defaultAlarmsFilter,
+  'status.valid': true,
+  'status.valid_hyp': true,
+  'status.unknown': true,
+  'status.invalid': true,
+  'status.invalid_hyp': true,
+  'status.considered_valid': false,
+  'status.untried': false,
+  'status.inconsistent': true,
+  'kind.assert': true,
+  'kind.invariant': true,
+  'kind.variant': true,
+  'kind.requires': true,
+  'kind.ensures': true,
+  'kind.instance': true,
+  'kind.assumes': true,
+  'kind.assigns': true,
+  'kind.froms': true,
+  'kind.allocates': true,
+  'kind.behavior': false,
+  'kind.reachable': false,
+  'kind.axiomatic': true,
+  'kind.pragma': true,
+  'kind.others': true,
+  'alarms.alarms': true, // show properties that are alarms
+  'alarms.others': true, // show properties that are not alarms
+  'alarms.overflow': true,
+  'alarms.division_by_zero': true,
+  'alarms.mem_access': true,
+  'alarms.index_bound': true,
+  'alarms.pointer_value': true,
+  'alarms.shift': true,
+  'alarms.ptr_comparison': true,
+  'alarms.differing_blocks': true,
+  'alarms.separation': true,
+  'alarms.overlap': true,
+  'alarms.initialization': true,
+  'alarms.dangling_pointer': true,
+  'alarms.special_float': true,
+  'alarms.float_to_int': true,
+  'alarms.function_pointer': true,
+  'alarms.union_initialization': true,
+  'alarms.bool_value': true,
 };
+
+function filter(path: string) {
+  const defaultValue = DEFAULTS[path] ?? true;
+  return Settings.getWindowSettings(
+    `ivette.properties.filter.${path}`,
+    Json.jBoolean,
+    defaultValue,
+  );
+}
+
+function useFilter(path: string) {
+  const defaultValue = DEFAULTS[path] ?? true;
+  return Dome.useFlipSettings(
+    `ivette.properties.filter.${path}`,
+    defaultValue,
+  );
+}
 
 function filterStatus(
-  f: typeof defaultStatusFilter,
   status: Properties.propStatus,
 ) {
   switch (status) {
     case 'valid':
-    case 'valid_but_dead': return f.valid;
-    case 'valid_under_hyp': return f.valid_hyp;
+    case 'valid_but_dead':
+      return filter('status.valid');
+    case 'valid_under_hyp':
+      return filter('status.valid_hyp');
     case 'invalid':
-    case 'invalid_but_dead': return f.invalid;
-    case 'invalid_under_hyp': return f.invalid_hyp;
+    case 'invalid_but_dead':
+      return filter('status.invalid');
+    case 'invalid_under_hyp':
+      return filter('status.invalid_hyp');
+    case 'inconsistent':
+      return filter('inconsistent');
     case 'unknown':
-    case 'unknown_but_dead': return f.unknown;
-    case 'considered_valid': return f.considered_valid;
-    case 'never_tried': return f.untried;
-    case 'inconsistent': return f.inconsistent;
-    default: return true;
+    case 'unknown_but_dead':
+      return filter('status.unknown');
+    case 'considered_valid':
+      return filter('considered_valid');
+    case 'never_tried':
+      return filter('status.untried');
+    default:
+      return true;
   }
 }
 
 function filterKind(
-  f: typeof defaultKindFilter,
   kind: Properties.propKind,
 ) {
   switch (kind) {
-    case 'assert': return f.assert;
-    case 'loop_invariant':
-      return f.invariant;
-    case 'loop_variant': return f.variant;
-    case 'requires': return f.requires;
-    case 'ensures': return f.ensures;
-    case 'instance': return f.instance;
-    case 'assigns': return f.assigns;
-    case 'froms': return f.from;
-    case 'allocates': return f.allocates;
-    case 'behavior': return f.behavior;
-    case 'reachable': return f.reachable;
-    case 'axiomatic': return f.axiomatic;
-    case 'loop_pragma': return f.pragma;
-    default: return f.others;
+    case 'assert': return filter('kind.assert');
+    case 'loop_invariant': return filter('kind.invariant');
+    case 'loop_variant': return filter('kind.variant');
+    case 'requires': return filter('kind.requires');
+    case 'ensures': return filter('kind.ensures');
+    case 'instance': return filter('kind.instance');
+    case 'assigns': return filter('kind.assigns');
+    case 'froms': return filter('kind.froms');
+    case 'allocates': return filter('kind.allocates');
+    case 'behavior': return filter('kind.behavior');
+    case 'reachable': return filter('kind.reachable');
+    case 'axiomatic': return filter('kind.axiomatic');
+    case 'loop_pragma': return filter('kind.pragma');
+    default: return filter('kind.others');
   }
 }
 
-function filterAlarm(f: typeof defaultAlarmsFilter, alarm: string) {
-  switch (alarm) {
-    case 'overflow': return f.overflow;
-    case 'division_by_zero': return f.division_by_zero;
-    case 'mem_access': return f.mem_access;
-    case 'index_bound': return f.index_bound;
-    case 'pointer_value': return f.pointer_value;
-    case 'shift': return f.shift;
-    case 'ptr_comparison': return f.ptr_comparison;
-    case 'differing_blocks': return f.differing_blocks;
-    case 'separation': return f.separation;
-    case 'overlap': return f.overlap;
-    case 'initialization': return f.initialization;
-    case 'dangling_pointer': return f.dangling_pointer;
-    case 'is_nan_or_infinite':
-    case 'is_nan': return f.special_float;
-    case 'float_to_int': return f.float_to_int;
-    case 'function_pointer': return f.function_pointer;
-    case 'initialization_of_union': return f.union_initialization;
-    case 'bool_value': return f.bool_value;
-    default: return true;
+function filterAlarm(alarm: string | undefined) {
+  if (alarm) {
+    if (!filter('alarms.alarms')) return false;
+    switch (alarm) {
+      case 'overflow': return filter('alarms.overflow');
+      case 'division_by_zero': return filter('alarms.division_by_zero');
+      case 'mem_access': return filter('alarms.mem_access');
+      case 'index_bound': return filter('alarms.index_bound');
+      case 'pointer_value': return filter('alarms.pointer_value');
+      case 'shift': return filter('alarms.shift');
+      case 'ptr_comparison': return filter('alarms.ptr_comparison');
+      case 'differing_blocks': return filter('alarms.differing_blocks');
+      case 'separation': return filter('alarms.separation');
+      case 'overlap': return filter('alarms.overlap');
+      case 'initialization': return filter('alarms.initialization');
+      case 'dangling_pointer': return filter('alarms.dangling_pointer');
+      case 'is_nan_or_infinite':
+      case 'is_nan': return filter('alarms.special_float');
+      case 'float_to_int': return filter('alarms.float_to_int');
+      case 'function_pointer': return filter('alarms.function_pointer');
+      case 'initialization_of_union':
+        return filter('alarms.union_initialization');
+      case 'bool_value': return filter('alarms.bool_value');
+      default: return false;
+    }
   }
+  return filter('alarms.others');
 }
 
-function filterProperty(f: typeof defaultFilter, item: Property) {
-  return filterStatus(f.status, item.status)
-    && filterKind(f.kind, item.kind)
-    && ((item.alarm && f.alarms.alarms)
-      || (!item.alarm && f.alarms.others))
-    && (!item.alarm || filterAlarm(f.alarms, item.alarm));
+function filterProperty(p: Property) {
+  return filterStatus(p.status)
+    && filterKind(p.kind)
+    && filterAlarm(p.alarm);
 }
 
 // --------------------------------------------------------------------------
@@ -239,10 +250,9 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
+class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
 
   private filterFun?: string;
-  private filterProp = _.cloneDeep(defaultFilter);
 
   constructor() {
     super((p: Property) => p.key);
@@ -251,23 +261,17 @@ class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
     this.setFilter(this.filterItem.bind(this));
   }
 
-  getFilterProps() {
-    return this.filterProp;
-  }
-
   setFilterFunction(kf?: string) {
     this.filterFun = kf;
-    if (this.filterProp.currentFunction)
-      this.reload();
+    if (filter('currentFunction')) this.reload();
   }
 
-  filterItem(item: Property) {
+  filterItem(prop: Property) {
+    const kf = prop.function;
     const cf = this.filterFun;
-    const cp = this.filterProp;
-    return (
-      (!cp.currentFunction || cf === undefined || cf === item.function) &&
-      filterProperty(cp, item)
-    );
+    const filteringFun = cf && filter('currentFunction');
+    const filterFunction = filteringFun ? kf === cf : true;
+    return filterFunction && filterProperty(prop);
   }
 
 }
@@ -276,70 +280,101 @@ class PropertyModel extends Arrays.CompactModel<key<'#status'>, Property> {
 // --- Property Filter Form
 // -------------------------------------------------------------------------
 
-const PropertyFilter =
-  (props: { model: PropertyModel }) => (
-    <Vfill>
-      <Form
-        value={props.model.getFilterProps()}
-        onChange={props.model.reload}
-      >
-        <FieldCheckbox label="Current function" path="currentFunction" />
-        <Section label="Status" unfold path="status">
-          <FieldCheckbox label="Valid" path="valid" />
-          <FieldCheckbox label="Valid under hyp." path="valid_hyp" />
-          <FieldCheckbox label="Unknown" path="unknown" />
-          <FieldCheckbox label="Invalid" path="invalid" />
-          <FieldCheckbox label="Invalid under hyp." path="invalid_hyp" />
-          <FieldCheckbox label="Considered valid" path="considered_valid" />
-          <FieldCheckbox label="Untried" path="untried" />
-          <FieldCheckbox label="Dead" path="dead" />
-          <FieldCheckbox label="Inconsistent" path="inconsistent" />
-        </Section>
-        <Section label="Property kind" path="kind">
-          <FieldCheckbox label="Assertions" path="assert" />
-          <FieldCheckbox label="Invariants" path="invariant" />
-          <FieldCheckbox label="Variants" path="variant" />
-          <FieldCheckbox label="Preconditions" path="requires" />
-          <FieldCheckbox label="Postconditions" path="ensures" />
-          <FieldCheckbox label="Instance" path="instance" />
-          <FieldCheckbox label="Assigns clauses" path="assigns" />
-          <FieldCheckbox label="From clauses" path="from" />
-          <FieldCheckbox label="Allocates" path="allocates" />
-          <FieldCheckbox label="Behaviors" path="behavior" />
-          <FieldCheckbox label="Reachables" path="reachable" />
-          <FieldCheckbox label="Axiomatics" path="axiomatic" />
-          <FieldCheckbox label="Pragma" path="pragma" />
-          <FieldCheckbox label="Others" path="others" />
-        </Section>
-        <Section label="Alarms" path="alarms">
-          <FieldCheckbox label="Alarms" path="alarms" />
-          <FieldCheckbox label="Others" path="others" />
-        </Section>
-        <Section label="Alarms kind" path="alarms">
-          <FieldCheckbox label="Overflows" path="overflow" />
-          <FieldCheckbox label="Divisions by zero" path="division_by_zero" />
-          <FieldCheckbox label="Shifts" path="shift" />
-          <FieldCheckbox label="Special floats" path="special_float" />
-          <FieldCheckbox label="Float to int" path="float_to_int" />
-          <FieldCheckbox label="_Bool values" path="bool_value" />
-          <FieldCheckbox label="Memory accesses" path="mem_access" />
-          <FieldCheckbox label="Index bounds" path="index_bound" />
-          <FieldCheckbox label="Initializations" path="initialization" />
-          <FieldCheckbox label="Dangling pointers" path="dangling_pointer" />
-          <FieldCheckbox label="Pointer values" path="pointer_value" />
-          <FieldCheckbox label="Function pointers" path="function_pointer" />
-          <FieldCheckbox label="Pointer comparisons" path="ptr_comparison" />
-          <FieldCheckbox label="Differing blocks" path="differing_blocks" />
-          <FieldCheckbox label="Separations" path="separation" />
-          <FieldCheckbox label="Overlaps" path="overlap" />
-          <FieldCheckbox
-            label="Initialization of unions"
-            path="union_initialization"
-          />
-        </Section>
-      </Form>
-    </Vfill>
+const Reload = new Dome.Event('ivette.properties.reload');
+
+interface SectionProps {
+  label: string;
+  path: string;
+  children: React.ReactNode;
+}
+
+function Section(props: SectionProps) {
+  const settings = `properties-section-${props.path}`;
+  return (
+    <Folder label={props.label} settings={settings}>
+      {props.children}
+    </Folder>
   );
+}
+
+interface CheckFieldProps {
+  label: string;
+  path: string;
+}
+
+function CheckField(props: CheckFieldProps) {
+  const [value, setValue] = useFilter(props.path);
+  const onChange = () => { setValue(); Reload.emit(); };
+  return (
+    <Checkbox
+      style={{ display: 'block' }}
+      label={props.label}
+      value={value}
+      onChange={onChange}
+    />
+  );
+}
+
+/* eslint-disable max-len */
+
+function PropertyFilter() {
+  return (
+    <Scroll>
+      <CheckField label="Current function" path="currentFunction" />
+      <Section label="Status" path="status">
+        <CheckField label="Valid" path="status.valid" />
+        <CheckField label="Valid under hyp." path="status.valid_hyp" />
+        <CheckField label="Unknown" path="status.unknown" />
+        <CheckField label="Invalid" path="status.invalid" />
+        <CheckField label="Invalid under hyp." path="status.invalid_hyp" />
+        <CheckField label="Considered valid" path="status.considered_valid" />
+        <CheckField label="Untried" path="status.untried" />
+        <CheckField label="Inconsistent" path="status.inconsistent" />
+      </Section>
+      <Section label="Property kind" path="kind">
+        <CheckField label="Assertions" path="kind.assert" />
+        <CheckField label="Invariants" path="kind.invariant" />
+        <CheckField label="Variants" path="kind.variant" />
+        <CheckField label="Preconditions" path="kind.requires" />
+        <CheckField label="Postconditions" path="kind.ensures" />
+        <CheckField label="Instance" path="kind.instance" />
+        <CheckField label="Assigns clauses" path="kind.assigns" />
+        <CheckField label="From clauses" path="kind.from" />
+        <CheckField label="Allocates" path="kind.allocates" />
+        <CheckField label="Behaviors" path="kind.behavior" />
+        <CheckField label="Reachables" path="kind.reachable" />
+        <CheckField label="Axiomatics" path="kind.axiomatic" />
+        <CheckField label="Pragma" path="kind.pragma" />
+        <CheckField label="Others" path="kind.others" />
+      </Section>
+      <Section label="Alarms" path="alarms">
+        <CheckField label="Alarms" path="alarms.alarms" />
+        <CheckField label="Others" path="alarms.others" />
+      </Section>
+      <Section label="Alarms kind" path="alarms">
+        <CheckField label="Overflows" path="alarms.overflow" />
+        <CheckField label="Divisions by zero" path="alarms.division_by_zero" />
+        <CheckField label="Shifts" path="alarms.shift" />
+        <CheckField label="Special floats" path="alarms.special_float" />
+        <CheckField label="Float to int" path="alarms.float_to_int" />
+        <CheckField label="_Bool values" path="alarms.bool_value" />
+        <CheckField label="Memory accesses" path="alarms.mem_access" />
+        <CheckField label="Index bounds" path="alarms.index_bound" />
+        <CheckField label="Initializations" path="alarms.initialization" />
+        <CheckField label="Dangling pointers" path="alarms.dangling_pointer" />
+        <CheckField label="Pointer values" path="alarms.pointer_value" />
+        <CheckField label="Function pointers" path="alarms.function_pointer" />
+        <CheckField label="Pointer comparisons" path="alarms.ptr_comparison" />
+        <CheckField label="Differing blocks" path="alarms.differing_blocks" />
+        <CheckField label="Separations" path="alarms.separation" />
+        <CheckField label="Overlaps" path="alarms.overlap" />
+        <CheckField label="Initialization of unions" path="alarms.union_initialization" />
+      </Section>
+    </Scroll>
+  );
+}
+
+/* eslint-enable max-len */
 
 // -------------------------------------------------------------------------
 // --- Property Columns
@@ -438,12 +473,14 @@ const RenderTable = () => {
     model.reload();
   }, [model, data]);
 
-  const [selection, updateSelection] = States.useSelection();
+  const [selection, updateSelection] =
+    States.useSelection();
 
   const [showFilter, flipFilter] =
-    Dome.useSwitch('ivette.properties.showFilter', true);
+    Dome.useFlipSettings('ivette.properties.showFilter');
 
   // Updating the filter
+  Dome.useEvent(Reload, model.reload);
   const selectedFunction = selection?.current?.function;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
@@ -471,7 +508,10 @@ const RenderTable = () => {
           title="Toggle filters panel"
         />
       </TitleBar>
-      <Splitter dir="RIGHT" unfold={showFilter}>
+      <RSplit
+        settings="ivette.properties.filterSplit"
+        unfold={showFilter}
+      >
         <Table<string, Property>
           model={model}
           sorting={model}
@@ -481,8 +521,8 @@ const RenderTable = () => {
         >
           <PropertyColumns />
         </Table>
-        <PropertyFilter model={model} />
-      </Splitter>
+        <PropertyFilter />
+      </RSplit>
     </>
   );
 };

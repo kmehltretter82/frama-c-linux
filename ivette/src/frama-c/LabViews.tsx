@@ -10,19 +10,18 @@
 import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
 import { Catch } from 'dome/errors';
 import { DnD, DragSource } from 'dome/dnd';
 import { SideBar, Section, Item } from 'dome/frame/sidebars';
-import { Splitter } from 'dome/layout/splitters';
+import { RSplit } from 'dome/layout/splitters';
 import * as Grids from 'dome/layout/grids';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
-import {
-  Item as ItemToRender,
-  Render as RenderItem,
-} from 'dome/layout/dispatch';
+import { DefineElement, RenderElement } from 'dome/layout/dispatch';
 
 import './style.css';
 
@@ -36,6 +35,8 @@ class Library {
   collection: {};
   items: any[];
 
+  static update = new Dome.Event('labview.library');
+
   constructor() {
     this.modified = false;
     this.virtual = {};
@@ -48,7 +49,7 @@ class Library {
       this.collection = { ...this.virtual };
       this.items = _.sortBy(this.collection, ['order', 'id']);
       this.modified = false;
-      Dome.emit('labview.library');
+      Library.update.emit();
     }
   }
 
@@ -248,7 +249,7 @@ const TitleContext: any = React.createContext(undefined);
 export const TitleBar = ({ icon, label, title, children }: any) => {
   const context: any = React.useContext(TitleContext);
   return (
-    <ItemToRender id={`labview.title.${context.id}`}>
+    <DefineElement id={`labview.title.${context.id}`}>
       <Label
         className="labview-handle"
         icon={icon}
@@ -256,7 +257,7 @@ export const TitleBar = ({ icon, label, title, children }: any) => {
         title={title || context.title}
       />
       {children}
-    </ItemToRender>
+    </DefineElement>
   );
 };
 
@@ -330,9 +331,9 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
         <Hbox className="labview-titlebar">
           <Hfill>
             <Catch label={id}>
-              <RenderItem id={`labview.title.${id}`}>
+              <RenderElement id={`labview.title.${id}`}>
                 <Label className="labview-handle" label={label} title={title} />
-              </RenderItem>
+              </RenderElement>
             </Catch>
           </Hfill>
           {CLOSING}
@@ -350,8 +351,12 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
 // --------------------------------------------------------------------------
 
 function CustomViews({ settings, shape, setShape, views: libViews }: any) {
-  const [local, setLocal] = Dome.useState(settings, {});
-  const [customs, setCustoms] = Dome.useGlobalSetting(settings, {});
+  const [local, setLocal] = Settings.useWindowSettings(
+    settings, Json.jObj, {},
+  ) as any;
+  const [customs, setCustoms] = Settings.useLocalStorage(
+    'frama-c.labview', Json.jObj, {},
+  );
   const [edited, setEdited]: any = React.useState();
   const triggerDefault = React.useRef();
   const { current, shapes = {} } = local;
@@ -370,7 +375,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
       { id, order, label, title, builtin: true, defaultView, origin };
   });
 
-  _.forEach(customs, (view) => {
+  _.forEach(customs as any, (view) => {
     const { id, order, label = '(Custom View)', title, origin } = view;
     if (id && !theViews[id]) {
       theViews[id] = { id, order, label, title, builtin: false, origin };
@@ -459,7 +464,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     if (edited === id) {
       const RENAMED = (newLabel: string) => {
         if (newLabel) {
-          const custom = customs[id];
+          const custom = Json.jObj(customs[id]) || {};
           if (custom) custom.label = newLabel;
           setCustoms(customs);
         }
@@ -471,11 +476,14 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
           placeholder="View Name"
           autoFocus
           value={label}
+          title={title}
           onChange={RENAMED}
         />
       );
       return (
-        <Item key={id} id={id} icon="DISPLAY" title={title} label={FIELD} />
+        <Item key={id} icon="DISPLAY">
+          {FIELD}
+        </Item>
       );
     }
     const FLAGS = [];
@@ -483,13 +491,12 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
     return (
       <Item
         key={id}
-        id={id}
         icon="DISPLAY"
         label={label}
         title={title}
         selected={id && current === id}
-        onSelection={SELECT}
-        onContextMenu={POPUP}
+        onSelection={() => SELECT(id)}
+        onContextMenu={() => POPUP(id)}
       >
         {FLAGS.map((icn) => (
           <Icon
@@ -511,7 +518,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
   }
 
   return (
-    <Section label="Views">
+    <Section label="Views" defaultUnfold>
       {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
     </Section>
   );
@@ -524,6 +531,7 @@ function CustomViews({ settings, shape, setShape, views: libViews }: any) {
 const DRAGOVERLAY = { className: 'labview-stock' };
 
 function CustomGroup({
+  settings,
   dnd, shape, setDragging,
   id: sectionId,
   title: sectionTitle,
@@ -550,9 +558,14 @@ function CustomGroup({
       </DragSource>
     );
   };
-
   return (
-    <Section id={sectionId} label={sectionLabel} title={sectionTitle}>
+    <Section
+      key={sectionId}
+      settings={settings && `${settings}.${sectionId}`}
+      label={sectionLabel}
+      title={sectionTitle}
+      defaultUnfold={sectionId === 'groups.frama-c'}
+    >
       {components.map(makeComponent)}
     </Section>
   );
@@ -565,7 +578,7 @@ function CustomGroup({
 function CustomizePanel(
   { dnd, settings, library, shape, setShape, setDragging }: any,
 ) {
-  Dome.useUpdate('labview.library');
+  Dome.useUpdate(Library.update);
   const { items } = library;
   const views = getItems(items, 'views');
   const groups = getItems(items, 'groups');
@@ -585,7 +598,7 @@ function CustomizePanel(
   });
 
   return (
-    <SideBar settings={settingFolds}>
+    <SideBar>
       <CustomViews
         key="views"
         settings={settingViews}
@@ -595,6 +608,7 @@ function CustomizePanel(
       />
       {groups.map((g) => (
         <CustomGroup
+          settings={settingFolds}
           key={g.id}
           id={g.id}
           label={g.label}
@@ -633,10 +647,15 @@ export function LabView(props: any) {
   const settingShape = settings && `${settings}.shape`;
   const settingPanel = settings && `${settings}.panel`;
   // Hooks & State
-  Dome.useUpdate('labview.library', 'dome.defaults');
+  Dome.useUpdate(
+    Library.update,
+    Dome.windowSettings,
+    Dome.globalSettings,
+  );
   const dnd = React.useMemo(() => new DnD(), []);
   const lib = React.useMemo(() => new Library(), []);
-  const [shape, setShape] = Dome.useState(settingShape);
+  const [shape, setShape] =
+    Settings.useWindowSettings(settingShape, Json.jAny, undefined);
   const [dragging, setDragging] = React.useState();
   // Preparation
   const onClose =
@@ -653,7 +672,7 @@ export function LabView(props: any) {
       <UseLibrary library={lib}>
         {children}
       </UseLibrary>
-      <Splitter settings={settingSplit} unfold={customize} dir="RIGHT">
+      <RSplit margin={120} settings={settingSplit} unfold={customize}>
         <Grids.GridLayout
           dnd={dnd}
           padding={2}
@@ -671,7 +690,7 @@ export function LabView(props: any) {
           setDragging={setDragging}
           library={lib}
         />
-      </Splitter>
+      </RSplit>
     </>
   );
 }
