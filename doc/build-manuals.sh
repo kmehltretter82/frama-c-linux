@@ -46,7 +46,7 @@ build () {
     MANUAL=${2%.*}-$3.${2##*.}
     cp -f $1 manuals/$MANUAL
     echo "##### $MANUAL copied"
-    ln -srf manuals/$MANUAL manuals/$2
+    
 }
 
 EACSL_DOC=../src/plugins/e-acsl/doc
