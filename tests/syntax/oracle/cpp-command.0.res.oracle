@@ -1,2 +1,2 @@
 [kernel] Parsing tests/syntax/cpp-command.c (with preprocessing)
-[cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [/tmp/FILE.i /tmp/FILE.i /tmp/FILE.i /tmp/FILE.i] [ -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32]
+[cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [TMPDIR/FILE.i TMPDIR/FILE.i TMPDIR/FILE.i TMPDIR/FILE.i] [ -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc]

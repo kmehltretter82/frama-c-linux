@@ -414,6 +414,29 @@ to apply the theorems. Such a strategy is \emph{not} complete in general.
 Typically, $\mathtt{land}(x,y) < 38$ is true whenever both $x$ and $y$ are in range $0\ldots 31$, but this is also true
 in other cases.
 
+\paragraph{Bit-Test Range} Tighten bounds with respect to bits \\
+The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
+to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
+\textsf{Qed} engine has many simplification rules that applies to
+such patterns.
+
+The user selects an expression $\mathtt{bit\_test}(n,k)$ with $k$
+a \emph{constant} integer value greater or equal to 0 and lower than
+128. The tactic uses this test to thighten the bounds of $n$.
+
+$$\TACTIC{\Delta\models\,G}{%
+\begin{array}[t]{ll}
+\Delta,T &\models G \\
+\Delta,F &\models G
+\end{array}} $$
+
+with
+$$\begin{array}[t]{rlcll}
+  T \equiv & \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n & \Rightarrow 2^{k} \leq n) \\
+  F \equiv & \neg \mathtt{bit\_test}(n,k) & \wedge & (0 \leq n < 2^{k+1} & \Rightarrow n < 2^{k})
+  \end{array}
+$$
+
 \paragraph{Bitwise} Decompose equalities over $N$-bits\\
 The use selects an integer equality and a number of bits.
 Providing the two members of the equality are in range $0..2^N-1$,
@@ -430,11 +453,6 @@ where $\sigma$ is the following subsitution:
 \bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
 \right]
 \]
-
-The \lstinline{bit_test(a,b)} function is predefined in \textsf{WP} and is equivalent
-to the \textsf{ACSL} expression \lstinline{(a & (1 << k)) != 0}. The
-\textsf{Qed} engine has many simplification rules that applies to
-such patterns, and the a tactic is good way to reason over bits.
 
 \paragraph{Congruence} Simplify Divisions and Products \\
 This tactic rewrites integer comparisons involving products and divisions.
@@ -577,6 +595,11 @@ Rule for unroll sum:
   \models G[A^{\sum_{i=1}^{k}n_i}\leftarrow \bigoplus_{i=1}^{k} A^{n_i}]
 \end{array}
 }\]
+
+\paragraph{Validity} Unfold validity and range definitions\\
+The user selects a validity expression (\lstinline{valid_rd},
+\lstinline{valid_rw}, \lstinline{invalid} or \lstinline{included}).
+The expression is unfolded to a \textsf{Qed} term.
 
 
 \subsection{Custom Tactics and Strategies}
@@ -940,13 +963,36 @@ weakest precondition calculus.
   and it can generates a large number of verifications for structures
   with many (nested) fields (defaults to \texttt{no}).
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
-  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation.
-  For each call to a function pointer \texttt{fp}
-  in the instruction or block under the annotation,
-  \texttt{fp} is required to belongs to the set \texttt{f1,\ldots,fn} and
-  a case analysis is performed with the contract of each provided function
-  (default is: \texttt{yes}).
+  thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
 \end{description}
+
+\subsubsection{ACSL extension \texttt{@calls}}
+
+The handling of functions pointers is done via the ACSL code annotation
+extension \verb+@calls+. For each call to a function pointer \verb+fp+
+in the instruction or block under the annotation \verb+calls f1,\ldots,fn+,
+\verb+fp+ is required to belongs to the set \verb+f1,\ldots,fn+ and
+a case analysis is performed with the contract of each provided function.
+
+For example:
+
+\begin{lstlisting}[language=c, alsolanguage=acsl]
+/*@ ensures \result == x ; */
+int f1(int x);
+/*@ ensures \result == x+1 ; */
+int f2(int x);
+
+/*@ requires fp == &f1 || fp == &f2 ;
+    ensures POST: \result == 4 || \result == 5; */
+int caller(int (*fp)(int)){
+  //@ calls f1, f2 ;
+  return (*fp)(4);
+}
+\end{lstlisting}
+
+These annotations split post-conditions to the dynamic call into two sub-goals: one for call to \verb+f1+ and
+a second for the call to \verb+f2+. A last goal is generated at the call
+site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 
 \subsection{Smoke Tests}
 

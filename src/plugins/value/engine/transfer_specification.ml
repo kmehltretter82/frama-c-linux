@@ -291,7 +291,7 @@ module Make
           Value_parameters.warning ~current:true ~once:true
             ~wkey:Value_parameters.wkey_garbled_mix
             "The specification of function %a has generated a garbled mix \
-             for assigns clause %a."
+             for %a."
             Kernel_function.pretty kf pp_assign_free_alloc assign
         end
     in

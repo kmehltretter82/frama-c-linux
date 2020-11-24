@@ -158,30 +158,6 @@ else
 	$(CHMOD_RO) $@
 endif
 
-##################
-# Frama-C-config #
-##################
-
-src/kernel_internals/runtime/frama_c_config.ml: src/kernel_internals/runtime/fc_config.ml \
-	src/kernel_internals/runtime/frama_c_config.ml.in Makefile.generating
-	$(PRINT_MAKING) $@
-	$(RM) $@
-	$(ECHO) "module Filepath = struct let add_symbolic_dir _ _ = () end" >> $@
-	$(ECHO) "module Fc_config = struct" >> $@
-	$(CAT) src/kernel_internals/runtime/fc_config.ml >> $@
-	$(ECHO) "end" >> $@
-	$(CAT) src/kernel_internals/runtime/frama_c_config.ml.in >> $@
-	$(CHMOD_RO) $@
-
-GENERATED+= src/kernel_internals/runtime/frama_c_config.ml
-
-bin/fc-config$(EXE): src/kernel_internals/runtime/frama_c_config.ml
-ifeq ($(OCAMLBEST),opt)
-	$(OCAMLOPT) str.cmxa $< -o $@
-else
-	$(OCAMLC) str.cma $< -o $@
-endif
-
 # Merlin #
 
 .PHONY:merlin

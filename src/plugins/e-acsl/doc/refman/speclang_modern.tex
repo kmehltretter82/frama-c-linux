@@ -291,11 +291,6 @@ It is not possible to define logic types introduced by the specification writer
 \end{notimplementedenv}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{String literals}
-\nodiff
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -385,7 +380,7 @@ set of all integers between 0 and 9 and between 20 and 29.
 
 \begin{notimplementedenv}
   Ranges are currently only supported in memory built-ins described in
-  Section~\ref{subsec:memory} and~\ref{sec:dangling}.
+  Section~\ref{subsec:memory},~\ref{sec:initialized} and~\ref{sec:dangling}.
 
 \begin{example}
 The predicate \lstinline|\valid(&t[0 .. 9])| is supported and denotes that
@@ -484,6 +479,7 @@ loop invariants are not inductive.
 \end{example}
 
 \subsubsection{General inductive invariant}
+\label{sec:generalized-invariants}
 
 Syntax of these kinds of invariant is shown Figure~\ref{fig:advancedinvariants}
 \begin{figure}[t]
@@ -725,7 +721,7 @@ predicates which are related to memory location.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Allocation and deallocation}
+\subsection{Dynamic allocation and deallocation}
 \difficultswhy{All these constructs}{the implementation of a memory model}
 \label{sec:alloc-dealloc}
 \nodiff
@@ -852,13 +848,18 @@ same than the one of \acsl.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Undefined values, dangling pointers}
+\section{Initialization and undefined values}
+\label{sec:initialized}
+\nodiff
+
+\difficultwhy{\lstinline|\\initialized|}{the implementation of a memory model}
+
+\section{Dangling pointers}
 \label{sec:dangling}
 \nodiff
 
-\difficultswhy{\lstinline|\\initialized| and
-  \notimplemented{\lstinline|\\dangling|}}{the implementation of a memory
-  model}
+\difficultwhy{\notimplemented{\lstinline|\\dangling|}}{the implementation of a
+  memory model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -867,3 +868,17 @@ same than the one of \acsl.
 \section{Well-typed pointers}
 \label{sec:typedpointers}
 \absentexperimental
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Logic attribute annotations}
+\absentexperimental
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preprocessing for ACSL}
+\nodiff

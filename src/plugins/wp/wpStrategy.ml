@@ -318,6 +318,11 @@ let add_prop_dead_call kf stmt acc_posts acc_exits =
 
 (* -------------------------------------------------------------------------- *)
 
+let from_has_deps = function _, FromAny -> false | _, From _ -> true
+let assigns_has_deps = function
+  | WritesAny -> false
+  | Writes l -> List.exists from_has_deps l
+
 let add_assigns acc kind id a_desc =
   let take_assigns () =
     debug "take %a %a" WpPropId.pp_propid id WpPropId.pp_assigns_desc a_desc;
@@ -334,6 +339,11 @@ let add_assigns acc kind id a_desc =
     | Agoal -> true, {info with a_goal = take_assigns ()}
     | _ -> Wp_parameters.fatal "Assigns prop can only be Hyp or Goal"
   in let acc = { acc with info = info } in
+  if goal && assigns_has_deps a_desc.a_assigns then
+    Wp_parameters.warning
+      ~once: true ~current:false ~wkey:AssignsCompleteness.wkey_pedantic
+      "WP uses \\from to generate precise hypotheses, however their proof is \
+       not supported yet" ;
   if goal then { acc with has_asgn_goal = true} else acc
 
 let add_assigns_any acc kind asgn =

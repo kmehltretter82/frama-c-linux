@@ -44,13 +44,9 @@ Running \eacsl on \texttt{first.i} consists of adding \shortopt{e-acsl} option
 to the \framac command line:
 \begin{shell}
 \$ frama-c -e-acsl first.i
-[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_gmp.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl_mmodel_api.h (with preprocessing)
 [kernel] Parsing first.i (no preprocessing)
 [e-acsl] beginning translation.
-<skip a warning when translating the Frama-C libc>
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
@@ -58,8 +54,8 @@ Even though \texttt{first.i} has already been pre-processed, \eacsl first asks
 the \framac kernel to process and combine it against several header files
 provided by the \eacsl plug-in.  Further \eacsl translates the annotated code
 into a new \framac project named \texttt{e-acsl}\footnote{The notion of
-\emph{project} is explained in Section 8.1 of the \framac user
-manual~\cite{userman}.}. By default, the option \shortopt{e-acsl} does nothing
+  \emph{project} is explained in Section 8.1 of the \framac user
+  manual~\cite{userman}.}. By default, the option \shortopt{e-acsl} does nothing
 more. It is however possible to have a look at the generated code in the
 \framac GUI. This is also possible through the command line thanks to the
 kernel options \shortopt{then-last} and \shortopt{print}. The former
@@ -72,15 +68,15 @@ As you can see, the generated code contains additional type declarations,
 constant declarations and global \acsl annotations not present in the initial
 file \texttt{first.i}. They are part of the \eacsl monitoring library. You can
 safely ignore them for now. The translated \texttt{main} function of
-\texttt{first.i} is displayed at the end. After each \eacsl annotation,
+\texttt{first.i} is displayed at the end. Before each \eacsl annotation,
 a call to \texttt{\_\_e\_acsl\_assert}\codeidx{e\_acsl\_assert} has been added.
 
 \begin{minipage}{\linewidth}
 \begin{ccode}
-  /*@ assert x == 0; */
-  __e_acsl_assert(x == 0,(char *)"Assertion",(char *)"main",(char *)"x == 0",3);
-  /*@ assert x == 1; */
-  __e_acsl_assert(x == 1,(char *)"Assertion",(char *)"main",(char *)"x == 1",4);
+  __e_acsl_assert(x == 0,"Assertion","main","x == 0","first.i",3);
+  /*@ assert x == 0; */ ;
+  __e_acsl_assert(x == 1,"Assertion","main","x == 1","first.i",4);
+  /*@ assert x == 1; */ ;
 \end{ccode}
 \end{minipage}
 
@@ -117,15 +113,15 @@ corresponding to your compiler and your system. For instance, in a 64-bit
 machine you should also pass
 \shortopt{machdep} \texttt{x86\_64} option as follows:
 \begin{shell}
-  \$ frama-c -machdep x86_64 -e-acsl first.i -then-last \
-    -print -ocode monitored_first.c
+\$ frama-c -machdep x86_64 -e-acsl first.i -then-last \
+  -print -ocode monitored_first.c
 \end{shell}
 
 This file can be compile with a \C compiler (for instance \gcc), as follows:
 
 \lstset{escapechar=£}
 \begin{shell}
-\$  gcc -c -Wno-attributes monitored_first.c
+\$ gcc -c -Wno-attributes monitored_first.c
 \end{shell}
 
 However, creating an executable through a proper invokation to \gcc is painful
@@ -154,7 +150,7 @@ The default behaviour of \eacslgcc is to instrument an annotated C program
 with runtime assertions via a run of \framac.
 
 \begin{shell}
- \$ e-acsl-gcc.sh -omonitored_first.i first.i
+\$ e-acsl-gcc.sh -omonitored_first.i first.i
 \end{shell}
 
 The above command instruments \texttt{first.i} with runtime assertions and
@@ -167,7 +163,7 @@ Compilation and Linking of the original and the instrumented sources
 is enabled using the \shortopt{c} option.  For instance, command
 
 \begin{shell}
- \$ e-acsl-gcc.sh -c -omonitored_first.i first.i
+\$ e-acsl-gcc.sh -c -omonitored_first.i first.i
 \end{shell}
 
 instruments the code in \texttt{first.i}, outputs it to
@@ -180,18 +176,19 @@ You can execute the generate binaries, in particular \texttt{a.out.e-acsl} which
 detects at runtime the incorrect annotation.
 \begin{shell}
 \$ ./a.out.e-acsl
-Assertion failed at line 4 in function main.
-The failing predicate is:
-x == 1.
-Aborted
+first.i: In function 'main'
+first.i:4: Error: Assertion failed:
+        The failing predicate is:
+        x == 1.
+Aborted (core dumped)
 \$ echo \$?
 134
 \end{shell}
 The execution aborts with a non-zero exit code (134) and an error message
-indicating \eacsl annotation that has been violated. There is no output for the
-valid \eacsl annotation. That is, the run of an executable generated from the
-instrumented source file (i.e., \texttt{monitored\_first.i}) detects that the
-second annotation in the initial program is invalid, whereas the first
+indicating an \eacsl annotation that has been violated. There is no output for
+the valid \eacsl annotation. That is, the run of an executable generated from
+the instrumented source file (i.e., \texttt{monitored\_first.i}) detects that
+the second annotation in the initial program is invalid, whereas the first
 annotation holds for this execution.
 
 Named executables can be created using the \shortopt{O} option.  This is such
@@ -201,7 +198,7 @@ generated from the original program and the executable generated from the
 
 For example, command
 \begin{shell}
- \$ e-acsl-gcc.sh -c -omonitored_first.i -Omonitored_first first.i
+\$ e-acsl-gcc.sh -c -omonitored_first.i -Omonitored_first first.i
 \end{shell}
 names the executables generated from \texttt{first.i} and
 \texttt{monitored\_first.i}: \texttt{monitored\_first} and
@@ -213,7 +210,7 @@ plug-in.  This option is useful if one makes changes to an already
 instrumented source file by hand and only wants to recompile it.
 
 \begin{shell}
- \$ e-acsl-gcc.sh -C -Omonitored_first monitored_first.i
+\$ e-acsl-gcc.sh -C -Omonitored_first monitored_first.i
 \end{shell}
 
 The above command generates a single executable named
@@ -230,16 +227,16 @@ also be passed using \shortopt{I} and \shortopt{G} options
 respectively, for instance as follows:
 
 \begin{shell}
- \$ e-acsl-gcc.sh -I/usr/local/bin/frama-c -G/usr/bin/gcc6 foo.c
+\$ e-acsl-gcc.sh -I/usr/local/bin/frama-c -G/usr/bin/gcc6 foo.c
 \end{shell}
 
 Runs of \framac and \gcc issued by \eacslgcc can further be customized by using
 additional flags.  \framac flags can be passed using the \shortopt{F} option,
-while \shortopt{l} and \shortopt{e} options allow for passing additional
+while \shortopt{e} and \shortopt{l} options allow for passing additional
 pre-processor and linker flags during \gcc invocations.  For example, command
 
 \begin{shell}
- \$ e-acsl-gcc.sh -c -F"-unicode" -e"-I/bar -I/baz" foo.c
+\$ e-acsl-gcc.sh -c -F"-unicode" -e"-I/bar -I/baz" foo.c
 \end{shell}
 
 yields an instrumented program \texttt{a.out.frama.c} where ACSL formulas
@@ -264,7 +261,7 @@ the \framac kernel while instrumenting \texttt{foo.c} one can use the following
 command:
 
 \begin{shell}
- \$ e-acsl-gcc.sh -v5 -F"-kernel-verbose 0" foo.c
+\$ e-acsl-gcc.sh -v5 -F"-kernel-verbose 0" foo.c
 \end{shell}
 
 Verbosity of the \eacslgcc output can also be reduced using the \shortopt{q}
@@ -277,7 +274,7 @@ output during instrumentation and compilation of \texttt{foo.c} to the
 file named \texttt{/tmp/log}.
 
 \begin{shell}
- \$ e-acsl-gcc.sh -c -s/tmp/log foo.c
+\$ e-acsl-gcc.sh -c -s/tmp/log foo.c
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,6 +301,7 @@ One of the benefits of using the wrapper script is that it makes sure that
 further passed \shortopt{m64} or \shortopt{m32} options to generate code using
 64-bit or 32-bit ABI respectively.
 
+
 At the present stage of implementation \eacsl does not support generating
 executables with ABI different to the default one.
 
@@ -313,13 +311,13 @@ executables with ABI different to the default one.
 For full up-to-date documentation of \eacslgcc see its man page:
 
 \begin{shell}
-    \$ man e-acsl-gcc.sh
+\$ man e-acsl-gcc.sh
 \end{shell}
 
 Alternatively, you can also use the \shortopt{h} option of \eacslgcc:
 
 \begin{shell}
-    \$ man e-acsl-gcc.sh -h
+\$ e-acsl-gcc.sh -h
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -347,8 +345,8 @@ is undefined if $e$ leads to a runtime error and, consequently, the semantics of
 any term $t$ (resp. predicate $p$) containing such a construct $c$ is
 undefined as soon as $e$ has to be evaluated in order to evaluate $t$
 (resp. $p$). The \eacsl Reference Manual also states that \emph{``it is the
-responsibility of each tool which interprets \eacsl to ensure that an
-undefined term is never evaluated''}~\cite{eacsl}.
+  responsibility of each tool which interprets \eacsl to ensure that an
+  undefined term is never evaluated''}~\cite{eacsl}.
 
 Accordingly, the \eacsl plug-in prevents an undefined term from being
 evaluated. If an annotation contains such a term, \eacsl will report a proper
@@ -390,20 +388,20 @@ line.
 
 It might be particularly useful in one of the following contexts:
 \begin{itemize}
-\item several libc functions used by the analyzed program are still not defined
-  in the \framac libc; or
-\item your system libc and the \framac libc mismatch about several function
-  types (for instance, your system libc is not 100\% POSIX compliant); or
-\item several \framac lib functions get a contract and you are not interested in
-  verifying them (for instance, only checking undefine behaviors matters).
+  \item several libc functions used by the analyzed program are still not defined
+        in the \framac libc; or
+  \item your system libc and the \framac libc mismatch about several function
+        types (for instance, your system libc is not 100\% POSIX compliant); or
+  \item several \framac lib functions get a contract and you are not interested in
+        verifying them (for instance, only checking undefine behaviors matters).
 \end{itemize}
 
 \begin{important}
-Notably, \eacslgcc disables \framac libc by default. This is because most of
-its functions are annotated with \eacsl contracts and generating code for
-these contracts results in additional runtime overheads. To enforce default
-\framac contracts with \eacslgcc you can pass \shortopt{L} option to the wrapper
-script.
+  Notably, \eacslgcc disables \framac libc by default. This is because most of
+  its functions are annotated with \eacsl contracts and generating code for
+  these contracts results in additional runtime overheads. To enforce default
+  \framac contracts with \eacslgcc you can pass \shortopt{L} option to the wrapper
+  script.
 \end{important}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -464,10 +462,11 @@ reports the violation of the second annotation:
 \begin{shell}
 \$ e-acsl-gcc.sh -c -Ovalid valid.c
 \$ ./valid.e-acsl
-Assertion failed at line 11 in function main.
-The failing predicate is:
-freed: \valid(x).
-Aborted
+valid.c: In function 'main'
+valid.c:11: Error: Assertion failed:
+        The failing predicate is:
+        freed: \valid(x).
+Aborted (core dumped)
 \end{shell}
 
 To check memory-related predicates (such as \lstinline|\valid|) \eacsl tracks
@@ -494,11 +493,10 @@ location \T{x} as belonging unallocated memory space.
 Memory tracking implemented by the \eacsl library comes in two flavours dubbed
 \I{bittree-based} and \I{segment-based} memory models. With the bittree-based
 model meta-storage is implemented as a compact prefix trie called Patricia
-trie~\cite{rv13}, whereas segment-based memory model
-\footnote{Segment-based model of \eacsl has not yet appeared in the literature.}
-is based on shadow memory~\cite{pldi16}. The functionality of the provided
-memory models is equivalent, however they differ in performance. We further
-discuss performance considerations.
+trie~\cite{rv13}, whereas segment-based memory model is based on shadow
+memory~\cite{vorobyov17ismm}. The functionality of the provided memory models is
+equivalent, however they differ in performance. We further discuss performance
+considerations.
 
 The \eacsl models allocate heap memory using a customized version of the
 \dlmalloc\footnote{\url{http://dlmalloc.net/}} memory allocator replacing
@@ -537,7 +535,7 @@ performance. The bittree-based model uses compact memory representation of
 metadata. The segment-based model on the other hand uses significantly more
 memory. You can expect over 2x times memory overheads when using it. However It
 is often an order of magnitude faster than the bittree-based
-model~\cite{pldi16}.
+model~\cite{vorobyov17ismm}.
 
 %[Need ref here with comparison of the performance. Ideally a reference to the PLDI paper].
 
@@ -553,9 +551,9 @@ feature can be enabled using the \shortopt{M} switch of \eacslgcc or
 \shortopt{e-acsl-full-mtracking} option of the \eacsl plug-in.
 
 \begin{important}
-The above-mentioned static analysis is probably the less robust part of \eacsl
-for the time being. When handling a large piece of code, it might be necessary
-to deactivate it and systematically instrument the code as explained above.
+  The above-mentioned static analysis is probably the less robust part of \eacsl
+  for the time being. When handling a large piece of code, it might be necessary
+  to deactivate it and systematically instrument the code as explained above.
 \end{important}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -636,7 +634,7 @@ that uses \texttt{exit(CODE)} instead of \texttt{abort}.
 For instance, the program generated using the following command
 exits with code \texttt{5} on a predicate violation.
 \begin{shell}
- \$ e-acsl-gcc.sh -c --fail-with-code=5 foo.c
+\$ e-acsl-gcc.sh -c --fail-with-code=5 foo.c
 \end{shell}
 
 Forceful termination of a monitored program can be disabled using
@@ -657,7 +655,7 @@ following signature:
 Additionally, it may depends on the global variable
 \texttt{\_\_e\_acsl\_sound\_verdict}\codeidxdef{e\_acsl\_sound\_verdict}. This
 variable of type \texttt{int} is set to \texttt{0} as soon as the verdict
-provided by \eacsl is not trustable anymore (see
+provided by \eacsl is not trustworthy anymore (see
 Section~\ref{sec:partial-instrumentation}).
 
 Below is an example which prints the validity status of each property but never
@@ -675,9 +673,9 @@ with the customized one specified in \texttt{my\_assert.c}
 \begin{shell}
 \$ e-acsl-gcc.sh -c -X first.i -Ofirst --external-assert=my_assert.c
 \$ ./first.e-acsl
-Assertion at line 3 in function main is valid (trustable).
+Assertion in file first.i at line 3 in function main is valid (trustworthy).
 The verified predicate was: `x == 0'.
-Assertion at line 4 in function main is invalid (trustable).
+Assertion in file first.i at line 4 in function main is invalid (trustworthy).
 The verified predicate was: `x == 1'.
 \end{shell}
 
@@ -716,16 +714,16 @@ Abort
 Whenever option \longopt{libc-replacements} of \eacslgcc is set, \eacsl is
 able to detect incorrect usage of the following libc functions:
 \begin{itemize}
-\item \texttt{memcmp}
-\item \texttt{memcpy}
-\item \texttt{memmove}
-\item \texttt{memset}
-\item \texttt{strcat}
-\item \texttt{strncat}
-\item \texttt{strcmp}
-\item \texttt{strcpy}
-\item \texttt{strncpy}
-\item \texttt{strlen}
+  \item \texttt{memcmp}
+  \item \texttt{memcpy}
+  \item \texttt{memmove}
+  \item \texttt{memset}
+  \item \texttt{strcat}
+  \item \texttt{strncat}
+  \item \texttt{strcmp}
+  \item \texttt{strcpy}
+  \item \texttt{strncpy}
+  \item \texttt{strlen}
 \end{itemize}
 
 For instance, the program below incorrectly uses \texttt{strcpy} because the
@@ -774,12 +772,13 @@ The instrumented code is generated as usual, even though you get an additional
 warning.
 \begin{shell}
 \$ e-acsl-gcc.sh no_main.i -omonitored_no_main.i
-<skip preprocessing command line>
+[kernel] Parsing no_main.i (no preprocessing)
 [e-acsl] beginning translation.
-[e-acsl] warning: cannot find entry point `main'.
-                  Please use option `-main' for specifying a valid entry point.
-                  The generated program may miss memory instrumentation.
-                  if there are memory-related annotations.
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
+[e-acsl] Warning: cannot find entry point `main'.
+  Please use option `-main' for specifying a valid entry point.
+  The generated program may miss memory instrumentation
+  if there are memory-related annotations.
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
@@ -817,12 +816,12 @@ The instrumented code is generated as usual, even though you get an additional
 warning.
 \begin{shell}
 \$ e-acsl-gcc.sh -omonitored_no_code.i no_code.c
+[kernel] Parsing no_code.c (with preprocessing)
 [e-acsl] beginning translation.
-[e-acsl] warning: annotating undefined function `my_pow':
-                  the generated program may miss memory instrumentation
-                  if there are memory-related annotations.
-no_code.c:9:[kernel] warning: No code nor implicit assigns clause for function my_pow,
-generating default assigns from the prototype
+[e-acsl] Warning: annotating undefined function `my_pow':
+  the generated program may miss memory instrumentation
+  if there are memory-related annotations.
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
@@ -840,10 +839,11 @@ executable by providing definition of \T{my\_pow}.
 \begin{shell}
 \$ e-acsl-gcc.sh -C -Ono_code pow.i monitored_no_code.i
 \$ ./no_code.e-acsl
-Postcondition failed at line 5 in function my_pow.
-The failing predicate is:
-\old(n % 2 == 0) ==> \result >= 1.
-Aborted
+no_code.c: In function 'my_pow'
+no_code.c:5: Error: Postcondition failed:
+        The failing predicate is:
+        even: \result >= 1.
+Aborted (core dumped)
 \end{shell}
 
 The execution of the corresponding binary fails at runtime: actually, our
@@ -896,21 +896,23 @@ One can ask to not instrument function \texttt{g} (\emph{i.e.} to instrument
 only functions \texttt{f} and \texttt{main}) through the following command.
 \begin{shell}
 \$ e-acsl-gcc.sh \
-    -c --oexec-e-acsl partial.out \
-    --e-acsl-extra="-e-acsl-instrument=+@all,-g"' \
-    partial.i
+  -c --oexec-e-acsl partial.out \
+  --e-acsl-extra="-e-acsl-instrument=+@all,-g" \
+  partial.i
 \end{shell}
 
 Therefore, running the generated executable \texttt{partial.out} leads to the
 following verdicts.
 \begin{shell}
 \$ ./partial.out
-warning: no sound verdict (guess: ok) at line 16 (function main).
-The considered predicate is:
-\initialized(&t[1]).
-warning: no sound verdict (guess: FAIL) at line 17 (function main).
-The considered predicate is:
-\initialized(&t[2]).
+partial.i: In function 'main'
+partial.i:16: Warning: no sound verdict for Assertion (guess: ok).
+        the considered predicate is:
+        \initialized(&t[1])
+partial.i: In function 'main'
+partial.i:17: Warning: no sound verdict for Assertion (guess: FAIL).
+        the considered predicate is:
+        \initialized(&t[2])
 \end{shell}
 
 First, there is no message for the first assertion about the initialization of
@@ -919,7 +921,7 @@ First, there is no message for the first assertion about the initialization of
 the complete instrumentation of functions \texttt{f} and \texttt{main}.
 
 Second, since function \texttt{g} was not instrumented, no sound verdict may be
-provided after executing it. It leads to the printed warnings for the two last
+provided after executing it. It leads to the printed warnings for the last two
 assertions. The indicated guesses (\texttt{ok} for the first assertion and
 \texttt{FAIL} for the second one) are the verdicts computed by \eacsl. They can
 be trusted if and only if the \eacsl instrumentation is not necessary for
@@ -957,15 +959,15 @@ are potential overflows in this case), just do:
 
 \begin{shell}
 \$ frama-c -rte combine.i -then -e-acsl -then-last -print
-          -ocode monitored_combine.i
-\$ e-acsl-gcc.sh -C -Ocombine  monitored_combine.i
-\$ ./combine.
+  -ocode monitored_combine.c
+\$ e-acsl-gcc.sh -C -Ocombine monitored_combine.c
+\$ ./combine.e-acsl
 \end{shell}
 
 Automatic assertion generation can also be enabled via \eacslgcc directly via
 the following command:
 \begin{shell}
-\$ e-acsl-gcc.sh -c -Ocombine -omonitored_combine.i --rte=all
+\$ e-acsl-gcc.sh -c -Ocombine -omonitored_combine.i --rte=all combine.i
 \end{shell}
 
 Note the use of \eacslgcc \longopt{rte} option which asks \framac to combine
@@ -987,13 +989,13 @@ prove that there is no potential overflow in the previous program, so the \eacsl
 plug-in does not generate additional code for checking them if you run the
 following command.
 \begin{shell}
-\$ frama-c -rte combine.i -then -val -then -e-acsl \
-          -then-last -print -ocode monitored_combine.i
+\$ frama-c -rte combine.i -then -eva -then -e-acsl \
+  -then-last -print -ocode monitored_combine.i
 \end{shell}
 The additional code will be generated with the two following command.
 \begin{shell}
-\$ frama-c -rte combine.i -then -val -then -e-acsl \
-          -e-acsl-valid -then-last -print -ocode monitored_combine.i
+\$ frama-c -rte combine.i -then -eva -then -e-acsl \
+  -e-acsl-valid -then-last -print -ocode monitored_combine.i
 \end{shell}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1014,10 +1016,9 @@ you can pass it using \shortopt{F} switch:
 
 \begin{shell}
 \$ e-acsl-gcc.sh -F"-e-acsl-project foobar" check.i
-<skip preprocessing commands>
+[kernel] Parsing check.i (no preprocessing)
 [e-acsl] beginning translation.
-check.i:4:[e-acsl] warning: E-ACSL construct `right shift' is not yet supported.
-  Ignoring annotation.
+[kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [e-acsl] translation done in project "foobar".
 \end{shell}
 
@@ -1047,21 +1048,21 @@ which information is displayed according to the verbosing level. The level $n$
 also displays the information of all the lower levels.
 
 \begin{center}
-\begin{tabular}{|l|l|}
-\hline
-\shortopt{e-acsl-verbose 0}& only warnings and errors\\
-\hline
-\shortopt{e-acsl-verbose 1}& beginning and ending of the translation\\
-\hline
-\shortopt{e-acsl-verbose 2}& different parts of the translation and
-  functions-related information\\
-\hline
-\shortopt{e-acsl-verbose 3}& predicates- and statements-related information\\
-\hline
-\shortopt{e-acsl-verbose 4}& terms- and expressions-related information
-\\
-\hline
-\end{tabular}
+  \begin{tabular}{|l|l|}
+    \hline
+    \shortopt{e-acsl-verbose 0} & only warnings and errors                       \\
+    \hline
+    \shortopt{e-acsl-verbose 1} & beginning and ending of the translation        \\
+    \hline
+    \shortopt{e-acsl-verbose 2} & different parts of the translation and
+    functions-related information                                                \\
+    \hline
+    \shortopt{e-acsl-verbose 3} & predicates- and statements-related information \\
+    \hline
+    \shortopt{e-acsl-verbose 4} & terms- and expressions-related information
+    \\
+    \hline
+  \end{tabular}
 \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1074,19 +1075,19 @@ The kind of information to display is settable by the option
 parts of the translation, as detailed below.
 
 \begin{center}
-\begin{tabular}{|l|l|}
-\hline
-analysis & minimization of the instrumentation for memory-related annotation
-(section~\ref{sec:memory}) \\
-\hline
-duplication & duplication of functions with contracts
-(section~\ref{sec:no-code}) \\
-\hline
-translation & translation of an annotation into \C code\\
-\hline
-typing & minimization of the instrumentation for integers
-(section~\ref{sec:integers}) \\
-\hline
-\end{tabular}
+  \begin{tabular}{|l|l|}
+    \hline
+    analysis    & minimization of the instrumentation for memory-related annotation
+    (section~\ref{sec:memory})                                                      \\
+    \hline
+    preparation & duplication of functions with contracts
+    (section~\ref{sec:no-code})                                                     \\
+    \hline
+    translation & translation of an annotation into \C code                         \\
+    \hline
+    typing      & minimization of the instrumentation for integers
+    (section~\ref{sec:integers})                                                    \\
+    \hline
+  \end{tabular}
 \end{center}
 % >>>

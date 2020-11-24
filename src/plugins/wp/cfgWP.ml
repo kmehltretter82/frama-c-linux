@@ -755,11 +755,23 @@ struct
     | Some exp ->
         in_wenv wenv wp
           begin fun env wp ->
-            let vr = L.result () in
-            let tr = L.return () in
-            let sigma = L.current env in
-            let returned = p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
-            let vcs = gmap (assume_vc ~descr:"Return" ~stmt [returned]) wp.vcs in
+            let compile () =
+              let sigma = L.current env in
+              let vr = L.result () in
+              let tr = L.return () in
+              p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
+            let outcome = Warning.catch
+                ~severe:false ~effect:"Result value discarded (unknown)"
+                compile () in
+            let warn, condition =
+              match outcome with
+              | Warning.Failed warn ->
+                  warn , p_true
+              | Warning.Result(warn,condition) ->
+                  warn , condition in
+            let vcs = gmap (
+                assume_vc ~descr:"Return" ~stmt ~warn [condition]
+              ) wp.vcs in
             { wp with vcs = vcs }
           end
 
@@ -1120,13 +1132,17 @@ struct
   let cc_result call = match call.loc_result with
     | None -> []
     | Some(tr,obj,loc) ->
-        (* [LC,VP] : the C left unspecified where to compute the lv *)
-        (* [LC,BY] : lv computed before, like in Value Analysis *)
-        let vr = M.load call.seq_result.post obj loc in
-        let re = L.in_frame call.frame_post L.result () in
-        let te = L.in_frame call.frame_post L.return () in
-        let value = C.result call.sigma_pre tr re in
-        [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
+        let handler () = [ p_true ] in
+        let compile () =
+          (* [LC,VP] : the C left unspecified where to compute the lv *)
+          (* [LC,BY] : lv computed before, like in Value Analysis *)
+          let vr = M.load call.seq_result.post obj loc in
+          let re = L.in_frame call.frame_post L.result () in
+          let te = L.in_frame call.frame_post L.return () in
+          let value = C.result call.sigma_pre tr re in
+          [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
+        in
+        Warning.handle ~handler ~severe:false ~effect:"Hide \\result" compile ()
 
   let cc_status f_caller f_callee =
     p_equal
