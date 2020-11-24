@@ -41,6 +41,7 @@ bin/migration_scripts/sodium2magnesium.sh: CEA_LGPL
 bin/migration_scripts/sulfur2chlorine.sh: CEA_LGPL
 bin/migration_scripts/chlorine2argon.sh: CEA_LGPL
 bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
+bin/migration_scripts/titanium2vanadium.sh: CEA_LGPL
 bin/sed_get_binutils_version: .ignore
 bin/sed_get_make_major: .ignore
 bin/sed_get_make_minor: .ignore
