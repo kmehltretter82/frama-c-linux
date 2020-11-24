@@ -130,7 +130,10 @@ export function Section(props: SectionProps) {
 
   return (
     <div className="dome-xSideBarSection">
-      <div className="dome-xSideBarSection-title" title={props.label}>
+      <div
+        className="dome-xSideBarSection-title dome-color-frame"
+        title={props.label}
+      >
         <Label label={props.label} />
         {!visible && makeBadge(props.summary)}
         {foldable && <HideShow visible={visible} onClick={flipState} />}
