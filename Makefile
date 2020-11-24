@@ -338,7 +338,7 @@ DOC_GEN_FILES:=$(addprefix doc/code/,\
 
 # additional compilation targets for 'make all'.
 # cannot be delayed after 'make all'
-EXTRAS	= ptests bin/fc-config$(EXE)
+EXTRAS	= ptests
 
 ifneq ($(ENABLE_GUI),no)
 ifeq ($(HAS_LABLGTK),yes)
@@ -1980,9 +1980,7 @@ install:: install-lib-$(OCAMLBEST)
 	fi
 	$(CP) bin/ptests.$(OCAMLBEST)$(EXE) \
 	      $(BINDIR)/ptests.$(OCAMLBEST)$(EXE)
-	if [ -x bin/fc-config$(EXE) ] ; then \
-		$(CP) bin/fc-config$(EXE) $(BINDIR)/frama-c-config$(EXE); \
-	fi
+	$(CP) bin/frama-c-config $(BINDIR)/frama-c-config; \
 	if [ -x bin/frama-c-script ] ; then \
 		$(CP) bin/frama-c-script $(BINDIR)/frama-c-script; \
 	fi
@@ -2237,7 +2235,6 @@ clean:: $(PLUGIN_LIST:=_CLEAN) \
 	$(PRINT_RM) binaries
 	$(RM) bin/toplevel.byte$(EXE) bin/viewer.byte$(EXE) \
 		bin/ptests.byte$(EXE) bin/*.opt$(EXE) bin/toplevel.top$(EXE)
-	$(RM) bin/fc-config$(EXE)
 
 smartclean:
 	$(MAKE) -f share/Makefile.clean smartclean

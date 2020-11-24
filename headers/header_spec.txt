@@ -371,7 +371,6 @@ src/kernel_internals/runtime/dump_config.ml: CEA_LGPL
 src/kernel_internals/runtime/dump_config.mli: CEA_LGPL
 src/kernel_internals/runtime/fc_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/fc_config.mli: CEA_LGPL
-src/kernel_internals/runtime/frama_c_config.ml.in: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.ml: CEA_LGPL
 src/kernel_internals/runtime/frama_c_init.mli: CEA_LGPL
 src/kernel_internals/runtime/gui_init.ml: CEA_LGPL

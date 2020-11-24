@@ -414,7 +414,7 @@ available:
 
 - `frama-c`
 - `frama-c-gui`       if available
-- `frama-c-config`    displays Frama-C configuration paths
+- `frama-c-config`    lightweight wrapper used to display configuration paths
 - `frama-c.byte`      bytecode version of frama-c
 - `frama-c-gui.byte`  bytecode version of frama-c-gui, if available
 - `ptests.opt`        testing tool for Frama-c
