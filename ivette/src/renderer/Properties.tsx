@@ -36,6 +36,7 @@ const DEFAULTS: { [key: string]: boolean } = {
   'status.invalid_hyp': true,
   'status.considered_valid': false,
   'status.untried': false,
+  'status.dead': false,
   'status.inconsistent': true,
   'kind.assert': true,
   'kind.invariant': true,
@@ -95,24 +96,25 @@ function filterStatus(
 ) {
   switch (status) {
     case 'valid':
-    case 'valid_but_dead':
       return filter('status.valid');
     case 'valid_under_hyp':
       return filter('status.valid_hyp');
     case 'invalid':
-    case 'invalid_but_dead':
       return filter('status.invalid');
     case 'invalid_under_hyp':
       return filter('status.invalid_hyp');
     case 'inconsistent':
       return filter('status.inconsistent');
     case 'unknown':
-    case 'unknown_but_dead':
       return filter('status.unknown');
     case 'considered_valid':
       return filter('status.considered_valid');
     case 'never_tried':
       return filter('status.untried');
+    case 'valid_but_dead':
+    case 'unknown_but_dead':
+    case 'invalid_but_dead':
+      return filter('status.dead');
     default:
       return true;
   }
@@ -328,6 +330,7 @@ function PropertyFilter() {
         <CheckField label="Invalid under hyp." path="status.invalid_hyp" />
         <CheckField label="Considered valid" path="status.considered_valid" />
         <CheckField label="Untried" path="status.untried" />
+        <CheckField label="Dead" path="status.dead" />
         <CheckField label="Inconsistent" path="status.inconsistent" />
       </Section>
       <Section label="Property kind">
