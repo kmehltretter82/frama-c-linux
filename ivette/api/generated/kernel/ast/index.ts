@@ -280,6 +280,14 @@ export interface functionsData {
   name: string;
   /** Signature */
   signature: string;
+  /** Is the function defined? */
+  defined: boolean;
+  /** Is the function from the Frama-C stdlib? */
+  stdlib: boolean;
+  /** Is the function a Frama-C builtin? */
+  builtin: boolean;
+  /** Has the function been analyzed by Eva */
+  eva_analyzed?: boolean;
 }
 
 /** Loose decoder for `functionsData` */
@@ -289,6 +297,10 @@ export const jFunctionsData: Json.Loose<functionsData> =
            '#functions expected'),
     name: Json.jFail(Json.jString,'String expected'),
     signature: Json.jFail(Json.jString,'String expected'),
+    defined: Json.jFail(Json.jBoolean,'Boolean expected'),
+    stdlib: Json.jFail(Json.jBoolean,'Boolean expected'),
+    builtin: Json.jFail(Json.jBoolean,'Boolean expected'),
+    eva_analyzed: Json.jBoolean,
   });
 
 /** Safe decoder for `functionsData` */
@@ -298,10 +310,16 @@ export const jFunctionsDataSafe: Json.Safe<functionsData> =
 /** Natural order for `functionsData` */
 export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
-    <{ key: Json.key<'#functions'>, name: string, signature: string }>({
+    <{ key: Json.key<'#functions'>, name: string, signature: string,
+       defined: boolean, stdlib: boolean, builtin: boolean,
+       eva_analyzed?: boolean }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
+    defined: Compare.boolean,
+    stdlib: Compare.boolean,
+    builtin: Compare.boolean,
+    eva_analyzed: Compare.defined(Compare.boolean),
   });
 
 /** Signal for array [`functions`](#functions)  */
