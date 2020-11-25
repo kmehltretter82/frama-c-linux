@@ -23,6 +23,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let show_aorai_variable state fmt var_name =
+  let vi = Data_for_aorai.(get_varinfo var_name) in
+  let cvalue = !Db.Value.eval_expr state (Cil.evar vi) in
+  try
+    let i = Ival.project_int (Cvalue.V.project_ival cvalue) in
+    let state_name = Data_for_aorai.getStateName (Integer.to_int i) in
+    Format.fprintf fmt "%s" state_name
+  with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int |
+       Z.Overflow | Not_found ->
+    Format.fprintf fmt "?"
+
+let builtin_show_aorai_state state _args =
+  let history = Data_for_aorai.(curState :: (whole_history ())) in
+  Aorai_option.result ~current:true "@[<hv>%a@]"
+    (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
+  (* Return value : returns nothing, changes nothing *)
+  {
+    Value_types.c_values = [None, state];
+    c_clobbered = Base.SetLattice.bottom;
+    c_from = None;
+    c_cacheable = Value_types.Cacheable;
+  }
+
+let () =
+  !Db.Value.register_builtin "Frama_C_show_aorai_state" builtin_show_aorai_state
+
 let add_slevel_annotation vi kind =
   match kind with
   | Aorai_visitors.Aux_funcs.(Pre _ | Post _) ->
