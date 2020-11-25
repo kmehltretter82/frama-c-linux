@@ -137,6 +137,7 @@ function filterKind(
     case 'reachable': return filter('kind.reachable');
     case 'axiomatic': return filter('kind.axiomatic');
     case 'loop_pragma': return filter('kind.pragma');
+    case 'assumes': return filter('kind.assumes');
     default: return filter('kind.others');
   }
 }
@@ -347,6 +348,7 @@ function PropertyFilter() {
         <CheckField label="Reachables" path="kind.reachable" />
         <CheckField label="Axiomatics" path="kind.axiomatic" />
         <CheckField label="Pragma" path="kind.pragma" />
+        <CheckField label="Assumes" path="kind.assumes" />
         <CheckField label="Others" path="kind.others" />
       </Section>
       <Section label="Alarms">
