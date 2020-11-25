@@ -8,15 +8,10 @@
  */
 
 import React from 'react';
+import { SVG } from 'dome/controls/icons';
 import { classes } from 'dome/misc/utils';
 
 import './style.css';
-
-// --------------------------------------------------------------------------
-// --- ToolBar Button
-// --------------------------------------------------------------------------
-
-import { SVG } from 'dome/controls/icons';
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container
@@ -70,8 +65,8 @@ export const Separator = () => (
   </div>
 );
 
-const SELECT = 'dome-xToolBar-Control dome-selected';
-const BUTTON = 'dome-xToolBar-Control dome-color-frame';
+const SELECT = 'dome-xToolBar-control dome-selected';
+const BUTTON = 'dome-xToolBar-control dome-color-frame';
 const KIND = (kind: undefined | string) => (
   kind ? ` dome-xToolBar-${kind}` : ''
 );
@@ -165,7 +160,7 @@ export function ButtonGroup<A>(props: SelectionProps<A>) {
     onClick: onChange,
   };
   return (
-    <div className="dome-xToolBar-Group">
+    <div className="dome-xToolBar-group">
       {React.Children.map(children, (elt) => React.cloneElement(
         elt,
         { ...baseProps, ...elt.props },
@@ -192,13 +187,60 @@ export function Select(props: SelectionProps<string>) {
   };
   return (
     <select
-      className="dome-xToolBar-Control dome-color-frame"
+      className="dome-xToolBar-control dome-color-frame"
       value={props.value}
       disabled={disabled || !enabled}
       onChange={callback}
     >
       {props.children}
     </select>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- SearchField
+// --------------------------------------------------------------------------
+
+export interface SearchFieldProps {
+  /** Tooltip Text */
+  title?: string;
+  /** Placeholder Text */
+  placeholder?: string;
+}
+
+export function SearchField(props: SearchFieldProps) {
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [value, setValue] = React.useState('');
+  const forceBlur = () => inputRef?.current?.blur();
+  const onBlur = () => setValue('');
+  const onKeyUp = (evt: React.KeyboardEvent) => {
+    if (evt.key === 'Escape') forceBlur();
+    if (evt.key === 'Enter') {
+      console.log('ENTER', value);
+      forceBlur();
+    }
+  };
+  const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(evt.target.value);
+  };
+  console.log('VALUE', value);
+  return (
+    <>
+      <div className="dome-xToolBar-searchicon">
+        <SVG id="SEARCH" />
+      </div>
+      <input
+        ref={inputRef}
+        type="search"
+        title={props.title}
+        value={value}
+        placeholder={props.placeholder}
+        className="dome-xToolBar-control dome-xToolBar-searchfield"
+        onKeyUp={onKeyUp}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    </>
   );
 }
 

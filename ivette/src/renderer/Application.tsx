@@ -74,6 +74,7 @@ export default (() => {
         <Controller.Control />
         <HistorySelectionControls />
         <Toolbar.Filler />
+        <Toolbar.SearchField placeholder="Search…" />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"
