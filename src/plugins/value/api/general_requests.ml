@@ -31,6 +31,12 @@ let package =
     ~readme:"eva.md"
     ()
 
+let () = Request.register ~package
+    ~kind:`GET ~name:"isComputed"
+    ~descr:(Markdown.plain "True if the Eva analysis has been done")
+    ~input:(module Data.Junit) ~output:(module Data.Jbool)
+    Db.Value.is_computed
+
 let is_computed kf =
   Db.Value.is_computed () &&
   match kf with
