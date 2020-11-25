@@ -99,6 +99,8 @@ export interface SectionProps {
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
   summary?: Badge;
+  /** Right-click callback. */
+  onContextMenu?: () => void;
   /** Section contents. */
   children?: React.ReactNode;
 }
@@ -133,6 +135,7 @@ export function Section(props: SectionProps) {
       <div
         className="dome-xSideBarSection-title dome-color-frame"
         title={props.label}
+        onContextMenu={props.onContextMenu}
       >
         <Label label={props.label} />
         {!visible && makeBadge(props.summary)}
