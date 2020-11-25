@@ -339,7 +339,7 @@ function PropertyFilter() {
         <CheckField label="Postconditions" path="kind.ensures" />
         <CheckField label="Instance" path="kind.instance" />
         <CheckField label="Assigns clauses" path="kind.assigns" />
-        <CheckField label="From clauses" path="kind.from" />
+        <CheckField label="From clauses" path="kind.froms" />
         <CheckField label="Allocates" path="kind.allocates" />
         <CheckField label="Behaviors" path="kind.behavior" />
         <CheckField label="Reachables" path="kind.reachable" />
