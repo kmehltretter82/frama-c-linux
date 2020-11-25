@@ -105,12 +105,12 @@ function filterStatus(
     case 'invalid_under_hyp':
       return filter('status.invalid_hyp');
     case 'inconsistent':
-      return filter('inconsistent');
+      return filter('status.inconsistent');
     case 'unknown':
     case 'unknown_but_dead':
       return filter('status.unknown');
     case 'considered_valid':
-      return filter('considered_valid');
+      return filter('status.considered_valid');
     case 'never_tried':
       return filter('status.untried');
     default:
