@@ -3,8 +3,24 @@
     "id": "GET-1",
     "data": {
       "updated": [
-        { "key": "kf#24", "name": "g", "signature": "int g(int y);" },
-        { "key": "kf#20", "name": "f", "signature": "int f(int x);" }
+        {
+          "key": "kf#24",
+          "name": "g",
+          "signature": "int g(int y);",
+          "defined": true,
+          "stdlib": false,
+          "builtin": false,
+          "eva_analyzed": null
+        },
+        {
+          "key": "kf#20",
+          "name": "f",
+          "signature": "int f(int x);",
+          "defined": true,
+          "stdlib": false,
+          "builtin": false,
+          "eva_analyzed": null
+        }
       ],
       "removed": [],
       "reload": true,
