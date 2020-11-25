@@ -284,12 +284,11 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
-  path: string;
   children: React.ReactNode;
 }
 
 function Section(props: SectionProps) {
-  const settings = `properties-section-${props.path}`;
+  const settings = `properties-section-${props.label}`;
   return (
     <Folder label={props.label} settings={settings}>
       {props.children}
@@ -321,7 +320,7 @@ function PropertyFilter() {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
-      <Section label="Status" path="status">
+      <Section label="Status">
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
         <CheckField label="Unknown" path="status.unknown" />
@@ -331,7 +330,7 @@ function PropertyFilter() {
         <CheckField label="Untried" path="status.untried" />
         <CheckField label="Inconsistent" path="status.inconsistent" />
       </Section>
-      <Section label="Property kind" path="kind">
+      <Section label="Property kind">
         <CheckField label="Assertions" path="kind.assert" />
         <CheckField label="Invariants" path="kind.invariant" />
         <CheckField label="Variants" path="kind.variant" />
@@ -347,11 +346,11 @@ function PropertyFilter() {
         <CheckField label="Pragma" path="kind.pragma" />
         <CheckField label="Others" path="kind.others" />
       </Section>
-      <Section label="Alarms" path="alarms">
+      <Section label="Alarms">
         <CheckField label="Alarms" path="alarms.alarms" />
         <CheckField label="Others" path="alarms.others" />
       </Section>
-      <Section label="Alarms kind" path="alarms">
+      <Section label="Alarms kind">
         <CheckField label="Overflows" path="alarms.overflow" />
         <CheckField label="Divisions by zero" path="alarms.division_by_zero" />
         <CheckField label="Shifts" path="alarms.shift" />
