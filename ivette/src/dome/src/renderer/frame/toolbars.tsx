@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { Event, useEvent, find } from 'dome';
 import { debounce } from 'lodash';
 import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
@@ -221,16 +222,23 @@ export interface SearchFieldProps<A> {
   onSearch?: (pattern: string, suggestions: A[]) => void;
   /** Suggestions Callback. */
   onLookup?: (pattern: string) => Promise<Suggestion<A>[]>;
+  /** Triggering Event (defaults to [[Dome.find]]). */
+  event?: null | Event<void>;
 }
 
 /**
    Search Bar.
  */
 export function SearchField<A>(props: SearchFieldProps<A>) {
-  const { onLookup } = props;
+  const { onLookup, event = find } = props;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const blur = () => inputRef.current?.blur();
+  const focus = () => inputRef.current?.focus();
   const [value, setValue] = React.useState('');
   const [items, setItems] = React.useState<Suggestion<A>[]>([]);
+
+  // Find event trigger
+  useEvent(event, focus);
 
   // Lookup trigger
   const triggerLookup = React.useCallback(debounce((pattern: string) => {
@@ -242,8 +250,6 @@ export function SearchField<A>(props: SearchFieldProps<A>) {
     setValue('');
     setItems([]);
   };
-
-  const blur = () => inputRef.current?.blur();
 
   // Key Events
   const onKeyUp = (evt: React.KeyboardEvent) => {

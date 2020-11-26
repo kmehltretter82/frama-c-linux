@@ -162,6 +162,16 @@ const editMenuItems: MenuSpec = [
     accelerator: 'CmdOrCtrl+A',
     role: 'selectAll',
   },
+  Separator,
+  {
+    label: 'Find',
+    accelerator: 'CmdOrCtrl+F',
+    click: (
+      _item: Electron.MenuItem,
+      window: Electron.BrowserWindow,
+      _evt: Electron.KeyboardEvent,
+    ) => window.webContents.send('dome.ipc.find'),
+  },
 ];
 
 // --------------------------------------------------------------------------

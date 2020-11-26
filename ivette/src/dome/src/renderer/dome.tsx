@@ -98,13 +98,17 @@ export class Event<A = void> {
 
 }
 
+/** Custom React Hook on event. */
 export function useEvent<A>(
-  evt: Event<A>,
+  evt: undefined | null | Event<A>,
   callback: (arg: A) => void,
 ) {
   return React.useEffect(() => {
-    evt.on(callback);
-    return () => evt.off(callback);
+    if (evt) {
+      evt.on(callback);
+      return () => evt.off(callback);
+    }
+    return undefined;
   });
 }
 
@@ -126,8 +130,13 @@ export const update = new Event('dome.update');
    It is emitted when the entire window is reloaded.
 */
 export const reload = new Event('dome.reload');
-
 ipcRenderer.on('dome.ipc.reload', () => reload.emit());
+
+/**
+   Dome « Find » event. Trigered by [Cmd+F] and [Edit > Find] menu.
+ */
+export const find = new Event('dome.find');
+ipcRenderer.on('dome.ipc.find', () => find.emit());
 
 /** Command-line arguments event handler. */
 export function onCommand(
