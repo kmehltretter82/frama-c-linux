@@ -1,4 +1,3 @@
-make: Entering directory 'PWD'
 
 [34mCommand: ../../bin/frama-c  -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort   -cpp-extra-args="" make-wrapper.c make-wrapper2.c(B[m
 
@@ -11,12 +10,11 @@ make: Entering directory 'PWD'
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function specified
-[kernel:annot:missing-spec] make-wrapper.c:16: Warning: 
+[kernel:annot:missing-spec] make-wrapper.c:17: Warning: 
   Neither code nor specification for function external, generating default assigns from the prototype
 [kernel] User Error: warning annot:missing-spec treated as fatal error.
 [kernel] Frama-C aborted: invalid user input.
 [kernel] Warning: attempting to save on non-zero exit code: modifying filename into `PWD/make-for-make-wrapper.eva/framac.sav.error'.
-make: Leaving directory 'PWD'
 
 ***** make-wrapper recommendations *****
 
