@@ -84,7 +84,7 @@ else
   SED_UNBUFFERED:=sed --unbuffered
 ifneq (,$(wildcard /usr/bin/time))
 define time_with_output
-  /usr/bin/time --format='user_time=%U\nmemory=%M' --output="$(1)"
+  /usr/bin/time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
 define time_with_output
