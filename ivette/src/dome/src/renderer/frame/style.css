@@ -463,17 +463,46 @@
 .dome-xToolBar-searchfield:hover,
 .dome-xToolBar-searchicon:hover + .dome-xToolBar-searchfield
 {
-    width: 120px;
+    width: 160px;
 }
 
 .dome-xToolBar-searchicon {
     position: relative ;
+    overflow: visible ;
+    z-Index: +1;
+    height: 0px;
+    width: 0px;
     top: 2px ;
-    left: 23px ;
+    left: 12px ;
 }
 
 .dome-window-inactive .dome-xToolBar-searchicon svg {
     fill: #ccc ;
+}
+
+.dome-xToolBar-searchmenu {
+    position: relative ;
+    width: 162px ;
+    max-height: 120px ;
+    overflow-x: hidden ;
+    overflow-y: auto ;
+    left: -7px ;
+    top: 4px ;
+    border: 1pt solid #aaa ;
+    background: #fff ;
+}
+
+.dome-xToolBar-searchitem {
+    padding-left: 4pt ;
+    padding-right: 2pt ;
+}
+
+.dome-xToolBar-searchitem:hover {
+    background: lightblue;
+}
+
+.dome-xToolBar-searchitem:nth-child(even):not(:hover) {
+    background: #eef7f7;
 }
 
 /* -------------------------------------------------------------------------- */

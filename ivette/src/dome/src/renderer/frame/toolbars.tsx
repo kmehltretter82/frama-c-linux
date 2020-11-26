@@ -8,9 +8,10 @@
  */
 
 import React from 'react';
+import { debounce } from 'lodash';
 import { SVG } from 'dome/controls/icons';
+import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -201,33 +202,91 @@ export function Select(props: SelectionProps<string>) {
 // --- SearchField
 // --------------------------------------------------------------------------
 
-export interface SearchFieldProps {
-  /** Tooltip Text */
+const DEBOUNCED_SEARCH = 200;
+
+export interface Suggestion<A> {
+  id: string | number;
+  icon?: string;
+  label: string | JSX.Element;
   title?: string;
-  /** Placeholder Text */
-  placeholder?: string;
+  value: A;
 }
 
-export function SearchField(props: SearchFieldProps) {
+export interface SearchFieldProps<A> {
+  /** Tooltip Text. */
+  title?: string;
+  /** Placeholder Text. */
+  placeholder?: string;
+  /** Search Callback. */
+  onSearch?: (pattern: string, suggestions: A[]) => void;
+  /** Suggestions Callback. */
+  onLookup?: (pattern: string) => Promise<Suggestion<A>[]>;
+}
+
+/**
+   Search Bar.
+ */
+export function SearchField<A>(props: SearchFieldProps<A>) {
+  const { onLookup } = props;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [value, setValue] = React.useState('');
-  const forceBlur = () => inputRef?.current?.blur();
-  const onBlur = () => setValue('');
+  const [items, setItems] = React.useState<Suggestion<A>[]>([]);
+
+  // Lookup trigger
+  const triggerLookup = React.useCallback(debounce((pattern: string) => {
+    if (onLookup) onLookup(pattern).then(setItems).catch();
+  }, DEBOUNCED_SEARCH), [onLookup, setItems]);
+
+  // Blur Event
+  const onBlur = () => {
+    setValue('');
+    setItems([]);
+  };
+
+  const blur = () => inputRef.current?.blur();
+
+  // Key Events
   const onKeyUp = (evt: React.KeyboardEvent) => {
-    if (evt.key === 'Escape') forceBlur();
+    if (evt.key === 'Escape') blur();
     if (evt.key === 'Enter') {
-      console.log('ENTER', value);
-      forceBlur();
+      const callback = props.onSearch;
+      if (callback) callback(value, items.map((s) => s.value));
+      blur();
     }
   };
+
+  // Input Events
   const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(evt.target.value);
+    const newValue = evt.target.value;
+    triggerLookup(newValue);
+    setValue(newValue);
   };
-  console.log('VALUE', value);
+
+  // Render Suggestions
+  const suggestions = items.map((s) => (
+    <Label
+      key={s.id}
+      icon={s.icon}
+      title={s.title}
+      className="dome-xToolBar-searchitem"
+    >
+      {s.label}
+    </Label>
+  ));
+  const haspopup = value !== '' && suggestions.length > 0;
+  const visibility = haspopup ? 'visible' : 'hidden';
+
+  // Render Component
   return (
     <>
       <div className="dome-xToolBar-searchicon">
         <SVG id="SEARCH" />
+        <div
+          style={{ visibility }}
+          className="dome-xToolBar-searchmenu"
+        >
+          {suggestions}
+        </div>
       </div>
       <input
         ref={inputRef}
