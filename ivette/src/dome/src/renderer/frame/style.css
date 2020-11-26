@@ -502,11 +502,13 @@
     padding-right: 2px ;
 }
 
-.dome-xToolBar-searchitem:hover {
-    background: lightblue;
+.dome-xToolBar-searchitem:hover,
+.dome-xToolBar-searchindex
+{
+    background: lightblue !important;
 }
 
-.dome-xToolBar-searchitem:nth-child(even):not(:hover) {
+.dome-xToolBar-searchitem:nth-child(even) {
     background: #eef7f7;
 }
 

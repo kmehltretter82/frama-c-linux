@@ -205,6 +205,10 @@ export function Select(props: SelectionProps<string>) {
 
 const DEBOUNCED_SEARCH = 200;
 
+const scrollToRef = (r: undefined | HTMLLabelElement) => {
+  if (r) r.scrollIntoView({ block: 'nearest' });
+};
+
 export interface Hint<A> {
   id: string | number;
   icon?: string;
@@ -238,12 +242,13 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   const blur = () => inputRef.current?.blur();
   const focus = () => inputRef.current?.focus();
   const [value, setValue] = React.useState('');
+  const [index, setIndex] = React.useState(-1);
+  const { onHint, onSelect, onSearch, hints = [] } = props;
 
   // Find event trigger
   useEvent(props.event ?? find, focus);
 
   // Lookup trigger
-  const { onSearch } = props;
   const triggerLookup = React.useCallback(
     debounce((pattern: string) => {
       if (onSearch) onSearch(pattern);
@@ -252,18 +257,32 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   );
 
   // Blur Event
-  const onBlur = () => {
+  const onBlur = debounce(() => {
     setValue('');
+    setIndex(-1);
     if (onSearch) onSearch('');
-  };
+  }, 50);
 
   // Key Events
-  const onKeyUp = (evt: React.KeyboardEvent) => {
-    if (evt.key === 'Escape') blur();
-    if (evt.key === 'Enter') {
-      const { onSelect } = props;
-      if (onSelect) onSelect(value);
-      blur();
+  const onKey = (evt: React.KeyboardEvent) => {
+    switch (evt.key) {
+      case 'Escape':
+        blur();
+        break;
+      case 'Enter':
+        if (index >= 0 && index < hints.length) {
+          if (onHint) onHint(hints[index]);
+        } else if (onSelect) onSelect(value);
+        blur();
+        break;
+      case 'ArrowUp':
+        if (index < 0) setIndex(hints.length - 1);
+        if (index > 0) setIndex(index - 1);
+        break;
+      case 'ArrowDown':
+        if (index < 0 && 0 < hints.length) setIndex(0);
+        if (0 <= index && index < hints.length - 1) setIndex(index + 1);
+        break;
     }
   };
 
@@ -271,26 +290,33 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = evt.target.value;
     triggerLookup(newValue);
+    setIndex(-1);
     setValue(newValue);
   };
 
   // Render Suggestions
-  const { onHint } = props;
-  const suggestions = props.hints?.map((h) => (
-    <Label
-      key={h.id}
-      icon={h.icon}
-      title={h.title}
-      className="dome-xToolBar-searchitem"
-      onClick={() => onHint && onHint(h)}
-    >
-      {h.label}
-    </Label>
-  ));
+  const suggestions = hints.map((h, k) => {
+    const selected = k === index || hints.length === 1;
+    const className = classes(
+      'dome-xToolBar-searchitem',
+      selected && 'dome-xToolBar-searchindex',
+    );
+    return (
+      <Label
+        ref={selected ? scrollToRef : undefined}
+        key={h.id}
+        icon={h.icon}
+        title={h.title}
+        className={className}
+        onClick={() => { if (onHint) onHint(h); }}
+      >
+        {h.label}
+      </Label>
+    );
+  });
   const haspopup =
     inputRef.current === document.activeElement
-    && suggestions
-    && suggestions.length;
+    && suggestions.length > 0;
   const visibility = haspopup ? 'visible' : 'hidden';
 
   // Render Component
@@ -312,7 +338,7 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
         value={value}
         placeholder={props.placeholder}
         className="dome-xToolBar-control dome-xToolBar-searchfield"
-        onKeyUp={onKeyUp}
+        onKeyUp={onKey}
         onChange={onChange}
         onBlur={onBlur}
       />
