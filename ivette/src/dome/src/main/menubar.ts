@@ -336,8 +336,13 @@ export function addMenuItem(custom: CustomMenuItemSpec) {
       }
       if (entry.spec) Object.assign(entry.spec, spec);
       if (entry.item) Object.assign(entry.item, spec);
-
     } else {
+      if (!spec.click && !spec.role)
+        spec.click = (
+          _item: Electron.MenuItem,
+          window: Electron.BrowserWindow,
+          _evt: Electron.KeyboardEvent,
+        ) => window.webContents.send('dome.ipc.menu.clicked', id);
       customItems.set(id, { spec });
       menuSpec.push(spec);
     }
