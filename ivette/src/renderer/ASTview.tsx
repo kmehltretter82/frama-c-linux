@@ -17,6 +17,7 @@ import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 import { printFunction, markerInfo } from 'frama-c/api/kernel/ast';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
+import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -77,6 +78,17 @@ async function functionCallers(functionName: string) {
     D.error(`Fail to retrieve callers of function '${functionName}':`, err);
     return [];
   }
+}
+
+type access = 'Reads' | 'Writes';
+
+async function studia(marker: string, kind: access) {
+  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
+  const data = await Server.send(request, marker);
+  const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
+  if (locations.length > 0)
+    return { locations, index: 0 };
+  return 'MULTIPLE_CLEAR';
 }
 
 // --------------------------------------------------------------------------
@@ -170,6 +182,18 @@ const ASTview = () => {
         });
       }
     }
+    const enabled = selectedMarkerInfo?.kind === 'lvalue'
+                 || selectedMarkerInfo?.var === 'variable';
+    items.push({
+      label: 'Studia: select writes',
+      enabled,
+      onClick: () => studia(markerId, 'Writes').then(updateSelection),
+    });
+    items.push({
+      label: 'Studia: select reads',
+      enabled,
+      onClick: () => studia(markerId, 'Reads').then(updateSelection),
+    });
     if (items.length > 0)
       Dome.popupMenu(items);
   }
