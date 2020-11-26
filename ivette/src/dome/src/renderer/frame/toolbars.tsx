@@ -205,7 +205,7 @@ export function Select(props: SelectionProps<string>) {
 
 const DEBOUNCED_SEARCH = 200;
 
-export interface Suggestion<A> {
+export interface Hint<A> {
   id: string | number;
   icon?: string;
   label: string | JSX.Element;
@@ -218,45 +218,51 @@ export interface SearchFieldProps<A> {
   title?: string;
   /** Placeholder Text. */
   placeholder?: string;
-  /** Search Callback. */
-  onSearch?: (pattern: string, suggestions: A[]) => void;
-  /** Suggestions Callback. */
-  onLookup?: (pattern: string) => Promise<Suggestion<A>[]>;
-  /** Triggering Event (defaults to [[Dome.find]]). */
+  /** Provided search hints (with respect to last `onSearch()` callback). */
+  hints?: Hint<A>[];
+  /** Search callback. Triggered on Enter Key, Escape Key or Blur event. */
+  onSelect?: (pattern: string) => void;
+  /** Dynamic search callback. Triggered on key pressed (debounced). */
+  onSearch?: (pattern: string) => void;
+  /** Hint selection callback. */
+  onHint?: (hint: Hint<A>) => void;
+  /** Event that triggers a focus request (defaults to [[Dome.find]]). */
   event?: null | Event<void>;
 }
 
 /**
    Search Bar.
  */
-export function SearchField<A>(props: SearchFieldProps<A>) {
-  const { onLookup, event = find } = props;
+export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const blur = () => inputRef.current?.blur();
   const focus = () => inputRef.current?.focus();
   const [value, setValue] = React.useState('');
-  const [items, setItems] = React.useState<Suggestion<A>[]>([]);
 
   // Find event trigger
-  useEvent(event, focus);
+  useEvent(props.event ?? find, focus);
 
   // Lookup trigger
-  const triggerLookup = React.useCallback(debounce((pattern: string) => {
-    if (onLookup) onLookup(pattern).then(setItems).catch();
-  }, DEBOUNCED_SEARCH), [onLookup, setItems]);
+  const { onSearch } = props;
+  const triggerLookup = React.useCallback(
+    debounce((pattern: string) => {
+      if (onSearch) onSearch(pattern);
+    }, DEBOUNCED_SEARCH),
+    [onSearch],
+  );
 
   // Blur Event
   const onBlur = () => {
     setValue('');
-    setItems([]);
+    if (onSearch) onSearch('');
   };
 
   // Key Events
   const onKeyUp = (evt: React.KeyboardEvent) => {
     if (evt.key === 'Escape') blur();
     if (evt.key === 'Enter') {
-      const callback = props.onSearch;
-      if (callback) callback(value, items.map((s) => s.value));
+      const { onSelect } = props;
+      if (onSelect) onSelect(value);
       blur();
     }
   };
@@ -269,17 +275,22 @@ export function SearchField<A>(props: SearchFieldProps<A>) {
   };
 
   // Render Suggestions
-  const suggestions = items.map((s) => (
+  const { onHint } = props;
+  const suggestions = props.hints?.map((h) => (
     <Label
-      key={s.id}
-      icon={s.icon}
-      title={s.title}
+      key={h.id}
+      icon={h.icon}
+      title={h.title}
       className="dome-xToolBar-searchitem"
+      onClick={() => onHint && onHint(h)}
     >
-      {s.label}
+      {h.label}
     </Label>
   ));
-  const haspopup = value !== '' && suggestions.length > 0;
+  const haspopup =
+    inputRef.current === document.activeElement
+    && suggestions
+    && suggestions.length;
   const visibility = haspopup ? 'visible' : 'hidden';
 
   // Render Component

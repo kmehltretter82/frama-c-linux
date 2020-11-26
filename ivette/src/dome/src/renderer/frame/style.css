@@ -488,13 +488,18 @@
     overflow-y: auto ;
     left: -7px ;
     top: 4px ;
+    padding: 0px ;
     border: 1pt solid #aaa ;
     background: #fff ;
 }
 
 .dome-xToolBar-searchitem {
-    padding-left: 4pt ;
-    padding-right: 2pt ;
+    display: block ;
+    width: 100% ;
+    margin-left: 0px ;
+    margin-right: 0px ;
+    padding-left: 4px ;
+    padding-right: 2px ;
 }
 
 .dome-xToolBar-searchitem:hover {
