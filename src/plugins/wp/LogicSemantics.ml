@@ -900,14 +900,14 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec compound_offsets = function
-    | C_comp comp when comp.cstruct ->
+    | C_comp { cfields = Some fields ; cstruct = true } ->
         List.fold_left
           (fun offsets fd ->
              List.fold_left
                (fun offsets (obj,ofs) ->
                   (obj , TField(fd,ofs)) :: offsets
                ) offsets (compound_offsets (Ctypes.object_of fd.ftype))
-          ) [] (Option.get comp.cfields)
+          ) [] fields
     | obj -> [obj , TNoOffset]
 
   let assignable_lval env ~unfold lv =

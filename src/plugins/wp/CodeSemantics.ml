@@ -93,10 +93,12 @@ struct
     | C_int _ -> is_zero_int (M.load sigma obj l)
     | C_float _ -> is_zero_float (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
-    | C_comp c ->
+    | C_comp { cfields = None } ->
+        Wp_parameters.fatal "0-initialization of an opaque structure"
+    | C_comp { cfields = Some fields } ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
-          (Option.get c.cfields)
+          fields
     | C_array a ->
         (*TODO[LC] make zero-initializers model-dependent.
                    For instance, a[N][M] becomes a[N*M] in MemTyped,
@@ -484,9 +486,12 @@ struct
         let ct = constfold_ctyp ct in
         let acc = (* updated acc with default init of structure *)
           match ct with
-          | TComp (cp,_,_)
-            when cp.cstruct && (* not for union... *)
-                 (List.length initl) < (List.length (Option.get cp.cfields)) ->
+          | TComp ( { cfields = None },_,_) ->
+              Wp_parameters.fatal
+                "Initializer for incomplete type %a" Cil_printer.pp_typ ct
+          | TComp ( { cstruct ; cfields = Some fields },_,_)
+            when cstruct && (* not for union... *)
+                 (List.length initl) < (List.length fields) ->
               (* default init for unintialized field of a struct *)
               List.fold_left
                 (fun acc f ->
@@ -502,7 +507,7 @@ struct
                          (Cil.addOffsetLval (Field(f, NoOffset)) lv)
                          f.ftype None in
                      init :: acc)
-                acc (List.rev (Option.get cp.cfields))
+                acc (List.rev fields)
 
           | _ -> acc
         in

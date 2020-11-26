@@ -48,7 +48,7 @@ sig
   val name : string
 
   type loc
-  val sizeof : c_object -> int
+  val sizeof : c_object -> term
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc
 
@@ -195,12 +195,18 @@ struct
           in
           (* Since its a generated it is the unique name given *)
           let xms,chunks,sigma = signature domain in
-          let def = List.map
-              (fun f ->
-                 Cfield (f, KValue) ,
-                 !loadrec sigma (object_of f.ftype) (M.field loc f)
-              ) (Option.get c.cfields) in
-          let dfun = Definitions.Function( result , Def , e_record def ) in
+          let dfun =
+            match c.cfields with
+            | None -> Definitions.Logic result
+            | Some fields ->
+                let def = List.map
+                    (fun f ->
+                       Cfield (f, KValue) ,
+                       !loadrec sigma (object_of f.ftype) (M.field loc f)
+                    ) fields
+                in
+                Definitions.Function( result , Def , e_record def )
+          in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
             d_params = x :: xms ;
@@ -364,14 +370,19 @@ struct
           let lfun = Lang.generated_p name in
           let xms,chunks,sigma = signature domain in
           let params = x :: xms in
-          let def = p_all
-              (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
-              (Option.get c.cfields)
+          let def = match c.cfields with
+            | None -> Logic Lang.t_prop
+            | Some fields ->
+                let def = p_all
+                    (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
+                    fields
+                in
+                Predicate(Def, def)
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
             d_params = params ;
-            d_definition = Predicate(Def , def) ;
+            d_definition = def ;
             d_cluster = cluster ;
           } ;
           (* Is_init: full-range definition *)

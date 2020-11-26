@@ -1,0 +1,29 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_acsl/opaque_struct.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+[wp] 7 goals scheduled
+[wp] [Alt-Ergo] Goal typed_check_lemma_should_fail : Unsuccess
+[wp] [Qed] Goal typed_check_lemma_should_succeed : Valid
+[wp] [Alt-Ergo] Goal typed_assigns_check_should_fail : Unsuccess
+[wp] [Qed] Goal typed_assigns_check_should_succeed : Valid
+[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_should_succeed : Valid
+[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_should_fail : Unsuccess
+[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_should_fail_2 : Unsuccess
+[wp] Proved goals:    3 / 7
+  Qed:             2 
+  Alt-Ergo:        1  (unsuccess: 4)
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Axiomatic test            1        -        2      50.0%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  assigns                   1        -        2      50.0%
+  initialized_assigns       -        1        1       100%
+  uninitialized_assigns     -        -        2       0.0%
+------------------------------------------------------------
+[wp] tests/wp_acsl/opaque_struct.i:23: Warning: 
+  Memory model hypotheses for function 'g':
+  /*@ behavior wp_typed:
+        requires \separated(p, &S1, &S2, &p); */
+  void g(void);

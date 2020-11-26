@@ -112,13 +112,13 @@ val frames : addr:term -> offset:term -> sizeof:term ->
 val separated :
   shift:('a -> Ctypes.c_object -> term -> 'a) ->
   addrof:('a -> term) ->
-  sizeof:(Ctypes.c_object -> int) ->
+  sizeof:(Ctypes.c_object -> term) ->
   'a Sigs.rloc -> 'a Sigs.rloc -> pred
 
 val included :
   shift:('a -> Ctypes.c_object -> term -> 'a) ->
   addrof:('a -> term) ->
-  sizeof:(Ctypes.c_object -> int) ->
+  sizeof:(Ctypes.c_object -> term) ->
   'a Sigs.rloc -> 'a Sigs.rloc -> pred
 
 (* -------------------------------------------------------------------------- *)
