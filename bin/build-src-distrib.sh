@@ -200,7 +200,7 @@ function fill_wiki {
     done
     echo "" >> $WIKI_PAGE
     echo "## Main changes" >> $WIKI_PAGE
-    sed 's/\(\#.*\)/##\1/' changes.md >> $WIKI_PAGE
+    sed 's/\(\#.*\)/##\1/' $CHANGES >> $WIKI_PAGE
     run "git -C $WIKI_DIR add $PAGE_NAME"
     diff_validation $WIKI_DIR "Home.md"
     diff_validation $WIKI_DIR "_sidebar.md"
@@ -254,7 +254,7 @@ function add_event_page {
     echo >> $EVENT_WEBPAGE_PATH
     echo "Main changes with respect to $TEXTUAL_PREVIOUS include:" >> $EVENT_WEBPAGE_PATH
     echo >> $EVENT_WEBPAGE_PATH
-    sed 's/\(\#.*\)/###\1/' changes.md >> $EVENT_WEBPAGE_PATH
+    sed 's/\(\#.*\)/###\1/' $CHANGES >> $EVENT_WEBPAGE_PATH
 
     run "git -C $WEBSITE_DIR add $EVENT_WEBPAGE"
 }
