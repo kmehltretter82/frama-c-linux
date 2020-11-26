@@ -16,6 +16,7 @@ import './style.css';
 // --- Generic Label
 // --------------------------------------------------------------------------
 
+/** Labels support fowarding refs to their inner [<label/>] element. */
 export interface LabelProps {
   /** Text of the label. Prepend to other children elements. */
   label?: string;
@@ -31,9 +32,13 @@ export interface LabelProps {
   display?: boolean;
   /** Additional content of the `<label/>` element. */
   children?: React.ReactNode;
+  /** Click event callback. */
+  onClick?: (evt: React.MouseEvent) => void;
+  /** Right-click event callback. */
+  onContextMenu?: (evt: React.MouseEvent) => void;
 }
 
-const makeLabel = (className: string, props: LabelProps) => {
+const makeLabel = (className: string) => (props: LabelProps, ref: any) => {
   const { display = true } = props;
   const allClasses = classes(
     className,
@@ -42,9 +47,12 @@ const makeLabel = (className: string, props: LabelProps) => {
   );
   return (
     <label
+      ref={ref}
       className={allClasses}
       title={props.title}
       style={props.style}
+      onClick={props.onClick}
+      onContextMenu={props.onContextMenu}
     >
       {props.icon && <Icon title={props.title} id={props.icon} />}
       {props.label}
@@ -68,18 +76,18 @@ const TCODE = 'dome-xLabel dome-text-code';
 // --------------------------------------------------------------------------
 
 /** Simple labels. */
-export const Label = (props: LabelProps) => makeLabel(LABEL, props);
+export const Label = React.forwardRef(makeLabel(LABEL));
 
 /** Title and headings. */
-export const Title = (props: LabelProps) => makeLabel(TITLE, props);
+export const Title = React.forwardRef(makeLabel(TITLE));
 
 /** Description, textbook content. */
-export const Descr = (props: LabelProps) => makeLabel(DESCR, props);
+export const Descr = React.forwardRef(makeLabel(DESCR));
 
 /** Selectable textual information. */
-export const Data = (props: LabelProps) => makeLabel(TDATA, props);
+export const Data = React.forwardRef(makeLabel(TDATA));
 
 /** Selectable inlined source-code content. */
-export const Code = (props: LabelProps) => makeLabel(TCODE, props);
+export const Code = React.forwardRef(makeLabel(TCODE));
 
 // --------------------------------------------------------------------------
