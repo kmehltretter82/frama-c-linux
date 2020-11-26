@@ -49,7 +49,7 @@ function find_REMOTE {
     if [ "$REMOTE" != "" ]; then
         return
     fi
-    echo "WARNING: can't find a remote for $name git repository";
+    echo "### WARNING: can't find a remote for $name git repository";
 
     if [ "$create" != "yes" ]; then
         exit 1
@@ -314,6 +314,38 @@ function add_downloads {
     run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
 }
 
+function create_website_branch {
+    if test "$FINAL_RELEASE" = "yes"; then
+        BRANCH_NAME="release/stable-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+    else
+        BRANCH_NAME="release/beta-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
+    fi
+    # Chech whether release/<release> exists on the website
+    git -C $WEBSITE_DIR show-ref --verify --quiet refs/heads/$BRANCH_NAME
+    if [[ "$?" == "0" ]]; then
+        echo "### Warning: branch $BRANCH_NAME already exists in $WEBSITE_DIR"
+        echo "The script will ERASE this branch"
+        proceed_anyway "Rename or erase the branch, then run the script again."
+        run "git -C $WEBSITE_DIR branch -D $BRANCH_NAME"
+    fi
+
+    # Set release/<release> and displays changes to be committed
+    run "git -C $WEBSITE_DIR checkout --quiet -b $BRANCH_NAME"
+    run "git -C $WEBSITE_DIR status"
+
+    echo "Commit locally the previous changes on $WEBSITE_DIR:$BRANCH_NAME? [y/N]"
+    read CHOICE
+    case "${CHOICE}" in
+        "Y"|"y")
+            ;;
+        *)
+            echo "Abort website branch creation, reset to master"
+            run "git -C $WEBSITE_DIR checkout master"
+            exit 1
+    esac
+    run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+}
+
 function fill_website {
     add_install_page
     add_event_page
@@ -323,8 +355,13 @@ function fill_website {
 
 # BEGIN SCRIPT
 
+if [ -z ${GITLAB_FRAMA_C_PUBLIC+x} ]; then
+    GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub/frama-c.git"
+    PUBLIC_REMOTE_NAME="public"
+else
+    PUBLIC_REMOTE_NAME="test-public"
+fi
 GITLAB_FRAMA_C_PRIVATE="git@git.frama-c.com:frama-c/frama-c.git"
-GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub/frama-c.git"
 GITLAB_WIKI="git@git.frama-c.com:pub/frama-c.wiki"
 GITLAB_WEBSITE="git@git.frama-c.com:pub/pub.frama-c.com.git"
 GITLAB_ACSL="git@github.com:acsl-language/acsl.git"
@@ -355,12 +392,12 @@ VERSION_MINOR=$(cat VERSION | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 
 if test -n "$VERSION_MODIFIER"; then FINAL_RELEASE=no; else FINAL_RELEASE=yes; fi
 if [ "$VERSION_MODIFIER" == "+dev" ]; then
-    echo "WARNING: The VERSION is a development version"
+    echo "### WARNING: The VERSION is a development version"
     proceed_anyway "Update VERSION and run the script again"
 fi
 
 if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
-    echo "WARNING: The current commit is not tagged with the current version:"
+    echo "### WARNING: The current commit is not tagged with the current version:"
     echo "Frama-C Version: $FRAMAC_VERSION"
     echo "Frama-C Tag    : $FRAMAC_TAG"
 fi
@@ -369,23 +406,25 @@ fi
 
 find_REMOTE "no" "origin" $GITLAB_FRAMA_C_PRIVATE
 ORIGIN_REMOTE=$REMOTE
-find_REMOTE "yes" "public" $GITLAB_FRAMA_C_PUBLIC
+find_REMOTE "yes" $PUBLIC_REMOTE_NAME $GITLAB_FRAMA_C_PUBLIC
 PUBLIC_REMOTE=$REMOTE
 
 # Find specific repositories
 
 find_repository_DIRECTORY_BRANCH "./website" $GITLAB_WEBSITE
 WEBSITE_DIR=$DIRECTORY
+WEBSITE_BRANCH=$BRANCH
 
 find_repository_DIRECTORY_BRANCH "./doc/acsl" $GITLAB_ACSL
 ACSL_DIR=$DIRECTORY
 
 find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $GITLAB_WIKI
 WIKI_DIR=$DIRECTORY
+WIKI_BRANCH=$BRANCH
 
 CHANGES="./main_changes.md"
 if test \! -f $CHANGES ; then
-    echo "WARNING: The $CHANGES file is missing"
+    echo "### WARNING: The $CHANGES file is missing"
     echo "Do you want to create an empty one? [y/N]"
     read CHOICE
     case "${CHOICE}" in
@@ -407,8 +446,8 @@ OUT_DIR="./distributed"
 echo "Frama-C Version      : $FRAMAC_VERSION"
 echo "Final release        : $FINAL_RELEASE"
 echo "Frama-C Branch       : $FRAMAC_BRANCH"
-echo "Origin remote        : $ORIGIN_REMOTE"
-echo "Public remote        : $PUBLIC_REMOTE"
+echo "Origin remote        : $ORIGIN_REMOTE ($(git remote get-url $ORIGIN_REMOTE))"
+echo "Public remote        : $PUBLIC_REMOTE ($(git remote get-url $PUBLIC_REMOTE))"
 echo "Manuals Dir          : $MANUALS_DIR"
 echo "ACSL Dir             : $ACSL_DIR"
 echo "Frama-C Wiki Dir     : $WIKI_DIR"
@@ -427,8 +466,10 @@ echo -n "Steps are:
   3) build API bundle
   4) build documentation companions
   5) clean $BUILD_DIR
-  6) prepare wiki (will RESET HARD $WIKI_DIR branch)
-  7) prepare website (will RESET HARD $WEBSITE_DIR branch)
+  6) prepare wiki (will RESET HARD $WIKI_DIR:$WIKI_BRANCH)
+  7) prepare website (will RESET HARD $WEBSITE_DIR:$WEBSITE_BRANCH)
+  8) check generated distribution
+  9) propagate all changes
 Start at which step? (default is N, which cancels everything)
 - If this is the first time running this script, start at 0
 - Otherwise, start at the latest step before failure
@@ -495,6 +536,41 @@ case "${STEP}" in
         step 7 "PREPARE WEBSITE"
         run "git -C $WEBSITE_DIR reset --hard"
         fill_website
+        ;&
+    8)
+        step 8 "CHECK GENERATED DISTRIBUTION"
+        TEST_DIR="$BUILD_DIR_ROOT/frama-c-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME"
+        run "mkdir -p $BUILD_DIR_ROOT"
+        run "rm -rf $TEST_DIR"
+        run "cp $OUT_DIR/$TARGZ_FILENAME $BUILD_DIR_ROOT"
+        run "cd $BUILD_DIR_ROOT ; tar xzf $TARGZ_FILENAME"
+        run "./doc/release/checktar.sh $TEST_DIR"
+        run "cd $TEST_DIR ; ./configure && make -j && make tests"
+        ;&
+    9)
+        step 9 "PROPAGATE CHANGES"
+        echo "This step will:"
+        echo "- ask for a validation of the changes to website"
+        echo "- create and push a new branch for the website for the release"
+        echo "- ask for a validation of the changes to wiki"
+        echo "- push changes to the wiki"
+        echo "- push Frama-C:$FRAMAC_BRANCH on the remote $PUBLIC_REMOTE"
+        echo "- push tag $FRAMAC_TAG on the remote $PUBLIC_REMOTE"
+        echo "If you want to perform some additional checks it is probably time to stop"
+        echo "Generated files are available in: $OUT_DIR"
+        echo
+        echo -n "If you are ready to continue, type exactly YES: "
+        read CHOICE
+        case "${CHOICE}" in
+            "YES")
+                ;;
+            "Y"|"y")
+                echo "If you really want to continue type exactly YES"
+                ;&
+            *)
+                echo "Aborting"
+                exit 1
+        esac
         ;;
     *)
         echo "Bad entry: ${STEP}"
