@@ -3,8 +3,8 @@
                 "target": "exists i_0,i_1:int.\n(i_0<=i_13) /\\ (i_1<=i_14) /\\ (0<=i_0) /\\ (i_13<=i_0) /\\ (i_14<=i_1)\n/\\ (i_0<=9)",
                 "pattern": "\\E$i$i0$i$i9" },
     "children": { "Goal 1/2": [ { "prover": "Alt-Ergo:2.2.0",
-                                  "verdict": "valid", "time": 0.0169,
+                                  "verdict": "valid", "time": 0.0209,
                                   "steps": 39 } ],
                   "Goal 2/2": [ { "prover": "Alt-Ergo:2.2.0",
-                                  "verdict": "valid", "time": 0.0167,
+                                  "verdict": "valid", "time": 0.0184,
                                   "steps": 39 } ] } } ]
