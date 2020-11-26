@@ -16,6 +16,7 @@ import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 import { printFunction, markerInfo } from 'frama-c/api/kernel/ast';
+import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 
 import 'codemirror/mode/clike/clike';
@@ -79,6 +80,33 @@ async function functionCallers(functionName: string) {
   }
 }
 
+function getBulletColor(status: States.Tag) {
+  switch (status.name) {
+    case 'unknown': return '#FF8300';
+    case 'invalid':
+    case 'invalid_under_hyp': return '#FF0000';
+    case 'valid':
+    case 'valid_under_hyp': return '#00B900';
+    case 'considered_valid': return '#0000FF';
+    case 'invalid_but_dead':
+    case 'valid_but_dead':
+    case 'unknown_but_dead': return '#000000';
+    case 'never_tried': return '#FFFFFF';
+    case 'inconsistent': return '#FF00FF';
+    default: return '#0000FF';
+  }
+}
+
+function makeBullet(status: States.Tag) {
+  const marker = document.createElement('div');
+  marker.style.color = getBulletColor(status);
+  if (status.descr)
+    marker.title = status.descr;
+  marker.innerHTML = '◉';
+  marker.align = 'center';
+  return marker;
+}
+
 // --------------------------------------------------------------------------
 // --- AST Printer
 // --------------------------------------------------------------------------
@@ -99,6 +127,32 @@ const ASTview = () => {
   const theMarker = selection?.current?.marker;
 
   const deadCode = States.useRequest(getDeadCode, theFunction);
+
+  const propertyStatus = States.useSyncArray(Properties.status).getArray();
+  const statusDict = States.useTags(Properties.propStatusTags);
+
+  React.useEffect(() => {
+    function setBullets() {
+      if (theFunction) {
+        propertyStatus.forEach((prop) => {
+          if (prop.function === theFunction) {
+            const status = statusDict.get(prop.status);
+            if (status) {
+              const bullet = makeBullet(status);
+              const markers = buffer.findTextMarker(prop.key);
+              markers.forEach((marker) => {
+                const pos = marker.find();
+                buffer.forEach((cm) => {
+                  cm.setGutterMarker(pos.from.line, 'bullet', bullet);
+                });
+              });
+            }
+          }
+        });
+      }
+    }
+    buffer.on('change', setBullets);
+  }, [buffer, propertyStatus, statusDict, theFunction]);
 
   // Hook: async loading
   React.useEffect(() => {
@@ -218,6 +272,7 @@ const ASTview = () => {
         selection={theMarker}
         onSelection={onTextSelection}
         onContextMenu={onContextMenu}
+        gutters={['bullet']}
         readOnly
       />
     </>
