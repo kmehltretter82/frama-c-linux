@@ -6,5 +6,5 @@
                                   "verdict": "valid", "time": 0.0146,
                                   "steps": 27 } ],
                   "Goal 2/2": [ { "prover": "Alt-Ergo:2.2.0",
-                                  "verdict": "valid", "time": 0.0146,
+                                  "verdict": "valid", "time": 0.0143,
                                   "steps": 27 } ] } } ]
