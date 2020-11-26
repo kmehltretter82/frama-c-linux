@@ -172,16 +172,17 @@ class visitor = object(self)
         | { enode = Lval ( (Var vi), NoOffset ) } -> Some vi
         | _ -> None
       in
+      let is_ghost vi = vi.vghost || Ast_info.is_frama_c_builtin vi.vname in
       let failed = match i with
         | Call(_, fexp, _, _) ->
           begin match call_varinfo fexp with
-            | Some fct when not fct.vghost ->
+            | Some fct when not (is_ghost fct) ->
               Error.non_ghost_function_call_in_ghost ~current:true () ; true
             | None ->
               Error.function_pointer_call ~current:true () ; true
             | _ -> false
           end
-        | Local_init(_, ConsInit(fct, _, _), _) when not fct.vghost ->
+        | Local_init(_, ConsInit(fct, _, _), _) when not (is_ghost fct) ->
           Error.non_ghost_function_call_in_ghost ~current:true () ; true
         | _ -> false
       in
