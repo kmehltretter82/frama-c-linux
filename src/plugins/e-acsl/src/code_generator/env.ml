@@ -215,9 +215,9 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
         env_stack = local_env :: tl_env }
     | Varname.Block ->
       let local_env =
-        { block_info = new_block;
-          mp_tbl = extend_tbl local_env.mp_tbl;
-          rte = false (* must be already checked by mk_stmts *) }
+        { local_env with
+          block_info = new_block;
+          mp_tbl = extend_tbl local_env.mp_tbl }
       in
       { env with
         cpt = n;
@@ -227,8 +227,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
     let new_global_vars = (v, lscope) :: env.new_global_vars in
     let local_env =
       { local_env with
-        block_info = new_block;
-        rte = false (* must be already checked by mk_stmts *) }
+        block_info = new_block }
     in
     { env with
       new_global_vars = new_global_vars;
