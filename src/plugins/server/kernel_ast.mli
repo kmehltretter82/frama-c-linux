@@ -30,6 +30,7 @@ open Cil_types
 module Kf : Data.S with type t = kernel_function
 module Ki : Data.S with type t = kinstr
 module Stmt : Data.S with type t = stmt
+module Lval : Data.S with type t = kinstr * lval
 
 module Marker :
 sig

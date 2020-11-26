@@ -254,6 +254,25 @@ module Printer = Printer_tag.Make(Marker)
 (* --- Ast Data                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Lval =
+struct
+  type t = kinstr * lval
+  let jtype = Marker.jlval
+  let to_json (kinstr, lval) =
+    let kf = match kinstr with
+      | Kglobal -> None
+      | Kstmt stmt -> Some (Kernel_function.find_englobing_kf stmt)
+    in
+    Marker.to_json (PLval (kf, kinstr, lval))
+  let of_json js =
+    let open Printer_tag in
+    match Marker.of_json js with
+    | PLval (_, kinstr, lval) -> kinstr, lval
+    | PVDecl (_, kinstr, vi) -> kinstr, Cil.var vi
+    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Kglobal, Cil.var vi
+    | _ -> Data.failure "not a lval marker"
+end
+
 module Stmt =
 struct
   type t = stmt
