@@ -94,6 +94,11 @@ const LocationsTable = () => {
           title={`Clear location${numberOfSelections > 1 ? 's' : ''}`}
         />
       </TitleBar>
+      <Label
+        label={multipleSelections?.name}
+        title={multipleSelections?.title}
+        style={{ textAlign: 'center' }}
+      />
       <Table
         model={model}
         selection={multipleSelections?.index}
