@@ -135,6 +135,20 @@ let generate_rte env =
   let local_env, _ = top env in
   local_env.rte
 
+let with_rte ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let env = f env in
+  let env = rte env old_rte_value in
+  env
+
+let with_rte_and_result ~f env rte_value =
+  let old_rte_value = generate_rte env in
+  let env = rte env rte_value in
+  let other, env = f env in
+  let env = rte env old_rte_value in
+  other, env
+
 (* ************************************************************************** *)
 
 (* eta-expansion required for typing generalisation *)
