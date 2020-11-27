@@ -53,23 +53,19 @@ if not framac_bin:
    sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
 framac_script = f"{framac_bin}/frama-c-script"
 
-_logfd, logname = tempfile.mkstemp(prefix="make_wrapper_tmp_")
+output_lines = []
 cmd_list = ['make', "-C", make_dir] + args
 with subprocess.Popen(cmd_list,
                       stdout=subprocess.PIPE,
-                      stderr=subprocess.STDOUT) as proc, \
-     open (logname, "bw") as logfile:
+                      stderr=subprocess.PIPE) as proc:
   while True:
     line = proc.stdout.readline()
     if line:
        sys.stdout.buffer.write(line)
        sys.stdout.flush()
-       logfile.write(line)
+       output_lines.append(line.decode('utf-8'))
     else:
        break
-
-output = open(logname, "r").read()
-os.remove(logname)
 
 re_missing_spec = re.compile("Neither code nor specification for function ([^,]+),")
 re_recursive_call_start = re.compile("detected recursive call")
@@ -77,7 +73,7 @@ re_recursive_call_end = re.compile("Use -eva-ignore-recursive-calls to ignore")
 
 tips = []
 
-lines = iter(output.splitlines())
+lines = iter(output_lines)
 for line in lines:
     match = re_missing_spec.search(line)
     if match:
