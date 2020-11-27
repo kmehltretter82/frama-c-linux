@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -26,26 +26,30 @@
 # on a best-efforts basis (no guarantee that the result is fully compatible).
 #
 # known missing features:
-# - doesn't work if a directory name contains spaces
 # - doesn't follow symbolic links to directories
-
-ARGS=$@
 
 DIR=
 
-# verbosing on by default
+# verbose on by default
 VERBOSE="v"
 
+# test once if sed supports -i (BSD/macOS does not)
+SED_HAS_I=$(sed --help 2>/dev/null | grep '\-i' 2>/dev/null)
+
+# [sedi file expressions] runs 'sed -i expressions' on the specified file;
+# if '-i' is not supported, creates a temporary file and overwrites the
+# original, like '-i' does.
 sedi ()
 {
-  if [ -n "`sed --help 2> /dev/null | grep \"\\-i\" 2> /dev/null`" ]; then
-    sed -i "$@"
+  file="$1"
+  shift
+  if [ -n "$SED_HAS_I" ]; then
+    sed -i "$@" "$file"
   else
-      # option '-i' is not recognized by sed: use a tmp file
+    # option '-i' is not recognized by sed: use a tmp file
     new_temp=`mktemp /tmp/frama-c.XXXXXXX` || exit 1
-    sed "$@" > $new_temp
-    eval last=\${$#}
-    mv $new_temp $last
+    sed "$@" "$file" > "$new_temp"
+    mv -f "$new_temp" "$file"
   fi
 }
 
@@ -56,18 +60,19 @@ dirs ()
   fi
 }
 
+# [safe_goto d1 d2 cmd] goes to d1, runs cmd, and returns to d2
 safe_goto ()
 {
-  dir=$1
-  cd $dir
+  dir="$1"
+  cd "$dir"
   $3
-  cd $2
+  cd "$2"
 }
 
 goto ()
 {
-  if [ -d $1 ]; then
-    safe_goto $1 $2 $3
+  if [ -d "$1" ]; then
+    safe_goto "$1" "$2" "$3"
   else
     echo "Directory '$1' does not exist. Omitted."
   fi
@@ -75,11 +80,11 @@ goto ()
 
 process_file ()
 {
-  file=$1
+  file="$1"
   if [ "$VERBOSE" ]; then
     echo "Processing file $file"
   fi
-  sedi \
+  sedi "$file" \
    -e 's/Cil\.Frama_c_builtins/Cil_builtins.Frama_c_builtins/g' \
    -e 's/Cil\.is_builtin/Cil_builtins.is_builtin/g' \
    -e 's/Cil\.is_unused_builtin/Cil_builtins.is_unused_builtin/g' \
@@ -88,8 +93,7 @@ process_file ()
    -e 's/Cil\.add_special_builtin_family/Cil_builtins.add_special_builtin_family/g' \
    -e 's/Cil\.init_builtins/Cil_builtins.init_builtins/g' \
    -e 's/Cil\.Builtin_functions/Cil_builtins.Builtin_functions/g' \
-   -e 's/Cil\.builtinLoc/Cil_builtins.builtinLoc/g' \
-   $file
+   -e 's/Cil\.builtinLoc/Cil_builtins.builtinLoc/g'
 }
 
 apply_one_dir ()
@@ -97,17 +101,20 @@ apply_one_dir ()
   if [ "$VERBOSE" ]; then
     echo "Processing directory `pwd`"
   fi
-  for f in `ls -p1 *.ml* 2> /dev/null`; do
-    process_file $f
+  for f in $(find . -maxdepth 1 -type f -name "*.ml*" 2> /dev/null); do
+    process_file "$f"
   done
 }
 
 apply_recursively ()
 {
-  apply_one_dir
-  for d in `ls -p1 | grep \/`; do
-    safe_goto $d .. apply_recursively
-  done
+    apply_one_dir
+    while IFS= read -r -d $'\0' d; do
+        if [ "$d" = "." ]; then
+            continue
+        fi
+        safe_goto "$d" .. apply_recursively
+    done < <(find . -maxdepth 1 -type d -print0)
 }
 
 applying_to_list ()
@@ -115,7 +122,7 @@ applying_to_list ()
   dirs
   tmpdir=`pwd`
   for d in $DIR; do
-    goto $d $tmpdir $1
+    goto "$d" "$tmpdir" "$1"
   done
 }
 
@@ -154,11 +161,11 @@ parse_arg ()
 
 cmd_line ()
 {
-  for s in $ARGS; do
-    parse_arg $s
+  for s in "$@"; do
+    parse_arg "$s"
   done
   applying_to_list $FN
 }
 
-cmd_line
+cmd_line "$@"
 exit 0
