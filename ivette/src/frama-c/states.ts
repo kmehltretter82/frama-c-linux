@@ -648,10 +648,10 @@ function reducer(s: Selection, action: SelectionActions): Selection {
     return selectLocation(s, action.location);
   }
   if (isMultipleSelect(action)) {
-    if (action.locations.length === 0)
-      return s;
     const index = action.index > 0 ? action.index : 0;
-    const selection = selectLocation(s, action.locations[index]);
+    const selection =
+      action.locations.length === 0 ? s :
+        selectLocation(s, action.locations[index]);
     return {
       ...selection,
       multiple: {

@@ -87,15 +87,16 @@ async function studia(marker: string, info: markerInfoData, kind: access) {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
+  const lval = info.name;
   if (locations.length > 0) {
-    const lval = info.name;
     const name = `${kind} of ${lval}`;
     const title = `List of statements ${
       (kind === 'Reads') ? 'accessing' : 'modifying'
     } the memory location pointed by ${lval}.`;
     return { name, title, locations, index: 0 };
   }
-  return 'MULTIPLE_CLEAR';
+  const name = `No ${kind.toLowerCase()} of ${lval}`;
+  return { name, title: '', locations: [], index: 0 };
 }
 
 // --------------------------------------------------------------------------
