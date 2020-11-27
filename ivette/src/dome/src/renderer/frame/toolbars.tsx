@@ -327,6 +327,7 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
         <div
           style={{ visibility }}
           className="dome-xToolBar-searchmenu"
+          onMouseDown={(event) => event.preventDefault()}
         >
           {suggestions}
         </div>
