@@ -5,7 +5,8 @@ Please directly edit it inline to provide the required information.
 Before submitting the issue, please confirm (by adding a X in the [ ]):
 
 - [ ] the issue has not yet been reported on [Gitlab](https://git.frama-c.com/pub/frama-c/issues);
-- [ ] the issue has not yet been reported on our [BTS](https://bts.frama-c.com);
+- [ ] the issue has not yet been reported on our old
+  [BTS](https://bts.frama-c.com) (*note: the old BTS is deprecated*);
 - [ ] you installed Frama-C as prescribed in the [instructions](INSTALL.md).
 
 # Contextual information
