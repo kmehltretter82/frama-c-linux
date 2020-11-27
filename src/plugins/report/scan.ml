@@ -147,7 +147,7 @@ let iter (inspector:inspector) =
         Kernel_function.Map.iter
           (fun kf ips ->
              let vi = Kernel_function.get_vi kf in
-             if not (Cil.is_unused_builtin vi) then
+             if not (Cil_builtins.is_unused_builtin vi) then
                report (fun () -> inspector#function_section kf) inspector#property !ips)
           !functions ;
         inspector#finished ;

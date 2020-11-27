@@ -143,7 +143,7 @@ class printer_with_annot () = object (self)
        then begin
          declared_globs <- Cil_datatype.Varinfo.Set.add vi declared_globs;
          (* pretty prints the spec, but not for built-ins*)
-         if not (Cil.Builtin_functions.mem vi.vname) then
+         if not (Cil_builtins.Builtin_functions.mem vi.vname) then
            self#pretty_funspec fmt kf
        end
      with Not_found ->

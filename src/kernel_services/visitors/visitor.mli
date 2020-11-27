@@ -35,69 +35,69 @@ open Cil_types
     {b A few hints on how to use correctly this visitor}
 
     - when initializing a new project with it
-    (see {!File.init_project_from_visitor}), use a visitor with copy behavior
+      (see {!File.init_project_from_visitor}), use a visitor with copy behavior
 
     - [SkipChildren] and [ChangeTo] must be used with extreme care in a visitor
-    with copy behavior, or some nodes may be shared between the original and
-    the copy.
+      with copy behavior, or some nodes may be shared between the original and
+      the copy.
 
     - Do not erase a statement during the visit, as there might be
-    annotations attached to it. Change it to Skip instead, the
-    [generic_frama_c_visitor] will know what to do.
+      annotations attached to it. Change it to Skip instead, the
+      [generic_frama_c_visitor] will know what to do.
 
     - Be careful if you change the [vid] or [sid]: this must be done before
-    anything has been attached to the corresponding variable or
-    statement in the new project, which means
-       - for statements, in [vstmt], for the current statement only
-       - for variables, at their declaration point. *)
+      anything has been attached to the corresponding variable or
+      statement in the new project, which means
+      -- for statements, in [vstmt], for the current statement only
+      -- for variables, at their declaration point. *)
 class type frama_c_visitor = object
 
   inherit Cil.cilVisitor
 
   method frama_c_plain_copy: frama_c_visitor
-    (** same as plain_copy_visitor but for frama-c specific methods *)
+  (** same as plain_copy_visitor but for frama-c specific methods *)
 
   method vstmt_aux: stmt -> stmt Cil.visitAction
-    (** Replacement of vstmt.
-        @plugin development guide*)
+  (** Replacement of vstmt.
+      @plugin development guide*)
 
   method vglob_aux: global -> global list Cil.visitAction
-    (** Replacement of vglob.
-        @plugin development guide*)
+  (** Replacement of vglob.
+      @plugin development guide*)
 
   method current_kf: kernel_function option
-    (** link to the kernel function currently being visited.
-        {b NB:} for copy visitors, the link is to the original kf (anyway,
-        the new kf is created only after the visit is over).
-	@plugin development guide *)
+  (** link to the kernel function currently being visited.
+      {b NB:} for copy visitors, the link is to the original kf (anyway,
+      the new kf is created only after the visit is over).
+      @plugin development guide *)
 
   method set_current_kf: kernel_function -> unit
-    (** Internal use only. *)
+  (** Internal use only. *)
 
   method reset_current_kf: unit -> unit
-    (** Internal use only. *)
+  (** Internal use only. *)
 end
 
 class frama_c_inplace: frama_c_visitor
-  (** in-place visitor; always act in the current project. 
-      @plugin development guide *)
+(** in-place visitor; always act in the current project.
+    @plugin development guide *)
 
 class frama_c_copy: Project.t -> frama_c_visitor
-  (** Copying visitor. The [Project.t] argument specifies in which project the
-      visitor creates the new values. (Technically, the method
-      [fill_global_tables] is called inside this project.)
-      See {!File.init_project_from_visitor} and [create_project_from_visitor]
-      for possible uses. *)
+(** Copying visitor. The [Project.t] argument specifies in which project the
+    visitor creates the new values. (Technically, the method
+    [fill_global_tables] is called inside this project.)
+    See {!File.init_project_from_visitor} and [create_project_from_visitor]
+    for possible uses. *)
 
 class frama_c_refresh: Project.t -> frama_c_visitor
-  (** Similar to {!frama_c_copy}, but ids will be refreshed in the copy.
-      @since Sodium-20150201
-   *)
+(** Similar to {!frama_c_copy}, but ids will be refreshed in the copy.
+    @since Sodium-20150201
+*)
 
 class generic_frama_c_visitor:
   Visitor_behavior.t ->  frama_c_visitor
-  (** Generic class that abstracts over [frama_c_inplace] and [frama_c_copy]. 
-      @plugin development guide *)
+(** Generic class that abstracts over [frama_c_inplace] and [frama_c_copy].
+    @plugin development guide *)
 
 (** Visit a file. This will re-cons all globals TWICE (so that it is
     tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
@@ -111,21 +111,21 @@ val visitFramacFile: frama_c_visitor -> file -> unit
 (** A visitor for the whole file that does not change the globals (but maybe
     changes things inside the globals). Use this function instead of
     {!Visitor.visitFramacFile} whenever appropriate because it is more
-    efficient for long files. 
+    efficient for long files.
     @plugin development guide *)
 val visitFramacFileSameGlobals: frama_c_visitor -> file -> unit
 
 (** Visit a global.
 
-{b Warning} Do not call this function during another visit using the
-same visitor, as it is not reentrant: the inner visit will leave the visitor
-in an inconsistent state for the outer visit.
+    {b Warning} Do not call this function during another visit using the
+    same visitor, as it is not reentrant: the inner visit will leave the visitor
+    in an inconsistent state for the outer visit.
 *)
 val visitFramacGlobal: frama_c_visitor -> global -> global list
 
 (** Visit a kernel_function. More precisely, the entry point for the visit
     will be the global corresponding to the last declaration/definition of
-    the kf. The returned kf is the one that has the varinfo 
+    the kf. The returned kf is the one that has the varinfo
     associated to the varinfo of the original kf. If this is a new kf, it is
     however the responsibility of the visitor to insert it in the AST at
     the appropriate place.
@@ -165,7 +165,7 @@ val visitFramacType: frama_c_visitor -> typ -> typ
 (** Visit a variable declaration *)
 val visitFramacVarDecl: frama_c_visitor -> varinfo -> varinfo
 
-(** Visit a logic variable declaration 
+(** Visit a logic variable declaration
 
     @since Magnesium-20151001
 *)
@@ -209,7 +209,7 @@ val visitFramacPredicates: frama_c_visitor -> identified_predicate list
 
 (** visit identified_term.
     @since Oxygen-20120901
- *)
+*)
 val visitFramacIdTerm: frama_c_visitor -> identified_term -> identified_term
 
 val visitFramacTerm: frama_c_visitor -> term -> term

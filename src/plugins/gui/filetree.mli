@@ -25,70 +25,71 @@
 type filetree_node =
   | File of Datatype.Filepath.t * Cil_types.global list
   | Global of Cil_types.global
-(** Caml type for the infos on a node of the tree. Not all globals appear
-    in the filetree. Currently, the visible ones are:
-    - functions definitions, or declarations if no definition exists
-    - global variables
-    - global annotations
-    @since Nitrogen-20111001 *)
+  (** Caml type for the infos on a node of the tree. Not all globals appear
+      in the filetree. Currently, the visible ones are:
+      - functions definitions, or declarations if no definition exists
+      - global variables
+      - global annotations
+
+      @since Nitrogen-20111001 *)
 
 class type t =  object
   method model : GTree.model
 
   method flat_mode: bool
-    (** Return [true] if the filetree currently displays all globals in
-        flat mode (all children of the same node), [false] otherwise
-        (children of the file they are declared in). If [true], the methods
-        [set_file_attribute] and [get_files_globals] must not be used
+  (** Return [true] if the filetree currently displays all globals in
+      flat mode (all children of the same node), [false] otherwise
+      (children of the file they are declared in). If [true], the methods
+      [set_file_attribute] and [get_files_globals] must not be used
 
-        @since Nitrogen-20111001  *)
+      @since Nitrogen-20111001  *)
 
   method set_file_attribute:
     ?strikethrough:bool -> ?text:string -> Datatype.Filepath.t -> unit
-    (** Manually set some attributes of the given filename. *)
+  (** Manually set some attributes of the given filename. *)
 
   method set_global_attribute:
     ?strikethrough:bool -> ?text:string -> Cil_types.varinfo -> unit
-    (** Manually set some attributes of the given variable. *)
+  (** Manually set some attributes of the given variable. *)
 
   method add_global_filter:
     text:string ->
     key:string ->
     (Cil_types.global -> bool) ->
     (unit -> bool) * GMenu.check_menu_item
-    (** [add_global_filter text key f] adds a filter for the visibility of
-        the globals, according to [f]. If any of the filters registered
-        through this method returns true, the global is not displayed in the
-        filetree. [text] is used in the filetree menu, to label the entry
-        permitting to activate or deactivate the filter. [key] is used to
-        store the current state of the filter internally. The created
-        menu is returned.
+  (** [add_global_filter text key f] adds a filter for the visibility of
+      the globals, according to [f]. If any of the filters registered
+      through this method returns true, the global is not displayed in the
+      filetree. [text] is used in the filetree menu, to label the entry
+      permitting to activate or deactivate the filter. [key] is used to
+      store the current state of the filter internally. The created
+      menu is returned.
 
-        @since Nitrogen-20111001
-        @modify Oxygen-20120901 Signature change for the filter argument,
-        return the menu.
-    *)
+      @since Nitrogen-20111001
+      @modify Oxygen-20120901 Signature change for the filter argument,
+      return the menu.
+  *)
 
   method get_file_globals:
     Datatype.Filepath.t -> (string * bool) list
-    (** Return the names and the attributes (currently only the strikethrough
-        property) of the globals in the file passed as argument *)
+  (** Return the names and the attributes (currently only the strikethrough
+      property) of the globals in the file passed as argument *)
 
   method find_visible_global:
     string -> Cil_types.global option
-    (** [find_visible_global str] searches for the next occurrence of a visible
-        global whose name contains [str], starting at the currently selected
-        element. Returns the global found (if any).
+  (** [find_visible_global str] searches for the next occurrence of a visible
+      global whose name contains [str], starting at the currently selected
+      element. Returns the global found (if any).
 
-        @since Magnesium-20151001 *)
+      @since Magnesium-20151001 *)
 
   method add_select_function :
     (was_activated:bool -> activating:bool -> filetree_node -> unit) -> unit
-    (** Register a callback that is called whenever an element of the file tree
-        is selected or unselected.
+  (** Register a callback that is called whenever an element of the file tree
+      is selected or unselected.
 
-        @modify Nitrogen-20111001 Changed argument from a list
-        of globals to [filetree_node] *)
+      @modify Nitrogen-20111001 Changed argument from a list
+      of globals to [filetree_node] *)
 
   method append_text_column:
     title:string ->
@@ -137,27 +138,27 @@ class type t =  object
       a [varinfo]. Returns a boolean to indicate success or failure. *)
 
   method selected_globals : Cil_types.global list
-    (** @since Carbon-20101201
-        @return the list of selected globals in the treeview. *)
+  (** @since Carbon-20101201
+      @return the list of selected globals in the treeview. *)
 
   method view : GTree.view
-    (** The tree view associated in which the file tree is packed. *)
+  (** The tree view associated in which the file tree is packed. *)
 
   method reset : unit -> unit
-    (** Resynchronize the tree view with the current project state.
-        This is called in particular by the generic reset extension of
-        {!Design} *)
+  (** Resynchronize the tree view with the current project state.
+      This is called in particular by the generic reset extension of
+      {!Design} *)
 
   method register_reset_extension : (t -> unit) -> unit
   (** Register a function to be called whenever the reset method of the
       filetree is called. *)
 
   method refresh_columns : unit -> unit
-    (** Refresh the state of all the non-source columns of the filetree,
-        by hiding those that should be hidden, and displaying the
-        others. Called by [reset]
+  (** Refresh the state of all the non-source columns of the filetree,
+      by hiding those that should be hidden, and displaying the
+      others. Called by [reset]
 
-        @since Nitrogen-20111001 *)
+      @since Nitrogen-20111001 *)
 end
 
 val make : GTree.view -> t

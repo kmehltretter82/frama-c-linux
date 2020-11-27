@@ -34,7 +34,7 @@ let html_stag_functions =
       let index = String.index t ' ' in
       Format.sprintf "</%s>" (String.sub t 0 index)
     with
-      | Not_found -> Format.sprintf "</%s>" t
+    | Not_found -> Format.sprintf "</%s>" t
   and print_open_stag _ = ()
   and print_close_stag _ = ()
   in
@@ -64,7 +64,7 @@ module OptionKf =
 
 (** Defining base metrics and operations on those *)
 module BasicMetrics = struct
-(** Record type to compute cyclomatic complexity *)
+  (** Record type to compute cyclomatic complexity *)
 
   type t = {
     cfile_name : Datatype.Filepath.t;
@@ -139,11 +139,11 @@ module BasicMetrics = struct
   ;;
 
   let labels =
-      [ "Sloc"; "Decision point"; "Global variables"; "If"; "Loop";  "Goto";
-        "Assignment"; "Exit point"; "Function"; "Function call";
-        "Pointer dereferencing";
-        "Cyclomatic complexity";
-      ]
+    [ "Sloc"; "Decision point"; "Global variables"; "If"; "Loop";  "Goto";
+      "Assignment"; "Exit point"; "Function"; "Function call";
+      "Pointer dereferencing";
+      "Cyclomatic complexity";
+    ]
   ;;
 
   let str_values metrics =
@@ -162,12 +162,12 @@ module BasicMetrics = struct
   let pp_func_or_none =
     Pretty_utils.pp_opt ~none:"<none>" Kernel_function.pretty
 
-(* Pretty print metrics as text eg. in stdout *)
+  (* Pretty print metrics as text eg. in stdout *)
   let pp_base_metrics fmt metrics =
     let heading =
       if metrics.cfile_name = Datatype.Filepath.dummy &&
          metrics.cfunc = None then
-      (* It is a global metrics *)
+        (* It is a global metrics *)
         "Global metrics"
       else
         Format.asprintf "Stats for function <%a/%a>"
@@ -177,12 +177,12 @@ module BasicMetrics = struct
     Format.fprintf fmt "@[<v 0>%a @ %a@]"
       (mk_hdr 1) heading
       ((fun l1 ppf l2 ->
-        List.iter2 (fun x y -> Format.fprintf ppf "%s = %s@ " x y)
-          l1 l2) labels)
+          List.iter2 (fun x y -> Format.fprintf ppf "%s = %s@ " x y)
+            l1 l2) labels)
       (str_values metrics)
   ;;
 
-(* Dummy utility functions for pretty printing simple types *)
+  (* Dummy utility functions for pretty printing simple types *)
   let pp_int fmt n = Format.fprintf fmt "%d" n
   ;;
 
@@ -242,7 +242,7 @@ let get_suffix filename =
       String.sub filename (succ last_dot_idx) (slen - last_dot_idx - 1)
     else ""
   with
-    | Not_found -> raise No_suffix
+  | Not_found -> raise No_suffix
 ;;
 
 type output_type =
@@ -254,16 +254,16 @@ type output_type =
 let get_file_type filename =
   try
     match get_suffix filename with
-      | "html" | "htm" -> Html
-      | "txt" | "text" -> Text
-      | "json" -> Json
-      | s ->
-        Metrics_parameters.abort
-          "Unknown file extension %s. Cannot produce output.@." s
+    | "html" | "htm" -> Html
+    | "txt" | "text" -> Text
+    | "json" -> Json
+    | s ->
+      Metrics_parameters.abort
+        "Unknown file extension %s. Cannot produce output.@." s
   with
-    | No_suffix ->
-       Metrics_parameters.abort
-         "File %s has no suffix. Cannot produce output.@." filename
+  | No_suffix ->
+    Metrics_parameters.abort
+      "File %s has no suffix. Cannot produce output.@." filename
 
 module VarinfoByName = struct
   type t = Cil_types.varinfo
@@ -280,10 +280,10 @@ let pretty_set fmt s =
   Format.fprintf fmt "@[";
   VInfoMap.iter
     (fun f n ->
-      Format.fprintf fmt "%s %s(%d call%s);@ "
-        f.Cil_types.vname
-        (if f.vaddrof then "(address taken) " else "")
-        n (if n > 1 then "s" else ""))
+       Format.fprintf fmt "%s %s(%d call%s);@ "
+         f.Cil_types.vname
+         (if f.vaddrof then "(address taken) " else "")
+         n (if n > 1 then "s" else ""))
     s;
   Format.fprintf fmt "@]"
 
@@ -318,8 +318,8 @@ let pretty_entry_points  fmt fs =
   let print fmt =
     VInfoMap.iter
       (fun fvinfo n  ->
-        if is_entry_point fvinfo n
-        then Format.fprintf fmt "%s;@ " fvinfo.vname)
+         if is_entry_point fvinfo n
+         then Format.fprintf fmt "%s;@ " fvinfo.vname)
   in
   Format.fprintf fmt "@[<hov 1>%a@]" print fs;
 ;;
@@ -339,7 +339,7 @@ let json_of_entry_points m =
 let file_of_vinfodef fvinfo =
   let kf = Globals.Functions.get fvinfo in
   let decl_loc1, _decl_loc2 =
-  match kf.fundec with
+    match kf.fundec with
     | Definition (_, loc) -> loc
     | Declaration (_, _, _, loc) -> loc
   in decl_loc1.Filepath.pos_path
@@ -353,12 +353,12 @@ let file_of_fundef (fun_dec: Cil_types.fundec) =
 
 let extract_fundef_name sname =
   match sname with
-    | _spec, (the_name, _, _, _) -> the_name
+  | _spec, (the_name, _, _, _) -> the_name
 ;;
 
 let kf_of_cabs_name sname =
   match sname with
-    | _spec, (the_name, _, _, _) -> Globals.Functions.find_by_name the_name
+  | _spec, (the_name, _, _, _) -> Globals.Functions.find_by_name the_name
 
 let get_filename fdef =
   match fdef with
@@ -370,12 +370,12 @@ let get_filename fdef =
 let consider_function ~libc vinfo =
   not (!Db.Value.mem_builtin vinfo.vname
        || Ast_info.is_frama_c_builtin vinfo.vname
-       || Cil.is_unused_builtin vinfo
-  ) && (libc || not (is_in_libc vinfo.vattr))
+       || Cil_builtins.is_unused_builtin vinfo
+      ) && (libc || not (is_in_libc vinfo.vattr))
 
 let consider_variable ~libc vinfo =
   not (Cil.hasAttribute "FRAMA_C_MODEL" vinfo.vattr) &&
-    (libc || not (is_in_libc vinfo.vattr))
+  (libc || not (is_in_libc vinfo.vattr))
 
 let float_to_string f =
   let s = Format.sprintf "%F" f in

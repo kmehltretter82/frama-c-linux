@@ -32,7 +32,7 @@ class transform prj = object(_self)
       let mk_gvar_decl = function l -> 
 	begin match l with
 	  | (GFunDecl (_fspec, vi, _loc) as g) :: [] ->
-	    if not (Cil.Frama_c_builtins.mem vi.vname) then
+	    if not (Cil_builtins.Frama_c_builtins.mem vi.vname) then
 	      begin match vi.vtype with
 		| TFun(typ, args, varity, attr) ->
 		  let vtype = Cil.argsToList args in

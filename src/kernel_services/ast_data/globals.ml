@@ -307,7 +307,7 @@ module Functions = struct
       *)
       (*Kernel.feedback "adding empty fun for %a"
         Cil_datatype.Varinfo.pretty vi; *)
-      if Cil.is_special_builtin v.vname then
+      if Cil_builtins.is_special_builtin v.vname then
         add_declaration (empty_funspec ()) v v.vdecl
       else
         raise Not_found
