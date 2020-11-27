@@ -2,11 +2,15 @@
 
 set -u
 
-# Search "BEGIN SCRIPT" to skip function
+# Search "BEGIN SCRIPT" to skip functions
 
 # Set it to "no" in order to really execute the commands.
 # Otherwise, they are only printed.
-DEBUG=no
+DEBUG=yes
+
+# Define the variable PUBLIC_GITLAB either here or on command line to use
+# a test Frama-C repository when pushing changes "publicly" (for example,
+# fork Frama-C and use this fork).
 
 # Executing this script requires bash 4.0 or higher
 # (special use of the 'case' construct)
@@ -314,6 +318,15 @@ function add_downloads {
     run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
 }
 
+function fill_website {
+    add_install_page
+    add_event_page
+    add_version_page
+    add_downloads
+}
+
+# Push changes
+
 function create_website_branch {
     if test "$FINAL_RELEASE" = "yes"; then
         BRANCH_NAME="release/stable-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME_LOWER"
@@ -339,32 +352,88 @@ function create_website_branch {
         "Y"|"y")
             ;;
         *)
-            echo "Abort website branch creation, reset to master"
+            echo "Abort website branch creation, reset to master."
             run "git -C $WEBSITE_DIR checkout master"
             exit 1
     esac
     run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WEBSITE_DIR push --set-upstream origin $BRANCH_NAME"
 }
 
-function fill_website {
-    add_install_page
-    add_event_page
-    add_version_page
-    add_downloads
+function push_wiki {
+    run "git -C $WIKI_DIR status"
+
+    echo "Commit locally the previous changes on $WIKI_DIR? [y/N]"
+    read CHOICE
+    case "${CHOICE}" in
+        "Y"|"y")
+            ;;
+        *)
+            echo "Abort wiki update."
+            exit 1
+    esac
+    run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
+    run "git -C $WIKI_DIR push"
 }
+
+function push_stable_branch {
+    run "git -C push $PUBLIC_REMOTE $FRAMAC_BRANCH"
+}
+
+function propagate_changes {
+    create_website_branch
+    push_wiki
+    push_stable_branch
+}
+
+function last_step_validation {
+    echo "
+    This step will:
+
+      - ask for a validation of the changes to website
+      - create and push a NEW branch on the website GitLab:
+        Git: $GITLAB_WEBSITE
+
+      - ask for a validation of the changes to wiki
+      - push changes to the wiki MASTER branch
+        Git: $GITLAB_WIKI
+
+      - push Frama-C:$FRAMAC_BRANCH and tag $FRAMAC_TAG on the public remote
+        Git: $GITLAB_FRAMA_C_PUBLIC (Remote: $PUBLIC_REMOTE)
+
+    If you want to perform some additional checks it is probably time to stop.
+
+    Generated files are available in: $OUT_DIR.
+    "
+    echo -n "If you are ready to continue, type exactly \"RELEASE\": "
+    read CHOICE
+    case "${CHOICE}" in
+        "RELEASE")
+            ;;
+        *)
+            echo "Aborting"
+            exit 1
+    esac
+}
+
 
 # BEGIN SCRIPT
-
-if [ -z ${GITLAB_FRAMA_C_PUBLIC+x} ]; then
-    GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub/frama-c.git"
+if [ -z ${PUBLIC_GITLAB+x} ]; then
+    PUBLIC_GITLAB="git@git.frama-c.com:pub"
     PUBLIC_REMOTE_NAME="public"
 else
     PUBLIC_REMOTE_NAME="test-public"
 fi
-GITLAB_FRAMA_C_PRIVATE="git@git.frama-c.com:frama-c/frama-c.git"
-GITLAB_WIKI="git@git.frama-c.com:pub/frama-c.wiki"
+
+GITLAB_WIKI="$PUBLIC_GITLAB/frama-c.wiki.git"
+GITLAB_FRAMA_C_PUBLIC="$PUBLIC_GITLAB/frama-c.git"
+
+# As website modifications are put into a branch, we do not use the user defined
+# Frama-C public GitLab
 GITLAB_WEBSITE="git@git.frama-c.com:pub/pub.frama-c.com.git"
+
 GITLAB_ACSL="git@github.com:acsl-language/acsl.git"
+GITLAB_FRAMA_C_PRIVATE="git@git.frama-c.com:frama-c/frama-c.git"
 
 if test \! -e .git ; then
     echo "ERROR: .git directory not found"
@@ -459,6 +528,7 @@ echo "Output Dir           : $OUT_DIR"
 export LC_CTYPE=en_US.UTF-8
 
 echo -n "Steps are:
+
   N) previous information is wrong, STOP the script
   0) ERASE $OUT_DIR
   1) compile PDF manuals (will ERASE $MANUALS_DIR!)
@@ -470,6 +540,7 @@ echo -n "Steps are:
   7) prepare website (will RESET HARD $WEBSITE_DIR:$WEBSITE_BRANCH)
   8) check generated distribution
   9) propagate all changes
+
 Start at which step? (default is N, which cancels everything)
 - If this is the first time running this script, start at 0
 - Otherwise, start at the latest step before failure
@@ -549,28 +620,8 @@ case "${STEP}" in
         ;&
     9)
         step 9 "PROPAGATE CHANGES"
-        echo "This step will:"
-        echo "- ask for a validation of the changes to website"
-        echo "- create and push a new branch for the website for the release"
-        echo "- ask for a validation of the changes to wiki"
-        echo "- push changes to the wiki"
-        echo "- push Frama-C:$FRAMAC_BRANCH on the remote $PUBLIC_REMOTE"
-        echo "- push tag $FRAMAC_TAG on the remote $PUBLIC_REMOTE"
-        echo "If you want to perform some additional checks it is probably time to stop"
-        echo "Generated files are available in: $OUT_DIR"
-        echo
-        echo -n "If you are ready to continue, type exactly YES: "
-        read CHOICE
-        case "${CHOICE}" in
-            "YES")
-                ;;
-            "Y"|"y")
-                echo "If you really want to continue type exactly YES"
-                ;&
-            *)
-                echo "Aborting"
-                exit 1
-        esac
+        last_step_validation
+        propagate_changes
         ;;
     *)
         echo "Bad entry: ${STEP}"
