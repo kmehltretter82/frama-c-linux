@@ -267,10 +267,17 @@ module Normalized = struct
     if case_sensitive then String.compare s1 s2
     else Extlib.compare_ignore_case s1 s2
 
-  let pretty fmt p = Format.fprintf fmt "%s" (pretty p)
-  let pp_abs fmt p = Format.fprintf fmt "%s" p
   let unknown = normalize ""
   let is_unknown fp = equal fp unknown
+  let special_stdout = normalize "-"
+  let is_special_stdout fp = equal fp special_stdout
+
+  let pretty fmt p =
+    if is_special_stdout p then
+      Format.fprintf fmt "<stdout>"
+    else
+      Format.fprintf fmt "%s" (pretty p)
+  let pp_abs fmt p = Format.fprintf fmt "%s" p
   let is_file fp =
     try
       (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
