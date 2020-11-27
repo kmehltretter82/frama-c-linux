@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
+                           to module Cil_builtins. Code can be updated using
+                           `bin/migration_scripts/titanium2vanadium.sh`.
 -   Metrics   [2020-10-27] Add json output in addition to text and html
 
 ###################################
