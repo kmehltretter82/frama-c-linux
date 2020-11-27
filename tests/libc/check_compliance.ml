@@ -45,53 +45,41 @@ let run_once = ref false
 
 module StringSet = Set.Make(String)
 
-let set_of_data_from_list dir f =
-  let file = Filename.concat dir f in
-  let open Yojson.Basic.Util in
-  Kernel.feedback "parsing %s" f;
-  let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_list in
-  List.fold_left (fun acc e ->
-      StringSet.add (e |> to_string) acc
-    ) StringSet.empty elements
+module Json =
+struct
+  open Yojson.Basic
+  open Util
 
+  let parse dir f =
+    let file = Filename.concat dir f in
+    Kernel.feedback "Parsing %s" f;
+    let json = Yojson.Basic.from_file file in
+    member "data" json
 
-let set_of_data_from_assoc dir f =
-  let file = Filename.concat dir f in
-  let open Yojson.Basic.Util in
-  Kernel.feedback "parsing %s" f;
-  let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_assoc in
-  List.fold_left (fun acc (ident, _) ->
-      StringSet.add ident acc
-    ) StringSet.empty elements
+  let to_set (json : t) : StringSet.t =
+    json |> to_list |> List.map to_string |> StringSet.of_list
 
-let hashtable_of_ident_headers dir f =
-  let file = Filename.concat dir f in
-  let idents = Hashtbl.create 500 in
-  let open Yojson.Basic.Util in
-  Kernel.feedback "parsing %s" f;
-  let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_assoc in
-  List.iter (fun (ident, values) ->
-      let header = values |> member "header" |> to_string in
-      Hashtbl.replace idents ident header
-    ) elements;
-  idents
+  let keys (json : t) : StringSet.t =
+    json |> to_assoc |> List.map fst |> StringSet.of_list
 
-let hashtable_of_ident_headers_and_extensions dir f =
-  let file = Filename.concat dir f in
-  let idents = Hashtbl.create 500 in
-  let open Yojson.Basic.Util in
-  Kernel.feedback "parsing %s" f;
-  let json = Yojson.Basic.from_file file in
-  let elements = json |> member "data" |> to_assoc in
-  List.iter (fun (ident, values) ->
-      let header = values |> member "header" |> to_string in
-      let extensions = values |> member "extensions" |> to_list in
-      Hashtbl.replace idents ident (header, extensions)
-    ) elements;
-  idents
+  type _ table_format =
+    | HeadersOnly : string table_format
+    | HeadersAndExtensions : (string*t list) table_format
+
+  let to_table : type a. a table_format -> t -> (string,a) Hashtbl.t =
+    let convert json : a table_format -> a = function
+      | HeadersOnly ->
+        json |> member "header" |> to_string
+      | HeadersAndExtensions ->
+        json |> member "header" |> to_string,
+        json |> member "extensions" |> to_list
+    in
+    fun format json ->
+      let table = Hashtbl.create 500 in
+      json |> to_assoc |> List.iter (fun (ident, values) ->
+        Hashtbl.replace table ident (convert values format));
+      table
+end
 
 let () =
   Db.Main.extend (fun () ->
@@ -101,11 +89,11 @@ let () =
         ignore (Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) (Ast.get ()));
         let fc_stdlib_idents = vis#get_idents in
         let dir = Filename.concat Fc_config.datadir "compliance" in
-        let c11_idents = hashtable_of_ident_headers dir "c11_functions.json" in
-        let c11_headers = set_of_data_from_list dir "c11_headers.json" in
-        let glibc_idents = set_of_data_from_list dir "glibc_functions.json" in
-        let posix_idents = hashtable_of_ident_headers_and_extensions dir "posix_identifiers.json" in
-        let nonstandard_idents = set_of_data_from_assoc dir "nonstandard_identifiers.json" in
+        let c11_idents = Json.(to_table HeadersOnly (parse dir "c11_functions.json"))
+        and c11_headers = Json.(to_set (parse dir "c11_headers.json"))
+        and glibc_idents = Json.(to_set (parse dir "glibc_functions.json"))
+        and posix_idents = Json.(to_table HeadersAndExtensions (parse dir "posix_identifiers.json"))
+        and nonstandard_idents = Json.(keys (parse dir "nonstandard_identifiers.json")) in
         Hashtbl.iter (fun id headers ->
             if not (Extlib.string_prefix "__" id) &&
                not (Extlib.string_prefix "Frama_C" id) &&
