@@ -257,11 +257,11 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
   );
 
   // Blur Event
-  const onBlur = debounce(() => {
+  const onBlur = () => {
     setValue('');
     setIndex(-1);
     if (onSearch) onSearch('');
-  }, 50);
+  };
 
   // Key Events
   const onKey = (evt: React.KeyboardEvent) => {
@@ -308,7 +308,10 @@ export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
         icon={h.icon}
         title={h.title}
         className={className}
-        onClick={() => { if (onHint) onHint(h); }}
+        onClick={() => {
+          if (onHint) onHint(h);
+          blur();
+        }}
       >
         {h.label}
       </Label>
