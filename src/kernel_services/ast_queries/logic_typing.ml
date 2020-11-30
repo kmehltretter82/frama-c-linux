@@ -2316,17 +2316,21 @@ struct
       accept_models: bool;
       accept_func_ptr: bool;
       accept_addrs: bool;
+      accept_const: bool;
     }
 
   let lval_addressable_mode =
     { accept_empty = false; accept_formal = true; accept_array = true;
-      accept_models = false; accept_func_ptr = true; accept_addrs = false;}
+      accept_models = false; accept_func_ptr = true; accept_addrs = false;
+      accept_const = true; }
   let lval_assignable_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; accept_addrs = false;}
+      accept_models = true; accept_func_ptr = false; accept_addrs = false;
+      accept_const = false; }
   let lval_assigns_dependency_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; accept_addrs = true;}
+      accept_models = true; accept_func_ptr = false; accept_addrs = true;
+      accept_const = true; }
 
   let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
 
@@ -2345,12 +2349,15 @@ struct
                else
                  false (* pure logic variable, at least as long as
                           model variables are not supported. *)
-             | Some v -> not v.vformal || m.accept_formal
+             | Some v ->
+               (not v.vformal || m.accept_formal) &&
+               (not (Cil.isConstType v.vtype) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
         (match snd (Logic_utils.remove_term_offset loff) with
          | TModel _ -> m.accept_models
+         | TField(f, _) -> not (Cil.isConstType f.ftype) || m.accept_const
          | _ -> true)
       | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
       | TAddrOf lv | TStartOf lv ->
@@ -3289,10 +3296,11 @@ struct
       (other_prms @ prms), p
     | _ -> [], ctxt.type_predicate ctxt env p0
 
-  let term_lval_assignable ctxt ~accept_formal env t =
+  let term_lval_assignable ctxt ~accept_formal ~accept_const env t =
     let module [@warning "-60"] C = struct end in
     let t = ctxt.type_term ctxt env t in
-    if not (check_lval_kind { lval_assignable_mode with accept_formal } t) then
+    let mode = { lval_assignable_mode with accept_formal ; accept_const } in
+    if not (check_lval_kind mode t) then
       ctxt.error t.term_loc "not an assignable left value: %a"
         Cil_printer.pp_term t;
     lift_set (term_lval (fun _ t -> t)) t
@@ -3500,7 +3508,7 @@ struct
     let module [@warning "-60"] C = struct end in
     (* Yannick: [assigns *\at(\result,Post)] should be allowed *)
     let tl =
-      term_lval_assignable ctxt ~accept_formal env l
+      term_lval_assignable ctxt ~accept_formal ~accept_const:false env l
     in
     let tl = Logic_const.new_identified_term tl in
     match d with
@@ -4212,8 +4220,10 @@ struct
       let env = Lenv.empty () in
       let ctxt = base_ctxt env in
       let tsets =
+        let accept_formal = false in
+        let accept_const  = true in
         List.map
-          (term_lval_assignable ctxt ~accept_formal:false env) tsets
+          (term_lval_assignable ctxt ~accept_formal ~accept_const env) tsets
       in
       let checks_tsets_type fct ctyp =
         List.iter
