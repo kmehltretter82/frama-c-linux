@@ -114,15 +114,19 @@ export default () => {
   // Items
   const current: undefined | string = selection?.current?.function;
   const makeFctItem = (fct: functionsData) => {
-    const { name } = fct;
+    const { name, signature } = fct;
+    const isMain = 0 < signature.indexOf("/* main */");
     return (
       <Item
+        className={isMain ? 'fct-main' : undefined}
         key={name}
         label={name}
-        title={fct.signature}
+        title={signature}
         selected={name === current}
         onSelection={() => updateSelection({ location: { function: name } })}
-      />
+      >
+        {isMain && '(main)'}
+      </Item>
     );
   };
 
@@ -131,7 +135,7 @@ export default () => {
   const filtered = fcts.filter(showFunction);
   const nTotal = fcts.length;
   const nFilter = filtered.length;
-  const title = `Filtered ${nFilter} / ${nTotal}`;
+  const title = `Functions ${nFilter} / ${nTotal}`;
   return (
     <Section
       label="Functions"

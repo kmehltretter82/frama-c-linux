@@ -36,4 +36,8 @@
     border-bottom: solid 0.2em #BBB;
 }
 
+.fct-main label {
+    text-decoration: underline;
+}
+
 /* -------------------------------------------------------------------------- */

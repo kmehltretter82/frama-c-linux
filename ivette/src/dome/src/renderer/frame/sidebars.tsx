@@ -171,6 +171,10 @@ export interface ItemProps {
   onSelection?: () => void;
   /** Right-click callback. */
   onContextMenu?: () => void;
+  /** Additional class. */
+  className?: string;
+  /** Additional styles. */
+  style?: React.CSSProperties;
   /** Other item elements. */
   children?: React.ReactNode;
 }
@@ -185,10 +189,12 @@ export function Item(props: ItemProps) {
     'dome-xSideBarItem',
     selected ? 'dome-active' : 'dome-inactive',
     isDisabled && 'dome-disabled',
+    props.className,
   );
   return (
     <div
       className={className}
+      style={props.style}
       title={props.title}
       onContextMenu={onContextMenu}
       onClick={onClick}
