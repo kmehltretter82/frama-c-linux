@@ -42,6 +42,40 @@ Check the following pages:
   \item \texttt{rss.xml}: check last event
 \end{itemize}
 
+On GitLab, the following files must appear as \textbf{new} in \texttt{download}:
+
+\begin{itemize}
+  \item \texttt{acsl-X.XX.pdf}
+  \item \texttt{acsl-implementation-NN.N-VERSION.pdf}
+  \item \texttt{plugin-development-guide-NN.N-VERSION.pdf}
+  \item \texttt{user-manual-NN.N-VERSION.pdf}
+  \item \texttt{<plugin>-manual-NN.N-VERSION.pdf}\\
+        for Aorai, EVA, Metrics, RTE and WP
+  \item \texttt{e-acsl/e-acsl-X.XX.pdf}
+  \item \texttt{e-acsl/e-acsl-implementation-NN.N-VERSION.pdf}
+  \item \texttt{e-acsl/e-acsl-manual-NN.N-VERSION.pdf}
+  \item \texttt{aorai-example-NN.N-VERSION.tgz}
+  \item \texttt{frama-c-NN.N-VERSION.tar.gz}
+  \item \texttt{frama-c-api-NN.N-VERSION.tar.gz}
+  \item \texttt{hello-NN.N-VERSION.tar.gz}
+\end{itemize}
+
+On GitLab, the following files must appear as \textbf{modified} in \texttt{download}:
+
+\begin{itemize}
+  \item \texttt{acsl.pdf}
+  \item \texttt{frama-c-acsl-implementation.pdf}
+  \item \texttt{frama-c-plugin-development-guide.pdf}
+  \item \texttt{frama-c-user-manual.pdf}
+  \item \texttt{frama-c-<plugin>-manual.pdf}\\
+        for Aorai, EVA, Metrics, RTE, \textbf{Value Analysis} and WP
+  \item \texttt{e-acsl/e-acsl.pdf}
+  \item \texttt{e-acsl/e-acsl-implementation.pdf}
+  \item \texttt{e-acsl/e-acsl-manual.pdf}
+  \item \texttt{frama-c-aorai-example.tgz}
+  \item \texttt{hello.tar.gz}
+\end{itemize}
+
 \section{Announcements}
 
 \begin{itemize}
@@ -100,6 +134,16 @@ commit to it.
 
 ({\em Non-beta only}) After pushing the tag to Gitlab, go to the Releases page
 and create a release for the tag.
+
+You should also push the wiki changes. Note that all files listed as \textbf{new}
+in the website section should appear in the wiki but:
+
+\begin{itemize}
+  \item \texttt{frama-c-api-NN.N-VERSION.tar.gz}
+  \item \texttt{hello-NN.N-VERSION.tar.gz}
+\end{itemize}
+
+and E-ACSL files are not in a sub-folder \texttt{e-acsl} on the wiki.
 
 \section{Updating the BTS}
 
