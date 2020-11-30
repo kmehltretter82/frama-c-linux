@@ -21,6 +21,9 @@ $\rightarrow$ Repository $\rightarrow$ Protected Branches.
 
 \section{Creating the branch}
 
+Note that ou must be member of the groups "frama-c", "dev" and have
+access to each plugin of continuous integration.
+
 Create the branch \texttt{stable/release}, where \texttt{release} is the
 element name, using the \texttt{frama-ci} tool:
 \begin{enumerate}
@@ -86,7 +89,7 @@ This should go directly below
 
 From now on, Changelog items corresponding to MR merged into \texttt{master}
 must be placed between these two banners. This should minimize conflicts when
-merging back \texttt{stable/element} into \texttt{master}
+merging back \texttt{stable/element} into \texttt{master}.
 
 \todo{Do the same thing in the manuals that contain a Changelog?}
 
