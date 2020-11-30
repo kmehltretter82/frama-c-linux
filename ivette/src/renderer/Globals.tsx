@@ -52,11 +52,16 @@ export default () => {
   const fcts = States.useSyncArray(functions).getArray().sort(
     (f, g) => alpha(f.name, g.name),
   );
-  const [stdlib, flipStdlib] = useFlipSettings('ivette.globals.stdlib', false);
-  const [builtin, flipBuiltin] = useFlipSettings('ivette.globals.builtin', false);
-  const [undef, flipUndef] = useFlipSettings('ivette.globals.undef', true);
-  const [selected, flipSelected] = useFlipSettings('ivette.globals.selected', false);
-  const [evaOnly, flipEvaOnly] = useFlipSettings('ivette.globals.evaonly', false);
+  const [stdlib, flipStdlib] =
+    useFlipSettings('ivette.globals.stdlib', false);
+  const [builtin, flipBuiltin] =
+    useFlipSettings('ivette.globals.builtin', false);
+  const [undef, flipUndef] =
+    useFlipSettings('ivette.globals.undef', true);
+  const [selected, flipSelected] =
+    useFlipSettings('ivette.globals.selected', false);
+  const [evaOnly, flipEvaOnly] =
+    useFlipSettings('ivette.globals.evaonly', false);
   const multipleSelection = selection?.multiple;
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useRequest(isComputed, null);
@@ -106,7 +111,7 @@ export default () => {
         enabled: evaComputed,
         checked: evaOnly,
         onClick: flipEvaOnly,
-      }
+      },
     ];
     Dome.popupMenu(items);
   }
@@ -115,7 +120,7 @@ export default () => {
   const current: undefined | string = selection?.current?.function;
   const makeFctItem = (fct: functionsData) => {
     const { name, signature } = fct;
-    const isMain = 0 < signature.indexOf("/* main */");
+    const isMain = 0 < signature.indexOf('/* main */');
     return (
       <Item
         className={isMain ? 'fct-main' : undefined}
@@ -140,11 +145,13 @@ export default () => {
     <Section
       label="Functions"
       title={title}
-      onContextMenu={onContextMenu} defaultUnfold>
+      onContextMenu={onContextMenu}
+      defaultUnfold
+    >
       {filtered.map(makeFctItem)}
     </Section>
   );
 
-}
+};
 
 // --------------------------------------------------------------------------
