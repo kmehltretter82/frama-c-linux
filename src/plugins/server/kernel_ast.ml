@@ -359,7 +359,7 @@ struct
       if not libc then Kernel.PrintLibc.set true ;
       let txt = Rich_text.to_string Printer_tag.pretty (PGlobal global) in
       if not libc then Kernel.PrintLibc.set false ;
-      if Kernel_function.is_main kf then (txt ^ " /* main */") else txt
+      if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
     with err ->
       if not libc then Kernel.PrintLibc.set false ; raise err
 
