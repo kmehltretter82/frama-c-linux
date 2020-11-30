@@ -258,7 +258,7 @@ function add_downloads {
         elif [[ $f_no_ext =~ ^e-acsl-* ]]; then
             REPL=$(echo $BASE | sed -e "s/-$FRAMAC_VERSION_AND_CODENAME//")
         else
-            REPL=$(echo $BASE | sed -e "s/\(.*\)\/\(.*\)-$FRAMAC_VERSION_AND_CODENAME/\1\/frama-c-\2/")
+            REPL=$(echo $BASE | sed -e "s/\(.*\)-$FRAMAC_VERSION_AND_CODENAME/frama-c-\1/")
         fi
 
         run "cp $fpath $DOWNLOAD_DIR/$BASE"
@@ -272,6 +272,21 @@ function add_downloads {
     VALUE_GIT_PATH="$DOWNLOAD_PATH/frama-c-value-analysis.pdf"
     run "cp $EVA_FILE $VALUE_PATH"
     run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
+
+    # Examples:
+    HELLO="hello-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
+    run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$HELLO"
+    run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/hello.tar.gz"
+    
+    # Source distribution:
+    run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
+
+    # API
+    run "cp $OUT_DIR/frama-c-api.tar.gz $DOWNLOAD_DIR/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
+    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/frama-c-api-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
 }
 
 function fill_website {
