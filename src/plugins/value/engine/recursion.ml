@@ -23,6 +23,8 @@
 open Cil_types
 open Eval
 
+module Varinfo = Cil_datatype.Varinfo
+
 (** Recursion *)
 
 (* Our current treatment for recursion -- use the specification for
@@ -133,14 +135,12 @@ module CallDepth =
     (struct let module_name = "CallDepth" end)
 
 module VarCopies =
-  Datatype.List (Datatype.Pair (Cil_datatype.Varinfo) (Cil_datatype.Varinfo))
-
-module Vars = Datatype.Pair (VarCopies) (Datatype.List (Cil_datatype.Varinfo))
+  Datatype.List (Datatype.Pair (Varinfo) (Varinfo))
 
 module VarStack =
   State_builder.Hashtbl
     (CallDepth.Hashtbl)
-    (Vars)
+    (VarCopies)
     (struct
       let name = "Eva.Recursion.VarStack"
       let dependencies = [ Ast.self ]
@@ -168,16 +168,24 @@ let make_stack (kf, depth) =
     with Kernel_function.No_Definition -> assert false
   in
   let vars = Kernel_function.(get_formals kf @ get_locals kf) in
-  let reachable, withdrawal = List.partition (fun vi -> vi.vaddrof) vars in
   let copy v = v, copy_fresh_variable fundec depth v in
-  let substitution = List.map copy reachable in
-  substitution, withdrawal
+  List.map copy vars
 
 let get_stack kf depth = VarStack.memo make_stack (kf, depth)
 
-let make_recursion kf depth =
-  warn_recursive_call kf;
-  let substitution, withdrawal = get_stack kf depth in
+let make_recursion call depth =
+  warn_recursive_call call.kf;
+  let substitution = get_stack call.kf depth in
+  let add_if_copy acc argument =
+    match argument.avalue with
+    | Copy ({ lval = Var vi, _ }, _) -> Varinfo.Set.add vi acc
+    | _ -> acc
+  in
+  let empty = Varinfo.Set.empty in
+  let copied_varinfos = List.fold_left add_if_copy empty call.arguments in
+  let may_be_used (vi, _) = vi.vaddrof || Varinfo.Set.mem vi copied_varinfos in
+  let substitution, withdrawal = List.partition may_be_used substitution in
+  let withdrawal = List.map fst withdrawal in
   let base_of_varinfo (v1, v2) = Base.of_varinfo v1, Base.of_varinfo v2 in
   let list_substitution = List.map base_of_varinfo substitution in
   let base_substitution = Base.substitution_from_list list_substitution in
@@ -185,12 +193,12 @@ let make_recursion kf depth =
   let base_withdrawal = Base.Hptset.of_list list_withdrawal in
   { depth; substitution; base_substitution; withdrawal; base_withdrawal; }
 
-let get_recursion kf =
+let get_recursion call =
   let call_stack = Value_util.call_stack () in
-  let previous_calls = List.filter (fun (f, _) -> f == kf) call_stack in
+  let previous_calls = List.filter (fun (f, _) -> f == call.kf) call_stack in
   let depth = List.length previous_calls in
   if depth > 0
-  then Some (make_recursion kf depth)
+  then Some (make_recursion call depth)
   else None
 
 let revert_recursion recursion =

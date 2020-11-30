@@ -582,7 +582,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
     let call = create_call kf args in
-    let recursion = Recursion.get_recursion kf in
+    let recursion = Recursion.get_recursion call in
     let call = Extlib.opt_fold replace_recursive_call recursion call in
     call, recursion, valuation
 

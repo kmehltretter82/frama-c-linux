@@ -28,6 +28,6 @@ open Eval
 val recursive_spec: kinstr -> kernel_function -> funspec
 
 (** TODO *)
-val get_recursion: kernel_function -> recursion option
+val get_recursion: ('v, 'loc) call -> recursion option
 
 val revert_recursion: recursion -> recursion
