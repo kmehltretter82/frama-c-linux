@@ -338,11 +338,13 @@ let () = Request.register ~package
     ~input:(module Kf) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in
-      if not libc then Kernel.PrintLibc.set true ;
-      let global = Kernel_function.get_global kf in
-      let ast = Jbuffer.to_json Printer.pp_global global in
-      if not libc then Kernel.PrintLibc.set false ;
-      ast
+      try
+        if not libc then Kernel.PrintLibc.set true ;
+        let global = Kernel_function.get_global kf in
+        let ast = Jbuffer.to_json Printer.pp_global global in
+        if not libc then Kernel.PrintLibc.set false ; ast
+      with err ->
+        if not libc then Kernel.PrintLibc.set false ; raise err
     end
 
 module Functions =
@@ -352,9 +354,17 @@ struct
 
   let signature kf =
     let global = Kernel_function.get_global kf in
-    Rich_text.to_string Printer_tag.pretty (PGlobal global)
+    let libc = Kernel.PrintLibc.get () in
+    try
+      if not libc then Kernel.PrintLibc.set true ;
+      let txt = Rich_text.to_string Printer_tag.pretty (PGlobal global) in
+      if not libc then Kernel.PrintLibc.set false ;
+      if Kernel_function.is_main kf then (txt ^ " /* main */") else txt
+    with err ->
+      if not libc then Kernel.PrintLibc.set false ; raise err
 
-  let is_builtin kf = Cil.is_builtin (Kernel_function.get_vi kf)
+  let is_builtin kf =
+    Cil_builtins.is_builtin (Kernel_function.get_vi kf)
 
   let is_stdlib kf =
     let vi = Kernel_function.get_vi kf in
