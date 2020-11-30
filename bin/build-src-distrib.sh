@@ -8,10 +8,6 @@ set -u
 # Otherwise, they are only printed.
 DEBUG=no
 
-# Define the variable USER_GITLAB either here or on command line to use
-# a test Frama-C repository when pushing changes "publicly" (for example,
-# fork Frama-C and use this fork).
-
 # Executing this script requires bash 4.0 or higher
 # (special use of the 'case' construct)
 if test `echo $BASH_VERSION | sed "s/\([0-9]\).*/\1/" ` -lt 4; then
@@ -39,56 +35,6 @@ function step {
     echo "Step $1: $2"
 }
 
-# find_REMOTE create name url
-# - create: yes/no -> create if not found
-# - name: default name of the remote
-# - url: url of the repository
-# - repo: (optional) directory
-# Sets:
-# REMOTE, the name of the found or created remote
-function find_REMOTE {
-    create=$1
-    name=$2
-    url=$3
-    if [ $# -ge 4 ] ; then
-        CUR_DIR=$4
-        CDIR="-C $4"
-    else
-        CUR_DIR="frama-c"
-        CDIR=""
-    fi
-
-    REMOTE=$(git $CDIR remote -v | grep $url | head -n 1 | cut -d"	" -f1)
-    if [ "$REMOTE" != "" ]; then
-        return
-    fi
-    echo "### WARNING: In repository: $CUR_DIR ";
-    echo "Can't find a remote name for $url"
-
-    if [ "$create" != "yes" ]; then
-        exit 1
-    fi
-
-    echo "Do you want to create one? (y/n)"
-    read CHOICE
-    case "${CHOICE}" in
-        "Y"|"y")
-            NAME=$name
-            git remote $CDIR get-url $NAME &> /dev/null
-            while [ "$?" == "0" ]; do
-                echo -n "Give an available remote name for the public Frama-C remote: "
-                read NAME
-                git remote $CDIR get-url $NAME &> /dev/null
-            done
-            run "git $CDIR remote add $NAME $url"
-            REMOTE=$NAME
-            return ;;
-        *)
-            echo "No remote for public Frama-C repository"
-            exit 1
-    esac
-}
-
 # find_repository path url
 # - path: path to the directory
 # - url: URL of the repository
@@ -100,7 +46,7 @@ function find_repository_DIRECTORY_BRANCH {
     name=$1
     url=$2
     if test \! -d $name/.git ; then
-        echo "ERROR: $name/.git directory not found; do you want to clone it? (y/n)"
+        echo "### WARNING: $name/.git directory not found; do you want to clone it? (y/n)"
         read CHOICE
         case "${CHOICE}" in
             "Y"|"y")
@@ -335,7 +281,7 @@ function fill_website {
     add_downloads
 }
 
-# Push changes
+# Commit changes
 
 function create_website_branch {
     if test "$FINAL_RELEASE" = "yes"; then
@@ -367,10 +313,9 @@ function create_website_branch {
             exit 1
     esac
     run "git -C $WEBSITE_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
-    run "git -C $WEBSITE_DIR push --set-upstream origin $BRANCH_NAME"
 }
 
-function push_wiki {
+function commit_wiki {
     run "git -C $WIKI_DIR status"
 
     echo "Commit locally the previous changes on $WIKI_DIR? [y/N]"
@@ -383,38 +328,27 @@ function push_wiki {
             exit 1
     esac
     run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
-    run "git -C $WIKI_DIR push $WIKI_REMOTE master"
 }
 
-function push_stable_branch {
-    run "git push --set-upstream $PUBLIC_REMOTE $FRAMAC_BRANCH"
-    run "git push $PUBLIC_REMOTE $FRAMAC_TAG"
-}
 
 function propagate_changes {
     create_website_branch
-    push_wiki
-    push_stable_branch
+    commit_wiki
 }
 
 function last_step_validation {
-    if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
-        echo "To go further, the last commit must be tagged with the right version"
-        exit 1
-    fi
+    # if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
+    #     echo "To go further, the last commit must be tagged with the right version"
+    #     exit 1
+    # fi
     echo "
     This step will:
 
       - ask for a validation of the changes to website
-      - create and push a NEW branch on the website GitLab:
-        Git: $GITLAB_WEBSITE
+      - create a NEW branch on for the website
 
       - ask for a validation of the changes to wiki
-      - push changes to the wiki MASTER branch
-        Git: $(git -C $WIKI_DIR remote get-url $WIKI_REMOTE) (Remote: $WIKI_REMOTE)
-
-      - push Frama-C:$FRAMAC_BRANCH and tag $FRAMAC_TAG on the public remote
-        Git: $(git remote get-url $PUBLIC_REMOTE) (Remote: $PUBLIC_REMOTE)
+      - commit changes to the wiki MASTER branch
 
     If you want to perform some additional checks it is probably time to stop.
 
@@ -434,21 +368,8 @@ function last_step_validation {
 
 # BEGIN SCRIPT
 GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub"
-OFFICIAL_GITLAB_WIKI="$GITLAB_FRAMA_C_PUBLIC/frama-c.wiki.git"
-OFFICIAL_GITLAB_FRAMA_C_PUBLIC="$GITLAB_FRAMA_C_PUBLIC/frama-c.git"
-
-if [ -z ${USER_GITLAB+x} ]; then
-    USE_OFFICIAL="yes"
-else
-    USE_OFFICIAL="no"
-    USER_GITLAB_WIKI="$USER_GITLAB/frama-c.wiki.git"
-    USER_GITLAB_FRAMA_C_PUBLIC="$USER_GITLAB/frama-c.git"
-fi
-
-# As website modifications are put into a branch, we do not use the user defined
-# Frama-C public GitLab
-GITLAB_WEBSITE="git@git.frama-c.com:pub/pub.frama-c.com.git"
-
+GITLAB_WIKI="$GITLAB_FRAMA_C_PUBLIC/frama-c.wiki.git"
+GITLAB_WEBSITE="$GITLAB_FRAMA_C_PUBLIC/pub.frama-c.com.git"
 GITLAB_ACSL="git@github.com:acsl-language/acsl.git"
 GITLAB_FRAMA_C_PRIVATE="git@git.frama-c.com:frama-c/frama-c.git"
 
@@ -488,33 +409,11 @@ if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
     echo "Frama-C Tag    : $FRAMAC_TAG"
 fi
 
-# Find Frama-C remotes
+# Find specific repositories
 
-find_REMOTE "no" "origin" $GITLAB_FRAMA_C_PRIVATE
-ORIGIN_REMOTE=$REMOTE
-find_REMOTE "yes" "public" $OFFICIAL_GITLAB_FRAMA_C_PUBLIC
-OFFICIAL_PUBLIC_REMOTE=$REMOTE
-
-if [[ "$USE_OFFICIAL" == "no" ]]; then
-    find_REMOTE "yes" "test-public" $USER_GITLAB_FRAMA_C_PUBLIC
-    USER_REMOTE=$REMOTE
-fi
-
-# Find Frama-C wiki remotes
-
-find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $OFFICIAL_GITLAB_WIKI
+find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $GITLAB_WIKI
 WIKI_DIR=$DIRECTORY
 WIKI_BRANCH=$BRANCH
-
-find_REMOTE "no" "origin" $OFFICIAL_GITLAB_WIKI $WIKI_DIR
-OFFICIAL_WIKI_REMOTE=$REMOTE
-
-if [[ "$USE_OFFICIAL" == "no" ]]; then
-    find_REMOTE "yes" "test-public" $USER_GITLAB_WIKI $WIKI_DIR
-    USER_WIKI_REMOTE=$REMOTE
-fi
-
-# Find specific repositories
 
 find_repository_DIRECTORY_BRANCH "./website" $GITLAB_WEBSITE
 WEBSITE_DIR=$DIRECTORY
@@ -522,8 +421,6 @@ WEBSITE_BRANCH=$BRANCH
 
 find_repository_DIRECTORY_BRANCH "./doc/acsl" $GITLAB_ACSL
 ACSL_DIR=$DIRECTORY
-
-
 
 CHANGES="./main_changes.md"
 if test \! -f $CHANGES ; then
@@ -539,14 +436,6 @@ if test \! -f $CHANGES ; then
     esac
 fi
 
-if [[ "$USE_OFFICIAL" == "no" ]]; then
-    PUBLIC_REMOTE=$USER_WIKI_REMOTE
-    WIKI_REMOTE=$USER_WIKI_REMOTE
-else
-    PUBLIC_REMOTE=$OFFICIAL_PUBLIC_REMOTE
-    WIKI_REMOTE=$OFFICIAL_WIKI_REMOTE
-fi
-
 MANUALS_DIR="./doc/manuals"
 
 BUILD_DIR_ROOT="/tmp/release"
@@ -557,12 +446,9 @@ OUT_DIR="./distributed"
 echo "Frama-C Version      : $FRAMAC_VERSION"
 echo "Final release        : $FINAL_RELEASE"
 echo "Frama-C Branch       : $FRAMAC_BRANCH"
-echo "Origin remote        : $ORIGIN_REMOTE ($(git remote get-url $ORIGIN_REMOTE))"
-echo "Public remote        : $PUBLIC_REMOTE ($(git remote get-url $PUBLIC_REMOTE))"
 echo "Manuals Dir          : $MANUALS_DIR"
 echo "ACSL Dir             : $ACSL_DIR"
 echo "Frama-C Wiki Dir     : $WIKI_DIR"
-echo "Frama-C Wiki remote  : $WIKI_REMOTE ($(git remote get-url $WIKI_REMOTE))"
 echo "Website Dir          : $WEBSITE_DIR"
 echo "Changes file         : $CHANGES"
 echo "Build Dir            : $BUILD_DIR"
@@ -582,7 +468,8 @@ echo -n "Steps are:
   6) prepare wiki (will RESET HARD $WIKI_DIR:$WIKI_BRANCH)
   7) prepare website (will RESET HARD $WEBSITE_DIR:$WEBSITE_BRANCH)
   8) check generated distribution
-  9) propagate all changes
+  9) generate opam file
+  10) commit changes
 
 Start at which step? (default is N, which cancels everything)
 - If this is the first time running this script, start at 0
@@ -663,7 +550,16 @@ case "${STEP}" in
         run "rm -rf $TEST_DIR"
         ;&
     9)
-        step 9 "PROPAGATE CHANGES"
+        step 9 "GENERATE OPAM FILE"
+        run "cp opam/opam $OUT_DIR/opam"
+        echo >> "$OUT_DIR/opam"
+        echo "url {" >> "$OUT_DIR/opam"
+        echo "  src: \"https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_FILENAME\"" >> "$OUT_DIR/opam"
+        echo "  checksum: \"md5=$(md5sum $OUT_DIR/$TARGZ_FILENAME | cut -d" " -f1)\"" >> "$OUT_DIR/opam"
+        echo "}" >> "$OUT_DIR/opam"
+        ;&
+    10)
+        step 10 "COMMIT CHANGES"
         last_step_validation
         propagate_changes
         ;;
