@@ -36,6 +36,7 @@ const DEFAULTS: { [key: string]: boolean } = {
   'status.invalid_hyp': true,
   'status.considered_valid': false,
   'status.untried': false,
+  'status.dead': false,
   'status.inconsistent': true,
   'kind.assert': true,
   'kind.invariant': true,
@@ -95,24 +96,25 @@ function filterStatus(
 ) {
   switch (status) {
     case 'valid':
-    case 'valid_but_dead':
       return filter('status.valid');
     case 'valid_under_hyp':
       return filter('status.valid_hyp');
     case 'invalid':
-    case 'invalid_but_dead':
       return filter('status.invalid');
     case 'invalid_under_hyp':
       return filter('status.invalid_hyp');
     case 'inconsistent':
-      return filter('inconsistent');
+      return filter('status.inconsistent');
     case 'unknown':
-    case 'unknown_but_dead':
       return filter('status.unknown');
     case 'considered_valid':
-      return filter('considered_valid');
+      return filter('status.considered_valid');
     case 'never_tried':
       return filter('status.untried');
+    case 'valid_but_dead':
+    case 'unknown_but_dead':
+    case 'invalid_but_dead':
+      return filter('status.dead');
     default:
       return true;
   }
@@ -135,6 +137,7 @@ function filterKind(
     case 'reachable': return filter('kind.reachable');
     case 'axiomatic': return filter('kind.axiomatic');
     case 'loop_pragma': return filter('kind.pragma');
+    case 'assumes': return filter('kind.assumes');
     default: return filter('kind.others');
   }
 }
@@ -284,12 +287,11 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
-  path: string;
   children: React.ReactNode;
 }
 
 function Section(props: SectionProps) {
-  const settings = `properties-section-${props.path}`;
+  const settings = `properties-section-${props.label}`;
   return (
     <Folder label={props.label} settings={settings}>
       {props.children}
@@ -321,7 +323,7 @@ function PropertyFilter() {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
-      <Section label="Status" path="status">
+      <Section label="Status">
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
         <CheckField label="Unknown" path="status.unknown" />
@@ -329,9 +331,10 @@ function PropertyFilter() {
         <CheckField label="Invalid under hyp." path="status.invalid_hyp" />
         <CheckField label="Considered valid" path="status.considered_valid" />
         <CheckField label="Untried" path="status.untried" />
+        <CheckField label="Dead" path="status.dead" />
         <CheckField label="Inconsistent" path="status.inconsistent" />
       </Section>
-      <Section label="Property kind" path="kind">
+      <Section label="Property kind">
         <CheckField label="Assertions" path="kind.assert" />
         <CheckField label="Invariants" path="kind.invariant" />
         <CheckField label="Variants" path="kind.variant" />
@@ -339,19 +342,20 @@ function PropertyFilter() {
         <CheckField label="Postconditions" path="kind.ensures" />
         <CheckField label="Instance" path="kind.instance" />
         <CheckField label="Assigns clauses" path="kind.assigns" />
-        <CheckField label="From clauses" path="kind.from" />
+        <CheckField label="From clauses" path="kind.froms" />
         <CheckField label="Allocates" path="kind.allocates" />
         <CheckField label="Behaviors" path="kind.behavior" />
         <CheckField label="Reachables" path="kind.reachable" />
         <CheckField label="Axiomatics" path="kind.axiomatic" />
         <CheckField label="Pragma" path="kind.pragma" />
+        <CheckField label="Assumes" path="kind.assumes" />
         <CheckField label="Others" path="kind.others" />
       </Section>
-      <Section label="Alarms" path="alarms">
+      <Section label="Alarms">
         <CheckField label="Alarms" path="alarms.alarms" />
         <CheckField label="Others" path="alarms.others" />
       </Section>
-      <Section label="Alarms kind" path="alarms">
+      <Section label="Alarms kind">
         <CheckField label="Overflows" path="alarms.overflow" />
         <CheckField label="Divisions by zero" path="alarms.division_by_zero" />
         <CheckField label="Shifts" path="alarms.shift" />
