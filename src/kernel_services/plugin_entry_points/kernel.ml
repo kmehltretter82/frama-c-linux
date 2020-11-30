@@ -931,11 +931,15 @@ module Machdep =
     (struct
       let module_name = "Machdep"
       let option_name = "-machdep"
-      let default = "x86_32"
+      let default =
+        try Sys.getenv "FRAMAC_MACHDEP"
+        with Not_found -> "x86_64"
       let arg_name = "machine"
       let help =
         "use <machine> as the current machine dependent configuration. \
-         See \"-machdep help\" for a list"
+         See \"-machdep help\" for a list. The environment variable \
+         FRAMAC_MACHDEP can be used to override the default value. The command \
+         line parameter still has priority over the default value"
     end)
 
 let () = Parameter_customize.set_group parsing
