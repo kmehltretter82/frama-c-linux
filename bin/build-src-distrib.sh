@@ -6,9 +6,9 @@ set -u
 
 # Set it to "no" in order to really execute the commands.
 # Otherwise, they are only printed.
-DEBUG=yes
+DEBUG=no
 
-# Define the variable PUBLIC_GITLAB either here or on command line to use
+# Define the variable USER_GITLAB either here or on command line to use
 # a test Frama-C repository when pushing changes "publicly" (for example,
 # fork Frama-C and use this fork).
 
@@ -43,17 +43,27 @@ function step {
 # - create: yes/no -> create if not found
 # - name: default name of the remote
 # - url: url of the repository
+# - repo: (optional) directory
 # Sets:
 # REMOTE, the name of the found or created remote
 function find_REMOTE {
     create=$1
     name=$2
     url=$3
-    REMOTE=$(git remote -v | grep $url | head -n 1 | cut -d"	" -f1)
+    if [ $# -ge 4 ] ; then
+        CUR_DIR=$4
+        CDIR="-C $4"
+    else
+        CUR_DIR="frama-c"
+        CDIR=""
+    fi
+
+    REMOTE=$(git $CDIR remote -v | grep $url | head -n 1 | cut -d"	" -f1)
     if [ "$REMOTE" != "" ]; then
         return
     fi
-    echo "### WARNING: can't find a remote for $name git repository";
+    echo "### WARNING: In repository: $CUR_DIR ";
+    echo "Can't find a remote name for $url"
 
     if [ "$create" != "yes" ]; then
         exit 1
@@ -64,13 +74,13 @@ function find_REMOTE {
     case "${CHOICE}" in
         "Y"|"y")
             NAME=$name
-            git remote get-url $NAME &> /dev/null
+            git remote $CDIR get-url $NAME &> /dev/null
             while [ "$?" == "0" ]; do
                 echo -n "Give an available remote name for the public Frama-C remote: "
                 read NAME
-                git remote get-url $NAME &> /dev/null
+                git remote $CDIR get-url $NAME &> /dev/null
             done
-            run "git remote add $NAME $url"
+            run "git $CDIR remote add $NAME $url"
             REMOTE=$NAME
             return ;;
         *)
@@ -373,11 +383,12 @@ function push_wiki {
             exit 1
     esac
     run "git -C $WIKI_DIR commit -m \"Prepare pages for the release of Frama-C $FRAMAC_VERSION\""
-    run "git -C $WIKI_DIR push"
+    run "git -C $WIKI_DIR push $WIKI_REMOTE master"
 }
 
 function push_stable_branch {
-    run "git -C push $PUBLIC_REMOTE $FRAMAC_BRANCH"
+    run "git push --set-upstream $PUBLIC_REMOTE $FRAMAC_BRANCH"
+    run "git push $PUBLIC_REMOTE $FRAMAC_TAG"
 }
 
 function propagate_changes {
@@ -387,6 +398,10 @@ function propagate_changes {
 }
 
 function last_step_validation {
+    if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
+        echo "To go further, the last commit must be tagged with the right version"
+        exit 1
+    fi
     echo "
     This step will:
 
@@ -396,10 +411,10 @@ function last_step_validation {
 
       - ask for a validation of the changes to wiki
       - push changes to the wiki MASTER branch
-        Git: $GITLAB_WIKI
+        Git: $(git -C $WIKI_DIR remote get-url $WIKI_REMOTE) (Remote: $WIKI_REMOTE)
 
       - push Frama-C:$FRAMAC_BRANCH and tag $FRAMAC_TAG on the public remote
-        Git: $GITLAB_FRAMA_C_PUBLIC (Remote: $PUBLIC_REMOTE)
+        Git: $(git remote get-url $PUBLIC_REMOTE) (Remote: $PUBLIC_REMOTE)
 
     If you want to perform some additional checks it is probably time to stop.
 
@@ -418,15 +433,17 @@ function last_step_validation {
 
 
 # BEGIN SCRIPT
-if [ -z ${PUBLIC_GITLAB+x} ]; then
-    PUBLIC_GITLAB="git@git.frama-c.com:pub"
-    PUBLIC_REMOTE_NAME="public"
-else
-    PUBLIC_REMOTE_NAME="test-public"
-fi
+GITLAB_FRAMA_C_PUBLIC="git@git.frama-c.com:pub"
+OFFICIAL_GITLAB_WIKI="$GITLAB_FRAMA_C_PUBLIC/frama-c.wiki.git"
+OFFICIAL_GITLAB_FRAMA_C_PUBLIC="$GITLAB_FRAMA_C_PUBLIC/frama-c.git"
 
-GITLAB_WIKI="$PUBLIC_GITLAB/frama-c.wiki.git"
-GITLAB_FRAMA_C_PUBLIC="$PUBLIC_GITLAB/frama-c.git"
+if [ -z ${USER_GITLAB+x} ]; then
+    USE_OFFICIAL="yes"
+else
+    USE_OFFICIAL="no"
+    USER_GITLAB_WIKI="$USER_GITLAB/frama-c.wiki.git"
+    USER_GITLAB_FRAMA_C_PUBLIC="$USER_GITLAB/frama-c.git"
+fi
 
 # As website modifications are put into a branch, we do not use the user defined
 # Frama-C public GitLab
@@ -471,12 +488,31 @@ if test "$FRAMAC_VERSION" != "$FRAMAC_TAG"; then
     echo "Frama-C Tag    : $FRAMAC_TAG"
 fi
 
-# Find remotes
+# Find Frama-C remotes
 
 find_REMOTE "no" "origin" $GITLAB_FRAMA_C_PRIVATE
 ORIGIN_REMOTE=$REMOTE
-find_REMOTE "yes" $PUBLIC_REMOTE_NAME $GITLAB_FRAMA_C_PUBLIC
-PUBLIC_REMOTE=$REMOTE
+find_REMOTE "yes" "public" $OFFICIAL_GITLAB_FRAMA_C_PUBLIC
+OFFICIAL_PUBLIC_REMOTE=$REMOTE
+
+if [[ "$USE_OFFICIAL" == "no" ]]; then
+    find_REMOTE "yes" "test-public" $USER_GITLAB_FRAMA_C_PUBLIC
+    USER_REMOTE=$REMOTE
+fi
+
+# Find Frama-C wiki remotes
+
+find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $OFFICIAL_GITLAB_WIKI
+WIKI_DIR=$DIRECTORY
+WIKI_BRANCH=$BRANCH
+
+find_REMOTE "no" "origin" $OFFICIAL_GITLAB_WIKI $WIKI_DIR
+OFFICIAL_WIKI_REMOTE=$REMOTE
+
+if [[ "$USE_OFFICIAL" == "no" ]]; then
+    find_REMOTE "yes" "test-public" $USER_GITLAB_WIKI $WIKI_DIR
+    USER_WIKI_REMOTE=$REMOTE
+fi
 
 # Find specific repositories
 
@@ -487,9 +523,7 @@ WEBSITE_BRANCH=$BRANCH
 find_repository_DIRECTORY_BRANCH "./doc/acsl" $GITLAB_ACSL
 ACSL_DIR=$DIRECTORY
 
-find_repository_DIRECTORY_BRANCH "./frama-c.wiki" $GITLAB_WIKI
-WIKI_DIR=$DIRECTORY
-WIKI_BRANCH=$BRANCH
+
 
 CHANGES="./main_changes.md"
 if test \! -f $CHANGES ; then
@@ -503,6 +537,14 @@ if test \! -f $CHANGES ; then
             echo "Create a changes file and run the script again"
             exit 1
     esac
+fi
+
+if [[ "$USE_OFFICIAL" == "no" ]]; then
+    PUBLIC_REMOTE=$USER_WIKI_REMOTE
+    WIKI_REMOTE=$USER_WIKI_REMOTE
+else
+    PUBLIC_REMOTE=$OFFICIAL_PUBLIC_REMOTE
+    WIKI_REMOTE=$OFFICIAL_WIKI_REMOTE
 fi
 
 MANUALS_DIR="./doc/manuals"
@@ -520,6 +562,7 @@ echo "Public remote        : $PUBLIC_REMOTE ($(git remote get-url $PUBLIC_REMOTE
 echo "Manuals Dir          : $MANUALS_DIR"
 echo "ACSL Dir             : $ACSL_DIR"
 echo "Frama-C Wiki Dir     : $WIKI_DIR"
+echo "Frama-C Wiki remote  : $WIKI_REMOTE ($(git remote get-url $WIKI_REMOTE))"
 echo "Website Dir          : $WEBSITE_DIR"
 echo "Changes file         : $CHANGES"
 echo "Build Dir            : $BUILD_DIR"
@@ -617,6 +660,7 @@ case "${STEP}" in
         run "cd $BUILD_DIR_ROOT ; tar xzf $TARGZ_FILENAME"
         run "./doc/release/checktar.sh $TEST_DIR"
         run "cd $TEST_DIR ; ./configure && make -j && make tests"
+        run "rm -rf $TEST_DIR"
         ;&
     9)
         step 9 "PROPAGATE CHANGES"
