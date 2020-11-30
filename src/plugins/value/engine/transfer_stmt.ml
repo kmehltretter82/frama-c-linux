@@ -553,21 +553,24 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     {kf; arguments; rest; return; }
 
-  let replace_value substitution = function
+  let replace_value visitor substitution = function
     | Assign value -> Assign (Value.replace_base substitution value)
     | Copy (loc, flagged) ->
       let v = flagged.v >>-: Value.replace_base substitution in
       let flagged = { flagged with v } in
-      (* TODO: replace base in [loc] *)
+      let lloc = Location.replace_base substitution loc.lloc in
+      let lval = Visitor.visitFramacLval visitor loc.lval in
+      let loc = { loc with lval; lloc } in
       Copy (loc, flagged)
 
   let replace_recursive_call recursion call =
     let tbl = VarHashtbl.create 9 in
     List.iter (fun (v1, v2) -> VarHashtbl.add tbl v1 v2) recursion.substitution;
     let visitor = substitution_visitor tbl in
+    let base_substitution = recursion.base_substitution in
     let replace_arg argument =
       let concrete = Visitor.visitFramacExpr visitor argument.concrete in
-      let avalue = replace_value recursion.base_substitution argument.avalue in
+      let avalue = replace_value visitor base_substitution argument.avalue in
       { argument with concrete; avalue }
     in
     let arguments = List.map replace_arg call.arguments in

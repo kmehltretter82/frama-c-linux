@@ -263,6 +263,25 @@ let loc_top = {
 }
 let is_top_loc pl = equal_loc loc_top pl
 
+let replace_base substitution po =
+  match po.loc with
+  | PLBottom -> po
+  | PLLoc loc ->
+    let modified, loc = Location_Bits.replace_base substitution loc in
+    if modified then { po with loc = PLLoc loc } else po
+  | PLVarOffset (base, offset) ->
+    let set = Base.Hptset.singleton base in
+    let modified, set = Base.Hptset.replace substitution set in
+    if modified then
+      let base = Option.get (Base.Hptset.contains_single_elt set) in
+      { po with loc = PLVarOffset (base, offset) }
+    else po
+  | PLLocOffset (loc, offset) ->
+    let modified, loc = Location_Bits.replace_base substitution loc in
+    if modified
+    then { po with loc = PLLocOffset (loc, offset) }
+    else po
+
 let rec fold_offset f po acc =
   match po with
     | POBottom -> f Ival.bottom acc

@@ -44,6 +44,8 @@ module type S = sig
   val to_value : location -> value
   val size : location -> Int_Base.t
 
+  val replace_base: Base.substitution -> location -> location
+
   (** {3 Alarms } *)
 
   (** These functions are used to create the alarms that report undesirable
