@@ -57,7 +57,7 @@ class visitor = object
       Cil.DoChildren
     | GVarDecl (v, _) | GVar (v, _, _)
     | GFun ({svar = v}, _) | GFunDecl (_, v, _)
-      when Cil.is_unused_builtin v ->
+      when Cil_builtins.is_unused_builtin v ->
       Cil.SkipChildren
     | _ ->
       Cil.DoChildren
@@ -101,8 +101,8 @@ class visitor = object
     else begin
       if Cil.isFunctionType vi.vtype then begin
         if vi.vname <> "main"
-        && not (Cil.is_builtin vi)
-        && not (Cil.is_special_builtin vi.vname)
+        && not (Cil_builtins.is_builtin vi)
+        && not (Cil_builtins.is_special_builtin vi.vname)
         && not (Cil.hasAttribute "fc_stdlib" vi.vattr) then
           vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname
       end

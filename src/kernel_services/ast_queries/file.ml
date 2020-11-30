@@ -208,7 +208,7 @@ end = struct
       [ Ast.self;
         Ast.UntypedFiles.self;
         Cabshelper.Comments.self;
-        Cil.Frama_c_builtins.self ]
+        Cil_builtins.Frama_c_builtins.self ]
 
   let () =
     Ast.add_linked_state Cabshelper.Comments.self
@@ -1188,7 +1188,7 @@ let prepare_cil_file ast =
 let fill_built_ins () =
   if Cil.selfMachine_is_computed () then begin
     Kernel.debug "Machine is computed, just fill the built-ins";
-    Cil.init_builtins ();
+    Cil_builtins.init_builtins ();
   end else begin
     Kernel.debug "Machine is not computed, initialize everything";
     Cil.initCIL (Logic_builtin.init()) (get_machdep ());
@@ -1203,7 +1203,7 @@ let init_project_from_cil_file prj file =
       State_selection.full
       (State_selection.list_union
          (List.map State_selection.with_dependencies
-            [Cil.Builtin_functions.self;
+            [Cil_builtins.Builtin_functions.self;
              Ast.self;
              Files.pre_register_state]))
   in
@@ -1685,7 +1685,7 @@ let init_from_cmdline () =
     let selection =
       State_selection.list_union
         (List.map State_selection.with_dependencies
-           [ Cil.Builtin_functions.self;
+           [ Cil_builtins.Builtin_functions.self;
              Logic_env.Logic_info.self;
              Logic_env.Logic_type_info.self;
              Logic_env.Logic_ctor_info.self;

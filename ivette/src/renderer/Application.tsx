@@ -19,7 +19,7 @@ import * as Controller from './Controller';
 
 import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
-import Globals from './Globals';
+import Globals, { GlobalHint, useHints } from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
 import Values from './Values';
@@ -61,6 +61,14 @@ export default (() => {
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
+  const [hints, onSearchHint] = useHints();
+  const [, setSelection] = States.useSelection();
+  const onGlobalHint = (h: GlobalHint) => {
+    setSelection({ location: h.value });
+  };
+  const onSelectHint = () => {
+    if (hints.length === 1) onGlobalHint(hints[0]);
+  };
 
   return (
     <Vfill>
@@ -74,6 +82,13 @@ export default (() => {
         <Controller.Control />
         <HistorySelectionControls />
         <Toolbar.Filler />
+        <Toolbar.SearchField
+          placeholder="Search…"
+          hints={hints}
+          onSearch={onSearchHint}
+          onSelect={onSelectHint}
+          onHint={onGlobalHint}
+        />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"

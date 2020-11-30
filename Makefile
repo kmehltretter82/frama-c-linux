@@ -317,7 +317,7 @@ DISTRIB_FILES:=\
       opam/opam \
 
 # Test files to be included in the distribution (without header checking).
-# Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files. 
+# Plug-ins should use PLUGIN_DISTRIB_TESTS to export their test files.
 DISTRIB_TESTS=$(shell git ls-files \
                   tests \
                   src/plugins/aorai/tests \
@@ -518,6 +518,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_queries/logic_const.cmo              \
 	src/kernel_services/visitors/visitor_behavior.cmo		\
 	src/kernel_services/ast_queries/cil.cmo                      \
+	src/kernel_services/ast_queries/cil_builtins.cmo             \
 	src/kernel_internals/parsing/errorloc.cmo                      \
 	src/kernel_services/ast_printing/cil_printer.cmo                \
 	src/kernel_services/ast_printing/cil_descriptive_printer.cmo    \
@@ -2375,7 +2376,7 @@ DISTRIB_FILES += $(wildcard $(PLUGIN_DISTRIBUTED_LIST)                   \
 DISTRIB_FILES:=$(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST),\
                   $(DISTRIB_FILES))
 
-DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST)) 
+DISTRIB_TESTS += $(wildcard $(PLUGIN_DIST_TESTS_LIST))
 
 
 SPECIFIED_OPEN_SOURCE:=$(OPEN_SOURCE)

@@ -3217,7 +3217,7 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
     | None -> empty_funspec ()
     | Some s -> s
   in
-  cabsPushGlobal (GFunDecl (funspec, v, Cil.builtinLoc));
+  cabsPushGlobal (GFunDecl (funspec, v, Cil_builtins.builtinLoc));
   Cil.unsafeSetFormalsDecl v args;
   if force_keep then
     v.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN",[])) v.vattr;
@@ -6665,7 +6665,7 @@ and doExp local_env
        * functions alone*)
       let isSpecialBuiltin =
         match f''.enode with
-        | Lval (Var fv, NoOffset) -> Cil.is_special_builtin fv.vname
+        | Lval (Var fv, NoOffset) -> Cil_builtins.is_special_builtin fv.vname
         | _ -> false
       in
       let init_chunk = unspecified_chunk empty in
@@ -10310,7 +10310,7 @@ let convFile (path, f) =
   Logic_env.prepare_tables ();
   anonCompFieldNameId := 0;
   Kernel.debug ~level:2 "Converting CABS->CIL" ;
-  Cil.Builtin_functions.iter_sorted
+  Cil_builtins.Builtin_functions.iter_sorted
     (fun name (resTyp, argTypes, isva) ->
        ignore (setupBuiltin name (resTyp, ArgTypes argTypes, isva)));
   let globalidx = ref 0 in

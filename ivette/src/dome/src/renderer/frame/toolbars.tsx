@@ -8,15 +8,12 @@
  */
 
 import React from 'react';
-import { classes } from 'dome/misc/utils';
-
-import './style.css';
-
-// --------------------------------------------------------------------------
-// --- ToolBar Button
-// --------------------------------------------------------------------------
-
+import { Event, useEvent, find } from 'dome';
+import { debounce } from 'lodash';
 import { SVG } from 'dome/controls/icons';
+import { Label } from 'dome/controls/labels';
+import { classes } from 'dome/misc/utils';
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container
@@ -70,8 +67,8 @@ export const Separator = () => (
   </div>
 );
 
-const SELECT = 'dome-xToolBar-Control dome-selected';
-const BUTTON = 'dome-xToolBar-Control dome-color-frame';
+const SELECT = 'dome-xToolBar-control dome-selected';
+const BUTTON = 'dome-xToolBar-control dome-color-frame';
 const KIND = (kind: undefined | string) => (
   kind ? ` dome-xToolBar-${kind}` : ''
 );
@@ -165,7 +162,7 @@ export function ButtonGroup<A>(props: SelectionProps<A>) {
     onClick: onChange,
   };
   return (
-    <div className="dome-xToolBar-Group">
+    <div className="dome-xToolBar-group">
       {React.Children.map(children, (elt) => React.cloneElement(
         elt,
         { ...baseProps, ...elt.props },
@@ -192,13 +189,164 @@ export function Select(props: SelectionProps<string>) {
   };
   return (
     <select
-      className="dome-xToolBar-Control dome-color-frame"
+      className="dome-xToolBar-control dome-color-frame"
       value={props.value}
       disabled={disabled || !enabled}
       onChange={callback}
     >
       {props.children}
     </select>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- SearchField
+// --------------------------------------------------------------------------
+
+const DEBOUNCED_SEARCH = 200;
+
+const scrollToRef = (r: undefined | HTMLLabelElement) => {
+  if (r) r.scrollIntoView({ block: 'nearest' });
+};
+
+export interface Hint<A> {
+  id: string | number;
+  icon?: string;
+  label: string | JSX.Element;
+  title?: string;
+  value: A;
+}
+
+export interface SearchFieldProps<A> {
+  /** Tooltip Text. */
+  title?: string;
+  /** Placeholder Text. */
+  placeholder?: string;
+  /** Provided search hints (with respect to last `onSearch()` callback). */
+  hints?: Hint<A>[];
+  /** Search callback. Triggered on Enter Key, Escape Key or Blur event. */
+  onSelect?: (pattern: string) => void;
+  /** Dynamic search callback. Triggered on key pressed (debounced). */
+  onSearch?: (pattern: string) => void;
+  /** Hint selection callback. */
+  onHint?: (hint: Hint<A>) => void;
+  /** Event that triggers a focus request (defaults to [[Dome.find]]). */
+  event?: null | Event<void>;
+}
+
+/**
+   Search Bar.
+ */
+export function SearchField<A = undefined>(props: SearchFieldProps<A>) {
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const blur = () => inputRef.current?.blur();
+  const focus = () => inputRef.current?.focus();
+  const [value, setValue] = React.useState('');
+  const [index, setIndex] = React.useState(-1);
+  const { onHint, onSelect, onSearch, hints = [] } = props;
+
+  // Find event trigger
+  useEvent(props.event ?? find, focus);
+
+  // Lookup trigger
+  const triggerLookup = React.useCallback(
+    debounce((pattern: string) => {
+      if (onSearch) onSearch(pattern);
+    }, DEBOUNCED_SEARCH),
+    [onSearch],
+  );
+
+  // Blur Event
+  const onBlur = () => {
+    setValue('');
+    setIndex(-1);
+    if (onSearch) onSearch('');
+  };
+
+  // Key Events
+  const onKey = (evt: React.KeyboardEvent) => {
+    switch (evt.key) {
+      case 'Escape':
+        blur();
+        break;
+      case 'Enter':
+        if (index >= 0 && index < hints.length) {
+          if (onHint) onHint(hints[index]);
+        } else if (onSelect) onSelect(value);
+        blur();
+        break;
+      case 'ArrowUp':
+        if (index < 0) setIndex(hints.length - 1);
+        if (index > 0) setIndex(index - 1);
+        break;
+      case 'ArrowDown':
+        if (index < 0 && 0 < hints.length) setIndex(0);
+        if (0 <= index && index < hints.length - 1) setIndex(index + 1);
+        break;
+    }
+  };
+
+  // Input Events
+  const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = evt.target.value;
+    triggerLookup(newValue);
+    setIndex(-1);
+    setValue(newValue);
+  };
+
+  // Render Suggestions
+  const suggestions = hints.map((h, k) => {
+    const selected = k === index || hints.length === 1;
+    const className = classes(
+      'dome-xToolBar-searchitem',
+      selected && 'dome-xToolBar-searchindex',
+    );
+    return (
+      <Label
+        ref={selected ? scrollToRef : undefined}
+        key={h.id}
+        icon={h.icon}
+        title={h.title}
+        className={className}
+        onClick={() => {
+          if (onHint) onHint(h);
+          blur();
+        }}
+      >
+        {h.label}
+      </Label>
+    );
+  });
+  const haspopup =
+    inputRef.current === document.activeElement
+    && suggestions.length > 0;
+  const visibility = haspopup ? 'visible' : 'hidden';
+
+  // Render Component
+  return (
+    <>
+      <div className="dome-xToolBar-searchicon">
+        <SVG id="SEARCH" />
+        <div
+          style={{ visibility }}
+          className="dome-xToolBar-searchmenu"
+          onMouseDown={(event) => event.preventDefault()}
+        >
+          {suggestions}
+        </div>
+      </div>
+      <input
+        ref={inputRef}
+        type="search"
+        title={props.title}
+        value={value}
+        placeholder={props.placeholder}
+        className="dome-xToolBar-control dome-xToolBar-searchfield"
+        onKeyUp={onKey}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    </>
   );
 }
 

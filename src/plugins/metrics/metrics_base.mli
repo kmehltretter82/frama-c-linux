@@ -29,6 +29,7 @@ val html_stag_functions : Format.formatter_stag_functions;;
     - level 1 headers are underlined by '='
     - level 2 headers by '-'
     - level 3 headers by '~'
+
     This function is supposed to follow reStructuredText's conventions.
 *)
 val mk_hdr : int -> Format.formatter -> string -> unit;;
@@ -52,7 +53,7 @@ module BasicMetrics : sig
                                  function, possibly more for a file.*)
     cptrs: int ;             (** Access to pointers *)
     cdecision_points: int ;  (** Decision points of the program: ifs,
-                              switch cases, exception handlers, ... *)
+                                 switch cases, exception handlers, ... *)
     cglob_vars: int;         (** Global variables *)
     ccyclo: int;             (** Cyclomatic complexity *)
   }
@@ -164,7 +165,7 @@ val consider_variable: libc:bool -> Cil_types.varinfo -> bool
 
 (** Convert float to string with the following convention:
     - if the float is an integer (ie, it has no digits after the decimal point),
-    print it as such;
+      print it as such;
     - otherwise, print the first two digits after the decimal point.
 *)
 val float_to_string : float -> string ;;

@@ -464,7 +464,7 @@ let bits_sizeof_comp cinfo = Cil.bitsSizeOf (typ_comp cinfo)
 let bits_sizeof_array ainfo =
   match ainfo.arr_flat with
   | Some a ->
-      let csize = Cil.integer ~loc:Cil.builtinLoc a.arr_cell_nbr in
+      let csize = Cil.integer ~loc:Cil_builtins.builtinLoc a.arr_cell_nbr in
       let ctype = TArray(a.arr_cell,Some csize,Cil.empty_size_cache(),[]) in
       Cil.bitsSizeOf ctype
   | None ->

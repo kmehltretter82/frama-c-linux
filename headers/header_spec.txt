@@ -41,6 +41,7 @@ bin/migration_scripts/sodium2magnesium.sh: CEA_LGPL
 bin/migration_scripts/sulfur2chlorine.sh: CEA_LGPL
 bin/migration_scripts/chlorine2argon.sh: CEA_LGPL
 bin/migration_scripts/potassium2calcium.sh: CEA_LGPL
+bin/migration_scripts/titanium2vanadium.sh: CEA_LGPL
 bin/sed_get_binutils_version: .ignore
 bin/sed_get_make_major: .ignore
 bin/sed_get_make_minor: .ignore
@@ -541,6 +542,8 @@ src/kernel_services/ast_queries/ast_info.ml: CEA_LGPL
 src/kernel_services/ast_queries/ast_info.mli: CEA_LGPL
 src/kernel_services/ast_queries/cil.ml: CIL
 src/kernel_services/ast_queries/cil.mli: CIL
+src/kernel_services/ast_queries/cil_builtins.ml: CIL
+src/kernel_services/ast_queries/cil_builtins.mli: CIL
 src/kernel_services/ast_queries/cil_const.ml: CIL
 src/kernel_services/ast_queries/cil_const.mli: CIL
 src/kernel_services/ast_queries/cil_datatype.ml: CEA_LGPL

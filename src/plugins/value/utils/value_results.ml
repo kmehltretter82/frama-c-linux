@@ -358,8 +358,8 @@ open Cil_types
 let plural count = if count = 1 then "" else "s"
 
 let consider_function vi =
-  not (Cil.is_builtin vi
-       || Cil.is_special_builtin vi.vname
+  not (Cil_builtins.is_builtin vi
+       || Cil_builtins.is_special_builtin vi.vname
        || Cil.hasAttribute "fc_stdlib" vi.vattr
        || Cil.hasAttribute "fc_stdlib_generated" vi.vattr)
 
