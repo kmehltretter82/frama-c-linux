@@ -134,7 +134,7 @@ export function Section(props: SectionProps) {
     <div className="dome-xSideBarSection">
       <div
         className="dome-xSideBarSection-title dome-color-frame"
-        title={props.label}
+        title={props.title}
         onContextMenu={props.onContextMenu}
       >
         <Label label={props.label} />

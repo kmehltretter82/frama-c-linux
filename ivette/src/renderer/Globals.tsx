@@ -6,24 +6,12 @@ import React from 'react';
 import { Section, Item } from 'dome/frame/sidebars';
 import type { Hint } from 'dome/frame/toolbars';
 import * as States from 'frama-c/states';
+import { useFlipSettings } from 'dome';
 import { alpha } from 'dome/data/compare';
 import { functions, functionsData } from 'frama-c/api/kernel/ast';
 import { isComputed } from 'frama-c/api/plugins/eva/general';
 
 import * as Dome from 'dome';
-
-// --------------------------------------------------------------------------
-// --- Filters
-// --------------------------------------------------------------------------
-
-const defaultFilter =
-  {
-    stdlib: false, // Show functions from the Frama-C stdlib
-    builtin: false, // Show Frama-C builtins
-    undef: true, // Show undefined functions
-    eva_only: false, // Only show functions analyzed by Eva
-    selected_only: false, // Only show functions from a multiple selection
-  };
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
@@ -64,7 +52,11 @@ export default () => {
   const fcts = States.useSyncArray(functions).getArray().sort(
     (f, g) => alpha(f.name, g.name),
   );
-  const [filter, setFilter] = React.useState(defaultFilter);
+  const [stdlib, flipStdlib] = useFlipSettings('ivette.globals.stdlib', false);
+  const [builtin, flipBuiltin] = useFlipSettings('ivette.globals.builtin', false);
+  const [undef, flipUndef] = useFlipSettings('ivette.globals.undef', true);
+  const [selected, flipSelected] = useFlipSettings('ivette.globals.selected', false);
+  const [evaOnly, flipEvaOnly] = useFlipSettings('ivette.globals.evaonly', false);
   const multipleSelection = selection?.multiple;
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useRequest(isComputed, null);
@@ -77,46 +69,45 @@ export default () => {
 
   function showFunction(fct: functionsData) {
     const visible =
-      (filter.stdlib || !fct.stdlib)
-      && (filter.builtin || !fct.builtin)
-      && (filter.undef || fct.defined)
-      && (!filter.eva_only || !evaComputed || (fct.eva_analyzed === true))
-      && (!filter.selected_only || !multipleSelectionActive || isSelected(fct));
+      (stdlib || !fct.stdlib)
+      && (builtin || !fct.builtin)
+      && (undef || fct.defined)
+      && (!evaOnly || !evaComputed || (fct.eva_analyzed === true))
+      && (!selected || !multipleSelectionActive || isSelected(fct));
     return visible;
   }
 
   async function onContextMenu() {
-    const items: Dome.PopupMenuItem[] = [];
-    items.push({
-      label: 'Show Frama-C builtins',
-      checked: filter.builtin,
-      onClick: () => setFilter({ ...filter, builtin: !filter.builtin }),
-    });
-    items.push({
-      label: 'Show stdlib functions',
-      checked: filter.stdlib,
-      onClick: () => setFilter({ ...filter, stdlib: !filter.stdlib }),
-    });
-    items.push({
-      label: 'Show undefined functions',
-      checked: filter.undef,
-      onClick: () => setFilter({ ...filter, undef: !filter.undef }),
-    });
-    items.push('separator');
-    items.push({
-      label: 'Selected only',
-      enabled: multipleSelectionActive,
-      checked: filter.selected_only,
-      onClick: () => {
-        setFilter({ ...filter, selected_only: !filter.selected_only });
+    const items: Dome.PopupMenuItem[] = [
+      {
+        label: 'Show Frama-C builtins',
+        checked: builtin,
+        onClick: flipBuiltin,
       },
-    });
-    items.push({
-      label: 'Analyzed by Eva only',
-      enabled: evaComputed,
-      checked: filter.eva_only,
-      onClick: () => setFilter({ ...filter, eva_only: !filter.eva_only }),
-    });
+      {
+        label: 'Show stdlib functions',
+        checked: stdlib,
+        onClick: flipStdlib,
+      },
+      {
+        label: 'Show undefined functions',
+        checked: undef,
+        onClick: flipUndef,
+      },
+      'separator',
+      {
+        label: 'Selected only',
+        enabled: multipleSelectionActive,
+        checked: selected,
+        onClick: flipSelected,
+      },
+      {
+        label: 'Analyzed by Eva only',
+        enabled: evaComputed,
+        checked: evaOnly,
+        onClick: flipEvaOnly,
+      }
+    ];
     Dome.popupMenu(items);
   }
 
@@ -135,12 +126,21 @@ export default () => {
     );
   };
 
+  // Filtered
+
+  const filtered = fcts.filter(showFunction);
+  const nTotal = fcts.length;
+  const nFilter = filtered.length;
+  const title = `Filtered ${nFilter} / ${nTotal}`;
   return (
-    <Section label="Functions" onContextMenu={onContextMenu} defaultUnfold>
-      {fcts.filter(showFunction).map(makeFctItem)}
+    <Section
+      label="Functions"
+      title={title}
+      onContextMenu={onContextMenu} defaultUnfold>
+      {filtered.map(makeFctItem)}
     </Section>
   );
 
-};
+}
 
 // --------------------------------------------------------------------------
