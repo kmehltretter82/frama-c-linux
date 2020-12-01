@@ -581,7 +581,7 @@ let is_entry_point kf =
   String.equal (get_name kf) (Kernel.MainFunction.get ())
 
 let is_main kf =
-  get_name kf = "main"
+  String.equal (get_name kf) "main"
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
