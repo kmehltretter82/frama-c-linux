@@ -1602,10 +1602,14 @@ module Make
 
   (* Aborts the analysis when a function pointer is completely imprecise. *)
   let top_function_pointer funcexp =
+    if not (Value_parameters.Domains.mem "cvalue") then
+      Value_parameters.abort ~current:true
+        "Calls through function pointers are not supported without the cvalue \
+         domain.";
     if Mark_noresults.no_memoization_enabled () then
       Value_parameters.abort ~current:true
         "Function pointer evaluates to anything. Try deactivating \
-         option(s) -no-results, -no-results-function and -obviously-terminates."
+         option(s) -eva-no-results and -eva-no-results-function."
     else
       Value_parameters.fatal ~current:true
         "Function pointer evaluates to anything. function %a"
