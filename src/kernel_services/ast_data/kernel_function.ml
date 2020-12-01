@@ -578,12 +578,10 @@ let is_return_stmt kf stmt =
     false
 
 let is_entry_point kf =
-  let main, _ = Globals.entry_point () in
-  equal kf main
+  get_name kf = Kernel.MainFunction.get ()
 
 let is_main kf =
-  let name = get_name kf in
-  Datatype.String.equal name "main"
+  get_name kf = "main"
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
