@@ -97,7 +97,7 @@ endif
 
 define display_command =
   $(info )
-  $(info $(shell tput setaf 4)Command: $(1)$(shell tput sgr0))
+  $(info $(shell tput setaf 4)Command: $(strip $(1))$(shell tput sgr0))
   $(info )
 endef
 
