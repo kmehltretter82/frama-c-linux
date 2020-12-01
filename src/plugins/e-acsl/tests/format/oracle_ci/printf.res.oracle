@@ -73,10 +73,11 @@
   E-ACSL construct `logic functions with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:165: Warning: 
-  invalid E-ACSL construct
+  E-ACSL construct
   `non integer variable p in quantification
   found: result_first_occur:
-    ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c)'.
+    ∀ char *p; \old(s) ≤ p < \result ⇒ *p ≢ (char)\old(c)'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:125: Warning: 
   E-ACSL construct `logic functions with labels' is not yet supported.
