@@ -8,6 +8,8 @@ set -u
 # Otherwise, they are only printed.
 DEBUG=no
 
+# Set variable VERBOSE_MAKE_DOC to see all latex messages during manuals build
+
 # Executing this script requires bash 4.0 or higher
 # (special use of the 'case' construct)
 if test `echo $BASH_VERSION | sed "s/\([0-9]\).*/\1/" ` -lt 4; then
@@ -453,6 +455,12 @@ fi
 
 MANUALS_DIR="./doc/manuals"
 
+if [ -z ${VERBOSE_MAKE_DOC+x} ]; then
+    FILTER="texfot --ignore '(Warning|Overfull|Underfull|Version)'"
+else
+    FILTER=""
+fi
+
 BUILD_DIR_ROOT="/tmp/release"
 BUILD_DIR="$BUILD_DIR_ROOT/frama-c"
 
@@ -507,7 +515,7 @@ case "${STEP}" in
         step 1 "COMPILING PDF MANUALS"
         run "rm -rf $MANUALS_DIR"
         run "mkdir -p $MANUALS_DIR"
-        run "doc/build-manuals.sh"
+        run "$FILTER doc/build-manuals.sh"
         run "rm -rf $OUT_DIR/manuals"
         run "mkdir -p $OUT_DIR/manuals"
         run "cp $MANUALS_DIR/* $OUT_DIR/manuals"
