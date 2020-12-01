@@ -3,7 +3,7 @@
 # --------------------------------------------------------------------------
 FRAMAC_DOC= .make-class .make-images .make-icons VERSION VERSION_CODENAME
 # --------------------------------------------------------------------------
-FRAMAC_CLASS=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
+FRAMAC_CLASS=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf frama-c-affiliation.tex
 FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
 FRAMAC_IMAGES=cealistlogo.jpg
 # --------------------------------------------------------------------------

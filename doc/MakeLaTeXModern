@@ -1,5 +1,5 @@
 FRAMAC_DOC_ROOT_DIR?=..
-FRAMAC_MODERN=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
+FRAMAC_MODERN=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf frama-c-affiliation.tex
 
 frama-c-book.cls: $(FRAMAC_DOC_ROOT_DIR)/frama-c-book.cls
 	@rm -f $@
@@ -20,6 +20,12 @@ frama-c-right.pdf: $(FRAMAC_DOC_ROOT_DIR)/frama-c-right.pdf
 	@echo "import $<"
 
 frama-c-left.pdf: $(FRAMAC_DOC_ROOT_DIR)/frama-c-left.pdf
+	@rm -f $@
+	@cp $< .
+	@chmod a-w $@
+	@echo "import $<"
+
+frama-c-affiliation.tex: $(FRAMAC_DOC_ROOT_DIR)/frama-c-affiliation.tex
 	@rm -f $@
 	@cp $< .
 	@chmod a-w $@
