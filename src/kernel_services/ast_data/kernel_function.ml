@@ -578,7 +578,7 @@ let is_return_stmt kf stmt =
     false
 
 let is_entry_point kf =
-  get_name kf = Kernel.MainFunction.get ()
+  String.equal (get_name kf) (Kernel.MainFunction.get ())
 
 let is_main kf =
   get_name kf = "main"
