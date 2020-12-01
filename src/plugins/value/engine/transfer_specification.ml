@@ -127,9 +127,9 @@ let reduce_to_valid_location out loc =
   if Locations.(Location_Bits.(equal top loc.loc)) then
     begin
       Value_parameters.error ~once:true ~current:true
-        "Cannot@ handle@ %a,@ location@ is@ too@ imprecise@ \
-         (%a).@ Assuming@ it@ is@ not@ assigned,@ but@ be@ aware@ this\
-         @ is@ incorrect." pp_assign_free_alloc out Locations.pretty loc;
+        "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
+         Assuming it is not assigned,@ but be aware@ this is incorrect.@]"
+        pp_assign_free_alloc out Locations.pretty loc;
       None
     end
   else
