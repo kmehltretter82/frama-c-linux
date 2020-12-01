@@ -394,6 +394,11 @@ struct
         ~data:(module Data.Jstring)
         ~get:signature ;
       States.column model
+        ~name:"main"
+        ~descr:(Md.plain "Is the function the main entry point")
+        ~data:(module Data.Jbool)
+        ~get:Kernel_function.is_entry_point;
+      States.column model
         ~name:"defined"
         ~descr:(Md.plain "Is the function defined?")
         ~data:(module Data.Jbool)

@@ -280,6 +280,8 @@ export interface functionsData {
   name: string;
   /** Signature */
   signature: string;
+  /** Is the function the main entry point */
+  main: boolean;
   /** Is the function defined? */
   defined: boolean;
   /** Is the function from the Frama-C stdlib? */
@@ -297,6 +299,7 @@ export const jFunctionsData: Json.Loose<functionsData> =
            '#functions expected'),
     name: Json.jFail(Json.jString,'String expected'),
     signature: Json.jFail(Json.jString,'String expected'),
+    main: Json.jFail(Json.jBoolean,'Boolean expected'),
     defined: Json.jFail(Json.jBoolean,'Boolean expected'),
     stdlib: Json.jFail(Json.jBoolean,'Boolean expected'),
     builtin: Json.jFail(Json.jBoolean,'Boolean expected'),
@@ -311,11 +314,12 @@ export const jFunctionsDataSafe: Json.Safe<functionsData> =
 export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string,
-       defined: boolean, stdlib: boolean, builtin: boolean,
+       main: boolean, defined: boolean, stdlib: boolean, builtin: boolean,
        eva_analyzed?: boolean }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
+    main: Compare.boolean,
     defined: Compare.boolean,
     stdlib: Compare.boolean,
     builtin: Compare.boolean,

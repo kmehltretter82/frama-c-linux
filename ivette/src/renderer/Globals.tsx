@@ -119,8 +119,7 @@ export default () => {
   // Items
   const current: undefined | string = selection?.current?.function;
   const makeFctItem = (fct: functionsData) => {
-    const { name, signature } = fct;
-    const isMain = 0 < signature.indexOf('/* main */');
+    const { name, signature, main: isMain } = fct;
     return (
       <Item
         className={isMain ? 'fct-main' : undefined}
