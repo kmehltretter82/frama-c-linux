@@ -7,19 +7,13 @@
           "key": "kf#24",
           "name": "g",
           "signature": "int g(int y);",
-          "defined": true,
-          "stdlib": false,
-          "builtin": false,
-          "eva_analyzed": null
+          "defined": true
         },
         {
           "key": "kf#20",
           "name": "f",
           "signature": "int f(int x);",
-          "defined": true,
-          "stdlib": false,
-          "builtin": false,
-          "eva_analyzed": null
+          "defined": true
         }
       ],
       "removed": [],

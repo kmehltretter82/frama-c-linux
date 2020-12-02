@@ -371,8 +371,8 @@ struct
     Cil.hasAttribute "fc_stdlib" vi.vattr ||
     Cil.hasAttribute "fc_stdlib_generated" vi.vattr
 
-  let is_analyzed kf =
-    if Db.Value.is_computed () then Some (!Db.Value.is_called kf) else None
+  let is_eva_analyzed kf =
+    if Db.Value.is_computed () then !Db.Value.is_called kf else false
 
   let iter f =
     Globals.Functions.iter
@@ -397,27 +397,32 @@ struct
         ~name:"main"
         ~descr:(Md.plain "Is the function the main entry point")
         ~data:(module Data.Jbool)
+        ~default:false
         ~get:Kernel_function.is_entry_point;
       States.column model
         ~name:"defined"
         ~descr:(Md.plain "Is the function defined?")
         ~data:(module Data.Jbool)
+        ~default:false
         ~get:Kernel_function.is_definition;
       States.column model
         ~name:"stdlib"
         ~descr:(Md.plain "Is the function from the Frama-C stdlib?")
         ~data:(module Data.Jbool)
+        ~default:false
         ~get:is_stdlib;
       States.column model
         ~name:"builtin"
         ~descr:(Md.plain "Is the function a Frama-C builtin?")
         ~data:(module Data.Jbool)
+        ~default:false
         ~get:is_builtin;
       States.column model
         ~name:"eva_analyzed"
         ~descr:(Md.plain "Has the function been analyzed by Eva")
-        ~data:(module Data.Joption (Data.Jbool))
-        ~get:is_analyzed;
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_eva_analyzed;
       States.register_array model
         ~package ~key
         ~name:"functions"

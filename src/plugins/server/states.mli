@@ -76,12 +76,23 @@ type 'a model (** Columns array model *)
 val model : unit -> 'a model
 
 (** Populate an array model with a new field.
-    Columns with name `"id"` and `"_index"` are reserved for internal use. *)
+    If a [~default] value is given, the field becomes optional and
+    the field is omitted when equal to the default value (compared with [=]).
+*)
 val column :
   name:string ->
   descr:Markdown.text ->
   data:('b Request.output) ->
   get:('a -> 'b) ->
+  ?default:'b ->
+  'a model -> unit
+
+(** Populate an array model with a new optional field. *)
+val option :
+  name:string ->
+  descr:Markdown.text ->
+  data:('b Request.output) ->
+  get:('a -> 'b option) ->
   'a model -> unit
 
 (** Synchronized array state. *)

@@ -281,13 +281,13 @@ export interface functionsData {
   /** Signature */
   signature: string;
   /** Is the function the main entry point */
-  main: boolean;
+  main?: boolean;
   /** Is the function defined? */
-  defined: boolean;
+  defined?: boolean;
   /** Is the function from the Frama-C stdlib? */
-  stdlib: boolean;
+  stdlib?: boolean;
   /** Is the function a Frama-C builtin? */
-  builtin: boolean;
+  builtin?: boolean;
   /** Has the function been analyzed by Eva */
   eva_analyzed?: boolean;
 }
@@ -299,10 +299,10 @@ export const jFunctionsData: Json.Loose<functionsData> =
            '#functions expected'),
     name: Json.jFail(Json.jString,'String expected'),
     signature: Json.jFail(Json.jString,'String expected'),
-    main: Json.jFail(Json.jBoolean,'Boolean expected'),
-    defined: Json.jFail(Json.jBoolean,'Boolean expected'),
-    stdlib: Json.jFail(Json.jBoolean,'Boolean expected'),
-    builtin: Json.jFail(Json.jBoolean,'Boolean expected'),
+    main: Json.jBoolean,
+    defined: Json.jBoolean,
+    stdlib: Json.jBoolean,
+    builtin: Json.jBoolean,
     eva_analyzed: Json.jBoolean,
   });
 
@@ -314,15 +314,15 @@ export const jFunctionsDataSafe: Json.Safe<functionsData> =
 export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string,
-       main: boolean, defined: boolean, stdlib: boolean, builtin: boolean,
-       eva_analyzed?: boolean }>({
+       main?: boolean, defined?: boolean, stdlib?: boolean,
+       builtin?: boolean, eva_analyzed?: boolean }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
-    main: Compare.boolean,
-    defined: Compare.boolean,
-    stdlib: Compare.boolean,
-    builtin: Compare.boolean,
+    main: Compare.defined(Compare.boolean),
+    defined: Compare.defined(Compare.boolean),
+    stdlib: Compare.defined(Compare.boolean),
+    builtin: Compare.defined(Compare.boolean),
     eva_analyzed: Compare.defined(Compare.boolean),
   });
 
