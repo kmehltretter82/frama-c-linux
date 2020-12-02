@@ -184,7 +184,9 @@ let nb_fundefs () =
           is_analyzed_function (Kernel_function.get_vi kf)
        then nb + 1 else nb) 0
 
-let md_gen () =
+open Markdown
+
+let coverage_md_gen () =
   let main = Kernel.MainFunction.get () in
   !Db.Value.compute ();
   let vis = new eva_coverage_vis ~from_entry_point:false in
@@ -227,4 +229,10 @@ let md_gen () =
       (float_of_int stats.covered_stmts *. 100. /.
        float_of_int stats.total_stmts)
   in
-  Markdown.([ Block [Text summary_whole]; Block [Text summary ]])
+  [ Block [Text summary_whole]; Block [Text summary ]]
+
+let domains_md_gen () =
+  let eva_domains = Eva.Value_parameters.enabled_domains () in
+  let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
+  let aux (name, descr) = (plain "domain" @ bold name), plain descr in
+  List.map aux domains

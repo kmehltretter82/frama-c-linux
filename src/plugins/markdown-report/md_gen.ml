@@ -49,12 +49,6 @@ let plural l s =
   | [] | [ _ ] -> s
   | _::_::_ -> s ^ "s"
 
-let get_eva_domains () =
-  let eva_domains = Eva.Value_parameters.enabled_domains () in
-  let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
-  let aux (name, descr) = (plain "domain" @ bold name), plain descr in
-  List.map aux domains
-
 let section_domains env =
   let anchor = "domains" in
   let head = H3 (plain "Eva Domains", Some anchor) in
@@ -63,7 +57,7 @@ let section_domains env =
     :: Comment "You can give more information about the choice of Eva domains"
     :: insert_marks env anchor
   else begin
-    let l = get_eva_domains () in
+    let l = Eva_info.domains_md_gen () in
     head
     :: Block
       (match l with
@@ -271,7 +265,7 @@ let gen_context env =
 let gen_coverage env =
   let anchor = "coverage" in
   let header = H1 (plain "Coverage", Some anchor) in
-  let content = Eva_coverage.md_gen () in
+  let content = Eva_info.coverage_md_gen () in
   let content =
     if env.is_draft then
       content @
