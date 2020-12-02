@@ -173,12 +173,13 @@
   =======================================
    __builtin_abort (1 call); 
   
-  'Extern' global variables (16)
+  'Extern' global variables (20)
   ==============================
    __fc_basename; __fc_dirname; __fc_getpwuid_pw_dir; __fc_getpwuid_pw_name;
-   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_hostname; __fc_locale;
-   __fc_locale_names; __fc_mblen_state; __fc_mbtowc_state; __fc_wctomb_state;
-   optarg; opterr; optopt; tzname
+   __fc_getpwuid_pw_passwd; __fc_getpwuid_pw_shell; __fc_heap_status;
+   __fc_hostname; __fc_locale; __fc_locale_names; __fc_mblen_state;
+   __fc_mbtowc_state; __fc_random_counter; __fc_stack_status; __fc_tz;
+   __fc_wctomb_state; optarg; opterr; optopt; tzname
   
   Potential entry points (1)
   ==========================
@@ -188,7 +189,7 @@
   ============== 
   Sloc = 1127
   Decision point = 213
-  Global variables = 70
+  Global variables = 85
   If = 198
   Loop = 43
   Goto = 97

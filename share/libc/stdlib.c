@@ -74,7 +74,7 @@ void *calloc(size_t nmemb, size_t size)
   return p;
 }
 
-char *__fc_env[ARG_MAX] __attribute__((FRAMA_C_MODEL));
+char *__fc_env[ARG_MAX];
 // To provide for some non-determinism, __fc_initenv initializes the
 // environment with an arbitrary string
 #define __FC_INITENV_LEN 64

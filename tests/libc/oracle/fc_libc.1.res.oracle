@@ -380,8 +380,7 @@ struct termios {
    tcflag_t c_lflag ;
    cc_t c_cc[32] ;
 };
-int volatile Frama_C_entropy_source __attribute__((__unused__,
-                                                   __FRAMA_C_MODEL__));
+int volatile Frama_C_entropy_source __attribute__((__unused__));
 void Frama_C_make_unknown(char *p, size_t l);
 
 int Frama_C_nondet(int a, int b);
@@ -1129,8 +1128,7 @@ int feholdexcept(fenv_t *envp);
 
 int fesetenv(fenv_t const *envp);
 
-static int volatile fetestexcept___fc_random_fetestexcept __attribute__((
-  __FRAMA_C_MODEL__));
+static int volatile fetestexcept___fc_random_fetestexcept;
 int fetestexcept(int excepts)
 {
   int __retres;
@@ -1138,7 +1136,7 @@ int fetestexcept(int excepts)
   return __retres;
 }
 
-fenv_t volatile __fc_fenv_state __attribute__((__FRAMA_C_MODEL__));
+fenv_t volatile __fc_fenv_state;
 int feholdexcept(fenv_t *envp)
 {
   int __retres;
@@ -1913,7 +1911,7 @@ int glob(char const *pattern, int flags,
 
 void globfree(glob_t *pglob);
 
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_heap_status; */
 
 /*@
 axiomatic dynamic_allocation {
@@ -2179,9 +2177,7 @@ extern unsigned long strtoul(char const * __restrict nptr,
 extern unsigned long long strtoull(char const * __restrict nptr,
                                    char ** __restrict endptr, int base);
 
-/*@ ghost
-extern int __fc_random_counter __attribute__((__unused__, __FRAMA_C_MODEL__));
-*/
+/*@ ghost extern int __fc_random_counter __attribute__((__unused__)); */
 
 unsigned long const __fc_rand_max = (unsigned long)32767;
 /*@ ensures result_range: 0 ≤ \result ≤ __fc_rand_max;
@@ -2205,8 +2201,8 @@ extern long random(void);
     assigns __fc_random_counter \from seed; */
 extern void srandom(unsigned int seed);
 
-int __fc_random48_init __attribute__((__FRAMA_C_MODEL__));
-unsigned short __fc_random48_counter[3] __attribute__((__FRAMA_C_MODEL__));
+int __fc_random48_init;
+unsigned short __fc_random48_counter[3];
 unsigned short *__fc_p_random48_counter = __fc_random48_counter;
 /*@ ensures random48_initialized: __fc_random48_init ≡ 1;
     assigns __fc_random48_counter[0 .. 2], __fc_random48_init;
@@ -2398,7 +2394,7 @@ extern  __attribute__((__noreturn__)) void exit(int status);
     assigns \nothing; */
 extern  __attribute__((__noreturn__)) void _Exit(int status);
 
-char *__fc_env[4096] __attribute__((__FRAMA_C_MODEL__));
+char *__fc_env[4096];
 char *getenv(char const *name);
 
 int putenv(char *string);
@@ -6292,8 +6288,7 @@ char *strsignal(int signum)
   return __retres;
 }
 
-/*@ ghost unsigned int volatile __fc_time __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost unsigned int volatile __fc_time; */
 /*@ assigns \result;
     assigns \result \from __fc_time; */
 extern clock_t clock(void);
@@ -6431,8 +6426,7 @@ axiomatic nanosleep_predicates {
   }
 
 */
-/*@ ghost int volatile __fc_interrupted __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost int volatile __fc_interrupted; */
 /*@ requires valid_request: \valid_read(rqtp);
     requires
       initialization: initialized_request:
@@ -6941,7 +6935,7 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
   return dest;
 }
 
-/*@ ghost extern int __fc_stack_status __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_stack_status; */
 
 /*@ ensures allocation: \fresh{Old, Here}(\result,\old(size));
     assigns __fc_stack_status, \result;
@@ -7423,7 +7417,7 @@ extern int __va_openat_void(int dirfd, char const *filename, int flags);
 extern int __va_openat_mode_t(int dirfd, char const *filename, int flags,
                               mode_t mode);
 
-/*@ ghost extern int __fc_tz __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_tz; */
 
 /*@ requires valid_path: valid_read_string(path);
     requires
@@ -7507,15 +7501,9 @@ extern int gettimeofday(struct timeval * __restrict tv, void * __restrict tz);
  */
 extern int settimeofday(struct timeval const *tv, struct timezone const *tz);
 
-/*@ ghost
-  struct itimerval volatile __fc_itimer_real __attribute__((__FRAMA_C_MODEL__));
-  */
-/*@ ghost
-  struct itimerval volatile __fc_itimer_virtual __attribute__((__FRAMA_C_MODEL__));
-  */
-/*@ ghost
-  struct itimerval volatile __fc_itimer_prof __attribute__((__FRAMA_C_MODEL__));
-  */
+/*@ ghost struct itimerval volatile __fc_itimer_real; */
+/*@ ghost struct itimerval volatile __fc_itimer_virtual; */
+/*@ ghost struct itimerval volatile __fc_itimer_prof; */
 /*@ requires valid_curr_value: \valid(curr_value);
     ensures initialization: curr_value: \initialized(\old(curr_value));
     assigns \result, *curr_value;
