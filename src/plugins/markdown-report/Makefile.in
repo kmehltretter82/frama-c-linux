@@ -45,6 +45,7 @@ PLUGIN_TESTS_DIRS:= md sarif
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
+ifneq (@ENABLE_MDR@,no)
 ifneq ($(ENABLE_EVA), no)
 byte:: $(PLUGIN_LIB_DIR)/top/eva_info.cmo $(PLUGIN_LIB_DIR)/top/eva_info.cmi
 opt:: $(PLUGIN_LIB_DIR)/top/eva_info.cmxs $(PLUGIN_LIB_DIR)/top/eva_info.cmi
@@ -56,6 +57,7 @@ $(PLUGIN_LIB_DIR)/top/eva_info.cm%: $(Markdown_report_DIR)/eva_info.cm%
 $(Markdown_report_DIR)/eva_info.cmo: BFLAGS+=-I $(Markdown_report_DIR)
 $(Markdown_report_DIR)/eva_info.cmx: OFLAGS+=-I $(Markdown_report_DIR)
 
+endif
 endif
 
 $(Markdown_report_DIR)/Markdown_report.mli: \
