@@ -39,7 +39,8 @@ PLUGIN_CMO:=\
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_DISTRIB_EXTERNAL:=\
- Makefile.in configure.ac configure share/acsl.xml eva_info.ml eva_info.mli
+ Makefile.in configure.ac configure share/acsl.xml META.in \
+ eva_info.ml eva_info.mli
 PLUGIN_DEPFLAGS:= $(PLUGIN_DIR)/eva_info.mli $(PLUGIN_DIR)/eva_info.ml
 PLUGIN_TESTS_DIRS:= md sarif
 
