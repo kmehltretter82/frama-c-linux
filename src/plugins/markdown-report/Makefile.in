@@ -49,6 +49,9 @@ ifneq (@ENABLE_MDR@,no)
 ifneq ($(ENABLE_EVA), no)
 byte:: $(PLUGIN_LIB_DIR)/top/eva_info.cmo $(PLUGIN_LIB_DIR)/top/eva_info.cmi
 opt:: $(PLUGIN_LIB_DIR)/top/eva_info.cmxs $(PLUGIN_LIB_DIR)/top/eva_info.cmi
+install::
+	$(MKDIR) $(PLUGIN_INSTALL_DIR)/top
+	$(CP) $(PLUGIN_LIB_DIR)/top/eva_info.cm* $(PLUGIN_INSTALL_DIR)/top
 
 $(PLUGIN_LIB_DIR)/top/eva_info.cm%: $(Markdown_report_DIR)/eva_info.cm%
 	$(MKDIR) $(dir $@)
