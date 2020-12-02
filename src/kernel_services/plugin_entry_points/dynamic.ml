@@ -132,6 +132,8 @@ let once pkg =
   if Hashtbl.mem packages pkg then false
   else ( Hashtbl.add packages pkg () ; true )
 
+let is_loaded pkg = Hashtbl.mem packages pkg
+
 exception ArchiveError of string
 
 let load_archive pkg base file =
