@@ -5,12 +5,12 @@
 import React from 'react';
 import { Section, Item } from 'dome/frame/sidebars';
 import type { Hint } from 'dome/frame/toolbars';
+import { classes } from 'dome/misc/utils';
 import * as States from 'frama-c/states';
 import { useFlipSettings } from 'dome';
 import { alpha } from 'dome/data/compare';
 import { functions, functionsData } from 'frama-c/api/kernel/ast';
 import { isComputed } from 'frama-c/api/plugins/eva/general';
-
 import * as Dome from 'dome';
 
 // --------------------------------------------------------------------------
@@ -39,6 +39,39 @@ export function useHints(): [GlobalHint[], (pattern: string) => void] {
     }
   };
   return [hints, onSearch];
+}
+
+// --------------------------------------------------------------------------
+// --- Function Item
+// --------------------------------------------------------------------------
+
+interface FctItemProps {
+  fct: functionsData;
+  current: string | undefined;
+  onSelection: (name: string) => void;
+}
+
+function FctItem(props: FctItemProps) {
+  const { name, signature, main, stdlib, builtin, defined } = props.fct;
+  const className = classes(
+    main && 'globals-main',
+    (stdlib || builtin) && 'globals-stdlib',
+  );
+  const attributes = classes(
+    main && '(main)',
+    !stdlib && !builtin && !defined && '(ext)',
+  );
+  return (
+    <Item
+      className={className}
+      label={name}
+      title={signature}
+      selected={name === props.current}
+      onSelection={() => props.onSelection(name)}
+    >
+      {attributes && <span className="globals-attr">{attributes}</span>}
+    </Item>
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -82,6 +115,10 @@ export default () => {
     return visible;
   }
 
+  function onSelection(name: string) {
+    updateSelection({ location: { function: name } });
+  }
+
   async function onContextMenu() {
     const items: Dome.PopupMenuItem[] = [
       {
@@ -118,21 +155,6 @@ export default () => {
 
   // Items
   const current: undefined | string = selection?.current?.function;
-  const makeFctItem = (fct: functionsData) => {
-    const { name, signature, main: isMain } = fct;
-    return (
-      <Item
-        className={isMain ? 'fct-main' : undefined}
-        key={name}
-        label={name}
-        title={signature}
-        selected={name === current}
-        onSelection={() => updateSelection({ location: { function: name } })}
-      >
-        {isMain && '(main)'}
-      </Item>
-    );
-  };
 
   // Filtered
 
@@ -147,7 +169,14 @@ export default () => {
       onContextMenu={onContextMenu}
       defaultUnfold
     >
-      {filtered.map(makeFctItem)}
+      {filtered.map((fct) => (
+        <FctItem
+          key={fct.name}
+          fct={fct}
+          current={current}
+          onSelection={onSelection}
+        />
+      ))}
     </Section>
   );
 

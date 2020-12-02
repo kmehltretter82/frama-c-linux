@@ -36,8 +36,18 @@
     border-bottom: solid 0.2em #BBB;
 }
 
-.fct-main label {
+.globals-main label {
     text-decoration: underline;
+}
+
+.globals-stdlib label {
+    font-style: italic;
+}
+
+.globals-attr {
+    font-size: smaller;
+    font-weight: lighter;
+    color: #aaa;
 }
 
 /* -------------------------------------------------------------------------- */
