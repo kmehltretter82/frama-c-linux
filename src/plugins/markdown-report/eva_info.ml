@@ -68,7 +68,7 @@ let is_analyzed_function vi =
                    vi)
               (Globals.FileIndex.get_functions
                  (Filepath.Normalized.of_string s)))
-         (Mdr_params.Stubs.get())) &&
+         (Markdown_report.Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','
             (Dynamic.Parameter.String.get "-eva-use-spec" ()))) &&
@@ -238,6 +238,6 @@ let domains_md_gen () =
   List.map aux domains
 
 let () =
-  Md_gen.Eva_info.coverage_md_gen := coverage_md_gen;
-  Md_gen.Eva_info.domains_md_gen := domains_md_gen;
-  Md_gen.Eva_info.loaded := true
+  Markdown_report.Md_gen.Eva_info.coverage_md_gen := coverage_md_gen;
+  Markdown_report.Md_gen.Eva_info.domains_md_gen := domains_md_gen;
+  Markdown_report.Md_gen.Eva_info.loaded := true
