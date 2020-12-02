@@ -40,6 +40,7 @@ module type Results = sig
   val eval_lval_to_loc: state -> lval -> location evaluated
   val eval_function_exp:
     state -> ?args:exp list -> exp -> kernel_function list evaluated
+  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
 end
 
 
@@ -55,7 +56,7 @@ end
 
 
 module type S = sig
-  include Abstractions.S
+  include Abstractions.Eva
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location

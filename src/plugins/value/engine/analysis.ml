@@ -40,10 +40,11 @@ module type Results = sig
   val eval_lval_to_loc: state -> lval -> location evaluated
   val eval_function_exp:
     state -> ?args:exp list -> exp ->  kernel_function list evaluated
+  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
 end
 
 module type S = sig
-  include Abstractions.S
+  include Abstractions.Eva
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
@@ -94,6 +95,11 @@ module Make (Abstract: Abstractions.S) = struct
 
   let eval_function_exp state ?args e =
     Eval.eval_function_exp e ?args state >>=: (List.map fst)
+
+  let assume_cond stmt state cond positive =
+    fst (Eval.reduce state cond positive) >>- fun valuation ->
+    let dval = Eval.to_domain_valuation valuation in
+    Dom.assume stmt cond positive dval state
 
 end
 
