@@ -192,7 +192,7 @@ let md_gen () =
   let summary_whole =
     Markdown.format
       "There are %d function definitions that are not stubbed. They represent \
-       %d statements, of which %d are potentially reachable through EVA, \
+       %d statements, of which %d are potentially reachable through Eva, \
        resulting in a **statement coverage of %.1f%%** with respect to the \
        entire application."
       (nb_fundefs())
@@ -220,7 +220,7 @@ let md_gen () =
     summary @
     Markdown.format
       "These functions contain %d statements, \
-       of which %d are potentially reachable according to EVA, resulting in \
+       of which %d are potentially reachable according to Eva, resulting in \
        a **statement coverage of %.1f%%** with respect to the perimeter set \
        by this entry point."
       stats.total_stmts stats.covered_stmts

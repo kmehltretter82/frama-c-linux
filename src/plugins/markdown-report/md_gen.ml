@@ -57,10 +57,10 @@ let get_eva_domains () =
 
 let section_domains env =
   let anchor = "domains" in
-  let head = H3 (plain "EVA Domains", Some anchor) in
+  let head = H3 (plain "Eva Domains", Some anchor) in
   if env.is_draft then
     head
-    :: Comment "You can give more information about the choice of EVA domains"
+    :: Comment "You can give more information about the choice of Eva domains"
     :: insert_marks env anchor
   else begin
     let l = get_eva_domains () in
@@ -76,7 +76,7 @@ let section_domains env =
          [Text
             (plain
                "In addition to the base domain (`cvalue`), additional \
-                domains have been used by EVA");
+                domains have been used by Eva");
           DL l]
       )
     :: insert_remark env anchor
@@ -275,7 +275,7 @@ let gen_coverage env =
   let content =
     if env.is_draft then
       content @
-      Comment "You can comment on the coverage obtained by EVA"
+      Comment "You can comment on the coverage obtained by Eva"
       :: insert_marks env anchor
     else
       content @ insert_remark env anchor
