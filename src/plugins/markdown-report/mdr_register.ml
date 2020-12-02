@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 let load_eva_info () =
-  if not !Md_gen.Eva_info.loaded then begin
+  if not !Md_gen.Eva_info.loaded && Dynamic.is_loaded "frama-c-eva"
+  then begin
     let eva_info = "top/eva_info.cmo" in
     try
       List.iter
