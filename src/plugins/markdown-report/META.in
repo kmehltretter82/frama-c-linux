@@ -5,3 +5,8 @@ archive(byte) = "top/Markdown_report.cmo"
 archive(native) = "top/Markdown_report.cmx"
 plugin(native) = "top/Markdown_report.cmxs"
 plugin(byte) = "top/Markdown_report.cmo"
+package "eva_info" (
+  requires = "frama-c-markdown_report frama-c-eva"
+  plugin(native) = "top/eva_info.cmxs"
+  plugin(byte) = "top/eva_info.cmo"
+)
