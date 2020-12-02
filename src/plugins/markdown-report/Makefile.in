@@ -36,7 +36,7 @@ PLUGIN_HAS_META:=yes
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Markdown_report.mli
 PLUGIN_CMO:=\
   sarif mdr_params parse_remarks \
-  eva_info md_gen sarif_gen mdr_register
+  md_gen sarif_gen mdr_register eva_info
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure share/acsl.xml

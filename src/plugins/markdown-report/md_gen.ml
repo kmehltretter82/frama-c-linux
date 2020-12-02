@@ -23,6 +23,13 @@
 open Cil_types
 open Markdown
 
+module Eva_info = struct
+  let loaded = ref false
+  let coverage_md_gen: (unit -> elements) ref = Extlib.mk_fun "coverage_md_gen"
+  let domains_md_gen: (unit -> (text * text) list) ref=
+    Extlib.mk_fun "domains_md_gen"
+end
+
 type env =
   { is_draft: bool;
     remarks: Markdown.element list Datatype.String.Map.t; }
@@ -57,7 +64,7 @@ let section_domains env =
     :: Comment "You can give more information about the choice of Eva domains"
     :: insert_marks env anchor
   else begin
-    let l = Eva_info.domains_md_gen () in
+    let l = !Eva_info.domains_md_gen () in
     head
     :: Block
       (match l with
@@ -252,7 +259,7 @@ let gen_context env =
   H1 (plain "Context of the analysis", Some "context")
   :: gen_inputs env
   @ gen_config env
-  @ section_domains env
+  @ (if !Eva_info.loaded then section_domains env else [])
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: (
       if env.is_draft then
@@ -265,7 +272,7 @@ let gen_context env =
 let gen_coverage env =
   let anchor = "coverage" in
   let header = H1 (plain "Coverage", Some anchor) in
-  let content = Eva_info.coverage_md_gen () in
+  let content = !Eva_info.coverage_md_gen () in
   let content =
     if env.is_draft then
       content @
@@ -562,7 +569,7 @@ let gen_report ~draft:is_draft () =
   let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
-  let coverage = gen_coverage env in
+  let coverage = if !Eva_info.loaded then gen_coverage env else [] in
   let alarms = gen_alarms env in
   let title = Mdr_params.Title.get () in
   let title =

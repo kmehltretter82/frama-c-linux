@@ -20,8 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** generates a coverage summary of Eva's run*)
-val coverage_md_gen: unit -> Markdown.elements
-
-(** generates a summary of activated Eva domains. *)
-val domains_md_gen: unit -> (Markdown.text * Markdown.text) list
+(** Only loaded when Eva is loaded. Nothing is exported, rather the module
+    does fill the functions of {!Md_gen.Eva_info}. *)

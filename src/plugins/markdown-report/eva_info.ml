@@ -236,3 +236,8 @@ let domains_md_gen () =
   let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
   let aux (name, descr) = (plain "domain" @ bold name), plain descr in
   List.map aux domains
+
+let () =
+  Md_gen.Eva_info.coverage_md_gen := coverage_md_gen;
+  Md_gen.Eva_info.domains_md_gen := domains_md_gen;
+  Md_gen.Eva_info.loaded := true
