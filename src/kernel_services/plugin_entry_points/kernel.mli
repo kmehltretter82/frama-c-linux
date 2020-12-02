@@ -186,6 +186,9 @@ val wkey_acsl_extension: warn_category
 val wkey_cmdline: warn_category
 (** Command-line related warning, e.g. for invalid options given by the user *)
 
+val wkey_audit: warn_category
+(** Warning related to options '-audit-*'. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:
@@ -413,6 +416,12 @@ module CppGnuLike: Parameter_sig.Bool
 
 module PrintCppCommands: Parameter_sig.Bool
 (** Behavior of option "-print-cpp-commands" *)
+
+module AuditPrepare: Parameter_sig.Filepath
+(** Behavior of option "-audit-prepare" *)
+
+module AuditCheck: Parameter_sig.Filepath
+(** Behavior of option "-audit-check" *)
 
 module FramaCStdLib: Parameter_sig.Bool
 (** Behavior of option "-frama-c-stdlib" *)

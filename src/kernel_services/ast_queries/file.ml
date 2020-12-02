@@ -46,6 +46,11 @@ type file =
   | External of Filepath.Normalized.t * string
   (* file * name of plug-in that handles it *)
 
+let filepath_of_file = function
+  | NeedCPP (fp, _, _)
+  | NoCPP fp
+  | External (fp, _) -> fp
+
 module D =
   Datatype.Make
     (struct
@@ -1605,6 +1610,121 @@ let init_cil () =
   Logic_env.Builtins.apply ();
   Logic_env.prepare_tables ()
 
+let re_included_file = Str.regexp "^[.]+ \\(.*\\)$"
+
+let file_hash file =
+  Digest.to_hex (Digest.file file)
+
+let add_source_if_new tbl (fp : Filepath.Normalized.t) =
+  if not (Hashtbl.mem tbl fp) then
+    Hashtbl.replace tbl fp (file_hash (fp:>string))
+
+(* Inserts, into the hashtbl of (Filepath.Normalized.t, Digest.t), [tbl],
+   the included sources listed in [file],
+   which contains the output of 'gcc -H -MM'. *)
+let add_included_sources tbl file =
+  let ic = open_in file in
+  try
+    while true; do
+      let line = input_line ic in
+      if Str.string_match re_included_file line 0 then
+        let f = Str.matched_group 1 line in
+        add_source_if_new tbl (Filepath.Normalized.of_string f)
+    done;
+    assert false
+  with End_of_file ->
+    close_in ic
+
+let print_all_sources out all_sources_tbl =
+  let elems =
+    Hashtbl.fold (fun f hash acc ->
+        (Filepath.Normalized.to_pretty_string f, hash) :: acc)
+      all_sources_tbl []
+  in
+  let sorted_elems =
+    List.sort (fun (f1, _) (f2, _) -> Extlib.compare_ignore_case f1 f2) elems
+  in
+  if Filepath.Normalized.is_special_stdout out then begin
+    (* text format, to stdout *)
+    Kernel.feedback "Audit: all used sources, with md5 hashes:@\n%a"
+      (Pretty_utils.pp_list ~sep:"@\n"
+         (Pretty_utils.pp_pair ~sep:": "
+            Format.pp_print_string Format.pp_print_string)) sorted_elems
+  end else begin
+    (* json format, into file [out] *)
+    let json =
+      `Assoc
+        [("sources",
+          `Assoc (List.map (fun (f, hash) -> f, `String hash) sorted_elems)
+         )]
+    in
+    Json.merge_object out json
+  end
+
+let compute_sources_table cpp_commands =
+  let all_sources_tbl = Hashtbl.create 7 in
+  List.iter (fun (f, cmd_opt) ->
+      let fp = filepath_of_file f in
+      match cmd_opt with
+      | None ->
+        add_source_if_new all_sources_tbl fp
+      | Some (cpp_cmd, _ppf, _sl) ->
+        let audit_sources_tmpfile =
+          try
+            Datatype.Filepath.of_string
+              (Extlib.temp_file_cleanup_at_exit
+                 "audit_produce_sources" ".txt")
+          with Extlib.Temp_file_error s ->
+            Kernel.abort "cannot create temporary file: %s" s
+        in
+        let cmd_for_sources =
+          cpp_cmd ^ " -H -MM >/dev/null 2>" ^ (audit_sources_tmpfile:>string)
+        in
+        let exit_code = Sys.command cmd_for_sources in
+        if exit_code <> 0 then begin
+          let cause_frama_c_compliant =
+            if not (Kernel.CppGnuLike.get ()) then
+              Kernel.abort "\nPlease ensure preprocessor is Frama-C-compliant \
+                            (see option %s)"
+                Kernel.CppGnuLike.option_name
+            else ""
+          in
+          Kernel.abort "error running command to obtain included sources \
+                        (exit code %d):@\n%s%s"
+            exit_code cmd_for_sources
+            cause_frama_c_compliant;
+        end else begin
+          add_included_sources all_sources_tbl (audit_sources_tmpfile:>string);
+          add_source_if_new all_sources_tbl fp;
+        end;
+    ) cpp_commands;
+  all_sources_tbl
+
+let source_hashes_of_json path =
+  try
+    let json = Json.from_file path in
+    let open Yojson.Basic.Util in
+    json |> member "sources" |> to_assoc |>
+    List.map (fun (k, h) -> k, to_string h)
+  with
+  | Yojson.Json_error msg ->
+    Kernel.abort "error reading %a: %s"
+      Filepath.Normalized.pretty path msg
+  | Yojson.Basic.Util.Type_error (msg, v) ->
+    Kernel.abort "error reading %a: %s - %s"
+      Filepath.Normalized.pretty path msg
+      (Yojson.Basic.pretty_to_string v)
+
+let check_source_hashes expected actual_table =
+  Hashtbl.iter (fun fp hash ->
+      let fp = Filepath.Normalized.to_pretty_string fp in
+      let expected_hash = List.assoc_opt fp expected in
+      if Some hash <> expected_hash then
+        Kernel.warning ~wkey:Kernel.wkey_audit
+          "different hashes for %s: got %s, expected %s"
+          fp hash (Option.value ~default:("<none> (not in list)") expected_hash)
+    ) actual_table
+
 let prepare_from_c_files () =
   init_cil ();
   let files = Files.get () in (* Allow pre-registration of prolog files *)
@@ -1618,6 +1738,19 @@ let prepare_from_c_files () =
             "Preprocessing command:@.%s" cpp_cmd
       ) cpp_commands;
     raise Cmdline.Exit
+  end;
+  let audit_check_path = Kernel.AuditCheck.get () in
+  if not (Filepath.Normalized.is_unknown audit_check_path) then begin
+    let all_sources_tbl = compute_sources_table cpp_commands in
+    let expected_hashes = source_hashes_of_json audit_check_path in
+    check_source_hashes expected_hashes all_sources_tbl
+  end;
+  let audit_path = Kernel.AuditPrepare.get () in
+  if not (Filepath.Normalized.is_unknown audit_path) then begin
+    let all_sources_tbl = compute_sources_table cpp_commands in
+    print_all_sources audit_path all_sources_tbl;
+    Kernel.feedback "Audit: sources list written to: %a@."
+      Filepath.Normalized.pretty audit_path;
   end;
   let cil, cabs_files = files_to_cabs_cil files cpp_commands in
   prepare_cil_file cil;

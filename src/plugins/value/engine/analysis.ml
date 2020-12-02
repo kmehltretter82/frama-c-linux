@@ -173,7 +173,10 @@ let reset_analyzer () =
 let force_compute () =
   Ast.compute ();
   Value_parameters.configure_precision ();
-  Value_parameters.print_configuration ();
+  if not (Filepath.Normalized.is_unknown (Kernel.AuditCheck.get ()))
+  then Value_parameters.check_configuration (Kernel.AuditCheck.get ());
+  if not (Filepath.Normalized.is_unknown (Kernel.AuditPrepare.get ()))
+  then Value_parameters.print_configuration (Kernel.AuditPrepare.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in

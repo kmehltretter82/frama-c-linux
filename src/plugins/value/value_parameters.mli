@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Fc_filepath = Filepath
+
 include Plugin.General_services
 
 module ForceValues: Parameter_sig.With_output
@@ -153,7 +155,8 @@ val configure_precision: unit -> unit
 val parameters_correctness: Typed_parameter.t list
 val parameters_tuning: Typed_parameter.t list
 
-val print_configuration: unit -> unit
+val check_configuration: Fc_filepath.Normalized.t -> unit
+val print_configuration: Fc_filepath.Normalized.t -> unit
 
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
