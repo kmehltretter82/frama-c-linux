@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc
+                           Fixes #@877
 -*  Logic     [2020-11-30] assigns clause can't mention const locations 
                            anymore. Fixes #@855.
 o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
