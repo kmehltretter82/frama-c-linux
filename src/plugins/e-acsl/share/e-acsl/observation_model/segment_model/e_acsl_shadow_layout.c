@@ -79,8 +79,8 @@ extern char ** environ;
 /*! \brief Return the greatest (known) address on a program's stack.
  * This function presently determines the address using the address of the
  * last string in `environ`. That is, it assumes that argc and argv are
- * stored below environ, which holds for GCC/Glibc but is not necessarily
- * true for some other compilers/libraries. */
+ * stored below environ, which holds for GCC or Clang and Glibc but is not
+ * necessarily true for some other compilers/libraries. */
 static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
   char **env = environ;
   while (env[1])
@@ -94,6 +94,20 @@ static uintptr_t get_stack_start(int *argc_ref,  char *** argv_ref) {
    * ::argv_alloca. */
   uintptr_t stack_end = addr + ULONG_BITS;
   uintptr_t stack_start = stack_end - get_stack_size();
+
+  // Check that the assumption that argc and argv are stored below environ in
+  // the stack holds
+  DVASSERT(stack_start <= (uintptr_t)argc_ref
+           && (uintptr_t)argc_ref <= stack_end,
+           "Assumption that argc is stored below environ is not verified.\n\
+           \tStack: [%a - %a]\n\t&argc: %a",
+           stack_start, stack_end, argc_ref);
+  DVASSERT(stack_start <= (uintptr_t)argv_ref
+           && (uintptr_t)argv_ref <= stack_end,
+           "Assumption that argv is stored below environ is not verified.\n\
+           \tStack: [%a - %a]\n\t&argc: %a",
+           stack_start, stack_end, argc_ref);
+
   return stack_start;
 }
 /* }}} */
