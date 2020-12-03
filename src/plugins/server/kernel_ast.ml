@@ -194,6 +194,14 @@ struct
         ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
         model
     in
+    let () =
+      States.column
+        ~name:"position"
+        ~descr:(Md.plain "Marker position")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+        model
+    in
     States.register_array
       ~package
       ~name:"markerInfo"
