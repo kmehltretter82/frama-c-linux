@@ -183,6 +183,7 @@ export interface ItemProps {
 export function Item(props: ItemProps) {
   const { selected = false, disabled = false, enabled = true } = props;
   const isDisabled = disabled || !enabled;
+  const ref = React.useRef<HTMLDivElement>(null);
   const onClick = isDisabled ? undefined : props.onSelection;
   const onContextMenu = isDisabled ? undefined : props.onContextMenu;
   const className = classes(
@@ -191,8 +192,19 @@ export function Item(props: ItemProps) {
     isDisabled && 'dome-disabled',
     props.className,
   );
+
+  React.useLayoutEffect(() => {
+    if (selected) {
+      ref?.current?.scrollIntoView({
+        behavior: 'auto',
+        block: 'nearest',
+      });
+    }
+  }, [selected]);
+
   return (
     <div
+      ref={ref}
       className={className}
       style={props.style}
       title={props.title}
