@@ -24,6 +24,15 @@ import { jMarkerSafe } from 'frama-c/api/kernel/ast';
 //@ts-ignore
 import { marker } from 'frama-c/api/kernel/ast';
 
+const isComputed_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.isComputed',
+  input:  Json.jNull,
+  output: Json.jBoolean,
+};
+/** True if the Eva analysis has been done */
+export const isComputed: Server.GetRequest<null,boolean>= isComputed_internal;
+
 const getCallers_internal: Server.GetRequest<
   Json.key<'#fct'>,
   [ Json.key<'#fct'>, Json.key<'#stmt'> ][]

@@ -92,23 +92,55 @@ let register_state (type a) ~package ~name ~descr
 (* --- Model Signature                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a column = Package.fieldInfo * ('a -> json)
+type 'a column = Package.fieldInfo * ('a -> json option)
 
 type 'a model = 'a column list ref
 
 let model () = ref []
 
-let column (type a b) ~name ~descr
-    ~(data: b Request.output) ~(get : a -> b) (model : a model) =
-  let module D = (val data) in
-  if List.exists (fun (fd,_) -> fd.Package.fd_name = name) !model then
+let mkfield (model : 'a model) fd (js : 'a -> json option) =
+  let open Package in
+  let name = fd.fd_name in
+  if List.exists (fun (fd,_) -> fd.fd_name = name) !model then
     raise (Invalid_argument "Server.States.column: duplicate name") ;
+  model := (fd , js) :: !model
+
+let column (type a b) ~name ~descr
+    ~(data: b Request.output)
+    ~(get : a -> b)
+    ?(default: b option)
+    (model : a model) =
+  let module D = (val data) in
+  match default with
+  | None ->
+    let fd = Package.{
+        fd_name = name ;
+        fd_type = D.jtype ;
+        fd_descr = descr ;
+      } in
+    mkfield model fd (fun a -> Some (D.to_json (get a)))
+  | Some d ->
+    let fd = Package.{
+        fd_name = name ;
+        fd_type = Joption D.jtype ;
+        fd_descr = descr ;
+      } in
+    mkfield model fd (fun a ->
+        let v = get a in
+        if v = d then None else Some (D.to_json v)
+      )
+
+let option (type a b) ~name ~descr
+    ~(data: b Request.output) ~(get : a -> b option) (model : a model) =
+  let module D = (val data) in
   let fd = Package.{
       fd_name = name ;
-      fd_type = D.jtype ;
+      fd_type = Joption D.jtype ;
       fd_descr = descr ;
     } in
-  model := (fd , fun a -> D.to_json (get a)) :: !model
+  mkfield model fd (fun a -> match get a with
+      | None -> None
+      | Some b -> Some (D.to_json b))
 
 module Kmap = Map.Make(String)
 
@@ -127,7 +159,7 @@ type 'a array = {
   fkey : string ;
   key : 'a -> string ;
   iter : ('a -> unit) -> unit ;
-  getter : (string * ('a -> json)) list ;
+  getter : (string * ('a -> json option)) list ;
   (* [LC+JS]
      The two following fields allow to keep an array in sync
      with the current project and still have a polymorphic data type. *)
@@ -206,8 +238,9 @@ type buffer = {
 
 let add_entry buffer cols fkey key v =
   let fjs = List.fold_left (fun fjs (fd,to_json) ->
-      try (fd , to_json v) :: fjs
-      with Not_found -> fjs
+      match to_json v with
+      | Some js -> (fd , js) :: fjs
+      | None | exception Not_found -> fjs
     ) [] cols in
   let row = (fkey, `String key) :: fjs in
   buffer.updated <- `Assoc row :: buffer.updated ;
@@ -267,7 +300,7 @@ let register_array ~package ~name ~descr ~key
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
     ?(add_reload_hook : unit callback option)
-    model =
+    (model : 'a model) =
   let open Markdown in
   let href = link ~name () in
   let columns = List.rev !model in

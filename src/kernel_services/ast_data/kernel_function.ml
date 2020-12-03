@@ -578,12 +578,11 @@ let is_return_stmt kf stmt =
     false
 
 let is_entry_point kf =
-  let main, _ = Globals.entry_point () in
-  equal kf main
+  try equal kf (fst (Globals.entry_point ()))
+  with Globals.No_such_entry_point _ -> false
 
 let is_main kf =
-  let name = get_name kf in
-  Datatype.String.equal name "main"
+  String.equal (get_name kf) "main"
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
