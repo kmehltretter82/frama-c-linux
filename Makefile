@@ -2131,6 +2131,8 @@ check-headers: $(HDRCK)
 	@$(foreach file,$(HEADER_EXCEPTIONS),\
 			echo $(file) >> file_list_exceptions.tmp$(NEWLINE))
 
+	echo "Checking that distributed files terminate with a newline..."
+	bin/check_newline.sh file_list_to_check.tmp
 	@if command -v file >/dev/null 2>/dev/null; then \
 		echo "Checking that distributed files do not use iso-8859..."; \
 		file --mime-encoding -f file_list_to_check.tmp | \
