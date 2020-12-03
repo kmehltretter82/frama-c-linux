@@ -2125,17 +2125,20 @@ check-headers: $(HDRCK)
 	 # using 'file' built-in, only available on make 4.0+
 	 # for make 4.0+, using the 'file' function could be a better solution,
 	 # although it seems to segfault in 4.0 (but not in 4.1)
-	$(RM) file_list_to_check.tmp file_list_exceptions.tmp
+	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
 	@$(foreach file,$(DISTRIB_FILES),\
-			echo $(file) >> file_list_to_check.tmp$(NEWLINE))
+			echo $(file) >> distrib_files.tmp$(NEWLINE))
+	@$(foreach file,$(DISTRIB_TESTS),\
+			echo $(file) >> distrib_tests.tmp$(NEWLINE))
 	@$(foreach file,$(HEADER_EXCEPTIONS),\
-			echo $(file) >> file_list_exceptions.tmp$(NEWLINE))
+			echo $(file) >> header_exceptions.tmp$(NEWLINE))
 
 	echo "Checking that distributed files terminate with a newline..."
-	bin/check_newline.sh file_list_to_check.tmp
+	bin/check_newline.sh distrib_files.tmp
+	bin/check_newline.sh distrib_tests.tmp
 	@if command -v file >/dev/null 2>/dev/null; then \
 		echo "Checking that distributed files do not use iso-8859..."; \
-		file --mime-encoding -f file_list_to_check.tmp | \
+		file --mime-encoding -f distrib_files.tmp -f distrib_tests.tmp | \
 			grep "iso-8859" \
 			| $(SED) "s/^/error: invalid encoding in /" \
 			| ( ! grep "error: invalid encoding" ); \
@@ -2146,10 +2149,10 @@ check-headers: $(HDRCK)
 		$(addprefix -header-dirs ,$(CURRENT_HEADER_DIRS)) \
 		$(addprefix -forbidden-headers ,$(DISTRIB_PROPRIETARY_HEADERS)) \
 		-headache-config-file ./headers/headache_config.txt \
-		-distrib-file file_list_to_check.tmp \
-		-header-except-file file_list_exceptions.tmp \
+		-distrib-file distrib_files.tmp \
+		-header-except-file header_exceptions.tmp \
 		$(HEADER_SPEC_FILE)
-	$(RM) file_list_to_check.tmp file_list_exceptions.tmp
+	$(RM) distrib_files.tmp distrib_tests.tmp header_exceptions.tmp
 
 ########################################################################
 # Makefile is rebuilt whenever Makefile.in or configure.in is modified #
