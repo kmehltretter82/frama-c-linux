@@ -745,7 +745,8 @@ let compute_on_cilast ~libc =
          | Text -> pp_with_funinfo fmt cil_visitor
          | Json ->
            let json = json_of_funinfo cil_visitor in
-           Yojson.pretty_print fmt json
+           Yojson.pretty_print fmt json;
+           Format.fprintf fmt "@." (* ensure the file ends with a newline *)
         );
         close_out oc;
       with Sys_error _ ->
