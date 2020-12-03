@@ -578,7 +578,8 @@ let is_return_stmt kf stmt =
     false
 
 let is_entry_point kf =
-  String.equal (get_name kf) (Kernel.MainFunction.get ())
+  try equal kf (fst (Globals.entry_point ()))
+  with Globals.No_such_entry_point _ -> false
 
 let is_main kf =
   String.equal (get_name kf) "main"
