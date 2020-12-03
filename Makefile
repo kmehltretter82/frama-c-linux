@@ -908,7 +908,7 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode value_parameters \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
 	api/general_requests api/values_request \
-	utils/unit_tests
+	utils/unit_tests utils/results
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Server
