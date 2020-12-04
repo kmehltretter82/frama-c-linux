@@ -39,13 +39,9 @@ let package =
     ()
 
 type callstack = Value_types.callstack
-
 type truth = Abstract_interp.truth
 type step = [ `Here | `After | `Then of exp | `Else of exp ]
-
-type probe =
-  | Expr of exp * stmt
-  | Lval of lval * stmt
+type probe = Pexpr of exp * stmt | Plval of lval
 
 type domain = {
   values: ( step * string ) list ;
@@ -65,6 +61,18 @@ let next_steps s : step list =
     -> [ `After ]
   | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
+module CS = Value_types.Callstack
+module CSmap = CS.Hashtbl
+module CSlist =
+struct
+  type t = callstack list
+  let rec hash = function [] -> 1 | a::q -> CS.hash a + 31 * hash q
+  let rec equal ca cb = match ca , cb with
+    | [] , [] -> true
+    | a::p , b::q -> Callstack.equal a b && equal p q
+    | _ -> false
+end
+
 (* -------------------------------------------------------------------------- *)
 (* --- EVA Proxy                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -72,7 +80,7 @@ let next_steps s : step list =
 module type EvaProxy =
 sig
   val callstacks : stmt -> callstack list
-  val domain : probe -> callstack option -> domain
+  val domain : Printer_tag.localizable -> callstack list -> domain
 end
 
 module Proxy(A : Analysis.S) : EvaProxy =
@@ -80,6 +88,17 @@ struct
 
   open Eval
   type dstate = A.Dom.state or_top_or_bottom
+
+  module CSSmap = Hashtbl.Make
+      (struct
+        type t = bool * stmt * callstack list
+        let hash (after,stmt,cs) =
+          Hashtbl.hash (after,Cil_datatype.Stmt.hash stmt,CSlist.hash cs)
+        let equal (a1,s1,cs1) (a2,s2,cs2) =
+          a1 = a2 && Cil_datatype.Stmt.equal s1 s2 && CSlist.equal cs1 cs2
+      end)
+
+  let stackcache = CSSmap.create 0
 
   let callstacks stmt =
     match A.get_stmt_state_by_callstack ~after:false stmt with
@@ -89,24 +108,47 @@ struct
 
   let dstate ~after stmt callstack =
     match callstack with
-    | None -> (A.get_stmt_state ~after stmt :> dstate)
-    | Some cs ->
+    | [] -> (A.get_stmt_state ~after stmt :> dstate)
+    | css ->
       begin match A.get_stmt_state_by_callstack ~after stmt with
         | `Top -> `Top
-          | `Bottom -> `Bottom
-          | `Value cmap ->
-            try `Value (CSmap.find cmap cs)
-            with Not_found -> `Bottom
+        | `Bottom -> `Bottom
+        | `Value cmap ->
+          match css with
+          | [cs] ->
+            begin
+              try `Value (CSmap.find cmap cs)
+              with Not_found -> `Bottom
+            end
+          | css ->
+            begin
+              try CSSmap.find stackcache (after,stmt,css)
+              with Not_found ->
+                (List.fold_left
+                   (fun d cs ->
+                      try
+                        let s = CSmap.find cmap cs in
+                        match d with
+                        | `Bottom -> d
+                        | `Value s0 -> `Value (A.Dom.join s0 s)
+                      with Not_found -> d
+                   ) `Bottom css :> dstate)
+            end
       end
 
-  let dbottom = {
+  let dnone = {
     alarms = [] ;
-    values = [`Here , "Unreachable (bottom)"] ;
+    values = [] ;
   }
 
   let dtop = {
     alarms = [] ;
-    values = [`Here , "Not available (top)"] ;
+    values = [`Here , "Not available."] ;
+  }
+
+  let dbottom = {
+    alarms = [] ;
+    values = [`Here , "Unreachable."] ;
   }
 
   let dalarms alarms =
@@ -157,10 +199,13 @@ struct
       alarms
     end
 
-  let domain probe callstack =
-    match probe with
-    | Expr(expr,stmt) -> deval (e_expr expr) stmt callstack
-    | Lval(lval,stmt) -> deval (e_lval lval) stmt callstack
+  let dexpr e s css = deval (e_expr e) s css
+  let dlval l s css = deval (e_lval l) s css
+
+  let domain marker _callstacks =
+    let open Printer_tag in
+    match marker with
+    | _ -> dnone
 
 end
 
