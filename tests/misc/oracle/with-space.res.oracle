@@ -1,3 +1,2 @@
-[kernel] User Error: Missing source file 'with space/module.ml'
-[kernel] User Error: Deferred error message was emitted during execution. See above messages for more information.
-[kernel] Frama-C aborted: invalid user input.
+[kernel] Parsing tests/misc/with-space.i (no preprocessing)
+[kernel] module successfully loaded
