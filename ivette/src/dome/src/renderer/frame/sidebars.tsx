@@ -184,7 +184,10 @@ export function Item(props: ItemProps) {
   const { selected = false, disabled = false, enabled = true } = props;
   const isDisabled = disabled || !enabled;
   const ref = React.useRef<HTMLDivElement>(null);
-  const onClick = isDisabled ? undefined : props.onSelection;
+  const [clicked, setClicked] = React.useState(false);
+  const onSelection = isDisabled ? undefined : props.onSelection;
+  const onClick =
+    onSelection ? () => { setClicked(true); onSelection(); } : undefined;
   const onContextMenu = isDisabled ? undefined : props.onContextMenu;
   const className = classes(
     'dome-xSideBarItem',
@@ -194,13 +197,15 @@ export function Item(props: ItemProps) {
   );
 
   React.useLayoutEffect(() => {
-    if (selected) {
+    if (!clicked && selected) {
       ref?.current?.scrollIntoView({
         behavior: 'auto',
-        block: 'nearest',
+        block: 'center',
       });
     }
-  }, [selected]);
+    if (!selected && clicked)
+      setClicked(false);
+  }, [clicked, selected]);
 
   return (
     <div
