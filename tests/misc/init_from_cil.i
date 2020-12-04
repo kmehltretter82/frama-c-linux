@@ -1,6 +1,6 @@
 /* run.config
    MODULE: @PTEST_NAME@
-   OPT: 
+   OPT:
 */
 
 int f(int x);

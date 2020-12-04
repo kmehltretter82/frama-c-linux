@@ -1,5 +1,5 @@
 /* run.config
-OPT: -load-script %{dep:queue_ghost_instr.ml} -print
+MODULE: @PTEST_NAME@
 */
 
 

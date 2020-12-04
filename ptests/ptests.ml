@@ -941,7 +941,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
   let deps = command.deps in
-  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes (or %d 1 4 125)" command.exit_code in
+  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes (or %d 1 4)" command.exit_code in
   let command_string = basic_command_string command in
   Format.fprintf result_fmt
     "(rule ; TEST #%d OF TEST FILE %S\n  \

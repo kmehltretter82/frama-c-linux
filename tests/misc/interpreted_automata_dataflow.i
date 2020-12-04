@@ -1,5 +1,6 @@
 /* run.config
-OPT: -load-script %{dep:interpreted_automata_dataflow.ml}
+MODULE: @PTEST_NAME@
+OPT: 
 */
 
 /* Tests the dataflow functor of interpreted automata via a caml script

@@ -1,5 +1,5 @@
 /* run.config
-OPT: -load-script %{dep:change_to_instr.ml} -print
+MODULE: @PTEST_NAME@
 */
 
 
