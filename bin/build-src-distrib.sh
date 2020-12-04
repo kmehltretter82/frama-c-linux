@@ -108,6 +108,13 @@ function assert_build_dir {
     fi
 }
 
+function assert_out_dir {
+    if test \! -d "$OUT_DIR" ; then
+        echo "ERROR: $OUT_DIR does not exist, possibly removed by another step"
+        exit 1
+    fi
+}
+
 # diff_validation repository file
 # - repository: target repository
 # - file: target file
@@ -128,6 +135,68 @@ function diff_validation {
             exit 1
     esac
     run "git -C $repo add $file"
+}
+
+# Manuals choice
+
+function get_MANUAL_NAME {
+    case "$1" in
+        "user") MANUAL_NAME="Frama-C user manual" ;;
+        "plugin-dev") MANUAL_NAME="Frama-C plug-in development guide" ;;
+        "api") MANUAL_NAME="Frama-C API bundle" ;;
+        "acsl-1") MANUAL_NAME="ACSL manual" ;;
+        "acsl-impl") MANUAL_NAME="ACSL implementation" ;;
+        "aorai") MANUAL_NAME="Aorai manual" ;;
+        "e-acsl-1") MANUAL_NAME="E-ACSL reference" ;;
+        "e-acsl-impl") MANUAL_NAME="E-ACSL implementation" ;;
+        "e-acsl-man") MANUAL_NAME="E-ACSL manual" ;;
+        "eva") MANUAL_NAME="EVA manual" ;;
+        "metrics") MANUAL_NAME="Metrics manual" ;;
+        "rte") MANUAL_NAME="RTE manual" ;;
+        "wp") MANUAL_NAME="WP manual" ;;
+        *) MANUAL_NAME="Not a manual identifier: $1" ;;
+    esac
+}
+
+function check_manual {
+    value=$1
+    if [[ ! " ${AVAILABLE_MANUALS[@]} " =~ " ${value} " ]]; then
+        echo "### ERROR: in $INCLUDED_MANUALS_CONFIG: $value is not a valid manual identifier"
+        exit 1
+    fi
+}
+
+function show_generated_manuals {
+    echo
+    echo "The following manuals will be included."
+    for i in ${INCLUDED_MANUALS[@]}; do
+        get_MANUAL_NAME $i
+        echo "- $MANUAL_NAME"
+    done
+    echo
+}
+
+function create_manuals_config {
+    echo -n > $INCLUDED_MANUALS_CONFIG
+    for i in ${AVAILABLE_MANUALS[@]}; do
+        get_MANUAL_NAME $i
+        echo "Include $MANUAL_NAME? [y/N]"
+        read CHOICE
+        case "${CHOICE}" in
+            "Y"|"y")
+                echo $i >> $INCLUDED_MANUALS_CONFIG ;;
+            *) ;;
+        esac
+    done
+}
+
+function check_manual_path_MUST_ADD {
+    MUST_ADD="no"
+    for i in ${INCLUDED_MANUALS[@]}; do
+        if [[ $1 == "$i"* ]]; then
+            MUST_ADD="yes"
+        fi
+    done
 }
 
 # WIKI generation
@@ -154,11 +223,14 @@ function fill_wiki {
     echo "## Manuals" >> $WIKI_PAGE
     for fpath in $OUT_DIR/manuals/* ; do
         f=$(basename $fpath)
-        f_no_ext=${f%.*}
-        f_no_pdf_ext="${f%.pdf}"
-        echo "- [${f_no_pdf_ext%-${FRAMAC_VERSION_AND_CODENAME}}](manuals/$f)" >> $WIKI_PAGE
-        run "cp $fpath $WIKI_DIR/manuals/"
-        run "git -C $WIKI_DIR add manuals/$f"
+        check_manual_path_MUST_ADD $f
+        if [[ $MUST_ADD == "yes" ]]; then
+            f_no_ext=${f%.*}
+            f_no_pdf_ext="${f%.pdf}"
+            echo "- [${f_no_pdf_ext%-${FRAMAC_VERSION_AND_CODENAME}}](manuals/$f)" >> $WIKI_PAGE
+            run "cp $fpath $WIKI_DIR/manuals/"
+            run "git -C $WIKI_DIR add manuals/$f"
+        fi
     done
     echo "" >> $WIKI_PAGE
     echo "## Main changes" >> $WIKI_PAGE
@@ -224,21 +296,84 @@ function add_event_page {
 function add_version_page {
     VERSION_WEBPAGE="_fc-versions/$FRAMAC_VERSION_CODENAME_LOWER.md"
     VERSION_WEBPAGE_PATH=$WEBSITE_DIR/$VERSION_WEBPAGE
+    ACSL_VERSION=$(ls $OUT_DIR/manuals | sed -n 's/^acsl-1.\([0-9][0-9]\).pdf/\1/p')
+    echo "---" > $VERSION_WEBPAGE_PATH
+    echo "layout: version" >> $VERSION_WEBPAGE_PATH
+    echo "number: $VERSION_MAJOR" >> $VERSION_WEBPAGE_PATH
+    echo "name: $FRAMAC_VERSION_CODENAME" >> $VERSION_WEBPAGE_PATH
     if [ "$FINAL_RELEASE" = "no" ]; then
-        REMOVE="^acsl\| acsl\|/acsl"
-        ACSL_VERSION=0
+        echo "beta: true" >> $VERSION_WEBPAGE_PATH
     else
-        REMOVE="beta"
-        ACSL_VERSION=$(ls $OUT_DIR/manuals | sed -n 's/^acsl-1.\([0-9][0-9]\).pdf/\1/p')
+        echo "acsl: $ACSL_VERSION" >> $VERSION_WEBPAGE_PATH
     fi
-    sed -e "s/ACSL_VERSION/$ACSL_VERSION/" \
-        -e "s/MAJOR_VERSION/$VERSION_MAJOR/" \
-        -e "s/MINOR_VERSION/$VERSION_MINOR/" \
-        -e "s/VERSION_CODENAME/$FRAMAC_VERSION_CODENAME/" \
-        -e "s/LOWER_CODENAME/$FRAMAC_VERSION_CODENAME_LOWER/" \
-        -e "s/COMP_VERSION/$FRAMAC_VERSION/" \
-        ./bin/version_template.md \
-        | grep -vi "$REMOVE" > $VERSION_WEBPAGE_PATH
+    echo "releases:" >> $VERSION_WEBPAGE_PATH
+    echo "  - number: $VERSION_MINOR" >> $VERSION_WEBPAGE_PATH
+    echo "    categories:" >> $VERSION_WEBPAGE_PATH
+    echo "    - name: Frama-C v$FRAMAC_VERSION $FRAMAC_VERSION_CODENAME" >> $VERSION_WEBPAGE_PATH
+    echo "      files:" >> $VERSION_WEBPAGE_PATH
+    echo "      - name: Source distribution" >> $VERSION_WEBPAGE_PATH
+    echo "        link: /download/$TARGZ_FILENAME" >> $VERSION_WEBPAGE_PATH
+    echo "        help: Compilation instructions" >> $VERSION_WEBPAGE_PATH
+    echo "        help_link: /html/installations/$FRAMAC_VERSION_CODENAME_LOWER.html" >> $VERSION_WEBPAGE_PATH
+    check_manual_path_MUST_ADD "user"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: User manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/user-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "plugin-dev"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: Plug-in development guide" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/plugin-development-guide-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+        echo "        help: Hello plug-in tutorial archive" >> $VERSION_WEBPAGE_PATH
+        echo "        help_link: /download/hello-$FRAMAC_VERSION_AND_CODENAME.tar.gz" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "api"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: API Documentation" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/frama-c-$FRAMAC_VERSION_AND_CODENAME-api.tar.gz" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "acsl-impl"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: ACSL 1.$ACSL_VERSION ($FRAMAC_VERSION_CODENAME implementation)" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/acsl-implementation-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    echo "    - name: Plug-in Manuals" >> $VERSION_WEBPAGE_PATH
+    echo "      sort: true" >> $VERSION_WEBPAGE_PATH
+    echo "      files:" >> $VERSION_WEBPAGE_PATH
+    check_manual_path_MUST_ADD "aorai"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: Aoraï manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/aorai-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+        echo "        help: Aoraï example" >> $VERSION_WEBPAGE_PATH
+        echo "        help_link: /download/aorai-example-$FRAMAC_VERSION_AND_CODENAME.tgz" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "metrics"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: Metrics manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/metrics-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "rte"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: Rte manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/rte-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "eva"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: Eva manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/eva-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "wp"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: WP manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/wp-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    check_manual_path_MUST_ADD "e-acsl-man"
+    if [[ $MUST_ADD == "yes" ]]; then
+        echo "      - name: E-ACSL manual" >> $VERSION_WEBPAGE_PATH
+        echo "        link: /download/e-acsl/e-acsl-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
+    fi
+    echo "---" >> $VERSION_WEBPAGE_PATH
+
     run "git -C $WEBSITE_DIR add $VERSION_WEBPAGE"
 }
 
@@ -249,39 +384,56 @@ function add_downloads {
         f=$(basename $fpath)
         f_no_ext=${f%.*}
 
-        if [[ $f_no_ext =~ ^e-acsl.*$ ]]; then
-            BASE="e-acsl/$f"
-        else
-            BASE="$f"
-        fi
+        check_manual_path_MUST_ADD $f
+        if [[ $MUST_ADD == "yes" ]]; then
+            if [[ $f_no_ext =~ ^e-acsl.*$ ]]; then
+                BASE="e-acsl/$f"
+            else
+                BASE="$f"
+            fi
 
-        if   [[ $f_no_ext =~ ^(e-)?acsl-[0-9].[0-9][0-9]$ ]]; then
-            REPL=$(echo $BASE | sed -e "s/-[0-9].[0-9][0-9]//")
-        elif [[ $f_no_ext =~ ^e-acsl-* ]]; then
-            REPL=$(echo $BASE | sed -e "s/-$FRAMAC_VERSION_AND_CODENAME//")
-        else
-            REPL=$(echo $BASE | sed -e "s/\(.*\)-$FRAMAC_VERSION_AND_CODENAME/frama-c-\1/")
-        fi
+            if   [[ $f_no_ext =~ ^(e-)?acsl-[0-9].[0-9][0-9]$ ]]; then
+                REPL=$(echo $BASE | sed -e "s/-[0-9].[0-9][0-9]//")
+            elif [[ $f_no_ext =~ ^e-acsl-* ]]; then
+                REPL=$(echo $BASE | sed -e "s/-$FRAMAC_VERSION_AND_CODENAME//")
+            else
+                REPL=$(echo $BASE | sed -e "s/\(.*\)-$FRAMAC_VERSION_AND_CODENAME/frama-c-\1/")
+            fi
 
-        run "cp $fpath $DOWNLOAD_DIR/$BASE"
-        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$BASE"
-        run "cp $fpath $DOWNLOAD_DIR/$REPL"
-        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$REPL"
+            run "cp $fpath $DOWNLOAD_DIR/$BASE"
+            run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$BASE"
+
+            # we change generic files ONLY for FINAL release
+            if test "$FINAL_RELEASE" = "yes"; then
+                run "cp $fpath $DOWNLOAD_DIR/$REPL"
+                run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$REPL"
+            fi
+        fi
     done
+
     # Particular case for the value analysis manual:
     EVA_FILE="$OUT_DIR/manuals/eva-manual-$FRAMAC_VERSION_AND_CODENAME.pdf"
     VALUE_PATH="$DOWNLOAD_DIR/frama-c-value-analysis.pdf"
     VALUE_GIT_PATH="$DOWNLOAD_PATH/frama-c-value-analysis.pdf"
-    run "cp $EVA_FILE $VALUE_PATH"
-    run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
+    # we change generic files ONLY for FINAL release
+    if test "$FINAL_RELEASE" = "yes"; then
+        run "cp $EVA_FILE $VALUE_PATH"
+        run "git -C $WEBSITE_DIR add $VALUE_GIT_PATH"
+    fi
 
     # Examples:
     HELLO="hello-$FRAMAC_VERSION_AND_CODENAME.tar.gz"
-    run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
-    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$HELLO"
-    run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
-    run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/hello.tar.gz"
-    
+    check_manual_path_MUST_ADD "plugin-dev"
+    if [[ $MUST_ADD == "yes" ]]; then
+        run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
+        run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$HELLO"
+        # we change generic files ONLY for FINAL release
+        if test "$FINAL_RELEASE" = "yes"; then
+            run "cp $OUT_DIR/$HELLO $DOWNLOAD_DIR"
+            run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/hello.tar.gz"
+        fi
+    fi
+
     # Source distribution:
     run "cp $OUT_DIR/$TARGZ_FILENAME $DOWNLOAD_DIR"
     run "git -C $WEBSITE_DIR add $DOWNLOAD_PATH/$TARGZ_FILENAME"
@@ -453,6 +605,40 @@ if test \! -f $CHANGES ; then
     esac
 fi
 
+AVAILABLE_MANUALS=("user" "api" "plugin-dev" "acsl-1" "acsl-impl" "aorai" "e-acsl-1" "e-acsl-man" "e-acsl-impl" "eva" "metrics" "rte" "wp")
+INCLUDED_MANUALS_CONFIG="./included_manuals"
+INCLUDED_MANUALS=()
+
+if test "$FINAL_RELEASE" = "yes"; then
+    # In final release mode, all manuals must be distributed
+    for i in ${AVAILABLE_MANUALS[@]}; do
+        INCLUDED_MANUALS+=($i)
+    done
+else
+    if test \! -f $INCLUDED_MANUALS_CONFIG ; then
+        echo "### WARNING: The $INCLUDED_MANUALS_CONFIG file is missing"
+        echo "Do you want to create a one? [y/N]"
+        read CHOICE
+        case "${CHOICE}" in
+            "Y"|"y")
+                create_manuals_config
+                for i in $(cat $INCLUDED_MANUALS_CONFIG); do
+                    check_manual $i
+                    INCLUDED_MANUALS+=($i)
+                done
+                ;;
+            *)
+                echo "NO manuals will be included"
+                ;;
+        esac
+    else
+        for i in $(cat $INCLUDED_MANUALS_CONFIG); do
+            check_manual $i
+            INCLUDED_MANUALS+=($i)
+        done
+    fi
+fi
+
 MANUALS_DIR="./doc/manuals"
 
 if [ -z ${VERBOSE_MAKE_DOC+x} ]; then
@@ -466,20 +652,29 @@ BUILD_DIR="$BUILD_DIR_ROOT/frama-c"
 
 OUT_DIR="./distributed"
 
+echo "############################# Frama-C Info ##############################"
+echo ""
 echo "Frama-C Version      : $FRAMAC_VERSION"
 echo "Final release        : $FINAL_RELEASE"
 echo "Frama-C Branch       : $FRAMAC_BRANCH"
-echo "Manuals Dir          : $MANUALS_DIR"
-echo "ACSL Dir             : $ACSL_DIR"
 echo "Frama-C Wiki Dir     : $WIKI_DIR"
 echo "Website Dir          : $WEBSITE_DIR"
 echo "Changes file         : $CHANGES"
 echo "Build Dir            : $BUILD_DIR"
 echo "Output Dir           : $OUT_DIR"
+echo ""
+echo "############################# Manuals      ##############################"
+echo ""
+echo "Manuals Dir          : $MANUALS_DIR"
+echo "ACSL Dir             : $ACSL_DIR"
+show_generated_manuals
+
+echo "#########################################################################"
 
 export LC_CTYPE=en_US.UTF-8
 
-echo -n "Steps are:
+echo -n "
+Steps are:
 
   N) previous information is wrong, STOP the script
   0) ERASE $OUT_DIR
@@ -553,16 +748,19 @@ case "${STEP}" in
         ;&
     6)
         step 6 "PREPARE WIKI"
+        assert_out_dir
         run "git -C $WIKI_DIR reset --hard"
         fill_wiki
         ;&
     7)
         step 7 "PREPARE WEBSITE"
+        assert_out_dir
         run "git -C $WEBSITE_DIR reset --hard"
         fill_website
         ;&
     8)
         step 8 "CHECK GENERATED DISTRIBUTION"
+        assert_out_dir
         TEST_DIR="$BUILD_DIR_ROOT/frama-c-$FRAMAC_VERSION-$FRAMAC_VERSION_CODENAME"
         run "mkdir -p $BUILD_DIR_ROOT"
         run "rm -rf $TEST_DIR"
@@ -574,6 +772,7 @@ case "${STEP}" in
         ;&
     9)
         step 9 "GENERATE OPAM FILE"
+        assert_out_dir
         run "cp opam/opam $OUT_DIR/opam"
         echo >> "$OUT_DIR/opam"
         echo "url {" >> "$OUT_DIR/opam"
