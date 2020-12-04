@@ -23,12 +23,12 @@
 open Server
 open Data
 open Cil_types
+
 module Md = Markdown
 module Jkf = Kernel_ast.Kf
 module Jki = Kernel_ast.Ki
 module Jstmt = Kernel_ast.Stmt
-module CS = Value_types.Callstack
-module CSmap = CS.Hashtbl
+module Jmarker = Kernel_ast.Marker
 
 let package =
   Package.package
@@ -38,18 +38,24 @@ let package =
     ~readme:"eva.md"
     ()
 
+type probe =
+  | Pexpr of exp * stmt
+  | Plval of lval * stmt
+  | Pnone
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
 type step = [ `Here | `After | `Then of exp | `Else of exp ]
-type probe = Pexpr of exp * stmt | Plval of lval
 
 type domain = {
   values: ( step * string ) list ;
   alarms: ( truth * string ) list ;
 }
 
+let signal = Request.signal ~package ~name:"changed"
+    ~descr:(Md.plain "Emitted when EVA results has changed")
+
 (* -------------------------------------------------------------------------- *)
-(* --- Domain Utilities                                                   --- *)
+(* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 let next_steps s : step list =
@@ -61,16 +67,43 @@ let next_steps s : step list =
     -> [ `After ]
   | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
+let probe_stmt s =
+  match s.skind with
+  | Instr (Set(lv,_,_)) -> Plval(lv,s)
+  | Instr (Call(Some lr,_,_,_)) -> Plval(lr,s)
+  | Instr (Local_init(v,_,_)) -> Plval((Var v,NoOffset),s)
+  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Pexpr(e,s)
+  | _ -> Pnone
+
+let probe marker =
+  let open Printer_tag in
+  match marker with
+  | PLval(_,Kstmt s,l) -> Plval(l,s)
+  | PExp(_,Kstmt s,e) -> Pexpr(e,s)
+  | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
+  | PVDecl(_,Kstmt s,v) -> Plval((Var v,NoOffset),s)
+  | _ -> Pnone
+
+(* -------------------------------------------------------------------------- *)
+(* --- Domain Utilities                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
 module CS = Value_types.Callstack
 module CSmap = CS.Hashtbl
-module CSlist =
+
+module Jtruth : Data.S with type t = truth =
 struct
-  type t = callstack list
-  let rec hash = function [] -> 1 | a::q -> CS.hash a + 31 * hash q
-  let rec equal ca cb = match ca , cb with
-    | [] , [] -> true
-    | a::p , b::q -> Callstack.equal a b && equal p q
-    | _ -> false
+  type t = truth
+  let jtype =
+    Package.(Junion [ Jtag "True" ; Jtag "False" ; Jtag "Unknown" ])
+  let to_json = function
+    | Abstract_interp.Unknown -> `String "Unknown"
+    | True -> `String "True"
+    | False -> `String "False"
+  let of_json = function
+    | `String "True" -> Abstract_interp.True
+    | `String "False" -> Abstract_interp.False
+    | _ -> Abstract_interp.Unknown
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -80,7 +113,7 @@ end
 module type EvaProxy =
 sig
   val callstacks : stmt -> callstack list
-  val domain : Printer_tag.localizable -> callstack list -> domain
+  val domain : probe -> callstack option -> domain
 end
 
 module Proxy(A : Analysis.S) : EvaProxy =
@@ -89,51 +122,22 @@ struct
   open Eval
   type dstate = A.Dom.state or_top_or_bottom
 
-  module CSSmap = Hashtbl.Make
-      (struct
-        type t = bool * stmt * callstack list
-        let hash (after,stmt,cs) =
-          Hashtbl.hash (after,Cil_datatype.Stmt.hash stmt,CSlist.hash cs)
-        let equal (a1,s1,cs1) (a2,s2,cs2) =
-          a1 = a2 && Cil_datatype.Stmt.equal s1 s2 && CSlist.equal cs1 cs2
-      end)
-
-  let stackcache = CSSmap.create 0
-
   let callstacks stmt =
     match A.get_stmt_state_by_callstack ~after:false stmt with
     | `Top | `Bottom -> []
     | `Value states ->
-      CSmap.fold_sorted (fun cs _st css -> cs :: css) states []
+      CSmap.fold_sorted (fun cs _st wcs -> cs :: wcs) states []
 
   let dstate ~after stmt callstack =
     match callstack with
-    | [] -> (A.get_stmt_state ~after stmt :> dstate)
-    | css ->
+    | None -> (A.get_stmt_state ~after stmt :> dstate)
+    | Some cs ->
       begin match A.get_stmt_state_by_callstack ~after stmt with
         | `Top -> `Top
         | `Bottom -> `Bottom
         | `Value cmap ->
-          match css with
-          | [cs] ->
-            begin
-              try `Value (CSmap.find cmap cs)
-              with Not_found -> `Bottom
-            end
-          | css ->
-            begin
-              try CSSmap.find stackcache (after,stmt,css)
-              with Not_found ->
-                (List.fold_left
-                   (fun d cs ->
-                      try
-                        let s = CSmap.find cmap cs in
-                        match d with
-                        | `Bottom -> d
-                        | `Value s0 -> `Value (A.Dom.join s0 s)
-                      with Not_found -> d
-                   ) `Bottom css :> dstate)
-            end
+          try `Value (CSmap.find cmap cs)
+          with Not_found -> `Bottom
       end
 
   let dnone = {
@@ -168,7 +172,11 @@ struct
       let value, alarms = eval state in
       let dnext (step : step) vs = function
         | `Top | `Bottom -> vs
-        | `Value state -> (step , fst @@ eval state) :: vs in
+        | `Value state ->
+          let values =
+            try fst @@ eval state
+            with exn -> Printf.sprintf "Error (%S)" (Printexc.to_string exn)
+          in (step , values) :: vs in
       let others = List.fold_right
           begin fun st vs ->
             match st with
@@ -199,24 +207,25 @@ struct
       alarms
     end
 
-  let dexpr e s css = deval (e_expr e) s css
-  let dlval l s css = deval (e_lval l) s css
-
-  let domain marker _callstacks =
-    let open Printer_tag in
-    match marker with
-    | _ -> dnone
+  let domain p wcs = match p with
+    | Plval(l,s) -> deval (e_lval l) s wcs
+    | Pexpr(e,s) -> deval (e_expr e) s wcs
+    | Pnone -> dnone
 
 end
 
 let proxy =
   let make (a : (module Analysis.S)) = (module Proxy(val a) : EvaProxy) in
   let current = ref (make @@ Analysis.current_analyzer ()) in
-  let () = Analysis.register_hook (fun a -> current := make a) in
-  current
+  let () = Analysis.register_hook
+      begin fun a ->
+        current := make a ;
+        Request.emit signal ;
+      end
+  in current
 
 (* -------------------------------------------------------------------------- *)
-(* --- Request getCallstackInfos                                          --- *)
+(* --- Request getCallstackInfo                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Jcallstack = Data.Index(Value_types.Callstack.Map)
@@ -231,16 +240,16 @@ let pretty fmt cs =
     | _ -> ()
 
 let () =
-  let getCallstackInfos = Request.signature
+  let getCallstackInfo = Request.signature
       ~input:(module Jcallstack) () in
-  let set_descr = Request.result getCallstackInfos ~name:"descr"
+  let set_descr = Request.result getCallstackInfo ~name:"descr"
       ~descr:(Md.plain "Description")
       (module Jstring) in
-  let set_calls = Request.result getCallstackInfos ~name:"calls"
+  let set_calls = Request.result getCallstackInfo ~name:"calls"
       ~descr:(Md.plain "Callers site, from last to first")
       (module Jlist(Jpair(Jkf)(Jki))) in
-  Request.register_sig ~package getCallstackInfos
-      ~kind:`GET ~name:"getCallstackInfos"
+  Request.register_sig ~package getCallstackInfo
+      ~kind:`GET ~name:"getCallstackInfo"
       ~descr:(Md.plain "Callstack Description")
       begin fun rq cs ->
         set_calls rq cs ;
@@ -253,9 +262,58 @@ let () =
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getCallstacks"
-    ~descr:(Md.plain "Callstacks to a statement")
+    ~descr:(Md.plain "Callstacks for markers")
     ~input:(module Jstmt)
     ~output:(module Jlist(Jcallstack))
     (fun stmt -> let module A = (val !proxy) in A.callstacks stmt)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getValues                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let getValues = Request.signature () in
+  let get_tgt = Request.param getValues ~name:"target"
+      ~descr:(Md.plain "Works with all markers containing an expression")
+      (module Jmarker) in
+  let get_cs = Request.param_opt getValues ~name:"callstacks"
+      ~descr:(Md.plain "Callstacks to collect (defaults to all)")
+      (module Jcallstack) in
+  let set_alarms = Request.result getValues ~name:"alarms"
+      ~descr:(Md.plain "Alarms raised during evaluation")
+      (module Jlist(Jpair(Jtruth)(Jstring))) in
+  let set_domain = Request.result_opt getValues ~name:"values"
+      ~descr:(Md.plain "Domain values")
+      (module Jstring) in
+  let set_after = Request.result_opt getValues ~name:"v_after"
+      ~descr:(Md.plain "Domain values after execution")
+      (module Jstring) in
+  let set_then = Request.result_opt getValues ~name:"v_then"
+      ~descr:(Md.plain "Domain values for true condition")
+      (module Jstring) in
+  let set_else = Request.result_opt getValues ~name:"v_else"
+      ~descr:(Md.plain "Domain values for false condition")
+      (module Jstring) in
+  Request.register_sig ~package getValues
+    ~kind:`GET ~name:"getValues"
+    ~descr:(Md.plain "Abstract values for the given marker")
+    begin fun rq () ->
+      let marker = get_tgt rq in
+      let callstack = get_cs rq in
+      let domain =
+        let module A : EvaProxy = (val !proxy) in
+        A.domain (probe marker) callstack in
+      set_alarms rq domain.alarms ;
+      List.iter
+        (fun (step,values) ->
+           let domain = Some values in
+           match step with
+           | `Here -> set_domain rq domain
+           | `After -> set_after rq domain
+           | `Then _ -> set_then rq domain
+           | `Else _ -> set_else rq domain
+        ) domain.values ;
+    end
+
 
 (* -------------------------------------------------------------------------- *)
