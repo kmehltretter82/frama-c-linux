@@ -1,4 +1,4 @@
-\chapter{The Website Stage}
+\chapter{The Web Stage}
 
 Where all our efforts goes on the web.  There are two very different
 tasks for \FramaC to go online.  Authoring the web site pages is the
@@ -160,11 +160,6 @@ already done).
 Finally have a look at each still opened task in order to see what should be
 resolved in the next release.
 
-%% \section{Update the Wiki}
-
-%% Update references of the Wiki, especially pointers to manuals of this page:
-%% \url{http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:publications}
-
 \section{Other repositories to update}
 
 Check if other Frama-C (and related) repositories need to be updated:
@@ -181,6 +176,48 @@ Check if other Frama-C (and related) repositories need to be updated:
 Just update the \texttt{VERSION} file in \texttt{master}, by adding
 \texttt{"+dev"}. Do not add any newline at the end of the
 \texttt{VERSION} file.
+
+\section{Docker image preparation}
+
+\textbf{Note:} you need access to the \texttt{framac} Docker Hub account to be able to upload the image.
+
+Make sure:
+\begin{itemize}
+  \item \texttt{devel\_tools/docker/frama-c.dev/Dockerfile}
+  \item \texttt{devel\_tools/docker/frama-c.custom/Dockerfile}
+\end{itemize}
+are up-to-date; to do so, you can do the following:
+
+\begin{lstlisting}
+cd devel_tools/docker/frama-c.custom
+<edit Dockerfile to change the base image, from debian:sid (unstable) to the
+ latest stable release>
+<copy release .tar.gz to this directory, extract and rename the directory
+ `frama-c`>
+docker build . -t fc-with-test --build-arg=with_source=yes\
+  --build-arg=with_test=yes
+\end{lstlisting}
+
+This should copy the contents of \texttt{frama-c} into the Docker image and try
+to compile Frama-C with it, then run the tests.
+
+If the local tests do not work, check that the OCaml version and package
+dependencies are all up-to-date. Remember that there are several differences
+between Debian unstable (`sid`) and stable, which may require changes to the
+\texttt{Dockerfile}.
+
+If the local tests work, then re-run Docker \textit{without} the source/tests,
+to make the image leaner:
+
+\begin{lstlisting}
+docker build . -t framac/frama-c:<VERSION>
+\end{lstlisting}
+
+Replacing \texttt{<VERSION>} with the release number, e.g. \texttt{23.0}.
+
+After building the image, upload it with \texttt{docker push framac/frama-c:<VERSION>}.
+You will need to have setup your \texttt{framac} Docker Hub account for this to work.
+
 
 %%% Local Variables:
 %%% mode: latex
