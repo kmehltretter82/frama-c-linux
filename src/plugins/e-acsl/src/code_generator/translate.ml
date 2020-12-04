@@ -537,21 +537,28 @@ and context_insensitive_term_to_exp kf env t =
     end
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let env' = Env.push env1 in
-    let res2 = term_to_exp kf (Env.push env') t2 in
     let e, env =
-      conditional_to_exp ~name:"or" loc kf (Some t) e1 (Cil.one loc, env') res2
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let env' = Env.push env1 in
+            let res2 = term_to_exp kf (Env.push env') t2 in
+            conditional_to_exp
+              ~name:"or" loc kf (Some t) e1 (Cil.one loc, env') res2
+          )
     in
     e, env, C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let _, env2 as res2 = term_to_exp kf (Env.push env1) t2 in
-    let env3 = Env.push env2 in
     let e, env =
-      conditional_to_exp
-        ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let _, env2 as res2 = term_to_exp kf (Env.push env1) t2 in
+            let env3 = Env.push env2 in
+            conditional_to_exp
+              ~name:"and" loc kf (Some t) e1 res2 (Cil.zero loc, env3)
+          )
     in
     e, env, C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
@@ -671,10 +678,15 @@ and context_insensitive_term_to_exp kf env t =
   | Tlambda _ -> Env.not_yet env "functional"
   | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
-    let e1, env1 = term_to_exp kf (Env.rte env true) t1 in
-    let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
-    let res3 = term_to_exp kf (Env.push env2) t3 in
-    let e, env = conditional_to_exp loc kf (Some t) e1 res2 res3 in
+    let e, env =
+      Env.with_rte_and_result env true
+        ~f:(fun env ->
+            let e1, env1 = term_to_exp kf env t1 in
+            let (_, env2 as res2) = term_to_exp kf (Env.push env1) t2 in
+            let res3 = term_to_exp kf (Env.push env2) t3 in
+            conditional_to_exp loc kf (Some t) e1 res2 res3
+          )
+    in
     e, env, C_number, ""
   | Tat(t, BuiltinLabel Here) ->
     let e, env = term_to_exp kf env t in
@@ -731,21 +743,23 @@ and term_to_exp kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)"
     Printer.pp_term t generate_rte;
-  let env = Env.rte env false in
-  let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
-  let e, env, sty, name = context_insensitive_term_to_exp kf env t in
-  let env = if generate_rte then translate_rte kf env e else env in
-  let cast = Typing.get_cast t in
-  let name = if name = "" then None else Some name in
-  add_cast
-    ~loc:t.term_loc
-    ?name
-    env
-    kf
-    cast
-    sty
-    (Some t)
-    e
+  Env.with_rte_and_result env false
+    ~f:(fun env ->
+        let t = match t.term_node with TLogic_coerce(_, t) -> t | _ -> t in
+        let e, env, sty, name = context_insensitive_term_to_exp kf env t in
+        let env = if generate_rte then translate_rte kf env e else env in
+        let cast = Typing.get_cast t in
+        let name = if name = "" then None else Some name in
+        add_cast
+          ~loc:t.term_loc
+          ?name
+          env
+          kf
+          cast
+          sty
+          (Some t)
+          e
+      )
 
 (* generate the C code equivalent to [t1 bop t2]. *)
 and comparison_to_exp
@@ -890,19 +904,25 @@ and predicate_content_to_exp ?name kf env p =
     comparison_to_exp ~loc kf env ity (relation_to_binop rel) t1 t2 None
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
-    let _, env2 as res2 =
-      predicate_to_exp kf (Env.push env1) p2 in
-    let env3 = Env.push env2 in
-    let name = match name with None -> "and" | Some n -> n in
-    conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = predicate_to_exp kf env p1 in
+          let _, env2 as res2 =
+            predicate_to_exp kf (Env.push env1) p2 in
+          let env3 = Env.push env2 in
+          let name = match name with None -> "and" | Some n -> n in
+          conditional_to_exp ~name loc kf None e1 res2 (Cil.zero loc, env3)
+        )
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
-    let e1, env1 = predicate_to_exp kf (Env.rte env true) p1 in
-    let env' = Env.push env1 in
-    let res2 = predicate_to_exp kf (Env.push env') p2 in
-    let name = match name with None -> "or" | Some n -> n in
-    conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = predicate_to_exp kf env p1 in
+          let env' = Env.push env1 in
+          let res2 = predicate_to_exp kf (Env.push env') p2 in
+          let name = match name with None -> "or" | Some n -> n in
+          conditional_to_exp ~name loc kf None e1 (Cil.one loc, env') res2
+        )
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -924,11 +944,14 @@ and predicate_content_to_exp ?name kf env p =
     let e, env = predicate_to_exp kf env p in
     Cil.new_exp ~loc (UnOp(LNot, e, Cil.intType)), env
   | Pif(t, p2, p3) ->
-    let e1, env1 = term_to_exp kf (Env.rte env true) t in
-    let (_, env2 as res2) =
-      predicate_to_exp kf (Env.push env1) p2 in
-    let res3 = predicate_to_exp kf (Env.push env2) p3 in
-    conditional_to_exp loc kf None e1 res2 res3
+    Env.with_rte_and_result env true
+      ~f:(fun env ->
+          let e1, env1 = term_to_exp kf env t in
+          let (_, env2 as res2) =
+            predicate_to_exp kf (Env.push env1) p2 in
+          let res3 = predicate_to_exp kf (Env.push env2) p3 in
+          conditional_to_exp loc kf None e1 res2 res3
+        )
   | Plet(li, p) ->
     let lvs = Lscope.Lvs_let(li.l_var_info, Misc.term_of_li li) in
     let env = Env.Logic_scope.extend env lvs in
@@ -1035,19 +1058,21 @@ and predicate_content_to_exp ?name kf env p =
 
 and predicate_to_exp ?name kf ?rte env p =
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  let env = Env.rte env false in
-  let e, env = predicate_content_to_exp ?name kf env p in
-  let env = if rte then translate_rte kf env e else env in
-  let cast = Typing.get_cast_of_predicate p in
-  add_cast
-    ~loc:p.pred_loc
-    ?name
-    env
-    kf
-    cast
-    C_number
-    None
-    e
+  Env.with_rte_and_result env false
+    ~f:(fun env ->
+        let e, env = predicate_content_to_exp ?name kf env p in
+        let env = if rte then translate_rte kf env e else env in
+        let cast = Typing.get_cast_of_predicate p in
+        add_cast
+          ~loc:p.pred_loc
+          ?name
+          env
+          kf
+          cast
+          C_number
+          None
+          e
+      )
 
 and generalized_untyped_predicate_to_exp ?name kf ?rte ?must_clear_typing env p =
   (* If [rte] is true, it means we're translating the root predicate of an
@@ -1083,7 +1108,10 @@ and translate_rte_annots:
                 let p = p.tp_statement in
                 let lscope_reset_old = Env.Logic_scope.get_reset env in
                 let env = Env.Logic_scope.set_reset env false in
-                let env = translate_predicate kf (Env.rte env false) p in
+                let env =
+                  Env.with_rte env false
+                    ~f:(fun env -> translate_predicate kf env p)
+                in
                 let env = Env.Logic_scope.set_reset env lscope_reset_old in
                 env)
              env

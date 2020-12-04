@@ -165,7 +165,26 @@ val pop_loop: t -> predicate list * t
 (* ************************************************************************** *)
 
 val rte: t -> bool -> t
+(** [rte env x] sets RTE generation to x for the given environment *)
+
 val generate_rte: t -> bool
+(** Returns the current value of RTE generation for the given environment *)
+
+val with_rte: f:(t -> t) -> t -> bool -> t
+(** [with_rte ~f env x] executes the given closure with RTE generation set to x,
+    and reset RTE generation to its original value afterwards.
+    This function does not handle exceptions at all. The user must handle them
+    either directly in the [f] closure or around the call to the function. *)
+
+val with_rte_and_result: f:(t -> 'a * t) -> t -> bool -> 'a * t
+(** [with_rte_and_result ~f env x] executes the given closure with RTE
+    generation set to x, and reset RTE generation to its original value
+    afterwards. [f] is a closure that takes an environment an returns a pair
+    where the first member is an arbitrary value and the second member is the
+    environment. The function will return the first member of the returned pair
+    of the closure along with the updated environment.
+    This function does not handle exceptions at all. The user must handle them
+    either directly in the [f] closure or around the call to the function. *)
 
 (* ************************************************************************** *)
 (** {2 Context for error handling} *)
