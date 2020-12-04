@@ -444,7 +444,7 @@ type execnow =
 
 
 (** configuration of a directory/test. *)
-type cmd = { toplevel:string; opts:string; macros: Macros.t ; logs:string list ; timeout:string }
+type cmd = { toplevel:string; opts:string; macros: Macros.t ; exit_code: string option; logs:string list ; timeout:string }
 type config =
   {
     dc_test_regexp: string; (** regexp of test files. *)
@@ -461,7 +461,8 @@ type config =
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
                                        standard output *)
-    dc_commands    : cmd list;
+    dc_exit_code  : string option; (** required exit code *)
+    dc_commands   : cmd list;
     (** toplevel full path, options to launch the toplevel on, and list
         of output files to monitor beyond stdout and stderr. *)
     dc_dont_run   : bool;
@@ -506,7 +507,7 @@ end  = struct
       dc_deps = List.map subst config.dc_deps;
       dc_plugins = List.map subst config.dc_plugins;
       dc_load_module = List.map subst config.dc_load_module;
-      dc_libs = List.map subst config.dc_libs
+      dc_libs = List.map subst config.dc_libs;
     },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
@@ -520,7 +521,7 @@ end  = struct
   let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
   let default_toplevel = "@frama-c@ @OPTIONS@"
-  let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; macros=config.dc_macros; logs=[]; timeout=""} ]
+  let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; exit_code=None; macros=config.dc_macros; logs=[]; timeout=""} ]
   let default_config =
     { dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros;
@@ -531,6 +532,7 @@ end  = struct
       dc_plugins = [];
       dc_load_module = [];
       dc_filter = None ;
+      dc_exit_code = None;
       dc_default_toplevel = default_toplevel;
       dc_commands = [];
       dc_dont_run = false;
@@ -667,6 +669,7 @@ end  = struct
            { toplevel = current.dc_default_toplevel;
              opts = s;
              macros = current.dc_macros ;
+             exit_code = current.dc_exit_code ;
              logs = current.dc_default_log;
              timeout = current.dc_timeout }
          in
@@ -681,7 +684,8 @@ end  = struct
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts command.opts s ;
+                { command with opts= make_custom_opts command.opts s;
+                               exit_code = current.dc_exit_code;
                                timeout= current.dc_timeout})
              (if !current_default_cmds = [] then
                default_commands current
@@ -699,6 +703,11 @@ end  = struct
       (fun _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_filter = Some s });
+
+      "EXIT",
+      (fun _ s current ->
+         let s = Macros.expand current.dc_macros s in
+         { current with dc_exit_code = Some s });
 
       "GCC",
       (fun _ _ acc -> acc);
@@ -839,6 +848,7 @@ type toplevel_command =
     options : string ;
     toplevel: string ;
     filter : string option ;
+    exit_code : int ;
     directory : SubDir.t ;
     nth : int;
     execnow:bool;
@@ -900,42 +910,6 @@ let basic_command_string command =
   if command.timeout = "" then raw_command
   else "ulimit -t " ^ command.timeout ^ " && " ^ raw_command
 
-(* Searches for executable [s] in the directories contained in the PATH
-   environment variable. Returns [None] if not found, or
-   [Some <fullpath>] otherwise. *)
-(*
-  let find_in_path s =
-  let trim_right s =
-    let n = ref (String.length s - 1) in
-    let last_char_to_keep =
-      try
-        while !n > 0 do
-          if String.get s !n <> ' ' then raise Exit;
-          n := !n - 1
-        done;
-        0
-      with Exit -> !n
-    in
-    String.sub s 0 (last_char_to_keep+1)
-  in
-  let s = trim_right s in
-  let path_separator = if Sys.os_type = "Win32" then ";" else ":" in
-  let re_path_sep = Str.regexp path_separator in
-  let path_dirs = Str.split re_path_sep (Sys.getenv "PATH") in
-  let found = ref "" in
-  try
-    List.iter (fun dir ->
-        let fullname = dir ^ Filename.dir_sep ^ s in
-        if Sys.file_exists fullname then begin
-          found := fullname;
-          raise Exit
-        end
-      ) path_dirs;
-    None
-  with Exit ->
-    Some !found
-*)
-
 let print_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
   let plugin_as_package fmt s = Format.fprintf fmt "frama-c-%s" s
@@ -967,13 +941,13 @@ let command_string ~result_fmt ~oracle_fmt command =
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
   let deps = command.deps in
-  let accepted_exit_code = "(or 0 1 3 4 125)" in
+  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes (or %d 1 4 125)" command.exit_code in
   let command_string = basic_command_string command in
   Format.fprintf result_fmt
     "(rule ; TEST #%d OF TEST FILE %S\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes %s (system %S)))))\n\
+     (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
      )@."
     command.nth command.file
     cmderrlog
@@ -1007,7 +981,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a %S (package frama-c)%a (universe))\n  \
-     (action (with-accepted-exit-codes %s (system %S)))\n\
+     (action (%s (system %S)))\n\
      )@."
     command.nth command.file
     (mk_alias command "exec")
@@ -1074,7 +1048,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
     let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; logs; timeout } ->
+      fun { toplevel; opts=options; macros; exit_code; logs; timeout } ->
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
@@ -1083,6 +1057,13 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
             filter = config.dc_filter;
+            exit_code = begin
+              match exit_code with
+              | None -> 0
+              | Some exit_code ->
+                try int_of_string exit_code with
+                | _ -> Format.eprintf ":%s: integer required for directive EXIT: %s@." file exit_code ; 0
+            end;
             execnow=false;
             deps = config.dc_deps;
             plugins = config.dc_plugins;
@@ -1100,6 +1081,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
            log_files = [];
            options = "";
            toplevel = execnow.ex_cmd;
+           exit_code = 0;
            timeout=execnow.ex_timeout;
            macros = ptest_vars ~nth Macros.empty;
            filter = config.dc_filter;
@@ -1248,8 +1230,8 @@ let () =
        close_out result_cout;
        close_out oracle_cout;
        if not !has_test then begin (* there is no test_command *)
-         Unix.unlink result_dune_file;
-         Unix.unlink oracle_dune_file
+         unlink ~silent:false result_dune_file;
+         unlink ~silent:false oracle_dune_file
        end
     )
     suites
