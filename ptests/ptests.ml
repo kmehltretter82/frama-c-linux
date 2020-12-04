@@ -967,12 +967,13 @@ let command_string ~result_fmt ~oracle_fmt command =
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
   let deps = command.deps in
+  let accepted_exit_code = "(or 0 1 3 4 125)" in
   let command_string = basic_command_string command in
   Format.fprintf result_fmt
     "(rule ; TEST #%d OF TEST FILE %S\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1 4 125) (system %S)))))\n\
+     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes %s (system %S)))))\n\
      )@."
     command.nth command.file
     cmderrlog
@@ -983,6 +984,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     cmderrlog
     cmdreslog
+    accepted_exit_code
     command_string
   ;
   begin
@@ -1005,13 +1007,14 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a %S (package frama-c)%a (universe))\n  \
-     (action (system %S))\n\
+     (action (with-accepted-exit-codes %s (system %S)))\n\
      )@."
     command.nth command.file
     (mk_alias command "exec")
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
+    accepted_exit_code
     command_string
   ;
   Format.fprintf result_fmt
