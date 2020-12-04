@@ -126,24 +126,6 @@ let load_packages pkgs =
   List.iter Dune_site_plugins.V1.load pkgs
 
 (* -------------------------------------------------------------------------- *)
-(* --- Load Objects                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-let load_script base =
-  Klog.feedback ~dkey "compiling script '%s.ml'" base ;
-  let result, stdout, stderr =
-    Dune_site_plugins.V1.load_script
-      ~open_:["Frama_c_kernel"]
-      ~warnings:Fc_config.ocaml_wflags
-      (base^".ml")
-  in
-  List.iter (Format.printf "%s") stdout;
-  List.iter (Format.eprintf "%s") stderr;
-  match result with
-  | `Ok -> ()
-  | `Compilation_failed -> Klog.error "compilation of '%s.ml' failed" base
-
-(* -------------------------------------------------------------------------- *)
 (* --- Command-Line Entry Points                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -158,12 +140,7 @@ let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    begin
-      (* force script compilation *)
-      match is_file base ".ml" with
-      | Some _ -> load_script base
-      | None -> Klog.error "Missing source file '%s'" m
-    end
+    Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
   | _ ->
     begin
       (* load object or compile script or find package *)
@@ -171,7 +148,8 @@ let load_module m =
       | Some file -> dynlib_module (Filename.basename base) file
       | None ->
         match is_file base ".ml" with
-        | Some _ -> load_script base
+        | Some _ ->
+          Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
         | None ->
           if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
           else

@@ -37,7 +37,7 @@
   (action (with-stdout-to fc_config.ml (run sed -f ../config.sed fc_config.ml.in)))
 )
 
-(generate_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))
+(generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))
 
 (rule
   (targets transitioning.ml)

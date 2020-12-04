@@ -816,7 +816,6 @@ module LoadModule =
                   Loading order is preserved and \
                   additional dependencies can be listed in *.depend files."
     end)
-let () = LoadModule.add_aliases [ "-load-script" ]
 
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
