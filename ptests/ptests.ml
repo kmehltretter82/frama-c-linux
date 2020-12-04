@@ -948,8 +948,8 @@ end
 let show_cmd =
   let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
   let subst = Str.global_replace regexp "\\1" in
-  fun ?res ?errlog cmd ->
-    match res, errlog with
+  fun ?reslog ?errlog cmd ->
+    match reslog, errlog with
     | None, None         -> Format.sprintf "echo '%s'" (subst cmd)
     | None, Some err     -> Format.sprintf "echo '%s 2> %s'" (subst cmd) err
     | Some res, None     -> Format.sprintf "echo '%s > %s'" (subst cmd) res
@@ -960,96 +960,47 @@ let ptests_alias = config_name "ptests_config"
 let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
+  let reslog = log_prefix ^ ".res.log" in
   let errlog = log_prefix ^ ".err.log" in
-  (* let stderr = match command.filter with
-   *     None -> errlog
-   *   | Some _ ->
-   *     let stderr =
-   *       Filename.temp_file (Filename.basename log_prefix) ".err.log"
-   *     in
-   *     at_exit (fun () ->  unlink stderr);
-   *     stderr
-   * in *)
-  (* let filter = match command.filter with
-   *   | None -> None
-   *   | Some filter ->
-   *     let len = String.length filter in
-   *     let rec split_filter i =
-   *       if i < len && filter.[i] = ' ' then split_filter (i+1)
-   *       else
-   *         try
-   *           let idx = String.index_from filter i ' ' in
-   *           String.sub filter i idx,
-   *           String.sub filter idx (len - idx)
-   *         with Not_found ->
-   *           String.sub filter i (len - i), ""
-   *     in
-   *     let exec_name, params = split_filter 0 in
-   *     let exec_name =
-   *       if Sys.file_exists exec_name || not (Filename.is_relative exec_name)
-   *       then exec_name
-   *       else
-   *         match find_in_path exec_name with
-   *         | Some full_exec_name -> full_exec_name
-   *         | None ->
-   *           Filename.concat
-   *             (Filename.dirname (Filename.dirname log_prefix))
-   *             (Filename.basename exec_name)
-   *     in
-   *     Some (exec_name ^ params)
-   * in *)
-    let filter_stdout_begin,filter_stdout_end = match command.filter with
-    | None -> "",""
-    | Some filter ->
-      "(pipe-stdout ",
-      Format.sprintf "(system %S))" filter
+  let cmdreslog,cmderrlog = match command.filter with
+    | None -> reslog,errlog
+    | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
-  let command_string = basic_command_string command in
-  (* let command_string = match filter with
-   *   | None -> command_string
-   *   | Some filter -> command_string ^ " | " ^ filter
-   * in *)
-  let res = (log_prefix ^ ".res.log") in
-  (* let command_string =
-   *   match command.timeout with
-   *   | "" -> command_string
-   *   | s ->
-   *     Format.sprintf
-   *       "%s; if test $? -gt 127; then \
-   *        echo 'TIMEOUT (%s); ABORTING EXECUTION' > %s; \
-   *        fi"
-   *       command_string s (Filename.sanitize stderr)
-   * in *)
-  (* let command_string = match filter with
-   *   | None -> command_string
-   *   | Some filter ->
-   *     Format.sprintf "%s && %s < %s >%s && rm -f %s"
-   *       command_string
-   *       filter
-   *       (Filename.sanitize stderr)
-   *       (Filename.sanitize errlog)
-   *       (Filename.sanitize stderr)
-   * in *)
   let deps = command.deps in
+  let command_string = basic_command_string command in
   Format.fprintf result_fmt
     "(rule ; TEST #%d OF TEST FILE %S\n  \
      (targets %S %S %a)\n  \
      (deps   %a %S (package frama-c)%a)\n  \
-     (action (with-stderr-to %S (with-stdout-to %S %s(with-accepted-exit-codes (or 0 1 4 125) (system %S))%s)))\n\
+     (action (with-stderr-to %S (with-stdout-to %S (with-accepted-exit-codes (or 0 1 4 125) (system %S)))))\n\
      )@."
     command.nth command.file
-    errlog
-    res
+    cmderrlog
+    cmdreslog
     print_list command.log_files
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    errlog
-    res
-    filter_stdout_begin
+    cmderrlog
+    cmdreslog
     command_string
-    filter_stdout_end
   ;
+  begin
+    match command.filter with
+    | None -> ()
+    | Some filter ->
+      let filter_rule txt fin fout =
+        Format.fprintf result_fmt
+          "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
+           (action (with-stdout-to %S (system %S)))\n\
+           )@."
+          txt
+          command.nth command.file
+          fout (Format.sprintf "%s %%{dep:%s}" filter fin)
+      in
+      filter_rule "RES" cmdreslog reslog ;
+      filter_rule "ERR" cmderrlog errlog ;
+  end ;
   Format.fprintf result_fmt
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
@@ -1074,7 +1025,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     print_list deps
     command.file
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
-    (show_cmd ~res ~errlog command_string);
+    (show_cmd ~reslog ~errlog command_string);
 
   let oracle_prefix = oracle_prefix command in
   let diff_alias = log_prefix ^ ".diff" in
@@ -1086,7 +1037,7 @@ let command_string ~result_fmt ~oracle_fmt command =
      )@."
     diff_alias
     (Filename.concat ".." (oracle_prefix ^ ".res.oracle"))
-    (log_prefix ^ ".res.log");
+    reslog;
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
@@ -1094,7 +1045,7 @@ let command_string ~result_fmt ~oracle_fmt command =
      )@."
     diff_alias
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
-    (log_prefix ^ ".err.log");
+    errlog;
   Format.fprintf result_fmt
     "(alias (deps (alias %S)) (name %s); (enabled_if (and true %a))\n\
      )@."
