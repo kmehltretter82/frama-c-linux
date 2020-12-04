@@ -2,7 +2,6 @@ FROM debian:sid as base
 
 # Install non-OCaml dependencies + opam
 RUN apt-get update && apt-get install -y \
-    cvc4 \
     opam \
     z3 \
     && rm -rf /var/lib/apt/lists/*
@@ -37,6 +36,11 @@ RUN apt-get update && opam update -y && opam depext --install -y --verbose \
     conf-time.1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Note: Debian's CVC is too recent for Why3, so we do not install the Debian
+# package; instead, we download its binary and add it to a directory in PATH.
+RUN wget https://github.com/CVC4/CVC4/releases/download/1.7/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4
+RUN chmod a+x /usr/local/bin/cvc4
+
 RUN why3 config --detect
 
 # with_source: keep Frama-C sources
@@ -49,7 +53,7 @@ RUN cd /root && \
         make -j && \
         make install \
     ) && \
-    [ "${with_source}" != "no" ] || rm -rf frama-c
+    ([ "${with_source}" != "no" ] || rm -rf frama-c)
 
 # with_test: run Frama-C tests; requires "with_source=yes"
 ARG with_test=no
@@ -57,7 +61,7 @@ ARG with_test=no
 # run general tests, then test that WP can see external provers
 RUN if [ "${with_test}" != "no" ]; then \
         cd /root/frama-c && \
-        make tests && \
+        make tests PTESTS_OPTS=-error-code && \
         (cd src/plugins/wp/tests/ && \
          frama-c -wp wp_gallery/binary-multiplication-without-overflow.c \
          -wp-prover alt-ergo,cvc4); \
