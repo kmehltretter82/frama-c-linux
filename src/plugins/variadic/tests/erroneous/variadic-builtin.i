@@ -1,3 +1,7 @@
+/* run.config
+   EXIT: 3
+*/
+
 extern void Frama_C_show_each_warning(char const * , ...);
 
 void main(void)
