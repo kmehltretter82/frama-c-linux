@@ -1,9 +1,9 @@
 /* run.config
-STDOPT: +"-machdep gcc_x86_32"
+ EXIT: 1
+   STDOPT: +"-machdep gcc_x86_32"
 */
 
 // GCC allows such things
-
 int f(int);
 
 int f(x) short x; { return x; }

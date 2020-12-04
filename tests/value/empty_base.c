@@ -1,4 +1,5 @@
 /* run.config*
+   EXIT: 1
    STDOPT: #"-machdep gcc_x86_32"
    STDOPT:
  */
@@ -10,7 +11,6 @@
 volatile int nondet;
 
 struct empty {};
-
 struct empty global_empty;
 
 typedef struct {

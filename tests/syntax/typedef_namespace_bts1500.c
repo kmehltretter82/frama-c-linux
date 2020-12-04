@@ -1,10 +1,10 @@
 /* run.config
-STDOPT:
-STDOPT: +"-cpp-extra-args='-DHIDING_TYPEDEF'"
-STDOPT: +"-cpp-extra-args='-DREDEFINITION'"
+   STDOPT:
+ EXIT: 1
+   STDOPT: +"-cpp-extra-args='-DHIDING_TYPEDEF'"
+   STDOPT: +"-cpp-extra-args='-DREDEFINITION'"
 */
 typedef int digit;
-
 struct S {
   digit d1;
   int const digit;

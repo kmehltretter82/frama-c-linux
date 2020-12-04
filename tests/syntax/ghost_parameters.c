@@ -1,7 +1,10 @@
 /* run.config
+ EXIT: 1
    STDOPT: +" -cpp-extra-args=-DARGS_NOT_VOID"
    STDOPT: +" -cpp-extra-args=-DARGS_VOID"
+ EXIT: 0
    STDOPT: +" -cpp-extra-args=-DCOHERENT_DECL"
+ EXIT: 1
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_LOCAL_DECL_NON_GHOST"
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_GLOBAL_DECL_NON_GHOST"
    STDOPT: +" -cpp-extra-args=-DINCOHERENT_LOCAL_DECL_GHOST"
@@ -13,11 +16,8 @@
    STDOPT: +" -cpp-extra-args=-DVOID_EMPTY_GHOST_PARAMETER_LIST"
    STDOPT: +" -cpp-extra-args=-DVOID_GHOST_PARAMETER"
 */
-
 #ifdef ARGS_NOT_VOID
-
 void function(int a, int b) /*@ ghost (int c, int d) */{
-
 }
 
 void caller(void){

@@ -1,5 +1,5 @@
 [kernel] Parsing flexible_array_member_invalid5.i (no preprocessing)
-[kernel] flexible_array_member_invalid5.i:7: User Error: 
+[kernel] flexible_array_member_invalid5.i:14: User Error: 
   field `f' declared with a type containing a flexible array member.
 [kernel] User Error: stopping on file "flexible_array_member_invalid5.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

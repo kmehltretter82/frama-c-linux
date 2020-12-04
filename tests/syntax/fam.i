@@ -1,13 +1,17 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
+
 // Tests related to flexible array members
 
-// FAM declaration OK
-struct {
+struct { // FAM declaration OK
   int len;
   char a[];
 } fam;
 
-// static FAM initialization not allowed (unsupported GCC extension)
-struct {
+struct {// static FAM initialization not allowed (unsupported GCC extension)
   int len;
   char a[];
 } fam2 = {1, {1, 2, 3, 4, 5, 6}};

@@ -1,3 +1,7 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
 void titi() {
   int c = 0;
     L0: ;

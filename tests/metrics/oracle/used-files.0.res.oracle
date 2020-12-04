@@ -1,2 +1,2 @@
-[kernel] User Error: source file 'tests/metrics/used-files1.i' does not exist
+[kernel] User Error: source file 'used-files1.i' does not exist
 [kernel] Frama-C aborted: invalid user input.

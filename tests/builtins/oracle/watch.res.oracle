@@ -1,9 +1,9 @@
 [kernel] Parsing watch.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] watch.c:5: Warning: 
+[kernel:typing:implicit-function-declaration] watch.c:10: Warning: 
   Calling undeclared function Frama_C_watch_value. Old style K&R code?
-[kernel:typing:implicit-function-declaration] watch.c:11: Warning: 
+[kernel:typing:implicit-function-declaration] watch.c:16: Warning: 
   Calling undeclared function u. Old style K&R code?
-[kernel:annot:missing-spec] watch.c:3: Warning: 
+[kernel:annot:missing-spec] watch.c:8: Warning: 
   Neither code nor specification for function Frama_C_watch_value, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -12,18 +12,18 @@
   x ∈ {0}
   y ∈ {0}
   z ∈ {0}
-[eva] watch.c:5: Call to builtin Frama_C_watch_value
-[eva] watch.c:8: Watchpoint: & c [--..--]
-[eva] watch.c:9: Watchpoint: & c [--..--]
+[eva] watch.c:10: Call to builtin Frama_C_watch_value
+[eva] watch.c:13: Watchpoint: & c [--..--]
+[eva] watch.c:14: Watchpoint: & c [--..--]
 [eva] computing for function u <- main.
-  Called from watch.c:11.
-[kernel:annot:missing-spec] watch.c:11: Warning: 
+  Called from watch.c:16.
+[kernel:annot:missing-spec] watch.c:16: Warning: 
   Neither code nor specification for function u, generating default assigns from the prototype
 [eva] using specification for function u
 [eva] Done for function u
-[eva] watch.c:12: Watchpoint: & c [--..--]
-[eva] watch.c:13: Watchpoint: & c [--..--]
-[eva] watch.c:14: Watchpoint: & c [--..--]
+[eva] watch.c:17: Watchpoint: & c [--..--]
+[eva] watch.c:18: Watchpoint: & c [--..--]
+[eva] watch.c:19: Watchpoint: & c [--..--]
 [eva] User Error: Degeneration occurred:
   results are not correct for lines of code that can be reached from the degeneration point.
 [from] Computing for function main

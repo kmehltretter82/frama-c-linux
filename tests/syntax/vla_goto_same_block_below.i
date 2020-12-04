@@ -1,3 +1,8 @@
+/* run.config*
+ EXIT: 1
+   STDOPT:
+*/
+
 volatile int nondet ;
 
 int main() {

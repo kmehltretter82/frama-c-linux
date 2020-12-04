@@ -3,7 +3,7 @@
   syntax error:
   Location: between lines 6 and 8, before or at token: 
   
-  4     
+  4     */
   5     void if_ghost_else_one_line_bad(int x, int y) {
   
   6       if (x) {

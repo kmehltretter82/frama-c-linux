@@ -1,9 +1,9 @@
 /*run.config*
+  EXIT: 1
   OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_OPTIONS@ -journal-disable
   OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_OPTIONS@ -eva-ignore-recursive-calls -journal-disable
  */
 int G;
-
 int ff() {
   if (G) ff();
   return 5;
@@ -20,7 +20,7 @@ struct s {
 
 // Use given assigns
 /*@ assigns x \from x, y;
-  assigns s.f1 \from s.f2; 
+  assigns s.f1 \from s.f2;
   assigns \result \from s;
 */
 struct s f(int y) {

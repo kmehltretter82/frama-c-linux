@@ -1,8 +1,8 @@
 /* run.config
+   EXIT: 1
    OPT: -cpp-extra-args="-DCAN_CHECK"
    OPT: -cpp-extra-args="-DCANT_CHECK"
 */
-
 #ifdef CAN_CHECK
 
 int first_stmt(void){

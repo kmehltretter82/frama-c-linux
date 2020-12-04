@@ -1,5 +1,5 @@
 [kernel] Parsing invalid_constant.i (no preprocessing)
-[kernel] invalid_constant.i:2: Failure: 
+[kernel] invalid_constant.i:5: Failure: 
   Invalid digit 8 in integer constant '0123456789' in base 8.
 [kernel] User Error: stopping on file "invalid_constant.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

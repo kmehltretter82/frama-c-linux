@@ -1,5 +1,7 @@
 [kernel] Parsing cert_msc_38.c (with preprocessing)
-[kernel:CERT:MSC:38] cert_msc_38.c:37: Warning: 
-  Attempt to declare math_errhandling as external identifier outside of the stdlib. It is supposed to be a macro name and cannot be declared. See CERT C coding rule MSC38-C
-[kernel] Warning: warning CERT:MSC:38 treated as deferred error. See above messages for more information.
+[kernel:CERT:MSC:38] cert_msc_38.c:42: Warning: 
+  va_start is a standard macro. Its definition cannot be suppressed, see CERT C coding rules MSC38-C
+[kernel] cert_msc_38.c:42: User Error: Cannot resolve variable va_start
+[kernel] User Error: stopping on file "cert_msc_38.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

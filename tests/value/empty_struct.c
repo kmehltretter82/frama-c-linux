@@ -2,14 +2,14 @@
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -then -lib-entry"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP2 -lib-entry"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP3 -lib-entry"
+EXIT: 1
    STDOPT: +" -cpp-extra-args=-DP1 -lib-entry"
+EXIT: 0
    STDOPT: +" -cpp-extra-args=-DP1 -absolute-valid-range 0-1 -main main2"
    STDOPT: +"  -cpp-extra-args=\"-DP1 -DP5\" -machdep gcc_x86_32 -absolute-valid-range 0-1 -main main3"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -main main4"
 */
-
 // BTS 1416 and 1874
-
 struct s {}; // empty structs only allowed in GCC/MSVC mode
 struct s2 { int i1; struct s s; int i2; };
 

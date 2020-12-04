@@ -1,3 +1,5 @@
-[kernel] User Error: option `-report-unclassified-error' is unknown.
+[report] Monitoring events
+[kernel] User Error: option `-foobar' is unknown.
   use `frama-c -help' for more information.
-[kernel] Frama-C aborted: invalid user input.
+[report] User Error: Invalid action ("JAZZ")
+[kernel] Plug-in report aborted: invalid user input.

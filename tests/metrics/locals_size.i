@@ -1,8 +1,8 @@
 /* run.config
+  EXIT: 1
   OPT: -metrics-locals-size f,g,level3,level2,level1,main
   OPT: -metrics-locals-size recurse2
  */
-
 // locals size without temps: 0
 int f() {
   static int count = 0; // not a local

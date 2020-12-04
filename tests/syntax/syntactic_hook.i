@@ -1,6 +1,9 @@
 /* run.config
    MODULE: @PTEST_NAME@
+ EXIT: 1
+   STDOPT:
 */
+
 
 int f(void);
 

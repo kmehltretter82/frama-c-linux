@@ -1,8 +1,8 @@
 /* run.config
+EXIT: 1
 DEPS: merge_unused.h
 OPT: -cpp-extra-args="-I@PTEST_DIR@" %{dep:@PTEST_NAME@_2.c} -print
 */
-
 #pragma pack(1)
 
 #include "merge_unused.h"

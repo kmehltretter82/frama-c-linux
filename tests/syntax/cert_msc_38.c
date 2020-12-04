@@ -1,19 +1,19 @@
 /* run.config
-STDOPT: +"-cpp-extra-args='-DTEST_ASSERT'"
-STDOPT: +"-cpp-extra-args='-DTEST_ERRNO'"
-STDOPT: +"-cpp-extra-args='-DTEST_MATHERRHANDLING'"
-STDOPT: +"-cpp-extra-args='-DTEST_VASTART'"
-STDOPT: +"-cpp-extra-args='-DTEST_VACOPY'"
-STDOPT: +"-cpp-extra-args='-DTEST_VAARG'"
-STDOPT: +"-cpp-extra-args='-DTEST_VAEND'"
-STDOPT: +"-cpp-extra-args='-DTEST_SETJMP'"
+ EXIT: 1
+   STDOPT: +"-cpp-extra-args='-DTEST_ASSERT'"
+   STDOPT  : +"-cpp-extra-args='-DTEST_ERRNO'"
+   STDOPT: +"-cpp-extra-args='-DTEST_MATHERRHANDLING'"
+   STDOPT: +"-cpp-extra-args='-DTEST_VASTART'"
+   STDOPT: +"-cpp-extra-args='-DTEST_VACOPY'"
+   STDOPT: +"-cpp-extra-args='-DTEST_VAARG'"
+   STDOPT: +"-cpp-extra-args='-DTEST_VAEND'"
+   STDOPT: +"-cpp-extra-args='-DTEST_SETJMP'"
 */
 #include <assert.h>
 #include <stdarg.h>
 #include <setjmp.h>
 
 #ifdef TEST_ASSERT
-
 typedef void (*handler_type)(int);
 
 void execute_handler(handler_type handler, int value) {

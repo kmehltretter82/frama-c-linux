@@ -1,5 +1,8 @@
-/* run.config
+/* run.config*
+   EXIT: 1
+   STDOPT:
 */
+
 
 void f(void) { }
 

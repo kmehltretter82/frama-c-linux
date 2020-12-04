@@ -1,5 +1,5 @@
 [kernel] Parsing sizeof_incomplete_type.c (with preprocessing)
-[kernel] sizeof_incomplete_type.c:21: User Error: 
+[kernel] sizeof_incomplete_type.c:26: User Error: 
   sizeof on incomplete type 'struct inexistent'
 [kernel] User Error: stopping on file "sizeof_incomplete_type.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

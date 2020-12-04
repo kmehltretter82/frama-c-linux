@@ -1,10 +1,13 @@
 /* run.config
    CMXS: @PTEST_NAME@
+ EXIT: 1
    OPT:-cpp-extra-args="-DFAIL_DECL_TYPE"
+ EXIT: 0
    OPT:-load-module %{dep:@PTEST_NAME@.cmxs}
 */
 
 /* When there is no comment, the code should be allowed */
+
 void f_ints(){
   int ng ;
 

@@ -13,195 +13,195 @@
   v7 ∈ {0}
   rand ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from split_return.i:204.
+  Called from split_return.i:208.
 [eva] computing for function init <- main1 <- main.
-  Called from split_return.i:17.
+  Called from split_return.i:21.
 [eva] using specification for function init
 [eva] Done for function init
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
-  Called from split_return.i:205.
+  Called from split_return.i:209.
 [eva] computing for function f2 <- main2 <- main.
-  Called from split_return.i:48.
+  Called from split_return.i:52.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] split_return.i:49: Frama_C_show_each_f2: {0}, {0}
-[eva] split_return.i:49: Frama_C_show_each_f2: {5}, {5}
-[eva] split_return.i:49: Frama_C_show_each_f2: {7}, {5}
-[eva] split_return.i:51: assertion got status valid.
-[eva] split_return.i:53: Frama_C_show_each_f2_2: {5}, {5}
-[eva] split_return.i:53: Frama_C_show_each_f2_2: {7}, {5}
-[eva] split_return.i:54: assertion got status valid.
+[eva] split_return.i:53: Frama_C_show_each_f2: {0}, {0}
+[eva] split_return.i:53: Frama_C_show_each_f2: {5}, {5}
+[eva] split_return.i:53: Frama_C_show_each_f2: {7}, {5}
+[eva] split_return.i:55: assertion got status valid.
+[eva] split_return.i:57: Frama_C_show_each_f2_2: {5}, {5}
+[eva] split_return.i:57: Frama_C_show_each_f2_2: {7}, {5}
+[eva] split_return.i:58: assertion got status valid.
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
-  Called from split_return.i:206.
+  Called from split_return.i:210.
 [eva] computing for function f3 <- main3 <- main.
-  Called from split_return.i:73.
+  Called from split_return.i:77.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] split_return.i:74: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
-[eva] split_return.i:76: assertion got status valid.
-[eva] split_return.i:78: assertion got status valid.
+[eva] split_return.i:78: Frama_C_show_each_f3: {7}, {5}
+[eva] split_return.i:78: Frama_C_show_each_f3: {-2}, {0}
+[eva] split_return.i:80: assertion got status valid.
+[eva] split_return.i:82: assertion got status valid.
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main3 <- main.
-  Called from split_return.i:206.
+  Called from split_return.i:210.
 [eva] computing for function f3 <- main3 <- main.
-  Called from split_return.i:73.
+  Called from split_return.i:77.
 [eva] Recording results for f3
 [eva] Done for function f3
-[eva] split_return.i:74: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:74: Frama_C_show_each_f3: {-2}, {0}
+[eva] split_return.i:78: Frama_C_show_each_f3: {7}, {5}
+[eva] split_return.i:78: Frama_C_show_each_f3: {-2}, {0}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from split_return.i:207.
+  Called from split_return.i:211.
 [eva] computing for function f4 <- main4 <- main.
-  Called from split_return.i:94.
+  Called from split_return.i:98.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:95: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:95: Frama_C_show_each_f4: {7}, {5}
-[eva] split_return.i:97: assertion got status valid.
-[eva] split_return.i:99: assertion got status valid.
+[eva] split_return.i:99: Frama_C_show_each_f4: {4}, {0}
+[eva] split_return.i:99: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:101: assertion got status valid.
+[eva] split_return.i:103: assertion got status valid.
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
-  Called from split_return.i:207.
+  Called from split_return.i:211.
 [eva] computing for function f4 <- main4 <- main.
-  Called from split_return.i:94.
+  Called from split_return.i:98.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:95: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:99: Frama_C_show_each_f4: {4}, {0}
+[eva] split_return.i:99: Frama_C_show_each_f4: {7}, {5}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
-  Called from split_return.i:207.
+  Called from split_return.i:211.
 [eva] computing for function f4 <- main4 <- main.
-  Called from split_return.i:94.
+  Called from split_return.i:98.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:95: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:99: Frama_C_show_each_f4: {4}, {0}
+[eva] split_return.i:99: Frama_C_show_each_f4: {7}, {5}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
-  Called from split_return.i:207.
+  Called from split_return.i:211.
 [eva] computing for function f4 <- main4 <- main.
-  Called from split_return.i:94.
+  Called from split_return.i:98.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:95: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:95: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:99: Frama_C_show_each_f4: {4}, {0}
+[eva] split_return.i:99: Frama_C_show_each_f4: {7}, {5}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from split_return.i:208.
+  Called from split_return.i:212.
 [eva] computing for function f5 <- main5 <- main.
-  Called from split_return.i:117.
+  Called from split_return.i:121.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] split_return.i:118: Frama_C_show_each_f5: {7}, {5}
-[eva] split_return.i:118: Frama_C_show_each_f5: {-2}, {0}
-[eva] split_return.i:120: assertion got status valid.
-[eva] split_return.i:122: assertion got status valid.
+[eva] split_return.i:122: Frama_C_show_each_f5: {7}, {5}
+[eva] split_return.i:122: Frama_C_show_each_f5: {-2}, {0}
+[eva] split_return.i:124: assertion got status valid.
+[eva] split_return.i:126: assertion got status valid.
 [eva] Recording results for main5
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
-  Called from split_return.i:209.
+  Called from split_return.i:213.
 [eva] computing for function f6 <- main6 <- main.
-  Called from split_return.i:135.
-[eva:alarm] split_return.i:130: Warning: assertion got status unknown.
+  Called from split_return.i:139.
+[eva:alarm] split_return.i:134: Warning: assertion got status unknown.
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main6 <- main.
-  Called from split_return.i:209.
+  Called from split_return.i:213.
 [eva] computing for function f6 <- main6 <- main.
-  Called from split_return.i:135.
+  Called from split_return.i:139.
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
-  Called from split_return.i:210.
+  Called from split_return.i:214.
 [eva] computing for function f7 <- main7 <- main.
-  Called from split_return.i:148.
+  Called from split_return.i:152.
 [eva] Recording results for f7
 [eva] Done for function f7
-[eva] split_return.i:153: Frama_C_show_each_NULL: {0}, {0}
-[eva] split_return.i:153: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva] split_return.i:157: Frama_C_show_each_NULL: {0}, {0}
+[eva] split_return.i:157: Frama_C_show_each_NULL: {{ &v }}, {1}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main7 <- main.
-  Called from split_return.i:210.
+  Called from split_return.i:214.
 [eva] computing for function f7 <- main7 <- main.
-  Called from split_return.i:148.
+  Called from split_return.i:152.
 [eva] Recording results for f7
 [eva] Done for function f7
-[eva] split_return.i:153: Frama_C_show_each_NULL: {0}, {0}
-[eva] split_return.i:153: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva] split_return.i:157: Frama_C_show_each_NULL: {0}, {0}
+[eva] split_return.i:157: Frama_C_show_each_NULL: {{ &v }}, {1}
 [eva] Recording results for main7
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from split_return.i:211.
+  Called from split_return.i:215.
 [eva] computing for function f8 <- main8 <- main.
-  Called from split_return.i:171.
+  Called from split_return.i:175.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] split_return.i:176: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:176: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
-  Called from split_return.i:211.
+  Called from split_return.i:215.
 [eva] computing for function f8 <- main8 <- main.
-  Called from split_return.i:171.
+  Called from split_return.i:175.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] split_return.i:176: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:176: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
-  Called from split_return.i:211.
+  Called from split_return.i:215.
 [eva] computing for function f8 <- main8 <- main.
-  Called from split_return.i:171.
+  Called from split_return.i:175.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] split_return.i:176: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:176: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
-  Called from split_return.i:211.
+  Called from split_return.i:215.
 [eva] computing for function f8 <- main8 <- main.
-  Called from split_return.i:171.
+  Called from split_return.i:175.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:172: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:172: Frama_C_show_each_then8: {-1}, {0}
+[eva] split_return.i:176: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:176: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from split_return.i:212.
+  Called from split_return.i:216.
 [eva] computing for function uninit <- main9 <- main.
-  Called from split_return.i:199.
+  Called from split_return.i:203.
 [eva] Recording results for uninit
 [eva] Done for function uninit
 [eva] computing for function escaping <- main9 <- main.
-  Called from split_return.i:200.
-[eva:locals-escaping] split_return.i:192: Warning: 
+  Called from split_return.i:204.
+[eva:locals-escaping] split_return.i:196: Warning: 
   locals {x} escaping the scope of a block of escaping through p
 [eva] Recording results for escaping
 [eva] Done for function escaping
 [eva] computing for function escaping <- main9 <- main.
-  Called from split_return.i:200.
+  Called from split_return.i:204.
 [eva] Recording results for escaping
 [eva] Done for function escaping
 [eva] Recording results for main9

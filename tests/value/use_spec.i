@@ -1,8 +1,8 @@
 /* run.config*
- OPT: -no-autoload-plugins -load-module from,inout,eva -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps
- OPT: -no-autoload-plugins -load-module from,inout,eva -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps -show-indirect-deps
+ EXIT: 1
+ OPT: -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps
+ OPT: -eva-use-spec f,h -eva @EVA_OPTIONS@ -inout -calldeps -show-indirect-deps
 */
-
 
 void f(int *x) {
 }

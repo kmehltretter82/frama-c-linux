@@ -1,10 +1,10 @@
 /* run.config
+ EXIT: 0
    STDOPT: +"-cpp-command='gcc -C -E -I.'" +"-cpp-frama-c-compliant"
+ EXIT: 1
    STDOPT: +"-cpp-command='gcc -C -E -I. -DERR'" +"-cpp-frama-c-compliant"
  */
-
 int t[4];
-
 #ifdef ERR
 int q[static 3];
 #endif
