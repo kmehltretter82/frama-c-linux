@@ -193,7 +193,6 @@ Makefile.plugin.generated
 /src/libraries/utils/json.ml
 /src/kernel_internals/runtime/toplevel_boot.ml
 /src/kernel_internals/runtime/fc_config.ml
-/src/kernel_internals/runtime/frama_c_config.ml
 /src/kernel_internals/parsing/logic_lexer.ml
 /src/kernel_internals/parsing/logic_parser.ml
 /src/kernel_internals/parsing/logic_parser.mli
