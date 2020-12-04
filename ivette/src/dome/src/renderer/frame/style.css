@@ -130,7 +130,7 @@
     padding-left: 3px ;
     padding-right: 2px ;
     display: flex ;
-    flew-flow: row nowrap ;
+    flex-flow: row nowrap ;
     align-items: center ;
 }
 
