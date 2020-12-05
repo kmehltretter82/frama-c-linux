@@ -91,6 +91,9 @@ let probe marker =
 module CS = Value_types.Callstack
 module CSmap = CS.Hashtbl
 
+module Jcallstack = Data.Index(Value_types.Callstack.Map)
+    (struct let name = "eva-callstack-id" end)
+
 module Jtruth : Data.S with type t = truth =
 struct
   type t = truth
@@ -225,11 +228,19 @@ let proxy =
   in current
 
 (* -------------------------------------------------------------------------- *)
-(* --- Request getCallstackInfo                                           --- *)
+(* --- Request getCallstacks                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack = Data.Index(Value_types.Callstack.Map)
-    (struct let name = "eva-callstack-id" end)
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallstacks"
+    ~descr:(Md.plain "Callstacks for markers")
+    ~input:(module Jstmt)
+    ~output:(module Jlist(Jcallstack))
+    (fun stmt -> let module A = (val !proxy) in A.callstacks stmt)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getCallstackInfo                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 let pretty fmt cs =
   match cs with
@@ -257,15 +268,30 @@ let () =
       end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Request getCallstacks                                              --- *)
+(* --- Request getProbeInfo                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCallstacks"
-    ~descr:(Md.plain "Callstacks for markers")
-    ~input:(module Jstmt)
-    ~output:(module Jlist(Jcallstack))
-    (fun stmt -> let module A = (val !proxy) in A.callstacks stmt)
+let () =
+  let getProbeInfo = Request.signature ~input:(module Jmarker) () in
+  let set_stmt = Request.result_opt getProbeInfo
+      ~name:"stmt" ~descr:(Md.plain "Probe statement")
+      (module Jstmt) in
+  let set_code = Request.result_opt getProbeInfo
+      ~name:"code" ~descr:(Md.plain "Probe source code")
+      (module Jstring) in
+  let pp_code rq pp x = set_code rq (Some (Pretty_utils.to_string pp x)) in
+  Request.register_sig ~package ~kind:`GET getProbeInfo
+    ~name:"getProbeInfo" ~descr:(Md.plain "Probe informations")
+    begin fun rq marker ->
+      match probe marker with
+      | Plval(l,s) ->
+        pp_code rq Printer.pp_lval l ;
+        set_stmt rq (Some s) ;
+      | Pexpr(e,s) ->
+        pp_code rq Printer.pp_exp e ;
+        set_stmt rq (Some s) ;
+      | Pnone -> ()
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getValues                                                  --- *)
