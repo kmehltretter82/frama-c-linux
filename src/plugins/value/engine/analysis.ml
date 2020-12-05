@@ -127,8 +127,15 @@ let current_analyzer () = (module (val (snd !ref_analyzer)): S)
    Useful for the GUI parts that depend on it. *)
 module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
 
+(* Set of hooks called whenever the current Analyzer is computed.
+   Useful for the GUI parts that depend on it. *)
+module Computed_Hook = Hook.Build (struct type t = unit end)
+
 (* Register a new hook. *)
 let register_hook = Analyzer_Hook.extend
+
+(* Register a new computed hook. *)
+let register_computed_hook = Computed_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
@@ -169,7 +176,8 @@ let force_compute () =
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   let module Analyzer = (val snd !ref_analyzer) in
-  Analyzer.compute_from_entry_point ~lib_entry kf
+  Analyzer.compute_from_entry_point ~lib_entry kf ;
+  Computed_Hook.apply ()
 
 (* Resets the Analyzer when the current project is changed. *)
 let () =

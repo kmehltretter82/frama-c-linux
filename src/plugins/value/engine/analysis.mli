@@ -70,6 +70,10 @@ val register_hook: ((module S) -> unit) -> unit
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
 
+val register_computed_hook: (unit -> unit) -> unit
+(** Registers a hook that will be called each time the [current] analyzer
+    has been computed. *)
+
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
 
