@@ -6,4 +6,4 @@
 
 /* dummy source file in order to test select_simple.ml */
 
-#include "tests/slicing/simple_intra_slice.c"
+#include "tests/slicing/simple_intra_slice.i"
