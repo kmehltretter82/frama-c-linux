@@ -196,8 +196,8 @@ struct
     in
     let () =
       States.column
-        ~name:"position"
-        ~descr:(Md.plain "Marker position")
+        ~name:"loc"
+        ~descr:(Md.plain "Source location")
         ~data:(module Kernel_main.LogSource)
         ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
         model
