@@ -39,9 +39,15 @@ fi
 build () {
 
     echo "##### Building $1"
-    make -C $(dirname $1) $(basename $1) || \
-         (echo "######### $1 failed" ; exit 1)
-    echo "##### $1 done"
+    set +e
+    make -C $(dirname $1) $(basename $1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        echo "##### $1 done"
+    else
+        echo "######### $1 failed"
+        exit 1
+    fi
     # extract extension, add suffix, re-append extension
     MANUAL=${2%.*}-$3.${2##*.}
     cp -f $1 manuals/$MANUAL
