@@ -7,9 +7,11 @@ The procedure for creating the source distribution.
 \begin{itemize}
 \item All tools needed to compile Frama-C (that you should have anyways)
 \item \texttt{bash} v4.0 or higher
+\item \texttt{rgrep}
 \item \texttt{git-lfs}
 \item GNU \texttt{parallel}
 \item a \TeX distribution
+\item (recommended) \texttt{texfot}
 \end{itemize}
 
 \section{Final checks}
@@ -33,7 +35,7 @@ The procedure for creating the source distribution.
     opam packages, including alt-ergo, why3, coq, etc.
     Use \verb+bin/check-reference-configuration.sh+ to help check if the
     configuration is ok. You can also try running
-    \verb+ptests.opt -config qualif src/plugins/wp/tests+.
+    \verb+make wp-qualif+.
   \end{itemize}
 \item Check the contents of \texttt{README.md} \todo{Should always be up to date}
 \item Check the contents of \texttt{Changelog}
@@ -235,16 +237,60 @@ website git.
 
 \expertise{release manager} Use the script
 \texttt{build-src-distrib.sh} for this purpose (\texttt{bash version
-  4} required) after cloning the following repositories
+  4} required).
+
+The script will search for the following repositories:
+
 \begin{itemize}
-\item \texttt{pub-frama-c} (\texttt{git@git.frama-c.com:pub/frama-c}),
-\item \texttt{frama-c.wiki} (\texttt{git@git.frama-c.com:pub/frama-c.wiki}), and
-\item \texttt{website} (\texttt{git@git.frama-c.com:frama-c/website})
+  \item \texttt{./doc/acsl} (\texttt{git@github.com:acsl-language/acsl.git})
+  \item \texttt{./frama-c.wiki} (\texttt{git@git.frama-c.com:pub/frama-c.wiki.git})
+  \item \texttt{./website} (\texttt{git@git.frama-c.com:pub/pub.frama-c.com.git})
 \end{itemize}
-in the root directory of Frama-C. The last one is only needed when creating a
-final release. Release candidates are pushed as a branch \texttt{stable/<codename>}
-and added to the \texttt{pub/frama-c} wiki.
-For \texttt{website}, a new branch should be created over \texttt{online}.
+
+If they are not available, they can be cloned by the script.
+
+The following steps will be performed by the script:
+
+\begin{itemize}
+  \item compile manuals
+  \item build source distribution
+  \item build the API bundle
+  \item build the documentation companions
+  \item update locally the wiki pages
+  \item create a new branch for the website
+  \item run some sanity checks on the source distribution
+  \item generate the \texttt{opam} file
+\end{itemize}
+
+In order to create "ready to deploy" wiki and website pages, a file \texttt{main\_changes.md}
+must be provided. The expected format is:
+
+\begin{lstlisting}
+# Kernel
+
+- item
+- ...
+
+# <Plugin-Name> (Prefer alphabetic order)
+
+- item
+- ...
+
+# ...
+
+\end{lstlisting}
+
+The performed sanity checks are:
+
+\begin{itemize}
+  \item verification that no non-free files are distributed,
+  \item verification that no non-free plugins are distributed,
+  \item no \texttt{/home/user} path can be found in the distribution,
+  \item the source code can be compiled and tests succeed.
+\end{itemize}
+
+Note that there are some interactive steps in the script, that ask for user
+approval before going further.
 
 Finally, ensure that locale \verb+en_US.UTF-8+ is available on your system,
 as it is used by the script to ensure a proper encoding of the generated files.
@@ -254,17 +300,21 @@ Now, run the script:
 ./bin/build-src-distrib.sh
 \end{shell}
 
+The generated files are available in the \texttt{./distributed} repository.
+After testing more extensively the distribution, the following actions should
+be performed:
+
+\begin{itemize}
+  \item push stable branch on the public repository
+  \item push stable tag on the public repository
+  \item push the local Frama-C wiki branch to the public repository
+  \item push the generated website branch
+\end{itemize}
+
 \section{Testing the Distribution}
 
 Please check that the distribution (sources and API) is OK:
 \begin{enumerate}
-\item Inspect the contents of the \texttt{tar.gz}:
-  \begin{enumerate}
-  \item Extract it to a new directory.
-  \item run \texttt{<path-to-frama-c-git-clone>/doc/release/checktar.sh}
-    (CWD must be where the tar was extracted). Fix issues and/or update
-    the script if needed.
-  \end{enumerate}
 \item check for possible path/environment leaks in the \texttt{tar.gz}:
   grep for the path where your Frama-C git directory is, e.g.
   \texttt{/home/user/git/frama-c}. It should appear nowhere in the archive.
@@ -272,8 +322,8 @@ Please check that the distribution (sources and API) is OK:
   (or check e.g. \texttt{./configure --prefix=\$PWD/build \&\& make -j \&\& make install});
 \item test the installed binaries (especially the GUI). (On Linux, OCI tests
   everything but the GUI);
-\item redo the two steps above on Windows/WSL \expertise{André/Allan}, macOS
-  \expertise{André/Loïc/Thibaud};
+\item redo the two steps above on Windows/WSL \expertise{André}\expertise{Allan},
+  macOS \expertise{André}\expertise{Loïc}\\\expertise{Thibaud};
   \begin{itemize}
   \item For instance, you can compile and test as follows:
   \item \verb+./configure --prefix="$PWD/build"+
