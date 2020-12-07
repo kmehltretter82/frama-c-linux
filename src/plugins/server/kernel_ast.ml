@@ -450,6 +450,11 @@ struct
         ~data:(module Data.Jbool)
         ~default:false
         ~get:is_eva_analyzed;
+      States.column model
+        ~name:"loc"
+        ~descr:(Md.plain "Source location")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun kf -> fst (Kernel_function.get_location kf));
       States.register_array model
         ~package ~key
         ~name:"functions"
