@@ -23,6 +23,12 @@ if ! command -v git-lfs >/dev/null 2>/dev/null; then
     exit 99
 fi
 
+# rgrep needs to be installed
+if ! command -v rgrep --version >/dev/null 2>/dev/null; then
+    echo "rgrep is required"
+    exit 99
+fi
+
 function run {
     cmd=$1
     echo "$cmd"
@@ -37,7 +43,7 @@ function step {
     echo "Step $1: $2"
 }
 
-# find_repository path url
+# find_repository_DIRECTORY_BRANCH path url
 # - path: path to the directory
 # - url: URL of the repository
 # Checks:
@@ -55,7 +61,7 @@ function find_repository_DIRECTORY_BRANCH {
                 run "git clone $url $name"
                 ;;
             *)
-                echo "The Github Website repository must be linked at $name (clone or symbolic link)"
+                echo "The $url repository must be linked at $name (clone or symbolic link)"
                 exit 1
                 ;&
         esac
@@ -70,7 +76,7 @@ function find_repository_DIRECTORY_BRANCH {
 
 # proceed_anyway message
 # - message: text to display if we have to stop
-# Ask if the user want to continue and display the message if not (then exit)
+# Ask if the user wants to continue and display the message if not (then exit)
 function proceed_anyway {
     message=$1
     echo "Proceed anyway? [y/N]"
@@ -96,7 +102,7 @@ function look_for_uncommited_changes {
 function look_for_frama_c_dev {
     rgrep -i "frama-c+dev" src &> /dev/null
     if [ "$?" == "0" ]; then
-        echo "### WARNING: Remaing frama-c+dev occurrences in 'src'"
+        echo "### WARNING: Remaining frama-c+dev occurrences in 'src'"
         proceed_anyway "Update API, then run the script again"
     fi
 }
@@ -617,7 +623,7 @@ if test "$FINAL_RELEASE" = "yes"; then
 else
     if test \! -f $INCLUDED_MANUALS_CONFIG ; then
         echo "### WARNING: The $INCLUDED_MANUALS_CONFIG file is missing"
-        echo "Do you want to create a one? [y/N]"
+        echo "Do you want to create one? [y/N]"
         read CHOICE
         case "${CHOICE}" in
             "Y"|"y")
@@ -641,10 +647,11 @@ fi
 
 MANUALS_DIR="./doc/manuals"
 
+FILTER=""
 if [ -z ${VERBOSE_MAKE_DOC+x} ]; then
-    FILTER="texfot --ignore '(Warning|Overfull|Underfull|Version)'"
-else
-    FILTER=""
+    if command -v texfot --version >/dev/null 2>/dev/null; then
+        FILTER="texfot --ignore '(Warning|Overfull|Underfull|Version)'"
+    fi
 fi
 
 BUILD_DIR_ROOT="/tmp/release"
@@ -767,7 +774,7 @@ case "${STEP}" in
         run "cp $OUT_DIR/$TARGZ_FILENAME $BUILD_DIR_ROOT"
         run "cd $BUILD_DIR_ROOT ; tar xzf $TARGZ_FILENAME"
         run "./doc/release/checktar.sh $TEST_DIR"
-        run "cd $TEST_DIR ; ./configure && make -j && make tests"
+        run "cd $TEST_DIR ; ./configure && make -j && make tests PTESTS_OPTS=\"-error-code\""
         run "rm -rf $TEST_DIR"
         ;&
     9)
