@@ -1691,7 +1691,6 @@ src/plugins/wp/doc/coqdoc/typed_generated.tex: .ignore
 src/plugins/wp/doc/coqdoc/wpcoq.tex: .ignore
 src/plugins/wp/doc/manual/.gitignore: .ignore
 src/plugins/wp/doc/manual/Makefile: .ignore
-src/plugins/wp/doc/manual/cealistlogo.jpg: .ignore
 src/plugins/wp/doc/manual/mem.pdf: .ignore
 src/plugins/wp/doc/manual/size_base.pdf: .ignore
 src/plugins/wp/doc/manual/size_compl.pdf: .ignore
