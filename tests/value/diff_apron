@@ -72,148 +72,193 @@ diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_apron/a
 <   Frama_C_show_each_32_80: [0..2147483647]
 ---
 > [eva] tests/value/auto_loop_unroll.c:82: Frama_C_show_each_32_80: [0..164]
-49,52c32
-< [eva:alarm] tests/value/auto_loop_unroll.c:86: Warning: 
+55,56d37
+< [eva:alarm] tests/value/auto_loop_unroll.c:88: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:90: 
-<   Frama_C_show_each_11_111: [0..2147483647]
----
-> [eva] tests/value/auto_loop_unroll.c:90: Frama_C_show_each_11_111: [11..111]
-60,61d39
-< [eva:alarm] tests/value/auto_loop_unroll.c:96: Warning: 
+60,62c41
+< [eva:alarm] tests/value/auto_loop_unroll.c:93: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-72c50,53
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:95: Frama_C_show_each_101: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:95: Frama_C_show_each_101: {101}
+71c50,53
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-82c63,66
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+81c63,66
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-91c75,78
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+90c75,78
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-108c95,98
-< [eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
+107c95,98
+< [eva] tests/value/auto_loop_unroll.c:100: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:102.
+>   Called from tests/value/auto_loop_unroll.c:100.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-115,116d104
+114,115d104
 < [eva:alarm] tests/value/auto_loop_unroll.c:14: Warning: 
 <   signed overflow. assert g + 1 ≤ 2147483647;
-119c107,110
-< [eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
+118c107,110
+< [eva] tests/value/auto_loop_unroll.c:100: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:102.
+>   Called from tests/value/auto_loop_unroll.c:100.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-124,125c115,122
-< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr_g
-< [eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
----
-> [eva] computing for function incr_g <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:101.
-> [eva] Recording results for incr_g
-> [eva] Done for function incr_g
-> [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:102.
-> [eva] Recording results for incr
-> [eva] Done for function incr
-130,131c127,134
-< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr_g
-< [eva] tests/value/auto_loop_unroll.c:102: Reusing old results for call to incr
----
-> [eva] computing for function incr_g <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:101.
-> [eva] Recording results for incr_g
-> [eva] Done for function incr_g
-> [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:102.
-> [eva] Recording results for incr
-> [eva] Done for function incr
-134,135d136
+121,122d112
 < [eva:alarm] tests/value/auto_loop_unroll.c:18: Warning: 
 <   signed overflow. assert i + 1 ≤ 2147483647;
-138c139
-< [eva] tests/value/auto_loop_unroll.c:105: Frama_C_show_each_25: [0..2147483647]
+125c115
+< [eva] tests/value/auto_loop_unroll.c:103: Frama_C_show_each_25: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:105: Frama_C_show_each_25: {25}
-144c145,146
-< [eva] tests/value/auto_loop_unroll.c:114: Frama_C_show_each_120: [0..2147483647]
+> [eva] tests/value/auto_loop_unroll.c:103: Frama_C_show_each_25: {25}
+131c121,122
+< [eva] tests/value/auto_loop_unroll.c:112: Frama_C_show_each_120: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:114: 
+> [eva] tests/value/auto_loop_unroll.c:112: 
 >   Frama_C_show_each_120: [15..2147483647]
-160,161d161
-< [eva:alarm] tests/value/auto_loop_unroll.c:136: Warning: 
+133,136c124
+< [eva:alarm] tests/value/auto_loop_unroll.c:120: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-168c168
+< [eva] tests/value/auto_loop_unroll.c:122: 
+<   Frama_C_show_each_32_64: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:122: Frama_C_show_each_32_64: [0..65]
+152,153d139
+< [eva:alarm] tests/value/auto_loop_unroll.c:145: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+160c146
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
 >   Frama_C_show_each_imprecise: [10..2147483647]
-170,174c170,174
-< [eva:alarm] tests/value/auto_loop_unroll.c:156: Warning: 
+178,183c164,172
+< [eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+< [eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+< [eva:alarm] tests/value/auto_loop_unroll.c:164: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:158: 
-<   Frama_C_show_each_imprecise: [0..2147483647]
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
----
-> [eva] tests/value/auto_loop_unroll.c:158: Frama_C_show_each_imprecise: {10}
-> [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
-> [eva] Recording results for incr_g
-> [eva] Done for function incr_g
-188,193c188,196
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-< [eva:alarm] tests/value/auto_loop_unroll.c:165: Warning: 
-<   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:167: 
+< [eva] tests/value/auto_loop_unroll.c:166: 
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
 > [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
+>   Called from tests/value/auto_loop_unroll.c:162.
 > [eva] Recording results for incr_g
 > [eva] Done for function incr_g
 > [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
+>   Called from tests/value/auto_loop_unroll.c:162.
 > [eva] Recording results for incr_g
 > [eva] Done for function incr_g
-> [eva] tests/value/auto_loop_unroll.c:167: Frama_C_show_each_imprecise: [0..64]
-195,198c198
-< [eva:alarm] tests/value/auto_loop_unroll.c:174: Warning: 
+> [eva] tests/value/auto_loop_unroll.c:166: Frama_C_show_each_imprecise: [0..64]
+185,188c174
+< [eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:176: 
+< [eva] tests/value/auto_loop_unroll.c:175: 
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:176: Frama_C_show_each_imprecise: [0..9]
-200,203c200
-< [eva:alarm] tests/value/auto_loop_unroll.c:182: Warning: 
+> [eva] tests/value/auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [0..9]
+190,191d175
+< [eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:184: 
+195c179
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:184: Frama_C_show_each_imprecise: [0..64]
-210c207
+>   Frama_C_show_each_imprecise: [64..2147483647]
+201,203c185
+< [eva:alarm] tests/value/auto_loop_unroll.c:193: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
+205,207c187
+< [eva:alarm] tests/value/auto_loop_unroll.c:198: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
+209,210d188
+< [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+212a191,192
+> [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+216,217d195
+< [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+219a198,199
+> [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+223,224d202
+< [eva:alarm] tests/value/auto_loop_unroll.c:217: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+228,231c206
+< [eva:alarm] tests/value/auto_loop_unroll.c:222: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:226: 
+<   Frama_C_show_each_11_111: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:226: Frama_C_show_each_11_111: [11..111]
+239,241c214
+< [eva:alarm] tests/value/auto_loop_unroll.c:236: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [20..2147483646]
+243,244d215
+< [eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+247c218,220
+< [eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: [0..2147483647]
+---
+> [eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+> [eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: {21}
+253,255c226,227
+< [eva:alarm] tests/value/auto_loop_unroll.c:250: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:254: Frama_C_show_each_30: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:254: Frama_C_show_each_30: {30}
+> [eva] tests/value/auto_loop_unroll.c:258: starting to merge loop iterations
+258,259c230,231
+< [eva] tests/value/auto_loop_unroll.c:258: starting to merge loop iterations
+< [eva] tests/value/auto_loop_unroll.c:263: Frama_C_show_each_top: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:263: 
+>   Frama_C_show_each_top: [31..2147483647]
+261,263c233
+< [eva:alarm] tests/value/auto_loop_unroll.c:267: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:272: Frama_C_show_each_32: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:272: Frama_C_show_each_32: {32}
+268c238
+<   Frama_C_show_each_33_inf: [0..2147483647]
+---
+>   Frama_C_show_each_33_inf: [33..2147483647]
+272,273d241
+< [eva:alarm] tests/value/auto_loop_unroll.c:283: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+281c249
 <   __retres ∈ [1..2147483647]
 ---
 >   __retres ∈ [1..25]
-212c209
+283c251
 <   g ∈ [1..2147483647]
 ---
->   g ∈ [1..63]
+>   g ∈ [1..126]
 diff tests/value/oracle/auto_loop_unroll.1.res.oracle tests/value/oracle_apron/auto_loop_unroll.1.res.oracle
 15,18c15
 < [eva:alarm] tests/value/auto_loop_unroll.c:31: Warning: 
@@ -230,230 +275,273 @@ diff tests/value/oracle/auto_loop_unroll.1.res.oracle tests/value/oracle_apron/a
 ---
 > [eva] tests/value/auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
 58c52,55
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 67c64,67
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 76c76,79
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 85c88,91
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 94c100,103
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 103c112,115
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 112c124,127
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 121c136,139
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 130c148,151
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 139c160,163
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 148c172,175
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 157c184,187
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 166c196,199
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 175c208,211
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 184c220,223
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 193c232,235
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 202c244,247
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 211c256,259
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 220c268,271
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 229c280,283
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 238c292,295
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 247c304,307
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 256c316,319
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 265c328,331
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
 274c340,343
-< [eva] tests/value/auto_loop_unroll.c:103: Reusing old results for call to incr
+< [eva] tests/value/auto_loop_unroll.c:101: Reusing old results for call to incr
 ---
 > [eva] computing for function incr <- various_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:103.
+>   Called from tests/value/auto_loop_unroll.c:101.
 > [eva] Recording results for incr
 > [eva] Done for function incr
-294,295d362
-< [eva:alarm] tests/value/auto_loop_unroll.c:136: Warning: 
+296,297d364
+< [eva:alarm] tests/value/auto_loop_unroll.c:145: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-302c369
+304c371
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
 >   Frama_C_show_each_imprecise: [10..2147483647]
-304,308c371,375
-< [eva:alarm] tests/value/auto_loop_unroll.c:156: Warning: 
-<   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:158: 
-<   Frama_C_show_each_imprecise: [0..2147483647]
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
----
-> [eva] tests/value/auto_loop_unroll.c:158: Frama_C_show_each_imprecise: {10}
-> [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
-> [eva] Recording results for incr_g
-> [eva] Done for function incr_g
 322,327c389,397
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-< [eva] tests/value/auto_loop_unroll.c:163: Reusing old results for call to incr_g
-< [eva:alarm] tests/value/auto_loop_unroll.c:165: Warning: 
+< [eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+< [eva] tests/value/auto_loop_unroll.c:162: Reusing old results for call to incr_g
+< [eva:alarm] tests/value/auto_loop_unroll.c:164: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:167: 
+< [eva] tests/value/auto_loop_unroll.c:166: 
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
 > [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
+>   Called from tests/value/auto_loop_unroll.c:162.
 > [eva] Recording results for incr_g
 > [eva] Done for function incr_g
 > [eva] computing for function incr_g <- complex_loops <- main.
->   Called from tests/value/auto_loop_unroll.c:163.
+>   Called from tests/value/auto_loop_unroll.c:162.
 > [eva] Recording results for incr_g
 > [eva] Done for function incr_g
-> [eva] tests/value/auto_loop_unroll.c:167: Frama_C_show_each_imprecise: [0..64]
+> [eva] tests/value/auto_loop_unroll.c:166: Frama_C_show_each_imprecise: [0..64]
 329,332c399
-< [eva:alarm] tests/value/auto_loop_unroll.c:174: Warning: 
+< [eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:176: 
+< [eva] tests/value/auto_loop_unroll.c:175: 
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:176: Frama_C_show_each_imprecise: [0..9]
-334,337c401
-< [eva:alarm] tests/value/auto_loop_unroll.c:182: Warning: 
+> [eva] tests/value/auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [0..9]
+334,335d400
+< [eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:184: 
+339c404
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
-> [eva] tests/value/auto_loop_unroll.c:184: Frama_C_show_each_imprecise: [0..64]
+>   Frama_C_show_each_imprecise: [64..2147483647]
+344c409
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:192: Automatic loop unrolling.
+---
+> [eva] tests/value/auto_loop_unroll.c:192: starting to merge loop iterations
+346c411
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:197: Automatic loop unrolling.
+---
+> [eva] tests/value/auto_loop_unroll.c:197: starting to merge loop iterations
+348,353c413,429
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:203: Automatic loop unrolling.
+< [eva] tests/value/auto_loop_unroll.c:206: Frama_C_show_each_0_13: [0..13]
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:208: Automatic loop unrolling.
+< [eva] tests/value/auto_loop_unroll.c:211: Frama_C_show_each_0_14: [0..14]
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:214: Automatic loop unrolling.
+< [eva] tests/value/auto_loop_unroll.c:219: Frama_C_show_each_0_15: [0..15]
+---
+> [eva] tests/value/auto_loop_unroll.c:203: starting to merge loop iterations
+> [eva:alarm] tests/value/auto_loop_unroll.c:203: Warning: 
+>   signed overflow. assert -2147483648 ≤ i_0 - 1;
+> [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+> [eva] tests/value/auto_loop_unroll.c:206: 
+>   Frama_C_show_each_0_13: [0..2147483647]
+> [eva] tests/value/auto_loop_unroll.c:208: starting to merge loop iterations
+> [eva:alarm] tests/value/auto_loop_unroll.c:208: Warning: 
+>   signed overflow. assert -2147483648 ≤ i_1 - 1;
+> [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+> [eva] tests/value/auto_loop_unroll.c:211: 
+>   Frama_C_show_each_0_14: [0..2147483647]
+> [eva] tests/value/auto_loop_unroll.c:214: starting to merge loop iterations
+> [eva] tests/value/auto_loop_unroll.c:219: 
+>   Frama_C_show_each_0_15: [0..2147483647]
+364c440,444
+< [eva:loop-unroll] tests/value/auto_loop_unroll.c:240: Automatic loop unrolling.
+---
+> [eva] tests/value/auto_loop_unroll.c:240: starting to merge loop iterations
+> [eva:alarm] tests/value/auto_loop_unroll.c:240: Warning: 
+>   signed overflow. assert -2147483648 ≤ i - 1;
+> [eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+375c455,456
+< [eva] tests/value/auto_loop_unroll.c:263: Frama_C_show_each_top: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:263: 
+>   Frama_C_show_each_top: [31..2147483647]
+391,392d471
+< [eva:alarm] tests/value/auto_loop_unroll.c:283: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+425,426c504,505
+<   i ∈ {-1}
+<   res ∈ {21}
+---
+>   i ∈ [-2147483648..20]
+>   res ∈ [0..2147483647]
 diff tests/value/oracle/backward_add_ptr.res.oracle tests/value/oracle_apron/backward_add_ptr.res.oracle
 71c71,74
 < [eva] tests/value/backward_add_ptr.c:91: Reusing old results for call to gm

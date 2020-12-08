@@ -33,6 +33,20 @@ diff tests/value/oracle/alias.6.res.oracle tests/value/oracle_octagons/alias.6.r
 >   tz1 ∈ {1}
 >   tz2 ∈ {1}
 >   tz3 ∈ {1}
+diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_octagons/auto_loop_unroll.0.res.oracle
+211,212d210
+< [eva:alarm] tests/value/auto_loop_unroll.c:203: Warning: 
+<   signed overflow. assert -2147483648 ≤ i_0 - 1;
+218,219d215
+< [eva:alarm] tests/value/auto_loop_unroll.c:208: Warning: 
+<   signed overflow. assert -2147483648 ≤ i_1 - 1;
+245,246d240
+< [eva:alarm] tests/value/auto_loop_unroll.c:240: Warning: 
+<   signed overflow. assert -2147483648 ≤ i - 1;
+306c300
+<   i ∈ [-2147483648..20]
+---
+>   i ∈ {-1}
 diff tests/value/oracle/bitfield.res.oracle tests/value/oracle_octagons/bitfield.res.oracle
 138a139,141
 > [eva] tests/value/bitfield.i:71: 
