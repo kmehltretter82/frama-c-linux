@@ -24,14 +24,7 @@ import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
 import 'codemirror/theme/solarized.css';
 
-import { Theme, FontSize } from './Preferences';
-
-const THEMES = [
-  { id: 'default', label: 'Default' },
-  { id: 'ambiance', label: 'Ambiance' },
-  { id: 'solarized light', label: 'Solarized Light' },
-  { id: 'solarized dark', label: 'Solarized Dark' },
-];
+import { THEMES, ThemeASTview, FontSizeASTview } from './Preferences';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -110,8 +103,8 @@ const ASTview = () => {
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const multipleSelections = selection?.multiple.allSelections;
-  const [theme, setTheme] = Settings.useGlobalSettings(Theme);
-  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
+  const [theme, setTheme] = Settings.useGlobalSettings(ThemeASTview);
+  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSizeASTview);
   const [wrapText, flipWrapText] = Dome.useFlipSettings('ASTview.wrapText');
   const markersInfo = States.useSyncArray(markerInfo);
 
