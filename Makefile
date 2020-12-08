@@ -180,7 +180,9 @@ force-reconfigure:
 # todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
 # NOTE: the elements of this list shoud be part of the DEFAULT_SUITES contained into `tests/ptest_config`
 TESTS=builtins callgraph cil constant_propagation dynamic fc_script float idct impact jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual saveload scope slicing sparecode spec syntax test value value/traces
-# todo: adds value:apron value:bitwise value:equalities value:gauges values:octagons values:symbols
+
+# todo: adds value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
+# CONFIGS=value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
 CONFIGS=
 
 # todo: adds aorai (2 configs + Aorai_test library)
@@ -215,7 +217,10 @@ clean-tests: purge-tests
 	rm -rf _build/default/tests
 
 PTESTS=./ptests.exe
-#PTESTS=./ptests.exe -v
+PTESTS=./ptests.exe -v
+
+tests.info:
+	echo $(TEST_CONFIGS)
 
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: config.sed purge-tests

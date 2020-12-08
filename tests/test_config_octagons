@@ -1,3 +1,5 @@
 MACRO: EVA_CONFIG from inout eva scope variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-domains octagon
+FILTER: diff %{dep:../oracle/@PTEST_ORACLE@}
+PLUGIN: @EVA_CONFIG@
 OPT: -eva @EVA_OPTIONS@ -journal-disable -out -input -deps

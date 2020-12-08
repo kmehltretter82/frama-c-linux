@@ -950,6 +950,8 @@ let show_cmd =
 
 let ptests_alias = config_name "ptests_config"
 
+let filter_log_regexp = Str.regexp "@PTEST_LOG@"
+    
 let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
 let command_string ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix command in
@@ -984,17 +986,19 @@ let command_string ~result_fmt ~oracle_fmt command =
     match command.filter with
     | None -> ()
     | Some filter ->
-      let filter_rule txt fin fout =
-        Format.fprintf result_fmt
+      let regexp = Str.regexp "@PTEST_ORACLE@" in
+      let filter_rule txt fin fout foracle =
+        let filter = Str.global_replace regexp foracle filter in
+         Format.fprintf result_fmt
           "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
-           (action (with-stdout-to %S (system %S)))\n\
+            (action (with-stdout-to %S (system %S)))\n\
            )@."
           txt
           command.nth command.file
           fout (Format.sprintf "%s %%{dep:%s}" filter fin)
       in
-      filter_rule "RES" cmdreslog reslog ;
-      filter_rule "ERR" cmderrlog errlog ;
+      filter_rule "RES" cmdreslog reslog (log_prefix ^ ".res.oracle") ;
+      filter_rule "ERR" cmderrlog errlog (log_prefix ^ ".err.oracle")
   end ;
   Format.fprintf result_fmt
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
@@ -1075,7 +1079,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         command_string ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
-            filter = config.dc_filter;
+            filter = (match config.dc_filter with None -> None | Some s -> Some (Macros.expand macros s));
             exit_code = begin
               match exit_code with
               | None -> 0
