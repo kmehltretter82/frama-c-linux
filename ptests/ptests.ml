@@ -232,7 +232,7 @@ end = struct
     | [] ->
       if Sys.file_exists "tests" && Sys.is_directory "tests" then "tests", []
       else begin
-        Format.eprintf "No test path found. Aborting (CWD=%s).@." (Sys.getcwd());
+        Format.eprintf "No path found to 'tests' directory. Aborting (CWD=%s).@." (Sys.getcwd());
         exit 1
       end
     | [f] -> let tests, suffix = get_upper_test_dir f f in
@@ -478,7 +478,7 @@ module Test_config: sig
   val filename: string
   val current_config: unit -> config
 
-  val scan_directives: SubDir.t -> Scanf.Scanning.in_channel -> config -> config
+  val scan_directives: SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
   val scan_test_file:  SubDir.t -> file:string -> config -> config
 
   (* updates the configuration directives that do not depend of the test number and
@@ -572,7 +572,7 @@ end  = struct
 
   let make_custom_opts =
     let space = Str.regexp " " in
-    fun stdopts s ->
+    fun ~file stdopts s ->
       let rec aux opts s =
         try
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
@@ -585,7 +585,7 @@ end  = struct
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            Format.eprintf "unknown STDOPT configuration string: %s\n%!" s;
+            Format.eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
           opts
         | End_of_file -> opts
       in
@@ -598,7 +598,7 @@ end  = struct
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
 
-  let config_exec ~once dir s current =
+  let config_exec ~file:_ ~once dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with
       dc_execnow =
@@ -623,27 +623,27 @@ end  = struct
       let _,_,res = (add "" acc) in
       res
 
-  let config_deps _dir s current =
+  let config_deps ~file:_ _dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_deps = (split_list s) @ current.dc_deps }
 
-  let config_cmxs _dir s current =
+  let config_cmxs ~file:_ _dir s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with dc_cmxs = l @ current.dc_cmxs }
 
-  let config_libs _dir s current =
+  let config_libs ~file:_ _dir s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with dc_libs = l @ current.dc_libs ;
                    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
 
-  let config_plugin _dir s current =
+  let config_plugin ~file:_ _dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_plugins = split_list s ;
                    dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
 
-  let config_module _dir s current =
+  let config_module ~file:_ _dir s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
@@ -653,7 +653,7 @@ end  = struct
       dc_load_module = deps @ current.dc_load_module;
     }
 
-  let config_macro _dir s current =
+  let config_macro ~file _dir s current =
     (* note: the expansion is donly done into the definition *)
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     if Str.string_match regex s 0 then begin
@@ -665,7 +665,7 @@ end  = struct
         Format.printf "new macro %s with definition %s\n%!" name def;
       { current with dc_macros = Macros.add_expand name def current.dc_macros }
     end else begin
-      Format.eprintf "cannot understand MACRO definition: %s\n%!" s;
+      Format.eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
       current
     end
 
@@ -676,12 +676,12 @@ end  = struct
 
   let config_options =
     [ "CMD",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          let t =
            { toplevel = current.dc_default_toplevel;
@@ -697,12 +697,12 @@ end  = struct
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun _ s current ->
+      (fun ~file _ s current ->
          let s = Macros.expand current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts command.opts s;
+                { command with opts= make_custom_opts ~file command.opts s;
                                exit_code = current.dc_exit_code;
                                timeout= current.dc_timeout})
              (if !current_default_cmds = [] then
@@ -713,28 +713,28 @@ end  = struct
                         dc_default_log = !current_default_log @
                                          current.dc_default_log });
       "FILEREG",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_filter = Some s });
 
       "EXIT",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun _ _ acc -> acc);
+      (fun ~file:_ _ _ acc -> acc);
 
       "COMMENT",
-      (fun _ _ acc -> acc);
+      (fun ~file:_ _ _ acc -> acc);
 
       "DONTRUN",
-      (fun _ _ current -> { current with dc_dont_run = true });
+      (fun ~file:_ _ _ current -> { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
@@ -745,18 +745,18 @@ end  = struct
       "MODULE", config_module;
       "PLUGIN", config_plugin;
       "LOG",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
       "TIMEOUT",
-      (fun _ s current ->
+      (fun ~file:_ _ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_timeout = s });
       "NOFRAMAC",
-      (fun _ _ current -> { current with dc_commands = []; dc_framac = false; });
+      (fun ~file:_ _ _ current -> { current with dc_commands = []; dc_framac = false; });
     ]
 
-  let scan_directives dir scan_buffer default =
+  let scan_directives dir ~file scan_buffer default =
     current_default_toplevel := default.dc_default_toplevel;
     current_default_log := default.dc_default_log;
     current_default_cmds := List.rev default.dc_commands;
@@ -766,9 +766,9 @@ end  = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options) dir opt !r
+               r := (List.assoc name config_options ~file) dir opt !r
              with Not_found ->
-               Format.eprintf "@[unknown configuration option: %s@\n%!@]" name)
+               Format.eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
       with
       | Scanf.Scan_failure _ ->
         if Str.string_match end_comment s 0
@@ -796,6 +796,7 @@ end  = struct
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
       scan_directives
         (SubDir.create ~with_subdir:false Filename.current_dir_name)
+        ~file:general_config_file
         scan_buffer
         default_config
     end
@@ -829,14 +830,14 @@ end  = struct
              let configs = split_config (String.trim names) in
              if List.exists is_current_config configs then
                (* Found options for current config! *)
-               scan_directives dir scan_buffer default
+               scan_directives dir ~file:f scan_buffer default
              else (* config name does not match: eat config and continue.
                      But only if the comment is still opened by the end of
                      the line and we are indeed reading a config
                   *)
                (if List.exists is_config configs &&
                    not (Str.string_match end_comment names 0) then
-                  ignore (scan_directives dir scan_buffer default);
+                  ignore (scan_directives dir ~file:f scan_buffer default);
                 scan_config ()))
       in
       let config =
@@ -1080,7 +1081,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
               | None -> 0
               | Some exit_code ->
                 try int_of_string exit_code with
-                | _ -> Format.eprintf ":%s: integer required for directive EXIT: %s@." file exit_code ; 0
+                | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
             end;
             execnow=false;
             deps = config.dc_deps;
@@ -1230,7 +1231,7 @@ let () =
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           Test_config.scan_directives directory scan_buffer default
+           Test_config.scan_directives directory ~file:config scan_buffer default
          end
          else default
        in
