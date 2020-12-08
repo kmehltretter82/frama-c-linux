@@ -48,16 +48,38 @@ let intraprocedural () = not (Parameters.OctagonCall.get ())
 (*                  Basic types: pair of variables and Ival.t                 *)
 (* -------------------------------------------------------------------------- *)
 
-(* Variables of the octagons. Should be extended later to also include
-   symbolic lvalues. *)
-module Variable = struct
-  include Cil_datatype.Varinfo
-  let id v = v.vid
+type kind = Integer | Float
+
+let typ_kind typ =
+  match Cil.unrollType typ with
+  | TInt _ | TEnum  _ -> Integer
+  | TFloat _ -> Float
+  | _ -> assert false
+
+(* Abstract interface for the variables used by the octagons. *)
+module type Variable = sig
+  include Datatype.S_with_collections
+  (* Creates a variable from a varinfo. Should be extended to support more
+     lvalues. *)
+  val make: varinfo -> t
+  (* Returns all variables that may have been created for a varinfo. *)
+  val get_all: varinfo -> t list
+  val kind: t -> kind   (* The kind of the variable: integer or float. *)
+  val lval: t -> lval   (* The CIL lval corresponding to the variable. *)
+  val base: t -> Base.t (* Base of the variable. *)
+  val id: t -> int      (* Unique id, needed to use variables as hptmap keys. *)
 end
 
-module VariableSet = struct
-  include Variable.Set
-  let pretty_debug = pretty
+(* Variables of the octagons. Should be extended later to also include
+   symbolic lvalues. *)
+module Variable : Variable = struct
+  include Cil_datatype.Varinfo
+  let make v = v
+  let get_all v = [ v ]
+  let kind v = typ_kind v.vtype
+  let lval v = Var v, NoOffset
+  let base v = Base.of_varinfo v
+  let id v = v.vid
 end
 
 (* Pairs of related variables in an octagon.
@@ -76,11 +98,15 @@ module Pair = struct
   (* Creates a pair, and also returns a boolean that is [true] if x, y are
      swapped in the pair. *)
   let make x y =
-    assert (x.vid <> y.vid);
-    let pair, swap = if x.vid < y.vid then (x, y), false else (y, x), true in
+    let x_id = Variable.id x
+    and y_id = Variable.id y in
+    assert (x_id <> y_id);
+    if debug then assert (Variable.kind x = Variable.kind y);
+    let pair, swap = if x_id < y_id then (x, y), false else (y, x), true in
     hashcons pair, swap
 
   let fst t = fst (get t)
+  let kind t = Variable.kind (fst t)
 end
 
 
@@ -114,12 +140,11 @@ module Arith = struct
     then neg_int ival
     else inject_float (Fval.neg (project_float ival))
 
-  let int_or_float_operation i_op f_op = fun typ ->
-    match Cil.unrollType typ with
-    | TInt _ | TEnum _ -> i_op
-    | TFloat _ -> fun i1 i2 ->
-      inject_float (f_op Fval.Real (project_float i1) (project_float i2))
-    | _ -> assert false
+  let int_or_float_operation i_op f_op = function
+    | Integer -> i_op
+    | Float ->
+      fun i1 i2 ->
+        inject_float (f_op Fval.Real (project_float i1) (project_float i2))
 
   let sub = int_or_float_operation Ival.sub_int Fval.sub
   let add = int_or_float_operation Ival.add_int Fval.add
@@ -150,7 +175,7 @@ let _pretty_octagon fmt octagon =
   let x, y = Pair.get octagon.variables in
   let op = match octagon.operation with Add -> "+" | Sub -> "-" in
   Format.fprintf fmt "%a %s %a %s %a"
-    Printer.pp_varinfo x op Printer.pp_varinfo y
+    Variable.pretty x op Variable.pretty y
     (Unicode.inset_string ()) Ival.pretty octagon.value
 
 (* Transforms Cil expressions into mathematical octagons.
@@ -186,11 +211,11 @@ module Rewriting = struct
 
   (* Simplified form [±X-coeff] for expressions,
      where X is a variable and coeff an interval. *)
-  type var_coeff = { varinfo: varinfo; sign: bool; coeff: Ival.t; }
+  type var_coeff = { var: Variable.t; sign: bool; coeff: Ival.t; }
 
   (* Negates a simplified form. *)
-  let neg { varinfo; sign; coeff } =
-    { varinfo; sign = not sign; coeff = Arith.neg coeff }
+  let neg { var; sign; coeff } =
+    { var; sign = not sign; coeff = Arith.neg coeff }
 
   (* Is the interval computed for a variable a singleton? *)
   let is_singleton = function
@@ -209,11 +234,11 @@ module Rewriting = struct
   let apply_binop f evaluate typ e1 op e2 =
     evaluate e1 >> fun v1 ->
     evaluate e2 >> fun v2 ->
-    let typ_e1 = Cil.typeOf e1 in
-    let result = Arith.apply op typ_e1 v1 v2 in
+    let kind = typ_kind (Cil.typeOf e1) in
+    let result = Arith.apply op kind v1 v2 in
     if may_overflow typ result
     then []
-    else f typ_e1 v1 v2
+    else f kind v1 v2
 
   (* Rewrites the Cil expression [expr] into the simplified form [±x-coeff],
      where [x] is a non-singleton variable and [coeff] is an interval. The
@@ -230,7 +255,9 @@ module Rewriting = struct
       if Cil.isIntegralType varinfo.vtype
       && not (Cil.typeHasQualifier "volatile" varinfo.vtype)
       && not (is_singleton (evaluate expr))
-      then [ { varinfo; sign = true; coeff = Ival.zero } ]
+      then
+        let var = Variable.make varinfo in
+        [ { var; sign = true; coeff = Ival.zero } ]
       else []
 
     | UnOp (Neg, e, typ) ->
@@ -264,20 +291,21 @@ module Rewriting = struct
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)
   let rewrite_binop evaluate e1 binop e2 =
+    let kind = typ_kind (Cil.typeOf e1) in
     let vars1 = rewrite evaluate e1 in
     let vars2 = rewrite evaluate e2 in
     let vars2 = if binop = Sub then List.map neg vars2 else vars2 in
     let aux acc var1 var2 =
-      if Cil_datatype.Varinfo.equal var1.varinfo var2.varinfo
+      if Variable.equal var1.var var2.var
       then acc
       else
-        let variables, swap = Pair.make var1.varinfo var2.varinfo in
+        let variables, swap = Pair.make var1.var var2.var in
         let operation = if var1.sign = var2.sign then Add else Sub in
         let sign = match operation with
           | Add -> var1.sign
           | Sub -> if swap then var2.sign else var1.sign
         in
-        let value = Arith.add (Cil.typeOf e1) var1.coeff var2.coeff in
+        let value = Arith.add kind var1.coeff var2.coeff in
         let value = if sign then value else Arith.neg value in
         (sign, { variables; operation; value }) :: acc
     in
@@ -297,13 +325,13 @@ module Rewriting = struct
   (* Transforms the constraint [expr] ∈ [ival] into a list of octagonal
      constraints. *)
   let make_octagons evaluate expr ival =
-    let make_octagons_from_binop typ e1 op e2 ival =
+    let make_octagons_from_binop kind e1 op e2 ival =
       (* equivalent octagonal forms ±(X±Y-v) for [e1 op e2]. *)
       let rewritings = rewrite_binop evaluate e1 op e2 in
       (* create the final octagon, knowning that [e1 op e2] ∈ [ival]. *)
       let make_octagon (sign, octagon) =
         let ival = if sign then ival else Arith.neg ival in
-        let value = Arith.add typ ival octagon.value in
+        let value = Arith.add kind ival octagon.value in
         { octagon with value }
       in
       List.map make_octagon rewritings
@@ -324,7 +352,7 @@ module Rewriting = struct
           if Ival.is_zero ival then Abstract_interp.Comp.inv comp else comp
         in
         let range = comparison_range comp in
-        make_octagons_from_binop typ e1 Sub e2 range
+        make_octagons_from_binop (typ_kind typ) e1 Sub e2 range
     | _ -> []
 
   let overflow_alarms typ expr ival =
@@ -370,10 +398,10 @@ module Rewriting = struct
       let octagons = rewrite_binop evaluate_expr e1 op e2 in
       let ival = evaluate_octagons octagons in
       if Ival.(equal top ival) then default else
-        let typ_e1 = Cil.typeOf e1 in
+        let kind = typ_kind (Cil.typeOf e1) in
         let ival2 =
           match evaluate_expr e1, evaluate_expr e2 with
-          | `Value v1, `Value v2 -> Arith.apply op typ_e1 v1 v2
+          | `Value v1, `Value v2 -> Arith.apply op kind v1 v2
           | _, _ -> Ival.top
         in
         let ival = Ival.narrow ival ival2 in
@@ -577,8 +605,8 @@ module Octagons = struct
       if Ival.(equal top ival)
       then None
       else
-        let typ = (Pair.fst octagon.variables).vtype in
-        let ival = Arith.sub typ ival octagon.value in
+        let kind = Pair.kind octagon.variables in
+        let ival = Arith.sub kind ival octagon.value in
         Some ival
     with Not_found -> None
 end
@@ -592,7 +620,8 @@ module Relations = struct
   module Initial_Values = struct let v = [[]] end
   module Dependencies = struct let l = [ Ast.self ] end
 
-  include Hptmap.Make (Variable) (VariableSet)
+  include Hptmap.Make (Variable)
+      (struct include Variable.Set let pretty_debug = pretty end)
       (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
 
   let inter =
@@ -612,9 +641,9 @@ module Relations = struct
   let relate_aux x y t =
     let related =
       try find x t
-      with Not_found -> VariableSet.empty
+      with Not_found -> Variable.Set.empty
     in
-    let updated = VariableSet.add y related in
+    let updated = Variable.Set.add y related in
     add x updated t
 
   (* Marks x and y as mutually related. *)
@@ -623,7 +652,7 @@ module Relations = struct
     relate_aux y x (relate_aux x y t)
 
   let add variable set t =
-    if VariableSet.is_empty set
+    if Variable.Set.is_empty set
     then remove variable t
     else add variable set t
 end
@@ -751,8 +780,8 @@ module State = struct
          between them. *)
       let check_octagon pair _ =
         let x, y = Pair.get pair in
-        try VariableSet.mem x (Relations.find y t.relations)
-            && VariableSet.mem y (Relations.find x t.relations)
+        try Variable.Set.mem x (Relations.find y t.relations)
+            && Variable.Set.mem y (Relations.find x t.relations)
         with Not_found -> false
       in
       if Octagons.for_all check_octagon t.octagons
@@ -771,7 +800,7 @@ module State = struct
         let v1, v2 = Pair.get variables in
         let i1 = Intervals.find v1 intervals
         and i2 = Intervals.find v2 intervals in
-        let i = Arith.apply operation v1.vtype i1 i2 in
+        let i = Arith.apply operation (Variable.kind v1) i1 i2 in
         Ival.is_included i value
       with Not_found -> false
     else false
@@ -809,8 +838,9 @@ module State = struct
           try
             let i1 = Intervals.find v1 intervals
             and i2 = Intervals.find v2 intervals in
-            let add = Arith.add v1.vtype i1 i2
-            and sub = Arith.sub v1.vtype i1 i2 in
+            let kind = Variable.kind v1 in
+            let add = Arith.add kind i1 i2
+            and sub = Arith.sub kind i1 i2 in
             let diamond = Diamond.join diamond { add; sub } in
             if Diamond.is_top diamond then None else Some diamond
           with Not_found -> None
@@ -841,8 +871,9 @@ module State = struct
           try
             let i1 = Intervals.find v1 intervals
             and i2 = Intervals.find v2 intervals in
-            let add = Arith.add v1.vtype i1 i2
-            and sub = Arith.sub v1.vtype i1 i2 in
+            let kind = Variable.kind v1 in
+            let add = Arith.add kind i1 i2
+            and sub = Arith.sub kind i1 i2 in
             let diamond =
               if b
               then Diamond.widen { add; sub } diamond
@@ -877,7 +908,7 @@ module State = struct
   (* -------------- Transitive closure when adding an octagon --------------- *)
 
   type relation =
-    { vars: varinfo * varinfo;
+    { vars: Variable.t * Variable.t;
       diamond: diamond; }
 
   let add_diamond state variables diamond =
@@ -899,17 +930,17 @@ module State = struct
       if Variable.equal y (fst rel2.vars) then rel2 else inverse rel2
     in
     (* rel1 is about X±Y, rel2 is about Y±Z. *)
-    let typ = y.vtype in
+    let kind = Variable.kind y in
     (* X+Z = (X+Y) - (Y-Z) and X+Y = (X-Y) + (Y+Z) *)
     let add =
       Ival.narrow
-        (Arith.sub typ rel1.diamond.add rel2.diamond.sub)
-        (Arith.add typ rel1.diamond.sub rel2.diamond.add)
+        (Arith.sub kind rel1.diamond.add rel2.diamond.sub)
+        (Arith.add kind rel1.diamond.sub rel2.diamond.add)
     (* X-Z = (X+Y) - (Y+Z) and X-Z = (X-Y) + (Y-Z) *)
     and sub =
       Ival.narrow
-        (Arith.sub typ rel1.diamond.add rel2.diamond.add)
-        (Arith.add typ rel1.diamond.sub rel2.diamond.sub)
+        (Arith.sub kind rel1.diamond.add rel2.diamond.add)
+        (Arith.add kind rel1.diamond.sub rel2.diamond.sub)
     in
     let diamond = {add; sub} in
     let pair, swap = Pair.make (fst rel1.vars) (snd rel2.vars) in
@@ -919,7 +950,7 @@ module State = struct
   let saturate state x y rel1 =
     try
       let y_related = Relations.find y state.relations in
-      let y_related = VariableSet.remove x y_related in
+      let y_related = Variable.Set.remove x y_related in
       let aux z state =
         state >>- fun state ->
         try
@@ -931,7 +962,7 @@ module State = struct
           add_diamond state pair diamond
         with Not_found -> `Value state
       in
-      VariableSet.fold aux y_related (`Value state)
+      Variable.Set.fold aux y_related (`Value state)
     with Not_found -> `Value state
 
   let add_octagon state octagon =
@@ -964,14 +995,14 @@ module State = struct
       let remove_one y state =
         try
           let yrelations = Relations.find y state.relations in
-          let yrelations = VariableSet.remove x yrelations in
+          let yrelations = Variable.Set.remove x yrelations in
           let relations = Relations.add y yrelations state.relations in
           let pair, _ = Pair.make x y in
           let octagons = Octagons.remove pair state.octagons in
           { state with octagons; relations }
         with Not_found -> state
       in
-      let state = VariableSet.fold remove_one relations state in
+      let state = Variable.Set.fold remove_one relations state in
       let relations = Relations.remove x state.relations in
       { state with relations }
     with Not_found -> state
@@ -987,7 +1018,7 @@ module State = struct
           (y, diamond) :: acc
         with Not_found -> acc
       in
-      VariableSet.fold aux related []
+      Variable.Set.fold aux related []
     with Not_found -> []
 
   (* x' = ±x - delta *)
@@ -1007,23 +1038,23 @@ module State = struct
               sub = op diamond.add }
           else diamond
         in
-        let typ = x.vtype in
+        let kind = Variable.kind x in
         let op = if swap then Arith.add else Arith.sub in
         let add =
           if Ival.(equal top diamond.add)
           then diamond.add
-          else Arith.sub typ diamond.add delta
+          else Arith.sub kind diamond.add delta
         and sub =
           if Ival.(equal top diamond.sub)
           then diamond.sub
-          else op typ diamond.sub delta
+          else op kind diamond.sub delta
         in
         let diamond' = { add; sub } in
         let octagons = Octagons.unsafe_add pair diamond' state.octagons in
         { state with octagons }
       with Not_found -> state
     in
-    VariableSet.fold aux x_related state
+    Variable.Set.fold aux x_related state
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -1067,21 +1098,23 @@ module Domain = struct
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
-          let octagons = State.related_octagons state x in
+          let var = Variable.make x in
+          let kind = Variable.kind var in
+          let octagons = State.related_octagons state var in
           let reduce acc (y, octagons) =
             let y_ival1 =
               if Ival.(equal top octagons.add)
               then Ival.top
-              else Arith.sub x.vtype octagons.add x_ival
+              else Arith.sub kind octagons.add x_ival
             in
             let y_ival2 =
               if Ival.(equal top octagons.sub)
               then Ival.top
-              else Arith.sub x.vtype x_ival octagons.sub
+              else Arith.sub kind x_ival octagons.sub
             in
             let y_ival = Ival.narrow y_ival1 y_ival2 in
             if Ival.(equal top y_ival) then acc else
-              let y_enode = Lval (Var y, NoOffset) in
+              let y_enode = Lval (Variable.lval y) in
               let y_expr = Cil.new_exp ~loc:expr.eloc y_enode in
               let y_cvalue = Cvalue.V.inject_ival y_ival in
               (y_expr, y_cvalue) :: acc
@@ -1095,7 +1128,8 @@ module Domain = struct
   let kill_base base state =
     try
       let varinfo = Base.to_varinfo base in
-      State.remove state varinfo
+      let vars = Variable.get_all varinfo in
+      List.fold_left State.remove state vars
     with Base.Not_a_C_variable -> state
 
   let kill zone state =
@@ -1135,7 +1169,8 @@ module Domain = struct
       match expr.enode with
       | Lval (Var varinfo, NoOffset)
         when Cil.isIntegralType varinfo.vtype ->
-        let intervals = Intervals.add varinfo ival state.intervals in
+        let var = Variable.make varinfo in
+        let intervals = Intervals.add var ival state.intervals in
         { state with intervals }
       | _ -> state
 
@@ -1157,7 +1192,7 @@ module Domain = struct
     try `Value (check "update" (valuation.Abstract_domain.fold aux state))
     with EBottom -> `Bottom
 
-  let assign_interval varinfo assigned state =
+  let assign_interval variable assigned state =
     if not infer_intervals
     then state
     else
@@ -1167,7 +1202,7 @@ module Domain = struct
         begin
           try
             let ival = Cvalue.V.project_ival v in
-            let intervals = Intervals.add varinfo ival state.intervals in
+            let intervals = Intervals.add variable ival state.intervals in
             { state with intervals }
           with Cvalue.V.Not_based_on_null -> state
         end
@@ -1177,15 +1212,16 @@ module Domain = struct
     let evaluate = evaluation_function valuation in
     (* TODO: redundant with rewrite_binop below. *)
     let vars = Rewriting.rewrite evaluate expr in
-    let equal_varinfo v = Variable.equal varinfo v.Rewriting.varinfo in
+    let variable = Variable.make varinfo in
+    let equal_varinfo v = Variable.equal variable v.Rewriting.var in
     let state =
       try
         let var = List.find equal_varinfo vars in
         let inverse = not var.Rewriting.sign in
-        State.sub_delta ~inverse state varinfo var.Rewriting.coeff
-      with Not_found -> State.remove state varinfo
+        State.sub_delta ~inverse state variable var.Rewriting.coeff
+      with Not_found -> State.remove state variable
     in
-    let state = assign_interval varinfo assigned state in
+    let state = assign_interval variable assigned state in
     let enode = Lval (Var varinfo, NoOffset) in
     let left_expr = Cil.new_exp ~loc:expr.eloc enode in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
@@ -1216,6 +1252,7 @@ module Domain = struct
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
+    let vars = List.flatten (List.map Variable.get_all vars) in
     List.fold_left State.remove state vars
 
   let start_call _stmt call recursion valuation state =
@@ -1251,7 +1288,8 @@ module Domain = struct
 
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
-    let state = List.fold_left State.remove state varinfos in
+    let vars = List.flatten (List.map Variable.get_all varinfos) in
+    let state = List.fold_left State.remove state vars in
     check "leave_scope" state
 
   let initialize_variable _lval _location ~initialized:_ _value state = state
@@ -1261,32 +1299,34 @@ module Domain = struct
     if intraprocedural ()
     then Base.SetLattice.empty
     else
+      let add_related_bases acc var =
+        let related = Relations.find var state.relations in
+        Variable.Set.fold
+          (fun var -> Base.Hptset.add (Variable.base var))
+          related acc
+      in
       let aux base acc =
         try
           let varinfo = Base.to_varinfo base in
-          let varset = Relations.find varinfo state.relations in
-          let baseset =
-            VariableSet.fold
-              (fun vi acc -> Base.Hptset.add (Base.of_varinfo vi) acc)
-              varset Base.Hptset.empty
-          in
-          Base.SetLattice.(join (inject baseset) acc)
+          let variables = Variable.get_all varinfo in
+          List.fold_left add_related_bases acc variables
         with Base.Not_a_C_variable | Not_found -> acc
       in
-      Base.Hptset.fold aux bases Base.SetLattice.empty
+      let hptset = Base.Hptset.fold aux bases Base.Hptset.empty in
+      Base.SetLattice.inject hptset
 
   let filter _kind bases state =
     if intraprocedural ()
     then state
     else
-      let mem_vi varinfo = Base.Hptset.mem (Base.of_varinfo varinfo) bases in
+      let mem_var var = Base.Hptset.mem (Variable.base var) bases in
       let mem_pair pair =
         let x, y = Pair.get pair in
-        mem_vi x && mem_vi y
+        mem_var x && mem_var y
       in
       let octagons = Octagons.filter mem_pair state.octagons in
-      let intervals = Intervals.filter mem_vi state.intervals in
-      let relations = Relations.filter mem_vi state.relations in
+      let intervals = Intervals.filter mem_var state.intervals in
+      let relations = Relations.filter mem_var state.relations in
       { state with octagons; intervals; relations; }
 
   let reuse =
