@@ -187,9 +187,8 @@ CONFIGS=
 
 # todo: adds aorai (2 configs + Aorai_test library)
 # todo: no test found for studia ?
-# todo: adds report, wp
 # todo: adds wp (config qualif)
-PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic
+PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
 PLUGIN_CONFIGS=
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)
