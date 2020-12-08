@@ -506,28 +506,39 @@ let copy_visit_gen fresh prj =
   in
   let temp_set_compinfo c new_c =
     Cil_datatype.Compinfo.Hashtbl.add compinfos c new_c;
-    List.iter2
-      (fun f new_f -> Cil_datatype.Fieldinfo.Hashtbl.add fieldinfos f new_f)
-      c.cfields new_c.cfields
+    match c.cfields, new_c.cfields with
+    | None, None -> ()
+    | Some c_flds, Some new_c_flds ->
+      List.iter2
+        (fun f new_f -> Cil_datatype.Fieldinfo.Hashtbl.add fieldinfos f new_f)
+        c_flds new_c_flds
+    | _ ->
+      Kernel.fatal "set_compinfo: structures or unions do not match"
   in
   let temp_set_orig_compinfo new_c c =
     Cil_datatype.Compinfo.Hashtbl.add orig_compinfos new_c c;
-    List.iter2
-      (fun new_f f ->
-         Cil_datatype.Fieldinfo.Hashtbl.add orig_fieldinfos new_f f)
-      new_c.cfields c.cfields
+    match new_c.cfields, c.cfields  with
+    | None, None -> ()
+    | Some new_c_flds, Some c_flds ->
+      List.iter2
+        (fun new_f f ->
+           Cil_datatype.Fieldinfo.Hashtbl.add orig_fieldinfos new_f f)
+        new_c_flds c_flds
+    | _ ->
+      Kernel.fatal "set_orig_compinfo: structures or unions do not match"
   in
   let temp_unset_compinfo c =
     Cil_datatype.Compinfo.Hashtbl.remove compinfos c;
     List.iter
-      (fun f -> Cil_datatype.Fieldinfo.Hashtbl.remove fieldinfos f) c.cfields
+      (fun f -> Cil_datatype.Fieldinfo.Hashtbl.remove fieldinfos f)
+      (Extlib.opt_conv [] c.cfields)
   in
   let temp_unset_orig_compinfo new_c =
     Cil_datatype.Compinfo.Hashtbl.remove orig_compinfos new_c;
     List.iter
       (fun new_f ->
          Cil_datatype.Fieldinfo.Hashtbl.remove orig_fieldinfos new_f)
-      new_c.cfields
+      (Extlib.opt_conv [] new_c.cfields)
   in
   let temp_memo_compinfo c =
     try Cil_datatype.Compinfo.Hashtbl.find compinfos c

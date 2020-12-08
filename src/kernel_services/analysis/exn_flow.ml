@@ -444,7 +444,7 @@ class erase_exn =
         let s = get_type_tag t in
         Kernel.debug ~dkey:Kernel.dkey_exn_flow
           "Registering %a as possible exn type" Cil_datatype.Typ.pretty t;
-        let fi = List.find (fun fi -> fi.fname = s) union.cfields in
+        let fi = List.find (fun fi -> fi.fname = s) (Extlib.the union.cfields) in
         Cil_datatype.Typ.Hashtbl.add exn_union t fi
       in
       Cil_datatype.Typ.Set.iter update_one_binding exns
@@ -454,7 +454,7 @@ class erase_exn =
     method private is_thrown t = Cil_datatype.Typ.Hashtbl.mem exn_enum t
 
     method private exn_field_off name =
-      List.find (fun fi -> fi.fname = name) (Extlib.the exn_struct).cfields
+      List.find (fun fi -> fi.fname = name) (Extlib.(the (the exn_struct).cfields))
 
     method private exn_field name =
       Var (Extlib.the exn_var), Field(self#exn_field_off name, NoOffset)

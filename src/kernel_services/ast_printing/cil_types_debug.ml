@@ -207,7 +207,7 @@ and pp_compinfo fmt compinfo =
       pp_string compinfo.corig_name
       pp_string compinfo.cname
       pp_int compinfo.ckey
-      (pp_list pp_fieldinfo) compinfo.cfields
+      (pp_option (pp_list pp_fieldinfo)) compinfo.cfields
       pp_attributes compinfo.cattr
       pp_bool compinfo.cdefined
       pp_bool compinfo.creferenced

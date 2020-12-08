@@ -47,7 +47,7 @@ and comp_ghost_status fmt lval =
   match Cil.typeOfLval lval with
   | TComp({ cfields }, _, _) ->
     Format.fprintf fmt "{ " ;
-    List.iter (field_ghost_status fmt lval) cfields ;
+    List.iter (field_ghost_status fmt lval) (Extlib.opt_conv [] cfields) ;
     Format.fprintf fmt " }"
   | _ -> assert false
 and field_ghost_status fmt lval f =

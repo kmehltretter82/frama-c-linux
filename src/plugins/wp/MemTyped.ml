@@ -204,7 +204,7 @@ and footprint_comp c =
   List.fold_left
     (fun ft f ->
        Heap.Set.union ft (footprint (object_of f.ftype))
-    ) Heap.Set.empty c.cfields
+    ) Heap.Set.empty (Extlib.opt_conv [] c.cfields)
 
 let init_footprint _ _ = Heap.Set.singleton T_init
 let value_footprint obj _l = footprint obj
@@ -227,7 +227,7 @@ and length_of_comp c =
   (* union field are considered as struct field *)
   List.fold_left
     (fun s f -> s + length_of_field f)
-    0 c.cfields
+    0 (Extlib.opt_conv [] c.cfields)
 
 let position_of_field f =
   let rec fnext k f = function
@@ -235,7 +235,7 @@ let position_of_field f =
     | g::gs ->
         if Fieldinfo.equal f g then k
         else fnext (k + length_of_field g) f gs
-  in fnext 0 f f.fcomp.cfields
+  in fnext 0 f (Extlib.the f.fcomp.cfields)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities on loc-as-term                                           --- *)
@@ -649,7 +649,7 @@ struct
     | C_int i -> A (I i)
     | C_float f -> A (F f)
     | C_pointer t -> A (P t)
-    | C_comp ( { cfields = [f] } as c ) ->
+    | C_comp ( { cfields = Some [f] } as c ) ->
         begin (* union having only one field is equivalent to a struct *)
           match Ctypes.object_of f.ftype with
           | C_array _ -> (if c.cstruct then S c else U c)
@@ -719,7 +719,7 @@ struct
 
   let clayout (c: Cil_types.compinfo) : layout =
     let flayout w f = rlayout w (Ctypes.object_of f.ftype) in
-    List.fold_left flayout [] (List.rev c.cfields)
+    List.fold_left flayout [] (List.rev (Extlib.the c.cfields))
 
   type comparison = Srem of layout | Drem of layout | Equal | Mismatch
 

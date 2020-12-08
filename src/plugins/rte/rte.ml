@@ -113,13 +113,13 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
         match typ with
         | TComp({cstruct = false; cfields} ,_,_) ->
           (match cfields with
-           | [] -> () (* empty union, supported by gcc with size 0.
+           | Some [] | None -> () (* empty union, supported by gcc with size 0.
                          Trivially initialized. *)
            | _ ->
              let llv =
                List.map
                  (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv)
-                 cfields
+                 (Extlib.opt_conv [] cfields)
              in
              if default then
                on_alarm ~invalid:false (Alarms.Uninitialized_union llv))

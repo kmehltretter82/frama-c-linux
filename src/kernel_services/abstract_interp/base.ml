@@ -41,7 +41,7 @@ type validity =
 let pretty_validity fmt v =
   match v with
   | Empty -> Format.fprintf fmt "Empty"
-  | Unknown (b,k,e)  -> 
+  | Unknown (b,k,e)  ->
       Format.fprintf fmt "Unknown %a/%a/%a"
 	Int.pretty b (Pretty_utils.pp_opt Int.pretty) k Int.pretty e
   | Known (b,e)  -> Format.fprintf fmt "Known %a-%a" Int.pretty b Int.pretty e
@@ -128,10 +128,10 @@ let null = Null
 
 let is_null x = match x with Null -> true | _ -> false
 
-let pretty fmt t = 
+let pretty fmt t =
   match t with
     | String (_, CSString s) -> Format.fprintf fmt "%S" s
-    | String (_, CSWstring s) -> 
+    | String (_, CSWstring s) ->
         Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
     | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
     | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
@@ -154,8 +154,8 @@ let typeof v =
   | Null -> None
   | Var (v,_) | Allocated(v,_,_) -> Some (unrollType v.vtype)
 
-let cstring_bitlength s = 
-  let u, l = 
+let cstring_bitlength s =
+  let u, l =
     match s with
     | CSString s ->
 	bitsSizeOf charType, (String.length s)
@@ -200,7 +200,7 @@ let () =
          (fun min max ->
 (* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
 (* the above is what we would like to write but it is too early *)
-	   let mul_CHAR_BIT = Int.mul Int.eight in 
+	   let mul_CHAR_BIT = Int.mul Int.eight in
             MinValidAbsoluteAddress.set
               (mul_CHAR_BIT (Int.of_string min));
             MaxValidAbsoluteAddress.set
@@ -257,8 +257,8 @@ let rec final_empty_struct = function
   | TComp (compinfo, _, _) ->
     begin
       match compinfo.cfields with
-      | [] -> true
-      | l ->
+      | Some [] | None -> true
+      | Some l ->
         let last_field = List.(hd (rev l)) in
         try Cil.bitsSizeOf last_field.ftype = 0
         with Cil.SizeOfError _ -> false

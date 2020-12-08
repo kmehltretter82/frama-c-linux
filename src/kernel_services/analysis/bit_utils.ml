@@ -280,7 +280,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                else
                  acc)
             []
-            compinfo.cfields
+            (Extlib.opt_conv [] compinfo.cfields)
           in
           (** find non covered intervals in structs *)
           let non_covered,succ_last =
@@ -303,7 +303,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                      (s,succ_stop_o)
                 )
                 (full_fields_to_print,start)
-                compinfo.cfields
+                (Extlib.opt_conv [] compinfo.cfields)
             else full_fields_to_print, Integer.zero
           in
           let overflowing =
@@ -462,7 +462,7 @@ type offset_match =
 let rec equal_type_no_attribute t1 t2 =
   match Cil.unrollType t1, Cil.unrollType t2 with
   | TVoid _, TVoid _ -> true
-  | TInt (i1, _), TInt (i2, _) -> i1 = i2 
+  | TInt (i1, _), TInt (i2, _) -> i1 = i2
   | TFloat (f1, _), TFloat (f2, _) -> f1 = f2
   | TPtr (t1, _), TPtr (t2, _) -> equal_type_no_attribute t1 t2
   | TArray (t1', s1, _, _), TArray (t2', s2, _, _) ->
@@ -577,7 +577,7 @@ let rec find_offset typ ~offset om =
                other fields are too far and we abort. *)
             find_field q
       in
-      find_field ci.cfields
+      find_field (Extlib.opt_conv [] ci.cfields)
 
     | _ -> raise NoMatchingOffset
 

@@ -903,7 +903,7 @@ struct
     | OBJ , _ , [Shift(te,k)] -> Some(te,k,obj)
     | OBJ , C_comp c , (Field fd :: ofs) ->
         begin
-          match List.rev c.cfields with
+          match List.rev (Extlib.the c.cfields) with
           | fd0::_ when Fieldinfo.equal fd fd0 ->
               last_field_shift acs (Ctypes.object_of fd.ftype) ofs
           | _ -> None
@@ -1055,7 +1055,7 @@ struct
           let ofs = ofs @ [Field f] in
           initialized_loc sigma obj x ofs
         in
-        Lang.F.p_conj (List.map mk_pred ci.cfields)
+        Lang.F.p_conj (List.map mk_pred (Extlib.the ci.cfields))
 
   and initialized_range sigma obj x ofs low up =
     match obj with
@@ -1140,7 +1140,7 @@ struct
         F.p_all
           (fun fd ->
              forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
-          cfields
+          (Extlib.the cfields)
     | TArray(elt,_,_,_) ->
         let k = Lang.freshvar Qed.Logic.Int in
         F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
@@ -1250,7 +1250,7 @@ struct
                  let bg = e_getfield b cg in
                  let eqg = p_forall ys (p_equal ag bg) in
                  eqg :: hs
-            ) hs f.fcomp.cfields
+            ) hs (Extlib.the f.fcomp.cfields)
 
       | Shift(_,e) :: ofs ->
           let y = Lang.freshvar ~basename:"k" Qed.Logic.Int in
@@ -1327,7 +1327,7 @@ struct
             let ofs = ofs @ [Field f] in
             monotonic_initialized seq obj x ofs
           in
-          Lang.F.p_conj (List.map mk_pred ci.cfields)
+          Lang.F.p_conj (List.map mk_pred (Extlib.the ci.cfields))
 
   let memvar_assigned seq obj loc v =
     match loc with

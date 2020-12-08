@@ -460,7 +460,7 @@ class markReachableVisitor
 
              (* to recurse, we must ask explicitly *)
              let recurse f = ignore (self#vtype f.ftype) in
-             List.iter recurse c.cfields;
+             List.iter recurse (Extlib.opt_conv [] c.cfields);
              self#visitAttrs attrs;
              self#visitAttrs c.cattr
            end;

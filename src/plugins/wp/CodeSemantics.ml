@@ -96,7 +96,7 @@ struct
     | C_comp c ->
         p_all
           (fun f -> is_zero sigma (Ctypes.object_of f.ftype) (M.field l f))
-          c.cfields
+          (Extlib.the c.cfields)
     | C_array a ->
         (*TODO[LC] make zero-initializers model-dependent.
                    For instance, a[N][M] becomes a[N*M] in MemTyped,
@@ -485,7 +485,7 @@ struct
         let acc = (* updated acc with default init of structure *)
           match ct with
           | TComp (cp,_,_) when cp.cstruct && (* not for union... *)
-                                (List.length initl) < (List.length cp.cfields) ->
+                                (List.length initl) < (List.length (Extlib.the cp.cfields)) ->
               (* default init for unintialized field of a struct *)
               List.fold_left
                 (fun acc f ->
@@ -501,7 +501,7 @@ struct
                          (Cil.addOffsetLval (Field(f, NoOffset)) lv)
                          f.ftype None in
                      init :: acc)
-                acc (List.rev cp.cfields)
+                acc (List.rev (Extlib.the cp.cfields))
 
           | _ -> acc
         in

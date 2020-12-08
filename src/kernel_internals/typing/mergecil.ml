@@ -1200,8 +1200,8 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     let ci = cinode.ndata in
     let fidx = cinode.nfidx in
 
-    let old_len = List.length oldci.cfields in
-    let len = List.length ci.cfields in
+    let old_len = List.length (Extlib.opt_conv [] oldci.cfields) in
+    let len = List.length (Extlib.opt_conv [] ci.cfields) in
     (* It is easy to catch here the case when the new structure is undefined
      * and the old one was defined. We just reuse the old *)
     (* More complicated is the case when the old one is not defined but the
@@ -1249,18 +1249,23 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
                      [%a] vs [%a]"
                     pp_attrs attrs pp_attrs oldattrs))
         in
-        List.iter2
-          (fun oldf f ->
-             checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
-             (* Make sure the types are compatible *)
-             (* Note: 6.2.7 §1 states that the names of the fields should be the
-                same. We do not force this for now, but could do it. *)
-             let newtype =
-               combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
-             in
-             (* Change the type in the representative *)
-             oldf.ftype <- newtype)
-          oldci.cfields ci.cfields
+        match oldci.cfields, ci.cfields with
+        | None, None -> ()
+        | Some old_flds, Some flds ->
+          List.iter2
+            (fun oldf f ->
+               checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
+               (* Make sure the types are compatible *)
+               (* Note: 6.2.7 §1 states that the names of the fields should be the
+                  same. We do not force this for now, but could do it. *)
+               let newtype =
+                 combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
+               in
+               (* Change the type in the representative *)
+               oldf.ftype <- newtype)
+            old_flds flds
+        | _ ->
+          Kernel.fatal "unmatching fields lists"
       with Failure reason ->
         (* Our assumption was wrong. Forget the isomorphism *)
         undo ();
@@ -2178,12 +2183,12 @@ class renameVisitorClass =
                   | f' :: _ when f' == f -> i
                   | _ :: rest -> indexOf (i + 1) rest
                 in
-                let index = indexOf 0 f.fcomp.cfields in
-                if List.length ci'.cfields <= index then
+                let index = indexOf 0 (Extlib.the f.fcomp.cfields) in
+                if List.length (Extlib.the ci'.cfields) <= index then
                   Kernel.fatal "Too few fields in replacement %s for %s"
                     (compFullName ci')
                     (compFullName f.fcomp);
-                let f' = List.nth ci'.cfields index in
+                let f' = List.nth (Extlib.the ci'.cfields) index in
                 ChangeDoChildrenPost (Field (f', o), fun x -> x)
               end
           end
@@ -2208,12 +2213,12 @@ class renameVisitorClass =
                   | f' :: _ when f' == f -> i
                   | _ :: rest -> indexOf (i + 1) rest
                 in
-                let index = indexOf 0 f.fcomp.cfields in
-                if List.length ci'.cfields <= index then
+                let index = indexOf 0 (Extlib.the f.fcomp.cfields) in
+                if List.length (Extlib.the ci'.cfields) <= index then
                   Kernel.fatal "Too few fields in replacement %s for %s"
                     (compFullName ci')
                     (compFullName f.fcomp);
-                let f' = List.nth ci'.cfields index in
+                let f' = List.nth (Extlib.the ci'.cfields) index in
                 ChangeDoChildrenPost (TField (f', o), fun x -> x)
               end
           end

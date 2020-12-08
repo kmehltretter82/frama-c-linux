@@ -897,7 +897,9 @@ module Base_checker = struct
         Compinfo.Hashtbl.add known_compinfos c c;
         Kernel.debug
           ~dkey:Kernel.dkey_check "Adding fields for type %s(%d)" c.cname c.ckey;
-        List.iter (fun x -> Fieldinfo.Hashtbl.add known_fields x x) c.cfields;
+        List.iter
+          (fun x -> Fieldinfo.Hashtbl.add known_fields x x)
+          (Extlib.opt_conv [] c.cfields);
         Cil.DoChildren
 
       method! vfieldinfo f =

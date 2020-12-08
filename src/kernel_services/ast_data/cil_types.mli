@@ -365,7 +365,7 @@ and compinfo = {
       files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
-  mutable cfields: fieldinfo list;
+  mutable cfields: fieldinfo list option;
   (** Information about the fields. Notice that each fieldinfo has a pointer
       back to the host compinfo. This means that you should not share
       fieldinfo's between two compinfo's *)

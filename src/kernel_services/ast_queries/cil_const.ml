@@ -110,7 +110,7 @@ let mkCompInfo
       corig_name = norig;
       cname = n;
       ckey = nextCompinfoKey ();
-      cfields = []; (* fields will be added afterwards. *)
+      cfields = None; (* fields will be added afterwards. *)
       cattr = a;
       creferenced = false;
       (* Make this compinfo undefined by default *)
@@ -131,7 +131,7 @@ let mkCompInfo
 	  foffset_in_bits = None;
 	  fpadding_in_bits = None;
 	}) (mkfspec comp) in
-  comp.cfields <- flds;
+  comp.cfields <- if flds <> [] then Some flds else None;
   if flds <> [] then comp.cdefined <- true;
   comp
 
@@ -140,12 +140,13 @@ let copyCompInfo ?(fresh=true) ci cname =
   let ckey = if fresh then nextCompinfoKey () else ci.ckey in
   let ci' = { ci with cname; ckey } in
   (* Copy the fields and set the new pointers to parents *)
-  ci'.cfields <- List.map (fun f -> {f with fcomp = ci'}) ci'.cfields;
+  ci'.cfields <-
+    Extlib.opt_map (List.map (fun f -> {f with fcomp = ci'})) ci'.cfields;
   ci'
 
 
 let make_logic_var_kind x kind typ =
-  {lv_name = x; lv_id = new_raw_id(); lv_type = typ; lv_kind = kind; 
+  {lv_name = x; lv_id = new_raw_id(); lv_type = typ; lv_kind = kind;
    lv_origin = None; lv_attr = [] }
 
 let make_logic_var_global x t = make_logic_var_kind x LVGlobal t
@@ -154,7 +155,7 @@ let make_logic_var_quant x t = make_logic_var_kind x LVQuant t
 let make_logic_var_local x t = make_logic_var_kind x LVLocal t
 
 let make_logic_var =
-  Kernel.deprecated "Cil_const.make_logic_var" 
+  Kernel.deprecated "Cil_const.make_logic_var"
     ~now:"Use one of Cil_const.make_logic_var_* to indicate \
           the origin of the variable"
     make_logic_var_quant
