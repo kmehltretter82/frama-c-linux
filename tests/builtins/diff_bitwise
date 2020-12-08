@@ -1,12 +1,3 @@
-diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_bitwise/Longinit_sequencer.res.oracle
-320c320
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_bitwise/Longinit_sequencer.sav
-556c556
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_bitwise/Longinit_sequencer.sav
 diff tests/builtins/oracle/allocated.0.res.oracle tests/builtins/oracle_bitwise/allocated.0.res.oracle
 260a261,263
 > [eva] tests/builtins/allocated.c:127: Call to builtin __fc_vla_alloc

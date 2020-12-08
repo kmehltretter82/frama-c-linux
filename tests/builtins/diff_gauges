@@ -1,12 +1,3 @@
-diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_gauges/Longinit_sequencer.res.oracle
-320c320
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_gauges/Longinit_sequencer.sav
-556c556
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_gauges/Longinit_sequencer.sav
 diff tests/builtins/oracle/linked_list.0.res.oracle tests/builtins/oracle_gauges/linked_list.0.res.oracle
 1122a1123,1128
 > [eva] computing for function printf_va_1 <- main.
