@@ -1,4 +1,6 @@
 /* run.config
-   #MODULE: with\ space/module.ml
-   OPT: 
+   MODULE: with\ space/module
+   OPT:
+COMMENT: TODO - dune migration has to be fixed
+DONTRUN:
  */
