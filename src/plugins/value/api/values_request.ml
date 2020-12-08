@@ -24,6 +24,11 @@ open Server
 open Data
 open Cil_types
 
+module Kmap = Kernel_function.Hashtbl
+module Smap = Cil_datatype.Stmt.Hashtbl
+module CS = Value_types.Callstack
+module CSmap = CS.Hashtbl
+
 module Md = Markdown
 module Jkf = Kernel_ast.Kf
 module Jki = Kernel_ast.Ki
@@ -87,14 +92,118 @@ let probe marker =
   | _ -> Pnone
 
 (* -------------------------------------------------------------------------- *)
+(* --- Stmt Ranking                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Ranking :
+sig
+  val stmt : stmt -> int
+  val kinstr : kinstr -> int
+  val sort : callstack list -> callstack list
+end =
+struct
+
+  class ranker =
+    object(self)
+      inherit Visitor.frama_c_inplace
+
+      val mutable rank = (-1)
+      val rmap = Smap.create 0
+      val fmark = Kmap.create 0
+      val fqueue = Queue.create ()
+
+      method private call kf =
+        if not (Kmap.mem fmark kf) then
+          begin
+            Kmap.add fmark kf () ;
+            Queue.push kf fqueue ;
+          end
+
+      method private newrank s =
+        let r = succ rank in
+        Smap.add rmap s r ;
+        rank <- r ; r
+
+      method! vlval lv =
+        begin
+          try match fst lv with
+            | Var vi -> self#call (Globals.Functions.get vi)
+            | _ -> ()
+          with Not_found -> ()
+        end ; Cil.DoChildren
+
+      method! vstmt_aux s =
+        ignore (self#newrank s) ;
+        Cil.DoChildren
+
+      method compute =
+        match Globals.entry_point () with
+        | kf , _ ->
+          let job kf =
+            ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
+          in begin
+            job kf ;
+            while not (Queue.is_empty fqueue) do
+              job (Queue.pop fqueue)
+            done
+          end
+        | exception Globals.No_such_entry_point _ -> ()
+
+      method rank s =
+        if rank < 0 then (rank <- 0 ; self#compute) ;
+        try Smap.find rmap s
+        with Not_found -> self#newrank s
+
+    end
+
+  let stmt = let rk = new ranker in rk#rank
+
+  let kinstr = function
+    | Kglobal -> 0
+    | Kstmt s -> stmt s
+
+  let rec ranks (rks : int list) (cs : callstack) : int list =
+    match cs with
+    | [] -> rks
+    | (_,Kglobal)::wcs -> ranks rks wcs
+    | (_,Kstmt s)::wcs -> ranks (stmt s :: rks) wcs
+
+  let order : int list -> int list -> int = Stdlib.compare
+
+  let sort (wcs : callstack list) : callstack list =
+    List.map fst @@
+    List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
+    List.map (fun cs -> cs , ranks [] cs) wcs
+
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module CS = Value_types.Callstack
-module CSmap = CS.Hashtbl
-
 module Jcallstack = Data.Index(Value_types.Callstack.Map)
     (struct let name = "eva-callstack-id" end)
+
+module Jcallsite : Data.S with type t = Value_types.call_site =
+struct
+  type t = kernel_function * kinstr
+  let jtype = Package.(Jrecord [
+      "fct" , Jkf.jtype ;
+      "stmt" , Jki.jtype ;
+      "rank" , Jnumber ;
+    ])
+  let to_json (kf,ki) = `Assoc [
+      "fct" , Jkf.to_json kf ;
+      "stmt" , Jki.to_json ki ;
+      "rank" , Jint.to_json (Ranking.kinstr ki) ;
+    ]
+  let of_json = function
+    | `Assoc fds ->
+      let kf = Jkf.of_json (List.assoc "fct" fds) in
+      let ki = Jki.of_json (List.assoc "stmt" fds) in
+      (kf,ki)
+    | _ -> failwith "Not a call-site"
+end
 
 module Jtruth : Data.S with type t = truth =
 struct
@@ -238,7 +347,10 @@ let () = Request.register ~package
     ~descr:(Md.plain "Callstacks for markers")
     ~input:(module Jstmt)
     ~output:(module Jlist(Jcallstack))
-    (fun stmt -> let module A = (val !proxy) in A.callstacks stmt)
+    begin fun stmt ->
+      let module A = (val !proxy) in
+      Ranking.sort (A.callstacks stmt)
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getCallstackInfo                                           --- *)
@@ -260,7 +372,7 @@ let () =
       (module Jstring) in
   let set_calls = Request.result getCallstackInfo ~name:"calls"
       ~descr:(Md.plain "Callers site, from last to first")
-      (module Jlist(Jpair(Jkf)(Jki))) in
+      (module Jlist(Jcallsite)) in
   Request.register_sig ~package getCallstackInfo
       ~kind:`GET ~name:"getCallstackInfo"
       ~descr:(Md.plain "Callstack Description")
@@ -268,6 +380,26 @@ let () =
         set_calls rq cs ;
         set_descr rq (Pretty_utils.to_string pretty cs) ;
       end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Request getStmtInfo                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let getStmtInfo = Request.signature ~input:(module Jstmt) () in
+  let set_fct = Request.result getStmtInfo ~name:"fct"
+      ~descr:(Md.plain "Englobing function")
+      (module Jkf) in
+  let set_rank = Request.result getStmtInfo ~name:"rank"
+      ~descr:(Md.plain "Global stmt order")
+      (module Jint) in
+  Request.register_sig ~package getStmtInfo
+    ~kind:`GET ~name:"getStmtInfo"
+    ~descr:(Md.plain "Stmt Information")
+    begin fun rq s ->
+      set_fct rq (Kernel_function.find_englobing_kf s) ;
+      set_rank rq (Ranking.stmt s) ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getProbeInfo                                               --- *)
