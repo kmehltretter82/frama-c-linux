@@ -604,7 +604,25 @@ end  = struct
       dc_execnow =
         scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
 
-  let split_list s = Str.split (Str.regexp "[ ,]+") s
+  let split_list = (* considers blanks (not preceded by '\'), tabs and commas as separators *)
+    let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
+    let sep_regexp = Str.regexp "[\t ,]+" in
+    fun s -> (* splits on '\ ' first then on ' ' or ',' *)
+      let r = List.fold_left (fun acc -> function
+          | Str.Text s -> List.rev_append (Str.full_split sep_regexp s) acc
+          | (Str.Delim _ as delim) -> delim::acc)
+          []
+          (Str.full_split nonsep_regexp s)
+      in
+      let add s (glue,prev,curr) = if glue then false,(s^prev),curr else false,s,(if prev = "" then curr else prev::curr) in
+      let acc = List.fold_left (fun ((_,prev,curr) as acc) -> function
+          | Str.Delim ("\\ " as nonsep) -> true,(nonsep^prev),curr (* restore '\ ' *)
+          | Str.Delim _ -> add "" acc (* separator *)
+          | Str.Text s -> add s acc) (false,"",[]) r
+      in
+      let _,_,res = (add "" acc) in
+      res
+
   let config_deps _dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_deps = (split_list s) @ current.dc_deps }
@@ -941,7 +959,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
   let deps = command.deps in
-  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes (or %d 1 4)" command.exit_code in
+  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes %d" command.exit_code in
   let command_string = basic_command_string command in
   Format.fprintf result_fmt
     "(rule ; TEST #%d OF TEST FILE %S\n  \
@@ -1024,7 +1042,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     (Filename.concat ".." (oracle_prefix ^ ".err.oracle"))
     errlog;
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name %s); (enabled_if (and true %a))\n\
+    "(alias (deps (alias %S)) (name %S); (enabled_if (and true %a))\n\
      )@."
     diff_alias
     ptests_alias
@@ -1153,14 +1171,15 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         let libraries = String.concat " " config.dc_libs in
         Format.fprintf result_fmt
           "(executable ; LIBRAIRIES #%d FOR TEST FILE %S\n  \
-           (name %s)\n  \
-           (modules %s)\n  \
+           (name %S)\n  \
+           (modules %S)\n  \
            (modes plugin)\n  \
            (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a %s)\n  \
            (flags -open Frama_c_kernel)\n\
            )@."
           n file
-          cmxs cmxs
+          cmxs
+          cmxs
           print_list (List.map (Format.sprintf "frama-c-%s.core") config.dc_plugins)
           libraries
       ) config.dc_cmxs;
