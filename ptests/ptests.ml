@@ -1218,9 +1218,10 @@ let () =
   let suites = Ptests_config.suites () in
   List.iter
     (fun suite ->
-       if !verbosity >= 1 then Format.printf "%% Test suite %s\n%!" suite;
        let directory = SubDir.create suite in
        let result_dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
+       if !verbosity >= 1 then Format.printf "%% Generates %S file for test suite %s%s ...\n%!"
+           result_dune_file suite (if !special_config = "" then "" else (" -config " ^ !special_config));
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
