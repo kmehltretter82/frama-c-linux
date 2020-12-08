@@ -20,5 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** generates a coverage summary of EVA's run*)
-val md_gen: unit -> Markdown.element list
+(** Only loaded when Eva is loaded. Nothing is exported, rather the module
+    does fill the functions of {!Md_gen.Eva_info}. *)

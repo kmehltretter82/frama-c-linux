@@ -210,6 +210,7 @@ Makefile.plugin.generated
 /src/plugins/gui/GSourceView2.ml
 /src/plugins/gui/GSourceView2.mli
 /src/plugins/gui/gtk_compat.ml
+/src/plugins/markdown-report/META
 
 # generated tar.gz files
 
