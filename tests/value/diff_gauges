@@ -1047,6 +1047,7 @@ diff tests/value/oracle/undefined_sequence.0.res.oracle tests/value/oracle_gauge
 > [eva] tests/value/undefined_sequence.i:43: starting to merge loop iterations
 101a103
 > [eva] tests/value/undefined_sequence.i:49: starting to merge loop iterations
+Only in tests/value/oracle: unit_tests.res.oracle
 diff tests/value/oracle/unroll.res.oracle tests/value/oracle_gauges/unroll.res.oracle
 13,14d12
 < [eva:alarm] tests/value/unroll.i:34: Warning: 

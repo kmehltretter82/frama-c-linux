@@ -1149,8 +1149,8 @@ diff tests/value/oracle/offsetmap.1.res.oracle tests/value/oracle_apron/offsetma
 >   b ∈ {0; 1}
 >   a7 ∈ {1}
 diff tests/value/oracle/partitioning-annots.4.res.oracle tests/value/oracle_apron/partitioning-annots.4.res.oracle
-14,15d13
-< [eva:alarm] tests/value/partitioning-annots.c:134: Warning: 
+15,16d14
+< [eva:alarm] tests/value/partitioning-annots.c:138: Warning: 
 <   division by zero. assert j ≢ 0;
 diff tests/value/oracle/precise_locations.res.oracle tests/value/oracle_apron/precise_locations.res.oracle
 32,35c32,47
@@ -1394,6 +1394,7 @@ diff tests/value/oracle/undefined_sequence.1.res.oracle tests/value/oracle_apron
 >   Called from tests/value/undefined_sequence.i:54.
 > [eva] Recording results for g
 > [eva] Done for function g
+Only in tests/value/oracle: unit_tests.res.oracle
 diff tests/value/oracle/unroll.res.oracle tests/value/oracle_apron/unroll.res.oracle
 13,14d12
 < [eva:alarm] tests/value/unroll.i:34: Warning: 
