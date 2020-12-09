@@ -23,13 +23,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let state_name ty i =
+  (* Data_for_aorai.getStateName (Integer.to_int i) *)
+  let open Cil_types in
+  let matching_enumitem ei =
+    match Cil.isInteger ei.eival with
+    | Some j -> Integer.equal i j
+    | None -> false
+  in
+  let find_enumitem e =
+    List.find_opt matching_enumitem e.eitems
+  in
+  let e = match ty with
+    | TEnum (e,_) -> Some e
+    | _ -> None
+  in
+  match Extlib.opt_bind find_enumitem e with
+  | Some ei -> ei.eiorig_name
+  | None -> Integer.to_string i
+
 let show_aorai_variable state fmt var_name =
-  let vi = Data_for_aorai.(get_varinfo var_name) in
+  let vi = Globals.Vars.find_from_astinfo var_name Cil_types.VGlobal in
+  let ty = Globals.Types.find_type Logic_typing.Enum Data_for_aorai.states in
   let cvalue = !Db.Value.eval_expr state (Cil.evar vi) in
   try
     let i = Ival.project_int (Cvalue.V.project_ival cvalue) in
-    let state_name = Data_for_aorai.getStateName (Integer.to_int i) in
-    Format.fprintf fmt "%s" state_name
+    Format.fprintf fmt "%s" (state_name ty i)
   with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int |
        Z.Overflow | Not_found ->
     Format.fprintf fmt "?"
