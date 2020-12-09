@@ -1,12 +1,12 @@
 /*run.config
-  STDOPT: #"-machdep x86_16"
-  STDOPT: #"-machdep x86_32"
-  STDOPT: #"-machdep x86_64"
-  STDOPT: #"-machdep gcc_x86_16"
-  STDOPT: #"-machdep gcc_x86_32"
-  STDOPT: #"-machdep gcc_x86_64"
-  STDOPT: #"-machdep ppc_32"
-  STDOPT: #"-machdep msvc_x86_64"
+  STDOPT: +"-machdep x86_16"
+  STDOPT: +"-machdep x86_32"
+  STDOPT: +"-machdep x86_64"
+  STDOPT: +"-machdep gcc_x86_16"
+  STDOPT: +"-machdep gcc_x86_32"
+  STDOPT: +"-machdep gcc_x86_64"
+  STDOPT: +"-machdep ppc_32"
+  STDOPT: +"-machdep msvc_x86_64"
 */
 #include <sys/types.h>
 #include <stdint.h>
