@@ -1,0 +1,22 @@
+/* -------------------------------------------------------------------------- */
+/* --- Styling Values                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-probe {
+    margin: 8px;
+}
+
+.eva-probe-label {
+    min-width: 50px;
+    text-align: right;
+}
+
+.eva-probe-code {
+    background: lightgrey;
+    min-width: 120px;
+    width: auto;
+    border: thin solid black;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: 4px;
+}

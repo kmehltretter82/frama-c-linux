@@ -4,9 +4,11 @@
 
 // React & Dome
 import React from 'react';
-import { Vfill } from 'dome/layout/boxes';
+import { Vfill, Hpack } from 'dome/layout/boxes';
+import { Label, Code } from 'dome/controls/labels';
 
 // External Libs
+import { debounce } from 'lodash';
 import { AutoSizer } from 'react-virtualized';
 
 // Frama-C
@@ -15,21 +17,23 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 // Plugins
-import * as Values from 'frama-c/api/plugins/eva/values'
+import * as Values from 'frama-c/api/plugins/eva/values';
+
+// CSS
+import './style.css';
 
 /* --------------------------------------------------------------------------*/
 /* --- Utilities                                                          ---*/
 /* --------------------------------------------------------------------------*/
 
 type callback = () => void;
-interface Size { width: number; height: number };
+interface Size { width: number; height: number }
 
 /* --------------------------------------------------------------------------*/
 /* --- Cell Properties                                                    ---*/
 /* --------------------------------------------------------------------------*/
 
-interface CellProps extends Size {
-}
+type CellProps = Size;
 
 /* --------------------------------------------------------------------------*/
 /* --- Row Properties                                                     ---*/
@@ -47,15 +51,51 @@ interface RowProps {
 /* --- Probe State                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
-class Probe {
+const Ka = 'A'.charCodeAt(0);
+const Kz = 'Z'.charCodeAt(0);
 
+class Probe {
   marker: Readonly<string>;
-  transient: boolean;
+  transient = true;
+
+  // labeling
+  static La = Ka;
+  static Lk = 0;
+  static newLabel() {
+    const a = Probe.La;
+    const k = Probe.Lk;
+    const lbl = String.fromCharCode(a);
+    if (a < Kz) {
+      Probe.La++;
+    } else {
+      Probe.La = Ka;
+      Probe.Lk++;
+    }
+    return k > 0 ? lbl + k : lbl;
+  }
+
+  // the undefined values means not-a-probe
+  label?: string;
+  code?: string;
+  stmt?: string;
 
   constructor(marker: string) {
     this.marker = marker;
-    this.transient = true;
   }
+
+  async requestProbeInfo(): Promise<void> {
+    return Server
+      .send(Values.getProbeInfo, this.marker)
+      .then(({ code, stmt }) => {
+        this.code = code;
+        this.stmt = stmt;
+        this.label = code ? 'Focus' : undefined;
+      })
+      .catch(() => {
+        this.code = '(error)';
+      });
+  }
+
 }
 
 /* --------------------------------------------------------------------------*/
@@ -66,10 +106,12 @@ class VState {
 
   constructor() {
     this.forceUpdate = this.forceUpdate.bind(this);
+    this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
+    this.setWidth = debounce(this.setWidth.bind(this), 600);
   }
 
-  //--- Probes
+  // --- Probes
   private focused?: Probe;
   private probes = new Map<string, Probe>();
 
@@ -78,40 +120,63 @@ class VState {
     if (!p) {
       p = new Probe(m);
       this.probes.set(m, p);
+      p.requestProbeInfo().then(this.forceLayout);
     }
     return p;
   }
 
-  setFocused(m: string | undefined) {
-    const p = m ? this.getProbe(m) : undefined;
-    const q = this.focused;
-    if (p !== q) {
-      this.focused = p;
+  focus(m: string | undefined): Probe | undefined {
+    if (m) {
+      const p = this.getProbe(m);
+      if (p.stmt) this.focused = p;
+    }
+    return this.focused;
+  }
+
+  // --- Rows
+
+  private width = 0;
+  private rows?: RowProps[];
+
+  forceLayout() {
+    this.rows = undefined;
+    this.forceUpdate();
+  }
+
+  getRows(): RowProps[] {
+    if (this.rows === undefined) {
+      this.rows = [];
+    }
+    return this.rows;
+  }
+
+  // Debounced
+  setWidth(width: number) {
+    if (this.width !== width) {
+      this.width = width;
       this.forceUpdate();
-      return;
     }
   }
 
-  //--- Rows
-
-  getRows(): RowProps[] { return []; }
-
-  //--- Force Reload (empty caches)
+  // --- Force Reload (empty caches)
   forceReload() {
+    this.probes.forEach((p) => {
+      if (p.transient && p !== this.focused) {
+        this.probes.delete(p.marker);
+      } else {
+        p.requestProbeInfo().then(this.forceUpdate);
+      }
+    });
 
   }
 
-  //--- Force Updating (re-render)
-  private age = 0;
+  // --- Force Updating (re-render)
   private signal?: callback;
-
-  getAge() { return this.age; }
 
   bind(age: number, setAge: (a: number) => void) {
     const next = age < 0xFFFF ? 1 + age : 0;
-    this.age = age;
     this.signal = () => setAge(next);
-    return () => { this.signal = undefined; }
+    return () => { this.signal = undefined; };
   }
 
   forceUpdate() {
@@ -126,14 +191,19 @@ class VState {
 // --------------------------------------------------------------------------
 
 interface ProbePanelProps {
-  age: number;
-  marker: string | undefined;
+  age?: number;
+  label?: string;
+  code?: string;
 }
 
 function ProbePanel(props: ProbePanelProps) {
-  return (
-    <div>MARKER {props.marker ?? '(none)'}@{props.age}</div>
-  );
+  const { label, code } = props;
+  return code ? (
+    <Hpack className="eva-probe">
+      {label && <Label className="eva-probe-label">{label}:</Label>}
+      {code && <Code className="eva-probe-code">{code}</Code>}
+    </Hpack>
+  ) : null;
 }
 
 // --------------------------------------------------------------------------
@@ -141,8 +211,8 @@ function ProbePanel(props: ProbePanelProps) {
 // --------------------------------------------------------------------------
 
 interface ValuesPanelProps {
-  marker: string | undefined;
-  rows: RowProps[];
+  age: number;
+  vstate: VState;
 }
 
 function ValuesPanel(_props: ValuesPanelProps) {
@@ -164,24 +234,29 @@ function ValuesPanel(_props: ValuesPanelProps) {
 // --------------------------------------------------------------------------
 
 // WARNING: MUST HAVE SINGLE USE
-function useVState(): VState {
-  const vstate = React.useMemo(() => new VState(), [VState]);
+function useVState(): [number, VState] {
+  const vstate = React.useMemo(() => new VState(), []);
   const [age, setAge] = React.useState(0);
-  React.useEffect(() => vstate.bind(age, setAge), [age, setAge]);
+  React.useEffect(() => vstate.bind(age, setAge), [vstate, age, setAge]);
   Server.useSignal(Values.changed, vstate.forceReload);
-  return vstate;
+  return [age, vstate];
 }
 
 function ValuesComponent() {
-  const vstate = useVState();
+  const [age, vstate] = useVState();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
+  const probe = vstate.focus(marker);
   return (
     <>
       <TitleBar />
       <Vfill>
-        <ProbePanel marker={marker} age={vstate.getAge()} />
-        <ValuesPanel marker={marker} rows={vstate.getRows()} />
+        <ProbePanel
+          key="probe"
+          label={probe?.label}
+          code={probe?.code}
+        />
+        <ValuesPanel key="values" age={age} vstate={vstate} />
       </Vfill>
     </>
   );
