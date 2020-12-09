@@ -135,41 +135,77 @@ let macro_frama_c_only = "@frama-c-exe@ @DEFAULT_OPTIONS@"
 let macro_frama_c_cmd = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
 let macro_frama_c = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
 
+  (** the files in [suites] whose name matches
+      the pattern [test_file_regexp] will be considered as test files *)
+let test_file_regexp = ".*\\.\\(c\\|i\\)$"
+
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
      Build the dune files allowing running the test suite contained into a directory (defaults to ./tests).@ @ \
      @[<v 1>\
-     Some variables can be used in test directives:@  \
-     @@PTEST_CONFIG@@    \
-     # test configuration suffix@  \
-     @@PTEST_FILE@@      \
-     # substituted by the test filename@  \
-     @@PTEST_DIR@@       \
-     # dirname of the test file@  \
-     @@PTEST_NAME@@      \
-     # basename of the test file@  \
-     @@PTEST_NUMBER@@    \
-     # test command number@  \
-     @@DEFAULT_OPTIONS@@ \
-     # the default option list: %s@  \
-     @@PLUGIN@@          \
-     # the current list of plugins set by the PLUGIN directive@]@.@.\
+     Directives:@  \
+     COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
+     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern (defaults to: %s).@]@  \
+     DONTRUN:            @[<v 0># Ignores the file.@]@  \
+     EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
+                                                    # Note: the textual targets are compared to oracles.@]@  \
+     DEPS: <file>...     @[<v 0># Adds a dependency to all sub-test and execnow commands.@ \
+                                # Notes: a dependency to the included file can be added with this directive.@ \
+                                # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
+     LOG: <file>...      @[<v 0># Defines dune targets built by the next sub-test command.@]@  \
+     CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
+     OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
+     STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
+     STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
+     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the @@PLUGIN@@ variable used to define the '-load-plugins' option into the @@PLUGIN_OPTIONS@@ variable.@]@  \
+     CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
+     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the @@PLUGIN_OPTIONS@@ variable.@]@  \
+     LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
+     EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
+     FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
+                                # The oracle will be compared from the standard output of the command: <cmd> <test-output-file>.@ \
+                                # Note: in such a command, the @@PTEST_LOG@@ variable is set to the basename of the oracle.@ \
+                                # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
+                                #    FILTER: diff ../oracle_configuration/@@PTEST_LOG@@ @]@  \
+     TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
+     NOFRAMAC:           @[<v 0># ??.@]@  \
+     GCC:                @[<v 0># Deprecated.@]@  \
+     MACRO: <name> <def> @[<v 0># set a definition to the variable @@<name>@@.@]@  \
+     @]@ \
+     @[<v 1>\
+     Some predefined variables can be used in test directives:@  \
+     @@PTEST_CONFIG@@    # Test configuration suffix.@  \
+     @@PTEST_FILE@@      # Substituted by the test filename.@  \
+     @@PTEST_DIR@@       # Dirname of the test file.@  \
+     @@PTEST_NAME@@      # Basename of the test file.@  \
+     @@PTEST_NUMBER@@    # Test command number.@  \
+     @@DEFAULT_OPTIONS@@ # The default option list: %s@  \
+     @@PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
+     @]@ \
      @[<v 1>\
      Other variables can only be used in test commands (CMD and EXECNOW directives):@  \
-     @@PLUGIN_OPTIONS@@          \
-     # the current list of options related to PLUGIN, MODULE and LIBS to load@  \
-     @@OPTIONS@@      \
-     # the current list of options related to OPT and STDOPT directives (for CMD directives)@  \
-     @@frama-c-exe@@ \
-     # shortcut defined as follow: %s@  \
-     @@frama-c-only@@ \
-     # shortcut defined as follow: %s@  \
-     @@frama-c@@      \
-     # shortcut defined as follow: %s@  \
-     @@frama-c-cmd@@  \
-     # shortcut defined as follow: %s@  \
-     @]@ @]"
+     @@PLUGIN_OPTIONS@@ # The current list of options related to PLUGIN, MODULE and LIBS to load.@  \
+     @@OPTIONS@@        # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
+     @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
+     @@frama-c-only@@   # Shortcut defined as follow: %s@  \
+     @@frama-c@@        # Shortcut defined as follow: %s@  \
+     @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
+     @]@ \
+     @[<v 1>\
+     Dune aliases related to the test:@  \
+     @@ptests                         # Tests all configuration.@  \
+     @@ptests_config                  # Tests only the default configuration.@  \
+     @@ptests_config_<configuration>  # Tests only the specified <configuration>.@  \
+     @@<PTEST_FILE>                   # Force to reproduce the corresponding test and prints the outputs.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show     # Prints related sub-test command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show  # Prints related execnow command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.diff          # Prints the difference from the related oracles.@  \
+     Note: 'dune build @<alias>' can be restricted to a test subdirectory in using:@  \
+     - 'dune build @<subdirectory>/<alias>'@  \
+     @]@ \
+     @]"
+    test_file_regexp
     macro_default_options
     macro_frama_c_exe
     macro_frama_c_only
@@ -183,7 +219,7 @@ let rec argspec =
     "-v", Arg.Unit (fun () -> incr verbosity),
     " Increase verbosity (up to  twice)" ;
     "-make", Arg.String (fun s -> do_make := s;),
-    "<command> Use command instead of make";
+    "<command> Use command instead of make (DEPRECATED)";
     "-config", Arg.Set_string special_config,
     " <name> Use special configuration and oracles";
   ]
@@ -436,10 +472,12 @@ type execnow =
     ex_log: string list; (** log files *)
     ex_bin: string list; (** bin files *)
     ex_dir: SubDir.t;    (** directory of test suite *)
+    ex_timeout: string;
+
+    (* DEPRECATED FEATURE *)
     ex_once: bool;       (** true iff the command has to be executed only once
                              per config file (otherwise it is executed for
                              every file of the test suite) *)
-    ex_timeout: string;
   }
 
 
@@ -516,10 +554,6 @@ end  = struct
   let filename = "test_config"
   let filename = config_name filename
 
-  (** the files in [suites] whose name matches
-      the pattern [test_file_regexp] will be considered as test files *)
-  let test_file_regexp = ".*\\.\\(c\\|i\\)$"
-
   let default_toplevel = "@frama-c@ @OPTIONS@"
   let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; exit_code=None; macros=config.dc_macros; logs=[]; timeout=""} ]
   let default_config =
@@ -541,7 +575,9 @@ end  = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~once dir ex_timeout (s:string) =
+  let scan_execnow ~file ~once dir ex_timeout (s:string) =
+    if once=false then
+      Format.eprintf "%s: using EXEC directive (DEPRECATED): %s\n%!" file s;
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -556,19 +592,25 @@ end  = struct
       try
         Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
           (fun cmd ->
+             (* It should be better to use a specific macro into the command (such as @MAKE@) for that. *)
+             Format.eprintf "%s: EXEC%s directive with a make command (DEPRECATED): %s\n%!" file (if once then "NOW" else "") cmd;
              let s = aux ({ s with ex_cmd = cmd; }) in
              { s with ex_cmd = !do_make^" "^cmd; } )
       with Scanf.Scan_failure _ ->
         s
     in
-    aux
-      { ex_cmd = s;
-        ex_log = [];
-        ex_bin = [];
-        ex_dir = dir;
-        ex_once = once;
-        ex_timeout;
-      }
+    let execnow = aux
+        { ex_cmd = s;
+          ex_log = [];
+          ex_bin = [];
+          ex_dir = dir;
+          ex_once = once;
+          ex_timeout;
+        }
+    in
+    if execnow.ex_log = [] && execnow.ex_bin = [] then
+      Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s\n%!" file (if once then "NOW" else "") s;
+    execnow
 
   let make_custom_opts =
     let space = Str.regexp " " in
@@ -598,11 +640,11 @@ end  = struct
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
 
-  let config_exec ~file:_ ~once dir s current =
+  let config_exec ~file ~once dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with
       dc_execnow =
-        scan_execnow ~once dir current.dc_timeout s :: current.dc_execnow }
+        scan_execnow ~file ~once dir current.dc_timeout s :: current.dc_execnow }
 
   let split_list = (* considers blanks (not preceded by '\'), tabs and commas as separators *)
     let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
@@ -728,7 +770,9 @@ end  = struct
          { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~file:_ _ _ acc -> acc);
+      (fun ~file _ _ acc ->
+         Format.eprintf "%s: GCC directive (seprecated)\n%!" file;
+         acc);
 
       "COMMENT",
       (fun ~file:_ _ _ acc -> acc);

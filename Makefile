@@ -216,7 +216,7 @@ clean-tests: purge-tests
 	rm -rf _build/default/tests
 
 PTESTS=./ptests.exe
-PTESTS=./ptests.exe -v
+#PTESTS=./ptests.exe -v
 
 tests.info:
 	echo $(TEST_CONFIGS)
