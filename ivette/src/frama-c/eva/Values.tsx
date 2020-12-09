@@ -4,6 +4,7 @@
 
 // React & Dome
 import React from 'react';
+import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -21,7 +22,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
 
-import { callback, VState } from './vmodel';
+import { callback, Size, VState } from './vmodel';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -53,25 +54,42 @@ function ProbePanel(props: ProbePanelProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Values Row
+// --------------------------------------------------------------------------
+
+interface ValuesRowProps {
+  style: React.CSSProperties;
+  index: number;
+  data: VState;
+}
+
+function ValuesRow(props: ValuesRowProps) {
+  const h = props.data.getRowHeight(props.index);
+  return (<div style={props.style}>#{props.index} : {h}</div>);
+}
+
+// --------------------------------------------------------------------------
 // --- Values Panel
 // --------------------------------------------------------------------------
 
-interface ValuesPanelProps {
-  age: number;
+interface ValuesPanelProps extends Size {
   vstate: VState;
 }
 
-function ValuesPanel(_props: ValuesPanelProps) {
+function ValuesPanel(props: ValuesPanelProps) {
+  const { vstate, width, height } = props;
+  const rows = vstate.layout(width);
   return (
-    <Vfill>
-      <AutoSizer>
-        {({ width, height }) => (
-          <div style={{ width, height }}>
-            SIZE {width} x {height} (W/H)
-          </div>
-        )}
-      </AutoSizer>
-    </Vfill>
+    <VariableSizeList
+      itemCount={rows}
+      itemKey={vstate.getRowKey}
+      itemSize={vstate.getRowHeight}
+      width={width}
+      height={height}
+      itemData={vstate}
+    >
+      {ValuesRow}
+    </VariableSizeList>
   );
 }
 
@@ -80,32 +98,38 @@ function ValuesPanel(_props: ValuesPanelProps) {
 // --------------------------------------------------------------------------
 
 // WARNING: MUST HAVE SINGLE USE
-function useVState(): [number, VState] {
+function useVState(): VState {
   const vstate = React.useMemo(() => new VState(), []);
   const [age, setAge] = React.useState(0);
   React.useEffect(() => vstate.bind(age, setAge), [vstate, age, setAge]);
   Server.useSignal(Values.changed, vstate.forceReload);
-  return [age, vstate];
+  return vstate;
 }
 
 function ValuesComponent() {
-  const [age, vstate] = useVState();
+  const vstate = useVState();
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
   const probe = vstate.focus(marker);
+  const makeWindow = (size: Size) => (
+    <ValuesPanel vstate={vstate} {...size} />
+  );
   return (
     <>
       <TitleBar />
       <Vfill>
         <ProbePanel
-          key="probe"
           transient={probe?.transient}
           label={probe?.label}
           code={probe?.code}
           onPersistent={probe?.setPersistent}
           onTransient={probe?.setTransient}
         />
-        <ValuesPanel key="values" age={age} vstate={vstate} />
+        <Vfill>
+          <AutoSizer>
+            {makeWindow}
+          </AutoSizer>
+        </Vfill>
       </Vfill>
     </>
   );

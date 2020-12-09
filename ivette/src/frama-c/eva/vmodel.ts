@@ -28,17 +28,23 @@ export interface Size { width: number; height: number }
 /* --- Cell Properties                                                    ---*/
 /* --------------------------------------------------------------------------*/
 
-type CellProps = Size;
-
 /* --------------------------------------------------------------------------*/
 /* --- Row Properties                                                     ---*/
 /* --------------------------------------------------------------------------*/
 
 export type RowKind = 'probes' | 'values' | 'callstack';
 
-interface RowProps extends Size {
+export class Row {
+
+  key: string;
   kind: RowKind;
-  cells: CellProps[];
+  height = 0;
+
+  constructor(kind: RowKind, key: string) {
+    this.key = key;
+    this.kind = kind;
+  }
+
 }
 
 /* --------------------------------------------------------------------------*/
@@ -136,7 +142,9 @@ export class VState implements StateCallbacks {
     this.forceUpdate = this.forceUpdate.bind(this);
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
-    this.setWidth = debounce(this.setWidth.bind(this), 600);
+    this.layout = debounce(this.layout.bind(this), 600);
+    this.getRowKey = this.getRowKey.bind(this);
+    this.getRowHeight = this.getRowHeight.bind(this);
   }
 
   // --- Probes
@@ -164,26 +172,38 @@ export class VState implements StateCallbacks {
   // --- Rows
 
   private width = 0;
-  private rows?: RowProps[];
+  private rows?: Row[];
 
   forceLayout() {
     this.rows = undefined;
     this.forceUpdate();
   }
 
-  getRows(): RowProps[] {
-    if (this.rows === undefined) {
-      this.rows = [];
+  private computeRows(): Row[] {
+    let { rows } = this;
+    if (rows === undefined) {
+      // eslint-disable-next-line no-multi-assign
+      this.rows = rows = [];
+
     }
-    return this.rows;
+    return rows;
+  }
+
+  getRowKey(index: number): string {
+    return this.computeRows()[index].key;
+  }
+
+  getRowHeight(index: number): number {
+    return this.computeRows()[index].height;
   }
 
   // Debounced
-  setWidth(width: number) {
+  layout(width: number): number {
     if (this.width !== width) {
       this.width = width;
-      this.forceUpdate();
+      this.forceLayout();
     }
+    return this.computeRows().length;
   }
 
   // --- Force Reload (empty caches)
