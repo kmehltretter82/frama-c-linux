@@ -55,6 +55,7 @@
   "dependencies": {
     "@babel/runtime": "^7.9.2",
     "@fortawesome/fontawesome-free": "^5.13.1",
+    "@types/react-window": "^1.8.2",
     "codemirror": "^5.52.2",
     "cytoscape": "^3.15.1",
     "cytoscape-cola": "^2.3.1",
@@ -72,6 +73,7 @@
     "react-draggable": "^4.2.0",
     "react-fast-compare": "^3.2.0",
     "react-virtualized": "^9.21.2",
+    "react-window": "^1.8.6",
     "source-map-support": "^0.5.16",
     "tippy.js": "5.2.1",
     "zeromq": "^6.0.0-beta.5"
