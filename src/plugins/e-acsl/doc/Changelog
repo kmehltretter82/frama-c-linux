@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-  E-ACSL       [2020-12-09] Add RTL support for Windows.
 -  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
                 can be compiled and used from sources.
 

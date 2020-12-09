@@ -587,11 +587,13 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   int i;
   for (i = 0; i < get_safe_locations_count(); i++) {
     memory_location * loc = get_safe_location(i);
-    void *addr = (void*)loc->address;
-    uintptr_t len = loc->length;
-    eacsl_store_block(addr, len);
-    if (loc->is_initialized)
-      eacsl_initialize(addr, len);
+    if (loc->is_on_static) {
+      void *addr = (void*)loc->address;
+      uintptr_t len = loc->length;
+      eacsl_store_block(addr, len);
+      if (loc->is_initialized)
+        eacsl_initialize(addr, len);
+    }
   }
   init_infinity_values();
 }

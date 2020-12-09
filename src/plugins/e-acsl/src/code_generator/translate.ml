@@ -135,7 +135,11 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
             None
             new_ty
             (fun v _ ->
-               [ Smart_stmt.lib_call ~loc ~result:(Cil.var v) fname [ e ] ])
+               [ Smart_stmt.rtl_call ~loc
+                   ~result:(Cil.var v)
+                   ~prefix:""
+                   fname
+                   [ e ] ])
         in
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
@@ -297,7 +301,7 @@ and context_insensitive_term_to_exp kf env t =
           kf
           ~name:vname
           (Some t)
-          (fun _ ev -> [ Smart_stmt.lib_call ~loc name [ ev; e ] ])
+          (fun _ ev -> [ Smart_stmt.rtl_call ~loc ~prefix:"" name [ ev; e ] ])
       in
       e, env, C_number, ""
     else if Gmp_types.Q.is_t ty then
@@ -326,7 +330,10 @@ and context_insensitive_term_to_exp kf env t =
     let e2, env = term_to_exp kf env t2 in
     if Gmp_types.Z.is_t ty then
       let name = name_of_mpz_arith_bop bop in
-      let mk_stmts _ e = [ Smart_stmt.lib_call ~loc name [ e; e1; e2 ] ] in
+      let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
+                             ~prefix:""
+                             name
+                             [ e; e1; e2 ] ] in
       let name = Misc.name_of_binop bop in
       let _, e, env =
         Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
@@ -371,7 +378,7 @@ and context_insensitive_term_to_exp kf env t =
             p
         in
         Env.add_assert kf cond p;
-        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -429,7 +436,7 @@ and context_insensitive_term_to_exp kf env t =
             (fun vi _e ->
                let result = Cil.var vi in
                let fname = "__gmpz_fits_ulong_p" in
-               [ Smart_stmt.lib_call ~loc ~result fname [ e2 ] ])
+               [ Smart_stmt.rtl_call ~loc ~result ~prefix:"" fname [ e2 ] ])
         in
         e, env
       in
@@ -459,7 +466,7 @@ and context_insensitive_term_to_exp kf env t =
         in
         let result = Cil.var vi in
         let name = "__gmpz_get_ui" in
-        let instr = Smart_stmt.lib_call ~loc ~result name [ e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~result ~prefix:"" name [ e2 ] in
         [ coerce_guard_cond; instr ]
       in
       let name = e2_name ^ bop_name ^ "_coerced" in
@@ -478,7 +485,10 @@ and context_insensitive_term_to_exp kf env t =
       (* Create the shift instruction *)
       let mk_shift_instr result_e =
         let name = name_of_mpz_arith_bop bop in
-        Smart_stmt.lib_call ~loc name [ result_e; e1; e2_as_bitcnt_e ]
+        Smart_stmt.rtl_call ~loc
+          ~prefix:""
+          name
+          [ result_e; e1; e2_as_bitcnt_e ]
       in
 
       (* Put t in an option to use with comparison_to_exp and
@@ -569,7 +579,7 @@ and context_insensitive_term_to_exp kf env t =
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
         let name = name_of_mpz_arith_bop bop in
-        let instr = Smart_stmt.lib_call ~loc name [ e; e1; e2 ] in
+        let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ instr ]
       in
       let name = Misc.name_of_binop bop in
@@ -648,7 +658,11 @@ and context_insensitive_term_to_exp kf env t =
           (Some t)
           (Misc.cty (Extlib.the li.l_type))
           (fun vi _ ->
-             [ Smart_stmt.lib_call ~loc ~result:(Cil.var vi) fname args ])
+             [ Smart_stmt.rtl_call ~loc
+                 ~result:(Cil.var vi)
+                 ~prefix:""
+                 fname
+                 args ])
       else
         (* build the arguments and compute the integer_ty of the parameters *)
         let params_ty, args, env =
@@ -797,8 +811,9 @@ and comparison_to_exp
             ~name
             Cil.intType
             (fun v _ ->
-               [ Smart_stmt.lib_call ~loc
+               [ Smart_stmt.rtl_call ~loc
                    ~result:(Cil.var v)
+                   ~prefix:""
                    "__gmpz_cmp"
                    [ e1; e2 ] ])
         in

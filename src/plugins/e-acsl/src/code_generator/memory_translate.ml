@@ -159,8 +159,9 @@ let gmp_to_sizet ~loc kf env size p =
       sizet
       (fun vi _ ->
          [ Smart_stmt.runtime_check Smart_stmt.RTE kf guard p;
-           Smart_stmt.lib_call ~loc
+           Smart_stmt.rtl_call ~loc
              ~result:(Cil.var vi)
+             ~prefix:""
              "__gmpz_get_ui"
              [ size ] ])
   in

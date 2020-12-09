@@ -276,7 +276,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   temporal,weak-validity,stack-size:,heap-size:,rt-verbose,free-valid-address,
   external-assert:,validate-format-strings,no-trace,libc-replacements,
   with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
-  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:"
+  dlmalloc-compile-flags:,odlmalloc:,ar:,ranlib:,mbits:"
 SHORTOPTIONS="h,c,C,d:,D,o:,O:,v:,f,E:,L,M,l:,e:,g,q,s:,F:,m:,I:,G:,X,a:,T,k,V"
 # Prefix for an error message due to wrong arguments
 ERROR="ERROR parsing arguments:"
@@ -286,6 +286,7 @@ OPTION_CFLAGS=                           # Compiler flags
 OPTION_CPPFLAGS=                         # Preprocessor flags
 OPTION_LDFLAGS=                          # Linker flags
 OPTION_FRAMAC="frama-c"                  # Frama-C executable name
+OPTION_MBITS=                            # Which architecture to compile to
 OPTION_CC="gcc"                          # GCC executable name
 OPTION_AR="ar"                           # AR executable name
 OPTION_RANLIB="ranlib"                   # RANLIB executable name
@@ -684,6 +685,12 @@ do
       OPTION_OUTPUT_DLMALLOC="$1"
       shift;
     ;;
+    # Architecture selection
+    --mbits)
+      shift;
+      OPTION_MBITS="$1"
+      shift;
+    ;;
   esac
 done
 shift;
@@ -732,7 +739,11 @@ fi
 # Architecture-dependent flags. Since by default Frama-C uses 32-bit
 # architecture we need to make sure that same architecture is used for
 # instrumentation and for compilation.
-MACHDEPFLAGS="`getconf LONG_BIT`"
+if [ -n "$OPTION_MBITS" ]; then
+  MACHDEPFLAGS="$OPTION_MBITS"
+else
+  MACHDEPFLAGS="`getconf LONG_BIT`"
+fi
 # Check if getconf gives out the value accepted by Frama-C/GCC
 echo "$MACHDEPFLAGS" | grep '16\|32\|64' 2>&1 >/dev/null \
   || error "$MACHDEPFLAGS-bit architecture not supported"
@@ -846,6 +857,7 @@ if [ "$OPTION_DLMALLOC_FROM_SOURCES" = "1" -o \
   fi
 
   DLMALLOC_FLAGS="\
+    $GCCMACHDEP \
     -DHAVE_MORECORE=0 \
     -DHAVE_MMAP=1  \
     -DNO_MALLINFO=1 \

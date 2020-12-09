@@ -20,16 +20,12 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Get default definitions and macros e.g., PATH_MAX */
-// #ifndef _DEFAULT_SOURCE
-// # define _DEFAULT_SOURCE 1
-// #endif
-
 #include <limits.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
 
+#include "e_acsl_config.h"
 #include "e_acsl_rtl_io.h"
 #include "e_acsl_trace.h"
 
@@ -54,14 +50,18 @@ void raise_abort(const char *file, int line) {
 
 void private_abort_fail(const char * file, int line, char *fmt, ...) {
   va_list va;
+#if E_ACSL_OS_IS_LINUX
   sigset_t defer_abrt;
   sigemptyset(&defer_abrt);
   sigaddset(&defer_abrt,SIGABRT);
   sigprocmask(SIG_BLOCK,&defer_abrt,NULL);
+#endif // E_ACSL_OS_IS_LINUX
   va_start(va,fmt);
   rtl_veprintf(fmt, va);
   va_end(va);
+#if E_ACSL_OS_IS_LINUX
   sigprocmask(SIG_UNBLOCK,&defer_abrt,NULL);
+#endif // E_ACSL_OS_IS_LINUX
   raise_abort(file, line);
 }
 

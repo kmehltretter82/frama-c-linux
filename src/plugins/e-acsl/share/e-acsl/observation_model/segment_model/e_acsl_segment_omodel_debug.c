@@ -20,6 +20,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include "../../internals/e_acsl_bits.h"
 #include "../../internals/e_acsl_rtl_io.h"
 #include "e_acsl_segment_tracking.h"
 #include "e_acsl_shadow_layout.h"

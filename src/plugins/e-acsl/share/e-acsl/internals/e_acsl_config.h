@@ -22,39 +22,45 @@
 
 /*! ***********************************************************************
  * \file
+ * \brief Internal defines for E-ACSL set according to the current environment.
  *
- * Declaration of memory locations considered safe before a program starts.
- * Most of these should be declared somewhere in start procedures of c
- * and gcc libraries. One example of a safe location is errno.
-***************************************************************************/
+ * Instead of using complicated logic with predefined macros in the RTL, the
+ * logic should be done in this file and an E-ACSL specific define set to record
+ * the result of the logic.
+ */
 
-#ifndef E_ACSL_SAFE_LOCATIONS_H
-#define E_ACSL_SAFE_LOCATIONS_H
+#ifndef E_ACSL_CONFIG_H
+#define E_ACSL_CONFIG_H
 
-#include <stdint.h>
-#include <stddef.h>
+// OS detection
+//  - Assign values to specific OSes
+#define E_ACSL_OS_LINUX_VALUE 1
+#define E_ACSL_OS_WINDOWS_VALUE 2
+#define E_ACSL_OS_OTHER_VALUE 999
+//  - Declare defines to test for a specific OS
+/*!
+ * \brief True if the target OS is linux, false otherwise
+ */
+#define E_ACSL_OS_IS_LINUX E_ACSL_OS == E_ACSL_OS_LINUX_VALUE
+/*!
+ * \brief True if the target OS is windows, false otherwise
+ */
+#define E_ACSL_OS_IS_WINDOWS E_ACSL_OS == E_ACSL_OS_WINDOWS_VALUE
+/*!
+ * \brief True if the target OS is unknown, false otherwise
+ */
+#define E_ACSL_OS_IS_OTHER E_ACSL_OS == E_ACSL_OS_OTHER_VALUE
+//  - Check current OS
+#ifdef __linux__
+// Linux compilation
+# define E_ACSL_OS E_ACSL_OS_LINUX_VALUE
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+// Windows compilation
+# define E_ACSL_OS E_ACSL_OS_WINDOWS_VALUE
+#else
+// Other
+# define E_ACSL_OS E_ACSL_OS_OTHER_VALUE
+# error "Unsupported OS for E-ACSL RTL"
+#endif
 
-/*! Simple representation of a safe location */
-struct memory_location {
-  /*! Address */
-  uintptr_t address;
-  /*! Byte-length */
-  uintptr_t length;
-  /*! Notion of initialization */
-  int is_initialized;
-  /*! True if the address is on static memory, false if it is on dynamic
-      memory */
-  int is_on_static;
-};
-typedef struct memory_location memory_location;
-
-/*! Initialize the array of safe locations */
-void collect_safe_locations();
-
-/*! \return the number of safe locations collected */
-size_t get_safe_locations_count();
-
-/*! \return The i-th safe location collected */
-memory_location * get_safe_location(size_t i);
-
-#endif // E_ACSL_SAFE_LOCATIONS_H
+#endif // E_ACSL_CONFIG_H
