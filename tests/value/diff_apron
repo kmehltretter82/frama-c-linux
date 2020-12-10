@@ -1074,7 +1074,7 @@ diff tests/value/oracle/loopinv.res.oracle tests/value/oracle_apron/loopinv.res.
 >      3 To be validated
 >     12 Total
 diff tests/value/oracle/memexec.res.oracle tests/value/oracle_apron/memexec.res.oracle
-27,32c27,50
+29,34c29,52
 < [eva] tests/value/memexec.c:13: Reusing old results for call to f11
 < [eva] tests/value/memexec.c:14: Reusing old results for call to f11
 < [eva] tests/value/memexec.c:16: Reusing old results for call to f11
@@ -1106,21 +1106,21 @@ diff tests/value/oracle/memexec.res.oracle tests/value/oracle_apron/memexec.res.
 >   Called from tests/value/memexec.c:21.
 > [eva] Recording results for f11
 > [eva] Done for function f11
-106c124,127
+108c126,129
 < [eva] tests/value/memexec.c:113: Reusing old results for call to f5_aux
 ---
 > [eva] computing for function f5_aux <- f5 <- main.
 >   Called from tests/value/memexec.c:113.
 > [eva] Recording results for f5_aux
 > [eva] Done for function f5_aux
-129c150,153
+131c152,155
 < [eva] tests/value/memexec.c:137: Reusing old results for call to f7_1
 ---
 > [eva] computing for function f7_1 <- f7 <- main.
 >   Called from tests/value/memexec.c:137.
 > [eva] Recording results for f7_1
 > [eva] Done for function f7_1
-144c168,171
+146c170,173
 < [eva] tests/value/memexec.c:150: Reusing old results for call to f8_1
 ---
 > [eva] computing for function f8_1 <- f8 <- main.
