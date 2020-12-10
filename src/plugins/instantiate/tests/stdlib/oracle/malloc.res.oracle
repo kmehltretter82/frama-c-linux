@@ -204,15 +204,15 @@ int *malloc_int(size_t size)
 int main(void)
 {
   int __retres;
-  int *pi = malloc_int(sizeof(int) * (unsigned int)10);
-  float *pf = malloc_float(sizeof(float) * (unsigned int)10);
-  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned int)10);
-  char *pc = malloc_char((unsigned int)10);
-  int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned int)10);
+  int *pi = malloc_int(sizeof(int) * (unsigned long)10);
+  float *pf = malloc_float(sizeof(float) * (unsigned long)10);
+  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned long)10);
+  char *pc = malloc_char((unsigned long)10);
+  int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned long)10);
   struct Flex *f =
-    malloc_st_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
-  void *v = malloc(sizeof(char) * (unsigned int)10);
-  struct incomplete *inc = malloc((unsigned int)10);
+    malloc_st_Flex(sizeof(struct Flex) + (unsigned long)3 * sizeof(int));
+  void *v = malloc(sizeof(char) * (unsigned long)10);
+  struct incomplete *inc = malloc((unsigned long)10);
   __retres = 0;
   return __retres;
 }
@@ -420,15 +420,15 @@ int *malloc_int(size_t size)
 int main(void)
 {
   int __retres;
-  int *pi = malloc_int(sizeof(int) * (unsigned int)10);
-  float *pf = malloc_float(sizeof(float) * (unsigned int)10);
-  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned int)10);
-  char *pc = malloc_char((unsigned int)10);
-  int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned int)10);
+  int *pi = malloc_int(sizeof(int) * (unsigned long)10);
+  float *pf = malloc_float(sizeof(float) * (unsigned long)10);
+  struct X *px = malloc_st_X(sizeof(struct X) * (unsigned long)10);
+  char *pc = malloc_char((unsigned long)10);
+  int (*pa)[10] = malloc_arr10_int(sizeof(int [10]) * (unsigned long)10);
   struct Flex *f =
-    malloc_st_Flex(sizeof(struct Flex) + (unsigned int)3 * sizeof(int));
-  void *v = malloc(sizeof(char) * (unsigned int)10);
-  struct incomplete *inc = malloc((unsigned int)10);
+    malloc_st_Flex(sizeof(struct Flex) + (unsigned long)3 * sizeof(int));
+  void *v = malloc(sizeof(char) * (unsigned long)10);
+  struct incomplete *inc = malloc((unsigned long)10);
   __retres = 0;
   return __retres;
 }

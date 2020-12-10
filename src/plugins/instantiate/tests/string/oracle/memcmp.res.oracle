@@ -48,14 +48,14 @@ int memcmp_int(int const *s1, int const *s2, size_t len)
 int integer(int * /*[10]*/ s1, int * /*[10]*/ s2)
 {
   int tmp;
-  tmp = memcmp_int(s1,s2,(unsigned int)10 * sizeof(int));
+  tmp = memcmp_int(s1,s2,(unsigned long)10 * sizeof(int));
   return tmp;
 }
 
 int with_named(named * /*[10]*/ s1, named * /*[10]*/ s2)
 {
   int tmp;
-  tmp = memcmp_int(s1,s2,(unsigned int)10 * sizeof(named));
+  tmp = memcmp_int(s1,s2,(unsigned long)10 * sizeof(named));
   return tmp;
 }
 
@@ -86,26 +86,26 @@ int memcmp_st_X(struct X const *s1, struct X const *s2, size_t len)
 int structure(struct X * /*[10]*/ s1, struct X * /*[10]*/ s2)
 {
   int tmp;
-  tmp = memcmp_st_X(s1,s2,(unsigned int)10 * sizeof(struct X));
+  tmp = memcmp_st_X(s1,s2,(unsigned long)10 * sizeof(struct X));
   return tmp;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
     requires
       valid_read_s2:
-        \let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
     ensures
       equals:
-        \let __fc_len = len / 4;
+        \let __fc_len = len / 8;
           \result ≡ 0 ⇔
           (∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(s1 + j0) ≡ *(s2 + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
-            (indirect: *(s2 + (0 .. len / 4 - 1)));
+      \from (indirect: *(s1 + (0 .. len / 8 - 1))),
+            (indirect: *(s2 + (0 .. len / 8 - 1)));
  */
 int memcmp_ptr_int(int * const *s1, int * const *s2, size_t len)
 {
@@ -117,7 +117,7 @@ int memcmp_ptr_int(int * const *s1, int * const *s2, size_t len)
 int pointers(int ** /*[10]*/ s1, int ** /*[10]*/ s2)
 {
   int tmp;
-  tmp = memcmp_ptr_int(s1,s2,(unsigned int)10 * sizeof(int *));
+  tmp = memcmp_ptr_int(s1,s2,(unsigned long)10 * sizeof(int *));
   return tmp;
 }
 
@@ -151,32 +151,32 @@ int memcmp_arr10_int(int const (*s1)[10], int const (*s2)[10], size_t len)
 int nested(int (*s1)[10], int (*s2)[10], int n)
 {
   int tmp;
-  tmp = memcmp_arr10_int(s1,s2,(unsigned int)n * sizeof(int [10]));
+  tmp = memcmp_arr10_int(s1,s2,(unsigned long)n * sizeof(int [10]));
   return tmp;
 }
 
 int with_void(void *s1, void *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned int)10);
+  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)10);
   return tmp;
 }
 
 int with_incomplete(struct incomplete *s1, struct incomplete *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned int)n);
+  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)n);
   return tmp;
 }
 
 void with_null_or_int(int * /*[10]*/ p)
 {
-  memcmp((void const *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memcmp((void const *)p,(void const *)0,(unsigned int)10 * sizeof(int));
+  memcmp((void const *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memcmp((void const *)p,(void const *)0,(unsigned long)10 * sizeof(int));
   memcmp((void const *)((int const *)42),(void const *)p,
-         (unsigned int)10 * sizeof(int));
+         (unsigned long)10 * sizeof(int));
   memcmp((void const *)p,(void const *)((int const *)42),
-         (unsigned int)10 * sizeof(int));
+         (unsigned long)10 * sizeof(int));
   return;
 }
 
@@ -221,7 +221,7 @@ int integer(int *s1, int *s2)
 {
   int tmp;
   tmp = memcmp_int((int const *)s1,(int const *)s2,
-                   (unsigned int)10 * sizeof(int));
+                   (unsigned long)10 * sizeof(int));
   return tmp;
 }
 
@@ -229,7 +229,7 @@ int with_named(named *s1, named *s2)
 {
   int tmp;
   tmp = memcmp_int((int const *)s1,(int const *)s2,
-                   (unsigned int)10 * sizeof(named));
+                   (unsigned long)10 * sizeof(named));
   return tmp;
 }
 
@@ -262,27 +262,27 @@ int structure(struct X *s1, struct X *s2)
 {
   int tmp;
   tmp = memcmp_st_X((struct X const *)s1,(struct X const *)s2,
-                    (unsigned int)10 * sizeof(struct X));
+                    (unsigned long)10 * sizeof(struct X));
   return tmp;
 }
 
-/*@ requires aligned_end: len % 4 ≡ 0;
+/*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
     requires
       valid_read_s2:
-        \let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1));
+        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
     ensures
       equals:
-        \let __fc_len = \old(len) / 4;
+        \let __fc_len = \old(len) / 8;
           \result ≡ 0 ⇔
           (∀ ℤ j0;
              0 ≤ j0 < __fc_len ⇒ *(\old(s1) + j0) ≡ *(\old(s2) + j0));
     assigns \result;
     assigns \result
-      \from (indirect: *(s1 + (0 .. len / 4 - 1))),
-            (indirect: *(s2 + (0 .. len / 4 - 1)));
+      \from (indirect: *(s1 + (0 .. len / 8 - 1))),
+            (indirect: *(s2 + (0 .. len / 8 - 1)));
  */
 int memcmp_ptr_int(int * const *s1, int * const *s2, size_t len)
 {
@@ -295,7 +295,7 @@ int pointers(int **s1, int **s2)
 {
   int tmp;
   tmp = memcmp_ptr_int((int * const *)s1,(int * const *)s2,
-                       (unsigned int)10 * sizeof(int *));
+                       (unsigned long)10 * sizeof(int *));
   return tmp;
 }
 
@@ -331,32 +331,32 @@ int nested(int (*s1)[10], int (*s2)[10], int n)
 {
   int tmp;
   tmp = memcmp_arr10_int((int const (*)[10])s1,(int const (*)[10])s2,
-                         (unsigned int)n * sizeof(int [10]));
+                         (unsigned long)n * sizeof(int [10]));
   return tmp;
 }
 
 int with_void(void *s1, void *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned int)10);
+  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)10);
   return tmp;
 }
 
 int with_incomplete(struct incomplete *s1, struct incomplete *s2, int n)
 {
   int tmp;
-  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned int)n);
+  tmp = memcmp((void const *)s1,(void const *)s2,(unsigned long)n);
   return tmp;
 }
 
 void with_null_or_int(int *p)
 {
-  memcmp((void const *)0,(void const *)p,(unsigned int)10 * sizeof(int));
-  memcmp((void const *)p,(void const *)0,(unsigned int)10 * sizeof(int));
+  memcmp((void const *)0,(void const *)p,(unsigned long)10 * sizeof(int));
+  memcmp((void const *)p,(void const *)0,(unsigned long)10 * sizeof(int));
   memcmp((void const *)((int const *)42),(void const *)p,
-         (unsigned int)10 * sizeof(int));
+         (unsigned long)10 * sizeof(int));
   memcmp((void const *)p,(void const *)((int const *)42),
-         (unsigned int)10 * sizeof(int));
+         (unsigned long)10 * sizeof(int));
   return;
 }
 
