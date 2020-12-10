@@ -45,7 +45,7 @@ digraph "job" {
   { rank=same; A005; _011; }
   _011 -> A005 [ arrowhead="tee" ];
   _012 [ shape="record",
-    label="<_p1> 0..31: D32|<_p2> 32..127: D32[3]|<_p3> 128..223: D32[3]|<_p4> 224..319: D32[3]|<_p5> 320..351: D32"
+    label="<_p1> 0..63: D64|<_p2> 64..255: D64[3]|<_p3> 256..447: D64[3]|<_p4> 448..639: D64[3]|<_p5> 640..703: D64"
   ];
   _012:_p5 -> A010 [ style="dotted" ];
   _012:_p4 -> A008 [ style="dotted" ];
@@ -82,7 +82,7 @@ digraph "job" {
   _020:_p1 -> A014:w [ taillabel="*", labelangle="+30", color="red" ];
   A009 -> _020:w [ arrowhead="tee" ];
   A010 [ label="D", shape="oval" ];
-  _021 [ label="roots:&fb+320", style="filled", color="lightblue",
+  _021 [ label="roots:&fb+640", style="filled", color="lightblue",
     shape="box"
   ];
   { rank=same; A010; _021; }
@@ -122,7 +122,7 @@ digraph "job" {
   _030:_p1 -> A022 [ style="dotted" ];
   A014 -> _030:w [ arrowhead="tee" ];
   A015 [ label="", shape="oval" ];
-  _031 [ label="roots:&fb+320", style="filled", color="lightblue",
+  _031 [ label="roots:&fb+640", style="filled", color="lightblue",
     shape="box"
   ];
   { rank=same; A015; _031; }
@@ -174,7 +174,7 @@ digraph "job" {
   _046 [ shape="record", label="Var float64" ];
   A022 -> _046:w [ arrowhead="tee" ];
   A023 [ label="W", shape="oval", fillcolor="green", style="filled" ];
-  _047 [ label="roots:&fb+320", style="filled", color="lightblue",
+  _047 [ label="roots:&fb+640", style="filled", color="lightblue",
     shape="box"
   ];
   { rank=same; A023; _047; }
@@ -182,7 +182,7 @@ digraph "job" {
   _048 [ shape="record", label="Var float64" ];
   A023 -> _048:w [ arrowhead="tee" ];
   A024 [ label="W", shape="oval", fillcolor="green", style="filled" ];
-  _049 [ label="roots:&fb+384", style="filled", color="lightblue",
+  _049 [ label="roots:&fb+704", style="filled", color="lightblue",
     shape="box"
   ];
   { rank=same; A024; _049; }
