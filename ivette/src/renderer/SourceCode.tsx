@@ -3,7 +3,6 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import _ from 'lodash';
 import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
@@ -36,22 +35,6 @@ import { THEMES, ThemeSC, FontSizeSC } from './Preferences';
 const D = new Dome.Debug('Source Code');
 
 // --------------------------------------------------------------------------
-// --- Rich Text Printer
-// --------------------------------------------------------------------------
-
-async function loadSourceCode(buffer: RichTextBuffer, sloc: source) {
-  const { file, line } = sloc;
-  try {
-    const content = await readFile(file);
-    buffer.setValue(content);
-    buffer.scroll(line);
-    buffer.getDoc().setCursor(line);
-  } catch (err) {
-    D.error(`Fail to load source code file ${file}.`);
-  }
-}
-
-// --------------------------------------------------------------------------
 // --- Source Code Printer
 // --------------------------------------------------------------------------
 
@@ -59,38 +42,51 @@ const SourceCode = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const [selection] = States.useSelection();
   const [theme, setTheme] = Settings.useGlobalSettings(ThemeSC);
   const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSizeSC);
   const [wrapText, flipWrapText] = Dome.useFlipSettings('SourceCode.wrapText');
 
   const markersInfo = States.useSyncArray(markerInfo);
-  const fcts = States.useSyncArray(functions).getArray();
+  const functionsData = States.useSyncArray(functions).getArray();
 
+  const [selection] = States.useSelection();
   const theFunction = selection?.current?.function;
-  const currentFunction = React.useRef<string | undefined>();
-
   const theMarker = selection?.current?.marker;
-  const currentMarker = React.useRef<string | undefined>();
 
-  // Hook: async loading
+  const currentFile = React.useRef<string>();
+
   React.useEffect(() => {
-    if (theMarker && currentMarker.current !== theMarker) {
-      currentMarker.current = theMarker;
-      const markerId = (theMarker as Json.key<'#markerInfo'>);
-      const markerIdInfo = markersInfo.getData(markerId);
-      if (markerIdInfo) {
-        loadSourceCode(buffer, markerIdInfo.sloc);
+    // Async source file loading and jump to line/location.
+    async function loadSourceCode(sloc?: source) {
+      if (sloc) {
+        const { file, line } = sloc;
+        try {
+          if (file !== currentFile.current) {
+            currentFile.current = file;
+            const content = await readFile(file);
+            buffer.setValue(content);
+          }
+          buffer.forEach((cm) => { cm.setCursor(line - 1); });
+        } catch (err) {
+          D.error(`Fail to load source code file ${file}.`);
+        }
       }
-    } else if (theFunction && currentFunction.current !== theFunction) {
-      currentFunction.current = theFunction;
-      const currentFunctionData = _.find(fcts, (e) => e.name === theFunction);
-      if (currentFunctionData) {
-        loadSourceCode(buffer, currentFunctionData.sloc);
-      }
-    } else
+    }
+    // Actual source code loading upon function or marker update.
+    const sloc =
+      /* Non-empty [selection] has defined either marker or function: we give
+         precedence to marker as it provides more precise source location. */
+      (theMarker &&
+        markersInfo.getData(theMarker as Json.key<'#markerInfo'>)?.sloc)
+      ??
+      (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
+    if (sloc) {
+      loadSourceCode(sloc);
+    } else {
+      currentFile.current = undefined;
       buffer.clear();
-  }, [buffer, fcts, markersInfo, theFunction, theMarker]);
+    }
+  }, [buffer, functionsData, markersInfo, theFunction, theMarker]);
 
   // Callbacks
   const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
@@ -139,9 +135,9 @@ const SourceCode = () => {
         lineWrapping={wrapText}
         selection={theMarker}
         lineNumbers={!!theFunction}
-        readOnly
         styleActiveLine={!!theFunction}
         extraKeys={{ 'Alt-F': 'findPersistent' }}
+        readOnly
       />
     </>
   );
