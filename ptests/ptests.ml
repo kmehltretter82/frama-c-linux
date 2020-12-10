@@ -771,7 +771,7 @@ end  = struct
 
       "GCC",
       (fun ~file _ _ acc ->
-         Format.eprintf "%s: GCC directive (seprecated)\n%!" file;
+         Format.eprintf "%s: GCC directive (DEPRECATED)\n%!" file;
          acc);
 
       "COMMENT",
