@@ -263,7 +263,7 @@ int main(void)
           "%" "E" "\\n" ,42.0,42.0,42.0); /* wprintf_va_4 */
   wprintf((wchar_t const *)L"%" "*" "d" " " "\\n" ,4,2); /* wprintf_va_5 */
   wprintf((wchar_t const *)L"%" "l" "s" " " "\\n" ,(wchar_t *)L"4" "2" ); /* wprintf_va_6 */
-  swprintf(wstring,(unsigned int)0x100,(wchar_t const *)L"%" "s" " " "=" " "
+  swprintf(wstring,(unsigned long)0x100,(wchar_t const *)L"%" "s" " " "=" " "
            "%" "d" ,(char *)L"4" "2" " " "+" " " "4" "2" ,42 + 42); /* swprintf_va_1 */
   wscanf((wchar_t const *)L"%" "l" "s" ,wstring); /* wscanf_va_1 */
   wscanf((wchar_t const *)L"%" "d" " " "%" "d" ,& i,& j); /* wscanf_va_2 */

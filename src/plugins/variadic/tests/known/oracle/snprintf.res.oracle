@@ -84,7 +84,7 @@ int main(void)
   int __retres;
   char data[100];
   size_t tmp_0;
-  memset((void *)(data),'A',(unsigned int)99);
+  memset((void *)(data),'A',(unsigned long)99);
   data[99] = (char)0;
   char dest[50] = {(char)'\000'};
   if (nondet) {

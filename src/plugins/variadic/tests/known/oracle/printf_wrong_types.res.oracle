@@ -438,12 +438,20 @@ int main(void)
   Incorrect type for argument 2. The argument will be cast from int to unsigned int.
 [variadic] tests/known/printf_wrong_types.c:21: 
   Translating call to printf to a call to the specialized version printf_va_4.
+[variadic] tests/known/printf_wrong_types.c:21: Warning: 
+  Incorrect type for argument 2. The argument will be cast from int to long.
 [variadic] tests/known/printf_wrong_types.c:22: 
   Translating call to printf to a call to the specialized version printf_va_5.
+[variadic] tests/known/printf_wrong_types.c:22: Warning: 
+  Incorrect type for argument 2. The argument will be cast from long to int.
 [variadic] tests/known/printf_wrong_types.c:23: 
   Translating call to printf to a call to the specialized version printf_va_6.
+[variadic] tests/known/printf_wrong_types.c:23: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned int to unsigned long.
 [variadic] tests/known/printf_wrong_types.c:24: 
   Translating call to printf to a call to the specialized version printf_va_7.
+[variadic] tests/known/printf_wrong_types.c:24: Warning: 
+  Incorrect type for argument 2. The argument will be cast from unsigned long to unsigned int.
 [variadic] tests/known/printf_wrong_types.c:25: 
   Translating call to printf to a call to the specialized version printf_va_8.
 [variadic] tests/known/printf_wrong_types.c:25: Warning: 
