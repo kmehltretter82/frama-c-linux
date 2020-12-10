@@ -130,29 +130,31 @@ const ASTview = () => {
 
   const propertyStatus = States.useSyncArray(Properties.status).getArray();
   const statusDict = States.useTags(Properties.propStatusTags);
+  const [edited, setEdited] = React.useState(false);
 
   React.useEffect(() => {
-    function setBullets() {
-      if (theFunction) {
-        propertyStatus.forEach((prop) => {
-          if (prop.function === theFunction) {
-            const status = statusDict.get(prop.status);
-            if (status) {
-              const bullet = makeBullet(status);
-              const markers = buffer.findTextMarker(prop.key);
-              markers.forEach((marker) => {
-                const pos = marker.find();
-                buffer.forEach((cm) => {
-                  cm.setGutterMarker(pos.from.line, 'bullet', bullet);
-                });
+    if (edited && theFunction) {
+      propertyStatus.forEach((prop) => {
+        if (prop.function === theFunction) {
+          const status = statusDict.get(prop.status);
+          if (status) {
+            const bullet = makeBullet(status);
+            const markers = buffer.findTextMarker(prop.key);
+            markers.forEach((marker) => {
+              const pos = marker.find();
+              buffer.forEach((cm) => {
+                cm.setGutterMarker(pos.from.line, 'bullet', bullet);
               });
-            }
+            });
           }
-        });
-      }
+        }
+      });
     }
-    buffer.on('change', setBullets);
-  }, [buffer, propertyStatus, statusDict, theFunction]);
+  }, [buffer, edited, theFunction, propertyStatus, statusDict]);
+
+  React.useEffect(() => {
+    buffer.on('edited', () => { setEdited(false); setEdited(true); });
+  }, [buffer]);
 
   // Hook: async loading
   React.useEffect(() => {
