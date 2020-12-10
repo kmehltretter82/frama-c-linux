@@ -453,7 +453,11 @@ struct
     | Iinit _ -> Sigs.Mlval (ilval c, KInit)
 
   let lookup s e =
-    try imval (Tmap.find e s.svar)
+    try
+      (* If the term is closed, any variable simplified to [e] can match. Thus,
+         we could return a variable that equals to [e] but is not really [e]. *)
+      if Lang.F.is_closed e then Sigs.Mterm
+      else imval (Tmap.find e s.svar)
     with Not_found -> M.lookup s.smem e
 
   let apply f s =

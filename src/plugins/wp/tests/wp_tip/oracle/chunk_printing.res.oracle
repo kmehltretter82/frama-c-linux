@@ -17,10 +17,10 @@ Assume {
   Stmt { L1:  }
   Stmt { x.a = `v;  }
   (* Call 'get_int' *)
-  Have: ((x@L1.F1_V_a) = `v) \/ (« y->a »@L1 = `v).
+  Have: ((x@L1.F1_V_a) = `v) \/ (« null->a »@L1 = `v).
   Stmt { x.b = `v_1;  }
   (* Call 'get_uint' *)
-  Have: ((x@L1.F1_V_b) = `v_1) \/ (« y->b »@L1 = `v_1).
+  Have: ((x@L1.F1_V_b) = `v_1) \/ (« null->b »@L1 = `v_1).
 }
 Prove: `x_2 = `x_1.
 
