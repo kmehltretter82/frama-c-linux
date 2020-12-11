@@ -73,11 +73,8 @@ let make_axiomatic_is_allocable loc () =
   let lv_i = Cil_const.make_logic_var_quant "i" Linteger in
   let t_i = tvar lv_i in
   let zero = tinteger 0 in
-  let max =
-    tinteger
-      (Integer.to_int
-         (Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ()))))
-  in
+  let max_value = Cil.max_unsigned_number (Cil.bitsSizeOf (size_t ())) in
+  let max = term ~loc (TConst (Integer (max_value, None))) Linteger in
   let label = FormalLabel("L") in
   let cond = pand (prel (Rlt, t_i, zero), prel (Rgt, t_i, max)) in
   let app = pnot (papp (is_allocable,[label],[t_i])) in

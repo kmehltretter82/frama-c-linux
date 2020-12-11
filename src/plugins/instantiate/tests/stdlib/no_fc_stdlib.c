@@ -1,6 +1,3 @@
-/* run.config
-  STDOPT: #"-machdep x86_32"
- */
 #include <stddef.h>
 
 void* malloc(size_t s);
