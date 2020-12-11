@@ -23,7 +23,13 @@
 
 .eva-probe-stmt {
     color: grey;
-    margin-left: 0px;
-    margin-right: 2px;
+    margin-left: 3px;
+    margin-right: 3px;
     margin-top: 3px;
+}
+
+.eva-sized-area {
+    padding: 3px;
+    white-space: pre;
+    overflow: visible;
 }

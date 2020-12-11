@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------
 
 // External Libs
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import equal from 'react-fast-compare';
 
 // Frama-C
@@ -23,11 +23,44 @@ export interface StateCallbacks {
   forceLayout: callback;
 }
 
-export interface Size { width: number; height: number }
-
 /* --------------------------------------------------------------------------*/
 /* --- Cell Properties                                                    ---*/
 /* --------------------------------------------------------------------------*/
+
+const LABEL = 12; /* number of chars for labels */
+const EMPTY = { width: 0, height: 0 };
+
+export interface Size { width: number; height: number }
+
+export function sizeof(text?: string): Size {
+  if (!text) return EMPTY;
+  const lines = text.split('\n');
+  return {
+    height: lines.length,
+    width: lines.reduce((w, l) => Math.max(w, l.length), 0),
+  };
+}
+
+export function merge(a: Size, b: Size): Size {
+  return {
+    width: Math.max(a.width, b.width),
+    height: Math.max(a.height, b.height),
+  };
+}
+
+export function addH(a: Size, b: Size, padding = 0): Size {
+  return {
+    width: a.width + b.width + padding,
+    height: Math.max(a.height, b.height),
+  };
+}
+
+export function addV(a: Size, b: Size, padding = 0): Size {
+  return {
+    width: Math.max(a.width, b.width),
+    height: a.height + b.height + padding,
+  };
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- Row Properties                                                     ---*/
@@ -39,11 +72,13 @@ export class Row {
 
   key: string;
   kind: RowKind;
+  size: Size;
   height = 0;
 
   constructor(kind: RowKind, key: string) {
     this.key = key;
     this.kind = kind;
+    this.size = EMPTY;
   }
 
 }
@@ -54,7 +89,6 @@ export class Row {
 
 const Ka = 'A'.charCodeAt(0);
 const Kz = 'Z'.charCodeAt(0);
-const LabelSize = 6;
 const LabelRing: string[] = [];
 let La = Ka;
 let Lk = 0;
@@ -116,7 +150,7 @@ export class Probe implements StateCallbacks {
   setPersistent() {
     if (this.transient && this.code) {
       this.transient = false;
-      if (this.code.length > LabelSize)
+      if (this.code.length > LABEL)
         this.label = newLabel();
       this.forceLayout();
     }
@@ -141,24 +175,45 @@ export class Probe implements StateCallbacks {
 
 export interface LayoutProps {
   zoom?: number;
-  width?: number;
+  wmax: number;
+  hmax: number;
 }
 
 class LayoutEngine {
 
   // --- Setup
 
-  /* private */ readonly zoom: number;
-  /* private */ readonly width: number;
-  private readonly rows: Row[] = [];
-  constructor(props?: LayoutProps) {
-    this.zoom = props?.zoom ?? 0;
-    this.width = props?.width ?? 0;
+  /* private */ readonly wcrop: number;
+  /* private */ readonly hcrop: number;
+  /* private */ readonly wmax: number;
+  /* private */ readonly hmax: number;
+  /* private */ readonly remanent?: Probe;
+
+  constructor(
+    props: undefined | LayoutProps,
+  ) {
+    const zoom = Math.max(0, props?.zoom ?? 0);
+    this.hcrop = zoom;
+    this.wcrop = LABEL + 2 * zoom;
+    this.wmax = props?.wmax ?? 80;
+    this.hmax = props?.hmax ?? 60;
   }
 
-  // --- Final Rows
+  // --- Buffer
 
-  flush() { return this.rows; }
+  private buffer?: Row;
+  private readonly rows: Row[] = [];
+
+  // --- Flushes current rows
+
+  flush() {
+    const p = this.buffer;
+    if (p) {
+      this.rows.push(p);
+      this.buffer = undefined;
+    }
+    return this.rows;
+  }
 
 }
 
@@ -173,13 +228,15 @@ export class VState implements StateCallbacks {
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
     this.computeLayout = this.computeLayout.bind(this);
-    this.setLayout = debounce(this.setLayout.bind(this), 600);
+    this.setLayout = throttle(this.setLayout.bind(this), 300);
     this.getRowKey = this.getRowKey.bind(this);
+    this.getRowCount = this.getRowCount.bind(this);
     this.getRowHeight = this.getRowHeight.bind(this);
   }
 
   // --- Probes
   private focused?: Probe;
+  private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
 
   getProbe(m: string): Probe {
@@ -195,7 +252,12 @@ export class VState implements StateCallbacks {
   focus(m: string | undefined): Probe | undefined {
     if (m) {
       const p = this.getProbe(m);
-      if (p.stmt) this.focused = p;
+      if (p.stmt) {
+        this.focused = p;
+        if (p.transient) this.remanent = p;
+      } else {
+        this.focused = undefined;
+      }
     }
     return this.focused;
   }
@@ -214,8 +276,14 @@ export class VState implements StateCallbacks {
   }
 
   private computeLayout() {
-    const engine = new LayoutEngine(this.layout);
+    const probes: Probe[] = [];
     this.forcedLayout = false;
+    this.probes.forEach((p) => {
+      if (p.code || !p.transient || p === this.remanent) {
+        probes.push(p);
+      }
+    });
+    const engine = new LayoutEngine(this.layout);
     this.rows = engine.flush();
     this.forceUpdate();
   }
@@ -234,7 +302,7 @@ export class VState implements StateCallbacks {
     return row ? row.height : 0;
   }
 
-  // --- Debounced
+  // --- Throttled
   setLayout(ly?: LayoutProps) {
     if (!equal(this.layout, ly)) {
       this.layout = ly;

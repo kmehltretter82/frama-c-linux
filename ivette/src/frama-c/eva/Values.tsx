@@ -22,7 +22,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
 
-import { callback, Size, VState } from './vmodel';
+import { VState, Size, callback, sizeof } from './vmodel';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -40,10 +40,13 @@ interface ProbePanelProps {
 
 function ProbePanel(props: ProbePanelProps) {
   const { transient = false, label, code, stmt } = props;
+  const { width, height } = sizeof(code);
   return code ? (
     <Hpack className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
-      <Code className="eva-probe-code">{code}</Code>
+      <div className="eva-probe-code">
+        <SizedArea width={width} height={height}>{code}</SizedArea>
+      </div>
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
         kind={transient ? 'positive' : 'negative'}
@@ -53,6 +56,71 @@ function ProbePanel(props: ProbePanelProps) {
       />
     </Hpack>
   ) : null;
+}
+
+// --------------------------------------------------------------------------
+// --- Value Cell
+// --------------------------------------------------------------------------
+
+class FontSizer {
+  a = 0;
+  b = 0;
+  k: number;
+  p: number;
+  constructor(k: number, p: number) {
+    this.k = k;
+    this.p = p;
+  }
+
+  push(x: number, y: number) {
+    const a0 = this.a;
+    const b0 = this.b;
+    if (x !== a0 && a0 !== 0) {
+      const k = (y - b0) / (x - a0);
+      const p = y - k * x;
+      this.k = Math.round(k);
+      this.p = Math.round(p);
+    }
+    this.a = x;
+    this.b = y;
+  }
+
+  capacity(y: number) {
+    return Math.round(0.5 + (y - this.p) / this.k);
+  }
+
+  compute(n: number) {
+    return this.p + n * this.k;
+  }
+
+}
+
+const WSIZER = new FontSizer(7, 6);
+const HSIZER = new FontSizer(14, 6);
+
+interface SizedAreaProps extends Size {
+  children?: React.ReactNode;
+}
+
+function SizedArea(props: SizedAreaProps) {
+  const { height, width, children } = props;
+  const refSizer = React.useCallback(
+    (ref: null | HTMLDivElement) => {
+      if (ref) {
+        const r = ref.getBoundingClientRect();
+        WSIZER.push(width, r.width);
+        HSIZER.push(height, r.height);
+      }
+    }, [height, width],
+  );
+  return (
+    <div
+      ref={refSizer}
+      className="eva-sized-area dome-text-code"
+    >
+      {children}
+    </div>
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -80,12 +148,18 @@ interface ValuesPanelProps extends Size {
 
 function ValuesPanel(props: ValuesPanelProps) {
   const { vstate, width, height } = props;
-  vstate.setLayout({ width });
+  const getRowHeight = React.useCallback(
+    (k: number) => HSIZER.compute(vstate.getRowHeight(k))
+    , [vstate]);
+  const wmax = WSIZER.capacity(width);
+  const hmax = HSIZER.capacity(height);
+  const layout = { wmax, hmax };
+  vstate.setLayout(layout);
   return (
     <VariableSizeList
       itemCount={vstate.getRowCount()}
       itemKey={vstate.getRowKey}
-      itemSize={vstate.getRowHeight}
+      itemSize={getRowHeight}
       width={width}
       height={height}
       itemData={vstate}
