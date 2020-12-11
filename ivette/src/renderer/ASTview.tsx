@@ -130,10 +130,9 @@ const ASTview = () => {
 
   const propertyStatus = States.useSyncArray(Properties.status).getArray();
   const statusDict = States.useTags(Properties.propStatusTags);
-  const [edited, setEdited] = React.useState(false);
 
-  React.useEffect(() => {
-    if (edited && theFunction) {
+  const setBullets = React.useCallback(() => {
+    if (theFunction) {
       propertyStatus.forEach((prop) => {
         if (prop.function === theFunction) {
           const status = statusDict.get(prop.status);
@@ -150,11 +149,12 @@ const ASTview = () => {
         }
       });
     }
-  }, [buffer, edited, theFunction, propertyStatus, statusDict]);
+  }, [buffer, theFunction, propertyStatus, statusDict]);
 
   React.useEffect(() => {
-    buffer.on('edited', () => { setEdited(false); setEdited(true); });
-  }, [buffer]);
+    buffer.on('change', setBullets);
+    return () => { buffer.off('change', setBullets); };
+  }, [buffer, setBullets]);
 
   // Hook: async loading
   React.useEffect(() => {
