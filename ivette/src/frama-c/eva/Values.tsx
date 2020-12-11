@@ -80,10 +80,10 @@ interface ValuesPanelProps extends Size {
 
 function ValuesPanel(props: ValuesPanelProps) {
   const { vstate, width, height } = props;
-  const rows = vstate.layout(width);
+  vstate.setLayout({ width });
   return (
     <VariableSizeList
-      itemCount={rows}
+      itemCount={vstate.getRowCount()}
       itemKey={vstate.getRowKey}
       itemSize={vstate.getRowHeight}
       width={width}

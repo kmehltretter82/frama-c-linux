@@ -4,6 +4,7 @@
 
 // External Libs
 import { debounce } from 'lodash';
+import equal from 'react-fast-compare';
 
 // Frama-C
 import * as Server from 'frama-c/server';
@@ -135,6 +136,33 @@ export class Probe implements StateCallbacks {
 }
 
 /* --------------------------------------------------------------------------*/
+/* --- Layout Algorithm                                                   ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface LayoutProps {
+  zoom?: number;
+  width?: number;
+}
+
+class LayoutEngine {
+
+  // --- Setup
+
+  /* private */ readonly zoom: number;
+  /* private */ readonly width: number;
+  private readonly rows: Row[] = [];
+  constructor(props?: LayoutProps) {
+    this.zoom = props?.zoom ?? 0;
+    this.width = props?.width ?? 0;
+  }
+
+  // --- Final Rows
+
+  flush() { return this.rows; }
+
+}
+
+/* --------------------------------------------------------------------------*/
 /* --- Values State                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
@@ -144,7 +172,8 @@ export class VState implements StateCallbacks {
     this.forceUpdate = this.forceUpdate.bind(this);
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
-    this.layout = debounce(this.layout.bind(this), 600);
+    this.computeLayout = this.computeLayout.bind(this);
+    this.setLayout = debounce(this.setLayout.bind(this), 600);
     this.getRowKey = this.getRowKey.bind(this);
     this.getRowHeight = this.getRowHeight.bind(this);
   }
@@ -173,39 +202,44 @@ export class VState implements StateCallbacks {
 
   // --- Rows
 
-  private width = 0;
-  private rows?: Row[];
+  private forcedLayout = false;
+  private layout?: LayoutProps;
+  private rows: Row[] = [];
 
   forceLayout() {
-    this.rows = undefined;
+    if (!this.forcedLayout) {
+      this.forcedLayout = true;
+      setImmediate(this.computeLayout);
+    }
+  }
+
+  private computeLayout() {
+    const engine = new LayoutEngine(this.layout);
+    this.forcedLayout = false;
+    this.rows = engine.flush();
     this.forceUpdate();
   }
 
-  private computeRows(): Row[] {
-    let { rows } = this;
-    if (rows === undefined) {
-      // eslint-disable-next-line no-multi-assign
-      this.rows = rows = [];
-
-    }
-    return rows;
+  getRowCount() {
+    return this.rows.length;
   }
 
   getRowKey(index: number): string {
-    return this.computeRows()[index].key;
+    const row = this.rows[index];
+    return row ? row.key : `#${index}`;
   }
 
   getRowHeight(index: number): number {
-    return this.computeRows()[index].height;
+    const row = this.rows[index];
+    return row ? row.height : 0;
   }
 
-  // Debounced
-  layout(width: number): number {
-    if (this.width !== width) {
-      this.width = width;
+  // --- Debounced
+  setLayout(ly?: LayoutProps) {
+    if (!equal(this.layout, ly)) {
+      this.layout = ly;
       this.forceLayout();
     }
-    return this.computeRows().length;
   }
 
   // --- Force Reload (empty caches)
