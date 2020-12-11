@@ -114,7 +114,7 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
         | TComp({cstruct = false; cfields} ,_,_) ->
           (match cfields with
            | Some [] | None -> () (* empty union, supported by gcc with size 0.
-                         Trivially initialized. *)
+                                     Trivially initialized. *)
            | _ ->
              let llv =
                List.map

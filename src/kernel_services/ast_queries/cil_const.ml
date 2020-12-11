@@ -47,10 +47,10 @@ module CurrentLoc =
   State_builder.Ref
     (Cil_datatype.Location)
     (struct
-       let dependencies = []
-       let name = "CurrentLoc"
-       let default () = Cil_datatype.Location.unknown
-     end)
+      let dependencies = []
+      let name = "CurrentLoc"
+      let default () = Cil_datatype.Location.unknown
+    end)
 
 let voidType = TVoid([])
 
@@ -66,27 +66,27 @@ let copy_with_new_vid v =
   let n = Vid.next () in
   let new_v = { v with vid = n } in
   (match v.vlogic_var_assoc with
-    | None -> ()
-    | Some lv ->
-      let new_lv = { lv with lv_id = n } in
-      new_v.vlogic_var_assoc <- Some new_lv;
-      new_lv.lv_origin <- Some new_v);
+   | None -> ()
+   | Some lv ->
+     let new_lv = { lv with lv_id = n } in
+     new_v.vlogic_var_assoc <- Some new_lv;
+     new_lv.lv_origin <- Some new_v);
   new_v
 
 let change_varinfo_name vi name =
   vi.vname <- name;
   match vi.vlogic_var_assoc with
-    | None -> ()
-    | Some lv -> lv.lv_name <- name
+  | None -> ()
+  | Some lv -> lv.lv_name <- name
 
 let new_raw_id = Vid.next
 
 (* The next compindo identifier to use. Counts up. *)
- let nextCompinfoKey =
-   let module M =
-         State_builder.SharedCounter(struct let name = "compinfokey" end)
-   in
-   M.next
+let nextCompinfoKey =
+  let module M =
+    State_builder.SharedCounter(struct let name = "compinfokey" end)
+  in
+  M.next
 
 (** Creates a (potentially recursive) composite type. Make sure you add a
   * GTag for it to the file! **)
@@ -99,7 +99,7 @@ let mkCompInfo
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
     (mkfspec: compinfo -> (string * typ * int option * attribute list *
-			   location) list)
+                           location) list option)
     (a: attribute list) : compinfo =
 
   (* make a new name for anonymous structs *)
@@ -114,25 +114,24 @@ let mkCompInfo
       cattr = a;
       creferenced = false;
       (* Make this compinfo undefined by default *)
-      cdefined = false; }
+    }
   in
   let flds =
-    List.mapi (fun forder (fn, ft, fb, fa, fl) ->
-	{ fcomp = comp;
-    forder;
-	  ftype = ft;
-	  forig_name = fn;
-	  fname = fn;
-	  fbitfield = fb;
-	  fattr = fa;
-	  floc = fl;
-	  faddrof = false;
-	  fsize_in_bits = None;
-	  foffset_in_bits = None;
-	  fpadding_in_bits = None;
-	}) (mkfspec comp) in
-  comp.cfields <- if flds <> [] then Some flds else None;
-  if flds <> [] then comp.cdefined <- true;
+    Extlib.opt_map (List.mapi (fun forder (fn, ft, fb, fa, fl) ->
+        { fcomp = comp;
+          forder;
+          ftype = ft;
+          forig_name = fn;
+          fname = fn;
+          fbitfield = fb;
+          fattr = fa;
+          floc = fl;
+          faddrof = false;
+          fsize_in_bits = None;
+          foffset_in_bits = None;
+          fpadding_in_bits = None;
+        })) (mkfspec comp) in
+  comp.cfields <- flds;
   comp
 
 (** Make a copy of a compinfo, changing the name and the key *)
@@ -162,8 +161,8 @@ let make_logic_var =
 
 let make_logic_info k x =
   { l_var_info = make_logic_var_kind x k (Ctype voidType);
-      (* we should put the right type when fields
-	 l_profile, l_type will be factorized *)
+    (* we should put the right type when fields
+       l_profile, l_type will be factorized *)
     l_type = None;
     l_tparams = [];
     l_labels = [];

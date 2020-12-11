@@ -200,7 +200,6 @@ and pp_compinfo fmt compinfo =
        ckey=%a;\
        cfields=%a;\
        cattr=%a;\
-       cdefined=%a;\
        creferenced=%a;\
        }"
       pp_bool compinfo.cstruct
@@ -209,7 +208,6 @@ and pp_compinfo fmt compinfo =
       pp_int compinfo.ckey
       (pp_option (pp_list pp_fieldinfo)) compinfo.cfields
       pp_attributes compinfo.cattr
-      pp_bool compinfo.cdefined
       pp_bool compinfo.creferenced
   else
     Format.fprintf fmt

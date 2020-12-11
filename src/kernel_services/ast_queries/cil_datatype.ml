@@ -778,7 +778,6 @@ module Compinfo = struct
               ckey = -1;
               cfields = None;
               cattr = [];
-              cdefined = false;
               creferenced = false } ]
         let compare v1 v2 = Datatype.Int.compare v1.ckey v2.ckey
         let hash v = Hashtbl.hash v.ckey

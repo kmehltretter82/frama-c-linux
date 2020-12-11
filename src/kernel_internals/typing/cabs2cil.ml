@@ -1263,7 +1263,7 @@ let createCompInfo (iss: bool) (n: string) ~(norig: string) : compinfo * bool =
   with Not_found -> begin
       (* Create a compinfo. This will have "cdefined" false. *)
       let res =
-        Cil_const.mkCompInfo iss n ~norig (fun _ ->[]) (fc_stdlib_attribute [])
+        Cil_const.mkCompInfo iss n ~norig (fun _ -> None) (fc_stdlib_attribute [])
       in
       H.add compInfoNameEnv key res;
       res, true
@@ -5544,6 +5544,10 @@ and makeCompType ghost (isstruct: bool)
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
+  if flds = [] && not (Cil.gccMode() || Cil.msvcMode()) then
+    Kernel.error ~current:true ~once:true
+      "Empty %s is allowed only in GCC or MSVC mode"
+      (if comp.cstruct then "struct" else "union");
   List.iter check flds;
   if comp.cfields <> Some [] && comp.cfields <> None then begin
     (* This appears to be a multiply defined structure. This can happen from
@@ -5575,8 +5579,6 @@ and makeCompType ghost (isstruct: bool)
   let a = Cil.addAttributes comp.cattr a in
   comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
   let res = TComp (comp,empty_size_cache (), []) in
-  (* This compinfo is defined, even if there are no fields *)
-  comp.cdefined <- true;
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
 
@@ -8219,7 +8221,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Start over with the fields *)
     doInit local_env asconst add_implicit_ensures preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
-  | TComp (comp, _, _), _ :: restil when not comp.cdefined ->
+  | TComp (comp, _, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
     doInit local_env asconst add_implicit_ensures preinit so acc restil

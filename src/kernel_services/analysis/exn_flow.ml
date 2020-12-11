@@ -346,7 +346,7 @@ let generate_exn_union e exns =
   let loc = Cil_datatype.Location.unknown in
   let create_union_fields _ =
     let add_one_field t acc = (get_type_tag t, t, None, [], loc) :: acc in
-    Cil_datatype.Typ.Set.fold add_one_field exns []
+    Some (Cil_datatype.Typ.Set.fold add_one_field exns [])
   in
   let union_name = "__fc_exn_union" in
   let exn_kind_union =
@@ -360,7 +360,7 @@ let generate_exn_union e exns =
       (exn_obj_name,
        TComp(exn_kind_union, { scache = Not_Computed } , []), None, [], loc)
     in
-    [uncaught; kind; obj]
+    Some [uncaught; kind; obj]
   in
   let struct_name = "__fc_exn_struct" in
   let exn_struct =

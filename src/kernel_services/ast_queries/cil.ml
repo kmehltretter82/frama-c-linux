@@ -4321,11 +4321,16 @@ and bitsSizeOf t =
       scache
       (fun () -> begin
            (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
-           if not comp.cdefined && not (gccMode () || msvcMode ()) then begin
+           if comp.cfields = None then begin
              raise
                (SizeOfError
                   (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-           end else
+           end
+           else if comp.cfields = Some [] && not (gccMode () || msvcMode ()) then
+             raise
+               (SizeOfError
+                  (Format.sprintf "empty struct '%s'" (compFullName comp), t))
+           else
              0
          end)
 
@@ -6105,9 +6110,9 @@ let rec isCompleteType ?allowZeroSizeArrays ?(last_field=false) t =
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
   | TArray(t, Some _, _, _) ->
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp (comp, _, _) -> (* Struct or union *)
-    comp.cdefined &&
-    complete_type_fields ~allowZeroSizeArrays comp.cstruct comp.cfields
+  | TComp ( { cfields = None } , _, _) -> false
+  | TComp ( { cstruct ; cfields = Some flds }, _, _) -> (* Struct or union *)
+    complete_type_fields ~allowZeroSizeArrays cstruct flds
   | TEnum({eitems = []},_) -> false
   | TEnum _ -> true
   | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list _ -> true
@@ -6123,9 +6128,7 @@ and complete_type_fields ?allowZeroSizeArrays is_struct fields =
     | f :: tl ->
       is_complete_agg_member ?allowZeroSizeArrays f.ftype && aux false tl
   in
-  match fields with
-  | None -> false
-  | Some fields -> aux true fields
+  aux true fields
 
 and is_complete_agg_member ?allowZeroSizeArrays ?last_field t =
   isCompleteType ?allowZeroSizeArrays ?last_field t &&
