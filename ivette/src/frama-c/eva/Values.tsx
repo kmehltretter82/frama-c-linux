@@ -33,16 +33,18 @@ interface ProbePanelProps {
   transient?: boolean;
   label?: string;
   code?: string;
+  stmt?: string;
   onPersistent?: callback;
   onTransient?: callback;
 }
 
 function ProbePanel(props: ProbePanelProps) {
-  const { transient = false, label, code } = props;
+  const { transient = false, label, code, stmt } = props;
   return code ? (
     <Hpack className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
       <Code className="eva-probe-code">{code}</Code>
+      <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
         kind={transient ? 'positive' : 'negative'}
         icon={transient ? 'CIRC.PLUS' : 'CIRC.CLOSE'}
@@ -114,6 +116,8 @@ function ValuesComponent() {
   const makeWindow = (size: Size) => (
     <ValuesPanel vstate={vstate} {...size} />
   );
+  const rank = probe?.rank;
+  const stmt = rank ? `@S${rank}` : undefined;
   return (
     <>
       <TitleBar />
@@ -122,6 +126,7 @@ function ValuesComponent() {
           transient={probe?.transient}
           label={probe?.label}
           code={probe?.code}
+          stmt={stmt}
           onPersistent={probe?.setPersistent}
           onTransient={probe?.setTransient}
         />

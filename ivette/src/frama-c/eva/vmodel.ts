@@ -80,13 +80,14 @@ function newLabel() {
 export class Probe implements StateCallbacks {
 
   // properties
-  marker: Readonly<string>;
+  readonly marker: string;
   forceUpdate: callback;
   forceLayout: callback;
   transient = true;
   label?: string;
   code?: string;
   stmt?: string;
+  rank?: number;
 
   constructor(marker: string, state: StateCallbacks) {
     this.marker = marker;
@@ -100,9 +101,10 @@ export class Probe implements StateCallbacks {
   requestProbeInfo() {
     Server
       .send(Values.getProbeInfo, this.marker)
-      .then(({ code, stmt }) => {
+      .then(({ code, stmt, rank }) => {
         this.code = code;
         this.stmt = stmt;
+        this.rank = rank;
       })
       .catch(() => {
         this.code = '(error)';

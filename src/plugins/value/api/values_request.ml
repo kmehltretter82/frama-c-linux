@@ -106,7 +106,8 @@ struct
   class ranker =
     object(self)
       inherit Visitor.frama_c_inplace
-
+      (* ranks really starts at 1 *)
+      (* rank < 0 means not computed yet *)
       val mutable rank = (-1)
       val rmap = Smap.create 0
       val fmark = Kmap.create 0
@@ -136,23 +137,26 @@ struct
         ignore (self#newrank s) ;
         Cil.DoChildren
 
+      method flush =
+        while not (Queue.is_empty fqueue) do
+          let kf = Queue.pop fqueue in
+          ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
+        done
+
       method compute =
         match Globals.entry_point () with
-        | kf , _ ->
-          let job kf =
-            ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
-          in begin
-            job kf ;
-            while not (Queue.is_empty fqueue) do
-              job (Queue.pop fqueue)
-            done
-          end
+        | kf , _ -> self#call kf ; self#flush
         | exception Globals.No_such_entry_point _ -> ()
 
       method rank s =
         if rank < 0 then (rank <- 0 ; self#compute) ;
         try Smap.find rmap s
-        with Not_found -> self#newrank s
+        with Not_found ->
+          let kf = Kernel_function.find_englobing_kf s in
+          self#call kf ;
+          self#flush ;
+          try Smap.find rmap s
+          with Not_found -> self#newrank s
 
     end
 
@@ -358,11 +362,11 @@ let () = Request.register ~package
 
 let pretty fmt cs =
   match cs with
-    | (_, Kstmt _) :: callers ->
-      Value_types.Callstack.pretty_hash fmt cs;
-      Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
-        (fun fmt (kf, _) -> Kernel_function.pretty fmt kf) fmt callers
-    | _ -> ()
+  | (_, Kstmt _) :: callers ->
+    Value_types.Callstack.pretty_hash fmt cs;
+    Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
+      (fun fmt (kf, _) -> Kernel_function.pretty fmt kf) fmt callers
+  | _ -> ()
 
 let () =
   let getCallstackInfo = Request.signature
@@ -374,12 +378,12 @@ let () =
       ~descr:(Md.plain "Callers site, from last to first")
       (module Jlist(Jcallsite)) in
   Request.register_sig ~package getCallstackInfo
-      ~kind:`GET ~name:"getCallstackInfo"
-      ~descr:(Md.plain "Callstack Description")
-      begin fun rq cs ->
-        set_calls rq cs ;
-        set_descr rq (Pretty_utils.to_string pretty cs) ;
-      end
+    ~kind:`GET ~name:"getCallstackInfo"
+    ~descr:(Md.plain "Callstack Description")
+    begin fun rq cs ->
+      set_calls rq cs ;
+      set_descr rq (Pretty_utils.to_string pretty cs) ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getStmtInfo                                                --- *)
@@ -413,6 +417,9 @@ let () =
   let set_code = Request.result_opt getProbeInfo
       ~name:"code" ~descr:(Md.plain "Probe source code")
       (module Jstring) in
+  let set_rank = Request.result getProbeInfo
+      ~name:"rank" ~descr:(Md.plain "Probe statement rank")
+      ~default:0 (module Jint) in
   let pp_code rq pp x = set_code rq (Some (Pretty_utils.to_string pp x)) in
   Request.register_sig ~package ~kind:`GET getProbeInfo
     ~name:"getProbeInfo" ~descr:(Md.plain "Probe informations")
@@ -421,9 +428,11 @@ let () =
       | Plval(l,s) ->
         pp_code rq Printer.pp_lval l ;
         set_stmt rq (Some s) ;
+        set_rank rq (Ranking.stmt s) ;
       | Pexpr(e,s) ->
         pp_code rq Printer.pp_exp e ;
         set_stmt rq (Some s) ;
+        set_rank rq (Ranking.stmt s) ;
       | Pnone -> ()
     end
 
