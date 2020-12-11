@@ -58,12 +58,13 @@ let translate_type = function
 
 let add_vpar vi =
   let formals = Cil.getFormalsDecl vi in
+  let n_formals, g_formals = List.partition (fun v -> not v.vghost) formals in
   (* Add the vpar formal once *)
   if not (List.exists (fun vi -> vi.vname = vpar_name) formals) then
     begin
       (* Register the new formal *)
       let new_formal = Cil.makeFormalsVarDecl vpar in
-      let new_formals = formals @ [new_formal] in
+      let new_formals = n_formals @ [new_formal] @ g_formals in
       Cil.unsafeSetFormalsDecl vi new_formals
     end
 
