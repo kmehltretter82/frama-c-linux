@@ -24,7 +24,7 @@ let struct_name =
 
 let mk_compinfo cstruct field1 field2 field3 =
   let tname = struct_name () in
-  let mk_type _ = [ field1; field2; field3 ] in
+  let mk_type _ = Some [ field1; field2; field3 ] in
   Cil.mkCompInfo cstruct tname ~norig:tname mk_type []
 
 type result =
