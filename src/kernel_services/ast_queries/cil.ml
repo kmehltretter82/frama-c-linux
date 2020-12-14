@@ -164,6 +164,13 @@ let theMachine = createMachine ()
 let msvcMode () = (theMachine.theMachine.compiler = "msvc")
 let gccMode () = (theMachine.theMachine.compiler = "gcc")
 
+let acceptEmptyCompinfo = ref false
+
+let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true
+
+let acceptEmptyCompinfo () =
+  msvcMode () || gccMode () || !acceptEmptyCompinfo
+
 let theMachineProject = ref (createMachine ())
 
 module Machine_datatype =
@@ -4326,7 +4333,7 @@ and bitsSizeOf t =
                (SizeOfError
                   (Format.sprintf "abstract type '%s'" (compFullName comp), t))
            end
-           else if comp.cfields = Some [] && not (gccMode () || msvcMode ()) then
+           else if comp.cfields = Some [] && not (acceptEmptyCompinfo ()) then
              raise
                (SizeOfError
                   (Format.sprintf "empty struct '%s'" (compFullName comp), t))

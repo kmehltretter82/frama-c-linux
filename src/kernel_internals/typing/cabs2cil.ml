@@ -5544,7 +5544,7 @@ and makeCompType ghost (isstruct: bool)
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
-  if flds = [] && not (Cil.gccMode() || Cil.msvcMode()) then
+  if flds = [] && not (Cil.acceptEmptyCompinfo ()) then
     Kernel.error ~current:true ~once:true
       "Empty %s is allowed only in GCC or MSVC mode"
       (if comp.cstruct then "struct" else "union");
