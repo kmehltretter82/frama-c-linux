@@ -15,8 +15,8 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { printFunction, markerInfo, markerInfoData }
-  from 'frama-c/api/kernel/ast';
+import * as AST from 'frama-c/api/kernel/ast';
+import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
 
@@ -51,7 +51,7 @@ async function loadAST(
     buffer.log('// Loading', theFunction, '…');
     (async () => {
       try {
-        const data = await Server.send(printFunction, theFunction);
+        const data = await Server.send(AST.printFunction, theFunction);
         buffer.clear();
         if (!data) {
           buffer.log('// No code for function', theFunction);
@@ -90,7 +90,11 @@ async function functionCallers(functionName: string) {
 
 type access = 'Reads' | 'Writes';
 
-async function studia(marker: string, info: markerInfoData, kind: access) {
+async function studia(
+  marker: string,
+  info: AST.markerInfoData,
+  kind: access,
+) {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
@@ -99,7 +103,7 @@ async function studia(marker: string, info: markerInfoData, kind: access) {
     const name = `${kind} of ${lval}`;
     const title = `List of statements ${
       (kind === 'Reads') ? 'accessing' : 'modifying'
-      } the memory location pointed by ${lval}.`;
+    } the memory location pointed by ${lval}.`;
     return { name, title, locations, index: 0 };
   }
   const name = `No ${kind.toLowerCase()} of ${lval}`;
@@ -151,7 +155,7 @@ const ASTview = () => {
   const [theme, setTheme] = Settings.useGlobalSettings(Theme);
   const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
   const [wrapText, flipWrapText] = Dome.useFlipSettings('ASTview.wrapText');
-  const markersInfo = States.useSyncArray(markerInfo);
+  const markersInfo = States.useSyncArray(AST.markerInfo);
 
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
