@@ -105,6 +105,9 @@ export default () => {
     );
   }
 
+  // Currently selected function.
+  const current: undefined | string = selection?.current?.function;
+
   function showFunction(fct: functionsData) {
     const visible =
       (stdlib || !fct.stdlib)
@@ -112,7 +115,7 @@ export default () => {
       && (undef || fct.defined)
       && (!evaOnly || !evaComputed || (fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
-    return visible;
+    return visible || (current && fct.name === current);
   }
 
   function onSelection(name: string) {
@@ -152,9 +155,6 @@ export default () => {
     ];
     Dome.popupMenu(items);
   }
-
-  // Items
-  const current: undefined | string = selection?.current?.function;
 
   // Filtered
 
