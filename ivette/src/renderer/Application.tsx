@@ -23,6 +23,7 @@ import Globals, { GlobalHint, useHints } from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
 import Values from './Values';
+import SourceCode from './SourceCode';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls
@@ -129,6 +130,7 @@ export default (() => {
           <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
             <Controller.Console />
             <Properties />
+            <SourceCode />
             <ASTview />
             <ASTinfo />
             <Locations />

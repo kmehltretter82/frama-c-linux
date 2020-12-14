@@ -36,8 +36,8 @@ const LocationsTable = () => {
     (loc: string) => {
       const markerId = (loc as Json.key<'#markerInfo'>);
       const info = markersInfo.getData(markerId);
-      const source = info?.position;
-      const position = `${source?.base}:${source?.line}`;
+      const sloc = info?.sloc;
+      const position = `${sloc?.base}:${sloc?.line}`;
       return <Label label={position} title={info?.descr} />;
     };
 

@@ -10,28 +10,15 @@ import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
-import * as Settings from 'dome/data/settings';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 import * as AST from 'frama-c/api/kernel/ast';
 import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
 
-import 'codemirror/mode/clike/clike';
-import 'codemirror/theme/ambiance.css';
-import 'codemirror/theme/solarized.css';
-
-import { Theme, FontSize } from './Preferences';
-
-const THEMES = [
-  { id: 'default', label: 'Default' },
-  { id: 'ambiance', label: 'Ambiance' },
-  { id: 'solarized light', label: 'Solarized Light' },
-  { id: 'solarized dark', label: 'Solarized Dark' },
-];
+import * as Preferences from './Preferences';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -152,16 +139,19 @@ const ASTview = () => {
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const multipleSelections = selection?.multiple.allSelections;
-  const [theme, setTheme] = Settings.useGlobalSettings(Theme);
-  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSize);
-  const [wrapText, flipWrapText] = Dome.useFlipSettings('ASTview.wrapText');
-  const markersInfo = States.useSyncArray(AST.markerInfo);
-
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
+  const { buttons: themeButtons, theme, fontSize, wrapText } =
+    Preferences.useThemeButtons({
+      target: 'Internal AST',
+      theme: Preferences.AstTheme,
+      fontSize: Preferences.AstFontSize,
+      wrapText: Preferences.AstWrapText,
+      disabled: !theFunction,
+    });
 
+  const markersInfo = States.useSyncArray(AST.markerInfo);
   const deadCode = States.useRequest(getDeadCode, theFunction);
-
   const propertyStatus = States.useSyncArray(Properties.status).getArray();
   const statusDict = States.useTags(Properties.propStatusTags);
 
@@ -215,10 +205,6 @@ const ASTview = () => {
   React.useEffect(() => {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
-
-  // Callbacks
-  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
-  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
 
   function onTextSelection(id: string) {
     if (selection.current) {
@@ -282,40 +268,11 @@ const ASTview = () => {
       Dome.popupMenu(items);
   }
 
-  // Theme Popup
-  const selectTheme = (id?: string) => id && setTheme(id);
-  const themeItem = (th: { id: string; label: string }) => (
-    { checked: th.id === theme, ...th }
-  );
-  const themePopup = () => Dome.popupMenu(THEMES.map(themeItem), selectTheme);
-
   // Component
   return (
     <>
       <TitleBar>
-        <IconButton
-          icon="ZOOM.OUT"
-          onClick={zoomOut}
-          disabled={!theFunction}
-          title="Decrease font size"
-        />
-        <IconButton
-          icon="ZOOM.IN"
-          onClick={zoomIn}
-          disabled={!theFunction}
-          title="Increase font size"
-        />
-        <IconButton
-          icon="PAINTBRUSH"
-          onClick={themePopup}
-          title="Choose theme"
-        />
-        <IconButton
-          icon="WRAPTEXT"
-          selected={wrapText}
-          onClick={flipWrapText}
-          title="Wrap text"
-        />
+        {themeButtons}
       </TitleBar>
       <Text
         buffer={buffer}

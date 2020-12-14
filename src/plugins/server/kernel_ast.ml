@@ -196,8 +196,8 @@ struct
     in
     let () =
       States.column
-        ~name:"position"
-        ~descr:(Md.plain "Marker position")
+        ~name:"sloc"
+        ~descr:(Md.plain "Source location")
         ~data:(module Kernel_main.LogSource)
         ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
         model
@@ -450,6 +450,11 @@ struct
         ~data:(module Data.Jbool)
         ~default:false
         ~get:is_eva_analyzed;
+      States.column model
+        ~name:"sloc"
+        ~descr:(Md.plain "Source location")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun kf -> fst (Kernel_function.get_location kf));
       States.register_array model
         ~package ~key
         ~name:"functions"

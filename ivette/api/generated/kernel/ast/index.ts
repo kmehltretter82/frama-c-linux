@@ -129,8 +129,8 @@ export interface markerInfoData {
   name: string;
   /** Marker declaration or description */
   descr: string;
-  /** Marker position */
-  position: source;
+  /** Source location */
+  sloc: source;
 }
 
 /** Loose decoder for `markerInfoData` */
@@ -142,7 +142,7 @@ export const jMarkerInfoData: Json.Loose<markerInfoData> =
     var: jMarkerVarSafe,
     name: Json.jFail(Json.jString,'String expected'),
     descr: Json.jFail(Json.jString,'String expected'),
-    position: jSourceSafe,
+    sloc: jSourceSafe,
   });
 
 /** Safe decoder for `markerInfoData` */
@@ -153,13 +153,13 @@ export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
     <{ key: Json.key<'#markerInfo'>, kind: markerKind, var: markerVar,
-       name: string, descr: string, position: source }>({
+       name: string, descr: string, sloc: source }>({
     key: Compare.string,
     kind: byMarkerKind,
     var: byMarkerVar,
     name: Compare.alpha,
     descr: Compare.string,
-    position: bySource,
+    sloc: bySource,
   });
 
 /** Signal for array [`markerInfo`](#markerinfo)  */
@@ -302,6 +302,8 @@ export interface functionsData {
   builtin?: boolean;
   /** Has the function been analyzed by Eva */
   eva_analyzed?: boolean;
+  /** Source location */
+  sloc: source;
 }
 
 /** Loose decoder for `functionsData` */
@@ -316,6 +318,7 @@ export const jFunctionsData: Json.Loose<functionsData> =
     stdlib: Json.jBoolean,
     builtin: Json.jBoolean,
     eva_analyzed: Json.jBoolean,
+    sloc: jSourceSafe,
   });
 
 /** Safe decoder for `functionsData` */
@@ -327,7 +330,7 @@ export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string,
        main?: boolean, defined?: boolean, stdlib?: boolean,
-       builtin?: boolean, eva_analyzed?: boolean }>({
+       builtin?: boolean, eva_analyzed?: boolean, sloc: source }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
@@ -336,6 +339,7 @@ export const byFunctionsData: Compare.Order<functionsData> =
     stdlib: Compare.defined(Compare.boolean),
     builtin: Compare.defined(Compare.boolean),
     eva_analyzed: Compare.defined(Compare.boolean),
+    sloc: bySource,
   });
 
 /** Signal for array [`functions`](#functions)  */
