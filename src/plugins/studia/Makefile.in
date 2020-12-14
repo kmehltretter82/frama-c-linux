@@ -36,7 +36,7 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_STUDIA@
 PLUGIN_NAME:=Studia
-PLUGIN_CMO:= options writes reads
+PLUGIN_CMO:= options writes reads studia_request
 PLUGIN_GUI_CMO:= studia_gui
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure

@@ -5,12 +5,14 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 
+import * as Json from 'dome/data/json';
 import { CompactModel } from 'dome/table/arrays';
-import { Table, Column } from 'dome/table/views';
+import { Table, Column, Renderer } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { Component, TitleBar } from 'frama-c/LabViews';
+import { markerInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
@@ -27,6 +29,17 @@ const LocationsTable = () => {
   ), []);
   const multipleSelections = selection?.multiple;
   const numberOfSelections = multipleSelections?.allSelections?.length;
+  const markersInfo = States.useSyncArray(markerInfo);
+
+  // Renderer for statement markers.
+  const renderMarker: Renderer<string> =
+    (loc: string) => {
+      const markerId = (loc as Json.key<'#markerInfo'>);
+      const info = markersInfo.getData(markerId);
+      const source = info?.position;
+      const position = `${source?.base}:${source?.line}`;
+      return <Label label={position} title={info?.descr} />;
+    };
 
   // Updates [[model]] with the current multiple selections.
   React.useEffect(() => {
@@ -94,6 +107,11 @@ const LocationsTable = () => {
           title={`Clear location${numberOfSelections > 1 ? 's' : ''}`}
         />
       </TitleBar>
+      <Label
+        label={multipleSelections?.name}
+        title={multipleSelections?.title}
+        style={{ textAlign: 'center' }}
+      />
       <Table
         model={model}
         selection={multipleSelections?.index}
@@ -107,7 +125,12 @@ const LocationsTable = () => {
           getter={(r: { id: number }) => r.id + 1}
         />
         <Column id="function" label="Function" width={120} />
-        <Column id="marker" label="Marker" fill />
+        <Column
+          id="marker"
+          label="Statement"
+          fill
+          render={renderMarker}
+        />
       </Table>
     </>
   );

@@ -479,6 +479,10 @@ export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
 
 /** A selection of multiple locations. */
 export interface MultipleSelection {
+  /** Name of the multiple selection.  */
+  name: string;
+  /** Explanatory description of the multiple selection.  */
+  title: string;
   /** The index of the current selected location in [[allSelections]]. */
   index: number;
   /** All locations forming a multiple selection. */
@@ -487,6 +491,8 @@ export interface MultipleSelection {
 
 /** A select action on multiple locations. */
 export interface MultipleSelect {
+  readonly name: string;
+  readonly title: string;
   readonly index: number;
   readonly locations: Location[];
 }
@@ -625,6 +631,8 @@ function fromMultipleSelections(
       return {
         ...s,
         multiple: {
+          name: '',
+          title: '',
           index: 0,
           allSelections: [],
         },
@@ -640,13 +648,15 @@ function reducer(s: Selection, action: SelectionActions): Selection {
     return selectLocation(s, action.location);
   }
   if (isMultipleSelect(action)) {
-    if (action.locations.length === 0)
-      return s;
     const index = action.index > 0 ? action.index : 0;
-    const selection = selectLocation(s, action.locations[index]);
+    const selection =
+      action.locations.length === 0 ? s :
+        selectLocation(s, action.locations[index]);
     return {
       ...selection,
       multiple: {
+        name: action.name,
+        title: action.title,
         allSelections: action.locations,
         index,
       },
@@ -684,6 +694,8 @@ const emptySelection = {
     nextSelections: [],
   },
   multiple: {
+    name: '',
+    title: '',
     index: 0,
     allSelections: [],
   },

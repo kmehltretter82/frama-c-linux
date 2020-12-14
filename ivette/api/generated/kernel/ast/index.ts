@@ -31,6 +31,14 @@ import { jTextSafe } from 'frama-c/api/kernel/data';
 import { tag } from 'frama-c/api/kernel/data';
 //@ts-ignore
 import { text } from 'frama-c/api/kernel/data';
+//@ts-ignore
+import { bySource } from 'frama-c/api/kernel/services';
+//@ts-ignore
+import { jSource } from 'frama-c/api/kernel/services';
+//@ts-ignore
+import { jSourceSafe } from 'frama-c/api/kernel/services';
+//@ts-ignore
+import { source } from 'frama-c/api/kernel/services';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
@@ -121,6 +129,8 @@ export interface markerInfoData {
   name: string;
   /** Marker declaration or description */
   descr: string;
+  /** Marker position */
+  position: source;
 }
 
 /** Loose decoder for `markerInfoData` */
@@ -132,6 +142,7 @@ export const jMarkerInfoData: Json.Loose<markerInfoData> =
     var: jMarkerVarSafe,
     name: Json.jFail(Json.jString,'String expected'),
     descr: Json.jFail(Json.jString,'String expected'),
+    position: jSourceSafe,
   });
 
 /** Safe decoder for `markerInfoData` */
@@ -142,12 +153,13 @@ export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
     <{ key: Json.key<'#markerInfo'>, kind: markerKind, var: markerVar,
-       name: string, descr: string }>({
+       name: string, descr: string, position: source }>({
     key: Compare.string,
     kind: byMarkerKind,
     var: byMarkerVar,
     name: Compare.alpha,
     descr: Compare.string,
+    position: bySource,
   });
 
 /** Signal for array [`markerInfo`](#markerinfo)  */
