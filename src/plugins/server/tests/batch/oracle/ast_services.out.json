@@ -7,13 +7,27 @@
           "key": "kf#24",
           "name": "g",
           "signature": "int g(int y);",
-          "defined": true
+          "defined": true,
+          "sloc": {
+            "dir": "tests/batch",
+            "base": "ast_services.i",
+            "file":
+              "/home/michele/work/frama-c/src/plugins/server/tests/batch/ast_services.i",
+            "line": 2
+          }
         },
         {
           "key": "kf#20",
           "name": "f",
           "signature": "int f(int x);",
-          "defined": true
+          "defined": true,
+          "sloc": {
+            "dir": "tests/batch",
+            "base": "ast_services.i",
+            "file":
+              "/home/michele/work/frama-c/src/plugins/server/tests/batch/ast_services.i",
+            "line": 1
+          }
         }
       ],
       "removed": [],
