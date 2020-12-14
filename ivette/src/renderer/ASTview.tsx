@@ -13,8 +13,8 @@ import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { printFunction, markerInfo, markerInfoData }
-  from 'frama-c/api/kernel/ast';
+import * as AST from 'frama-c/api/kernel/ast';
+import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
 
@@ -38,7 +38,7 @@ async function loadAST(
     buffer.log('// Loading', theFunction, '…');
     (async () => {
       try {
-        const data = await Server.send(printFunction, theFunction);
+        const data = await Server.send(AST.printFunction, theFunction);
         buffer.clear();
         if (!data) {
           buffer.log('// No code for function', theFunction);
@@ -56,7 +56,10 @@ async function loadAST(
   }
 }
 
-/** Compute the [[functionName]] caller locations. */
+/* --------------------------------------------------------------------------*/
+/* --- Function Callers                                                   ---*/
+/* --------------------------------------------------------------------------*/
+
 async function functionCallers(functionName: string) {
   try {
     const data = await Server.send(getCallers, functionName);
@@ -68,9 +71,17 @@ async function functionCallers(functionName: string) {
   }
 }
 
+/* --------------------------------------------------------------------------*/
+/* --- Studia Access                                                      ---*/
+/* --------------------------------------------------------------------------*/
+
 type access = 'Reads' | 'Writes';
 
-async function studia(marker: string, info: markerInfoData, kind: access) {
+async function studia(
+  marker: string,
+  info: AST.markerInfoData,
+  kind: access,
+) {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
@@ -84,6 +95,37 @@ async function studia(marker: string, info: markerInfoData, kind: access) {
   }
   const name = `No ${kind.toLowerCase()} of ${lval}`;
   return { name, title: '', locations: [], index: 0 };
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Property Bullets                                                   ---*/
+/* --------------------------------------------------------------------------*/
+
+function getBulletColor(status: States.Tag) {
+  switch (status.name) {
+    case 'unknown': return '#FF8300';
+    case 'invalid':
+    case 'invalid_under_hyp': return '#FF0000';
+    case 'valid':
+    case 'valid_under_hyp': return '#00B900';
+    case 'considered_valid': return '#0000FF';
+    case 'invalid_but_dead':
+    case 'valid_but_dead':
+    case 'unknown_but_dead': return '#000000';
+    case 'never_tried': return '#FFFFFF';
+    case 'inconsistent': return '#FF00FF';
+    default: return '#0000FF';
+  }
+}
+
+function makeBullet(status: States.Tag) {
+  const marker = document.createElement('div');
+  marker.style.color = getBulletColor(status);
+  if (status.descr)
+    marker.title = status.descr;
+  marker.innerHTML = '◉';
+  marker.align = 'center';
+  return marker;
 }
 
 // --------------------------------------------------------------------------
@@ -107,9 +149,36 @@ const ASTview = () => {
       wrapText: Preferences.AstWrapText,
       disabled: !theFunction,
     });
-  const markersInfo = States.useSyncArray(markerInfo);
 
+  const markersInfo = States.useSyncArray(AST.markerInfo);
   const deadCode = States.useRequest(getDeadCode, theFunction);
+  const propertyStatus = States.useSyncArray(Properties.status).getArray();
+  const statusDict = States.useTags(Properties.propStatusTags);
+
+  const setBullets = React.useCallback(() => {
+    if (theFunction) {
+      propertyStatus.forEach((prop) => {
+        if (prop.function === theFunction) {
+          const status = statusDict.get(prop.status);
+          if (status) {
+            const bullet = makeBullet(status);
+            const markers = buffer.findTextMarker(prop.key);
+            markers.forEach((marker) => {
+              const pos = marker.find();
+              buffer.forEach((cm) => {
+                cm.setGutterMarker(pos.from.line, 'bullet', bullet);
+              });
+            });
+          }
+        }
+      });
+    }
+  }, [buffer, theFunction, propertyStatus, statusDict]);
+
+  React.useEffect(() => {
+    buffer.on('change', setBullets);
+    return () => { buffer.off('change', setBullets); };
+  }, [buffer, setBullets]);
 
   // Hook: async loading
   React.useEffect(() => {
@@ -214,6 +283,7 @@ const ASTview = () => {
         selection={theMarker}
         onSelection={onTextSelection}
         onContextMenu={onContextMenu}
+        gutters={['bullet']}
         readOnly
       />
     </>

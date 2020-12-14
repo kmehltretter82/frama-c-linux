@@ -80,9 +80,23 @@ void main4() {
 }
 
 
+static double sub(double a, double b) {return a - b;}
+
+/* Test for a possible crash on function pointers. */
+void main5 (void) {
+  int i = 0;
+  void *ptr = sub;
+  /* Do not add [sub] to the bases to be widened. */
+  while(i < 32 && ptr == sub) {
+    i++;
+  }
+}
+
+
 void main() {
   main1();
   main2();
   main3();
   main4();
+  main5();
 }
