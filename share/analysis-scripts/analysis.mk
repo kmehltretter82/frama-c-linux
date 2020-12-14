@@ -96,9 +96,13 @@ endif
 # --- Utilities ---
 
 define display_command =
-  $(info )
-  $(info $(shell tput setaf 4)Command: $(1)$(shell tput sgr0))
-  $(info )
+  @{
+    echo '';
+    [ -t 1 ] && tput setaf 4;
+    echo "Command: $(strip $(1))";
+    [ -t 1 ] && tput sgr0;
+    echo '';
+  }
 endef
 
 empty :=

@@ -149,15 +149,25 @@ end
 (** {2 Dynamically Loaded Modules} *)
 (* ************************************************************************* *)
 
-val load_module: string -> unit
+(** loads a list of Findlib packages
+    @since Frama-C+dev
+*)
+val load_packages: string list -> unit
+
 (** Load the module specification. See -load-module option.
     @modify Magnesium-20151001 new API. *)
+val load_module: string -> unit
 
 (** Sets the load path for modules in FRAMAC_PLUGIN, prepending it with [path].
     Does not load any plugins.
     Must be invoked only once from boot during extending stage.
     @since Phosphorus-20170501-beta1. *)
 val set_module_load_path : string list -> unit
+
+(** [is_loaded package] returns [true] iff [package] has already been loaded.
+    @since Frama-C+dev
+*)
+val is_loaded: string -> bool
 
 (**/**)
 val load_plugin_path: unit -> unit

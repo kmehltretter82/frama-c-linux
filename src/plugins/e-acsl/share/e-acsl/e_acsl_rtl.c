@@ -25,6 +25,14 @@
 # define _DEFAULT_SOURCE 1
 #endif
 
+/* On Windows, setup minimum version to Windows 8 (or Server 2012) to be able to
+   use some specific API functions.
+   Check directly for windows instead of using E_ACSL_OS_IS_WINDOWS so that it
+   can be done without including anything. */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+# define _WIN32_WINNT 0x0602
+#endif
+
 // Internals
 #include "internals/e_acsl_bits.c"
 #include "internals/e_acsl_debug.c"

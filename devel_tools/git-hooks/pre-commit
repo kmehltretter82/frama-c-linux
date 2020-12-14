@@ -17,6 +17,6 @@ else
 fi
 
 MANUAL_ML_FILES=\
-$(git diff-index --name-only $against | \
+$(git diff-index --name-only --diff-filter d $against | \
     grep -e '^src/.*\.mli\?$' | tr '\n' ' ') \
 make ${MAKELEVEL} lint

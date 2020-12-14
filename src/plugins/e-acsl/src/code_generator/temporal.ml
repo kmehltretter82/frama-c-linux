@@ -75,13 +75,13 @@ module Mk: sig
 end = struct
 
   let store_reference ~loc flow lhs rhs =
+    let prefix = RTL.temporal_prefix in
     let fname = match flow with
       | Direct -> "store_nblock"
       | Indirect -> "store_nreferent"
       | Copy -> Options.fatal "Copy flow type in store_reference"
     in
-    let fname = RTL.mk_temporal_name fname in
-    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ Cil.mkAddrOf ~loc lhs; rhs ]
 
   let save_param ~loc flow lhs pos =
     let infix = match flow with
@@ -89,17 +89,19 @@ end = struct
       | Indirect -> "nreferent"
       | Copy -> "copy"
     in
+    let prefix = RTL.temporal_prefix in
     let fname = "save_" ^ infix ^ "_parameter" in
-    let fname = RTL.mk_temporal_name fname in
-    Smart_stmt.lib_call ~loc fname [ lhs ; Cil.integer ~loc pos ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ lhs ; Cil.integer ~loc pos ]
 
   let pull_param ~loc vi pos =
+    let prefix = RTL.temporal_prefix in
+    let fname = "pull_parameter" in
     let exp = Cil.mkAddrOfVi vi in
-    let fname = RTL.mk_temporal_name "pull_parameter" in
     let sz = Cil.kinteger ~loc IULong (Cil.bytesSizeOf vi.vtype) in
-    Smart_stmt.lib_call ~loc fname [ exp ; Cil.integer ~loc pos ; sz ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ exp ; Cil.integer ~loc pos ; sz ]
 
   let handle_return_referent ~save ~loc lhs =
+    let prefix = RTL.temporal_prefix in
     let fname = match save with
       | true -> "save_return"
       | false -> "pull_return"
@@ -108,15 +110,17 @@ end = struct
     (match (Cil.typeOf lhs) with
      | TPtr _ -> ()
      | _ -> Error.not_yet "Struct in return");
-    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name fname) [ lhs ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ lhs ]
 
   let reset_return_referent ~loc =
-    Smart_stmt.lib_call ~loc (RTL.mk_temporal_name "reset_return") []
+    let prefix = RTL.temporal_prefix in
+    Smart_stmt.rtl_call ~loc ~prefix "reset_return" []
 
   let temporal_memcpy_struct ~loc lhs rhs =
-    let fname  = RTL.mk_temporal_name "memcpy" in
+    let prefix = RTL.temporal_prefix in
+    let fname  = "memcpy" in
     let size = Cil.sizeOf ~loc (Cil.typeOfLval lhs) in
-    Smart_stmt.lib_call ~loc fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
+    Smart_stmt.rtl_call ~loc ~prefix fname [ Cil.mkAddrOf ~loc lhs; rhs; size ]
 end
 (* }}} *)
 
@@ -301,12 +305,13 @@ end = struct
      associated with memcpy/memset call *)
   let call_memxxx current_stmt loc args fexp env kf =
     if Libc.is_memcpy fexp || Libc.is_memset fexp then
+      let prefix = RTL.temporal_prefix in
       let name = match fexp.enode with
         | Lval(Var vi, _) -> vi.vname
         | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
       in
       let stmt =
-        Smart_stmt.lib_call ~loc (RTL.mk_temporal_name name) args
+        Smart_stmt.rtl_call ~loc ~prefix name args
       in
       Env.add_stmt ~before:current_stmt ~post:false env kf stmt
     else
@@ -320,8 +325,11 @@ end = struct
        it makes sense to make this somewhat-debug-level-call. In production mode
        the implementation of the function should be empty and compiler should
        be able to optimize that code out. *)
-    let name = (RTL.mk_temporal_name "reset_parameters") in
-    let stmt = Smart_stmt.lib_call ~loc name [] in
+    let stmt =
+      let prefix = RTL.temporal_prefix in
+      let name = "reset_parameters" in
+      Smart_stmt.rtl_call ~loc ~prefix name []
+    in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in
     let stmt = Mk.reset_return_referent ~loc in
     let env = Env.add_stmt ~before:current_stmt ~post:false env kf stmt in

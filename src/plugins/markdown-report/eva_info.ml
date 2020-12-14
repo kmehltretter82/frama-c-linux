@@ -68,7 +68,7 @@ let is_analyzed_function vi =
                    vi)
               (Globals.FileIndex.get_functions
                  (Filepath.Normalized.of_string s)))
-         (Mdr_params.Stubs.get())) &&
+         (Markdown_report.Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','
             (Dynamic.Parameter.String.get "-eva-use-spec" ()))) &&
@@ -184,7 +184,9 @@ let nb_fundefs () =
           is_analyzed_function (Kernel_function.get_vi kf)
        then nb + 1 else nb) 0
 
-let md_gen () =
+open Markdown
+
+let coverage_md_gen () =
   let main = Kernel.MainFunction.get () in
   !Db.Value.compute ();
   let vis = new eva_coverage_vis ~from_entry_point:false in
@@ -192,7 +194,7 @@ let md_gen () =
   let summary_whole =
     Markdown.format
       "There are %d function definitions that are not stubbed. They represent \
-       %d statements, of which %d are potentially reachable through EVA, \
+       %d statements, of which %d are potentially reachable through Eva, \
        resulting in a **statement coverage of %.1f%%** with respect to the \
        entire application."
       (nb_fundefs())
@@ -220,11 +222,22 @@ let md_gen () =
     summary @
     Markdown.format
       "These functions contain %d statements, \
-       of which %d are potentially reachable according to EVA, resulting in \
+       of which %d are potentially reachable according to Eva, resulting in \
        a **statement coverage of %.1f%%** with respect to the perimeter set \
        by this entry point."
       stats.total_stmts stats.covered_stmts
       (float_of_int stats.covered_stmts *. 100. /.
        float_of_int stats.total_stmts)
   in
-  Markdown.([ Block [Text summary_whole]; Block [Text summary ]])
+  [ Block [Text summary_whole]; Block [Text summary ]]
+
+let domains_md_gen () =
+  let eva_domains = Eva.Value_parameters.enabled_domains () in
+  let domains = List.filter (fun (name, _) -> name <> "cvalue") eva_domains in
+  let aux (name, descr) = (plain "domain" @ bold name), plain descr in
+  List.map aux domains
+
+let () =
+  Markdown_report.Md_gen.Eva_info.coverage_md_gen := coverage_md_gen;
+  Markdown_report.Md_gen.Eva_info.domains_md_gen := domains_md_gen;
+  Markdown_report.Md_gen.Eva_info.loaded := true

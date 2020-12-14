@@ -63,7 +63,7 @@ authors: [
   "Boris Yakobowski"
 ]
 homepage: "http://frama-c.com/"
-license: "GNU Lesser General Public License version 2.1"
+license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
 doc: "http://frama-c.com/download/user-manual-22.0-Titanium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"

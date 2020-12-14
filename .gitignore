@@ -34,6 +34,7 @@ autom4te.cache
 /config.log
 /config.status
 /frama-c-*.tar.gz
+/distributed
 /.log.autoconf
 /.Makefile.user
 /ocamlgraph/
@@ -193,7 +194,6 @@ Makefile.plugin.generated
 /src/libraries/utils/json.ml
 /src/kernel_internals/runtime/toplevel_boot.ml
 /src/kernel_internals/runtime/fc_config.ml
-/src/kernel_internals/runtime/frama_c_config.ml
 /src/kernel_internals/parsing/logic_lexer.ml
 /src/kernel_internals/parsing/logic_parser.ml
 /src/kernel_internals/parsing/logic_parser.mli
@@ -210,6 +210,7 @@ Makefile.plugin.generated
 /src/plugins/gui/GSourceView2.ml
 /src/plugins/gui/GSourceView2.mli
 /src/plugins/gui/gtk_compat.ml
+/src/plugins/markdown-report/META
 
 # generated tar.gz files
 

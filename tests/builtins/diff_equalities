@@ -1,12 +1,3 @@
-diff tests/builtins/oracle/Longinit_sequencer.res.oracle tests/builtins/oracle_equalities/Longinit_sequencer.res.oracle
-320c320
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_equalities/Longinit_sequencer.sav
-556c556
-<   tests/builtins/result/Longinit_sequencer.sav
----
->   tests/builtins/result_equalities/Longinit_sequencer.sav
 diff tests/builtins/oracle/alloc_weak.res.oracle tests/builtins/oracle_equalities/alloc_weak.res.oracle
 36,37d35
 < [eva:alarm] tests/builtins/alloc_weak.c:30: Warning: 

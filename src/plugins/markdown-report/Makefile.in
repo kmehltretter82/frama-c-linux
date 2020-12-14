@@ -32,16 +32,37 @@ endif
 PLUGIN_DIR ?=.
 PLUGIN_ENABLE:=@ENABLE_MDR@
 PLUGIN_NAME:=Markdown_report
+PLUGIN_HAS_META:=yes
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Markdown_report.mli
 PLUGIN_CMO:=\
-  sarif mdr_params parse_remarks \
-  eva_coverage md_gen sarif_gen mdr_register
+  sarif mdr_params parse_remarks md_gen sarif_gen mdr_register
 PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
 PLUGIN_REQUIRES:=ppx_deriving ppx_deriving_yojson yojson
-PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure share/acsl.xml
+PLUGIN_DISTRIB_EXTERNAL:=\
+ Makefile.in configure.ac configure share/acsl.xml META.in \
+ eva_info.ml eva_info.mli
+PLUGIN_DEPFLAGS:= $(PLUGIN_DIR)/eva_info.mli $(PLUGIN_DIR)/eva_info.ml
 PLUGIN_TESTS_DIRS:= md sarif
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
+
+ifneq (@ENABLE_MDR@,no)
+ifneq ($(ENABLE_EVA), no)
+byte:: $(PLUGIN_LIB_DIR)/top/eva_info.cmo $(PLUGIN_LIB_DIR)/top/eva_info.cmi
+opt:: $(PLUGIN_LIB_DIR)/top/eva_info.cmxs $(PLUGIN_LIB_DIR)/top/eva_info.cmi
+install::
+	$(MKDIR) $(PLUGIN_INSTALL_DIR)/top
+	$(CP) $(PLUGIN_LIB_DIR)/top/eva_info.cm* $(PLUGIN_INSTALL_DIR)/top
+
+$(PLUGIN_LIB_DIR)/top/eva_info.cm%: $(Markdown_report_DIR)/eva_info.cm%
+	$(MKDIR) $(dir $@)
+	$(CP) $< $@
+
+$(Markdown_report_DIR)/eva_info.cmo: BFLAGS+=-I $(Markdown_report_DIR)
+$(Markdown_report_DIR)/eva_info.cmx: OFLAGS+=-I $(Markdown_report_DIR)
+
+endif
+endif
 
 $(Markdown_report_DIR)/Markdown_report.mli: \
   $(Markdown_report_DIR)/mdr_params.mli \
@@ -53,6 +74,14 @@ $(Markdown_report_DIR)/Markdown_report.mli: \
 	echo "module Md_gen: sig" >> $@
 	cat $(Markdown_report_DIR)/md_gen.mli >> $@
 	echo "end" >> $@
+
+VERSION:=$(shell $(CAT) $(FRAMAC_SRC)/VERSION)
+
+$(Markdown_report_DIR)/META: $(Markdown_report_DIR)/META.in $(FRAMAC_SRC)/VERSION
+	$(PRINT_MAKING) $@
+	$(RM) $@
+	$(SED) -e 's|@VERSION@|$(VERSION)|' $< > $@
+	$(CHMOD_RO) $@
 
 ifeq ("$(FRAMAC_INTERNAL)","yes")
 CONFIG_STATUS_DIR=$(FRAMAC_SRC)

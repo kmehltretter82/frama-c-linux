@@ -36,7 +36,7 @@ _eacsl_gcc() {
     --no-trace
     --ocode= --oexec= --oexec-e-acsl=
     --ld-flags= --cpp-flags= --extra-cpp-args=
-    --frama-c-extra= --frama-c= --gcc= --ar= --ranlib=
+    --frama-c-extra= --frama-c= --gcc= --ar= --ranlib= --mbits=
     --e-acsl-share= --memory-model= --e-acsl-extra=
     --compile --compile-only --print-mmodels --frama-c-only --instrumented-only
     --gmp --full-mtracking --rte= --rte-select= --no-int-overflow

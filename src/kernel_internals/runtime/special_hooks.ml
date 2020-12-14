@@ -221,6 +221,15 @@ let run_list_all_plugin_options () =
   else Cmdline.nop
 let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
 
+(* Write JSON files to disk if required *)
+let flush_json_files () =
+  let written = Json.flush_cache () in
+  List.iter (fun fp ->
+      Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
+    written
+
+let () = Cmdline.at_normal_exit (fun () -> flush_json_files ())
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

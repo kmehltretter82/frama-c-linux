@@ -1,10 +1,10 @@
 
-[34mCommand: ../../bin/frama-c  -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort   -cpp-extra-args="" make-wrapper.c make-wrapper2.c(B[m
+Command: ../../bin/frama-c -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort -cpp-extra-args= make-wrapper.c make-wrapper2.c
 
 [kernel] Parsing make-wrapper.c (with preprocessing)
 [kernel] Parsing make-wrapper2.c (with preprocessing)
 
-[34mCommand: ../../bin/frama-c  -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort  -eva -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state -eva-print-callstacks -eva-warn-key alarm=inactive -no-deps-print -no-calldeps-print -eva-warn-key garbled-mix -calldeps -from-verbose 0   -eva-warn-key builtins:missing-spec=abort (B[m
+Command: ../../bin/frama-c -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort -eva -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state -eva-print-callstacks -eva-warn-key alarm=inactive -no-deps-print -no-calldeps-print -eva-warn-key garbled-mix -calldeps -from-verbose 0 -eva-warn-key builtins:missing-spec=abort
 
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

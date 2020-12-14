@@ -41,4 +41,18 @@
     background: #DDD
 }
 
+.globals-main label {
+    text-decoration: underline;
+}
+
+.globals-stdlib label {
+    font-style: italic;
+}
+
+.globals-attr {
+    font-size: smaller;
+    font-weight: lighter;
+    color: #aaa;
+}
+
 /* -------------------------------------------------------------------------- */

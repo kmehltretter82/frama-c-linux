@@ -47,20 +47,98 @@ diff tests/value/oracle/auto_loop_unroll.0.res.oracle tests/value/oracle_gauges/
 <   Frama_C_show_each_32_80: [0..2147483647]
 ---
 > [eva] tests/value/auto_loop_unroll.c:82: Frama_C_show_each_32_80: [32..83]
-49,52c32
-< [eva:alarm] tests/value/auto_loop_unroll.c:86: Warning: 
+55,56d37
+< [eva:alarm] tests/value/auto_loop_unroll.c:88: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-< [eva] tests/value/auto_loop_unroll.c:90: 
-<   Frama_C_show_each_11_111: [0..2147483647]
----
-> [eva] tests/value/auto_loop_unroll.c:90: Frama_C_show_each_11_111: [11..111]
-60,61d39
-< [eva:alarm] tests/value/auto_loop_unroll.c:96: Warning: 
-<   signed overflow. assert res + 1 ≤ 2147483647;
-63c41
+58c39
 <   Frama_C_show_each_40_50: [0..2147483647]
 ---
 >   Frama_C_show_each_40_50: [40..1073741861]
+133,136c114
+< [eva:alarm] tests/value/auto_loop_unroll.c:120: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:122: 
+<   Frama_C_show_each_32_64: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:122: Frama_C_show_each_32_64: [32..65]
+185,188c163
+< [eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:175: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [1..9]
+190,191d164
+< [eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+195c168
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+>   Frama_C_show_each_imprecise: [64..2147483647]
+201,203c174
+< [eva:alarm] tests/value/auto_loop_unroll.c:193: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:195: Frama_C_show_each_11: {11}
+205,207c176
+< [eva:alarm] tests/value/auto_loop_unroll.c:198: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:200: Frama_C_show_each_12: {12}
+209,210d177
+< [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+212a180,181
+> [eva:alarm] tests/value/auto_loop_unroll.c:204: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+216,217d184
+< [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+219a187,188
+> [eva:alarm] tests/value/auto_loop_unroll.c:209: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+223,224d191
+< [eva:alarm] tests/value/auto_loop_unroll.c:217: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+228,231c195
+< [eva:alarm] tests/value/auto_loop_unroll.c:222: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:226: 
+<   Frama_C_show_each_11_111: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:226: Frama_C_show_each_11_111: [11..111]
+239,241c203
+< [eva:alarm] tests/value/auto_loop_unroll.c:236: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:238: Frama_C_show_each_20: [20..2147483646]
+243,244d204
+< [eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+247c207,209
+< [eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: [0..2147483647]
+---
+> [eva:alarm] tests/value/auto_loop_unroll.c:241: Warning: 
+>   signed overflow. assert res + 1 ≤ 2147483647;
+> [eva] tests/value/auto_loop_unroll.c:243: Frama_C_show_each_21: {21}
+253,255c215,216
+< [eva:alarm] tests/value/auto_loop_unroll.c:250: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:254: Frama_C_show_each_30: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:254: Frama_C_show_each_30: {30}
+> [eva] tests/value/auto_loop_unroll.c:258: starting to merge loop iterations
+258d218
+< [eva] tests/value/auto_loop_unroll.c:258: starting to merge loop iterations
+261,263c221
+< [eva:alarm] tests/value/auto_loop_unroll.c:267: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:272: Frama_C_show_each_32: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:272: Frama_C_show_each_32: {32}
 diff tests/value/oracle/auto_loop_unroll.1.res.oracle tests/value/oracle_gauges/auto_loop_unroll.1.res.oracle
 15,18c15
 < [eva:alarm] tests/value/auto_loop_unroll.c:31: Warning: 
@@ -76,6 +154,105 @@ diff tests/value/oracle/auto_loop_unroll.1.res.oracle tests/value/oracle_gauges/
 <   Frama_C_show_each_imprecise: [0..2147483647]
 ---
 > [eva] tests/value/auto_loop_unroll.c:41: Frama_C_show_each_imprecise: {100}
+329,332c323
+< [eva:alarm] tests/value/auto_loop_unroll.c:173: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+< [eva] tests/value/auto_loop_unroll.c:175: 
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+> [eva] tests/value/auto_loop_unroll.c:175: Frama_C_show_each_imprecise: [1..9]
+334,335d324
+< [eva:alarm] tests/value/auto_loop_unroll.c:181: Warning: 
+<   signed overflow. assert res + 1 ≤ 2147483647;
+339c328
+<   Frama_C_show_each_imprecise: [0..2147483647]
+---
+>   Frama_C_show_each_imprecise: [64..2147483647]
+385a375,458
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 200 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 300 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 400 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 500 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 600 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 700 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 800 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 900 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1000 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1100 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1200 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1300 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1400 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1500 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1600 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1700 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1800 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 1900 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2000 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2100 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2200 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2300 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2400 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2500 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2600 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2700 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2800 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 2900 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3000 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3100 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3200 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3300 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3400 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3500 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3600 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3700 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3800 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 3900 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 4000 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 4100 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 4200 states
+> [eva] tests/value/auto_loop_unroll.c:276: 
+>   Trace partitioning superposing up to 4300 states
 diff tests/value/oracle/bad_loop.res.oracle tests/value/oracle_gauges/bad_loop.res.oracle
 6a7
 > [eva] tests/value/bad_loop.i:12: starting to merge loop iterations
@@ -1047,6 +1224,7 @@ diff tests/value/oracle/undefined_sequence.0.res.oracle tests/value/oracle_gauge
 > [eva] tests/value/undefined_sequence.i:43: starting to merge loop iterations
 101a103
 > [eva] tests/value/undefined_sequence.i:49: starting to merge loop iterations
+Only in tests/value/oracle: unit_tests.res.oracle
 diff tests/value/oracle/unroll.res.oracle tests/value/oracle_gauges/unroll.res.oracle
 13,14d12
 < [eva:alarm] tests/value/unroll.i:34: Warning: 

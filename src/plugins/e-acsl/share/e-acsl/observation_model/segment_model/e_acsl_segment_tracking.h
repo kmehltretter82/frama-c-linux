@@ -114,8 +114,18 @@
   DVASSERT(((uintptr_t)_addr) % HEAP_SEGMENT == 0,  \
       "Heap base address %a is unaligned", _addr)
 
+#define DVALIDATE_MEMORY_PRE_MAIN_INIT \
+  DVASSERT(mem_layout.is_initialized_pre_main != 0, \
+           "Un-initialized pre-main shadow layout", NULL)
+
+#define DVALIDATE_MEMORY_MAIN_INIT \
+  DVASSERT(mem_layout.is_initialized_main != 0, \
+           "Un-initialized main shadow layout", NULL)
+
 #define DVALIDATE_MEMORY_INIT \
-  DVASSERT(mem_layout.is_initialized != 0, "Un-initialized shadow layout", NULL)
+  DVASSERT(mem_layout.is_initialized_pre_main != 0 && \
+           mem_layout.is_initialized_main != 0, \
+           "Un-initialized shadow layout", NULL)
 
 /* Debug function making sure that the order of program segments is as expected
  * and that the program and the shadow segments used do not overlap. */
@@ -137,12 +147,24 @@ void validate_shadow_layout();
 /* Assert that [_addr, _addr+_size] are within stack segment */
 #define DVALIDATE_IS_ON_STACK(_addr, _size) \
   DVALIDATE_IS_ON(_addr, _size, STACK)
+#if E_ACSL_OS_IS_LINUX
 /* Assert that [_addr, _addr+_size] are within global segment */
-#define DVALIDATE_IS_ON_GLOBAL(_addr, _size) \
+# define DVALIDATE_IS_ON_GLOBAL(_addr, _size) \
   DVALIDATE_IS_ON(_addr, _size, GLOBAL)
 /* Assert that [_addr, _addr+_size] are within TLS segment */
-#define DVALIDATE_IS_ON_TLS(_addr, _size) \
+# define DVALIDATE_IS_ON_TLS(_addr, _size) \
   DVALIDATE_IS_ON(_addr, _size, TLS)
+#elif E_ACSL_OS_IS_WINDOWS
+/* Assert that [_addr, _addr+_size] are within text segment */
+# define DVALIDATE_IS_ON_TEXT(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, TEXT)
+/* Assert that [_addr, _addr+_size] are within bss segment */
+# define DVALIDATE_IS_ON_BSS(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, BSS)
+/* Assert that [_addr, _addr+_size] are within idata segment */
+# define DVALIDATE_IS_ON_IDATA(_addr, _size) \
+  DVALIDATE_IS_ON(_addr, _size, IDATA)
+#endif
 /* Assert that [_addr, _addr+_size] are within stack, global or TLS segments */
 #define DVALIDATE_IS_ON_STATIC(_addr, _size) \
   DVALIDATE_IS_ON(_addr, _size, STATIC)
@@ -222,6 +244,8 @@ void validate_shadow_layout();
 
 #else
 /*! \cond exclude from doxygen */
+#  define DVALIDATE_MEMORY_PRE_MAIN_INIT
+#  define DVALIDATE_MEMORY_MAIN_INIT
 #  define DVALIDATE_MEMORY_INIT
 #  define DVALIDATE_SHADOW_LAYOUT
 #  define DVALIDATE_HEAP_ACCESS
@@ -231,8 +255,14 @@ void validate_shadow_layout();
 #  define DVALIDATE_IS_ON
 #  define DVALIDATE_IS_ON_HEAP
 #  define DVALIDATE_IS_ON_STACK
+#  if E_ACSL_OS_IS_LINUX
 #  define DVALIDATE_IS_ON_GLOBAL
 #  define DVALIDATE_IS_ON_TLS
+#  elif E_ACSL_OS_IS_WINDOWS
+#    define DVALIDATE_IS_ON_TEXT
+#    define DVALIDATE_IS_ON_BSS
+#    define DVALIDATE_IS_ON_IDATA
+#  endif
 #  define DVALIDATE_IS_ON_STATIC
 #  define DVALIDATE_FREEABLE
 #  define DVALIDATE_STATIC_FREE
@@ -308,6 +338,14 @@ void shadow_freea(void *ptr);
 /* }}} */
 
 /* Static querying {{{ */
+
+/*! \brief Checking whether a globally allocated memory block containing an
+ * address _addr has read-only access. Note, this is light checking that
+ * relies on the fact that a single block cannot contain read/write and
+ * read-only parts, that is to check whether the block has read-only access it
+ * is sufficient to check any of its bytes. */
+#define global_readonly(_addr) \
+  checkbit(READONLY_BIT, (*(char*)PRIMARY_GLOBAL_SHADOW(_addr)))
 
 /*! \brief Return a non-zero value if a memory region of length `size`
  * starting at address `addr` belongs to a tracked stack, tls or
