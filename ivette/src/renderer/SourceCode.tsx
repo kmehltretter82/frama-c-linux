@@ -8,25 +8,19 @@ import * as States from 'frama-c/states';
 import * as Dome from 'dome';
 import { readFile } from 'dome/system';
 import * as Json from 'dome/data/json';
-import * as Settings from 'dome/data/settings';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { source } from 'frama-c/api/kernel/services';
+import * as Preferences from './Preferences';
 
-import 'codemirror/mode/clike/clike';
-import 'codemirror/theme/ambiance.css';
-import 'codemirror/theme/solarized.css';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/dialog/dialog';
 import 'codemirror/addon/search/searchcursor';
 import 'codemirror/addon/search/search';
 import 'codemirror/addon/search/jump-to-line';
-
-import { THEMES, ThemeSC, FontSizeSC } from './Preferences';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -42,16 +36,20 @@ const SourceCode = () => {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const [theme, setTheme] = Settings.useGlobalSettings(ThemeSC);
-  const [fontSize, setFontSize] = Settings.useGlobalSettings(FontSizeSC);
-  const [wrapText, flipWrapText] = Dome.useFlipSettings('SourceCode.wrapText');
-
-  const markersInfo = States.useSyncArray(markerInfo);
-  const functionsData = States.useSyncArray(functions).getArray();
-
   const [selection] = States.useSelection();
   const theFunction = selection?.current?.function;
   const theMarker = selection?.current?.marker;
+  const { buttons: themeButtons, theme, fontSize, wrapText } =
+    Preferences.useThemeButtons({
+      target: 'Source Code',
+      theme: Preferences.SourceTheme,
+      fontSize: Preferences.SourceFontSize,
+      wrapText: Preferences.AstWrapText,
+      disabled: !theFunction,
+    });
+
+  const markersInfo = States.useSyncArray(markerInfo);
+  const functionsData = States.useSyncArray(functions).getArray();
 
   const currentFile = React.useRef<string>();
 
@@ -88,44 +86,11 @@ const SourceCode = () => {
     }
   }, [buffer, functionsData, markersInfo, theFunction, theMarker]);
 
-  // Callbacks
-  const zoomIn = () => fontSize < 48 && setFontSize(fontSize + 2);
-  const zoomOut = () => fontSize > 4 && setFontSize(fontSize - 2);
-
-  // Theme Popup
-  const selectTheme = (id?: string) => id && setTheme(id);
-  const themeItem = (th: { id: string; label: string }) => (
-    { checked: th.id === theme, ...th }
-  );
-  const themePopup = () => Dome.popupMenu(THEMES.map(themeItem), selectTheme);
-
   // Component
   return (
     <>
       <TitleBar>
-        <IconButton
-          icon="ZOOM.OUT"
-          onClick={zoomOut}
-          disabled={!theFunction}
-          title="Decrease font size"
-        />
-        <IconButton
-          icon="ZOOM.IN"
-          onClick={zoomIn}
-          disabled={!theFunction}
-          title="Increase font size"
-        />
-        <IconButton
-          icon="PAINTBRUSH"
-          onClick={themePopup}
-          title="Choose theme"
-        />
-        <IconButton
-          icon="WRAPTEXT"
-          selected={wrapText}
-          onClick={flipWrapText}
-          title="Wrap text"
-        />
+        {themeButtons}
       </TitleBar>
       <Text
         buffer={buffer}
