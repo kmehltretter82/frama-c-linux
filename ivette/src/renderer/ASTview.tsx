@@ -15,8 +15,10 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { IconButton } from 'dome/controls/buttons';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import { printFunction, markerInfo } from 'frama-c/api/kernel/ast';
+import { printFunction, markerInfo, markerInfoData }
+  from 'frama-c/api/kernel/ast';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
+import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/theme/ambiance.css';
@@ -77,6 +79,24 @@ async function functionCallers(functionName: string) {
     D.error(`Fail to retrieve callers of function '${functionName}':`, err);
     return [];
   }
+}
+
+type access = 'Reads' | 'Writes';
+
+async function studia(marker: string, info: markerInfoData, kind: access) {
+  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
+  const data = await Server.send(request, marker);
+  const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
+  const lval = info.name;
+  if (locations.length > 0) {
+    const name = `${kind} of ${lval}`;
+    const title = `List of statements ${
+      (kind === 'Reads') ? 'accessing' : 'modifying'
+    } the memory location pointed by ${lval}.`;
+    return { name, title, locations, index: 0 };
+  }
+  const name = `No ${kind.toLowerCase()} of ${lval}`;
+  return { name, title: '', locations: [], index: 0 };
 }
 
 // --------------------------------------------------------------------------
@@ -143,8 +163,9 @@ const ASTview = () => {
     const selectedMarkerInfo = markersInfo.getData(markerId);
     if (selectedMarkerInfo?.var === 'function') {
       if (selectedMarkerInfo.kind === 'declaration') {
-        if (selectedMarkerInfo?.name) {
-          const locations = await functionCallers(selectedMarkerInfo.name);
+        const name = selectedMarkerInfo?.name;
+        if (name) {
+          const locations = await functionCallers(name);
           const locationsByFunction = _.groupBy(locations, (e) => e.function);
           _.forEach(locationsByFunction,
             (e) => {
@@ -154,6 +175,7 @@ const ASTview = () => {
                   `Go to caller ${callerName} ` +
                   `${e.length > 1 ? `(${e.length} call sites)` : ''}`,
                 onClick: () => updateSelection({
+                  name: `Call sites of function ${name}`,
                   locations,
                   index: locations.findIndex((l) => l.function === callerName),
                 }),
@@ -170,6 +192,22 @@ const ASTview = () => {
         });
       }
     }
+    const enabled = selectedMarkerInfo?.kind === 'lvalue'
+                 || selectedMarkerInfo?.var === 'variable';
+    function onClick(kind: access) {
+      if (selectedMarkerInfo)
+        studia(markerId, selectedMarkerInfo, kind).then(updateSelection);
+    }
+    items.push({
+      label: 'Studia: select writes',
+      enabled,
+      onClick: () => onClick('Writes'),
+    });
+    items.push({
+      label: 'Studia: select reads',
+      enabled,
+      onClick: () => onClick('Reads'),
+    });
     if (items.length > 0)
       Dome.popupMenu(items);
   }

@@ -194,6 +194,14 @@ struct
         ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
         model
     in
+    let () =
+      States.column
+        ~name:"position"
+        ~descr:(Md.plain "Marker position")
+        ~data:(module Kernel_main.LogSource)
+        ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+        model
+    in
     States.register_array
       ~package
       ~name:"markerInfo"
@@ -253,6 +261,25 @@ module Printer = Printer_tag.Make(Marker)
 (* -------------------------------------------------------------------------- *)
 (* --- Ast Data                                                           --- *)
 (* -------------------------------------------------------------------------- *)
+
+module Lval =
+struct
+  type t = kinstr * lval
+  let jtype = Marker.jlval
+  let to_json (kinstr, lval) =
+    let kf = match kinstr with
+      | Kglobal -> None
+      | Kstmt stmt -> Some (Kernel_function.find_englobing_kf stmt)
+    in
+    Marker.to_json (PLval (kf, kinstr, lval))
+  let of_json js =
+    let open Printer_tag in
+    match Marker.of_json js with
+    | PLval (_, kinstr, lval) -> kinstr, lval
+    | PVDecl (_, kinstr, vi) -> kinstr, Cil.var vi
+    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Kglobal, Cil.var vi
+    | _ -> Data.failure "not a lval marker"
+end
 
 module Stmt =
 struct

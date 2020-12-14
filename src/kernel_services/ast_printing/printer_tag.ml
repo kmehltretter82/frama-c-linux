@@ -76,9 +76,7 @@ let pretty fmt = function
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_property fmt prop
-  | PStmt(_,stmt) | PStmtStart (_, stmt) ->
-    let p = fst @@ Cil_datatype.Stmt.loc stmt in
-    Format.fprintf fmt "Statement at %a" Filepath.pp_pos p
+  | PStmt(_,stmt) | PStmtStart (_, stmt) -> Printer.pp_stmt fmt stmt
   | PGlobal g -> Printer.pp_global fmt (decl_of g)
 
 let pp_ki_loc fmt ki =

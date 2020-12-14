@@ -1211,6 +1211,8 @@ src/plugins/studia/reads.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/reads.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/studia_gui.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/studia_gui.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/studia_request.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/studia/studia_request.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/Studia.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/writes.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/studia/writes.mli: CEA_LGPL_OR_PROPRIETARY
