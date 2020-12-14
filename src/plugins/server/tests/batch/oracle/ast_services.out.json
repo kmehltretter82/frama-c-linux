@@ -11,8 +11,7 @@
           "sloc": {
             "dir": "tests/batch",
             "base": "ast_services.i",
-            "file":
-              "/home/michele/work/frama-c/src/plugins/server/tests/batch/ast_services.i",
+            "file": "tests/batch/ast_services.i",
             "line": 2
           }
         },
@@ -24,8 +23,7 @@
           "sloc": {
             "dir": "tests/batch",
             "base": "ast_services.i",
-            "file":
-              "/home/michele/work/frama-c/src/plugins/server/tests/batch/ast_services.i",
+            "file": "tests/batch/ast_services.i",
             "line": 1
           }
         }
