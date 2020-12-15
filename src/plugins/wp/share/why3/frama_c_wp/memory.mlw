@@ -95,6 +95,9 @@ theory Memory
     0 <= p.offset < m[p.base] ->
     (valid_rd m p 1 /\ not (valid_rw m p 1))
 
+  lemma invalid_null :
+    forall m : map int int, n: int. n <> 0 -> invalid m null n
+
   lemma separated_1 : forall p q : addr. forall a b i j : int
     [ separated p a q b , { base = p.base ; offset = i } ,
                           { base = q.base ; offset = j } ].

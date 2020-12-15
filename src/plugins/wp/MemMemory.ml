@@ -342,6 +342,28 @@ let phi_addr_of_int p =
     | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
+(* --- Simplifier for (in)validity                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Lemmas proved with Memory definition:
+   - lemma valid_rd_null: forall m n. n <= 0 -> valid_rd m null n
+   - lemma valid_rw_null: forall m n. n <= 0 -> valid_rw m null n *)
+let r_valid_unref = function
+  | [_; p; n] when p == a_null -> e_leq n e_zero
+  | _ -> raise Not_found
+
+(* Lemmas proved with Memory definition:
+   - lemma valid_obj_null: forall m n. valid_obj m null n *)
+let r_valid_obj = function
+  | [_; p; _] when p == a_null -> e_true
+  | _ -> raise Not_found
+
+(* Condition: by definition of 'invalid_null' *)
+let r_invalid = function
+  | [_; p; n] when p == a_null -> e_neq e_zero n
+  | _ -> raise Not_found
+
+(* -------------------------------------------------------------------------- *)
 (* --- Simplifiers Registration                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -358,6 +380,10 @@ let () = Context.register
       F.set_builtin_get f_havoc r_get_havoc ;
       F.set_builtin_1 f_addr_of_int phi_addr_of_int ;
       F.set_builtin_1 f_int_of_addr phi_int_of_addr ;
+      F.set_builtin p_invalid r_invalid ;
+      F.set_builtin p_valid_rd r_valid_unref ;
+      F.set_builtin p_valid_rw r_valid_unref ;
+      F.set_builtin p_valid_obj r_valid_obj ;
     end
 
 (* -------------------------------------------------------------------------- *)
