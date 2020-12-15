@@ -3390,6 +3390,20 @@ float fabsf(float x)
   return_label: return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from f;
+    
+    behavior finite:
+      assumes isfinite_f: \is_finite(f);
+      ensures nonzero_result: \result > 0 ∨ \result < 0;
+    
+    behavior nonfinite:
+      assumes nonfinite_f: ¬\is_finite(f);
+      ensures zero_result: \result ≡ 0;
+    
+    complete behaviors nonfinite, finite;
+    disjoint behaviors nonfinite, finite;
+ */
 int __finitef(float f)
 {
   int __retres;
@@ -3402,6 +3416,20 @@ int __finitef(float f)
   return __retres;
 }
 
+/*@ assigns \result;
+    assigns \result \from d;
+    
+    behavior finite:
+      assumes isfinite_d: \is_finite(d);
+      ensures nonzero_result: \result > 0 ∨ \result < 0;
+    
+    behavior nonfinite:
+      assumes nonfinite_d: ¬\is_finite(d);
+      ensures zero_result: \result ≡ 0;
+    
+    complete behaviors nonfinite, finite;
+    disjoint behaviors nonfinite, finite;
+ */
 int __finite(double d)
 {
   int __retres;
