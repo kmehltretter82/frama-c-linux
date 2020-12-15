@@ -62,24 +62,64 @@ module type Variable = sig
   (* Creates a variable from a varinfo. Should be extended to support more
      lvalues. *)
   val make: varinfo -> t
+  val make_int: varinfo -> t
   (* Returns all variables that may have been created for a varinfo. *)
   val get_all: varinfo -> t list
-  val kind: t -> kind   (* The kind of the variable: integer or float. *)
-  val lval: t -> lval   (* The CIL lval corresponding to the variable. *)
+  val kind: t -> kind (* The kind of the variable: integer or float. *)
+  val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
   val base: t -> Base.t (* Base of the variable. *)
-  val id: t -> int      (* Unique id, needed to use variables as hptmap keys. *)
+  val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
 end
 
 (* Variables of the octagons. Should be extended later to also include
    symbolic lvalues. *)
 module Variable : Variable = struct
-  include Cil_datatype.Varinfo
-  let make v = v
-  let get_all v = [ v ]
-  let kind v = typ_kind v.vtype
-  let lval v = Var v, NoOffset
-  let base v = Base.of_varinfo v
-  let id v = v.vid
+  type var =
+    | Var of varinfo
+    | Int of varinfo
+
+  let id = function
+    | Var vi -> 2 * vi.vid
+    | Int vi -> 2 * vi.vid + 1
+
+  module Datatype_Input = struct
+    include Datatype.Undefined
+    type t = var
+    let name = "Eva.Octagons.Variable"
+    let structural_descr = Structural_descr.t_abstract
+    let reprs = [ Var (List.hd Cil_datatype.Varinfo.reprs) ]
+
+    let compare x y =
+      match x, y with
+      | Var x, Var y
+      | Int x, Int y -> Cil_datatype.Varinfo.compare x y
+      | Var _, Int _ -> -1
+      | Int _, Var _ -> 1
+
+    let equal x y = compare x y = 0
+
+    let hash = id
+    let rehash = Datatype.identity
+
+    let pretty fmt = function
+      | Var vi -> Printer.pp_varinfo fmt vi
+      | Int vi -> Format.fprintf fmt "(integer)%a" Printer.pp_varinfo vi
+  end
+
+  include Datatype.Make_with_collections (Datatype_Input)
+  let make vi = Var vi
+  let make_int vi = Int vi
+  let get_all vi = [ Var vi; Int vi ]
+
+  let kind = function
+    | Var vi -> typ_kind vi.vtype
+    | Int _ -> Integer
+
+  let lval = function
+    | Var vi -> Some (Cil_types.Var vi, NoOffset)
+    | Int _ -> None
+
+  let base = function Var vi | Int vi -> Base.of_varinfo vi
 end
 
 (* Pairs of related variables in an octagon.
@@ -280,6 +320,15 @@ module Rewriting = struct
         List.map add_v1 (rewrite evaluate e2)
       in
       apply_binop rewrite_binop evaluate typ e1 op e2
+
+    | CastE (typ, { enode = Lval (Var vi, NoOffset) })
+      when Cil.isIntegralType typ
+        && Cil.isFloatingType vi.vtype
+        && not (Cil.typeHasQualifier "volatile" vi.vtype)
+        && not (is_singleton (evaluate expr)) ->
+      let var = Variable.make_int vi in
+      [ { var; sign = true; coeff = Ival.zero } ]
+
 
     | CastE (typ, e) ->
       if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
@@ -1102,22 +1151,25 @@ module Domain = struct
           let kind = Variable.kind var in
           let octagons = State.related_octagons state var in
           let reduce acc (y, octagons) =
-            let y_ival1 =
-              if Ival.(equal top octagons.add)
-              then Ival.top
-              else Arith.sub kind octagons.add x_ival
-            in
-            let y_ival2 =
-              if Ival.(equal top octagons.sub)
-              then Ival.top
-              else Arith.sub kind x_ival octagons.sub
-            in
-            let y_ival = Ival.narrow y_ival1 y_ival2 in
-            if Ival.(equal top y_ival) then acc else
-              let y_enode = Lval (Variable.lval y) in
-              let y_expr = Cil.new_exp ~loc:expr.eloc y_enode in
-              let y_cvalue = Cvalue.V.inject_ival y_ival in
-              (y_expr, y_cvalue) :: acc
+            match Variable.lval y with
+            | None -> acc
+            | Some lval ->
+              let y_ival1 =
+                if Ival.(equal top octagons.add)
+                then Ival.top
+                else Arith.sub kind octagons.add x_ival
+              in
+              let y_ival2 =
+                if Ival.(equal top octagons.sub)
+                then Ival.top
+                else Arith.sub kind x_ival octagons.sub
+              in
+              let y_ival = Ival.narrow y_ival1 y_ival2 in
+              if Ival.(equal top y_ival) then acc else
+                let y_enode = Lval lval in
+                let y_expr = Cil.new_exp ~loc:expr.eloc y_enode in
+                let y_cvalue = Cvalue.V.inject_ival y_ival in
+                (y_expr, y_cvalue) :: acc
           in
           List.fold_left reduce [] octagons
         with Cvalue.V.Not_based_on_null -> []
