@@ -2671,7 +2671,11 @@ imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom);
 extern intmax_t strtoimax(char const * __restrict nptr,
                           char ** __restrict endptr, int base);
 
-/*@ requires abs_representable: (long long)(-c) ≢ c;
+/*@ requires abs_representable: c > -9223372036854775807LL - 1LL;
+    ensures positive_result: \result ≥ 0.;
+    ensures
+      equal_magnitude_result: \result ≡ \old(c) ∨ \result ≡ -\old(c);
+    ensures logical_abs_result: \result ≡ \abs(\old(c));
     assigns \result;
     assigns \result \from c;
  */
