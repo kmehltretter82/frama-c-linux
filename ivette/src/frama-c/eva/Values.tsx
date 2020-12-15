@@ -4,6 +4,7 @@
 
 // React & Dome
 import React from 'react';
+import * as Dome from 'dome';
 import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
@@ -22,7 +23,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
 
-import { VState, Size, callback, sizeof } from './vmodel';
+import { VState, Probe, Size, callback, sizeof } from './vmodel';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -65,14 +66,44 @@ function ProbePanel(props: ProbePanelProps) {
 // --- Value Cell
 // --------------------------------------------------------------------------
 
+class Streamer {
+  private readonly v0: number;
+  private readonly vs: number[] = [];
+  private v?: number;
+  constructor(v0: number) {
+    this.v0 = v0;
+  }
+
+  push(v: number) {
+    const { vs } = this;
+    vs.push(Math.round(v));
+    if (vs.length > 200) vs.shift();
+  }
+
+  mean(): number {
+    if (this.v === undefined) {
+      const { vs } = this;
+      const n = vs.length;
+      if (n > 0) {
+        const m = vs.reduce((s, v) => s + v, 0) / n;
+        this.v = Math.round(m + 0.5);
+      } else {
+        this.v = this.v0;
+      }
+    }
+    return this.v;
+  }
+}
+
 class FontSizer {
   a = 0;
   b = 0;
-  k: number;
-  p: number;
+  k: Streamer;
+  p: Streamer;
+
   constructor(k: number, p: number) {
-    this.k = k;
-    this.p = p;
+    this.k = new Streamer(k);
+    this.p = new Streamer(p);
   }
 
   push(x: number, y: number) {
@@ -81,19 +112,23 @@ class FontSizer {
     if (x !== a0 && a0 !== 0) {
       const k = (y - b0) / (x - a0);
       const p = y - k * x;
-      this.k = Math.round(k);
-      this.p = Math.round(p);
+      this.k.push(k);
+      this.p.push(p);
     }
     this.a = x;
     this.b = y;
   }
 
   capacity(y: number) {
-    return Math.round(0.5 + (y - this.p) / this.k);
+    const k = this.k.mean();
+    const p = this.p.mean();
+    return Math.round(0.5 + (y - p) / k);
   }
 
-  compute(n: number) {
-    return this.p + n * this.k;
+  dimension(n: number) {
+    const k = this.k.mean();
+    const p = this.p.mean();
+    return p + n * k;
   }
 
 }
@@ -127,18 +162,66 @@ function SizedArea(props: SizedAreaProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Values Row
+// --- Table Update
 // --------------------------------------------------------------------------
 
-interface ValuesRowProps {
+const ChangeEvent = new Dome.Event<void>('eva-changed');
+const forceUpdate = () => ChangeEvent.emit();
+
+// --------------------------------------------------------------------------
+// --- Table Cell
+// --------------------------------------------------------------------------
+
+interface TableCellProps {
+  probe: Probe;
+}
+
+function TableCell(props: TableCellProps) {
+  const { probe } = props;
+  return (
+    <div className="eva-cell">
+      {probe.marker}
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Table Row
+// --------------------------------------------------------------------------
+
+interface TableRowProps {
   style: React.CSSProperties;
   index: number;
   data: VState;
 }
 
-function ValuesRow(props: ValuesRowProps) {
-  const h = props.data.getRowHeight(props.index);
-  return (<div style={props.style}>#{props.index} : {h}</div>);
+function TableRow(props: TableRowProps) {
+  Dome.useUpdate(ChangeEvent);
+  const { data: vstate, index } = props;
+  const row = vstate.getRow(index);
+  if (!row) return null;
+  let className = '';
+  switch (row.kind) {
+    case 'probes':
+      className = 'eva-row eva-row-probes';
+      break;
+    case 'values':
+    case 'callstack':
+      className = 'eva-row eva-row-values';
+      break;
+  }
+  const contents = row.probes.map((p) => (
+    <TableCell key={p.marker} probe={p} />
+  ));
+  return (
+    <div
+      style={props.style}
+    >
+      <Hpack className={className}>
+        {contents}
+      </Hpack>
+    </div>
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -151,23 +234,38 @@ interface ValuesPanelProps extends Size {
 
 function ValuesPanel(props: ValuesPanelProps) {
   const { vstate, width, height } = props;
+  const listRef = React.useRef<VariableSizeList>(null);
+  // --- reset line cache
+  const forceLayout = React.useCallback(
+    () => {
+      const vlist = listRef.current;
+      if (vlist) vlist.resetAfterIndex(0, true);
+    }, [listRef],
+  );
+  // --- compute line height
   const getRowHeight = React.useCallback(
-    (k: number) => HSIZER.compute(vstate.getRowHeight(k))
-    , [vstate]);
+    (k: number) => HSIZER.dimension(vstate.getRowHeight(k)),
+    [vstate],
+  );
+  // --- compute layout
   const wmax = WSIZER.capacity(width);
   const hmax = HSIZER.capacity(height);
+  const hline = HSIZER.dimension(1);
   const layout = { wmax, hmax };
-  vstate.setLayout(layout);
+  vstate.setLayout(layout, forceLayout);
+  // --- render list
   return (
     <VariableSizeList
+      ref={listRef}
       itemCount={vstate.getRowCount()}
       itemKey={vstate.getRowKey}
       itemSize={getRowHeight}
+      estimatedItemSize={hline}
       width={width}
       height={height}
       itemData={vstate}
     >
-      {ValuesRow}
+      {TableRow}
     </VariableSizeList>
   );
 }
@@ -176,17 +274,10 @@ function ValuesPanel(props: ValuesPanelProps) {
 // --- Values Component
 // --------------------------------------------------------------------------
 
-// WARNING: MUST HAVE SINGLE USE
-function useVState(): VState {
-  const vstate = React.useMemo(() => new VState(), []);
-  const [age, setAge] = React.useState(0);
-  React.useEffect(() => vstate.bind(age, setAge), [vstate, age, setAge]);
-  Server.useSignal(Values.changed, vstate.forceReload);
-  return vstate;
-}
-
 function ValuesComponent() {
-  const vstate = useVState();
+  const vstate = React.useMemo(() => new VState(forceUpdate), []);
+  Dome.useUpdate(ChangeEvent);
+  Server.useSignal(Values.changed, forceUpdate);
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
   const probe = vstate.focus(marker);

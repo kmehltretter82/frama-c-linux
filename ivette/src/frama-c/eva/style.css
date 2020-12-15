@@ -2,6 +2,17 @@
 /* --- Styling Values                                                     --- */
 /* -------------------------------------------------------------------------- */
 
+.eva-sized-area {
+    padding: 3px;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Probe Panel                                                        --- */
+/* -------------------------------------------------------------------------- */
+
 .eva-probe {
     margin: 4px;
     width: 100%;
@@ -39,9 +50,22 @@
     min-width: 16px;
 }
 
-.eva-sized-area {
-    padding: 3px;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-row-probes {
+    background: #cbe4cb;
+}
+
+.eva-row-values {
+
+}
+
+.eva-row-values:nth-child(odd) {
+    background: #d8edef;
+}
+
+.eva-row-values:nth-child(even) {
+    background: #fff;
 }

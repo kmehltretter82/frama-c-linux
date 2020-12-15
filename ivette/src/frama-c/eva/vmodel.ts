@@ -114,11 +114,13 @@ export class Probe {
   code?: string;
   stmt?: string;
   rank?: number;
+  layout: Size;
   summary: Size;
 
   constructor(state: StateCallbacks, marker: string) {
     this.marker = marker;
     this.state = state;
+    this.layout = EMPTY;
     this.summary = EMPTY;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
     this.setPersistent = this.setPersistent.bind(this);
@@ -186,7 +188,6 @@ export class StmtCallstacks {
     this.stmt = stmt;
   }
 
-
 }
 
 /* --------------------------------------------------------------------------*/
@@ -235,6 +236,7 @@ class LayoutEngine {
   push(p: Probe) {
     const s = this.crop(p.summary);
     if (s.width + this.rowSize.width > this.wmax) this.flush();
+    p.layout = s;
     this.rowSize = addH(this.rowSize, s);
     this.buffer.push(p);
   }
@@ -270,8 +272,8 @@ class LayoutEngine {
 
 export class VState implements StateCallbacks {
 
-  constructor() {
-    this.forceUpdate = this.forceUpdate.bind(this);
+  constructor(forceUpdate: callback) {
+    this.forceUpdate = forceUpdate;
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
     this.computeLayout = this.computeLayout.bind(this);
@@ -308,6 +310,8 @@ export class VState implements StateCallbacks {
         }
       } else {
         this.focused = undefined;
+        this.remanent = undefined;
+        this.forceLayout();
       }
     }
     return this.focused;
@@ -337,7 +341,6 @@ export class VState implements StateCallbacks {
     const engine = new LayoutEngine(this.layout);
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
-    console.log('ROWS', this.rows.length);
     this.forceUpdate();
   }
 
