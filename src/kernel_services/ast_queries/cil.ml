@@ -4355,10 +4355,9 @@ and bitsSizeOf t =
          let lastoff =
            fold_struct_fields
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
-             startAcc (Extlib.opt_conv [] comp.cfields)
+             startAcc (Extlib.the comp.cfields) (* Note: we treat None above *)
          in
-         if msvcMode () && lastoff.oaFirstFree = 0 &&
-            comp.cfields = Some [] && comp.cfields <> None
+         if msvcMode () && lastoff.oaFirstFree = 0
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
@@ -4377,11 +4376,14 @@ and bitsSizeOf t =
              oaLastFieldWidth = 0;
              oaPrevBitPack = None;
            } in
-         let max =
-           List.fold_left (fun acc fi ->
-               let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
-               if lastoff.oaFirstFree > acc then
-                 lastoff.oaFirstFree else acc) 0 (Extlib.opt_conv [] comp.cfields) in
+         let fold acc fi =
+          let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
+          if lastoff.oaFirstFree > acc
+          then lastoff.oaFirstFree
+          else acc
+         in
+          (* Note: we treat None above *)
+         let max = List.fold_left fold 0 (Extlib.the comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
          addTrailing max (8 * bytesAlignOf t))
 
