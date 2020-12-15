@@ -68,19 +68,11 @@ export function addV(a: Size, b: Size, padding = 0): Size {
 
 export type RowKind = 'probes' | 'values' | 'callstack';
 
-export class Row {
-
+export interface Row {
   key: string;
   kind: RowKind;
-  size: Size;
-  height = 0;
-
-  constructor(kind: RowKind, key: string) {
-    this.key = key;
-    this.kind = kind;
-    this.size = EMPTY;
-  }
-
+  probes: Probe[];
+  height: number;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -112,22 +104,22 @@ function newLabel() {
 /* --- Probe State                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
-export class Probe implements StateCallbacks {
+export class Probe {
 
   // properties
   readonly marker: string;
-  forceUpdate: callback;
-  forceLayout: callback;
+  readonly state: StateCallbacks;
   transient = true;
   label?: string;
   code?: string;
   stmt?: string;
   rank?: number;
+  summary: Size;
 
-  constructor(marker: string, state: StateCallbacks) {
+  constructor(state: StateCallbacks, marker: string) {
     this.marker = marker;
-    this.forceUpdate = state.forceUpdate;
-    this.forceLayout = state.forceLayout;
+    this.state = state;
+    this.summary = EMPTY;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
     this.setPersistent = this.setPersistent.bind(this);
     this.setTransient = this.setTransient.bind(this);
@@ -144,7 +136,7 @@ export class Probe implements StateCallbacks {
       .catch(() => {
         this.code = '(error)';
       })
-      .finally(this.forceUpdate);
+      .finally(this.state.forceUpdate);
   }
 
   setPersistent() {
@@ -152,7 +144,7 @@ export class Probe implements StateCallbacks {
       this.transient = false;
       if (this.code.length > LABEL)
         this.label = newLabel();
-      this.forceLayout();
+      this.state.forceLayout();
     }
   }
 
@@ -163,7 +155,7 @@ export class Probe implements StateCallbacks {
         LabelRing.push(this.label);
         this.label = undefined;
       }
-      this.forceLayout();
+      this.state.forceLayout();
     }
   }
 
@@ -178,6 +170,22 @@ export class Probe implements StateCallbacks {
     if (p.marker > q.marker) return (+1);
     return 0;
   }
+
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- StmtCallstacks                                                     ---*/
+/* --------------------------------------------------------------------------*/
+
+export class StmtCallstacks {
+  state: StateCallbacks;
+  stmt: string;
+
+  constructor(state: StateCallbacks, stmt: string) {
+    this.state = state;
+    this.stmt = stmt;
+  }
+
 
 }
 
@@ -205,24 +213,53 @@ class LayoutEngine {
     props: undefined | LayoutProps,
   ) {
     const zoom = Math.max(0, props?.zoom ?? 0);
-    this.hcrop = zoom;
+    this.hcrop = 1 + zoom;
     this.wcrop = LABEL + 2 * zoom;
     this.wmax = props?.wmax ?? 80;
     this.hmax = props?.hmax ?? 60;
+    this.push = this.push.bind(this);
   }
 
-  // --- Buffer
+  // --- Probe Buffer
+  private rowSize: Size = EMPTY;
+  private buffer: Probe[] = [];
+  private rows: Row[] = [];
 
-  private probes: Probe[] = [];
+  crop(s: Size): Size {
+    return {
+      width: Math.max(LABEL, Math.min(s.width, this.wcrop)),
+      height: Math.max(1, Math.min(s.height, this.hcrop)),
+    };
+  }
 
-  push(p: Probe) { this.probes.push(p); }
+  push(p: Probe) {
+    const s = this.crop(p.summary);
+    if (s.width + this.rowSize.width > this.wmax) this.flush();
+    this.rowSize = addH(this.rowSize, s);
+    this.buffer.push(p);
+  }
 
-  layout(): Row[] {
-    console.log('LAYOUT');
-    this.probes.sort(Probe.order).forEach((p, k) => {
-      console.log('PROBE', k, p.marker);
-    });
-    return [];
+  // --- Flush Buffer
+  flush(): Row[] {
+    const ps = this.buffer;
+    const rs = this.rows;
+    if (ps.length > 0) {
+      const n = rs.length;
+      rs.push({
+        key: `P${n}`,
+        kind: 'probes',
+        probes: ps,
+        height: 1,
+      }, {
+        key: `V${n}`,
+        kind: 'values',
+        probes: ps,
+        height: this.rowSize.height,
+      });
+    }
+    this.buffer = [];
+    this.rowSize = EMPTY;
+    return rs;
   }
 
 }
@@ -252,7 +289,7 @@ export class VState implements StateCallbacks {
   getProbe(m: string): Probe {
     let p = this.probes.get(m);
     if (!p) {
-      p = new Probe(m, this);
+      p = new Probe(this, m);
       this.probes.set(m, p);
       p.requestProbeInfo();
     }
@@ -279,7 +316,7 @@ export class VState implements StateCallbacks {
   // --- Rows
 
   private forcedLayout = false;
-  private layout?: LayoutProps;
+  private layout: LayoutProps = { wmax: 80, hmax: 40 };
   private rows: Row[] = [];
 
   forceLayout() {
@@ -291,14 +328,21 @@ export class VState implements StateCallbacks {
 
   private computeLayout() {
     this.forcedLayout = false;
-    const engine = new LayoutEngine(this.layout);
+    const toLayout: Probe[] = [];
     this.probes.forEach((p) => {
       if (p.code && (!p.transient || p === this.remanent)) {
-        engine.push(p);
+        toLayout.push(p);
       }
     });
-    this.rows = engine.layout();
+    const engine = new LayoutEngine(this.layout);
+    toLayout.sort(Probe.order).forEach(engine.push);
+    this.rows = engine.flush();
+    console.log('ROWS', this.rows.length);
     this.forceUpdate();
+  }
+
+  getRow(index: number): Row | undefined {
+    return this.rows[index];
   }
 
   getRowCount() {
@@ -316,10 +360,11 @@ export class VState implements StateCallbacks {
   }
 
   // --- Throttled
-  setLayout(ly?: LayoutProps) {
+  setLayout(ly: LayoutProps, forceGridLayout: callback) {
     if (!equal(this.layout, ly)) {
       this.layout = ly;
       this.forceLayout();
+      forceGridLayout();
     }
   }
 
