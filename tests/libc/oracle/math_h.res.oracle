@@ -267,6 +267,41 @@
 [eva:alarm] tests/libc/math_h.c:50: Warning: 
   function fabsl: precondition 'finite_arg' got status unknown.
 [eva] Done for function fabsl
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:54.
+[eva] using specification for function __finite
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:55: assertion got status valid.
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:56.
+[eva] Done for function __finite
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:56.
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:57: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:58.
+[eva] using specification for function __finitef
+[eva] Done for function __finitef
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:58.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:59: assertion got status valid.
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:60.
+[eva] Done for function __finite
+[eva] computing for function __finite <- main.
+  Called from tests/libc/math_h.c:60.
+[eva] Done for function __finite
+[eva] tests/libc/math_h.c:61: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:62.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:63: assertion got status valid.
+[eva] computing for function __finitef <- main.
+  Called from tests/libc/math_h.c:64.
+[eva] Done for function __finitef
+[eva] tests/libc/math_h.c:65: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -325,4 +360,5 @@
   fabsl_minus_one ∈ [-inf .. inf]
   fabsl_large ∈ [-inf .. inf]
   fabsl_ld_top ∈ [-inf .. inf]
+  r ∈ {0}
   __retres ∈ {0}
