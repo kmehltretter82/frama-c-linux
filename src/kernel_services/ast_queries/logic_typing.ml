@@ -3163,7 +3163,7 @@ struct
       with Not_found ->
         C.find_all_logic_functions f in
     match infos with
-    | [] -> C.error loc "unbound function %s" f
+    | [] -> C.error loc "unbound logic function %s" f
     | [info] ->
       begin
         let labels = List.map (find_logic_label loc env) labels in
