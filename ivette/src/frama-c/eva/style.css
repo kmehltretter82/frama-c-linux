@@ -3,15 +3,19 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-probe {
-    margin: 8px;
+    margin: 4px;
+    width: 100%;
+    display: flex;
 }
 
 .eva-probe-label {
-    min-width: 24px;
+    flex: 0 1 auto;
+    min-width: 22px;
     text-align: right;
 }
 
 .eva-probe-code {
+    flex: 0 1 auto;
     background: lightgrey;
     min-width: 120px;
     width: auto;
@@ -19,17 +23,25 @@
     padding-left: 6px;
     padding-right: 6px;
     border-radius: 4px;
+    overflow: hidden;
 }
 
 .eva-probe-stmt {
+    flex: 0 0 auto;
     color: grey;
     margin-left: 3px;
     margin-right: 3px;
     margin-top: 3px;
 }
 
+.eva-probe-button {
+    flex: 0 0 auto;
+    min-width: 16px;
+}
+
 .eva-sized-area {
     padding: 3px;
     white-space: pre;
-    overflow: visible;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

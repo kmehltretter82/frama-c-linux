@@ -5,7 +5,7 @@
 // React & Dome
 import React from 'react';
 import { VariableSizeList } from 'react-window';
-import { Vfill, Hpack } from 'dome/layout/boxes';
+import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 
@@ -41,7 +41,7 @@ interface ProbePanelProps {
 function ProbePanel(props: ProbePanelProps) {
   const { transient = false, label, code, stmt } = props;
   const { width, height } = sizeof(code);
-  return code ? (
+  return (
     <Hpack className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
       <div className="eva-probe-code">
@@ -49,13 +49,16 @@ function ProbePanel(props: ProbePanelProps) {
       </div>
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
+        className="eva-probe-button"
+        visible={!!code}
         kind={transient ? 'positive' : 'negative'}
-        icon={transient ? 'CIRC.PLUS' : 'CIRC.CLOSE'}
+        icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
         onClick={transient ? props.onPersistent : props.onTransient}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
       />
+      <Filler />
     </Hpack>
-  ) : null;
+  );
 }
 
 // --------------------------------------------------------------------------
