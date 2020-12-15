@@ -167,6 +167,18 @@ export class Probe implements StateCallbacks {
     }
   }
 
+  static order(p: Probe, q: Probe): number {
+    const rp = p.rank ?? 0;
+    const rq = q.rank ?? 0;
+    if (rp < rq) return (-1);
+    if (rp > rq) return (+1);
+    if (p.transient && !q.transient) return (-1);
+    if (!p.transient && q.transient) return (+1);
+    if (p.marker < q.marker) return (-1);
+    if (p.marker > q.marker) return (+1);
+    return 0;
+  }
+
 }
 
 /* --------------------------------------------------------------------------*/
@@ -201,18 +213,16 @@ class LayoutEngine {
 
   // --- Buffer
 
-  private buffer?: Row;
-  private readonly rows: Row[] = [];
+  private probes: Probe[] = [];
 
-  // --- Flushes current rows
+  push(p: Probe) { this.probes.push(p); }
 
-  flush() {
-    const p = this.buffer;
-    if (p) {
-      this.rows.push(p);
-      this.buffer = undefined;
-    }
-    return this.rows;
+  layout(): Row[] {
+    console.log('LAYOUT');
+    this.probes.sort(Probe.order).forEach((p, k) => {
+      console.log('PROBE', k, p.marker);
+    });
+    return [];
   }
 
 }
@@ -250,11 +260,15 @@ export class VState implements StateCallbacks {
   }
 
   focus(m: string | undefined): Probe | undefined {
+    const r = this.remanent;
     if (m) {
       const p = this.getProbe(m);
       if (p.stmt) {
         this.focused = p;
-        if (p.transient) this.remanent = p;
+        if (p.transient && p !== r) {
+          this.remanent = p;
+          this.forceLayout();
+        }
       } else {
         this.focused = undefined;
       }
@@ -276,15 +290,14 @@ export class VState implements StateCallbacks {
   }
 
   private computeLayout() {
-    const probes: Probe[] = [];
     this.forcedLayout = false;
+    const engine = new LayoutEngine(this.layout);
     this.probes.forEach((p) => {
-      if (p.code || !p.transient || p === this.remanent) {
-        probes.push(p);
+      if (p.code && (!p.transient || p === this.remanent)) {
+        engine.push(p);
       }
     });
-    const engine = new LayoutEngine(this.layout);
-    this.rows = engine.flush();
+    this.rows = engine.layout();
     this.forceUpdate();
   }
 
