@@ -7,7 +7,7 @@
    STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable -print"
    STDOPT: +"-load %{dep:@PTEST_NAME@.1.sav} -eva @EVA_OPTIONS@ -out -input -deps -journal-disable"
    CMXS: status
-   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -load-module status -save status.sav > status_sav.res 2> status_sav.err
+   EXECNOW: LOG status_sav.res LOG status_sav.err BIN status.sav @frama-c@ -load-module %{dep:status.cmxs} -save status.sav > status_sav.res 2> status_sav.err
    STDOPT: +"-load-module %{dep:status.cmxs} -load %{dep:status.sav}"
    STDOPT: +"-load %{dep:status.sav}"
 */

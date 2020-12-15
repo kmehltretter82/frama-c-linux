@@ -362,6 +362,7 @@ module SubDir: sig
   val make_file: t -> string -> string
   val oracle_dirname: string
   val result_dirname: string
+  val pp_file: dir:t -> Format.formatter -> string -> unit
 end = struct
   type t = string
 
@@ -389,6 +390,7 @@ end = struct
     end;
     dir
 
+  let pp_file ~dir fmt s = Format.fprintf fmt "%s/%s" dir s
 end
 
 module Macros = struct
@@ -577,7 +579,8 @@ end  = struct
 
   let scan_execnow ~file ~once dir ex_timeout (s:string) =
     if once=false then
-      Format.eprintf "%s: using EXEC directive (DEPRECATED): %s\n%!" file s;
+      Format.eprintf "%a: using EXEC directive (DEPRECATED): %s\n%!"
+        (SubDir.pp_file ~dir) file s;
     let rec aux (s:execnow) =
       try
         Scanf.sscanf s.ex_cmd "%_[ ]LOG%_[ ]%[-A-Za-z0-9_',+=:.\\@@]%_[ ]%s@\n"
@@ -593,7 +596,8 @@ end  = struct
         Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
           (fun cmd ->
              (* It should be better to use a specific macro into the command (such as @MAKE@) for that. *)
-             Format.eprintf "%s: EXEC%s directive with a make command (DEPRECATED): %s\n%!" file (if once then "NOW" else "") cmd;
+             Format.eprintf "%a: EXEC%s directive with a make command (DEPRECATED): %s\n%!"
+               (SubDir.pp_file ~dir) file (if once then "NOW" else "") cmd;
              let s = aux ({ s with ex_cmd = cmd; }) in
              { s with ex_cmd = !do_make^" "^cmd; } )
       with Scanf.Scan_failure _ ->
@@ -609,12 +613,13 @@ end  = struct
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
-      Format.eprintf "%s: EXEC%s without LOG nor BIN target (DEPRECATED): %s\n%!" file (if once then "NOW" else "") s;
+      Format.eprintf "%a: EXEC%s without LOG nor BIN target (DEPRECATED): %s\n%!"
+        (SubDir.pp_file ~dir) file (if once then "NOW" else "") s;
     execnow
 
   let make_custom_opts =
     let space = Str.regexp " " in
-    fun ~file stdopts s ->
+    fun ~file ~dir stdopts s ->
       let rec aux opts s =
         try
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
@@ -627,7 +632,8 @@ end  = struct
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            Format.eprintf "%s: unknown STDOPT configuration string: %s\n%!" file s;
+            Format.eprintf "%a: unknown STDOPT configuration string: %s\n%!"
+              (SubDir.pp_file ~dir) file s;
           opts
         | End_of_file -> opts
       in
@@ -640,7 +646,7 @@ end  = struct
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
 
-  let config_exec ~file ~once dir s current =
+  let config_exec ~once ~file ~dir s current =
     let s = Macros.expand current.dc_macros s in
     { current with
       dc_execnow =
@@ -665,27 +671,27 @@ end  = struct
       let _,_,res = (add "" acc) in
       res
 
-  let config_deps ~file:_ _dir s current =
+  let config_deps ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_deps = (split_list s) @ current.dc_deps }
 
-  let config_cmxs ~file:_ _dir s current =
+  let config_cmxs ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with dc_cmxs = l @ current.dc_cmxs }
 
-  let config_libs ~file:_ _dir s current =
+  let config_libs ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     { current with dc_libs = l @ current.dc_libs ;
                    dc_deps = (List.map (fun s -> s^".cmxs") l) @ current.dc_deps }
 
-  let config_plugin ~file:_ _dir s current =
+  let config_plugin ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     { current with dc_plugins = split_list s ;
                    dc_macros = Macros.add_list ["PLUGIN", s] current.dc_macros }
 
-  let config_module ~file:_ _dir s current =
+  let config_module ~file:_ ~dir:_ s current =
     let s = Macros.expand current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension s) (split_list s) in
     let deps = List.map (fun s -> s ^ ".cmxs") l in
@@ -695,7 +701,7 @@ end  = struct
       dc_load_module = deps @ current.dc_load_module;
     }
 
-  let config_macro ~file _dir s current =
+  let config_macro ~file ~dir s current =
     (* note: the expansion is donly done into the definition *)
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     if Str.string_match regex s 0 then begin
@@ -707,7 +713,7 @@ end  = struct
         Format.printf "new macro %s with definition %s\n%!" name def;
       { current with dc_macros = Macros.add_expand name def current.dc_macros }
     end else begin
-      Format.eprintf "%s: cannot understand MACRO definition: %s\n%!" file s;
+      Format.eprintf "%a: cannot understand MACRO definition: %s\n%!" (SubDir.pp_file ~dir) file s;
       current
     end
 
@@ -718,12 +724,12 @@ end  = struct
 
   let config_options =
     [ "CMD",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          let t =
            { toplevel = current.dc_default_toplevel;
@@ -739,12 +745,12 @@ end  = struct
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
-      (fun ~file _ s current ->
+      (fun ~file ~dir s current ->
          let s = Macros.expand current.dc_macros s in
          let new_top =
            List.map
              (fun command ->
-                { command with opts= make_custom_opts ~file command.opts s;
+                { command with opts= make_custom_opts ~file ~dir command.opts s;
                                exit_code = current.dc_exit_code;
                                timeout= current.dc_timeout})
              (if !current_default_cmds = [] then
@@ -755,30 +761,30 @@ end  = struct
                         dc_default_log = !current_default_log @
                                          current.dc_default_log });
       "FILEREG",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_test_regexp = s });
 
       "FILTER",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_filter = Some s });
 
       "EXIT",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~file _ _ acc ->
-         Format.eprintf "%s: GCC directive (DEPRECATED)\n%!" file;
+      (fun ~file ~dir _ acc ->
+         Format.eprintf "%a: GCC directive (DEPRECATED)\n%!" (SubDir.pp_file ~dir) file;
          acc);
 
       "COMMENT",
-      (fun ~file:_ _ _ acc -> acc);
+      (fun ~file:_ ~dir:_ _ acc -> acc);
 
       "DONTRUN",
-      (fun ~file:_ _ _ current -> { current with dc_dont_run = true });
+      (fun ~file:_ ~dir:_ _ current -> { current with dc_dont_run = true });
 
       "EXECNOW", config_exec ~once:true;
       "EXEC", config_exec ~once:false;
@@ -789,15 +795,15 @@ end  = struct
       "MODULE", config_module;
       "PLUGIN", config_plugin;
       "LOG",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_default_log = s :: current.dc_default_log });
       "TIMEOUT",
-      (fun ~file:_ _ s current ->
+      (fun ~file:_ ~dir:_ s current ->
          let s = Macros.expand current.dc_macros s in
          { current with dc_timeout = s });
       "NOFRAMAC",
-      (fun ~file:_ _ _ current -> { current with dc_commands = []; dc_framac = false; });
+      (fun ~file:_ ~dir:_ _ current -> { current with dc_commands = []; dc_framac = false; });
     ]
 
   let scan_directives dir ~file scan_buffer default =
@@ -810,7 +816,7 @@ end  = struct
         Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
-               r := (List.assoc name config_options ~file) dir opt !r
+               r := (List.assoc name config_options ~file ~dir) opt !r
              with Not_found ->
                Format.eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
       with
