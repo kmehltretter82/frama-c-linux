@@ -1024,7 +1024,7 @@ let compute_pdg kf =
     | Pdg_state.Cannot_fold ->
         Pdg_parameters.warning "too imprecise value analysis : abort" ;
         degenerated true kf
-    | Log.FeatureRequest (who, what) ->
+    | Log.FeatureRequest (_source, who, what) ->
 	(* [JS 2012/08/24] nobody should catch this exception *)
         Pdg_parameters.warning "not implemented by %s yet: %s" who what ;
         degenerated true kf

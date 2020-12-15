@@ -49,7 +49,7 @@ let kernel_label_name = "kernel"
 (* --- Exception Management                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception FeatureRequest of string * string
+exception FeatureRequest of Filepath.position option * string * string
 exception AbortError of string (* plug-in *)
 exception AbortFatal of string (* plug-in *)
 
@@ -813,7 +813,8 @@ sig
   val fatal   : ('a,'b) pretty_aborter
   val verify  : bool -> ('a,bool) pretty_aborter
 
-  val not_yet_implemented : ('a,formatter,unit,'b) format4 -> 'a
+  val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
+    ('a,formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter
@@ -1203,12 +1204,13 @@ struct
     let em = channel.emitters.(nth_kind kd) in
     em.listeners <- em.listeners @ [f]
 
-  let not_yet_implemented text =
+  let not_yet_implemented ?(current=false) ?source text =
     let buffer = Buffer.create 80 in
+    let source = get_source current source in
     let finally fmt =
       Format.pp_print_flush fmt ();
       let msg = Buffer.contents buffer in
-      raise (FeatureRequest(channel.plugin,msg)) in
+      raise (FeatureRequest(source,channel.plugin,msg)) in
     let fmt = Format.formatter_of_buffer buffer in
     Format.kfprintf finally fmt text
 
