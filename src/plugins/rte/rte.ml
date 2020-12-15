@@ -119,7 +119,7 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
              let llv =
                List.map
                  (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv)
-                 (Extlib.opt_conv [] cfields)
+                 (Extlib.the cfields)
              in
              if default then
                on_alarm ~invalid:false (Alarms.Uninitialized_union llv))
