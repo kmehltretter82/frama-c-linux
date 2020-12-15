@@ -570,8 +570,9 @@ and comment = parse
       | Logic_utils.Not_well_formed (loc, m) ->
         output ~source:(fst loc) "%s" m;
         None
-      | Log.FeatureRequest(_,_,msg) ->
-        output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "unimplemented ACSL feature: %s" msg; None
+      | Log.FeatureRequest(source,_,msg) ->
+        let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
+        output ~source "unimplemented ACSL feature: %s" msg; None
       | exn ->
         Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
           (Printexc.to_string exn)
