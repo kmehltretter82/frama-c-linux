@@ -1,5 +1,5 @@
 /* run.config_qualif
-   EXECNOW: rm -rf @PTEST_DIR@/oracle@PTEST_CONFIG@/@PTEST_NAME@.1.session/script
+   EXECNOW: rm -rf ../oracle@PTEST_CONFIG@/@PTEST_NAME@.1.session/script
    OPT: -wp-prop=-lack,-tactic
    OPT: -wp-prop=tactic -wp-auto=wp:split,wp:range -wp-prover=tip,alt-ergo
    OPT: -wp-prop=lack
