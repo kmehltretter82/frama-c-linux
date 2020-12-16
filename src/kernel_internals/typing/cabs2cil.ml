@@ -6278,7 +6278,7 @@ and doExp local_env
             finishExp []
               (se' +++
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                  (Set(lv, makeCastT result tresult t,
+                  (Set(lv, snd (castTo tresult t result),
                        CurrentLoc.get ())),[],[lv],r'))
               e'
               t
@@ -6333,7 +6333,7 @@ and doExp local_env
               (se' +++
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
                   (Set(lv,
-                       makeCastT opresult tresult (typeOfLval lv),
+                       snd (castTo tresult (typeOfLval lv) opresult),
                        CurrentLoc.get ())),
                 [],[lv], r'))
               result
