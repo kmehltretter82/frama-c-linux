@@ -100,8 +100,20 @@
     background: #fff;
 }
 
-.eva-transient {
+.eva-probes .eva-transient {
     background: orange;
+}
+
+.eva-values .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-probes .eva-focused {
+    background: lightblue;
+}
+
+.eva-values .eva-focused {
+    background: #def6ff;
 }
 
 /* -------------------------------------------------------------------------- */

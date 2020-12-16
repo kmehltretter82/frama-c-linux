@@ -81,26 +81,28 @@ const forceUpdate = () => setImmediate(ChangeEvent.emit);
 interface TableCellProps {
   kind: RowKind;
   probe: Probe;
+  model: Model;
 }
 
 function TableCell(props: TableCellProps) {
   Dome.useUpdate(ChangeEvent);
-  const { probe, kind } = props;
+  const { probe, kind, model } = props;
   const minWidth = WSIZER.dimension(probe.minCols);
   const maxWidth = WSIZER.dimension(probe.maxCols);
   const style = { minWidth, maxWidth };
   let styling = 'dome-text-code';
   let contents: React.ReactNode = props.probe.marker;
+  const { transient, label, code } = probe;
   switch (kind) {
     case 'probes':
-      if (probe.transient) {
-        styling = 'eva-transient dome-text-label';
-        contents = '« Current »';
-      } else if (probe.label) {
+      if (transient) {
         styling = 'dome-text-label';
-        contents = probe.label;
+        contents = '« Current »';
+      } else if (label) {
+        styling = 'dome-text-label';
+        contents = label;
       } else {
-        contents = <>{probe.code}</>;
+        contents = <>{code}</>;
       }
       break;
     case 'values':
@@ -109,6 +111,8 @@ function TableCell(props: TableCellProps) {
   const className = classes(
     'eva-cell',
     styling,
+    transient && 'eva-transient',
+    !transient && model.isFocused(probe) && 'eva-focused',
   );
   return (
     <div className={className} style={style}>
@@ -134,8 +138,12 @@ function TableRow(props: TableRowProps) {
   if (!row) return null;
   const { kind, probes } = row;
   const className = `eva-${kind}`;
-  const contents = probes.map((p) => (
-    <TableCell kind={kind} key={p.marker} probe={p} />
+  const contents = probes.map((probe) => (
+    <TableCell
+      key={probe.marker}
+      kind={kind}
+      probe={probe}
+      model={model} />
   ));
   return (
     <Hpack className={className} style={props.style}>

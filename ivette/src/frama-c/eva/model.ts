@@ -36,6 +36,8 @@ export class Model implements StateCallbacks {
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
 
+  isFocused(p: Probe | undefined) { return p === this.focused; }
+
   getProbe(m: marker): Probe {
     let p = this.probes.get(m);
     if (!p) {
@@ -55,6 +57,8 @@ export class Model implements StateCallbacks {
         if (p.transient && p !== r) {
           this.remanent = p;
           this.forceLayout();
+        } else {
+          this.forceUpdate();
         }
       } else {
         this.focused = undefined;
@@ -67,7 +71,7 @@ export class Model implements StateCallbacks {
 
   // --- Values
 
-  private readonly cache = new ValueCache(this);
+  readonly cache = new ValueCache(this);
 
   // --- Rows
 
@@ -132,7 +136,8 @@ export class Model implements StateCallbacks {
         p.requestProbeInfo();
       }
     });
-
+    this.cache.clear();
+    this.forceLayout();
   }
 
   // --- Force Updating (re-render)
