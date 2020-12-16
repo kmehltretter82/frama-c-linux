@@ -1,4 +1,5 @@
 (executable
+ (public_name ptests)
  (name ptests)
  (modules ptests)
  (libraries unix str)

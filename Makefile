@@ -215,21 +215,22 @@ purge-tests:
 clean-tests: purge-tests
 	rm -rf _build/default/tests
 
-PTESTS=./ptests.exe
-#PTESTS=./ptests.exe -v
+# Command for executing ptest (in order to generate dune test files)
+PTESTS=dune exec --root ptests -- ./ptests.exe
+#PTESTS=.dune exec --root ptests -- /ptests.exe -v
 
 tests.info:
 	echo $(TEST_CONFIGS)
 
 run-tests: FRAMAC_WP_CACHE=replay
-run-tests: config.sed purge-tests
-	dune exec --root ptests -- $(PTESTS) tests
+run-tests: config.sed purge-tests ptests/ptests.exe
+	$(PTESTS) tests
 	for config in $(TEST_CONFIGS); do \
 		test -f tests/ptests_$$config || echo "Warning: use default ptests_config (no file: tests/ptests_config_$$config)"; \
-		dune exec --root ptests -- $(PTESTS) tests -config $$config; \
+		$(PTESTS) tests -config $$config; \
 	done
 	for plugin in $(PLUGIN_TEST_DIRS); do \
-		dune exec --root ptests -- $(PTESTS) $$plugin; \
+		$(PTESTS) $$plugin; \
 	done
 	rm tests/spec/result/dune # HACK while WP problem is not solved
 	for plugin in $(PLUGIN_CONFIGS); do \
@@ -237,7 +238,7 @@ run-tests: config.sed purge-tests
 		config_name=$$(echo $$plugin | sed -e "s/^[^:]*://"); \
 		config_file=$$plugin_dir/ptests_config_$$config_name; \
 		test -f $$config_file || echo "Warning: use default ptests_config (no file: $$(config_file))"; \
-		dune exec --root ptests -- $(PTESTS) $$plugin_dir -config $$config_name; \
+		$(PTESTS) $$plugin_dir -config $$config_name; \
 	done
 	dune build $(TEST_ALIAS)
 
