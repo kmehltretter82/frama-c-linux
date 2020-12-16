@@ -335,6 +335,25 @@ let bind_logic_vars env lvs =
   let state, logic_vars = List.fold_left bind_one (state, env.logic_vars) lvs in
   overwrite_current_state { env with logic_vars } state
 
+let copy_logic_vars ~src ~dst lvars =
+  let copy_one env lvar =
+    match Logic_utils.unroll_type lvar.lv_type with
+    | Linteger | Lreal ->
+      let value = LogicVarEnv.find lvar src.logic_vars in
+      let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
+      { env with logic_vars }
+    | _ ->
+      try
+        let base, _ = c_logic_var lvar in
+        match Model.find_base base (env_current_state src) with
+        | `Bottom | `Top -> env
+        | `Value offsm ->
+          let state = Model.add_base base offsm (env_current_state env) in
+          overwrite_current_state env state
+      with Cil.SizeOfError _ -> unsupported_lvar lvar
+  in
+  List.fold_left copy_one dst lvars
+
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
     match Logic_utils.unroll_type lv.lv_type with
@@ -2417,14 +2436,32 @@ and eval_predicate env pred =
 
     | Pforall (varl, p') | Pexists (varl, p') ->
       begin
-        try
-          let env = bind_logic_vars env varl in
-          let r = do_eval env p' in
-          match p.pred_content with
-          | Pexists _ -> if r = False then False else Unknown
-          | Pforall _ -> if r = True then True else Unknown
-          | _ -> assert false
-        with LogicEvalError _ee -> Unknown (* No error display? *)
+        (* If [p'] is true (or false) for all possible values of [varl],
+           then so is Pforall(varl, p') and Pexists(varl, p'). *)
+        let env = bind_logic_vars env varl in
+        let r = do_eval env p' in
+        if r <> Unknown then r else
+          (* Otherwise:
+             - if [p'] evaluates to [false] for at least some values of [varl],
+               then Pforall (varl, p') is false.
+             - if [p'] evaluates to [true] for at least some values of [varl],
+               then Pexists (varl, p') is true.
+
+             In order to find such values, we reduce the environment by assuming
+             [p'] is true (for Pexists) or false (for Pforall), and then we
+             reevaluate [p'] with these values. *)
+          let positive =
+            match p.pred_content with Pforall _ -> false | _ -> true
+          in
+          let reduced_env = reduce_by_predicate ~alarm_mode env positive p' in
+          (* Reduce the values of logical variables [varl] in [env] according to
+             [reduced_env]. To be more precise, we could reduce them to
+             singleton values — for instance by using the interval bounds. *)
+          let env = copy_logic_vars ~src:reduced_env ~dst:env varl in
+          match p.pred_content, do_eval env p' with
+          | Pexists _, True -> True
+          | Pforall _, False -> False
+          | _ -> Unknown
       end
 
     | Pnot p ->  begin match do_eval env p with
