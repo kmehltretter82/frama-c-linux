@@ -19,6 +19,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 // Plugins
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
@@ -284,8 +285,8 @@ function ValuesComponent() {
   Dome.useUpdate(ChangeEvent);
   Server.useSignal(Values.changed, forceUpdate);
   const [selection] = States.useSelection();
-  const marker = selection?.current?.marker;
-  const probe = vstate.focus(marker);
+  const target = Ast.jMarker(selection?.current?.marker);
+  const probe = vstate.focus(target);
   const makeWindow = (size: Dimension) => (
     <ValuesPanel vstate={vstate} {...size} />
   );

@@ -4,12 +4,11 @@
 
 // Frama-C
 import * as Server from 'frama-c/server';
-
-// Plugins
 import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
-import { StateCallbacks, Size, EMPTY, LABEL } from './cells';
+import { StateCallbacks, LABEL } from './cells';
 
 /* --------------------------------------------------------------------------*/
 /* --- Probe Labelling                                                    ---*/
@@ -43,21 +42,18 @@ function newLabel() {
 export class Probe {
 
   // properties
-  readonly marker: string;
+  readonly marker: Ast.marker;
   readonly state: StateCallbacks;
   transient = true;
   label?: string;
   code?: string;
   stmt?: string;
   rank?: number;
-  layout: Size;
-  summary: Size;
+  colwidth: number = LABEL;
 
-  constructor(state: StateCallbacks, marker: string) {
+  constructor(state: StateCallbacks, marker: Ast.marker) {
     this.marker = marker;
     this.state = state;
-    this.layout = EMPTY;
-    this.summary = EMPTY;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
     this.setPersistent = this.setPersistent.bind(this);
     this.setTransient = this.setTransient.bind(this);

@@ -2,7 +2,7 @@
 /* --- Layout                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
-import { Size, EMPTY, LABEL, addH } from './cells';
+import { Size, EMPTY, LABEL, addH, ValueCache } from './cells';
 import { Probe } from './probes';
 
 export interface LayoutProps {
@@ -27,14 +27,16 @@ export class LayoutEngine {
 
   // --- Setup
 
-  /* private */ readonly wcrop: number;
-  /* private */ readonly hcrop: number;
-  /* private */ readonly margin: number;
-  /* private */ readonly remanent?: Probe;
+  private readonly cache: ValueCache;
+  private readonly wcrop: number;
+  private readonly hcrop: number;
+  private readonly margin: number;
 
   constructor(
+    cache: ValueCache,
     props: undefined | LayoutProps,
   ) {
+    this.cache = cache;
     const zoom = Math.max(0, props?.zoom ?? 0);
     this.hcrop = 1 + zoom;
     this.wcrop = LABEL + 2 * zoom;
@@ -55,9 +57,10 @@ export class LayoutEngine {
   }
 
   push(p: Probe) {
-    const s = this.crop(p.summary);
+    const probeSize = this.cache.getProbeSize(p.marker);
+    const s = this.crop(probeSize);
     if (s.cols + this.rowSize.cols > this.margin) this.flush();
-    p.layout = s;
+    p.colwidth = s.cols;
     this.rowSize = addH(this.rowSize, s);
     this.buffer.push(p);
   }

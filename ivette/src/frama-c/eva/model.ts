@@ -6,9 +6,11 @@
 import { throttle } from 'lodash';
 import equal from 'react-fast-compare';
 
+import type { marker } from 'frama-c/api/kernel/ast';
+
 // Model
-import { StateCallbacks, callback } from './cells';
 import { Probe } from './probes';
+import { callback, StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 /* --------------------------------------------------------------------------*/
@@ -29,11 +31,12 @@ export class Model implements StateCallbacks {
   }
 
   // --- Probes
+
   private focused?: Probe;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
 
-  getProbe(m: string): Probe {
+  getProbe(m: marker): Probe {
     let p = this.probes.get(m);
     if (!p) {
       p = new Probe(this, m);
@@ -43,7 +46,7 @@ export class Model implements StateCallbacks {
     return p;
   }
 
-  focus(m: string | undefined): Probe | undefined {
+  focus(m: marker | undefined): Probe | undefined {
     const r = this.remanent;
     if (m) {
       const p = this.getProbe(m);
@@ -61,6 +64,10 @@ export class Model implements StateCallbacks {
     }
     return this.focused;
   }
+
+  // --- Values
+
+  private readonly cache = new ValueCache(this);
 
   // --- Rows
 
@@ -83,7 +90,7 @@ export class Model implements StateCallbacks {
         toLayout.push(p);
       }
     });
-    const engine = new LayoutEngine(this.layout);
+    const engine = new LayoutEngine(this.cache, this.layout);
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
     this.forceUpdate();

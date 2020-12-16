@@ -185,8 +185,16 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack = Data.Index(Value_types.Callstack.Map)
-    (struct let name = "eva-callstack-id" end)
+module Jcallstack : S with type t = callstack =
+struct
+  module I = Data.Index
+      (Value_types.Callstack.Map)
+      (struct let name = "eva-callstack-id" end)
+  let jtype = Data.declare ~package ~name:"callstack" I.jtype
+  type t = I.t
+  let to_json = I.to_json
+  let of_json = I.of_json
+end
 
 module Jcallsite : Data.S with type t = Value_types.call_site =
 struct
@@ -445,8 +453,8 @@ let () =
   let get_tgt = Request.param getValues ~name:"target"
       ~descr:(Md.plain "Works with all markers containing an expression")
       (module Jmarker) in
-  let get_cs = Request.param_opt getValues ~name:"callstacks"
-      ~descr:(Md.plain "Callstacks to collect (defaults to all)")
+  let get_cs = Request.param_opt getValues ~name:"callstack"
+      ~descr:(Md.plain "Callstack to collect (defaults to none)")
       (module Jcallstack) in
   let set_alarms = Request.result getValues ~name:"alarms"
       ~descr:(Md.plain "Alarms raised during evaluation")

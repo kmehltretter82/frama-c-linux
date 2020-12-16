@@ -29,30 +29,41 @@ export const changed: Server.Signal = {
   name: 'plugins.eva.values.changed',
 };
 
+export type callstack = Json.index<'#eva-callstack-id'>;
+
+/** Loose decoder for `callstack` */
+export const jCallstack: Json.Loose<callstack> =
+  Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id');
+
+/** Safe decoder for `callstack` */
+export const jCallstackSafe: Json.Safe<callstack> =
+  Json.jFail(Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id'),
+    '#eva-callstack-id expected');
+
+/** Natural order for `callstack` */
+export const byCallstack: Compare.Order<callstack> = Compare.number;
+
 const getCallstacks_internal: Server.GetRequest<
   Json.key<'#stmt'>,
-  Json.index<'#eva-callstack-id'>[]
+  callstack[]
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstacks',
   input:  Json.jKey<'#stmt'>('#stmt'),
-  output: Json.jList(Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id')),
+  output: Json.jList(jCallstack),
 };
 /** Callstacks for markers */
-export const getCallstacks: Server.GetRequest<
-  Json.key<'#stmt'>,
-  Json.index<'#eva-callstack-id'>[]
-  >= getCallstacks_internal;
+export const getCallstacks: Server.GetRequest<Json.key<'#stmt'>,callstack[]>= getCallstacks_internal;
 
 const getCallstackInfo_internal: Server.GetRequest<
-  Json.index<'#eva-callstack-id'>,
+  callstack,
   { calls:
         { fct: Json.key<'#fct'>, stmt?: Json.key<'#stmt'>, rank: number }[],
     descr: string }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstackInfo',
-  input:  Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id'),
+  input:  jCallstack,
   output: Json.jObject({
             calls: Json.jList(
                      Json.jObject({
@@ -66,7 +77,7 @@ const getCallstackInfo_internal: Server.GetRequest<
 };
 /** Callstack Description */
 export const getCallstackInfo: Server.GetRequest<
-  Json.index<'#eva-callstack-id'>,
+  callstack,
   { calls:
         { fct: Json.key<'#fct'>, stmt?: Json.key<'#stmt'>, rank: number }[],
     descr: string }
@@ -110,16 +121,13 @@ export const getProbeInfo: Server.GetRequest<
   >= getProbeInfo_internal;
 
 const getValues_internal: Server.GetRequest<
-  { callstacks?: Json.index<'#eva-callstack-id'>, target: marker },
+  { callstack?: callstack, target: marker },
   { v_else?: string, v_then?: string, v_after?: string, values?: string,
     alarms: [ "True" | "False" | "Unknown", string ][] }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
-  input:  Json.jObject({
-            callstacks: Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id'),
-            target: jMarkerSafe,
-          }),
+  input:  Json.jObject({ callstack: jCallstack, target: jMarkerSafe,}),
   output: Json.jObject({
             v_else: Json.jString,
             v_then: Json.jString,
@@ -140,7 +148,7 @@ const getValues_internal: Server.GetRequest<
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<
-  { callstacks?: Json.index<'#eva-callstack-id'>, target: marker },
+  { callstack?: callstack, target: marker },
   { v_else?: string, v_then?: string, v_after?: string, values?: string,
     alarms: [ "True" | "False" | "Unknown", string ][] }
   >= getValues_internal;
