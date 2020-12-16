@@ -23,7 +23,9 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
 
-import { VState, Probe, Size, callback, sizeof } from './vmodel';
+import { Size, callback, sizeof } from './cells';
+import { Probe } from './probes';
+import { Model } from './model';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -192,7 +194,7 @@ function TableCell(props: TableCellProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
-  data: VState;
+  data: Model;
 }
 
 function TableRow(props: TableRowProps) {
@@ -234,7 +236,7 @@ interface Dimension {
 }
 
 interface ValuesPanelProps extends Dimension {
-  vstate: VState;
+  vstate: Model;
 }
 
 function ValuesPanel(props: ValuesPanelProps) {
@@ -278,7 +280,7 @@ function ValuesPanel(props: ValuesPanelProps) {
 // --------------------------------------------------------------------------
 
 function ValuesComponent() {
-  const vstate = React.useMemo(() => new VState(forceUpdate), []);
+  const vstate = React.useMemo(() => new Model(forceUpdate), []);
   Dome.useUpdate(ChangeEvent);
   Server.useSignal(Values.changed, forceUpdate);
   const [selection] = States.useSelection();
