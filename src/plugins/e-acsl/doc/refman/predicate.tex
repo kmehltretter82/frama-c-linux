@@ -3,7 +3,7 @@
        \
   pred ::= "\true" | "\false" ;
        | term (rel-op term)+ ; comparisons
-       | { id "(" term ("," term)* ")" } ; predicate application
+       | id "(" term ("," term)* ")" ; predicate application
        | "(" pred ")" ; parentheses
        | [ pred "&&" pred ] ; conjunction
        | [ pred "||" pred ] ; disjunction
