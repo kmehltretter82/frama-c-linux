@@ -44,6 +44,7 @@ SRC_LIBRARIES:= \
 	functions \
 	misc \
 	gmp_types \
+	logic_aggr \
 	varname
 SRC_LIBRARIES:=$(addprefix src/libraries/, $(SRC_LIBRARIES))
 
