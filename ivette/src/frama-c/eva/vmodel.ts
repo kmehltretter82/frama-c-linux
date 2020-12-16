@@ -27,38 +27,38 @@ export interface StateCallbacks {
 /* --- Cell Properties                                                    ---*/
 /* --------------------------------------------------------------------------*/
 
-const LABEL = 12; /* number of chars for labels */
-const EMPTY = { width: 0, height: 0 };
+export interface Size { cols: number; rows: number }
 
-export interface Size { width: number; height: number }
+const LABEL = 12; /* number of chars for labels */
+const EMPTY = { cols: 0, rows: 0 };
 
 export function sizeof(text?: string): Size {
   if (!text) return EMPTY;
   const lines = text.split('\n');
   return {
-    height: lines.length,
-    width: lines.reduce((w, l) => Math.max(w, l.length), 0),
+    rows: lines.length,
+    cols: lines.reduce((w, l) => Math.max(w, l.length), 0),
   };
 }
 
 export function merge(a: Size, b: Size): Size {
   return {
-    width: Math.max(a.width, b.width),
-    height: Math.max(a.height, b.height),
+    cols: Math.max(a.cols, b.cols),
+    rows: Math.max(a.rows, b.rows),
   };
 }
 
 export function addH(a: Size, b: Size, padding = 0): Size {
   return {
-    width: a.width + b.width + padding,
-    height: Math.max(a.height, b.height),
+    cols: a.cols + b.cols + padding,
+    rows: Math.max(a.rows, b.rows),
   };
 }
 
 export function addV(a: Size, b: Size, padding = 0): Size {
   return {
-    width: Math.max(a.width, b.width),
-    height: a.height + b.height + padding,
+    cols: Math.max(a.cols, b.cols),
+    rows: a.rows + b.rows + padding,
   };
 }
 
@@ -196,8 +196,7 @@ export class StmtCallstacks {
 
 export interface LayoutProps {
   zoom?: number;
-  wmax: number;
-  hmax: number;
+  margin: number;
 }
 
 class LayoutEngine {
@@ -206,8 +205,7 @@ class LayoutEngine {
 
   /* private */ readonly wcrop: number;
   /* private */ readonly hcrop: number;
-  /* private */ readonly wmax: number;
-  /* private */ readonly hmax: number;
+  /* private */ readonly margin: number;
   /* private */ readonly remanent?: Probe;
 
   constructor(
@@ -216,8 +214,7 @@ class LayoutEngine {
     const zoom = Math.max(0, props?.zoom ?? 0);
     this.hcrop = 1 + zoom;
     this.wcrop = LABEL + 2 * zoom;
-    this.wmax = props?.wmax ?? 80;
-    this.hmax = props?.hmax ?? 60;
+    this.margin = props?.margin ?? 80;
     this.push = this.push.bind(this);
   }
 
@@ -228,14 +225,14 @@ class LayoutEngine {
 
   crop(s: Size): Size {
     return {
-      width: Math.max(LABEL, Math.min(s.width, this.wcrop)),
-      height: Math.max(1, Math.min(s.height, this.hcrop)),
+      cols: Math.max(LABEL, Math.min(s.cols, this.wcrop)),
+      rows: Math.max(1, Math.min(s.rows, this.hcrop)),
     };
   }
 
   push(p: Probe) {
     const s = this.crop(p.summary);
-    if (s.width + this.rowSize.width > this.wmax) this.flush();
+    if (s.cols + this.rowSize.cols > this.margin) this.flush();
     p.layout = s;
     this.rowSize = addH(this.rowSize, s);
     this.buffer.push(p);
@@ -256,7 +253,7 @@ class LayoutEngine {
         key: `V${n}`,
         kind: 'values',
         probes: ps,
-        height: this.rowSize.height,
+        height: this.rowSize.rows,
       });
     }
     this.buffer = [];
@@ -320,7 +317,7 @@ export class VState implements StateCallbacks {
   // --- Rows
 
   private forcedLayout = false;
-  private layout: LayoutProps = { wmax: 80, hmax: 40 };
+  private layout: LayoutProps = { margin: 80 };
   private rows: Row[] = [];
 
   forceLayout() {

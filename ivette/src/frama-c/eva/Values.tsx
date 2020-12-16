@@ -41,12 +41,12 @@ interface ProbePanelProps {
 
 function ProbePanel(props: ProbePanelProps) {
   const { transient = false, label, code, stmt } = props;
-  const { width, height } = sizeof(code);
+  const { cols, rows } = sizeof(code);
   return (
     <Hpack className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
       <div className="eva-probe-code">
-        <SizedArea width={width} height={height}>{code}</SizedArea>
+        <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
@@ -141,15 +141,15 @@ interface SizedAreaProps extends Size {
 }
 
 function SizedArea(props: SizedAreaProps) {
-  const { height, width, children } = props;
+  const { rows, cols, children } = props;
   const refSizer = React.useCallback(
     (ref: null | HTMLDivElement) => {
       if (ref) {
         const r = ref.getBoundingClientRect();
-        WSIZER.push(width, r.width);
-        HSIZER.push(height, r.height);
+        WSIZER.push(cols, r.width);
+        HSIZER.push(rows, r.height);
       }
-    }, [height, width],
+    }, [rows, cols],
   );
   return (
     <div
@@ -228,7 +228,12 @@ function TableRow(props: TableRowProps) {
 // --- Values Panel
 // --------------------------------------------------------------------------
 
-interface ValuesPanelProps extends Size {
+interface Dimension {
+  width: number;
+  height: number;
+}
+
+interface ValuesPanelProps extends Dimension {
   vstate: VState;
 }
 
@@ -248,11 +253,9 @@ function ValuesPanel(props: ValuesPanelProps) {
     [vstate],
   );
   // --- compute layout
-  const wmax = WSIZER.capacity(width);
-  const hmax = HSIZER.capacity(height);
-  const hline = HSIZER.dimension(1);
-  const layout = { wmax, hmax };
-  vstate.setLayout(layout, forceLayout);
+  const margin = WSIZER.capacity(width);
+  const rowHeight = HSIZER.dimension(1);
+  vstate.setLayout({ margin }, forceLayout);
   // --- render list
   return (
     <VariableSizeList
@@ -260,7 +263,7 @@ function ValuesPanel(props: ValuesPanelProps) {
       itemCount={vstate.getRowCount()}
       itemKey={vstate.getRowKey}
       itemSize={getRowHeight}
-      estimatedItemSize={hline}
+      estimatedItemSize={rowHeight}
       width={width}
       height={height}
       itemData={vstate}
@@ -281,7 +284,7 @@ function ValuesComponent() {
   const [selection] = States.useSelection();
   const marker = selection?.current?.marker;
   const probe = vstate.focus(marker);
-  const makeWindow = (size: Size) => (
+  const makeWindow = (size: Dimension) => (
     <ValuesPanel vstate={vstate} {...size} />
   );
   const rank = probe?.rank;
