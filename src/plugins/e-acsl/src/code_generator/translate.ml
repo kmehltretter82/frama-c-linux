@@ -788,8 +788,8 @@ and comparison_to_exp
   let ty1 = Cil.typeOf e1 in
   let e2, env = term_to_exp kf env t2 in
   let ty2 = Cil.typeOf e2 in
-  match Logic_array.is_array ty1, Logic_array.is_array ty2 with
-  | true, true ->
+  match Logic_aggr.get_t ty1, Logic_aggr.get_t ty2 with
+  | Logic_aggr.Array, Logic_aggr.Array ->
     Logic_array.comparison_to_exp
       ~loc
       kf
@@ -798,7 +798,9 @@ and comparison_to_exp
       bop
       e1
       e2
-  | false, false -> (
+  | Logic_aggr.StructOrUnion, Logic_aggr.StructOrUnion ->
+    Env.not_yet env "comparison between two structs or unions"
+  | Logic_aggr.NotAggregate, Logic_aggr.NotAggregate -> begin
       match ity with
       | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
         Cil.mkBinOp ~loc bop e1 e2, env
@@ -822,10 +824,13 @@ and comparison_to_exp
         Rational.cmp ~loc bop e1 e2 env kf t_opt
       | Typing.Real ->
         Error.not_yet "comparison involving real numbers"
-    )
+    end
   | _, _ ->
-    Options.fatal ~current:true "Comparison involving an array with something \
-                                 else."
+    Options.fatal
+      ~current:true
+      "Comparison involving incompatible types: '%a' and '%a'"
+      Printer.pp_typ ty1
+      Printer.pp_typ ty2
 
 and at_to_exp_no_lscope env kf t_opt label e =
   let stmt = E_acsl_label.get_stmt kf label in
