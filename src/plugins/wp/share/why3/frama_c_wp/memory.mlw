@@ -80,7 +80,7 @@ theory Memory
              ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= 1 + m[p.base] ))
 
   predicate invalid (m : map int int) (p:addr) (n:int) =
-    n > 0 -> ( m[p.base] <= p.offset \/ p.offset + n <= 0 )
+    n > 0 /\ (p = null \/ m[p.base] <= p.offset \/ p.offset + n <= 0 )
 
   lemma valid_rw_rd :
     forall m : map int int.
@@ -94,9 +94,6 @@ theory Memory
     p.base < 0 ->
     0 <= p.offset < m[p.base] ->
     (valid_rd m p 1 /\ not (valid_rw m p 1))
-
-  lemma invalid_null :
-    forall m : map int int, n: int. n <> 0 -> invalid m null n
 
   lemma separated_1 : forall p q : addr. forall a b i j : int
     [ separated p a q b , { base = p.base ; offset = i } ,

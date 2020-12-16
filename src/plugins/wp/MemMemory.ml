@@ -346,21 +346,22 @@ let phi_addr_of_int p =
 (* -------------------------------------------------------------------------- *)
 
 (* Lemmas proved with Memory definition:
-   - lemma valid_rd_null: forall m n. n <= 0 -> valid_rd m null n
-   - lemma valid_rw_null: forall m n. n <= 0 -> valid_rw m null n *)
+   - lemma valid_rd_null: forall m n. n <= 0 <-> valid_rd m null n
+   - lemma valid_rw_null: forall m n. n <= 0 <-> valid_rw m null n *)
 let r_valid_unref = function
   | [_; p; n] when p == a_null -> e_leq n e_zero
   | _ -> raise Not_found
 
-(* Lemmas proved with Memory definition:
+(* Lemma proved with Memory definition:
    - lemma valid_obj_null: forall m n. valid_obj m null n *)
 let r_valid_obj = function
   | [_; p; _] when p == a_null -> e_true
   | _ -> raise Not_found
 
-(* Condition: by definition of 'invalid_null' *)
+(* Lemma proved with Memory definition:
+   - lemma invalid_null: forall m n. 0 < n <-> invalid m null n *)
 let r_invalid = function
-  | [_; p; n] when p == a_null -> e_neq e_zero n
+  | [_; p; n] when p == a_null -> e_lt e_zero n
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
