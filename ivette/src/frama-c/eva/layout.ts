@@ -2,7 +2,7 @@
 /* --- Layout                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
-import { Size, EMPTY, LABEL, addH, ValueCache } from './cells';
+import { Size, EMPTY, addH, ValueCache } from './cells';
 import { Probe } from './probes';
 
 export interface LayoutProps {
@@ -23,13 +23,16 @@ export interface Row {
 /* --- Layout Enfine                                                      ---*/
 /* --------------------------------------------------------------------------*/
 
+const HCROP = 18;
+const VCROP = 1;
+
 export class LayoutEngine {
 
   // --- Setup
 
   private readonly cache: ValueCache;
-  private readonly wcrop: number;
   private readonly hcrop: number;
+  private readonly vcrop: number;
   private readonly margin: number;
 
   constructor(
@@ -38,8 +41,8 @@ export class LayoutEngine {
   ) {
     this.cache = cache;
     const zoom = Math.max(0, props?.zoom ?? 0);
-    this.hcrop = 1 + zoom;
-    this.wcrop = LABEL + 2 * zoom;
+    this.vcrop = VCROP + 2 * zoom;
+    this.hcrop = HCROP + zoom;
     this.margin = props?.margin ?? 80;
     this.push = this.push.bind(this);
   }
@@ -51,16 +54,17 @@ export class LayoutEngine {
 
   crop(s: Size): Size {
     return {
-      cols: Math.max(LABEL, Math.min(s.cols, this.wcrop)),
-      rows: Math.max(1, Math.min(s.rows, this.hcrop)),
+      cols: Math.max(HCROP, Math.min(s.cols, this.hcrop)),
+      rows: Math.max(VCROP, Math.min(s.rows, this.vcrop)),
     };
   }
 
   push(p: Probe) {
     const probeSize = this.cache.getProbeSize(p.marker);
     const s = this.crop(probeSize);
+    p.minCols = s.cols;
+    p.maxCols = Math.max(p.minCols, probeSize.cols);
     if (s.cols + this.rowSize.cols > this.margin) this.flush();
-    p.colwidth = s.cols;
     this.rowSize = addH(this.rowSize, s);
     this.buffer.push(p);
   }

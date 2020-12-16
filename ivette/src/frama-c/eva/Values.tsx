@@ -5,6 +5,7 @@
 // React & Dome
 import React from 'react';
 import * as Dome from 'dome';
+import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
@@ -23,8 +24,9 @@ import * as Ast from 'frama-c/api/kernel/ast';
 import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
-
-import { Size, callback, sizeof } from './cells';
+import { SizedArea, HSIZER, WSIZER } from './sized';
+import { callback, sizeof } from './cells';
+import { RowKind } from './layout';
 import { Probe } from './probes';
 import { Model } from './model';
 import './style.css';
@@ -66,124 +68,51 @@ function ProbePanel(props: ProbePanelProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Value Cell
-// --------------------------------------------------------------------------
-
-class Streamer {
-  private readonly v0: number;
-  private readonly vs: number[] = [];
-  private v?: number;
-  constructor(v0: number) {
-    this.v0 = v0;
-  }
-
-  push(v: number) {
-    const { vs } = this;
-    vs.push(Math.round(v));
-    if (vs.length > 200) vs.shift();
-  }
-
-  mean(): number {
-    if (this.v === undefined) {
-      const { vs } = this;
-      const n = vs.length;
-      if (n > 0) {
-        const m = vs.reduce((s, v) => s + v, 0) / n;
-        this.v = Math.round(m + 0.5);
-      } else {
-        this.v = this.v0;
-      }
-    }
-    return this.v;
-  }
-}
-
-class FontSizer {
-  a = 0;
-  b = 0;
-  k: Streamer;
-  p: Streamer;
-
-  constructor(k: number, p: number) {
-    this.k = new Streamer(k);
-    this.p = new Streamer(p);
-  }
-
-  push(x: number, y: number) {
-    const a0 = this.a;
-    const b0 = this.b;
-    if (x !== a0 && a0 !== 0) {
-      const k = (y - b0) / (x - a0);
-      const p = y - k * x;
-      this.k.push(k);
-      this.p.push(p);
-    }
-    this.a = x;
-    this.b = y;
-  }
-
-  capacity(y: number) {
-    const k = this.k.mean();
-    const p = this.p.mean();
-    return Math.round(0.5 + (y - p) / k);
-  }
-
-  dimension(n: number) {
-    const k = this.k.mean();
-    const p = this.p.mean();
-    return p + n * k;
-  }
-
-}
-
-const WSIZER = new FontSizer(7, 6);
-const HSIZER = new FontSizer(14, 6);
-
-interface SizedAreaProps extends Size {
-  children?: React.ReactNode;
-}
-
-function SizedArea(props: SizedAreaProps) {
-  const { rows, cols, children } = props;
-  const refSizer = React.useCallback(
-    (ref: null | HTMLDivElement) => {
-      if (ref) {
-        const r = ref.getBoundingClientRect();
-        WSIZER.push(cols, r.width);
-        HSIZER.push(rows, r.height);
-      }
-    }, [rows, cols],
-  );
-  return (
-    <div
-      ref={refSizer}
-      className="eva-sized-area dome-text-code"
-    >
-      {children}
-    </div>
-  );
-}
-
-// --------------------------------------------------------------------------
 // --- Table Update
 // --------------------------------------------------------------------------
 
 const ChangeEvent = new Dome.Event<void>('eva-changed');
-const forceUpdate = () => ChangeEvent.emit();
+const forceUpdate = () => setImmediate(ChangeEvent.emit);
 
 // --------------------------------------------------------------------------
 // --- Table Cell
 // --------------------------------------------------------------------------
 
 interface TableCellProps {
+  kind: RowKind;
   probe: Probe;
 }
 
 function TableCell(props: TableCellProps) {
-  const { probe } = props;
+  Dome.useUpdate(ChangeEvent);
+  const { probe, kind } = props;
+  const minWidth = WSIZER.dimension(probe.minCols);
+  const maxWidth = WSIZER.dimension(probe.maxCols);
+  const style = { minWidth, maxWidth };
+  let styling = 'dome-text-code';
+  let contents: React.ReactNode = props.probe.marker;
+  switch (kind) {
+    case 'probes':
+      if (probe.transient) {
+        styling = 'eva-transient dome-text-label';
+        contents = '« Current »';
+      } else if (probe.label) {
+        styling = 'dome-text-label';
+        contents = probe.label;
+      } else {
+        contents = <>{probe.code}</>;
+      }
+      break;
+    case 'values':
+      contents = 'VALUES';
+  }
+  const className = classes(
+    'eva-cell',
+    styling,
+  );
   return (
-    <div className="eva-cell">
-      {probe.marker}
+    <div className={className} style={style}>
+      {contents}
     </div>
   );
 }
@@ -200,30 +129,21 @@ interface TableRowProps {
 
 function TableRow(props: TableRowProps) {
   Dome.useUpdate(ChangeEvent);
-  const { data: vstate, index } = props;
-  const row = vstate.getRow(index);
+  const { data: model, index } = props;
+  const row = model.getRow(index);
   if (!row) return null;
-  let className = '';
-  switch (row.kind) {
-    case 'probes':
-      className = 'eva-row eva-row-probes';
-      break;
-    case 'values':
-    case 'callstack':
-      className = 'eva-row eva-row-values';
-      break;
-  }
-  const contents = row.probes.map((p) => (
-    <TableCell key={p.marker} probe={p} />
+  const { kind, probes } = row;
+  const className = `eva-${kind}`;
+  const contents = probes.map((p) => (
+    <TableCell kind={kind} key={p.marker} probe={p} />
   ));
   return (
-    <div
-      style={props.style}
-    >
-      <Hpack className={className}>
+    <Hpack className={className} style={props.style}>
+      <div className="eva-row">
         {contents}
-      </Hpack>
-    </div>
+      </div>
+      <Filler />
+    </Hpack>
   );
 }
 
@@ -237,11 +157,11 @@ interface Dimension {
 }
 
 interface ValuesPanelProps extends Dimension {
-  vstate: Model;
+  model: Model;
 }
 
 function ValuesPanel(props: ValuesPanelProps) {
-  const { vstate, width, height } = props;
+  const { model, width, height } = props;
   const listRef = React.useRef<VariableSizeList>(null);
   // --- reset line cache
   const forceLayout = React.useCallback(
@@ -252,24 +172,24 @@ function ValuesPanel(props: ValuesPanelProps) {
   );
   // --- compute line height
   const getRowHeight = React.useCallback(
-    (k: number) => HSIZER.dimension(vstate.getRowHeight(k)),
-    [vstate],
+    (k: number) => HSIZER.dimension(model.getRowHeight(k)),
+    [model],
   );
   // --- compute layout
   const margin = WSIZER.capacity(width);
   const rowHeight = HSIZER.dimension(1);
-  vstate.setLayout({ margin }, forceLayout);
+  model.setLayout({ margin }, forceLayout);
   // --- render list
   return (
     <VariableSizeList
       ref={listRef}
-      itemCount={vstate.getRowCount()}
-      itemKey={vstate.getRowKey}
+      itemCount={model.getRowCount()}
+      itemKey={model.getRowKey}
       itemSize={getRowHeight}
       estimatedItemSize={rowHeight}
       width={width}
       height={height}
-      itemData={vstate}
+      itemData={model}
     >
       {TableRow}
     </VariableSizeList>
@@ -281,14 +201,14 @@ function ValuesPanel(props: ValuesPanelProps) {
 // --------------------------------------------------------------------------
 
 function ValuesComponent() {
-  const vstate = React.useMemo(() => new Model(forceUpdate), []);
+  const model = React.useMemo(() => new Model(forceUpdate), []);
   Dome.useUpdate(ChangeEvent);
   Server.useSignal(Values.changed, forceUpdate);
   const [selection] = States.useSelection();
   const target = Ast.jMarker(selection?.current?.marker);
-  const probe = vstate.focus(target);
+  const probe = model.focus(target);
   const makeWindow = (size: Dimension) => (
-    <ValuesPanel vstate={vstate} {...size} />
+    <ValuesPanel model={model} {...size} />
   );
   const rank = probe?.rank;
   const stmt = rank ? `@S${rank}` : undefined;

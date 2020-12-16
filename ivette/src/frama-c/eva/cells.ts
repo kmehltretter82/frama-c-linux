@@ -20,7 +20,6 @@ export interface StateCallbacks {
 
 export interface Size { cols: number; rows: number }
 
-export const LABEL = 12; /* number of chars for labels */
 export const EMPTY: Size = { cols: 0, rows: 0 };
 
 export function sizeof(text?: string): Size {

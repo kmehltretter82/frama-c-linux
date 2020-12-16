@@ -51,21 +51,57 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Table Rows                                                         --- */
+/* --- Table Rows General                                                 --- */
 /* -------------------------------------------------------------------------- */
 
-.eva-row-probes {
+.eva-row {
+    display: flex;
+    flex: 0 1 auto;
+    height: 100%;
+    border-bottom: thin solid black;
+    border-right: thin solid black;
+}
+
+.eva-probes .eva-row {
+    border-top: thin solid black;
+}
+
+.eva-cell {
+    flex: 1 1 auto;
+    padding: 2px;
+    border-left: thin solid black;
+}
+
+.eva-cell:nth-child(last) {
+    border-left: none;
+}
+
+.eva-probes .eva-cell {
+    text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows Background                                              --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-probes .eva-row {
     background: #cbe4cb;
 }
 
-.eva-row-values {
-
+.eva-values .eva-row {
+    background: #fff;
 }
 
-.eva-row-values:nth-child(odd) {
+.eva-callstack .eva-row:nth-child(odd) {
     background: #d8edef;
 }
 
-.eva-row-values:nth-child(even) {
+.eva-callsatck .eva-row:nth-child(even) {
     background: #fff;
 }
+
+.eva-transient {
+    background: orange;
+}
+
+/* -------------------------------------------------------------------------- */

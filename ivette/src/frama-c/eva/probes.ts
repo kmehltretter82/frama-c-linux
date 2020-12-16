@@ -8,7 +8,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
-import { StateCallbacks, LABEL } from './cells';
+import { StateCallbacks } from './cells';
 
 /* --------------------------------------------------------------------------*/
 /* --- Probe Labelling                                                    ---*/
@@ -17,6 +17,7 @@ import { StateCallbacks, LABEL } from './cells';
 const Ka = 'A'.charCodeAt(0);
 const Kz = 'Z'.charCodeAt(0);
 const LabelRing: string[] = [];
+const LabelSize = 12;
 let La = Ka;
 let Lk = 0;
 
@@ -49,7 +50,8 @@ export class Probe {
   code?: string;
   stmt?: string;
   rank?: number;
-  colwidth: number = LABEL;
+  minCols: number = LabelSize;
+  maxCols: number = LabelSize;
 
   constructor(state: StateCallbacks, marker: Ast.marker) {
     this.marker = marker;
@@ -73,10 +75,14 @@ export class Probe {
       .finally(this.state.forceUpdate);
   }
 
+  // --------------------------------------------------------------------------
+  // --- Internal State
+  // --------------------------------------------------------------------------
+
   setPersistent() {
     if (this.transient && this.code) {
       this.transient = false;
-      if (this.code.length > LABEL)
+      if (this.code.length > LabelSize)
         this.label = newLabel();
       this.state.forceLayout();
     }
@@ -92,6 +98,10 @@ export class Probe {
       this.state.forceLayout();
     }
   }
+
+  // --------------------------------------------------------------------------
+  // --- Ordering
+  // --------------------------------------------------------------------------
 
   static order(p: Probe, q: Probe): number {
     const rp = p.rank ?? 0;
