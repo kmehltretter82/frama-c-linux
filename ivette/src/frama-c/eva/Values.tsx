@@ -16,36 +16,41 @@ import { AutoSizer } from 'react-virtualized';
 
 // Frama-C
 import { Component, TitleBar } from 'frama-c/LabViews';
-import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
 // Plugins
 import * as Ast from 'frama-c/api/kernel/ast';
-import * as Values from 'frama-c/api/plugins/eva/values';
 
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
-import { callback, sizeof } from './cells';
+import { sizeof } from './cells';
 import { RowKind } from './layout';
 import { Probe } from './probes';
-import { Model } from './model';
+import { Model, getModelInstance } from './model';
 import './style.css';
+
+// --------------------------------------------------------------------------
+// --- Use Model
+// --------------------------------------------------------------------------
+
+function useModel(): Model {
+  const model = getModelInstance();
+  Dome.useUpdate(model.signal);
+  return model;
+}
 
 // --------------------------------------------------------------------------
 // --- Probe Panel
 // --------------------------------------------------------------------------
 
-interface ProbePanelProps {
-  transient?: boolean;
-  label?: string;
-  code?: string;
-  stmt?: string;
-  onPersistent?: callback;
-  onTransient?: callback;
-}
-
-function ProbePanel(props: ProbePanelProps) {
-  const { transient = false, label, code, stmt } = props;
+function ProbeEditor() {
+  const model = useModel();
+  const probe = model.getFocused();
+  const transient = probe?.transient ?? false;
+  const label = probe?.label;
+  const code = probe?.code;
+  const rank = probe?.rank;
+  const stmt = rank ? `@S${rank}` : undefined;
   const { cols, rows } = sizeof(code);
   return (
     <Hpack className="eva-probe">
@@ -59,7 +64,7 @@ function ProbePanel(props: ProbePanelProps) {
         visible={!!code}
         kind={transient ? 'positive' : 'negative'}
         icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
-        onClick={transient ? props.onPersistent : props.onTransient}
+        onClick={() => { if (probe) probe.setTransient(!transient); }}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
       />
       <Filler />
@@ -68,27 +73,21 @@ function ProbePanel(props: ProbePanelProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Table Update
-// --------------------------------------------------------------------------
-
-const ChangeEvent = new Dome.Event<void>('eva-changed');
-const forceUpdate = () => setImmediate(ChangeEvent.emit);
-
-// --------------------------------------------------------------------------
 // --- Table Cell
 // --------------------------------------------------------------------------
 
 interface TableCellProps {
   kind: RowKind;
   probe: Probe;
-  model: Model;
 }
 
+const CELLPADDING = 4;
+
 function TableCell(props: TableCellProps) {
-  Dome.useUpdate(ChangeEvent);
-  const { probe, kind, model } = props;
-  const minWidth = WSIZER.dimension(probe.minCols);
-  const maxWidth = WSIZER.dimension(probe.maxCols);
+  const model = useModel();
+  const { probe, kind } = props;
+  const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
+  const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { minWidth, maxWidth };
   let styling = 'dome-text-code';
   let contents: React.ReactNode = props.probe.marker;
@@ -106,13 +105,17 @@ function TableCell(props: TableCellProps) {
       }
       break;
     case 'values':
-      contents = 'VALUES';
+      contents = (
+        model.cache.getValues(probe.marker).values
+      );
+      break;
   }
+  const isFocused = model.getFocused() === probe;
   const className = classes(
     'eva-cell',
     styling,
     transient && 'eva-transient',
-    !transient && model.isFocused(probe) && 'eva-focused',
+    !transient && isFocused && 'eva-focused',
   );
   return (
     <div className={className} style={style}>
@@ -128,13 +131,11 @@ function TableCell(props: TableCellProps) {
 interface TableRowProps {
   style: React.CSSProperties;
   index: number;
-  data: Model;
 }
 
 function TableRow(props: TableRowProps) {
-  Dome.useUpdate(ChangeEvent);
-  const { data: model, index } = props;
-  const row = model.getRow(index);
+  const model = useModel();
+  const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
   const className = `eva-${kind}`;
@@ -143,7 +144,7 @@ function TableRow(props: TableRowProps) {
       key={probe.marker}
       kind={kind}
       probe={probe}
-      model={model} />
+    />
   ));
   return (
     <Hpack className={className} style={props.style}>
@@ -164,19 +165,17 @@ interface Dimension {
   height: number;
 }
 
-interface ValuesPanelProps extends Dimension {
-  model: Model;
-}
-
-function ValuesPanel(props: ValuesPanelProps) {
-  const { model, width, height } = props;
-  const listRef = React.useRef<VariableSizeList>(null);
+function ValuesPanel(props: Dimension) {
+  const model = useModel();
+  const { width, height } = props;
   // --- reset line cache
-  const forceLayout = React.useCallback(
+  const listRef = React.useRef<VariableSizeList>(null);
+  const forceGridLayout = React.useCallback(
     () => {
       const vlist = listRef.current;
       if (vlist) vlist.resetAfterIndex(0, true);
-    }, [listRef],
+    },
+    [listRef],
   );
   // --- compute line height
   const getRowHeight = React.useCallback(
@@ -186,7 +185,11 @@ function ValuesPanel(props: ValuesPanelProps) {
   // --- compute layout
   const margin = WSIZER.capacity(width);
   const rowHeight = HSIZER.dimension(1);
-  model.setLayout({ margin }, forceLayout);
+  const [selection] = States.useSelection();
+  React.useEffect(() => {
+    const target = Ast.jMarker(selection?.current?.marker);
+    model.setLayout({ margin, target }, forceGridLayout);
+  });
   // --- render list
   return (
     <VariableSizeList
@@ -209,32 +212,14 @@ function ValuesPanel(props: ValuesPanelProps) {
 // --------------------------------------------------------------------------
 
 function ValuesComponent() {
-  const model = React.useMemo(() => new Model(forceUpdate), []);
-  Dome.useUpdate(ChangeEvent);
-  Server.useSignal(Values.changed, forceUpdate);
-  const [selection] = States.useSelection();
-  const target = Ast.jMarker(selection?.current?.marker);
-  const probe = model.focus(target);
-  const makeWindow = (size: Dimension) => (
-    <ValuesPanel model={model} {...size} />
-  );
-  const rank = probe?.rank;
-  const stmt = rank ? `@S${rank}` : undefined;
   return (
     <>
       <TitleBar />
       <Vfill>
-        <ProbePanel
-          transient={probe?.transient}
-          label={probe?.label}
-          code={probe?.code}
-          stmt={stmt}
-          onPersistent={probe?.setPersistent}
-          onTransient={probe?.setTransient}
-        />
+        <ProbeEditor />
         <Vfill>
           <AutoSizer>
-            {makeWindow}
+            {(dim: Dimension) => <ValuesPanel {...dim} />}
           </AutoSizer>
         </Vfill>
       </Vfill>

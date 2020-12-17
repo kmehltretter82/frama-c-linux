@@ -46,6 +46,7 @@ export class Probe {
   readonly marker: Ast.marker;
   readonly state: StateCallbacks;
   transient = true;
+  loading = true;
   label?: string;
   code?: string;
   stmt?: string;
@@ -57,43 +58,41 @@ export class Probe {
     this.marker = marker;
     this.state = state;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
-    this.setPersistent = this.setPersistent.bind(this);
     this.setTransient = this.setTransient.bind(this);
   }
 
   requestProbeInfo() {
+    this.loading = true;
     Server
       .send(Values.getProbeInfo, this.marker)
       .then(({ code, stmt, rank }) => {
         this.code = code;
         this.stmt = stmt;
         this.rank = rank;
+        this.loading = false;
       })
       .catch(() => {
         this.code = '(error)';
+        this.stmt = undefined;
+        this.rank = undefined;
+        this.loading = false;
       })
-      .finally(this.state.forceUpdate);
+      .finally(this.state.forceLayout);
   }
 
   // --------------------------------------------------------------------------
   // --- Internal State
   // --------------------------------------------------------------------------
 
-  setPersistent() {
-    if (this.transient && this.code) {
-      this.transient = false;
-      if (this.code.length > LabelSize)
-        this.label = newLabel();
-      this.state.forceLayout();
-    }
-  }
-
-  setTransient() {
-    if (!this.transient) {
-      this.transient = true;
-      if (this.label) {
+  setTransient(tr: boolean) {
+    if (this.transient !== tr) {
+      this.transient = tr;
+      if (tr && this.label) {
         LabelRing.push(this.label);
         this.label = undefined;
+      }
+      if (!tr && !this.label && this.code && this.code.length > LabelSize) {
+        this.label = newLabel();
       }
       this.state.forceLayout();
     }

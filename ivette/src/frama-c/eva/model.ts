@@ -5,13 +5,20 @@
 // External Libs
 import { throttle } from 'lodash';
 import equal from 'react-fast-compare';
+import * as Dome from 'dome';
 
-import type { marker } from 'frama-c/api/kernel/ast';
+import * as Server from 'frama-c/server';
+import * as Values from 'frama-c/api/plugins/eva/values';
+import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
 import { Probe } from './probes';
 import { callback, StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
+
+export interface ModelLayout extends LayoutProps {
+  target?: Ast.marker;
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- EVA Values Model                                                   ---*/
@@ -19,8 +26,8 @@ import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export class Model implements StateCallbacks {
 
-  constructor(forceUpdate: callback) {
-    this.forceUpdate = forceUpdate;
+  constructor() {
+    this.forceUpdate = this.forceUpdate.bind(this);
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
     this.computeLayout = this.computeLayout.bind(this);
@@ -28,17 +35,21 @@ export class Model implements StateCallbacks {
     this.getRowKey = this.getRowKey.bind(this);
     this.getRowCount = this.getRowCount.bind(this);
     this.getRowHeight = this.getRowHeight.bind(this);
+    Server.onSignal(Values.changed, this.forceReload);
   }
 
   // --- Probes
 
+  private selected?: Probe;
   private focused?: Probe;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
 
-  isFocused(p: Probe | undefined) { return p === this.focused; }
+  getFocused() { return this.focused; }
+  isFocused(p: Probe | undefined) { return this.focused === p; }
+  isRemanent(p: Probe | undefined) { return this.remanent === p; }
 
-  getProbe(m: marker): Probe {
+  getProbe(m: Ast.marker): Probe {
     let p = this.probes.get(m);
     if (!p) {
       p = new Probe(this, m);
@@ -48,27 +59,6 @@ export class Model implements StateCallbacks {
     return p;
   }
 
-  focus(m: marker | undefined): Probe | undefined {
-    const r = this.remanent;
-    if (m) {
-      const p = this.getProbe(m);
-      if (p.stmt) {
-        this.focused = p;
-        if (p.transient && p !== r) {
-          this.remanent = p;
-          this.forceLayout();
-        } else {
-          this.forceUpdate();
-        }
-      } else {
-        this.focused = undefined;
-        this.remanent = undefined;
-        this.forceLayout();
-      }
-    }
-    return this.focused;
-  }
-
   // --- Values
 
   readonly cache = new ValueCache(this);
@@ -76,18 +66,25 @@ export class Model implements StateCallbacks {
   // --- Rows
 
   private forcedLayout = false;
-  private layout: LayoutProps = { margin: 80 };
+  private layout: ModelLayout = { margin: 80 };
   private rows: Row[] = [];
-
-  forceLayout() {
-    if (!this.forcedLayout) {
-      this.forcedLayout = true;
-      setImmediate(this.computeLayout);
-    }
-  }
 
   private computeLayout() {
     this.forcedLayout = false;
+    const s = this.selected;
+    if (!s) {
+      this.focused = undefined;
+      this.remanent = undefined;
+    } else if (s.loading) {
+      this.focused = undefined;
+    } else {
+      this.focused = s;
+      if (s.code) {
+        if (s.transient) this.remanent = s;
+      } else {
+        this.remanent = undefined;
+      }
+    }
     const toLayout: Probe[] = [];
     this.probes.forEach((p) => {
       if (p.code && (!p.transient || p === this.remanent)) {
@@ -119,9 +116,11 @@ export class Model implements StateCallbacks {
   }
 
   // --- Throttled
-  setLayout(ly: LayoutProps, forceGridLayout: callback) {
+  setLayout(ly: ModelLayout, forceGridLayout: callback) {
     if (!equal(this.layout, ly)) {
       this.layout = ly;
+      const target = Ast.jMarker(ly.target);
+      this.selected = target && this.getProbe(target);
       this.forceLayout();
       forceGridLayout();
     }
@@ -140,20 +139,31 @@ export class Model implements StateCallbacks {
     this.forceLayout();
   }
 
-  // --- Force Updating (re-render)
-  private signal?: callback;
-
-  bind(age: number, setAge: (a: number) => void) {
-    const next = age < 0xFFFF ? 1 + age : 0;
-    this.signal = () => setAge(next);
-    return () => { this.signal = undefined; };
+  // --- Force Layout
+  forceLayout() {
+    if (!this.forcedLayout) {
+      this.forcedLayout = true;
+      setImmediate(this.computeLayout);
+    }
   }
 
+  // --- Foce Update
+  readonly signal = new Dome.Event('eva-force-update');
   forceUpdate() {
-    const s = this.signal;
-    if (s) { this.signal = undefined; s(); }
+    this.signal.emit();
   }
 
+}
+
+// --------------------------------------------------------------------------
+// --- EVA Model
+// --------------------------------------------------------------------------
+
+let MODEL: Model | undefined;
+
+export function getModelInstance(): Model {
+  if (!MODEL) MODEL = new Model();
+  return MODEL;
 }
 
 // --------------------------------------------------------------------------
