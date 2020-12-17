@@ -23,6 +23,7 @@ export interface Row {
 /* --- Layout Enfine                                                      ---*/
 /* --------------------------------------------------------------------------*/
 
+const PADDING = 2;
 const HCROP = 18;
 const VCROP = 1;
 
@@ -66,6 +67,7 @@ export class LayoutEngine {
     p.maxCols = Math.max(p.minCols, probeSize.cols);
     if (s.cols + this.rowSize.cols > this.margin) this.flush();
     this.rowSize = addH(this.rowSize, s);
+    this.rowSize.cols += PADDING;
     this.buffer.push(p);
   }
 
