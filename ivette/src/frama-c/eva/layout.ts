@@ -106,13 +106,13 @@ export class LayoutEngine {
         });
         wcs.forEach((cs, k) => {
           rs.push({
-            key: `C${cs}`,
+            key: `C${stmt}::${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
             stacks: wcs.length,
             callstack: cs,
-            hlines: this.values.getStackSize(cs).rows,
+            hlines: this.values.getStackSize(stmt, cs).rows,
           });
         });
       } else {

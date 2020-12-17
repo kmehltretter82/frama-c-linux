@@ -128,7 +128,11 @@ function TableCell(props: TableCellProps) {
     case 'values':
     case 'callstack':
       {
-        const { values } = model.values.getValues(probe.marker, callstack);
+        const { values } = model.values.getValues(
+          probe.marker,
+          probe.stmt,
+          callstack,
+        );
         const { cols, rows } = sizeof(values);
         contents = (
           <SizedArea cols={cols} rows={rows}>

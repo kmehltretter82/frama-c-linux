@@ -89,7 +89,7 @@ export class ValueCache {
 
   private readonly state: StateCallbacks;
   private readonly probes = new Map<Ast.marker, Size>(); // Marker -> max in column
-  private readonly stacks = new Map<Values.callstack, Size>(); // Callstack -> max in row
+  private readonly stacks = new Map<string, Size>(); // Callstack -> max in row
   private readonly vcache = new Map<string, EvaValues>(); // '<Marker><@Callstack>?' -> value
   private smax = EMPTY; // max cell size
 
@@ -113,18 +113,30 @@ export class ValueCache {
     return this.probes.get(target) ?? EMPTY;
   }
 
-  getStackSize(callstack: Values.callstack) {
-    return this.stacks.get(callstack) ?? EMPTY;
+  private static stackKey(stmt: string, callstack: Values.callstack) {
+    return `${stmt}::${callstack}`;
+  }
+
+  getStackSize(stmt: string, callstack: Values.callstack) {
+    const key = ValueCache.stackKey(stmt, callstack);
+    return this.stacks.get(key) ?? EMPTY;
   }
 
   // --- Cached Values & Request Update
 
-  getValues(target: Ast.marker, callstack?: Values.callstack): EvaValues {
-    const key = `${target}@${callstack ?? '*'}`;
+  getValues(
+    target: Ast.marker,
+    stmt: string | undefined,
+    callstack: Values.callstack | undefined,
+  ): EvaValues {
+    const key = callstack !== undefined ? `${target}@${callstack}` : target;
     const cache = this.vcache;
     const cached = cache.get(key);
     if (cached) return cached;
     const newValue: EvaValues = { values: '', size: EMPTY };
+    if (callstack !== undefined && stmt === undefined)
+      return newValue;
+    // callstack !== undefined ==> stmt !== undefined)
     cache.set(key, newValue);
     Server
       .send(Values.getValues, { target, callstack })
@@ -135,7 +147,7 @@ export class ValueCache {
         newValue.v_then = r.v_then;
         newValue.v_else = r.v_else;
         newValue.alarms = r.alarms;
-        if (this.updateLayout(target, callstack, newValue))
+        if (this.updateLayout(target, stmt, callstack, newValue))
           this.state.forceLayout();
         else
           this.state.forceUpdate();
@@ -151,6 +163,7 @@ export class ValueCache {
 
   private updateLayout(
     target: Ast.marker,
+    stmt: string | undefined,
     callstack: Values.callstack | undefined,
     v: EvaValues,
   ): boolean {
@@ -172,10 +185,14 @@ export class ValueCache {
     }
     // max size for stack row
     if (callstack !== undefined) {
-      const cs = this.getStackSize(callstack);
-      if (!leq(s, cs)) {
-        this.stacks.set(callstack, merge(cs, s));
-        small = false;
+      if (stmt === undefined) small = false;
+      else {
+        const key = ValueCache.stackKey(stmt, callstack);
+        const cs = this.stacks.get(key) ?? EMPTY;
+        if (!leq(s, cs)) {
+          this.stacks.set(key, merge(cs, s));
+          small = false;
+        }
       }
     }
     // request new layout if not small enough

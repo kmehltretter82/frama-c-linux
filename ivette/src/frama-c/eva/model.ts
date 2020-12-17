@@ -72,7 +72,7 @@ export class Model implements StateCallbacks {
 
   // --- Rows
 
-  private forcedLayout = false;
+  private lock = false;
   private layout: ModelLayout = { margin: 80 };
   private rows: Row[] = [];
 
@@ -99,14 +99,16 @@ export class Model implements StateCallbacks {
     if (!equal(this.layout, ly)) {
       this.layout = ly;
       const target = Ast.jMarker(ly.target);
-      this.selected = target && this.getProbe(target);
-      this.forceUpdate();
+      this.selected = target ? this.getProbe(target) : undefined;
+      this.forceLayout();
     }
   }
 
   // --- Recompute Layout
 
   private computeLayout() {
+    if (this.lock) return;
+    this.lock = true;
     const s = this.selected;
     if (!s) {
       this.focused = undefined;
@@ -134,8 +136,8 @@ export class Model implements StateCallbacks {
     );
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
-    this.forcedLayout = false;
     this.laidout.emit();
+    this.lock = false;
   }
 
   // --- Force Reload (empty caches)
@@ -155,10 +157,7 @@ export class Model implements StateCallbacks {
 
   // --- Force Layout
   forceLayout() {
-    if (!this.forcedLayout) {
-      this.forcedLayout = true;
-      setImmediate(this.computeLayout);
-    }
+    setImmediate(this.computeLayout);
   }
 
   // --- Foce Update
