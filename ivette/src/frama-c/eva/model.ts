@@ -149,6 +149,7 @@ export class Model implements StateCallbacks {
     this.stacks.clear();
     this.values.clear();
     this.forceLayout();
+    this.forceUpdate();
   }
 
   // --- Events

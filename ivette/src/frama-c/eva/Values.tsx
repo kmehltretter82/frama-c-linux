@@ -171,7 +171,10 @@ function TableCell(props: TableCellProps) {
     }
   };
   const onDoubleClick = () => {
-    if (probe && probe.zoomable) probe.setZoomed(!probe.zoomed);
+    if (probe) {
+      if (probe.transient) probe.setTransient(false);
+      if (probe.zoomable) probe.setZoomed(!probe.zoomed);
+    }
   };
   return (
     <div
