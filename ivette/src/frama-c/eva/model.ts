@@ -13,6 +13,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
 import { Probe } from './probes';
+import { StacksCache } from './stacks';
 import { callback, StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
@@ -59,9 +60,15 @@ export class Model implements StateCallbacks {
     return p;
   }
 
-  // --- Values
+  getStacks(p: Probe | undefined): Values.callstack[] {
+    const stmt = p?.stmt;
+    return stmt ? this.stacks.getStacks(stmt) : [];
+  }
 
-  readonly cache = new ValueCache(this);
+  // --- Caches
+
+  readonly stacks = new StacksCache(this);
+  readonly values = new ValueCache(this);
 
   // --- Rows
 
@@ -91,7 +98,7 @@ export class Model implements StateCallbacks {
         toLayout.push(p);
       }
     });
-    const engine = new LayoutEngine(this.cache, this.layout);
+    const engine = new LayoutEngine(this.values, this.layout);
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
     this.forceUpdate();
@@ -128,14 +135,12 @@ export class Model implements StateCallbacks {
 
   // --- Force Reload (empty caches)
   forceReload() {
-    this.probes.forEach((p) => {
-      if (p.transient && p !== this.focused) {
-        this.probes.delete(p.marker);
-      } else {
-        p.requestProbeInfo();
-      }
-    });
-    this.cache.clear();
+    this.focused = undefined;
+    this.remanent = undefined;
+    this.selected = undefined;
+    this.probes.clear();
+    this.stacks.clear();
+    this.values.clear();
     this.forceLayout();
   }
 

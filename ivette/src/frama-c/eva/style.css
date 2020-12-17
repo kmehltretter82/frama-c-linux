@@ -14,7 +14,7 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-probe {
-    margin: 4px;
+    margin: 8px;
     width: 100%;
     display: flex;
 }
@@ -40,13 +40,14 @@
 .eva-probe-stmt {
     flex: 0 0 auto;
     color: grey;
-    margin-left: 3px;
-    margin-right: 3px;
-    margin-top: 3px;
+    margin-left: 2px;
+    margin-right: 0px;
+    margin-top: 2px;
 }
 
 .eva-probe-button {
     flex: 0 0 auto;
+    margin: 1px;
     min-width: 16px;
 }
 

@@ -50,23 +50,35 @@ function ProbeEditor() {
   const label = probe?.label;
   const code = probe?.code;
   const rank = probe?.rank;
+  const byCS = probe?.byCallstacks;
   const stmt = rank ? `@S${rank}` : undefined;
+  const stacks = model.getStacks(probe).length;
   const { cols, rows } = sizeof(code);
+  const width = WSIZER.dimension(cols) + 4;
+  const height = HSIZER.dimension(rows) + 3;
   const visible = probe ? !!code : model.getRowCount() > 0;
   const visibility = visible ? 'visible' : 'hidden';
   return (
     <Hpack style={{ visibility }} className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
-      <div className="eva-probe-code">
+      <div style={{ width, height }} className="eva-probe-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
         className="eva-probe-button"
+        visible={byCS || stacks > 0}
+        selected={byCS}
+        icon="ITEMS.LIST"
+        title={`Details by callstack (${stacks})`}
+        onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
+      />
+      <IconButton
+        className="eva-probe-button"
         kind={transient ? 'selected' : 'warning'}
         icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
-        onClick={() => { if (probe) probe.setTransient(!transient); }}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
+        onClick={() => { if (probe) probe.setTransient(!transient); }}
       />
       <Filler />
     </Hpack>
@@ -93,22 +105,26 @@ function TableCell(props: TableCellProps) {
   const style = { width: minWidth, maxWidth };
   let styling = 'dome-text-code';
   let contents: React.ReactNode = props.probe.marker;
-  const { transient, label, code } = probe;
+  const { transient } = probe;
   switch (kind) {
     case 'probes':
       if (transient) {
         styling = 'dome-text-label';
         contents = '« Probe »';
-      } else if (label) {
-        styling = 'dome-text-label';
-        contents = label;
       } else {
-        contents = <>{code}</>;
+        const { rank, code, label } = probe;
+        const atpoint = rank && (
+          <span className='dome-text-code eva-probe-stmt'>@S{probe.rank}</span>
+        );
+        styling = 'dome-text-label';
+        contents = (
+          <>{label ?? code}{atpoint}</>
+        );
       }
       break;
     case 'values':
       {
-        const { values } = model.cache.getValues(probe.marker);
+        const { values } = model.values.getValues(probe.marker);
         const { cols, rows } = sizeof(values);
         contents = (
           <SizedArea cols={cols} rows={rows}>

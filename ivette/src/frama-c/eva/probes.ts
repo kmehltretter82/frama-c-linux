@@ -53,6 +53,7 @@ export class Probe {
   rank?: number;
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
+  byCallstacks = false;
 
   constructor(state: StateCallbacks, marker: Ast.marker) {
     this.marker = marker;
@@ -94,6 +95,13 @@ export class Probe {
       if (!tr && !this.label && this.code && this.code.length > LabelSize) {
         this.label = newLabel();
       }
+      this.state.forceLayout();
+    }
+  }
+
+  setByCallstacks(byCS: boolean) {
+    if (byCS !== this.byCallstacks) {
+      this.byCallstacks = byCS;
       this.state.forceLayout();
     }
   }
