@@ -2,8 +2,10 @@
 /* --- Layout                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
-import { Size, EMPTY, addH, ValueCache } from './cells';
+import { callstack } from 'frama-c/api/plugins/eva/values';
 import { Probe } from './probes';
+import { StacksCache } from './stacks';
+import { Size, EMPTY, addH, ValueCache } from './cells';
 
 export interface LayoutProps {
   zoom?: number;
@@ -16,7 +18,11 @@ export interface Row {
   key: string;
   kind: RowKind;
   probes: Probe[];
-  height: number;
+  headstack?: string;
+  stacks?: number;
+  stackIndex?: number;
+  callstack?: callstack;
+  hlines: number;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -31,16 +37,19 @@ export class LayoutEngine {
 
   // --- Setup
 
-  private readonly cache: ValueCache;
+  private readonly values: ValueCache;
+  private readonly stacks: StacksCache;
   private readonly hcrop: number;
   private readonly vcrop: number;
   private readonly margin: number;
 
   constructor(
-    cache: ValueCache,
     props: undefined | LayoutProps,
+    values: ValueCache,
+    stacks: StacksCache,
   ) {
-    this.cache = cache;
+    this.values = values;
+    this.stacks = stacks;
     const zoom = Math.max(0, props?.zoom ?? 0);
     this.vcrop = VCROP + 2 * zoom;
     this.hcrop = HCROP + zoom;
@@ -49,6 +58,7 @@ export class LayoutEngine {
   }
 
   // --- Probe Buffer
+  private byStacks?: string; // stmt
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
   private rows: Row[] = [];
@@ -61,33 +71,64 @@ export class LayoutEngine {
   }
 
   push(p: Probe) {
-    const probeSize = this.cache.getProbeSize(p.marker);
+    const probeSize = this.values.getProbeSize(p.marker);
     const s = this.crop(probeSize);
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
-    if (s.cols + this.rowSize.cols > this.margin) this.flush();
+    const stmt = p.byCallstacks ? p.stmt : undefined;
+    if (stmt !== this.byStacks) {
+      this.flush();
+      this.byStacks = stmt;
+    }
+    if (!stmt && s.cols + this.rowSize.cols > this.margin)
+      this.flush();
     this.rowSize = addH(this.rowSize, s);
     this.rowSize.cols += PADDING;
     this.buffer.push(p);
   }
 
-  // --- Flush Buffer
+  // --- Flush Rows
+
   flush(): Row[] {
     const ps = this.buffer;
     const rs = this.rows;
     if (ps.length > 0) {
-      const n = rs.length;
-      rs.push({
-        key: `P${n}`,
-        kind: 'probes',
-        probes: ps,
-        height: 1,
-      }, {
-        key: `V${n}`,
-        kind: 'values',
-        probes: ps,
-        height: this.rowSize.rows,
-      });
+      const stmt = this.byStacks;
+      if (stmt) {
+        // --- by callstacks
+        const wcs = this.stacks.getStacks(stmt);
+        rs.push({
+          key: `P${stmt}`,
+          kind: 'probes',
+          probes: ps,
+          stacks: wcs.length,
+          hlines: 1,
+        });
+        wcs.forEach((cs, k) => {
+          rs.push({
+            key: `C${cs}`,
+            kind: 'callstack',
+            probes: ps,
+            stackIndex: k,
+            stacks: wcs.length,
+            hlines: this.values.getStackSize(cs).rows,
+          });
+        });
+      } else {
+        // --- by callstacks
+        const n = rs.length;
+        rs.push({
+          key: `P${n}`,
+          kind: 'probes',
+          probes: ps,
+          hlines: 1,
+        }, {
+          key: `V${n}`,
+          kind: 'values',
+          probes: ps,
+          hlines: this.rowSize.rows,
+        });
+      }
     }
     this.buffer = [];
     this.rowSize = EMPTY;

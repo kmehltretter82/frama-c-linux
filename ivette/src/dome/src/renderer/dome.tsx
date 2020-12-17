@@ -490,11 +490,10 @@ export function useForceUpdate() {
 export function useUpdate(...events: Event<any>[]) {
   const fn = useForceUpdate();
   React.useEffect(() => {
-    if (events.length === 0) events.push(update);
-    events.forEach((evt) => evt.on(fn));
-    return () => events.forEach((evt) => evt.off(fn));
-  }, [fn, ...events]); // eslint-disable-line react-hooks/exhaustive-deps
-  // The rule signals events is missing, probably because of « … »
+    const theEvents = events ? events.slice() : [update];
+    theEvents.forEach((evt) => evt.on(fn));
+    return () => theEvents.forEach((evt) => evt.off(fn));
+  });
 }
 
 // --------------------------------------------------------------------------

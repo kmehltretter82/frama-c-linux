@@ -71,6 +71,13 @@
 /* --- Table Cells                                                        --- */
 /* -------------------------------------------------------------------------- */
 
+.eva-stack {
+    width: 12px;
+    padding-top: 1px;
+    color: #777;
+    text-align: center;
+}
+
 .eva-cell {
     flex: 1 1 auto;
     border-left: thin solid black;
@@ -119,6 +126,10 @@
 
 .eva-values .eva-focused {
     background: #def6ff;
+}
+
+.eva-cell.eva-stack {
+    background: #eee;
 }
 
 /* -------------------------------------------------------------------------- */

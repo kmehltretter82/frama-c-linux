@@ -14,7 +14,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Model
 import { Probe } from './probes';
 import { StacksCache } from './stacks';
-import { callback, StateCallbacks, ValueCache } from './cells';
+import { StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
@@ -35,7 +35,7 @@ export class Model implements StateCallbacks {
     this.setLayout = throttle(this.setLayout.bind(this), 300);
     this.getRowKey = this.getRowKey.bind(this);
     this.getRowCount = this.getRowCount.bind(this);
-    this.getRowHeight = this.getRowHeight.bind(this);
+    this.getRowLines = this.getRowLines.bind(this);
     Server.onSignal(Values.changed, this.forceReload);
   }
 
@@ -76,6 +76,36 @@ export class Model implements StateCallbacks {
   private layout: ModelLayout = { margin: 80 };
   private rows: Row[] = [];
 
+  getRow(index: number): Row | undefined {
+    return this.rows[index];
+  }
+
+  getRowCount() {
+    return this.rows.length;
+  }
+
+  getRowKey(index: number): string {
+    const row = this.rows[index];
+    return row ? row.key : `#${index}`;
+  }
+
+  getRowLines(index: number): number {
+    const row = this.rows[index];
+    return row ? row.hlines : 0;
+  }
+
+  // --- Throttled
+  setLayout(ly: ModelLayout) {
+    if (!equal(this.layout, ly)) {
+      this.layout = ly;
+      const target = Ast.jMarker(ly.target);
+      this.selected = target && this.getProbe(target);
+      this.forceUpdate();
+    }
+  }
+
+  // --- Recompute Layout
+
   private computeLayout() {
     this.forcedLayout = false;
     const s = this.selected;
@@ -98,39 +128,14 @@ export class Model implements StateCallbacks {
         toLayout.push(p);
       }
     });
-    const engine = new LayoutEngine(this.values, this.layout);
+    const engine = new LayoutEngine(
+      this.layout,
+      this.values,
+      this.stacks,
+    );
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
-    this.forceUpdate();
-  }
-
-  getRow(index: number): Row | undefined {
-    return this.rows[index];
-  }
-
-  getRowCount() {
-    return this.rows.length;
-  }
-
-  getRowKey(index: number): string {
-    const row = this.rows[index];
-    return row ? row.key : `#${index}`;
-  }
-
-  getRowHeight(index: number): number {
-    const row = this.rows[index];
-    return row ? row.height : 0;
-  }
-
-  // --- Throttled
-  setLayout(ly: ModelLayout, forceGridLayout: callback) {
-    if (!equal(this.layout, ly)) {
-      this.layout = ly;
-      const target = Ast.jMarker(ly.target);
-      this.selected = target && this.getProbe(target);
-      this.forceLayout();
-      forceGridLayout();
-    }
+    this.laidout.emit();
   }
 
   // --- Force Reload (empty caches)
@@ -144,6 +149,10 @@ export class Model implements StateCallbacks {
     this.forceLayout();
   }
 
+  // --- Events
+  readonly changed = new Dome.Event('eva-changed');
+  readonly laidout = new Dome.Event('eva-laidout');
+
   // --- Force Layout
   forceLayout() {
     if (!this.forcedLayout) {
@@ -153,10 +162,7 @@ export class Model implements StateCallbacks {
   }
 
   // --- Foce Update
-  readonly signal = new Dome.Event('eva-force-update');
-  forceUpdate() {
-    this.signal.emit();
-  }
+  forceUpdate() { this.changed.emit(); }
 
 }
 

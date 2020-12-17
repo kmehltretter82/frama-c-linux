@@ -24,7 +24,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
 import { sizeof } from './cells';
-import { RowKind } from './layout';
+import { Row } from './layout';
 import { Probe } from './probes';
 import { Model, getModelInstance } from './model';
 import './style.css';
@@ -35,7 +35,7 @@ import './style.css';
 
 function useModel(): Model {
   const model = getModelInstance();
-  Dome.useUpdate(model.signal);
+  Dome.useUpdate(model.changed, model.laidout);
   return model;
 }
 
@@ -90,8 +90,8 @@ function ProbeEditor() {
 // --------------------------------------------------------------------------
 
 interface TableCellProps {
-  kind: RowKind;
   probe: Probe;
+  row: Row;
 }
 
 const CELLPADDING = 4;
@@ -99,32 +99,36 @@ const CELLPADDING = 4;
 function TableCell(props: TableCellProps) {
   const model = useModel();
   const [selection, setSelection] = States.useSelection();
-  const { probe, kind } = props;
+  const { probe, row } = props;
+  const { kind, callstack } = row;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
   const style = { width: minWidth, maxWidth };
-  let styling = 'dome-text-code';
   let contents: React.ReactNode = props.probe.marker;
   const { transient } = probe;
+
   switch (kind) {
+
+    // ---- Probe Contents
     case 'probes':
       if (transient) {
-        styling = 'dome-text-label';
-        contents = '« Probe »';
+        contents = <span className="dome-text-label">« Probe »</span>;
       } else {
         const { rank, code, label } = probe;
         const atpoint = rank && (
-          <span className='dome-text-code eva-probe-stmt'>@S{probe.rank}</span>
+          <span className="eva-probe-stmt">@S{rank}</span>
         );
-        styling = 'dome-text-label';
         contents = (
-          <>{label ?? code}{atpoint}</>
+          <span className="dome-text-label">{label ?? code}{atpoint}</span>
         );
       }
       break;
+
+    // ---- Values Contents
     case 'values':
+    case 'callstack':
       {
-        const { values } = model.values.getValues(probe.marker);
+        const { values } = model.values.getValues(probe.marker, callstack);
         const { cols, rows } = sizeof(values);
         contents = (
           <SizedArea cols={cols} rows={rows}>
@@ -133,11 +137,13 @@ function TableCell(props: TableCellProps) {
         );
       }
       break;
+
   }
+
+  // --- Cell Packing
   const isFocused = model.getFocused() === probe;
   const className = classes(
     'eva-cell',
-    styling,
     transient && 'eva-transient',
     !transient && isFocused && 'eva-focused',
   );
@@ -174,16 +180,23 @@ function TableRow(props: TableRowProps) {
   if (!row) return null;
   const { kind, probes } = row;
   const className = `eva-${kind}`;
+  const sk = row.stackIndex;
+  const header = row.stacks && (
+    <div className="eva-cell eva-stack">
+      {sk === undefined ? '#' : `${1 + sk}`}
+    </div>
+  );
   const contents = probes.map((probe) => (
     <TableCell
       key={probe.marker}
-      kind={kind}
       probe={probe}
+      row={row}
     />
   ));
   return (
     <Hpack className={className} style={props.style}>
       <div className="eva-row">
+        {header}
         {contents}
       </div>
       <Filler />
@@ -205,16 +218,13 @@ function ValuesPanel(props: Dimension) {
   const { width, height } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
-  const forceGridLayout = React.useCallback(
-    () => {
-      const vlist = listRef.current;
-      if (vlist) vlist.resetAfterIndex(0, true);
-    },
-    [listRef],
-  );
+  Dome.useEvent(model.laidout, () => {
+    const vlist = listRef.current;
+    if (vlist) vlist.resetAfterIndex(0, true);
+  });
   // --- compute line height
   const getRowHeight = React.useCallback(
-    (k: number) => HSIZER.dimension(model.getRowHeight(k)),
+    (k: number) => HSIZER.dimension(model.getRowLines(k)),
     [model],
   );
   // --- compute layout
@@ -223,7 +233,7 @@ function ValuesPanel(props: Dimension) {
   const [selection] = States.useSelection();
   React.useEffect(() => {
     const target = Ast.jMarker(selection?.current?.marker);
-    model.setLayout({ margin, target }, forceGridLayout);
+    model.setLayout({ margin, target });
   });
   // --- render list
   return (
