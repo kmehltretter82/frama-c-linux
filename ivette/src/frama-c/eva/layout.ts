@@ -111,6 +111,7 @@ export class LayoutEngine {
             probes: ps,
             stackIndex: k,
             stacks: wcs.length,
+            callstack: cs,
             hlines: this.values.getStackSize(cs).rows,
           });
         });

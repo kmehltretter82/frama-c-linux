@@ -219,8 +219,10 @@ function ValuesPanel(props: Dimension) {
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
   Dome.useEvent(model.laidout, () => {
-    const vlist = listRef.current;
-    if (vlist) vlist.resetAfterIndex(0, true);
+    setImmediate(() => {
+      const vlist = listRef.current;
+      if (vlist) vlist.resetAfterIndex(0, true);
+    });
   });
   // --- compute line height
   const getRowHeight = React.useCallback(

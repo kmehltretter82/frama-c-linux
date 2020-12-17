@@ -171,10 +171,10 @@ export class ValueCache {
       small = false;
     }
     // max size for stack row
-    if (callstack) {
+    if (callstack !== undefined) {
       const cs = this.getStackSize(callstack);
       if (!leq(s, cs)) {
-        this.stacks.set(callstack, merge(ps, s));
+        this.stacks.set(callstack, merge(cs, s));
         small = false;
       }
     }

@@ -107,7 +107,6 @@ export class Model implements StateCallbacks {
   // --- Recompute Layout
 
   private computeLayout() {
-    this.forcedLayout = false;
     const s = this.selected;
     if (!s) {
       this.focused = undefined;
@@ -135,6 +134,7 @@ export class Model implements StateCallbacks {
     );
     toLayout.sort(Probe.order).forEach(engine.push);
     this.rows = engine.flush();
+    this.forcedLayout = false;
     this.laidout.emit();
   }
 
