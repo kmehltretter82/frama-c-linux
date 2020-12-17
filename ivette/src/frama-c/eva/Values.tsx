@@ -7,7 +7,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
-import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
+import { Vfill, Hpack, Space, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 
@@ -96,6 +96,23 @@ function ProbeEditor() {
 }
 
 // --------------------------------------------------------------------------
+// --- Stack Panel
+// --------------------------------------------------------------------------
+
+function StackEditor() {
+  const model = useModel();
+  const callstack = model.getCallstack();
+  const visibility = callstack === undefined ? 'hidden' : 'visible';
+  return (
+    <Hpack style={{ visibility }} className="eva-callinfo">
+      <Code className="eva-probe-code">
+        {callstack}
+      </Code>
+    </Hpack>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Table Cell Layout
 // --------------------------------------------------------------------------
 
@@ -168,6 +185,7 @@ function TableCell(props: TableCellProps) {
       const fct = selection?.current?.function;
       const location = { function: fct, marker: probe.marker };
       setSelection({ location });
+      model.setSelectedRow(row);
     }
   };
   const onDoubleClick = () => {
@@ -202,8 +220,16 @@ function TableRow(props: TableRowProps) {
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
-  const className = `eva-${kind}`;
   const sk = row.stackIndex;
+  const rowKind = `eva-${kind}`;
+  const rowParity = sk !== undefined && (sk % 2 === 0);
+  const rowStyle =
+    model.isSelectedRow(row) ? 'eva-row-selected' :
+      rowParity ? 'eva-row-odd' : 'eva-row-even';
+  const className = classes(
+    rowKind,
+    rowStyle,
+  );
   const header = row.stacks && (
     <div className="eva-cell eva-stack">
       {sk === undefined ? '#' : `${1 + sk}`}
@@ -314,6 +340,7 @@ function ValuesComponent() {
             )}
           </AutoSizer>
         </Vfill>
+        <StackEditor />
       </Vfill>
     </>
   );

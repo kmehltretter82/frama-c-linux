@@ -43,6 +43,7 @@ export class Model implements StateCallbacks {
 
   private selected?: Probe;
   private focused?: Probe;
+  private callstack?: Values.callstack;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
 
@@ -94,6 +95,27 @@ export class Model implements StateCallbacks {
     return row ? row.hlines : 0;
   }
 
+  setSelectedRow(row: Row) {
+    const cs = row.callstack;
+    if (cs !== this.callstack) {
+      this.callstack = cs;
+      this.forceUpdate();
+    }
+  }
+
+  isSelectedRow(row: Row): boolean {
+    const cs = this.callstack;
+    return cs !== undefined ? cs === row.callstack : false;
+  }
+
+  getCallstack(): string | undefined {
+    const p = this.selected;
+    const c = this.callstack;
+    if (p && c) return `${p.stmt}::${c}`;
+    if (p) return p.stmt;
+    return undefined;
+  }
+
   // --- Throttled
   setLayout(ly: ModelLayout) {
     if (!equal(this.layout, ly)) {
@@ -112,9 +134,11 @@ export class Model implements StateCallbacks {
     const s = this.selected;
     if (!s) {
       this.focused = undefined;
+      this.callstack = undefined;
       this.remanent = undefined;
     } else if (s.loading) {
       this.focused = undefined;
+      this.callstack = undefined;
     } else {
       this.focused = s;
       if (s.code) {
@@ -145,6 +169,7 @@ export class Model implements StateCallbacks {
     this.focused = undefined;
     this.remanent = undefined;
     this.selected = undefined;
+    this.callstack = undefined;
     this.probes.clear();
     this.stacks.clear();
     this.values.clear();

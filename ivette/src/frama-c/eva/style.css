@@ -14,15 +14,18 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-probe {
-    margin: 8px;
+    padding-left: 6px;
+    padding-top: 2px;
+    padding-bottom: 4px;
     width: 100%;
+    background: #ccc;
     display: flex;
 }
 
 .eva-probe-label {
     flex: 0 1 auto;
     min-width: 22px;
-    text-align: right;
+    text-align: left;
 }
 
 .eva-probe-code {
@@ -61,7 +64,7 @@
     flex: 0 1 auto;
     height: 100%;
     border-bottom: thin solid black;
-    border-right: thin solid black;
+    border-left: thin solid black;
 }
 
 .eva-probes .eva-row {
@@ -81,16 +84,27 @@
 
 .eva-cell {
     flex: 1 1 auto;
-    border-left: thin solid black;
+    border-right: thin solid black;
 }
 
 .eva-cell:nth-child(last) {
-    border-left: none;
+    border-right: none;
 }
 
 .eva-probes .eva-cell {
     padding: 2px;
     text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Call Satck Info                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-callinfo {
+    width: 100%;
+    background: #ccc;
+    padding-top: 2px;
+    padding-left: 12px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -102,15 +116,31 @@
 }
 
 .eva-values .eva-row {
-    background: #fff;
+    background: #eee;
 }
 
-.eva-callstack .eva-row:nth-child(odd) {
-    background: #d8edef;
+.eva-callstack.eva-row-odd .eva-row {
+    background: #eee;
 }
 
-.eva-callsatck .eva-row:nth-child(even) {
-    background: #fff;
+.eva-callstack.eva-row-even .eva-row {
+    background: #e2e8e8;
+}
+
+.eva-callstack.eva-row-odd .eva-row .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-callstack.eva-row-even .eva-row .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-callstack.eva-row-selected .eva-row .eva-transient {
+    background: lightblue;
+}
+
+.eva-callstack.eva-row-selected .eva-row {
+    background: lightblue;
 }
 
 .eva-probes .eva-transient {
@@ -125,12 +155,12 @@
     background: lightblue;
 }
 
-.eva-values .eva-focused {
-    background: #def6ff;
+.eva-stack {
+    background: #eee;
 }
 
-.eva-cell.eva-stack {
-    background: #eee;
+.eva-callstack.eva-row-selected .eva-stack {
+    background: lightblue;
 }
 
 /* -------------------------------------------------------------------------- */
