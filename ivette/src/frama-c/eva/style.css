@@ -57,6 +57,7 @@
 
 .eva-row {
     display: flex;
+    position: relative;
     flex: 0 1 auto;
     height: 100%;
     border-bottom: thin solid black;

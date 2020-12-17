@@ -54,6 +54,8 @@ export class Probe {
   minCols: number = LabelSize;
   maxCols: number = LabelSize;
   byCallstacks = false;
+  zoomed = false;
+  zoomable = false;
 
   constructor(state: StateCallbacks, marker: Ast.marker) {
     this.marker = marker;
@@ -102,6 +104,13 @@ export class Probe {
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
+      this.state.forceLayout();
+    }
+  }
+
+  setZoomed(zoomed: boolean) {
+    if (zoomed !== this.zoomed) {
+      this.zoomed = zoomed;
       this.state.forceLayout();
     }
   }

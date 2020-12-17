@@ -5,7 +5,7 @@
 import { callstack } from 'frama-c/api/plugins/eva/values';
 import { Probe } from './probes';
 import { StacksCache } from './stacks';
-import { Size, EMPTY, addH, ValueCache } from './cells';
+import { Size, EMPTY, leq, addH, ValueCache } from './cells';
 
 export interface LayoutProps {
   zoom?: number;
@@ -63,16 +63,19 @@ export class LayoutEngine {
   private buffer: Probe[] = [];
   private rows: Row[] = [];
 
-  crop(s: Size): Size {
+  crop(zoomed: boolean, s: Size): Size {
+    const cols = zoomed ? s.cols : Math.min(s.cols, this.hcrop);
+    const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
-      cols: Math.max(HCROP, Math.min(s.cols, this.hcrop)),
-      rows: Math.max(VCROP, Math.min(s.rows, this.vcrop)),
+      cols: Math.max(HCROP, cols),
+      rows: Math.max(VCROP, rows),
     };
   }
 
   push(p: Probe) {
     const probeSize = this.values.getProbeSize(p.marker);
-    const s = this.crop(probeSize);
+    const s = this.crop(p.zoomed, probeSize);
+    p.zoomable = p.zoomed || !leq(probeSize, s);
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
     const stmt = p.byCallstacks ? p.stmt : undefined;

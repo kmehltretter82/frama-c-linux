@@ -50,28 +50,38 @@ function ProbeEditor() {
   const label = probe?.label;
   const code = probe?.code;
   const rank = probe?.rank;
-  const byCS = probe?.byCallstacks;
   const stmt = rank ? `@S${rank}` : undefined;
+  const byCS = probe?.byCallstacks;
   const stacks = model.getStacks(probe).length;
+  const stackable = byCS || stacks > 1;
   const { cols, rows } = sizeof(code);
   const width = WSIZER.dimension(cols) + 4;
   const height = HSIZER.dimension(rows) + 3;
   const visible = probe ? !!code : model.getRowCount() > 0;
+  const zoomed = probe?.zoomed;
+  const zoomable = probe?.zoomable;
   const visibility = visible ? 'visible' : 'hidden';
   return (
     <Hpack style={{ visibility }} className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
-      <div style={{ width, height }} className="eva-probe-code">
+      <div style={{ minWidth: width, height }} className="eva-probe-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
         className="eva-probe-button"
-        visible={byCS || stacks > 0}
+        display={stackable}
         selected={byCS}
         icon="ITEMS.LIST"
         title={`Details by callstack (${stacks})`}
         onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
+      />
+      <IconButton
+        className="eva-probe-button"
+        display={zoomable}
+        selected={zoomed}
+        icon="SEARCH"
+        onClick={() => { if (probe) probe.setZoomed(!zoomed); }}
       />
       <IconButton
         className="eva-probe-button"
@@ -94,7 +104,7 @@ interface TableCellProps {
   row: Row;
 }
 
-const CELLPADDING = 4;
+const CELLPADDING = 12;
 
 function TableCell(props: TableCellProps) {
   const model = useModel();
@@ -118,8 +128,10 @@ function TableCell(props: TableCellProps) {
         const atpoint = rank && (
           <span className="eva-probe-stmt">@S{rank}</span>
         );
+        const text =
+          label ? <span className="dome-text-label">{label}</span> : code;
         contents = (
-          <span className="dome-text-label">{label ?? code}{atpoint}</span>
+          <span className="dome-text-code">{text}{atpoint}</span>
         );
       }
       break;
@@ -158,11 +170,15 @@ function TableCell(props: TableCellProps) {
       setSelection({ location });
     }
   };
+  const onDoubleClick = () => {
+    if (probe && probe.zoomable) probe.setZoomed(!probe.zoomed);
+  };
   return (
     <div
       className={className}
       style={style}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
     >
       {contents}
     </div>
@@ -190,6 +206,7 @@ function TableRow(props: TableRowProps) {
       {sk === undefined ? '#' : `${1 + sk}`}
     </div>
   );
+  const style: React.CSSProperties = { left: row.stacks ? 0 : 12 };
   const contents = probes.map((probe) => (
     <TableCell
       key={probe.marker}
@@ -199,7 +216,7 @@ function TableRow(props: TableRowProps) {
   ));
   return (
     <Hpack className={className} style={props.style}>
-      <div className="eva-row">
+      <div style={style} className="eva-row">
         {header}
         {contents}
       </div>
@@ -217,9 +234,13 @@ interface Dimension {
   height: number;
 }
 
-function ValuesPanel(props: Dimension) {
+interface ValuesPanelProps extends Dimension {
+  zoom: number;
+}
+
+function ValuesPanel(props: ValuesPanelProps) {
   const model = useModel();
-  const { width, height } = props;
+  const { zoom, width, height } = props;
   // --- reset line cache
   const listRef = React.useRef<VariableSizeList>(null);
   Dome.useEvent(model.laidout, () => {
@@ -239,7 +260,7 @@ function ValuesPanel(props: Dimension) {
   const [selection] = States.useSelection();
   React.useEffect(() => {
     const target = Ast.jMarker(selection?.current?.marker);
-    model.setLayout({ margin, target });
+    model.setLayout({ zoom, margin, target });
   });
   // --- render list
   return (
@@ -263,14 +284,31 @@ function ValuesPanel(props: Dimension) {
 // --------------------------------------------------------------------------
 
 function ValuesComponent() {
+  const [zoom, setZoom] = Dome.useNumberSettings('eva-zoom-factor', 0);
   return (
     <>
-      <TitleBar />
+      <TitleBar>
+        <IconButton
+          enabled={zoom > 0}
+          icon="ZOOM.OUT"
+          onClick={() => setZoom(zoom - 1)}
+        />
+        <IconButton
+          enabled={zoom < 20}
+          icon="ZOOM.IN"
+          onClick={() => setZoom(zoom + 1)}
+        />
+      </TitleBar>
       <Vfill>
         <ProbeEditor />
         <Vfill>
           <AutoSizer>
-            {(dim: Dimension) => <ValuesPanel {...dim} />}
+            {(dim: Dimension) => (
+              <ValuesPanel
+                zoom={zoom}
+                {...dim}
+              />
+            )}
           </AutoSizer>
         </Vfill>
       </Vfill>
