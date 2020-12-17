@@ -52,8 +52,10 @@ function ProbeEditor() {
   const rank = probe?.rank;
   const stmt = rank ? `@S${rank}` : undefined;
   const { cols, rows } = sizeof(code);
+  const visible = probe ? !!code : model.getRowCount() > 0;
+  const visibility = visible ? 'visible' : 'hidden';
   return (
-    <Hpack className="eva-probe">
+    <Hpack style={{ visibility }} className="eva-probe">
       <Label className="eva-probe-label">{label && `${label}:`}</Label>
       <div className="eva-probe-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
@@ -61,8 +63,7 @@ function ProbeEditor() {
       <Code className="eva-probe-stmt">{stmt}</Code>
       <IconButton
         className="eva-probe-button"
-        visible={!!code}
-        kind={transient ? 'positive' : 'negative'}
+        kind={transient ? 'selected' : 'warning'}
         icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
         onClick={() => { if (probe) probe.setTransient(!transient); }}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
@@ -73,7 +74,7 @@ function ProbeEditor() {
 }
 
 // --------------------------------------------------------------------------
-// --- Table Cell
+// --- Table Cell Layout
 // --------------------------------------------------------------------------
 
 interface TableCellProps {
@@ -85,10 +86,11 @@ const CELLPADDING = 4;
 
 function TableCell(props: TableCellProps) {
   const model = useModel();
+  const [selection, setSelection] = States.useSelection();
   const { probe, kind } = props;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
   const maxWidth = CELLPADDING + WSIZER.dimension(probe.maxCols);
-  const style = { minWidth, maxWidth };
+  const style = { width: minWidth, maxWidth };
   let styling = 'dome-text-code';
   let contents: React.ReactNode = props.probe.marker;
   const { transient, label, code } = probe;
@@ -96,7 +98,7 @@ function TableCell(props: TableCellProps) {
     case 'probes':
       if (transient) {
         styling = 'dome-text-label';
-        contents = '« Current »';
+        contents = '« Probe »';
       } else if (label) {
         styling = 'dome-text-label';
         contents = label;
@@ -105,9 +107,15 @@ function TableCell(props: TableCellProps) {
       }
       break;
     case 'values':
-      contents = (
-        model.cache.getValues(probe.marker).values
-      );
+      {
+        const { values } = model.cache.getValues(probe.marker);
+        const { cols, rows } = sizeof(values);
+        contents = (
+          <SizedArea cols={cols} rows={rows}>
+            {values}
+          </SizedArea>
+        );
+      }
       break;
   }
   const isFocused = model.getFocused() === probe;
@@ -117,8 +125,19 @@ function TableCell(props: TableCellProps) {
     transient && 'eva-transient',
     !transient && isFocused && 'eva-focused',
   );
+  const onClick = () => {
+    if (probe) {
+      const fct = selection?.current?.function;
+      const location = { function: fct, marker: probe.marker };
+      setSelection({ location });
+    }
+  };
   return (
-    <div className={className} style={style}>
+    <div
+      className={className}
+      style={style}
+      onClick={onClick}
+    >
       {contents}
     </div>
   );

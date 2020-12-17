@@ -107,8 +107,6 @@ export class Probe {
     const rq = q.rank ?? 0;
     if (rp < rq) return (-1);
     if (rp > rq) return (+1);
-    if (p.transient && !q.transient) return (-1);
-    if (!p.transient && q.transient) return (+1);
     if (p.marker < q.marker) return (-1);
     if (p.marker > q.marker) return (+1);
     return 0;
