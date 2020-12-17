@@ -135,7 +135,9 @@ let macro_frama_c_only = "@frama-c-exe@ @DEFAULT_OPTIONS@"
 let macro_frama_c_cmd = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@"
 let macro_frama_c = "@frama-c-exe@ @DEFAULT_OPTIONS@ @PLUGIN_OPTIONS@ @PTEST_FILE@"
 
-  (** the files in [suites] whose name matches
+let default_toplevel = "@frama-c@ @OPTIONS@"
+
+(** the files in [suites] whose name matches
       the pattern [test_file_regexp] will be considered as test files *)
 let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 
@@ -146,7 +148,7 @@ let example_msg =
      @[<v 1>\
      Directives:@  \
      COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
-     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern (defaults to: %s).@]@  \
+     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
                                                     # Note: the textual targets are compared to oracles.@]@  \
@@ -193,6 +195,12 @@ let example_msg =
      @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
      @]@ \
      @[<v 1>\
+     Default directive values:@  \
+     FILEREG: %s@  \
+     CMD:     %s@  \
+     EXIT:    0@  \
+     @]@ \
+     @[<v 1>\
      Dune aliases related to the test:@  \
      @@ptests                         # Tests all configuration.@  \
      @@ptests_config                  # Tests only the default configuration.@  \
@@ -205,12 +213,13 @@ let example_msg =
      - 'dune build @<subdirectory>/<alias>'@  \
      @]@ \
      @]"
-    test_file_regexp
     macro_default_options
     macro_frama_c_exe
     macro_frama_c_only
     macro_frama_c
     macro_frama_c_cmd
+    test_file_regexp
+    default_toplevel
 
 let umsg = "Usage: ptests [options] [names of test suites]"
 
@@ -556,7 +565,6 @@ end  = struct
   let filename = "test_config"
   let filename = config_name filename
 
-  let default_toplevel = "@frama-c@ @OPTIONS@"
   let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; exit_code=None; macros=config.dc_macros; logs=[]; timeout=""} ]
   let default_config =
     { dc_test_regexp = test_file_regexp;
