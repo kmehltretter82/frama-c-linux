@@ -3,7 +3,7 @@
    EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:@PTEST_NAME@.i}                 -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > /dev/null 2> /dev/null
    EXECNOW: BIN ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i @frama-c-cmd@ %{dep:ocode_@PTEST_NAME@.0.execnow.i} -region-annot -print -ocode ocode_@PTEST_NAME@.@PTEST_NUMBER@.execnow.i > /dev/null 2> /dev/null
 
-   EXECNOW: LOG   diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt    diff -v %{dep:ocode_@PTEST_NAME@.0.execnow.i} %{dep:ocode_@PTEST_NAME@.1.execnow.i} &> diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt
+   EXECNOW: LOG   diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt    diff %{dep:ocode_@PTEST_NAME@.0.execnow.i} %{dep:ocode_@PTEST_NAME@.1.execnow.i} &> diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt
 COMMENT: The file diff_@PTEST_NAME@.@PTEST_NUMBER@.execnow.txt must be empty. 
 COMMENT: So, that file has not to be present into the oracle directory since absent files are considered such as empty files.
  */
