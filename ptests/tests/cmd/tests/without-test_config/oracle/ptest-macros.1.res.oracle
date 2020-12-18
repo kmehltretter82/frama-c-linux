@@ -1,1 +1,1 @@
-PTEST_DIR=tests/without-test_config PTEST_NAME=ptest-macros.i PTEST_RESULT=tests/without-test_config/result PTEST_NAME=ptest-macros PTEST_NUMBER=1
+PTEST_DIR=./tests/cmd/tests/without-test_config PTEST_NAME=ptest-macros.i PTEST_RESULT=./tests/cmd/tests/without-test_config/result PTEST_NAME=ptest-macros PTEST_NUMBER=1
