@@ -8,6 +8,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
+import { Icon } from 'dome/controls/icons';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { ButtonGroup, Button } from 'dome/frame/toolbars';
@@ -232,6 +233,7 @@ function TableCell(props: TableCellProps) {
           probe.stmt,
           callstack,
         );
+        const { alarms = [] } = domain;
         const { vstate: s, effects, condition } = probe;
         const text = valueAt(domain, s) ?? '';
         const diff = diffAfter(domain, effects, s);
@@ -239,11 +241,16 @@ function TableCell(props: TableCellProps) {
         const diffB = diffElse(domain, condition, s);
         const { cols, rows } = sizeof(text);
         contents = (
-          <SizedArea cols={cols} rows={rows}>
-            <span className={`eva-state-${s}`}>
-              <Diff text={text} diff={diff} diffA={diffA} diffB={diffB} />
-            </span>
-          </SizedArea>
+          <>
+            {alarms.length > 0 && (
+              <Icon className="eva-cell-alarms" size={10} id='WARNING' />
+            )}
+            <SizedArea cols={cols} rows={rows}>
+              <span className={`eva-state-${s}`}>
+                <Diff text={text} diff={diff} diffA={diffA} diffB={diffB} />
+              </span>
+            </SizedArea>
+          </>
         );
       }
       break;
