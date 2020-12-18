@@ -9,11 +9,17 @@
     text-overflow: ellipsis;
 }
 
+.eva-stmt {
+    cursor: default;
+    color: grey;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Probe Panel                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-.eva-probe {
+.eva-probeinfo {
+    min-height: 29px;
     padding-left: 6px;
     padding-top: 2px;
     padding-bottom: 4px;
@@ -22,13 +28,13 @@
     display: flex;
 }
 
-.eva-probe-label {
+.eva-probeinfo-label {
     flex: 0 1 auto;
     min-width: 22px;
     text-align: left;
 }
 
-.eva-probe-code {
+.eva-probeinfo-code {
     flex: 0 1 auto;
     background: lightgrey;
     min-width: 120px;
@@ -40,15 +46,14 @@
     overflow: hidden;
 }
 
-.eva-probe-stmt {
+.eva-probeinfo-stmt {
     flex: 0 0 auto;
-    color: grey;
     margin-left: 2px;
     margin-right: 0px;
     margin-top: 2px;
 }
 
-.eva-probe-button {
+.eva-probeinfo-button {
     flex: 0 0 auto;
     margin: 1px;
     min-width: 16px;
@@ -100,11 +105,20 @@
 /* --- Call Satck Info                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-.eva-callinfo {
+.eva-info {
     width: 100%;
     background: #ccc;
-    padding-top: 2px;
+    padding-top: 3px;
     padding-left: 12px;
+    padding-bottom: 2px;
+}
+
+.eva-callsite {
+    fill: #7cacbb;
+    background: #eee;
+    border-radius: 4px;
+    border: thin solid black;
+    padding-right: 7px;
 }
 
 /* -------------------------------------------------------------------------- */

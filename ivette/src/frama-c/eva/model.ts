@@ -13,7 +13,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
 import { Probe } from './probes';
-import { StacksCache } from './stacks';
+import { StacksCache, Callsite } from './stacks';
 import { StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
@@ -108,12 +108,12 @@ export class Model implements StateCallbacks {
     return cs !== undefined ? cs === row.callstack : false;
   }
 
-  getCallstack(): string | undefined {
-    const p = this.selected;
+  getCallstack(): Callsite[] {
     const c = this.callstack;
-    if (p && c) return `${p.stmt}::${c}`;
-    if (p) return p.stmt;
-    return undefined;
+    if (c !== undefined) return this.stacks.getCalls(c);
+    const [s] = this.getStacks(this.focused);
+    if (s !== undefined) return this.stacks.getCalls(s);
+    return [];
   }
 
   // --- Throttled

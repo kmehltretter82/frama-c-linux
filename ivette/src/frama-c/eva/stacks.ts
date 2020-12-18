@@ -12,6 +12,12 @@ import { StateCallbacks } from './cells';
 // --------------------------------------------------------------------------
 
 export type callstacks = Values.callstack[];
+export interface Callsite {
+  callee: string;
+  caller?: string;
+  stmt?: string;
+  rank?: number;
+}
 
 // --------------------------------------------------------------------------
 // --- CallStacks Cache
@@ -21,6 +27,7 @@ export class StacksCache {
 
   private readonly state: StateCallbacks;
   private readonly stacks = new Map<string, callstacks>();
+  private readonly calls = new Map<Values.callstack, Callsite[]>();
 
   // --------------------------------------------------------------------------
   // --- LifeCycle
@@ -46,6 +53,14 @@ export class StacksCache {
     return [];
   }
 
+  getCalls(cs: Values.callstack): Callsite[] {
+    const fs = this.calls.get(cs);
+    if (fs !== undefined) return fs;
+    this.calls.set(cs, []);
+    this.requestCalls(cs);
+    return [];
+  }
+
   // --------------------------------------------------------------------------
   // --- Fetchers
   // --------------------------------------------------------------------------
@@ -56,6 +71,15 @@ export class StacksCache {
       .then((cs: callstacks) => {
         this.stacks.set(stmt, cs);
         this.state.forceLayout();
+      });
+  }
+
+  private requestCalls(cs: Values.callstack) {
+    Server
+      .send(Values.getCallstackInfo, cs)
+      .then((calls) => {
+        this.calls.set(cs, calls);
+        this.state.forceUpdate();
       });
   }
 

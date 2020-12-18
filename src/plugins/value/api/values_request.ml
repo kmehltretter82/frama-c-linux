@@ -31,7 +31,6 @@ module CSmap = CS.Hashtbl
 
 module Md = Markdown
 module Jkf = Kernel_ast.Kf
-module Jki = Kernel_ast.Ki
 module Jstmt = Kernel_ast.Stmt
 module Jmarker = Kernel_ast.Marker
 
@@ -98,7 +97,6 @@ let probe marker =
 module Ranking :
 sig
   val stmt : stmt -> int
-  val kinstr : kinstr -> int
   val sort : callstack list -> callstack list
 end =
 struct
@@ -162,10 +160,6 @@ struct
 
   let stmt = let rk = new ranker in rk#rank
 
-  let kinstr = function
-    | Kglobal -> 0
-    | Kstmt s -> stmt s
-
   let rec ranks (rks : int list) (cs : callstack) : int list =
     match cs with
     | [] -> rks
@@ -196,26 +190,39 @@ struct
   let of_json = I.of_json
 end
 
-module Jcallsite : Data.S with type t = Value_types.call_site =
+module Jcalls : Request.Output with type t = callstack =
 struct
-  type t = kernel_function * kinstr
-  let jtype = Package.(Jrecord [
-      "fct" , Jkf.jtype ;
-      "stmt" , Jki.jtype ;
-      "rank" , Jnumber ;
-    ])
-  let to_json (kf,ki) = `Assoc [
-      "fct" , Jkf.to_json kf ;
-      "stmt" , Jki.to_json ki ;
-      "rank" , Jint.to_json (Ranking.kinstr ki) ;
-    ]
-  let of_json = function
-    | `Assoc fds ->
-      let kf = Jkf.of_json (List.assoc "fct" fds) in
-      let ki = Jki.of_json (List.assoc "stmt" fds) in
-      (kf,ki)
-    | _ -> failwith "Not a call-site"
+
+  type t = callstack
+  let jtype = Package.(Jlist (Jrecord [
+      "callee" , Jkf.jtype ;
+      "caller" , Joption Jkf.jtype ;
+      "stmt" , Joption Jstmt.jtype ;
+      "rank" , Joption Jnumber ;
+    ]))
+
+  let rec jcallstack jcallee ki cs : json list =
+    match ki , cs with
+    | Kglobal , _ | _ , [] -> [
+        `Assoc [ "callee", jcallee ]
+      ]
+    | Kstmt stmt , (called,ki) :: cs ->
+      let jcaller = Jkf.to_json called in
+      let callsite = `Assoc [
+          "callee", jcallee ;
+          "caller", jcaller ;
+          "stmt", Jstmt.to_json stmt ;
+          "rank", Jint.to_json (Ranking.stmt stmt) ;
+        ] in
+      callsite :: jcallstack jcaller ki cs
+
+  let to_json = function
+    | [] -> `List []
+    | (callee,ki)::cs -> `List (jcallstack (Jkf.to_json callee) ki cs)
+
 end
+
+
 
 module Jtruth : Data.S with type t = truth =
 struct
@@ -368,30 +375,13 @@ let () = Request.register ~package
 (* --- Request getCallstackInfo                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pretty fmt cs =
-  match cs with
-  | (_, Kstmt _) :: callers ->
-    Value_types.Callstack.pretty_hash fmt cs;
-    Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
-      (fun fmt (kf, _) -> Kernel_function.pretty fmt kf) fmt callers
-  | _ -> ()
-
 let () =
-  let getCallstackInfo = Request.signature
-      ~input:(module Jcallstack) () in
-  let set_descr = Request.result getCallstackInfo ~name:"descr"
-      ~descr:(Md.plain "Description")
-      (module Jstring) in
-  let set_calls = Request.result getCallstackInfo ~name:"calls"
-      ~descr:(Md.plain "Callers site, from last to first")
-      (module Jlist(Jcallsite)) in
-  Request.register_sig ~package getCallstackInfo
+  Request.register ~package
     ~kind:`GET ~name:"getCallstackInfo"
     ~descr:(Md.plain "Callstack Description")
-    begin fun rq cs ->
-      set_calls rq cs ;
-      set_descr rq (Pretty_utils.to_string pretty cs) ;
-    end
+    ~input:(module Jcallstack)
+    ~output:(module Jcalls)
+    begin fun cs -> cs end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getStmtInfo                                                --- *)

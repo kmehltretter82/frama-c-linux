@@ -7,7 +7,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
-import { Vfill, Hpack, Space, Filler } from 'dome/layout/boxes';
+import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 
@@ -26,6 +26,7 @@ import { SizedArea, HSIZER, WSIZER } from './sized';
 import { sizeof } from './cells';
 import { Row } from './layout';
 import { Probe } from './probes';
+import { Callsite } from './stacks';
 import { Model, getModelInstance } from './model';
 import './style.css';
 
@@ -40,36 +41,56 @@ function useModel(): Model {
 }
 
 // --------------------------------------------------------------------------
+// --- Stmt Printer
+// --------------------------------------------------------------------------
+
+interface StmtProps {
+  stmt?: string;
+  rank?: number;
+}
+
+function Stmt(props: StmtProps) {
+  const { rank, stmt } = props;
+  if (rank === undefined || !stmt) return null;
+  const title = `Stmt id ${stmt} at rank ${rank}`;
+  return (
+    <span className="dome-text-code eva-stmt" title={title}>
+      @S{rank}
+    </span>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Probe Panel
 // --------------------------------------------------------------------------
 
-function ProbeEditor() {
+function ProbeInfos() {
   const model = useModel();
   const probe = model.getFocused();
   const transient = probe?.transient ?? false;
   const label = probe?.label;
   const code = probe?.code;
+  const stmt = probe?.stmt;
   const rank = probe?.rank;
-  const stmt = rank ? `@S${rank}` : undefined;
   const byCS = probe?.byCallstacks;
   const stacks = model.getStacks(probe).length;
   const stackable = byCS || stacks > 1;
   const { cols, rows } = sizeof(code);
   const width = WSIZER.dimension(cols) + 4;
   const height = HSIZER.dimension(rows) + 3;
-  const visible = probe ? !!code : model.getRowCount() > 0;
+  const visible = !!code;
   const zoomed = probe?.zoomed;
   const zoomable = probe?.zoomable;
   const visibility = visible ? 'visible' : 'hidden';
   return (
-    <Hpack style={{ visibility }} className="eva-probe">
-      <Label className="eva-probe-label">{label && `${label}:`}</Label>
-      <div style={{ minWidth: width, height }} className="eva-probe-code">
+    <Hpack style={{ visibility }} className="eva-probeinfo">
+      <Label className="eva-probeinfo-label">{label && `${label}:`}</Label>
+      <div style={{ minWidth: width, height }} className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
-      <Code className="eva-probe-stmt">{stmt}</Code>
+      <Code><Stmt stmt={stmt} rank={rank} /></Code>
       <IconButton
-        className="eva-probe-button"
+        className="eva-probeinfo-button"
         display={stackable}
         selected={byCS}
         icon="ITEMS.LIST"
@@ -77,14 +98,14 @@ function ProbeEditor() {
         onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
       />
       <IconButton
-        className="eva-probe-button"
+        className="eva-probeinfo-button"
         display={zoomable}
         selected={zoomed}
         icon="SEARCH"
         onClick={() => { if (probe) probe.setZoomed(!zoomed); }}
       />
       <IconButton
-        className="eva-probe-button"
+        className="eva-probeinfo-button"
         kind={transient ? 'selected' : 'warning'}
         icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
@@ -99,15 +120,33 @@ function ProbeEditor() {
 // --- Stack Panel
 // --------------------------------------------------------------------------
 
-function StackEditor() {
+function StackInfos() {
   const model = useModel();
+  const [, setSelection] = States.useSelection();
   const callstack = model.getCallstack();
-  const visibility = callstack === undefined ? 'hidden' : 'visible';
-  return (
-    <Hpack style={{ visibility }} className="eva-callinfo">
-      <Code className="eva-probe-code">
-        {callstack}
+  if (callstack.length <= 1) return null;
+  const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
+    if (!caller || !stmt) return null;
+    const key = `${caller}@${stmt}`;
+    const onClick = () => {
+      const location = { function: caller, marker: stmt };
+      setSelection({ location });
+    };
+    return (
+      <Code
+        key={key}
+        icon="TRIANGLE.LEFT"
+        className="eva-callsite"
+        onClick={onClick}
+      >
+        {caller}
+        <Stmt stmt={stmt} rank={rank} />
       </Code>
+    );
+  };
+  return (
+    <Hpack className="eva-info">
+      {callstack.map(makeCallsite)}
     </Hpack>
   );
 }
@@ -141,14 +180,13 @@ function TableCell(props: TableCellProps) {
       if (transient) {
         contents = <span className="dome-text-label">« Probe »</span>;
       } else {
-        const { rank, code, label } = probe;
-        const atpoint = rank && (
-          <span className="eva-probe-stmt">@S{rank}</span>
-        );
-        const text =
-          label ? <span className="dome-text-label">{label}</span> : code;
+        const { stmt, rank, code, label } = probe;
+        const textClass = label ? 'dome-text-label' : 'dome-text-code';
         contents = (
-          <span className="dome-text-code">{text}{atpoint}</span>
+          <>
+            <span className={textClass}>{label ?? code}</span>
+            <Stmt stmt={stmt} rank={rank} />
+          </>
         );
       }
       break;
@@ -329,7 +367,7 @@ function ValuesComponent() {
         />
       </TitleBar>
       <Vfill>
-        <ProbeEditor />
+        <ProbeInfos />
         <Vfill>
           <AutoSizer>
             {(dim: Dimension) => (
@@ -340,7 +378,7 @@ function ValuesComponent() {
             )}
           </AutoSizer>
         </Vfill>
-        <StackEditor />
+        <StackInfos />
       </Vfill>
     </>
   );

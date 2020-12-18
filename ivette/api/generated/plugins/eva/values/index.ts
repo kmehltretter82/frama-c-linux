@@ -57,30 +57,25 @@ export const getCallstacks: Server.GetRequest<Json.key<'#stmt'>,callstack[]>= ge
 
 const getCallstackInfo_internal: Server.GetRequest<
   callstack,
-  { calls:
-        { fct: Json.key<'#fct'>, stmt?: Json.key<'#stmt'>, rank: number }[],
-    descr: string }
+  { callee: Json.key<'#fct'>, caller?: Json.key<'#fct'>,
+    stmt?: Json.key<'#stmt'>, rank?: number }[]
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstackInfo',
   input:  jCallstack,
-  output: Json.jObject({
-            calls: Json.jList(
-                     Json.jObject({
-                       fct: Json.jFail(Json.jKey<'#fct'>('#fct'),
-                              '#fct expected'),
-                       stmt: Json.jKey<'#stmt'>('#stmt'),
-                       rank: Json.jFail(Json.jNumber,'Number expected'),
-                     })),
-            descr: Json.jFail(Json.jString,'String expected'),
-          }),
+  output: Json.jList(
+            Json.jObject({
+              callee: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+              caller: Json.jKey<'#fct'>('#fct'),
+              stmt: Json.jKey<'#stmt'>('#stmt'),
+              rank: Json.jNumber,
+            })),
 };
 /** Callstack Description */
 export const getCallstackInfo: Server.GetRequest<
   callstack,
-  { calls:
-        { fct: Json.key<'#fct'>, stmt?: Json.key<'#stmt'>, rank: number }[],
-    descr: string }
+  { callee: Json.key<'#fct'>, caller?: Json.key<'#fct'>,
+    stmt?: Json.key<'#stmt'>, rank?: number }[]
   >= getCallstackInfo_internal;
 
 const getStmtInfo_internal: Server.GetRequest<
