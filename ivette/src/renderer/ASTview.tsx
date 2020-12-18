@@ -108,13 +108,13 @@ function getBulletColor(status: States.Tag) {
     case 'invalid_under_hyp': return '#FF0000';
     case 'valid':
     case 'valid_under_hyp': return '#00B900';
-    case 'considered_valid': return '#0000FF';
+    case 'considered_valid': return '#73bbbb';
     case 'invalid_but_dead':
     case 'valid_but_dead':
     case 'unknown_but_dead': return '#000000';
     case 'never_tried': return '#FFFFFF';
     case 'inconsistent': return '#FF00FF';
-    default: return '#0000FF';
+    default: return '#FF8300';
   }
 }
 

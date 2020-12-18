@@ -58,6 +58,8 @@ export class Probe {
   zoomed = false;
   zoomable = false;
   vstate: EvaState = 'Here';
+  effects = false;
+  condition = false;
 
   constructor(state: ModelCallbacks, fct: string, marker: Ast.marker) {
     this.fct = fct;
@@ -71,10 +73,13 @@ export class Probe {
     this.loading = true;
     Server
       .send(Values.getProbeInfo, this.marker)
-      .then(({ code, stmt, rank }) => {
+      .then(({ code, stmt, rank, effects, condition }) => {
         this.code = code;
         this.stmt = stmt;
         this.rank = rank;
+        this.effects = effects;
+        this.condition = condition;
+        this.vstate = effects ? 'After' : 'Here';
         this.loading = false;
       })
       .catch(() => {
@@ -116,6 +121,11 @@ export class Probe {
       this.zoomed = zoomed;
       this.model.forceLayout();
     }
+  }
+
+  setState(s: EvaState | undefined) {
+    this.vstate = s ?? 'Here';
+    this.model.forceUpdate();
   }
 
   // --------------------------------------------------------------------------

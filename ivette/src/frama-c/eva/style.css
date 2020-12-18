@@ -19,7 +19,7 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-probeinfo {
-    min-height: 29px;
+    min-height: 32px;
     padding-left: 6px;
     padding-top: 2px;
     padding-bottom: 4px;
@@ -57,6 +57,35 @@
     flex: 0 0 auto;
     margin: 1px;
     min-width: 16px;
+}
+
+.eva-probeinfo-state {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Call Satck Info                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-info {
+    width: 100%;
+    background: #ccc;
+    padding-top: 3px;
+    padding-left: 12px;
+    padding-bottom: 2px;
+}
+
+.eva-callsite {
+    fill: #7cacbb;
+    background: #eee;
+    border-radius: 4px;
+    border: thin solid black;
+    padding-right: 7px;
+}
+
+.eva-callsite {
+    cursor: default;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,29 +130,19 @@
     text-align: center;
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- Call Satck Info                                                    --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-info {
-    width: 100%;
-    background: #ccc;
-    padding-top: 3px;
-    padding-left: 12px;
-    padding-bottom: 2px;
+.eva-diff-shadow {
+    border: solid red thin;
+    position: relative;
+    z-index: -1;
 }
 
-.eva-callsite {
-    fill: #7cacbb;
-    background: #eee;
-    border-radius: 4px;
-    border: thin solid black;
-    padding-right: 7px;
-}
+.eva-diff-added { }
+.eva-diff-removed { text-decoration: strike }
 
-.eva-callsite {
-    cursor: default;
-}
+.eva-state-Here .eva-diff { background: pink; }
+.eva-state-After .eva-diff { background: yellow; }
+.eva-state-Then .eva-diff { background: green; }
+.eva-state-Else .eva-diff { background: orange; }
 
 /* -------------------------------------------------------------------------- */
 /* --- Table Rows Background                                              --- */

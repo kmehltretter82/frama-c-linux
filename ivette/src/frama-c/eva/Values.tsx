@@ -10,6 +10,7 @@ import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { ButtonGroup, Button } from 'dome/frame/toolbars';
 
 // External Libs
 import { AutoSizer } from 'react-virtualized';
@@ -23,7 +24,8 @@ import * as Ast from 'frama-c/api/kernel/ast';
 
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
-import { sizeof } from './cells';
+import { Diff } from './diffed';
+import { sizeof, valueAt, diffAfter, diffThen, diffElse } from './cells';
 import { Row } from './layout';
 import { Probe } from './probes';
 import { Callsite } from './stacks';
@@ -83,6 +85,8 @@ function ProbeInfos() {
   const zoomed = probe?.zoomed;
   const zoomable = probe?.zoomable;
   const visibility = visible ? 'visible' : 'hidden';
+  const effects = probe?.effects;
+  const condition = probe?.condition;
   return (
     <Hpack style={{ visibility }} className="eva-probeinfo">
       <Label className="eva-probeinfo-label">{label && `${label}:`}</Label>
@@ -113,6 +117,33 @@ function ProbeInfos() {
         onClick={() => { if (probe) probe.setTransient(!transient); }}
       />
       <Filler />
+      <ButtonGroup
+        enabled={!!probe}
+        value={probe?.vstate}
+        onChange={(s) => { if (probe) probe.setState(s); }}
+        className="eva-probeinfo-state"
+      >
+        <Button
+          visible={effects || condition}
+          label="H"
+          value="Here"
+        />
+        <Button
+          visible={condition}
+          label="T"
+          value="Then"
+        />
+        <Button
+          visible={condition}
+          label="E"
+          value="Else"
+        />
+        <Button
+          visible={effects}
+          label="A"
+          value="After"
+        />
+      </ButtonGroup>
     </Hpack>
   );
 }
@@ -153,7 +184,7 @@ function StackInfos() {
 }
 
 // --------------------------------------------------------------------------
-// --- Table Cell Layout
+// --- Table Cell
 // --------------------------------------------------------------------------
 
 interface TableCellProps {
@@ -196,15 +227,22 @@ function TableCell(props: TableCellProps) {
     case 'values':
     case 'callstack':
       {
-        const { values } = model.values.getValues(
+        const domain = model.values.getValues(
           probe.marker,
           probe.stmt,
           callstack,
         );
-        const { cols, rows } = sizeof(values);
+        const { vstate: s, effects, condition } = probe;
+        const text = valueAt(domain, s) ?? '';
+        const diff = diffAfter(domain, effects, s);
+        const diffA = diffThen(domain, condition, s);
+        const diffB = diffElse(domain, condition, s);
+        const { cols, rows } = sizeof(text);
         contents = (
           <SizedArea cols={cols} rows={rows}>
-            {values}
+            <span className={`eva-state-${s}`}>
+              <Diff text={text} diff={diff} diffA={diffA} diffB={diffB} />
+            </span>
           </SizedArea>
         );
       }

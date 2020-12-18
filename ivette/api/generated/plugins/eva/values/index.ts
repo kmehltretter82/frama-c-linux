@@ -98,21 +98,25 @@ export const getStmtInfo: Server.GetRequest<
 
 const getProbeInfo_internal: Server.GetRequest<
   marker,
-  { rank: number, code?: string, stmt?: Json.key<'#stmt'> }
+  { condition: boolean, effects: boolean, rank: number,
+    stmt?: Json.key<'#stmt'>, code?: string }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getProbeInfo',
   input:  jMarker,
   output: Json.jObject({
+            condition: Json.jFail(Json.jBoolean,'Boolean expected'),
+            effects: Json.jFail(Json.jBoolean,'Boolean expected'),
             rank: Json.jFail(Json.jNumber,'Number expected'),
-            code: Json.jString,
             stmt: Json.jKey<'#stmt'>('#stmt'),
+            code: Json.jString,
           }),
 };
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
   marker,
-  { rank: number, code?: string, stmt?: Json.key<'#stmt'> }
+  { condition: boolean, effects: boolean, rank: number,
+    stmt?: Json.key<'#stmt'>, code?: string }
   >= getProbeInfo_internal;
 
 const getValues_internal: Server.GetRequest<

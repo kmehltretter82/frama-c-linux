@@ -46,6 +46,7 @@ type probe =
   | Pexpr of exp * stmt
   | Plval of lval * stmt
   | Pnone
+
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
 type step = [ `Here | `After | `Then of exp | `Else of exp ]
@@ -314,7 +315,7 @@ struct
           begin fun st vs ->
             match st with
             | `Here -> vs (* absurd *)
-            | `After -> dnext st vs @@ dstate ~after:false stmt callstack
+            | `After -> dnext st vs @@ dstate ~after:true stmt callstack
             | `Then cond -> dnext st vs @@ A.assume_cond stmt state cond true
             | `Else cond -> dnext st vs @@ A.assume_cond stmt state cond false
           end (next_steps stmt) []
@@ -409,28 +410,42 @@ let () =
 
 let () =
   let getProbeInfo = Request.signature ~input:(module Jmarker) () in
-  let set_stmt = Request.result_opt getProbeInfo
-      ~name:"stmt" ~descr:(Md.plain "Probe statement")
-      (module Jstmt) in
   let set_code = Request.result_opt getProbeInfo
       ~name:"code" ~descr:(Md.plain "Probe source code")
       (module Jstring) in
+  let set_stmt = Request.result_opt getProbeInfo
+      ~name:"stmt" ~descr:(Md.plain "Probe statement")
+      (module Jstmt) in
   let set_rank = Request.result getProbeInfo
       ~name:"rank" ~descr:(Md.plain "Probe statement rank")
       ~default:0 (module Jint) in
-  let pp_code rq pp x = set_code rq (Some (Pretty_utils.to_string pp x)) in
-  Request.register_sig ~package ~kind:`GET getProbeInfo
+  let set_effects = Request.result getProbeInfo
+      ~name:"effects" ~descr:(Md.plain "Effectfull statement")
+      ~default:false (module Jbool) in
+  let set_condition = Request.result getProbeInfo
+      ~name:"condition" ~descr:(Md.plain "Conditional statement")
+      ~default:false (module Jbool) in
+  let set_probe rq pp p s =
+    begin
+      set_code rq (Some (Pretty_utils.to_string pp p)) ;
+      set_stmt rq (Some s) ;
+      set_rank rq (Ranking.stmt s) ;
+      List.iter
+        (function
+          | `Here -> ()
+          | `Then _ | `Else _ -> set_condition rq true
+          | `After -> set_effects rq true
+        )
+        (next_steps s)
+    end
+  in Request.register_sig ~package ~kind:`GET getProbeInfo
     ~name:"getProbeInfo" ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
       | Plval(l,s) ->
-        pp_code rq Printer.pp_lval l ;
-        set_stmt rq (Some s) ;
-        set_rank rq (Ranking.stmt s) ;
+        set_probe rq Printer.pp_lval l s ;
       | Pexpr(e,s) ->
-        pp_code rq Printer.pp_exp e ;
-        set_stmt rq (Some s) ;
-        set_rank rq (Ranking.stmt s) ;
+        set_probe rq Printer.pp_exp e s ;
       | Pnone -> ()
     end
 
