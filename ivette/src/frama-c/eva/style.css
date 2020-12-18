@@ -144,13 +144,27 @@
 .eva-state-Then .eva-diff { background: green; }
 .eva-state-Else .eva-diff { background: orange; }
 
+/* -------------------------------------------------------------------------- */
+/* --- Alarms                                                             --- */
+/* -------------------------------------------------------------------------- */
+
 .eva-cell-alarms {
-    fill: red;
+    fill: orange;
     position: absolute;
     top: -1px;
     right: 3px;
     z-index: 1;
 }
+
+.eva-alarm-info {
+    font-size: x-small;
+    padding: 0px;
+    margin: 1px;
+}
+
+.eva-alarm-True { fill: green; }
+.eva-alarm-False { fill: red; }
+.eva-alarm-Unknown { fill: darkorange; }
 
 /* -------------------------------------------------------------------------- */
 /* --- Table Rows Background                                              --- */

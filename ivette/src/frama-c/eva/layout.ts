@@ -30,6 +30,7 @@ export interface Row {
 /* --------------------------------------------------------------------------*/
 
 const PADDING = 2;
+const INSET = 1;
 const HCROP = 18;
 const VCROP = 1;
 
@@ -64,7 +65,8 @@ export class LayoutEngine {
   private rows: Row[] = [];
 
   crop(zoomed: boolean, s: Size): Size {
-    const cols = zoomed ? s.cols : Math.min(s.cols, this.hcrop);
+    const s_cols = s.cols + INSET;
+    const cols = zoomed ? s_cols : Math.min(s_cols, this.hcrop);
     const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
       cols: Math.max(HCROP, cols),

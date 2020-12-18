@@ -7,7 +7,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
-import { Vfill, Hpack, Filler } from 'dome/layout/boxes';
+import { Vfill, Hpack, Vpack, Filler } from 'dome/layout/boxes';
 import { Icon } from 'dome/controls/icons';
 import { Label, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -26,7 +26,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
 import { Diff } from './diffed';
-import { sizeof, valueAt, diffAfter, diffThen, diffElse } from './cells';
+import { sizeof, valueAt, diffAfter, diffThen, diffElse, EvaAlarm } from './cells';
 import { Row } from './layout';
 import { Probe } from './probes';
 import { Callsite } from './stacks';
@@ -150,13 +150,43 @@ function ProbeInfos() {
 }
 
 // --------------------------------------------------------------------------
+// --- Alarms Panel
+// --------------------------------------------------------------------------
+
+function AlarmsInfo() {
+  const model = useModel();
+  const probe = model.getFocused();
+  if (probe) {
+    const callstack = model.getCallstack();
+    const domain =
+      model.values.getValues(probe.marker, probe.stmt, callstack);
+    const alarms = domain?.alarms ?? [];
+    if (alarms.length > 0) {
+      console.log('ALARMS', alarms);
+      const renderAlarm = ([status, alarm]: EvaAlarm) => {
+        const className = `eva-alarm-info eva-alarm-${status}`;
+        return (
+          <Code className={className} icon='WARNING'>{alarm}</Code>
+        );
+      };
+      return (
+        <Vpack className="eva-info">
+          {alarms.map(renderAlarm)}
+        </Vpack>
+      );
+    }
+  }
+  return null;
+}
+
+// --------------------------------------------------------------------------
 // --- Stack Panel
 // --------------------------------------------------------------------------
 
-function StackInfos() {
+function StackInfo() {
   const model = useModel();
   const [, setSelection] = States.useSelection();
-  const callstack = model.getCallstack();
+  const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
   const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
     if (!caller || !stmt) return null;
@@ -425,7 +455,8 @@ function ValuesComponent() {
             )}
           </AutoSizer>
         </Vfill>
-        <StackInfos />
+        <AlarmsInfo />
+        <StackInfo />
       </Vfill>
     </>
   );

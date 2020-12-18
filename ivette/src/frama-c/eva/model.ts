@@ -109,7 +109,11 @@ export class Model implements ModelCallbacks {
     return cs !== undefined ? cs === row.callstack : false;
   }
 
-  getCallstack(): Callsite[] {
+  getCallstack(): Values.callstack | undefined {
+    return this.callstack;
+  }
+
+  getCalls(): Callsite[] {
     const c = this.callstack;
     return c === undefined ? [] : this.stacks.getCalls(c);
   }
