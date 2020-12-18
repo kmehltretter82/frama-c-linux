@@ -27,11 +27,11 @@ export class DiffBuffer {
     const { value, added, removed, contents } = this;
     if (value) {
       if (added && removed) {
-        contents.push(<span className='eva-diff-modified'>{value}</span>);
+        contents.push(<span className="eva-diff-modified">{value}</span>);
       } else if (removed) {
-        contents.push(<span className='eva-diff-removed'>{value}</span>);
+        contents.push(<span className="eva-diff-removed">{value}</span>);
       } else if (added) {
-        contents.push(<span className='eva-diff-added' />);
+        contents.push(<span className="eva-diff-added" />);
       } else {
         contents.push(value);
       }

@@ -5,7 +5,7 @@
 import * as Server from 'frama-c/server';
 import * as Values from 'frama-c/api/plugins/eva/values';
 
-import { StateCallbacks } from './cells';
+import { ModelCallbacks } from './cells';
 
 // --------------------------------------------------------------------------
 // --- Callstack infos
@@ -25,7 +25,7 @@ export interface Callsite {
 
 export class StacksCache {
 
-  private readonly state: StateCallbacks;
+  private readonly model: ModelCallbacks;
   private readonly stacks = new Map<string, callstacks>();
   private readonly calls = new Map<Values.callstack, Callsite[]>();
 
@@ -33,8 +33,8 @@ export class StacksCache {
   // --- LifeCycle
   // --------------------------------------------------------------------------
 
-  constructor(state: StateCallbacks) {
-    this.state = state;
+  constructor(state: ModelCallbacks) {
+    this.model = state;
   }
 
   clear() {
@@ -70,7 +70,7 @@ export class StacksCache {
       .send(Values.getCallstacks, stmt)
       .then((cs: callstacks) => {
         this.stacks.set(stmt, cs);
-        this.state.forceLayout();
+        this.model.forceLayout();
       });
   }
 
@@ -79,7 +79,7 @@ export class StacksCache {
       .send(Values.getCallstackInfo, cs)
       .then((calls) => {
         this.calls.set(cs, calls);
-        this.state.forceUpdate();
+        this.model.forceUpdate();
       });
   }
 

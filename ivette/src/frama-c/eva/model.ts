@@ -14,7 +14,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Model
 import { Probe } from './probes';
 import { StacksCache, Callsite } from './stacks';
-import { StateCallbacks, ValueCache } from './cells';
+import { ModelCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
@@ -26,7 +26,7 @@ export interface ModelLayout extends LayoutProps {
 /* --- EVA Values Model                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-export class Model implements StateCallbacks {
+export class Model implements ModelCallbacks {
 
   constructor() {
     this.forceUpdate = this.forceUpdate.bind(this);

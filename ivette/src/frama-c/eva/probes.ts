@@ -8,7 +8,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
-import { StateCallbacks } from './cells';
+import { ModelCallbacks, EvaState } from './cells';
 
 /* --------------------------------------------------------------------------*/
 /* --- Probe Labelling                                                    ---*/
@@ -45,7 +45,7 @@ export class Probe {
   // properties
   readonly fct: string;
   readonly marker: Ast.marker;
-  readonly state: StateCallbacks;
+  readonly model: ModelCallbacks;
   transient = true;
   loading = true;
   label?: string;
@@ -57,11 +57,12 @@ export class Probe {
   byCallstacks = false;
   zoomed = false;
   zoomable = false;
+  vstate: EvaState = 'Here';
 
-  constructor(state: StateCallbacks, fct: string, marker: Ast.marker) {
+  constructor(state: ModelCallbacks, fct: string, marker: Ast.marker) {
     this.fct = fct;
     this.marker = marker;
-    this.state = state;
+    this.model = state;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
     this.setTransient = this.setTransient.bind(this);
   }
@@ -82,7 +83,7 @@ export class Probe {
         this.rank = undefined;
         this.loading = false;
       })
-      .finally(this.state.forceLayout);
+      .finally(this.model.forceLayout);
   }
 
   // --------------------------------------------------------------------------
@@ -99,21 +100,21 @@ export class Probe {
       if (!tr && !this.label && this.code && this.code.length > LabelSize) {
         this.label = newLabel();
       }
-      this.state.forceLayout();
+      this.model.forceLayout();
     }
   }
 
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
-      this.state.forceLayout();
+      this.model.forceLayout();
     }
   }
 
   setZoomed(zoomed: boolean) {
     if (zoomed !== this.zoomed) {
       this.zoomed = zoomed;
-      this.state.forceLayout();
+      this.model.forceLayout();
     }
   }
 

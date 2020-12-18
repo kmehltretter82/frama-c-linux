@@ -13,7 +13,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 
 export type callback = () => void;
 
-export interface StateCallbacks {
+export interface ModelCallbacks {
   forceUpdate: callback;
   forceLayout: callback;
 }
@@ -70,6 +70,7 @@ export function leq(a: Size, b: Size): boolean {
 
 export type EvaStatus = 'True' | 'False' | 'Unknown';
 export type EvaAlarm = [EvaStatus, string];
+export type EvaState = 'Here' | 'After' | 'Then' | 'Else';
 
 export interface EvaValues {
   errors?: string;
@@ -81,19 +82,29 @@ export interface EvaValues {
   size: Size;
 }
 
+export function valueAt(v: EvaValues, st: EvaState): string | undefined {
+  switch (st) {
+    case 'Here': return v.values;
+    case 'After': return v.v_after;
+    case 'Then': return v.v_then;
+    case 'Else': return v.v_else;
+    default: return undefined;
+  }
+}
+
 // --------------------------------------------------------------------------
 // --- Value Cache
 // --------------------------------------------------------------------------
 
 export class ValueCache {
 
-  private readonly state: StateCallbacks;
+  private readonly state: ModelCallbacks;
   private readonly probes = new Map<Ast.marker, Size>(); // Marker -> max in column
   private readonly stacks = new Map<string, Size>(); // Callstack -> max in row
   private readonly vcache = new Map<string, EvaValues>(); // '<Marker><@Callstack>?' -> value
   private smax = EMPTY; // max cell size
 
-  constructor(state: StateCallbacks) {
+  constructor(state: ModelCallbacks) {
     this.state = state;
   }
 
