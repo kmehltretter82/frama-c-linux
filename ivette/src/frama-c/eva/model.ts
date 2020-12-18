@@ -18,7 +18,8 @@ import { StateCallbacks, ValueCache } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
-  target?: Ast.marker;
+  fct?: string;
+  marker?: Ast.marker;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -51,10 +52,10 @@ export class Model implements StateCallbacks {
   isFocused(p: Probe | undefined) { return this.focused === p; }
   isRemanent(p: Probe | undefined) { return this.remanent === p; }
 
-  getProbe(m: Ast.marker): Probe {
+  getProbe(fct: string, m: Ast.marker): Probe {
     let p = this.probes.get(m);
     if (!p) {
-      p = new Probe(this, m);
+      p = new Probe(this, fct, m);
       this.probes.set(m, p);
       p.requestProbeInfo();
     }
@@ -110,18 +111,16 @@ export class Model implements StateCallbacks {
 
   getCallstack(): Callsite[] {
     const c = this.callstack;
-    if (c !== undefined) return this.stacks.getCalls(c);
-    const [s] = this.getStacks(this.focused);
-    if (s !== undefined) return this.stacks.getCalls(s);
-    return [];
+    return c === undefined ? [] : this.stacks.getCalls(c);
   }
 
   // --- Throttled
   setLayout(ly: ModelLayout) {
     if (!equal(this.layout, ly)) {
       this.layout = ly;
-      const target = Ast.jMarker(ly.target);
-      this.selected = target ? this.getProbe(target) : undefined;
+      const { fct, marker } = ly;
+      this.selected =
+        fct && marker ? this.getProbe(fct, marker) : undefined;
       this.forceLayout();
     }
   }
@@ -136,13 +135,17 @@ export class Model implements StateCallbacks {
       this.focused = undefined;
       this.callstack = undefined;
       this.remanent = undefined;
-    } else if (s.loading) {
-      this.focused = undefined;
-      this.callstack = undefined;
-    } else {
+    } else if (!s.loading) {
       this.focused = s;
-      if (s.code) {
-        if (s.transient) this.remanent = s;
+      const stacks = this.getStacks(s);
+      if (s.byCallstacks) {
+        const cs0 = this.callstack;
+        if (cs0) this.callstack = stacks.find((cs) => cs === cs0);
+      } else {
+        this.callstack = stacks.length === 1 ? stacks[0] : undefined;
+      }
+      if (s.code && s.transient) {
+        this.remanent = s;
       } else {
         this.remanent = undefined;
       }

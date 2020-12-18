@@ -69,6 +69,7 @@ function ProbeInfos() {
   const probe = model.getFocused();
   const transient = probe?.transient ?? false;
   const label = probe?.label;
+  const fct = probe?.fct;
   const code = probe?.code;
   const stmt = probe?.stmt;
   const rank = probe?.rank;
@@ -88,7 +89,7 @@ function ProbeInfos() {
       <div style={{ minWidth: width, height }} className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
-      <Code><Stmt stmt={stmt} rank={rank} /></Code>
+      <Code>{fct}<Stmt stmt={stmt} rank={rank} /></Code>
       <IconButton
         className="eva-probeinfo-button"
         display={stackable}
@@ -164,7 +165,7 @@ const CELLPADDING = 12;
 
 function TableCell(props: TableCellProps) {
   const model = useModel();
-  const [selection, setSelection] = States.useSelection();
+  const [, setSelection] = States.useSelection();
   const { probe, row } = props;
   const { kind, callstack } = row;
   const minWidth = CELLPADDING + WSIZER.dimension(probe.minCols);
@@ -216,12 +217,11 @@ function TableCell(props: TableCellProps) {
   const className = classes(
     'eva-cell',
     transient && 'eva-transient',
-    !transient && isFocused && 'eva-focused',
+    isFocused && 'eva-focused',
   );
   const onClick = () => {
     if (probe) {
-      const fct = selection?.current?.function;
-      const location = { function: fct, marker: probe.marker };
+      const location = { function: probe.fct, marker: probe.marker };
       setSelection({ location });
       model.setSelectedRow(row);
     }
@@ -326,8 +326,10 @@ function ValuesPanel(props: ValuesPanelProps) {
   const rowHeight = HSIZER.dimension(1);
   const [selection] = States.useSelection();
   React.useEffect(() => {
-    const target = Ast.jMarker(selection?.current?.marker);
-    model.setLayout({ zoom, margin, target });
+    const curr = selection?.current;
+    const fct = curr?.function;
+    const marker = Ast.jMarker(curr?.marker);
+    model.setLayout({ zoom, margin, fct, marker });
   });
   // --- render list
   return (

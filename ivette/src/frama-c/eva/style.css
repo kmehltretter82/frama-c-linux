@@ -121,6 +121,10 @@
     padding-right: 7px;
 }
 
+.eva-callsite {
+    cursor: default;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Table Rows Background                                              --- */
 /* -------------------------------------------------------------------------- */
@@ -157,16 +161,16 @@
     background: lightblue;
 }
 
-.eva-probes .eva-transient {
-    background: orange;
+.eva-probes .eva-focused {
+    background: #02da02;
 }
 
-.eva-values .eva-transient {
+.eva-probes .eva-transient {
     background: #fff0d5;
 }
 
-.eva-probes .eva-focused {
-    background: lightblue;
+.eva-probes .eva-transient.eva-focused {
+    background: orange;
 }
 
 .eva-stack {

@@ -43,6 +43,7 @@ function newLabel() {
 export class Probe {
 
   // properties
+  readonly fct: string;
   readonly marker: Ast.marker;
   readonly state: StateCallbacks;
   transient = true;
@@ -57,7 +58,8 @@ export class Probe {
   zoomed = false;
   zoomable = false;
 
-  constructor(state: StateCallbacks, marker: Ast.marker) {
+  constructor(state: StateCallbacks, fct: string, marker: Ast.marker) {
+    this.fct = fct;
     this.marker = marker;
     this.state = state;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
