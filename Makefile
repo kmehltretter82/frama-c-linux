@@ -169,18 +169,6 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests clean-tests run-tests purge-tests
 
-# todo: adds bugs?
-# todo: adds crowbar?
-# todo: adds dynamic_plugin? No, will be removed from master branch.
-# todo: adds fc_script (waiting for a fix in scripts of share/analysis-scripts/)
-# todo: adds make_run_script
-# todo: adds more_wp?
-# todo: adds value/numerors? (requires opam package mlgmpidl and system libraries for MPFR)
-# todo: adds verisec
-# todo: adds configuration tests related to tests/test_config_apron (and tests/test_config_...) done by the scripts src/plugins/value/vtests and  script src/plugins/value/utests.
-# NOTE: the elements of this list shoud be part of the DEFAULT_SUITES contained into `tests/ptest_config`
-TESTS=builtins callgraph cil constant_propagation dynamic fc_script float idct impact jcdb journal libc metrics misc occurrence pdg pretty_printing rte rte_manual saveload scope slicing sparecode spec syntax test value value/traces
-
 # todo: adds value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
 # CONFIGS=value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
 CONFIGS=
@@ -217,29 +205,14 @@ clean-tests: purge-tests
 
 # Command for executing ptest (in order to generate dune test files)
 PTESTS=dune exec --root ptests -- ./ptests.exe
-#PTESTS=.dune exec --root ptests -- /ptests.exe -v
+PTESTS=dune exec --root ptests -- ./ptests.exe -v
 
 tests.info:
 	echo $(TEST_CONFIGS)
 
 run-tests: FRAMAC_WP_CACHE=replay
 run-tests: config.sed purge-tests ptests/ptests.exe
-	$(PTESTS) tests
-	for config in $(TEST_CONFIGS); do \
-		test -f tests/ptests_$$config || echo "Warning: use default ptests_config (no file: tests/ptests_config_$$config)"; \
-		$(PTESTS) tests -config $$config; \
-	done
-	for plugin in $(PLUGIN_TEST_DIRS); do \
-		$(PTESTS) $$plugin; \
-	done
-	rm tests/spec/result/dune # HACK while WP problem is not solved
-	for plugin in $(PLUGIN_CONFIGS); do \
-		plugin_dir=src/plugins/$$(echo $$plugin | sed -e "s/:.*$$//")/tests; \
-		config_name=$$(echo $$plugin | sed -e "s/^[^:]*://"); \
-		config_file=$$plugin_dir/ptests_config_$$config_name; \
-		test -f $$config_file || echo "Warning: use default ptests_config (no file: $$(config_file))"; \
-		$(PTESTS) $$plugin_dir -config $$config_name; \
-	done
+	$(PTESTS) $(TEST_DIRS)
 	dune build $(TEST_ALIAS)
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)

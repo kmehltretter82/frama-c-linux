@@ -20,6 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Command-line flags *)
+
+let verbosity = ref 0
+let nb_dune_files = ref 0
+let nb_ignores = ref 0
+let ignored_suites = ref []
+
+type env_t = {
+  config: string
+; dir: string
+}
+
 module Filename = struct
   include Filename
   let concat =
@@ -43,31 +55,6 @@ module Filename = struct
       fun a b -> temp_file a b
 
   let sanitize f = String.escaped f
-end
-
-module Env = struct
-  let default_env = ref []
-
-  let add_default_env x y = default_env:=(x,y)::!default_env
-
-  let add_env var value =
-    add_default_env var value;
-    Unix.putenv var value
-
-  let print_default_env fmt =
-    match !default_env with
-    | [] -> ()
-    | l ->
-      Format.fprintf fmt "@[Env:@\n";
-      List.iter (fun (x,y) -> Format.fprintf fmt "%s = \"%s\"@\n"  x y) l;
-      Format.fprintf fmt "@]"
-
-  let default_env var value =
-    try
-      let v = Unix.getenv var in
-      add_default_env (var ^ " (set from outside)") v
-    with Not_found -> add_env var value
-
 end
 
 (** the pattern that ends the parsing of options in a test file *)
@@ -111,23 +98,9 @@ let is_file_empty_or_nonexisting filename =
     output_unix_error e;
     raise e
 
-let base_path = Filename.current_dir_name
-
-(** Command-line flags *)
-
-let verbosity = ref 0
-let do_make = ref "make"
-let suites = ref []
-let add_test_suite s = suites := s :: !suites
-
 (** special configuration, with associated oracles *)
-let special_config = ref ""
-let config_name name =
-  if !special_config = "" then name else name ^ "_" ^ !special_config
-
-let () =
-  Unix.putenv "LC_ALL" "C" (* some oracles, especially in Jessie, depend on the
-                              locale *)
+let config_name ~env name =
+  if env.config = "" then name else name ^ "_" ^ env.config
 
 let macro_default_options = "-journal-disable -check -no-autoload-plugins"
 let macro_frama_c_exe = "frama-c"
@@ -144,9 +117,15 @@ let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
-     Build the dune files allowing running the test suite contained into a directory (defaults to ./tests).@ @ \
+     Build the dune files allowing running the test suite contained into directories (defaults to ./tests).@ @ \
      @[<v 1>\
-     Directives:@  \
+     Directives of <ptest_config> files:@  \
+     # <comment>                 @[<v 0># Just a comment line.@]@  \
+     DEFAULT_SUITES = <suite>... @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config\" files).@]@  \
+     <mode>_SUITES = <suite>...  @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config_<mode>\" files).@]@  \
+     @]@ \
+     @[<v 1>\
+     Directives of <test_config[_mode]> files:@  \
      COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
      FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
@@ -227,150 +206,98 @@ let rec argspec =
   [
     "-v", Arg.Unit (fun () -> incr verbosity),
     " Increase verbosity (up to  twice)" ;
-    "-make", Arg.String (fun s -> do_make := s;),
+    "-make", Arg.String (fun s -> Format.eprintf "Deprecated option -make %s" s),
     "<command> Use command instead of make (DEPRECATED)";
-    "-config", Arg.Set_string special_config,
+    "-config", Arg.String (fun s -> Format.eprintf "Deprecated option -config %s" s),
     " <name> Use special configuration and oracles";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg
-
-let () =
-  Arg.parse
-    ((Arg.align
-        (List.sort
-           (fun (optname1, _, _) (optname2, _, _) ->
-              compare optname1 optname2
-           ) argspec)
-     ) @ ["", Arg.Unit (fun () -> ()), example_msg;])
-    add_test_suite
-    umsg
-
 
 let fail s =
   Format.printf "Error: %s@.Aborting (CWD=%s).@." s (Sys.getcwd());
   exit 2
 
+module StringMap = Map.Make (String)
+module StringSet = Set.Make (String)
 (* parses the [tests/ptests_config] file (prefers the one related to the expected configuration name*)
 module Ptests_config: sig
 
-  val test_path: string
-  val suites: unit -> string list
+  val parse: dir:string -> StringSet.t StringMap.t
 
 end = struct
 
-  (** split the filename into before including "tests" dir and after including "tests" dir
-      NOTA: both part contains "tests" (one as suffix the other as prefix). *)
-  let rec get_upper_test_dir initial dir =
-    let tests = Filename.dirname dir in
-    if tests = dir then
-      (* root directory *)
-      (fail (Printf.sprintf "Can't find a tests directory below %s" initial))
-    else
-      let base = Filename.basename dir in
-      if base = "tests" then
-        dir, "tests"
-      else
-        let tests, suffix = get_upper_test_dir initial tests in
-        tests, Filename.concat suffix base
+  let add_suite map config s =
+    StringMap.update config (function | None -> Some (StringSet.of_list s)
+                                      | Some set -> Some (StringSet.union (StringSet.of_list s) set))
+      map
 
-  let rec get_test_path = function
-    | [] ->
-      if Sys.file_exists "tests" && Sys.is_directory "tests" then "tests", []
-      else begin
-        Format.eprintf "No path found to 'tests' directory. Aborting (CWD=%s).@." (Sys.getcwd());
-        exit 1
-      end
-    | [f] -> let tests, suffix = get_upper_test_dir f f in
-      tests, [suffix]
-    | a::l ->
-      let tests, l = get_test_path l in
-      let a_tests, a = get_upper_test_dir a a in
-      if a_tests <> tests
-      then fail (Printf.sprintf "All the tests should be inside the same tests directory")
-      else tests, a::l
-
-  let test_path =
-    let files, names = List.partition Sys.file_exists !suites in
-    let tests, l = get_test_path files in
-    let names = List.map (Filename.concat tests) names in
-    suites := names@l;
-    Sys.chdir (Filename.dirname tests);
-    "tests"
-
-  (* Those variables are read from a ptests_config file *)
-  let default_suites = ref []
-
-  let parse_config_line =
-    let split_blank s = Str.split (Str.regexp "[ ]+") s in
-    fun (key, value) ->
-    match key with
-    | "DEFAULT_SUITES" ->
-      let l = split_blank value in
-      default_suites := List.map (Filename.concat test_path) l
-    | _ -> Env.default_env key value (* Environnement variable that Frama-C reads*)
-
-  (** parses the [tests/ptests_config] file  *)
-  let () =
-    let config =
-      let filename = "tests/ptests_config" in
-      let expected_filename = config_name filename in
-      if Sys.file_exists expected_filename then expected_filename else filename
-    in
-    if Sys.file_exists config then begin
-      let ch = open_in config in
-      try
-        (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
-        let regexp = Str.regexp "\\([^=]+\\)=\\(.*\\)" in
-        let regexp_comment = Str.regexp " *#" in
-        while true do
-          let line = input_line ch in
-          if Str.string_match regexp line 0 then
-            let key = Str.matched_group 1 line in
-            let value = Str.matched_group 2 line in
-            parse_config_line (key, value)
-          else if not (Str.string_match regexp_comment line 0) then begin
-            close_in ch;
-            Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line config (Sys.getcwd());
-            exit 1
+  (** parses the [dir/ptests_config] file  *)
+  let parse =
+    let split_blank = Str.split (Str.regexp "[ ]+") in
+    let regexp = Str.regexp " *\\([^#=][^=]*\\)=\\(.*\\)" in
+    let regexp_config = Str.regexp "\\([a-zA-Z_]+\\)_SUITES" in
+    let regexp_comment = Str.regexp " *#" in
+    fun ~dir ->
+      let default_suites = ref StringMap.empty in
+      let ptests_config = Filename.concat dir "ptests_config" in
+      let parse_config_line =
+        fun (key, value) ->
+          if Str.string_match regexp_config key 0 then
+            let config = match Str.matched_group 1 key with
+              | "DEFAULT" -> ""
+              | s -> s
+            in
+            let l = split_blank value in
+            default_suites := add_suite !default_suites config l
+          else if key = "IGNORE" then begin
+            incr nb_ignores;
+            ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
+            Format.eprintf "%s: %s=%s@." ptests_config key value
           end
-        done
-      with
-      | End_of_file -> close_in ch
-    end
-    else begin
-      Format.eprintf
-        "Cannot find configuration file %s. Aborting (CWD=%s).@." config (Sys.getcwd()) ;
-      exit 1
-    end
-
-  let suites () =
-    match !suites with
-    | [] -> !default_suites
-    | l ->
-      List.fold_left (fun acc x ->
-          if x = "tests"
-          then !default_suites @ acc
-          else x::acc
-        ) [] l
-
+          else Format.eprintf "%s: setenv (DEPRECATED): %s=%s@." ptests_config key value;
+      in
+      if Sys.file_exists ptests_config then begin
+        let ch = open_in ptests_config in
+        try
+          (*Parse the plugin configuration file for tests. Format is 'Key=value' *)
+          while true do
+            let line = input_line ch in
+            if Str.string_match regexp line 0 then
+              let key = Str.matched_group 1 line in
+              let value = Str.matched_group 2 line in
+              parse_config_line (key, value)
+            else if not ((Str.string_match regexp_comment line 0) || (split_blank line = [])) then begin
+              close_in ch;
+              Format.eprintf "Cannot interpret line '%s' in file %s. Aborting (CWD=%s).@." line ptests_config (Sys.getcwd());
+              exit 1
+            end
+          done
+        with
+        | End_of_file -> close_in ch ;
+      end
+      else begin
+        Format.eprintf
+          "Cannot find configuration file %s. Aborting (CWD=%s).@." ptests_config (Sys.getcwd()) ;
+      end;
+      !default_suites
 end
-
-let gen_make_file s _dir file = Filename.concat s file
 
 module SubDir: sig
   type t
 
   val get: t -> string
 
-  val create: ?with_subdir:bool -> string (** dirname *) -> t
-  (** By default, creates the needed subdirectories if absent.
+  val create: with_subdir:bool -> env:env_t -> string (** dirname *) -> t
+  (** creates the needed subdirectories if [with_subdir=true].
       Anyway, fails if the given dirname doesn't exists *)
 
-  val make_oracle_file: t -> string -> string
-  val make_result_file: t -> string -> string
   val make_file: t -> string -> string
-  val oracle_dirname: string
-  val result_dirname: string
+  val make_subdir: t -> string -> t
+
+  val oracle_subdir: env:env_t -> t -> t
+  val result_subdir: env:env_t -> t -> t
+  val upper_dir: t
+
   val pp_file: dir:t -> Format.formatter -> string -> unit
 end = struct
   type t = string
@@ -383,19 +310,19 @@ end = struct
     else if not (Sys.is_directory dir)
     then fail (Printf.sprintf "the file %s exists but is not a directory" dir)
 
-  let oracle_dirname = config_name "oracle"
-  let result_dirname = config_name "result"
+  let oracle_subdir ~env dir = Filename.concat dir (config_name ~env "oracle")
+  let result_subdir ~env dir = Filename.concat dir (config_name ~env "result")
 
-  let make_result_file _ x = x
-  let make_oracle_file = gen_make_file oracle_dirname
   let make_file = Filename.concat
+  let make_subdir = Filename.concat
+  let upper_dir = ".."
 
-  let create ?(with_subdir=true) dir =
+  let create ~with_subdir ~env dir =
     if not (Sys.file_exists dir && Sys.is_directory dir)
     then fail (Printf.sprintf "the directory %s must be an existing directory" dir);
     if (with_subdir) then begin
-      create_if_absent (Filename.concat dir result_dirname);
-      create_if_absent (Filename.concat dir oracle_dirname)
+      create_if_absent (result_subdir ~env dir);
+      create_if_absent (oracle_subdir ~env dir)
     end;
     dir
 
@@ -403,8 +330,6 @@ end = struct
 end
 
 module Macros = struct
-  module StringMap = Map.Make (String)
-  open StringMap
 
   type t = string StringMap.t
 
@@ -412,12 +337,14 @@ module Macros = struct
 
   let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
 
+  let pp_macros fmt macros =
+    Format.fprintf fmt "Macros (%d):@."  (StringMap.cardinal macros);
+    StringMap.iter (fun key data -> Format.fprintf fmt "- %s -> %s@." key data) macros;
+    Format.fprintf fmt "End macros@."
+
   let does_expand macros s =
-    if !verbosity >=3 then begin
-      Format.printf "looking for macros in string %s\n%!" s;
-      Format.printf "Existing macros:\n%!";
-      iter (fun s1 s2 -> Format.printf "%s => %s\n%!" s1 s2) macros;
-      Format.printf "End macros\n%!";
+    if !verbosity >=5 then begin
+      Format.printf "%%     - Looking for macros in string %s@.Existing %a" s pp_macros macros;
     end;
     let rec aux n (ptest_file_matched,s as acc) =
       if Str.string_match macro_regex s n then begin
@@ -431,17 +358,18 @@ module Macros = struct
             new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
           end else begin
             try
-              if !verbosity >= 3 then Format.printf "macro is %s\n%!" macro;
-              let replacement =  find macro macros in
-              if !verbosity >= 2 then
-                Format.printf "replacement for %s is %s\n%!" macro replacement;
+              if !verbosity >= 5 then Format.printf "     - macro is %s@." macro;
+              let replacement =  StringMap.find macro macros in
+              if !verbosity >= 4 then
+                Format.printf "     - replacement for %s is %s@." macro replacement;
+              if replacement = "@EVA_OPTIONS@ -eva-msg-key malloc -eva-warn-key malloc:weak=feedback -eva-no-alloc-returns-null" then exit 1;
               new_n,
               String.sub s 0 n ^ start ^ replacement ^ rest
             with
             | Not_found -> Str.group_end 2 + 1, s
           end
         in
-        if !verbosity >= 3 then Format.printf "new string is %s\n%!" new_s;
+        if !verbosity >= 5 then Format.printf "%%    - New string is %s@." new_s;
         let new_acc = ptest_file_matched, new_s in
         if n <= String.length new_s then aux n new_acc else new_acc
       end else acc
@@ -449,23 +377,23 @@ module Macros = struct
     try
       aux 0 (false,s)
     with e ->
-      Format.eprintf "Uncaught exception %s\n%!" (Printexc.to_string e);
+      Format.eprintf "Uncaught exception %s@." (Printexc.to_string e);
       raise e
 
   let expand (macros:t) s =
     snd (does_expand macros s)
 
   let get ?(default="") name macros =
-    try find name macros with Not_found -> default
+    try StringMap.find name macros with Not_found -> default
 
   let add_list l map =
-    List.fold_left (fun acc (k,v) -> add k v acc) map l
+    List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
 
   let add_expand name def macros =
-    add name (expand macros def) macros
+    StringMap.add name (expand macros def) macros
 
   let append_expand name def macros =
-    add name (get name macros ^ expand macros def) macros
+    StringMap.add name (get name macros ^ expand macros def) macros
 
   let default_macros = add_list
     [ "PLUGIN", "" ;
@@ -496,6 +424,7 @@ type execnow =
 type cmd = { toplevel:string; opts:string; macros: Macros.t ; exit_code: string option; logs:string list ; timeout:string }
 type config =
   {
+    dc_subdir: SubDir.t ;
     dc_test_regexp: string; (** regexp of test files. *)
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
@@ -525,26 +454,25 @@ module Test_config: sig
 
   (** The [test_config] filename related to the expected configuration name *)
   val filename: string
-  val current_config: unit -> config
+  val current_config: env:env_t -> SubDir.t -> config
 
   val scan_directives: SubDir.t -> file:string -> Scanf.Scanning.in_channel -> config -> config
-  val scan_test_file:  SubDir.t -> file:string -> config -> config
+  val scan_test_file: env:env_t -> SubDir.t -> file:string -> config -> config
 
   (* updates the configuration directives that do not depend of the test number and
      returns a getter of the PTEST_xxx variables including the one depending on the test number *)
-  val ptest_vars: SubDir.t -> file:string -> config -> string * config * (nth:int -> Macros.t -> Macros.t)
+  val ptest_vars: env:env_t -> SubDir.t -> file:string -> config -> string * config * (nth:int -> Macros.t -> Macros.t)
 
-end  = struct
+end = struct
 
-  let ptest_vars directory ~file config =
-    let ptest_config = config_name "" in
+  let ptest_vars ~env directory ~file config =
+    let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
     let ptest_vars =
         [ "PTEST_CONFIG", ptest_config;
           "PTEST_DIR", SubDir.get directory;
-          "PTEST_RESULT",
-          Filename.concat (SubDir.get directory) SubDir.result_dirname;
+          "PTEST_RESULT", SubDir.get (SubDir.result_subdir ~env directory);
           "PTEST_FILE", ptest_file;
           "PTEST_NAME", ptest_name;
         ] in
@@ -563,11 +491,11 @@ end  = struct
 
   (** the name of the directory-wide configuration file*)
   let filename = "test_config"
-  let filename = config_name filename
 
   let default_commands config = [ { toplevel=config.dc_default_toplevel; opts=""; exit_code=None; macros=config.dc_macros; logs=[]; timeout=""} ]
-  let default_config =
-    { dc_test_regexp = test_file_regexp;
+  let default_config dir =
+    { dc_subdir = dir;
+      dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros;
       dc_execnow = [];
       dc_libs = [];
@@ -587,7 +515,7 @@ end  = struct
 
   let scan_execnow ~file ~once dir ex_timeout (s:string) =
     if once=false then
-      Format.eprintf "%a: using EXEC directive (DEPRECATED): %s\n%!"
+      Format.eprintf "%a: using EXEC directive (DEPRECATED): %s@."
         (SubDir.pp_file ~dir) file s;
     let rec aux (s:execnow) =
       try
@@ -604,10 +532,10 @@ end  = struct
         Scanf.sscanf s.ex_cmd "%_[ ]make%_[ ]%s@\n"
           (fun cmd ->
              (* It should be better to use a specific macro into the command (such as @MAKE@) for that. *)
-             Format.eprintf "%a: EXEC%s directive with a make command (DEPRECATED): %s\n%!"
+             Format.eprintf "%a: EXEC%s directive with a make command (DEPRECATED): %s@."
                (SubDir.pp_file ~dir) file (if once then "NOW" else "") cmd;
              let s = aux ({ s with ex_cmd = cmd; }) in
-             { s with ex_cmd = !do_make^" "^cmd; } )
+             { s with ex_cmd = "make "^cmd; } )
       with Scanf.Scan_failure _ ->
         s
     in
@@ -621,7 +549,7 @@ end  = struct
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
-      Format.eprintf "%a: EXEC%s without LOG nor BIN target (DEPRECATED): %s\n%!"
+      Format.eprintf "%a: EXEC%s without LOG nor BIN target (DEPRECATED): %s@."
         (SubDir.pp_file ~dir) file (if once then "NOW" else "") s;
     execnow
 
@@ -640,7 +568,7 @@ end  = struct
         with
         | Scanf.Scan_failure _ ->
           if s <> "" then
-            Format.eprintf "%a: unknown STDOPT configuration string: %s\n%!"
+            Format.eprintf "%a: unknown STDOPT configuration string: %s@."
               (SubDir.pp_file ~dir) file s;
           opts
         | End_of_file -> opts
@@ -717,11 +645,11 @@ end  = struct
       let def =
         try Str.matched_group 3 s with Not_found -> (* empty text *) ""
       in
-      if !verbosity >= 2 then
-        Format.printf "new macro %s with definition %s\n%!" name def;
+      if !verbosity >= 4 then
+        Format.printf "%%   - New macro %s with definition %s@." name def;
       { current with dc_macros = Macros.add_expand name def current.dc_macros }
     end else begin
-      Format.eprintf "%a: cannot understand MACRO definition: %s\n%!" (SubDir.pp_file ~dir) file s;
+      Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
       current
     end
 
@@ -729,6 +657,11 @@ end  = struct
   let current_default_toplevel = ref default_toplevel
   let current_default_log = ref []
   let current_default_cmds = ref []
+
+  let _reset_current () =
+    current_default_toplevel := default_toplevel;
+    current_default_log := [];
+    current_default_cmds := []
 
   let config_options =
     [ "CMD",
@@ -785,7 +718,7 @@ end  = struct
 
       "GCC",
       (fun ~file ~dir _ acc ->
-         Format.eprintf "%a: GCC directive (DEPRECATED)\n%!" (SubDir.pp_file ~dir) file;
+         Format.eprintf "%a: GCC directive (DEPRECATED)@." (SubDir.pp_file ~dir) file;
          acc);
 
       "COMMENT",
@@ -826,7 +759,7 @@ end  = struct
              try
                r := (List.assoc name config_options ~file ~dir) opt !r
              with Not_found ->
-               Format.eprintf "@[%s: unknown configuration option: %s@\n%!@]" file name)
+               Format.eprintf "@[%s: unknown configuration option: %s@@.@]" file name)
       with
       | Scanf.Scan_failure _ ->
         if Str.string_match end_comment s 0
@@ -847,18 +780,23 @@ end  = struct
        | l -> { !r with dc_commands = List.rev l })
 
   (* test for a possible toplevel configuration. *)
-  let current_config () =
-    let general_config_file = Filename.concat Ptests_config.test_path filename in
+  let current_config ~env dir =
+    let default_config = default_config dir in
+    let general_config_file = SubDir.make_file dir filename in
     if Sys.file_exists general_config_file
     then begin
+      if !verbosity >=3 then Format.printf "%% - Parsing global config file=%s@." general_config_file;
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
       scan_directives
-        (SubDir.create ~with_subdir:false Filename.current_dir_name)
+        (SubDir.create ~env ~with_subdir:false Filename.current_dir_name)
         ~file:general_config_file
         scan_buffer
         default_config
     end
-    else default_config
+    else begin
+      if !verbosity >=3 then Format.printf "%% - There is no global config file=%s@." general_config_file;
+      default_config
+    end
 
   let split_config s = Str.split (Str.regexp ",[ ]*") s
 
@@ -867,7 +805,7 @@ end  = struct
     let len = String.length prefix in
     String.length name >= len && String.sub name 0 len = prefix
 
-  let scan_test_file dir ~file default =
+  let scan_test_file ~env dir ~file default =
     let f = SubDir.make_file dir file in
     let exists_as_file =
       try
@@ -882,8 +820,8 @@ end  = struct
           (fun names ->
              let is_current_config name =
                name = "run.config*" ||
-               name = "run.config" && !special_config = ""  ||
-               name = "run.config_" ^ !special_config
+               name = "run.config" && env.config = ""  ||
+               name = "run.config_" ^ env.config
              in
              let configs = split_config (String.trim names) in
              if List.exists is_current_config configs then
@@ -963,12 +901,15 @@ let name_without_extension command =
     fail ("this test file does not have any extension: " ^
           command.file)
 
-let gen_prefix gen_file cmd =
-  let prefix = gen_file cmd.directory (name_without_extension cmd) in
-  catenate_number cmd.nb_files prefix cmd.nth
+let make_result_file ~env:_ x = x
+let make_oracle_file ~env x = Filename.concat (config_name ~env "oracle") x
 
-let log_prefix = gen_prefix SubDir.make_result_file
-let oracle_prefix = gen_prefix SubDir.make_oracle_file
+let gen_prefix gen_file cmd =
+  let prefix = gen_file (name_without_extension cmd) in
+  catenate_number cmd.nb_files prefix cmd.nth
+let oracle_prefix ~env = gen_prefix (make_oracle_file ~env)
+let log_prefix ~env = gen_prefix (make_result_file ~env)
+
 
 let basic_command_string command =
   let plugins_options =
@@ -1006,13 +947,13 @@ let show_cmd =
     | Some res, None     -> Format.sprintf "echo '%s > %s'" (subst cmd) res
     | Some res, Some err -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res err
 
-let ptests_alias = config_name "ptests_config"
+let ptests_alias ~env = config_name ~env "ptests_config"
 
 let filter_log_regexp = Str.regexp "@PTEST_LOG@"
-    
+
 let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
-let command_string ~result_fmt ~oracle_fmt command =
-  let log_prefix = log_prefix command in
+let command_string ~env ~result_fmt ~oracle_fmt command =
+  let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
   let errlog = log_prefix ^ ".err.log" in
   let cmdreslog,cmderrlog = match command.filter with
@@ -1085,7 +1026,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     Fmt.(list (package_as_deps (quote plugin_as_package))) command.plugins
     (show_cmd ~reslog ~errlog command_string);
 
-  let oracle_prefix = oracle_prefix command in
+  let oracle_prefix = oracle_prefix ~env command in
   let diff_alias = log_prefix ^ ".diff" in
   (* diff with oracles *)
   Format.fprintf result_fmt
@@ -1108,7 +1049,7 @@ let command_string ~result_fmt ~oracle_fmt command =
     "(alias (deps (alias %S)) (name %S); (enabled_if (and true %a))\n\
      )@."
     diff_alias
-    ptests_alias
+    (ptests_alias ~env)
     Fmt.(list (var_libavailable plugin_as_package )) command.plugins
   ;
   Format.fprintf oracle_fmt
@@ -1122,10 +1063,10 @@ let command_string ~result_fmt ~oracle_fmt command =
   ()
 
 (** process a test file *)
-let dispatcher ~result_fmt ~oracle_fmt file directory config =
-  let config = Test_config.scan_test_file directory ~file config in
+let dispatcher ~env ~result_fmt ~oracle_fmt file directory config =
+  let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
-    let test_name,config,ptest_vars = Test_config.ptest_vars directory ~file config  in
+    let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
     let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
@@ -1134,7 +1075,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
         incr i ;
         let macros = ptest_vars ~nth macros in
         let log_files = List.map (Macros.expand macros) logs in
-        command_string ~result_fmt ~oracle_fmt
+        command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files;
             filter = (match config.dc_filter with None -> None | Some s -> Some (Macros.expand macros s));
@@ -1187,7 +1128,7 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
           (action (system %S))\n\
           )@."
          nth file
-         ptests_alias
+         (ptests_alias ~env)
          print_list config.dc_deps
          Fmt.(list (package_as_deps (quote plugin_as_package))) config.dc_plugins
          print_list res.ex_log
@@ -1225,8 +1166,8 @@ let dispatcher ~result_fmt ~oracle_fmt file directory config =
               (action (diff %S %S))\n\
               )@."
              n nth file
-             ptests_alias
-             (Filename.concat ".." (Filename.concat SubDir.oracle_dirname log))
+             (ptests_alias ~env)
+             (SubDir.make_file (SubDir.oracle_subdir ~env SubDir.upper_dir) log)
              log
          ) res.ex_log
     in
@@ -1271,41 +1212,40 @@ let update_dir_ref dir config =
   let dc_execnow = List.map update_execnow config.dc_execnow in
   { config with dc_execnow }
 
-let () =
-  (* enqueue the test files *)
-  let suites = Ptests_config.suites () in
-  List.iter
+let process ~env default_config =
+  StringSet.iter
     (fun suite ->
-       let directory = SubDir.create suite in
-       let result_dune_file = Filename.concat (SubDir.make_file directory SubDir.result_dirname) "dune" in
-       if !verbosity >= 1 then Format.printf "%% Generates %S file for test suite %s%s ...\n%!"
-           result_dune_file suite (if !special_config = "" then "" else (" -config " ^ !special_config));
+       let suite = Filename.concat env.dir suite in
+       let directory = SubDir.create ~with_subdir:true ~env suite in
+       let result_dune_file = SubDir.make_file (SubDir.result_subdir ~env directory) "dune" in
+       if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s ...@."
+           result_dune_file suite (if env.config = "" then "" else (" and config=" ^ env.config));
+       let dir_config =
+         let config = SubDir.make_file directory Test_config.filename in
+         if Sys.file_exists config
+         then begin
+            let scan_buffer = Scanf.Scanning.from_file config in
+           Test_config.scan_directives directory ~file:config scan_buffer default_config
+         end
+         else default_config
+       in
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
-       Format.fprintf result_fmt "(alias (deps (alias %s)) (name ptests))@." ptests_alias ;
-       let oracle_dune_file = Filename.concat (SubDir.make_file directory SubDir.oracle_dirname) "dune" in
+       Format.fprintf result_fmt "(alias (deps (alias %s)) (name ptests))@." (ptests_alias ~env) ;
+       let oracle_dune_file = SubDir.make_file (SubDir.oracle_subdir ~env directory) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
-       let dir_config =
-         let config = SubDir.make_file directory Test_config.filename in
-         let default = Test_config.current_config () in
-         let default = update_dir_ref directory default in
-         if Sys.file_exists config
-         then begin
-           let scan_buffer = Scanf.Scanning.from_file config in
-           Test_config.scan_directives directory ~file:config scan_buffer default
-         end
-         else default
-       in
        let dir_files = Sys.readdir (SubDir.get directory) in
        let has_test = ref false in
+       if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (Array.length dir_files);
        for i = 0 to pred (Array.length dir_files) do
          let file = dir_files.(i) in
          assert (Filename.is_relative file);
          if test_pattern dir_config file
          then begin
-           has_test := dispatcher ~result_fmt ~oracle_fmt file directory dir_config || !has_test
+           if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
+           has_test := dispatcher ~env ~result_fmt ~oracle_fmt file directory dir_config || !has_test
          end;
        done;
        Format.fprintf result_fmt "@.";
@@ -1316,8 +1256,50 @@ let () =
          unlink ~silent:false result_dune_file;
          unlink ~silent:false oracle_dune_file
        end
+       else nb_dune_files := !nb_dune_files +2
     )
-    suites
+
+let parse_args () =
+  let suites = ref [] in
+  let add_test_suite s = suites := s :: !suites in
+  Arg.parse
+    ((Arg.align
+        (List.sort
+           (fun (optname1, _, _) (optname2, _, _) ->
+              compare optname1 optname2
+           ) argspec)
+     ) @ ["", Arg.Unit (fun () -> ()), example_msg;])
+    add_test_suite
+    umsg;
+  !suites
+
+let () =
+  let suites = match parse_args () with
+    | [] -> [ "tests" ]
+    | l -> l
+  in
+  List.iter (fun dir ->
+      Format.printf "Test: %s@." dir;
+      let suites = Ptests_config.parse ~dir in
+      if !verbosity >= 1 then Format.printf "- nb config= %d@." (StringMap.cardinal suites);
+      let nb = !nb_dune_files in
+      let nbi = !nb_ignores in
+      StringMap.iter (fun config_mode suites ->
+          if !verbosity >= 1 then Format.printf "- %S -> nb suites= %d@."
+              (match config_mode with "" -> "DEFAULT" | s -> s) (StringSet.cardinal suites);
+          let env = { config = config_mode ; dir } in
+          let directory = SubDir.create ~with_subdir:false ~env dir in
+          let config = Test_config.current_config ~env directory in
+          let config = update_dir_ref directory config in
+          process ~env config suites) suites ;
+      if !verbosity >= 1 then Format.printf "- dune files= %d@." (!nb_dune_files-nb);
+      if (!nb_ignores-nbi) <> 0 then Format.printf "- %d ignored suite(s)@." (!nb_ignores-nbi);
+    ) suites ;
+  Format.printf "Total number of generated dune files: %d@." !nb_dune_files;
+  if !nb_ignores <> 0 then begin
+    Format.printf "- ignored suites= %d@." !nb_ignores;
+    List.iter (Format.printf "  - %s@.") !ignored_suites
+  end
 
 (*
 Local Variables:

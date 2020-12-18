@@ -1,5 +1,5 @@
 (executable
- (public_name ptests)
+ (public_name frama-c-ptests)
  (name ptests)
  (modules ptests)
  (libraries unix str)
