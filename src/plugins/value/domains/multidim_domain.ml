@@ -484,8 +484,8 @@ struct
     let decide _ v1 v2 =
       Base_Domain.narrow v1 v2
     in
-    fun a b ->
-      `Value (join ~cache ~symmetric:true ~idempotent:true ~decide a b)
+    let narrow = join ~cache ~symmetric:true ~idempotent:true ~decide in
+    fun a b -> `Value (narrow a b)
 
   let join =
     let cache = cache_name "join" in
@@ -495,15 +495,13 @@ struct
     in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
-  let widen =
-    let cache = cache_name "widen" in
-    fun kf stmt ->
-      let _,get_hints = Widen.getWidenHints kf stmt in
-      let decide base b1 b2 =
-        let r = Base_Domain.widen (get_hints base) b1 b2 in
-        if Base_Domain.(is_top r) then None else Some r
-      in
-      inter ~cache ~symmetric:false ~idempotent:true ~decide
+  let widen kf stmt =
+    let _,get_hints = Widen.getWidenHints kf stmt in
+    let decide base b1 b2 =
+      let r = Base_Domain.widen (get_hints base) b1 b2 in
+      if Base_Domain.(is_top r) then None else Some r
+    in
+    inter ~cache:Hptmap_sig.NoCache ~symmetric:false ~idempotent:true ~decide
 
 
   (* Bases handling *)

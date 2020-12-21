@@ -307,7 +307,7 @@ struct
 
   (* Caches *)
 
-  let cache_name s =
+  let _cache_name s =
     Hptmap_sig.PersistentCache ("Multidim_domain.(" ^ Value.name ^ ")." ^ s)
 
   (* Datatype *)
@@ -387,7 +387,6 @@ struct
     Ival.inject_range (Some Integer.zero) (Some (typ_size t))
 
   let is_included =
-    let cache = cache_name "is_included" in
     let rec is_included m1 m2 = match m1, m2 with
       | Default d1, Default d2 -> Default.is_included d1 d2
       | _, Default Top -> true
@@ -409,7 +408,7 @@ struct
         let decide_fst _fi m1 = is_included m1 (Default s2.struct_default) in
         let decide_snd _fi m2 = is_included (Default s1.struct_default) m2 in
         let decide_both _fi m1 m2 = is_included m1 m2 in
-        FieldMap.binary_predicate cache UniversalPredicate
+        FieldMap.binary_predicate Hptmap_sig.NoCache UniversalPredicate
           ~decide_fast ~decide_fst ~decide_snd ~decide_both
           s1.struct_value s2.struct_value
       | Union u1, Union u2 ->
@@ -427,7 +426,6 @@ struct
     is_included
 
   let join f =
-    let cache = cache_name "join" in
     let rec join m1 m2 =
       match m1, m2 with
       | _, Default Top | Default Top, _ -> Default Top
@@ -466,7 +464,8 @@ struct
           and decide_left = empty_action s2.struct_default
           and decide_right = empty_action s1.struct_default
           in
-          let struct_value = FieldMap.merge ~cache
+          let struct_value = FieldMap.merge
+              ~cache:Hptmap_sig.NoCache
               ~symmetric:false ~idempotent:true
               ~decide_both ~decide_left ~decide_right
               s1.struct_value s2.struct_value
@@ -500,7 +499,6 @@ struct
     join
 
   let widen f =
-    let cache = cache_name "widen" in
     let rec widen m1 m2 = match m1, m2 with
       | _, Default _ | Default _, _ -> join f m1 m2
       | Scalar s1, Scalar s2 ->
@@ -528,7 +526,8 @@ struct
           and decide_left = empty_action s2.struct_default
           and decide_right = empty_action s1.struct_default
           in
-          let struct_value = FieldMap.merge ~cache
+          let struct_value = FieldMap.merge
+              ~cache:Hptmap_sig.NoCache
               ~symmetric:false ~idempotent:true
               ~decide_both ~decide_left ~decide_right
               s1.struct_value s2.struct_value
