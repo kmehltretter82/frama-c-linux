@@ -1,7 +1,5 @@
 [kernel] Parsing tests/value/memexec.c (with preprocessing)
 [rte] annotating function fbug
-[kernel] Parsing tests/value/memexec.c (with preprocessing)
-[rte] annotating function fbug
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
