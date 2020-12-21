@@ -15,9 +15,18 @@ IGNORE= DEFAULT_SUITES= spec
 IGNORE= DEFAULT_SUITES= make_run_script
 IGNORE= DEFAULT_SUITES= value/numerors
 
-apron_SUITES = value
-bitwise_SUITES = value
-equalities_SUITES = value
-gauges_SUITES = value
-octagon_SUITES = value
-symbols_SUITES = value
+IGNORE= qualif_SUITES = wp
+
+IGNORE= apron_SUITES = value
+IGNORE= bitwise_SUITES = value
+IGNORE= equalities_SUITES = value
+IGNORE= gauges_SUITES = value
+IGNORE= octagon_SUITES = value
+IGNORE= symbols_SUITES = value
+
+IGNORE= apron_SUITES = value/numerors
+IGNORE= bitwise_SUITES = value/numerors
+IGNORE= equalities_SUITES = value/numerors
+IGNORE= gauges_SUITES = value/numerors
+IGNORE= octagon_SUITES = value/numerors
+IGNORE= symbols_SUITES = value/numerors

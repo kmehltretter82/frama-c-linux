@@ -169,51 +169,43 @@ force-reconfigure:
 ##############################################################################
 .PHONY: tests clean-tests run-tests purge-tests
 
-# todo: adds value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
-# CONFIGS=value:apron value:bitwise value:equalities value:gauges value:octagons value:symbols
-CONFIGS=
-
 # todo: adds aorai (2 configs + Aorai_test library)
-# todo: no test found for studia ?
-# todo: adds wp (config qualif)
 PLUGIN_TESTS= dive instantiate loop_analysis markdown-report nonterm report server variadic wp
-PLUGIN_CONFIGS=
 
-ifneq ($(FRAMAC_WP_CACHEDIR),)
-PLUGIN_CONFIGS+= wp:qualif
-endif
+TEST_DIRS=tests $(addsuffix /tests,$(addprefix src/plugins/,$(PLUGIN_TESTS)))
 
-TEST_CONFIGS=$(sort $(filter-out %:, $(subst :,: ,$(CONFIGS))))
+.PHONY: tests.info
+tests.info:
+	echo "PLUGIN_TESTS=$(PLUGIN_TESTS)"
+	echo "TEST_DIRS=$(TEST_DIRS)"
 
-TEST_DIRS=tests
-TEST_ALIAS=$(addprefix @tests/, ptests_config $(subst :,/ptests_config_,$(CONFIGS)))
-
-PLUGIN_TEST_DIRS=$(patsubst %,src/plugins/%/tests,$(sort $(filter-out :%,$(subst :, :,$(PLUGIN_TESTS) $(PLUGIN_CONFIGS)))))
-PLUGIN_TEST_ALIAS= $(addprefix @src/plugins/,$(addsuffix /tests/ptests_config,$(PLUGIN_TESTS)) $(subst :,/tests/ptests_config_,$(PLUGIN_CONFIGS)))
-TEST_DIRS+=$(PLUGIN_TEST_DIRS)
-TEST_ALIAS+=$(PLUGIN_TEST_ALIAS)
-
+# Note: the plublic name of ptest.exe is frama-c-ptest
 ptests/ptests.exe: ptests/ptests.ml
 	dune build --root ptests ptests.exe
-
-.PHONY: run-tests clean-tests purge-tests tests
-purge-tests:
-	find tests src/plugins/*/tests -name dune | grep -e "oracle.*/dune\|result.*/dune" | xargs --no-run-if-empty rm
-
-clean-tests: purge-tests
-	rm -rf _build/default/tests
 
 # Command for executing ptest (in order to generate dune test files)
 PTESTS=dune exec --root ptests -- ./ptests.exe
 PTESTS=dune exec --root ptests -- ./ptests.exe -v
 
-tests.info:
-	echo $(TEST_CONFIGS)
+# Removes all dune files generated for testing
+.PHONY: purge-tests
+purge-tests:
+	find tests src/plugins/*/tests -name dune | grep -e "/oracle.*/dune\|/result.*/dune" | xargs --no-run-if-empty rm
 
-run-tests: FRAMAC_WP_CACHE=replay
-run-tests: config.sed purge-tests ptests/ptests.exe
+# Force the full cleaning of the testing environment
+.PHONY: clean-tests
+clean-tests: purge-tests
+	rm -rf $(addprefix _build/default/,$(TEST_DIRS))
+
+# Generates all dune files used for testing
+run-ptests:
+run-ptests: config.sed purge-tests ptests/ptests.exe
 	$(PTESTS) $(TEST_DIRS)
-	dune build $(TEST_ALIAS)
+
+# run tests of for all configurations (requires all dune files)
+run-tests: FRAMAC_WP_CACHE=replay
+run-tests: run-ptests
+	dune build $(addprefix @,$(addsuffix /ptests,$(TEST_DIRS)))
 
 ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests
