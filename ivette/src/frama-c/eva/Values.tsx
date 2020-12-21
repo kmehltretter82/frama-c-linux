@@ -26,7 +26,8 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
 import { Diff } from './diffed';
-import { sizeof, valueAt, diffAfter, diffThen, diffElse, EvaAlarm } from './cells';
+import { sizeof, valueAt, diffAfter, diffThen, diffElse, EvaAlarm }
+  from './cells';
 import { Row } from './layout';
 import { Probe } from './probes';
 import { Callsite } from './stacks';
@@ -162,11 +163,11 @@ function AlarmsInfo() {
       model.values.getValues(probe.marker, probe.stmt, callstack);
     const alarms = domain?.alarms ?? [];
     if (alarms.length > 0) {
-      console.log('ALARMS', alarms);
+      // console.log('ALARMS', alarms);
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
         return (
-          <Code className={className} icon='WARNING'>{alarm}</Code>
+          <Code className={className} icon="WARNING">{alarm}</Code>
         );
       };
       return (
@@ -273,7 +274,7 @@ function TableCell(props: TableCellProps) {
         contents = (
           <>
             {alarms.length > 0 && (
-              <Icon className="eva-cell-alarms" size={10} id='WARNING' />
+              <Icon className="eva-cell-alarms" size={10} id="WARNING" />
             )}
             <SizedArea cols={cols} rows={rows}>
               <span className={`eva-state-${s}`}>

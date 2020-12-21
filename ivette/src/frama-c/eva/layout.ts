@@ -65,8 +65,8 @@ export class LayoutEngine {
   private rows: Row[] = [];
 
   crop(zoomed: boolean, s: Size): Size {
-    const s_cols = s.cols + INSET;
-    const cols = zoomed ? s_cols : Math.min(s_cols, this.hcrop);
+    const sCols = s.cols + INSET;
+    const cols = zoomed ? sCols : Math.min(sCols, this.hcrop);
     const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
       cols: Math.max(HCROP, cols),

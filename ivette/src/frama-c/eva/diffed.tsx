@@ -50,24 +50,22 @@ export class DiffBuffer {
       if (value) {
         this.scratch += '\0'.repeat(value.length);
         this.contents.push(
-          <span className={MODIFIED} title='Modified'> {value}</span >
+          <span className={MODIFIED} title="Modified"> {value}</span>,
         );
       }
     } else if (removed) {
       if (value) {
         this.contents.push(
-          <span className={REMOVED} title='Removed'>{value}</span>
+          <span className={REMOVED} title="Removed">{value}</span>,
         );
       }
     } else if (added) {
       this.contents.push(
-        <span className={ADDED}><span className={SHADOW} /></span>
+        <span className={ADDED}><span className={SHADOW} /></span>,
       );
-    } else {
-      if (value) {
-        this.scratch += value;
-        this.contents.push(value);
-      }
+    } else if (value) {
+      this.scratch += value;
+      this.contents.push(value);
     }
     this.value = '';
     this.added = false;
@@ -95,17 +93,17 @@ export interface Diff2Props {
   diff: string;
 }
 
-export function Diff2(props: Diff2Props) {
+export function Diff2(props: Diff2Props): JSX.Element {
   const { text, diff } = props;
   const contents = React.useMemo(() => {
     if (text === diff) return text;
     const buffer = new DiffBuffer();
     const chunks = diffChars(text, diff);
-    console.log('DIFF', text, diff, chunks);
+    // console.log('DIFF', text, diff, chunks);
     chunks.forEach(buffer.push);
     return buffer.getContents();
   }, [text, diff]);
-  return contents;
+  return contents as JSX.Element;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -118,7 +116,7 @@ export interface Diff3Props {
   diffB: string;
 }
 
-export function Diff3(props: Diff3Props) {
+export function Diff3(props: Diff3Props): JSX.Element {
   const { text, diffA, diffB } = props;
   const contents = React.useMemo(() => {
     if (text === diffA && text === diffB) return text;
@@ -129,7 +127,7 @@ export function Diff3(props: Diff3Props) {
     diffChars(text, scratch).forEach(buffer.push);
     return buffer.getContents();
   }, [text, diffA, diffB]);
-  return contents;
+  return contents as JSX.Element;
 }
 
 /* --------------------------------------------------------------------------*/
