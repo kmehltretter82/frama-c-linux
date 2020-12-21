@@ -2,6 +2,8 @@
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
 
+// --- React & Dome
+
 import React from 'react';
 import * as Dome from 'dome';
 import * as States from 'frama-c/states';
@@ -9,21 +11,25 @@ import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
+import { GridHbox, GridItem } from 'dome/layout/grids';
 
-import './style.css';
+// --- Frama-C Plugins
 
 import { LabView, View, Group } from 'frama-c/LabViews';
+import Values from 'frama-c/eva/Values';
 import Dive from 'frama-c/dive/Dive';
-import { GridHbox, GridItem } from 'dome/layout/grids';
-import * as Controller from './Controller';
 
+// --- Ivette Main Renderers
+
+import * as Controller from './Controller';
 import ASTview from './ASTview';
 import ASTinfo from './ASTinfo';
 import Globals, { GlobalHint, useHints } from './Globals';
 import Properties from './Properties';
 import Locations from './Locations';
-import Values from './Values';
 import SourceCode from './SourceCode';
+
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls

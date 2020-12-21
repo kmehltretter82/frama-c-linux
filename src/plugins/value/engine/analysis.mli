@@ -40,6 +40,7 @@ module type Results = sig
   val eval_lval_to_loc: state -> lval -> location evaluated
   val eval_function_exp:
     state -> ?args:exp list -> exp -> kernel_function list evaluated
+  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
 end
 
 
@@ -55,7 +56,7 @@ end
 
 
 module type S = sig
-  include Abstractions.S
+  include Abstractions.Eva
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
@@ -68,6 +69,10 @@ val register_hook: ((module S) -> unit) -> unit
 (** Registers a hook that will be called each time the [current] analyzer
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
+
+val register_computed_hook: (unit -> unit) -> unit
+(** Registers a hook that will be called each time the [current] analyzer
+    has been computed. *)
 
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)

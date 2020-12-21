@@ -24,6 +24,8 @@ module.exports = {
     "react/display-name": "off",
     // Do not enforce component methods order
     "react/sort-comp": "off",
+    // We do not use propTypes
+    "react/require-default-props": "off",
     // Be more strict on usage of useMemo and useRef
     "react-hooks/exhaustive-deps": "error",
     // Allow type any, even if it should be avoided

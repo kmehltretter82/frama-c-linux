@@ -1,0 +1,225 @@
+/* -------------------------------------------------------------------------- */
+/* --- Styling Values                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-sized-area {
+    padding: 3px;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.eva-stmt {
+    cursor: default;
+    color: grey;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Probe Panel                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-probeinfo {
+    min-height: 32px;
+    padding-left: 6px;
+    padding-top: 2px;
+    padding-bottom: 4px;
+    width: 100%;
+    background: #ccc;
+    display: flex;
+}
+
+.eva-probeinfo-label {
+    flex: 0 1 auto;
+    min-width: 22px;
+    text-align: left;
+}
+
+.eva-probeinfo-code {
+    flex: 0 1 auto;
+    background: lightgrey;
+    min-width: 120px;
+    width: auto;
+    border: thin solid black;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.eva-probeinfo-stmt {
+    flex: 0 0 auto;
+    margin-left: 2px;
+    margin-right: 0px;
+    margin-top: 2px;
+}
+
+.eva-probeinfo-button {
+    flex: 0 0 auto;
+    margin: 1px;
+    min-width: 16px;
+}
+
+.eva-probeinfo-state {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Call Satck Info                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-info {
+    width: 100%;
+    background: #ccc;
+    padding-top: 3px;
+    padding-left: 12px;
+    padding-bottom: 2px;
+}
+
+.eva-callsite {
+    fill: #7cacbb;
+    background: #eee;
+    border-radius: 4px;
+    border: thin solid black;
+    padding-right: 7px;
+}
+
+.eva-callsite {
+    cursor: default;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-row {
+    display: flex;
+    position: relative;
+    flex: 0 1 auto;
+    height: 100%;
+    border-bottom: thin solid black;
+    border-left: thin solid black;
+}
+
+.eva-probes .eva-row {
+    border-top: thin solid black;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Cells                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-stack {
+    width: 12px;
+    padding-top: 1px;
+    color: #777;
+    text-align: center;
+}
+
+.eva-cell {
+    flex: 1 1 auto;
+    border-right: thin solid black;
+}
+
+.eva-cell:nth-child(last) {
+    border-right: none;
+}
+
+.eva-probes .eva-cell {
+    padding: 2px;
+    text-align: center;
+}
+
+.eva-diff-shadow {
+    border: solid red thin;
+    position: relative;
+    z-index: -1;
+}
+
+.eva-diff-added { }
+.eva-diff-removed { text-decoration: strike }
+
+.eva-state-Here .eva-diff { background: pink; }
+.eva-state-After .eva-diff { background: yellow; }
+.eva-state-Then .eva-diff { background: green; }
+.eva-state-Else .eva-diff { background: orange; }
+
+/* -------------------------------------------------------------------------- */
+/* --- Alarms                                                             --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-cell-alarms {
+    fill: orange;
+    position: absolute;
+    top: -1px;
+    right: 3px;
+    z-index: 1;
+}
+
+.eva-alarm-info {
+    font-size: x-small;
+    padding: 0px;
+    margin: 1px;
+}
+
+.eva-alarm-True { fill: green; }
+.eva-alarm-False { fill: red; }
+.eva-alarm-Unknown { fill: darkorange; }
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows Background                                              --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-probes .eva-row {
+    background: #cbe4cb;
+}
+
+.eva-values .eva-row {
+    background: #eee;
+}
+
+.eva-callstack.eva-row-odd .eva-row {
+    background: #eee;
+}
+
+.eva-callstack.eva-row-even .eva-row {
+    background: #e2e8e8;
+}
+
+.eva-callstack.eva-row-odd .eva-row .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-callstack.eva-row-even .eva-row .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-callstack.eva-row-selected .eva-row .eva-transient {
+    background: lightblue;
+}
+
+.eva-callstack.eva-row-selected .eva-row {
+    background: lightblue;
+}
+
+.eva-probes .eva-focused {
+    background: #02da02;
+}
+
+.eva-probes .eva-transient {
+    background: #fff0d5;
+}
+
+.eva-probes .eva-transient.eva-focused {
+    background: orange;
+}
+
+.eva-stack {
+    background: #eee;
+}
+
+.eva-callstack.eva-row-selected .eva-stack {
+    background: lightblue;
+}
+
+/* -------------------------------------------------------------------------- */

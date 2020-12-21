@@ -237,7 +237,7 @@
 }
 
 .dome-xButton-led-positive {
-    background: radial-gradient( circle at center , #00ff0091 , #00ff00 );
+    background: radial-gradient( circle at center , #50c140, #279c16 );
 }
 
 .dome-xButton-led-negative {
@@ -288,7 +288,7 @@
 .dome-xIconButton-selected:not(:hover) { fill: #449bef ; }
 .dome-xIconButton-selected:hover { fill: #c54dae ; }
 
-.dome-xIconButton-positive { fill: #00d000 ; }
+.dome-xIconButton-positive { fill: #279c16 ; }
 
 .dome-xIconButton-negative { fill: #fb3832 ; }
 

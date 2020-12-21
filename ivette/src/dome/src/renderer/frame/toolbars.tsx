@@ -91,6 +91,10 @@ export interface ButtonProps<A> {
   title?: string;
   /** Button kind. */
   kind?: ButtonKind;
+  /** Button is displayed (default `true`). */
+  visible?: boolean;
+  /** Button is hidden (default `false`). */
+  hidden?: boolean;
   /** Enabled State (default `true`). */
   enabled?: boolean;
   /** Disabled State (default `false`). */
@@ -107,8 +111,10 @@ export interface ButtonProps<A> {
 
 /** Toolbar Button. */
 export function Button<A = undefined>(props: ButtonProps<A>) {
-  const { selected, value, selection, onClick } = props;
+  const { visible = true, hidden = false } = props;
+  if (!visible || hidden) return null;
   const { enabled = true, disabled = false } = props;
+  const { selected, value, selection, onClick } = props;
   const isSelected = selected !== undefined
     ? selected
     : (value !== undefined && value === selection);
@@ -147,13 +153,18 @@ export interface SelectionProps<A> {
 // --- ToolBar Button Group
 // --------------------------------------------------------------------------
 
+export interface ButtonGroupProps<A> extends SelectionProps<A> {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
 /**
    Toolbar Button Group.
 
    Properties of the button group are passed down the buttons of the group
    as appropriate defaults.
  */
-export function ButtonGroup<A>(props: SelectionProps<A>) {
+export function ButtonGroup<A>(props: ButtonGroupProps<A>) {
   const { children, value, onChange, enabled, disabled } = props;
   const baseProps: ButtonProps<A> = {
     enabled,
@@ -161,8 +172,9 @@ export function ButtonGroup<A>(props: SelectionProps<A>) {
     selection: value,
     onClick: onChange,
   };
+  const className = classes('dome-xToolBar-group', props.className);
   return (
-    <div className="dome-xToolBar-group">
+    <div className={className} style={props.style}>
       {React.Children.map(children, (elt) => React.cloneElement(
         elt,
         { ...baseProps, ...elt.props },

@@ -239,7 +239,7 @@ export const CircButton = (props: ButtonProps) => {
 // --------------------------------------------------------------------------
 
 export type IconButtonKind =
-  undefined | 'default' | 'negative' | 'positive' | 'warning';
+  undefined | 'selected' | 'default' | 'negative' | 'positive' | 'warning';
 
 export interface IconButtonProps {
   /** Icon identifier. Displayed on the left side of the label. */
@@ -266,6 +266,7 @@ export interface IconButtonProps {
   display?: boolean;
   /** Styled bytton:
      - `'default'`: normal button;
+     - `'selected'`: selection button, in blue;
      - `'warning'`: warning button, in orange;
      - `'positive'`: positive button, in green;
      - `'negative'`: negative button, in red.
