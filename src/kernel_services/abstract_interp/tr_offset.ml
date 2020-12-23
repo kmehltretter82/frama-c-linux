@@ -52,7 +52,7 @@ let reduce_offset_by_validity origin ival size validity =
       | None ->
         let min, max, _r, modu = Ival.min_max_r_mod reduced_ival in
         (* The bounds are finite thanks to the narrow with the valid range. *)
-        let min = Extlib.the min and max = Extlib.the max in
+        let min = Option.get min and max = Option.get max in
         if Int.lt modu size
         then Overlap (min, Int.add max (Int.pred size), origin)
         else Interval (min, max, modu)

@@ -121,7 +121,7 @@ class visit_adding_code_for_synchronisation =
     method! vglob_aux g =
       match g with
       | GFun (fundec,loc) ->
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let vi = Kernel_function.get_vi kf in
         let vi_pre = Cil_const.copy_with_new_vid vi in
         vi_pre.vname <- Data_for_aorai.get_fresh (vi_pre.vname ^ "_pre_func");
@@ -208,7 +208,7 @@ class visit_adding_code_for_synchronisation =
     method! vstmt_aux stmt =
       match stmt.skind with
       | Return (res,loc)  ->
-        let kf = Extlib.the self#current_kf in
+        let kf = Option.get self#current_kf in
         let vi = Kernel_function.get_vi kf in
         let current_function = vi.vname in
         if not (Data_for_aorai.isIgnoredFunction current_function) then begin
@@ -907,7 +907,7 @@ class visit_adding_pre_post_from_buch treatloops =
     method private leave_block () = !(Stack.pop has_call)
 
     method! vfunc f =
-      let my_kf = Extlib.the self#current_kf in
+      let my_kf = Option.get self#current_kf in
       let vi = Kernel_function.get_vi my_kf in
       let spec = Annotations.funspec my_kf in
       let loc = Kernel_function.get_location my_kf in
@@ -940,7 +940,7 @@ class visit_adding_pre_post_from_buch treatloops =
     method! vglob_aux g =
       match g with
       | GFun(f,_)  ->
-        let my_kf = Extlib.the self#current_kf in
+        let my_kf = Option.get self#current_kf in
         (* don't use get_spec, as we'd generate default assigns,
            while we'll fill the spec just below. *)
         let vi = Kernel_function.get_vi my_kf in
@@ -981,7 +981,7 @@ class visit_adding_pre_post_from_buch treatloops =
       | _ -> DoChildren;
 
     method! vstmt_aux stmt =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let treat_loop body_ref stmt =
         let init_state = Data_for_aorai.get_loop_init_state stmt in
         let inv_state = Data_for_aorai.get_loop_invariant_state stmt in
@@ -1105,7 +1105,7 @@ class visit_adding_pre_post_from_buch treatloops =
           List.iter
             (update_assigns
                (Cil_datatype.Stmt.loc stmt)
-               (Extlib.the self#current_kf)
+               (Option.get self#current_kf)
                (Kstmt stmt))
             specs;
           s

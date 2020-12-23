@@ -100,7 +100,10 @@ process_file ()
    -e 's/Extlib\.may_map /Option.fold ~some:/g' \
    -e 's/~dft:/~none:/g' \
    -e 's/Extlib\.may /Option.iter /g' \
-   -e 's/Extlib\.opt_map/Option.map/g'
+   -e 's/Extlib\.opt_map/Option.map/g' \
+   -e 's/Extlib\.has_some/Option.is_some/g' \
+   -e 's/Extlib\.opt_bind/Option.bind/g' \
+   -e 's/Extlib\.the \([^~]\)/Option.get \1/g'
 }
 
 apply_one_dir ()

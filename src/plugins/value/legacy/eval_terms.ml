@@ -548,7 +548,7 @@ let constraint_trange idx size_arr =
     match idx.term_node with
     | Trange ((None as low), up) | Trange (low, (None as up)) -> begin
         let loc = idx.term_loc in
-        match Extlib.opt_bind Cil.constFoldToInt size_arr with
+        match Option.bind size_arr Cil.constFoldToInt with
         | None -> idx
         | Some size ->
           let low = match low with (* constrained l.h.s *)
@@ -576,7 +576,7 @@ let apply_logic_builtin builtin env args_list =
   match res with
   | None -> None
   | Some offsm ->
-    let v = Extlib.the (Cvalue.V_Offsetmap.single_interval_value offsm) in
+    let v = Option.get (Cvalue.V_Offsetmap.single_interval_value offsm) in
     let v = Cvalue.V_Or_Uninitialized.get_v v in
     Some (v, alarms)
 

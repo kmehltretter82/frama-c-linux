@@ -246,8 +246,6 @@ let array_existsi f a =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let has_some = function None -> false | Some _ -> true
-
 let opt_if b v = if b then None else Some v
 
 let opt_fold f o b =
@@ -260,10 +258,6 @@ let merge_opt f k o1 o2 =
     | None, None -> None
     | Some x, None | None, Some x -> Some x
     | Some x1, Some x2 -> Some (f k x1 x2)
-
-let opt_bind f = function
-  | None -> None
-  | Some x -> f x
 
 let opt_filter f = function
   | None -> None

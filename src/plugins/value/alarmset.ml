@@ -229,7 +229,7 @@ let local_printer: Printer.extensible_printer =
 
     method private pp_temporaries fmt =
       let pp_var fmt vi =
-        Format.fprintf fmt "%s from@ @[%s@]" vi.vname (Extlib.the vi.vdescr)
+        Format.fprintf fmt "%s from@ @[%s@]" vi.vname (Option.get vi.vdescr)
       in
       Pretty_utils.pp_iter Cil_datatype.Varinfo.Set.iter
         ~pre:"" ~suf:"" ~sep:",@ " pp_var fmt temporaries

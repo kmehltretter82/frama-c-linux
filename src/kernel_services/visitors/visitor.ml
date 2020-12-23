@@ -114,7 +114,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       let change_stmt stmt (add, remove) =
         if (add <> [] || remove <> []) then begin
-          let kf = Extlib.the self#current_kf in
+          let kf = Option.get self#current_kf in
           let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
           Queue.add
             (fun () ->
@@ -159,7 +159,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
     method vglob_aux _ = DoChildren
 
     method private vbehavior_annot ?e b =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let treat_elt emit elt acc =
         match e with
         | None -> (emit, elt) :: acc
@@ -387,7 +387,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       | DoChildrenPost f -> visit_clauses self f
 
     method private vfunspec_annot () =
-      let kf = Extlib.the self#current_kf in
+      let kf = Option.get self#current_kf in
       let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
       let old_behaviors =
         Annotations.fold_behaviors (fun e b acc -> (e,b)::acc) kf []
@@ -671,7 +671,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       let get_spec () = match g with
         | GFun _ | GFunDecl _ when Ast.is_def_or_last_decl g ->
           let spec =
-            Annotations.funspec ~populate:false (Extlib.the self#current_kf)
+            Annotations.funspec ~populate:false (Option.get self#current_kf)
           in
           Some (Cil.visitCilFunspec self#plain_copy_visitor spec)
         | _ -> None
@@ -721,7 +721,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                  self#get_filling_actions;
                if
                  Cil_datatype.Varinfo.equal v
-                   (Kernel_function.get_vi new_kf) && Extlib.has_some spec
+                   (Kernel_function.get_vi new_kf) && Option.is_some spec
                then
                  Queue.add
                    (fun () ->
@@ -776,7 +776,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                 self#get_filling_actions;
               if Cil_datatype.Varinfo.equal f.svar
                   (Kernel_function.get_vi new_kf)
-              && Extlib.has_some spec
+              && Option.is_some spec
               then
                 Queue.add
                   (fun () -> Annotations.register_funspec ~force:true new_kf)

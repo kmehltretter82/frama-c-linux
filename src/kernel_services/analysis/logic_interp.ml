@@ -154,9 +154,9 @@ let code_annot kf stmt s =
   end) in
   let loc = Stmt.loc stmt in
   let pa =
-    Extlib.opt_bind
-      (function (_, Logic_ptree.Acode_annot (_,a)) -> Some a | _ -> None)
+    Option.bind
       (Logic_lexer.annot (fst loc,s))
+      (function (_, Logic_ptree.Acode_annot (_,a)) -> Some a | _ -> None)
   in
   let parse pa =
     LT.code_annot
@@ -954,13 +954,13 @@ to function contracts."
         (* WARNING this is obsolete *)
         (* [JS 2010/09/02] TODO: so what is the right way to do? *)
         (* to preserve the interpretation of the loop invariant *)
-        get_zone_from_pred (Extlib.the loop_body_opt) pred.tp_statement;
+        get_zone_from_pred (Option.get loop_body_opt) pred.tp_statement;
       | AInvariant (_behav,false,pred) -> (* code invariant *)
         (* to preserve the interpretation of the code invariant *)
         get_zone_from_pred ki pred.tp_statement;
       | AVariant (term,_) ->
         (* to preserve the interpretation of the variant *)
-        get_zone_from_term (Extlib.the loop_body_opt) term;
+        get_zone_from_term (Option.get loop_body_opt) term;
       | APragma (Loop_pragma (Unroll_specs terms))
       | APragma (Loop_pragma (Widen_hints terms))
       | APragma (Loop_pragma (Widen_variables terms)) ->
@@ -973,14 +973,14 @@ to function contracts."
       | AAllocation (_,FreeAllocAny) -> ();
       | AAllocation (_,FreeAlloc(f,a)) -> 
         let get_zone x =
-          get_zone_from_term (Extlib.the loop_body_opt) x.it_content
+          get_zone_from_term (Option.get loop_body_opt) x.it_content
         in
           List.iter get_zone f ;
           List.iter get_zone a 
       | AAssigns (_, WritesAny) -> ()
       | AAssigns (_, Writes l) -> (* loop assigns *)
         let get_zone x =
-          get_zone_from_term (Extlib.the loop_body_opt) x.it_content
+          get_zone_from_term (Option.get loop_body_opt) x.it_content
         in
         List.iter
           (fun (zone,deps) ->

@@ -603,7 +603,7 @@ module Make (Input: Input) = struct
     in
     (* Add 'Unfocus callstacks' option to menu. *)
     let add_unfocus_callstacks menu icon =
-      if Extlib.has_some model.focused_rev_callstacks then begin
+      if Option.is_some model.focused_rev_callstacks then begin
         let unfocus = GMenu.menu_item ~label:"Unfocus callstack(s)" () in
         (!!menu)#add unfocus;
         ignore (unfocus#connect#activate (callback_focus_unfocus None icon))

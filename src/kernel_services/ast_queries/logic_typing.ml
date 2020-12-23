@@ -327,7 +327,7 @@ module Lenv = struct
   }
 
   let string_of_current_label env =
-    Extlib.opt_bind (
+    Option.bind env.current_logic_label (
       function
       | FormalLabel _ -> None
       | BuiltinLabel Init -> Some "Init"
@@ -345,7 +345,6 @@ module Lenv = struct
          | None -> None
          | Some (Label (lab,_,_)) -> Some lab
          | Some _ -> None))
-      env.current_logic_label
 
   let fresh_var env name kind typ =
     let name =
@@ -1809,7 +1808,7 @@ struct
 
 
   let conditional_conversion loc env rel t1 t2 =
-    let is_rel = Extlib.has_some rel in
+    let is_rel = Option.is_some rel in
     (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
        performs the needed unifications on both sides.*)
     let var = fresh_type_var "cmp" in
@@ -1843,7 +1842,7 @@ struct
         else if isArithmeticType ty1 && isArithmeticType ty2 then begin
           if is_same_type lty1 lty2 then begin
             if is_rel then begin
-              let rel = Extlib.the rel in
+              let rel = Option.get rel in
               let kind =
                 match Cil.unrollType ty1 with
                 | TFloat (FFloat,_) -> "float"

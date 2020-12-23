@@ -70,7 +70,7 @@ struct
     match Cil.unrollType ty with
     | TArray(te,n,_,_) ->
         begin
-          match Extlib.opt_bind Ctypes.get_int n with
+          match Option.bind n Ctypes.get_int with
           | None -> failwith "Wp.Layout: unkown array size"
           | Some n -> Index(te,n)
         end

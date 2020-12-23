@@ -52,7 +52,7 @@ type acc =
     from: Ival.t;  (* The offsets from which the current search has begun. *)
     stop: bool; }  (* True if the search is completely done. *)
 
-let the_max_int ival = Extlib.the (Ival.max_int ival)
+let the_max_int ival = Option.get (Ival.max_int ival)
 
 let pos_min_int ival =
   match Ival.min_int ival with
@@ -230,7 +230,7 @@ let search_offsm kind ~validity ~offset ~rem offsetmap =
     | Base.Valid_range (Some (_min, max)) -> max
   in
   (* Uses [kind.limit] to bound the read. *)
-  let limit_max = Extlib.opt_bind Ival.max_int kind.limit in
+  let limit_max = Option.bind kind.limit Ival.max_int in
   let max = match Ival.max_int offset, limit_max with
     | Some max_start, Some max_limit ->
       let max = Integer.(add max_start (pred max_limit)) in

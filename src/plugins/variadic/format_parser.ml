@@ -39,7 +39,7 @@ let check_flag spec flag =
   let cs = spec.f_conversion_specifier in
   match flag, cs with
   | FSharp, #has_alternative_form -> true
-  | FZero, #integer_specifier when Extlib.has_some spec.f_precision ->
+  | FZero, #integer_specifier when Option.is_some spec.f_precision ->
     warn "Flag 0 is ignored when a precision is specified"; false
   | FZero, #numeric_specifier when List.mem FMinus spec.f_flags ->
     warn "Flag 0 is ignored when flag - is also specified."; false

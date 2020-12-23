@@ -333,7 +333,7 @@ module Make_Dataflow
       match return_exp with
       | None -> id
       | Some return_exp ->
-        let vi_ret = Extlib.the (Library_functions.get_retres_vi kf) in
+        let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
         let return_lval = Var vi_ret, NoOffset in
         let kstmt = Kstmt stmt in
         fun state ->
@@ -399,7 +399,7 @@ module Make_Dataflow
       | _ -> flow
     in
     (* Loop transitions *)
-    let the_stmt v = Extlib.the v.vertex_start_of in
+    let the_stmt v = Option.get v.vertex_start_of in
     let enter_loop f v =
       let f = Partition.enter_loop f (the_stmt v) in
       Partition.transfer (lift (Domain.enter_loop (the_stmt v))) f

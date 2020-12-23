@@ -260,7 +260,7 @@ module Make
       match Deps.intersects deps zone with
       | [] -> equalities, deps, modified_zone
       | atoms ->
-        let extract_lval h = Extlib.the (HCE.to_lval h) in
+        let extract_lval h = Option.get (HCE.to_lval h) in
         let atoms = List.map extract_lval atoms in
         let process eq atom = Equality.Set.remove kt atom eq in
         let equalities' = List.fold_left process equalities atoms in

@@ -339,7 +339,7 @@ let build_node_writes context node =
     match Node_kind.get_base node.node_kind with
     (* TODO refine formal dependency computation for non-scalar formals *)
     | Some vi when vi.vformal ->
-      let kf = Extlib.the (Kernel_function.find_defining_kf vi) in
+      let kf = Option.get (Kernel_function.find_defining_kf vi) in
       let pos = Kernel_function.get_formal_position vi kf in
       let callsites =
         match Callstack.pop callstack with

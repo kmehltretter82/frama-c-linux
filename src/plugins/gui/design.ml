@@ -602,7 +602,7 @@ let to_do_on_select
           (if vi.vaddrof then "" else "not ")
       end else begin
         main_ui#view_original vi.vdecl;
-        let kf = Extlib.the kf in
+        let kf = Option.get kf in
         main_ui#pretty_information
           "This is the declaration of %s %a in function %a%t@."
           (formal_or_local vi) Varinfo.pretty vi
@@ -1040,7 +1040,7 @@ class main_window () : main_window_extension_points =
         m
       | Some s ->
         s
-    method file_tree = Extlib.the file_tree
+    method file_tree = Option.get file_tree
     method file_tree_view = file_tree_view
     method annot_window = annot_window
 

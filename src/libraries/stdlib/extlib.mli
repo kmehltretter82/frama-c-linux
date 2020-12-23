@@ -195,10 +195,6 @@ val array_existsi: (int -> 'a -> bool) -> 'a array -> bool
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-(** [true] iff its argument is [Some x] 
-    @since Nitrogen-20111001 *)
-val has_some: 'a option -> bool
-
 val opt_if: bool -> 'a -> 'a option
 (** [opt_if cond v] returns [Some v] if [cond] is [true] and
     [None] otherwise *)
@@ -218,12 +214,6 @@ val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
 *)
 val merge_opt:
   ('a -> 'b -> 'b -> 'b) -> 'a -> 'b option -> 'b option -> 'b option
-
-(** [opt_bind f x] returns [None] if [x] is [None] and [f y] if is [Some y]
-    (monadic bind)
-    @since Nitrogen-20111001
-*)
-val opt_bind: ('a -> 'b option) -> 'a option -> 'b option
 
 val opt_filter: ('a -> bool) -> 'a option -> 'a option
 

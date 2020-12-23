@@ -244,7 +244,7 @@ class vis flag = object(self)
         Kernel.fatal ~current:true
           "%a in function %a is expected to have a single successor"
           Printer.pp_stmt s
-          Kernel_function.pretty (Extlib.the self#current_kf)
+          Kernel_function.pretty (Option.get self#current_kf)
     in
     let treat_succ_open kind s succ =
       (* The jump must not bypass a vla initialization in the opened blocks. *)

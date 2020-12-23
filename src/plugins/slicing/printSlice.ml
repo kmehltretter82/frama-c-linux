@@ -90,7 +90,7 @@ class printerClass optional_ff = object(self)
           else
 	    Format.fprintf fmt "@[/* %s */@]" str_m
     in
-    let s = Extlib.the self#current_stmt in
+    let s = Option.get self#current_stmt in
     try
       Format.fprintf fmt "@[<v>%a@ %a@]"
         stmt_info s
@@ -104,7 +104,7 @@ class printerClass optional_ff = object(self)
     let label_info = match opt_ff with
       | None -> "label"
       | Some ff ->
-        let m = Fct_slice.get_label_mark ff (Extlib.the self#current_stmt) l in
+        let m = Fct_slice.get_label_mark ff (Option.get self#current_stmt) l in
         SlicingMarks.mark_to_string m
     in
     Format.fprintf fmt "@[<hv>/* %s */@ %a@]"

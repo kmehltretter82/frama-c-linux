@@ -1404,7 +1404,7 @@ let ip_from_of_behavior kf st ~active b =
       | From _ ->
         let a = Datatype.String.Set.of_list active in
         let ip =
-          Extlib.the (ip_of_from kf st (Id_contract (a,b)) (out, froms))
+          Option.get (ip_of_from kf st (Id_contract (a,b)) (out, froms))
         in
         ip :: acc
     in
@@ -1424,7 +1424,7 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
     let treat_from acc (out, froms) = match froms with FromAny -> acc
                                                      | From _ ->
                                                        let ip =
-                                                         Extlib.the (ip_of_from kf st (Id_loop ca) (out, froms))
+                                                         Option.get (ip_of_from kf st (Id_loop ca) (out, froms))
                                                        in
                                                        ip::acc
     in

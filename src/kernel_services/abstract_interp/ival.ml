@@ -837,8 +837,8 @@ type overflow_float_to_int =
 
 let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let all = create_all_values ~size ~signed in
-  let min_all = Extlib.the (min_int all) in
-  let max_all = Extlib.the (max_int all) in
+  let min_all = Option.get (min_int all) in
+  let max_all = Option.get (max_int all) in
   let conv f =
     try
       (* truncate_to_integer returns an integer that fits in a 64 bits

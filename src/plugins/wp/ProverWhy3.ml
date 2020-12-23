@@ -284,7 +284,7 @@ struct
       let neg = Q.sign q < 0 in
       let int,frac,exp = (group 1 s), (group 2 s), (group 3 s) in
       let exp = if String.equal exp "" then None else Some exp in
-      let ty = Extlib.the (of_tau ~cnv tau) in
+      let ty = Option.get (of_tau ~cnv tau) in
       why3_real ty ~radix:16 ~neg ~int ~frac ?exp ()
     else raise Not_found
 

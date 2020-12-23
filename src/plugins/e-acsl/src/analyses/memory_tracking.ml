@@ -646,7 +646,7 @@ end = struct
               List.iter
                 (fun s ->
                    let old =
-                     try Extlib.the (Stmt.Hashtbl.find tbl s)
+                     try Option.get (Stmt.Hashtbl.find tbl s)
                      with Not_found -> assert false
                    in
                    Stmt.Hashtbl.replace

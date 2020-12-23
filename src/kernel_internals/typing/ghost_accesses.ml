@@ -226,7 +226,7 @@ class visitor = object(self)
         if not (ghost_term_type term.term_type) then
           Error.assigns_non_ghost_term ~current:true term
       in
-      let kf = Extlib.the (self#current_kf) in
+      let kf = Option.get (self#current_kf) in
       match assigns with
       | Writes froms -> List.iter check_assign froms
       | WritesAny when not (Kernel_function.has_definition kf) ->

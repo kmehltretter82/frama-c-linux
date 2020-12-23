@@ -433,7 +433,7 @@ let build_fun_spec env loc vf format_fun tvparams formals =
             let labels = List.map (fun _ -> here) logic_info.l_labels in
             let nterm = match precision with
               | PStar ->
-                let n_vi = List.nth vformals (Extlib.the pos) in
+                let n_vi = List.nth vformals (Option.get pos) in
                 Logic_utils.numeric_coerce Linteger (Build.tvar ~loc n_vi)
               | PInt n -> Cil.lconstant ~loc (Integer.of_int n)
             in

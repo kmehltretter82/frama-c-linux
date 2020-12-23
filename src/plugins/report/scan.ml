@@ -166,13 +166,13 @@ class visit_properties (phi : Property.t -> unit) =
 
     method! vspec fspec =
       Property.ip_of_spec
-        (Extlib.the self#current_kf) self#current_kinstr ~active:[] fspec |>
+        (Option.get self#current_kf) self#current_kinstr ~active:[] fspec |>
       List.iter phi ;
       Cil.DoChildren
 
     method! vcode_annot ca =
       Property.ip_of_code_annot
-        (Extlib.the self#current_kf) (Extlib.the self#current_stmt) ca |>
+        (Option.get self#current_kf) (Option.get self#current_stmt) ca |>
       List.iter phi ;
       Cil.DoChildren
 

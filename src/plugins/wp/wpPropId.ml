@@ -121,12 +121,12 @@ let mk_var_pos_id    kf s ca = mk_prop PKVarPos  (mk_annot_id kf s ca)
 
 let mk_loop_from_id kf s ca from =
   let id = Property.ip_of_from kf (Kstmt s) (Property.Id_loop ca) from in
-  mk_prop PKPropLoop (Extlib.the id)
+  mk_prop PKPropLoop (Option.get id)
 
 let mk_bhv_from_id kf ki a bhv from =
   let a = Datatype.String.Set.of_list a in
   let id = Property.ip_of_from kf ki (Property.Id_contract (a,bhv)) from in
-  mk_prop PKProp (Extlib.the id)
+  mk_prop PKProp (Option.get id)
 
 let get_kind_for_tk kf tkind = match tkind with
   | Normal ->
@@ -138,7 +138,7 @@ let mk_fct_from_id kf bhv tkind from =
   let contract_info = Property.Id_contract(Datatype.String.Set.empty,bhv) in
   let id = Property.ip_of_from kf Kglobal contract_info from in
   let kind = get_kind_for_tk kf tkind in
-  mk_prop kind (Extlib.the id)
+  mk_prop kind (Option.get id)
 
 let mk_disj_bhv_id (kf,ki,active,disj)  =
   mk_prop PKProp (Property.ip_of_disjoint kf ki active disj)

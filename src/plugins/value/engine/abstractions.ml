@@ -280,7 +280,7 @@ module Internal_Value = struct
 
     let restrict_val =
       let rec get: type v. v structure -> Value.t -> v = function
-        | Leaf (key, _) -> Extlib.the (Value.get key)
+        | Leaf (key, _) -> Option.get (Value.get key)
         | Node (s1, s2) ->
           let get1 = get s1 and get2 = get s2 in
           fun v -> get1 v, get2 v

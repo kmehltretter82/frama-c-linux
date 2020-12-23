@@ -485,8 +485,8 @@ let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
         in
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
-           Thus using [Extlib.the] is fine *)
-        dup (ty_of_logic_ty (Extlib.the li.l_type))
+           Thus using [Option.get] is fine *)
+        dup (ty_of_logic_ty (Option.get li.l_type))
       else begin
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both

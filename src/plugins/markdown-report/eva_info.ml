@@ -113,7 +113,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
       end;
       Cil.SkipChildren
     | Call(_,{ enode = Lval (Mem _,NoOffset)},_,_) ->
-      let s = Extlib.the self#current_stmt in
+      let s = Option.get self#current_stmt in
       let kfs = Db.Value.call_to_kernel_function s in
       let handle_one kf =
         let vi = Kernel_function.get_vi kf in

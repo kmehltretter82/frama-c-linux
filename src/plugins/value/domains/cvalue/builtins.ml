@@ -195,7 +195,7 @@ let prepare_builtins () =
   (* Overrides builtins attribution according to the -eva-builtin option. *)
   Value_parameters.BuiltinsOverrides.iter
     (fun (kf, name) ->
-       let builtin_name = Extlib.the name in
+       let builtin_name = Option.get name in
        let f, typ, _, _ = Hashtbl.find table builtin_name in
        prepare_builtin kf builtin_name f typ)
 

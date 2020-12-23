@@ -1735,7 +1735,7 @@ and visitCilLogicVarUse vis lv =
         we target the current project, builtins are by definition already
         tied to logic_infos and should not be copied.
      *)
-     not (Project.is_current (Extlib.the vis#project)) &&
+     not (Project.is_current (Option.get vis#project)) &&
      Logic_env.is_builtin_logic_function lv.lv_name
   then begin
     (* Do as if the variable has been declared.
@@ -4449,7 +4449,7 @@ and fieldBitsOffset (f : fieldinfo) : int * int =
           (Option.value ~default:[] f.fcomp.cfields)
       );
     end;
-    Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
+    Option.get f.foffset_in_bits, Option.get f.fsize_in_bits
   end
 
 and bitsOffset (baset: typ) (off: offset) : int * int =
@@ -6056,7 +6056,7 @@ let foldLeftCompound
                    Works because [initl] is sorted by Cabs2cil.*)
                 let good_offset i off = match off with
                   | Index (i', NoOffset) ->
-                    Integer.(equal (Extlib.the (constFoldToInt i')) (of_int i))
+                    Integer.(equal (Option.get (constFoldToInt i')) (of_int i))
                   | _ -> Kernel.fatal ~current:true
                            "Invalid initializer"
                 in

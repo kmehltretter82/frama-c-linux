@@ -301,7 +301,7 @@ module Allocation = struct
 
   let get stmt =
     match get stmt with
-    | [] -> Extlib.the (of_string (Value_parameters.AllocBuiltin.get ()))
+    | [] -> Option.get (of_string (Value_parameters.AllocBuiltin.get ()))
     | [x] -> x
     | x :: _ ->
       Value_parameters.warning ~current:true ~once:true

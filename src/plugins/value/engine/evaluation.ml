@@ -1044,7 +1044,7 @@ module Make
             if Integer.is_zero size
             then `Value index, Alarmset.none
             else
-              let size_expr = Extlib.the array_size in (* array_size exists *)
+              let size_expr = Option.get array_size in (* array_size exists *)
               assume_valid_index ~size ~size_expr ~index_expr index
           with
           | Cil.LenOfArray -> `Value index, Alarmset.none (* unknown array size *)

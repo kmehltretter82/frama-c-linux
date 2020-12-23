@@ -246,7 +246,7 @@ module Base_checker = struct
         self#push_behavior_stack ();
         (* Initial AST does not have kf *)
         if is_normalized then begin
-          let kf = Extlib.the self#current_kf in
+          let kf = Option.get self#current_kf in
           if not (Kernel_function.is_definition kf) then
             check_abort
               "Kernel function %a is supposed to be a prototype, but it has a body"
@@ -307,7 +307,7 @@ module Base_checker = struct
            | Some _ -> (* can only happen in normalized mode. *)
              check_abort
                "Function %a does not have a return statement in its body"
-               Kernel_function.pretty (Extlib.the self#current_kf));
+               Kernel_function.pretty (Option.get self#current_kf));
           let check_one_stmt stmt _ =
             let check_cfg_edge stmt' =
               try
@@ -409,7 +409,7 @@ module Base_checker = struct
                 self#add_spec_behavior_names spec
               | _ -> assert false (* filter should prevent anything else. *))
             contracts;
-          let kf = Extlib.the self#current_kf in
+          let kf = Option.get self#current_kf in
           let s',kf' =
             try
               Kernel_function.find_from_sid s.sid
@@ -495,12 +495,12 @@ module Base_checker = struct
              | None ->
                check_abort
                  "Found a second return statement in body of function %a"
-                 Kernel_function.pretty (Extlib.the self#current_kf)
+                 Kernel_function.pretty (Option.get self#current_kf)
              | Some s' when s != s' ->
                check_abort
                  "Function %a is supposed to have as return statement %d:@\n%a@\n\
                   Found in its body statement %d:@\n%a@\n"
-                 Kernel_function.pretty (Extlib.the self#current_kf)
+                 Kernel_function.pretty (Option.get self#current_kf)
                  s'.sid Printer.pp_stmt s'
                  s.sid Printer.pp_stmt s
              | Some _ -> return_stmt <- None
@@ -512,7 +512,7 @@ module Base_checker = struct
         let prefix fmt =
           Format.fprintf fmt "Local variable %a(%d) in function %a"
             Printer.pp_varinfo v v.vid
-            Printer.pp_varinfo (Extlib.the self#current_func).svar
+            Printer.pp_varinfo (Option.get self#current_func).svar
         in
         if v.vglob then check_abort "%t is marked as global" prefix;
         if v.vformal then check_abort "%t is marked as formal" prefix;
@@ -529,7 +529,7 @@ module Base_checker = struct
           Format.fprintf fmt
             "Local variable %a(%d) in function %a"
             Printer.pp_varinfo v v.vid
-            Printer.pp_varinfo (Extlib.the self#current_func).svar
+            Printer.pp_varinfo (Option.get self#current_func).svar
         in
         if not v.vglob then
           check_abort
