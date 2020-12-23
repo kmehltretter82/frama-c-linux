@@ -1392,6 +1392,18 @@ val global_annotation_attributes: global_annotation -> attributes
 *)
 val global_attributes: global -> attributes
 
+(**
+   Whether the given attributes contain libc indicators.
+   @since Frama-C+dev
+*)
+val is_in_libc: attributes -> bool
+
+(**
+   Whether the given global contains libc indicators.
+   @since Frama-C+dev
+*)
+val global_is_in_libc: global -> bool
+
 exception NotAnAttrParam of exp
 
 (* ************************************************************************* *)
