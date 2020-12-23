@@ -3257,7 +3257,7 @@ their execution order.
   plug-in are determined during this stage.
 
 \item \textbf{The Exiting Stage:} this step is reserved for commands
-  that makes \framac exit before starting any analysis at all, such as
+  that make \framac exit before starting any analysis at all, such as
   printing help information:
   \begin{enumerate}[(a)]
 
@@ -3312,7 +3312,7 @@ their execution order.
   \begin{enumerate}[(a)]
   \item first, the command line options registered for the
     \texttt{Cmdline.Configuring}\sscodeidxdef{Cmdline}{stage}{Configuring} stage
-    are treated. Command line parameters that do not begin by an hyphen
+    are treated. Command line parameters that do not begin by a hyphen
     (character \texttt{'-'}) are \emph{not} options and are treated as
     \textsf{C} files. Thus they are added to the list of files to be
     preprocessed or parsed for building the \texttt{AST} (on demand);
@@ -3326,7 +3326,7 @@ their execution order.
   according to those indicated on the command line. More precisely:
 
   \begin{enumerate}[(a)]
-  \item first, each argument of the command line which does not begin by an
+  \item first, each argument of the command line which does not begin by a
     hyphen (character \texttt{'-'}) is registered for later analysis;
   \item then, the hooks registered through
     \texttt{Cmdline.run\_after\_setting\_files}
