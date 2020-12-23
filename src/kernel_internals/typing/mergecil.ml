@@ -3263,7 +3263,7 @@ let find_decls g =
       method! vspec _ = SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
-        Extlib.may (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
+        Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
         SkipChildren
     end
   in

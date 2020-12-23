@@ -195,7 +195,7 @@ class visit_assembly =
              List.iter
                Property_status.(
                  fun x -> emit emitter ~hyps:[] x True)
-               (Extlib.list_of_opt ip_assigns @ ip_from)
+               (Option.to_list ip_assigns @ ip_from)
            end
          | [ { annot_content = AStmtSpec ([], spec) } ] ->
            (* Already existing contracts. Just add assigns clause for

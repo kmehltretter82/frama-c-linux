@@ -403,7 +403,7 @@ let catch_exn f_acc is_dyn comment ret_ty exn =
      So don't use it in OCaml code. *)
   let comment fmt =
     Format.fprintf fmt "@[<hv 2>exception %s@;raised on: @]%t" s_exn
-      (fun fmt -> Extlib.may (fun f -> f fmt) comment)
+      (fun fmt -> Option.iter (fun f -> f fmt) comment)
   in
   let print fmt =
     (* open a new box for the sentence *)

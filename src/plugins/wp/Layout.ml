@@ -382,7 +382,7 @@ struct
   let pretty ?title pp fmt rs =
     begin
       Format.fprintf fmt "@[<hv 0>" ;
-      Extlib.may (fun pp -> pp fmt) title ;
+      Option.iter (fun pp -> pp fmt) title ;
       Format.fprintf fmt "@[<hov 2>{" ;
       List.iter
         (fun rg ->

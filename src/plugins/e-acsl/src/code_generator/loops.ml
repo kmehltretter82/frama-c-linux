@@ -152,7 +152,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       (* whenever provided, [ty] is known to be the type of the result *)
       let tone = Cil.lone ~loc () in
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
-      Extlib.may
+      Option.iter
         (fun ty ->
            Typing.unsafe_set tone ~ctx:ty ctx;
            Typing.unsafe_set t ~ctx:ty ctx;

@@ -4497,7 +4497,7 @@ and constFold (machdep: bool) (e: exp) : exp =
         Const(CInt64(i,_ik,repr)) -> begin
           match unop with
             Neg ->
-            let repr = Extlib.opt_map (fun s -> "-" ^ s) repr in
+            let repr = Option.map (fun s -> "-" ^ s) repr in
             kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
           | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
           | LNot ->

@@ -90,7 +90,7 @@ end = struct
           Some v, [ elt ])
         (None, [])
     in
-    Extlib.may (fun v -> f v l) old
+    Option.iter (fun v -> f v l) old
 
   let fold_sorted f init =
     let map = IState.fold Varinfo.Map.add Varinfo.Map.empty in

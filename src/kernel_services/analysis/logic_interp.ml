@@ -175,7 +175,7 @@ let term kf ?(loc=Location.unknown) ?(env=default_term_env ()) s =
     let kf = kf
     let kinstr = Kglobal
   end) in
-  let pa_expr = Extlib.opt_map snd (Logic_lexer.lexpr (fst loc, s)) in
+  let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
   let parse pa_expr = LT.term env pa_expr in
   wrap parse pa_expr loc
 
@@ -190,7 +190,7 @@ let predicate kf ?(loc=Location.unknown) ?(env=default_term_env ()) s =
     let kf = kf
     let kinstr = Kglobal
   end) in
-  let pa_expr = Extlib.opt_map snd (Logic_lexer.lexpr (fst loc, s)) in
+  let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
   let parse pa_expr = LT.predicate env pa_expr in
   wrap parse pa_expr loc
 
@@ -642,7 +642,7 @@ struct
 	     None)  
         in
         let get_ctrl_point dft =
-          let before = Extlib.opt_conv dft before_opt in
+          let before = Option.value ~default:dft before_opt in
           match ki_opt with
           | None -> (* function contract *)
 
@@ -994,7 +994,7 @@ to function contracts."
       | AExtended _ -> raise (NYI "[logic_interp] extension")
     (** Used by annotations entry points. *)
     let get_from_stmt_annots code_annot_filter ((ki, _kf) as stmt) =
-      Extlib.may
+      Option.iter
         (fun caf ->
            let loop_body_opt = match ki.skind with
              | Loop(_, { bstmts = body :: _ }, _, _, _) -> Some body

@@ -270,7 +270,7 @@ module Internal_Value = struct
         | Node (s1, s2) ->
           let set1 = set s1 and set2 = set s2 in
           fun (v1, v2) value -> set1 v1 (set2 v2 value)
-        | Option (s, default) -> fun v -> set s (Extlib.opt_conv default v)
+        | Option (s, default) -> fun v -> set s (Option.value ~default:default v)
         | Unit -> fun () value -> value
         | Void -> void_value ()
       in

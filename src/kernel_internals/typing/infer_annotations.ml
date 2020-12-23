@@ -169,7 +169,7 @@ let emit_unknown_status_on_assigns kf bhv assigns =
     Property.ip_of_assigns
       kf Kglobal (Property.Id_contract (Datatype.String.Set.empty,bhv)) assigns
   in
-  Extlib.may emit pptopt;
+  Option.iter emit pptopt;
   match assigns with
     | WritesAny -> ()
     | Writes froms ->
@@ -179,7 +179,7 @@ let emit_unknown_status_on_assigns kf bhv assigns =
               kf Kglobal
               (Property.Id_contract (Datatype.String.Set.empty,bhv)) from
           in
-          Extlib.may emit pptopt
+          Option.iter emit pptopt
         in
         List.iter emit froms
 

@@ -321,7 +321,7 @@ let type_letin li li_t =
 (* type the term [t] in a context [ctx] by taking --e-acsl-gmp-only into account
    iff [use_gmp_opt] is true. *)
 let rec type_term ~use_gmp_opt ?(arith_operand=false) ?ctx t =
-  let ctx = Extlib.opt_map (mk_ctx ~use_gmp_opt) ctx in
+  let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let dup ty = ty, ty in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -751,12 +751,12 @@ let get_op t =
 
 let get_cast t =
   let info = Memo.get t in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_cast_of_predicate p =
   let info = type_predicate p in
-  try Extlib.opt_map typ_of_number_ty info.cast
+  try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
 
 let clear = Memo.clear

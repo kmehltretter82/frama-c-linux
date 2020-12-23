@@ -211,7 +211,7 @@ let mk_stmt_from_assign loc lhs rhs =
     | Direct | Indirect -> Mk.store_reference ~loc flow lhs rhs
     | Copy -> Mk.temporal_memcpy_struct ~loc lhs rhs
   in
-  Extlib.opt_map fn (assign lhs rhs loc)
+  Option.map fn (assign lhs rhs loc)
 (* }}} *)
 
 (* ************************************************************************** *)
@@ -221,9 +221,9 @@ let mk_stmt_from_assign loc lhs rhs =
 (* Top-level handler for Set instructions *)
 let set_instr ?(post=false) current_stmt loc lhs rhs env kf =
   if Memory_tracking.must_monitor_lval ~kf lhs then
-    Extlib.may_map
-      (fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
-      ~dft:env
+    Option.fold
+      ~some:(fun stmt -> Env.add_stmt ~before:current_stmt ~post env kf stmt)
+      ~none:env
       (mk_stmt_from_assign loc lhs rhs)
   else
     env
@@ -249,16 +249,16 @@ end = struct
            let lv = Mem(param), NoOffset in
            let ltype = Cil.typeOf param in
            let vals = assign ~ltype lv param loc in
-           Extlib.may_map
-             (fun (_, rhs, flow) ->
-                let env =
-                  if Memory_tracking.must_monitor_exp ~kf param then
-                    let stmt = Mk.save_param ~loc flow rhs index in
-                    Env.add_stmt ~before:current_stmt ~post:false env kf stmt
-                  else env
-                in
-                (env, index+1))
-             ~dft:(env, index+1)
+           Option.fold
+             ~some:(fun (_, rhs, flow) ->
+                 let env =
+                   if Memory_tracking.must_monitor_exp ~kf param then
+                     let stmt = Mk.save_param ~loc flow rhs index in
+                     Env.add_stmt ~before:current_stmt ~post:false env kf stmt
+                   else env
+                 in
+                 (env, index+1))
+             ~none:(env, index+1)
              vals)
         (env, 0)
         args
@@ -285,20 +285,20 @@ end = struct
        been instrumented, then information about referent numbers should be
        stored in the internal data structure and it is retrieved using
        [pull_return] added via a call to [Mk.handle_return_referent] *)
-    Extlib.may_map
-      (fun (lhs, rhs, flow) ->
-         let flow, rhs = match flow with
-           | Indirect when alloc -> Direct, (Smart_exp.deref ~loc rhs)
-           | _ -> flow, rhs
-         in
-         let stmt =
-           if alloc then
-             Mk.store_reference ~loc flow lhs rhs
-           else
-             Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
-         in
-         Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
-      ~dft:env
+    Option.fold
+      ~some:(fun (lhs, rhs, flow) ->
+          let flow, rhs = match flow with
+            | Indirect when alloc -> Direct, (Smart_exp.deref ~loc rhs)
+            | _ -> flow, rhs
+          in
+          let stmt =
+            if alloc then
+              Mk.store_reference ~loc flow lhs rhs
+            else
+              Mk.handle_return_referent ~save:false ~loc (Cil.mkAddrOf ~loc lhs)
+          in
+          Env.add_stmt ~before:current_stmt ~post:true env kf stmt)
+      ~none:env
       vals
 
   (* Update local environment with a statement tracking temporal metadata
@@ -347,12 +347,12 @@ end = struct
     (* Memory allocating functions have no definitions so below expression
        should capture them *)
     let alloc = not has_def in
-    Extlib.may_map
-      (fun lhs ->
-         if Memory_tracking.must_monitor_lval ~kf lhs then
-           call_with_ret ~alloc current_stmt loc lhs env kf
-         else env)
-      ~dft:env
+    Option.fold
+      ~some:(fun lhs ->
+          if Memory_tracking.must_monitor_lval ~kf lhs then
+            call_with_ret ~alloc current_stmt loc lhs env kf
+          else env)
+      ~none:env
       ret
 end
 (* }}} *)
@@ -399,7 +399,7 @@ end
 (* Update local environment with a statement tracking temporal metadata
    associated with adding a function argument to a stack frame *)
 let track_argument ?(typ) param index env kf =
-  let typ = Extlib.opt_conv param.vtype typ in
+  let typ = Option.value ~default:param.vtype typ in
   match Cil.unrollType typ with
   | TPtr _
   | TComp _ ->
@@ -515,7 +515,7 @@ let handle_stmt stmt env kf =
     match stmt.skind with
     | Instr instr -> handle_instruction stmt instr env kf
     | Return(ret, loc) ->
-      Extlib.may_map (fun ret -> handle_return_stmt loc ret env kf) ~dft:env ret
+      Option.fold ~some:(fun ret -> handle_return_stmt loc ret env kf) ~none:env ret
     | Goto _ | Break _ | Continue _ | If _ | Switch _ | Loop _ | Block _
     | UnspecifiedSequence _ | Throw _ | TryCatch _ | TryFinally _
     | TryExcept _ -> env

@@ -62,7 +62,7 @@ struct
     | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e ->
       from_exp f e
     | Pointer_comparison (opt_e1,e2) ->
-      Extlib.may (from_exp f) opt_e1;
+      Option.iter (from_exp f) opt_e1;
       from_exp f e2
     | Differing_blocks (e1,e2) ->
       from_exp f e1; from_exp f e2
@@ -614,7 +614,7 @@ let add_alarm context stmt alarm =
 
 let add_annotation context stmt annot =
   (* Only do something for alarms notations *)
-  Extlib.opt_map (add_alarm context stmt) (Alarms.find annot)
+  Option.map (add_alarm context stmt) (Alarms.find annot)
 
 let add_instr context stmt = function
   | Set (lval, _, _)

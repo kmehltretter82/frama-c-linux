@@ -158,7 +158,7 @@ let compute_englobing_subexpr ~subexpr ~expr =
           merge (compute_host host) (compute_offset offset)
         | _ -> None
       in
-      Extlib.opt_map (fun l -> expr :: l) sublist
+      Option.map (fun l -> expr :: l) sublist
   and compute_host = function
     | Var _ -> None
     | Mem e -> compute e
@@ -168,7 +168,7 @@ let compute_englobing_subexpr ~subexpr ~expr =
     | Index (index, offset) ->
       merge (compute index) (compute_offset offset)
   in
-  Extlib.opt_conv [] (compute expr)
+  Option.value ~default:[] (compute expr)
 
 module Englobing =
   Datatype.Pair_with_collections (Cil_datatype.ExpStructEq) (Cil_datatype.ExpStructEq)

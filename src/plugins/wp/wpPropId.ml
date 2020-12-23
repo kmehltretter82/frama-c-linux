@@ -153,18 +153,18 @@ let mk_stmt_assigns_id kf s active b a =
   let active = Datatype.String.Set.of_list active in
   let b = Property.Id_contract (active,b) in
   let p = Property.ip_of_assigns kf (Kstmt s) b (Writes a) in
-  Extlib.opt_map (mk_prop PKProp) p
+  Option.map (mk_prop PKProp) p
 
 let mk_loop_assigns_id kf s ca a =
   let ca = Property.Id_loop ca in
   let p = Property.ip_of_assigns kf (Kstmt s) ca (Writes a) in
-  Extlib.opt_map (mk_prop PKPropLoop) p
+  Option.map (mk_prop PKPropLoop) p
 
 let mk_fct_assigns_id kf b tkind a =
   let b = Property.Id_contract(Datatype.String.Set.empty,b) in
   let kind = get_kind_for_tk kf tkind in
   let p = Property.ip_of_assigns kf Kglobal b (Writes a) in
-  Extlib.opt_map (mk_prop kind) p
+  Option.map (mk_prop kind) p
 
 let mk_pre_id kf ki b p =
   mk_prop PKProp (Property.ip_of_requires kf ki b p)
@@ -418,7 +418,7 @@ struct
         (** remove name of callee kernel function given by get_ip *)
         let ip_string = get_ip pre in
         let ip_string =
-          Extlib.opt_conv ip_string
+          Option.value ~default:ip_string
             (Extlib.string_del_prefix
                ((Kernel_function.get_name callee_kf)^"_")
                ip_string)
@@ -535,7 +535,7 @@ let user_bhv_names p =
           | _ -> []
         in fors
     | _ -> []
-  in Extlib.may_map ~dft:fors (fun b -> b.b_name :: fors) (get_behavior p)
+  in Option.fold ~none:fors ~some:(fun b -> b.b_name :: fors) (get_behavior p)
 
 let string_of_termination_kind = function
     Normal -> "post"

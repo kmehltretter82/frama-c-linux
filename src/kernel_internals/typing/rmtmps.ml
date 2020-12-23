@@ -483,10 +483,10 @@ class markReachableVisitor
        | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
        | TArray(ty,sz, _, a) ->
          ignore (self#vtype ty); self#visitAttrs a;
-         Extlib.may (ignore $ (visitCilExpr (self:>cilVisitor))) sz
+         Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
        | TFun (ty, args,_,a) ->
          ignore (self#vtype ty);
-         Extlib.may (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
+         Option.iter (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
          self#visitAttrs a
       );
       SkipChildren

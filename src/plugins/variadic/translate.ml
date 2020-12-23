@@ -58,7 +58,7 @@ let translate_variadics (file : file) =
           when not (is_framac_builtin vi) ->
           if not (Table.mem classification vi) then begin
             let vf = Classify.classify env vi in
-            may (Table.add classification vi) vf
+            Option.iter (Table.add classification vi) vf
           end;
           Cil.SkipChildren
         | _ ->

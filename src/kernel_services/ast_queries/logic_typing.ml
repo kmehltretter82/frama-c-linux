@@ -2984,7 +2984,7 @@ struct
       if is_set_type t.term_type then begin
         ctxt.error loc "sets of sets are not supported yet"
       end else begin
-        let pred = Extlib.opt_map (predicate env) pred in
+        let pred = Option.map (predicate env) pred in
         Tcomprehension(t,quants,pred), (make_set_type t.term_type)
       end
     | PLempty
@@ -3762,9 +3762,9 @@ struct
             loc "%s clause isn't allowed into statement contract" clause;
         x
     in
-    let v = Extlib.opt_map (type_variant env)
+    let v = Option.map (type_variant env)
         (none_for_stmt_contract "decreases" s.spec_variant) in
-    let t = Extlib.opt_map (id_predicate env)
+    let t = Option.map (id_predicate env)
         (none_for_stmt_contract "terminates" s.spec_terminates) in
     let my_names = check_unique_behavior_names loc [] b in
     let bnames = old_behaviors @ my_names in
@@ -3975,7 +3975,7 @@ struct
     in let rt_vars = ref Datatype.String.Set.empty
     in let prm_vars = ref Datatype.String.Set.empty
     in
-    ignore(Extlib.opt_map (Cil.visitCilLogicType (obj rt_vars)) return_type);
+    ignore(Option.map (Cil.visitCilLogicType (obj rt_vars)) return_type);
     List.iter
       (fun v -> ignore (Cil.visitCilLogicType (obj prm_vars) v.lv_type)) p;
     if not (Datatype.String.Set.subset !rt_vars !prm_vars) then
@@ -4177,7 +4177,7 @@ struct
         }
       in
       add_logic_type loc my_info;
-      let tdef = Extlib.opt_map (typedef loc env my_info) def in
+      let tdef = Option.map (typedef loc env my_info) def in
       if is_cyclic_typedef s tdef then
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;

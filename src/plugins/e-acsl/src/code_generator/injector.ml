@@ -687,7 +687,7 @@ let inject_in_global (env, main) = function
 let surround_function_with kf fundec stmt_begin stmt_end =
   let body = fundec.sbody in
   (* Insert last statement *)
-  Extlib.may
+  Option.iter
     (fun stmt_end ->
        let last_stmts ?return_stmt () =
          match return_stmt with
@@ -828,7 +828,7 @@ let inject_mtracking_handler main =
       let clean = Smart_stmt.rtl_call loc "memory_clean" [] in
       surround_function_with main fundec init (Some clean)
     in
-    Extlib.may handle_main main
+    Option.iter handle_main main
   end
 
 let inject_in_file file =

@@ -399,7 +399,7 @@ module Make (Input: Input) = struct
     in
     let col_empty = w#add_column_empty in
     let clear_widget remove_columns =
-      Extlib.may (fun (_, r) -> r.selected <- RUnselected) model.row_selected;
+      Option.iter (fun (_, r) -> r.selected <- RUnselected) model.row_selected;
       model.row_selected <- None;
       if remove_columns then begin
         model.all_exprs <- [];
@@ -595,7 +595,7 @@ module Make (Input: Input) = struct
     (* Callback called when a callstack is focused or unfocused *)
     let callback_focus_unfocus lcs icon () =
       let conv = List.map Gui_callstacks_filters.from_callstack in
-      let lrcs = Extlib.opt_map conv lcs in
+      let lrcs = Option.map conv lcs in
       callback_focus_callstack lrcs;
       icon ~filtered:(lcs <> None);
       model.focused_rev_callstacks <- lrcs;
@@ -697,7 +697,7 @@ module Make (Input: Input) = struct
       ignore (different#connect#activate (callback_only_except false));
       (* add menu items for variables present in the selected expression *)
       let callback_display_var vi () =
-        Extlib.may (fun loc ->
+        Option.iter (fun loc ->
             let lval = Cil.var vi in
             let selection = GS_LVal lval in
             let list = Input.make_data_for_lvalue lval loc in

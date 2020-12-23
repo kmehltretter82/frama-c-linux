@@ -409,9 +409,9 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
           spec_complete_behaviors = snd (List.split old_complete);
           spec_disjoint_behaviors = snd (List.split old_disjoint);
           spec_terminates =
-            (Extlib.opt_map snd) old_terminates;
+            (Option.map snd) old_terminates;
           spec_variant =
-            (Extlib.opt_map snd) old_decreases
+            (Option.map snd) old_decreases
         }
       in
       let res = self#vspec spec in
@@ -431,7 +431,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
             old_behaviors
         in
         let new_terminates =
-          Extlib.opt_map
+          Option.map
             (fun (e,t) ->
                let t' = Cil.visitCilIdPredicate (self:>Cil.cilVisitor) t in
                if t != t' || kf != new_kf then
@@ -444,7 +444,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
             old_terminates
         in
         let new_decreases =
-          Extlib.opt_map
+          Option.map
             (fun (e,(d,s as acc)) ->
                let d' = Cil.visitCilTerm (self:>Cil.cilVisitor) d in
                if d != d' || kf != new_kf then begin
@@ -586,19 +586,21 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
              end
           )
           old_behaviors;
-        Extlib.may
+        Option.iter
           (fun (e,t) ->
-             if not (Extlib.may_map
-                       ~dft:false (fun t' -> t == t') new_spec.spec_terminates)
+             if not (Option.fold
+                       ~none:false ~some:(fun t' -> t == t')
+                       new_spec.spec_terminates)
              then
                Queue.add
                  (fun () -> Annotations.remove_terminates e new_kf)
                  self#get_filling_actions)
           old_terminates;
-        Extlib.may
+        Option.iter
           (fun (e,d) ->
-             if not (Extlib.may_map
-                       ~dft:false (fun d' -> d == d') new_spec.spec_variant)
+             if not (Option.fold
+                       ~none:false ~some:(fun d' -> d == d')
+                       new_spec.spec_variant)
              then
                Queue.add
                  (fun () -> Annotations.remove_decreases e new_kf)
@@ -707,7 +709,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                       let dft =
                         { dft with spec_behavior = dft.spec_behavior }
                       in
-                      let spec = Extlib.opt_conv dft spec in
+                      let spec = Option.value ~default:dft spec in
                       Globals.Functions.register new_kf;
                       Globals.Functions.replace_by_declaration spec v l;
                       (* Format.printf "registered spec:@\n%a@." Printer.pp_funspec
@@ -762,8 +764,9 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                    then begin
                      Globals.Functions.register new_kf;
                      let spec =
-                       Extlib.opt_conv
-                         (Annotations.funspec ~populate:false new_kf) spec
+                       Option.value
+                         ~default:(Annotations.funspec ~populate:false new_kf)
+                         spec
                      in
                      Globals.Functions.replace_by_definition spec f l
                    end else
@@ -797,11 +800,11 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         | _ -> ()
       in
       let post_action g =
-        Extlib.may self#set_current_func fundec;
+        Option.iter self#set_current_func fundec;
         let spec = get_spec () in
         List.iter (fun g -> change_glob g spec) g;
         if has_kf then self#reset_current_kf();
-        Extlib.may (fun _ -> self#reset_current_func ()) fundec;
+        Option.iter (fun _ -> self#reset_current_func ()) fundec;
         g
       in
       let post_change_to g =
@@ -810,13 +813,13 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         g
       in
       let post_do_children f g =
-        Extlib.may self#set_current_func fundec;
+        Option.iter self#set_current_func fundec;
         make_funspec ();
         let res = f g in
         (* Spec registration is already handled at the vfunspec level. *)
         List.iter (fun g -> change_glob g None) res;
         if has_kf then self#reset_current_kf();
-        Extlib.may (fun _ -> self#reset_current_func ()) fundec;
+        Option.iter (fun _ -> self#reset_current_func ()) fundec;
         res
       in
       match res with
@@ -865,7 +868,7 @@ let visitFramacFunction vis f =
   vis#set_current_kf (Globals.Functions.get orig_var);
   let f' = visitCilFunction (vis:>cilVisitor) f in
   vis#reset_current_kf ();
-  Extlib.may vis#set_current_kf old_current_kf;
+  Option.iter vis#set_current_kf old_current_kf;
   vis#fill_global_tables; f'
 
 let visitFramacKf vis kf =

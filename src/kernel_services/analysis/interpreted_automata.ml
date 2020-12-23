@@ -753,7 +753,7 @@ module MakeDot
         incr component_count;
         let subgraph = Some {
             sg_name = string_of_int !component_count;
-            sg_parent = Extlib.opt_map (fun s -> s.sg_name) subgraph;
+            sg_parent = Option.map (fun s -> s.sg_name) subgraph;
             sg_attributes = []} in
         donode subgraph true v;
         traverse_component subgraph w

@@ -31,7 +31,7 @@ val may: (unit -> unit) -> unit
 (** apply the given closure if the slicing project has been initialized through
     {!Db.Slicing.reset_slice}. *)
 
-val may_map: dft:'a -> (unit -> 'a) -> 'a
+val may_map: none:'a -> (unit -> 'a) -> 'a
 (** apply the given closure if the slicing project has been initialized through
     {!Db.Slicing.reset_slice}, or else return the default value.*)
 

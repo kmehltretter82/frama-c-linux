@@ -141,7 +141,7 @@ module V = struct
      [typ]. Whenever possible, we print real addresses instead of bytes
      offsets. *)
   let pretty_base_offsets_typ typ fmt b i =
-    let typ_match = match Extlib.opt_map Cil.unrollType typ with
+    let typ_match = match Option.map Cil.unrollType typ with
       | Some (TPtr (typ_pointed, _)) ->
         if Cil.isVoidType typ_pointed then None else Some typ_pointed
       | _ -> None
@@ -265,7 +265,7 @@ module V = struct
     try
       let right = project_ival right in
       let result = project_ival result in
-      Ival.backward_mult_int_left ~right ~result >>-: Extlib.opt_map inject_ival
+      Ival.backward_mult_int_left ~right ~result >>-: Option.map inject_ival
     with Not_based_on_null -> `Value None
 
   let backward_rel_int_left op l r =

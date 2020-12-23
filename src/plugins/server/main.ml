@@ -214,7 +214,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
   | `Poll -> ()
   | `Shutdown ->
     begin
-      Extlib.may kill_exec server.running ;
+      Option.iter kill_exec server.running ;
       Queue.clear server.q_in ;
       Queue.clear server.q_out ;
       server.shutdown <- true ;
@@ -233,7 +233,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     begin
       let set_killed = kill_request server.equal id in
       Queue.iter set_killed server.q_in ;
-      Extlib.may set_killed server.running ;
+      Option.iter set_killed server.running ;
     end
   | `Request(id,request,data) ->
     begin
@@ -271,14 +271,14 @@ let communicate server =
     Queue.clear server.q_out ;
     server.s_signal <- Sigs.empty ;
     message.callback !pool ;
-    Extlib.may raise error ; true
+    Option.iter raise error ; true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Yielding & Signaling                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 let do_yield server () =
-  Extlib.may raise_if_killed server.running ;
+  Option.iter raise_if_killed server.running ;
   ignore ( communicate server )
 
 let do_signal server s =

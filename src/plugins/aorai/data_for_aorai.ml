@@ -551,7 +551,7 @@ let memo_aux_variable tr counter used_prms vi =
     Cil_datatype.Varinfo.Hashtbl.add used_prms vi my_lvar;
     (match tr.cross with
       | Normal _ ->
-        let st = Extlib.opt_map (fun _ -> tr.stop) counter in
+        let st = Option.map (fun _ -> tr.stop) counter in
         let loc = get_bindings st my_lvar in
         let copy = Copy_value (loc,Logic_const.tvar (Cil.cvar_to_lvar vi)) in
         tr.actions <- copy :: tr.actions
@@ -920,7 +920,7 @@ let type_cond needs_pebble metaenv env tr cond =
           with Not_found -> Aorai_option.abort "No such function: %s" s
         in
         let b =
-          Extlib.opt_map
+          Option.map
             (fun b ->
               let bhvs = Annotations.behaviors ~populate:false kf in
               try List.find (fun x -> x.b_name = b) bhvs

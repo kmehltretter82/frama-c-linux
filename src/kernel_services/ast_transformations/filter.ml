@@ -432,7 +432,7 @@ end = struct
       new_locals
 
     method! vcode_annot v =
-      Extlib.may Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
+      Option.iter Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
       let stmt =
         Visitor_behavior.Get_orig.stmt
           self#behavior (Extlib.the self#current_stmt)

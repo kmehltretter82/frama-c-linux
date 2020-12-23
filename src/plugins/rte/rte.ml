@@ -52,7 +52,7 @@ let valid_index ~remove_trivial ~on_alarm e size =
     let v_e = get_expr_val e in
     let v_size = get_expr_val size in
     let neg_ok =
-      Extlib.may_map ~dft:false (Integer.le Integer.zero) v_e
+      Option.fold ~none:false ~some:(Integer.le Integer.zero) v_e
       || Cil.isUnsignedInteger (Cil.typeOf e)
     in
     if not neg_ok then alarm Lower_bound;
@@ -470,7 +470,7 @@ let is_safe_pointer_value = function
   | CastE (_typ, e) ->
     (* 0 can always be converted into a NULL pointer. *)
     let v = get_expr_val e in
-    Extlib.may_map ~dft:false Integer.(equal zero) v
+    Option.fold ~none:false ~some:Integer.(equal zero) v
   | _ -> false
 
 let pointer_value ~remove_trivial ~on_alarm expr =

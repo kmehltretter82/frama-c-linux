@@ -198,7 +198,7 @@ module Make
         (* Adds the fake varinfo used for the result of [kf] to the
            output_bases. *)
         let return_varinfo = Library_functions.get_retres_vi kf in
-        let return_base = Extlib.opt_map Base.of_varinfo return_varinfo in
+        let return_base = Option.map Base.of_varinfo return_varinfo in
         let all_output_bases =
           Extlib.opt_fold Base.Hptset.add return_base all_output_bases
         in

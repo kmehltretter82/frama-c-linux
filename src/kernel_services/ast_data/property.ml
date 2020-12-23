@@ -536,7 +536,7 @@ include Datatype.Make_with_collections
             (11, Kf.hash kf, Kinstr.hash s,
              (b.b_name:string), (a:Datatype.String.Set.t))
         | IPReachable {ir_kf=kf; ir_kinstr=ki; ir_program_point=ba} ->
-          Hashtbl.hash(12, Extlib.may_map Kf.hash ~dft:0 kf,
+          Hashtbl.hash(12, Option.fold ~some:Kf.hash ~none:0 kf,
                        Kinstr.hash ki, Hashtbl.hash ba)
         | IPAllocation {ial_kf=f; ial_kinstr=ki; ial_bhv=b} ->
           Hashtbl.hash (13, Kf.hash f, Kinstr.hash ki, hash_bhv_loop b)
@@ -1433,9 +1433,9 @@ let ip_from_of_code_annot kf st ca = match ca.annot_content with
 
 let ip_post_cond_of_behavior kf st ~active b =
   ip_ensures_of_behavior kf st b
-  @ (Extlib.list_of_opt (ip_assigns_of_behavior kf st ~active b))
+  @ (Option.to_list (ip_assigns_of_behavior kf st ~active b))
   @ ip_from_of_behavior kf st active b
-  @ (Extlib.list_of_opt (ip_allocation_of_behavior kf st ~active b))
+  @ (Option.to_list (ip_allocation_of_behavior kf st ~active b))
 
 let ip_of_behavior ib_kf ib_kinstr ~active ib_bhv =
   let ib_active = Datatype.String.Set.of_list active in
@@ -1487,7 +1487,7 @@ let ip_of_decreases id_kf id_kinstr id_variant =
   IPDecrease {id_kf; id_kinstr; id_ca = None; id_variant}
 
 let ip_decreases_of_spec kf st s =
-  Extlib.opt_map (ip_of_decreases kf st) s.spec_variant
+  Option.map (ip_of_decreases kf st) s.spec_variant
 
 let ip_post_cond_of_spec kf st ~active s =
   List.concat
@@ -1497,8 +1497,8 @@ let ip_of_spec kf st ~active s =
   List.concat (List.map (ip_all_of_behavior kf st ~active) s.spec_behavior)
   @ ip_complete_of_spec kf st active s
   @ ip_disjoint_of_spec kf st active s
-  @ (Extlib.list_of_opt (ip_terminates_of_spec kf st s))
-  @ (Extlib.list_of_opt (ip_decreases_of_spec kf st s))
+  @ (Option.to_list (ip_terminates_of_spec kf st s))
+  @ (Option.to_list (ip_decreases_of_spec kf st s))
 
 let ip_axiom s = IPAxiom s
 let ip_lemma s = IPLemma s
@@ -1516,10 +1516,10 @@ let ip_of_code_annot kf stmt ca =
   | AVariant t ->
     [ IPDecrease {id_kf=kf;id_kinstr=ki;id_ca=Some ca; id_variant=t}]
   | AAllocation _ ->
-    Extlib.list_of_opt (ip_allocation_of_code_annot kf ki ca)
+    Option.to_list (ip_allocation_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
   | AAssigns _ ->
-    Extlib.list_of_opt (ip_assigns_of_code_annot kf ki ca)
+    Option.to_list (ip_assigns_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
   | APragma p when Logic_utils.is_property_pragma p ->
     [ IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca=ca} ]

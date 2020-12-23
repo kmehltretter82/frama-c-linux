@@ -136,7 +136,7 @@ struct
         | _, (CPtr | Ptr), _ -> exp_type_of_pointed e
         | _, Data _ , _ -> Value_of (Cil.typeOf e)
       in
-      let lvt = Extlib.opt_map Cil.typeOfLval lval in
+      let lvt = Option.map Cil.typeOfLval lval in
       let pts = List.map2 extract args ps in
       let is_no_pointed = function No_pointed -> true | _ -> false in
       let the_typ = function

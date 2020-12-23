@@ -57,7 +57,7 @@ let convert_ltl_exprs t =
   in
   let rec convert_seq_elt e =
     { e with
-      condition = Extlib.opt_map convert_cond e.condition;
+      condition = Option.map convert_cond e.condition;
       nested = convert_seq e.nested; }
   and convert_seq s = List.map convert_seq_elt s in
   let convert_parsed c =

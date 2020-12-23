@@ -90,7 +90,7 @@ struct
 
   let empty_widening ~(stmt : stmt option) : widening =
     {
-      widening_stmt = Extlib.opt_conv Cil.invalidStmt stmt;
+      widening_stmt = Option.value ~default:Cil.invalidStmt stmt;
       widening_partition = Partition.empty;
     }
 
@@ -286,7 +286,7 @@ struct
       let add s =
         dest.store_partition <- Partition.replace key s dest.store_partition;
       in
-      Extlib.may add state;
+      Option.iter add state;
       (* Filter out already propagated states (only at statements). *)
       if dest.store_stmt = None
       then state
@@ -294,7 +294,7 @@ struct
     in
     let flow = Flow.join_duplicate_keys flow_states in
     let flow = Flow.filter_map update flow in
-    Extlib.may (partitioning_feedback dest flow) dest.store_stmt;
+    Option.iter (partitioning_feedback dest flow) dest.store_stmt;
     flow
 
   let widen (w : widening) (flow : flow) : flow =

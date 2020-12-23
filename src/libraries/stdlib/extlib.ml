@@ -155,11 +155,6 @@ let rec list_compare cmp_elt l1 l2 =
           let c = cmp_elt v1 v2 in
           if c = 0 then list_compare cmp_elt r1 r2 else c
 
-let list_of_opt =
-  function
-    | None -> []
-    | Some x -> [x]
-
 let opt_of_list =
   function
     | [] -> None
@@ -252,27 +247,6 @@ let array_existsi f a =
 (* ************************************************************************* *)
 
 let has_some = function None -> false | Some _ -> true
-
-let may f = function
-  | None -> ()
-  | Some x -> f x
-
-(** [may_map f ?dft x] applies [f] to the value of [x] if exists. Otherwise
-    returns the default value [dft].
-    Assume that either [x] or [dft] is defined. *)
-let may_map f ?dft x =
-  match x, dft with
-  | None, None -> assert false
-  | None, Some dft -> dft
-  | Some x, _ -> f x
-
-let opt_map f = function
-  | None -> None
-  | Some x -> Some (f x)
-
-let opt_conv default = function
-  | None -> default
-  | Some x -> x
 
 let opt_if b v = if b then None else Some v
 

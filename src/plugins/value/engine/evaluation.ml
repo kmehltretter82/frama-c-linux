@@ -411,7 +411,7 @@ module Make
      the comparison. *)
   let reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth =
     let reduce (new_value1, new_value2) =
-      Extlib.may (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
+      Option.iter (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
       reduce_argument (e2, v2) new_value2;
     in
     process_truth ~reduce ~alarm (v1, v2) truth

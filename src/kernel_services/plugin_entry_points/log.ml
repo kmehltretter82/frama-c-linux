@@ -519,7 +519,7 @@ let logwithfinal finally channel
                  let e = channel.emitters.(nth_kind kind) in
                  if echo && e.echo then
                    do_echo channel.terminal event ;
-                 Extlib.may (do_fire event) emitwith;
+                 Option.iter (do_fire event) emitwith;
                  if fire && not !locked_listeners then
                    begin
                      try
@@ -954,7 +954,7 @@ struct
     List.rev
       (Category_trie.fold
          (fun cat status l  ->
-            (merge_category cat, Extlib.opt_conv Wactive status) :: l)
+            (merge_category cat, Option.value ~default:Wactive status) :: l)
          !warn_categories [])
 
   let is_warn_category s =

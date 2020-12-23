@@ -1361,8 +1361,8 @@ let check_ast ?is_normalized ?(ast = Ast.get()) what =
   let module M = (val !current_checker : Extensible_checker) in
   Kernel.debug ~dkey:Kernel.dkey_check
     "Checking integrity of %s (%snormalized):@\n%a"
-    what (if Extlib.opt_conv true is_normalized then "" else "not ")
-    (if Extlib.opt_conv true is_normalized
+    what (if Option.value ~default:true is_normalized then "" else "not ")
+    (if Option.value ~default:true is_normalized
      then Printer.pp_file else Cil_printer.pp_file)
     ast;
   Cil.visitCilFileSameGlobals

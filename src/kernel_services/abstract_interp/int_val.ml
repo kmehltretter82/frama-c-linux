@@ -270,7 +270,7 @@ let cardinal = function
 
 let cardinal_estimate ~size = function
   | Set s -> Int.of_int (Int_set.cardinal s)
-  | Itv i -> Extlib.opt_conv (Int.two_power size) (Int_interval.cardinal i)
+  | Itv i -> Option.value ~default:(Int.two_power size) (Int_interval.cardinal i)
 
 let cardinal_less_than v n =
   let c =
@@ -521,8 +521,8 @@ let shift_aux scale op (x: t) (y: t) =
     match y with
     | Set s -> Int_set.map_reduce (fun n -> scale (Int.two_power n) x) join s
     | Itv _ ->
-      let min = Extlib.opt_map Int.two_power (min_int y) in
-      let max = Extlib.opt_map Int.two_power (max_int y) in
+      let min = Option.map Int.two_power (min_int y) in
+      let max = Option.map Int.two_power (max_int y) in
       let modu = match min with None -> Int.one | Some m -> m in
       let factor = check_make ~min ~max ~rem:Int.zero ~modu in
       op x factor

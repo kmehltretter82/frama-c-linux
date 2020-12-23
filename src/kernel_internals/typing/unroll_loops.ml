@@ -604,7 +604,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       ChangeDoChildrenPost (s, update)
   | Loop _ ->
     let infos = extract_from_pragmas global_find_init s in
-    let number = Extlib.opt_conv times infos.unroll_number in
+    let number = Option.value ~default:times infos.unroll_number in
     let total_unrolling = infos.total_unroll in
     let is_ignored_unrolling = not force && infos.ignore_unroll in
     let f sloop = 

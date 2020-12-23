@@ -667,8 +667,8 @@ let backward_ge_int min v =
   | Float _ -> v
   | Int _ -> narrow v (inject_int (Int_val.inject_range min None))
 
-let backward_lt_int max v = backward_le_int (Extlib.opt_map Int.pred max) v
-let backward_gt_int min v = backward_ge_int (Extlib.opt_map Int.succ min) v
+let backward_lt_int max v = backward_le_int (Option.map Int.pred max) v
+let backward_gt_int min v = backward_ge_int (Option.map Int.succ min) v
 
 let diff_if_one value rem =
   match value, rem with

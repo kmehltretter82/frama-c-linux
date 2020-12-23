@@ -355,7 +355,7 @@ let add_assert kf stmt annot =
 
 let add_stmt ?(post=false) ?before env kf stmt =
   if not post then
-    Extlib.may (fun old -> E_acsl_label.move kf ~old stmt) before;
+    Option.iter (fun old -> E_acsl_label.move kf ~old stmt) before;
   let local_env, tl = top env in
   let block = local_env.block_info in
   let block =

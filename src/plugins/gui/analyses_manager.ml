@@ -46,7 +46,7 @@ let run title filter_name extension loader
              !Db.Main.play ();
              host_window#reset ()
            in
-           Extlib.may run dialog#filename;
+           Option.iter run dialog#filename;
        | `DELETE_EVENT | `CANCEL ->
            ());
   dialog#destroy ()

@@ -388,7 +388,7 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Extlib.opt_conv (Integer.of_int theMachine.theMachine.alignof_aligned)
+    Option.value ~default:(Integer.of_int theMachine.theMachine.alignof_aligned)
       !current_packing_pragma
   in
   (Integer.pretty ~hexa:false) fmt align
@@ -8332,7 +8332,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         [(A.NEXT_INIT, A.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
-      let fi = findField (Extlib.opt_conv [] ci.cfields) in
+      let fi = findField (Option.value ~default:[] ci.cfields) in
       (* Change the designator and redo *)
       doInit
         local_env asconst add_implicit_ensures preinit so acc
@@ -9101,7 +9101,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
             Kernel.warning ~current:true "Unexpected attribute in #pragma";
             Some (Attr ("", [a']))
         in
-        Extlib.may
+        Option.iter
           (fun a'' ->
              cabsPushGlobal (GPragma (a'', CurrentLoc.get ())))
           a'';

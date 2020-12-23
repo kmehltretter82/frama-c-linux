@@ -1101,7 +1101,7 @@ class main_window () : main_window_extension_points =
            ignore (expander#drag#connect#ending (fun _ -> dragged_frame:=None));
 
            (* Refreshers *)
-           Extlib.may
+           Option.iter
              (fun refresh ->
                 to_refresh:=
                   (fun ()->
@@ -1442,7 +1442,7 @@ class main_window () : main_window_extension_points =
           begin
             let text =
               if use_dialog then
-                Extlib.opt_conv ""
+                Option.value ~default:""
                   (Gtk_helper.input_string
                      ~parent:main_window
                      ~title:"Find global" ~ok:"Find" ~cancel:"Cancel"
@@ -1486,7 +1486,7 @@ class main_window () : main_window_extension_points =
       | Some (where,viewer) ->
         let text =
           if use_dialog then
-            Extlib.opt_conv ""
+            Option.value ~default:""
               (Gtk_helper.input_string
                  ~parent:main_window
                  ~title:("Find " ^ where) ~ok:"Find" ~cancel:"Cancel"
@@ -1696,9 +1696,9 @@ class main_window () : main_window_extension_points =
           GtkMisc.Label.set_text label text
         in
         let callback e _column =
-          Extlib.may
+          Option.iter
             (fun pos ->
-               Extlib.may self#scroll (Pretty_source.loc_to_localizable pos);
+               Option.iter self#scroll (Pretty_source.loc_to_localizable pos);
                (* Note: the code below generates double scrolling:
                   the previous call to self#scroll causes the original source
                   viewer to scroll to the beginning of the function, and then

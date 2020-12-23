@@ -88,7 +88,7 @@ class item ?menu ?menu_item ?button group = object (self)
     match button with Some b -> Some (bt_type_as_skel b) | None -> None
 
   method add_accelerator modifier c =
-    Extlib.may
+    Option.iter
       (fun (i : GMenu.menu_item_skel) ->
          i#add_accelerator
            ~group ~flags:[ `VISIBLE ] ~modi:[ modifier ] (int_of_char c)) 
@@ -138,11 +138,11 @@ class menu_manager ?packing ~host:(_:Gtk_helper.host) =
       let items = self#add_entries ?title (snd debug_item_and_menu) entries in
       let action item =
         if show () then begin
-          Extlib.may (fun i -> i#misc#show ()) item#menu_item;
-          Extlib.may (fun i -> i#misc#show ()) item#tool_button
+          Option.iter (fun i -> i#misc#show ()) item#menu_item;
+          Option.iter (fun i -> i#misc#show ()) item#tool_button
         end else begin
-          Extlib.may (fun i -> i#misc#hide ()) item#menu_item;
-          Extlib.may (fun i -> i#misc#hide ()) item#tool_button
+          Option.iter (fun i -> i#misc#hide ()) item#menu_item;
+          Option.iter (fun i -> i#misc#hide ()) item#tool_button
         end
       in
       let l = List.rev debug_actions in

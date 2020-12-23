@@ -490,7 +490,7 @@ class callsite_visitor hmap = object (self)
     in
     match stmt.skind with
       | Instr(Call(_,fct,_,_)) ->
-        Extlib.may add_call (called_kernel_function fct); Cil.SkipChildren
+        Option.iter add_call (called_kernel_function fct); Cil.SkipChildren
       | Instr (Local_init (_, ConsInit(f,_,_),_)) ->
         add_call (Globals.Functions.get f); Cil.SkipChildren
       | Instr _ -> Cil.SkipChildren

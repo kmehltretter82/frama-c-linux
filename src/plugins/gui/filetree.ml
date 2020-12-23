@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Extlib
 open Gtk_helper
 
 (* To debug performance related to height of lines *)
@@ -556,10 +555,10 @@ let make (tree_view:GTree.view) =
 
   let set_row model ?strikethrough ?text (path,raw_row) =
     let row = raw_row.MODEL.finfo in
-    may
+    Option.iter
       (fun b -> (MYTREE.get_storage row).MYTREE.strikethrough <- b)
       strikethrough;
-    may (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
+    Option.iter (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
     if false then model#custom_row_changed (GTree.Path.create (List.rev path)) raw_row
   in
 

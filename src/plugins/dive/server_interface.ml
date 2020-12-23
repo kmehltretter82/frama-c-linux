@@ -262,7 +262,7 @@ let finalize' context node_opt =
     | None -> ()
     | Some node ->
       let may_explore f =
-        Extlib.may (fun depth -> f ~depth context node)
+        Option.iter (fun depth -> f ~depth context node)
       in
       may_explore Build.explore_backward !global_window.perception.backward;
       may_explore Build.explore_forward !global_window.perception.forward;

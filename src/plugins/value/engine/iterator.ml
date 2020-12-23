@@ -479,7 +479,7 @@ module Make_Dataflow
              in this function. *)
           Partition.transfer (transfer_annotations stmt ~record:false) flow
         in
-        Extlib.may_map correct_over_widening ~dft:flow v.vertex_start_of
+        Option.fold ~some:correct_over_widening ~none:flow v.vertex_start_of
       end else
         flow
     in

@@ -704,13 +704,13 @@ module SlevelFunction =
       include Datatype.Int
       type key = Cil_types.kernel_function
       let of_string ~key:_ ~prev:_ s =
-        Extlib.opt_map
+        Option.map
           (fun s ->
              try int_of_string s
              with Failure _ ->
                raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
           s
-      let to_string ~key:_ = Extlib.opt_map string_of_int
+      let to_string ~key:_ = Option.map string_of_int
     end)
     (struct
       let option_name = "-eva-slevel-function"
@@ -822,11 +822,11 @@ module SplitReturnFunction =
       include Split_strategy
       type key = Cil_types.kernel_function
       let of_string ~key:_ ~prev:_ s =
-        try Extlib.opt_map Split_strategy.of_string s
+        try Option.map Split_strategy.of_string s
         with Split_strategy.ParseFailure s ->
           raise (Cannot_build ("unknown split strategy " ^ s))
       let to_string ~key:_ v =
-        Extlib.opt_map Split_strategy.to_string v
+        Option.map Split_strategy.to_string v
     end)
     (struct
       let option_name = "-eva-split-return-function"
@@ -963,13 +963,13 @@ module LinearLevelFunction =
       include Datatype.Int
       type key = Cil_types.kernel_function
       let of_string ~key:_ ~prev:_ s =
-        Extlib.opt_map
+        Option.map
           (fun s ->
              try int_of_string s
              with Failure _ ->
                raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
           s
-      let to_string ~key:_ = Extlib.opt_map string_of_int
+      let to_string ~key:_ = Option.map string_of_int
     end)
     (struct
       let option_name = "-eva-subdivide-non-linear-function"
