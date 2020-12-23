@@ -195,10 +195,6 @@ val array_existsi: (int -> 'a -> bool) -> 'a array -> bool
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-val opt_if: bool -> 'a -> 'a option
-(** [opt_if cond v] returns [Some v] if [cond] is [true] and
-    [None] otherwise *)
-
 val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
 (** @since Oxygen-20120901 *)
 
@@ -223,8 +219,6 @@ val the: ?exn:exn -> 'a option -> 'a
     @return v if the value is [Some v].
     @modify Magnesium-20151001 add optional argument [exn]
     @plugin development guide *)
-
-val find_or_none: ('a -> 'b) -> 'a -> 'b option
 
 val opt_equal : ('a -> 'a -> bool) -> 'a option -> 'a option -> bool
 

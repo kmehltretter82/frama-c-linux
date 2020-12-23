@@ -246,8 +246,6 @@ let array_existsi f a =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let opt_if b v = if b then None else Some v
-
 let opt_fold f o b =
   match o with
     | None -> b
@@ -270,8 +268,6 @@ let the ?exn = function
       | Some exn -> raise exn
     end
   | Some x -> x
-
-let find_or_none f v = try Some(f v) with Not_found -> None
 
 let opt_equal f v1 v2 = match v1, v2 with
   | None, None -> true
