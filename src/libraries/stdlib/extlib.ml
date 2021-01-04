@@ -221,27 +221,6 @@ let list_slice ?(first = 0) ?last l =
   | None -> l
   | Some n -> list_first_n (normalize n - first) l
 
-
-(* ************************************************************************* *)
-(** {2 Arrays} *)
-(* ************************************************************************* *)
-
-let array_exists f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
-let array_existsi f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f i a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
