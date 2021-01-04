@@ -2386,9 +2386,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     end
   | Dvolatile(vi,rd,wr,attr,loc) ->
     let is_representative id =
-      not
-        (Option.is_some
-           (VolatileMerging.findReplacement true lvEq !currentFidx id))
+      Option.is_none
+        (VolatileMerging.findReplacement true lvEq !currentFidx id)
     in
     let push_volatile l rd wr =
       match l with
@@ -2415,8 +2414,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
            annotation can be used as is (i.e. does not overlap with a
            preceding annotation.
       *)
-      let reads = not (Option.is_some rd) || is_representative (v,R) in
-      let writes = not (Option.is_some wr) || is_representative (v,W) in
+      let reads = Option.is_none rd || is_representative (v,R) in
+      let writes = Option.is_none wr || is_representative (v,W) in
       if reads then
         if writes then
           no_drop, v::full_representative, only_reads, only_writes

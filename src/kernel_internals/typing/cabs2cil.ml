@@ -8114,7 +8114,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if ((not (Option.is_some leno)) ||
+        if (Option.is_none leno ||
             ((String.length s) < (integerArrayLength leno)))
         then ref [init Int64.zero]
         else ref []
@@ -8192,7 +8192,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if (not (Option.is_some leno)
+        if (Option.is_none leno
             || ((List.length s) < (integerArrayLength leno)))
         then [init Int64.zero]
         else [])
