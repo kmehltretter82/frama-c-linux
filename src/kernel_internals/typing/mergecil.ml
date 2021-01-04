@@ -845,7 +845,8 @@ let init ?(all=true) () =
   if all then Logic_env.prepare_tables ()
 
 (* Ignores some attributes that are irrelevant for mergecil, e.g. fc_stdlib *)
-let drop_attributes_for_merge attrs = Cil.dropAttributes ["fc_stdlib"] attrs
+let drop_attributes_for_merge attrs =
+  Cil.dropAttributes ["fc_stdlib"; "fc_stdlib_generated"] attrs
 
 let equal_attributes_for_merge attrs1 attrs2 =
   Cil_datatype.Attributes.equal (drop_attributes_for_merge attrs1)

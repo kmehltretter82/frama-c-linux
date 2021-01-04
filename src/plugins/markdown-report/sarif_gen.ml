@@ -139,8 +139,7 @@ let make_message alarm annot remark =
   Message.create ~text ~markdown ()
 
 let kf_is_in_libc kf =
-  let g = Kernel_function.get_global kf in
-  Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g)
+  Cil.global_is_in_libc (Kernel_function.get_global kf)
 
 let ip_is_in_libc ip =
   match Property.get_kf ip with
@@ -151,7 +150,7 @@ let ip_is_in_libc ip =
       | IPAxiomatic {iax_attrs=attrs}
       | IPLemma {il_attrs=attrs}
       | IPAxiom {il_attrs=attrs} ->
-        Cil.hasAttribute "fc_stdlib" attrs
+        Cil.is_in_libc attrs
       | _ ->
         false
     end

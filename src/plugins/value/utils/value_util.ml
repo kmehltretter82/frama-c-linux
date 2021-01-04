@@ -335,7 +335,7 @@ and height_offset = function
 let skip_specifications kf =
   Value_parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
-  Cil.hasAttribute "fc_stdlib" (Kernel_function.get_vi kf).vattr
+  Cil.is_in_libc (Kernel_function.get_vi kf).vattr
 
 (*
 Local Variables:

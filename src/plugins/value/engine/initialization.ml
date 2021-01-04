@@ -370,8 +370,7 @@ module Make
     let print_base base =
       try
         let varinfo = Base.to_varinfo base in
-        not (Cil.hasAttribute "fc_stdlib" varinfo.vattr
-             || Cil.hasAttribute "fc_stdlib_generated" varinfo.vattr)
+        not (Cil.is_in_libc varinfo.vattr)
       with Base.Not_a_C_variable -> true
     in
     let cvalue_state =

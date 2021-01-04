@@ -55,7 +55,7 @@ let () =
               | Definition (fd, _) -> fd.svar.vattr
               | Declaration (_, vi, _, _) -> vi.vattr
             in
-            if Cil.hasAttribute "fc_stdlib" fun_attrs then begin
+            if Cil.is_in_libc fun_attrs then begin
               Annotations.iter_behaviors (fun _emitter bhv ->
                   List.iter (fun ip ->
                       let pred = Logic_const.pred_of_id_pred ip in
