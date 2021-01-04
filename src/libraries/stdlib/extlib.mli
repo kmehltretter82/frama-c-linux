@@ -220,11 +220,6 @@ val the: ?exn:exn -> 'a option -> 'a
     @modify Magnesium-20151001 add optional argument [exn]
     @plugin development guide *)
 
-val opt_equal : ('a -> 'a -> bool) -> 'a option -> 'a option -> bool
-
-val opt_compare : ('a -> 'a -> int) -> 'a option -> 'a option -> int
-  (** @since Boron-20100401 *)
-
 val opt_hash: ('a -> int) -> 'a option -> int
   (** @since Sodium-20150201 *)
 

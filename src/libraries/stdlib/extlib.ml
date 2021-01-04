@@ -269,17 +269,6 @@ let the ?exn = function
     end
   | Some x -> x
 
-let opt_equal f v1 v2 = match v1, v2 with
-  | None, None -> true
-  | Some _, None | None, Some _ -> false
-  | Some v1, Some v2 -> f v1 v2
-
-let opt_compare f v1 v2 = match v1, v2 with
-  | None, None -> 0
-  | Some _, None -> 1
-  | None, Some _ -> -1
-  | Some v1, Some v2 -> f v1 v2
-
 let opt_hash hash v = match v with
   | None -> 31179
   | Some v -> hash v
