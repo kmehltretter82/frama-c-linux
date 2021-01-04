@@ -77,8 +77,8 @@ module G = struct
       (opt2 fmin bmin1 bmin2, opt2 fmax bmax1 bmax2)
 
     let equal (bmin1, bmax1: t) (bmin2, bmax2: t) =
-      Extlib.opt_equal Integer.equal bmin1 bmin2 &&
-      Extlib.opt_equal Integer.equal bmax1 bmax2
+      Option.equal Integer.equal bmin1 bmin2 &&
+      Option.equal Integer.equal bmax1 bmax2
 
     let is_included (bmin1, bmax1: t) (bmin2, bmax2: t) =
       (match bmin1, bmin2 with
@@ -161,7 +161,7 @@ module G = struct
        widening of Ival. *)
     let widen ?threshold (min1, max1: t) (min2, max2: t) : t =
       let widen_unstable_min b1 b2 =
-        if Extlib.opt_equal Integer.equal b1 b2 then b1 else None
+        if Option.equal Integer.equal b1 b2 then b1 else None
       in
       let widen_unstable_max b1 b2 =
         match threshold with

@@ -814,7 +814,7 @@ struct
         | Branch (c,n1,n2) ->
             let n1' = Option.map find n1 in
             let n2' = Option.map find n2 in
-            if Extlib.opt_equal Node.equal n1 n1' && Extlib.opt_equal Node.equal n2 n2'
+            if Option.equal Node.equal n1 n1' && Option.equal Node.equal n2 n2'
             then Some e
             else Some (Branch(c,n1',n2'))
         | Either l ->

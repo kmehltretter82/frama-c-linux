@@ -103,7 +103,9 @@ process_file ()
    -e 's/Extlib\.opt_map/Option.map/g' \
    -e 's/Extlib\.has_some/Option.is_some/g' \
    -e 's/Extlib\.opt_bind/Option.bind/g' \
-   -e 's/Extlib\.the \([^~]\)/Option.get \1/g'
+   -e 's/Extlib\.the \([^~]\)/Option.get \1/g' \
+   -e 's/Extlib\.opt_equal/Option.equal/g' \
+   -e 's/Extlib\.opt_compare/Option.compare/g'
 }
 
 apply_one_dir ()

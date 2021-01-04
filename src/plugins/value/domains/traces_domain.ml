@@ -145,7 +145,7 @@ end = struct
       if c <> 0 then c else
         let c = Extlib.list_compare ExpStructEq.compare es1 es2 in
         if c <> 0 then c else
-          Extlib.opt_compare Lval.compare lv1 lv2
+          Option.compare Lval.compare lv1 lv2
     | Msg s1, Msg s2 ->
       String.compare s1 s2
     | Loop (stmt1, s1, g1), Loop (stmt2, s2, g2) ->

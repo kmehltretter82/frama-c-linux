@@ -467,9 +467,9 @@ and compare_array_sizes e1o e2o =
     match i1, i2 with
     | None, None -> (* inconclusive. do not return 0 *)
       !compare_exp_struct_eq e1 e2
-    | _ -> Extlib.opt_compare Integer.compare i1 i2
+    | _ -> Option.compare Integer.compare i1 i2
   in
-  Extlib.opt_compare compare_non_empty_size e1o e2o
+  Option.compare compare_non_empty_size e1o e2o
 
 and compare_type config t1 t2 =
   if t1 == t2 then 0
@@ -521,7 +521,7 @@ and compare_type config t1 t2 =
       index_typ a1 - index_typ a2
 
 and compare_arg_list  config l1 l2 =
-  Extlib.opt_compare
+  Option.compare
     (compare_list
        (fun (_n1, t1, l1) (_n2, t2, l2) ->
           (compare_chain (compare_type config) t1 t2

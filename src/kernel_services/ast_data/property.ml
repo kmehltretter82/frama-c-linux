@@ -591,7 +591,7 @@ include Datatype.Make_with_collections
           Kf.equal f1 f2 && Kinstr.equal ki1 ki2
         | IPReachable {ir_kf=kf1; ir_kinstr=ki1; ir_program_point=ba1},
           IPReachable {ir_kf=kf2; ir_kinstr=ki2; ir_program_point=ba2} ->
-          Extlib.opt_equal Kf.equal kf1 kf2 && Kinstr.equal ki1 ki2 && ba1 = ba2
+          Option.equal Kf.equal kf1 kf2 && Kinstr.equal ki1 ki2 && ba1 = ba2
         | IPBehavior {ib_kf=f1; ib_kinstr=k1; ib_active=a1; ib_bhv=b1},
           IPBehavior {ib_kf=f2; ib_kinstr=k2; ib_active=a2; ib_bhv=b2} ->
           Kf.equal f1 f2
@@ -665,7 +665,7 @@ include Datatype.Make_with_collections
           if n = 0 then Kinstr.compare ki1 ki2 else n
         | IPReachable {ir_kf=kf1; ir_kinstr=ki1; ir_program_point=ba1},
           IPReachable {ir_kf=kf2; ir_kinstr=ki2; ir_program_point=ba2} ->
-          let n = Extlib.opt_compare Kf.compare kf1 kf2 in
+          let n = Option.compare Kf.compare kf1 kf2 in
           if n = 0 then
             let n = Kinstr.compare ki1 ki2 in
             if n = 0 then Stdlib.compare ba1 ba2 else n

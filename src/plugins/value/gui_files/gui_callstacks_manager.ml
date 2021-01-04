@@ -428,7 +428,7 @@ module Make (Input: Input) = struct
       model.hidden_columns <- [];
     in
     let start_session loc ~multiple =
-      if not (multiple && Extlib.opt_equal gui_loc_equal (Some loc) model.loc)
+      if not (multiple && Option.equal gui_loc_equal (Some loc) model.loc)
       then begin
         clear_model ();
         model.loc <- Some loc;

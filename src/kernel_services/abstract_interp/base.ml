@@ -66,7 +66,7 @@ module Validity = Datatype.Make
         | Unknown (b1, m1, e1), Unknown (b2, m2, e2) ->
           let c = Int.compare b1 b2 in
           if c = 0 then
-            let c = Extlib.opt_compare Int.compare m1 m2 in
+            let c = Option.compare Int.compare m1 m2 in
             if c = 0 then Int.compare e1 e2 else c
           else c
         | Variable v1, Variable v2 ->
