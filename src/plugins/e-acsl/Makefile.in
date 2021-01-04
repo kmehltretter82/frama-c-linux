@@ -243,8 +243,12 @@ TEST_DEPENDENCIES:= \
 	$(EACSL_PLUGIN_DIR)/tests/ptests_config \
 	$(EACSL_PLUGIN_DIR)/tests/test_config_ci \
 	$(EACSL_PLUGIN_DIR)/tests/test_config_dev \
-	$(EACSL_PLUGIN_DIR)/tests/print.cmxs \
 	$(EACSL_PLUGIN_DIR)/tests/print.cmo
+
+ifeq ($(OCAMLBEST),opt)
+TEST_DEPENDENCIES += \
+	$(EACSL_PLUGIN_DIR)/tests/print.cmxs
+endif
 
 # Add the test dependencies to the test targets, but also to
 # `plugins_ptests_config` so that they are built along with the main target.
