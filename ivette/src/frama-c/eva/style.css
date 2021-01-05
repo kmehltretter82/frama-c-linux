@@ -139,10 +139,10 @@
 .eva-diff-added { }
 .eva-diff-removed { text-decoration: strike }
 
-.eva-state-Here .eva-diff { background: #ffcdb8; }
-.eva-state-After .eva-diff { background: #c8e06e; }
-.eva-state-Then .eva-diff { background: green; }
-.eva-state-Else .eva-diff { background: orange; }
+.eva-state-Here .eva-diff { background: #95f5ff; }
+.eva-state-After .eva-diff { background: #fff819; }
+.eva-state-Then .eva-diff { background: #c8e06e; }
+.eva-state-Else .eva-diff { background: #ff834e; }
 
 /* -------------------------------------------------------------------------- */
 /* --- Alarms                                                             --- */

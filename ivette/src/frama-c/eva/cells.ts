@@ -23,7 +23,7 @@ export interface Size { cols: number; rows: number }
 export const EMPTY: Size = { cols: 0, rows: 0 };
 
 export function sizeof(text?: string): Size {
-  if (!text) return EMPTY;
+  if (text === undefined) return EMPTY;
   const lines = text.split('\n');
   return {
     rows: lines.length,
@@ -80,51 +80,6 @@ export interface EvaValues {
   v_else?: string;
   alarms?: EvaAlarm[];
   size: Size;
-}
-
-export function valueAt(v: EvaValues, st: EvaState): string | undefined {
-  switch (st) {
-    case 'Here': return v.values;
-    case 'After': return v.v_after;
-    case 'Then': return v.v_then;
-    case 'Else': return v.v_else;
-  }
-}
-
-export function diffAfter(
-  v: EvaValues,
-  effects: boolean,
-  st: EvaState,
-): string | undefined {
-  if (!effects) return undefined;
-  switch (st) {
-    case 'Here': return v.v_after;
-    default: return v.values;
-  }
-}
-
-export function diffThen(
-  v: EvaValues,
-  condition: boolean,
-  st: EvaState,
-): string | undefined {
-  if (!condition) return undefined;
-  switch (st) {
-    case 'Here': return v.v_then;
-    default: return v.values;
-  }
-}
-
-export function diffElse(
-  v: EvaValues,
-  condition: boolean,
-  st: EvaState,
-): string | undefined {
-  if (!condition) return undefined;
-  switch (st) {
-    case 'Here': return v.v_else;
-    default: return v.values;
-  }
 }
 
 // --------------------------------------------------------------------------

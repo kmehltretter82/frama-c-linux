@@ -80,6 +80,10 @@ export class LayoutEngine {
   }
 
   private static order(p: Probe, q: Probe): number {
+    const rp = p.rank ?? 0;
+    const rq = q.rank ?? 0;
+    if (rp < rq) return (-1);
+    if (rp > rq) return (+1);
     const fp = p.fct;
     const fq = q.fct;
     if (fp < fq) return -1;
@@ -88,7 +92,9 @@ export class LayoutEngine {
     const cq = q.byCallstacks;
     if (!cp && cq) return (-1);
     if (cp && !cq) return (+1);
-    return Probe.order(p, q);
+    if (p.marker < q.marker) return (-1);
+    if (p.marker > q.marker) return (+1);
+    return 0;
   }
 
   private push(p: Probe) {

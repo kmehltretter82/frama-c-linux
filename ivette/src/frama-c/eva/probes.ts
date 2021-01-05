@@ -8,7 +8,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
-import { ModelCallbacks, EvaState } from './cells';
+import { ModelCallbacks } from './cells';
 
 /* --------------------------------------------------------------------------*/
 /* --- Probe Labelling                                                    ---*/
@@ -57,7 +57,6 @@ export class Probe {
   byCallstacks = false;
   zoomed = false;
   zoomable = false;
-  vstate: EvaState = 'Here';
   effects = false;
   condition = false;
 
@@ -79,7 +78,6 @@ export class Probe {
         this.rank = rank;
         this.effects = effects;
         this.condition = condition;
-        this.vstate = effects ? 'After' : 'Here';
         this.loading = false;
       })
       .catch(() => {
@@ -122,25 +120,6 @@ export class Probe {
       this.zoomed = zoomed;
       this.model.forceLayout();
     }
-  }
-
-  setState(s: EvaState | undefined) {
-    this.vstate = s ?? 'Here';
-    this.model.forceUpdate();
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Ordering
-  // --------------------------------------------------------------------------
-
-  static order(p: Probe, q: Probe): number {
-    const rp = p.rank ?? 0;
-    const rq = q.rank ?? 0;
-    if (rp < rq) return (-1);
-    if (rp > rq) return (+1);
-    if (p.marker < q.marker) return (-1);
-    if (p.marker > q.marker) return (+1);
-    return 0;
   }
 
 }

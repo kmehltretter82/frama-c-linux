@@ -50,7 +50,7 @@ export class DiffBuffer {
       if (value) {
         this.scratch += '\0'.repeat(value.length);
         this.contents.push(
-          <span className={MODIFIED} title="Modified"> {value}</span>,
+          <span className={MODIFIED} title="Modified">{value}</span>,
         );
       }
     } else if (removed) {
@@ -134,7 +134,7 @@ export function Diff3(props: Diff3Props) {
 /* --------------------------------------------------------------------------*/
 
 export interface DiffProps {
-  text: string;
+  text?: string;
   diff?: string;
   diffA?: string;
   diffB?: string;
@@ -142,9 +142,12 @@ export interface DiffProps {
 
 export function Diff(props: DiffProps) {
   const { text, diff, diffA, diffB } = props;
-  if (text === diff) return <>{text}</>;
-  if (diff !== undefined)
+  if (text === undefined)
+    return diff ? <>{diff}</> : null;
+  if (diff !== undefined) {
+    if (diff === text) return <>{text}</>;
     return <Diff2 text={text} diff={diff} />;
+  }
   if (diffA === undefined) {
     if (diffB === undefined) return <>{text}</>;
     return <Diff2 text={text} diff={diffB} />;

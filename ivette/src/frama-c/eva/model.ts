@@ -14,7 +14,7 @@ import * as Ast from 'frama-c/api/kernel/ast';
 // Model
 import { Probe } from './probes';
 import { StacksCache, Callsite } from './stacks';
-import { ModelCallbacks, ValueCache } from './cells';
+import { ModelCallbacks, ValueCache, EvaState } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
@@ -42,6 +42,8 @@ export class Model implements ModelCallbacks {
 
   // --- Probes
 
+  private vstmt: EvaState = 'After';
+  private vcond: EvaState = 'Here';
   private selected?: Probe;
   private focused?: Probe;
   private callstack?: Values.callstack;
@@ -65,6 +67,11 @@ export class Model implements ModelCallbacks {
   getStacks(p: Probe | undefined): Values.callstack[] {
     return p ? this.stacks.getStacks(p.marker) : [];
   }
+
+  getVstmt(): EvaState { return this.vstmt; }
+  getVcond(): EvaState { return this.vcond; }
+  setVstmt(s: EvaState) { this.vstmt = s; this.forceUpdate(); }
+  setVcond(s: EvaState) { this.vcond = s; this.forceUpdate(); }
 
   // --- Caches
 

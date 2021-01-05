@@ -25,11 +25,10 @@ import * as Ast from 'frama-c/api/kernel/ast';
 
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
-import { Diff } from './diffed';
-import { sizeof, valueAt, diffAfter, diffThen, diffElse, EvaAlarm }
-  from './cells';
-import { Row } from './layout';
+import { Diff, DiffProps } from './diffed';
+import { sizeof, EvaValues, EvaState, EvaAlarm } from './cells';
 import { Probe } from './probes';
+import { Row } from './layout';
 import { Callsite } from './stacks';
 import { Model, getModelInstance } from './model';
 import './style.css';
@@ -87,16 +86,18 @@ function ProbeInfos() {
   const zoomed = probe?.zoomed;
   const zoomable = probe?.zoomable;
   const visibility = visible ? 'visible' : 'hidden';
-  const effects = probe?.effects;
-  const condition = probe?.condition;
+  const effects = probe ? probe.effects : false;
+  const condition = probe ? probe.condition : false;
   const summary = fct ? model.stacks.getSummary(fct) : false;
+  const vcond = model.getVcond();
+  const vstmt = model.getVstmt();
   return (
     <Hpack style={{ visibility }} className="eva-probeinfo">
       <Label className="eva-probeinfo-label">{label && `${label}:`}</Label>
       <div style={{ minWidth: width, height }} className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
-      <Code>{fct}<Stmt stmt={stmt} rank={rank} /></Code>
+      <Code><Stmt stmt={stmt} rank={rank} />({fct})</Code>
       <IconButton
         icon="ITEMS.LIST"
         className="eva-probeinfo-button"
@@ -122,8 +123,6 @@ function ProbeInfos() {
       <Filler />
       <ButtonGroup
         enabled={!!probe}
-        value={probe?.vstate}
-        onChange={(s) => { if (probe) probe.setState(s); }}
         className="eva-probeinfo-state"
       >
         <Button
@@ -134,28 +133,39 @@ function ProbeInfos() {
           onClick={() => { if (fct) model.stacks.setSummary(fct, !summary); }}
         />
         <Button
-          visible={effects || condition}
-          label="H"
-          value="Here"
-          title="Show values before statement"
+          visible={condition}
+          label="C"
+          selected={vcond === 'Here'}
+          title="Show values in all conditions"
+          onClick={() => model.setVcond('Here')}
         />
         <Button
-          visible={condition}
+          visible={condition || vcond === 'Then'}
+          selected={vcond === 'Then'}
+          enabled={condition}
           label="T"
           value="Then"
-          title="Show values when condition is true"
+          title="Show reduced values when condition holds (Then)"
+          onClick={() => model.setVcond('Then')}
         />
         <Button
-          visible={condition}
+          visible={condition || vcond === 'Else'}
+          selected={vcond === 'Else'}
+          enabled={condition}
           label="E"
           value="Else"
-          title="Show values when condition is false"
+          title="Show reduced values when condition does not hold (Else)"
+          onClick={() => model.setVcond('Else')}
         />
         <Button
-          visible={effects}
+          visible={condition || effects}
+          selected={vstmt === 'After'}
           label="A"
           value="After"
-          title="Show values after statement"
+          title="Show values after/before statement effects"
+          onClick={() => {
+            model.setVstmt(vstmt === 'After' ? 'Here' : 'After');
+          }}
         />
       </ButtonGroup>
     </Hpack>
@@ -226,6 +236,45 @@ function StackInfo() {
 }
 
 // --------------------------------------------------------------------------
+// --- Cell Diffs
+// --------------------------------------------------------------------------
+
+function isTrivial(v: EvaValues) {
+  return v.values === '{0; 1}' &&
+    v.v_then === '{1}' &&
+    v.v_else === '{0}';
+}
+
+function computeDiffs(
+  condition: boolean,
+  v: EvaValues,
+  vstate: EvaState,
+): DiffProps {
+  if (condition) {
+    const trv = isTrivial(v);
+    switch (vstate) {
+      case 'Here':
+      case 'After':
+        return trv ? { text: v.values } :
+          { text: v.values, diffA: v.v_then, diffB: v.v_else };
+      case 'Then':
+        return { text: v.v_then, diff: !trv ? v.values : undefined };
+      case 'Else':
+        return { text: v.v_else, diff: !trv ? v.values : undefined };
+    }
+  } else {
+    switch (vstate) {
+      case 'Here':
+      case 'Then':
+      case 'Else':
+        return { text: v.values, diff: v.v_after };
+      case 'After':
+        return { text: v.v_after, diff: v.values };
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
 // --- Table Cell
 // --------------------------------------------------------------------------
 
@@ -246,6 +295,8 @@ function TableCell(props: TableCellProps) {
   const style = { width: minWidth, maxWidth };
   let contents: React.ReactNode = props.probe.marker;
   const { transient } = probe;
+  const focused = model.getFocused();
+  const isFocused = focused === probe;
 
   switch (kind) {
 
@@ -271,11 +322,10 @@ function TableCell(props: TableCellProps) {
       {
         const domain = model.values.getValues(probe, callstack);
         const { alarms = [] } = domain;
-        const { vstate: s, effects, condition } = probe;
-        const text = valueAt(domain, s) ?? '';
-        const diff = diffAfter(domain, effects, s);
-        const diffA = diffThen(domain, condition, s);
-        const diffB = diffElse(domain, condition, s);
+        const { condition } = probe;
+        const vstate = condition ? model.getVcond() : model.getVstmt();
+        const vdiffs = computeDiffs(condition, domain, vstate);
+        const text = vdiffs.text ?? vdiffs.diff;
         const { cols, rows } = sizeof(text);
         let status = 'none';
         if (alarms.length > 0) {
@@ -287,8 +337,8 @@ function TableCell(props: TableCellProps) {
           <>
             <Icon className={alarmClass} size={10} id="WARNING" />
             <SizedArea cols={cols} rows={rows}>
-              <span className={`eva-state-${s}`}>
-                <Diff text={text} diff={diff} diffA={diffA} diffB={diffB} />
+              <span className={`eva-state-${vstate}`}>
+                <Diff {...vdiffs} />
               </span>
             </SizedArea>
           </>
@@ -299,7 +349,6 @@ function TableCell(props: TableCellProps) {
   }
 
   // --- Cell Packing
-  const isFocused = model.getFocused() === probe;
   const className = classes(
     'eva-cell',
     transient && 'eva-transient',
