@@ -2164,64 +2164,46 @@ class renameVisitorClass =
              })
       | _ -> DoChildren
 
+    method private update_field f =
+      (* See if the compinfo was changed *)
+        if f.fcomp.creferenced then None
+        else begin
+          match
+            PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
+          with
+            None -> None (* We did not replace it *)
+          | Some (ci', _oldfidx) -> begin
+              (* First, find out the index of the original field *)
+              let rec indexOf (i: int) = function
+                | [] -> Kernel.fatal "Cannot find field %s in %s"
+                          f.fname (compFullName f.fcomp)
+                | f' :: _ when f' == f -> i
+                | _ :: rest -> indexOf (i + 1) rest
+              in
+              let index = indexOf 0 (Extlib.opt_conv [] f.fcomp.cfields) in
+              let ci'_fields = Extlib.opt_conv [] ci'.cfields in
+              if List.length ci'_fields <= index then
+                Kernel.fatal "Too few fields in replacement %s for %s"
+                  (compFullName ci')
+                  (compFullName f.fcomp);
+              Some (List.nth ci'_fields index)
+            end
+        end
+
     (* The Field offset might need to be changed to use new compinfo *)
     method! voffs = function
         Field (f, o) -> begin
-          (* See if the compinfo was changed *)
-          if f.fcomp.creferenced then
-            DoChildren
-          else begin
-            match
-              PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
-            with
-              None -> DoChildren (* We did not replace it *)
-            | Some (ci', _oldfidx) -> begin
-                (* First, find out the index of the original field *)
-                let rec indexOf (i: int) = function
-                    [] -> Kernel.fatal "Cannot find field %s in %s"
-                            f.fname (compFullName f.fcomp)
-                  | f' :: _ when f' == f -> i
-                  | _ :: rest -> indexOf (i + 1) rest
-                in
-                let index = indexOf 0 (Extlib.the f.fcomp.cfields) in
-                if List.length (Extlib.the ci'.cfields) <= index then
-                  Kernel.fatal "Too few fields in replacement %s for %s"
-                    (compFullName ci')
-                    (compFullName f.fcomp);
-                let f' = List.nth (Extlib.the ci'.cfields) index in
-                ChangeDoChildrenPost (Field (f', o), fun x -> x)
-              end
-          end
+          match self#update_field f with
+          | None -> DoChildren
+          | Some f' -> ChangeDoChildrenPost (Field (f', o), fun x -> x)
         end
       | _ -> DoChildren
 
     method! vterm_offset = function
         TField (f, o) -> begin
-          (* See if the compinfo was changed *)
-          if f.fcomp.creferenced then
-            DoChildren
-          else begin
-            match
-              PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
-            with
-              None -> DoChildren (* We did not replace it *)
-            | Some (ci', _oldfidx) -> begin
-                (* First, find out the index of the original field *)
-                let rec indexOf (i: int) = function
-                    [] -> Kernel.fatal "Cannot find field %s in %s"
-                            f.fname (compFullName f.fcomp)
-                  | f' :: _ when f' == f -> i
-                  | _ :: rest -> indexOf (i + 1) rest
-                in
-                let index = indexOf 0 (Extlib.the f.fcomp.cfields) in
-                if List.length (Extlib.the ci'.cfields) <= index then
-                  Kernel.fatal "Too few fields in replacement %s for %s"
-                    (compFullName ci')
-                    (compFullName f.fcomp);
-                let f' = List.nth (Extlib.the ci'.cfields) index in
-                ChangeDoChildrenPost (TField (f', o), fun x -> x)
-              end
-          end
+          match self#update_field f with
+          | None -> DoChildren
+          | Some f' -> ChangeDoChildrenPost (TField (f', o), fun x -> x)
         end
       | TModel(f,o) ->
         (match
