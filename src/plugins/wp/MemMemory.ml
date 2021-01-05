@@ -239,27 +239,28 @@ let is_separated args = F.is_true (r_separated args)
 (* --- Simplifier for 'included'                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(*
-logic a : int
-logic b : int
+(* See: tests/why3/test_memory.why
 
-predicate R =     p.base = q.base
+   logic a : int
+   logic b : int
+
+   predicate R = p.base = q.base
               /\ (q.offset <= p.offset)
               /\ (p.offset + a <= q.offset + b)
 
-predicate included = 0 < a -> ( 0 <= b and R )
-predicate a_empty = a <= 0
-predicate b_negative = b < 0
+   predicate included = 0 < a -> ( 0 <= b and R )
+   predicate a_empty = a <= 0
+   predicate b_negative = b < 0
 
-lemma SAME_P: p=q -> (R <-> a<=b)
-lemma SAME_A: a=b -> (R <-> p=q)
+   lemma SAME_P: p=q -> (R <-> a<=b)
+   lemma SAME_A: a=b -> (R <-> p=q)
 
-goal INC_P:  p=q -> (included <-> ( 0 < a -> a <= b )) (by SAME_P)
-goal INC_A:  a=b -> 0 < a -> (included <-> R) (by SAME_A)
-goal INC_1:  a_empty -> (included <-> true)
-goal INC_2:  b_negative -> (included <-> a_empty)
-goal INC_3:  not R -> (included <-> a_empty)
-goal INC_4:  not a_empty -> not b_negative -> (included <-> R)
+   goal INC_P:  p=q -> (included <-> ( 0 < a -> a <= b )) (by SAME_P)
+   goal INC_A:  a=b -> 0 < a -> (included <-> R) (by SAME_A)
+   goal INC_1:  a_empty -> (included <-> true)
+   goal INC_2:  b_negative -> (included <-> a_empty)
+   goal INC_3:  not R -> (included <-> a_empty)
+   goal INC_4:  not a_empty -> not b_negative -> (included <-> R)
 *)
 
 let r_included = function
@@ -345,23 +346,26 @@ let phi_addr_of_int p =
 (* --- Simplifier for (in)validity                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Lemmas proved with Memory definition:
-   - lemma valid_rd_null: forall m n. n <= 0 <-> valid_rd m null n
-   - lemma valid_rw_null: forall m n. n <= 0 <-> valid_rw m null n *)
+let null_base p = e_eq (F.e_fun f_base [p]) F.e_zero
+
+(* See: tests/why3/test_memory.why *)
+
+(* - lemma valid_rd_null: forall m n p. p.base = 0 -> (n <= 0 <-> valid_rd m p n)
+   - lemma valid_rw_null: forall m n p. p.base = 0 -> (n <= 0 <-> valid_rw m p n)
+*)
 let r_valid_unref = function
-  | [_; p; n] when p == a_null -> e_leq n e_zero
+  | [_; p; n] when F.decide (null_base p) ->
+      e_leq n e_zero
   | _ -> raise Not_found
 
-(* Lemma proved with Memory definition:
-   - lemma valid_obj_null: forall m n. valid_obj m null n *)
+(* - lemma valid_obj_null: forall m n. valid_obj m null n *)
 let r_valid_obj = function
-  | [_; p; _] when p == a_null -> e_true
+  | [_; p; _] when F.decide (e_eq p a_null) -> e_true
   | _ -> raise Not_found
 
-(* Lemma proved with Memory definition:
-   - lemma invalid_null: forall m n. 0 < n <-> invalid m null n *)
+(* - lemma invalid_null: forall m n p. p.base = 0 -> invalid m p n *)
 let r_invalid = function
-  | [_; p; n] when p == a_null -> e_lt e_zero n
+  | [_; p; _] when F.decide (null_base p) -> e_true
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)

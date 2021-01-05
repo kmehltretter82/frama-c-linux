@@ -129,7 +129,7 @@ CEA_WP_GENEREATED= script.ml rformat.ml driver.ml
 # --------------------------------------------------------------------------
 
 PLUGIN_TESTS_DIRS:= \
-  wp wp_plugin wp_acsl wp_bts \
+  why3 wp wp_plugin wp_acsl wp_bts \
   wp_store wp_hoare wp_typed wp_usage \
   wp_gallery wp_manual wp_tip \
   wp_region

@@ -1,0 +1,4 @@
+FILEREG: .*\.why
+CMD: why3 -L ./share/why3 prove -P alt-ergo
+OPT:
+FILTER: sed -e 's|\(.*\)\( (.*)\)|\1|'

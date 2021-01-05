@@ -80,7 +80,7 @@ theory Memory
              ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= 1 + m[p.base] ))
 
   predicate invalid (m : map int int) (p:addr) (n:int) =
-    n > 0 /\ (p = null \/ m[p.base] <= p.offset \/ p.offset + n <= 0 )
+    n <= 0 \/ p.base = 0 \/ m[p.base] <= p.offset \/ p.offset + n <= 0
 
   lemma valid_rw_rd :
     forall m : map int int.
@@ -152,7 +152,7 @@ theory Memory
     forall a : int.
     eqmem m1 m2 p a -> eqmem m2 m1 p a
 
-  lemma havoc_access :
+  axiom havoc_access :
     forall m0 m1 : map addr 'a.
     forall q p : addr.
     forall a : int.
@@ -168,7 +168,7 @@ theory Memory
 
   function set_init (m: map addr bool) (p:addr) (a:int) : map addr bool
 
-  lemma set_init_access :
+  axiom set_init_access :
     forall m : map addr bool.
     forall q p : addr.
     forall a : int.
