@@ -21,27 +21,14 @@ export interface Callsite {
 }
 
 // --------------------------------------------------------------------------
-// --- CallStacks by Function
-// --------------------------------------------------------------------------
-
-interface StacksByFct {
-  dirty: boolean;
-  stacks: callstacks;
-}
-
-interface ProbeFct {
-  fct: string;
-  marker: Ast.marker;
-}
-
-// --------------------------------------------------------------------------
 // --- CallStacks Cache
 // --------------------------------------------------------------------------
 
 export class StacksCache {
 
   private readonly model: ModelCallbacks;
-  private readonly byFct = new Map<string, StacksByFct>();
+  private readonly stacks = new Map<string, callstacks>();
+  private readonly summary = new Map<string, boolean>();
   private readonly calls = new Map<Values.callstack, Callsite[]>();
 
   // --------------------------------------------------------------------------
@@ -53,40 +40,36 @@ export class StacksCache {
   }
 
   clear() {
-    this.byFct.clear();
+    this.stacks.clear();
+    this.calls.clear();
   }
 
   // --------------------------------------------------------------------------
   // --- Getters
   // --------------------------------------------------------------------------
 
-  mergeStacksForFunction(fct: string) {
-    const buffer = this.byFct.get(fct);
-    if (buffer) buffer.dirty = true;
+  getSummary(fct: string): boolean {
+    return this.summary.get(fct) || false;
   }
 
-  getStacksForProbe({ fct, marker }: ProbeFct): callstacks {
-    const fs = this.byFct.get(fct);
-    if (!fs) {
-      this.byFct.set(fct, { dirty: true, stacks: [] });
-      this.requestCallstacks(fct, [marker]);
-    }
-    return fs ? fs.stacks : [];
+  setSummary(fct: string, s: boolean) {
+    this.summary.set(fct, s);
+    this.model.forceLayout();
   }
 
-  getStacksForFunction(fct: string, probes?: Ast.marker[]): callstacks {
-    const fs = this.byFct.get(fct);
-    if (!fs) this.byFct.set(fct, { dirty: false, stacks: [] });
-    if (probes) {
-      if (!fs || fs.dirty) this.requestCallstacks(fct, probes);
-      if (fs && fs.dirty) fs.dirty = false;
-    }
-    return fs ? fs.stacks : [];
+  getStacks(...markers: Ast.marker[]): callstacks {
+    if (markers.length === 0) return [];
+    const key = markers.join('$');
+    const cs = this.stacks.get(key);
+    if (cs !== undefined) return cs;
+    this.stacks.set(key, []);
+    this.requestStacks(key, markers);
+    return [];
   }
 
   getCalls(cs: Values.callstack): Callsite[] {
-    const fcs = this.calls.get(cs);
-    if (fcs !== undefined) return fcs;
+    const fs = this.calls.get(cs);
+    if (fs !== undefined) return fs;
     this.calls.set(cs, []);
     this.requestCalls(cs);
     return [];
@@ -96,11 +79,11 @@ export class StacksCache {
   // --- Fetchers
   // --------------------------------------------------------------------------
 
-  private requestCallstacks(fct: string, probes: Ast.marker[]) {
+  private requestStacks(key: string, markers: Ast.marker[]) {
     Server
-      .send(Values.getCallstacks, probes)
+      .send(Values.getCallstacks, markers)
       .then((stacks: callstacks) => {
-        this.byFct.set(fct, { dirty: false, stacks });
+        this.stacks.set(key, stacks);
         this.model.forceLayout();
         this.model.forceUpdate();
       });

@@ -52,7 +52,7 @@ export class LayoutEngine {
     this.values = values;
     this.stacks = stacks;
     const zoom = Math.max(0, props?.zoom ?? 0);
-    this.vcrop = VCROP + 2 * zoom;
+    this.vcrop = VCROP + 3 * zoom;
     this.hcrop = HCROP + zoom;
     this.margin = props?.margin ?? 80;
     this.push = this.push.bind(this);
@@ -65,8 +65,8 @@ export class LayoutEngine {
   private rows: Row[] = [];
 
   crop(zoomed: boolean, s: Size): Size {
-    const sCols = s.cols + INSET;
-    const cols = zoomed ? sCols : Math.min(sCols, this.hcrop);
+    const s$cols = s.cols + INSET;
+    const cols = zoomed ? s$cols : Math.min(s$cols, this.hcrop);
     const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
       cols: Math.max(HCROP, cols),
@@ -120,21 +120,31 @@ export class LayoutEngine {
       if (fct) {
         // --- by callstacks
         const markers = ps.map((p) => p.marker);
-        const wcs = this.stacks.getStacksForFunction(fct, markers);
+        const stacks = this.stacks.getStacks(...markers);
+        const summary = this.stacks.getSummary(fct);
+        const callstacks = stacks.length;
         rs.push({
           key: `F${fct}`,
           kind: 'probes',
           probes: ps,
-          stacks: wcs.length,
+          stacks: callstacks,
           hlines: 1,
         });
-        wcs.forEach((cs, k) => {
+        if (summary) rs.push({
+          key: `M${fct}`,
+          kind: 'values',
+          probes: ps,
+          stackIndex: -1,
+          stacks: stacks.length,
+          hlines: 1,
+        });
+        stacks.forEach((cs, k) => {
           rs.push({
             key: `C${fct}::${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
-            stacks: wcs.length,
+            stacks: callstacks,
             callstack: cs,
             hlines,
           });

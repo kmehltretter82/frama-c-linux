@@ -78,8 +78,8 @@ function ProbeInfos() {
   const stmt = probe?.stmt;
   const rank = probe?.rank;
   const byCS = probe?.byCallstacks;
-  const stacks = model.getStacks(probe).length;
-  const stackable = byCS || stacks > 1;
+  const stacks = model.getStacks(probe);
+  const stackable = byCS || stacks.length > 1;
   const { cols, rows } = sizeof(code);
   const width = WSIZER.dimension(cols) + 4;
   const height = HSIZER.dimension(rows) + 3;
@@ -89,6 +89,7 @@ function ProbeInfos() {
   const visibility = visible ? 'visible' : 'hidden';
   const effects = probe?.effects;
   const condition = probe?.condition;
+  const summary = fct ? model.stacks.getSummary(fct) : false;
   return (
     <Hpack style={{ visibility }} className="eva-probeinfo">
       <Label className="eva-probeinfo-label">{label && `${label}:`}</Label>
@@ -114,7 +115,7 @@ function ProbeInfos() {
       <IconButton
         icon="PIN"
         className="eva-probeinfo-button"
-        kind={transient ? 'default' : 'selected'}
+        selected={!transient}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
         onClick={() => { if (probe) probe.setTransient(!transient); }}
       />
@@ -126,24 +127,35 @@ function ProbeInfos() {
         className="eva-probeinfo-state"
       >
         <Button
+          label={'\u2211'}
+          title="Show Callstacks Summary"
+          selected={summary}
+          visible={byCS}
+          onClick={() => { if (fct) model.stacks.setSummary(fct, !summary); }}
+        />
+        <Button
           visible={effects || condition}
           label="H"
           value="Here"
+          title="Show values before statement"
         />
         <Button
           visible={condition}
           label="T"
           value="Then"
+          title="Show values when condition is true"
         />
         <Button
           visible={condition}
           label="E"
           value="Else"
+          title="Show values when condition is false"
         />
         <Button
           visible={effects}
           label="A"
           value="After"
+          title="Show values after statement"
         />
       </ButtonGroup>
     </Hpack>
@@ -334,17 +346,30 @@ function TableRow(props: TableRowProps) {
   const { kind, probes } = row;
   const sk = row.stackIndex;
   const rowKind = `eva-${kind}`;
-  const rowParity = sk !== undefined && (sk % 2 === 0);
+  const rowHeader = sk === undefined;
+  const rowSummary = sk !== undefined && sk < 0;
+  const rowParity = sk !== undefined && sk % 2 === 1;
+  const rowNumber = sk === undefined ? 0 : 1 + sk;
   const rowStyle =
     model.isSelectedRow(row) ? 'eva-row-selected' :
       rowParity ? 'eva-row-odd' : 'eva-row-even';
+  const rowTitle =
+    rowHeader ? 'Callstack / Summary' :
+      rowSummary ? 'Summary' : 'Callstack details';
   const className = classes(
     rowKind,
     rowStyle,
   );
+  const onHeaderClick = () => {
+    model.setSelectedRow(row);
+  };
   const header = row.stacks && (
-    <div className="eva-cell eva-stack">
-      {sk === undefined ? '#' : `${1 + sk}`}
+    <div
+      className="eva-cell eva-stack"
+      title={rowTitle}
+      onClick={onHeaderClick}
+    >
+      {rowHeader ? '#' : rowSummary ? '\u2211' : `${rowNumber}`}
     </div>
   );
   const style: React.CSSProperties = { left: row.stacks ? 0 : 12 };

@@ -16,7 +16,6 @@ export type callback = () => void;
 export interface ModelCallbacks {
   forceUpdate: callback;
   forceLayout: callback;
-  mergeStacks: (fct: string) => void;
 }
 
 export interface Size { cols: number; rows: number }

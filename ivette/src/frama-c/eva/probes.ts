@@ -112,7 +112,8 @@ export class Probe {
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
-      this.model.mergeStacks(this.fct);
+      if (byCS) this.setTransient(false);
+      this.model.forceLayout();
     }
   }
 
