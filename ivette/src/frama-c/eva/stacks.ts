@@ -3,6 +3,7 @@
 // --------------------------------------------------------------------------
 
 import * as Server from 'frama-c/server';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Values from 'frama-c/api/plugins/eva/values';
 
 import { ModelCallbacks } from './cells';
@@ -20,13 +21,27 @@ export interface Callsite {
 }
 
 // --------------------------------------------------------------------------
+// --- CallStacks by Function
+// --------------------------------------------------------------------------
+
+interface StacksByFct {
+  dirty: boolean;
+  stacks: callstacks;
+}
+
+interface ProbeFct {
+  fct: string;
+  marker: Ast.marker;
+}
+
+// --------------------------------------------------------------------------
 // --- CallStacks Cache
 // --------------------------------------------------------------------------
 
 export class StacksCache {
 
   private readonly model: ModelCallbacks;
-  private readonly stacks = new Map<string, callstacks>();
+  private readonly byFct = new Map<string, StacksByFct>();
   private readonly calls = new Map<Values.callstack, Callsite[]>();
 
   // --------------------------------------------------------------------------
@@ -38,24 +53,40 @@ export class StacksCache {
   }
 
   clear() {
-    this.stacks.clear();
+    this.byFct.clear();
   }
 
   // --------------------------------------------------------------------------
   // --- Getters
   // --------------------------------------------------------------------------
 
-  getStacks(stmt: string): callstacks {
-    const cs = this.stacks.get(stmt);
-    if (cs !== undefined) return cs;
-    this.stacks.set(stmt, []);
-    this.requestCallstacks(stmt);
-    return [];
+  mergeStacksForFunction(fct: string) {
+    const buffer = this.byFct.get(fct);
+    if (buffer) buffer.dirty = true;
+  }
+
+  getStacksForProbe({ fct, marker }: ProbeFct): callstacks {
+    const fs = this.byFct.get(fct);
+    if (!fs) {
+      this.byFct.set(fct, { dirty: true, stacks: [] });
+      this.requestCallstacks(fct, [marker]);
+    }
+    return fs ? fs.stacks : [];
+  }
+
+  getStacksForFunction(fct: string, probes?: Ast.marker[]): callstacks {
+    const fs = this.byFct.get(fct);
+    if (!fs) this.byFct.set(fct, { dirty: false, stacks: [] });
+    if (probes) {
+      if (!fs || fs.dirty) this.requestCallstacks(fct, probes);
+      if (fs && fs.dirty) fs.dirty = false;
+    }
+    return fs ? fs.stacks : [];
   }
 
   getCalls(cs: Values.callstack): Callsite[] {
-    const fs = this.calls.get(cs);
-    if (fs !== undefined) return fs;
+    const fcs = this.calls.get(cs);
+    if (fcs !== undefined) return fcs;
     this.calls.set(cs, []);
     this.requestCalls(cs);
     return [];
@@ -65,12 +96,13 @@ export class StacksCache {
   // --- Fetchers
   // --------------------------------------------------------------------------
 
-  private requestCallstacks(stmt: string) {
+  private requestCallstacks(fct: string, probes: Ast.marker[]) {
     Server
-      .send(Values.getCallstacks, stmt)
-      .then((cs: callstacks) => {
-        this.stacks.set(stmt, cs);
+      .send(Values.getCallstacks, probes)
+      .then((stacks: callstacks) => {
+        this.byFct.set(fct, { dirty: false, stacks });
         this.model.forceLayout();
+        this.model.forceUpdate();
       });
   }
 

@@ -159,11 +159,9 @@ function AlarmsInfo() {
   const probe = model.getFocused();
   if (probe) {
     const callstack = model.getCallstack();
-    const domain =
-      model.values.getValues(probe.marker, probe.stmt, callstack);
+    const domain = model.values.getValues(probe, callstack);
     const alarms = domain?.alarms ?? [];
     if (alarms.length > 0) {
-      // console.log('ALARMS', alarms);
       const renderAlarm = ([status, alarm]: EvaAlarm) => {
         const className = `eva-alarm-info eva-alarm-${status}`;
         return (
@@ -172,7 +170,7 @@ function AlarmsInfo() {
       };
       return (
         <Vpack className="eva-info">
-          {alarms.map(renderAlarm)}
+          {React.Children.toArray(alarms.map(renderAlarm))}
         </Vpack>
       );
     }
@@ -259,11 +257,7 @@ function TableCell(props: TableCellProps) {
     case 'values':
     case 'callstack':
       {
-        const domain = model.values.getValues(
-          probe.marker,
-          probe.stmt,
-          callstack,
-        );
+        const domain = model.values.getValues(probe, callstack);
         const { alarms = [] } = domain;
         const { vstate: s, effects, condition } = probe;
         const text = valueAt(domain, s) ?? '';

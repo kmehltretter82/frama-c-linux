@@ -16,6 +16,7 @@ export type callback = () => void;
 export interface ModelCallbacks {
   forceUpdate: callback;
   forceLayout: callback;
+  mergeStacks: (fct: string) => void;
 }
 
 export interface Size { cols: number; rows: number }
@@ -131,6 +132,11 @@ export function diffElse(
 // --- Value Cache
 // --------------------------------------------------------------------------
 
+export interface Probe {
+  fct: string | undefined;
+  marker: Ast.marker;
+}
+
 export class ValueCache {
 
   private readonly state: ModelCallbacks;
@@ -159,33 +165,32 @@ export class ValueCache {
     return this.probes.get(target) ?? EMPTY;
   }
 
-  private static stackKey(stmt: string, callstack: Values.callstack) {
-    return `${stmt}::${callstack}`;
+  private static stackKey(fct: string, callstack: Values.callstack) {
+    return `${fct}::${callstack}`;
   }
 
-  getStackSize(stmt: string, callstack: Values.callstack) {
-    const key = ValueCache.stackKey(stmt, callstack);
+  getStackSize(fct: string, callstack: Values.callstack) {
+    const key = ValueCache.stackKey(fct, callstack);
     return this.stacks.get(key) ?? EMPTY;
   }
 
   // --- Cached Values & Request Update
 
   getValues(
-    target: Ast.marker,
-    stmt: string | undefined,
+    { fct, marker }: Probe,
     callstack: Values.callstack | undefined,
   ): EvaValues {
-    const key = callstack !== undefined ? `${target}@${callstack}` : target;
+    const key = callstack !== undefined ? `${marker}@${callstack}` : marker;
     const cache = this.vcache;
     const cached = cache.get(key);
     if (cached) return cached;
     const newValue: EvaValues = { values: '', size: EMPTY };
-    if (callstack !== undefined && stmt === undefined)
+    if (callstack !== undefined && fct === undefined)
       return newValue;
-    // callstack !== undefined ==> stmt !== undefined)
+    // callstack !== undefined ==> fct !== undefined)
     cache.set(key, newValue);
     Server
-      .send(Values.getValues, { target, callstack })
+      .send(Values.getValues, { target: marker, callstack })
       .then((r) => {
         newValue.errors = undefined;
         newValue.values = r.values;
@@ -193,7 +198,7 @@ export class ValueCache {
         newValue.v_then = r.v_then;
         newValue.v_else = r.v_else;
         newValue.alarms = r.alarms;
-        if (this.updateLayout(target, stmt, callstack, newValue))
+        if (this.updateLayout(marker, fct, callstack, newValue))
           this.state.forceLayout();
         else
           this.state.forceUpdate();
@@ -209,7 +214,7 @@ export class ValueCache {
 
   private updateLayout(
     target: Ast.marker,
-    stmt: string | undefined,
+    fct: string | undefined,
     callstack: Values.callstack | undefined,
     v: EvaValues,
   ): boolean {
@@ -231,9 +236,9 @@ export class ValueCache {
     }
     // max size for stack row
     if (callstack !== undefined) {
-      if (stmt === undefined) small = false;
+      if (fct === undefined) small = false;
       else {
-        const key = ValueCache.stackKey(stmt, callstack);
+        const key = ValueCache.stackKey(fct, callstack);
         const cs = this.stacks.get(key) ?? EMPTY;
         if (!leq(s, cs)) {
           this.stacks.set(key, merge(cs, s));

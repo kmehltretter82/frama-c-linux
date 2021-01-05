@@ -59,7 +59,7 @@ export class LayoutEngine {
   }
 
   // --- Probe Buffer
-  private byStacks?: string; // stmt
+  private byFctStacks?: string; // function
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
   private rows: Row[] = [];
@@ -74,18 +74,35 @@ export class LayoutEngine {
     };
   }
 
-  push(p: Probe) {
+  layout(ps: Probe[]): Row[] {
+    ps.sort(LayoutEngine.order).forEach(this.push);
+    return this.flush();
+  }
+
+  private static order(p: Probe, q: Probe): number {
+    const fp = p.fct;
+    const fq = q.fct;
+    if (fp < fq) return -1;
+    if (fp > fq) return +1;
+    const cp = p.byCallstacks;
+    const cq = q.byCallstacks;
+    if (!cp && cq) return (-1);
+    if (cp && !cq) return (+1);
+    return Probe.order(p, q);
+  }
+
+  private push(p: Probe) {
     const probeSize = this.values.getProbeSize(p.marker);
     const s = this.crop(p.zoomed, probeSize);
     p.zoomable = p.zoomed || !leq(probeSize, s);
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
-    const stmt = p.byCallstacks ? p.stmt : undefined;
-    if (stmt !== this.byStacks) {
+    const fct = p.byCallstacks ? p.fct : undefined;
+    if (fct !== this.byFctStacks) {
       this.flush();
-      this.byStacks = stmt;
+      this.byFctStacks = fct;
     }
-    if (!stmt && s.cols + this.rowSize.cols > this.margin)
+    if (!fct && s.cols + this.rowSize.cols > this.margin)
       this.flush();
     this.rowSize = addH(this.rowSize, s);
     this.rowSize.cols += PADDING;
@@ -94,16 +111,18 @@ export class LayoutEngine {
 
   // --- Flush Rows
 
-  flush(): Row[] {
+  private flush(): Row[] {
     const ps = this.buffer;
     const rs = this.rows;
     if (ps.length > 0) {
-      const stmt = this.byStacks;
-      if (stmt) {
+      const fct = this.byFctStacks;
+      const hlines = this.rowSize.rows;
+      if (fct) {
         // --- by callstacks
-        const wcs = this.stacks.getStacks(stmt);
+        const markers = ps.map((p) => p.marker);
+        const wcs = this.stacks.getStacksForFunction(fct, markers);
         rs.push({
-          key: `P${stmt}`,
+          key: `F${fct}`,
           kind: 'probes',
           probes: ps,
           stacks: wcs.length,
@@ -111,13 +130,13 @@ export class LayoutEngine {
         });
         wcs.forEach((cs, k) => {
           rs.push({
-            key: `C${stmt}::${cs}`,
+            key: `C${fct}::${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
             stacks: wcs.length,
             callstack: cs,
-            hlines: this.values.getStackSize(stmt, cs).rows,
+            hlines,
           });
         });
       } else {
@@ -132,7 +151,7 @@ export class LayoutEngine {
           key: `V${n}`,
           kind: 'values',
           probes: ps,
-          hlines: this.rowSize.rows,
+          hlines,
         });
       }
     }

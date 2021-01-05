@@ -112,7 +112,7 @@ export class Probe {
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
-      this.model.forceLayout();
+      this.model.mergeStacks(this.fct);
     }
   }
 
@@ -137,10 +137,6 @@ export class Probe {
     const rq = q.rank ?? 0;
     if (rp < rq) return (-1);
     if (rp > rq) return (+1);
-    const cp = p.byCallstacks;
-    const cq = q.byCallstacks;
-    if (!cp && cq) return (-1);
-    if (cp && !cq) return (+1);
     if (p.marker < q.marker) return (-1);
     if (p.marker > q.marker) return (+1);
     return 0;

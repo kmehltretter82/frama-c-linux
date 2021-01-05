@@ -27,6 +27,7 @@ open Cil_types
 module Kmap = Kernel_function.Hashtbl
 module Smap = Cil_datatype.Stmt.Hashtbl
 module CS = Value_types.Callstack
+module CSet = CS.Set
 module CSmap = CS.Hashtbl
 
 module Md = Markdown
@@ -365,11 +366,18 @@ let proxy =
 let () = Request.register ~package
     ~kind:`GET ~name:"getCallstacks"
     ~descr:(Md.plain "Callstacks for markers")
-    ~input:(module Jstmt)
+    ~input:(module Jlist(Jmarker))
     ~output:(module Jlist(Jcallstack))
-    begin fun stmt ->
+    begin fun markers ->
       let module A = (val !proxy) in
-      Ranking.sort (A.callstacks stmt)
+      let cset = List.fold_left
+          (fun cset marker ->
+             match probe marker with
+             | Pexpr(_,stmt) | Plval(_,stmt) ->
+               List.fold_right CSet.add (A.callstacks stmt) cset
+             | Pnone -> cset
+          ) CSet.empty markers in
+      Ranking.sort (CSet.elements cset)
     end
 
 (* -------------------------------------------------------------------------- *)

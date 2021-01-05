@@ -32,6 +32,7 @@ export class Model implements ModelCallbacks {
     this.forceUpdate = this.forceUpdate.bind(this);
     this.forceLayout = this.forceLayout.bind(this);
     this.forceReload = this.forceReload.bind(this);
+    this.mergeStacks = this.mergeStacks.bind(this);
     this.computeLayout = this.computeLayout.bind(this);
     this.setLayout = throttle(this.setLayout.bind(this), 300);
     this.getRowKey = this.getRowKey.bind(this);
@@ -63,8 +64,7 @@ export class Model implements ModelCallbacks {
   }
 
   getStacks(p: Probe | undefined): Values.callstack[] {
-    const stmt = p?.stmt;
-    return stmt ? this.stacks.getStacks(stmt) : [];
+    return p ? this.stacks.getStacksForProbe(p) : [];
   }
 
   // --- Caches
@@ -165,8 +165,7 @@ export class Model implements ModelCallbacks {
       this.values,
       this.stacks,
     );
-    toLayout.sort(Probe.order).forEach(engine.push);
-    this.rows = engine.flush();
+    this.rows = engine.layout(toLayout);
     this.laidout.emit();
     this.lock = false;
   }
@@ -196,6 +195,11 @@ export class Model implements ModelCallbacks {
   // --- Foce Update
   forceUpdate() { this.changed.emit(); }
 
+  // --- Force Stacks Reload
+  mergeStacks(fct: string) {
+    this.stacks.mergeStacksForFunction(fct);
+    this.forceLayout();
+  }
 }
 
 // --------------------------------------------------------------------------
