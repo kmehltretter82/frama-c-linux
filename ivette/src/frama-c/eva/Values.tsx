@@ -265,11 +265,15 @@ function TableCell(props: TableCellProps) {
         const diffA = diffThen(domain, condition, s);
         const diffB = diffElse(domain, condition, s);
         const { cols, rows } = sizeof(text);
+        let status = 'none';
+        if (alarms.length > 0) {
+          if (alarms.find(([st, _]) => st === 'False')) status = 'False';
+          else status = 'Unknown';
+        }
+        const alarmClass = `eva-cell-alarms eva-alarm-${status}`;
         contents = (
           <>
-            {alarms.length > 0 && (
-              <Icon className="eva-cell-alarms" size={10} id="WARNING" />
-            )}
+            <Icon className={alarmClass} size={10} id="WARNING" />
             <SizedArea cols={cols} rows={rows}>
               <span className={`eva-state-${s}`}>
                 <Diff text={text} diff={diff} diffA={diffA} diffB={diffB} />

@@ -162,6 +162,7 @@
     margin: 1px;
 }
 
+.eva-alarm-none { display: none; }
 .eva-alarm-True { fill: green; }
 .eva-alarm-False { fill: red; }
 .eva-alarm-Unknown { fill: darkorange; }
