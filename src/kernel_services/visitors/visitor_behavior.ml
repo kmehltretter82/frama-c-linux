@@ -531,14 +531,14 @@ let copy_visit_gen fresh prj =
     Cil_datatype.Compinfo.Hashtbl.remove compinfos c;
     List.iter
       (fun f -> Cil_datatype.Fieldinfo.Hashtbl.remove fieldinfos f)
-      (Extlib.opt_conv [] c.cfields)
+      (Option.value ~default:[] c.cfields)
   in
   let temp_unset_orig_compinfo new_c =
     Cil_datatype.Compinfo.Hashtbl.remove orig_compinfos new_c;
     List.iter
       (fun new_f ->
          Cil_datatype.Fieldinfo.Hashtbl.remove orig_fieldinfos new_f)
-      (Extlib.opt_conv [] new_c.cfields)
+      (Option.value ~default:[] new_c.cfields)
   in
   let temp_memo_compinfo c =
     try Cil_datatype.Compinfo.Hashtbl.find compinfos c

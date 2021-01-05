@@ -899,7 +899,7 @@ module Base_checker = struct
           ~dkey:Kernel.dkey_check "Adding fields for type %s(%d)" c.cname c.ckey;
         List.iter
           (fun x -> Fieldinfo.Hashtbl.add known_fields x x)
-          (Extlib.opt_conv [] c.cfields);
+          (Option.value ~default:[] c.cfields);
         Cil.DoChildren
 
       method! vfieldinfo f =

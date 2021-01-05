@@ -35,7 +35,7 @@ let add_my_exn my_exn f =
   let init =
     CompoundInit(
         exn_type,
-        [Field(List.hd (Extlib.the my_exn.cfields), NoOffset), SingleInit (Cil.zero ~loc)])
+        [Field(List.hd (Option.get my_exn.cfields), NoOffset), SingleInit (Cil.zero ~loc)])
   in
   add_throw_test f exn_type c init
 
@@ -61,8 +61,8 @@ let add_int_ptr_exn glob f =
 let add_catch my_exn my_exn2 f =
   let exn_type = TComp(my_exn, { scache = Not_Computed }, []) in
   let exn_type2 = TComp(my_exn2, {scache = Not_Computed }, []) in
-  let exn_field = Field (List.hd (Extlib.the my_exn.cfields), NoOffset) in
-  let exn2_field = Field (List.hd (Extlib.the my_exn2.cfields), NoOffset) in
+  let exn_field = Field (List.hd (Option.get my_exn.cfields), NoOffset) in
+  let exn2_field = Field (List.hd (Option.get my_exn2.cfields), NoOffset) in
   let loc = Cil_datatype.Location.unknown in
   let real_locals = f.sbody.blocals in
   let v1 = Cil.makeLocalVar f "exn" exn_type in

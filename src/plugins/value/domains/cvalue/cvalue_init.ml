@@ -313,7 +313,8 @@ let initialize_var_using_type varinfo state =
       in
       begin
         try
-          List.fold_left treat_field state (Extlib.opt_conv [] compinfo.cfields)
+          List.fold_left treat_field state
+            (Option.value ~default:[] compinfo.cfields)
         with Cil.SizeOfError (s, t) ->
           warn_unknown_size varinfo (s, t);
           bind_entire_loc Cvalue.V.top_int;

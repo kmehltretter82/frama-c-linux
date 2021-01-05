@@ -270,7 +270,7 @@ let parse_varinfo env ~loc x =
     error env ~loc "Unknown variable (or region) '%s'" x
 
 let parse_fieldinfo env ~loc comp f =
-  try List.find (fun fd -> fd.fname = f) (Extlib.opt_conv [] comp.cfields)
+  try List.find (fun fd -> fd.fname = f) (Option.value ~default:[] comp.cfields)
   with Not_found ->
     error env ~loc "No field '%s' in compound type '%s'" f comp.cname
 
@@ -382,17 +382,26 @@ let rec parse_lpath env e =
       let comp =
         if Compinfo.equal fa.fcomp fb.fcomp then fa.fcomp
         else error env ~loc "Range of fields from incompatible types" in
-      let fields = field_range ~inside:false fa fb (Extlib.opt_conv [] comp.cfields) in
+      let fields =
+        field_range ~inside:false fa fb
+          (Option.value ~default:[] comp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( Some a , None ) ->
       let p,fd = parse_fpath env a in
-      let fields = field_range ~inside:false fd fd (Extlib.opt_conv [] fd.fcomp.cfields) in
+      let fields =
+        field_range ~inside:false fd fd
+          (Option.value ~default:[] fd.fcomp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | PLrange( None , Some a ) ->
       let p,fd = parse_fpath env a in
-      let fields = field_range ~inside:true fd fd (Extlib.opt_conv [] fd.fcomp.cfields) in
+      let fields =
+        field_range ~inside:true fd fd
+          (Option.value ~default:[] fd.fcomp.cfields)
+      in
       let ltype = typeof_fields fields in
       { loc ; lnode = L_field(p,fields) ; ltype }
   | _ ->

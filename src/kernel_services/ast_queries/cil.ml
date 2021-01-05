@@ -450,7 +450,7 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
     | TComp (comp, _, a') -> f a';
       List.iter
         (fun fi -> f fi.fattr; visit fi.ftype)
-        (Extlib.opt_conv [] comp.cfields)
+        (Option.value ~default:[] comp.cfields)
     | TVoid a'
     | TInt (_, a')
     | TFloat (_, a')
@@ -2848,7 +2848,7 @@ let visitCilFieldInfo vis f =
   doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
-  comp.cfields <- Extlib.opt_map (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
+  comp.cfields <- Option.map (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
   comp.cattr <- visitCilAttributes vis comp.cattr;
   comp
 
@@ -4032,7 +4032,7 @@ let rec bytesAlignOf t =
         | f :: rest -> f :: dropZeros (f.fbitfield <> None) rest
         | [] -> []
       in
-      let fields = dropZeros false (Extlib.opt_conv [] c.cfields) in
+      let fields = dropZeros false (Option.value ~default:[] c.cfields) in
       List.fold_left
         (fun sofar f ->
            (* Bitfields with zero width do not contribute to the alignment in
@@ -4355,7 +4355,7 @@ and bitsSizeOf t =
          let lastoff =
            fold_struct_fields
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
-             startAcc (Extlib.the comp.cfields) (* Note: we treat None above *)
+             startAcc (Option.get comp.cfields) (* Note: we treat None above *)
          in
          if msvcMode () && lastoff.oaFirstFree = 0
          then
@@ -4377,13 +4377,13 @@ and bitsSizeOf t =
              oaPrevBitPack = None;
            } in
          let fold acc fi =
-          let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
-          if lastoff.oaFirstFree > acc
-          then lastoff.oaFirstFree
-          else acc
+           let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
+           if lastoff.oaFirstFree > acc
+           then lastoff.oaFirstFree
+           else acc
          in
-          (* Note: we treat None above *)
-         let max = List.fold_left fold 0 (Extlib.the comp.cfields) in
+         (* Note: we treat None above *)
+         let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
          addTrailing max (8 * bytesAlignOf t))
 
@@ -4453,7 +4453,7 @@ and fieldBitsOffset (f : fieldinfo) : int * int =
             oaLastFieldStart = 0;
             oaLastFieldWidth = 0;
             oaPrevBitPack    = None }
-          (Extlib.opt_conv [] f.fcomp.cfields)
+          (Option.value ~default:[] f.fcomp.cfields)
       );
     end;
     Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
@@ -5751,7 +5751,9 @@ let isIntegerConstant e =
     e
 
 let getCompField cinfo fieldName =
-  List.find (fun fi -> fi.fname = fieldName) (Extlib.opt_conv [] cinfo.cfields)
+  List.find
+    (fun fi -> fi.fname = fieldName)
+    (Option.value ~default:[] cinfo.cfields)
 
 let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   let loc = e.eloc in
@@ -5925,7 +5927,7 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
       false
     else begin
       Hashtbl.add memo c.ckey ();
-      List.exists (fun f -> loop f.ftype) (Extlib.opt_conv [] c.cfields)
+      List.exists (fun f -> loop f.ftype) (Option.value ~default:[] c.cfields)
     end
   in
   loop t
@@ -5977,7 +5979,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
              (Field(f, NoOffset), makeZeroInit ~loc f.ftype) :: acc
            else
              acc)
-        (Extlib.opt_conv [] comp.cfields) []
+        (Option.value ~default:[] comp.cfields) []
     in
     CompoundInit (t', inits)
   | TComp (comp, _, _) when not comp.cstruct ->

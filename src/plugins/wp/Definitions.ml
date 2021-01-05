@@ -341,7 +341,7 @@ class virtual visitor main =
                      let t = Lang.tau_of_ctype f.ftype in
                      self#vtau t ; Cfield (f, KValue) , t
                   )
-                  (Extlib.opt_conv [] r.cfields)
+                  (Option.value ~default:[] r.cfields)
               in self#on_comp r fts ;
             end
         end
@@ -358,7 +358,7 @@ class virtual visitor main =
                      let t = Lang.init_of_ctype f.ftype in
                      self#vtau t ; Cfield (f, KInit) , t
                   )
-                  (Extlib.opt_conv [] r.cfields)
+                  (Option.value ~default:[] r.cfields)
               in self#on_icomp r fts ;
             end
         end

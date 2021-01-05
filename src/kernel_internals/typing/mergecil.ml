@@ -1200,8 +1200,8 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     let ci = cinode.ndata in
     let fidx = cinode.nfidx in
 
-    let old_len = List.length (Extlib.opt_conv [] oldci.cfields) in
-    let len = List.length (Extlib.opt_conv [] ci.cfields) in
+    let old_len = List.length (Option.value ~default:[] oldci.cfields) in
+    let len = List.length (Option.value ~default:[] ci.cfields) in
     (* It is easy to catch here the case when the new structure is undefined
      * and the old one was defined. We just reuse the old *)
     (* More complicated is the case when the old one is not defined but the
@@ -2166,29 +2166,29 @@ class renameVisitorClass =
 
     method private update_field f =
       (* See if the compinfo was changed *)
-        if f.fcomp.creferenced then None
-        else begin
-          match
-            PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
-          with
-            None -> None (* We did not replace it *)
-          | Some (ci', _oldfidx) -> begin
-              (* First, find out the index of the original field *)
-              let rec indexOf (i: int) = function
-                | [] -> Kernel.fatal "Cannot find field %s in %s"
-                          f.fname (compFullName f.fcomp)
-                | f' :: _ when f' == f -> i
-                | _ :: rest -> indexOf (i + 1) rest
-              in
-              let index = indexOf 0 (Extlib.opt_conv [] f.fcomp.cfields) in
-              let ci'_fields = Extlib.opt_conv [] ci'.cfields in
-              if List.length ci'_fields <= index then
-                Kernel.fatal "Too few fields in replacement %s for %s"
-                  (compFullName ci')
-                  (compFullName f.fcomp);
-              Some (List.nth ci'_fields index)
-            end
-        end
+      if f.fcomp.creferenced then None
+      else begin
+        match
+          PlainMerging.findReplacement true sEq !currentFidx f.fcomp.cname
+        with
+          None -> None (* We did not replace it *)
+        | Some (ci', _oldfidx) -> begin
+            (* First, find out the index of the original field *)
+            let rec indexOf (i: int) = function
+              | [] -> Kernel.fatal "Cannot find field %s in %s"
+                        f.fname (compFullName f.fcomp)
+              | f' :: _ when f' == f -> i
+              | _ :: rest -> indexOf (i + 1) rest
+            in
+            let idx = indexOf 0 (Option.value ~default:[] f.fcomp.cfields) in
+            let ci'_fields = Option.value ~default:[] ci'.cfields in
+            if List.length ci'_fields <= idx then
+              Kernel.fatal "Too few fields in replacement %s for %s"
+                (compFullName ci')
+                (compFullName f.fcomp);
+            Some (List.nth ci'_fields idx)
+          end
+      end
 
     (* The Field offset might need to be changed to use new compinfo *)
     method! voffs = function

@@ -117,7 +117,7 @@ let mkCompInfo
     }
   in
   let flds =
-    Extlib.opt_map (List.mapi (fun forder (fn, ft, fb, fa, fl) ->
+    Option.map (List.mapi (fun forder (fn, ft, fb, fa, fl) ->
         { fcomp = comp;
           forder;
           ftype = ft;
@@ -140,7 +140,7 @@ let copyCompInfo ?(fresh=true) ci cname =
   let ci' = { ci with cname; ckey } in
   (* Copy the fields and set the new pointers to parents *)
   ci'.cfields <-
-    Extlib.opt_map (List.map (fun f -> {f with fcomp = ci'})) ci'.cfields;
+    Option.map (List.map (fun f -> {f with fcomp = ci'})) ci'.cfields;
   ci'
 
 

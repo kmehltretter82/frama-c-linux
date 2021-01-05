@@ -70,7 +70,7 @@ class collect_visitor = object (self)
           Hashtbl.add used_compinfo ci.cname ();
           List.iter
             (fun f -> ignore (visitCilType (self:>Cil.cilVisitor) f.ftype))
-            (Extlib.opt_conv [] ci.cfields);
+            (Option.value ~default:[] ci.cfields);
           DoChildren
         end
     | _ -> DoChildren

@@ -280,7 +280,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                else
                  acc)
             []
-            (Extlib.opt_conv [] compinfo.cfields)
+            (Option.value ~default:[] compinfo.cfields)
           in
           (** find non covered intervals in structs *)
           let non_covered,succ_last =
@@ -303,7 +303,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                      (s,succ_stop_o)
                 )
                 (full_fields_to_print,start)
-                (Extlib.opt_conv [] compinfo.cfields)
+                (Option.value ~default:[] compinfo.cfields)
             else full_fields_to_print, Integer.zero
           in
           let overflowing =
@@ -577,7 +577,7 @@ let rec find_offset typ ~offset om =
                other fields are too far and we abort. *)
             find_field q
       in
-      find_field (Extlib.opt_conv [] ci.cfields)
+      find_field (Option.value ~default:[] ci.cfields)
 
     | _ -> raise NoMatchingOffset
 
