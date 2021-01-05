@@ -56,7 +56,7 @@ interface StmtProps {
 function Stmt(props: StmtProps) {
   const { rank, stmt } = props;
   if (rank === undefined || !stmt) return null;
-  const title = `Stmt id ${stmt} at rank ${rank}`;
+  const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
   return (
     <span className="dome-text-code eva-stmt" title={title}>
       @S{rank}
@@ -97,24 +97,24 @@ function ProbeInfos() {
       </div>
       <Code>{fct}<Stmt stmt={stmt} rank={rank} /></Code>
       <IconButton
+        icon="ITEMS.LIST"
         className="eva-probeinfo-button"
         display={stackable}
         selected={byCS}
-        icon="ITEMS.LIST"
         title={`Details by callstack (${stacks})`}
         onClick={() => { if (probe) probe.setByCallstacks(!byCS); }}
       />
       <IconButton
+        icon="SEARCH"
         className="eva-probeinfo-button"
         display={zoomable}
         selected={zoomed}
-        icon="SEARCH"
         onClick={() => { if (probe) probe.setZoomed(!zoomed); }}
       />
       <IconButton
+        icon="PIN"
         className="eva-probeinfo-button"
-        kind={transient ? 'selected' : 'warning'}
-        icon={transient ? 'CIRC.CHECK' : 'CIRC.CLOSE'}
+        kind={transient ? 'default' : 'selected'}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
         onClick={() => { if (probe) probe.setTransient(!transient); }}
       />
