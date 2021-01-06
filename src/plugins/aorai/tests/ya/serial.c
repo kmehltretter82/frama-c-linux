@@ -3,8 +3,6 @@
 */
 
 #include "__fc_builtin.h"
-#include "aorai/aorai.h"
-
 
 /*@ assigns \result \from \nothing;
     ensures 0 <= \result < 0x100; */
