@@ -207,11 +207,16 @@ function AlarmsInfo() {
 function StackInfo() {
   const model = useModel();
   const [, setSelection] = States.useSelection();
+  const focused = model.getFocused()?.marker;
   const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
   const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
     if (!caller || !stmt) return null;
     const key = `${caller}@${stmt}`;
+    const className = classes(
+      'eva-callsite',
+      focused === stmt && 'eva-focused',
+    );
     const onClick = () => {
       const location = { function: caller, marker: stmt };
       setSelection({ location });
@@ -220,7 +225,7 @@ function StackInfo() {
       <Code
         key={key}
         icon="TRIANGLE.LEFT"
-        className="eva-callsite"
+        className={className}
         onClick={onClick}
       >
         {caller}

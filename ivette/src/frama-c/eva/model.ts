@@ -143,17 +143,9 @@ export class Model implements ModelCallbacks {
     const s = this.selected;
     if (!s) {
       this.focused = undefined;
-      this.callstack = undefined;
       this.remanent = undefined;
     } else if (!s.loading) {
       this.focused = s;
-      const stacks = this.getStacks(s);
-      if (s.byCallstacks) {
-        const cs0 = this.callstack;
-        if (cs0) this.callstack = stacks.find((cs) => cs === cs0);
-      } else {
-        this.callstack = stacks.length === 1 ? stacks[0] : undefined;
-      }
       if (s.code && s.transient) {
         this.remanent = s;
       } else {
