@@ -1,8 +1,8 @@
 [kernel] Parsing tests/value/empty_struct.c (with preprocessing)
 [kernel] tests/value/empty_struct.c:13: User Error: 
-  Empty struct is allowed only in GCC or MSVC mode
+  empty structs only allowed for GCC/MSVC
 [kernel] tests/value/empty_struct.c:67: User Error: 
-  Empty struct is allowed only in GCC or MSVC mode
+  empty structs only allowed for GCC/MSVC
 [kernel] User Error: stopping on file "tests/value/empty_struct.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

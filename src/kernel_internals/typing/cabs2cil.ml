@@ -5550,7 +5550,7 @@ and makeCompType ghost (isstruct: bool)
   in
   if flds = [] && not (Cil.acceptEmptyCompinfo ()) then
     Kernel.error ~current:true ~once:true
-      "Empty %s is allowed only in GCC or MSVC mode"
+      "empty %ss only allowed for GCC/MSVC"
       (if comp.cstruct then "struct" else "union");
   List.iter check flds;
   if comp.cfields <> None then begin
