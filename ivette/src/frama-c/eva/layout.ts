@@ -80,18 +80,18 @@ export class LayoutEngine {
   }
 
   private static order(p: Probe, q: Probe): number {
+    const fp = p.fct;
+    const fq = q.fct;
+    if (fp === fq) {
+      const cp = p.byCallstacks;
+      const cq = q.byCallstacks;
+      if (!cp && cq) return (-1);
+      if (cp && !cq) return (+1);
+    }
     const rp = p.rank ?? 0;
     const rq = q.rank ?? 0;
     if (rp < rq) return (-1);
     if (rp > rq) return (+1);
-    const fp = p.fct;
-    const fq = q.fct;
-    if (fp < fq) return -1;
-    if (fp > fq) return +1;
-    const cp = p.byCallstacks;
-    const cq = q.byCallstacks;
-    if (!cp && cq) return (-1);
-    if (cp && !cq) return (+1);
     if (p.marker < q.marker) return (-1);
     if (p.marker > q.marker) return (+1);
     return 0;
@@ -130,14 +130,14 @@ export class LayoutEngine {
         const summary = this.stacks.getSummary(fct);
         const callstacks = stacks.length;
         rs.push({
-          key: `F${fct}`,
+          key: `F:${fct}`,
           kind: 'probes',
           probes: ps,
           stackCount: callstacks,
           hlines: 1,
         });
         if (summary) rs.push({
-          key: `M${fct}`,
+          key: `M:${fct}`,
           kind: 'values',
           probes: ps,
           stackIndex: -1,
@@ -146,7 +146,7 @@ export class LayoutEngine {
         });
         stacks.forEach((cs, k) => {
           rs.push({
-            key: `C${fct}::${cs}`,
+            key: `C:${fct}:${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
@@ -156,7 +156,7 @@ export class LayoutEngine {
           });
         });
       } else {
-        // --- by callstacks
+        // --- not by callstacks
         const n = rs.length;
         rs.push({
           key: `P${n}`,

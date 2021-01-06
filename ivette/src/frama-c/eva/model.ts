@@ -38,6 +38,7 @@ export class Model implements ModelCallbacks {
     this.getRowCount = this.getRowCount.bind(this);
     this.getRowLines = this.getRowLines.bind(this);
     Server.onSignal(Values.changed, this.forceReload);
+    Server.onShutdown(this.forceReload);
   }
 
   // --- Probes
@@ -52,7 +53,6 @@ export class Model implements ModelCallbacks {
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
-  isRemanent(p: Probe | undefined) { return this.remanent === p; }
 
   getProbe(fct: string, m: Ast.marker): Probe {
     let p = this.probes.get(m);
