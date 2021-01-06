@@ -385,6 +385,38 @@ function TableCell(props: TableCellProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Table Row Header
+// --------------------------------------------------------------------------
+
+interface TableHeadProps {
+  stackIndex: number | undefined;
+  stackCount: number | undefined;
+  onClick: () => void;
+}
+
+function TableHead(props: TableHeadProps) {
+  const sk = props.stackIndex;
+  const sc = props.stackCount;
+  const hdClass = classes('eva-head', sc ? undefined : 'dome-hidden');
+  const hdHeader = sk === undefined;
+  const hdSummary = sk !== undefined && sk < 0;
+  const hdNumber = sk === undefined ? 0 : 1 + sk;
+  const hdTitle =
+    hdHeader ? 'Callstack / Summary' :
+      hdSummary ? 'Summary' : 'Callstack details';
+  return (
+    <div
+      className={hdClass}
+      title={hdTitle}
+      onClick={props.onClick}
+    >
+      <div className="eva-phantom">{'\u2211'}{sc ?? '#'}</div>
+      {hdHeader ? '#' : hdSummary ? '\u2211' : `${hdNumber}`}
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Table Row
 // --------------------------------------------------------------------------
 
@@ -399,46 +431,30 @@ function TableRow(props: TableRowProps) {
   if (!row) return null;
   const { kind, probes } = row;
   const sk = row.stackIndex;
+  const sc = row.stackCount;
   const rowKind = `eva-${kind}`;
-  const rowHeader = sk === undefined;
-  const rowSummary = sk !== undefined && sk < 0;
   const rowParity = sk !== undefined && sk % 2 === 1;
-  const rowNumber = sk === undefined ? 0 : 1 + sk;
-  const rowStyle =
+  const rowIndexKind =
     model.isSelectedRow(row) ? 'eva-row-selected' :
       rowParity ? 'eva-row-odd' : 'eva-row-even';
-  const rowTitle =
-    rowHeader ? 'Callstack / Summary' :
-      rowSummary ? 'Summary' : 'Callstack details';
-  const className = classes(
-    rowKind,
-    rowStyle,
-  );
-  const onHeaderClick = () => {
-    model.setSelectedRow(row);
-  };
-  const header = row.stacks && (
-    <div
-      className="eva-cell eva-stack"
-      title={rowTitle}
-      onClick={onHeaderClick}
-    >
-      {rowHeader ? '#' : rowSummary ? '\u2211' : `${rowNumber}`}
-    </div>
-  );
-  const style: React.CSSProperties = { left: row.stacks ? 0 : 12 };
-  const contents = probes.map((probe) => (
+  const rowClass = classes('eva-row', rowKind, rowIndexKind);
+  const onHeaderClick = () => model.setSelectedRow(row);
+  const makeCell = (probe: Probe) => (
     <TableCell
       key={probe.marker}
       probe={probe}
       row={row}
     />
-  ));
+  );
   return (
-    <Hpack className={className} style={props.style}>
-      <div style={style} className="eva-row">
-        {header}
-        {contents}
+    <Hpack style={props.style}>
+      <div className={rowClass}>
+        <TableHead
+          stackIndex={sk}
+          stackCount={sc}
+          onClick={onHeaderClick}
+        />
+        {probes.map(makeCell)}
       </div>
       <Filler />
     </Hpack>

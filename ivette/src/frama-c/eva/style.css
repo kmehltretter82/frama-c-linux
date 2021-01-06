@@ -1,18 +1,3 @@
-/* -------------------------------------------------------------------------- */
-/* --- Styling Values                                                     --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-sized-area {
-    padding: 3px;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.eva-stmt {
-    cursor: default;
-    color: grey;
-}
 
 /* -------------------------------------------------------------------------- */
 /* --- Probe Panel                                                        --- */
@@ -93,62 +78,6 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Table Rows                                                         --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-row {
-    display: flex;
-    position: relative;
-    flex: 0 1 auto;
-    height: 100%;
-    border-bottom: thin solid black;
-    border-left: thin solid black;
-}
-
-.eva-probes .eva-row {
-    border-top: thin solid black;
-}
-
-/* -------------------------------------------------------------------------- */
-/* --- Table Cells                                                        --- */
-/* -------------------------------------------------------------------------- */
-
-.eva-stack {
-    width: 12px;
-    padding-top: 1px;
-    color: #777;
-    text-align: center;
-}
-
-.eva-cell {
-    flex: 1 1 auto;
-    border-right: thin solid black;
-}
-
-.eva-cell:nth-child(last) {
-    border-right: none;
-}
-
-.eva-probes .eva-cell {
-    padding: 2px;
-    text-align: center;
-}
-
-.eva-diff-shadow {
-    border: solid red thin;
-    position: relative;
-    z-index: -1;
-}
-
-.eva-diff-added { }
-.eva-diff-removed { text-decoration: strike }
-
-.eva-state-Here .eva-diff { background: #95f5ff; }
-.eva-state-After .eva-diff { background: #fff819; }
-.eva-state-Then .eva-diff { background: #c8e06e; }
-.eva-state-Else .eva-diff { background: #ff834e; }
-
-/* -------------------------------------------------------------------------- */
 /* --- Alarms                                                             --- */
 /* -------------------------------------------------------------------------- */
 
@@ -172,39 +101,99 @@
 .eva-alarm-Unknown { fill: darkorange; }
 
 /* -------------------------------------------------------------------------- */
+/* --- Styling Values                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-stmt {
+    cursor: default;
+    color: grey;
+}
+
+.eva-sized-area {
+    padding: 3px;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Rows                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-row {
+    display: flex;
+    position: relative;
+    flex: 0 1 auto;
+    height: 100%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Heads                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-head {
+    padding-top: 2px;
+    color: #777;
+    text-align: center;
+    border-left: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.eva-probes .eva-head {
+    border-top: thin solid black;
+}
+
+.eva-phantom {
+    visibility: hidden;
+    height: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Cells                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-cell {
+    flex: 1 1 auto;
+    border-right: thin solid black;
+    border-bottom: thin solid black;
+}
+
+.eva-cell:nth-child(2) {
+    border-left: thin solid black;
+}
+
+.eva-probes .eva-cell {
+    padding: 2px;
+    text-align: center;
+    border-top: thin solid black;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Cell Diffs                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-diff-shadow {
+    border: solid transparent 2px;
+    position: relative;
+    z-index: -1;
+}
+
+.eva-diff-added { }
+.eva-diff-removed { text-decoration: strike }
+
+.eva-state-Here .eva-diff { background: #95f5ff; }
+.eva-state-After .eva-diff { background: #fff819; }
+.eva-state-Then .eva-diff { background: #c8e06e; }
+.eva-state-Else .eva-diff { background: #ff834e; }
+
+/* -------------------------------------------------------------------------- */
 /* --- Table Rows Background                                              --- */
 /* -------------------------------------------------------------------------- */
 
-.eva-probes .eva-row {
+/* --- Probes --- */
+
+.eva-probes .eva-cell {
     background: #cbe4cb;
-}
-
-.eva-values .eva-row {
-    background: #eee;
-}
-
-.eva-callstack.eva-row-odd .eva-row {
-    background: #eee;
-}
-
-.eva-callstack.eva-row-even .eva-row {
-    background: #e2e8e8;
-}
-
-.eva-callstack.eva-row-odd .eva-row .eva-transient {
-    background: #fff0d5;
-}
-
-.eva-callstack.eva-row-even .eva-row .eva-transient {
-    background: #fff0d5;
-}
-
-.eva-callstack.eva-row-selected .eva-row .eva-transient {
-    background: lightblue;
-}
-
-.eva-callstack.eva-row-selected .eva-row {
-    background: lightblue;
 }
 
 .eva-probes .eva-focused {
@@ -219,11 +208,22 @@
     background: orange;
 }
 
-.eva-stack {
+
+/* --- Values / Callstacks --- */
+
+.eva-values .eva-cell {
     background: #eee;
 }
 
-.eva-callstack.eva-row-selected .eva-stack {
+.eva-callstack.eva-row-odd .eva-cell {
+    background: #eee;
+}
+
+.eva-callstack.eva-row-even .eva-cell {
+    background: #e2e8e8;
+}
+
+.eva-callstack.eva-row-selected {
     background: lightblue;
 }
 

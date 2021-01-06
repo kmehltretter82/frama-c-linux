@@ -19,8 +19,8 @@ export interface Row {
   kind: RowKind;
   probes: Probe[];
   headstack?: string;
-  stacks?: number;
   stackIndex?: number;
+  stackCount?: number;
   callstack?: callstack;
   hlines: number;
 }
@@ -133,7 +133,7 @@ export class LayoutEngine {
           key: `F${fct}`,
           kind: 'probes',
           probes: ps,
-          stacks: callstacks,
+          stackCount: callstacks,
           hlines: 1,
         });
         if (summary) rs.push({
@@ -141,7 +141,7 @@ export class LayoutEngine {
           kind: 'values',
           probes: ps,
           stackIndex: -1,
-          stacks: stacks.length,
+          stackCount: stacks.length,
           hlines: 1,
         });
         stacks.forEach((cs, k) => {
@@ -150,7 +150,7 @@ export class LayoutEngine {
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
-            stacks: callstacks,
+            stackCount: callstacks,
             callstack: cs,
             hlines,
           });
