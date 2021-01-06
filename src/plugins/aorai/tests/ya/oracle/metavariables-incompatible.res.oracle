@@ -1,4 +1,4 @@
 [kernel] Parsing tests/ya/metavariables-incompatible.i (no preprocessing)
 [aorai] Welcome to the Aorai plugin
-[aorai] User Error: The use of metavariables is incompatible with non-deterministic automata, such as automa using extended transitions.
+[aorai] User Error: The use of metavariables is incompatible with non-deterministic automata, such as automata using extended transitions.
 [kernel] Plug-in aorai aborted: invalid user input.

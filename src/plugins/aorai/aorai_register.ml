@@ -383,16 +383,12 @@ let work () =
       (* Step 8 : clearing tables whose information has been
          invalidated by our transformations.
       *)
+      Ast.mark_as_changed();
       Cfg.clearFileCFG ~clear_id:false file;
       Cfg.computeFileCFG file;
       Ast.clear_last_decl ();
       if Kernel.Check.get() then Filecheck.check_ast "aorai";
-      let prj =
-        File.create_project_from_visitor "aorai"
-          (fun prj -> new Visitor.frama_c_copy prj)
-      in
-      Project.copy ~selection:(Parameter_state.get_selection ()) prj;
-      Project.on prj output ()
+      output ()
     end
 
 let run () =
@@ -409,12 +405,11 @@ let run () =
     (* Step 2 : Work in our own project, initialized by a copy of the main
        one. *)
     let work_prj =
-      File.create_project_from_visitor ~last:false "aorai_tmp"
+      File.create_project_from_visitor "aorai"
         (fun prj -> new Visitor.frama_c_copy prj)
     in
     Project.copy ~selection:(Parameter_state.get_selection ()) work_prj;
-    Project.on work_prj work ();
-    Project.remove ~project:work_prj ()
+    Project.on work_prj work ()
 
 (* Plugin registration *)
 

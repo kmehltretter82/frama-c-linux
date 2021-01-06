@@ -73,6 +73,21 @@ module Aorai_typed_trans =
       let mem_project = Datatype.never_any_project
     end)
 
+module Aorai_automaton =
+  Datatype.Make(
+      struct
+        include Datatype.Serializable_undefined
+        let name = "Aorai_automaton"
+        type t = Promelaast.typed_automaton
+        let structural_descr = Structural_descr.t_abstract
+        let reprs = [ { states = Aorai_state.reprs;
+                        trans = Aorai_typed_trans.reprs;
+                        metavariables = Datatype.String.Map.empty;
+                        observables = Some Datatype.String.Set.empty;
+                      }]
+      end
+    )
+
 module State_var =
   State_builder.Hashtbl
     (Aorai_state.Hashtbl)
@@ -212,7 +227,16 @@ let buch_sync   = "Aorai_Sync"                           (* Deprecated ? *)
 
 (* ************************************************************************* *)
 (* Buchi automata as stored after parsing *)
-let automata = ref None
+module Automaton =
+  State_builder.Ref
+    (Datatype.Option(Aorai_automaton))
+    (struct
+      let name = "Data_for_aorai.Automaton"
+      let dependencies =
+        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
+          Aorai_option.Ya.self ]
+      let default () = None
+    end)
 
 (* Each transition with a parametrized cross condition (call param access or return value access) has its parametrized part stored in this array. *)
 let cond_of_parametrizedTransitions = ref (Array.make (1) [[]])
@@ -222,9 +246,9 @@ let defined_functions = ref []
 (* List of functions without declaration *)
 let ignored_functions = ref []
 
-(** Return the buchi automata as stored after parsing *)
+(** Return the buchi automaton as stored after parsing *)
 let getAutomata () =
-  match !automata with
+  match Automaton.get() with
   | Some auto -> auto
   | None ->
     Aorai_option.fatal "The automaton has not been compiled yet"
@@ -233,11 +257,11 @@ let getGraph () =
   let auto = getAutomata () in
   auto.states, auto.trans
 
-(** Return the number of transitions of the automata *)
+(** Return the number of transitions of the automaton *)
 let getNumberOfTransitions () =
   List.length (getAutomata ()).trans
 
-(** Return the number of states of the automata *)
+(** Return the number of states of the automaton *)
 let getNumberOfStates () =
   List.length (getAutomata ()).states
 
@@ -1547,7 +1571,7 @@ let checkMetavariableCompatibility auto =
   if has_metavariables && (not deterministic || uses_extended_guards) then
     Aorai_option.abort
       "The use of metavariables is incompatible with non-deterministic \
-       automata, such as automa using extended transitions."
+       automata, such as automata using extended transitions."
 
 let check_observables auto =
  match auto.observables with
@@ -1576,8 +1600,8 @@ let check_observables auto =
 let setAutomata auto =
   checkMetavariableCompatibility auto;
   let auto = type_cond_auto auto in
-  automata:=Some auto;
-  check_states "typed automata";
+  Automaton.set (Some auto);
+  check_states "typed automaton";
   check_observables auto;
   if Aorai_option.debug_atleast 1 then
     Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
@@ -1645,18 +1669,42 @@ let is_reject_state state =
 (* ************************************************************************* *)
 (* Table giving the varinfo structure associated to a given variable name *)
 (* In practice it contains all variables (from promela and globals from C file) and only variables *)
-let varinfos = Hashtbl.create 97
-let paraminfos = Hashtbl.create 97
+
+module Aux_varinfos =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Varinfo)
+  (struct
+    let name = "Data_for_aorai.Aux_varinfos"
+    let dependencies =
+      [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
+        Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+    let size = 13
+  end)
+
+let () = Ast.add_linked_state Aux_varinfos.self
+
+module StringPair =
+  Datatype.Pair_with_collections
+    (Datatype.String)(Datatype.String)
+    (struct let module_name = "Data_for_aorai.StringPair" end)
+
+module Paraminfos =
+  State_builder.Hashtbl(StringPair.Hashtbl)(Cil_datatype.Varinfo)
+  (struct
+    let name = "Data_for_aorai.Paraminfos"
+    let dependencies =
+      [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
+        Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+    let size = 13
+  end)
 
 (* Add a new variable into the association table name -> varinfo *)
-let set_varinfo name vi =
-  Hashtbl.add varinfos name vi
+let set_varinfo = Aux_varinfos.add
 
 (* Given a variable name, it returns its associated varinfo.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_varinfo name =
   try
-    Hashtbl.find varinfos name
+    Aux_varinfos.find name
   with Not_found -> raise_error ("Variable not declared ("^name^")")
 
 let get_logic_var name =
@@ -1666,20 +1714,20 @@ let get_logic_var name =
    Hence, if the variable is not found then None is return. *)
 let get_varinfo_option name =
   try
-    Some(Hashtbl.find varinfos name)
+    Some(Aux_varinfos.find name)
   with
     | Not_found -> None
 
 (* Add a new param into the association table (funcname,paramname) -> varinfo *)
 let set_paraminfo funcname paramname vi =
   (* Aorai_option.log "Adding %s(...,%s,...) " funcname paramname; *)
-  Hashtbl.add paraminfos (funcname,paramname)  vi
+  Paraminfos.add (funcname,paramname)  vi
 
 (* Given a function name and a param name, it returns the varinfo associated to the given param.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_paraminfo funcname paramname =
   try
-    Hashtbl.find paraminfos (funcname,paramname)
+    Paraminfos.find (funcname,paramname)
   with Not_found ->
     raise_error
       ("Parameter '"^paramname^"' not declared for function '"^funcname^"'.")
@@ -1687,13 +1735,13 @@ let get_paraminfo funcname paramname =
 (* Add a new param into the association table funcname -> varinfo *)
 let set_returninfo funcname vi =
   (* Aorai_option.log "Adding return %s(...) " funcname ; *)
-  Hashtbl.add paraminfos (funcname,"\\return")  vi
+  Paraminfos.add (funcname,"\\return")  vi
 
 (* Given a function name, it returns the varinfo associated to the given param.
     If the variable is not found then an error message is print and an assert false is raised. *)
 let get_returninfo funcname =
   try
-    Hashtbl.find paraminfos (funcname,"\\return")
+    Paraminfos.find (funcname,"\\return")
   with Not_found ->
     raise_error ("Return varinfo not declared for function '"^funcname^"'.")
 
@@ -2142,8 +2190,8 @@ let removeUnusedTransitionsAndStates () =
         Reject_state.set new_reject
       with Not_found -> Reject_state.clear ());
   (* Step 3 : rewriting stored information *)
-  automata := Some { auto with states =state_list; trans = trans_list };
-  check_states "reduced automata";
+  Automaton.set (Some { auto with states =state_list; trans = trans_list });
+  check_states "reduced automaton";
 
   let rewrite_state state =
     let rewrite_set set =
