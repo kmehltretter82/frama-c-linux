@@ -20,6 +20,10 @@ export interface Callsite {
   rank?: number;
 }
 
+function equalSite(a: Callsite, b: Callsite): boolean {
+  return a.stmt === b.stmt && a.callee === b.callee;
+}
+
 // --------------------------------------------------------------------------
 // --- CallStacks Cache
 // --------------------------------------------------------------------------
@@ -73,6 +77,19 @@ export class StacksCache {
     this.calls.set(cs, []);
     this.requestCalls(cs);
     return [];
+  }
+
+  aligned(a: Values.callstack, b: Values.callstack): boolean {
+    if (a === b) return true;
+    const ca = this.getCalls(a);
+    const cb = this.getCalls(b);
+    let ka = ca.length - 1;
+    let kb = cb.length - 1;
+    while (ka >= 0 && kb >= 0 && equalSite(ca[ka], cb[kb])) {
+      --ka;
+      --kb;
+    }
+    return ka < 0 || kb < 0;
   }
 
   // --------------------------------------------------------------------------

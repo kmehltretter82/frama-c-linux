@@ -436,7 +436,8 @@ function TableRow(props: TableRowProps) {
   const rowParity = sk !== undefined && sk % 2 === 1;
   const rowIndexKind =
     model.isSelectedRow(row) ? 'eva-row-selected' :
-      rowParity ? 'eva-row-odd' : 'eva-row-even';
+      model.isAlignedRow(row) ? 'eva-row-aligned' :
+        rowParity ? 'eva-row-odd' : 'eva-row-even';
   const rowClass = classes('eva-row', rowKind, rowIndexKind);
   const onHeaderClick = () => model.setSelectedRow(row);
   const makeCell = (probe: Probe) => (

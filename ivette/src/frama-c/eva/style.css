@@ -223,8 +223,12 @@
     background: #e2e8e8;
 }
 
-.eva-callstack.eva-row-selected {
+.eva-callstack.eva-row-aligned {
     background: lightblue;
+}
+
+.eva-callstack.eva-row-selected {
+    background: orange;
 }
 
 /* -------------------------------------------------------------------------- */

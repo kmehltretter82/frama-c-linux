@@ -112,7 +112,13 @@ export class Model implements ModelCallbacks {
 
   isSelectedRow(row: Row): boolean {
     const cs = this.callstack;
-    return cs !== undefined ? cs === row.callstack : false;
+    return cs !== undefined && cs === row.callstack;
+  }
+
+  isAlignedRow(row: Row): boolean {
+    const cs = this.callstack;
+    const cr = row.callstack;
+    return cs !== undefined && cr !== undefined && this.stacks.aligned(cs, cr);
   }
 
   getCallstack(): Values.callstack | undefined {
