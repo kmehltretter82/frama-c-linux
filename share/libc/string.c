@@ -272,13 +272,11 @@ char *strstr(const char *haystack, const char *needle)
 }
 
 char __fc_strerror[64];
-#ifdef __FRAMAC__
-static int __fc_strerror_init;
-#endif
 
 char *strerror(int errnum)
 {
 #ifdef __FRAMAC__
+  static int __fc_strerror_init;
   if (!__fc_strerror_init) {
     Frama_C_make_unknown(__fc_strerror, 63);
     __fc_strerror[63] = 0;
@@ -320,13 +318,11 @@ char *strndup(const char *s, size_t n)
 }
 
 char __fc_strsignal[64];
-#ifdef __FRAMAC__
-static int __fc_strsignal_init;
-#endif
 
 char *strsignal(int signum)
 {
 #ifdef __FRAMAC__
+  static int __fc_strsignal_init;
   if (!__fc_strsignal_init) {
     Frama_C_make_unknown(__fc_strsignal, 63);
     __fc_strsignal[63] = 0;
