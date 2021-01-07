@@ -405,7 +405,7 @@ else
   HAS_LANDMARKS="no"
 fi
 
-# Python 3 (for analysis-scripts)
+# Python 3 (for analysis-scripts, and for several tests: compliance, jcdb, ...)
 ########
 
 AC_MSG_CHECKING(for python3)
@@ -429,6 +429,8 @@ else
      ;;
   esac
 fi
+
+plugin_use_external(tests,python3)
 
 ############
 # Platform #
