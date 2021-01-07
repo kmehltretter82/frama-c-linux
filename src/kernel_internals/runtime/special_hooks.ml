@@ -35,15 +35,15 @@ let print_config () =
            FRAMAC_PLUGIN = %S%t@."
           Fc_config.version_and_codename
           Fc_config.datadir Fc_config.libdir Fc_config.plugin_path
-        (fun fmt ->
-          if Fc_config.preprocessor = "" then
-            Format.fprintf fmt "@\nWarning: no default pre-processor"
-          else if not Fc_config.preprocessor_keep_comments then
-            Format.fprintf fmt
-              "@\nWarning: default pre-processor is not able to keep comments \
-               (hence ACSL annotations) in its output")
+          (fun fmt ->
+             if Fc_config.preprocessor = "" then
+               Format.fprintf fmt "@\nWarning: no default pre-processor"
+             else if not Fc_config.preprocessor_keep_comments then
+               Format.fprintf fmt
+                 "@\nWarning: default pre-processor is not able to keep comments \
+                  (hence ACSL annotations) in its output")
         ;
-        );
+      );
     raise Cmdline.Exit
   end
 let () = Cmdline.run_after_early_stage print_config
@@ -54,7 +54,8 @@ let print_config get value () =
     raise Cmdline.Exit
   end
 
-let print_version = print_config Kernel.PrintVersion.get Fc_config.version_and_codename
+let print_version =
+  print_config Kernel.PrintVersion.get Fc_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version
 
 let print_sharepath = print_config Kernel.PrintShare.get Fc_config.datadir
@@ -76,9 +77,9 @@ let () = Cmdline.run_after_early_stage print_pluginpath
 let () =
   Cmdline.run_after_extended_stage
     (fun () ->
-      State_dependency_graph.add_dependencies
-        ~from:Ast.self
-        !Parameter_builder.ast_dependencies)
+       State_dependency_graph.add_dependencies
+         ~from:Ast.self
+         !Parameter_builder.ast_dependencies)
 
 (**************************************************************************)
 (* Hooks run when restoring a saved file *)
