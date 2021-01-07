@@ -89,8 +89,10 @@ let translate_variadics (file : file) =
     method! vglob glob =
       begin match glob with
         | GFunDecl(_, vi, _) when is_framac_builtin vi ->
-          Self.result ~level:2 ~current:true
-            "Variadic builtin %s left untransformed." vi.vname;
+          if Classify.classify env vi <> None then begin
+            Self.result ~level:2 ~current:true
+              "Variadic builtin %s left untransformed." vi.vname;
+          end;
           Cil.SkipChildren
 
         | GFunDecl(_, vi, _) ->

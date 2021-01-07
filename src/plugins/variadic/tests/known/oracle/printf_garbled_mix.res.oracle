@@ -14,8 +14,6 @@
   Declaration of variadic function sscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:541: 
   Declaration of variadic function dprintf.
-[variadic] tests/known/printf_garbled_mix.c:8: 
-  Variadic builtin Frama_C_show_each_nb_printed left untransformed.
 [variadic] tests/known/printf_garbled_mix.c:7: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
