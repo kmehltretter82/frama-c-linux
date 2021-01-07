@@ -54,8 +54,7 @@ let translate_variadics (file : file) =
 
     method! vglob glob =
       begin match glob with
-        | GFunDecl(_, vi, _) | GFun ({svar = vi}, _)
-          when not (is_framac_builtin vi) ->
+        | GFunDecl(_, vi, _) | GFun ({svar = vi}, _) ->
           if not (Table.mem classification vi) then begin
             let vf = Classify.classify env vi in
             Option.iter (Table.add classification vi) vf
@@ -88,16 +87,14 @@ let translate_variadics (file : file) =
     (* Translate types and signatures *)
     method! vglob glob =
       begin match glob with
-        | GFunDecl(_, vi, _) when is_framac_builtin vi ->
-          if Classify.classify env vi <> None then begin
-            Self.result ~level:2 ~current:true
-              "Variadic builtin %s left untransformed." vi.vname;
-          end;
-          Cil.SkipChildren
-
         | GFunDecl(_, vi, _) ->
-          if Table.mem classification vi then
-            Generic.add_vpar vi;
+          (match Table.find_opt classification vi with
+           | None -> ()
+           | Some { vf_class = Builtin } ->
+             Self.result ~level:2 ~current:true
+               "Variadic builtin %s left untransformed." vi.vname;
+           | Some _ ->
+             Generic.add_vpar vi);
           Cil.DoChildren
 
         | GFun ({svar = vi} as fundec, _) ->
