@@ -2,8 +2,8 @@
 [kernel] Parsing tests/wp_acsl/invalid_pointer.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] tests/wp_acsl/invalid_pointer.c:21: Warning: void object
-[wp] 19 goals scheduled
+[wp] tests/wp_acsl/invalid_pointer.c:23: Warning: void object
+[wp] 20 goals scheduled
 [wp] [Qed] Goal typed_memvar_check_M1 : Valid
 [wp] [Qed] Goal typed_memvar_check_P0 : Valid
 [wp] [Qed] Goal typed_memvar_check_P1 : Valid
@@ -12,7 +12,8 @@
 [wp] [Alt-Ergo] Goal typed_pointer_check_P0 : Valid
 [wp] [Alt-Ergo] Goal typed_pointer_check_P1 : Valid
 [wp] [Alt-Ergo] Goal typed_pointer_check_P2 : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_NULL : Valid
+[wp] [Qed] Goal typed_pointer_check_qed_NULL : Valid
+[wp] [Alt-Ergo] Goal typed_pointer_check_prover_NULL : Valid
 [wp] [Alt-Ergo] Goal typed_array_check_ARR : Valid
 [wp] [Qed] Goal typed_compound_check_M1 : Valid
 [wp] [Qed] Goal typed_compound_check_P0 : Valid
@@ -23,13 +24,13 @@
 [wp] [Alt-Ergo] Goal typed_compound_check_F2 : Valid
 [wp] [Alt-Ergo] Goal typed_compound_check_G2 : Valid
 [wp] [Qed] Goal typed_compound_check_AM : Valid
-[wp] Proved goals:   19 / 19
-  Qed:             9 
+[wp] Proved goals:   20 / 20
+  Qed:            10 
   Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   memvar                    4        -        4       100%
-  pointer                   -        5        5       100%
+  pointer                   1        5        6       100%
   array                     -        1        1       100%
   compound                  5        4        9       100%
 ------------------------------------------------------------
