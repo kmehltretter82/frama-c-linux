@@ -612,7 +612,7 @@ module SymbolicPath =
 
 let () =
   SymbolicPath.add_update_hook
-    (fun _ map ->
+    (fun _old map ->
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
        Filepath.reset_symbolic_dirs ();
        Datatype.Filepath.Map.iter
@@ -627,10 +627,10 @@ module SymbolicPathFakeState =
     (struct
       type t = unit
       let create () = ()
-      let clear _ = ()
+      let clear () = ()
       let get () = ()
       let set () = ()
-      let clear_some_projects _ _ = false
+      let clear_some_projects _f () = false
     end)
     (struct
       let name = "SymbolicPathFakeState"
