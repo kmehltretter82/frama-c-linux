@@ -206,7 +206,7 @@ struct
       ~package
       ~name:"markerInfo"
       ~descr:(Md.plain "Marker informations")
-      ~key:snd
+      ~key:snd ~keyType:Jstring
       ~iter model
 
   let create_tag = function

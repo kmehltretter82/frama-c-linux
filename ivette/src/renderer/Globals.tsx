@@ -23,7 +23,7 @@ const makeHint = (fct: functionsData): GlobalHint => ({
   id: fct.key,
   label: fct.name,
   title: fct.signature,
-  value: { function: fct.name },
+  value: { fct: fct.name },
 });
 
 export function useHints(): [GlobalHint[], (pattern: string) => void] {
@@ -101,12 +101,12 @@ export default () => {
 
   function isSelected(fct: functionsData) {
     return multipleSelection?.allSelections.some(
-      (l) => fct.name === l?.function
+      (l) => fct.name === l?.fct
     );
   }
 
   // Currently selected function.
-  const current: undefined | string = selection?.current?.function;
+  const current: undefined | string = selection?.current?.fct;
 
   function showFunction(fct: functionsData) {
     const visible =
@@ -119,7 +119,7 @@ export default () => {
   }
 
   function onSelection(name: string) {
-    updateSelection({ location: { function: name } });
+    updateSelection({ location: { fct: name } });
   }
 
   async function onContextMenu() {

@@ -15,6 +15,7 @@ import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Server from './server';
 
 const PROJECT = new Dome.Event('frama-c.project');
@@ -445,22 +446,15 @@ export function useSyncArray<K, A>(
 // --- Selection
 // --------------------------------------------------------------------------
 
-type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> =
-  Partial<T> & U[keyof U];
-
-export interface FullLocation {
-  /** Function name. */
-  readonly function: string;
-  /** Marker identifier. */
-  readonly marker: string;
-}
-
 /** An AST location.
  *
  *  Properties [[function]] and [[marker]] are optional,
  *  but at least one of the two must be set.
  */
-export type Location = AtLeastOne<FullLocation>;
+export type Location = {
+  fct?: string;
+  marker?: Ast.marker;
+};
 
 export interface HistorySelection {
   /** Previous locations with respect to the [[current]] one. */
@@ -554,7 +548,7 @@ function isNthSelect(a: SelectionActions): a is NthSelect {
 /** Update selection to the given location. */
 function selectLocation(s: Selection, location: Location): Selection {
   const [prevSelections, nextSelections] =
-    s.current && s.current.function !== location.function ?
+    s.current && s.current.fct !== location.fct ?
       [[s.current, ...s.history.prevSelections], []] :
       [s.history.prevSelections, s.history.nextSelections];
   return {

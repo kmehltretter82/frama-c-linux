@@ -35,7 +35,7 @@ tsc: dome-pkg dome-templ
 
 api:
 	@echo "[Ivette] Generating TypeScript API"
-	@find api -name "*.ts" -exec rm -f {} \;
+	@rm -fr api/generated
 	../bin/frama-c.byte -load-module api/server_tsc.ml -server-tsc
 	@find api -name "*.ts" -exec chmod a-w {} \;
 

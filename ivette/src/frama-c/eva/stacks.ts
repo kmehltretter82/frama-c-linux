@@ -16,7 +16,7 @@ export type callstacks = Values.callstack[];
 export interface Callsite {
   callee: string;
   caller?: string;
-  stmt?: string;
+  stmt?: Ast.marker;
   rank?: number;
 }
 

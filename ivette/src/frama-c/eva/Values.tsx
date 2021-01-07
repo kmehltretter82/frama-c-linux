@@ -218,7 +218,7 @@ function StackInfo() {
       focused === stmt && 'eva-focused',
     );
     const onClick = () => {
-      const location = { function: caller, marker: stmt };
+      const location = { fct: caller, marker: stmt };
       setSelection({ location });
     };
     return (
@@ -361,7 +361,7 @@ function TableCell(props: TableCellProps) {
   );
   const onClick = () => {
     if (probe) {
-      const location = { function: probe.fct, marker: probe.marker };
+      const location = { fct: probe.fct, marker: probe.marker };
       setSelection({ location });
       model.setSelectedRow(row);
     }
@@ -497,7 +497,7 @@ function ValuesPanel(props: ValuesPanelProps) {
   const [selection] = States.useSelection();
   React.useEffect(() => {
     const curr = selection?.current;
-    const fct = curr?.function;
+    const fct = curr?.fct;
     const marker = Ast.jMarker(curr?.marker);
     model.setLayout({ zoom, margin, fct, marker });
   });

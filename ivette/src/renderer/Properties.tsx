@@ -235,7 +235,7 @@ const byStatus =
 
 const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
-  function: Compare.defined(Compare.alpha),
+  fct: Compare.defined(Compare.alpha),
   source: bySource,
   kind: Compare.structural,
   alarm: Compare.defined(Compare.alpha),
@@ -270,7 +270,7 @@ class PropertyModel extends Arrays.CompactModel<Json.key<'#status'>, Property> {
   }
 
   filterItem(prop: Property) {
-    const kf = prop.function;
+    const kf = prop.fct;
     const cf = this.filterFun;
     const filteringFun = cf && filter('currentFunction');
     const filterFunction = filteringFun ? kf === cf : true;
@@ -477,15 +477,14 @@ const RenderTable = () => {
     model.reload();
   }, [model, data]);
 
-  const [selection, updateSelection] =
-    States.useSelection();
+  const [selection, updateSelection] = States.useSelection();
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.properties.showFilter');
 
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
-  const selectedFunction = selection?.current?.function;
+  const selectedFunction = selection?.current?.fct;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
   }, [model, selectedFunction]);
@@ -493,8 +492,8 @@ const RenderTable = () => {
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    ({ key: propKey, function: fct }: Property) => {
-      const location = { function: fct, marker: propKey };
+    ({ key: marker, fct }: Property) => {
+      const location = { fct, marker };
       updateSelection({ location });
     }, [updateSelection],
   );

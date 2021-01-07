@@ -281,7 +281,7 @@ let () = States.column model ~name:"status"
     ~data:(module PropStatus)
     ~get:(Property_status.Feedback.get)
 
-let () = States.column model ~name:"function"
+let () = States.column model ~name:"fct"
     ~descr:(Md.plain "Function")
     ~data:(module Joption(Kf)) ~get:Property.get_kf
 
@@ -330,6 +330,7 @@ let array =
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+    ~keyType:Kernel_ast.Marker.jproperty
     ~iter
     ~add_update_hook
     ~add_remove_hook

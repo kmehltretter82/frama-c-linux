@@ -9,11 +9,10 @@ import * as States from 'frama-c/states';
 import * as Utils from 'frama-c/utils';
 
 import * as Dome from 'dome';
-import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component, TitleBar } from 'frama-c/LabViews';
-import * as AST from 'frama-c/api/kernel/ast';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
@@ -38,7 +37,7 @@ async function loadAST(
     buffer.log('// Loading', theFunction, '…');
     (async () => {
       try {
-        const data = await Server.send(AST.printFunction, theFunction);
+        const data = await Server.send(Ast.printFunction, theFunction);
         buffer.clear();
         if (!data) {
           buffer.log('// No code for function', theFunction);
@@ -63,7 +62,7 @@ async function loadAST(
 async function functionCallers(functionName: string) {
   try {
     const data = await Server.send(getCallers, functionName);
-    const locations = data.map(([fct, marker]) => ({ function: fct, marker }));
+    const locations = data.map(([fct, marker]) => ({ fct, marker }));
     return locations;
   } catch (err) {
     D.error(`Fail to retrieve callers of function '${functionName}':`, err);
@@ -79,12 +78,12 @@ type access = 'Reads' | 'Writes';
 
 async function studia(
   marker: string,
-  info: AST.markerInfoData,
+  info: Ast.markerInfoData,
   kind: access,
 ) {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
-  const locations = data.direct.map(([f, m]) => ({ function: f, marker: m }));
+  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
   const lval = info.name;
   if (locations.length > 0) {
     const name = `${kind} of ${lval}`;
@@ -139,7 +138,7 @@ const ASTview = () => {
   const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
   const multipleSelections = selection?.multiple.allSelections;
-  const theFunction = selection?.current?.function;
+  const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
   const { buttons: themeButtons, theme, fontSize, wrapText } =
     Preferences.useThemeButtons({
@@ -150,7 +149,7 @@ const ASTview = () => {
       disabled: !theFunction,
     });
 
-  const markersInfo = States.useSyncArray(AST.markerInfo);
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
   const deadCode = States.useRequest(getDeadCode, theFunction);
   const propertyStatus = States.useSyncArray(Properties.status).getArray();
   const statusDict = States.useTags(Properties.propStatusTags);
@@ -158,7 +157,7 @@ const ASTview = () => {
   const setBullets = React.useCallback(() => {
     if (theFunction) {
       propertyStatus.forEach((prop) => {
-        if (prop.function === theFunction) {
+        if (prop.fct === theFunction) {
           const status = statusDict.get(prop.status);
           if (status) {
             const bullet = makeBullet(status);
@@ -206,26 +205,26 @@ const ASTview = () => {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
-  function onTextSelection(id: string) {
+  function onSelection(markerId: string) {
     if (selection.current) {
-      const location = { ...selection.current, marker: id };
+      const { fct } = selection.current;
+      const location: States.Location = { fct, marker: Ast.jMarker(markerId) };
       updateSelection({ location });
     }
   }
 
-  async function onContextMenu(id: string) {
+  async function onContextMenu(markerId: string) {
     const items = [];
-    const markerId = (id as Json.key<'#markerInfo'>);
     const selectedMarkerInfo = markersInfo.getData(markerId);
     if (selectedMarkerInfo?.var === 'function') {
       if (selectedMarkerInfo.kind === 'declaration') {
         const name = selectedMarkerInfo?.name;
         if (name) {
           const locations = await functionCallers(name);
-          const locationsByFunction = _.groupBy(locations, (e) => e.function);
+          const locationsByFunction = _.groupBy(locations, (e) => e.fct);
           _.forEach(locationsByFunction,
             (e) => {
-              const callerName = e[0].function;
+              const callerName = e[0].fct;
               items.push({
                 label:
                   `Go to caller ${callerName} ` +
@@ -233,7 +232,7 @@ const ASTview = () => {
                 onClick: () => updateSelection({
                   name: `Call sites of function ${name}`,
                   locations,
-                  index: locations.findIndex((l) => l.function === callerName),
+                  index: locations.findIndex((l) => l.fct === callerName),
                 }),
               });
             });
@@ -242,7 +241,7 @@ const ASTview = () => {
         items.push({
           label: `Go to definition of ${selectedMarkerInfo.name}`,
           onClick: () => {
-            const location = { function: selectedMarkerInfo.name };
+            const location = { fct: selectedMarkerInfo.name };
             updateSelection({ location });
           },
         });
@@ -252,7 +251,11 @@ const ASTview = () => {
       || selectedMarkerInfo?.var === 'variable';
     function onClick(kind: access) {
       if (selectedMarkerInfo)
-        studia(markerId, selectedMarkerInfo, kind).then(updateSelection);
+        studia(
+          markerId,
+          selectedMarkerInfo,
+          kind,
+        ).then(updateSelection);
     }
     items.push({
       label: 'Studia: select writes',
@@ -281,7 +284,7 @@ const ASTview = () => {
         fontSize={fontSize}
         lineWrapping={wrapText}
         selection={theMarker}
-        onSelection={onTextSelection}
+        onSelection={onSelection}
         onContextMenu={onContextMenu}
         gutters={['bullet']}
         readOnly
