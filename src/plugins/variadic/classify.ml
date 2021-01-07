@@ -148,7 +148,7 @@ let classify_std env vi = match vi.vname with
 
   (* stropts.h *)
   | "ioctl"   -> mk_overload env ["__va_ioctl_void" ; "__va_ioctl_int" ; "__va_ioctl_ptr"]
-
+  | n when Cil_builtins.Builtin_functions.mem n -> Builtin
   (* Anything else *)
   | _ -> Unknown
 

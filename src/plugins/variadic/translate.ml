@@ -35,6 +35,7 @@ let va_builtins = [
 
 let is_framac_builtin vi =
   Ast_info.is_frama_c_builtin vi.vname ||
+  Cil_builtins.Builtin_functions.mem vi.vname ||
   Extlib.string_prefix "__FRAMAC_" vi.vname (* Mthread prefixes *)
 
 
@@ -147,6 +148,7 @@ let translate_variadics (file : file) =
             | Overload o -> Standard.overloaded_call ~fundec o
             | Aggregator a -> Standard.aggregator_call ~fundec ~ghost a
             | FormatFun f -> Standard.format_fun_call ~fundec env f
+            | Builtin -> raise Not_found
             | _ -> raise Standard.Translate_call_exn
           in
           call_translator block loc mk_call vf args
