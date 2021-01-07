@@ -89,6 +89,10 @@ val pretty: string -> string
     printed identically in different machines. *)
 val add_symbolic_dir: string -> string -> unit
 
+(** Remove all symbolic dirs that have been added earlier.
+    @since Frama-C+dev *)
+val reset_symbolic_dirs: unit -> unit
+
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
 

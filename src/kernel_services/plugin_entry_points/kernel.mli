@@ -306,8 +306,9 @@ module CodeOutput : sig
 end
 
 (** Behavior of option "-add-symbolic-path"
-    @since Neon-20140301 *)
-module SymbolicPath: Parameter_sig.String_set
+    @since Neon-20140301
+    @modify Frama-C+dev inversed argument order (now uses path:name) *)
+module SymbolicPath: Parameter_sig.Filepath_map
 
 module FloatNormal: Parameter_sig.Bool
 (** Behavior of option "-float-normal" *)

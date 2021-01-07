@@ -173,6 +173,8 @@ let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs name dir;
   (insert cwd dir).symbolic_name <- Some name
 
+let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
+
 let rec add_uri_path buffer path =
   let open Buffer in
   match path.symbolic_name with

@@ -24,7 +24,6 @@
 (** {2 Kernel as an almost standard plug-in} *)
 (* ************************************************************************* *)
 
-module CamlString = String
 module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
@@ -246,13 +245,6 @@ module Zero(X:Input_with_arg) =
 module String
     (X: sig include Input_with_arg val default: string end) =
   P.String
-    (struct
-      let () = Parameter_customize.set_module_name X.module_name
-      include X
-    end)
-
-module String_set(X: Input_with_arg) =
-  P.String_set
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
@@ -606,16 +598,50 @@ module Time =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 module SymbolicPath =
-  String_set (* TODO: to be replaced by an hashtbl *)
+  Filepath_map
     (struct
       let option_name = "-add-symbolic-path"
       let module_name = "SymbolicPath"
       let arg_name = "name_1:path_1,...,name_n:path_n"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
       let help =
-        "When displaying file locations, replace (absolute) path by the \
+        "When displaying file locations, replace (absolute) path with the \
          corresponding symbolic name"
     end)
 
+let () =
+  SymbolicPath.add_update_hook
+    (fun _ map ->
+       (* keep module [Filepath] synchronized with [SymbolicPath] *)
+       Filepath.reset_symbolic_dirs ();
+       Datatype.Filepath.Map.iter
+         (fun n p -> Filepath.add_symbolic_dir p (n :> string))
+         map)
+
+(* [SymbolicPath] is better to be not projectified,
+   but must be saved: use a fake state for saving it without projectifying it *)
+module SymbolicPathFakeState =
+  State_builder.Register
+    (Datatype.Unit)
+    (struct
+      type t = unit
+      let create () = ()
+      let clear _ = ()
+      let get () = ()
+      let set () = ()
+      let clear_some_projects _ _ = false
+    end)
+    (struct
+      let name = "SymbolicPathFakeState"
+      let unique_name = name
+      let dependencies = []
+    end)
+
+let () =
+  SymbolicPathFakeState.howto_marshal
+    (fun () -> SymbolicPath.get ())
+    (fun paths -> SymbolicPath.set paths)
 
 (* ************************************************************************* *)
 (** {2 Input / Output Source Code} *)
@@ -711,22 +737,6 @@ module CodeOutput = struct
   let () = Extlib.safe_at_exit close_all
 
 end
-
-let add_path s =
-  try
-    let n = CamlString.index s ':' in
-    let name = CamlString.sub s 0 n in
-    let path = CamlString.sub s (n+1) (CamlString.length s - (n+1)) in
-    Filepath.add_symbolic_dir name path
-  with Not_found ->
-    warning "%s is not a valid option argument for -add-symbolic-path. \
-             It will be ignored" s
-
-let () =
-  SymbolicPath.add_set_hook
-    (fun o n ->
-       let d = Datatype.String.Set.diff n o in
-       Datatype.String.Set.iter add_path d)
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
