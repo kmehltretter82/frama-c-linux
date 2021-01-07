@@ -2701,7 +2701,8 @@ struct
       TUnOp (BNot, t), logic_arithmetic_promotion t.term_type
     | PLunop (Uminus, t) ->
       let t = type_num_term ctxt env t in
-      TUnOp (Neg, t), logic_arithmetic_promotion t.term_type
+      let ty = logic_arithmetic_promotion t.term_type in
+      TUnOp (Neg, mk_cast t ty), ty
     | PLunop (Ustar, t) ->
       check_current_label loc env;
       (* memory access need a current label to have some semantics *)
