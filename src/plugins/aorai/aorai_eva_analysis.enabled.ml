@@ -34,10 +34,19 @@ let show_aorai_variable state fmt var_name =
        Z.Overflow | Not_found ->
     Format.fprintf fmt "?"
 
-let builtin_show_aorai_state state _args =
+let show_val fmt (expr, v, _) =
+  Format.fprintf fmt "%a in %a"
+    Printer.pp_exp expr
+    (Cvalue.V.pretty_typ (Some (Cil.typeOf expr))) v
+
+let builtin_show_aorai_state state args =
   let history = Data_for_aorai.(curState :: (whole_history ())) in
   Aorai_option.result ~current:true "@[<hv>%a@]"
     (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
+  if args <> [] then begin
+    Aorai_option.result ~current:true "@[<hv>%a@]"
+      (Pretty_utils.pp_list ~sep:"," show_val) args
+  end;
   (* Return value : returns nothing, changes nothing *)
   {
     Value_types.c_values = [None, state];
@@ -46,8 +55,14 @@ let builtin_show_aorai_state state _args =
     c_cacheable = Value_types.Cacheable;
   }
 
+let show_aorai_state = "Frama_C_show_aorai_state"
+
 let () =
-  !Db.Value.register_builtin "Frama_C_show_aorai_state" builtin_show_aorai_state
+  Cil_builtins.add_custom_builtin
+    (fun () -> (show_aorai_state,Cil.voidType,[],true))
+
+let () =
+  !Db.Value.register_builtin show_aorai_state builtin_show_aorai_state
 
 let add_slevel_annotation vi kind =
   match kind with
