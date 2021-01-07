@@ -55,6 +55,7 @@
 
 .eva-info {
     width: 100%;
+    flex-wrap: wrap;
     background: #ccc;
     padding-top: 3px;
     padding-left: 12px;
@@ -62,6 +63,7 @@
 }
 
 .eva-callsite {
+    flex: 0 0 auto;
     fill: #7cacbb;
     background: #eee;
     border-radius: 4px;

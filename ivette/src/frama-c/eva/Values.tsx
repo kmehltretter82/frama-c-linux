@@ -20,9 +20,6 @@ import { AutoSizer } from 'react-virtualized';
 import { Component, TitleBar } from 'frama-c/LabViews';
 import * as States from 'frama-c/states';
 
-// Plugins
-import * as Ast from 'frama-c/api/kernel/ast';
-
 // Locals
 import { SizedArea, HSIZER, WSIZER } from './sized';
 import { Diff, DiffProps } from './diffed';
@@ -119,6 +116,22 @@ function ProbeInfos() {
         selected={!transient}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
         onClick={() => { if (probe) probe.setTransient(!transient); }}
+      />
+      <IconButton
+        icon="CIRC.CLOSE"
+        className="eva-probeinfo-button"
+        visible={!transient}
+        title="Discard the probe"
+        onClick={() => {
+          if (probe) {
+            probe.setTransient(true);
+            const p = probe.next ?? probe.prev;
+            if (p) setImmediate(() => {
+              States.setSelection({ fct: p.fct, marker: p.marker });
+            });
+            else model.clearSelection();
+          }
+        }}
       />
       <Filler />
       <ButtonGroup
@@ -217,9 +230,10 @@ function StackInfo() {
       'eva-callsite',
       focused === stmt && 'eva-focused',
     );
-    const onClick = () => {
+    const onClick = (evt: React.MouseEvent) => {
       const location = { fct: caller, marker: stmt };
       setSelection({ location });
+      if (evt.altKey) States.MetaSelection.emit(location);
     };
     return (
       <Code
@@ -496,10 +510,8 @@ function ValuesPanel(props: ValuesPanelProps) {
   const rowHeight = HSIZER.dimension(1);
   const [selection] = States.useSelection();
   React.useEffect(() => {
-    const curr = selection?.current;
-    const fct = curr?.fct;
-    const marker = Ast.jMarker(curr?.marker);
-    model.setLayout({ zoom, margin, fct, marker });
+    const location = selection?.current;
+    model.setLayout({ zoom, margin, location });
   });
   // --- render list
   return (

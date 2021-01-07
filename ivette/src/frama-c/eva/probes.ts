@@ -46,6 +46,8 @@ export class Probe {
   readonly fct: string;
   readonly marker: Ast.marker;
   readonly model: ModelCallbacks;
+  next?: Probe;
+  prev?: Probe;
   transient = true;
   loading = true;
   label?: string;

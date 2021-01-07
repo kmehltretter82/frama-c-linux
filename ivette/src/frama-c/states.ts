@@ -597,19 +597,18 @@ function fromHistory(s: Selection, action: HistorySelectActions): Selection {
  */
 function fromMultipleSelections(
   s: Selection,
-  action: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE'
-  | 'MULTIPLE_CLEAR',
+  a: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR',
 ): Selection {
-  switch (action) {
+  switch (a) {
     case 'MULTIPLE_PREV':
     case 'MULTIPLE_NEXT':
     case 'MULTIPLE_CYCLE': {
       const idx =
-        action === 'MULTIPLE_PREV' ?
+        a === 'MULTIPLE_PREV' ?
           s.multiple.index - 1 :
           s.multiple.index + 1;
       const index =
-        action === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
+        a === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
           0 :
           idx;
       if (0 <= index && index < s.multiple.allSelections.length) {
@@ -695,19 +694,20 @@ const emptySelection = {
   },
 };
 
-const GlobalSelection = new GlobalState<Selection>(emptySelection);
+export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
+export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+
+export function setSelection(location: Location, meta = false) {
+  const s = GlobalSelection.getValue();
+  GlobalSelection.setValue(reducer(s, { location }));
+  if (meta) MetaSelection.emit(location);
+}
 
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [selection, setSelection] = useGlobalState(GlobalSelection);
-
-  function update(action: SelectionActions) {
-    const nextSelection = reducer(selection, action);
-    setSelection(nextSelection);
-  }
-
-  return [selection, update];
+  const [current, setCurrent] = useGlobalState(GlobalSelection);
+  return [current, (action) => setCurrent(reducer(current, action))];
 }
 
 // --------------------------------------------------------------------------

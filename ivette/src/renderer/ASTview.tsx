@@ -205,12 +205,11 @@ const ASTview = () => {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
-  function onSelection(markerId: string) {
-    if (selection.current) {
-      const { fct } = selection.current;
-      const location: States.Location = { fct, marker: Ast.jMarker(markerId) };
-      updateSelection({ location });
-    }
+  function onSelection(markerId: string, meta = false) {
+    const fct = selection?.current?.fct;
+    const location = { fct, marker: Ast.jMarker(markerId) };
+    updateSelection({ location });
+    if (meta) States.MetaSelection.emit(location);
   }
 
   async function onContextMenu(markerId: string) {

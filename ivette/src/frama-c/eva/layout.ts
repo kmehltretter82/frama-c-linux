@@ -63,6 +63,7 @@ export class LayoutEngine {
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
   private rows: Row[] = [];
+  private chained?: Probe;
 
   crop(zoomed: boolean, s: Size): Size {
     const s$cols = s.cols + INSET;
@@ -75,6 +76,7 @@ export class LayoutEngine {
   }
 
   layout(ps: Probe[]): Row[] {
+    this.chained = undefined;
     ps.sort(LayoutEngine.order).forEach(this.push);
     return this.flush();
   }
@@ -98,6 +100,10 @@ export class LayoutEngine {
   }
 
   private push(p: Probe) {
+    const q = this.chained;
+    if (q) q.next = p;
+    p.prev = q;
+    this.chained = p;
     const probeSize = this.values.getProbeSize(p.marker);
     const s = this.crop(p.zoomed, probeSize);
     p.zoomable = p.zoomed || !leq(probeSize, s);
