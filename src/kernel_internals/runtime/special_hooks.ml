@@ -20,18 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* just after loading all plug-ins, add the dependencies between the AST
-   and the command line options that depend on it. *)
-let () =
-  Cmdline.run_after_extended_stage
-    (fun () ->
-      State_dependency_graph.add_dependencies
-        ~from:Ast.self
-        !Parameter_builder.ast_dependencies)
+(**************************************************************************)
+(* Hooks run very early *)
+(**************************************************************************)
 
 let print_config () =
   if Kernel.PrintConfig.get () then begin
-    Log.print_on_output 
+    Log.print_on_output
       (fun fmt -> Format.fprintf fmt
           "Frama-C %s@\n\
            Environment:@\n  \
@@ -72,6 +67,39 @@ let print_pluginpath =
   print_config Kernel.PrintPluginPath.get Fc_config.plugin_path
 let () = Cmdline.run_after_early_stage print_pluginpath
 
+(**************************************************************************)
+(* Hooks run after loading plug-ins *)
+(**************************************************************************)
+
+(* just after loading all plug-ins, add the dependencies between the AST
+   and the command line options that depend on it. *)
+let () =
+  Cmdline.run_after_extended_stage
+    (fun () ->
+      State_dependency_graph.add_dependencies
+        ~from:Ast.self
+        !Parameter_builder.ast_dependencies)
+
+(**************************************************************************)
+(* Hooks run when restoring a saved file *)
+(**************************************************************************)
+
+(* Load Frama-c from disk if required *)
+let load_binary () =
+  let filepath = Kernel.LoadState.get () in
+  if filepath <> Filepath.Normalized.unknown then begin
+    try
+      Project.load_all filepath
+    with Project.IOError s ->
+      Kernel.abort "problem while loading file %a (%s)"
+        Filepath.Normalized.pretty filepath s
+  end
+let () = Cmdline.run_after_loading_stage load_binary
+
+(**************************************************************************)
+(* Hooks run when exiting *)
+(**************************************************************************)
+
 let print_machdep () =
   if Kernel.PrintMachdep.get () then begin
     File.pretty_machdep ();
@@ -79,7 +107,6 @@ let print_machdep () =
   end else
     Cmdline.nop
 let () = Cmdline.run_after_exiting_stage print_machdep
-
 
 (* Time *)
 let time () =
@@ -118,13 +145,13 @@ let save_binary error_extension =
            modifying filename into `%s'." s;
         Filepath.Normalized.of_string s
     in
-    try 
+    try
       Project.save_all realname
     with Project.IOError s ->
       Kernel.error "problem while saving to file %a (%s)."
         Filepath.Normalized.pretty realname s
   end
-let () = 
+let () =
   (* implement a refinement of the behavior described in BTS #1388:
      - on normal exit: save
      - on Sys.break, system error or feature request: do not save
@@ -137,29 +164,14 @@ let () =
       | Log.AbortError _ -> save_binary (Some ".error")
       | _ -> save_binary (Some ".crash"))
 
-(* Load Frama-c from disk if required *)
-let load_binary () =
-  let filepath = Kernel.LoadState.get () in
-  if filepath <> Filepath.Normalized.unknown then begin
-    try
-      Project.load_all filepath
-    with Project.IOError s ->
-      Kernel.abort "problem while loading file %a (%s)"
-        Filepath.Normalized.pretty filepath s
-  end
-let () = Cmdline.run_after_loading_stage load_binary
+(* Write JSON files to disk if required *)
+let flush_json_files () =
+  let written = Json.flush_cache () in
+  List.iter (fun fp ->
+      Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
+    written
 
-(* This hook cannot be registered directly in Kernel or Cabs2cil, as it
-   depends on Ast_info *)
-let on_call_to_undeclared_function vi =
-  let name = vi.Cil_types.vname in
-  if not (Ast_info.is_frama_c_builtin name) then
-    Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
-      ~current:true ~once:true
-      "Calling undeclared function %s. Old style K&R code?" name
-
-let () =
-  Cabs2cil.register_implicit_prototype_hook on_call_to_undeclared_function
+let () = Cmdline.at_normal_exit (fun () -> flush_json_files ())
 
 let run_list_all_plugin_options () =
   if not (Kernel.AutocompleteHelp.is_empty ()) then begin
@@ -221,14 +233,21 @@ let run_list_all_plugin_options () =
   else Cmdline.nop
 let () = Cmdline.run_after_exiting_stage run_list_all_plugin_options
 
-(* Write JSON files to disk if required *)
-let flush_json_files () =
-  let written = Json.flush_cache () in
-  List.iter (fun fp ->
-      Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
-    written
+(**************************************************************************)
+(* Hooks independent from cmdline ordering *)
+(**************************************************************************)
 
-let () = Cmdline.at_normal_exit (fun () -> flush_json_files ())
+(* This hook cannot be registered directly in Kernel or Cabs2cil, as it
+   depends on Ast_info *)
+let on_call_to_undeclared_function vi =
+  let name = vi.Cil_types.vname in
+  if not (Ast_info.is_frama_c_builtin name) then
+    Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
+      ~current:true ~once:true
+      "Calling undeclared function %s. Old style K&R code?" name
+
+let () =
+  Cabs2cil.register_implicit_prototype_hook on_call_to_undeclared_function
 
 (*
 Local Variables:
