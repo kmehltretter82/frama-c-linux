@@ -136,6 +136,7 @@ share/analysis-scripts/results_display.py: .ignore
 share/analysis-scripts/summary.py: .ignore
 share/analysis-scripts/template.mk: .ignore
 share/compliance/c11_functions.json: .ignore
+share/compliance/c11_headers.json: .ignore
 share/compliance/glibc_functions.json: .ignore
 share/compliance/nonstandard_identifiers.json: .ignore
 share/compliance/posix_identifiers.json: .ignore

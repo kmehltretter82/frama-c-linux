@@ -280,6 +280,7 @@ DISTRIB_FILES:=\
       $(wildcard share/emacs/*.el) share/autocomplete_frama-c           \
       share/_frama-c                                                    \
       share/compliance/c11_functions.json                               \
+      share/compliance/c11_headers.json                                 \
       share/compliance/glibc_functions.json                             \
       share/compliance/nonstandard_identifiers.json                     \
       share/compliance/posix_identifiers.json                           \
@@ -1945,6 +1946,7 @@ install:: install-lib-$(OCAMLBEST)
 	  $(FRAMAC_DATADIR)/analysis-scripts
 	$(MKDIR) $(FRAMAC_DATADIR)/compliance
 	$(CP) share/compliance/c11_functions.json \
+	  share/compliance/c11_headers.json \
 	  share/compliance/glibc_functions.json \
 	  share/compliance/nonstandard_identifiers.json \
 	  share/compliance/posix_identifiers.json \
