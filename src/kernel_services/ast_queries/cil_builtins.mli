@@ -86,13 +86,22 @@ val init_builtins: unit -> unit
 (** A list of the built-in functions for the current compiler (GCC or
   * MSVC, depending on [!msvcMode]).  Maps the name to the
   * result and argument types, and whether it is vararg.
-  * Initialized by {!Cil.initCIL}
+  * Initialized by {!Cil.initCIL}. Do not add builtins directly, use
+  * {! add_custom_builtin } below for that.
   *
   * This map replaces [gccBuiltins] and [msvcBuiltins] in previous
   * versions of CIL.*)
 module Builtin_functions :
   State_builder.Hashtbl with type key = string
                          and type data = typ * typ list * bool
+
+(** Register a new builtin. The function will be called after setting
+    the machdep and initializing machine-dependent builtins. Hence, types
+    such {!Cil.uint16_t} might be used if needed.
+
+    @since Frama-C+dev
+*)
+val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 
 (** This is used as the location of the prototypes of builtin functions. *)
 val builtinLoc: location
