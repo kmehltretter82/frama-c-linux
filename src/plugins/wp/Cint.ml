@@ -765,7 +765,7 @@ let smp_leq_with_lsr x y =
       (* p >= 0 ==> ( 0 <= (a >> p) <==> 0 <= a )*)
       e_leq e_zero a
     else
-      (* p >= 0 ==> ( x <= (a >> p) <= y <==> x <= a/(2**p) ) *)
+      (* p >= 0 ==> ( x <= (a >> p) <==> x <= a/(2**p) ) *)
       let k = two_power_k p in
       e_leq x (e_div a (e_zint k))
   with Not_found ->
