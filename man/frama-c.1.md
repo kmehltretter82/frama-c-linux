@@ -85,6 +85,10 @@ By default, all numerical addresses are considered invalid.
 : adds directories *p1* through *pn* to the list of directories in which
 plugins are searched.
 
+-add-symbolic-path *p1:n1[,p2:n2[...,pn:nn]]*
+: replaces each path *pi* with the name *ni* when displaying file locations
+in messages.
+
 [-no]-aggressive-merging
 : merges function definitions modulo renaming. Defaults to no.
 

@@ -25,7 +25,7 @@
 .\" using pandoc 2.0 or newer. To modify this file, edit the Markdown file
 .\" and run `make man/frama-c.1`.
 
-.TH FRAMA-C 1 2020-10-07
+.TH FRAMA-C 1 2021-01-07
 .SH NAME
 .PP
 frama-c[.byte] - a static analyzer for C programs
@@ -122,6 +122,12 @@ By default, all numerical addresses are considered invalid.
 .B -add-path \f[I]p1[,p2[\&...,pn]]\f[R]
 adds directories \f[I]p1\f[R] through \f[I]pn\f[R] to the list of
 directories in which plugins are searched.
+.TP
+.B \-add\-symbolic\-path \f[I]p1:n1[,p2:n2[\&...,pn:nn]]\f[]
+replaces each path \f[I]pi\f[] with the name \f[I]ni\f[] when displaying
+file locations in messages.
+.RS
+.RE
 .TP
 .B [-no]-aggressive-merging
 merges function definitions modulo renaming.
