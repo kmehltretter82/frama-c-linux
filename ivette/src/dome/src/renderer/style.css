@@ -132,4 +132,13 @@ div.dome-dragged {
     text-overflow: clip ;
 }
 
+.dome-text-cell {
+    cursor: default ;
+    user-select: text ;
+    font-family: 'Andale mono', monospace ;
+    font-size: 9pt ;
+    white-space: nowrap ;
+    text-overflow: clip ;
+}
+
 /* -------------------------------------------------------------------------- */

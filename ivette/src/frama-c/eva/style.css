@@ -1,4 +1,3 @@
-
 /* -------------------------------------------------------------------------- */
 /* --- Probe Panel                                                        --- */
 /* -------------------------------------------------------------------------- */
@@ -99,7 +98,7 @@
 
 .eva-alarm-none { display: none; }
 .eva-alarm-True { fill: green; }
-.eva-alarm-False { fill: red; }
+.eva-alarm-False { fill: #fb4e4a; }
 .eva-alarm-Unknown { fill: darkorange; }
 
 /* -------------------------------------------------------------------------- */
@@ -107,8 +106,8 @@
 /* -------------------------------------------------------------------------- */
 
 .eva-stmt {
-    cursor: default;
     color: grey;
+    text-select: none;
 }
 
 .eva-sized-area {
@@ -231,6 +230,14 @@
 
 .eva-values .eva-cell {
     background: #eee;
+}
+
+.eva-values .eva-focused {
+    background: #e1e8f7;
+}
+
+.eva-values .eva-transient.eva-focused {
+    background: #fff0d5;
 }
 
 .eva-callstack.eva-row-odd .eva-cell {

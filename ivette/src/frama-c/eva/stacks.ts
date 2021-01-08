@@ -53,7 +53,7 @@ export class StacksCache {
   // --------------------------------------------------------------------------
 
   getSummary(fct: string): boolean {
-    return this.summary.get(fct) || false;
+    return this.summary.get(fct) || true;
   }
 
   setSummary(fct: string, s: boolean) {

@@ -9,7 +9,7 @@ import { classes } from 'dome/misc/utils';
 import { VariableSizeList } from 'react-window';
 import { Vfill, Hpack, Vpack, Filler } from 'dome/layout/boxes';
 import { Icon } from 'dome/controls/icons';
-import { Label, Code } from 'dome/controls/labels';
+import { Label, Code, Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { ButtonGroup, Button } from 'dome/frame/toolbars';
 
@@ -54,7 +54,7 @@ function Stmt(props: StmtProps) {
   if (rank === undefined || !stmt) return null;
   const title = `Stmt at global rank ${rank} (internal id: ${stmt})`;
   return (
-    <span className="dome-text-code eva-stmt" title={title}>
+    <span className="dome-text-cell eva-stmt" title={title}>
       @S{rank}
     </span>
   );
@@ -244,7 +244,6 @@ function StackInfo() {
       if (meta) States.MetaSelection.emit(location);
     };
     const onClick = (evt: React.MouseEvent) => {
-      evt.preventDefault();
       select(evt.altKey);
     };
     const onDoubleClick = (evt: React.MouseEvent) => {
@@ -252,7 +251,7 @@ function StackInfo() {
       select(true);
     };
     return (
-      <Code
+      <Cell
         key={key}
         icon="TRIANGLE.LEFT"
         className={className}
@@ -261,7 +260,7 @@ function StackInfo() {
       >
         {caller}
         <Stmt stmt={stmt} rank={rank} />
-      </Code>
+      </Cell>
     );
   };
   return (
@@ -342,7 +341,7 @@ function TableCell(props: TableCellProps) {
         contents = <span className="dome-text-label">« Probe »</span>;
       } else {
         const { stmt, rank, code, label } = probe;
-        const textClass = label ? 'dome-text-label' : 'dome-text-code';
+        const textClass = label ? 'dome-text-label' : 'dome-text-cell';
         contents = (
           <>
             <span className={textClass}>{label ?? code}</span>
@@ -391,10 +390,8 @@ function TableCell(props: TableCellProps) {
     isFocused && 'eva-focused',
   );
   const onClick = () => {
-    if (kind === 'probes') {
-      const location = { fct: probe.fct, marker: probe.marker };
-      setSelection({ location });
-    }
+    const location = { fct: probe.fct, marker: probe.marker };
+    setSelection({ location });
     model.setSelectedRow(row);
   };
   const onDoubleClick = () => {
@@ -470,7 +467,7 @@ function TableSection(props: TableSectionProps) {
         enabled={foldable}
         onClick={onClick}
       />
-      <Code className="eva-fct-name">{fct}</Code>
+      <Cell className="eva-fct-name">{fct}</Cell>
     </>
   );
 }

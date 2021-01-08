@@ -102,7 +102,7 @@ export function SizedArea(props: SizedAreaProps) {
   return (
     <div
       ref={refSizer}
-      className="eva-sized-area dome-text-code"
+      className="eva-sized-area dome-text-cell"
     >
       {children}
     </div>
