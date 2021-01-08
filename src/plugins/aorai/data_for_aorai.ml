@@ -1581,7 +1581,7 @@ let check_observables auto =
      try
        ignore (Globals.Functions.find_by_name name)
      with Not_found ->
-       Aorai_option.fatal "Observable %s doesn't match any function" name
+       Aorai_option.abort "Observable %s doesn't match any function" name
    in
    let rec check = function
      | TAnd (c1,c2) | TOr (c1,c2) -> check c1; check c2
@@ -1590,7 +1590,7 @@ let check_observables auto =
      | TCall (kf,_) | TReturn kf ->
        let name = Kernel_function.get_name kf in
        if not (Datatype.String.Set.mem name set) then
-         Aorai_option.fatal "Function %s is not observable" name
+         Aorai_option.abort "Function %s is not observable" name
    in
    Datatype.String.Set.iter is_relevant set;
    List.iter (fun tr -> check tr.cross) auto.trans
