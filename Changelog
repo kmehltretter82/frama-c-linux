@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
+              invert argument order (path:name).
 -   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc
                            Fixes #@877
 -*  Logic     [2020-11-30] assigns clause can't mention const locations 
