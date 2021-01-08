@@ -94,7 +94,7 @@ function ProbeInfos() {
       <div style={{ minWidth: width, height }} className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
-      <Code><Stmt stmt={stmt} rank={rank} />({fct})</Code>
+      <Code><Stmt stmt={stmt} rank={rank} /></Code>
       <IconButton
         icon="ITEMS.LIST"
         className="eva-probeinfo-button"
@@ -115,7 +115,12 @@ function ProbeInfos() {
         className="eva-probeinfo-button"
         selected={!transient}
         title={transient ? 'Make the probe persistent' : 'Release the probe'}
-        onClick={() => { if (probe) probe.setTransient(!transient); }}
+        onClick={() => {
+          if (probe) {
+            if (transient) probe.setPersistent();
+            else probe.setTransient();
+          }
+        }}
       />
       <IconButton
         icon="CIRC.CLOSE"
@@ -124,7 +129,7 @@ function ProbeInfos() {
         title="Discard the probe"
         onClick={() => {
           if (probe) {
-            probe.setTransient(true);
+            probe.setTransient();
             const p = probe.next ?? probe.prev;
             if (p) setImmediate(() => {
               States.setSelection({ fct: p.fct, marker: p.marker });
@@ -220,20 +225,31 @@ function AlarmsInfo() {
 function StackInfo() {
   const model = useModel();
   const [, setSelection] = States.useSelection();
-  const focused = model.getFocused()?.marker;
+  const focused = model.getFocused();
   const callstack = model.getCalls();
   if (callstack.length <= 1) return null;
   const makeCallsite = ({ caller, stmt, rank }: Callsite) => {
     if (!caller || !stmt) return null;
     const key = `${caller}@${stmt}`;
+    const isFocused = focused?.marker === stmt;
+    const isTransient = focused?.transient;
     const className = classes(
       'eva-callsite',
-      focused === stmt && 'eva-focused',
+      isFocused && 'eva-focused',
+      isTransient && 'eva-transient',
     );
-    const onClick = (evt: React.MouseEvent) => {
+    const select = (meta: boolean) => {
       const location = { fct: caller, marker: stmt };
       setSelection({ location });
-      if (evt.altKey) States.MetaSelection.emit(location);
+      if (meta) States.MetaSelection.emit(location);
+    };
+    const onClick = (evt: React.MouseEvent) => {
+      evt.preventDefault();
+      select(evt.altKey);
+    };
+    const onDoubleClick = (evt: React.MouseEvent) => {
+      evt.preventDefault();
+      select(true);
     };
     return (
       <Code
@@ -241,6 +257,7 @@ function StackInfo() {
         icon="TRIANGLE.LEFT"
         className={className}
         onClick={onClick}
+        onDoubleClick={onDoubleClick}
       >
         {caller}
         <Stmt stmt={stmt} rank={rank} />
@@ -374,17 +391,15 @@ function TableCell(props: TableCellProps) {
     isFocused && 'eva-focused',
   );
   const onClick = () => {
-    if (probe) {
+    if (kind === 'probes') {
       const location = { fct: probe.fct, marker: probe.marker };
       setSelection({ location });
-      model.setSelectedRow(row);
     }
+    model.setSelectedRow(row);
   };
   const onDoubleClick = () => {
-    if (probe) {
-      if (probe.transient) probe.setTransient(false);
-      if (probe.zoomable) probe.setZoomed(!probe.zoomed);
-    }
+    probe.setPersistent();
+    if (probe.zoomable) probe.setZoomed(!probe.zoomed);
   };
   return (
     <div
@@ -431,6 +446,36 @@ function TableHead(props: TableHeadProps) {
 }
 
 // --------------------------------------------------------------------------
+// --- Table Section
+// --------------------------------------------------------------------------
+
+interface TableSectionProps {
+  fct: string;
+  folded: boolean;
+  foldable: boolean;
+  onClick: () => void;
+}
+
+function TableSection(props: TableSectionProps) {
+  const { fct, foldable, folded, onClick } = props;
+  const icon = folded ? 'ANGLE.RIGHT' :
+    foldable ? 'ANGLE.DOWN' : 'TRIANGLE.RIGHT';
+  return (
+    <>
+      <IconButton
+        className="eva-fct-fold"
+        size={10}
+        offset={-1}
+        icon={icon}
+        enabled={foldable}
+        onClick={onClick}
+      />
+      <Code className="eva-fct-name">{fct}</Code>
+    </>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Table Row
 // --------------------------------------------------------------------------
 
@@ -444,6 +489,22 @@ function TableRow(props: TableRowProps) {
   const row = model.getRow(props.index);
   if (!row) return null;
   const { kind, probes } = row;
+  if (kind === 'section') {
+    const { fct } = row;
+    if (!fct) return null;
+    const folded = model.isFolded(fct);
+    const foldable = model.isFoldable(fct);
+    return (
+      <Hpack className="eva-function" style={props.style}>
+        <TableSection
+          fct={fct}
+          folded={folded}
+          foldable={foldable}
+          onClick={() => model.setFolded(fct, !folded)}
+        />
+      </Hpack>
+    );
+  }
   const sk = row.stackIndex;
   const sc = row.stackCount;
   const rowKind = `eva-${kind}`;

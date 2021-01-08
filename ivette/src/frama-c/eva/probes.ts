@@ -95,7 +95,10 @@ export class Probe {
   // --- Internal State
   // --------------------------------------------------------------------------
 
-  setTransient(tr: boolean) {
+  setPersistent() { this.updateTransient(false); }
+  setTransient() { this.updateTransient(true); }
+
+  private updateTransient(tr: boolean) {
     if (this.transient !== tr) {
       this.transient = tr;
       if (tr && this.label) {
@@ -112,7 +115,7 @@ export class Probe {
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
-      if (byCS) this.setTransient(false);
+      if (byCS) this.setPersistent();
       this.model.forceLayout();
     }
   }

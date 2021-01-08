@@ -71,12 +71,12 @@
     padding-right: 7px;
 }
 
-.eva-callsite {
-    cursor: default;
+.eva-callsite.eva-focused {
+    background: #cbe4cb;
 }
 
-.eva-callsite.eva-focused {
-    background: orange;
+.eva-callsite.eva-focused.eva-transient {
+    background: #f9dca6;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -133,6 +133,11 @@
 /* --- Table Heads                                                        --- */
 /* -------------------------------------------------------------------------- */
 
+.eva-function {
+    padding-top: 0px;
+    background: #ccc;
+}
+
 .eva-head {
     padding-top: 2px;
     color: #777;
@@ -153,6 +158,17 @@
 /* -------------------------------------------------------------------------- */
 /* --- Table Cells                                                        --- */
 /* -------------------------------------------------------------------------- */
+
+.eva-fct-fold {
+    margin-left: 4px;
+    margin-right: 8px;
+    padding: 0px;
+}
+
+.eva-fct-name {
+    padding: 0px;
+    font-weight: bold;
+}
 
 .eva-cell {
     flex: 1 1 auto;
@@ -230,7 +246,7 @@
 }
 
 .eva-callstack.eva-row-selected {
-    background: orange;
+    background: #f9dca6;
 }
 
 /* -------------------------------------------------------------------------- */

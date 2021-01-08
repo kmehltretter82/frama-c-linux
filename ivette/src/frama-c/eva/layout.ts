@@ -12,10 +12,11 @@ export interface LayoutProps {
   margin: number;
 }
 
-export type RowKind = 'probes' | 'values' | 'callstack';
+export type RowKind = 'section' | 'probes' | 'values' | 'callstack';
 
 export interface Row {
   key: string;
+  fct: string;
   kind: RowKind;
   probes: Probe[];
   headstack?: string;
@@ -38,6 +39,7 @@ export class LayoutEngine {
 
   // --- Setup
 
+  private readonly folded: (fct: string) => boolean;
   private readonly values: ValueCache;
   private readonly stacks: StacksCache;
   private readonly hcrop: number;
@@ -48,9 +50,11 @@ export class LayoutEngine {
     props: undefined | LayoutProps,
     values: ValueCache,
     stacks: StacksCache,
+    folded: (fct: string) => boolean,
   ) {
     this.values = values;
     this.stacks = stacks;
+    this.folded = folded;
     const zoom = Math.max(0, props?.zoom ?? 0);
     this.vcrop = VCROP + 3 * zoom;
     this.hcrop = HCROP + zoom;
@@ -59,7 +63,9 @@ export class LayoutEngine {
   }
 
   // --- Probe Buffer
-  private byFctStacks?: string; // function
+  private byFct?: string; // current function
+  private byStk?: boolean; // callstack probes
+  private skip?: boolean; // skip current function
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
   private rows: Row[] = [];
@@ -100,21 +106,38 @@ export class LayoutEngine {
   }
 
   private push(p: Probe) {
+    // --- sectionning
+    const { fct, byCallstacks: stk } = p;
+    if (fct !== this.byFct) {
+      this.flush();
+      this.rows.push({
+        key: `S:${fct}`,
+        kind: 'section',
+        fct,
+        probes: [],
+        hlines: 1,
+      });
+      this.byFct = fct;
+      this.byStk = stk;
+      this.skip = this.folded(fct);
+    } else if (stk !== this.byStk) {
+      this.flush();
+      this.byStk = stk;
+    }
+    if (this.skip) return;
+    // --- chaining
     const q = this.chained;
     if (q) q.next = p;
     p.prev = q;
     this.chained = p;
+    // --- sizing
     const probeSize = this.values.getProbeSize(p.marker);
     const s = this.crop(p.zoomed, probeSize);
     p.zoomable = p.zoomed || !leq(probeSize, s);
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
-    const fct = p.byCallstacks ? p.fct : undefined;
-    if (fct !== this.byFctStacks) {
-      this.flush();
-      this.byFctStacks = fct;
-    }
-    if (!fct && s.cols + this.rowSize.cols > this.margin)
+    // --- queueing
+    if (!stk && s.cols + this.rowSize.cols > this.margin)
       this.flush();
     this.rowSize = addH(this.rowSize, s);
     this.rowSize.cols += PADDING;
@@ -126,28 +149,31 @@ export class LayoutEngine {
   private flush(): Row[] {
     const ps = this.buffer;
     const rs = this.rows;
-    if (ps.length > 0) {
-      const fct = this.byFctStacks;
+    const fct = this.byFct;
+    if (fct && ps.length > 0) {
+      const stk = this.byStk;
       const hlines = this.rowSize.rows;
-      if (fct) {
+      if (stk) {
         // --- by callstacks
         const markers = ps.map((p) => p.marker);
         const stacks = this.stacks.getStacks(...markers);
-        const summary = this.stacks.getSummary(fct);
+        const summary = fct ? this.stacks.getSummary(fct) : false;
         const callstacks = stacks.length;
         rs.push({
-          key: `F:${fct}`,
+          key: `P:${fct}`,
           kind: 'probes',
           probes: ps,
           stackCount: callstacks,
+          fct,
           hlines: 1,
         });
         if (summary) rs.push({
-          key: `M:${fct}`,
+          key: `V:${fct}`,
           kind: 'values',
           probes: ps,
           stackIndex: -1,
           stackCount: stacks.length,
+          fct,
           hlines: 1,
         });
         stacks.forEach((cs, k) => {
@@ -158,6 +184,7 @@ export class LayoutEngine {
             stackIndex: k,
             stackCount: callstacks,
             callstack: cs,
+            fct,
             hlines,
           });
         });
@@ -165,14 +192,16 @@ export class LayoutEngine {
         // --- not by callstacks
         const n = rs.length;
         rs.push({
-          key: `P${n}`,
+          key: `P#${n}`,
           kind: 'probes',
           probes: ps,
+          fct,
           hlines: 1,
         }, {
-          key: `V${n}`,
+          key: `V#${n}`,
           kind: 'values',
           probes: ps,
+          fct,
           hlines,
         });
       }

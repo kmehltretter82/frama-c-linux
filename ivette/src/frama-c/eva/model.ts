@@ -37,6 +37,7 @@ export class Model implements ModelCallbacks {
     this.getRowKey = this.getRowKey.bind(this);
     this.getRowCount = this.getRowCount.bind(this);
     this.getRowLines = this.getRowLines.bind(this);
+    this.isFolded = this.isFolded.bind(this);
   }
 
   // --- Probes
@@ -48,6 +49,7 @@ export class Model implements ModelCallbacks {
   private callstack?: Values.callstack;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
+  private folded = new Map<string, boolean>(); // folded functions
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
@@ -75,6 +77,19 @@ export class Model implements ModelCallbacks {
   getVcond(): EvaState { return this.vcond; }
   setVstmt(s: EvaState) { this.vstmt = s; this.forceUpdate(); }
   setVcond(s: EvaState) { this.vcond = s; this.forceUpdate(); }
+
+  isFolded(fct: string): boolean {
+    return (this.focused?.fct !== fct) && (this.folded.get(fct) ?? false);
+  }
+
+  isFoldable(fct: string): boolean {
+    return this.focused?.fct !== fct;
+  }
+
+  setFolded(fct: string, folded: boolean) {
+    this.folded.set(fct, folded);
+    this.forceLayout();
+  }
 
   // --- Caches
 
@@ -114,6 +129,7 @@ export class Model implements ModelCallbacks {
   }
 
   isSelectedRow(row: Row): boolean {
+    if (!this.focused?.byCallstacks) return false;
     const cs = this.callstack;
     return cs !== undefined && cs === row.callstack;
   }
@@ -149,7 +165,7 @@ export class Model implements ModelCallbacks {
         if (this.focused?.byCallstacks)
           p.setByCallstacks(true);
         else
-          p.setTransient(false);
+          p.setPersistent();
       }
     }
   }
@@ -188,6 +204,7 @@ export class Model implements ModelCallbacks {
       this.layout,
       this.values,
       this.stacks,
+      this.isFolded,
     );
     this.rows = engine.layout(toLayout);
     this.laidout.emit();
