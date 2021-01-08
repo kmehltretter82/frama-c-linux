@@ -61,37 +61,28 @@ function Stmt(props: StmtProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Probe Panel
+// --- Probe Editor
 // --------------------------------------------------------------------------
 
-function ProbeInfos() {
+function ProbeEditor() {
   const model = useModel();
   const probe = model.getFocused();
-  const transient = probe?.transient ?? false;
-  const label = probe?.label;
-  const fct = probe?.fct;
-  const code = probe?.code;
-  const stmt = probe?.stmt;
-  const rank = probe?.rank;
-  const byCS = probe?.byCallstacks;
+  if (!probe || !probe.code) return null;
+  const { label } = probe;
+  const { code } = probe;
+  const { stmt } = probe;
+  const { rank } = probe;
+  const byCS = probe.byCallstacks;
   const stacks = model.getStacks(probe);
   const stackable = byCS || stacks.length > 1;
   const { cols, rows } = sizeof(code);
-  const width = WSIZER.dimension(cols) + 4;
-  const height = HSIZER.dimension(rows) + 3;
-  const visible = !!code;
-  const zoomed = probe?.zoomed;
-  const zoomable = probe?.zoomable;
-  const visibility = visible ? 'visible' : 'hidden';
-  const effects = probe ? probe.effects : false;
-  const condition = probe ? probe.condition : false;
-  const summary = fct ? model.stacks.getSummary(fct) : false;
-  const vcond = model.getVcond();
-  const vstmt = model.getVstmt();
+  const { transient } = probe;
+  const { zoomed } = probe;
+  const { zoomable } = probe;
   return (
-    <Hpack style={{ visibility }} className="eva-probeinfo">
-      <Label className="eva-probeinfo-label">{label && `${label}:`}</Label>
-      <div style={{ minWidth: width, height }} className="eva-probeinfo-code">
+    <>
+      <Label className="eva-probeinfo-label">{label}</Label>
+      <div className="eva-probeinfo-code">
         <SizedArea cols={cols} rows={rows}>{code}</SizedArea>
       </div>
       <Code><Stmt stmt={stmt} rank={rank} /></Code>
@@ -125,7 +116,7 @@ function ProbeInfos() {
       <IconButton
         icon="CIRC.CLOSE"
         className="eva-probeinfo-button"
-        visible={!transient}
+        display={!transient}
         title="Discard the probe"
         onClick={() => {
           if (probe) {
@@ -138,6 +129,27 @@ function ProbeInfos() {
           }
         }}
       />
+    </>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Probe Panel
+// --------------------------------------------------------------------------
+
+function ProbeInfos() {
+  const model = useModel();
+  const probe = model.getFocused();
+  const fct = probe?.fct;
+  const byCS = probe?.byCallstacks;
+  const effects = probe ? probe.effects : false;
+  const condition = probe ? probe.condition : false;
+  const summary = fct ? model.stacks.getSummary(fct) : false;
+  const vcond = model.getVcond();
+  const vstmt = model.getVstmt();
+  return (
+    <Hpack className="eva-probeinfo">
+      <ProbeEditor />
       <Filler />
       <ButtonGroup
         enabled={!!probe}
@@ -576,7 +588,7 @@ function ValuesPanel(props: ValuesPanelProps) {
   );
   // --- compute layout
   const margin = WSIZER.capacity(width);
-  const rowHeight = HSIZER.dimension(1);
+  const estimatedHeight = HSIZER.dimension(1);
   const [selection] = States.useSelection();
   React.useEffect(() => {
     const location = selection?.current;
@@ -589,7 +601,7 @@ function ValuesPanel(props: ValuesPanelProps) {
       itemCount={model.getRowCount()}
       itemKey={model.getRowKey}
       itemSize={getRowHeight}
-      estimatedItemSize={rowHeight}
+      estimatedItemSize={estimatedHeight}
       width={width}
       height={height}
       itemData={model}

@@ -20,6 +20,7 @@
 
 .eva-probeinfo-code {
     flex: 0 1 auto;
+    height: fit-content;
     background: lightgrey;
     min-width: 120px;
     width: auto;

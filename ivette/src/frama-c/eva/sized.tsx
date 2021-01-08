@@ -35,6 +35,7 @@ export class Streamer {
     }
     return this.v;
   }
+
 }
 
 export class FontSizer {
@@ -71,6 +72,12 @@ export class FontSizer {
     const k = this.k.mean();
     const p = this.p.mean();
     return p + n * k;
+  }
+
+  dump(x: string) {
+    const k = this.k.mean();
+    const p = this.p.mean();
+    return `${k}.${x}+${p}`;
   }
 
 }

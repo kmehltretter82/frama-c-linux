@@ -30,8 +30,9 @@ export interface Row {
 /* --- Layout Enfine                                                      ---*/
 /* --------------------------------------------------------------------------*/
 
-const PADDING = 2;
-const INSET = 1;
+const HEAD_PADDING = 4; // Left margin
+const CELL_PADDING = 4; // Inter cell padding
+const TEXT_PADDING = 2; // Intra cell padding
 const HCROP = 18;
 const VCROP = 1;
 
@@ -58,7 +59,7 @@ export class LayoutEngine {
     const zoom = Math.max(0, props?.zoom ?? 0);
     this.vcrop = VCROP + 3 * zoom;
     this.hcrop = HCROP + zoom;
-    this.margin = props?.margin ?? 80;
+    this.margin = (props?.margin ?? 80) - HEAD_PADDING;
     this.push = this.push.bind(this);
   }
 
@@ -72,7 +73,7 @@ export class LayoutEngine {
   private chained?: Probe;
 
   crop(zoomed: boolean, s: Size): Size {
-    const s$cols = s.cols + INSET;
+    const s$cols = s.cols + TEXT_PADDING;
     const cols = zoomed ? s$cols : Math.min(s$cols, this.hcrop);
     const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
@@ -140,7 +141,7 @@ export class LayoutEngine {
     if (!stk && s.cols + this.rowSize.cols > this.margin)
       this.flush();
     this.rowSize = addH(this.rowSize, s);
-    this.rowSize.cols += PADDING;
+    this.rowSize.cols += CELL_PADDING;
     this.buffer.push(p);
   }
 
