@@ -411,38 +411,6 @@ function TableCell(props: TableCellProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Table Row Header
-// --------------------------------------------------------------------------
-
-interface TableHeadProps {
-  stackIndex: number | undefined;
-  stackCount: number | undefined;
-  onClick: () => void;
-}
-
-function TableHead(props: TableHeadProps) {
-  const sk = props.stackIndex;
-  const sc = props.stackCount;
-  const hdClass = classes('eva-head', sc ? undefined : 'dome-hidden');
-  const hdHeader = sk === undefined;
-  const hdSummary = sk !== undefined && sk < 0;
-  const hdNumber = sk === undefined ? 0 : 1 + sk;
-  const hdTitle =
-    hdHeader ? 'Callstack / Summary' :
-      hdSummary ? 'Summary' : 'Callstack details';
-  return (
-    <div
-      className={hdClass}
-      title={hdTitle}
-      onClick={props.onClick}
-    >
-      <div className="eva-phantom">{'\u2211'}{sc ?? '#'}</div>
-      {hdHeader ? '#' : hdSummary ? '\u2211' : `${hdNumber}`}
-    </div>
-  );
-}
-
-// --------------------------------------------------------------------------
 // --- Table Section
 // --------------------------------------------------------------------------
 
@@ -469,6 +437,46 @@ function TableSection(props: TableSectionProps) {
       />
       <Cell className="eva-fct-name">{fct}</Cell>
     </>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Table Row Header
+// --------------------------------------------------------------------------
+
+interface TableHeadProps {
+  stackCalls: Callsite[];
+  stackIndex: number | undefined;
+  stackCount: number | undefined;
+  onClick: () => void;
+}
+
+function makeStackTitle(calls: Callsite[]) {
+  const cs = calls.slice(1);
+  if (cs.length > 0)
+    return `Callstack: ${cs.map((c) => c.callee).join(' \u2190 ')}`;
+  return 'Callstack Details';
+}
+
+function TableHead(props: TableHeadProps) {
+  const sk = props.stackIndex;
+  const sc = props.stackCount;
+  const hdClass = classes('eva-head', sc ? undefined : 'dome-hidden');
+  const hdHeader = sk === undefined;
+  const hdSummary = sk !== undefined && sk < 0;
+  const hdNumber = sk === undefined ? 0 : 1 + sk;
+  const hdTitle =
+    hdHeader ? 'Callstack / Summary' :
+      hdSummary ? 'Summary' : makeStackTitle(props.stackCalls);
+  return (
+    <div
+      className={hdClass}
+      title={hdTitle}
+      onClick={props.onClick}
+    >
+      <div className="eva-phantom">{'\u2211'}{sc ?? '#'}</div>
+      {hdHeader ? '#' : hdSummary ? '\u2211' : `${hdNumber}`}
+    </div>
   );
 }
 
@@ -504,6 +512,8 @@ function TableRow(props: TableRowProps) {
   }
   const sk = row.stackIndex;
   const sc = row.stackCount;
+  const cs = row.callstack;
+  const calls = cs ? model.stacks.getCalls(cs) : [];
   const rowKind = `eva-${kind}`;
   const rowParity = sk !== undefined && sk % 2 === 1;
   const rowIndexKind =
@@ -525,6 +535,7 @@ function TableRow(props: TableRowProps) {
         <TableHead
           stackIndex={sk}
           stackCount={sc}
+          stackCalls={calls}
           onClick={onHeaderClick}
         />
         {probes.map(makeCell)}
