@@ -19,14 +19,14 @@ Open Source Release <next-release>
 
 -   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
               invert argument order (path:name).
--   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc
-                           Fixes #@877
--*  Logic     [2020-11-30] assigns clause can't mention const locations 
-                           anymore. Fixes #@855.
+-   Libc      [2020-12-02] remove obsolete attribute FRAMA_C_MODEL in the libc.
+              Fixes #@877.
+-*  Logic     [2020-11-30] assigns clause can't mention const locations
+              anymore. Fixes #@855.
 o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
-                           to module Cil_builtins. Code can be updated using
-                           `bin/migration_scripts/titanium2vanadium.sh`.
--   Metrics   [2020-10-27] Add json output in addition to text and html
+              to module Cil_builtins. Code can be updated using
+              `bin/migration_scripts/titanium2vanadium.sh`.
+-   Metrics   [2020-10-27] Add json output in addition to text and html.
 
 ###################################
 Open Source Release 22.0 (Titanium)
