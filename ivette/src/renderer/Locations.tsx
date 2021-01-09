@@ -11,7 +11,7 @@ import { Table, Column, Renderer } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 import { markerInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------

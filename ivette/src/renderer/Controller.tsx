@@ -14,7 +14,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
 import * as Server from 'frama-c/server';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 
 import 'codemirror/theme/ambiance.css';
 

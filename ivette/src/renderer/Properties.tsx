@@ -14,7 +14,7 @@ import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { TitleBar, Component } from 'frama-c/LabViews';
+import { TitleBar, Component } from 'ivette';
 import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';

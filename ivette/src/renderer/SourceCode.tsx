@@ -9,7 +9,7 @@ import * as Dome from 'dome';
 import { readFile } from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { source } from 'frama-c/api/kernel/services';
 import * as Preferences from './Preferences';

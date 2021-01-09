@@ -11,7 +11,7 @@ import * as Utils from 'frama-c/utils';
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
@@ -87,9 +87,9 @@ async function studia(
   const lval = info.name;
   if (locations.length > 0) {
     const name = `${kind} of ${lval}`;
-    const title = `List of statements ${
-      (kind === 'Reads') ? 'accessing' : 'modifying'
-    } the memory location pointed by ${lval}.`;
+    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
+    const title =
+      `List of statements ${acc} the memory location pointed by ${lval}.`;
     return { name, title, locations, index: 0 };
   }
   const name = `No ${kind.toLowerCase()} of ${lval}`;

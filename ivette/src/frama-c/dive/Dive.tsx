@@ -20,7 +20,7 @@ import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 
 import '@fortawesome/fontawesome-free/js/all';
 

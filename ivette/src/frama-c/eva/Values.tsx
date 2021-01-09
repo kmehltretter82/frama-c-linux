@@ -12,7 +12,7 @@ import { IconButton } from 'dome/controls/buttons';
 import { AutoSizer } from 'react-virtualized';
 
 // Frama-C
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { Component, TitleBar } from 'ivette';
 
 // Locals
 import { ProbeInfos } from './probeinfos';

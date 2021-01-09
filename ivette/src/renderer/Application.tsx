@@ -15,7 +15,7 @@ import { GridHbox, GridItem } from 'dome/layout/grids';
 
 // --- Frama-C Plugins
 
-import { LabView, View, Group } from 'frama-c/LabViews';
+import { LabView, View, Group } from 'ivette';
 import Values from 'frama-c/eva/Values';
 import Dive from 'frama-c/dive/Dive';
 

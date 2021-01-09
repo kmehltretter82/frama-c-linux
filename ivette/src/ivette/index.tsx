@@ -4,7 +4,7 @@
 
 /**
    @packageDocumentation
-   @module frama-c/labviews
+   @module ivette
 */
 
 import _ from 'lodash';

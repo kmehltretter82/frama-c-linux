@@ -9,7 +9,7 @@ import * as Utils from 'frama-c/utils';
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component } from 'frama-c/LabViews';
+import { Component } from 'ivette';
 import { getInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
