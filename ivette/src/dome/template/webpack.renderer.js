@@ -27,11 +27,10 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      '@plugins':     path.resolve( __dirname , 'src/plugins' ),
-      'dome/misc':    path.resolve( DOME , 'src/misc' ),
-      'dome/system':  path.resolve( DOME , 'src/misc/system.ts' ),
-      'dome$':        path.resolve( DOME , 'src/renderer/dome.tsx' ),
-      'dome':         path.resolve( DOME , 'src/renderer' ),
+      'dome/misc':    path.resolve( DOME , 'misc' ),
+      'dome/system':  path.resolve( DOME , 'misc/system.ts' ),
+      'dome$':        path.resolve( DOME , 'renderer/dome.tsx' ),
+      'dome':         path.resolve( DOME , 'renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }
   }

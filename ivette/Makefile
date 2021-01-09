@@ -47,7 +47,7 @@ VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 
 DOC_ICONS_CSS= src/dome/doc/gallery.css
 DOC_ICONS_MAKE= src/dome/doc/iconsmd.js
-DOC_ICONS_DATA= src/dome/src/renderer/controls/gallery.json
+DOC_ICONS_DATA= src/dome/renderer/controls/gallery.json
 DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
@@ -80,13 +80,6 @@ serve: $(NODEBIN)/serve
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"
 	yarn add -D $*
-
-# --------------------------------------------------------------------------
-# --- Ivette Plugins
-# --------------------------------------------------------------------------
-
-DOME_PLUGINS=
-DOME_EXPORTS=
 
 # --------------------------------------------------------------------------
 include $(DOME)/template/makefile
