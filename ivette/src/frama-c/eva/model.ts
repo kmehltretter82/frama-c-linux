@@ -251,7 +251,7 @@ export class Model implements ModelCallbacks {
 }
 
 // --------------------------------------------------------------------------
-// --- EVA Model
+// --- EVA Model Hook
 // --------------------------------------------------------------------------
 
 let MODEL: Model | undefined;
@@ -263,11 +263,12 @@ Server.onShutdown(() => {
   }
 });
 
-export function getModelInstance(): Model {
+export function useModel(): Model {
   if (!MODEL) {
     MODEL = new Model();
     MODEL.mount();
   }
+  Dome.useUpdate(MODEL.changed, MODEL.laidout);
   return MODEL;
 }
 
