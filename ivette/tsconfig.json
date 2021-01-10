@@ -43,7 +43,8 @@
     "resolveJsonModule": true,                /* Allow to load JSON files as module. */
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "ivette": [ "src/renderer/LabView.tsx" ],
+      "ivette@lab": [ "src/renderer/LabView.tsx" ],
+      "ivette": [ "src/ivette" ],
       "frama-c/api/*": [ "api/generated/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
       "dome": [ "src/dome/renderer/dome.tsx" ],

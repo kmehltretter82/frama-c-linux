@@ -2,11 +2,6 @@
 // ---  Lab View Component
 // --------------------------------------------------------------------------
 
-/**
-   @packageDocumentation
-   @module ivette
-*/
-
 import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
@@ -21,7 +16,7 @@ import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
-import { DefineElement, RenderElement } from 'dome/layout/dispatch';
+import { RenderElement } from 'dome/layout/dispatch';
 
 import './style-labview.css';
 
@@ -125,7 +120,14 @@ interface GroupContext {
 
 const GROUP = React.createContext<GroupContext>({});
 
-function useLibraryItem(fd: string, { id, ...props }: any): GroupContext {
+export function useGroupContext() {
+  return React.useContext(GROUP);
+}
+
+export function useLibraryItem(
+  fd: string,
+  { id, ...props }: any,
+): GroupContext {
   const context = React.useContext(GROUP);
   React.useEffect(() => {
     const { group, order } = context;
@@ -140,13 +142,13 @@ function useLibraryItem(fd: string, { id, ...props }: any): GroupContext {
 /* --- Rankifyier                                                         ---*/
 /* --------------------------------------------------------------------------*/
 
-interface RankifyProps {
+export interface RankifyProps {
   group: string | undefined;
   order: number[] | undefined;
   children: React.ReactNode | undefined;
 }
 
-function Rankify(props: RankifyProps) {
+export function Rankify(props: RankifyProps) {
   const { group, order = [], children } = props;
   let rank = 0;
   const rankify = (elt: any) => {
@@ -174,169 +176,21 @@ function UseLibrary(props: { children?: React.ReactNode }) {
   );
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Fragments                                                          ---*/
-/* --------------------------------------------------------------------------*/
-
-export interface FragmentProps {
-  group?: string;
-  rank?: number;
-  children?: React.ReactNode;
-}
-
-/**
-   Ordered collection of LabView Components.
-   Otherwise, elements are ordered by `rank` and `id`.
- */
-export function Fragment(props: FragmentProps) {
-  const { group, rank, children } = props;
-  const context = React.useContext(GROUP);
-  const base = context.order ?? [];
-  return (
-    <Rankify
-      group={group ?? context.group}
-      order={rank === undefined ? base : [...base, rank]}
-    >
-      {children}
-    </Rankify>
-  );
-}
-
-/* --------------------------------------------------------------------------*/
-/* --- Groups                                                             ---*/
-/* --------------------------------------------------------------------------*/
-
-export interface ItemProps {
-  /** Identifier. */
-  id: string;
-  /** Displayed name. */
-  label: string;
-  /** Tooltip description. */
-  title?: string;
-  /** Contents. */
-  children?: React.ReactNode;
-}
-
-/**
-   Defines a group of components. The components rendered
-   _inside_ its content are implicitely affected to this group,
-   unless specified. The group content are also rendered
-   in their specified order. For nested collections of components,
-   use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
- */
-export function Group(props: ItemProps) {
-  const { children, ...group } = props;
-  const context = useLibraryItem('groups', group);
-  return (
-    <Rankify
-      group={props.id}
-      order={context.order ?? []}
-    >
-      {children}
-    </Rankify>
-  );
-}
-
 // --------------------------------------------------------------------------
-// --- Views
+// --- Grid Item
 // --------------------------------------------------------------------------
-
-export interface ViewProps extends ItemProps {
-  /** Use this view by default. */
-  defaultView?: boolean;
-}
-
-/**
-   Layout of LabView Components.
-   Defines a predefined layout of components. The view is organized
-   into a GridContent, which must _only_ consists of:
-   - `<GridHbox>…</GridHbox>` an horizontal grid of `GridContent` elements;
-   - `<GridVbox>…</GridVbox>` a vertical grid of `GridContent` elements;
-   - `<GridItem id=…>` a single component.
-
-   These grid content components must be imported from the `dome/layout/grids`
-   module:
-   ```
-   import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-   ```
- */
-export function View(props: ViewProps) {
-  useLibraryItem('views', props);
-  return null;
-}
-
-// --------------------------------------------------------------------------
-// --- Components
-// --------------------------------------------------------------------------
-
-export interface ComponentProps extends ItemProps {
-  /** Group attachment (defaults to group context) */
-  group?: string;
-  /** Ordering index (defaults to fragment context). */
-  rank?: number;
-}
-
-/**
-   LabView Component.
-   Defines a component and its content when incorporated inside a view.
-   Unless specified, the component will be implicitely attached
-   to the current enclosing group. The `rank` property can be used
-   for adjusting component ordering (see also `<Fragment/>` and `<Group/>`).
- */
-export function Component(props: ComponentProps) {
-  useLibraryItem('components', props);
-  return null;
-}
 
 interface TitleContext {
   id?: string;
   label?: string;
   title?: string;
 }
+
 const TITLE = React.createContext<TitleContext>({});
 
-export interface TitleBarProps {
-  /*
-     @property {string} [icon] - displayed icon
-     @property {string} [label] - displayed name
-     @property {string} [title] - description tooltip
-     @property {React.Children} children - additional components to render
-   */
-  /** Displayed icon. */
-  icon?: string;
-  /** Displayed name (when mounted). */
-  label?: string;
-  /** Tooltip description (when mounted). */
-  title?: string;
-  /** TitleBar additional components (stacked to right). */
-  children?: React.ReactNode;
+export function useTitleContext() {
+  return React.useContext(TITLE);
 }
-
-/**
-   LabView Component's title bar.
-   Defines an alternative component title bar in current context.
-   Default values are taken from the associated component.
- */
-export const TitleBar = ({ icon, label, title, children }: any) => {
-  const context = React.useContext(TITLE);
-  const { id } = context;
-  if (!id) return null;
-  return (
-    <DefineElement id={`labview.title.${id}`}>
-      <Label
-        className="labview-handle"
-        icon={icon}
-        label={label || context.label}
-        title={title || context.title}
-      />
-      {children}
-    </DefineElement>
-  );
-};
-
-// --------------------------------------------------------------------------
-// --- Grid Item
-// --------------------------------------------------------------------------
 
 const GRIDITEM = {
   className: 'dome-container dome-xBoxes-vbox dome-xBoxes-box',
