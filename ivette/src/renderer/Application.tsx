@@ -6,21 +6,22 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import * as States from 'frama-c/states';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
 import { GridHbox, GridItem } from 'dome/layout/grids';
 
-// --- Frama-C Plugins
+// --- Ivette
 
 import { LabView } from 'ivette@lab';
 import { View, Group } from 'ivette';
-import Values from 'frama-c/eva/Values';
-import Dive from 'frama-c/dive/Dive';
 
-// --- Ivette Main Renderers
+// --- Frama-C Plugins
+
+import * as States from 'frama-c/states';
+import Values from 'frama-c/plugins/eva';
+import Dive from 'frama-c/plugins/dive';
 
 import * as Controller from './Controller';
 import ASTview from './ASTview';
