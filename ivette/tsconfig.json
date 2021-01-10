@@ -44,7 +44,8 @@
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
       "ivette@lab": [ "src/renderer/LabView.tsx" ],
-      "ivette": [ "src/ivette" ],
+      "ivette": [ "src/ivette/index.tsx" ],
+      "ivette/*": [ "src/ivette/*" ],
       "frama-c/api/*": [ "api/generated/*" ],
       "frama-c/*": [ "src/frama-c/*" ],
       "dome": [ "src/dome/renderer/dome.tsx" ],

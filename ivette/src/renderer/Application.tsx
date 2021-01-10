@@ -17,21 +17,21 @@ import { GridHbox, GridItem } from 'dome/layout/grids';
 import { LabView } from 'ivette@lab';
 import { View, Group } from 'ivette';
 
-// --- Frama-C Plugins
+// --- Frama-C
 
 import * as States from 'frama-c/states';
+import ASTview from 'frama-c/kernel/ASTview';
+import ASTinfo from 'frama-c/kernel/ASTinfo';
+import Properties from 'frama-c/kernel/Properties';
+import Locations from 'frama-c/kernel/Locations';
+import SourceCode from 'frama-c/kernel/SourceCode';
 import Values from 'frama-c/plugins/eva';
 import Dive from 'frama-c/plugins/dive';
 
 import * as Controller from './Controller';
-import ASTview from './ASTview';
-import ASTinfo from './ASTinfo';
 import Globals, { GlobalHint, useHints } from './Globals';
-import Properties from './Properties';
-import Locations from './Locations';
-import SourceCode from './SourceCode';
 
-import './style-frama-c.css';
+import 'frama-c/kernel/style.css';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls

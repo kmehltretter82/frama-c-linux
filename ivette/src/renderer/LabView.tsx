@@ -18,7 +18,7 @@ import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 import { RenderElement } from 'dome/layout/dispatch';
 
-import './style-labview.css';
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Library Class

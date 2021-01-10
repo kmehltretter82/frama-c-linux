@@ -12,12 +12,12 @@ import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component, TitleBar } from 'ivette';
+import * as Preferences from 'ivette/prefs';
+
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
-
-import * as Preferences from './Preferences';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
