@@ -23,7 +23,7 @@ import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 import { DefineElement, RenderElement } from 'dome/layout/dispatch';
 
-import './style.css';
+import './style-labview.css';
 
 // --------------------------------------------------------------------------
 // --- Library

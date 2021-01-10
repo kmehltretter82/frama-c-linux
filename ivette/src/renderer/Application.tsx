@@ -29,7 +29,7 @@ import Properties from './Properties';
 import Locations from './Locations';
 import SourceCode from './SourceCode';
 
-import './style.css';
+import './style-frama-c.css';
 
 // --------------------------------------------------------------------------
 // --- Selection Controls

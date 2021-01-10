@@ -1,10 +1,24 @@
 /* -------------------------------------------------------------------------- */
-/* --- Styling LabViews                                                   --- */
+/* --- Main Frame                                                         --- */
 /* -------------------------------------------------------------------------- */
 
-.dome-window-active .labview-icon {
-    fill: #7d7d7d ;
+.sidebar-ruler {
+    display: block;
+    visibility: hidden;
+    width: 80px;
+    height: 0px;
 }
+
+.component-info {
+    color: #888 ;
+    min-width: 50px;
+    padding-top: 4px;
+    font-size: smaller;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling LabViews                                                   --- */
+/* -------------------------------------------------------------------------- */
 
 .labview-field {
     position: relative ;
@@ -46,4 +60,8 @@
 .labview-close:hover
 {
     fill: red ;
+}
+
+.dome-window-active .labview-icon {
+    fill: #7d7d7d ;
 }
