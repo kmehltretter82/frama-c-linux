@@ -14,7 +14,6 @@ import { GridHbox, GridItem } from 'dome/layout/grids';
 
 // --- Ivette
 
-import { LabView } from 'ivette@lab';
 import { View, Group } from 'ivette';
 
 // --- Frama-C
@@ -29,7 +28,9 @@ import Values from 'frama-c/plugins/eva';
 import Dive from 'frama-c/plugins/dive';
 
 import * as Controller from './Controller';
-import Globals, { GlobalHint, useHints } from './Globals';
+import * as Extensions from './Extensions';
+import { LabView } from './LabView';
+import Globals from './Globals';
 
 import 'frama-c/kernel/style.css';
 
@@ -70,13 +71,9 @@ export default (() => {
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
-  const [hints, onSearchHint] = useHints();
-  const [, setSelection] = States.useSelection();
-  const onGlobalHint = (h: GlobalHint) => {
-    setSelection({ location: h.value });
-  };
-  const onSelectHint = () => {
-    if (hints.length === 1) onGlobalHint(hints[0]);
+  const hints = Extensions.useSearchHints();
+  const onSelectedHints = () => {
+    if (hints.length === 1) Extensions.onSearchHint(hints[0]);
   };
 
   return (
@@ -94,9 +91,9 @@ export default (() => {
         <Toolbar.SearchField
           placeholder="Search…"
           hints={hints}
-          onSearch={onSearchHint}
-          onSelect={onSelectHint}
-          onHint={onGlobalHint}
+          onSearch={Extensions.searchHints}
+          onHint={Extensions.onSearchHint}
+          onSelect={onSelectedHints}
         />
         <Toolbar.Button
           icon="ITEMS.GRID"

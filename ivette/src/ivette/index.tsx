@@ -1,6 +1,6 @@
-// --------------------------------------------------------------------------
-// ---  Lab View Component
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------*/
+/* --- Lab View Component                                                 ---*/
+/* --------------------------------------------------------------------------*/
 
 /**
    @packageDocumentation
@@ -11,13 +11,8 @@ import React from 'react';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-import {
-  Rankify,
-  useGroupContext,
-  useLibraryItem,
-  addLibraryItem,
-  useTitleContext,
-} from 'ivette@lab';
+import * as Lab from 'ivette@lab';
+import * as Ext from 'ivette@ext';
 
 /* --------------------------------------------------------------------------*/
 /* --- Fragments                                                          ---*/
@@ -36,15 +31,15 @@ export interface FragmentProps {
  */
 export function Fragment(props: FragmentProps) {
   const { group, rank, children } = props;
-  const context = useGroupContext();
+  const context = Lab.useGroupContext();
   const base = context.order ?? [];
   return (
-    <Rankify
+    <Lab.Rankify
       group={group ?? context.group}
       order={rank === undefined ? base : [...base, rank]}
     >
       {children}
-    </Rankify>
+    </Lab.Rankify>
   );
 }
 
@@ -76,7 +71,7 @@ export interface ContentProps extends ItemProps {
    Empty groups are not displayed.
  */
 export function registerGroup(group: ItemProps) {
-  addLibraryItem('groups', group);
+  Lab.addLibraryItem('groups', group);
 }
 
 /**
@@ -89,20 +84,20 @@ export function registerGroup(group: ItemProps) {
  */
 export function Group(props: ContentProps) {
   const { children, ...group } = props;
-  const context = useLibraryItem('groups', group);
+  const context = Lab.useLibraryItem('groups', group);
   return (
-    <Rankify
+    <Lab.Rankify
       group={props.id}
       order={context.order ?? []}
     >
       {children}
-    </Rankify>
+    </Lab.Rankify>
   );
 }
 
-// --------------------------------------------------------------------------
-// --- View Layout
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------*/
+/* --- View Layout                                                        ---*/
+/* --------------------------------------------------------------------------*/
 
 export type Layout = string | { hsplit: Layout[] } | { vsplit: Layout[] };
 
@@ -146,7 +141,7 @@ export interface ViewLayoutProps extends ItemProps {
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps) {
   const { id, label, title, defaultView, layout } = view;
-  addLibraryItem('view', {
+  Lab.addLibraryItem('view', {
     id,
     label,
     title,
@@ -155,9 +150,9 @@ export function registerView(view: ViewLayoutProps) {
   });
 }
 
-// --------------------------------------------------------------------------
-// --- Deprecated Views
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------*/
+/* --- Deprecated View                                                    ---*/
+/* --------------------------------------------------------------------------*/
 
 export interface ViewProps extends ContentProps {
   /** Use this view by default. */
@@ -180,13 +175,13 @@ export interface ViewProps extends ContentProps {
    @deprecated Use [[registerView]] instead.
  */
 export function View(props: ViewProps) {
-  useLibraryItem('views', props);
+  Lab.useLibraryItem('views', props);
   return null;
 }
 
-// --------------------------------------------------------------------------
-// --- Components
-// --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------*/
+/* --- Components                                                         ---*/
+/* --------------------------------------------------------------------------*/
 
 export interface ComponentProps extends ContentProps {
   /** Group attachment. */
@@ -200,7 +195,7 @@ export interface ComponentProps extends ContentProps {
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps) {
-  addLibraryItem('components', props);
+  Lab.addLibraryItem('components', props);
 }
 
 /**
@@ -212,7 +207,7 @@ export function registerComponent(props: ComponentProps) {
    @deprecated Use [[registerComponent]] instead.
  */
 export function Component(props: ComponentProps) {
-  useLibraryItem('components', props);
+  Lab.useLibraryItem('components', props);
   return null;
 }
 
@@ -240,7 +235,7 @@ export interface TitleBarProps {
  */
 export function TitleBar(props: TitleBarProps) {
   const { icon, label, title, children } = props;
-  const context = useTitleContext();
+  const context = Lab.useTitleContext();
   if (!context.id) return null;
   return (
     <DefineElement id={`labview.title.${context.id}`}>
@@ -253,6 +248,32 @@ export function TitleBar(props: TitleBarProps) {
       {children}
     </DefineElement>
   );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Search Hints                                                       ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface Hint {
+  id: string;
+  label: string | JSX.Element;
+  title?: string;
+  rank?: number;
+  onSelection: () => void;
+}
+
+/**
+   Register a hint search engine for the Ivette toolbar.
+*/
+export function registerHints(
+  id: string,
+  lookup: (pattern: string) => Promise<Hint[]>,
+) {
+  const adaptor = (h: Hint): Ext.SearchHint => (
+    { ...h, value: () => h.onSelection() }
+  );
+  const search = (p: string) => lookup(p).then((hs) => hs.map(adaptor));
+  Ext.registerHints({ id, search });
 }
 
 // --------------------------------------------------------------------------

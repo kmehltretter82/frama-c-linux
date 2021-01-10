@@ -2,8 +2,7 @@
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
 
-/*
-   Ivette Preferences
+/**
    @packageDocumentation
    @module ivette/prefs
  */

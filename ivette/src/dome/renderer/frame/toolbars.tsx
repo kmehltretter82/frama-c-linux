@@ -242,7 +242,7 @@ export interface SearchFieldProps<A> {
   onSearch?: (pattern: string) => void;
   /** Hint selection callback. */
   onHint?: (hint: Hint<A>) => void;
-  /** Event that triggers a focus request (defaults to [[Dome.find]]). */
+  /** Event that triggers a focus request (defaults to [[dome.find]]). */
   event?: null | Event<void>;
 }
 

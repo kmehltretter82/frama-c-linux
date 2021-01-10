@@ -29,6 +29,7 @@ module.exports = {
     alias: {
       'frama-c/api':  path.resolve( __dirname , 'src/frama-c/api/generated' ),
       'frama-c':      path.resolve( __dirname , 'src/frama-c' ),
+      'ivette@ext':   path.resolve( __dirname , 'src/renderer/Extensions' ),
       'ivette@lab':   path.resolve( __dirname , 'src/renderer/LabView' ),
       'ivette':       path.resolve( __dirname , 'src/ivette' ),
       'dome/misc':    path.resolve( DOME , 'misc' ),

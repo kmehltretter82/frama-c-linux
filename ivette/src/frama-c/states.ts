@@ -13,7 +13,7 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
-import { useModel } from 'dome/table/models';
+import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Server from './server';
@@ -398,7 +398,7 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<string, SyncArray<any, any>>();
 
-function getSyncArray<K, A>(
+function lookupSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
@@ -418,7 +418,7 @@ Server.onShutdown(() => syncArrays.clear());
 
 /** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>) {
-  getSyncArray(arr).reload();
+  lookupSyncArray(arr).reload();
 }
 
 /**
@@ -435,11 +435,35 @@ export function useSyncArray<K, A>(
   sync = true,
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
-  const st = getSyncArray(arr);
+  const st = lookupSyncArray(arr);
   React.useEffect(st.update);
   Server.useSignal(arr.signal, st.fetch);
   useModel(st.model, sync);
   return st.model;
+}
+
+/**
+   Return the associated array model.
+*/
+export function getSyncArray<K, A>(
+  arr: Array<K, A>,
+): CompactModel<K, A> {
+  const st = lookupSyncArray(arr);
+  return st.model;
+}
+
+/**
+   Link on the associated array model.
+   @param onReload callback on reload event and update event if not specified.
+   @param onUpdate callback on update event.
+ */
+export function onSyncArray<K, A>(
+  arr: Array<K, A>,
+  onReload?: () => void,
+  onUpdate?: () => void,
+): Client {
+  const st = lookupSyncArray(arr);
+  return st.model.link(onReload, onUpdate);
 }
 
 // --------------------------------------------------------------------------
