@@ -138,6 +138,14 @@ export function useLibraryItem(
   return context;
 }
 
+export function addLibraryItem(
+  fd: string,
+  { id, ...props }: any,
+) {
+  const itemId = `${fd}.${id}`;
+  LIBRARY.addItem(itemId, undefined, [], props);
+}
+
 /* --------------------------------------------------------------------------*/
 /* --- Rankifyier                                                         ---*/
 /* --------------------------------------------------------------------------*/

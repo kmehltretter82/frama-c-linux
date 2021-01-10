@@ -10,10 +10,12 @@
 import React from 'react';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
+import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import {
   Rankify,
   useGroupContext,
   useLibraryItem,
+  addLibraryItem,
   useTitleContext,
 } from 'ivette@lab';
 
@@ -30,6 +32,7 @@ export interface FragmentProps {
 /**
    Ordered collection of LabView Components.
    Otherwise, elements are ordered by `rank` and `id`.
+   @deprecated Use [[registerComponent]] with `rank` property.
  */
 export function Fragment(props: FragmentProps) {
   const { group, rank, children } = props;
@@ -46,7 +49,7 @@ export function Fragment(props: FragmentProps) {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- Groups                                                             ---*/
+/* --- Items                                                              ---*/
 /* --------------------------------------------------------------------------*/
 
 export interface ItemProps {
@@ -56,8 +59,24 @@ export interface ItemProps {
   label: string;
   /** Tooltip description. */
   title?: string;
+}
+
+export interface ContentProps extends ItemProps {
   /** Contents. */
   children?: React.ReactNode;
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Groups                                                             ---*/
+/* --------------------------------------------------------------------------*/
+
+/**
+   Defines a group of components.
+   To arrach components to the group, use their `group` property.
+   Empty groups are not displayed.
+ */
+export function registerGroup(group: ItemProps) {
+  addLibraryItem('groups', group);
 }
 
 /**
@@ -66,8 +85,9 @@ export interface ItemProps {
    unless specified. The group content are also rendered
    in their specified order. For nested collections of components,
    use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
+   @deprecated Use [[registerGroup]] instead.
  */
-export function Group(props: ItemProps) {
+export function Group(props: ContentProps) {
   const { children, ...group } = props;
   const context = useLibraryItem('groups', group);
   return (
@@ -81,10 +101,65 @@ export function Group(props: ItemProps) {
 }
 
 // --------------------------------------------------------------------------
-// --- Views
+// --- View Layout
 // --------------------------------------------------------------------------
 
-export interface ViewProps extends ItemProps {
+export type Layout = string | { hsplit: Layout[] } | { vsplit: Layout[] };
+
+function isHsplit(ly: Layout): ly is { hsplit: Layout[] } {
+  return (ly as any).hsplit !== undefined;
+}
+
+function isVsplit(ly: Layout): ly is { vsplit: Layout[] } {
+  return (ly as any).vsplit !== undefined;
+}
+
+function makeLayout(ly: Layout) {
+  if (typeof (ly) === 'string') return <GridItem id={ly} />;
+  if (isHsplit(ly)) return (
+    <GridHbox>
+      {React.Children.toArray(ly.hsplit.map(makeLayout))}
+    </GridHbox>
+  );
+  if (isVsplit(ly)) return (
+    <GridVbox>
+      {React.Children.toArray(ly.vsplit.map(makeLayout))}
+    </GridVbox>
+  );
+  return null;
+}
+
+function makeRootLayout(ly: Layout) {
+  if (isVsplit(ly)) return (
+    React.Children.toArray(ly.vsplit.map(makeLayout))
+  );
+  return makeLayout(ly);
+}
+
+export interface ViewLayoutProps extends ItemProps {
+  /** Use this view by default. */
+  defaultView?: boolean;
+  /** View layout. */
+  layout: Layout;
+}
+
+/** Register a new View. */
+export function registerView(view: ViewLayoutProps) {
+  const { id, label, title, defaultView, layout } = view;
+  addLibraryItem('view', {
+    id,
+    label,
+    title,
+    defaultView,
+    children: makeRootLayout(layout),
+  });
+}
+
+// --------------------------------------------------------------------------
+// --- Deprecated Views
+// --------------------------------------------------------------------------
+
+export interface ViewProps extends ContentProps {
   /** Use this view by default. */
   defaultView?: boolean;
 }
@@ -102,6 +177,7 @@ export interface ViewProps extends ItemProps {
    ```
    import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
    ```
+   @deprecated Use [[registerView]] instead.
  */
 export function View(props: ViewProps) {
   useLibraryItem('views', props);
@@ -112,11 +188,19 @@ export function View(props: ViewProps) {
 // --- Components
 // --------------------------------------------------------------------------
 
-export interface ComponentProps extends ItemProps {
-  /** Group attachment (defaults to group context) */
+export interface ComponentProps extends ContentProps {
+  /** Group attachment. */
   group?: string;
-  /** Ordering index (defaults to fragment context). */
+  /** Ordering index. */
   rank?: number;
+}
+
+/**
+   Register the given Ivette Component.
+   Components are sorted by rank and identifier among each group.
+ */
+export function registerComponent(props: ComponentProps) {
+  addLibraryItem('components', props);
 }
 
 /**
@@ -125,6 +209,7 @@ export interface ComponentProps extends ItemProps {
    Unless specified, the component will be implicitely attached
    to the current enclosing group. The `rank` property can be used
    for adjusting component ordering (see also `<Fragment/>` and `<Group/>`).
+   @deprecated Use [[registerComponent]] instead.
  */
 export function Component(props: ComponentProps) {
   useLibraryItem('components', props);
