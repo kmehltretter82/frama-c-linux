@@ -376,7 +376,6 @@ access_or_const
   : INT { PCst (IntConstant $1) }
   | MINUS INT { PUnop (Uminus, PCst (IntConstant $2)) }
   | access %prec TRUE { $1 }
-  | LPAREN arith_relation RPAREN { $2 }
   ;
 
 /* returns a lval */
