@@ -228,6 +228,20 @@ let backward_bor ~v1 ~v2 ~res =
   in
   backward_bor_aux v1 v2, backward_bor_aux v2 v1
 
+let backward_land ~v1 ~v2 ~res =
+  if V.is_zero res then
+    match V.contains_zero v1, V.contains_zero v2 with
+    | true, true -> None
+    | false, false -> Some (V.bottom, V.bottom)
+    | true, false -> Some (V.singleton_zero, v2)
+    | false, true -> Some (v1, V.singleton_zero)
+  else if V.contains_zero res then
+    None
+  else
+    let v1' = V.(diff v1 singleton_zero)
+    and v2' = V.(diff v2 singleton_zero) in
+    if V.equal v1 v1' && V.equal v2 v2' then None else Some (v1', v2')
+
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   let typ = Cil.unrollType typ_res in
   match binop, typ with
@@ -302,6 +316,8 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   | BAnd, TInt _ -> Some (backward_band ~v1 ~v2 ~res:res_value typ)
 
   | BOr, TInt _ -> Some (backward_bor ~v1 ~v2 ~res:res_value)
+
+  | LAnd, TInt _ -> backward_land ~v1 ~v2 ~res:res_value
 
   | _, _ -> None
 
