@@ -149,7 +149,7 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token EOF
 
 %left STAR
-%left DOT
+%left DOT RARROW
 %left LSQUARE
 
 %type <Promelaast.parsed_automaton> main
@@ -378,6 +378,7 @@ access_or_const
 /* returns a lval */
 access
   : access DOT IDENTIFIER { PField($1,$3) }
+  | access RARROW IDENTIFIER { PField(PUnop(Ustar,$1),$3) }
   | access LSQUARE access_or_const RSQUARE { PArrget($1,$3) }
   | access_leaf     {$1}
   ;
@@ -392,19 +393,9 @@ access_leaf
 
 actions
   : /* epsilon */                   { [] }
-  | non_empty_actions opt_semicolon { $1 }
-  ;
-
-non_empty_actions
-  : non_empty_actions SEMI_COLON action { $1 @ [$3] }
-  | action                              { [$1] }
+  | action actions { $1 :: $2 }
   ;
 
 action
-  : METAVAR AFF arith_relation { Metavar_assign ($1, $3) }
-  ;
-
-opt_semicolon
-  : /* empty */ {}
-  | SEMI_COLON  {}
+  : METAVAR AFF arith_relation SEMI_COLON { Metavar_assign ($1, $3) }
   ;
