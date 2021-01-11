@@ -62,9 +62,20 @@ function ValuesComponent() {
 Ivette.registerComponent({
   id: 'frama-c.plugins.values',
   group: 'frama-c.plugins',
+  rank: 1,
   label: 'Eva Values',
   title: 'Values inferred by the Eva analysis',
   children: <ValuesComponent />,
+});
+
+Ivette.registerView({
+  id: 'values',
+  rank: 1,
+  label: 'Eva Values',
+  layout: [
+    ['frama-c.astview', 'frama-c.plugins.values'],
+    'frama-c.properties',
+  ],
 });
 
 // --------------------------------------------------------------------------

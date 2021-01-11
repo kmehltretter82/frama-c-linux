@@ -15,67 +15,6 @@ import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
 
 /* --------------------------------------------------------------------------*/
-/* --- Fragments                                                          ---*/
-/* --------------------------------------------------------------------------*/
-
-let PKG = 0;
-let RANK = 0;
-let ORDER: number[] = [];
-
-/** @internal */
-export function newPackage() {
-  RANK = ++PKG;
-  ORDER = [];
-}
-
-/** @internal */
-export function nextOrder() {
-  return [...ORDER, ++RANK];
-}
-
-/**
-   Use implicit rank ordering for each element register
-   during the continuation passed in argument.
- */
-export function registerFragment(job: () => void) {
-  const STACK = ORDER;
-  const SRANK = ++RANK;
-  try {
-    ORDER = [...ORDER, SRANK];
-    RANK = 0;
-    job();
-  } finally {
-    ORDER = STACK;
-    RANK = SRANK;
-  }
-}
-
-export interface FragmentProps {
-  group?: string;
-  rank?: number;
-  children?: React.ReactNode;
-}
-
-/**
-   Ordered collection of LabView Components.
-   Otherwise, elements are ordered by `rank` and `id`.
-   @deprecated Use [[registerComponent]] with `rank` property.
- */
-export function Fragment(props: FragmentProps) {
-  const { group, rank, children } = props;
-  const context = Lab.useGroupContext();
-  const base = context.order ?? [];
-  return (
-    <Lab.Rankify
-      group={group ?? context.group}
-      order={rank === undefined ? base : [...base, rank]}
-    >
-      {children}
-    </Lab.Rankify>
-  );
-}
-
-/* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
 /* --------------------------------------------------------------------------*/
 
@@ -110,7 +49,7 @@ let GROUP: string | undefined;
    during the continuation.
  */
 export function registerGroup(group: ItemProps, job?: () => void) {
-  Lab.addLibraryItem('groups', undefined, nextOrder(), group);
+  Lab.addLibraryItem('groups', undefined, [], group);
   if (job) {
     const STACK = GROUP;
     try {
@@ -122,61 +61,31 @@ export function registerGroup(group: ItemProps, job?: () => void) {
   }
 }
 
-/**
-   Defines a group of components. The components rendered
-   _inside_ its content are implicitely affected to this group,
-   unless specified. The group content are also rendered
-   in their specified order. For nested collections of components,
-   use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
-   @deprecated Use [[registerGroup]] instead.
- */
-export function Group(props: ContentProps) {
-  const { children, ...group } = props;
-  const context = Lab.useLibraryItem('groups', group);
-  return (
-    <Lab.Rankify
-      group={props.id}
-      order={context.order ?? []}
-    >
-      {children}
-    </Lab.Rankify>
-  );
-}
-
 /* --------------------------------------------------------------------------*/
 /* --- View Layout                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
-export type Layout = string | { hsplit: Layout[] } | { vsplit: Layout[] };
+/**
+   Alternating V-split and H-split layouts.
+ */
+export type Layout = string | Layout[];
 
-function isHsplit(ly: Layout): ly is { hsplit: Layout[] } {
-  return (ly as any).hsplit !== undefined;
-}
-
-function isVsplit(ly: Layout): ly is { vsplit: Layout[] } {
-  return (ly as any).vsplit !== undefined;
-}
-
-function makeLayout(ly: Layout) {
+function makeLayout(ly: Layout, hsplit = false) {
   if (typeof (ly) === 'string') return <GridItem id={ly} />;
-  if (isHsplit(ly)) return (
-    <GridHbox>
-      {React.Children.toArray(ly.hsplit.map(makeLayout))}
-    </GridHbox>
-  );
-  if (isVsplit(ly)) return (
+  if (!ly) return null;
+  if (hsplit) {
+    return (
+      <GridHbox>
+        {React.Children.toArray(ly.map((l) => makeLayout(l, false)))}
+      </GridHbox>
+    );
+  }
+  return (
     <GridVbox>
-      {React.Children.toArray(ly.vsplit.map(makeLayout))}
+      {React.Children.toArray(ly.map((l) => makeLayout(l, true)))}
     </GridVbox>
   );
-  return null;
-}
 
-function makeRootLayout(ly: Layout) {
-  if (isVsplit(ly)) return (
-    React.Children.toArray(ly.vsplit.map(makeLayout))
-  );
-  return makeLayout(ly);
 }
 
 export interface ViewLayoutProps extends ItemProps {
@@ -188,43 +97,11 @@ export interface ViewLayoutProps extends ItemProps {
 
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps) {
-  const { id, label, title, defaultView, layout } = view;
-  Lab.addLibraryItem('view', undefined, nextOrder(), {
-    id,
-    label,
-    title,
-    defaultView,
-    children: makeRootLayout(layout),
+  const { layout, ...viewprops } = view;
+  Lab.addLibraryItem('views', undefined, [], {
+    ...viewprops,
+    children: makeLayout(layout),
   });
-}
-
-/* --------------------------------------------------------------------------*/
-/* --- Deprecated View                                                    ---*/
-/* --------------------------------------------------------------------------*/
-
-export interface ViewProps extends ContentProps {
-  /** Use this view by default. */
-  defaultView?: boolean;
-}
-
-/**
-   Layout of LabView Components.
-   Defines a predefined layout of components. The view is organized
-   into a GridContent, which must _only_ consists of:
-   - `<GridHbox>…</GridHbox>` an horizontal grid of `GridContent` elements;
-   - `<GridVbox>…</GridVbox>` a vertical grid of `GridContent` elements;
-   - `<GridItem id=…>` a single component.
-
-   These grid content components must be imported from the `dome/layout/grids`
-   module:
-   ```
-   import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-   ```
-   @deprecated Use [[registerView]] instead.
- */
-export function View(props: ViewProps) {
-  Lab.useLibraryItem('views', props);
-  return null;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -241,20 +118,7 @@ export interface ComponentProps extends ContentProps {
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps) {
-  Lab.addLibraryItem('components', GROUP, nextOrder(), props);
-}
-
-/**
-   LabView Component.
-   Defines a component and its content when incorporated inside a view.
-   Unless specified, the component will be implicitely attached
-   to the current enclosing group. The `rank` property can be used
-   for adjusting component ordering (see also `<Fragment/>` and `<Group/>`).
-   @deprecated Use [[registerComponent]] instead.
- */
-export function Component(props: ComponentProps) {
-  Lab.useLibraryItem('components', props);
-  return null;
+  Lab.addLibraryItem('components', GROUP, [], props);
 }
 
 export interface TitleBarProps {

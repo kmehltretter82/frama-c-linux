@@ -13,8 +13,8 @@ import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
+import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
-import { registerComponent, TitleBar } from 'ivette';
 
 import 'codemirror/theme/ambiance.css';
 
@@ -251,7 +251,7 @@ const RenderConsole = () => {
 
   return (
     <>
-      <TitleBar label={edited ? 'Command line' : 'Console'}>
+      <Ivette.TitleBar label={edited ? 'Command line' : 'Console'}>
         <IconButton
           icon="TRASH"
           display={edited}
@@ -300,7 +300,7 @@ const RenderConsole = () => {
           onClick={doSwitch}
           title="Toggle command line editing"
         />
-      </TitleBar>
+      </Ivette.TitleBar>
       <Text
         buffer={edited ? editor : Server.buffer}
         mode="text"
@@ -311,13 +311,21 @@ const RenderConsole = () => {
   );
 };
 
-registerComponent({
+Ivette.registerComponent({
   id: 'frama-c.console',
   group: 'frama-c.kernel',
   label: 'Console',
   title: 'Frama-C Server Output & Command Line',
   rank: -1,
   children: <RenderConsole />,
+});
+
+Ivette.registerView({
+  id: 'console',
+  rank: -1,
+  label: 'Console',
+  defaultView: true,
+  layout: 'frama-c.console',
 });
 
 // --------------------------------------------------------------------------

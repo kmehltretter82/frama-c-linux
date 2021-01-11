@@ -10,11 +10,9 @@ import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
-import { GridHbox, GridItem } from 'dome/layout/grids';
-import { View } from 'ivette';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
-import * as Laboratory from './LabView';
+import * as Laboratory from './Laboratory';
 import './PackageLoader';
 
 // --------------------------------------------------------------------------
@@ -65,29 +63,7 @@ export default (() => {
         <Laboratory.LabView
           customize={viewbar}
           settings="frama-c.labview"
-        >
-          <View id="console" label="Console" defaultView>
-            <GridItem id="frama-c.console" />
-          </View>
-          <View id="values" label="Values">
-            <GridHbox>
-              <GridItem id="frama-c.astview" />
-              <GridItem id="frama-c.plugins.values" />
-            </GridHbox>
-            <GridItem id="frama-c.properties" />
-          </View>
-          <View id="dive" label="Dive">
-            <GridHbox>
-              <GridItem id="frama-c.astview" />
-              <GridItem id="frama-c.plugins.dive" />
-              <GridItem id="frama-c.locations" />
-            </GridHbox>
-            <GridHbox>
-              <GridItem id="frama-c.properties" />
-              <GridItem id="frama-c.console" />
-            </GridHbox>
-          </View>
-        </Laboratory.LabView>
+        />
       </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />

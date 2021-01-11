@@ -412,7 +412,7 @@ class Dive {
         });
         break;
       default: /* This is useless and impossible if the program is correctly
-        typed, but the linter wants it */
+                  typed, but the linter wants it */
     }
   }
 
@@ -607,13 +607,23 @@ function GraphView() {
 
 Ivette.registerComponent({
   id: 'frama-c.plugins.dive',
-  label: 'Data-flow graph',
+  label: 'Dive Dataflow',
   group: 'frama-c.plugins',
   rank: 2,
   title:
     'Data dependency graph according to an Eva analysis.\nNodes color ' +
     'represents the precision of the values inferred by Eva.',
   children: <GraphView />,
+});
+
+Ivette.registerView({
+  id: 'dive',
+  label: 'Dive Dataflow',
+  rank: 2,
+  layout: [
+    ['frama-c.astview', 'frama-c.plugins.dive', 'frama-c.locations'],
+    ['frama-c.properties', 'frama-c.console'],
+  ],
 });
 
 // --------------------------------------------------------------------------
