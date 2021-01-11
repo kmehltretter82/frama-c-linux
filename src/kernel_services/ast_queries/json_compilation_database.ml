@@ -211,6 +211,16 @@ let update_flags_verbosely path flags =
   | Not_found ->
     Flags.add path flags
 
+let parse_build_entry bcdb_dir r =
+  let open Yojson.Basic.Util in
+  let filenames = r |> member "sources" |> to_list |> List.map to_string in
+  let args = List.map to_string (r |> member "arguments" |> to_list) in
+  let flags = filter_useful_flags ~requote:true args in
+  List.iter (fun filename ->
+      let path = Datatype.Filepath.of_string ~base_name:bcdb_dir filename in
+      update_flags_verbosely path flags
+    ) filenames
+
 let parse_compilation_entry jcdb_dir r =
   let open Yojson.Basic.Util in
   let filename = r |> member "file" |> to_string in
@@ -259,7 +269,15 @@ let compute_flags_from_file () =
       let r_list =
         Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
       in
-      List.iter (parse_compilation_entry jcdb_dir) r_list;
+      let is_build_database =
+        try
+          List.hd r_list |> Yojson.Basic.Util.member "sources" <> `Null
+        with _ -> false
+      in
+      let parse_entry =
+        if is_build_database then parse_build_entry else parse_compilation_entry
+      in
+      List.iter (parse_entry jcdb_dir) r_list;
     with
     | Sys_error msg
     | Yojson.Json_error msg
