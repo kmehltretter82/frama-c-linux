@@ -18,7 +18,8 @@ import { View, Group } from 'ivette';
 
 // --- Frama-C
 
-import * as States from 'frama-c/states';
+import History from 'frama-c/kernel/History';
+import Globals from 'frama-c/kernel/Globals';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import Properties from 'frama-c/kernel/Properties';
@@ -30,37 +31,8 @@ import Dive from 'frama-c/plugins/dive';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import { LabView } from './LabView';
-import Globals from './Globals';
 
 import 'frama-c/kernel/style.css';
-
-// --------------------------------------------------------------------------
-// --- Selection Controls
-// --------------------------------------------------------------------------
-
-const HistorySelectionControls = () => {
-  const [selection, updateSelection] = States.useSelection();
-
-  const doPrevSelect = () => { updateSelection('HISTORY_PREV'); };
-  const doNextSelect = () => { updateSelection('HISTORY_NEXT'); };
-
-  return (
-    <Toolbar.ButtonGroup>
-      <Toolbar.Button
-        icon="ANGLE.LEFT"
-        onClick={doPrevSelect}
-        disabled={!selection || selection.history.prevSelections.length === 0}
-        title="Previous location"
-      />
-      <Toolbar.Button
-        icon="ANGLE.RIGHT"
-        onClick={doNextSelect}
-        disabled={!selection || selection.history.nextSelections.length === 0}
-        title="Next location"
-      />
-    </Toolbar.ButtonGroup>
-  );
-};
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -86,7 +58,7 @@ export default (() => {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <HistorySelectionControls />
+        <History />
         <Toolbar.Filler />
         <Toolbar.SearchField
           placeholder="Search…"
@@ -105,7 +77,7 @@ export default (() => {
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
-          <Globals key="globals" />
+          <Globals />
         </Sidebar.SideBar>
         <LabView
           customize={viewbar}
