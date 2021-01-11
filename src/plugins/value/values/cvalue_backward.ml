@@ -242,6 +242,20 @@ let backward_land ~v1 ~v2 ~res =
     and v2' = V.(diff v2 singleton_zero) in
     if V.equal v1 v1' && V.equal v2 v2' then None else Some (v1', v2')
 
+let backward_lor ~v1 ~v2 ~res =
+  if V.is_zero res then
+    if V.is_zero v1 && V.is_zero v2
+    then None
+    else Some (V.singleton_zero, V.singleton_zero)
+  else if V.contains_zero res then
+    None
+  else
+    match V.is_zero v1, V.is_zero v2 with
+    | false, false -> None
+    | true, true -> Some (V.bottom, V.bottom)
+    | true, false -> Some (v1, V.diff v2 V.singleton_zero)
+    | false, true -> Some (V.diff v1 V.singleton_zero, v2)
+
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   let typ = Cil.unrollType typ_res in
   match binop, typ with
@@ -318,6 +332,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   | BOr, TInt _ -> Some (backward_bor ~v1 ~v2 ~res:res_value)
 
   | LAnd, TInt _ -> backward_land ~v1 ~v2 ~res:res_value
+  | LOr, TInt _ -> backward_lor ~v1 ~v2 ~res:res_value
 
   | _, _ -> None
 
