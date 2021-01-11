@@ -134,4 +134,8 @@ export const SIDEBAR = new ElementRack();
 export const TOOLBAR = new ElementRack();
 export const STATUSBAR = new ElementRack();
 
+export function Sidebar() { return useRack(SIDEBAR); }
+export function Toolbar() { return useRack(TOOLBAR); }
+export function Statusbar() { return useRack(STATUSBAR); }
+
 /* --------------------------------------------------------------------------*/

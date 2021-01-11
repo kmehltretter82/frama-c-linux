@@ -52,7 +52,7 @@ class Library {
     id: string,
     gcontext: any,
     path: any[],
-    props: { rank: undefined; group: any },
+    props: any,
   ) {
     if (!this.modified) {
       this.modified = true;
@@ -140,10 +140,13 @@ export function useLibraryItem(
 
 export function addLibraryItem(
   fd: string,
+  group: string | undefined,
+  order: number[],
   { id, ...props }: any,
 ) {
   const itemId = `${fd}.${id}`;
-  LIBRARY.addItem(itemId, undefined, [], props);
+  console.log('ITEM', itemId, group, order, props);
+  LIBRARY.addItem(itemId, group, order, props);
 }
 
 /* --------------------------------------------------------------------------*/

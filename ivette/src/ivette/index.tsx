@@ -18,6 +18,38 @@ import * as Ext from 'ivette@ext';
 /* --- Fragments                                                          ---*/
 /* --------------------------------------------------------------------------*/
 
+let PKG = 0;
+let RANK = 0;
+let ORDER: number[] = [];
+
+/** @internal */
+export function newPackage() {
+  RANK = ++PKG;
+  ORDER = [];
+}
+
+/** @internal */
+export function nextOrder() {
+  return [...ORDER, ++RANK];
+}
+
+/**
+   Use implicit rank ordering for each element register
+   during the continuation passed in argument.
+ */
+export function registerFragment(job: () => void) {
+  const STACK = ORDER;
+  const SRANK = ++RANK;
+  try {
+    ORDER = [...ORDER, SRANK];
+    RANK = 0;
+    job();
+  } finally {
+    ORDER = STACK;
+    RANK = SRANK;
+  }
+}
+
 export interface FragmentProps {
   group?: string;
   rank?: number;
@@ -54,6 +86,8 @@ export interface ItemProps {
   label: string;
   /** Tooltip description. */
   title?: string;
+  /** Ordering index. */
+  rank?: number;
 }
 
 export interface ContentProps extends ItemProps {
@@ -65,13 +99,27 @@ export interface ContentProps extends ItemProps {
 /* --- Groups                                                             ---*/
 /* --------------------------------------------------------------------------*/
 
+let GROUP: string | undefined;
+
 /**
    Defines a group of components.
    To arrach components to the group, use their `group` property.
    Empty groups are not displayed.
+
+   If provided, the group is used by default for all components registered
+   during the continuation.
  */
-export function registerGroup(group: ItemProps) {
-  Lab.addLibraryItem('groups', group);
+export function registerGroup(group: ItemProps, job?: () => void) {
+  Lab.addLibraryItem('groups', undefined, nextOrder(), group);
+  if (job) {
+    const STACK = GROUP;
+    try {
+      GROUP = group.id;
+      job();
+    } finally {
+      GROUP = STACK;
+    }
+  }
 }
 
 /**
@@ -141,7 +189,7 @@ export interface ViewLayoutProps extends ItemProps {
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps) {
   const { id, label, title, defaultView, layout } = view;
-  Lab.addLibraryItem('view', {
+  Lab.addLibraryItem('view', undefined, nextOrder(), {
     id,
     label,
     title,
@@ -186,8 +234,6 @@ export function View(props: ViewProps) {
 export interface ComponentProps extends ContentProps {
   /** Group attachment. */
   group?: string;
-  /** Ordering index. */
-  rank?: number;
 }
 
 /**
@@ -195,7 +241,7 @@ export interface ComponentProps extends ContentProps {
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps) {
-  Lab.addLibraryItem('components', props);
+  Lab.addLibraryItem('components', GROUP, nextOrder(), props);
 }
 
 /**
@@ -212,12 +258,6 @@ export function Component(props: ComponentProps) {
 }
 
 export interface TitleBarProps {
-  /*
-     @property {string} [icon] - displayed icon
-     @property {string} [label] - displayed name
-     @property {string} [title] - description tooltip
-     @property {React.Children} children - additional components to render
-   */
   /** Displayed icon. */
   icon?: string;
   /** Displayed name (when mounted). */
