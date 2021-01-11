@@ -1982,8 +1982,49 @@ let mk_transitions_stmt generated_kf loc f st res trans =
     trans
     ([],[],Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc, [])
 
+let mk_goto loc b =
+  let ghost = true in
+  match b.bstmts with
+  | [] -> Cil.mkBlock []
+  | [ { skind = Instr i } ] ->
+    let s = mkStmtOneInstr ~ghost i in
+    Cil.mkBlock [s]
+  | [ { skind = Goto (s,_) }] ->
+    let s' = mkStmt ~ghost (Goto (ref !s,loc)) in
+    Cil.mkBlock [s']
+  | s::_ ->
+    s.labels <-
+      (Label(Data_for_aorai.get_fresh "__aorai_label",loc,false)):: s.labels;
+    let s' = mkStmt ~ghost (Goto (ref s,loc)) in
+    Cil.mkBlock [s']
+
+let normalize_condition loc cond block1 block2 =
+  let rec aux cond b1 b2 =
+    match cond.enode with
+    | UnOp(LNot,e,_) -> aux e b2 b1
+    | BinOp(LAnd,e1,e2,_) ->
+      let b2' = mk_goto loc b2 in
+      let b1'= aux e2 b1 b2' in
+      aux e1 b1' b2
+    | BinOp(LOr,e1,e2,_) ->
+      let b1' = mk_goto loc b1 in
+      let b2' = aux e2 b1' b2 in
+      aux e1 b1 b2'
+    | _ ->
+      Cil.mkBlock [ Cil.mkStmt ~ghost:true (If(cond,b1,b2,loc)) ]
+  in
+  let b = aux cond block1 block2 in
+  match b.bstmts with
+  | [] -> Aorai_option.fatal "If normalization failed"
+  | [ s ] -> s
+  | _ -> Cil.mkStmt ~ghost:true (Block b)
+
 let mkIfStmt loc exp1 block1 block2 =
-  Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+  if Kernel.LogicalOperators.get() then
+    Cil.mkStmt ~ghost:true (If (exp1, block1, block2, loc))
+  else
+    normalize_condition loc exp1 block1 block2
+
 
 let mk_deterministic_stmt
     generated_kf loc auto f fst status ret state
