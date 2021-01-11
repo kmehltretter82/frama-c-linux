@@ -145,27 +145,20 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token NOT DOT AMP
 %token COLON SEMI_COLON COMMA PIPE CARET QUESTION COLUMNCOLUMN
 %token EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
-%token INIT ACCEPT DETERMINISTIC
 %token OTHERWISE
 %token EOF
 
-%nonassoc highest
-%left LPAREN RPAREN
-%left LCURLY
-%right EQ LT GT LE GE NEQ PLUS MINUS SLASH STAR PERCENT OR AND
-/* [VP] priorities taken from cparser.mly */
-%left LSQUARE RSQUARE
+%left OR AND
+%nonassoc NOT
+%left STAR
 %left DOT
-%nonassoc NOT TRUE FALSE
-%nonassoc QUESTION
-%right SEMI_COLON
-%nonassoc lowest
+%left LSQUARE
 
 %type <Promelaast.parsed_automaton> main
 %start main
 %%
 
-main : options metavars states { build_automaton $1 $2 $3 }
+main : options metavars states EOF { build_automaton $1 $2 $3 }
 
 options
   : options option { $1 @ [$2] }
@@ -318,7 +311,7 @@ seq_elt:
 ;
 
 repetition:
-  | /* empty */ %prec highest
+  | /* empty */
       { Some Data_for_aorai.cst_one, Some Data_for_aorai.cst_one }
   | PLUS { Some Data_for_aorai.cst_one, None}
   | STAR { None, None }
@@ -349,24 +342,24 @@ logic_relation
   | arith_relation LE arith_relation { PRel(Le, $1, $3) }
   | arith_relation GE arith_relation { PRel(Ge, $1, $3) }
   | arith_relation NEQ arith_relation { PRel(Neq, $1, $3) }
-  | arith_relation %prec TRUE { PRel (Neq, $1, PCst(IntConstant "0")) }
+  | arith_relation { PRel (Neq, $1, PCst(IntConstant "0")) }
   ;
 
 arith_relation
   : arith_relation_mul PLUS arith_relation { PBinop(Badd,$1,$3) }
   | arith_relation_mul MINUS arith_relation { PBinop(Bsub,$1,$3) }
-  | arith_relation_mul %prec highest { $1 }
+  | arith_relation_mul { $1 }
   ;
 
 arith_relation_mul
   : arith_relation_mul SLASH access_or_const { PBinop(Bdiv,$1,$3) }
   | arith_relation_mul STAR access_or_const { PBinop(Bmul, $1, $3) }
   | arith_relation_mul PERCENT access_or_const { PBinop(Bmod, $1, $3) }
-  | arith_relation_bw %prec highest { $1 }
+  | arith_relation_bw { $1 }
   ;
 
 arith_relation_bw
-  : access_or_const %prec highest { $1 }
+  : access_or_const { $1 }
   | arith_relation_bw AMP access_or_const { PBinop(Bbw_and,$1,$3) }
   | arith_relation_bw PIPE access_or_const { PBinop(Bbw_or,$1,$3) }
   | arith_relation_bw CARET access_or_const { PBinop(Bbw_xor,$1,$3) }
@@ -375,7 +368,7 @@ arith_relation_bw
 access_or_const
   : INT { PCst (IntConstant $1) }
   | MINUS INT { PUnop (Uminus, PCst (IntConstant $2)) }
-  | access %prec TRUE { $1 }
+  | access { $1 }
   ;
 
 /* returns a lval */
