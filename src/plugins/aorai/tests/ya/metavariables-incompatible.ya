@@ -4,6 +4,6 @@
 
 $x : int;
 
-a : { CALL(main)* } -> b;
+a : { [CALL(main)]* } -> b;
 
 b : -> b;

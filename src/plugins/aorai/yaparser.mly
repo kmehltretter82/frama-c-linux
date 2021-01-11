@@ -148,8 +148,6 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %token OTHERWISE
 %token EOF
 
-%left OR AND
-%nonassoc NOT
 %left STAR
 %left DOT
 %left LSQUARE
@@ -254,7 +252,6 @@ seq:
 ;
 
 guard:
-  | single_cond { to_seq $1 }
   | LSQUARE non_empty_seq RSQUARE { $2 }
   | IDENTIFIER pre_cond LPAREN seq RPAREN post_cond
       { let pre_cond =
@@ -289,15 +286,16 @@ guard:
 
 pre_cond:
   | COLUMNCOLUMN IDENTIFIER { Behavior $2 }
-  | LBRACELBRACE single_cond RBRACERBRACE { Pre $2 }
+  | LBRACELBRACE cond RBRACERBRACE { Pre $2 }
 ;
 
 post_cond:
   | /* epsilon */ { None }
-  | LBRACELBRACE single_cond RBRACERBRACE { Some $2 }
+  | LBRACELBRACE cond RBRACERBRACE { Some $2 }
 ;
 
 seq_elt:
+  | cond { to_seq $1 }
   | guard repetition {
     let min, max = $2 in
     match $1 with
@@ -321,17 +319,23 @@ repetition:
   | LCURLY arith_relation COMMA RCURLY { Some $2, None }
   | LCURLY COMMA arith_relation RCURLY { None, Some $3 }
 
-single_cond:
+cond:
+  | conjunction OR cond { POr ($1,$3) }
+  | conjunction { $1 }
+
+conjunction:
+  | atomic_cond AND conjunction { PAnd($1,$3) }
+  | atomic_cond { $1 }
+
+atomic_cond:
   | CALLORRETURN_OF  LPAREN IDENTIFIER RPAREN
       { POr (PCall ($3,None), PReturn $3) }
   | CALL_OF  LPAREN IDENTIFIER RPAREN { PCall ($3,None) }
   | RETURN_OF  LPAREN IDENTIFIER RPAREN { PReturn $3 }
   | TRUE { PTrue }
   | FALSE { PFalse }
-  | NOT single_cond { PNot $2 }
-  | single_cond AND single_cond { PAnd ($1,$3) }
-  | single_cond OR single_cond { POr ($1,$3) }
-  | LPAREN single_cond RPAREN { $2 }
+  | NOT atomic_cond { PNot $2 }
+  | LPAREN cond RPAREN { $2 }
   | logic_relation { $1 }
 ;
 
@@ -342,7 +346,7 @@ logic_relation
   | arith_relation LE arith_relation { PRel(Le, $1, $3) }
   | arith_relation GE arith_relation { PRel(Ge, $1, $3) }
   | arith_relation NEQ arith_relation { PRel(Neq, $1, $3) }
-  | arith_relation { PRel (Neq, $1, PCst(IntConstant "0")) }
+/*  | arith_relation { PRel (Neq, $1, PCst(IntConstant "0")) } */
   ;
 
 arith_relation
@@ -352,9 +356,9 @@ arith_relation
   ;
 
 arith_relation_mul
-  : arith_relation_mul SLASH access_or_const { PBinop(Bdiv,$1,$3) }
-  | arith_relation_mul STAR access_or_const { PBinop(Bmul, $1, $3) }
-  | arith_relation_mul PERCENT access_or_const { PBinop(Bmod, $1, $3) }
+  : arith_relation_mul SLASH arith_relation_bw { PBinop(Bdiv,$1,$3) }
+  | arith_relation_mul STAR arith_relation_bw { PBinop(Bmul, $1, $3) }
+  | arith_relation_mul PERCENT arith_relation_bw { PBinop(Bmod, $1, $3) }
   | arith_relation_bw { $1 }
   ;
 
@@ -382,7 +386,7 @@ access_leaf
   : STAR access { PUnop (Ustar,$2) }
   | IDENTIFIER LPAREN RPAREN DOT IDENTIFIER { PPrm($1,$5) }
   | IDENTIFIER { PVar $1 }
-  | LPAREN access RPAREN { $2 }
+  | LPAREN arith_relation RPAREN { $2 }
   | METAVAR { PMetavar $1 }
   ;
 
