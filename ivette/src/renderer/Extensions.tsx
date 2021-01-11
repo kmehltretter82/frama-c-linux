@@ -84,3 +84,54 @@ export function useSearchHints() {
 }
 
 /* --------------------------------------------------------------------------*/
+/* --- Extension Elements                                                 ---*/
+/* --------------------------------------------------------------------------*/
+
+const UPDATED = new Dome.Event('ivette.updated');
+
+export interface ElementProps {
+  id: string;
+  rank?: number;
+  children?: React.ReactNode;
+}
+
+function byPanel(p: ElementProps, q: ElementProps) {
+  const rp = p.rank ?? 0;
+  const rq = q.rank ?? 0;
+  if (rp < rq) return -1;
+  if (rp > rq) return +1;
+  const ip = p.id;
+  const iq = q.id;
+  if (ip < iq) return -1;
+  if (ip > iq) return +1;
+  return 0;
+}
+
+export class ElementRack {
+
+  private readonly items = new Map<string, ElementProps>();
+
+  register(elt: ElementProps) {
+    this.items.set(elt.id, elt);
+    UPDATED.emit();
+  }
+
+  render() {
+    const panels: ElementProps[] = [];
+    this.items.forEach((p) => { if (p.children) { panels.push(p); } });
+    const contents = panels.sort(byPanel).map((p) => p.children);
+    return <>{React.Children.toArray(contents)}</>;
+  }
+
+}
+
+export function useRack(E: ElementRack) {
+  Dome.useUpdate(UPDATED);
+  return E.render();
+}
+
+export const SIDEBAR = new ElementRack();
+export const TOOLBAR = new ElementRack();
+export const STATUSBAR = new ElementRack();
+
+/* --------------------------------------------------------------------------*/

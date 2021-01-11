@@ -276,4 +276,26 @@ export function registerHints(
   Ext.registerHints({ id, search });
 }
 
+/* --------------------------------------------------------------------------*/
+/* --- Sidebar Panels                                                     ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface ToolProps {
+  id: string;
+  rank?: number;
+  children?: React.ReactNode;
+}
+
+export function registerSidebar(panel: ToolProps) {
+  Ext.SIDEBAR.register(panel);
+}
+
+export function registerToolbar(tools: ToolProps) {
+  Ext.TOOLBAR.register(tools);
+}
+
+export function registerStatusbar(status: ToolProps) {
+  Ext.STATUSBAR.register(status);
+}
+
 // --------------------------------------------------------------------------
