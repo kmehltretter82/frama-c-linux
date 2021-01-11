@@ -11,7 +11,7 @@ import * as Utils from 'frama-c/utils';
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component, TitleBar } from 'ivette';
+import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
 import * as Ast from 'frama-c/api/kernel/ast';
@@ -131,7 +131,7 @@ function makeBullet(status: States.Tag) {
 // --- AST Printer
 // --------------------------------------------------------------------------
 
-const ASTview = () => {
+export default function ASTview() {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
@@ -291,20 +291,6 @@ const ASTview = () => {
     </>
   );
 
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.astview"
-    label="AST"
-    title="Normalized source code representation"
-  >
-    <ASTview />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------

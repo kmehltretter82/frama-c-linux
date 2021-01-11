@@ -14,7 +14,7 @@ import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { TitleBar, Component } from 'ivette';
+import { TitleBar } from 'ivette';
 import { Scroll, Folder } from 'dome/layout/boxes';
 
 import { RSplit } from 'dome/layout/splitters';
@@ -467,7 +467,8 @@ function FilterRatio({ model }: { model: PropertyModel }) {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
-const RenderTable = () => {
+export default function RenderProperties() {
+
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
   const data = States.useSyncArray(Properties.status).getArray();
@@ -528,20 +529,6 @@ const RenderTable = () => {
       </RSplit>
     </>
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// -------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.properties"
-    label="Properties"
-    title="Registered ACSL properties status"
-  >
-    <RenderTable />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------

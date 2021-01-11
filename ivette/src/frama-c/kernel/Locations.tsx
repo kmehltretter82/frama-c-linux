@@ -11,7 +11,7 @@ import { Table, Column, Renderer } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
-import { Component, TitleBar } from 'ivette';
+import { TitleBar } from 'ivette';
 import { markerInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
@@ -20,7 +20,7 @@ import { markerInfo } from 'frama-c/api/kernel/ast';
 
 type LocationId = States.Location & { id: number };
 
-const LocationsTable = () => {
+export default function LocationsTable() {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
@@ -134,20 +134,6 @@ const LocationsTable = () => {
       </Table>
     </>
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.locations"
-    label="Locations"
-    title="Browse multiple locations"
-  >
-    <LocationsTable />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------

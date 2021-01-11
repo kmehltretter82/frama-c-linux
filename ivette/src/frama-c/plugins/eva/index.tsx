@@ -5,14 +5,10 @@
 // React & Dome
 import React from 'react';
 import * as Dome from 'dome';
+import * as Ivette from 'ivette';
 import { Vfill } from 'dome/layout/boxes';
 import { IconButton } from 'dome/controls/buttons';
-
-// External Libs
 import { AutoSizer } from 'react-virtualized';
-
-// Frama-C
-import { Component, TitleBar } from 'ivette';
 
 // Locals
 import { ProbeInfos } from './probeinfos';
@@ -28,7 +24,7 @@ function ValuesComponent() {
   const [zoom, setZoom] = Dome.useNumberSettings('eva-zoom-factor', 0);
   return (
     <>
-      <TitleBar>
+      <Ivette.TitleBar>
         <IconButton
           enabled={zoom > 0}
           icon="ZOOM.OUT"
@@ -39,7 +35,7 @@ function ValuesComponent() {
           icon="ZOOM.IN"
           onClick={() => setZoom(zoom + 1)}
         />
-      </TitleBar>
+      </Ivette.TitleBar>
       <Vfill>
         <ProbeInfos />
         <Vfill>
@@ -63,14 +59,12 @@ function ValuesComponent() {
 // --- Export Component
 // --------------------------------------------------------------------------
 
-export default () => (
-  <Component
-    id="frama-c.values"
-    label="Eva Values"
-    title="Values inferred by the Eva analysis"
-  >
-    <ValuesComponent />
-  </Component>
-);
+Ivette.registerComponent({
+  id: 'frama-c.plugins.values',
+  group: 'frama-c.plugins',
+  label: 'Eva Values',
+  title: 'Values inferred by the Eva analysis',
+  children: <ValuesComponent />,
+});
 
 // --------------------------------------------------------------------------

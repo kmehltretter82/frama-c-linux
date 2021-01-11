@@ -145,7 +145,6 @@ export function addLibraryItem(
   { id, ...props }: any,
 ) {
   const itemId = `${fd}.${id}`;
-  console.log('ITEM', itemId, group, order, props);
   LIBRARY.addItem(itemId, group, order, props);
 }
 

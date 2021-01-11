@@ -14,7 +14,7 @@ import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 
 import * as Server from 'frama-c/server';
-import { Component, TitleBar } from 'ivette';
+import { registerComponent, TitleBar } from 'ivette';
 
 import 'codemirror/theme/ambiance.css';
 
@@ -311,15 +311,14 @@ const RenderConsole = () => {
   );
 };
 
-export const Console = () => (
-  <Component
-    id="frama-c.console"
-    label="Console"
-    title="Frama-C Server Output & Command Line"
-  >
-    <RenderConsole />
-  </Component>
-);
+registerComponent({
+  id: 'frama-c.console',
+  group: 'frama-c.kernel',
+  label: 'Console',
+  title: 'Frama-C Server Output & Command Line',
+  rank: -1,
+  children: <RenderConsole />,
+});
 
 // --------------------------------------------------------------------------
 // --- Status

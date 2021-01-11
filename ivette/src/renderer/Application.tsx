@@ -11,28 +11,11 @@ import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from 'dome/frame/sidebars';
 import { GridHbox, GridItem } from 'dome/layout/grids';
-
-// --- Ivette
-
-import { View, Group } from 'ivette';
-
-// --- Frama-C
-
-import History from 'frama-c/kernel/History';
-import Globals from 'frama-c/kernel/Globals';
-import ASTview from 'frama-c/kernel/ASTview';
-import ASTinfo from 'frama-c/kernel/ASTinfo';
-import Properties from 'frama-c/kernel/Properties';
-import Locations from 'frama-c/kernel/Locations';
-import SourceCode from 'frama-c/kernel/SourceCode';
-import Values from 'frama-c/plugins/eva';
-import Dive from 'frama-c/plugins/dive';
-
+import { View } from 'ivette';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
-import { LabView } from './LabView';
-
-import 'frama-c/kernel/style.css';
+import * as Laboratory from './LabView';
+import './PackageLoader';
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -58,7 +41,7 @@ export default (() => {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <History />
+        <Extensions.Toolbar />
         <Toolbar.Filler />
         <Toolbar.SearchField
           placeholder="Search…"
@@ -77,9 +60,9 @@ export default (() => {
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
-          <Globals />
+          <Extensions.Sidebar />
         </Sidebar.SideBar>
-        <LabView
+        <Laboratory.LabView
           customize={viewbar}
           settings="frama-c.labview"
         >
@@ -89,14 +72,14 @@ export default (() => {
           <View id="values" label="Values">
             <GridHbox>
               <GridItem id="frama-c.astview" />
-              <GridItem id="frama-c.values" />
+              <GridItem id="frama-c.plugins.values" />
             </GridHbox>
             <GridItem id="frama-c.properties" />
           </View>
           <View id="dive" label="Dive">
             <GridHbox>
               <GridItem id="frama-c.astview" />
-              <GridItem id="dive.graph" />
+              <GridItem id="frama-c.plugins.dive" />
               <GridItem id="frama-c.locations" />
             </GridHbox>
             <GridHbox>
@@ -104,20 +87,11 @@ export default (() => {
               <GridItem id="frama-c.console" />
             </GridHbox>
           </View>
-          <Group id="frama-c" label="Frama-C" title="Frama-C Kernel Components">
-            <Controller.Console />
-            <Properties />
-            <SourceCode />
-            <ASTview />
-            <ASTinfo />
-            <Locations />
-            <Dive />
-            <Values />
-          </Group>
-        </LabView>
+        </Laboratory.LabView>
       </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
+        <Extensions.Statusbar />
         <Toolbar.Filler />
         <Controller.Stats />
       </Toolbar.ToolBar>
