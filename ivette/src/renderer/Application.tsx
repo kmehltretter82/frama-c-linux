@@ -13,7 +13,7 @@ import * as Sidebar from 'dome/frame/sidebars';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
-import './PackageLoader';
+import './loader';
 
 // --------------------------------------------------------------------------
 // --- Main View

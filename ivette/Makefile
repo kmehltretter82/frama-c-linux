@@ -9,9 +9,9 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc serve dist lint fixlint
+.PHONY: all app dev pkg doc serve dist lint fixlint
 
-all: lint app
+all: pkg lint app
 
 app: dome-app
 dev: dome-dev
@@ -26,6 +26,23 @@ tsc: dome-pkg dome-templ
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
 	yarn run typecheck
 	yarn run lint --fix --cache --cache-location .eslint-cache
+
+# --------------------------------------------------------------------------
+# --- Ivette Package Loader
+# --------------------------------------------------------------------------
+
+LOADER=src/renderer/loader.ts
+PACKAGES=$(shell find src -name "pkg.json")
+
+lint: pkg
+app: pkg
+dev: pkg
+pkg: $(LOADER)
+$(LOADER): $(PACKAGES) ./configure.js ./Makefile
+	@rm -f $(LOADER)
+	@echo "[Ivette] configure packages"
+	@node ./configure.js $(LOADER) $(PACKAGES)
+	@chmod -f a-w $(LOADER)
 
 # --------------------------------------------------------------------------
 # --- Frama-C API
