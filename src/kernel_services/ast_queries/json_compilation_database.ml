@@ -132,18 +132,13 @@ let split_command_args s =
 let quote_define_argument arg = Format.sprintf "%S" arg
 
 (* Filters and normalize useful flags: -I, -D, -U, ... *)
-let filter_useful_flags ~dirname ~requote option_list =
-  (* conversion for '-I' flags *)
-  let convert_path arg =
-    if Filename.is_relative arg then Filename.concat dirname arg
-    else arg
-  in
+let filter_useful_flags ~requote option_list =
   let convert_define arg =
     if requote then quote_define_argument arg else arg
   in
   let process_prefix prefix suffix =
     match prefix with
-    | Path s -> s ^ convert_path suffix
+    | Path s -> s ^ suffix
     | Define s -> s ^ convert_define suffix
     | Undefine s -> s ^ suffix
   in
@@ -247,7 +242,7 @@ let parse_compilation_entry jcdb_dir r =
     with _ ->
       Kernel.abort "compilation database: expected 'arguments' or 'command'"
   in
-  let flags = filter_useful_flags ~dirname ~requote string_option_list in
+  let flags = filter_useful_flags ~requote string_option_list in
   update_flags_verbosely path flags
 
 let compute_flags_from_file () =
