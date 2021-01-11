@@ -49,7 +49,7 @@ let GROUP: string | undefined;
    during the continuation.
  */
 export function registerGroup(group: ItemProps, job?: () => void) {
-  Lab.addLibraryItem('groups', undefined, [], group);
+  Lab.addLibraryItem('groups', group);
   if (job) {
     const STACK = GROUP;
     try {
@@ -98,7 +98,7 @@ export interface ViewLayoutProps extends ItemProps {
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps) {
   const { layout, ...viewprops } = view;
-  Lab.addLibraryItem('views', undefined, [], {
+  Lab.addLibraryItem('views', {
     ...viewprops,
     children: makeLayout(layout),
   });
@@ -118,7 +118,7 @@ export interface ComponentProps extends ContentProps {
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps) {
-  Lab.addLibraryItem('components', GROUP, [], props);
+  Lab.addLibraryItem('components', { group: GROUP, ...props });
 }
 
 export interface TitleBarProps {

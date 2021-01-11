@@ -24,6 +24,7 @@ import './style.css';
 // --- Library Class
 // --------------------------------------------------------------------------
 
+let RANK = 0;
 const UPDATE = new Dome.Event('labview.library');
 
 class Library {
@@ -50,55 +51,20 @@ class Library {
 
   addItem(
     id: string,
-    gcontext: any,
-    path: any[],
-    props: any,
+    props: { rank?: number },
   ) {
     if (!this.modified) {
       this.modified = true;
       setImmediate(() => this.commit());
     }
-    const order = props.rank === undefined
-      ? path
-      : path.slice(0, -1).concat([props.rank]);
-    const group = props.group || gcontext;
+    const order = props.rank ?? ++RANK;
     const collection: any = this.virtual;
-    collection[id] = { id, order, group, ...props };
-  }
-
-  removeItem(id?: string) {
-    if (id) {
-      const collection: any = this.virtual;
-      delete collection[id];
-    }
-  }
-
-  updateFrom(lib: Library) {
-    if (lib === this) return false;
-    this.virtual = { ...lib.virtual, ...this.virtual };
-    if (!this.modified) {
-      this.modified = true;
-      setImmediate(() => this.commit());
-    }
-    return true;
+    collection[id] = { ...props, id, order };
   }
 
 }
-
-// --------------------------------------------------------------------------
-// --- Global Consolidated Library
-// --------------------------------------------------------------------------
 
 const LIBRARY = new Library();
-
-function useLibrary() {
-  const libRef = React.useRef(LIBRARY);
-  // Hot Reload detection
-  if (LIBRARY.updateFrom(libRef.current)) {
-    libRef.current = LIBRARY;
-  }
-  return LIBRARY;
-}
 
 // --------------------------------------------------------------------------
 // --- Library Components
@@ -113,77 +79,12 @@ const getItemId =
 const getItems =
   (items: any[], fd: string) => items.filter((item) => isItemId(fd, item.id));
 
-interface GroupContext {
-  group?: string;
-  order?: number[];
-}
-
-const GROUP = React.createContext<GroupContext>({});
-
-export function useGroupContext() {
-  return React.useContext(GROUP);
-}
-
-export function useLibraryItem(
-  fd: string,
-  { id, ...props }: any,
-): GroupContext {
-  const context = React.useContext(GROUP);
-  React.useEffect(() => {
-    const { group, order } = context;
-    const itemId = `${fd}.${id}`;
-    LIBRARY.addItem(itemId, group, order ?? [], props);
-    return () => LIBRARY.removeItem(itemId);
-  });
-  return context;
-}
-
 export function addLibraryItem(
   fd: string,
-  group: string | undefined,
-  order: number[],
   { id, ...props }: any,
 ) {
   const itemId = `${fd}.${id}`;
-  LIBRARY.addItem(itemId, group, order, props);
-}
-
-/* --------------------------------------------------------------------------*/
-/* --- Rankifyier                                                         ---*/
-/* --------------------------------------------------------------------------*/
-
-export interface RankifyProps {
-  group: string | undefined;
-  order: number[] | undefined;
-  children: React.ReactNode | undefined;
-}
-
-export function Rankify(props: RankifyProps) {
-  const { group, order = [], children } = props;
-  let rank = 0;
-  const rankify = (elt: any) => {
-    rank += 1;
-    return (
-      <GROUP.Provider value={{ group, order: [...order, rank] }}>
-        {elt}
-      </GROUP.Provider>
-    );
-  };
-  return (
-    <>
-      {React.Children.map(children, rankify)}
-    </>
-  );
-}
-
-function UseLibrary(props: { children?: React.ReactNode }) {
-  return (
-    <div className="dome-phantom">
-      <Rankify group={undefined} order={[]}>
-        {props.children}
-      </Rankify>
-    </div>
-  );
+  LIBRARY.addItem(itemId, props);
 }
 
 // --------------------------------------------------------------------------
@@ -513,10 +414,10 @@ function CustomGroup({
 // --------------------------------------------------------------------------
 
 function CustomizePanel(
-  { dnd, settings, library, shape, setShape, setDragging }: any,
+  { dnd, settings, shape, setShape, setDragging }: any,
 ) {
   Dome.useUpdate(UPDATE);
-  const { items } = library;
+  const { items } = LIBRARY;
   const views = getItems(items, 'views');
   const groups = getItems(items, 'groups');
   const components = getItems(items, 'components');
@@ -564,22 +465,19 @@ function CustomizePanel(
 // --- LabView Container
 // --------------------------------------------------------------------------
 
-/**
-   @summary Reconfigurable Container (React Component).
-   @property {boolean} [customize] - show components panel (false by default)
-   @property {string} [settings] - window settings to make views persistent
-   @property {React.Children} children - the labview content
-   @description
-   This container displays its content into a reconfigurable view.
+export interface LabViewProps {
+  /** Show component panels. */
+  customize?: boolean;
+  /** Base settings identifier. */
+  settings?: string;
+}
 
-   The entire content is rendered, but elements must be packed into
-   `<Component/>` containers, otherwise, they would remain invisible.
-   Content may also contains `<View/>` and `<Group/>` definitions, and the
-   content can be defined through any kind of React components.
+/**
+   Reconfigurable Component Display.
  */
-export function LabView(props: any) {
+export function LabView(props: LabViewProps) {
   // Parameters
-  const { settings, customize = false, children } = props;
+  const { settings, customize = false } = props;
   const settingSplit = settings && `${settings}.split`;
   const settingShape = settings && `${settings}.shape`;
   const settingPanel = settings && `${settings}.panel`;
@@ -590,7 +488,6 @@ export function LabView(props: any) {
     Dome.globalSettings,
   );
   const dnd = React.useMemo(() => new DnD(), []);
-  const lib = useLibrary();
   const [shape, setShape] =
     Settings.useWindowSettings(settingShape, Json.jAny, undefined);
   const [dragging, setDragging] = React.useState();
@@ -598,37 +495,34 @@ export function LabView(props: any) {
   const onClose =
     (id: string) => setShape(Grids.removeShapeItem(shape, id));
   const components =
-    _.filter(lib.collection, (item: any) => isItemId('components', item.id));
+    _.filter(
+      LIBRARY.collection,
+      (item: any) => isItemId('components', item.id),
+    );
   const gridItems =
     components.map(makeGridItem(customize, onClose));
   const holding =
     dragging ? gridItems.find((elt) => elt.props.id === dragging) : undefined;
   // Make view
   return (
-    <>
-      <UseLibrary>
-        {children}
-      </UseLibrary>
-      <RSplit margin={120} settings={settingSplit} unfold={customize}>
-        <Grids.GridLayout
-          dnd={dnd}
-          padding={2}
-          className="labview-container"
-          items={gridItems}
-          shape={shape}
-          onReshape={setShape}
-          holding={holding}
-        />
-        <CustomizePanel
-          dnd={dnd}
-          settings={settingPanel}
-          shape={shape}
-          setShape={setShape}
-          setDragging={setDragging}
-          library={lib}
-        />
-      </RSplit>
-    </>
+    <RSplit margin={120} settings={settingSplit} unfold={customize}>
+      <Grids.GridLayout
+        dnd={dnd}
+        padding={2}
+        className="labview-container"
+        items={gridItems}
+        shape={shape}
+        onReshape={setShape}
+        holding={holding}
+      />
+      <CustomizePanel
+        dnd={dnd}
+        settings={settingPanel}
+        shape={shape}
+        setShape={setShape}
+        setDragging={setDragging}
+      />
+    </RSplit>
   );
 }
 
