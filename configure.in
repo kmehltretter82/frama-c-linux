@@ -82,11 +82,18 @@ if test "$VERBOSEMAKE" = yes ; then
   AC_MSG_RESULT(Make will be verbose.)
 fi
 
-##########################################
-# Check for invalid command-line options #
-##########################################
+##############################################################
+# Check for invalid command-line options and build directory #
+##############################################################
 case $prefix in
   *\ * ) AC_MSG_ERROR(spaces not allowed in --prefix argument "$prefix");;
+  * ) ;;
+esac
+
+case $(pwd) in
+  *\ * ) AC_MSG_ERROR(spaces not allowed in build directory "$(pwd)");;
+  *\'* ) AC_MSG_ERROR(single quotes not allowed in build directory "$(pwd)");;
+  *\"* ) AC_MSG_ERROR(double quotes not allowed in build directory "$(pwd)");;
   * ) ;;
 esac
 
