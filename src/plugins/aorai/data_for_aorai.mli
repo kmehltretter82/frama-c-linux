@@ -222,16 +222,18 @@ val getNumberOfStates : unit -> int
 (** Return the list of all function name observed in the C file, except ignored functions. *)
 val getObservablesFunctions : unit -> Cil_types.kernel_function list
 
-(** Return the list of names of observable but ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
+(** Return the list of names of observable but ignored functions.
+    A function is ignored if it is used in C file and if its declaration
+    is unavailable. *)
 val getIgnoredFunctions : unit -> Cil_types.kernel_function list
 
-(** Return the list of names of all ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
+(** Add a function to the list of ignored functions. *)
 val addIgnoredFunction : Cil_types.kernel_function -> unit
 
 (** Return true if and only if the given string fname denotes an ignored function. *)
 val isIgnoredFunction : Cil_types.kernel_function -> bool
 
-(** Return true if and onfly if the given function can be observed *)
+(** Return true if and only if the given function can be observed *)
 val isObservableFunction : Cil_types.kernel_function -> bool
 
 (** returns the state of given index.
