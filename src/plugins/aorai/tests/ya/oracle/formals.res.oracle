@@ -131,16 +131,23 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (7 == aorai_CurStates && x == 1) {
-      aorai_CurStates = aorai_intermediate_state;
-      aorai_x = x;
-    }
-    else 
-      if (7 == aorai_CurStates && x == 3) {
-        aorai_CurStates = aorai_intermediate_state_2;
-        aorai_x_0 = x;
+    if (7 == aorai_CurStates) {
+      if (x == 1) {
+        aorai_CurStates = aorai_intermediate_state;
+        aorai_x = x;
       }
+      else goto __aorai_label;
+    }
+    else {
+      __aorai_label: ;
+      if (7 == aorai_CurStates) 
+        if (x == 3) {
+          aorai_CurStates = aorai_intermediate_state_2;
+          aorai_x_0 = x;
+        }
+        else aorai_CurStates = aorai_reject;
       else aorai_CurStates = aorai_reject;
+    }
     return;
   }
 
@@ -214,14 +221,30 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (4 == aorai_CurStates && aorai_x_0 == 3) aorai_CurStates = OK;
-    else 
-      if (1 == aorai_CurStates && aorai_x == 1) aorai_CurStates = aorai_intermediate_state_0;
-      else 
-        if (4 == aorai_CurStates && aorai_x_0 != 3) aorai_CurStates = aorai_reject;
-        else 
-          if (1 == aorai_CurStates && aorai_x != 1) aorai_CurStates = aorai_reject;
+    if (4 == aorai_CurStates) {
+      if (aorai_x_0 == 3) aorai_CurStates = OK; else goto __aorai_label_2;
+    }
+    else {
+      __aorai_label_2: ;
+      if (1 == aorai_CurStates) {
+        if (aorai_x == 1) aorai_CurStates = aorai_intermediate_state_0;
+        else goto __aorai_label_1;
+      }
+      else {
+        __aorai_label_1: ;
+        if (4 == aorai_CurStates) {
+          if (aorai_x_0 != 3) aorai_CurStates = aorai_reject;
+          else goto __aorai_label_0;
+        }
+        else {
+          __aorai_label_0: ;
+          if (1 == aorai_CurStates) 
+            if (aorai_x != 1) aorai_CurStates = aorai_reject;
+            else aorai_CurStates = aorai_reject;
           else aorai_CurStates = aorai_reject;
+        }
+      }
+    }
     return;
   }
 
@@ -422,14 +445,20 @@ int f(int x)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
-    if (3 == aorai_CurStates && aorai_y == 2) aorai_CurStates = OK;
-    else 
+    if (3 == aorai_CurStates) {
+      if (aorai_y == 2) aorai_CurStates = OK; else goto __aorai_label_3;
+    }
+    else {
+      __aorai_label_3: ;
       if (0 == aorai_CurStates) aorai_CurStates = OK;
       else 
         if (5 == aorai_CurStates) aorai_CurStates = aorai_reject;
         else 
-          if (3 == aorai_CurStates && aorai_y != 2) aorai_CurStates = aorai_reject;
+          if (3 == aorai_CurStates) 
+            if (aorai_y != 2) aorai_CurStates = aorai_reject;
+            else aorai_CurStates = aorai_reject;
           else aorai_CurStates = aorai_reject;
+    }
     return;
   }
 

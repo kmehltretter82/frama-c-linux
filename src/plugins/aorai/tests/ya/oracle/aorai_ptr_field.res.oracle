@@ -42,8 +42,15 @@ enum aorai_OpStatusList {
     aorai_CurOperation = op_main;
     S0_tmp = S0;
     S1_tmp = S1;
-    if (S0 == 1 && s->x >= 0 || S0 == 1 && s->x < 0) S1_tmp = 1;
-    else S1_tmp = 0;
+    if (S0 == 1) {
+      if (s->x >= 0) S1_tmp = 1; else goto __aorai_label;
+    }
+    else {
+      __aorai_label: ;
+      if (S0 == 1) 
+        if (s->x < 0) S1_tmp = 1; else S1_tmp = 0;
+      else S1_tmp = 0;
+    }
     S0_tmp = 0;
     S0 = S0_tmp;
     S1 = S1_tmp;

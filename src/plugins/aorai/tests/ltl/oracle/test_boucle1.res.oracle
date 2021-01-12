@@ -274,10 +274,12 @@ int commit_trans(void)
     accept_S4_tmp = accept_S4;
     accept_init_tmp = accept_init;
     accept_init_tmp = 0;
-    if (accept_S2 == 1 && status != 0) accept_S4_tmp = 1;
+    if (accept_S2 == 1) 
+      if (status != 0) accept_S4_tmp = 1; else accept_S4_tmp = 0;
     else accept_S4_tmp = 0;
     accept_S3_tmp = 0;
-    if (accept_S2 == 1 && status == 0) accept_S2_tmp = 1;
+    if (accept_S2 == 1) 
+      if (status == 0) accept_S2_tmp = 1; else accept_S2_tmp = 0;
     else accept_S2_tmp = 0;
     accept_S1_tmp = 0;
     accept_S1 = accept_S1_tmp;
