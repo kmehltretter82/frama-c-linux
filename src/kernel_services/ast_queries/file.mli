@@ -142,8 +142,10 @@ val get_suffixes: unit -> string list
 val get_name: t -> string
 (** File name (not normalized). *)
 
-val get_preprocessor_command: unit -> string * cpp_opt_kind
-(** Return the preprocessor command to use. *)
+val get_preprocessor_command: unit -> string
+(** Return the preprocessor command to use.
+    @modify Frama-C+dev return type now contains only the command
+*)
 
 val pre_register: t -> unit
 (** Register some file as source file before command-line files *)

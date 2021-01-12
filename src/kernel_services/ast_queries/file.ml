@@ -99,6 +99,14 @@ let cpp_opt_kind () =
     if Kernel.CppGnuLike.get () then Gnu else Not_gnu
   else Unknown
 
+let is_cpp_gnu_like () =
+  let open Fc_config in
+  let cpp_cmd = Kernel.CppCommand.get () in
+  match cpp_cmd = "", using_default_cpp, preprocessor_is_gnu_like with
+  | true, true, true -> Gnu
+  | true, true, false -> Not_gnu
+  | _, _, _ -> cpp_opt_kind ()
+
 (* the preprocessor command is:
    If the program has an explicit argument -cpp-command "XX -Y"
    (quotes are required by the shell)
@@ -106,22 +114,12 @@ let cpp_opt_kind () =
    else use the command in [Fc_config.preprocessor].*)
 let get_preprocessor_command () =
   let cmdline = Kernel.CppCommand.get() in
-  if cmdline <> "" then begin
-    (cmdline, cpp_opt_kind ())
-  end else begin
-    let gnu =
-      if Fc_config.using_default_cpp then
-        if Fc_config.preprocessor_is_gnu_like then Gnu else Not_gnu
-      else cpp_opt_kind ()
-    in
-    Fc_config.preprocessor, gnu
-  end
+  if cmdline <> "" then cmdline else Fc_config.preprocessor
 
 let from_filename ?cpp f =
-  let cpp, is_gnu_like =
+  let cpp =
     let cmdline = Kernel.CppCommand.get() in
-    if cmdline <> "" then
-      cmdline, cpp_opt_kind ()
+    if cmdline <> "" then cmdline
     else
       let extra_flags =
         try Kernel.CppExtraArgsPerFile.find f
@@ -133,13 +131,11 @@ let from_filename ?cpp f =
           "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
            in the json compilation database;@ the latter will be ignored"
           Filepath.Normalized.pretty f;
-      let cpp, gnu =
-        match cpp with
-        | None -> get_preprocessor_command ()
-        | Some cpp -> cpp, cpp_opt_kind ()
+      let cpp =
+        if cpp = None then get_preprocessor_command () else Option.get cpp
       in
       let flags = if extra_flags <> "" then [extra_flags] else jcdb_flags in
-      String.concat " " (cpp :: flags), gnu
+      String.concat " " (cpp :: flags)
   in
   if Filename.check_suffix (f:>string) ".i" then begin
     NoCPP f
@@ -158,7 +154,7 @@ let from_filename ?cpp f =
         Kernel.warning ~once:true
           "Default pre-processor does not keep comments. Any ACSL annotation \
            on non-pre-processed file will be discarded.";
-      NeedCPP (f, cpp, is_gnu_like)
+      NeedCPP (f, cpp, is_cpp_gnu_like ())
     end else
       Kernel.abort "No working pre-processor found. You can only analyze \
                     pre-processed .i files."
@@ -645,7 +641,7 @@ let to_cil_cabs cpp_cmds_and_args f =
 let () =
   let handle f =
     let preprocess =
-      replace_in_cpp_cmd (fst (get_preprocessor_command ())) "-nostdinc"
+      replace_in_cpp_cmd (get_preprocessor_command ()) "-nostdinc"
     in
     let ppf =
       try Logic_preprocess.file ".c" preprocess f
