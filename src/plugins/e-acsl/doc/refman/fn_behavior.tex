@@ -7,14 +7,16 @@
   \
   requires-clause ::= clause-kind? "requires" pred ";"
   \
-  { decreases-clause } ::= { "decreases" term ("for" id)? ";" }
+  { decreases-clause } ::= { "decreases" term ("for" ident)? ";" }
   \
-  [ simple-clause ] ::= { assigns-clause } | ensures-clause ;
-                        | { allocation-clause} | { abrupt-clause }
+  simple-clause ::= { assigns-clause } | ensures-clause ;
+                  | { allocation-clause} | { abrupt-clause }
   \
   { assigns-clause } ::= { "assigns" locations ";" }
   \
-  { locations } ::= { location ("," location) * | "\nothing" }
+  { locations } ::= { locations-list | "\nothing" }
+  \
+  { locations-list } ::= { location ("," location) * }
   \
   { location } ::= { tset }
   \

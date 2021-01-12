@@ -9,6 +9,8 @@
 \newcommand{\eacsl}{\textsc{E-ACSL}\xspace}
 \newcommand{\C}{\textsc{C}\xspace}
 \newcommand{\jml}{\textsc{JML}\xspace}
+\newcommand{\Eva}{\textsc{Eva}\xspace}
+\newcommand{\Wp}{\textsc{Wp}\xspace}
 
 \newcommand{\nodiff}{\emph{No difference with \acsl.}}
 \newcommand{\except}[1]{\emph{No difference with \acsl, but #1.}}
@@ -30,6 +32,8 @@
 \newcommand{\difficults}[1]{\emph{#1 are usually difficult to implement. Thus
     you would not wonder if most tools do not support them (or support
     them partially).}}
+\newcommand{\unefficient}[1]{\emph{#1 are unlikely evaluated efficiently at
+    runtime.}}
 
 \newcommand{\mywarning}[1]{\paragraph{Warning:} #1}
 
@@ -120,16 +124,15 @@
 }%
 {#2}}
 
-\newenvironment{notimplementedenv}[1][]{%
 \ifthenelse{\boolean{PrintImplementationRq}}{%
+\newenvironment{notimplementedenv}[1][]{%
   \begin{changebar}%
   \highlightnotimplemented%
   \ifthenelse{\equal{#1}{}}{}{\def\myrq{#1}}%
-  \bgroup
-}{}}%
-{\ifthenelse{\boolean{PrintImplementationRq}}{%
-    \egroup%
-    \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}\end{changebar}}{}}
+  \bgroup}%
+{\egroup%
+ \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}\end{changebar}}}
+{\excludecomment{notimplementedenv}}
 
 %%% Environnements et commandes non conditionnelles
 \newcommand{\experimental}{\textsc{Experimental}}
@@ -207,6 +210,7 @@
 \newcommand{\blocklength}{\keywordbs{block\_length}}
 \newcommand{\baseaddr}{\keywordbs{base\_addr}}
 \newcommand{\comparable}{\keywordbs{comparable}}
+\newcommand{\Length}{\keywordbs{length}}
 
 \newcommand{\N}{\ensuremath{\mathbb{N}}}
 \newcommand{\ra}{\ensuremath{\rightarrow}}
