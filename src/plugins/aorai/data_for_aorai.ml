@@ -1579,7 +1579,12 @@ let check_observables auto =
  | Some set ->
    let is_relevant name =
      try
-       ignore (Globals.Functions.find_by_name name)
+       let kf = Globals.Functions.find_by_name name in
+       if not (Kernel_function.is_definition kf) then
+         Aorai_option.warning
+           "Function %a is observable by the automaton but is not defined \
+            in the C code. It will be ignored in the instrumentation"
+           Printer.pp_varname (Kernel_function.get_name kf)
      with Not_found ->
        Aorai_option.abort "Observable %s doesn't match any function" name
    in
