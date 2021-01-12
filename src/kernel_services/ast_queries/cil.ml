@@ -665,7 +665,9 @@ let update_var_type v t =
   v.vtype <- if v.vghost then typeAddGhost t else t;
   match v.vlogic_var_assoc with
   | None -> ()
-  | Some lv -> lv.lv_type <- Ctype v.vtype
+  | Some lv ->
+    (* ghost attribute is irrelevant in ACSL. *)
+    lv.lv_type <- Ctype t
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
