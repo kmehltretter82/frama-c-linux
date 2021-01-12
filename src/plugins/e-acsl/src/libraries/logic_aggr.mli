@@ -22,18 +22,20 @@
 
 open Cil_types
 
-val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
-  name:string -> binop -> exp -> exp -> exp * Env.t
-(** [comparison_to_exp ~loc kf env ~name bop e1 e2] generate the C code
-    equivalent to [e1 bop e2].
-    Requires that [bop] is either [Ne] or [Eq] and that [e1] and [e2] are
-    arrays. *)
+(** Utilities function for aggregate types. *)
 
+val get_array_typ_opt:
+  typ -> (typ * exp option * bitsSizeofTypCache * attributes) option
+(** @return the content of the array type if [ty] is an array, or None
+    otherwise. *)
 
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
+(** Represent the different types of aggregations. *)
+type t =
+  | StructOrUnion
+  | Array
+  | NotAggregate
 
-val translate_rte_ref:
-  (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
-   Env.t) ref
+val get_t: typ -> t
+(** [get_t ty] returns [Array] if [ty] is an array type,
+    [StructOrUnion] if [ty] is a struct or an union type and [NotAggregate]
+    otherwise. *)

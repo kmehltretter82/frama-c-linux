@@ -32,25 +32,6 @@ let translate_rte_ref:
   in
   ref func
 
-(** @return the content of the array type if [ty] is an array, or None
-    otherwise. *)
-let rec get_array_typ_opt ty =
-  if Gmp_types.is_t ty then
-    (* GMP pointer types are declared as arrays of one element. They are treated
-       as a special case here to ensure that they are not considered as arrays.
-    *)
-    None
-  else
-    match ty with
-    | TNamed (r, _) -> get_array_typ_opt r.ttype
-    | TArray (t, eo, bsot, a) -> Some (t, eo, bsot, a)
-    | _ -> None
-
-let is_array ty =
-  match get_array_typ_opt ty with
-  | Some _ -> true
-  | None -> false
-
 (** Retrieve the length of the [array] expression in a new variable [name] and
     return it as an expression.
     If the length is present in the type then the function directly assigns the
@@ -58,7 +39,7 @@ let is_array ty =
     [length = (\block_length(array) - \offset(array)) / sizeof(elem_typ)]. *)
 let length_exp ~loc kf env ~name array =
   let elem_typ, array_len =
-    match get_array_typ_opt (Cil.typeOf array) with
+    match Logic_aggr.get_array_typ_opt (Cil.typeOf array) with
     | None -> Options.fatal "Trying to retrieve the length of a non-array"
     | Some (t, len, _, _) -> t, len
   in

@@ -20,20 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+type t =
+  | StructOrUnion
+  | Array
+  | NotAggregate
 
-val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
-  name:string -> binop -> exp -> exp -> exp * Env.t
-(** [comparison_to_exp ~loc kf env ~name bop e1 e2] generate the C code
-    equivalent to [e1 bop e2].
-    Requires that [bop] is either [Ne] or [Eq] and that [e1] and [e2] are
-    arrays. *)
+(** @return the content of the array type if [ty] is an array, or None
+    otherwise. *)
+let rec get_array_typ_opt ty =
+  if Gmp_types.is_t ty then
+    (* GMP pointer types are declared as arrays of one element. They are treated
+       as a special case here to ensure that they are not considered as arrays.
+    *)
+    None
+  else
+    match ty with
+    | TNamed (r, _) -> get_array_typ_opt r.ttype
+    | TArray (t, eo, bsot, a) -> Some (t, eo, bsot, a)
+    | _ -> None
 
+(** @return true iff the type is an array *)
+let is_array ty =
+  match get_array_typ_opt ty with
+  | Some _ -> true
+  | None -> false
 
-(**************************************************************************)
-(********************** Forward references ********************************)
-(**************************************************************************)
-
-val translate_rte_ref:
-  (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
-   Env.t) ref
+let get_t ty =
+  if is_array ty then
+    Array
+  else if Cil.isStructOrUnionType ty then
+    StructOrUnion
+  else
+    NotAggregate

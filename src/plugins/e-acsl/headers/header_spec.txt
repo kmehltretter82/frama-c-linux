@@ -133,6 +133,8 @@ src/libraries/functions.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/functions.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/gmp_types.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/gmp_types.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/logic_aggr.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
+src/libraries/logic_aggr.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/misc.mli: CEA_LGPL_OR_PROPRIETARY.E_ACSL
 src/libraries/varname.ml: CEA_LGPL_OR_PROPRIETARY.E_ACSL
