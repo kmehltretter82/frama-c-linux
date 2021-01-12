@@ -479,10 +479,6 @@ let build_cpp_cmd = function
       then [machdep_macro (Kernel.Machdep.get ())]
       else []
     in
-    let extra_args =
-      if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
-      else []
-    in
     let define_args = "__FRAMAC__" :: define_args in
     (* Hypothesis: the preprocessor does support the arch-related
        options tested when 'configure' was run. *)
@@ -502,17 +498,19 @@ let build_cpp_cmd = function
          Your preprocessor is known to support these flags: %s"
         (concat_strs unsupported_cpp_arch_args) (Kernel.Machdep.get ())
         (concat_strs Fc_config.preprocessor_supported_arch_options);
-    let extra_args =
-      if Kernel.ReadAnnot.get () then
-        if Kernel.PreprocessAnnot.is_set () then
-          if Kernel.PreprocessAnnot.get () then
-            "-dD" :: extra_args
-          else extra_args
-        else
-          let opt = add_if_gnu "-dD" in
-          opt @ extra_args
-      else extra_args
+    let nostdinc_arg =
+      if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
+      else []
     in
+    let output_defines_arg =
+      let open Kernel in
+      match ReadAnnot.get (), PreprocessAnnot.is_set (), PreprocessAnnot.get () with
+      | true, true, true -> ["-dD"] (* keep '#defines' in preprocessed output *)
+      | true, true, false -> []
+      | true, false, _ -> add_if_gnu "-dD"
+      | _, _, _ -> []
+    in
+    let gnu_implicit_args = output_defines_arg @ nostdinc_arg in
     let string_of_supp_args extra includes defines =
       Format.asprintf "%s%s%s"
         (concat_strs ~pre:"-I" ~sep:" -I" includes)
@@ -521,7 +519,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (Kernel.CppExtraArgs.get () @ extra_args @ supported_cpp_arch_args)
+        (Kernel.CppExtraArgs.get () @ gnu_implicit_args @ supported_cpp_arch_args)
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
