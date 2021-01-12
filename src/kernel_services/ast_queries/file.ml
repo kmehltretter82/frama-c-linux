@@ -519,7 +519,7 @@ let build_cpp_cmd = function
     in
     let string_of_supp_args extra includes defines =
       Format.asprintf "%s%s%s"
-        (concat_strs ~pre:" -I" ~sep:" -I" includes)
+        (concat_strs ~pre:"-I" ~sep:" -I" includes)
         (concat_strs ~pre:" -D" ~sep:" -D" defines)
         (concat_strs ~pre:" " ~sep:" " extra)
     in
