@@ -73,16 +73,6 @@ module Ya =
                   (in Ya language) from file <f>."
     end)
 
-module Output_C_File =
-  Filepath
-    (struct
-      let option_name = "-aorai-output-c-file"
-      let arg_name = ""
-      let file_kind = "annotated C"
-      let existence = Fc_Filepath.Indifferent
-      let help = "specifies generated file name for annotated C code"
-    end)
-
 module Dot =
   False(struct
     let option_name = "-aorai-dot"

@@ -29,7 +29,6 @@ module Ltl_File: Parameter_sig.Filepath
 module To_Buchi: Parameter_sig.Filepath
 module Buchi: Parameter_sig.Filepath
 module Ya: Parameter_sig.Filepath
-module Output_C_File: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
 module AbstractInterpretation: Parameter_sig.Bool
