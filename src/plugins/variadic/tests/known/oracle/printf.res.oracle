@@ -468,7 +468,7 @@ int printf_va_18(char const * __restrict format, size_t param0,
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_19(char const * __restrict format, unsigned long long param0);
+int printf_va_19(char const * __restrict format, unsigned long param0);
 
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
@@ -494,7 +494,7 @@ int printf_va_20(char const * __restrict format, int param0);
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_21(char const * __restrict format, unsigned long long param0);
+int printf_va_21(char const * __restrict format, unsigned long param0);
 
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
@@ -617,9 +617,9 @@ int main(void)
   uintmax_t uj = (unsigned long long)42;
   double f = (double)42.0f;
   long double L = 42.0l;
-  uint64_t u64 = (unsigned long long)42ul;
+  uint64_t u64 = 42ul;
   int8_t i8 = (signed char)42;
-  uint_least64_t uleast64 = (unsigned long long)42u;
+  uint_least64_t uleast64 = (unsigned long)42u;
   int_fast32_t ifast32 = 42;
   printf("Hello world !\n"); /* printf_va_1 */
   printf("%s%n",string,& i); /* printf_va_2 */
@@ -639,9 +639,9 @@ int main(void)
   printf("%llu ",ull); /* printf_va_16 */
   printf("%jo ",uj); /* printf_va_17 */
   printf("%zx %tX\n",z,t); /* printf_va_18 */
-  printf("%llu",u64); /* printf_va_19 */
+  printf("%lu",u64); /* printf_va_19 */
   printf("%hhi",(int)i8); /* printf_va_20 */
-  printf("%llx",uleast64); /* printf_va_21 */
+  printf("%lx",uleast64); /* printf_va_21 */
   printf("%d",ifast32); /* printf_va_22 */
   printf("%f %Le\n",f,L); /* printf_va_23 */
   printf("%c\n",(int)c); /* printf_va_24 */

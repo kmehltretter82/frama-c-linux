@@ -1,1 +1,1 @@
-OPT: -journal-disable -scf @EVA_OPTIONS@
+OPT: -journal-disable -scf @EVA_OPTIONS@ -machdep x86_32

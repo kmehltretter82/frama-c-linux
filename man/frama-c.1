@@ -401,7 +401,9 @@ uses \f[I]machine\f[R] as the current machine-dependent configuration
 (size of the various integer types, endiandness, \&...).
 The list of currently supported machines is available through option
 \f[I]-machdep help\f[R].
-Default is \f[B]x86_32\f[R].
+Default is \f[B]x86_64\f[R].
+The environment variable FRAMAC_MACHDEP can be used to override the default
+value. The command line parameter still has priority over the default value.
 .TP
 .B -main \f[I]f\f[R]
 sets \f[I]f\f[R] as the entry point of the analysis.

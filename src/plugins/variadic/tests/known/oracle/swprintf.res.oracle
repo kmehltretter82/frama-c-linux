@@ -97,7 +97,7 @@ int main(void)
   int __retres;
   wchar_t data[100];
   size_t tmp_0;
-  wmemset(data,65,(unsigned int)99);
+  wmemset(data,65,(unsigned long)99);
   data[99] = 0;
   wchar_t dest[50] = {0};
   if (nondet) {

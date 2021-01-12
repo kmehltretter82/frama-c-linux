@@ -7,7 +7,7 @@ Goal Post-condition 'copied_contents' in 'memcpy':
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n).
+  Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -37,7 +37,7 @@ Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 3
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n).
+  Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -53,13 +53,13 @@ Assume {
   (* Then *)
   Have: i < n.
 }
-Prove: to_uint32(1 + i) <= n.
+Prove: to_uint64(1 + i) <= n.
 
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 33):
 Assume {
-  Type: is_uint32(n).
+  Type: is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0).
@@ -77,12 +77,12 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = a_1[shift_sint8(dest_0, i) <- a_1[shift_sint8(src_0, i)]].
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n).
+  Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < to_uint32(1 + i)).
+  When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
       P_valid_read_or_empty(Malloc_0, src_0, n) /\
@@ -121,7 +121,7 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(dest_0, i).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n).
+  Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -153,7 +153,7 @@ Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 3
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n).
+  Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -169,7 +169,7 @@ Assume {
   (* Then *)
   Have: i < n.
 }
-Prove: i < to_uint32(1 + i).
+Prove: i < to_uint64(1 + i).
 
 ------------------------------------------------------------
 
@@ -180,8 +180,8 @@ Prove: true.
 
 Goal Post-condition 'copied_contents' in 'memmove':
 Assume {
-  Type: is_uint32(i) /\ is_uint32(i_1) /\ is_uint32(n) /\
-      is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(i_1) /\
+      is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -252,7 +252,7 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -280,7 +280,7 @@ Assume {
   (* Then *)
   Have: i < n.
 }
-Prove: to_uint32(1 + i) <= n.
+Prove: to_uint64(1 + i) <= n.
 
 ------------------------------------------------------------
 
@@ -288,7 +288,7 @@ Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 
 Let a = shift_sint8(d, 0).
 Let a_1 = shift_sint8(s, 0).
 Assume {
-  Type: is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
@@ -314,12 +314,12 @@ Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(s, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 < to_uint32(1 + i)).
+  When: (0 <= i_1) /\ (i_1 < to_uint64(1 + i)).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, d, n) /\
       P_valid_read_or_empty(Malloc_0, s, n).
@@ -360,12 +360,12 @@ Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(s, 0).
 Let a_3 = shift_sint8(s, i_1).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (i_1 < n) /\ (to_uint32(1 + i) <= i_1).
+  When: (i_1 < n) /\ (to_uint64(1 + i) <= i_1).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, d, n) /\
       P_valid_read_or_empty(Malloc_0, s, n).
@@ -404,7 +404,7 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -432,7 +432,7 @@ Assume {
   (* Then *)
   Have: 0 < i.
 }
-Prove: to_uint32(i - 1) < n.
+Prove: to_uint64(i - 1) < n.
 
 ------------------------------------------------------------
 
@@ -440,7 +440,7 @@ Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 
 Let a = shift_sint8(d, 0).
 Let a_1 = shift_sint8(s, 0).
 Assume {
-  Type: is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
   (* Pre-condition *)
@@ -457,7 +457,7 @@ Assume {
   (* Else *)
   Have: 0 < memoverlap_0.
 }
-Prove: to_uint32(n - 1) < n.
+Prove: to_uint64(n - 1) < n.
 
 ------------------------------------------------------------
 
@@ -466,12 +466,12 @@ Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(s, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (i_1 < n) /\ (to_uint32(i - 1) < i_1).
+  When: (i_1 < n) /\ (to_uint64(i - 1) < i_1).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, d, n) /\
       P_valid_read_or_empty(Malloc_0, s, n).
@@ -505,12 +505,12 @@ Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
   (* Goal *)
-  When: (i < n) /\ (to_uint32(n - 1) < i).
+  When: (i < n) /\ (to_uint64(n - 1) < i).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, dest_0, n) /\
       P_valid_read_or_empty(Malloc_0, src_0, n).
@@ -535,12 +535,12 @@ Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(s, 0).
 Let a_3 = shift_sint8(s, i_1).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0) /\
       sconst(Mchar_0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= to_uint32(i - 1)).
+  When: (0 <= i_1) /\ (i_1 <= to_uint64(i - 1)).
   (* Pre-condition *)
   Have: P_valid_or_empty(Malloc_0, d, n) /\
       P_valid_read_or_empty(Malloc_0, s, n).
@@ -592,7 +592,7 @@ Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Let a_3 = shift_sint8(d, i).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -644,7 +644,7 @@ Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Let a_3 = shift_sint8(d, i).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -718,7 +718,7 @@ Let a = shift_sint8(d, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(d.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -763,7 +763,7 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -791,7 +791,7 @@ Assume {
   (* Then *)
   Have: i < n.
 }
-Prove: i < to_uint32(1 + i).
+Prove: i < to_uint64(1 + i).
 
 ------------------------------------------------------------
 
@@ -805,7 +805,7 @@ Let a = shift_sint8(dest_0, 0).
 Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
-  Type: is_uint32(i) /\ is_uint32(n) /\ is_sint32(memoverlap_0).
+  Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
   (* Heap *)
   Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
       linked(Malloc_0) /\ sconst(Mchar_0).
@@ -833,7 +833,7 @@ Assume {
   (* Then *)
   Have: 0 < i.
 }
-Prove: to_uint32(i - 1) < i.
+Prove: to_uint64(i - 1) < i.
 
 ------------------------------------------------------------
 

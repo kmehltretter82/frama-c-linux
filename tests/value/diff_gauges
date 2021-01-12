@@ -764,7 +764,7 @@ diff tests/value/oracle/loopfun.1.res.oracle tests/value/oracle_gauges/loopfun.1
 13a18
 > [eva] tests/value/loopfun.i:27: starting to merge loop iterations
 diff tests/value/oracle/memexec.res.oracle tests/value/oracle_gauges/memexec.res.oracle
-101a102
+103a104
 > [eva] tests/value/memexec.c:98: starting to merge loop iterations
 diff tests/value/oracle/modulo.res.oracle tests/value/oracle_gauges/modulo.res.oracle
 40a41,123

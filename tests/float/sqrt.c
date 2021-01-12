@@ -1,6 +1,6 @@
 /* run.config*
    STDOPT: #"-eva-slevel 10 -big-ints-hex 257"
-   STDOPT: #"-eva-slevel 10 -big-ints-hex 257 -machdep ppc_32"
+   STDOPT: #"-eva-slevel 10 -big-ints-hex 257" +"-machdep ppc_32"
 */
 
 #include <math.h>
@@ -27,5 +27,5 @@ void main() {
 
   for (k=0; k<8; k++)
     c[k] = ((unsigned char*)&i)[k];
-   
+
 }

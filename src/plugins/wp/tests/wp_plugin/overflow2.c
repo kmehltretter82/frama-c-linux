@@ -1,3 +1,10 @@
+/* run.config
+   OPT: -machdep x86_32
+*/
+/* run.config_qualif
+   OPT: -machdep x86_32
+*/
+
 /* run with: frama-c-gui -wp -wp-rte strange_work_again.c */
 // uproven: a04, a05, a09, a10
 // note that when the type of distance is ushort, all is proven

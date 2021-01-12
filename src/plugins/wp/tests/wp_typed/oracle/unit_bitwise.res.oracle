@@ -175,7 +175,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion 'ok' (file tests/wp_typed/unit_bitwise.c, line 170):
-Let x = land(1, a). Assume { Type: is_uint32(a) /\ is_uint32(x). }
+Let x = land(1, a). Assume { Type: is_uint64(a) /\ is_uint64(x). }
 Prove: 0 <= x.
 
 ------------------------------------------------------------
