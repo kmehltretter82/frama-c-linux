@@ -1,5 +1,5 @@
 /* run.config*
-  OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -aorai-test 1 -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@ -aorai-no-acceptance -aorai-instrumentation-history 2 -aorai-no-generate-annotations -aorai-no-generate-deterministic-lemmas -then-last -eva -eva-partition-value n -eva-ilevel 256
+  OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@ -aorai-no-acceptance -aorai-instrumentation-history 2 -aorai-no-generate-annotations -aorai-no-generate-deterministic-lemmas -then-last -eva -eva-partition-value n -eva-ilevel 256
 */
 
 #include "__fc_builtin.h"

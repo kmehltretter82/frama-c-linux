@@ -1,5 +1,4 @@
 [kernel] Parsing tests/ltl/test_boucle2.c (with preprocessing)
-[aorai] Welcome to the Aorai plugin
 [kernel] Parsing TMPDIR/aorai_test_boucle2_0.i (no preprocessing)
 [wp] TMPDIR/aorai_test_boucle2_0.i:4: Warning: 
   Global invariant not handled yet ('inv' ignored)

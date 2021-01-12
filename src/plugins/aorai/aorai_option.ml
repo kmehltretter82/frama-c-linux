@@ -24,95 +24,95 @@
 (**************************************************************************)
 
 include Plugin.Register
-  (struct
-     let name = "aorai"
-     let shortname = "aorai"
-     let help = "verification of behavioral properties (experimental)"
-   end)
+    (struct
+      let name = "aorai"
+      let shortname = "aorai"
+      let help = "verification of behavioral properties (experimental)"
+    end)
 
 module Ltl_File =
   Filepath
     (struct
-       let option_name = "-aorai-ltl"
-       let arg_name = ""
-       let file_kind = "ltl"
-       let existence = Fc_Filepath.Must_exist
-       let help = "specifies file name for LTL property"
-     end)
+      let option_name = "-aorai-ltl"
+      let arg_name = ""
+      let file_kind = "ltl"
+      let existence = Fc_Filepath.Must_exist
+      let help = "specifies file name for LTL property"
+    end)
 
 module To_Buchi =
   Filepath
     (struct
-       let option_name = "-aorai-to-buchi"
-       let arg_name = "f"
-       let file_kind = "Promela"
-       let existence = Fc_Filepath.Indifferent
-       let help =
-         "only generates the buchi automata (in Promela language) in file <s>"
-     end)
+      let option_name = "-aorai-to-buchi"
+      let arg_name = "f"
+      let file_kind = "Promela"
+      let existence = Fc_Filepath.Indifferent
+      let help =
+        "only generates the buchi automata (in Promela language) in file <s>"
+    end)
 
 module Buchi =
   Filepath
     (struct
-       let option_name = "-aorai-buchi"
-       let arg_name = "f"
-       let file_kind = "Promela"
-       let existence = Fc_Filepath.Must_exist
-       let help = "considers the property described by the buchi automata \
-                   (in Promela language) from file <f>."
-     end)
+      let option_name = "-aorai-buchi"
+      let arg_name = "f"
+      let file_kind = "Promela"
+      let existence = Fc_Filepath.Must_exist
+      let help = "considers the property described by the buchi automata \
+                  (in Promela language) from file <f>."
+    end)
 
 module Ya =
   Filepath
     (struct
-       let option_name = "-aorai-automata"
-       let arg_name = "f"
-       let file_kind = "Ya"
-       let existence = Fc_Filepath.Must_exist
-       let help = "considers the property described by the ya automata \
-                   (in Ya language) from file <f>."
-     end)
+      let option_name = "-aorai-automata"
+      let arg_name = "f"
+      let file_kind = "Ya"
+      let existence = Fc_Filepath.Must_exist
+      let help = "considers the property described by the ya automata \
+                  (in Ya language) from file <f>."
+    end)
 
 module Output_C_File =
   Filepath
     (struct
-       let option_name = "-aorai-output-c-file"
-       let arg_name = ""
-       let file_kind = "annotated C"
-       let existence = Fc_Filepath.Indifferent
-       let help = "specifies generated file name for annotated C code"
-     end)
+      let option_name = "-aorai-output-c-file"
+      let arg_name = ""
+      let file_kind = "annotated C"
+      let existence = Fc_Filepath.Indifferent
+      let help = "specifies generated file name for annotated C code"
+    end)
 
 module Dot =
   False(struct
-          let option_name = "-aorai-dot"
-          let help = "generates a dot file of the Buchi automata"
-        end)
+    let option_name = "-aorai-dot"
+    let help = "generates a dot file of the Buchi automata"
+  end)
 
 module DotSeparatedLabels =
   False(struct
-          let option_name = "-aorai-dot-sep-labels"
-          let help = "tells dot to not output guards directly over the edges"
-        end)
+    let option_name = "-aorai-dot-sep-labels"
+    let help = "tells dot to not output guards directly over the edges"
+  end)
 
 module AbstractInterpretation =
   False(struct
-          let option_name = "-aorai-simple-AI"
-          let help = "use simple abstract interpretation"
-        end)
+    let option_name = "-aorai-simple-AI"
+    let help = "use simple abstract interpretation"
+  end)
 
 module AbstractInterpretationOff  =
   False(struct
-          let option_name = "-aorai-AI-off"
-          let help = "does not use abstract interpretation"
-        end)
+    let option_name = "-aorai-AI-off"
+    let help = "does not use abstract interpretation"
+  end)
 
 let () = Parameter_customize.set_negative_option_name "-aorai-spec-off"
 module Axiomatization =
   True(struct
-         let option_name = "-aorai-spec-on"
-         let help = "if set, does not axiomatize automata"
-       end)
+    let option_name = "-aorai-spec-on"
+    let help = "if set, does not axiomatize automata"
+  end)
 
 module GenerateAnnotations =
   True
@@ -131,41 +131,34 @@ module GenerateDeterministicLemmas =
 
 module ConsiderAcceptance =
   False(struct
-         let option_name = "-aorai-acceptance"
-         let help = "if set, considers acceptation states"
-       end)
+    let option_name = "-aorai-acceptance"
+    let help = "if set, considers acceptation states"
+  end)
 
 let () = Parameter_customize.set_negative_option_name "-aorai-raw-auto"
 module AutomataSimplification=
   True
     (struct
-       let option_name = "-aorai-simplified-auto"
-       let help = "If set, does not simplify automata"
-     end)
-
-module Test =
-  Zero(struct
-         let option_name = "-aorai-test"
-         let arg_name = ""
-         let help = "Testing mode (0 = no test)"
-       end)
+      let option_name = "-aorai-simplified-auto"
+      let help = "If set, does not simplify automata"
+    end)
 
 module AddingOperationNameAndStatusInSpecification =
   False
     (struct
       let option_name = "-aorai-add-oper"
       let help = "Adding current operation name (and statut) in pre/post \
-conditions"
-     end)
+                  conditions"
+    end)
 
 module Deterministic=
   State_builder.Ref
     (Datatype.Bool)
     (struct
-        let name = "Aorai_option.Deterministic"
-        let dependencies = []
-        let default () = false
-     end)
+      let name = "Aorai_option.Deterministic"
+      let dependencies = []
+      let default () = false
+    end)
 
 module InstrumentationHistory =
   Int
@@ -187,20 +180,20 @@ let promela_file () =
 let advance_abstract_interpretation () =
   not (AbstractInterpretationOff.get ()) && not (AbstractInterpretation.get ())
 
-let emitter = 
+let emitter =
   Emitter.create
     "Aorai"
-    [ Emitter.Code_annot; Emitter.Funspec; Emitter.Global_annot ] 
+    [ Emitter.Code_annot; Emitter.Funspec; Emitter.Global_annot ]
     ~correctness:
-    [ Ltl_File.parameter; To_Buchi.parameter; Buchi.parameter;
-      Ya.parameter; Axiomatization.parameter;
-      ConsiderAcceptance.parameter;
-      AutomataSimplification.parameter ]
+      [ Ltl_File.parameter; To_Buchi.parameter; Buchi.parameter;
+        Ya.parameter; Axiomatization.parameter;
+        ConsiderAcceptance.parameter;
+        AutomataSimplification.parameter ]
     ~tuning:
-    [ AbstractInterpretation.parameter;
-      AddingOperationNameAndStatusInSpecification.parameter;
-      InstrumentationHistory.parameter;
-      GenerateAnnotations.parameter ]
+      [ AbstractInterpretation.parameter;
+        AddingOperationNameAndStatusInSpecification.parameter;
+        InstrumentationHistory.parameter;
+        GenerateAnnotations.parameter ]
 
 
 (*

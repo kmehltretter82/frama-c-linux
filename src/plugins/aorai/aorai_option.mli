@@ -38,7 +38,6 @@ module GenerateAnnotations: Parameter_sig.Bool
 module GenerateDeterministicLemmas: Parameter_sig.Bool
 module ConsiderAcceptance: Parameter_sig.Bool
 module AutomataSimplification: Parameter_sig.Bool
-module Test: Parameter_sig.Int
 module AddingOperationNameAndStatusInSpecification: Parameter_sig.Bool
 
 (** [true] if the user declares that its ya automaton is deterministic. *)

@@ -1,5 +1,4 @@
 [kernel] Parsing tests/ya/serial.c (with preprocessing)
-[aorai] Welcome to the Aorai plugin
 [kernel:annot:missing-spec] tests/ya/serial.c:43: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main

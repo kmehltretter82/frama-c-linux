@@ -1,8 +1,5 @@
 [kernel] Parsing tests/ya/serial.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] tests/ya/serial.c:81: Warning: 
-  Calling undeclared function Frama_C_show_aorai_state. Old style K&R code?
-[aorai] Welcome to the Aorai plugin
-[kernel:annot:missing-spec] tests/ya/serial.c:45: Warning: 
+[kernel:annot:missing-spec] tests/ya/serial.c:43: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -21,28 +18,36 @@
   aorai_StatesHistory_1 ∈ {19}
   aorai_StatesHistory_2 ∈ {19}
 [eva] using specification for function Frama_C_interval
-[eva] tests/ya/serial.c:47: starting to merge loop iterations
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 100 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 300 states
-[aorai] tests/ya/serial.c:81: Wait1 <- Wait1 <- Complete
-[aorai] tests/ya/serial.c:81: Error <- Error <- Complete
-[aorai] tests/ya/serial.c:81: Complete <- Complete <- Complete
-[aorai] tests/ya/serial.c:81: Wait1 <- Wait1 <- Complete
-[aorai] tests/ya/serial.c:81: Error <- Error <- Complete
-[aorai] tests/ya/serial.c:81: Complete <- Complete <- Complete
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 500 states
-[eva:alarm] tests/ya/serial.c:54: Warning: 
+[eva] tests/ya/serial.c:45: starting to merge loop iterations
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 100 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 300 states
+[aorai] tests/ya/serial.c:79: Wait1 <- Wait1 <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
+[aorai] tests/ya/serial.c:79: Error <- Error <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
+[aorai] tests/ya/serial.c:79: Complete <- Complete <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
+[aorai] tests/ya/serial.c:79: Wait1 <- Wait1 <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
+[aorai] tests/ya/serial.c:79: Error <- Error <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
+[aorai] tests/ya/serial.c:79: Complete <- Complete <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 500 states
+[eva:alarm] tests/ya/serial.c:52: Warning: 
   accessing uninitialized left-value. assert \initialized(&status);
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 700 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 900 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 1200 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 1500 states
-[aorai] tests/ya/serial.c:81: Error <- Error <- Error
-[aorai] tests/ya/serial.c:81: Error <- Error <- Error
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 1700 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 1900 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 2000 states
-[eva] tests/ya/serial.c:52: Trace partitioning superposing up to 2100 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 700 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 900 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1200 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1500 states
+[aorai] tests/ya/serial.c:79: Error <- Error <- Error
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
+[aorai] tests/ya/serial.c:79: Error <- Error <- Error
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1700 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1900 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 2000 states
+[eva] tests/ya/serial.c:50: Trace partitioning superposing up to 2100 states
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
@@ -299,7 +304,7 @@
   100% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
 [kernel] Parsing TMPDIR/aorai_serial_0.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] TMPDIR/aorai_serial_0.i:176: Warning: 
+[kernel:typing:implicit-function-declaration] TMPDIR/aorai_serial_0.i:174: Warning: 
   Calling undeclared function Frama_C_interval. Old style K&R code?
 [wp] Warning: Missing RTE guards
 [wp] Warning: No goal generated

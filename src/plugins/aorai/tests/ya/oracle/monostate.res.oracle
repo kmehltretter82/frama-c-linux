@@ -1,5 +1,4 @@
 [kernel] Parsing tests/ya/monostate.i (no preprocessing)
-[aorai] Welcome to the Aorai plugin
 [aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
 [aorai] tests/ya/monostate.i:8: Warning: 
   Call to main not conforming to automaton (pre-cond). Assuming it is on a dead path
