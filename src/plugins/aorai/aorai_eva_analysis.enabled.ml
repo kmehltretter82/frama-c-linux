@@ -39,13 +39,21 @@ let show_val fmt (expr, v, _) =
     Printer.pp_exp expr
     (Cvalue.V.pretty_typ (Some (Cil.typeOf expr))) v
 
+let show_aorai_state = "Frama_C_show_aorai_state"
+
 let builtin_show_aorai_state state args =
-  let history = Data_for_aorai.(curState :: (whole_history ())) in
-  Aorai_option.result ~current:true "@[<hv>%a@]"
-    (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
-  if args <> [] then begin
+  if not (Aorai_option.Deterministic.get()) then begin
+    Aorai_option.warning
+      ~current:true "%s can only display info for deterministic automata"
+      show_aorai_state
+  end else begin
+    let history = Data_for_aorai.(curState :: (whole_history ())) in
     Aorai_option.result ~current:true "@[<hv>%a@]"
-      (Pretty_utils.pp_list ~sep:"," show_val) args
+      (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
+    if args <> [] then begin
+      Aorai_option.result ~current:true "@[<hv>%a@]"
+        (Pretty_utils.pp_list ~sep:"," show_val) args
+    end;
   end;
   (* Return value : returns nothing, changes nothing *)
   {
@@ -54,8 +62,6 @@ let builtin_show_aorai_state state args =
     c_from = None;
     c_cacheable = Value_types.Cacheable;
   }
-
-let show_aorai_state = "Frama_C_show_aorai_state"
 
 let () =
   Cil_builtins.add_custom_builtin
