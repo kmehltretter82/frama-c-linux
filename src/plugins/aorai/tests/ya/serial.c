@@ -76,7 +76,7 @@ void main(void)
           output(x, y);
           /* "Error" state should show up as, for now, it is  hard to prove
             the metavariable équation in the input automaton */
-          Frama_C_show_aorai_state();
+          Frama_C_show_aorai_state(n,x,y);
         }
 
         n = 0;

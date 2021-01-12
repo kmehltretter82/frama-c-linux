@@ -23,11 +23,17 @@
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 100 states
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 300 states
 [aorai] tests/ya/serial.c:79: Wait1 <- Wait1 <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
 [aorai] tests/ya/serial.c:79: Error <- Error <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
 [aorai] tests/ya/serial.c:79: Complete <- Complete <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
 [aorai] tests/ya/serial.c:79: Wait1 <- Wait1 <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
 [aorai] tests/ya/serial.c:79: Error <- Error <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
 [aorai] tests/ya/serial.c:79: Complete <- Complete <- Complete
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 500 states
 [eva:alarm] tests/ya/serial.c:52: Warning: 
   accessing uninitialized left-value. assert \initialized(&status);
@@ -36,7 +42,9 @@
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1200 states
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1500 states
 [aorai] tests/ya/serial.c:79: Error <- Error <- Error
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [8192..16383]
 [aorai] tests/ya/serial.c:79: Error <- Error <- Error
+[aorai] tests/ya/serial.c:79: n in {5},x in [0..16383],y in [0..8191]
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1700 states
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 1900 states
 [eva] tests/ya/serial.c:50: Trace partitioning superposing up to 2000 states
@@ -675,7 +683,7 @@ void main(void)
           int x = buffer[1] + 0x80 * buffer[2];
           int y = buffer[3] + 0x80 * buffer[4];
           output(x,y);
-          Frama_C_show_aorai_state();
+          Frama_C_show_aorai_state(n,x,y);
         }
         n = 0;
       }
