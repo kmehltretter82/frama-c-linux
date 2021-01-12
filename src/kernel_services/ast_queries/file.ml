@@ -121,12 +121,12 @@ let from_filename ?cpp f =
     let cmdline = Kernel.CppCommand.get() in
     if cmdline <> "" then cmdline
     else
-      let extra_flags =
+      let extra_by_file =
         try Kernel.CppExtraArgsPerFile.find f
         with Not_found -> ""
       in
       let jcdb_flags = Json_compilation_database.get_flags f in
-      if extra_flags <> "" && jcdb_flags <> [] then
+      if extra_by_file <> "" && jcdb_flags <> [] then
         Kernel.warning ~wkey:Kernel.wkey_jcdb
           "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
            in the json compilation database;@ the latter will be ignored"
@@ -134,7 +134,7 @@ let from_filename ?cpp f =
       let cpp =
         if cpp = None then get_preprocessor_command () else Option.get cpp
       in
-      let flags = if extra_flags <> "" then [extra_flags] else jcdb_flags in
+      let flags = if extra_by_file <> "" then [extra_by_file] else jcdb_flags in
       String.concat " " (cpp :: flags)
   in
   if Filename.check_suffix (f:>string) ".i" then begin
