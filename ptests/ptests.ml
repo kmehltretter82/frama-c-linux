@@ -161,6 +161,7 @@ let example_msg =
      @@PTEST_DIR@@       # Dirname of the test file.@  \
      @@PTEST_NAME@@      # Basename of the test file.@  \
      @@PTEST_NUMBER@@    # Test command number.@  \
+     @@PTEST_LOG@@       # Basename of the current oracle file (variable only usable in FILTER directives).@  \
      @@DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
      @]@ \
@@ -181,7 +182,7 @@ let example_msg =
      @]@ \
      @[<v 1>\
      Dune aliases related to the test:@  \
-     @@ptests                         # Tests all configuration.@  \
+     @@ptests                         # Tests all configurations.@  \
      @@ptests_config                  # Tests only the default configuration.@  \
      @@ptests_config_<configuration>  # Tests only the specified <configuration>.@  \
      @@<PTEST_FILE>                   # Force to reproduce the corresponding test and prints the outputs.@  \
@@ -209,7 +210,7 @@ let rec argspec =
     "-make", Arg.String (fun s -> Format.eprintf "Deprecated option -make %s" s),
     "<command> Use command instead of make (DEPRECATED)";
     "-config", Arg.String (fun s -> Format.eprintf "Deprecated option -config %s" s),
-    " <name> Use special configuration and oracles";
+    " <name> Use special configuration and oracles (DEPRECATED)";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg
 
@@ -759,7 +760,7 @@ end = struct
              try
                r := (List.assoc name config_options ~file ~dir) opt !r
              with Not_found ->
-               Format.eprintf "@[%s: unknown configuration option: %s@@.@]" file name)
+               Format.eprintf "@[%s: unknown configuration option: %s@.@]" file name)
       with
       | Scanf.Scan_failure _ ->
         if Str.string_match end_comment s 0
@@ -1279,7 +1280,7 @@ let () =
     | l -> l
   in
   List.iter (fun dir ->
-      Format.printf "Test: %s@." dir;
+      Format.printf "Test directory: %s@." dir;
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "- nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in

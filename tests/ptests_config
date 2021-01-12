@@ -15,8 +15,6 @@ IGNORE= DEFAULT_SUITES= spec
 IGNORE= DEFAULT_SUITES= make_run_script
 IGNORE= DEFAULT_SUITES= value/numerors
 
-IGNORE= qualif_SUITES = wp
-
 IGNORE= apron_SUITES = value
 IGNORE= bitwise_SUITES = value
 IGNORE= equalities_SUITES = value
