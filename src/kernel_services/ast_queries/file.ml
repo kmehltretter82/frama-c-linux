@@ -36,9 +36,11 @@ let pretty_cpp_opt_kind fmt =
 type file =
   | NeedCPP of
       Filepath.Normalized.t (* filename of the [.c] to preprocess *)
-      * string (* Preprocessor command.
-                  [filename.c -o tempfilname.i] will be appended at the
-                    end.*)
+      * string (* Preprocessing command, as given by -cpp-command, or
+                  the default value, but without extra arguments *)
+      * string list (* Extra arguments to be given to the preprocessing
+                       command, as given by -cpp-extra-args-per-file or
+                       a JSON Compilation Database. *)
       * cpp_opt_kind
   | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
   | External of Filepath.Normalized.t * string
@@ -51,7 +53,7 @@ module D =
       type t = file
       let name = "File"
       let reprs =
-        [ NeedCPP(Filepath.Normalized.unknown, "", Unknown);
+        [ NeedCPP(Filepath.Normalized.unknown, "", [], Unknown);
           NoCPP Filepath.Normalized.unknown;
           External(Filepath.Normalized.unknown, "")
         ]
@@ -65,11 +67,12 @@ module D =
           | External (f,p) ->
             Format.fprintf fmt "@[File.External (%a,%S)@]"
               Filepath.Normalized.pretty f p
-          | NeedCPP (f,cmd,kind) ->
+          | NeedCPP (f,cmd,extra,kind) ->
             Format.fprintf
-              fmt "@[File.NeedCPP (%a,%S,%a)@]"
+              fmt "@[File.NeedCPP (%a,%S,%S,%a)@]"
               Filepath.Normalized.pretty f
               cmd
+              (String.concat " " extra)
               pretty_cpp_opt_kind kind
         in
         Type.par p_caller Type.Call fmt pp
@@ -85,7 +88,7 @@ let get_suffixes () =
     [ ".c"; ".i"; ".h" ]
 
 let get_name s =
-  let file = match s with  NeedCPP (s,_,_) | NoCPP s | External (s,_) -> s in
+  let file = match s with  NeedCPP (s,_,_,_) | NoCPP s | External (s,_) -> s in
   Filepath.Normalized.to_pretty_string file
 
 (* ************************************************************************* *)
@@ -118,24 +121,23 @@ let get_preprocessor_command () =
 
 let from_filename ?cpp f =
   let cpp =
-    let cmdline = Kernel.CppCommand.get() in
-    if cmdline <> "" then cmdline
-    else
-      let extra_by_file =
-        try Kernel.CppExtraArgsPerFile.find f
-        with Not_found -> ""
-      in
-      let jcdb_flags = Json_compilation_database.get_flags f in
-      if extra_by_file <> "" && jcdb_flags <> [] then
-        Kernel.warning ~wkey:Kernel.wkey_jcdb
-          "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
-           in the json compilation database;@ the latter will be ignored"
-          Filepath.Normalized.pretty f;
-      let cpp =
-        if cpp = None then get_preprocessor_command () else Option.get cpp
-      in
-      let flags = if extra_by_file <> "" then [extra_by_file] else jcdb_flags in
-      String.concat " " (cpp :: flags)
+    let cpp_command = Kernel.CppCommand.get() in
+    if cpp_command <> "" then cpp_command
+    else if cpp = None then get_preprocessor_command ()
+    else Option.get cpp
+  in
+  let extra =
+    let extra_by_file =
+      try Kernel.CppExtraArgsPerFile.find f
+      with Not_found -> ""
+    in
+    let jcdb_flags = Json_compilation_database.get_flags f in
+    if extra_by_file <> "" && jcdb_flags <> [] then
+      Kernel.warning ~wkey:Kernel.wkey_jcdb
+        "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
+         in the json compilation database;@ the latter will be ignored"
+        Filepath.Normalized.pretty f;
+    if extra_by_file <> "" then [extra_by_file] else jcdb_flags
   in
   if Filename.check_suffix (f:>string) ".i" then begin
     NoCPP f
@@ -154,7 +156,7 @@ let from_filename ?cpp f =
         Kernel.warning ~once:true
           "Default pre-processor does not keep comments. Any ACSL annotation \
            on non-pre-processed file will be discarded.";
-      NeedCPP (f, cpp, is_cpp_gnu_like ())
+      NeedCPP (f, cpp, extra, is_cpp_gnu_like ())
     end else
       Kernel.abort "No working pre-processor found. You can only analyze \
                     pre-processed .i files."
@@ -440,7 +442,7 @@ let concat_strs ?(pre="") ?(sep=" ") l =
 
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
-  | NeedCPP (f, cmdl, is_gnu_like) ->
+  | NeedCPP (f, cmdl, extra, is_gnu_like) ->
     if not (Sys.file_exists (f :> string)) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
@@ -519,16 +521,16 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (Kernel.CppExtraArgs.get () @ gnu_implicit_args @ supported_cpp_arch_args)
+        (Kernel.CppExtraArgs.get () @ gnu_implicit_args @ supported_cpp_arch_args @ extra)
         include_args define_args
     in
     let cpp_command = replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string) in
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "@{<i>preprocessing@} with \"%s\""
       cpp_command;
-    Some (cpp_command, ppf, supported_cpp_arch_args)
+    Some (cpp_command, ppf, supp_args)
 
-let parse_cabs cpp_command_no_output = function
+let parse_cabs cpp_command = function
   | NoCPP f ->
     if not (Sys.file_exists (f:>string)) then
       Kernel.abort "preprocessed file %a does not exist"
@@ -536,8 +538,8 @@ let parse_cabs cpp_command_no_output = function
     Kernel.feedback "Parsing %a (no preprocessing)"
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
-  | NeedCPP (f, cmdl, is_gnu_like) ->
-    let cpp_command, ppf, supported_cpp_arch_args = Option.get cpp_command_no_output in
+  | NeedCPP (f, cmdl, _extra, is_gnu_like) ->
+    let cpp_command, ppf, supp_args = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -581,13 +583,9 @@ let parse_cabs cpp_command_no_output = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
-        let pp_annot_supp_args =
-          Format.asprintf "-nostdinc %s"
-            (concat_strs supported_cpp_arch_args)
-        in
         let ppf' =
           try Logic_preprocess.file ".c"
-                (replace_in_cpp_cmd cmdl pp_annot_supp_args)
+                (replace_in_cpp_cmd cmdl supp_args)
                 (ppf : Filepath.Normalized.t :> string)
           with Sys_error _ as e ->
             safe_remove_file ppf;

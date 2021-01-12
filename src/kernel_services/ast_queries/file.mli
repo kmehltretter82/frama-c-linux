@@ -30,10 +30,14 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
     Note: [string] is used here instead of [Filepath], to preserve
           names given on the command line, without normalization. *)
 type file =
-  | NeedCPP of Filepath.Normalized.t * string * cpp_opt_kind
-  (** The first string is the filename of the [.c] to preprocess.
-      The second one is the preprocessor command ([filename.c -o
-      tempfilname.i] will be appended at the end).*)
+  | NeedCPP of Filepath.Normalized.t * string * string list * cpp_opt_kind
+  (** File which needs preprocessing.
+      NeedCPP(filepath, cmd, extra, cpp_opt_kind):
+      - filepath: source file to be preprocessed;
+      - cmd: preprocessing command, before replacement of '%'-arguments;
+      - extra: list of extra arguments (e.g. from a JCDB);
+      - cpp_opt_kind: whether the preprocessor supports GNU options
+        such as -I/-D. *)
   | NoCPP of Filepath.Normalized.t
   (** Already pre-processed file [.i] *)
   | External of Filepath.Normalized.t * string
