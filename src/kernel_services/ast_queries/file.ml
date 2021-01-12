@@ -433,6 +433,15 @@ let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   with Not_found ->
     Format.sprintf "%s %s %s -o %s" cmdl supp_args in_file out_file
 
+(* Note: using Pretty_utils.pp_list without forcing '~pre' and '~suf' to
+   be empty strings can lead to issues when the commands are too long and
+   Format's pretty-printer decides to insert newlines.
+   This concatenation function serves as a reminder to avoid using them.
+*)
+let concat_strs ?(pre="") ?(sep=" ") l =
+  if l = [] then ""
+  else pre ^ (String.concat sep l)
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, is_gnu_like) ->
@@ -490,15 +499,13 @@ let build_cpp_cmd = function
     if is_gnu_like = Unknown && not (Kernel.CppCommand.is_set ())
        && unsupported_cpp_arch_args <> [] then
       Kernel.warning ~once:true
-        "your preprocessor is not known to handle option(s) `%a', \
+        "your preprocessor is not known to handle option(s) `%s', \
          considered necessary for machdep `%s'. To ensure compatibility \
          between your preprocessor and the machdep, consider using \
          -cpp-command with the appropriate flags. \
-         Your preprocessor is known to support these flags: %a"
-        (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
-        unsupported_cpp_arch_args (Kernel.Machdep.get ())
-        (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
-        Fc_config.preprocessor_supported_arch_options;
+         Your preprocessor is known to support these flags: %s"
+        (concat_strs unsupported_cpp_arch_args) (Kernel.Machdep.get ())
+        (concat_strs Fc_config.preprocessor_supported_arch_options);
     let extra_args =
       if Kernel.ReadAnnot.get () then
         if Kernel.PreprocessAnnot.is_set () then
@@ -510,12 +517,11 @@ let build_cpp_cmd = function
           opt @ extra_args
       else extra_args
     in
-    let pp_str = Format.pp_print_string in
     let string_of_supp_args extra includes defines =
-      Format.asprintf "%a%a%a"
-        (Pretty_utils.pp_list ~pre:" -I" ~sep:" -I" ~empty:"" pp_str) includes
-        (Pretty_utils.pp_list ~pre:" -D" ~sep:" -D" ~empty:"" pp_str) defines
-        (Pretty_utils.pp_list ~pre:" " ~sep:" " ~empty:"" pp_str) extra
+      Format.asprintf "%s%s%s"
+        (concat_strs ~pre:" -I" ~sep:" -I" includes)
+        (concat_strs ~pre:" -D" ~sep:" -D" defines)
+        (concat_strs ~pre:" " ~sep:" " extra)
     in
     let supp_args =
       string_of_supp_args
@@ -582,9 +588,8 @@ let parse_cabs cpp_command_no_output = function
                    preprocessor."; true))
       then begin
         let pp_annot_supp_args =
-          Format.asprintf "-nostdinc %a"
-            (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
-            supported_cpp_arch_args
+          Format.asprintf "-nostdinc %s"
+            (concat_strs supported_cpp_arch_args)
         in
         let ppf' =
           try Logic_preprocess.file ".c"
