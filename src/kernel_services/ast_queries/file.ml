@@ -139,7 +139,7 @@ let from_filename ?cpp f =
         | Some cpp -> cpp, cpp_opt_kind ()
       in
       let flags = if extra_flags <> "" then [extra_flags] else jcdb_flags in
-      (if flags = [] then cpp else cpp ^ " " ^ String.concat " " flags), gnu
+      String.concat " " (cpp :: flags), gnu
   in
   if Filename.check_suffix (f:>string) ".i" then begin
     NoCPP f
