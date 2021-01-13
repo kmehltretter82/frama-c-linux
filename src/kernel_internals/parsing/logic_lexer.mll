@@ -367,17 +367,17 @@ rule token = parse
       end else curr_tok
     }
 
-  | '0'['x''X'] rH+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | '0'['b''B'] rB+ rIS?    { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | '0' rD+ rIS?            { CONSTANT (IntConstant (lexeme lexbuf)) }
-  | rD+                     { CONSTANT10 (lexeme lexbuf) }
-  | rD+ rIS                 { CONSTANT (IntConstant (lexeme lexbuf)) }
+  | '0'['x''X'] rH+ rIS?    { INT_CONSTANT (lexeme lexbuf) }
+  | '0'['b''B'] rB+ rIS?    { INT_CONSTANT (lexeme lexbuf) }
+  | '0' rD+ rIS?            { INT_CONSTANT (lexeme lexbuf) }
+  | rD+                     { INT_CONSTANT (lexeme lexbuf) }
+  | rD+ rIS                 { INT_CONSTANT (lexeme lexbuf) }
   | ('L'? "'" as prelude) (([^ '\\' '\'' '\n']|("\\"[^ '\n']))+ as content) "'"
       {
         let b = Buffer.create 5 in
         Buffer.add_string b prelude;
         let lbf = Lexing.from_string content in
-        CONSTANT (IntConstant (chr b lbf ^ "'"))
+        INT_CONSTANT (chr b lbf ^ "'")
       }
 (* floating-point literals, both decimal and hexadecimal *)
   | rD+ rE rFS?
@@ -386,11 +386,11 @@ rule token = parse
   | '0'['x''X'] rH+ '.' rH* rP rFS?
   | '0'['x''X'] rH* '.' rH+ rP rFS?
   | '0'['x''X'] rH+ rP rFS?
-      { CONSTANT (FloatConstant (lexeme lexbuf)) }
+      { FLOAT_CONSTANT (lexeme lexbuf) }
 
  (* hack to lex 0..3 as 0 .. 3 and not as 0. .3 *)
   | (rD+ as n) ".."         { lexbuf.lex_curr_pos <- lexbuf.lex_curr_pos - 2;
-                              CONSTANT (IntConstant n) }
+                              INT_CONSTANT n }
 
   | 'L'? '"' as prelude (([^ '\\' '"' '\n']|("\\"[^ '\n']))* as content) '"'
       { STRING_LITERAL (prelude.[0] = 'L',content) }

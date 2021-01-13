@@ -264,8 +264,10 @@
 /* ACSL extension for external spec  file */
 %token <string> IDENTIFIER TYPENAME
 %token <bool*string> STRING_LITERAL
-%token <Logic_ptree.constant> CONSTANT
-%token <string> CONSTANT10
+%token <string> INT_CONSTANT
+%token <string> FLOAT_CONSTANT
+%token <string> STRING_CONSTANT
+%token <string> WSTRING_CONSTANT
 %token LPAR RPAR IF ELSE COLON COLON2 COLONCOLON DOT DOTDOT DOTDOTDOT
 %token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
@@ -678,12 +680,14 @@ var_spec:
 ;
 
 constant:
-| CONSTANT   { $1 }
-| CONSTANT10 { IntConstant $1 }
+| INT_CONSTANT   { IntConstant $1 }
+| FLOAT_CONSTANT { FloatConstant $1 }
+| STRING_CONSTANT { StringConstant $1 }
+| WSTRING_CONSTANT { WStringConstant $1 }
 ;
 
 array_size:
-| CONSTANT10 { ASinteger $1 }
+| INT_CONSTANT { ASinteger $1 }
 | identifier { ASidentifier $1 }
 | /* empty */ { ASnone }
 ;
@@ -1040,7 +1044,7 @@ ext_contract_markup:
 
 stmt_markup:
 | any_identifier { $1 }
-| CONSTANT10 { $1 }
+| INT_CONSTANT { $1 }
 ;
 
 stmt_markup_attr:
@@ -2041,8 +2045,10 @@ wildcard:
 | COLON2 { () }
 | COLONCOLON { () }
 | COMMA { () }
-| CONSTANT { () }
-| CONSTANT10 { () }
+| INT_CONSTANT { () }
+| FLOAT_CONSTANT { () }
+| STRING_CONSTANT { () }
+| WSTRING_CONSTANT { () }
 | DOLLAR { () }
 | DOT { () }
 | DOTDOT { () }
