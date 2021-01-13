@@ -119,7 +119,7 @@ int decode_int(char *s)
   int __retres;
   char c;
   /*@ ghost decode_int_pre_func(s); */
-  int intmax = ~ (1 << (sizeof(int) * (unsigned int)8 - (unsigned int)1));
+  int intmax = ~ (1 << (sizeof(int) * (unsigned long)8 - (unsigned long)1));
   int cutlim = intmax % 10;
   int cutoff = intmax / 10;
   int value = 0;
