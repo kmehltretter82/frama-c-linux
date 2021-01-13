@@ -1,0 +1,14 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_plugin/cfg.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+[wp] 3 goals scheduled
+[wp] [Qed] Goal typed_bar_ensures_BUG_WP : Valid
+[wp] [Qed] Goal typed_bar_assigns_exit : Valid
+[wp] [Qed] Goal typed_bar_assigns_normal : Valid
+[wp] Proved goals:    3 / 3
+  Qed:             3
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  bar                       3        -        3       100%
+------------------------------------------------------------

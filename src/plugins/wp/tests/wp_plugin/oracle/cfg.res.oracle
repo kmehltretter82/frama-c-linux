@@ -1,0 +1,22 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_plugin/cfg.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function bar
+------------------------------------------------------------
+
+Goal Post-condition 'BUG_WP' in 'bar':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'bar':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'bar':
+Prove: true.
+
+------------------------------------------------------------
