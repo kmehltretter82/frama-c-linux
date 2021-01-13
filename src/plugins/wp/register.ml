@@ -64,7 +64,10 @@ let set_model (s:setup) =
 
 let computer () =
   if Wp_parameters.Model.get () = ["Dump"]
-  then CfgDump.create ()
+  then begin
+    Cil2cfg.Dump.process () ;
+    CfgDump.create ()
+  end
   else CfgWP.computer (cmdline ()) (Driver.load_driver ())
 
 (* ------------------------------------------------------------------------ *)

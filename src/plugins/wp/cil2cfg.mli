@@ -177,3 +177,8 @@ sig
 end
 
 module HE (I : sig type t end) : HEsig with type ti = I.t
+
+module Dump :
+sig
+  val process: unit -> unit
+end
