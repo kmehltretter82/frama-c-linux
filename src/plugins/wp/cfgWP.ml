@@ -600,6 +600,7 @@ struct
 
   let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
+        assert (stmt == ainfo.a_stmt) ;
         match ainfo.a_assigns with
 
         | WritesAny ->
