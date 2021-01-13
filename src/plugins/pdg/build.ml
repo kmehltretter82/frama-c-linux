@@ -732,6 +732,7 @@ let process_call pdg state stmt lvaloption funcexp argl _loc =
     | [] ->
        let stmt_str = Format.asprintf "%a" Printer.pp_stmt stmt in
        Pdg_parameters.not_yet_implemented
+         ~source:(fst (Cil_datatype.Stmt.loc stmt))
          "pdg with an unknown function call: %s" stmt_str
     | st :: [] -> st
     | st :: other_states ->

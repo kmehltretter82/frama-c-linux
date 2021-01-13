@@ -510,12 +510,23 @@ lexpr_inner:
 | ALLOCABLE opt_label_1 LPAR lexpr RPAR { info (PLallocable ($2,$4)) }
 | FREEABLE opt_label_1 LPAR lexpr RPAR { info (PLfreeable ($2,$4)) }
 | ALLOCATION opt_label_1 LPAR lexpr RPAR
-  { Kernel.not_yet_implemented "\\allocation" }
-| AUTOMATIC { Kernel.not_yet_implemented "\\automatic" }
-| DYNAMIC { Kernel.not_yet_implemented "\\dynamic" }
-| REGISTER { Kernel.not_yet_implemented "\\register" }
-| STATIC { Kernel.not_yet_implemented "\\static" }
-| UNALLOCATED { Kernel.not_yet_implemented "\\unallocated" }
+  { let source = fst(loc()) in
+    Kernel.not_yet_implemented ~source "\\allocation" }
+| AUTOMATIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\automatic" }
+| DYNAMIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\dynamic" }
+| REGISTER {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\register" }
+| STATIC {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\static" }
+| UNALLOCATED {
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "\\unallocated" }
 | NULL { info PLnull }
 | constant { info (PLconstant $1) }
 | lexpr_inner PLUS lexpr_inner { info (PLbinop ($1, Badd, $3)) }
@@ -706,7 +717,8 @@ abs_param_type_list:
 | /* empty */    { [ ] }
 | abs_param_list { $1 }
 | abs_param_list COMMA DOTDOTDOT {
-    Kernel.not_yet_implemented "variadic C function types"
+  let source = fst(loc()) in
+  Kernel.not_yet_implemented ~source "variadic C function types"
   }
 ;
 

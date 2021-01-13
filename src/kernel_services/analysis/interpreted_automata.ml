@@ -331,7 +331,7 @@ let build_automaton ~annotations kf =
   and do_stmt control (labels:vertex labels) stmt =
     let kinstr = Kstmt stmt
     and loc = stmt_loc stmt in
-
+    let source = fst loc in
     let do_annot control labels (annot: code_annotation) : unit =
       let labels = LabelMap.add_builtin Here control.src labels in
       let annotation = make_annotation kf stmt annot labels in
@@ -511,7 +511,7 @@ let build_automaton ~annotations kf =
       control.dest
 
     | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
-        -> Kernel.not_yet_implemented
+        -> Kernel.not_yet_implemented ~source
                   "[interpreted_automata] exception handling"
     in
     (* Update statement table *)

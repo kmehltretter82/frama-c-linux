@@ -46,6 +46,7 @@ let get_call_name exp = match exp.enode with
   | Lval(Var(vi),NoOffset) -> vi.vname
   | _ ->
     Aorai_option.not_yet_implemented
+      ~source:(fst exp.eloc)
       "At this time, only explicit calls are allowed by the Aorai plugin."
 
 (****************************************************************************)

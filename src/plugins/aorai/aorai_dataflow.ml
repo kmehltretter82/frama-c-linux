@@ -471,6 +471,7 @@ module Computer(I: Init) = struct
         do_call s v args d
       | Call (_,e,_,_) ->
         Aorai_option.not_yet_implemented
+          ~source:(fst e.eloc)
           "Indirect call to %a is not handled yet" Printer.pp_exp e
       | Local_init (v, ConsInit(f,args,kind),_) ->
         let args =
@@ -796,6 +797,7 @@ struct
       | Call (_,{ enode = Lval(Var f,NoOffset) },_,_) -> do_call s f state
       | Call (_,e,_,_) ->
         Aorai_option.not_yet_implemented
+          ~source:(fst e.eloc)
           "Indirect call to %a is not handled yet" Printer.pp_exp e
       | Local_init (_,ConsInit(f,_,_),_) -> do_call s f state
       | Local_init (_,AssignInit _,_)
