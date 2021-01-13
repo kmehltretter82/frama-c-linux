@@ -124,7 +124,7 @@ struct
     Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
     merge env u k
 
-  let use_assigns _env _stmt region d k =
+  let use_assigns _env region d k =
     let u = node () in
     begin match region with
       | None ->

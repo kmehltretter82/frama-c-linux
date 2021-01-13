@@ -598,9 +598,9 @@ struct
     let sequence = { pre=s0 ; post=s1 } in
     sequence , assigned
 
-  let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
+  let use_assigns wenv hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
-        assert (stmt == ainfo.a_stmt) ;
+        let stmt = ainfo.a_stmt in
         match ainfo.a_assigns with
 
         | WritesAny ->

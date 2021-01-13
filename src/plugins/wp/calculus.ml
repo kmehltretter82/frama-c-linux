@@ -76,12 +76,12 @@ module Cfg (W : Mcfg.S) = struct
   let add_assigns_hyp wenv obj h_assigns = match h_assigns with
     | WpPropId.AssignsLocations (h_id, a) ->
         let hid = Some h_id in
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt hid a obj in
+        let obj = W.use_assigns wenv hid a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.AssignsAny a ->
         Wp_parameters.warning ~current:true ~once:true
           "Missing assigns clause (assigns 'everything' instead)" ;
-        let obj = W.use_assigns wenv a.WpPropId.a_stmt None a obj in
+        let obj = W.use_assigns wenv None a obj in
         Some a.WpPropId.a_label, obj
     | WpPropId.NoAssignsInfo -> None, obj
 
@@ -476,7 +476,7 @@ module Cfg (W : Mcfg.S) = struct
           | (Set (lv, e, _)) -> W.assign wenv s lv e obj
           | (Asm _) ->
               let asm = WpPropId.mk_asm_assigns_desc s in
-              W.use_assigns wenv asm.WpPropId.a_stmt None asm obj
+              W.use_assigns wenv None asm obj
           | (Call _) -> assert false
           | Skip _ | Code_annot _ -> obj
         end
@@ -652,7 +652,7 @@ module Cfg (W : Mcfg.S) = struct
         let obj =
           if WpStrategy.isInitConst ()
           then process_global_const wenv obj else obj in
-        let obj = W.use_assigns wenv None None WpPropId.mk_init_assigns obj in
+        let obj = W.use_assigns wenv None WpPropId.mk_init_assigns obj in
         let obj = W.label wenv None Clabels.init obj in
         compute_global_init wenv `All obj
       end
