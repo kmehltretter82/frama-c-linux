@@ -892,6 +892,36 @@ struct
     | Ltype _ | Linteger | Lreal | Lvar _ | Larrow _ ->
       C.error loc "not a C type"
 
+  let parseInt loc s =
+    let explode s =
+      let l = ref [] in
+      String.iter (fun c -> l:=Int64.of_int (Char.code c) :: !l) s;
+      List.rev !l
+    in
+    match String.get s 0 with
+    | 'L' -> (* L'wide_char' *)
+      let content = String.sub s 2 (String.length s - 3) in
+      let tokens = explode content in
+      let value = Cil.reduce_multichar Cil.theMachine.Cil.wcharType tokens
+      in
+      tinteger_s64 ~loc value
+    | '\'' -> (* 'char' *)
+      let content = String.sub s 1 (String.length s - 2) in
+      let tokens = explode content in
+      let value,_= Cil.interpret_character_constant tokens in
+      term ~loc (TConst (constant_to_lconstant value)) Linteger
+    | _ -> Cil.parseIntLogic ~loc s
+
+  let find_logic_label loc env l =
+    try Lenv.find_logic_label l env
+    with Not_found ->
+    (* look for a C label *)
+    try
+      let lab = C.find_label l in
+      StmtLabel lab
+    with Not_found ->
+      C.error loc "logic label `%s' not found" l
+
   let logic_type ctxt loc env t =
     (* force calls to go through ctxt *)
     let module [@warning "-60"] C = struct end in
@@ -904,7 +934,12 @@ struct
     | LTarray (ty,length) ->
       let size = match length with
         | ASnone -> None
-        | ASinteger s -> Some (parseIntExp ~loc s)
+        | ASinteger s ->
+          let t = parseInt loc s in
+          (match t.term_node with
+           | TConst lconst ->
+             Some (new_exp ~loc (Const (lconstant_to_constant lconst)))
+           | _ -> Kernel.fatal ~loc "integer literal not parsed as constant")
         | ASidentifier s ->
           let size = ctxt.type_term ctxt env
               {lexpr_node=PLvar(s);lexpr_loc=loc} in
@@ -1906,36 +1941,6 @@ struct
     else logic_coerce typ t
 
   (* Typing terms *)
-
-  let parseInt loc s =
-    let explode s =
-      let l = ref [] in
-      String.iter (fun c -> l:=Int64.of_int (Char.code c) :: !l) s;
-      List.rev !l
-    in
-    match String.get s 0 with
-    | 'L' -> (* L'wide_char' *)
-      let content = String.sub s 2 (String.length s - 3) in
-      let tokens = explode content in
-      let value = Cil.reduce_multichar Cil.theMachine.Cil.wcharType tokens
-      in
-      tinteger_s64 ~loc value
-    | '\'' -> (* 'char' *)
-      let content = String.sub s 1 (String.length s - 2) in
-      let tokens = explode content in
-      let value,_= Cil.interpret_character_constant tokens in
-      term ~loc (TConst (constant_to_lconstant value)) Linteger
-    | _ -> Cil.parseIntLogic ~loc s
-
-  let find_logic_label loc env l =
-    try Lenv.find_logic_label l env
-    with Not_found ->
-    (* look for a C label *)
-    try
-      let lab = C.find_label l in
-      StmtLabel lab
-    with Not_found ->
-      C.error loc "logic label `%s' not found" l
 
   let find_old_label loc env =
     try Lenv.find_logic_label "Old" env
