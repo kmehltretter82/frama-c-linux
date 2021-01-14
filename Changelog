@@ -17,6 +17,8 @@
 Open Source Release <next-release>
 ##################################
 
+-*  RTE       [2021-01-13] remove spurious assert when comparing function
+              pointer to NULL (fixes #@940)
 -   Kernel    [2021-01-12] set default machdep to x86_64; allow setting machdep
               via environment variable FRAMAC_MACHDEP.
 -   Kernel    [2021-01-08] allow -add-symbolic-path to survive saves/loads and
