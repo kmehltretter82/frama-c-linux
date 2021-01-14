@@ -45,33 +45,33 @@ type deallocation = Malloc | VLA | Alloca
 
 type base = private
   | Var of Cil_types.varinfo * validity
-      (** Base for a standard C variable. *)
+  (** Base for a standard C variable. *)
   | CLogic_Var of Cil_types.logic_var * Cil_types.typ * validity
-      (** Base for a logic variable that has a C type. *)
+  (** Base for a logic variable that has a C type. *)
   | Null (** Base for an address like [(int* )0x123] *)
   | String of int (** unique id of the constant string (one per code location)*)
-    * cstring (** contents of the constant string *)
+              * cstring (** contents of the constant string *)
   | Allocated of Cil_types.varinfo * deallocation  * validity
-      (** Base for a variable dynamically allocated via malloc/calloc/realloc/alloca *)
+  (** Base for a variable dynamically allocated via malloc/calloc/realloc/alloca *)
 
 and validity =
   | Empty (** For 0-sized bases *)
   | Known of Int.t * Int.t (** Valid between those two bits *)
-  | Unknown of Int.t * Int.t option * Int.t 
-      (** Unknown(b,k,e) indicates:
-          If k is [None], potentially valid between b and e
-          If k is [Some k], then b <= k <= e, and the base is
-           - valid between b and k;
-  	   - potentially valid between k+1 and e:
-          Accesses on potentially valid parts will succeed, but will also
-          raise an alarm. *)
+  | Unknown of Int.t * Int.t option * Int.t
+  (** Unknown(b,k,e) indicates:
+      If k is [None], potentially valid between b and e
+      If k is [Some k], then b <= k <= e, and the base is
+      - valid between b and k;
+      - potentially valid between k+1 and e:
+        Accesses on potentially valid parts will succeed, but will also
+        raise an alarm. *)
   | Variable of variable_validity
-        (** Variable(min_alloc, max_alloc) means:
-            - all offsets between [0] and [min_alloc] are valid; min_alloc can
-              be -1, in which case no offsets are guaranteed to be valid.
-            - offsets between [min_alloc+1] and [max_alloc] are potentially valid;
-            - offsets above [max_alloc+1] are invalid.
-        *)
+  (** Variable(min_alloc, max_alloc) means:
+      - all offsets between [0] and [min_alloc] are valid; min_alloc can
+        be -1, in which case no offsets are guaranteed to be valid.
+      - offsets between [min_alloc+1] and [max_alloc] are potentially valid;
+      - offsets above [max_alloc+1] are invalid.
+  *)
   | Invalid (** Valid nowhere. Typically used for the NULL base, or for
                 function pointers. *)
 
@@ -84,13 +84,13 @@ include Datatype.S_with_collections with type t = base
 
 module Hptset: Hptset.S
   with type elt = t
-  and type 'a shape = 'a Hptmap.Shape(Base).t
+   and type 'a shape = 'a Hptmap.Shape(Base).t
 
 module SetLattice: Lattice_type.Lattice_Set with module O = Hptset
 
 module Validity: Datatype.S with type t = validity
 
-(** [pretty_addr fmt base] pretty-prints the name of [base] on [fmt], with 
+(** [pretty_addr fmt base] pretty-prints the name of [base] on [fmt], with
     a leading ampersand if it is a variable *)
 val pretty_addr : Format.formatter -> t -> unit
 
@@ -107,7 +107,7 @@ val validity : t -> validity
 (** [validity_from_size size] returns [Empty] if [size] is zero,
     or [Known (0, size-1)] if [size > 0].
     [size] must not be negative.
-   @since Aluminium-20160501 *)
+    @since Aluminium-20160501 *)
 val validity_from_size : Int.t -> validity
 val validity_from_type : Cil_types.varinfo -> validity
 
@@ -216,14 +216,14 @@ val is_aligned_by : t -> Int.t -> bool
     and is never needed for normal users. *)
 
 val register_allocated_var: Cil_types.varinfo -> deallocation -> validity -> t
-  (** Allocated variables are variables not present in the source of the
-      program, but instead created through dynamic allocation. Their field
-      [vsource] is set to false. *)
+(** Allocated variables are variables not present in the source of the
+    program, but instead created through dynamic allocation. Their field
+    [vsource] is set to false. *)
 
 val register_memory_var : Cil_types.varinfo -> validity -> t
-  (** Memory variables are variables not present in the source of the program.
-      They are created only to fill the contents of another variable.
-      Their field [vsource] is set to false. *)
+(** Memory variables are variables not present in the source of the program.
+    They are created only to fill the contents of another variable.
+    Their field [vsource] is set to false. *)
 
 (*
 Local Variables:
