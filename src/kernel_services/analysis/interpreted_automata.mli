@@ -97,9 +97,9 @@ val pretty_edge: vertex edge Pretty_utils.formatter
 
 module G : Graph.Sig.I
   with type V.t = vertex
-  and  type E.t = vertex * vertex edge * vertex
-  and  type V.label = vertex
-  and  type E.label = vertex edge
+   and  type E.t = vertex * vertex edge * vertex
+   and  type V.label = vertex
+   and  type E.label = vertex edge
 
 type graph = G.t
 
@@ -134,7 +134,7 @@ module WTO : sig
   include Datatype.S with type t = wto
 end
 
-(** Get the interpreted automaton for the given kernel_function without annotations *)
+(** Get the automaton for the given kernel_function without annotations *)
 val get_automaton : Cil_types.kernel_function -> automaton
 (** Get the wto for the automaton of the given kernel_function *)
 val get_wto : Cil_types.kernel_function -> wto
@@ -142,10 +142,10 @@ val get_wto : Cil_types.kernel_function -> wto
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : graph -> vertex Wto.component -> wto
 (** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
+val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+  automaton -> unit
 
-
-(** the position of a statement in a wto given as the list of 
+(** the position of a statement in a wto given as the list of
     component heads *)
 type wto_index = vertex list
 
@@ -187,7 +187,8 @@ module Compute: sig
       vertices lead outside the wto without passing through the head. *)
   val exit_strategy : graph -> vertex Wto.component -> wto
   (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto -> automaton -> unit
+  val output_to_dot : out_channel -> ?number:[`Stmt|`Vertex] -> ?wto:wto ->
+    automaton -> unit
 
 
   type wto_index_table
@@ -219,9 +220,10 @@ end
 module UnrollUnnatural : sig
   (** Could enter a loop only by head nodes *)
 
-
-  module Vertex_Set : Datatype.S_with_collections with type t = Vertex.Set.t
-  module Version :Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
+  module Vertex_Set:
+    Datatype.S_with_collections with type t = Vertex.Set.t
+  module Version:
+    Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
 
   module G : sig
     include Graph.Sig.I
@@ -277,4 +279,3 @@ module Dataflow (D : Domain) :
 sig
   val fixpoint : Cil_types.kernel_function -> D.t -> D.t Vertex.Hashtbl.t
 end
-
