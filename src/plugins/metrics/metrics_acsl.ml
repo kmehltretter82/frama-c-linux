@@ -317,7 +317,8 @@ let dump () =
             | Metrics_base.Html -> dump_acsl_stats_html fmt
             | Metrics_base.Text -> dump_acsl_stats fmt
             | Metrics_base.Json ->
-              raise (Log.FeatureRequest ("Metrics", "JSON format for ACSL metrics"))
+              Metrics_parameters.not_yet_implemented
+                "JSON format for ACSL metrics"
       );
       close_out chan
     with Sys_error s ->

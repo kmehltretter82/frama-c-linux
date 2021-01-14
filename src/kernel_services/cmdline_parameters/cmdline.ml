@@ -136,14 +136,18 @@ let protect = function
         (long_plugin_name p)
         (additional_info ())
         request_crash_report
-  | Log.FeatureRequest(p, m) ->
-      let name = long_plugin_name p in
-      Printf.sprintf
-        "%s aborted: unimplemented feature.%s\n\
-         You may send a feature request at \
-         https://git.frama-c.com/pub/frama-c/issues with:\n\
-         '[%s] %s'."
-        name (additional_info ()) name m
+  | Log.FeatureRequest(s, p, m) ->
+    let name = long_plugin_name p in
+    let pp_oloc fmt = function
+      | None -> Format.fprintf fmt ""
+      | Some loc -> Format.fprintf fmt "%a: " Filepath.pp_pos loc
+    in
+    Format.asprintf
+      "%a%s aborted: unimplemented feature.%s\n\
+       You may send a feature request at \
+       https://git.frama-c.com/pub/frama-c/issues with:\n\
+       '[%s] %s'."
+      pp_oloc s name (additional_info ()) name m
   | e ->
       let bt = get_backtrace () in
       Printf.sprintf

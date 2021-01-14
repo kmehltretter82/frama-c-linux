@@ -806,7 +806,8 @@ let get_stmt_node env s =
   | Instr _  | Return _ ->  get_node env (Vstmt s)
   | Switch (e, _, _, _) -> get_node env (Vswitch (s, e))
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
-      Wp_parameters.not_yet_implemented "[cfg] exception handling"
+      Wp_parameters.not_yet_implemented
+        ~source:(fst (Cil_datatype.Stmt.loc s)) "[cfg] exception handling"
 
 let cfg_stmt_goto env s next =
   let node = get_node env (Vstmt s) in
@@ -942,7 +943,8 @@ and cfg_stmt env s next =
   | Switch (e, b, lstmts, _) ->
       cfg_switch env s e b lstmts next
   | TryExcept _ | TryFinally _ | Throw _ | TryCatch _ ->
-      Wp_parameters.not_yet_implemented "[cfg] exception handling"
+      Wp_parameters.not_yet_implemented
+        ~source:(fst (Cil_datatype.Stmt.loc s)) "[cfg] exception handling"
 
 and cfg_block_with ?continue ?break env bkind block next =
   let s_continue = env.node_continue in

@@ -236,6 +236,7 @@ let translate_variadics (file : file) =
         | AddrOf (Var vi, NoOffset)
           when Extends.Cil.is_variadic_function vi && is_framac_builtin vi ->
           Self.not_yet_implemented
+            ~source:(fst exp.eloc)
             "The variadic plugin doesn't handle calls to a pointer to the \
              variadic builtin %s."
             vi.vname
