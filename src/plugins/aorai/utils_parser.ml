@@ -75,8 +75,8 @@ let get_new_offset my_host my_offset name=
              mc
            end
          in
-         let cfiels = Option.value ~default:[] my_comp.Cil_types.cfields in
-         let field_info = get_field_info_from_name cfiels name in
+         let cfields = Option.value ~default:[] my_comp.Cil_types.cfields in
+         let field_info = get_field_info_from_name cfields name in
          Cil_types.Field(field_info,Cil_types.NoOffset)
 
      | _ -> Aorai_option.fatal "NOT YET IMPLEMENTED : mem is not supported"
