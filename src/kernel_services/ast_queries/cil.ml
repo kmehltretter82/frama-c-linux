@@ -2848,7 +2848,7 @@ let visitCilFieldInfo vis f =
   doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
-  comp.cfields <- Option.map (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
+  comp.cfields <- optMapNoCopy (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
   comp.cattr <- visitCilAttributes vis comp.cattr;
   comp
 
@@ -4327,13 +4327,13 @@ and bitsSizeOf t =
     find_size_in_cache
       scache
       (fun () -> begin
-           (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
            if comp.cfields = None then begin
              raise
                (SizeOfError
                   (Format.sprintf "abstract type '%s'" (compFullName comp), t))
            end
            else if comp.cfields = Some [] && not (acceptEmptyCompinfo ()) then
+             (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
              raise
                (SizeOfError
                   (Format.sprintf "empty struct '%s'" (compFullName comp), t))
@@ -6096,11 +6096,8 @@ let has_flexible_array_member t =
     | _ -> false
   in
   match unrollType t with
-  | TComp (c,_,_) ->
-    begin match c.cfields with
-      | Some ((_ :: _) as l) -> is_flexible_array (Extlib.last l).ftype
-      | _ -> false
-    end
+  | TComp ({ cfields = Some ((_::_) as l) },_,_) ->
+    is_flexible_array (Extlib.last l).ftype
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
