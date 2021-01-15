@@ -27,11 +27,17 @@ open Cil_datatype
 (* --- Automata Helpers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+module WpLog = Wp_parameters
 module Cfg = Interpreted_automata
 module G = Cfg.G
 module V = Cfg.Vertex
 module Vhash = V.Hashtbl
 type vertex = Cfg.vertex
+
+let guard = function
+  | (_,{ Cfg.edge_transition = Guard(_,Then,_) },v) -> `Then v
+  | (_,{ Cfg.edge_transition = Guard(_,Else,_) },v) -> `Else v
+  | _ -> `None
 
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
@@ -67,7 +73,7 @@ struct
         (* cut circularities *)
         Vhash.add env.wp a None ;
         let pi = match a.vertex_start_of with
-          | None -> transitions env a
+          | None -> successors env a
           | Some s -> stmt env a s
         in Vhash.add env.wp a (Some pi) ; pi
 
@@ -90,19 +96,38 @@ struct
     (*TODO: apply code annots *) branching env a s
 
   (* Branching wrt control-flow *)
-  and branching env a (_: stmt) : M.t_prop =
-    (*TODO: apply conditional & switches *)
-    transitions env a
+  and branching env a (s: stmt) : M.t_prop =
+    match s.skind with
+    | If(e,_,_,_) ->
+        begin
+          match succ env a with
+          | [p;q] -> conditional env s e p q
+          | es -> transitions env es
+        end
+    | _ ->
+        (*TODO: apply conditional & switches *)
+        successors env a
 
-  (* Merge all successors *)
-  and transitions env a : M.t_prop =
-    fmerge env (transition env) (succ env a)
+  (* Compute conditionals *)
+  and conditional env s (e: exp) (p: G.edge) (q: G.edge) : M.t_prop =
+    begin match guard p, guard q with
+      | `Then vthen , `Else velse
+      | `Else velse , `Then vthen ->
+          if V.equal velse vthen then
+            wp env vthen
+          else
+            M.test env.we s e (wp env vthen) (wp env velse)
+      | _ ->
+          M.merge env.we (transition env p) (transition env q)
+    end
 
-  (* Compute a single transition *)
+  (* Merge transitions *)
+  and successors env (a : vertex) = transitions env (succ env a)
+  and transitions env (es : G.edge list) = fmerge env (transition env) es
   and transition env (_,edge,dst) : M.t_prop =
     let p = wp env dst in
     match edge.edge_transition with
-    | Skip -> wp env dst
+    | Skip -> p
     | Return(r,s) -> M.return env.we s r p
     | Enter { blocals=xs } -> M.scope env.we xs SC_Block_in p
     | Leave { blocals=xs } -> M.scope env.we xs SC_Block_out p
@@ -110,10 +135,10 @@ struct
     | Prop _ | Guard _ -> (* soundly ignored *) p
 
   (* Compute a single instruction *)
-  and instr env stmt instr p =
+  and instr env s instr (p : M.t_prop) : M.t_prop =
     match instr with
     | Skip _ | Code_annot _ -> p
-    | Set(lv,e,_) -> M.assign env.we stmt lv e p
+    | Set(lv,e,_) -> M.assign env.we s lv e p
     | Local_init(x,AssignInit i,_) -> M.init env.we x (Some i) p
     | Local_init(_,ConsInit _,_) -> (* soundly ignored *) p
     | Call _ -> assert false
