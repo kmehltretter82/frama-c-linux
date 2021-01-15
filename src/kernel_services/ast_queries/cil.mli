@@ -102,8 +102,7 @@ val gccMode: unit -> bool
 val set_acceptEmptyCompinfo: unit -> unit
 (** After a call to this function, empty compinfos are allowed by the kernel,
     this must be used as a configuration step equivalent to a machdep, except
-    that it is not a user configuration. Typical use: Frama-Clang must call it
-    as C++ allows empty structs.
+    that it is not a user configuration.
 
     Note that if the selected machdep is GCC or MSVC, this call has no effect
     as these modes already allow empty compinfos.
@@ -112,7 +111,12 @@ val set_acceptEmptyCompinfo: unit -> unit
 *)
 
 val acceptEmptyCompinfo: unit -> bool
+(** whether we accept empty struct. Implied by {!Cil.msvcMode} and
+    {!Cil.gccMode}, and can be forced by {!Cil.set_acceptEmptyCompinfo}
+    otherwise.
 
+    @since Frama-C+dev
+*)
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
