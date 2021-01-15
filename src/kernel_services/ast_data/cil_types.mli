@@ -347,7 +347,10 @@ and attrparam =
 (** The definition of a structure or union type. Use {!Cil.mkCompInfo} to make
     one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
     assigned and that the fields have the right pointers to parents.).
-    @plugin development guide *)
+    @plugin development guide
+
+    @since Frama-C+dev [cfields] is an option, [None] is used for incomplete
+    types (in replacement of removed field [cdefined]) *)
 and compinfo = {
   mutable cstruct: bool;
   (** [true] if struct, [false] if union *)
@@ -365,20 +368,17 @@ and compinfo = {
       files might have different keys. Use {!Cil_const.copyCompInfo} to copy
       structures so that a new key is assigned. *)
 
-  mutable cfields: fieldinfo list;
+  mutable cfields: fieldinfo list option;
   (** Information about the fields. Notice that each fieldinfo has a pointer
       back to the host compinfo. This means that you should not share
-      fieldinfo's between two compinfo's *)
+      fieldinfo's between two compinfo's.
+
+      None value means that the type is incomplete. *)
 
   mutable cattr:   attributes;
   (** The attributes that are defined at the same time as the composite
       type. These attributes can be supplemented individually at each
       reference to this [compinfo] using the [TComp] type constructor. *)
-
-  mutable cdefined: bool;
-  (** This boolean flag can be used to distinguish between structures
-      that have not been defined and those that have been defined but have
-      no fields (such things are allowed in gcc). *)
 
   mutable creferenced: bool;
   (** [true] if used. Initially set to [false]. *)

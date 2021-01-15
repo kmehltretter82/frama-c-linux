@@ -193,7 +193,7 @@ module V = struct
           if o = NoOffset then
             let o' = match Cil.unrollType typ_base with
               | TArray _ -> Index (Cil.(zero Cil_builtins.builtinLoc), NoOffset)
-              | TComp (ci, _, _) -> Field (List.hd ci.cfields, NoOffset)
+              | TComp (ci, _, _) -> Field (List.hd (Option.get ci.cfields), NoOffset)
               | _ -> raise Bit_utils.NoMatchingOffset
             in o', ok
           else o, ok

@@ -189,7 +189,7 @@ let rec contains_union_type t =
   match Cil.unrollType t with
   | TComp({ cstruct = false }, _, _) ->
     true
-  | TComp({ cfields = fields }, _, _) ->
+  | TComp({ cfields = Some fields }, _, _) ->
     List.exists contains_union_type (List.map (fun f -> f.ftype) fields)
   | TArray(t, _, _, _) ->
     contains_union_type t

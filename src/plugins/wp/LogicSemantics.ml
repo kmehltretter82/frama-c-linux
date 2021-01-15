@@ -907,7 +907,7 @@ struct
                (fun offsets (obj,ofs) ->
                   (obj , TField(fd,ofs)) :: offsets
                ) offsets (compound_offsets (Ctypes.object_of fd.ftype))
-          ) [] comp.cfields
+          ) [] (Option.get comp.cfields)
     | obj -> [obj , TNoOffset]
 
   let assignable_lval env ~unfold lv =

@@ -39,9 +39,9 @@ let mk_type ftype attr =
   let tname = struct_name () in
   let fname = field_name () in
   let mk_type _ =
-    [ fname, ftype, None, attr, Cil_datatype.Location.unknown ]
+    Some [ fname, ftype, None, attr, Cil_datatype.Location.unknown ]
   in
-  Cil.mkCompInfo true tname ~norig:tname mk_type []
+  Cil_const.mkCompInfo true tname ~norig:tname mk_type []
 
 let mk_int_type field_kind =
   let field_attr = attr_of_kind field_kind in
@@ -144,5 +144,5 @@ let test (types, kind) =
     end;
     true
 
-let () = Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@ 
+let () = Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@
   (fun x -> Crowbar.check (test x))

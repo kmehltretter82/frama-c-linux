@@ -475,10 +475,10 @@ let memset_typ_offsm_int full_typ i =
             let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
             aux fi.ftype (Int.add offset offset_fi) offsm
           in
-          List.fold_left aux_field offsm l
+          List.fold_left aux_field offsm (Option.value ~default:[] l)
         | TComp ({ cstruct = false ; cfields = l}, _, _) -> (* union *)
           (* Use only the first field. This is somewhat arbitrary *)
-          aux (List.hd l).ftype offset offsm
+          aux (List.hd (Option.get l)).ftype offset offsm
         | TArray (typelt, nb, _, _) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)

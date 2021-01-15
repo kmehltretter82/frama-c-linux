@@ -199,7 +199,7 @@ struct
               (fun f ->
                  Cfield (f, KValue) ,
                  !loadrec sigma (object_of f.ftype) (M.field loc f)
-              ) c.cfields in
+              ) (Option.get c.cfields) in
           let dfun = Definitions.Function( result , Def , e_record def ) in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
@@ -366,7 +366,7 @@ struct
           let params = x :: xms in
           let def = p_all
               (fun f -> !isinitrec sigma (object_of f.ftype) (M.field loc f))
-              c.cfields
+              (Option.get c.cfields)
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;

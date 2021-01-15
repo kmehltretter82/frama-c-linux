@@ -58,12 +58,12 @@ let mk_comp_type
   in
   let mk_fields compinfo =
     match nb_fields with
-    | 0 -> compinfo.cdefined <- false; []
-    | 1 -> compinfo.cdefined <- true; [ mk_field typ1 ]
-    | _ -> compinfo.cdefined <- true; [ mk_field typ1; mk_field typ2 ]
+    | 0 -> None
+    | 1 -> Some [ mk_field typ1 ]
+    | _ -> Some [ mk_field typ1; mk_field typ2 ]
   in
   let compinfo =
-    Cil.mkCompInfo cstruct (type_name()) mk_fields []
+    Cil_const.mkCompInfo cstruct (type_name()) mk_fields []
   in
   let kind =
    match cstruct, nb_fields, kind1, kind2 with

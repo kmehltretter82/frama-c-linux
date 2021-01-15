@@ -1,4 +1,6 @@
 [kernel] Parsing tests/value/empty_base.c (with preprocessing)
+[kernel] tests/value/empty_base.c:12: User Error: 
+  empty structs only allowed for GCC/MSVC
 [kernel] tests/value/empty_base.c:47: User Error: 
   zero-length arrays only allowed for GCC/MSVC
 [kernel] tests/value/empty_base.c:49: User Error: 

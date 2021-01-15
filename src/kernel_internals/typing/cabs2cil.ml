@@ -688,10 +688,10 @@ let isTransparentUnion (t: typ) : fieldinfo option =
     (* Turn transparent unions into the type of their first field *)
     if typeHasAttribute "transparent_union" t then begin
       match comp.cfields with
-      | [] ->
+      | Some [] | None ->
         abort_context
           "Empty transparent union: %s" (compFullName comp)
-      | f :: _ -> Some f
+      | Some (f :: _) -> Some f
     end else
       None
   | _ -> None
@@ -1263,7 +1263,8 @@ let createCompInfo (iss: bool) (n: string) ~(norig: string) : compinfo * bool =
   with Not_found -> begin
       (* Create a compinfo. This will have "cdefined" false. *)
       let res =
-        Cil_const.mkCompInfo iss n ~norig (fun _ ->[]) (fc_stdlib_attribute [])
+        Cil_const.mkCompInfo
+          iss n ~norig (fun _ -> None) (fc_stdlib_attribute [])
       in
       H.add compInfoNameEnv key res;
       res, true
@@ -3342,7 +3343,7 @@ let rec setOneInit this o preinit =
           | f' :: _ when f'.fname = f.fname -> idx
           | _ :: restf -> loop (idx + 1) restf
         in
-        loop 0 f.fcomp.cfields, off
+        loop 0 (Option.value ~default:[] f.fcomp.cfields), off
       | _ -> abort_context "setOneInit: non-constant index"
     in
     let pMaxIdx, pArray =
@@ -3519,7 +3520,8 @@ let rec collectInitializer
             let rest, reads' = collect (idx+1) reads' restf in
             (Field(f, NoOffset), thisi) :: rest, reads'
       in
-      let init, reads = collect 0 reads comp.cfields in
+      let init, reads =
+        collect 0 reads (Option.value ~default:[] comp.cfields) in
       CompoundInit (thistype, init), thistype, reads
 
     | TComp (comp, _, _), CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
@@ -3543,7 +3545,7 @@ let rec collectInitializer
       if Cil.msvcMode () && !pMaxIdx != 0 then
         Kernel.warning ~current:true
           "On MSVC we can initialize only the first field of a union";
-      let init, reads = findField 0 comp.cfields in
+      let init, reads = findField 0 (Option.value ~default:[] comp.cfields) in
       CompoundInit (thistype, [ init ]), thistype, reads
 
     | _ -> Kernel.fatal ~current:true "collectInitializer"
@@ -3684,7 +3686,7 @@ let fieldsToInit
      the resulting fields are in reverse order *)
   let rec add_comp (offset : offset) (comp : compinfo) acc =
     let in_union = not comp.cstruct in
-    add_fields offset in_union comp.cfields acc
+    add_fields offset in_union (Option.value ~default:[] comp.cfields) acc
   and add_fields (offset : offset) (in_union : bool) (l : fieldinfo list) acc =
     match l with
     | [] -> acc
@@ -3744,7 +3746,9 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
     | fid :: rest when prefix anonCompFieldName fid.fname -> begin
         match unrollType fid.ftype with
         | TComp (ci, _, _) ->
-          (try let off = search ci.cfields in Field(fid,off)
+          (try
+             let off = search (Option.value ~default:[] ci.cfields) in
+             Field(fid,off)
            with Not_found -> search rest  (* Continue searching *))
         | _ ->
           abort_context "unnamed field type is not a struct/union"
@@ -3755,7 +3759,7 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
 
 let findField n comp =
   try
-    find_field_offset (fun x -> x.fname = n) comp.cfields
+    find_field_offset (fun x -> x.fname = n) (Option.value ~default:[] comp.cfields)
   with Not_found ->
     abort_context "Cannot find field %s in type %s" n (Cil.compFullName comp)
 
@@ -5500,7 +5504,9 @@ and makeCompType ghost (isstruct: bool)
               (if comp.cstruct then "struct" else "union")
               comp.cname;
           end else
-            List.iter (fun f -> is_circular f.ftype) comp'.cfields;
+            List.iter
+              (fun f -> is_circular f.ftype)
+              (Option.value ~default:[] comp'.cfields);
         | _ -> ()
       in
       is_circular ftype;
@@ -5542,39 +5548,42 @@ and makeCompType ghost (isstruct: bool)
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
+  if flds = [] && not (Cil.acceptEmptyCompinfo ()) then
+    Kernel.error ~current:true ~once:true
+      "empty %ss only allowed for GCC/MSVC"
+      (if comp.cstruct then "struct" else "union");
   List.iter check flds;
-  if comp.cfields <> [] then begin
+  if comp.cfields <> None then begin
+    let old_fields = Extlib.the comp.cfields in
     (* This appears to be a multiply defined structure. This can happen from
      * a construct like "typedef struct foo { ... } A, B;". This is dangerous
      * because at the time B is processed some forward references in { ... }
      * appear as backward references, which could lead to circularity in
      * the type structure. We do a thorough check and then we reuse the type
      * for A *)
-    if List.length comp.cfields <> List.length flds
+    if List.length old_fields <> List.length flds
     || (List.exists2 (fun f1 f2 -> not (Cil_datatype.Typ.equal f1.ftype f2.ftype))
-          comp.cfields flds)
+          old_fields flds)
     then
       Kernel.error ~once:true ~current:true
         "%s seems to be multiply defined" (compFullName comp)
   end else
     begin
-      comp.cfields <- flds;
+      comp.cfields <- Some flds;
       let fields_with_pragma_attrs =
         List.map (fun fld ->
             (* note: in the call below, we CANNOT use fld.fcomp.cattr because it has not
                been filled in yet, so we need to pass the list of attributes [a] to it *)
             {fld with fattr = (process_pragmas_pack_align_field_attributes fld fld.fattr a)}
-          ) comp.cfields
+          ) flds
       in
-      comp.cfields <- fields_with_pragma_attrs
+      comp.cfields <- Some fields_with_pragma_attrs
     end;
 
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
   let a = Cil.addAttributes comp.cattr a in
   comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
   let res = TComp (comp,empty_size_cache (), []) in
-  (* This compinfo is defined, even if there are no fields *)
-  comp.cdefined <- true;
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
 
@@ -8217,7 +8226,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Start over with the fields *)
     doInit local_env asconst add_implicit_ensures preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
-  | TComp (comp, _, _), _ :: restil when not comp.cdefined ->
+  | TComp (comp, _, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
     doInit local_env asconst add_implicit_ensures preinit so acc restil
@@ -8323,7 +8332,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         [(A.NEXT_INIT, A.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
-      let fi = findField ci.cfields in
+      let fi = findField (Extlib.opt_conv [] ci.cfields) in
       (* Change the designator and redo *)
       doInit
         local_env asconst add_implicit_ensures preinit so acc

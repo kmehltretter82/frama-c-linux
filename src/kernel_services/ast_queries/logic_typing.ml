@@ -798,7 +798,9 @@ struct
     with Not_found ->
       (match Cil.unrollType ty with
        | TComp(comp,_,_) ->
-         List.exists (fun x -> x.fname = f) comp.cfields
+         List.exists
+           (fun x -> x.fname = f)
+           (Option.value ~default:[] comp.cfields)
        | _ -> false)
 
   let plain_type_of_c_field loc f ty =

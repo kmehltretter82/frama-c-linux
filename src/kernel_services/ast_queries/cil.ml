@@ -164,6 +164,13 @@ let theMachine = createMachine ()
 let msvcMode () = (theMachine.theMachine.compiler = "msvc")
 let gccMode () = (theMachine.theMachine.compiler = "gcc")
 
+let acceptEmptyCompinfo = ref false
+
+let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true
+
+let acceptEmptyCompinfo () =
+  msvcMode () || gccMode () || !acceptEmptyCompinfo
+
 let theMachineProject = ref (createMachine ())
 
 module Machine_datatype =
@@ -441,7 +448,9 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
     | TNamed (r, a') -> f a' ; visit r.ttype
     | TArray(t, _, _, a') -> f a'; visit t
     | TComp (comp, _, a') -> f a';
-      List.iter (fun fi -> f fi.fattr; visit fi.ftype) comp.cfields
+      List.iter
+        (fun fi -> f fi.fattr; visit fi.ftype)
+        (Option.value ~default:[] comp.cfields)
     | TVoid a'
     | TInt (_, a')
     | TFloat (_, a')
@@ -2839,7 +2848,7 @@ let visitCilFieldInfo vis f =
   doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
-  comp.cfields <- mapNoCopy (visitCilFieldInfo vis) comp.cfields;
+  comp.cfields <- optMapNoCopy (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
   comp.cattr <- visitCilAttributes vis comp.cattr;
   comp
 
@@ -4023,7 +4032,7 @@ let rec bytesAlignOf t =
         | f :: rest -> f :: dropZeros (f.fbitfield <> None) rest
         | [] -> []
       in
-      let fields = dropZeros false c.cfields in
+      let fields = dropZeros false (Option.value ~default:[] c.cfields) in
       List.fold_left
         (fun sofar f ->
            (* Bitfields with zero width do not contribute to the alignment in
@@ -4314,19 +4323,17 @@ and bitsSizeOf t =
   | TPtr _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TBuiltin_va_list _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TNamed (t, _) -> bitsSizeOf t.ttype
-  | TComp (comp, scache, _) when comp.cfields == [] ->
-    find_size_in_cache
-      scache
-      (fun () -> begin
-           (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
-           if not comp.cdefined && not (gccMode () || msvcMode ()) then begin
-             raise
-               (SizeOfError
-                  (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-           end else
-             0
-         end)
-
+  | TComp ({cfields=None} as comp, _, _) ->
+    raise
+      (SizeOfError
+         (Format.sprintf "abstract type '%s'" (compFullName comp), t))
+  | TComp ({cfields=Some[]}, scache,_) when acceptEmptyCompinfo() ->
+    find_size_in_cache scache (fun () -> 0)
+  | TComp ({cfields=Some[]} as comp,_,_) ->
+    (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
+    raise
+      (SizeOfError
+         (Format.sprintf "empty struct '%s'" (compFullName comp), t))
   | TComp (comp, scache, _) when comp.cstruct -> (* Struct *)
     find_size_in_cache
       scache
@@ -4341,9 +4348,9 @@ and bitsSizeOf t =
          let lastoff =
            fold_struct_fields
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
-             startAcc comp.cfields
+             startAcc (Option.get comp.cfields) (* Note: we treat None above *)
          in
-         if msvcMode () && lastoff.oaFirstFree = 0 && comp.cfields <> []
+         if msvcMode () && lastoff.oaFirstFree = 0
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
@@ -4362,11 +4369,14 @@ and bitsSizeOf t =
              oaLastFieldWidth = 0;
              oaPrevBitPack = None;
            } in
-         let max =
-           List.fold_left (fun acc fi ->
-               let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
-               if lastoff.oaFirstFree > acc then
-                 lastoff.oaFirstFree else acc) 0 comp.cfields in
+         let fold acc fi =
+           let lastoff = offsetOfFieldAcc ?last:None ~fi ~sofar:startAcc in
+           if lastoff.oaFirstFree > acc
+           then lastoff.oaFirstFree
+           else acc
+         in
+         (* Note: we treat None above *)
+         let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
          addTrailing max (8 * bytesAlignOf t))
 
@@ -4436,7 +4446,7 @@ and fieldBitsOffset (f : fieldinfo) : int * int =
             oaLastFieldStart = 0;
             oaLastFieldWidth = 0;
             oaPrevBitPack    = None }
-          f.fcomp.cfields
+          (Option.value ~default:[] f.fcomp.cfields)
       );
     end;
     Extlib.the f.foffset_in_bits, Extlib.the f.fsize_in_bits
@@ -5734,7 +5744,9 @@ let isIntegerConstant e =
     e
 
 let getCompField cinfo fieldName =
-  List.find (fun fi -> fi.fname = fieldName) cinfo.cfields
+  List.find
+    (fun fi -> fi.fname = fieldName)
+    (Option.value ~default:[] cinfo.cfields)
 
 let mkCastT ?(force=false) ~(e: exp) ~(oldt: typ) ~(newt: typ) =
   let loc = e.eloc in
@@ -5908,7 +5920,7 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
       false
     else begin
       Hashtbl.add memo c.ckey ();
-      List.exists (fun f -> loop f.ftype) c.cfields
+      List.exists (fun f -> loop f.ftype) (Option.value ~default:[] c.cfields)
     end
   in
   loop t
@@ -5960,16 +5972,18 @@ let rec makeZeroInit ~loc (t: typ) : init =
              (Field(f, NoOffset), makeZeroInit ~loc f.ftype) :: acc
            else
              acc)
-        comp.cfields []
+        (Option.value ~default:[] comp.cfields) []
     in
     CompoundInit (t', inits)
   | TComp (comp, _, _) when not comp.cstruct ->
     (match comp.cfields with
-     | [] -> CompoundInit(t, []) (* tolerate empty initialization. *)
-     | f :: _rest ->
+     | Some [] -> CompoundInit(t, []) (* tolerate empty initialization. *)
+     | Some (f :: _rest) ->
        (* ISO C99 [6.7.8.10] says that the first field of the union
           is the one we should initialize. *)
-       CompoundInit(t, [(Field(f, NoOffset), makeZeroInit ~loc f.ftype)]))
+       CompoundInit(t, [(Field(f, NoOffset), makeZeroInit ~loc f.ftype)])
+     | None ->
+       Kernel.fatal "Initialization of incomplete struct")
   | TArray(bt, Some len, _, _) as t' ->
     let n =
       match constFoldToInt len with
@@ -6075,8 +6089,8 @@ let has_flexible_array_member t =
     | _ -> false
   in
   match unrollType t with
-  | TComp (c,_,_) ->
-    c.cfields <> [] && is_flexible_array (Extlib.last c.cfields).ftype
+  | TComp ({ cfields = Some ((_::_) as l) },_,_) ->
+    is_flexible_array (Extlib.last l).ftype
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
@@ -6097,9 +6111,9 @@ let rec isCompleteType ?allowZeroSizeArrays ?(last_field=false) t =
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
   | TArray(t, Some _, _, _) ->
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp (comp, _, _) -> (* Struct or union *)
-    comp.cdefined &&
-    complete_type_fields ~allowZeroSizeArrays comp.cstruct comp.cfields
+  | TComp ( { cfields = None } , _, _) -> false
+  | TComp ( { cstruct ; cfields = Some flds }, _, _) -> (* Struct or union *)
+    complete_type_fields ~allowZeroSizeArrays cstruct flds
   | TEnum({eitems = []},_) -> false
   | TEnum _ -> true
   | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list _ -> true

@@ -111,15 +111,18 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
     | NoOffset ->
       begin
         match typ with
-        | TComp({cstruct = false; cfields} ,_,_) ->
+        | TComp({cstruct = false; cfields; cname} ,_,_) ->
           (match cfields with
-           | [] -> () (* empty union, supported by gcc with size 0.
-                         Trivially initialized. *)
-           | _ ->
+           | None ->
+             Options.fatal
+               "Access to an object of undefined union %a"
+               Printer.pp_varname cname
+           | Some [] -> () (* empty union, supported by gcc with size 0.
+                              Trivially initialized. *)
+           | Some l ->
              let llv =
                List.map
-                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv)
-                 cfields
+                 (fun fi -> Cil.addOffsetLval (Field (fi, NoOffset)) lv) l
              in
              if default then
                on_alarm ~invalid:false (Alarms.Uninitialized_union llv))

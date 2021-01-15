@@ -98,8 +98,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
   | TComp (ci, _, _) ->
-    if ci.cfields = [] && ci.cdefined &&
-       not (Cil.gccMode () || Cil.msvcMode ()) then
+    if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
       Value_parameters.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
          in C99 (only allowed as GCC/MSVC extension).@ Aborting.@]"
@@ -314,7 +313,8 @@ let initialize_var_using_type varinfo state =
       in
       begin
         try
-          List.fold_left treat_field state compinfo.cfields
+          List.fold_left treat_field state
+            (Option.value ~default:[] compinfo.cfields)
         with Cil.SizeOfError (s, t) ->
           warn_unknown_size varinfo (s, t);
           bind_entire_loc Cvalue.V.top_int;

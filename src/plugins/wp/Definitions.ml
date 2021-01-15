@@ -340,7 +340,8 @@ class virtual visitor main =
                   (fun f ->
                      let t = Lang.tau_of_ctype f.ftype in
                      self#vtau t ; Cfield (f, KValue) , t
-                  ) r.cfields
+                  )
+                  (Option.value ~default:[] r.cfields)
               in self#on_comp r fts ;
             end
         end
@@ -356,7 +357,8 @@ class virtual visitor main =
                   (fun f ->
                      let t = Lang.init_of_ctype f.ftype in
                      self#vtau t ; Cfield (f, KInit) , t
-                  ) r.cfields
+                  )
+                  (Option.value ~default:[] r.cfields)
               in self#on_icomp r fts ;
             end
         end

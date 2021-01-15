@@ -350,7 +350,8 @@ let comp_init c = Comp (c, KInit)
 
 let fields_of_adt = function
   | Mrecord(_,r) -> r.fields
-  | Comp (c, k) -> List.map (fun f -> Cfield (f, k)) c.cfields
+  | Comp (c, k) ->
+      List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
   | _ -> []
 
 let fields_of_tau = function
@@ -360,7 +361,8 @@ let fields_of_tau = function
 
 let fields_of_field = function
   | Mfield(_,r,_,_) -> r.fields
-  | Cfield(f, k) -> List.map (fun f -> Cfield (f, k)) f.fcomp.cfields
+  | Cfield(f, k) ->
+      List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
 
 let tau_of_field = function
   | Mfield(_,_,_,t) -> t

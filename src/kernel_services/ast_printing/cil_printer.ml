@@ -1723,7 +1723,7 @@ class cil_printer () = object (self)
           self#attributes sto_mod
           self#varname n
           (Pretty_utils.pp_list ~sep:"@\n" self#fieldinfo)
-          comp.cfields
+          (Option.value ~default:[] comp.cfields)
           self#attributes rest_attr
 
       | GCompTagDecl (comp, l) -> (* This is a declaration of a tag *)

@@ -77,7 +77,7 @@ let rec init_value value obj =
       let make_term f =
         Cfield (f, KInit), init_value value (object_of f.ftype)
       in
-      Lang.F.e_record (List.map make_term ci.cfields)
+      Lang.F.e_record (List.map make_term (Option.get ci.cfields))
   | C_array _ as arr ->
       Lang.F.e_const Lang.t_int
         (init_value value (object_of_array_elem arr))
@@ -99,7 +99,8 @@ and is_constrained_obj = function
   | C_comp c -> is_constrained_comp c
 
 and is_constrained_comp c =
-  List.exists (fun f -> is_constrained f.ftype) c.cfields
+  List.exists
+    (fun f -> is_constrained f.ftype) (Option.value ~default:[] c.cfields)
 
 module type CASES =
 sig
@@ -160,7 +161,7 @@ struct
          let def = p_all
              (fun f ->
                 is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
-             c.cfields
+             (Option.get c.cfields)
          in {
            d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
            d_cluster = Definitions.compinfo c ;
@@ -351,7 +352,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
                let fd = Cfield (f, KValue) in
                !equal_rec (Ctypes.object_of f.ftype)
                  (e_getfield ra fd) (e_getfield rb fd))
-            c.cfields
+            (Option.get c.cfields)
         in
         (* Registration *)
         Definitions.define_symbol {

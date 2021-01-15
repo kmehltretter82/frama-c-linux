@@ -346,7 +346,7 @@ let generate_exn_union e exns =
   let loc = Cil_datatype.Location.unknown in
   let create_union_fields _ =
     let add_one_field t acc = (get_type_tag t, t, None, [], loc) :: acc in
-    Cil_datatype.Typ.Set.fold add_one_field exns []
+    Some (Cil_datatype.Typ.Set.fold add_one_field exns [])
   in
   let union_name = "__fc_exn_union" in
   let exn_kind_union =
@@ -360,7 +360,7 @@ let generate_exn_union e exns =
       (exn_obj_name,
        TComp(exn_kind_union, { scache = Not_Computed } , []), None, [], loc)
     in
-    [uncaught; kind; obj]
+    Some [uncaught; kind; obj]
   in
   let struct_name = "__fc_exn_struct" in
   let exn_struct =
@@ -444,7 +444,7 @@ class erase_exn =
         let s = get_type_tag t in
         Kernel.debug ~dkey:Kernel.dkey_exn_flow
           "Registering %a as possible exn type" Cil_datatype.Typ.pretty t;
-        let fi = List.find (fun fi -> fi.fname = s) union.cfields in
+        let fi = List.find (fun fi -> fi.fname = s) (Option.get union.cfields) in
         Cil_datatype.Typ.Hashtbl.add exn_union t fi
       in
       Cil_datatype.Typ.Set.iter update_one_binding exns
@@ -454,7 +454,7 @@ class erase_exn =
     method private is_thrown t = Cil_datatype.Typ.Hashtbl.mem exn_enum t
 
     method private exn_field_off name =
-      List.find (fun fi -> fi.fname = name) (Extlib.the exn_struct).cfields
+      List.find (fun fi -> fi.fname = name) (Option.(get (get exn_struct).cfields))
 
     method private exn_field name =
       Var (Extlib.the exn_var), Field(self#exn_field_off name, NoOffset)
