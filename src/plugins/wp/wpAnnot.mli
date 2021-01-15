@@ -54,14 +54,37 @@ val dependencies : proof -> Property.t list
 
 val filter_status : WpPropId.prop_id -> bool
 
-(*----------------------------------------------------------------------------*)
+(* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Function Calls                                --- *)
+(* -------------------------------------------------------------------------- *)
 
 val get_called_preconditions_at : kernel_function -> stmt -> Property.t list
 val get_called_post_conditions : kernel_function -> Property.t list
 val get_called_exit_conditions : kernel_function -> Property.t list
 val get_called_assigns : kernel_function -> Property.t list
 
-(*----------------------------------------------------------------------------*)
+(* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Loop Contracts                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+type loop_contract = {
+  (** to be verified at loop entry *)
+  loop_established: WpPropId.pred_info list;
+  (** to be assumed for loop current *)
+  loop_invariants: WpPropId.pred_info list;
+  (** to be verified after loop body *)
+  loop_preserved: WpPropId.pred_info list;
+  (** assigned by loop body *)
+  loop_assigns: WpPropId.assigns_full_info list;
+}
+
+val get_loop_contract : kernel_function -> stmt -> loop_contract
+
+(* ########################################################################## *)
+(* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)
+(* ########################################################################## *)
+
+(**/**)
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
 

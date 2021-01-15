@@ -39,12 +39,16 @@ let guard = function
   | (_,{ Cfg.edge_transition = Guard(_,Else,_) },v) -> `Else v
   | _ -> `None
 
+type annot = WpPropId.pred_info (* = prop_id * predicate *)
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Make(M : Mcfg.S) =
 struct
+
+  (* --- Traversal Environment --- *)
 
   type env = {
     kf: kernel_function;
@@ -54,6 +58,9 @@ struct
     wp: M.t_prop option Vhash.t; (* None is used for non-dag detection *)
   }
 
+  (* --- Annotation Helpers --- *)
+
+  (* merge map *)
   let fmerge env f = function
     | [] -> M.empty
     | [x] -> f x
@@ -61,9 +68,11 @@ struct
         let cup = M.merge env.we in
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
-  let succ env a = G.succ_e env.cfg.graph a
+  (* --- Decomposition of WP Rules --- *)
 
   exception NonNaturalLoop of kernel_function * kinstr
+
+  let succ env a = G.succ_e env.cfg.graph a
 
   let rec wp (env:env) (a:vertex) : M.t_prop =
     match Vhash.find env.wp a with
@@ -84,20 +93,22 @@ struct
     try
       env.ki <- Kstmt s ;
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let pi = M.label env.we (Some s) (Clabels.stmt s) (annots env a s) in
+      let pi = M.label env.we (Some s) (Clabels.stmt s) (asserts env a s) in
       Cil.CurrentLoc.set kl ;
       env.ki <- ki ; pi
     with err ->
       Cil.CurrentLoc.set kl ;
       env.ki <- ki ; raise err
 
-  (* Consider annotations *)
-  and annots env a (s: stmt) : M.t_prop =
-    (*TODO: apply code annots *) branching env a s
+  (* Consider assertions *)
+  and asserts env a (s: stmt) : M.t_prop =
+    (*TODO: apply code annots *) control env a s
 
   (* Branching wrt control-flow *)
-  and branching env a (s: stmt) : M.t_prop =
+  and control env a (s: stmt) : M.t_prop =
     match s.skind with
+    | Loop(_,_,_,_,_) ->
+        assert false
     | If(e,_,_,_) ->
         begin
           match succ env a with

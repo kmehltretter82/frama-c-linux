@@ -30,41 +30,6 @@ open Cil_types
 open Cil_datatype
 
 (* -------------------------------------------------------------------------- *)
-(* --- Selection of relevant assigns and postconditions                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* Properties for kf-conditions of termination-kind 'tkind' *)
-let get_called_postconds (tkind:termination_kind) kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       List.fold_left
-         (fun properties postcond ->
-            if tkind = fst postcond then
-              let pid_spec = Property.ip_of_ensures kf Kglobal bhv postcond in
-              pid_spec :: properties
-            else properties)
-         properties bhv.b_post_cond)
-    []
-    bhvs
-
-let get_called_post_conditions = get_called_postconds Cil_types.Normal
-let get_called_exit_conditions = get_called_postconds Cil_types.Exits
-
-(** Properties for assigns of kf *)
-let get_called_assigns kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       if Cil.is_default_behavior bhv then
-         match Property.ip_assigns_of_behavior kf Kglobal [] bhv with
-         | None -> properties
-         | Some ip -> ip :: properties
-       else properties)
-    []
-    bhvs
-
-(* -------------------------------------------------------------------------- *)
 (* --- Status of Unreachable Annotations                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -163,8 +128,46 @@ let is_invalid pf =
   pf.invalid && not (is_proved pf)
 
 (* -------------------------------------------------------------------------- *)
-(* --- PID for Functions                                                  --- *)
+(* --- Function Contracts                                                 --- *)
 (* -------------------------------------------------------------------------- *)
+
+(* Properties for kf-conditions of termination-kind 'tkind' *)
+let get_called_postconds (tkind:termination_kind) kf =
+  let bhvs = Annotations.behaviors kf in
+  List.fold_left
+    (fun properties bhv ->
+       List.fold_left
+         (fun properties postcond ->
+            if tkind = fst postcond then
+              let pid_spec = Property.ip_of_ensures kf Kglobal bhv postcond in
+              pid_spec :: properties
+            else properties)
+         properties bhv.b_post_cond)
+    []
+    bhvs
+
+let get_called_post_conditions = get_called_postconds Cil_types.Normal
+let get_called_exit_conditions = get_called_postconds Cil_types.Exits
+
+(** Properties for assigns of kf *)
+let get_called_assigns kf =
+  let bhvs = Annotations.behaviors kf in
+  List.fold_left
+    (fun properties bhv ->
+       if Cil.is_default_behavior bhv then
+         match Property.ip_assigns_of_behavior kf Kglobal [] bhv with
+         | None -> properties
+         | Some ip -> ip :: properties
+       else properties)
+    []
+    bhvs
+
+(* -------------------------------------------------------------------------- *)
+(* --- Preconditions at Callsites                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let call_preconditions =
+  Statuses_by_call.all_call_preconditions_at ~warn_missing:true
 
 let mk_call_pre_id called_kf bhv s_call called_pre =
   (* TODOclean : quite dirty here ! *)
@@ -173,13 +176,6 @@ let mk_call_pre_id called_kf bhv s_call called_pre =
   let called_pre_p =
     Statuses_by_call.precondition_at_call called_kf called_pre s_call in
   WpPropId.mk_call_pre_id called_kf s_call called_pre called_pre_p
-
-(* -------------------------------------------------------------------------- *)
-(* --- Preconditions                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
-let call_preconditions =
-  Statuses_by_call.all_call_preconditions_at ~warn_missing:true
 
 (* Preconditions at call-point as WpPropId.t *)
 let preconditions_at_call s = function
@@ -191,6 +187,69 @@ let preconditions_at_call s = function
 
 let get_called_preconditions_at kf stmt =
   List.map snd (call_preconditions kf stmt)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Loop Invariants                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type loop_contract = {
+  (* to be verified at loop entry *)
+  loop_established: WpPropId.pred_info list;
+  (* to be assumed for loop current *)
+  loop_invariants: WpPropId.pred_info list;
+  (* to be verified after loop body *)
+  loop_preserved: WpPropId.pred_info list;
+  (* assigned by loop body *)
+  loop_assigns: WpPropId.assigns_full_info list;
+}
+
+let get_loop_contract kf stmt =
+  let labels = NormAtLabels.labels_loop stmt in
+  let normalize_pred p = NormAtLabels.preproc_annot labels p in
+  let normalize_annot (i,p) = i, normalize_pred p in
+  let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+  Annotations.fold_code_annot
+    begin fun _emitter ca l ->
+      match ca.annot_content with
+      | AInvariant(_,true,inv) ->
+          let p = normalize_pred inv.tp_statement in
+          let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
+          let g_est = WpPropId.mk_loop_inv_id kf stmt ~established:true ca in
+          let g_ind = WpPropId.mk_loop_inv_id kf stmt ~established:false ca in
+          { l with
+            loop_established = (g_est,p) :: l.loop_established ;
+            loop_invariants = (g_hyp,p) :: l.loop_invariants ;
+            loop_preserved = (g_ind,p) :: l.loop_preserved ;
+          }
+      | AVariant(term, None) ->
+          let vpos , vdec = WpStrategy.mk_variant_properties kf stmt ca term in
+          { l with loop_preserved =
+                     normalize_annot vdec ::
+                     normalize_annot vpos ::
+                     l.loop_preserved }
+      | AAssigns(_,WritesAny) ->
+          let asgn = WpPropId.mk_loop_any_assigns_info stmt in
+          { l with loop_assigns = asgn :: l.loop_assigns }
+      | AAssigns(_,Writes w) ->
+          begin match WpPropId.mk_loop_assigns_id kf stmt ca w with
+            | None -> l (* shall not occur *)
+            | Some id ->
+                let w = normalize_assigns w in
+                let a = WpPropId.mk_loop_assigns_desc stmt w in
+                let asgn = WpPropId.mk_assigns_info id a in
+                { l with loop_assigns = asgn :: l.loop_assigns }
+          end
+      | _ -> l
+    end stmt {
+    loop_established = [] ;
+    loop_invariants = [] ;
+    loop_preserved = [] ;
+    loop_assigns = [] ;
+  }
+
+(* ########################################################################## *)
+(* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)
+(* ########################################################################## *)
 
 (*----------------------------------------------------------------------------*)
 (* Strategy and annotations                                                   *)
