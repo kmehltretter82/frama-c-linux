@@ -39,7 +39,7 @@ let guard = function
   | (_,{ Cfg.edge_transition = Guard(_,Else,_) },v) -> `Else v
   | _ -> `None
 
-type annot = WpPropId.pred_info (* = prop_id * predicate *)
+type assigns = WpPropId.assigns_full_info
 
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
@@ -60,13 +60,23 @@ struct
 
   (* --- Annotation Helpers --- *)
 
-  (* merge map *)
   let fmerge env f = function
     | [] -> M.empty
     | [x] -> f x
     | x::xs ->
         let cup = M.merge env.we in
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
+
+  let use_assigns env (a : assigns) (w : M.t_prop) : M.t_prop =
+    match a with
+    | NoAssignsInfo -> assert false
+    | AssignsAny ad -> M.use_assigns env.we None ad w
+    | AssignsLocations(ap,ad) -> M.use_assigns env.we (Some ap) ad w
+
+  let check_assigns env (a : assigns) (w : M.t_prop) : M.t_prop =
+    match a with
+    | NoAssignsInfo | AssignsAny _ -> w
+    | AssignsLocations ai -> M.add_assigns env.we ai w
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -84,7 +94,7 @@ struct
         let pi = match a.vertex_start_of with
           | None -> successors env a
           | Some s -> stmt env a s
-        in Vhash.add env.wp a (Some pi) ; pi
+        in Vhash.replace env.wp a (Some pi) ; pi
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : M.t_prop =
@@ -108,15 +118,15 @@ struct
   and control env a (s: stmt) : M.t_prop =
     match s.skind with
     | Loop(_,_,_,_,_) ->
-        assert false
+        loop env a s (WpAnnot.get_loop_contract env.kf s)
     | If(e,_,_,_) ->
         begin
           match succ env a with
           | [p;q] -> conditional env s e p q
           | es -> transitions env es
         end
+    (*TODO: switches *)
     | _ ->
-        (*TODO: apply conditional & switches *)
         successors env a
 
   (* Compute conditionals *)
@@ -132,14 +142,31 @@ struct
           M.merge env.we (transition env p) (transition env q)
     end
 
+  (* Compute loops *)
+  and loop env a s (lc : WpAnnot.loop_contract) : M.t_prop =
+    begin
+      let loop_current = Clabels.loop_current s in
+      M.label env.we None loop_current @@
+      List.fold_right (M.add_goal env.we) lc.loop_established @@
+      List.fold_right (use_assigns env) lc.loop_assigns @@
+      M.label env.we None loop_current @@
+      List.fold_right (M.add_hyp env.we) lc.loop_invariants @@
+      let q =
+        M.label env.we None (Clabels.loop_current s) @@
+        List.fold_right (M.add_goal env.we) lc.loop_preserved @@
+        List.fold_right (check_assigns env) lc.loop_assigns @@
+        M.empty in
+      ( Vhash.replace env.wp a (Some q) ; successors env a )
+    end
+
   (* Merge transitions *)
   and successors env (a : vertex) = transitions env (succ env a)
   and transitions env (es : G.edge list) = fmerge env (transition env) es
   and transition env (_,edge,dst) : M.t_prop =
     let p = wp env dst in
     match edge.edge_transition with
-    | Skip -> wp env dst
-    | Return(r,s) -> M.return env.we s r (wp env dst)
+    | Skip -> p
+    | Return(r,s) -> M.return env.we s r p
     | Enter { blocals=xs } -> M.scope env.we xs SC_Block_in p
     | Leave { blocals=xs } -> M.scope env.we xs SC_Block_out p
     | Instr (i,s) -> instr env s i p
