@@ -26,7 +26,6 @@
 
   open Logic_parser
   open Lexing
-  open Logic_ptree
 
   type state = Normal | Test
 
