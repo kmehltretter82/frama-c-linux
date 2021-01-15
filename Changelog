@@ -17,6 +17,9 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Kernel    [2021-01-15] Make cfields list optional. None means undefined,
+              empty struct allowed only in specific machdeps.
+              removed cdefined field
 -*  RTE       [2021-01-13] remove spurious assert when comparing function
               pointer to NULL (fixes #@940)
 -   Kernel    [2021-01-12] set default machdep to x86_64; allow setting machdep
