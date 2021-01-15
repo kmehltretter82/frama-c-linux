@@ -98,7 +98,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 let reject_empty_struct b offset typ =
   match Cil.unrollType typ with
   | TComp (ci, _, _) ->
-    if ci.cfields = Some [] && not (Cil.gccMode () || Cil.msvcMode ()) then
+    if ci.cfields = Some [] && not (Cil.acceptEmptyCompinfo ()) then
       Value_parameters.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
          in C99 (only allowed as GCC/MSVC extension).@ Aborting.@]"
