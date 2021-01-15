@@ -127,8 +127,8 @@ struct
   and transition env (_,edge,dst) : M.t_prop =
     let p = wp env dst in
     match edge.edge_transition with
-    | Skip -> p
-    | Return(r,s) -> M.return env.we s r p
+    | Skip -> wp env dst
+    | Return(r,s) -> M.return env.we s r (wp env dst)
     | Enter { blocals=xs } -> M.scope env.we xs SC_Block_in p
     | Leave { blocals=xs } -> M.scope env.we xs SC_Block_out p
     | Instr (i,s) -> instr env s i p
@@ -140,9 +140,17 @@ struct
     | Skip _ | Code_annot _ -> p
     | Set(lv,e,_) -> M.assign env.we s lv e p
     | Local_init(x,AssignInit i,_) -> M.init env.we x (Some i) p
-    | Local_init(_,ConsInit _,_) -> (* soundly ignored *) p
+    | Local_init(x,ConsInit _,_) ->
+        WpLog.warning ~once:true
+          "Ignored constructor init for '%a' (sound)."
+          Varinfo.pretty x ; p
+    | Asm _ ->
+        M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) p
     | Call _ -> assert false
-    | Asm _ -> assert false
+
+  let return env (p : M.t_prop) : vertex =
+    Vhash.add env.wp env.cfg.return_point (Some p) ;
+    env.cfg.entry_point
 
   (* Putting everything together *)
   let compute kf =
@@ -152,7 +160,16 @@ struct
       we = M.new_env kf ;
       wp = Vhash.create 32 ;
     } in
-    env.we , wp env env.cfg.entry_point
+    let xs = Kernel_function.get_formals kf in
+    env.we ,
+    M.scope env.we [] SC_Global @@
+    M.label env.we None Clabels.pre @@
+    (*TODO: add function requires *)
+    M.scope env.we xs SC_Frame_in @@
+    wp env @@
+    return env @@
+    M.scope env.we xs SC_Frame_out @@
+    M.empty
 
 end
 
