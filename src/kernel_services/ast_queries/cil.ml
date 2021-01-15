@@ -4323,24 +4323,17 @@ and bitsSizeOf t =
   | TPtr _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TBuiltin_va_list _ -> 8 * theMachine.theMachine.sizeof_ptr
   | TNamed (t, _) -> bitsSizeOf t.ttype
-  | TComp (comp, scache, _) when comp.cfields = Some [] || comp.cfields =  None ->
-    find_size_in_cache
-      scache
-      (fun () -> begin
-           if comp.cfields = None then begin
-             raise
-               (SizeOfError
-                  (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-           end
-           else if comp.cfields = Some [] && not (acceptEmptyCompinfo ()) then
-             (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
-             raise
-               (SizeOfError
-                  (Format.sprintf "empty struct '%s'" (compFullName comp), t))
-           else
-             0
-         end)
-
+  | TComp ({cfields=None} as comp, _, _) ->
+    raise
+      (SizeOfError
+         (Format.sprintf "abstract type '%s'" (compFullName comp), t))
+  | TComp ({cfields=Some[]}, scache,_) when acceptEmptyCompinfo() ->
+    find_size_in_cache scache (fun () -> 0)
+  | TComp ({cfields=Some[]} as comp,_,_) ->
+    (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
+    raise
+      (SizeOfError
+         (Format.sprintf "empty struct '%s'" (compFullName comp), t))
   | TComp (comp, scache, _) when comp.cstruct -> (* Struct *)
     find_size_in_cache
       scache
