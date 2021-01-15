@@ -1200,123 +1200,112 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     let ci = cinode.ndata in
     let fidx = cinode.nfidx in
 
-    let old_len = List.length (Option.value ~default:[] oldci.cfields) in
-    let len = List.length (Option.value ~default:[] ci.cfields) in
-    (* It is easy to catch here the case when the new structure is undefined
-     * and the old one was defined. We just reuse the old *)
-    (* More complicated is the case when the old one is not defined but the
-     * new one is. We still reuse the old one and we'll take care of defining
-     * it later with the new fields.
-     * GN: 7/10/04, I could not find when is "later", so I added it below *)
-    if len <> 0 && old_len <> 0 && old_len <> len then begin
-      let curLoc = CurrentLoc.get () in     (* d_global blows this away.. *)
-      CurrentLoc.set curLoc;
-      let aggregate_name = if cstruct then "struct" else "union" in
-      let msg = Printf.sprintf
-          "different number of fields in %s %s and %s %s: %d != %d."
-          aggregate_name oldci.cname aggregate_name ci.cname
-          old_len len
-      in
-      raise (Failure msg)
-    end;
-    (* We check that they are defined in the same way. While doing this there
-     * might be recursion and we have to watch for going into an infinite
-     * loop. So we add the assumption that they are equal *)
-    let newrep, undo = union oldcinode cinode in
-    (* We check the fields but watch for Failure. We only do the check when
-     * the lengths are the same. Due to the code above this the other
-     * possibility is that one of the length is 0, in which case we reuse the
-     * old compinfo. *)
-    (* But what if the old one is the empty one ? *)
-    if old_len = len then begin
-      try
-        (* must_check_offsets indicates that composite type attributes are
-           different, which may impact field offsets *)
-        let mustCheckOffsets =
-          if equal_attributes_for_merge ci.cattr oldci.cattr then false
-          else if equalModuloPackedAlign ci.cattr oldci.cattr then true
-          else raise
-              (Failure
-                 (let attrs = drop_attributes_for_merge ci.cattr in
-                  let oldattrs = drop_attributes_for_merge oldci.cattr in
-                  (* we do not use Cil_datatype.Attributes.pretty because it
-                     may not print some relevant attributes *)
-                  let pp_attrs =
-                    Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
-                  in
-                  Format.asprintf
-                    "different/incompatible composite type attributes: \
-                     [%a] vs [%a]"
-                    pp_attrs attrs pp_attrs oldattrs))
+    match oldci.cfields, ci.cfields with
+    | _, None -> () (* new struct is not defined, just keep using the old one *)
+    | None, Some fields ->
+      (* old struct is not defined, but new one is. Use its fields. *)
+      oldci.cfields <- Some fields
+    | Some oldfields, Some fields ->
+      let old_len = List.length oldfields in
+      let len = List.length fields in
+      if old_len <> len then begin
+        let curLoc = CurrentLoc.get () in (* d_global blows this away.. *)
+        CurrentLoc.set curLoc;
+        let aggregate_name = if cstruct then "struct" else "union" in
+        let msg = Printf.sprintf
+            "different number of fields in %s %s and %s %s: %d != %d."
+            aggregate_name oldci.cname aggregate_name ci.cname
+            old_len len
         in
-        match oldci.cfields, ci.cfields with
-        | None, None -> ()
-        | Some old_flds, Some flds ->
+        raise (Failure msg)
+      end;
+      (* We check that they are defined in the same way. While doing this there
+       * might be recursion and we have to watch for going into an infinite
+       * loop. So we add the assumption that they are equal *)
+      let newrep, undo = union oldcinode cinode in
+      (* We check the fields but watch for Failure. We only do the check when
+       * the lengths are the same. Due to the code above this the other
+       * possibility is that one of the length is 0, in which case we reuse the
+       * old compinfo. *)
+      begin
+        try
+          (* must_check_offsets indicates that composite type attributes are
+             different, which may impact field offsets *)
+          let mustCheckOffsets =
+            if equal_attributes_for_merge ci.cattr oldci.cattr then false
+            else if equalModuloPackedAlign ci.cattr oldci.cattr then true
+            else raise
+                (Failure
+                   (let attrs = drop_attributes_for_merge ci.cattr in
+                    let oldattrs = drop_attributes_for_merge oldci.cattr in
+                    (* we do not use Cil_datatype.Attributes.pretty because it
+                       may not print some relevant attributes *)
+                    let pp_attrs =
+                      Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
+                    in
+                    Format.asprintf
+                      "different/incompatible composite type attributes: \
+                       [%a] vs [%a]"
+                      pp_attrs attrs pp_attrs oldattrs))
+          in
           List.iter2
             (fun oldf f ->
                checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f oldf;
                (* Make sure the types are compatible *)
-               (* Note: 6.2.7 §1 states that the names of the fields should be the
-                  same. We do not force this for now, but could do it. *)
+               (* Note: 6.2.7 §1 states that the names of the fields
+                  should be the same.
+                  We do not force this for now, but could do it. *)
                let newtype =
                  combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
                in
                (* Change the type in the representative *)
                oldf.ftype <- newtype)
-            old_flds flds
-        | _ ->
-          Kernel.fatal "unmatching fields lists"
-      with Failure reason ->
-        (* Our assumption was wrong. Forget the isomorphism *)
-        undo ();
-        let fields_old =
-          Format.asprintf "%a"
-            Cil_printer.pp_global
-            (GCompTag(oldci, Cil_datatype.Location.unknown))
-        in
-        let fields =
-          Format.asprintf "%a"
-            Cil_printer.pp_global (GCompTag(ci, Cil_datatype.Location.unknown))
-        in
-        let fullname_old = compFullName oldci in
-        let fullname = compFullName ci in
-        let msg =
-          match fullname_old = fullname,
-                fields_old = fields (* Could also use a special comparison *)
-          with
-            true, true ->
-            Format.asprintf
-              "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
-              fullname_old reason
-          | false, true ->
-            Format.asprintf
-              "%s and %s are not isomorphic. Reason follows:@\n@?%s"
-              fullname_old fullname reason
-          | true, false ->
-            Format.asprintf
-              "Definitions of %s are not isomorphic. \
-               Reason follows:@\n@?%s@\n@?%s@?%s"
-              fullname_old reason
-              fields_old fields
-          | false, false ->
-            Format.asprintf
-              "%s and %s are not isomorphic. Reason follows:@\n@?%s@\n@?%s@?%s"
-              fullname_old fullname reason
-              fields_old fields
-
-
-        in
-        raise (Failure msg)
-    end else begin
-      (* We will reuse the old one. One of them is empty. If the old one is
-       * empty, copy over the fields from the new one. Won't this result in
-       * all sorts of undefined types??? *)
-      if old_len = 0 then oldci.cfields <- ci.cfields;
-    end;
-    (* We get here when we succeeded checking that they are equal, or one of
-     * them was empty *)
-    newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr;
-    ()
+            oldfields fields
+        with Failure reason ->
+          (* Our assumption was wrong. Forget the isomorphism *)
+          undo ();
+          let fields_old =
+            Format.asprintf "%a"
+              Cil_printer.pp_global
+              (GCompTag(oldci, Cil_datatype.Location.unknown))
+          in
+          let fields =
+            Format.asprintf "%a"
+              Cil_printer.pp_global
+              (GCompTag(ci, Cil_datatype.Location.unknown))
+          in
+          let fullname_old = compFullName oldci in
+          let fullname = compFullName ci in
+          let msg =
+            match fullname_old = fullname,
+                  fields_old = fields (* Could also use a special comparison *)
+            with
+              true, true ->
+              Format.asprintf
+                "Definitions of %s are not isomorphic. Reason follows:@\n@?%s"
+                fullname_old reason
+            | false, true ->
+              Format.asprintf
+                "%s and %s are not isomorphic. Reason follows:@\n@?%s"
+                fullname_old fullname reason
+            | true, false ->
+              Format.asprintf
+                "Definitions of %s are not isomorphic. \
+                 Reason follows:@\n@?%s@\n@?%s@?%s"
+                fullname_old reason
+                fields_old fields
+            | false, false ->
+              Format.asprintf
+                "%s and %s are not isomorphic. \
+                 Reason follows:@\n@?%s@\n@?%s@?%s"
+                fullname_old fullname reason
+                fields_old fields
+          in
+          raise (Failure msg)
+      end;
+      (* We get here when we succeeded checking that they are equal, or one of
+       * them was empty *)
+      newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr
   end
 
 (* Match two enuminfos and throw a Failure if they do not match *)
