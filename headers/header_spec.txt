@@ -1674,7 +1674,7 @@ src/plugins/wp/WpTac.ml: CEA_WP
 src/plugins/wp/WpTac.mli: CEA_WP
 src/plugins/wp/calculus.ml: CEA_WP
 src/plugins/wp/calculus.mli: CEA_WP
-src/plugins/wp/cfgCalculus: CEA_WP
+src/plugins/wp/cfgCalculus.ml: CEA_WP
 src/plugins/wp/cfgCalculus.mli: CEA_WP
 src/plugins/wp/cfgDump.ml: CEA_WP
 src/plugins/wp/cfgDump.mli: CEA_WP
