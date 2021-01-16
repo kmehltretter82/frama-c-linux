@@ -203,24 +203,36 @@ type loop_contract = {
   loop_assigns: WpPropId.assigns_full_info list;
 }
 
-let get_loop_contract kf stmt =
+let reverse_loop_contract l = {
+  loop_established = List.rev l.loop_established ;
+  loop_invariants = List.rev l.loop_invariants ;
+  loop_preserved = List.rev l.loop_preserved ;
+  loop_assigns = List.rev l.loop_assigns ;
+}
+
+let get_loop_contract kf stmt : loop_contract =
   let labels = NormAtLabels.labels_loop stmt in
   let normalize_pred p = NormAtLabels.preproc_annot labels p in
   let normalize_annot (i,p) = i, normalize_pred p in
   let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+  reverse_loop_contract @@
   Annotations.fold_code_annot
     begin fun _emitter ca l ->
       match ca.annot_content with
       | AInvariant(_,true,inv) ->
           let p = normalize_pred inv.tp_statement in
-          let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
           let g_est = WpPropId.mk_loop_inv_id kf stmt ~established:true ca in
           let g_ind = WpPropId.mk_loop_inv_id kf stmt ~established:false ca in
-          { l with
-            loop_established = (g_est,p) :: l.loop_established ;
-            loop_invariants = (g_hyp,p) :: l.loop_invariants ;
-            loop_preserved = (g_ind,p) :: l.loop_preserved ;
-          }
+          if inv.tp_only_check then
+            { l with
+              loop_established = (g_est,p) :: l.loop_established ;
+              loop_preserved   = (g_ind,p) :: l.loop_preserved }
+          else
+            let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
+            { l with
+              loop_established = (g_est,p) :: l.loop_established ;
+              loop_invariants  = (g_hyp,p) :: l.loop_invariants ;
+              loop_preserved   = (g_ind,p) :: l.loop_preserved }
       | AVariant(term, None) ->
           let vpos , vdec = WpStrategy.mk_variant_properties kf stmt ca term in
           { l with loop_preserved =
