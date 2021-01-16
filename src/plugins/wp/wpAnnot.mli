@@ -64,6 +64,17 @@ val get_called_exit_conditions : kernel_function -> Property.t list
 val get_called_assigns : kernel_function -> Property.t list
 
 (* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Assertions                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type code_assertions = {
+  code_admitted: WpPropId.pred_info list ;
+  code_verified: WpPropId.pred_info list ;
+}
+
+val get_code_assertions : kernel_function -> stmt -> code_assertions
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Loop Contracts                                --- *)
 (* -------------------------------------------------------------------------- *)
 

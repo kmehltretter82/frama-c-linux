@@ -103,19 +103,21 @@ struct
     try
       env.ki <- Kstmt s ;
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let pi = M.label env.we (Some s) (Clabels.stmt s) (asserts env a s) in
+      let ca = WpAnnot.get_code_assertions env.kf s in
+      let pi =
+        M.label env.we (Some s) (Clabels.stmt s) @@
+        List.fold_right (M.add_goal env.we) ca.code_verified @@
+        List.fold_right (M.add_hyp env.we) ca.code_admitted @@
+        control env a s
+      in
       Cil.CurrentLoc.set kl ;
       env.ki <- ki ; pi
     with err ->
       Cil.CurrentLoc.set kl ;
       env.ki <- ki ; raise err
 
-  (* Consider assertions *)
-  and asserts env a (s: stmt) : M.t_prop =
-    (*TODO: apply code annots *) control env a s
-
   (* Branching wrt control-flow *)
-  and control env a (s: stmt) : M.t_prop =
+  and control env a s : M.t_prop =
     match s.skind with
     | Loop(_,_,_,_,_) ->
         loop env a s (WpAnnot.get_loop_contract env.kf s)

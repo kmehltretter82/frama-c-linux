@@ -189,6 +189,43 @@ let get_called_preconditions_at kf stmt =
   List.map snd (call_preconditions kf stmt)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Code Assertions                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type code_assertions = {
+  code_admitted: WpPropId.pred_info list ;
+  code_verified: WpPropId.pred_info list ;
+}
+
+let reverse_code_assertions a = {
+  code_admitted = List.rev a.code_admitted ;
+  code_verified = List.rev a.code_verified ;
+}
+
+let get_code_assertions kf stmt : code_assertions =
+  let labels = NormAtLabels.labels_assert_before ~kf stmt in
+  let normalize_pred p = NormAtLabels.preproc_annot labels p in
+  reverse_code_assertions @@
+  Annotations.fold_code_annot
+    begin fun _emitter ca l ->
+      match ca.annot_content with
+      | AAssert(_,a) ->
+          let p =
+            WpPropId.mk_assert_id kf stmt ca ,
+            normalize_pred a.tp_statement
+          in if a.tp_only_check then {
+            l with code_admitted = p :: l.code_admitted ;
+          } else {
+            code_admitted = p :: l.code_admitted ;
+            code_verified = p :: l.code_verified ;
+          }
+      | _ -> l
+    end stmt {
+    code_admitted = [];
+    code_verified = [];
+  }
+
+(* -------------------------------------------------------------------------- *)
 (* --- Loop Invariants                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
