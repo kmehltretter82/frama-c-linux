@@ -42,6 +42,91 @@ let guard = function
 type assigns = WpPropId.assigns_full_info
 
 (* -------------------------------------------------------------------------- *)
+(* --- Calculus Modes (passes)                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+type mode = {
+  bhv : string option ; (* Selected behavior (None is default) *)
+  stmt : stmt option ;  (* Stmt contract under proof *)
+}
+
+let default_mode = { bhv = None ; stmt = None }
+
+let get_modes kf =
+  default_mode ::
+  begin
+    Annotations.fold_behaviors
+      (fun _emitter b ms -> { bhv = Some b.b_name ; stmt = None } :: ms)
+      kf @@
+    List.fold_right
+      (fun stmt ms ->
+         Annotations.fold_code_annot (fun _emitter ca ms ->
+             match ca.annot_content with
+             | AStmtSpec(_, { spec_behavior = bs } ) ->
+                 { bhv = None ; stmt = Some stmt } ::
+                 List.fold_right (fun b ms -> {
+                       bhv = Some b.b_name ;
+                       stmt = Some stmt ;
+                     }::ms) bs ms
+             | _ -> ms
+           ) stmt ms
+      ) (Kernel_function.get_definition kf).sallstmts []
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Selection by Mode                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_default (m: mode) = m.bhv = None
+
+let is_selected (m: mode) (bhv: funbehavior) =
+  match m.bhv with
+  | None -> Cil.is_default_behavior bhv
+  | Some b -> b = bhv.b_name
+
+let is_active (m: mode) (fors: string list) =
+  match m.bhv with
+  | None -> fors = []
+  | Some b0 -> List.mem b0 fors
+
+let is_selected_ca (m: mode) (ca: code_annotation) =
+  match ca.annot_content with
+  | AAssert(forb,_)
+  | AInvariant(forb,_,_)
+  | AAssigns(forb,_)
+  | AAllocation(forb,_)
+    -> is_active m forb
+  | AVariant _ -> m.bhv = None
+  | AExtended _ | AStmtSpec _ | APragma _ ->
+      assert false (* n/a *)
+
+let is_selected_property (m: mode) (p: Property.t) =
+  let open Property in
+  match p with
+  | IPCodeAnnot { ica_ca } -> is_selected_ca m ica_ca
+  | IPPredicate { ip_kind } ->
+      begin match ip_kind with
+        | PKRequires bhv | PKAssumes bhv ->
+            Cil.is_default_behavior bhv || is_selected m bhv
+        | PKEnsures(bhv,_) -> is_selected m bhv
+        | PKTerminates -> is_default m
+      end
+  | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
+      begin match bhv with
+        | Id_loop ca -> is_selected_ca m ca
+        | Id_contract(_,bhv) -> is_selected m bhv
+      end
+  | IPDecrease { id_ca = None } -> is_default m
+  | IPDecrease { id_ca = Some ca } -> is_selected_ca m ca
+  | IPComplete _ | IPDisjoint _ | IPFrom _
+  | IPGlobalInvariant _ | IPTypeInvariant _ ->
+      (*TODO: is it in pass or not ? *) assert false
+  | IPAxiomatic _ | IPAxiom _ | IPLemma _
+  | IPOther _ | IPExtended _ | IPBehavior _
+  | IPReachable _ | IPPropertyInstance _
+    -> assert false (* n/a *)
+
+(* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -52,6 +137,8 @@ struct
 
   type env = {
     kf: kernel_function;
+    mode: mode;
+    props: string list;
     mutable ki: kinstr; (* Current localisation *)
     cfg: Cfg.automaton;
     we: M.t_env;
@@ -67,16 +154,28 @@ struct
         let cup = M.merge env.we in
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
-  let use_assigns env (a : assigns) (w : M.t_prop) : M.t_prop =
+  let use_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo -> assert false
     | AssignsAny ad -> M.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> M.use_assigns env.we (Some ap) ad w
 
-  let check_assigns env (a : assigns) (w : M.t_prop) : M.t_prop =
+  let is_selected { mode ; props } (pid,_) =
+    (is_selected_property mode @@ WpPropId.property_of_id pid)
+    && (props = [] || WpPropId.select_by_name props pid)
+
+  let check_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo | AssignsAny _ -> w
-    | AssignsLocations ai -> M.add_assigns env.we ai w
+    | AssignsLocations ai ->
+        if is_selected env ai then M.add_assigns env.we ai w
+        else w
+
+  let use_property env (p : WpPropId.pred_info) w =
+    if is_selected env p then M.add_hyp env.we p w else w
+
+  let prove_property env (p : WpPropId.pred_info) w =
+    if is_selected env p then M.add_goal env.we p w else w
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -106,8 +205,8 @@ struct
       let ca = WpAnnot.get_code_assertions env.kf s in
       let pi =
         M.label env.we (Some s) (Clabels.stmt s) @@
-        List.fold_right (M.add_goal env.we) ca.code_verified @@
-        List.fold_right (M.add_hyp env.we) ca.code_admitted @@
+        List.fold_right (prove_property env) ca.code_verified @@
+        List.fold_right (use_property env) ca.code_admitted @@
         control env a s
       in
       Cil.CurrentLoc.set kl ;
@@ -149,13 +248,13 @@ struct
     begin
       let loop_current = Clabels.loop_current s in
       M.label env.we None loop_current @@
-      List.fold_right (M.add_goal env.we) lc.loop_established @@
+      List.fold_right (prove_property env) lc.loop_established @@
       List.fold_right (use_assigns env) lc.loop_assigns @@
       M.label env.we None loop_current @@
-      List.fold_right (M.add_hyp env.we) lc.loop_invariants @@
+      List.fold_right (use_property env) lc.loop_invariants @@
       let q =
         M.label env.we None (Clabels.loop_current s) @@
-        List.fold_right (M.add_goal env.we) lc.loop_preserved @@
+        List.fold_right (prove_property env) lc.loop_preserved @@
         List.fold_right (check_assigns env) lc.loop_assigns @@
         M.empty in
       ( Vhash.replace env.wp a (Some q) ; successors env a )
@@ -193,9 +292,9 @@ struct
     env.cfg.entry_point
 
   (* Putting everything together *)
-  let compute kf =
+  let compute ~mode ~props kf =
     let env = {
-      kf ; ki = Kglobal ;
+      kf ; ki = Kglobal ; mode ; props ;
       cfg = Cfg.get_automaton kf ;
       we = M.new_env kf ;
       wp = Vhash.create 32 ;

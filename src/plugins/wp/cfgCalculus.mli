@@ -20,14 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+type mode = {
+  bhv : string option ; (* Selected behavior (None is default) *)
+  stmt : stmt option ;  (* Stmt contract under proof *)
+}
+
+val get_modes : kernel_function -> mode list
+
 module Make(M : Mcfg.S) :
 sig
 
-  val compute : Cil_types.kernel_function -> M.t_env * M.t_prop
+  val compute : mode:mode -> props:string list -> kernel_function ->
+    M.t_env * M.t_prop
 
 end
 
