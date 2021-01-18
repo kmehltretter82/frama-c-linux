@@ -79,45 +79,45 @@ let get_modes kf =
 
 let is_default (m: mode) = m.bhv = None
 
-let is_selected (m: mode) (bhv: funbehavior) =
+let is_selected_bhv (m: mode) (bhv: funbehavior) =
   match m.bhv with
   | None -> Cil.is_default_behavior bhv
   | Some b -> b = bhv.b_name
 
-let is_active (m: mode) (fors: string list) =
+let is_selected_for (m: mode) (fors: string list) =
   match m.bhv with
   | None -> fors = []
   | Some b0 -> List.mem b0 fors
 
-let is_selected_ca (m: mode) (ca: code_annotation) =
+let is_selected_ca ~goal (m: mode) (ca: code_annotation) =
   match ca.annot_content with
-  | AAssert(forb,_)
-  | AInvariant(forb,_,_)
   | AAssigns(forb,_)
   | AAllocation(forb,_)
-    -> is_active m forb
+  | AAssert(forb,_)
+  | AInvariant(forb,_,_)
+    ->  not goal || is_selected_for m forb
   | AVariant _ -> m.bhv = None
   | AExtended _ | AStmtSpec _ | APragma _ ->
       assert false (* n/a *)
 
-let is_selected_property (m: mode) (p: Property.t) =
+let is_selected_property ~goal (m: mode) (p: Property.t) =
   let open Property in
   match p with
-  | IPCodeAnnot { ica_ca } -> is_selected_ca m ica_ca
+  | IPCodeAnnot { ica_ca } -> is_selected_ca ~goal m ica_ca
   | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires bhv | PKAssumes bhv ->
-            Cil.is_default_behavior bhv || is_selected m bhv
-        | PKEnsures(bhv,_) -> is_selected m bhv
+            Cil.is_default_behavior bhv || is_selected_bhv m bhv
+        | PKEnsures(bhv,_) -> is_selected_bhv m bhv
         | PKTerminates -> is_default m
       end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
       begin match bhv with
-        | Id_loop ca -> is_selected_ca m ca
-        | Id_contract(_,bhv) -> is_selected m bhv
+        | Id_loop ca -> is_selected_ca ~goal m ca
+        | Id_contract(_,bhv) -> is_selected_bhv m bhv
       end
   | IPDecrease { id_ca = None } -> is_default m
-  | IPDecrease { id_ca = Some ca } -> is_selected_ca m ca
+  | IPDecrease { id_ca = Some ca } -> is_selected_ca ~goal m ca
   | IPComplete _ | IPDisjoint _ | IPFrom _
   | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
@@ -160,22 +160,23 @@ struct
     | AssignsAny ad -> M.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> M.use_assigns env.we (Some ap) ad w
 
-  let is_selected { mode ; props } (pid,_) =
-    (is_selected_property mode @@ WpPropId.property_of_id pid)
-    && (props = [] || WpPropId.select_by_name props pid)
+  let is_selected ~goal { mode ; props } (pid,_) =
+    (is_selected_property ~goal mode @@ WpPropId.property_of_id pid)
+    && (not goal || props = [] || WpPropId.select_by_name props pid)
 
   let check_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo | AssignsAny _ -> w
     | AssignsLocations ai ->
-        if is_selected env ai then M.add_assigns env.we ai w
+        if is_selected ~goal:true env ai
+        then M.add_assigns env.we ai w
         else w
 
   let use_property env (p : WpPropId.pred_info) w =
-    if is_selected env p then M.add_hyp env.we p w else w
+    if is_selected ~goal:false env p then M.add_hyp env.we p w else w
 
   let prove_property env (p : WpPropId.pred_info) w =
-    if is_selected env p then M.add_goal env.we p w else w
+    if is_selected ~goal:true env p then M.add_goal env.we p w else w
 
   (* --- Decomposition of WP Rules --- *)
 
