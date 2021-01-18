@@ -253,7 +253,7 @@ module Code_annotation: sig
   val loc: t -> location option
 end
 
-module Funbehavior: S with type t = funbehavior
+module Funbehavior: S_with_pretty with type t = funbehavior
 
 module Funspec: S_with_pretty with type t = funspec
 
