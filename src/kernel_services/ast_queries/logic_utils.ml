@@ -2229,6 +2229,9 @@ let lhost_c_type thost =
      | _ -> assert false)
   | TResult ty -> ty
 
+let use_predicate = function Assert | Admit -> true | Check -> false
+let verify_predicate = function Assert | Check -> true | Admit -> false
+
 let is_assert ca =
   match ca.annot_content with AAssert (_, p) -> p.tp_kind = Assert | _ -> false
 

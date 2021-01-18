@@ -28,6 +28,7 @@ let debug fmt = Wp_parameters.debug ~dkey fmt
 
 open Cil_types
 open Cil_datatype
+open Logic_utils
 
 (* -------------------------------------------------------------------------- *)
 (* --- Selection of relevant assigns and postconditions                   --- *)
@@ -761,7 +762,7 @@ let add_called_post called_kf termination_kind acc =
     let kind = WpStrategy.AcallHyp called_kf in
     let assumes = (Ast_info.behavior_assumes b) in
     let add_post acc (tk, p) =
-      if tk = termination_kind && p.ip_content.tp_kind <> Check
+      if tk = termination_kind && use_predicate p.ip_content.tp_kind
       then WpStrategy.add_prop_call_post acc kind called_kf b tk ~assumes p
       else acc
     in List.fold_left add_post acc b.b_post_cond
@@ -838,7 +839,8 @@ let add_variant_annot config s ca var_exp loop_entry loop_back =
   in loop_entry, loop_back
 
 let add_loop_invariant_annot config vloop s ca b_list inv acc =
-  let only_check = inv.tp_kind = Check in
+  let hyp = use_predicate inv.tp_kind in
+  let goal = verify_predicate inv.tp_kind in
   let inv = inv.tp_statement in
   let assigns, loop_entry, loop_back , loop_core = acc in
   (* we have to prove that inv is true for each edge that goes
@@ -849,22 +851,29 @@ let add_loop_invariant_annot config vloop s ca b_list inv acc =
   | TBRpart (* TODO: PKPartial *)
     ->
       begin
-        let loop_entry = add_prop_loop_inv ~established:true config loop_entry
-            WpStrategy.Agoal s ca inv in
-        let loop_back = add_prop_loop_inv ~established:false config loop_back
-            WpStrategy.Agoal s ca inv in
+        let loop_entry =
+          if goal then
+            add_prop_loop_inv ~established:true config loop_entry
+              WpStrategy.Agoal s ca inv
+          else loop_entry in
+        let loop_back =
+          if goal then
+            add_prop_loop_inv ~established:false config loop_back
+              WpStrategy.Agoal s ca inv
+          else loop_back in
         let loop_core =
-          if only_check then loop_core
-          else
+          if hyp then
             add_prop_inv_fixpoint config loop_core WpStrategy.Ahyp s ca inv
-        in
+          else loop_core in
         assigns, loop_entry , loop_back , loop_core
       end
-  | TBRhyp when not only_check ->
-      let kind = WpStrategy.Ahyp in
-      let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
-      in assigns, loop_entry , loop_back , loop_core
-  | TBRhyp | TBRno -> acc
+  | TBRhyp ->
+      if hyp then
+        let kind = WpStrategy.Ahyp in
+        let loop_core = add_prop_inv_fixpoint config loop_core kind s ca inv
+        in assigns, loop_entry , loop_back , loop_core
+      else acc
+  | TBRno -> acc
 
 (** Returns the annotations for the three edges of the loop node:
  * - loop_entry : goals for the edge entering in the loop
@@ -952,24 +961,25 @@ let get_stmt_annots config v s =
         let acc = match is_annot_for_config config v s b_list with
           | TBRno -> acc
           | TBRhyp ->
-              if p.tp_kind = Check then acc
-              else
+              if use_predicate p.tp_kind then
                 let b_acc =
                   WpStrategy.add_prop_assert
                     b_acc WpStrategy.Ahyp kf s a p.tp_statement
                 in (b_acc, (a_acc, e_acc))
+              else acc
           | TBRok | TBRpart ->
               let id = WpPropId.mk_assert_id config.kf s a in
               let goal = goal_to_select config id in
-              if p.tp_kind = Check && not goal then acc
-              else
-                let kind =
-                  WpStrategy.(if p.tp_kind = Check then Agoal else Aboth goal)
-                in
+              let add, kind =
+                match p.tp_kind with
+                | Admit -> true, WpStrategy.Ahyp
+                | Assert -> true, Aboth goal
+                | Check -> goal, Agoal
+              in if add then
                 let b_acc =
                   WpStrategy.add_prop_assert b_acc kind kf s a p.tp_statement
-                in
-                (b_acc, (a_acc, e_acc))
+                in (b_acc, (a_acc, e_acc))
+              else acc
         in acc
     | AAllocation (_b_list, _frees_allocates) ->
         (* [PB] TODO *) acc
@@ -1136,7 +1146,7 @@ let add_global_annotations annots =
           linfo.l_var_info.lv_name;
         ()
     | Dlemma (name,_,_,_,p,_,_) ->
-        if p.tp_kind <> Check then
+        if use_predicate p.tp_kind then
           WpStrategy.add_axiom annots (LogicUsage.logic_lemma name)
 
   and do_globals gs = List.iter do_global gs in

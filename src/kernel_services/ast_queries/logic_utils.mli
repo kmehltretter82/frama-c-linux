@@ -444,6 +444,15 @@ val merge_funspec :
 val clear_funspec: funspec -> unit
 
 (** {2 Discriminating code_annotations} *)
+
+(** Checks if a predicate kind can be used as an hypothesis or requirement.
+    It is true for `Admit` and `Assert`, and false for `Check`. *)
+val use_predicate : predicate_kind -> bool
+
+(** Checks if a predicate kind shall be put under verification.
+    It is true for `Assert` and `Check`, and false for `Admit`. *)
+val verify_predicate : predicate_kind -> bool
+
 (** Functions below allows to test a special kind of code_annotation.
     Use them in conjunction with {!Annotations.get_filter} to retrieve
     a particular kind of annotations associated to a statement. *)
