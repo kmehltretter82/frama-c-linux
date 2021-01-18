@@ -1640,9 +1640,6 @@ let setCData () =
   defined_functions := f_def;
   ignored_functions := f_decl
 
-let addIgnoredFunction kf =
-  ignored_functions := kf :: !ignored_functions
-
 (** Return true if and only if the given string fname denotes an ignored function. *)
 let isIgnoredFunction kf =
   List.exists (Kernel_function.equal kf) !ignored_functions

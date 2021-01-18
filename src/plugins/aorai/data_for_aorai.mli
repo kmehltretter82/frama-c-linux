@@ -227,9 +227,6 @@ val getObservablesFunctions : unit -> Cil_types.kernel_function list
     is unavailable. *)
 val getIgnoredFunctions : unit -> Cil_types.kernel_function list
 
-(** Add a function to the list of ignored functions. *)
-val addIgnoredFunction : Cil_types.kernel_function -> unit
-
 (** Return true if and only if the given string fname denotes an ignored function. *)
 val isIgnoredFunction : Cil_types.kernel_function -> bool
 
