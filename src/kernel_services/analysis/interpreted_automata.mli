@@ -42,7 +42,8 @@ type info =
 
 (** Control flow informations for outgoing edges, if any. *)
 type 'a control =
-  | Edges (** control flow is only given by vertex edges *)
+  | Edges (** control flow is only given by vertex edges. *)
+  | Loop (** start of a Loop stmt. *)
   | If of { cond: exp; vthen: 'a; velse: 'a }
   (** edges are guaranteed to be two guards `Then` else `Else`
       with the given condition and successor vertices. *)

@@ -32,6 +32,7 @@ type info =
 
 type 'a control =
   | Edges (* control flow is only given by vertex edges *)
+  | Loop of 'a (* start vertex of a Loop stmt with breaking vertex *)
   | If of { cond: exp; vthen: 'a; velse: 'a }
   (* edges are guaranteed to be two guards `Then` else `Else`
      with the given condition and successor vertices. *)
@@ -405,11 +406,11 @@ let build_automaton ~annotations kf =
         in
         add_edge control.src then_point kinstr then_transition loc;
         add_edge control.src else_point kinstr else_transition loc;
+        do_block {control with src=then_point} kinstr labels then_block;
+        do_block {control with src=else_point} kinstr labels else_block;
         control.src.vertex_control <- If {
             cond = exp ; vthen = then_point; velse = else_point
           };
-        do_block {control with src=then_point} kinstr labels then_block;
-        do_block {control with src=else_point} kinstr labels else_block;
         control.dest
 
       | Switch (exp1, block, cases, _) ->
@@ -512,6 +513,7 @@ let build_automaton ~annotations kf =
         in
         do_block loop_control kinstr labels block;
         decr loop_level;
+        control.src.vertex_control <- Loop control.dest ;
         control.dest
 
       | Block block ->
