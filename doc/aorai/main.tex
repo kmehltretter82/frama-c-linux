@@ -997,16 +997,27 @@ int main(int c) {
   \label{FigGeneratedLoopInvariants}
 \end{figure}
 
-\section{Interaction with Annotated Files}
+\section{Analyzing Annotated Files with Eva or WP}
 \label{collaboration}
 Once the annotated file has been generated, it remains to verify that all the
 annotations hold. This section describes briefly how this can be done and some
 common issues that may arise during verification.
 
-\aorai tries to generate ACSL annotations that stay in the fragment
-supported by Value Analysis, so that this plug-in might be used over the
-generated code, but there is no guarantee that it will be able to establish
-the validity of all annotations.
+In addition to annotations, \aorai generates an implementation for the transition
+functions, so that it is possible to use the Eva plug-in of Frama-C on the
+instrumented code. However, there's no guarantee that Eva will be able to
+perform an analysis that stays precise enough to verify that the automaton
+always ends in an accepting state. Aoraï will set up automatically a certain number
+of parameters in Eva to help make the analysis more precise, but,
+in the case of deterministic automata it is also possible
+to use option \texttt{-aorai-instrumentation-history n} to have the instrumentation
+retain the \texttt{n} previous states of the automaton (in addition to the
+current state), that will be used for splitting Eva's abstract states. Furthermore,
+each time Eva encounters a call to the 
+built-in function \texttt{Frama\_C\_show\_aorai\_state}, it will display the current
+state (together with the previous ones up to \texttt{-aorai\-instrumentation-history}).
+If the function is called with some arguments, their abstract value will also be
+displayed.
 
 Another possibility is to use the deductive verification plug-in WP.
 Note however that the generated annotations are not guaranteed to be complete,
@@ -1224,6 +1235,8 @@ The plug-in is composed of three parts:
 \section{Recent updates}
 \subsection{Frama-C+dev}
 \begin{itemize}
+\item Documentation for option \texttt{-aorai-instrumentation-history}
+and built-in \texttt{Frama\_C\_show\_aorai\_state}
 \item Aoraï does not generate a C file by default anymore, relying on
 kernel options \texttt{-print} and \texttt{-ocode} for that, like all
 plug-ins. Remove corresponding ad'hoc options.
