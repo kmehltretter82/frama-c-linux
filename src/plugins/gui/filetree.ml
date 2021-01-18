@@ -296,10 +296,6 @@ module MYTREE = struct
   let comes_from_share filename =
     Filepath.is_relative ~base_name:Fc_config.datadir filename
 
-  let is_stdlib_global g =
-    Cil.hasAttribute "fc_stdlib" (Cil_datatype.Global.attr g) ||
-    Cil.hasAttribute "fc_stdlib_generated" (Cil_datatype.Global.attr g)
-
   let is_function t = match t with
     | MFile _ -> false
     | MGlobal {globals = [| g |]} -> is_function_global g
@@ -530,7 +526,7 @@ let make (tree_view:GTree.view) =
     in
     hide_kind g
     || (MYTREE.is_builtin_global g && hide_builtins ())
-    || (MYTREE.is_stdlib_global g && hide_stdlib ())
+    || (Cil.global_is_in_libc g && hide_stdlib ())
     || (MYTREE.is_defined_global g && hide_defined ())
     || (MYTREE.is_undefined_global g && hide_undefined ())
   in

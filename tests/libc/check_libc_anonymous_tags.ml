@@ -8,7 +8,7 @@ class tags_visitor = object
   val in_stdlib = ref false
 
   method! vglob_aux g =
-    if Cil.hasAttribute "fc_stdlib" (Cil.global_attributes g) then
+    if Cil.global_is_in_libc g then
       begin
         in_stdlib := true;
         begin

@@ -132,7 +132,7 @@ let initialize_var_using_type varinfo state =
     | TPtr (typ, _) as full_typ
       when depth <= Value_parameters.AutomaticContextMaxDepth.get () ->
       let attr = Cil.typeAttrs full_typ in
-      let libc = Cil.hasAttribute "fc_stdlib" varinfo.vattr in
+      let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
         Value_parameters.AutomaticContextMaxWidth.get ()
       in begin

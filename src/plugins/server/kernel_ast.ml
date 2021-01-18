@@ -395,8 +395,7 @@ struct
 
   let is_stdlib kf =
     let vi = Kernel_function.get_vi kf in
-    Cil.hasAttribute "fc_stdlib" vi.vattr ||
-    Cil.hasAttribute "fc_stdlib_generated" vi.vattr
+    Cil.is_in_libc vi.vattr
 
   let is_eva_analyzed kf =
     if Db.Value.is_computed () then !Db.Value.is_called kf else false

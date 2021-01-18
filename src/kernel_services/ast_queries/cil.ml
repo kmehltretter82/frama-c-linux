@@ -5372,6 +5372,13 @@ let global_attributes = function
   | GAnnot (gannot,_) -> global_annotation_attributes gannot
   | GAsm _ | GText _ -> []
 
+let is_in_libc attrs =
+  hasAttribute "fc_stdlib" attrs ||
+  hasAttribute "fc_stdlib_generated" attrs
+
+let global_is_in_libc g =
+  is_in_libc (global_attributes g)
+
 (***************************************************************************)
 
 (* Convert an expression into an attribute, if possible. Otherwise raise

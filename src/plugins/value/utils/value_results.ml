@@ -360,8 +360,7 @@ let plural count = if count = 1 then "" else "s"
 let consider_function vi =
   not (Cil_builtins.is_builtin vi
        || Cil_builtins.is_special_builtin vi.vname
-       || Cil.hasAttribute "fc_stdlib" vi.vattr
-       || Cil.hasAttribute "fc_stdlib_generated" vi.vattr)
+       || Cil.is_in_libc vi.vattr)
 
 let print_coverage fmt =
   let dead_function, reachable_function = ref 0, ref 0

@@ -56,8 +56,7 @@ let direct_call = { indirect_call with call = Direct }
 let visit info = { info with visited = true; }
 
 let is_analyzed_function vi =
-  not (Cil.hasAttribute "fc_stdlib" vi.vattr) &&
-  not (Cil.hasAttribute "fc_stdlib_generated" vi.vattr) &&
+  not (Cil.is_in_libc vi.vattr) &&
   Kernel_function.is_definition (Globals.Functions.get vi) &&
   not (List.exists
          (fun s ->

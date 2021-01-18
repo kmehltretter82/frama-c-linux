@@ -301,11 +301,8 @@ let pretty_extern_vars fmt s =
   Pretty_utils.pp_iter ~pre:"@[" ~suf:"@]" ~sep:";@ "
     VInfoSet.iter Printer.pp_varinfo fmt s
 
-let is_in_libc attrs = Cil.hasAttribute "fc_stdlib" attrs ||
-                       Cil.hasAttribute "fc_stdlib_generated" attrs
-
 let is_entry_point vinfo times_called =
-  times_called = 0 && not vinfo.vaddrof && not (is_in_libc vinfo.vattr)
+  times_called = 0 && not vinfo.vaddrof && not (Cil.is_in_libc vinfo.vattr)
 ;;
 
 let number_entry_points fs =
@@ -371,11 +368,11 @@ let consider_function ~libc vinfo =
   not (!Db.Value.mem_builtin vinfo.vname
        || Ast_info.is_frama_c_builtin vinfo.vname
        || Cil_builtins.is_unused_builtin vinfo
-      ) && (libc || not (is_in_libc vinfo.vattr))
+      ) && (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let consider_variable ~libc vinfo =
   not (Cil.hasAttribute "FRAMA_C_MODEL" vinfo.vattr) &&
-  (libc || not (is_in_libc vinfo.vattr))
+  (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let float_to_string f =
   let s = Format.sprintf "%F" f in
