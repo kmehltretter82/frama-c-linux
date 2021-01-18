@@ -213,17 +213,14 @@ struct
   (* Branching wrt control-flow *)
   and control env a s : M.t_prop =
     match a.vertex_control with
+    | If { cond ; vthen ; velse } ->
+        M.test env.we s cond (wp env vthen) (wp env velse)
+    | Switch { value ; cases ; default } ->
+        M.switch env.we s value
+          (List.map (fun (e,v) -> [e], wp env v) cases)
+          (wp env default)
     | Loop _ -> loop env a s (WpAnnot.get_loop_contract env.kf s)
-    | If { cond ; vthen ; velse } -> conditional env s cond ~vthen ~velse
-    (*TODO: switches *)
-    | Switch _ | Edges -> successors env a
-
-  (* Compute conditionals *)
-  and conditional env s (e: exp) ~vthen ~velse =
-    if V.equal velse vthen then
-      wp env vthen
-    else
-      M.test env.we s e (wp env vthen) (wp env velse)
+    | Edges -> successors env a
 
   (* Compute loops *)
   and loop env a s (lc : WpAnnot.loop_contract) : M.t_prop =
