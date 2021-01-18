@@ -40,6 +40,16 @@ type info =
   | NoneInfo
   | LoopHead of int (* level *)
 
+(** Control flow informations for outgoing edges, if any. *)
+type 'a control =
+  | Edges (** control flow is only given by vertex edges *)
+  | If of { cond: exp; vthen: 'a; velse: 'a }
+    (** edges are guaranteed to be two guards `Then` else `Else`
+       with the given condition and successor vertices. *)
+  | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
+    (** edges are guaranteed to be issued from a `switch()` statement with
+       the given cases and default vertices. *)
+
 (** Vertices are control points. When a vertice is the *start* of a statement,
     this statement is kept in vertex_stmt. Currently, this statement is kept for
     two reasons: to know when callbacks should be called and when annotations
@@ -49,6 +59,7 @@ type vertex = private {
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
+  mutable vertex_control : vertex control;
 }
 
 type assert_kind =

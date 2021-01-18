@@ -30,10 +30,20 @@ type info =
   | NoneInfo
   | LoopHead of int (* level *)
 
+type 'a control =
+  | Edges (* control flow is only given by vertex edges *)
+  | If of { cond: exp; vthen: 'a; velse: 'a }
+    (* edges are guaranteed to be two guards `Then` else `Else`
+       with the given condition and successor vertices. *)
+  | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
+    (* edges are guaranteed to be issued from a `switch()` statement with
+       the given cases and default vertices. *)
+
 type vertex = {
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
+  mutable vertex_control : vertex control;
 }
 
 type assert_kind =
@@ -73,6 +83,7 @@ let dummy_vertex = {
   vertex_key = -1;
   vertex_start_of = None;
   vertex_info = NoneInfo;
+  vertex_control = Edges;
 }
 
 let dummy_edge = {
@@ -241,6 +252,7 @@ let build_automaton ~annotations kf =
       vertex_key = !next_vertex;
       vertex_start_of = None;
       vertex_info = NoneInfo;
+      vertex_control = Edges;
     } in
     incr next_vertex;
     G.add_vertex g v; v
@@ -272,20 +284,27 @@ let build_automaton ~annotations kf =
     in
     fold_transition src l
   in
-  let build_stmt_transition src dest stmt succ transition =
-    (* Get the list of exited and enterd group *)
+  let build_stmt_next src dest stmt succ transition =
+    (* Also returns the successor of the required transition. *)
+    (* Inserts between next and dest the list of exited and enterd group. *)
     let exited_blocks = Kernel_function.blocks_closed_by_edge stmt succ
     and entered_blocks = Kernel_function.blocks_opened_by_edge stmt succ
     in
     let l =
-      transition ::
       List.map (fun b -> Leave b) exited_blocks @
       List.map (fun b -> Enter b) entered_blocks
-    and kinstr = Kstmt stmt
+    and kinstr = Kstmt stmt and loc = stmt_loc stmt
     in
-    build_transitions src dest kinstr (stmt_loc stmt) l
+    if l = [] then
+      ( add_edge src dest kinstr transition loc ; dest )
+    else
+      let v = add_vertex () in
+      add_edge src v kinstr transition loc ;
+      build_transitions v dest kinstr loc l ; v
   in
-
+  let build_stmt_transition src dest stmt succ transition =
+    ignore (build_stmt_next src dest stmt succ transition) in
+  
   let rec do_list do_one control labels = function
     | [] -> assert false
     | stmt :: [] -> do_one control labels stmt
@@ -387,6 +406,9 @@ let build_automaton ~annotations kf =
         in
         add_edge control.src then_point kinstr then_transition loc;
         add_edge control.src else_point kinstr else_transition loc;
+        control.src.vertex_control <- If {
+            cond = exp ; vthen = then_point; velse = else_point
+          };
         do_block {control with src=then_point} kinstr labels then_block;
         do_block {control with src=else_point} kinstr labels else_block;
         control.dest
@@ -405,6 +427,7 @@ let build_automaton ~annotations kf =
         do_block block_control kinstr labels block;
         (* Then link the cases *)
         let default_case : (vertex * Cil_types.stmt) option ref = ref None in
+        let value_cases : (Cil_types.exp * vertex) list ref = ref [] in
         (* For all statements *)
         let values = List.fold_left
             begin fun values case_stmt ->
@@ -414,7 +437,9 @@ let build_automaton ~annotations kf =
                 begin fun values -> function
                   | Case (exp2,_) ->
                     let guard = build_guard exp2 Then in
-                    build_stmt_transition control.src dest stmt case_stmt guard;
+                    let v2 =
+                      build_stmt_next control.src dest stmt case_stmt guard in
+                    value_cases := (exp2,v2) :: !value_cases ;
                     exp2 :: values
                   | Default (_) ->
                     default_case := Some (dest,case_stmt);
@@ -438,11 +463,18 @@ let build_automaton ~annotations kf =
         and add_last_edge src transition =
           match !default_case with
           | None ->
-            add_edge src control.dest kinstr transition loc
+            add_edge src control.dest kinstr transition loc ;
+            control.dest
           | Some (case_vertex, case_stmt) ->
-            build_stmt_transition src case_vertex stmt case_stmt transition
+            build_stmt_transition src case_vertex stmt case_stmt transition ;
+            case_vertex
         in
-        add_default_edge control.src values;
+        let default_vertex = add_default_edge control.src values in
+        control.src.vertex_control <- Switch {
+            value = exp1;
+            cases = List.rev !value_cases;
+            default = default_vertex;
+          };
         control.dest
 
       | Loop (_annotations, block, _, _, _) ->
