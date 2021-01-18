@@ -189,6 +189,47 @@ let get_called_preconditions_at kf stmt =
   List.map snd (call_preconditions kf stmt)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Behaviors                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+type behavior = {
+  bhv_assumes: WpPropId.pred_info list ;
+  bhv_requires: WpPropId.pred_info list ;
+  bhv_ensures: WpPropId.pred_info list ;
+  bhv_exits: WpPropId.pred_info list ;
+  bhv_assigns: WpPropId.assigns_full_info list ;
+}
+
+let get_behavior kf ki bhv =
+  let module L = NormAtLabels in
+  let normalize_pre ip =
+    let labels =
+      match ki with
+      | Kglobal -> L.labels_fct_pre
+      | Kstmt s -> L.labels_stmt_pre kf s in
+    WpPropId.mk_pre_id kf ki bhv ip ,
+    L.preproc_annot labels ip.ip_content.tp_statement
+  in
+  let normalize_post tk ip =
+    let labels =
+      match ki with
+      | Kglobal -> L.labels_fct_pre
+      | Kstmt s -> L.labels_stmt_post kf s in
+    WpPropId.mk_post_id kf ki bhv (tk,ip) ,
+    L.preproc_annot labels ip.ip_content.tp_statement
+  in
+  let post_cond tk = List.filter_map (fun (kind,ip) ->
+      if kind = tk then Some (normalize_post tk ip) else None
+    ) bhv.b_post_cond
+  in {
+    bhv_assumes = List.map normalize_pre bhv.b_assumes;
+    bhv_requires = List.map normalize_pre bhv.b_requires;
+    bhv_ensures = post_cond Normal ;
+    bhv_exits = post_cond Exits ;
+    bhv_assigns = [];
+  }
+
+(* -------------------------------------------------------------------------- *)
 (* --- Code Assertions                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -517,7 +558,7 @@ let add_stmt_assigns_goal config s active acc b l_post = match b.b_assigns with
       | Some id ->
           if goal_to_select config id then
             let kf = config.kf in
-            let labels = NormAtLabels.labels_stmt_assigns ~kf s l_post in
+            let labels = NormAtLabels.labels_stmt_assigns_l ~kf s l_post in
             let assigns = NormAtLabels.preproc_assigns labels assigns in
             let a_desc = WpPropId.mk_stmt_assigns_desc s assigns in
             WpStrategy.add_assigns acc WpStrategy.Agoal id a_desc

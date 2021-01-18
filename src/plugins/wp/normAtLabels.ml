@@ -153,12 +153,24 @@ let labels_stmt_pre ~kf s = function
   | BuiltinLabel Here -> Clabels.stmt s
   | l -> labels_fct ~kf ~at:s l
 
-let labels_stmt_post ~kf s l_post = function
+let labels_stmt_post ~kf s = function
+  | BuiltinLabel Old -> Clabels.stmt s
+  | BuiltinLabel (Here | Post) -> Clabels.stmt_post s
+  | l -> labels_fct ~kf ~at:s l
+
+let labels_stmt_assigns ~kf s = function
+  | BuiltinLabel (Here | Old) -> Clabels.stmt s
+  | BuiltinLabel Post -> Clabels.stmt_post s
+  | l -> labels_fct ~kf ~at:s l
+
+(* LEGACY *)
+let labels_stmt_post_l ~kf s l_post = function
   | BuiltinLabel Old -> Clabels.stmt s
   | BuiltinLabel (Here | Post) as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l
 
-let labels_stmt_assigns ~kf s l_post = function
+(* LEGACY *)
+let labels_stmt_assigns_l ~kf s l_post = function
   | BuiltinLabel (Here | Old) -> Clabels.stmt s
   | BuiltinLabel Post as l -> option l l_post
   | l -> labels_fct ~kf ~at:s l

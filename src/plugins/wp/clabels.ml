@@ -59,6 +59,7 @@ let mem l lbl = List.mem l lbl
 
 let case n = "wp:case" ^ Int64.to_string n
 let stmt s = "wp:sid"  ^ string_of_int s.sid
+let stmt_post s = "wp:sid:post:" ^ string_of_int s.sid
 let loop_entry s = stmt s (* same point *)
 let loop_current s = "wp:head" ^ string_of_int s.sid
 

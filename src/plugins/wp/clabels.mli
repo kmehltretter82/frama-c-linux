@@ -56,6 +56,7 @@ val formal : string -> c_label
 
 val case : int64 -> c_label
 val stmt : Cil_types.stmt -> c_label
+val stmt_post : Cil_types.stmt -> c_label
 val loop_entry : Cil_types.stmt -> c_label
 val loop_current : Cil_types.stmt -> c_label
 

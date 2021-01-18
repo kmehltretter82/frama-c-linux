@@ -183,6 +183,9 @@ val mk_fct_assigns_id : kernel_function -> funbehavior ->
 val mk_pre_id : kernel_function -> kinstr -> funbehavior ->
   identified_predicate -> prop_id
 
+val mk_post_id : kernel_function -> kinstr -> funbehavior ->
+  termination_kind * identified_predicate -> prop_id
+
 val mk_stmt_post_id : kernel_function -> stmt -> funbehavior ->
   termination_kind * identified_predicate -> prop_id
 

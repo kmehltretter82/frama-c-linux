@@ -36,8 +36,10 @@ val labels_assert_before : kf:kernel_function -> stmt -> label_mapping
 val labels_assert_after : kf:kernel_function -> stmt -> c_label option -> label_mapping
 val labels_loop : stmt -> label_mapping
 val labels_stmt_pre : kf:kernel_function -> stmt -> label_mapping
-val labels_stmt_post : kf:kernel_function -> stmt -> c_label option -> label_mapping
-val labels_stmt_assigns : kf:kernel_function -> stmt -> c_label option -> label_mapping
+val labels_stmt_post : kf:kernel_function -> stmt -> label_mapping
+val labels_stmt_assigns : kf:kernel_function -> stmt -> label_mapping
+val labels_stmt_post_l : kf:kernel_function -> stmt -> c_label option -> label_mapping
+val labels_stmt_assigns_l : kf:kernel_function -> stmt -> c_label option -> label_mapping
 val labels_predicate : (logic_label * logic_label) list -> label_mapping
 val labels_axiom : label_mapping
 

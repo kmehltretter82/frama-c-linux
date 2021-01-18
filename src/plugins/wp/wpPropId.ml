@@ -169,6 +169,9 @@ let mk_fct_assigns_id kf b tkind a =
 let mk_pre_id kf ki b p =
   mk_prop PKProp (Property.ip_of_requires kf ki b p)
 
+let mk_post_id kf ki b p =
+  mk_prop PKProp (Property.ip_of_ensures kf ki b p)
+
 let mk_stmt_post_id kf s b p =
   mk_prop PKProp (Property.ip_of_ensures kf (Kstmt s) b p)
 

@@ -64,6 +64,20 @@ val get_called_exit_conditions : kernel_function -> Property.t list
 val get_called_assigns : kernel_function -> Property.t list
 
 (* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Behaviors                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+type behavior = {
+  bhv_assumes: WpPropId.pred_info list ;
+  bhv_requires: WpPropId.pred_info list ;
+  bhv_ensures: WpPropId.pred_info list ;
+  bhv_exits: WpPropId.pred_info list ;
+  bhv_assigns: WpPropId.assigns_full_info list;
+}
+
+val get_behavior : kernel_function -> kinstr -> funbehavior -> behavior
+
+(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -90,6 +104,8 @@ type loop_contract = {
 }
 
 val get_loop_contract : kernel_function -> stmt -> loop_contract
+
+(* -------------------------------------------------------------------------- *)
 
 (* ########################################################################## *)
 (* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)
