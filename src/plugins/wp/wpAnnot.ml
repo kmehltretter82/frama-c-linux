@@ -197,36 +197,61 @@ type behavior = {
   bhv_requires: WpPropId.pred_info list ;
   bhv_ensures: WpPropId.pred_info list ;
   bhv_exits: WpPropId.pred_info list ;
-  bhv_assigns: WpPropId.assigns_full_info list ;
+  bhv_assigns: WpPropId.assigns_full_info ;
 }
 
-let get_behavior kf ki bhv =
+let normalize_pre kf ki bhv ip =
   let module L = NormAtLabels in
-  let normalize_pre ip =
-    let labels =
-      match ki with
-      | Kglobal -> L.labels_fct_pre
-      | Kstmt s -> L.labels_stmt_pre kf s in
-    WpPropId.mk_pre_id kf ki bhv ip ,
-    L.preproc_annot labels ip.ip_content.tp_statement
-  in
-  let normalize_post tk ip =
-    let labels =
-      match ki with
-      | Kglobal -> L.labels_fct_pre
-      | Kstmt s -> L.labels_stmt_post kf s in
-    WpPropId.mk_post_id kf ki bhv (tk,ip) ,
-    L.preproc_annot labels ip.ip_content.tp_statement
-  in
-  let post_cond tk = List.filter_map (fun (kind,ip) ->
-      if kind = tk then Some (normalize_post tk ip) else None
-    ) bhv.b_post_cond
-  in {
-    bhv_assumes = List.map normalize_pre bhv.b_assumes;
-    bhv_requires = List.map normalize_pre bhv.b_requires;
-    bhv_ensures = post_cond Normal ;
-    bhv_exits = post_cond Exits ;
-    bhv_assigns = [];
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_pre
+    | Kstmt s -> L.labels_stmt_pre kf s in
+  WpPropId.mk_pre_id kf ki bhv ip ,
+  L.preproc_annot labels ip.ip_content.tp_statement
+
+let normalize_post kf ki bhv tk ip =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_pre
+    | Kstmt s -> L.labels_stmt_post kf s in
+  WpPropId.mk_post_id kf ki bhv (tk,ip) ,
+  L.preproc_annot labels ip.ip_content.tp_statement
+
+let normalize_assigns kf ki bhv ~active = function
+  | WritesAny -> WpPropId.empty_assigns_info
+  | Writes froms ->
+      let module L = NormAtLabels in
+      let aid = match ki with
+        | Kglobal -> WpPropId.mk_fct_assigns_id kf bhv Normal froms
+        | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms in
+      match aid with
+      | None -> WpPropId.empty_assigns_info
+      | Some id ->
+          let labels =
+            match ki with
+            | Kglobal -> L.labels_fct_assigns
+            | Kstmt s -> L.labels_stmt_assigns kf s in
+          let assigns = L.preproc_assigns labels froms in
+          let desc = match ki with
+            | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
+            | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
+          in  WpPropId.mk_assigns_info id desc
+
+let get_requires kf ki bhv =
+  List.map (normalize_pre kf ki bhv) bhv.b_requires
+
+let get_behavior kf ki ~active bhv =
+  let pre_cond = normalize_pre kf ki bhv in
+  let post_cond tk (kind,ip) =
+    if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
+  let assigns = normalize_assigns kf ki bhv ~active bhv.b_assigns in
+  {
+    bhv_assumes = List.map pre_cond bhv.b_assumes;
+    bhv_requires = List.map pre_cond bhv.b_requires;
+    bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
+    bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
+    bhv_assigns = assigns ;
   }
 
 (* -------------------------------------------------------------------------- *)

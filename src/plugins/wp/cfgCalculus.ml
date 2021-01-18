@@ -61,6 +61,13 @@ let get_modes kf =
          ) stmt ms
     ) (Kernel_function.get_definition kf).sallstmts []
 
+let get_default_requires mode kf =
+  if Cil.is_default_behavior mode.bhv then [] else
+    try
+      let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
+      WpAnnot.get_requires kf Kglobal bhv
+    with Not_found -> []
+
 (* -------------------------------------------------------------------------- *)
 (* --- Property Selection by Mode                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -127,6 +134,7 @@ struct
     cfg: Cfg.automaton;
     we: M.t_env;
     wp: M.t_prop option Vhash.t; (* None is used for non-dag detection *)
+    mutable wk: M.t_prop; (* end point *)
   }
 
   (* --- Annotation Helpers --- *)
@@ -138,17 +146,17 @@ struct
         let cup = M.merge env.we in
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
+  let is_selected ~goal { mode ; props } (pid,_) =
+    (is_selected_property ~goal mode @@ WpPropId.property_of_id pid)
+    && (not goal || props = [] || WpPropId.select_by_name props pid)
+
   let use_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo -> assert false
     | AssignsAny ad -> M.use_assigns env.we None ad w
     | AssignsLocations(ap,ad) -> M.use_assigns env.we (Some ap) ad w
 
-  let is_selected ~goal { mode ; props } (pid,_) =
-    (is_selected_property ~goal mode @@ WpPropId.property_of_id pid)
-    && (not goal || props = [] || WpPropId.select_by_name props pid)
-
-  let check_assigns env (a : assigns) w =
+  let prove_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo | AssignsAny _ -> w
     | AssignsLocations ai ->
@@ -224,7 +232,7 @@ struct
       let q =
         M.label env.we None (Clabels.loop_current s) @@
         List.fold_right (prove_property env) lc.loop_preserved @@
-        List.fold_right (check_assigns env) lc.loop_assigns @@
+        List.fold_right (prove_assigns env) lc.loop_assigns @@
         M.empty in
       ( Vhash.replace env.wp a (Some q) ; successors env a )
     end
@@ -256,9 +264,12 @@ struct
         M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) p
     | Call _ -> assert false
 
-  let return env (p : M.t_prop) : vertex =
-    Vhash.add env.wp env.cfg.return_point (Some p) ;
-    env.cfg.entry_point
+  let body env ~ensures ~exits w =
+    let rw = List.fold_right (prove_property env) ensures w in
+    let rk = List.fold_right (prove_property env) exits w in
+    Vhash.add env.wp env.cfg.return_point (Some rw) ;
+    env.wk <- rk ;
+    wp env env.cfg.entry_point
 
   (* Putting everything together *)
   let compute ~mode ~props kf =
@@ -267,16 +278,29 @@ struct
       cfg = Cfg.get_automaton kf ;
       we = M.new_env kf ;
       wp = Vhash.create 32 ;
+      wk = M.empty ;
     } in
     let xs = Kernel_function.get_formals kf in
+    let req = get_default_requires mode kf in
+    let bhv = WpAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
     env.we ,
+    (* global *)
     M.scope env.we [] SC_Global @@
+    (* pre-state *)
     M.label env.we None Clabels.pre @@
-    (*TODO: add function requires *)
+    List.fold_right (use_property env) req @@
+    List.fold_right (use_property env) bhv.bhv_assumes @@
+    List.fold_right (use_property env) bhv.bhv_requires @@
+    (* frame-in *)
     M.scope env.we xs SC_Frame_in @@
-    wp env @@
-    return env @@
+    (* function body *)
+    body env
+      ~ensures:bhv.bhv_ensures
+      ~exits:bhv.bhv_exits @@
+    (* frame-out *)
     M.scope env.we xs SC_Frame_out @@
+    prove_assigns env bhv.bhv_assigns @@
+    (* wp-end *)
     M.empty
 
 end

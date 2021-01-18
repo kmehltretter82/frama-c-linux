@@ -25,16 +25,17 @@
   * is allowed to use. *)
 
 open Cil_types
+open WpPropId
 
 (*----------------------------------------------------------------------------*)
 
 (** A proof accumulator for a set of related prop_id *)
 type proof
 
-val create_proof : WpPropId.prop_id -> proof
+val create_proof : prop_id -> proof
 (** to be used only once for one of the related prop_id *)
 
-val add_proof : proof -> WpPropId.prop_id -> Property.t list -> unit
+val add_proof : proof -> prop_id -> Property.t list -> unit
 (** accumulate in the proof the partial proof for this prop_id *)
 
 val add_invalid_proof : proof -> unit
@@ -52,7 +53,7 @@ val is_invalid : proof -> bool
 val target : proof -> Property.t
 val dependencies : proof -> Property.t list
 
-val filter_status : WpPropId.prop_id -> bool
+val filter_status : prop_id -> bool
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Function Calls                                --- *)
@@ -68,22 +69,24 @@ val get_called_assigns : kernel_function -> Property.t list
 (* -------------------------------------------------------------------------- *)
 
 type behavior = {
-  bhv_assumes: WpPropId.pred_info list ;
-  bhv_requires: WpPropId.pred_info list ;
-  bhv_ensures: WpPropId.pred_info list ;
-  bhv_exits: WpPropId.pred_info list ;
-  bhv_assigns: WpPropId.assigns_full_info list;
+  bhv_assumes: pred_info list ;
+  bhv_requires: pred_info list ;
+  bhv_ensures: pred_info list ;
+  bhv_exits: pred_info list ;
+  bhv_assigns: assigns_full_info ;
 }
 
-val get_behavior : kernel_function -> kinstr -> funbehavior -> behavior
+val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
+val get_behavior : kernel_function -> kinstr -> active:string list ->
+  funbehavior -> behavior
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 type code_assertions = {
-  code_admitted: WpPropId.pred_info list ;
-  code_verified: WpPropId.pred_info list ;
+  code_admitted: pred_info list ;
+  code_verified: pred_info list ;
 }
 
 val get_code_assertions : kernel_function -> stmt -> code_assertions
@@ -94,13 +97,13 @@ val get_code_assertions : kernel_function -> stmt -> code_assertions
 
 type loop_contract = {
   (** to be verified at loop entry *)
-  loop_established: WpPropId.pred_info list;
+  loop_established: pred_info list;
   (** to be assumed for loop current *)
-  loop_invariants: WpPropId.pred_info list;
+  loop_invariants: pred_info list;
   (** to be verified after loop body *)
-  loop_preserved: WpPropId.pred_info list;
+  loop_preserved: pred_info list;
   (** assigned by loop body *)
-  loop_assigns: WpPropId.assigns_full_info list;
+  loop_assigns: assigns_full_info list;
 }
 
 val get_loop_contract : kernel_function -> stmt -> loop_contract
