@@ -40,48 +40,38 @@ type assigns = WpPropId.assigns_full_info
 (* -------------------------------------------------------------------------- *)
 
 type mode = {
-  bhv : string option ; (* Selected behavior (None is default) *)
+  bhv : funbehavior ; (* Selected behavior (None is default) *)
   stmt : stmt option ;  (* Stmt contract under proof *)
 }
 
-let default_mode = { bhv = None ; stmt = None }
-
 let get_modes kf =
-  default_mode ::
-  begin
-    Annotations.fold_behaviors
-      (fun _emitter b ms -> { bhv = Some b.b_name ; stmt = None } :: ms)
-      kf @@
-    List.fold_right
-      (fun stmt ms ->
-         Annotations.fold_code_annot (fun _emitter ca ms ->
-             match ca.annot_content with
-             | AStmtSpec(_, { spec_behavior = bs } ) ->
-                 { bhv = None ; stmt = Some stmt } ::
-                 List.fold_right (fun b ms -> {
-                       bhv = Some b.b_name ;
-                       stmt = Some stmt ;
-                     }::ms) bs ms
-             | _ -> ms
-           ) stmt ms
-      ) (Kernel_function.get_definition kf).sallstmts []
-  end
+  Annotations.fold_behaviors
+    (fun _emitter bhv ms -> { bhv ; stmt = None } :: ms)
+    kf @@
+  List.fold_right
+    (fun stmt ms ->
+       Annotations.fold_code_annot (fun _emitter ca ms ->
+           match ca.annot_content with
+           | AStmtSpec(_, { spec_behavior = bs } ) ->
+               List.fold_right (fun bhv ms -> {
+                     bhv ;
+                     stmt = Some stmt ;
+                   }::ms) bs ms
+           | _ -> ms
+         ) stmt ms
+    ) (Kernel_function.get_definition kf).sallstmts []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Selection by Mode                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_default (m: mode) = m.bhv = None
+let is_default_bhv (m: mode) = Cil.is_default_behavior m.bhv
 
 let is_selected_bhv (m: mode) (bhv: funbehavior) =
-  match m.bhv with
-  | None -> Cil.is_default_behavior bhv
-  | Some b -> b = bhv.b_name
+  m.bhv.b_name = bhv.b_name
 
 let is_selected_for (m: mode) (fors: string list) =
-  match m.bhv with
-  | None -> fors = []
-  | Some b0 -> List.mem b0 fors
+  List.mem m.bhv.b_name fors
 
 let is_selected_ca ~goal (m: mode) (ca: code_annotation) =
   match ca.annot_content with
@@ -90,7 +80,7 @@ let is_selected_ca ~goal (m: mode) (ca: code_annotation) =
   | AAssert(forb,_)
   | AInvariant(forb,_,_)
     ->  not goal || is_selected_for m forb
-  | AVariant _ -> m.bhv = None
+  | AVariant _ -> is_default_bhv m
   | AExtended _ | AStmtSpec _ | APragma _ ->
       assert false (* n/a *)
 
@@ -103,14 +93,14 @@ let is_selected_property ~goal (m: mode) (p: Property.t) =
         | PKRequires bhv | PKAssumes bhv ->
             Cil.is_default_behavior bhv || is_selected_bhv m bhv
         | PKEnsures(bhv,_) -> is_selected_bhv m bhv
-        | PKTerminates -> is_default m
+        | PKTerminates -> is_default_bhv m
       end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
       begin match bhv with
         | Id_loop ca -> is_selected_ca ~goal m ca
         | Id_contract(_,bhv) -> is_selected_bhv m bhv
       end
-  | IPDecrease { id_ca = None } -> is_default m
+  | IPDecrease { id_ca = None } -> is_default_bhv m
   | IPDecrease { id_ca = Some ca } -> is_selected_ca ~goal m ca
   | IPComplete _ | IPDisjoint _ | IPFrom _
   | IPGlobalInvariant _ | IPTypeInvariant _ ->

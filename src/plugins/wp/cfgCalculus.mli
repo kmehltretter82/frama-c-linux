@@ -27,7 +27,7 @@ open Cil_types
 (* -------------------------------------------------------------------------- *)
 
 type mode = {
-  bhv : string option ; (* Selected behavior (None is default) *)
+  bhv : funbehavior ; (* Selected behavior (None is default) *)
   stmt : stmt option ;  (* Stmt contract under proof *)
 }
 
