@@ -1,4 +1,4 @@
-/tests/**/dune
+/tests/*/dune
 /Makefile
 /*parser*.output
 /ptests_local_config.ml

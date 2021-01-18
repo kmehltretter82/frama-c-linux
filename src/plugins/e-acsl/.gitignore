@@ -59,7 +59,6 @@
 /tests/*/result*/*
 /tests/check/obj/*
 .frama-c
-tests/ptests_config
 META.frama-c-e_acsl
 .merlin
 .Makefile.plugin.generated

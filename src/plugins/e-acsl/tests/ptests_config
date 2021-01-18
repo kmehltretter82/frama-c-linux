@@ -1,0 +1,1 @@
+IGNORE= DEFAULT_SUITES = arith bts builtin constructs examples format full-mtracking gmp-only memory special temporal

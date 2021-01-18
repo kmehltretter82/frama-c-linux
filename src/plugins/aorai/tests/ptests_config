@@ -1,1 +1,2 @@
-DEFAULT_SUITES= aorai ya
+IGNORE= DEFAULT_SUITES= aorai ya
+IGNORE= prove_SUITES= aorai ya

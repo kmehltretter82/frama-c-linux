@@ -1,0 +1,7 @@
+; Used by the ptests directive `LIBS: ../../print` in `tests_config` files.
+(library
+ (name print)
+ (modules print)
+ (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel frama-c-e-acsl.core)
+ (flags -open Frama_c_kernel)
+)
