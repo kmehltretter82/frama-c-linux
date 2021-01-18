@@ -16,9 +16,6 @@ is_likely_text_file() {
     esac
 }
 
-declare -A exceptions
-exceptions=(["VERSION"]=1 ["VERSION_CODENAME"]=1)
-
 errors=0
 
 IFS=''
@@ -27,11 +24,9 @@ while read file
 do
     if [ -n "$(is_likely_text_file "$file")" ]; then
         x=$(tail -c 1 "$file")
-        if [ "$x" != "" ]; then
-            if [ ! ${exceptions["$file"]+x} ]; then
-                echo "error: no newline at end of file: $file"
-                errors=$((errors+1))
-            fi
+        if [ "$x" != "" -a "$file" != "VERSION" -a "$file" != "VERSION_CODENAME" ]; then
+            echo "error: no newline at end of file: $file"
+            errors=$((errors+1))
         fi
     fi
 done
