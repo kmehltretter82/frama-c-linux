@@ -683,14 +683,18 @@ struct
     | Loc l -> M.block_length sigma.mem obj l
     | Ref x -> noref ~op:"block-length of" x
     | Val(m,x,_) ->
-        let obj = Ctypes.object_of (vtype m x) in
-        let size =
-          if Ctypes.sizeof_defined obj
-          then Ctypes.sizeof_object obj
-          else if Wp_parameters.ExternArrays.get ()
-          then max_int
-          else Warning.error ~source:"MemVar" "Unknown array-size"
-        in F.e_int size
+        begin match Ctypes.object_of (vtype m x) with
+          | C_comp ({ cfields = None } as c) ->
+              Cvalues.bytes_length_of_opaque_comp c
+          | obj ->
+              let size =
+                if Ctypes.sizeof_defined obj
+                then Ctypes.sizeof_object obj
+                else if Wp_parameters.ExternArrays.get ()
+                then max_int
+                else Warning.error ~source:"MemVar" "Unknown array-size"
+              in F.e_int size
+        end
 
   let cast obj l = Loc(M.cast obj (mloc_of_loc l))
   let loc_of_int e a = Loc(M.loc_of_int e a)

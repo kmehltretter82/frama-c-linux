@@ -220,18 +220,19 @@ and all_value_chunks () =
 let init_footprint _ _ = Heap.Set.singleton T_init
 let value_footprint obj _l = footprint obj
 
-module OPAQUE_COMP_SIZE = WpContext.Generator(Cil_datatype.Compinfo)
+(* Note that it is the length in MemTyped and not the occupied bytes *)
+module OPAQUE_COMP_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
     (struct
-      let name = "MemTyped.EmptyCompSize"
+      let name = "MemTyped.EmptyCompLength"
       type key = compinfo
       type data = lfun
       let compile c =
         if c.cfields <> None then
           Wp_parameters.fatal
-            "Asking for opaque struct size on non opaque struct" ;
+            "Asking for opaque struct length on non opaque struct" ;
         let result = Lang.t_int in
         let size =
-          Lang.generated_f ~params:[] ~result "%s" ("Size_of_" ^ Lang.comp_id c)
+          Lang.generated_f ~params:[] ~result "Length_of_%s" (Lang.comp_id c)
         in
         (* Registration *)
         Definitions.define_symbol {
@@ -241,7 +242,7 @@ module OPAQUE_COMP_SIZE = WpContext.Generator(Cil_datatype.Compinfo)
         } ;
         Definitions.define_lemma {
           l_kind = `Axiom ;
-          l_name = "Positive_Size_of_" ^ Lang.comp_id c ;
+          l_name = "Positive_Length_of_" ^ Lang.comp_id c ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
           l_lemma = Lang.F.(p_lt e_zero (e_fun size []))
@@ -266,7 +267,7 @@ and length_of_field f = length_of_typ f.ftype
 and length_of_comp c =
   match c.cfields with
   | None ->
-      Lang.F.e_fun (OPAQUE_COMP_SIZE.get c) []
+      Lang.F.e_fun (OPAQUE_COMP_LENGTH.get c) []
   | Some fields ->
       (* union field are considered as struct field *)
       e_sum (List.map length_of_field fields)
@@ -644,7 +645,11 @@ let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (a_base l)
 let base_addr l = a_addr (a_base l) e_zero
 let base_offset l = a_base_offset (a_base l) (a_offset l)
 let block_length sigma obj l =
-  e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
+  match obj with
+  | C_comp ({ cfields = None } as c) ->
+      e_mul (Cvalues.bytes_length_of_opaque_comp c) (allocated sigma l)
+  | _ ->
+      e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cast                                                               --- *)

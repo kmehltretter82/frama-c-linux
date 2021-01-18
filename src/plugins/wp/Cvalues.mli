@@ -102,6 +102,8 @@ val constant_term : Cil_types.term -> term
 val initialized_obj: c_object -> term
 val uninitialized_obj: c_object -> term
 
+val bytes_length_of_opaque_comp: compinfo -> term
+
 (** {2 Lifting Operations over Memory Values} *)
 
 val map_sloc : ('a -> 'b) -> 'a Sigs.sloc -> 'b Sigs.sloc

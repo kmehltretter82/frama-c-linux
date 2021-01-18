@@ -70,7 +70,10 @@ and constant_term t =
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
-(* Initialization values *)
+(* -------------------------------------------------------------------------- *)
+(* --- Initialization values                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
 module OPAQUE_COMP_INIT = struct
   type initialization_funs = {
     init: lfun ;
@@ -129,6 +132,44 @@ and init_comp_value value ci =
 
 let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
+
+(* -------------------------------------------------------------------------- *)
+(* --- Length of empty compinfos                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
+    (struct
+      let name = "Cvalues.EmptyCompBytesLength"
+      type key = compinfo
+      type data = lfun
+      let compile c =
+        if c.cfields <> None then
+          Wp_parameters.fatal
+            "Asking for opaque struct length on non opaque struct" ;
+        let result = Lang.t_int in
+        let name = "BytesLength" in
+        let size =
+          Lang.(generated_f ~params:[] ~result "%s_of_%s" name (comp_id c))
+        in
+        (* Registration *)
+        Definitions.define_symbol {
+          d_cluster = Definitions.compinfo c ;
+          d_lfun = size ; d_types = 0 ; d_params = [] ;
+          d_definition = Logic result ;
+        } ;
+        let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
+        Definitions.define_lemma {
+          l_kind = `Axiom ;
+          l_name = "Positive_" ^ name ^ "_of_" ^ Lang.comp_id c ;
+          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_cluster = Definitions.compinfo c ;
+          l_lemma = Lang.F.(p_leq min_size (e_fun size []))
+        } ;
+        size
+    end)
+
+let bytes_length_of_opaque_comp c =
+  Lang.F.e_fun (OPAQUE_COMP_BYTES_LENGTH.get c) []
 
 (* -------------------------------------------------------------------------- *)
 

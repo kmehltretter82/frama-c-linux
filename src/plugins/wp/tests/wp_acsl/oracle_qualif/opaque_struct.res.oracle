@@ -2,28 +2,51 @@
 [kernel] Parsing tests/wp_acsl/opaque_struct.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 7 goals scheduled
-[wp] [Alt-Ergo] Goal typed_check_lemma_should_fail : Unsuccess
-[wp] [Qed] Goal typed_check_lemma_should_succeed : Valid
-[wp] [Alt-Ergo] Goal typed_assigns_check_should_fail : Unsuccess
-[wp] [Qed] Goal typed_assigns_check_should_succeed : Valid
-[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_should_succeed : Valid
-[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_should_fail : Unsuccess
-[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_should_fail_2 : Unsuccess
-[wp] Proved goals:    3 / 7
+[wp] 13 goals scheduled
+[wp] [Alt-Ergo] Goal typed_check_lemma_fail : Unsuccess
+[wp] [Qed] Goal typed_check_lemma_succeed_L1 : Valid
+[wp] [Alt-Ergo] Goal typed_check_lemma_succeed_L2 : Valid
+[wp] [Alt-Ergo] Goal typed_assigns_check_fail : Unsuccess
+[wp] [Qed] Goal typed_assigns_check_succeed : Valid
+[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_succeed : Valid
+[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_succeed_2 : Valid
+[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_fail : Unsuccess
+[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_fail_2 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_assigned_via_pointer_check_fail : Unsuccess
+[wp] [Alt-Ergo] Goal typed_assigns_effect_check_fail : Unsuccess
+[wp] [Alt-Ergo] Goal typed_assigns_effect_check_fail_2 : Unsuccess
+[wp] [Alt-Ergo] Goal typed_assigns_effect_check_succeed : Valid
+[wp] Proved goals:    6 / 13
   Qed:             2 
-  Alt-Ergo:        1  (unsuccess: 4)
+  Alt-Ergo:        4  (unsuccess: 7)
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Axiomatic test            1        -        2      50.0%
+  Axiomatic test            1        1        3      66.7%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   assigns                   1        -        2      50.0%
-  initialized_assigns       -        1        1       100%
+  initialized_assigns       -        2        2       100%
   uninitialized_assigns     -        -        2       0.0%
+  assigned_via_pointer      -        -        1       0.0%
+  assigns_effect            -        1        3      33.3%
 ------------------------------------------------------------
-[wp] tests/wp_acsl/opaque_struct.i:23: Warning: 
+[wp] tests/wp_acsl/opaque_struct.i:24: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_typed:
         requires \separated(p, &S1, &S2, &p); */
   void g(void);
+[wp] tests/wp_acsl/opaque_struct.i:57: Warning: 
+  Memory model hypotheses for function 'assign':
+  /*@ behavior wp_typed:
+        requires \separated(a, &S1, &S2); */
+  void assign(struct S *a);
+[wp] tests/wp_acsl/opaque_struct.i:60: Warning: 
+  Memory model hypotheses for function 'assigns_effect':
+  /*@
+     behavior wp_typed:
+       requires \separated(a, &S1, &S2);
+       requires \separated(c, &S1, &S2);
+       requires \separated(p_0, &S1, &S2);
+       requires \separated(q, &S1, &S2);
+     */
+  void assigns_effect(int *p_0, float *q, char *c, struct S *a);

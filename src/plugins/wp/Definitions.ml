@@ -336,11 +336,12 @@ class virtual visitor main =
           let c = compinfo r in
           if self#do_local c then
             begin
-              let fts = Option.map (List.map
-                  (fun f ->
-                     let t = Lang.tau_of_ctype f.ftype in
-                     self#vtau t ; Cfield (f, KValue) , t
-                  ))
+              let fts = Option.map
+                  (List.map
+                     (fun f ->
+                        let t = Lang.tau_of_ctype f.ftype in
+                        self#vtau t ; Cfield (f, KValue) , t
+                     ))
                   r.cfields
               in self#on_comp r fts ;
             end
@@ -353,11 +354,12 @@ class virtual visitor main =
           let c = icompinfo r in
           if self#do_local c then
             begin
-              let fts = Option.map (List.map
-                  (fun f ->
-                     let t = Lang.init_of_ctype f.ftype in
-                     self#vtau t ; Cfield (f, KInit) , t
-                  ))
+              let fts = Option.map
+                  (List.map
+                     (fun f ->
+                        let t = Lang.init_of_ctype f.ftype in
+                        self#vtau t ; Cfield (f, KInit) , t
+                     ))
                   r.cfields
               in self#on_icomp r fts ;
             end
