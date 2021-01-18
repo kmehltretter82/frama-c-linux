@@ -33,11 +33,11 @@ type info =
 type 'a control =
   | Edges (* control flow is only given by vertex edges *)
   | If of { cond: exp; vthen: 'a; velse: 'a }
-    (* edges are guaranteed to be two guards `Then` else `Else`
-       with the given condition and successor vertices. *)
+  (* edges are guaranteed to be two guards `Then` else `Else`
+     with the given condition and successor vertices. *)
   | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
-    (* edges are guaranteed to be issued from a `switch()` statement with
-       the given cases and default vertices. *)
+  (* edges are guaranteed to be issued from a `switch()` statement with
+     the given cases and default vertices. *)
 
 type vertex = {
   vertex_key : int;
@@ -339,7 +339,6 @@ let build_automaton ~annotations kf =
   and do_stmt control (labels:vertex labels) stmt =
     let kinstr = Kstmt stmt
     and loc = stmt_loc stmt in
-    let source = fst loc in
     let do_annot control labels (annot: code_annotation) : unit =
       let labels = LabelMap.add_builtin Here control.src labels in
       let annotation = make_annotation kf stmt annot labels in

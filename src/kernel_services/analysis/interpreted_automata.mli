@@ -44,11 +44,11 @@ type info =
 type 'a control =
   | Edges (** control flow is only given by vertex edges *)
   | If of { cond: exp; vthen: 'a; velse: 'a }
-    (** edges are guaranteed to be two guards `Then` else `Else`
-       with the given condition and successor vertices. *)
+  (** edges are guaranteed to be two guards `Then` else `Else`
+      with the given condition and successor vertices. *)
   | Switch of { value: exp; cases: (exp * 'a) list; default: 'a }
-    (** edges are guaranteed to be issued from a `switch()` statement with
-       the given cases and default vertices. *)
+  (** edges are guaranteed to be issued from a `switch()` statement with
+      the given cases and default vertices. *)
 
 (** Vertices are control points. When a vertice is the *start* of a statement,
     this statement is kept in vertex_stmt. Currently, this statement is kept for
