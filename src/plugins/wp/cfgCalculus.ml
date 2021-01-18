@@ -33,12 +33,6 @@ module G = Cfg.G
 module V = Cfg.Vertex
 module Vhash = V.Hashtbl
 type vertex = Cfg.vertex
-
-let guard = function
-  | (_,{ Cfg.edge_transition = Guard(_,Then,_) },v) -> `Then v
-  | (_,{ Cfg.edge_transition = Guard(_,Else,_) },v) -> `Else v
-  | _ -> `None
-
 type assigns = WpPropId.assigns_full_info
 
 (* -------------------------------------------------------------------------- *)
@@ -218,31 +212,18 @@ struct
 
   (* Branching wrt control-flow *)
   and control env a s : M.t_prop =
-    match s.skind with
-    | Loop(_,_,_,_,_) ->
-        loop env a s (WpAnnot.get_loop_contract env.kf s)
-    | If(e,_,_,_) ->
-        begin
-          match succ env a with
-          | [p;q] -> conditional env s e p q
-          | es -> transitions env es
-        end
+    match a.vertex_control with
+    | Loop _ -> loop env a s (WpAnnot.get_loop_contract env.kf s)
+    | If { cond ; vthen ; velse } -> conditional env s cond ~vthen ~velse
     (*TODO: switches *)
-    | _ ->
-        successors env a
+    | Switch _ | Edges -> successors env a
 
   (* Compute conditionals *)
-  and conditional env s (e: exp) (p: G.edge) (q: G.edge) : M.t_prop =
-    begin match guard p, guard q with
-      | `Then vthen , `Else velse
-      | `Else velse , `Then vthen ->
-          if V.equal velse vthen then
-            wp env vthen
-          else
-            M.test env.we s e (wp env vthen) (wp env velse)
-      | _ ->
-          M.merge env.we (transition env p) (transition env q)
-    end
+  and conditional env s (e: exp) ~vthen ~velse =
+    if V.equal velse vthen then
+      wp env vthen
+    else
+      M.test env.we s e (wp env vthen) (wp env velse)
 
   (* Compute loops *)
   and loop env a s (lc : WpAnnot.loop_contract) : M.t_prop =
