@@ -2304,23 +2304,26 @@ module Identified_predicate = struct
       end)
 end
 
-module Funbehavior =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = funbehavior
-      let name = "Funbehavior"
-      let reprs =
-        [ {  b_name = "default!"; (* Cil.default_behavior_name *)
-             b_requires = Identified_predicate.reprs;
-             b_assumes = Identified_predicate.reprs;
-             b_post_cond =
-               List.map (fun x -> Normal, x) Identified_predicate.reprs;
-             b_assigns = WritesAny;
-             b_allocation = FreeAllocAny;
-             b_extended = []; } ]
-      let mem_project = Datatype.never_any_project
-    end)
+module Funbehavior = struct
+  let pretty_ref = ref (fun _ _ -> assert false)
+  include Datatype.Make
+      (struct
+        include Datatype.Serializable_undefined
+        type t = funbehavior
+        let name = "Funbehavior"
+        let reprs =
+          [ {  b_name = "default!"; (* Cil.default_behavior_name *)
+               b_requires = Identified_predicate.reprs;
+               b_assumes = Identified_predicate.reprs;
+               b_post_cond =
+                 List.map (fun x -> Normal, x) Identified_predicate.reprs;
+               b_assigns = WritesAny;
+               b_allocation = FreeAllocAny;
+               b_extended = []; } ]
+        let pretty fmt x = !pretty_ref fmt x
+        let mem_project = Datatype.never_any_project
+      end)
+end
 
 module Funspec = struct
   let pretty_ref = ref (fun _ _ -> assert false)

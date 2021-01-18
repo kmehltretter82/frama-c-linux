@@ -281,6 +281,7 @@ let () = Cil_datatype.Term_lval.pretty_ref := pp_term_lval
 let () = Cil_datatype.Term_offset.pretty_ref := pp_term_offset
 let () = Cil_datatype.Code_annotation.pretty_ref := pp_code_annotation
 let () = Cil_datatype.Funspec.pretty_ref := pp_funspec
+let () = Cil_datatype.Funbehavior.pretty_ref := pp_behavior
 
 let () = Cil_datatype.Label.pretty_ref := pp_label
 let () = Cil_datatype.Compinfo.pretty_ref := pp_compinfo
