@@ -236,6 +236,22 @@ let get_behavior kf ki ~active bhv =
 (* --- Called Contract                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
+(*TODO: put it in Status_by_call ? *)
+module AllPrecondStatus =
+  State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
+    (struct
+      let name = "Call Preconditions Proxy Generated"
+      let dependencies = [Ast.self]
+      let size = 32
+    end)
+
+let setup_preconditions kf =
+  if not (AllPrecondStatus.mem kf) then
+    begin
+      AllPrecondStatus.add kf () ;
+      Statuses_by_call.setup_all_preconditions_proxies kf ;
+    end
+
 type call_contract = {
   call_pre : WpPropId.pred_info list ;
   call_post : WpPropId.pred_info list ;
@@ -243,12 +259,19 @@ type call_contract = {
   call_assigns : Cil_types.assigns ;
 }
 
+let get_precond_at kf stmt (id,p) =
+  let pi = WpPropId.property_of_id id in
+  let pi_at = Statuses_by_call.precondition_at_call kf pi stmt in
+  let id_at = WpPropId.mk_call_pre_id kf stmt pi pi_at in
+  id_at , p
+
 let get_call_contract kf =
   let cpre : WpPropId.pred_info list ref = ref [] in
   let cpost : WpPropId.pred_info list ref = ref [] in
   let cexit : WpPropId.pred_info list ref = ref [] in
   let cwrites = ref [] in
   let add c f x = c := (f x) :: !c in
+  setup_preconditions kf ;
   List.iter
     begin fun bhv ->
       let assumes =

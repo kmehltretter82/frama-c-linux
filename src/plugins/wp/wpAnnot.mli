@@ -104,12 +104,13 @@ val get_loop_contract : kernel_function -> stmt -> loop_contract
 (* -------------------------------------------------------------------------- *)
 
 type call_contract = {
-  call_pre : WpPropId.pred_info list ;
-  call_post : WpPropId.pred_info list ;
-  call_exit : WpPropId.pred_info list ;
-  call_assigns : Cil_types.assigns ;
+  call_pre : pred_info list ;
+  call_post : pred_info list ;
+  call_exit : pred_info list ;
+  call_assigns : assigns ;
 }
 
+val get_precond_at : kernel_function -> stmt -> pred_info -> pred_info
 val get_call_contract : kernel_function -> call_contract
 
 (* -------------------------------------------------------------------------- *)

@@ -262,7 +262,32 @@ struct
           Varinfo.pretty x ; p
     | Asm _ ->
         M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) p
-    | Call _ -> assert false
+    | Call(r,fct,es,_) ->
+        begin
+          match Kernel_function.get_called fct with
+          | Some kf -> call env s r kf es (WpAnnot.get_call_contract kf) p
+          | None ->
+              (*TODO: dynamic call *)
+              assert false
+        end
+
+  and call env s r kf es (c : WpAnnot.call_contract) wr : M.t_prop =
+    let filter ps = List.filter (is_selected env ~goal:false) ps in
+    let w_call = M.call env.we s r kf es
+      ~pre:(filter c.call_pre)
+      ~post:(filter c.call_post)
+      ~pexit:(filter c.call_exit)
+      ~assigns:c.call_assigns
+      ~p_post:wr ~p_exit:env.wk in
+    if is_default_bhv env.mode then
+      let pre =
+        List.filter_map (fun p ->
+            if is_selected env ~goal:true p then
+              Some (WpAnnot.get_precond_at kf s p)
+            else None
+          ) c.call_pre
+      in M.call_goal_precond env.we s kf es ~pre w_call
+    else w_call
 
   let body env ~ensures ~exits w =
     let rw = List.fold_right (prove_property env) ensures w in
