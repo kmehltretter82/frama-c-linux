@@ -238,7 +238,7 @@ export const byMarker: Compare.Order<marker> = Compare.structural;
 /** Location: function and marker */
 export interface location {
   /** Function */
-  function: Json.key<'#fct'>;
+  fct: Json.key<'#fct'>;
   /** Marker */
   marker: marker;
 }
@@ -246,7 +246,7 @@ export interface location {
 /** Loose decoder for `location` */
 export const jLocation: Json.Loose<location> =
   Json.jObject({
-    function: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+    fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
     marker: jMarkerSafe,
   });
 
@@ -257,8 +257,8 @@ export const jLocationSafe: Json.Safe<location> =
 /** Natural order for `location` */
 export const byLocation: Compare.Order<location> =
   Compare.byFields
-    <{ function: Json.key<'#fct'>, marker: marker }>({
-    function: Compare.string,
+    <{ fct: Json.key<'#fct'>, marker: marker }>({
+    fct: Compare.string,
     marker: byMarker,
   });
 
