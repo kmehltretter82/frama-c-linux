@@ -100,6 +100,19 @@ type loop_contract = {
 val get_loop_contract : kernel_function -> stmt -> loop_contract
 
 (* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Call Contracts                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+type call_contract = {
+  call_pre : WpPropId.pred_info list ;
+  call_post : WpPropId.pred_info list ;
+  call_exit : WpPropId.pred_info list ;
+  call_assigns : Cil_types.assigns ;
+}
+
+val get_call_contract : kernel_function -> call_contract
+
+(* -------------------------------------------------------------------------- *)
 
 (* ########################################################################## *)
 (* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)

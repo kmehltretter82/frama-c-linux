@@ -162,39 +162,55 @@ type behavior = {
   bhv_assigns: WpPropId.assigns_full_info ;
 }
 
-let normalize_pre kf ki bhv ip =
+let normalize_assumes kf ki h =
   let module L = NormAtLabels in
   let labels =
     match ki with
     | Kglobal -> L.labels_fct_pre
     | Kstmt s -> L.labels_stmt_pre kf s in
-  WpPropId.mk_pre_id kf ki bhv ip ,
-  L.preproc_annot labels ip.ip_content.tp_statement
+  L.preproc_annot labels h
 
-let normalize_post kf ki bhv tk ip =
+let implies ?assumes p =
+  match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
+
+let normalize_pre kf ki bhv ?assumes ip =
   let module L = NormAtLabels in
   let labels =
     match ki with
     | Kglobal -> L.labels_fct_pre
+    | Kstmt s -> L.labels_stmt_pre kf s in
+  let id = WpPropId.mk_pre_id kf ki bhv ip in
+  let p = L.preproc_annot labels ip.ip_content.tp_statement in
+  id, implies ?assumes p
+
+let normalize_post kf ki bhv tk ?assumes ip =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_post
     | Kstmt s -> L.labels_stmt_post kf s in
-  WpPropId.mk_post_id kf ki bhv (tk,ip) ,
-  L.preproc_annot labels ip.ip_content.tp_statement
+  let id = WpPropId.mk_post_id kf ki bhv (tk,ip) in
+  let p = L.preproc_annot labels ip.ip_content.tp_statement in
+  id , implies ?assumes p
+
+let normalize_froms kf ki froms =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_assigns
+    | Kstmt s -> L.labels_stmt_assigns kf s in
+  L.preproc_assigns labels froms
 
 let normalize_assigns kf ki bhv ~active = function
   | WritesAny -> WpPropId.empty_assigns_info
   | Writes froms ->
-      let module L = NormAtLabels in
       let aid = match ki with
         | Kglobal -> WpPropId.mk_fct_assigns_id kf bhv Normal froms
         | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms in
       match aid with
       | None -> WpPropId.empty_assigns_info
       | Some id ->
-          let labels =
-            match ki with
-            | Kglobal -> L.labels_fct_assigns
-            | Kstmt s -> L.labels_stmt_assigns kf s in
-          let assigns = L.preproc_assigns labels froms in
+          let assigns = normalize_froms kf ki froms in
           let desc = match ki with
             | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
             | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
@@ -214,6 +230,48 @@ let get_behavior kf ki ~active bhv =
     bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
     bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
     bhv_assigns = assigns ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Called Contract                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type call_contract = {
+  call_pre : WpPropId.pred_info list ;
+  call_post : WpPropId.pred_info list ;
+  call_exit : WpPropId.pred_info list ;
+  call_assigns : Cil_types.assigns ;
+}
+
+let get_call_contract kf =
+  let cpre : WpPropId.pred_info list ref = ref [] in
+  let cpost : WpPropId.pred_info list ref = ref [] in
+  let cexit : WpPropId.pred_info list ref = ref [] in
+  let cwrites = ref [] in
+  let add c f x = c := (f x) :: !c in
+  List.iter
+    begin fun bhv ->
+      let assumes =
+        normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv) in
+      let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
+      let mk_post = normalize_post kf Kglobal bhv ~assumes in
+      List.iter (add cpre @@ mk_pre) bhv.b_requires ;
+      List.iter
+        (fun (tk,ip) ->
+           add (if tk = Returns then cpost else cexit) (mk_post tk) ip
+        ) bhv.b_post_cond ;
+      match bhv.b_assigns with
+      | WritesAny -> ()
+      | Writes froms ->
+          let assigns = normalize_froms kf Kglobal froms in
+          cwrites := List.rev_append assigns !cwrites ;
+    end (Annotations.behaviors kf) ;
+  {
+    call_pre = List.rev !cpre ;
+    call_post = List.rev !cpost ;
+    call_exit = List.rev !cexit ;
+    call_assigns =
+      match List.rev !cwrites with [] -> WritesAny | ws -> Writes ws ;
   }
 
 (* -------------------------------------------------------------------------- *)
