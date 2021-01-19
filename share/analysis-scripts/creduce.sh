@@ -37,13 +37,23 @@ Frama-C, or when minimizing test cases resulting in a Frama-C error.
 
 # Basic usage
 
-  arguments: <file> <command line options>
+  arguments: <script options> <file> <Frama-C command line options>
 
 This script creates a temporary directory named 'creducing'. It copies <file>
 inside it, then runs creduce with 'frama-c <command line options>'
 on the copied file, modifying it to make it smaller while still crashing.
 
 When done, you need to copy the reduced file and erase directoy 'creducing'.
+
+# Script options
+
+Note: these options must be placed _before_ all other arguments.
+
+--help: show this help message.
+
+--ignore-parsability: do not check that each reduced program conforms to
+                      a gcc parsability check; helps avoid issues due to
+                      preprocessing flags.
 
 # Advanced usage
 
@@ -52,29 +62,41 @@ When done, you need to copy the reduced file and erase directoy 'creducing'.
   preprocess the file in GCC to make sure it is parseable during reduction.
   This may cause some issues; use a preprocessed file if you can.
 
-- For "fatal" crashes (with stack trace and 'Please report...' message),
+- For 'fatal' crashes (with stack trace and 'Please report...' message),
   this script should work automatically. For other crashes (e.g. invalid
   input), this script will copy a template to the current directory and you
   need to fill it so that creduce will work. This usage mode requires knowing
   how C-Reduce works.
 "
 
+#### Command-line and environment validation
+#
+#
+
+ignore_parsability=0
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --help) echo "$usage"; exit;;
+        --h) echo "$usage"; exit;;
+        -help) echo "$usage"; exit;;
+        -h) echo "$usage"; exit;;
+        --ignore-parsability)
+            ignore_parsability=1
+            shift
+            ;;
+        *) break;;
+    esac
+done
+
 if [ $# -lt 1 ]; then
     echo "$usage"
-    exit 1
+    exit
 fi
-
-case "$1" in
-    --help) echo "$usage"; exit;;
-    --h) echo "$usage"; exit;;
-    -help) echo "$usage"; exit;;
-    -h) echo "$usage"; exit;;
-esac
 
 file="$1"
 base=$(basename "$file")
 shift
-fcflags="$@"
+
 dir_for_reduction="creducing"
 
 script_for_creduce="./script_for_creduce.sh"
@@ -91,6 +113,18 @@ fi
 
 if [[ ! -f "$file" ]]; then
     echo "Source file not found (must be first argument): $file"
+    exit 1
+fi
+
+too_many_sources=""
+for f in "$@"; do
+    if [ -e "$f" ]; then
+        too_many_sources+=" $f"
+    fi
+done
+if [ ! -z "$too_many_sources" ]; then
+    echo "error: too many sources; only the first argument must be a file: $file"
+    echo "       remove these from the command-line:$too_many_sources"
     exit 1
 fi
 
@@ -116,6 +150,23 @@ if [ -z "$FRAMAC_SHARE" ]; then
     FRAMAC_SHARE="$("$FRAMAC" -print-share-path)"
 fi
 
+if ! sed --version >/dev/null 2>&1; then
+    echo "[info] sed is not GNU, trying gsed..."
+    if command -v gsed >/dev/null; then
+        echo "[info] gsed found, using it."
+        SED="gsed"
+    else
+        echo "error: GNU sed is required but was not found (neither sed nor gsed)"
+        exit 1
+    fi
+else
+    SED="sed"
+fi
+
+#
+#
+#### End of command-line and environment validation
+
 if [[ ! "$options" =~ no-autoload-plugins ]]; then
     echo "********************************************************************"
     echo "Hint: consider using -no-autoload-plugins -load-module [modules]"
@@ -137,9 +188,16 @@ if [[ "$base" =~ \.i$ ]]; then
     # TODO: check for '-machdep' option and add/remove flags accordingly
     CPP="gcc -fsyntax-only"
 else
-    CPP=$("$FRAMAC" -kernel-msg-key pp $fcflags "$file" 2>/dev/null | \
-          grep "preprocessing with " | \
-          sed 's|.* preprocessing with "||' | sed 's|"$||')
+    set +e
+    cpp_output=$("$FRAMAC" -print-cpp-commands "$@" "$file" 2>/dev/null)
+    cpp_retcode=$?
+    set -e
+    if [ $cpp_retcode -ne 0 ]; then
+        echo "error trying to get preprocessing flags (exit code: $cpp_retcode): $FRAMAC -print-cpp-commands $@ $file"
+        exit $cpp_retcode
+    fi
+    CPP=$(echo "$cpp_output" | \
+          "$SED" -n '/Preprocessing command:/{n;p;}' | "$SED" "s|'.*' -o '.*'||")
     if [[ "$CPP" = "" ]]; then
         echo "[info] Could not get preprocessing flags when running Frama-C,"
         echo "       using default flags"
@@ -149,9 +207,9 @@ else
         # Replace -E with -fsyntax-only to force GCC to try parsing the file;
         # also remove Frama-C's libc; use the standard system libraries.
         CPP=$(echo $CPP | \
-                  sed 's| -E | -fsyntax-only |' | \
-                  sed 's| -nostdinc | |' | \
-                  sed 's| -I[^ ]\+/libc | |' )
+                  "$SED" 's| -E | -fsyntax-only |' | \
+                  "$SED" 's| -nostdinc | |' | \
+                  "$SED" 's| -I[^ ]\+/libc | |' )
     fi
 fi
 
@@ -177,27 +235,29 @@ if [ ! -e "$script_for_creduce" ]; then
     esac
 fi
 
-echo "[info] the following command will be used to check for syntactic validity during reduction:"
-echo "    $CPP"
+if [ "$ignore_parsability" -eq 0 ]; then
+    echo "[info] the following command will be used to check for syntactic validity during reduction:"
+    echo "    $CPP"
+fi
 
 mkdir -p "$dir_for_reduction"
 cp "$file" "$dir_for_reduction"
 cp "$script_for_creduce" "$dir_for_reduction"
 cd "$dir_for_reduction"
 
-# we avoid using '-i' for compatibility with macOS sed
-sed -e "s|@CPP@|$CPP|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
-mv "${script_for_creduce}.tmp" "$script_for_creduce"
-sed -e "s|@FRAMAC@|$FRAMAC|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
-mv "${script_for_creduce}.tmp" "$script_for_creduce"
-sed -e "s|@BASE@|$base|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
-mv "${script_for_creduce}.tmp" "$script_for_creduce"
-sed -e "s|@FCFLAGS@|$fcflags|g" "$script_for_creduce" > "${script_for_creduce}.tmp"
-mv "${script_for_creduce}.tmp" "$script_for_creduce"
+if [ "$ignore_parsability" -eq 0 ]; then
+    "$SED" -i "s|@CPP@|$CPP|g" "$script_for_creduce"
+else
+    "$SED" -i "s|^.*@CPP@.*$||g" "$script_for_creduce"
+fi
+"$SED" -i "s|@FRAMAC@|$FRAMAC|g" "$script_for_creduce"
+"$SED" -i "s|@BASE@|$base|g" "$script_for_creduce"
+"$SED" -i "s|@FCFLAGS@|$(echo $@ | tr "'" "\\'")|g" "$script_for_creduce"
 chmod u+x "$script_for_creduce"
 
 trap "{ echo \"Creduce interrupted!\"; echo \"\"; echo \"(partially) reduced file: $dir_for_reduction/$base\"; exit 0; }" SIGINT
 
+echo ""
 echo "File being reduced: $dir_for_reduction/$base (press Ctrl+C to stop at any time)"
 
 set +e
