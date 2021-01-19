@@ -645,11 +645,12 @@ let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (a_base l)
 let base_addr l = a_addr (a_base l) e_zero
 let base_offset l = a_base_offset (a_base l) (a_offset l)
 let block_length sigma obj l =
+  let n_cells = e_div (allocated sigma l) (length_of_object obj) in
   match obj with
   | C_comp ({ cfields = None } as c) ->
-      e_mul (Cvalues.bytes_length_of_opaque_comp c) (allocated sigma l)
+      e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
   | _ ->
-      e_fact (Ctypes.sizeof_object obj) (allocated sigma l)
+      e_fact (Ctypes.sizeof_object obj) n_cells
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cast                                                               --- *)

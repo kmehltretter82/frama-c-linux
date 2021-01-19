@@ -130,7 +130,7 @@ Assume {
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, p, Length_of_S1_S).
 }
-Prove: 0 <= (BytesLength_of_S1_S * Malloc_0[x]).
+Prove: 0 <= (BytesLength_of_S1_S * (Malloc_0[x] / Length_of_S1_S)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
