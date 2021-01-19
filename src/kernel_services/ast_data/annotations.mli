@@ -334,6 +334,14 @@ type 'a behavior_component_addition =
     @since Aluminium-20160501
 *)
 
+val add_spec: ?register_children:bool -> spec contract_component_addition
+(** Add new spec into the given contract.
+
+    [register_children] is directly given to the function [add_behaviors].
+
+    @since Frama-C+dev
+*)
+
 val add_behaviors:
   ?register_children:bool -> funbehavior list contract_component_addition
 (** Add new behaviors into the given contract. 
