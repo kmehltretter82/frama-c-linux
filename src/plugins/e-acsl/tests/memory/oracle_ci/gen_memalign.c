@@ -40,6 +40,12 @@ extern int __e_acsl_sound_verdict;
  */
 int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size);
 
+/*@ assigns __e_acsl_heap_allocation_size, __e_acsl_heap_allocated_blocks;
+    assigns __e_acsl_heap_allocation_size
+      \from (indirect: alignment), size, __e_acsl_heap_allocation_size;
+    assigns __e_acsl_heap_allocated_blocks
+      \from (indirect: alignment), size, __e_acsl_heap_allocated_blocks;
+ */
 void *aligned_alloc(size_t alignment, size_t size);
 
 int main(int argc, char const **argv)

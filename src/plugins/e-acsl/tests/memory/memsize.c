@@ -1,5 +1,6 @@
-/* run.config
+/* run.config_ci
    COMMENT: Checking heap memory size
+   STDOPT: +"-eva-no-builtins-auto"
 */
 
 #include <stdlib.h>
