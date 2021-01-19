@@ -323,7 +323,7 @@ let get_code_assertions kf stmt : code_assertions =
             WpPropId.mk_assert_id kf stmt ca ,
             normalize_pred a.tp_statement
           in if a.tp_only_check then {
-            l with code_admitted = p :: l.code_admitted ;
+            l with code_verified = p :: l.code_verified ;
           } else {
             code_admitted = p :: l.code_admitted ;
             code_verified = p :: l.code_verified ;
