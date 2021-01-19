@@ -424,7 +424,7 @@ const PropertyColumns = () => {
         getter={(prop: Property) => prop?.source}
         render={renderFile}
       />
-      <ColumnCode id="function" label="Function" width={120} />
+      <ColumnCode id="fct" label="Function" width={120} />
       <ColumnTag id="kind" label="Property kind" getter={getKind} width={120} />
       <ColumnTag id="alarm" label="Alarms" getter={getAlarm} width={160} />
       <Column
