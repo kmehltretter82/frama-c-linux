@@ -121,8 +121,10 @@ let is_selected_property ~goal (m: mode) (p: Property.t) =
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Make(M : Mcfg.S) =
+module Make(W : Mcfg.S) =
 struct
+
+  module I = CfgInit.Make(W)
 
   (* --- Traversal Environment --- *)
 
@@ -132,18 +134,18 @@ struct
     props: string list;
     mutable ki: kinstr; (* Current localisation *)
     cfg: Cfg.automaton;
-    we: M.t_env;
-    wp: M.t_prop option Vhash.t; (* None is used for non-dag detection *)
-    mutable wk: M.t_prop; (* end point *)
+    we: W.t_env;
+    wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
+    mutable wk: W.t_prop; (* end point *)
   }
 
   (* --- Annotation Helpers --- *)
 
   let fmerge env f = function
-    | [] -> M.empty
+    | [] -> W.empty
     | [x] -> f x
     | x::xs ->
-        let cup = M.merge env.we in
+        let cup = W.merge env.we in
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
   let is_selected ~goal { mode ; props } (pid,_) =
@@ -153,22 +155,22 @@ struct
   let use_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo -> assert false
-    | AssignsAny ad -> M.use_assigns env.we None ad w
-    | AssignsLocations(ap,ad) -> M.use_assigns env.we (Some ap) ad w
+    | AssignsAny ad -> W.use_assigns env.we None ad w
+    | AssignsLocations(ap,ad) -> W.use_assigns env.we (Some ap) ad w
 
   let prove_assigns env (a : assigns) w =
     match a with
     | NoAssignsInfo | AssignsAny _ -> w
     | AssignsLocations ai ->
         if is_selected ~goal:true env ai
-        then M.add_assigns env.we ai w
+        then W.add_assigns env.we ai w
         else w
 
   let use_property env (p : WpPropId.pred_info) w =
-    if is_selected ~goal:false env p then M.add_hyp env.we p w else w
+    if is_selected ~goal:false env p then W.add_hyp env.we p w else w
 
   let prove_property env (p : WpPropId.pred_info) w =
-    if is_selected ~goal:true env p then M.add_goal env.we p w else w
+    if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -176,7 +178,7 @@ struct
 
   let succ env a = G.succ_e env.cfg.graph a
 
-  let rec wp (env:env) (a:vertex) : M.t_prop =
+  let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
     | None -> raise (NonNaturalLoop(env.kf,env.ki))
     | Some pi -> pi
@@ -189,7 +191,7 @@ struct
         in Vhash.replace env.wp a (Some pi) ; pi
 
   (* Compute a stmt node *)
-  and stmt env a (s: stmt) : M.t_prop =
+  and stmt env a (s: stmt) : W.t_prop =
     let ki = env.ki in
     let kl = Cil.CurrentLoc.get () in
     try
@@ -197,7 +199,7 @@ struct
       Cil.CurrentLoc.set (Stmt.loc s) ;
       let ca = WpAnnot.get_code_assertions env.kf s in
       let pi =
-        M.label env.we (Some s) (Clabels.stmt s) @@
+        W.label env.we (Some s) (Clabels.stmt s) @@
         List.fold_right (prove_property env) ca.code_verified @@
         List.fold_right (use_property env) ca.code_admitted @@
         control env a s
@@ -209,59 +211,59 @@ struct
       env.ki <- ki ; raise err
 
   (* Branching wrt control-flow *)
-  and control env a s : M.t_prop =
+  and control env a s : W.t_prop =
     match a.vertex_control with
     | If { cond ; vthen ; velse } ->
-        M.test env.we s cond (wp env vthen) (wp env velse)
+        W.test env.we s cond (wp env vthen) (wp env velse)
     | Switch { value ; cases ; default } ->
-        M.switch env.we s value
+        W.switch env.we s value
           (List.map (fun (e,v) -> [e], wp env v) cases)
           (wp env default)
     | Loop _ -> loop env a s (WpAnnot.get_loop_contract env.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
-  and loop env a s (lc : WpAnnot.loop_contract) : M.t_prop =
+  and loop env a s (lc : WpAnnot.loop_contract) : W.t_prop =
     begin
       let loop_current = Clabels.loop_current s in
-      M.label env.we None loop_current @@
+      W.label env.we None loop_current @@
       List.fold_right (prove_property env) lc.loop_established @@
       List.fold_right (use_assigns env) lc.loop_assigns @@
-      M.label env.we None loop_current @@
+      W.label env.we None loop_current @@
       List.fold_right (use_property env) lc.loop_invariants @@
       let q =
-        M.label env.we None (Clabels.loop_current s) @@
+        W.label env.we None (Clabels.loop_current s) @@
         List.fold_right (prove_property env) lc.loop_preserved @@
         List.fold_right (prove_assigns env) lc.loop_assigns @@
-        M.empty in
+        W.empty in
       ( Vhash.replace env.wp a (Some q) ; successors env a )
     end
 
   (* Merge transitions *)
   and successors env (a : vertex) = transitions env (succ env a)
   and transitions env (es : G.edge list) = fmerge env (transition env) es
-  and transition env (_,edge,dst) : M.t_prop =
+  and transition env (_,edge,dst) : W.t_prop =
     let p = wp env dst in
     match edge.edge_transition with
     | Skip -> p
-    | Return(r,s) -> M.return env.we s r p
-    | Enter { blocals=xs } -> M.scope env.we xs SC_Block_in p
-    | Leave { blocals=xs } -> M.scope env.we xs SC_Block_out p
+    | Return(r,s) -> W.return env.we s r p
+    | Enter { blocals=xs } -> W.scope env.we xs SC_Block_in p
+    | Leave { blocals=xs } -> W.scope env.we xs SC_Block_out p
     | Instr (i,s) -> instr env s i p
     | Prop _ | Guard _ -> (* soundly ignored *) p
 
   (* Compute a single instruction *)
-  and instr env s instr (w : M.t_prop) : M.t_prop =
+  and instr env s instr (w : W.t_prop) : W.t_prop =
     match instr with
     | Skip _ | Code_annot _ -> w
-    | Set(lv,e,_) -> M.assign env.we s lv e w
-    | Local_init(x,AssignInit i,_) -> M.init env.we x (Some i) w
+    | Set(lv,e,_) -> W.assign env.we s lv e w
+    | Local_init(x,AssignInit i,_) -> W.init env.we x (Some i) w
     | Local_init(x,ConsInit _,_) ->
         WpLog.warning ~once:true
           "Ignored constructor init for '%a' (sound)."
           Varinfo.pretty x ; w
     | Asm _ ->
-        M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
+        W.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
     | Call(r,fct,es,_) ->
         begin
           match Kernel_function.get_called fct with
@@ -271,17 +273,17 @@ struct
               | None ->
                   WpLog.warning ~once:true "Missing dynamic-call infos." ;
                   let ad = WpPropId.mk_stmt_assigns_any_desc s in
-                  M.use_assigns env.we None ad (M.merge env.we w env.wk)
+                  W.use_assigns env.we None ad (W.merge env.we w env.wk)
               | Some(prop,kfs) ->
                   let id = WpPropId.mk_property prop in
-                  M.call_dynamic env.we s id fct @@
+                  W.call_dynamic env.we s id fct @@
                   List.map (fun kf -> kf, call env s r kf es w) kfs
         end
 
-  and call env s r kf es wr : M.t_prop =
+  and call env s r kf es wr : W.t_prop =
     let c = WpAnnot.get_call_contract kf in
     let filter ps = List.filter (is_selected env ~goal:false) ps in
-    let w_call = M.call env.we s r kf es
+    let w_call = W.call env.we s r kf es
         ~pre:(filter c.call_pre)
         ~post:(filter c.call_post)
         ~pexit:(filter c.call_exit)
@@ -294,7 +296,7 @@ struct
               Some (WpAnnot.get_precond_at kf s p)
             else None
           ) c.call_pre
-      in M.call_goal_precond env.we s kf es ~pre w_call
+      in W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
 
   let body env ~ensures ~exits w =
@@ -309,32 +311,34 @@ struct
     let env = {
       kf ; ki = Kglobal ; mode ; props ;
       cfg = Cfg.get_automaton kf ;
-      we = M.new_env kf ;
+      we = W.new_env kf ;
       wp = Vhash.create 32 ;
-      wk = M.empty ;
+      wk = W.empty ;
     } in
     let xs = Kernel_function.get_formals kf in
     let req = get_default_requires mode kf in
     let bhv = WpAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
     env.we ,
-    (* global *)
-    M.scope env.we [] SC_Global @@
+    (* global init *)
+    W.close env.we @@
+    I.process_global_init env.we kf @@
+    W.scope env.we [] SC_Global @@
     (* pre-state *)
-    M.label env.we None Clabels.pre @@
+    W.label env.we None Clabels.pre @@
     List.fold_right (use_property env) req @@
     List.fold_right (use_property env) bhv.bhv_assumes @@
     List.fold_right (use_property env) bhv.bhv_requires @@
     (* frame-in *)
-    M.scope env.we xs SC_Frame_in @@
+    W.scope env.we xs SC_Frame_in @@
     (* function body *)
     body env
       ~ensures:bhv.bhv_ensures
       ~exits:bhv.bhv_exits @@
     (* frame-out *)
-    M.scope env.we xs SC_Frame_out @@
+    W.scope env.we xs SC_Frame_out @@
     prove_assigns env bhv.bhv_assigns @@
     (* wp-end *)
-    M.empty
+    W.empty
 
 end
 

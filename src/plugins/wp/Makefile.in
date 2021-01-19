@@ -97,7 +97,7 @@ PLUGIN_CMO:= \
 	filter_axioms Cache ProverWhy3 \
 	driver prover ProverSearch ProverScript \
 	Generator Factory \
-	calculus cfgCalculus cfgDump cfgWP \
+	cfgInit calculus cfgCalculus cfgDump cfgWP \
 	register VC
 
 PLUGIN_CMI:=
