@@ -234,6 +234,7 @@ val merge_assign_info :
 val mk_loop_assigns_desc : stmt -> from list -> assigns_desc
 
 val mk_stmt_assigns_desc : stmt -> from list -> assigns_desc
+val mk_stmt_assigns_any_desc : stmt -> assigns_desc
 
 val mk_asm_assigns_desc : stmt -> assigns_desc
 

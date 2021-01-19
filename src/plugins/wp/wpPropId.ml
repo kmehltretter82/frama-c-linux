@@ -864,6 +864,13 @@ let mk_stmt_assigns_desc s assigns = {
   a_assigns = Writes assigns ;
 }
 
+let mk_stmt_assigns_any_desc s = {
+  a_label = Clabels.stmt s ;
+  a_stmt = Some s ;
+  a_kind = StmtAssigns ;
+  a_assigns = WritesAny ;
+}
+
 let mk_init_assigns = {
   a_label = Clabels.init ;
   a_stmt = None ;

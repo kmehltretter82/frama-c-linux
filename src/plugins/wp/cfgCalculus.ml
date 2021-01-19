@@ -251,34 +251,42 @@ struct
     | Prop _ | Guard _ -> (* soundly ignored *) p
 
   (* Compute a single instruction *)
-  and instr env s instr (p : M.t_prop) : M.t_prop =
+  and instr env s instr (w : M.t_prop) : M.t_prop =
     match instr with
-    | Skip _ | Code_annot _ -> p
-    | Set(lv,e,_) -> M.assign env.we s lv e p
-    | Local_init(x,AssignInit i,_) -> M.init env.we x (Some i) p
+    | Skip _ | Code_annot _ -> w
+    | Set(lv,e,_) -> M.assign env.we s lv e w
+    | Local_init(x,AssignInit i,_) -> M.init env.we x (Some i) w
     | Local_init(x,ConsInit _,_) ->
         WpLog.warning ~once:true
           "Ignored constructor init for '%a' (sound)."
-          Varinfo.pretty x ; p
+          Varinfo.pretty x ; w
     | Asm _ ->
-        M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) p
+        M.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
     | Call(r,fct,es,_) ->
         begin
           match Kernel_function.get_called fct with
-          | Some kf -> call env s r kf es (WpAnnot.get_call_contract kf) p
+          | Some kf -> call env s r kf es w
           | None ->
-              (*TODO: dynamic call *)
-              assert false
+              match Dyncall.get ~bhv:env.mode.bhv.b_name s with
+              | None ->
+                  WpLog.warning ~once:true "Missing dynamic-call infos." ;
+                  let ad = WpPropId.mk_stmt_assigns_any_desc s in
+                  M.use_assigns env.we None ad (M.merge env.we w env.wk)
+              | Some(prop,kfs) ->
+                  let id = WpPropId.mk_property prop in
+                  M.call_dynamic env.we s id fct @@
+                  List.map (fun kf -> kf, call env s r kf es w) kfs
         end
 
-  and call env s r kf es (c : WpAnnot.call_contract) wr : M.t_prop =
+  and call env s r kf es wr : M.t_prop =
+    let c = WpAnnot.get_call_contract kf in
     let filter ps = List.filter (is_selected env ~goal:false) ps in
     let w_call = M.call env.we s r kf es
-      ~pre:(filter c.call_pre)
-      ~post:(filter c.call_post)
-      ~pexit:(filter c.call_exit)
-      ~assigns:c.call_assigns
-      ~p_post:wr ~p_exit:env.wk in
+        ~pre:(filter c.call_pre)
+        ~post:(filter c.call_post)
+        ~pexit:(filter c.call_exit)
+        ~assigns:c.call_assigns
+        ~p_post:wr ~p_exit:env.wk in
     if is_default_bhv env.mode then
       let pre =
         List.filter_map (fun p ->
