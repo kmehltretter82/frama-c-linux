@@ -20,75 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 (** Every access to annotations have to go through here,
   * so this is the place where we decide what the computation
   * is allowed to use. *)
 
-open Cil_types
-open WpPropId
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Behaviors                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-type behavior = {
-  bhv_assumes: pred_info list ;
-  bhv_requires: pred_info list ;
-  bhv_ensures: pred_info list ;
-  bhv_exits: pred_info list ;
-  bhv_assigns: assigns_full_info ;
-}
-
-val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
-val get_behavior : kernel_function -> kinstr -> active:string list ->
-  funbehavior -> behavior
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Assertions                                    --- *)
-(* -------------------------------------------------------------------------- *)
-
-type code_assertions = {
-  code_admitted: pred_info list ;
-  code_verified: pred_info list ;
-}
-
-val get_code_assertions : kernel_function -> stmt -> code_assertions
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Loop Contracts                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-type loop_contract = {
-  (** to be verified at loop entry *)
-  loop_established: pred_info list;
-  (** to be assumed for loop current *)
-  loop_invariants: pred_info list;
-  (** to be verified after loop body *)
-  loop_preserved: pred_info list;
-  (** assigned by loop body *)
-  loop_assigns: assigns_full_info list;
-}
-
-val get_loop_contract : kernel_function -> stmt -> loop_contract
-
-(* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Call Contracts                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-type call_contract = {
-  call_pre : pred_info list ;
-  call_post : pred_info list ;
-  call_exit : pred_info list ;
-  call_assigns : assigns ;
-}
-
-val get_precond_at : kernel_function -> stmt -> pred_info -> pred_info
-val get_call_contract : kernel_function -> call_contract
-
-(* -------------------------------------------------------------------------- *)
-
 (* ########################################################################## *)
-(* ###      WARNING:  DEPRECATED API BELOW THIS LINE                      ### *)
+(* ###      WARNING:  DEPRECATED API                                      ### *)
 (* ########################################################################## *)
 
 (**/**)

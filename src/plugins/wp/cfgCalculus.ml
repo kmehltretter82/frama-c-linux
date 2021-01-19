@@ -65,7 +65,7 @@ let get_default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
     try
       let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
-      WpAnnot.get_requires kf Kglobal bhv
+      CfgAnnot.get_requires kf Kglobal bhv
     with Not_found -> []
 
 (* -------------------------------------------------------------------------- *)
@@ -197,7 +197,7 @@ struct
     try
       env.ki <- Kstmt s ;
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let ca = WpAnnot.get_code_assertions env.kf s in
+      let ca = CfgAnnot.get_code_assertions env.kf s in
       let pi =
         W.label env.we (Some s) (Clabels.stmt s) @@
         List.fold_right (prove_property env) ca.code_verified @@
@@ -219,11 +219,11 @@ struct
         W.switch env.we s value
           (List.map (fun (e,v) -> [e], wp env v) cases)
           (wp env default)
-    | Loop _ -> loop env a s (WpAnnot.get_loop_contract env.kf s)
+    | Loop _ -> loop env a s (CfgAnnot.get_loop_contract env.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
-  and loop env a s (lc : WpAnnot.loop_contract) : W.t_prop =
+  and loop env a s (lc : CfgAnnot.loop_contract) : W.t_prop =
     begin
       let loop_current = Clabels.loop_current s in
       W.label env.we None loop_current @@
@@ -281,7 +281,7 @@ struct
         end
 
   and call env s r kf es wr : W.t_prop =
-    let c = WpAnnot.get_call_contract kf in
+    let c = CfgAnnot.get_call_contract kf in
     let filter ps = List.filter (is_selected env ~goal:false) ps in
     let w_call = W.call env.we s r kf es
         ~pre:(filter c.call_pre)
@@ -293,7 +293,7 @@ struct
       let pre =
         List.filter_map (fun p ->
             if is_selected env ~goal:true p then
-              Some (WpAnnot.get_precond_at kf s p)
+              Some (CfgAnnot.get_precond_at kf s p)
             else None
           ) c.call_pre
       in W.call_goal_precond env.we s kf es ~pre w_call
@@ -317,7 +317,7 @@ struct
     } in
     let xs = Kernel_function.get_formals kf in
     let req = get_default_requires mode kf in
-    let bhv = WpAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
+    let bhv = CfgAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
     env.we ,
     (* global init *)
     W.close env.we @@

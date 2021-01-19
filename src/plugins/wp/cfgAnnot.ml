@@ -1,0 +1,280 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2020                                               *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+
+(* -------------------------------------------------------------------------- *)
+(* --- Property Accessors : Behaviors                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+type behavior = {
+  bhv_assumes: WpPropId.pred_info list ;
+  bhv_requires: WpPropId.pred_info list ;
+  bhv_ensures: WpPropId.pred_info list ;
+  bhv_exits: WpPropId.pred_info list ;
+  bhv_assigns: WpPropId.assigns_full_info ;
+}
+
+let normalize_assumes kf ki h =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_pre
+    | Kstmt s -> L.labels_stmt_pre kf s in
+  L.preproc_annot labels h
+
+let implies ?assumes p =
+  match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
+
+let normalize_pre kf ki bhv ?assumes ip =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_pre
+    | Kstmt s -> L.labels_stmt_pre kf s in
+  let id = WpPropId.mk_pre_id kf ki bhv ip in
+  let p = L.preproc_annot labels ip.ip_content.tp_statement in
+  id, implies ?assumes p
+
+let normalize_post kf ki bhv tk ?assumes ip =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_post
+    | Kstmt s -> L.labels_stmt_post kf s in
+  let id = WpPropId.mk_post_id kf ki bhv (tk,ip) in
+  let p = L.preproc_annot labels ip.ip_content.tp_statement in
+  id , implies ?assumes p
+
+let normalize_froms kf ki froms =
+  let module L = NormAtLabels in
+  let labels =
+    match ki with
+    | Kglobal -> L.labels_fct_assigns
+    | Kstmt s -> L.labels_stmt_assigns kf s in
+  L.preproc_assigns labels froms
+
+let normalize_assigns kf ki bhv ~active = function
+  | WritesAny -> WpPropId.empty_assigns_info
+  | Writes froms ->
+      let aid = match ki with
+        | Kglobal -> WpPropId.mk_fct_assigns_id kf bhv Normal froms
+        | Kstmt s -> WpPropId.mk_stmt_assigns_id kf s active bhv froms in
+      match aid with
+      | None -> WpPropId.empty_assigns_info
+      | Some id ->
+          let assigns = normalize_froms kf ki froms in
+          let desc = match ki with
+            | Kglobal -> WpPropId.mk_kf_assigns_desc assigns
+            | Kstmt s -> WpPropId.mk_stmt_assigns_desc s assigns
+          in  WpPropId.mk_assigns_info id desc
+
+let get_requires kf ki bhv =
+  List.map (normalize_pre kf ki bhv) bhv.b_requires
+
+let get_behavior kf ki ~active bhv =
+  let pre_cond = normalize_pre kf ki bhv in
+  let post_cond tk (kind,ip) =
+    if kind = tk then Some (normalize_post kf ki bhv tk ip) else None in
+  let assigns = normalize_assigns kf ki bhv ~active bhv.b_assigns in
+  {
+    bhv_assumes = List.map pre_cond bhv.b_assumes;
+    bhv_requires = List.map pre_cond bhv.b_requires;
+    bhv_ensures = List.filter_map (post_cond Normal) bhv.b_post_cond ;
+    bhv_exits = List.filter_map (post_cond Exits) bhv.b_post_cond ;
+    bhv_assigns = assigns ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Called Contract                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+(*TODO: put it in Status_by_call ? *)
+module AllPrecondStatus =
+  State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
+    (struct
+      let name = "Call Preconditions Proxy Generated"
+      let dependencies = [Ast.self]
+      let size = 32
+    end)
+
+let setup_preconditions kf =
+  if not (AllPrecondStatus.mem kf) then
+    begin
+      AllPrecondStatus.add kf () ;
+      Statuses_by_call.setup_all_preconditions_proxies kf ;
+    end
+
+type call_contract = {
+  call_pre : WpPropId.pred_info list ;
+  call_post : WpPropId.pred_info list ;
+  call_exit : WpPropId.pred_info list ;
+  call_assigns : Cil_types.assigns ;
+}
+
+let get_precond_at kf stmt (id,p) =
+  let pi = WpPropId.property_of_id id in
+  let pi_at = Statuses_by_call.precondition_at_call kf pi stmt in
+  let id_at = WpPropId.mk_call_pre_id kf stmt pi pi_at in
+  id_at , p
+
+let get_call_contract kf =
+  let cpre : WpPropId.pred_info list ref = ref [] in
+  let cpost : WpPropId.pred_info list ref = ref [] in
+  let cexit : WpPropId.pred_info list ref = ref [] in
+  let cwrites = ref [] in
+  let add c f x = c := (f x) :: !c in
+  setup_preconditions kf ;
+  List.iter
+    begin fun bhv ->
+      let assumes =
+        normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv) in
+      let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
+      let mk_post = normalize_post kf Kglobal bhv ~assumes in
+      List.iter (add cpre @@ mk_pre) bhv.b_requires ;
+      List.iter
+        (fun (tk,ip) ->
+           add (if tk = Returns then cpost else cexit) (mk_post tk) ip
+        ) bhv.b_post_cond ;
+      match bhv.b_assigns with
+      | WritesAny -> ()
+      | Writes froms ->
+          let assigns = normalize_froms kf Kglobal froms in
+          cwrites := List.rev_append assigns !cwrites ;
+    end (Annotations.behaviors kf) ;
+  {
+    call_pre = List.rev !cpre ;
+    call_post = List.rev !cpost ;
+    call_exit = List.rev !cexit ;
+    call_assigns =
+      match List.rev !cwrites with [] -> WritesAny | ws -> Writes ws ;
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Code Assertions                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type code_assertions = {
+  code_admitted: WpPropId.pred_info list ;
+  code_verified: WpPropId.pred_info list ;
+}
+
+let reverse_code_assertions a = {
+  code_admitted = List.rev a.code_admitted ;
+  code_verified = List.rev a.code_verified ;
+}
+
+let get_code_assertions kf stmt : code_assertions =
+  let labels = NormAtLabels.labels_assert_before ~kf stmt in
+  let normalize_pred p = NormAtLabels.preproc_annot labels p in
+  reverse_code_assertions @@
+  Annotations.fold_code_annot
+    begin fun _emitter ca l ->
+      match ca.annot_content with
+      | AAssert(_,a) ->
+          let p =
+            WpPropId.mk_assert_id kf stmt ca ,
+            normalize_pred a.tp_statement
+          in if a.tp_only_check then {
+            l with code_verified = p :: l.code_verified ;
+          } else {
+            code_admitted = p :: l.code_admitted ;
+            code_verified = p :: l.code_verified ;
+          }
+      | _ -> l
+    end stmt {
+    code_admitted = [];
+    code_verified = [];
+  }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Loop Invariants                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+type loop_contract = {
+  (* to be verified at loop entry *)
+  loop_established: WpPropId.pred_info list;
+  (* to be assumed for loop current *)
+  loop_invariants: WpPropId.pred_info list;
+  (* to be verified after loop body *)
+  loop_preserved: WpPropId.pred_info list;
+  (* assigned by loop body *)
+  loop_assigns: WpPropId.assigns_full_info list;
+}
+
+let reverse_loop_contract l = {
+  loop_established = List.rev l.loop_established ;
+  loop_invariants = List.rev l.loop_invariants ;
+  loop_preserved = List.rev l.loop_preserved ;
+  loop_assigns = List.rev l.loop_assigns ;
+}
+
+let get_loop_contract kf stmt : loop_contract =
+  let labels = NormAtLabels.labels_loop stmt in
+  let normalize_pred p = NormAtLabels.preproc_annot labels p in
+  let normalize_annot (i,p) = i, normalize_pred p in
+  let normalize_assigns w = NormAtLabels.preproc_assigns labels w in
+  reverse_loop_contract @@
+  Annotations.fold_code_annot
+    begin fun _emitter ca l ->
+      match ca.annot_content with
+      | AInvariant(_,true,inv) ->
+          let p = normalize_pred inv.tp_statement in
+          let g_est = WpPropId.mk_loop_inv_id kf stmt ~established:true ca in
+          let g_ind = WpPropId.mk_loop_inv_id kf stmt ~established:false ca in
+          if inv.tp_only_check then
+            { l with
+              loop_established = (g_est,p) :: l.loop_established ;
+              loop_preserved   = (g_ind,p) :: l.loop_preserved }
+          else
+            let g_hyp = WpPropId.mk_inv_hyp_id kf stmt ca in
+            { l with
+              loop_established = (g_est,p) :: l.loop_established ;
+              loop_invariants  = (g_hyp,p) :: l.loop_invariants ;
+              loop_preserved   = (g_ind,p) :: l.loop_preserved }
+      | AVariant(term, None) ->
+          let vpos , vdec = WpStrategy.mk_variant_properties kf stmt ca term in
+          { l with loop_preserved =
+                     normalize_annot vdec ::
+                     normalize_annot vpos ::
+                     l.loop_preserved }
+      | AAssigns(_,WritesAny) ->
+          let asgn = WpPropId.mk_loop_any_assigns_info stmt in
+          { l with loop_assigns = asgn :: l.loop_assigns }
+      | AAssigns(_,Writes w) ->
+          begin match WpPropId.mk_loop_assigns_id kf stmt ca w with
+            | None -> l (* shall not occur *)
+            | Some id ->
+                let w = normalize_assigns w in
+                let a = WpPropId.mk_loop_assigns_desc stmt w in
+                let asgn = WpPropId.mk_assigns_info id a in
+                { l with loop_assigns = asgn :: l.loop_assigns }
+          end
+      | _ -> l
+    end stmt {
+    loop_established = [] ;
+    loop_invariants = [] ;
+    loop_preserved = [] ;
+    loop_assigns = [] ;
+  }
+
+(* -------------------------------------------------------------------------- *)
