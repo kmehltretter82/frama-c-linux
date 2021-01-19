@@ -128,41 +128,6 @@ let is_invalid pf =
   pf.invalid && not (is_proved pf)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Function Contracts                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* Properties for kf-conditions of termination-kind 'tkind' *)
-let get_called_postconds (tkind:termination_kind) kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       List.fold_left
-         (fun properties postcond ->
-            if tkind = fst postcond then
-              let pid_spec = Property.ip_of_ensures kf Kglobal bhv postcond in
-              pid_spec :: properties
-            else properties)
-         properties bhv.b_post_cond)
-    []
-    bhvs
-
-let get_called_post_conditions = get_called_postconds Cil_types.Normal
-let get_called_exit_conditions = get_called_postconds Cil_types.Exits
-
-(** Properties for assigns of kf *)
-let get_called_assigns kf =
-  let bhvs = Annotations.behaviors kf in
-  List.fold_left
-    (fun properties bhv ->
-       if Cil.is_default_behavior bhv then
-         match Property.ip_assigns_of_behavior kf Kglobal [] bhv with
-         | None -> properties
-         | Some ip -> ip :: properties
-       else properties)
-    []
-    bhvs
-
-(* -------------------------------------------------------------------------- *)
 (* --- Preconditions at Callsites                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -184,9 +149,6 @@ let preconditions_at_call s = function
       let aux (pre, pre_call) = WpPropId.mk_call_pre_id kf s pre pre_call in
       List.map aux preconds
   | Cil2cfg.Dynamic _ -> []
-
-let get_called_preconditions_at kf stmt =
-  List.map snd (call_preconditions kf stmt)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Behaviors                                     --- *)

@@ -56,15 +56,6 @@ val dependencies : proof -> Property.t list
 val filter_status : prop_id -> bool
 
 (* -------------------------------------------------------------------------- *)
-(* --- Property Accessors : Function Calls                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-val get_called_preconditions_at : kernel_function -> stmt -> Property.t list
-val get_called_post_conditions : kernel_function -> Property.t list
-val get_called_exit_conditions : kernel_function -> Property.t list
-val get_called_assigns : kernel_function -> Property.t list
-
-(* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Behaviors                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
