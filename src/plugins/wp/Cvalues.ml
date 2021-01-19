@@ -147,11 +147,9 @@ module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
           Wp_parameters.fatal
             "Asking for opaque struct length on non opaque struct" ;
         let result = Lang.t_int in
-        let name = "BytesLength" in
-        let size =
-          Lang.(generated_f ~params:[] ~result "%s_of_%s" name (comp_id c))
-        in
-        (* Registration *)
+        let f_name = "BytesLength_of_" ^ (comp_id c) in
+        let l_name = "Positive_" ^ f_name in
+        let size = Lang.generated_f ~params:[] ~result "%s" f_name in
         Definitions.define_symbol {
           d_cluster = Definitions.compinfo c ;
           d_lfun = size ; d_types = 0 ; d_params = [] ;
@@ -159,8 +157,7 @@ module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
         } ;
         let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
         Definitions.define_lemma {
-          l_kind = `Axiom ;
-          l_name = "Positive_" ^ name ^ "_of_" ^ Lang.comp_id c ;
+          l_kind = `Axiom ; l_name ;
           l_types = 0 ; l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
           l_lemma = Lang.F.(p_leq min_size (e_fun size []))
