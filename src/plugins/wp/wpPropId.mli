@@ -281,3 +281,33 @@ val subproof_idx : prop_id -> int
 val get_induction : prop_id -> stmt option
 
 (*----------------------------------------------------------------------------*)
+
+(*----------------------------------------------------------------------------*)
+
+(** A proof accumulator for a set of related prop_id *)
+type proof
+
+val create_proof : prop_id -> proof
+(** to be used only once for one of the related prop_id *)
+
+val add_proof : proof -> prop_id -> Property.t list -> unit
+(** accumulate in the proof the partial proof for this prop_id *)
+
+val add_invalid_proof : proof -> unit
+(** add an invalid proof result ; can not revert a complete proof *)
+
+val is_composed : proof -> bool
+(** whether a proof needs several lemma to be complete *)
+
+val is_proved : proof -> bool
+(** whether all partial proofs have been accumulated or not *)
+
+val is_invalid : proof -> bool
+(** whether an invalid proof result has been registered or not *)
+
+val target : proof -> Property.t
+val dependencies : proof -> Property.t list
+
+val filter_status : prop_id -> bool
+
+(*----------------------------------------------------------------------------*)

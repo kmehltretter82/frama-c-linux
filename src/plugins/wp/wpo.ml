@@ -578,7 +578,7 @@ type system = {
   mutable wpo_ip : WPOset.t Pmap.t ; (* ip -> WPOs *)
   mutable age : int WPOmap.t ; (* wpo -> age *)
   mutable results : Results.t WPOmap.t ; (* results collector *)
-  proofs : WpAnnot.proof Hproof.t ; (* proof collector *)
+  proofs : WpPropId.proof Hproof.t ; (* proof collector *)
 }
 
 let create_system () =
@@ -707,11 +707,11 @@ let get_proof g =
     try
       let proof = Hproof.find system.proofs (proof g target) in
       if is_smoke_test g then
-        if WpAnnot.is_proved proof then `Failed else
-        if WpAnnot.is_invalid proof then `Passed else
+        if WpPropId.is_proved proof then `Failed else
+        if WpPropId.is_invalid proof then `Passed else
           `Unknown
       else
-      if WpAnnot.is_proved proof then `Passed else `Unknown
+      if WpPropId.is_proved proof then `Passed else `Unknown
     with Not_found -> `Unknown
   in status , target
 
@@ -741,7 +741,7 @@ let find_proof system g =
   let pi = proof g (WpPropId.property_of_id g.po_pid) in
   try Hproof.find system.proofs pi
   with Not_found ->
-    let proof = WpAnnot.create_proof g.po_pid in
+    let proof = WpPropId.create_proof g.po_pid in
     Hproof.add system.proofs pi proof ; proof
 
 let clear_results g =
@@ -768,18 +768,18 @@ let set_result g p r =
       let smoke = is_smoke_test g in
       let proof = find_proof system g in
       let emitter = WpContext.get_emitter g.po_model in
-      let target = WpAnnot.target proof in
-      let unproved = not (WpAnnot.is_proved proof) in
+      let target = WpPropId.target proof in
+      let unproved = not (WpPropId.is_proved proof) in
       if VCS.is_valid r then
-        WpAnnot.add_proof proof g.po_pid (get_depend g)
+        WpPropId.add_proof proof g.po_pid (get_depend g)
       else if smoke then
-        WpAnnot.add_invalid_proof proof ;
-      let proved = WpAnnot.is_proved proof in
+        WpPropId.add_invalid_proof proof ;
+      let proved = WpPropId.is_proved proof in
       let status =
         if smoke then
           if proved
           then Property_status.False_if_reachable (* All goals SAT *)
-          else if WpAnnot.is_invalid proof
+          else if WpPropId.is_invalid proof
           then Property_status.True (* Some goal is UNSAT *)
           else Property_status.Dont_know (* Not finished yet *)
         else
@@ -787,7 +787,7 @@ let set_result g p r =
         then Property_status.True
         else Property_status.Dont_know
       in
-      let hyps = if smoke then [] else WpAnnot.dependencies proof in
+      let hyps = if smoke then [] else WpPropId.dependencies proof in
       Property_status.emit emitter ~hyps target status ;
       if smoke && unproved && proved then set_doomed emitter g.po_pid ;
   end

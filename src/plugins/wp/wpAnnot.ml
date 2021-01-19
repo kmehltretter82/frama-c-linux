@@ -63,70 +63,6 @@ let set_unreachable pid =
   in
   List.iter emit pids
 
-(*----------------------------------------------------------------------------*)
-(* Proofs                                                                     *)
-(*----------------------------------------------------------------------------*)
-
-type proof = {
-  target : Property.t ;
-  proved : proofpart array ;
-  mutable invalid : bool ;
-  mutable dependencies : Property.Set.t ;
-} and proofpart =
-    | Noproof
-    | Complete
-    | Parts of Bitvector.t
-
-let target p = p.target
-let dependencies p =
-  Property.Set.elements (Property.Set.remove p.target p.dependencies)
-
-let create_proof ip =
-  let n = WpPropId.subproofs ip in
-  {
-    target = WpPropId.property_of_id ip ;
-    proved = Array.make n Noproof ;
-    dependencies = Property.Set.empty ;
-    invalid = false ;
-  }
-
-let add_proof pf ip hs =
-  begin
-    if not (Property.equal (WpPropId.property_of_id ip) pf.target)
-    then Wp_parameters.fatal "Partial proof inconsistency" ;
-    List.iter
-      (fun iph ->
-         if not (WpPropId.is_requires iph) then
-           pf.dependencies <- Property.Set.add iph pf.dependencies
-      ) hs ;
-    let k = WpPropId.subproof_idx ip in
-    match WpPropId.parts_of_id ip with
-    | None -> pf.proved.(k) <- Complete
-    | Some(p,n) ->
-        match pf.proved.(k) with
-        | Complete -> ()
-        | Noproof ->
-            let bv = Bitvector.create n in
-            Bitvector.set_range bv 0 (p-1) ;
-            Bitvector.set_range bv (p+1) (n-1) ;
-            pf.proved.(k) <- Parts bv
-        | Parts bv ->
-            Bitvector.clear bv p ;
-            if Bitvector.is_empty bv
-            then pf.proved.(k) <- Complete
-  end
-
-let add_invalid_proof pf = pf.invalid <- true
-
-let is_composed pf =
-  Array.length pf.proved > 1
-
-let is_proved pf =
-  Array.for_all (function Complete -> true | _ -> false) pf.proved
-
-let is_invalid pf =
-  pf.invalid && not (is_proved pf)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Preconditions at Callsites                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -520,23 +456,9 @@ let filter_speconly config pid =
     | _ -> false
   else true
 
-let filter_status pid =
-  Wp_parameters.StatusAll.get () ||
-  begin
-    let module C = Property_status.Consolidation in
-    match C.get (WpPropId.property_of_id pid) with
-    | C.Never_tried -> true
-    | C.Considered_valid | C.Inconsistent _ -> false
-    | C.Valid _ | C.Valid_under_hyp _
-    | C.Invalid_but_dead _ | C.Valid_but_dead _ | C.Unknown_but_dead _ ->
-        Wp_parameters.StatusTrue.get ()
-    | C.Unknown _ -> Wp_parameters.StatusMaybe.get ()
-    | C.Invalid _ | C.Invalid_under_hyp _ -> Wp_parameters.StatusFalse.get ()
-  end
-
 let filter_configstatus config pid =
   (match config.asked_prop with IdProp _ -> true | _ -> false) ||
-  (filter_status pid)
+  (WpPropId.filter_status pid)
 
 let filter_asked config pid =
   match config.asked_prop with
@@ -1505,7 +1427,7 @@ let process_unreached_annots cfg =
   let kf = Cil2cfg.cfg_kf cfg in
   let spec = Annotations.funspec kf in
   let add_id acc id =
-    if filter_status id then id::acc
+    if WpPropId.filter_status id then id::acc
     else (* non-selected property : nothing to do *) acc
   in
   let do_post b tk acc (termk, _ as p) =

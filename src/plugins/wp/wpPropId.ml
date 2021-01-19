@@ -1112,3 +1112,87 @@ let get_induction p =
   | PKEstablished|PKVarDecr|PKVarPos|PKPreserved ->
       (match get_stmt (property_of_id p) with
        | None -> None | Some (_, s) -> Some s)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Filter according to status                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let filter_status pid =
+  Wp_parameters.StatusAll.get () ||
+  begin
+    let module C = Property_status.Consolidation in
+    match C.get (property_of_id pid) with
+    | C.Never_tried -> true
+    | C.Considered_valid | C.Inconsistent _ -> false
+    | C.Valid _ | C.Valid_under_hyp _
+    | C.Invalid_but_dead _ | C.Valid_but_dead _ | C.Unknown_but_dead _ ->
+        Wp_parameters.StatusTrue.get ()
+    | C.Unknown _ -> Wp_parameters.StatusMaybe.get ()
+    | C.Invalid _ | C.Invalid_under_hyp _ -> Wp_parameters.StatusFalse.get ()
+  end
+
+(*----------------------------------------------------------------------------*)
+(* Proofs Management                                                          *)
+(*----------------------------------------------------------------------------*)
+
+type proof = {
+  target : Property.t ;
+  proved : proofpart array ;
+  mutable invalid : bool ;
+  mutable dependencies : Property.Set.t ;
+} and proofpart =
+    | Noproof
+    | Complete
+    | Parts of Bitvector.t
+
+let target p = p.target
+let dependencies p =
+  Property.Set.elements (Property.Set.remove p.target p.dependencies)
+
+let create_proof ip =
+  let n = subproofs ip in
+  {
+    target = property_of_id ip ;
+    proved = Array.make n Noproof ;
+    dependencies = Property.Set.empty ;
+    invalid = false ;
+  }
+
+let add_proof pf ip hs =
+  begin
+    if not (Property.equal (property_of_id ip) pf.target)
+    then Wp_parameters.fatal "Partial proof inconsistency" ;
+    List.iter
+      (fun iph ->
+         if not (is_requires iph) then
+           pf.dependencies <- Property.Set.add iph pf.dependencies
+      ) hs ;
+    let k = subproof_idx ip in
+    match parts_of_id ip with
+    | None -> pf.proved.(k) <- Complete
+    | Some(p,n) ->
+        match pf.proved.(k) with
+        | Complete -> ()
+        | Noproof ->
+            let bv = Bitvector.create n in
+            Bitvector.set_range bv 0 (p-1) ;
+            Bitvector.set_range bv (p+1) (n-1) ;
+            pf.proved.(k) <- Parts bv
+        | Parts bv ->
+            Bitvector.clear bv p ;
+            if Bitvector.is_empty bv
+            then pf.proved.(k) <- Complete
+  end
+
+let add_invalid_proof pf = pf.invalid <- true
+
+let is_composed pf =
+  Array.length pf.proved > 1
+
+let is_proved pf =
+  Array.for_all (function Complete -> true | _ -> false) pf.proved
+
+let is_invalid pf =
+  pf.invalid && not (is_proved pf)
+
+(* -------------------------------------------------------------------------- *)

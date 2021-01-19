@@ -97,13 +97,13 @@ let add_lemmas cc = function
       LogicUsage.iter_lemmas
         (fun lem ->
            let idp = WpPropId.mk_lemma_id lem in
-           if WpAnnot.filter_status idp then cc#add_lemma lem)
+           if WpPropId.filter_status idp then cc#add_lemma lem)
   | Some ps ->
       if List.mem "-@lemmas" ps then ()
       else LogicUsage.iter_lemmas
           (fun lem ->
              let idp = WpPropId.mk_lemma_id lem in
-             if WpAnnot.filter_status idp && WpPropId.select_by_name ps idp
+             if WpPropId.filter_status idp && WpPropId.select_by_name ps idp
              then cc#add_lemma lem)
 
 let compute_kf cc ?kf ?bhv ?prop () =
