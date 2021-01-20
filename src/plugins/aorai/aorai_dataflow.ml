@@ -430,7 +430,7 @@ module Computer(I: Init) = struct
 
   let do_call s f args (state,loops as d) =
     let kf = Globals.Functions.get f in
-    if Data_for_aorai.isIgnoredFunction kf
+    if not (Data_for_aorai.isObservableFunction kf)
     then d (* we simply skip ignored functions. *)
     else begin
       set_call_state s state;
