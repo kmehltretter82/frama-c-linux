@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 #########################
 
+-* WP         [2020-01-20] Fixes opaque structures handling
 - TIP         [2020-11-06] New tactic: Sequence unrolling
 - TIP         [2020-11-05] New tactic: Induction
 - WP          [2020-11-04] Removed option -wp-bits (now always enabled)

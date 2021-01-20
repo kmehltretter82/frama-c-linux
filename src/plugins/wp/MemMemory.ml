@@ -426,20 +426,20 @@ type range =
 
 let range ~shift ~addrof ~sizeof = function
   | Sigs.Rloc(obj,loc) ->
-      LOC( addrof loc , F.e_int (sizeof obj) )
+      LOC( addrof loc , sizeof obj )
   | Sigs.Rrange(loc,obj,Some a,Some b) ->
       let s = sizeof obj in
       let p = addrof (shift loc obj a) in
-      let n = e_fact s (e_range a b) in
+      let n = e_mul s (e_range a b) in
       LOC( p , n )
   | Sigs.Rrange(loc,_obj,None,None) ->
       RANGE( a_base (addrof loc) , Vset.range None None )
   | Sigs.Rrange(loc,obj,Some a,None) ->
       let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range (Some (e_fact s a)) None )
+      RANGE( a_base (addrof loc) , Vset.range (Some (e_mul s a)) None )
   | Sigs.Rrange(loc,obj,None,Some b) ->
       let s = sizeof obj in
-      RANGE( a_base (addrof loc) , Vset.range None (Some (e_fact s b)) )
+      RANGE( a_base (addrof loc) , Vset.range None (Some (e_mul s b)) )
 
 let range_set = function
   | LOC(l,n) ->

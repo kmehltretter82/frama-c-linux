@@ -70,20 +70,103 @@ and constant_term t =
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t
 
+(* -------------------------------------------------------------------------- *)
+(* --- Initialization values                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+module OPAQUE_COMP_INIT = struct
+  type initialization_funs = {
+    init: lfun ;
+    uninit: lfun ;
+  }
+  include WpContext.Generator(Cil_datatype.Compinfo)
+      (struct
+        let name = "Cvalues.EmptyCompInit"
+        type key = compinfo
+        type data = initialization_funs
+        let compile c =
+          if c.cfields <> None then
+            Wp_parameters.fatal
+              "Asking for opaque struct init on non opaque struct" ;
+          let result = Lang.t_init c in
+          let generate_init name =
+            Lang.generated_f ~params:[] ~result "%s" name
+          in
+          let init = generate_init ("Initialized" ^ Lang.comp_id c) in
+          let uninit = generate_init ("Uninitialized" ^ Lang.comp_id c) in
+          (* Registration *)
+          Definitions.define_symbol {
+            d_cluster = Definitions.compinfo c ;
+            d_lfun = init ; d_types = 0 ; d_params = [] ;
+            d_definition = Logic result ;
+          } ;
+          Definitions.define_symbol {
+            d_cluster = Definitions.compinfo c ;
+            d_lfun = uninit ; d_types = 0 ; d_params = [] ;
+            d_definition = Logic result ;
+          } ;
+          { init ; uninit }
+      end)
+end
+
+let initialized_value_opaque_comp value comp =
+  let pick_fun r =
+    if value = e_true then r.OPAQUE_COMP_INIT.init
+    else r.uninit
+  in
+  Lang.F.e_fun (pick_fun (OPAQUE_COMP_INIT.get comp)) []
+
 let rec init_value value obj =
   match obj with
   | C_int _ | C_float _ | C_pointer _ -> value
-  | C_comp ci ->
-      let make_term f =
-        Cfield (f, KInit), init_value value (object_of f.ftype)
-      in
-      Lang.F.e_record (List.map make_term (Option.get ci.cfields))
+  | C_comp ci -> init_comp_value value ci
   | C_array _ as arr ->
       Lang.F.e_const Lang.t_int
         (init_value value (object_of_array_elem arr))
+and init_comp_value value ci =
+  match ci.cfields with
+  | None -> initialized_value_opaque_comp value ci
+  | Some fields ->
+      let make f = Cfield (f, KInit), init_value value (object_of f.ftype) in
+      Lang.F.e_record (List.map make fields)
 
 let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
+
+(* -------------------------------------------------------------------------- *)
+(* --- Length of empty compinfos                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
+    (struct
+      let name = "Cvalues.EmptyCompBytesLength"
+      type key = compinfo
+      type data = lfun
+      let compile c =
+        if c.cfields <> None then
+          Wp_parameters.fatal
+            "Asking for opaque struct length on non opaque struct" ;
+        let result = Lang.t_int in
+        let f_name = "BytesLength_of_" ^ (comp_id c) in
+        let l_name = "Positive_" ^ f_name in
+        let size = Lang.generated_f ~params:[] ~result "%s" f_name in
+        Definitions.define_symbol {
+          d_cluster = Definitions.compinfo c ;
+          d_lfun = size ; d_types = 0 ; d_params = [] ;
+          d_definition = Logic result ;
+        } ;
+        let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
+        Definitions.define_lemma {
+          l_kind = `Axiom ; l_name ;
+          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_cluster = Definitions.compinfo c ;
+          l_lemma = Lang.F.(p_leq min_size (e_fun size []))
+        } ;
+        size
+    end)
+
+let bytes_length_of_opaque_comp c =
+  Lang.F.e_fun (OPAQUE_COMP_BYTES_LENGTH.get c) []
 
 (* -------------------------------------------------------------------------- *)
 
@@ -98,9 +181,10 @@ and is_constrained_obj = function
   | C_array a -> is_constrained a.arr_element
   | C_comp c -> is_constrained_comp c
 
-and is_constrained_comp c =
-  List.exists
-    (fun f -> is_constrained f.ftype) (Option.value ~default:[] c.cfields)
+and is_constrained_comp { cfields } =
+  match cfields with
+  | None -> false
+  | Some l -> List.exists (fun f -> is_constrained f.ftype) l
 
 module type CASES =
 sig
@@ -158,14 +242,17 @@ struct
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.t_comp c) in
-         let def = p_all
-             (fun f ->
-                is_typ f.ftype (e_getfield (e_var s) (Lang.Cfield (f, KValue))))
-             (Option.get c.cfields)
+         let dfun =
+           match c.cfields with
+           | None -> Logic Lang.t_prop
+           | Some fields ->
+               let value f = e_getfield (e_var s) (Lang.Cfield (f, KValue)) in
+               let def = p_all (fun f -> is_typ f.ftype (value f)) fields in
+               Predicate(Def,def)
          in {
            d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
            d_cluster = Definitions.compinfo c ;
-           d_definition = Predicate(Def,def) ;
+           d_definition = dfun ;
          })
       [s]
 
@@ -347,18 +434,23 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         let xb = Lang.freshvar ~basename tc in
         let ra = e_var xa in
         let rb = e_var xb in
-        let def = p_all
-            (fun f ->
-               let fd = Cfield (f, KValue) in
-               !equal_rec (Ctypes.object_of f.ftype)
-                 (e_getfield ra fd) (e_getfield rb fd))
-            (Option.get c.cfields)
+        let d_definition =
+          match c.cfields with
+          | None -> Logic Lang.t_prop
+          | Some fields ->
+              let def = p_all
+                  (fun f ->
+                     let fd = Cfield (f, KValue) in
+                     !equal_rec (Ctypes.object_of f.ftype)
+                       (e_getfield ra fd) (e_getfield rb fd))
+                  fields
+              in Predicate(Def, def)
         in
         (* Registration *)
         Definitions.define_symbol {
           d_cluster = Definitions.compinfo c ;
           d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-          d_definition = Predicate(Def,def) ;
+          d_definition ;
         } ; lfun
     end)
 
