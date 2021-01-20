@@ -1386,29 +1386,13 @@ struct
 
       end !groups
 
-  let lemma = L.lemma
-
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- WPO Computer                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module KFmap = Kernel_function.Map
-
-module Computer(M : Sigs.Compiler) =
-struct
-
-  module VCG = VC(M)
-  module WP = Calculus.Cfg(VCG)
-
-  let compile_lemma l = ignore (VCG.lemma l)
+  let lemma l = ignore (L.lemma l)
 
   let prove_lemma collection l =
     if l.lem_kind <> `Axiom then
       begin
         let id = WpPropId.mk_lemma_id l in
-        let def = VCG.lemma l in
+        let def = L.lemma l in
         let model = WpContext.get_model () in
         let vca = {
           Wpo.VC_Lemma.depends = l.lem_depends ;
@@ -1434,6 +1418,20 @@ struct
         Wpo.add wpo ;
         collection := Bag.append !collection wpo ;
       end
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- WPO Computer                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module KFmap = Kernel_function.Map
+
+module Computer(M : Sigs.Compiler) =
+struct
+
+  module VCG = VC(M)
+  module WP = Calculus.Cfg(VCG)
 
   let prove_strategy collection model kf strategy =
     let cfg = WpStrategy.cfg_of_strategy strategy in
@@ -1469,14 +1467,14 @@ struct
           Lang.F.release () ;
           WpContext.on_context (model,WpContext.Global)
             begin fun () ->
-              LogicUsage.iter_lemmas compile_lemma ;
-              Bag.iter (prove_lemma collection) lemmas ;
+              LogicUsage.iter_lemmas VCG.lemma ;
+              Bag.iter (VCG.prove_lemma collection) lemmas ;
             end () ;
           KFmap.iter
             (fun kf strategies ->
                WpContext.on_context (model,WpContext.Kf kf)
                  begin fun () ->
-                   LogicUsage.iter_lemmas compile_lemma ;
+                   LogicUsage.iter_lemmas VCG.lemma ;
                    Bag.iter (prove_strategy collection model kf) strategies ;
                  end ()
             ) annots ;

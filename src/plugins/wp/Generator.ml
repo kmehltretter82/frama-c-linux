@@ -48,39 +48,10 @@ let compute_ip cc ip =
         | _ -> ()
       in iter cc ip ;
       cc#compute
-
-  | IPBehavior {ib_kf; ib_bhv} ->
-      let model = cc#model in
-      let bhv = [ib_bhv.Cil_types.b_name] in
-      let assigns = WpAnnot.WithAssigns in
+  | _ ->
       List.iter cc#add_strategy
-        (WpAnnot.get_function_strategies ~model ~assigns ~bhv ib_kf) ;
+        (WpAnnot.get_property_strategies ~model:cc#model ip) ;
       cc#compute
-  | IPComplete _
-  | IPDisjoint _
-  | IPCodeAnnot _
-  | IPAllocation _
-  | IPAssigns _
-  | IPDecrease _
-  | IPPredicate _
-    ->
-      let model = cc#model in
-      let assigns = WpAnnot.WithAssigns in
-      List.iter cc#add_strategy
-        (WpAnnot.get_id_prop_strategies ~model ~assigns ip) ;
-      cc#compute
-
-  | IPFrom _
-  | IPAxiom _
-  | IPReachable _
-  | IPPropertyInstance _
-  | IPOther _
-  | IPTypeInvariant _
-  | IPGlobalInvariant _
-  | IPExtended _
-    ->
-      Wp_parameters.result "Nothing to compute for '%a'" pretty ip ;
-      Bag.empty
 
 (* -------------------------------------------------------------------------- *)
 (* --- Annotations Entry Point                                            --- *)

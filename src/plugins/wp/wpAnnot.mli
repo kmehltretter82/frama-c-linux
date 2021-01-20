@@ -34,10 +34,6 @@ open Cil_types
 
 type asked_assigns = NoAssigns | OnlyAssigns | WithAssigns
 
-val get_id_prop_strategies :
-  model:WpContext.model ->
-  ?assigns:asked_assigns -> Property.t -> WpStrategy.strategy list
-
 val get_call_pre_strategies :
   model:WpContext.model ->
   stmt -> WpStrategy.strategy list
@@ -48,5 +44,8 @@ val get_function_strategies :
   ?bhv:string list ->
   ?prop:string list ->
   Kernel_function.t -> WpStrategy.strategy list
+
+val get_property_strategies :
+  model:WpContext.model -> Property.t -> WpStrategy.strategy list
 
 (*----------------------------------------------------------------------------*)
