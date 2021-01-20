@@ -152,7 +152,7 @@ let example_msg =
                                 # That allows to perform a 'diff' command with the oracle of another test configuration:@ \
                                 #    FILTER: diff ../oracle_configuration/@@PTEST_LOG@@ @]@  \
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
-     NOFRAMAC:           @[<v 0># ??.@]@  \
+     NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
      MACRO: <name> <def> @[<v 0># set a definition to the variable @@<name>@@.@]@  \
      @]@ \
@@ -697,7 +697,10 @@ end = struct
          { current with dc_default_toplevel = s});
 
       "OPT",
-      (fun ~file:_ ~dir:_ s current ->
+      (fun ~file ~dir:_ s current ->
+         if not current.dc_framac then
+           Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by an 'OPT' directive (That NOFRAMAC directive could be misleading.).@."
+             file;
          let s = Macros.expand current.dc_macros s in
          let t =
            { toplevel = current.dc_default_toplevel;
@@ -708,12 +711,14 @@ end = struct
              timeout = current.dc_timeout }
          in
          { current with
-           (*           dc_default_toplevel = !current_default_toplevel;*)
            dc_default_log = !current_default_log;
            dc_commands = t :: current.dc_commands });
 
       "STDOPT",
       (fun ~file ~dir s current ->
+         if not current.dc_framac then
+           Format.eprintf "%s: a NOFRAMAC directive has been defined before a sub-test defined by a 'STDOPT' directive (That NOFRAMAC directive could be misleading.).@."
+             file;
          let s = Macros.expand current.dc_macros s in
          let new_top =
            List.map
@@ -744,8 +749,8 @@ end = struct
          { current with dc_exit_code = Some s });
 
       "GCC",
-      (fun ~file ~dir _ acc ->
-         Format.eprintf "%a: GCC directive (DEPRECATED)@." (SubDir.pp_file ~dir) file;
+      (fun ~file ~dir:_ _ acc ->
+         Format.eprintf "%s: GCC directive (DEPRECATED)@." file;
          acc);
 
       "COMMENT",
@@ -771,7 +776,11 @@ end = struct
          let s = Macros.expand current.dc_macros s in
          { current with dc_timeout = s });
       "NOFRAMAC",
-      (fun ~file:_ ~dir:_ _ current -> { current with dc_commands = []; dc_framac = false; });
+      (fun ~file ~dir:_ _ current ->
+         if current.dc_commands <> [] && current.dc_framac then
+           Format.eprintf "%s: a NOFRAMAC directive has the effect of ignoring previous defined sub-tests (by some 'OPT' or 'STDOPT' directives that seems misleading). @."
+             file;
+         { current with dc_commands = []; dc_framac = false; });
     ]
 
   let scan_directives dir ~file scan_buffer default =
@@ -809,10 +818,10 @@ end = struct
   (* test for a possible toplevel configuration. *)
   let current_config ~env dir =
     let default_config = default_config dir in
-    let general_config_file = SubDir.make_file dir filename in
+    let general_config_file = SubDir.make_file dir (config_name ~env filename) in
     if Sys.file_exists general_config_file
     then begin
-      if !verbosity >=3 then Format.printf "%% - Parsing global config file=%s@." general_config_file;
+      if !verbosity >=2 then Format.printf "%% Parsing global config file=%s@." general_config_file;
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
       scan_directives
         (SubDir.create ~env ~with_subdir:false Filename.current_dir_name)
@@ -821,7 +830,7 @@ end = struct
         default_config
     end
     else begin
-      if !verbosity >=3 then Format.printf "%% - There is no global config file=%s@." general_config_file;
+      if !verbosity >=2 then Format.printf "%% There is no global config file=%s@." general_config_file;
       default_config
     end
 
@@ -1309,18 +1318,18 @@ let () =
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let suites = Ptests_config.parse ~dir in
-      if !verbosity >= 1 then Format.printf "- nb config= %d@." (StringMap.cardinal suites);
+      if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
       let nbi = !nb_ignores in
       StringMap.iter (fun config_mode suites ->
-          if !verbosity >= 1 then Format.printf "- %S -> nb suites= %d@."
+          if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
               (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
           let env = { config = config_mode ; dir ; dune_alias = "" } in
           let directory = SubDir.create ~with_subdir:false ~env dir in
           let config = Test_config.current_config ~env directory in
           let config = update_dir_ref directory config in
           process ~env config suites) suites ;
-      if !verbosity >= 1 then Format.printf "- dune files= %d@." (!nb_dune_files-nb);
+      if !verbosity >= 1 then Format.printf "%% Nb dune files= %d@." (!nb_dune_files-nb);
       if (!nb_ignores-nbi) <> 0 then Format.printf "- %d ignored suite(s)@." (!nb_ignores-nbi);
     ) suites ;
   Format.printf "Total number of generated dune files: %d@." !nb_dune_files;
