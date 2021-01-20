@@ -7,7 +7,7 @@ $x2 : int;
 $y1 : int;
 $y2 : int;
 
-Error : { 0 } -> Error;
+Error : { false } -> Error;
 
 Wait1 :
   { CALL(input_status) } -> StatusReq1
@@ -129,25 +129,25 @@ DataReq1 :
 DataReq2 :
   { input_data().\result & 192 == 128 } -> Wait2
 | { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x1 := \result -> Wait3
+| { input_data().\result & 128 == 0 } $x1 := \result; -> Wait3
 ;
 
 DataReq3 :
   { input_data().\result & 192 == 128 } -> Wait2
 | { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x2 := \result -> Wait4
+| { input_data().\result & 128 == 0 } $x2 := \result; -> Wait4
 ;
 
 DataReq4 :
   { input_data().\result & 192 == 128 } -> Wait2
 | { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y1 := \result -> Wait5
+| { input_data().\result & 128 == 0 } $y1 := \result; -> Wait5
 ;
 
 DataReq5 :
   { input_data().\result & 192 == 128 } -> Wait2
 | { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y2 := \result -> Complete
+| { input_data().\result & 128 == 0 } $y2 := \result; -> Complete
 ;
 
 Complete :
