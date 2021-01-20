@@ -30,6 +30,7 @@ let ignored_suites = ref []
 type env_t = {
   config: string
 ; dir: string
+; dune_alias: string
 }
 
 module Filename = struct
@@ -119,13 +120,14 @@ let example_msg =
     "@.@[<v 0>\
      Build the dune files allowing running the test suite contained into directories (defaults to ./tests).@ @ \
      @[<v 1>\
-     Directives of <ptest_config> files:@  \
+     Directives of the \"ptests_config\" files:@  \
      # <comment>                 @[<v 0># Just a comment line.@]@  \
      DEFAULT_SUITES = <suite>... @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config\" files).@]@  \
      <mode>_SUITES = <suite>...  @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config_<mode>\" files).@]@  \
+     DUNE_ALIAS = <alias-name>   @[<v 0># The dune alias @@<alias-name> has to be used to executes the next defined suites (defaults to \"ptests\").@]@  \
      @]@ \
      @[<v 1>\
-     Directives of <test_config[_mode]> files:@  \
+     Directives of \"test_config[_<mode>]\" files:@  \
      COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
      FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
@@ -182,15 +184,18 @@ let example_msg =
      @]@ \
      @[<v 1>\
      Dune aliases related to the test:@  \
-     @@ptests                         # Tests all configurations.@  \
-     @@ptests_config                  # Tests only the default configuration.@  \
-     @@ptests_config_<configuration>  # Tests only the specified <configuration>.@  \
-     @@<PTEST_FILE>                   # Force to reproduce the corresponding test and prints the outputs.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show     # Prints related sub-test command.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show  # Prints related execnow command.@  \
+     @@<alias-name>                         # Tests all configurations related to the <alias-name>@  \
+     @@<alias-name>_config                  # Tests only the default configuration.@  \
+     @@<alias-name>_config_<configuration>  # Tests only the specified <configuration>.@  \
+     @@<PTEST_FILE>                         # Force to reproduce the corresponding test and prints the outputs.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show     # Prints the related sub-test command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show  # Prints the related execnow command.@  \
      @@<PTEST_NAME>.<PTEST_NUMBER>.diff          # Prints the difference from the related oracles.@  \
-     Note: 'dune build @<alias>' can be restricted to a test subdirectory in using:@  \
-     - 'dune build @<subdirectory>/<alias>'@  \
+     Note: the <alias-name> defaults to 'ptests'. It can be specified in different ways:@  \
+     - from the command line option '-dune-alias <alias-name>'@  \
+     - from directives in 'ptests_config' files such as 'DUNE_ALIAS = <alias-name>'@  \
+     Note: 'dune build @<alias-name>' can be restricted to a test subdirectory in using:@  \
+     - 'dune build @<subdirectory>/<alias-name>'@  \
      @]@ \
      @]"
     macro_default_options
@@ -203,6 +208,7 @@ let example_msg =
 
 let umsg = "Usage: ptests [options] [names of test suites]"
 
+let default_dune_alias = ref "ptests"
 let rec argspec =
   [
     "-v", Arg.Unit (fun () -> incr verbosity),
@@ -211,6 +217,8 @@ let rec argspec =
     "<command> Use command instead of make (DEPRECATED)";
     "-config", Arg.String (fun s -> Format.eprintf "Deprecated option -config %s" s),
     " <name> Use special configuration and oracles (DEPRECATED)";
+    "-dune-alias", Arg.String (fun s -> default_dune_alias := s),
+    " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")";
   ]
 and help_msg () = Arg.usage (Arg.align argspec) umsg
 
@@ -219,18 +227,15 @@ let fail s =
   exit 2
 
 module StringMap = Map.Make (String)
-module StringSet = Set.Make (String)
 (* parses the [tests/ptests_config] file (prefers the one related to the expected configuration name*)
 module Ptests_config: sig
 
-  val parse: dir:string -> StringSet.t StringMap.t
+  type alias = { alias : string }
+  val parse: dir:string -> alias StringMap.t StringMap.t (* config_name -> suite_name -> dune_alias *)
 
 end = struct
 
-  let add_suite map config s =
-    StringMap.update config (function | None -> Some (StringSet.of_list s)
-                                      | Some set -> Some (StringSet.union (StringSet.of_list s) set))
-      map
+  type alias = { alias : string }
 
   (** parses the [dir/ptests_config] file  *)
   let parse =
@@ -240,7 +245,22 @@ end = struct
     let regexp_comment = Str.regexp " *#" in
     fun ~dir ->
       let default_suites = ref StringMap.empty in
+      let dune_alias = ref {alias = !default_dune_alias } in
       let ptests_config = Filename.concat dir "ptests_config" in
+      let add_suite config map s =
+        let add_to suites =
+          Some (StringMap.update s (function | None -> Some !dune_alias
+                                             | Some a ->
+                                               if a.alias <> !dune_alias.alias then begin
+                                                 Format.eprintf "ERROR: %s: %s_SUITES contains already %s suite (with %s as dune alias).@"
+                                                   ptests_config config s !dune_alias.alias;
+                                                 exit 2
+                                               end;
+                                               Some a) suites)
+        in
+        StringMap.update config (function | None -> Some (StringMap.singleton s !dune_alias)
+                                          | Some suites -> add_to suites) map
+      in
       let parse_config_line =
         fun (key, value) ->
           if Str.string_match regexp_config key 0 then
@@ -249,13 +269,17 @@ end = struct
               | s -> s
             in
             let l = split_blank value in
-            default_suites := add_suite !default_suites config l
-          else if key = "IGNORE" then begin
-            incr nb_ignores;
-            ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
-            Format.eprintf "%s: %s=%s@." ptests_config key value
-          end
-          else Format.eprintf "%s: setenv (DEPRECATED): %s=%s@." ptests_config key value;
+            default_suites := List.fold_left (add_suite config) !default_suites l
+          else match key with
+            | "DUNE_ALIAS" -> (match split_blank value with
+                | [ alias ] -> dune_alias := { alias }
+                | _  ->
+                  Format.eprintf "ERROR: %s: %s=%s@." ptests_config key value;
+                  exit 2)
+            | "IGNORE" -> incr nb_ignores;
+              ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
+              Format.eprintf "%s: %s=%s@." ptests_config key value
+            | _ ->  Format.eprintf "%s: setenv (DEPRECATED): %s=%s@." ptests_config key value;
       in
       if Sys.file_exists ptests_config then begin
         let ch = open_in ptests_config in
@@ -345,9 +369,11 @@ module Macros = struct
 
   let does_expand macros s =
     if !verbosity >=5 then begin
-      Format.printf "%%     - Looking for macros in string %s@.Existing %a" s pp_macros macros;
+      Format.printf "%%     - Looking for macros in string %s@. Existing %a@." s pp_macros macros;
     end;
+    let nb_loops = ref 0 in
     let rec aux n (ptest_file_matched,s as acc) =
+      incr nb_loops ;
       if Str.string_match macro_regex s n then begin
         let macro = Str.matched_group 2 s in
         let ptest_file_matched = ptest_file_matched || macro = "PTEST_FILE" in
@@ -359,11 +385,11 @@ module Macros = struct
             new_n + 1, String.sub s 0 new_n ^ "@" ^ rest
           end else begin
             try
-              if !verbosity >= 5 then Format.printf "     - macro is %s@." macro;
+              if !verbosity >= 5 then Format.printf "%%     - macro is %s@." macro;
               let replacement =  StringMap.find macro macros in
               if !verbosity >= 4 then
-                Format.printf "     - replacement for %s is %s@." macro replacement;
-              if replacement = "@EVA_OPTIONS@ -eva-msg-key malloc -eva-warn-key malloc:weak=feedback -eva-no-alloc-returns-null" then exit 1;
+                Format.printf "%%     - replacement for %s is %s@." macro replacement;
+              if !nb_loops > 100 then fail "Possible infinite recursivity in macro expands" ;
               new_n,
               String.sub s 0 n ^ start ^ replacement ^ rest
             with
@@ -948,7 +974,7 @@ let show_cmd =
     | Some res, None     -> Format.sprintf "echo '%s > %s'" (subst cmd) res
     | Some res, Some err -> Format.sprintf "echo '%s > %s 2> %s'" (subst cmd) res err
 
-let ptests_alias ~env = config_name ~env "ptests_config"
+let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
 let filter_log_regexp = Str.regexp "@PTEST_LOG@"
 
@@ -1213,14 +1239,15 @@ let update_dir_ref dir config =
   let dc_execnow = List.map update_execnow config.dc_execnow in
   { config with dc_execnow }
 
-let process ~env default_config =
-  StringSet.iter
-    (fun suite ->
+let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
+  StringMap.iter
+    (fun suite alias ->
+       let env = { env with dune_alias = alias.Ptests_config.alias } in
        let suite = Filename.concat env.dir suite in
        let directory = SubDir.create ~with_subdir:true ~env suite in
        let result_dune_file = SubDir.make_file (SubDir.result_subdir ~env directory) "dune" in
-       if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s ...@."
-           result_dune_file suite (if env.config = "" then "" else (" and config=" ^ env.config));
+       if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
+           result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
        let dir_config =
          let config = SubDir.make_file directory Test_config.filename in
          if Sys.file_exists config
@@ -1233,7 +1260,7 @@ let process ~env default_config =
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
-       Format.fprintf result_fmt "(alias (deps (alias %s)) (name ptests))@." (ptests_alias ~env) ;
+       Format.fprintf result_fmt "(alias (deps (alias %s)) (name %s))@." (ptests_alias ~env) env.dune_alias;
        let oracle_dune_file = SubDir.make_file (SubDir.oracle_subdir ~env directory) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
@@ -1258,7 +1285,7 @@ let process ~env default_config =
          unlink ~silent:false oracle_dune_file
        end
        else nb_dune_files := !nb_dune_files +2
-    )
+    ) suites
 
 let parse_args () =
   let suites = ref [] in
@@ -1287,8 +1314,8 @@ let () =
       let nbi = !nb_ignores in
       StringMap.iter (fun config_mode suites ->
           if !verbosity >= 1 then Format.printf "- %S -> nb suites= %d@."
-              (match config_mode with "" -> "DEFAULT" | s -> s) (StringSet.cardinal suites);
-          let env = { config = config_mode ; dir } in
+              (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
+          let env = { config = config_mode ; dir ; dune_alias = "" } in
           let directory = SubDir.create ~with_subdir:false ~env dir in
           let config = Test_config.current_config ~env directory in
           let config = update_dir_ref directory config in
