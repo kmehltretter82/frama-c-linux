@@ -367,6 +367,7 @@ let build_node_writes context node =
     | {skind = Return (Some {enode = Lval lval_res},_)} as return_stmt ->
       let callstack = Callstack.push (kf,stmt) callstack in
       build_lval_deps callstack return_stmt Data lval_res
+    | {skind = Return (None, _)} -> () (* return void *)
     | _ -> assert false (* Cil invariant *)
     | exception Kernel_function.No_Statement ->
       (* the function is only a prototype *)
