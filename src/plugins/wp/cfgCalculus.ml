@@ -40,36 +40,11 @@ type assigns = WpPropId.assigns_full_info
 (* -------------------------------------------------------------------------- *)
 
 type mode = {
+  kf: kernel_function;
   bhv : funbehavior ; (* Selected behavior (None is default) *)
-  stmt : stmt option ;  (* Stmt contract under proof *)
 }
 
 type props = [ `All | `Names of string list | `PropId of Property.t ]
-
-module MODES = WpContext.StaticGenerator(Kernel_function)
-    (struct
-      type key = kernel_function
-      type data = mode list
-      let name = "Wp.CfgCalculus.Modes"
-      let compile kf =
-        Annotations.fold_behaviors
-          (fun _emitter bhv ms -> { bhv ; stmt = None } :: ms)
-          kf @@
-        List.fold_right
-          (fun stmt ms ->
-             Annotations.fold_code_annot (fun _emitter ca ms ->
-                 match ca.annot_content with
-                 | AStmtSpec(_, { spec_behavior = bs } ) ->
-                     List.fold_right (fun bhv ms -> {
-                           bhv ;
-                           stmt = Some stmt ;
-                         }::ms) bs ms
-                 | _ -> ms
-               ) stmt ms
-          ) (Kernel_function.get_definition kf).sallstmts []
-    end)
-
-let modes = MODES.get
 
 let default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
@@ -139,10 +114,8 @@ struct
   (* --- Traversal Environment --- *)
 
   type env = {
-    kf: kernel_function;
     mode: mode;
     props: props;
-    mutable ki: kinstr; (* Current localisation *)
     cfg: Cfg.automaton;
     we: W.t_env;
     wp: W.t_prop option Vhash.t; (* None is used for non-dag detection *)
@@ -189,13 +162,13 @@ struct
 
   (* --- Decomposition of WP Rules --- *)
 
-  exception NonNaturalLoop of kernel_function * kinstr
+  exception NonNaturalLoop
 
   let succ env a = G.succ_e env.cfg.graph a
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise (NonNaturalLoop(env.kf,env.ki))
+    | None -> raise NonNaturalLoop
     | Some pi -> pi
     | exception Not_found ->
         (* cut circularities *)
@@ -207,23 +180,19 @@ struct
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
-    let ki = env.ki in
     let kl = Cil.CurrentLoc.get () in
     try
-      env.ki <- Kstmt s ;
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let ca = CfgAnnot.get_code_assertions env.kf s in
+      let ca = CfgAnnot.get_code_assertions env.mode.kf s in
       let pi =
         W.label env.we (Some s) (Clabels.stmt s) @@
         List.fold_right (prove_property env) ca.code_verified @@
         List.fold_right (use_property env) ca.code_admitted @@
         control env a s
       in
-      Cil.CurrentLoc.set kl ;
-      env.ki <- ki ; pi
+      Cil.CurrentLoc.set kl ; pi
     with err ->
-      Cil.CurrentLoc.set kl ;
-      env.ki <- ki ; raise err
+      Cil.CurrentLoc.set kl ; raise err
 
   (* Branching wrt control-flow *)
   and control env a s : W.t_prop =
@@ -234,7 +203,7 @@ struct
         W.switch env.we s value
           (List.map (fun (e,v) -> [e], wp env v) cases)
           (wp env default)
-    | Loop _ -> loop env a s (CfgAnnot.get_loop_contract env.kf s)
+    | Loop _ -> loop env a s (CfgAnnot.get_loop_contract env.mode.kf s)
     | Edges -> successors env a
 
   (* Compute loops *)
@@ -322,21 +291,21 @@ struct
     wp env env.cfg.entry_point
 
   (* Putting everything together *)
-  let compute ~mode ~props kf =
+  let compute ~mode ~props =
     let env = {
-      kf ; ki = Kglobal ; mode ; props ;
-      cfg = Cfg.get_automaton kf ;
-      we = W.new_env kf ;
+      mode ; props ;
+      cfg = Cfg.get_automaton mode.kf ;
+      we = W.new_env mode.kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
     } in
-    let xs = Kernel_function.get_formals kf in
-    let req = default_requires mode kf in
-    let bhv = CfgAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
+    let xs = Kernel_function.get_formals mode.kf in
+    let req = default_requires mode mode.kf in
+    let bhv = CfgAnnot.get_behavior mode.kf Kglobal ~active:[] mode.bhv in
     env.we ,
     (* global init *)
     W.close env.we @@
-    I.process_global_init env.we kf @@
+    I.process_global_init env.we mode.kf @@
     W.scope env.we [] SC_Global @@
     (* pre-state *)
     W.label env.we None Clabels.pre @@

@@ -67,17 +67,19 @@ let create
   let legacy = default Wp_parameters.Dump.get legacy in
   let driver = default Driver.load_driver driver in
   let setup = default user_setup setup in
-  ignore legacy ;
-  let cc =
-    if dump
-    then WpGenerator.dumper ()
-    else WpGenerator.computer setup driver in
-  let the_model = cc#model in
-  object
-    method model = the_model
-    method compute_ip = WpGenerator.compute_ip cc
-    method compute_call = WpGenerator.compute_call cc
-    method compute_main = WpGenerator.compute_selection cc
-  end
+  if legacy then
+    let cc =
+      if dump
+      then WpGenerator.dumper ()
+      else WpGenerator.computer setup driver in
+    let the_model = cc#model in
+    object
+      method model = the_model
+      method compute_ip = WpGenerator.compute_ip cc
+      method compute_call = WpGenerator.compute_call cc
+      method compute_main = WpGenerator.compute_selection cc
+    end
+  else
+    CfgGenerator.generator setup driver
 
 (* -------------------------------------------------------------------------- *)

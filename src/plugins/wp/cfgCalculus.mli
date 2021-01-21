@@ -27,20 +27,16 @@ open Cil_types
 (* -------------------------------------------------------------------------- *)
 
 type mode = {
-  bhv : funbehavior ; (* Selected behavior (None is default) *)
-  stmt : stmt option ;  (* Stmt contract under proof *)
+  kf : kernel_function ; (* Selected function *)
+  bhv : funbehavior ; (* Selected behavior *)
 }
 
 type props = [ `All | `Names of string list | `PropId of Property.t ]
 
-(* Memoized *)
-val modes : kernel_function -> mode list
-
 module Make(W : Mcfg.S) :
 sig
 
-  val compute : mode:mode -> props:props -> kernel_function ->
-    W.t_env * W.t_prop
+  val compute : mode:mode -> props:props -> W.t_env * W.t_prop
 
 end
 
