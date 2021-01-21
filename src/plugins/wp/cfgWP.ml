@@ -1451,7 +1451,7 @@ struct
     object
       val mutable lemmas : LogicUsage.logic_lemma Bag.t = Bag.empty
       val mutable annots : WpStrategy.strategy Bag.t KFmap.t = KFmap.empty
-      method lemma = true
+
       method model = model
 
       method add_lemma lemma = lemmas <- Bag.append lemmas lemma

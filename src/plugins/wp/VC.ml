@@ -71,7 +71,7 @@ let () = Property_status.register_property_remove_hook remove
 
 let generator ?model () =
   let setup = match model with
-    | None -> Register.cmdline ()
+    | None -> Register.setup ()
     | Some s -> Factory.parse [s] in
   let driver = Driver.load_driver () in
   CfgWP.computer setup driver

@@ -44,7 +44,7 @@ let has_dkey (k:category) = is_debug_key_enabled k
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_generation = add_group "Goal Selection"
+let wp_generation = add_group "Goal Generator"
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()
@@ -54,6 +54,21 @@ module WP =
     let help = "Generate proof obligations for all (selected) properties."
   end)
 let () = on_reset WP.clear
+
+let () = Parameter_customize.set_group wp_generation
+module Legacy =
+  True(struct
+    let option_name = "-wp-legacy"
+    let help = "Use legacy generator engine."
+  end)
+
+let () = Parameter_customize.set_group wp_generation
+module Dump =
+  Action(struct
+    let option_name = "-wp-dump"
+    let help = "Dump WP calculus graph."
+  end)
+let () = on_reset Dump.clear
 
 let () = Parameter_customize.set_group wp_generation
 let () = Parameter_customize.do_not_save ()

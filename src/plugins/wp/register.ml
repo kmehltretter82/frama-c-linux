@@ -28,7 +28,7 @@ let wkey_smoke = Wp_parameters.register_warn_category "smoke"
 
 (* --------- Command Line ------------------- *)
 
-let cmdline () : setup =
+let setup () : setup =
   begin
     match Wp_parameters.Model.get () with
     | ["Runtime"] ->
@@ -63,12 +63,12 @@ let set_model (s:setup) =
 (* --------- WP Computer -------------------- *)
 
 let computer () =
-  if Wp_parameters.Model.get () = ["Dump"]
+  if Wp_parameters.Dump.get ()
   then begin
     Cil2cfg.Dump.process () ;
     CfgDump.create ()
   end
-  else CfgWP.computer (cmdline ()) (Driver.load_driver ())
+  else CfgWP.computer (setup ()) (Driver.load_driver ())
 
 (* ------------------------------------------------------------------------ *)
 (* --- Memory Model Hypotheses                                          --- *)
@@ -815,10 +815,7 @@ let pp_wp_parameters fmt =
     if Wp_parameters.RTE.get () then Format.pp_print_string fmt " -wp-rte" ;
     let spec = Wp_parameters.Model.get () in
     if spec <> [] && spec <> ["Typed"] then
-      ( let descr =
-          if spec = ["Dump"] then "Dump"
-          else Factory.descr (Factory.parse spec)
-        in
+      ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
     if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
         " -wp-no-let" ;

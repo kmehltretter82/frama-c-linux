@@ -273,7 +273,7 @@ class computer () =
     val mutable wptasks = []
 
     method model = model
-    method lemma = true
+
     method add_lemma (_ : LogicUsage.logic_lemma) = ()
 
     method add_strategy strategy =

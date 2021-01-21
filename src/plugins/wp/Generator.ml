@@ -20,32 +20,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Wp_parameters
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type computer =
+class type t =
   object
     method model : WpContext.model
-    method add_strategy : WpStrategy.strategy -> unit
-    method add_lemma : LogicUsage.logic_lemma -> unit
-    method compute : Wpo.t Bag.t
+    method generate_ip : Property.t -> Wpo.t Bag.t
+    method generate_kf : kernel_function -> Wpo.t Bag.t
+    method generate_call : stmt -> Wpo.t Bag.t
+    method generate_main :
+      ?fct:functions ->
+      ?bhv:string list ->
+      ?prop:string list ->
+      unit -> Wpo.t Bag.t
   end
 
-open Wp_parameters
+type computer = [ `Dump | `Legacy | `Cfg ]
 
-val compute_ip : computer -> Property.t -> Wpo.t Bag.t
-val compute_call : computer -> Cil_types.stmt -> Wpo.t Bag.t
+let make
+    ?(computer = `Cfg)
+    ?(setup: Factory.setup option)
+    ?(driver: Factory.driver option)
+    () : t =
+  ignore setup ; ignore driver ;
+  match (computer : computer) with
+  | `Cfg -> assert false
+  | `Dump -> assert false
+  | `Legacy -> assert false
 
-val compute_kf : computer ->
-  ?kf:Kernel_function.t ->
-  ?bhv:string list ->
-  ?prop:string list ->
-  unit -> Wpo.t Bag.t
-
-val compute_selection : computer ->
-  ?fct:functions ->
-  ?bhv:string list ->
-  ?prop:string list ->
-  unit -> Wpo.t Bag.t
-
+(* -------------------------------------------------------------------------- *)
