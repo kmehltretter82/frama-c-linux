@@ -27,23 +27,24 @@ open Wp_parameters
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
+(** Compute model setup from command line options. *)
+val user_setup : unit -> Factory.setup
+
 class type t =
   object
     method model : WpContext.model
-    method generate_ip : Property.t -> Wpo.t Bag.t
-    method generate_kf : kernel_function -> Wpo.t Bag.t
-    method generate_call : stmt -> Wpo.t Bag.t
-    method generate_main :
+    method compute_ip : Property.t -> Wpo.t Bag.t
+    method compute_call : stmt -> Wpo.t Bag.t
+    method compute_main :
       ?fct:functions ->
       ?bhv:string list ->
       ?prop:string list ->
       unit -> Wpo.t Bag.t
   end
 
-type computer = [ `Dump | `Legacy | `Cfg ]
-
-val make :
-  ?computer:computer ->
+val create :
+  ?dump:bool ->
+  ?legacy:bool ->
   ?setup:Factory.setup ->
   ?driver:Factory.driver ->
   unit -> t

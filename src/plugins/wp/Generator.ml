@@ -24,33 +24,75 @@ open Cil_types
 open Wp_parameters
 
 (* -------------------------------------------------------------------------- *)
+(* --- Model Setup                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let user_setup () : Factory.setup =
+  begin
+    match Wp_parameters.Model.get () with
+    | ["Runtime"] ->
+        Wp_parameters.abort
+          "Model 'Runtime' is no more available.@\nIt will be reintroduced \
+           in a future release."
+    | ["Logic"] ->
+        Wp_parameters.warning ~once:true
+          "Deprecated 'Logic' model.@\nUse 'Typed' with option '-wp-ref' \
+           instead." ;
+        {
+          mheap = Factory.Typed MemTyped.Fits ;
+          mvar = Factory.Ref ;
+          cint = Cint.Natural ;
+          cfloat = Cfloat.Real ;
+        }
+    | ["Store"] ->
+        Wp_parameters.warning ~once:true
+          "Deprecated 'Store' model.@\nUse 'Typed' instead." ;
+        {
+          mheap = Factory.Typed MemTyped.Fits ;
+          mvar = Factory.Var ;
+          cint = Cint.Natural ;
+          cfloat = Cfloat.Real ;
+        }
+    | spec -> Factory.parse spec
+  end
+
+(* -------------------------------------------------------------------------- *)
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 class type t =
   object
     method model : WpContext.model
-    method generate_ip : Property.t -> Wpo.t Bag.t
-    method generate_kf : kernel_function -> Wpo.t Bag.t
-    method generate_call : stmt -> Wpo.t Bag.t
-    method generate_main :
+    method compute_ip : Property.t -> Wpo.t Bag.t
+    method compute_call : stmt -> Wpo.t Bag.t
+    method compute_main :
       ?fct:functions ->
       ?bhv:string list ->
       ?prop:string list ->
       unit -> Wpo.t Bag.t
   end
 
-type computer = [ `Dump | `Legacy | `Cfg ]
-
-let make
-    ?(computer = `Cfg)
+let create
+    ?dump ?legacy
     ?(setup: Factory.setup option)
     ?(driver: Factory.driver option)
     () : t =
-  ignore setup ; ignore driver ;
-  match (computer : computer) with
-  | `Cfg -> assert false
-  | `Dump -> assert false
-  | `Legacy -> assert false
+  let default f = function Some v -> v | None -> f () in
+  let dump = default Wp_parameters.Dump.get dump in
+  let legacy = default Wp_parameters.Dump.get legacy in
+  let driver = default Driver.load_driver driver in
+  let setup = default user_setup setup in
+  ignore legacy ;
+  let cc =
+    if dump
+    then ( Cil2cfg.Dump.process () ; CfgDump.create () )
+    else CfgWP.computer setup driver in
+  let the_model = cc#model in
+  object
+    method model = the_model
+    method compute_ip = WpGenerator.compute_ip cc
+    method compute_call = WpGenerator.compute_call cc
+    method compute_main = WpGenerator.compute_selection cc
+  end
 
 (* -------------------------------------------------------------------------- *)

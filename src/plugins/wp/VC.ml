@@ -69,24 +69,21 @@ let () = Property_status.register_property_remove_hook remove
 (* --- Generator Interface                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let generator ?model () =
+let generator model =
   let setup = match model with
-    | None -> Register.setup ()
-    | Some s -> Factory.parse [s] in
-  let driver = Driver.load_driver () in
-  CfgWP.computer setup driver
+    | None -> None
+    | Some s -> Some (Factory.parse [s]) in
+  Generator.create ~dump:false ?setup ()
 
 let generate_ip ?model ip =
-  let gen = generator ?model () in
-  WpGenerator.compute_ip gen ip
+  (generator model)#compute_ip ip
 
-let generate_kf ?model ?(bhv=[]) kf =
-  let gen = generator ?model () in
-  WpGenerator.compute_kf gen ~bhv ~kf ()
+let generate_kf ?model ?bhv ?prop kf =
+  let kfs = Kernel_function.Set.singleton kf in
+  (generator model)#compute_main ~fct:(Fct_list kfs) ?bhv ?prop ()
 
 let generate_call ?model stmt =
-  let gen = generator ?model () in
-  WpGenerator.compute_call gen stmt
+  (generator model)#compute_call stmt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)

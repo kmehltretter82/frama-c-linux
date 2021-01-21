@@ -66,7 +66,8 @@ val iter_kf : (t -> unit) -> ?bhv:string list -> Kernel_function.t -> unit
 *)
 
 val generate_ip : ?model:string -> Property.t -> t Bag.t
-val generate_kf : ?model:string -> ?bhv:string list -> Kernel_function.t -> t Bag.t
+val generate_kf : ?model:string -> ?bhv:string list -> ?prop:string list ->
+  Kernel_function.t -> t Bag.t
 val generate_call : ?model:string -> Cil_types.stmt -> t Bag.t
 
 (** {2 Prover Interface} *)
