@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-main test_infinite_loop -fct-pdg test_infinite_loop "
    STDOPT: +"-main test_infinite_loop_2 -fct-pdg test_infinite_loop_2 "
    STDOPT: +"-main test_exit -fct-pdg test_exit "

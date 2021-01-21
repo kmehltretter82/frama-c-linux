@@ -1,5 +1,5 @@
 /* run.config
-  GCC:
+  
   STDOPT: #"-load-module pdg -eva -out -input -deps -main g"
   STDOPT: #"-load-module pdg -eva -out -input -deps -main h"
   STDOPT: #"-load-module pdg -eva -out -input -deps -main f"

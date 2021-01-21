@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: +"-eva-msg-key initial-state -eva-initialization-padding-globals no -lib-entry -main main -eva-context-depth 3 -then -main main2 -then -eva-context-width 4"
 */
 int f_int(int x);

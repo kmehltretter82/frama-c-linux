@@ -1,5 +1,5 @@
 /* run.config*
-  GCC:
+  
   STDOPT: #"-main g"
   STDOPT: #"-main h"
 */

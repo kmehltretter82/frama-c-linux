@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-fct-pdg test_struct"
    STDOPT: +"-fct-pdg test_if_simple"
    STDOPT: +"-fct-pdg test_goto_simple"

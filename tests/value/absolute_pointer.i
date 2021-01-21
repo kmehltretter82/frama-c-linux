@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-absolute-valid-range 0-0x3"
 */
 

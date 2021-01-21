@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-impact-pragma impact" +"-lib-entry" +"-main impact" +"-impact-slicing" +"-then-on 'impact slicing'" +"-print"
    */
 

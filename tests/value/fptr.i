@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -journal-disable -then -deps -out
    OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -main main_uninit -journal-disable -then -deps -out
 */

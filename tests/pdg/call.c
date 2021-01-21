@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-lib-entry -main g -pdg -pdg-dot call "
 */
 

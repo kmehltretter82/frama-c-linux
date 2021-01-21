@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: +"-eva-msg-key=summary -load-module report,scope,variadic -float-normal -no-warn-signed-overflow %{dep:idct.c} -eva-remove-redundant-alarms -eva-memexec -eva-builtin sqrt:Frama_C_sqrt,cos:Frama_C_cos -then -report -report-print-properties"
 */
 /* IEEE_1180_1990: a testbed for IDCT accuracy

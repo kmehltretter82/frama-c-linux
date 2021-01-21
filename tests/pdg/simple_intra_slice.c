@@ -1,5 +1,5 @@
 /* run.config
-   GCC:
+   
    STDOPT: +"-pdg "
 */
 /* test conçu initialement comme test pour le slicing */

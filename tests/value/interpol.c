@@ -1,5 +1,5 @@
 /* run.config*
-   GCC:
+   
    STDOPT: #"-eva-subdivide-non-linear 15"
 */
 

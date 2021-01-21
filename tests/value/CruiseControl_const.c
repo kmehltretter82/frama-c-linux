@@ -1,6 +1,6 @@
 /* run.config*
    DEPS: CruiseControl.h
-   GCC:
+   
    DONTRUN:
 */
 /*$************* SCADE_KCG KCG Version 5.1.1 (build i10) **************
