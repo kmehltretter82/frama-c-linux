@@ -2200,6 +2200,8 @@ let treat_val loc base range pred =
       let max = Logic_const.prel (Rle, loc, add max) in
       Logic_const.pand (min,max)
     | Unbounded min -> Logic_const.prel (Rle, add_cst min, loc)
+    | Unknown -> Logic_const.ptrue (* nothing is known: the loc can
+                                      take any value from then on. *)
   in
   Aorai_option.debug ~dkey:action_dkey "Action predicate: %a"
     Printer.pp_predicate res;

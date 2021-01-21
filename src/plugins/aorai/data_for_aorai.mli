@@ -301,6 +301,7 @@ type range =
     (** range bounded by a logic term (depending on program parameter). *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
+  | Unknown (** completely unknown relation. *)
 
 module Range: Datatype.S_with_collections with type t = range
 

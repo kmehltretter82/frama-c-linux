@@ -1755,6 +1755,7 @@ type range =
                            *)
   | Unbounded of int (** only the lower bound is known,
                          there is no upper bound *)
+  | Unknown (** completely unknown value. *)
 
 module Range = Datatype.Make_with_collections
   (struct
@@ -1782,11 +1783,15 @@ module Range = Datatype.Make_with_collections
             | Bounded _, _ -> 1
             | _, Bounded _ -> -1
             | Unbounded c1, Unbounded c2 -> Datatype.Int.compare c1 c2
+            | Unbounded _, _ -> 1
+            | _, Unbounded _ -> -1
+            | Unknown, Unknown -> 0
       let hash = function
         | Fixed c1 -> 2 * c1
         | Interval(c1,c2) -> 3 * (c1 + c2)
         | Bounded (c1,c2) -> 5 * (c1 + Cil_datatype.Term.hash c2)
         | Unbounded c1 -> 7 * c1
+        | Unknown -> 11
       let copy = function
         | Fixed c1 ->
           Fixed (Datatype.Int.copy c1)
@@ -1795,6 +1800,7 @@ module Range = Datatype.Make_with_collections
         | Bounded(c1,c2) ->
           Bounded(Datatype.Int.copy c1, Cil_datatype.Term.copy c2)
         | Unbounded c1 -> Unbounded (Datatype.Int.copy c1)
+        | Unknown -> Unknown
       let internal_pretty_code _ = Datatype.from_pretty_code
       let pretty fmt = function
         | Fixed c1 -> Format.fprintf fmt "%d" c1
@@ -1804,6 +1810,7 @@ module Range = Datatype.Make_with_collections
           Format.fprintf fmt "@[<2>[%d..@;%a]@]" c1
             Cil_datatype.Term.pretty c2
         | Unbounded c1 -> Format.fprintf fmt "[%d..]" c1
+        | Unknown -> Format.fprintf fmt "[..]"
       let varname _ = "r"
       let mem_project = Datatype.never_any_project
    end)
@@ -1879,6 +1886,7 @@ let merge_range loc base r1 r2 =
       let min =
         if Datatype.Int.compare min2 min1 < 0 then min2 else min1
       in Unbounded min
+    | Unknown, _ | _, Unknown -> Unknown
 
 let tlval lv = Logic_const.term (TLval lv) (Cil.typeOfTermLval lv)
 
@@ -1900,6 +1908,8 @@ let included_range range1 range2 =
     | Bounded(l1,_), Unbounded l2 -> Datatype.Int.compare l1 l2 <= 0
     | Unbounded l1, Unbounded l2 -> Datatype.Int.compare l1 l2 <= 0
     | Unbounded _, (Fixed _ | Interval _ | Bounded _) -> false
+    | _, Unknown -> true
+    | Unknown, _ -> false
 
 let unchanged loc =
   Cil_datatype.Term.Map.add loc (Fixed 0) Cil_datatype.Term.Map.empty
