@@ -120,7 +120,7 @@ export const markerVarTags: Server.GetRequest<null,tag[]>= markerVarTags_interna
 /** Data for array rows [`markerInfo`](#markerinfo)  */
 export interface markerInfoData {
   /** Entry identifier. */
-  key: Json.key<'#markerInfo'>;
+  key: string;
   /** Marker kind */
   kind: markerKind;
   /** Marker variable */
@@ -136,8 +136,7 @@ export interface markerInfoData {
 /** Loose decoder for `markerInfoData` */
 export const jMarkerInfoData: Json.Loose<markerInfoData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#markerInfo'>('#markerInfo'),
-           '#markerInfo expected'),
+    key: Json.jFail(Json.jString,'String expected'),
     kind: jMarkerKindSafe,
     var: jMarkerVarSafe,
     name: Json.jFail(Json.jString,'String expected'),
@@ -152,8 +151,8 @@ export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
 /** Natural order for `markerInfoData` */
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
-    <{ key: Json.key<'#markerInfo'>, kind: markerKind, var: markerVar,
-       name: string, descr: string, sloc: source }>({
+    <{ key: string, kind: markerKind, var: markerVar, name: string,
+       descr: string, sloc: source }>({
     key: Compare.string,
     kind: byMarkerKind,
     var: byMarkerVar,
@@ -178,8 +177,8 @@ export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_in
 
 const fetchMarkerInfo_internal: Server.GetRequest<
   number,
-  { pending: number, updated: markerInfoData[],
-    removed: Json.key<'#markerInfo'>[], reload: boolean }
+  { pending: number, updated: markerInfoData[], removed: string[],
+    reload: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchMarkerInfo',
@@ -187,21 +186,18 @@ const fetchMarkerInfo_internal: Server.GetRequest<
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jMarkerInfoData),
-            removed: Json.jList(Json.jKey<'#markerInfo'>('#markerInfo')),
+            removed: Json.jList(Json.jString),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
 /** Data fetcher for array [`markerInfo`](#markerinfo)  */
 export const fetchMarkerInfo: Server.GetRequest<
   number,
-  { pending: number, updated: markerInfoData[],
-    removed: Json.key<'#markerInfo'>[], reload: boolean }
+  { pending: number, updated: markerInfoData[], removed: string[],
+    reload: boolean }
   >= fetchMarkerInfo_internal;
 
-const markerInfo_internal: State.Array<
-  Json.key<'#markerInfo'>,
-  markerInfoData
-  > = {
+const markerInfo_internal: State.Array<string,markerInfoData> = {
   name: 'kernel.ast.markerInfo',
   getkey: ((d:markerInfoData) => d.key),
   signal: signalMarkerInfo,
@@ -210,7 +206,7 @@ const markerInfo_internal: State.Array<
   order: byMarkerInfoData,
 };
 /** Marker informations */
-export const markerInfo: State.Array<Json.key<'#markerInfo'>,markerInfoData> = markerInfo_internal;
+export const markerInfo: State.Array<string,markerInfoData> = markerInfo_internal;
 
 /** Localizable AST markers */
 export type marker =
@@ -242,7 +238,7 @@ export const byMarker: Compare.Order<marker> = Compare.structural;
 /** Location: function and marker */
 export interface location {
   /** Function */
-  function: Json.key<'#fct'>;
+  fct: Json.key<'#fct'>;
   /** Marker */
   marker: marker;
 }
@@ -250,7 +246,7 @@ export interface location {
 /** Loose decoder for `location` */
 export const jLocation: Json.Loose<location> =
   Json.jObject({
-    function: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+    fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
     marker: jMarkerSafe,
   });
 
@@ -261,8 +257,8 @@ export const jLocationSafe: Json.Safe<location> =
 /** Natural order for `location` */
 export const byLocation: Compare.Order<location> =
   Compare.byFields
-    <{ function: Json.key<'#fct'>, marker: marker }>({
-    function: Compare.string,
+    <{ fct: Json.key<'#fct'>, marker: marker }>({
+    fct: Compare.string,
     marker: byMarker,
   });
 

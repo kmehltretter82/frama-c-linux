@@ -8,7 +8,7 @@ import * as Values from 'frama-c/api/plugins/eva/values';
 import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
-import { ModelCallbacks, EvaState } from './cells';
+import { ModelCallbacks } from './cells';
 
 /* --------------------------------------------------------------------------*/
 /* --- Probe Labelling                                                    ---*/
@@ -46,6 +46,8 @@ export class Probe {
   readonly fct: string;
   readonly marker: Ast.marker;
   readonly model: ModelCallbacks;
+  next?: Probe;
+  prev?: Probe;
   transient = true;
   loading = true;
   label?: string;
@@ -57,7 +59,6 @@ export class Probe {
   byCallstacks = false;
   zoomed = false;
   zoomable = false;
-  vstate: EvaState = 'Here';
   effects = false;
   condition = false;
 
@@ -66,26 +67,30 @@ export class Probe {
     this.marker = marker;
     this.model = state;
     this.requestProbeInfo = this.requestProbeInfo.bind(this);
-    this.setTransient = this.setTransient.bind(this);
   }
 
   requestProbeInfo() {
     this.loading = true;
+    this.label = '…';
     Server
       .send(Values.getProbeInfo, this.marker)
       .then(({ code, stmt, rank, effects, condition }) => {
         this.code = code;
         this.stmt = stmt;
         this.rank = rank;
+        this.label = undefined;
         this.effects = effects;
         this.condition = condition;
-        this.vstate = effects ? 'After' : 'Here';
         this.loading = false;
+        this.updateLabel();
       })
       .catch(() => {
         this.code = '(error)';
         this.stmt = undefined;
         this.rank = undefined;
+        this.label = undefined;
+        this.effects = false;
+        this.condition = false;
         this.loading = false;
       })
       .finally(this.model.forceLayout);
@@ -95,16 +100,23 @@ export class Probe {
   // --- Internal State
   // --------------------------------------------------------------------------
 
-  setTransient(tr: boolean) {
+  setPersistent() { this.updateTransient(false); }
+  setTransient() { this.updateTransient(true); }
+
+  private updateLabel() {
+    const { transient, label, code } = this;
+    if (transient && label) {
+      LabelRing.push(label);
+      this.label = undefined;
+    }
+    if (!transient && !label && code && code.length > LabelSize)
+      this.label = newLabel();
+  }
+
+  private updateTransient(tr: boolean) {
     if (this.transient !== tr) {
       this.transient = tr;
-      if (tr && this.label) {
-        LabelRing.push(this.label);
-        this.label = undefined;
-      }
-      if (!tr && !this.label && this.code && this.code.length > LabelSize) {
-        this.label = newLabel();
-      }
+      this.updateLabel();
       this.model.forceLayout();
     }
   }
@@ -112,6 +124,7 @@ export class Probe {
   setByCallstacks(byCS: boolean) {
     if (byCS !== this.byCallstacks) {
       this.byCallstacks = byCS;
+      if (byCS) this.setPersistent();
       this.model.forceLayout();
     }
   }
@@ -121,29 +134,6 @@ export class Probe {
       this.zoomed = zoomed;
       this.model.forceLayout();
     }
-  }
-
-  setState(s: EvaState | undefined) {
-    this.vstate = s ?? 'Here';
-    this.model.forceUpdate();
-  }
-
-  // --------------------------------------------------------------------------
-  // --- Ordering
-  // --------------------------------------------------------------------------
-
-  static order(p: Probe, q: Probe): number {
-    const rp = p.rank ?? 0;
-    const rq = q.rank ?? 0;
-    if (rp < rq) return (-1);
-    if (rp > rq) return (+1);
-    const cp = p.byCallstacks;
-    const cq = q.byCallstacks;
-    if (!cp && cq) return (-1);
-    if (cp && !cq) return (+1);
-    if (p.marker < q.marker) return (-1);
-    if (p.marker > q.marker) return (+1);
-    return 0;
   }
 
 }

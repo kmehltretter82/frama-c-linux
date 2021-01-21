@@ -43,17 +43,14 @@ export const jCallstackSafe: Json.Safe<callstack> =
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> = Compare.number;
 
-const getCallstacks_internal: Server.GetRequest<
-  Json.key<'#stmt'>,
-  callstack[]
-  > = {
+const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstacks',
-  input:  Json.jKey<'#stmt'>('#stmt'),
+  input:  Json.jList(jMarker),
   output: Json.jList(jCallstack),
 };
 /** Callstacks for markers */
-export const getCallstacks: Server.GetRequest<Json.key<'#stmt'>,callstack[]>= getCallstacks_internal;
+export const getCallstacks: Server.GetRequest<marker[],callstack[]>= getCallstacks_internal;
 
 const getCallstackInfo_internal: Server.GetRequest<
   callstack,

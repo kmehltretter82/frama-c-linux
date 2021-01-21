@@ -225,7 +225,7 @@ export const alarmsTags: Server.GetRequest<null,tag[]>= alarmsTags_internal;
 /** Data for array rows [`status`](#status)  */
 export interface statusData {
   /** Entry identifier. */
-  key: Json.key<'#status'>;
+  key: Json.key<'#property'>;
   /** Full description */
   descr: string;
   /** Kind */
@@ -235,7 +235,7 @@ export interface statusData {
   /** Status */
   status: propStatus;
   /** Function */
-  function?: Json.key<'#fct'>;
+  fct?: Json.key<'#fct'>;
   /** Instruction */
   kinstr?: Json.key<'#stmt'>;
   /** Position */
@@ -251,12 +251,12 @@ export interface statusData {
 /** Loose decoder for `statusData` */
 export const jStatusData: Json.Loose<statusData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#status'>('#status'),'#status expected'),
+    key: Json.jFail(Json.jKey<'#property'>('#property'),'#property expected'),
     descr: Json.jFail(Json.jString,'String expected'),
     kind: jPropKindSafe,
     names: Json.jList(Json.jString),
     status: jPropStatusSafe,
-    function: Json.jKey<'#fct'>('#fct'),
+    fct: Json.jKey<'#fct'>('#fct'),
     kinstr: Json.jKey<'#stmt'>('#stmt'),
     source: jSourceSafe,
     alarm: Json.jString,
@@ -271,8 +271,8 @@ export const jStatusDataSafe: Json.Safe<statusData> =
 /** Natural order for `statusData` */
 export const byStatusData: Compare.Order<statusData> =
   Compare.byFields
-    <{ key: Json.key<'#status'>, descr: string, kind: propKind,
-       names: string[], status: propStatus, function?: Json.key<'#fct'>,
+    <{ key: Json.key<'#property'>, descr: string, kind: propKind,
+       names: string[], status: propStatus, fct?: Json.key<'#fct'>,
        kinstr?: Json.key<'#stmt'>, source: source, alarm?: string,
        alarm_descr?: string, predicate?: string }>({
     key: Compare.string,
@@ -280,7 +280,7 @@ export const byStatusData: Compare.Order<statusData> =
     kind: byPropKind,
     names: Compare.array(Compare.string),
     status: byPropStatus,
-    function: Compare.defined(Compare.string),
+    fct: Compare.defined(Compare.string),
     kinstr: Compare.defined(Compare.string),
     source: bySource,
     alarm: Compare.defined(Compare.string),
@@ -304,7 +304,7 @@ export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
 
 const fetchStatus_internal: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
+  { pending: number, updated: statusData[], removed: Json.key<'#property'>[],
     reload: boolean }
   > = {
   kind: Server.RqKind.GET,
@@ -313,18 +313,18 @@ const fetchStatus_internal: Server.GetRequest<
   output: Json.jObject({
             pending: Json.jFail(Json.jNumber,'Number expected'),
             updated: Json.jList(jStatusData),
-            removed: Json.jList(Json.jKey<'#status'>('#status')),
+            removed: Json.jList(Json.jKey<'#property'>('#property')),
             reload: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
 };
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: Json.key<'#status'>[],
+  { pending: number, updated: statusData[], removed: Json.key<'#property'>[],
     reload: boolean }
   >= fetchStatus_internal;
 
-const status_internal: State.Array<Json.key<'#status'>,statusData> = {
+const status_internal: State.Array<Json.key<'#property'>,statusData> = {
   name: 'kernel.properties.status',
   getkey: ((d:statusData) => d.key),
   signal: signalStatus,
@@ -333,6 +333,6 @@ const status_internal: State.Array<Json.key<'#status'>,statusData> = {
   order: byStatusData,
 };
 /** Status of Registered Properties */
-export const status: State.Array<Json.key<'#status'>,statusData> = status_internal;
+export const status: State.Array<Json.key<'#property'>,statusData> = status_internal;
 
 /* ------------------------------------- */

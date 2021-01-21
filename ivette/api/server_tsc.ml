@@ -375,10 +375,9 @@ let makeDeclaration fmt names d =
       self.name jtype js self.name;
 
 
-  | D_array { arr_key ; arr_kind } ->
+  | D_array { arr_key ; arr_kind = jkey } ->
     let data = Pkg.Derived.data self in
-    let jkey = (Pkg.Jkey arr_kind) in
-    let jrow = (Pkg.Jdata data) in
+    let jrow = Pkg.Jdata data in
     Format.fprintf fmt
       "@[<hv 2>const %s_internal: State.Array<@,%a,@,%a@,>@] = {@\n"
       self.name jtype jkey jtype jrow ;

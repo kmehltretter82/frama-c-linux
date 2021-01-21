@@ -7,7 +7,6 @@ import * as States from 'frama-c/states';
 
 import * as Dome from 'dome';
 import { readFile } from 'dome/system';
-import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
 import { Component, TitleBar } from 'frama-c/LabViews';
@@ -37,7 +36,7 @@ const SourceCode = () => {
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection] = States.useSelection();
-  const theFunction = selection?.current?.function;
+  const theFunction = selection?.current?.fct;
   const theMarker = selection?.current?.marker;
   const { buttons: themeButtons, theme, fontSize, wrapText } =
     Preferences.useThemeButtons({
@@ -72,10 +71,8 @@ const SourceCode = () => {
     }
     // Actual source code loading upon function or marker update.
     const sloc =
-      /* Non-empty [selection] has defined either marker or function: we give
-         precedence to marker as it provides more precise source location. */
-      (theMarker &&
-        markersInfo.getData(theMarker as Json.key<'#markerInfo'>)?.sloc)
+      /* markers have more precise source location */
+      (theMarker && markersInfo.getData(theMarker)?.sloc)
       ??
       (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
     if (sloc) {

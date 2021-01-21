@@ -8,18 +8,17 @@ import equal from 'react-fast-compare';
 import * as Dome from 'dome';
 
 import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
 import * as Values from 'frama-c/api/plugins/eva/values';
-import * as Ast from 'frama-c/api/kernel/ast';
 
 // Model
 import { Probe } from './probes';
 import { StacksCache, Callsite } from './stacks';
-import { ModelCallbacks, ValueCache } from './cells';
+import { ModelCallbacks, ValueCache, EvaState } from './cells';
 import { LayoutProps, LayoutEngine, Row } from './layout';
 
 export interface ModelLayout extends LayoutProps {
-  fct?: string;
-  marker?: Ast.marker;
+  location?: States.Location;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -34,37 +33,62 @@ export class Model implements ModelCallbacks {
     this.forceReload = this.forceReload.bind(this);
     this.computeLayout = this.computeLayout.bind(this);
     this.setLayout = throttle(this.setLayout.bind(this), 300);
+    this.metaSelection = this.metaSelection.bind(this);
     this.getRowKey = this.getRowKey.bind(this);
     this.getRowCount = this.getRowCount.bind(this);
     this.getRowLines = this.getRowLines.bind(this);
-    Server.onSignal(Values.changed, this.forceReload);
+    this.isFolded = this.isFolded.bind(this);
   }
 
   // --- Probes
 
+  private vstmt: EvaState = 'After';
+  private vcond: EvaState = 'Here';
   private selected?: Probe;
   private focused?: Probe;
   private callstack?: Values.callstack;
   private remanent?: Probe; // last transient
   private probes = new Map<string, Probe>();
+  private folded = new Map<string, boolean>(); // folded functions
 
   getFocused() { return this.focused; }
   isFocused(p: Probe | undefined) { return this.focused === p; }
-  isRemanent(p: Probe | undefined) { return this.remanent === p; }
 
-  getProbe(fct: string, m: Ast.marker): Probe {
-    let p = this.probes.get(m);
-    if (!p) {
-      p = new Probe(this, fct, m);
-      this.probes.set(m, p);
-      p.requestProbeInfo();
+  getProbe(location: States.Location | undefined): Probe | undefined {
+    if (!location) return undefined;
+    const { fct, marker } = location;
+    if (fct && marker) {
+      let p = this.probes.get(marker);
+      if (!p) {
+        p = new Probe(this, fct, marker);
+        this.probes.set(marker, p);
+        p.requestProbeInfo();
+      }
+      return p;
     }
-    return p;
+    return undefined;
   }
 
   getStacks(p: Probe | undefined): Values.callstack[] {
-    const stmt = p?.stmt;
-    return stmt ? this.stacks.getStacks(stmt) : [];
+    return p ? this.stacks.getStacks(p.marker) : [];
+  }
+
+  getVstmt(): EvaState { return this.vstmt; }
+  getVcond(): EvaState { return this.vcond; }
+  setVstmt(s: EvaState) { this.vstmt = s; this.forceUpdate(); }
+  setVcond(s: EvaState) { this.vcond = s; this.forceUpdate(); }
+
+  isFolded(fct: string): boolean {
+    return (this.focused?.fct !== fct) && (this.folded.get(fct) ?? false);
+  }
+
+  isFoldable(fct: string): boolean {
+    return this.focused?.fct !== fct;
+  }
+
+  setFolded(fct: string, folded: boolean) {
+    this.folded.set(fct, folded);
+    this.forceLayout();
   }
 
   // --- Caches
@@ -105,8 +129,15 @@ export class Model implements ModelCallbacks {
   }
 
   isSelectedRow(row: Row): boolean {
+    if (!this.focused?.byCallstacks) return false;
     const cs = this.callstack;
-    return cs !== undefined ? cs === row.callstack : false;
+    return cs !== undefined && cs === row.callstack;
+  }
+
+  isAlignedRow(row: Row): boolean {
+    const cs = this.callstack;
+    const cr = row.callstack;
+    return cs !== undefined && cr !== undefined && this.stacks.aligned(cs, cr);
   }
 
   getCallstack(): Values.callstack | undefined {
@@ -122,11 +153,28 @@ export class Model implements ModelCallbacks {
   setLayout(ly: ModelLayout) {
     if (!equal(this.layout, ly)) {
       this.layout = ly;
-      const { fct, marker } = ly;
-      this.selected =
-        fct && marker ? this.getProbe(fct, marker) : undefined;
+      this.selected = this.getProbe(ly.location);
       this.forceLayout();
     }
+  }
+
+  metaSelection(location: States.Location) {
+    const p = this.getProbe(location);
+    if (p) {
+      if (p.transient) {
+        if (this.focused?.byCallstacks)
+          p.setByCallstacks(true);
+        else
+          p.setPersistent();
+      }
+    }
+  }
+
+  clearSelection() {
+    this.focused = undefined;
+    this.selected = undefined;
+    this.remanent = undefined;
+    this.forceLayout();
   }
 
   // --- Recompute Layout
@@ -137,17 +185,9 @@ export class Model implements ModelCallbacks {
     const s = this.selected;
     if (!s) {
       this.focused = undefined;
-      this.callstack = undefined;
       this.remanent = undefined;
     } else if (!s.loading) {
       this.focused = s;
-      const stacks = this.getStacks(s);
-      if (s.byCallstacks) {
-        const cs0 = this.callstack;
-        if (cs0) this.callstack = stacks.find((cs) => cs === cs0);
-      } else {
-        this.callstack = stacks.length === 1 ? stacks[0] : undefined;
-      }
       if (s.code && s.transient) {
         this.remanent = s;
       } else {
@@ -164,9 +204,9 @@ export class Model implements ModelCallbacks {
       this.layout,
       this.values,
       this.stacks,
+      this.isFolded,
     );
-    toLayout.sort(Probe.order).forEach(engine.push);
-    this.rows = engine.flush();
+    this.rows = engine.layout(toLayout);
     this.laidout.emit();
     this.lock = false;
   }
@@ -196,16 +236,39 @@ export class Model implements ModelCallbacks {
   // --- Foce Update
   forceUpdate() { this.changed.emit(); }
 
+  // --- Global Signals
+
+  mount() {
+    States.MetaSelection.on(this.metaSelection);
+    Server.onSignal(Values.changed, this.forceReload);
+  }
+
+  unmount() {
+    States.MetaSelection.off(this.metaSelection);
+    Server.offSignal(Values.changed, this.forceReload);
+  }
+
 }
 
 // --------------------------------------------------------------------------
-// --- EVA Model
+// --- EVA Model Hook
 // --------------------------------------------------------------------------
 
 let MODEL: Model | undefined;
 
-export function getModelInstance(): Model {
-  if (!MODEL) MODEL = new Model();
+Server.onShutdown(() => {
+  if (MODEL) {
+    MODEL.unmount();
+    MODEL = undefined;
+  }
+});
+
+export function useModel(): Model {
+  if (!MODEL) {
+    MODEL = new Model();
+    MODEL.mount();
+  }
+  Dome.useUpdate(MODEL.changed, MODEL.laidout);
   return MODEL;
 }
 

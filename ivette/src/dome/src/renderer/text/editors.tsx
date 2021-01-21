@@ -25,7 +25,7 @@ const CSS_SELECTED = 'dome-xText-select';
 /* --------------------------------------------------------------------------*/
 
 export interface MarkerCallback {
-  (id: string): void;
+  (id: string, meta?: boolean): void;
 }
 
 /**
@@ -329,10 +329,12 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
 
   onMouseClick(evt: MouseEvt, callback: MarkerCallback | undefined) {
     // No need for throttling
-    const { target } = evt;
-    if (target instanceof Element && callback) {
-      const marker = this._findMarker(target);
-      if (marker && marker.id) callback(marker.id);
+    if (callback) {
+      const { target } = evt;
+      if (target instanceof Element) {
+        const marker = this._findMarker(target);
+        if (marker && marker.id) callback(marker.id, evt.altKey);
+      }
     }
     this.props.buffer?.setFocused(true);
   }

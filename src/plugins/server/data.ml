@@ -635,8 +635,8 @@ struct
   let get m a =
     try M.find a m.index
     with Not_found ->
-      let id = m.kid in
-      m.kid <- succ id ;
+      let id = succ m.kid in
+      m.kid <- id ;
       m.index <- M.add a id m.index ;
       Hashtbl.add m.lookup id a ; id
 

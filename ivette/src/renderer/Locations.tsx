@@ -124,7 +124,7 @@ const LocationsTable = () => {
           width={25}
           getter={(r: { id: number }) => r.id + 1}
         />
-        <Column id="function" label="Function" width={120} />
+        <Column id="fct" label="Function" width={120} />
         <Column
           id="marker"
           label="Statement"

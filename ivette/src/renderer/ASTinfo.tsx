@@ -33,7 +33,7 @@ const ASTinfo = () => {
   // Callbacks
   function onTextSelection(id: string) {
     // For now, the only markers are functions.
-    const location = { function: id };
+    const location = { fct: id };
     updateSelection({ location });
   }
 

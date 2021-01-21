@@ -384,7 +384,7 @@
     background-image: none ;
 }
 
-.dome-window-inactive .dome-xToolBar-control.dome-selected {
+.dome-window-inactive .dome-xToolBar-control.dome-selected:not(:disabled) {
     fill:  #eee;
     color: #eee;
     background-color: #ccc ;
@@ -396,14 +396,14 @@
     fill: #ccc ;
     color: #ccc ;
     border: 1px solid #bbb ;
-    background-color: #eee ;
+    background-color: #ddd ;
 }
 
 .dome-window-inactive .dome-xToolBar-control.dome-selected:disabled {
     fill: #ccc ;
     color: #ccc ;
     border-color: #ddd ;
-    background-color: #eee ;
+    background-color: #ddd ;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -433,6 +433,10 @@
 .dome-xToolBar-group > .dome-xToolBar-control:last-child {
     border-top-left-radius: 0 ;
     border-bottom-left-radius: 0 ;
+}
+
+.dome-xToolBar-group > .dome-xToolBar-control:first-child:last-child {
+    border-radius: 4px ;
 }
 
 .dome-xToolBar-group > .dome-xToolBar-control:not(:first-child):not(:last-child) {

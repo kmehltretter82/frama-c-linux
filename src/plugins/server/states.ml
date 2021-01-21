@@ -293,9 +293,14 @@ let fetch array n =
 (* --- Signature Registry                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
+let rec is_keyType = function
+  | Package.Junion js -> List.for_all is_keyType js
+  | Jstring | Jalpha | Jkey _ | Jtag _ -> true
+  | _ -> false
+
 let register_array ~package ~name ~descr ~key
     ?(keyName="key")
-    ?(keyKind=name)
+    ?(keyType=Package.Jkey name)
     ~(iter : 'a callback)
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
@@ -304,15 +309,24 @@ let register_array ~package ~name ~descr ~key
   let open Markdown in
   let href = link ~name () in
   let columns = List.rev !model in
-  if List.exists (fun (fd,_) -> fd.Package.fd_name = keyName) columns then
-    raise (Invalid_argument "States.array: key name overrides column name") ;
+  begin
+    if List.exists (fun (fd,_) -> fd.Package.fd_name = keyName) columns then
+      raise (Invalid_argument (
+          Printf.sprintf "States.array(%S) : invalid key %S"
+            name keyName
+        ));
+    if not (is_keyType keyType) then
+      raise (Invalid_argument (
+          Printf.sprintf "States.array(%S): invalid key type" name
+        ));
+  end ;
   let fields = Package.{
       fd_name = keyName ;
-      fd_type = Jkey keyKind ;
+      fd_type = keyType ;
       fd_descr = plain "Entry identifier." ;
     } :: List.map fst columns in
   let id = Package.declare_id ~package:package ~name:name ~descr
-      (D_array { arr_key = keyName ; arr_kind = keyKind }) in
+      (D_array { arr_key = keyName ; arr_kind = keyType }) in
   let signal = Request.signal
       ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for array" @ href) in
@@ -331,7 +345,7 @@ let register_array ~package ~name ~descr ~key
   let signature = Request.signature ~input:(module Jint) () in
   let module Jkeys = Jlist(struct
       include Jstring
-      let jtype = Package.Jkey keyKind
+      let jtype = keyType
     end) in
   let module Jrows = Jlist (struct
       include Jany

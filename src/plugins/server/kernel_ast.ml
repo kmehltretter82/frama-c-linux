@@ -206,7 +206,7 @@ struct
       ~package
       ~name:"markerInfo"
       ~descr:(Md.plain "Marker informations")
-      ~key:snd
+      ~key:snd ~keyType:Jstring
       ~iter model
 
   let create_tag = function
@@ -322,7 +322,7 @@ end
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
-  let fct = Record.field record ~name:"function"
+  let fct = Record.field record ~name:"fct"
       ~descr:(Md.plain "Function") (module Kf)
   let marker = Record.field record ~name:"marker"
       ~descr:(Md.plain "Marker") (module Marker)

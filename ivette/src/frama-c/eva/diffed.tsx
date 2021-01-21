@@ -50,7 +50,7 @@ export class DiffBuffer {
       if (value) {
         this.scratch += '\0'.repeat(value.length);
         this.contents.push(
-          <span className={MODIFIED} title="Modified"> {value}</span>,
+          <span className={MODIFIED} title="Modified">{value}</span>,
         );
       }
     } else if (removed) {
@@ -74,7 +74,7 @@ export class DiffBuffer {
 
   getContents(): React.ReactNode {
     this.flush();
-    return <>{React.Children.toArray(this.contents)}</>;
+    return React.Children.toArray(this.contents);
   }
 
   getScratch() {
@@ -93,17 +93,16 @@ export interface Diff2Props {
   diff: string;
 }
 
-export function Diff2(props: Diff2Props): JSX.Element {
+export function Diff2(props: Diff2Props) {
   const { text, diff } = props;
-  const contents = React.useMemo(() => {
+  const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diff) return text;
     const buffer = new DiffBuffer();
     const chunks = diffChars(text, diff);
-    // console.log('DIFF', text, diff, chunks);
     chunks.forEach(buffer.push);
     return buffer.getContents();
   }, [text, diff]);
-  return contents as JSX.Element;
+  return <>{contents}</>;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -116,9 +115,9 @@ export interface Diff3Props {
   diffB: string;
 }
 
-export function Diff3(props: Diff3Props): JSX.Element {
+export function Diff3(props: Diff3Props) {
   const { text, diffA, diffB } = props;
-  const contents = React.useMemo(() => {
+  const contents = React.useMemo<React.ReactNode>(() => {
     if (text === diffA && text === diffB) return text;
     const buffer = new DiffBuffer();
     diffChars(diffA, diffB).forEach(buffer.push);
@@ -127,7 +126,7 @@ export function Diff3(props: Diff3Props): JSX.Element {
     diffChars(text, scratch).forEach(buffer.push);
     return buffer.getContents();
   }, [text, diffA, diffB]);
-  return contents as JSX.Element;
+  return <>{contents}</>;
 }
 
 /* --------------------------------------------------------------------------*/
@@ -135,17 +134,20 @@ export function Diff3(props: Diff3Props): JSX.Element {
 /* --------------------------------------------------------------------------*/
 
 export interface DiffProps {
-  text: string;
+  text?: string;
   diff?: string;
   diffA?: string;
   diffB?: string;
 }
 
-export function Diff(props: DiffProps): JSX.Element {
+export function Diff(props: DiffProps) {
   const { text, diff, diffA, diffB } = props;
-  if (text === diff) return <>{text}</>;
-  if (diff !== undefined)
+  if (text === undefined)
+    return diff ? <>{diff}</> : null;
+  if (diff !== undefined) {
+    if (diff === text) return <>{text}</>;
     return <Diff2 text={text} diff={diff} />;
+  }
   if (diffA === undefined) {
     if (diffB === undefined) return <>{text}</>;
     return <Diff2 text={text} diff={diffB} />;
@@ -154,7 +156,6 @@ export function Diff(props: DiffProps): JSX.Element {
     return <Diff2 text={text} diff={diffA} />;
   }
   return <Diff3 text={text} diffA={diffA} diffB={diffB} />;
-
 }
 
 // --------------------------------------------------------------------------

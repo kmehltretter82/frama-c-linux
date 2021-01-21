@@ -35,6 +35,7 @@ export class Streamer {
     }
     return this.v;
   }
+
 }
 
 export class FontSizer {
@@ -73,6 +74,12 @@ export class FontSizer {
     return p + n * k;
   }
 
+  dump(x: string) {
+    const k = this.k.mean();
+    const p = this.p.mean();
+    return `${k}.${x}+${p}`;
+  }
+
 }
 
 /* --------------------------------------------------------------------------*/
@@ -102,7 +109,7 @@ export function SizedArea(props: SizedAreaProps) {
   return (
     <div
       ref={refSizer}
-      className="eva-sized-area dome-text-code"
+      className="eva-sized-area dome-text-cell"
     >
       {children}
     </div>

@@ -3,6 +3,7 @@
 // --------------------------------------------------------------------------
 
 import * as Server from 'frama-c/server';
+import * as Ast from 'frama-c/api/kernel/ast';
 import * as Values from 'frama-c/api/plugins/eva/values';
 
 import { ModelCallbacks } from './cells';
@@ -15,8 +16,12 @@ export type callstacks = Values.callstack[];
 export interface Callsite {
   callee: string;
   caller?: string;
-  stmt?: string;
+  stmt?: Ast.marker;
   rank?: number;
+}
+
+function equalSite(a: Callsite, b: Callsite): boolean {
+  return a.stmt === b.stmt && a.callee === b.callee;
 }
 
 // --------------------------------------------------------------------------
@@ -27,6 +32,7 @@ export class StacksCache {
 
   private readonly model: ModelCallbacks;
   private readonly stacks = new Map<string, callstacks>();
+  private readonly summary = new Map<string, boolean>();
   private readonly calls = new Map<Values.callstack, Callsite[]>();
 
   // --------------------------------------------------------------------------
@@ -39,17 +45,29 @@ export class StacksCache {
 
   clear() {
     this.stacks.clear();
+    this.calls.clear();
   }
 
   // --------------------------------------------------------------------------
   // --- Getters
   // --------------------------------------------------------------------------
 
-  getStacks(stmt: string): callstacks {
-    const cs = this.stacks.get(stmt);
+  getSummary(fct: string): boolean {
+    return this.summary.get(fct) ?? true;
+  }
+
+  setSummary(fct: string, s: boolean) {
+    this.summary.set(fct, s);
+    this.model.forceLayout();
+  }
+
+  getStacks(...markers: Ast.marker[]): callstacks {
+    if (markers.length === 0) return [];
+    const key = markers.join('$');
+    const cs = this.stacks.get(key);
     if (cs !== undefined) return cs;
-    this.stacks.set(stmt, []);
-    this.requestCallstacks(stmt);
+    this.stacks.set(key, []);
+    this.requestStacks(key, markers);
     return [];
   }
 
@@ -61,16 +79,30 @@ export class StacksCache {
     return [];
   }
 
+  aligned(a: Values.callstack, b: Values.callstack): boolean {
+    if (a === b) return true;
+    const ca = this.getCalls(a);
+    const cb = this.getCalls(b);
+    let ka = ca.length - 1;
+    let kb = cb.length - 1;
+    while (ka >= 0 && kb >= 0 && equalSite(ca[ka], cb[kb])) {
+      --ka;
+      --kb;
+    }
+    return ka < 0 || kb < 0;
+  }
+
   // --------------------------------------------------------------------------
   // --- Fetchers
   // --------------------------------------------------------------------------
 
-  private requestCallstacks(stmt: string) {
+  private requestStacks(key: string, markers: Ast.marker[]) {
     Server
-      .send(Values.getCallstacks, stmt)
-      .then((cs: callstacks) => {
-        this.stacks.set(stmt, cs);
+      .send(Values.getCallstacks, markers)
+      .then((stacks: callstacks) => {
+        this.stacks.set(key, stacks);
         this.model.forceLayout();
+        this.model.forceUpdate();
       });
   }
 

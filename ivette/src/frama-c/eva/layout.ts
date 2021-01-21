@@ -12,15 +12,16 @@ export interface LayoutProps {
   margin: number;
 }
 
-export type RowKind = 'probes' | 'values' | 'callstack';
+export type RowKind = 'section' | 'probes' | 'values' | 'callstack';
 
 export interface Row {
   key: string;
+  fct: string;
   kind: RowKind;
   probes: Probe[];
   headstack?: string;
-  stacks?: number;
   stackIndex?: number;
+  stackCount?: number;
   callstack?: callstack;
   hlines: number;
 }
@@ -29,8 +30,9 @@ export interface Row {
 /* --- Layout Enfine                                                      ---*/
 /* --------------------------------------------------------------------------*/
 
-const PADDING = 2;
-const INSET = 1;
+const HEAD_PADDING = 4; // Left margin
+const CELL_PADDING = 4; // Inter cell padding
+const TEXT_PADDING = 2; // Intra cell padding
 const HCROP = 18;
 const VCROP = 1;
 
@@ -38,6 +40,7 @@ export class LayoutEngine {
 
   // --- Setup
 
+  private readonly folded: (fct: string) => boolean;
   private readonly values: ValueCache;
   private readonly stacks: StacksCache;
   private readonly hcrop: number;
@@ -48,25 +51,30 @@ export class LayoutEngine {
     props: undefined | LayoutProps,
     values: ValueCache,
     stacks: StacksCache,
+    folded: (fct: string) => boolean,
   ) {
     this.values = values;
     this.stacks = stacks;
+    this.folded = folded;
     const zoom = Math.max(0, props?.zoom ?? 0);
-    this.vcrop = VCROP + 2 * zoom;
+    this.vcrop = VCROP + 3 * zoom;
     this.hcrop = HCROP + zoom;
-    this.margin = props?.margin ?? 80;
+    this.margin = (props?.margin ?? 80) - HEAD_PADDING;
     this.push = this.push.bind(this);
   }
 
   // --- Probe Buffer
-  private byStacks?: string; // stmt
+  private byFct?: string; // current function
+  private byStk?: boolean; // callstack probes
+  private skip?: boolean; // skip current function
   private rowSize: Size = EMPTY;
   private buffer: Probe[] = [];
   private rows: Row[] = [];
+  private chained?: Probe;
 
   crop(zoomed: boolean, s: Size): Size {
-    const sCols = s.cols + INSET;
-    const cols = zoomed ? sCols : Math.min(sCols, this.hcrop);
+    const s$cols = s.cols + TEXT_PADDING;
+    const cols = zoomed ? s$cols : Math.min(s$cols, this.hcrop);
     const rows = zoomed ? s.rows : Math.min(s.rows, this.vcrop);
     return {
       cols: Math.max(HCROP, cols),
@@ -74,65 +82,128 @@ export class LayoutEngine {
     };
   }
 
-  push(p: Probe) {
+  layout(ps: Probe[]): Row[] {
+    this.chained = undefined;
+    ps.sort(LayoutEngine.order).forEach(this.push);
+    return this.flush();
+  }
+
+  private static order(p: Probe, q: Probe): number {
+    const fp = p.fct;
+    const fq = q.fct;
+    if (fp === fq) {
+      const cp = p.byCallstacks;
+      const cq = q.byCallstacks;
+      if (!cp && cq) return (-1);
+      if (cp && !cq) return (+1);
+    }
+    const rp = p.rank ?? 0;
+    const rq = q.rank ?? 0;
+    if (rp < rq) return (-1);
+    if (rp > rq) return (+1);
+    if (p.marker < q.marker) return (-1);
+    if (p.marker > q.marker) return (+1);
+    return 0;
+  }
+
+  private push(p: Probe) {
+    // --- sectionning
+    const { fct, byCallstacks: stk } = p;
+    if (fct !== this.byFct) {
+      this.flush();
+      this.rows.push({
+        key: `S:${fct}`,
+        kind: 'section',
+        fct,
+        probes: [],
+        hlines: 1,
+      });
+      this.byFct = fct;
+      this.byStk = stk;
+      this.skip = this.folded(fct);
+    } else if (stk !== this.byStk) {
+      this.flush();
+      this.byStk = stk;
+    }
+    if (this.skip) return;
+    // --- chaining
+    const q = this.chained;
+    if (q) q.next = p;
+    p.prev = q;
+    this.chained = p;
+    // --- sizing
     const probeSize = this.values.getProbeSize(p.marker);
     const s = this.crop(p.zoomed, probeSize);
     p.zoomable = p.zoomed || !leq(probeSize, s);
     p.minCols = s.cols;
     p.maxCols = Math.max(p.minCols, probeSize.cols);
-    const stmt = p.byCallstacks ? p.stmt : undefined;
-    if (stmt !== this.byStacks) {
-      this.flush();
-      this.byStacks = stmt;
-    }
-    if (!stmt && s.cols + this.rowSize.cols > this.margin)
+    // --- queueing
+    if (!stk && s.cols + this.rowSize.cols > this.margin)
       this.flush();
     this.rowSize = addH(this.rowSize, s);
-    this.rowSize.cols += PADDING;
+    this.rowSize.cols += CELL_PADDING;
     this.buffer.push(p);
   }
 
   // --- Flush Rows
 
-  flush(): Row[] {
+  private flush(): Row[] {
     const ps = this.buffer;
     const rs = this.rows;
-    if (ps.length > 0) {
-      const stmt = this.byStacks;
-      if (stmt) {
+    const fct = this.byFct;
+    if (fct && ps.length > 0) {
+      const stk = this.byStk;
+      const hlines = this.rowSize.rows;
+      if (stk) {
         // --- by callstacks
-        const wcs = this.stacks.getStacks(stmt);
+        const markers = ps.map((p) => p.marker);
+        const stacks = this.stacks.getStacks(...markers);
+        const summary = fct ? this.stacks.getSummary(fct) : false;
+        const callstacks = stacks.length;
         rs.push({
-          key: `P${stmt}`,
+          key: `P:${fct}`,
           kind: 'probes',
           probes: ps,
-          stacks: wcs.length,
+          stackCount: callstacks,
+          fct,
           hlines: 1,
         });
-        wcs.forEach((cs, k) => {
+        if (summary) rs.push({
+          key: `V:${fct}`,
+          kind: 'values',
+          probes: ps,
+          stackIndex: -1,
+          stackCount: stacks.length,
+          fct,
+          hlines: 1,
+        });
+        stacks.forEach((cs, k) => {
           rs.push({
-            key: `C${stmt}::${cs}`,
+            key: `C:${fct}:${cs}`,
             kind: 'callstack',
             probes: ps,
             stackIndex: k,
-            stacks: wcs.length,
+            stackCount: callstacks,
             callstack: cs,
-            hlines: this.values.getStackSize(stmt, cs).rows,
+            fct,
+            hlines,
           });
         });
       } else {
-        // --- by callstacks
+        // --- not by callstacks
         const n = rs.length;
         rs.push({
-          key: `P${n}`,
+          key: `P#${n}`,
           kind: 'probes',
           probes: ps,
+          fct,
           hlines: 1,
         }, {
-          key: `V${n}`,
+          key: `V#${n}`,
           kind: 'values',
           probes: ps,
-          hlines: this.rowSize.rows,
+          fct,
+          hlines,
         });
       }
     }

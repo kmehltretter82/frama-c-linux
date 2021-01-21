@@ -31,6 +31,10 @@ body {
 /* --- Frame Colors                                                       --- */
 /* -------------------------------------------------------------------------- */
 
+.dome-hidden {
+    visibility: hidden;
+}
+
 .dome-window-active .dome-color-frame {
     fill:         #606060 ;
     color:        #606060 ;
@@ -121,6 +125,15 @@ div.dome-dragged {
 
 .dome-text-code {
     cursor: text ;
+    user-select: text ;
+    font-family: 'Andale mono', monospace ;
+    font-size: 9pt ;
+    white-space: nowrap ;
+    text-overflow: clip ;
+}
+
+.dome-text-cell {
+    cursor: default ;
     user-select: text ;
     font-family: 'Andale mono', monospace ;
     font-size: 9pt ;
