@@ -725,7 +725,7 @@ module SlevelMergeAfterLoop =
       let arg_name = "f | @all"
       let help =
         "When set, the different execution paths that originate from the body \
-         of a loop are merged before entering the next excution."
+         of a loop are merged before entering the next execution."
     end)
 let () = add_precision_dep SlevelMergeAfterLoop.parameter
 
@@ -1077,7 +1077,8 @@ module ShowSlevel =
       let option_name = "-eva-show-slevel"
       let default = 100
       let arg_name = "n"
-      let help = "Period for showing consumption of the alloted slevel during analysis"
+      let help = "Period for showing consumption of the allotted slevel during \
+                  analysis"
     end)
 let () = ShowSlevel.set_range ~min:1 ~max:max_int
 
