@@ -1,0 +1,11 @@
+# frama-c -wp [...]
+[kernel] Parsing tests/wp_acsl/issue_A228.c (with preprocessing)
+[kernel] :0: 
+  syntax error:
+  Location: between <unknown> and 1:5, before or at token: A
+  
+  1     Bool A, B;
+  
+  2     
+  3     /*@
+[kernel] Frama-C aborted: invalid user input.
