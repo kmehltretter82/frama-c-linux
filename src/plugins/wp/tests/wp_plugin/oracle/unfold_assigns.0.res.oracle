@@ -27,6 +27,66 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function NESTED_ARRAY_STATIC
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 90) in 'NESTED_ARRAY_STATIC':
+Call Effect at line 92
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 90) in 'NESTED_ARRAY_STATIC':
+Call Effect at line 92
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function NESTED_ARRAY_VARS
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 96) in 'NESTED_ARRAY_VARS':
+Call Effect at line 98
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+  (* Pre-condition *)
+  Have: 3 <= n.
+}
+Prove: included(s, 4, shift_sint32(shiftfield_F2_With_array_t(s), 1), n).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 96) in 'NESTED_ARRAY_VARS':
+Call Effect at line 98
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, s, 4).
+  (* Pre-condition *)
+  Have: 3 <= n.
+}
+Prove: included(s, 4, shift_sint32(shiftfield_F2_With_array_t(s), 1), n).
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function NO_UNFOLD_KO
 ------------------------------------------------------------
 
@@ -99,11 +159,38 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
-  Function PARTIAL_ASSIGNS
+  Function PARTIAL_ASSIGNS_STATIC
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 72) in 'PARTIAL_ASSIGNS':
-Call Effect at line 74
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 71) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 73
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(p, 0), 5).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 71) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 73
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_sint32(p, 0), 5).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function PARTIAL_ASSIGNS_VARS
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 77) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 79
 Let a = shift_sint32(p, 0).
 Let x = 1 + n.
 Assume {
@@ -121,8 +208,8 @@ Prove: (n <= 0) \/ included(a, x, shift_sint32(p, 1), n - 1) \/
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 72) in 'PARTIAL_ASSIGNS':
-Call Effect at line 74
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 77) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 79
 Let a = shift_sint32(p, 0).
 Let x = 1 + n.
 Assume {
@@ -137,6 +224,84 @@ Assume {
 }
 Prove: (n <= 0) \/ included(a, x, shift_sint32(p, 1), n - 1) \/
     included(a, x, shift_sint32(p, n), 1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function RANGE_NESTED_ARRAY_STATIC
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 104) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 109
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_S2_With_array(s, 0), 12).
+}
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 104) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 109
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, shift_S2_With_array(s, 0), 12).
+}
+Prove: false.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function RANGE_NESTED_ARRAY_VARS
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 113) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 118
+Let a = shift_S2_With_array(s, 0).
+Let x = 4 * n.
+Let x_1 = 4 + x.
+Let a_1 = shift_S2_With_array(s, 1).
+Let a_2 = shiftfield_F2_With_array_t(a).
+Assume {
+  Type: is_uint32(m) /\ is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x_1).
+  (* Pre-condition *)
+  Have: (3 <= n) /\ (4 <= m).
+}
+Prove: (n < 0) \/ included(a, x_1, shift_S2_With_array(s, 2), x - 4) \/
+    included(a, x_1, shiftfield_F2_With_array_x(a_1), 1) \/
+    included(a, x_1, shift_sint32(a_2, 0), 1) \/
+    included(a, x_1, shift_sint32(a_2, 1), m) \/
+    included(a, x_1, shift_sint32(shiftfield_F2_With_array_t(a_1), 0), 1 + m).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 113) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 118
+Let a = shift_S2_With_array(s, 0).
+Let x = 4 * n.
+Let x_1 = 4 + x.
+Let a_1 = shift_S2_With_array(s, 1).
+Let a_2 = shiftfield_F2_With_array_t(a).
+Assume {
+  Type: is_uint32(m) /\ is_uint32(n).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: !invalid(Malloc_0, a, x_1).
+  (* Pre-condition *)
+  Have: (3 <= n) /\ (4 <= m).
+}
+Prove: (n < 0) \/ included(a, x_1, shift_S2_With_array(s, 2), x - 4) \/
+    included(a, x_1, shiftfield_F2_With_array_x(a_1), 1) \/
+    included(a, x_1, shift_sint32(a_2, 0), 1) \/
+    included(a, x_1, shift_sint32(a_2, 1), m) \/
+    included(a, x_1, shift_sint32(shiftfield_F2_With_array_t(a_1), 0), 1 + m).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
