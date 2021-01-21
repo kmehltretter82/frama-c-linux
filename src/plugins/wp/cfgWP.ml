@@ -437,7 +437,7 @@ struct
     let from = ainfo.WpPropId.a_label in
     let sigma = L.mem_frame from in
     let authorized_region =
-      L.assigned_of_assigns ~unfold:false
+      L.assigned_of_assigns
         (match ainfo.a_kind with
          | StmtAssigns -> L.move_at env sigma
          | LoopAssigns -> env)
@@ -568,8 +568,8 @@ struct
       ) effects vcs
 
   let do_assigns ?descr ?stmt ~source ?hpid ?warn sequence
-      ~assigned ?(unfolded=assigned) effects vcs =
-    let vcs = check_assigns stmt source ?warn unfolded effects vcs in
+      ~assigned effects vcs =
+    let vcs = check_assigns stmt source ?warn assigned effects vcs in
     let eqmem = A.apply_assigns sequence assigned in
     gmap (assume_vc ?descr ?hpid ?stmt ?warn eqmem) vcs
 
@@ -583,13 +583,9 @@ struct
          add_vc target ?warn F.p_false vcs)
       effects vcs
 
-  let cc_region ~unfold cc data =
-    let assigned = cc ~unfold:false data in
-    assigned , if unfold then cc ~unfold:true data else assigned
-
-  let cc_assigned env ~unfold kind froms =
+  let cc_assigned env kind froms =
     let dummy = Sigma.create () in
-    let r0 = L.assigned_of_froms ~unfold:false (L.move_at env dummy) froms in
+    let r0 = L.assigned_of_froms (L.move_at env dummy) froms in
     let d0 = A.domain r0 in
     let s1 = L.current env in
     let s0 = Sigma.havoc s1 d0 in
@@ -598,9 +594,9 @@ struct
       | LoopAssigns -> s1
     in
     let cc_assigned = L.assigned_of_froms (L.move_at env sref) in
-    let assigned,unfolded = cc_region ~unfold cc_assigned froms in
+    let assigned = cc_assigned froms in
     let sequence = { pre=s0 ; post=s1 } in
-    sequence , assigned , unfolded
+    sequence , assigned
 
   let use_assigns wenv stmt hpid ainfo wp = in_wenv wenv wp
       begin fun env wp ->
@@ -613,17 +609,16 @@ struct
 
         | Writes froms ->
             let kind = ainfo.WpPropId.a_kind in
-            let unfold = Wp_parameters.UnfoldAssigns.get () in
             let outcome =
               Warning.catch ~severe:true ~effect:"Assigns everything"
-                (cc_assigned env ~unfold kind) froms
+                (cc_assigned env kind) froms
             in
             match outcome with
-            | Warning.Result(warn,(sequence,assigned,unfolded)) ->
+            | Warning.Result(warn,(sequence,assigned)) ->
                 let vcs =
                   do_assigns ~source:FromCode
                     ?hpid ?stmt ~warn sequence
-                    ~assigned ~unfolded
+                    ~assigned
                     wp.effects wp.vcs in
                 { sigma = Some sequence.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Failed warn ->
@@ -709,14 +704,7 @@ struct
             { sigma = Some sigma ; vcs=vcs ; effects = wp.effects }
         | Warning.Result(l_warn,(obj,dom,seq,loc)) ->
             (* L-Value has been translated *)
-            let unfold = Wp_parameters.UnfoldAssigns.get () in
-            let assigned,unfolded =
-              if unfold && Ctypes.is_compound obj then
-                let env_pre = L.move_at env seq.pre in
-                cc_region ~unfold (L.assigned_of_lval env_pre) lv
-              else
-                let region = [obj,Sloc loc] in region,region
-            in
+            let assigned = [obj,Sloc loc] in
             let outcome = Warning.catch
                 ~severe:false ~effect:"Havoc l-value (unknown r-value)"
                 (cc_stored lv seq loc obj) expr in
@@ -726,7 +714,7 @@ struct
                 (* R-Value is unknown or L-Value is volatile *)
                 let warn = Warning.Set.union l_warn r_warn in
                 let vcs = do_assigns ~source:FromCode
-                    ~stmt ~warn seq ~assigned ~unfolded wp.effects wp.vcs in
+                    ~stmt ~warn seq ~assigned wp.effects wp.vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
             | Warning.Result(r_warn,Some stored) ->
                 (* R-Value and effects has been translated *)
@@ -742,7 +730,7 @@ struct
                   else vc in
                 let vcs = gmap update wp.vcs in
                 let vcs =
-                  check_assigns (Some stmt) FromCode unfolded wp.effects vcs in
+                  check_assigns (Some stmt) FromCode assigned wp.effects vcs in
                 { sigma = Some seq.pre ; vcs=vcs ; effects = wp.effects }
       end
 
@@ -1049,8 +1037,7 @@ struct
         let env = L.move_at env0 dummy in
         let init = L.mem_at env0 Clabels.init in
         let frame = L.call_pre init (L.call kf vs) dummy in
-        let unfold = Wp_parameters.UnfoldAssigns.get () in
-        let cc_froms = L.assigned_of_froms ~unfold env in
+        let cc_froms = L.assigned_of_froms env in
         Some (A.domain (L.in_frame frame cc_froms froms))
 
   let cc_havoc d s = match d with
@@ -1103,14 +1090,12 @@ struct
         }
     | Writes froms ->
         let env = L.move_at env0 cenv.sigma_pre in
-        let unfold = Wp_parameters.UnfoldAssigns.get () in
-        let assigned,unfolded = L.in_frame cenv.frame_pre
-            (cc_region ~unfold (L.assigned_of_froms env))
-            froms in
+        let assigned = L.in_frame cenv.frame_pre
+            (L.assigned_of_froms env) froms in
         let vcs_post = do_assigns ~descr:"Call Effects" ~source:FromCall
-            ~stmt cenv.seq_post ~assigned ~unfolded wpost.effects wpost.vcs in
+            ~stmt cenv.seq_post ~assigned wpost.effects wpost.vcs in
         let vcs_exit = do_assigns ~descr:"Exit Effects" ~source:FromCall
-            ~stmt cenv.seq_exit ~assigned ~unfolded wexit.effects wexit.vcs in
+            ~stmt cenv.seq_exit ~assigned wexit.effects wexit.vcs in
         let vcs_result =
           match cenv.loc_result with
           | None -> vcs_post (* no result *)

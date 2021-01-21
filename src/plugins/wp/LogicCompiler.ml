@@ -473,13 +473,13 @@ struct
   let cc_logic : (env -> Cil_types.term -> logic) ref
     = ref (fun _ _ -> assert false)
   let cc_region
-    : (env -> unfold:bool -> Cil_types.term -> loc Sigs.region) ref
-    = ref (fun _ ~unfold _ -> ignore unfold ; assert false)
+    : (env -> Cil_types.term -> loc Sigs.region) ref
+    = ref (fun _ -> assert false)
 
   let term env t = !cc_term env t
   let pred polarity env t = !cc_pred polarity env t
   let logic env t = !cc_logic env t
-  let region env ~unfold t = !cc_region env ~unfold t
+  let region env t = !cc_region env t
   let reads env ts = List.iter (fun t -> ignore (logic env t.it_content)) ts
 
   let bootstrap_term cc = cc_term := cc

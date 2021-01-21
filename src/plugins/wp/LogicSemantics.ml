@@ -899,37 +899,18 @@ struct
   (* --- Set of locations for a term representing a set of l-values         --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec compound_offsets = function
-    | C_comp { cfields = Some fields ; cstruct = true } ->
-        List.fold_left
-          (fun offsets fd ->
-             List.fold_left
-               (fun offsets (obj,ofs) ->
-                  (obj , TField(fd,ofs)) :: offsets
-               ) offsets (compound_offsets (Ctypes.object_of fd.ftype))
-          ) [] fields
-    | obj -> [obj , TNoOffset]
-
-  let assignable_lval env ~unfold lv =
+  let assignable_lval env lv =
     match fst lv with
     | TResult _  | TVar{lv_name="\\exit_status"} -> [] (* special case ! *)
     | _ ->
-        let offsets =
-          let obj = Ctypes.object_of_logic_type (Cil.typeOfTermLval lv) in
-          if unfold then compound_offsets obj else [obj , TNoOffset]
-        in
-        List.concat
-          (List.map
-             (fun (obj,offset) ->
-                let lv = Logic_const.addTermOffsetLval offset lv in
-                L.region obj (addr_lval env lv))
-             offsets)
+        let obj = Ctypes.object_of_logic_type (Cil.typeOfTermLval lv) in
+        L.region obj (addr_lval env lv)
 
-  let assignable env ~unfold t =
+  let assignable env t =
     match t.term_node with
     | Tempty_set -> []
-    | TLval lv -> assignable_lval env ~unfold lv
-    | Tunion ts -> List.concat (List.map (C.region env ~unfold) ts)
+    | TLval lv -> assignable_lval env lv
+    | Tunion ts -> List.concat (List.map (C.region env) ts)
     | Tinter _ -> Warning.error "Intersection in assigns not implemented yet"
     | Tcomprehension(t,qs,cond) ->
         begin
@@ -945,22 +926,22 @@ struct
                | (Sarray _ | Srange _ | Sdescr _) as sloc ->
                    let ys,l,extend = L.rdescr sloc in
                    Sdescr(xs@ys,l,p_conj (extend :: conditions))
-            ) (C.region env ~unfold t)
+            ) (C.region env t)
         end
 
     | Tat(t,label) ->
-        C.region ~unfold (C.env_at env (Clabels.of_logic label)) t
+        C.region (C.env_at env (Clabels.of_logic label)) t
 
     | Tlet( { l_var_info=v ; l_body=LBterm a } , b ) ->
         let va = C.logic env a in
-        C.region ~unfold (C.env_let env v va) b
+        C.region (C.env_let env v va) b
 
     | Tlet _ ->
         Warning.error "Complex let-binding not implemented yet (%a)"
           Printer.pp_term t
 
     | TCastE (_,t)
-    | TLogic_coerce(_,t) -> C.region env ~unfold t
+    | TLogic_coerce(_,t) -> C.region env t
 
     | TBinOp _ | TUnOp _ | Trange _ | TUpdate _ | Tapp _ | Tif _
     | TConst _ | Tnull | TDataCons _ | Tlambda _
@@ -1023,8 +1004,8 @@ struct
   let logic env t =
     Context.with_current_loc t.term_loc (term_trigger env) t
 
-  let region env ~unfold t =
-    Context.with_current_loc t.term_loc (assignable env ~unfold) t
+  let region env t =
+    Context.with_current_loc t.term_loc (assignable env) t
 
   let () = C.bootstrap_pred pred
   let () = C.bootstrap_term term
@@ -1037,17 +1018,17 @@ struct
   (* --- Regions                                                            --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let assigned_of_lval env ~unfold (lv : Cil_types.lval) =
-    assignable_lval env ~unfold (Logic_utils.lval_to_term_lval lv)
+  let assigned_of_lval env (lv : Cil_types.lval) =
+    assignable_lval env (Logic_utils.lval_to_term_lval lv)
 
-  let assigned_of_froms env ~unfold froms =
+  let assigned_of_froms env froms =
     List.concat
       (List.map
-         (fun ({it_content=wr},_deps) -> region env ~unfold wr) froms)
+         (fun ({it_content=wr},_deps) -> region env wr) froms)
 
-  let assigned_of_assigns env ~unfold = function
+  let assigned_of_assigns env = function
     | WritesAny -> None
-    | Writes froms -> Some (assigned_of_froms env ~unfold froms)
+    | Writes froms -> Some (assigned_of_froms env froms)
 
   let occurs_opt x = function None -> false | Some t -> F.occurs x t
 
