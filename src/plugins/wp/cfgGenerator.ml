@@ -21,34 +21,29 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Model Factory                                                      --- *)
+(* --- New WP Computer (main entry points)                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer
-type mvar = Raw | Var | Ref | Caveat
+let generators = WpContext.MINDEX.create 1
 
-type setup = {
-  mvar : mvar ;
-  mheap : mheap ;
-  cint : Cint.model ;
-  cfloat : Cfloat.model ;
-}
-
-type driver = LogicBuiltins.driver
-
-val ident : setup -> string
-val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
-val configure_driver : setup -> driver -> unit -> WpContext.rollback
-val instance : setup -> driver -> WpContext.model
-val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)
-val parse :
-  ?default:setup ->
-  ?warning:(string -> unit) ->
-  string list -> setup
-(**
-   Apply specifications to default setup.
-   Default setup is [Factory.default].
-   Default warning is [Wp_parameters.abort]. *)
+let generator setup driver =
+  let model = Factory.instance setup driver in
+  try WpContext.MINDEX.find generators model
+  with Not_found ->
+    let module VCG = (val CfgWP.vcgen setup driver) in
+    let module WP = CfgCalculus.Make(VCG) in
+    let generator : Wpo.generator =
+      object
+        method model = model
+        method compute_ip _ = Bag.empty
+        method compute_call _ = Bag.empty
+        method compute_main ?fct ?bhv ?prop () =
+          ignore fct ;
+          ignore bhv ;
+          ignore prop ;
+          Bag.empty
+      end in
+    WpContext.MINDEX.add generators model generator ;
+    generator
 
 (* -------------------------------------------------------------------------- *)

@@ -18,7 +18,7 @@
 (*  See the GNU Lesser General Public License version 2.1                 *)
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
-(**************************************************************************)
+(*****************************************t*********************************)
 
 open Cil_types
 open Wp_parameters
@@ -30,23 +30,11 @@ open Wp_parameters
 (** Compute model setup from command line options. *)
 val user_setup : unit -> Factory.setup
 
-class type t =
-  object
-    method model : WpContext.model
-    method compute_ip : Property.t -> Wpo.t Bag.t
-    method compute_call : stmt -> Wpo.t Bag.t
-    method compute_main :
-      ?fct:functions ->
-      ?bhv:string list ->
-      ?prop:string list ->
-      unit -> Wpo.t Bag.t
-  end
-
 val create :
   ?dump:bool ->
   ?legacy:bool ->
   ?setup:Factory.setup ->
   ?driver:Factory.driver ->
-  unit -> t
+  unit -> Wpo.generator
 
 (* -------------------------------------------------------------------------- *)

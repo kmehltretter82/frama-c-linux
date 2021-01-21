@@ -20,9 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Wp_parameters
-
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setup                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -60,23 +57,11 @@ let user_setup () : Factory.setup =
 (* --- WP Computer (main entry points)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type t =
-  object
-    method model : WpContext.model
-    method compute_ip : Property.t -> Wpo.t Bag.t
-    method compute_call : stmt -> Wpo.t Bag.t
-    method compute_main :
-      ?fct:functions ->
-      ?bhv:string list ->
-      ?prop:string list ->
-      unit -> Wpo.t Bag.t
-  end
-
 let create
     ?dump ?legacy
     ?(setup: Factory.setup option)
     ?(driver: Factory.driver option)
-    () : t =
+    () : Wpo.generator =
   let default f = function Some v -> v | None -> f () in
   let dump = default Wp_parameters.Dump.get dump in
   let legacy = default Wp_parameters.Dump.get legacy in

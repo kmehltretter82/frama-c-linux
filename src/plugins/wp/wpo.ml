@@ -1010,3 +1010,21 @@ let get_files w =
       ) results []
   in
   descr_files @ result_files
+
+(* -------------------------------------------------------------------------- *)
+(* --- Generators                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type generator =
+  object
+    method model : WpContext.model
+    method compute_ip : Property.t -> t Bag.t
+    method compute_call : stmt -> t Bag.t
+    method compute_main :
+      ?fct:Wp_parameters.functions ->
+      ?bhv:string list ->
+      ?prop:string list ->
+      unit -> t Bag.t
+  end
+
+(* -------------------------------------------------------------------------- *)

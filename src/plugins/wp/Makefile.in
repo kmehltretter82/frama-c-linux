@@ -99,7 +99,7 @@ PLUGIN_CMO:= \
 	Factory \
 	cfgInit cfgAnnot cfgCalculus \
 	calculus cfgDump cfgWP \
-	wpGenerator \
+	wpGenerator cfgGenerator \
 	Generator register VC
 
 PLUGIN_CMI:=

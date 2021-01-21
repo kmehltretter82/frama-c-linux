@@ -1407,7 +1407,7 @@ struct
         Wpo.VC_Lemma.depends = l.lem_depends ;
         Wpo.VC_Lemma.lemma = def ;
         Wpo.VC_Lemma.sequent = None ;
-        } in
+      } in
       let index = match LogicUsage.section_of_lemma l.lem_name with
         | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
         | LogicUsage.Axiomatic a -> Wpo.Axiomatic (Some a.ax_name) in
