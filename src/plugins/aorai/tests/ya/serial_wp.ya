@@ -45,32 +45,32 @@ Wait5 :
 ;
 
 StatusReq1 :
-  { input_status().\result & 1 == 0 } -> Wait1
-| { input_status().\result & 15 == 1 } -> StatusOk1
+  { input_status().\result < 1 } -> Wait1
+| { input_status().\result == 14 } -> StatusOk1
 | other -> StatusError
 ;
 
 StatusReq2 :
-  { input_status().\result & 1 == 0 } -> Wait2
-| { input_status().\result & 15 == 1 } -> StatusOk2
+  { input_status().\result < 1 } -> Wait2
+| { input_status().\result == 14 } -> StatusOk2
 | other -> StatusError
 ;
 
 StatusReq3 :
-  { input_status().\result & 1 == 0 } -> Wait3
-| { input_status().\result & 15 == 1 } -> StatusOk3
+  { input_status().\result < 1 } -> Wait3
+| { input_status().\result == 14 } -> StatusOk3
 | other -> StatusError
 ;
 
 StatusReq4 :
-  { input_status().\result & 1 == 0 } -> Wait4
-| { input_status().\result & 15 == 1 } -> StatusOk4
+  { input_status().\result < 1 } -> Wait4
+| { input_status().\result == 14 } -> StatusOk4
 | other -> StatusError
 ;
 
 StatusReq5 :
-  { input_status().\result & 1 == 0 } -> Wait5
-| { input_status().\result & 15 == 1 } -> StatusOk5
+  { input_status().\result < 1 } -> Wait5
+| { input_status().\result == 14 } -> StatusOk5
 | other -> StatusError
 ;
 
@@ -121,33 +121,33 @@ DataReqE :
 ;
 
 DataReq1 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } -> Wait1
+  { input_data().\result <= 128 && input_data().\result != 64 } -> Wait2
+| { input_data().\result == 64 } -> Wait1
+| { input_data().\result > 128 } -> Wait1
 ;
 
 DataReq2 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x1 := \result; -> Wait3
+  { input_data().\result <= 128 && input_data().\result != 64 } -> Wait2
+| { input_data().\result == 64 } -> Wait1
+| { input_data().\result > 128 } $x1 := \result; -> Wait3
 ;
 
 DataReq3 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x2 := \result; -> Wait4
+  { input_data().\result <= 128 && input_data().\result != 64 } -> Wait2
+| { input_data().\result == 64 } -> Wait1
+| { input_data().\result > 128 } $x2 := \result; -> Wait4
 ;
 
 DataReq4 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y1 := \result; -> Wait5
+  { input_data().\result <= 128 && input_data().\result != 64 } -> Wait2
+| { input_data().\result == 64 } -> Wait1
+| { input_data().\result > 128 } $y1 := \result; -> Wait5
 ;
 
 DataReq5 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y2 := \result; -> Complete
+  { input_data().\result <= 128 && input_data().\result != 64 } -> Wait2
+| { input_data().\result == 64 } -> Wait1
+| { input_data().\result > 128 } $y2 := \result; -> Complete
 ;
 
 Complete :
@@ -157,4 +157,3 @@ Complete :
 | { CALL(input_data) } -> Error
 | other -> Complete
 ;
-

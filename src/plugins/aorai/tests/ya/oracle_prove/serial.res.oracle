@@ -1,13 +1,9 @@
 [kernel] Parsing tests/ya/serial.c (with preprocessing)
-[aorai] tests/ya/serial.c:79: Warning: 
-  Call to output not conforming to automaton (post-cond). Assuming it is on a dead path
-[aorai] tests/ya/serial.c:25: Warning: 
-  Call to output not conforming to automaton (pre-cond). Assuming it is on a dead path
 [kernel] Parsing TMPDIR/aorai_serial_0.i (no preprocessing)
-[kernel:typing:implicit-function-declaration] TMPDIR/aorai_serial_0.i:98: Warning: 
+[kernel:typing:implicit-function-declaration] TMPDIR/aorai_serial_0.i:1359: Warning: 
   Calling undeclared function Frama_C_interval. Old style K&R code?
-[wp] Warning: Missing RTE guards
-[kernel:annot:missing-spec] TMPDIR/aorai_serial_0.i:125: Warning: 
+[kernel:annot:missing-spec] TMPDIR/aorai_serial_0.i:851: Warning: 
   Neither code nor specification for function Frama_C_interval, generating default assigns from the prototype
-[kernel:annot:missing-spec] TMPDIR/aorai_serial_0.i:125: Warning: 
+[kernel:annot:missing-spec] TMPDIR/aorai_serial_0.i:851: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
+[wp] Warning: Missing RTE guards

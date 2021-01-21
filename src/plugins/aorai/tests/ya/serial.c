@@ -2,10 +2,20 @@
   OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ -aorai-no-acceptance -aorai-instrumentation-history 2 -aorai-no-generate-annotations -aorai-no-generate-deterministic-lemmas -then-last -eva -eva-partition-value n -eva-ilevel 256
 */
 /* run.config_prove
-OPT: -aorai-automata @PTEST_DIR@/@PTEST_NAME@.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ -aorai-no-acceptance @PROVE_OPTIONS@
+OPT: -cpp-extra-args="-DFOR_WP" -aorai-automata @PTEST_DIR@/@PTEST_NAME@_wp.ya -load-module tests/Aorai_test.cmxs -aorai-test-number @PTEST_NUMBER@ -aorai-no-acceptance @PROVE_OPTIONS@
 */
 
 #include "__fc_builtin.h"
+
+#ifndef FOR_WP
+#define BW_AND &
+#define BW_AND2 &
+#define BW_AND3 &
+#else
+#define BW_AND ==
+#define BW_AND2 >=
+#define BW_AND3 <=
+#endif
 
 /*@ assigns \result \from \nothing;
     ensures 0 <= \result < 0x100; */
@@ -29,8 +39,8 @@ int read(int *status)
 {
   int s = input_status();
 
-  if (s & 0x01) {
-    *status = s & 0x0e;
+  if (s BW_AND2 0x01) {
+    *status = s BW_AND 0x0e;
     return input_data();
   }
 
@@ -56,7 +66,7 @@ void main(void)
         n = 0;
         continue;
       }
-      if (data & 0x80) { // status received
+      if (data BW_AND3 0x80) { // status received
         if (n != 0) { // but data was expected
           n = 0;
           continue;
@@ -72,7 +82,7 @@ void main(void)
       buffer[n++] = data;
 
       if (n == 5) { // the packet is completely read
-        if ((buffer[0] & 0x40) == 0) // it is a release action
+        if ((buffer[0] BW_AND 0x40) == 0) // it is a release action
         {
           int x = buffer[1] + 0x80 * buffer[2];
           int y = buffer[3] + 0x80 * buffer[4];
