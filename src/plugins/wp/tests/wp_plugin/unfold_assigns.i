@@ -4,7 +4,7 @@
  */
 
 /* run.config_qualif
-   DONTRUN:
+   OPT: -wp-unfold-assigns
  */
 
 struct S { int a,b; };

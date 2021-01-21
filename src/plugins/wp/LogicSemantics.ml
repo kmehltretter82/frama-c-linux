@@ -1064,52 +1064,43 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec decompose_region (obj, sloc) =
-    let is_primitive_int t = Lang.F.is_int t && Lang.F.is_primitive t in
+    let max_range size = Some (e_sub (e_int size) e_one) in
     match sloc with
     | Sloc loc ->
         begin match obj with
           | C_pointer _ | C_int _ | C_float _
           | C_comp { cfields = None } | C_array { arr_flat = None } ->
-              [obj, sloc]
+              Bag.elt (obj, sloc)
 
           | C_comp { cfields = Some fields } ->
               let slocs_of_field f =
                 let obj = Ctypes.object_of f.ftype in
                 decompose_region (obj, (Sloc (M.field loc f)))
               in
-              List.(concat (map slocs_of_field fields))
+              Bag.umap_list slocs_of_field fields
 
           | C_array { arr_flat = Some { arr_size=len ; arr_cell=typ } } ->
               let obj = Ctypes.object_of typ in
-              decompose_range loc obj Z.zero (Z.of_int (len - 1))
+              decompose_range loc obj (Some e_zero) (max_range len)
         end
 
-    | Sarray (loc, obj, n) ->
-        decompose_range loc obj Z.zero (Z.of_int (n - 1))
+    | Sarray (loc, obj, len) ->
+        decompose_range loc obj (Some e_zero) (max_range len)
 
-    | Srange (loc, obj, Some b, Some e)
-      when is_primitive_int b && is_primitive_int e ->
-        let b, e = match Lang.F.repr b, Lang.F.repr e with
-          | Kint b, Kint e -> b, e
-          | _ -> assert false (* by match guard *)
-        in
+    | Srange (loc, obj, b, e) ->
         decompose_range loc obj b e
 
     | _ ->
         (* It is not trivial to go further: the list of regions depends on some
            unknown values (length of the range, property, ...) *)
-        [obj, sloc]
+        Bag.elt (obj, sloc)
 
-  and decompose_range l obj b e =
-    let rec generate_i l f i =
-      if Z.leq i b then l
-      else generate_i (f i :: l) f (Z.sub i Z.one)
-    in
-    let slocs_of_index i =
-      let l = M.shift l obj (e_zint i) in
-      decompose_region (obj, (Sloc l))
-    in
-    List.(concat (generate_i [] slocs_of_index e))
+  and decompose_range loc obj low up =
+    let x = Lang.freshvar ~basename:"k" Lang.t_int in
+    let k = e_var x in
+    let guard = Vset.in_range k low up in
+    let loc = M.shift loc obj k in
+    Bag.elt (obj, Sdescr([x], loc, guard))
 
   let rec assignable_region ~unfold reg assignable =
     let check_inclusion reg =
@@ -1118,21 +1109,17 @@ struct
     if unfold then
       (* This phase unfolds terms that cannot be "statically" unfolded *)
       let logic_decompose = function
+        (* decompose always remove Sarray and Srange *)
+        | (_, Sarray _) | (_, Srange _)-> assert false
+
         | (_, Sloc _) as s -> check_inclusion s
-        | (_, Sarray _) -> assert false (* decompose always remove Sarray *)
-        | (obj, Sdescr(xs, l, p)) ->
-            let sloc = obj, Sloc l in
+        | (obj, Sdescr(xs, l, guard)) ->
             p_forall xs
-              (p_imply p (assignable_region ~unfold:true sloc assignable))
-        | (_, Srange(l, obj, low, up)) ->
-            let x = Lang.freshvar ~basename:"k" Lang.t_int in
-            let k = e_var x in
-            let p = Vset.in_range k low up in
-            let sloc = obj, Sloc (M.shift l obj k) in
-            p_forall [x]
-              (p_imply p (assignable_region ~unfold:true sloc assignable))
+              (p_imply guard
+                 (assignable_region ~unfold:true (obj, Sloc l) assignable))
       in
-      p_all logic_decompose (decompose_region reg)
+      let props = Bag.map logic_decompose (decompose_region reg) in
+      p_conj (Bag.fold_left (fun l p -> p :: l) [] props)
     else
       check_inclusion reg
 

@@ -43,6 +43,8 @@ Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 96) in 'NESTED_ARRAY_V
 Call Effect at line 98
 Let a = shiftfield_F2_With_array_t(s).
 Assume {
+  Have: 0 < i.
+  Have: i <= 2.
   Type: is_uint32(n).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -51,7 +53,7 @@ Assume {
   (* Pre-condition *)
   Have: 3 <= n.
 }
-Prove: (0 < n) /\ included(shift_sint32(a, 2), 1, shift_sint32(a, 1), n).
+Prove: (i = (-1)) \/ included(shift_sint32(a, i), 1, shift_sint32(a, 1), n).
 
 ------------------------------------------------------------
 
@@ -59,6 +61,8 @@ Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 96) in 'NESTED_ARRAY_V
 Call Effect at line 98
 Let a = shiftfield_F2_With_array_t(s).
 Assume {
+  Have: 0 < i.
+  Have: i <= 2.
   Type: is_uint32(n).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -67,7 +71,7 @@ Assume {
   (* Pre-condition *)
   Have: 3 <= n.
 }
-Prove: (0 < n) /\ included(shift_sint32(a, 2), 1, shift_sint32(a, 1), n).
+Prove: (i = (-1)) \/ included(shift_sint32(a, i), 1, shift_sint32(a, 1), n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -136,13 +140,25 @@ Prove: true.
 
 Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 71) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 73
-Prove: true.
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 4) /\ (!invalid(Malloc_0, shift_sint32(p, 0), 5)).
+}
+Prove: (i = 0) \/ (i = 4) \/ ((0 < i) /\ (i <= 3)).
 
 ------------------------------------------------------------
 
 Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 71) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 73
-Prove: true.
+Assume {
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 4) /\ (!invalid(Malloc_0, shift_sint32(p, 0), 5)).
+}
+Prove: (i = 0) \/ (i = 4) \/ ((0 < i) /\ (i <= 3)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -188,13 +204,35 @@ Prove: (i = 0) \/ (n = i) \/
 
 Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 104) in 'RANGE_NESTED_ARRAY_STATIC':
 Call Effect at line 109
-Prove: true.
+Let x = 4 * i.
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 2) /\
+      (!invalid(Malloc_0, shift_S2_With_array(s, 0), 12)).
+}
+Prove: ((i = 0) \/ (i = 1) \/ (2 <= i)) /\
+    (forall i_1 : Z. let x_1 = i_1 + x in ((0 <= i_1) -> ((i_1 <= 2) ->
+     ((x_1 = (-1)) \/ (x_1 = 0) \/ (x_1 = 3) \/ ((0 < x_1) /\ (x_1 <= 2)) \/
+      ((4 <= x_1) /\ (x_1 <= 6)) \/ ((7 <= x_1) /\ (x_1 <= 10)))))).
 
 ------------------------------------------------------------
 
 Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 104) in 'RANGE_NESTED_ARRAY_STATIC':
 Call Effect at line 109
-Prove: true.
+Let x = 4 * i.
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 2) /\
+      (!invalid(Malloc_0, shift_S2_With_array(s, 0), 12)).
+}
+Prove: ((i = 0) \/ (i = 1) \/ (2 <= i)) /\
+    (forall i_1 : Z. let x_1 = i_1 + x in ((0 <= i_1) -> ((i_1 <= 2) ->
+     ((x_1 = (-1)) \/ (x_1 = 0) \/ (x_1 = 3) \/ ((0 < x_1) /\ (x_1 <= 2)) \/
+      ((4 <= x_1) /\ (x_1 <= 6)) \/ ((7 <= x_1) /\ (x_1 <= 10)))))).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -206,16 +244,15 @@ Call Effect at line 118
 Let a = shift_S2_With_array(s, 0).
 Let x = 4 * n.
 Let a_1 = shift_S2_With_array(s, i).
-Let a_2 = shiftfield_F2_With_array_t(a_1).
-Let a_3 = shift_sint32(a_2, 1).
-Let a_4 = shift_S2_With_array(s, 2).
+Let a_2 = shiftfield_F2_With_array_x(a_1).
+Let a_3 = shift_S2_With_array(s, 2).
 Let x_1 = x - 4.
-Let a_5 = shift_sint32(shiftfield_F2_With_array_t(a), 1).
-Let a_6 = shift_sint32(shiftfield_F2_With_array_t(shift_S2_With_array(s, 1)),
+Let a_4 = shift_sint32(shiftfield_F2_With_array_t(a), 1).
+Let a_5 = shift_sint32(shiftfield_F2_With_array_t(shift_S2_With_array(s, 1)),
             0).
 Let x_2 = 1 + m.
-Let a_7 = shift_sint32(a_2, 2).
-Let a_8 = shiftfield_F2_With_array_x(a_1).
+Let x_3 = 4 * i.
+Let a_6 = shiftfield_F2_With_array_t(a_1).
 Assume {
   Type: is_uint32(m) /\ is_uint32(n).
   (* Heap *)
@@ -225,12 +262,12 @@ Assume {
   (* Pre-condition *)
   Have: (3 <= n) /\ (4 <= m).
 }
-Prove: (included(a_3, 1, a_4, x_1) \/ included(a_3, 1, a_5, m) \/
-        included(a_3, 1, a_6, x_2)) /\
-    (included(a_7, 1, a_4, x_1) \/ included(a_7, 1, a_5, m) \/
-     included(a_7, 1, a_6, x_2)) /\
-    ((i = 0) \/ (i = 1) \/ included(a_8, 1, a_4, x_1) \/
-     included(a_8, 1, a_5, m) \/ included(a_8, 1, a_6, x_2)).
+Prove: ((i = 0) \/ (i = 1) \/ included(a_2, 1, a_3, x_1) \/
+        included(a_2, 1, a_4, m) \/ included(a_2, 1, a_5, x_2)) /\
+    (forall i_1 : Z. let x_4 = i_1 + x_3 in
+     let a_7 = shift_sint32(a_6, i_1) in ((0 <= i_1) -> ((i_1 <= 2) ->
+     ((x_4 = (-1)) \/ (x_4 = 0) \/ (x_4 = 3) \/ included(a_7, 1, a_3, x_1) \/
+      included(a_7, 1, a_4, m) \/ included(a_7, 1, a_5, x_2))))).
 
 ------------------------------------------------------------
 
@@ -239,16 +276,15 @@ Call Effect at line 118
 Let a = shift_S2_With_array(s, 0).
 Let x = 4 * n.
 Let a_1 = shift_S2_With_array(s, i).
-Let a_2 = shiftfield_F2_With_array_t(a_1).
-Let a_3 = shift_sint32(a_2, 1).
-Let a_4 = shift_S2_With_array(s, 2).
+Let a_2 = shiftfield_F2_With_array_x(a_1).
+Let a_3 = shift_S2_With_array(s, 2).
 Let x_1 = x - 4.
-Let a_5 = shift_sint32(shiftfield_F2_With_array_t(a), 1).
-Let a_6 = shift_sint32(shiftfield_F2_With_array_t(shift_S2_With_array(s, 1)),
+Let a_4 = shift_sint32(shiftfield_F2_With_array_t(a), 1).
+Let a_5 = shift_sint32(shiftfield_F2_With_array_t(shift_S2_With_array(s, 1)),
             0).
 Let x_2 = 1 + m.
-Let a_7 = shift_sint32(a_2, 2).
-Let a_8 = shiftfield_F2_With_array_x(a_1).
+Let x_3 = 4 * i.
+Let a_6 = shiftfield_F2_With_array_t(a_1).
 Assume {
   Type: is_uint32(m) /\ is_uint32(n).
   (* Heap *)
@@ -258,12 +294,12 @@ Assume {
   (* Pre-condition *)
   Have: (3 <= n) /\ (4 <= m).
 }
-Prove: (included(a_3, 1, a_4, x_1) \/ included(a_3, 1, a_5, m) \/
-        included(a_3, 1, a_6, x_2)) /\
-    (included(a_7, 1, a_4, x_1) \/ included(a_7, 1, a_5, m) \/
-     included(a_7, 1, a_6, x_2)) /\
-    ((i = 0) \/ (i = 1) \/ included(a_8, 1, a_4, x_1) \/
-     included(a_8, 1, a_5, m) \/ included(a_8, 1, a_6, x_2)).
+Prove: ((i = 0) \/ (i = 1) \/ included(a_2, 1, a_3, x_1) \/
+        included(a_2, 1, a_4, m) \/ included(a_2, 1, a_5, x_2)) /\
+    (forall i_1 : Z. let x_4 = i_1 + x_3 in
+     let a_7 = shift_sint32(a_6, i_1) in ((0 <= i_1) -> ((i_1 <= 2) ->
+     ((x_4 = (-1)) \/ (x_4 = 0) \/ (x_4 = 3) \/ included(a_7, 1, a_3, x_1) \/
+      included(a_7, 1, a_4, m) \/ included(a_7, 1, a_5, x_2))))).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
