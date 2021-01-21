@@ -517,7 +517,8 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let assigns_condition (region : L.region) (e:effect) : F.pred =
-    L.check_assigns e.e_valid ~written:region ~assignable:e.e_region
+    let unfold = Wp_parameters.UnfoldAssigns.get () in
+    L.check_assigns ~unfold e.e_valid ~written:region ~assignable:e.e_region
 
   exception COLLECTED
 

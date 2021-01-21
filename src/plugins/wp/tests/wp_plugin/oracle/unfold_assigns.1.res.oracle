@@ -81,6 +81,43 @@ Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function PARTIAL_ASSIGNS
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 72) in 'PARTIAL_ASSIGNS':
+Call Effect at line 74
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= n) /\
+      (!invalid(Malloc_0, shift_sint32(p, 0), 1 + n)).
+  (* Pre-condition *)
+  Have: 5 <= n.
+}
+Prove: (i = 0) \/ (n = i) \/
+    included(shift_sint32(p, i), 1, shift_sint32(p, 1), n - 1).
+
+------------------------------------------------------------
+
+Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 72) in 'PARTIAL_ASSIGNS':
+Call Effect at line 74
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= n) /\
+      (!invalid(Malloc_0, shift_sint32(p, 0), 1 + n)).
+  (* Pre-condition *)
+  Have: 5 <= n.
+}
+Prove: (i = 0) \/ (n = i) \/
+    included(shift_sint32(p, i), 1, shift_sint32(p, 1), n - 1).
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function USE_ASSIGN_UNFOLD_KO
 ------------------------------------------------------------
 

@@ -812,7 +812,8 @@ sig
       Compute a formula that checks whether written locations are either
       invalid (at the given memory location)
       or included in some assignable region. *)
-  val check_assigns : sigma -> written:region -> assignable:region -> pred
+  val check_assigns :
+    unfold:bool -> sigma -> written:region -> assignable:region -> pred
 
 end
 

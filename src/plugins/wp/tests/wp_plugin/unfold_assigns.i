@@ -64,3 +64,12 @@ void ASSIGN_NO_UNFOLD_KO(struct S *s) {
   struct S p = { 0,1 };
   *s = p ;
 }
+
+/*@ assigns *(p+(0..n)); */
+void f_assigns_array(int *p, unsigned n);
+
+/*@ requires n > 4 ;
+    assigns *(p+0), *(p+(1..n-1)), *(p+n); */
+void PARTIAL_ASSIGNS(int *p, unsigned n) {
+  f_assigns_array(p, n);
+}

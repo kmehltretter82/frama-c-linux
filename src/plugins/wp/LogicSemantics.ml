@@ -1082,12 +1082,85 @@ struct
   (* --- CheckAssigns                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let check_assigns sigma ~written ~assignable =
+  let rec decompose_region (obj, sloc) =
+    let is_primitive_int t = Lang.F.is_int t && Lang.F.is_primitive t in
+    match sloc with
+    | Sloc loc ->
+        begin match obj with
+          | C_pointer _ | C_int _ | C_float _
+          | C_comp { cfields = None } | C_array { arr_flat = None } ->
+              [obj, sloc]
+
+          | C_comp { cfields = Some fields } ->
+              let slocs_of_field f =
+                let obj = Ctypes.object_of f.ftype in
+                decompose_region (obj, (Sloc (M.field loc f)))
+              in
+              List.(concat (map slocs_of_field fields))
+
+          | C_array { arr_flat = Some { arr_size=len ; arr_cell=typ } } ->
+              let obj = Ctypes.object_of typ in
+              decompose_range loc obj Z.zero (Z.of_int (len - 1))
+        end
+
+    | Sarray (loc, obj, n) ->
+        decompose_range loc obj Z.zero (Z.of_int (n - 1))
+
+    | Srange (loc, obj, Some b, Some e)
+      when is_primitive_int b && is_primitive_int e ->
+        let b, e = match Lang.F.repr b, Lang.F.repr e with
+          | Kint b, Kint e -> b, e
+          | _ -> assert false (* by match guard *)
+        in
+        decompose_range loc obj b e
+
+    | _ ->
+        (* It is not trivial to go further: the list of regions depends on some
+           unknown values (length of the range, property, ...) *)
+        [obj, sloc]
+
+  and decompose_range l obj b e =
+    let rec generate_i l f i =
+      if Z.leq i b then l
+      else generate_i (f i :: l) f (Z.sub i Z.one)
+    in
+    let slocs_of_index i =
+      let l = M.shift l obj (e_zint i) in
+      decompose_region (obj, (Sloc l))
+    in
+    List.(concat (generate_i [] slocs_of_index e))
+
+  let rec assignable_region ~unfold reg assignable =
+    let check_inclusion reg =
+      p_any (L.included reg) assignable
+    in
+    if unfold then
+      (* This phase unfolds terms that cannot be "statically" unfolded *)
+      let logic_decompose = function
+        | (_, Sloc _) as s -> check_inclusion s
+        | (_, Sarray _) -> assert false (* decompose always remove Sarray *)
+        | (obj, Sdescr(xs, l, p)) ->
+            let sloc = obj, Sloc l in
+            p_forall xs
+              (p_imply p (assignable_region ~unfold:true sloc assignable))
+        | (_, Srange(l, obj, low, up)) ->
+            let x = Lang.freshvar ~basename:"k" Lang.t_int in
+            let k = e_var x in
+            let p = Vset.in_range k low up in
+            let sloc = obj, Sloc (M.shift l obj k) in
+            p_forall [x]
+              (p_imply p (assignable_region ~unfold:true sloc assignable))
+      in
+      p_all logic_decompose (decompose_region reg)
+    else
+      check_inclusion reg
+
+  let check_assigns ~unfold sigma ~written ~assignable =
     p_all
-      (fun seg ->
+      (fun reg ->
          p_imply
-           (p_not (L.invalid sigma seg))
-           (p_any (L.included seg) assignable)
+           (p_not (L.invalid sigma reg))
+           (assignable_region ~unfold reg assignable)
       ) (written : region)
 
 end
