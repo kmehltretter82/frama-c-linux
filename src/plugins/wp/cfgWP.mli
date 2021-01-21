@@ -20,14 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open LogicUsage
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-module VC( M : Sigs.Compiler ) : Mcfg.S
-module Computer( M : Sigs.Compiler ) :
+module type VCgen =
 sig
-  class wp : WpContext.model -> WpGenerator.computer
+  include Mcfg.S
+  val register_lemma : logic_lemma -> unit
+  val compile_lemma : logic_lemma -> Wpo.t
+  val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
 end
+
+val vcgen : Factory.setup -> Factory.driver -> (module VCgen)
 
 val computer : Factory.setup -> Factory.driver -> WpGenerator.computer

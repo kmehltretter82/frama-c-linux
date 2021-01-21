@@ -85,7 +85,7 @@ let create
   ignore legacy ;
   let cc =
     if dump
-    then ( Cil2cfg.Dump.process () ; CfgDump.create () )
+    then CfgDump.create ()
     else CfgWP.computer setup driver in
   let the_model = cc#model in
   object
