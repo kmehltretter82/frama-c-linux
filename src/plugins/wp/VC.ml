@@ -78,15 +78,15 @@ let generator ?model () =
 
 let generate_ip ?model ip =
   let gen = generator ?model () in
-  Generator.compute_ip gen ip
+  WpGenerator.compute_ip gen ip
 
 let generate_kf ?model ?(bhv=[]) kf =
   let gen = generator ?model () in
-  Generator.compute_kf gen ~bhv ~kf ()
+  WpGenerator.compute_kf gen ~bhv ~kf ()
 
 let generate_call ?model stmt =
   let gen = generator ?model () in
-  Generator.compute_call gen stmt
+  WpGenerator.compute_call gen stmt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)

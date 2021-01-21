@@ -1827,6 +1827,8 @@ src/plugins/wp/wpAnnot.ml: CEA_WP
 src/plugins/wp/wpAnnot.mli: CEA_WP
 src/plugins/wp/wpContext.ml: CEA_WP
 src/plugins/wp/wpContext.mli: CEA_WP
+src/plugins/wp/wpGenerator.ml: CEA_WP
+src/plugins/wp/wpGenerator.mli: CEA_WP
 src/plugins/wp/wpPropId.ml: CEA_WP
 src/plugins/wp/wpPropId.mli: CEA_WP
 src/plugins/wp/wpReached.ml: CEA_WP

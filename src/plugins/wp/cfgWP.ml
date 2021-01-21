@@ -1497,6 +1497,6 @@ let computer setup driver =
   with Not_found ->
     let module M = (val Factory.(compiler setup.mheap setup.mvar)) in
     let module VC = Computer(M) in
-    let generator = (new VC.wp model :> Generator.computer) in
+    let generator = (new VC.wp model :> WpGenerator.computer) in
     COMPUTERS.add computers model generator ;
     generator

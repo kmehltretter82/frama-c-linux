@@ -299,4 +299,4 @@ class computer () =
 
   end (* class computer *)
 
-let create () = (new computer () :> Generator.computer)
+let create () = (new computer () :> WpGenerator.computer)
