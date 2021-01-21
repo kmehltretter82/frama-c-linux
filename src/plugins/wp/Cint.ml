@@ -618,11 +618,11 @@ let smp_eq_with_land a b =
 let smp_eq_with_lor a b =
   let b1 = match_integer b in
   let es = match_fun f_lor a in
-  try (* b1==(a2|t22) <==> (b1^a2)==(~a2&e) *)
+  try (* b1==(a2|e) <==> (b1^a2)==(~a2&e) *)
     let a2,es = match_integer_extraction es in
     let k1 = Integer.logxor b1 a2 in
     let k2 = Integer.lognot a2 in
-    e_eq (e_zint k1) (e_fun f_land ((e_zint k2)::es))
+    e_eq (e_zint k1) (e_fun f_land [e_zint k2 ; e_fun f_lor es])
   with Not_found when b == e_zero ->
     (* 0==(a1|a2) <=> (0==a1 && 0==a2) *)
     F.e_and (List.map (e_eq b) es)
