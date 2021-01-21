@@ -31,13 +31,16 @@ type mode = {
   stmt : stmt option ;  (* Stmt contract under proof *)
 }
 
-val get_modes : kernel_function -> mode list
+type props = [ `All | `Names of string list | `PropId of Property.t ]
 
-module Make(M : Mcfg.S) :
+(* Memoized *)
+val modes : kernel_function -> mode list
+
+module Make(W : Mcfg.S) :
 sig
 
-  val compute : mode:mode -> props:string list -> kernel_function ->
-    M.t_env * M.t_prop
+  val compute : mode:mode -> props:props -> kernel_function ->
+    W.t_env * W.t_prop
 
 end
 

@@ -44,24 +44,34 @@ type mode = {
   stmt : stmt option ;  (* Stmt contract under proof *)
 }
 
-let get_modes kf =
-  Annotations.fold_behaviors
-    (fun _emitter bhv ms -> { bhv ; stmt = None } :: ms)
-    kf @@
-  List.fold_right
-    (fun stmt ms ->
-       Annotations.fold_code_annot (fun _emitter ca ms ->
-           match ca.annot_content with
-           | AStmtSpec(_, { spec_behavior = bs } ) ->
-               List.fold_right (fun bhv ms -> {
-                     bhv ;
-                     stmt = Some stmt ;
-                   }::ms) bs ms
-           | _ -> ms
-         ) stmt ms
-    ) (Kernel_function.get_definition kf).sallstmts []
+type props = [ `All | `Names of string list | `PropId of Property.t ]
 
-let get_default_requires mode kf =
+module MODES = WpContext.StaticGenerator(Kernel_function)
+    (struct
+      type key = kernel_function
+      type data = mode list
+      let name = "Wp.CfgCalculus.Modes"
+      let compile kf =
+        Annotations.fold_behaviors
+          (fun _emitter bhv ms -> { bhv ; stmt = None } :: ms)
+          kf @@
+        List.fold_right
+          (fun stmt ms ->
+             Annotations.fold_code_annot (fun _emitter ca ms ->
+                 match ca.annot_content with
+                 | AStmtSpec(_, { spec_behavior = bs } ) ->
+                     List.fold_right (fun bhv ms -> {
+                           bhv ;
+                           stmt = Some stmt ;
+                         }::ms) bs ms
+                 | _ -> ms
+               ) stmt ms
+          ) (Kernel_function.get_definition kf).sallstmts []
+    end)
+
+let modes = MODES.get
+
+let default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
     try
       let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
@@ -91,24 +101,24 @@ let is_selected_ca ~goal (m: mode) (ca: code_annotation) =
   | AExtended _ | AStmtSpec _ | APragma _ ->
       assert false (* n/a *)
 
-let is_selected_property ~goal (m: mode) (p: Property.t) =
+let is_selected_mode ~goal ~mode (p: Property.t) =
   let open Property in
   match p with
-  | IPCodeAnnot { ica_ca } -> is_selected_ca ~goal m ica_ca
+  | IPCodeAnnot { ica_ca } -> is_selected_ca ~goal mode ica_ca
   | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires bhv | PKAssumes bhv ->
-            Cil.is_default_behavior bhv || is_selected_bhv m bhv
-        | PKEnsures(bhv,_) -> is_selected_bhv m bhv
-        | PKTerminates -> is_default_bhv m
+            Cil.is_default_behavior bhv || is_selected_bhv mode bhv
+        | PKEnsures(bhv,_) -> is_selected_bhv mode bhv
+        | PKTerminates -> is_default_bhv mode
       end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
       begin match bhv with
-        | Id_loop ca -> is_selected_ca ~goal m ca
-        | Id_contract(_,bhv) -> is_selected_bhv m bhv
+        | Id_loop ca -> is_selected_ca ~goal mode ca
+        | Id_contract(_,bhv) -> is_selected_bhv mode bhv
       end
-  | IPDecrease { id_ca = None } -> is_default_bhv m
-  | IPDecrease { id_ca = Some ca } -> is_selected_ca ~goal m ca
+  | IPDecrease { id_ca = None } -> is_default_bhv mode
+  | IPDecrease { id_ca = Some ca } -> is_selected_ca ~goal mode ca
   | IPComplete _ | IPDisjoint _ | IPFrom _
   | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
@@ -131,7 +141,7 @@ struct
   type env = {
     kf: kernel_function;
     mode: mode;
-    props: string list;
+    props: props;
     mutable ki: kinstr; (* Current localisation *)
     cfg: Cfg.automaton;
     we: W.t_env;
@@ -149,8 +159,13 @@ struct
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
   let is_selected ~goal { mode ; props } (pid,_) =
-    (is_selected_property ~goal mode @@ WpPropId.property_of_id pid)
-    && (not goal || props = [] || WpPropId.select_by_name props pid)
+    let p = WpPropId.property_of_id pid in
+    is_selected_mode ~goal ~mode p &&
+    ( not goal ||
+      match props with
+      | `All | `Names [] -> true
+      | `Names ps ->WpPropId.select_by_name ps pid
+      | `PropId id -> Property.equal id p )
 
   let use_assigns env (a : assigns) w =
     match a with
@@ -316,7 +331,7 @@ struct
       wk = W.empty ;
     } in
     let xs = Kernel_function.get_formals kf in
-    let req = get_default_requires mode kf in
+    let req = default_requires mode kf in
     let bhv = CfgAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
     env.we ,
     (* global init *)
