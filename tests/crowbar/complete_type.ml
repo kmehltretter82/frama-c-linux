@@ -42,7 +42,7 @@ let mk_array_type (is_gcc, typ, types, kind) length =
     | Complete, Some _ -> Complete
   in
   let length =
-    Extlib.opt_map (Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf)) length
+    Option.map (Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf)) length
   in
   (is_gcc, TArray (typ, length, { scache = Not_Computed }, []), types, kind)
 

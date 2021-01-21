@@ -125,7 +125,7 @@ let add_exn ast =
     | GVar(v,_,_) when v.vname = "x" -> glob := Some v
     | GFun(f,_) ->
         change_body
-          (Extlib.the !my_exn) (Extlib.the !my_exn2) (Extlib.the !glob) f
+          (Option.get !my_exn) (Option.get !my_exn2) (Option.get !glob) f
     | _ -> ()
   in
   List.iter treat_glob ast.globals

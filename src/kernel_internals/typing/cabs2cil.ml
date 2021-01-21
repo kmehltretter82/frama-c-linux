@@ -5554,7 +5554,7 @@ and makeCompType ghost (isstruct: bool)
       (if comp.cstruct then "struct" else "union");
   List.iter check flds;
   if comp.cfields <> None then begin
-    let old_fields = Extlib.the comp.cfields in
+    let old_fields = Option.get comp.cfields in
     (* This appears to be a multiply defined structure. This can happen from
      * a construct like "typedef struct foo { ... } A, B;". This is dangerous
      * because at the time B is processed some forward references in { ... }

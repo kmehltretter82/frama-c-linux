@@ -7,7 +7,7 @@ object(self)
 
   method! vspec sp =
     Format.printf "Considering spec of function %s@."
-      (Kernel_function.get_name (Extlib.the self#current_kf));
+      (Kernel_function.get_name (Option.get self#current_kf));
     (match self#current_func with
       | Some f ->
           if  f.svar.vname ="f" then (
