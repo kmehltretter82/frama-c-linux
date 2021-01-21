@@ -48,3 +48,6 @@ val compute_selection : computer ->
   ?bhv:string list ->
   ?prop:string list ->
   unit -> Wpo.t Bag.t
+
+val dumper : unit -> computer
+val computer : Factory.setup -> Factory.driver -> computer

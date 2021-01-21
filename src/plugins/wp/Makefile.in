@@ -96,9 +96,10 @@ PLUGIN_CMO:= \
 	ProverTask ProverErgo ProverCoq \
 	filter_axioms Cache ProverWhy3 \
 	driver prover ProverSearch ProverScript \
-	wpGenerator Factory \
+	Factory \
 	cfgInit cfgAnnot cfgCalculus \
 	calculus cfgDump cfgWP \
+	wpGenerator \
 	Generator register VC
 
 PLUGIN_CMI:=

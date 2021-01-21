@@ -85,8 +85,8 @@ let create
   ignore legacy ;
   let cc =
     if dump
-    then CfgDump.create ()
-    else CfgWP.computer setup driver in
+    then WpGenerator.dumper ()
+    else WpGenerator.computer setup driver in
   let the_model = cc#model in
   object
     method model = the_model

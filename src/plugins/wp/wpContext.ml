@@ -56,6 +56,8 @@ struct
   }
 end
 
+module MINDEX = Hashtbl.Make(MODEL)
+
 module MODELS =
 struct
 

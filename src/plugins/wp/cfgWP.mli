@@ -23,7 +23,7 @@
 open LogicUsage
 
 (* -------------------------------------------------------------------------- *)
-(* --- WP Calculus                                                        --- *)
+(* --- VC Generator                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 module type VCgen =
@@ -36,4 +36,4 @@ end
 
 val vcgen : Factory.setup -> Factory.driver -> (module VCgen)
 
-val computer : Factory.setup -> Factory.driver -> WpGenerator.computer
+(* -------------------------------------------------------------------------- *)
