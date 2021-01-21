@@ -523,7 +523,8 @@ module IgnoreRecursiveCalls =
     (struct
       let option_name = "-eva-ignore-recursive-calls"
       let help =
-        "Pretend function calls that would be recursive do not happen. Causes unsoundness"
+        "Pretend function calls that would be recursive do not happen. \
+         Causes unsoundness"
     end)
 let () = add_correctness_dep IgnoreRecursiveCalls.parameter
 
@@ -535,9 +536,9 @@ module WarnCopyIndeterminate =
       let option_name = "-eva-warn-copy-indeterminate"
       let arg_name = "f | @all"
       let help = "Warn when a statement of the specified functions copies a \
-                  value that may be indeterminate (uninitialized or containing escaping address). \
-                  Set by default; can be deactivated for function 'f' by '=-f', or for all \
-                  functions by '=-@all'."
+                  value that may be indeterminate (uninitialized or containing \
+                  escaping address). Set by default; can be deactivated for \
+                  function 'f' by '=-f', or for all functions by '=-@all'."
     end)
 let () = add_correctness_dep WarnCopyIndeterminate.parameter
 let () = WarnCopyIndeterminate.Category.(set_default (all ()))
@@ -574,7 +575,8 @@ module AutomaticContextMaxDepth =
       let option_name = "-eva-context-depth"
       let default = 2
       let arg_name = "n"
-      let help = "Use <n> as the depth of the default context for Eva. (defaults to 2)"
+      let help = "Use <n> as the depth of the default context for Eva. \
+                  (defaults to 2)"
     end)
 let () = AutomaticContextMaxDepth.set_range 0 max_int
 let () = add_correctness_dep AutomaticContextMaxDepth.parameter
@@ -586,7 +588,8 @@ module AutomaticContextMaxWidth =
       let option_name = "-eva-context-width"
       let default = 2
       let arg_name = "n"
-      let help = "Use <n> as the width of the default context for Eva. (defaults to 2)"
+      let help = "Use <n> as the width of the default context for Eva. \
+                  (defaults to 2)"
     end)
 let () = AutomaticContextMaxWidth.set_range ~min:1 ~max:max_int
 let () = add_correctness_dep AutomaticContextMaxWidth.parameter
@@ -609,9 +612,9 @@ module InitializationPaddingGlobals =
       let option_name = "-eva-initialization-padding-globals"
       let arg_name = "yes|no|maybe"
       let help = "Specify how padding bits are initialized inside global \
-                  variables. Possible values are <yes> (padding is fully initialized), \
-                  <no> (padding is completely uninitialized), or <maybe> \
-                  (padding may be uninitialized). Default is <yes>."
+                  variables. Possible values are <yes> (padding is fully \
+                  initialized), <no> (padding is completely uninitialized), or \
+                  <maybe> (padding may be uninitialized). Default is <yes>."
     end)
 let () = InitializationPaddingGlobals.set_possible_values ["yes"; "no"; "maybe"]
 let () = add_correctness_dep InitializationPaddingGlobals.parameter
@@ -631,9 +634,9 @@ module DescendingIteration =
       let option_name = "-eva-descending-iteration"
       let arg_name = "no|exits|full"
       let help = "Experimental. After hitting a postfix point, try to improve \
-                  the precision with either a <full> iteration or an iteration from loop \
-                  head to exit paths (<exits>) or do not try anything (<no>). Default \
-                  is <no>."
+                  the precision with either a <full> iteration or an iteration \
+                  from loop head to exit paths (<exits>) or do not try anything \
+                  (<no>). Default is <no>."
     end)
 let () = DescendingIteration.set_possible_values ["no" ; "exits" ; "full"]
 let () = add_precision_dep DescendingIteration.parameter
@@ -645,9 +648,9 @@ module HierarchicalConvergence =
     (struct
       let option_name = "-eva-hierarchical-convergence"
       let help = "Experimental and unsound. Separate the convergence process \
-                  of each level of nested loops. This implies that the convergence of \
-                  inner loops will be completely recomputed when doing another iteration \
-                  of the outer loops."
+                  of each level of nested loops. This implies that the \
+                  convergence of inner loops will be completely recomputed when \
+                  doing another iteration of the outer loops."
     end)
 let () = add_precision_dep HierarchicalConvergence.parameter
 
@@ -1029,8 +1032,8 @@ module ArrayPrecisionLevel =
       let option_name = "-eva-plevel"
       let arg_name = "n"
       let help = "Use <n> as the precision level for arrays accesses. \
-                  Array accesses are precise as long as the interval for the index contains \
-                  less than n values. (defaults to 200)"
+                  Array accesses are precise as long as the interval for the \
+                  index contains less than n values. (defaults to 200)"
     end)
 let () = ArrayPrecisionLevel.set_range 0 max_int
 let () = add_precision_dep ArrayPrecisionLevel.parameter
@@ -1054,7 +1057,8 @@ module ValShowPerf =
   False
     (struct
       let option_name = "-eva-show-perf"
-      let help = "Compute and show a summary of the time spent analyzing function calls"
+      let help = "Compute and show a summary of the time spent analyzing \
+                  function calls"
     end)
 
 let () = Parameter_customize.set_group messages
