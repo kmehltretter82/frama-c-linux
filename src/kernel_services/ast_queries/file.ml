@@ -46,11 +46,6 @@ type file =
   | External of Filepath.Normalized.t * string
   (* file * name of plug-in that handles it *)
 
-let filepath_of_file = function
-  | NeedCPP (fp, _, _)
-  | NoCPP fp
-  | External (fp, _) -> fp
-
 module D =
   Datatype.Make
     (struct
@@ -92,9 +87,8 @@ let get_suffixes () =
     check_suffixes
     [ ".c"; ".i"; ".h" ]
 
-let get_name s =
-  let file = match s with  NeedCPP (s,_,_,_) | NoCPP s | External (s,_) -> s in
-  Filepath.Normalized.to_pretty_string file
+let get_filepath = function NeedCPP (s, _, _, _) | NoCPP s | External (s, _) -> s
+let get_name s = Filepath.Normalized.to_pretty_string (get_filepath s)
 
 (* ************************************************************************* *)
 (** {2 Preprocessor command} *)
@@ -1664,10 +1658,9 @@ let print_all_sources out all_sources_tbl =
 let compute_sources_table cpp_commands =
   let all_sources_tbl = Hashtbl.create 7 in
   List.iter (fun (f, cmd_opt) ->
-      let fp = filepath_of_file f in
+      add_source_if_new all_sources_tbl (get_filepath f);
       match cmd_opt with
-      | None ->
-        add_source_if_new all_sources_tbl fp
+      | None -> ()
       | Some (cpp_cmd, _ppf, _sl) ->
         let audit_sources_tmpfile =
           try
@@ -1693,10 +1686,8 @@ let compute_sources_table cpp_commands =
                         (exit code %d):@\n%s%s"
             exit_code cmd_for_sources
             cause_frama_c_compliant;
-        end else begin
+        end else
           add_included_sources all_sources_tbl (audit_sources_tmpfile:>string);
-          add_source_if_new all_sources_tbl fp;
-        end;
     ) cpp_commands;
   all_sources_tbl
 
