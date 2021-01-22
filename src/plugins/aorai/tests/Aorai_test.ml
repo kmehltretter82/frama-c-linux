@@ -92,7 +92,9 @@ let extend () =
       in
       let chan = open_out tmpfile in
       let fmt = Format.formatter_of_out_channel chan in
-      File.pretty_ast ~prj:(Project.from_unique_name "aorai") ~fmt ();
+      let aorai_prj = Project.from_unique_name "aorai" in
+      Project.on aorai_prj Kernel.PrintLibc.on ();
+      File.pretty_ast ~prj:aorai_prj ~fmt ();
       close_out chan;
       let selection =
         State_selection.of_list [ InternalWpShare.self; ProveAuxSpec.self ]
