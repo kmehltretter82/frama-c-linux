@@ -810,10 +810,11 @@ sig
   (** Check assigns inclusion.
       Compute a formula that checks whether written locations are either
       invalid (at the given memory location) or included in some assignable
-      region. When [~unfold:true], compound memory locations are expanded
-      field-by-field. *)
+      region. When [~unfold:n && n <> 0], compound memory locations are expanded
+      field-by-field and arrays, cell-by-cell (by quantification). Up to [n]
+      levels are unfolded, -1 means unlimited. *)
   val check_assigns :
-    unfold:bool -> sigma -> written:region -> assignable:region -> pred
+    unfold:int -> sigma -> written:region -> assignable:region -> pred
 
 end
 

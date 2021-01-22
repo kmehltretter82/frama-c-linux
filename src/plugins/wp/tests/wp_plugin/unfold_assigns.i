@@ -1,10 +1,14 @@
 /* run.config
    OPT:
-   OPT: -wp-unfold-assigns
+   OPT: -wp-unfold-assigns -1
+   OPT: -wp-unfold-assigns 2
+   OPT: -wp-unfold-assigns 1
  */
 
 /* run.config_qualif
-   OPT: -wp-unfold-assigns
+   OPT: -wp-unfold-assigns -1
+   OPT: -wp-unfold-assigns 2
+   OPT: -wp-unfold-assigns 1
  */
 
 struct S { int a,b; };
@@ -87,11 +91,13 @@ struct With_array {
 //@ assigns *s ;
 void f_assigns_with_array(struct With_array* s);
 
+// FAILS AT UNFOLD LEVEL 1
 //@ assigns s->x, s->t[0], s->t[1..2] ;
 void NESTED_ARRAY_STATIC(struct With_array *s){
   f_assigns_with_array(s);
 }
 
+// FAILS AT UNFOLD LEVEL 1
 /*@ requires n > 2 ;
     assigns s->x, s->t[0], s->t[1..n] ; */
 void NESTED_ARRAY_VARS(struct With_array *s, unsigned n){
@@ -101,6 +107,7 @@ void NESTED_ARRAY_VARS(struct With_array *s, unsigned n){
 //@ assigns *(s+(0..n)) ;
 void f_assigns_range_with_array(struct With_array* s, unsigned n);
 
+// FAILS AT UNFOLD LEVEL 2
 /*@ assigns s[0].x, s[0].t[0], s[0].t[1..2],
             s[1].x, s[1].t[0..2],
             s[2];
@@ -109,6 +116,7 @@ void RANGE_NESTED_ARRAY_STATIC(struct With_array* s){
   f_assigns_range_with_array(s, 2);
 }
 
+// FAILS AT UNFOLD LEVEL 2
 /*@ requires n > 2 && m > 3 ;
     assigns s[0].x, s[0].t[0], s[0].t[1..m],
             s[1].x, s[1].t[0..m],

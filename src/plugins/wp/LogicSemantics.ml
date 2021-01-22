@@ -1063,72 +1063,63 @@ struct
   (* --- CheckAssigns                                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec decompose_region (obj, sloc) =
-    let max_range size = Some (e_sub (e_int size) e_one) in
+  let rec assignable_region unfold reg assignable =
+    let inclusion = p_any (L.included reg) assignable in
+    if unfold = 0 then inclusion
+    else p_or inclusion (assignable_unfolded_region unfold reg assignable)
+
+  (* Note that when a region cannot be unfolded anymore (that is, when it is a
+     [Sloc] with atomic type, including unknown size arrays and opaque structs),
+     the function return [p_false]. *)
+  and assignable_unfolded_region unfold (obj, sloc) assignable =
+    let range size = Some e_zero, Some (e_sub (e_int size) e_one) in
     match sloc with
     | Sloc loc ->
         begin match obj with
           | C_pointer _ | C_int _ | C_float _
           | C_comp { cfields = None } | C_array { arr_flat = None } ->
-              Bag.elt (obj, sloc)
+              (* Nothing to unfold *)
+              p_false
 
           | C_comp { cfields = Some fields } ->
-              let slocs_of_field f =
-                let obj = Ctypes.object_of f.ftype in
-                decompose_region (obj, (Sloc (M.field loc f)))
+              let assignable_field f =
+                let reg = Ctypes.object_of f.ftype, Sloc (M.field loc f) in
+                assignable_region (unfold-1) reg assignable
               in
-              Bag.umap_list slocs_of_field fields
+              p_conj (List.map assignable_field fields)
 
           | C_array { arr_flat = Some { arr_size=len ; arr_cell=typ } } ->
               let obj = Ctypes.object_of typ in
-              decompose_range loc obj (Some e_zero) (max_range len)
+              assignable_unfolded_range unfold loc obj (range len) assignable
         end
 
     | Sarray (loc, obj, len) ->
-        decompose_range loc obj (Some e_zero) (max_range len)
+        assignable_unfolded_range unfold loc obj (range len) assignable
 
     | Srange (loc, obj, b, e) ->
-        decompose_range loc obj b e
+        assignable_unfolded_range unfold loc obj (b, e) assignable
 
-    | _ ->
-        (* It is not trivial to go further: the list of regions depends on some
-           unknown values (length of the range, property, ...) *)
-        Bag.elt (obj, sloc)
+    | Sdescr (xs, loc, guard) ->
+        assignable_unfolded_descr unfold obj xs loc guard assignable
 
-  and decompose_range loc obj low up =
+  and assignable_unfolded_range unfold loc obj (low, up) =
     let x = Lang.freshvar ~basename:"k" Lang.t_int in
     let k = e_var x in
     let guard = Vset.in_range k low up in
     let loc = M.shift loc obj k in
-    Bag.elt (obj, Sdescr([x], loc, guard))
+    assignable_unfolded_descr unfold obj [x] loc guard
 
-  let rec assignable_region ~unfold reg assignable =
-    let check_inclusion reg =
-      p_any (L.included reg) assignable
-    in
-    if unfold then
-      (* This phase unfolds terms that cannot be "statically" unfolded *)
-      let logic_decompose = function
-        (* decompose always remove Sarray and Srange *)
-        | (_, Sarray _) | (_, Srange _)-> assert false
-
-        | (_, Sloc _) as s -> check_inclusion s
-        | (obj, Sdescr(xs, l, guard)) ->
-            p_forall xs
-              (p_imply guard
-                 (assignable_region ~unfold:true (obj, Sloc l) assignable))
-      in
-      let props = Bag.map logic_decompose (decompose_region reg) in
-      p_conj (Bag.fold_left (fun l p -> p :: l) [] props)
-    else
-      check_inclusion reg
+  and assignable_unfolded_descr unfold obj xs loc guard assignable =
+    p_forall xs
+      (p_imply guard
+         (assignable_region (unfold-1) (obj, Sloc loc) assignable))
 
   let check_assigns ~unfold sigma ~written ~assignable =
     p_all
       (fun reg ->
          p_imply
            (p_not (L.invalid sigma reg))
-           (assignable_region ~unfold reg assignable)
+           (assignable_region unfold reg assignable)
       ) (written : region)
 
 end
