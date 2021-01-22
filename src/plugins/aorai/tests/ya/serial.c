@@ -17,13 +17,13 @@ OPT: -cpp-extra-args="-DFOR_WP" -aorai-automata @PTEST_DIR@/@PTEST_NAME@_wp.ya -
 #define BW_AND3 <=
 #endif
 
-/*@ assigns \result \from \nothing;
+/*@ assigns \result,Frama_C_entropy_source \from Frama_C_entropy_source;
     ensures 0 <= \result < 0x100; */
 int input_status(void) {
   return Frama_C_interval(0x00, 0xff);
 }
 
-/*@ assigns \result \from \nothing;
+/*@ assigns \result,Frama_C_entropy_source \from Frama_C_entropy_source;
     ensures 0 <= \result < 0x100; */
 int input_data(void) {
   return Frama_C_interval(0x00, 0xff);
