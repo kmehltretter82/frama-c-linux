@@ -141,8 +141,8 @@ struct
           begin fun () ->
             LogicUsage.iter_lemmas VCG.register_lemma ;
             List.iter (fun l ->
-               let wpo = VCG.compile_lemma l in
-               collection := Bag.add wpo !collection
+                let wpo = VCG.compile_lemma l in
+                collection := Bag.add wpo !collection
               ) task.lemmas ;
           end () ;
       List.iter

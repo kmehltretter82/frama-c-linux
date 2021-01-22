@@ -1680,6 +1680,8 @@ src/plugins/wp/cfgCalculus.ml: CEA_WP
 src/plugins/wp/cfgCalculus.mli: CEA_WP
 src/plugins/wp/cfgDump.ml: CEA_WP
 src/plugins/wp/cfgDump.mli: CEA_WP
+src/plugins/wp/cfgGenerator.ml: CEA_WP
+src/plugins/wp/cfgGenerator.mli: CEA_WP
 src/plugins/wp/cfgInit.ml: CEA_WP
 src/plugins/wp/cfgInit.mli: CEA_WP
 src/plugins/wp/cfgWP.ml: CEA_WP
