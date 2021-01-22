@@ -1656,33 +1656,29 @@ let print_all_sources out all_sources_tbl =
 
 let compute_sources_table cpp_commands =
   let all_sources_tbl = Hashtbl.create 7 in
-  List.iter (fun (f, cmd_opt) ->
-      add_source_if_new all_sources_tbl (get_filepath f);
-      match cmd_opt with
-      | None -> ()
-      | Some (cpp_cmd, _ppf, _sl) ->
-        let audit_sources_tmpfile =
-          create_temp_file "audit_produce_sources" ".txt"
+  let process_file (file, cmd_opt) =
+    add_source_if_new all_sources_tbl (get_filepath file);
+    match cmd_opt with
+    | None -> ()
+    | Some (cpp_cmd, _ppf, _sl) ->
+      let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
+      let tmp_file = (tmp_file :> string) in
+      let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file in
+      let exit_code = Sys.command cmd_for_sources in
+      if exit_code = 0
+      then add_included_sources all_sources_tbl tmp_file
+      else
+        let cause_frama_c_compliant =
+          if Kernel.CppGnuLike.get () then "" else
+            Format.asprintf
+              "\nPlease ensure preprocessor is Frama-C compliant \
+               (see option %s)" Kernel.CppGnuLike.option_name
         in
-        let cmd_for_sources =
-          cpp_cmd ^ " -H -MM >/dev/null 2>" ^ (audit_sources_tmpfile:>string)
-        in
-        let exit_code = Sys.command cmd_for_sources in
-        if exit_code <> 0 then begin
-          let cause_frama_c_compliant =
-            if not (Kernel.CppGnuLike.get ()) then
-              Format.asprintf "\nPlease ensure preprocessor is Frama-C-compliant \
-                            (see option %s)"
-                Kernel.CppGnuLike.option_name
-            else ""
-          in
-          Kernel.abort "error running command to obtain included sources \
-                        (exit code %d):@\n%s%s"
-            exit_code cmd_for_sources
-            cause_frama_c_compliant;
-        end else
-          add_included_sources all_sources_tbl (audit_sources_tmpfile:>string);
-    ) cpp_commands;
+        Kernel.abort "error running command to obtain included sources \
+                      (exit code %d):@\n%s%s"
+          exit_code cmd_for_sources cause_frama_c_compliant;
+  in
+  List.iter process_file cpp_commands;
   all_sources_tbl
 
 let source_hashes_of_json path =
