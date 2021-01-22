@@ -956,12 +956,16 @@ weakest precondition calculus.
   a call (default is: \texttt{yes}).
 \item[\tt -wp-(no)-precond-weakening] discard pre-conditions of side behaviours (sound but
   incomplete optimisation, default is: \texttt{no}).
-\item[\tt -wp-(no)-unfold-assigns] prove assigns goal of \texttt{struct}
-  compound types field by field. This allows for proving that assigning
-  a complete structure is still included into an assignment field by field.
-  This option is not set by default, because it is generally not necessary
-  and it can generates a large number of verifications for structures
-  with many (nested) fields (defaults to \texttt{no}).
+\item[\tt -wp-unfold-assigns <{\it n}>] when proving assigns, unfold up to
+  \textit{n} levels of \texttt{struct} compounds types or access via ranges.
+  \texttt{struct} are unfolded field by field, ranges are unfolded cell by
+  cell (via a universal quantification over the index of the cell).
+  This allows for proving that assigning a complete structure is still included
+  into an assignment field by field, or that assigning a range is still included
+  in a union of subranges. This option is set to \texttt{0} by default, because
+  it is generally not necessary and it can generates a large number of
+  verifications for structures with many (nested) fields. \texttt{-1} enables
+  full unfolding.
 \item[\tt -wp-(no)-dynamic] handles calls \textit{via} function pointers
   thanks to the dedicated \verb+@calls f1,...,fn+ code annotation (default is: \texttt{yes}).
 \end{description}
