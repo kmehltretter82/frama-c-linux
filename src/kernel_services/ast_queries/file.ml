@@ -1671,7 +1671,7 @@ let compute_sources_table cpp_commands =
         if exit_code <> 0 then begin
           let cause_frama_c_compliant =
             if not (Kernel.CppGnuLike.get ()) then
-              Kernel.abort "\nPlease ensure preprocessor is Frama-C-compliant \
+              Format.asprintf "\nPlease ensure preprocessor is Frama-C-compliant \
                             (see option %s)"
                 Kernel.CppGnuLike.option_name
             else ""
