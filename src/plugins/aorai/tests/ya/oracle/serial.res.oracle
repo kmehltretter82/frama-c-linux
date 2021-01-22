@@ -21,33 +21,20 @@
 [eva] tests/ya/serial.c:58: starting to merge loop iterations
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 100 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 300 states
-[aorai] tests/ya/serial.c:92: aorai_reject <- aorai_reject <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
-[aorai] tests/ya/serial.c:92: aorai_reject <- Error <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
+[eva:alarm] tests/ya/serial.c:33: Warning: 
+  assertion 'Aorai,aorai_smoke_test' got status invalid (stopping propagation).
 [aorai] tests/ya/serial.c:92: Wait1 <- Wait1 <- Complete
 [aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
-[aorai] tests/ya/serial.c:92: aorai_reject <- aorai_reject <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [0..8191]
-[aorai] tests/ya/serial.c:92: aorai_reject <- Error <- Complete
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [0..8191]
 [aorai] tests/ya/serial.c:92: Wait1 <- Wait1 <- Complete
 [aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [0..8191]
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 500 states
-[eva:alarm] tests/ya/serial.c:65: Warning: 
-  accessing uninitialized left-value. assert \initialized(&status);
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 700 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 900 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1200 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1400 states
-[aorai] tests/ya/serial.c:92: aorai_reject <- aorai_reject <- aorai_reject
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
-[aorai] tests/ya/serial.c:92: aorai_reject <- aorai_reject <- aorai_reject
-[aorai] tests/ya/serial.c:92: n in {5},x in [0..16383],y in [0..8191]
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1500 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1600 states
 [eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1700 states
-[eva] tests/ya/serial.c:63: Trace partitioning superposing up to 1800 states
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
@@ -84,15 +71,15 @@
   aorai_y2 ∈ [0..2147483647]
   aorai_CurOperation ∈ {2}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 24}
-  aorai_StatesHistory_2 ∈ {8; 9; 10; 11; 12; 13; 24}
+  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6}
+  aorai_StatesHistory_2 ∈ {8; 9; 10; 11; 12; 13}
 [eva:final-states] Values at end of function input_data_pre_func:
   aorai_CurOperation ∈ {2}
   aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {1; 2; 3; 4; 5; 6; 24}
-  aorai_StatesHistory_1 ∈ {8; 9; 10; 11; 12; 13; 24}
-  aorai_StatesHistory_2 ∈ {14; 15; 16; 17; 18; 24}
+  aorai_CurStates ∈ {1; 2; 3; 4; 5; 6}
+  aorai_StatesHistory_1 ∈ {8; 9; 10; 11; 12; 13}
+  aorai_StatesHistory_2 ∈ {14; 15; 16; 17; 18}
 [eva:final-states] Values at end of function input_data:
   Frama_C_entropy_source ∈ [--..--]
   aorai_x1 ∈
@@ -128,46 +115,46 @@
   aorai_y2 ∈ [0..2147483647]
   aorai_CurOperation ∈ {2}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 24}
-  aorai_StatesHistory_2 ∈ {8; 9; 10; 11; 12; 13; 24}
+  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6}
+  aorai_StatesHistory_2 ∈ {8; 9; 10; 11; 12; 13}
 [eva:final-states] Values at end of function input_status_post_func:
   aorai_CurOperation ∈ {1}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {14; 15; 16; 17; 18; 24}
-  aorai_StatesHistory_2 ∈ {0; 19; 20; 21; 22; 23; 24}
+  aorai_CurStates ∈ {8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {14; 15; 16; 17; 18}
+  aorai_StatesHistory_2 ∈ {0; 19; 20; 21; 22; 23}
 [eva:final-states] Values at end of function input_status_pre_func:
   aorai_CurOperation ∈ {1}
   aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {14; 15; 16; 17; 18; 24}
-  aorai_StatesHistory_1 ∈ {0; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_2 ∈ {1; 2; 3; 4; 5; 6; 7; 14; 15; 16; 17; 18; 19; 24}
+  aorai_CurStates ∈ {14; 15; 16; 17; 18}
+  aorai_StatesHistory_1 ∈ {0; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_2 ∈ {1; 2; 3; 4; 5; 6; 14; 15; 16; 17; 18; 19}
 [eva:final-states] Values at end of function input_status:
   Frama_C_entropy_source ∈ [--..--]
   aorai_CurOperation ∈ {1}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {14; 15; 16; 17; 18; 24}
-  aorai_StatesHistory_2 ∈ {0; 19; 20; 21; 22; 23; 24}
+  aorai_CurStates ∈ {8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {14; 15; 16; 17; 18}
+  aorai_StatesHistory_2 ∈ {0; 19; 20; 21; 22; 23}
 [eva:final-states] Values at end of function output_post_func:
   aorai_CurOperation ∈ {0}
   aorai_CurOpStatus ∈ {1}
   aorai_CurStates ∈ {19; 24}
-  aorai_StatesHistory_1 ∈ {7; 19; 24}
-  aorai_StatesHistory_2 ∈ {0; 24}
+  aorai_StatesHistory_1 ∈ {7; 19}
+  aorai_StatesHistory_2 ∈ {0}
 [eva:final-states] Values at end of function output_pre_func:
   aorai_CurOperation ∈ {0}
   aorai_CurOpStatus ∈ {0}
   aorai_CurStates ∈ {7; 19; 24}
-  aorai_StatesHistory_1 ∈ {0; 24}
-  aorai_StatesHistory_2 ∈ {5; 24}
+  aorai_StatesHistory_1 ∈ {0}
+  aorai_StatesHistory_2 ∈ {5}
 [eva:final-states] Values at end of function output:
   aorai_CurOperation ∈ {0}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {19; 24}
-  aorai_StatesHistory_1 ∈ {7; 19; 24}
-  aorai_StatesHistory_2 ∈ {0; 24}
+  aorai_CurStates ∈ {19}
+  aorai_StatesHistory_1 ∈ {19}
+  aorai_StatesHistory_2 ∈ {0}
 [eva:final-states] Values at end of function read:
   Frama_C_entropy_source ∈ [--..--]
   s ∈
@@ -223,9 +210,9 @@
   aorai_y2 ∈ [0..2147483647]
   aorai_CurOperation ∈ {1; 2}
   aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 14; 15; 16; 17; 18; 24}
-  aorai_StatesHistory_2 ∈ {0; 8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23; 24}
+  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 14; 15; 16; 17; 18}
+  aorai_StatesHistory_2 ∈ {0; 8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23}
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   buffer[0] ∈
@@ -283,25 +270,24 @@
   aorai_y2 ∈ [0..2147483647]
   aorai_CurOperation ∈ {0; 1; 2}
   aorai_CurOpStatus ∈ {0; 1}
-  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23; 24}
-  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 7; 14; 15; 16; 17; 18; 19; 24}
-  aorai_StatesHistory_2 ∈ {0; 8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23; 24}
+  aorai_CurStates ∈ {0; 19; 20; 21; 22; 23}
+  aorai_StatesHistory_1 ∈ {1; 2; 3; 4; 5; 6; 14; 15; 16; 17; 18; 19}
+  aorai_StatesHistory_2 ∈ {0; 8; 9; 10; 11; 12; 13; 19; 20; 21; 22; 23}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   11 functions analyzed (out of 11): 100% coverage.
-  In these functions, 222 statements reached (out of 261): 85% coverage.
+  In these functions, 206 statements reached (out of 261): 78% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    0 warnings
     by the Frama-C kernel:    0 errors    1 warning
   ----------------------------------------------------------------------------
-  1 alarm generated by the analysis:
-       1 access to uninitialized left-values
+  0 alarms generated by the analysis.
   ----------------------------------------------------------------------------
   Evaluation of the logical properties reached by the analysis:
-    Assertions        0 valid     0 unknown     0 invalid      0 total
+    Assertions        4 valid     2 unknown     0 invalid      6 total
     Preconditions     2 valid     0 unknown     0 invalid      2 total
-  100% of the logical properties reached have been proven.
+  75% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------
 [kernel] Parsing TMPDIR/aorai_serial_0.i (no preprocessing)
 /* Generated by Frama-C */
@@ -575,6 +561,8 @@ int n = 0;
                         else 
                           if (13 == aorai_CurStates) aorai_CurStates = StatusReq5;
                           else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -628,6 +616,8 @@ int n = 0;
                                 if (18 == aorai_CurStates && (res & 1) == 0) 
                                   aorai_CurStates = Wait5;
                                 else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -677,6 +667,8 @@ int input_status(void)
                       else 
                         if (19 == aorai_CurStates) aorai_CurStates = Error;
                         else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -738,6 +730,8 @@ int input_status(void)
                                     aorai_y1 = res;
                                   }
                                   else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -799,6 +793,8 @@ int input_data(void)
                                                               128 * aorai_y2)) 
                               aorai_CurStates = Wait1;
                             else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -814,6 +810,8 @@ int input_data(void)
     aorai_StatesHistory_1 = aorai_CurStates;
     if (19 == aorai_CurStates) aorai_CurStates = Wait1;
     else aorai_CurStates = aorai_reject;
+    /@ assert Aorai: aorai_smoke_test: aorai_CurStates ≢ aorai_reject; @/
+    ;
     return;
   }
 
@@ -851,7 +849,6 @@ void main(void)
     int data = read(& status);
     if (data != -1) {
       int tmp_0;
-      /*@ assert Eva: initialization: \initialized(&status); */ ;
       if (status != 0) {
         n = 0;
         continue;

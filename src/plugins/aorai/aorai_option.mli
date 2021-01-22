@@ -39,6 +39,13 @@ module ConsiderAcceptance: Parameter_sig.Bool
 module AutomataSimplification: Parameter_sig.Bool
 module AddingOperationNameAndStatusInSpecification: Parameter_sig.Bool
 
+(** if [true], adds assertion at the end of the generated function
+    to check that the automaton is not in the rejecting state (in
+    the deterministic case), or that at least one non-rejecting state
+    is active (in the non-deterministic state).
+*)
+module SmokeTests: Parameter_sig.Bool
+
 (** [true] if the user declares that its ya automaton is deterministic. *)
 module Deterministic: State_builder.Ref with type data = bool
 

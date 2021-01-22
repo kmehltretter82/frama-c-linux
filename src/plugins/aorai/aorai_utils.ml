@@ -874,6 +874,24 @@ let is_out_of_state_exp state loc =
       (Cil.evar (Data_for_aorai.get_state_var state))
       (mk_int_exp 0)
 
+let assert_alive_automaton kf stmt =
+  let pred =
+    if Aorai_option.Deterministic.get() then
+      let reject_state = Data_for_aorai.get_reject_state() in
+      is_out_of_state_pred reject_state
+    else begin
+      let valid_states =
+        List.filter
+          (fun x -> not (Data_for_aorai.is_reject_state x))
+          (fst (Data_for_aorai.getGraph ()))
+      in
+      let valid_preds = List.map is_state_pred valid_states in
+      Logic_const.pors valid_preds
+    end
+  in
+  let pred = { pred with pred_name = "aorai_smoke_test" :: pred.pred_name } in
+  Annotations.add_assert Aorai_option.emitter ~kf stmt pred
+
 (* Utilities for other globals *)
 
 let mk_global_comment txt = add_global (GText (txt))
@@ -2126,10 +2144,15 @@ let auto_func_block generated_kf loc f st status res =
     else
       mk_non_deterministic_body generated_kf loc f st status res
   in
-  let ret = [ Cil.mkStmt ~ghost:true (Cil_types.Return(None,loc)) ] in
+  let ret =
+    Cil.mkStmt ~ghost:true ~valid_sid:true (Cil_types.Return(None,loc))
+  in
+  if Aorai_option.SmokeTests.get () then begin
+    assert_alive_automaton generated_kf ret;
+  end;
   let res_block =
     (Cil.mkBlock
-       ( stmt_begin_list @ stmt_history_update @ main_stmt @ ret))
+       ( stmt_begin_list @ stmt_history_update @ main_stmt @ [ret]))
   in
   res_block.blocals <- local_var;
   Aorai_option.debug ~dkey "Generated body is:@\n%a"

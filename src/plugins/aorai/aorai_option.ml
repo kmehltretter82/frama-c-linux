@@ -150,6 +150,14 @@ module Deterministic=
       let default () = false
     end)
 
+module SmokeTests=
+  False
+    (struct
+      let option_name = "-aorai-smoke-tests"
+      let help = "Add assertion in the generated functions to ensure \
+                  that the automaton is always in at least one state"
+    end)
+
 module InstrumentationHistory =
   Int
     (struct
