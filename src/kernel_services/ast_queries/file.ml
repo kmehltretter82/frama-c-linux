@@ -406,6 +406,12 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
+let create_temp_file ?debug name suffix =
+  let of_string = Filepath.Normalized.of_string in
+  try of_string (Extlib.temp_file_cleanup_at_exit ?debug name suffix)
+  with Extlib.Temp_file_error s ->
+    Kernel.abort "cannot create temporary file: %s" s
+
 let safe_remove_file (f : Datatype.Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
     Extlib.safe_remove (f :> string)
@@ -461,14 +467,7 @@ let build_cpp_cmd = function
           opt;
         [opt]
     in
-    let ppf =
-      try
-        Datatype.Filepath.of_string
-          (Extlib.temp_file_cleanup_at_exit ~debug
-             (Filename.basename (f :> string)) ".i")
-      with Extlib.Temp_file_error s ->
-        Kernel.abort "cannot create temporary file: %s" s
-    in
+    let ppf = create_temp_file ~debug (Filename.basename (f :> string)) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let include_args =
@@ -1663,12 +1662,7 @@ let compute_sources_table cpp_commands =
       | None -> ()
       | Some (cpp_cmd, _ppf, _sl) ->
         let audit_sources_tmpfile =
-          try
-            Datatype.Filepath.of_string
-              (Extlib.temp_file_cleanup_at_exit
-                 "audit_produce_sources" ".txt")
-          with Extlib.Temp_file_error s ->
-            Kernel.abort "cannot create temporary file: %s" s
+          create_temp_file "audit_produce_sources" ".txt"
         in
         let cmd_for_sources =
           cpp_cmd ^ " -H -MM >/dev/null 2>" ^ (audit_sources_tmpfile:>string)
@@ -1887,8 +1881,7 @@ let create_rebuilt_project_from_visitor
       let name = "frama_c_project_" ^ prj_name ^ "_" in
       let ext = if preprocess then ".c" else ".i" in
       let debug = Kernel.Debug.get () > 0 in
-      let tmp_fname = Extlib.temp_file_cleanup_at_exit ~debug name ext in
-      Filepath.Normalized.of_string tmp_fname
+      create_temp_file ~debug name ext
     in
     let cout = open_out (f :> string) in
     let fmt = Format.formatter_of_out_channel cout in
@@ -1900,7 +1893,7 @@ let create_rebuilt_project_from_visitor
     in
     Project.on prj redo ();
     prj
-  with Extlib.Temp_file_error s | Sys_error s ->
+  with Sys_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
 (*
