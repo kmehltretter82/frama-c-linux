@@ -244,6 +244,12 @@ val getStateName : int -> string
     sequences. *)
 val is_reject_state: state -> bool
 
+(** [true] iff a rejecting state already exists. *)
+val has_reject_state: unit -> bool
+
+(** return the rejecting state of the graph, creating it if needed. *)
+val get_reject_state: unit -> state
+
 (** returns the transition having the corresponding id.
     @raise Not_found if this is not the case.
 *)

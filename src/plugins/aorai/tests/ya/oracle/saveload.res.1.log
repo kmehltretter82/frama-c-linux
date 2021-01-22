@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   aorai_CurOperation ∈ {0}
   aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {1}
+  aorai_CurStates ∈ {2}
 [aorai] tests/ya/saveload.i:14: accept
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -38,7 +38,7 @@
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   6 functions analyzed (out of 6): 100% coverage.
-  In these functions, 31 statements reached (out of 31): 100% coverage.
+  In these functions, 31 statements reached (out of 35): 88% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    0 warnings

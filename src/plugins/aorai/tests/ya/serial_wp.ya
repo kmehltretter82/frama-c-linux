@@ -7,7 +7,7 @@ $x2 : int;
 $y1 : int;
 $y2 : int;
 
-Error : { 0 == 1 } -> Error;
+Error : { false } -> Error;
 
 Wait1 :
   { CALL(input_status) } -> StatusReq1

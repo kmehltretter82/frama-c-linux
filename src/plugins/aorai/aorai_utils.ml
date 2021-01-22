@@ -1073,18 +1073,6 @@ let make_enum_states () =
   let state_list =
     List.map (fun x -> (x.Promelaast.name, x.Promelaast.nums)) state_list
   in
-  let state_list =
-    if not (Aorai_option.Deterministic.get ()) then state_list
-    else
-      (*[VP] Strictly speaking this is not needed, but Jessie tends
-        to consider that a value of enum type can only be one of the
-        tags, so that we must add this dummy state that is always a
-        possible value, even when a contract concludes that curState
-        is none of the others. Note that ISO C does not impose this
-        limitation to values of enum types.
-      *)
-      (get_fresh "aorai_reject_state", -2)::state_list
-  in
   let enum = mk_global_c_enum_type_tagged states state_list in
   let mapping =
     List.map
@@ -2042,7 +2030,9 @@ let mk_deterministic_body generated_kf loc f st status res =
     List.fold_right
       (mk_deterministic_stmt generated_kf loc auto f st status res)
       states
-      ([], Cil_datatype.Varinfo.Set.empty, [],[])
+      ([], Cil_datatype.Varinfo.Set.empty, [],
+       (* if all else fails, go to reject state. *)
+       [is_state_det_stmt (Data_for_aorai.get_reject_state()) loc])
   in
   aux_funcs, aux_vars, aux_stmts @ trans_stmts
 

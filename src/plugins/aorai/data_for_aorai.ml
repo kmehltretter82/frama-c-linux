@@ -984,13 +984,21 @@ module Reject_state =
     (struct
         let name = "Data_for_aorai.Reject_state"
         let dependencies =
-          [ Ast.self; Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
+          [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
             Aorai_option.Ya.self]
      end)
 
 let get_reject_state () =
   let create () = new_state "aorai_reject" in
   Reject_state.memo create
+
+let is_reject_state state =
+  match Reject_state.get_option () with
+      None -> false
+    | Some state' -> Aorai_state.equal state state'
+
+let has_reject_state () =
+  match Reject_state.get_option () with None -> false | Some _ -> true
 
 let add_if_needed states st =
   if List.for_all (fun x -> not (Aorai_state.equal x st)) states
@@ -1540,10 +1548,16 @@ let type_cond_auto auto =
           | _ -> (i+1,{ t with cross = cond; numt = i } :: l))
       (0,[]) trans
   in
+  let states =
+    if Aorai_option.Deterministic.get () then
+      add_if_needed states (get_reject_state())
+    else states
+  in
   let _, states =
     List.fold_left
       (fun (i,l as acc) s ->
         if
+          is_reject_state s ||
           List.exists
             (fun t -> t.start.nums = s.nums || t.stop.nums = s.nums)
             trans
@@ -1662,11 +1676,6 @@ let getObservablesFunctions () =
 (** Return the list of names of observable but ignored functions. A function is ignored if it is used in C file and if its declaration is unavailable. *)
 let getIgnoredFunctions () =
   List.filter isDeclaredObservable !ignored_functions
-
-let is_reject_state state =
-  match Reject_state.get_option () with
-      None -> false
-    | Some state' -> Aorai_state.equal state state'
 
 (* ************************************************************************* *)
 (* Table giving the varinfo structure associated to a given variable name *)
@@ -2170,6 +2179,12 @@ let removeUnusedTransitionsAndStates () =
   let reached_states = Loop_invariant_state.fold reached reached_states in
   if Aorai_state.Set.is_empty reached_states then
     raise Empty_automaton;
+  let reached_states =
+    if Aorai_option.Deterministic.get() then
+      (* keep the rejecting state anyways. *)
+      Aorai_state.Set.add (get_reject_state()) reached_states
+    else reached_states
+  in
   (* Step 2 : computation of translation tables *)
   let state_list =
     List.sort
