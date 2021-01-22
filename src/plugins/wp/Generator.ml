@@ -64,7 +64,7 @@ let create
     () : Wpo.generator =
   let default f = function Some v -> v | None -> f () in
   let dump = default Wp_parameters.Dump.get dump in
-  let legacy = default Wp_parameters.Dump.get legacy in
+  let legacy = default Wp_parameters.Legacy.get legacy in
   let driver = default Driver.load_driver driver in
   let setup = default user_setup setup in
   if legacy then
