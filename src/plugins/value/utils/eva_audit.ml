@@ -20,21 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-let json_of_parameters parms =
-  let pair param =
+let get_correctness_parameters () =
+  let get param =
     let name = param.Typed_parameter.name in
     let value = Typed_parameter.get_value param in
-    (name, `String value)
+    (name, value)
   in
-  let parms_json = List.map pair parms in
-  `Assoc [("correctness-parameters", `Assoc parms_json)]
+  List.map get (Value_parameters.parameters_correctness)
 
-let parameters_of_json parms_json =
+let parameters_of_json json =
   try
     let open Yojson.Basic.Util in
-    let parms = parms_json |> member "correctness-parameters" |> to_assoc in
-    List.map (fun (key, value) -> (key, value |> to_string)) parms
+    let params =
+      json |> member "eva" |> member "correctness-parameters" |> to_assoc
+    in
+    List.map (fun (key, value) -> (key, to_string value)) params
   with
   | Yojson.Json_error msg ->
     Kernel.abort "error reading JSON file: %s" msg
@@ -43,35 +43,22 @@ let parameters_of_json parms_json =
       (Yojson.Basic.pretty_to_string v)
 
 let print_correctness_parameters path =
-  let parameters_correctness = Value_parameters.parameters_correctness in
+  let parameters = get_correctness_parameters () in
   if Filepath.Normalized.is_special_stdout path then begin
     Value_parameters.feedback "Correctness parameters of the analysis:";
-    let print param =
-      let name = param.Typed_parameter.name in
-      let value = Typed_parameter.get_value param in
-      Value_parameters.printf "  %s: %s" name value
-    in
-    List.iter print parameters_correctness
+    let print (name, value) = Value_parameters.printf "  %s: %s" name value in
+    List.iter print parameters
   end else begin
-    let json = `Assoc [("eva", json_of_parameters parameters_correctness)] in
-    Json.merge_object path json
+    let json = List.map (fun (name, value) -> name, `String value) parameters in
+    let params_json = `Assoc [("correctness-parameters", `Assoc json)] in
+    let eva_json = `Assoc [("eva", params_json)] in
+    Json.merge_object path eva_json
   end
 
 let check_correctness_parameters json =
-  let get param =
-    let name = param.Typed_parameter.name in
-    let value = Typed_parameter.get_value param in
-    (name, value)
-  in
-  let parameters_correctness = Value_parameters.parameters_correctness in
-  let parameters = List.map get parameters_correctness in
-  let expected_parameters =
-    parameters_of_json (json |> Yojson.Basic.Util.member "eva")
-  in
-  let sort = List.sort (fun (p1, _) (p2, _) -> Stdlib.String.compare p1 p2) in
-  let expected_parameters = sort expected_parameters in
-  let parameters = sort parameters in
-  (* Note: we could simply compare lengths and use a two-list iterator,
+  let parameters = get_correctness_parameters () in
+  let expected_parameters = parameters_of_json json in
+  (* Note: we could compare lengths and use a two-list iterator on sorted lists,
      but in case of divergence, the error messages would be less clear. *)
   List.iter (fun (exp_p, exp_v) ->
       try
@@ -100,10 +87,11 @@ let json_of_warning_statuses wkeys key_name =
   let json_of_wkey = List.map (fun (c, _) -> `String c) in
   (key_name, `List (json_of_wkey wkeys))
 
-let warning_statuses_of_json json =
+let enabled_warning_of_json name json =
   try
     let open Yojson.Basic.Util in
-    json |> to_list |> filter_string
+    json |> member name |> member "warning-categories" |>
+    member "enabled" |> to_list |> filter_string
   with
   | Yojson.Json_error msg ->
     Kernel.abort "error reading JSON file: %s" msg
@@ -125,41 +113,25 @@ let print_warning_status path name (module Plugin: Log.Messages) =
         pp_categories (List.map fst disabled)
     end
   else begin
-    let enabled_json =
-      json_of_warning_statuses enabled "enabled"
-    in
-    let disabled_json =
-      json_of_warning_statuses disabled "disabled"
-    in
-    let json = `Assoc [(Stdlib.String.lowercase_ascii name,
-                        `Assoc [("warning-categories",
-                                 `Assoc [enabled_json; disabled_json])])]
-    in
+    let enabled_json = json_of_warning_statuses enabled "enabled"
+    and disabled_json = json_of_warning_statuses disabled "disabled" in
+    let warning_json = `Assoc [enabled_json; disabled_json] in
+    let name = Stdlib.String.lowercase_ascii name in
+    let json = `Assoc [(name, `Assoc [("warning-categories", warning_json)])] in
     Json.merge_object path json
   end
 
 let check_warning_status json name (module Plugin: Log.Messages) =
-  let lower_name = Stdlib.String.lowercase_ascii name in
+  let name = Stdlib.String.lowercase_ascii name in
   let enabled, _disabled = compute_warning_status (module Plugin) in
   let enabled = List.map fst enabled in
-  let (expected_enabled : string list) =
-    try
-      let open Yojson.Basic.Util in
-      json |> member lower_name |> member "warning-categories" |>
-      member "enabled" |> to_list |> filter_string
-    with
-    | Yojson.Json_error msg ->
-      Kernel.abort "error reading JSON file: %s" msg
-    | Yojson.Basic.Util.Type_error (msg, v) ->
-      Kernel.abort "error reading JSON file: %s - %s" msg
-        (Yojson.Basic.pretty_to_string v)
-  in
+  let expected_enabled = enabled_warning_of_json name json in
   let diff l1 l2 = List.filter (fun k -> not (List.mem k l2)) l1 in
   let should_be_enabled = diff expected_enabled enabled in
   if should_be_enabled <> [] then
     Kernel.warning ~wkey:Kernel.wkey_audit
       "the following warning categories were expected to be enabled,@ \
-       but were disabled: %a"
+       but are disabled: %a"
       (Pretty_utils.pp_list ~sep:", " Format.pp_print_string) should_be_enabled
 
 let check_configuration path =
