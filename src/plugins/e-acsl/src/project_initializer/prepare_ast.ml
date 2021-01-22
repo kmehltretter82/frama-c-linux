@@ -131,12 +131,12 @@ let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
   in
   let return =
     Cil.mkStmt ~valid_sid:true
-      (Return(Extlib.opt_map (Cil.evar ~loc) res, loc))
+      (Return(Option.map (Cil.evar ~loc) res, loc))
   in
   let stmts =
     let l =
       [ Cil.mkStmtOneInstr ~valid_sid:true
-          (Call(Extlib.opt_map Cil.var res,
+          (Call(Option.map Cil.var res,
                 Cil.evar ~loc vi,
                 List.map (Cil.evar ~loc) new_formals,
                 loc));

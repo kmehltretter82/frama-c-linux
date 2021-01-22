@@ -93,7 +93,20 @@ process_file ()
    -e 's/Cil\.add_special_builtin_family/Cil_builtins.add_special_builtin_family/g' \
    -e 's/Cil\.init_builtins/Cil_builtins.init_builtins/g' \
    -e 's/Cil\.Builtin_functions/Cil_builtins.Builtin_functions/g' \
-   -e 's/Cil\.builtinLoc/Cil_builtins.builtinLoc/g'
+   -e 's/Cil\.builtinLoc/Cil_builtins.builtinLoc/g' \
+   -e 's/Extlib\.list_of_opt/Option.to_list/g' \
+   -e 's/Extlib\.opt_conv /Option.value ~default:/g' \
+   -e 's/Extlib\.may_map ~dft:\([^ ]*\) /Option.fold ~none:\1 ~some:/g' \
+   -e 's/Extlib\.may_map /Option.fold ~some:/g' \
+   -e 's/~dft:/~none:/g' \
+   -e 's/Extlib\.may /Option.iter /g' \
+   -e 's/Extlib\.opt_map/Option.map/g' \
+   -e 's/Extlib\.has_some/Option.is_some/g' \
+   -e 's/Extlib\.opt_bind/Option.bind/g' \
+   -e 's/Extlib\.the \([^~]\)/Option.get \1/g' \
+   -e 's/Extlib\.opt_equal/Option.equal/g' \
+   -e 's/Extlib\.opt_compare/Option.compare/g' \
+   -e 's/Extlib\.array_exists/Array.exists/g'
 }
 
 apply_one_dir ()

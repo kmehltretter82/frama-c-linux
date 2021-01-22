@@ -385,11 +385,11 @@ let build_automaton ~annotations kf =
         control.src
 
       | Break _ ->
-        add_jump control.src (Extlib.the control.break) stmt;
+        add_jump control.src (Option.get control.break) stmt;
         control.src
 
       | Continue _ ->
-        add_jump control.src (Extlib.the control.continue) stmt;
+        add_jump control.src (Option.get control.continue) stmt;
         control.src
 
       | If (exp, then_block, else_block, _) ->
@@ -741,7 +741,7 @@ module MakeDot
         | `Vertex -> htmllabel "%a" V.pretty v
       in
       let vertex_attributes =
-        if head && Extlib.has_some subgraph
+        if head && Option.is_some subgraph
         then [`Shape `Invtriangle ; label]
         else [label]
       in
@@ -753,7 +753,7 @@ module MakeDot
         incr component_count;
         let subgraph = Some {
             sg_name = string_of_int !component_count;
-            sg_parent = Extlib.opt_map (fun s -> s.sg_name) subgraph;
+            sg_parent = Option.map (fun s -> s.sg_name) subgraph;
             sg_attributes = []} in
         donode subgraph true v;
         traverse_component subgraph w

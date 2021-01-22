@@ -133,7 +133,7 @@ let syntactic_compute g =
 
     (* add defined functions into the graph *)
     method !vfunc _f =
-      G.add_vertex g (Extlib.the self#current_kf);
+      G.add_vertex g (Option.get self#current_kf);
       Cil.DoChildren
 
     (* add edges from callers to callees into the graph *)
@@ -144,17 +144,17 @@ let syntactic_compute g =
         try Globals.Functions.get vi
         with Not_found -> assert false
       in
-      let caller = Extlib.the self#current_kf in
-      G.add_edge_e g (caller, Extlib.the self#current_stmt, callee);
+      let caller = Option.get self#current_kf in
+      G.add_edge_e g (caller, Option.get self#current_stmt, callee);
       Cil.SkipChildren
     | Call _ ->
       (* call via a function pointer: add an edge from each function which
          the address is taken to this callee. *)
       let pointed = get_pointed_kfs () in
-      let caller = Extlib.the self#current_kf in
+      let caller = Option.get self#current_kf in
       List.iter
         (fun callee ->
-          G.add_edge_e g (caller, Extlib.the self#current_stmt, callee))
+          G.add_edge_e g (caller, Option.get self#current_stmt, callee))
         pointed;
       Cil.SkipChildren
     | Local_init (_,ConsInit(v,_,_),_) ->
@@ -162,8 +162,8 @@ let syntactic_compute g =
         try Globals.Functions.get v
         with Not_found -> assert false
       in
-      let caller = Extlib.the self#current_kf in
-      G.add_edge_e g (caller, Extlib.the self#current_stmt, callee);
+      let caller = Option.get self#current_kf in
+      G.add_edge_e g (caller, Option.get self#current_stmt, callee);
       Cil.SkipChildren
     | Local_init (_, AssignInit _, _) | Set _
     | Skip _ | Asm _ | Code_annot _  ->

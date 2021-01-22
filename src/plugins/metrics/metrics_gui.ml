@@ -116,7 +116,7 @@ let coerce_panel_to_ui panel_box _main_ui = "Metrics", panel_box#coerce, None ;;
 let register_metrics ?(apply=false) name display_function =
   add_panel_action (name, display_function);
   let metrics_panel = get_panel () in
-  GEdit.text_combo_add (Extlib.the metrics_panel.top) name;
+  GEdit.text_combo_add (Option.get metrics_panel.top) name;
   if apply
-  then display_function (Extlib.the metrics_panel.bottom);
+  then display_function (Option.get metrics_panel.bottom);
 ;;

@@ -602,7 +602,7 @@ let to_do_on_select
           (if vi.vaddrof then "" else "not ")
       end else begin
         main_ui#view_original vi.vdecl;
-        let kf = Extlib.the kf in
+        let kf = Option.get kf in
         main_ui#pretty_information
           "This is the declaration of %s %a in function %a%t@."
           (formal_or_local vi) Varinfo.pretty vi
@@ -1040,7 +1040,7 @@ class main_window () : main_window_extension_points =
         m
       | Some s ->
         s
-    method file_tree = Extlib.the file_tree
+    method file_tree = Option.get file_tree
     method file_tree_view = file_tree_view
     method annot_window = annot_window
 
@@ -1101,7 +1101,7 @@ class main_window () : main_window_extension_points =
            ignore (expander#drag#connect#ending (fun _ -> dragged_frame:=None));
 
            (* Refreshers *)
-           Extlib.may
+           Option.iter
              (fun refresh ->
                 to_refresh:=
                   (fun ()->
@@ -1442,7 +1442,7 @@ class main_window () : main_window_extension_points =
           begin
             let text =
               if use_dialog then
-                Extlib.opt_conv ""
+                Option.value ~default:""
                   (Gtk_helper.input_string
                      ~parent:main_window
                      ~title:"Find global" ~ok:"Find" ~cancel:"Cancel"
@@ -1486,7 +1486,7 @@ class main_window () : main_window_extension_points =
       | Some (where,viewer) ->
         let text =
           if use_dialog then
-            Extlib.opt_conv ""
+            Option.value ~default:""
               (Gtk_helper.input_string
                  ~parent:main_window
                  ~title:("Find " ^ where) ~ok:"Find" ~cancel:"Cancel"
@@ -1696,9 +1696,9 @@ class main_window () : main_window_extension_points =
           GtkMisc.Label.set_text label text
         in
         let callback e _column =
-          Extlib.may
+          Option.iter
             (fun pos ->
-               Extlib.may self#scroll (Pretty_source.loc_to_localizable pos);
+               Option.iter self#scroll (Pretty_source.loc_to_localizable pos);
                (* Note: the code below generates double scrolling:
                   the previous call to self#scroll causes the original source
                   viewer to scroll to the beginning of the function, and then

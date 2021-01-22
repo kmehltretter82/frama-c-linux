@@ -145,7 +145,7 @@ end = struct
       if c <> 0 then c else
         let c = Extlib.list_compare ExpStructEq.compare es1 es2 in
         if c <> 0 then c else
-          Extlib.opt_compare Lval.compare lv1 lv2
+          Option.compare Lval.compare lv1 lv2
     | Msg s1, Msg s2 ->
       String.compare s1 s2
     | Loop (stmt1, s1, g1), Loop (stmt2, s2, g2) ->
@@ -887,7 +887,7 @@ module Internal = struct
         | None -> state in
       let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
       let state = Traces.add_trans state
-          (CallDeclared (call.Eval.kf, exps, Extlib.opt_map Cil.var var))
+          (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
       in `Value {state with call_declared_function = true}
 
   let finalize_call _stmt call ~pre:_ ~post =
@@ -1107,7 +1107,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
 
       | CallDeclared (kf,exps,lval) ->
         let exps = List.map (subst_in_exp var_map) exps in
-        let lval = Extlib.opt_map (subst_in_lval var_map) lval in
+        let lval = Option.map (subst_in_lval var_map) lval in
         let call = Cil.evar ~loc:dummy_loc (subst_in_varinfo var_map (Kernel_function.get_vi kf)) in
         let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Call(lval,call,exps,dummy_loc)) in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
@@ -1200,7 +1200,7 @@ let project_of_cfg vreturn s =
 (*     State_selection.full *)
 (*     (State_selection.list_union *)
 (*        (List.map State_selection.with_dependencies *)
-(*           [Cil.Builtin_functions.self; *)
+(*           [Cil_builtins.Builtin_functions.self; *)
 (*            Ast.self; *)
 (*            Frama_c_File.files_pre_register_state])) *)
 (* in *)

@@ -438,8 +438,8 @@ let opt_map2 f m1 m2 =
 
 let add_singleton_int i t =
   let incr = Int.add i in
-  let min = Extlib.opt_map incr t.min in
-  let max = Extlib.opt_map incr t.max in
+  let min = Option.map incr t.min in
+  let max = Option.map incr t.max in
   let rem = Int.e_rem (incr t.rem) t.modu in
   make ~min ~max ~rem ~modu:t.modu
 
@@ -477,8 +477,8 @@ let add_under t1 t2 =
 
 let neg t =
   make
-    ~min:(Extlib.opt_map Int.neg t.max)
-    ~max:(Extlib.opt_map Int.neg t.min)
+    ~min:(Option.map Int.neg t.max)
+    ~max:(Option.map Int.neg t.min)
     ~rem:(Int.e_rem (Int.neg t.rem) t.modu)
     ~modu:t.modu
 
@@ -530,12 +530,12 @@ let scale f t =
   then
     let modu = incr t.modu in
     make
-      ~min:(Extlib.opt_map incr t.min) ~max:(Extlib.opt_map incr t.max)
+      ~min:(Option.map incr t.min) ~max:(Option.map incr t.max)
       ~rem:(Int.e_rem (incr t.rem) modu) ~modu
   else
     let modu = Int.neg (incr t.modu) in
     make
-      ~min:(Extlib.opt_map incr t.max) ~max:(Extlib.opt_map incr t.min)
+      ~min:(Option.map incr t.max) ~max:(Option.map incr t.min)
       ~rem:(Int.e_rem (incr t.rem) modu) ~modu
 
 let scale_div_common ~pos f t degenerate =
@@ -559,8 +559,8 @@ let scale_div_common ~pos f t degenerate =
     else (* degeneration*)
       degenerate t.rem t.modu
   in
-  let divf_mn1 = Extlib.opt_map div_f t.min in
-  let divf_mx1 = Extlib.opt_map div_f t.max in
+  let divf_mn1 = Option.map div_f t.min in
+  let divf_mx1 = Option.map div_f t.max in
   let min, max =
     if Int.gt f Int.zero
     then divf_mn1, divf_mx1
@@ -627,7 +627,7 @@ let c_rem t1 t2 =
       (* Bound the result: no more than |x|, and no more than |y|-1 *)
       let pos_rem = Integer.max (Int.abs min2) (Int.abs max2) in
       let bound = Int.pred pos_rem in
-      let bound = Extlib.may_map (Int.min bound) ~dft:bound max_x in
+      let bound = Option.fold ~some:(Int.min bound) ~none:bound max_x in
       (* Compute result bounds using sign information *)
       let min = if neg then Some (Int.neg bound) else Some Int.zero in
       let max = if pos then Some bound else Some Int.zero in

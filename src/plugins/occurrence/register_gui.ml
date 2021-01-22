@@ -233,7 +233,7 @@ let file_tree_decorate (file_tree:Filetree.t) =
               match ki with
                 | Kglobal -> false
                 | Kstmt _ ->
-                  let kf = Extlib.the kf in
+                  let kf = Option.get kf in
                   let v0 = Kernel_function.get_vi kf in
                   List.exists
                     (fun glob -> match glob with

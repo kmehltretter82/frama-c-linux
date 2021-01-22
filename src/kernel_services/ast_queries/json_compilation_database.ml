@@ -134,7 +134,7 @@ let quote_define_argument arg = Format.sprintf "%S" arg
 let parse_entry jcdb_dir r =
   let open Yojson.Basic.Util in
   let filename = r |> member "file" |> to_string in
-  let dirname  = r |> member "directory" |> to_string_option |> Extlib.opt_conv jcdb_dir in
+  let dirname  = r |> member "directory" |> to_string_option |> Option.value ~default:jcdb_dir in
   let dirname =
     if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
     else dirname

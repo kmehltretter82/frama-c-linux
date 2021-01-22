@@ -388,7 +388,7 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Extlib.opt_conv (Integer.of_int theMachine.theMachine.alignof_aligned)
+    Option.value ~default:(Integer.of_int theMachine.theMachine.alignof_aligned)
       !current_packing_pragma
   in
   (Integer.pretty ~hexa:false) fmt align
@@ -3719,7 +3719,7 @@ let fieldsToInit
   in
   let found, r = add_comp NoOffset comp (designator = None, []) in
   begin if not found then
-      let fn = Extlib.the designator in
+      let fn = Option.get designator in
       Kernel.fatal ~current:true "Cannot find designated field %s" fn;
   end;
   List.rev r
@@ -4247,11 +4247,11 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
           Extlib.swap
-            Extlib.opt_bind
-            (collapseCallCast (s2,s1)) (* the chunk list is reversed.*)
+            Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
               | _ -> None (* should not happen. *))
+            (collapseCallCast (s2,s1)) (* the chunk list is reversed.*)
         | _ -> None
       in
       match res with
@@ -5554,7 +5554,7 @@ and makeCompType ghost (isstruct: bool)
       (if comp.cstruct then "struct" else "union");
   List.iter check flds;
   if comp.cfields <> None then begin
-    let old_fields = Extlib.the comp.cfields in
+    let old_fields = Option.get comp.cfields in
     (* This appears to be a multiply defined structure. This can happen from
      * a construct like "typedef struct foo { ... } A, B;". This is dangerous
      * because at the time B is processed some forward references in { ... }
@@ -8114,7 +8114,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if ((not (Extlib.has_some leno)) ||
+        if (Option.is_none leno ||
             ((String.length s) < (integerArrayLength leno)))
         then ref [init Int64.zero]
         else ref []
@@ -8192,7 +8192,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* ISO 6.7.8 para 14: final NUL added only if no size specified, or
          * if there is room for it; btw, we can't rely on zero-init of
          * globals, since this array might be a local variable *)
-        if (not (Extlib.has_some leno)
+        if (Option.is_none leno
             || ((List.length s) < (integerArrayLength leno)))
         then [init Int64.zero]
         else [])
@@ -8332,7 +8332,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         [(A.NEXT_INIT, A.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
-      let fi = findField (Extlib.opt_conv [] ci.cfields) in
+      let fi = findField (Option.value ~default:[] ci.cfields) in
       (* Change the designator and redo *)
       doInit
         local_env asconst add_implicit_ensures preinit so acc
@@ -8527,7 +8527,7 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * A
     if inite != A.NO_INIT  then
       Kernel.error ~once:true ~current:true
         "Function declaration with initializer (%s)\n" vi.vname;
-  end else if Extlib.has_some logic_spec then begin
+  end else if Option.is_some logic_spec then begin
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~current:true ~once:true
       "Global variable %s is not a function. It cannot have a contract."
       vi.vname
@@ -8717,7 +8717,7 @@ and cleanup_autoreference vi chunk =
 
       method! vinst = function
         | Call _ | Local_init(_,ConsInit _,_) ->
-          calls := ref (Extlib.the self#current_stmt) :: !calls;
+          calls := ref (Option.get self#current_stmt) :: !calls;
           DoChildren
         | _ -> DoChildren
 
@@ -9101,7 +9101,7 @@ and doDecl local_env (isglobal: bool) : A.definition -> chunk = function
             Kernel.warning ~current:true "Unexpected attribute in #pragma";
             Some (Attr ("", [a']))
         in
-        Extlib.may
+        Option.iter
           (fun a'' ->
              cabsPushGlobal (GPragma (a'', CurrentLoc.get ())))
           a'';

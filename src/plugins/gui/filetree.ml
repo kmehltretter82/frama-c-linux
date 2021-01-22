@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Extlib
 open Gtk_helper
 
 (* To debug performance related to height of lines *)
@@ -556,10 +555,10 @@ let make (tree_view:GTree.view) =
 
   let set_row model ?strikethrough ?text (path,raw_row) =
     let row = raw_row.MODEL.finfo in
-    may
+    Option.iter
       (fun b -> (MYTREE.get_storage row).MYTREE.strikethrough <- b)
       strikethrough;
-    may (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
+    Option.iter (fun b -> (MYTREE.get_storage row).MYTREE.name <- b) text;
     if false then model#custom_row_changed (GTree.Path.create (List.rev path)) raw_row
   in
 
@@ -831,7 +830,7 @@ let make (tree_view:GTree.view) =
         in
         try
           let {MODEL.finfo=t} =
-            Extlib.the (model_custom#custom_get_iter path) in
+            Option.get (model_custom#custom_get_iter path) in
           let selected_node = MYTREE.storage_type t in
           let was_activated = match current_node with
             | None -> false
@@ -883,7 +882,7 @@ let make (tree_view:GTree.view) =
       expand_to_path tree_view path;
       tree_view#selection#select_path path;
       (* set_cursor updates the keyboard cursor and scrolls to the element *)
-      tree_view#set_cursor path (Extlib.the name_column);
+      tree_view#set_cursor path (Option.get name_column);
       tree_view#misc#grab_focus ()
 
     (* TODO: keep the structure of the tree, ie. reexpand all the nodes that

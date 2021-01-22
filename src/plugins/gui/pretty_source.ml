@@ -477,7 +477,7 @@ class pos_to_localizable =
         | _ -> false
       in
       if not skip then
-        self#add_range (Stmt.loc s) (PStmt (Extlib.the self#current_kf, s));
+        self#add_range (Stmt.loc s) (PStmt (Option.get self#current_kf, s));
       begin
         match s.skind with
         | If (exp, _, _, _) ->

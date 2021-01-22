@@ -537,7 +537,7 @@ let parse_cabs cpp_command_no_output = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, is_gnu_like) ->
-    let cpp_command, ppf, supported_cpp_arch_args = Extlib.the cpp_command_no_output in
+    let cpp_command, ppf, supported_cpp_arch_args = Option.get cpp_command_no_output in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -1631,7 +1631,7 @@ let prepare_from_c_files () =
 let init_project_from_visitor ?(reorder=false) prj
     (vis:Visitor.frama_c_visitor) =
   if not (Visitor_behavior.is_copy vis#behavior)
-  || not (Project.equal prj (Extlib.the vis#project))
+  || not (Project.equal prj (Option.get vis#project))
   then
     Kernel.fatal
       "Visitor does not copy or does not operate on correct project.";

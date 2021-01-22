@@ -327,7 +327,7 @@ module Lenv = struct
   }
 
   let string_of_current_label env =
-    Extlib.opt_bind (
+    Option.bind env.current_logic_label (
       function
       | FormalLabel _ -> None
       | BuiltinLabel Init -> Some "Init"
@@ -345,7 +345,6 @@ module Lenv = struct
          | None -> None
          | Some (Label (lab,_,_)) -> Some lab
          | Some _ -> None))
-      env.current_logic_label
 
   let fresh_var env name kind typ =
     let name =
@@ -1809,7 +1808,7 @@ struct
 
 
   let conditional_conversion loc env rel t1 t2 =
-    let is_rel = Extlib.has_some rel in
+    let is_rel = Option.is_some rel in
     (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
        performs the needed unifications on both sides.*)
     let var = fresh_type_var "cmp" in
@@ -1843,7 +1842,7 @@ struct
         else if isArithmeticType ty1 && isArithmeticType ty2 then begin
           if is_same_type lty1 lty2 then begin
             if is_rel then begin
-              let rel = Extlib.the rel in
+              let rel = Option.get rel in
               let kind =
                 match Cil.unrollType ty1 with
                 | TFloat (FFloat,_) -> "float"
@@ -2984,7 +2983,7 @@ struct
       if is_set_type t.term_type then begin
         ctxt.error loc "sets of sets are not supported yet"
       end else begin
-        let pred = Extlib.opt_map (predicate env) pred in
+        let pred = Option.map (predicate env) pred in
         Tcomprehension(t,quants,pred), (make_set_type t.term_type)
       end
     | PLempty
@@ -3762,9 +3761,9 @@ struct
             loc "%s clause isn't allowed into statement contract" clause;
         x
     in
-    let v = Extlib.opt_map (type_variant env)
+    let v = Option.map (type_variant env)
         (none_for_stmt_contract "decreases" s.spec_variant) in
-    let t = Extlib.opt_map (id_predicate env)
+    let t = Option.map (id_predicate env)
         (none_for_stmt_contract "terminates" s.spec_terminates) in
     let my_names = check_unique_behavior_names loc [] b in
     let bnames = old_behaviors @ my_names in
@@ -3975,7 +3974,7 @@ struct
     in let rt_vars = ref Datatype.String.Set.empty
     in let prm_vars = ref Datatype.String.Set.empty
     in
-    ignore(Extlib.opt_map (Cil.visitCilLogicType (obj rt_vars)) return_type);
+    ignore(Option.map (Cil.visitCilLogicType (obj rt_vars)) return_type);
     List.iter
       (fun v -> ignore (Cil.visitCilLogicType (obj prm_vars) v.lv_type)) p;
     if not (Datatype.String.Set.subset !rt_vars !prm_vars) then
@@ -4177,7 +4176,7 @@ struct
         }
       in
       add_logic_type loc my_info;
-      let tdef = Extlib.opt_map (typedef loc env my_info) def in
+      let tdef = Option.map (typedef loc env my_info) def in
       if is_cyclic_typedef s tdef then
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;

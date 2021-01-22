@@ -170,7 +170,7 @@ let compute kf stmt lval =
   in
   !Db.Value.compute ();
   let zone = !Db.Value.lval_to_zone (Kstmt stmt) lval in
-  Extlib.opt_map extract (compute_aux kf stmt zone)
+  Option.map extract (compute_aux kf stmt zone)
 
 (* Variation of the function above. For each PDG node that has been found,
    we find whether it directly modifies [zone] through an affectation
@@ -216,7 +216,7 @@ let compute_with_def_type_zone kf stmt zone =
     let stmts = NSet.fold add_node nodes Stmt.Map.empty in
     (stmts, undef)
   in
-  Extlib.opt_map extract (compute_aux kf stmt zone)
+  Option.map extract (compute_aux kf stmt zone)
 
 let compute_with_def_type kf stmt lval =
   !Db.Value.compute ();

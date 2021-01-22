@@ -163,7 +163,7 @@ struct
 
   let t_status value name ?label descr =
     Enum.tag ~name
-      ?label:(Extlib.opt_map Md.plain label)
+      ?label:(Option.map Md.plain label)
       ~descr:(Md.plain descr) ~value status
 
   open Property_status.Feedback
@@ -297,17 +297,17 @@ let () = States.column model ~name:"source"
 let () = States.column model ~name:"alarm"
     ~descr:(Md.plain "Alarm name (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_short_name (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_short_name (find_alarm ip))
 
 let () = States.column model ~name:"alarm_descr"
     ~descr:(Md.plain "Alarm description (if the property is an alarm)")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map Alarms.get_description (find_alarm ip))
+    ~get:(fun ip -> Option.map Alarms.get_description (find_alarm ip))
 
 let () = States.column model ~name:"predicate"
     ~descr:(Md.plain "Predicate")
     ~data:(module Joption(Jstring))
-    ~get:(fun ip -> Extlib.opt_map snd (Description.property_kind_and_node ip))
+    ~get:(fun ip -> Option.map snd (Description.property_kind_and_node ip))
 
 let is_relevant ip =
   match Property.get_kf ip with

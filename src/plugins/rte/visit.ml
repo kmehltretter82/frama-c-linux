@@ -106,7 +106,7 @@ class annot_visitor kf flags on_alarm = object (self)
     flags.Flags.bool_value && not (Generator.Bool_value.is_computed kf)
 
   method private queue_stmt_spec spec =
-    let stmt = Extlib.the (self#current_stmt) in
+    let stmt = Option.get (self#current_stmt) in
     Queue.add
       (fun () ->
          let annot = Logic_const.new_code_annotation (AStmtSpec ([], spec)) in

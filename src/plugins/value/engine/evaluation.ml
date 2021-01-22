@@ -411,7 +411,7 @@ module Make
      the comparison. *)
   let reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth =
     let reduce (new_value1, new_value2) =
-      Extlib.may (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
+      Option.iter (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
       reduce_argument (e2, v2) new_value2;
     in
     process_truth ~reduce ~alarm (v1, v2) truth
@@ -1044,7 +1044,7 @@ module Make
             if Integer.is_zero size
             then `Value index, Alarmset.none
             else
-              let size_expr = Extlib.the array_size in (* array_size exists *)
+              let size_expr = Option.get array_size in (* array_size exists *)
               assume_valid_index ~size ~size_expr ~index_expr index
           with
           | Cil.LenOfArray -> `Value index, Alarmset.none (* unknown array size *)

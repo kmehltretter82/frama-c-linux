@@ -251,7 +251,7 @@ let initialize_var_using_type varinfo state =
                  The periodicity of the contents may be smaller than the size
                  of a cell; take this into account. *)
               let v, modu, offset =
-                Extlib.the (Cvalue.V_Offsetmap.fold
+                Option.get (Cvalue.V_Offsetmap.fold
                               (fun _itv v _ -> Some v) offsm_joined None)
               in
               assert (Abstract_interp.Rel.(equal offset zero));

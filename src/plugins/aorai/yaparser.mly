@@ -42,7 +42,7 @@ let to_seq c =
    }]
 
 let is_no_repet (min,max) =
-  let is_one c = Extlib.may_map Data_for_aorai.is_cst_one ~dft:false c in
+  let is_one c = Option.fold ~some:Data_for_aorai.is_cst_one ~none:false c in
   is_one min && is_one max
 
 let observed_states      = Hashtbl.create 1

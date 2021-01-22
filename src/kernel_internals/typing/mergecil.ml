@@ -892,12 +892,12 @@ let rec global_annot_pass1 g = match g with
            annotation at loc %a. Ignoring new binding."
           Cil_printer.pp_identified_term t
           pretty_volatile_kind k
-          Cil_printer.pp_location (fst (Extlib.the node.nloc))
+          Cil_printer.pp_location (fst (Option.get node.nloc))
     in
     List.iter
       (fun x ->
-         if Extlib.has_some rvi then process_term_kind (x,R);
-         if Extlib.has_some wvi then process_term_kind (x,W))
+         if Option.is_some rvi then process_term_kind (x,R);
+         if Option.is_some wvi then process_term_kind (x,W))
       hs
   | Daxiomatic(id,decls,_,l) ->
     CurrentLoc.set l;
@@ -1941,7 +1941,7 @@ class renameVisitorClass =
          if lv == lv' then DoChildren (* Replacement already done... *)
          else ChangeTo lv')
     | LVC ->
-      let vi = Extlib.the lv.lv_origin in
+      let vi = Option.get lv.lv_origin in
       if not vi.vglob then DoChildren
       else begin
         match PlainMerging.findReplacement true vEq !currentFidx vi.vname
@@ -2386,9 +2386,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     end
   | Dvolatile(vi,rd,wr,attr,loc) ->
     let is_representative id =
-      not
-        (Extlib.has_some
-           (VolatileMerging.findReplacement true lvEq !currentFidx id))
+      Option.is_none
+        (VolatileMerging.findReplacement true lvEq !currentFidx id)
     in
     let push_volatile l rd wr =
       match l with
@@ -2415,8 +2414,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
            annotation can be used as is (i.e. does not overlap with a
            preceding annotation.
       *)
-      let reads = not (Extlib.has_some rd) || is_representative (v,R) in
-      let writes = not (Extlib.has_some wr) || is_representative (v,W) in
+      let reads = Option.is_none rd || is_representative (v,R) in
+      let writes = Option.is_none wr || is_representative (v,W) in
       if reads then
         if writes then
           no_drop, v::full_representative, only_reads, only_writes
@@ -2433,8 +2432,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     if no_drop then mergePushGlobals (visitCilGlobal renameVisitor g)
     else begin
       push_volatile full_representative rd wr;
-      if Extlib.has_some rd then push_volatile only_reads rd None;
-      if Extlib.has_some wr then push_volatile only_writes None wr
+      if Option.is_some rd then push_volatile only_reads rd None;
+      if Option.is_some wr then push_volatile only_writes None wr
     end
   | Daxiomatic(n,l,_,loc) ->
     begin
@@ -2964,7 +2963,7 @@ let oneFilePass2 (f: file) =
               (* Restore the formals from the old definition. We always have
                  Some l from getFormalsDecl
                  in case of a defined function. *)
-              Cil.setFormals fdec (Extlib.the defn_formals);
+              Cil.setFormals fdec (Option.get defn_formals);
               (* previous was found *)
               if (curSum = prevSum) then
                 Kernel.warning ~current:true
@@ -3263,7 +3262,7 @@ let find_decls g =
       method! vspec _ = SkipChildren
       method! vfunc f =
         ignore (self#vvdec f.svar);
-        Extlib.may (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
+        Option.iter (ignore $ self#vlogic_var_decl) f.svar.vlogic_var_assoc;
         SkipChildren
     end
   in

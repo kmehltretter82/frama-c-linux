@@ -71,14 +71,14 @@ module G = struct
       Some (Integer.of_int (min n1 n2)), Some (Integer.of_int (max n1 n2))
 
     let enlarge i (b1, b2: t) : t =
-      (Extlib.opt_map (Integer.min i) b1, Extlib.opt_map (Integer.max i) b2)
+      (Option.map (Integer.min i) b1, Option.map (Integer.max i) b2)
 
     let lift fmin fmax (bmin1, bmax1: t) (bmin2, bmax2: t) : t =
       (opt2 fmin bmin1 bmin2, opt2 fmax bmax1 bmax2)
 
     let equal (bmin1, bmax1: t) (bmin2, bmax2: t) =
-      Extlib.opt_equal Integer.equal bmin1 bmin2 &&
-      Extlib.opt_equal Integer.equal bmax1 bmax2
+      Option.equal Integer.equal bmin1 bmin2 &&
+      Option.equal Integer.equal bmax1 bmax2
 
     let is_included (bmin1, bmax1: t) (bmin2, bmax2: t) =
       (match bmin1, bmin2 with
@@ -122,17 +122,17 @@ module G = struct
       | min, max -> `Value (min, max)
 
     let succ (b1, b2: t): t =
-      (Extlib.opt_map Integer.succ b1, Extlib.opt_map Integer.succ b2)
+      (Option.map Integer.succ b1, Option.map Integer.succ b2)
 
     let neg (bmin, bmax: t) : t =
-      Extlib.opt_map Integer.neg bmax, Extlib.opt_map Integer.neg bmin
+      Option.map Integer.neg bmax, Option.map Integer.neg bmin
 
     let mul_ct k (bmin, bmax: t) : t =
       let mul = Integer.mul k in
       if Integer.le k Integer.zero then
-        Extlib.opt_map mul bmax, Extlib.opt_map mul bmin
+        Option.map mul bmax, Option.map mul bmin
       else
-        Extlib.opt_map mul bmin, Extlib.opt_map mul bmax
+        Option.map mul bmin, Option.map mul bmax
 
     let mul (bmin1, bmax1: t) (bmin2, bmax2 as b2: t) : t =
       (* multiplication by infty *)
@@ -161,7 +161,7 @@ module G = struct
        widening of Ival. *)
     let widen ?threshold (min1, max1: t) (min2, max2: t) : t =
       let widen_unstable_min b1 b2 =
-        if Extlib.opt_equal Integer.equal b1 b2 then b1 else None
+        if Option.equal Integer.equal b1 b2 then b1 else None
       in
       let widen_unstable_max b1 b2 =
         match threshold with
@@ -475,7 +475,7 @@ module G = struct
              - invert this interval using the gauges domain, to
                deduce the number of iterations from which we exit
              - use the max of those values as threshold. *)
-          let threshold = Extlib.opt_map Integer.of_int threshold in
+          let threshold = Option.map Integer.of_int threshold in
           let (min, max as w) = Bounds.widen ?threshold i1.nb i2.nb in
           (* Limit min bound to 0 *)
           if min = None then (Some Integer.zero, max) else w

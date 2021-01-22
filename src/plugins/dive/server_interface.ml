@@ -262,13 +262,13 @@ let finalize' context node_opt =
     | None -> ()
     | Some node ->
       let may_explore f =
-        Extlib.may (fun depth -> f ~depth context node)
+        Option.iter (fun depth -> f ~depth context node)
       in
       may_explore Build.explore_backward !global_window.perception.backward;
       may_explore Build.explore_forward !global_window.perception.forward;
       let horizon = !global_window.horizon in
-      if Extlib.has_some horizon.forward ||
-         Extlib.has_some horizon.backward
+      if Option.is_some horizon.forward ||
+         Option.is_some horizon.backward
       then
         Build.reduce_to_horizon context horizon node
   end;

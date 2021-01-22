@@ -2578,8 +2578,8 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
         (* Force the computation of the fields fsize_in_bits and
            foffset_in_bits *)
         ignore (Cil.bitsOffset typ (Field (f, NoOffset)));
-        let size = Integer.of_int (Extlib.the f.fsize_in_bits) in
-        let offset_f = Integer.of_int (Extlib.the f.foffset_in_bits) in
+        let size = Integer.of_int (Option.get f.fsize_in_bits) in
+        let offset_f = Integer.of_int (Option.get f.foffset_in_bits) in
         loopOff f.ftype size (Integer.add start offset_f) off
       end
       else
@@ -2611,7 +2611,7 @@ let rec fold_itv f b e acc =
 let find_init_by_index init i =
   let same_offset (off, _) = match off with
     | Index (i', NoOffset) ->
-      Integer.equal i (Extlib.the (Cil.isInteger i'))
+      Integer.equal i (Option.get (Cil.isInteger i'))
     | _ -> false
   in
   snd (List.find same_offset init)

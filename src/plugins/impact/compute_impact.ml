@@ -673,7 +673,7 @@ let nodes_to_stmts ns =
     (* Do not generate a list immediately, some nodes would be duplicated *)
     NS.fold
       (fun (n, _z) acc ->
-        Extlib.may_map ~dft:acc (fun s -> Stmt.Set.add s acc) (get_stmt n)
+        Option.fold ~none:acc ~some:(fun s -> Stmt.Set.add s acc) (get_stmt n)
       ) ns  Stmt.Set.empty
   in
   Stmt.Set.elements set

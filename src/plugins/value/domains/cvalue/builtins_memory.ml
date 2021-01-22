@@ -290,7 +290,7 @@ let frama_c_memcpy state actuals =
       if Ival.is_zero size then
         raise (Memcpy_result (state, empty_cfrom, Zone.bottom));
       let (precise_state,precise_deps_table,sure_zone) = precise_copy state in
-      if Extlib.may_map ~dft:false (Int.equal min) max then
+      if Option.fold ~none:false ~some:(Int.equal min) max then
         (let open Function_Froms in
          let c_from = { deps_table = precise_deps_table; deps_return } in
          raise (Memcpy_result (precise_state, c_from, sure_zone)));

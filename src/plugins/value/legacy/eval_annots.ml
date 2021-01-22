@@ -90,7 +90,7 @@ let mark_unreachable () =
         in
         match stmt.skind with
         | Instr (Call (_, e, _, _)) ->
-          Extlib.may mark_status (Kernel_function.get_called e)
+          Option.iter mark_status (Kernel_function.get_called e)
         | Instr(Local_init(_, ConsInit(f,_,_),_)) ->
           mark_status (Globals.Functions.get f)
         | _ -> ()

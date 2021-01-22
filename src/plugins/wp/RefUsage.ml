@@ -684,7 +684,7 @@ let cfun_spec env kf =
 let cfun kf =
   let env = mk_ctx () in
   (* Skipping frama-c builtins?
-     if not (Cil.is_builtin (Kernel_function.get_vi kf)) then *)
+     if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then *)
   begin
     if Kernel_function.is_definition kf then cfun_code env kf ;
     cfun_spec env kf

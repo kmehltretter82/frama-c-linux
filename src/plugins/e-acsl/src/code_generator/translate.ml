@@ -656,7 +656,7 @@ and context_insensitive_term_to_exp kf env t =
           env
           kf
           (Some t)
-          (Misc.cty (Extlib.the li.l_type))
+          (Misc.cty (Option.get li.l_type))
           (fun vi _ ->
              [ Smart_stmt.rtl_call ~loc
                  ~result:(Cil.var vi)
@@ -1216,7 +1216,7 @@ let untyped_term_to_exp typ t =
       | TFloat(fk, _) -> Typing.fkind fk
       | _ -> Typing.nan
   in
-  let ctx = Extlib.opt_map ctx_of_typ typ in
+  let ctx = Option.map ctx_of_typ typ in
   Typing.type_term ~use_gmp_opt:true ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.rte env false in

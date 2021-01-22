@@ -489,7 +489,7 @@ module Restrict
     | None -> None
     | Some (state, mode) ->
       let assign =
-        Extlib.opt_map (fun (assign, state) -> assign, get_state state) assign
+        Option.map (fun (assign, state) -> assign, get_state state) assign
       in
       Some (Domain.logic_assign assign location state, mode)
 

@@ -306,7 +306,7 @@ let update_condition vi1 vi2 cond =
 let pebble_set_at li lab =
   assert (li.l_profile = []);
   let labels = List.map (fun _ -> lab) li.l_labels in
-  Logic_const.term (Tapp (li,labels,[])) (Extlib.the li.l_type)
+  Logic_const.term (Tapp (li,labels,[])) (Option.get li.l_type)
 
 let memo_multi_state st =
   match st.multi_state with
@@ -327,8 +327,8 @@ let memo_multi_state st =
     | Some multi_state -> multi_state
 
 let change_bound_var st1 st2 cond =
-  if Extlib.has_some st1.multi_state then begin
-    let (_,idx1) = Extlib.the st1.multi_state in
+  if Option.is_some st1.multi_state then begin
+    let (_,idx1) = Option.get st1.multi_state in
     let (_,idx2) = memo_multi_state st2 in
     update_condition idx1 idx2 cond
   end else cond
@@ -551,7 +551,7 @@ let memo_aux_variable tr counter used_prms vi =
     Cil_datatype.Varinfo.Hashtbl.add used_prms vi my_lvar;
     (match tr.cross with
       | Normal _ ->
-        let st = Extlib.opt_map (fun _ -> tr.stop) counter in
+        let st = Option.map (fun _ -> tr.stop) counter in
         let loc = get_bindings st my_lvar in
         let copy = Copy_value (loc,Logic_const.tvar (Cil.cvar_to_lvar vi)) in
         tr.actions <- copy :: tr.actions
@@ -920,7 +920,7 @@ let type_cond needs_pebble metaenv env tr cond =
           with Not_found -> Aorai_option.abort "No such function: %s" s
         in
         let b =
-          Extlib.opt_map
+          Option.map
             (fun b ->
               let bhvs = Annotations.behaviors ~populate:false kf in
               try List.find (fun x -> x.b_name = b) bhvs
@@ -987,7 +987,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       in
       let might_be_zero =
         is_opt ||
-          (match Extlib.the elt.min_rep with PCst _ -> false | _ -> true)
+          (match Option.get elt.min_rep with PCst _ -> false | _ -> true)
       in
       let at_most_one =
         is_opt &&
@@ -1021,7 +1021,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       let guard_exit_loop env current counter =
         if is_opt then TTrue
         else
-          let e = Extlib.the elt.min_rep in
+          let e = Option.get elt.min_rep in
           let _,e,_ = type_expr metaenv env ?current e in
           (* If we have done at least the lower bound of cycles, we can exit
              the loop. *)
@@ -1195,7 +1195,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
                       if needs_pebble then Some curr_start else None
                     in
                     let _,t,_ =
-                      type_expr metaenv env ?current (Extlib.the elt.min_rep)
+                      type_expr metaenv env ?current (Option.get elt.min_rep)
                     in
                     TRel (Cil_types.Req, t, Logic_const.tinteger ~loc 0)
                 in
@@ -1302,7 +1302,7 @@ let type_trans auto metaenv env tr =
   match tr.cross with
     | Seq seq ->
       let default_state = find_otherwise_trans auto tr.start in
-      let has_default_state = Extlib.has_some default_state in
+      let has_default_state = Option.is_some default_state in
       let env,states, transitions,_,_ =
         type_seq has_default_state tr metaenv env needs_pebble tr.start tr.stop seq
       in

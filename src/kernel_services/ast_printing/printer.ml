@@ -122,7 +122,7 @@ class printer_with_annot () = object (self)
   method! private stmt_has_annot s = Annotations.has_code_annot s
 
   method! private has_annot =
-    Extlib.may_map self#stmt_has_annot ~dft:false self#current_stmt
+    Option.fold ~some:self#stmt_has_annot ~none:false self#current_stmt
 
   method! private inline_block ctxt blk =
     super#inline_block ctxt blk

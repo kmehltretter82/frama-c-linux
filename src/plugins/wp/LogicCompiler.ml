@@ -871,7 +871,7 @@ struct
   let logic_profile phi =
     begin
       List.iter (fun x -> logic_type x.lv_type) phi.l_profile ;
-      Extlib.may logic_type phi.l_type ;
+      Option.iter logic_type phi.l_type ;
     end
 
   (* -------------------------------------------------------------------------- *)

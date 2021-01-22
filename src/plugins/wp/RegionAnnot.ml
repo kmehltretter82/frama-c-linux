@@ -212,7 +212,7 @@ let pp_region_spec pp fmt coma spec =
   begin
     if coma then Format.fprintf fmt ",@ " ;
     Format.fprintf fmt "@[<hv 2>" ;
-    Extlib.may (Format.fprintf fmt "%s:@ ") spec.region_name ;
+    Option.iter (Format.fprintf fmt "%s:@ ") spec.region_name ;
     let coma = pp_pattern_spec fmt spec.region_pattern in
     let coma = List.fold_left (pp_path_spec pp fmt) coma spec.region_lpath in
     Format.fprintf fmt "@]" ;
@@ -238,7 +238,7 @@ let flush env =
   let region_name = env.name in env.name <- None ;
   let region_pattern = env.pattern in env.pattern <- FREE ;
   let region_lpath = List.rev env.paths in env.paths <- [] ;
-  Extlib.may (fun a -> env.declared <- a::env.declared) region_name ;
+  Option.iter (fun a -> env.declared <- a::env.declared) region_name ;
   if not (region_name = None && region_lpath = []) then
     let region = { region_name ; region_pattern ; region_lpath } in
     env.specs <- region :: env.specs

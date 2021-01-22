@@ -325,7 +325,7 @@ let ldomain ltype =
 
 let volatile ?warn () =
   Wp_parameters.Volatile.get () ||
-  ( Extlib.may
+  ( Option.iter
       (fun w -> Warning.emit ~severe:false
           ~effect:"ignore volatile attribute" "%s" w)
       warn ; false )

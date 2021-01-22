@@ -493,7 +493,7 @@ let iter_stat ?first ?sep ?last ~from start next=
           | Some app -> app v
         in
         let next app =
-          let item = (Extlib.the !items) in
+          let item = (Option.get !items) in
           apply item app;
           items := next item
         in

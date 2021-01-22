@@ -155,11 +155,6 @@ let rec list_compare cmp_elt l1 l2 =
           let c = cmp_elt v1 v2 in
           if c = 0 then list_compare cmp_elt r1 r2 else c
 
-let list_of_opt =
-  function
-    | None -> []
-    | Some x -> [x]
-
 let opt_of_list =
   function
     | [] -> None
@@ -226,55 +221,9 @@ let list_slice ?(first = 0) ?last l =
   | None -> l
   | Some n -> list_first_n (normalize n - first) l
 
-
-(* ************************************************************************* *)
-(** {2 Arrays} *)
-(* ************************************************************************* *)
-
-let array_exists f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
-let array_existsi f a =
-  try
-    for i = 0 to Array.length a - 1 do
-      if f i a.(i) then raise Exit
-    done;
-    false
-  with Exit -> true
-
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
-
-let has_some = function None -> false | Some _ -> true
-
-let may f = function
-  | None -> ()
-  | Some x -> f x
-
-(** [may_map f ?dft x] applies [f] to the value of [x] if exists. Otherwise
-    returns the default value [dft].
-    Assume that either [x] or [dft] is defined. *)
-let may_map f ?dft x =
-  match x, dft with
-  | None, None -> assert false
-  | None, Some dft -> dft
-  | Some x, _ -> f x
-
-let opt_map f = function
-  | None -> None
-  | Some x -> Some (f x)
-
-let opt_conv default = function
-  | None -> default
-  | Some x -> x
-
-let opt_if b v = if b then None else Some v
 
 let opt_fold f o b =
   match o with
@@ -287,10 +236,6 @@ let merge_opt f k o1 o2 =
     | Some x, None | None, Some x -> Some x
     | Some x1, Some x2 -> Some (f k x1 x2)
 
-let opt_bind f = function
-  | None -> None
-  | Some x -> f x
-
 let opt_filter f = function
   | None -> None
   | (Some x) as o -> if f x then o else None
@@ -302,19 +247,6 @@ let the ?exn = function
       | Some exn -> raise exn
     end
   | Some x -> x
-
-let find_or_none f v = try Some(f v) with Not_found -> None
-
-let opt_equal f v1 v2 = match v1, v2 with
-  | None, None -> true
-  | Some _, None | None, Some _ -> false
-  | Some v1, Some v2 -> f v1 v2
-
-let opt_compare f v1 v2 = match v1, v2 with
-  | None, None -> 0
-  | Some _, None -> 1
-  | None, Some _ -> -1
-  | Some v1, Some v2 -> f v1 v2
 
 let opt_hash hash v = match v with
   | None -> 31179

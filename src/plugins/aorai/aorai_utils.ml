@@ -222,7 +222,8 @@ let isCrossableAtInit tr func =
         match base with
         | TVar v ->
           (try
-             Extlib.opt_bind
+             Option.bind
+               v.lv_origin
                (fun v ->
                   let init = Globals.Vars.find v in
                   let init = match init.Cil_types.init with
@@ -230,7 +231,6 @@ let isCrossableAtInit tr func =
                     | Some i -> i
                   in
                   aux_init off init)
-               v.lv_origin
            with Not_found -> None)
         | TMem t ->
           (match (aux t).term_node with
@@ -931,7 +931,7 @@ class visit_decl_loops_init () =
         match stmt.skind with
         | Loop _ ->
           let scope = Kernel_function.find_enclosing_block stmt in
-          let f = Extlib.the self#current_func in
+          let f = Option.get self#current_func in
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
@@ -1270,13 +1270,13 @@ let action_assigns trans =
            (Cil.typeOfTermLval (host,my_off)))
         acc
     | Pebble_init(_,v,c) ->
-      let cc = Extlib.the c.lv_origin in
-      let cv = Extlib.the v.lv_origin in
+      let cc = Option.get c.lv_origin in
+      let cv = Option.get v.lv_origin in
       add_if_needed cv (Logic_const.tvar v)
         (add_if_needed cc (Logic_const.tvar c) acc)
     | Pebble_move(_,v1,_,v2) ->
-      let cv1 = Extlib.the v1.lv_origin in
-      let cv2 = Extlib.the v2.lv_origin in
+      let cv1 = Option.get v1.lv_origin in
+      let cv2 = Option.get v2.lv_origin in
       add_if_needed cv1 (Logic_const.tvar v1)
         (add_if_needed cv2 (Logic_const.tvar v2) acc)
   in
@@ -1284,7 +1284,7 @@ let action_assigns trans =
   let empty_pebble =
     match trans.start.multi_state, trans.stop.multi_state with
     | Some(_,aux), None ->
-      let caux = Extlib.the aux.lv_origin in
+      let caux = Option.get aux.lv_origin in
       add_if_needed caux (Logic_const.tvar aux) empty
     | _ -> empty
   in

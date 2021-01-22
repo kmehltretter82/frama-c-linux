@@ -139,9 +139,8 @@ let generate_requires loc ptr value len =
     ])
 
 let generate_assigns loc t ptr value len =
-  let open Extlib in
   let ptr_range = new_identified_term (tunref_range_bytes_len ~loc ptr len) in
-  let value = list_of_opt (opt_map new_identified_term value) in
+  let value = Option.to_list (Option.map new_identified_term value) in
   let set = ptr_range, From value in
   let result = new_identified_term (tresult t) in
   let res = result, From [ new_identified_term ptr ] in
@@ -172,7 +171,7 @@ let generate_spec (_t, e) { svar = vi } loc =
   let t = cptr.vtype in
   let ptr = cvar_to_tvar cptr in
   let len = cvar_to_tvar clen in
-  let value = Extlib.opt_map cvar_to_tvar cvalue in
+  let value = Option.map cvar_to_tvar cvalue in
   let requires = generate_requires loc ptr value len in
   let assigns  = generate_assigns loc t ptr value len in
   let ensures  = generate_ensures e loc t ptr value len in

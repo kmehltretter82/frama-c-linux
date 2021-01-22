@@ -109,7 +109,7 @@ class virtual do_it_ = object(self)
         Cil.SkipChildren
 
       | Call (lv_opt,exp,args,_) ->
-        Extlib.may self#do_assign lv_opt;
+        Option.iter self#do_assign lv_opt;
         self#do_arg_calls exp args;
         Cil.SkipChildren
       | Local_init(v, ConsInit(f, args, Plain_func), _) ->

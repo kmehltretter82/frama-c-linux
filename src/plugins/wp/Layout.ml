@@ -70,7 +70,7 @@ struct
     match Cil.unrollType ty with
     | TArray(te,n,_,_) ->
         begin
-          match Extlib.opt_bind Ctypes.get_int n with
+          match Option.bind n Ctypes.get_int with
           | None -> failwith "Wp.Layout: unkown array size"
           | Some n -> Index(te,n)
         end
@@ -382,7 +382,7 @@ struct
   let pretty ?title pp fmt rs =
     begin
       Format.fprintf fmt "@[<hv 0>" ;
-      Extlib.may (fun pp -> pp fmt) title ;
+      Option.iter (fun pp -> pp fmt) title ;
       Format.fprintf fmt "@[<hov 2>{" ;
       List.iter
         (fun rg ->

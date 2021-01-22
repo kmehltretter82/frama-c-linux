@@ -463,7 +463,7 @@ struct
         ~severe:false ~effect:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
-           let e = Extlib.opt_map (exp sigma) value in
+           let e = Option.map (exp sigma) value in
            let low = e_bigint low and up = e_bigint up in
            (is_exp_range sigma l obj low up e),
            (M.initialized sigma (Rrange(l, obj, Some low, Some up)))

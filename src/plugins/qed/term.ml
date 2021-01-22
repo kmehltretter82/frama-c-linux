@@ -641,7 +641,7 @@ struct
       if a == b then 0 else
         let cmp = cmp_struct compare a b in
         if cmp <> 0 then cmp else
-          Extlib.opt_compare Tau.compare a.tau b.tau
+          Option.compare Tau.compare a.tau b.tau
 
 
   end
@@ -715,7 +715,7 @@ struct
           | NOT p,NOT q -> p==q
           | CMP(c,a,b),CMP(c',a',b') -> c=c' && a==a' && b==b'
           | FUN(f,xs,t) , FUN(g,ys,t') -> Fun.equal f g && Hcons.equal_list (==) xs ys
-                                          && Extlib.opt_equal Tau.equal t t'
+                                          && Option.equal Tau.equal t t'
           | _ -> false
       end)
 

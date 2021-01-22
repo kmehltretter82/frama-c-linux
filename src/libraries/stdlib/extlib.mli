@@ -131,10 +131,6 @@ val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
       with the specified function
       @since Boron-20100401 *)
 
-val list_of_opt: 'a option -> 'a list
-  (** converts an option into a list with 0 or 1 elt.
-      @since Carbon-20111201-beta2 *)
-
 val opt_of_list: 'a list -> 'a option
   (** converts a list with 0 or 1 element into an option.
       @raise Invalid_argument on lists with more than one argument
@@ -189,37 +185,8 @@ val list_slice: ?first:int -> ?last:int -> 'a list -> 'a list
     @since 18.0-Argon *)
 
 (* ************************************************************************* *)
-(** {2 Arrays} *)
-(* ************************************************************************* *)
-
-val array_exists: ('a -> bool) -> 'a array -> bool
-val array_existsi: (int -> 'a -> bool) -> 'a array -> bool
-
-(* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
-
-(** [true] iff its argument is [Some x] 
-    @since Nitrogen-20111001 *)
-val has_some: 'a option -> bool
-
-val may: ('a -> unit) -> 'a option -> unit
-  (** [may f v] applies [f] to [x] if [v = Some(x)] *)
-
-val opt_conv: 'a -> 'a option -> 'a
-  (** [opt_conv default v] returns [default] if [v] is [None] and [a] if
-      [v] is [Some a] *)
-
-val opt_if: bool -> 'a -> 'a option
-(** [opt_if cond v] returns [Some v] if [cond] is [true] and
-    [None] otherwise *)
-
-val may_map: ('a -> 'b) -> ?dft:'b -> 'a option -> 'b
-  (** [may_map f ?dft x] applies [f] to the value of [x] if exists. Otherwise
-      returns the default value [dft].
-      Assume that either [x] or [dft] is defined. *)
-
-val opt_map: ('a -> 'b) -> 'a option -> 'b option
 
 val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
 (** @since Oxygen-20120901 *)
@@ -237,12 +204,6 @@ val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
 val merge_opt:
   ('a -> 'b -> 'b -> 'b) -> 'a -> 'b option -> 'b option -> 'b option
 
-(** [opt_bind f x] returns [None] if [x] is [None] and [f y] if is [Some y]
-    (monadic bind)
-    @since Nitrogen-20111001
-*)
-val opt_bind: ('a -> 'b option) -> 'a option -> 'b option
-
 val opt_filter: ('a -> bool) -> 'a option -> 'a option
 
 val the: ?exn:exn -> 'a option -> 'a
@@ -251,13 +212,6 @@ val the: ?exn:exn -> 'a option -> 'a
     @return v if the value is [Some v].
     @modify Magnesium-20151001 add optional argument [exn]
     @plugin development guide *)
-
-val find_or_none: ('a -> 'b) -> 'a -> 'b option
-
-val opt_equal : ('a -> 'a -> bool) -> 'a option -> 'a option -> bool
-
-val opt_compare : ('a -> 'a -> int) -> 'a option -> 'a option -> int
-  (** @since Boron-20100401 *)
 
 val opt_hash: ('a -> int) -> 'a option -> int
   (** @since Sodium-20150201 *)

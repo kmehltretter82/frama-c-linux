@@ -1080,7 +1080,7 @@ class cil_printer () = object (self)
         match arg.enode with
         | CastE (_, { enode = AddrOf (host, offset) }) ->
           (* Print the destination *)
-          Extlib.may (fprintf fmt "%a = " self#lval) dest;
+          Option.iter (fprintf fmt "%a = " self#lval) dest;
           (* Now the call itself *)
           fprintf fmt "%a(%a, %a)%s"
             self#varname "offsetof"
