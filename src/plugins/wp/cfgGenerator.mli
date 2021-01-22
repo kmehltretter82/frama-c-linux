@@ -24,6 +24,7 @@
 (* --- New WP Computer (main entry points)                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+val dumper : Factory.setup -> Factory.driver -> Wpo.generator
 val generator : Factory.setup -> Factory.driver -> Wpo.generator
 
 (* -------------------------------------------------------------------------- *)

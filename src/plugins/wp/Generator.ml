@@ -80,6 +80,8 @@ let create
       method compute_main = WpGenerator.compute_selection cc
     end
   else
-    CfgGenerator.generator setup driver
+  if dump
+  then CfgGenerator.dumper setup driver
+  else CfgGenerator.generator setup driver
 
 (* -------------------------------------------------------------------------- *)

@@ -49,9 +49,13 @@ let default kf =
     (Annotations.behaviors kf)
 
 let select kf bnames =
-  List.filter
-    (fun b -> List.mem b.b_name bnames)
-    (Annotations.behaviors kf)
+  let bhvs = Annotations.behaviors kf in
+  if bnames = [] then bhvs else
+    List.filter
+      (fun b -> List.mem b.b_name bnames)
+      bhvs
+
+let lemma task l = task.lemmas <- l :: task.lemmas
 
 let apply task ~kf ?bhvs ?prop () =
   begin
@@ -68,14 +72,13 @@ let notyet prop =
   Wp_parameters.warning ~once:true
     "Not yet implemented wp for '%a'" Property.pretty prop
 
-let rec strategy task prop =
+let rec strategy_ip task prop =
   let open Property in
   match prop with
   | IPLemma { il_name } ->
-      let l = LogicUsage.logic_lemma il_name in
-      task.lemmas <- l :: task.lemmas
+      lemma task (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
-      List.iter (strategy task) iax_props
+      List.iter (strategy_ip task) iax_props
   | IPBehavior { ib_kf = kf ; ib_bhv = bhv } ->
       apply task ~kf ~bhvs:[bhv] ()
   | IPPredicate { ip_kf = kf ; ip_kind ; ip_kinstr = ki } ->
@@ -123,6 +126,26 @@ let rec strategy task prop =
   | IPPropertyInstance _ -> notyet prop (* ? *)
   | IPExtended _ | IPAxiom _ | IPOther _ -> ()
 
+let select_lemma_prop l = function
+  | None -> true
+  | Some ns -> WpPropId.select_by_name ns (WpPropId.mk_lemma_id l)
+
+let strategy_main task ?(fct=Fct_all) ?bhv ?prop () =
+  begin
+    if fct = Fct_all && bhv = None then
+      LogicUsage.iter_lemmas (fun l ->
+          if l.lem_kind <> `Axiom && select_lemma_prop l prop
+          then lemma task l
+        ) ;
+    Wp_parameters.iter_fct
+      (fun kf ->
+         match bhv with
+         | None | Some [] -> apply task ~kf ()
+         | Some bs -> apply task ~kf ~bhvs:(select kf bs) ()
+      ) fct ;
+    task.props <- (match prop with None -> `All | Some ps -> `Names ps) ;
+  end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Compute All Tasks                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -143,17 +166,17 @@ struct
             List.iter (fun l ->
                 let wpo = VCG.compile_lemma l in
                 collection := Bag.add wpo !collection
-              ) task.lemmas ;
+              ) (List.rev task.lemmas) ;
           end () ;
       List.iter
         (fun (mode : CfgCalculus.mode) ->
            WpContext.on_context (model,WpContext.Kf mode.kf)
              begin fun () ->
-               let wp = snd @@ WP.compute ~mode ~props:task.props in
                let bhv =
                  if Cil.is_default_behavior mode.bhv then None
                  else Some mode.bhv.b_name in
                let index = Wpo.Function(mode.kf,bhv) in
+               let wp = snd @@ WP.compute ~mode ~props:task.props in
                let wcs = VCG.compile_wp index wp in
                collection := Bag.concat !collection wcs
              end ()
@@ -163,7 +186,7 @@ struct
 
   let compute_ip model ip =
     let task = empty () in
-    strategy task ip ;
+    strategy_ip task ip ;
     compute model task
 
   let compute_call _model _stmt =
@@ -171,15 +194,9 @@ struct
       ~once:true "Not yet implemented call preconds" ;
     Bag.empty
 
-  let compute_main model ?(fct=Fct_all) ?bhv ?prop () =
+  let compute_main model ?fct ?bhv ?prop () =
     let task = empty () in
-    Wp_parameters.iter_fct
-      (fun kf ->
-         match bhv with
-         | None -> apply task ~kf ()
-         | Some bs -> apply task ~kf ~bhvs:(select kf bs) ()
-      ) fct ;
-    task.props <- (match prop with None -> `All | Some ps -> `Names ps) ;
+    strategy_main task ?fct ?bhv ?prop () ;
     compute model task
 
 end
@@ -205,5 +222,43 @@ let generator setup driver =
       end in
     WpContext.MINDEX.add generators model generator ;
     generator
+
+(* -------------------------------------------------------------------------- *)
+(* --- Dumper                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let dump task =
+  let module WP = CfgCalculus.Make(CfgDump) in
+  let props = task.props in
+  List.iter
+    (fun (mode : CfgCalculus.mode) ->
+       let bhv =
+         if Cil.is_default_behavior mode.bhv
+         then None else Some mode.bhv.b_name in
+       try
+         CfgDump.fopen mode.kf bhv ;
+         ignore (WP.compute ~mode ~props) ;
+         CfgDump.flush () ;
+       with err ->
+         CfgDump.flush () ;
+         raise err
+    ) task.modes
+
+let dumper setup driver =
+  let model = Factory.instance setup driver in
+  let generator : Wpo.generator =
+    object
+      method model = model
+      method compute_ip ip =
+        let task = empty () in
+        strategy_ip task ip ;
+        dump task ; Bag.empty
+      method compute_call _ = Bag.empty
+      method compute_main ?fct ?bhv ?prop () =
+        let task = empty () in
+        strategy_main task ?fct ?bhv ?prop () ;
+        dump task ; Bag.empty
+    end
+  in generator
 
 (* -------------------------------------------------------------------------- *)
