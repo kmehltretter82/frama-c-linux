@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@ pdg
+   PLUGIN: @EVA_PLUGINS@ pdg
    CMXS: @PTEST_NAME@
    OPT: -load-module %{dep:@PTEST_NAME@.cmxs} -eva @EVA_OPTIONS@ -journal-disable
 */

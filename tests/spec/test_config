@@ -3,8 +3,8 @@ COMMENT: we continue on annotation errors, as this allows to put
 COMMENT: various variations of the same test in one file.
 COMMENT: by default, no analysis is performed (since the PLUGIN directive
 COMMENT: is empty).
-COMMENT: to perform value analyses, the macro @EVA_CONFIG@ (resp. @EVA_OPTIONS@)
+COMMENT: to perform value analyses, the macro @EVA_PLUGINS@ (resp. @EVA_OPTIONS@)
 COMMENT: can be used into PLUGIN (resp. OPT) directives of specific test files.
 
 PLUGIN:
-OPT: -pp-annot -print -kernel-warn-key=annot-error=active
+OPT: -pp-annot -print -kernel-warn-key=annot-error=active -machdep x86_32

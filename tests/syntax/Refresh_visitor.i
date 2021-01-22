@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: @EVA_CONFIG@
+PLUGIN: @EVA_PLUGINS@
 MODULE: @PTEST_NAME@
 STDOPT: +"-no-print" +"@EVA_OPTIONS@"
 */

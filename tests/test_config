@@ -1,10 +1,11 @@
-COMMENT: macros @EVA_CONFIG@ (resp. @EVA_OPTIONS@) are usables in test files
-COMMENT: redefining the PLUGIN (resp. OPT) directives.
+COMMENT: macros @EVA_PLUGINS@ (resp. @EVA_OPTIONS@ and @EVA_CONFIG@) are usables
+COMMENT: in test files redefining the PLUGIN (resp. OPT) directives.
 COMMENT: the PLUGIN directive sets automatically the @PLUGIN@ macro that can be
 COMMENT: used into others PLUGIN directives in order to extend the parent list
 COMMENT: of used plug'ins.
 
-MACRO: EVA_CONFIG from inout eva scope variadic
+MACRO: EVA_PLUGINS from inout eva scope variadic
 MACRO: EVA_OPTIONS -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0
-PLUGIN: @EVA_CONFIG@
-OPT: -eva @EVA_OPTIONS@ -out -input -deps
+MACRO: EVA_CONFIG @EVA_OPTIONS@ -machdep x86_32
+PLUGIN: @EVA_PLUGINS@
+OPT: -eva @EVA_CONFIG@ -out -input -deps

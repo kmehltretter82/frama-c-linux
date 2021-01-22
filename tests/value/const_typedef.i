@@ -1,5 +1,6 @@
 /* run.config*
-  OPT: -no-autoload-plugins -load-module inout,eva -print -then -eva @EVA_OPTIONS@ -lib-entry -no-print
+  PLUGIN= inout eva
+  OPT: -machdep x86_32 -print -then -eva @EVA_CONFIG@ -lib-entry -no-print
 */
 
 typedef int INT[3][3];

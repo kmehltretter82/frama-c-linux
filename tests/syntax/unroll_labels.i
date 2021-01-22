@@ -1,5 +1,5 @@
 /* run.config
-  PLUGIN: @EVA_CONFIG@
+  PLUGIN: @EVA_PLUGINS@
   STDOPT: +"-eva @EVA_OPTIONS@"
   STDOPT: +"-eva @EVA_OPTIONS@ -main main2 -eva-slevel 3"
 */

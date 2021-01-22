@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@
+   PLUGIN: @EVA_PLUGINS@
    DEPS: preprocess.h
    OPT: -eva @EVA_OPTIONS@ -journal-disable -print
 */

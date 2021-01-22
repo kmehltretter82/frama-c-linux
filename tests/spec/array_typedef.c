@@ -1,5 +1,5 @@
 /*run.config
- PLUGIN: @EVA_CONFIG@
+ PLUGIN: @EVA_PLUGINS@
  OPT: -print -eva @EVA_OPTIONS@ -journal-disable
  */
 #define IP_FIELD 4

@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@
+   PLUGIN: @EVA_PLUGINS@
    OPT: %{dep:@PTEST_NAME@_1.i} %{dep:@PTEST_NAME@_2.i} -eva @EVA_OPTIONS@
    OPT: %{dep:@PTEST_NAME@_2.i} %{dep:@PTEST_NAME@_1.i} -eva @EVA_OPTIONS@
 */

@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: sparecode @EVA_CONFIG@
+   PLUGIN: sparecode @EVA_PLUGINS@
    MODULE: @PTEST_NAME@
    STDOPT: 
 */

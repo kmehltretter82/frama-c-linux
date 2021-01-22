@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@
+   PLUGIN: @EVA_PLUGINS@
    STDOPT: +"-deps @EVA_OPTIONS@"
 */
 int X,Y;

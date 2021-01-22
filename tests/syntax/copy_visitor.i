@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@
+   PLUGIN: @EVA_PLUGINS@
    STDOPT: +"-copy -eva @EVA_OPTIONS@"
  */
 struct S {

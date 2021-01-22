@@ -1,1 +1,1 @@
-OPT:  -journal-disable -eva @EVA_OPTIONS@ -cpp-extra-args='-nostdinc -Ishare/libc'
+OPT:  -eva @EVA_CONFIG@ -cpp-extra-args='-nostdinc -Ishare/libc'

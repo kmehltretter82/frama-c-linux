@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @EVA_CONFIG@
+   PLUGIN: @EVA_PLUGINS@
    STDOPT: +"-inline-calls @all -kernel-msg-key printer:attrs"
    STDOPT: +"-inline-calls @inline"
    STDOPT: +"-inline-calls @inline -remove-inlined @inline"

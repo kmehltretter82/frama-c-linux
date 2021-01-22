@@ -1,7 +1,6 @@
 # todo: adds bugs?
 # todo: adds crowbar?
 # todo: adds dynamic_plugin? No, will be removed from master branch.
-# todo: adds more_wp? No, will be removed from master branch.
 # todo: adds verisec?
 
 DEFAULT_SUITES= builtins callgraph cil constant_propagation dynamic fc_script float idct impact

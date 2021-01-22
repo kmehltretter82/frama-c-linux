@@ -1,5 +1,5 @@
 /* run.config
-PLUGIN: report @EVA_CONFIG@
+PLUGIN: report @EVA_PLUGINS@
 OPT: -rte -then -eva @EVA_OPTIONS@ -then -report
 */
 
