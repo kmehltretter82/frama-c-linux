@@ -24,9 +24,9 @@
 Plugin WP <next-release>
 #########################
 
-- WP          [2020-00-00] Option -wp-unfold-assigns is now parameterized by
-                           a max unfold depth and can unfold assigned ranges
-						   (typically arrays)
+
+- WP          [2020-01-25] Improved -wp-unfold-assigns <depth>
+			   Now recursively applies to all compounds
 -* WP         [2020-01-20] Fixes opaque structures handling
 - TIP         [2020-11-06] New tactic: Sequence unrolling
 - TIP         [2020-11-05] New tactic: Induction
