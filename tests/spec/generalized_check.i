@@ -1,4 +1,5 @@
 /* run.config
+PLUGIN: @EVA_PLUGINS@
 OPT: -eva -eva-use-spec f
 OPT: -print
 */
