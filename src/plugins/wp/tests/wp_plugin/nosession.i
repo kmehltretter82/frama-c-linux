@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   CMD: @frama-c@ -wp-msg-key shell @OPTIONS@
+   CMD: @frama-c@ -wp-msg-key shell @OPTIONS@ -wp-warn-key pedantic-assigns=inactive
    OPT: -wp -wp-prover alt-ergo -wp-session shall_not_exists_dir -wp-cache offline -wp-no-cache-env
    COMMENT: The session directory shall not be created
  */

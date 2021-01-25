@@ -1,5 +1,5 @@
 /* run.config
-   CMD: @frama-c@ -wp-msg-key cluster,shell,print-generated -wp-prover why3 @OPTIONS@
+   CMD: @frama-c@ -wp-msg-key cluster,shell,print-generated -wp-prover why3 @OPTIONS@ -wp-warn-key "pedantic-assigns=inactive"
    OPT: -wp-model Typed -wp -wp-gen -wp-print -then -wp-model Typed+ref -wp -wp-gen -wp-print
 */
 
