@@ -411,7 +411,6 @@ zloop sequent:
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
-     Have: 10 <= i.
      Have: i = 10.
      Have: 0 <= x.
      Have: foo_1 = 0.
@@ -434,7 +433,6 @@ zloop sequent:
      Have: i_1 <= 10.
      Have: i_2 <= 10.
      Have: 10 <= i_2.
-     Have: 10 <= i_2.
      Have: i_2 = 10.
    }
 Prove: 0 <= x.
@@ -454,29 +452,10 @@ zloop sequent:
      Have: i_2 <= 10.
      Have: i <= 10.
      Have: 10 <= i.
-     Have: 10 <= i.
    }
 Prove: i = 10.
 
 Goal Assertion (file tests/wp/stmtcompiler_test.i, line 85):
-Prove: true.
-[Qed] Valid
-
-------------------------------------------------------------
-zloop sequent:
-   Assume {
-     Have: foo_0 = 42.
-     Have: 0 <= x.
-     Have: (ta_i_0=true) /\ (ta_i_1=false).
-     Have: (Init_i_0=true) /\ (i_1 = 0).
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
-     Have: i_2 <= 10.
-     Have: i <= 10.
-     Have: 10 <= i.
-   }
-Prove: 10 <= i.
-
-Goal Assertion (file tests/wp/stmtcompiler_test.i, line 84):
 Prove: true.
 [Qed] Valid
 
@@ -525,7 +504,6 @@ zloop sequent:
      Have: (Init_i_1=true) /\ ((1 + i) = i_1).
      Have: i_1 <= 10.
      Have: i_2 <= 10.
-     Have: 10 <= i_2.
      Have: 10 <= i_2.
      Have: i_2 = 10.
      Have: 0 <= x.

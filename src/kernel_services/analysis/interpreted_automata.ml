@@ -145,7 +145,6 @@ type goto_list = (vertex * stmt * stmt) list ref
 type control_points = {
   src: vertex;
   dest: vertex;
-  break: vertex option;
   continue: vertex option;
 }
 
@@ -385,7 +384,9 @@ let build_automaton ~annotations kf =
         control.src
 
       | Break _ ->
-        add_jump control.src (Option.get control.break) stmt;
+        assert (List.length stmt.succs = 1);
+        let dest_stmt = List.hd stmt.succs in
+        gotos := (control.src,stmt,dest_stmt) :: !gotos;
         control.src
 
       | Continue _ ->
@@ -414,7 +415,6 @@ let build_automaton ~annotations kf =
         let block_control = {
           control with
           src = add_vertex ();
-          break = Some control.dest;
         } in
         do_block block_control kinstr labels block;
         (* Then link the cases *)
@@ -466,7 +466,6 @@ let build_automaton ~annotations kf =
           then
             { src = control.src;
               dest = control.src;
-              break = Some control.dest;
               continue = Some control.src; }
           else
             (* We separate loop head from first statement of the loop, otherwise
@@ -493,7 +492,6 @@ let build_automaton ~annotations kf =
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
             { src=loop_start_body;
-              break=Some control.dest;
               dest=loop_end_point;
               continue=Some loop_end_point; }
         in
@@ -529,7 +527,6 @@ let build_automaton ~annotations kf =
   let control = {
     src = start_code;
     dest = end_code;
-    break = None;
     continue = None;
   }
   in
