@@ -63,23 +63,23 @@ let is_selected_bhv (m: mode) (bhv: funbehavior) =
   m.bhv.b_name = bhv.b_name
 
 let is_selected_for (m: mode) (fors: string list) =
-  List.mem m.bhv.b_name fors
+  fors=[] || List.mem m.bhv.b_name fors
 
-let is_selected_ca ~goal (m: mode) (ca: code_annotation) =
+let is_selected_ca (m: mode) (ca: code_annotation) =
   match ca.annot_content with
   | AAssigns(forb,_)
   | AAllocation(forb,_)
   | AAssert(forb,_)
   | AInvariant(forb,_,_)
-    ->  not goal || is_selected_for m forb
+    -> is_selected_for m forb
   | AVariant _ -> is_default_bhv m
   | AExtended _ | AStmtSpec _ | APragma _ ->
       assert false (* n/a *)
 
-let is_selected_mode ~goal ~mode (p: Property.t) =
+let is_active_mode ~mode (p: Property.t) =
   let open Property in
   match p with
-  | IPCodeAnnot { ica_ca } -> is_selected_ca ~goal mode ica_ca
+  | IPCodeAnnot { ica_ca } -> is_selected_ca mode ica_ca
   | IPPredicate { ip_kind } ->
       begin match ip_kind with
         | PKRequires bhv | PKAssumes bhv ->
@@ -89,11 +89,11 @@ let is_selected_mode ~goal ~mode (p: Property.t) =
       end
   | IPAllocation { ial_bhv = bhv } | IPAssigns { ias_bhv = bhv } ->
       begin match bhv with
-        | Id_loop ca -> is_selected_ca ~goal mode ca
+        | Id_loop ca -> is_selected_ca mode ca
         | Id_contract(_,bhv) -> is_selected_bhv mode bhv
       end
   | IPDecrease { id_ca = None } -> is_default_bhv mode
-  | IPDecrease { id_ca = Some ca } -> is_selected_ca ~goal mode ca
+  | IPDecrease { id_ca = Some ca } -> is_selected_ca mode ca
   | IPComplete _ | IPDisjoint _ | IPFrom _
   | IPGlobalInvariant _ | IPTypeInvariant _ ->
       (*TODO: is it in pass or not ? *) assert false
@@ -133,7 +133,7 @@ struct
 
   let is_selected ~goal { mode ; props } (pid,_) =
     let p = WpPropId.property_of_id pid in
-    is_selected_mode ~goal ~mode p &&
+    is_active_mode ~mode p &&
     ( not goal ||
       match props with
       | `All | `Names [] -> true
