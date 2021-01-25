@@ -479,7 +479,7 @@ struct
     let lenv = L.mk_env () in (* TODO: lenv for ghost code. *)
     let here = Sigma.create () in
     let authorized_region = L.in_frame frame
-        (L.assigned_of_assigns ~unfold:false lenv) a in
+        (L.assigned_of_assigns lenv) a in
     match authorized_region with
     | None -> goto (env @: Clabels.here) (env @: Clabels.next)
     | Some region ->

@@ -88,7 +88,7 @@ module Prenex: Parameter_sig.Bool
 module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
-module UnfoldAssigns : Parameter_sig.Bool
+module UnfoldAssigns : Parameter_sig.Int
 module Split: Parameter_sig.Bool
 module SplitMax: Parameter_sig.Int
 module SplitDepth: Parameter_sig.Int

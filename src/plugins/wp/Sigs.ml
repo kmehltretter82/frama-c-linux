@@ -773,22 +773,21 @@ sig
   val pred : polarity -> env -> Cil_types.predicate -> pred
 
   (** Compile a term representing a set of memory locations into an abstract
-      region. When [~unfold:true], compound memory locations are expanded
-      field-by-field. *)
-  val region : env -> unfold:bool -> Cil_types.term -> region
+      region.  *)
+  val region : env -> Cil_types.term -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_lval :
-    env -> unfold:bool -> Cil_types.lval -> region
+    env -> Cil_types.lval -> region
 
   (** Computes the region assigned by a list of froms. *)
   val assigned_of_froms :
-    env -> unfold:bool -> from list -> region
+    env -> from list -> region
 
   (** Computes the region assigned by an assigns clause.
       [None] means everyhting is assigned. *)
   val assigned_of_assigns :
-    env -> unfold:bool -> assigns -> region option
+    env -> assigns -> region option
 
   (** Same as [term] above but reject any set of locations. *)
   val val_of_term : env -> Cil_types.term -> term
@@ -810,9 +809,12 @@ sig
 
   (** Check assigns inclusion.
       Compute a formula that checks whether written locations are either
-      invalid (at the given memory location)
-      or included in some assignable region. *)
-  val check_assigns : sigma -> written:region -> assignable:region -> pred
+      invalid (at the given memory location) or included in some assignable
+      region. When [~unfold:n && n <> 0], compound memory locations are expanded
+      field-by-field and arrays, cell-by-cell (by quantification). Up to [n]
+      levels are unfolded, -1 means unlimited. *)
+  val check_assigns :
+    unfold:int -> sigma -> written:region -> assignable:region -> pred
 
 end
 

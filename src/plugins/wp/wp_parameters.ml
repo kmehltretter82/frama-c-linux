@@ -415,9 +415,12 @@ module Split =
 
 let () = Parameter_customize.set_group wp_strategy
 module UnfoldAssigns =
-  False(struct
+  Int(struct
     let option_name = "-wp-unfold-assigns"
-    let help = "Unfold aggregates in assigns."
+    let default = 0
+    let arg_name = "n"
+    let help = "Unfold up to <n> levels of aggregates and arrays in assigns.\n\
+                Value -1 means unlimited depth (default 0)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
