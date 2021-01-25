@@ -231,6 +231,7 @@ struct
     match edge.edge_transition with
     | Skip -> p
     | Return(r,s) -> W.return env.we s r p
+    | Enter { blocals=[] } | Leave { blocals=[] } -> p
     | Enter { blocals=xs } -> W.scope env.we xs SC_Block_in p
     | Leave { blocals=xs } -> W.scope env.we xs SC_Block_out p
     | Instr (i,s) -> instr env s i p
