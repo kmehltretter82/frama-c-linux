@@ -1,5 +1,5 @@
 /*run.config*
-  OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -input-with-formals  -inout-with-formals
+  OPT: @EVA_OPTIONS@ -inout -input-with-formals  -inout-with-formals
 */
 int x, y;
 

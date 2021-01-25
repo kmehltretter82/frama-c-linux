@@ -1,7 +1,7 @@
 /* run.config*
    
-   OPT: -no-autoload-plugins -load-module from,inout,eva @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-main -main main -journal-disable -then -out -deps
-   OPT: -no-autoload-plugins -load-module from,inout,eva @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-origin -main origin -journal-disable -then -out -deps
+   OPT: @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-main -main main -then -out -deps
+   OPT: @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-origin -main origin -then -out -deps
 
 */
 char f(void);

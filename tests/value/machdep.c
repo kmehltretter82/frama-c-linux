@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,eva -eva @EVA_OPTIONS@ -cpp-extra-args="-DPTEST"  -journal-disable -then -machdep x86_64 -then -machdep x86_16
+   OPT: -eva @EVA_OPTIONS@ -cpp-extra-args="-DPTEST"  -then -machdep x86_64 -then -machdep x86_16
 */
 
 #ifndef PTEST

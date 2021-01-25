@@ -1,6 +1,6 @@
 /* run.config*
    
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -lib-entry -main f -absolute-valid-range 0x200-0x199 -eva-msg-key initial-state -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -lib-entry -main f -absolute-valid-range 0x200-0x199 -eva-msg-key initial-state
 */
 
 

@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_OPTIONS@ -print -journal-disable -eva-no-results
+   OPT: -eva @EVA_OPTIONS@ -print -eva-no-results
 */
 int *p;
 int t[90];

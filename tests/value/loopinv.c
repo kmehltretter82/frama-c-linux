@@ -1,7 +1,7 @@
 /* run.config* 
-OPT: @EVA_OPTIONS@ -no-autoload-plugins -load-module from,inout,eva,report -eva-slevel-function main2:20 -pp-annot -eva -then -report
+PLUGIN: from,inout,eva,report
+OPT: @EVA_OPTIONS@ -eva-slevel-function main2:20 -pp-annot -eva -then -report
 */
-
 /*@ requires valid: \valid(&t[0..s-1]);
     requires c: 1 <= c < s; */
 void init (int *t, int c, int s) {

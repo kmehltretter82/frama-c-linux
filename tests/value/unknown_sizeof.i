@@ -1,7 +1,7 @@
 /* run.config*
    EXIT: 1
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_OPTIONS@ -main main1
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_OPTIONS@ -main main2
+   OPT: -eva @EVA_OPTIONS@ -main main1
+   OPT: -eva @EVA_OPTIONS@ -main main2
 */
 struct s;
 

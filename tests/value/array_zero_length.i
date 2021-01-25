@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -journal-disable -machdep gcc_x86_32
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -lib-entry -journal-disable -machdep gcc_x86_32
+   OPT: -eva @EVA_OPTIONS@ -machdep gcc_x86_32
+   OPT: -eva @EVA_OPTIONS@ -lib-entry -machdep gcc_x86_32
  EXIT: 1
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -lib-entry -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -lib-entry
 */
 char T[];
 char U[0];

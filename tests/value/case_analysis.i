@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -eva-slevel 30 -journal-disable -float-normal
+   OPT: -eva @EVA_OPTIONS@ -eva-slevel 30 -float-normal
 
 */
 

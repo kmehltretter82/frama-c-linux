@@ -1,7 +1,7 @@
 /* run.config*
-   OPT: @EVA_OPTIONS@ -deps -show-indirect-deps -journal-disable
+   OPT: @EVA_OPTIONS@ -deps -show-indirect-deps
    PLUGIN: users @PLUGIN@
-   OPT: -calldeps -eva @EVA_OPTIONS@ -journal-disable -users -then -input
+   OPT: -calldeps -eva @EVA_OPTIONS@ -users -then -input
 */
 int a,b,c,d;
 int x,y,z,t;

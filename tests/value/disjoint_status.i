@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: +"-then -load-module report -report"
+   PLUGIN: @PLUGIN@ report
+   STDOPT: +"-then -report"
 */
-
 int x;
 //@ requires ReqTrue: \true; ensures PostTrue: \true; // Test printing of ACSL names
 void f(unsigned int c, unsigned int d) {

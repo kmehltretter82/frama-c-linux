@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-load-module scope -scope-verbose 2 -eva-remove-redundant-alarms -eva-context-width 3"
+   STDOPT: #"-scope-verbose 2 -eva-remove-redundant-alarms -eva-context-width 3"
    */
 
 

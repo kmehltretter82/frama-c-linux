@@ -1,5 +1,6 @@
-/* run.config* 
-OPT: -no-autoload-plugins @EVA_OPTIONS@ -load-module eva,inout,report -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
+/* run.config*
+PLUGIN: eva,inout,report
+OPT: @EVA_OPTIONS@ -eva-no-show-progress -eva -eva-use-spec g1,g2,g3 -then -report
 */
 
 /* Test what is printed when Value evaluates a post-condition:
@@ -14,7 +15,6 @@ OPT: -no-autoload-plugins @EVA_OPTIONS@ -load-module eva,inout,report -eva-no-sh
    - in the last two cases, do nothing in the case 'ensures \false' (the
      warning is too distracting otherwise)
 */
-
 
 extern int i;
 

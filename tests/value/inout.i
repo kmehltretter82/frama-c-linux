@@ -1,10 +1,10 @@
 /* run.config*
    
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -deps -main inout_11_0 -journal-disable
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -deps -main inout_11_3 -journal-disable
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -deps -main never_terminate -journal-disable
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -deps -main may_not_terminate -journal-disable
-   OPT: -no-autoload-plugins -load-module from,inout @EVA_OPTIONS@ -inout -deps -main call_may_not_terminate -journal-disable
+   OPT: @EVA_OPTIONS@ -inout -deps -main inout_11_0
+   OPT: @EVA_OPTIONS@ -inout -deps -main inout_11_3
+   OPT: @EVA_OPTIONS@ -inout -deps -main never_terminate
+   OPT: @EVA_OPTIONS@ -inout -deps -main may_not_terminate
+   OPT: @EVA_OPTIONS@ -inout -deps -main call_may_not_terminate
 */
 
 int Xt, Xs, Xs_I, Ys, Ys_I, Z, I;

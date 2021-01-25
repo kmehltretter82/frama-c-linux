@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -cpp-extra-args="-Dprintf=Frama_C_show_each" -journal-disable
+   OPT: -eva @EVA_OPTIONS@ -cpp-extra-args="-Dprintf=Frama_C_show_each"
 */
 struct X50 {
  long long int z:50;

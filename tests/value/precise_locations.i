@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: +"-eva-widening-period 3 -then -inout -load-module report -report -then -eva-plevel 250"
+   PLUGIN: @PLUGIN@ report
+   STDOPT: +"-eva-widening-period 3 -then -inout -report -then -eva-plevel 250"
 */
-
 struct s {
   int f1[5];
   int f_inter[5];

@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module eva -eva @EVA_OPTIONS@ -eva-no-results -then -float-hex -main mainbis
+   OPT: -eva @EVA_OPTIONS@ -eva-no-results -then -float-hex -main mainbis
 */
 typedef double D;
 typedef float F;

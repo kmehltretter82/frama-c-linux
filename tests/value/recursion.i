@@ -1,7 +1,7 @@
 /*run.config*
   EXIT: 1
-  OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_OPTIONS@ -journal-disable
-  OPT: -no-autoload-plugins -load-module from,inout,eva -lib-entry -main main -eva @EVA_OPTIONS@ -eva-ignore-recursive-calls -journal-disable
+  OPT: -lib-entry -main main -eva @EVA_OPTIONS@
+  OPT: -lib-entry -main main -eva @EVA_OPTIONS@ -eva-ignore-recursive-calls
  */
 int G;
 int ff() {

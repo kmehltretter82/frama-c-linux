@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -eva-context-width 3 -then -eva-slevel 3
+   OPT: -eva @EVA_OPTIONS@ -eva-context-width 3 -then -eva-slevel 3
 */
 
 

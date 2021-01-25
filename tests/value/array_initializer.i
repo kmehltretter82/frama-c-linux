@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module inout,eva -eva @EVA_OPTIONS@ -then -eva-initialization-padding-globals maybe
+   OPT: -eva @EVA_OPTIONS@ -then -eva-initialization-padding-globals maybe
 */
 
 int t[5] = { [2] = 3 };

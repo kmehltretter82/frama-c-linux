@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: +"-load-module report -then -report"
+   PLUGIN: @PLUGIN@ report
+   STDOPT: +"-then -report"
 */
-
 int i = 1;
 int G[2] = 
   {99<<63, 1};

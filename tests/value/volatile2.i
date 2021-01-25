@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -no-autoload-plugins -load-module from,inout,eva -print -eva @EVA_OPTIONS@ -machdep x86_16
+   OPT: -print -eva @EVA_OPTIONS@ -machdep x86_16
 */
 
 
