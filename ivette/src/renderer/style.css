@@ -17,54 +17,51 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Properties                                                         --- */
+/* --- Styling LabViews                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-.code-column {
-    margin: 0px;
-    padding: 0px;
-    display: block;
-    text-overflow: ellipsis;
+.labview-field {
+    position: relative ;
+    left: -8px ;
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- AST View                                                           --- */
-/* -------------------------------------------------------------------------- */
-
-.highlighted-marker {
-    background-color: #FFFF66;
+.labview-stock:hover {
+    background: #ccc ;
 }
 
-.dead-code {
-    background-color: #BBB;
-    border-bottom: solid 0.1em #BBB;
+.labview-stock:hover * {
+    cursor: move ;
 }
 
-.non-terminating {
-    border-bottom: solid 0.2em #BBB;
+.labview-stock.dome-dragging
+{
+    border-radius: 4px ;
+    background: #ccc ;
+    border: thin solid black ;
 }
 
-.bullet {
-    width: 1.5em;
-    background: #DDD
+.labview-content
+{
+    background: #e6e6e6 ;
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- Globals                                                            --- */
-/* -------------------------------------------------------------------------- */
-
-.globals-main label {
-    text-decoration: underline;
+.labview-titlebar
+{
+    background: #ccc ;
+    height: 24px ;
 }
 
-.globals-stdlib label {
-    font-style: italic;
+.labview-handle
+{
+    flex: 1 1 auto ;
+    cursor: move ;
 }
 
-.globals-attr {
-    font-size: smaller;
-    font-weight: lighter;
-    color: #aaa;
+.labview-close:hover
+{
+    fill: red ;
 }
 
-/* -------------------------------------------------------------------------- */
+.dome-window-active .labview-icon {
+    fill: #7d7d7d ;
+}

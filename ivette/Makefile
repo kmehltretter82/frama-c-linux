@@ -9,9 +9,9 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev doc serve dist lint fixlint
+.PHONY: all app dev pkg doc serve dist lint fixlint
 
-all: lint app
+all: pkg lint app
 
 app: dome-app
 dev: dome-dev
@@ -28,6 +28,25 @@ tsc: dome-pkg dome-templ
 	yarn run lint --fix --cache --cache-location .eslint-cache
 
 # --------------------------------------------------------------------------
+# --- Ivette Package Loader
+# --------------------------------------------------------------------------
+
+LOADER=src/renderer/loader.ts
+PACKAGES=$(shell find src -name "pkg.json")
+
+lint: pkg
+dome-pkg: pkg
+dome-app: pkg
+dome-dev: pkg
+dome-dist: pkg
+pkg: $(LOADER)
+$(LOADER): $(PACKAGES) ./configure.js ./Makefile
+	@rm -f $(LOADER)
+	@echo "[Ivette] configure packages"
+	@node ./configure.js $(LOADER) $(PACKAGES)
+	@chmod -f a-w $(LOADER)
+
+# --------------------------------------------------------------------------
 # --- Frama-C API
 # --------------------------------------------------------------------------
 
@@ -35,9 +54,9 @@ tsc: dome-pkg dome-templ
 
 api:
 	@echo "[Ivette] Generating TypeScript API"
-	@rm -fr api/generated
-	../bin/frama-c.byte -load-module api/server_tsc.ml -server-tsc
-	@find api -name "*.ts" -exec chmod a-w {} \;
+	@rm -fr src/frama-c/api/generated
+	../bin/frama-c.byte -load-module src/frama-c/api/generator.ml -server-tsc
+	@find src/frama-c/api/generated -name "*.ts" -exec chmod a-w {} \;
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation
@@ -47,7 +66,7 @@ VERSION=$(shell echo "console.log(require('./package.json').version)" | node -)
 
 DOC_ICONS_CSS= src/dome/doc/gallery.css
 DOC_ICONS_MAKE= src/dome/doc/iconsmd.js
-DOC_ICONS_DATA= src/dome/src/renderer/controls/gallery.json
+DOC_ICONS_DATA= src/dome/renderer/controls/gallery.json
 DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
@@ -80,13 +99,6 @@ serve: $(NODEBIN)/serve
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"
 	yarn add -D $*
-
-# --------------------------------------------------------------------------
-# --- Ivette Plugins
-# --------------------------------------------------------------------------
-
-DOME_PLUGINS=
-DOME_EXPORTS=
 
 # --------------------------------------------------------------------------
 include $(DOME)/template/makefile

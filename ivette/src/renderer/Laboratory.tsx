@@ -2,11 +2,6 @@
 // ---  Lab View Component
 // --------------------------------------------------------------------------
 
-/**
-   @packageDocumentation
-   @module frama-c/labviews
-*/
-
 import _ from 'lodash';
 import React from 'react';
 import * as Dome from 'dome';
@@ -21,21 +16,22 @@ import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
-import { DefineElement, RenderElement } from 'dome/layout/dispatch';
+import { RenderElement } from 'dome/layout/dispatch';
 
 import './style.css';
 
 // --------------------------------------------------------------------------
-// --- Library
+// --- Library Class
 // --------------------------------------------------------------------------
+
+let RANK = 0;
+const UPDATE = new Dome.Event('labview.library');
 
 class Library {
   modified: boolean;
   virtual: {};
   collection: {};
   items: any[];
-
-  static update = new Dome.Event('labview.library');
 
   constructor() {
     this.modified = false;
@@ -49,30 +45,26 @@ class Library {
       this.collection = { ...this.virtual };
       this.items = _.sortBy(this.collection, ['order', 'id']);
       this.modified = false;
-      Library.update.emit();
+      UPDATE.emit();
     }
   }
 
-  useItem(
+  addItem(
     id: string,
-    gcontext: any,
-    path: any[],
-    props: { rank: undefined; group: any },
+    props: { rank?: number },
   ) {
     if (!this.modified) {
       this.modified = true;
       setImmediate(() => this.commit());
     }
-    if (!id) return undefined;
-    const order = props.rank === undefined
-      ? path
-      : path.slice(0, -1).concat([props.rank]);
-    const group = props.group || gcontext;
+    const order = props.rank ?? ++RANK;
     const collection: any = this.virtual;
-    collection[id] = { id, order, group, ...props };
-    return (): boolean => delete collection[id];
+    collection[id] = { ...props, id, order };
   }
+
 }
+
+const LIBRARY = new Library();
 
 // --------------------------------------------------------------------------
 // --- Library Components
@@ -87,183 +79,29 @@ const getItemId =
 const getItems =
   (items: any[], fd: string) => items.filter((item) => isItemId(fd, item.id));
 
-const LibraryManager = React.createContext(undefined);
-
-const useLibraryItem = (fd: string, { id, ...props }: any) => {
-  const context = React.useContext(LibraryManager);
-  React.useEffect(() => {
-    if (context) {
-      const { group, order, library }: any = context;
-      const itemId = `${fd}.${id}`;
-      return library.useItem(itemId, group, order, props);
-    }
-    return undefined;
-  });
-  return context;
-};
-
-const Rankify =
-  ({ library, group, order, children }: any) => {
-    let rank = 0;
-    const rankify = (elt: any) => {
-      rank += 1;
-      const context: any = { group, order: [...order, rank], library };
-      return (
-        <LibraryManager.Provider value={context}>
-          {elt}
-        </LibraryManager.Provider>
-      );
-    };
-    return (
-      <>
-        {React.Children.map(children, rankify)}
-      </>
-    );
-  };
-
-const HIDDEN = { display: 'none' };
-
-const UseLibrary = ({ library, children }: any) => (
-  <div style={HIDDEN}>
-    <Rankify library={library} order={[]}>
-      {children}
-    </Rankify>
-  </div>
-);
-
-/**
-   @summary Ordered collection of LabView Components.
-   @description
-   Renderers its children in the specified order.
-   Otherwise, elements are ordered by `rank` and `id`.
- */
-export const Fragment = ({ group, children }: any) => {
-  const context: any = React.useContext(LibraryManager);
-
-  if (!context) return null;
-
-  return (
-    <Rankify
-      group={group || context.group}
-      order={context.order}
-      library={context.library}
-    >
-      {children}
-    </Rankify>
-  );
-};
-
-/**
-   @summary Group of LabView Components.
-   @property {string} id - group identifier
-   @property {string} label - displayed name
-   @property {string} [title] - description tooltip
-   @property {React.Children} [children] - group content
-   @description
-   Defines a group of components. The components rendered
-   _inside_ its content are implicitely affected to this group,
-   unless specified. The group content are also rendered
-   in their specified order. For nested collections of components,
-   use `<Fragment/>` instead of `<React.Fragment/>` to specify order.
- */
-export const Group = ({ children, ...props }: any) => {
-  const context: any = useLibraryItem('groups', props);
-  return (
-    <Rankify
-      group={props.id}
-      order={context.order}
-      library={context.library}
-    >
-      {children}
-    </Rankify>
-  );
-};
-
-// --------------------------------------------------------------------------
-// --- Views
-// --------------------------------------------------------------------------
-
-/**
-   @summary Layout of LabView Components.
-   @property {string} id - view identifier
-   @property {string} label - displayed name
-   @property {string} [title] - description tooltip
-   @property {boolean} [defaultView] - use this view by default
-   @property {GridContent} children - grid content of the view
-   @description
-   Defines a predefined layout of components. The view is organized
-   into a GridContent, which must _only_ consists of:
-   - `<GridHbox>…</GridHbox>` an horizontal grid of `GridContent` elements;
-   - `<GridVbox>…</GridVbox>` a vertical grid of `GridContent` elements;
-   - `<GridItem id=…>` a single component.
-
-   These grid content components must be imported from the `dome/layout/grids`
-   module:
-   ```
-   import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-   ```
- */
-export const View = (props: any) => {
-  useLibraryItem('views', props);
-  return null;
-};
-
-// --------------------------------------------------------------------------
-// --- Components
-// --------------------------------------------------------------------------
-
-/**
-   @summary LabView Component.
-   @property {string} id - component identifier
-   @property {string} label - displayed name
-   @property {number} [rank] - ordering index
-   @property {string} [group] - attachment group
-   @property {string} [title] - description tooltip
-   @property {React.Children} children - component rendering elements
-   @description
-   Defines a component and its content when incorporated inside a view.
-   Unless specified, the component will be implicitely attached
-   to the current enclosing group. The `rank` property can be used
-   for adjusting component ordering (see also `<Fragment/>` and `<Group/>`).
- */
-export const Component = (props: any) => {
-  useLibraryItem('components', props);
-  return null;
-};
-
-const TitleContext: any = React.createContext(undefined);
-
-/**
-   @summary LabView Component's title bar.
-   @property {string} [icon] - displayed icon
-   @property {string} [label] - displayed name
-   @property {string} [title] - description tooltip
-   @property {React.Children} children - additional components to render
-   @description
-   Defines an alternative component title bar.
-   If specified, the icon, label and title properties are rendered in an
-   `<Label/>` component.
-   By default, the component title bar is labelled according to the component
-   properties.
- */
-export const TitleBar = ({ icon, label, title, children }: any) => {
-  const context: any = React.useContext(TitleContext);
-  return (
-    <DefineElement id={`labview.title.${context.id}`}>
-      <Label
-        className="labview-handle"
-        icon={icon}
-        label={label || context.label}
-        title={title || context.title}
-      />
-      {children}
-    </DefineElement>
-  );
-};
+export function addLibraryItem(
+  fd: string,
+  { id, ...props }: any,
+) {
+  const itemId = `${fd}.${id}`;
+  LIBRARY.addItem(itemId, props);
+}
 
 // --------------------------------------------------------------------------
 // --- Grid Item
 // --------------------------------------------------------------------------
+
+interface TitleContext {
+  id?: string;
+  label?: string;
+  title?: string;
+}
+
+const TITLE = React.createContext<TitleContext>({});
+
+export function useTitleContext() {
+  return React.useContext(TITLE);
+}
 
 const GRIDITEM = {
   className: 'dome-container dome-xBoxes-vbox dome-xBoxes-box',
@@ -338,9 +176,9 @@ const makeGridItem = (customize: any, onClose: any) => (comp: any) => {
           </Hfill>
           {CLOSING}
         </Hbox>
-        <TitleContext.Provider value={{ id, label, title }}>
+        <TITLE.Provider value={{ id, label, title }}>
           <Catch label={id}>{children}</Catch>
-        </TitleContext.Provider>
+        </TITLE.Provider>
       </Vfill>
     </Grids.GridItem>
   );
@@ -576,10 +414,10 @@ function CustomGroup({
 // --------------------------------------------------------------------------
 
 function CustomizePanel(
-  { dnd, settings, library, shape, setShape, setDragging }: any,
+  { dnd, settings, shape, setShape, setDragging }: any,
 ) {
-  Dome.useUpdate(Library.update);
-  const { items } = library;
+  Dome.useUpdate(UPDATE);
+  const { items } = LIBRARY;
   const views = getItems(items, 'views');
   const groups = getItems(items, 'groups');
   const components = getItems(items, 'components');
@@ -627,33 +465,29 @@ function CustomizePanel(
 // --- LabView Container
 // --------------------------------------------------------------------------
 
-/**
-   @summary Reconfigurable Container (React Component).
-   @property {boolean} [customize] - show components panel (false by default)
-   @property {string} [settings] - window settings to make views persistent
-   @property {React.Children} children - the labview content
-   @description
-   This container displays its content into a reconfigurable view.
+export interface LabViewProps {
+  /** Show component panels. */
+  customize?: boolean;
+  /** Base settings identifier. */
+  settings?: string;
+}
 
-   The entire content is rendered, but elements must be packed into
-   `<Component/>` containers, otherwise, they would remain invisible.
-   Content may also contains `<View/>` and `<Group/>` definitions, and the
-   content can be defined through any kind of React components.
-*/
-export function LabView(props: any) {
+/**
+   Reconfigurable Component Display.
+ */
+export function LabView(props: LabViewProps) {
   // Parameters
-  const { settings, customize = false, children } = props;
+  const { settings, customize = false } = props;
   const settingSplit = settings && `${settings}.split`;
   const settingShape = settings && `${settings}.shape`;
   const settingPanel = settings && `${settings}.panel`;
   // Hooks & State
   Dome.useUpdate(
-    Library.update,
+    UPDATE,
     Dome.windowSettings,
     Dome.globalSettings,
   );
   const dnd = React.useMemo(() => new DnD(), []);
-  const lib = React.useMemo(() => new Library(), []);
   const [shape, setShape] =
     Settings.useWindowSettings(settingShape, Json.jAny, undefined);
   const [dragging, setDragging] = React.useState();
@@ -661,37 +495,34 @@ export function LabView(props: any) {
   const onClose =
     (id: string) => setShape(Grids.removeShapeItem(shape, id));
   const components =
-    _.filter(lib.collection, (item: any) => isItemId('components', item.id));
+    _.filter(
+      LIBRARY.collection,
+      (item: any) => isItemId('components', item.id),
+    );
   const gridItems =
     components.map(makeGridItem(customize, onClose));
   const holding =
     dragging ? gridItems.find((elt) => elt.props.id === dragging) : undefined;
   // Make view
   return (
-    <>
-      <UseLibrary library={lib}>
-        {children}
-      </UseLibrary>
-      <RSplit margin={120} settings={settingSplit} unfold={customize}>
-        <Grids.GridLayout
-          dnd={dnd}
-          padding={2}
-          className="labview-container"
-          items={gridItems}
-          shape={shape}
-          onReshape={setShape}
-          holding={holding}
-        />
-        <CustomizePanel
-          dnd={dnd}
-          settings={settingPanel}
-          shape={shape}
-          setShape={setShape}
-          setDragging={setDragging}
-          library={lib}
-        />
-      </RSplit>
-    </>
+    <RSplit margin={120} settings={settingSplit} unfold={customize}>
+      <Grids.GridLayout
+        dnd={dnd}
+        padding={2}
+        className="labview-container"
+        items={gridItems}
+        shape={shape}
+        onReshape={setShape}
+        holding={holding}
+      />
+      <CustomizePanel
+        dnd={dnd}
+        settings={settingPanel}
+        shape={shape}
+        setShape={setShape}
+        setDragging={setDragging}
+      />
+    </RSplit>
   );
 }
 

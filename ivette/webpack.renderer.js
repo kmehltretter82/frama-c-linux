@@ -27,13 +27,15 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
     alias: {
-      'frama-c/api':  path.resolve( __dirname , 'api/generated' ),
+      'frama-c/api':  path.resolve( __dirname , 'src/frama-c/api/generated' ),
       'frama-c':      path.resolve( __dirname , 'src/frama-c' ),
-      '@plugins':     path.resolve( __dirname , 'src/plugins' ),
-      'dome/misc':    path.resolve( DOME , 'src/misc' ),
-      'dome/system':  path.resolve( DOME , 'src/misc/system.ts' ),
-      'dome$':        path.resolve( DOME , 'src/renderer/dome.tsx' ),
-      'dome':         path.resolve( DOME , 'src/renderer' ),
+      'ivette@ext':   path.resolve( __dirname , 'src/renderer/Extensions' ),
+      'ivette@lab':   path.resolve( __dirname , 'src/renderer/Laboratory' ),
+      'ivette':       path.resolve( __dirname , 'src/ivette' ),
+      'dome/misc':    path.resolve( DOME , 'misc' ),
+      'dome/system':  path.resolve( DOME , 'misc/system.ts' ),
+      'dome$':        path.resolve( DOME , 'renderer/dome.tsx' ),
+      'dome':         path.resolve( DOME , 'renderer' ),
       'react-dom':    '@hot-loader/react-dom'
     }
   }

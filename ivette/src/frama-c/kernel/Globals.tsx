@@ -1,45 +1,40 @@
 // --------------------------------------------------------------------------
-// --- Globals Side Bar
+// --- Frama-C Globals
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { Section, Item } from 'dome/frame/sidebars';
-import type { Hint } from 'dome/frame/toolbars';
+import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
-import * as States from 'frama-c/states';
-import { useFlipSettings } from 'dome';
 import { alpha } from 'dome/data/compare';
+import { Section, Item } from 'dome/frame/sidebars';
+import * as Ivette from 'ivette';
+
+import * as States from 'frama-c/states';
 import { functions, functionsData } from 'frama-c/api/kernel/ast';
 import { isComputed } from 'frama-c/api/plugins/eva/general';
-import * as Dome from 'dome';
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
-export type GlobalHint = Hint<States.Location>;
-
-const makeHint = (fct: functionsData): GlobalHint => ({
-  id: fct.key,
-  label: fct.name,
-  title: fct.signature,
-  value: { fct: fct.name },
-});
-
-export function useHints(): [GlobalHint[], (pattern: string) => void] {
-  const fcts = States.useSyncArray(functions).getArray();
-  const [hints, setHints] = React.useState<GlobalHint[]>([]);
-  const onSearch = (pattern: string) => {
-    if (pattern === '') setHints([]);
-    else {
-      const p = pattern.toLowerCase();
-      setHints(fcts.filter((fn) => (
-        0 <= fn.name.toLowerCase().indexOf(p)
-      )).map(makeHint));
-    }
+function makeFunctionHint(fct: functionsData): Ivette.Hint {
+  return {
+    id: fct.key,
+    label: fct.name,
+    title: fct.signature,
+    onSelection: () => States.setSelection({ fct: fct.name }),
   };
-  return [hints, onSearch];
 }
+
+async function lookupGlobals(pattern: string): Promise<Ivette.Hint[]> {
+  const lookup = pattern.toLowerCase();
+  const fcts = States.getSyncArray(functions).getArray();
+  return fcts.filter((fn) => (
+    0 <= fn.name.toLowerCase().indexOf(lookup)
+  )).map(makeFunctionHint);
+}
+
+Ivette.registerHints('frama-c.globals', lookupGlobals);
 
 // --------------------------------------------------------------------------
 // --- Function Item
@@ -85,6 +80,7 @@ export default () => {
   const fcts = States.useSyncArray(functions).getArray().sort(
     (f, g) => alpha(f.name, g.name),
   );
+  const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
     useFlipSettings('ivette.globals.stdlib', false);
   const [builtin, flipBuiltin] =

@@ -1,0 +1,52 @@
+/* -------------------------------------------------------------------------- */
+/* --- Properties                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.code-column {
+    margin: 0px;
+    padding: 0px;
+    display: block;
+    text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- AST View                                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.highlighted-marker {
+    background-color: #FFFF66;
+}
+
+.dead-code {
+    background-color: #BBB;
+    border-bottom: solid 0.1em #BBB;
+}
+
+.non-terminating {
+    border-bottom: solid 0.2em #BBB;
+}
+
+.bullet {
+    width: 1.5em;
+    background: #DDD;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Globals                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.globals-main label {
+    text-decoration: underline;
+}
+
+.globals-stdlib label {
+    font-style: italic;
+}
+
+.globals-attr {
+    font-size: smaller;
+    font-weight: lighter;
+    color: #aaa;
+}
+
+/* -------------------------------------------------------------------------- */

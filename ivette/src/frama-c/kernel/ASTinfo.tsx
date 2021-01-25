@@ -9,14 +9,13 @@ import * as Utils from 'frama-c/utils';
 import { Vfill } from 'dome/layout/boxes';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component } from 'frama-c/LabViews';
 import { getInfo } from 'frama-c/api/kernel/ast';
 
 // --------------------------------------------------------------------------
 // --- Information Panel
 // --------------------------------------------------------------------------
 
-const ASTinfo = () => {
+export default function ASTinfo() {
 
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
   const [selection, updateSelection] = States.useSelection();
@@ -51,20 +50,6 @@ const ASTinfo = () => {
       </Vfill>
     </>
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.astinfo"
-    label="Information"
-    title="AST Information"
-  >
-    <ASTinfo />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------

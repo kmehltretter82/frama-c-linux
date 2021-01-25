@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { renderToString } from 'react-dom/server';
 import * as Dome from 'dome';
+import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
@@ -20,7 +21,6 @@ import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
-import { Component, TitleBar } from 'frama-c/LabViews';
 
 import '@fortawesome/fontawesome-free/js/all';
 
@@ -412,7 +412,7 @@ class Dive {
         });
         break;
       default: /* This is useless and impossible if the program is correctly
-        typed, but the linter wants it */
+                  typed, but the linter wants it */
     }
   }
 
@@ -495,7 +495,7 @@ class Dive {
   }
 }
 
-const GraphView = () => {
+function GraphView() {
 
   // Hooks
   const [dive, setDive] = useState(() => new Dive());
@@ -565,7 +565,7 @@ const GraphView = () => {
   // Component
   return (
     <>
-      <TitleBar>
+      <Ivette.TitleBar>
         <IconButton
           icon="LOCK"
           onClick={flipLock}
@@ -590,7 +590,7 @@ const GraphView = () => {
           onClick={() => dive.clear()}
           title="Clear the graph"
         />
-      </TitleBar>
+      </Ivette.TitleBar>
       <CytoscapeComponent
         stylesheet={style}
         cy={setCy}
@@ -599,21 +599,31 @@ const GraphView = () => {
     </>
   );
 
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Export Component
 // --------------------------------------------------------------------------
 
-export default () => (
-  <Component
-    id="dive.graph"
-    label="Data-flow graph"
-    title={'Data dependency graph according to an Eva analysis.\nNodes color ' +
-      'represents the precision of the values inferred by Eva.'}
-  >
-    <GraphView />
-  </Component>
-);
+Ivette.registerComponent({
+  id: 'frama-c.plugins.dive',
+  label: 'Dive Dataflow',
+  group: 'frama-c.plugins',
+  rank: 2,
+  title:
+    'Data dependency graph according to an Eva analysis.\nNodes color ' +
+    'represents the precision of the values inferred by Eva.',
+  children: <GraphView />,
+});
+
+Ivette.registerView({
+  id: 'dive',
+  label: 'Dive Dataflow',
+  rank: 2,
+  layout: [
+    ['frama-c.astview', 'frama-c.plugins.dive', 'frama-c.locations'],
+    ['frama-c.properties', 'frama-c.console'],
+  ],
+});
 
 // --------------------------------------------------------------------------

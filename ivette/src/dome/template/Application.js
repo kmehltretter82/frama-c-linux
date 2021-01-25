@@ -13,7 +13,6 @@
 
 import React from 'react' ;
 import * as Dome from 'dome' ;
-import 'dome/misc/exports' ;
 
 export default (() => (
   <h1 className='dome-text-title' style={{margin: 24}}>

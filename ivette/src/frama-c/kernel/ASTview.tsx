@@ -11,13 +11,13 @@ import * as Utils from 'frama-c/utils';
 import * as Dome from 'dome';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { TitleBar } from 'ivette';
+import * as Preferences from 'ivette/prefs';
+
 import * as Ast from 'frama-c/api/kernel/ast';
 import * as Properties from 'frama-c/api/kernel/properties';
 import { getCallers, getDeadCode } from 'frama-c/api/plugins/eva/general';
 import { getWritesLval, getReadsLval } from 'frama-c/api/plugins/studia/studia';
-
-import * as Preferences from './Preferences';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -87,9 +87,9 @@ async function studia(
   const lval = info.name;
   if (locations.length > 0) {
     const name = `${kind} of ${lval}`;
-    const title = `List of statements ${
-      (kind === 'Reads') ? 'accessing' : 'modifying'
-    } the memory location pointed by ${lval}.`;
+    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
+    const title =
+      `List of statements ${acc} the memory location pointed by ${lval}.`;
     return { name, title, locations, index: 0 };
   }
   const name = `No ${kind.toLowerCase()} of ${lval}`;
@@ -131,7 +131,7 @@ function makeBullet(status: States.Tag) {
 // --- AST Printer
 // --------------------------------------------------------------------------
 
-const ASTview = () => {
+export default function ASTview() {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
@@ -291,20 +291,6 @@ const ASTview = () => {
     </>
   );
 
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.astview"
-    label="AST"
-    title="Normalized source code representation"
-  >
-    <ASTview />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------

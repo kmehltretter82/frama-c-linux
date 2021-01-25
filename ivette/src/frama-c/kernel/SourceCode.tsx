@@ -9,10 +9,10 @@ import * as Dome from 'dome';
 import { readFile } from 'dome/system';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Component, TitleBar } from 'frama-c/LabViews';
+import { TitleBar } from 'ivette';
+import * as Preferences from 'ivette/prefs';
 import { functions, markerInfo } from 'frama-c/api/kernel/ast';
 import { source } from 'frama-c/api/kernel/services';
-import * as Preferences from './Preferences';
 
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
@@ -31,7 +31,7 @@ const D = new Dome.Debug('Source Code');
 // --- Source Code Printer
 // --------------------------------------------------------------------------
 
-const SourceCode = () => {
+export default function SourceCode() {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
@@ -104,20 +104,6 @@ const SourceCode = () => {
     </>
   );
 
-};
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-export default () => (
-  <Component
-    id="frama-c.sourcecode"
-    label="Source Code"
-    title="Original source code"
-  >
-    <SourceCode />
-  </Component>
-);
+}
 
 // --------------------------------------------------------------------------
