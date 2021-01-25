@@ -238,31 +238,29 @@ struct
 
   (* Compute a single instruction *)
   and instr env s instr (w : W.t_prop) : W.t_prop =
+    let do_call res fct args _loc =
+      match Kernel_function.get_called fct with
+      | Some kf -> call env s res kf args w
+      | None ->
+          match Dyncall.get ~bhv:env.mode.bhv.b_name s with
+          | None ->
+              WpLog.warning ~once:true "Missing dynamic-call infos." ;
+              let ad = WpPropId.mk_stmt_assigns_any_desc s in
+              W.use_assigns env.we None ad (W.merge env.we w env.wk)
+          | Some(prop,kfs) ->
+              let id = WpPropId.mk_property prop in
+              W.call_dynamic env.we s id fct @@
+              List.map (fun kf -> kf, call env s res kf args w) kfs
+    in
     match instr with
     | Skip _ | Code_annot _ -> w
     | Set(lv,e,_) -> W.assign env.we s lv e w
     | Local_init(x,AssignInit i,_) -> W.init env.we x (Some i) w
-    | Local_init(x,ConsInit _,_) ->
-        WpLog.warning ~once:true
-          "Ignored constructor init for '%a' (sound)."
-          Varinfo.pretty x ; w
+    | Local_init(x,ConsInit (fct, args, kind), loc) ->
+        Cil.treat_constructor_as_func do_call x fct args kind loc
+    | Call(res,fct,args,loc) -> do_call res fct args loc
     | Asm _ ->
         W.use_assigns env.we None (WpPropId.mk_asm_assigns_desc s) w
-    | Call(r,fct,es,_) ->
-        begin
-          match Kernel_function.get_called fct with
-          | Some kf -> call env s r kf es w
-          | None ->
-              match Dyncall.get ~bhv:env.mode.bhv.b_name s with
-              | None ->
-                  WpLog.warning ~once:true "Missing dynamic-call infos." ;
-                  let ad = WpPropId.mk_stmt_assigns_any_desc s in
-                  W.use_assigns env.we None ad (W.merge env.we w env.wk)
-              | Some(prop,kfs) ->
-                  let id = WpPropId.mk_property prop in
-                  W.call_dynamic env.we s id fct @@
-                  List.map (fun kf -> kf, call env s r kf es w) kfs
-        end
 
   and call env s r kf es wr : W.t_prop =
     let c = CfgAnnot.get_call_contract kf in
