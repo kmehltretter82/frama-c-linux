@@ -35,8 +35,10 @@ LOADER=src/renderer/loader.ts
 PACKAGES=$(shell find src -name "pkg.json")
 
 lint: pkg
-app: pkg
-dev: pkg
+dome-pkg: pkg
+dome-app: pkg
+dome-dev: pkg
+dome-dist: pkg
 pkg: $(LOADER)
 $(LOADER): $(PACKAGES) ./configure.js ./Makefile
 	@rm -f $(LOADER)
