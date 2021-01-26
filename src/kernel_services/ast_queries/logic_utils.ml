@@ -354,8 +354,8 @@ and numeric_bound ltyp = function
 
 let is_zero_comparable t =
   match unroll_type t.term_type with
-  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _) -> true
-  | Ctype _ -> false
+  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TEnum _) -> true
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _) -> false
   | Linteger | Lreal -> true
   | Ltype ({lt_name},[]) -> lt_name = Utf8_logic.boolean
   | Ltype _ -> false
@@ -373,7 +373,7 @@ let scalar_term_conversion conversion t =
     let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
     conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type) in
   match unroll_type t.term_type with
-  | Ctype (TInt _) -> int_conversion t
+  | Ctype (TInt _ | TEnum _) -> int_conversion t
   | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
   | Ctype (TPtr _) -> ptr_conversion t
   | Ctype (TArray _) -> ptr_conversion t
@@ -385,7 +385,7 @@ let scalar_term_conversion conversion t =
   | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
     bool_conversion t
   | Ltype _ | Lvar _ | Larrow _
-  | Ctype (TVoid _ | TNamed _ | TComp _ | TEnum _ | TBuiltin_va_list _)
+  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
     -> Kernel.fatal
          "Cannot convert a term of type %a"
          Cil_printer.pp_logic_type t.term_type
