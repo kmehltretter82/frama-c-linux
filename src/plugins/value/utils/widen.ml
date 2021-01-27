@@ -72,13 +72,13 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
 
   method private add_int_thresholds ?base int_thresholds =
     let new_hints = Widen_type.num_hints None(*see note*) base int_thresholds in
-    if Extlib.may_map Base.is_global ~dft:false base
+    if Option.fold ~none:false ~some:Base.is_global base
     then update_global_hints new_hints
     else widen_hints := Widen_type.join new_hints !widen_hints
 
   method private add_float_thresholds ?base float_thresholds =
     let new_hints = Widen_type.float_hints None base float_thresholds in
-    if Extlib.may_map Base.is_global ~dft:false base
+    if Option.fold ~none:false ~some:Base.is_global base
     then update_global_hints new_hints
     else widen_hints := Widen_type.join new_hints !widen_hints
 
