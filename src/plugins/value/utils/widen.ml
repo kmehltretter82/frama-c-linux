@@ -176,7 +176,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
       let rec find_candidates expr =
         match expr.enode with
         | BinOp (Mod, _, modu, _typ) -> [modu]
-        | BinOp (LAnd, e1, e2, _typ) -> [e1; e2]
+        | BinOp (BAnd, e1, e2, _typ) -> [e1; e2]
         | CastE (_, expr)
         | Info (expr, _) -> find_candidates expr
         | _ -> []
