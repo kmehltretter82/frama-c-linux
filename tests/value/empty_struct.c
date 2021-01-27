@@ -2,8 +2,8 @@
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -then -lib-entry"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP2 -lib-entry"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP3 -lib-entry"
-   STDOPT: +" -cpp-extra-args=-DP1 -lib-entry"
-   STDOPT: +" -cpp-extra-args=-DP1 -absolute-valid-range 0-1 -main main2"
+   STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -lib-entry"
+   STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -absolute-valid-range 0-1 -main main2"
    STDOPT: +"  -cpp-extra-args=\"-DP1 -DP5\" -machdep gcc_x86_32 -absolute-valid-range 0-1 -main main3"
    STDOPT: +" -machdep gcc_x86_32 -cpp-extra-args=-DP1 -main main4"
 */
