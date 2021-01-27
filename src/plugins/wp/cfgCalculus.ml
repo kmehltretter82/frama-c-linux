@@ -327,6 +327,7 @@ struct
       ~ensures:bhv.bhv_ensures
       ~exits:bhv.bhv_exits @@
     (* frame-out *)
+    W.label env.we None Clabels.post @@
     W.scope env.we xs SC_Frame_out @@
     prove_assigns env bhv.bhv_assigns @@
     (* wp-end *)
