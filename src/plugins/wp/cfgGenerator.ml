@@ -164,14 +164,16 @@ struct
           begin fun () ->
             LogicUsage.iter_lemmas VCG.register_lemma ;
             List.iter (fun l ->
-                let wpo = VCG.compile_lemma l in
-                collection := Bag.add wpo !collection
+                if l.LogicUsage.lem_kind <> `Axiom then
+                  let wpo = VCG.compile_lemma l in
+                  collection := Bag.add wpo !collection
               ) (List.rev task.lemmas) ;
           end () ;
       List.iter
         (fun (mode : CfgCalculus.mode) ->
            WpContext.on_context (model,WpContext.Kf mode.kf)
              begin fun () ->
+               LogicUsage.iter_lemmas VCG.register_lemma ;
                let bhv =
                  if Cil.is_default_behavior mode.bhv then None
                  else Some mode.bhv.b_name in
