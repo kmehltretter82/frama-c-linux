@@ -47,7 +47,7 @@ let code_annotation_loc ca stmt =
 
 let mark_unreachable () =
   let mark ppt =
-    if not (Property_status.automatically_proven ppt) then begin
+    if not (Property_status.automatically_computed ppt) then begin
       Value_parameters.debug "Marking property %a as dead"
         Description.pp_property ppt;
       let emit =

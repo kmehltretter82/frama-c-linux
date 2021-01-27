@@ -694,27 +694,10 @@ and get_status ?(must_register=true) ppt =
 (* local alias: too much local definitions of get implies name clashes *)
 let get ppt = get_status ppt
 
-let automatically_proven ppt =
+let automatically_computed ppt =
   match property_kind ppt with
-  | Hypothesis | Unverifiable | Ignored | Other -> false
-  | Consequence _ | Tautology ->
-    (* nobody else tried to prove it *)
-    try
-      let by_emitter = Status.find ppt in
-      try
-        Emitter_with_properties.Hashtbl.iter
-          (fun e _ ->
-             if not (Emitter.equal
-                       (Emitter.Usable_emitter.get e.emitter)
-                       Emitter.kernel)
-             then raise Exit)
-          by_emitter;
-        true
-      with Exit ->
-        false
-    with Not_found ->
-      true
-
+  | Hypothesis | Unverifiable | Ignored | Consequence _ | Tautology -> true
+  | Other -> false
 
 (**************************************************************************)
 (** {3 Consolidated property status} *)

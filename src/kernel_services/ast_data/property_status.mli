@@ -261,8 +261,8 @@ val merge: old:Property.t list  -> Property.t list -> unit
 (** [merge old new] registers properties in [new] which are not in [old] and
     removes properties in [old] which are not in [new]. *)
 
-val automatically_proven: Property.t -> bool
-(** Is the status of the given property only automatically handled by the 
+val automatically_computed: Property.t -> bool
+(** Is the status of the given property only automatically handled by the
     kernel? *)
 
 (*
