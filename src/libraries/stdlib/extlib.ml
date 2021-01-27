@@ -240,12 +240,8 @@ let opt_filter f = function
   | None -> None
   | (Some x) as o -> if f x then o else None
 
-let the ?exn = function
-  | None ->
-    begin match exn with
-      | None -> invalid_arg "Extlib.the"
-      | Some exn -> raise exn
-    end
+let the ~exn = function
+  | None -> raise exn
   | Some x -> x
 
 let opt_hash hash v = match v with
