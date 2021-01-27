@@ -145,8 +145,6 @@ type goto_list = (vertex * stmt * stmt) list ref
 type control_points = {
   src: vertex;
   dest: vertex;
-  break: vertex option;
-  continue: vertex option;
 }
 
 
@@ -288,14 +286,6 @@ let build_automaton ~annotations kf =
     in
     build_transitions src dest kinstr (stmt_loc stmt) l 
   in
-  let add_jump src dest stmt =
-    (* We use Cil stmt successor informations *)
-    let succ = match stmt.succs with
-    | [succ] -> succ (* List must contain one element *)
-    | _ -> assert false
-    in
-    build_stmt_transition src dest stmt succ Skip
-  in
 
   let rec do_list do_one control labels = function
     | [] -> assert false
@@ -324,7 +314,7 @@ let build_automaton ~annotations kf =
       in
       add_edge control.src block_start kinstr (Enter block) loc_start;
       add_edge block_end control.dest kinstr (Leave block) loc_end;
-      let block_control = {control with src = block_start; dest = block_end} in
+      let block_control = {src = block_start; dest = block_end} in
       do_list do_stmt block_control labels block.bstmts
     end
 
@@ -384,12 +374,10 @@ let build_automaton ~annotations kf =
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
-      | Break _ ->
-        add_jump control.src (Option.get control.break) stmt;
-        control.src
-
-      | Continue _ ->
-        add_jump control.src (Option.get control.continue) stmt;
+      | Break _ | Continue _ ->
+        assert (List.length stmt.succs = 1);
+        let dest_stmt = List.hd stmt.succs in
+        gotos := (control.src,stmt,dest_stmt) :: !gotos;
         control.src
 
       | If (exp, then_block, else_block, _) ->
@@ -414,7 +402,6 @@ let build_automaton ~annotations kf =
         let block_control = {
           control with
           src = add_vertex ();
-          break = Some control.dest;
         } in
         do_block block_control kinstr labels block;
         (* Then link the cases *)
@@ -465,9 +452,7 @@ let build_automaton ~annotations kf =
           if not annotations
           then
             { src = control.src;
-              dest = control.src;
-              break = Some control.dest;
-              continue = Some control.src; }
+              dest = control.src; }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
@@ -493,9 +478,7 @@ let build_automaton ~annotations kf =
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
             { src=loop_start_body;
-              break=Some control.dest;
-              dest=loop_end_point;
-              continue=Some loop_end_point; }
+              dest=loop_end_point; }
         in
         do_block loop_control kinstr labels block;
         decr loop_level;
@@ -529,8 +512,6 @@ let build_automaton ~annotations kf =
   let control = {
     src = start_code;
     dest = end_code;
-    break = None;
-    continue = None;
   }
   in
 
@@ -543,7 +524,7 @@ let build_automaton ~annotations kf =
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
       let dest,_ = StmtTable.find table dest_stmt in
-      add_jump src dest src_stmt
+      build_stmt_transition src dest src_stmt dest_stmt Skip
     end !gotos;
 
   (* For annotation transitions, bind statement labels to their corresponding
@@ -775,21 +756,23 @@ module MakeDot
           try let (x,_,_,_) = Table.find subgraphs v in x
           with Not_found ->
             let l = if wto = None then [] else [`Style `Dashed] in
-            (htmllabel "%a" V.pretty v)::l
+            let pretty fmt v =
+              V.pretty fmt v ;
+              match V.start_of v with
+              | None -> ()
+              | Some s -> Format.fprintf fmt "@s%d" s.sid
+            in (htmllabel "%a" pretty v)::l
         let get_subgraph v =
           try let (_,x,_,_) = Table.find subgraphs v in x
           with Not_found -> None
         let default_edge_attributes _g = []
         let edge_attributes (v1,e,v2) =
+          htmllabel "%a" pretty_edge e ::
           if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
             let (_,_,c1,_) = Table.find subgraphs v1 in
             let (_,_,c2,head2) = Table.find subgraphs v2 in
-            let l = if head2 && c2 <= c1 then [`Constraint false] else [] in
-            (htmllabel "%a" pretty_edge e)::l
-          else if wto = None then
-            [`Style `Dashed]
-          else
-            []
+            if head2 && c2 <= c1 then [`Constraint false] else []
+          else if wto = None then [] else [`Style `Dashed]
         include G
       end)
     in

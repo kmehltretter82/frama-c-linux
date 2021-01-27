@@ -56,16 +56,14 @@ c -> 5
     37 -> Assume: i < 3 false -> 38
     38 -> LeaveScope: i -> 41
     39 -> LeaveScope: i -> 40
-    40 -> LeaveScope: i -> 42
-    41 -> LeaveScope: i -> 43
-    42 -> Assign: g = tmp -> 44
-    43 -> Assign: g = tmp -> 45
-    44 -> EnterScope: \result<main> -> 46
-    45 -> EnterScope: \result<main> -> 48
+    40 -> Assign: g = tmp -> 42
+    41 -> Assign: g = tmp -> 43
+    42 -> EnterScope: \result<main> -> 44
+    43 -> EnterScope: \result<main> -> 46
+    44 -> Assign: \result<main> = tmp -> 45
+    45 -> join -> 48
     46 -> Assign: \result<main> = tmp -> 47
-    47 -> join -> 50
-    48 -> Assign: \result<main> = tmp -> 49
-    49 -> join -> 50 ]} at 50
+    47 -> join -> 48 ]} at 48
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
