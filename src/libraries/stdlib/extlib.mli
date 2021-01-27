@@ -206,11 +206,13 @@ val merge_opt:
 
 val opt_filter: ('a -> bool) -> 'a option -> 'a option
 
-val the: ?exn:exn -> 'a option -> 'a
+val the: exn:exn -> 'a option -> 'a
 (** @raise Exn if the value is [None] and [exn] is specified.
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
     @modify Magnesium-20151001 add optional argument [exn]
+    @modify Frama-C+dev optional argument [exn] now mandatory; otherwise,
+            use [Option.get], which is equivalent.
     @plugin development guide *)
 
 val opt_hash: ('a -> int) -> 'a option -> int

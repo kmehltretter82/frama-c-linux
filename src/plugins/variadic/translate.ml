@@ -23,7 +23,6 @@
 open Cil_types
 open Va_types
 open Options
-open Extlib
 module Typ = Extends.Typ
 
 (* List of builtin function names to translate *)
@@ -137,10 +136,10 @@ let translate_variadics (file : file) =
 
     (* Replace variadic calls *)
     method! vinst i =
-      let fundec = the self#current_func in
+      let fundec = Option.get self#current_func in
       let loc = Cil_datatype.Instr.loc i in
       let block = self#enclosing_block () in
-      let ghost = (the self#current_stmt).ghost in
+      let ghost = (Option.get self#current_stmt).ghost in
       let make_new_args mk_call f args =
         let vf = Table.find classification f in
         try

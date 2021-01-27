@@ -544,7 +544,7 @@ struct
       | FromAny -> super#from s fmt from
       | From _ ->
         let ip =
-          Extlib.the
+          Option.get
             (Property.ip_of_from
                (Option.get self#current_kf) self#current_kinstr
                self#current_behavior_or_loop from)
