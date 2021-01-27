@@ -756,21 +756,23 @@ module MakeDot
           try let (x,_,_,_) = Table.find subgraphs v in x
           with Not_found ->
             let l = if wto = None then [] else [`Style `Dashed] in
-            (htmllabel "%a" V.pretty v)::l
+            let pretty fmt v =
+              V.pretty fmt v ;
+              match V.start_of v with
+              | None -> ()
+              | Some s -> Format.fprintf fmt "@s%d" s.sid
+            in (htmllabel "%a" pretty v)::l
         let get_subgraph v =
           try let (_,x,_,_) = Table.find subgraphs v in x
           with Not_found -> None
         let default_edge_attributes _g = []
         let edge_attributes (v1,e,v2) =
+          htmllabel "%a" pretty_edge e ::
           if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
             let (_,_,c1,_) = Table.find subgraphs v1 in
             let (_,_,c2,head2) = Table.find subgraphs v2 in
-            let l = if head2 && c2 <= c1 then [`Constraint false] else [] in
-            (htmllabel "%a" pretty_edge e)::l
-          else if wto = None then
-            [`Style `Dashed]
-          else
-            []
+            if head2 && c2 <= c1 then [`Constraint false] else []
+          else if wto = None then [] else [`Style `Dashed]
         include G
       end)
     in
