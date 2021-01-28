@@ -44,6 +44,10 @@ val get_requires : kernel_function -> kinstr -> funbehavior -> pred_info list
 val get_behavior : kernel_function -> kinstr -> active:string list ->
   funbehavior -> behavior
 
+val get_preconditions : kernel_function -> pred_info list
+val get_complete_behaviors : kernel_function -> pred_info list
+val get_disjoint_behaviors : kernel_function -> pred_info list
+
 (* -------------------------------------------------------------------------- *)
 (* --- Property Accessors : Assertions                                    --- *)
 (* -------------------------------------------------------------------------- *)

@@ -75,8 +75,10 @@ val refresh_predicate: identified_predicate -> identified_predicate
 (** @return a fresh id for predicates *)
 val fresh_predicate_id: unit -> int
 
-(** extract a named predicate for an identified predicate. *)
-val pred_of_id_pred: identified_predicate -> predicate
+(** extract a named predicate for an identified predicate.
+    When [~check:false] is specified, check-only predicate
+    returns a [ptrue] condition. *)
+val pred_of_id_pred: ?check:bool -> identified_predicate -> predicate
 
 (** creates a new identified term with a fresh id*)
 val new_identified_term: term -> identified_term

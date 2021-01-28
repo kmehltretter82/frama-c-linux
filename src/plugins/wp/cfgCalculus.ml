@@ -146,7 +146,7 @@ struct
     is_active_mode ~mode pi &&
     ( not goal || is_selected_props props ~pi pid )
 
-  let is_selected_precond { props } (pid,_) =
+  let is_selected_callpre { props } (pid,_) =
     is_selected_props props pid
 
   let use_assigns env (a : assigns) w =
@@ -296,12 +296,24 @@ struct
     if is_default_bhv env.mode then
       let pre =
         List.filter_map (fun p ->
-            if is_selected_precond env p then
+            if is_selected_callpre env p then
               Some (CfgAnnot.get_precond_at kf s p)
             else None
           ) c.call_pre
       in W.call_goal_precond env.we s kf es ~pre w_call
     else w_call
+
+  let behaviors kf =
+    if WpStrategy.is_main_init kf || WpLog.PrecondWeakening.get () then []
+    else CfgAnnot.get_preconditions kf
+
+  let complete mode kf =
+    if not (is_default_bhv mode) then []
+    else CfgAnnot.get_complete_behaviors kf
+
+  let disjoint mode kf =
+    if not (is_default_bhv mode) then []
+    else CfgAnnot.get_disjoint_behaviors kf
 
   let body env ~ensures ~exits w =
     let rw = List.fold_right (prove_property env) ensures w in
@@ -312,26 +324,31 @@ struct
 
   (* Putting everything together *)
   let compute ~mode ~props =
+    let kf = mode.kf in
     let env = {
       mode ; props ;
-      cfg = Cfg.get_automaton mode.kf ;
-      we = W.new_env mode.kf ;
+      cfg = Cfg.get_automaton kf ;
+      we = W.new_env kf ;
       wp = Vhash.create 32 ;
       wk = W.empty ;
     } in
-    let xs = Kernel_function.get_formals mode.kf in
-    let req = default_requires mode mode.kf in
-    let bhv = CfgAnnot.get_behavior mode.kf Kglobal ~active:[] mode.bhv in
+    let xs = Kernel_function.get_formals kf in
+    let req = default_requires mode kf in
+    let bhv = CfgAnnot.get_behavior kf Kglobal ~active:[] mode.bhv in
+
     env.we ,
     (* global init *)
     W.close env.we @@
-    I.process_global_init env.we mode.kf @@
+    I.process_global_init env.we kf @@
     W.scope env.we [] SC_Global @@
     (* pre-state *)
     W.label env.we None Clabels.pre @@
     List.fold_right (use_property env) req @@
     List.fold_right (use_property env) bhv.bhv_assumes @@
     List.fold_right (use_property env) bhv.bhv_requires @@
+    List.fold_right (use_property env) (behaviors kf) @@
+    List.fold_right (use_property env) (complete mode kf) @@
+    List.fold_right (use_property env) (disjoint mode kf) @@
     (* frame-in *)
     W.scope env.we xs SC_Frame_in @@
     (* function body *)

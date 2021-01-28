@@ -51,8 +51,6 @@ let new_predicate ?only_check p =
 
 let fresh_predicate_id = PredicateId.next
 
-let pred_of_id_pred p = p.ip_content.tp_statement
-
 let refresh_predicate p = { p with ip_id = PredicateId.next () }
 
 let new_identified_term t =
@@ -341,6 +339,10 @@ let unamed ?(loc=Cil_datatype.Location.unknown) p =
 
 let ptrue = unamed Ptrue
 let pfalse = unamed Pfalse
+
+let pred_of_id_pred ?(check=true) p =
+  let tp = p.ip_content in
+  if tp.tp_only_check && not check then ptrue else tp.tp_statement
 
 let pold ?(loc=Cil_datatype.Location.unknown) p = match p.pred_content with
   | Ptrue | Pfalse -> p

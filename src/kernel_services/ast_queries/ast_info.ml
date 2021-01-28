@@ -117,15 +117,15 @@ let behavior_postcondition b k =
   in
   Logic_const.pimplies (assumes,postcondition)
 
-let behavior_precondition b =
+let behavior_precondition ?check b =
   let assumes = behavior_assumes b in
   let requires = Logic_const.pands
-      (List.rev_map Logic_const.pred_of_id_pred b.b_requires)
+      (List.rev_map (Logic_const.pred_of_id_pred ?check) b.b_requires)
   in
   Logic_const.pimplies (assumes,requires)
 
-let precondition spec =
-  Logic_const.pands (List.map behavior_precondition spec.spec_behavior)
+let precondition ?check spec =
+  Logic_const.pands (List.map (behavior_precondition ?check) spec.spec_behavior)
 
 (** find the behavior named [name] in the list *)
 let get_named_bhv bhv_list name =

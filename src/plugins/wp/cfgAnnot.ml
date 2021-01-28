@@ -105,6 +105,43 @@ let get_behavior kf ki ~active bhv =
   }
 
 (* -------------------------------------------------------------------------- *)
+(* --- Side Behavior Requires                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_assumes kf bhv =
+  normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv)
+
+let get_preconditions kf =
+  (*TODO use this code instead! *)
+  (*
+  let assumes = get_assumes kf bhv in
+  List.map (normalize_pre kf Kglobal ~assumes bhv) bhv.b_requires
+  *)
+  List.map
+    (fun bhv ->
+       let p = Ast_info.behavior_precondition ~check:false bhv in
+       normalize_pre kf Kglobal bhv (Logic_const.new_predicate p)
+    ) (Annotations.behaviors kf)
+
+let get_complete_behaviors kf =
+  let spec = Annotations.funspec kf in
+  let module L = NormAtLabels in
+  List.map
+    (fun bs ->
+       WpPropId.mk_compl_bhv_id (kf,Kglobal,[],bs) ,
+       L.preproc_annot L.labels_fct_pre @@ Ast_info.complete_behaviors spec bs
+    ) spec.spec_complete_behaviors
+
+let get_disjoint_behaviors kf =
+  let spec = Annotations.funspec kf in
+  let module L = NormAtLabels in
+  List.map
+    (fun bs ->
+       WpPropId.mk_disj_bhv_id (kf,Kglobal,[],bs) ,
+       L.preproc_annot L.labels_fct_pre @@ Ast_info.disjoint_behaviors spec bs
+    ) spec.spec_disjoint_behaviors
+
+(* -------------------------------------------------------------------------- *)
 (* --- Called Contract                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -112,7 +149,7 @@ let get_behavior kf ki ~active bhv =
 module AllPrecondStatus =
   State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
     (struct
-      let name = "Call Preconditions Proxy Generated"
+      let name = "Wp.CfgAnnot.AllPrecondStatus"
       let dependencies = [Ast.self]
       let size = 32
     end)
@@ -164,8 +201,7 @@ let get_call_contract kf =
   setup_preconditions kf ;
   List.iter
     begin fun bhv ->
-      let assumes =
-        normalize_assumes kf Kglobal (Ast_info.behavior_assumes bhv) in
+      let assumes = get_assumes kf bhv in
       let mk_pre = normalize_pre kf Kglobal bhv ~assumes in
       let mk_post = normalize_post kf Kglobal bhv ~assumes in
       List.iter (add cpre @@ mk_pre) bhv.b_requires ;

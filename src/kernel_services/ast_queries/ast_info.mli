@@ -65,16 +65,18 @@ val term_lvals_of_term: term -> term_lval list
 (** @return the list of all the term lvals of a given term.
     Purely syntactic function. *)
 
-val precondition : funspec -> predicate
+val precondition : ?check:bool -> funspec -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
+    If [~check:false] is specified, check-only requires are skipped.
     @since Carbon-20101201 *)
 
 val behavior_assumes : funbehavior -> predicate
 (** Builds the conjunction of the [b_assumes].
     @since Nitrogen-20111001 *)
 
-val behavior_precondition : funbehavior -> predicate
+val behavior_precondition : ?check:bool -> funbehavior -> predicate
 (** Builds the precondition from [b_assumes] and [b_requires] clauses.
+    If [~check:false] is specified, check-only requires are skipped.
     @since Carbon-20101201 *)
 
 val behavior_postcondition : funbehavior -> termination_kind -> predicate
