@@ -102,6 +102,15 @@ let is_active_mode ~mode (p: Property.t) =
   | IPReachable _ | IPPropertyInstance _
     -> assert false (* n/a *)
 
+let is_selected_props (props : props) ?pi pid =
+  match props with
+  | `All | `Names [] -> true
+  | `Names ps -> WpPropId.select_by_name ps pid
+  | `PropId p ->
+      Property.equal p @@ match pi with
+      | Some q -> q
+      | None -> WpPropId.property_of_id pid
+
 (* -------------------------------------------------------------------------- *)
 (* --- WP Calculus Driver from Interpreted Automata                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -132,13 +141,12 @@ struct
         List.fold_left (fun p y -> cup (f y) p) (f x) xs
 
   let is_selected ~goal { mode ; props } (pid,_) =
-    let p = WpPropId.property_of_id pid in
-    is_active_mode ~mode p &&
-    ( not goal ||
-      match props with
-      | `All | `Names [] -> true
-      | `Names ps ->WpPropId.select_by_name ps pid
-      | `PropId id -> Property.equal id p )
+    let pi = WpPropId.property_of_id pid in
+    is_active_mode ~mode pi &&
+    ( not goal || is_selected_props props ~pi pid )
+
+  let is_selected_precond { props } (pid,_) =
+    is_selected_props props pid
 
   let use_assigns env (a : assigns) w =
     match a with
@@ -278,17 +286,16 @@ struct
 
   and call env s r kf es wr : W.t_prop =
     let c = CfgAnnot.get_call_contract kf in
-    let filter ps = List.filter (is_selected env ~goal:false) ps in
     let w_call = W.call env.we s r kf es
-        ~pre:(filter c.call_pre)
-        ~post:(filter c.call_post)
-        ~pexit:(filter c.call_exit)
+        ~pre:c.call_pre
+        ~post:c.call_post
+        ~pexit:c.call_exit
         ~assigns:c.call_assigns
         ~p_post:wr ~p_exit:env.wk in
     if is_default_bhv env.mode then
       let pre =
         List.filter_map (fun p ->
-            if is_selected env ~goal:true p then
+            if is_selected_precond env p then
               Some (CfgAnnot.get_precond_at kf s p)
             else None
           ) c.call_pre

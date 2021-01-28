@@ -813,11 +813,9 @@ let are_selected_names asked names =
     | Some false -> false
     | _ -> true
 
-
 let select_by_name asked_names pid =
   let names = user_prop_pid pid in
   are_selected_names asked_names names
-
 
 let select_call_pre s_call asked_pre pid =
   match pid.p_kind with
