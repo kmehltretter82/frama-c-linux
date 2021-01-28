@@ -80,7 +80,7 @@ void send_msg(msg const *msg)
 
 void host_address(int * /*[4]*/ ip)
 {
-  unsigned int i = sizeof(int [4]) / sizeof(int);
+  unsigned int i = (unsigned int)(sizeof(int [4]) / sizeof(int));
   *(ip + 0) = 192;
   *(ip + 1) = 100;
   *(ip + 2) = 200;

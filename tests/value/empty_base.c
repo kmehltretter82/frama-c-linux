@@ -1,12 +1,6 @@
 /* run.config*
-<<<<<<< HEAD
    EXIT: 1
    STDOPT: +"-machdep gcc_x86_32"
-||||||| ac7807782d
-   STDOPT: #"-machdep gcc_x86_32"
-=======
-   STDOPT: +"-machdep gcc_x86_32"
->>>>>>> origin/master
    STDOPT:
  */
 // the tests above must be done separately because both fail:

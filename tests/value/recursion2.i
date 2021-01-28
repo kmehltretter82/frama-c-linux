@@ -1,5 +1,5 @@
 /*run.config*
-  OPT: -eva @EVA_OPTIONS@ -then -input -out -inout
+  OPT: -eva @EVA_CONFIG@ -then -input -out -inout
  */
 int x, y;
 

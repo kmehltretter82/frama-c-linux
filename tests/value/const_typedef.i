@@ -1,12 +1,6 @@
 /* run.config*
-<<<<<<< HEAD
   PLUGIN= inout eva
   OPT: -machdep x86_32 -print -then -eva @EVA_CONFIG@ -lib-entry -no-print
-||||||| ac7807782d
-  OPT: -no-autoload-plugins -load-module inout,eva -print -then -eva @EVA_CONFIG@ -lib-entry -no-print
-=======
-  OPT: -machdep x86_32 -no-autoload-plugins -load-module inout,eva -print -then -eva @EVA_CONFIG@ -lib-entry -no-print
->>>>>>> origin/master
 */
 
 typedef int INT[3][3];

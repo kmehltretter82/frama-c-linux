@@ -23,21 +23,9 @@
 [eva] Initial state computed
 [eva] printf_garbled_mix.c:6: 
   Assigning imprecise value to b.
-<<<<<<< HEAD
   The imprecision originates from Arithmetic {printf_garbled_mix.c:6}
 [eva:alarm] printf_garbled_mix.c:7: Warning: 
-  pointer downcast. assert (unsigned int)b ≤ 2147483647;
-||||||| ac7807782d
-  The imprecision originates from Arithmetic
-  {tests/known/printf_garbled_mix.c:6}
-[eva:alarm] tests/known/printf_garbled_mix.c:7: Warning: 
-  pointer downcast. assert (unsigned int)b ≤ 2147483647;
-=======
-  The imprecision originates from Arithmetic
-  {tests/known/printf_garbled_mix.c:6}
-[eva:alarm] tests/known/printf_garbled_mix.c:7: Warning: 
   pointer downcast. assert (unsigned long)b ≤ 2147483647;
->>>>>>> origin/master
 [eva] using specification for function printf_va_1
 [eva] printf_garbled_mix.c:8: 
   Frama_C_show_each_nb_printed: [-2147483648..2147483647]

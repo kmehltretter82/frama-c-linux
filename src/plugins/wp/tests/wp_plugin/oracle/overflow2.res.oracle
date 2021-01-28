@@ -1,5 +1,5 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/overflow2.c (with preprocessing)
+[kernel] Parsing overflow2.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
@@ -11,22 +11,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a01' (file tests/wp_plugin/overflow2.c, line 27):
+Goal Assertion 'a01' (file overflow2.c, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a02' (file tests/wp_plugin/overflow2.c, line 28):
+Goal Assertion 'a02' (file overflow2.c, line 28):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a03' (file tests/wp_plugin/overflow2.c, line 29):
+Goal Assertion 'a03' (file overflow2.c, line 29):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a04' (file tests/wp_plugin/overflow2.c, line 30):
+Goal Assertion 'a04' (file overflow2.c, line 30):
 Assume {
   Type: is_sint16(distance_0) /\ is_uint32(p1_off_0).
   (* Pre-condition *)
@@ -36,7 +36,7 @@ Prove: (p1_off_0 + to_uint16(distance_0)) <= 65545.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a05' (file tests/wp_plugin/overflow2.c, line 31):
+Goal Assertion 'a05' (file overflow2.c, line 31):
 Let x = p1_off_0 + to_uint16(distance_0).
 Assume {
   Type: is_sint16(distance_0) /\ is_uint32(p1_off_0).
@@ -49,7 +49,7 @@ Prove: x = to_uint32(x).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/overflow2.c, line 21) in 'pointers_and_companions':
+Goal Assigns (file overflow2.c, line 21) in 'pointers_and_companions':
 Prove: true.
 
 ------------------------------------------------------------
@@ -62,22 +62,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a06' (file tests/wp_plugin/overflow2.c, line 46):
+Goal Assertion 'a06' (file overflow2.c, line 46):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a07' (file tests/wp_plugin/overflow2.c, line 47):
+Goal Assertion 'a07' (file overflow2.c, line 47):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a08' (file tests/wp_plugin/overflow2.c, line 48):
+Goal Assertion 'a08' (file overflow2.c, line 48):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a09' (file tests/wp_plugin/overflow2.c, line 49):
+Goal Assertion 'a09' (file overflow2.c, line 49):
 Assume {
   Type: is_sint16(distance_0) /\ is_uint32(p1_off_alt_0).
   (* Pre-condition *)
@@ -87,7 +87,7 @@ Prove: (p1_off_alt_0 + to_uint16(distance_0)) <= 65545.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a10' (file tests/wp_plugin/overflow2.c, line 50):
+Goal Assertion 'a10' (file overflow2.c, line 50):
 Let x = p1_off_alt_0 + to_uint16(distance_0).
 Assume {
   Type: is_sint16(distance_0) /\ is_uint32(p1_off_alt_0).
@@ -100,7 +100,7 @@ Prove: x = to_uint32(x).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/overflow2.c, line 40) in 'pointers_and_companions_ulong':
+Goal Assigns (file overflow2.c, line 40) in 'pointers_and_companions_ulong':
 Prove: true.
 
 ------------------------------------------------------------

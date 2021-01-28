@@ -25,7 +25,7 @@ Assume {
 Prove: `x_2 = `x_1.
 
 ------------------------------------------------------------
-[wp] tests/wp_tip/chunk_printing.i:19: Warning: 
+[wp] chunk_printing.i:19: Warning: 
   Memory model hypotheses for function 'get_int':
   /*@
      behavior wp_typed:
@@ -33,7 +33,7 @@ Prove: `x_2 = `x_1.
        ensures \separated(\result, &y);
      */
   int *get_int(struct V *v);
-[wp] tests/wp_tip/chunk_printing.i:25: Warning: 
+[wp] chunk_printing.i:25: Warning: 
   Memory model hypotheses for function 'get_uint':
   /*@
      behavior wp_typed:

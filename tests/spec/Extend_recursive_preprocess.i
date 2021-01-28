@@ -1,6 +1,6 @@
 /* run.config
-MODULE: @PTEST_DIR@/@PTEST_NAME@.cmxs
-OPT: -no-autoload-plugins -kernel-warn-key=annot-error=active -print
+MODULE: @PTEST_NAME@.cmxs
+OPT: -kernel-warn-key=annot-error=active -print
 */
 
 /*@ gl_foo foo1 {

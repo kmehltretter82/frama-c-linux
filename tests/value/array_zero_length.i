@@ -1,8 +1,8 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -machdep gcc_x86_32
-   OPT: -eva @EVA_OPTIONS@ -lib-entry -machdep gcc_x86_32
+   OPT: -eva @EVA_CONFIG@ -machdep gcc_x86_32
+   OPT: -eva @EVA_CONFIG@ -lib-entry -machdep gcc_x86_32
  EXIT: 1
-   OPT: -eva @EVA_OPTIONS@ -lib-entry
+   OPT: -eva @EVA_CONFIG@ -lib-entry
 */
 char T[];
 char U[0];

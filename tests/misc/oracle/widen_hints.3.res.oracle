@@ -76,7 +76,7 @@
   m ∈ {10}
   n ∈ {43}
   ss.i ∈ {87}
-    .d ∈ UNINITIALIZED
+    {.d; .[bits 32 to 63]} ∈ UNINITIALIZED
   ip ∈ {87}
   p ∈ {{ &ip }}
   ip2 ∈ {87}

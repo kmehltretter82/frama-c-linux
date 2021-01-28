@@ -97,7 +97,7 @@ Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_usage/caveat2.i:17: Warning: 
+[wp] caveat2.i:17: Warning: 
   Memory model hypotheses for function 'job':
   /*@
      behavior wp_typed_caveat:

@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 [kernel] Parsing libc.c (with preprocessing)
-[metrics] Defined functions (5)
-||||||| ac7807782d
-[kernel] Parsing tests/metrics/libc.c (with preprocessing)
-[metrics] Defined functions (5)
-=======
-[kernel] Parsing tests/metrics/libc.c (with preprocessing)
 [metrics] Defined functions (6)
->>>>>>> origin/master
   =====================
    bar (0 call); f (0 call); foo (0 call); g (address taken) (0 call);
    h (1 call); main (0 call); 

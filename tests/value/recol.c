@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -eva-slevel 100 -cpp-extra-args="-DPTEST " -no-warn-signed-overflow
-   OPT: -eva @EVA_OPTIONS@ -eva-slevel 100 -cpp-extra-args="-DPTEST " -machdep ppc_32 -no-warn-signed-overflow
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 100 -cpp-extra-args="-DPTEST " -no-warn-signed-overflow
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 100 -cpp-extra-args="-DPTEST " -machdep ppc_32 -no-warn-signed-overflow
 */
 
 #ifndef PTEST

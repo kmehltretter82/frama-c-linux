@@ -26,7 +26,7 @@ Goal Assertion 'PJ' (file unit_labels.i, line 10):
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/unit_labels.i:7: Warning: 
+[wp] unit_labels.i:7: Warning: 
   Memory model hypotheses for function 'duplet':
   /*@
      behavior wp_typed_ref:

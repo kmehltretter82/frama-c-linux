@@ -5,131 +5,43 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   pg ∈ {{ &global_empty }}
-<<<<<<< HEAD
-[eva] empty_struct2.c:44: assertion got status valid.
-[eva] empty_struct2.c:46: Frama_C_show_each_global_empty: ∅
-[eva] empty_struct2.c:47: Frama_C_show_each_e1: ∅
-[eva] empty_struct2.c:48: Call to builtin memcpy
-[eva] empty_struct2.c:48: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:44: assertion got status valid.
-[eva] tests/value/empty_struct2.c:46: Frama_C_show_each_global_empty: ∅
-[eva] tests/value/empty_struct2.c:47: Frama_C_show_each_e1: ∅
-[eva] tests/value/empty_struct2.c:48: Call to builtin memcpy
-[eva] tests/value/empty_struct2.c:48: 
-=======
-[eva] tests/value/empty_struct2.c:48: assertion got status valid.
-[eva] tests/value/empty_struct2.c:50: Frama_C_show_each_global_empty: ∅
-[eva] tests/value/empty_struct2.c:51: Frama_C_show_each_e1: ∅
-[eva] tests/value/empty_struct2.c:52: Call to builtin memcpy
-[eva] tests/value/empty_struct2.c:52: 
->>>>>>> origin/master
+[eva] empty_struct2.c:48: assertion got status valid.
+[eva] empty_struct2.c:50: Frama_C_show_each_global_empty: ∅
+[eva] empty_struct2.c:51: Frama_C_show_each_e1: ∅
+[eva] empty_struct2.c:52: Call to builtin memcpy
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'valid_dest' got status valid.
-<<<<<<< HEAD
-[eva] empty_struct2.c:48: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:48: 
-=======
-[eva] tests/value/empty_struct2.c:52: 
->>>>>>> origin/master
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'valid_src' got status valid.
-<<<<<<< HEAD
-[eva] empty_struct2.c:48: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:48: 
-=======
-[eva] tests/value/empty_struct2.c:52: 
->>>>>>> origin/master
+[eva] empty_struct2.c:52: 
   function memcpy: precondition 'separation' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:98: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-<<<<<<< HEAD
-[eva] empty_struct2.c:53: Call to builtin memcpy
-[eva] empty_struct2.c:53: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:53: Call to builtin memcpy
-[eva] tests/value/empty_struct2.c:53: 
-=======
-[eva] tests/value/empty_struct2.c:57: Call to builtin memcpy
-[eva] tests/value/empty_struct2.c:57: 
->>>>>>> origin/master
+[eva] empty_struct2.c:57: Call to builtin memcpy
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'valid_dest' got status valid.
-<<<<<<< HEAD
-[eva] empty_struct2.c:53: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:53: 
-=======
-[eva] tests/value/empty_struct2.c:57: 
->>>>>>> origin/master
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'valid_src' got status valid.
-<<<<<<< HEAD
-[eva] empty_struct2.c:53: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:53: 
-=======
-[eva] tests/value/empty_struct2.c:57: 
->>>>>>> origin/master
+[eva] empty_struct2.c:57: 
   function memcpy: precondition 'separation' got status valid.
-<<<<<<< HEAD
-[eva] empty_struct2.c:54: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:54: 
-=======
-[eva] tests/value/empty_struct2.c:58: 
->>>>>>> origin/master
+[eva] empty_struct2.c:58: 
   Frama_C_show_each_c2: .a ∈ {42}
                         .b ∈ {77}
-<<<<<<< HEAD
-[eva] empty_struct2.c:55: Frama_C_show_each_c2_e: ∅
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:55: Frama_C_show_each_c2_e: ∅
-=======
-[eva] tests/value/empty_struct2.c:59: Frama_C_show_each_c2_e: ∅
->>>>>>> origin/master
+[eva] empty_struct2.c:59: Frama_C_show_each_c2_e: ∅
 [eva] computing for function f <- main.
-<<<<<<< HEAD
-  Called from empty_struct2.c:56.
-||||||| ac7807782d
-  Called from tests/value/empty_struct2.c:56.
-=======
-  Called from tests/value/empty_struct2.c:60.
->>>>>>> origin/master
+  Called from empty_struct2.c:60.
 [eva] Recording results for f
 [eva] Done for function f
-<<<<<<< HEAD
-[eva] empty_struct2.c:58: 
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:58: 
-=======
-[eva] tests/value/empty_struct2.c:62: 
->>>>>>> origin/master
+[eva] empty_struct2.c:62: 
   Frama_C_show_each_res: .a ∈ {87}
                          .b ∈ {39}
-<<<<<<< HEAD
-[eva] empty_struct2.c:62: assertion got status valid.
-||||||| ac7807782d
-[eva] tests/value/empty_struct2.c:62: assertion got status valid.
-=======
-[eva] tests/value/empty_struct2.c:66: assertion got status valid.
->>>>>>> origin/master
+[eva] empty_struct2.c:66: assertion got status valid.
 [eva] computing for function ret_empty <- main.
-<<<<<<< HEAD
-  Called from empty_struct2.c:64.
-||||||| ac7807782d
-  Called from tests/value/empty_struct2.c:64.
-=======
-  Called from tests/value/empty_struct2.c:68.
->>>>>>> origin/master
+  Called from empty_struct2.c:68.
 [eva] using specification for function ret_empty
 [eva] Done for function ret_empty
 [eva] computing for function ret_ptr_empty <- main.
-<<<<<<< HEAD
-  Called from empty_struct2.c:65.
-||||||| ac7807782d
-  Called from tests/value/empty_struct2.c:65.
-=======
-  Called from tests/value/empty_struct2.c:69.
->>>>>>> origin/master
+  Called from empty_struct2.c:69.
 [eva] using specification for function ret_ptr_empty
 [eva] Done for function ret_ptr_empty
 [eva] Recording results for main

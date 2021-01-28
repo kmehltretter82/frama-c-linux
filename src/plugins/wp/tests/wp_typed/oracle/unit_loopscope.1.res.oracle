@@ -17,7 +17,7 @@ Goal Establishment of Invariant (file unit_loopscope.i, line 13):
 Prove: false.
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/unit_loopscope.i:9: Warning: 
+[wp] unit_loopscope.i:9: Warning: 
   Memory model hypotheses for function 'f':
   /*@ behavior wp_typed_ref:
         requires \valid(written); */

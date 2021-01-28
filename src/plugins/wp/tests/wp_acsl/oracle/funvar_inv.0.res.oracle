@@ -134,17 +134,17 @@ Goal Loop assigns 'qed_ok':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_acsl/funvar_inv.i:26: Warning: 
+[wp] funvar_inv.i:26: Warning: 
   Memory model hypotheses for function 'f':
   /*@ behavior wp_hoare:
         ensures \separated(\result, (int *)G + (..)); */
   int *f(void);
-[wp] tests/wp_acsl/funvar_inv.i:40: Warning: 
+[wp] funvar_inv.i:40: Warning: 
   Memory model hypotheses for function 'f2':
   /*@ behavior wp_hoare:
         ensures \separated(\result, (int *)G + (..)); */
   int *f2(void);
-[wp] tests/wp_acsl/funvar_inv.i:55: Warning: 
+[wp] funvar_inv.i:55: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_hoare:
         ensures \separated(\result, (int *)G + (..)); */

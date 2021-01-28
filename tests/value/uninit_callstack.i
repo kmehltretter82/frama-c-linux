@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -eva-no-show-progress -eva-print-callstacks -eva-no-results
+   OPT: -eva @EVA_CONFIG@ -eva-no-show-progress -eva-print-callstacks -eva-no-results
 */
 int *p, x;
 

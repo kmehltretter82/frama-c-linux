@@ -372,22 +372,22 @@ Tags: Call h1.
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_plugin/dynamic.i:41: Warning: 
+[wp] dynamic.i:41: Warning: 
   Memory model hypotheses for function 'guarded_call':
   /*@ behavior wp_typed:
         requires \separated(p, &X); */
   void guarded_call(struct S *p);
-[wp] tests/wp_plugin/dynamic.i:63: Warning: 
+[wp] dynamic.i:63: Warning: 
   Memory model hypotheses for function 'behavior':
   /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int behavior(int (*p)(void));
-[wp] tests/wp_plugin/dynamic.i:76: Warning: 
+[wp] dynamic.i:76: Warning: 
   Memory model hypotheses for function 'some_behaviors':
   /*@ behavior wp_typed:
         requires \separated(p + (..), &X1); */
   int some_behaviors(int (*p)(void));
-[wp] tests/wp_plugin/dynamic.i:85: Warning: 
+[wp] dynamic.i:85: Warning: 
   Memory model hypotheses for function 'missing_context':
   /*@ behavior wp_typed:
         requires \separated(p, &X1); */

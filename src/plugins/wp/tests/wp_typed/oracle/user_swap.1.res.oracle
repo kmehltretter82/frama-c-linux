@@ -40,7 +40,7 @@ Goal Assigns 'E' in 'swap':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/user_swap.i:13: Warning: 
+[wp] user_swap.i:13: Warning: 
   Memory model hypotheses for function 'swap':
   /*@
      behavior wp_typed_ref:

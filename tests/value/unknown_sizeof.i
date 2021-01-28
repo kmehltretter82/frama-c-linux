@@ -1,7 +1,7 @@
 /* run.config*
    EXIT: 1
-   OPT: -eva @EVA_OPTIONS@ -main main1
-   OPT: -eva @EVA_OPTIONS@ -main main2
+   OPT: -eva @EVA_CONFIG@ -main main1
+   OPT: -eva @EVA_CONFIG@ -main main2
 */
 struct s;
 

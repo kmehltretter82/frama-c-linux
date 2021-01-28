@@ -42,7 +42,7 @@ Assume {
 Prove: valid_rw(Malloc_0, p, 2).
 
 ------------------------------------------------------------
-[wp] tests/wp_plugin/subset_fopen.c:13: Warning: 
+[wp] subset_fopen.c:13: Warning: 
   Memory model hypotheses for function 'fopen':
   /*@
      behavior wp_typed:

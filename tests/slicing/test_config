@@ -1,10 +1,2 @@
-<<<<<<< HEAD
 PLUGIN: slicing @EVA_PLUGINS@
 OPT: @EVA_OPTIONS@ -machdep x86_32
-||||||| ac7807782d
-EXECNOW: make -s tests/slicing/libSelect.cmxs tests/slicing/libAnim.cmxs
-OPT: @EVA_OPTIONS@
-=======
-EXECNOW: make -s tests/slicing/libSelect.cmxs tests/slicing/libAnim.cmxs
-OPT: @EVA_OPTIONS@ -machdep x86_32
->>>>>>> origin/master

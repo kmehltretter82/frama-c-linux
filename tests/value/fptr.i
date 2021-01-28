@@ -1,7 +1,7 @@
 /* run.config*
    
-   OPT: -eva @EVA_OPTIONS@ -then -deps -out
-   OPT: -eva @EVA_OPTIONS@ -main main_uninit -then -deps -out
+   OPT: -eva @EVA_CONFIG@ -then -deps -out
+   OPT: -eva @EVA_CONFIG@ -main main_uninit -then -deps -out
 */
 int R=77; volatile int v; int n;
 

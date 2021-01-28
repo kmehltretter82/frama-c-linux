@@ -1,12 +1,10 @@
-[variadic] tests/defined/maintain-formals-order.i:2: 
-  Declaration of variadic function f.
-[variadic] tests/defined/maintain-formals-order.i:7: 
-  Declaration of variadic function g.
-[variadic] tests/defined/maintain-formals-order.i:12: 
+[variadic] maintain-formals-order.i:2: Declaration of variadic function f.
+[variadic] maintain-formals-order.i:7: Declaration of variadic function g.
+[variadic] maintain-formals-order.i:12: 
   Generic translation of call to variadic function.
-[variadic] tests/defined/maintain-formals-order.i:13: 
+[variadic] maintain-formals-order.i:13: 
   Generic translation of call to variadic function.
-[variadic] tests/defined/maintain-formals-order.i:15: 
+[variadic] maintain-formals-order.i:15: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

@@ -10,7 +10,7 @@ Goal Post-condition (file unit_ite.i, line 2) in 'check':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/unit_ite.i:3: Warning: 
+[wp] unit_ite.i:3: Warning: 
   Memory model hypotheses for function 'check':
   /*@ behavior wp_typed_ref:
         requires \valid(p); */

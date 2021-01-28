@@ -193,24 +193,24 @@ Effect at line 103
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:17: Warning: 
+[wp] alias_assigns_hypotheses.i:17: Warning: 
   Memory model hypotheses for function 'global_alias':
   /*@
      behavior wp_typed:
        requires \separated(g_alias, (int *)global + (..), &g_alias);
      */
   void global_alias(void);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:24: Warning: 
+[wp] alias_assigns_hypotheses.i:24: Warning: 
   Memory model hypotheses for function 'global_no_alias':
   /*@ behavior wp_typed:
         requires \separated(g_alias, &g_alias); */
   void global_no_alias(void);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:32: Warning: 
+[wp] alias_assigns_hypotheses.i:32: Warning: 
   Memory model hypotheses for function 'formal_alias':
   /*@ behavior wp_typed:
         requires \separated(f_alias, (int *)global + (..)); */
   void formal_alias(int *f_alias);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:48: Warning: 
+[wp] alias_assigns_hypotheses.i:48: Warning: 
   Memory model hypotheses for function 'formal_alias_array':
   /*@
      behavior wp_typed:
@@ -218,7 +218,7 @@ Prove: true.
        requires \separated(alias_array + (..), (int *)global + (..));
      */
   void formal_alias_array(int (*alias_array)[2]);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:61: Warning: 
+[wp] alias_assigns_hypotheses.i:61: Warning: 
   Memory model hypotheses for function 'field_alias':
   /*@
      behavior wp_typed:
@@ -226,7 +226,7 @@ Prove: true.
        requires \separated(x, (int *)global + (..));
      */
   void field_alias(struct X *x);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:73: Warning: 
+[wp] alias_assigns_hypotheses.i:73: Warning: 
   Memory model hypotheses for function 'field_range_alias':
   /*@
      behavior wp_typed:
@@ -234,7 +234,7 @@ Prove: true.
        requires \separated(x + (..), (int *)global + (..));
      */
   void field_range_alias(struct X *x);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:81: Warning: 
+[wp] alias_assigns_hypotheses.i:81: Warning: 
   Memory model hypotheses for function 'set_alias':
   /*@
      behavior wp_typed:
@@ -242,7 +242,7 @@ Prove: true.
        requires \separated(f_alias, (int *)global + (..), &g_alias);
      */
   void set_alias(int *f_alias);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:92: Warning: 
+[wp] alias_assigns_hypotheses.i:92: Warning: 
   Memory model hypotheses for function 'comprehension_alias':
   /*@
      behavior wp_typed:
@@ -253,7 +253,7 @@ Prove: true.
            );
      */
   void comprehension_alias(void);
-[wp] tests/wp_hoare/alias_assigns_hypotheses.i:102: Warning: 
+[wp] alias_assigns_hypotheses.i:102: Warning: 
   Memory model hypotheses for function 'union_alias':
   /*@
      behavior wp_typed:

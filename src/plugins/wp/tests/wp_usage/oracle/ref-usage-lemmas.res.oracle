@@ -17,7 +17,7 @@ Goal Pre-condition (file ref-usage-lemmas.i, line 30) in 'main':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_usage/ref-usage-lemmas.i:26: Warning: 
+[wp] ref-usage-lemmas.i:26: Warning: 
   Memory model hypotheses for function 'foo':
   /*@ behavior wp_typed:
         requires \separated(x, &b); */

@@ -1,12 +1,12 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_plugin/unfold_assigns.i (no preprocessing)
+[kernel] Parsing unfold_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function ASSIGN_NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 66) in 'ASSIGN_NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 66) in 'ASSIGN_NO_UNFOLD_KO':
 Effect at line 69
 Prove: true.
 
@@ -15,7 +15,7 @@ Prove: true.
   Function ASSIGN_NO_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 60) in 'ASSIGN_NO_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 60) in 'ASSIGN_NO_UNFOLD_OK':
 Effect at line 63
 Prove: true.
 
@@ -24,7 +24,7 @@ Prove: true.
   Function NESTED_ARRAY_STATIC
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
+Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
 Call Effect at line 97
 Assume {
   (* Heap *)
@@ -36,7 +36,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
+Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
 Call Effect at line 97
 Assume {
   (* Heap *)
@@ -51,7 +51,7 @@ Prove: false.
   Function NESTED_ARRAY_VARS
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
 Call Effect at line 104
 Let a = shiftfield_F2_With_array_t(s).
 Let a_1 = shift_sint32(a, 1).
@@ -68,7 +68,7 @@ Prove: included(s, 4, a_1, n) \/ included(a, 3, a_1, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
 Call Effect at line 104
 Let a = shiftfield_F2_With_array_t(s).
 Let a_1 = shift_sint32(a, 1).
@@ -88,13 +88,13 @@ Prove: included(s, 4, a_1, n) \/ included(a, 3, a_1, n).
   Function NO_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
 Call Effect at line 39
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
 Call Effect at line 39
 Prove: true.
 
@@ -103,13 +103,13 @@ Prove: true.
   Function NO_UNFOLD_OK_1
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
+Goal Assigns (file unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
 Call Effect at line 24
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
+Goal Assigns (file unfold_assigns.i, line 22) in 'NO_UNFOLD_OK_1':
 Call Effect at line 24
 Prove: true.
 
@@ -118,13 +118,13 @@ Prove: true.
   Function NO_UNFOLD_OK_2
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
+Goal Assigns (file unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
 Call Effect at line 29
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
+Goal Assigns (file unfold_assigns.i, line 27) in 'NO_UNFOLD_OK_2':
 Call Effect at line 29
 Prove: true.
 
@@ -133,13 +133,13 @@ Prove: true.
   Function NO_UNFOLD_OK_3
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
+Goal Assigns (file unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
 Call Effect at line 34
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
+Goal Assigns (file unfold_assigns.i, line 32) in 'NO_UNFOLD_OK_3':
 Call Effect at line 34
 Prove: true.
 
@@ -148,7 +148,7 @@ Prove: true.
   Function PARTIAL_ASSIGNS_STATIC
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 77
 Assume {
   (* Heap *)
@@ -160,7 +160,7 @@ Prove: (i = 0) \/ (i = 4) \/ ((0 < i) /\ (i <= 3)).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 77
 Assume {
   (* Heap *)
@@ -175,7 +175,7 @@ Prove: (i = 0) \/ (i = 4) \/ ((0 < i) /\ (i <= 3)).
   Function PARTIAL_ASSIGNS_VARS
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
 Call Effect at line 83
 Let a = shift_sint32(p, 0).
 Let x = 1 + n.
@@ -197,7 +197,7 @@ Prove: (i = 0) \/ (n = i) \/ (n <= 0) \/ included(a, x, a_1, x_1) \/
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
 Call Effect at line 83
 Let a = shift_sint32(p, 0).
 Let x = 1 + n.
@@ -222,7 +222,7 @@ Prove: (i = 0) \/ (n = i) \/ (n <= 0) \/ included(a, x, a_1, x_1) \/
   Function RANGE_NESTED_ARRAY_STATIC
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
 Call Effect at line 116
 Assume {
   (* Heap *)
@@ -235,7 +235,7 @@ Prove: i = 2.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
 Call Effect at line 116
 Assume {
   (* Heap *)
@@ -251,7 +251,7 @@ Prove: i = 2.
   Function RANGE_NESTED_ARRAY_VARS
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
 Call Effect at line 126
 Let a = shift_S2_With_array(s, 0).
 Let x = 4 * n.
@@ -281,7 +281,7 @@ Prove: (n < 0) \/ included(a, x_1, a_1, x_2) \/ included(a_2, 4, a_1, x_2) \/
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
 Call Effect at line 126
 Let a = shift_S2_With_array(s, 0).
 Let x = 4 * n.
@@ -314,7 +314,7 @@ Prove: (n < 0) \/ included(a, x_1, a_1, x_2) \/ included(a_2, 4, a_1, x_2) \/
   Function USE_ASSIGN_UNFOLD_KO
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/unfold_assigns.i, line 52) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Post-condition (file unfold_assigns.i, line 52) in 'USE_ASSIGN_UNFOLD_KO':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -328,13 +328,13 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
 Call Effect at line 57
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
+Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
 Call Effect at line 57
 Prove: true.
 
@@ -343,7 +343,7 @@ Prove: true.
   Function USE_ASSIGN_UNFOLD_OK
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_plugin/unfold_assigns.i, line 43) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Post-condition (file unfold_assigns.i, line 43) in 'USE_ASSIGN_UNFOLD_OK':
 Let a = Load_S1_S(q, Mint_0).
 Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
 Assume {
@@ -357,13 +357,13 @@ Prove: EqS1_S(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
 Call Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_plugin/unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
+Goal Assigns (file unfold_assigns.i, line 44) in 'USE_ASSIGN_UNFOLD_OK':
 Call Effect at line 48
 Prove: true.
 

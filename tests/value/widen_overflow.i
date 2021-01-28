@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@
+   OPT: -eva @EVA_CONFIG@
 */
 
 int main() {

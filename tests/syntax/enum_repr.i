@@ -1,23 +1,11 @@
 /* run.config
-<<<<<<< HEAD
 MODULE: Enum_repr
 STDOPT: #"-enums int"
 STDOPT: #"-enums gcc-short-enums"
 STDOPT: #"-enums gcc-enums"
-||||||| ac7807782d
-EXECNOW: make -s tests/syntax/Enum_repr.cmxs
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums int -print
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums gcc-short-enums -print
-OPT: -load-module tests/syntax/Enum_repr.cmxs -enums gcc-enums -print
-=======
-EXECNOW: make -s tests/syntax/Enum_repr.cmxs
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums int -print
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums gcc-short-enums -print
-OPT: -machdep x86_32 -load-module tests/syntax/Enum_repr.cmxs -enums gcc-enums -print
->>>>>>> origin/master
 */
 
-// is represented by | int | gcc-enums          | gcc-short-enums
+// is represented by | int | gcc-enums          | gcc-short-enums 
 // foo               | int | unsigned int       | unsigned char
 // bar               | int | unsigned char      | unsigned char
 // bu1               | int | unsigned int       | unsigned int

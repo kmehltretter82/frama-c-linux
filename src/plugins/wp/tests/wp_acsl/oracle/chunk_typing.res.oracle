@@ -1876,7 +1876,7 @@ Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_acsl/chunk_typing.i:21: Warning: 
+[wp] chunk_typing.i:21: Warning: 
   Memory model hypotheses for function 'function':
   /*@
      behavior wp_typed:

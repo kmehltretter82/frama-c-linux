@@ -1,10 +1,5 @@
 /* run.config
-<<<<<<< HEAD
 PLUGIN: @EVA_PLUGINS@
-||||||| ac7807782d
-OPT: -wp -wp-prover qed -wp-msg-key shell
-=======
->>>>>>> origin/master
 OPT: -eva -eva-use-spec f
 OPT: -print
 */

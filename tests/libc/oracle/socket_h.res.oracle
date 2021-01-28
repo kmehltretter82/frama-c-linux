@@ -60,42 +60,42 @@
   function getsockname: precondition 'valid_address' got status valid.
 [eva] Done for function getsockname
 [eva] computing for function sendto <- main.
-  Called from tests/libc/socket_h.c:24.
+  Called from socket_h.c:24.
 [eva] using specification for function sendto
-[eva] tests/libc/socket_h.c:24: 
+[eva] socket_h.c:24: 
   function sendto: precondition 'available_sockfd' got status valid.
-[eva] tests/libc/socket_h.c:24: 
+[eva] socket_h.c:24: 
   function sendto: precondition 'buf_len_ok' got status valid.
 [eva] Done for function sendto
 [eva] computing for function sendto <- main.
-  Called from tests/libc/socket_h.c:27.
-[eva] tests/libc/socket_h.c:27: 
+  Called from socket_h.c:27.
+[eva] socket_h.c:27: 
   function sendto: precondition 'available_sockfd' got status valid.
-[eva] tests/libc/socket_h.c:27: 
+[eva] socket_h.c:27: 
   function sendto: precondition 'buf_len_ok' got status valid.
 [eva] Done for function sendto
 [eva] computing for function recvfrom <- main.
-  Called from tests/libc/socket_h.c:31.
+  Called from socket_h.c:31.
 [eva] using specification for function recvfrom
-[eva] tests/libc/socket_h.c:31: 
+[eva] socket_h.c:31: 
   function recvfrom: precondition 'valid_sockfd' got status valid.
-[eva] tests/libc/socket_h.c:31: 
+[eva] socket_h.c:31: 
   function recvfrom: precondition 'valid_buffer_length' got status valid.
-[eva] tests/libc/socket_h.c:31: 
+[eva] socket_h.c:31: 
   function recvfrom: precondition 'valid_addrbuf_or_null' got status valid.
 [eva] Done for function recvfrom
-[eva] tests/libc/socket_h.c:35: assertion got status valid.
+[eva] socket_h.c:35: assertion got status valid.
 [eva] computing for function recvfrom <- main.
-  Called from tests/libc/socket_h.c:37.
-[eva] tests/libc/socket_h.c:37: 
+  Called from socket_h.c:37.
+[eva] socket_h.c:37: 
   function recvfrom: precondition 'valid_sockfd' got status valid.
-[eva] tests/libc/socket_h.c:37: 
+[eva] socket_h.c:37: 
   function recvfrom: precondition 'valid_buffer_length' got status valid.
-[eva] tests/libc/socket_h.c:37: 
+[eva] socket_h.c:37: 
   function recvfrom: precondition 'valid_addrbuf_or_null' got status valid.
-[eva:invalid-assigns] tests/libc/socket_h.c:37: 
+[eva:invalid-assigns] socket_h.c:37: 
   Completely invalid destination for assigns clause *addrbuf_len. Ignoring.
-[eva:invalid-assigns] tests/libc/socket_h.c:37: 
+[eva:invalid-assigns] socket_h.c:37: 
   Completely invalid destination
   for assigns clause *((char *)addrbuf + (0 .. \old(*addrbuf_len) - 1)).
   Ignoring.

@@ -1,20 +1,6 @@
-<<<<<<< HEAD
 [kernel] Parsing fc_libc.c (with preprocessing)
-[kernel] parsing c11_functions.json
-[kernel] parsing glibc_functions.json
-[kernel] parsing posix_identifiers.json
-[kernel] parsing nonstandard_identifiers.json
-||||||| ac7807782d
-[kernel] Parsing tests/libc/fc_libc.c (with preprocessing)
-[kernel] parsing c11_functions.json
-[kernel] parsing glibc_functions.json
-[kernel] parsing posix_identifiers.json
-[kernel] parsing nonstandard_identifiers.json
-=======
-[kernel] Parsing tests/libc/fc_libc.c (with preprocessing)
 [kernel] Parsing c11_functions.json
 [kernel] Parsing c11_headers.json
 [kernel] Parsing glibc_functions.json
 [kernel] Parsing posix_identifiers.json
 [kernel] Parsing nonstandard_identifiers.json
->>>>>>> origin/master

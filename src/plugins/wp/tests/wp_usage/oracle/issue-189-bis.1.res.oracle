@@ -167,7 +167,7 @@ Effect at line 59
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_usage/issue-189-bis.i:48: Warning: 
+[wp] issue-189-bis.i:48: Warning: 
   Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior wp_typed:

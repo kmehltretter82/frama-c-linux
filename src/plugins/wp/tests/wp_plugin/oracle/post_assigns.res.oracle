@@ -32,7 +32,7 @@ Call Effect at line 14
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_plugin/post_assigns.i:12: Warning: 
+[wp] post_assigns.i:12: Warning: 
   Memory model hypotheses for function 'receive':
   /*@
      behavior wp_typed:

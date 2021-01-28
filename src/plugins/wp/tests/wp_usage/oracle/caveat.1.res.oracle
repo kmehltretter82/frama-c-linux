@@ -68,7 +68,7 @@ Assume {
 Prove: P_OBS(x_2, x_3, x_4).
 
 ------------------------------------------------------------
-[wp] tests/wp_usage/caveat.i:17: Warning: 
+[wp] caveat.i:17: Warning: 
   Memory model hypotheses for function 'implicit':
   /*@
      behavior wp_typed_caveat:
@@ -77,7 +77,7 @@ Prove: P_OBS(x_2, x_3, x_4).
        requires \valid(r);
      */
   void implicit(struct S *a, int *r);
-[wp] tests/wp_usage/caveat.i:32: Warning: 
+[wp] caveat.i:32: Warning: 
   Memory model hypotheses for function 'explicit':
   /*@
      behavior wp_typed_caveat:
@@ -86,7 +86,7 @@ Prove: P_OBS(x_2, x_3, x_4).
        requires \valid(r);
      */
   void explicit(struct S *a, int *r);
-[wp] tests/wp_usage/caveat.i:47: Warning: 
+[wp] caveat.i:47: Warning: 
   Memory model hypotheses for function 'observer':
   /*@
      behavior wp_typed_caveat:

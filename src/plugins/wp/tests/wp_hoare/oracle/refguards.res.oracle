@@ -68,7 +68,7 @@ Assume { (* Heap *) Type: (region(c.base) <= 0) /\ (region(d.base) <= 0). }
 Prove: d != c.
 
 ------------------------------------------------------------
-[wp] tests/wp_hoare/refguards.i:10: Warning: 
+[wp] refguards.i:10: Warning: 
   Memory model hypotheses for function 'f':
   /*@
      behavior wp_typed_ref:
@@ -77,7 +77,7 @@ Prove: d != c.
        requires \valid(d);
      */
   void f(int *a, int *b, int *c, int *d, int k);
-[wp] tests/wp_hoare/refguards.i:25: Warning: 
+[wp] refguards.i:25: Warning: 
   Memory model hypotheses for function 'h':
   /*@
      behavior wp_typed_ref:
@@ -86,7 +86,7 @@ Prove: d != c.
        requires \valid(d);
      */
   void h(int *c, int *d, int k);
-[wp] tests/wp_hoare/refguards.i:39: Warning: 
+[wp] refguards.i:39: Warning: 
   Memory model hypotheses for function 's':
   /*@
      behavior wp_typed_ref:

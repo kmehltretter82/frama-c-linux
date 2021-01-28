@@ -1,5 +1,5 @@
 /* run.config
-OPT: -machdep x86_32 -cpp-extra-args="-Ishare/libc" -print
+OPT: -cpp-extra-args="-Ishare/libc" -print
 */
 
 #include "__fc_define_off_t.h"

@@ -464,52 +464,8 @@ zloop sequent:
    Assume {
      Have: foo_0 = 42.
      Have: 0 <= x.
-<<<<<<< HEAD
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
-     Have: i_2 <= 10.
-     Have: i <= 10.
-     Have: 10 <= i.
-   }
-Prove: 10 <= i.
-
-Goal Assertion (file stmtcompiler_test.i, line 84):
-Prove: true.
-[Qed] Valid
-
-------------------------------------------------------------
-zloop sequent:
-   Assume {
-     Have: foo_0 = 42.
-     Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
-||||||| ac7807782d
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
-     Have: (Init_i_1=true) /\ ((1 + i_1) = i_2).
-     Have: i_2 <= 10.
-     Have: i <= 10.
-     Have: 10 <= i.
-   }
-Prove: 10 <= i.
-
-Goal Assertion (file tests/wp/stmtcompiler_test.i, line 84):
-Prove: true.
-[Qed] Valid
-
-------------------------------------------------------------
-zloop sequent:
-   Assume {
-     Have: foo_0 = 42.
-     Have: 0 <= x.
-     Have: (Init_i_0=false) /\ (ta_i_0=true) /\ (ta_i_1=false).
-     Have: i_1 = 0.
-=======
      Have: (ta_i_0=true) /\ (ta_i_1=false).
      Have: (Init_i_0=true) /\ (i_1 = 0).
->>>>>>> origin/master
      Have: (Init_i_1=true) /\ ((1 + i_1) = i).
    }
 Prove: i <= 10.

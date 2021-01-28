@@ -1,10 +1,2 @@
-<<<<<<< HEAD
 [kernel] Parsing cpp-command.c (with preprocessing)
 %1 = cpp-command.c %2 = /tmp/FILE.i %args =  -I LIBC -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32
-||||||| ac7807782d
-[kernel] Parsing tests/syntax/cpp-command.c (with preprocessing)
-%1 = cpp-command.c %2 = /tmp/FILE.i %args =  -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc -m32
-=======
-[kernel] Parsing tests/syntax/cpp-command.c (with preprocessing)
-%1 = cpp-command.c %2 = TMPDIR/FILE.i %args =  -I./share/libc -D__FRAMAC__ -D__FC_MACHDEP_X86_32 -dD -nostdinc
->>>>>>> origin/master

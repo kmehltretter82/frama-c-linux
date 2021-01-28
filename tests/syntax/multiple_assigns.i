@@ -1,3 +1,7 @@
+/* run.config
+  EXIT: 1
+*/
+
 int z;
 
 /*@ assigns z, z;

@@ -1,64 +1,64 @@
 # frama-c -wp [...]
-[kernel] Parsing tests/wp_acsl/postassigns.c (with preprocessing)
+[kernel] Parsing postassigns.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job1
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/postassigns.c, line 4) in 'job1':
+Goal Post-condition (file postassigns.c, line 4) in 'job1':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (1/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (1/9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (2/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (2/9):
 Effect at line 10
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (3/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (3/9):
 Effect at line 10
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (4/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (4/9):
 Effect at line 11
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (5/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (5/9):
 Effect at line 11
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (6/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (6/9):
 Effect at line 12
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (7/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (7/9):
 Effect at line 12
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (8/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (8/9):
 Effect at line 13
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 5) in 'job1' (9/9):
+Goal Assigns (file postassigns.c, line 5) in 'job1' (9/9):
 Effect at line 13
 Prove: true.
 
@@ -67,35 +67,35 @@ Prove: true.
   Function job2
 ------------------------------------------------------------
 
-Goal Post-condition (file tests/wp_acsl/postassigns.c, line 19) in 'job2':
+Goal Post-condition (file postassigns.c, line 19) in 'job2':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (1/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (1/9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (2/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (2/9):
 Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (3/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (3/9):
 Effect at line 25
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (4/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (4/9):
 Effect at line 26
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (5/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (5/9):
 Effect at line 26
 Let x = A[1].
 Assume {
@@ -109,13 +109,13 @@ Prove: exists i : Z. (A[i] = x) /\ (0 <= i) /\ (i <= 3).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (6/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (6/9):
 Effect at line 27
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (7/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (7/9):
 Effect at line 27
 Let x = A[2].
 Assume {
@@ -129,13 +129,13 @@ Prove: exists i : Z. (A[i] = x) /\ (0 <= i) /\ (i <= 3).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (8/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (8/9):
 Effect at line 28
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 20) in 'job2' (9/9):
+Goal Assigns (file postassigns.c, line 20) in 'job2' (9/9):
 Effect at line 28
 Prove: true.
 
@@ -144,7 +144,7 @@ Prove: true.
   Function job3
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file tests/wp_acsl/postassigns.c, line 38):
+Goal Preservation of Invariant (file postassigns.c, line 38):
 Assume {
   Type: is_sint32(N) /\ is_sint32(i) /\ is_sint32(1 + i).
   (* Pre-condition *)
@@ -158,23 +158,23 @@ Prove: (-1) <= i.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file tests/wp_acsl/postassigns.c, line 38):
+Goal Establishment of Invariant (file postassigns.c, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/postassigns.c, line 39) (1/3):
+Goal Loop assigns (file postassigns.c, line 39) (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/postassigns.c, line 39) (2/3):
+Goal Loop assigns (file postassigns.c, line 39) (2/3):
 Effect at line 41
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file tests/wp_acsl/postassigns.c, line 39) (3/3):
+Goal Loop assigns (file postassigns.c, line 39) (3/3):
 Effect at line 42
 Let a = shift_sint32(p, i).
 Assume {
@@ -194,17 +194,17 @@ Prove: included(a, 1, shift_sint32(p, 0), N).
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 33) in 'job3' (1/2):
+Goal Assigns (file postassigns.c, line 33) in 'job3' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file tests/wp_acsl/postassigns.c, line 33) in 'job3' (2/2):
+Goal Assigns (file postassigns.c, line 33) in 'job3' (2/2):
 Effect at line 41
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_acsl/postassigns.c:7: Warning: 
+[wp] postassigns.c:7: Warning: 
   Memory model hypotheses for function 'job1':
   /*@
      behavior wp_typed:
@@ -212,7 +212,7 @@ Prove: true.
        ensures \separated(p + (0 .. \at(N,Post) - 1), &N);
      */
   void job1(int *p);
-[wp] tests/wp_acsl/postassigns.c:22: Warning: 
+[wp] postassigns.c:22: Warning: 
   Memory model hypotheses for function 'job2':
   /*@
      behavior wp_typed:
@@ -220,7 +220,7 @@ Prove: true.
        ensures \separated(p + A[0 .. \at(N,Post) - 1], (int *)A + (..), &N);
      */
   void job2(int *p);
-[wp] tests/wp_acsl/postassigns.c:35: Warning: 
+[wp] postassigns.c:35: Warning: 
   Memory model hypotheses for function 'job3':
   /*@
      behavior wp_typed:

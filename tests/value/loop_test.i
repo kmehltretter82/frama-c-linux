@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -main test_onzes
-   OPT: -eva @EVA_OPTIONS@ -main test_cent_onzes
+   OPT: -eva @EVA_CONFIG@ -main test_onzes
+   OPT: -eva @EVA_CONFIG@ -main test_cent_onzes
 */
 
 

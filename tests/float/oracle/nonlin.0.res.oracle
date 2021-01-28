@@ -229,9 +229,9 @@
 [eva] computing for function garbled <- main.
   Called from nonlin.c:148.
 [eva:alarm] nonlin.c:98: Warning: 
-  pointer downcast. assert (unsigned int)(&x_0) ≤ 2147483647;
+  pointer downcast. assert (unsigned long)(&x_0) ≤ 2147483647;
 [eva:alarm] nonlin.c:98: Warning: 
-  pointer downcast. assert (unsigned int)(&x_0 + (int)(&x_0)) ≤ 2147483647;
+  pointer downcast. assert (unsigned long)(&x_0 + (int)(&x_0)) ≤ 2147483647;
 [eva:alarm] nonlin.c:98: Warning: 
   non-finite float value.
   assert \is_finite((float)((int)(&x_0 + (int)(&x_0))));
@@ -290,7 +290,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}
-  x0 ∈ [--..--]
+  x0 ∈ [0..13862255574906830848]
   __retres ∈ {0; 1}
 [eva:final-states] Values at end of function around_zeros:
   Frama_C_entropy_source ∈ [--..--]

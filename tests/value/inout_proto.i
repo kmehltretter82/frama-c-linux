@@ -1,5 +1,5 @@
 /*run.config*
-  OPT: @EVA_OPTIONS@ -inout -input-with-formals  -inout-with-formals -main main_main
+  OPT: @EVA_CONFIG@ -inout -input-with-formals  -inout-with-formals -main main_main
 */
 
 typedef unsigned char   BYTE;

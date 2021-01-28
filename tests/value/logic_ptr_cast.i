@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -print -eva-no-results
+   OPT: -eva @EVA_CONFIG@ -print -eva-no-results
 */
 int *p;
 int t[90];

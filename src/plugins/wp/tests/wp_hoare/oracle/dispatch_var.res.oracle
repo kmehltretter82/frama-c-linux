@@ -496,22 +496,22 @@ Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_hoare/dispatch_var.i:12: Warning: 
+[wp] dispatch_var.i:12: Warning: 
   Memory model hypotheses for function 'ref_ctr':
   /*@ behavior wp_typed_ref:
         requires \valid(p); */
   int ref_ctr(int *p);
-[wp] tests/wp_hoare/dispatch_var.i:44: Warning: 
+[wp] dispatch_var.i:44: Warning: 
   Memory model hypotheses for function 'ref_bd':
   /*@ behavior wp_typed_ref:
         requires \valid(q); */
   int ref_bd(int *q);
-[wp] tests/wp_hoare/dispatch_var.i:83: Warning: 
+[wp] dispatch_var.i:83: Warning: 
   Memory model hypotheses for function 'ref_valid':
   /*@ behavior wp_typed_ref:
         requires \valid(p1); */
   int ref_valid(int *p1);
-[wp] tests/wp_hoare/dispatch_var.i:133: Warning: 
+[wp] dispatch_var.i:133: Warning: 
   Memory model hypotheses for function 'ref_ctr_nr':
   /*@
      behavior wp_typed_ref:
@@ -521,12 +521,12 @@ Prove: true.
        requires \valid(ref2);
      */
   int ref_ctr_nr(int *ref, int *ref1, int *ref2);
-[wp] tests/wp_hoare/dispatch_var.i:158: Warning: 
+[wp] dispatch_var.i:158: Warning: 
   Memory model hypotheses for function 'ref_ctr_nstars':
   /*@ behavior wp_typed_ref:
         requires \valid(pp); */
   int ref_ctr_nstars(int **pp);
-[wp] tests/wp_hoare/dispatch_var.i:194: Warning: 
+[wp] dispatch_var.i:194: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_typed_ref:
         requires \valid(pg); */

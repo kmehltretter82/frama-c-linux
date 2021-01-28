@@ -1,7 +1,7 @@
 /* run.config*
    
-   OPT: @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-main -main main -then -out -deps
-   OPT: @EVA_OPTIONS@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-origin -main origin -then -out -deps
+   OPT: @EVA_CONFIG@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-main -main main -then -out -deps
+   OPT: @EVA_CONFIG@ -eva -eva-warn-copy-indeterminate=-origin_misalign_2,-origin -main origin -then -out -deps
 
 */
 char f(void);

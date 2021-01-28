@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -absolute-valid-range 32-36
+   OPT: -eva @EVA_CONFIG@ -absolute-valid-range 32-36
 */
 
 char t[5];

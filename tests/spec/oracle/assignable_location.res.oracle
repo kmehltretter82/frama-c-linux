@@ -1,90 +1,26 @@
-<<<<<<< HEAD
 [kernel] Parsing assignable_location.i (no preprocessing)
-[kernel:annot-error] assignable_location.i:36: Warning: unexpected token ';'
-[kernel:annot-error] assignable_location.i:28: Warning: 
-||||||| ac7807782d
-[kernel] Parsing tests/spec/assignable_location.i (no preprocessing)
-[kernel:annot-error] tests/spec/assignable_location.i:36: Warning: 
-  unexpected token ';'
-[kernel:annot-error] tests/spec/assignable_location.i:28: Warning: 
-=======
-[kernel] Parsing tests/spec/assignable_location.i (no preprocessing)
-[kernel:annot-error] tests/spec/assignable_location.i:43: Warning: 
-  unexpected token ';'
-[kernel:annot-error] tests/spec/assignable_location.i:35: Warning: 
->>>>>>> origin/master
-  not an addressable left value: \result. Ignoring logic specification of function annotations_to_reject
-<<<<<<< HEAD
-[kernel:annot-error] assignable_location.i:30: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:30: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:37: Warning: 
->>>>>>> origin/master
-  not an assignable left value: *t. Ignoring code annotation
-<<<<<<< HEAD
-[kernel:annot-error] assignable_location.i:31: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:31: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:38: Warning: 
->>>>>>> origin/master
-  not an assignable left value: *(t + 0). Ignoring code annotation
-<<<<<<< HEAD
-[kernel:annot-error] assignable_location.i:32: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:32: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:39: Warning: 
->>>>>>> origin/master
-  not an assignable left value: *(t + (0 .. 0)). Ignoring code annotation
-<<<<<<< HEAD
-[kernel:annot-error] assignable_location.i:33: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:33: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:40: Warning: 
->>>>>>> origin/master
-  not an assignable left value: (int)x. Ignoring code annotation
-<<<<<<< HEAD
-[kernel:annot-error] assignable_location.i:34: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:34: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:41: Warning: 
->>>>>>> origin/master
-  not an assignable left value: (char)x. Ignoring code annotation
-<<<<<<< HEAD
+[kernel:annot-error] assignable_location.i:43: Warning: unexpected token ';'
 [kernel:annot-error] assignable_location.i:35: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:35: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:42: Warning: 
->>>>>>> origin/master
-  not an addressable left value: (char)x. Ignoring code annotation
-<<<<<<< HEAD
+  not an addressable left value: \result. Ignoring logic specification of function annotations_to_reject
 [kernel:annot-error] assignable_location.i:37: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:37: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:44: Warning: 
->>>>>>> origin/master
-  not an addressable left value: \empty. Ignoring code annotation
-<<<<<<< HEAD
+  not an assignable left value: *t. Ignoring code annotation
 [kernel:annot-error] assignable_location.i:38: Warning: 
-  not an assignable left value: lx. Ignoring code annotation
+  not an assignable left value: *(t + 0). Ignoring code annotation
 [kernel:annot-error] assignable_location.i:39: Warning: 
-||||||| ac7807782d
-[kernel:annot-error] tests/spec/assignable_location.i:38: Warning: 
+  not an assignable left value: *(t + (0 .. 0)). Ignoring code annotation
+[kernel:annot-error] assignable_location.i:40: Warning: 
+  not an assignable left value: (int)x. Ignoring code annotation
+[kernel:annot-error] assignable_location.i:41: Warning: 
+  not an assignable left value: (char)x. Ignoring code annotation
+[kernel:annot-error] assignable_location.i:42: Warning: 
+  not an addressable left value: (char)x. Ignoring code annotation
+[kernel:annot-error] assignable_location.i:44: Warning: 
+  not an addressable left value: \empty. Ignoring code annotation
+[kernel:annot-error] assignable_location.i:45: Warning: 
   not an assignable left value: lx. Ignoring code annotation
-[kernel:annot-error] tests/spec/assignable_location.i:39: Warning: 
-=======
-[kernel:annot-error] tests/spec/assignable_location.i:45: Warning: 
->>>>>>> origin/master
-  not an assignable left value: lx. Ignoring code annotation
-[kernel:annot-error] tests/spec/assignable_location.i:46: Warning: 
+[kernel:annot-error] assignable_location.i:46: Warning: 
   not a valid dependency: lx. Ignoring code annotation
-[kernel:annot-error] tests/spec/assignable_location.i:50: Warning: 
+[kernel:annot-error] assignable_location.i:50: Warning: 
   unbound logic variable l. Ignoring logic specification of function from_address_to_reject
-[kernel:annot-error] tests/spec/assignable_location.i:53: Warning: 
+[kernel:annot-error] assignable_location.i:53: Warning: 
   not an addressable left value: lx. Ignoring code annotation

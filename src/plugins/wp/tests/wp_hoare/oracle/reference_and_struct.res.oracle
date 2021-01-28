@@ -251,19 +251,19 @@ Goal Assigns (file reference_and_struct.i, line 12) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_hoare/reference_and_struct.i:15: Warning: 
+[wp] reference_and_struct.i:15: Warning: 
   Memory model hypotheses for function 'reset':
   /*@ behavior wp_typed_ref:
         requires \valid(p); */
   void reset(struct T *p);
-[wp] tests/wp_hoare/reference_and_struct.i:48: Warning: 
+[wp] reference_and_struct.i:48: Warning: 
   Memory model hypotheses for function 'call_reset_5_tps':
   /*@
      behavior wp_typed_ref:
        requires \separated((struct T **)tps + (..), tps[9] + (0 .. 4));
      */
   void call_reset_5_tps(void);
-[wp] tests/wp_hoare/reference_and_struct.i:88: Warning: 
+[wp] reference_and_struct.i:88: Warning: 
   Memory model hypotheses for function 'load_5':
   /*@
      behavior wp_typed_ref:

@@ -1,3 +1,8 @@
+/* run.config
+  EXIT: 1
+*/
+
+
 int a, b, c, d, e;
 
 // Reminder: assigns are visited in reverse

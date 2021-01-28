@@ -154,7 +154,7 @@ Effect at line 24
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_usage/caveat_range.i:16: Warning: 
+[wp] caveat_range.i:16: Warning: 
   Memory model hypotheses for function 'reset':
   /*@ behavior wp_typed_caveat:
         requires \valid(p + (..)); */

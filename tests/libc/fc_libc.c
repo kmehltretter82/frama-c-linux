@@ -1,5 +1,4 @@
 /* run.config*
-<<<<<<< HEAD
    CMXS: check_libc_naming_conventions
    CMXS: check_const
    CMXS: check_parsing_individual_headers
@@ -13,31 +12,6 @@
    OPT: -load-module %{dep:check_compliance.cmxs} -kernel-msg-key printer:attrs
    DEPS: ./check_full_libc.sh
    CMD: ./check_full_libc.sh
-||||||| ac7807782d
-   EXECNOW: make -s @PTEST_DIR@/check_libc_naming_conventions.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_const.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_libc_anonymous_tags.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_compliance.cmxs
-   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
-   OPT: -print -print-libc
-   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
-   OPT: -load-module @PTEST_DIR@/check_libc_anonymous_tags
-   OPT: -load-module @PTEST_DIR@/check_compliance -kernel-msg-key printer:attrs
-   CMD: ./tests/libc/check_full_libc.sh
-=======
-   EXECNOW: make -s @PTEST_DIR@/check_libc_naming_conventions.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_const.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_parsing_individual_headers.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_libc_anonymous_tags.cmxs
-   EXECNOW: make -s @PTEST_DIR@/check_compliance.cmxs
-   OPT: -load-module @PTEST_DIR@/check_libc_naming_conventions -print -cpp-extra-args='-nostdinc -Ishare/libc' -metrics -metrics-libc -load-module @PTEST_DIR@/check_const -load-module metrics -eva @EVA_CONFIG@ -then -lib-entry -no-print -metrics-no-libc
-   OPT: -print -print-libc -machdep x86_32
-   OPT: -load-module @PTEST_DIR@/check_parsing_individual_headers
-   OPT: -load-module @PTEST_DIR@/check_libc_anonymous_tags
-   OPT: -load-module @PTEST_DIR@/check_compliance -kernel-msg-key printer:attrs
-   CMD: ./tests/libc/check_full_libc.sh
->>>>>>> origin/master
    OPT:
 **/
 #define __FC_REG_TEST

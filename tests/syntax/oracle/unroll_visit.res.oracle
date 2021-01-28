@@ -4,16 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-<<<<<<< HEAD
 [eva] unroll_visit.i:10: assertion got status valid.
 [eva] unroll_visit.i:8: starting to merge loop iterations
-||||||| ac7807782d
-[eva] tests/syntax/unroll_visit.i:8: assertion got status valid.
-[eva] tests/syntax/unroll_visit.i:6: starting to merge loop iterations
-=======
-[eva] tests/syntax/unroll_visit.i:9: assertion got status valid.
-[eva] tests/syntax/unroll_visit.i:7: starting to merge loop iterations
->>>>>>> origin/master
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -34,76 +26,26 @@
 typedef char i8;
 void main(void)
 {
-<<<<<<< HEAD
-  i8 i = (char)0;
-  if (! ((int)i < 100)) goto unrolling_2_loop;
-  i = (i8)((int)i - 1);
-||||||| ac7807782d
-  int i = 0;
-  if (! (i < 100)) goto unrolling_2_loop;
-  i --;
-=======
   i8 i = (char)0;
   if (! ((int)i < 100)) goto unrolling_2_loop;
   i = (char)((int)i - 1);
->>>>>>> origin/master
   /*@ assert i < 100; */ ;
-<<<<<<< HEAD
-  i = (i8)((int)i + 1);
-  i = (i8)((int)i + 1);
-||||||| ac7807782d
-  i ++;
-  i ++;
-=======
   i = (char)((int)i + 1);
   i = (char)((int)i + 1);
->>>>>>> origin/master
   unrolling_4_loop: ;
-<<<<<<< HEAD
-  if (! ((int)i < 100)) goto unrolling_2_loop;
-  i = (i8)((int)i - 1);
-||||||| ac7807782d
-  if (! (i < 100)) goto unrolling_2_loop;
-  i --;
-=======
   if (! ((int)i < 100)) goto unrolling_2_loop;
   i = (char)((int)i - 1);
->>>>>>> origin/master
   /*@ assert i < 100; */ ;
-<<<<<<< HEAD
-  i = (i8)((int)i + 1);
-  i = (i8)((int)i + 1);
-||||||| ac7807782d
-  i ++;
-  i ++;
-=======
   i = (char)((int)i + 1);
   i = (char)((int)i + 1);
->>>>>>> origin/master
   unrolling_3_loop: ;
   /*@ loop pragma UNROLL 2;
       loop pragma UNROLL "done", 2; */
-<<<<<<< HEAD
-  while ((int)i < 100) {
-    i = (i8)((int)i - 1);
-||||||| ac7807782d
-  while (i < 100) {
-    i --;
-=======
   while ((int)i < 100) {
     i = (char)((int)i - 1);
->>>>>>> origin/master
     /*@ assert i < 100; */ ;
-<<<<<<< HEAD
-    i = (i8)((int)i + 1);
-    i = (i8)((int)i + 1);
-||||||| ac7807782d
-    i ++;
-    i ++;
-=======
     i = (char)((int)i + 1);
     i = (char)((int)i + 1);
->>>>>>> origin/master
   }
   unrolling_2_loop: ;
   return;

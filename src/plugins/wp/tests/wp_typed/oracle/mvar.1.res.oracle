@@ -18,7 +18,7 @@ Assume {
 Prove: P_equal(1, 1).
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/mvar.i:8: Warning: 
+[wp] mvar.i:8: Warning: 
   Memory model hypotheses for function 'Write':
   /*@
      behavior wp_typed_ref:

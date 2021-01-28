@@ -52,7 +52,7 @@
 [wp] Goal typed_ref_equal_elements_loop_variant_positive : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_positive : not tried
-[wp] tests/wp_gallery/frama_c_exo3_solved.old.c:73: Warning: 
+[wp] frama_c_exo3_solved.old.c:73: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@
      behavior wp_typed_ref:

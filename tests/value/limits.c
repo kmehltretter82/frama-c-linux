@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_OPTIONS@ -warn-signed-overflow
+   OPT: -eva @EVA_CONFIG@ -warn-signed-overflow
 */
 
 #include <limits.h>

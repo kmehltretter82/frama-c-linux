@@ -1,11 +1,5 @@
 /* run.config
-<<<<<<< HEAD
-   CMD: @frama-c@ -wp -wp-prover none -wp-msg-key shell -wp-msg-key rte @OPTIONS@ -wp-warn-key "pedantic-assigns=inactive"
-||||||| ac7807782d
-   CMD: @frama-c@ -wp -wp-prover none -wp-share ./share -wp-msg-key shell -wp-msg-key rte
-=======
-   CMD: @frama-c@ -wp -wp-prover none -wp-share ./share -wp-msg-key shell,rte -wp-warn-key "pedantic-assigns=inactive"
->>>>>>> origin/master
+   CMD: @frama-c@ -wp -wp-prover none -wp-msg-key shell -wp-msg-key rte -wp-warn-key "pedantic-assigns=inactive" @OPTIONS@
    OPT: -wp-rte -no-warn-invalid-bool -then -print -no-unicode
    OPT: -wp-rte -no-warn-signed-overflow -then -print -no-unicode
    OPT: -wp-rte -warn-unsigned-overflow -then -print -no-unicode

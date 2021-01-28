@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -print -eva @EVA_OPTIONS@ -machdep x86_16
+   OPT: -print -eva @EVA_CONFIG@ -machdep x86_16
 */
 
 

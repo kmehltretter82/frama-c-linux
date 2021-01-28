@@ -55,7 +55,7 @@ Prove: (Init_0[px_0]=true).
   Function ptr_on_local
 ------------------------------------------------------------
 
-Goal Assertion 'provable' (file tests/wp_acsl/initialized_memtyped.i, line 89):
+Goal Assertion 'provable' (file initialized_memtyped.i, line 89):
 Let a = global(L_x_63).
 Assume {
   (* Heap *)

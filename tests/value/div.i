@@ -1,14 +1,6 @@
 /* run.config*
-<<<<<<< HEAD
    STDOPT: #"-eva-remove-redundant-alarms"
-   OPT: -machdep x86_32 -rte -then -eva @EVA_OPTIONS@
-||||||| ac7807782d
-   STDOPT: #"-load-module scope -eva-remove-redundant-alarms"
-   OPT: -no-autoload-plugins -load-module eva,inout -rte -then -eva @EVA_CONFIG@
-=======
-   STDOPT: #"-load-module scope -eva-remove-redundant-alarms"
-   OPT: -machdep x86_32 -no-autoload-plugins -load-module eva,inout -rte -then -eva @EVA_CONFIG@
->>>>>>> origin/master
+   OPT: -machdep x86_32 -rte -then -eva @EVA_CONFIG@
 */
 int X,Y,Z1,Z2,T,U1,U2,V,W1,W2;
 int a,b,d1,d2,d0,e;

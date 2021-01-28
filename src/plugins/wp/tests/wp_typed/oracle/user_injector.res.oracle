@@ -115,7 +115,7 @@ Effect at line 68
 Prove: true.
 
 ------------------------------------------------------------
-[wp] tests/wp_typed/user_injector.i:58: Warning: 
+[wp] user_injector.i:58: Warning: 
   Memory model hypotheses for function 'job':
   /*@
      behavior wp_typed:

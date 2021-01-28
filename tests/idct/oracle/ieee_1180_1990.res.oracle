@@ -3364,7 +3364,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 706)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 706)
             assigns \result \from f;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3390,7 +3390,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file share/libc/math.h, line 719)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 719)
             assigns \result \from d;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3413,13 +3413,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-<<<<<<< HEAD
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 724)
-||||||| ac7807782d
-[ Extern  ] Froms (file share/libc/math.h, line 724)
-=======
-[ Extern  ] Froms (file share/libc/math.h, line 746)
->>>>>>> origin/master
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 746)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -3436,13 +3430,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-<<<<<<< HEAD
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 730)
-||||||| ac7807782d
-[ Extern  ] Froms (file share/libc/math.h, line 730)
-=======
-[ Extern  ] Froms (file share/libc/math.h, line 752)
->>>>>>> origin/master
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 752)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
