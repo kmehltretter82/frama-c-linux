@@ -187,6 +187,8 @@ struct
            WpContext.on_context (model,WpContext.Kf mode.kf)
              begin fun () ->
                LogicUsage.iter_lemmas VCG.register_lemma ;
+               if WpRTE.missing_guards model mode.kf then
+                 warning ~current:false ~once:true "Missing RTE guards" ;
                let bhv =
                  if Cil.is_default_behavior mode.bhv then None
                  else Some mode.bhv.b_name in
