@@ -131,7 +131,10 @@ let print_global g =
 let print_std_includes fmt globs =
   if not (Kernel.PrintLibc.get ()) then begin
     let extract_file acc = function
-      | AStr s -> Datatype.String.Set.add s acc
+      | AStr s ->
+        (* These strings are filepaths, so we normalize and prettify them *)
+        let s = Filepath.Normalized.(to_pretty_string (of_string s)) in
+        Datatype.String.Set.add s acc
       | _ -> Kernel.warning "Unexpected attribute parameter for fc_stdlib"; acc
     in
     let add_file acc g =
